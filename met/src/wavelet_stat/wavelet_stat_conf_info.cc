@@ -466,9 +466,9 @@ void WaveletStatConfInfo::center_tiles(int nx, int ny) {
    m = min(nx, ny);
 
    i = 0;
-   while(pow(2.0, i) < m) i++;
+   while(pow(2.0, i) <= m) i++;
 
-   // Set the tile dimension to be the largest power of 2 < min(nx, ny)
+   // Set the tile dimension to be the largest power of 2 <= min(nx, ny)
    tile_dim = nint(pow(2.0, i-1));
 
    // Compute the number of tiles that will fit in the domain without

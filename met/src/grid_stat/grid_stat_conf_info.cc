@@ -188,7 +188,7 @@ void GridStatConfInfo::process_config() {
    // Parse the obs field information
    for(i=0; i<n_vx; i++) {
 
-      // If obs_field is emptpy, use fcst_field
+      // If obs_field is empty, use fcst_field
       if(conf.n_obs_field_elements() == 0) {
          obs_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
             conf.grib_ptv().ival());
@@ -386,7 +386,7 @@ void GridStatConfInfo::process_config() {
    //
 
    // Parse the fcst wind threshold information
-   for(i=0; i<n_wind_thresh; i++) {
+   for(i=0; i<conf.n_fcst_wind_thresh_elements(); i++) {
       fcst_wind_ta.add(conf.fcst_wind_thresh(i).sval());
    }
    n_wind_thresh = fcst_wind_ta.n_elements();

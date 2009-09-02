@@ -2249,7 +2249,8 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
          h_tab += 3.0*plot_text_sep;
 
          // Total Interest
-         sprintf(label, "%.4f", eng.info_clus[i].interest_value);
+         if(eng.info_clus[i].interest_value < 0) sprintf(label, na_str);
+         else sprintf(label, "%.4f", eng.info_clus[i].interest_value);
          p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
          h_tab += 3.0*plot_text_sep;
 

@@ -190,11 +190,11 @@ class GCPairData {
       //////////////////////////////////////////////////////////////////
 
       int      n_fcst;         // Number of fcst fields
-      NumArray fcst_prs_lvl;   // Array of pressure level values
+      NumArray fcst_lvl;       // Array of vertical levels
       WrfData  **fcst_wd_ptr;  // Array of pointers to the fcst data
 
       int      n_climo;        // Number of climo fields
-      NumArray climo_prs_lvl;  // Array of pressure level values
+      NumArray climo_lvl;      // Array of vertical levels
       WrfData  **climo_wd_ptr; // Array of pointers to the climo data
 
       //////////////////////////////////////////////////////////////////
@@ -225,11 +225,11 @@ class GCPairData {
       void set_interp_thresh(double);
 
       void set_n_fcst(int);
-      void set_fcst_prs_lvl(int, double);
+      void set_fcst_lvl(int, double);
       void set_fcst_wd_ptr(int, WrfData *);
 
       void set_n_climo(int);
-      void set_climo_prs_lvl(int, double);
+      void set_climo_lvl(int, double);
       void set_climo_wd_ptr(int, WrfData *);
 
       void set_beg_ut(const unixtime);
@@ -247,13 +247,14 @@ class GCPairData {
       void set_interp(int, InterpMthd, int);
 
       void add_obs(float *, char *, char *, unixtime, float *, Grid &);
-      void find_prs_lvl(int, double, int &, int &);
+      void find_vert_lvl(int, double, int &, int &);
 
       int  get_n_pair();
 
       double compute_interp(int, double, double, int, double, int, int);
       double compute_horz_interp(WrfData *, double, double, int, int);
-      double compute_vert_interp(double, double, double, double, double);
+      double compute_vert_pinterp(double, double, double, double, double);
+      double compute_vert_zinterp(double, double, double, double, double);
 };
 
 ////////////////////////////////////////////////////////////////////////

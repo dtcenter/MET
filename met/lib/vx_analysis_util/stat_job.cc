@@ -1179,7 +1179,7 @@ void STATAnalysisJob::open_dump_row_file() {
    dr_out = new ofstream;
    dr_out->open(dump_row);
 
-   if(!dr_out) {
+   if(!(*dr_out)) {
       cerr << "\n\nERROR: open_dump_row_file()-> "
            << "can't open the output file \"" << dump_row
            << "\" for writing!\n\n" << flush;

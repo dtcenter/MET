@@ -121,6 +121,11 @@ bool check_reg_exp(const char *reg_exp_str, const char *test_str)
 
    if( regexec(preg, test_str, 0, 0, 0) == 0 ) { valid = true; }
 
+   //
+   // Free allocated memory.
+   //
+   regfree( preg );
+
    return(valid);
 }
 
