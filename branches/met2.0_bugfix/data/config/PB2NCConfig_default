@@ -1,0 +1,222 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default pb2nc configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Stratify the observation data in the PrepBufr files in the following
+// ways:
+//  (1) by message type: supply a list of PrepBufr message types
+//      to retain (i.e. AIRCFT)
+//  (2) by station id: supply a list of observation stations to retain
+//  (3) by valid time: supply starting and ending times in form
+//      YYYY-MM-DD HH:MM:SS UTC
+//  (4) by location: supply either an NCEP masking grid, a masking
+//      lat/lon polygon or a file to a mask lat/lon polygon
+//  (5) by elevation: supply min/max elevation values
+//  (6) by report type (typ): supply a list of report types to retain
+//  (7) by instrument type (itp): supply a list of instrument type to
+//      retain
+//  (8) by vertical level: supply min/max vertical levels
+//  (9) by variable type: supply a list of variable types to retain
+//      P, Q, T, Z, U, V
+// (11) by quality mark: supply a quality mark threshold
+// (12) Flag to retain values for all quality marks, or just the first
+//      quality mark (highest)
+// (13) by data level category: supply a list of category types to
+//      retain.
+//
+//      0 - Surface level (mass reports only)
+//      1 - Mandatory level (upper-air profile reports)
+//      2 - Significant temperature level (upper-air profile reports)
+//      2 - Significant temperature and winds-by-pressure level
+//          (future combined mass and wind upper-air reports)
+//      3 - Winds-by-pressure level (upper-air profile reports)
+//      4 - Winds-by-height level (upper-air profile reports)
+//      5 - Tropopause level (upper-air profile reports)
+//      6 - Reports on a single level
+//          (e.g., aircraft, satellite-wind, surface wind,
+//           precipitable water retrievals, etc.)
+//      7 - Auxiliary levels generated via interpolation from spanning levels
+//          (upper-air profile reports)
+//
+
+//
+// Specify a comma-separated list of PrepBufr message type strings to retain.
+// An empty list indicates that all should be retained.
+// List of valid message types:
+//    ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
+//    MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
+//    SFCSHP SPSSMI SYNDAT VADWND
+//    ANYAIR (= AIRCAR, AIRCFT)
+//    ANYSFC (= ADPSFC, SFCSHP, ADPUPA, PROFLR)
+//    ONLYSF (= ADPSFC, SFCSHP)
+// http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+//
+// e.g. message_type[] = [ "ADPUPA", "AIRCAR" ];
+//
+message_type[] = [];
+
+//
+// Specify a comma-separated list of station ID strings to retain.
+// An empty list indicates that all should be retained.
+//
+// e.g. station_id[] = [ "KDEN" ];
+//
+station_id[] = [];
+
+//
+// Beginning and ending time offset values in seconds for observations
+// to retain.  The valid time window for retaining observations is
+// defined in reference to the observation time.  So observations with
+// a valid time falling in the window [obs_time+beg_ds, obs_time+end_ds]
+// will be retained.
+//
+beg_ds = -5400;
+end_ds =  5400;
+
+//
+// Specify the name of a single grid to be used in masking the data.
+// An empty string indicates that no grid should be used.  The standard
+// NCEP grids are named "GNNN" where NNN indicates the three digit grid number.
+//
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
+//
+// e.g. mask_grid = "G212";
+//
+mask_grid = "";
+
+//
+// Specify a single ASCII file containing a lat/lon polygon.
+// Latitude in degrees north and longitude in degrees east.
+// By default, the first and last polygon points are connected.
+//
+// The lat/lon polygon file should contain a name for the polygon
+// followed by a space-separated list of lat/lon points:
+//    "name lat1 lon1 lat2 lon2... latn lonn"
+//
+// MET_BASE may be used in the path for the lat/lon polygon file.
+//
+// e.g. mask_poly = "MET_BASE/data/poly/EAST.poly";
+//
+mask_poly = "";
+
+//
+// Beginning and ending elevation values in meters for observations
+// to retain.
+//
+beg_elev = -1000;
+end_elev = 100000;
+
+//
+// Specify a comma-separated list of PrepBufr report type values to retain.
+// An empty list indicates that all should be retained.
+//
+// http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
+//
+// e.g. pb_report_type[] = [ 120, 133 ];
+//
+pb_report_type[] = [];
+
+//
+// Specify a comma-separated list of input report type values to retain.
+// An empty list indicates that all should be retained.
+//
+// http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm
+//
+// e.g. in_report_type[] = [ 11, 22, 23 ];
+//
+in_report_type[] = [];
+
+//
+// Specify a comma-separated list of instrument type values to retain.
+// An empty list indicates that all should be retained.
+//
+// e.g. instrument_type[] = [ 52, 87 ];
+//
+instrument_type[] = [];
+
+//
+// Beginning and ending vertical levels to retain.
+//
+beg_level = 1;
+end_level = 255;
+
+//
+// Specify a comma-separated list of strings containing grib codes or
+// corresponding grib code abbreviations to retain or be derived from
+// the available observations.
+//
+// Grib Codes to be RETAINED:
+//    SPFH or 51 for Specific Humidity in kg/kg
+//    TMP  or 11 for Temperature in K
+//    HGT  or 7  for Height in meters
+//    UGRD or 33 for the East-West component of the wind in m/s
+//    VGRD or 34 for the North-South component of the wind in m/s
+//
+// Grib Codes to be DERIVED:
+//    DPT   or 17 for Dewpoint Temperature in K
+//    WIND  or 32 for Wind Speed in m/s
+//    RH    or 52 for Relative Humidity in %
+//    MIXR  or 53 for Humidity Mixing Ratio in kg/kg
+//    PRMSL or  2 for Pressure Reduced to Mean Sea Level in Pa
+//
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+// e.g. obs_grib_code[] = [ "TMP", "UGRD", "VGRD", "WIND" ];
+//
+obs_grib_code[] = [ "SPFH", "TMP", "HGT", "UGRD", "VGRD" ];
+
+//
+// Quality mark threshold to indicate which observations to retain.
+// Observations with a quality mark equal to or LESS THAN this threshold
+// will be retained, while observations with a quality mark GREATER THAN
+// this threshold will be discarded.
+// http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm
+//
+quality_mark_thresh = 2;
+
+//
+// Flag to indicate whether observations should be drawn from the top
+// of the event stack (most quality controlled) or the bottom of the
+// event stack (most raw).  A value of 1 indicates that the top of the
+// event stack should be used while a value of zero indicates that the
+// bottom should be used.
+//
+event_stack_flag = 1;
+
+//
+// Space comma-separated list of data level categorie values to retain,
+// where a value of:
+//    0 = Surface level (mass reports only)
+//    1 = Mandatory level (upper-air profile reports)
+//    2 = Significant temperature level (upper-air profile reports)
+//    2 = Significant temperature and winds-by-pressure level
+//        (future combined mass and wind upper-air reports)
+//    3 = Winds-by-pressure level (upper-air profile reports)
+//    4 = Winds-by-height level (upper-air profile reports)
+//    5 = Tropopause level (upper-air profile reports)
+//    6 = Reports on a single level
+//        (e.g., aircraft, satellite-wind, surface wind,
+//         precipitable water retrievals, etc.)
+//    7 = Auxiliary levels generated via interpolation from spanning levels
+//        (upper-air profile reports)
+// An empty list indicates that all should be retained.
+//
+// http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+//
+// e.g. level_category[] = [ 0, 1 ];
+//
+level_category[] = [];
+
+//
+// Directory where temp files should be written by the PB2NC tool
+//
+tmp_dir = "/tmp";
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V2.0";

@@ -1,0 +1,70 @@
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2005
+# ** University Corporation for Atmospheric Research(UCAR)
+# ** National Center for Atmospheric Research(NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+###############################################################################
+#
+# Makefile for the wavelet_stat application
+#
+###############################################################################
+
+TARGETS		= wavelet_stat
+
+OBJECTS		= wavelet_stat_Conf.o \
+		  wavelet_stat_conf_info.o
+
+OPT_FLAGS	=
+
+FAKES		= all clean objects targets
+
+LIB_DIR		= ../../lib
+
+INC_DIR		= ../../lib
+
+all:
+	@ echo
+	@ echo "*** Making wavelet_stat application ***"
+	@ echo
+	@ $(MAKE) objects $(PRINT_OPTS)
+	@ $(MAKE) targets $(PRINT_OPTS)
+	@ echo
+	@ echo "*** Finished Making wavelet_stat application ***"
+	@ echo
+
+objects: $(OBJECTS)
+	@ echo
+
+targets: $(TARGETS)
+	@ echo
+
+wavelet_stat: wavelet_stat.cc
+	@echo
+	$(CXX) -o $(TARGETS) wavelet_stat.cc $(OBJECTS) \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE)\" \
+	-I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
+	-L$(LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-lvx_met_util -lvx_wrfdata -lvx_contable \
+	-lvx_grib_classes -lvx_analysis_util \
+	-lvx_econfig -lvx_gsl_prob -lgsl \
+	-lvx_plot_util  -lvx_render -lvx_pxm -lvx_color -lvx_ps -lvx_afm \
+	-lvx_data_grids -lvx_gnomon -lvx_nav -lvx_cal -lvx_util -lvx_math -lm \
+	-lnetcdf_c++ -lnetcdf \
+	$(CXX_LIBS)
+	cp $(TARGETS) ../../bin/.
+
+wavelet_stat_Conf.o: wavelet_stat_Conf.cc
+	$(CXX) -c wavelet_stat_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) \
+	-I$(INC_DIR)
+
+wavelet_stat_conf_info.o: wavelet_stat_conf_info.cc
+	$(CXX) -c wavelet_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) \
+	-I$(INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
+
+clean:
+	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)
+
+.PHONY: $(FAKES)

@@ -1,0 +1,500 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default WrfMode configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Specify a name to designate the model being verified.  This name will be
+// written to the first column of the ASCII output generated.
+//
+model = "WRF";
+
+//
+// The nominal grid spacing in kilometers.  This value is used to provide
+// default configuration values for distance related parameters below.
+//
+grid_res = 40;
+
+//
+// Specify the fields to be used in the verification.  The forecast and
+// observation fields may be specified separately.
+//
+// Each field is specified as a grib code or corresponding grib code
+// abbreviation followed by an accumulation or vertical level indicator.
+//
+// Each verification field is specified as one of the following:
+//    GC/ANNN for accumulation interval NNN
+//    GC/ZNNN for vertical level NNN
+//    GC/PNNN for pressure level NNN in hPa
+//    GC/PNNN-NNN for a range of pressure levels in hPa
+//    GC/LNNN for a generic level type
+//    GC/RNNN for a specific GRIB record number
+//    Where GC is the number of or abbreviation for the grib code
+//    to be verified.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+// e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+//
+fcst_field = "APCP/A24";
+obs_field  = "APCP/A24";
+
+//
+// If the mask_missing_flag is set, the missing data in one field will
+// be used to mask the other field as follows:
+// (0) Do not apply
+// (1) Mask the forecast field with the missing data in the observation field
+// (2) Mask the observation field using the missing data in the forecast field
+// (3) Mask both fields using the missing data in the other field
+//
+mask_missing_flag = 3;
+
+//
+// Specify the name of a single grid to be used in masking the data.
+// An empty string indicates that no masking grid should be used.
+// The standard NCEP grids are named "GNNN" where NNN indicates the
+// three digit grid number.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
+//
+mask_grid = "";
+
+//
+// Flag to indicate how the mask_grid should be applied:
+// (0) Do not apply
+// (1) Apply masking grid to the forecast field only
+// (2) Apply masking grid to the observation field only
+// (3) Apply masking grid to both the forecast and observation fields
+//
+mask_grid_flag = 0;
+
+//
+// Specify a masking regions to be applied.
+// An empty list indicates that no additional masks should be used.
+// The masking region may be defined in one of 4 ways:
+//
+// (1) An ASCII file containing a lat/lon polygon.
+//     Latitude in degrees north and longitude in degrees east.
+//     By default, the first and last polygon points are connected.
+//     e.g. "MET_BASE/data/poly/EAST.poly" which consists of n points:
+//          "poly_name lat1 lon1 lat2 lon2... latn lonn"
+//
+// (2) The NetCDF output of the gen_poly_mask tool.
+//
+// (3) A NetCDF data file, followed by the name of the NetCDF variable
+//     to be used, and optionally, a threshold to be applied to the field.
+//     e.g. "sample.nc var_name gt0.00"
+//
+// (4) A GRIB data file, followed by a description of the field
+//     to be used, and optionally, a threshold to be applied to the field.
+//     e.g. "sample.grb APCP/A3 gt0.00"
+//
+// Any NetCDF or GRIB file used must have the same grid dimensions as the
+// data being verified.
+//
+// MET_BASE may be used in the path for the files above.
+//
+mask_poly = "";
+
+//
+// Flag to indicate how the mask_poly should be applied:
+// (0) Do not apply
+// (1) Apply masking polygon to the forecast field only
+// (2) Apply masking polygon to the observation field only
+// (3) Apply masking polygon to both the forecast and observation fields
+//
+mask_poly_flag = 0;
+
+/////////////////////////////////////////////////////////////////////////
+//
+// Object definition parameters
+//
+/////////////////////////////////////////////////////////////////////////
+
+//
+// Apply a threshold to the raw fcst and obs fields prior to defining
+// objects using the threshold values below.  The threshold values are
+// specified as "xxT" where T is the threshold value and xx is one of:
+//    'lt' for less than, 'le' for less than or equal to,
+//    'eq' for equal to, 'ne' for not equal to,
+//    'gt' for greater than, and 'ge' for greater than or equal to
+//
+fcst_raw_thresh   = "ge0.0";
+obs_raw_thresh    = "ge0.0";
+
+//
+// Radius (grid squares) for the circular convolution applied to the raw
+// fcst and obs fields.
+//
+fcst_conv_radius  = 5;
+obs_conv_radius   = 5;
+
+//
+// When performing the convolution step on points containing bad data,
+// compute a ratio of the number of bad data points to the total number
+// of points in the convolution area.  If that ratio is greater than this
+// threshold, set the convolved field value to bad data.  Otherwise, use
+// the computed convolution value.  Must be between 0 and 1.  Setting
+// this threshold to 0 will have the effect of masking out bad data
+// entirely from the object field.
+//
+bad_data_thresh   = 0.5;
+
+//
+// Apply a threshold to the convolved fcst and obs fields to define
+// objects using the threshold values below.  The threshold values are
+// specified as "xxT" where T is the threshold value and xx is one of:
+//    'lt' for less than, 'le' for less than or equal to,
+//    'eq' for equal to, 'ne' for not equal to,
+//    'gt' for greater than, and 'ge' for greater than or equal to
+//
+fcst_conv_thresh  = "ge5.0";
+obs_conv_thresh   = "ge5.0";
+
+//
+// Apply a threshold to the area (as a count of grid squares) of the
+// fcst and obs objects using the threshold values below.  Discard
+// objects which do not meet the area threshold criteria.  The
+// threshold values are specified as "xxT" where T is the threshold
+// value and xx is one of:
+//    'lt' for less than, 'le' for less than or equal to,
+//    'eq' for equal to, 'ne' for not equal to,
+//    'gt' for greater than, and 'ge' for greater than or equal to
+//
+fcst_area_thresh  = "ge10";
+obs_area_thresh   = "ge10";
+
+//
+// Define an intensity percentile for fcst and obs objects.  The
+// percentile values must be between 0 and 102.  Values between
+// 0 and 100 indicate the corresponding intensity percentile.  A value
+// of 101 indicates that the mean of the intensities should be used.
+// A value of 102 indicates that the sum of the intensities should be
+// used.  Apply a threshold to the percentile value chosen for the fcst
+// and obs objects using the threshold values below.  Discard objects
+// which do not meet the intensity percentile threshold criteria.  The
+// threshold values are specified as "xxT" where T is the threshold
+// value and xx is one of:
+//    'lt' for less than, 'le' for less than or equal to,
+//    'eq' for equal to, 'ne' for not equal to,
+//    'gt' for greater than, and 'ge' for greater than or equal to
+//
+fcst_inten_perc        = 100;
+fcst_inten_perc_thresh = "ge0.0";
+obs_inten_perc         = 100;
+obs_inten_perc_thresh  = "ge0.0";
+
+//
+// Apply a second threshold to the convolved fcst and obs fields to
+// assist in the merging process.  The original objects defined by the
+// fcst/obs_conv_thresh will be merged if they reside in the same
+// object defined by the fcst/obs_merge_thresh. The
+// fcst/obs_merge_thresh should be chosen to define objects which
+// wholly contain the original objects. The threshold values are
+// specified as "xxT" where T is the threshold value and xx is one of:
+//    'lt' for less than, 'le' for less than or equal to,
+//    'eq' for equal to, 'ne' for not equal to,
+//    'gt' for greater than, and 'ge' for greater than or equal to
+//
+// NOTE: The fcst/obs_merge_flags must be used to request this merging
+//       method.
+//
+fcst_merge_thresh = "ge1.25";
+obs_merge_thresh  = "ge1.25";
+
+/////////////////////////////////////////////////////////////////////////
+//
+// Merging/matching instructions
+//
+/////////////////////////////////////////////////////////////////////////
+
+//
+// Flag to indicate how merging will be performed in the forecast field:
+// (0) Perform no merging in the forecast field
+// (1) Use the double thresholding merging method only
+// (2) Use the fuzzy engine merging method only
+// (3) Use both the double thresholding and fuzzy engine merging methods
+//
+fcst_merge_flag = 0;
+
+//
+// Flag to indicate how merging will be performed in the observation field:
+// (0) Perform no merging in the observation field
+// (1) Use the double thresholding merging method only
+// (2) Use the fuzzy engine merging method only
+// (3) Use both the double thresholding and fuzzy engine merging methods
+//
+obs_merge_flag = 0;
+
+//
+// Flag to indicate what type of matching between the fcst and obs
+// fields is to be performed:
+// (0) Perform no matching
+// (1) Perform matching allowing additional merging in both fields
+// (2) Perform matching allowing additional merging of only fcst objects
+// (3) Perform matching allowing no additional merging
+//
+match_flag = 1;
+
+//
+// The total interest will not be computed for object pairs with
+// a centroid distance greater than this threshold (grid squares).
+//
+max_centroid_dist = 800/grid_res;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Fuzzy engine weights:
+// The weights need not sum to any particular value but must be
+// non-negative.  When computing a total interest value, the weights
+// are normalized by their sum.
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// Weight for the distance (grid squares) between centroids
+//
+centroid_dist_weight      = 2.0;
+
+//
+// Weight for the minimum distance (grid squares) between objects
+//
+boundary_dist_weight      = 4.0;
+
+//
+// Weight for the minimum distance (grid squares) between the convex
+// hulls of the objects
+//
+convex_hull_dist_weight   = 0.0;
+
+//
+// Weight for the difference in orientation angles (degrees) between
+// objects.  The difference will be between 0 and 90 degrees.
+//
+angle_diff_weight         = 1.0;
+
+//
+// Weight for the ratio of the objects' areas.  Area is defined as a
+// count of grid squares.
+//
+area_ratio_weight         = 1.0;
+
+//
+// Weight for the ratio of the objects' intersection divided by the
+// minimum of the areas of the two objects.
+//
+int_area_ratio_weight     = 2.0;
+
+//
+// Weight for the ratio of the objects' complexities.  Complexity of an
+// object is defined as:
+// (Area of Convex Hull - Area of Object)/(Area of Convex Hull)
+//
+complexity_ratio_weight   = 0.0;
+
+//
+// Percentile to be used in computing the intensity ratio attribute
+// below.  Percentile value must be between 0 and 100.
+//
+intensity_percentile      = 50;
+
+//
+// Weight for the ratio of the percentile intensities of the raw data
+// inside each object.
+//
+intensity_ratio_weight    = 0.0;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Attribute interest maps:
+// The following interest functions are piecewise linear functions
+// defined by their significant points.  An interest function is
+// defined for each of the weights listed above.
+//
+////////////////////////////////////////////////////////////////////////
+
+centroid_dist_if = {
+  (   0.0,          1.0 )
+  (  60.0/grid_res, 1.0 )
+  ( 600.0/grid_res, 0.0 )
+};
+
+boundary_dist_if = {
+  (   0.0,          1.0 )
+  ( 400.0/grid_res, 0.0 )
+};
+
+convex_hull_dist_if = {
+  (   0.0,          1.0 )
+  ( 400.0/grid_res, 0.0 )
+};
+
+angle_diff_if = {
+   (  0.0, 1.0 )
+   ( 30.0, 1.0 )
+   ( 90.0, 0.0 )
+};
+
+corner = 0.8;
+ratio_if = {
+   ( 0.0,    0.0 )
+   ( corner, 1.0 )
+   ( 1.0,    1.0 )
+};
+
+area_ratio_if(x) = ratio_if(x);
+
+int_area_ratio_if = {
+   ( 0.00, 0.00 )
+   ( 0.10, 0.50 )
+   ( 0.25, 1.00 )
+   ( 1.00, 1.00 )
+};
+
+complexity_ratio_if(x) = ratio_if(x);
+
+intensity_ratio_if(x) = ratio_if(x);
+
+////////////////////////////////////////////////////////////////////////
+//
+// Confidence maps:
+// Confidence functions are applied to a handful of the attribute
+// comparisons to indicate when an attribute comparison is meaningful.
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// Aspect ratio confidence is applied to the angle difference attribute.
+// An aspect ratio near one indicates the object is nearly circular, so
+// we have lower confidence in it's orientation angle.
+//
+aspect_ratio_conf(t) = ( (t - 1)^2/(t^2 + 1) )^0.3;
+
+//
+// The area ratio confidence is applied to the centroid distance
+// attribute.  For two objects which are very different in size,
+// meaning their area ratio is close to zero, we have lower confidence
+// in the importance of the distance between their centroids.
+//
+area_ratio_conf(t) = t;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Interest threshold
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// Apply a total interest threshold to the object pair interest values
+// to determine which objects should be merged/matched.  Object pairs
+// with a total interest greater than or equal to this threshold will
+// be matched/merged.  Must be between 0 and 1.
+//
+total_interest_thresh  = 0.7;
+
+//
+// Print out only the object pair attributes to the statistics file
+// when the object pair has an interest value greater than or equal to
+// this threshold.  Must be between 0 and 1.
+//
+print_interest_thresh  = 0.0;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Plotting Information
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// The location of the data directory containing data files used for
+// plotting.
+//
+// MET_BASE may be used in the path for the data directory.
+//
+met_data_dir = "MET_BASE/data";
+
+//
+// Color table files to be used for plotting the raw forecast and
+// observation fields. If the values in these color tables range from
+// 0 to 1, the colors will be rescaled to match the range of the raw
+// data.  Otherwise, the values specified in the colortable will be used.
+// Use a value of -9999 to specify a color for the missing data other
+// than the default of white.
+//
+// MET_BASE may be used in the path for the colortable file.
+//
+fcst_raw_color_table = "MET_BASE/data/colortables/met_default.ctable";
+obs_raw_color_table  = "MET_BASE/data/colortables/met_default.ctable";
+
+//
+// Min and max raw data values to be plotted for the forecast and
+// observation fields.  If set to non-zero values, the forecast and
+// observation raw color tables specified above will be rescaled to
+// match the specified range.
+//
+fcst_raw_plot_min = 0.0;
+fcst_raw_plot_max = 0.0;
+obs_raw_plot_min  = 0.0;
+obs_raw_plot_max  = 0.0;
+
+//
+// The stride length value is used when plotting the colorbar to
+// display the entries in the colortable.  A value of 1 indicates that
+// every colortable value should be plotted, while a value of n (>1),
+// indicates that every nth colortable value should be plotted.
+//
+stride_length = 1;
+
+//
+// Color table file to be used for plotting object colors.
+//
+// MET_BASE may be used in the path for the colortable file.
+//
+mode_color_table = "MET_BASE/data/colortables/mode_obj.ctable";
+
+//
+// Number of grid boxes to fill with bad data values along the edge of
+// the field to avoid edge effects.
+//
+zero_border_size = 1;
+
+//
+// If the raw_valid_flag is set, only the region containing valid data
+// after the masking is applied will be plotted:
+// (0) Plot the entire domain of the data
+// (1) Plot only the region containing valid data after masking
+//
+plot_valid_flag = 0;
+
+//
+// If the plot_gcarc_flag is set, polyline edges will be plotted as
+// great circle arcs as opposed to straight lines in the grid:
+// (0) Plot polylines using straight lines in the grid
+// (1) Plot polylines using great circle arcs
+//
+plot_gcarc_flag = 0;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Misc
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// Specify the GRIB Table 2 parameter table version number to be used
+// for interpreting GRIB codes.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+grib_ptv = 2;
+
+//
+// Prefix to be used for the output file names.
+//
+output_prefix = "";
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V2.0";
+
+////////////////////////////////////////////////////////////////////////
