@@ -843,7 +843,8 @@ void read_pds(GribRecord &r, int &bms_flag,
    //
    // Check PDS for the initialization time
    //
-   init_ut = mdyhms_to_unix(r.pds->month, r.pds->day, r.pds->year + 2000,
+   init_ut = mdyhms_to_unix(r.pds->month, r.pds->day,
+                            r.pds->year + (r.pds->century - 1)*100,
                             r.pds->hour, r.pds->minute, 0);
 
    //
@@ -1310,6 +1311,10 @@ int is_grid_relative(const GribRecord &r) {
    // LatLonGrid
    if(r.gds->type == 0) {
       res_flag = r.gds->grid_type.latlon_grid.res_flag;
+   }
+   // Mercator
+   else if(r.gds->type == 1) {
+      res_flag = r.gds->grid_type.mercator.res_flag;
    }
    // LambertConf
    else if(r.gds->type == 3) {

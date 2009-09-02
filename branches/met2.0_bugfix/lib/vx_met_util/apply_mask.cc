@@ -46,22 +46,22 @@ void parse_grid_mask(const char *mask_grid_str, const Grid &grid,
    strcpy(mask_name, mask_grid_str);
 
    //
-   // Search for the special full domain string
+   // Check to make sure that we're not using the full domain
    //
-   if(strcmp(full_domain_str, mask_grid_str) == 0) {
-      mask_grid = grid;
-   }
-   //
-   // Otherwise, search for the predefined grids
-   //
-   else if(find_grid(mask_name, mask_grid) != 0) {
-      cerr << "\n\nERROR: parse_grid_mask() -> "
-           << "the mask_grid requested \"" << mask_grid_str
-           << "\" is not defined.\n\n" << flush;
-      exit(1);
-   }
+   if(strcmp(full_domain_str, mask_grid_str) != 0) {
 
-   apply_grid_mask(&grid, &mask_grid, mask_wd, 0);
+      //
+      // Search for the grid name in the predefined grids
+      //
+      if(find_grid(mask_name, mask_grid) != 0) {
+         cerr << "\n\nERROR: parse_grid_mask() -> "
+              << "the mask_grid requested \"" << mask_grid_str
+              << "\" is not defined.\n\n" << flush;
+         exit(1);
+      }
+
+      apply_grid_mask(&grid, &mask_grid, mask_wd, 0);
+   }
 
    return;
 }

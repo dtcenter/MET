@@ -1934,10 +1934,10 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
 
    // Compute observation standard deviation
    if(!aflag) cnt_info.ostdev.v = compute_stdev(s.obar*s.scount,
-                                                s.fobar*s.scount,
+                                                s.oobar*s.scount,
                                                 s.scount);
    else       cnt_info.ostdev.v = compute_stdev(s.oabar*s.sacount,
-                                                s.foabar*s.sacount,
+                                                s.ooabar*s.sacount,
                                                 s.sacount);
 
    // Compute f*o mean
@@ -1968,6 +1968,9 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
                           (  (cnt_info.n*cnt_info.fobar*cnt_info.n)
                           - (cnt_info.fbar.v*cnt_info.n*cnt_info.obar.v*cnt_info.n))
                           /den;
+
+   // Check that the correlation is not bigger than 1
+   if(cnt_info.pr_corr.v > 1) cnt_info.pr_corr.v = bad_data_double;
 
    // Compute mean error
    cnt_info.me.v = cnt_info.fbar.v - cnt_info.obar.v;
@@ -2849,13 +2852,17 @@ void dbl_to_str(double v, char *v_str, int precision) {
 ////////////////////////////////////////////////////////////////////////
 
 double compute_stdev(double sum, double sum_sq, int n) {
-   double sigma;
+   double sigma, v;
 
    if(n <= 1) {
       sigma = bad_data_double;
    }
    else {
-      sigma = sqrt((sum_sq - sum*sum/(double) n)/((double) (n - 1)));
+
+      v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
+
+      if(v < 0) sigma = bad_data_double;
+      else      sigma = sqrt(v);
    }
 
    return(sigma);
@@ -3711,3 +3718,4 @@ int is_precip_code(int gc) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
