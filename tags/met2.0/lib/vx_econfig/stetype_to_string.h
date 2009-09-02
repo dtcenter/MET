@@ -1,0 +1,50 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2007
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Warning:
+   //
+   //    This file is machine generated.
+   //
+   //    Do not edit by hand.
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#ifndef  __STETYPE_TO_STRING__
+#define  __STETYPE_TO_STRING__
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include "symtab.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern void stetype_to_string(const SteType, char * out);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   //  __STETYPE_TO_STRING__
+
+
+////////////////////////////////////////////////////////////////////////
+
+
