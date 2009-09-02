@@ -351,8 +351,8 @@ class Engine {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-extern double total_interest(WrfMode_Conf &, const PairFeature &);
-extern double total_interest_print(WrfMode_Conf &, const PairFeature &, ostream *);
+extern double total_interest(WrfMode_Conf &, int, const PairFeature &);
+extern double total_interest_print(WrfMode_Conf &, int, const PairFeature &, ostream *);
 extern double interest_percentile(Engine &, const double, const int);
 
 extern void write_engine_stats(Engine &, const Grid &, AsciiTable &);

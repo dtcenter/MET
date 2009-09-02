@@ -357,12 +357,11 @@ void set_out_file(const char *path) {
    sa_out = new ofstream;
    sa_out->open(out_file);
 
-   if(!sa_out) {
+   if(!(*sa_out)) {
       cerr << "\n\nERROR: set_out_file()-> "
            << "can't open the output file \"" << out_file
            << "\" for writing!\n\n" << flush;
-
-      throw(1);
+      exit(1);
    }
 
    if(verbosity > 0) {

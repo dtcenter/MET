@@ -47,6 +47,7 @@
 //                    determine the input file types.
 //   013    03/13/09  Halley Gotway  Add support for verifying
 //                    probabilistic forecasts.
+//   014    04/21/09  Halley Gotway  Fix bug for resetting obs_var.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -662,9 +663,16 @@ void process_grib_codes() {
          }
          // GRIB format
          else {
-            gc_info       = conf_info.gc_pd[i].fcst_gci;
-            gc_info.lvl_1 = fcst_lvl[j];
-            gc_info.lvl_2 = fcst_lvl[j];
+
+            // Initialize the GCInfo object
+            gc_info = conf_info.gc_pd[i].fcst_gci;
+
+            // When retrieving multiple single records, set the current
+            // level value for the record to retrieve.
+            if(n_fcst_rec > 1) {
+               gc_info.lvl_1 = fcst_lvl[j];
+               gc_info.lvl_2 = fcst_lvl[j];
+            }
 
             status = get_grib_record(fcst_gb_file, rec,
                                      gc_info, fcst_wd[i][j],
@@ -696,7 +704,7 @@ void process_grib_codes() {
          }
 
          // Store information for the raw forecast fields
-         conf_info.gc_pd[i].set_fcst_prs_lvl(j, fcst_lvl[j]);
+         conf_info.gc_pd[i].set_fcst_lvl(j, fcst_lvl[j]);
          conf_info.gc_pd[i].set_fcst_wd_ptr(j, &fcst_wd[i][j]);
       } // end for j
 
@@ -773,7 +781,7 @@ void process_grib_codes() {
          }
 
          // Store information for the raw climo fields
-         conf_info.gc_pd[i].set_climo_prs_lvl(j, climo_lvl[j]);
+         conf_info.gc_pd[i].set_climo_lvl(j, climo_lvl[j]);
          conf_info.gc_pd[i].set_climo_wd_ptr(j, &climo_wd[i][j]);
 
       } // end for j
@@ -1224,7 +1232,7 @@ void process_scores() {
                   shc.set_fcst_var(conf_info.gc_pd[i].fcst_gci.abbr_str.text());
 
                   // Reset the observation variable name
-                  shc.set_fcst_lev(conf_info.gc_pd[i].fcst_gci.lvl_str.text());
+                  shc.set_obs_var(conf_info.gc_pd[i].obs_gci.abbr_str.text());
 
                } // end Compute VL1L2 and VAL1L2
 

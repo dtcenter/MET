@@ -427,6 +427,14 @@ void open_txt_file(ofstream *&out, const char *file_name,
    // Create and open the output file stream
    out = new ofstream;
    out->open(file_name);
+
+   if(!(*out)) {
+      cerr << "\n\nERROR: open_txt_file()-> "
+           << "can't open the output file \"" << file_name
+           << "\" for writing!\n\n" << flush;
+      exit(1);
+   }
+
    out->setf(ios::fixed);
 
    return;

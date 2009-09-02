@@ -908,7 +908,7 @@ void Engine::do_match_merge() {
          info[n].fcst_number    = (j+1);
          info[n].obs_number     = (k+1);
          info[n].pair_number    = n;
-         info[n].interest_value = total_interest(wconf, pair[n]);
+         info[n].interest_value = total_interest(wconf, 1, pair[n]);
       }
    }
 
@@ -1686,7 +1686,7 @@ void Engine::do_match_fcst_merge() {
          info[n].fcst_number    = (j+1);
          info[n].obs_number     = (k+1);
          info[n].pair_number    = n;
-         info[n].interest_value = total_interest(wconf, pair[n]);
+         info[n].interest_value = total_interest(wconf, 1, pair[n]);
       }
    }
 
@@ -1852,7 +1852,7 @@ void Engine::do_match_only() {
          info[n].fcst_number    = (j+1);
          info[n].obs_number     = (k+1);
          info[n].pair_number    = n;
-         info[n].interest_value = total_interest(wconf, pair[n]);
+         info[n].interest_value = total_interest(wconf, 1, pair[n]);
       }
    }
 
@@ -2073,7 +2073,7 @@ void Engine::do_cluster_features() {
       info_clus[j].fcst_number    = (j+1);
       info_clus[j].obs_number     = (j+1);
       info_clus[j].pair_number    = j;
-      info_clus[j].interest_value = total_interest(wconf, pair_clus[j]);
+      info_clus[j].interest_value = total_interest(wconf, 0, pair_clus[j]);
    }
 
    //
@@ -2196,17 +2196,19 @@ int Engine::get_unmatched_obs(int area) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-double total_interest(WrfMode_Conf &fm, const PairFeature &p) {
+double total_interest(WrfMode_Conf &wmc, int dist_flag,
+                      const PairFeature &p) {
    double t;
 
-   t = total_interest_print(fm, p, (ostream *) 0);
+   t = total_interest_print(wmc, dist_flag, p, (ostream *) 0);
 
    return(t);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-double total_interest_print(WrfMode_Conf &wmc, const PairFeature &p, ostream *out) {
+double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
+                            const PairFeature &p, ostream *out) {
    double attribute;
    double interest, weight;
    double confidence;
@@ -2218,12 +2220,12 @@ double total_interest_print(WrfMode_Conf &wmc, const PairFeature &p, ostream *ou
 
    ////////////////////////////////////////////////////////////////////
    //
-   // Check for centroid distance too large, if it is don't compute
-   // the interest for this pair
+   // If the distance flag is set and the centroid distance is too
+   // large, don't compute the interest for this pair.
    //
    ////////////////////////////////////////////////////////////////////
 
-   if(p.centroid_dist > wmc.max_centroid_dist().ival()) {
+   if(dist_flag && p.centroid_dist > wmc.max_centroid_dist().ival()) {
       total = bad_data_double;
 
       if(out) {

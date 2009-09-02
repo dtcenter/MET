@@ -166,8 +166,8 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
          // Check if a range of levels match
          //
          else if(grib_level_list[j].flag == 2 &&
-                 ((int) r.pds->level_info[1]) == l1 &&
-                 ((int) r.pds->level_info[0]) == l2) {
+                 ((int) r.pds->level_info[0]) == l1 &&
+                 ((int) r.pds->level_info[1]) == l2) {
             break;
          }
       }
@@ -236,11 +236,28 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
    }
 
    //
-   // l1 != l2, so find all GRIB records at levels within that range
-   // plus one level above and one level below
+   // If l1 != l2, attempt to find a single GRIB record containing this range
+   // of levels.
+   //
+   else if(l1 != l2 &&
+           (i_rec[0] = find_grib_record(grib_file, gc_tmp)) >= 0) {
+
+      //
+      // Store the level as the midpoint
+      //
+      i_lvl[0] = nint((l1 + l2)/2.0);
+      n_rec = 1;
+   }
+
+   //
+   // If l1 != l2 and there's no single matching GRIB record, find all GRIB
+   // records at levels within that range plus one level above and below.
    //
    else {
 
+      //
+      // Initialize
+      //
       rec_below = rec_above = -1;
       lvl_below = lvl_above = -1;
       dist_below = dist_above = 1.0e30;
@@ -843,7 +860,8 @@ void read_pds(GribRecord &r, int &bms_flag,
    //
    // Check PDS for the initialization time
    //
-   init_ut = mdyhms_to_unix(r.pds->month, r.pds->day, r.pds->year + 2000,
+   init_ut = mdyhms_to_unix(r.pds->month, r.pds->day,
+                            r.pds->year + (r.pds->century - 1)*100,
                             r.pds->hour, r.pds->minute, 0);
 
    //
@@ -1310,6 +1328,10 @@ int is_grid_relative(const GribRecord &r) {
    // LatLonGrid
    if(r.gds->type == 0) {
       res_flag = r.gds->grid_type.latlon_grid.res_flag;
+   }
+   // Mercator 
+   else if(r.gds->type == 1) {
+      res_flag = r.gds->grid_type.mercator.res_flag;
    }
    // LambertConf
    else if(r.gds->type == 3) {

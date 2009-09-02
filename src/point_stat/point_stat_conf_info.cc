@@ -175,16 +175,6 @@ void PointStatConfInfo::process_config() {
          exit(1);
       }
 
-      // Only support vertical levels at 0m, 2m, or 10m
-      if(gci.lvl_type == VertLevel &&
-         gci.lvl_1 != 0 && gci.lvl_1 != 2 && gci.lvl_1 != 10) {
-
-         cerr << "\n\nERROR: process_config() -> "
-              << "Only vertical level values of 2 and 10 meters "
-              << "are currently supported.\n\n"
-              << flush;
-         exit(1);
-      }
       gc_pd[i].set_fcst_gci(gci);
    }
 
@@ -226,16 +216,6 @@ void PointStatConfInfo::process_config() {
          exit(1);
       }
 
-      // Only support vertical levels at 0m, 2m, or 10m
-      if(gci.lvl_type == VertLevel &&
-         gci.lvl_1 != 0 && gci.lvl_1 != 2 && gci.lvl_1 != 10) {
-
-         cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
-              << "Only vertical level values of 2 and 10 meters "
-              << "are currently supported.\n\n"
-              << flush;
-         exit(1);
-      }
       gc_pd[i].set_obs_gci(gci);
 
       // Check the levels for the fcst and obs fields.  If the
