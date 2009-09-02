@@ -386,7 +386,7 @@ void GridStatConfInfo::process_config() {
    //
 
    // Parse the fcst wind threshold information
-   for(i=0; i<n_wind_thresh; i++) {
+   for(i=0; i<conf.n_fcst_wind_thresh_elements(); i++) {
       fcst_wind_ta.add(conf.fcst_wind_thresh(i).sval());
    }
    n_wind_thresh = fcst_wind_ta.n_elements();

@@ -47,6 +47,7 @@
 //                    determine the input file types.
 //   013    03/13/09  Halley Gotway  Add support for verifying
 //                    probabilistic forecasts.
+//   014    04/21/09  Halley Gotway  Fix bug for resetting obs_var.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1224,7 +1225,7 @@ void process_scores() {
                   shc.set_fcst_var(conf_info.gc_pd[i].fcst_gci.abbr_str.text());
 
                   // Reset the observation variable name
-                  shc.set_fcst_lev(conf_info.gc_pd[i].fcst_gci.lvl_str.text());
+                  shc.set_obs_var(conf_info.gc_pd[i].obs_gci.abbr_str.text());
 
                } // end Compute VL1L2 and VAL1L2
 
