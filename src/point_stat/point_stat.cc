@@ -337,9 +337,8 @@ void process_grid(WrfData &wd) {
 
       // Read the first GRIB record from the forecast file to extract
       // the grid information
-      read_grib_record(fcst_gb_file, rec, 0,
-                       conf_info.gc_pd[0].fcst_gci, wd, fcst_grid,
-                       verbosity);
+      read_single_grib_record(fcst_gb_file, rec, 0, wd, fcst_grid,
+                              verbosity);
    }
    // fcst_ftype == NcFileType
    else {
