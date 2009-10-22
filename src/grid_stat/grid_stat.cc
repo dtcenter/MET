@@ -47,6 +47,7 @@
 //                    Stat and move several functions to libraries.
 //   014    03/13/09  Halley Gotway  Add support for verifying
 //                    probabilistic forecasts.
+//   015    10/22/09  Halley Gotway  Fix output_flag cut and paste bug.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -828,7 +829,7 @@ void process_scores() {
                         if(nbrcts_info[n].cts_info.cts.n() > 0) {
 
                            // Write out NBRCTC
-                           if(conf_info.conf.output_flag(i_nbrcnt).ival()) {
+                           if(conf_info.conf.output_flag(i_nbrctc).ival()) {
 
                               write_nbrctc_row(shc, nbrcts_info[n],
                                  conf_info.conf.output_flag(i_nbrctc).ival(),
@@ -837,7 +838,7 @@ void process_scores() {
                            }
 
                            // Write out NBRCTS
-                           if(conf_info.conf.output_flag(i_nbrcnt).ival()) {
+                           if(conf_info.conf.output_flag(i_nbrcts).ival()) {
 
                               write_nbrcts_row(shc, nbrcts_info[n],
                                  conf_info.conf.output_flag(i_nbrcts).ival(),

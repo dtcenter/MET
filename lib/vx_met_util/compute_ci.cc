@@ -58,7 +58,7 @@ void compute_proportion_ci(double p, int n, double alpha, double &p_cl, double &
 ////////////////////////////////////////////////////////////////////////
 
 void compute_wald_ci(double p, int n, double alpha, double &p_cl, double &p_cu) {
-   double cv_normal_l, cv_normal_u;
+   double v, cv_normal_l, cv_normal_u;
 
    if(is_bad_data(p)) {
       p_cl = p_cu = bad_data_double;
@@ -75,8 +75,16 @@ void compute_wald_ci(double p, int n, double alpha, double &p_cl, double &p_cu) 
    //
    // Compute the upper and lower bounds of the confidence interval
    //
-   p_cl = p + cv_normal_l * sqrt(p*(1.0-p)/n);
-   p_cu = p + cv_normal_u * sqrt(p*(1.0-p)/n);
+   v = p*(1.0-p)/n;
+
+   if(v < 0.0) {
+      p_cl = bad_data_double;
+      p_cu = bad_data_double;
+   }
+   else {
+      p_cl = p + cv_normal_l * sqrt(v);
+      p_cu = p + cv_normal_u * sqrt(v);
+   }
 
    return;
 }
@@ -90,7 +98,7 @@ void compute_wald_ci(double p, int n, double alpha, double &p_cl, double &p_cu) 
 ////////////////////////////////////////////////////////////////////////
 
 void compute_wilson_ci(double p, int n, double alpha, double &p_cl, double &p_cu) {
-   double cv_normal_l, cv_normal_u;
+   double v, cv_normal_l, cv_normal_u;
 
    if(is_bad_data(p)) {
       p_cl = p_cu = bad_data_double;
@@ -107,14 +115,23 @@ void compute_wilson_ci(double p, int n, double alpha, double &p_cl, double &p_cu
    //
    // Compute the upper and lower bounds of the confidence interval
    //
-   p_cl = ( p
-            + (cv_normal_l*cv_normal_l)/(2.0*n)
-            + cv_normal_l * sqrt(p*(1.0-p)/n + cv_normal_l*cv_normal_l/(4*n*n)) )
-          / (1.0 + cv_normal_l*cv_normal_l/n);
-   p_cu = ( p
-            + (cv_normal_u*cv_normal_u)/(2.0*n)
-            + cv_normal_u * sqrt(p*(1.0-p)/n + cv_normal_u*cv_normal_u/(4*n*n)) )
+   v = p*(1.0-p)/n + cv_normal_l*cv_normal_l/(4*n*n);
+   if(v < 0.0) {
+      p_cl = bad_data_double;
+   }
+   else {
+      p_cl = ( p + (cv_normal_l*cv_normal_l)/(2.0*n) + cv_normal_l * sqrt(v) )
+             / (1.0 + cv_normal_l*cv_normal_l/n);
+   }
+
+   v = p*(1.0-p)/n + cv_normal_u*cv_normal_u/(4*n*n);
+   if(v < 0.0) {
+      p_cu = bad_data_double;
+   }
+   else {
+      p_cu = ( p + (cv_normal_u*cv_normal_u)/(2.0*n) + cv_normal_u * sqrt(v) )
           / (1.0 + cv_normal_u*cv_normal_u/n);
+   }
 
    return;
 }

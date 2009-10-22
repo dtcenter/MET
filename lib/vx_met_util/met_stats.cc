@@ -855,8 +855,7 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
    // Set the forecast and climatology levels above and below
    // the observation point to zero since we're looking at a single
    // level
-   else if(fcst_gci.lvl_type == VertLevel ||
-           fcst_gci.lvl_type == AccumLevel) {
+   else {
       fcst_lvl_below  = fcst_lvl_above  = 0;
       climo_lvl_below = climo_lvl_above = 0;
    }
@@ -1720,8 +1719,13 @@ void CNTInfo::compute_ci() {
       // Compute confidence interval for forecast standard deviation,
       // assuming normality of the forecast values
       //
-      fstdev.v_ncl[i] = sqrt((n-1)*fstdev.v*fstdev.v/cv_chi2_u);
-      fstdev.v_ncu[i] = sqrt((n-1)*fstdev.v*fstdev.v/cv_chi2_l);
+      v = (n-1)*fstdev.v*fstdev.v/cv_chi2_u;
+      if(v < 0) fstdev.v_ncl[i] = bad_data_double;
+      else      fstdev.v_ncl[i] = sqrt(v);
+
+      v = (n-1)*fstdev.v*fstdev.v/cv_chi2_l;
+      if(v < 0) fstdev.v_ncu[i] = bad_data_double;
+      else      fstdev.v_ncu[i] = sqrt(v);
 
       //
       // Compute confidence interval for observation mean
@@ -1733,13 +1737,19 @@ void CNTInfo::compute_ci() {
       // Compute confidence interval for observation standard deviation
       // assuming normality of the observation values
       //
-      ostdev.v_ncl[i] = sqrt((n-1)*ostdev.v*ostdev.v/cv_chi2_u);
-      ostdev.v_ncu[i] = sqrt((n-1)*ostdev.v*ostdev.v/cv_chi2_l);
+      v = (n-1)*ostdev.v*ostdev.v/cv_chi2_u;
+      if(v < 0) ostdev.v_ncl[i] = bad_data_double;
+      else      ostdev.v_ncl[i] = sqrt(v);
+
+      v = (n-1)*ostdev.v*ostdev.v/cv_chi2_l;
+      if(v < 0) ostdev.v_ncu[i] = bad_data_double;
+      else      ostdev.v_ncu[i] = sqrt(v);
 
       //
       // Compute confidence interval for the correlation coefficient
       //
-      if(is_bad_data(pr_corr.v) || n <= 3) {
+      if(is_bad_data(pr_corr.v) || n <= 3 ||
+         is_eq(pr_corr.v, 1.0) || is_eq(pr_corr.v, -1.0)) {
          pr_corr.v_ncl[i] = bad_data_double;
          pr_corr.v_ncu[i] = bad_data_double;
       }
@@ -1760,8 +1770,13 @@ void CNTInfo::compute_ci() {
       //
       // Compute confidence interval for the error standard deviation
       //
-      estdev.v_ncl[i] = sqrt((n-1)*estdev.v*estdev.v/cv_chi2_u);
-      estdev.v_ncu[i] = sqrt((n-1)*estdev.v*estdev.v/cv_chi2_l);
+      v = (n-1)*estdev.v*estdev.v/cv_chi2_u;
+      if(v < 0) estdev.v_ncl[i] = bad_data_double;
+      else      estdev.v_ncl[i] = sqrt(v);
+
+      v = (n-1)*estdev.v*estdev.v/cv_chi2_l;
+      if(v < 0) estdev.v_ncu[i] = bad_data_double;
+      else      estdev.v_ncu[i] = sqrt(v);
 
    } // end for i
 
@@ -1897,7 +1912,7 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
-   double den, f, o;
+   double den, f, o, v;
 
    // Handle the count
    if(!aflag) cnt_info.n = s.scount;
@@ -1957,17 +1972,21 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    else                            cnt_info.mbias.v = cnt_info.fbar.v/cnt_info.obar.v;
 
    // Compute correlation coefficient
-   den = sqrt((cnt_info.n*cnt_info.ffbar*cnt_info.n
-               - cnt_info.fbar.v*cnt_info.n*cnt_info.fbar.v*cnt_info.n)
-              *
-              (cnt_info.n*cnt_info.oobar*cnt_info.n
-               - cnt_info.obar.v*cnt_info.n*cnt_info.obar.v*cnt_info.n)
-             );
-   if(is_eq(den, 0.0)) cnt_info.pr_corr.v = bad_data_double;
-   else                cnt_info.pr_corr.v =
-                          (  (cnt_info.n*cnt_info.fobar*cnt_info.n)
-                          - (cnt_info.fbar.v*cnt_info.n*cnt_info.obar.v*cnt_info.n))
-                          /den;
+   v =  (cnt_info.n*cnt_info.ffbar*cnt_info.n
+       - cnt_info.fbar.v*cnt_info.n*cnt_info.fbar.v*cnt_info.n)
+        *
+        (cnt_info.n*cnt_info.oobar*cnt_info.n
+       - cnt_info.obar.v*cnt_info.n*cnt_info.obar.v*cnt_info.n);
+
+   if(v < 0 || is_eq(v, 0.0)) {
+      cnt_info.pr_corr.v = bad_data_double;
+   }
+   else {
+      den = sqrt(v);
+      cnt_info.pr_corr.v = (  (cnt_info.n*cnt_info.fobar*cnt_info.n)
+                            - (cnt_info.fbar.v*cnt_info.n*cnt_info.obar.v*cnt_info.n))
+                           /den;
+   }
 
    // Check that the correlation is not bigger than 1
    if(cnt_info.pr_corr.v > 1) cnt_info.pr_corr.v = bad_data_double;
@@ -2934,7 +2953,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
                      int cnt_flag, int rank_flag, int normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
-   double f, o, f_sum, o_sum, ff_sum, oo_sum, fo_sum;
+   double f, o, v, f_sum, o_sum, ff_sum, oo_sum, fo_sum;
    double err, err_sum, abs_err_sum, err_sq_sum, den;
    NumArray err_na;
 
@@ -3025,9 +3044,14 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute Pearson correlation coefficient
    //
-   den = sqrt((n*ff_sum - f_sum*f_sum)*(n*oo_sum - o_sum*o_sum));
-   if(is_eq(den, 0.0)) cnt_info.pr_corr.v = bad_data_double;
-   else                cnt_info.pr_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
+   v = (n*ff_sum - f_sum*f_sum)*(n*oo_sum - o_sum*o_sum);
+   if(v < 0 || is_eq(v, 0.0)) {
+      cnt_info.pr_corr.v = bad_data_double;
+   }
+   else {
+      den = sqrt(v);
+      cnt_info.pr_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
+   }
 
    //
    // Compute percentiles of the error
@@ -3164,9 +3188,14 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       //
       // Compute Spearman's Rank correlation coefficient
       //
-      den = sqrt((n*ff_sum - f_sum*f_sum)*(n*oo_sum - o_sum*o_sum));
-      if(is_eq(den, 0.0)) cnt_info.sp_corr.v = bad_data_double;
-      else                cnt_info.sp_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
+      v = (n*ff_sum - f_sum*f_sum)*(n*oo_sum - o_sum*o_sum);
+      if(v < 0 || is_eq(v, 0.0)) {
+         cnt_info.sp_corr.v = bad_data_double;
+      }
+      else {
+         den = sqrt(v);
+         cnt_info.sp_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
+      }
 
       //
       // Compute Kendall Tau Rank correlation coefficient:
@@ -3614,9 +3643,16 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
    //
    // Compute the standard deviation
    //
-   if(n <= 1) stdev_ci.v = bad_data_double;
-   else       stdev_ci.v =
-                 sqrt((sum_sq - sum*sum/(double) n)/((double) (n - 1)));
+   if(n <= 1) {
+      stdev_ci.v = bad_data_double;
+   }
+   else {
+
+      v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
+
+      if(v < 0) stdev_ci.v = bad_data_double;
+      else      stdev_ci.v = sqrt(v);
+   }
 
    //
    // Compute the normal confidence interval for the mean
