@@ -1748,7 +1748,8 @@ void CNTInfo::compute_ci() {
       //
       // Compute confidence interval for the correlation coefficient
       //
-      if(is_bad_data(pr_corr.v) || n <= 3) {
+      if(is_bad_data(pr_corr.v) || n <= 3 ||
+         is_eq(pr_corr.v, 1.0) || is_eq(pr_corr.v, -1.0)) {
          pr_corr.v_ncl[i] = bad_data_double;
          pr_corr.v_ncu[i] = bad_data_double;
       }
