@@ -548,7 +548,8 @@ class ISCInfo {
 
       // ContingencyTable
       TTContingencyTable cts;
-      SingleThresh       cts_thresh;
+      SingleThresh       cts_fcst_thresh;
+      SingleThresh       cts_obs_thresh;
 
       // Dimension of the tile
       int tile_dim;
