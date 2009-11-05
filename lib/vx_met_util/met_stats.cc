@@ -190,21 +190,22 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
 
    // Look for a '-' and a second level indicator
    ptr2 = strchr(ptr, '-');
-   if(ptr2 != NULL) {
-      lvl_2 = atoi(++ptr2);
-   }
-   else {
-      lvl_2 = lvl_1;
-   }
+   if(ptr2 != NULL) lvl_2 = atoi(++ptr2);
+   else             lvl_2 = lvl_1;
 
-   if(lvl_type != PresLevel && lvl_1 != lvl_2) {
+   // Only allow ranges for PresLevel and VertLevel
+   if(lvl_type != PresLevel &&
+      lvl_type != VertLevel &&
+      lvl_1    != lvl_2) {
       cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
-           << "ranges of values are only supported for pressure "
-           << "levels \"" << c << "\".\n\n" << flush;
+           << "ranges of levels are only supported for pressure levels "
+           << "(P) and vertical levels (Z).\n"
+           << flush;
       exit(1);
    }
 
    // For pressure levels, check the order of lvl_1 and lvl_2
+   // and define lvl_1 < lvl_2
    if(lvl_type == PresLevel) {
 
       // If the levels are the same, reset the lvl_str
@@ -527,8 +528,8 @@ void GCPairData::clear() {
    n_mask        = 0;
    n_interp      = 0;
 
-   fcst_prs_lvl.clear();
-   climo_prs_lvl.clear();
+   fcst_lvl.clear();
+   climo_lvl.clear();
 
    for(i=0; i<n_fcst; i++)  fcst_wd_ptr[i]  = (WrfData *) 0;
    for(i=0; i<n_climo; i++) climo_wd_ptr[i] = (WrfData *) 0;
@@ -564,13 +565,13 @@ void GCPairData::assign(const GCPairData &gc_pd) {
 
    set_n_fcst(gc_pd.n_fcst);
    for(i=0; i<gc_pd.n_fcst; i++) {
-      set_fcst_prs_lvl(i, fcst_prs_lvl[i]);
+      set_fcst_lvl(i, fcst_lvl[i]);
       set_fcst_wd_ptr(i, fcst_wd_ptr[i]);
    }
 
    set_n_climo(gc_pd.n_climo);
    for(i=0; i<gc_pd.n_climo; i++) {
-      set_climo_prs_lvl(i, climo_prs_lvl[i]);
+      set_climo_lvl(i, climo_lvl[i]);
       set_climo_wd_ptr(i, climo_wd_ptr[i]);
    }
 
@@ -625,7 +626,7 @@ void GCPairData::set_n_fcst(int n) {
    fcst_wd_ptr  = new WrfData * [n_fcst];
 
    for(i=0; i<n_fcst; i++) {
-      fcst_prs_lvl.add(bad_data_double);
+      fcst_lvl.add(bad_data_double);
       fcst_wd_ptr[i] = (WrfData *) 0;
    }
 
@@ -634,9 +635,9 @@ void GCPairData::set_n_fcst(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GCPairData::set_fcst_prs_lvl(int i, double lvl) {
+void GCPairData::set_fcst_lvl(int i, double lvl) {
 
-   fcst_prs_lvl.set(i, lvl);
+   fcst_lvl.set(i, lvl);
 
    return;
 }
@@ -660,7 +661,7 @@ void GCPairData::set_n_climo(int n) {
    climo_wd_ptr  = new WrfData * [n_climo];
 
    for(i=0; i<n_climo; i++) {
-      climo_prs_lvl.add(bad_data_double);
+      climo_lvl.add(bad_data_double);
       climo_wd_ptr[i] = (WrfData *) 0;
    }
 
@@ -669,9 +670,9 @@ void GCPairData::set_n_climo(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GCPairData::set_climo_prs_lvl(int i, double lvl) {
+void GCPairData::set_climo_lvl(int i, double lvl) {
 
-   climo_prs_lvl.set(i, lvl);
+   climo_lvl.set(i, lvl);
 
    return;
 }
@@ -795,7 +796,7 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
                          float *obs_arr,     Grid &gr) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
-   double obs_x, obs_y, obs_lvl, obs_elv;
+   double obs_x, obs_y, obs_lvl, obs_hgt;
    double fcst_v, climo_v, obs_v;
    int fcst_lvl_below, fcst_lvl_above;
    int climo_lvl_below, climo_lvl_above;
@@ -812,7 +813,7 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
    hdr_lon = hdr_arr[1];
 
    obs_lvl = obs_arr[2];
-   obs_elv = obs_arr[3];
+   obs_hgt = obs_arr[3];
    obs_v   = obs_arr[4];
 
    // Check whether the observation value contains valid data
@@ -827,41 +828,75 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
    if(x < 0 || x >= gr.nx() ||
       y < 0 || y >= gr.ny()) return;
 
-   // If looking for observations on pressure levels, check whether
-   // this observation falls within the specified range
-   if(obs_gci.lvl_type == PresLevel &&
-      (obs_lvl < obs_gci.lvl_1 || obs_lvl > obs_gci.lvl_2)
-     ) return;
+   // For pressure levels, check if the observation pressure level
+   // falls in the requsted range.
+   if(obs_gci.lvl_type == PresLevel) {
 
-   // If looking for observations at a vertical level check if the
-   // header type is APDSFC or SFCSHP
-   if(obs_gci.lvl_type == VertLevel &&
-      strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL) return;
-
-   // FUTURE WORK: add the ability to match observations at vertical
-   // levels other than the surface
-
-   // If looking for observations with an accumulation interval,
-   // check whether this accumulation interval matches
-   if(obs_gci.lvl_type == AccumLevel &&
-      !is_eq(obs_lvl, obs_gci.lvl_1)) return;
-
-   // Find the forecast and climatology pressure levels above and below
-   // the observation point
-   if(fcst_gci.lvl_type == PresLevel) {
-      find_prs_lvl(1, obs_lvl, fcst_lvl_below, fcst_lvl_above);
-      find_prs_lvl(0, obs_lvl, climo_lvl_below, climo_lvl_above);
+      if(obs_lvl < obs_gci.lvl_1 ||
+         obs_lvl > obs_gci.lvl_2) return;
    }
-   // Set the forecast and climatology levels above and below
-   // the observation point to zero since we're looking at a single
-   // level
+   // For accumulations, check if the observation accumulation interval
+   // matches the requested interval.
+   else if(obs_gci.lvl_type == AccumLevel) {
+
+      if(obs_lvl < obs_gci.lvl_1 ||
+         obs_lvl > obs_gci.lvl_2) return;
+   }
+   // For vertical levels, check for a surface message type or if the
+   // observation height falls within the requested range.
+   else if(obs_gci.lvl_type == VertLevel) {
+
+      if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
+         (obs_hgt < obs_gci.lvl_1 ||
+          obs_hgt > obs_gci.lvl_2)) return;
+   }
+   // For all other level types (RecNumber, NoLevel), check
+   // if the observation height falls within the requested range.
    else {
-      fcst_lvl_below  = fcst_lvl_above  = 0;
-      climo_lvl_below = climo_lvl_above = 0;
+      if(obs_hgt < obs_gci.lvl_1 ||
+         obs_hgt > obs_gci.lvl_2) return;
    }
 
-   // Look through all of the PairData objects to see if the
-   // observation should be added
+   // For a single forecast field
+   if(n_fcst == 1) {
+      fcst_lvl_below = 0;
+      fcst_lvl_above = 0;
+   }
+   // For multiple forecast fields, find the levels above and below
+   // the observation point.
+   else {
+
+      // Interpolate using the pressure value
+      if(fcst_gci.lvl_type == PresLevel) {
+         find_vert_lvl(1, obs_lvl, fcst_lvl_below, fcst_lvl_above);
+      }
+      // Interpolate using the height value
+      else {
+         find_vert_lvl(1, obs_hgt, fcst_lvl_below, fcst_lvl_above);
+      }
+   }
+
+   // For a single climatology field
+   if(n_climo == 1) {
+      climo_lvl_below = 0;
+      climo_lvl_above = 0;
+   }
+   // For multiple climatology fields, find the levels above and below
+   // the observation point.
+   else {
+
+      // Interpolate using the pressure value
+      if(fcst_gci.lvl_type == PresLevel) {
+         find_vert_lvl(0, obs_lvl, climo_lvl_below, climo_lvl_above);
+      }
+      // Interpolate using the height value
+      else {
+         find_vert_lvl(0, obs_hgt, climo_lvl_below, climo_lvl_above);
+      }
+   }
+
+   // Look through all of the PairData objects to see if the observation
+   // should be added.
 
    // Check the message types
    for(i=0; i<n_msg_typ; i++) {
@@ -919,7 +954,7 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
 
             // Add the forecast, climatological, and observation data
             pd[i][j][k].add_pair(hdr_lat, hdr_lon,
-                                 obs_lvl, obs_elv,
+                                 obs_lvl, obs_hgt,
                                  fcst_v, climo_v, obs_v);
 
          } // end for k
@@ -931,15 +966,15 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GCPairData::find_prs_lvl(int fcst_flag, double prs,
-                              int &i_below, int &i_above) {
+void GCPairData::find_vert_lvl(int fcst_flag, double obs_lvl,
+                               int &i_below, int &i_above) {
    int i, n;
-   NumArray *prs_lvl;
+   NumArray *lvl_na;
    double dist, dist_below, dist_above;
 
    // Check for the forecast or climo fields
-   if(fcst_flag) { n = n_fcst;  prs_lvl = &fcst_prs_lvl;  }
-   else          { n = n_climo; prs_lvl = &climo_prs_lvl; }
+   if(fcst_flag) { n = n_fcst;  lvl_na = &fcst_lvl;  }
+   else          { n = n_climo; lvl_na = &climo_lvl; }
 
    if(n==0) {
       i_below = i_above = bad_data_int;
@@ -950,7 +985,7 @@ void GCPairData::find_prs_lvl(int fcst_flag, double prs,
    dist_below = dist_above = 1.0e30;
    for(i=0; i<n; i++) {
 
-      dist = prs - (*prs_lvl)[i];
+      dist = obs_lvl - (*lvl_na)[i];
 
       // Check for the closest level below.
       // Levels below contain higher values of pressure.
@@ -968,7 +1003,7 @@ void GCPairData::find_prs_lvl(int fcst_flag, double prs,
    }
 
    // Check if the observation is above the forecast range
-   if     (is_eq(dist_below, 1.0e30) && !is_eq(dist_above, 1.0e30)) {
+   if(is_eq(dist_below, 1.0e30) && !is_eq(dist_above, 1.0e30)) {
 
       // Set the index below to the index above and perform
       // no vertical interpolation
@@ -984,9 +1019,9 @@ void GCPairData::find_prs_lvl(int fcst_flag, double prs,
    // Check if an error occurred
    else if(is_eq(dist_below, 1.0e30) && is_eq(dist_above, 1.0e30)) {
 
-      cerr << "\n\nERROR: GCPairData::find_prs_lvl() -> "
+      cerr << "\n\nERROR: GCPairData::find_vert_lvl() -> "
            << "could not find a level above and/or below the "
-           << "observation pressure level of " << prs << " hp\n\n"
+           << "observation level of " << obs_lvl << ".\n\n"
            << flush;
       exit(1);
    }
@@ -1015,22 +1050,22 @@ int GCPairData::get_n_pair() {
 
 double GCPairData::compute_interp(int fcst_flag,
                                   double obs_x, double obs_y,
-                                  int i_interp, double prs,
+                                  int i_interp, double to_lvl,
                                   int i_below, int i_above) {
    int n;
-   NumArray *prs_lvl;
+   NumArray *lvl_na;
    WrfData **wd_ptr;
    double v, v_below, v_above, t;
 
    // Check for the forecast or climo fields
    if(fcst_flag) {
       n       = n_fcst;
-      prs_lvl = &fcst_prs_lvl;
+      lvl_na  = &fcst_lvl;
       wd_ptr  = fcst_wd_ptr;
    }
    else {
       n       = n_climo;
-      prs_lvl = &climo_prs_lvl;
+      lvl_na  = &climo_lvl;
       wd_ptr  = climo_wd_ptr;
    }
 
@@ -1052,16 +1087,22 @@ double GCPairData::compute_interp(int fcst_flag,
       // the natural log of q
       if(fcst_gci.code == spfh_grib_code &&
          obs_gci.code  == spfh_grib_code) {
-         t = compute_vert_interp(log(v_below), (*prs_lvl)[i_below],
-                                 log(v_above), (*prs_lvl)[i_above],
-                                 prs);
+         t = compute_vert_pinterp(log(v_below), (*lvl_na)[i_below],
+                                  log(v_above), (*lvl_na)[i_above],
+                                  to_lvl);
          v = exp(t);
       }
       // Vertically interpolate to the observation pressure level
+      else if(fcst_gci.lvl_type == PresLevel) {
+         v = compute_vert_pinterp(v_below, (*lvl_na)[i_below],
+                                  v_above, (*lvl_na)[i_above],
+                                  to_lvl);
+      }
+      // Vertically interpolate to the observation height
       else {
-         v = compute_vert_interp(v_below, (*prs_lvl)[i_below],
-                                 v_above, (*prs_lvl)[i_above],
-                                 prs);
+         v = compute_vert_zinterp(v_below, (*lvl_na)[i_below],
+                                  v_above, (*lvl_na)[i_above],
+                                  to_lvl);
       }
    }
 
@@ -1131,23 +1172,50 @@ double GCPairData::compute_horz_interp(WrfData *wd_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Vertically interpolate between values "v1" and "v2" at pressure
-// levels "prs1" and "prs2" to pressure level "to_prs".
+// Interpolate lineary in the log of pressure between values "v1" and
+// "v2" at pressure levels "prs1" and "prs2" to pressure level "to_prs".
 //
 ////////////////////////////////////////////////////////////////////////
 
-double GCPairData::compute_vert_interp(double v1, double prs1,
-                                       double v2, double prs2,
-                                       double to_prs) {
+double GCPairData::compute_vert_pinterp(double v1, double prs1,
+                                        double v2, double prs2,
+                                        double to_prs) {
    double v_interp;
 
    if(prs1 <= 0.0 || prs2 <= 0.0 || to_prs <= 0.0) {
-      cerr << "\n\nERROR: GCPairData::compute_vert_interp() -> "
+      cerr << "\n\nERROR: GCPairData::compute_vert_pinterp() -> "
            << "pressure shouldn't be <= zero!\n\n" << flush;
       exit(1);
    }
 
    v_interp = v1 + ((v2-v1)*log(prs1/to_prs)/log(prs1/prs2));
+
+   return(v_interp);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Linearly interpolate between values "v1" and "v2" at height levels
+// "lvl1" and "lvl2" to height level "to_lvl".
+//
+////////////////////////////////////////////////////////////////////////
+
+double GCPairData::compute_vert_zinterp(double v1, double lvl1,
+                                        double v2, double lvl2,
+                                        double to_lvl) {
+   double d1, d2, v_interp;
+
+   if(lvl1 <= 0.0 || lvl2 <= 0.0 || to_lvl <= 0.0) {
+      cerr << "\n\nERROR: GCPairData::compute_vert_zinterp() -> "
+           << "level shouldn't be <= zero!\n\n" << flush;
+      exit(1);
+   }
+
+   d1 = abs(lvl1 - to_lvl);
+   d2 = abs(lvl2 - to_lvl);
+
+   // Linearly interpolate betwen lvl_1 and lvl_2
+   v_interp = v1*d1/(d1+d2) + v2*d2/(d1+d2);
 
    return(v_interp);
 }
@@ -2464,7 +2532,8 @@ void ISCInfo::assign(const ISCInfo &c) {
 
    cts = c.cts;
 
-   cts_thresh = c.cts_thresh;
+   cts_fcst_thresh = c.cts_fcst_thresh;
+   cts_obs_thresh  = c.cts_obs_thresh;
 
    mse   = c.mse;
    isc   = c.isc;
@@ -3754,4 +3823,3 @@ int is_precip_code(int gc) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
