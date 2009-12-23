@@ -31,6 +31,7 @@
 //                    GRIB record access routines.
 //   004    02/20/09  Halley Gotway  Append _HH to the variable name
 //                    for non-zero accumulation times.
+//   005    12/23/09  Halley Gotway  Call the library read_pds routine.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +105,6 @@ static void   process_add_subtract_args(int, char **, int);
 static void   do_sum_command(int, char **);
 static void   sum_grib_files(GribRecord &);
 static void   check_file_time(char *, unixtime, int &);
-static double get_sec_per_unit(int);
 
 static void   do_add_subtract_command(int, char **);
 static void   get_field(const char *, int, WrfData &, unixtime &, unixtime &,
@@ -625,8 +625,7 @@ void sum_grib_files(GribRecord &rec) {
 void check_file_time(char *file, unixtime pcp_valid, int &i_gc) {
    GribFile grib_file;
    GribRecord rec;
-   int i, file_accum;
-   double sec_per_unit;
+   int i, bms_flag, file_accum;
    unixtime file_init, file_valid;
 
    i_gc = -1;
@@ -658,34 +657,9 @@ void check_file_time(char *file, unixtime pcp_valid, int &i_gc) {
          grib_file >> rec;
 
          //
-         // Check PDS for the file initialization time
+         // Read the Product Description Section
          //
-         file_init = mdyhms_to_unix(rec.pds->month, rec.pds->day,
-                                    rec.pds->year + 2000,
-                                    rec.pds->hour, rec.pds->minute, 0);
-
-         //
-         // Check PDS for time range indicator = 4 (accumulation time)
-         //
-         if(rec.pds->tri != 4) {
-            cerr << "\n\nERROR: check_file_time() -> "
-                 << "time range indicator of " << rec.pds->tri
-                 << " not currently supported.  "
-                 << "Time range indicator must be accumulation (Grib Code 4)\n\n"
-                 << flush;
-            exit(1);
-         }
-
-         //
-         // Check PDS for time units
-         //
-         sec_per_unit = get_sec_per_unit(rec.pds->fcst_unit);
-
-         //
-         // Set the file valid and file accumulation times
-         //
-         file_valid = (unixtime) (file_init + rec.pds->p2*sec_per_unit);
-         file_accum = nint((rec.pds->p2 - rec.pds->p1)*sec_per_unit);
+         read_pds(rec, bms_flag, file_init, file_valid, file_accum);
 
          //
          // The file matches if the issuance times, valid times, and
@@ -703,49 +677,6 @@ void check_file_time(char *file, unixtime pcp_valid, int &i_gc) {
    grib_file.close();
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double get_sec_per_unit(int unit) {
-   double sec_per_unit;
-
-   switch(unit) {
-      case 0: // minute
-         sec_per_unit = sec_per_minute;
-         break;
-      case 1: // hour
-         sec_per_unit = sec_per_hour;
-         break;
-      case 2: // day
-         sec_per_unit = sec_per_day;
-         break;
-      case 3: // month
-         sec_per_unit = sec_per_day*30.0;
-         break;
-      case 4: // year
-         sec_per_unit = sec_per_day*365.0;
-         break;
-      case 5: // decade
-         sec_per_unit = sec_per_day*365.0*10.0;
-         break;
-      case 6: // normal (30 years)
-         sec_per_unit = sec_per_day*365.0*30.0;
-         break;
-      case 7: // century
-         sec_per_unit = sec_per_day*365.0*100.0;
-         break;
-      case 254: // second
-         sec_per_unit = 1.0;
-         break;
-      default:
-         cerr << "\n\nERROR: get_sec_per_unit() -> "
-              << "unexpected time unit.\n\n" << flush;
-         exit(1);
-      break;
-   }
-
-   return(sec_per_unit);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -909,7 +840,7 @@ void do_add_subtract_command(int argc, char **argv) {
 void get_field(const char *in_file, int accum, WrfData &wd,
                unixtime &init_ut, unixtime &valid_ut, GribRecord &rec) {
    GribFile grib_file;
-   double sec_per_unit;
+   int bms_flag, rec_accum;
 
    //
    // Setup the GCInfo object
@@ -943,18 +874,9 @@ void get_field(const char *in_file, int accum, WrfData &wd,
    }
 
    //
-   // Check PDS for time units
+   // Read the Product Description Section
    //
-   sec_per_unit = get_sec_per_unit(rec.pds->fcst_unit);
-
-   //
-   // Retrieve the init and valid times
-   //
-   init_ut = mdyhms_to_unix(rec.pds->month, rec.pds->day,
-                            rec.pds->year + 2000,
-                            rec.pds->hour, rec.pds->minute, 0);
-
-   valid_ut = (unixtime) (init_ut + rec.pds->p2*sec_per_unit);
+   read_pds(rec, bms_flag, init_ut, valid_ut, rec_accum);
 
    return;
 }
