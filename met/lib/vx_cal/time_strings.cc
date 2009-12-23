@@ -496,11 +496,12 @@ int is_hhmmss(const char * text)
 
 {
 
-if ( strlen(text) != 6 )  return ( 0 );
+// Allow 2 or 3 digits for the number of hours
+if ( strlen(text) != 6 && strlen(text) != 7)  return ( 0 );
 
 int j;
 
-for (j=0; j<6; ++j)  {
+for (j=0; j<strlen(text); ++j)  {
 
    if ( !(isdigit(text[j])) )  return ( 0 );
 
@@ -519,11 +520,12 @@ int is_hh(const char * text)
 
 {
 
-if ( strlen(text) != 2 )  return ( 0 );
+// Allow 2 or 3 digits for the number of hours
+if ( strlen(text) != 2 && strlen(text) != 3 )  return ( 0 );
 
 int j;
 
-for (j=0; j<2; ++j)  {
+for (j=0; j<strlen(text); ++j)  {
 
    if ( !(isdigit(text[j])) )  return ( 0 );
 
