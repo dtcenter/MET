@@ -1778,7 +1778,7 @@ void WrfData::conv_filter_circ(int diameter, double bd_thresh) {
          // the minimum value and continue.
          //
          if(bd_thresh == 0 && !is_valid_xy(x, y)) {
-            field.put_xy_int(0, x, y);
+            field.put_xy_int(bad_data_int, x, y);
             continue;
          }
 
@@ -1817,17 +1817,17 @@ void WrfData::conv_filter_circ(int diameter, double bd_thresh) {
          //
          ratio = (double) bd_count/(bd_count + count);
          if(!is_valid_xy(x, y) && ratio > bd_thresh) {
-            sum = b;
+            sum = bad_data_double;
          }
          else if(count == 0) {
-            sum = b;
+            sum = bad_data_double;
          }
          else {
             sum /= count;
          }
 
-         if(sum > max_sum) max_sum = sum;
-         if(sum < min_sum) min_sum = sum;
+         if(!is_bad_data(sum) && sum > max_sum) max_sum = sum;
+         if(!is_bad_data(sum) && sum < min_sum) min_sum = sum;
 
          field.put_xy_int(double_to_int(sum), x, y);
       } // for y
