@@ -20,7 +20,7 @@
    //
    //     Created from config file "WaveletStatConfig_default"
    //
-   //     on March 26, 2009    10:43 am  MST
+   //     on December 7, 2009    9:33 am  MST
    //
 
 
@@ -53,9 +53,13 @@ class wavelet_stat_Conf {
 
       const SymbolTableEntry * _model_entry;
 
-      const SymbolTableEntry * _field_entry;
+      const SymbolTableEntry * _fcst_field_entry;
 
-      const SymbolTableEntry * _thresh_entry;
+      const SymbolTableEntry * _obs_field_entry;
+
+      const SymbolTableEntry * _fcst_thresh_entry;
+
+      const SymbolTableEntry * _obs_thresh_entry;
 
       const SymbolTableEntry * _mask_missing_flag_entry;
 
@@ -75,13 +79,19 @@ class wavelet_stat_Conf {
 
       const SymbolTableEntry * _met_data_dir_entry;
 
-      const SymbolTableEntry * _raw_color_table_entry;
+      const SymbolTableEntry * _fcst_raw_color_table_entry;
+
+      const SymbolTableEntry * _obs_raw_color_table_entry;
 
       const SymbolTableEntry * _wvlt_color_table_entry;
 
-      const SymbolTableEntry * _raw_plot_min_entry;
+      const SymbolTableEntry * _fcst_raw_plot_min_entry;
 
-      const SymbolTableEntry * _raw_plot_max_entry;
+      const SymbolTableEntry * _fcst_raw_plot_max_entry;
+
+      const SymbolTableEntry * _obs_raw_plot_min_entry;
+
+      const SymbolTableEntry * _obs_raw_plot_max_entry;
 
       const SymbolTableEntry * _wvlt_plot_min_entry;
 
@@ -119,14 +129,24 @@ class wavelet_stat_Conf {
       Result model();
 
 
-      Result field(int);   //  1-dimensional array, indices from 0 to 1
+      Result fcst_field(int);   //  1-dimensional array, indices from 0 to 1
 
-      int n_field_elements();
+      int n_fcst_field_elements();
 
 
-      Result thresh(int);   //  1-dimensional array, indices from 0 to 1
+      Result obs_field(int);   //  1-dimensional array, indices from 0 to 0
 
-      int n_thresh_elements();
+      int n_obs_field_elements();
+
+
+      Result fcst_thresh(int);   //  1-dimensional array, indices from 0 to 1
+
+      int n_fcst_thresh_elements();
+
+
+      Result obs_thresh(int);   //  1-dimensional array, indices from 0 to 0
+
+      int n_obs_thresh_elements();
 
 
       Result mask_missing_flag();
@@ -162,16 +182,25 @@ class wavelet_stat_Conf {
       Result met_data_dir();
 
 
-      Result raw_color_table();
+      Result fcst_raw_color_table();
+
+
+      Result obs_raw_color_table();
 
 
       Result wvlt_color_table();
 
 
-      Result raw_plot_min();
+      Result fcst_raw_plot_min();
 
 
-      Result raw_plot_max();
+      Result fcst_raw_plot_max();
+
+
+      Result obs_raw_plot_min();
+
+
+      Result obs_raw_plot_max();
 
 
       Result wvlt_plot_min();
