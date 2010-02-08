@@ -43,8 +43,10 @@ void WaveletStatConfInfo::init_from_scratch() {
    // Initialize pointers
    wvlt_ptr      = (gsl_wavelet *) 0;
    wvlt_work_ptr = (gsl_wavelet_workspace *) 0;
-   gci           = (GCInfo *) 0;
-   ta            = (ThreshArray *) 0;
+   fcst_gci      = (GCInfo *) 0;
+   obs_gci       = (GCInfo *) 0;
+   fcst_ta       = (ThreshArray *) 0;
+   obs_ta        = (ThreshArray *) 0;
 
    clear();
 
@@ -77,8 +79,10 @@ void WaveletStatConfInfo::clear() {
    if(wvlt_ptr)      { wavelet_free(wvlt_ptr);                }
    if(wvlt_work_ptr) { wavelet_workspace_free(wvlt_work_ptr); }
 
-   if(gci) { delete [] gci; gci = (GCInfo *)     0; }
-   if(ta)  { delete [] ta;  ta  = (ThreshArray *) 0; }
+   if(fcst_gci) { delete [] fcst_gci; fcst_gci = (GCInfo *)      0; }
+   if(obs_gci)  { delete [] obs_gci;  obs_gci  = (GCInfo *)      0; }
+   if(fcst_ta)  { delete [] fcst_ta;  fcst_ta  = (ThreshArray *) 0; }
+   if(obs_ta)   { delete [] obs_ta;   obs_ta   = (ThreshArray *) 0; }
 
    return;
 }
@@ -116,30 +120,30 @@ void WaveletStatConfInfo::process_config() {
    }
 
    //
-   // Conf: field
+   // Conf: fcst_field
    //
 
-   // Parse out the fields to be verified
-   n_vx = conf.n_field_elements();
+   // Parse out the forecast fields to be verified
+   n_vx = conf.n_fcst_field_elements();
 
    if(n_vx == 0) {
 
       cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
            << "At least one value must be provided "
-           << "for field.\n\n" << flush;
+           << "for fcst_field.\n\n" << flush;
       exit(1);
    }
 
-   // Allocate space to store the field information
-   gci = new GCInfo [n_vx];
+   // Allocate space to store the forecast field information
+   fcst_gci = new GCInfo [n_vx];
 
-   // Parse the field information
+   // Parse the fcst_field information
    for(i=0; i<n_vx; i++) {
-      gci[i].set_gcinfo(conf.field(i).sval(),
-                        conf.grib_ptv().ival());
+      fcst_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
+         conf.grib_ptv().ival());
 
       // No support for WDIR
-      if(gci[i].code == wdir_grib_code) {
+      if(fcst_gci[i].code == wdir_grib_code) {
 
          cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
               << "the wind direction field may not be verified "
@@ -150,25 +154,98 @@ void WaveletStatConfInfo::process_config() {
    }
 
    //
-   // Conf: thresh
+   // Conf: obs_field
    //
 
-   // Check that the number of threshold levels matches n_vx
-   if(conf.n_thresh_elements() != n_vx) {
+   // Check if the length of obs_field is non-zero and
+   // not equal to n_vx
+   if(conf.n_obs_field_elements() != 0 &&
+      conf.n_obs_field_elements() != n_vx) {
 
       cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
-           << "The number of thresh levels provided must match the "
-           << "number of fields provided.\n\n"
+           << "The length of obs_field must be the same as the "
+           << "length of fcst_field.\n\n" << flush;
+      exit(1);
+   }
+
+   // Allocate space to store the observation field information
+   obs_gci = new GCInfo [n_vx];
+
+   // Parse the obs field information
+   for(i=0; i<n_vx; i++) {
+
+      // If obs_field is empty, use fcst_field
+      if(conf.n_obs_field_elements() == 0) {
+         obs_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
+            conf.grib_ptv().ival());
+      }
+      else {
+         obs_gci[i].set_gcinfo(conf.obs_field(i).sval(),
+            conf.grib_ptv().ival());
+      }
+
+      // No support for WDIR
+      if(obs_gci[i].code == wdir_grib_code) {
+
+         cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
+              << "the wind direction field may not be verified "
+              << "using grid_stat.\n\n"
+              << flush;
+         exit(1);
+      }
+   }
+
+   //
+   // Conf: fcst_thresh
+   //
+
+   // Check that the number of forecast threshold levels matches n_vx
+   if(conf.n_fcst_thresh_elements() != n_vx) {
+
+      cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
+           << "The number of fcst_thresh levels provided must match the "
+           << "number of fields provided in fcst_field.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   // Allocate space to store the forecast threshold information
+   fcst_ta = new ThreshArray [n_vx];
+
+   // Parse the fcst threshold information
+   for(i=0; i<n_vx; i++) {
+      fcst_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
+   }
+
+   //
+   // Conf: obs_thresh
+   //
+
+   // Check if the length of obs_thresh is non-zero and
+   // not equal to n_vx
+   if(conf.n_obs_thresh_elements() != 0 &&
+      conf.n_obs_thresh_elements() != n_vx) {
+
+      cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
+           << "The number obs_thresh levels provided must match the "
+           << "number of fields provided in obs_field.\n\n"
            << flush;
       exit(1);
    }
 
    // Allocate space to store the threshold information
-   ta = new ThreshArray [n_vx];
+   obs_ta = new ThreshArray [n_vx];
 
-   // Parse the fcst threshold information
+   // Parse the obs threshold information
    for(i=0; i<n_vx; i++) {
-      ta[i].parse_thresh_str(conf.thresh(i).sval());
+
+      // If obs_thresh is empty, use fcst_thresh
+      if(conf.n_obs_thresh_elements() == 0) {
+         obs_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
+      }
+      else {
+         obs_ta[i].parse_thresh_str(conf.obs_thresh(i).sval());
+      }
    }
 
    //
@@ -176,9 +253,19 @@ void WaveletStatConfInfo::process_config() {
    //
    for(i=0, max_n_thresh=0; i<n_vx; i++) {
 
-      if(ta[i].n_elements() > max_n_thresh) {
-         max_n_thresh = ta[i].n_elements();
+      // Check for the same number of fcst and obs thresholds
+      if(fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
+
+         cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
+              << "The number of thresholds for each field in "
+              << "fcst_thresh must match the number of thresholds "
+              << "for each field in obs_thresh.\n\n"
+              << flush;
+         exit(1);
       }
+
+      if(fcst_ta[i].n_elements() > max_n_thresh)
+         max_n_thresh = fcst_ta[i].n_elements();
    }
 
    //
@@ -542,9 +629,9 @@ int WaveletStatConfInfo::n_isc_row() {
    // Compute the number of output lines for each verification field
    for(i=0,n=0; i<n_vx; i++) {
 
-      n += (n_scale + 2) * ta[i].n_elements() * n_tile;
+      n += (n_scale + 2) * fcst_ta[i].n_elements() * n_tile;
 
-      if(n_tile > 1) n += (n_scale + 2) * ta[i].n_elements();
+      if(n_tile > 1) n += (n_scale + 2) * fcst_ta[i].n_elements();
    }
 
    return(n);

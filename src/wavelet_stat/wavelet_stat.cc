@@ -15,6 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    04/02/08  Halley Gotway   New
+//   001    11/05/09  Halley Gotway   Generalize to compare two
+//                    different fcst and obs fields.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -88,7 +90,8 @@ static void compute_energy(const double *, int, double &);
 static void write_nc_raw(const double *, const double *,
                          int, int, int);
 static void write_nc_wav(const double *, const double *,
-                         int, int, int, int, SingleThresh &);
+                         int, int, int, int,
+                         SingleThresh &, SingleThresh &);
 
 static void close_in_files();
 static void close_out_files();
@@ -107,11 +110,11 @@ static void set_xy_bb();
 static void set_ll_bb();
 static void check_xy_ll(int, int);
 static void set_dim(BoundingBox &, double, double, double);
-static void draw_colorbar(PSfile *, BoundingBox &, int);
+static void draw_colorbar(PSfile *, BoundingBox &, int, int);
 static void draw_border(PSfile *, BoundingBox &);
 static void draw_map(PSfile *, BoundingBox &);
 static void draw_tiles(PSfile *, BoundingBox &, int, int, int);
-static void render_image(PSfile *, const WrfData &, BoundingBox &);
+static void render_image(PSfile *, const WrfData &, BoundingBox &, int);
 static void render_tile(PSfile *, const double *, int, int, BoundingBox &);
 
 static void usage(int, char **);
@@ -309,12 +312,12 @@ void process_scores() {
       if(fcst_ftype == GbFileType) {
 
          status = get_grib_record(fcst_gb_file, fcst_r,
-                                  conf_info.gci[i],
+                                  conf_info.fcst_gci[i],
                                   fcst_wd, fcst_grid, verbosity);
 
          if(status != 0) {
             cout << "***WARNING***: process_scores() -> "
-                 << conf_info.gci[i].info_str
+                 << conf_info.fcst_gci[i].info_str
                  << " not found in GRIB file: " << fcst_file
                  << "\n" << flush;
             continue;
@@ -324,7 +327,7 @@ void process_scores() {
       else {
 
          read_netcdf(fcst_nc_file,
-                     conf_info.gci[i].abbr_str.text(),
+                     conf_info.fcst_gci[i].abbr_str.text(),
                      tmp_str,
                      fcst_wd, fcst_grid, verbosity);
       }
@@ -338,12 +341,12 @@ void process_scores() {
       if(obs_ftype == GbFileType) {
 
          status = get_grib_record(obs_gb_file, obs_r,
-                                  conf_info.gci[i],
+                                  conf_info.obs_gci[i],
                                   obs_wd, obs_grid, verbosity);
 
          if(status != 0) {
             cout << "***WARNING***: process_scores() -> "
-                 << conf_info.gci[i].info_str
+                 << conf_info.obs_gci[i].info_str
                  << " not found in GRIB file: " << obs_file
                  << "\n" << flush;
             continue;
@@ -353,7 +356,7 @@ void process_scores() {
       else {
 
          read_netcdf(obs_nc_file,
-                     conf_info.gci[i].abbr_str.text(),
+                     conf_info.obs_gci[i].abbr_str.text(),
                      tmp_str,
                      obs_wd, obs_grid, verbosity);
       }
@@ -419,7 +422,7 @@ void process_scores() {
       }
 
       // Set the message type
-      if(conf_info.gci[i].code == apcp_grib_code) {
+      if(conf_info.fcst_gci[i].code == apcp_grib_code) {
          shc.set_msg_typ("MC_PCP");
       }
       else {
@@ -427,16 +430,17 @@ void process_scores() {
       }
 
       // Store the forecast variable and level names
-      shc.set_fcst_var(conf_info.gci[i].abbr_str.text());
-      shc.set_fcst_lev(conf_info.gci[i].lvl_str.text());
+      shc.set_fcst_var(conf_info.fcst_gci[i].abbr_str.text());
+      shc.set_fcst_lev(conf_info.fcst_gci[i].lvl_str.text());
 
       // Store the observation variable and level names
-      shc.set_obs_var(conf_info.gci[i].abbr_str.text());
-      shc.set_obs_lev(conf_info.gci[i].lvl_str.text());
+      shc.set_obs_var(conf_info.obs_gci[i].abbr_str.text());
+      shc.set_obs_lev(conf_info.obs_gci[i].lvl_str.text());
 
       if(verbosity > 1) {
          cout << "\n----------------------------------------\n\n"
-              << "Processing field " << conf_info.gci[i].info_str << ".\n"
+              << "Processing " << conf_info.fcst_gci[i].info_str
+              << " versus " << conf_info.obs_gci[i].info_str << ".\n"
               << flush;
       }
 
@@ -484,7 +488,7 @@ void process_scores() {
       // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
       isc_info = new ISCInfo * [conf_info.get_n_tile()];
       for(j=0; j<conf_info.get_n_tile(); j++) {
-         isc_info[j] = new ISCInfo [conf_info.ta[i].n_elements()];
+         isc_info[j] = new ISCInfo [conf_info.fcst_ta[i].n_elements()];
       }
 
       // Loop through the tiles to be applied
@@ -507,7 +511,7 @@ void process_scores() {
             // Write out the ISC statistics
             if(conf_info.conf.output_flag(i_isc).ival()) {
 
-               for(k=0; k<conf_info.ta[i].n_elements(); k++) {
+               for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
 
                   // Store the tile definition parameters
                   isc_info[j][k].tile_dim = conf_info.get_tile_dim();
@@ -515,8 +519,8 @@ void process_scores() {
                   isc_info[j][k].tile_yll = nint(conf_info.tile_xll[j]);
 
                   // Set the forecast and observation thresholds
-                  shc.set_fcst_thresh(conf_info.ta[i][k]);
-                  shc.set_obs_thresh(conf_info.ta[i][k]);
+                  shc.set_fcst_thresh(conf_info.fcst_ta[i][k]);
+                  shc.set_obs_thresh(conf_info.obs_ta[i][k]);
 
                   write_isc_row(shc, isc_info[j][k],
                      conf_info.conf.output_flag(i_isc).ival(),
@@ -533,11 +537,11 @@ void process_scores() {
          // Set the mask name
          shc.set_mask("TILE_TOT");
 
-         for(j=0; j<conf_info.ta[i].n_elements(); j++) {
+         for(j=0; j<conf_info.fcst_ta[i].n_elements(); j++) {
 
             // Set the forecast and observation thresholds
-            shc.set_fcst_thresh(conf_info.ta[i][j]);
-            shc.set_obs_thresh(conf_info.ta[i][j]);
+            shc.set_fcst_thresh(conf_info.fcst_ta[i][j]);
+            shc.set_obs_thresh(conf_info.obs_ta[i][j]);
 
             // Aggregate the tiles for the current threshold
             aggregate_isc_info(isc_info, i, j, isc_aggr);
@@ -852,7 +856,8 @@ double get_fill_value(const WrfData &wd, int i_gc) {
    // If verifying precipitation, fill bad data points with zero.
    // Otherwise, fill them with the mean of the valid data.
    //
-   if(is_precip_code(conf_info.gci[i_gc].code)) {
+   if(is_precip_code(conf_info.fcst_gci[i_gc].code) ||
+      is_precip_code(conf_info.obs_gci[i_gc].code)) {
       fill_val = 0.0;
    }
    else {
@@ -1040,6 +1045,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    int bnd, row, col;
    int i, j, k;
    char thresh_str[max_str_len];
+   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
 
    // Check the NumArray lengths
    n = f_na.n_elements();
@@ -1064,10 +1070,11 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    ns = conf_info.get_n_scale();
 
    // Set up the ISCInfo thresholds and n_scale
-   n_isc = conf_info.ta[i_gc].n_elements();
+   n_isc = conf_info.fcst_ta[i_gc].n_elements();
    for(i=0; i<n_isc; i++) {
       isc_info[i].clear();
-      isc_info[i].cts_thresh = conf_info.ta[i_gc][i];
+      isc_info[i].cts_fcst_thresh = conf_info.fcst_ta[i_gc][i];
+      isc_info[i].cts_obs_thresh  = conf_info.obs_ta[i_gc][i];
       isc_info[i].allocate_n_scale(ns);
    }
 
@@ -1090,20 +1097,24 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    if(nc_flag) write_nc_raw(f_dat, o_dat, n, i_gc, i_tile);
 
    // Apply each threshold
-   for(i=0; i<conf_info.ta[i_gc].n_elements(); i++) {
+   for(i=0; i<conf_info.fcst_ta[i_gc].n_elements(); i++) {
 
       if(verbosity > 1) {
-         isc_info[i].cts_thresh.get_abbr_str(thresh_str);
+         isc_info[i].cts_fcst_thresh.get_abbr_str(fcst_thresh_str);
+         isc_info[i].cts_obs_thresh.get_abbr_str(obs_thresh_str);
 
-         cout << "Computing ISC for " << conf_info.gci[i_gc].info_str
-              << ", raw threshold of " << thresh_str << ".\n"
+         cout << "Computing Intensity-Scale decomposition for "
+              << conf_info.fcst_gci[i_gc].info_str << " "
+              << fcst_thresh_str << " versus "
+              << conf_info.obs_gci[i_gc].info_str << " "
+              << obs_thresh_str << ".\n"
               << flush;
       }
 
       // Apply the threshold to each point to create 0/1 mask fields
       for(j=0; j<n; j++) {
-         f_dat[j] = isc_info[i].cts_thresh.check(f_na[j]);
-         o_dat[j] = isc_info[i].cts_thresh.check(o_na[j]);
+         f_dat[j] = isc_info[i].cts_fcst_thresh.check(f_na[j]);
+         o_dat[j] = isc_info[i].cts_obs_thresh.check(o_na[j]);
          diff[j]  = f_dat[j] - o_dat[j];
       } // end for j
 
@@ -1122,7 +1133,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
       // Write the thresholded binary fields to NetCDF
       if(nc_flag) write_nc_wav(f_dat, o_dat, n, i_gc, i_tile, -1,
-                               isc_info[i].cts_thresh);
+                               isc_info[i].cts_fcst_thresh,
+                               isc_info[i].cts_obs_thresh);
 
       // Write the thresholded binary difference field to PostScript
       if(ps_flag) plot_ps_wvlt(diff, n, i_gc, i_tile,
@@ -1197,7 +1209,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
          // Write the decomposed fields for this scale to NetCDF
          if(nc_flag) write_nc_wav(f_scl, o_scl, n, i_gc, i_tile, j,
-                                  isc_info[i].cts_thresh);
+                                  isc_info[i].cts_fcst_thresh,
+                                  isc_info[i].cts_obs_thresh);
 
          // Compute the difference field for this scale
          for(k=0; k<n; k++) diff[k] = f_scl[k] - o_scl[k];
@@ -1210,6 +1223,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
       // Dump out the scores
       if(verbosity > 2) {
+
+         sprintf(thresh_str, "%s, %s", fcst_thresh_str, obs_thresh_str);
 
          cout << "FBIAS[" << thresh_str << "]\t\t= "
               << isc_info[i].fbias << "\n" << flush;
@@ -1267,18 +1282,21 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_gc, int i_thresh,
                         ISCInfo &isc_aggr) {
    int i, j;
    int fy_oy, fy_on, fn_oy, fn_on;
-   char thresh_str[max_str_len];
+   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
 
    // Set up the aggregated ISCInfo object
    isc_aggr = isc_info[0][i_thresh];
    isc_aggr.zero_out();
 
    if(verbosity > 1) {
-      isc_aggr.cts_thresh.get_abbr_str(thresh_str);
+      isc_aggr.cts_fcst_thresh.get_abbr_str(fcst_thresh_str);
+      isc_aggr.cts_obs_thresh.get_abbr_str(obs_thresh_str);
 
-      cout << "Aggregating ISC for " << conf_info.gci[i_gc].info_str
-           << ", raw threshold of " << thresh_str
-           << ", using " << conf_info.get_n_tile() << " tiles.\n"
+      cout << "Aggregating ISC for "
+           << conf_info.fcst_gci[i_gc].info_str << " " << fcst_thresh_str
+           << " versus "
+           << conf_info.obs_gci[i_gc].info_str << " " << obs_thresh_str
+           << " using " << conf_info.get_n_tile() << " tiles.\n"
            << flush;
    }
 
@@ -1331,21 +1349,28 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_gc, int i_thresh,
    // Dump out the scores
    if(verbosity > 2) {
 
-      cout << "FBIAS[" << thresh_str << "]\t\t= "
+      cout << "FBIAS["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
            << isc_aggr.fbias << "\n" << flush;
-      cout << "BASER[" << thresh_str << "]\t\t= "
+      cout << "BASER["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
            << isc_aggr.baser << "\n" << flush;
-      cout << "MSE[" << thresh_str << "]\t\t= "
+      cout << "MSE["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
            << isc_aggr.mse << "\n" << flush;
-      cout << "ISC[" << thresh_str << "]\t\t= "
+      cout << "ISC["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
            << isc_aggr.isc << "\n" << flush;
-      cout << "FEN[" << thresh_str << "]\t\t= "
+      cout << "FEN["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
            << isc_aggr.fen << "\n" << flush;
-      cout << "OEN[" << thresh_str << "]\t\t= "
+      cout << "OEN["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
            << isc_aggr.oen << "\n" << flush;
 
       for(j=0; j<=isc_aggr.n_scale; j++) {
-         cout << "SCALE_" << j+1 << "[" << thresh_str
+         cout << "SCALE_" << j+1 << "["
+              << fcst_thresh_str<< ", " << obs_thresh_str
               << "] MSE, ISC, FEN, OEN = "
               << isc_aggr.mse_scale[j] << ", "
               << isc_aggr.isc_scale[j] << ", "
@@ -1354,16 +1379,20 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_gc, int i_thresh,
               << "\n" << flush;
       }
 
-      cout << "MSE_SUM[" << thresh_str << "]\t= "
+      cout << "MSE_SUM["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
            << sum_array(isc_aggr.mse_scale, isc_aggr.n_scale+1)
            << "\n" << flush;
-      cout << "ISC_MEAN[" << thresh_str << "]\t= "
+      cout << "ISC_MEAN["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
            << mean_array(isc_aggr.isc_scale, isc_aggr.n_scale+1)
            << "\n" << flush;
-      cout << "FEN_SUM[" << thresh_str << "]\t= "
+      cout << "FEN_SUM["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
            << sum_array(isc_aggr.fen_scale, isc_aggr.n_scale+1)
            << "\n" << flush;
-      cout << "OEN_SUM[" << thresh_str << "]\t= "
+      cout << "OEN_SUM["
+           << fcst_thresh_str << ", " << obs_thresh_str << "]\t= "
            << sum_array(isc_aggr.oen_scale, isc_aggr.n_scale+1)
            << "\n" << flush;
    } // end if
@@ -1463,15 +1492,21 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
    char tmp_str[max_str_len];
 
    // Build the variable names
-   sprintf(fcst_var_name, "FCST_%s_%s_RAW",
-           conf_info.gci[i_gc].abbr_str.text(),
-           conf_info.gci[i_gc].lvl_str.text());
-   sprintf(obs_var_name, "OBS_%s_%s_RAW",
-           conf_info.gci[i_gc].abbr_str.text(),
-           conf_info.gci[i_gc].lvl_str.text());
-   sprintf(diff_var_name, "DIFF_%s_%s_RAW",
-           conf_info.gci[i_gc].abbr_str.text(),
-           conf_info.gci[i_gc].lvl_str.text());
+   sprintf(fcst_var_name, "FCST_%s_%s_%s_%s_RAW",
+           conf_info.fcst_gci[i_gc].abbr_str.text(),
+           conf_info.fcst_gci[i_gc].lvl_str.text(),
+           conf_info.obs_gci[i_gc].abbr_str.text(),
+           conf_info.obs_gci[i_gc].lvl_str.text());
+   sprintf(obs_var_name, "OBS_%s_%s_%s_%s_RAW",
+           conf_info.fcst_gci[i_gc].abbr_str.text(),
+           conf_info.fcst_gci[i_gc].lvl_str.text(),
+           conf_info.obs_gci[i_gc].abbr_str.text(),
+           conf_info.obs_gci[i_gc].lvl_str.text());
+   sprintf(diff_var_name, "DIFF_%s_%s_%s_%s_RAW",
+           conf_info.fcst_gci[i_gc].abbr_str.text(),
+           conf_info.fcst_gci[i_gc].lvl_str.text(),
+           conf_info.obs_gci[i_gc].abbr_str.text(),
+           conf_info.obs_gci[i_gc].lvl_str.text());
 
    // If this is the first tile, define new variables
    if(i_tile == 0) {
@@ -1487,12 +1522,12 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
       // Add variable attributes for the forecast field
       fcst_var->add_att("type", "Forecast");
       fcst_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.gci[i_gc].code,
+      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
       fcst_var->add_att("long_name", tmp_str);
       fcst_var->add_att("level", shc.get_fcst_lev());
-      get_grib_code_unit(conf_info.gci[i_gc].code,
+      get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
       fcst_var->add_att("units", tmp_str);
@@ -1500,13 +1535,13 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
 
       // Add variable attributes for the observation field
       obs_var->add_att("type", "Observation");
-      obs_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.gci[i_gc].code,
+      obs_var->add_att("name", shc.get_obs_var());
+      get_grib_code_name(conf_info.obs_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
       obs_var->add_att("long_name", tmp_str);
       obs_var->add_att("level", shc.get_obs_lev());
-      get_grib_code_unit(conf_info.gci[i_gc].code,
+      get_grib_code_unit(conf_info.obs_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
       obs_var->add_att("units", tmp_str);
@@ -1514,16 +1549,27 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
 
       // Add variable attributes for the difference field
       diff_var->add_att("type", "Difference (F-O)");
-      diff_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.gci[i_gc].code,
+      sprintf(tmp_str, "%s_minus_%s",
+         shc.get_fcst_var(), shc.get_obs_var());
+      diff_var->add_att("name", tmp_str);
+      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
-      diff_var->add_att("long_name", tmp_str);
-      diff_var->add_att("level", shc.get_fcst_lev());
-      get_grib_code_unit(conf_info.gci[i_gc].code,
+      diff_var->add_att("fcst_long_name", tmp_str);
+      diff_var->add_att("fcst_level", shc.get_fcst_lev());
+      get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
-      diff_var->add_att("units", tmp_str);
+      diff_var->add_att("fcst_units", tmp_str);
+      get_grib_code_name(conf_info.obs_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      diff_var->add_att("obs_long_name", tmp_str);
+      diff_var->add_att("obs_level", shc.get_obs_lev());
+      get_grib_code_unit(conf_info.obs_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      diff_var->add_att("obs_units", tmp_str);
       diff_var->add_att("_FillValue", bad_data_float);
    }
    // Otherwise, retrieve the previously defined variables
@@ -1604,7 +1650,7 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
 
 void write_nc_wav(const double *fdata, const double *odata, int n,
                   int i_gc, int i_tile, int i_scale,
-                  SingleThresh &st) {
+                  SingleThresh &fcst_st, SingleThresh &obs_st) {
    int i, d;
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
@@ -1612,25 +1658,35 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
    char fcst_var_name[max_str_len];
    char obs_var_name[max_str_len];
    char diff_var_name[max_str_len];
-   char thresh_str[max_str_len];
+   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
    char tmp_str[max_str_len];
 
    // Get the string for the threshold applied
-   st.get_abbr_str(thresh_str);
+   fcst_st.get_abbr_str(fcst_thresh_str);
+   obs_st.get_abbr_str(obs_thresh_str);
 
    // Build the variable names
-   sprintf(fcst_var_name, "FCST_%s_%s_%s",
-           conf_info.gci[i_gc].abbr_str.text(),
-           conf_info.gci[i_gc].lvl_str.text(),
-           thresh_str);
-   sprintf(obs_var_name, "OBS_%s_%s_%s",
-           conf_info.gci[i_gc].abbr_str.text(),
-           conf_info.gci[i_gc].lvl_str.text(),
-           thresh_str);
-   sprintf(diff_var_name, "DIFF_%s_%s_%s",
-           conf_info.gci[i_gc].abbr_str.text(),
-           conf_info.gci[i_gc].lvl_str.text(),
-           thresh_str);
+   sprintf(fcst_var_name, "FCST_%s_%s_%s_%s_%s_%s",
+           conf_info.fcst_gci[i_gc].abbr_str.text(),
+           conf_info.fcst_gci[i_gc].lvl_str.text(),
+           fcst_thresh_str,
+           conf_info.obs_gci[i_gc].abbr_str.text(),
+           conf_info.obs_gci[i_gc].lvl_str.text(),
+           obs_thresh_str);
+   sprintf(obs_var_name, "OBS_%s_%s_%s_%s_%s_%s",
+           conf_info.fcst_gci[i_gc].abbr_str.text(),
+           conf_info.fcst_gci[i_gc].lvl_str.text(),
+           fcst_thresh_str,
+           conf_info.obs_gci[i_gc].abbr_str.text(),
+           conf_info.obs_gci[i_gc].lvl_str.text(),
+           obs_thresh_str);
+   sprintf(diff_var_name, "DIFF_%s_%s_%s_%s_%s_%s",
+           conf_info.fcst_gci[i_gc].abbr_str.text(),
+           conf_info.fcst_gci[i_gc].lvl_str.text(),
+           fcst_thresh_str,
+           conf_info.obs_gci[i_gc].abbr_str.text(),
+           conf_info.obs_gci[i_gc].lvl_str.text(),
+           obs_thresh_str);
 
    // If this is the binary field, define new variables
    if(i_tile == 0 && i_scale < 0) {
@@ -1646,38 +1702,54 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
       // Add variable attributes for the forecast field
       fcst_var->add_att("type", "Forecast");
       fcst_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.gci[i_gc].code,
+      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
       fcst_var->add_att("long_name", tmp_str);
       fcst_var->add_att("level", shc.get_fcst_lev());
-      fcst_var->add_att("threshold", thresh_str);
+      fcst_var->add_att("threshold", fcst_thresh_str);
       fcst_var->add_att("scale_0", "binary");
       fcst_var->add_att("scale_n", "scale 2^(n-1)");
       fcst_var->add_att("_FillValue", bad_data_float);
 
       // Add variable attributes for the observation field
       obs_var->add_att("type", "Observation");
-      obs_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.gci[i_gc].code,
+      obs_var->add_att("name", shc.get_obs_var());
+      get_grib_code_name(conf_info.obs_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
       obs_var->add_att("long_name", tmp_str);
       obs_var->add_att("level", shc.get_obs_lev());
-      obs_var->add_att("threshold", thresh_str);
+      obs_var->add_att("threshold", fcst_thresh_str);
       obs_var->add_att("scale_0", "binary");
       obs_var->add_att("scale_n", "scale 2^(n-1)");
       obs_var->add_att("_FillValue", bad_data_float);
 
       // Add variable attributes for the difference field
       diff_var->add_att("type", "Difference (F-O)");
-      diff_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.gci[i_gc].code,
+      sprintf(tmp_str, "%s_minus_%s",
+         shc.get_fcst_var(), shc.get_obs_var());
+      diff_var->add_att("name", tmp_str);
+      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
                          conf_info.conf.grib_ptv().ival(),
                          tmp_str);
-      diff_var->add_att("long_name", tmp_str);
-      diff_var->add_att("level", shc.get_obs_lev());
-      diff_var->add_att("threshold", thresh_str);
+      diff_var->add_att("fcst_long_name", tmp_str);
+      diff_var->add_att("fcst_level", shc.get_fcst_lev());
+      get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      diff_var->add_att("fcst_units", tmp_str);
+      diff_var->add_att("fcst_threshold", fcst_thresh_str);
+      get_grib_code_name(conf_info.obs_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      diff_var->add_att("obs_long_name", tmp_str);
+      diff_var->add_att("obs_level", shc.get_obs_lev());
+      get_grib_code_unit(conf_info.obs_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      diff_var->add_att("obs_units", tmp_str);
+      diff_var->add_att("obs_threshold", obs_thresh_str);
       diff_var->add_att("scale_0", "binary");
       diff_var->add_att("scale_n", "scale 2^(n-1)");
       diff_var->add_att("_FillValue", bad_data_float);
@@ -1857,6 +1929,7 @@ void plot_ps_raw(const WrfData &fcst_wd,
    char fcst_str[max_str_len], fcst_short_str[max_str_len];
    char obs_str[max_str_len], obs_short_str[max_str_len];
    double v_tab, h_tab_a, h_tab_b;
+   double data_min, data_max;
    int i, mon, day, yr, hr, minute, sec;
    BoundingBox dim;
 
@@ -1885,15 +1958,26 @@ void plot_ps_raw(const WrfData &fcst_wd,
    set_plot_dims(nint(xy_bb.width), nint(xy_bb.height));
 
    //
-   // Load the raw color table
+   // Load the raw forecast color table
    //
    replace_string(met_base_str, MET_BASE,
-                  conf_info.conf.raw_color_table().sval(), tmp_str);
+                  conf_info.conf.fcst_raw_color_table().sval(), tmp_str);
    if(verbosity > 1) {
-      cout << "Loading raw color table: "
+      cout << "Loading forecast raw color table: "
            << tmp_str << "\n" << flush;
    }
-   raw_ct.read(tmp_str);
+   fcst_ct.read(tmp_str);
+
+   //
+   // Load the raw observation color table
+   //
+   replace_string(met_base_str, MET_BASE,
+                  conf_info.conf.obs_raw_color_table().sval(), tmp_str);
+   if(verbosity > 1) {
+      cout << "Loading observation raw color table: "
+           << tmp_str << "\n" << flush;
+   }
+   obs_ct.read(tmp_str);
 
    //
    // Load the wavelet color table
@@ -1907,33 +1991,80 @@ void plot_ps_raw(const WrfData &fcst_wd,
    wvlt_ct.read(tmp_str);
 
    //
-   // If the range of the colortable is [0, 1], rescale it to the
-   // raw_plot_min and raw_plot_max values.
+   // Compute the min and max data values across both raw fields for use
+   // in setting up the color table
    //
-   if(is_eq(raw_ct.data_min(bad_data_double), 0.0) &&
-      is_eq(raw_ct.data_max(bad_data_double), 1.0)) {
-      raw_ct.rescale(raw_plot_min, raw_plot_max, bad_data_double);
+   data_min = min(fcst_wd.int_to_double(0),
+                  obs_wd.int_to_double(0));
+   data_max = max(fcst_wd.int_to_double(wrfdata_int_data_max),
+                  obs_wd.int_to_double(wrfdata_int_data_max));
+
+   //
+   // If the forecast and observation fields are the same and if the range
+   // of both colortables is [0, 1], rescale both colortables to the
+   // data_min and data_max values
+   //
+   if(conf_info.fcst_gci[i_gc] == conf_info.obs_gci[i_gc] &&
+      is_eq(fcst_ct.data_min(bad_data_double), 0.0) &&
+      is_eq(fcst_ct.data_max(bad_data_double), 1.0) &&
+      is_eq(obs_ct.data_min(bad_data_double),  0.0) &&
+      is_eq(obs_ct.data_max(bad_data_double),  1.0)) {
+
+      fcst_ct.rescale(data_min, data_max, bad_data_double);
+      obs_ct.rescale(data_min, data_max, bad_data_double);
+   }
+   //
+   // Otherwise, if the range of either colortable is [0, 1], rescale
+   // the field using the min/max values in the field
+   //
+   else {
+      if(is_eq(fcst_ct.data_min(bad_data_double), 0.0) &&
+         is_eq(fcst_ct.data_max(bad_data_double), 1.0)) {
+
+         fcst_ct.rescale(fcst_wd.int_to_double(0),
+                         fcst_wd.int_to_double(wrfdata_int_data_max),
+                         bad_data_double);
+      }
+      if(is_eq(obs_ct.data_min(bad_data_double), 0.0) &&
+         is_eq(obs_ct.data_max(bad_data_double), 1.0)) {
+
+         obs_ct.rescale(obs_wd.int_to_double(0),
+                        obs_wd.int_to_double(wrfdata_int_data_max),
+                        bad_data_double);
+      }
    }
 
    //
-   // If the raw_plot_min or raw_plot_max value is set in the
-   // configuration file, rescale the colortable to the requested range.
+   // If the fcst_raw_plot_min or fcst_raw_plot_max value is set in the
+   // config file, rescale the forecast colortable to the requested range
    //
-   if(!is_eq(conf_info.conf.raw_plot_min().dval(), 0.0) ||
-      !is_eq(conf_info.conf.raw_plot_max().dval(), 0.0)) {
-      raw_ct.rescale(conf_info.conf.raw_plot_min().dval(),
-                     conf_info.conf.raw_plot_max().dval(),
+   if(!is_eq(conf_info.conf.fcst_raw_plot_min().dval(), 0.0) ||
+      !is_eq(conf_info.conf.fcst_raw_plot_max().dval(), 0.0)) {
+      fcst_ct.rescale(conf_info.conf.fcst_raw_plot_min().dval(),
+                      conf_info.conf.fcst_raw_plot_max().dval(),
+                      bad_data_double);
+   }
+
+   //
+   // If the obs_raw_plot_min or obs_raw_plot_max value is set in the
+   // config file, rescale the observation colortable to the requested range
+   //
+   if(!is_eq(conf_info.conf.obs_raw_plot_min().dval(), 0.0) ||
+      !is_eq(conf_info.conf.obs_raw_plot_max().dval(), 0.0)) {
+      obs_ct.rescale(conf_info.conf.obs_raw_plot_min().dval(),
+                     conf_info.conf.obs_raw_plot_max().dval(),
                      bad_data_double);
    }
 
    //
-   // Set the fill color.  If a fill value is not specified in the range
+   // Set the fill colors.  If a fill value is not specified in the range
    // of the color table, use the default color.  Otherwise, use the
    // color specified in the color table.
    //
-   if(bad_data_double >= raw_ct.data_min() &&
-      bad_data_double <= raw_ct.data_max())
-      c_raw_fill = raw_ct.nearest(bad_data_double);
+   if(bad_data_double >= fcst_ct.data_min() &&
+      bad_data_double <= fcst_ct.data_max()) c_fcst_fill = fcst_ct.nearest(bad_data_double);
+   if(bad_data_double >= obs_ct.data_min() &&
+      bad_data_double <= obs_ct.data_max())  c_obs_fill = obs_ct.nearest(bad_data_double);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -1943,8 +2074,9 @@ void plot_ps_raw(const WrfData &fcst_wd,
 
    ps_out->pagenumber(n_page);
 
-   sprintf(tmp_str, "Wavelet-Stat: %s",
-           conf_info.gci[i_gc].info_str.text());
+   sprintf(tmp_str, "Wavelet-Stat: %s vs %s ",
+           conf_info.fcst_gci[i_gc].info_str.text(),
+           conf_info.obs_gci[i_gc].info_str.text());
 
    ps_out->choose_font(31, 24.0, met_data_dir);
    ps_out->write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5,
@@ -1968,7 +2100,7 @@ void plot_ps_raw(const WrfData &fcst_wd,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_1);
-   render_image(ps_out, fcst_wd, dim);
+   render_image(ps_out, fcst_wd, dim, 1);
    draw_map(ps_out, dim);
    draw_border(ps_out, dim);
 
@@ -1978,7 +2110,7 @@ void plot_ps_raw(const WrfData &fcst_wd,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   draw_colorbar(ps_out, dim, 1);
+   draw_colorbar(ps_out, dim, 1, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -1987,7 +2119,7 @@ void plot_ps_raw(const WrfData &fcst_wd,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_3);
-   render_image(ps_out, obs_wd, dim);
+   render_image(ps_out, obs_wd, dim, 0);
    draw_map(ps_out, dim);
    draw_border(ps_out, dim);
 
@@ -1998,7 +2130,7 @@ void plot_ps_raw(const WrfData &fcst_wd,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_2, v_tab_2 + sm_plot_height, h_tab_1);
-   render_image(ps_out, fcst_wd_fill, dim);
+   render_image(ps_out, fcst_wd_fill, dim, 1);
    draw_map(ps_out, dim);
    draw_border(ps_out, dim);
    draw_tiles(ps_out, dim, 0, conf_info.get_n_tile()-1, 1);
@@ -2009,7 +2141,7 @@ void plot_ps_raw(const WrfData &fcst_wd,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   draw_colorbar(ps_out, dim, 1);
+   draw_colorbar(ps_out, dim, 0, 1);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2018,7 +2150,7 @@ void plot_ps_raw(const WrfData &fcst_wd,
    ////////////////////////////////////////////////////////////////////////////
 
    set_dim(dim, v_tab_2, v_tab_2 + sm_plot_height, h_tab_3);
-   render_image(ps_out, obs_wd_fill, dim);
+   render_image(ps_out, obs_wd_fill, dim, 0);
    draw_map(ps_out, dim);
    draw_border(ps_out, dim);
    draw_tiles(ps_out, dim, 0, conf_info.get_n_tile()-1, 1);
@@ -2180,8 +2312,8 @@ void plot_ps_raw(const WrfData &fcst_wd,
 void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
                   ISCInfo &isc_info,
                   int i_scale, int n_scale) {
-   char tmp_str[max_str_len], thresh_str[max_str_len];
-   char field_str[max_str_len];
+   char tmp_str[max_str_len];
+   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
    BoundingBox dim;
    double v_tab, h_tab_a, h_tab_b, h_tab_c, h_tab_d;
    double p;
@@ -2230,28 +2362,28 @@ void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   isc_info.cts_thresh.get_str(thresh_str, 2);
+   isc_info.cts_fcst_thresh.get_str(fcst_thresh_str, 2);
+   isc_info.cts_obs_thresh.get_str(obs_thresh_str, 2);
 
-   if(i_scale == -1)
-      sprintf(tmp_str, "Wavelet-Stat: %s, Tile %i, %s, Binary",
-              conf_info.gci[i_gc].info_str.text(),
-              i_tile+1, thresh_str);
-   else
-      sprintf(tmp_str, "Wavelet-Stat: %s, Tile %i, %s, Scale %i",
-              conf_info.gci[i_gc].info_str.text(),
-              i_tile+1, thresh_str, i_scale+1);
+   sprintf(tmp_str, "Wavelet-Stat: %s %s vs %s %s",
+           conf_info.fcst_gci[i_gc].info_str.text(), fcst_thresh_str,
+           conf_info.obs_gci[i_gc].info_str.text(), obs_thresh_str);
 
    ps_out->choose_font(31, 24.0, met_data_dir);
    v_tab -= 1.0*plot_text_sep;
    ps_out->write_centered_text(1, 1, h_tab_cen, v_tab, 0.5, 0.5,
                                tmp_str);
+   if(i_scale == -1)
+      sprintf(tmp_str, "Tile %i, Binary, Difference (F-0)",
+              i_tile+1);
+   else
+      sprintf(tmp_str, "Tile %i, Scale %i, Difference (F-0)",
+              i_tile+1, i_scale+1);
 
-   strcpy(field_str, "Difference (F-0)");
-
-   ps_out->choose_font(31, 18.0, met_data_dir);
    v_tab -= 2.0*plot_text_sep;
    ps_out->write_centered_text(1, 1, h_tab_cen, v_tab, 0.5, 0.5,
-                               field_str);
+                               tmp_str);
+
    v_tab -= 1.0*plot_text_sep;
 
    ////////////////////////////////////////////////////////////////////////////
@@ -2265,7 +2397,7 @@ void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
    draw_map(ps_out, dim);
    draw_border(ps_out, dim);
    draw_tiles(ps_out, dim, i_tile, i_tile, 0);
-   draw_colorbar(ps_out, dim, 0);
+   draw_colorbar(ps_out, dim, 0, 0);
 
    ////////////////////////////////////////////////////////////////////////////
    //
@@ -2522,7 +2654,7 @@ void set_dim(BoundingBox &dim, double y_ll, double y_ur, double x_cen) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_colorbar(PSfile *p, BoundingBox &dim, int raw) {
+void draw_colorbar(PSfile *p, BoundingBox &dim, int fcst, int raw) {
    int i;
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll, step, v;
@@ -2532,8 +2664,9 @@ void draw_colorbar(PSfile *p, BoundingBox &dim, int raw) {
    //
    // Set up the pointer to the appropriate colortable
    //
-   if(raw == 1) ct_ptr = &raw_ct;
-   else         ct_ptr = &wvlt_ct;
+   if     (raw == 1 && fcst == 1) ct_ptr = &fcst_ct;
+   else if(raw == 1 && fcst == 0) ct_ptr = &obs_ct;
+   else                           ct_ptr = &wvlt_ct;
 
    //
    // Draw colorbar in the bottom-right corner of the Bounding Box
@@ -2708,7 +2841,7 @@ void draw_tiles(PSfile *p, BoundingBox &dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-void render_image(PSfile *p, const WrfData &wd, BoundingBox &dim) {
+void render_image(PSfile *p, const WrfData &wd, BoundingBox &dim, int fcst) {
    RenderInfo render_info;
    Ppm ppm_image;
    int x, y, grid_x, grid_y;
@@ -2721,8 +2854,14 @@ void render_image(PSfile *p, const WrfData &wd, BoundingBox &dim) {
    // Set up pointers to the appropriate colortable and fill color
    // values.
    //
-   ct_ptr = &raw_ct;
-   c_fill_ptr = &c_raw_fill;
+   if(fcst == 1) {
+      ct_ptr     = &fcst_ct;
+      c_fill_ptr = &c_fcst_fill;
+   }
+   else {
+      ct_ptr     = &obs_ct;
+      c_fill_ptr = &c_obs_fill;
+   }
 
    //
    // Convert the WrfData object to PPM

@@ -68,8 +68,10 @@ class WaveletStatConfInfo {
 
       // Various objects to store the data that's parsed from the
       // Wavelet-Stat configuration object
-      GCInfo      *gci;         // Array for verification fields [n_vx]
-      ThreshArray *ta;          // Array for thresholds [n_vx]
+      GCInfo      *fcst_gci;    // Array for fcst fields [n_vx]
+      GCInfo      *obs_gci;     // Array for obs fields [n_vx]
+      ThreshArray *fcst_ta;     // Array for fcst thresholds [n_vx]
+      ThreshArray *obs_ta;      // Array for obs thresholds [n_vx]
 
       NumArray     tile_xll;    // Array of lower-left x coordinates
       NumArray     tile_yll;    // Array of lower-left y coordinates

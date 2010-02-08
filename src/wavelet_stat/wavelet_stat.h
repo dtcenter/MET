@@ -153,7 +153,7 @@ static int          i_isc_row;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static ColorTable raw_ct, wvlt_ct;
+static ColorTable fcst_ct, obs_ct, wvlt_ct;
 static const Color c_map(25, 25, 25);
 static const Color c_hull(0, 0, 0);
 static const Color c_bndy(0, 0, 255);
@@ -191,7 +191,8 @@ static double sm_plot_height, lg_plot_height;
 static double h_tab_1, h_tab_2, h_tab_3;
 static double v_tab_1, v_tab_2, v_tab_3;
 
-static Color c_raw_fill(150, 150, 150);
+static Color c_fcst_fill(150, 150, 150);
+static Color c_obs_fill(150, 150, 150);
 static Color c_wvlt_fill(150, 150, 150);
 
 ////////////////////////////////////////////////////////////////////////

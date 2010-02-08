@@ -13,7 +13,7 @@
    //
    //     Created from config file "WaveletStatConfig_default"
    //
-   //     on March 26, 2009    10:43 am  MST
+   //     on December 7, 2009    9:33 am  MST
    //
 
 
@@ -130,47 +130,57 @@ void wavelet_stat_Conf::clear()
 
 {
 
-            _model_entry = (const SymbolTableEntry *) 0;
+               _model_entry = (const SymbolTableEntry *) 0;
 
-            _field_entry = (const SymbolTableEntry *) 0;
+          _fcst_field_entry = (const SymbolTableEntry *) 0;
 
-           _thresh_entry = (const SymbolTableEntry *) 0;
+           _obs_field_entry = (const SymbolTableEntry *) 0;
 
-_mask_missing_flag_entry = (const SymbolTableEntry *) 0;
+         _fcst_thresh_entry = (const SymbolTableEntry *) 0;
 
- _grid_decomp_flag_entry = (const SymbolTableEntry *) 0;
+          _obs_thresh_entry = (const SymbolTableEntry *) 0;
 
-         _tile_xll_entry = (const SymbolTableEntry *) 0;
+   _mask_missing_flag_entry = (const SymbolTableEntry *) 0;
 
-         _tile_yll_entry = (const SymbolTableEntry *) 0;
+    _grid_decomp_flag_entry = (const SymbolTableEntry *) 0;
 
-         _tile_dim_entry = (const SymbolTableEntry *) 0;
+            _tile_xll_entry = (const SymbolTableEntry *) 0;
 
-     _wavelet_flag_entry = (const SymbolTableEntry *) 0;
+            _tile_yll_entry = (const SymbolTableEntry *) 0;
 
-        _wavelet_k_entry = (const SymbolTableEntry *) 0;
+            _tile_dim_entry = (const SymbolTableEntry *) 0;
 
-      _output_flag_entry = (const SymbolTableEntry *) 0;
+        _wavelet_flag_entry = (const SymbolTableEntry *) 0;
 
-     _met_data_dir_entry = (const SymbolTableEntry *) 0;
+           _wavelet_k_entry = (const SymbolTableEntry *) 0;
 
-  _raw_color_table_entry = (const SymbolTableEntry *) 0;
+         _output_flag_entry = (const SymbolTableEntry *) 0;
 
- _wvlt_color_table_entry = (const SymbolTableEntry *) 0;
+        _met_data_dir_entry = (const SymbolTableEntry *) 0;
 
-     _raw_plot_min_entry = (const SymbolTableEntry *) 0;
+_fcst_raw_color_table_entry = (const SymbolTableEntry *) 0;
 
-     _raw_plot_max_entry = (const SymbolTableEntry *) 0;
+ _obs_raw_color_table_entry = (const SymbolTableEntry *) 0;
 
-    _wvlt_plot_min_entry = (const SymbolTableEntry *) 0;
+    _wvlt_color_table_entry = (const SymbolTableEntry *) 0;
 
-    _wvlt_plot_max_entry = (const SymbolTableEntry *) 0;
+   _fcst_raw_plot_min_entry = (const SymbolTableEntry *) 0;
 
-         _grib_ptv_entry = (const SymbolTableEntry *) 0;
+   _fcst_raw_plot_max_entry = (const SymbolTableEntry *) 0;
 
-    _output_prefix_entry = (const SymbolTableEntry *) 0;
+    _obs_raw_plot_min_entry = (const SymbolTableEntry *) 0;
 
-          _version_entry = (const SymbolTableEntry *) 0;
+    _obs_raw_plot_max_entry = (const SymbolTableEntry *) 0;
+
+       _wvlt_plot_min_entry = (const SymbolTableEntry *) 0;
+
+       _wvlt_plot_max_entry = (const SymbolTableEntry *) 0;
+
+            _grib_ptv_entry = (const SymbolTableEntry *) 0;
+
+       _output_prefix_entry = (const SymbolTableEntry *) 0;
+
+             _version_entry = (const SymbolTableEntry *) 0;
 
 
 _m.clear();
@@ -212,30 +222,56 @@ if ( !_e && Panic )  {
 _model_entry = _e;
 
 
-_e = _m.find("field");
+_e = _m.find("fcst_field");
 
 if ( !_e && Panic )  {
 
-   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"field\"\n\n";
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_field\"\n\n";
 
    exit ( 1 );
 
 }
 
-_field_entry = _e;
+_fcst_field_entry = _e;
 
 
-_e = _m.find("thresh");
+_e = _m.find("obs_field");
 
 if ( !_e && Panic )  {
 
-   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"thresh\"\n\n";
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_field\"\n\n";
 
    exit ( 1 );
 
 }
 
-_thresh_entry = _e;
+_obs_field_entry = _e;
+
+
+_e = _m.find("fcst_thresh");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_thresh\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_fcst_thresh_entry = _e;
+
+
+_e = _m.find("obs_thresh");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_thresh\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_obs_thresh_entry = _e;
 
 
 _e = _m.find("mask_missing_flag");
@@ -355,17 +391,30 @@ if ( !_e && Panic )  {
 _met_data_dir_entry = _e;
 
 
-_e = _m.find("raw_color_table");
+_e = _m.find("fcst_raw_color_table");
 
 if ( !_e && Panic )  {
 
-   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"raw_color_table\"\n\n";
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_raw_color_table\"\n\n";
 
    exit ( 1 );
 
 }
 
-_raw_color_table_entry = _e;
+_fcst_raw_color_table_entry = _e;
+
+
+_e = _m.find("obs_raw_color_table");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_raw_color_table\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_obs_raw_color_table_entry = _e;
 
 
 _e = _m.find("wvlt_color_table");
@@ -381,30 +430,56 @@ if ( !_e && Panic )  {
 _wvlt_color_table_entry = _e;
 
 
-_e = _m.find("raw_plot_min");
+_e = _m.find("fcst_raw_plot_min");
 
 if ( !_e && Panic )  {
 
-   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"raw_plot_min\"\n\n";
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_raw_plot_min\"\n\n";
 
    exit ( 1 );
 
 }
 
-_raw_plot_min_entry = _e;
+_fcst_raw_plot_min_entry = _e;
 
 
-_e = _m.find("raw_plot_max");
+_e = _m.find("fcst_raw_plot_max");
 
 if ( !_e && Panic )  {
 
-   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"raw_plot_max\"\n\n";
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_raw_plot_max\"\n\n";
 
    exit ( 1 );
 
 }
 
-_raw_plot_max_entry = _e;
+_fcst_raw_plot_max_entry = _e;
+
+
+_e = _m.find("obs_raw_plot_min");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_raw_plot_min\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_obs_raw_plot_min_entry = _e;
+
+
+_e = _m.find("obs_raw_plot_max");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  wavelet_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_raw_plot_max\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_obs_raw_plot_max_entry = _e;
 
 
 _e = _m.find("wvlt_plot_min");
@@ -510,18 +585,18 @@ return ( _temp_result );
 ////////////////////////////////////////////////////////////////////////
 
 
-Result wavelet_stat_Conf::field(int _i0)
+Result wavelet_stat_Conf::fcst_field(int _i0)
 
 {
 
 Result _temp_result;
 
-if ( !_field_entry && !Panic )  return ( _temp_result );
+if ( !_fcst_field_entry && !Panic )  return ( _temp_result );
 
 IcodeCell _cell;
 const IcodeVector * _v = (const IcodeVector *) 0;
 int _indices[max_array_dim];
-const ArrayInfo * _a = _field_entry->ai;
+const ArrayInfo * _a = _fcst_field_entry->ai;
 
 
    //
@@ -553,14 +628,14 @@ return ( _temp_result );
 ////////////////////////////////////////////////////////////////////////
 
 
-int wavelet_stat_Conf::n_field_elements()
+int wavelet_stat_Conf::n_fcst_field_elements()
 
 {
 
-if ( !_field_entry && !Panic )  return ( 0 );
+if ( !_fcst_field_entry && !Panic )  return ( 0 );
 
 int _n;
-const ArrayInfo * _a = _field_entry->ai;
+const ArrayInfo * _a = _fcst_field_entry->ai;
 
 
 _n = _a->size(0);
@@ -578,18 +653,18 @@ return ( _n );
 ////////////////////////////////////////////////////////////////////////
 
 
-Result wavelet_stat_Conf::thresh(int _i0)
+Result wavelet_stat_Conf::obs_field(int _i0)
 
 {
 
 Result _temp_result;
 
-if ( !_thresh_entry && !Panic )  return ( _temp_result );
+if ( !_obs_field_entry && !Panic )  return ( _temp_result );
 
 IcodeCell _cell;
 const IcodeVector * _v = (const IcodeVector *) 0;
 int _indices[max_array_dim];
-const ArrayInfo * _a = _thresh_entry->ai;
+const ArrayInfo * _a = _obs_field_entry->ai;
 
 
    //
@@ -621,14 +696,150 @@ return ( _temp_result );
 ////////////////////////////////////////////////////////////////////////
 
 
-int wavelet_stat_Conf::n_thresh_elements()
+int wavelet_stat_Conf::n_obs_field_elements()
 
 {
 
-if ( !_thresh_entry && !Panic )  return ( 0 );
+if ( !_obs_field_entry && !Panic )  return ( 0 );
 
 int _n;
-const ArrayInfo * _a = _thresh_entry->ai;
+const ArrayInfo * _a = _obs_field_entry->ai;
+
+
+_n = _a->size(0);
+
+
+   //
+   //  done
+   //
+
+return ( _n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result wavelet_stat_Conf::fcst_thresh(int _i0)
+
+{
+
+Result _temp_result;
+
+if ( !_fcst_thresh_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+const IcodeVector * _v = (const IcodeVector *) 0;
+int _indices[max_array_dim];
+const ArrayInfo * _a = _fcst_thresh_entry->ai;
+
+
+   //
+   //  load up the indices
+   //
+
+_indices[0] = _i0;
+
+
+_v = _a->get(_indices);
+
+
+_m.run( *_v );
+
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+   //
+   //  done
+   //
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int wavelet_stat_Conf::n_fcst_thresh_elements()
+
+{
+
+if ( !_fcst_thresh_entry && !Panic )  return ( 0 );
+
+int _n;
+const ArrayInfo * _a = _fcst_thresh_entry->ai;
+
+
+_n = _a->size(0);
+
+
+   //
+   //  done
+   //
+
+return ( _n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result wavelet_stat_Conf::obs_thresh(int _i0)
+
+{
+
+Result _temp_result;
+
+if ( !_obs_thresh_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+const IcodeVector * _v = (const IcodeVector *) 0;
+int _indices[max_array_dim];
+const ArrayInfo * _a = _obs_thresh_entry->ai;
+
+
+   //
+   //  load up the indices
+   //
+
+_indices[0] = _i0;
+
+
+_v = _a->get(_indices);
+
+
+_m.run( *_v );
+
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+   //
+   //  done
+   //
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int wavelet_stat_Conf::n_obs_thresh_elements()
+
+{
+
+if ( !_obs_thresh_entry && !Panic )  return ( 0 );
+
+int _n;
+const ArrayInfo * _a = _obs_thresh_entry->ai;
 
 
 _n = _a->size(0);
@@ -1000,17 +1211,42 @@ return ( _temp_result );
 ////////////////////////////////////////////////////////////////////////
 
 
-Result wavelet_stat_Conf::raw_color_table()
+Result wavelet_stat_Conf::fcst_raw_color_table()
 
 {
 
 Result _temp_result;
 
-if ( !_raw_color_table_entry && !Panic )  return ( _temp_result );
+if ( !_fcst_raw_color_table_entry && !Panic )  return ( _temp_result );
 
 IcodeCell _cell;
 
-_m.run( *_raw_color_table_entry );
+_m.run( *_fcst_raw_color_table_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result wavelet_stat_Conf::obs_raw_color_table()
+
+{
+
+Result _temp_result;
+
+if ( !_obs_raw_color_table_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_obs_raw_color_table_entry );
 
 _cell = _m.pop();
 
@@ -1050,17 +1286,17 @@ return ( _temp_result );
 ////////////////////////////////////////////////////////////////////////
 
 
-Result wavelet_stat_Conf::raw_plot_min()
+Result wavelet_stat_Conf::fcst_raw_plot_min()
 
 {
 
 Result _temp_result;
 
-if ( !_raw_plot_min_entry && !Panic )  return ( _temp_result );
+if ( !_fcst_raw_plot_min_entry && !Panic )  return ( _temp_result );
 
 IcodeCell _cell;
 
-_m.run( *_raw_plot_min_entry );
+_m.run( *_fcst_raw_plot_min_entry );
 
 _cell = _m.pop();
 
@@ -1075,17 +1311,67 @@ return ( _temp_result );
 ////////////////////////////////////////////////////////////////////////
 
 
-Result wavelet_stat_Conf::raw_plot_max()
+Result wavelet_stat_Conf::fcst_raw_plot_max()
 
 {
 
 Result _temp_result;
 
-if ( !_raw_plot_max_entry && !Panic )  return ( _temp_result );
+if ( !_fcst_raw_plot_max_entry && !Panic )  return ( _temp_result );
 
 IcodeCell _cell;
 
-_m.run( *_raw_plot_max_entry );
+_m.run( *_fcst_raw_plot_max_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result wavelet_stat_Conf::obs_raw_plot_min()
+
+{
+
+Result _temp_result;
+
+if ( !_obs_raw_plot_min_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_obs_raw_plot_min_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result wavelet_stat_Conf::obs_raw_plot_max()
+
+{
+
+Result _temp_result;
+
+if ( !_obs_raw_plot_max_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_obs_raw_plot_max_entry );
 
 _cell = _m.pop();
 
