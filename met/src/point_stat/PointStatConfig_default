@@ -41,7 +41,7 @@ end_ds =  5400;
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
 //    NOTE: To verify winds as vectors rather than scalars,
-//          specify UGRD (or 33) followd by VGRD (or 34) with the
+//          specify UGRD (or 33) followed by VGRD (or 34) with the
 //          same level values.
 //
 //    NOTE: To process a probability field, add "/PROB", such as "POP/Z0/PROB".
