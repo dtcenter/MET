@@ -343,6 +343,9 @@ class Grid : public GridInterface {
       Grid(const Grid &);
       Grid & operator=(const Grid &);
 
+      bool operator==(const Grid &);
+      bool operator!=(const Grid &);
+
       void latlon_to_xy(double lat, double lon, double &x, double &y) const;
 
       void xy_to_latlon(double x, double y, double &lat, double &lon) const;

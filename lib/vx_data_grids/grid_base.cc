@@ -129,6 +129,103 @@ return ( *this );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool Grid::operator==(const Grid &g)
+
+{
+
+GridData d1, d2;
+bool match = false;
+
+if ( this->rep->proj_type() == g.rep->proj_type() ) {
+
+   // Retrieve the grid data
+   this->rep->grid_data(d1);
+   g.rep->grid_data(d2);
+
+   // Switch on the projection type
+   switch ( this->rep->proj_type() ) {
+
+      case LambertProj:
+         if ( d1.lc_data.p1_deg   == d2.lc_data.p1_deg   &&
+              d1.lc_data.p2_deg   == d2.lc_data.p2_deg   &&
+              d1.lc_data.p0_deg   == d2.lc_data.p0_deg   &&
+              d1.lc_data.l0_deg   == d2.lc_data.l0_deg   &&
+              d1.lc_data.lcen_deg == d2.lc_data.lcen_deg &&
+              d1.lc_data.d_km     == d2.lc_data.d_km     &&
+              d1.lc_data.r_km     == d2.lc_data.r_km     &&
+              d1.lc_data.nx       == d2.lc_data.nx       &&
+              d1.lc_data.ny       == d2.lc_data.ny )  match = true;
+         break;
+
+      case StereographicProj:
+         if ( d1.st_data.p1_deg   == d2.st_data.p1_deg   &&
+              d1.st_data.p0_deg   == d2.st_data.p0_deg   &&
+              d1.st_data.l0_deg   == d2.st_data.l0_deg   &&
+              d1.st_data.lcen_deg == d2.st_data.lcen_deg &&
+              d1.st_data.d_km     == d2.st_data.d_km     &&
+              d1.st_data.r_km     == d2.st_data.r_km     &&
+              d1.st_data.nx       == d2.st_data.nx       &&
+              d1.st_data.ny       == d2.st_data.ny )  match = true;
+         break;
+
+      case ExpProj:
+         if ( d1.ex_data.lat_origin_deg == d2.ex_data.lat_origin_deg &&
+              d1.ex_data.lon_origin_deg == d2.ex_data.lon_origin_deg &&
+              d1.ex_data.lat_2_deg      == d2.ex_data.lat_2_deg      &&
+              d1.ex_data.lon_2_deg      == d2.ex_data.lon_2_deg      &&
+              d1.ex_data.x_scale        == d2.ex_data.x_scale        &&
+              d1.ex_data.y_scale        == d2.ex_data.y_scale        &&
+              d1.ex_data.x_offset       == d2.ex_data.x_offset       &&
+              d1.ex_data.y_offset       == d2.ex_data.y_offset       &&
+              d1.ex_data.nx             == d2.ex_data.nx             &&
+              d1.ex_data.ny             == d2.ex_data.ny )  match = true;
+         break;
+
+      case PlateCarreeProj:
+         if ( d1.pc_data.lat_ll_deg    == d2.pc_data.lat_ll_deg    &&
+              d1.pc_data.lon_ll_deg    == d2.pc_data.lon_ll_deg    &&
+              d1.pc_data.delta_lat_deg == d2.pc_data.delta_lat_deg &&
+              d1.pc_data.delta_lon_deg == d2.pc_data.delta_lon_deg &&
+              d1.pc_data.Nlat          == d2.pc_data.Nlat          &&
+              d1.pc_data.Nlon          == d2.pc_data.Nlon )  match = true;
+         break;
+
+      case MercatorProj:
+         if ( d1.mc_data.lat_ll_deg == d2.mc_data.lat_ll_deg &&
+              d1.mc_data.lon_ll_deg == d2.mc_data.lon_ll_deg &&
+              d1.mc_data.lat_ur_deg == d2.mc_data.lat_ur_deg &&
+              d1.mc_data.lon_ur_deg == d2.mc_data.lon_ur_deg &&
+              d1.mc_data.nx         == d2.mc_data.nx         &&
+              d1.mc_data.ny         == d2.mc_data.ny )  match = true;
+         break;
+
+      case NoProj:
+      default:
+         match = false;
+         break;
+   }
+
+}
+
+return ( match );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Grid::operator!=(const Grid &g)
+
+{
+
+return ( !(*this == g) );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 void Grid::detach()
 
 {
