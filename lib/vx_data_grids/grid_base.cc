@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 #include <vx_data_grids/grid_base.h>
+#include <vx_math/is_bad_data.h>
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -146,57 +147,57 @@ if ( this->rep->proj_type() == g.rep->proj_type() ) {
    switch ( this->rep->proj_type() ) {
 
       case LambertProj:
-         if ( d1.lc_data.p1_deg   == d2.lc_data.p1_deg   &&
-              d1.lc_data.p2_deg   == d2.lc_data.p2_deg   &&
-              d1.lc_data.p0_deg   == d2.lc_data.p0_deg   &&
-              d1.lc_data.l0_deg   == d2.lc_data.l0_deg   &&
-              d1.lc_data.lcen_deg == d2.lc_data.lcen_deg &&
-              d1.lc_data.d_km     == d2.lc_data.d_km     &&
-              d1.lc_data.r_km     == d2.lc_data.r_km     &&
-              d1.lc_data.nx       == d2.lc_data.nx       &&
-              d1.lc_data.ny       == d2.lc_data.ny )  match = true;
+         if ( is_eq(d1.lc_data.p1_deg,   d2.lc_data.p1_deg   ) &&
+              is_eq(d1.lc_data.p2_deg,   d2.lc_data.p2_deg   ) &&
+              is_eq(d1.lc_data.p0_deg,   d2.lc_data.p0_deg   ) &&
+              is_eq(d1.lc_data.l0_deg,   d2.lc_data.l0_deg   ) &&
+              is_eq(d1.lc_data.lcen_deg, d2.lc_data.lcen_deg ) &&
+              is_eq(d1.lc_data.d_km,     d2.lc_data.d_km     ) &&
+              is_eq(d1.lc_data.r_km,     d2.lc_data.r_km     ) &&
+              d1.lc_data.nx           == d2.lc_data.nx         &&
+              d1.lc_data.ny           == d2.lc_data.ny )  match = true;
          break;
 
       case StereographicProj:
-         if ( d1.st_data.p1_deg   == d2.st_data.p1_deg   &&
-              d1.st_data.p0_deg   == d2.st_data.p0_deg   &&
-              d1.st_data.l0_deg   == d2.st_data.l0_deg   &&
-              d1.st_data.lcen_deg == d2.st_data.lcen_deg &&
-              d1.st_data.d_km     == d2.st_data.d_km     &&
-              d1.st_data.r_km     == d2.st_data.r_km     &&
-              d1.st_data.nx       == d2.st_data.nx       &&
-              d1.st_data.ny       == d2.st_data.ny )  match = true;
+         if ( is_eq(d1.st_data.p1_deg,   d2.st_data.p1_deg   ) &&
+              is_eq(d1.st_data.p0_deg,   d2.st_data.p0_deg   ) &&
+              is_eq(d1.st_data.l0_deg,   d2.st_data.l0_deg   ) &&
+              is_eq(d1.st_data.lcen_deg, d2.st_data.lcen_deg ) &&
+              is_eq(d1.st_data.d_km,     d2.st_data.d_km     ) &&
+              is_eq(d1.st_data.r_km,     d2.st_data.r_km     ) &&
+              d1.st_data.nx           == d2.st_data.nx         &&
+              d1.st_data.ny           == d2.st_data.ny )  match = true;
          break;
 
       case ExpProj:
-         if ( d1.ex_data.lat_origin_deg == d2.ex_data.lat_origin_deg &&
-              d1.ex_data.lon_origin_deg == d2.ex_data.lon_origin_deg &&
-              d1.ex_data.lat_2_deg      == d2.ex_data.lat_2_deg      &&
-              d1.ex_data.lon_2_deg      == d2.ex_data.lon_2_deg      &&
-              d1.ex_data.x_scale        == d2.ex_data.x_scale        &&
-              d1.ex_data.y_scale        == d2.ex_data.y_scale        &&
-              d1.ex_data.x_offset       == d2.ex_data.x_offset       &&
-              d1.ex_data.y_offset       == d2.ex_data.y_offset       &&
-              d1.ex_data.nx             == d2.ex_data.nx             &&
-              d1.ex_data.ny             == d2.ex_data.ny )  match = true;
+         if ( is_eq(d1.ex_data.lat_origin_deg, d2.ex_data.lat_origin_deg ) &&
+              is_eq(d1.ex_data.lon_origin_deg, d2.ex_data.lon_origin_deg ) &&
+              is_eq(d1.ex_data.lat_2_deg,      d2.ex_data.lat_2_deg      ) &&
+              is_eq(d1.ex_data.lon_2_deg,      d2.ex_data.lon_2_deg      ) &&
+              is_eq(d1.ex_data.x_scale,        d2.ex_data.x_scale        ) &&
+              is_eq(d1.ex_data.y_scale,        d2.ex_data.y_scale        ) &&
+              is_eq(d1.ex_data.x_offset,       d2.ex_data.x_offset       ) &&
+              is_eq(d1.ex_data.y_offset,       d2.ex_data.y_offset       ) &&
+              d1.ex_data.nx                 == d2.ex_data.nx               &&
+              d1.ex_data.ny                 == d2.ex_data.ny )  match = true;
          break;
 
       case PlateCarreeProj:
-         if ( d1.pc_data.lat_ll_deg    == d2.pc_data.lat_ll_deg    &&
-              d1.pc_data.lon_ll_deg    == d2.pc_data.lon_ll_deg    &&
-              d1.pc_data.delta_lat_deg == d2.pc_data.delta_lat_deg &&
-              d1.pc_data.delta_lon_deg == d2.pc_data.delta_lon_deg &&
-              d1.pc_data.Nlat          == d2.pc_data.Nlat          &&
-              d1.pc_data.Nlon          == d2.pc_data.Nlon )  match = true;
+         if ( is_eq(d1.pc_data.lat_ll_deg,    d2.pc_data.lat_ll_deg    ) &&
+              is_eq(d1.pc_data.lon_ll_deg,    d2.pc_data.lon_ll_deg    ) &&
+              is_eq(d1.pc_data.delta_lat_deg, d2.pc_data.delta_lat_deg ) &&
+              is_eq(d1.pc_data.delta_lon_deg, d2.pc_data.delta_lon_deg ) &&
+              d1.pc_data.Nlat              == d2.pc_data.Nlat            &&
+              d1.pc_data.Nlon              == d2.pc_data.Nlon )  match = true;
          break;
 
       case MercatorProj:
-         if ( d1.mc_data.lat_ll_deg == d2.mc_data.lat_ll_deg &&
-              d1.mc_data.lon_ll_deg == d2.mc_data.lon_ll_deg &&
-              d1.mc_data.lat_ur_deg == d2.mc_data.lat_ur_deg &&
-              d1.mc_data.lon_ur_deg == d2.mc_data.lon_ur_deg &&
-              d1.mc_data.nx         == d2.mc_data.nx         &&
-              d1.mc_data.ny         == d2.mc_data.ny )  match = true;
+         if ( is_eq(d1.mc_data.lat_ll_deg, d2.mc_data.lat_ll_deg ) &&
+              is_eq(d1.mc_data.lon_ll_deg, d2.mc_data.lon_ll_deg ) &&
+              is_eq(d1.mc_data.lat_ur_deg, d2.mc_data.lat_ur_deg ) &&
+              is_eq(d1.mc_data.lon_ur_deg, d2.mc_data.lon_ur_deg ) &&
+              d1.mc_data.nx             == d2.mc_data.nx           &&
+              d1.mc_data.ny             == d2.mc_data.ny )  match = true;
          break;
 
       case NoProj:
