@@ -40,11 +40,14 @@ inline int is_bad_data(float a) {
    else                                                return(0);
 }
 
-inline int is_eq(double a, double b) {
-   if(abs((long double) (a - b)) < 10E-5) return(1);
-   else                                   return(0);
+inline int is_eq(double a, double b, double tol) {
+   if(abs((long double) (a - b)) < tol) return(1);
+   else                                 return(0);
 }
 
+inline int is_eq(double a, double b) {
+   return(is_eq(a, b, 10E-5));
+}
 
 ////////////////////////////////////////////////////////////////////////
 
