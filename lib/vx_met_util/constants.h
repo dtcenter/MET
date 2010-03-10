@@ -45,7 +45,7 @@ static const char all_interp_mthd_str[] =
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
    "[0-9]\\{8,8\\}_[0-9]\\{6,6\\}";
-static const char non_ws_reg_exp[] = "[a-zA-Z0-9]";
+static const char ws_reg_exp[] = "[ \t\r\n]";
 
 // Bootstrap methods
 static const int boot_bca_flag  = 0;

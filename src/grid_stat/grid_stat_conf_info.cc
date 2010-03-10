@@ -125,11 +125,12 @@ void GridStatConfInfo::process_config() {
    //
 
    if(strlen(conf.model().sval()) == 0 ||
-      check_reg_exp(non_ws_reg_exp, conf.model().sval()) != true) {
+      check_reg_exp(ws_reg_exp, conf.model().sval()) == true) {
 
       cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-           << "The model name must be set to a non-empty "
-           << "string value.\n\n" << flush;
+           << "The model name (\"" << conf.model().sval()
+           << "\") must be non-empty and contain no embedded "
+           << "whitespace.\n\n" << flush;
       exit(1);
    }
 

@@ -778,12 +778,12 @@ void check_engine_config() {
 
    // Check that the model name is not empty
    if(strlen(engine.wconf.model().sval()) == 0 ||
-      check_reg_exp(non_ws_reg_exp,
-                    engine.wconf.model().sval()) != true) {
+      check_reg_exp(ws_reg_exp, engine.wconf.model().sval()) == true) {
 
       cerr << "\n\nERROR: check_engine_config() -> "
-           << "The model name must be set to a non-empty "
-           << "string value.\n\n" << flush;
+           << "The model name (\"" << engine.wconf.model().sval() 
+           << "\") must be non-empty and contain no embedded "
+           << "whitespace.\n\n" << flush;
       exit(1);
    }
 
