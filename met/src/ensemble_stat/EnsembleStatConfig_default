@@ -1,0 +1,81 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default ensemble_stat configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+model = "WRF";
+
+//
+// Section 1: Ensemble Processing
+// Must specify...
+// (1) Ensemble field to be processed (ens_field[] = ["APCP/A3"];)
+// (2) Ensemble thresholds to be used in computing ensemble relative frequencies (ens_thresh[] = ["gt0.0 ge5.0"];)
+// (3) Valid Ensemble threshold - percentage of input ensemble members that must exist (vld_ens_thresh = 1.0;)
+// (4) Valid Data threshold - percentage of ensemble data points that must be valid (vld_data_thresh = 1.0;)
+// (5) Output flag to specify which of the following should be computed (output_flag[] = [];):
+//     - NetCDF Field for Ensemble Mean
+//     - NetCDF Field for Ensemble Standard Deviation
+//     - NetCDF Field for Ensemble Mean - 1 Standard Deviation
+//     - NetCDF Field for Ensemble Mean + 1 Standard Deviation
+//     - NetCDF Field for Ensemble Minimum
+//     - NetCDF Field for Ensemble Maximum
+//     - NetCDF Field for Ensemble Range
+//     - NetCDF Field for Ensemble Valid Data Count
+//     - NetCDF Field for Ensemble Relative Frequency (by threshold)
+//
+ens_field[]     = [ "61/A3" ];
+ens_thresh[]    = [ "gt0.0 ge5.0" ];
+vld_ens_thresh  = 1.0;
+vld_data_thresh = 1.0;
+output_flag[]   = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2 ];
+
+//
+// Section 2: Rank Histograms with Point Observations
+// Must specify...
+// (1) Forecast field to be ranked (fcst_field[] = ["APCP/A3", "TMP/P500-1000"];)
+// (2) Observation field to be ranked (obs_field[] = [];)
+// (3) Valid time window for matching (beg_ds and end_ds - also allow -valid_beg and -valid_end command line options)
+// (4) Verifying message type (message_type[] = ["ADPUPA"];)
+// (5) Verification grid masking region (mask_grid[] = ["FULL"];)
+// (6) Verification poly masking region (mask_poly[] = ["MET_BASE/data/poly/EAST.poly"];)
+// (7) Interpolation width (interp_width[] = [1];)
+// (8) Interpolation method (interp_method[] = [1];)
+// (9) Interpolation valid data threshold (interp_thresh = 1.0;)
+// (10) Output flag to specify:
+//     - Ranked histogram data
+//     - Matched pair data (obs value + obs rank + (all interpolated ensemble member values???)
+// Questions:
+//     - Do we need to implement masking by station id (mask_sid)?  Probably not.
+//     - Do we need to handle ranges of pressure levels? Probably yes.
+//
+fcst_field[]    = [ "61/A3" ];
+obs_field[]     = [];
+beg_ds          = -5400;
+end_ds          =  5400;
+message_type[]  = [ "ADPUPA" ];
+mask_grid[]     = [ "FULL" ];
+mask_poly[]     = [ "MET_BASE/data/poly/EAST.poly" ];
+mask_sid        = "";
+interp_method[] = [ "UW_MEAN" ];
+interp_width[]  = [ 1 ];
+interp_thresh   = 1.0;
+
+//
+// Section 3: Rank Histograms with Gridded Observations
+// Must specify...
+// (1) SAME AS (1) ABOVE
+// (2) SAME AS (2) ABOVE
+// (3) SAME AS (5) ABOVE
+// (4) SAME AS (6) ABOVE
+// (5) Smoothing interpolation width (interp_width[] = [1];) SAME AS (7) ABOVE
+// (6) Smoothing interpolation method (interp_method[] = [1];) SAME AS (8) ABOVE
+// (7) Smoothing interpolation valid data threshold (interp_thresh = 1.0;) SAME AS (9) ABOVE
+// (10) Output flag to specify:
+//     - Ranked histogram data SAME AS ABOVE
+//     - NetCDF Field for Observation Rank values
+//
+
+grib_ptv      = 2;
+output_prefix = "";
+version       = "V2.0";
