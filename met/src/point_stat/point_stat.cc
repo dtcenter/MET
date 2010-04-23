@@ -815,10 +815,10 @@ void process_obs_file(int i_nc) {
       delete obs_in;
       obs_in = (NcFile *) 0;
 
-      cerr << "\n\nERROR: process_obs_file() -> "
+      cout << "\n\nWARNING: process_obs_file() -> "
            << "can't open observation netCDF file: "
            << obs_file[i_nc] << "\n\n" << flush;
-      exit(1);
+      return;
    }
 
    // Define dimensions
