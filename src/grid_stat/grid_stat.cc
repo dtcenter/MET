@@ -48,6 +48,9 @@
 //   014    03/13/09  Halley Gotway  Add support for verifying
 //                    probabilistic forecasts.
 //   015    10/22/09  Halley Gotway  Fix output_flag cut and paste bug.
+//   016    05/03/10  Halley Gotway  Don't write duplicate NetCDF
+//                    matched pair variables or probabilistic
+//                    difference fields.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1524,8 +1527,9 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
-              int lev, InterpMthd mthd, int wdth) {
+              int i_gc, InterpMthd mthd, int wdth) {
    int i, n, x, y, mon, day, yr, hr, min, sec;
+   int fcst_flag, obs_flag, diff_flag;
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
@@ -1555,20 +1559,20 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
       if(wdth > 1) {
 
          sprintf(fcst_var_name, "FCST_%s_%s_%s_%s_%i",
-                 conf_info.fcst_gci[lev].abbr_str.text(),
-                 conf_info.fcst_gci[lev].lvl_str.text(),
+                 conf_info.fcst_gci[i_gc].abbr_str.text(),
+                 conf_info.fcst_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i],
                  mthd_str, wdth*wdth);
          sprintf(obs_var_name, "OBS_%s_%s_%s_%s_%i",
-                 conf_info.obs_gci[lev].abbr_str.text(),
-                 conf_info.obs_gci[lev].lvl_str.text(),
+                 conf_info.obs_gci[i_gc].abbr_str.text(),
+                 conf_info.obs_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i],
                  mthd_str, wdth*wdth);
          sprintf(diff_var_name, "DIFF_%s_%s_%s_%s_%s_%s_%i",
-                 conf_info.fcst_gci[lev].abbr_str.text(),
-                 conf_info.fcst_gci[lev].lvl_str.text(),
-                 conf_info.obs_gci[lev].abbr_str.text(),
-                 conf_info.obs_gci[lev].lvl_str.text(),
+                 conf_info.fcst_gci[i_gc].abbr_str.text(),
+                 conf_info.fcst_gci[i_gc].lvl_str.text(),
+                 conf_info.obs_gci[i_gc].abbr_str.text(),
+                 conf_info.obs_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i],
                  mthd_str, wdth*wdth);
       }
@@ -1576,121 +1580,155 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
       else {
 
          sprintf(fcst_var_name, "FCST_%s_%s_%s",
-                 conf_info.fcst_gci[lev].abbr_str.text(),
-                 conf_info.fcst_gci[lev].lvl_str.text(),
+                 conf_info.fcst_gci[i_gc].abbr_str.text(),
+                 conf_info.fcst_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i]);
          sprintf(obs_var_name, "OBS_%s_%s_%s",
-                 conf_info.obs_gci[lev].abbr_str.text(),
-                 conf_info.obs_gci[lev].lvl_str.text(),
+                 conf_info.obs_gci[i_gc].abbr_str.text(),
+                 conf_info.obs_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i]);
          sprintf(diff_var_name, "DIFF_%s_%s_%s_%s_%s",
-                 conf_info.fcst_gci[lev].abbr_str.text(),
-                 conf_info.fcst_gci[lev].lvl_str.text(),
-                 conf_info.obs_gci[lev].abbr_str.text(),
-                 conf_info.obs_gci[lev].lvl_str.text(),
+                 conf_info.fcst_gci[i_gc].abbr_str.text(),
+                 conf_info.fcst_gci[i_gc].lvl_str.text(),
+                 conf_info.obs_gci[i_gc].abbr_str.text(),
+                 conf_info.obs_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i]);
       }
 
-      // Define the forecast and difference variables
-      fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
-                                 lat_dim, lon_dim);
-      obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
-                                 lat_dim, lon_dim);
-      diff_var = nc_out->add_var(diff_var_name, ncFloat,
-                                 lat_dim, lon_dim);
+      // Figure out if the forecast, observation, and difference
+      // fields should be written out.
+      fcst_flag = !fcst_var_sa.has(fcst_var_name);
+      obs_flag  = !obs_var_sa.has(obs_var_name);
 
-      // Add variable attributes for the forecast field
-      fcst_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_unit(conf_info.fcst_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      fcst_var->add_att("units", tmp_str);
-      get_grib_code_name(conf_info.fcst_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      fcst_var->add_att("long_name", tmp_str);
-      fcst_var->add_att("level", shc.get_fcst_lev());
+      // Don't write the difference field for probability forecasts
+      diff_flag = (!diff_var_sa.has(diff_var_name) &&
+                   !conf_info.fcst_gci[i_gc].pflag);
+// JHG
+      // Set up the forecast variable if not already defined
+      if(fcst_flag) {
 
-      fcst_var->add_att("_FillValue", bad_data_float);
+         // Define the forecast variable
+         fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
+                                    lat_dim, lon_dim);
 
-      ut = fcst_wd.get_valid_time();
-      unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-              yr, mon, day, hr, min, sec);
-      fcst_var->add_att("valid_time", time_str);
-      fcst_var->add_att("valid_time_ut", (long int) ut);
+         // Add to the list of previously defined variables
+         fcst_var_sa.add(fcst_var_name);
 
-      fcst_var->add_att("masking_region", conf_info.mask_name[i]);
-      fcst_var->add_att("smoothing_method", mthd_str);
-      fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
+         // Add variable attributes for the forecast field
+         fcst_var->add_att("name", shc.get_fcst_var());
+         get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         fcst_var->add_att("units", tmp_str);
+         get_grib_code_name(conf_info.fcst_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         fcst_var->add_att("long_name", tmp_str);
+         fcst_var->add_att("i_gcel", shc.get_fcst_lev());
 
-      // Add variable attributes for the observation field
-      obs_var->add_att("name", shc.get_obs_var());
-      get_grib_code_unit(conf_info.obs_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      obs_var->add_att("units", tmp_str);
-      get_grib_code_name(conf_info.obs_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      obs_var->add_att("long_name", tmp_str);
-      obs_var->add_att("level", shc.get_obs_lev());
+         fcst_var->add_att("_FillValue", bad_data_float);
 
-      obs_var->add_att("_FillValue", bad_data_float);
+         ut = fcst_wd.get_valid_time();
+         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
+         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+                 yr, mon, day, hr, min, sec);
+         fcst_var->add_att("valid_time", time_str);
+         fcst_var->add_att("valid_time_ut", (long int) ut);
 
-      ut = obs_wd.get_valid_time();
-      unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-              yr, mon, day, hr, min, sec);
-      obs_var->add_att("valid_time", time_str);
-      obs_var->add_att("valid_time_ut", (long int) ut);
+         fcst_var->add_att("masking_region", conf_info.mask_name[i]);
+         fcst_var->add_att("smoothing_method", mthd_str);
+         fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
+      } // end fcst_flag
 
-      obs_var->add_att("masking_region", conf_info.mask_name[i]);
-      obs_var->add_att("smoothing_method", mthd_str);
-      obs_var->add_att("smoothing_neighborhood", wdth*wdth);
+      // Set up the observation variable if not already defined
+      if(obs_flag) {
 
-      // Add variable attributes for the difference field
-      sprintf(tmp_str, "%s_minus_%s",
-         shc.get_fcst_var(), shc.get_obs_var());
-      diff_var->add_att("name", tmp_str);
-      get_grib_code_unit(conf_info.fcst_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      diff_var->add_att("fcst_units", tmp_str);
-      get_grib_code_name(conf_info.fcst_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      diff_var->add_att("fcst_long_name", tmp_str);
-      diff_var->add_att("fcst_level", shc.get_fcst_lev());
-      get_grib_code_unit(conf_info.obs_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      diff_var->add_att("obs_units", tmp_str);
-      get_grib_code_name(conf_info.obs_gci[lev].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      diff_var->add_att("obs_long_name", tmp_str);
-      diff_var->add_att("obs_level", shc.get_obs_lev());
+         // Define the observation variable
+         obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
+                                    lat_dim, lon_dim);
 
-      diff_var->add_att("_FillValue", bad_data_float);
+         // Add to the list of previously defined variables
+         obs_var_sa.add(obs_var_name);
 
-      ut = fcst_wd.get_valid_time();
-      unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-              yr, mon, day, hr, min, sec);
-      diff_var->add_att("fcst_valid_time", time_str);
-      fcst_var->add_att("fcst_valid_time_ut", (long int) ut);
+         // Add variable attributes for the observation field
+         obs_var->add_att("name", shc.get_obs_var());
+         get_grib_code_unit(conf_info.obs_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         obs_var->add_att("units", tmp_str);
+         get_grib_code_name(conf_info.obs_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         obs_var->add_att("long_name", tmp_str);
+         obs_var->add_att("i_gcel", shc.get_obs_lev());
 
-      ut = obs_wd.get_valid_time();
-      unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-              yr, mon, day, hr, min, sec);
-      diff_var->add_att("obs_valid_time", time_str);
-      fcst_var->add_att("obs_valid_time_ut", (long int) ut);
+         obs_var->add_att("_FillValue", bad_data_float);
 
-      diff_var->add_att("masking_region", conf_info.mask_name[i]);
-      diff_var->add_att("smoothing_method", mthd_str);
-      diff_var->add_att("smoothing_neighborhood", wdth*wdth);
+         ut = obs_wd.get_valid_time();
+         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
+         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+                 yr, mon, day, hr, min, sec);
+         obs_var->add_att("valid_time", time_str);
+         obs_var->add_att("valid_time_ut", (long int) ut);
+
+         obs_var->add_att("masking_region", conf_info.mask_name[i]);
+         obs_var->add_att("smoothing_method", mthd_str);
+         obs_var->add_att("smoothing_neighborhood", wdth*wdth);
+      } // end obs_flag
+
+      // Set up the observation variable if not already defined
+      if(diff_flag) {
+
+         // Define the difference variable
+         diff_var = nc_out->add_var(diff_var_name, ncFloat,
+                                    lat_dim, lon_dim);
+
+         // Add to the list of previously defined variables
+         diff_var_sa.add(diff_var_name);
+
+         // Add variable attributes for the difference field
+         sprintf(tmp_str, "%s_minus_%s",
+            shc.get_fcst_var(), shc.get_obs_var());
+         diff_var->add_att("name", tmp_str);
+         get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         diff_var->add_att("fcst_units", tmp_str);
+         get_grib_code_name(conf_info.fcst_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         diff_var->add_att("fcst_long_name", tmp_str);
+         diff_var->add_att("fcst_i_gcel", shc.get_fcst_lev());
+         get_grib_code_unit(conf_info.obs_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         diff_var->add_att("obs_units", tmp_str);
+         get_grib_code_name(conf_info.obs_gci[i_gc].code,
+                            conf_info.conf.grib_ptv().ival(),
+                            tmp_str);
+         diff_var->add_att("obs_long_name", tmp_str);
+         diff_var->add_att("obs_i_gcel", shc.get_obs_lev());
+
+         diff_var->add_att("_FillValue", bad_data_float);
+
+         ut = fcst_wd.get_valid_time();
+         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
+         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+                 yr, mon, day, hr, min, sec);
+         diff_var->add_att("fcst_valid_time", time_str);
+         fcst_var->add_att("fcst_valid_time_ut", (long int) ut);
+
+         ut = obs_wd.get_valid_time();
+         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
+         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+                 yr, mon, day, hr, min, sec);
+         diff_var->add_att("obs_valid_time", time_str);
+         fcst_var->add_att("obs_valid_time_ut", (long int) ut);
+
+         diff_var->add_att("masking_region", conf_info.mask_name[i]);
+         diff_var->add_att("smoothing_method", mthd_str);
+         diff_var->add_att("smoothing_neighborhood", wdth*wdth);
+      } // end diff_flag
 
       // Store the forecast, observation, and difference values
       for(x=0; x<grid.nx(); x++) {
@@ -1726,33 +1764,39 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
       } // end for x
 
       // Write out the forecast field
-      if(!fcst_var->put(&fcst_data[0], grid.ny(), grid.nx())) {
-         cerr << "\n\nERROR: write_nc() -> "
-              << "error with the fcst_var->put for fields "
-              << shc.get_fcst_var() << " and " << shc.get_obs_var()
-              << " and masking region " << conf_info.mask_name[i]
-              << "\n\n" << flush;
-         exit(1);
+      if(fcst_flag) {
+         if(!fcst_var->put(&fcst_data[0], grid.ny(), grid.nx())) {
+            cerr << "\n\nERROR: write_nc() -> "
+                 << "error with the fcst_var->put for fields "
+                 << shc.get_fcst_var() << " and " << shc.get_obs_var()
+                 << " and masking region " << conf_info.mask_name[i]
+                 << "\n\n" << flush;
+            exit(1);
+         }
       }
 
       // Write out the observation field
-      if(!obs_var->put(&obs_data[0], grid.ny(), grid.nx())) {
-         cerr << "\n\nERROR: write_nc() -> "
-              << "error with the obs_var->put for fields "
-              << shc.get_fcst_var() << " and " << shc.get_obs_var()
-              << " and masking region " << conf_info.mask_name[i]
-              << "\n\n" << flush;
-         exit(1);
+      if(obs_flag) {
+         if(!obs_var->put(&obs_data[0], grid.ny(), grid.nx())) {
+            cerr << "\n\nERROR: write_nc() -> "
+                 << "error with the obs_var->put for fields "
+                 << shc.get_fcst_var() << " and " << shc.get_obs_var()
+                 << " and masking region " << conf_info.mask_name[i]
+                 << "\n\n" << flush;
+            exit(1);
+         }
       }
 
       // Write out the difference field
-      if(!diff_var->put(&diff_data[0], grid.ny(), grid.nx())) {
-         cerr << "\n\nERROR: write_nc() -> "
-              << "error with the diff_var->put for fields "
-              << shc.get_fcst_var() << " and " << shc.get_obs_var()
-              << " and masking region " << conf_info.mask_name[i]
-              << "\n\n" << flush;
-         exit(1);
+      if(diff_flag) {
+         if(!diff_var->put(&diff_data[0], grid.ny(), grid.nx())) {
+            cerr << "\n\nERROR: write_nc() -> "
+                 << "error with the diff_var->put for fields "
+                 << shc.get_fcst_var() << " and " << shc.get_obs_var()
+                 << " and masking region " << conf_info.mask_name[i]
+                 << "\n\n" << flush;
+            exit(1);
+         }
       }
 
    } // end for i
