@@ -32,6 +32,8 @@
 //                    NetCDF object file for the raw fcst/obs values.
 //   005    09/23/08  Halley Gotway  Change argument sequence for the
 //                    get_grib_record routine.
+//   006    05/03/10  Halley Gotway  Remove the variable/level info
+//                    from the output file naming convention.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -2819,12 +2821,6 @@ void build_outfile_name(const char *suffix, ConcatString &str) {
    // Append the output prefix, if defined
    if(strlen(engine.wconf.output_prefix().sval()) > 0)
       str << "_" << engine.wconf.output_prefix().sval();
-
-   // Append the variables and levels
-   sprintf(tmp_str, "%s_%s_vs_%s_%s",
-           engine.fcst_var_str, engine.fcst_lvl_str,
-           engine.obs_var_str,  engine.obs_lvl_str);
-   str << "_" << tmp_str;
 
    // Append the timing information
    sec_to_hms(engine.fcst_raw->get_lead_time(), l_hr, l_min, l_sec);
