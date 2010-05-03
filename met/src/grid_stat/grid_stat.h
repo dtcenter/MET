@@ -15,9 +15,9 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
+//   001    05/03/10  Halley Gotway   Add fcst/obs/diff variable name
+//                    arrays to keep track of NetCDF variables. 
 //
-////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __GRID_STAT_H__
@@ -127,6 +127,11 @@ static ConcatString out_nc_file;
 static NcFile      *nc_out  = (NcFile *) 0;
 static NcDim       *lat_dim = (NcDim *)  0;
 static NcDim       *lon_dim = (NcDim *)  0;
+
+// List of output NetCDF variable names
+static StringArray fcst_var_sa;
+static StringArray obs_var_sa;
+static StringArray diff_var_sa;
 
 // Output STAT file
 static ConcatString stat_file;

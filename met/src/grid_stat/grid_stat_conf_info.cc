@@ -278,14 +278,15 @@ void GridStatConfInfo::process_config() {
 
          n = fcst_ta[i].n_elements();
 
-         // Check that the first threshold is 0 and the last is 1.
-         if(!is_eq(fcst_ta[i][0].thresh,   0.0) ||
+         // Check for at least 3 thresholds beginning with 0 and ending with 1.
+         if(n < 3 ||
+            !is_eq(fcst_ta[i][0].thresh,   0.0) ||
             !is_eq(fcst_ta[i][n-1].thresh, 1.0)) {
 
             cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
                  << "When verifying a probability field, you must "
-                 << "select thresholds beginning with 0.0 and ending "
-                 << "with 1.0.\n\n"
+                 << "select at least 3 thresholds beginning with 0.0 "
+                 << "and ending with 1.0.\n\n"
                  << flush;
             exit(1);
          }
