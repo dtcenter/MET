@@ -1775,7 +1775,7 @@ void WrfData::conv_filter_circ(int diameter, double bd_thresh) {
          //
          // If the bad data threshold is set to zero and the center of the
          // convolution radius contains bad data, set the convolved value to
-         // the minimum value and continue.
+         // bad data and continue.
          //
          if(bd_thresh == 0 && !is_valid_xy(x, y)) {
             field.put_xy_int(bad_data_int, x, y);
