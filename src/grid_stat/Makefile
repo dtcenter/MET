@@ -12,6 +12,13 @@
 #
 ###############################################################################
 
+CXX         = /usr/bin/g++
+CXX_FLAGS   = -static -g
+SVNROOT     = /home/johnhg/MET/svn/code
+MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
+
+###############################################################################
+
 TARGETS		= grid_stat
 
 OBJECTS		= grid_stat_Conf.o grid_stat_conf_info.o
@@ -23,6 +30,19 @@ FAKES		= all clean objects targets
 LIB_DIR		= ../../lib
 
 INC_DIR		= ../../lib
+
+VX_ECONFIG_CLASS = grid_stat
+VX_ECONFIG_EXAMPLE_PARM = GridStatConfig_default
+VX_ECONFIG_IS_RAP_LIB = false
+VX_ECONFIG_HEADER_SUFFIX = h
+VX_ECONFIG_PANIC = true
+MODULE_TYPE = progcpp
+
+#
+# vx_econfig macros and targets
+#
+include $(SVNROOT)/build/scripts/rap_make_vx_econfig_macros
+include $(SVNROOT)/build/scripts/rap_make_vx_econfig_targets
 
 all:
 	@ echo
@@ -67,3 +87,4 @@ clean:
 	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)
 
 .PHONY: $(FAKES)
+

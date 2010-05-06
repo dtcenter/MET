@@ -51,6 +51,7 @@
 //   016    05/03/10  Halley Gotway  Don't write duplicate NetCDF
 //                    matched pair variables or probabilistic
 //                    difference fields.
+//   017    05/06/10  Halley Gotway  Add interp_flag config parameter.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -289,8 +290,8 @@ void process_scores() {
    int i, j, k, m, n, status;
    int max_scal_t, max_prob_t, wind_t, frac_t;
 
-   WrfData fcst_wd,             obs_wd;
-   WrfData fcst_wd_smooth,      obs_wd_smooth;
+   WrfData fcst_wd,        obs_wd;
+   WrfData fcst_wd_smooth, obs_wd_smooth;
 
    GribRecord fcst_r, obs_r;
    Grid fcst_grid, obs_grid;
@@ -494,16 +495,31 @@ void process_scores() {
          shc.set_interp_mthd(conf_info.interp_mthd[j]);
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 
-         // Smooth the forecast and observation fields based on the
-         // interp_mthd and interp_wdth
-         fcst_wd_smooth = smooth_field(fcst_wd,
-                             conf_info.interp_mthd[j],
-                             conf_info.interp_wdth[j],
-                             conf_info.conf.interp_thresh().dval());
-         obs_wd_smooth  = smooth_field(obs_wd,
-                             conf_info.interp_mthd[j],
-                             conf_info.interp_wdth[j],
-                             conf_info.conf.interp_thresh().dval());
+         // If requested in the config file, smooth the forecast field
+         if(conf_info.conf.interp_flag().ival() == 1 ||
+            conf_info.conf.interp_flag().ival() == 3) {
+            fcst_wd_smooth = smooth_field(fcst_wd,
+                                conf_info.interp_mthd[j],
+                                conf_info.interp_wdth[j],
+                                conf_info.conf.interp_thresh().dval());
+         }
+         // Do not smooth the forecast field
+         else {
+            fcst_wd_smooth = fcst_wd;
+         }
+
+         // If requested in the config file, smooth the observation field
+         if(conf_info.conf.interp_flag().ival() == 2 ||
+            conf_info.conf.interp_flag().ival() == 3) {
+            obs_wd_smooth  = smooth_field(obs_wd,
+                                conf_info.interp_mthd[j],
+                                conf_info.interp_wdth[j],
+                                conf_info.conf.interp_thresh().dval());
+         }
+         // Do not smooth the observation field
+         else {
+            obs_wd_smooth = obs_wd;
+         }
 
          // Loop through the masks to be applied
          for(k=0; k<conf_info.get_n_mask(); k++) {
@@ -1553,20 +1569,46 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
    // Compute the difference field for each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
 
-      // If the neighborhood width is greater than 1, name the variables
-      // using the smoothing method
-      if(wdth > 1) {
-
+      // If the neighborhood width is greater than 1 and the forecast
+      // field was smoothed
+      if((wdth > 1) &&
+         (conf_info.conf.interp_flag().ival() == 1 ||
+          conf_info.conf.interp_flag().ival() == 3)) {
          sprintf(fcst_var_name, "FCST_%s_%s_%s_%s_%i",
                  conf_info.fcst_gci[i_gc].abbr_str.text(),
                  conf_info.fcst_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i],
                  mthd_str, wdth*wdth);
+      }
+      // Forecast field was not smoothed
+      else {
+         sprintf(fcst_var_name, "FCST_%s_%s_%s",
+                 conf_info.fcst_gci[i_gc].abbr_str.text(),
+                 conf_info.fcst_gci[i_gc].lvl_str.text(),
+                 conf_info.mask_name[i]);
+      }
+
+      // If the neighborhood width is greater than 1 and the observation
+      // field was smoothed
+      if((wdth > 1) &&
+         (conf_info.conf.interp_flag().ival() == 2 ||
+          conf_info.conf.interp_flag().ival() == 3)) {
          sprintf(obs_var_name, "OBS_%s_%s_%s_%s_%i",
                  conf_info.obs_gci[i_gc].abbr_str.text(),
                  conf_info.obs_gci[i_gc].lvl_str.text(),
                  conf_info.mask_name[i],
                  mthd_str, wdth*wdth);
+      }
+      // Observation field was not smoothed
+      else {
+         sprintf(obs_var_name, "OBS_%s_%s_%s",
+                 conf_info.obs_gci[i_gc].abbr_str.text(),
+                 conf_info.obs_gci[i_gc].lvl_str.text(),
+                 conf_info.mask_name[i]);
+      }
+
+      // If any smoothing was performed
+      if(wdth > 1) {
          sprintf(diff_var_name, "DIFF_%s_%s_%s_%s_%s_%s_%i",
                  conf_info.fcst_gci[i_gc].abbr_str.text(),
                  conf_info.fcst_gci[i_gc].lvl_str.text(),
@@ -1575,17 +1617,8 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
                  conf_info.mask_name[i],
                  mthd_str, wdth*wdth);
       }
-      // If the neighborhood width is equal to 1, no smoothing was done
+      // Smoothing was not performed
       else {
-
-         sprintf(fcst_var_name, "FCST_%s_%s_%s",
-                 conf_info.fcst_gci[i_gc].abbr_str.text(),
-                 conf_info.fcst_gci[i_gc].lvl_str.text(),
-                 conf_info.mask_name[i]);
-         sprintf(obs_var_name, "OBS_%s_%s_%s",
-                 conf_info.obs_gci[i_gc].abbr_str.text(),
-                 conf_info.obs_gci[i_gc].lvl_str.text(),
-                 conf_info.mask_name[i]);
          sprintf(diff_var_name, "DIFF_%s_%s_%s_%s_%s",
                  conf_info.fcst_gci[i_gc].abbr_str.text(),
                  conf_info.fcst_gci[i_gc].lvl_str.text(),
@@ -1602,7 +1635,7 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
       // Don't write the difference field for probability forecasts
       diff_flag = (!diff_var_sa.has(diff_var_name) &&
                    !conf_info.fcst_gci[i_gc].pflag);
-// JHG
+
       // Set up the forecast variable if not already defined
       if(fcst_flag) {
 
@@ -1715,14 +1748,14 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
                  yr, mon, day, hr, min, sec);
          diff_var->add_att("fcst_valid_time", time_str);
-         fcst_var->add_att("fcst_valid_time_ut", (long int) ut);
+         diff_var->add_att("fcst_valid_time_ut", (long int) ut);
 
          ut = obs_wd.get_valid_time();
          unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
          sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
                  yr, mon, day, hr, min, sec);
          diff_var->add_att("obs_valid_time", time_str);
-         fcst_var->add_att("obs_valid_time_ut", (long int) ut);
+         diff_var->add_att("obs_valid_time_ut", (long int) ut);
 
          diff_var->add_att("masking_region", conf_info.mask_name[i]);
          diff_var->add_att("smoothing_method", mthd_str);

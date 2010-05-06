@@ -163,7 +163,7 @@ boot_rep_prop = 1.0;
 //
 // e.g. n_boot_rep = 1000;
 //
-n_boot_rep = 1000;
+n_boot_rep = 0;
 
 //
 // Specify the name of the random number generator to be used.  See the MET
@@ -179,10 +179,10 @@ boot_rng = "mt19937";
 boot_seed = "";
 
 //
-// Specify a comma-separated list of interpolation method(s) to be used
-// for smoothing the forecast grid prior to comparing it to the observation
-// grid.  The value at each forecast grid point is replaced by the measure
-// computed over the neighborhood defined around the grid point.
+// Specify a comma-separated list of interpolation method(s) to be used for
+// smoothing the data fields prior to comparing them.  The value at each grid
+// point is replaced by the measure computed over the neighborhood defined
+// around the grid point.
 // String values are interpreted as follows:
 //    MIN     = Minimum in the neighborhood
 //    MAX     = Maximum in the neighborhood
@@ -200,15 +200,22 @@ boot_seed = "";
 interp_method[] = [ "UW_MEAN" ];
 
 //
-// Specify a comma-separated list of box widths to be used by the
-// interpolation techniques listed above.  A value of 1 indicates that
-// no smoothing should be performed.  For a value of n greater than 1,
-// the n*n grid points around each point will be used to smooth
-// the forecast field.
+// Specify a comma-separated list of box widths to be used by the interpolation
+// techniques listed above.  A value of 1 indicates that no smoothing should be
+// performed.  For a value of n greater than 1, the n*n grid points around each
+// point will be used to smooth the data fields.
 //
 // e.g. interp_width = [ 1, 3, 5 ];
 //
 interp_width[] = [ 1 ];
+
+//
+// The interp_flag controls how the smoothing defined above should be applied:
+// (1) Smooth only the forecast field
+// (2) Smooth only the observation field
+// (3) Smooth both the forecast and observation fields
+//
+interp_flag = 1;
 
 //
 // When smoothing, compute a ratio of the number of valid data points to
@@ -434,7 +441,7 @@ output_flag[] = [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 ];
 //    (0) Do not compute these correlation coefficients
 //    (1) Compute these correlation coefficients
 //
-rank_corr_flag = 1;
+rank_corr_flag = 0;
 
 //
 // Specify the GRIB Table 2 parameter table version number to be used

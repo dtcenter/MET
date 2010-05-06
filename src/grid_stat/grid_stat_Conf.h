@@ -20,7 +20,7 @@
    //
    //     Created from config file "GridStatConfig_default"
    //
-   //     on March 27, 2009    6:12 pm  MST
+   //     on May 6, 2010    4:52 pm  MDT
    //
 
 
@@ -84,6 +84,8 @@ class grid_stat_Conf {
       const SymbolTableEntry * _interp_method_entry;
 
       const SymbolTableEntry * _interp_width_entry;
+
+      const SymbolTableEntry * _interp_flag_entry;
 
       const SymbolTableEntry * _interp_thresh_entry;
 
@@ -199,6 +201,9 @@ class grid_stat_Conf {
       Result interp_width(int);   //  1-dimensional array, indices from 0 to 1
 
       int n_interp_width_elements();
+
+
+      Result interp_flag();
 
 
       Result interp_thresh();
