@@ -571,7 +571,7 @@ void process_grib_codes() {
       climo_wd[i] = (WrfData *) 0;
 
       if(verbosity > 1) {
-         cout << "\n----------------------------------------\n\n"
+         cout << "\n" << sep_str << "\n\n"
               << "Reading records for "
               << conf_info.gc_pd[i].fcst_gci.info_str
               << ".\n" << flush;
@@ -787,7 +787,7 @@ void process_grib_codes() {
    } // end for i
 
    if(verbosity > 1) {
-      cout << "\n----------------------------------------\n\n" << flush;
+      cout << "\n" << sep_str << "\n\n" << flush;
    }
 
    return;
@@ -980,8 +980,7 @@ void process_scores() {
    WrfData   *wd_ptr;
 
    if(verbosity > 1) {
-      cout << "\n----------------------------------------\n\n"
-           << flush;
+      cout << "\n" << sep_str << "\n\n" << flush;
    }
 
    // Allocate enough space for the CTSInfo objects
@@ -1298,8 +1297,7 @@ void process_scores() {
       } // end for j
 
       if(verbosity > 1) {
-         cout << "\n----------------------------------------\n\n"
-              << flush;
+         cout << "\n" << sep_str << "\n\n" << flush;
       }
    } // end for i
 

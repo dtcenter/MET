@@ -474,8 +474,7 @@ void process_scores() {
       shc.set_obs_lev(conf_info.obs_gci[i].lvl_str.text());
 
       if(verbosity > 1) {
-         cout << "\n----------------------------------------\n\n"
-              << flush;
+         cout << "\n" << sep_str << "\n\n" << flush;
       }
 
       // If verifying vector winds, store the UGRD fields
@@ -877,7 +876,7 @@ void process_scores() {
    } // end for i
 
    if(verbosity > 1) {
-      cout << "\n----------------------------------------\n\n" << flush;
+      cout << "\n" << sep_str << "\n\n" << flush;
    }
 
    // Deallocate memory
