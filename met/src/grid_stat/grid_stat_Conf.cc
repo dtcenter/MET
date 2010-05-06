@@ -13,7 +13,7 @@
    //
    //     Created from config file "GridStatConfig_default"
    //
-   //     on March 27, 2009    6:12 pm  MST
+   //     on May 6, 2010    4:52 pm  MDT
    //
 
 
@@ -36,7 +36,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Panic = 1;
+static const int Panic = 0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,6 +163,8 @@ _fcst_wind_thresh_entry = (const SymbolTableEntry *) 0;
    _interp_method_entry = (const SymbolTableEntry *) 0;
 
     _interp_width_entry = (const SymbolTableEntry *) 0;
+
+     _interp_flag_entry = (const SymbolTableEntry *) 0;
 
    _interp_thresh_entry = (const SymbolTableEntry *) 0;
 
@@ -430,6 +432,19 @@ if ( !_e && Panic )  {
 }
 
 _interp_width_entry = _e;
+
+
+_e = _m.find("interp_flag");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  grid_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"interp_flag\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_interp_flag_entry = _e;
 
 
 _e = _m.find("interp_thresh");
@@ -1466,6 +1481,31 @@ _n = _a->size(0);
    //
 
 return ( _n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result grid_stat_Conf::interp_flag()
+
+{
+
+Result _temp_result;
+
+if ( !_interp_flag_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_interp_flag_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
 
 }
 

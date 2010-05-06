@@ -571,11 +571,24 @@ void GridStatConfInfo::process_config() {
    }
 
    //
+   // Conf: interp_flag
+   //
+
+   // Check that the interpolation flag is set between 1 and 3.
+   if(conf.interp_flag().dval() < 1.0 ||
+      conf.interp_flag().dval() > 3.0) {
+
+         cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
+              << "The interpolation threshold value must be set "
+              << "between 1 and 3.\n\n" << flush;
+         exit(1);
+   }
+
+   //
    // Conf: interp_thresh
    //
 
-   // Check that the interpolation threshold is set between
-   // 0 and 1.
+   // Check that the interpolation threshold is set between 0 and 1.
    if(conf.interp_thresh().dval() < 0.0 ||
       conf.interp_thresh().dval() > 1.0) {
 
