@@ -70,6 +70,8 @@ class IntArray {
 
       void sort_increasing();
 
+      int sum() const;
+
 };
 
 

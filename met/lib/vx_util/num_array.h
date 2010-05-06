@@ -77,6 +77,7 @@ class NumArray {
       void   compute_mean_stdev(double &, double &);
       double mean();
       double sum();
+      double mode();
 
       int n_elements() const;
 

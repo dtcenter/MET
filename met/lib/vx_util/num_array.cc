@@ -583,3 +583,50 @@ return(s);
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::mode()
+
+{
+
+int j, k, max_n, max_j;
+double v;
+NumArray uniq_v, uniq_n;
+
+for(j=0; j<Nelements; j++) {
+
+   // If value isn't already in the list, add it
+   if(!uniq_v.has(e[j])) {
+      uniq_v.add(e[j]);
+      uniq_n.add(1);
+   }
+   // Otherwise, increment the existing count
+   else {
+
+      for(k=0; k<uniq_v.n_elements(); k++) {
+         if(uniq_v[k] == e[j]) {
+            uniq_n.set(k, uniq_n[k] + 1);
+            break;
+         }
+      }
+   }
+}
+
+// Search uniq_v and uniq_n for the most common value
+max_n = 0;
+max_j = -1;
+for(j=0; j<uniq_n.n_elements(); j++) {
+   if(uniq_n[j] >= max_n) {
+      max_n = nint(uniq_n[j]);
+      max_j = j;
+   }
+}
+
+if(max_j >= 0) v = uniq_v[max_j];
+else           v = bad_data_double;
+
+return(v);
+
+}
+
+////////////////////////////////////////////////////////////////////////
