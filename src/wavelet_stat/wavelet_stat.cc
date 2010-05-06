@@ -438,7 +438,7 @@ void process_scores() {
       shc.set_obs_lev(conf_info.obs_gci[i].lvl_str.text());
 
       if(verbosity > 1) {
-         cout << "\n----------------------------------------\n\n"
+         cout << "\n" << sep_str << "\n\n"
               << "Processing " << conf_info.fcst_gci[i].info_str
               << " versus " << conf_info.obs_gci[i].info_str << ".\n"
               << flush;
@@ -568,7 +568,7 @@ void process_scores() {
    } // end for i
 
    if(verbosity > 1) {
-      cout << "\n----------------------------------------\n\n" << flush;
+      cout << "\n" << sep_str << "\n\n" << flush;
    }
 
    return;
