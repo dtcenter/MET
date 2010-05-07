@@ -402,14 +402,6 @@ void read_grib_record(GribFile &grib_file, GribRecord &grib_record, int i_rec,
        grib_record.pds->grib_code == wdir_grib_code) &&
       is_grid_relative(grib_record)) {
 
-      // If the grid type is a non-conformal Plate Carree, do not rotate
-      if(gr.proj_type() == PlateCarreeProj) {
-         cerr << "\n\nERROR: read_grib_record() -> "
-              << "rotation of non-conformal Plate Carree projection "
-              << "not yet implemented\n\n" << flush;
-         exit(1);
-      }
-
       // Handle the UGRD field
       if(grib_record.pds->grib_code == ugrd_grib_code) {
 
