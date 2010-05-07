@@ -48,6 +48,8 @@
 //   013    03/13/09  Halley Gotway  Add support for verifying
 //                    probabilistic forecasts.
 //   014    04/21/09  Halley Gotway  Fix bug for resetting obs_var.
+//   015    05/07/10  Halley Gotway  Rename process_grid() to
+//                    setup_first_pass() and modify its logic.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,7 +86,7 @@ using namespace std;
 
 static void process_command_line    (int, char **);
 static void process_fcst_climo_files();
-static void process_grid            (WrfData &);
+static void setup_first_pass        (const Grid &);
 
 static void setup_txt_files(unixtime, int);
 static void setup_table    (AsciiTable &);
@@ -123,9 +125,6 @@ int main(int argc, char *argv[]) {
 
    // Process the forecast and climo files
    process_fcst_climo_files();
-
-   // Process the grid to be used for this data
-   process_grid(wd);
 
    // Process each of the GRIB codes to be verified
    process_grib_codes();
@@ -327,30 +326,10 @@ void process_fcst_climo_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_grid(WrfData &wd) {
-   Grid fcst_grid;
-   GribRecord rec;
-   char tmp_str[max_str_len];
-
-   // Continue based on the forecast file type
-   if(fcst_ftype == GbFileType) {
-
-      // Read the first GRIB record from the forecast file to extract
-      // the grid information
-      read_single_grib_record(fcst_gb_file, rec, 0, wd, fcst_grid,
-                              verbosity);
-   }
-   // fcst_ftype == NcFileType
-   else {
-
-      read_netcdf(fcst_nc_file,
-                  conf_info.gc_pd[0].fcst_gci.abbr_str.text(),
-                  tmp_str,
-                  wd, fcst_grid, verbosity);
-   }
+void setup_first_pass(const Grid &data_grid) {
 
    // Store the grid
-   grid = fcst_grid;
+   grid = data_grid;
 
    // Process the masks
    conf_info.process_masks(grid);
@@ -689,17 +668,28 @@ void process_grib_codes() {
             }
          }
 
-         // Check that the grid dimensions have not changed
-         if(data_grid.nx() != grid.nx() ||
-            data_grid.ny() != grid.ny()) {
-            cerr << "\n\nERROR: process_grib_codes() -> "
-                 << "The forecast grid dimensions "
-                 << "have changed (" << data_grid.nx() << ", "
-                 << data_grid.ny() << ") != (" << grid.nx()
-                 << ", " << grid.ny() << ") for GRIB code "
-                 << conf_info.gc_pd[i].fcst_gci.code << ".\n\n"
-                 << flush;
-            exit(1);
+         // If the grid is unset, process it
+         if(grid.nx() == 0 && grid.ny() == 0) {
+
+            // Setup the first pass through the data
+            setup_first_pass(data_grid);
+         }
+         // For multiple verification fields, check to make sure that the
+         // grid dimensions don't change
+         else {
+
+            // Check that the grid dimensions have not changed
+            if(data_grid.nx() != grid.nx() ||
+               data_grid.ny() != grid.ny()) {
+               cerr << "\n\nERROR: process_grib_codes() -> "
+                    << "The forecast grid dimensions "
+                    << "have changed (" << data_grid.nx() << ", "
+                    << data_grid.ny() << ") != (" << grid.nx()
+                    << ", " << grid.ny() << ") for GRIB code "
+                    << conf_info.gc_pd[i].fcst_gci.code << ".\n\n"
+                    << flush;
+               exit(1);
+            }
          }
 
          // Store information for the raw forecast fields
