@@ -137,6 +137,28 @@ struct StereographicData {
 
 ////////////////////////////////////////////////////////////////////////
 
+
+struct StereoType2Data {
+
+   const char * name;
+
+   char hemisphere;   //  'N' or 'S'
+
+   double lcen;
+
+   double alpha;
+
+   double bx;
+   double by;
+
+   int nx;
+   int ny;
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
 //
 // Exponential projection, sometimes known as 'flat' projection.
 //
