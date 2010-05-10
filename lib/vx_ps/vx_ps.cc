@@ -569,7 +569,8 @@ n = &node;
 
 while ( n )  {
 
-   x_cur -= scale*(n->dx());
+   // x_cur -= scale*(n->dx());
+      x_cur += scale*(n->dx());
 
    write_single_node(n, x_cur, y_cur, fill_flag);
 
