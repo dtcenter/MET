@@ -34,6 +34,7 @@
 //                    get_grib_record routine.
 //   006    05/03/10  Halley Gotway  Remove the variable/level info
 //                    from the output file naming convention.
+//   007    05/11/10  Halley Gotway  Plot polyline lines thicker.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -147,7 +148,8 @@ static int ct_stat_flag = 1;
 static const Color c_map(25, 25, 25);
 static const Color c_hull(0, 0, 0);
 static const Color c_bndy(0, 0, 255);
-static const double l_width = 0.50;
+static const double l_thin = 0.50;
+static const double l_thick = 1.00;
 
 static int n_page;
 
@@ -2341,7 +2343,7 @@ void plot_threshold_merging(PSfile &p, Engine &eng, const char *title, int fcst)
 void draw_border(PSfile &p, BoundingBox &dim) {
 
    p.gsave();
-   p.setlinewidth(l_width);
+   p.setlinewidth(l_thin);
    p.newpath();
    p.moveto(dim.x_ll, dim.y_ll);
    p.lineto(dim.x_ur, dim.y_ll);
@@ -2359,7 +2361,7 @@ void draw_border(PSfile &p, BoundingBox &dim) {
 void draw_map(PSfile &p, BoundingBox &dim) {
 
    p.gsave();
-   p.setlinewidth(l_width);
+   p.setlinewidth(l_thin);
    draw_world(grid, xy_bb, p, ll_bb, dim, c_map, met_data_dir);
    draw_states(grid, xy_bb, p, ll_bb, dim, c_map, met_data_dir);
    p.grestore();
@@ -2644,7 +2646,7 @@ void draw_polyline(PSfile &p, Polyline &poly, const Color &c,
 
    // Set to specified values
    p.gsave();
-   p.setlinewidth(l_width);
+   p.setlinewidth(l_thick);
    p.setrgbcolor(c.red()/255.0, c.green()/255.0, c.blue()/255.0);
    p.newpath();
 
@@ -2735,7 +2737,7 @@ void plot_colorbar(PSfile &p, BoundingBox &dim, int fcst) {
    // Draw colorbar in the bottom right corner of the Bounding Box
    //
    p.gsave();
-   p.setlinewidth(l_width);
+   p.setlinewidth(l_thin);
    p.choose_font(28, 8.0, met_data_dir);
 
    bar_width = h_margin/2.0;
