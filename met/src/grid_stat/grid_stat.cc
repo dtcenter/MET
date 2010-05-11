@@ -417,7 +417,7 @@ void process_scores() {
               << ".\n\n" << flush;
       }
 
-      // Check that the accumulation intervals match when comparing 
+      // Check that the accumulation intervals match when comparing
       // the same GRIB codes
       if(conf_info.fcst_gci[i].code == conf_info.obs_gci[i].code &&
          fcst_wd.get_accum_time()   != obs_wd.get_accum_time()) {
@@ -1656,7 +1656,7 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
                             conf_info.conf.grib_ptv().ival(),
                             tmp_str);
          fcst_var->add_att("long_name", tmp_str);
-         fcst_var->add_att("i_gcel", shc.get_fcst_lev());
+         fcst_var->add_att("i_level", shc.get_fcst_lev());
 
          fcst_var->add_att("_FillValue", bad_data_float);
 
@@ -1692,7 +1692,7 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
                             conf_info.conf.grib_ptv().ival(),
                             tmp_str);
          obs_var->add_att("long_name", tmp_str);
-         obs_var->add_att("i_gcel", shc.get_obs_lev());
+         obs_var->add_att("i_level", shc.get_obs_lev());
 
          obs_var->add_att("_FillValue", bad_data_float);
 
@@ -1730,7 +1730,7 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
                             conf_info.conf.grib_ptv().ival(),
                             tmp_str);
          diff_var->add_att("fcst_long_name", tmp_str);
-         diff_var->add_att("fcst_i_gcel", shc.get_fcst_lev());
+         diff_var->add_att("fcst_i_level", shc.get_fcst_lev());
          get_grib_code_unit(conf_info.obs_gci[i_gc].code,
                             conf_info.conf.grib_ptv().ival(),
                             tmp_str);
@@ -1739,7 +1739,7 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
                             conf_info.conf.grib_ptv().ival(),
                             tmp_str);
          diff_var->add_att("obs_long_name", tmp_str);
-         diff_var->add_att("obs_i_gcel", shc.get_obs_lev());
+         diff_var->add_att("obs_i_level", shc.get_obs_lev());
 
          diff_var->add_att("_FillValue", bad_data_float);
 
