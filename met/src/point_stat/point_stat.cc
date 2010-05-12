@@ -86,7 +86,7 @@ using namespace std;
 
 static void process_command_line    (int, char **);
 static void process_fcst_climo_files();
-static void setup_first_pass        (const Grid &);
+static void setup_first_pass        (const WrfData &, const Grid &);
 
 static void setup_txt_files(unixtime, int);
 static void setup_table    (AsciiTable &);
@@ -114,7 +114,6 @@ static void usage(int, char **);
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
-   WrfData wd;
    int i;
 
    // Set handler to be called for memory allocation error
@@ -133,9 +132,6 @@ int main(int argc, char *argv[]) {
    for(i=0; i<obs_file.n_elements(); i++) {
       process_obs_file(i);
    }
-
-   // Setup the output text files as requested in the config file
-   setup_txt_files(wd.get_valid_time(), wd.get_lead_time());
 
    // Compute the scores and write them out
    process_scores();
@@ -326,7 +322,7 @@ void process_fcst_climo_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_first_pass(const Grid &data_grid) {
+void setup_first_pass(const WrfData &wd, const Grid &data_grid) {
 
    // Store the grid
    grid = data_grid;
@@ -336,6 +332,9 @@ void setup_first_pass(const Grid &data_grid) {
 
    // Setup the GCPairData objects
    conf_info.set_gc_pd();
+
+   // Setup the output text files as requested in the config file
+   setup_txt_files(wd.get_valid_time(), wd.get_lead_time());
 
    return;
 }
@@ -672,7 +671,7 @@ void process_grib_codes() {
          if(grid.nx() == 0 && grid.ny() == 0) {
 
             // Setup the first pass through the data
-            setup_first_pass(data_grid);
+            setup_first_pass(fcst_wd[i][j], data_grid);
          }
          // For multiple verification fields, check to make sure that the
          // grid dimensions don't change
