@@ -99,11 +99,7 @@ FileType check_magic_cookie(const char *filename) {
 
    // Open the file
    ifstream in(filename, ios::binary);
-   if(!in) {
-      cerr << "\n\ncheck_magic_cookie() -> "
-           << "can't open file \"" << filename << "\"\n\n";
-      exit(1);
-   }
+   if(!in) return(NoFileType);
 
    // Read first set of bytes into a buffer
    in.read(buf, sizeof(buf));
@@ -127,11 +123,7 @@ FileType check_grib_magic_cookie(const char *filename) {
 
    // Open the file
    ifstream in(filename);
-   if(!in) {
-      cerr << "\n\ncheck_magic_cookie() -> "
-           << "can't open file \"" << filename << "\"\n\n";
-      exit(1);
-   }
+   if(!in) return(NoFileType);
 
    // Read through the file looking for the GRIB magic cookie
    while(in) {
