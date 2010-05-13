@@ -292,6 +292,152 @@ void GCInfo::set_info_str(const char *c) {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Code for class PairBase
+//
+////////////////////////////////////////////////////////////////////////
+
+PairBase::PairBase() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+PairBase::~PairBase() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::clear() {
+
+   msg_typ.clear();
+   mask_name.clear();
+
+   mask_wd_ptr = (WrfData *) 0;  // Not allocated
+
+   interp_mthd = im_na;
+   interp_wdth = bad_data_int;
+
+   sid_sa.clear();
+   lat_na.clear();
+   lon_na.clear();
+   x_na.clear();
+   y_na.clear();
+   lvl_na.clear();
+   elv_na.clear();
+   o_na.clear();
+
+   n_obs = 0;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_mask_name(const char *c) {
+
+   mask_name = c;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_mask_wd_ptr(WrfData *wd_ptr) {
+
+   mask_wd_ptr = wd_ptr;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_msg_typ(const char *c) {
+
+   msg_typ = c;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_interp_mthd(const char *str) {
+
+   interp_mthd = string_to_interpmthd(str);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_interp_mthd(InterpMthd m) {
+
+   interp_mthd = m;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_interp_wdth(int n) {
+
+   interp_wdth = n;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::add_obs(const char *sid,
+                       double lat, double lon,
+                       double x, double y,
+                       double lvl, double elv,
+                       double o) {
+   sid_sa.add(sid);
+   lat_na.add(lat);
+   lon_na.add(lon);
+   x_na.add(x);
+   y_na.add(y);
+   lvl_na.add(lvl);
+   elv_na.add(elv);
+   o_na.add(o);
+
+   // Increment the number of pairs
+   n_obs += 1;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::add_obs(double x, double y, double o) {
+
+   sid_sa.add(na_str);
+   lat_na.add(bad_data_double);
+   lon_na.add(bad_data_double);
+   x_na.add(x);
+   y_na.add(y);
+   lvl_na.add(bad_data_double);
+   elv_na.add(bad_data_double);
+   o_na.add(o);
+
+   // Increment the number of observations
+   n_obs += 1;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Code for class PairData
 //
 ////////////////////////////////////////////////////////////////////////
@@ -330,8 +476,6 @@ PairData & PairData::operator=(const PairData &pd) {
 
 void PairData::init_from_scratch() {
 
-   mask_wd_ptr = (WrfData *) 0;
-
    clear();
 
    return;
@@ -341,24 +485,12 @@ void PairData::init_from_scratch() {
 
 void PairData::clear() {
 
-   msg_typ.clear();
-   mask_name.clear();
-
-   mask_wd_ptr = (WrfData *) 0;  // Not allocated
-
-   interp_mthd = im_na;
-   interp_wdth = bad_data_int;
+   PairBase::clear();
 
    f_na.clear();
    c_na.clear();
-   o_na.clear();
 
-   lat_na.clear();
-   lon_na.clear();
-   lvl_na.clear();
-   elv_na.clear();
-
-   n_pair  = 0;
+   n_pair = 0;
 
    return;
 }
@@ -372,15 +504,14 @@ void PairData::assign(const PairData &pd) {
 
    set_mask_name(pd.mask_name);
    set_mask_wd_ptr(pd.mask_wd_ptr);
-
    set_msg_typ(pd.msg_typ);
 
    set_interp_mthd(pd.interp_mthd);
    set_interp_wdth(pd.interp_wdth);
 
    for(i=0; i<pd.n_pair; i++) {
-      add_pair(pd.lat_na[i], pd.lon_na[i],
-               pd.lvl_na[i], pd.elv_na[i],
+      add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+               pd.x_na[i], pd.y_na[i], pd.lvl_na[i], pd.elv_na[i],
                pd.f_na[i], pd.c_na[i], pd.o_na[i]);
    }
 
@@ -389,71 +520,14 @@ void PairData::assign(const PairData &pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairData::set_mask_name(const char *c) {
+void PairData::add_pair(const char *sid, double lat, double lon,
+                        double x, double y, double lvl, double elv,
+                        double f, double c, double o) {
 
-   mask_name = c;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairData::set_mask_wd_ptr(WrfData *wd_ptr) {
-
-   mask_wd_ptr = wd_ptr;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairData::set_msg_typ(const char *c) {
-
-   msg_typ = c;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairData::set_interp_mthd(const char *str) {
-
-   interp_mthd = string_to_interpmthd(str);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairData::set_interp_mthd(InterpMthd m) {
-
-   interp_mthd = m;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairData::set_interp_wdth(int n) {
-
-   interp_wdth = n;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairData::add_pair(double lat, double lon,
-                        double lvl, double elv,
-                        double f,   double c,   double o) {
-   lat_na.add(lat);
-   lon_na.add(lon);
-   lvl_na.add(lvl);
-   elv_na.add(elv);
+   PairBase::add_obs(sid, lat, lon, x, y, lvl, elv, o);
 
    f_na.add(f);
    c_na.add(c);
-   o_na.add(o);
 
    // Increment the number of pairs
    n_pair += 1;
@@ -728,23 +802,6 @@ void GCPairData::set_pd_size(int types, int masks, int interps) {
    return;
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-void GCEnsPairData::set_ens_size() {
-   int i, j, k;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
-            pd[i][j][k].set_size();
-         }
-      }
-   }
-
-   return;
-}
-
 ////////////////////////////////////////////////////////////////////////
 
 void GCPairData::set_msg_typ(int i_msg_typ, const char *name) {
@@ -970,9 +1027,8 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
                          obs_lvl, climo_lvl_below, climo_lvl_above);
 
             // Add the forecast, climatological, and observation data
-            pd[i][j][k].add_pair(hdr_lat, hdr_lon,
-                                 obs_lvl, obs_hgt,
-                                 fcst_v, climo_v, obs_v);
+            pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon, obs_x, obs_y,
+                                 obs_lvl, obs_hgt, fcst_v, climo_v, obs_v);
 
          } // end for k
       } // end for j
@@ -1090,7 +1146,8 @@ double GCPairData::compute_interp(int fcst_flag,
 
    v_below = compute_horz_interp(wd_ptr[i_below], obs_x, obs_y,
                                  pd[0][0][i_interp].interp_mthd,
-                                 pd[0][0][i_interp].interp_wdth);
+                                 pd[0][0][i_interp].interp_wdth,
+                                 interp_thresh);
 
    if(i_below == i_above) {
       v = v_below;
@@ -1098,7 +1155,8 @@ double GCPairData::compute_interp(int fcst_flag,
    else {
       v_above = compute_horz_interp(wd_ptr[i_above], obs_x, obs_y,
                                     pd[0][0][i_interp].interp_mthd,
-                                    pd[0][0][i_interp].interp_wdth);
+                                    pd[0][0][i_interp].interp_wdth,
+                                    interp_thresh);
 
       // If verifying specific humidity, do vertical interpolation in
       // the natural log of q
@@ -1124,117 +1182,6 @@ double GCPairData::compute_interp(int fcst_flag,
    }
 
    return(v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double GCPairData::compute_horz_interp(WrfData *wd_ptr,
-                                       double obs_x, double obs_y,
-                                       int mthd, int wdth) {
-   double v;
-   int x_ll, y_ll;
-
-   // The neighborhood width is odd, find the lower-left corner of
-   // the neighborhood
-   if(wdth%2 == 1) {
-      x_ll = nint(obs_x) - (wdth - 1)/2;
-      y_ll = nint(obs_y) - (wdth - 1)/2;
-   }
-   // The neighborhood width is even, find the lower-left corner of
-   // the neighborhood
-   else {
-      x_ll = nint(floor(obs_x) - (wdth/2 - 1));
-      y_ll = nint(floor(obs_y) - (wdth/2 - 1));
-   }
-
-   // Compute the interpolated value for the fields above and below
-   switch(mthd) {
-
-      case(im_min):     // Minimum
-         v = interp_min(*wd_ptr, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(im_max):     // Maximum
-         v = interp_max(*wd_ptr, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(im_median):  // Median
-         v = interp_median(*wd_ptr, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(im_uw_mean): // Unweighted Mean
-         v = interp_uw_mean(*wd_ptr, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(im_dw_mean): // Distance-Weighted Mean
-         v = interp_dw_mean(*wd_ptr, x_ll, y_ll, wdth, obs_x, obs_y,
-                            dw_mean_pow, interp_thresh);
-         break;
-
-      case(im_ls_fit):  // Least-squares fit
-         v = interp_ls_fit(*wd_ptr, x_ll, y_ll, wdth, obs_x, obs_y,
-                           interp_thresh);
-         break;
-
-      default:
-         cerr << "\n\nERROR: GCPairData::compute_horz_interp() -> "
-              << "unexpected interpolation method encountered: "
-              << mthd << "\n\n" << flush;
-         exit(1);
-         break;
-   }
-
-   return(v);
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Interpolate lineary in the log of pressure between values "v1" and
-// "v2" at pressure levels "prs1" and "prs2" to pressure level "to_prs".
-//
-////////////////////////////////////////////////////////////////////////
-
-double GCPairData::compute_vert_pinterp(double v1, double prs1,
-                                        double v2, double prs2,
-                                        double to_prs) {
-   double v_interp;
-
-   if(prs1 <= 0.0 || prs2 <= 0.0 || to_prs <= 0.0) {
-      cerr << "\n\nERROR: GCPairData::compute_vert_pinterp() -> "
-           << "pressure shouldn't be <= zero!\n\n" << flush;
-      exit(1);
-   }
-
-   v_interp = v1 + ((v2-v1)*log(prs1/to_prs)/log(prs1/prs2));
-
-   return(v_interp);
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Linearly interpolate between values "v1" and "v2" at height levels
-// "lvl1" and "lvl2" to height level "to_lvl".
-//
-////////////////////////////////////////////////////////////////////////
-
-double GCPairData::compute_vert_zinterp(double v1, double lvl1,
-                                        double v2, double lvl2,
-                                        double to_lvl) {
-   double d1, d2, v_interp;
-
-   if(lvl1 <= 0.0 || lvl2 <= 0.0 || to_lvl <= 0.0) {
-      cerr << "\n\nERROR: GCPairData::compute_vert_zinterp() -> "
-           << "level shouldn't be <= zero!\n\n" << flush;
-      exit(1);
-   }
-
-   d1 = abs(lvl1 - to_lvl);
-   d2 = abs(lvl2 - to_lvl);
-
-   // Linearly interpolate betwen lvl_1 and lvl_2
-   v_interp = v1*d1/(d1+d2) + v2*d2/(d1+d2);
-
-   return(v_interp);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1277,9 +1224,8 @@ EnsPairData & EnsPairData::operator=(const EnsPairData &pd) {
 
 void EnsPairData::init_from_scratch() {
 
-   mask_wd_ptr = (WrfData * ) 0;
-   e_na        = (NumArray *) 0;
-   n_pair      = 0;
+   e_na   = (NumArray *) 0;
+   n_pair = 0;
 
    clear();
 
@@ -1291,29 +1237,13 @@ void EnsPairData::init_from_scratch() {
 void EnsPairData::clear() {
    int i;
 
-   msg_typ.clear();
-   mask_name.clear();
-
-   mask_wd_ptr = (WrfData *) 0;  // Not allocated
-
-   interp_mthd = im_na;
-   interp_wdth = bad_data_int;
+   PairBase::clear();
 
    for(i=0; i<n_pair; i++) e_na[i].clear();
-
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
 
-   o_na.clear();
    v_na.clear();
    r_na.clear();
-
-   sid_sa.clear();
-   lat_na.clear();
-   lon_na.clear();
-     x_na.clear();
-     y_na.clear();
-   lvl_na.clear();
-   elv_na.clear();
 
    n_pair = 0;
 
@@ -1329,7 +1259,6 @@ void EnsPairData::assign(const EnsPairData &pd) {
 
    set_mask_name(pd.mask_name);
    set_mask_wd_ptr(pd.mask_wd_ptr);
-
    set_msg_typ(pd.msg_typ);
 
    set_interp_mthd(pd.interp_mthd);
@@ -1338,8 +1267,8 @@ void EnsPairData::assign(const EnsPairData &pd) {
    sid_sa = pd.sid_sa;
    lat_na = pd.lat_na;
    lon_na = pd.lon_na;
-     x_na = pd.x_na;
-     y_na = pd.y_na;
+   x_na   = pd.x_na;
+   y_na   = pd.y_na;
    lvl_na = pd.lvl_na;
    elv_na = pd.elv_na;
    n_pair = pd.n_pair;
@@ -1347,97 +1276,12 @@ void EnsPairData::assign(const EnsPairData &pd) {
    v_na   = pd.v_na;
    r_na   = pd.r_na;
 
+   n_obs  = pd.n_obs;
+   n_pair = pd.n_pair;
+
    set_size();
 
-   for(i=0; i<pd.n_pair; i++) e_na[i] = pd.e_na[i];
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::set_mask_name(const char *c) {
-
-   mask_name = c;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::set_mask_wd_ptr(WrfData *wd_ptr) {
-
-   mask_wd_ptr = wd_ptr;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::set_msg_typ(const char *c) {
-
-   msg_typ = c;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::set_interp_mthd(const char *str) {
-
-   interp_mthd = string_to_interpmthd(str);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::set_interp_mthd(InterpMthd m) {
-
-   interp_mthd = m;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::set_interp_wdth(int n) {
-
-   interp_wdth = n;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::add_obs(const char *sid, double lat, double lon,
-                          double x, double y, double lvl, double elv,
-                          double o) {
-   sid_sa.add(sid);
-   lat_na.add(lat);
-   lon_na.add(lon);
-     x_na.add(x);
-     y_na.add(y);
-   lvl_na.add(lvl);
-   elv_na.add(elv);
-     o_na.add(o);
-
-   // Increment the number of pairs
-   n_pair += 1;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::add_obs(int x, int y, double o) {
-
-   x_na.add(x);
-   y_na.add(y);
-   o_na.add(o);
-
-   // Increment the number of pairs
-   n_pair += 1;
+   for(i=0; i<n_pair; i++) e_na[i] = pd.e_na[i];
 
    return;
 }
@@ -1454,6 +1298,8 @@ void EnsPairData::add_ens(int i, double v) {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsPairData::set_size() {
+
+   n_pair = n_obs;
 
    // Allocate a NumArray to store ensemble values for each observation
    e_na = new NumArray [n_pair];
@@ -1806,6 +1652,22 @@ void GCEnsPairData::set_interp(int i_interp, InterpMthd mthd, int wdth) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void GCEnsPairData::set_ens_size() {
+   int i, j, k;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_mask; j++) {
+         for(k=0; k<n_interp; k++) {
+            pd[i][j][k].set_size();
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void GCEnsPairData::add_obs(float *hdr_arr, const char *hdr_typ_str,
                             const char  *hdr_sid_str, unixtime hdr_ut,
                             float *obs_arr, Grid &gr) {
@@ -2101,7 +1963,8 @@ double GCEnsPairData::compute_interp(double obs_x, double obs_y,
 
    v_below = compute_horz_interp(wd_ptr[i_below], obs_x, obs_y,
                                  pd[0][0][i_interp].interp_mthd,
-                                 pd[0][0][i_interp].interp_wdth);
+                                 pd[0][0][i_interp].interp_wdth,
+                                 interp_thresh);
 
    if(i_below == i_above) {
       v = v_below;
@@ -2109,7 +1972,8 @@ double GCEnsPairData::compute_interp(double obs_x, double obs_y,
    else {
       v_above = compute_horz_interp(wd_ptr[i_above], obs_x, obs_y,
                                     pd[0][0][i_interp].interp_mthd,
-                                    pd[0][0][i_interp].interp_wdth);
+                                    pd[0][0][i_interp].interp_wdth,
+                                    interp_thresh);
 
       // If verifying specific humidity, do vertical interpolation in
       // the natural log of q
@@ -2138,10 +2002,14 @@ double GCEnsPairData::compute_interp(double obs_x, double obs_y,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Begin utility functions for interpolating
+//
+////////////////////////////////////////////////////////////////////////
 
-double GCEnsPairData::compute_horz_interp(WrfData *wd_ptr,
-                                       double obs_x, double obs_y,
-                                       int mthd, int wdth) {
+double compute_horz_interp(WrfData *wd_ptr,
+                           double obs_x, double obs_y,
+                           int mthd, int wdth, double interp_thresh) {
    double v;
    int x_ll, y_ll;
 
@@ -2188,7 +2056,7 @@ double GCEnsPairData::compute_horz_interp(WrfData *wd_ptr,
          break;
 
       default:
-         cerr << "\n\nERROR: GCEnsPairData::compute_horz_interp() -> "
+         cerr << "\n\nERROR: compute_horz_interp() -> "
               << "unexpected interpolation method encountered: "
               << mthd << "\n\n" << flush;
          exit(1);
@@ -2205,13 +2073,13 @@ double GCEnsPairData::compute_horz_interp(WrfData *wd_ptr,
 //
 ////////////////////////////////////////////////////////////////////////
 
-double GCEnsPairData::compute_vert_pinterp(double v1, double prs1,
-                                        double v2, double prs2,
-                                        double to_prs) {
+double compute_vert_pinterp(double v1, double prs1,
+                            double v2, double prs2,
+                            double to_prs) {
    double v_interp;
 
    if(prs1 <= 0.0 || prs2 <= 0.0 || to_prs <= 0.0) {
-      cerr << "\n\nERROR: GCEnsPairData::compute_vert_pinterp() -> "
+      cerr << "\n\nERROR: compute_vert_pinterp() -> "
            << "pressure shouldn't be <= zero!\n\n" << flush;
       exit(1);
    }
@@ -2228,13 +2096,13 @@ double GCEnsPairData::compute_vert_pinterp(double v1, double prs1,
 //
 ////////////////////////////////////////////////////////////////////////
 
-double GCEnsPairData::compute_vert_zinterp(double v1, double lvl1,
-                                        double v2, double lvl2,
-                                        double to_lvl) {
+double compute_vert_zinterp(double v1, double lvl1,
+                            double v2, double lvl2,
+                            double to_lvl) {
    double d1, d2, v_interp;
 
    if(lvl1 <= 0.0 || lvl2 <= 0.0 || to_lvl <= 0.0) {
-      cerr << "\n\nERROR: GCEnsPairData::compute_vert_zinterp() -> "
+      cerr << "\n\nERROR: compute_vert_zinterp() -> "
            << "level shouldn't be <= zero!\n\n" << flush;
       exit(1);
    }

@@ -22,7 +22,7 @@ static const int pair_data_alloc_jump = 1000;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Class to store Grib Code Information
+// Class to store GRIB Code Information
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +76,6 @@ class GCInfo {
       void clear();
 
       void set_gcinfo(const char *, int);
-
       void set_abbr_str(const char *);
       void set_lvl_str(const char *);
       void set_info_str(const char *);
@@ -84,23 +83,20 @@ class GCInfo {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Class to store Fcst-Climo-Obs pair data
+// Base class for matched pair data
 //
 ////////////////////////////////////////////////////////////////////////
 
-class PairData {
+class PairBase {
 
    private:
 
       void init_from_scratch();
-      void assign(const PairData &);
 
    public:
 
-      PairData();
-      ~PairData();
-      PairData(const PairData &);
-      PairData & operator=(const PairData &);
+      PairBase();
+      ~PairBase();
 
       //////////////////////////////////////////////////////////////////
 
@@ -116,17 +112,16 @@ class PairData {
       InterpMthd interp_mthd;
       int        interp_wdth;
 
-      // Forecast, climotological, and observation data pairs
-      NumArray f_na;
-      NumArray c_na;
-      NumArray o_na;
-
-      // Observation latitude, longitude, pressure, and elevation
-      NumArray lat_na;
-      NumArray lon_na;
-      NumArray lvl_na;
-      NumArray elv_na;
-      int      n_pair;
+      // Observation Information
+      StringArray sid_sa;  // Station ID [n_obs]
+      NumArray    lat_na;  // Latitude [n_obs]
+      NumArray    lon_na;  // Longitude [n_obs]
+      NumArray    x_na;    // X [n_obs]
+      NumArray    y_na;    // Y [n_obs]
+      NumArray    lvl_na;  // Level [n_obs]
+      NumArray    elv_na;  // Elevation [n_obs]
+      NumArray    o_na;    // Observation value [n_obs]
+      int         n_obs;   // Number of observations
 
       //////////////////////////////////////////////////////////////////
 
@@ -134,20 +129,95 @@ class PairData {
 
       void set_mask_name(const char *);
       void set_mask_wd_ptr(WrfData *);
-
       void set_msg_typ(const char *);
 
       void set_interp_mthd(const char *);
       void set_interp_mthd(InterpMthd);
       void set_interp_wdth(int);
 
-      void add_pair(double, double, double, double,
-                    double, double, double);
+      void add_obs(const char *, double, double, double, double,
+                   double, double, double);
+      void add_obs(double, double, double);
 };
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Class to store a variety of PairData objects for each Grib Code
+// Class to store matched pair data:
+//    forecast, observation, and climatology values
+//
+////////////////////////////////////////////////////////////////////////
+
+class PairData : public PairBase {
+
+   private:
+
+      void init_from_scratch();
+      void assign(const PairData &);
+
+   public:
+
+      PairData();
+      ~PairData();
+      PairData(const PairData &);
+      PairData & operator=(const PairData &);
+
+      //////////////////////////////////////////////////////////////////
+
+      // Forecast and climatological values
+      NumArray f_na;    // Forecast [n_pair]
+      NumArray c_na;    // Climatology [n_pair]
+      int      n_pair;
+
+      //////////////////////////////////////////////////////////////////
+
+      void clear();
+
+      void add_pair(const char *, double, double, double, double,
+                    double, double, double, double, double);
+};
+
+////////////////////////////////////////////////////////////////////////
+//
+// Class to store ensemble pair data
+//
+////////////////////////////////////////////////////////////////////////
+
+class EnsPairData : public PairBase {
+
+   private:
+
+      void init_from_scratch();
+      void assign(const EnsPairData &);
+
+   public:
+
+      EnsPairData();
+      ~EnsPairData();
+      EnsPairData(const EnsPairData &);
+      EnsPairData & operator=(const EnsPairData &);
+
+      //////////////////////////////////////////////////////////////////
+
+      // Ensemble, valid count, and rank values
+      NumArray *e_na;    // Ensemble values [n_pair][n_ens]
+      NumArray  v_na;    // Number of valid ensemble values [n_pair]
+      NumArray  r_na;    // Observation ranks [n_pair]
+      int       n_pair;
+
+      //////////////////////////////////////////////////////////////////
+
+      void clear();
+
+      void add_ens(int, double);
+      void set_size();
+
+      void compute_rank(int);
+      void compute_rhist(int, NumArray &);
+};
+
+////////////////////////////////////////////////////////////////////////
+//
+// Class to store a variety of PairData objects for each GRIB Code
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -167,7 +237,7 @@ class GCPairData {
 
       //////////////////////////////////////////////////////////////////
       //
-      // The grib code information to be verified
+      // The GRIB code information to be verified
       //
       //////////////////////////////////////////////////////////////////
 
@@ -232,99 +302,21 @@ class GCPairData {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
-      // Should call set_pd_size prior to setting up the msg_typ, mask
-      // or interpolation stuff
+      // Call set_pd_size before set_msg_typ, set_mask_wd, and set_interp
       void set_pd_size(int, int, int);
 
       void set_msg_typ(int, const char *);
-
       void set_mask_wd(int, const char *, WrfData *);
-
       void set_interp(int, const char *, int);
       void set_interp(int, InterpMthd, int);
 
       void add_obs(float *, char *, char *, unixtime, float *, Grid &);
+
       void find_vert_lvl(int, double, int &, int &);
 
       int  get_n_pair();
 
       double compute_interp(int, double, double, int, double, int, int);
-      double compute_horz_interp(WrfData *, double, double, int, int);
-      double compute_vert_pinterp(double, double, double, double, double);
-      double compute_vert_zinterp(double, double, double, double, double);
-};
-
-////////////////////////////////////////////////////////////////////////
-//
-// Class to store Ensemble-Observation pair data
-//
-////////////////////////////////////////////////////////////////////////
-
-class EnsPairData {
-
-   private:
-
-      void init_from_scratch();
-      void assign(const EnsPairData &);
-
-   public:
-
-      EnsPairData();
-      ~EnsPairData();
-      EnsPairData(const EnsPairData &);
-      EnsPairData & operator=(const EnsPairData &);
-
-      //////////////////////////////////////////////////////////////////
-
-      // Masking area applied to the forecast and climo fields
-      ConcatString mask_name;
-      WrfData     *mask_wd_ptr; // Pointer to the masking field
-                                // which is not allocated
-
-      // The verifying message type
-      ConcatString msg_typ;
-
-      // Interpolation method and width used
-      InterpMthd interp_mthd;
-      int        interp_wdth;
-
-      // Ensemble, observation, and rank data pairs
-      NumArray  o_na; // Observation values [n_pair]
-      NumArray *e_na; // Ensemble values [n_pair][n_ens]
-      NumArray  v_na; // Number of valid ensemble values [n_pair]
-      NumArray  r_na; // Observation ranks [n_pair]
-
-      // Observation latitude, longitude, pressure, and elevation
-      StringArray sid_sa;
-      NumArray    lat_na;
-      NumArray    lon_na;
-      NumArray      x_na;
-      NumArray      y_na;
-      NumArray    lvl_na;
-      NumArray    elv_na;
-      int         n_pair;
-
-      //////////////////////////////////////////////////////////////////
-
-      void clear();
-
-      void set_mask_name(const char *);
-      void set_mask_wd_ptr(WrfData *);
-
-      void set_msg_typ(const char *);
-
-      void set_interp_mthd(const char *);
-      void set_interp_mthd(InterpMthd);
-      void set_interp_wdth(int);
-
-      void add_obs(const char *, double, double, double, double, 
-                   double, double, double);
-      void add_obs(int, int, double);
-      void add_ens(int, double);
-      void set_size();
-
-      void compute_rank(int);
-      void compute_rhist(int, NumArray &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -349,7 +341,7 @@ class GCEnsPairData {
 
       //////////////////////////////////////////////////////////////////
       //
-      // The grib code information to be verified
+      // The GRIB code information to be verified
       //
       //////////////////////////////////////////////////////////////////
 
@@ -406,18 +398,16 @@ class GCEnsPairData {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
-      // Should call set_pd_size prior to setting up the msg_typ, mask
-      // or interpolation stuff
+      // Call set_pd_size before set_msg_typ, set_mask_wd, and set_interp
       void set_pd_size(int, int, int);
 
-      void set_ens_size();
-
       void set_msg_typ(int, const char *);
-
       void set_mask_wd(int, const char *, WrfData *);
-
       void set_interp(int, const char *, int);
       void set_interp(int, InterpMthd, int);
+
+      // Call set_ens_size before add_ens
+      void set_ens_size();
 
       void add_obs(float *, const char *, const char *, unixtime, float *, Grid &);
       void add_ens();
@@ -428,10 +418,17 @@ class GCEnsPairData {
       int  get_n_pair();
 
       double compute_interp(double, double, int, double, int, int);
-      double compute_horz_interp(WrfData *, double, double, int, int);
-      double compute_vert_pinterp(double, double, double, double, double);
-      double compute_vert_zinterp(double, double, double, double, double);
 };
+
+////////////////////////////////////////////////////////////////////////
+//
+// Utility functions for interpolating
+//
+////////////////////////////////////////////////////////////////////////
+
+extern double compute_horz_interp(WrfData *, double, double, int, int, double);
+extern double compute_vert_pinterp(double, double, double, double, double);
+extern double compute_vert_zinterp(double, double, double, double, double);
 
 ////////////////////////////////////////////////////////////////////////
 
