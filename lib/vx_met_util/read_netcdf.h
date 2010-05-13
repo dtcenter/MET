@@ -27,6 +27,9 @@ extern void read_netcdf_grid(NcFile *, Grid &, int);
 extern void read_netcdf(NcFile *, const char *, char *,
                         WrfData &, Grid &, int);
 
+extern int  read_netcdf_status(NcFile *, const char *, char *,
+                               WrfData &, Grid &, int);
+
 extern int  has_variable(NcFile *, const char *);
 
 ////////////////////////////////////////////////////////////////////////

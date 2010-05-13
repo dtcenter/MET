@@ -464,6 +464,24 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
 
 void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
                  WrfData &wd, Grid &gr, int verbosity) {
+   int status;
+
+   status = read_netcdf_status(f_in, var_name, lvl_name, wd, gr, verbosity);
+
+   if(status != 0) {
+      cerr << "\n\nERROR: read_netcdf() -> "
+           << "\"" << var_name << "\" variable at \""
+           << lvl_name << "\" level not found.\n\n" << flush;
+      exit(1);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int read_netcdf_status(NcFile *f_in, const char *var_name, char *lvl_name,
+                WrfData &wd, Grid &gr, int verbosity) {
    double v, v_min, v_max;
    int i, x, y, accum;
    unixtime init_ut, valid_ut;
@@ -483,10 +501,10 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
    // Check whether the file contains the requested variable
    //
    if(!has_variable(f_in, var_name)) {
-      cerr << "\n\nERROR: read_netcdf() -> "
+      cout << "\n\nWARNING: read_netcdf_status() -> "
            << "\"" << var_name << "\" variable not found.\n\n"
            << flush;
-      exit(1);
+      return(1);
    }
 
    //
@@ -494,10 +512,10 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
    //
    pcp_var = f_in->get_var(var_name);
    if(!pcp_var || !pcp_var->is_valid()) {
-      cerr << "\n\nERROR: read_netcdf() -> "
+      cout << "\n\nWARNING: read_netcdf_status() -> "
            << "Trouble reading \"" << var_name << "\" variable.\n\n"
            << flush;
-      exit(1);
+      return(1);
    }
 
    //
@@ -505,10 +523,10 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
    //
    lvl_att = pcp_var->get_att("level");
    if(!lvl_att) {
-      cerr << "\n\nERROR: read_netcdf() -> "
+      cout << "\n\nWARNING: read_netcdf_status() -> "
            << "\"level\" attribute not found for the \""
            << var_name << "\" variable.\n\n" << flush;
-      exit(1);
+      return(1);
    }
    strcpy(lvl_name, lvl_att->as_string(0));
 
@@ -518,19 +536,19 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
    //
    time_att = pcp_var->get_att("init_time_ut");
    if(!time_att) {
-      cerr << "\n\nERROR: read_netcdf() -> "
+      cout << "\n\nWARNING: read_netcdf_status() -> "
            << "\"init_time_ut\" attribute not found for the \""
            << var_name << "\" variable.\n\n" << flush;
-      exit(1);
+      return(1);
    }
    init_ut = time_att->as_long(0);
 
    time_att = pcp_var->get_att("valid_time_ut");
    if(!time_att) {
-      cerr << "\n\nERROR: read_netcdf() -> "
+      cout << "\n\nWARNING: read_netcdf_status() -> "
            << "\"valid_time_ut\" attribute not found for the \""
            << var_name << "\" variable.\n\n" << flush;
-      exit(1);
+      return(1);
    }
    valid_ut = time_att->as_long(0);
 
@@ -552,10 +570,10 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
 
       time_att = pcp_var->get_att("accum_time");
       if(!time_att) {
-         cerr << "\n\nERROR: read_netcdf() -> "
+         cout << "\n\nWARNING: read_netcdf_status() -> "
               << "\"accum_time\" attribute not found for the \""
               << var_name << "\" variable.\n\n" << flush;
-         exit(1);
+         return(1);
       }
       accum = sec_per_hour*atoi(time_att->as_string(0));
    }
@@ -566,9 +584,9 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
    pcp_data = new float [gr.nx()*gr.ny()];
 
    if( !pcp_var->get(&pcp_data[0], gr.ny(), gr.nx()) ) {
-      cerr << "\n\nERROR: read_netcdf() -> "
+      cout << "\n\nWARNING: read_netcdf_status() -> "
            << "error with the pcp_var->get\n\n" << flush;
-      exit(1);
+      return(1);
    }
 
    //
@@ -616,7 +634,7 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
 
    if(pcp_data) { delete pcp_data; pcp_data = (float *) 0; }
 
-   return;
+   return(0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
