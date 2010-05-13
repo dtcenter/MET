@@ -404,6 +404,131 @@ int get_prc_column_offset(const char *col_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int get_rhist_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the rhist columns:
+   //    TOTAL, N_RANK, [RANK_] (for possible ranks, n_ens+1)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<2; i++) {
+
+         if(strcasecmp(rhist_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable column
+   //
+   if(!found) {
+
+      // RANK_i
+      if(strncasecmp(rhist_columns[3], col_name,
+                     strlen(rhist_columns[3])) == 0) {
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + (i-1);
+      }
+   }
+
+   if(!found) {
+      cerr << "\n\nERROR: get_rhist_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n" << flush;
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_orank_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the orank columns:
+   //    TOTAL,       INDEX,       OBS_LAT,
+   //    OBS_LON,     OBS_LVL,     OBS_ELV,
+   //    OBS,         RANK,        N_ENS_VLD,
+   //    N_ENS,       [ENS_] (for each ensemble member)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<10; i++) {
+
+         if(strcasecmp(orank_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable column
+   //
+   if(!found) {
+
+      // ENS_i
+      if(strncasecmp(orank_columns[10], col_name,
+                     strlen(orank_columns[10])) == 0) {
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 10 + (i-1);
+      }
+   }
+
+   if(!found) {
+      cerr << "\n\nERROR: get_orank_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n" << flush;
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int parse_thresh_index(const char *col_name) {
    int i;
    char *ptr;
@@ -661,6 +786,74 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    if(n_thresh >= 1) {
       sprintf(tmp_str, "%s%i", prc_columns[2], n_thresh);
       at.set_entry(r, col, tmp_str);    // Threshold
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
+                            int r, int c) {
+   int i, col;
+   char tmp_str[max_str_len];
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_header_columns; i++)
+         at.set_entry(r, i+c, hdr_columns[i]);
+
+      c += n_header_columns;
+   }
+
+   // Write the columns names specific to the RHIST line type
+   at.set_entry(r, c+0, rhist_columns[0]);
+   at.set_entry(r, c+1, rhist_columns[1]);
+
+   // Write N_i for each ensemble member
+   for(i=0, col=c+2; i<n_rank; i++) {
+
+      sprintf(tmp_str, "%s%i", rhist_columns[2], i+1);
+      at.set_entry(r, col, tmp_str); // Counts for each rank
+      col++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
+                            int r, int c) {
+   int i, col;
+   char tmp_str[max_str_len];
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_header_columns; i++)
+         at.set_entry(r, i+c, hdr_columns[i]);
+
+      c += n_header_columns;
+   }
+
+   // Write the columns names specific to the orank line type
+   at.set_entry(r, c+0, orank_columns[0]);
+   at.set_entry(r, c+1, orank_columns[1]);
+   at.set_entry(r, c+2, orank_columns[2]);
+   at.set_entry(r, c+3, orank_columns[3]);
+   at.set_entry(r, c+4, orank_columns[4]);
+   at.set_entry(r, c+5, orank_columns[5]);
+   at.set_entry(r, c+6, orank_columns[6]);
+   at.set_entry(r, c+7, orank_columns[7]);
+   at.set_entry(r, c+8, orank_columns[8]);
+   at.set_entry(r, c+9, orank_columns[9]);
+
+   // Write ENS_i for each ensemble member
+   for(i=0, col=c+10; i<n_ens; i++) {
+
+      sprintf(tmp_str, "%s%i", orank_columns[10], i+1);
+      at.set_entry(r, col, tmp_str); // Ensemble member value
+      col++;
    }
 
    return;
@@ -1321,7 +1514,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairData *pd_ptr,
    shc.clear_cov_thresh();
    shc.set_alpha(bad_data_double);
 
-   // Write a line for each alpha value
+   // Write a line for each matched pair
    for(i=0; i<pd_ptr->n_pair; i++) {
 
       // Write the header columns
@@ -1353,7 +1546,7 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
                    AsciiTable &txt_at, int &txt_row) {
    int i;
 
-   // MPR line type
+   // ISC line type
    shc.set_line_type("ISC");
 
    // Not Applicable
@@ -1371,6 +1564,83 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
 
       // Write the data columns
       write_isc_cols(isc_info, i, stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_flag >= 2) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_rhist_row(StatHdrColumns &shc, const NumArray &rhist_na,
+                     int out_flag,
+                     AsciiTable &stat_at, int &stat_row,
+                     AsciiTable &txt_at, int &txt_row) {
+
+   // RHIST line type
+   shc.set_line_type("RHIST");
+
+   // Not Applicable
+   shc.clear_fcst_thresh();
+   shc.clear_obs_thresh();
+   shc.clear_cov_thresh();
+   shc.set_alpha(bad_data_double);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_rhist_cols(rhist_na, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(out_flag >= 2) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_orank_row(StatHdrColumns &shc, const EnsPairData *pd_ptr,
+                     int out_flag,
+                     AsciiTable &stat_at, int &stat_row,
+                     AsciiTable &txt_at, int &txt_row) {
+   int i;
+
+   // Observation Rank line type
+   shc.set_line_type("ORANK");
+
+   // Not Applicable
+   shc.clear_fcst_thresh();
+   shc.clear_obs_thresh();
+   shc.clear_cov_thresh();
+   shc.set_alpha(bad_data_double);
+
+   // Write a line for each ensemble pair
+   for(i=0; i<pd_ptr->n_pair; i++) {
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      write_orank_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(out_flag >= 2) {
@@ -2709,5 +2979,91 @@ void write_isc_cols(const ISCInfo &isc_info, int i,
 
    return;
 }
+////////////////////////////////////////////////////////////////////////
+
+void write_rhist_cols(const NumArray &rhist_na,
+                      AsciiTable &at, int r, int c) {
+   int i, col;
+
+   //
+   // Ensemble Ranked Histogram
+   // Dump out the RHIST line:
+   //    TOTAL, N_RANKS, [RANK_] (for each bin)
+   //
+   at.set_entry(r, c+0,  // Total Number of Ranked Observations
+      nint(rhist_na.sum()));
+
+   at.set_entry(r, c+1,  // Total Number of Ranks
+      rhist_na.n_elements());
+
+   //
+   // Write RANK_i count for each bin
+   //
+   for(i=0, col=c+2; i<rhist_na.n_elements(); i++) {
+
+      at.set_entry(r, col, // RANK_i
+         nint(rhist_na[i]));
+      col++;
+   }
+
+   return;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+void write_orank_cols(const EnsPairData *pd_ptr, int i,
+                      AsciiTable &at, int r, int c) {
+   int j, col;
+
+   //
+   // Ensemble Observation Rank Matched Pairs
+   // Dump out the ORANK line:
+   //    TOTAL,       INDEX,       OBS_LAT,
+   //    OBS_LON,     OBS_LVL,     OBS_ELV,
+   //    OBS,         RANK,        N_ENS_VLD,
+   //    N_ENS,       [ENS_] (for each ensemble member)
+   //
+   at.set_entry(r, c+0,  // Total Number of Pairs
+      pd_ptr->n_pair);
+
+   at.set_entry(r, c+1,  // Index of Current Pair
+      i+1);
+
+   at.set_entry(r, c+2,  // Latitude
+      pd_ptr->lat_na[i]);
+
+   at.set_entry(r, c+3,  // Longitude
+      pd_ptr->lon_na[i]);
+
+   at.set_entry(r, c+4,  // Level
+      pd_ptr->lvl_na[i]);
+
+   at.set_entry(r, c+5,  // Elevation
+      pd_ptr->elv_na[i]);
+
+   at.set_entry(r, c+6,  // Observation Value
+      pd_ptr->o_na[i]);
+
+   at.set_entry(r, c+7,  // Observation Rank
+      nint(pd_ptr->r_na[i]));
+
+   at.set_entry(r, c+8,  // Number of valid ensembles
+      nint(pd_ptr->v_na[i]));
+
+   at.set_entry(r, c+9,  // Number of ensembles
+      pd_ptr->e_na[i].n_elements());
+
+   //
+   // Write ENS_j for each ensemble member
+   //
+   for(j=0, col=c+10; j<pd_ptr->e_na[i].n_elements(); j++) {
+
+      at.set_entry(r, col, // ENS_j
+         pd_ptr->e_na[i][j]);
+      col++;
+   }
+
+   return;
+};
 
 ////////////////////////////////////////////////////////////////////////
