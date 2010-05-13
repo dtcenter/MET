@@ -17,6 +17,7 @@
 #include "vx_met_util/compute_ci.h"
 #include "vx_met_util/constants.h"
 #include "vx_met_util/met_stats.h"
+#include "vx_met_util/pair_data.h"
 #include "vx_met_util/read_grib.h"
 #include "vx_met_util/read_netcdf.h"
 #include "vx_met_util/write_netcdf.h"

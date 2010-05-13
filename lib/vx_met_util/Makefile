@@ -19,6 +19,7 @@ OBJECTS  = apply_mask.o \
 	conversions.o \
 	file_type.o \
 	met_stats.o \
+	pair_data.o \
 	read_grib.o \
 	read_netcdf.o \
 	stat_columns.o \
@@ -61,6 +62,9 @@ file_type.o: file_type.cc
 
 met_stats.o: met_stats.cc
 	$(CXX) met_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
+
+pair_data.o: pair_data.cc
+	$(CXX) pair_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
 
 read_grib.o: read_grib.cc
 	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
