@@ -12,13 +12,6 @@
 #
 ###############################################################################
 
-CXX         = /usr/bin/g++
-CXX_FLAGS   = -static -g
-SVNROOT     = /home/johnhg/MET/svn/code
-MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
-
-###############################################################################
-
 TARGETS		= wavelet_stat
 
 OBJECTS		= wavelet_stat_Conf.o \
@@ -32,19 +25,6 @@ LIB_DIR		= ../../lib
 
 INC_DIR		= ../../lib
 
-VX_ECONFIG_CLASS = wavelet_stat
-VX_ECONFIG_EXAMPLE_PARM = WaveletStatConfig_default
-VX_ECONFIG_IS_RAP_LIB = false
-VX_ECONFIG_HEADER_SUFFIX = h
-VX_ECONFIG_PANIC = true
-
-MODULE_TYPE = progcpp
-
-#
-# vx_econfig macros and targets
-#
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_macros
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_targets
 all:
 	@ echo
 	@ echo "*** Making wavelet_stat application ***"
