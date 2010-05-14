@@ -13,7 +13,7 @@
    //
    //     Created from config file "PointStatConfig_default"
    //
-   //     on March 27, 2009    6:13 pm  MST
+   //     on May 14, 2010    1:57 pm  MDT
    //
 
 
@@ -36,7 +36,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Panic = 1;
+static const int Panic = 0;
 
 
 ////////////////////////////////////////////////////////////////////////
