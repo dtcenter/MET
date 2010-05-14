@@ -23,7 +23,7 @@ TARGETS		= ensemble_stat
 
 OBJECTS		= ensemble_stat_Conf.o ensemble_stat_conf_info.o
 
-OPT_FLAGS	=
+OPT_FLAGS		= -Wall
 
 FAKES		= all clean objects targets
 

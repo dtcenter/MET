@@ -43,15 +43,14 @@ EnsembleStatConfInfo::~EnsembleStatConfInfo() {
 void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   ens_gci     = (GCInfo *)      0;
-   ens_ta      = (ThreshArray *) 0;
-   fcst_gci    = (GCInfo *)      0;
-   obs_gci     = (GCInfo *)      0;
-   msg_typ     = (char **)       0;
-   interp_mthd = (InterpMthd *)  0;
-   interp_wdth = (int *)         0;
-   mask_wd     = (WrfData *)     0;
-   mask_name   = (char **)       0;
+   ens_gci     = (GCInfo *)        0;
+   ens_ta      = (ThreshArray *)   0;
+   gc_pd       = (GCEnsPairData *) 0;
+   msg_typ     = (char **)         0;
+   interp_mthd = (InterpMthd *)    0;
+   interp_wdth = (int *)           0;
+   mask_wd     = (WrfData *)       0;
+   mask_name   = (char **)         0;
 
    clear();
 
@@ -64,7 +63,7 @@ void EnsembleStatConfInfo::clear() {
    int i;
 
    // Set counts to zero
-   n_ens        = 0;
+   n_ens_var    = 0;
    max_n_thresh = 0;
    n_vx         = 0;
    n_msg_typ    = 0;
@@ -74,14 +73,13 @@ void EnsembleStatConfInfo::clear() {
    n_mask_sid   = 0;
 
    // Deallocate memory
-   if(ens_gci)     { delete [] ens_gci;     ens_gci     = (GCInfo *)      0; }
-   if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *) 0; }
-   if(fcst_gci)    { delete [] fcst_gci;    fcst_gci    = (GCInfo *)      0; }
-   if(obs_gci)     { delete [] obs_gci;     obs_gci     = (GCInfo *)      0; }
-   if(msg_typ)     { delete [] msg_typ;     msg_typ     = (char **)       0; }
-   if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)  0; }
-   if(interp_wdth) { delete [] interp_wdth; interp_wdth = (int *)         0; }
-   if(mask_wd)     { delete [] mask_wd;     mask_wd     = (WrfData *)     0; }
+   if(ens_gci)     { delete [] ens_gci;     ens_gci     = (GCInfo *)        0; }
+   if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)   0; }
+   if(gc_pd)       { delete [] gc_pd;       gc_pd       = (GCEnsPairData *) 0; }
+   if(msg_typ)     { delete [] msg_typ;     msg_typ     = (char **)         0; }
+   if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)    0; }
+   if(interp_wdth) { delete [] interp_wdth; interp_wdth = (int *)           0; }
+   if(mask_wd)     { delete [] mask_wd;     mask_wd     = (WrfData *)       0; }
 
    for(i=0; i<n_mask; i++) {
       if(mask_name[i]) {
@@ -113,7 +111,7 @@ void EnsembleStatConfInfo::read_config(const char *file_name) {
 
 void EnsembleStatConfInfo::process_config() {
    int i, j, n, n_mthd, n_wdth;
-   InterpMthd im;
+   GCInfo gci;
 
    //
    // Conf: model
@@ -134,9 +132,9 @@ void EnsembleStatConfInfo::process_config() {
    //
 
    // Parse out the GRIB codes to be verified
-   n_ens = conf.n_ens_field_elements();
+   n_ens_var = conf.n_ens_field_elements();
 
-   if(n_ens == 0) {
+   if(n_ens_var == 0) {
 
       cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
            << "At least one value must be provided "
@@ -145,10 +143,10 @@ void EnsembleStatConfInfo::process_config() {
    }
 
    // Allocate space to store the GRIB code information
-   ens_gci = new GCInfo [n_ens];
+   ens_gci = new GCInfo [n_ens_var];
 
    // Parse the ensemble field information
-   for(i=0; i<n_ens; i++) {
+   for(i=0; i<n_ens_var; i++) {
       ens_gci[i].set_gcinfo(conf.ens_field(i).sval(),
          conf.grib_ptv().ival());
    }
@@ -158,9 +156,9 @@ void EnsembleStatConfInfo::process_config() {
    //
 
    // If the ensemble relative frequency is requested, check that the
-   // number of forecast threshold levels matches n_ens
+   // number of forecast threshold levels matches n_ens_var
    if(conf.output_flag(i_nc_freq).ival() != 0 &&
-      conf.n_ens_thresh_elements()       != n_ens) {
+      conf.n_ens_thresh_elements()       != n_ens_var) {
 
       cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
            << "When computing ensemble relative frequencies, "
@@ -171,10 +169,10 @@ void EnsembleStatConfInfo::process_config() {
    }
 
    // Allocate space to store the threshold information
-   ens_ta = new ThreshArray [n_ens];
+   ens_ta = new ThreshArray [n_ens_var];
 
    // Parse the ensemble threshold information
-   for(i=0,max_n_thresh=0; i<n_ens; i++) {
+   for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
       ens_ta[i].parse_thresh_str(conf.ens_thresh(i).sval());
 
       // Keep track of the maximum number of thresholds
@@ -221,12 +219,14 @@ void EnsembleStatConfInfo::process_config() {
    if(n_vx != 0) {
 
       // Allocate space to store the GRIB code information
-      fcst_gci = new GCInfo [n_vx];
+      gc_pd = new GCEnsPairData [n_vx];
 
       // Parse the fcst field information
       for(i=0; i<n_vx; i++) {
-         fcst_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
+         gci.set_gcinfo(conf.fcst_field(i).sval(),
             conf.grib_ptv().ival());
+
+         gc_pd[i].set_fcst_gci(gci);
       }
    }
 
@@ -247,21 +247,20 @@ void EnsembleStatConfInfo::process_config() {
 
    if(n_vx != 0) {
 
-      // Allocate space to store the GRIB code information
-      obs_gci = new GCInfo [n_vx];
-
       // Parse the obs field information
       for(i=0; i<n_vx; i++) {
 
-         // If obs_field is empty, use fcst_field
+         // If obs_field is emptpy, use fcst_field
          if(conf.n_obs_field_elements() == 0) {
-            obs_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
+            gci.set_gcinfo(conf.fcst_field(i).sval(),
                conf.grib_ptv().ival());
          }
          else {
-            obs_gci[i].set_gcinfo(conf.obs_field(i).sval(),
+            gci.set_gcinfo(conf.obs_field(i).sval(),
                conf.grib_ptv().ival());
          }
+
+         gc_pd[i].set_obs_gci(gci);
       }
    }
 
@@ -463,6 +462,41 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void EnsembleStatConfInfo::set_gc_pd() {
+   int i, j;
+
+   // EnsPairData is stored in the gc_pd objects in the following order:
+   // [n_msg_typ][n_mask][n_interp]
+   for(i=0; i<n_vx; i++) {
+
+      // Set up the dimensions for the gc_pd object
+      gc_pd[i].set_pd_size(n_msg_typ, n_mask, n_interp);
+
+      // Add the verifying message type to the gc_pd objects
+      for(j=0; j<n_msg_typ; j++)
+         gc_pd[i].set_msg_typ(j, msg_typ[j]);
+
+      // Add the masking information to the gc_pd objects
+      for(j=0; j<n_mask; j++) {
+
+         // If this is a masking area
+         if(j<n_mask_area)
+            gc_pd[i].set_mask_wd(j, mask_name[j], &mask_wd[j]);
+         // Otherwise this is a masking StationID
+         else
+            gc_pd[i].set_mask_wd(j, mask_name[j], (WrfData *) 0);
+      }
+
+      // Add the interpolation methods to the gc_pd objects
+      for(j=0; j<n_interp; j++)
+         gc_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int EnsembleStatConfInfo::n_txt_row(int i) {
    int n;
 
@@ -471,22 +505,18 @@ int EnsembleStatConfInfo::n_txt_row(int i) {
 
       case(i_rhist):
          // Maximum number of Rank Histogram lines possible =
-         //    Fields * Masks
-         n = n_vx * n_msg_typ * n_mask * n_interp;
+         //    Fields * Masks * Interpolations * Message Type [Point Obs]
+         //    Fields * Masks * Interpolations [Grid Obs]
+         n =   n_vx * n_mask * n_interp * n_msg_typ
+             + n_vx * n_mask * n_interp;
          break;
 
       case(i_orank):
-         // Maximum number of Observation Rank lines possible =
-         //    Point Observations * Fields * Masks
-         n = n_vx * n_msg_typ * n_mask * n_interp;
-
-/* JHG, work here
          // Compute the maximum number of matched pairs to be written
-         // out by summing the number for each GCPairData object
+         // out by summing the number for each GCEnsPairData object
          for(i=0, n=0; i<n_vx; i++) {
             n += gc_pd[i].get_n_pair();
          }
-*/
          break;
 
       default:

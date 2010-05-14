@@ -20,8 +20,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __GRID_STAT_H__
-#define  __GRID_STAT_H__
+#ifndef  __ENSEMBLE_STAT_H__
+#define  __ENSEMBLE_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -78,6 +78,9 @@ static const int n_txt_columns[n_txt] = {
    n_rhist_columns, n_orank_columns
 };
 
+// Maximum number of GRIB records
+static const int max_n_rec = 300;
+
 // Point observation header length
 static const int hdr_arr_len = 3;
 
@@ -90,20 +93,21 @@ static const int obs_arr_len = 5;
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Input Forecast files
-static int          n_fcst;
+// Input Ensemble files
+static int          n_ens;
+static int          n_ens_vld;
 static int          n_rank;
-static StringArray  fcst_file_list;
-static GribFile     fcst_gb_file;
-static NcFile      *fcst_nc_file = (NcFile *) 0;
-static FileType     fcst_ftype   = NoFileType;
+static StringArray  ens_file_list;
+static IntArray     ens_file_vld;
 
 // Input Observation files
-static StringArray  grid_obs_list;
+static StringArray  grid_obs_file_list;
 static int          grid_obs_flag = 0;
 
-static StringArray  point_obs_list;
+static StringArray  point_obs_file_list;
 static int          point_obs_flag = 0;
+
+static int          vx_flag = 0;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;
@@ -111,6 +115,10 @@ static ConcatString         config_file;
 static ConcatString         out_file;
 
 // Optional arguments
+static unixtime     obs_valid_beg_ut = (unixtime) 0;
+static unixtime     obs_valid_end_ut = (unixtime) 0;
+static unixtime     ens_valid_ut = (unixtime) 0;
+static NumArray     ens_lead_na;
 static ConcatString out_dir;
 static int          verbosity = 2;
 
@@ -121,7 +129,7 @@ static int          verbosity = 2;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static ConcatString out_nc_file;
+static StringArray  out_nc_file_list;
 static NcFile      *nc_out  = (NcFile *) 0;
 static NcDim       *lat_dim = (NcDim *)  0;
 static NcDim       *lon_dim = (NcDim *)  0;
@@ -150,19 +158,12 @@ static Grid grid;
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;
 
-// Arrays for storing point observations
-static NumArray na_lat, na_lon, na_lvl, na_elv;
-static NumArray na_obs, na_obs_rank;
-
 // Arrays to store running sums and counts
 static NumArray na_count, na_min, na_max, na_sum, na_sum_sq;
 static NumArray *na_thresh_count = (NumArray *) 0;
 
-// JHG, don't need the following:
-static gsl_rng *rng_ptr = (gsl_rng *) 0;
-
 ////////////////////////////////////////////////////////////////////////
 
-#endif   //  __GRID_STAT_H__
+#endif   //  __ENSEMBLE_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
