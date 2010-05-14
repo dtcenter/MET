@@ -129,7 +129,7 @@ mask_grid[] = [ "FULL" ];
 //                      "sample.nc APCP",
 //                      "sample.grb HGT/Z0 gt100.0" ];
 //
-mask_poly[] = [ "MET_BASE/data/poly/EAST.poly" ];
+mask_poly[] = [];
 
 //
 // Specify a comma-separated list of values for alpha to be used when computing
@@ -182,8 +182,7 @@ boot_seed = "";
 // Specify a comma-separated list of interpolation method(s) to be used for
 // smoothing the data fields prior to comparing them.  The value at each grid
 // point is replaced by the measure computed over the neighborhood defined
-// around the grid point.
-// String values are interpreted as follows:
+// around the grid point.  String values are interpreted as follows:
 //    MIN     = Minimum in the neighborhood
 //    MAX     = Maximum in the neighborhood
 //    MEDIAN  = Median in the neighborhood
@@ -262,6 +261,7 @@ cov_thresh[] = [ "ge0.5" ];
 
 //
 // Specify flags to indicate the type of data to be output:
+//
 //    (1) STAT and FHO Text Files, Forecast, Hit, Observation Rates:
 //           Total (TOTAL),
 //           Forecast Rate (F_RATE),
@@ -395,8 +395,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           Forecast Yes and Observation No Count (FY_ON),
 //           Forecast No and Observation Yes Count (FN_OY),
 //           Forecast No and Observation No Count (FN_ON),
-//           Fractional Threshold Value (FRAC_T),
-//           Neighborhood Size (INTERP_PNTS)
+//           Fractional Threshold Value (FRAC_T)
 //
 //   (12) STAT and NBRCTS Text Files, Neighborhood Methods Contingency Table Scores:
 //           Total (TOTAL),
@@ -413,14 +412,12 @@ cov_thresh[] = [ "ge0.5" ];
 //           Hanssen and Kuipers Discriminant (HK), HK_CL, HK_CU,
 //           Heidke Skill Score (HSS),
 //           Odds Ratio (ODDS), ODDS_CL, ODDS_CU
-//           Fractional Threshold Value (FRAC_T),
-//           Neighborhood Size (INTERP_PNTS)
+//           Fractional Threshold Value (FRAC_T)
 //
 //   (13) STAT and NBRCNT Text Files, Neighborhood Methods Continuous Scores:
 //           Total (TOTAL),
 //           Fractions Brier Score (FBS),
-//           Fractions Skill Score (FSS),
-//           Neighborhood Size (INTERP_PNTS)
+//           Fractions Skill Score (FSS)
 //
 //   (14) NetCDF File containing difference fields for each grib
 //        code/mask combination.  A non-zero value indicates that
@@ -464,4 +461,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V2.0";
+version = "V3.0";

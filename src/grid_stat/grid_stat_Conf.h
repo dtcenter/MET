@@ -20,7 +20,7 @@
    //
    //     Created from config file "GridStatConfig_default"
    //
-   //     on May 6, 2010    4:52 pm  MDT
+   //     on May 14, 2010    1:16 pm  MDT
    //
 
 
@@ -168,7 +168,7 @@ class grid_stat_Conf {
       int n_mask_grid_elements();
 
 
-      Result mask_poly(int);   //  1-dimensional array, indices from 0 to 1
+      Result mask_poly(int);   //  1-dimensional array, indices from 0 to 0
 
       int n_mask_poly_elements();
 
