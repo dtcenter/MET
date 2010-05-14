@@ -13,15 +13,16 @@
 ###############################################################################
 
 CXX         = /usr/bin/g++
-CXX_FLAGS   = -static -g
-SVNROOT     = /home/johnhg/MET/svn/code
+CXX_FLAGS   = -Wall -static -g
+SVNROOT     = ../../../..
 MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
 
 ###############################################################################
 
 TARGETS		= grid_stat
 
-OBJECTS		= grid_stat_Conf.o grid_stat_conf_info.o
+OBJECTS		= grid_stat_Conf.o \
+		  grid_stat_conf_info.o
 
 OPT_FLAGS	=
 
@@ -36,6 +37,7 @@ VX_ECONFIG_EXAMPLE_PARM = GridStatConfig_default
 VX_ECONFIG_IS_RAP_LIB = false
 VX_ECONFIG_HEADER_SUFFIX = h
 VX_ECONFIG_PANIC = true
+
 MODULE_TYPE = progcpp
 
 #

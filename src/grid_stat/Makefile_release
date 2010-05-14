@@ -14,7 +14,8 @@
 
 TARGETS		= grid_stat
 
-OBJECTS		= grid_stat_Conf.o grid_stat_conf_info.o
+OBJECTS		= grid_stat_Conf.o \
+		  grid_stat_conf_info.o
 
 OPT_FLAGS	=
 

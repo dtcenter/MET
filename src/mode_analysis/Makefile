@@ -13,15 +13,16 @@
 ###############################################################################
 
 CXX         = /usr/bin/g++
-CXX_FLAGS   = -static -g
-SVNROOT     = /home/johnhg/MET/svn/code
+CXX_FLAGS   = -Wall -static -g
+SVNROOT     = ../../../..
 MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
 
 ###############################################################################
 
 TARGETS		= mode_analysis
 
-OBJECTS		= mode_analysis_Conf.o config_to_att.o
+OBJECTS		= mode_analysis_Conf.o \
+		  config_to_att.o
 
 OPT_FLAGS	=
 

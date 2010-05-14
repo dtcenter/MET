@@ -13,8 +13,8 @@
 ###############################################################################
 
 CXX         = /usr/bin/g++
-CXX_FLAGS   = -static -g
-SVNROOT     = /home/johnhg/MET/svn/code
+CXX_FLAGS   = -Wall -static -g
+SVNROOT     = ../../../..
 MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
 
 ###############################################################################
@@ -22,10 +22,10 @@ MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
 TARGETS		= pb2nc
 
 OBJECTS		= pb2nc_Conf.o \
-		numpbmsg.o \
-		openpb.o \
-		readpb.o \
-		dumppb.o
+		  numpbmsg.o \
+		  openpb.o \
+		  readpb.o \
+		  dumppb.o
 
 OPT_FLAGS	=
 
