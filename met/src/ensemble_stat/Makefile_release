@@ -12,38 +12,18 @@
 #
 ###############################################################################
 
-CXX         = /usr/bin/g++
-CXX_FLAGS   = -static -g
-SVNROOT     = /home/johnhg/MET/svn/code
-MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
-
-###############################################################################
-
 TARGETS		= ensemble_stat
 
-OBJECTS		= ensemble_stat_Conf.o ensemble_stat_conf_info.o
+OBJECTS		= ensemble_stat_Conf.o \
+		  ensemble_stat_conf_info.o
 
-OPT_FLAGS	= -Wall
+OPT_FLAGS	=
 
 FAKES		= all clean objects targets
 
 LIB_DIR		= ../../lib
 
 INC_DIR		= ../../lib
-
-VX_ECONFIG_CLASS = ensemble_stat
-VX_ECONFIG_EXAMPLE_PARM = EnsembleStatConfig_default
-VX_ECONFIG_IS_RAP_LIB = false
-VX_ECONFIG_HEADER_SUFFIX = h
-VX_ECONFIG_PANIC = true
-
-MODULE_TYPE = progcpp
-
-#
-# vx_econfig macros and targets
-#
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_macros
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_targets
 
 all:
 	@ echo
@@ -68,7 +48,7 @@ ensemble_stat: ensemble_stat.cc
 	-I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_met_util -lvx_analysis_util -lvx_wrfdata -lvx_met_util \
-	-lvx_contable -lvx_grib_classes \
+        -lvx_contable -lvx_grib_classes \
 	-lvx_econfig -lvx_gsl_prob -lgsl \
 	-lvx_plot_util  -lvx_render -lvx_pxm -lvx_color -lvx_ps -lvx_afm \
 	-lvx_data_grids -lvx_gnomon -lvx_nav -lvx_cal -lvx_util -lvx_math -lm \
@@ -88,4 +68,3 @@ clean:
 	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)
 
 .PHONY: $(FAKES)
-
