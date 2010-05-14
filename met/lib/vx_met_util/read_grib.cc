@@ -949,6 +949,16 @@ void read_pds(GribRecord &r, int &bms_flag,
          accum = 0;
          break;
 
+      case 6: // Average: reference time - P1 to reference time - P2
+         valid_ut = (unixtime) (init_ut - r.pds->p2*sec_per_fcst_unit);
+         accum = 0;
+         break;
+
+      case 7: // Average: reference time - P1 to reference time + P2
+         valid_ut = (unixtime) (init_ut + r.pds->p2*sec_per_fcst_unit);
+         accum = 0;
+         break;
+
       case 10: // P1 occupies octets 19 and 20: product valid at init + p1
           pp1[0] = r.pds->p1;
           pp1[1] = r.pds->p2;
