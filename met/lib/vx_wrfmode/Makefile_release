@@ -12,13 +12,6 @@
 #
 ###############################################################################
 
-CXX         = /usr/bin/g++
-CXX_FLAGS   = -Wall -static -g
-SVNROOT     = ../../../..
-MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
-
-###############################################################################
-
 TARGETS  = libvx_wrfmode.a
 
 OBJECTS  =  WrfMode_Conf.o \
@@ -32,22 +25,6 @@ FAKES    = vx_wrfmode_all vx_wrfmode_lib clean
 
 LIB_DIR  = ..
 
-VX_ECONFIG_LIBNAME = vx_wrfmode
-VX_ECONFIG_CLASS = WrfMode
-VX_ECONFIG_EXAMPLE_PARM = WrfModeConfig_default
-VX_ECONFIG_IS_RAP_LIB = false
-VX_ECONFIG_HEADER_SUFFIX = h
-VX_ECONFIG_PANIC = true
-
-TARGET_FILE = ../libvx_wrfmode.a
-
-MODULE_TYPE=library
-
-#
-# vx_econfig macros and targets
-#
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_macros
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_targets
 
 vx_wrfmode_all:
 	@ echo

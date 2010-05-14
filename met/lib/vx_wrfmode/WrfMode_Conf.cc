@@ -13,7 +13,7 @@
    //
    //     Created from config file "WrfModeConfig_default"
    //
-   //     on March 26, 2009    10:44 am  MST
+   //     on May 14, 2010    2:30 pm  MDT
    //
 
 
@@ -29,14 +29,14 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_wrfmode/WrfMode_Conf.h"
+#include "WrfMode_Conf.h"
 #include "vx_econfig/icodecell_to_result.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Panic = 1;
+static const int Panic = 0;
 
 
 ////////////////////////////////////////////////////////////////////////
