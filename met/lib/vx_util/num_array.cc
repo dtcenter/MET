@@ -497,7 +497,7 @@ return ( v );
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::compute_mean_stdev(double &mn, double &stdev)
+void NumArray::compute_mean_stdev(double &mn, double &stdev) const
 
 {
 
@@ -538,7 +538,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double NumArray::mean()
+double NumArray::mean() const
 
 {
 
@@ -562,7 +562,7 @@ return(mn);
 ////////////////////////////////////////////////////////////////////////
 
 
-double NumArray::sum()
+double NumArray::sum() const
 
 {
 
@@ -585,7 +585,7 @@ return(s);
 ////////////////////////////////////////////////////////////////////////
 
 
-double NumArray::mode()
+double NumArray::mode() const
 
 {
 
