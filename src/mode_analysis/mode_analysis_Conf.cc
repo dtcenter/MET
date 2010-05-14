@@ -13,7 +13,7 @@
    //
    //     Created from config file "MODEAnalysisConfig_default"
    //
-   //     on April 3, 2009    7:10 am  MST
+   //     on May 14, 2010    2:22 pm  MDT
    //
 
 
@@ -36,7 +36,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Panic = 0;
+static const int Panic = 1;
 
 
 ////////////////////////////////////////////////////////////////////////

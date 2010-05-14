@@ -13,7 +13,7 @@
    //
    //     Created from config file "PB2NCConfig_default"
    //
-   //     on March 30, 2009    6:43 am  MST
+   //     on May 14, 2010    2:22 pm  MDT
    //
 
 
@@ -36,7 +36,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Panic = 1;
+static const int Panic = 0;
 
 
 ////////////////////////////////////////////////////////////////////////

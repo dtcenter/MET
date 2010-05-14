@@ -13,7 +13,7 @@
    //
    //     Created from config file "WaveletStatConfig_default"
    //
-   //     on December 7, 2009    9:33 am  MST
+   //     on May 14, 2010    2:23 pm  MDT
    //
 
 
@@ -36,7 +36,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Panic = 1;
+static const int Panic = 0;
 
 
 ////////////////////////////////////////////////////////////////////////
