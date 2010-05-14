@@ -20,7 +20,7 @@
    //
    //     Created from config file "EnsembleStatConfig_default"
    //
-   //     on April 9, 2010    1:41 pm  MDT
+   //     on May 14, 2010    11:29 am  MDT
    //
 
 
@@ -61,8 +61,6 @@ class ensemble_stat_Conf {
 
       const SymbolTableEntry * _vld_data_thresh_entry;
 
-      const SymbolTableEntry * _output_flag_entry;
-
       const SymbolTableEntry * _fcst_field_entry;
 
       const SymbolTableEntry * _obs_field_entry;
@@ -83,7 +81,11 @@ class ensemble_stat_Conf {
 
       const SymbolTableEntry * _interp_width_entry;
 
+      const SymbolTableEntry * _interp_flag_entry;
+
       const SymbolTableEntry * _interp_thresh_entry;
+
+      const SymbolTableEntry * _output_flag_entry;
 
       const SymbolTableEntry * _grib_ptv_entry;
 
@@ -133,11 +135,6 @@ class ensemble_stat_Conf {
       Result vld_data_thresh();
 
 
-      Result output_flag(int);   //  1-dimensional array, indices from 0 to 12
-
-      int n_output_flag_elements();
-
-
       Result fcst_field(int);   //  1-dimensional array, indices from 0 to 1
 
       int n_fcst_field_elements();
@@ -164,7 +161,7 @@ class ensemble_stat_Conf {
       int n_mask_grid_elements();
 
 
-      Result mask_poly(int);   //  1-dimensional array, indices from 0 to 1
+      Result mask_poly(int);   //  1-dimensional array, indices from 0 to 0
 
       int n_mask_poly_elements();
 
@@ -182,7 +179,15 @@ class ensemble_stat_Conf {
       int n_interp_width_elements();
 
 
+      Result interp_flag();
+
+
       Result interp_thresh();
+
+
+      Result output_flag(int);   //  1-dimensional array, indices from 0 to 12
+
+      int n_output_flag_elements();
 
 
       Result grib_ptv();

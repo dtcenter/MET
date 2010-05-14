@@ -32,16 +32,16 @@
 // Indices for the output flag types in the configuration file
 static const int i_rhist    = 0;
 static const int i_orank    = 1;
-static const int i_nc_orank = 2;
-static const int i_nc_mean  = 3;
-static const int i_nc_stdev = 4;
-static const int i_nc_minus = 5;
-static const int i_nc_plus  = 6;
-static const int i_nc_min   = 7;
-static const int i_nc_max   = 8;
-static const int i_nc_range = 9;
-static const int i_nc_vld   = 10;
-static const int i_nc_freq  = 11;
+static const int i_nc_mean  = 2;
+static const int i_nc_stdev = 3;
+static const int i_nc_minus = 4;
+static const int i_nc_plus  = 5;
+static const int i_nc_min   = 6;
+static const int i_nc_max   = 7;
+static const int i_nc_range = 8;
+static const int i_nc_vld   = 9;
+static const int i_nc_freq  = 10;
+static const int i_nc_orank = 11;
 
 static const int n_txt      = 2;
 static const int n_out      = 12;
@@ -62,7 +62,7 @@ class EnsembleStatConfInfo {
       void init_from_scratch();
 
       // Ensemble processing
-      int n_ens;        // Number of ensemble fields to be processed
+      int n_ens_var;    // Number of ensemble fields to be processed
       int max_n_thresh; // Maximum number of ensemble thresholds
 
       // Ensemble verification
@@ -80,16 +80,15 @@ class EnsembleStatConfInfo {
 
       // Various objects to store the data that's parsed from the
       // Ensemble-Stat configuration object
-      GCInfo      *ens_gci;     // Array for ensemble fields [n_ens]
-      ThreshArray *ens_ta;      // Array for ensemble thresholds [n_ens]
+      GCInfo      *ens_gci;      // Array for ensemble fields [n_ens_var]
+      ThreshArray *ens_ta;       // Array for ensemble thresholds [n_ens_var]
 
-      GCInfo      *fcst_gci;     // Array for fcst fields [n_vx]
-      GCInfo      *obs_gci;      // Array for obs fields [n_vx]
+      GCEnsPairData *gc_pd;      // Array pair data [n_vx]
 
-      char       **msg_typ;      // Array of message types
+      char       **msg_typ;      // Array of message types [n_msg_typ]
 
-      InterpMthd  *interp_mthd;  // Array for interpolation methods
-      int         *interp_wdth;  // Array for interpolation widths
+      InterpMthd  *interp_mthd;  // Array for interpolation methods [n_interp]
+      int         *interp_wdth;  // Array for interpolation widths [n_interp]
 
       WrfData     *mask_wd;      // Array for masking regions [n_masks]
       char       **mask_name;    // Masking region names [n_masks]
@@ -103,12 +102,14 @@ class EnsembleStatConfInfo {
       void read_config   (const char *);
       void process_config();
       void process_masks (const Grid &);
+      void set_gc_pd     ();
 
       // Dump out the counts
-      int get_n_ens()         const;
+      int get_n_ens_var()     const;
       int get_max_n_thresh()  const;
       int get_n_vx()          const;
       int get_n_msg_typ()     const;
+      int get_n_interp()      const;
       int get_n_mask()        const;
       int get_n_mask_area()   const;
       int get_n_mask_sid()    const;
@@ -121,10 +122,11 @@ class EnsembleStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens()         const { return(n_ens);        }
+inline int EnsembleStatConfInfo::get_n_ens_var()     const { return(n_ens_var);    }
 inline int EnsembleStatConfInfo::get_max_n_thresh()  const { return(max_n_thresh); }
 inline int EnsembleStatConfInfo::get_n_vx()          const { return(n_vx);         }
 inline int EnsembleStatConfInfo::get_n_msg_typ()     const { return(n_msg_typ);    }
+inline int EnsembleStatConfInfo::get_n_interp()      const { return(n_interp);     }
 inline int EnsembleStatConfInfo::get_n_mask()        const { return(n_mask);       }
 inline int EnsembleStatConfInfo::get_n_mask_area()   const { return(n_mask_area);  }
 inline int EnsembleStatConfInfo::get_n_mask_sid()    const { return(n_mask_sid);   }

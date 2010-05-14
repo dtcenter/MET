@@ -13,7 +13,7 @@
    //
    //     Created from config file "EnsembleStatConfig_default"
    //
-   //     on April 9, 2010    1:41 pm  MDT
+   //     on May 14, 2010    11:29 am  MDT
    //
 
 
@@ -140,8 +140,6 @@ void ensemble_stat_Conf::clear()
 
 _vld_data_thresh_entry = (const SymbolTableEntry *) 0;
 
-    _output_flag_entry = (const SymbolTableEntry *) 0;
-
      _fcst_field_entry = (const SymbolTableEntry *) 0;
 
       _obs_field_entry = (const SymbolTableEntry *) 0;
@@ -162,7 +160,11 @@ _vld_data_thresh_entry = (const SymbolTableEntry *) 0;
 
    _interp_width_entry = (const SymbolTableEntry *) 0;
 
+    _interp_flag_entry = (const SymbolTableEntry *) 0;
+
   _interp_thresh_entry = (const SymbolTableEntry *) 0;
+
+    _output_flag_entry = (const SymbolTableEntry *) 0;
 
        _grib_ptv_entry = (const SymbolTableEntry *) 0;
 
@@ -260,19 +262,6 @@ if ( !_e && Panic )  {
 }
 
 _vld_data_thresh_entry = _e;
-
-
-_e = _m.find("output_flag");
-
-if ( !_e && Panic )  {
-
-   cerr << "\n\n  ensemble_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"output_flag\"\n\n";
-
-   exit ( 1 );
-
-}
-
-_output_flag_entry = _e;
 
 
 _e = _m.find("fcst_field");
@@ -405,6 +394,19 @@ if ( !_e && Panic )  {
 _interp_width_entry = _e;
 
 
+_e = _m.find("interp_flag");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  ensemble_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"interp_flag\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_interp_flag_entry = _e;
+
+
 _e = _m.find("interp_thresh");
 
 if ( !_e && Panic )  {
@@ -416,6 +418,19 @@ if ( !_e && Panic )  {
 }
 
 _interp_thresh_entry = _e;
+
+
+_e = _m.find("output_flag");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  ensemble_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"output_flag\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_output_flag_entry = _e;
 
 
 _e = _m.find("grib_ptv");
@@ -674,74 +689,6 @@ icodecell_to_result(_cell, _temp_result);
 
 
 return ( _temp_result );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Result ensemble_stat_Conf::output_flag(int _i0)
-
-{
-
-Result _temp_result;
-
-if ( !_output_flag_entry && !Panic )  return ( _temp_result );
-
-IcodeCell _cell;
-const IcodeVector * _v = (const IcodeVector *) 0;
-int _indices[max_array_dim];
-const ArrayInfo * _a = _output_flag_entry->ai;
-
-
-   //
-   //  load up the indices
-   //
-
-_indices[0] = _i0;
-
-
-_v = _a->get(_indices);
-
-
-_m.run( *_v );
-
-
-_cell = _m.pop();
-
-icodecell_to_result(_cell, _temp_result);
-
-   //
-   //  done
-   //
-
-return ( _temp_result );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ensemble_stat_Conf::n_output_flag_elements()
-
-{
-
-if ( !_output_flag_entry && !Panic )  return ( 0 );
-
-int _n;
-const ArrayInfo * _a = _output_flag_entry->ai;
-
-
-_n = _a->size(0);
-
-
-   //
-   //  done
-   //
-
-return ( _n );
 
 }
 
@@ -1300,6 +1247,31 @@ return ( _n );
 ////////////////////////////////////////////////////////////////////////
 
 
+Result ensemble_stat_Conf::interp_flag()
+
+{
+
+Result _temp_result;
+
+if ( !_interp_flag_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_interp_flag_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 Result ensemble_stat_Conf::interp_thresh()
 
 {
@@ -1318,6 +1290,74 @@ icodecell_to_result(_cell, _temp_result);
 
 
 return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result ensemble_stat_Conf::output_flag(int _i0)
+
+{
+
+Result _temp_result;
+
+if ( !_output_flag_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+const IcodeVector * _v = (const IcodeVector *) 0;
+int _indices[max_array_dim];
+const ArrayInfo * _a = _output_flag_entry->ai;
+
+
+   //
+   //  load up the indices
+   //
+
+_indices[0] = _i0;
+
+
+_v = _a->get(_indices);
+
+
+_m.run( *_v );
+
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+   //
+   //  done
+   //
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ensemble_stat_Conf::n_output_flag_elements()
+
+{
+
+if ( !_output_flag_entry && !Panic )  return ( 0 );
+
+int _n;
+const ArrayInfo * _a = _output_flag_entry->ai;
+
+
+_n = _a->size(0);
+
+
+   //
+   //  done
+   //
+
+return ( _n );
 
 }
 
