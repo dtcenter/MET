@@ -15,10 +15,10 @@
 TARGETS		= pb2nc
 
 OBJECTS		= pb2nc_Conf.o \
-		numpbmsg.o \
-		openpb.o \
-		readpb.o \
-		dumppb.o
+		  numpbmsg.o \
+		  openpb.o \
+		  readpb.o \
+		  dumppb.o
 
 OPT_FLAGS	=
 

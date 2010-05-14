@@ -13,15 +13,16 @@
 ###############################################################################
 
 CXX         = /usr/bin/g++
-CXX_FLAGS   = -static -g
-SVNROOT     = /home/johnhg/MET/svn/code
+CXX_FLAGS   = -Wall -static -g
+SVNROOT     = ../../../..
 MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
 
 ###############################################################################
 
 TARGETS		= point_stat
 
-OBJECTS		= point_stat_Conf.o point_stat_conf_info.o
+OBJECTS		= point_stat_Conf.o \
+		  point_stat_conf_info.o
 
 OPT_FLAGS	=
 
