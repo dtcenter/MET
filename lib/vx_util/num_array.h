@@ -74,10 +74,10 @@ class NumArray {
       void   sort_array();
       int    rank_array(int &);
       double percentile_array(double);
-      void   compute_mean_stdev(double &, double &);
-      double mean();
-      double sum();
-      double mode();
+      void   compute_mean_stdev(double &, double &) const;
+      double mean() const;
+      double sum() const;
+      double mode() const;
 
       int n_elements() const;
 
