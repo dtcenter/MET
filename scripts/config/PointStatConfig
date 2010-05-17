@@ -41,7 +41,7 @@ end_ds =  5400;
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
 //    NOTE: To verify winds as vectors rather than scalars,
-//          specify UGRD (or 33) followd by VGRD (or 34) with the
+//          specify UGRD (or 33) followed by VGRD (or 34) with the
 //          same level values.
 //
 //    NOTE: To process a probability field, add "/PROB", such as "POP/Z0/PROB".
@@ -422,14 +422,13 @@ interp_thresh = 1.0;
 //   (13) STAT and MPR Text Files, Matched Pair Data:
 //           Total (TOTAL),
 //           Index (INDEX),
-//           Latitude (LAT),
-//           Longitude (LON),
-//           Level (LEVEL),
+//           Observation Latitude (OBS_LAT),
+//           Observation Longitude (OBS_LON),
+//           Observation Level (OBS_LVL),
+//           Observation Elevation (OBS_ELV),
 //           Forecast Value (FCST),
 //           Observation Value (OBS),
-//           Climatological Value (CLIMO),
-//           Interpolation Methold (INTERP_MTHD),
-//           Interpolation Points (INTERP_PNTS)
+//           Climatological Value (CLIMO)
 //
 //   In the expressions above, f are forecast values, o are observed values,
 //   and c are climatological values.
@@ -471,4 +470,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V2.0";
+version = "V3.0";
