@@ -46,8 +46,8 @@ MODULE_TYPE = progcpp
 #
 # vx_econfig macros and targets
 #
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_macros
-include $(SVNROOT)/build/scripts/rap_make_vx_econfig_targets
+include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
+include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
 
 all:
 	@ echo
