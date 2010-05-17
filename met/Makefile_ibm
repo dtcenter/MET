@@ -86,6 +86,7 @@ DISABLE_PB2NC         = 0
 DISABLE_ASCII2NC      = 0
 DISABLE_POINT_STAT    = 0
 DISABLE_WAVELET_STAT  = 0
+DISABLE_ENSEMBLE_STAT = 0
 DISABLE_STAT_ANALYSIS = 0
 DISABLE_MODE_ANALYSIS = 0
 
@@ -151,6 +152,7 @@ PB2NC		= $(SRC_DIR)/pb2nc
 ASCII2NC	= $(SRC_DIR)/ascii2nc
 POINT_STAT	= $(SRC_DIR)/point_stat
 WAVELET_STAT	= $(SRC_DIR)/wavelet_stat
+ENSEMBLE_STAT	= $(SRC_DIR)/ensemble_stat
 STAT_ANALYSIS	= $(SRC_DIR)/stat_analysis
 MODE_ANALYSIS	= $(SRC_DIR)/mode_analysis
 
@@ -212,6 +214,9 @@ endif
 ifeq ($(DISABLE_WAVELET_STAT), 0)
 	@ cd $(WAVELET_STAT);	 $(MAKE) $(PRINT_OPTS)
 endif
+ifeq ($(DISABLE_ENSEMBLE_STAT), 0)
+	@ cd $(ENSEMBLE_STAT);	 $(MAKE) $(PRINT_OPTS)
+endif
 ifeq ($(DISABLE_STAT_ANALYSIS), 0)
 	@ cd $(STAT_ANALYSIS);	 $(MAKE) $(PRINT_OPTS)
 endif
@@ -249,6 +254,7 @@ clean:
 	@ cd $(ASCII2NC);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(POINT_STAT);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(WAVELET_STAT);	 $(MAKE) clean $(PRINT_OPTS)
+	@ cd $(ENSEMBLE_STAT);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(STAT_ANALYSIS);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(MODE_ANALYSIS);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(OUT_DIR);	 rm -f */*
