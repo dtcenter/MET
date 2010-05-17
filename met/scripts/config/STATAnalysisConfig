@@ -246,7 +246,7 @@ line_type[] = [];
 //       "-fcst_init_end  YYYYMMDD[_HH[MMSS]]" (use once)
 //       "-obs_init_beg   YYYYMMDD[_HH[MMSS]]" (use once)
 //       "-obs_init_end   YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-fsct_init_hour HH[MMSS]"
+//       "-fcst_init_hour HH[MMSS]"
 //       "-obs_init_hour  HH[MMSS]"
 //       "-fcst_var       name"
 //       "-obs_var        name"
@@ -368,4 +368,4 @@ tmp_dir = "/tmp";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V2.0";
+version = "V3.0";

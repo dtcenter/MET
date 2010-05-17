@@ -11,9 +11,12 @@
 model = "WRF";
 
 //
-// Specify a comma-separated list of fields to be verified.  Each field is
-// specified as a grib code or corresponding grib code abbreviation followed
-// by an accumulation or vertical level indicator.
+// Specify a comma-separated list of fields to be verified.  The forecast and
+// observation fields may be specified separately.  If the obs_field parameter
+// is left blank, it will default to the contents of fcst_field.
+//
+// Each field is specified as a grib code or corresponding grib code
+// abbreviation followed by an accumulation or vertical level indicator.
 //
 // Each verification field is specified as one of the following:
 //    GC/ANNN for accumulation interval NNN
@@ -26,17 +29,21 @@ model = "WRF";
 //    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
-// e.g. field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+// e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ];
 //
-field[] = [ "61/A12" ];
+fcst_field[] = [ "61/A12" ];
+obs_field[]  = [];
 
 //
 // Specify a comma-separated list of groups of thresholds to be applied to the
-// verification fields listed above.  At least one threshold must be provided
-// for each verification field listed above.  The lengths of the "vx_grib_code"
-// array and the "thresholds" array must be the same.  To apply  multiple
-// thresholds to a verification field, separate the threshold values with a
-// space.
+// fields listed above.  Thresholds for the forecast and observation fields
+// may be specified separately.  If the obs_thresh parameter is left blank,
+// it will default to the contents of fcst_thresh.
+//
+// At least one threshold must be provided for each field listed above.  The
+// lengths of the "fcst_field" and "fcst_thresh" arrays must match, as must
+// lengths of the "obs_field" and "obs_thresh" arrays.  To apply multiple
+// thresholds to a field, separate the threshold values with a space.
 //
 // Each threshold must be preceded by a two letter indicator for the type of
 // thresholding to be performed:
@@ -44,9 +51,10 @@ field[] = [ "61/A12" ];
 //    'eq' for equal to      'ne' for not equal to
 //    'gt' for greater than  'ge' for greater than or equal to
 //
-// e.g. thresh[] = [ "gt0.0 ge5.0", "gt0.0", "lt80.0 ge80.0" ];
+// e.g. fcst_thresh[] = [ "gt80", "gt273" ];
 //
-thresh[] = [ "gt0.0 ge5.0" ];
+fcst_thresh[] = [ "gt0.0 ge5.0" ];
+obs_thresh[]  = [];
 
 //
 // If the mask_missing_flag is set, the missing data in one field will
@@ -157,8 +165,9 @@ met_data_dir = "MET_BASE/data";
 //
 // MET_BASE may be used in the path for the colortable file.
 //
-raw_color_table  = "MET_BASE/data/colortables/met_default.ctable";
-wvlt_color_table = "MET_BASE/data/colortables/NCL_colortables/BlWhRe.ctable";
+fcst_raw_color_table = "MET_BASE/data/colortables/met_default.ctable";
+obs_raw_color_table  = "MET_BASE/data/colortables/met_default.ctable";
+wvlt_color_table     = "MET_BASE/data/colortables/NCL_colortables/BlWhRe.ctable";
 
 //
 // Min and max data values to be plotted for the forecast and
@@ -166,8 +175,16 @@ wvlt_color_table = "MET_BASE/data/colortables/NCL_colortables/BlWhRe.ctable";
 // observation raw color tables specified above will be rescaled to
 // match the specified range.
 //
-raw_plot_min  =  0.0;
-raw_plot_max  =  0.0;
+fcst_raw_plot_min = 0.0;
+fcst_raw_plot_max = 0.0;
+obs_raw_plot_min  = 0.0;
+obs_raw_plot_max  = 0.0;
+
+//
+// Min and max data values to be plotted for the decomposed wavelet
+// fields.  If set to non-zero values, the wavelet color table
+// specified above will be rescaled to match the specified range.
+//
 wvlt_plot_min = -1.0;
 wvlt_plot_max =  1.0;
 
@@ -193,4 +210,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V2.0";
+version = "V3.0";

@@ -179,11 +179,10 @@ boot_rng = "mt19937";
 boot_seed = "";
 
 //
-// Specify a comma-separated list of interpolation method(s) to be used
-// for smoothing the forecast grid prior to comparing it to the observation
-// grid.  The value at each forecast grid point is replaced by the measure
-// computed over the neighborhood defined around the grid point.
-// String values are interpreted as follows:
+// Specify a comma-separated list of interpolation method(s) to be used for
+// smoothing the data fields prior to comparing them.  The value at each grid
+// point is replaced by the measure computed over the neighborhood defined
+// around the grid point.  String values are interpreted as follows:
 //    MIN     = Minimum in the neighborhood
 //    MAX     = Maximum in the neighborhood
 //    MEDIAN  = Median in the neighborhood
@@ -200,15 +199,22 @@ boot_seed = "";
 interp_method[] = [ "UW_MEAN" ];
 
 //
-// Specify a comma-separated list of box widths to be used by the
-// interpolation techniques listed above.  A value of 1 indicates that
-// no smoothing should be performed.  For a value of n greater than 1,
-// the n*n grid points around each point will be used to smooth
-// the forecast field.
+// Specify a comma-separated list of box widths to be used by the interpolation
+// techniques listed above.  A value of 1 indicates that no smoothing should be
+// performed.  For a value of n greater than 1, the n*n grid points around each
+// point will be used to smooth the data fields.
 //
 // e.g. interp_width = [ 1, 3, 5 ];
 //
 interp_width[] = [ 1 ];
+
+//
+// The interp_flag controls how the smoothing defined above should be applied:
+// (1) Smooth only the forecast field
+// (2) Smooth only the observation field
+// (3) Smooth both the forecast and observation fields
+//
+interp_flag = 1;
 
 //
 // When smoothing, compute a ratio of the number of valid data points to
@@ -255,6 +261,7 @@ cov_thresh[] = [ "ge0.5" ];
 
 //
 // Specify flags to indicate the type of data to be output:
+//
 //    (1) STAT and FHO Text Files, Forecast, Hit, Observation Rates:
 //           Total (TOTAL),
 //           Forecast Rate (F_RATE),
@@ -388,8 +395,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           Forecast Yes and Observation No Count (FY_ON),
 //           Forecast No and Observation Yes Count (FN_OY),
 //           Forecast No and Observation No Count (FN_ON),
-//           Fractional Threshold Value (FRAC_T),
-//           Neighborhood Size (INTERP_PNTS)
+//           Fractional Threshold Value (FRAC_T)
 //
 //   (12) STAT and NBRCTS Text Files, Neighborhood Methods Contingency Table Scores:
 //           Total (TOTAL),
@@ -406,14 +412,12 @@ cov_thresh[] = [ "ge0.5" ];
 //           Hanssen and Kuipers Discriminant (HK), HK_CL, HK_CU,
 //           Heidke Skill Score (HSS),
 //           Odds Ratio (ODDS), ODDS_CL, ODDS_CU
-//           Fractional Threshold Value (FRAC_T),
-//           Neighborhood Size (INTERP_PNTS)
+//           Fractional Threshold Value (FRAC_T)
 //
 //   (13) STAT and NBRCNT Text Files, Neighborhood Methods Continuous Scores:
 //           Total (TOTAL),
 //           Fractions Brier Score (FBS),
-//           Fractions Skill Score (FSS),
-//           Neighborhood Size (INTERP_PNTS)
+//           Fractions Skill Score (FSS)
 //
 //   (14) NetCDF File containing difference fields for each grib
 //        code/mask combination.  A non-zero value indicates that
@@ -457,4 +461,4 @@ output_prefix = "POP_12";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V2.0";
+version = "V3.0";
