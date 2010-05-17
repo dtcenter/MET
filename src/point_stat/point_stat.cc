@@ -88,7 +88,7 @@ static void process_command_line    (int, char **);
 static void process_fcst_climo_files();
 static void setup_first_pass        (const WrfData &, const Grid &);
 
-static void setup_txt_files(unixtime, int);
+static void setup_txt_files();
 static void setup_table    (AsciiTable &);
 
 static void build_outfile_name(unixtime, int, const char *,
@@ -333,20 +333,21 @@ void setup_first_pass(const WrfData &wd, const Grid &data_grid) {
    // Setup the GCPairData objects
    conf_info.set_gc_pd();
 
-   // Setup the output text files as requested in the config file
-   setup_txt_files(wd.get_valid_time(), wd.get_lead_time());
+   // Store the lead and valid times
+   if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = wd.get_valid_time();
+   if(fcst_lead_sec == 0)            fcst_lead_sec = wd.get_lead_time();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(unixtime valid_ut, int lead_sec) {
+void setup_txt_files() {
    int  i, max_col, max_prob_col, n;
    ConcatString tmp_str;
 
    // Create output file names for the stat file and optional text files
-   build_outfile_name(valid_ut, lead_sec, "", tmp_str);
+   build_outfile_name(fcst_valid_ut, fcst_lead_sec, "", tmp_str);
 
    /////////////////////////////////////////////////////////////////////
    //
@@ -971,6 +972,9 @@ void process_scores() {
    if(verbosity > 1) {
       cout << "\n" << sep_str << "\n\n" << flush;
    }
+
+   // Setup the output text files as requested in the config file
+   setup_txt_files();
 
    // Allocate enough space for the CTSInfo objects
    max_scal_t = conf_info.get_max_n_scal_thresh();
