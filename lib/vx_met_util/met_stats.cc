@@ -1524,6 +1524,7 @@ void PCTInfo::clear() {
    pct_fcst_thresh.clear();
    pct_obs_thresh.clear();
 
+   baser.clear();
    brier.clear();
 
    return;
@@ -1543,6 +1544,7 @@ void PCTInfo::assign(const PCTInfo &c) {
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
 
+   baser = c.baser;
    brier = c.brier;
 
    return;
@@ -1564,6 +1566,7 @@ void PCTInfo::allocate_n_alpha(int i) {
          exit(1);
       }
 
+      baser.allocate_n_alpha(n_alpha);
       brier.allocate_n_alpha(n_alpha);
    }
 
@@ -1574,6 +1577,7 @@ void PCTInfo::allocate_n_alpha(int i) {
 
 void PCTInfo::compute_stats() {
 
+   baser.v = pct.baser();
    brier.v = pct.brier_score();
 
    return;
@@ -1589,6 +1593,8 @@ void PCTInfo::compute_ci() {
    // Compute confidence intervals for each alpha value specified
    //
    for(i=0; i<n_alpha; i++) {
+
+      baser.v = pct.baser_ci(alpha[i], baser.v_ncl[i], baser.v_ncu[i]);
 
       halfwidth = pct.brier_ci_halfwidth(alpha[i]);
       brier.v_ncl[i] = brier.v - halfwidth;

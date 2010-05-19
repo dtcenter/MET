@@ -163,17 +163,18 @@ int get_pstd_column_offset(const char *col_name) {
 
    //
    // If not found, search the PSTD columns:
-   //    TOTAL,       N_THRESH,    RELIABILTY,
+   //    TOTAL,       BASER,       BASER_NCL,
+   //    BASER_NCU,   N_THRESH,    RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
-   //   [THRESH] (for each threshold)
+   //    [THRESH] (for each threshold)
    //
 
    //
    // Check the static columns
    //
    if(!found) {
-      for(i=0; i<9; i++) {
+      for(i=0; i<12; i++) {
 
          if(strcasecmp(pstd_columns[i], col_name) == 0) {
             found  = 1;
@@ -189,12 +190,12 @@ int get_pstd_column_offset(const char *col_name) {
    if(!found) {
 
       // THRESH_i
-      if(strncasecmp(pstd_columns[9], col_name,
-                     strlen(pstd_columns[9])) == 0) {
+      if(strncasecmp(pstd_columns[12], col_name,
+                     strlen(pstd_columns[12])) == 0) {
 
          found  = 1;
          i      = parse_thresh_index(col_name);
-         offset = n_header_columns + 9 + (i-1);
+         offset = n_header_columns + 12 + (i-1);
       }
    }
 
@@ -483,17 +484,17 @@ int get_orank_column_offset(const char *col_name) {
 
    //
    // If not found, search the orank columns:
-   //    TOTAL,       INDEX,       OBS_LAT,
-   //    OBS_LON,     OBS_LVL,     OBS_ELV,
-   //    OBS,         RANK,        N_ENS_VLD,
-   //    N_ENS,       [ENS_] (for each ensemble member)
+   //    TOTAL,       INDEX,       OBS_SID,
+   //    OBS_LAT,     OBS_LON,     OBS_LVL,
+   //    OBS_ELV,     OBS,         RANK,
+   //    N_ENS_VLD,   N_ENS,       [ENS_] (for each ensemble member)
    //
 
    //
    // Check the static columns
    //
    if(!found) {
-      for(i=0; i<10; i++) {
+      for(i=0; i<11; i++) {
 
          if(strcasecmp(orank_columns[i], col_name) == 0) {
             found  = 1;
@@ -509,11 +510,11 @@ int get_orank_column_offset(const char *col_name) {
    if(!found) {
 
       // ENS_i
-      if(strncasecmp(orank_columns[10], col_name,
-                     strlen(orank_columns[10])) == 0) {
+      if(strncasecmp(orank_columns[11], col_name,
+                     strlen(orank_columns[11])) == 0) {
          found  = 1;
          i      = parse_thresh_index(col_name);
-         offset = n_header_columns + 10 + (i-1);
+         offset = n_header_columns + 11 + (i-1);
       }
    }
 
@@ -665,20 +666,23 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    }
 
    // Write the columns names specific to the pstd line type
-   at.set_entry(r, c+0, pstd_columns[0]);
-   at.set_entry(r, c+1, pstd_columns[1]);
-   at.set_entry(r, c+2, pstd_columns[2]);
-   at.set_entry(r, c+3, pstd_columns[3]);
-   at.set_entry(r, c+4, pstd_columns[4]);
-   at.set_entry(r, c+5, pstd_columns[5]);
-   at.set_entry(r, c+6, pstd_columns[6]);
-   at.set_entry(r, c+7, pstd_columns[7]);
-   at.set_entry(r, c+8, pstd_columns[8]);
+   at.set_entry(r, c+0,  pstd_columns[0]);
+   at.set_entry(r, c+1,  pstd_columns[1]);
+   at.set_entry(r, c+2,  pstd_columns[2]);
+   at.set_entry(r, c+3,  pstd_columns[3]);
+   at.set_entry(r, c+4,  pstd_columns[4]);
+   at.set_entry(r, c+5,  pstd_columns[5]);
+   at.set_entry(r, c+6,  pstd_columns[6]);
+   at.set_entry(r, c+7,  pstd_columns[7]);
+   at.set_entry(r, c+8,  pstd_columns[8]);
+   at.set_entry(r, c+9,  pstd_columns[9]);
+   at.set_entry(r, c+10, pstd_columns[10]);
+   at.set_entry(r, c+11, pstd_columns[11]);
 
    // Write THRESH_i for each threshold
-   for(i=0, col=c+9; i<n_thresh; i++) {
+   for(i=0, col=c+12; i<n_thresh; i++) {
 
-      sprintf(tmp_str, "%s%i", pstd_columns[9], i+1);
+      sprintf(tmp_str, "%s%i", pstd_columns[12], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
    }
@@ -837,21 +841,22 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    }
 
    // Write the columns names specific to the orank line type
-   at.set_entry(r, c+0, orank_columns[0]);
-   at.set_entry(r, c+1, orank_columns[1]);
-   at.set_entry(r, c+2, orank_columns[2]);
-   at.set_entry(r, c+3, orank_columns[3]);
-   at.set_entry(r, c+4, orank_columns[4]);
-   at.set_entry(r, c+5, orank_columns[5]);
-   at.set_entry(r, c+6, orank_columns[6]);
-   at.set_entry(r, c+7, orank_columns[7]);
-   at.set_entry(r, c+8, orank_columns[8]);
-   at.set_entry(r, c+9, orank_columns[9]);
+   at.set_entry(r, c+0,  orank_columns[0]);
+   at.set_entry(r, c+1,  orank_columns[1]);
+   at.set_entry(r, c+2,  orank_columns[2]);
+   at.set_entry(r, c+3,  orank_columns[3]);
+   at.set_entry(r, c+4,  orank_columns[4]);
+   at.set_entry(r, c+5,  orank_columns[5]);
+   at.set_entry(r, c+6,  orank_columns[6]);
+   at.set_entry(r, c+7,  orank_columns[7]);
+   at.set_entry(r, c+8,  orank_columns[8]);
+   at.set_entry(r, c+9,  orank_columns[9]);
+   at.set_entry(r, c+10, orank_columns[10]);
 
    // Write ENS_i for each ensemble member
-   for(i=0, col=c+10; i<n_ens; i++) {
+   for(i=0, col=c+11; i<n_ens; i++) {
 
-      sprintf(tmp_str, "%s%i", orank_columns[10], i+1);
+      sprintf(tmp_str, "%s%i", orank_columns[11], i+1);
       at.set_entry(r, col, tmp_str); // Ensemble member value
       col++;
    }
@@ -2438,42 +2443,52 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //
    // Nx2 Contingency Table Statistics for Probability Forecast
    // Dump out the PSTD line:
-   //    TOTAL,       N_THRESH,    RELIABILTY,
+   //    TOTAL,       BASER,       BASER_NCL,
+   //    BASER_NCU,   N_THRESH,    RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
-   //   [THRESH] (for each threshold)
+   //    [THRESH] (for each threshold)
    //
    at.set_entry(r, c+0,  // Total count
       pct_info.pct.n());
 
-   at.set_entry(r, c+1,    // N_THRESH
+   at.set_entry(r, c+1,  // N_THRESH
       pct_info.pct.nrows() + 1);
 
-   at.set_entry(r, c+2,  // RELIABILITY
+   at.set_entry(r, c+2,  // BASER
+      pct_info.baser.v);
+
+   at.set_entry(r, c+3,  // BASER_NCL
+      pct_info.baser.v_ncl[alpha_i]);
+
+   at.set_entry(r, c+4,  // BASER_NCU
+      pct_info.baser.v_ncu[alpha_i]);
+
+   at.set_entry(r, c+5,  // RELIABILITY
       pct_info.pct.reliability());
 
-   at.set_entry(r, c+3,  // RESOLUTION
+   at.set_entry(r, c+6,  // RESOLUTION
       pct_info.pct.resolution());
 
-   at.set_entry(r, c+4,  // UNCERTAINTY
+   at.set_entry(r, c+7,  // UNCERTAINTY
       pct_info.pct.uncertainty());
 
-   at.set_entry(r, c+5,  // ROC_AUC
+   at.set_entry(r, c+8,  // ROC_AUC
       pct_info.pct.roc_auc());
 
-   at.set_entry(r, c+6,  // BRIER
+   at.set_entry(r, c+9,  // BRIER
       pct_info.brier.v);
 
-   at.set_entry(r, c+7,  // BRIER_NCL
+   at.set_entry(r, c+10, // BRIER_NCL
       pct_info.brier.v_ncl[alpha_i]);
 
-   at.set_entry(r, c+8,  // BRIER_NCU
+   at.set_entry(r, c+11, // BRIER_NCU
       pct_info.brier.v_ncu[alpha_i]);
 
    //
    // Write THRESH_i for each probability threshold
    //
-   for(i=0, col=c+9; i<=pct_info.pct.nrows(); i++) {
+   for(i=0, col=c+12; i<=pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
@@ -2879,9 +2894,10 @@ void write_mpr_cols(const PairData *pd_ptr, int i,
    //
    // Matched Pairs (MPR)
    // Dump out the MPR line:
-   //    TOTAL,       INDEX,       OBS_LAT,
-   //    OBS_LON,     OBS_LVL,     OBS_ELV,
-   //    FCST,        OBS,         CLIMO
+   //    TOTAL,       INDEX,       OBS_SID,
+   //    OBS_LAT,     OBS_LON,     OBS_LVL,
+   //    OBS_ELV,     FCST,        OBS,
+   //    CLIMO
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_pair);
@@ -2889,25 +2905,28 @@ void write_mpr_cols(const PairData *pd_ptr, int i,
    at.set_entry(r, c+1,  // Index of Current Pair
       i+1);
 
-   at.set_entry(r, c+2,  // Latitude
+   at.set_entry(r, c+2,  // Station ID
+      pd_ptr->sid_sa[i]);
+
+   at.set_entry(r, c+3,  // Latitude
       pd_ptr->lat_na[i]);
 
-   at.set_entry(r, c+3,  // Longitude
+   at.set_entry(r, c+4,  // Longitude
       pd_ptr->lon_na[i]);
 
-   at.set_entry(r, c+4,  // Level
+   at.set_entry(r, c+5,  // Level
       pd_ptr->lvl_na[i]);
 
-   at.set_entry(r, c+5,  // Elevation
+   at.set_entry(r, c+6,  // Elevation
       pd_ptr->elv_na[i]);
 
-   at.set_entry(r, c+6,  // Forecast Value
+   at.set_entry(r, c+7,  // Forecast Value
       pd_ptr->f_na[i]);
 
-   at.set_entry(r, c+7,  // Observation Value
+   at.set_entry(r, c+8,  // Observation Value
       pd_ptr->o_na[i]);
 
-   at.set_entry(r, c+8,  // Climatology Value
+   at.set_entry(r, c+9,  // Climatology Value
       pd_ptr->c_na[i]);
 
    return;
@@ -3018,10 +3037,10 @@ void write_orank_cols(const EnsPairData *pd_ptr, int i,
    //
    // Ensemble Observation Rank Matched Pairs
    // Dump out the ORANK line:
-   //    TOTAL,       INDEX,       OBS_LAT,
-   //    OBS_LON,     OBS_LVL,     OBS_ELV,
-   //    OBS,         RANK,        N_ENS_VLD,
-   //    N_ENS,       [ENS_] (for each ensemble member)
+   //    TOTAL,       INDEX,       OBS_SID,
+   //    OBS_LAT,     OBS_LON,     OBS_LVL,
+   //    OBS_ELV,     OBS,         RANK,
+   //    N_ENS_VLD,   N_ENS,       [ENS_] (for each ensemble member)
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_pair);
@@ -3029,34 +3048,37 @@ void write_orank_cols(const EnsPairData *pd_ptr, int i,
    at.set_entry(r, c+1,  // Index of Current Pair
       i+1);
 
-   at.set_entry(r, c+2,  // Latitude
+   at.set_entry(r, c+2,  // Station ID
+      pd_ptr->sid_sa[i]);
+
+   at.set_entry(r, c+3,  // Latitude
       pd_ptr->lat_na[i]);
 
-   at.set_entry(r, c+3,  // Longitude
+   at.set_entry(r, c+4,  // Longitude
       pd_ptr->lon_na[i]);
 
-   at.set_entry(r, c+4,  // Level
+   at.set_entry(r, c+5,  // Level
       pd_ptr->lvl_na[i]);
 
-   at.set_entry(r, c+5,  // Elevation
+   at.set_entry(r, c+6,  // Elevation
       pd_ptr->elv_na[i]);
 
-   at.set_entry(r, c+6,  // Observation Value
+   at.set_entry(r, c+7,  // Observation Value
       pd_ptr->o_na[i]);
 
-   at.set_entry(r, c+7,  // Observation Rank
+   at.set_entry(r, c+8,  // Observation Rank
       nint(pd_ptr->r_na[i]));
 
-   at.set_entry(r, c+8,  // Number of valid ensembles
+   at.set_entry(r, c+9,  // Number of valid ensembles
       nint(pd_ptr->v_na[i]));
 
-   at.set_entry(r, c+9,  // Number of ensembles
+   at.set_entry(r, c+10, // Number of ensembles
       pd_ptr->e_na[i].n_elements());
 
    //
    // Write ENS_j for each ensemble member
    //
-   for(j=0, col=c+10; j<pd_ptr->e_na[i].n_elements(); j++) {
+   for(j=0, col=c+11; j<pd_ptr->e_na[i].n_elements(); j++) {
 
       at.set_entry(r, col, // ENS_j
          pd_ptr->e_na[i][j]);
