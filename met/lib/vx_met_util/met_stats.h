@@ -384,6 +384,7 @@ class PCTInfo {
       // Single threshold for the scalar observation
       SingleThresh        pct_obs_thresh;
 
+      CIInfo baser;
       CIInfo brier;
 
       void clear();

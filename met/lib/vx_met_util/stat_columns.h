@@ -134,7 +134,8 @@ static const char * pct_columns [] = {
 };
 
 static const char * pstd_columns [] = {
-   "TOTAL",       "N_THRESH",    "RELIABILITY",
+   "TOTAL",       "BASER",       "BASER_NCL",
+   "BASER_NCU",   "N_THRESH",    "RELIABILITY",
    "RESOLUTION",  "UNCERTAINTY", "ROC_AUC",
    "BRIER",       "BRIER_NCL",   "BRIER_NCU",
    "THRESH_"
@@ -152,9 +153,10 @@ static const char * prc_columns [] = {
 };
 
 static const char * mpr_columns [] = {
-   "TOTAL",       "INDEX",       "OBS_LAT",
-   "OBS_LON",     "OBS_LVL",     "OBS_ELV",
-   "FCST",        "OBS",         "CLIMO"
+   "TOTAL",       "INDEX",       "OBS_SID",
+   "OBS_LAT",     "OBS_LON",     "OBS_LVL",
+   "OBS_ELV",     "FCST",        "OBS",
+   "CLIMO"
 };
 
 static const char * nbrctc_columns [] = {
@@ -198,10 +200,10 @@ static const char * rhist_columns [] = {
 };
 
 static const char * orank_columns [] = {
-   "TOTAL",       "INDEX",       "OBS_LAT",
-   "OBS_LON",     "OBS_LVL",     "OBS_ELV",
-   "OBS",         "RANK",        "N_ENS_VLD",
-   "N_ENS",       "ENS_"
+   "TOTAL",       "INDEX",       "OBS_SID",
+   "OBS_LAT",     "OBS_LON",     "OBS_LVL",
+   "OBS_ELV",     "OBS",         "RANK",
+   "N_ENS_VLD",   "N_ENS",       "ENS_"
 };
 
 static const char * job_sum_columns [] = {
@@ -259,12 +261,12 @@ static const int n_orank_columns    = sizeof(orank_columns)/sizeof(*orank_column
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int get_n_pct_columns   (int n) { return(3 + 3*(max(1, n)-1)); }
-inline int get_n_pstd_columns  (int n) { return(9 +    max(1, n)   ); }
-inline int get_n_pjc_columns   (int n) { return(3 + 7*(max(1, n)-1)); }
-inline int get_n_prc_columns   (int n) { return(3 + 3*(max(1, n)-1)); }
-inline int get_n_rhist_columns (int n) { return(2 + n);               } // n = N_RANK
-inline int get_n_orank_columns (int n) { return(10 + n);              } // n = N_ENS
+inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
+inline int get_n_pstd_columns  (int n) { return(12 +    max(1, n)   ); }
+inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
+inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
+inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
+inline int get_n_orank_columns (int n) { return(11 + n);               } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 
