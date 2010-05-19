@@ -845,6 +845,10 @@ STATLineType string_to_statlinetype(const char *str) {
       t = stat_isc;
    else if(strcasecmp(str, statlinetype_str[17]) == 0)
       t = stat_wdir;
+   else if(strcasecmp(str, statlinetype_str[18]) == 0)
+      t = stat_rhist;
+   else if(strcasecmp(str, statlinetype_str[19]) == 0)
+      t = stat_orank;
    else
       t = no_stat_line_type;
 
@@ -1100,6 +1104,14 @@ switch(type) {
 
    case stat_isc:
       offset = get_column_offset(isc_columns, n_isc_columns, c);
+      break;
+
+   case stat_rhist:
+      offset = get_column_offset(rhist_columns, n_rhist_columns, c);
+      break;
+
+   case stat_orank:
+      offset = get_column_offset(orank_columns, n_orank_columns, c);
       break;
 
    default:
