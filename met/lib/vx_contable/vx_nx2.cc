@@ -28,6 +28,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_contable/vx_contable.h"
+#include "vx_met_util/vx_met_util.h"
 
 #include "gsl/gsl_cdf.h"
 
@@ -456,6 +457,30 @@ else              x = Thresholds[row];
 
 return ( x );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Nx2ContingencyTable::baser() const {
+
+   return(event_col_total()/n());
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Nx2ContingencyTable::baser_ci(double alpha,
+                                    double &cl, double &cu) const {
+   double v;
+
+   v = baser();
+
+   compute_proportion_ci(v, n(), alpha, cl, cu);
+
+   return(v);
 }
 
 

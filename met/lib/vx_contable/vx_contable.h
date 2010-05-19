@@ -215,13 +215,14 @@ class Nx2ContingencyTable : public ContingencyTable {
          //  statistics
          //
 
-      double  brier_score  () const;
+      double baser        () const;
+      double baser_ci     (double alpha, double &cl, double &cu) const;
+      double brier_score  () const;
+      double brier_ci_halfwidth(double alpha) const;
 
-      double  brier_ci_halfwidth(double alpha) const;
-
-      double  reliability  () const;
-      double  resolution   () const;
-      double  uncertainty  () const;
+      double reliability  () const;
+      double resolution   () const;
+      double uncertainty  () const;
 
       double row_obar  (int row) const;
       double     obar  ()        const;
