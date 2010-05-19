@@ -356,6 +356,7 @@ cov_thresh[] = [ "ge0.5" ];
 //
 //    (8) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
 //           Total (TOTAL),
+//           Base Rate (BASER), BASER_CL, BASER_CU,
 //           Number of Forecast Probability Thresholds (N_THRESH),
 //           Reliability (RELIABILITY),
 //           Resolution (RESOLUTION),
