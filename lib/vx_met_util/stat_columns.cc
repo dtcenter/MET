@@ -2452,17 +2452,17 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    at.set_entry(r, c+0,  // Total count
       pct_info.pct.n());
 
-   at.set_entry(r, c+1,  // N_THRESH
-      pct_info.pct.nrows() + 1);
-
-   at.set_entry(r, c+2,  // BASER
+   at.set_entry(r, c+1,  // BASER
       pct_info.baser.v);
 
-   at.set_entry(r, c+3,  // BASER_NCL
+   at.set_entry(r, c+2,  // BASER_NCL
       pct_info.baser.v_ncl[alpha_i]);
 
-   at.set_entry(r, c+4,  // BASER_NCU
+   at.set_entry(r, c+3,  // BASER_NCU
       pct_info.baser.v_ncu[alpha_i]);
+
+   at.set_entry(r, c+4,  // N_THRESH
+      pct_info.pct.nrows() + 1);
 
    at.set_entry(r, c+5,  // RELIABILITY
       pct_info.pct.reliability());
