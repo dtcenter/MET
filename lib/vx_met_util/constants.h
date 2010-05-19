@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char met_version[]     = "V2.0";
+static const char met_version[]     = "V3.0";
 static const char met_base_str[]    = "MET_BASE";
 static const char txt_file_ext[]    = ".txt";
 static const char stat_file_ext[]   = ".stat";
