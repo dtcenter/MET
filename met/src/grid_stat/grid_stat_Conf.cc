@@ -13,7 +13,7 @@
    //
    //     Created from config file "GridStatConfig_default"
    //
-   //     on May 14, 2010    1:16 pm  MDT
+   //     on May 19, 2010    3:20 pm  MDT
    //
 
 
@@ -36,7 +36,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Panic = 0;
+static const int Panic = 1;
 
 
 ////////////////////////////////////////////////////////////////////////

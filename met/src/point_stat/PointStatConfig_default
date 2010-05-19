@@ -387,6 +387,7 @@ interp_thresh = 1.0;
 //
 //   (10) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
 //           Total (TOTAL),
+//           Base Rate (BASER), BASER_NCL, BASER_NCU,
 //           Number of Forecast Probability Thresholds (N_THRESH),
 //           Reliability (RELIABILITY),
 //           Resolution (RESOLUTION),
@@ -423,6 +424,7 @@ interp_thresh = 1.0;
 //   (13) STAT and MPR Text Files, Matched Pair Data:
 //           Total (TOTAL),
 //           Index (INDEX),
+//           Observation Station ID (OBS_SID),
 //           Observation Latitude (OBS_LAT),
 //           Observation Longitude (OBS_LON),
 //           Observation Level (OBS_LVL),
