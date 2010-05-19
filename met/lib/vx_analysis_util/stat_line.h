@@ -59,22 +59,25 @@ enum STATLineType {
    stat_nbrcnt = 15,
    stat_isc    = 16,
    stat_wdir   = 17,
+   stat_rhist  = 18,
+   stat_orank  = 19,
 
       //
       //  flag value
       //
 
-   no_stat_line_type = 18
+   no_stat_line_type = 20
 
 };
-static const int n_statlinetypes = 19;
+static const int n_statlinetypes = 21;
 
 static const char * const statlinetype_str[n_statlinetypes] = {
    "SL1L2", "SAL1L2", "VL1L2",  "VAL1L2",
    "FHO",   "CTC",    "CTS",    "CNT",
    "PCT",   "PSTD",   "PJC",    "PRC",
    "MPR",   "NBRCTC", "NBRCTS", "NBRCNT",
-   "ISC",   "WDIR",   "NA"
+   "ISC",   "WDIR",   "RHIST",  "ORANK",
+   "NA"
 };
 
 extern const char * statlinetype_to_string(const STATLineType);
