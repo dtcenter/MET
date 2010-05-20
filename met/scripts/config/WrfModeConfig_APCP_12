@@ -458,7 +458,7 @@ mode_color_table = "MET_BASE/data/colortables/mode_obj.ctable";
 zero_border_size = 1;
 
 //
-// If the raw_valid_flag is set, only the region containing valid data
+// If the plot_valid_flag is set, only the region containing valid data
 // after the masking is applied will be plotted:
 // (0) Plot the entire domain of the data
 // (1) Plot only the region containing valid data after masking
