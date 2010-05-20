@@ -20,7 +20,7 @@
    //
    //     Created from config file "WrfModeConfig_default"
    //
-   //     on May 14, 2010    2:30 pm  MDT
+   //     on May 20, 2010    11:59 am  MDT
    //
 
 
