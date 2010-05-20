@@ -45,6 +45,11 @@ echo
 ./test_wavelet_stat.sh
 
 echo
+echo "*** Testing Ensemble-Stat application ***"
+echo
+./test_ensemble_stat.sh
+
+echo
 echo "*** Testing STAT-Analysis application ***"
 echo
 ./test_stat_analysis.sh
