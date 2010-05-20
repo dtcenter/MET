@@ -202,7 +202,7 @@ mask_sid = "";
 //
 // e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
 //
-interp_method[] = [ "DW_MEAN" ];
+interp_method[] = [ "UW_MEAN" ];
 
 //
 // Specify a comma-separated list of box widths to be used by the interpolation
