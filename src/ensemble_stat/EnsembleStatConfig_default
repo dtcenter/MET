@@ -48,7 +48,7 @@ ens_field[] = [ "61/A3" ];
 //
 // e.g. ens_thresh[] = [ "gt0.0 ge5.0", "gt0.0", "lt80.0 ge80.0" ];
 //
-ens_thresh[]    = [ "gt0.0 ge5.0" ];
+ens_thresh[] = [ "gt0.0 ge5.0" ];
 
 //
 // When summarizing the ensemble, compute a ratio of the number of valid
@@ -59,7 +59,7 @@ ens_thresh[]    = [ "gt0.0 ge5.0" ];
 //
 // e.g. vld_ens_thresh = 1.0;
 //
-vld_ens_thresh  = 1.0;
+vld_ens_thresh = 1.0;
 
 //
 // When summarizing the ensemble, for each grid point compute a ratio of the
@@ -70,7 +70,7 @@ vld_ens_thresh  = 1.0;
 //
 // e.g. vld_data_thresh = 1.0;
 //
-vld_data_thresh  = 1.0;
+vld_data_thresh = 1.0;
 
 //
 // Section 2: Rank Histograms
@@ -286,7 +286,7 @@ interp_thresh = 1.0;
 //    (0) Do not write this field to the NetCDF file.
 //    (1) Write this field to the NetCDF file.
 //
-output_flag[]   = [ 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
+output_flag[] = [ 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
 
 //
 // Specify the GRIB Table 2 parameter table version number to be used
