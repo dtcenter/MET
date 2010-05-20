@@ -1,0 +1,307 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default ensemble_stat configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Specify a name to designate the model being verified.  This name will be
+// written to the second column of the ASCII output generated.
+//
+model = "WRF";
+
+//
+// Section 1: Ensemble Processing
+//
+
+//
+// Specify a comma-separated list of ensemble fields to be computed.
+// Each field is specified as a GRIB code or corresponding GRIB code
+// abbreviation followed by an accumulation or vertical level indicator.
+//
+// Each ensemble field is specified as one of the following:
+//    GC/ANNN for accumulation interval NNN
+//    GC/ZNNN for vertical level NNN
+//    GC/PNNN for pressure level NNN in hPa
+//    GC/LNNN for a generic level type
+//    GC/RNNN for a specific GRIB record number
+//    Where GC is the number of or abbreviation for the GRIB code.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+// e.g. ens_field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+//
+ens_field[] = [ "61/A24", "REFC/L0", "UGRD/Z10", "VGRD/Z10", "WIND/Z10" ];
+
+//
+// Specify a comma-separated list of groups of thresholds to be applied to the
+// fields listed above.  Ensemble thresholds are used to compute the ensemble
+// relative frequency output.
+//
+// The length of the "ens_field" and "ens_thresh" arrays must match.  To apply
+// multiple thresholds to a field, separate the threshold values with a space.
+//
+// Each threshold must be preceded by a two letter indicator for the type of
+// thresholding to be performed:
+//    'lt' for less than     'le' for less than or equal to
+//    'eq' for equal to      'ne' for not equal to
+//    'gt' for greater than  'ge' for greater than or equal to
+//
+// e.g. ens_thresh[] = [ "gt0.0 ge5.0", "gt0.0", "lt80.0 ge80.0" ];
+//
+ens_thresh[] = [ "gt0.0 ge10.0", "ge35.0", "ge5.0", "ge5.0", "ge5.0" ];
+
+//
+// When summarizing the ensemble, compute a ratio of the number of valid
+// ensemble fields to the total number of ensemble members.  If that ratio is
+// less than this threshold, error out.  This threshold must be between 0 and 1.
+// Setting this threshold to 1 will require that each all ensemble members be
+// present to be processed.
+//
+// e.g. vld_ens_thresh = 1.0;
+//
+vld_ens_thresh = 1.0;
+
+//
+// When summarizing the ensemble, for each grid point compute a ratio of the
+// number of valid data values to the number of ensemble members.  If that
+// ratio is less than this threshold, write out bad data.  This threshold must
+// be between 0 and 1.  Setting this threshold to 1 will require each grid
+// point to contain valid data for all ensemble members.
+//
+// e.g. vld_data_thresh = 1.0;
+//
+vld_data_thresh = 1.0;
+
+//
+// Section 2: Rank Histograms
+//
+
+//
+// Specify a comma-separated list of ensemble fields to be verified. The
+// forecast and observation fields may be specified separately. If the
+// obs_field parameter is left blank, it will default to the contents of
+// fcst_field.
+//
+// Each field is specified as a GRIB code or corresponding GRIB code
+// abbreviation followed by an accumulation or vertical level indicator.
+//
+// Each ensemble verification field is specified as one of the following:
+//    GC/ANNN for accumulation interval NNN
+//    GC/ZNNN for vertical level NNN
+//    GC/PNNN for pressure level NNN in hPa
+//    GC/PNNN-NNN for a range of pressure levels in hPa
+//    GC/LNNN for a generic level type
+//    GC/RNNN for a specific GRIB record number
+//    Where GC is the number of or abbreviation for the GRIB code.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+// e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+//
+fcst_field[] = [ "61/A24" ];
+obs_field[]  = [];
+
+//
+// Beginning and ending time offset values in seconds for point observations
+// to be used.  These time offsets are defined in reference to the
+// ensemble valid time, v.  Observations with a valid time falling in the
+// window [v+beg_ds, v+end_ds] will be used.
+// These selections are overridden by the command line arguments
+// -obs_valid_beg and -obs_valid_end.
+//
+beg_ds = -5400;
+end_ds =  5400;
+
+//
+// Specify a comma-separated list of PrepBufr message types with which
+// to perform the point verification.  Statistics will be computed separately
+// for each message type specified.  At least one PrepBufr message type
+// must be provided when verifying with point observations.
+// List of valid message types:
+//    ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
+//    MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
+//    SFCSHP SPSSMI SYNDAT VADWND
+//    ANYAIR (= AIRCAR, AIRCFT)
+//    ANYSFC (= ADPSFC, SFCSHP, ADPUPA, PROFLR)
+//    ONLYSF (= ADPSFC, SFCSHP)
+// http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+//
+// e.g. message_type[] = [ "ADPUPA", "AIRCAR" ];
+//
+message_type[] = [ "ADPSFC" ];
+
+//
+// Specify a comma-separated list of grids to be used in masking the data over
+// which to perform scoring.  An empty list indicates that no masking grid
+// should be performed.  The standard NCEP grids are named "GNNN" where NNN
+// indicates the three digit grid number.  Enter "FULL" to score over the
+// entire domain.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
+//
+// e.g. mask_grid[] = [ "FULL" ];
+//
+mask_grid[] = [ "FULL" ];
+
+//
+// Specify a comma-separated list of masking regions to be applied.
+// An empty list indicates that no additional masks should be used.
+// The masking regions may be defined in one of 4 ways:
+//
+// (1) An ASCII file containing a lat/lon polygon.
+//     Latitude in degrees north and longitude in degrees east.
+//     By default, the first and last polygon points are connected.
+//     e.g. "MET_BASE/data/poly/EAST.poly" which consists of n points:
+//          "poly_name lat1 lon1 lat2 lon2... latn lonn"
+//
+// (2) The NetCDF output of the gen_poly_mask tool.
+//
+// (3) A NetCDF data file, followed by the name of the NetCDF variable
+//     to be used, and optionally, a threshold to be applied to the field.
+//     e.g. "sample.nc var_name gt0.00"
+//
+// (4) A GRIB data file, followed by a description of the field
+//     to be used, and optionally, a threshold to be applied to the field.
+//     e.g. "sample.grb APCP/A3 gt0.00"
+//
+// Any NetCDF or GRIB file used must have the same grid dimensions as the
+// data being verified.
+//
+// MET_BASE may be used in the path for the files above.
+//
+// e.g. mask_poly[] = [ "MET_BASE/data/poly/EAST.poly",
+//                      "poly_mask.ncf",
+//                      "sample.nc APCP",
+//                      "sample.grb HGT/Z0 gt100.0" ];
+//
+mask_poly[] = [];
+
+//
+// Specify the name of an ASCII file containing a space-separated list of
+// station ID's at which to perform verification.  Each station ID specified
+// is treated as an individual masking region.
+//
+// An empty list file name indicates that no station ID masks should be used.
+//
+// MET_BASE may be used in the path for the station ID mask file name.
+//
+// e.g. mask_sid = "CONUS.stations";
+//
+mask_sid = "";
+
+//
+// Specify a comma-separated list of interpolation method(s) to be used for
+// point observations.  For gridded observations, this serves to smooth
+// the data fields prior to verifying them.  The value at each grid point is
+// replaced by the measure computed over the neighborhood defined around the
+// grid point.  String values are interpreted as follows:
+//    MIN     = Minimum in the neighborhood
+//    MAX     = Maximum in the neighborhood
+//    MEDIAN  = Median in the neighborhood
+//    UW_MEAN = Unweighted mean in the neighborhood
+//    DW_MEAN = Distance-weighted mean in the neighborhood
+//    LS_FIT  = Least-squares fit in the neighborhood
+//
+// e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
+//
+interp_method[] = [ "UW_MEAN" ];
+
+//
+// Specify a comma-separated list of box widths to be used by the interpolation
+// techniques listed above.  A value of 1 indicates that no smoothing should be
+// performed.
+//
+// e.g. interp_width = [ 1, 3, 5 ];
+//
+interp_width[] = [ 1 ];
+
+//
+// The interp_flag controls how the smoothing defined above should be applied:
+// (1) Smooth only the forecast field
+// (2) Smooth only the observation field
+// (3) Smooth both the forecast and observation fields
+//
+interp_flag = 1;
+
+//
+// When smoothing, compute a ratio of the number of valid data points to
+// the total number of points in the neighborhood.  If that ratio is less
+// than this threshold, do not compute a smoothed forecast value.  This
+// threshold must be between 0 and 1.  Setting this threshold to 1 will
+// require that each observation be surrounded by n*n valid forecast
+// points.
+//
+// e.g. interp_thresh = 1.0;
+//
+interp_thresh = 1.0;
+
+//
+// Specify flags to indicate the type of data to be output:
+//
+//    (1) STAT and RHIST Text Files, Ranked Histograms:
+//           Total (TOTAL),
+//           Number of ranks used (N_RANK),
+//           Count of observations with current rank (RANK_i)
+//           NOTE: Previous column is repeated for each rank used (N_RANK)
+//
+//    (2) STAT and ORANK Text Files, Observation Rank Matched Pairs:
+//           Total (TOTAL),
+//           Index (INDEX),
+//           Observation Station ID (OBS_SID),
+//           Observation Latitude (OBS_LAT),
+//           Observation Longitude (OBS_LON),
+//           Observation Level (OBS_LVL),
+//           Observation Elevation (OBS_ELV),
+//           Observation Value (OBS),
+//           Observation Rank (RANK),
+//           Number of valid Ensemble Values (N_ENS_VLD),
+//           Total Number of Ensemble Values (N_ENS),
+//           Current Ensemble Value (ENS_i)
+//           NOTE: Previous column is repeated for each ensemble member (N_ENS)
+//
+//    (3) Write the Ensemble Mean fields.
+//
+//    (4) Write the Ensemble Standard Deviation fields.
+//
+//    (5) Write the Ensemble Mean - 1 Standard Deviation fields.
+//
+//    (6) Write the Ensemble Mean + 1 Standard Deviation fields.
+//
+//    (7) Write the Ensemble Minimum fields.
+//
+//    (8) Write the Ensemble Maximum fields.
+//
+//    (9) Write the Ensemble Range fields.
+//
+//   (10) Write the Ensemble Valid Data Count fields.
+//
+//   (11) Write the Ensemble Relative Frequency by threshold fields.
+//
+//   (12) Write the gridded field of Observation Ranks to a NetCDF file.
+//
+// Values for flags (1) and (2) are interpreted as follows:
+//    (0) Do not generate output of this type
+//    (1) Write output to a STAT file
+//    (2) Write output to a STAT file and a text file
+//
+// Values for flags (4) though (12) are interpreted as follows:
+//    (0) Do not write this field to the NetCDF file.
+//    (1) Write this field to the NetCDF file.
+//
+output_flag[] = [ 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
+
+//
+// Specify the GRIB Table 2 parameter table version number to be used
+// for interpreting GRIB codes.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+grib_ptv = 129;
+
+//
+// Prefix to be used for the output file names.
+//
+output_prefix = "";
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V3.0";
