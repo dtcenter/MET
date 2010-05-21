@@ -32,6 +32,8 @@
 //   004    02/20/09  Halley Gotway  Append _HH to the variable name
 //                    for non-zero accumulation times.
 //   005    12/23/09  Halley Gotway  Call the library read_pds routine.
+//   006    05/21/10  Halley Gotway  Enhance to search multiple
+//                    -pcp_dir directory arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -62,8 +64,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 // Constants
-static const char *program_name  = "pcp_combine";
-static const char *zero_time_str = "00000000_000000";
+static const char *program_name    = "pcp_combine";
+static const char *zero_time_str   = "00000000_000000";
+static const char *default_pcp_dir = ".";
+static const char *default_reg_exp = ".*";
 
 // Run Command enumeration
 enum RunCommand { sum = 0, add = 1, subtract = 2 };
@@ -84,8 +88,8 @@ static unixtime     init_time;
 static int          in_accum;
 static unixtime     valid_time;
 static int          out_accum;
-static ConcatString pcp_dir;
-static ConcatString pcp_reg_exp(".*");
+static StringArray  pcp_dir;
+static ConcatString pcp_reg_exp(default_reg_exp);
 
 // Variables for the add and subtract commands
 static ConcatString in_file1;
@@ -104,6 +108,7 @@ static void   process_add_subtract_args(int, char **, int);
 
 static void   do_sum_command(int, char **);
 static void   sum_grib_files(GribRecord &);
+static int    search_pcp_dir(const char *, const unixtime, char *&);
 static void   check_file_time(char *, unixtime, int &);
 
 static void   do_add_subtract_command(int, char **);
@@ -122,8 +127,6 @@ int main(int argc, char *argv[]) {
    // Set handler to be called for memory allocation error
    //
    set_new_handler(oom);
-
-   pcp_dir << MET_BASE << "/data/sample_obs/ST2ml";
 
    //
    // Process the command line arguments
@@ -196,6 +199,11 @@ void process_command_line(int argc, char **argv) {
    else                   process_add_subtract_args(argc, argv, i_args);
 
    //
+   // If pcp_dir is not set, set it to the current directory.
+   //
+   if(pcp_dir.n_elements() == 0) pcp_dir.add(default_pcp_dir);
+
+   //
    // Deallocate memory and clean up
    //
    clean_up();
@@ -247,7 +255,7 @@ void process_sum_args(int argc, char **argv, int i_args) {
    //
    // Input accumulation
    //
-   in_accum = atoi(argv[i_args+1])*sec_per_hour;
+   in_accum = atof(argv[i_args+1])*sec_per_hour;
 
    //
    // Valid time
@@ -262,7 +270,7 @@ void process_sum_args(int argc, char **argv, int i_args) {
    //
    // Output accumulation
    //
-   out_accum = atoi(argv[i_args+3])*sec_per_hour;
+   out_accum = atof(argv[i_args+3])*sec_per_hour;
 
    //
    // Out file
@@ -275,7 +283,7 @@ void process_sum_args(int argc, char **argv, int i_args) {
    for(i=0; i<argc; i++) {
 
       if(strcmp(argv[i], "-pcpdir") == 0) {
-         pcp_dir = argv[i+1];
+         pcp_dir.add(argv[i+1]);
          i++;
       }
       else if(strcmp(argv[i], "-pcprx") == 0) {
@@ -313,7 +321,7 @@ void process_add_subtract_args(int argc, char **argv, int i_args) {
    //
    // Input accumulation 1
    //
-   accum1 = atoi(argv[i_args+1])*sec_per_hour;
+   accum1 = atof(argv[i_args+1])*sec_per_hour;
 
    //
    // Input file 2
@@ -323,7 +331,7 @@ void process_add_subtract_args(int argc, char **argv, int i_args) {
    //
    // Input accumulation 2
    //
-   accum2 = atoi(argv[i_args+3])*sec_per_hour;
+   accum2 = atof(argv[i_args+3])*sec_per_hour;
 
    //
    // Out file
@@ -338,17 +346,31 @@ void process_add_subtract_args(int argc, char **argv, int i_args) {
 void do_sum_command(int argc, char **argv) {
    GribRecord rec;
    int lead_time;
+   char init_time_str[max_str_len], valid_time_str[max_str_len];
+   char in_accum_str[max_str_len], out_accum_str[max_str_len];
+   char lead_time_str[max_str_len];
 
    //
    // Compute the lead time
    //
    lead_time = valid_time - init_time;
 
+   //
+   // Build time strings
+   //
+   if(init_time != 0) unix_to_yyyymmdd_hhmmss(init_time, init_time_str);
+   else               strcpy(init_time_str, zero_time_str);
+   sec_to_hhmmss(in_accum, in_accum_str);
+   unix_to_yyyymmdd_hhmmss(valid_time, valid_time_str);
+   sec_to_hhmmss(out_accum, out_accum_str);
+   sec_to_hhmmss(lead_time, lead_time_str);
+
    if(verbosity > 0) {
+
       cout << "Performing sum command: "
-           << "init_time/in_accum/valid_time/out_accum Times = "
-           << init_time << "/" << in_accum << "/"
-           << valid_time << "/" << out_accum << "\n" << flush;
+           << "Init/In_Accum/Valid/Out_Accum Times = "
+           << init_time_str << "/" << in_accum_str << "/"
+           << valid_time_str << "/" << out_accum_str << "\n" << flush;
    }
 
    //
@@ -357,9 +379,9 @@ void do_sum_command(int argc, char **argv) {
    //
    if(out_accum > lead_time && init_time != (unixtime) 0) {
       cerr << "\n\nERROR: do_sum_command() -> "
-           << "The output accumulation time (" << out_accum/sec_per_hour
-           << " hours) cannot be greater than the "
-           << "lead time (" << lead_time/sec_per_hour << " hours).\n\n"
+           << "The output accumulation time (" << out_accum_str
+           << ") cannot be greater than the lead time ("
+           << lead_time_str << ").\n\n"
            << flush;
       exit(1);
    }
@@ -370,9 +392,9 @@ void do_sum_command(int argc, char **argv) {
    //
    if(out_accum%in_accum != 0) {
       cerr << "\n\nERROR: do_sum_command() -> "
-           << "The output accumulation time (" << out_accum/sec_per_hour
-           << " hours) must be divisible by the input accumulation "
-           << "time (" << in_accum/sec_per_hour << " hours).\n\n"
+           << "The output accumulation time (" << out_accum_str
+           << ") must be divisible by the input accumulation "
+           << "time (" << in_accum_str << ").\n\n"
            << flush;
       exit(1);
    }
@@ -383,10 +405,9 @@ void do_sum_command(int argc, char **argv) {
    //
    if(lead_time%in_accum != 0 && init_time != (unixtime) 0) {
       cerr << "\n\nERROR: do_sum_command() -> "
-           << "The lead time ("
-           << lead_time/sec_per_hour << " hours) must be divisible by "
-           << "the input accumulation time (" << in_accum/sec_per_hour
-           << " hours).\n\n" << flush;
+           << "The lead time (" << lead_time_str
+           << ") must be divisible by the input accumulation time ("
+           << in_accum_str << ").\n\n" << flush;
       exit(1);
    }
 
@@ -409,13 +430,18 @@ void do_sum_command(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void sum_grib_files(GribRecord &rec) {
-   int i, n, n_files, x, y, i_rec;
-   char pcp_file[PATH_MAX], valid_str[max_str_len];
+   int i, j, n, n_files, x, y;
+   char valid_str[max_str_len];
+   char in_accum_str[max_str_len], out_accum_str[max_str_len];
    double v;
    Grid gr;
    WrfData wd;
-   struct dirent *dirp;
-   DIR *dp;
+
+   //
+   // Build time strings
+   //
+   sec_to_hhmmss(in_accum, in_accum_str);
+   sec_to_hhmmss(out_accum, out_accum_str);
 
    //
    // Grib file info
@@ -443,10 +469,9 @@ void sum_grib_files(GribRecord &rec) {
 
    if(verbosity > 0) {
       cout << "Searching for " << n_files << " files "
-           << "with accumulation times of " << in_accum/sec_per_hour
-           << " hours to sum to a total accumulation time of "
-           << out_accum/sec_per_hour << " hours in " << pcp_dir
-           << "\n" << flush;
+           << "with accumulation times of " << in_accum_str
+           << " to sum to a total accumulation time of "
+           << out_accum_str << ".\n" << flush;
    }
 
    //
@@ -456,85 +481,52 @@ void sum_grib_files(GribRecord &rec) {
    for(i=0; i<n_files; i++) {
       pcp_times[i] = valid_time - i*in_accum;
       pcp_files[i] = new char [PATH_MAX];
-      strcpy(pcp_files[i], "\0");
    }
 
    //
-   // Find the files matching the specified regular expression with
-   // the correct valid and accumulation times.
-   //
-   if( (dp = opendir(pcp_dir)) == NULL ) {
-      cerr << "\n\nERROR: sum_grib_files() -> "
-           << "Cannot open precipitation directory "
-           << pcp_dir << "\n\n" << flush;
-      exit(1);
-   }
-
-   //
-   // For each file to be found, loop through the directory and
-   // find it.
+   // Search for each file time.
    //
    for(i=0; i<n_files; i++) {
 
       //
-      // Reset to the beginning of the directory.
+      // Search in each directory for the current file time.
       //
-      rewinddir(dp);
+      for(j=0; j<pcp_dir.n_elements(); j++) {
 
-      //
-      // Process each file contained in the directory.
-      //
-      while((dirp = readdir(dp)) != NULL) {
+         pcp_recs[i] = search_pcp_dir(pcp_dir[j], pcp_times[i], pcp_files[i]);
 
-         //
-         // Ignore "." and ".." files
-         //
-         if(strcmp(dirp->d_name, ".") == 0 ||
-            strcmp(dirp->d_name, "..") == 0) continue;
+         if(pcp_recs[i] != -1) {
 
-         //
-         // Check the file name for a matching regular expression.
-         //
-         if(check_reg_exp(pcp_reg_exp, dirp->d_name) == true) {
+            if(verbosity > 1) {
 
-            //
-            // Check the current file for matching initialization,
-            // valid, lead, and accumulation times.
-            //
-            sprintf(pcp_file, "%s/%s", pcp_dir.text(), dirp->d_name);
-            check_file_time(pcp_file, pcp_times[i], i_rec);
+               unix_to_yyyymmdd_hhmmss(pcp_times[i], valid_str);
 
-            if(i_rec != -1) {
-               strcpy(pcp_files[i], pcp_file);
-               pcp_recs[i] = i_rec;
-
-               if(verbosity > 1) {
-                  cout << "[" << i+1 << "] File " << pcp_files[i]
-                       << " matches valid time of " << pcp_times[i]
-                       << "\n" << flush;
-               }
-
-               break;
-            } // end if
+               cout << "[" << i+1 << "] File " << pcp_files[i]
+                    << " matches valid time of " << valid_str
+                    << "\n" << flush;
+            }
+            break;
          } // end if
-      } // end while
+
+      } // end for j
 
       //
       // Check for no matching file found
       //
-      if(strcmp(pcp_files[i], "\0") == 0) {
+      if(pcp_recs[i] == -1) {
 
          unix_to_yyyymmdd_hhmmss(pcp_times[i], valid_str);
 
          cerr << "\n\nERROR: sum_grib_files() -> "
               << "Cannot find a file with a valid time of "
               << valid_str << " and accumulation time of "
-              << in_accum/sec_per_hour << " hours in " << pcp_dir
-              << " matching the regular expression \"" << pcp_reg_exp
-              << "\"\n\n" << flush;
+              << in_accum_str << " matching the regular "
+              << "expression \"" << pcp_reg_exp << "\"\n\n"
+              << flush;
          exit(1);
       }
-   } // end for
+
+   } // end for i
 
    //
    // Open each of the files found and parse the data.
@@ -601,13 +593,6 @@ void sum_grib_files(GribRecord &rec) {
       } // end else
    } // end for i
 
-   if(closedir(dp) < 0) {
-      cerr << "\n\nERROR: sum_grib_files() -> "
-           << "Cannot close observation directory "
-           << pcp_dir << "\n\n" << flush;
-      exit(1);
-   }
-
    //
    // Deallocate any memory that was allocated above
    //
@@ -618,6 +603,65 @@ void sum_grib_files(GribRecord &rec) {
    if(pcp_times) { delete [] pcp_times; pcp_times = (unixtime *) 0; }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, char *&cur_file) {
+   int i_rec;
+   struct dirent *dirp;
+   DIR *dp;
+
+   //
+   // Find the files matching the specified regular expression with
+   // the correct valid and accumulation times.
+   //
+   if((dp = opendir(cur_dir)) == NULL ) {
+      cerr << "\n\nERROR: search_pcp_dir() -> "
+           << "Cannot open precipitation directory "
+           << cur_dir << "\n\n" << flush;
+      exit(1);
+   }
+
+   //
+   // Initialize the record index to not found.
+   //
+   i_rec = -1;
+
+   //
+   // Process each file contained in the directory.
+   //
+   while((dirp = readdir(dp)) != NULL) {
+
+      //
+      // Ignore any hidden files.
+      //
+      if(dirp->d_name[0] == '.') continue;
+
+      //
+      // Check the file name for a matching regular expression.
+      //
+      if(check_reg_exp(pcp_reg_exp, dirp->d_name) == true) {
+
+         //
+         // Check the current file for matching initialization,
+         // valid, lead, and accumulation times.
+         //
+         sprintf(cur_file, "%s/%s", cur_dir, dirp->d_name);
+         check_file_time(cur_file, cur_ut, i_rec);
+
+         if(i_rec != -1) break;
+      } // end if
+   } // end while
+
+   if(closedir(dp) < 0) {
+      cerr << "\n\nERROR: search_pcp_dir() -> "
+           << "Cannot close precipitation directory "
+           << cur_dir << "\n\n" << flush;
+      exit(1);
+   }
+
+   return(i_rec);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -689,6 +733,9 @@ void do_add_subtract_command(int argc, char **argv) {
    unixtime nc_init_time, nc_valid_time;
    int x, y, n, nc_accum;
    double v1, v2, v;
+   char init_time1_str[max_str_len], init_time2_str[max_str_len];
+   char valid_time1_str[max_str_len], valid_time2_str[max_str_len];
+   char accum1_str[max_str_len], accum2_str[max_str_len];
 
    //
    // Read the two specified Grib files
@@ -702,6 +749,16 @@ void do_add_subtract_command(int argc, char **argv) {
       cout << "Reading input file: " << in_file2 << "\n" << flush;
    }
    get_field(in_file2.text(), accum2, wd2, init_time2, valid_time2, rec);
+
+   //
+   // Build time strings
+   //
+   unix_to_yyyymmdd_hhmmss(init_time1, init_time1_str);
+   unix_to_yyyymmdd_hhmmss(init_time2, init_time2_str);
+   unix_to_yyyymmdd_hhmmss(valid_time1, valid_time1_str);
+   unix_to_yyyymmdd_hhmmss(valid_time2, valid_time2_str);
+   sec_to_hhmmss(accum1, accum1_str);
+   sec_to_hhmmss(accum2, accum2_str);
 
    //
    // Check for the same grid dimensions
@@ -765,8 +822,8 @@ void do_add_subtract_command(int argc, char **argv) {
       //
       if(init_time1 != init_time2) {
          cerr << "\n\nERROR: do_add_subtract_command() -> "
-              << "init_time1 (" << init_time1
-              <<  ") must be equal to init_time2 (" << init_time2
+              << "init_time1 (" << init_time1_str
+              <<  ") must be equal to init_time2 (" << init_time2_str
               << ") for subtraction.\n" << flush;
          exit(1);
       }
@@ -778,10 +835,9 @@ void do_add_subtract_command(int argc, char **argv) {
       //
       if(accum1 < accum2) {
          cerr << "\n\nERROR: do_add_subtract_command() -> "
-              << "accum1 (" << accum1/sec_per_hour
-              <<  " hours) must be greater than accum2 ("
-              << accum2/sec_per_hour
-              << " hours) for subtraction.\n" << flush;
+              << "accum1 (" << accum1_str
+              <<  ") must be greater than accum2 ("
+              << accum2_str << ") for subtraction.\n" << flush;
          exit(1);
       }
       nc_accum = accum1 - accum2;
@@ -841,6 +897,7 @@ void get_field(const char *in_file, int accum, WrfData &wd,
                unixtime &init_ut, unixtime &valid_ut, GribRecord &rec) {
    GribFile grib_file;
    int bms_flag, rec_accum;
+   char accum_str[max_str_len];
 
    //
    // Setup the GCInfo object
@@ -865,10 +922,13 @@ void get_field(const char *in_file, int accum, WrfData &wd,
    //
    if(get_grib_record(grib_file, rec, gc_info, wd,
                       grid, verbosity) != 0) {
+
+      sec_to_hhmmss(accum, accum_str);
+
       cerr << "\n\nERROR: get_field() -> "
            << "can't find grib code " << grib_code
-           << " with accumulation of " << accum/sec_per_hour
-           << " hours in grib file: " << in_file
+           << " with accumulation of " << accum_str
+           << " in GRIB file: " << in_file
            << "\n\n" << flush;
       exit(1);
    }
@@ -892,6 +952,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    char command_str[max_str_len];
    char time_str[max_str_len];
    char hostname_str[max_str_len];
+   char accum1_str[max_str_len], accum2_str[max_str_len];
 
    NcFile *f_out   = (NcFile *) 0;
    NcDim  *lat_dim = (NcDim *)  0;
@@ -924,21 +985,26 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    f_out->add_att("FileOrigins", attribute_str);
 
    if(run_command == sum) {
+      sec_to_hhmmss(in_accum, accum1_str);
       sprintf(command_str,
-              "Sum: Files from %s with accumulations of %i hours.",
-              pcp_dir.text(), in_accum/sec_per_hour);
+              "Sum: Files with accumulations of %s.",
+              accum1_str);
    }
    else if(run_command == add) {
+      sec_to_hhmmss(accum1, accum1_str);
+      sec_to_hhmmss(accum2, accum2_str);
       sprintf(command_str,
-              "Addition: %s with accumulation of %i hours plus %s with accumulation of %i hours.",
-              in_file1.text(), accum1/sec_per_hour,
-              in_file2.text(), accum2/sec_per_hour);
+              "Addition: %s with accumulation of %s plus %s with accumulation of %s.",
+              in_file1.text(), accum1_str,
+              in_file2.text(), accum2_str);
    }
    else { // run_command == subtract
+      sec_to_hhmmss(accum1, accum1_str);
+      sec_to_hhmmss(accum2, accum2_str);
       sprintf(command_str,
-              "Subtraction: %s with accumulation of %i hours minus %s with accumulation of %i hours.",
-              in_file1.text(), accum1/sec_per_hour,
-              in_file2.text(), accum2/sec_per_hour);
+              "Subtraction: %s with accumulation of %s minus %s with accumulation of %s.",
+              in_file1.text(), accum1_str,
+              in_file2.text(), accum2_str);
    }
    f_out->add_att("RunCommand", command_str);
 
@@ -1088,10 +1154,10 @@ void usage(int argc, char *argv[]) {
         << "(required).\n"
 
         << "\t\t\t\"-pcpdir path\" overrides the default precipitation directory ("
-        << pcp_dir << ") (optional).\n"
+        << default_pcp_dir << ") (optional).\n"
 
         << "\t\t\t\"-pcprx reg_exp\" overrides the default regular expression for "
-        << "precipitation file naming convention (" << pcp_reg_exp
+        << "precipitation file naming convention (" << default_reg_exp
         << ") (optional).\n\n"
 
         << "\t\t\tNote: Set init_time to 00000000_000000 when summing "
