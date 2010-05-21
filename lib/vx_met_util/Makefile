@@ -73,10 +73,10 @@ read_netcdf.o: read_netcdf.cc
 	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
 
 stat_columns.o: stat_columns.cc
-	$(CXX) stat_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+	$(CXX) stat_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
 
 stat_hdr_columns.o: stat_hdr_columns.cc
-	$(CXX) stat_hdr_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+	$(CXX) stat_hdr_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
 
 two_to_one.o: two_to_one.cc
 	$(CXX) two_to_one.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
