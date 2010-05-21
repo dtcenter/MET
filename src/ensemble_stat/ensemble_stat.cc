@@ -213,6 +213,11 @@ void process_command_line(int argc, char **argv) {
    // Allocate arrays to store threshold counts
    na_thresh_count = new NumArray [conf_info.get_max_n_thresh()];
 
+   // Set the random number generator and seed value to be used when
+   // computing bootstrap confidence intervals
+   rng_set(rng_ptr, conf_info.conf.rng_type().sval(),
+           conf_info.conf.rng_seed().sval());
+
    // List the input files
    if(verbosity > 0) {
 
@@ -808,7 +813,7 @@ void process_point_scores() {
                pd_ptr = &conf_info.gc_pd[i].pd[j][k][l];
 
                // Compute the ranks for the observations
-               pd_ptr->compute_rank(n_ens_vld);
+               pd_ptr->compute_rank(n_ens_vld, rng_ptr);
 
                if(verbosity > 1) {
 
@@ -1131,7 +1136,7 @@ void process_grid_scores(WrfData *&fcst_wd, WrfData &obs_wd,
    } // end for i
 
    // Compute the ranks and valid counts
-   if(pd.n_pair > 0) pd.compute_rank(n_ens_vld);
+   if(pd.n_pair > 0) pd.compute_rank(n_ens_vld, rng_ptr);
 
    return;
 }
@@ -2003,6 +2008,9 @@ void clean_up() {
       delete [] na_thresh_count;
       na_thresh_count = (NumArray *) 0;
    }
+
+   // Deallocate memory for the random number generator
+   rng_free(rng_ptr);
 
    return;
 }

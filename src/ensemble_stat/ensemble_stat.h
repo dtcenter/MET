@@ -155,6 +155,9 @@ static int          i_txt_row[n_txt];
 // Grid variables
 static Grid grid;
 
+// Pointer to the random number generator to be used
+static gsl_rng *rng_ptr = (gsl_rng *) 0;
+
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;
 

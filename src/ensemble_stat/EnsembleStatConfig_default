@@ -289,6 +289,20 @@ interp_thresh = 1.0;
 output_flag[] = [ 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
 
 //
+// When computing observation ranks, in the case of ties, randomly choose
+// the rank from all possible values.  Specify the name of the random
+// number generator to be used.  See the MET Users Guide for a list of
+// possible random number generators.
+//
+rng_type = "mt19937";
+
+//
+// If left unspecified, the random number generator seed will change for
+// each run and the assignment of ranks will not be reproducable.
+//
+rng_seed = "";
+
+//
 // Specify the GRIB Table 2 parameter table version number to be used
 // for interpreting GRIB codes.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
