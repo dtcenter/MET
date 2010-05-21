@@ -15,6 +15,7 @@
 #include "vx_data_grids/grid.h"
 #include "vx_wrfdata/vx_wrfdata.h"
 #include "vx_contable/vx_contable.h"
+#include "vx_gsl_prob/vx_gsl_prob.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -211,7 +212,7 @@ class EnsPairData : public PairBase {
       void add_ens(int, double);
       void set_size();
 
-      void compute_rank(int);
+      void compute_rank(int, const gsl_rng *);
       void compute_rhist(int, NumArray &);
 };
 

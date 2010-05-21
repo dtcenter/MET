@@ -23,6 +23,7 @@ using namespace std;
 #include "vx_util/vx_util.h"
 #include "vx_grib_classes/grib_strings.h"
 #include "vx_wrfdata/vx_wrfdata.h"
+#include "vx_gsl_prob/vx_gsl_prob.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1309,14 +1310,15 @@ void EnsPairData::set_size() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsPairData::compute_rank(int n_vld_ens) {
-   int i, j, n_vld, n_bel;
+void EnsPairData::compute_rank(int n_vld_ens, const gsl_rng *rng_ptr) {
+   int i, j, k, n_vld, n_bel, n_tie;
+   NumArray src_na, dest_na;
 
    // Compute the rank for each observation
    for(i=0; i<o_na.n_elements(); i++) {
 
       // Compute the number of ensemble values less than the observation
-      for(j=0, n_vld=0, n_bel=0; j<e_na[i].n_elements(); j++) {
+      for(j=0, n_vld=0, n_bel=0, n_tie=0; j<e_na[i].n_elements(); j++) {
 
          // Skip bad data
          if(!is_bad_data(e_na[i][j])) {
@@ -1324,18 +1326,44 @@ void EnsPairData::compute_rank(int n_vld_ens) {
             // Increment the valid count
             n_vld++;
 
-            // Increment the number of ensembles < observation
-            if(e_na[i][j] < o_na[i]) n_bel++;
+            // Keep track of the number of ties and the number below
+            if(is_eq(e_na[i][j], o_na[i])) n_tie++;
+            else if(e_na[i][j] < o_na[i])  n_bel++;
          }
       } // end for j
 
       // Store the number of valid ensemble values
       v_na.add(n_vld);
 
-      // Store the observation rank only when the number of vaild
+      // Store the observation rank only when the number of valid
       // values matches the number of valid ensembles
-      if(n_vld == n_vld_ens) r_na.add(n_bel+1);
-      else                   r_na.add(bad_data_int);
+      if(n_vld == n_vld_ens) {
+
+         // With no ties, the rank is the number below plus 1
+         if(n_tie == 0) {
+            r_na.add(n_bel+1);
+         }
+         // With ties present, randomly assign the rank in:
+         //    [n_bel+1, n_bel+n_tie+1]
+         else {
+
+            // Initialize
+            dest_na.clear();
+            src_na.clear();
+            for(k=n_bel+1; k<=n_bel+n_tie+1; k++) src_na.add(k);
+
+            // Randomly choose one of the ranks
+            ran_choose(rng_ptr, src_na, dest_na, 1);
+
+            // Store the rank
+            r_na.add(nint(dest_na[0]));
+         }
+
+      }
+      // Can't compute the rank when there is data missing
+      else {
+         r_na.add(bad_data_int);
+      }
 
    } // end for i
 
