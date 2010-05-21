@@ -13,7 +13,7 @@
    //
    //     Created from config file "EnsembleStatConfig_default"
    //
-   //     on May 20, 2010    3:54 pm  MDT
+   //     on May 21, 2010    2:39 pm  MDT
    //
 
 
@@ -165,6 +165,10 @@ _vld_data_thresh_entry = (const SymbolTableEntry *) 0;
   _interp_thresh_entry = (const SymbolTableEntry *) 0;
 
     _output_flag_entry = (const SymbolTableEntry *) 0;
+
+       _rng_type_entry = (const SymbolTableEntry *) 0;
+
+       _rng_seed_entry = (const SymbolTableEntry *) 0;
 
        _grib_ptv_entry = (const SymbolTableEntry *) 0;
 
@@ -431,6 +435,32 @@ if ( !_e && Panic )  {
 }
 
 _output_flag_entry = _e;
+
+
+_e = _m.find("rng_type");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  ensemble_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"rng_type\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_rng_type_entry = _e;
+
+
+_e = _m.find("rng_seed");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  ensemble_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"rng_seed\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_rng_seed_entry = _e;
 
 
 _e = _m.find("grib_ptv");
@@ -1358,6 +1388,56 @@ _n = _a->size(0);
    //
 
 return ( _n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result ensemble_stat_Conf::rng_type()
+
+{
+
+Result _temp_result;
+
+if ( !_rng_type_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_rng_type_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result ensemble_stat_Conf::rng_seed()
+
+{
+
+Result _temp_result;
+
+if ( !_rng_seed_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_rng_seed_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
 
 }
 
