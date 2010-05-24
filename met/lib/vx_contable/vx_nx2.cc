@@ -465,7 +465,7 @@ return ( x );
 
 double Nx2ContingencyTable::baser() const {
 
-   return(event_col_total()/n());
+   return((double) event_col_total()/n());
 }
 
 
