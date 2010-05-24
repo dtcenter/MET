@@ -93,6 +93,7 @@ void STATAnalysisJob::init_from_scratch() {
    line_type.set_ignore_case(1);
    column_min_name.set_ignore_case(1);
    column_max_name.set_ignore_case(1);
+   column_str_name.set_ignore_case(1);
 
    clear();
 
@@ -144,6 +145,9 @@ void STATAnalysisJob::clear() {
 
    column_max_name.clear();
    column_max_value.clear();
+
+   column_str_name.clear();
+   column_str_value.clear();
 
    if(dump_row) { delete [] dump_row; dump_row = (char *)    0; }
    if(column)   { delete [] column;   column   = (char *)    0; }
@@ -224,6 +228,9 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    column_max_name  = aj.column_max_name;
    column_max_value = aj.column_max_value;
+
+   column_str_name  = aj.column_str_name;
+   column_str_value = aj.column_str_value;
 
    out_line_type    = aj.out_line_type;
 
@@ -354,6 +361,12 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "column_max_value ...\n";
    column_max_value.dump(out, depth + 1);
+
+   out << prefix << "column_str_name ...\n";
+   column_str_name.dump(out, depth + 1);
+
+   out << prefix << "column_str_value ...\n";
+   column_str_value.dump(out, depth + 1);
 
    out << prefix << "dump_row = " << prefix
        << dump_row << "\n";
@@ -743,6 +756,27 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       }
    }
 
+   //
+   // column_str
+   //
+   if(column_str_name.n_elements() > 0) {
+
+      n = column_str_name.n_elements();
+
+      for(j=0; j<n; ++j) {
+
+         //
+         // Determine the column offset
+         //
+         c = determine_column_offset(L.type(), column_str_name[j]);
+
+         //
+         // Perform the string comparison
+         //
+         if(strcmp(L.get_item(c), column_str_value[j]) != 0) return(0);
+      }
+   }
+
    return(1);
 }
 
@@ -827,6 +861,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-column_max"    ) == 0) {
          column_max_name.clear();
          column_max_value.clear();
+      }
+      else if(strcmp(jc_array[i], "-column_str"    ) == 0) {
+         column_str_name.clear();
+         column_str_value.clear();
       }
    }
 
@@ -967,6 +1005,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-column_max") == 0) {
          column_max_name.add(jc_array[i+1]);
          column_max_value.add(atof(jc_array[i+2]));
+         i+=2;
+      }
+      else if(strcmp(jc_array[i], "-column_str") == 0) {
+         column_str_name.add(jc_array[i+1]);
+         column_str_value.add(jc_array[i+2]);
          i+=2;
       }
       else if(strcmp(jc_array[i], "-dump_row") == 0) {
@@ -1399,6 +1442,13 @@ void STATAnalysisJob::get_jobstring(char *js) {
       for(i=0; i<column_max_name.n_elements(); i++)
          sprintf(js, "%s -column_max %s %f", js,
                  column_max_name[i], column_max_value[i]);
+   }
+
+   // column_str
+   if(column_str_name.n_elements() > 0) {
+      for(i=0; i<column_str_name.n_elements(); i++)
+         sprintf(js, "%s -column_str %s %s", js,
+                 column_str_name[i], column_str_value[i]);
    }
 
    // dump_row
