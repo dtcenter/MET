@@ -13,7 +13,7 @@
 ###############################################################################
 
 CXX         = /usr/bin/g++
-CXX_FLAGS   = -Wall -static -g
+CXX_FLAGS   = -Wall -Wshadow -static -g
 SVNROOT     = ../../../..
 MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
 
