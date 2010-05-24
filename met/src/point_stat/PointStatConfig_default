@@ -387,8 +387,8 @@ interp_thresh = 1.0;
 //
 //   (10) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
 //           Total (TOTAL),
-//           Base Rate (BASER), BASER_NCL, BASER_NCU,
 //           Number of Forecast Probability Thresholds (N_THRESH),
+//           Base Rate (BASER), BASER_NCL, BASER_NCU,
 //           Reliability (RELIABILITY),
 //           Resolution (RESOLUTION),
 //           Uncertainty (UNCERTAINTY),

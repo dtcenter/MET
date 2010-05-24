@@ -163,8 +163,8 @@ int get_pstd_column_offset(const char *col_name) {
 
    //
    // If not found, search the PSTD columns:
-   //    TOTAL,       BASER,       BASER_NCL,
-   //    BASER_NCU,   N_THRESH,    RELIABILTY,
+   //    TOTAL,       N_THRESH,    BASER,
+   //    BASER_NCL,   BASER_NCU,   RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
    //    [THRESH] (for each threshold)
@@ -1221,7 +1221,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type("PCT");
 
    // Thresholds
-   shc.clear_fcst_thresh();
+   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
    shc.set_obs_thresh(pct_info.pct_obs_thresh);
 
    // Not Applicable
@@ -1260,7 +1260,7 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type("PSTD");
 
    // Thresholds
-   shc.clear_fcst_thresh();
+   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
    shc.set_obs_thresh(pct_info.pct_obs_thresh);
 
    // Not Applicable
@@ -1305,7 +1305,7 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type("PJC");
 
    // Thresholds
-   shc.clear_fcst_thresh();
+   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
    shc.set_obs_thresh(pct_info.pct_obs_thresh);
 
    // Not Applicable
@@ -1343,7 +1343,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type("PRC");
 
    // Thresholds
-   shc.clear_fcst_thresh();
+   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
    shc.set_obs_thresh(pct_info.pct_obs_thresh);
 
    // Not Applicable
@@ -2443,8 +2443,8 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //
    // Nx2 Contingency Table Statistics for Probability Forecast
    // Dump out the PSTD line:
-   //    TOTAL,       BASER,       BASER_NCL,
-   //    BASER_NCU,   N_THRESH,    RELIABILTY,
+   //    TOTAL,       N_THRESH,    BASER,
+   //    BASER_NCL,   BASER_NCU,   RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
    //    [THRESH] (for each threshold)
@@ -2452,17 +2452,17 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    at.set_entry(r, c+0,  // Total count
       pct_info.pct.n());
 
-   at.set_entry(r, c+1,  // BASER
+   at.set_entry(r, c+1,  // N_THRESH
+      pct_info.pct.nrows() + 1);
+
+   at.set_entry(r, c+2,  // BASER
       pct_info.baser.v);
 
-   at.set_entry(r, c+2,  // BASER_NCL
+   at.set_entry(r, c+3,  // BASER_NCL
       pct_info.baser.v_ncl[alpha_i]);
 
-   at.set_entry(r, c+3,  // BASER_NCU
+   at.set_entry(r, c+4,  // BASER_NCU
       pct_info.baser.v_ncu[alpha_i]);
-
-   at.set_entry(r, c+4,  // N_THRESH
-      pct_info.pct.nrows() + 1);
 
    at.set_entry(r, c+5,  // RELIABILITY
       pct_info.pct.reliability());
