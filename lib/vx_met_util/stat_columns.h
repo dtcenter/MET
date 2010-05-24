@@ -134,8 +134,8 @@ static const char * pct_columns [] = {
 };
 
 static const char * pstd_columns [] = {
-   "TOTAL",       "BASER",       "BASER_NCL",
-   "BASER_NCU",   "N_THRESH",    "RELIABILITY",
+   "TOTAL",       "N_THRESH",    "BASER",
+   "BASER_NCL",   "BASER_NCU",   "RELIABILITY",
    "RESOLUTION",  "UNCERTAINTY", "ROC_AUC",
    "BRIER",       "BRIER_NCL",   "BRIER_NCU",
    "THRESH_"

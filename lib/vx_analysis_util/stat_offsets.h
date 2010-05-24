@@ -379,10 +379,10 @@ inline int pct_on_offset(int i)          { return(nhc + 2 + 3*i + 2); }
 // PSTD Line Type offsets
 //
 static const int pstd_total_offset       = nhc + 0;
-static const int pstd_baser_offset       = nhc + 1;
-static const int pstd_baser_ncl_offset   = nhc + 2;
-static const int pstd_baser_ncu_offset   = nhc + 3;
-static const int pstd_n_thresh_offset    = nhc + 4;
+static const int pstd_n_thresh_offset    = nhc + 1;
+static const int pstd_baser_offset       = nhc + 2;
+static const int pstd_baser_ncl_offset   = nhc + 3;
+static const int pstd_baser_ncu_offset   = nhc + 4;
 static const int pstd_reliability_offset = nhc + 5;
 static const int pstd_resolution_offset  = nhc + 6;
 static const int pstd_uncertainty_offset = nhc + 7;
