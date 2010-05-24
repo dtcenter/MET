@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
+//   001    05/24/10  Halley Gotway   Add aggregate RHIST lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -373,6 +374,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
    PCTInfo    pct_info;
    NBRCTSInfo nbrcts_info;
    ISCInfo    isc_info;
+   NumArray   rhist_na;
 
    AsciiTable out_at;
    int i, n_thresh;
@@ -403,12 +405,12 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
       lt != stat_sl1l2 && lt != stat_sal1l2 &&
       lt != stat_vl1l2 && lt != stat_val1l2 &&
       lt != stat_pct   && lt != stat_nbrctc &&
-      lt != stat_isc) {
+      lt != stat_isc   && lt != stat_rhist) {
       cerr << "\n\nERROR: do_job_aggr()-> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
-           << "\tPCT, NBRCTC, ISC\n\n"
+           << "\tPCT, NBRCTC, ISC, RHIST\n\n"
            << flush;
 
       throw(1);
@@ -474,6 +476,13 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
       }
 
       aggr_isc_lines(jobstring, f, j, isc_info, n_in, n_out, verbosity);
+   }
+
+   //
+   // Sum the RHIST line types
+   //
+   else if(lt == stat_rhist) {
+      aggr_rhist_lines(jobstring, f, j, rhist_na, n_in, n_out, verbosity);
    }
 
    //
@@ -668,6 +677,24 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
          for(i=-1; i<=isc_info.n_scale; i++) {
             write_isc_cols(isc_info, i, out_at, i+2, 1);
          }
+
+         break;
+
+      case(stat_rhist):
+
+         //
+         // Get the column names
+         //
+         out_at.set_size(2, get_n_rhist_columns(rhist_na.n_elements())+1);
+         setup_table(out_at);
+         out_at.set_entry(0, 0,  "COL_NAME:");
+         write_rhist_header_row(0, rhist_na.n_elements(), out_at, 0, 1);
+
+         //
+         // Write the PCT row
+         //
+         out_at.set_entry(1, 0,  "RHIST:");
+         write_rhist_cols(rhist_na, out_at, 1, 1);
 
          break;
 

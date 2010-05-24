@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
+//   001    05/24/10  Halley Gotway   Add aggregate_rhist_lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -99,6 +100,11 @@ extern void aggr_mpr_lines_pct(
 extern void aggr_isc_lines(
                const char *, LineDataFile &,
                STATAnalysisJob &, ISCInfo &,
+               int &, int &, int);
+
+extern void aggr_rhist_lines(
+               const char *, LineDataFile &,
+               STATAnalysisJob &, NumArray &,
                int &, int &, int);
 
 ////////////////////////////////////////////////////////////////////////

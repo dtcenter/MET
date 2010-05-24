@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
+//   001    05/24/10  Halley Gotway   Add aggregate_rhist_lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -975,6 +976,75 @@ void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
    if(oen_na  ) { delete [] oen_na;   oen_na   = (NumArray *) 0; }
    if(baser_na) { delete [] baser_na; baser_na = (NumArray *) 0; }
    if(fbias_na) { delete [] fbias_na; fbias_na = (NumArray *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
+                      STATAnalysisJob &j, NumArray &rhist_na,
+                      int &n_in, int &n_out, int verbosity) {
+   STATLine line;
+   RHISTData r_data;
+   int i;
+
+   //
+   // Initialize the NumArray
+   //
+   rhist_na.clear();
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         if(line.type() != stat_rhist) {
+            cerr << "\n\nERROR: aggr_rhist_lines() -> "
+                 << "should only encounter ranked histogram line types!\n\n"
+                 << flush;
+            throw(1);
+         }
+
+         //
+         // Parse the current RHIST line
+         //
+         parse_rhist_line(line, r_data);
+
+         //
+         // Check for N_RANK remaining constant
+         //
+         if(rhist_na.n_elements() > 0 &&
+            rhist_na.n_elements() != r_data.n_rank) {
+            cerr << "\n\nERROR: aggr_rhist_lines() -> "
+                 << "the \"N_RANK\" column must remain constant ("
+                 << rhist_na.n_elements() << "!=" << r_data.n_rank
+                 << ")!\n\n"
+                 << flush;
+            throw(1);
+         }
+
+         //
+         // Aggregate the counts
+         //
+         if(rhist_na.n_elements() == 0) {
+            rhist_na = r_data.rank_na;
+         }
+         else {
+            for(i=0; i<rhist_na.n_elements(); i++) {
+               rhist_na.set(i, rhist_na[i] + r_data.rank_na[i]);
+            }
+         }
+
+         if(j.dr_out) *(j.dr_out) << line;
+
+         n_out++;
+      }
+   } // end while
 
    return;
 }
