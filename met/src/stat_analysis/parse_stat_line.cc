@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
+//   001    05/24/10  Halley Gotway   Add parse_rhist_line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -210,6 +211,7 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
    m_data.obs_gc  = str_to_grib_code(l.get_item(obs_var_offset));
    m_data.total   = atoi(l.get_item(mpr_total_offset));
    m_data.index   = atoi(l.get_item(mpr_index_offset));
+   strcpy(m_data.obs_sid, l.get_item(mpr_obs_sid_offset));
    m_data.obs_lat = atof(l.get_item(mpr_obs_lat_offset));
    m_data.obs_lon = atof(l.get_item(mpr_obs_lon_offset));
    m_data.obs_lvl = atof(l.get_item(mpr_obs_lvl_offset));
@@ -237,6 +239,24 @@ void parse_isc_line(STATLine &l, ISCInfo &i_info, int &iscale) {
    i_info.oen      = atof(l.get_item(isc_oenergy2_offset));
    i_info.baser    = atof(l.get_item(isc_baser_offset));
    i_info.fbias    = atof(l.get_item(isc_fbias_offset));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_rhist_line(STATLine &l, RHISTData &r_data) {
+   int i;
+
+   r_data.total  = atoi(l.get_item(rhist_total_offset));
+   r_data.n_rank = atoi(l.get_item(rhist_n_rank_offset));
+
+   r_data.rank_na.clear();
+
+   // Parse out RANK_i
+   for(i=0; i<r_data.n_rank; i++) {
+      r_data.rank_na.add(atoi(l.get_item(rhist_rank_offset(i))));
+   }
 
    return;
 }
