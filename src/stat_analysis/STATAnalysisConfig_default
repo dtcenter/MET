@@ -265,11 +265,12 @@ line_type[] = [];
 //   Job command FILTERING options used when the -line_type has been set to a
 //   single value.  These options take two arguments, the name of the data
 //   column to be used and the min or max value for that column.  If multiple
-//   column min/max options are listed, the job will be performed on their
+//   column min/max/str options are listed, the job will be performed on their
 //   intersection:
 //
 //       "-column_min col_name value"
 //       "-column_max col_name value"
+//       "-column_str col_name string"
 //
 //   Job command options to DEFINE the analysis job.  Unless otherwise noted,
 //   these options may only be used ONCE per analysis job:

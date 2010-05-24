@@ -73,7 +73,7 @@ static const int sal1l2_ffabar_offset    = nhc + 4;
 static const int sal1l2_ooabar_offset    = nhc + 5;
 
 //
-// VVDB VL1L2 Line Type offsets
+// VL1L2 Line Type offsets
 //
 static const int vl1l2_total_offset      = nhc + 0;
 static const int vl1l2_ufbar_offset      = nhc + 1;
@@ -85,7 +85,7 @@ static const int vl1l2_uvffbar_offset    = nhc + 6;
 static const int vl1l2_uvoobar_offset    = nhc + 7;
 
 //
-// VVDB VAL1L2 Line Type offsets
+// VAL1L2 Line Type offsets
 //
 static const int val1l2_total_offset     = nhc + 0;
 static const int val1l2_ufabar_offset    = nhc + 1;
@@ -338,7 +338,6 @@ static const int nbrcts_odds_ncl_offset  = nhc + 56;
 static const int nbrcts_odds_ncu_offset  = nhc + 57;
 static const int nbrcts_odds_bcl_offset  = nhc + 58;
 static const int nbrcts_odds_bcu_offset  = nhc + 59;
-
 
 //
 // NBRCNT Line Type offsets

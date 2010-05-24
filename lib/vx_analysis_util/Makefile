@@ -74,10 +74,10 @@ time_series.o: time_series.cc
 	$(CXX) time_series.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
 stat_job.o: stat_job.cc
-	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
 
 stat_line.o: stat_line.cc
-	$(CXX) stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+	$(CXX) stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)

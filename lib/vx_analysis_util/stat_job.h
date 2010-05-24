@@ -166,6 +166,9 @@ class STATAnalysisJob {
       StringArray column_max_name;
       NumArray    column_max_value;
 
+      StringArray column_str_name;
+      StringArray column_str_value;
+
       //
       // Variables used to the store the analysis job specification
       //
