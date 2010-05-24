@@ -446,8 +446,8 @@ int get_rhist_column_offset(const char *col_name) {
    if(!found) {
 
       // RANK_i
-      if(strncasecmp(rhist_columns[3], col_name,
-                     strlen(rhist_columns[3])) == 0) {
+      if(strncasecmp(rhist_columns[2], col_name,
+                     strlen(rhist_columns[2])) == 0) {
          found  = 1;
          i      = parse_thresh_index(col_name);
          offset = n_header_columns + 2 + (i-1);

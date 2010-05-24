@@ -1107,11 +1107,11 @@ switch(type) {
       break;
 
    case stat_rhist:
-      offset = get_column_offset(rhist_columns, n_rhist_columns, c);
+      offset = get_rhist_column_offset(c);
       break;
 
    case stat_orank:
-      offset = get_column_offset(orank_columns, n_orank_columns, c);
+      offset = get_orank_column_offset(c);
       break;
 
    default:
