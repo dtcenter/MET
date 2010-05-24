@@ -50,6 +50,10 @@
 //   014    04/21/09  Halley Gotway  Fix bug for resetting obs_var.
 //   015    05/07/10  Halley Gotway  Rename process_grid() to
 //                    setup_first_pass() and modify its logic.
+//   016    05/24/10  Halley Gotway  Rename command line options:
+//                    From -ncfile to -point_obs
+//                    From -valid_beg to -obs_valid_beg
+//                    From -valid_end to -obs_valid_end
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -164,7 +168,8 @@ void process_command_line(int argc, char **argv) {
    // Parse command line arguments
    for(i=0; i<argc; i++) {
 
-      if(strcmp(argv[i], "-ncfile") == 0) {
+      if(strcmp(argv[i], "-point_obs") == 0 ||
+         strcmp(argv[i], "-ncfile")    == 0) {
          obs_file.add(argv[i+1]);
          i++;
       }
@@ -173,11 +178,13 @@ void process_command_line(int argc, char **argv) {
          climo_flag = 1;
          i++;
       }
-      else if(strcmp(argv[i], "-valid_beg") == 0) {
+      else if(strcmp(argv[i], "-obs_valid_beg") == 0 ||
+              strcmp(argv[i], "-valid_beg")     == 0) {
          valid_beg_ut = timestring_to_unix(argv[i+1]);
          i++;
       }
-      else if(strcmp(argv[i], "-valid_end") == 0) {
+      else if(strcmp(argv[i], "-obs_valid_end") == 0 ||
+              strcmp(argv[i], "-valid_end")     == 0) {
          valid_end_ut = timestring_to_unix(argv[i+1]);
          i++;
       }
@@ -1785,9 +1792,9 @@ void usage(int argc, char *argv[]) {
         << "\tobs_file\n"
         << "\tconfig_file\n"
         << "\t[-climo climo_file]\n"
-        << "\t[-ncfile netcdf_file]\n"
-        << "\t[-valid_beg time]\n"
-        << "\t[-valid_end time]\n"
+        << "\t[-point_obs file]\n"
+        << "\t[-obs_valid_beg time]\n"
+        << "\t[-obs_valid_end time]\n"
         << "\t[-outdir path]\n"
         << "\t[-v level]\n\n"
 
@@ -1809,14 +1816,13 @@ void usage(int argc, char *argv[]) {
         << "measures.  If not provided, scalar and vector "
         << "anomaly values will not be computed (optional).\n"
 
-        << "\t\t\"-ncfile netcdf_file\" may be used to specify "
-        << "additional NetCDF point observation files to be used "
-        << "(optional).\n"
+        << "\t\t\"-point_obs file\" specifies additional NetCDF point "
+        << "observation files to be used (optional).\n"
 
-        << "\t\t\"-valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "beginning of the matching time window (optional).\n"
 
-        << "\t\t\"-valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "\t\t\"-obs_valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "end of the matching time window (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output "
