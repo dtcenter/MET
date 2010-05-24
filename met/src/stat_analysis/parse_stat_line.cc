@@ -15,7 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
-//   001    05/24/10  Halley Gotway   Add parse_rhist_line.
+//   001    05/24/10  Halley Gotway   Add parse_rhist_line and
+//                    parse_orank_line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -256,6 +257,32 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    // Parse out RANK_i
    for(i=0; i<r_data.n_rank; i++) {
       r_data.rank_na.add(atoi(l.get_item(rhist_rank_offset(i))));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_orank_line(STATLine &l, ORANKData &o_data) {
+   int i;
+
+   o_data.total     = atoi(l.get_item(orank_total_offset));
+   o_data.index     = atoi(l.get_item(orank_index_offset));
+   strcpy(o_data.obs_sid, l.get_item(orank_obs_sid_offset));
+   o_data.obs_lat   = atof(l.get_item(orank_obs_lat_offset));
+   o_data.obs_lon   = atof(l.get_item(orank_obs_lon_offset));
+   o_data.obs_lvl   = atof(l.get_item(orank_obs_lvl_offset));
+   o_data.obs_elv   = atof(l.get_item(orank_obs_elv_offset));
+   o_data.obs       = atof(l.get_item(orank_obs_offset));
+
+   o_data.rank      = atoi(l.get_item(orank_rank_offset));
+   o_data.n_ens_vld = atoi(l.get_item(orank_n_ens_vld_offset));
+   o_data.n_ens     = atoi(l.get_item(orank_n_ens_offset));
+
+   // Parse out ENS_i
+   for(i=0; i<o_data.n_ens; i++) {
+      o_data.ens_na.add(atof(l.get_item(orank_ens_offset(i))));
    }
 
    return;

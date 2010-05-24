@@ -15,7 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
-//   001    05/24/10  Halley Gotway   Add aggregate RHIST lines.
+//   001    05/24/10  Halley Gotway   Add aggregate RHIST lines and
+//                    aggregate_stat ORANK to RHIST.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -691,7 +692,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
          write_rhist_header_row(0, rhist_na.n_elements(), out_at, 0, 1);
 
          //
-         // Write the PCT row
+         // Write the RHIST row
          //
          out_at.set_entry(1, 0,  "RHIST:");
          write_rhist_cols(rhist_na, out_at, 1, 1);
@@ -740,6 +741,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    ISCInfo    isc_info;
    NumArray   f_na, o_na, c_na;
    NumArray   uf_na, vf_na, uo_na, vo_na;
+   NumArray   rhist_na;
 
    int fcst_gc, obs_gc;
    AsciiTable out_at;
@@ -775,6 +777,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    //    -line_type MPR,           -out_line_type FHO, CTC, CTS, CNT,
    //                                             SL1L2, SAL1L2,
    //                                             PCT, PSTD, PJC, PRC
+   //    -line_type ORANK,         -out_line_type RHIST
    //
    if     ( (in_lt  == stat_fho   || in_lt  == stat_ctc) &&
             (out_lt == stat_cts)
@@ -799,6 +802,9 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
              out_lt == stat_pct   || out_lt == stat_pstd   ||
              out_lt == stat_pjc   || out_lt == stat_prc)
           )  i = 1;
+   else if( (in_lt  == stat_orank) &&
+            (out_lt == stat_rhist)
+          ) i = 1;
    else {
 
       cerr << "\n\nERROR: do_job_aggr_stat()-> "
@@ -991,6 +997,14 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    }
 
    //
+   // Compute a ranked histogram from the observation ranks lines.
+   //
+   else if(in_lt == stat_orank) {
+      aggr_orank_lines(jobstring, f, j, rhist_na,
+                       n_in, n_out, verbosity);
+   }
+
+   //
    // Check for no matching STAT lines
    //
    if(n_out == 0) {
@@ -1025,6 +1039,22 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    else if(in_lt == stat_mpr) {
       write_job_mpr(j, in_lt, cts_info, cnt_info,
                     sl1l2_info, pct_info, out_at);
+   }
+   else if(in_lt == stat_orank) {
+
+      //
+      // Get the column names
+      //
+      out_at.set_size(2, get_n_rhist_columns(rhist_na.n_elements())+1);
+      setup_table(out_at);
+      out_at.set_entry(0, 0,  "COL_NAME:");
+      write_rhist_header_row(0, rhist_na.n_elements(), out_at, 0, 1);
+
+      //
+      // Write the RHIST row
+      //
+      out_at.set_entry(1, 0,  "RHIST:");
+      write_rhist_cols(rhist_na, out_at, 1, 1);
    }
 
    //
