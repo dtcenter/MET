@@ -15,7 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
-//   001    05/24/10  Halley Gotway   Add parse_rhist_line.
+//   001    05/24/10  Halley Gotway   Add parse_rhist_line and
+//                    parse_orank_line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,17 +46,26 @@ using namespace std;
 
 // Matched Pair (MPR) data structure
 struct MPRData {
-   int    fcst_gc, obs_gc;
-   int    total,   index;
+   int fcst_gc, obs_gc;
+   int total, index;
    char obs_sid[max_str_len];
    double obs_lat, obs_lon, obs_lvl, obs_elv;
-   double fcst,    obs,     climo;
+   double fcst, obs, climo;
 };
 
 // Ranked Histogram (RHIST) data structure
 struct RHISTData {
    int total, n_rank;
    NumArray rank_na;
+};
+
+// Observation Rank (ORANK) data structure
+struct ORANKData {
+   int total, index;
+   char obs_sid[max_str_len];
+   double obs_lat, obs_lon, obs_lvl, obs_elv, obs;
+   int rank, n_ens_vld, n_ens;
+   NumArray ens_na;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,6 +83,7 @@ extern void parse_val1l2_line  (STATLine &, VL1L2Info &);
 extern void parse_mpr_line     (STATLine &, MPRData &);
 extern void parse_isc_line     (STATLine &, ISCInfo &, int &);
 extern void parse_rhist_line   (STATLine &, RHISTData &);
+extern void parse_orank_line   (STATLine &, ORANKData &);
 
 ////////////////////////////////////////////////////////////////////////
 

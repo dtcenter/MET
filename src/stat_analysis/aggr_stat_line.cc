@@ -15,7 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
-//   001    05/24/10  Halley Gotway   Add aggregate_rhist_lines.
+//   001    05/24/10  Halley Gotway   Add aggr_rhist_lines and
+//                    aggr_orank_lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1005,7 +1006,7 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
 
          if(line.type() != stat_rhist) {
             cerr << "\n\nERROR: aggr_rhist_lines() -> "
-                 << "should only encounter ranked histogram line types!\n\n"
+                 << "should only encounter ranked histogram (RHIST) line types!\n\n"
                  << flush;
             throw(1);
          }
@@ -1022,8 +1023,8 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
             rhist_na.n_elements() != r_data.n_rank) {
             cerr << "\n\nERROR: aggr_rhist_lines() -> "
                  << "the \"N_RANK\" column must remain constant ("
-                 << rhist_na.n_elements() << "!=" << r_data.n_rank
-                 << ")!\n\n"
+                 << rhist_na.n_elements() << " != " << r_data.n_rank
+                 << ").  Try setting -column_min N_RANK n -column_max N_RANK n.\n\n"
                  << flush;
             throw(1);
          }
@@ -1039,6 +1040,80 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
                rhist_na.set(i, rhist_na[i] + r_data.rank_na[i]);
             }
          }
+
+         if(j.dr_out) *(j.dr_out) << line;
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_orank_lines(const char *jobstring, LineDataFile &f,
+                      STATAnalysisJob &j, NumArray &rhist_na,
+                      int &n_in, int &n_out, int verbosity) {
+   STATLine line;
+   ORANKData o_data;
+   int i;
+
+   //
+   // Initialize the NumArray
+   //
+   rhist_na.clear();
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         if(line.type() != stat_orank) {
+            cerr << "\n\nERROR: aggr_orank_lines() -> "
+                 << "should only encounter observation rank (ORANK) line types!\n\n"
+                 << flush;
+            throw(1);
+         }
+
+         //
+         // Parse the current RHIST line
+         //
+         parse_orank_line(line, o_data);
+
+         //
+         // Skip missing data
+         //
+         if(is_bad_data(o_data.rank)) continue;
+
+         //
+         // Check for N_ENS remaining constant
+         //
+         if(rhist_na.n_elements() > 0 &&
+            rhist_na.n_elements() != o_data.n_ens+1) {
+            cerr << "\n\nERROR: aggr_rhist_lines() -> "
+                 << "the \"N_ENS\" column must remain constant.  "
+                 << "Try setting -column_min N_ENS n -column_max N_ENS n.\n\n"
+                 << flush;
+            throw(1);
+         }
+
+         //
+         // Initialize the counts
+         //
+         if(rhist_na.n_elements() == 0) {
+            for(i=0; i<o_data.n_ens+1; i++) rhist_na.add(0);
+         }
+
+         //
+         // Aggregate the ranks
+         //
+         i = o_data.rank - 1;
+         rhist_na.set(i, rhist_na[i] + 1);
 
          if(j.dr_out) *(j.dr_out) << line;
 
