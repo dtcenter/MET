@@ -64,8 +64,8 @@ static void process_grid_scores   (WrfData *&, WrfData &, WrfData &,
                                    EnsPairData &);
 
 static void parse_ens_file_list(const char *);
-static int  read_field(const char *, const GCInfo &, WrfData &, int);
-static int  read_ens_field(const char *, const GCInfo &, WrfData &, int);
+static int  read_field(const char *, const GCInfo &, WrfData &);
+static int  read_ens_field(const char *, const GCInfo &, WrfData &);
 static void clear_counts(const WrfData &, int);
 static void track_counts(const WrfData &, int);
 
@@ -301,8 +301,7 @@ void process_ensemble() {
          // If the current forecast file is valid, read the field
          if(ens_file_vld[j]) {
             miss_flag = read_ens_field(ens_file_list[j],
-                                       conf_info.ens_gci[i],
-                                       ens_wd, verbosity);
+                                       conf_info.ens_gci[i], ens_wd);
 
             // Track the missing and valid counts
             if(miss_flag) n_miss++;
@@ -715,7 +714,7 @@ int process_point_ens(int i_ens) {
 
          // Read the current field from the current forecast file
          miss_flag = read_field(ens_file_list[i_ens], gc_info,
-                                fcst_wd[j], verbosity);
+                                fcst_wd[j]);
 
          // If a field is missing, return with bad status
          if(miss_flag > 0) return(1);
@@ -926,7 +925,7 @@ void process_grid_vx() {
          if(ens_file_vld[j]) {
             n_miss += read_field(ens_file_list[j],
                                  conf_info.gc_pd[i].fcst_gci,
-                                 fcst_wd[j], verbosity);
+                                 fcst_wd[j]);
          }
          else {
             n_miss++;
@@ -954,7 +953,7 @@ void process_grid_vx() {
          // Attempt to read the field from the current observation file
          miss_flag = read_field(grid_obs_file_list[j],
                                 conf_info.gc_pd[i].obs_gci,
-                                obs_wd, verbosity);
+                                obs_wd);
 
          // If found, break out of the loop
          if(!miss_flag) break;
@@ -1170,8 +1169,7 @@ void parse_ens_file_list(const char *fcst_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int read_field(const char *file_name, const GCInfo &gci,
-               WrfData &wd, int verbosity) {
+int read_field(const char *file_name, const GCInfo &gci, WrfData &wd) {
    FileType ftype = NoFileType;
    GribFile gb_file;
    NcFile  *nc_file = (NcFile *) 0;
@@ -1282,11 +1280,11 @@ int read_field(const char *file_name, const GCInfo &gci,
 ////////////////////////////////////////////////////////////////////////
 
 int read_ens_field(const char *file_name, const GCInfo &gci,
-                    WrfData &wd, int verbosity) {
+                   WrfData &wd) {
    int miss_flag;
 
    // Read the forecast field
-   miss_flag = read_field(file_name, gci, wd, verbosity);
+   miss_flag = read_field(file_name, gci, wd);
 
    // Store the lead time
    ens_lead_na.add(wd.get_lead_time());
