@@ -265,11 +265,12 @@ line_type[] = [];
 //   Job command FILTERING options used when the -line_type has been set to a
 //   single value.  These options take two arguments, the name of the data
 //   column to be used and the min or max value for that column.  If multiple
-//   column min/max options are listed, the job will be performed on their
+//   column min/max/str options are listed, the job will be performed on their
 //   intersection:
 //
 //       "-column_min col_name value"
 //       "-column_max col_name value"
+//       "-column_str col_name string"
 //
 //   Job command options to DEFINE the analysis job.  Unless otherwise noted,
 //   these options may only be used ONCE per analysis job:
@@ -295,15 +296,17 @@ line_type[] = [];
 //       "-tmp_dir         path"
 //
 jobs[] = [
-   "-job filter         -line_type SL1L2                                           -vx_mask DTC165                                     -dump_row ../out/stat_analysis/job_filter_SL1L2.stat",
-   "-job summary        -line_type CNT   -alpha 0.050                                                                -fcst_var TMP     -dump_row ../out/stat_analysis/job_summary_ME.stat -column ME",
-   "-job aggregate      -line_type SL1L2                                           -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_SL1L2.stat",
-   "-job aggregate_stat -line_type SL1L2 -out_line_type CNT                        -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_stat_SL1L2_CNT.stat",
-   "-job aggregate      -line_type FHO                       -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_FHO.stat",
-   "-job aggregate_stat -line_type FHO   -out_line_type CTS  -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_stat_FHO_CTS.stat",
-   "-job aggregate      -line_type PCT                                             -vx_mask DTC165   -vx_mask DTC166                   -dump_row ../out/stat_analysis/job_aggregate_PCT.stat",
-   "-job aggregate_stat -line_type PCT   -out_line_type PSTD                       -vx_mask DTC165   -vx_mask DTC166                   -dump_row ../out/stat_analysis/job_aggregate_stat_PCT_PSTD.stat",
-   "-job aggregate      -line_type ISC                       -fcst_thresh >0.000   -vx_mask TILE_TOT                 -fcst_var APCP_12 -dump_row ../out/stat_analysis/job_aggregate_ISC.stat"
+   "-job filter         -line_type SL1L2                                            -vx_mask DTC165                                     -dump_row ../out/stat_analysis/job_filter_SL1L2.stat",
+   "-job summary        -line_type CNT   -alpha 0.050                                                                 -fcst_var TMP     -dump_row ../out/stat_analysis/job_summary_ME.stat -column ME",
+   "-job aggregate      -line_type SL1L2                                            -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_SL1L2.stat",
+   "-job aggregate_stat -line_type SL1L2 -out_line_type CNT                         -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_stat_SL1L2_CNT.stat",
+   "-job aggregate      -line_type FHO                        -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_FHO.stat",
+   "-job aggregate_stat -line_type FHO   -out_line_type CTS   -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_stat_FHO_CTS.stat",
+   "-job aggregate      -line_type PCT                                              -vx_mask DTC165   -vx_mask DTC166                   -dump_row ../out/stat_analysis/job_aggregate_PCT.stat",
+   "-job aggregate_stat -line_type PCT   -out_line_type PSTD                        -vx_mask DTC165   -vx_mask DTC166                   -dump_row ../out/stat_analysis/job_aggregate_stat_PCT_PSTD.stat",
+   "-job aggregate      -line_type ISC                        -fcst_thresh >0.000   -vx_mask TILE_TOT                 -fcst_var APCP_12 -dump_row ../out/stat_analysis/job_aggregate_ISC.stat",
+   "-job aggregate      -line_type RHIST                      -obtype MC_PCP        -vx_mask HUC4_1605 -vx_mask HUC4_1803 -vx_mask HUC4_1804 -vx_mask HUC4_1805 -vx_mask HUC4_1806 -dump_row ../out/stat_analysis/job_aggregate_RHIST.stat",
+   "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC        -vx_mask HUC4_1605 -vx_mask HUC4_1803 -vx_mask HUC4_1804 -vx_mask HUC4_1805 -vx_mask HUC4_1806 -dump_row ../out/stat_analysis/job_aggregate_stat_ORANK_RHIST.stat"
 ];
 
 //
