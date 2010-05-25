@@ -168,6 +168,8 @@ class AsciiTable {
 
       bool   DeleteTrailingBlankRows;
 
+      bool   ElimTrailingWhitespace;   //  default: true
+
    public:
 
       AsciiTable();
@@ -222,6 +224,8 @@ class AsciiTable {
       virtual void set_comma_string               (bool);
 
       virtual void set_delete_trailing_blank_rows (bool);
+
+      virtual void set_elim_trailing_whitespace   (bool);
 
 
          //
@@ -289,6 +293,8 @@ class AsciiTable {
 
       virtual bool delete_trailing_blank_rows() const;
 
+      virtual bool elim_trailing_whitespace() const;
+
 };
 
 
@@ -316,6 +322,8 @@ inline const char * AsciiTable::float_format() const { return ( FloatFormat ); }
 inline bool AsciiTable::comma_string() const { return ( DoCommaString ); }
 
 inline bool AsciiTable::delete_trailing_blank_rows() const { return ( DeleteTrailingBlankRows ); }
+
+inline bool AsciiTable::elim_trailing_whitespace() const { return ( ElimTrailingWhitespace ); }
 
 
 ////////////////////////////////////////////////////////////////////////

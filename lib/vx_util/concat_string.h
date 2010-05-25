@@ -122,6 +122,8 @@ class ConcatString {
 
       void set_repeat(char, int count);
 
+      void elim_trailing_whitespace();
+
 };
 
 
