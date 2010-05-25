@@ -440,6 +440,38 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ConcatString::elim_trailing_whitespace()
+
+{
+
+if ( !s || (Length == 0) )  return;
+
+
+int j = Length - 1;
+
+
+while ( j>=0 )  {
+
+   if ( !(isspace(s[j])) )  break;
+
+   s[j] = (char) 0;
+
+   --Length;  --j;
+
+}   //  for j
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool ConcatString::startswith(const char * Text) const
 
 {

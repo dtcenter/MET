@@ -179,6 +179,8 @@ DoCommaString = false;
 
 DeleteTrailingBlankRows = false;
 
+ElimTrailingWhitespace = true;
+
 return;
 
 }
@@ -263,6 +265,8 @@ memcpy(FloatFormat, a.FloatFormat, sizeof(FloatFormat));
 DoCommaString = a.DoCommaString;
 
 DeleteTrailingBlankRows = a.DeleteTrailingBlankRows;
+
+ElimTrailingWhitespace = a.ElimTrailingWhitespace;
 
 
 for (r=0; r<Nrows; ++r)  {
@@ -652,6 +656,20 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void AsciiTable::set_elim_trailing_whitespace(bool tf)
+
+{
+
+ElimTrailingWhitespace = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void AsciiTable::set_table_just(const AsciiTableJust just)
 
 {
@@ -1019,6 +1037,9 @@ for (c=0; c<Ncols; ++c)  {
    s << padded_entry(r, c);
 
 }   //  for c
+
+
+if ( ElimTrailingWhitespace )  s.elim_trailing_whitespace();
 
 
 return ( s );
