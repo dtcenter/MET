@@ -164,7 +164,7 @@ boot_rep_prop = 1.0;
 //
 // e.g. n_boot_rep = 1000;
 //
-n_boot_rep = 1000;
+n_boot_rep = 0;
 
 //
 // Specify the name of the random number generator to be used.  See the MET
@@ -440,7 +440,7 @@ output_flag[] = [ 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 1 ];
 //    (0) Do not compute these correlation coefficients
 //    (1) Compute these correlation coefficients
 //
-rank_corr_flag = 1;
+rank_corr_flag = 0;
 
 //
 // Specify the GRIB Table 2 parameter table version number to be used
