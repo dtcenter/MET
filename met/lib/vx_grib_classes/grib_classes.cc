@@ -58,12 +58,12 @@ GribRecord::GribRecord()
 {
 
 is  = new Section0_Header;
-pds = new Section1_Header;
+pds = (unsigned char *) 0;
 gds = new Section2_Header;
 bms = new Section3_Header;
 bds = new Section4_Header;
 
-if ( !is || !pds || !gds || !bms || !bds )  {
+if ( !is || !gds || !bms || !bds )  {
 
    cerr << "\n\n  GribRecord::GribRecord() -> memory allocation error\n\n";
 
@@ -73,12 +73,11 @@ if ( !is || !pds || !gds || !bms || !bds )  {
 }
 
 memset(is,  0, sizeof(Section0_Header));
-memset(pds, 0, sizeof(Section1_Header));
 memset(gds, 0, sizeof(Section2_Header));
 memset(bms, 0, sizeof(Section3_Header));
 memset(bds, 0, sizeof(Section4_Header));
 
-gds_flag = bms_flag = 0;
+pds_len = gds_flag = bms_flag = 0;
 
 m_value = 0.0;
 b_value = 0.0;
@@ -130,7 +129,7 @@ GribRecord::~GribRecord()
 {
 
 if (  is )  { delete  is;    is = (Section0_Header *) 0; }
-if ( pds )  { delete pds;   pds = (Section1_Header *) 0; }
+if ( pds )  { delete pds;   pds = (unsigned char *)   0; }
 if ( gds )  { delete gds;   gds = (Section2_Header *) 0; }
 if ( bms )  { delete bms;   bms = (Section3_Header *) 0; }
 if ( bds )  { delete bds;   bds = (Section4_Header *) 0; }
@@ -150,7 +149,7 @@ GribRecord::GribRecord(const GribRecord &g)
 {
 
 is  = new Section0_Header;
-pds = new Section1_Header;
+pds = new unsigned char [g.pds_len];
 gds = new Section2_Header;
 bms = new Section3_Header;
 bds = new Section4_Header;
@@ -165,11 +164,12 @@ if ( !is || !pds || !gds || !bms || !bds )  {
 }
 
 memcpy(is,  g.is,  sizeof(Section0_Header));
-memcpy(pds, g.pds, sizeof(Section1_Header));
+memcpy(pds, g.pds, sizeof(unsigned char)*g.pds_len);
 memcpy(gds, g.gds, sizeof(Section2_Header));
 memcpy(bms, g.bms, sizeof(Section3_Header));
 memcpy(bds, g.bds, sizeof(Section4_Header));
 
+pds_len             = g.pds_len;
 gds_flag            = g.gds_flag;
 bms_flag            = g.bms_flag;
 m_value             = g.m_value;
@@ -236,12 +236,15 @@ GribRecord & GribRecord::operator=(const GribRecord &g)
 
 if ( this == &g )  return ( *this );   //  check for a = a
 
+pds = new unsigned char [g.pds_len];
+
 memcpy(is,  g.is,  sizeof(Section0_Header));
-memcpy(pds, g.pds, sizeof(Section1_Header));
+memcpy(pds, g.pds, sizeof(unsigned char)*g.pds_len);
 memcpy(gds, g.gds, sizeof(Section2_Header));
 memcpy(bms, g.bms, sizeof(Section3_Header));
 memcpy(bds, g.bds, sizeof(Section4_Header));
 
+pds_len             = g.pds_len;
 gds_flag            = g.gds_flag;
 bms_flag            = g.bms_flag;
 m_value             = g.m_value;
@@ -468,7 +471,7 @@ void GribRecord::reset()
 {
 
 if ( is )   memset(is,  0, sizeof(Section0_Header));
-if ( pds )  memset(pds, 0, sizeof(Section1_Header));
+if ( pds )  memset(pds, 0, sizeof(unsigned char)*pds_len);
 if ( gds )  memset(gds, 0, sizeof(Section2_Header));
 if ( bms )  memset(bms, 0, sizeof(Section3_Header));
 if ( bds )  memset(bds, 0, sizeof(Section4_Header));
@@ -477,7 +480,7 @@ if ( data ) memset(data, 0, data_alloc);
 
 if ( bitmap ) memset(bitmap, 0, bitmap_alloc);
 
-gds_flag = bms_flag = d_value = e_value = issue = lead = word_size = data_size = 0;
+pds_len = gds_flag = bms_flag = d_value = e_value = issue = lead = word_size = data_size = 0;
 
 m_value = b_value = r_value = 0.0;
 
@@ -552,8 +555,9 @@ int GribRecord::gribcode() const
 {
 
 int j;
+Section1_Header *pds_ptr = (Section1_Header *) pds;
 
-j = (int) (pds->grib_code);
+j = (int) (pds_ptr->grib_code);
 
 return ( j );
 
@@ -849,16 +853,15 @@ int GribFile::read_record(GribRecord &g)
 
 {
 
-int j, s, bytes, n_read;
+int j, s, bytes, n_read, len;
 int m, d, y, hh, mm;
 int D, E;
 int file_pos;
 int bytes_processed;
-unsigned char *c;
+unsigned char *c, c3[3];
 double t;
 float r[4];
 uint4 ibm;
-
 
 g.reset();
 
@@ -943,40 +946,52 @@ bytes_processed += 8;
 g.Sec1_offset_in_file   = file_pos + bytes_processed;
 g.Sec1_offset_in_record = bytes_processed;
 
-memcpy(g.pds, rep->buf + bytes_processed, sizeof(Section1_Header));
+   //
+   //  Extract the PDS length
+   //
+c3[0] = *(rep->buf + bytes_processed);
+c3[1] = *(rep->buf + bytes_processed + 1);
+c3[2] = *(rep->buf + bytes_processed + 2);
+len = char3_to_int(c3);
+
+g.pds = new unsigned char [len];
+
+memcpy(g.pds, rep->buf + bytes_processed, sizeof(unsigned char)*len);
+
+Section1_Header *pds_ptr = (Section1_Header *) g.pds;
 
 c = (unsigned char *) (&D);
 D = 0;
 
 if(native_endian == big_endian) {
-   c[2] = g.pds->d_value[0] & 127;
-   c[3] = g.pds->d_value[1];
+   c[2] = pds_ptr->d_value[0] & 127;
+   c[3] = pds_ptr->d_value[1];
 } else {
-   c[0] = g.pds->d_value[1];
-   c[1] = g.pds->d_value[0] & 127;
+   c[0] = pds_ptr->d_value[1];
+   c[1] = pds_ptr->d_value[0] & 127;
 }
 
-if ( g.pds->d_value[0] & 128 )  D = -D;
+if ( pds_ptr->d_value[0] & 128 )  D = -D;
 g.d_value = D;
 
-m  = g.pds->month;
-d  = g.pds->day;
-y  = 100*(g.pds->century - 1) + (g.pds->year);
-hh = g.pds->hour;
-mm = g.pds->minute;
+m  = pds_ptr->month;
+d  = pds_ptr->day;
+y  = 100*(pds_ptr->century - 1) + (pds_ptr->year);
+hh = pds_ptr->hour;
+mm = pds_ptr->minute;
 
 g.issue = mdyhms_to_unix(m, d, y, hh, mm, 0);
 
-g.lead = calc_lead_time(g.pds);
+g.lead = calc_lead_time(pds_ptr);
 
-bytes_processed += char3_to_int(g.pds->length);
+bytes_processed += char3_to_int(pds_ptr->length);
 
    //
    //  Process section 2
    //
 
 
-if ( (g.pds->flag) & 128 )  {
+if ( (pds_ptr->flag) & 128 )  {
 
    g.Sec2_offset_in_file   = file_pos + bytes_processed;
    g.Sec2_offset_in_record = bytes_processed;
@@ -1003,7 +1018,7 @@ if ( (g.pds->flag) & 128 )  {
    //  Process section 3
    //
 
-if ( g.pds->flag & 64 )  {
+if ( pds_ptr->flag & 64 )  {
 
    g.Sec3_offset_in_file   = file_pos + bytes_processed;
    g.Sec3_offset_in_record = bytes_processed;
@@ -1211,7 +1226,7 @@ void GribFile::index_records()
 {
 
 GribRecord g;
-
+Section1_Header *pds_ptr;
 
 rep->record_extend(1);
 
@@ -1221,7 +1236,9 @@ while ( read_record(g) )  {
 
    rep->record_info[rep->n_records].lseek_offset = g.record_lseek_offset;
 
-   rep->record_info[rep->n_records].gribcode = g.pds->grib_code;
+   pds_ptr = (Section1_Header *) g.pds;
+
+   rep->record_info[rep->n_records].gribcode = pds_ptr->grib_code;
 
    ++rep->n_records;
 
@@ -1497,6 +1514,44 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double char4_to_dbl(const unsigned char *c)
+
+{
+   int positive, power;
+   unsigned int abspower;
+   long int mant;
+   double value, exp;
+
+   mant = (c[1] << 16) + (c[2] << 8) + c[3];
+   if (mant == 0) return 0.0;
+
+   positive = (c[0] & 0x80) == 0;
+   power = (int) (c[0] & 0x7f) - 64;
+   abspower = power > 0 ? power : -power;
+
+
+   /* calc exp */
+   exp = 16.0;
+   value = 1.0;
+   while (abspower) {
+      if (abspower & 1) {
+         value *= exp;
+      }
+      exp = exp * exp;
+      abspower >>= 1;
+   }
+
+   if (power < 0) value = 1.0 / value;
+   value = value * mant / 16777216.0;
+   if (positive == 0) value = -value;
+
+   return(value);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int char3_to_int(const unsigned char *c)
 
 {
@@ -1594,6 +1649,7 @@ file << separator << "\n\n";
 
 file << "Grib Record:\n\n";
 
+file << "    pds_len:            " << g.pds_len  << "\n";
 file << "   gds_flag:            " << g.gds_flag << "\n";
 file << "   bms_flag:            " << g.bms_flag << "\n";
 

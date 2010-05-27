@@ -953,6 +953,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    char time_str[max_str_len];
    char hostname_str[max_str_len];
    char accum1_str[max_str_len], accum2_str[max_str_len];
+   Section1_Header *pds_ptr;
 
    NcFile *f_out   = (NcFile *) 0;
    NcDim  *lat_dim = (NcDim *)  0;
@@ -1032,8 +1033,9 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    pcp_var->add_att("units",      var_str);
    get_grib_code_name(grib_code, grib_ptv, var_str);
    pcp_var->add_att("long_name",  var_str);
-   get_grib_level_str(rec.pds->type,
-                      rec.pds->level_info, var_str);
+   pds_ptr = (Section1_Header *) rec.pds;
+   get_grib_level_str(pds_ptr->type,
+                      pds_ptr->level_info, var_str);
    pcp_var->add_att("level",      var_str);
    pcp_var->add_att("_FillValue", bad_data_float);
 

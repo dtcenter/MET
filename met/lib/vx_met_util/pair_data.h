@@ -71,6 +71,9 @@ class GCInfo {
 
       // Flag to indicate whether this is a probability field
       int          pflag;
+      int          pcode;
+      double       pthresh_lo;
+      double       pthresh_hi;
 
       //////////////////////////////////////////////////////////////////
 
