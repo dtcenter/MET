@@ -45,6 +45,7 @@ extern void   derive_wind_record(GribFile &, GribRecord &, WrfData &,
 extern void   read_pds(GribRecord &, int &, unixtime &, unixtime &,
                        int &);
 extern void   read_gds(GribRecord &, Grid &, int &, int &, int &);
+extern void   read_pds_prob(GribRecord &, int &, double &, double &);
 
 extern double decode_lat_lon(unsigned char *, int);
 

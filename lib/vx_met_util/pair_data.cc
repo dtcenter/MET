@@ -93,12 +93,15 @@ void GCInfo::clear() {
    lvl_str.clear();
    info_str.clear();
 
-   code     = 0;
-   lvl_type = NoLevel;
-   lvl_1    = 0;
-   lvl_2    = 0;
-   vflag    = 0;
-   pflag    = 0;
+   code       = 0;
+   lvl_type   = NoLevel;
+   lvl_1      = 0;
+   lvl_2      = 0;
+   vflag      = 0;
+   pflag      = 0;
+   pcode      = 0;
+   pthresh_lo = bad_data_double;
+   pthresh_hi = bad_data_double;
 
    return;
 }
@@ -109,17 +112,20 @@ void GCInfo::assign(const GCInfo &c) {
 
    clear();
 
-   abbr_str = c.abbr_str;
-   lvl_str  = c.lvl_str;
-   info_str = c.info_str;
+   abbr_str   = c.abbr_str;
+   lvl_str    = c.lvl_str;
+   info_str   = c.info_str;
 
-   code     = c.code;
+   code       = c.code;
 
-   lvl_type = c.lvl_type;
-   lvl_1    = c.lvl_1;
-   lvl_2    = c.lvl_2;
-   vflag    = c.vflag;
-   pflag    = c.pflag;
+   lvl_type   = c.lvl_type;
+   lvl_1      = c.lvl_1;
+   lvl_2      = c.lvl_2;
+   vflag      = c.vflag;
+   pflag      = c.pflag;
+   pcode      = c.pcode;
+   pthresh_lo = c.pthresh_lo;
+   pthresh_hi = c.pthresh_hi;
 
    return;
 }
@@ -127,8 +133,8 @@ void GCInfo::assign(const GCInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 void GCInfo::set_gcinfo(const char *c, int ptv) {
-   char tmp_str[max_str_len], tmp2_str[max_str_len];
-   char *ptr, *ptr2;
+   char tmp_str[max_str_len], tmp2_str[max_str_len], tmp3_str[max_str_len];
+   char *ptr, *ptr2, *save_ptr;
    int j;
 
    // Initialize
@@ -138,18 +144,18 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
    strcpy(tmp_str, c);
 
    // Retreive the GRIB code value
-   if((ptr = strtok(tmp_str, "/")) == NULL) {
+   if((ptr = strtok_r(tmp_str, "/", &save_ptr)) == NULL) {
       cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
            << "bad GRIB code specified \""
            << c << "\".\n\n" << flush;
       exit(1);
    }
 
-   // Store the code value
-   code = str_to_grib_code(ptr);
+   // Store the code value and parse any probability info
+   code = str_to_grib_code(ptr, pcode, pthresh_lo, pthresh_hi);
 
    // Retrieve the level value
-   if((ptr = strtok(NULL, "/")) == NULL) {
+   if((ptr = strtok_r(NULL, "/", &save_ptr)) == NULL) {
       cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
            << "each GRIB code specified must be followed by an "
            << "accumulation, level, or presssure level indicator \""
@@ -228,7 +234,7 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
    }
 
    // Check for "/PROB" to indicate a probability forecast
-   if((ptr = strtok(NULL, "/")) != NULL) {
+   if((ptr = strtok_r(NULL, "/", &save_ptr)) != NULL) {
 
       if(strncasecmp(ptr, "PROB", strlen("PROB")) == 0) pflag = 1;
       else {
@@ -246,6 +252,32 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
    if(lvl_type == AccumLevel && lvl_1 > 0) {
       sprintf(tmp2_str, "%s_%.2i", tmp_str, lvl_1);
       strcpy(tmp_str, tmp2_str);
+   }
+
+   // For probability fields, append probability information
+   if(pflag) {
+
+      // Get the probability GRIB code abbreviation string
+      get_grib_code_abbr(pcode, ptv, tmp3_str);
+
+      // Both thresholds specified
+      if(pcode > 0 && !is_bad_data(pthresh_lo) && !is_bad_data(pthresh_hi)) {
+         sprintf(tmp2_str, "%s(%.5f>%s>%.5f)",
+                 tmp_str, pthresh_lo, tmp3_str, pthresh_hi);
+         strcpy(tmp_str, tmp2_str);
+      }
+      // Lower threshold specified
+      else if(pcode > 0 && !is_bad_data(pthresh_lo) && is_bad_data(pthresh_hi)) {
+         sprintf(tmp2_str, "%s(%s>%.5f)",
+                 tmp_str, tmp3_str, pthresh_lo);
+         strcpy(tmp_str, tmp2_str);
+      }
+      // Upper threshold specified
+      else if(pcode > 0 && is_bad_data(pthresh_lo) && !is_bad_data(pthresh_hi)) {
+         sprintf(tmp2_str, "%s(%s<%.5f)",
+                 tmp_str, tmp3_str, pthresh_hi);
+         strcpy(tmp_str, tmp2_str);
+      }
    }
 
    // Set the abbr_str

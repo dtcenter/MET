@@ -368,6 +368,7 @@ void process_fcst_obs_files() {
    Grid fcst_grid, obs_grid;
    GribRecord fcst_r, obs_r;
    WrfData fcst_wd, obs_wd;
+   Section1_Header *pds_ptr;
 
    // Switch based on the forecast file type
    fcst_ftype = get_file_type(fcst_file);
@@ -408,7 +409,8 @@ void process_fcst_obs_files() {
          //
          // Get the forecast level name
          //
-         get_grib_level_str(fcst_r.pds->type, fcst_r.pds->level_info,
+         pds_ptr = (Section1_Header *) fcst_r.pds;
+         get_grib_level_str(pds_ptr->type, pds_ptr->level_info,
                             fcst_lvl);
 
          break;
@@ -491,7 +493,8 @@ void process_fcst_obs_files() {
          //
          // Get the observation level name
          //
-         get_grib_level_str(obs_r.pds->type, obs_r.pds->level_info,
+         pds_ptr = (Section1_Header *) obs_r.pds;
+         get_grib_level_str(pds_ptr->type, pds_ptr->level_info,
                             obs_lvl);
 
          break;

@@ -23,6 +23,8 @@ using namespace std;
 
 #include "vx_grib_classes/grib_classes.h"
 #include "vx_grib_classes/grib_strings.h"
+#include "vx_math/vx_math.h"
+#include "vx_util/vx_util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -278,6 +280,35 @@ void get_grib_level_str(int grib_level, unsigned char *level_info,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+int str_to_grib_code(const char *c) {
+   int gc = -1;
+
+   //
+   // Search all of the parameter table versions in order for a matching
+   // GRIB code
+   //
+   if(gc == -1) gc = str_to_grib_code(c, 2);
+   if(gc == -1) gc = str_to_grib_code(c, 128);
+   if(gc == -1) gc = str_to_grib_code(c, 129);
+   if(gc == -1) gc = str_to_grib_code(c, 130);
+   if(gc == -1) gc = str_to_grib_code(c, 131);
+   if(gc == -1) gc = str_to_grib_code(c, 133);
+   if(gc == -1) gc = str_to_grib_code(c, 140);
+   if(gc == -1) gc = str_to_grib_code(c, 141);
+
+   // Check if a matching GRIB code was found
+   if(gc == -1) {
+      cerr << "\n\nERROR: str_to_grib_code() -> "
+           << "can't find GRIB code corresponding to string \""
+           << c << "\".\n\n" << flush;
+      exit(1);
+   }
+
+   return(gc);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 int str_to_grib_code(const char *c, int ptv) {
    int gc = -1;
    int i, l, is_numeric, n_grib_code_list;
@@ -344,26 +375,130 @@ int str_to_grib_code(const char *c, int ptv) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int str_to_grib_code(const char *c) {
+int str_to_grib_code(const char *c, int &pcode,
+                     double &pthresh_lo, double &pthresh_hi) {
    int gc = -1;
 
    //
    // Search all of the parameter table versions in order for a matching
    // GRIB code
    //
-   if(gc == -1) gc = str_to_grib_code(c, 2);
-   if(gc == -1) gc = str_to_grib_code(c, 128);
-   if(gc == -1) gc = str_to_grib_code(c, 129);
-   if(gc == -1) gc = str_to_grib_code(c, 130);
-   if(gc == -1) gc = str_to_grib_code(c, 131);
-   if(gc == -1) gc = str_to_grib_code(c, 133);
-   if(gc == -1) gc = str_to_grib_code(c, 140);
-   if(gc == -1) gc = str_to_grib_code(c, 141);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 2);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 128);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 129);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 130);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 131);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 133);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 140);
+   if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 141);
 
    // Check if a matching GRIB code was found
    if(gc == -1) {
       cerr << "\n\nERROR: str_to_grib_code() -> "
            << "can't find GRIB code corresponding to string \""
+           << c << "\".\n\n" << flush;
+      exit(1);
+   }
+
+   return(gc);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int str_to_grib_code(const char *c, int &pcode,
+                     double &pthresh_lo, double &pthresh_hi, int ptv) {
+   int gc = -1;
+   char tmp_str[512];
+   char *ptr, *save_ptr;
+
+   // Parse out strings of the form:
+   //    PROB
+   //    PROB(lo<string<hi)
+   //    PROB(string>lo)
+   //    PROB(string<hi)
+
+   strcpy(tmp_str, c);
+
+   // Retrieve the first token containing the GRIB code info
+   if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == NULL) {
+      cerr << "\n\nERROR: str_to_grib_code() -> "
+           << "problems parsing the string \""
+           << c << "\".\n\n" << flush;
+      exit(1);
+   }
+
+   // Get the GRIB code
+   gc = str_to_grib_code(ptr, ptv);
+
+   // Check for probability information
+   if((ptr = strtok_r(NULL, "()", &save_ptr)) != NULL) {
+      pcode = str_to_prob_info(ptr, pthresh_lo, pthresh_hi, ptv);
+   }
+   // No probability information specified
+   else {
+     pcode = -1;
+     pthresh_lo = pthresh_hi = bad_data_double;
+   }
+
+   return(gc);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
+                     int ptv) {
+   int gc = -1, i, n_lt, n_gt;
+   char tmp_str[512];
+   char *ptr, *save_ptr;
+   SingleThresh st;
+
+   // Parse out strings of the form:
+   //    lo<string<hi
+   //    string>lo
+   //    string<hi
+
+   // Initialize
+   pthresh_lo = pthresh_hi = bad_data_double;
+
+   // Count the number of '<' or '>' characters
+   for(i=0, n_lt=0, n_gt=0; i<(int)strlen(c); i++) {
+      if(c[i] == '<') n_lt++;
+      if(c[i] == '>') n_gt++;
+   }
+   strcpy(tmp_str, c);
+
+   // Single inequality
+   if(n_lt + n_gt == 1) {
+
+      // Parse the GRIB code
+      ptr = strtok_r(tmp_str, "<>", &save_ptr);
+      gc  = str_to_grib_code(ptr, ptv);
+
+      // Parse the threshold
+      ptr = strtok_r(NULL, "<>", &save_ptr);
+      if(n_lt > 0) pthresh_hi = atof(ptr);
+      else         pthresh_lo = atof(ptr);
+   }
+   // Double inequality
+   else if(n_lt + n_gt == 2) {
+
+      // Parse the first threshold
+      ptr = strtok_r(tmp_str, "<>", &save_ptr);
+      if(n_lt > 0) pthresh_lo = atof(ptr);
+      else         pthresh_hi = atof(ptr);
+
+      // Parse the GRIB code
+      ptr = strtok_r(NULL, "<>", &save_ptr);
+      gc  = str_to_grib_code(ptr, ptv);
+
+      // Parse the second threshold
+      ptr = strtok_r(NULL, "<>", &save_ptr);
+      if(n_lt > 0) pthresh_hi = atof(ptr);
+      else         pthresh_lo = atof(ptr);
+   }
+   else {
+      cerr << "\n\nERROR: str_to_prob_info() -> "
+           << "problems parsing the string \""
            << c << "\".\n\n" << flush;
       exit(1);
    }

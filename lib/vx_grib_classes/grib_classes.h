@@ -294,7 +294,7 @@ class GribRecord  {
       unsigned char     *bitmap;
 
       Section0_Header       *is;
-      Section1_Header      *pds;
+      unsigned char        *pds;
       Section2_Header      *gds;
       Section3_Header      *bms;
       Section4_Header      *bds;
@@ -311,6 +311,7 @@ class GribRecord  {
       int Sec3_offset_in_file;
       int Sec4_offset_in_file;
 
+      int               pds_len;
       int              gds_flag;
       int              bms_flag;
 
@@ -487,8 +488,9 @@ class GribFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern int char3_to_int(const unsigned char *);
-extern int char2_to_int(const unsigned char *);
+extern double char4_to_dbl(const unsigned char *);
+extern int    char3_to_int(const unsigned char *);
+extern int    char2_to_int(const unsigned char *);
 
 extern ostream & operator<<(ostream &, const GribRecord &);
 

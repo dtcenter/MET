@@ -90,10 +90,13 @@ int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
 
 int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
    int i, j;
-   int gc, l1, l2;
+   int gc, l1, l2, pcode;
+   double pthresh_lo, pthresh_hi;
    GribRecord r;
    int bms_flag, accum;
    unixtime init_ut, valid_ut;
+
+   Section1_Header *pds_ptr;
 
    //
    // Store the code and level info
@@ -104,7 +107,8 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
 
    //
    // Find the GRIB record containing the indicated GRIB code and
-   // accumulation or level value
+   // accumulation or level value.  Also check the probability limits
+   // if specified.
    //
    for(i=0; i<grib_file.n_records(); i++) {
 
@@ -124,19 +128,35 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
          grib_file.seek_record(i);
          grib_file >> r;
          read_pds(r, bms_flag, init_ut, valid_ut, accum);
+         pds_ptr = (Section1_Header *) r.pds;
+
+         //
+         // Parse probability info from the PDS if requested
+         //
+         if(gc_info.pflag &&
+            gc_info.pcode > 0 &&
+            (!is_bad_data(gc_info.pthresh_lo) ||
+             !is_bad_data(gc_info.pthresh_hi))) {
+
+            read_pds_prob(r, pcode, pthresh_lo, pthresh_hi);
+
+            if(gc_info.pcode != pcode ||
+               !is_eq(gc_info.pthresh_lo, pthresh_lo) ||
+               !is_eq(gc_info.pthresh_hi, pthresh_hi)) continue;
+         }
 
          //
          // If the TRI indicates accumulation, check whether or not the
          // accumulation equals n
          //
-         if(gc_info.lvl_type == AccumLevel && r.pds->tri == 4 &&
+         if(gc_info.lvl_type == AccumLevel && pds_ptr->tri == 4 &&
             l1 == (accum/sec_per_hour)     && l2 == (accum/sec_per_hour)) break;
 
          //
          // Find the level value for this record
          //
          for(j=0; j<n_grib_level_list; j++) {
-            if(r.pds->type == grib_level_list[j].level) {
+            if(pds_ptr->type == grib_level_list[j].level) {
                break;
             }
          }
@@ -158,16 +178,16 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
          // Check if value stored in octets 11 and 12 matches lvl_1
          //
          if((grib_level_list[j].flag == 0 || grib_level_list[j].flag == 1) &&
-            char2_to_int(r.pds->level_info) == l1 &&
-            char2_to_int(r.pds->level_info) == l2) {
+            char2_to_int(pds_ptr->level_info) == l1 &&
+            char2_to_int(pds_ptr->level_info) == l2) {
             break;
          }
          //
          // Check if a range of levels match
          //
          else if(grib_level_list[j].flag == 2 &&
-                 ((int) r.pds->level_info[0]) == l1 &&
-                 ((int) r.pds->level_info[1]) == l2) {
+                 ((int) pds_ptr->level_info[0]) == l1 &&
+                 ((int) pds_ptr->level_info[1]) == l2) {
             break;
          }
       }
@@ -202,6 +222,8 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
    GribRecord r;
    int bms_flag, accum;
    unixtime init_ut, valid_ut;
+
+   Section1_Header *pds_ptr;
 
    //
    // Initialize
@@ -275,6 +297,7 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
             grib_file.seek_record(i);
             grib_file >> r;
             read_pds(r, bms_flag, init_ut, valid_ut, accum);
+            pds_ptr = (Section1_Header *) r.pds;
 
             //
             // Check that the level type is consistent with the field for
@@ -285,9 +308,9 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
             // Find the level value for this record
             //
             for(j=0; j<n_grib_level_list; j++) {
-               if(r.pds->type == grib_level_list[j].level) break;
+               if(pds_ptr->type == grib_level_list[j].level) break;
             }
-            if(j == n_grib_level_list) break;
+            if(j == n_grib_level_list) continue;
 
             //
             // Check that the level type is consistent with the field for which
@@ -308,35 +331,35 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
             // Check if the record falls within the requested
             // level range
             //
-            if((char2_to_int(r.pds->level_info) > l1) &&
-               (char2_to_int(r.pds->level_info) < l2))
+            if((char2_to_int(pds_ptr->level_info) > l1) &&
+               (char2_to_int(pds_ptr->level_info) < l2))
             {
                // Retain this record
                i_rec[n_rec]  = i;
-               i_lvl[n_rec] = char2_to_int(r.pds->level_info);
+               i_lvl[n_rec] = char2_to_int(pds_ptr->level_info);
                n_rec++;
             }
 
             //
             // Look for one level below the range
             //
-            if((char2_to_int(r.pds->level_info) <= l1) &&
-               (l1 - char2_to_int(r.pds->level_info) < dist_below))
+            if((char2_to_int(pds_ptr->level_info) <= l1) &&
+               (l1 - char2_to_int(pds_ptr->level_info) < dist_below))
             {
-               dist_below = l1 - char2_to_int(r.pds->level_info);
+               dist_below = l1 - char2_to_int(pds_ptr->level_info);
                rec_below  = i;
-               lvl_below  = char2_to_int(r.pds->level_info);
+               lvl_below  = char2_to_int(pds_ptr->level_info);
             }
 
             //
             // Look for one level above the range
             //
-            if((char2_to_int(r.pds->level_info) >= l2) &&
-               (char2_to_int(r.pds->level_info - l2) < dist_above))
+            if((char2_to_int(pds_ptr->level_info) >= l2) &&
+               (char2_to_int(pds_ptr->level_info - l2) < dist_above))
             {
-               dist_above = char2_to_int(r.pds->level_info) - l2;
+               dist_above = char2_to_int(pds_ptr->level_info) - l2;
                rec_above  = i;
-               lvl_above  = char2_to_int(r.pds->level_info);
+               lvl_above  = char2_to_int(pds_ptr->level_info);
             }
          } // end if
       } // end for i
@@ -392,18 +415,22 @@ void read_grib_record(GribFile &grib_file, GribRecord &grib_record, int i_rec,
    int i_rec2;
    GCInfo gc_info2;
 
+   Section1_Header *pds_ptr;
+
    // Read the specified record
    read_single_grib_record(grib_file, grib_record, i_rec, wd, gr, verbosity);
 
+   pds_ptr = (Section1_Header *) grib_record.pds;
+
    // If the field is UGRD, VGRD, or WDIR, determine whether the winds need to be
    // rotated from grid relative to earth relative.
-   if((grib_record.pds->grib_code == ugrd_grib_code ||
-       grib_record.pds->grib_code == vgrd_grib_code ||
-       grib_record.pds->grib_code == wdir_grib_code) &&
+   if((pds_ptr->grib_code == ugrd_grib_code ||
+       pds_ptr->grib_code == vgrd_grib_code ||
+       pds_ptr->grib_code == wdir_grib_code) &&
       is_grid_relative(grib_record)) {
 
       // Handle the UGRD field
-      if(grib_record.pds->grib_code == ugrd_grib_code) {
+      if(pds_ptr->grib_code == ugrd_grib_code) {
 
          // Set up the GCInfo object for vgrd
          gc_info2 = gc_info;
@@ -430,7 +457,7 @@ void read_grib_record(GribFile &grib_file, GribRecord &grib_record, int i_rec,
          wd = rot_u_wd;
       }
       // Handle the VGRD field
-      else if(grib_record.pds->grib_code == vgrd_grib_code) {
+      else if(pds_ptr->grib_code == vgrd_grib_code) {
 
          // Set up the GCInfo object for ugrd
          gc_info2 = gc_info;
@@ -457,7 +484,7 @@ void read_grib_record(GribFile &grib_file, GribRecord &grib_record, int i_rec,
          wd = rot_v_wd;
       }
       // Handle the WDIR field
-      else { // grib_record.pds->grib_code == wdir_grib_code) {
+      else { // pds_ptr->grib_code == wdir_grib_code) {
 
          // Rotate WDIR to be earth relative
          rotate_wdir_grid_to_earth(gr, wd, wd2);
@@ -837,29 +864,32 @@ void read_pds(GribRecord &r, int &bms_flag,
               unixtime &init_ut, unixtime &valid_ut, int &accum) {
    double sec_per_fcst_unit;
    unsigned char pp1[2];
+   Section1_Header *pds_ptr;
+
+   pds_ptr = (Section1_Header *) r.pds;
 
    //
    // Check PDS for flag for the presence of a GDS and BMS section
    //
-   if(!(r.pds->flag & 128)) {
+   if(!(pds_ptr->flag & 128)) {
       cerr << "\n\nERROR: read_pds() -> "
            << "No Grid Description Section present in the "
            << "grib record.\n\n" << flush;
       exit(1);
    }
-   if(r.pds->flag & 64) bms_flag = true;
+   if(pds_ptr->flag & 64) bms_flag = true;
 
    //
    // Check PDS for the initialization time
    //
-   init_ut = mdyhms_to_unix(r.pds->month, r.pds->day,
-                            r.pds->year + (r.pds->century - 1)*100,
-                            r.pds->hour, r.pds->minute, 0);
+   init_ut = mdyhms_to_unix(pds_ptr->month, pds_ptr->day,
+                            pds_ptr->year + (pds_ptr->century - 1)*100,
+                            pds_ptr->hour, pds_ptr->minute, 0);
 
    //
    // Check PDS for time units
    //
-   switch((int) r.pds->fcst_unit) {
+   switch((int) pds_ptr->fcst_unit) {
 
       case 0: // minute
          sec_per_fcst_unit = sec_per_minute;
@@ -908,7 +938,7 @@ void read_pds(GribRecord &r, int &bms_flag,
       default:
          cerr << "\n\nERROR: read_pds() -> "
               << "unexpected time unit of "
-              << (int) r.pds->fcst_unit << ".\n\n" << flush;
+              << (int) pds_ptr->fcst_unit << ".\n\n" << flush;
          exit(1);
          break;
    }
@@ -917,10 +947,10 @@ void read_pds(GribRecord &r, int &bms_flag,
    // Set the valid and accumulation times based on the
    // contents of the time range indicator
    //
-   switch((int) r.pds->tri) {
+   switch((int) pds_ptr->tri) {
 
       case 0: // Valid time = init + p1
-         valid_ut = (unixtime) (init_ut + r.pds->p1*sec_per_fcst_unit);
+         valid_ut = (unixtime) (init_ut + pds_ptr->p1*sec_per_fcst_unit);
          accum = 0;
          break;
 
@@ -930,38 +960,38 @@ void read_pds(GribRecord &r, int &bms_flag,
          break;
 
       case 2: // Valid time between init + p1 and init + p2
-         valid_ut = (unixtime) (init_ut + r.pds->p2*sec_per_fcst_unit);
+         valid_ut = (unixtime) (init_ut + pds_ptr->p2*sec_per_fcst_unit);
          accum = 0;
          break;
 
       case 3: // Average
-         valid_ut = (unixtime) (init_ut + r.pds->p2*sec_per_fcst_unit);
+         valid_ut = (unixtime) (init_ut + pds_ptr->p2*sec_per_fcst_unit);
          accum = 0;
          break;
 
       case 4: // Accumulation
-         valid_ut = (unixtime) (init_ut + r.pds->p2*sec_per_fcst_unit);
-         accum = nint((r.pds->p2 - r.pds->p1)*sec_per_fcst_unit);
+         valid_ut = (unixtime) (init_ut + pds_ptr->p2*sec_per_fcst_unit);
+         accum = nint((pds_ptr->p2 - pds_ptr->p1)*sec_per_fcst_unit);
          break;
 
       case 5: // Difference: product valid at init + p2
-         valid_ut = (unixtime) (init_ut + r.pds->p2*sec_per_fcst_unit);
+         valid_ut = (unixtime) (init_ut + pds_ptr->p2*sec_per_fcst_unit);
          accum = 0;
          break;
 
       case 6: // Average: reference time - P1 to reference time - P2
-         valid_ut = (unixtime) (init_ut - r.pds->p2*sec_per_fcst_unit);
+         valid_ut = (unixtime) (init_ut - pds_ptr->p2*sec_per_fcst_unit);
          accum = 0;
          break;
 
       case 7: // Average: reference time - P1 to reference time + P2
-         valid_ut = (unixtime) (init_ut + r.pds->p2*sec_per_fcst_unit);
+         valid_ut = (unixtime) (init_ut + pds_ptr->p2*sec_per_fcst_unit);
          accum = 0;
          break;
 
       case 10: // P1 occupies octets 19 and 20: product valid at init + p1
-          pp1[0] = r.pds->p1;
-          pp1[1] = r.pds->p2;
+          pp1[0] = pds_ptr->p1;
+          pp1[1] = pds_ptr->p2;
           valid_ut = (unixtime) (init_ut + char2_to_int(pp1)*sec_per_fcst_unit);
           accum = 0;
           break;
@@ -969,7 +999,7 @@ void read_pds(GribRecord &r, int &bms_flag,
       default:
          cerr << "\n\nERROR: read_pds() -> "
               << "unexpected time range indicator of "
-              << (int) r.pds->tri << ".\n\n" << flush;
+              << (int) pds_ptr->tri << ".\n\n" << flush;
          exit(1);
          break;
    }
@@ -1238,6 +1268,40 @@ void read_gds(GribRecord &r, Grid &gr, int &xdir, int &ydir, int &order) {
    return;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+void read_pds_prob(GribRecord &r, int &pcode,
+                   double &pthresh_lo, double &pthresh_hi) {
+   int len;
+   double t1, t2;
+
+   Section1_Header *pds_ptr = (Section1_Header *) r.pds;
+
+   // Initialize
+   pcode = 0;
+   pthresh_lo = pthresh_hi = bad_data_double;
+
+   // Get the PDS length
+   len = char3_to_int(pds_ptr->length);
+   if(len < 60) return;
+
+   // Store the probability GRIB code
+   pcode = r.pds[45];
+
+   // Store the thresholds
+   t1 = char4_to_dbl(&r.pds[47]);
+   t2 = char4_to_dbl(&r.pds[51]);
+
+   // Check the probability type
+   if(     r.pds[46] == 1) pthresh_hi = t1;
+   else if(r.pds[46] == 2) pthresh_lo = t2;
+   else if(r.pds[46] == 3) {
+      pthresh_lo = t1;
+      pthresh_hi = t2;
+   }
+
+   return;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1290,28 +1354,29 @@ int all_bits_set(unsigned char *p, int n) {
 
 void get_level_info(const GribRecord &r, int &l1, int &l2) {
    int i;
+   Section1_Header *pds_ptr = (Section1_Header *) r.pds;
 
    //
    // Extract the level values from the GRIB record
    //
    for(i=0; i<n_grib_level_list; i++) {
-      if(r.pds->type == grib_level_list[i].level) break;
+      if(pds_ptr->type == grib_level_list[i].level) break;
    }
    if(i == n_grib_level_list) {
       cerr << "\n\nERROR: get_level_info() -> "
-           << "Can't find matching GRIB level list entry for pds->type = "
-           << r.pds->type << "\n\n" << flush;
+           << "Can't find matching GRIB level list entry fopds_ptr->type = "
+           << pds_ptr->type << "\n\n" << flush;
       exit(1);
    }
 
    // Store the level information based on the grib_level_flag value
    if(grib_level_list[i].flag == 0 ||
       grib_level_list[i].flag == 1) {
-      l1 = l2 = char2_to_int(r.pds->level_info);
+      l1 = l2 = char2_to_int(pds_ptr->level_info);
    }
    else if(grib_level_list[i].flag == 2) {
-      l1 = (int) r.pds->level_info[1];
-      l2 = (int) r.pds->level_info[0];
+      l1 = (int) pds_ptr->level_info[1];
+      l2 = (int) pds_ptr->level_info[0];
    }
 
    return;
