@@ -54,6 +54,8 @@
 //                    From -ncfile to -point_obs
 //                    From -valid_beg to -obs_valid_beg
 //                    From -valid_end to -obs_valid_end
+//   017    05/27/10  Halley Gotway  Add -fcst_valid and -fcst_lead
+//                    command line options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -178,14 +180,22 @@ void process_command_line(int argc, char **argv) {
          climo_flag = 1;
          i++;
       }
+      else if(strcmp(argv[i], "-fcst_valid") == 0) {
+         fcst_valid_ut = timestring_to_unix(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-fcst_lead") == 0) {
+         fcst_lead_sec = timestring_to_sec(argv[i+1]);
+         i++;
+      }
       else if(strcmp(argv[i], "-obs_valid_beg") == 0 ||
               strcmp(argv[i], "-valid_beg")     == 0) {
-         valid_beg_ut = timestring_to_unix(argv[i+1]);
+         obs_valid_beg_ut = timestring_to_unix(argv[i+1]);
          i++;
       }
       else if(strcmp(argv[i], "-obs_valid_end") == 0 ||
               strcmp(argv[i], "-valid_end")     == 0) {
-         valid_end_ut = timestring_to_unix(argv[i+1]);
+         obs_valid_end_ut = timestring_to_unix(argv[i+1]);
          i++;
       }
       else if(strcmp(argv[i], "-outdir") == 0) {
@@ -205,13 +215,13 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check that the end_ut >= beg_ut
-   if(valid_beg_ut != (unixtime) 0 &&
-      valid_end_ut != (unixtime) 0 &&
-      valid_beg_ut > valid_end_ut) {
+   if(obs_valid_beg_ut != (unixtime) 0 &&
+      obs_valid_end_ut != (unixtime) 0 &&
+      obs_valid_beg_ut > obs_valid_end_ut) {
       cerr << "\n\nERROR: process_command_line() -> "
-           << "the ending time (" << valid_end_ut
+           << "the ending time (" << obs_valid_end_ut
            << ") must be greater than the beginning time ("
-           << valid_beg_ut << ").\n\n" << flush;
+           << obs_valid_beg_ut << ").\n\n" << flush;
       exit(1);
    }
 
@@ -342,7 +352,7 @@ void setup_first_pass(const WrfData &wd, const Grid &data_grid) {
 
    // Store the lead and valid times
    if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = wd.get_valid_time();
-   if(fcst_lead_sec == 0)            fcst_lead_sec = wd.get_lead_time();
+   if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = wd.get_lead_time();
 
    return;
 }
@@ -573,8 +583,10 @@ void process_grib_codes() {
       // and climatological data, including one level above and one
       // level below the range
       else {
+
          n_fcst_rec = find_grib_record_levels(fcst_gb_file,
                          conf_info.gc_pd[i].fcst_gci,
+                         fcst_valid_ut, fcst_lead_sec,
                          fcst_rec, fcst_lvl);
 
          if(n_fcst_rec == 0) {
@@ -659,9 +671,10 @@ void process_grib_codes() {
                gc_info.lvl_2 = fcst_lvl[j];
             }
 
-            status = get_grib_record(fcst_gb_file, rec,
-                                     gc_info, fcst_wd[i][j],
-                                     data_grid, verbosity);
+            status = get_grib_record(fcst_gb_file, rec, gc_info,
+                                     fcst_valid_ut, fcst_lead_sec,
+                                     fcst_wd[i][j], data_grid,
+                                     verbosity);
 
             if(status != 0) {
                cerr << "\n\nERROR: process_grib_codes() -> "
@@ -707,12 +720,12 @@ void process_grib_codes() {
       // Get the valid time for the first field
       file_ut = fcst_wd[i][0].get_valid_time();
 
-      // If valid_beg_ut and valid_end_ut were set on the command
+      // If obs_valid_beg_ut and obs_valid_end_ut were set on the command
       // line, use them.  If not, use beg_ds and end_ds.
-      if(valid_beg_ut != (unixtime) 0 ||
-         valid_end_ut != (unixtime) 0) {
-         beg_ut = valid_beg_ut;
-         end_ut = valid_end_ut;
+      if(obs_valid_beg_ut != (unixtime) 0 ||
+         obs_valid_end_ut != (unixtime) 0) {
+         beg_ut = obs_valid_beg_ut;
+         end_ut = obs_valid_end_ut;
       }
       else {
          beg_ut = file_ut + conf_info.conf.beg_ds().ival();
@@ -1793,6 +1806,8 @@ void usage(int argc, char *argv[]) {
         << "\tconfig_file\n"
         << "\t[-climo climo_file]\n"
         << "\t[-point_obs file]\n"
+        << "\t[-fcst_valid time]\n"
+        << "\t[-fcst_lead time]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
         << "\t[-outdir path]\n"
@@ -1818,6 +1833,12 @@ void usage(int argc, char *argv[]) {
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
+
+        << "\t\t\"-fcst_valid time\" in YYYYMMDD[_HH[MMSS]] format "
+        << "sets the forecast valid time to be verified (optional).\n"
+
+        << "\t\t\"-fcst_lead time\" in HH[MMSS] format sets "
+        << "the forecast lead time to be verified (optional).\n"
 
         << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "beginning of the matching time window (optional).\n"
