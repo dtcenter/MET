@@ -437,10 +437,10 @@ void process_scores() {
       }
 
       // Check that the valid times match
-      if(fcst_wd.get_valid_time() != obs_wd.get_valid_time()) {
+      if(fcst_valid_ut != obs_valid_ut) {
 
-         unix_to_yyyymmdd_hhmmss(fcst_wd.get_valid_time(), tmp_str);
-         unix_to_yyyymmdd_hhmmss(obs_wd.get_valid_time(), tmp2_str);
+         unix_to_yyyymmdd_hhmmss(fcst_valid_ut, tmp_str);
+         unix_to_yyyymmdd_hhmmss(obs_valid_ut, tmp2_str);
 
          cout << "***WARNING***: process_scores() -> "
               << "Forecast and observation valid times do not match "
@@ -452,10 +452,10 @@ void process_scores() {
       // Check that the accumulation intervals match
       if(conf_info.fcst_gci[i].lvl_type == AccumLevel &&
          conf_info.obs_gci[i].lvl_type  == AccumLevel &&
-         fcst_wd.get_accum_time()       != obs_wd.get_accum_time()) {
+         fcst_lead_sec                  != obs_lead_sec) {
 
-         sec_to_hhmmss(fcst_wd.get_accum_time(), tmp_str);
-         sec_to_hhmmss(obs_wd.get_accum_time(), tmp2_str);
+         sec_to_hhmmss(fcst_lead_sec, tmp_str);
+         sec_to_hhmmss(obs_lead_sec, tmp2_str);
 
          cout << "***WARNING***: process_scores() -> "
               << "Forecast and observation accumulation times "
