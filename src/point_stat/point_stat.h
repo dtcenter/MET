@@ -125,13 +125,13 @@ static ConcatString      config_file;
 static PointStatConfInfo conf_info;
 
 // Optional arguments
-static unixtime     valid_beg_ut  = (unixtime) 0;
-static unixtime     valid_end_ut  = (unixtime) 0;
-static unixtime     fcst_valid_ut = (unixtime) 0;
-static int          fcst_lead_sec = 0;
+static unixtime     fcst_valid_ut    = (unixtime) 0;
+static int          fcst_lead_sec    = bad_data_int;
+static unixtime     obs_valid_beg_ut = (unixtime) 0;
+static unixtime     obs_valid_end_ut = (unixtime) 0;
 static ConcatString out_dir;
-static int          verbosity     = 2;
-static int          climo_flag    = 0;
+static int          verbosity        = 2;
+static int          climo_flag       = 0;
 
 ////////////////////////////////////////////////////////////////////////
 //
