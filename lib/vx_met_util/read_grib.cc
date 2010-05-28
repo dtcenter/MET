@@ -52,13 +52,24 @@ int has_grib_code(GribFile &grib_file, int gc) {
 int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
                     const GCInfo &gc_info,
                     WrfData &wd, Grid &gr, int &verbosity) {
+
+   return(get_grib_record(grib_file, grib_record, gc_info,
+                          (unixtime) 0, bad_data_int, wd, gr, verbosity));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
+                    const GCInfo &gc_info, const unixtime req_vld_ut,
+                    const int req_lead_sec,
+                    WrfData &wd, Grid &gr, int &verbosity) {
    int i_rec, gc;
 
    // Store the GRIB code
    gc = gc_info.code;
 
    // Search for the GRIB record in the file
-   i_rec = find_grib_record(grib_file, gc_info);
+   i_rec = find_grib_record(grib_file, gc_info, req_vld_ut, req_lead_sec);
 
    // If the GRIB record is not found and can't be derived
    if(i_rec < 0 && gc != wdir_grib_code && gc != wind_grib_code) {
@@ -88,7 +99,16 @@ int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+
 int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
+
+   return(find_grib_record(grib_file, gc_info, (unixtime) 0, bad_data_int));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int find_grib_record(GribFile &grib_file, const GCInfo &gc_info,
+                     const unixtime req_vld_ut, const int req_lead_sec) {
    int i, j;
    int gc, l1, l2, pcode;
    double pthresh_lo, pthresh_hi;
@@ -131,7 +151,18 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
          pds_ptr = (Section1_Header *) r.pds;
 
          //
-         // Parse probability info from the PDS if requested
+         // If requested, check that the valid time matches
+         //
+         if(req_vld_ut > 0 && req_vld_ut != valid_ut) continue;
+
+         //
+         // If requested, check that the lead time matches
+         //
+         if(!is_bad_data(req_lead_sec) &&
+            req_lead_sec != (int) (valid_ut - init_ut)) continue;
+
+         //
+         // If requested, parse probability info from the PDS
          //
          if(gc_info.pflag &&
             gc_info.pcode > 0 &&
@@ -213,6 +244,16 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info) {
 
 int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
                             int *i_rec, int *i_lvl) {
+
+   return(find_grib_record_levels(grib_file, gc_info, (unixtime) 0,
+                                  bad_data_int, i_rec, i_lvl));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
+                            const unixtime req_vld_ut, const int req_lead_sec,
+                            int *i_rec, int *i_lvl) {
    int i, j, n_rec;
    int gc, l1, l2;
    GCInfo gc_tmp;
@@ -251,7 +292,7 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
    // If l1 = l2, only need to find a single GRIB record at that level
    //
    if(l1 == l2) {
-      i_rec[0] = find_grib_record(grib_file, gc_tmp);
+      i_rec[0] = find_grib_record(grib_file, gc_tmp, req_vld_ut, req_lead_sec);
       i_lvl[0] = l1;
       if(i_rec[0] < 0) n_rec = 0;
       else             n_rec = 1;
@@ -262,7 +303,8 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
    // of levels.
    //
    else if(l1 != l2 &&
-           (i_rec[0] = find_grib_record(grib_file, gc_tmp)) >= 0) {
+           (i_rec[0] = find_grib_record(grib_file, gc_tmp,
+                                        req_vld_ut, req_lead_sec)) >= 0) {
 
       //
       // Store the level as the midpoint
@@ -298,6 +340,17 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
             grib_file >> r;
             read_pds(r, bms_flag, init_ut, valid_ut, accum);
             pds_ptr = (Section1_Header *) r.pds;
+
+            //
+            // If requested, check that the valid time matches
+            //
+            if(req_vld_ut > 0 && req_vld_ut != valid_ut) continue;
+
+            //
+            // If requested, check that the lead time matches
+            //
+            if(!is_bad_data(req_lead_sec) &&
+               req_lead_sec != (int) (valid_ut - init_ut)) continue;
 
             //
             // Check that the level type is consistent with the field for
@@ -437,18 +490,21 @@ void read_grib_record(GribFile &grib_file, GribRecord &grib_record, int i_rec,
          gc_info2.code = vgrd_grib_code;
 
          // Find the corresponding VGRD record
-         i_rec2 = find_grib_record(grib_file, gc_info2);
+         i_rec2 = find_grib_record(grib_file, gc_info2,
+                                   wd.get_valid_time(), wd.get_lead_time());
 
          // Check that the VGRD record was found
          if(i_rec2 < 0) {
             cerr << "\n\nERROR: read_grib_record() -> "
                  << "can't find matching VGRD record when trying to rotate "
-                 << "the UGRD field to grid-relative coordinates\n\n" << flush;
+                 << "the UGRD field to grid-relative coordinates\n\n"
+                 << flush;
             exit(1);
          }
 
          // Read the VGRD record
-         read_single_grib_record(grib_file, grib_record2, i_rec2, wd2, gr2, verbosity);
+         read_single_grib_record(grib_file, grib_record2, i_rec2,
+                                 wd2, gr2, verbosity);
 
          // Rotate U and V to be earth relative
          rotate_uv_grid_to_earth(gr, wd, wd2, rot_u_wd, rot_v_wd);
@@ -464,18 +520,21 @@ void read_grib_record(GribFile &grib_file, GribRecord &grib_record, int i_rec,
          gc_info2.code = ugrd_grib_code;
 
          // Find the corresponding UGRD record
-         i_rec2 = find_grib_record(grib_file, gc_info2);
+         i_rec2 = find_grib_record(grib_file, gc_info2,
+                                   wd.get_valid_time(), wd.get_lead_time());
 
          // Check that the UGRD record was found
          if(i_rec2 < 0) {
             cerr << "\n\nERROR: read_grib_record() -> "
                  << "can't find matching UGRD record when trying to rotate "
-                 << "the VGRD field to grid-relative coordinates\n\n" << flush;
+                 << "the VGRD field to grid-relative coordinates\n\n"
+                 << flush;
             exit(1);
          }
 
          // Read the UGRD record
-         read_single_grib_record(grib_file, grib_record2, i_rec2, wd2, gr2, verbosity);
+         read_single_grib_record(grib_file, grib_record2, i_rec2,
+                                 wd2, gr2, verbosity);
 
          // Rotate U and V to be earth relative
          rotate_uv_grid_to_earth(gr, wd2, wd, rot_u_wd, rot_v_wd);
@@ -628,6 +687,18 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
 void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
                         WrfData &wd, Grid &gr, const GCInfo &gc_info,
                         int verbosity) {
+
+   derive_wdir_record(grib_file, grib_record, wd, gr, gc_info,
+                      (unixtime) 0, bad_data_int, verbosity);
+
+   return;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
+                        WrfData &wd, Grid &gr, const GCInfo &gc_info,
+                        const unixtime req_vld_ut, const int req_lead_sec,
+                        int verbosity) {
    int u_rec, v_rec, x, y, nx, ny, n;
    int l1, l2;
    WrfData u_wd, v_wd;
@@ -648,8 +719,8 @@ void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
    //
    // Find the GRIB record for the U and V components of the wind
    //
-   u_rec = find_grib_record(grib_file, ugrd_info);
-   v_rec = find_grib_record(grib_file, vgrd_info);
+   u_rec = find_grib_record(grib_file, ugrd_info, req_vld_ut, req_lead_sec);
+   v_rec = find_grib_record(grib_file, vgrd_info, req_vld_ut, req_lead_sec);
 
    if(u_rec < 0 || v_rec < 0) {
       cerr << "\n\nERROR: derive_wdir_record() -> "
@@ -746,6 +817,19 @@ void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
 void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
                         WrfData &wd, Grid &gr, const GCInfo &gc_info,
                         int verbosity) {
+
+   derive_wind_record(grib_file, grib_record, wd, gr, gc_info,
+                      (unixtime) 0, 0, verbosity);
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
+                        WrfData &wd, Grid &gr, const GCInfo &gc_info,
+                        const unixtime req_vld_ut, const int req_lead_sec,
+                        int verbosity) {
    int u_rec, v_rec, x, y, nx, ny, n, l1, l2;
    WrfData u_wd, v_wd;
    double u, v, wind, wind_min, wind_max;
@@ -765,8 +849,8 @@ void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
    //
    // Find the GRIB record for the U and V components of the wind
    //
-   u_rec = find_grib_record(grib_file, ugrd_info);
-   v_rec = find_grib_record(grib_file, vgrd_info);
+   u_rec = find_grib_record(grib_file, ugrd_info, req_vld_ut, req_lead_sec);
+   v_rec = find_grib_record(grib_file, vgrd_info, req_vld_ut, req_lead_sec);
 
    if(u_rec < 0 || v_rec < 0) {
       cerr << "\n\nERROR: derive_wind_record() -> "
