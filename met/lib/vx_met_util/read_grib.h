@@ -25,9 +25,18 @@ extern int    has_grib_code(GribFile &, int);
 
 extern int    get_grib_record(GribFile &, GribRecord &, const GCInfo &,
                               WrfData &, Grid &, int &);
+extern int    get_grib_record(GribFile &, GribRecord &, const GCInfo &,
+                              const unixtime, const int,
+                              WrfData &, Grid &, int &);
 
 extern int    find_grib_record(GribFile &, const GCInfo &);
+extern int    find_grib_record(GribFile &, const GCInfo &,
+                               const unixtime, const int);
+
 extern int    find_grib_record_levels(GribFile &, const GCInfo &,
+                                      int *, int *);
+extern int    find_grib_record_levels(GribFile &, const GCInfo &,
+                                      const unixtime, const int,
                                       int *, int *);
 
 extern void   read_grib_record(const char *, GribRecord &, int,
@@ -39,8 +48,15 @@ extern void   read_single_grib_record(GribFile &, GribRecord &, int,
 
 extern void   derive_wdir_record(GribFile &, GribRecord &, WrfData &,
                                  Grid &, const GCInfo &, int);
+extern void   derive_wdir_record(GribFile &, GribRecord &, WrfData &,
+                                 Grid &, const GCInfo &,
+                                 const unixtime, const int, int);
+
 extern void   derive_wind_record(GribFile &, GribRecord &, WrfData &,
                                  Grid &, const GCInfo &, int);
+extern void   derive_wind_record(GribFile &, GribRecord &, WrfData &,
+                                 Grid &, const GCInfo &,
+                                 const unixtime, const int, int);
 
 extern void   read_pds(GribRecord &, int &, unixtime &, unixtime &,
                        int &);
