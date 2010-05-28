@@ -113,6 +113,11 @@ static ConcatString obs_file;
 static GribFile     obs_gb_file;
 static NcFile      *obs_nc_file = (NcFile *) 0;
 
+static unixtime     fcst_valid_ut = (unixtime) 0;
+static int          fcst_lead_sec = bad_data_int;
+static unixtime     obs_valid_ut  = (unixtime) 0;
+static int          obs_lead_sec  = bad_data_int;
+
 static int verbosity = 1;
 static const int n_cts = 3;
 static const char *cts_str[n_cts] = {"RAW", "FILTER", "OBJECT"};
@@ -280,6 +285,22 @@ void process_command_line(int argc, char **argv) {
          merge_config_file = argv[i+1];
          i++;
       }
+      else if(strcmp(argv[i], "-fcst_valid") == 0) {
+         fcst_valid_ut = timestring_to_unix(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-fcst_lead") == 0) {
+         fcst_lead_sec = timestring_to_sec(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-obs_valid") == 0) {
+         obs_valid_ut = timestring_to_unix(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-obs_lead") == 0) {
+         obs_lead_sec = timestring_to_sec(argv[i+1]);
+         i++;
+      }
       else if(strcmp(argv[i], "-outdir") == 0) {
          out_dir = argv[i+1];
          i++;
@@ -394,8 +415,8 @@ void process_fcst_obs_files() {
          }
 
          status = get_grib_record(fcst_gb_file, fcst_r,
-                                  fcst_gci, fcst_wd, fcst_grid,
-                                  verbosity);
+                                  fcst_gci, fcst_valid_ut, fcst_lead_sec,
+                                  fcst_wd, fcst_grid, verbosity);
 
          if(status != 0) {
             cerr << "\n\nERROR: main() -> "
@@ -454,6 +475,10 @@ void process_fcst_obs_files() {
          break;
    }
 
+   // Store the forecast lead and valid times
+   if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = fcst_wd.get_valid_time();
+   if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = fcst_wd.get_lead_time();
+
    // Switch based on the observation file type
    obs_ftype = get_file_type(obs_file);
 
@@ -478,8 +503,8 @@ void process_fcst_obs_files() {
          }
 
          status = get_grib_record(obs_gb_file, obs_r,
-                                  obs_gci, obs_wd, obs_grid,
-                                  verbosity);
+                                  obs_gci, obs_valid_ut, obs_lead_sec,
+                                  obs_wd, obs_grid, verbosity);
 
          if(status != 0) {
             cerr << "\n\nERROR: main() -> "
@@ -538,6 +563,10 @@ void process_fcst_obs_files() {
          break;
    }
 
+   // Store the observation lead and valid times
+   if(obs_valid_ut == (unixtime) 0) obs_valid_ut = obs_wd.get_valid_time();
+   if(is_bad_data(obs_lead_sec))    obs_lead_sec = obs_wd.get_lead_time();
+
    //
    // Check that the grid dimensions match
    //
@@ -555,24 +584,29 @@ void process_fcst_obs_files() {
    //
    // Print a warning if the valid times do not match
    //
-   if(fcst_wd.get_valid_time() != obs_wd.get_valid_time()) {
-      unix_to_yyyymmdd_hhmmss(fcst_wd.get_valid_time(), tmp_str);
-      unix_to_yyyymmdd_hhmmss(obs_wd.get_valid_time(), tmp2_str);
+   if(fcst_valid_ut != obs_valid_ut) {
+
+      unix_to_yyyymmdd_hhmmss(fcst_valid_ut, tmp_str);
+      unix_to_yyyymmdd_hhmmss(obs_valid_ut, tmp2_str);
 
       cout << "\n***WARNING***: main() -> "
-           << "forecast and observation valid times do not match "
+           << "Forecast and observation valid times do not match "
            << tmp_str << " != " << tmp2_str << ".\n\n" << flush;
    }
 
    //
    // Print a warning if the accumulation intervals do not match
    //
-   if(fcst_wd.get_accum_time() != obs_wd.get_accum_time()) {
+   if(fcst_gci.lvl_type        == AccumLevel &&
+      obs_gci.lvl_type         == AccumLevel &&
+      fcst_wd.get_accum_time() != obs_wd.get_accum_time()) {
+
+      sec_to_hhmmss(fcst_wd.get_accum_time(), tmp_str);
+      sec_to_hhmmss(obs_wd.get_accum_time(), tmp2_str);
 
       cout << "\n***WARNING***: main() -> "
-           << "forecast and observation accumulation times do not match "
-           << fcst_wd.get_accum_time() << " seconds != "
-           << obs_wd.get_accum_time() << " seconds.\n\n" << flush;
+           << "Forecast and observation accumulation times do not match "
+           << tmp_str << " != " << tmp2_str << ".\n\n" << flush;
    }
 
    //
@@ -3818,6 +3852,10 @@ void usage(int argc, char *argv[]) {
         << "\tobs_file\n"
         << "\tconfig_file\n"
         << "\t[-config_merge merge_config_file]\n"
+        << "\t[-fcst_valid time]\n"
+        << "\t[-fcst_lead time]\n"
+        << "\t[-obs_valid time]\n"
+        << "\t[-obs_lead time]\n"
         << "\t[-outdir path]\n"
         << "\t[-plot]\n"
         << "\t[-obj_plot]\n"
@@ -3839,6 +3877,18 @@ void usage(int argc, char *argv[]) {
         << "\t\t\"-config_merge merge_config_file\" overrides the default "
         << "fuzzy engine settings for merging within the fcst/obs fields "
         << "(optional).\n"
+
+        << "\t\t\"-fcst_valid time\" in YYYYMMDD[_HH[MMSS]] format "
+        << "sets the forecast valid time to be verified (optional).\n"
+
+        << "\t\t\"-fcst_lead time\" in HH[MMSS] format sets "
+        << "the forecast lead time to be verified (optional).\n"
+
+        << "\t\t\"-obs_valid time\" in YYYYMMDD[_HH[MMSS]] format "
+        << "sets the observation valid time to be used (optional).\n"
+
+        << "\t\t\"-obs_lead time\" in HH[MMSS] format sets "
+        << "the observation lead time to be used (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output directory ("
         << out_dir << ") (optional).\n"

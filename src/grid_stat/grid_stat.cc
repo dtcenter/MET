@@ -452,10 +452,10 @@ void process_scores() {
       // Check that the accumulation intervals match
       if(conf_info.fcst_gci[i].lvl_type == AccumLevel &&
          conf_info.obs_gci[i].lvl_type  == AccumLevel &&
-         fcst_lead_sec                  != obs_lead_sec) {
+         fcst_wd.get_accum_time()       != obs_wd.get_accum_time()) {
 
-         sec_to_hhmmss(fcst_lead_sec, tmp_str);
-         sec_to_hhmmss(obs_lead_sec, tmp2_str);
+         sec_to_hhmmss(fcst_wd.get_accum_time(), tmp_str);
+         sec_to_hhmmss(obs_wd.get_accum_time(), tmp2_str);
 
          cout << "***WARNING***: process_scores() -> "
               << "Forecast and observation accumulation times "
