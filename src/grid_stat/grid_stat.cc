@@ -52,6 +52,8 @@
 //                    matched pair variables or probabilistic
 //                    difference fields.
 //   017    05/06/10  Halley Gotway  Add interp_flag config parameter.
+//   018    05/27/10  Halley Gotway  Add -fcst_valid, -fcst_lead,
+//                    -obs_valid, and -obs_lead command line options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -164,7 +166,23 @@ void process_command_line(int argc, char **argv) {
    // Parse command line arguments
    for(i=0; i<argc; i++) {
 
-      if(strcmp(argv[i], "-outdir") == 0) {
+      if(strcmp(argv[i], "-fcst_valid") == 0) {
+         fcst_valid_ut = timestring_to_unix(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-fcst_lead") == 0) {
+         fcst_lead_sec = timestring_to_sec(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-obs_valid") == 0) {
+         obs_valid_ut = timestring_to_unix(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-obs_lead") == 0) {
+         obs_lead_sec = timestring_to_sec(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-outdir") == 0) {
          out_dir = argv[i+1];
          i++;
       }
@@ -335,6 +353,7 @@ void process_scores() {
 
          status = get_grib_record(fcst_gb_file, fcst_r,
                                   conf_info.fcst_gci[i],
+                                  fcst_valid_ut, fcst_lead_sec,
                                   fcst_wd, fcst_grid, verbosity);
 
          if(status != 0) {
@@ -354,22 +373,27 @@ void process_scores() {
                      fcst_wd, fcst_grid, verbosity);
       }
 
+      // Store the forecast lead and valid times
+      if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = fcst_wd.get_valid_time();
+      if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = fcst_wd.get_lead_time();
+
       // For probability fields, check to see if they need to be
       // rescaled from [0, 100] to [0, 1]
       if(conf_info.fcst_gci[i].pflag == 1) rescale_probability(fcst_wd);
 
       // Set the forecast lead time
-      shc.set_fcst_lead_sec(fcst_wd.get_lead_time());
+      shc.set_fcst_lead_sec(fcst_lead_sec);
 
       // Set the forecast valid time
-      shc.set_fcst_valid_beg(fcst_wd.get_valid_time());
-      shc.set_fcst_valid_end(fcst_wd.get_valid_time());
+      shc.set_fcst_valid_beg(fcst_valid_ut);
+      shc.set_fcst_valid_end(fcst_valid_ut);
 
       // Continue based on the forecast file type
       if(obs_ftype == GbFileType) {
 
          status = get_grib_record(obs_gb_file, obs_r,
                                   conf_info.obs_gci[i],
+                                  obs_valid_ut, obs_lead_sec,
                                   obs_wd, obs_grid, verbosity);
 
          if(status != 0) {
@@ -389,12 +413,16 @@ void process_scores() {
                      obs_wd, obs_grid, verbosity);
       }
 
+      // Store the observation lead and valid times
+      if(obs_valid_ut == (unixtime) 0) obs_valid_ut = obs_wd.get_valid_time();
+      if(is_bad_data(obs_lead_sec))    obs_lead_sec = obs_wd.get_lead_time();
+
       // Set the observation lead time
-      shc.set_obs_lead_sec(obs_wd.get_lead_time());
+      shc.set_obs_lead_sec(obs_lead_sec);
 
       // Set the observation valid time
-      shc.set_obs_valid_beg(obs_wd.get_valid_time());
-      shc.set_obs_valid_end(obs_wd.get_valid_time());
+      shc.set_obs_valid_beg(obs_valid_ut);
+      shc.set_obs_valid_end(obs_valid_ut);
 
       // Check that the grid dimensions match
       if(fcst_grid.nx() != obs_grid.nx() ||
@@ -1927,6 +1955,10 @@ void usage(int argc, char *argv[]) {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
+        << "\t[-fcst_valid time]\n"
+        << "\t[-fcst_lead time]\n"
+        << "\t[-obs_valid time]\n"
+        << "\t[-obs_lead time]\n"
         << "\t[-outdir path]\n"
         << "\t[-v level]\n\n"
 
@@ -1940,6 +1972,18 @@ void usage(int argc, char *argv[]) {
 
         << "\t\t\"config_file\" is a GridStatConfig file containing "
         << "the desired configuration settings (required).\n"
+
+        << "\t\t\"-fcst_valid time\" in YYYYMMDD[_HH[MMSS]] format "
+        << "sets the forecast valid time to be verified (optional).\n"
+
+        << "\t\t\"-fcst_lead time\" in HH[MMSS] format sets "
+        << "the forecast lead time to be verified (optional).\n"
+
+        << "\t\t\"-obs_valid time\" in YYYYMMDD[_HH[MMSS]] format "
+        << "sets the observation valid time to be used (optional).\n"
+
+        << "\t\t\"-obs_lead time\" in HH[MMSS] format sets "
+        << "the observation lead time to be used (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output directory "
         << "(" << out_dir << ") (optional).\n"
