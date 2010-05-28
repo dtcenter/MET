@@ -313,7 +313,7 @@ void process_scores() {
 
    GribRecord fcst_r, obs_r;
    Grid fcst_grid, obs_grid;
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len], tmp2_str[max_str_len];
    char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
    NumArray f_na, o_na;
 
@@ -438,22 +438,30 @@ void process_scores() {
 
       // Check that the valid times match
       if(fcst_wd.get_valid_time() != obs_wd.get_valid_time()) {
+
+         unix_to_yyyymmdd_hhmmss(fcst_wd.get_valid_time(), tmp_str);
+         unix_to_yyyymmdd_hhmmss(obs_wd.get_valid_time(), tmp2_str);
+
          cout << "***WARNING***: process_scores() -> "
               << "Forecast and observation valid times do not match "
-              << fcst_wd.get_valid_time() << " != "
-              << obs_wd.get_valid_time() << " for field " << i+1
-              << ".\n\n" << flush;
+              << tmp_str << " != " << tmp2_str << " for "
+              << conf_info.fcst_gci[i].info_str << " versus "
+              << conf_info.obs_gci[i].info_str << ".\n\n" << flush;
       }
 
-      // Check that the accumulation intervals match when comparing
-      // the same GRIB codes
-      if(conf_info.fcst_gci[i].code == conf_info.obs_gci[i].code &&
-         fcst_wd.get_accum_time()   != obs_wd.get_accum_time()) {
+      // Check that the accumulation intervals match
+      if(conf_info.fcst_gci[i].lvl_type == AccumLevel &&
+         conf_info.obs_gci[i].lvl_type  == AccumLevel &&
+         fcst_wd.get_accum_time()       != obs_wd.get_accum_time()) {
+
+         sec_to_hhmmss(fcst_wd.get_accum_time(), tmp_str);
+         sec_to_hhmmss(obs_wd.get_accum_time(), tmp2_str);
+
          cout << "***WARNING***: process_scores() -> "
               << "Forecast and observation accumulation times "
-              << "do not match " << fcst_wd.get_accum_time()
-              << " != " << obs_wd.get_accum_time() << " for field "
-              << i+1 << ".\n\n" << flush;
+              << "do not match " << tmp_str << " != " << tmp2_str
+              << " for " << conf_info.fcst_gci[i].info_str << " versus "
+              << conf_info.obs_gci[i].info_str << ".\n\n" << flush;
       }
 
       // This is the first pass through the loop and grid is unset
