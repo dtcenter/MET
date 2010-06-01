@@ -105,9 +105,13 @@ static ConcatString        config_file;
 static WaveletStatConfInfo conf_info;
 
 // Optional arguments
+static unixtime     fcst_valid_ut = (unixtime) 0;
+static int          fcst_lead_sec = bad_data_int;
+static unixtime     obs_valid_ut  = (unixtime) 0;
+static int          obs_lead_sec  = bad_data_int;
 static ConcatString out_dir;
 static ConcatString met_data_dir;
-static int          verbosity = 2;
+static int          verbosity     = 2;
 
 ////////////////////////////////////////////////////////////////////////
 //
