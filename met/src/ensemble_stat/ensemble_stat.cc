@@ -666,7 +666,7 @@ int process_point_ens(int i_ens) {
 
       default:
          cout << "\n\n***WARNING***: process_point_ens() -> "
-              << "unsupport forecast file type: "
+              << "unsupported forecast file type: "
               << ens_file_list[i_ens] << "\n\n" << flush;
          return(1);
          break;
