@@ -118,6 +118,7 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    int i;
    struct stat results;
+   char tmp_str[max_str_len], tmp2_str[max_str_len];
 
    // Set default output directory
    out_dir << MET_BASE << "/out/ensemble_stat";
@@ -209,10 +210,14 @@ void process_command_line(int argc, char **argv) {
    if(obs_valid_beg_ut != (unixtime) 0 &&
       obs_valid_end_ut != (unixtime) 0 &&
       obs_valid_beg_ut > obs_valid_end_ut) {
+
+      unix_to_yyyymmdd_hhmmss(obs_valid_end_ut, tmp_str);
+      unix_to_yyyymmdd_hhmmss(obs_valid_beg_ut, tmp2_str);
+
       cerr << "\n\nERROR: process_command_line() -> "
-           << "the ending time (" << obs_valid_end_ut
+           << "the ending time (" << tmp_str
            << ") must be greater than the beginning time ("
-           << obs_valid_beg_ut << ").\n\n" << flush;
+           << tmp2_str << ").\n\n" << flush;
       exit(1);
    }
 
