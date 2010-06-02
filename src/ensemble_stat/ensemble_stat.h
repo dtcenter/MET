@@ -115,10 +115,16 @@ static ConcatString         config_file;
 static ConcatString         out_file;
 
 // Optional arguments
-static unixtime     obs_valid_beg_ut = (unixtime) 0;
-static unixtime     obs_valid_end_ut = (unixtime) 0;
-static unixtime     ens_valid_ut = (unixtime) 0;
+static unixtime     ens_valid_search_ut = (unixtime) 0;
+static int          ens_lead_search_sec = bad_data_int;
+
+static unixtime     ens_valid_ut        = (unixtime) 0;
 static NumArray     ens_lead_na;
+
+static unixtime     obs_valid_beg_ut    = (unixtime) 0;
+static unixtime     obs_valid_end_ut    = (unixtime) 0;
+static int          obs_lead_sec        = bad_data_int;
+
 static ConcatString out_dir;
 static int          verbosity = 2;
 

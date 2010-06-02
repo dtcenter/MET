@@ -64,7 +64,7 @@ static void process_grid_scores   (WrfData *&, WrfData &, WrfData &,
                                    EnsPairData &);
 
 static void parse_ens_file_list(const char *);
-static int  read_field(const char *, const GCInfo &, WrfData &);
+static int  read_field(const char *, const GCInfo &, WrfData &, int);
 static int  read_ens_field(const char *, const GCInfo &, WrfData &);
 static void clear_counts(const WrfData &, int);
 static void track_counts(const WrfData &, int);
@@ -169,12 +169,24 @@ void process_command_line(int argc, char **argv) {
          point_obs_flag = 1;
          i++;
       }
+      else if(strcmp(argv[i], "-ens_valid") == 0) {
+         ens_valid_search_ut = timestring_to_unix(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-ens_lead") == 0) {
+         ens_lead_search_sec = timestring_to_sec(argv[i+1]);
+         i++;
+      }
       else if(strcmp(argv[i], "-obs_valid_beg") == 0) {
          obs_valid_beg_ut = timestring_to_unix(argv[i+1]);
          i++;
       }
       else if(strcmp(argv[i], "-obs_valid_end") == 0) {
          obs_valid_end_ut = timestring_to_unix(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-obs_lead") == 0) {
+         obs_lead_sec = timestring_to_sec(argv[i+1]);
          i++;
       }
       else if(strcmp(argv[i], "-outdir") == 0) {
@@ -714,7 +726,7 @@ int process_point_ens(int i_ens) {
 
          // Read the current field from the current forecast file
          miss_flag = read_field(ens_file_list[i_ens], gc_info,
-                                fcst_wd[j]);
+                                fcst_wd[j], 1);
 
          // If a field is missing, return with bad status
          if(miss_flag > 0) return(1);
@@ -925,7 +937,7 @@ void process_grid_vx() {
          if(ens_file_vld[j]) {
             n_miss += read_field(ens_file_list[j],
                                  conf_info.gc_pd[i].fcst_gci,
-                                 fcst_wd[j]);
+                                 fcst_wd[j], 1);
          }
          else {
             n_miss++;
@@ -953,7 +965,7 @@ void process_grid_vx() {
          // Attempt to read the field from the current observation file
          miss_flag = read_field(grid_obs_file_list[j],
                                 conf_info.gc_pd[i].obs_gci,
-                                obs_wd);
+                                obs_wd, 0);
 
          // If found, break out of the loop
          if(!miss_flag) break;
@@ -1169,14 +1181,31 @@ void parse_ens_file_list(const char *fcst_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int read_field(const char *file_name, const GCInfo &gci, WrfData &wd) {
+int read_field(const char *file_name, const GCInfo &gci, WrfData &wd,
+               int ens_flag) {
    FileType ftype = NoFileType;
    GribFile gb_file;
    NcFile  *nc_file = (NcFile *) 0;
    int status;
-   char tmp_str[max_str_len], tmp2_str[max_str_len];
+   char tmp_str[max_str_len];
    Grid gr;
    GribRecord rec;
+   unixtime valid_ut;
+   int lead_sec;
+
+   if(ens_flag) {
+      valid_ut = ens_valid_search_ut;
+      lead_sec = ens_lead_search_sec;
+   }
+   else {
+      if(obs_valid_beg_ut == obs_valid_end_ut) {
+         valid_ut = obs_valid_beg_ut;
+      }
+      else {
+         valid_ut = (unixtime) 0;
+      }
+      lead_sec = obs_lead_sec;
+   }
 
    // Switch based on the file type
    ftype = get_file_type(file_name);
@@ -1195,8 +1224,8 @@ int read_field(const char *file_name, const GCInfo &gci, WrfData &wd) {
          }
 
          // Retrieve the requested field
-         status = get_grib_record(gb_file, rec, gci, wd, gr,
-                                  verbosity);
+         status = get_grib_record(gb_file, rec, gci, valid_ut,
+                                  lead_sec, wd, gr, verbosity);
 
          if(status != 0) {
             cout << "\n\n***WARNING***: read_field() -> "
@@ -1258,22 +1287,6 @@ int read_field(const char *file_name, const GCInfo &gci, WrfData &wd) {
       }
    }
 
-   // Store the valid time, if not already set
-   if(ens_valid_ut == (unixtime) 0) {
-      ens_valid_ut = wd.get_valid_time();
-   }
-   // Check to make sure that the valid time doesn't change
-   else {
-      if(ens_valid_ut != wd.get_valid_time()) {
-         unix_to_yyyymmdd_hhmmss(ens_valid_ut, tmp_str);
-         unix_to_yyyymmdd_hhmmss(wd.get_valid_time(), tmp2_str);
-         cerr << "\n\n***WARNING***: read_field() -> "
-              << "The valid time has changed, "
-              << tmp_str << " != " << tmp2_str << ": "
-              << file_name << "\n\n" << flush;
-      }
-   }
-
    return(0);
 }
 
@@ -1282,9 +1295,28 @@ int read_field(const char *file_name, const GCInfo &gci, WrfData &wd) {
 int read_ens_field(const char *file_name, const GCInfo &gci,
                    WrfData &wd) {
    int miss_flag;
+   char tmp_str[max_str_len], tmp2_str[max_str_len];
 
    // Read the forecast field
-   miss_flag = read_field(file_name, gci, wd);
+   miss_flag = read_field(file_name, gci, wd, 1);
+
+   // Store the ensemble valid time, if not already set
+   if(ens_valid_ut == (unixtime) 0) {
+      ens_valid_ut = wd.get_valid_time();
+   }
+   // Check to make sure that the valid time doesn't change
+   else {
+      if(ens_valid_ut != wd.get_valid_time()) {
+
+         unix_to_yyyymmdd_hhmmss(ens_valid_ut, tmp_str);
+         unix_to_yyyymmdd_hhmmss(wd.get_valid_time(), tmp2_str);
+
+         cerr << "\n\n***WARNING***: read_ens_field() -> "
+              << "The valid time has changed, "
+              << tmp_str << " != " << tmp2_str << ": "
+              << file_name << "\n\n" << flush;
+      }
+   }
 
    // Store the lead time
    ens_lead_na.add(wd.get_lead_time());
@@ -2025,8 +2057,11 @@ void usage(int argc, char *argv[]) {
         << "\tconfig_file\n"
         << "\t[-grid_obs file]\n"
         << "\t[-point_obs file]\n"
+        << "\t[-ens_valid time]\n"
+        << "\t[-ens_lead time]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
+        << "\t[-obs_lead time]\n"
         << "\t[-outdir path]\n"
         << "\t[-v level]\n\n"
 
@@ -2048,11 +2083,20 @@ void usage(int argc, char *argv[]) {
         << "\t\t\"-point_obs file\" specifies a NetCDF point observation file. "
         << "May be used multiple times (optional).\n"
 
+        << "\t\t\"-ens_valid time\" in YYYYMMDD[_HH[MMSS]] format "
+        << "sets the ensemble valid time to be used (optional).\n"
+
+        << "\t\t\"-ens_lead time\" in HH[MMSS] format sets "
+        << "the ensemble lead time to be used (optional).\n"
+
         << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
-        << "beginning of the matching observation time window (optional).\n"
+        << "beginning of the matching time window (optional).\n"
 
         << "\t\t\"-obs_valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
-        << "end of the matching observation time window (optional).\n"
+        << "end of the matching time window (optional).\n"
+
+        << "\t\t\"-obs_lead time\" in HH[MMSS] format sets "
+        << "the observation lead time to be used (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output directory "
         << "(" << out_dir << ") (optional).\n"
