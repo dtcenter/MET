@@ -819,7 +819,7 @@ void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
                         int verbosity) {
 
    derive_wind_record(grib_file, grib_record, wd, gr, gc_info,
-                      (unixtime) 0, 0, verbosity);
+                      (unixtime) 0, bad_data_int, verbosity);
 
    return;
 }
