@@ -664,12 +664,9 @@ void process_grib_codes() {
             // Initialize the GCInfo object
             gc_info = conf_info.gc_pd[i].fcst_gci;
 
-            // When retrieving multiple single records, set the current
-            // level value for the record to retrieve.
-            if(n_fcst_rec > 1) {
-               gc_info.lvl_1 = fcst_lvl[j];
-               gc_info.lvl_2 = fcst_lvl[j];
-            }
+            // Set the current level value for the record to retrieve.
+            gc_info.lvl_1 = fcst_lvl[j];
+            gc_info.lvl_2 = fcst_lvl[j];
 
             status = get_grib_record(fcst_gb_file, rec, gc_info,
                                      fcst_valid_ut, fcst_lead_sec,
