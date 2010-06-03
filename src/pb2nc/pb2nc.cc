@@ -32,6 +32,8 @@
 //   005    02-12-09  Halley Gotway  Fix npbmsg bug when reading
 //                    multiple PrepBufr files and use of valid_beg and
 //                    valid_end options.
+//   006    06-01-10  Halley Gotway  Pass flags to dumppb to only dump
+//                    observation for reqeusted message types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,6 +99,7 @@ static const int obs_arr_len    = 5;
 static int file_unit            = 11;
 // 2nd file unit number for opening the PrepBufr file
 static int dump_unit            = 22;
+static int msg_typ_ret[n_vld_msg_typ];
 
 // Grib codes corresponding to the variable types
 static const int var_gc[mxr8vt] = {
@@ -213,7 +216,7 @@ extern "C" {
    void readpb_(int *, char *, int *, int *, int *, double[mxr8pm],
                 double[mxr8vt][mxr8vn][mxr8lv][mxr8pm]);
    void dumppb_(char *, int *, const char *, int *,
-                const char *, int *);
+                const char *, int *, int *);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -718,11 +721,16 @@ void process_pbfile(int i_pb) {
          exit(1);
       }
 
+      for(i=0; i<n_vld_msg_typ; i++) {
+         msg_typ_ret[i] = keep_message_type(vld_msg_typ_list[i]);
+      }
+
       unit = dump_unit+i_pb;
       strcpy(prefix, get_short_name(pbfile[i_pb]));
       len1 = strlen(dump_dir);
       len2 = strlen(prefix);
-      dumppb_(blk_file, &unit, dump_dir.text(), &len1, prefix, &len2);
+      dumppb_(blk_file, &unit, dump_dir.text(), &len1,
+              prefix, &len2, msg_typ_ret);
    }
 
    //

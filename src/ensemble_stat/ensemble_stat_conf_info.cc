@@ -291,7 +291,7 @@ void EnsembleStatConfInfo::process_config() {
       // Check that each PrepBufr message type provided is valid
       for(i=0; i<n_msg_typ; i++) {
 
-         if(strstr(all_msg_typ_str, msg_typ[i]) == NULL) {
+         if(strstr(vld_msg_typ_str, msg_typ[i]) == NULL) {
             cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
                  << "Invalid message type string provided ("
                  << conf.message_type(i).sval() << ").\n\n" << flush;

@@ -27,20 +27,20 @@ static const char * const proj_type[4] = {
 };
 
 // String containing all valid PrepBufr message types
-static const char all_msg_typ_str[] =
+static const char vld_msg_typ_str[] =
    "ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW MSONET \
     PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG SFCSHP SPSSMI \
     SYNDAT VADWND ANYAIR ANYSFC ONLYSF";
 
 // Array of valid PrepBufr message types
-static const char *all_msg_typ_list[] = {
+static const char *vld_msg_typ_list[] = {
    "ADPUPA", "AIRCAR", "AIRCFT", "ADPSFC", "ERS1DA", "GOESND",
    "GPSIPW", "MSONET", "PROFLR", "QKSWND", "RASSDA", "SATEMP",
    "SATWND", "SFCBOG", "SFCSHP", "SPSSMI", "SYNDAT", "VADWND" };
 
 // Number of valid PrepBufr message types
-static const int n_msg_typ =
-   sizeof(all_msg_typ_list)/sizeof(*all_msg_typ_list);
+static const int n_vld_msg_typ =
+   sizeof(vld_msg_typ_list)/sizeof(*vld_msg_typ_list);
 
 // Special PrepBufr message types
 static const char anyair_str[]         = "ANYAIR";
