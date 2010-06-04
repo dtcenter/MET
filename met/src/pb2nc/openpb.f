@@ -1,24 +1,24 @@
-C*	*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-C*	** Copyright UCAR (c) 1992 - 2007
-C*	** University Corporation for AtmospheriC*Research (UCAR)
-C*	** National Center for AtmospheriC*Research (NCAR)
-C*	** Research Applications Lab (RAL)
-C*	** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-C*	*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+C*      ** Copyright UCAR (c) 1992 - 2007
+C*      ** University Corporation for AtmospheriC*Research (UCAR)
+C*      ** National Center for AtmospheriC*Research (NCAR)
+C*      ** Research Applications Lab (RAL)
+C*      ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-	SUBROUTINE OPENPB ( PBFILE, FID )
+        SUBROUTINE OPENPB ( PBFILE, FID )
 C*
-	INCLUDE		'readpb.prm'
+        INCLUDE    'readpb.prm'
 C*
-	CHARACTER	PBFILE*(FILEMXSTRL)
-	INTEGER		FID
+        CHARACTER  PBFILE*(FILEMXSTRL)
+        INTEGER    FID
 C*
 C-----------------------------------------------------------------------
 C*
-C*	Open the input file.
+C*      Open the input file.
 C*
-	OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED' )
-	CALL OPENBF  ( FID, 'IN', FID )
-	CALL DATELEN  ( 10 )
+        OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED' )
+        CALL OPENBF  ( FID, 'IN', FID )
+        CALL DATELEN  ( 10 )
 C*
         END
