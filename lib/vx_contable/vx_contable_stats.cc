@@ -419,28 +419,6 @@ double ContingencyTable::gaccuracy() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-double ContingencyTable::gaccuracy_ci(double alpha,
-                                     double &cl, double &cu) const {
-   double v;
-
-   if ( Nrows != Ncols )  {
-
-      cerr << "\n\n  ContingencyTable::gaccuracy() -> table not square!\n\n";
-
-      exit ( 1 );
-
-   }
-
-   v = gaccuracy();
-
-   compute_proportion_ci(v, total(), alpha, cl, cu);
-
-   return(v);
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 
 double ContingencyTable::gheidke()const  //  Reference: Eq. 7.11, page 249 in Wilks, 1st Ed.
 
