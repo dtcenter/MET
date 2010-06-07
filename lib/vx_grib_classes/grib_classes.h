@@ -84,10 +84,7 @@ inline GribError::GribError(int ErrType, int LineNo, const char *FileName, const
 ////////////////////////////////////////////////////////////////////////
 
 
-// static const int gribfile_buf_size = 65536;
-
-// static const int gribfile_buf_size = 1048576;
-static const int gribfile_buf_size = 2097152;
+static const int gribfile_buf_size = 4194304;
 
 
 ////////////////////////////////////////////////////////////////////////
