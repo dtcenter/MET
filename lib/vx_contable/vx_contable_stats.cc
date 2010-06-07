@@ -394,6 +394,54 @@ double TTContingencyTable::odds_ci(double alpha,
 ////////////////////////////////////////////////////////////////////////
 
 
+double ContingencyTable::gaccuracy() const {
+   double num, den, v;
+   int i;
+
+   if ( Nrows != Ncols )  {
+
+      cerr << "\n\n  ContingencyTable::gaccuracy() -> table not square!\n\n";
+
+      exit ( 1 );
+
+   }
+
+   for(i=0, num=0.0; i<Nrows; i++) num += (double) entry(i, i);
+
+   den = (double) total();
+
+   if(is_eq(den, 0.0)) v = bad_data_double;
+   else                v = num/den;
+
+   return(v);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+double ContingencyTable::gaccuracy_ci(double alpha,
+                                     double &cl, double &cu) const {
+   double v;
+
+   if ( Nrows != Ncols )  {
+
+      cerr << "\n\n  ContingencyTable::gaccuracy() -> table not square!\n\n";
+
+      exit ( 1 );
+
+   }
+
+   v = gaccuracy();
+
+   compute_proportion_ci(v, total(), alpha, cl, cu);
+
+   return(v);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double ContingencyTable::gheidke()const  //  Reference: Eq. 7.11, page 249 in Wilks, 1st Ed.
 
 {
@@ -624,7 +672,7 @@ for (j=0; j<Nrows; ++j)  {
    //  scoring matrix
    //
 
-calc_garrity_scoring_matrix(Nrows, p, s);
+calc_gerrity_scoring_matrix(Nrows, p, s);
 
    //
    //  calculate score
@@ -671,7 +719,7 @@ return ( sum );
 ////////////////////////////////////////////////////////////////////////
 
 
-void calc_garrity_scoring_matrix(int N, const double * p, double * s)
+void calc_gerrity_scoring_matrix(int N, const double * p, double * s)
 
 {
 

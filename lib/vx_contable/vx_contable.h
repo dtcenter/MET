@@ -122,9 +122,11 @@ class ContingencyTable {
          //  statistics
          //
 
-      virtual double  gheidke () const;
-      virtual double  gkuiper () const;
-      virtual double  gerrity () const;
+      virtual double gaccuracy    () const;
+      virtual double gaccuracy_ci (double alpha, double &cl, double &cu) const;
+      virtual double gheidke      () const;
+      virtual double gkuiper      () const;
+      virtual double gerrity      () const;
 
 };
 
@@ -416,7 +418,7 @@ static const int FN_row = 1;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void calc_garrity_scoring_matrix(int N, const double * p, double * s);
+extern void calc_gerrity_scoring_matrix(int N, const double * p, double * s);
 
 
 ////////////////////////////////////////////////////////////////////////
