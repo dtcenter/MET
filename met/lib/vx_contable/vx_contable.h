@@ -122,11 +122,10 @@ class ContingencyTable {
          //  statistics
          //
 
-      virtual double gaccuracy    () const;
-      virtual double gaccuracy_ci (double alpha, double &cl, double &cu) const;
-      virtual double gheidke      () const;
-      virtual double gkuiper      () const;
-      virtual double gerrity      () const;
+      virtual double gaccuracy () const;
+      virtual double gheidke   () const;
+      virtual double gkuiper   () const;
+      virtual double gerrity   () const;
 
 };
 
