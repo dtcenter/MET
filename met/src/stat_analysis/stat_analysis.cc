@@ -185,6 +185,17 @@ void parse_command_line(int &argc, char **argv) {
          set_out_file(argv[i+1]);
          i++;
       }
+      else if(strcmp(argv[i], "-tmp_dir") == 0) {
+
+         tmp_dir << argv[i+1];
+         if(opendir(tmp_dir) == NULL ) {
+            cerr << "\n\nERROR: parse_command_line() -> "
+                 << "Cannot access the tmp_dir temporary directory: "
+                 << tmp_dir << "\n\n" << flush;
+            exit(1);
+         }
+         i++;
+      }
       else if(strcmp(argv[i], "-v") == 0) {
          set_verbosity(atoi(argv[i+1]));
          i++;
@@ -692,11 +703,6 @@ void set_default_job() {
    //
    default_job.rank_corr_flag = conf.rank_corr_flag().ival();
 
-   //
-   // tmp_dir
-   //
-   default_job.set_tmp_dir(conf.tmp_dir().sval());
-
    return;
 }
 
@@ -735,8 +741,15 @@ void process_search_dirs() {
    //
    // Open up the temp file for storing the intermediate STAT line data
    //
-   if(config_file != (char *) 0) tmp_dir = conf.tmp_dir().sval();
-   else                          tmp_dir = default_tmp_dir;
+
+   //
+   // If the tmp_dir has not already been set on the command line,
+   // use the config file setting or default setting.
+   //
+   if(strlen(tmp_dir) == 0) {
+      if(config_file != (char *) 0) tmp_dir = conf.tmp_dir().sval();
+      else                          tmp_dir = default_tmp_dir;
+   }
 
    tmp_path << tmp_dir << "/" << tmp_file;
    tmp_out.open(tmp_path);
@@ -847,7 +860,8 @@ void process_job(const char * jobstring, int n_job) {
    //
    // Do the job
    //
-   do_job(full_jobstring, job, n_job, tmp_path, sa_out, verbosity);
+   do_job(full_jobstring, job, n_job, tmp_dir, tmp_path,
+          sa_out, verbosity);
 
    return;
 }
@@ -880,6 +894,7 @@ void usage() {
         << "Usage: " << program_name << "\n"
         << "\t-lookin path\n"
         << "\t[-out filename]\n"
+        << "\t[-tmp_dir path]\n"
         << "\t[-v level]\n"
         << "\t[-config config_file] | [JOB COMMAND LINE]\n\n"
 
@@ -889,6 +904,9 @@ void usage() {
 
         << "\t\t\"-out filename\" specifies a file name to which "
         << "output should written rather than the screen (optional).\n"
+
+        << "\t\t\"-tmp_dir path\" specifies the directory into which "
+        << "temporary files should be written (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
         << verbosity << ") (optional).\n"

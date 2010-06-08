@@ -80,13 +80,13 @@ extern void aggr_mpr_lines_ct(
 extern void aggr_mpr_lines_cts(
                STATAnalysisJob &,
                const NumArray &, const NumArray &,
-               CTSInfo &);
+               CTSInfo &, const char *);
 
 extern void aggr_mpr_lines_cnt(
                STATAnalysisJob &,
                int, int,
                const NumArray &, const NumArray &,
-               CNTInfo &);
+               CNTInfo &, const char *);
 
 extern void aggr_mpr_lines_psums(
                STATAnalysisJob &,
