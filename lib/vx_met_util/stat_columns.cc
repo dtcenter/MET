@@ -65,6 +65,65 @@ int get_column_offset(const char **arr, int n_cols, const char *col_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int get_mctc_column_offset(const char *col_name, int n_cat) {
+   int i, j, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the PCT columns:
+   //    TOTAL,       N_CAT,
+   //    [Fi_Oj] (for of the NxN contingency table cells)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<2; i++) {
+
+         if(strcasecmp(mctc_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable colum
+   //
+   if(!found) {
+
+      // Fi_Oj: Parse out i and j
+      parse_row_col(col_name, i, j);
+      offset = n_header_columns + 2 + (i-1)*n_cat + (j-1);
+      found  = 1;
+   }
+
+   if(!found) {
+      cerr << "\n\nERROR: get_mctc_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n" << flush;
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int get_pct_column_offset(const char *col_name) {
    int i, offset, found;
 
@@ -547,6 +606,25 @@ int parse_thresh_index(const char *col_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void parse_row_col(const char *col_name, int &r, int &c) {
+   char *ptr;
+
+   // Parse Fi_Oj strings
+   r = atoi(++col_name);
+
+   if((ptr = strrchr(col_name, '_')) != NULL) c = atoi(++ptr);
+   else {
+      cerr << "\n\nERROR: parse_row_col() -> "
+           << "unexpected column name specified: \""
+           << col_name << "\"\n\n" << flush;
+      throw(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void open_txt_file(ofstream *&out, const char *file_name,
                    int verbosity) {
 
@@ -602,6 +680,38 @@ void write_header_row(const char **cols, int n_cols, int hdr_flag,
    // Write the columns names specific to this line type
    for(i=0; i<n_cols; i++)
       at.set_entry(r, i+c, cols[i]);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
+                           int r, int c) {
+   int i, j, col;
+   char tmp_str[max_str_len];
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_header_columns; i++)
+         at.set_entry(r, i+c, hdr_columns[i]);
+
+      c += n_header_columns;
+   }
+
+   // Write the columns names specific to the MCTC line type
+   at.set_entry(r, c+0, mctc_columns[0]);
+   at.set_entry(r, c+1, mctc_columns[1]);
+
+   // Write Fi_Oj for each entry of the NxN table
+   for(i=0, col=c+2; i<n_cat; i++) {
+      for(j=0; j<n_cat; j++) {
+
+         sprintf(tmp_str, "F%i_O%i", i+1, j+1);
+         at.set_entry(r, col, tmp_str); // Threshold
+         col++;
+      }
+   }
 
    return;
 }
@@ -969,6 +1079,89 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 
       // Write the data columns
       write_cts_cols(cts_info, i, stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_flag >= 2) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
+                    int out_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+
+   // MCTC line type
+   shc.set_line_type("MCTC");
+
+   // Thresholds
+   shc.set_fcst_thresh(mcts_info.cts_fcst_ta);
+   shc.set_obs_thresh(mcts_info.cts_obs_ta);
+
+   // Not Applicable
+   shc.set_alpha(bad_data_double);
+   shc.clear_cov_thresh();
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_mctc_cols(mcts_info, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(out_flag >= 2) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
+                    int out_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+   int i;
+
+   // MCTS line type
+   shc.set_line_type("MCTS");
+
+   // Thresholds
+   shc.set_fcst_thresh(mcts_info.cts_fcst_ta);
+   shc.set_obs_thresh(mcts_info.cts_obs_ta);
+
+   // Not Applicable
+   shc.clear_cov_thresh();
+
+   // Write a line for each alpha value
+   for(i=0; i<mcts_info.n_alpha; i++) {
+
+      // Alpha value
+      shc.set_alpha(mcts_info.alpha[i]);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      write_mcts_cols(mcts_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(out_flag >= 2) {
@@ -2243,6 +2436,97 @@ void write_sl1l2_cols(const CNTInfo &cnt_info,
 
    at.set_entry(r, c+5,  // OOBAR
       cnt_info.oobar);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_mctc_cols(const MCTSInfo &mcts_info,
+                     AsciiTable &at, int r, int c) {
+   int i, j, col;
+
+   //
+   // Multi-Category Contingency Table Counts
+   // Dump out the MCTC line:
+   //    TOTAL,       N_CAT,     Fi_Oj
+   //
+   at.set_entry(r, c+0,  // Total Count
+      mcts_info.cts.total());
+
+   at.set_entry(r, c+1,  // N_CAT
+      mcts_info.cts.nrows());
+
+   //
+   // Loop through the contingency table rows and columns
+   //
+   for(i=0, col=c+2; i<mcts_info.cts.nrows(); i++) {
+      for(j=0; j<mcts_info.cts.ncols(); j++) {
+
+         at.set_entry(r, col,      // Fi_Oj
+            mcts_info.cts.entry(i, j));
+         col++;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_mcts_cols(const MCTSInfo &mcts_info, int i,
+                     AsciiTable &at, int r, int c) {
+
+   //
+   // Multi-Category Contingency Table Stats
+   // Dump out the MCTS line:
+   //    TOTAL,       N_CAT,
+   //    ACC,         ACC_NCL,     ACC_NCU,     ACC_BCL,     ACC_BCU,
+   //    HK,          HK_BCL,      HK_BCU,
+   //    HSS,         HSS_BCL,     HSS_BCU,
+   //    GER
+   //
+   at.set_entry(r, c+0,  // Total count
+      mcts_info.cts.total());
+
+   at.set_entry(r, c+1,  // Number of categories
+      mcts_info.cts.nrows());
+
+   at.set_entry(r, c+2, // Accuracy
+      mcts_info.acc.v);
+
+   at.set_entry(r, c+3, // Accuracy NCL
+      mcts_info.acc.v_ncl[i]);
+
+   at.set_entry(r, c+4, // Accuracy NCU
+      mcts_info.acc.v_ncu[i]);
+
+   at.set_entry(r, c+5, // Accuracy BCL
+      mcts_info.acc.v_bcl[i]);
+
+   at.set_entry(r, c+6, // Accuracy BCU
+      mcts_info.acc.v_bcu[i]);
+
+   at.set_entry(r, c+7, // Hanssen-Kuipers Discriminant (TSS)
+      mcts_info.hk.v);
+
+   at.set_entry(r, c+8, // Hanssen-Kuipers Discriminant (TSS) BCL
+      mcts_info.hk.v_bcl[i]);
+
+   at.set_entry(r, c+9, // Hanssen-Kuipers Discriminant (TSS) BCU
+      mcts_info.hk.v_bcu[i]);
+
+   at.set_entry(r, c+10, // Heidke Skill Score
+      mcts_info.hss.v);
+
+   at.set_entry(r, c+11, // Heidke Skill Score BCL
+      mcts_info.hss.v_bcl[i]);
+
+   at.set_entry(r, c+12, // Heidke Skill Score BCU
+      mcts_info.hss.v_bcu[i]);
+
+   at.set_entry(r, c+13, // Gerrity Score
+      mcts_info.ger.v);
 
    return;
 }

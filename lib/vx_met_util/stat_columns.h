@@ -80,6 +80,18 @@ static const char * cts_columns [] = {
    "ODDS",        "ODDS_NCL",    "ODDS_NCU",    "ODDS_BCL",    "ODDS_BCU"
 };
 
+static const char * mctc_columns [] = {
+   "TOTAL",       "N_CAT",       "Fi_Oj"
+};
+
+static const char * mcts_columns [] = {
+   "TOTAL",       "N_CAT",
+   "ACC",         "ACC_NCL",     "ACC_NCU",     "ACC_BCL",     "ACC_BCU",
+   "HK",          "HK_BCL",      "HK_BCU",
+   "HSS",         "HSS_BCL",     "HSS_BCU",
+   "GER"
+};
+
 static const char * cnt_columns [] = {
    "TOTAL",
    "FBAR",        "FBAR_NCL",    "FBAR_NCU",    "FBAR_BCL",    "FBAR_BCU",
@@ -236,6 +248,8 @@ static const int n_ctp_columns      = sizeof(ctp_columns)/sizeof(*ctp_columns);
 static const int n_cfp_columns      = sizeof(cfp_columns)/sizeof(*cfp_columns);
 static const int n_cop_columns      = sizeof(cop_columns)/sizeof(*cop_columns);
 static const int n_cts_columns      = sizeof(cts_columns)/sizeof(*cts_columns);
+static const int n_mctc_columns     = sizeof(mctc_columns)/sizeof(*mctc_columns);
+static const int n_mcts_columns     = sizeof(mcts_columns)/sizeof(*mcts_columns);
 static const int n_cnt_columns      = sizeof(cnt_columns)/sizeof(*cnt_columns);
 static const int n_sl1l2_columns    = sizeof(sl1l2_columns)/sizeof(*sl1l2_columns);
 static const int n_sal1l2_columns   = sizeof(sal1l2_columns)/sizeof(*sal1l2_columns);
@@ -261,6 +275,7 @@ static const int n_orank_columns    = sizeof(orank_columns)/sizeof(*orank_column
 
 ////////////////////////////////////////////////////////////////////////
 
+inline int get_n_mctc_columns  (int n) { return(2  + n*n); }
 inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_pstd_columns  (int n) { return(12 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
@@ -271,6 +286,7 @@ inline int get_n_orank_columns (int n) { return(11 + n);               } // n = 
 ////////////////////////////////////////////////////////////////////////
 
 extern int get_column_offset      (const char **, int, const char *);
+extern int get_mctc_column_offset (const char *, int);
 extern int get_pct_column_offset  (const char *);
 extern int get_pstd_column_offset (const char *);
 extern int get_pjc_column_offset  (const char *);
@@ -280,7 +296,8 @@ extern int get_orank_column_offset(const char *);
 
 ////////////////////////////////////////////////////////////////////////
 
-extern int parse_thresh_index(const char *);
+extern int  parse_thresh_index(const char *);
+extern void parse_row_col(const char *, int &, int &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -293,6 +310,7 @@ extern void close_txt_file(ofstream *&,  const char *, int);
 extern void write_header_row(const char **, int, int, AsciiTable &, int, int);
 
 // Write out the header row for variable length line types
+extern void write_mctc_header_row  (int, int, AsciiTable &, int, int);
 extern void write_pct_header_row   (int, int, AsciiTable &, int, int);
 extern void write_pstd_header_row  (int, int, AsciiTable &, int, int);
 extern void write_pjc_header_row   (int, int, AsciiTable &, int, int);
@@ -305,6 +323,10 @@ extern void write_fho_row   (StatHdrColumns &, const CTSInfo &, int,
 extern void write_ctc_row   (StatHdrColumns &, const CTSInfo &, int,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_cts_row   (StatHdrColumns &, const CTSInfo &, int,
+                             AsciiTable &, int &, AsciiTable &, int &);
+extern void write_mctc_row  (StatHdrColumns &, const MCTSInfo &, int,
+                             AsciiTable &, int &, AsciiTable &, int &);
+extern void write_mcts_row  (StatHdrColumns &, const MCTSInfo &, int,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_cnt_row   (StatHdrColumns &, const CNTInfo &, int,
                              AsciiTable &, int &, AsciiTable &, int &);
@@ -350,6 +372,8 @@ extern void write_header_cols(const StatHdrColumns &,  AsciiTable &, int);
 extern void write_fho_cols   (const CTSInfo &,          AsciiTable &, int, int);
 extern void write_ctc_cols   (const CTSInfo &,          AsciiTable &, int, int);
 extern void write_cts_cols   (const CTSInfo &,     int, AsciiTable &, int, int);
+extern void write_mctc_cols  (const MCTSInfo &,         AsciiTable &, int, int);
+extern void write_mcts_cols  (const MCTSInfo &,    int, AsciiTable &, int, int);
 extern void write_cnt_cols   (const CNTInfo &,     int, AsciiTable &, int, int);
 extern void write_sl1l2_cols (const CNTInfo &,          AsciiTable &, int, int);
 extern void write_sl1l2_cols (const SL1L2Info &,        AsciiTable &, int, int);

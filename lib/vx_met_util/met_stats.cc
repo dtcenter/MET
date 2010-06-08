@@ -371,6 +371,152 @@ void CTSInfo::compute_ci() {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Code for class MCTSInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+MCTSInfo::MCTSInfo() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MCTSInfo::~MCTSInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MCTSInfo::MCTSInfo(const MCTSInfo &c) {
+
+   init_from_scratch();
+
+   assign(c);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MCTSInfo & MCTSInfo::operator=(const MCTSInfo &c) {
+
+   if(this == &c) return(*this);
+
+   assign(c);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::init_from_scratch() {
+
+   alpha = (double *) 0;
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::clear() {
+
+   n_alpha = 0;
+   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+
+   cts.zero_out();
+   cts_fcst_ta.clear();
+   cts_obs_ta.clear();
+
+   acc.clear();
+   hk.clear();
+   hss.clear();
+   ger.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::assign(const MCTSInfo &c) {
+   int i;
+
+   clear();
+
+   cts = c.cts;
+   cts_fcst_ta = c.cts_fcst_ta;
+   cts_obs_ta  = c.cts_obs_ta;
+
+   allocate_n_alpha(c.n_alpha);
+   for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
+
+   acc = c.acc;
+   hk = c.hk;
+   hss = c.hss;
+   ger = c.ger;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::allocate_n_alpha(int i) {
+
+   n_alpha = i;
+
+   if(n_alpha > 0) {
+
+      alpha = new double [n_alpha];
+
+      if(!alpha) {
+         cerr << "\n\nERROR: MCTSInfo::allocate_n() -> "
+              << "Memory allocation error!\n\n" << flush;
+         exit(1);
+      }
+
+      acc.allocate_n_alpha(n_alpha);
+      hk.allocate_n_alpha(n_alpha);
+      hss.allocate_n_alpha(n_alpha);
+      ger.allocate_n_alpha(n_alpha);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::compute_stats() {
+
+   acc.v = cts.gaccuracy();
+   hk.v  = cts.gkuiper();
+   hss.v = cts.gheidke();
+   ger.v = cts.gerrity();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::compute_ci() {
+   int i;
+
+   //
+   // Compute confidence intervals for each alpha value specified
+   //
+   for(i=0; i<n_alpha; i++) {
+
+      //
+      // Compute confidence intervals for the scores based on
+      // proportions
+      //
+      compute_proportion_ci(acc.v, cts.total(), alpha[i],
+                            acc.v_ncl[i], acc.v_ncu[i]);
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Code for class CNTInfo
 //
 ////////////////////////////////////////////////////////////////////////
