@@ -59,6 +59,8 @@ class ThreshArray {
 
       void get_str(const char *, char *) const;
       void get_abbr_str(const char *, char *) const;
+
+      int  check(double) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
