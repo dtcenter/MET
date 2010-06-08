@@ -322,3 +322,36 @@ void ThreshArray::get_abbr_str(const char *sep, char *str) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int ThreshArray::check(double v) const {
+   int i, bin;
+
+   //
+   // Check that the threshold value are monotonically increasing and
+   // the threshold types are either < or <=.
+   //
+   for(i=0; i<Nelements-1; i++) {
+
+      if(t[i].thresh > t[i+1].thresh ||
+         (t[i].type != thresh_lt && t[i].type != thresh_le)) {
+
+         cerr << "\n\n  ThreshArray::check(double) const -> "
+              << "thresholds must be monotonically increasing and of "
+              << "type < or <=\n\n";
+         exit(1);
+      }
+   }
+
+   for(i=0, bin=-1; i<Nelements; i++) {
+      if(t[i].check(v)) {
+         bin = i;
+         break;
+      }
+   }
+
+   if(bin == -1) bin = Nelements;
+
+   return(bin);
+}
+
+////////////////////////////////////////////////////////////////////////
+
