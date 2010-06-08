@@ -98,6 +98,41 @@ class CTSInfo {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Class to store Multi-Category Contingency Table Counts and Statistics
+//
+////////////////////////////////////////////////////////////////////////
+
+class MCTSInfo {
+
+   private:
+      void init_from_scratch();
+      void assign(const MCTSInfo &);
+
+   public:
+
+      MCTSInfo();
+      ~MCTSInfo();
+      MCTSInfo(const MCTSInfo &);
+      MCTSInfo & operator=(const MCTSInfo &);
+
+      // Confidence interval alpha values
+      int     n_alpha;
+      double *alpha;
+
+      ContingencyTable cts;
+      ThreshArray      cts_fcst_ta;
+      ThreshArray      cts_obs_ta;
+
+      CIInfo acc, hk, hss, ger;
+
+      void clear();
+      void allocate_n_alpha(int);
+      void compute_stats();
+      void compute_ci();
+};
+
+////////////////////////////////////////////////////////////////////////
+//
 // Class to store Continuous Statistics
 //
 ////////////////////////////////////////////////////////////////////////
