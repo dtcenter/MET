@@ -106,7 +106,6 @@ class STATAnalysisJob {
       void set_mask_poly(const char *);
       void set_boot_rng (const char *);
       void set_boot_seed(const char *);
-      void set_tmp_dir  (const char *);
 
       void open_dump_row_file ();
       void close_dump_row_file();
@@ -225,11 +224,6 @@ class STATAnalysisJob {
       // Rank correlation flag
       //
       int rank_corr_flag;
-
-      //
-      // Temporary directory
-      //
-      char *tmp_dir;
 
       void process_mask_grid();
       void process_mask_poly();

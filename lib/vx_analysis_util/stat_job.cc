@@ -80,7 +80,6 @@ void STATAnalysisJob::init_from_scratch() {
    mask_poly = (char *)     0;
    boot_rng  = (char *)     0;
    boot_seed = (char *)     0;
-   tmp_dir   = (char *)     0;
 
    model.set_ignore_case(1);
    fcst_var.set_ignore_case(1);
@@ -171,7 +170,6 @@ void STATAnalysisJob::clear() {
    set_boot_seed(default_boot_seed);
    rank_corr_flag = default_rank_corr_flag;
 
-   set_tmp_dir(default_tmp_dir);
    poly_mask.clear();
 
    return;
@@ -250,7 +248,6 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    set_mask_poly(aj.mask_poly);
    set_boot_rng (aj.boot_rng);
    set_boot_seed(aj.boot_seed);
-   set_tmp_dir  (aj.tmp_dir);
 
    return;
 }
@@ -411,9 +408,6 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "rank_corr_flag = " << prefix
        << rank_corr_flag << "\n";
-
-   out << prefix << "tmp_dir = " << prefix
-       << tmp_dir << "\n";
 
    out.flush();
 
@@ -1068,10 +1062,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          rank_corr_flag = atoi(jc_array[i+1]);
          i++;
       }
-      else if(strcmp(jc_array[i], "-tmp_dir") == 0) {
-         set_tmp_dir(jc_array[i+1]);
-         i++;
-      }
       else {
          cerr << "\n\nERROR: parse_job_command() -> "
               << "unrecognized switch \"" << jc_array[i]
@@ -1192,21 +1182,6 @@ void STATAnalysisJob::set_boot_seed(const char *c) {
    boot_seed = new char [strlen(c) + 1];
 
    strcpy(boot_seed, c);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void STATAnalysisJob::set_tmp_dir(const char *c) {
-
-   if(tmp_dir) { delete [] tmp_dir; tmp_dir = (char *) 0; }
-
-   if(!c) return;
-
-   tmp_dir = new char [strlen(c) + 1];
-
-   strcpy(tmp_dir, c);
 
    return;
 }
@@ -1510,7 +1485,6 @@ void STATAnalysisJob::get_jobstring(char *js) {
          sprintf(js, "%s -n_boot_rep %i",    js, n_boot_rep);
          sprintf(js, "%s -boot_rng %s",      js, boot_rng);
          sprintf(js, "%s -boot_seed %s",     js, boot_seed);
-         sprintf(js, "%s -tmp_dir %s",       js, tmp_dir);
       }
    }
 
