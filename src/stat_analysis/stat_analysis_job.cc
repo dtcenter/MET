@@ -38,7 +38,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void do_job(const char *jobstring, STATAnalysisJob &j, int n_job,
-            const char *tmp_path, ofstream *sa_out, int verbosity) {
+            const char *tmp_dir, const char *tmp_path,
+            ofstream *sa_out, int verbosity) {
    LineDataFile f;
    int n_in, n_out;
 
@@ -98,7 +99,7 @@ void do_job(const char *jobstring, STATAnalysisJob &j, int n_job,
 
       case(stat_job_aggr_stat):
          do_job_aggr_stat(jobstring, f, j, n_in, n_out, sa_out,
-                          verbosity);
+                          tmp_dir, verbosity);
          break;
 
       case(stat_job_go_index):
@@ -728,7 +729,8 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
 
 void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
                       STATAnalysisJob &j, int &n_in, int &n_out,
-                      ofstream *sa_out, int verbosity) {
+                      ofstream *sa_out, const char *tmp_dir,
+                      int verbosity) {
    STATLine line;
    STATLineType in_lt, out_lt;
 
@@ -970,13 +972,13 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
       // When -out_line_type CTS
       //
       else if(out_lt == stat_cts) {
-         aggr_mpr_lines_cts(j, f_na, o_na, cts_info);
+         aggr_mpr_lines_cts(j, f_na, o_na, cts_info, tmp_dir);
       }
       //
       // When -out_line_type CNT
       //
       else if(out_lt == stat_cnt) {
-         aggr_mpr_lines_cnt(j, fcst_gc, obs_gc, f_na, o_na, cnt_info);
+         aggr_mpr_lines_cnt(j, fcst_gc, obs_gc, f_na, o_na, cnt_info, tmp_dir);
       }
       //
       // When -out_line_type SL1L2, SAL1L2

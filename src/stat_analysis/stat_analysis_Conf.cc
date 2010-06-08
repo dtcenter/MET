@@ -13,7 +13,7 @@
    //
    //     Created from config file "STATAnalysisConfig_default"
    //
-   //     on May 24, 2010    11:17 am  MDT
+   //     on June 8, 2010    2:36 pm  MDT
    //
 
 

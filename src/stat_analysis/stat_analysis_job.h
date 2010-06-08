@@ -41,7 +41,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 extern void do_job(const char *, STATAnalysisJob &, int,
-                   const char *, ofstream *, int);
+                   const char *, const char *, ofstream *, int);
 
 extern void do_job_filter(const char *, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *, int);
@@ -53,7 +53,8 @@ extern void do_job_aggr(const char *, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *, int);
 
 extern void do_job_aggr_stat(const char *, LineDataFile &,
-               STATAnalysisJob &, int &, int &, ofstream *, int);
+               STATAnalysisJob &, int &, int &, ofstream *,
+               const char *, int);
 
 extern void do_job_go_index(const char *, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *, int);

@@ -513,9 +513,8 @@ void aggr_mpr_lines_ct(STATAnalysisJob &j,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_mpr_lines_cts(STATAnalysisJob &j,
-                        const NumArray &f_na,
-                        const NumArray &o_na,
-                        CTSInfo &cts_info) {
+                        const NumArray &f_na, const NumArray &o_na,
+                        CTSInfo &cts_info, const char *tmp_dir) {
    CTSInfo *cts_info_ptr;
    gsl_rng *rng_ptr = (gsl_rng *) 0;
 
@@ -567,13 +566,13 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
       compute_cts_stats_ci_bca(rng_ptr, f_na, o_na,
          j.n_boot_rep,
          cts_info_ptr, 1, 1,
-         j.rank_corr_flag, j.tmp_dir);
+         j.rank_corr_flag, tmp_dir);
    }
    else {
       compute_cts_stats_ci_perc(rng_ptr, f_na, o_na,
          j.n_boot_rep, j.boot_rep_prop,
          cts_info_ptr, 1, 1,
-         j.rank_corr_flag, j.tmp_dir);
+         j.rank_corr_flag, tmp_dir);
    }
 
    //
@@ -589,7 +588,7 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
 void aggr_mpr_lines_cnt(STATAnalysisJob &j,
                         int fcst_gc, int obs_gc,
                         const NumArray &f_na, const NumArray &o_na,
-                        CNTInfo &cnt_info) {
+                        CNTInfo &cnt_info, const char *tmp_dir) {
    gsl_rng *rng_ptr = (gsl_rng *) 0;
 
    //
@@ -617,14 +616,14 @@ void aggr_mpr_lines_cnt(STATAnalysisJob &j,
          fcst_gc, obs_gc,
          j.n_boot_rep,
          cnt_info, 1,
-         j.rank_corr_flag, j.tmp_dir);
+         j.rank_corr_flag, tmp_dir);
    }
    else {
       compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na,
          fcst_gc, obs_gc,
          j.n_boot_rep, j.boot_rep_prop,
          cnt_info, 1,
-         j.rank_corr_flag, j.tmp_dir);
+         j.rank_corr_flag, tmp_dir);
    }
 
    //

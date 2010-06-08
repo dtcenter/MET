@@ -293,7 +293,6 @@ line_type[] = [];
 //       "-boot_seed       value"
 //
 //       "-rank_corr_flag  value"
-//       "-tmp_dir         path"
 //
 jobs[] = [
    "-job filter -dump_row ./filter_job.stat"
