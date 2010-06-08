@@ -150,6 +150,7 @@ class StatHdrColumns {
       void set_fcst_thresh   (const SingleThresh);
       void set_fcst_thresh   (const ThreshArray);
       void set_obs_thresh    (const SingleThresh);
+      void set_obs_thresh    (const ThreshArray);
 
       void set_cov_thresh    (const SingleThresh);
       void set_alpha         (const double);

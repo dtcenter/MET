@@ -256,7 +256,7 @@ void StatHdrColumns::set_fcst_thresh(const ThreshArray t) {
    fcst_thresh_str.clear();
 
    // Concatenate all of the forecast thresholds used
-   t.get_str("", tmp_str);
+   t.get_str(",", tmp_str);
    fcst_thresh_str << tmp_str;
 
    return;
@@ -267,6 +267,21 @@ void StatHdrColumns::set_fcst_thresh(const ThreshArray t) {
 void StatHdrColumns::set_obs_thresh(const SingleThresh t) {
    obs_thresh = t;
    set_obs_thresh_str();
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrColumns::set_obs_thresh(const ThreshArray t) {
+   char tmp_str[max_str_len];
+
+   fcst_thresh.clear();
+   fcst_thresh_str.clear();
+
+   // Concatenate all of the forecast thresholds used
+   t.get_str(",", tmp_str);
+   fcst_thresh_str << tmp_str;
+
    return;
 }
 
