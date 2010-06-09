@@ -33,20 +33,22 @@
 static const int i_fho    = 0;
 static const int i_ctc    = 1;
 static const int i_cts    = 2;
-static const int i_cnt    = 3;
-static const int i_sl1l2  = 4;
-static const int i_vl1l2  = 5;
-static const int i_pct    = 6;
-static const int i_pstd   = 7;
-static const int i_pjc    = 8;
-static const int i_prc    = 9;
-static const int i_nbrctc = 10;
-static const int i_nbrcts = 11;
-static const int i_nbrcnt = 12;;
-static const int i_nc     = 13;
+static const int i_mctc   = 3;
+static const int i_mcts   = 4;
+static const int i_cnt    = 5;
+static const int i_sl1l2  = 6;
+static const int i_vl1l2  = 7;
+static const int i_pct    = 8;
+static const int i_pstd   = 9;
+static const int i_pjc    = 10;
+static const int i_prc    = 11;
+static const int i_nbrctc = 12;
+static const int i_nbrcts = 13;
+static const int i_nbrcnt = 14;
+static const int i_nc     = 15;
 
-static const int n_txt    = 13;
-static const int n_out    = 14;
+static const int n_txt    = 15;
+static const int n_out    = 16;
 
 // Enumeration to store possible output flag values
 enum OutputFlag {
