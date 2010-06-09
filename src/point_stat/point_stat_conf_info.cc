@@ -400,6 +400,35 @@ void PointStatConfInfo::process_config() {
          exit(1);
       }
 
+      // Verifying with multi-category contingency tables
+      if(gc_pd[i].fcst_gci.pflag == 0 &&
+         (conf.output_flag(i_mctc).ival() ||
+          conf.output_flag(i_mcts).ival())) {
+
+         // Check that the threshold types are < or <= and that the
+         // threshold values are monotonically increasing
+         for(j=0; j<fcst_ta[i].n_elements()-1; j++) {
+
+            if(fcst_ta[i][j].thresh > fcst_ta[i][j+1].thresh ||
+               obs_ta[i][j].thresh  > obs_ta[i][j+1].thresh  ||
+               (fcst_ta[i][j].type   != thresh_lt && 
+                fcst_ta[i][j].type   != thresh_le) ||
+               (fcst_ta[i][j+1].type != thresh_lt && 
+                fcst_ta[i][j+1].type != thresh_le) ||
+               (obs_ta[i][j].type    != thresh_lt && 
+                obs_ta[i][j].type    != thresh_le) ||
+               (obs_ta[i][j+1].type  != thresh_lt && 
+                obs_ta[i][j+1].type  != thresh_le)) {
+
+               cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
+                    << "when verifying using multi-category contingency "
+                    << "tables, the thresholds must be monotonically "
+                    << "increasing and of type < or <=\n\n";
+               exit(1);
+            }
+         }
+      }
+
       // Look for the maximum number of thresholds for scalar fields
       if(gc_pd[i].fcst_gci.pflag == 0) {
 
@@ -802,6 +831,20 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          //    Max Thresholds * Alphas
          n = n_vx_scal * n_msg_typ * n_mask * n_interp *
              max_n_scal_thresh * n_ci_alpha;
+         break;
+
+      case(i_mctc):
+         // Maximum number of MCTC lines possible =
+         //    Fields * Message Types * Masks * Smoothing Methods
+         n = n_vx_scal * n_msg_typ * n_mask * n_interp;
+         break;
+
+      case(i_mcts):
+         // Maximum number of MCTS lines possible =
+         //    Fields * Message Types * Masks * Smoothing Methods *
+         //    Alphas
+         n = n_vx_scal * n_msg_typ * n_mask * n_interp *
+             n_ci_alpha;
          break;
 
       case(i_cnt):
