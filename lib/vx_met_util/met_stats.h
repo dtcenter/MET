@@ -92,6 +92,7 @@ class CTSInfo {
 
       void clear();
       void allocate_n_alpha(int);
+      void add(double, double);
       void compute_stats();
       void compute_ci();
 };
@@ -127,6 +128,7 @@ class MCTSInfo {
 
       void clear();
       void allocate_n_alpha(int);
+      void add(double, double);
       void compute_stats();
       void compute_ci();
 };
@@ -462,6 +464,11 @@ extern void   compute_ctsinfo(const NumArray &, const NumArray &,
                               const NumArray &, int, int, CTSInfo &);
 extern void   compute_i_ctsinfo(const NumArray &, const NumArray &,
                                 int, int, CTSInfo &);
+
+extern void   compute_mctsinfo(const NumArray &, const NumArray &,
+                               const NumArray &, int, int, MCTSInfo &);
+extern void   compute_i_mctsinfo(const NumArray &, const NumArray &,
+                                 int, int, MCTSInfo &);
 
 extern void   compute_pctinfo(const NumArray &, const NumArray &,
                               int, PCTInfo &);

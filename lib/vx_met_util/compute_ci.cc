@@ -29,6 +29,7 @@ using namespace std;
 
 static void write_cntinfo(ofstream &, const CNTInfo &);
 static void write_ctsinfo(ofstream &, const CTSInfo &);
+static void write_mctsinfo(ofstream &, const MCTSInfo &);
 static void write_nbrcntinfo(ofstream &, const NBRCNTInfo &);
 static void read_ldf(const char *, int, NumArray &);
 
@@ -596,6 +597,213 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    }
    if(cts_i_file) { delete [] cts_i_file; cts_i_file = (char **) 0; }
    if(cts_r_file) { delete [] cts_r_file; cts_r_file = (char **) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the multi-category statistics for the pairs provided.
+// Compute bootstrap confidence intervals using the BCa method with
+// the random number generator and number of replicates specified.
+// Arugments:
+//    gsl_rng is a pointer to the random number generator to be used.
+//    f_na and o_na are the arrays to be bootstrapped.
+//    b is the number of replicates to be used when bootstrapping.
+//    MCTSInfo is the object for holding the stats.
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
+                               const NumArray &f_na,
+                               const NumArray &o_na,
+                               int b, MCTSInfo &mcts_info,
+                               int mcts_flag, int rank_flag,
+                               const char *tmp_dir) {
+   int n, i;
+   double s;
+   NumArray i_na, ir_na, si_na, sr_na;
+   MCTSInfo mcts_tmp;
+   pid_t p;
+
+   //
+   // Temp file streams for categorical statistics
+   //
+   ofstream mcts_i_out, mcts_r_out;
+   char mcts_i_file[max_str_len];
+   char mcts_r_file[max_str_len];
+
+   //
+   // Check that the forecast and observation arrays of the same length
+   //
+   if(f_na.n_elements() != o_na.n_elements()) {
+      cerr << "\n\nERROR: compute_mcts_stats_ci_bca() -> "
+           << "the forecast and observation arrays must have the same "
+           << "length!\n\n" << flush;
+      exit(1);
+   }
+   else {
+      n = f_na.n_elements();
+   }
+
+   //
+   // Setup the index array
+   //
+   for(i=0; i<n; i++) i_na.add(i);
+
+   //
+   // Compute mulit-category stats from the raw data for each threshold
+   // with the normal_ci flag set
+   //
+   compute_mctsinfo(f_na, o_na, i_na, mcts_flag, 1, mcts_info);
+
+   //
+   // Do not compute bootstrap CI's if n<=1, the number of replicates
+   // is zero, or the mcts_flag is off
+   //
+   if(n<=1 || b<1 || !mcts_flag) return;
+
+   //
+   // Initialize the MCTSInfo temporary object.
+   //
+   mcts_tmp = mcts_info;
+
+   //
+   // Build the temp file names
+   //
+   p = getpid();
+   sprintf(mcts_i_file, "%s/tmp_%i_mcts_i.txt", tmp_dir, p);
+   sprintf(mcts_r_file, "%s/tmp_%i_mcts_r.txt", tmp_dir, p);
+
+   //
+   // Enclose computations in a try block to catch any errors and
+   // delete the temp files before exiting
+   //
+   try {
+
+      //
+      // Open up the temp files
+      //
+      mcts_i_out.open(mcts_i_file);
+      mcts_r_out.open(mcts_r_file);
+      if(!mcts_i_out || !mcts_r_out) {
+         cerr << "\n\nERROR: compute_mcts_stats_ci_bca() -> "
+              << "can't open one or more temporary files for writing:\n"
+              << mcts_i_file << "\n"
+              << mcts_r_file << "\n\n" << flush;
+         throw(1);
+      }
+
+      //
+      // Compute catgegorical stats from the raw data with the i-th data
+      // point removed and write out to a temp file
+      //
+      for(i=0; i<n; i++) {
+         compute_i_mctsinfo(f_na, o_na, i, 0, mcts_tmp);
+         write_mctsinfo(mcts_i_out, mcts_tmp);
+      } // end for i
+
+      //
+      // Resample the array of indices with replacement
+      //
+      for(i=0; i<b; i++) {
+
+         ran_sample(rng_ptr, i_na, ir_na, n);
+
+
+         //
+         // Compute categorical stats for each replicate with the
+         // cts_flag set and the normal_ci_flag unset
+         //
+         compute_mctsinfo(f_na, o_na, ir_na, 1, 0, mcts_tmp);
+         write_mctsinfo(mcts_r_out, mcts_tmp);
+      }
+
+      //
+      // Close the temp files
+      //
+      mcts_i_out.close();
+      mcts_r_out.close();
+
+      //
+      // Compute bootstrap interval for acc
+      //
+      s = mcts_info.acc.v;
+      read_ldf(mcts_i_file, 1, si_na);
+      read_ldf(mcts_r_file, 1, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              mcts_info.alpha[i],
+                              mcts_info.acc.v_bcl[i],
+                              mcts_info.acc.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for hk
+      //
+      s = mcts_info.hk.v;
+      read_ldf(mcts_i_file, 2, si_na);
+      read_ldf(mcts_r_file, 2, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              mcts_info.alpha[i],
+                              mcts_info.hk.v_bcl[i],
+                              mcts_info.hk.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for hss
+      //
+      s = mcts_info.hss.v;
+      read_ldf(mcts_i_file, 3, si_na);
+      read_ldf(mcts_r_file, 3, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              mcts_info.alpha[i],
+                              mcts_info.hss.v_bcl[i],
+                              mcts_info.hss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for ger
+      //
+      s = mcts_info.ger.v;
+      read_ldf(mcts_i_file, 4, si_na);
+      read_ldf(mcts_r_file, 4, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              mcts_info.alpha[i],
+                              mcts_info.ger.v_bcl[i],
+                              mcts_info.ger.v_bcu[i]);
+
+   } // end try block
+
+   //
+   // Catch any thrown errors
+   //
+   catch(int i_err) {
+
+      cerr << "\n\nERROR: compute_mcts_stats_ci_bca() -> "
+           << "encountered an error value of " << i_err
+           << ".  Deleting temp files before exiting.\n\n"
+           << flush;
+
+      //
+      // Attempt to delete temp files
+      //
+      remove(mcts_i_file);
+      remove(mcts_r_file);
+
+      exit(i_err);
+   } // end catch block
+
+   //
+   // Delete temp files
+   //
+   if(remove(mcts_i_file) != 0 || remove(mcts_r_file) != 0) {
+      cerr << "\n\nERROR: compute_stats_ci_bca() -> "
+           << "can't delete one or more temporary files:\n"
+           << mcts_i_file << "\n"
+           << mcts_r_file << "\n\n" << flush;
+      exit(1);
+   }
 
    return;
 }
@@ -1281,6 +1489,193 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
       }
    }
    if(cts_r_file) { delete [] cts_r_file; cts_r_file = (char **) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the muli-category statistics for the pairs provided.
+// Compute bootstrap confidence intervals using the percentile method
+// with the random number generator and number of replicates specified.
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
+                                const NumArray &f_na,
+                                const NumArray &o_na,
+                                int b, double m_prop,
+                                MCTSInfo &mcts_info,
+                                int mcts_flag, int rank_flag,
+                                const char *tmp_dir) {
+   int n, i, m;
+   double s;
+   NumArray i_na, ir_na, sr_na;
+   MCTSInfo mcts_tmp;
+   pid_t p;
+
+   //
+   // Temp file streams for categorical statistics
+   //
+   ofstream mcts_r_out;
+   char mcts_r_file[max_str_len];
+
+   //
+   // Check that the forecast and observation arrays of the same length
+   //
+   if(f_na.n_elements() != o_na.n_elements()) {
+      cerr << "\n\nERROR: compute_mcts_stats_ci_perc() -> "
+           << "the forecast and observation arrays must have the same "
+           << "length!\n\n" << flush;
+      exit(1);
+   }
+   else {
+      n = f_na.n_elements();
+   }
+
+   //
+   // Compute size of the replicate
+   //
+   m = nint(m_prop * n);
+
+   //
+   // Setup the index array
+   //
+   for(i=0; i<n; i++) i_na.add(i);
+
+   //
+   // Compute categorical stats from the raw data for each threshold
+   // with the normal_ci flag set
+   //
+   compute_mctsinfo(f_na, o_na, i_na, mcts_flag, 1, mcts_info);
+
+   //
+   // Do not compute bootstrap CI's if n<=1, the number of replicates
+   // is zero, or the mcts_flag is off
+   //
+   if(n<=1 || b<1 || !mcts_flag) return;
+
+   //
+   // Initialize the MCTSInfo temporary object.
+   //
+   mcts_tmp = mcts_info;
+
+   //
+   // Build the temp file name
+   //
+   p = getpid();
+   sprintf(mcts_r_file, "%s/tmp_%i_mcts_r.txt", tmp_dir, p);
+
+   //
+   // Enclose computations in a try block to catch any errors and
+   // delete the temp files before exiting
+   //
+   try {
+
+      //
+      // Open up the temp file
+      //
+      mcts_r_out.open(mcts_r_file);
+      if(!mcts_r_out) {
+         cerr << "\n\nERROR: compute_mcts_stats_ci_perc() -> "
+              << "can't open the temporary file for writing:\n"
+              << mcts_r_file << "\n\n" << flush;
+         throw(1);
+      }
+
+      //
+      // Resample the array of indices with replacement
+      //
+      for(i=0; i<b; i++) {
+
+         ran_sample(rng_ptr, i_na, ir_na, m);
+
+         //
+         // Compute multi-category stats for each replicate with the
+         // mcts_flag set and the normal_ci_flag unset
+         //
+         compute_mctsinfo(f_na, o_na, ir_na, 1, 0, mcts_tmp);
+         write_mctsinfo(mcts_r_out, mcts_tmp);
+      }
+
+      //
+      // Close the temp file
+      //
+      mcts_r_out.close();
+
+      //
+      // Compute bootstrap interval for acc
+      //
+      s = mcts_info.acc.v;
+      read_ldf(mcts_r_file, 1, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               mcts_info.alpha[i],
+                               mcts_info.acc.v_bcl[i],
+                               mcts_info.acc.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for hk
+      //
+      s = mcts_info.hk.v;
+      read_ldf(mcts_r_file, 2, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               mcts_info.alpha[i],
+                               mcts_info.hk.v_bcl[i],
+                               mcts_info.hk.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for hss
+      //
+      s = mcts_info.hss.v;
+      read_ldf(mcts_r_file, 3, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               mcts_info.alpha[i],
+                               mcts_info.hss.v_bcl[i],
+                               mcts_info.hss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for ger
+      //
+      s = mcts_info.ger.v;
+      read_ldf(mcts_r_file, 4, sr_na);
+      for(i=0; i<mcts_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               mcts_info.alpha[i],
+                               mcts_info.ger.v_bcl[i],
+                               mcts_info.ger.v_bcu[i]);
+   } // end try block
+
+   //
+   // Catch any thrown errors
+   //
+   catch(int i_err) {
+
+      cerr << "\n\nERROR: compute_mcts_stats_ci_perc() -> "
+           << "encountered an error value of " << i_err
+           << ".  Deleting temp files before exiting.\n\n"
+           << flush;
+
+      //
+      // Attempt to delete temp file
+      //
+      remove(mcts_r_file);
+
+      exit(i_err);
+   } // end catch block
+
+   //
+   // Delete temp file
+   //
+   if(remove(mcts_r_file) != 0) {
+      cerr << "\n\nERROR: compute_mcts_stats_ci_perc() -> "
+           << "can't delete the temporary file:\n"
+           << mcts_r_file << "\n\n" << flush;
+
+      exit(1);
+   }
 
    return;
 }
@@ -2898,6 +3293,19 @@ void write_ctsinfo(ofstream &tmp_out, const CTSInfo &c) {
            c.pody.v,    c.podn.v,    c.pofd.v,    c.far.v,
            c.csi.v,     c.gss.v,     c.hk.v,      c.hss.v,
            c.odds.v);
+
+   tmp_out << line << "\n" << flush;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_mctsinfo(ofstream &tmp_out, const MCTSInfo &c) {
+   char line[max_line_len];
+
+   sprintf(line, "%f %f %f %f",
+           c.acc.v, c.hk.v, c.hss.v, c.ger.v);
 
    tmp_out << line << "\n" << flush;
 

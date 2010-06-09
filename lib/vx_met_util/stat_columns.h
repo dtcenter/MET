@@ -81,7 +81,7 @@ static const char * cts_columns [] = {
 };
 
 static const char * mctc_columns [] = {
-   "TOTAL",       "N_CAT",       "Fi_Oj"
+   "TOTAL",       "N_CAT"
 };
 
 static const char * mcts_columns [] = {
@@ -89,7 +89,7 @@ static const char * mcts_columns [] = {
    "ACC",         "ACC_NCL",     "ACC_NCU",     "ACC_BCL",     "ACC_BCU",
    "HK",          "HK_BCL",      "HK_BCU",
    "HSS",         "HSS_BCL",     "HSS_BCU",
-   "GER"
+   "GER",         "GER_BCL",     "GER_BCU"
 };
 
 static const char * cnt_columns [] = {
@@ -310,7 +310,6 @@ extern void close_txt_file(ofstream *&,  const char *, int);
 extern void write_header_row(const char **, int, int, AsciiTable &, int, int);
 
 // Write out the header row for variable length line types
-extern void write_mctc_header_row  (int, int, AsciiTable &, int, int);
 extern void write_pct_header_row   (int, int, AsciiTable &, int, int);
 extern void write_pstd_header_row  (int, int, AsciiTable &, int, int);
 extern void write_pjc_header_row   (int, int, AsciiTable &, int, int);
