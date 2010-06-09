@@ -296,8 +296,7 @@ interp_thresh = 1.0;
 //    (4) STAT and MCTC Text Files, NxN Multi-Category Contingency Table Counts:
 //           Total (TOTAL),
 //           Number of Categories (N_CAT),
-//           Contingency Table Count (Fi_Oj)
-//           NOTE: Previous column repeated N_CAT*N_CAT times.
+//           Contingency Table Count columns repeated N_CAT*N_CAT times
 //
 //    (5) STAT and MCTS Text Files, NxN Multi-Category Contingency Table Scores:
 //           Total (TOTAL),
@@ -305,7 +304,7 @@ interp_thresh = 1.0;
 //           Accuracy (ACC), ACC_CL, ACC_CU,
 //           Hanssen and Kuipers Discriminant (HK), HK_CL, HK_CU,
 //           Heidke Skill Score (HSS), HSS_CU, HSS_CU,
-//           Gerrity Score (GER)
+//           Gerrity Score (GER), GER_CL, GER_CU
 //
 //    (6) STAT and CNT Text Files, Statistics of Continuous Variables:
 //           Total (TOTAL),
@@ -327,9 +326,6 @@ interp_thresh = 1.0;
 //           Bias-Corrected Mean Squared Error (BCMSE),
 //           Root Mean Squared Error (RMSE),
 //           Percentiles of the Error (E10, E25, E50, E75, E90)
-//
-//           NOTE: CL and CU values define lower and upper
-//                 confidence interval limits.
 //
 //    (7) STAT and SL1L2 Text Files, Scalar Partial Sums:
 //           Total (TOTAL),
@@ -449,6 +445,8 @@ interp_thresh = 1.0;
 //
 //   In the expressions above, f are forecast values, o are observed values,
 //   and c are climatological values.
+//
+//   NOTE: CL and CU values define lower and upper confidence interval limits.
 //
 // Values for these flags are interpreted as follows:
 //    (0) Do not generate output of this type
