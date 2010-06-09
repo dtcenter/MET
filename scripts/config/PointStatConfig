@@ -16,7 +16,7 @@ model = "WRF";
 // forecast valid time, v.  Observations with a valid time falling in the
 // window [v+beg_ds, v+end_ds] will be used.
 // These selections are overridden by the command line arguments
-// -valid_beg and -valid_end.
+// -obs_valid_beg and -obs_valid_end.
 //
 beg_ds = -5400;
 end_ds =  5400;
@@ -292,7 +292,20 @@ interp_thresh = 1.0;
 //           Heidke Skill Score (HSS),
 //           Odds Ratio (ODDS), ODDS_CL, ODDS_CU
 //
-//    (4) STAT and CNT Text Files, Statistics of Continuous Variables:
+//    (4) STAT and MCTC Text Files, NxN Multi-Category Contingency Table Counts:
+//           Total (TOTAL),
+//           Number of Categories (N_CAT),
+//           Contingency Table Count columns repeated N_CAT*N_CAT times
+//
+//    (5) STAT and MCTS Text Files, NxN Multi-Category Contingency Table Scores:
+//           Total (TOTAL),
+//           Number of Categories (N_CAT),
+//           Accuracy (ACC), ACC_CL, ACC_CU,
+//           Hanssen and Kuipers Discriminant (HK), HK_CL, HK_CU,
+//           Heidke Skill Score (HSS), HSS_CU, HSS_CU,
+//           Gerrity Score (GER), GER_CL, GER_CU
+//
+//    (6) STAT and CNT Text Files, Statistics of Continuous Variables:
 //           Total (TOTAL),
 //           Forecast Mean (FBAR), FBAR_CL, FBAR_CU,
 //           Forecast Standard Deviation (FSTDEV), FSTDEV_CL, FSTDEV_CU
@@ -313,10 +326,7 @@ interp_thresh = 1.0;
 //           Root Mean Squared Error (RMSE),
 //           Percentiles of the Error (E10, E25, E50, E75, E90)
 //
-//           NOTE: CL and CU values define lower and upper
-//                 confidence interval limits.
-//
-//    (5) STAT and SL1L2 Text Files, Scalar Partial Sums:
+//    (7) STAT and SL1L2 Text Files, Scalar Partial Sums:
 //           Total (TOTAL),
 //           Forecast Mean (FBAR),
 //              = mean(f)
@@ -329,7 +339,7 @@ interp_thresh = 1.0;
 //           Observation Squared Mean (OOBAR)
 //              = mean(o^2)
 //
-//    (6) STAT and SAL1L2 Text Files, Scalar Anomaly Partial Sums:
+//    (8) STAT and SAL1L2 Text Files, Scalar Anomaly Partial Sums:
 //           Total (TOTAL),
 //           Forecast Anomaly Mean (FABAR),
 //              = mean(f-c)
@@ -342,7 +352,7 @@ interp_thresh = 1.0;
 //           Observation Anomaly Squared Mean (OOABAR)
 //              = mean((o-c)^2)
 //
-//    (7) STAT and VL1L2 Text Files, Vector Partial Sums:
+//    (9) STAT and VL1L2 Text Files, Vector Partial Sums:
 //           Total (TOTAL),
 //           U-Forecast Mean (UFBAR),
 //              = mean(uf)
@@ -359,7 +369,7 @@ interp_thresh = 1.0;
 //           U-Observation Squared Plus V-Observation Squared (UVOOBAR)
 //              = mean(uo^2+vo^2)
 //
-//    (8) STAT and VAL1L2 Text Files, Vector Anomaly Partial Sums:
+//   (10) STAT and VAL1L2 Text Files, Vector Anomaly Partial Sums:
 //           U-Forecast Anomaly Mean (UFABAR),
 //              = mean(uf-uc)
 //           V-Forecast Anomaly Mean (VFABAR),
@@ -375,7 +385,7 @@ interp_thresh = 1.0;
 //           U-Observation Anomaly Squared Plus V-Observation Anomaly Squared (UVOOABAR)
 //              = mean((uo-uc)^2+(vo-vc)^2)
 //
-//    (9) STAT and PCT Text Files, Nx2 Probability Contingency Table Counts:
+//   (11) STAT and PCT Text Files, Nx2 Probability Contingency Table Counts:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
 //           Probability Threshold Value (THRESH_i),
@@ -384,10 +394,10 @@ interp_thresh = 1.0;
 //           NOTE: Previous 3 columns repeated for each row in the table
 //           Last Probability Threshold Value (THRESH_n)
 //
-//   (10) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
+//   (12) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
-//           Base Rate (BASER), BASER_CL, BASER_CU,
+//           Base Rate (BASER), BASER_NCL, BASER_NCU,
 //           Reliability (RELIABILITY),
 //           Resolution (RESOLUTION),
 //           Uncertainty (UNCERTAINTY),
@@ -396,7 +406,7 @@ interp_thresh = 1.0;
 //           Probability Threshold Value (THRESH_i)
 //           NOTE: Previous column repeated for each probability threshold
 //
-//   (11) STAT and PJC Text Files, Joint/Continuous Statistics of
+//   (13) STAT and PJC Text Files, Joint/Continuous Statistics of
 //                                 Probabilistic Variables:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
@@ -410,7 +420,7 @@ interp_thresh = 1.0;
 //           NOTE: Previous 7 columns repeated for each row in the table
 //           Last Probability Threshold Value (THRESH_n)
 //
-//   (12) STAT and PRC Text Files, ROC Curve Points for
+//   (14) STAT and PRC Text Files, ROC Curve Points for
 //                                 Probabilistic Variables:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
@@ -420,7 +430,7 @@ interp_thresh = 1.0;
 //           NOTE: Previous 3 columns repeated for each row in the table
 //           Last Probability Threshold Value (THRESH_n)
 //
-//   (13) STAT and MPR Text Files, Matched Pair Data:
+//   (15) STAT and MPR Text Files, Matched Pair Data:
 //           Total (TOTAL),
 //           Index (INDEX),
 //           Observation Station ID (OBS_SID),
@@ -435,12 +445,14 @@ interp_thresh = 1.0;
 //   In the expressions above, f are forecast values, o are observed values,
 //   and c are climatological values.
 //
+// NOTE: CL and CU values define lower and upper confidence interval limits.
+//
 // Values for these flags are interpreted as follows:
 //    (0) Do not generate output of this type
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file
 //
-output_flag[] = [ 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 ];
+output_flag[] = [ 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2 ];
 
 //
 // Flag to indicate whether Kendall's Tau and Spearman's Rank Correlation
