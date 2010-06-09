@@ -20,7 +20,7 @@
    //
    //     Created from config file "PointStatConfig_default"
    //
-   //     on May 24, 2010    3:12 pm  MDT
+   //     on June 8, 2010    10:43 am  MDT
    //
 
 
@@ -220,7 +220,7 @@ class point_stat_Conf {
       Result interp_thresh();
 
 
-      Result output_flag(int);   //  1-dimensional array, indices from 0 to 13
+      Result output_flag(int);   //  1-dimensional array, indices from 0 to 15
 
       int n_output_flag_elements();
 

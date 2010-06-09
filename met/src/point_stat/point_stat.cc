@@ -56,6 +56,8 @@
 //                    From -valid_end to -obs_valid_end
 //   017    05/27/10  Halley Gotway  Add -fcst_valid and -fcst_lead
 //                    command line options.
+//   017    06/08/10  Halley Gotway  Add support for multi-category
+//                    contingency tables.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -105,6 +107,7 @@ static void process_obs_file(int);
 static void process_scores();
 
 static void do_cts  (CTSInfo   *&, int, PairData *);
+static void do_mcts (MCTSInfo   &, int, PairData *);
 static void do_cnt  (CNTInfo    &, int, PairData *);
 static void do_sl1l2(SL1L2Info  &, int, PairData *);
 static void do_vl1l2(VL1L2Info *&, int, PairData *,
@@ -360,7 +363,7 @@ void setup_first_pass(const WrfData &wd, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, max_col, max_prob_col, n;
+   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat;
    ConcatString tmp_str;
 
    // Create output file names for the stat file and optional text files
@@ -373,13 +376,22 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n = conf_info.get_max_n_prob_fcst_thresh();
-   max_prob_col = get_n_pjc_columns(n);
+   n_prob = conf_info.get_max_n_prob_fcst_thresh();
+   n_cat  = conf_info.get_max_n_scal_thresh() + 1;
 
-   if(max_prob_col > max_stat_col)
+   max_prob_col = get_n_pjc_columns(n_prob);
+   max_mctc_col = get_n_mctc_columns(n_cat);
+
+   // Maximum number of standard STAT columns
+   max_col = max_stat_col + n_header_columns + 1;
+
+   // Maximum number of probabilistic columns
+   if(max_prob_col > max_col)
       max_col = max_prob_col + n_header_columns + 1;
-   else
-      max_col = max_stat_col + n_header_columns + 1;
+
+   // Maximum number of multi-category contingency table columns
+   if(max_mctc_col > max_stat_col)
+      max_col = max_mctc_col + n_header_columns + 1;
 
    // Initialize file stream
    stat_out = (ofstream *) 0;
@@ -425,24 +437,28 @@ void setup_txt_files() {
          // Get the maximum number of columns for this line type
          switch(i) {
 
+            case(i_mctc):
+               max_col = get_n_mctc_columns(n_cat) + n_header_columns + 1;
+               break;
+
             case(i_pct):
-               max_col = get_n_pct_columns(n)  + n_header_columns + 1;
+               max_col = get_n_pct_columns(n_prob) + n_header_columns + 1;
                break;
 
             case(i_pstd):
-               max_col = get_n_pstd_columns(n) + n_header_columns + 1;
+               max_col = get_n_pstd_columns(n_prob) + n_header_columns + 1;
                break;
 
             case(i_pjc):
-               max_col = get_n_pjc_columns(n)  + n_header_columns + 1;
+               max_col = get_n_pjc_columns(n_prob) + n_header_columns + 1;
                break;
 
             case(i_prc):
-               max_col = get_n_prc_columns(n)  + n_header_columns + 1;
+               max_col = get_n_prc_columns(n_prob) + n_header_columns + 1;
                break;
 
             default:
-               max_col = n_txt_columns[i]  + n_header_columns + 1;
+               max_col = n_txt_columns[i] + n_header_columns + 1;
                break;
          } // end switch
 
@@ -454,19 +470,19 @@ void setup_txt_files() {
          switch(i) {
 
             case(i_pct):
-               write_pct_header_row(1, n, txt_at[i], 0, 0);
+               write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             case(i_pstd):
-               write_pstd_header_row(1, n, txt_at[i], 0, 0);
+               write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             case(i_pjc):
-               write_pjc_header_row(1, n, txt_at[i], 0, 0);
+               write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             case(i_prc):
-               write_prc_header_row(1, n, txt_at[i], 0, 0);
+               write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             default:
@@ -980,6 +996,7 @@ void process_scores() {
    int i, j, k, l, m, max_scal_t, max_prob_t, wind_t;
    PairData  *pd_ptr;
    CTSInfo   *cts_info;
+   MCTSInfo   mcts_info;
    CNTInfo    cnt_info;
    SL1L2Info  sl1l2_info;
    VL1L2Info *vl1l2_info;
@@ -1096,7 +1113,7 @@ void process_scores() {
                   // Initialize
                   for(m=0; m<max_scal_t; m++) cts_info[m].clear();
 
-                  // Compute CTS
+                  // Compute CTS Info
                   do_cts(cts_info, i, pd_ptr);
 
                   // Loop through all of the thresholds
@@ -1132,7 +1149,40 @@ void process_scores() {
                            txt_at[i_cts], i_txt_row[i_cts]);
                      }
                   } // end for m
-               } // end Compute CTS
+               } // end Compute CTS scores
+
+               // Compute MCTS scores
+               if(conf_info.gc_pd[i].fcst_gci.pflag == 0 &&
+                  conf_info.fcst_ta[i].n_elements() > 1 &&
+                  (conf_info.conf.output_flag(i_mctc).ival() ||
+                   conf_info.conf.output_flag(i_mcts).ival())) {
+
+                  // Initialize
+                  mcts_info.clear();
+
+                  // Compute MCTS Info
+                  do_mcts(mcts_info, i, pd_ptr);
+
+                  // Write out MCTC
+                  if(conf_info.conf.output_flag(i_mctc).ival() &&
+                     mcts_info.cts.total() > 0) {
+
+                     write_mctc_row(shc, mcts_info,
+                        conf_info.conf.output_flag(i_mctc).ival(),
+                        stat_at, i_stat_row,
+                        txt_at[i_mctc], i_txt_row[i_mctc]);
+                  }
+
+                  // Write out MCTS
+                  if(conf_info.conf.output_flag(i_mcts).ival() &&
+                     mcts_info.cts.total() > 0) {
+
+                     write_mcts_row(shc, mcts_info,
+                        conf_info.conf.output_flag(i_mcts).ival(),
+                        stat_at, i_stat_row,
+                        txt_at[i_mcts], i_txt_row[i_mcts]);
+                  }
+               } // end Compute MCTS scores
 
                // Compute CNT scores
                if(conf_info.gc_pd[i].fcst_gci.pflag == 0 &&
@@ -1367,6 +1417,59 @@ void do_cts(CTSInfo *&cts_info, int i_gc, PairData *pd_ptr) {
          conf_info.conf.boot_rep_prop().dval(),
          cts_info, n_cts,
          conf_info.conf.output_flag(i_cts).ival(),
+         conf_info.conf.rank_corr_flag().ival(),
+         conf_info.conf.tmp_dir().sval());
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_mcts(MCTSInfo &mcts_info, int i_gc, PairData *pd_ptr) {
+   int i;
+   NumArray f_na, o_na;
+
+   //
+   // Set up the MCTSInfo size, thresholds, and alpha values
+   //
+   mcts_info.cts.set_size(conf_info.fcst_ta[i_gc].n_elements() + 1);
+   mcts_info.cts_fcst_ta = conf_info.fcst_ta[i_gc];
+   mcts_info.cts_obs_ta  = conf_info.obs_ta[i_gc];
+   mcts_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
+
+   for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
+      mcts_info.alpha[i] = conf_info.conf.ci_alpha(i).dval();
+   }
+
+   if(verbosity > 1) {
+      cout << "Computing Multi-Category Statistics.\n" << flush;
+   }
+
+   //
+   // If there are no matched pairs to process, return
+   //
+   if(pd_ptr->f_na.n_elements() == 0 ||
+      pd_ptr->o_na.n_elements() == 0) return;
+
+   //
+   // Compute the stats, normal confidence intervals, and bootstrap
+   // bootstrap confidence intervals
+   //
+   if(conf_info.conf.boot_interval().ival() == boot_bca_flag) {
+      compute_mcts_stats_ci_bca(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
+         conf_info.conf.n_boot_rep().ival(),
+         mcts_info,
+         conf_info.conf.output_flag(i_mcts).ival(),
+         conf_info.conf.rank_corr_flag().ival(),
+         conf_info.conf.tmp_dir().sval());
+   }
+   else {
+      compute_mcts_stats_ci_perc(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
+         conf_info.conf.n_boot_rep().ival(),
+         conf_info.conf.boot_rep_prop().dval(),
+         mcts_info,
+         conf_info.conf.output_flag(i_mcts).ival(),
          conf_info.conf.rank_corr_flag().ival(),
          conf_info.conf.tmp_dir().sval());
    }

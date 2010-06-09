@@ -65,29 +65,29 @@ static const char * program_name = "point_stat";
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "fho",   "ctc",    "cts",
-   "cnt",   "sl1l2",  "sal1l2",
-   "vl1l2", "val1l2", "pct",
-   "pstd",  "pjc",    "prc",
-   "mpr"
+   "fho",    "ctc",    "cts",
+   "mctc",   "mcts",   "cnt",
+   "sl1l2",  "sal1l2", "vl1l2",
+   "val1l2", "pct",    "pstd",
+   "pjc",    "prc",    "mpr"
 };
 
 // Header columns
 static const char **txt_columns[n_txt] = {
    fho_columns,    ctc_columns,    cts_columns,
-   cnt_columns,    sl1l2_columns,  sal1l2_columns,
-   vl1l2_columns,  val1l2_columns, pct_columns,
-   pstd_columns,   pjc_columns,    prc_columns,
-   mpr_columns
+   mctc_columns,   mcts_columns,   cnt_columns,
+   sl1l2_columns,  sal1l2_columns, vl1l2_columns,
+   val1l2_columns, pct_columns,    pstd_columns,
+   pjc_columns,    prc_columns,    mpr_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
    n_fho_columns,    n_ctc_columns,    n_cts_columns,
-   n_cnt_columns,    n_sl1l2_columns,  n_sal1l2_columns,
-   n_vl1l2_columns,  n_val1l2_columns, n_pct_columns,
-   n_pstd_columns,   n_pjc_columns,    n_prc_columns,
-   n_mpr_columns
+   n_mctc_columns,   n_mcts_columns,   n_cnt_columns,
+   n_sl1l2_columns,  n_sal1l2_columns, n_vl1l2_columns,
+   n_val1l2_columns, n_pct_columns,    n_pstd_columns,
+   n_pjc_columns,    n_prc_columns,    n_mpr_columns
 };
 
 // Maximum number of GRIB records
