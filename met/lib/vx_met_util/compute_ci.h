@@ -25,75 +25,73 @@ static const int wald_sample_threshold  = 100;
 ////////////////////////////////////////////////////////////////////////
 
 extern void compute_proportion_ci(double p, int n, double alpha,
-                                  double &p_cl, double &p_cu);
+   double &p_cl, double &p_cu);
 
 extern void compute_wald_ci(double p, int n, double alpha,
-                            double &p_cl, double &p_cu);
+   double &p_cl, double &p_cu);
 
 extern void compute_wilson_ci(double p, int n, double alpha,
-                              double &p_cl, double &p_cu);
+   double &p_cl, double &p_cu);
 
-extern void compute_woolf_ci(double odds, double alpha, 
-                             int fy_oy, int fy_on, int fn_oy, int fn_on,
-                             double &odds_cl, double &odds_cu);
+extern void compute_woolf_ci(double odds, double alpha,
+   int fy_oy, int fy_on, int fn_oy, int fn_on,
+   double &odds_cl, double &odds_cu);
 
 extern void compute_hk_ci(double hk, double alpha,
-                          int fy_oy, int fy_on, int fn_oy, int fn_on,
-                          double &hk_cl, double &hk_cu);
+   int fy_oy, int fy_on, int fn_oy, int fn_on,
+   double &hk_cl, double &hk_cu);
 
 extern void compute_cts_stats_ci_bca(const gsl_rng *,
-                                     const NumArray &, const NumArray &,
-                                     int, CTSInfo *&, int, int, int,
-                                     const char *);
+   const NumArray &, const NumArray &,
+   int, CTSInfo *&, int, int, int, const char *);
+
+extern void compute_mcts_stats_ci_bca(const gsl_rng *,
+   const NumArray &, const NumArray &,
+   int, MCTSInfo &, int, int, const char *);
 
 extern void compute_cnt_stats_ci_bca(const gsl_rng *,
-                                     const NumArray &, const NumArray &,
-                                     int, int, int, CNTInfo &, int,
-                                     int, const char *);
+   const NumArray &, const NumArray &,
+   int, int, int, CNTInfo &, int, int, const char *);
 
 extern void compute_cts_stats_ci_perc(const gsl_rng *,
-                                      const NumArray &, const NumArray &,
-                                      int, double, CTSInfo *&, int,
-                                      int, int, const char *);
+   const NumArray &, const NumArray &,
+   int, double, CTSInfo *&, int, int, int, const char *);
+
+extern void compute_mcts_stats_ci_perc(const gsl_rng *,
+   const NumArray &, const NumArray &,
+   int, double, MCTSInfo &, int, int, const char *);
 
 extern void compute_cnt_stats_ci_perc(const gsl_rng *,
-                                      const NumArray &, const NumArray &,
-                                      int, int, int, double, CNTInfo &,
-                                      int, int, const char *);
+   const NumArray &, const NumArray &,
+   int, int, int, double, CNTInfo &, int, int, const char *);
 
 extern void compute_nbrcts_stats_ci_bca(const gsl_rng *,
-                                        const NumArray &, const NumArray &,
-                                        int, NBRCTSInfo *&, int,
-                                        int, const char *);
+   const NumArray &, const NumArray &,
+   int, NBRCTSInfo *&, int, int, const char *);
 
 extern void compute_nbrcnt_stats_ci_bca(const gsl_rng *,
-                                        const NumArray &, const NumArray &,
-                                        int, NBRCNTInfo &, int,
-                                        const char *);
+   const NumArray &, const NumArray &,
+   int, NBRCNTInfo &, int, const char *);
 
 extern void compute_nbrcts_stats_ci_perc(const gsl_rng *,
-                                         const NumArray &, const NumArray &,
-                                         int, double, NBRCTSInfo *&, int,
-                                         int, const char *);
+   const NumArray &, const NumArray &,
+   int, double, NBRCTSInfo *&, int, int, const char *);
 
 extern void compute_nbrcnt_stats_ci_perc(const gsl_rng *,
-                                         const NumArray &, const NumArray &,
-                                         int, double, NBRCNTInfo &, int,
-                                         const char *);
+   const NumArray &, const NumArray &,
+   int, double, NBRCNTInfo &, int, const char *);
 
 extern void compute_mean_stdev_ci_bca(const gsl_rng *, const NumArray &,
-                                      int, double,
-                                      CIInfo &, CIInfo &);
+   int, double, CIInfo &, CIInfo &);
 
 extern void compute_mean_stdev_ci_perc(const gsl_rng *, const NumArray &,
-                                       int, double, double,
-                                       CIInfo &, CIInfo &);
+   int, double, double, CIInfo &, CIInfo &);
 
 extern void compute_bca_interval(double, NumArray &, NumArray &,
-                                 double, double &, double &);
+   double, double &, double &);
 
 extern void compute_perc_interval(double, NumArray &,
-                                  double, double &, double &);
+   double, double &, double &);
 
 ////////////////////////////////////////////////////////////////////////
 

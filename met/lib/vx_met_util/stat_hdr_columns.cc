@@ -275,12 +275,12 @@ void StatHdrColumns::set_obs_thresh(const SingleThresh t) {
 void StatHdrColumns::set_obs_thresh(const ThreshArray t) {
    char tmp_str[max_str_len];
 
-   fcst_thresh.clear();
-   fcst_thresh_str.clear();
+   obs_thresh.clear();
+   obs_thresh_str.clear();
 
    // Concatenate all of the forecast thresholds used
    t.get_str(",", tmp_str);
-   fcst_thresh_str << tmp_str;
+   obs_thresh_str << tmp_str;
 
    return;
 }

@@ -301,6 +301,20 @@ void CTSInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void CTSInfo::add(double f, double o) {
+   SingleThresh ft = cts_fcst_thresh;
+   SingleThresh ot = cts_obs_thresh;
+
+   if     ( ft.check(f) &&  ot.check(o)) cts.inc_fy_oy();
+   else if( ft.check(f) && !ot.check(o)) cts.inc_fy_on();
+   else if(!ft.check(f) &&  ot.check(o)) cts.inc_fn_oy();
+   else if(!ft.check(f) && !ot.check(o)) cts.inc_fn_on();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void CTSInfo::compute_stats() {
 
    baser.v = cts.oy_tp();
@@ -478,6 +492,21 @@ void MCTSInfo::allocate_n_alpha(int i) {
       hss.allocate_n_alpha(n_alpha);
       ger.allocate_n_alpha(n_alpha);
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::add(double f, double o) {
+   int r, c;
+
+   // Find the row and column for the forecast and observation values.
+   r = cts_fcst_ta.check(f);
+   c = cts_obs_ta.check(o);
+
+   // Increment the corresponding contingency table entry.
+   cts.inc_entry(r, c);
 
    return;
 }
@@ -2331,8 +2360,6 @@ void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
                      int cts_flag, int normal_ci_flag,
                      CTSInfo &cts_info) {
    int i, j, n;
-   double f, o;
-   SingleThresh ft, ot;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2355,12 +2382,6 @@ void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
    cts_info.cts.zero_out();
 
    //
-   // Get the threshold value to be applied
-   //
-   ft = cts_info.cts_fcst_thresh;
-   ot = cts_info.cts_obs_thresh;
-
-   //
    // Loop through the pair data and fill in the contingency table
    //
    for(i=0; i<n; i++) {
@@ -2370,16 +2391,11 @@ void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
       //
       j = nint(i_na[i]);
 
-      f = f_na[j];
-      o = o_na[j];
+      //
+      // Add this pair to the contingency table
+      //
+      cts_info.add(f_na[j], o_na[j]);
 
-      //
-      // Update the contingency table counts for this pair
-      //
-      if     ( ft.check(f) &&  ot.check(o)) cts_info.cts.inc_fy_oy();
-      else if( ft.check(f) && !ot.check(o)) cts_info.cts.inc_fy_on();
-      else if(!ft.check(f) &&  ot.check(o)) cts_info.cts.inc_fn_oy();
-      else if(!ft.check(f) && !ot.check(o)) cts_info.cts.inc_fn_on();
    } // end for i
 
    //
@@ -2441,6 +2457,113 @@ void compute_i_ctsinfo(const NumArray &f_na, const NumArray &o_na,
 
    compute_ctsinfo(f_na_i, o_na_i, i_na_i,
                    1, normal_ci_flag, cts_info);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_mctsinfo(const NumArray &f_na, const NumArray &o_na,
+                      const NumArray &i_na,
+                      int mcts_flag, int normal_ci_flag,
+                      MCTSInfo &mcts_info) {
+   int i, j, n;
+
+   //
+   // Check that the forecast and observation arrays of the same length
+   //
+   if(f_na.n_elements() != o_na.n_elements()) {
+      cerr << "\n\nERROR: compute_mctsinfo() -> "
+           << "the forecast and observation arrays must have the same "
+           << "length!\n\n" << flush;
+      throw(1);
+   }
+
+   //
+   // Loop over the length of the index array
+   //
+   n = i_na.n_elements();
+
+   //
+   // Reset the MCTS object
+   //
+   mcts_info.cts.zero_out();
+
+   //
+   // Loop through the pair data and fill in the contingency table
+   //
+   for(i=0; i<n; i++) {
+
+      //
+      // Get the index to be used from the index num array
+      //
+      j = nint(i_na[i]);
+
+      //
+      // Add this pair to the contingency table
+      //
+      mcts_info.add(f_na[j], o_na[j]);
+
+   } // end for i
+
+   //
+   // Only compute the categorical stats if reqeusted
+   //
+   if(mcts_flag) {
+
+      mcts_info.compute_stats();
+
+      //
+      // Only compute the normal confidence intervals if requested
+      //
+      if(normal_ci_flag) mcts_info.compute_ci();
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_i_mctsinfo(const NumArray &f_na, const NumArray &o_na,
+                        int skip, int normal_ci_flag,
+                        MCTSInfo &mcts_info) {
+   int i, n, count;
+   NumArray f_na_i, o_na_i, i_na_i;
+
+   //
+   // Check that the forecast and observation arrays of the same length
+   //
+   if(f_na.n_elements() != o_na.n_elements()) {
+      cerr << "\n\nERROR: compute_i_mctsinfo() -> "
+           << "the forecast and observation arrays must have the same "
+           << "length!\n\n" << flush;
+      throw(1);
+   }
+   else {
+      n = f_na.n_elements();
+   }
+
+   if(skip < 0 || skip > n) {
+      cerr << "\n\nERROR: compute_i_mctsinfo() -> "
+           << "the skip index (" << skip << ") is out of bounds!\n\n"
+           << flush;
+      throw(1);
+   }
+
+   //
+   // Copy over the forecast, observation, and index values except
+   // for the one to be skipped
+   //
+   for(i=0, count=0; i<n; i++) {
+      if(i == skip) continue;
+      f_na_i.add(f_na[i]);
+      o_na_i.add(o_na[i]);
+      i_na_i.add(count);
+      count++;
+   }
+
+   compute_mctsinfo(f_na_i, o_na_i, i_na_i,
+                    1, normal_ci_flag, mcts_info);
 
    return;
 }

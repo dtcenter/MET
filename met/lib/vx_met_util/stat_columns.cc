@@ -686,38 +686,6 @@ void write_header_row(const char **cols, int n_cols, int hdr_flag,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
-                           int r, int c) {
-   int i, j, col;
-   char tmp_str[max_str_len];
-
-   // Write the header column names if requested
-   if(hdr_flag) {
-      for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
-
-      c += n_header_columns;
-   }
-
-   // Write the columns names specific to the MCTC line type
-   at.set_entry(r, c+0, mctc_columns[0]);
-   at.set_entry(r, c+1, mctc_columns[1]);
-
-   // Write Fi_Oj for each entry of the NxN table
-   for(i=0, col=c+2; i<n_cat; i++) {
-      for(j=0; j<n_cat; j++) {
-
-         sprintf(tmp_str, "F%i_O%i", i+1, j+1);
-         at.set_entry(r, col, tmp_str); // Threshold
-         col++;
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_pct_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
                           int r, int c) {
    int i, col;
@@ -2484,7 +2452,7 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
    //    ACC,         ACC_NCL,     ACC_NCU,     ACC_BCL,     ACC_BCU,
    //    HK,          HK_BCL,      HK_BCU,
    //    HSS,         HSS_BCL,     HSS_BCU,
-   //    GER
+   //    GER,         GER_BCL,     GER_BCU
    //
    at.set_entry(r, c+0,  // Total count
       mcts_info.cts.total());
@@ -2527,6 +2495,12 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
 
    at.set_entry(r, c+13, // Gerrity Score
       mcts_info.ger.v);
+
+   at.set_entry(r, c+14, // Gerrity Score BCL
+      mcts_info.ger.v_bcl[i]);
+
+   at.set_entry(r, c+15, // Gerrity Score BCU
+      mcts_info.ger.v_bcu[i]);
 
    return;
 }
