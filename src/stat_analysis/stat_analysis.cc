@@ -746,7 +746,7 @@ void process_search_dirs() {
    // If the tmp_dir has not already been set on the command line,
    // use the config file setting or default setting.
    //
-   if(strlen(tmp_dir) == 0) {
+   if(tmp_dir.length() == 0) {
       if(config_file != (char *) 0) tmp_dir = conf.tmp_dir().sval();
       else                          tmp_dir = default_tmp_dir;
    }
