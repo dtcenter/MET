@@ -629,8 +629,13 @@ double t, sum;
 double * p = (double *) 0;
 double * s  = (double *) 0;
 
+   //
+   //  can't compute gerrity when the first column contains all zeros
+   //
 
-p  = new double [Nrows];
+if ( col_total(0) == 0 ) return ( bad_data_double );
+
+p = new double [Nrows];
 
 s = new double [Nrows*Nrows];
 
@@ -725,7 +730,7 @@ for (j=0; j<N; ++j)  {
 
    sum += p[j];
 
-   a[j] = (1.0 - sum)/sum;   //  can the denominator be zero here?
+   a[j] = (1.0 - sum)/sum;
 
 }
 
