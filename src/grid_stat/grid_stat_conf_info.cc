@@ -372,25 +372,24 @@ void GridStatConfInfo::process_config() {
          (conf.output_flag(i_mctc).ival() ||
           conf.output_flag(i_mcts).ival())) {
 
-         // Check that the threshold types are < or <= and that the
-         // threshold values are monotonically increasing
+         // Check that the threshold values are monotonically increasing
+         // and the threshold types are inequalities that remain the same
          for(j=0; j<fcst_ta[i].n_elements()-1; j++) {
 
-            if(fcst_ta[i][j].thresh > fcst_ta[i][j+1].thresh ||
-               obs_ta[i][j].thresh  > obs_ta[i][j+1].thresh  ||
-               (fcst_ta[i][j].type   != thresh_lt && 
-                fcst_ta[i][j].type   != thresh_le) ||
-               (fcst_ta[i][j+1].type != thresh_lt && 
-                fcst_ta[i][j+1].type != thresh_le) ||
-               (obs_ta[i][j].type    != thresh_lt && 
-                obs_ta[i][j].type    != thresh_le) ||
-               (obs_ta[i][j+1].type  != thresh_lt && 
-                obs_ta[i][j+1].type  != thresh_le)) {
+            if(fcst_ta[i][j].thresh >  fcst_ta[i][j+1].thresh ||
+               obs_ta[i][j].thresh  >  obs_ta[i][j+1].thresh  ||
+               fcst_ta[i][j].type   != fcst_ta[i][j+1].type   ||
+               obs_ta[i][j].type    != obs_ta[i][j+1].type    ||
+               fcst_ta[i][j].type   == thresh_eq              ||
+               fcst_ta[i][j].type   == thresh_ne              ||
+               obs_ta[i][j].type    == thresh_eq              ||
+               obs_ta[i][j].type    == thresh_ne) {
 
-               cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
+               cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
                     << "when verifying using multi-category contingency "
                     << "tables, the thresholds must be monotonically "
-                    << "increasing and of type < or <=\n\n";
+                    << "increasing and be of the same inequality type "
+                    << "(lt, le, gt, or ge).\n\n" << flush;
                exit(1);
             }
          }

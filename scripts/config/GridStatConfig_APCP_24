@@ -61,7 +61,7 @@ obs_field[]  = [];
 //
 // e.g. fcst_thresh[] = [ "gt0.0 ge5.0", "gt0.0", "lt80.0 ge80.0" ];
 //
-fcst_thresh[] = [ "gt0.0 ge10.0" ];
+fcst_thresh[] = [ "gt0.0 gt5.0 gt10.0" ];
 obs_thresh[]  = [];
 
 //
@@ -431,7 +431,7 @@ cov_thresh[] = [ "ge0.5" ];
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file
 //
-output_flag[] = [ 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 1 ];
+output_flag[] = [ 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 1 ];
 
 //
 // Flag to indicate whether Kendall's Tau and Spearman's Rank Correlation
