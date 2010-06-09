@@ -54,6 +54,8 @@
 //   017    05/06/10  Halley Gotway  Add interp_flag config parameter.
 //   018    05/27/10  Halley Gotway  Add -fcst_valid, -fcst_lead,
 //                    -obs_valid, and -obs_lead command line options.
+//   019    06/08/10  Halley Gotway  Add support for multi-category
+//                    contingency tables.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -101,18 +103,20 @@ static void setup_nc_file   (unixtime, int);
 static void build_outfile_name(unixtime, int, const char *,
                                ConcatString &);
 
-static void do_cts   (CTSInfo *&, int, int, int,
+static void do_cts   (CTSInfo *&, int,
                       const NumArray &, const NumArray &);
-static void do_cnt   (CNTInfo &, int, int, int,
+static void do_mcts  (MCTSInfo &, int,
                       const NumArray &, const NumArray &);
-static void do_vl1l2 (VL1L2Info *&, int, int, int,
+static void do_cnt   (CNTInfo &, int,
+                      const NumArray &, const NumArray &);
+static void do_vl1l2 (VL1L2Info *&, int,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
 static void do_pct   (PCTInfo   *&, int,
                       const NumArray &, const NumArray &);
-static void do_nbrcts(NBRCTSInfo *&, int, int, int, int,
+static void do_nbrcts(NBRCTSInfo *&, int, int, int,
                       const NumArray &, const NumArray &);
-static void do_nbrcnt(NBRCNTInfo &, int, int, int, int,
+static void do_nbrcnt(NBRCNTInfo &, int, int, int,
                       const NumArray &, const NumArray &);
 
 static void write_nc(const WrfData &, const WrfData &,
@@ -324,6 +328,7 @@ void process_scores() {
 
    CNTInfo     cnt_info;
    CTSInfo    *cts_info;
+   MCTSInfo    mcts_info;
    VL1L2Info  *vl1l2_info;
    NBRCNTInfo  nbrcnt_info;
    NBRCTSInfo *nbrcts_info;
@@ -596,7 +601,7 @@ void process_scores() {
                for(m=0; m<max_scal_t; m++) cts_info[m].clear();
 
                // Compute CTS
-               do_cts(cts_info, i, j, k, f_na, o_na);
+               do_cts(cts_info, i, f_na, o_na);
 
                // Loop through all of the thresholds
                for(m=0; m<conf_info.fcst_ta[i].n_elements(); m++) {
@@ -633,6 +638,39 @@ void process_scores() {
                } // end for m
             } // end Compute CTS
 
+            // Compute MCTS scores
+            if(conf_info.fcst_gci[i].pflag == 0 &&
+               conf_info.fcst_ta[i].n_elements() > 1 &&
+               (conf_info.conf.output_flag(i_mctc).ival() ||
+                conf_info.conf.output_flag(i_mcts).ival())) {
+
+               // Initialize
+               mcts_info.clear();
+
+               // Compute MCTS
+               do_mcts(mcts_info, i, f_na, o_na);
+
+               // Write out MCTC
+               if(conf_info.conf.output_flag(i_mctc).ival() &&
+                  mcts_info.cts.total() > 0) {
+
+                  write_mctc_row(shc, mcts_info,
+                     conf_info.conf.output_flag(i_mctc).ival(),
+                     stat_at, i_stat_row,
+                     txt_at[i_mctc], i_txt_row[i_mctc]);
+               }
+
+               // Write out MCTS
+               if(conf_info.conf.output_flag(i_mcts).ival() &&
+                  mcts_info.cts.total() > 0) {
+
+                  write_mcts_row(shc, mcts_info,
+                     conf_info.conf.output_flag(i_mcts).ival(),
+                     stat_at, i_stat_row,
+                     txt_at[i_mcts], i_txt_row[i_mcts]);
+               }
+            } // end Compute MCTS
+
             // Compute CNT scores
             if(conf_info.fcst_gci[i].pflag == 0 &&
                (conf_info.conf.output_flag(i_cnt).ival() ||
@@ -642,7 +680,7 @@ void process_scores() {
                cnt_info.clear();
 
                // Compute CNT
-               do_cnt(cnt_info, i, j, k, f_na, o_na);
+               do_cnt(cnt_info, i, f_na, o_na);
 
                // Write out CNT
                if(conf_info.conf.output_flag(i_cnt).ival() &&
@@ -702,7 +740,7 @@ void process_scores() {
                           f_ugrd_na, o_ugrd_na);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, j, k,
+               do_vl1l2(vl1l2_info, i,
                         f_na, o_na, f_ugrd_na, o_ugrd_na);
 
                // Loop through all of the wind speed thresholds
@@ -874,7 +912,7 @@ void process_scores() {
                         nbrcts_info[n].clear();
                      }
 
-                     do_nbrcts(nbrcts_info, i, j, k, m, f_na, o_na);
+                     do_nbrcts(nbrcts_info, i, j, k, f_na, o_na);
 
                      // Loop through all of the thresholds
                      for(n=0; n<conf_info.frac_ta.n_elements(); n++) {
@@ -909,7 +947,7 @@ void process_scores() {
                      // Initialize
                      nbrcnt_info.clear();
 
-                     do_nbrcnt(nbrcnt_info, i, j, k, m, f_na, o_na);
+                     do_nbrcnt(nbrcnt_info, i, j, k, f_na, o_na);
 
                      // Write out NBRCNT
                      if(conf_info.conf.output_flag(i_nbrcnt).ival() &&
@@ -965,7 +1003,7 @@ void setup_first_pass(const WrfData &wd, const Grid &fcst_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files(unixtime valid_ut, int lead_sec) {
-   int  i, max_col, max_prob_col, n;
+   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat;
    ConcatString tmp_str;
 
    // Create output file names for the stat file and optional text files
@@ -978,13 +1016,22 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n = conf_info.get_max_n_prob_fcst_thresh();
-   max_prob_col = get_n_pjc_columns(n);
+   n_prob = conf_info.get_max_n_prob_fcst_thresh();
+   n_cat  = conf_info.get_max_n_scal_thresh() + 1;
 
-   if(max_prob_col > max_stat_col)
+   max_prob_col = get_n_pjc_columns(n_prob);
+   max_mctc_col = get_n_mctc_columns(n_cat);
+
+   // Maximum number of standard STAT columns
+   max_col = max_stat_col + n_header_columns + 1;
+
+   // Maximum number of probabilistic columns
+   if(max_prob_col > max_col)
       max_col = max_prob_col + n_header_columns + 1;
-   else
-      max_col = max_stat_col + n_header_columns + 1;
+
+   // Maximum number of multi-category contingency table columns
+   if(max_mctc_col > max_stat_col)
+      max_col = max_mctc_col + n_header_columns + 1;
 
    // Initialize file stream
    stat_out   = (ofstream *) 0;
@@ -1030,20 +1077,24 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
          // Get the maximum number of columns for this line type
          switch(i) {
 
+            case(i_mctc):
+               max_col = get_n_mctc_columns(n_cat) + n_header_columns + 1;
+               break;
+
             case(i_pct):
-               max_col = get_n_pct_columns(n)  + n_header_columns + 1;
+               max_col = get_n_pct_columns(n_prob)  + n_header_columns + 1;
                break;
 
             case(i_pstd):
-               max_col = get_n_pstd_columns(n) + n_header_columns + 1;
+               max_col = get_n_pstd_columns(n_prob) + n_header_columns + 1;
                break;
 
             case(i_pjc):
-               max_col = get_n_pjc_columns(n)  + n_header_columns + 1;
+               max_col = get_n_pjc_columns(n_prob)  + n_header_columns + 1;
                break;
 
             case(i_prc):
-               max_col = get_n_prc_columns(n)  + n_header_columns + 1;
+               max_col = get_n_prc_columns(n_prob)  + n_header_columns + 1;
                break;
 
             default:
@@ -1059,19 +1110,19 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
          switch(i) {
 
             case(i_pct):
-               write_pct_header_row(1, n, txt_at[i], 0, 0);
+               write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             case(i_pstd):
-               write_pstd_header_row(1, n, txt_at[i], 0, 0);
+               write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             case(i_pjc):
-               write_pjc_header_row(1, n, txt_at[i], 0, 0);
+               write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             case(i_prc):
-               write_prc_header_row(1, n, txt_at[i], 0, 0);
+               write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
             default:
@@ -1190,8 +1241,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts(CTSInfo *&cts_info,
-            int i_gc, int i_interp, int i_mask,
+void do_cts(CTSInfo *&cts_info, int i_gc,
             const NumArray &f_na, const NumArray &o_na) {
    int i, j, n_cts;
 
@@ -1240,8 +1290,59 @@ void do_cts(CTSInfo *&cts_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt(CNTInfo &cnt_info,
-            int i_gc, int i_interp, int i_mask,
+void do_mcts(MCTSInfo &mcts_info, int i_gc,
+             const NumArray &f_na, const NumArray &o_na) {
+   int i;
+
+   //
+   // Set up the MCTSInfo size, thresholds, and alpha values
+   //
+   mcts_info.cts.set_size(conf_info.fcst_ta[i_gc].n_elements() + 1);
+   mcts_info.cts_fcst_ta = conf_info.fcst_ta[i_gc];
+   mcts_info.cts_obs_ta  = conf_info.obs_ta[i_gc];
+   mcts_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
+
+   for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
+      mcts_info.alpha[i] = conf_info.conf.ci_alpha(i).dval();
+   }
+
+   if(verbosity > 1) {
+      cout << "Computing Multi-Category Statistics.\n" << flush;
+   }
+
+   //
+   // If there are no matched pairs to process, return
+   //
+   if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
+
+   //
+   // Compute the stats, normal confidence intervals, and bootstrap
+   // bootstrap confidence intervals
+   //
+   if(conf_info.conf.boot_interval().ival() == boot_bca_flag) {
+      compute_mcts_stats_ci_bca(rng_ptr, f_na, o_na,
+         conf_info.conf.n_boot_rep().ival(),
+         mcts_info,
+         conf_info.conf.output_flag(i_mcts).ival(),
+         conf_info.conf.rank_corr_flag().ival(),
+         conf_info.conf.tmp_dir().sval());
+   }
+   else {
+      compute_mcts_stats_ci_perc(rng_ptr, f_na, o_na,
+         conf_info.conf.n_boot_rep().ival(),
+         conf_info.conf.boot_rep_prop().dval(),
+         mcts_info,
+         conf_info.conf.output_flag(i_mcts).ival(),
+         conf_info.conf.rank_corr_flag().ival(),
+         conf_info.conf.tmp_dir().sval());
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_cnt(CNTInfo &cnt_info, int i_gc,
             const NumArray &f_na, const NumArray &o_na) {
    int i;
 
@@ -1288,8 +1389,7 @@ void do_cnt(CNTInfo &cnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_vl1l2(VL1L2Info *&v_info,
-              int i_gc, int i_interp, int i_mask,
+void do_vl1l2(VL1L2Info *&v_info, int i_gc,
               const NumArray &vf_na, const NumArray &vo_na,
               const NumArray &uf_na, const NumArray &uo_na) {
    int i, j, n_thresh;
@@ -1456,7 +1556,7 @@ void do_pct(PCTInfo *&pct_info, int i_gc,
 ////////////////////////////////////////////////////////////////////////
 
 void do_nbrcts(NBRCTSInfo *&nbrcts_info,
-               int i_gc, int i_wdth, int i_thresh, int i_mask,
+               int i_gc, int i_wdth, int i_thresh,
                const NumArray &f_na, const NumArray &o_na) {
    int i, j, n_nbrcts;
 
@@ -1524,7 +1624,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
-               int i_gc, int i_wdth, int i_thresh, int i_mask,
+               int i_gc, int i_wdth, int i_thresh,
                const NumArray &f_na, const NumArray &o_na) {
    int i;
 

@@ -20,7 +20,7 @@
    //
    //     Created from config file "GridStatConfig_default"
    //
-   //     on May 24, 2010    3:12 pm  MDT
+   //     on June 9, 2010    12:59 pm  MDT
    //
 
 
@@ -222,7 +222,7 @@ class grid_stat_Conf {
       int n_cov_thresh_elements();
 
 
-      Result output_flag(int);   //  1-dimensional array, indices from 0 to 14
+      Result output_flag(int);   //  1-dimensional array, indices from 0 to 16
 
       int n_output_flag_elements();
 

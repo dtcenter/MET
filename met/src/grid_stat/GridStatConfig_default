@@ -291,7 +291,20 @@ cov_thresh[] = [ "ge0.5" ];
 //           Heidke Skill Score (HSS),
 //           Odds Ratio (ODDS), ODDS_CL, ODDS_CU
 //
-//    (4) STAT and CNT Text Files, Statistics of Continuous Variables:
+//    (4) STAT and MCTC Text Files, NxN Multi-Category Contingency Table Counts:
+//           Total (TOTAL),
+//           Number of Categories (N_CAT),
+//           Contingency Table Count columns repeated N_CAT*N_CAT times
+//
+//    (5) STAT and MCTS Text Files, NxN Multi-Category Contingency Table Scores:
+//           Total (TOTAL),
+//           Number of Categories (N_CAT),
+//           Accuracy (ACC), ACC_CL, ACC_CU,
+//           Hanssen and Kuipers Discriminant (HK), HK_CL, HK_CU,
+//           Heidke Skill Score (HSS), HSS_CU, HSS_CU,
+//           Gerrity Score (GER), GER_CL, GER_CU
+//
+//    (6) STAT and CNT Text Files, Statistics of Continuous Variables:
 //           Total (TOTAL),
 //           Forecast Mean (FBAR), FBAR_CL, FBAR_CU,
 //           Forecast Standard Deviation (FSTDEV), FSTDEV_CL, FSTDEV_CU
@@ -312,10 +325,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           Root Mean Squared Error (RMSE),
 //           Percentiles of the Error (E10, E25, E50, E75, E90)
 //
-//           NOTE: CL and CU values define lower and upper
-//                 confidence interval limits.
-//
-//    (5) STAT and SL1L2 Text Files, Scalar Partial Sums:
+//    (7) STAT and SL1L2 Text Files, Scalar Partial Sums:
 //           Total (TOTAL),
 //           Forecast Mean (FBAR),
 //              = mean(f)
@@ -328,7 +338,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           Observation Squared Mean (OOBAR)
 //              = mean(o^2)
 //
-//    (6) STAT and VL1L2 Text Files, Vector Partial Sums:
+//    (8) STAT and VL1L2 Text Files, Vector Partial Sums:
 //           Total (TOTAL),
 //           U-Forecast Mean (UFBAR),
 //              = mean(uf)
@@ -345,7 +355,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           U-Observation Squared Plus V-Observation Squared (UVOOBAR)
 //              = mean(uo^2+vo^2)
 //
-//    (7) STAT and PCT Text Files, Nx2 Probability Contingency Table Counts:
+//    (9) STAT and PCT Text Files, Nx2 Probability Contingency Table Counts:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
 //           Probability Threshold Value (THRESH_i),
@@ -354,7 +364,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           NOTE: Previous 3 columns repeated for each row in the table
 //           Last Probability Threshold Value (THRESH_n)
 //
-//    (8) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
+//   (10) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
 //           Base Rate (BASER), BASER_CL, BASER_CU,
@@ -366,7 +376,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           Probability Threshold Value (THRESH_i)
 //           NOTE: Previous column repeated for each probability threshold
 //
-//    (9) STAT and PJC Text Files, Joint/Continuous Statistics of
+//   (11) STAT and PJC Text Files, Joint/Continuous Statistics of
 //                                 Probabilistic Variables:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
@@ -380,7 +390,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           NOTE: Previous 7 columns repeated for each row in the table
 //           Last Probability Threshold Value (THRESH_n)
 //
-//   (10) STAT and PRC Text Files, ROC Curve Points for
+//   (12) STAT and PRC Text Files, ROC Curve Points for
 //                                 Probabilistic Variables:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
@@ -390,7 +400,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           NOTE: Previous 3 columns repeated for each row in the table
 //           Last Probability Threshold Value (THRESH_n)
 //
-//   (11) STAT and NBRCTC Text Files, Neighborhood Methods Contingency Table Counts:
+//   (13) STAT and NBRCTC Text Files, Neighborhood Methods Contingency Table Counts:
 //           Total (TOTAL),
 //           Forecast Yes and Observation Yes Count (FY_OY),
 //           Forecast Yes and Observation No Count (FY_ON),
@@ -398,7 +408,7 @@ cov_thresh[] = [ "ge0.5" ];
 //           Forecast No and Observation No Count (FN_ON),
 //           Fractional Threshold Value (FRAC_T)
 //
-//   (12) STAT and NBRCTS Text Files, Neighborhood Methods Contingency Table Scores:
+//   (14) STAT and NBRCTS Text Files, Neighborhood Methods Contingency Table Scores:
 //           Total (TOTAL),
 //           Base Rate (BASER), BASER_CL, BASER_CU,
 //           Forecast Mean (FMEAN), FMEAN_CL, FMEAN_CU,
@@ -415,22 +425,24 @@ cov_thresh[] = [ "ge0.5" ];
 //           Odds Ratio (ODDS), ODDS_CL, ODDS_CU
 //           Fractional Threshold Value (FRAC_T)
 //
-//   (13) STAT and NBRCNT Text Files, Neighborhood Methods Continuous Scores:
+//   (15) STAT and NBRCNT Text Files, Neighborhood Methods Continuous Scores:
 //           Total (TOTAL),
 //           Fractions Brier Score (FBS),
 //           Fractions Skill Score (FSS)
 //
-//   (14) NetCDF File containing difference fields for each grib
+//   (16) NetCDF File containing difference fields for each grib
 //        code/mask combination.  A non-zero value indicates that
 //        this NetCDF file should be produced.  A value of 0
 //        indicates that it should not be produced.
+//
+// NOTE: CL and CU values define lower and upper confidence interval limits.
 //
 // Values for flags (1) through (8) are interpreted as follows:
 //    (0) Do not generate output of this type
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file
 //
-output_flag[] = [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 ];
+output_flag[] = [ 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 ];
 
 //
 // Flag to indicate whether Kendall's Tau and Spearman's Rank Correlation
