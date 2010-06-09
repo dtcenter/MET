@@ -440,7 +440,7 @@ interp_thresh = 1.0;
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file
 //
-output_flag[] = [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 ];
+output_flag[] = [ 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 ];
 
 //
 // Flag to indicate whether Kendall's Tau and Spearman's Rank Correlation

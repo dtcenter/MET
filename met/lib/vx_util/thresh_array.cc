@@ -326,29 +326,46 @@ int ThreshArray::check(double v) const {
    int i, bin;
 
    //
-   // Check that the threshold value are monotonically increasing and
-   // the threshold types are either < or <=.
+   // Check that the threshold values are monotonically increasing
+   // and the threshold types are inequalities that remain the same
    //
    for(i=0; i<Nelements-1; i++) {
 
-      if(t[i].thresh > t[i+1].thresh ||
-         (t[i].type != thresh_lt && t[i].type != thresh_le)) {
+      if(t[i].thresh >  t[i+1].thresh ||
+         t[i].type   != t[i+1].type   ||
+         t[i].type   == thresh_eq     ||
+         t[i].type   == thresh_ne) {
 
          cerr << "\n\n  ThreshArray::check(double) const -> "
-              << "thresholds must be monotonically increasing and of "
-              << "type < or <=\n\n";
+              << "thresholds must be monotonically increasing and be of "
+              << "the same inequality type (lt, le, gt, or ge)."
+              << "\n\n" << flush;
          exit(1);
       }
    }
 
-   for(i=0, bin=-1; i<Nelements; i++) {
-      if(t[i].check(v)) {
-         bin = i;
-         break;
-      }
-   }
+   // For < and <=, check thresholds left to right.
+   if(t[0].type == thresh_lt || t[0].type == thresh_le) {
 
-   if(bin == -1) bin = Nelements;
+      for(i=0, bin=-1; i<Nelements; i++) {
+         if(t[i].check(v)) {
+            bin = i;
+            break;
+         }
+      }
+      if(bin == -1) bin = Nelements;
+   }
+   // For > and >=, check thresholds right to left.
+   else {
+
+      for(i=Nelements-1, bin=-1; i>=0; i--) {
+         if(t[i].check(v)) {
+            bin = i+1;
+            break;
+         }
+      }
+      if(bin == -1) bin = 0;
+   }
 
    return(bin);
 }
