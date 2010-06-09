@@ -446,7 +446,7 @@ interp_thresh = 1.0;
 //   In the expressions above, f are forecast values, o are observed values,
 //   and c are climatological values.
 //
-//   NOTE: CL and CU values define lower and upper confidence interval limits.
+// NOTE: CL and CU values define lower and upper confidence interval limits.
 //
 // Values for these flags are interpreted as follows:
 //    (0) Do not generate output of this type
