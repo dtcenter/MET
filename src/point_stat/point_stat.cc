@@ -56,7 +56,7 @@
 //                    From -valid_end to -obs_valid_end
 //   017    05/27/10  Halley Gotway  Add -fcst_valid and -fcst_lead
 //                    command line options.
-//   017    06/08/10  Halley Gotway  Add support for multi-category
+//   018    06/08/10  Halley Gotway  Add support for multi-category
 //                    contingency tables.
 //
 ////////////////////////////////////////////////////////////////////////
