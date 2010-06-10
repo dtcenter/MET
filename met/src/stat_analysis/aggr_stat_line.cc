@@ -187,7 +187,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
                cerr << "\n\nERROR: aggr_mctc_lines() -> "
                     << "when aggregating MCTC lines the size of the "
                     << "contingency table must remain the same for all "
-                    << "lines.  Try setting \"-column N_CAT n\", "
+                    << "lines.  Try setting \"-column_eq N_CAT n\", "
                     << mcts_info.cts.nrows() << " != "
                     << mct.nrows() << "\n\n" << flush;
                throw(1);
@@ -1192,7 +1192,7 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
             cerr << "\n\nERROR: aggr_rhist_lines() -> "
                  << "the \"N_RANK\" column must remain constant ("
                  << rhist_na.n_elements() << " != " << r_data.n_rank
-                 << ").  Try setting -column_min N_RANK n -column_max N_RANK n.\n\n"
+                 << ").  Try setting \"-column_eq N_RANK n\".\n\n"
                  << flush;
             throw(1);
          }
@@ -1265,7 +1265,7 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
             rhist_na.n_elements() != o_data.n_ens+1) {
             cerr << "\n\nERROR: aggr_rhist_lines() -> "
                  << "the \"N_ENS\" column must remain constant.  "
-                 << "Try setting -column_min N_ENS n -column_max N_ENS n.\n\n"
+                 << "Try setting \"-column_eq N_ENS n\".\n\n"
                  << flush;
             throw(1);
          }
