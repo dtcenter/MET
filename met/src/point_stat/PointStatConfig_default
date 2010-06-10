@@ -279,19 +279,21 @@ interp_thresh = 1.0;
 //
 //    (3) STAT and CTS Text Files, Contingency Table Scores:
 //           Total (TOTAL),
-//           Base Rate (BASER), BASER_CL, BASER_CU,
-//           Forecast Mean (FMEAN), FMEAN_CL, FMEAN_CU,
-//           Accuracy (ACC), ACC_CL, ACC_CU,
+//           Base Rate (BASER),
+//           Forecast Mean (FMEAN),
+//           Accuracy (ACC),
 //           Frequency Bias (FBIAS),
-//           Probability of Detecting Yes (PODY), PODY_CL, PODY_CU,
-//           Probability of Detecting No (PODN), PODN_CL, PODN_CU,
-//           Probability of False Detection (POFD), POFD_CL, POFD_CU,
-//           False Alarm Ratio (FAR), FAR_CL, FAR_CU,
-//           Critical Success Index (CSI), CSI_CL, CSI_CU,
+//           Probability of Detecting Yes (PODY),
+//           Probability of Detecting No (PODN),
+//           Probability of False Detection (POFD),
+//           False Alarm Ratio (FAR),
+//           Critical Success Index (CSI),
 //           Gilbert Skill Score (GSS),
-//           Hanssen and Kuipers Discriminant (HK), HK_CL, HK_CU,
+//           Hanssen and Kuipers Discriminant (HK),
 //           Heidke Skill Score (HSS),
-//           Odds Ratio (ODDS), ODDS_CL, ODDS_CU
+//           Odds Ratio (ODDS),
+//           NOTE: All statistics listed above contain parametric and/or
+//                 non-parametric confidence interval limits.
 //
 //    (4) STAT and MCTC Text Files, NxN Multi-Category Contingency Table Counts:
 //           Total (TOTAL),
@@ -301,31 +303,35 @@ interp_thresh = 1.0;
 //    (5) STAT and MCTS Text Files, NxN Multi-Category Contingency Table Scores:
 //           Total (TOTAL),
 //           Number of Categories (N_CAT),
-//           Accuracy (ACC), ACC_CL, ACC_CU,
-//           Hanssen and Kuipers Discriminant (HK), HK_CL, HK_CU,
-//           Heidke Skill Score (HSS), HSS_CU, HSS_CU,
-//           Gerrity Score (GER), GER_CL, GER_CU
+//           Accuracy (ACC),
+//           Hanssen and Kuipers Discriminant (HK),
+//           Heidke Skill Score (HSS),
+//           Gerrity Score (GER),
+//           NOTE: All statistics listed above contain parametric and/or
+//                 non-parametric confidence interval limits.
 //
 //    (6) STAT and CNT Text Files, Statistics of Continuous Variables:
 //           Total (TOTAL),
-//           Forecast Mean (FBAR), FBAR_CL, FBAR_CU,
-//           Forecast Standard Deviation (FSTDEV), FSTDEV_CL, FSTDEV_CU
-//           Observation Mean (OBAR), OBAR_CL, OBAR_CU,
-//           Observation Standard Deviation (OSTDEV), OSTDEV_CL, OSTDEV_CU,
-//           Pearson's Correlation Coefficient (PR_CORR), PR_CORR_CL, PR_CORR_CU,
+//           Forecast Mean (FBAR),
+//           Forecast Standard Deviation (FSTDEV),
+//           Observation Mean (OBAR),
+//           Observation Standard Deviation (OSTDEV),
+//           Pearson's Correlation Coefficient (PR_CORR),
 //           Spearman's Rank Correlation Coefficient (SP_CORR),
 //           Kendall Tau Rank Correlation Coefficient (KT_CORR),
 //           Number of ranks compared (RANKS),
 //           Number of tied ranks in the forecast field (FRANK_TIES),
 //           Number of tied ranks in the observation field (ORANK_TIES),
-//           Mean Error (ME), ME_CL, ME_CU,
-//           Standard Deviation of the Error (ESTDEV), ESTDEV_CL, ESTDEV_CU,
-//           Bias (BIAS = FBAR - OBAR),
+//           Mean Error (ME),
+//           Standard Deviation of the Error (ESTDEV),
+//           Multiplicative Bias (MBIAS = FBAR - OBAR),
 //           Mean Absolute Error (MAE),
 //           Mean Squared Error (MSE),
 //           Bias-Corrected Mean Squared Error (BCMSE),
 //           Root Mean Squared Error (RMSE),
 //           Percentiles of the Error (E10, E25, E50, E75, E90)
+//           NOTE: Most statistics listed above contain parametric and/or
+//                 non-parametric confidence interval limits.
 //
 //    (7) STAT and SL1L2 Text Files, Scalar Partial Sums:
 //           Total (TOTAL),
@@ -392,20 +398,20 @@ interp_thresh = 1.0;
 //           Probability Threshold Value (THRESH_i),
 //           Row Observation Yes Count (OY_i),
 //           Row Observation No Count (ON_i),
-//           NOTE: Previous 3 columns repeated for each row in the table
+//           NOTE: Previous 3 columns repeated for each row in the table.
 //           Last Probability Threshold Value (THRESH_n)
 //
 //   (12) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
 //           Total (TOTAL),
 //           Number of Forecast Probability Thresholds (N_THRESH),
-//           Base Rate (BASER), BASER_NCL, BASER_NCU,
+//           Base Rate (BASER) with confidence interval limits,
 //           Reliability (RELIABILITY),
 //           Resolution (RESOLUTION),
 //           Uncertainty (UNCERTAINTY),
 //           Area Under the ROC Curve (ROC_AUC),
-//           Brier Score (BRIER), BRIER_NCL, BRIER_NCU,
+//           Brier Score (BRIER) with confidence interval limits,
 //           Probability Threshold Value (THRESH_i)
-//           NOTE: Previous column repeated for each probability threshold
+//           NOTE: Previous column repeated for each probability threshold.
 //
 //   (13) STAT and PJC Text Files, Joint/Continuous Statistics of
 //                                 Probabilistic Variables:
@@ -418,7 +424,7 @@ interp_thresh = 1.0;
 //           Refinement (REFINEMENT_i),
 //           Likelikhood (LIKELIHOOD_i),
 //           Base Rate (BASER_i),
-//           NOTE: Previous 7 columns repeated for each row in the table
+//           NOTE: Previous 7 columns repeated for each row in the table.
 //           Last Probability Threshold Value (THRESH_n)
 //
 //   (14) STAT and PRC Text Files, ROC Curve Points for
@@ -428,7 +434,7 @@ interp_thresh = 1.0;
 //           Probability Threshold Value (THRESH_i),
 //           Probability of Detecting Yes (PODY_i),
 //           Probability of False Detection (POFD_i),
-//           NOTE: Previous 3 columns repeated for each row in the table
+//           NOTE: Previous 3 columns repeated for each row in the table.
 //           Last Probability Threshold Value (THRESH_n)
 //
 //   (15) STAT and MPR Text Files, Matched Pair Data:
@@ -445,8 +451,6 @@ interp_thresh = 1.0;
 //
 //   In the expressions above, f are forecast values, o are observed values,
 //   and c are climatological values.
-//
-// NOTE: CL and CU values define lower and upper confidence interval limits.
 //
 // Values for these flags are interpreted as follows:
 //    (0) Do not generate output of this type
