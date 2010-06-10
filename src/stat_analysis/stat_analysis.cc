@@ -247,6 +247,19 @@ void sanity_check() {
    unixtime ut_beg, ut_end;
 
    //
+   // Conf: version
+   //
+
+   if(strcasecmp(conf.version().sval(), met_version) != 0) {
+
+      cerr << "\n\nERROR: sanity_check() -> "
+           << "The version number listed in the config file ("
+           << conf.version().sval() << ") does not match the version "
+           << "of the code (" << met_version << ").\n\n" << flush;
+      exit(1);
+   }
+
+   //
    // Check for at least one search file or directory
    //
    if(search_dirs.n_elements() == 0) {

@@ -408,6 +408,19 @@ void process_config() {
    char tmp_str[PATH_MAX];
 
    //
+   // Conf: version
+   //
+
+   if(strcasecmp(conf.version().sval(), met_version) != 0) {
+
+      cerr << "\n\nERROR: process_config() -> "
+           << "The version number listed in the config file ("
+           << conf.version().sval() << ") does not match the version "
+           << "of the code (" << met_version << ").\n\n" << flush;
+      exit(1);
+   }
+
+   //
    // Check whether ANYAIR, ANYSFC, or ONLYSF have been specified
    // in the config file
    //
