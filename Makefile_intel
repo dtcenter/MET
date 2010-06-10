@@ -88,6 +88,7 @@ DISABLE_WAVELET_STAT  = 0
 DISABLE_ENSEMBLE_STAT = 0
 DISABLE_STAT_ANALYSIS = 0
 DISABLE_MODE_ANALYSIS = 0
+DISABLE_TOOLS         = 1
 
 ###############################################################################
 #
@@ -143,6 +144,8 @@ LIB_DIR		= lib
 INC_DIR		= lib
 
 SRC_DIR		= src
+
+TOOLS_DIR	= tools
 
 OUT_DIR		= out
 
@@ -246,6 +249,9 @@ endif
 ifeq ($(DISABLE_MODE_ANALYSIS), 0)
 	@ cd $(MODE_ANALYSIS);	 $(MAKE) $(PRINT_OPTS)
 endif
+ifeq ($(DISABLE_TOOLS), 0)
+	@ cd $(TOOLS_DIR);	 $(MAKE) all $(PRINT_OPTS)
+endif
 
 clean:
 	@ cd $(VX_AFM);		 $(MAKE) clean $(PRINT_OPTS)
@@ -280,6 +286,7 @@ clean:
 	@ cd $(ENSEMBLE_STAT);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(STAT_ANALYSIS);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(MODE_ANALYSIS);	 $(MAKE) clean $(PRINT_OPTS)
+	@ cd $(TOOLS_DIR);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(OUT_DIR);	 rm -f */*
 	rm -r -f *.a *.o junk temp core log c.ps a.out
 
