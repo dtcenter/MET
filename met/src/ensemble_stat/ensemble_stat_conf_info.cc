@@ -114,6 +114,19 @@ void EnsembleStatConfInfo::process_config() {
    GCInfo gci;
 
    //
+   // Conf: version
+   //
+
+   if(strcasecmp(conf.version().sval(), met_version) != 0) {
+
+      cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
+           << "The version number listed in the config file ("
+           << conf.version().sval() << ") does not match the version "
+           << "of the code (" << met_version << ").\n\n" << flush;
+      exit(1);
+   }
+
+   //
    // Conf: model
    //
 

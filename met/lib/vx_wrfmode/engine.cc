@@ -2092,6 +2092,19 @@ void Engine::do_cluster_features() {
 void Engine::process_engine_config() {
 
    //
+   // Check the version number of the config file
+   //
+
+   if(strcasecmp(wconf.version().sval(), met_version) != 0) {
+
+      cerr << "\n\nERROR: Engine::process_engine_config() -> "
+           << "The version number listed in the config file ("
+           << wconf.version().sval() << ") does not match the version "
+           << "of the code (" << met_version << ").\n\n" << flush;
+      exit(1);
+   }
+
+   //
    // For each of the threshold values specified in the config file
    // parse out the threshold value and the threshold indicator
    //
