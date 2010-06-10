@@ -384,9 +384,8 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "out_fcst_thresh ...\n";
    out_fcst_thresh.dump(out, depth + 1);
 
-   out_obs_thresh.get_str(junk);
-   out << prefix << "out_obs_thresh = " << prefix
-       << junk << "\n";
+   out << prefix << "out_obs_thresh ...\n";
+   out_obs_thresh.dump(out, depth + 1);
 
    out << prefix << "out_alpha = " << prefix
        << out_alpha << "\n";
@@ -1031,7 +1030,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-out_obs_thresh") == 0) {
-         out_obs_thresh.set(jc_array[i+1]);
+         out_obs_thresh.add(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-out_alpha") == 0) {
@@ -1453,14 +1452,17 @@ void STATAnalysisJob::get_jobstring(char *js) {
    }
 
    // out_obs_thresh
-   if(out_obs_thresh.type != thresh_na) {
-      out_obs_thresh.get_str(junk);
-      sprintf(js, "%s -out_obs_thresh %s", js, junk);
+   if(out_obs_thresh.n_elements() > 0) {
+      for(i=0; i<out_obs_thresh.n_elements(); i++) {
+         out_obs_thresh[i].get_str(junk);
+         sprintf(js, "%s -out_obs_thresh %s", js, junk);
+      }
    }
 
    // Jobs which use out_alpha
    if(job_type       == stat_job_summary ||
        out_line_type == stat_cts         ||
+       out_line_type == stat_mcts        ||
        out_line_type == stat_cnt         ||
        out_line_type == stat_pstd        ||
        out_line_type == stat_nbrcts      ||
@@ -1475,6 +1477,7 @@ void STATAnalysisJob::get_jobstring(char *js) {
       type = string_to_statlinetype(line_type[0]);
       if(type           == stat_mpr    &&
          (out_line_type == stat_cts    ||
+          out_line_type == stat_mcts   ||
           out_line_type == stat_cnt    ||
           out_line_type == stat_nbrcts ||
           out_line_type == stat_nbrcnt)) {

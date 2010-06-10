@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -48,36 +47,38 @@ enum STATLineType {
    stat_fho    = 4,
    stat_ctc    = 5,
    stat_cts    = 6,
-   stat_cnt    = 7,
-   stat_pct    = 8,
-   stat_pstd   = 9,
-   stat_pjc    = 10,
-   stat_prc    = 11,
-   stat_mpr    = 12,
-   stat_nbrctc = 13,
-   stat_nbrcts = 14,
-   stat_nbrcnt = 15,
-   stat_isc    = 16,
-   stat_wdir   = 17,
-   stat_rhist  = 18,
-   stat_orank  = 19,
+   stat_mctc   = 7,
+   stat_mcts   = 8,
+   stat_cnt    = 9,
+   stat_pct    = 10,
+   stat_pstd   = 11,
+   stat_pjc    = 12,
+   stat_prc    = 13,
+   stat_mpr    = 14,
+   stat_nbrctc = 15,
+   stat_nbrcts = 16,
+   stat_nbrcnt = 17,
+   stat_isc    = 18,
+   stat_wdir   = 19,
+   stat_rhist  = 20,
+   stat_orank  = 21,
 
       //
       //  flag value
       //
 
-   no_stat_line_type = 20
+   no_stat_line_type = 22
 
 };
-static const int n_statlinetypes = 21;
+static const int n_statlinetypes = 23;
 
 static const char * const statlinetype_str[n_statlinetypes] = {
-   "SL1L2", "SAL1L2", "VL1L2",  "VAL1L2",
-   "FHO",   "CTC",    "CTS",    "CNT",
-   "PCT",   "PSTD",   "PJC",    "PRC",
-   "MPR",   "NBRCTC", "NBRCTS", "NBRCNT",
-   "ISC",   "WDIR",   "RHIST",  "ORANK",
-   "NA"
+   "SL1L2", "SAL1L2",  "VL1L2",  "VAL1L2",
+   "FHO",   "CTC",     "CTS",    "MCTC",
+   "MCTS",  "CNT",     "PCT",    "PSTD",
+   "PJC",    "PRC",    "MPR",    "NBRCTC",
+   "NBRCTS", "NBRCNT", "ISC",    "WDIR",
+   "RHIST",  "ORANK",  "NA"
 };
 
 extern const char * statlinetype_to_string(const STATLineType);
@@ -179,5 +180,3 @@ extern int determine_column_offset(STATLineType, const char *);
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

@@ -178,6 +178,33 @@ static const int cts_odds_bcl_offset     = nhc + 58;
 static const int cts_odds_bcu_offset     = nhc + 59;
 
 //
+// MCTC Line Type offsets
+//
+static const int mctc_total_offset       = nhc + 0;
+static const int mctc_n_cat_offset       = nhc + 1;
+inline int mctc_fi_oj_offset(int i, int j, int n) { return(n*i + j); }
+
+//
+// CTS Line Type offsets
+//
+static const int mcts_total_offset       = nhc + 0;
+static const int mcts_n_cat_offset       = nhc + 1;
+static const int mcts_acc_offset         = nhc + 2;
+static const int mcts_acc_ncl_offset     = nhc + 3;
+static const int mcts_acc_ncu_offset     = nhc + 4;
+static const int mcts_acc_bcl_offset     = nhc + 5;
+static const int mcts_acc_bcu_offset     = nhc + 6;
+static const int mcts_hk_offset          = nhc + 7;
+static const int mcts_hk_bcl_offset      = nhc + 8;
+static const int mcts_hk_bcu_offset      = nhc + 9;
+static const int mcts_hss_offset         = nhc + 10;
+static const int mcts_hss_bcl_offset     = nhc + 11;
+static const int mcts_hss_bcu_offset     = nhc + 12;
+static const int mcts_ger_offset         = nhc + 13;
+static const int mcts_ger_bcl_offset     = nhc + 14;
+static const int mcts_ger_bcu_offset     = nhc + 15;
+
+//
 // CNT Line Type offsets
 //
 static const int cnt_total_offset        = nhc + 0;

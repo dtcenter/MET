@@ -178,7 +178,7 @@ class STATAnalysisJob {
 
       STATLineType out_line_type;   // output line type
       ThreshArray  out_fcst_thresh; // output forecast threshold(s)
-      SingleThresh out_obs_thresh;  // output observation threshold
+      ThreshArray  out_obs_thresh;  // output observation threshold
       double       out_alpha;       // output alpha value
 
       //
