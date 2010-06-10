@@ -182,7 +182,7 @@ static const int cts_odds_bcu_offset     = nhc + 59;
 //
 static const int mctc_total_offset       = nhc + 0;
 static const int mctc_n_cat_offset       = nhc + 1;
-inline int mctc_fi_oj_offset(int i, int j, int n) { return(n*i + j); }
+inline int mctc_fi_oj_offset(int i, int j, int n) { return(nhc + 2 + n*i + j); }
 
 //
 // CTS Line Type offsets
