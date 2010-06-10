@@ -49,6 +49,11 @@ extern void aggr_contable_lines(
                STATAnalysisJob &, CTSInfo &,
                STATLineType, int &, int &, int);
 
+extern void aggr_mctc_lines(
+               const char *, LineDataFile &,
+               STATAnalysisJob &, MCTSInfo &,
+               STATLineType, int &, int &, int);
+
 extern void aggr_nx2_contable_lines(
                const char *, LineDataFile &,
                STATAnalysisJob &, PCTInfo &,
@@ -72,7 +77,7 @@ extern void read_mpr_lines(
                NumArray &, NumArray &, NumArray &,
                int &, int &, int);
 
-extern void aggr_mpr_lines_ct(
+extern void aggr_mpr_lines_ctc(
                STATAnalysisJob &,
                const NumArray &, const NumArray &,
                CTSInfo &);
@@ -81,6 +86,16 @@ extern void aggr_mpr_lines_cts(
                STATAnalysisJob &,
                const NumArray &, const NumArray &,
                CTSInfo &, const char *);
+
+extern void aggr_mpr_lines_mctc(
+               STATAnalysisJob &,
+               const NumArray &, const NumArray &,
+               MCTSInfo &);
+
+extern void aggr_mpr_lines_mcts(
+               STATAnalysisJob &,
+               const NumArray &, const NumArray &,
+               MCTSInfo &, const char *);
 
 extern void aggr_mpr_lines_cnt(
                STATAnalysisJob &,

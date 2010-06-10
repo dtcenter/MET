@@ -72,6 +72,7 @@ struct ORANKData {
 
 extern void parse_fho_ctable   (STATLine &, TTContingencyTable &);
 extern void parse_ctc_ctable   (STATLine &, TTContingencyTable &);
+extern void parse_mctc_ctable  (STATLine &, ContingencyTable &);
 extern void parse_nbrctc_ctable(STATLine &, TTContingencyTable &);
 extern void parse_nx2_ctable   (STATLine &, Nx2ContingencyTable &);
 

@@ -17,6 +17,7 @@
 //   000    12/17/08  Halley Gotway   New
 //   001    05/24/10  Halley Gotway   Add aggr_rhist_lines and
 //                    aggr_orank_lines.
+//   002    06/09/10  Halley Gotway   Add aggr_mctc_lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -43,7 +44,7 @@ using namespace std;
 void aggr_contable_lines(const char *jobstring, LineDataFile &f,
                          STATAnalysisJob &j, CTSInfo &cts_info,
                          STATLineType lt, int &n_in, int &n_out,
-                        int verbosity) {
+                         int verbosity) {
    STATLine line;
    TTContingencyTable ct;
    int fy_oy, fy_on, fn_oy, fn_on;
@@ -123,6 +124,98 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
 
 ////////////////////////////////////////////////////////////////////////
 
+void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
+                     STATAnalysisJob &j, MCTSInfo &mcts_info,
+                     STATLineType lt, int &n_in, int &n_out,
+                     int verbosity) {
+   STATLine line;
+   ContingencyTable mct;
+   char line_type[max_str_len];
+   int i, k, cur;
+
+   //
+   // Initialize
+   //
+   mcts_info.clear();
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Initialize
+         //
+         mct.clear();
+
+         //
+         // Switch on the line type looking only for multi-category
+         // contingency table types of lines
+         //
+         switch(line.type()) {
+
+            case(stat_mctc):
+               parse_mctc_ctable(line, mct);
+               break;
+
+            default:
+               statlinetype_to_string(line.type(), line_type);
+               cerr << "\n\nERROR: aggr_mctc_lines() -> "
+                    << "line type value of " << line_type
+                    << " not currently supported for the aggregation "
+                    << "job!\n\n" << flush;
+               throw(1);
+         } // end switch
+
+         //
+         // Store the first mulit-category contingency table
+         //
+         if(mcts_info.cts.total() == 0) mcts_info.cts = mct;
+         //
+         // Increment the multi-category contingency table counts
+         //
+         else {
+
+            //
+            // The size of the contingency table must remain the same
+            //
+            if(mcts_info.cts.nrows() != mct.nrows()) {
+               cerr << "\n\nERROR: aggr_mctc_lines() -> "
+                    << "when aggregating MCTC lines the size of the "
+                    << "contingency table must remain the same for all "
+                    << "lines.  Try setting \"-column N_CAT n\", "
+                    << mcts_info.cts.nrows() << " != "
+                    << mct.nrows() << "\n\n" << flush;
+               throw(1);
+            }
+
+            for(i=0; i<mcts_info.cts.nrows(); i++) {
+               for(k=0; k<mcts_info.cts.ncols(); k++) {
+
+                  //
+                  // Increment the counts
+                  //
+                  cur = mcts_info.cts.entry(i, k);
+                  mcts_info.cts.set_entry(i, k, cur + mct.entry(i, k));
+               } //end for k
+            } // end for i
+         } // end else
+
+         if(j.dr_out) *(j.dr_out) << line;
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
                              STATAnalysisJob &j, PCTInfo &pct_info,
                              STATLineType lt, int &n_in, int &n_out,
@@ -152,8 +245,8 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
          pct.clear();
 
          //
-         // Switch on the line type looking only for contingency
-         // table types of lines
+         // Switch on the line type looking only for probabilistic
+         // contingency table types of lines
          //
          switch(line.type()) {
 
@@ -480,30 +573,27 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines_ct(STATAnalysisJob &j,
-                       const NumArray &f_na,
-                       const NumArray &o_na,
-                       CTSInfo &cts_info) {
+void aggr_mpr_lines_ctc(STATAnalysisJob &j,
+                        const NumArray &f_na,
+                        const NumArray &o_na,
+                        CTSInfo &cts_info) {
    int i;
    int n = f_na.n_elements();
    SingleThresh ft = j.out_fcst_thresh[0];
+   SingleThresh ot = j.out_obs_thresh[0];
 
    //
    // Update the contingency table counts
    //
    for(i=0; i<n; i++) {
 
-      if(      ft.check(f_na[i]) &&
-               j.out_obs_thresh.check(o_na[i]))
+      if(      ft.check(f_na[i]) &&  ot.check(o_na[i]))
          cts_info.cts.inc_fy_oy();
-      else if( ft.check(f_na[i]) &&
-              !j.out_obs_thresh.check(o_na[i]))
+      else if( ft.check(f_na[i]) && !ot.check(o_na[i]))
          cts_info.cts.inc_fy_on();
-      else if(!ft.check(f_na[i]) &&
-               j.out_obs_thresh.check(o_na[i]))
+      else if(!ft.check(f_na[i]) &&  ot.check(o_na[i]))
          cts_info.cts.inc_fn_oy();
-      else if(!ft.check(f_na[i]) &&
-              !j.out_obs_thresh.check(o_na[i]))
+      else if(!ft.check(f_na[i]) && !ot.check(o_na[i]))
          cts_info.cts.inc_fn_on();
    }
 
@@ -532,9 +622,9 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
    //
    // Store the thresholds to be applied.
    //
-   if(j.out_fcst_thresh[0].type == thresh_na) {
+   if(j.out_fcst_thresh.n_elements() == 0) {
       cerr << "\n\nERROR: aggr_mpr_lines_cts() -> "
-           << "when computing CTS lines, -out_fcst_thresh must be "
+           << "when computing CTS lines, \"-out_fcst_thresh\" must be "
            << "used.\n\n" << flush;
       throw(1);
    }
@@ -542,14 +632,14 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
       cts_info.cts_fcst_thresh = j.out_fcst_thresh[0];
    }
 
-   if(j.out_obs_thresh.type == thresh_na) {
+   if(j.out_obs_thresh.n_elements() == 0) {
       cerr << "\n\nERROR: aggr_mpr_lines_cts() -> "
-           << "when computing CTS lines, -out_obs_thresh must be "
+           << "when computing CTS lines, \"-out_obs_thresh\" must be "
            << "used.\n\n" << flush;
       throw(1);
    }
    else {
-      cts_info.cts_obs_thresh = j.out_obs_thresh;
+      cts_info.cts_obs_thresh = j.out_obs_thresh[0];
    }
 
    //
@@ -572,6 +662,85 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
       compute_cts_stats_ci_perc(rng_ptr, f_na, o_na,
          j.n_boot_rep, j.boot_rep_prop,
          cts_info_ptr, 1, 1,
+         j.rank_corr_flag, tmp_dir);
+   }
+
+   //
+   // Deallocate memory for the random number generator
+   //
+   rng_free(rng_ptr);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_mpr_lines_mctc(STATAnalysisJob &j,
+                         const NumArray &f_na,
+                         const NumArray &o_na,
+                         MCTSInfo &mcts_info) {
+   int i;
+   int n = f_na.n_elements();
+
+   //
+   // Initialize
+   //
+   mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
+   mcts_info.cts_fcst_ta = j.out_fcst_thresh;
+   mcts_info.cts_obs_ta  = j.out_obs_thresh;
+
+   //
+   // Update the contingency table counts
+   //
+   for(i=0; i<n; i++) mcts_info.add(f_na[i], o_na[i]);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_mpr_lines_mcts(STATAnalysisJob &j,
+                         const NumArray &f_na, const NumArray &o_na,
+                         MCTSInfo &mcts_info, const char *tmp_dir) {
+   gsl_rng *rng_ptr = (gsl_rng *) 0;
+
+   //
+   // If there are no matched pairs to process, return
+   //
+   if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
+
+   //
+   // Initialize
+   //
+   mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
+   mcts_info.cts_fcst_ta = j.out_fcst_thresh;
+   mcts_info.cts_obs_ta  = j.out_obs_thresh;
+
+   //
+   // Store the out_alpha value
+   //
+   mcts_info.allocate_n_alpha(1);
+   mcts_info.alpha[0] = j.out_alpha;
+
+   //
+   // Set up the random number generator and seed value
+   //
+   rng_set(rng_ptr, j.boot_rng, j.boot_seed);
+
+   //
+   // Compute the counts, stats, normal confidence intervals, and
+   // bootstrap confidence intervals
+   //
+   if(j.boot_interval == boot_bca_flag) {
+      compute_mcts_stats_ci_bca(rng_ptr, f_na, o_na,
+         j.n_boot_rep,
+         mcts_info, 1,
+         j.rank_corr_flag, tmp_dir);
+   }
+   else {
+      compute_mcts_stats_ci_perc(rng_ptr, f_na, o_na,
+         j.n_boot_rep, j.boot_rep_prop,
+         mcts_info, 1,
          j.rank_corr_flag, tmp_dir);
    }
 
@@ -727,7 +896,7 @@ void aggr_mpr_lines_pct(STATAnalysisJob &j,
    // Set up the PCTInfo thresholds and alpha values
    //
    pct_info.pct_fcst_thresh = j.out_fcst_thresh;
-   pct_info.pct_obs_thresh  = j.out_obs_thresh;
+   pct_info.pct_obs_thresh  = j.out_obs_thresh[0];
    pct_info.allocate_n_alpha(1);
    pct_info.alpha[0] = j.out_alpha;
 

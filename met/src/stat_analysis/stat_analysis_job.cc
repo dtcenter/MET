@@ -17,6 +17,8 @@
 //   000    12/17/08  Halley Gotway   New
 //   001    05/24/10  Halley Gotway   Add aggregate RHIST lines and
 //                    aggregate_stat ORANK to RHIST.
+//   002    06/09/10  Halley Gotway   Add aggregate MCTC lines and
+//                    aggregate_stat MCTC to MCTS.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -371,6 +373,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
    STATLineType lt;
 
    CTSInfo    cts_info;
+   MCTSInfo   mcts_info;
    SL1L2Info  sl1l2_info;
    VL1L2Info  vl1l2_info;
    PCTInfo    pct_info;
@@ -379,7 +382,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
    NumArray   rhist_na;
 
    AsciiTable out_at;
-   int i, n_thresh;
+   int i, n_thresh, n_cat;
 
    //
    // Check that the -line_type option has been supplied only once
@@ -403,14 +406,15 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
    //
    // Check that a valid line type has been selected
    //
-   if(lt != stat_fho   && lt != stat_ctc    &&
-      lt != stat_sl1l2 && lt != stat_sal1l2 &&
-      lt != stat_vl1l2 && lt != stat_val1l2 &&
-      lt != stat_pct   && lt != stat_nbrctc &&
-      lt != stat_isc   && lt != stat_rhist) {
+   if(lt != stat_fho    && lt != stat_ctc   &&
+      lt != stat_mctc   && lt != stat_sl1l2 &&
+      lt != stat_sal1l2 && lt != stat_vl1l2 &&
+      lt != stat_val1l2 && lt != stat_pct   &&
+      lt != stat_nbrctc && lt != stat_isc   &&
+      lt != stat_rhist) {
       cerr << "\n\nERROR: do_job_aggr()-> "
            << "the \"-line_type\" option must be set to one of:\n"
-           << "\tFHO, CTC,\n"
+           << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, ISC, RHIST\n\n"
            << flush;
@@ -426,6 +430,15 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
       lt == stat_ctc) {
       aggr_contable_lines(jobstring, f, j, cts_info,
                           lt, n_in, n_out, verbosity);
+   }
+
+   //
+   // Sum up the mulit-category contingency table type lines:
+   //    MCTC
+   //
+   else if(lt == stat_mctc) {
+      aggr_mctc_lines(jobstring, f, j, mcts_info,
+                      lt, n_in, n_out, verbosity);
    }
 
    //
@@ -538,6 +551,26 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
          //
          out_at.set_entry(1, 0,  "CTC:");
          write_ctc_cols(cts_info, out_at, 1, 1);
+
+         break;
+
+      case(stat_mctc):
+
+         //
+         // Get the column names
+         //
+         n_cat = mcts_info.cts.nrows();
+         out_at.set_size(2, get_n_mctc_columns(n_cat)+1);
+         setup_table(out_at);
+         out_at.set_entry(0, 0,  "COL_NAME:");
+         write_header_row(mctc_columns, n_mctc_columns, 0,
+                          out_at, 0, 1);
+
+         //
+         // Write the MCTC row
+         //
+         out_at.set_entry(1, 0,  "MCTC:");
+         write_mctc_cols(mcts_info, out_at, 1, 1);
 
          break;
 
@@ -735,6 +768,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    STATLineType in_lt, out_lt;
 
    CTSInfo    cts_info;
+   MCTSInfo   mcts_info;
    CNTInfo    cnt_info;
    SL1L2Info  sl1l2_info;
    VL1L2Info  vl1l2_info;
@@ -772,17 +806,22 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    //
    // Check for a valid combination of input and output line types
    //    -line_type FHO,   CTC,    -out_line_type CTS
+   //    -line_type MCTC,          -out_line_type MCTS
    //    -line_type SL1L2, SAL1L2, -out_line_type CNT
    //    -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
    //    -line_type PCT,           -out_line_type PSTD, PJC, PRC
    //    -line_type NBRCTC,        -out_line_type NBRCTS
-   //    -line_type MPR,           -out_line_type FHO, CTC, CTS, CNT,
+   //    -line_type MPR,           -out_line_type FHO, CTC, CTS,
+   //                                             MCTC, MCTS, CNT,
    //                                             SL1L2, SAL1L2,
    //                                             PCT, PSTD, PJC, PRC
    //    -line_type ORANK,         -out_line_type RHIST
    //
    if     ( (in_lt  == stat_fho   || in_lt  == stat_ctc) &&
             (out_lt == stat_cts)
+          ) i = 1;
+   else if( (in_lt  == stat_mctc) &&
+            (out_lt == stat_mcts)
           ) i = 1;
    else if( (in_lt  == stat_sl1l2 || in_lt  == stat_sal1l2) &&
             (out_lt == stat_cnt)
@@ -799,7 +838,8 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
           ) i = 1;
    else if( (in_lt  == stat_mpr) &&
             (out_lt == stat_fho   || out_lt == stat_ctc    ||
-             out_lt == stat_cts   || out_lt == stat_cnt    ||
+             out_lt == stat_cts   || out_lt == stat_mctc   ||
+             out_lt == stat_mcts  || out_lt == stat_cnt    ||
              out_lt == stat_sl1l2 || out_lt == stat_sal1l2 ||
              out_lt == stat_pct   || out_lt == stat_pstd   ||
              out_lt == stat_pjc   || out_lt == stat_prc)
@@ -826,6 +866,15 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
       in_lt == stat_ctc) {
       aggr_contable_lines(jobstring, f, j, cts_info,
                           in_lt, n_in, n_out, verbosity);
+   }
+
+   //
+   // Sum up the multi-category contingency table type lines:
+   //    MCTC
+   //
+   else if(in_lt == stat_mctc) {
+      aggr_mctc_lines(jobstring, f, j, mcts_info,
+                      in_lt, n_in, n_out, verbosity);
    }
 
    //
@@ -875,23 +924,61 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    else if(in_lt == stat_mpr) {
 
       //
-      // Check for output threshold values
+      // Check output threshold values for 2x2 contingency table
       //
       if(out_lt == stat_fho ||
          out_lt == stat_ctc ||
          out_lt == stat_cts) {
 
-         if(j.out_fcst_thresh.n_elements() == 0 ||
-            j.out_fcst_thresh[0].type == thresh_na ||
-            j.out_obs_thresh.type     == thresh_na) {
+         if(j.out_fcst_thresh.n_elements() != 1 ||
+            j.out_obs_thresh.n_elements()  != 1) {
             cerr << "\n\nERROR: do_job_aggr_stat()-> "
-                 << "when \"-out_line_type\" is set to FHO, CTC, "
-                 << "or CTS, the \"-out_fcst_thresh\" and "
-                 << "\"-out_obs_thresh\" options must also be "
-                 << "specified.\n\n" << flush;
+                 << "when \"-out_line_type\" is set to FHO, CTC, or "
+                 << "CTS the \"-out_fcst_thresh\" and "
+                 << "\"-out_obs_thresh\" options must be specified "
+                 << "exactly once.\n\n" << flush;
 
             throw(1);
          }
+      }
+
+      //
+      // Check output threshold values for NxN contingency table
+      //
+      if(out_lt == stat_mctc ||
+         out_lt == stat_mcts) {
+
+         if(j.out_fcst_thresh.n_elements() <= 1 ||
+            j.out_fcst_thresh.n_elements() != j.out_obs_thresh.n_elements()) {
+            cerr << "\n\nERROR: do_job_aggr_stat()-> "
+                 << "when \"-out_line_type\" is set to MCTC or MCTS "
+                 << "the \"-out_fcst_thresh\" and "
+                 << "\"-out_obs_thresh\" options must be specified "
+                 << "the same number of times and at least twice.\n\n"
+                 << flush;
+
+            throw(1);
+         }
+
+         for(i=0; i<j.out_fcst_thresh.n_elements()-1; i++) {
+
+            if(j.out_fcst_thresh[i].thresh >  j.out_fcst_thresh[i+1].thresh ||
+               j.out_obs_thresh[i].thresh  >  j.out_obs_thresh[i+1].thresh  ||
+               j.out_fcst_thresh[i].type   != j.out_fcst_thresh[i+1].type   ||
+               j.out_obs_thresh[i].type    != j.out_obs_thresh[i+1].type    ||
+               j.out_fcst_thresh[i].type   == thresh_eq              ||
+               j.out_fcst_thresh[i].type   == thresh_ne              ||
+               j.out_obs_thresh[i].type    == thresh_eq              ||
+               j.out_obs_thresh[i].type    == thresh_ne) {
+
+               cerr << "\n\nERROR: do_job_aggr_stat() -> "
+                    << "when \"-out_line_type\" is set to MCTC or MCTS "
+                    << "the thresholds must be monotonically "
+                    << "increasing and be of the same inequality type "
+                    << "(lt, le, gt, or ge).\n\n" << flush;
+               exit(1);
+            }
+         } // end for
       }
 
       //
@@ -902,11 +989,11 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
          out_lt == stat_pjc  ||
          out_lt == stat_prc) {
 
-         if(j.out_obs_thresh.type == thresh_na) {
+         if(j.out_obs_thresh.n_elements()  != 1) {
             cerr << "\n\nERROR: do_job_aggr_stat()-> "
                  << "when \"-out_line_type\" is set to PCT, PSTD, "
                  << "PJC, or PRC, the \"-out_obs_thresh\" option "
-                 << "must be specified.\n\n" << flush;
+                 << "must be specified exactly once.\n\n" << flush;
 
             throw(1);
          }
@@ -966,13 +1053,25 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
       //
       if(out_lt == stat_fho ||
          out_lt == stat_ctc) {
-         aggr_mpr_lines_ct(j, f_na, o_na, cts_info);
+         aggr_mpr_lines_ctc(j, f_na, o_na, cts_info);
       }
       //
       // When -out_line_type CTS
       //
       else if(out_lt == stat_cts) {
          aggr_mpr_lines_cts(j, f_na, o_na, cts_info, tmp_dir);
+      }
+      //
+      // When -out_line_type MCTC
+      //
+      else if(out_lt == stat_mctc) {
+         aggr_mpr_lines_mctc(j, f_na, o_na, mcts_info);
+      }
+      //
+      // When -out_line_type MCTS
+      //
+      else if(out_lt == stat_mcts) {
+         aggr_mpr_lines_mcts(j, f_na, o_na, mcts_info, tmp_dir);
       }
       //
       // When -out_line_type CNT
@@ -1022,6 +1121,9 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    if(in_lt == stat_fho ||
       in_lt == stat_ctc) {
       write_job_cts(j, in_lt, cts_info, out_at);
+   }
+   else if(in_lt == stat_mctc) {
+      write_job_mcts(j, in_lt, mcts_info, out_at);
    }
    else if(in_lt == stat_sl1l2 ||
            in_lt == stat_sal1l2) {
@@ -1100,6 +1202,42 @@ void write_job_cts(STATAnalysisJob &j, STATLineType in_lt,
    //
    out_at.set_entry(1, 0,  "CTS:");
    write_cts_cols(cts_info, 0, out_at, 1, 1);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_mcts(STATAnalysisJob &j, STATLineType in_lt,
+                    MCTSInfo &mcts_info, AsciiTable &out_at) {
+
+   //
+   // Store the alpha information in the CTSInfo object
+   //
+   mcts_info.allocate_n_alpha(1);
+   mcts_info.alpha[0] = j.out_alpha;
+
+   //
+   // Compute the stats and confidence intervals for this
+   // MCTSInfo object
+   //
+   mcts_info.compute_stats();
+   mcts_info.compute_ci();
+
+   //
+   // Get the column names
+   //
+   out_at.set_size(2, n_mcts_columns+1);
+   setup_table(out_at);
+   out_at.set_entry(0, 0,  "COL_NAME:");
+   write_header_row(mcts_columns, n_mcts_columns, 0,
+                    out_at, 0, 1);
+
+   //
+   // Write the MCTS row
+   //
+   out_at.set_entry(1, 0,  "MCTS:");
+   write_mcts_cols(mcts_info, 0, out_at, 1, 1);
 
    return;
 }

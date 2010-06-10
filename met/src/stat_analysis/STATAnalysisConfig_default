@@ -194,7 +194,12 @@ line_type[] = [];
 //       "aggregate"
 //          To aggregate the STAT data for the STAT line type specified using
 //          the "-line_type" argument.  The output of the job will be in the
-//          same format as the input line type specified.
+//          same format as the input line type specified.  The following line
+//          types may be aggregated:
+//          -line_type FHO, CTC, MCTC,
+//                     SL1L2, SAL1L2, VL1L2, VAL1L2,
+//                     PCT, NBRCTC, ISC, RHIST
+//
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
@@ -203,18 +208,21 @@ line_type[] = [];
 //          type specified using the "-out_line_type" argument.  The valid
 //          combinations of "-line_type" and "-out_line_type" are listed below.
 //          -line_type FHO,   CTC,    -out_line_type CTS
+//          -line_type MCTC           -out_line_type MCTS
 //          -line_type SL1L2, SAL1L2, -out_line_type CNT
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
 //          -line_type PCT,           -out_line_type PSTD, PJC, PRC
 //          -line_type NBRCTC,        -out_line_type NBRCTS
-//          -line_type MPR,           -out_line_type FHO, CTC, CTS, CNT,
+//          -line_type MPR,           -out_line_type FHO, CTC, CTS,
+//                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
 //                                                   PCT, PSTD, PJC, PRC
 //          Required Args:
 //             -line_type, -out_line_type
 //          Additional Required Args for -line_type MPR:
 //             -out_fcst_thresh, -out_obs_thresh
-//             When -out_line_type FHO, CTC, CTS, PCT, PSTD, PJC, PRC
+//             When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+//                                 PCT, PSTD, PJC, PRC
 //          Additional Optional Args for -line_type MPR:
 //             -mask_grid, -mask_poly
 //
@@ -282,8 +290,9 @@ line_type[] = [];
 //       "-mask_poly       file"
 //
 //       "-out_line_type   name"
-//       "-out_fcst_thresh value" multiple for probability thresholds
-//       "-out_obs_thresh  value"
+//       "-out_fcst_thresh value" multiple for multi-category contingency tables
+//                                and probabilistic forecasts
+//       "-out_obs_thresh  value" multiple for multi-category contingency tables
 //       "-out_alpha       value"
 //
 //       "-boot_interval   value"

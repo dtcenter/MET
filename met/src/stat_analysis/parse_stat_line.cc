@@ -17,6 +17,7 @@
 //   000    12/17/08  Halley Gotway   New
 //   001    05/24/10  Halley Gotway   Add parse_rhist_line and
 //                    parse_orank_line.
+//   002    06/09/10  Halley Gotway   Add parse_mctc_ctable.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -77,6 +78,26 @@ void parse_ctc_ctable(STATLine &l, TTContingencyTable &ct) {
 
    // FN_ON
    ct.set_fn_on(atoi(l.get_item(ctc_fn_on_offset)));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
+   int n_cat, i, j, offset;
+
+   // N_CAT
+   n_cat = atoi(l.get_item(mctc_n_cat_offset));
+   ct.set_size(n_cat);
+
+   // Fi_Oj
+   for(i=0; i<n_cat; i++) {
+      for(j=0; i<n_cat; j++) {
+         offset = mctc_fi_oj_offset(i, j, n_cat);
+         ct.set_entry(i, j, atoi(l.get_item(offset)));
+      }
+   }
 
    return;
 }
