@@ -64,6 +64,9 @@ extern void do_job_go_index(const char *, LineDataFile &,
 extern void write_job_cts(STATAnalysisJob &, STATLineType,
                CTSInfo &, AsciiTable &);
 
+extern void write_job_mcts(STATAnalysisJob &, STATLineType,
+               MCTSInfo &, AsciiTable &);
+
 extern void write_job_cnt(STATAnalysisJob &, STATLineType,
                SL1L2Info &, AsciiTable &);
 
