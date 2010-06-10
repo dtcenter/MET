@@ -93,7 +93,7 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
 
    // Fi_Oj
    for(i=0; i<n_cat; i++) {
-      for(j=0; i<n_cat; j++) {
+      for(j=0; j<n_cat; j++) {
          offset = mctc_fi_oj_offset(i, j, n_cat);
          ct.set_entry(i, j, atoi(l.get_item(offset)));
       }
