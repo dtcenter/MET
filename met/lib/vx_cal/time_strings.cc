@@ -499,7 +499,7 @@ int is_hhmmss(const char * text)
 // Allow 2 or 3 digits for the number of hours
 if ( strlen(text) != 6 && strlen(text) != 7)  return ( 0 );
 
-int j;
+unsigned int j;
 
 for (j=0; j<strlen(text); ++j)  {
 
@@ -523,7 +523,7 @@ int is_hh(const char * text)
 // Allow 2 or 3 digits for the number of hours
 if ( strlen(text) != 2 && strlen(text) != 3 )  return ( 0 );
 
-int j;
+unsigned int j;
 
 for (j=0; j<strlen(text); ++j)  {
 
