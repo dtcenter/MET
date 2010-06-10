@@ -1000,6 +1000,14 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          column_max_value.add(atof(jc_array[i+2]));
          i+=2;
       }
+      // For -column_eq, just add it to both column_min and column_max
+      else if(strcmp(jc_array[i], "-column_eq") == 0) {
+         column_min_name.add(jc_array[i+1]);
+         column_min_value.add(atof(jc_array[i+2]));
+         column_max_name.add(jc_array[i+1]);
+         column_max_value.add(atof(jc_array[i+2]));
+         i+=2;
+      }
       else if(strcmp(jc_array[i], "-column_str") == 0) {
          column_str_name.add(jc_array[i+1]);
          column_str_value.add(jc_array[i+2]);
