@@ -194,7 +194,12 @@ line_type[] = [];
 //       "aggregate"
 //          To aggregate the STAT data for the STAT line type specified using
 //          the "-line_type" argument.  The output of the job will be in the
-//          same format as the input line type specified.
+//          same format as the input line type specified.  The following line
+//          types may be aggregated:
+//          -line_type FHO, CTC, MCTC,
+//                     SL1L2, SAL1L2, VL1L2, VAL1L2,
+//                     PCT, NBRCTC, ISC, RHIST
+//
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
@@ -203,18 +208,21 @@ line_type[] = [];
 //          type specified using the "-out_line_type" argument.  The valid
 //          combinations of "-line_type" and "-out_line_type" are listed below.
 //          -line_type FHO,   CTC,    -out_line_type CTS
+//          -line_type MCTC           -out_line_type MCTS
 //          -line_type SL1L2, SAL1L2, -out_line_type CNT
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
 //          -line_type PCT,           -out_line_type PSTD, PJC, PRC
 //          -line_type NBRCTC,        -out_line_type NBRCTS
-//          -line_type MPR,           -out_line_type FHO, CTC, CTS, CNT,
+//          -line_type MPR,           -out_line_type FHO, CTC, CTS,
+//                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
 //                                                   PCT, PSTD, PJC, PRC
 //          Required Args:
 //             -line_type, -out_line_type
 //          Additional Required Args for -line_type MPR:
 //             -out_fcst_thresh, -out_obs_thresh
-//             When -out_line_type FHO, CTC, CTS, PCT, PSTD, PJC, PRC
+//             When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+//                                 PCT, PSTD, PJC, PRC
 //          Additional Optional Args for -line_type MPR:
 //             -mask_grid, -mask_poly
 //
@@ -264,12 +272,13 @@ line_type[] = [];
 //
 //   Job command FILTERING options used when the -line_type has been set to a
 //   single value.  These options take two arguments, the name of the data
-//   column to be used and the min or max value for that column.  If multiple
-//   column min/max/str options are listed, the job will be performed on their
-//   intersection:
+//   column to be used and the min, max, or exact value for that column.
+//   If multiple column eq/min/max/str options are listed, the job will be
+//   performed on their intersection:
 //
 //       "-column_min col_name value"
 //       "-column_max col_name value"
+//       "-column_eq  col_name value"
 //       "-column_str col_name string"
 //
 //   Job command options to DEFINE the analysis job.  Unless otherwise noted,
@@ -282,8 +291,9 @@ line_type[] = [];
 //       "-mask_poly       file"
 //
 //       "-out_line_type   name"
-//       "-out_fcst_thresh value" multiple for probability thresholds
-//       "-out_obs_thresh  value"
+//       "-out_fcst_thresh value" multiple for multi-category contingency tables
+//                                and probabilistic forecasts
+//       "-out_obs_thresh  value" multiple for multi-category contingency tables
 //       "-out_alpha       value"
 //
 //       "-boot_interval   value"
@@ -293,7 +303,6 @@ line_type[] = [];
 //       "-boot_seed       value"
 //
 //       "-rank_corr_flag  value"
-//       "-tmp_dir         path"
 //
 jobs[] = [
    "-job filter         -line_type SL1L2                                            -vx_mask DTC165                                     -dump_row ../out/stat_analysis/job_filter_SL1L2.stat",
@@ -302,6 +311,7 @@ jobs[] = [
    "-job aggregate_stat -line_type SL1L2 -out_line_type CNT                         -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_stat_SL1L2_CNT.stat",
    "-job aggregate      -line_type FHO                        -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_FHO.stat",
    "-job aggregate_stat -line_type FHO   -out_line_type CTS   -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row ../out/stat_analysis/job_aggregate_stat_FHO_CTS.stat",
+   "-job aggregate_stat -line_type MCTC  -out_line_type MCTS  -column_eq N_CAT 4    -vx_mask DTC165   -vx_mask DTC166 -fcst_var APCP_24 -dump_row ../out/stat_analysis/job_aggregate_stat_MCTC_MCTS.stat",
    "-job aggregate      -line_type PCT                                              -vx_mask DTC165   -vx_mask DTC166                   -dump_row ../out/stat_analysis/job_aggregate_PCT.stat",
    "-job aggregate_stat -line_type PCT   -out_line_type PSTD                        -vx_mask DTC165   -vx_mask DTC166                   -dump_row ../out/stat_analysis/job_aggregate_stat_PCT_PSTD.stat",
    "-job aggregate      -line_type ISC                        -fcst_thresh >0.000   -vx_mask TILE_TOT                 -fcst_var APCP_12 -dump_row ../out/stat_analysis/job_aggregate_ISC.stat",
