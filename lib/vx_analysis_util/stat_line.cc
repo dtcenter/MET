@@ -824,30 +824,34 @@ STATLineType string_to_statlinetype(const char *str) {
    else if(strcasecmp(str, statlinetype_str[6]) == 0)
       t = stat_cts;
    else if(strcasecmp(str, statlinetype_str[7]) == 0)
-      t = stat_cnt;
+      t = stat_mctc;
    else if(strcasecmp(str, statlinetype_str[8]) == 0)
-      t = stat_pct;
+      t = stat_mcts;
    else if(strcasecmp(str, statlinetype_str[9]) == 0)
-      t = stat_pstd;
+      t = stat_cnt;
    else if(strcasecmp(str, statlinetype_str[10]) == 0)
-      t = stat_pjc;
+      t = stat_pct;
    else if(strcasecmp(str, statlinetype_str[11]) == 0)
-      t = stat_prc;
+      t = stat_pstd;
    else if(strcasecmp(str, statlinetype_str[12]) == 0)
-      t = stat_mpr;
+      t = stat_pjc;
    else if(strcasecmp(str, statlinetype_str[13]) == 0)
-      t = stat_nbrctc;
+      t = stat_prc;
    else if(strcasecmp(str, statlinetype_str[14]) == 0)
-      t = stat_nbrcts;
+      t = stat_mpr;
    else if(strcasecmp(str, statlinetype_str[15]) == 0)
-      t = stat_nbrcnt;
+      t = stat_nbrctc;
    else if(strcasecmp(str, statlinetype_str[16]) == 0)
-      t = stat_isc;
+      t = stat_nbrcts;
    else if(strcasecmp(str, statlinetype_str[17]) == 0)
-      t = stat_wdir;
+      t = stat_nbrcnt;
    else if(strcasecmp(str, statlinetype_str[18]) == 0)
-      t = stat_rhist;
+      t = stat_isc;
    else if(strcasecmp(str, statlinetype_str[19]) == 0)
+      t = stat_wdir;
+   else if(strcasecmp(str, statlinetype_str[20]) == 0)
+      t = stat_rhist;
+   else if(strcasecmp(str, statlinetype_str[21]) == 0)
       t = stat_orank;
    else
       t = no_stat_line_type;
@@ -1064,6 +1068,14 @@ switch(type) {
 
    case stat_cts:
       offset = get_column_offset(cts_columns, n_cts_columns, c);
+      break;
+
+   case stat_mctc:
+      offset = get_column_offset(mctc_columns, n_mctc_columns, c);
+      break;
+
+   case stat_mcts:
+      offset = get_column_offset(mcts_columns, n_mcts_columns, c);
       break;
 
    case stat_cnt:
