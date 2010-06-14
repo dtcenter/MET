@@ -766,7 +766,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
          //
          // Perform the string comparison
          //
-         if(strcmp(L.get_item(c), column_str_value[j]) != 0) return(0);
+         if(strstr(column_str_value[j], L.get_item(c)) == NULL) return(0);
       }
    }
 
