@@ -279,7 +279,8 @@ line_type[] = [];
 //       "-column_min col_name value"
 //       "-column_max col_name value"
 //       "-column_eq  col_name value"
-//       "-column_str col_name string"
+//       "-column_str col_name string" separate multiple filtering strings
+//                                     with commas
 //
 //   Job command options to DEFINE the analysis job.  Unless otherwise noted,
 //   these options may only be used ONCE per analysis job:
