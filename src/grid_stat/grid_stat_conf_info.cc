@@ -265,162 +265,177 @@ void GridStatConfInfo::process_config() {
       else                       n_vx_scal++;
    }
 
-   //
-   // Conf: fcst_thresh
-   //
-
-   // Check that the number of forecast threshold levels matches n_vx
-   if(conf.n_fcst_thresh_elements() != n_vx) {
-
-      cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-           << "The number fcst_thresh levels provided must match the "
-           << "number of fields provided in fcst_field.\n\n"
-           << flush;
-      exit(1);
-   }
-
    // Allocate space to store the threshold information
    fcst_ta = new ThreshArray [n_vx];
-
-   // Parse the fcst threshold information
-   for(i=0; i<n_vx; i++) {
-      fcst_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
-
-      // Verifying a probability field
-      if(fcst_gci[i].pflag == 1) {
-
-         n = fcst_ta[i].n_elements();
-
-         // Check for at least 3 thresholds beginning with 0 and ending with 1.
-         if(n < 3 ||
-            !is_eq(fcst_ta[i][0].thresh,   0.0) ||
-            !is_eq(fcst_ta[i][n-1].thresh, 1.0)) {
-
-            cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-                 << "When verifying a probability field, you must "
-                 << "select at least 3 thresholds beginning with 0.0 "
-                 << "and ending with 1.0.\n\n"
-                 << flush;
-            exit(1);
-         }
-
-         for(j=0; j<n; j++) {
-
-            // Check that all threshold types are greater than or equal to
-            if(fcst_ta[i][j].type != thresh_ge) {
-               cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-                    << "When verifying a probability field, all "
-                    << "thresholds must be set as equal to, "
-                    << "using \"ge\" or \">=\".\n\n"
-                    << flush;
-               exit(1);
-            }
-
-            // Check that all thresholds are in [0, 1].
-            if(fcst_ta[i][j].thresh < 0.0 ||
-               fcst_ta[i][j].thresh > 1.0) {
-
-               cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-                    << "When verifying a probability field, all "
-                    << "thresholds must be between 0 and 1.\n\n"
-                    << flush;
-               exit(1);
-            }
-         } // end for j
-      }
-   } // end for i
+   obs_ta  = new ThreshArray [n_vx];
 
    //
-   // Conf: obs_thresh
+   // Only sanity check thresholds for thresholded line types
    //
+   if(conf.output_flag(i_fho).ival()    ||
+      conf.output_flag(i_ctc).ival()    ||
+      conf.output_flag(i_cts).ival()    ||
+      conf.output_flag(i_mctc).ival()   ||
+      conf.output_flag(i_mcts).ival()   ||
+      conf.output_flag(i_pct).ival()    ||
+      conf.output_flag(i_pstd).ival()   ||
+      conf.output_flag(i_pjc).ival()    ||
+      conf.output_flag(i_prc).ival()    ||
+      conf.output_flag(i_nbrctc).ival() ||
+      conf.output_flag(i_nbrcts).ival() ||
+      conf.output_flag(i_nbrcnt).ival()) {
 
-   // Check if the length of obs_thresh is non-zero and
-   // not equal to n_vx
-   if(conf.n_obs_thresh_elements() != 0 &&
-      conf.n_obs_thresh_elements() != n_vx) {
+      //
+      // Conf: fcst_thresh
+      //
 
-      cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-           << "The number obs_thresh levels provided must match the "
-           << "number of fields provided in obs_field.\n\n"
-           << flush;
-      exit(1);
-   }
-
-   // Allocate space to store the threshold information
-   obs_ta = new ThreshArray [n_vx];
-
-   // Parse the obs threshold information
-   for(i=0; i<n_vx; i++) {
-
-      // If obs_thresh is emptpy, use fcst_thresh
-      if(conf.n_obs_thresh_elements() == 0) {
-         obs_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
-      }
-      else {
-         obs_ta[i].parse_thresh_str(conf.obs_thresh(i).sval());
-      }
-   }
-
-   // Check that number of thresholds specified for each field is the
-   // same and compute the maximum number of thresholds
-   max_n_scal_thresh      = 0;
-   max_n_prob_fcst_thresh = 0;
-   max_n_prob_obs_thresh  = 0;
-   for(i=0; i<n_vx; i++) {
-
-      // Only check for non-probability fields
-      if(fcst_gci[i].pflag == 0 &&
-         fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
+      // Check that the number of forecast threshold levels matches n_vx
+      if(conf.n_fcst_thresh_elements() != n_vx) {
 
          cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-              << "The number of thresholds for each field in "
-              << "fcst_thresh must match the number of thresholds "
-              << "for each field in obs_thresh.\n\n"
+              << "The number fcst_thresh entries provided must match the "
+              << "number of fields provided in fcst_field.\n\n"
               << flush;
          exit(1);
       }
 
-      // Verifying with multi-category contingency tables
-      if(fcst_gci[i].pflag == 0 &&
-         (conf.output_flag(i_mctc).ival() ||
-          conf.output_flag(i_mcts).ival())) {
+      // Parse the fcst threshold information
+      for(i=0; i<n_vx; i++) {
+         fcst_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
 
-         // Check that the threshold values are monotonically increasing
-         // and the threshold types are inequalities that remain the same
-         for(j=0; j<fcst_ta[i].n_elements()-1; j++) {
+         // Verifying a probability field
+         if(fcst_gci[i].pflag == 1) {
 
-            if(fcst_ta[i][j].thresh >  fcst_ta[i][j+1].thresh ||
-               obs_ta[i][j].thresh  >  obs_ta[i][j+1].thresh  ||
-               fcst_ta[i][j].type   != fcst_ta[i][j+1].type   ||
-               obs_ta[i][j].type    != obs_ta[i][j+1].type    ||
-               fcst_ta[i][j].type   == thresh_eq              ||
-               fcst_ta[i][j].type   == thresh_ne              ||
-               obs_ta[i][j].type    == thresh_eq              ||
-               obs_ta[i][j].type    == thresh_ne) {
+            n = fcst_ta[i].n_elements();
 
-               cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
-                    << "when verifying using multi-category contingency "
-                    << "tables, the thresholds must be monotonically "
-                    << "increasing and be of the same inequality type "
-                    << "(lt, le, gt, or ge).\n\n" << flush;
+            // Check for at least 3 thresholds beginning with 0 and ending with 1.
+            if(n < 3 ||
+               !is_eq(fcst_ta[i][0].thresh,   0.0) ||
+               !is_eq(fcst_ta[i][n-1].thresh, 1.0)) {
+
+               cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
+                    << "When verifying a probability field, you must "
+                    << "select at least 3 thresholds beginning with 0.0 "
+                    << "and ending with 1.0.\n\n"
+                    << flush;
                exit(1);
             }
+
+            for(j=0; j<n; j++) {
+
+               // Check that all threshold types are greater than or equal to
+               if(fcst_ta[i][j].type != thresh_ge) {
+                  cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
+                       << "When verifying a probability field, all "
+                       << "thresholds must be set as equal to, "
+                       << "using \"ge\" or \">=\".\n\n"
+                       << flush;
+                  exit(1);
+               }
+
+               // Check that all thresholds are in [0, 1].
+               if(fcst_ta[i][j].thresh < 0.0 ||
+                  fcst_ta[i][j].thresh > 1.0) {
+
+                  cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
+                       << "When verifying a probability field, all "
+                       << "thresholds must be between 0 and 1.\n\n"
+                       << flush;
+                  exit(1);
+               }
+            } // end for j
+         }
+      } // end for i
+
+      //
+      // Conf: obs_thresh
+      //
+
+      // Check if the length of obs_thresh is non-zero and
+      // not equal to n_vx
+      if(conf.n_obs_thresh_elements() != 0 &&
+         conf.n_obs_thresh_elements() != n_vx) {
+
+         cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
+              << "The number obs_thresh entries provided must match the "
+              << "number of fields provided in obs_field.\n\n"
+              << flush;
+         exit(1);
+      }
+
+      // Parse the obs threshold information
+      for(i=0; i<n_vx; i++) {
+
+         // If obs_thresh is emptpy, use fcst_thresh
+         if(conf.n_obs_thresh_elements() == 0) {
+            obs_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
+         }
+         else {
+            obs_ta[i].parse_thresh_str(conf.obs_thresh(i).sval());
          }
       }
 
-      // Look for the maximum number of thresholds for scalar fields
-      if(fcst_gci[i].pflag == 0) {
+      // Check that number of thresholds specified for each field is the
+      // same and compute the maximum number of thresholds
+      max_n_scal_thresh      = 0;
+      max_n_prob_fcst_thresh = 0;
+      max_n_prob_obs_thresh  = 0;
+      for(i=0; i<n_vx; i++) {
 
-         if(fcst_ta[i].n_elements() > max_n_scal_thresh)
-            max_n_scal_thresh = fcst_ta[i].n_elements();
-      }
-      // Look for the maximum number of thresholds for prob fields
-      else {
+         // Only check for non-probability fields
+         if(fcst_gci[i].pflag == 0 &&
+            fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
 
-         if(fcst_ta[i].n_elements() > max_n_prob_fcst_thresh)
-            max_n_prob_fcst_thresh = fcst_ta[i].n_elements();
-         if(obs_ta[i].n_elements() > max_n_prob_obs_thresh)
-            max_n_prob_obs_thresh = obs_ta[i].n_elements();
+            cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
+                 << "The number of thresholds for each field in "
+                 << "fcst_thresh must match the number of thresholds "
+                 << "for each field in obs_thresh.\n\n"
+                 << flush;
+            exit(1);
+         }
+
+         // Verifying with multi-category contingency tables
+         if(fcst_gci[i].pflag == 0 &&
+            (conf.output_flag(i_mctc).ival() ||
+             conf.output_flag(i_mcts).ival())) {
+
+            // Check that the threshold values are monotonically increasing
+            // and the threshold types are inequalities that remain the same
+            for(j=0; j<fcst_ta[i].n_elements()-1; j++) {
+
+               if(fcst_ta[i][j].thresh >  fcst_ta[i][j+1].thresh ||
+                  obs_ta[i][j].thresh  >  obs_ta[i][j+1].thresh  ||
+                  fcst_ta[i][j].type   != fcst_ta[i][j+1].type   ||
+                  obs_ta[i][j].type    != obs_ta[i][j+1].type    ||
+                  fcst_ta[i][j].type   == thresh_eq              ||
+                  fcst_ta[i][j].type   == thresh_ne              ||
+                  obs_ta[i][j].type    == thresh_eq              ||
+                  obs_ta[i][j].type    == thresh_ne) {
+
+                  cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
+                       << "when verifying using multi-category contingency "
+                       << "tables, the thresholds must be monotonically "
+                       << "increasing and be of the same inequality type "
+                       << "(lt, le, gt, or ge).\n\n" << flush;
+                  exit(1);
+               }
+            }
+         }
+
+         // Look for the maximum number of thresholds for scalar fields
+         if(fcst_gci[i].pflag == 0) {
+
+            if(fcst_ta[i].n_elements() > max_n_scal_thresh)
+               max_n_scal_thresh = fcst_ta[i].n_elements();
+         }
+         // Look for the maximum number of thresholds for prob fields
+         else {
+
+            if(fcst_ta[i].n_elements() > max_n_prob_fcst_thresh)
+               max_n_prob_fcst_thresh = fcst_ta[i].n_elements();
+            if(obs_ta[i].n_elements() > max_n_prob_obs_thresh)
+               max_n_prob_obs_thresh = obs_ta[i].n_elements();
+         }
       }
    }
 
