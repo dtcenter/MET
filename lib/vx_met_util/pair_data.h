@@ -287,6 +287,20 @@ class GCPairData {
       PairData ***pd;          // 3-Dim Array of PairData objects
                                // as [n_msg_typ][n_mask][n_interp]
 
+
+      //  Counts for observation rejection reason codes
+      int n_try;            // Number of observations processed
+      int rej_gc;           // Reject based on GRIB code
+      int rej_vld;          // Reject based on valid time
+      int rej_obs;          // Reject observation bad data
+      int rej_grd;          // Reject based on location
+      int rej_lvl;          // Reject based on vertical level
+
+      //  3-Dim Arrays for observation rejection reason codes
+      int ***rej_typ;       // Reject based on message type
+      int ***rej_mask;      // Reject based on masking region
+      int ***rej_fcst;      // Reject forecast bad data
+
       //////////////////////////////////////////////////////////////////
 
       void clear();
@@ -319,6 +333,11 @@ class GCPairData {
       void find_vert_lvl(int, double, int &, int &);
 
       int  get_n_pair();
+
+      // Member functions for incrementing the counts
+      void inc_count(int ***&, int);
+      void inc_count(int ***&, int, int);
+      void inc_count(int ***&, int, int, int);
 
       double compute_interp(int, double, double, int, double, int, int);
 };

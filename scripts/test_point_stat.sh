@@ -7,4 +7,4 @@ echo "*** Running Point-Stat on sample NAM data ***"
    ../out/pb2nc/sample_pb.nc \
    config/PointStatConfig \
    -point_obs ../out/ascii2nc/sample_ascii.nc \
-   -outdir ../out/point_stat -v 2
+   -outdir ../out/point_stat -v 2 
