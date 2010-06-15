@@ -57,6 +57,8 @@
 //                    command line options.
 //   018    06/08/10  Halley Gotway  Add support for multi-category
 //                    contingency tables.
+//   019    06/15/10  Halley Gotway  Dump reason codes for why
+//                    point observations were rejected.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1087,6 +1089,22 @@ void process_scores() {
                        << shc.get_interp_mthd_str() << "("
                        << shc.get_interp_pnts_str()
                        << "), using " << pd_ptr->n_pair << " pairs.\n"
+                       << flush;
+               }
+
+               // Dump out detailed information about why observations were rejected
+               if(verbosity > 2) {
+
+                  cout << "Number of matched pairs  = " << pd_ptr->n_pair << "\n"
+                       << "Observations processed   = " << conf_info.gc_pd[i].n_try << "\n"
+                       << "Rejected: GRIB code      = " << conf_info.gc_pd[i].rej_gc << "\n"
+                       << "Rejected: valid time     = " << conf_info.gc_pd[i].rej_vld << "\n"
+                       << "Rejected: bad obs value  = " << conf_info.gc_pd[i].rej_obs << "\n"
+                       << "Rejected: off the grid   = " << conf_info.gc_pd[i].rej_grd << "\n"
+                       << "Rejected: level mismatch = " << conf_info.gc_pd[i].rej_lvl << "\n"
+                       << "Rejected: message type   = " << conf_info.gc_pd[i].rej_typ[j][k][l] << "\n"
+                       << "Rejected: masking region = " << conf_info.gc_pd[i].rej_mask[j][k][l] << "\n"
+                       << "Rejected: bad fcst value = " << conf_info.gc_pd[i].rej_fcst[j][k][l] << "\n"
                        << flush;
                }
 

@@ -611,6 +611,9 @@ void GCPairData::init_from_scratch() {
    fcst_wd_ptr  = (WrfData **) 0;
    climo_wd_ptr = (WrfData **) 0;
    pd           = (PairData ***) 0;
+   rej_typ      = (int ***) 0;
+   rej_mask     = (int ***) 0;
+   rej_fcst     = (int ***) 0;
 
    clear();
 
@@ -635,6 +638,13 @@ void GCPairData::clear() {
    n_mask        = 0;
    n_interp      = 0;
 
+   n_try         = 0;
+   rej_gc        = 0;
+   rej_vld       = 0;
+   rej_obs       = 0;
+   rej_grd       = 0;
+   rej_lvl       = 0;
+
    fcst_lvl.clear();
    climo_lvl.clear();
 
@@ -648,6 +658,9 @@ void GCPairData::clear() {
       for(j=0; j<n_mask; j++) {
          for(k=0; k<n_interp; k++) {
             pd[i][j][k].clear();
+            rej_typ[i][j][k]  = 0;
+            rej_mask[i][j][k] = 0;
+            rej_fcst[i][j][k] = 0;
          }
       }
    }
@@ -665,8 +678,13 @@ void GCPairData::assign(const GCPairData &gc_pd) {
    set_fcst_gci(gc_pd.fcst_gci);
    set_obs_gci(gc_pd.obs_gci);
 
-   beg_ut  = gc_pd.beg_ut;
-   end_ut  = gc_pd.end_ut;
+   beg_ut   = gc_pd.beg_ut;
+   end_ut   = gc_pd.end_ut;
+
+   n_try    = gc_pd.n_try;
+   rej_typ  = gc_pd.rej_typ;
+   rej_mask = gc_pd.rej_mask;
+   rej_fcst = gc_pd.rej_fcst;
 
    interp_thresh = gc_pd.interp_thresh;
 
@@ -689,6 +707,9 @@ void GCPairData::assign(const GCPairData &gc_pd) {
          for(k=0; k<gc_pd.n_interp; k++) {
 
             pd[i][j][k] = gc_pd.pd[i][j][k];
+            rej_typ[i][j][k]  = gc_pd.rej_typ[i][j][k];
+            rej_mask[i][j][k] = gc_pd.rej_mask[i][j][k];
+            rej_fcst[i][j][k] = gc_pd.rej_fcst[i][j][k];
          }
       }
    }
@@ -814,7 +835,7 @@ void GCPairData::set_end_ut(const unixtime ut) {
 ////////////////////////////////////////////////////////////////////////
 
 void GCPairData::set_pd_size(int types, int masks, int interps) {
-   int i, j;
+   int i, j, k;
 
    // Store the dimensions for the PairData array
    n_msg_typ = types;
@@ -822,15 +843,30 @@ void GCPairData::set_pd_size(int types, int masks, int interps) {
    n_interp  = interps;
 
    // Allocate space for the PairData array
-   pd = new PairData ** [n_msg_typ];
+   pd       = new PairData ** [n_msg_typ];
+   rej_typ  = new int **      [n_msg_typ];
+   rej_mask = new int **      [n_msg_typ];
+   rej_fcst = new int **      [n_msg_typ];
 
    for(i=0; i<n_msg_typ; i++) {
-      pd[i] = new PairData * [n_mask];
+      pd[i]       = new PairData * [n_mask];
+      rej_typ[i]  = new int *      [n_mask];
+      rej_mask[i] = new int *      [n_mask];
+      rej_fcst[i] = new int *      [n_mask];
 
       for(j=0; j<n_mask; j++) {
-         pd[i][j] = new PairData [n_interp];
-      }
-   }
+         pd[i][j]       = new PairData [n_interp];
+         rej_typ[i][j]  = new int      [n_interp];
+         rej_mask[i][j] = new int      [n_interp];
+         rej_fcst[i][j] = new int      [n_interp];
+
+         for(k=0; k<n_interp; k++) {
+            rej_typ[i][j][k]  = 0;
+            rej_mask[i][j][k] = 0;
+            rej_fcst[i][j][k] = 0;
+         } // end for k
+      } // end for j
+   } // end for i
 
    return;
 }
@@ -908,13 +944,22 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
    int fcst_lvl_below, fcst_lvl_above;
    int climo_lvl_below, climo_lvl_above;
 
+   // Increment the number of tries count
+   n_try++;
+
    // Check whether the GRIB code for the observation matches
    // the specified code
-   if(obs_gci.code != nint(obs_arr[1])) return;
+   if(obs_gci.code != nint(obs_arr[1])) {
+      rej_gc++;
+      return;
+   }
 
    // Check whether the observation time falls within the valid time
    // window
-   if(hdr_ut < beg_ut || hdr_ut > end_ut) return;
+   if(hdr_ut < beg_ut || hdr_ut > end_ut) {
+      rej_vld++;
+      return;
+   }
 
    hdr_lat = hdr_arr[0];
    hdr_lon = hdr_arr[1];
@@ -924,7 +969,10 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
    obs_v   = obs_arr[4];
 
    // Check whether the observation value contains valid data
-   if(is_bad_data(obs_v)) return;
+   if(is_bad_data(obs_v)) {
+      rej_obs++;
+      return;
+   }
 
    // Convert the lat/lon value to x/y
    gr.latlon_to_xy(hdr_lat, -1.0*hdr_lon, obs_x, obs_y);
@@ -933,21 +981,30 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
 
    // Check if the observation's lat/lon is on the grid
    if(x < 0 || x >= gr.nx() ||
-      y < 0 || y >= gr.ny()) return;
+      y < 0 || y >= gr.ny()) {
+      rej_grd++;
+      return;
+   }
 
    // For pressure levels, check if the observation pressure level
    // falls in the requsted range.
    if(obs_gci.lvl_type == PresLevel) {
 
       if(obs_lvl < obs_gci.lvl_1 ||
-         obs_lvl > obs_gci.lvl_2) return;
+         obs_lvl > obs_gci.lvl_2) {
+         rej_lvl++;
+         return;
+      }
    }
    // For accumulations, check if the observation accumulation interval
    // matches the requested interval.
    else if(obs_gci.lvl_type == AccumLevel) {
 
       if(obs_lvl < obs_gci.lvl_1 ||
-         obs_lvl > obs_gci.lvl_2) return;
+         obs_lvl > obs_gci.lvl_2) {
+         rej_lvl++;
+         return;
+      }
    }
    // For vertical levels, check for a surface message type or if the
    // observation height falls within the requested range.
@@ -955,13 +1012,19 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
 
       if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
          (obs_hgt < obs_gci.lvl_1 ||
-          obs_hgt > obs_gci.lvl_2)) return;
+          obs_hgt > obs_gci.lvl_2)) {
+         rej_lvl++;
+         return;
+      }
    }
    // For all other level types (RecNumber, NoLevel), check
    // if the observation height falls within the requested range.
    else {
       if(obs_hgt < obs_gci.lvl_1 ||
-         obs_hgt > obs_gci.lvl_2) return;
+         obs_hgt > obs_gci.lvl_2) {
+         rej_lvl++;
+         return;
+      }
    }
 
    // For a single forecast field
@@ -1014,22 +1077,34 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
 
       // Handle ANYAIR
       if(strcmp(anyair_str, pd[i][0][0].msg_typ) == 0) {
-         if(strstr(anyair_msg_typ_str, hdr_typ_str) == NULL ) continue;
+         if(strstr(anyair_msg_typ_str, hdr_typ_str) == NULL ) {
+            inc_count(rej_typ, i);
+            continue;
+         }
       }
 
       // Handle ANYSFC
       else if(strcmp(anysfc_str, pd[i][0][0].msg_typ) == 0) {
-         if(strstr(anysfc_msg_typ_str, hdr_typ_str) == NULL) continue;
+         if(strstr(anysfc_msg_typ_str, hdr_typ_str) == NULL) {
+            inc_count(rej_typ, i);
+            continue;
+         }
       }
 
       // Handle ONLYSF
       else if(strcmp(onlysf_str, pd[i][0][0].msg_typ) == 0) {
-         if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL) continue;
+         if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL) {
+            inc_count(rej_typ, i);
+            continue;
+         }
       }
 
       // Handle all other message types
       else {
-         if(strcmp(hdr_typ_str, pd[i][0][0].msg_typ) != 0) continue;
+         if(strcmp(hdr_typ_str, pd[i][0][0].msg_typ) != 0) {
+            inc_count(rej_typ, i);
+            continue;
+         }
       }
 
       // Check the masking areas and points
@@ -1037,13 +1112,18 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
 
          // Check for the obs falling within the masking region
          if(pd[i][j][0].mask_wd_ptr != (WrfData *) 0) {
-            if(!pd[i][j][0].mask_wd_ptr->s_is_on(x, y)) continue;
+            if(!pd[i][j][0].mask_wd_ptr->s_is_on(x, y)) {
+               inc_count(rej_mask, i, j);
+               continue;
+            }
          }
          // Otherwise, check for the obs Station ID matching the
          // masking SID
          else {
-            if(strcmp(hdr_sid_str, pd[i][j][0].mask_name) != 0)
+            if(strcmp(hdr_sid_str, pd[i][j][0].mask_name) != 0) {
+               inc_count(rej_mask, i, j);
                continue;
+            }
          }
 
          // Compute the interpolated values
@@ -1053,7 +1133,10 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
             fcst_v = compute_interp(1, obs_x, obs_y, k,
                         obs_lvl, fcst_lvl_below, fcst_lvl_above);
 
-            if(is_bad_data(fcst_v)) continue;
+            if(is_bad_data(fcst_v)) {
+               inc_count(rej_fcst, i, j, k);
+               continue;
+            }
 
             // Compute the interpolated climotological value
             climo_v = compute_interp(0, obs_x, obs_y, k,
@@ -1215,6 +1298,41 @@ double GCPairData::compute_interp(int fcst_flag,
    }
 
    return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GCPairData::inc_count(int ***&rej, int i) {
+   int j, k;
+
+   for(j=0; j<n_msg_typ; j++) {
+      for(k=0; k<n_interp; k++) {
+         rej[i][j][k]++;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GCPairData::inc_count(int ***&rej, int i, int j) {
+   int k;
+
+   for(k=0; k<n_interp; k++) {
+      rej[i][j][k]++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GCPairData::inc_count(int ***&rej, int i, int j, int k) {
+
+   rej[i][j][k]++;
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
