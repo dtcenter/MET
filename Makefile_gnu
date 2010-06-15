@@ -70,6 +70,7 @@ GSL_LIBS     = -L$(GSL_BASE)/lib
 # F2C library directory containing libf2c.a or libg2c.a and specified as:
 # -L/your/library/path
 # Name of the library to be used: -lf2c or -lg2c
+# NOTE: Only required for the GNU g77 Fortran compiler
 F2C_BASE     =
 F2C_INCS     =
 F2C_LIBS     =
