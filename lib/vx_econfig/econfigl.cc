@@ -17,7 +17,7 @@
 /* First, we deal with  platform-specific or compiler-specific issues. */
 
 /* begin standard C headers. */
-#include <stdio.h>
+#include <cstdio>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>

@@ -591,7 +591,7 @@ int get_orank_column_offset(const char *col_name) {
 
 int parse_thresh_index(const char *col_name) {
    int i;
-   char *ptr;
+   const char *ptr;
 
    if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
    else {
@@ -607,7 +607,7 @@ int parse_thresh_index(const char *col_name) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_row_col(const char *col_name, int &r, int &c) {
-   char *ptr;
+   const char *ptr;
 
    // Parse Fi_Oj strings
    r = atoi(++col_name);

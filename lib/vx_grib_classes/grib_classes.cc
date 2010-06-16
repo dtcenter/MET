@@ -11,6 +11,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <unistd.h>

@@ -34,7 +34,7 @@ int      has_substr             (const char *, int, const char *);
 
 FileType get_file_type(const char *filename) {
    FileType f_type = NoFileType;
-   char *ptr = (char *) 0;
+   const char *ptr = (char *) 0;
    char ext_str[max_str_len];
    int i;
 
