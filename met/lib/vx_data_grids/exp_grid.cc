@@ -1,3 +1,4 @@
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2007
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -6,20 +7,21 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
 using namespace std;
 
 #include <iostream>
-#include <string.h>
+#include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <cstdio>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include <vx_data_grids/exp_grid.h>
+#include "vx_math.h"
+#include "misc.h"
+#include "exp_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -59,9 +61,9 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-ExpGrid::~ExpGrid()
+ExpGrid::~ExpGrid() 
 
-{
+{ 
 
 clear();
 
@@ -76,8 +78,6 @@ ExpGrid::ExpGrid(const ExpData &data)
 {
 
 clear();
-
-ex_data = data;
 
 lat_origin_deg = data.lat_origin_deg;
 lon_origin_deg = data.lon_origin_deg;
@@ -101,9 +101,7 @@ y_offset = data.y_offset;
 Nx = data.nx;
 Ny = data.ny;
 
-Name = new char [1 + strlen(data.name)];
-
-strcpy(Name, data.name);
+Name = data.name;
 
 }
 
@@ -115,18 +113,6 @@ void ExpGrid::clear()
 
 {
 
-ex_data.name           = (char *) 0;
-ex_data.lat_origin_deg = 0.0;
-ex_data.lon_origin_deg = 0.0;
-ex_data.lat_2_deg      = 0.0;
-ex_data.lon_2_deg      = 0.0;
-ex_data.x_scale        = 0.0;
-ex_data.y_scale        = 0.0;
-ex_data.x_offset       = 0.0;
-ex_data.y_offset       = 0.0;
-ex_data.nx             = 0;
-ex_data.ny             = 0;
-
 e1x = 1.0;  e1y = 0.0;  e1z = 0.0;
 e2x = 0.0;  e2y = 1.0;  e2z = 0.0;
 e3x = 0.0;  e3y = 0.0;  e3z = 1.0;
@@ -134,6 +120,8 @@ e3x = 0.0;  e3y = 0.0;  e3z = 1.0;
 x_scale = y_scale = 1.0;
 
 x_offset = y_offset = 0.0;
+
+Name.clear();
 
 }
 
@@ -232,51 +220,11 @@ return ( Ny );
 ////////////////////////////////////////////////////////////////////////
 
 
-double ExpGrid::EarthRadiusKM() const
-
-{
-
-return ( earth_radius_km );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-const char * ExpGrid::name() const
+ConcatString ExpGrid::name() const
 
 {
 
 return ( Name );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-ProjType ExpGrid::proj_type() const
-
-{
-
-return ( ExpProj );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double ExpGrid::rot_grid_to_earth(int x, int y) const
-
-{
-
-cerr << "\n\n  ExpGrid::rot_grid_to_earth() -> not yet implemented\n\n";
-
-exit ( 1 );
-
-return ( 0.0 );
 
 }
 
@@ -300,31 +248,13 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-double ExpGrid::calc_area_ll(int x, int y) const
-
-{
-
-cerr << "\n\n  ExpGrid::calc_area_ll() -> not yet implemented\n\n";
-
-exit ( 1 );
-
-return ( 0.0 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void ExpGrid::uv_to_xy(double u, double v, double &x, double &y) const
 
 {
 
-const double R = EarthRadiusKM();
+x = x_offset + x_scale*(earth_radius_km*u);
 
-x = x_offset + x_scale*(R*u);
-
-y = y_offset + y_scale*(R*v);
+y = y_offset + y_scale*(earth_radius_km*v);
 
 return;
 
@@ -338,11 +268,9 @@ void ExpGrid::xy_to_uv(double x, double y, double &u, double &v) const
 
 {
 
-const double R = EarthRadiusKM();
+u = (x - x_offset)/(earth_radius_km*x_scale);
 
-u = (x - x_offset)/(R*x_scale);
-
-v = (y - y_offset)/(R*y_scale);
+v = (y - y_offset)/(earth_radius_km*y_scale);
 
 return;
 
@@ -394,16 +322,110 @@ return;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
-void ExpGrid::grid_data(GridData &gdata) const
+void ExpGrid::dump(ostream & out, int depth) const
 
 {
 
-gdata.ex_data = ex_data;
+Indent prefix(depth);
+char junk[256];
+
+
+out << prefix << "Name       = ";
+
+if ( Name.length() > 0 )  {
+
+   out << '\"' << Name << '\"';
+
+} else {
+
+   out << "(nul)";
+
+}
+
+out << "\n";
+
+out << prefix << "Projection = Exponential\n";
+
+sprintf(junk, "%8.5f  %8.5f  %8.5f", e1x, e1y, e1z);
+
+out << prefix << "E1         = [ " << junk << " ]\n";
+
+sprintf(junk, "%8.5f  %8.5f  %8.5f", e2x, e2y, e2z);
+
+out << prefix << "E2         = [ " << junk << " ]\n";
+
+sprintf(junk, "%8.5f  %8.5f  %8.5f", e3x, e3y, e3z);
+
+out << prefix << "E3         = [ " << junk << " ]\n";
+
+out << prefix << "Lat Origin = " << lat_origin_deg << "\n";
+out << prefix << "Lon Origin = " << lon_origin_deg << "\n";
+
+out << prefix << "x_scale    = " << x_scale << "\n";
+out << prefix << "y_scale    = " << y_scale << "\n";
+
+out << prefix << "x_offset   = " << x_offset << "\n";
+out << prefix << "y_offset   = " << y_offset << "\n";
+
+out << prefix << "Nx         = " << Nx << "\n";
+out << prefix << "Ny         = " << Ny << "\n";
+
+   //
+   //  done
+   //
+
+out.flush();
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString ExpGrid::serialize() const
+
+{
+
+ConcatString a;
+char junk[256];
+
+a << "Projection: Exponential";
+
+a << " Nx: " << Nx;
+a << " Ny: " << Ny;
+
+sprintf(junk, " e1x: %.6f", e1x);   a << junk;
+sprintf(junk, " e1y: %.6f", e1y);   a << junk;
+sprintf(junk, " e1z: %.6f", e1z);   a << junk;
+
+sprintf(junk, " e2x: %.6f", e2x);   a << junk;
+sprintf(junk, " e2y: %.6f", e2y);   a << junk;
+sprintf(junk, " e2z: %.6f", e2z);   a << junk;
+
+sprintf(junk, " e3x: %.6f", e3x);   a << junk;
+sprintf(junk, " e3y: %.6f", e3y);   a << junk;
+sprintf(junk, " e3z: %.6f", e3z);   a << junk;
+
+sprintf(junk, " lat_origin_deg: %.2f", lat_origin_deg);   a << junk;
+sprintf(junk, " lon_origin_deg: %.2f", lon_origin_deg);   a << junk;
+
+sprintf(junk, " x_scale: %.5f", x_scale);   a << junk;
+sprintf(junk, " y_scale: %.5f", y_scale);   a << junk;
+
+sprintf(junk, " x_offset: %.3f", x_offset);   a << junk;
+sprintf(junk, " y_offset: %.3f", y_offset);   a << junk;
+
+   //
+   //  done
+   //
+
+return ( a );
 
 }
 
@@ -526,17 +548,39 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const ExpData &data)
+   //
+   //  Grid code
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid::Grid(const ExpData & data)
 
 {
 
-rep = (GridRep *) 0;
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::set(const ExpData & data)
+
+{
+
+clear();
 
 rep = new ExpGrid (data);
 
 if ( !rep )  {
 
-   cerr << "\n\n  Grid::Grid(const ExpData &) -> memory allocation error\n\n";
+   cerr << "\n\n  Grid::set(const ExpData &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -544,14 +588,11 @@ if ( !rep )  {
 
 rep->refCount = 1;
 
+return;
+
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 

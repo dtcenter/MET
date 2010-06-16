@@ -1,3 +1,4 @@
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2007
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -6,8 +7,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -15,11 +14,14 @@ using namespace std;
 
 
 #include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
 #include <string.h>
 #include <cmath>
 
-#include <vx_data_grids/grid_base.h>
-#include <vx_math/is_bad_data.h>
+#include "misc.h"
+#include "grid_base.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -27,6 +29,16 @@ using namespace std;
    //
    //  Code for class GridInterface
    //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridInterface::GridInterface()
+
+{
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -80,7 +92,7 @@ Grid::Grid()
 
 {
 
-rep = (GridRep *) 0;
+init_from_scratch();
 
 }
 
@@ -100,29 +112,77 @@ detach();
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const Grid &g)
+Grid::Grid(const Grid & g)
+
+{
+
+init_from_scratch();
+
+assign(g);
+
+// attach(g.rep);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid & Grid::operator=(const Grid & g)
+
+{
+
+if ( this == &g )  return ( * this );
+
+// attach(g.rep);
+
+assign(g);
+
+return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::init_from_scratch()
 
 {
 
 rep = (GridRep *) 0;
 
+clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::clear()
+
+{
+
+detach();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::assign(const Grid & g)
+
+{
+
+clear();
+
 attach(g.rep);
 
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Grid & Grid::operator=(const Grid &g)
-
-{
-
-if ( this == &g )  return ( *this );
-
-attach(g.rep);
-
-return ( *this );
+return;
 
 }
 
@@ -130,99 +190,20 @@ return ( *this );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Grid::operator==(const Grid &g)
+void Grid::dump(ostream & out, int depth) const
 
 {
 
-GridData d1, d2;
-bool match = false;
+Indent prefix(depth);
 
-if ( this->rep->proj_type() == g.rep->proj_type() ) {
+out << prefix << "Grid Base ...\n";
 
-   // Retrieve the grid data
-   this->rep->grid_data(d1);
-   g.rep->grid_data(d2);
+if ( rep )  rep->dump(out, depth + 1);
 
-   // Switch on the projection type
-   switch ( this->rep->proj_type() ) {
-
-      case LambertProj:
-         if ( is_eq(d1.lc_data.p1_deg,   d2.lc_data.p1_deg   ) &&
-              is_eq(d1.lc_data.p2_deg,   d2.lc_data.p2_deg   ) &&
-              is_eq(d1.lc_data.p0_deg,   d2.lc_data.p0_deg   ) &&
-              is_eq(d1.lc_data.l0_deg,   d2.lc_data.l0_deg   ) &&
-              is_eq(d1.lc_data.lcen_deg, d2.lc_data.lcen_deg ) &&
-              is_eq(d1.lc_data.d_km,     d2.lc_data.d_km     ) &&
-              is_eq(d1.lc_data.r_km,     d2.lc_data.r_km     ) &&
-              d1.lc_data.nx           == d2.lc_data.nx         &&
-              d1.lc_data.ny           == d2.lc_data.ny )  match = true;
-         break;
-
-      case StereographicProj:
-         if ( is_eq(d1.st_data.p1_deg,   d2.st_data.p1_deg   ) &&
-              is_eq(d1.st_data.p0_deg,   d2.st_data.p0_deg   ) &&
-              is_eq(d1.st_data.l0_deg,   d2.st_data.l0_deg   ) &&
-              is_eq(d1.st_data.lcen_deg, d2.st_data.lcen_deg ) &&
-              is_eq(d1.st_data.d_km,     d2.st_data.d_km     ) &&
-              is_eq(d1.st_data.r_km,     d2.st_data.r_km     ) &&
-              d1.st_data.nx           == d2.st_data.nx         &&
-              d1.st_data.ny           == d2.st_data.ny )  match = true;
-         break;
-
-      case ExpProj:
-         if ( is_eq(d1.ex_data.lat_origin_deg, d2.ex_data.lat_origin_deg ) &&
-              is_eq(d1.ex_data.lon_origin_deg, d2.ex_data.lon_origin_deg ) &&
-              is_eq(d1.ex_data.lat_2_deg,      d2.ex_data.lat_2_deg      ) &&
-              is_eq(d1.ex_data.lon_2_deg,      d2.ex_data.lon_2_deg      ) &&
-              is_eq(d1.ex_data.x_scale,        d2.ex_data.x_scale        ) &&
-              is_eq(d1.ex_data.y_scale,        d2.ex_data.y_scale        ) &&
-              is_eq(d1.ex_data.x_offset,       d2.ex_data.x_offset       ) &&
-              is_eq(d1.ex_data.y_offset,       d2.ex_data.y_offset       ) &&
-              d1.ex_data.nx                 == d2.ex_data.nx               &&
-              d1.ex_data.ny                 == d2.ex_data.ny )  match = true;
-         break;
-
-      case PlateCarreeProj:
-         if ( is_eq(d1.pc_data.lat_ll_deg,    d2.pc_data.lat_ll_deg    ) &&
-              is_eq(d1.pc_data.lon_ll_deg,    d2.pc_data.lon_ll_deg    ) &&
-              is_eq(d1.pc_data.delta_lat_deg, d2.pc_data.delta_lat_deg ) &&
-              is_eq(d1.pc_data.delta_lon_deg, d2.pc_data.delta_lon_deg ) &&
-              d1.pc_data.Nlat              == d2.pc_data.Nlat            &&
-              d1.pc_data.Nlon              == d2.pc_data.Nlon )  match = true;
-         break;
-
-      case MercatorProj:
-         if ( is_eq(d1.mc_data.lat_ll_deg, d2.mc_data.lat_ll_deg ) &&
-              is_eq(d1.mc_data.lon_ll_deg, d2.mc_data.lon_ll_deg ) &&
-              is_eq(d1.mc_data.lat_ur_deg, d2.mc_data.lat_ur_deg ) &&
-              is_eq(d1.mc_data.lon_ur_deg, d2.mc_data.lon_ur_deg ) &&
-              d1.mc_data.nx             == d2.mc_data.nx           &&
-              d1.mc_data.ny             == d2.mc_data.ny )  match = true;
-         break;
-
-      case NoProj:
-      default:
-         match = false;
-         break;
-   }
+return;
 
 }
 
-return ( match );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool Grid::operator!=(const Grid &g)
-
-{
-
-return ( !(*this == g) );
-
-}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -243,7 +224,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Grid::attach(GridRep *r)
+void Grid::attach(GridRep * r)
 
 {
 
@@ -307,20 +288,6 @@ return ( rep->calc_area(x, y) );
 ////////////////////////////////////////////////////////////////////////
 
 
-double Grid::calc_area_ll(int x, int y) const
-
-{
-
-if ( !rep )  return ( 0.0 );
-
-return ( rep->calc_area_ll(x, y) );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 int Grid::nx() const
 
 {
@@ -349,25 +316,11 @@ return ( rep->ny() );
 ////////////////////////////////////////////////////////////////////////
 
 
-double Grid::EarthRadiusKM() const
+ConcatString Grid::name() const
 
 {
 
-if ( !rep )  return ( 0.0 );
-
-return ( rep->EarthRadiusKM() );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-const char * Grid::name() const
-
-{
-
-if ( !rep )  return ( "(no name)" );
+if ( !rep )  return ( ConcatString("(no name)") );
 
 return ( rep->name() );
 
@@ -377,26 +330,15 @@ return ( rep->name() );
 ////////////////////////////////////////////////////////////////////////
 
 
-ProjType Grid::proj_type() const
+ConcatString Grid::serialize() const
 
 {
 
-if ( !rep )  return ( NoProj );
+ConcatString s;
 
-return ( rep->proj_type() );
+if ( rep )  s = rep->serialize();
 
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Grid::rot_grid_to_earth(int x, int y) const
-
-{
-
-if ( !rep )  return ( 0.0 );
-
-return ( rep->rot_grid_to_earth(x, y) );
+return ( s );
 
 }
 
@@ -404,13 +346,34 @@ return ( rep->rot_grid_to_earth(x, y) );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Grid::grid_data(GridData &gdata) const
+   //
+   //  Code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool operator==(const Grid & g1, const Grid & g2)
+
 {
 
-if ( !rep )  return;
+if ( !(g1.rep) )  return ( false );
+if ( !(g2.rep) )  return ( false );
 
-return ( rep->grid_data(gdata) );
+
+ConcatString s1, s2;
+
+s1 = g1.rep->serialize();
+s1 = g2.rep->serialize();
+
+return ( s1 == s2 );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
+
+
+
