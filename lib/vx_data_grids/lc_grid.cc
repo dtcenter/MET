@@ -1,3 +1,4 @@
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2007
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -6,8 +7,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -15,23 +14,25 @@ using namespace std;
 
 
 #include <iostream>
-#include <string.h>
+#include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include <vx_data_grids/lc_grid.h>
+#include "vx_math.h"
+#include "misc.h"
+#include "lc_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static double     lc_func(double lat_rad, double cone_constant);
-static double lc_der_func(double lat_rad, double cone_constant);
+static double     lc_func(double lat, double Cone);
+static double lc_der_func(double lat, double Cone);
 
-static double lc_inv_func(double       r, double cone_constant);
+static double lc_inv_func(double   r, double Cone);
 
-static void reduce_rad(double &angle_rad);
+static void reduce(double &);
 
 static double lambert_segment_area(double u0, double v0, double u1, double v1, double c);
 
@@ -52,8 +53,6 @@ static double lambert_beta(double u0, double delta_u, double v0, double delta_v,
 LambertGrid::LambertGrid()
 
 {
-
-Name = (char *) 0;
 
 clear();
 
@@ -79,40 +78,22 @@ void LambertGrid::clear()
 
 {
 
-lc_data.name     = (char *) 0;
-lc_data.p1_deg   = 0.0;
-lc_data.p2_deg   = 0.0;
-lc_data.p0_deg   = 0.0;
-lc_data.l0_deg   = 0.0;
-lc_data.lcen_deg = 0.0;
-lc_data.d_km     = 0.0;
-lc_data.r_km     = 0.0;
-lc_data.nx       = 0;
-lc_data.ny       = 0;
+Lat_LL = 0.0;
+Lon_LL = 0.0;
 
-Phi1_radians = 0.0;
-Phi2_radians = 0.0;
+Lon_cen = 0.0;
 
-Phi0_radians = 0.0;
-Lon0_radians = 0.0;
+Alpha = 0.0;
 
-Lon_cen_radians = 0.0;
-
-Delta_km = 0.0;
-
-Radius_km = 0.0;
+Cone = 0.0;
 
 Bx = 0.0;
 By = 0.0;
 
-alpha = 0.0;
-
-cone = 0.0;
-
 Nx = 0;
 Ny = 0;
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+Name.clear();
 
 return;
 
@@ -122,31 +103,21 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LambertGrid::LambertGrid(const LambertData &data)
+LambertGrid::LambertGrid(const LambertData & data)
 
 {
 
-Name = (char *) 0;
-
 clear();
 
-lc_data = data;
 
-Phi1_radians = (data.p1_deg)/deg_per_rad;
-Phi2_radians = (data.p2_deg)/deg_per_rad;
+Lat_LL = data.lat_pin;
+Lon_LL = data.lon_pin;
 
-Phi0_radians = (data.p0_deg)/deg_per_rad;
-Lon0_radians = (data.l0_deg)/deg_per_rad;
+reduce(Lon_LL);
 
-reduce_rad(Lon0_radians);
+Lon_cen = data.lcen;
 
-Lon_cen_radians = (data.lcen_deg)/deg_per_rad;
-
-reduce_rad(Lon_cen_radians);
-
-Delta_km = data.d_km;
-
-Radius_km = data.r_km;
+reduce(Lon_cen);
 
 Bx = 0.0;
 By = 0.0;
@@ -154,40 +125,30 @@ By = 0.0;
 Nx = data.nx;
 Ny = data.ny;
 
-Name = new char [1 + strlen(data.name)];
-
-if ( !Name )  {
-
-   cerr << "\n\n  LambertGrid::LambertGrid(const LambertData &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-strcpy(Name, data.name);
+Name = data.name;
 
    //
-   //  calculate cone constant
+   //  calculate Cone constant
    //
 
-if ( fabs(Phi1_radians - Phi2_radians) < 1.0e-5 )  cone = sin(Phi1_radians);
+if ( fabs(data.scale_lat_1 - data.scale_lat_2) < 1.0e-5 )  Cone = sind(data.scale_lat_1);
 else {
 
    double t, b;
 
-   t = cos(Phi1_radians)/cos(Phi2_radians);
+   t = cosd(data.scale_lat_1)/cosd(data.scale_lat_2);
 
-   b = tan(piover4 - 0.5*Phi1_radians)/tan(piover4 - 0.5*Phi2_radians);
+   b = tand(45.0 - 0.5*(data.scale_lat_1))/tand(45.0 - 0.5*(data.scale_lat_2));
 
-   cone = log(t)/log(b);
+   Cone = log(t)/log(b);
 
 }
 
    //
-   //  calculate alpha
+   //  calculate Alpha
    //
 
-alpha = (-1.0/lc_der_func(Phi1_radians, cone))*(Radius_km/Delta_km);
+Alpha = (-1.0/lc_der_func(data.scale_lat_1, Cone))*((data.r_km)/(data.d_km));
 
    //
    //  Calculate Bx, By
@@ -195,12 +156,16 @@ alpha = (-1.0/lc_der_func(Phi1_radians, cone))*(Radius_km/Delta_km);
 
 double r0, theta0;
 
-r0 = lc_func(Phi0_radians, cone);
+r0 = lc_func(data.lat_pin, Cone);
 
-theta0 = cone*(Lon_cen_radians - Lon0_radians);
+theta0 = Cone*(Lon_cen - data.lon_pin);
 
-Bx = -alpha*r0*sin(theta0);
-By =  alpha*r0*cos(theta0);
+Bx = data.x_pin - Alpha*r0*sind(theta0);
+By = data.y_pin + Alpha*r0*cosd(theta0);
+
+xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
+
+reduce(Lon_LL);
 
    //
    //  Done
@@ -212,11 +177,11 @@ By =  alpha*r0*cos(theta0);
 ////////////////////////////////////////////////////////////////////////
 
 
-double LambertGrid::f(double lat_deg) const
+double LambertGrid::f(double lat) const
 
 {
 
-return ( lc_func(lat_deg/deg_per_rad, cone) );
+return ( lc_func(lat, Cone) );
 
 }
 
@@ -224,11 +189,11 @@ return ( lc_func(lat_deg/deg_per_rad, cone) );
 ////////////////////////////////////////////////////////////////////////
 
 
-double LambertGrid::df(double lat_deg) const
+double LambertGrid::df(double lat) const
 
 {
 
-return ( lc_der_func(lat_deg/deg_per_rad, cone) );
+return ( lc_der_func(lat, Cone) );
 
 }
 
@@ -236,25 +201,22 @@ return ( lc_der_func(lat_deg/deg_per_rad, cone) );
 ////////////////////////////////////////////////////////////////////////
 
 
-void LambertGrid::latlon_to_xy(double lat_deg, double lon_deg, double &x, double &y) const
+void LambertGrid::latlon_to_xy(double lat, double lon, double & x, double & y) const
 
 {
 
-double lat_rad, lon_rad;
 double r, theta;
 
-lat_rad = lat_deg/deg_per_rad;
-lon_rad = lon_deg/deg_per_rad;
 
-reduce_rad(lon_rad);
+reduce(lon);
 
-r = lc_func(lat_rad, cone);
+r = lc_func(lat, Cone);
 
-theta = cone*(Lon_cen_radians - lon_rad);
+theta = Cone*(Lon_cen - lon);
 
-x = Bx + alpha*r*sin(theta);
+x = Bx + Alpha*r*sind(theta);
 
-y = By - alpha*r*cos(theta);
+y = By - Alpha*r*cosd(theta);
 
 return;
 
@@ -264,30 +226,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LambertGrid::xy_to_latlon(double x, double y, double &lat_deg, double &lon_deg) const
+void LambertGrid::xy_to_latlon(double x, double y, double & lat, double & lon) const
 
 {
 
-double lat_rad, lon_rad;
 double r, theta;
 
-x = (x - Bx)/alpha;
-y = (y - By)/alpha;
+x = (x - Bx)/Alpha;
+y = (y - By)/Alpha;
 
 r = sqrt( x*x + y*y );
 
-lat_rad = lc_inv_func(r, cone);
-
-lat_deg = deg_per_rad*lat_rad;
+lat = lc_inv_func(r, Cone);
 
 if ( fabs(r) < 1.0e-5 )  theta = 0.0;
-else                     theta = atan2(x, -y);   //  NOT atan2(y, x);
+else                     theta = atan2d(x, -y);   //  NOT atan2d(y, x);
 
-lon_rad = Lon_cen_radians - theta/cone;
+lon = Lon_cen - theta/Cone;
 
-reduce_rad(lon_rad);
-
-lon_deg = deg_per_rad*lon_rad;
+reduce(lon);
 
 return;
 
@@ -301,8 +258,6 @@ double LambertGrid::calc_area(int x, int y) const
 
 {
 
-const double R = EarthRadiusKM();
-
 double u[4], v[4];
 double sum;
 
@@ -315,35 +270,7 @@ xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
 
 sum = uv_closedpolyline_area(u, v, 4);
 
-sum *= R*R;
-
-return ( sum );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double LambertGrid::calc_area_ll(int x, int y) const
-
-{
-
-const double R = EarthRadiusKM();
-
-double u[4], v[4];
-double sum;
-
-
-xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
-xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
-xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
-xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
-
-
-sum = uv_closedpolyline_area(u, v, 4);
-
-sum *= R*R;
+sum *= earth_radius_km*earth_radius_km;
 
 return ( sum );
 
@@ -377,19 +304,7 @@ return ( Ny );
 ////////////////////////////////////////////////////////////////////////
 
 
-double LambertGrid::EarthRadiusKM() const
-
-{
-
-return ( Radius_km );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-const char * LambertGrid::name() const
+ConcatString LambertGrid::name() const
 
 {
 
@@ -401,49 +316,7 @@ return ( Name );
 ////////////////////////////////////////////////////////////////////////
 
 
-ProjType LambertGrid::proj_type() const
-
-{
-
-return ( LambertProj );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double LambertGrid::rot_grid_to_earth(int x, int y) const
-
-{
-
-double lat_deg, lon_deg, angle;
-double diff, hemi;
-
-// Convert to lat/lon
-xy_to_latlon((double) x, (double) y, lat_deg, lon_deg);
-
-// Difference between lon and the center longitude
-diff = Lon_cen_radians*deg_per_rad - lon_deg;
-
-// Figure out if the grid is in the northern or southern hemisphere
-// by checking whether the first latitude (p1_deg -> Phi1_radians)
-// is greater than zero
-// NH -> hemi = 1, SH -> hemi = -1
-if(Phi1_radians < 0.0) hemi = -1.0;
-else                   hemi = 1.0;
-
-// Compute the rotation angle
-angle = diff*cone*hemi;
-
-return(angle);
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-double LambertGrid::uv_closedpolyline_area(const double *u, const double *v, int n) const
+double LambertGrid::uv_closedpolyline_area(const double * u, const double * v, int n) const
 
 {
 
@@ -457,7 +330,7 @@ for (j=0; j<n; ++j)  {
 
    k = (j + 1)%n;
 
-   sum += lambert_segment_area(u[j], v[j], u[k], v[k], cone);
+   sum += lambert_segment_area(u[j], v[j], u[k], v[k], Cone);
 
 }
 
@@ -471,11 +344,9 @@ return ( sum );
 ////////////////////////////////////////////////////////////////////////
 
 
-double LambertGrid::xy_closedpolyline_area(const double *x, const double *y, int n) const
+double LambertGrid::xy_closedpolyline_area(const double * x, const double *y , int n) const
 
 {
-
-const double R = EarthRadiusKM();
 
 int j;
 double sum;
@@ -501,7 +372,7 @@ for (j=0; j<n; ++j)  {
 
 sum = uv_closedpolyline_area(u, v, n);
 
-sum *= R*R;
+sum *= earth_radius_km*earth_radius_km;
 
 delete [] u;  u = (double *) 0;
 delete [] v;  v = (double *) 0;
@@ -514,13 +385,13 @@ return ( sum );
 ////////////////////////////////////////////////////////////////////////
 
 
-void LambertGrid::uv_to_xy(double u, double v, double &x, double &y) const
+void LambertGrid::uv_to_xy(double u, double v, double & x, double & y) const
 
 {
 
-x = alpha*v + Bx;
+x = Alpha*v + Bx;
 
-y = -alpha*u + By;
+y = -Alpha*u + By;
 
 return;
 
@@ -530,13 +401,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LambertGrid::xy_to_uv(double x, double y, double &u, double &v) const
+void LambertGrid::xy_to_uv(double x, double y, double & u, double & v) const
 
 {
 
-u = (x - Bx)/alpha;
+u = (x - Bx)/Alpha;
 
-v = (y - By)/(-alpha);
+v = (y - By)/(-Alpha);
 
 return;
 
@@ -546,13 +417,87 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LambertGrid::grid_data(GridData &gdata) const
+void LambertGrid::dump(ostream & out, int depth) const
 
 {
 
-gdata.lc_data = lc_data;
+Indent prefix(depth);
+
+
+
+out << prefix << "Name       = ";
+
+if ( Name.length() > 0 )  out << '\"' << Name << '\"';
+else                      out << "(nul)\n";
+
+out << '\n';
+
+out << prefix << "Projection = Lambert Conformal\n";
+
+out << prefix << "\n";
+
+out << prefix << "Lat_LL     = " << Lat_LL << "\n";
+out << prefix << "Lon_LL     = " << Lon_LL << "\n";
+
+out << prefix << "\n";
+
+out << prefix << "Alpha      = " << Alpha << "\n";
+out << prefix << "Cone       = " << Cone  << "\n";
+
+out << prefix << "\n";
+
+out << prefix << "Bx         = " << Bx << "\n";
+out << prefix << "By         = " << By << "\n";
+
+out << prefix << "\n";
+
+out << prefix << "Nx         = " << Nx << "\n";
+out << prefix << "Ny         = " << Ny << "\n";
+
+
+   //
+   //  done
+   //
+
+out.flush();
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString LambertGrid::serialize() const
+
+{
+
+ConcatString a;
+char junk[256];
+
+a << "Projection: Lambert Conformal";
+
+a << " Nx: " << Nx;
+a << " Ny: " << Ny;
+
+sprintf(junk, " Lat_LL: %.3f", Lat_LL);   a << junk;
+sprintf(junk, " Lon_LL: %.3f", Lon_LL);   a << junk;
+
+sprintf(junk, " Lon_cen: %.3f", Lon_cen);   a << junk;
+
+sprintf(junk, " Alpha: %.3f", Alpha);   a << junk;
+
+sprintf(junk, " Cone: %.3f", Cone);   a << junk;
+
+sprintf(junk, " Bx: %.4f", Bx);   a << junk;
+sprintf(junk, " By: %.4f", By);   a << junk;
+
+   //
+   //  done
+   //
+
+return ( a );
 
 }
 
@@ -568,15 +513,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double lc_func(double lat_rad, double cone_constant)
+double lc_func(double lat, double Cone)
 
 {
 
 double r;
 
-r = tan(piover4 - 0.5*lat_rad);
+r = tand(45.0 - 0.5*lat);
 
-r = pow(r, cone_constant);
+r = pow(r, Cone);
 
 return ( r );
 
@@ -586,15 +531,15 @@ return ( r );
 ////////////////////////////////////////////////////////////////////////
 
 
-double lc_inv_func(double r, double cone_constant)
+double lc_inv_func(double r, double Cone)
 
 {
 
-double lat_rad;
+double lat;
 
-lat_rad = piover2 - 2.0*atan(pow(r, 1.0/cone_constant));
+lat = 90.0 - 2.0*atand(pow(r, 1.0/Cone));
 
-return ( lat_rad );
+return ( lat );
 
 }
 
@@ -602,13 +547,15 @@ return ( lat_rad );
 ////////////////////////////////////////////////////////////////////////
 
 
-double lc_der_func(double lat_rad, double cone_constant)
+double lc_der_func(double lat, double Cone)
 
 {
 
-double a;
+double a, r;
 
-a = -(cone_constant/cos(lat_rad))*lc_func(lat_rad, cone_constant);
+r = lc_func(lat, Cone);
+
+a = -(Cone/cosd(lat))*lc_func(lat, Cone);
 
 return ( a );
 
@@ -618,11 +565,11 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-void reduce_rad(double &angle_rad)
+void reduce(double & angle)
 
 {
 
-angle_rad = angle_rad - twopi*floor( (angle_rad/twopi) + 0.5 );
+angle -= 360.0*floor( (angle/360.0) + 0.5 );
 
 return;
 
@@ -654,7 +601,7 @@ sum = lambert_beta(u0, delta_u, v0, delta_v, c, a) + lambert_beta(u0, delta_u, v
 
 t[0] = trap = (h/2.0)*sum + h*lambert_beta(u0, delta_u, v0, delta_v, c, a + h);
 
-do {
+do { 
 
    ++i;
 
@@ -734,17 +681,32 @@ return ( answer );
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const LambertData &data)
+Grid::Grid(const LambertData & data)
 
 {
 
-rep = (GridRep *) 0;
+init_from_scratch();
+
+set(data);
+
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::set(const LambertData & data)
+
+{
+
+clear();
 
 rep = new LambertGrid (data);
 
 if ( !rep )  {
 
-   cerr << "\n\n  Grid::Grid(const LambertData &) -> memory allocation error\n\n";
+   cerr << "\n\n  Grid::set(const LambertData &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -753,7 +715,6 @@ if ( !rep )  {
 rep->refCount = 1;
 
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,72 +1,134 @@
-# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2007
-# ** University Corporation for Atmospheric Research (UCAR)
-# ** National Center for Atmospheric Research (NCAR)
-# ** Research Applications Lab (RAL)
-# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-###############################################################################
-#
-# Makefile for the vx_data_grids library
-#
-###############################################################################
+#// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+#// ** Copyright UCAR (c) 1992 - 2007
+#// ** University Corporation for Atmospheric Research (UCAR)
+#// ** National Center for Atmospheric Research (NCAR)
+#// ** Research Applications Lab (RAL)
+#// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+#// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-TARGETS  = libvx_data_grids.a
-
-OBJECTS  =  exp_grid.o \
-	grid_base.o \
-	grid_defs.o \
-	lc_grid.o \
-	merc_grid.o \
-	pc_grid.o \
-	st_grid.o
-
-OPT_FLAGS=
-
-FAKES    = vx_data_grids_all vx_data_grids_lib clean
-
-LIB_DIR  = ..
+########################################################################
 
 
-vx_data_grids_all:
+TARGETS   = libvx_data_grids.a
+
+
+########################################################################
+
+
+OBJECTS     = exp_grid.o           \
+              grid_base.o          \
+              latlon_grid.o        \
+              lc_grid.o            \
+              st_grid.o            \
+              merc_grid.o          \
+              find_grid_by_name.o  \
+
+
+########################################################################
+
+
+HEADERS     = exp_grid.h           \
+              grid_base.h          \
+              grid.h               \
+              latlon_grid.h        \
+              lc_grid.h            \
+              st_grid.h            \
+              merc_grid.h          \
+              st_grid_defs.h       \
+              lc_grid_defs.h       \
+              exp_grid_defs.h      \
+              latlon_grid_defs.h   \
+              merc_grid_defs.h     \
+              find_grid_by_name.h  \
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES)
 	@ echo
-	@ echo "*** Making vx_data_grids Library ***"
-	@ echo
-	@ $(MAKE) vx_data_grids_lib  $(PRINT_OPTS)
-	cp $(TARGETS) ../.
 
-vx_data_grids_lib: libvx_data_grids.a
+
+tests: $(EXECUTABLES)
 	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+grid_base.o: grid_base.h grid_base.cc
+	@ echo
+	$(COMPILER) grid_base.cc          -c $(FLAGS) -I$(INC_DIR)
+
+
+st_grid.o: st_grid.cc st_grid.h grid_base.o st_grid_defs.h
+	@ echo
+	$(COMPILER) st_grid.cc            -c $(FLAGS) -I$(INC_DIR)
+
+
+lc_grid.o: lc_grid.cc lc_grid.h grid_base.o lc_grid_defs.h
+	@ echo
+	$(COMPILER) lc_grid.cc            -c $(FLAGS) -I$(INC_DIR)
+
+
+exp_grid.o: exp_grid.cc exp_grid.h grid_base.o exp_grid_defs.h
+	@ echo
+	$(COMPILER) exp_grid.cc           -c $(FLAGS) -I$(INC_DIR)
+
+
+latlon_grid.o: latlon_grid.cc latlon_grid.h grid_base.o latlon_grid_defs.h
+	@ echo
+	$(COMPILER) latlon_grid.cc        -c $(FLAGS) -I$(INC_DIR)
+
+
+merc_grid.o: merc_grid.cc merc_grid.h grid_base.o merc_grid_defs.h
+	@ echo
+	$(COMPILER) merc_grid.cc          -c $(FLAGS) -I$(INC_DIR)
+
+
+find_grid_by_name.o: find_grid_by_name.cc find_grid_by_name.h grid_base.h exp_grid.h latlon_grid.h lc_grid.h st_grid.h merc_grid.h
+	@ echo
+	$(COMPILER) find_grid_by_name.cc  -c $(FLAGS) -I$(INC_DIR)
+
+
+########################################################################
+
+
+   ##
+   ##  libs
+   ##
+
 
 libvx_data_grids.a: $(OBJECTS)
-	ar -rs libvx_data_grids.a $(OBJECTS)
+	@ echo
+	ar -rs libvx_data_grids.a $(OBJECTS) 2>&1
 	ranlib libvx_data_grids.a
 
-exp_grid.o: exp_grid.cc
-	$(CXX) exp_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
-grid_base.o: grid_base.cc
-	$(CXX) grid_base.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+########################################################################
 
-grid_defs.o: grid_defs.cc
-	$(CXX) grid_defs.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
-lc_grid.o: lc_grid.cc
-	$(CXX) lc_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+   ##
+   ##  executables
+   ##
 
-merc_grid.o: merc_grid.cc
-	$(CXX) merc_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
-pc_grid.o: pc_grid.cc
-	$(CXX) pc_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+########################################################################
 
-st_grid.o: st_grid.cc
-	$(CXX) st_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
+	@ echo
+	rm -f *.a *.o *.ps *.ppm *.pgm *.png temp junk core log a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
-.PHONY: $(FAKES)
+
+########################################################################
+
+
 
 

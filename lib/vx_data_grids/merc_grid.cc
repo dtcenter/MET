@@ -1,3 +1,4 @@
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2007
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -6,7 +7,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -14,12 +14,14 @@ using namespace std;
 
 
 #include <iostream>
-#include <string.h>
+#include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include <vx_data_grids/merc_grid.h>
+#include "vx_math.h"
+#include "misc.h"
+#include "merc_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,8 +53,6 @@ MercatorGrid::MercatorGrid()
 
 {
 
-Name = (char *) 0;
-
 clear();
 
 }
@@ -77,14 +77,10 @@ MercatorGrid::MercatorGrid(const MercatorData & data)
 
 {
 
-Name = (char *) 0;
-
 double lll;   //  lower-left longitude
 double lur;   //  upper-right longitude
 
 clear();
-
-mc_data = data;
 
 lll = data.lon_ll_deg;
 lur = data.lon_ur_deg;
@@ -118,12 +114,10 @@ Lon_LL_radians = lll/deg_per_rad;
 Lat_UR_radians = (data.lat_ur_deg)/deg_per_rad;
 Lon_UR_radians = lur/deg_per_rad;
 
-Nx = data.nx;
-Ny = data.ny;
+Nx = data.Nx;
+Ny = data.Ny;
 
-Name = new char [1 + strlen(data.name)];
-
-strcpy(Name, data.name);
+Name = data.name;
 
    //
    //  calculate mx, bx, my, by
@@ -160,14 +154,6 @@ void MercatorGrid::clear()
 
 {
 
-mc_data. name      = (char *) 0;
-mc_data.lat_ll_deg = 0.0;
-mc_data.lon_ll_deg = 0.0;
-mc_data.lat_ur_deg = 0.0;
-mc_data.lon_ur_deg = 0.0;
-mc_data.nx         = 0;
-mc_data.ny         = 0;
-
 Lat_LL_radians = 0.0;
 Lon_LL_radians = 0.0;
 
@@ -181,7 +167,7 @@ Bx = By = 0.0;
 Nx = 0;
 Ny = 0;
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+Name.clear();
 
 return;
 
@@ -295,23 +281,6 @@ return ( sum );
 ////////////////////////////////////////////////////////////////////////
 
 
-double MercatorGrid::calc_area_ll(int x, int y) const
-
-{
-
-cerr << "\n\n  MercatorGrid::calc_area_ll() -> not yet implemented\n\n";
-
-exit ( 1 );
-
-return ( 0.0 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
 int MercatorGrid::nx() const
 
 {
@@ -336,19 +305,7 @@ return ( Ny );
 ////////////////////////////////////////////////////////////////////////
 
 
-double MercatorGrid::EarthRadiusKM() const
-
-{
-
-return ( earth_radius_km );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-const char * MercatorGrid::name() const
+ConcatString MercatorGrid::name() const
 
 {
 
@@ -360,36 +317,7 @@ return ( Name );
 ////////////////////////////////////////////////////////////////////////
 
 
-ProjType MercatorGrid::proj_type() const
-
-{
-
-return ( MercatorProj );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double MercatorGrid::rot_grid_to_earth(int x, int y) const
-
-{
-
-//
-// The rotation angle from grid relative to earth relative is zero
-// for the Mercator projection
-//
-
-return ( 0.0 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double MercatorGrid::uv_closedpolyline_area(const double *u, const double *v, int n) const
+double MercatorGrid::uv_closedpolyline_area(const double * u, const double * v, int n) const
 
 {
 
@@ -417,7 +345,7 @@ return ( sum );
 ////////////////////////////////////////////////////////////////////////
 
 
-double MercatorGrid::xy_closedpolyline_area(const double *x, const double *y, int n) const
+double MercatorGrid::xy_closedpolyline_area(const double * x, const double * y, int n) const
 
 {
 
@@ -458,7 +386,7 @@ return ( sum );
 ////////////////////////////////////////////////////////////////////////
 
 
-void MercatorGrid::uv_to_xy(double u, double v, double &x, double &y) const
+void MercatorGrid::uv_to_xy(double u, double v, double & x, double & y) const
 
 {
 
@@ -474,7 +402,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MercatorGrid::xy_to_uv(double x, double y, double &u, double &v) const
+void MercatorGrid::xy_to_uv(double x, double y, double & u, double & v) const
 
 {
 
@@ -490,13 +418,80 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MercatorGrid::grid_data(GridData &gdata) const
+void MercatorGrid::dump(ostream & out, int depth) const
 
 {
 
-gdata.mc_data = mc_data;
+Indent prefix(depth);
+
+
+out << prefix << "Name       = ";
+
+if ( Name.length() > 0 )  out << '\"' << Name << '\"';
+else                      out << "(nul)\n";
+
+out << '\n';
+
+out << prefix << "Projection = Mercator\n";
+
+out << prefix << "Lat_LL     = " << (deg_per_rad*Lat_LL_radians) << "\n";
+out << prefix << "Lon_LL     = " << (deg_per_rad*Lon_LL_radians) << "\n";
+
+out << prefix << "Lat_UR     = " << (deg_per_rad*Lat_UR_radians) << "\n";
+out << prefix << "Lon_UR     = " << (deg_per_rad*Lon_UR_radians) << "\n";
+
+out << prefix << "Mx         = " << Mx << "\n";
+out << prefix << "My         = " << My << "\n";
+
+out << prefix << "Bx         = " << Bx << "\n";
+out << prefix << "By         = " << By << "\n";
+
+out << prefix << "Nx         = " << Nx << "\n";
+out << prefix << "Ny         = " << Ny << "\n";
+
+   //
+   //  done
+   //
+
+out.flush();
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString MercatorGrid::serialize() const
+
+{
+
+ConcatString a;
+char junk[256];
+
+a << "Projection: Mercator";
+
+a << " Nx: " << Nx;
+a << " Ny: " << Ny;
+
+sprintf(junk, " Lat_LL_radians: %.4f", Lat_LL_radians);   a << junk;
+sprintf(junk, " Lon_LL_radians: %.4f", Lon_LL_radians);   a << junk;
+
+sprintf(junk, " Lat_UR_radians: %.4f", Lat_UR_radians);   a << junk;
+sprintf(junk, " Lon_UR_radians: %.4f", Lon_UR_radians);   a << junk;
+
+sprintf(junk, " Mx: %.4f", Mx);   a << junk;
+sprintf(junk, " My: %.4f", My);   a << junk;
+
+sprintf(junk, " Bx: %.4f", Bx);   a << junk;
+sprintf(junk, " By: %.4f", By);   a << junk;
+
+   //
+   //  done
+   //
+
+return ( a );
 
 }
 
@@ -561,19 +556,31 @@ return ( a );
 
 
 double mercator_segment_area(double u0, double v0, double u1, double v1)
-
+ 
 {
 
+// cerr << "\n\n  warning -> mercator_segment_area() -> hasn't been tested yet!\n\n";
+ 
 double delta_u, delta_v;
+double u1_prime;
 double b0, b1;
 double answer;
 
-delta_u = u1 - u0;
+
+   //
+   //  u1_prime = u1 + 360*n, for some integer n
+   //
+   //      want -180 <= u1_prime - u0 < 180
+   //
+
+u1_prime = u1 - 360.0*floor((u1 - u0 + 180.0)/360.0);
+
+delta_u = u1_prime - u0;
 delta_v = v1 - v0;
 
 if ( fabs(delta_v) < 1.0e-4 )  {
 
-   answer = 0.5*delta_u*(1.0 - tanh(v0));
+   answer = delta_u*(1.0 - tanh(v0));
 
    return ( answer );
 
@@ -592,8 +599,8 @@ answer = (delta_u/delta_v)*(b1 - b0);
    //  done
    //
 
-return ( answer );
-
+return ( answer );                                 
+                                                   
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -635,19 +642,35 @@ Grid::Grid(const MercatorData & data)
 
 {
 
-rep = (GridRep *) 0;
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::set(const MercatorData & data)
+
+{
+
+clear();
 
 rep = new MercatorGrid (data);
 
 if ( !rep )  {
 
-   cerr << "\n\n  Grid::Grid(const MercatorData &) -> memory allocation error\n\n";
+   cerr << "\n\n  Grid::set(const MercatorData &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
 }
 
 rep->refCount = 1;
+
+return;
 
 }
 
