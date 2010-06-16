@@ -20,11 +20,11 @@ static const int verbose = 0;
 using namespace std;
 
 
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <cmath>

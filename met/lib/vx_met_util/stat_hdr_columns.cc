@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#include <cstdio>
 #include <string.h>
 
 #include "vx_met_util/stat_hdr_columns.h"

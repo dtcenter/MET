@@ -17,6 +17,7 @@ using namespace std;
 #include <fstream>
 #include <unistd.h>
 #include <limits.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
