@@ -20,13 +20,13 @@
 #include <iostream>
 
 
-#include "misc.h"
+#include "vx_util/vx_util.h"
 
-#include "st_grid_defs.h"
-#include "lc_grid_defs.h"
-#include "exp_grid_defs.h"
-#include "latlon_grid_defs.h"
-#include "merc_grid_defs.h"
+#include "vx_data_grids/st_grid_defs.h"
+#include "vx_data_grids/lc_grid_defs.h"
+#include "vx_data_grids/exp_grid_defs.h"
+#include "vx_data_grids/latlon_grid_defs.h"
+#include "vx_data_grids/merc_grid_defs.h"
 
 
 ////////////////////////////////////////////////////////////////////////

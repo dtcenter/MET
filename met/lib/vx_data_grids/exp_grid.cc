@@ -19,9 +19,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math.h"
-#include "misc.h"
-#include "exp_grid.h"
+#include "vx_math/vx_math.h"
+#include "vx_util/vx_util.h"
+#include "vx_data_grids/exp_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////

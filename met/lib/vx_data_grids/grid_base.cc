@@ -19,8 +19,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "misc.h"
-#include "grid_base.h"
+#include "vx_util/vx_util.h"
+#include "vx_data_grids/grid_base.h"
 
 
 ////////////////////////////////////////////////////////////////////////
