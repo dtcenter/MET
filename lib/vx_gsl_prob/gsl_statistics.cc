@@ -9,19 +9,33 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_GSL_PROB_H__
-#define  __VX_GSL_PROB_H__
+using namespace std;
 
-////////////////////////////////////////////////////////////////////////
+#include <cstdio>
+#include <iostream>
+#include <unistd.h>
+#include <string.h>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 
-#include "vx_gsl_prob/gsl_cdf.h"
-#include "vx_gsl_prob/gsl_bvn.h"
-#include "vx_gsl_prob/gsl_randist.h"
 #include "vx_gsl_prob/gsl_statistics.h"
-#include "vx_gsl_prob/gsl_wavelet2d.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   /*  __VX_GSL_PROB_H__  */
+double stats_lag1_autocorrelation(const NumArray &na) {
+   double auto_corr;
+   double *tmp;
+   int i;
+
+   tmp = new double [na.n_elements()];
+
+   for(i=0; i<na.n_elements(); i++) tmp[i] = na[i];
+
+   auto_corr = gsl_stats_lag1_autocorrelation(tmp, sizeof(double),
+                                              na.n_elements());
+
+   return(auto_corr);
+}
 
 ////////////////////////////////////////////////////////////////////////
