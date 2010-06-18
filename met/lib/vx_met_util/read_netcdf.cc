@@ -234,7 +234,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
       // Store the grid name
       lc_data.name = proj_type[2];
 
-      // First latitude
+      // First scale latitude
       proj_att = f_in->get_att("p1_deg");
       if(!proj_att) {
          cerr << "\n\nERROR: read_netcdf_grid() -> "
@@ -242,9 +242,9 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      lc_data.p1_deg = atof(proj_att->as_string(0));
+      lc_data.scale_lat_1 = atof(proj_att->as_string(0));
 
-      // Second latitude
+      // Second scale latitude
       proj_att = f_in->get_att("p2_deg");
       if(!proj_att) {
          cerr << "\n\nERROR: read_netcdf_grid() -> "
@@ -252,7 +252,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      lc_data.p2_deg = atof(proj_att->as_string(0));
+      lc_data.scale_lat_2 = atof(proj_att->as_string(0));
 
       // Latitude of first point
       proj_att = f_in->get_att("p0_deg");
@@ -262,7 +262,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      lc_data.p0_deg = atof(proj_att->as_string(0));
+      lc_data.lat_pin = atof(proj_att->as_string(0));
 
       // Longitude of first point
       proj_att = f_in->get_att("l0_deg");
@@ -272,7 +272,11 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      lc_data.l0_deg = -1.0*atof(proj_att->as_string(0));
+      lc_data.lon_pin = -1.0*atof(proj_att->as_string(0));
+
+      //  pin this point to the lower_left corner of the grid
+      lc_data.x_pin = 0.0;
+      lc_data.y_pin = 0.0;
 
       // Center longitude
       proj_att = f_in->get_att("lcen_deg");
@@ -282,7 +286,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      lc_data.lcen_deg = -1.0*atof(proj_att->as_string(0));
+      lc_data.lcen = -1.0*atof(proj_att->as_string(0));
 
       // Grid spacing in km
       proj_att = f_in->get_att("d_km");
@@ -351,7 +355,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
       // Store the grid name
       st_data.name = proj_type[3];
 
-      // First latitude
+      // Scale latitude
       proj_att = f_in->get_att("p1_deg");
       if(!proj_att) {
          cerr << "\n\nERROR: read_netcdf_grid() -> "
@@ -359,7 +363,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      st_data.p1_deg = atof(proj_att->as_string(0));
+      st_data.scale_lat = atof(proj_att->as_string(0));
 
       // Latitude of first point
       proj_att = f_in->get_att("p0_deg");
@@ -369,7 +373,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      st_data.p0_deg = atof(proj_att->as_string(0));
+      st_data.lat_pin = atof(proj_att->as_string(0));
 
       // Longitude of first point
       proj_att = f_in->get_att("l0_deg");
@@ -379,7 +383,11 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      st_data.l0_deg = -1.0*atof(proj_att->as_string(0));
+      st_data.lon_pin = -1.0*atof(proj_att->as_string(0));
+
+      //  pin this point to the lower_left corner of the grid
+      st_data.x_pin = 0.0;
+      st_data.y_pin = 0.0;
 
       // Center longitude
       proj_att = f_in->get_att("lcen_deg");
@@ -389,7 +397,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
               << flush;
          exit(1);
       }
-      st_data.lcen_deg = -1.0*atof(proj_att->as_string(0));
+      st_data.lcen = -1.0*atof(proj_att->as_string(0));
 
       // Grid spacing in km
       proj_att = f_in->get_att("d_km");

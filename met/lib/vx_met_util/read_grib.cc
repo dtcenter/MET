@@ -1249,19 +1249,23 @@ void read_gds(GribRecord &r, Grid &gr, int &xdir, int &ydir, int &order) {
       //
 
       // First latitude
-      lc_data.p1_deg = decode_lat_lon(r.gds->grid_type.lambert_conf.latin1, 3);
+      lc_data.scale_lat_1 = decode_lat_lon(r.gds->grid_type.lambert_conf.latin1, 3);
 
       // Second latitude
-      lc_data.p2_deg = decode_lat_lon(r.gds->grid_type.lambert_conf.latin2, 3);
+      lc_data.scale_lat_2 = decode_lat_lon(r.gds->grid_type.lambert_conf.latin2, 3);
 
       // Latitude of first point
-      lc_data.p0_deg = decode_lat_lon(r.gds->grid_type.lambert_conf.lat1, 3);
+      lc_data.lat_pin = decode_lat_lon(r.gds->grid_type.lambert_conf.lat1, 3);
 
       // Longitude of first point
-      lc_data.l0_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.lambert_conf.lon1, 3));
+      lc_data.lon_pin = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.lambert_conf.lon1, 3));
+
+      // "pin" this point to the lower-left corner of the grid
+      lc_data.x_pin = 0.0;
+      lc_data.y_pin = 0.0;
 
       // Center longitude
-      lc_data.lcen_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.lambert_conf.lov, 3));
+      lc_data.lcen = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.lambert_conf.lov, 3));
 
       // Grid spacing in km (given in the GRIB file in m)
       lc_data.d_km = (double) char3_to_int(r.gds->grid_type.lambert_conf.dx)/1000.0;
@@ -1304,16 +1308,20 @@ void read_gds(GribRecord &r, Grid &gr, int &xdir, int &ydir, int &order) {
       c = r.gds->grid_type.stereographic.pc_flag;
       if(c & 128) parity = -1; // South Pole
       else        parity = 1;  // North Pole
-      st_data.p1_deg = (double) 60.0*parity;
+      st_data.scale_lat = (double) 60.0*parity;
 
       // Latitude of first point
-      st_data.p0_deg = decode_lat_lon(r.gds->grid_type.stereographic.lat1, 3);
+      st_data.lat_pin = decode_lat_lon(r.gds->grid_type.stereographic.lat1, 3);
 
       // Longitude of first point
-      st_data.l0_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.stereographic.lon1, 3));
+      st_data.lon_pin = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.stereographic.lon1, 3));
+
+      // "pin" this point to the lower-left corner of the grid
+      st_data.x_pin = 0.0;
+      st_data.y_pin = 0.0;
 
       // Center longitude
-      st_data.lcen_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.stereographic.lov, 3));
+      st_data.lcen = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.stereographic.lov, 3));
 
       // Grid spacing in km (given in the GRIB file in m)
       st_data.d_km = (double) char3_to_int(r.gds->grid_type.stereographic.dx)/1000.0;
