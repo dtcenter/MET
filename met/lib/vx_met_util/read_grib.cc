@@ -1101,7 +1101,7 @@ void read_gds(GribRecord &r, Grid &gr, int &xdir, int &ydir, int &order) {
    // Structures to store projection info
    LambertData       lc_data;
    StereographicData st_data;
-   PlateCarreeData   pc_data;
+   LatLonData        pc_data;
    MercatorData      mc_data;
 
    //
