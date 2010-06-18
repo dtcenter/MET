@@ -34,7 +34,9 @@ OBJECTS  =  ascii_table.o \
 	substring.o \
 	thresh_array.o \
 	threshold.o \
-	vx_endian.o
+	vx_endian.o  \
+	fix_float.o  \
+
 
 OPT_FLAGS=
 
@@ -119,6 +121,9 @@ threshold.o: threshold.cc
 
 vx_endian.o: vx_endian.cc
 	$(CXX) vx_endian.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(LIB_DIR)
+
+fix_float.o: fix_float.cc fix_float.h
+	$(CXX) fix_float.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(LIB_DIR)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)

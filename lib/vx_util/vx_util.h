@@ -37,6 +37,7 @@
 #include "vx_util/threshold.h"
 #include "vx_util/thresh_array.h"
 #include "vx_util/memory.h"
+#include "vx_util/fix_float.h"
 
 
 ////////////////////////////////////////////////////////////////////////
