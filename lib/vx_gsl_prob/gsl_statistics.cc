@@ -24,18 +24,20 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 double stats_lag1_autocorrelation(const NumArray &na) {
-   double auto_corr;
-   double *tmp;
-   int i;
+   double corr;
+   double *src;
+   int n, i;
 
-   tmp = new double [na.n_elements()];
+   n   = na.n_elements();
+   src = new double [n];
 
-   for(i=0; i<na.n_elements(); i++) tmp[i] = na[i];
+   for(i=0; i<n; i++) src[i] = na[i];
 
-   auto_corr = gsl_stats_lag1_autocorrelation(tmp, sizeof(double),
-                                              na.n_elements());
+   corr = gsl_stats_lag1_autocorrelation(src, 1, n);
 
-   return(auto_corr);
+   if(src) { delete [] src; src = (double *) 0; }
+
+   return(corr);
 }
 
 ////////////////////////////////////////////////////////////////////////
