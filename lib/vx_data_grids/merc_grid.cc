@@ -114,8 +114,8 @@ Lon_LL_radians = lll/deg_per_rad;
 Lat_UR_radians = (data.lat_ur_deg)/deg_per_rad;
 Lon_UR_radians = lur/deg_per_rad;
 
-Nx = data.Nx;
-Ny = data.Ny;
+Nx = data.nx;
+Ny = data.ny;
 
 Name = data.name;
 
