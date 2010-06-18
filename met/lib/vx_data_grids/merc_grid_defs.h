@@ -30,8 +30,8 @@ struct MercatorData {
    // double delta_i;
    // double delta_j;
 
-   int Nx;
-   int Ny;
+   int nx;
+   int ny;
 
 };
 
