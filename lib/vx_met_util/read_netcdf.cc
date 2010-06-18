@@ -27,7 +27,7 @@ void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
    // Structures to store projection info
    LambertData       lc_data;
    StereographicData st_data;
-   PlateCarreeData   pc_data;
+   LatLonData        pc_data;
    MercatorData      mc_data;
 
    //
