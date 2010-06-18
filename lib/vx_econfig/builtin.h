@@ -96,7 +96,7 @@ typedef double (*dfunc_2) (double, double);
 
 struct BuiltinInfo {
 
-   char * name;
+   const char * name;
 
    int n_vars;   //  1 or 2
 
