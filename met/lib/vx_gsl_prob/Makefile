@@ -17,6 +17,7 @@ TARGETS  = libvx_gsl_prob.a
 OBJECTS  = gsl_cdf.o \
 	gsl_bvn.o \
 	gsl_randist.o \
+	gsl_statistics.o \
 	gsl_wavelet2d.o
 
 OPT_FLAGS=
@@ -48,6 +49,9 @@ gsl_bvn.o: gsl_bvn.cc
 
 gsl_randist.o: gsl_randist.cc
 	$(CXX) gsl_randist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
+
+gsl_statistics.o: gsl_statistics.cc
+	$(CXX) gsl_statistics.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
 
 gsl_wavelet2d.o: gsl_wavelet2d.cc
 	$(CXX) gsl_wavelet2d.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
