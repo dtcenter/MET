@@ -1476,7 +1476,7 @@ void get_level_info(const GribRecord &r, int &l1, int &l2) {
 int is_grid_relative(const GribRecord &r) {
    unsigned char res_flag;
 
-   // LatLonGrid
+   // LatLon
    if(r.gds->type == 0) {
       res_flag = r.gds->grid_type.latlon_grid.res_flag;
    }

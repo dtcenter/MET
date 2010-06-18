@@ -141,7 +141,7 @@ struct Section1_Header {                     //    PDS
 ////////////////////////////////////////////////////////////////////////
 
 
-struct LatLonGrid {                          //   Latitude/Longitude Grid
+struct LatLon {                          //   Latitude/Longitude Grid
 
    unsigned char         lat1[3];            //   11 - 13
    unsigned char         lon1[3];            //   14 - 16
@@ -229,7 +229,7 @@ struct Stereographic {
 
 union GridType {
 
-   struct LatLonGrid    latlon_grid;         //   Latitude/Longitude Grid
+   struct LatLon        latlon_grid;         //   Latitude/Longitude Grid
    struct Mercator      mercator;            //   Mercator Grid
    struct LambertConf   lambert_conf;        //   Lambert Conformal Secant Grid
    struct Stereographic stereographic;       //   Stereographic Grid
