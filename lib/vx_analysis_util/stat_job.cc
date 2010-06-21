@@ -169,6 +169,7 @@ void STATAnalysisJob::clear() {
    set_boot_rng (default_boot_rng);
    set_boot_seed(default_boot_seed);
    rank_corr_flag = default_rank_corr_flag;
+   vif_flag       = default_vif_flag;
 
    poly_mask.clear();
 
@@ -241,6 +242,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    n_boot_rep       = aj.n_boot_rep;
 
    rank_corr_flag   = aj.rank_corr_flag;
+   vif_flag         = aj.vif_flag;
 
    set_dump_row (aj.dump_row);
    set_column   (aj.column);
@@ -407,6 +409,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "rank_corr_flag = " << prefix
        << rank_corr_flag << "\n";
+
+   out << prefix << "vif_flag = " << prefix
+       << vif_flag << "\n";
 
    out.flush();
 
@@ -1069,6 +1074,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          rank_corr_flag = atoi(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-vif_flag") == 0) {
+         vif_flag = atoi(jc_array[i+1]);
+         i++;
+      }
       else {
          cerr << "\n\nERROR: parse_job_command() -> "
               << "unrecognized switch \"" << jc_array[i]
@@ -1504,6 +1513,13 @@ void STATAnalysisJob::get_jobstring(char *js) {
 
       // rank_corr_flag
       sprintf(js, "%s -rank_corr_flag %i", js, rank_corr_flag);
+   }
+
+   // Variance inflation factor for time series
+   if(vif_flag) {
+
+      // vif_flag
+      sprintf(js, "%s -vif_flag %i", js, vif_flag);
    }
 
    return;

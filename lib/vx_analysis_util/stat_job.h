@@ -36,6 +36,7 @@ static const int    default_n_boot_rep     = 1000;
 static const char   default_boot_rng[]     = "mt19937";
 static const char   default_boot_seed[]    = "";
 static const int    default_rank_corr_flag = 1;
+static const int    default_vif_flag       = 0;
 static const char   default_tmp_dir[]      = "/tmp";
 
 ////////////////////////////////////////////////////////////////////////
@@ -224,6 +225,11 @@ class STATAnalysisJob {
       // Rank correlation flag
       //
       int rank_corr_flag;
+
+      //
+      // Variance Inflation Factor flag
+      //
+      int vif_flag;
 
       void process_mask_grid();
       void process_mask_poly();
