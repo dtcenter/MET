@@ -509,7 +509,7 @@ double LambertGrid::rot_grid_to_earth(int x, int y) const
 
 {
 
-double latg, lon, angle;
+double lat, lon, angle;
 double diff, hemi;
 
 // Convert to lat/lon
