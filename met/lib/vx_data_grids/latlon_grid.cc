@@ -264,7 +264,7 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-double PlateCarreeGrid::rot_grid_to_earth(int x, int y) const
+double LatLonGrid::rot_grid_to_earth(int x, int y) const
 
 {
 
