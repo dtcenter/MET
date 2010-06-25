@@ -34,6 +34,8 @@
 //   005    12/23/09  Halley Gotway  Call the library read_pds routine.
 //   006    05/21/10  Halley Gotway  Enhance to search multiple
 //                    -pcp_dir directory arguments.
+//   007    06/25/10  Halley Gotway  Allow times to be specified in
+//                    HH[MMSS] and YYYYMMDD[_HH[MMSS]] format.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -227,18 +229,6 @@ void process_sum_args(int argc, char **argv, int i_args) {
    }
 
    //
-   // Check for the expected YYYYMMDD_HHMMSS time format
-   //
-   if(check_reg_exp(yyyymmdd_hhmmss_reg_exp, argv[i_args])   != true ||
-      check_reg_exp(yyyymmdd_hhmmss_reg_exp, argv[i_args+2]) != true) {
-      cerr << "\n\nERROR: process_sum_args() -> "
-           << "The init_time and valid_time command line arguments "
-           << "must be in the form YYYYMMDD_HHMMSS\n\n" << flush;
-      usage(argc, argv);
-      exit(1);
-   }
-
-   //
    // Parse the sum arguments
    //
 
@@ -249,13 +239,13 @@ void process_sum_args(int argc, char **argv, int i_args) {
       init_time = (unixtime) 0;
    }
    else {
-      init_time = yyyymmdd_hhmmss_to_unix(argv[i_args]);
+      init_time = timestring_to_unix(argv[i_args]);
    }
 
    //
    // Input accumulation
    //
-   in_accum = atof(argv[i_args+1])*sec_per_hour;
+   in_accum = timestring_to_sec(argv[i_args+1]);
 
    //
    // Valid time
@@ -264,13 +254,13 @@ void process_sum_args(int argc, char **argv, int i_args) {
       valid_time = (unixtime) 0;
    }
    else {
-      valid_time = yyyymmdd_hhmmss_to_unix(argv[i_args+2]);
+      valid_time = timestring_to_unix(argv[i_args+2]);
    }
 
    //
    // Output accumulation
    //
-   out_accum = atof(argv[i_args+3])*sec_per_hour;
+   out_accum = timestring_to_sec(argv[i_args+3]);
 
    //
    // Out file
@@ -321,7 +311,7 @@ void process_add_subtract_args(int argc, char **argv, int i_args) {
    //
    // Input accumulation 1
    //
-   accum1 = atof(argv[i_args+1])*sec_per_hour;
+   accum1 = timestring_to_sec(argv[i_args+1]);
 
    //
    // Input file 2
@@ -331,7 +321,7 @@ void process_add_subtract_args(int argc, char **argv, int i_args) {
    //
    // Input accumulation 2
    //
-   accum2 = atof(argv[i_args+3])*sec_per_hour;
+   accum2 = timestring_to_sec(argv[i_args+3]);
 
    //
    // Out file
@@ -1139,17 +1129,17 @@ void usage(int argc, char *argv[]) {
         << "\t\t[-pcprx reg_exp]\n\n"
 
         << "\t\twhere\t\"init_time\" indicates the initialization "
-        << "time of the input Grib files in YYYYMMDD_HHMMSS format "
+        << "time of the input GRIB files in YYYYMMDD[_HH[MMSS]] format "
         << "(required).\n"
 
         << "\t\t\t\"in_accum\" indicates the accumulation interval "
-        << "of the input Grib files in HH format (required).\n"
+        << "of the input GRIB files in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"valid_time\" indicates the desired valid "
-        << "time in YYYYMMDD_HHMMSS format (required).\n"
+        << "time in YYYYMMDD[_HH[MMSS]] format (required).\n"
 
         << "\t\t\t\"out_accum\" indicates the desired accumulation "
-        << "interval for the output NetCDF file in HH format (required).\n"
+        << "interval for the output NetCDF file in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
         << "be written consisting of the sum of the accumulation intervals "
@@ -1172,17 +1162,17 @@ void usage(int argc, char *argv[]) {
         << "\t\taccum2\n"
         << "\t\tout_file\n\n"
 
-        << "\t\twhere\t\"in_file1\" indicates the name of the first input Grib "
+        << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
         << "file to be used (required).\n"
 
         << "\t\t\t\"accum1\" indicates the accumulation interval "
-        << "to be used from in_file1 in HH format (required).\n"
+        << "to be used from in_file1 in HH[MMSS] format (required).\n"
 
-        << "\t\t\t\"in_file2\" indicates the name of the second input Grib "
+        << "\t\t\t\"in_file2\" indicates the name of the second input GRIB "
         << "file to be added to or subtracted from in_file1 (required).\n"
 
         << "\t\t\t\"accum2\" indicates the accumulation interval "
-        << "to be used from in_file2 in HH format (required).\n"
+        << "to be used from in_file2 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
         << "be written (required).\n"
