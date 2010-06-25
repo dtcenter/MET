@@ -505,6 +505,37 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+double LambertGrid::rot_grid_to_earth(int x, int y) const
+
+{
+
+double latg, lon, angle;
+double diff, hemi;
+
+// Convert to lat/lon
+xy_to_latlon((double) x, (double) y, lat, lon);
+
+// Difference between lon and the center longitude
+diff = Lon_cen - lon;
+
+// Figure out if the grid is in the northern or southern hemisphere
+// by checking whether the first latitude (p1_deg -> Phi1_radians)
+// is greater than zero
+// NH -> hemi = 1, SH -> hemi = -1
+if(Lat_LL < 0.0) hemi = -1.0;
+else             hemi = 1.0;
+
+// Compute the rotation angle
+angle = diff*Cone*hemi;
+
+return(angle);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

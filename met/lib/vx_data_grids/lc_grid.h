@@ -84,6 +84,8 @@ class LambertGrid : public GridRep {
 
       ConcatString serialize() const;
 
+      double rot_grid_to_earth(int x, int y) const;
+
 };
 
 

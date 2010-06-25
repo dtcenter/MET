@@ -499,6 +499,23 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+double MercatorGrid::rot_grid_to_earth(int x, int y) const
+
+{
+
+//
+// The rotation angle from grid relative to earth relative is zero
+// for the Mercator projection
+//
+
+return ( 0.0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

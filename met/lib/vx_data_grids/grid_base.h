@@ -68,6 +68,8 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual void dump(ostream &, int = 0) const = 0;
 
+      virtual double rot_grid_to_earth(int x, int y) const = 0;
+
 };
 
 
@@ -154,6 +156,8 @@ class Grid : public GridInterface {
       ConcatString name() const;
 
       ConcatString serialize() const;
+
+      double rot_grid_to_earth(int x, int y) const;
 
 };
 
