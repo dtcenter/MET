@@ -433,6 +433,22 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+double ExpGrid::rot_grid_to_earth(int x, int y) const
+
+{
+
+cerr << "\n\n  ExpGrid::rot_grid_to_earth() -> not yet implemented\n\n";
+
+exit ( 1 );
+
+return ( 0.0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

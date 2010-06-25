@@ -346,6 +346,20 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
+double Grid::rot_grid_to_earth(int x, int y) const
+
+{
+
+if ( !rep )  return ( 0.0 );
+
+return ( rep->rot_grid_to_earth(x, y) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

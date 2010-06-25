@@ -264,6 +264,24 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+double PlateCarreeGrid::rot_grid_to_earth(int x, int y) const
+
+{
+
+//
+// The rotation angle from grid relative to earth relative is zero
+// for the PlateCarreeGrids that are defined north and east.  This may
+// need to be changed when support is added for GRIB2.
+//
+
+return ( 0.0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
