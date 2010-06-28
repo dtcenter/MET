@@ -86,8 +86,8 @@ double lur;   //  upper-right longitude
 
 clear();
 
-lll = data.lon_ll_deg;
-lur = data.lon_ur_deg;
+lll = data.lon_ll;
+lur = data.lon_ur;
 
    //
    //  reduce lll and lur to the range -180 ... 180
@@ -112,10 +112,10 @@ if ( fabs(lur - lll) < 1.0e-2 )  lur = lll + 360.0;
    //  calculate stuff
    //
 
-Lat_LL_radians = (data.lat_ll_deg)/deg_per_rad;
+Lat_LL_radians = (data.lat_ll)/deg_per_rad;
 Lon_LL_radians = lll/deg_per_rad;
 
-Lat_UR_radians = (data.lat_ur_deg)/deg_per_rad;
+Lat_UR_radians = (data.lat_ur)/deg_per_rad;
 Lon_UR_radians = lur/deg_per_rad;
 
 Nx = data.nx;
@@ -185,11 +185,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double MercatorGrid::f(double lat_deg) const
+double MercatorGrid::f(double lat) const
 
 {
 
-return ( merc_func(lat_deg/deg_per_rad) );
+return ( merc_func(lat/deg_per_rad) );
 
 }
 
@@ -197,11 +197,11 @@ return ( merc_func(lat_deg/deg_per_rad) );
 ////////////////////////////////////////////////////////////////////////
 
 
-double MercatorGrid::df(double lat_deg) const
+double MercatorGrid::df(double lat) const
 
 {
 
-return ( merc_der_func(lat_deg/deg_per_rad) );
+return ( merc_der_func(lat/deg_per_rad) );
 
 }
 
@@ -209,15 +209,15 @@ return ( merc_der_func(lat_deg/deg_per_rad) );
 ////////////////////////////////////////////////////////////////////////
 
 
-void MercatorGrid::latlon_to_xy(double lat_deg, double lon_deg, double & x, double & y) const
+void MercatorGrid::latlon_to_xy(double lat, double lon, double & x, double & y) const
 
 {
 
 double lat_rad, lon_rad;
 double u, v;
 
-lat_rad = lat_deg/deg_per_rad;
-lon_rad = lon_deg/deg_per_rad;
+lat_rad = lat/deg_per_rad;
+lon_rad = lon/deg_per_rad;
 
 lon_rad += twopi*floor((Lon_LL_radians - lon_rad)/twopi);
 
@@ -235,7 +235,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MercatorGrid::xy_to_latlon(double x, double y, double & lat_deg, double & lon_deg) const
+void MercatorGrid::xy_to_latlon(double x, double y, double & lat, double & lon) const
 
 {
 
@@ -249,11 +249,11 @@ lon_rad = merc_u_to_lon(u);
 
 lat_rad = merc_inv_func(v);
 
-lat_deg = deg_per_rad*lat_rad;
+lat = deg_per_rad*lat_rad;
 
-lon_deg = deg_per_rad*lon_rad;
+lon = deg_per_rad*lon_rad;
 
-lon_deg += 360.0*floor((180.0 - lon_deg)/360.0);   //  reduce lon to range (-180, 180]
+lon += 360.0*floor((180.0 - lon)/360.0);   //  reduce lon to range (-180, 180]
 
 return;
 

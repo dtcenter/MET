@@ -25,11 +25,11 @@ struct LatLonData {
 
    const char * name;   //  not allocated
 
-   double lat_ll_deg;
-   double lon_ll_deg;
+   double lat_ll;
+   double lon_ll;
 
-   double delta_lat_deg;
-   double delta_lon_deg;
+   double delta_lat;
+   double delta_lon;
 
    int Nlat;
    int Nlon;
