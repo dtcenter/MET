@@ -21,455 +21,85 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void read_netcdf_grid(NcFile *f_in, Grid &gr, int verbosity) {
-   NcAtt *proj_att = (NcAtt *) 0;
+
+static void get_att(NcFile *, NcAtt * & att, const char * name);
+
+static void get_latlon_data        (NcFile *, LatLonData &,        int verbosity);
+static void get_lambert_data       (NcFile *, LambertData &,       int verbosity);
+static void get_stereographic_data (NcFile *, StereographicData &, int verbosity);
+static void get_mercator_data      (NcFile *, MercatorData &,      int verbosity);
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+void read_netcdf_grid(NcFile * f_in, Grid & gr, int verbosity)
+
+{
+
+NcAtt * proj_att = (NcAtt *) 0;
 
    // Structures to store projection info
    LambertData       lc_data;
    StereographicData st_data;
-   LatLonData        pc_data;
+   LatLonData        ll_data;
    MercatorData      mc_data;
 
-   //
-   // Parse the grid specification out of the global attributes
-   //
-   proj_att = f_in->get_att("Projection");
-   if(!proj_att) {
-      cerr << "\n\nERROR: read_netcdf_grid() -> "
-           << "\"Projection\" attribute not found.\n\n"
-           << flush;
-      exit(1);
-   }
+       //
+       // Parse the grid specification out of the global attributes
+       //
 
-   //
-   // Parse out the grid specification depending on the projection type
-   // The following 4 Projection types are supported:
-   //    - Lat/Lon
-   //    - Mercator
-   //    - Lambert Conformal
-   //    - Polar Stereographic
-   //
+   get_att(f_in, proj_att, "Projection");
 
-   //
-   // Latitude/Longitude Projections Grid
-   // Also called Equidistant Cylindrical or Plate Carree Projection Grid
-   //
-   if(strcmp(proj_att->as_string(0), proj_type[0]) == 0) {
+      //
+      // Parse out the grid specification depending on the projection type
+      // The following 4 Projection types are supported:
+      //    - Lat/Lon
+      //    - Mercator
+      //    - Lambert Conformal
+      //    - Polar Stereographic
+      //
 
-      if(verbosity > 3) {
-         cout << "It's a Lat/Lon (PlateCarree or Equidistant Cylindrical) grid...\n"
-              << flush;
-      }
+   if ( strcmp(proj_att->as_string(0), latlon_proj_type) == 0 )  {
 
-      // Store the grid name
-      pc_data.name = proj_type[0];
+      get_latlon_data(f_in, ll_data, verbosity);
 
-      // Latitude of the bottom left corner
-      proj_att = f_in->get_att("lat_ll_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lat_ll_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      pc_data.lat_ll_deg = atof(proj_att->as_string(0));
+      gr.set(ll_data);
 
-      // Longitude of the bottom left corner
-      proj_att = f_in->get_att("lon_ll_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lon_ll_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      pc_data.lon_ll_deg = -1.0*atof(proj_att->as_string(0));
+   } else if ( strcmp(proj_att->as_string(0), mercator_proj_type) == 0 )  {
 
-      // Latitudinal increment
-      proj_att = f_in->get_att("delta_lat_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"delta_lat_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      pc_data.delta_lat_deg = atof(proj_att->as_string(0));
+      get_mercator_data(f_in, mc_data, verbosity);
 
-      // Longitudinal increment
-      proj_att = f_in->get_att("delta_lon_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"delta_lon_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      pc_data.delta_lon_deg = atof(proj_att->as_string(0));
+      gr.set(mc_data);
 
-      // Number of points in the Latitudinal (y) direction
-      proj_att = f_in->get_att("Nlat");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"Nlat\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      pc_data.Nlat = atoi(proj_att->as_string(0));
+   } else if ( strcmp(proj_att->as_string(0), lambert_proj_type) == 0 )  {
 
-      // Number of points in the Longitudinal (x) direction
-      proj_att = f_in->get_att("Nlon");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"Nlon\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      pc_data.Nlon = atoi(proj_att->as_string(0));
+      get_lambert_data(f_in, lc_data, verbosity);
 
-      Grid pcp_grid(pc_data);
-      gr = pcp_grid;
+      gr.set(lc_data);
 
-      if(verbosity > 3) {
-         cout << "Latitude/Longitude Data:\n"
-              << "lat_ll_deg = " << pc_data.lat_ll_deg << "\n"
-              << "lon_ll_deg = " << pc_data.lon_ll_deg << "\n"
-              << "delta_lat_deg = " << pc_data.delta_lat_deg << "\n"
-              << "delta_lon_deg = " << pc_data.delta_lon_deg << "\n"
-              << "Nlat = " << pc_data.Nlat << "\n"
-              << "Nlon = " << pc_data.Nlon << "\n" << flush;
-      }
-   }
-   //
-   // Mercator Projection
-   //
-   else if(strcmp(proj_att->as_string(0), proj_type[1]) == 0) {
+   } else if ( strcmp(proj_att->as_string(0), stereographic_proj_type) == 0 )  {
 
-      if(verbosity > 3) {
-         cout << "It's a Mercator grid...\n" << flush;
-      }
+      get_stereographic_data(f_in, st_data, verbosity);
 
-      // Store the grid name
-      mc_data.name = proj_type[0];
+      gr.set(st_data);
 
-      // Latitude of the bottom left corner
-      proj_att = f_in->get_att("lat_ll_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lat_ll_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      mc_data.lat_ll_deg = atof(proj_att->as_string(0));
+   } else {   // Unsupported projection type
 
-      // Longitude of the bottom left corner
-      proj_att = f_in->get_att("lon_ll_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lon_ll_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      mc_data.lon_ll_deg = -1.0*atof(proj_att->as_string(0));
-
-      // Latitude of the bottom left corner
-      proj_att = f_in->get_att("lat_ur_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lat_ur_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      mc_data.lat_ur_deg = atof(proj_att->as_string(0));
-
-      // Longitude of the bottom left corner
-      proj_att = f_in->get_att("lon_ur_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lon_ur_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      mc_data.lon_ur_deg = -1.0*atof(proj_att->as_string(0));
-
-      // Number of points in the Latitudinal (y) direction
-      proj_att = f_in->get_att("Nlat");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"Nlat\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      mc_data.ny = atoi(proj_att->as_string(0));
-
-      // Number of points in the Longitudinal (x) direction
-      proj_att = f_in->get_att("Nlon");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"Nlon\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      mc_data.nx = atoi(proj_att->as_string(0));
-
-      Grid pcp_grid(mc_data);
-      gr = pcp_grid;
-
-      if(verbosity > 3) {
-         cout << "Mercator Data:\n"
-              << "lat_ll_deg = " << mc_data.lat_ll_deg << "\n"
-              << "lon_ll_deg = " << mc_data.lon_ll_deg << "\n"
-              << "lat_ur_deg = " << mc_data.lat_ur_deg << "\n"
-              << "lon_ur_deg = " << mc_data.lon_ur_deg << "\n"
-              << "ny = " << mc_data.ny << "\n"
-              << "nx = " << mc_data.nx << "\n" << flush;
-      }
-   }
-   //
-   // Lambert Conformal Projection
-   //
-   else if(strcmp(proj_att->as_string(0), proj_type[2]) == 0) {
-
-      if(verbosity > 3) {
-         cout << "It's a Lambert Conformal grid...\n" << flush;
-      }
-
-      // Store the grid name
-      lc_data.name = proj_type[2];
-
-      // First scale latitude
-      proj_att = f_in->get_att("p1_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"p1_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.scale_lat_1 = atof(proj_att->as_string(0));
-
-      // Second scale latitude
-      proj_att = f_in->get_att("p2_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"p2_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.scale_lat_2 = atof(proj_att->as_string(0));
-
-      // Latitude of first point
-      proj_att = f_in->get_att("p0_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"p0_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.lat_pin = atof(proj_att->as_string(0));
-
-      // Longitude of first point
-      proj_att = f_in->get_att("l0_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"l0_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.lon_pin = -1.0*atof(proj_att->as_string(0));
-
-      //  pin this point to the lower_left corner of the grid
-      lc_data.x_pin = 0.0;
-      lc_data.y_pin = 0.0;
-
-      // Center longitude
-      proj_att = f_in->get_att("lcen_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lcen_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.lcen = -1.0*atof(proj_att->as_string(0));
-
-      // Grid spacing in km
-      proj_att = f_in->get_att("d_km");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"d_km\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.d_km = atof(proj_att->as_string(0));
-
-      // Radius of the earth
-      proj_att = f_in->get_att("r_km");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"r_km\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.r_km = atof(proj_att->as_string(0));
-
-      // Number of points in the x-direction
-      proj_att = f_in->get_att("nx");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"nx\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.nx = atoi(proj_att->as_string(0));
-
-      // Number of points in the y-direction
-      proj_att = f_in->get_att("ny");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"ny\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      lc_data.ny = atoi(proj_att->as_string(0));
-
-      Grid pcp_grid(lc_data);
-      gr = pcp_grid;
-
-      if(verbosity > 3) {
-         cout << "Lambert Conformal Data:\n"
-              << "scale_lat_1 = " << lc_data.scale_lat_1 << "\n"
-              << "scale_lat_2 = " << lc_data.scale_lat_2 << "\n"
-              << "lat_pin = " << lc_data.lat_pin << "\n"
-              << "lon_pin = " << lc_data.lon_pin << "\n"
-              << "x_pin = " << lc_data.x_pin << "\n"
-              << "y_pin = " << lc_data.y_pin << "\n"
-              << "lcen = " << lc_data.lcen << "\n"
-              << "d_km = " << lc_data.d_km << "\n"
-              << "r_km = " << lc_data.r_km << "\n"
-              << "nx = " << lc_data.nx << "\n"
-              << "ny = " << lc_data.ny << "\n" << flush;
-      }
-   }
-   //
-   // Polar Stereographic Projection
-   //
-   else if(strcmp(proj_att->as_string(0), proj_type[3]) == 0) {
-     if(verbosity > 3) {
-         cout << "It's a Polar Stereographic grid...\n" << flush;
-      }
-
-      // Store the grid name
-      st_data.name = proj_type[3];
-
-      // Scale latitude
-      proj_att = f_in->get_att("p1_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"p1_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.scale_lat = atof(proj_att->as_string(0));
-
-      // Latitude of first point
-      proj_att = f_in->get_att("p0_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"p0_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.lat_pin = atof(proj_att->as_string(0));
-
-      // Longitude of first point
-      proj_att = f_in->get_att("l0_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"l0_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.lon_pin = -1.0*atof(proj_att->as_string(0));
-
-      //  pin this point to the lower_left corner of the grid
-      st_data.x_pin = 0.0;
-      st_data.y_pin = 0.0;
-
-      // Center longitude
-      proj_att = f_in->get_att("lcen_deg");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"lcen_deg\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.lcen = -1.0*atof(proj_att->as_string(0));
-
-      // Grid spacing in km
-      proj_att = f_in->get_att("d_km");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"d_km\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.d_km = atof(proj_att->as_string(0));
-
-      // Radius of the earth
-      proj_att = f_in->get_att("r_km");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"r_km\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.r_km = atof(proj_att->as_string(0));
-
-      // Number of points in the x-direction
-      proj_att = f_in->get_att("nx");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"nx\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.nx = atoi(proj_att->as_string(0));
-
-      // Number of points in the y-direction
-      proj_att = f_in->get_att("ny");
-      if(!proj_att) {
-         cerr << "\n\nERROR: read_netcdf_grid() -> "
-              << "\"ny\" attribute not found.\n\n"
-              << flush;
-         exit(1);
-      }
-      st_data.ny = atoi(proj_att->as_string(0));
-
-      Grid pcp_grid(st_data);
-      gr = pcp_grid;
-
-      if(verbosity > 3) {
-         cout << "Stereographic Data:\n"
-              << "scale_lat = " << st_data.scale_lat << "\n"
-              << "lat_pin = " << st_data.lat_pin << "\n"
-              << "lon_pin = " << st_data.lon_pin << "\n"
-              << "x_pin = " << st_data.x_pin << "\n"
-              << "y_pin = " << st_data.y_pin << "\n"
-              << "lcen = " << st_data.lcen << "\n"
-              << "d_km = " << st_data.d_km << "\n"
-              << "r_km = " << st_data.r_km << "\n"
-              << "nx = " << st_data.nx << "\n"
-              << "ny = " << st_data.ny << "\n" << flush;
-      }
-   }
-   //
-   // Unsupported projection type
-   //
-   else {
       cerr << "\n\nERROR: read_netcdf_grid() -> "
            << "Projection type " << proj_att->as_string(0)
            << " not currently supported.\n\n"
            << flush;
+
       exit(1);
+
    }
 
-   return;
+   //
+   //  done
+   //
+
+return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -682,3 +312,347 @@ int has_variable(NcFile *f_in, const char *var_name) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+void get_att(NcFile * ncfile, NcAtt * & att, const char * name)
+
+{
+
+att = ncfile->get_att(name);
+
+if ( !att )  {
+
+   cerr << "\n\nERROR: get_att() -> \"" << name << "\" attribute not found.\n\n" << flush;
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_latlon_data(NcFile * ncfile, LatLonData & data, int verbosity)
+
+{
+
+NcAtt * att = (NcAtt *) 0;
+
+if ( verbosity > 3 )  {
+
+   cout << "It's a Lat/Lon (PlateCarree or Equidistant Cylindrical) grid...\n" << flush;
+
+}
+
+   // Store the grid name
+data.name = latlon_proj_type;
+
+   // Latitude of the bottom left corner
+get_att(ncfile, att, "lat_ll");
+data.lat_ll = atof(att->as_string(0));
+
+   // Longitude of the bottom left corner
+get_att(ncfile, att, "lon_ll");
+data.lon_ll = atof(att->as_string(0));
+data.lon_ll *= -1.0;
+
+   // Latitude increment
+get_att(ncfile, att, "delta_lat");
+data.delta_lat = atof(att->as_string(0));
+
+   // Longitude increment
+get_att(ncfile, att, "delta_lon");
+data.delta_lon = atof(att->as_string(0));
+
+   // Number of points in the Latitude (y) direction
+get_att(ncfile, att, "Nlat");
+data.Nlat = atoi(att->as_string(0));
+
+   // Number of points in the Longitudinal (x) direction
+get_att(ncfile, att, "Nlon");
+data.Nlon = atoi(att->as_string(0));
+
+
+
+if ( verbosity > 3 )  {
+
+   cout << "Latitude/Longitude Grid Data:\n"
+        << "lat_ll = " << data.lat_ll << "\n"
+        << "lon_ll = " << data.lon_ll << "\n"
+        << "delta_lat = " << data.delta_lat << "\n"
+        << "delta_lon = " << data.delta_lon << "\n"
+        << "Nlat = " << data.Nlat << "\n"
+        << "Nlon = " << data.Nlon << "\n" << flush;
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_lambert_data(NcFile * ncfile, LambertData & data, int verbosity)
+
+{
+
+NcAtt * att = (NcAtt *) 0;
+
+if ( verbosity > 3 )  {
+
+   cout << "It's a Lambert Conformal grid...\n" << flush;
+
+}
+
+   // Store the grid name
+data.name = lambert_proj_type;
+
+   // First scale latitude
+get_att(ncfile, att, "scale_lat_1");
+data.scale_lat_1 = atof(att->as_string(0));
+
+   // Second scale latitude
+get_att(ncfile, att, "scale_lat_2");
+data.scale_lat_2 = atof(att->as_string(0));
+
+   // Latitude pin
+get_att(ncfile, att, "lat_pin");
+data.lat_pin = atof(att->as_string(0));
+
+   // Longitude pin
+get_att(ncfile, att, "lon_pin");
+data.lon_pin = atof(att->as_string(0));
+data.lon_pin *= -1.0;
+
+   // X pin
+get_att(ncfile, att, "x_pin");
+data.x_pin = atof(att->as_string(0));
+
+   // Y pin
+get_att(ncfile, att, "y_pin");
+data.y_pin = atof(att->as_string(0));
+
+   // Orientation longitude
+get_att(ncfile, att, "lon_orient");
+data.lcen = atof(att->as_string(0));
+data.lcen *= -1.0;
+
+   // Grid spacing in km
+get_att(ncfile, att, "d_km");
+data.d_km = atof(att->as_string(0));
+
+   // Radius of the earth
+get_att(ncfile, att, "r_km");
+data.r_km = atof(att->as_string(0));
+
+   // Number of points in the x-direction
+get_att(ncfile, att, "nx");
+data.nx = atoi(att->as_string(0));
+
+   // Number of points in the y-direction
+get_att(ncfile, att, "ny");
+data.ny = atoi(att->as_string(0));
+
+
+
+if(verbosity > 3) {
+
+   cout << "Lambert Conformal Grid Data:\n"
+        << "scale_lat_1 = " << data.scale_lat_1 << "\n"
+        << "scale_lat_2 = " << data.scale_lat_2 << "\n"
+        << "lat_pin = " << data.lat_pin << "\n"
+        << "lon_pin = " << data.lon_pin << "\n"
+        << "x_pin = " << data.x_pin << "\n"
+        << "y_pin = " << data.y_pin << "\n"
+        << "lcen = " << data.lcen << "\n"
+        << "d_km = " << data.d_km << "\n"
+        << "r_km = " << data.r_km << "\n"
+        << "nx = " << data.nx << "\n"
+        << "ny = " << data.ny << "\n" << flush;
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_stereographic_data(NcFile * ncfile, StereographicData & data, int verbosity)
+
+{
+
+NcAtt * att = (NcAtt *) 0;
+const char * c = (const cahr *) 0;
+
+
+if ( verbosity > 3 )  {
+
+   cout << "It's a Polar Stereographic grid...\n" << flush;
+
+}
+
+   // Store the grid name
+data.name = stereographic_proj_type;
+
+
+   // Hemisphere
+get_att(ncfile, att, "hemisphere");
+c = att->as_string(0);
+data.hemisphere = *c;
+
+   // Scale latitude
+get_att(ncfile, att, "scale_lat");
+data.scale_lat = atof(att->as_string(0));
+
+   // Latitude pin
+get_att(ncfile, att, "lat_pin");
+data.lat_pin = atof(att->as_string(0));
+
+   // Longitude pin
+get_att(ncfile, att, "lon_pin");
+data.lon_pin = atof(att->as_string(0));
+data.lon_pin *= -1.0;
+
+   // X pin
+get_att(ncfile, att, "x_pin");
+data.x_pin = atof(att->as_string(0));
+
+   // Y pin
+get_att(ncfile, att, "y_pin");
+data.y_pin = atof(att->as_string(0));
+
+   // Orientation longitude
+get_att(ncfile, att, "lon_orient");
+data.lon_orient = atof(att->as_string(0));
+data.lon_orient *= -1.0;
+
+   // Grid spacing in km
+get_att(ncfile, att, "d_km");
+data.d_km = atof(att->as_string(0));
+
+   // Radius of the earth
+get_att(ncfile, att, "r_km");
+data.r_km = atof(att->as_string(0));
+
+   // Number of points in the x-direction
+get_att(ncfile, att, "nx");
+data.nx = atoi(att->as_string(0));
+
+   // Number of points in the y-direction
+get_att(ncfile, att, "ny");
+data.ny = atoi(att->as_string(0));
+
+
+
+if ( verbosity > 3 )  {
+
+   cout << "Stereographic Grid Data:\n"
+        << "hemisphere = " << data.hemisphere << "\n"
+        << "scale_lat = " << data.scale_lat << "\n"
+        << "lat_pin = " << data.lat_pin << "\n"
+        << "lon_pin = " << data.lon_pin << "\n"
+        << "x_pin = " << data.x_pin << "\n"
+        << "y_pin = " << data.y_pin << "\n"
+        << "lcen = " << data.lcen << "\n"
+        << "d_km = " << data.d_km << "\n"
+        << "r_km = " << data.r_km << "\n"
+        << "nx = " << data.nx << "\n"
+        << "ny = " << data.ny << "\n" << flush;
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_mercator_data(NcFile * ncfile, MercatorData & data, int verbosity)
+
+{
+
+NcAtt * att = (NcAtt *) 0;
+
+if ( verbosity > 3 )  {
+
+   cout << "It's a Mercator grid...\n" << flush;
+
+}
+
+   // Store the grid name
+data.name = mercator_proj_type;
+
+   // Latitude of the bottom left corner
+get_att(ncfile, att, "lat_ll");
+data.lat_ll = atof(att->as_string(0));
+
+   // Longitude of the bottom left corner
+get_att(ncfile, att, "lon_ll");
+data.lon_ll = atof(att->as_string(0));
+data.lon_ll *= -1.0;
+
+   // Latitude of the bottom left corner
+get_att(ncfile, att, "lat_ur");
+data.lat_ur = atof(att->as_string(0));
+
+   // Longitude of the bottom left corner
+get_att(ncfile, att, "lon_ur");
+data.lon_ur = atof(att->as_string(0));
+data.lon_ur *= -1.0;
+
+   // Number of points in the Latitudinal (y) direction
+get_att(ncfile, att, "ny");
+data.ny = atoi(att->as_string(0));
+
+   // Number of points in the Longitudinal (x) direction
+get_att(ncfile, att, "nx");
+data.nx = atoi(att->as_string(0));
+
+
+if ( verbosity > 3 )  {
+
+   cout << "Mercator Data:\n"
+        << "lat_ll = " << data.lat_ll << "\n"
+        << "lon_ll = " << data.lon_ll << "\n"
+        << "lat_ur = " << data.lat_ur << "\n"
+        << "lon_ur = " << data.lon_ur << "\n"
+        << "ny = " << data.ny << "\n"
+        << "nx = " << data.nx << "\n" << flush;
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
