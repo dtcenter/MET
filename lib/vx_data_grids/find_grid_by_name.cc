@@ -242,7 +242,6 @@ if ( i.lc )  { g.set( *(i.lc) );  status = true; }
 if ( i.st )  { g.set( *(i.st) );  status = true; }
 if ( i.ll )  { g.set( *(i.ll) );  status = true; }
 if ( i.m  )  { g.set( *(i.m)  );  status = true; }
-if ( i.e  )  { g.set( *(i.e)  );  status = true; }
 
 return ( status );
 
