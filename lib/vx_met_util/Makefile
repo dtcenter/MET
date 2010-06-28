@@ -20,13 +20,13 @@ OBJECTS  = apply_mask.o        \
            file_type.o         \
            met_stats.o         \
            pair_data.o         \
-           read_grib.o         \
+           grid_output.o       \
            read_netcdf.o       \
+           read_grib.o         \
            stat_columns.o      \
            stat_hdr_columns.o  \
            two_to_one.o        \
            write_netcdf.o      \
-           grid_output.o       \
 
 
 OPT_FLAGS=
