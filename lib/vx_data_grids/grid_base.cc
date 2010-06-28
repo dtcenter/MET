@@ -137,7 +137,6 @@ if ( info.lc )  set( *(info.lc) );
 if ( info.st )  set( *(info.st) );
 if ( info.ll )  set( *(info.ll) );
 if ( info.m  )  set( *(info.m ) );
-if ( info.e  )  set( *(info.e ) );
 
 return;
 
@@ -157,7 +156,6 @@ if ( lc ) ++count;
 if ( st ) ++count;
 if ( ll ) ++count;
 if ( m  ) ++count;
-if ( e  ) ++count;
 
 return ( count == 1 );
 
@@ -183,7 +181,6 @@ if ( !(ok()) )  {
 else if ( st )  g.set( *st );
 else if ( ll )  g.set( *ll );
 else if ( m  )  g.set( *m  );
-else if ( e  )  g.set( *e  );
 
 return;
 
