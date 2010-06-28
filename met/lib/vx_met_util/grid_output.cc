@@ -21,7 +21,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "grid_output.h"
+#include "vx_met_util/grid_output.h"
 
 
 ////////////////////////////////////////////////////////////////////////
