@@ -71,9 +71,9 @@ Name.clear();
 
 Nx = Ny = 0;
 
-lat_ll_deg = lon_ll_deg = 0.0;
+lat_ll = lon_ll = 0.0;
 
-delta_lat_deg = delta_lon_deg = 0.0;
+delta_lat = delta_lon = 0.0;
 
 memset(&Data, 0, sizeof(Data));
 
@@ -91,11 +91,11 @@ LatLonGrid::LatLonGrid(const LatLonData & data)
 
 clear();
 
-lat_ll_deg = data.lat_ll_deg;
-lon_ll_deg = data.lon_ll_deg;
+lat_ll = data.lat_ll;
+lon_ll = data.lon_ll;
 
-delta_lat_deg = data.delta_lat_deg;
-delta_lon_deg = data.delta_lon_deg;
+delta_lat = data.delta_lat;
+delta_lon = data.delta_lon;
 
 Nx = data.Nlon;
 
@@ -111,13 +111,13 @@ Data = data;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::latlon_to_xy(double lat_deg, double lon_deg, double &x, double &y) const
+void LatLonGrid::latlon_to_xy(double lat, double lon, double &x, double &y) const
 
 {
 
-y = (lat_deg - lat_ll_deg)/delta_lat_deg;
+y = (lat - lat_ll)/delta_lat;
 
-x = (lon_ll_deg - lon_deg)/delta_lon_deg;
+x = (lon_ll - lon)/delta_lon;
 
 return;
 
@@ -127,13 +127,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::xy_to_latlon(double x, double y, double &lat_deg, double &lon_deg) const
+void LatLonGrid::xy_to_latlon(double x, double y, double &lat, double &lon) const
 
 {
 
-lat_deg = lat_ll_deg + delta_lat_deg*y;
+lat = lat_ll + delta_lat*y;
 
-lon_deg = lon_ll_deg - delta_lon_deg*x;
+lon = lon_ll - delta_lon*x;
 
 return;
 
@@ -148,16 +148,16 @@ double LatLonGrid::calc_area(int x, int y) const
 {
 
 double area = 0.0;
-double lat_center_deg, lon_center_deg;
-double delta_lon_rad = delta_lon_deg/deg_per_rad;
+double lat_center, lon_center;
+double delta_lon_rad = delta_lon/deg_per_rad;
 double lat_top_rad, lat_bottom_rad;
 
 
-xy_to_latlon((double) x, (double) y, lat_center_deg, lon_center_deg);
+xy_to_latlon((double) x, (double) y, lat_center, lon_center);
 
 
-lat_top_rad    = (lat_center_deg + 0.5*delta_lat_deg)/deg_per_rad;
-lat_bottom_rad = (lat_center_deg - 0.5*delta_lat_deg)/deg_per_rad;
+lat_top_rad    = (lat_center + 0.5*delta_lat)/deg_per_rad;
+lat_bottom_rad = (lat_center - 0.5*delta_lat)/deg_per_rad;
 
 area = ( sin(lat_top_rad) - sin(lat_bottom_rad) )*delta_lon_rad;
 
@@ -221,11 +221,11 @@ else                      out << "(nul)\n";
 
 out << '\n';
 
-out << prefix << "lat_ll       = " << lat_ll_deg << "\n";
-out << prefix << "lon_ll       = " << lon_ll_deg << "\n";
+out << prefix << "lat_ll       = " << lat_ll << "\n";
+out << prefix << "lon_ll       = " << lon_ll << "\n";
 
-out << prefix << "delta_lat_ll = " << delta_lat_deg << "\n";
-out << prefix << "delta_lon_ll = " << delta_lon_deg << "\n";
+out << prefix << "delta_lat_ll = " << delta_lat << "\n";
+out << prefix << "delta_lon_ll = " << delta_lon << "\n";
 
    //
    //  done
@@ -254,11 +254,11 @@ a << "Projection: Lat/Lon";
 a << " Nx: " << Nx;
 a << " Ny: " << Ny;
 
-sprintf(junk, " lat_ll_deg: %.3f", lat_ll_deg);   a << junk;
-sprintf(junk, " lon_ll_deg: %.3f", lon_ll_deg);   a << junk;
+sprintf(junk, " lat_ll: %.3f", lat_ll);   a << junk;
+sprintf(junk, " lon_ll: %.3f", lon_ll);   a << junk;
 
-sprintf(junk, " delta_lat_deg: %.3f", delta_lat_deg);   a << junk;
-sprintf(junk, " delta_lon_deg: %.3f", delta_lon_deg);   a << junk;
+sprintf(junk, " delta_lat: %.3f", delta_lat);   a << junk;
+sprintf(junk, " delta_lon: %.3f", delta_lon);   a << junk;
 
    //
    //  done

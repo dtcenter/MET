@@ -25,14 +25,11 @@ struct MercatorData {
 
    const char * name;
 
-   double lat_ll_deg;
-   double lon_ll_deg;
+   double lat_ll;
+   double lon_ll;
 
-   double lat_ur_deg;
-   double lon_ur_deg;
-
-   // double delta_i;
-   // double delta_j;
+   double lat_ur;
+   double lon_ur;
 
    int nx;
    int ny;
