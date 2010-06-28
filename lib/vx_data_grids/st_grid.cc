@@ -14,7 +14,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_math.h"
-#include "misc.h"
+#include "vx_util.h"
 #include "st_grid.h"
 
 

@@ -12,7 +12,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "misc.h"
+#include "vx_util.h"
 #include "grid_base.h"
 #include "find_grid_by_name.h"
 
