@@ -19,7 +19,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "grid.h"
+#include "vx_data_grids/grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
