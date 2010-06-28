@@ -13,9 +13,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math.h"
-#include "vx_util.h"
-#include "st_grid.h"
+#include "vx_math/vx_math.h"
+#include "vx_util/vx_util.h"
+#include "vx_data_grids/st_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
