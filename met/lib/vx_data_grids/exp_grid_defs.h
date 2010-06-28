@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,10 +40,37 @@ struct ExpData {
    //
 
 
+static const ExpData beijing_steps_data = { 
+
+   "beijing_steps", 
+   39.809, -116.472, 
+   50.191, 63.528, 
+   2.0, 2.0, 
+   127.0, 127.0, 
+   256, 256
+
+};
+
+
+static const ExpData beijing_bjanc_data = { 
+
+   "beijing_bjanc", 
+   37.52561, -113.6374, 
+   52.47439, 66.3653, 
+   1.0, 1.0, 
+   0.0, 0.0, 
+   500, 500
+
+};
+
+
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
 #endif   /*  __EXPONENTIAL_GRID_DEFINITIONS_H__  */
+
 
 
 ////////////////////////////////////////////////////////////////////////

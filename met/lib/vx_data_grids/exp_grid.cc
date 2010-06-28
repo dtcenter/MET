@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -19,9 +12,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/exp_grid.h"
+#include "vx_math.h"
+#include "misc.h"
+#include "exp_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -103,6 +96,8 @@ Ny = data.ny;
 
 Name = data.name;
 
+Data = data;
+
 }
 
 
@@ -122,6 +117,8 @@ x_scale = y_scale = 1.0;
 x_offset = y_offset = 0.0;
 
 Name.clear();
+
+memset(&Data, 0, sizeof(Data));
 
 }
 
@@ -426,6 +423,22 @@ sprintf(junk, " y_offset: %.3f", y_offset);   a << junk;
    //
 
 return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridInfo ExpGrid::info() const
+
+{
+
+GridInfo i;
+
+i.set(Data);
+
+return ( i );
 
 }
 

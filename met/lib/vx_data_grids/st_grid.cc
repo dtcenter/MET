@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -20,18 +13,18 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/st_grid.h"
+#include "vx_math.h"
+#include "misc.h"
+#include "st_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static double     st_func(double lat, bool is_north_hemisphere);
-static double st_der_func(double lat, bool is_north_hemisphere);
+static double     st_func (double lat, bool is_north_hemisphere);
+static double st_der_func (double lat, bool is_north_hemisphere);
 
-static double st_inv_func(double r, bool is_north_hemisphere);
+static double st_inv_func (double r, bool is_north_hemisphere);
 
 static void reduce(double & angle);
 
@@ -79,51 +72,7 @@ StereographicGrid::StereographicGrid(const StereographicData & data)
 
 clear();
 
-Lcen = data.lcen;
-
-Nx = data.nx;
-Ny = data.ny;
-
-IsNorthHemisphere = true;
-
-Name = data.name;
-
-   //
-   //  calculate Alpha
-   //
-
-Alpha = (1.0 + sind(data.scale_lat))*((data.r_km)/(data.d_km));
-
-   //
-   //  Calculate Bx, By
-   //
-
-double r0, theta0;
-
-r0 = st_func(data.lat_pin, IsNorthHemisphere);
-
-theta0 = Lcen - data.lon_pin;
-
-Bx = data.x_pin - Alpha*r0*sind(theta0);
-By = data.y_pin + Alpha*r0*cosd(theta0);
-
-   //
-   //  Done
-   //
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-StereographicGrid::StereographicGrid(const StereoType2Data & data)
-
-{
-
-clear();
-
-Lcen = data.lcen;
+Lon_orient = data.lon_orient;
 
 Nx = data.nx;
 Ny = data.ny;
@@ -134,7 +83,7 @@ switch ( data.hemisphere )  {
    case 'S':  IsNorthHemisphere = false;  break;
 
    default:
-      cerr << "\n\n  StereographicGrid::StereographicGrid(const StereoType2Data &) -> bad hemisphere ...\""
+      cerr << "\n\n  StereographicGrid::StereographicGrid(const StereographicData &) -> bad hemisphere ...\""
            << (data.hemisphere) << "\"\n\n";
       exit ( 1 );
       break;
@@ -157,41 +106,12 @@ double r0, theta0;
 
 r0 = st_func(data.lat_pin, IsNorthHemisphere);
 
-theta0 = Lcen - data.lon_pin;
+theta0 = Lon_orient - data.lon_pin;
 
 Bx = data.x_pin - Alpha*r0*sind(theta0);
 By = data.y_pin + Alpha*r0*cosd(theta0);
 
-   //
-   //  Done
-   //
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-StereographicGrid::StereographicGrid(const StereoType3Data & data)
-
-{
-
-clear();
-
-Lcen = data.lcen;
-
-Nx = data.nx;
-Ny = data.ny;
-
-Name = data.name;
-
-Alpha = data.alpha;
-
-Bx = data.bx;
-By = data.by;
-
-if ( data.hemisphere == 'N' )  IsNorthHemisphere = true;
-else                           IsNorthHemisphere = false;
+Data = data;
 
    //
    //  Done
@@ -207,7 +127,7 @@ void StereographicGrid::clear()
 
 {
 
-Lcen = 0.0;
+Lon_orient = 0.0;
 
 Bx = 0.0;
 By = 0.0;
@@ -220,6 +140,8 @@ Ny = 0;
 Name.clear();
 
 IsNorthHemisphere = true;
+
+memset(&Data, 0, sizeof(Data));
 
 return;
 
@@ -264,7 +186,7 @@ reduce(lon);
 
 r = st_func(lat, IsNorthHemisphere);
 
-theta = Lcen - lon;
+theta = Lon_orient - lon;
 
 if ( !IsNorthHemisphere )  theta = -theta;
 
@@ -299,7 +221,7 @@ else                     theta = atan2d(x, -y);   //  NOT atan2d(y, x);
 
 if ( !IsNorthHemisphere )  theta = -theta;
 
-lon = Lcen - theta;
+lon = Lon_orient - theta;
 
 reduce(lon);
 
@@ -498,9 +420,9 @@ out << prefix << "Projection = Stereographic\n";
 
 out << prefix << "Hemisphere = " << (IsNorthHemisphere ? "North" : "South") << "\n";
 
-sprintf(junk, "%.5f", Lcen);
+sprintf(junk, "%.5f", Lon_orient);
 fix_float(junk);
-out << prefix << "Lcen       = " << junk << "\n";
+out << prefix << "Lon_orient       = " << junk << "\n";
 
 sprintf(junk, "%.5f", Alpha);
 fix_float(junk);
@@ -549,7 +471,7 @@ a << " Ny: " << Ny;
 
 a << " IsNorthHemisphere: " << ( IsNorthHemisphere ? "true" : "false");
 
-sprintf(junk, " Lcen: %.3f", Lcen);   a << junk;
+sprintf(junk, " Lon_orient: %.3f", Lon_orient);   a << junk;
 
 sprintf(junk, " Bx: %.3f", Bx);   a << junk;
 sprintf(junk, " By: %.3f", By);   a << junk;
@@ -568,33 +490,36 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+GridInfo StereographicGrid::info() const
+
+{
+
+GridInfo i;
+
+i.set(Data);
+
+return ( i );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double StereographicGrid::rot_grid_to_earth(int x, int y) const
 
 {
 
 double lat, lon, angle;
-double diff, hemi;
 
-// Convert to lat/lon
+
 xy_to_latlon((double) x, (double) y, lat, lon);
 
-// Difference between lon and the center longitude
-diff = Lcen - lon;
+angle = Lon_orient - lon;
 
-// Figure out if the grid is in the northern or southern hemisphere
-// by checking whether the first latitude (p1_deg -> Phi1_radians)
-// is greater than zero
-// NH -> hemi = 1, SH -> hemi = -1
+if ( !IsNorthHemisphere )  angle = -angle;
 
-xy_to_latlon(0.0, 0.0, lat, lon);
-
-if ( lat < 0.0) hemi = -1.0;
-else            hemi = 1.0;
-
-// Compute the rotation angle
-angle = diff*hemi;
-
-return(angle);
+return ( angle );
 
 }
 
@@ -725,7 +650,7 @@ set(data);
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 Grid::Grid(const StereoType2Data & data)
 
 {
@@ -735,11 +660,11 @@ init_from_scratch();
 set(data);
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 Grid::Grid(const StereoType3Data & data)
 
 {
@@ -749,7 +674,7 @@ init_from_scratch();
 set(data);
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -779,7 +704,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void Grid::set(const StereoType2Data & data)
 
 {
@@ -801,11 +726,11 @@ rep->refCount = 1;
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void Grid::set(const StereoType3Data & data)
 
 {
@@ -827,7 +752,7 @@ rep->refCount = 1;
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 

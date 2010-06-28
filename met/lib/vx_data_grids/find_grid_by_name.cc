@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,22 +19,22 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_data_grids/grid.h"
+#include "grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  DTC lambert grids
+   //  DTC Lambert grids
    //
 
 
 static const LambertData dtc_lambert_grids [] = { 
 
-   { "DTC164", 30, 48, 20.47,  122.042, 98.8, 13.3, 6367.47, 376, 280 }, 
-   { "DTC165", 30, 48, 20.653, 121.907, 98.8, 13.3, 6367.47, 168, 280 }, 
-   { "DTC166", 30, 48, 23.114, 100.997, 98.8, 13.3, 6367.47, 208, 280 },
+   { "DTC164", 30, 48, 20.47,  122.042, 0.0, 0.0, 98.8, 13.3, 6367.47, 376, 280 }, 
+   { "DTC165", 30, 48, 20.653, 121.907, 0.0, 0.0, 98.8, 13.3, 6367.47, 168, 280 }, 
+   { "DTC166", 30, 48, 23.114, 100.997, 0.0, 0.0, 98.8, 13.3, 6367.47, 208, 280 },
 
 };
 
@@ -53,7 +46,7 @@ static const int n_dtc_lambert_grids = sizeof(dtc_lambert_grids)/sizeof(*dtc_lam
 
 
    //
-   //  Lat/Lon (PlateCarree) NCEP Grids
+   //  NCEP Lat/Lon (PlateCarree) Grids
    //
 
 
@@ -92,49 +85,62 @@ static const int n_ncep_latlon_grids = sizeof(ncep_latlon_grids)/sizeof(*ncep_la
 
 
    //
-   //  NCEP stereographic (north hemisphere) grids
+   //  NCEP Stereographic grids
    //
+
 
 static const StereographicData ncep_st_grids [] = {
 
-   { "G005", 60.0,   7.647, 133.443, 0.0, 0.0, 105.0, 190.5,    6367.47,   53,  57 },
-   { "G006", 60.0,   7.647, 133.443, 0.0, 0.0, 105.0, 190.5,    6367.47,   53,  45 },
-   { "G027", 60.0, -20.826, 125.0,   0.0, 0.0,  80.0, 381.0,    6367.47,   65,  65 },
-   { "G055", 60.0, -10.947, 154.289, 0.0, 0.0, 105.0, 254.0,    6367.47,   87,  71 },
-   { "G056", 60.0,   7.647, 133.443, 0.0, 0.0, 105.0, 127.0,    6367.47,   87,  71 },
-   { "G087", 60.0,  22.876, 120.491, 0.0, 0.0, 105.0,  68.153,  6367.47,   81,  62 },
-   { "G088", 60.0,  10.0,   128.0,   0.0, 0.0, 105.0,  15.0,    6367.47,  580, 548 },
-   { "G100", 60.0,  17.108, 129.296, 0.0, 0.0, 105.0,  91.452,  6367.47,   83,  83 },
-   { "G101", 60.0,  10.528, 137.146, 0.0, 0.0, 105.0,  91.452,  6367.47,  113,  91 },
-   { "G103", 60.0,  22.405, 121.352, 0.0, 0.0, 105.0,  91.452,  6367.47,   65,  56 },
-   { "G104", 60.0,  -0.268, 139.475, 0.0, 0.0, 105.0,  90.755,  6367.47,  147, 110 },
-   { "G105", 60.0,  17.529, 129.296, 0.0, 0.0, 105.0,  90.755,  6367.47,   83,  83 },
-   { "G106", 60.0,  17.533, 129.296, 0.0, 0.0, 105.0,  45.373,  6367.47,  165, 117 },
-   { "G107", 60.0,  23.438, 120.168, 0.0, 0.0, 105.0,  45.373,  6367.47,  120,  92 },
-   { "G201", 60.0, -20.826, 150.0,   0.0, 0.0, 105.0, 381.0,    6367.47,   65,  65 },
-   { "G202", 60.0,   7.838, 141.028, 0.0, 0.0, 105.0, 190.5,    6367.47,   65,  43 },
-   { "G203", 60.0,  19.132, 185.837, 0.0, 0.0, 150.0, 190.5,    6367.47,   45,  39 },
-   { "G205", 60.0,   0.616, 84.904,  0.0, 0.0,  60.0, 190.5,    6367.47,   45,  39 },
-   { "G207", 60.0,  42.085, 175.641, 0.0, 0.0, 150.0,  95.25,   6367.47,   49,  35 },
-   { "G213", 60.0,   7.838, 141.028, 0.0, 0.0, 105.0,  95.25,   6367.47,  129,  85 },
-   { "G214", 60.0,  42.085, 175.641, 0.0, 0.0, 150.0,  47.625,  6367.47,   97,  69 },
-   { "G216", 60.0,  30.0,   173.0,   0.0, 0.0, 135.0,  45.0,    6367.47,  139, 107 },
-   { "G217", 60.0,  30.0,   173.0,   0.0, 0.0, 135.0,  22.5,    6367.47,  277, 213 },
-   { "G223", 60.0, -20.826, 150.0,   0.0, 0.0, 105.0, 190.5,    6367.47,  129, 129 },
-   { "G240", 60.0,  23.098, 119.036, 0.0, 0.0, 105.0,   4.7625, 6367.47, 1121, 881 },
-   { "G242", 60.0,  30.0,   173.0,   0.0, 0.0, 135.0,  11.25,   6367.47,  553, 425 },
-   { "G249", 60.0,  45.4,   171.6,   0.0, 0.0, 150.0,   9.868,  6367.47,  367, 343 },
+      //
+      //  Northern Hemisphere grids
+      //
+
+   { "G005", 'N',  60.0,   7.647,  133.443, 0.0, 0.0,  105.0, 190.5,    6367.47,   53,  57 },
+   { "G006", 'N',  60.0,   7.647,  133.443, 0.0, 0.0,  105.0, 190.5,    6367.47,   53,  45 },
+   { "G027", 'N',  60.0, -20.826,  125.0,   0.0, 0.0,   80.0, 381.0,    6367.47,   65,  65 },
+   { "G055", 'N',  60.0, -10.947,  154.289, 0.0, 0.0,  105.0, 254.0,    6367.47,   87,  71 },
+   { "G056", 'N',  60.0,   7.647,  133.443, 0.0, 0.0,  105.0, 127.0,    6367.47,   87,  71 },
+   { "G087", 'N',  60.0,  22.876,  120.491, 0.0, 0.0,  105.0,  68.153,  6367.47,   81,  62 },
+   { "G088", 'N',  60.0,  10.0,    128.0,   0.0, 0.0,  105.0,  15.0,    6367.47,  580, 548 },
+   { "G100", 'N',  60.0,  17.108,  129.296, 0.0, 0.0,  105.0,  91.452,  6367.47,   83,  83 },
+   { "G101", 'N',  60.0,  10.528,  137.146, 0.0, 0.0,  105.0,  91.452,  6367.47,  113,  91 },
+   { "G103", 'N',  60.0,  22.405,  121.352, 0.0, 0.0,  105.0,  91.452,  6367.47,   65,  56 },
+   { "G104", 'N',  60.0,  -0.268,  139.475, 0.0, 0.0,  105.0,  90.755,  6367.47,  147, 110 },
+   { "G105", 'N',  60.0,  17.529,  129.296, 0.0, 0.0,  105.0,  90.755,  6367.47,   83,  83 },
+   { "G106", 'N',  60.0,  17.533,  129.296, 0.0, 0.0,  105.0,  45.373,  6367.47,  165, 117 },
+   { "G107", 'N',  60.0,  23.438,  120.168, 0.0, 0.0,  105.0,  45.373,  6367.47,  120,  92 },
+   { "G201", 'N',  60.0, -20.826,  150.0,   0.0, 0.0,  105.0, 381.0,    6367.47,   65,  65 },
+   { "G202", 'N',  60.0,   7.838,  141.028, 0.0, 0.0,  105.0, 190.5,    6367.47,   65,  43 },
+   { "G203", 'N',  60.0,  19.132,  185.837, 0.0, 0.0,  150.0, 190.5,    6367.47,   45,  39 },
+   { "G205", 'N',  60.0,   0.616,  84.904,  0.0, 0.0,   60.0, 190.5,    6367.47,   45,  39 },
+   { "G207", 'N',  60.0,  42.085,  175.641, 0.0, 0.0,  150.0,  95.25,   6367.47,   49,  35 },
+   { "G213", 'N',  60.0,   7.838,  141.028, 0.0, 0.0,  105.0,  95.25,   6367.47,  129,  85 },
+   { "G214", 'N',  60.0,  42.085,  175.641, 0.0, 0.0,  150.0,  47.625,  6367.47,   97,  69 },
+   { "G216", 'N',  60.0,  30.0,    173.0,   0.0, 0.0,  135.0,  45.0,    6367.47,  139, 107 },
+   { "G217", 'N',  60.0,  30.0,    173.0,   0.0, 0.0,  135.0,  22.5,    6367.47,  277, 213 },
+   { "G223", 'N',  60.0, -20.826,  150.0,   0.0, 0.0,  105.0, 190.5,    6367.47,  129, 129 },
+   { "G240", 'N',  60.0,  23.098,  119.036, 0.0, 0.0,  105.0,   4.7625, 6367.47, 1121, 881 },
+   { "G242", 'N',  60.0,  30.0,    173.0,   0.0, 0.0,  135.0,  11.25,   6367.47,  553, 425 },
+   { "G249", 'N',  60.0,  45.4,    171.6,   0.0, 0.0,  150.0,   9.868,  6367.47,  367, 343 },
+
+      //
+      //  Southern Hemisphere grids
+      //
+
+   { "G028", 'S', -60.0,  20.826, -145.0,   0.0, 0.0, -100.0, 381.0,    6367.47,   65,  65 }, 
+   { "G224", 'S',  60.0,  20.826, -120.0,   0.0, 0.0,  105.0, 381.0,    6367.47,   65,  65 }, 
 
 };
 
 static const int n_ncep_st_grids = sizeof(ncep_st_grids)/sizeof(*ncep_st_grids);
 
-// NOTE: Grids 28 and 224 are Polar Stereographic grids over the South Pole
-// static const StereographicData ncep_grid028_data = { "G028", -60, 20.826, -145, -100, 381, 6367.47, 65, 65 };
-// static const StereographicData ncep_grid224_data = { "G224", 60, 20.826, -120, 105, 381, 6367.47, 65, 65 };
-
 
 ////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  NCEP Lambert grids
+   //
 
 
 static const LambertData ncep_lambert_grids [] = {
@@ -172,10 +178,11 @@ static const int n_ncep_lambert_grids = sizeof(ncep_lambert_grids)/sizeof(*ncep_
 
 
    //
-   //  ncep mercator grids
+   //  NCEP Mercator grids
    //
    //    Note: Do not define NCEP Grid number 8 since it's range of longitude is 363.104, and the latlon_to_xy
    //          routine won't be well defined.
+   //
 
 
 static const MercatorData ncep_mercator_grids [] = {
@@ -194,180 +201,6 @@ static const MercatorData ncep_mercator_grids [] = {
 };
 
 static const int n_ncep_mercator_grids = sizeof(ncep_mercator_grids)/sizeof(*ncep_mercator_grids);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for class GridInfo
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-GridInfo::GridInfo()
-
-{
-
-init_from_scratch();
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-GridInfo::~GridInfo()
-
-{
-
-clear();
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-GridInfo::GridInfo(const GridInfo & info)
-
-{
-
-init_from_scratch();
-
-assign(info);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-GridInfo & GridInfo::operator=(const GridInfo & info)
-
-{
-
-if ( this == &info )  return ( * this );
-
-assign(info);
-
-return ( * this );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void GridInfo::init_from_scratch()
-
-{
-
-lc = (const LambertData *)       0;
-st = (const StereographicData *) 0;
-ll = (const LatLonData *)        0;
-m  = (const MercatorData *)      0;
-
-clear();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void GridInfo::clear()
-
-{
-
-if ( allocated )  {
-
-   if ( lc )  delete lc;
-   if ( st )  delete st;
-   if ( ll )  delete ll;
-   if ( m  )  delete m;
-
-}
-
-lc = (const LambertData *)       0;
-st = (const StereographicData *) 0;
-ll = (const LatLonData *)        0;
-m  = (const MercatorData *)      0;
-
-allocated = false;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void GridInfo::assign(const GridInfo & info)
-
-{
-
-clear();
-
-lc = info.lc;
-st = info.st;
-ll = info.ll;
-m  = info.m;
-
-allocated = false;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool GridInfo::ok() const
-
-{
-
-int count = 0;
-
-if ( lc ) ++count;
-if ( st ) ++count;
-if ( ll ) ++count;
-if ( m  ) ++count;
-
-return ( count == 1 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void GridInfo::set_grid(Grid & g) const 
-
-{
-
-if ( !(ok()) )  {
-
-   cerr << "\n\n  GridInfo::set_grid(Grid &) const -> bad gridinfo\n\n";
-
-   exit ( 1 );
-
-}
-
-     if ( lc )  g.set( *lc );
-else if ( st )  g.set( *st );
-else if ( ll )  g.set( *ll );
-else if ( m  )  g.set( *m  );
-
-return;
-
-}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -398,6 +231,7 @@ if ( i.lc )  { g.set( *(i.lc) );  status = true; }
 if ( i.st )  { g.set( *(i.st) );  status = true; }
 if ( i.ll )  { g.set( *(i.ll) );  status = true; }
 if ( i.m  )  { g.set( *(i.m)  );  status = true; }
+if ( i.e  )  { g.set( *(i.e)  );  status = true; }
 
 return ( status );
 
@@ -423,7 +257,7 @@ for (j=0; j<n_dtc_lambert_grids; ++j)  {
 
    if ( strcmp(name, dtc_lambert_grids[j].name) == 0 )  {
 
-      i.lc = dtc_lambert_grids + j;
+      i.set( dtc_lambert_grids[j] );
 
       return ( true );
 
@@ -432,14 +266,14 @@ for (j=0; j<n_dtc_lambert_grids; ++j)  {
 }
 
    //
-   //  ncep latlon grids
+   //  try ncep latlon grids
    //
 
 for (j=0; j<n_ncep_latlon_grids; ++j)  {
 
    if ( strcmp(name, ncep_latlon_grids[j].name) == 0 )  {
 
-      i.ll = ncep_latlon_grids + j;
+      i.set( ncep_latlon_grids[j] );
 
       return ( true );
 
@@ -448,14 +282,14 @@ for (j=0; j<n_ncep_latlon_grids; ++j)  {
 }
 
    //
-   //  ncep stereographic grids
+   //  try ncep stereographic grids
    //
 
 for (j=0; j<n_ncep_st_grids; ++j)  {
 
    if ( strcmp(name, ncep_st_grids[j].name) == 0 )  {
 
-      i.st = ncep_st_grids + j;
+      i.set( ncep_st_grids[j] );
 
       return ( true );
 
@@ -465,14 +299,14 @@ for (j=0; j<n_ncep_st_grids; ++j)  {
 
 
    //
-   //  ncep lambert grids
+   //  try ncep lambert grids
    //
 
 for (j=0; j<n_ncep_lambert_grids; ++j)  {
 
    if ( strcmp(name, ncep_lambert_grids[j].name) == 0 )  {
 
-      i.lc = ncep_lambert_grids + j;
+      i.set( ncep_lambert_grids[j] );
 
       return ( true );
 
@@ -482,14 +316,14 @@ for (j=0; j<n_ncep_lambert_grids; ++j)  {
 
 
    //
-   //  ncep mercator grids
+   //  try ncep mercator grids
    //
 
 for (j=0; j<n_ncep_mercator_grids; ++j)  {
 
    if ( strcmp(name, ncep_mercator_grids[j].name) == 0 )  {
 
-      i.m = ncep_mercator_grids + j;
+      i.set( ncep_mercator_grids[j] );
 
       return ( true );
 

@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_data_grids/grid_base.h"
+#include "grid_base.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -44,7 +37,7 @@ class LambertGrid : public GridRep {
       double Lat_LL;
       double Lon_LL;
 
-      double Lon_cen;
+      double Lon_orient;
 
       double Alpha;
 
@@ -58,6 +51,8 @@ class LambertGrid : public GridRep {
 
       double  f(double) const;
       double df(double) const;
+
+      LambertData Data;
 
          //
          //  grid interface
@@ -83,6 +78,8 @@ class LambertGrid : public GridRep {
       void dump(ostream &, int = 0) const;
 
       ConcatString serialize() const;
+
+      GridInfo info () const;
 
       double rot_grid_to_earth(int x, int y) const;
 

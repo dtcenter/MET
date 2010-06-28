@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,6 +35,11 @@ struct MercatorData {
    //
    //  Mercator grid definitions
    //
+
+                                           //              name    lat_ll_deg  lon_ll_deg  lat_ur_deg  lon_ur_deg   Nx    Ny
+                                           //   ===============    ==========  ==========  ==========  ==========  ===   ===
+static const MercatorData fw_test_data = {     "Full World Test",       -25.0,      110.0,     60.0  ,   110.0  ,  500,  100 };
+static const MercatorData g204_data    = {                "G204",       -25.0,     -110.0,     60.644,   109.129,   93,   68 };
 
 
 ////////////////////////////////////////////////////////////////////////
