@@ -444,8 +444,8 @@ data.y_pin = atof(att->as_string(0));
 
    // Orientation longitude
 get_att(ncfile, att, "lon_orient");
-data.lcen = atof(att->as_string(0));
-data.lcen *= -1.0;
+data.lon_orient = atof(att->as_string(0));
+data.lon_orient *= -1.0;
 
    // Grid spacing in km
 get_att(ncfile, att, "d_km");
@@ -474,7 +474,7 @@ if(verbosity > 3) {
         << "lon_pin = " << data.lon_pin << "\n"
         << "x_pin = " << data.x_pin << "\n"
         << "y_pin = " << data.y_pin << "\n"
-        << "lcen = " << data.lcen << "\n"
+        << "lon_orient = " << data.lon_orient << "\n"
         << "d_km = " << data.d_km << "\n"
         << "r_km = " << data.r_km << "\n"
         << "nx = " << data.nx << "\n"
@@ -570,7 +570,7 @@ if ( verbosity > 3 )  {
         << "lon_pin = " << data.lon_pin << "\n"
         << "x_pin = " << data.x_pin << "\n"
         << "y_pin = " << data.y_pin << "\n"
-        << "lcen = " << data.lcen << "\n"
+        << "lon_orient = " << data.lon_orient << "\n"
         << "d_km = " << data.d_km << "\n"
         << "r_km = " << data.r_km << "\n"
         << "nx = " << data.nx << "\n"
