@@ -499,7 +499,7 @@ void get_stereographic_data(NcFile * ncfile, StereographicData & data, int verbo
 {
 
 NcAtt * att = (NcAtt *) 0;
-const char * c = (const cahr *) 0;
+const char * c = (const char *) 0;
 
 
 if ( verbosity > 3 )  {
