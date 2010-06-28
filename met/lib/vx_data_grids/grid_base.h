@@ -17,7 +17,6 @@
 
 #include "vx_data_grids/st_grid_defs.h"
 #include "vx_data_grids/lc_grid_defs.h"
-#include "vx_data_grids/exp_grid_defs.h"
 #include "vx_data_grids/latlon_grid_defs.h"
 #include "vx_data_grids/merc_grid_defs.h"
 
@@ -54,7 +53,6 @@ class GridInfo {
       void set(const StereographicData &);
       void set(const LatLonData        &);
       void set(const MercatorData      &);
-      void set(const ExpData           &);
 
       void create_grid(Grid &) const;
 
@@ -66,7 +64,6 @@ class GridInfo {
       const StereographicData * st;   //  allocated
       const LatLonData        * ll;   //  allocated
       const MercatorData      * m;    //  allocated
-      const ExpData           * e;    //  allocated
 
 };
 
@@ -174,7 +171,6 @@ class Grid : public GridInterface {
       Grid(const StereographicData &);
       Grid(const LatLonData        &);
       Grid(const MercatorData      &);
-      Grid(const ExpData           &);
       virtual ~Grid();
       Grid(const Grid &);
       Grid & operator=(const Grid &);
@@ -188,7 +184,6 @@ class Grid : public GridInterface {
       void set (const StereographicData &);
       void set (const LatLonData        &);
       void set (const MercatorData      &);
-      void set (const ExpData           &);
 
       void latlon_to_xy(double lat, double lon, double & x, double & y) const;
 
