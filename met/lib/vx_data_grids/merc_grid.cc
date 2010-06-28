@@ -39,8 +39,6 @@ static double merc_inv_func(double r);
 static double merc_lon_to_u(double lon_rad);
 static double merc_u_to_lon(double u);
 
-static double mercator_segment_area(double u0, double v0, double u1, double v1);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -263,32 +261,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double MercatorGrid::calc_area(int x, int y) const
-
-{
-
-double u[4], v[4];
-double sum;
-
-
-xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
-xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
-xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
-xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
-
-
-sum = uv_closedpolyline_area(u, v, 4);
-
-sum *= earth_radius_km*earth_radius_km;
-
-return ( sum );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 int MercatorGrid::nx() const
 
 {
@@ -318,75 +290,6 @@ ConcatString MercatorGrid::name() const
 {
 
 return ( Name );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double MercatorGrid::uv_closedpolyline_area(const double * u, const double * v, int n) const
-
-{
-
-int j, k;
-double sum;
-
-
-sum = 0.0;
-
-for (j=0; j<n; ++j)  {
-
-   k = (j + 1)%n;
-
-   sum += mercator_segment_area(u[j], v[j], u[k], v[k]);
-
-}   //  for j
-
-sum = fabs(sum);
-
-return ( sum );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double MercatorGrid::xy_closedpolyline_area(const double * x, const double * y, int n) const
-
-{
-
-int j;
-double sum;
-double *u = (double *) 0;
-double *v = (double *) 0;
-
-u = new double [n];
-v = new double [n];
-
-if ( !u || !v )  {
-
-   cerr << "\n\n  MercatorGrid::xy_closedpolyline_area() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  {
-
-   xy_to_uv(x[j], y[j], u[j], v[j]);
-
-}
-
-sum = uv_closedpolyline_area(u, v, n);
-
-sum *= earth_radius_km*earth_radius_km;
-
-delete [] u;  u = (double *) 0;
-delete [] v;  v = (double *) 0;
-
-return ( sum );
 
 }
 
@@ -592,57 +495,6 @@ return ( a );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-double mercator_segment_area(double u0, double v0, double u1, double v1)
- 
-{
-
-// cerr << "\n\n  warning -> mercator_segment_area() -> hasn't been tested yet!\n\n";
- 
-double delta_u, delta_v;
-double u1_prime;
-double b0, b1;
-double answer;
-
-
-   //
-   //  u1_prime = u1 + 360*n, for some integer n
-   //
-   //      want -180 <= u1_prime - u0 < 180
-   //
-
-u1_prime = u1 - 360.0*floor((u1 - u0 + 180.0)/360.0);
-
-delta_u = u1_prime - u0;
-delta_v = v1 - v0;
-
-if ( fabs(delta_v) < 1.0e-4 )  {
-
-   answer = delta_u*(1.0 - tanh(v0));
-
-   return ( answer );
-
-}
-
-   //
-   //  ok, so now we know that delta_v is nonzero
-   //
-
-b0 = v0 - log(cosh(v0));
-b1 = v1 - log(cosh(v1));
-
-answer = (delta_u/delta_v)*(b1 - b0);
-
-   //
-   //  done
-   //
-
-return ( answer );                                 
-                                                   
-}
 
 ////////////////////////////////////////////////////////////////////////
 
