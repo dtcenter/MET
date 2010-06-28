@@ -43,16 +43,22 @@ void write_netcdf_proj(NcFile *f_out, const Grid &grid) {
 
       sprintf(attribute_str, "%f degrees_north", gdata.pc_data.lat_ll_deg);
       f_out->add_att("lat_ll_deg", attribute_str);
+
       sprintf(attribute_str, "%f degrees_east", -1.0*gdata.pc_data.lon_ll_deg);
       f_out->add_att("lon_ll_deg", attribute_str);
+
       sprintf(attribute_str, "%f degrees", gdata.pc_data.delta_lat_deg);
       f_out->add_att("delta_lat_deg", attribute_str);
+
       sprintf(attribute_str, "%f degrees", gdata.pc_data.delta_lon_deg);
       f_out->add_att("delta_lon_deg", attribute_str);
+
       sprintf(attribute_str, "%i grid_points", gdata.pc_data.Nlat);
       f_out->add_att("Nlat", attribute_str);
+
       sprintf(attribute_str, "%i grid_points", gdata.pc_data.Nlon);
       f_out->add_att("Nlon", attribute_str);
+
    }
 
    //

@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -17,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_data_grids/st_grid_defs.h"
-#include "vx_data_grids/grid_base.h"
+#include "st_grid_defs.h"
+#include "grid_base.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -33,8 +26,6 @@ class StereographicGrid : public GridRep {
       StereographicGrid();
      ~StereographicGrid();
       StereographicGrid(const StereographicData &);
-      StereographicGrid(const StereoType2Data &);
-      StereographicGrid(const StereoType3Data &);
 
          //
          //
@@ -55,7 +46,7 @@ class StereographicGrid : public GridRep {
 
       bool IsNorthHemisphere;
 
-      double Lcen;
+      double Lon_orient;
 
       double Bx;
       double By;
@@ -66,6 +57,8 @@ class StereographicGrid : public GridRep {
       int Ny;
 
       ConcatString Name;
+
+      StereographicData Data;
 
          //
          //  grid interface
@@ -85,6 +78,8 @@ class StereographicGrid : public GridRep {
       void dump(ostream &, int = 0) const;
 
       ConcatString serialize() const;
+
+      GridInfo info() const;
 
       double rot_grid_to_earth(int x, int y) const;
 

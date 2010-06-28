@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -19,9 +12,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/merc_grid.h"
+#include "vx_math.h"
+#include "misc.h"
+#include "merc_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -140,6 +133,8 @@ My = (Ny - 1.0)/(v_last - v_first);
 
 By = -My*v_first;
 
+Data = data;
+
    //
    //  Done
    //
@@ -168,6 +163,8 @@ Nx = 0;
 Ny = 0;
 
 Name.clear();
+
+memset(&Data, 0, sizeof(Data));
 
 return;
 
@@ -499,13 +496,29 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+GridInfo MercatorGrid::info() const
+
+{
+
+GridInfo i;
+
+i.set(Data);
+
+return ( i );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double MercatorGrid::rot_grid_to_earth(int x, int y) const
 
 {
 
 //
 // The rotation angle from grid relative to earth relative is zero
-// for the Mercator projection
+// for the Mercator projection in it's standard aspect
 //
 
 return ( 0.0 );

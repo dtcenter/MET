@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -20,13 +13,62 @@
 #include <iostream>
 
 
-#include "vx_util/vx_util.h"
+#include "misc.h"
 
-#include "vx_data_grids/st_grid_defs.h"
-#include "vx_data_grids/lc_grid_defs.h"
-#include "vx_data_grids/exp_grid_defs.h"
-#include "vx_data_grids/latlon_grid_defs.h"
-#include "vx_data_grids/merc_grid_defs.h"
+#include "st_grid_defs.h"
+#include "lc_grid_defs.h"
+#include "exp_grid_defs.h"
+#include "latlon_grid_defs.h"
+#include "merc_grid_defs.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+class Grid;   //  forward reference
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+class GridInfo {
+
+   private:
+
+      void init_from_scratch();
+
+      void assign(const GridInfo &);
+
+   public:
+
+      GridInfo();
+     ~GridInfo();
+      GridInfo(const GridInfo &);
+      GridInfo & operator=(const GridInfo &);
+
+      void clear();
+
+      bool ok() const;
+
+      void set(const LambertData       &);
+      void set(const StereographicData &);
+      void set(const LatLonData        &);
+      void set(const MercatorData      &);
+      void set(const ExpData           &);
+
+      void create_grid(Grid &) const;
+
+         //
+         //  at most ONE of these should be nonzero
+         //
+
+      const LambertData       * lc;   //  allocated
+      const StereographicData * st;   //  allocated
+      const LatLonData        * ll;   //  allocated
+      const MercatorData      * m;    //  allocated
+      const ExpData           * e;    //  allocated
+
+};
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,6 +110,8 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual void dump(ostream &, int = 0) const = 0;
 
+      virtual GridInfo info() const = 0;
+
       virtual double rot_grid_to_earth(int x, int y) const = 0;
 
 };
@@ -96,6 +140,10 @@ class GridRep : public GridInterface {
 
       virtual ConcatString serialize() const = 0;
 
+      virtual GridInfo info() const = 0;
+
+      virtual double rot_grid_to_earth(int x, int y) const = 0;
+
 };
 
 
@@ -121,13 +169,12 @@ class Grid : public GridInterface {
    public:
 
       Grid();
-      Grid(const LambertData &);
+      Grid(const char *);   //  lookup by name
+      Grid(const LambertData       &);
       Grid(const StereographicData &);
-      Grid(const StereoType2Data &);
-      Grid(const StereoType3Data &);
-      Grid(const ExpData &);
-      Grid(const LatLonData &);
-      Grid(const MercatorData &);
+      Grid(const LatLonData        &);
+      Grid(const MercatorData      &);
+      Grid(const ExpData           &);
       virtual ~Grid();
       Grid(const Grid &);
       Grid & operator=(const Grid &);
@@ -136,13 +183,12 @@ class Grid : public GridInterface {
 
       void dump(ostream &, int = 0) const;
 
-      void set (const LambertData &);
+      void set (const char *);   //  lookup by name
+      void set (const LambertData       &);
       void set (const StereographicData &);
-      void set (const StereoType2Data &);
-      void set (const StereoType3Data &);
-      void set (const ExpData &);
-      void set (const LatLonData &);
-      void set (const MercatorData &);
+      void set (const LatLonData        &);
+      void set (const MercatorData      &);
+      void set (const ExpData           &);
 
       void latlon_to_xy(double lat, double lon, double & x, double & y) const;
 
@@ -156,6 +202,8 @@ class Grid : public GridInterface {
       ConcatString name() const;
 
       ConcatString serialize() const;
+
+      GridInfo info() const;
 
       double rot_grid_to_earth(int x, int y) const;
 

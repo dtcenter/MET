@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -19,9 +12,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/lc_grid.h"
+#include "vx_math.h"
+#include "misc.h"
+#include "lc_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,7 +74,7 @@ void LambertGrid::clear()
 Lat_LL = 0.0;
 Lon_LL = 0.0;
 
-Lon_cen = 0.0;
+Lon_orient = 0.0;
 
 Alpha = 0.0;
 
@@ -94,6 +87,8 @@ Nx = 0;
 Ny = 0;
 
 Name.clear();
+
+memset(&Data, 0, sizeof(Data));
 
 return;
 
@@ -110,14 +105,15 @@ LambertGrid::LambertGrid(const LambertData & data)
 clear();
 
 
-Lat_LL = data.lat_pin;
-Lon_LL = data.lon_pin;
+
+Lat_LL = data.lat_pin;   //  temporarily
+Lon_LL = data.lon_pin;   //  temporarily
 
 reduce(Lon_LL);
 
-Lon_cen = data.lcen;
+Lon_orient = data.lon_orient;
 
-reduce(Lon_cen);
+reduce(Lon_orient);
 
 Bx = 0.0;
 By = 0.0;
@@ -158,7 +154,7 @@ double r0, theta0;
 
 r0 = lc_func(data.lat_pin, Cone);
 
-theta0 = Cone*(Lon_cen - data.lon_pin);
+theta0 = Cone*(Lon_orient - data.lon_pin);
 
 Bx = data.x_pin - Alpha*r0*sind(theta0);
 By = data.y_pin + Alpha*r0*cosd(theta0);
@@ -166,6 +162,8 @@ By = data.y_pin + Alpha*r0*cosd(theta0);
 xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
 
 reduce(Lon_LL);
+
+Data = data;
 
    //
    //  Done
@@ -212,7 +210,7 @@ reduce(lon);
 
 r = lc_func(lat, Cone);
 
-theta = Cone*(Lon_cen - lon);
+theta = Cone*(Lon_orient - lon);
 
 x = Bx + Alpha*r*sind(theta);
 
@@ -242,7 +240,7 @@ lat = lc_inv_func(r, Cone);
 if ( fabs(r) < 1.0e-5 )  theta = 0.0;
 else                     theta = atan2d(x, -y);   //  NOT atan2d(y, x);
 
-lon = Lon_cen - theta/Cone;
+lon = Lon_orient - theta/Cone;
 
 reduce(lon);
 
@@ -484,7 +482,7 @@ a << " Ny: " << Ny;
 sprintf(junk, " Lat_LL: %.3f", Lat_LL);   a << junk;
 sprintf(junk, " Lon_LL: %.3f", Lon_LL);   a << junk;
 
-sprintf(junk, " Lon_cen: %.3f", Lon_cen);   a << junk;
+sprintf(junk, " Lon_orient: %.3f", Lon_orient);   a << junk;
 
 sprintf(junk, " Alpha: %.3f", Alpha);   a << junk;
 
@@ -505,6 +503,22 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+GridInfo LambertGrid::info() const
+
+{
+
+GridInfo i;
+
+i.set(Data);
+
+return ( i );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double LambertGrid::rot_grid_to_earth(int x, int y) const
 
 {
@@ -512,23 +526,27 @@ double LambertGrid::rot_grid_to_earth(int x, int y) const
 double lat, lon, angle;
 double diff, hemi;
 
-// Convert to lat/lon
+
 xy_to_latlon((double) x, (double) y, lat, lon);
 
-// Difference between lon and the center longitude
-diff = Lon_cen - lon;
+diff = Lon_orient - lon;
 
 // Figure out if the grid is in the northern or southern hemisphere
 // by checking whether the first latitude (p1_deg -> Phi1_radians)
 // is greater than zero
 // NH -> hemi = 1, SH -> hemi = -1
-if(Lat_LL < 0.0) hemi = -1.0;
-else             hemi = 1.0;
+// if(Phi1_radians < 0.0) hemi = -1.0;
+// else                   hemi = 1.0;
 
-// Compute the rotation angle
+   //
+   //  assume northern hemisphere
+   //
+
+hemi = 1.0;
+
 angle = diff*Cone*hemi;
 
-return(angle);
+return ( angle );
 
 }
 
@@ -749,9 +767,6 @@ rep->refCount = 1;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
 
 
 

@@ -1,11 +1,4 @@
 
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_data_grids/grid_base.h"
+#include "grid_base.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -67,6 +60,8 @@ class MercatorGrid : public GridRep {
       int Nx;
       int Ny;
 
+      MercatorData Data;
+
          //
          //  grid interface
          //
@@ -85,6 +80,8 @@ class MercatorGrid : public GridRep {
       void dump(ostream &, int = 0) const;
 
       ConcatString serialize() const;
+
+      GridInfo info() const;
 
       double rot_grid_to_earth(int x, int y) const;
 
