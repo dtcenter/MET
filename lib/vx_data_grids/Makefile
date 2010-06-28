@@ -24,8 +24,7 @@ LIB_DIR  = ..
 ########################################################################
 
 
-OBJECTS     = exp_grid.o           \
-              grid_base.o          \
+OBJECTS     = grid_base.o          \
               latlon_grid.o        \
               lc_grid.o            \
               st_grid.o            \
@@ -36,8 +35,7 @@ OBJECTS     = exp_grid.o           \
 ########################################################################
 
 
-HEADERS     = exp_grid.h           \
-              grid_base.h          \
+HEADERS     = grid_base.h          \
               grid.h               \
               latlon_grid.h        \
               lc_grid.h            \
@@ -45,7 +43,6 @@ HEADERS     = exp_grid.h           \
               merc_grid.h          \
               st_grid_defs.h       \
               lc_grid_defs.h       \
-              exp_grid_defs.h      \
               latlon_grid_defs.h   \
               merc_grid_defs.h     \
               find_grid_by_name.h  \
@@ -85,11 +82,6 @@ lc_grid.o: lc_grid.cc lc_grid.h grid_base.o lc_grid_defs.h
 	$(CXX) lc_grid.cc            -c $(CXX_FLAGS) $(OPT_FLAGS) -I$(LIB_DIR)
 
 
-exp_grid.o: exp_grid.cc exp_grid.h grid_base.o exp_grid_defs.h
-	@ echo
-	$(CXX) exp_grid.cc           -c $(CXX_FLAGS) $(OPT_FLAGS) -I$(LIB_DIR)
-
-
 latlon_grid.o: latlon_grid.cc latlon_grid.h grid_base.o latlon_grid_defs.h
 	@ echo
 	$(CXX) latlon_grid.cc        -c $(CXX_FLAGS) $(OPT_FLAGS) -I$(LIB_DIR)
@@ -100,7 +92,7 @@ merc_grid.o: merc_grid.cc merc_grid.h grid_base.o merc_grid_defs.h
 	$(CXX) merc_grid.cc          -c $(CXX_FLAGS) $(OPT_FLAGS) -I$(LIB_DIR)
 
 
-find_grid_by_name.o: find_grid_by_name.cc find_grid_by_name.h grid_base.h exp_grid.h latlon_grid.h lc_grid.h st_grid.h merc_grid.h
+find_grid_by_name.o: find_grid_by_name.cc find_grid_by_name.h grid_base.h latlon_grid.h lc_grid.h st_grid.h merc_grid.h
 	@ echo
 	$(CXX) find_grid_by_name.cc  -c $(CXX_FLAGS) $(OPT_FLAGS) -I$(LIB_DIR)
 

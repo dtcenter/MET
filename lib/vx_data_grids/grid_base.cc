@@ -90,7 +90,6 @@ lc = (const LambertData *)       0;
 st = (const StereographicData *) 0;
 ll = (const LatLonData *)        0;
 m  = (const MercatorData *)      0;
-e  = (const ExpData *)           0;
 
 clear();
 
@@ -110,7 +109,6 @@ if ( lc )  { delete lc; lc = (const LambertData *)       0; };
 if ( st )  { delete st; st = (const StereographicData *) 0; };
 if ( ll )  { delete ll; ll = (const LatLonData *)        0; };
 if ( m  )  { delete m;  m  = (const MercatorData *)      0; };
-if ( e  )  { delete e;  e  = (const ExpData *)           0; };
 
 return;
 
@@ -263,28 +261,6 @@ D = new MercatorData;
 memcpy(D, &data, sizeof(data));
 
 m = D;  D = (MercatorData *) 0;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void GridInfo::set(const ExpData & data)
-
-{
-
-clear();
-
-ExpData * D = (ExpData *) 0;
-
-D = new ExpData;
-
-memcpy(D, &data, sizeof(data));
-
-e = D;  D = (ExpData *) 0;
 
 return;
 
