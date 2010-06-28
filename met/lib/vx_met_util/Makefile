@@ -14,18 +14,20 @@
 
 TARGETS  = libvx_met_util.a
 
-OBJECTS  = apply_mask.o \
-	compute_ci.o \
-	conversions.o \
-	file_type.o \
-	met_stats.o \
-	pair_data.o \
-	read_grib.o \
-	read_netcdf.o \
-	stat_columns.o \
-	stat_hdr_columns.o \
-	two_to_one.o \
-	write_netcdf.o
+OBJECTS  = apply_mask.o        \
+           compute_ci.o        \
+           conversions.o       \
+           file_type.o         \
+           met_stats.o         \
+           pair_data.o         \
+           read_grib.o         \
+           read_netcdf.o       \
+           stat_columns.o      \
+           stat_hdr_columns.o  \
+           two_to_one.o        \
+           write_netcdf.o      \
+           grid_output.o       \
+
 
 OPT_FLAGS=
 
@@ -83,6 +85,10 @@ two_to_one.o: two_to_one.cc
 
 write_netcdf.o: write_netcdf.cc
 	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
+
+grid_output.o: grid_output.h grid_output.cc
+	$(CXX) grid_output.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)

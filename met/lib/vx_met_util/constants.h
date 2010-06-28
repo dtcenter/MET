@@ -19,12 +19,19 @@ static const char txt_file_ext[]    = ".txt";
 static const char stat_file_ext[]   = ".stat";
 static const char full_domain_str[] = "FULL";
 
+/*
 static const char * const proj_type[4] = {
    "LatLon", 
    "Mercator", 
    "Lambert Conformal",
    "Polar Stereographic"
 };
+*/
+
+static const char latlon_proj_type         [] = "LatLon";
+static const char mercator_proj_type       [] = "Mercator";
+static const char lambert_proj_type        [] = "Lambert Conformal";
+static const char stereographic_proj_type  [] = "Polar Stereographic";
 
 // String containing all valid PrepBufr message types
 static const char vld_msg_typ_str[] =
