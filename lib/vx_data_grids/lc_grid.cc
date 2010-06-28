@@ -38,8 +38,6 @@ static double lc_inv_func(double   r, double Cone);
 
 static void reduce(double &);
 
-static double lambert_beta(double u0, double delta_u, double v0, double delta_v, double c, double t);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -535,32 +533,6 @@ void reduce(double & angle)
 angle -= 360.0*floor( (angle/360.0) + 0.5 );
 
 return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double lambert_beta(double u0, double delta_u, double v0, double delta_v, double c, double t)
-
-{
-
-double answer;
-double u, v, r2, e_top, e_bot;
-
-u = u0 + t*delta_u;
-v = v0 + t*delta_v;
-
-r2 = u*u + v*v;
-
-e_bot = 1.0/c;
-
-e_top = e_bot - 1.0;
-
-answer = pow(r2, e_top)/(1.0 + pow(r2, e_bot));
-
-return ( answer );
 
 }
 
