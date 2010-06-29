@@ -130,7 +130,7 @@ using namespace std;
 
 extern int            yylex();
 
-extern void           yyerror(char *);
+extern void           yyerror(const char *);
 
 extern "C" int        colorwrap();
 
@@ -1917,7 +1917,7 @@ return ( color );
 ////////////////////////////////////////////////////////////////////////
 
 
-void yyerror(char * s)
+void yyerror(const char * s)
 
 {
 
