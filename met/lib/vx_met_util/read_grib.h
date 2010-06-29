@@ -63,9 +63,9 @@ extern void   read_pds(GribRecord &, int &, unixtime &, unixtime &,
 extern void   read_gds(GribRecord &, Grid &, int &, int &, int &);
 extern void   read_pds_prob(GribRecord &, int &, double &, double &);
 
-extern double decode_lat_lon(unsigned char *, int);
+extern double decode_lat_lon(const unsigned char *, int);
 
-extern int    all_bits_set(unsigned char *, int);
+extern int    all_bits_set(const unsigned char *, int);
 
 extern void   get_level_info(const GribRecord &, int &, int &);
 

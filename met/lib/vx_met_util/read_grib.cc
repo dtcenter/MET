@@ -1120,7 +1120,7 @@ int parity;
    // Structures to store projection info
 LambertData       lc_data;
 StereographicData st_data;
-LatLonData        pc_data;
+LatLonData        ll_data;
 MercatorData      mc_data;
 
    //
@@ -1153,7 +1153,7 @@ if ( r.gds->type == latlon_type )  {
 
 } else if ( r.gds->type == stereographic_type )  {
 
-   gds_to_stereographic( &(r.gds), st_data, xdir, ydir, order);
+   gds_to_stereographic( *(r.gds), st_data, xdir, ydir, order);
 
    gr.set(st_data);
 
@@ -1212,7 +1212,7 @@ void read_pds_prob(GribRecord &r, int &pcode,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-double decode_lat_lon(unsigned char *p, int n) {
+double decode_lat_lon(const unsigned char *p, int n) {
    int i, parity;
    double answer;
    unsigned char c[3];
@@ -1237,7 +1237,7 @@ double decode_lat_lon(unsigned char *p, int n) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int all_bits_set(unsigned char *p, int n) {
+int all_bits_set(const unsigned char *p, int n) {
    int status, i;
    unsigned char c;
 
