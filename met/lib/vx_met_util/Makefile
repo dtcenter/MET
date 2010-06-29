@@ -22,11 +22,11 @@ OBJECTS  = apply_mask.o        \
            pair_data.o         \
            grid_output.o       \
            read_netcdf.o       \
+           write_netcdf.o      \
            read_grib.o         \
            stat_columns.o      \
            stat_hdr_columns.o  \
            two_to_one.o        \
-           write_netcdf.o      \
 
 
 OPT_FLAGS=
