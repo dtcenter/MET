@@ -16,7 +16,7 @@ TARGETS   = libvx_data_grids.a
 ########################################################################
 
 
-OPT_FLAGS=
+OPT_FLAGS =
 
 LIB_DIR  = ..
 
@@ -51,11 +51,7 @@ HEADERS     = grid_base.h          \
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES)
-	@ echo
-
-
-tests: $(EXECUTABLES)
+all: $(OBJECTS) $(TARGETS)
 	@ echo
 
 
@@ -109,7 +105,7 @@ libvx_data_grids.a: $(OBJECTS)
 	@ echo
 	ar -rs libvx_data_grids.a $(OBJECTS) 2>&1
 	ranlib libvx_data_grids.a
-	cp $(TARGETS) $(LIB_DIR)
+	cp -f $(TARGETS) $(LIB_DIR)
 
 
 ########################################################################
@@ -125,7 +121,7 @@ libvx_data_grids.a: $(OBJECTS)
 
 clean:
 	@ echo
-	rm -f *.a *.o *.ps *.ppm *.pgm *.png temp junk core log a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f *.a *.o *.ps *.ppm *.pgm *.png temp junk core log a.out $(OBJECTS) $(TARGETS)
 
 
 ########################################################################
