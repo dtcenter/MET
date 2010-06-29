@@ -20,7 +20,23 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+static const int latlon_type         = 0;
+static const int mercator_type       = 1;
+static const int lambert_type        = 3;
+static const int stereographic_type  = 5;
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+static void gds_to_latlon        (const Section2_Header & gds, LatLonData &,        int & xdir, int & ydir, int & order);
+static void gds_to_mercator      (const Section2_Header & gds, MercatorData &,      int & xdir, int & ydir, int & order);
+static void gds_to_lambert       (const Section2_Header & gds, LambertData &,       int & xdir, int & ydir, int & order);
+static void gds_to_stereographic (const Section2_Header & gds, StereographicData &, int & xdir, int & ydir, int & order);
+
 static int (*two_to_one_grib)(Grid &, int, int);
+
 extern int two_to_one_grib_0_0_0(Grid &, int, int);
 extern int two_to_one_grib_0_0_1(Grid &, int, int);
 extern int two_to_one_grib_0_1_0(Grid &, int, int);
@@ -1093,16 +1109,19 @@ void read_pds(GribRecord &r, int &bms_flag,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void read_gds(GribRecord &r, Grid &gr, int &xdir, int &ydir, int &order) {
-   unsigned char c;
-   double d;
-   int parity;
+void read_gds(GribRecord & r, Grid & gr, int & xdir, int & ydir, int & order)
+
+{
+
+unsigned char c;
+double d;
+int parity;
 
    // Structures to store projection info
-   LambertData       lc_data;
-   StereographicData st_data;
-   LatLonData        pc_data;
-   MercatorData      mc_data;
+LambertData       lc_data;
+StereographicData st_data;
+LatLonData        pc_data;
+MercatorData      mc_data;
 
    //
    // Check GDS for the grid type.
@@ -1113,251 +1132,47 @@ void read_gds(GribRecord &r, Grid &gr, int &xdir, int &ydir, int &order) {
    //    - Polar Stereographic
    //
 
-   //
-   // Latitude/Longitude Projections Grid
-   // Also called Equidistant Cylindrical or Plate Carree Projection Grid
-   //
-   if(r.gds->type == 0) {
 
-      // Store the grid name
-      pc_data.name = proj_type[0];
+if ( r.gds->type == latlon_type )  {
 
-      // Check the scan flag for the x and y scanning direction and order
-      if(r.gds->grid_type.latlon_grid.scan_flag & 128) xdir  = 1; // In the -x direction
-      else                                             xdir  = 0; // In the +x direction
-      if(r.gds->grid_type.latlon_grid.scan_flag & 64)  ydir  = 1; // In the +y direction
-      else                                             ydir  = 0; // In the -y direction
-      if(r.gds->grid_type.latlon_grid.scan_flag & 32)  order = 1; // Data in (y, x) order
-      else                                             order = 0; // Data in (x, y) order
+   gds_to_latlon( *(r.gds) , ll_data, xdir, ydir, order);
 
-      //
-      // Multiply longitude values by -1 since the NCAR code considers
-      // degrees west to be positive.
-      //
+   gr.set(ll_data);
 
-      // Latitude of the bottom left corner
-      if(ydir == 1) {
-         pc_data.lat_ll_deg = decode_lat_lon(r.gds->grid_type.latlon_grid.lat1, 3);
-      }
-      else {
-         pc_data.lat_ll_deg = decode_lat_lon(r.gds->grid_type.latlon_grid.lat2, 3);
-      }
+} else if ( r.gds->type == mercator_type )  {
 
-      // Longitude of the bottom left corner
-      if(xdir == 0) {
-         pc_data.lon_ll_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.latlon_grid.lon1, 3));
-      }
-      else {
-         pc_data.lon_ll_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.latlon_grid.lon2, 3));
-      }
+   gds_to_mercator( *(r.gds) , mc_data, xdir, ydir, order);
 
-      // Number of points in the Latitudinal (y) direction
-      pc_data.Nlat = char2_to_int(r.gds->ny);
+   gr.set(mc_data);
 
-      // Number of points in the Longitudinal (x) direction
-      pc_data.Nlon = char2_to_int(r.gds->nx);
+} else if ( r.gds->type == lambert_type )  {
 
-      // Latitudinal increment.  If not given, compute from lat1 and lat2
-      if(all_bits_set(r.gds->grid_type.latlon_grid.dj, 2)) {
+   gds_to_lambert( *(r.gds) , lc_data, xdir, ydir, order);
 
-         d = abs( (long double) decode_lat_lon(r.gds->grid_type.latlon_grid.lat1, 3)
-                - decode_lat_lon(r.gds->grid_type.latlon_grid.lat2, 3));
-         pc_data.delta_lat_deg = d/pc_data.Nlat;
-      }
-      else {
+   gr.set(lc_data);
 
-         pc_data.delta_lat_deg = decode_lat_lon(r.gds->grid_type.latlon_grid.dj, 2);
-      }
+} else if ( r.gds->type == stereographic_type )  {
 
-      // Longitudinal increment.  If not given, compute from lon1 and lon2
-      if(all_bits_set(r.gds->grid_type.latlon_grid.di, 2)) {
+   gds_to_stereographic( &(r.gds), st_data, xdir, ydir, order);
 
-         d = abs( (long double) decode_lat_lon(r.gds->grid_type.latlon_grid.lon1, 3)
-                - decode_lat_lon(r.gds->grid_type.latlon_grid.lon2, 3));
-         pc_data.delta_lon_deg = d/pc_data.Nlon;
-      }
-      else {
-         pc_data.delta_lon_deg = decode_lat_lon(r.gds->grid_type.latlon_grid.di, 2);
-      }
+   gr.set(st_data);
 
-      Grid pc_grid(pc_data);
-      gr = pc_grid;
-   }
+} else {
+
+   cerr << "\n\nERROR: read_gds() -> "
+        << "Grid type " << ((int) r.gds->type)
+        << " not currently supported.\n\n"
+        << flush;
+   exit(1);
+
+}
 
    //
-   // Mercator Projection Grid
+   //  done
    //
-   else if(r.gds->type == 1) {
 
-      // Store the grid name
-      mc_data.name = proj_type[1];
+return;
 
-      // Check the scan flag for the x and y scanning direction and order
-      if(r.gds->grid_type.mercator.scan_flag & 128) xdir  = 1; // In the -x direction
-      else                                          xdir  = 0; // In the +x direction
-      if(r.gds->grid_type.mercator.scan_flag & 64)  ydir  = 1; // In the +y direction
-      else                                          ydir  = 0; // In the -y direction
-      if(r.gds->grid_type.mercator.scan_flag & 32)  order = 1; // Data in (y, x) order
-      else                                          order = 0; // Data in (x, y) order
-
-      //
-      // Multiply longitude values by -1 since the NCAR code considers
-      // degrees west to be positive.
-      //
-
-      // Latitude of the bottom left and upper right corners
-      if(ydir == 1) {
-         mc_data.lat_ll_deg = decode_lat_lon(r.gds->grid_type.mercator.lat1, 3);
-         mc_data.lat_ur_deg = decode_lat_lon(r.gds->grid_type.mercator.lat2, 3);
-      }
-      else {
-         mc_data.lat_ll_deg = decode_lat_lon(r.gds->grid_type.mercator.lat2, 3);
-         mc_data.lat_ur_deg = decode_lat_lon(r.gds->grid_type.mercator.lat1, 3);
-      }
-
-      // Longitude of the bottom left and upper right corners
-      if(xdir == 0) {
-         mc_data.lon_ll_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.mercator.lon1, 3));
-         mc_data.lon_ur_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.mercator.lon2, 3));
-      }
-      else {
-         mc_data.lon_ll_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.mercator.lon2, 3));
-         mc_data.lon_ur_deg = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.mercator.lon1, 3));
-      }
-
-      // Number of points in the Latitudinal (y) direction
-      mc_data.ny = char2_to_int(r.gds->ny);
-
-      // Number of points in the Longitudinal (x) direction
-      mc_data.nx = char2_to_int(r.gds->nx);
-
-      Grid pc_grid(mc_data);
-      gr = pc_grid;
-   }
-
-   //
-   // Lambert Conformal Projection Grid
-   //
-   else if(r.gds->type == 3) {
-
-      // Store the grid name
-      lc_data.name = proj_type[2];
-
-      //
-      // Multiply longitude values by -1 since the NCAR code considers
-      // degrees west to be positive.
-      //
-
-      // First latitude
-      lc_data.scale_lat_1 = decode_lat_lon(r.gds->grid_type.lambert_conf.latin1, 3);
-
-      // Second latitude
-      lc_data.scale_lat_2 = decode_lat_lon(r.gds->grid_type.lambert_conf.latin2, 3);
-
-      // Latitude of first point
-      lc_data.lat_pin = decode_lat_lon(r.gds->grid_type.lambert_conf.lat1, 3);
-
-      // Longitude of first point
-      lc_data.lon_pin = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.lambert_conf.lon1, 3));
-
-      // "pin" this point to the lower-left corner of the grid
-      lc_data.x_pin = 0.0;
-      lc_data.y_pin = 0.0;
-
-      // Center longitude
-      lc_data.lcen = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.lambert_conf.lov, 3));
-
-      // Grid spacing in km (given in the GRIB file in m)
-      lc_data.d_km = (double) char3_to_int(r.gds->grid_type.lambert_conf.dx)/1000.0;
-
-      // Radius of the earth
-      lc_data.r_km = grib_earth_radius_km;
-
-      // Number of points in the x-direction
-      lc_data.nx = char2_to_int(r.gds->nx);
-
-      // Number of points in the y-direction
-      lc_data.ny = char2_to_int(r.gds->ny);
-
-      // Check the scan flag for the x and y scanning direction and order
-      if(r.gds->grid_type.lambert_conf.scan_flag & 128) xdir = 1; // In the -x direction
-      else                                              xdir = 0; // In the +x direction
-      if(r.gds->grid_type.lambert_conf.scan_flag & 64)  ydir = 1; // In the +y direction
-      else                                              ydir = 0; // In the -y direction
-      if(r.gds->grid_type.lambert_conf.scan_flag & 32) order = 1; // Data in (y, x) order
-      else                                             order = 0; // Data in (x, y) order
-
-      Grid lc_grid(lc_data);
-      gr = lc_grid;
-   }
-   //
-   // Polar Stereographic Projection Grid
-   //
-   else if(r.gds->type == 5) {
-
-      // Store the grid name
-      st_data.name = proj_type[3];
-
-      //
-      // Multiply longitude values by -1 since the NCAR code considers
-      // degrees west to be positive.
-      //
-
-      // Latitude where the scale factor is deteremined is 60.0 degrees
-      // based on WMO's Guide to Grib
-      c = r.gds->grid_type.stereographic.pc_flag;
-      if(c & 128) parity = -1; // South Pole
-      else        parity = 1;  // North Pole
-      st_data.scale_lat = (double) 60.0*parity;
-
-      // Latitude of first point
-      st_data.lat_pin = decode_lat_lon(r.gds->grid_type.stereographic.lat1, 3);
-
-      // Longitude of first point
-      st_data.lon_pin = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.stereographic.lon1, 3));
-
-      // "pin" this point to the lower-left corner of the grid
-      st_data.x_pin = 0.0;
-      st_data.y_pin = 0.0;
-
-      // Center longitude
-      st_data.lcen = -1.0*rescale_lon(decode_lat_lon(r.gds->grid_type.stereographic.lov, 3));
-
-      // Grid spacing in km (given in the GRIB file in m)
-      st_data.d_km = (double) char3_to_int(r.gds->grid_type.stereographic.dx)/1000.0;
-
-      // Radius of the earth
-      st_data.r_km = grib_earth_radius_km;
-
-      // Number of points in the x-direction
-      st_data.nx = char2_to_int(r.gds->nx);
-
-      // Number of points in the y-direction
-      st_data.ny = char2_to_int(r.gds->ny);
-
-      // Check the scan flag for the x and y scanning direction and order
-      if(r.gds->grid_type.stereographic.scan_flag & 128) xdir = 1; // In the -x direction
-      else                                               xdir = 0; // In the +x direction
-      if(r.gds->grid_type.stereographic.scan_flag & 64)  ydir = 1; // In the +y direction
-      else                                               ydir = 0; // In the -y direction
-      if(r.gds->grid_type.stereographic.scan_flag & 32) order = 1; // Data in (x, y) order
-      else                                              order = 0; // Data in (y, x) order
-
-      Grid st_grid(st_data);
-      gr = st_grid;
-   }
-   //
-   // Unsupported grid type
-   //
-   else {
-      cerr << "\n\nERROR: read_gds() -> "
-           << "Grid type " << (int) r.gds->type
-           << " not currently supported.\n\n"
-           << flush;
-      exit(1);
-   }
-
-   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1862,3 +1677,278 @@ int two_to_one_grib_1_1_1(Grid &gr, int x, int y) { // -x, +y, (y, x)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+void gds_to_latlon(const Section2_Header & gds, LatLonData & data, int & xdir, int & ydir, int & order)
+
+{
+
+   // Store the grid name
+data.name = latlon_proj_type;
+
+   // Check the scan flag for the x and y scanning direction and order
+if(gds.grid_type.latlon_grid.scan_flag & 128) xdir  = 1; // In the -x direction
+else                                          xdir  = 0; // In the +x direction
+
+if(gds.grid_type.latlon_grid.scan_flag & 64)  ydir  = 1; // In the +y direction
+else                                          ydir  = 0; // In the -y direction
+
+if(gds.grid_type.latlon_grid.scan_flag & 32)  order = 1; // Data in (y, x) order
+else                                          order = 0; // Data in (x, y) order
+
+   //
+   // Multiply longitude values by -1 since the NCAR code considers
+   // degrees west to be positive.
+   //
+
+   // Latitude of the bottom left corner
+if ( ydir == 1 )  data.lat_ll = decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3);
+else              data.lat_ll = decode_lat_lon(gds.grid_type.latlon_grid.lat2, 3);
+
+   // Longitude of the bottom left corner
+if ( xdir == 0 )  data.lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.latlon_grid.lon1, 3));
+else              data.lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.latlon_grid.lon2, 3));
+
+   // Number of points in the Latitudinal (y) direction
+data.Nlat = char2_to_int(gds.ny);
+
+   // Number of points in the Longitudinal (x) direction
+data.Nlon = char2_to_int(gds.nx);
+
+   // Latitudinal increment.  If not given, compute from lat1 and lat2
+if ( all_bits_set(gds.grid_type.latlon_grid.dj, 2) )  {
+
+   d = abs( (long double) decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3)
+          - decode_lat_lon(gds.grid_type.latlon_grid.lat2, 3));
+
+   data.delta_lat = d/(data.Nlat);
+
+} else {
+
+   data.delta_lat = decode_lat_lon(gds.grid_type.latlon_grid.dj, 2);
+
+}
+
+   // Longitudinal increment.  If not given, compute from lon1 and lon2
+if ( all_bits_set ( gds.grid_type.latlon_grid.di, 2) )  {
+
+   d = abs( (long double) decode_lat_lon(gds.grid_type.latlon_grid.lon1, 3)
+          - decode_lat_lon(gds.grid_type.latlon_grid.lon2, 3));
+
+   data.delta_lon = d/(data.Nlon);
+
+} else {
+
+   data.delta_lon = decode_lat_lon(gds.grid_type.latlon_grid.di, 2);
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void gds_to_mercator(const Section2_Header & gds, MercatorData & data, int & xdir, int & ydir, int & order)
+
+{
+
+   // Store the grid name
+data.name = mercator_proj_type;
+
+   // Check the scan flag for the x and y scanning direction and order
+if(gds.grid_type.mercator.scan_flag & 128) xdir  = 1; // In the -x direction
+else                                       xdir  = 0; // In the +x direction
+
+if(gds.grid_type.mercator.scan_flag & 64)  ydir  = 1; // In the +y direction
+else                                       ydir  = 0; // In the -y direction
+
+if(gds.grid_type.mercator.scan_flag & 32)  order = 1; // Data in (y, x) order
+else                                       order = 0; // Data in (x, y) order
+
+   //
+   // Multiply longitude values by -1 since the NCAR code considers
+   // degrees west to be positive.
+   //
+
+   // Latitude of the bottom left and upper right corners
+if ( ydir == 1 )  {
+
+   data.lat_ll = decode_lat_lon(gds.grid_type.mercator.lat1, 3);
+   data.lat_ur = decode_lat_lon(gds.grid_type.mercator.lat2, 3);
+
+} else {
+
+   data.lat_ll = decode_lat_lon(gds.grid_type.mercator.lat2, 3);
+   data.lat_ur = decode_lat_lon(gds.grid_type.mercator.lat1, 3);
+
+}
+
+   // Longitude of the bottom left and upper right corners
+if ( xdir == 0 )  {
+
+   data.lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.mercator.lon1, 3));
+   data.lon_ur = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.mercator.lon2, 3));
+
+} else {
+
+   data.lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.mercator.lon2, 3));
+   data.lon_ur = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.mercator.lon1, 3));
+
+}
+
+   // Number of points in the Latitudinal (y) direction
+data.ny = char2_to_int(gds.ny);
+
+   // Number of points in the Longitudinal (x) direction
+data.nx = char2_to_int(gds.nx);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void gds_to_lambert(const Section2_Header & gds, LambertData & data, int & xdir, int & ydir, int & order)
+
+{
+
+   // Store the grid name
+data.name = lambert_proj_type;
+
+   //
+   // Multiply longitude values by -1 since the NCAR code considers
+   // degrees west to be positive.
+   //
+
+   // First latitude
+data.scale_lat_1 = decode_lat_lon(gds.grid_type.lambert_conf.latin1, 3);
+
+   // Second latitude
+data.scale_lat_2 = decode_lat_lon(gds.grid_type.lambert_conf.latin2, 3);
+
+   // Latitude of first point
+data.lat_pin = decode_lat_lon(gds.grid_type.lambert_conf.lat1, 3);
+
+   // Longitude of first point
+data.lon_pin = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.lambert_conf.lon1, 3));
+
+   // "pin" this point to the lower-left corner of the grid
+data.x_pin = 0.0;
+data.y_pin = 0.0;
+
+   // Orientation longitude
+data.lon_orient = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.lambert_conf.lov, 3));
+
+   // Grid spacing in km (given in the GRIB file in m)
+data.d_km = (double) char3_to_int(gds.grid_type.lambert_conf.dx)/1000.0;
+
+   // Radius of the earth
+data.r_km = grib_earth_radius_km;
+
+   // Number of points in the x-direction
+data.nx = char2_to_int(gds.nx);
+
+   // Number of points in the y-direction
+data.ny = char2_to_int(gds.ny);
+
+   // Check the scan flag for the x and y scanning direction and order
+if(gds.grid_type.lambert_conf.scan_flag & 128) xdir = 1; // In the -x direction
+else                                           xdir = 0; // In the +x direction
+
+if(gds.grid_type.lambert_conf.scan_flag & 64)  ydir = 1; // In the +y direction
+else                                           ydir = 0; // In the -y direction
+
+if(gds.grid_type.lambert_conf.scan_flag & 32) order = 1; // Data in (y, x) order
+else                                          order = 0; // Data in (x, y) order
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void gds_to_stereographic(const Section2_Header & gds, StereographicData & data, int & xdir, int & ydir, int & order)
+
+{
+
+   // Store the grid name
+data.name = stereographic_proj_type;
+
+   //
+   // Multiply longitude values by -1 since the NCAR code considers
+   // degrees west to be positive.
+   //
+
+   // Latitude where the scale factor is deteremined is 60.0 degrees
+   // based on WMO's Guide to Grib
+c = gds.grid_type.stereographic.pc_flag;
+if ( c & 128 ) { parity = -1; data.hemisphere = 'S'; }  // South Pole
+else           { parity =  1; data.hemisphere = 'N'; }  // North Pole
+data.scale_lat = (double) 60.0*parity;
+
+   // Latitude of first point
+data.lat_pin = decode_lat_lon(gds.grid_type.stereographic.lat1, 3);
+
+   // Longitude of first point
+data.lon_pin = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.stereographic.lon1, 3));
+
+   // "pin" this point to the lower-left corner of the grid
+data.x_pin = 0.0;
+data.y_pin = 0.0;
+
+   // Orientation longitude
+data.lon_orient = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.stereographic.lov, 3));
+
+   // Grid spacing in km (given in the GRIB file in m)
+data.d_km = (double) char3_to_int(gds.grid_type.stereographic.dx)/1000.0;
+
+   // Radius of the earth
+data.r_km = grib_earth_radius_km;
+
+   // Number of points in the x-direction
+data.nx = char2_to_int(gds.nx);
+
+   // Number of points in the y-direction
+data.ny = char2_to_int(gds.ny);
+
+   // Check the scan flag for the x and y scanning direction and order
+if(gds.grid_type.stereographic.scan_flag & 128) xdir = 1; // In the -x direction
+else                                            xdir = 0; // In the +x direction
+
+if(gds.grid_type.stereographic.scan_flag & 64)  ydir = 1; // In the +y direction
+else                                            ydir = 0; // In the -y direction
+
+if(gds.grid_type.stereographic.scan_flag & 32) order = 1; // Data in (x, y) order
+else                                           order = 0; // Data in (y, x) order
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
