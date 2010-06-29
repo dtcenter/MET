@@ -1113,10 +1113,6 @@ void read_gds(GribRecord & r, Grid & gr, int & xdir, int & ydir, int & order)
 
 {
 
-unsigned char c;
-double d;
-int parity;
-
    // Structures to store projection info
 LambertData       lc_data;
 StereographicData st_data;
@@ -1683,6 +1679,8 @@ void gds_to_latlon(const Section2_Header & gds, LatLonData & data, int & xdir, i
 
 {
 
+double d;
+
    // Store the grid name
 data.name = latlon_proj_type;
 
@@ -1889,6 +1887,9 @@ return;
 void gds_to_stereographic(const Section2_Header & gds, StereographicData & data, int & xdir, int & ydir, int & order)
 
 {
+
+unsigned char c;
+int parity;
 
    // Store the grid name
 data.name = stereographic_proj_type;
