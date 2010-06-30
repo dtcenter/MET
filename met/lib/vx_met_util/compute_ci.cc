@@ -34,19 +34,22 @@ static void write_mctsinfo(ofstream &, const MCTSInfo &);
 static void write_nbrcntinfo(ofstream &, const NBRCNTInfo &);
 static void read_ldf(const char *, int, NumArray &);
 
+// JHG, need to adjust computations using the vif
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute a confidence interval for a proportion.
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_proportion_ci(double p, int n, double alpha, double &p_cl, double &p_cu) {
+void compute_proportion_ci(double p, int n, double alpha, double vif,
+                           double &p_cl, double &p_cu) {
 
    //
    // Compute the confidence interval using the Wilson method for all
    // sizes of n, since it provides a better approximation
    //
-   compute_wilson_ci(p, n, alpha, p_cl, p_cu);
+   compute_wilson_ci(p, n, alpha, vif, p_cl, p_cu);
 
    return;
 }
@@ -59,7 +62,8 @@ void compute_proportion_ci(double p, int n, double alpha, double &p_cl, double &
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_wald_ci(double p, int n, double alpha, double &p_cl, double &p_cu) {
+void compute_wald_ci(double p, int n, double alpha, double vif,
+                     double &p_cl, double &p_cu) {
    double v, cv_normal_l, cv_normal_u;
 
    if(is_bad_data(p)) {
@@ -99,7 +103,8 @@ void compute_wald_ci(double p, int n, double alpha, double &p_cl, double &p_cu) 
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_wilson_ci(double p, int n, double alpha, double &p_cl, double &p_cu) {
+void compute_wilson_ci(double p, int n, double alpha, double vif,
+                       double &p_cl, double &p_cu) {
    double v, cv_normal_l, cv_normal_u;
 
    if(is_bad_data(p)) {
@@ -145,7 +150,7 @@ void compute_wilson_ci(double p, int n, double alpha, double &p_cl, double &p_cu
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_woolf_ci(double odds, double alpha,
+void compute_woolf_ci(double odds, double alpha, double vif,
                       int fy_oy, int fy_on, int fn_oy, int fn_on,
                       double &odds_cl, double &odds_cu) {
    double cv_normal_l, cv_normal_u, a, b;
@@ -184,7 +189,7 @@ void compute_woolf_ci(double odds, double alpha,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_hk_ci(double hk, double alpha,
+void compute_hk_ci(double hk, double alpha, double vif,
                    int fy_oy, int fy_on, int fn_oy, int fn_on,
                    double &hk_cl, double &hk_cu) {
    double cv_normal, stdev;

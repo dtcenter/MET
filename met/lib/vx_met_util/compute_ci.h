@@ -25,19 +25,19 @@ static const int wald_sample_threshold  = 100;
 ////////////////////////////////////////////////////////////////////////
 
 extern void compute_proportion_ci(double p, int n, double alpha,
-   double &p_cl, double &p_cu);
+   double vif, double &p_cl, double &p_cu);
 
 extern void compute_wald_ci(double p, int n, double alpha,
-   double &p_cl, double &p_cu);
+   double vif, double &p_cl, double &p_cu);
 
 extern void compute_wilson_ci(double p, int n, double alpha,
-   double &p_cl, double &p_cu);
+   double vif, double &p_cl, double &p_cu);
 
-extern void compute_woolf_ci(double odds, double alpha,
+extern void compute_woolf_ci(double odds, double alpha, double vif,
    int fy_oy, int fy_on, int fn_oy, int fn_on,
    double &odds_cl, double &odds_cu);
 
-extern void compute_hk_ci(double hk, double alpha,
+extern void compute_hk_ci(double hk, double alpha, double vif,
    int fy_oy, int fy_on, int fn_oy, int fn_on,
    double &hk_cl, double &hk_cu);
 
