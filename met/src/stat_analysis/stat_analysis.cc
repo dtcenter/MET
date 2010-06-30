@@ -21,6 +21,8 @@
 //   001    07/01/08  Halley Gotway   Add the rank_corr_flag to the
 //                    config file to disable computing rank
 //                    correlations.
+//   002    06/21/10  Halley Gotway   Add the vif_flag to correct normal
+//                    CI's for time series aggregations.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -279,7 +281,8 @@ void sanity_check() {
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       cerr << "\n\nERROR: sanity_check() -> "
            << "fcst_valid_beg is after fcst_valid_end: "
-           << ut_beg << " > " << ut_end << "!\n\n";
+           << conf.fcst_valid_beg().sval() << " > "
+           << conf.fcst_valid_end().sval() << "!\n\n";
 
       exit(1);
    }
@@ -293,7 +296,8 @@ void sanity_check() {
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       cerr << "\n\nERROR: sanity_check() -> "
            << "obs_valid_beg is after obs_valid_end: "
-           << ut_beg << " > " << ut_end << "!\n\n";
+           << conf.obs_valid_beg().sval() << " > "
+           << conf.obs_valid_end().sval() << "!\n\n";
 
       exit(1);
    }
@@ -307,7 +311,8 @@ void sanity_check() {
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       cerr << "\n\nERROR: sanity_check() -> "
            << "fcst_init_beg is after fcst_init_end: "
-           << ut_beg << " > " << ut_end << "!\n\n";
+           << conf.fcst_init_beg().sval() << " > "
+           << conf.fcst_init_end().sval() << "!\n\n";
 
       exit(1);
    }
@@ -321,7 +326,8 @@ void sanity_check() {
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       cerr << "\n\nERROR: sanity_check() -> "
            << "obs_init_beg is after obs_init_end: "
-           << ut_beg << " > " << ut_end << "!\n\n";
+           << conf.obs_init_beg().sval() << " > "
+           << conf.obs_init_end().sval() << "!\n\n";
 
       exit(1);
    }
@@ -333,6 +339,18 @@ void sanity_check() {
       conf.rank_corr_flag().ival() != 1) {
       cerr << "\n\nERROR: sanity_check() -> "
            << "The rank_corr_flag (" << conf.rank_corr_flag().ival()
+           << ") must be set to 0 or 1.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   //
+   // Conf: vif_flag
+   //
+   if(conf.vif_flag().ival() != 0 &&
+      conf.vif_flag().ival() != 1) {
+      cerr << "\n\nERROR: sanity_check() -> "
+           << "The vif_flag (" << conf.vif_flag().ival()
            << ") must be set to 0 or 1.\n\n"
            << flush;
       exit(1);
@@ -715,6 +733,11 @@ void set_default_job() {
    // rank_corr_flag
    //
    default_job.rank_corr_flag = conf.rank_corr_flag().ival();
+
+   //
+   // vif_flag
+   //
+   default_job.vif_flag = conf.vif_flag().ival();
 
    return;
 }
