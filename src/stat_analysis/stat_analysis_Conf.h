@@ -20,7 +20,7 @@
    //
    //     Created from config file "STATAnalysisConfig_default"
    //
-   //     on June 14, 2010    3:28 pm  MDT
+   //     on June 21, 2010    10:19 am  MDT
    //
 
 
@@ -118,6 +118,8 @@ class stat_analysis_Conf {
       const SymbolTableEntry * _boot_seed_entry;
 
       const SymbolTableEntry * _rank_corr_flag_entry;
+
+      const SymbolTableEntry * _vif_flag_entry;
 
       const SymbolTableEntry * _tmp_dir_entry;
 
@@ -284,6 +286,9 @@ class stat_analysis_Conf {
 
 
       Result rank_corr_flag();
+
+
+      Result vif_flag();
 
 
       Result tmp_dir();

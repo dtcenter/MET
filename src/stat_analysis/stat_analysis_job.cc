@@ -19,6 +19,7 @@
 //                    aggregate_stat ORANK to RHIST.
 //   002    06/09/10  Halley Gotway   Add aggregate MCTC lines and
 //                    aggregate_stat MCTC to MCTS.
+//   003    06/21/10  Halley Gotway   Add support for vif_flag.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -374,6 +375,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
 
    CTSInfo    cts_info;
    MCTSInfo   mcts_info;
+   CNTInfo    cnt_info;
    SL1L2Info  sl1l2_info;
    VL1L2Info  vl1l2_info;
    PCTInfo    pct_info;
@@ -423,6 +425,11 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
    }
 
    //
+   // Turn off the vif_flag since it doesn't apply
+   //
+   j.vif_flag = 0;
+
+   //
    // Sum up the contingency table type lines:
    //    FHO, CTC
    //
@@ -449,7 +456,8 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
            lt == stat_sal1l2 ||
            lt == stat_vl1l2  ||
            lt == stat_val1l2) {
-      aggr_partial_sum_lines(jobstring, f, j, sl1l2_info, vl1l2_info,
+      aggr_partial_sum_lines(jobstring, f, j,
+                             sl1l2_info, vl1l2_info, cnt_info,
                              lt, n_in, n_out, verbosity);
    }
 
@@ -883,7 +891,8 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    //
    else if(in_lt == stat_sl1l2  ||
            in_lt == stat_sal1l2) {
-      aggr_partial_sum_lines(jobstring, f, j, sl1l2_info, vl1l2_info,
+      aggr_partial_sum_lines(jobstring, f, j,
+                             sl1l2_info, vl1l2_info, cnt_info,
                              in_lt, n_in, n_out, verbosity);
    }
 
@@ -1127,7 +1136,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    }
    else if(in_lt == stat_sl1l2 ||
            in_lt == stat_sal1l2) {
-      write_job_cnt(j, in_lt, sl1l2_info, out_at);
+      write_job_cnt(j, in_lt, sl1l2_info, cnt_info, out_at);
    }
    else if(in_lt == stat_vl1l2  ||
            in_lt == stat_val1l2) {
@@ -1245,8 +1254,8 @@ void write_job_mcts(STATAnalysisJob &j, STATLineType in_lt,
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_cnt(STATAnalysisJob &j, STATLineType in_lt,
-                   SL1L2Info &sl1l2_info, AsciiTable &out_at) {
-   CNTInfo cnt_info;
+                   SL1L2Info &sl1l2_info, CNTInfo &cnt_info,
+                   AsciiTable &out_at) {
 
    //
    // Allocate space for confidence intervals
