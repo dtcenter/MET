@@ -19,6 +19,7 @@
 //                    different fcst and obs fields.
 //   002    05/27/10  Halley Gotway  Add -fcst_valid, -fcst_lead,
 //                    -obs_valid, and -obs_lead command line options.
+//   003    06/30/10  Halley Gotway  Enhance grid equality checks.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -398,15 +399,11 @@ void process_scores() {
       shc.set_obs_valid_beg(obs_valid_ut);
       shc.set_obs_valid_end(obs_valid_ut);
 
-      // Check that the grid dimensions match
-      if(fcst_grid.nx() != obs_grid.nx() ||
-         fcst_grid.ny() != obs_grid.ny()) {
+      // Check that the grids match
+      if(!(fcst_grid == obs_grid)) {
          cerr << "\n\nERROR: process_scores() -> "
-              << "Forecast and observation grid dimensions "
-              << "do not match (" << fcst_grid.nx() << ", "
-              << fcst_grid.ny() << ") != (" << obs_grid.nx()
-              << ", " << obs_grid.ny() << ") for field " << i+1
-              << ".\n\n" << flush;
+              << "The forecast and observation grids do not match "
+              << "for field " << i+1 << ".\n\n" << flush;
          exit(1);
       }
 
@@ -447,17 +444,10 @@ void process_scores() {
       else {
 
          // For multiple verification fields, check to make sure that
-         // the grid dimensions don't change
-         if(fcst_grid.nx() != grid.nx() ||
-            fcst_grid.ny() != grid.ny() ||
-            obs_grid.nx()  != grid.nx() ||
-            obs_grid.ny()  != grid.ny()) {
+         // the grids don't change
+         if(!(fcst_grid == grid) || !(obs_grid == grid)) {
             cerr << "\n\nERROR: process_scores() -> "
-                 << "The grid dimensions must remain constant ("
-                 << grid.nx() << ", " << grid.ny() << ") != ("
-                 << fcst_grid.nx() << ", " << fcst_grid.ny()
-                 << ") or ("
-                 << obs_grid.nx() << ", " << obs_grid.ny() << ")\n\n"
+                 << "The grid must remain the same for all fields.\n\n"
                  << flush;
             exit(1);
          }

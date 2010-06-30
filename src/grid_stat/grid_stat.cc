@@ -56,6 +56,7 @@
 //                    -obs_valid, and -obs_lead command line options.
 //   019    06/08/10  Halley Gotway  Add support for multi-category
 //                    contingency tables.
+//   020    06/30/10  Halley Gotway  Enhance grid equality checks.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -429,15 +430,13 @@ void process_scores() {
       shc.set_obs_valid_beg(obs_valid_ut);
       shc.set_obs_valid_end(obs_valid_ut);
 
-      // Check that the grid dimensions match
-      if(fcst_grid.nx() != obs_grid.nx() ||
-         fcst_grid.ny() != obs_grid.ny()) {
-         cerr << "\n\nERROR: process_scores() -> "
-              << "Forecast and observation grid dimensions "
-              << "do not match (" << fcst_grid.nx() << ", "
-              << fcst_grid.ny() << ") != (" << obs_grid.nx()
-              << ", " << obs_grid.ny() << ") for field " << i+1
-              << ".\n\n" << flush;
+      //
+      // Check that the grids match
+      //
+      if(!(fcst_grid == obs_grid)) {
+         cerr << "\n\nERROR: main() -> "
+              << "The forecast and observation grids do not match "
+              << "for field " << i+1 << ".\n\n" << flush;
          exit(1);
       }
 
