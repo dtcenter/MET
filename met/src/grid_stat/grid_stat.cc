@@ -474,20 +474,13 @@ void process_scores() {
          // Setup the first pass through the data
          setup_first_pass(fcst_wd, fcst_grid);
       }
-      // For multiple verification fields, check to make sure that the
-      // grid dimensions don't change
       else {
 
-         if(fcst_grid.nx() != grid.nx() ||
-            fcst_grid.ny() != grid.ny() ||
-            obs_grid.nx()  != grid.nx() ||
-            obs_grid.ny()  != grid.ny()) {
+         // For multiple verification fields, check to make sure that
+         // the grids don't change
+         if(!(fcst_grid == grid) || !(obs_grid == grid)) {
             cerr << "\n\nERROR: process_scores() -> "
-                 << "The grid dimensions must remain constant ("
-                 << grid.nx() << ", " << grid.ny() << ") != ("
-                 << fcst_grid.nx() << ", " << fcst_grid.ny()
-                 << ") or ("
-                 << obs_grid.nx() << ", " << obs_grid.ny() << ")\n\n"
+                 << "The grid must remain the same for all fields.\n\n"
                  << flush;
             exit(1);
          }
