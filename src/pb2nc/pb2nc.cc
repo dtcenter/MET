@@ -310,6 +310,7 @@ void initialize() {
 
 void process_command_line(int argc, char **argv) {
    int i;
+   char tmp_str[max_str_len], tmp2_str[max_str_len];
 
    //
    // Check for the minimum number of arguments
@@ -385,10 +386,14 @@ void process_command_line(int argc, char **argv) {
    if(valid_beg_ut != (unixtime) 0 &&
       valid_end_ut != (unixtime) 0 &&
       valid_beg_ut > valid_end_ut) {
+
+      unix_to_yyyymmdd_hhmmss(valid_beg_ut, tmp_str);
+      unix_to_yyyymmdd_hhmmss(valid_end_ut, tmp2_str);
+
       cerr << "\n\nERROR: process_command_line() -> "
-           << "the ending time (" << valid_end_ut
+           << "the ending time (" << tmp2_str
            << ") must be greater than the beginning time ("
-           << valid_beg_ut << ").\n\n" << flush;
+           << tmp_str << ").\n\n" << flush;
       exit(1);
    }
 
