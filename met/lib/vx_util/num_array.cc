@@ -410,13 +410,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::sort_array(const NumArray &i_na) {
+void NumArray::reorder(const NumArray &i_na) {
    NumArray tmp_na;
    int i, j;
 
    // Check that the index array is of the correct length
    if(i_na.n_elements() != Nelements) {
-      cerr << "\n\nNumArray::sort_array(const NumArray &) -> "
+      cerr << "\n\nNumArray::reorder(const NumArray &) -> "
            << "the index and sorting arrays must have the same length\n\n"
            << flush;
       exit(1);
@@ -430,7 +430,7 @@ void NumArray::sort_array(const NumArray &i_na) {
       j = nint(i_na[i]) - 1;
 
       if(j<0 || j>=i_na.n_elements()) {
-         cerr << "\n\nNumArray::sort_array(const NumArray &) -> "
+         cerr << "\n\nNumArray::reorder(const NumArray &) -> "
               << "index out of bounds: " << j << "\n\n"
               << flush;
          exit(1);
