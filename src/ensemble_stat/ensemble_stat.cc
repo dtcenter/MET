@@ -1284,7 +1284,7 @@ int read_field(const char *file_name, const GCInfo &gci, WrfData &wd,
    }
    // Check to make sure that the grid doesn't change
    else {
-      if(grid != gr) {
+      if(!(grid == gr)) {
          cerr << "\n\nERROR: read_field() -> "
               << "All data files must be on the same grid: "
               << file_name << "\n\n" << flush;
