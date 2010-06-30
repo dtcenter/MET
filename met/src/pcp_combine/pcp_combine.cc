@@ -36,6 +36,7 @@
 //                    -pcp_dir directory arguments.
 //   007    06/25/10  Halley Gotway  Allow times to be specified in
 //                    HH[MMSS] and YYYYMMDD[_HH[MMSS]] format.
+//   008    06/30/10  Halley Gotway  Enhance grid equality checks.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -551,14 +552,12 @@ void sum_grib_files(GribRecord &rec) {
       else {
 
          //
-         // Check to make sure that the grid dimensions stay constant
-         // over all of the files
+         // Check to make sure the grid stays the same
          //
-         if(gr.nx() != grid.nx() || gr.ny() != grid.ny() ) {
+         if(!(grid == gr)) {
             cerr << "\n\nERROR: sum_grib_files() -> "
-                 << "Grid dimensions must be the same for all precipitation files "
-                 << "(nx, ny) = (" << gr.nx() << ", " << gr.ny() << ") != ("
-                 << grid.nx() << ", " << grid.ny() << ")\n\n" << flush;
+                 << "The grid must remain the same for all "
+                 << "data files.\n\n" << flush;
             exit(1);
          }
 

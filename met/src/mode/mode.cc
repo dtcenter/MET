@@ -35,6 +35,7 @@
 //   006    05/03/10  Halley Gotway  Remove the variable/level info
 //                    from the output file naming convention.
 //   007    05/11/10  Halley Gotway  Plot polyline lines thicker.
+//   008    06/30/10  Halley Gotway  Enhance grid equality checks.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -568,15 +569,12 @@ void process_fcst_obs_files() {
    if(is_bad_data(obs_lead_sec))    obs_lead_sec = obs_wd.get_lead_time();
 
    //
-   // Check that the grid dimensions match
+   // Check that the grids match
    //
-   if(fcst_grid.nx() != obs_grid.nx() ||
-      fcst_grid.ny() != obs_grid.ny()) {
+   if(!(fcst_grid == obs_grid)) {
       cerr << "\n\nERROR: main() -> "
-           << "forecast and observation grid dimensions "
-           << "do not match (" << fcst_grid.nx() << ", "
-           << fcst_grid.ny() << ") != (" << obs_grid.nx()
-           << ", " << obs_grid.ny() << ")\n\n" << flush;
+           << "The forecast and observation grids do not match.\n\n"
+           << flush;
       exit(1);
    }
    grid = fcst_grid;

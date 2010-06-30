@@ -59,6 +59,7 @@
 //                    contingency tables.
 //   019    06/15/10  Halley Gotway  Dump reason codes for why
 //                    point observations were rejected.
+//   020    06/30/10  Halley Gotway  Enhance grid equality checks.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -712,14 +713,10 @@ void process_grib_codes() {
          // grid dimensions don't change
          else {
 
-            // Check that the grid dimensions have not changed
-            if(data_grid.nx() != grid.nx() ||
-               data_grid.ny() != grid.ny()) {
+            // Check that the grid has not changed
+            if(!(data_grid == grid)) {
                cerr << "\n\nERROR: process_grib_codes() -> "
-                    << "The forecast grid dimensions "
-                    << "have changed (" << data_grid.nx() << ", "
-                    << data_grid.ny() << ") != (" << grid.nx()
-                    << ", " << grid.ny() << ") for GRIB code "
+                    << "The forecast grid has changed for GRIB code "
                     << conf_info.gc_pd[i].fcst_gci.code << ".\n\n"
                     << flush;
                exit(1);
@@ -790,14 +787,10 @@ void process_grib_codes() {
             }
          }
 
-         // Check that the grid dimensions have not changed
-         if(data_grid.nx() != grid.nx() ||
-            data_grid.ny() != grid.ny()) {
+         // Check that the grid has not changed
+         if(!(data_grid == grid)) {
             cerr << "\n\nERROR: process_grib_codes() -> "
-                 << "The climatology grid dimensions "
-                 << "have changed (" << data_grid.nx() << ", "
-                 << data_grid.ny() << ") != (" << grid.nx()
-                 << ", " << grid.ny() << ") for GRIB code "
+                 << "The climatology grid has changed for GRIB code "
                  << conf_info.gc_pd[i].fcst_gci.code << ".\n\n"
                  << flush;
             exit(1);
