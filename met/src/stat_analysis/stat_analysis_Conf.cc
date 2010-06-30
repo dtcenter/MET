@@ -13,7 +13,7 @@
    //
    //     Created from config file "STATAnalysisConfig_default"
    //
-   //     on June 14, 2010    3:28 pm  MDT
+   //     on June 21, 2010    10:19 am  MDT
    //
 
 
@@ -197,6 +197,8 @@ _fcst_init_hour_entry = (const SymbolTableEntry *) 0;
      _boot_seed_entry = (const SymbolTableEntry *) 0;
 
 _rank_corr_flag_entry = (const SymbolTableEntry *) 0;
+
+      _vif_flag_entry = (const SymbolTableEntry *) 0;
 
        _tmp_dir_entry = (const SymbolTableEntry *) 0;
 
@@ -669,6 +671,19 @@ if ( !_e && Panic )  {
 }
 
 _rank_corr_flag_entry = _e;
+
+
+_e = _m.find("vif_flag");
+
+if ( !_e && Panic )  {
+
+   cerr << "\n\n  stat_analysis_Conf::read(const char *) -> can't get symbol table entry for variable \"vif_flag\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_vif_flag_entry = _e;
 
 
 _e = _m.find("tmp_dir");
@@ -2363,6 +2378,31 @@ if ( !_rank_corr_flag_entry && !Panic )  return ( _temp_result );
 IcodeCell _cell;
 
 _m.run( *_rank_corr_flag_entry );
+
+_cell = _m.pop();
+
+icodecell_to_result(_cell, _temp_result);
+
+
+return ( _temp_result );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Result stat_analysis_Conf::vif_flag()
+
+{
+
+Result _temp_result;
+
+if ( !_vif_flag_entry && !Panic )  return ( _temp_result );
+
+IcodeCell _cell;
+
+_m.run( *_vif_flag_entry );
 
 _cell = _m.pop();
 

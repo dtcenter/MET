@@ -38,9 +38,14 @@ using namespace std;
 #include <unistd.h>
 
 #include "vx_analysis_util/vx_analysis_util.h"
+#include "vx_gsl_prob/vx_gsl_prob.h"
 #include "vx_util/vx_util.h"
 #include "vx_met_util/vx_met_util.h"
 #include "vx_contable/vx_contable.h"
+
+////////////////////////////////////////////////////////////////////////
+
+static const int min_time_series = 10;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -61,7 +66,7 @@ extern void aggr_nx2_contable_lines(
 
 extern void aggr_partial_sum_lines(
                const char *, LineDataFile &,
-               STATAnalysisJob &, SL1L2Info &, VL1L2Info &,
+               STATAnalysisJob &, SL1L2Info &, VL1L2Info &, CNTInfo &,
                STATLineType, int &, int &, int);
 
 extern void aggr_vl1l2_wdir(

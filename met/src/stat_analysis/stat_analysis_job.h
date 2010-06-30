@@ -68,7 +68,7 @@ extern void write_job_mcts(STATAnalysisJob &, STATLineType,
                MCTSInfo &, AsciiTable &);
 
 extern void write_job_cnt(STATAnalysisJob &, STATLineType,
-               SL1L2Info &, AsciiTable &);
+               SL1L2Info &, CNTInfo &, AsciiTable &);
 
 extern void write_job_wdir(STATAnalysisJob &, STATLineType,
                VL1L2Info &,

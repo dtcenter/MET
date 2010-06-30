@@ -18,6 +18,7 @@
 //   001    05/24/10  Halley Gotway   Add aggr_rhist_lines and
 //                    aggr_orank_lines.
 //   002    06/09/10  Halley Gotway   Add aggr_mctc_lines.
+//   003    06/21/10  Halley Gotway   Add support for vif_flag.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,8 +48,14 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
                          int verbosity) {
    STATLine line;
    TTContingencyTable ct;
-   int fy_oy, fy_on, fn_oy, fn_on;
+   CTSInfo cts_tmp;
+   int fy_oy, fy_on, fn_oy, fn_on, n, n_ties;
    char line_type[max_str_len];
+
+   // Keep track of scores for each time for computing VIF
+   unixtime ut;
+   NumArray valid_ts, baser_ts, acc_ts;
+   NumArray pody_ts, podn_ts, far_ts, csi_ts, hk_ts, odds_ts;
 
    //
    // Initialize the Contingency Table counts
@@ -105,6 +112,47 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
          fn_oy += ct.fn_oy();
          fn_on += ct.fn_on();
 
+         //
+         // Keep track of scores for each time step for VIF
+         //
+         if(j.vif_flag) {
+
+            //
+            // Cannot compute VIF when the times are not unique
+            //
+            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+
+            if(valid_ts.has((double) ut)) {
+               cout << "WARNING: aggr_contable_lines() -> "
+                    << "the variance inflation factor adjustment can "
+                    << "only be computed for time series with unique "
+                    << "valid times.\n" << flush;
+               j.vif_flag = 0;
+            }
+            else {
+               valid_ts.add((double) ut);
+            }
+
+            //
+            // Compute the stats for the current time
+            //
+            cts_tmp.clear();
+            cts_tmp.cts = ct;
+            cts_tmp.compute_stats();
+
+            //
+            // Append the stats
+            //
+            baser_ts.add(cts_tmp.baser.v);
+            acc_ts.add(cts_tmp.acc.v);
+            pody_ts.add(cts_tmp.pody.v);
+            podn_ts.add(cts_tmp.podn.v);
+            far_ts.add(cts_tmp.far.v);
+            csi_ts.add(cts_tmp.csi.v);
+            hk_ts.add(cts_tmp.hk.v);
+            odds_ts.add(cts_tmp.odds.v);
+         }
+
          if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
@@ -119,6 +167,60 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
    cts_info.cts.set_fn_oy(fn_oy);
    cts_info.cts.set_fn_on(fn_on);
 
+   //
+   // Check for the minimum length of time series
+   //
+   if(j.vif_flag && valid_ts.n_elements() < min_time_series) {
+      cout << "WARNING: aggr_contable_lines() -> "
+           << "the variance inflation factor adjustment can only "
+           << "be computed for at least " << min_time_series
+           << " unique valid times.\n"
+           << flush;
+      j.vif_flag = 0;
+   }
+
+   //
+   // Compute the auto-correlations for VIF
+   //
+   if(j.vif_flag) {
+
+      //
+      // Sort the valid times
+      //
+      n = valid_ts.rank_array(n_ties);
+
+      if(n_ties > 0 || n != valid_ts.n_elements()) {
+         cerr << "\n\nERROR: aggr_contable_lines() -> "
+              << "should be no ties in the valid time array!\n\n"
+              << flush;
+         throw(1);
+      }
+
+      //
+      // Sort the stats into time order
+      //
+      baser_ts.reorder(valid_ts);
+      acc_ts.reorder(valid_ts);
+      pody_ts.reorder(valid_ts);
+      podn_ts.reorder(valid_ts);
+      far_ts.reorder(valid_ts);
+      csi_ts.reorder(valid_ts);
+      hk_ts.reorder(valid_ts);
+      odds_ts.reorder(valid_ts);
+
+      //
+      // Compute the lag 1 autocorrelation
+      //
+      cts_info.baser.corr = stats_lag1_autocorrelation(baser_ts);
+      cts_info.acc.corr   = stats_lag1_autocorrelation(acc_ts);
+      cts_info.pody.corr  = stats_lag1_autocorrelation(pody_ts);
+      cts_info.podn.corr  = stats_lag1_autocorrelation(podn_ts);
+      cts_info.far.corr   = stats_lag1_autocorrelation(far_ts);
+      cts_info.csi.corr   = stats_lag1_autocorrelation(csi_ts);
+      cts_info.hk.corr    = stats_lag1_autocorrelation(hk_ts);
+      cts_info.odds.corr  = stats_lag1_autocorrelation(odds_ts);
+   }
+
    return;
 }
 
@@ -130,8 +232,13 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
                      int verbosity) {
    STATLine line;
    ContingencyTable mct;
+   MCTSInfo mcts_tmp;
    char line_type[max_str_len];
-   int i, k, cur;
+   int i, k, cur, n, n_ties;
+
+   // Keep track of scores for each time for computing VIF
+   unixtime ut;
+   NumArray valid_ts, acc_ts;
 
    //
    // Initialize
@@ -205,11 +312,85 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
             } // end for i
          } // end else
 
+         //
+         // Keep track of scores for each time step for VIF
+         //
+         if(j.vif_flag) {
+
+            //
+            // Cannot compute VIF when the times are not unique
+            //
+            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+
+            if(valid_ts.has((double) ut)) {
+               cout << "WARNING: aggr_mctc_lines() -> "
+                    << "the variance inflation factor adjustment can "
+                    << "only be computed for time series with unique "
+                    << "valid times.\n" << flush;
+               j.vif_flag = 0;
+            }
+            else {
+               valid_ts.add((double) ut);
+            }
+
+            //
+            // Compute the stats for the current time
+            //
+            mcts_tmp.clear();
+            mcts_tmp.cts = mct;
+            mcts_tmp.compute_stats();
+
+            //
+            // Append the stats
+            //
+            acc_ts.add(mcts_tmp.acc.v);
+         }
+
          if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
    } // end while
+
+   //
+   // Check for the minimum length of time series
+   //
+   if(j.vif_flag && valid_ts.n_elements() < min_time_series) {
+      cout << "WARNING: aggr_mctc_lines() -> "
+           << "the variance inflation factor adjustment can only "
+           << "be computed for at least " << min_time_series
+           << " unique valid times.\n"
+           << flush;
+      j.vif_flag = 0;
+   }
+
+   //
+   // Compute the auto-correlations for VIF
+   //
+   if(j.vif_flag) {
+
+      //
+      // Sort the valid times
+      //
+      n = valid_ts.rank_array(n_ties);
+
+      if(n_ties > 0 || n != valid_ts.n_elements()) {
+         cerr << "\n\nERROR: aggr_mctc_lines() -> "
+              << "should be no ties in the valid time array!\n\n"
+              << flush;
+         throw(1);
+      }
+
+      //
+      // Sort the stats into time order
+      //
+      acc_ts.reorder(valid_ts);
+
+      //
+      // Compute the lag 1 autocorrelation
+      //
+      mcts_info.acc.corr = stats_lag1_autocorrelation(acc_ts);
+   }
 
    return;
 }
@@ -222,8 +403,13 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
                              int verbosity) {
    STATLine line;
    Nx2ContingencyTable pct;
+   PCTInfo pct_tmp;
    char line_type[max_str_len];
-   int i, oy, on;
+   int i, oy, on, n, n_ties;
+
+   // Keep track of scores for each time for computing VIF
+   unixtime ut;
+   NumArray valid_ts, baser_ts, brier_ts;
 
    //
    // Initialize
@@ -312,11 +498,76 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
             } // end for i
          } // end else
 
+         //
+         // Keep track of scores for each time step for VIF
+         //
+         if(j.vif_flag) {
+
+            //
+            // Cannot compute VIF when the times are not unique
+            //
+            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+
+            if(valid_ts.has((double) ut)) {
+               cout << "WARNING: aggr_nx2_contable_lines() -> "
+                    << "the variance inflation factor adjustment can "
+                    << "only be computed for time series with unique "
+                    << "valid times.\n" << flush;
+               j.vif_flag = 0;
+            }
+            else {
+               valid_ts.add((double) ut);
+            }
+
+            //
+            // Compute the stats for the current time
+            //
+            pct_tmp.clear();
+            pct_tmp.pct = pct;
+            pct_tmp.compute_stats();
+
+            //
+            // Append the stats
+            //
+            baser_ts.add(pct_tmp.baser.v);
+            brier_ts.add(pct_tmp.brier.v);
+         }
+
          if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
    } // end while
+
+   //
+   // Compute the auto-correlations for VIF
+   //
+   if(j.vif_flag) {
+
+      //
+      // Sort the valid times
+      //
+      n = valid_ts.rank_array(n_ties);
+
+      if(n_ties > 0 || n != valid_ts.n_elements()) {
+         cerr << "\n\nERROR: aggr_nx2_contable_lines() -> "
+              << "should be no ties in the valid time array!\n\n"
+              << flush;
+         throw(1);
+      }
+
+      //
+      // Sort the stats into time order
+      //
+      baser_ts.reorder(valid_ts);
+      brier_ts.reorder(valid_ts);
+
+      //
+      // Compute the lag 1 autocorrelation
+      //
+      pct_info.baser.corr = stats_lag1_autocorrelation(baser_ts);
+      pct_info.brier.corr = stats_lag1_autocorrelation(brier_ts);
+   }
 
    return;
 }
@@ -324,13 +575,20 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
-                            STATAnalysisJob &j,
-                            SL1L2Info &sl1l2_info, VL1L2Info &vl1l2_info,
+                            STATAnalysisJob &j, SL1L2Info &sl1l2_info,
+                            VL1L2Info &vl1l2_info, CNTInfo &cnt_info,
                             STATLineType lt, int &n_in, int &n_out,
-                           int verbosity) {
+                            int verbosity) {
    STATLine line;
    SL1L2Info s;
    VL1L2Info v;
+   int n, n_ties;
+
+   // Keep track of scores for each time for computing VIF
+   unixtime ut;
+   NumArray valid_ts, fbar_ts, fstdev_ts, obar_ts, ostdev_ts;
+   NumArray pr_corr_ts, me_ts, estdev_ts;
+   CNTInfo cnt_tmp;
 
    //
    // Initialize the partial sums
@@ -385,11 +643,89 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
                throw(1);
          } // end switch
 
+         //
+         // Keep track of scores for each time step for VIF
+         //
+         if(line.type() == stat_sl1l2 && j.vif_flag) {
+
+            //
+            // Cannot compute VIF when the times are not unique
+            //
+            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+
+            if(valid_ts.has((double) ut)) {
+               cout << "WARNING: aggr_partial_sum_lines() -> "
+                    << "the variance inflation factor adjustment can "
+                    << "only be computed for time series with unique "
+                    << "valid times.\n" << flush;
+               j.vif_flag = 0;
+            }
+            else {
+               valid_ts.add((double) ut);
+            }
+
+            //
+            // Compute the stats for the current time
+            //
+            compute_cntinfo(s, 0, cnt_tmp);
+
+            //
+            // Append the stats
+            //
+            fbar_ts.add(cnt_tmp.fbar.v);
+            fstdev_ts.add(cnt_tmp.fstdev.v);
+            obar_ts.add(cnt_tmp.obar.v);
+            ostdev_ts.add(cnt_tmp.ostdev.v);
+            pr_corr_ts.add(cnt_tmp.pr_corr.v);
+            me_ts.add(cnt_tmp.me.v);
+            estdev_ts.add(cnt_tmp.estdev.v);
+         }
+
          if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
    } // end while
+
+   //
+   // Compute the auto-correlations for VIF
+   //
+   if(line.type() == stat_sl1l2 && j.vif_flag) {
+
+      //
+      // Sort the valid times
+      //
+      n = valid_ts.rank_array(n_ties);
+
+      if(n_ties > 0 || n != valid_ts.n_elements()) {
+         cerr << "\n\nERROR: aggr_partial_sum_lines() -> "
+              << "should be no ties in the valid time array!\n\n"
+              << flush;
+         throw(1);
+      }
+
+      //
+      // Sort the stats into time order
+      //
+      fbar_ts.reorder(valid_ts);
+      fstdev_ts.reorder(valid_ts);
+      obar_ts.reorder(valid_ts);
+      ostdev_ts.reorder(valid_ts);
+      pr_corr_ts.reorder(valid_ts);
+      me_ts.reorder(valid_ts);
+      estdev_ts.reorder(valid_ts);
+
+      //
+      // Compute the lag 1 autocorrelation
+      //
+      cnt_info.fbar.corr = stats_lag1_autocorrelation(fbar_ts);
+      cnt_info.fstdev.corr = stats_lag1_autocorrelation(fstdev_ts);
+      cnt_info.obar.corr = stats_lag1_autocorrelation(obar_ts);
+      cnt_info.ostdev.corr = stats_lag1_autocorrelation(ostdev_ts);
+      cnt_info.pr_corr.corr = stats_lag1_autocorrelation(pr_corr_ts);
+      cnt_info.me.corr = stats_lag1_autocorrelation(me_ts);
+      cnt_info.estdev.corr = stats_lag1_autocorrelation(estdev_ts);
+   }
 
    return;
 }
