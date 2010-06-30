@@ -45,6 +45,7 @@ class CIInfo {
       int n;
 
       double v;
+      double corr;
 
       // Confidence interval computed using a normal approximation
       double *v_ncl;
