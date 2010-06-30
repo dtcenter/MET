@@ -408,6 +408,43 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void NumArray::sort_array(const NumArray &i_na) {
+   NumArray tmp_na;
+   int i, j;
+
+   // Check that the index array is of the correct length
+   if(i_na.n_elements() != Nelements) {
+      cerr << "\n\nNumArray::sort_array(const NumArray &) -> "
+           << "the index and sorting arrays must have the same length\n\n"
+           << flush;
+      exit(1);
+   }
+
+   // Store temporary copy of data array
+   tmp_na = *this;
+   clear();
+
+   for(i=0; i<i_na.n_elements(); i++) {
+      j = nint(i_na[i]) - 1;
+
+      if(j<0 || j>=i_na.n_elements()) {
+         cerr << "\n\nNumArray::sort_array(const NumArray &) -> "
+              << "index out of bounds: " << j << "\n\n"
+              << flush;
+         exit(1);
+      }
+
+      // Add the elements in the indexed order
+      add(tmp_na[j]);
+   }
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
 //
 // Compute the rank of the values in the array and return the number
 // of valid data values that were ranked.
