@@ -44,8 +44,11 @@ class CIInfo {
 
       int n;
 
+      // Value of the statistic
       double v;
-      double corr;
+
+      // Variance inflation factor for time series
+      double vif;
 
       // Confidence interval computed using a normal approximation
       double *v_ncl;

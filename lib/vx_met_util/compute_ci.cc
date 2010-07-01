@@ -34,8 +34,6 @@ static void write_mctsinfo(ofstream &, const MCTSInfo &);
 static void write_nbrcntinfo(ofstream &, const NBRCNTInfo &);
 static void read_ldf(const char *, int, NumArray &);
 
-// JHG, need to adjust computations using the vif
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute a confidence interval for a proportion.
@@ -81,7 +79,7 @@ void compute_wald_ci(double p, int n, double alpha, double vif,
    //
    // Compute the upper and lower bounds of the confidence interval
    //
-   v = p*(1.0-p)/n;
+   v = vif*p*(1.0-p)/n;
 
    if(v < 0.0) {
       p_cl = bad_data_double;
@@ -122,7 +120,7 @@ void compute_wilson_ci(double p, int n, double alpha, double vif,
    //
    // Compute the upper and lower bounds of the confidence interval
    //
-   v = p*(1.0-p)/n + cv_normal_l*cv_normal_l/(4*n*n);
+   v = vif*p*(1.0-p)/n + cv_normal_l*cv_normal_l/(4*n*n);
    if(v < 0.0) {
       p_cl = bad_data_double;
    }
@@ -131,7 +129,7 @@ void compute_wilson_ci(double p, int n, double alpha, double vif,
              / (1.0 + cv_normal_l*cv_normal_l/n);
    }
 
-   v = p*(1.0-p)/n + cv_normal_u*cv_normal_u/(4*n*n);
+   v = vif*p*(1.0-p)/n + cv_normal_u*cv_normal_u/(4*n*n);
    if(v < 0.0) {
       p_cu = bad_data_double;
    }
@@ -150,7 +148,7 @@ void compute_wilson_ci(double p, int n, double alpha, double vif,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_woolf_ci(double odds, double alpha, double vif,
+void compute_woolf_ci(double odds, double alpha,
                       int fy_oy, int fy_on, int fn_oy, int fn_on,
                       double &odds_cl, double &odds_cu) {
    double cv_normal_l, cv_normal_u, a, b;
@@ -230,7 +228,7 @@ void compute_hk_ci(double hk, double alpha, double vif,
    //
    // Compute the standard deviation for HK
    //
-   stdev = sqrt(h_var*h_var + f_var*f_var);
+   stdev = sqrt(vif*(h_var*h_var + f_var*f_var));
 
    //
    // Compute the upper and lower bounds of the confidence interval
