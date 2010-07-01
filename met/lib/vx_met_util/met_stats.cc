@@ -762,10 +762,11 @@ void CNTInfo::compute_ci() {
       cv_chi2_u = chi2_cdf_inv(1.0 - (alpha[i]/2.0), n-1);
 
       //
-      // Compute confidence interval for forecast mean
+      // Compute confidence interval for forecast mean using VIF
       //
-      fbar.v_ncl[i] = fbar.v + cv_normal_l*fstdev.v/sqrt((double) n);
-      fbar.v_ncu[i] = fbar.v + cv_normal_u*fstdev.v/sqrt((double) n);
+      v = fbar.vif*fstdev.v*fstdev.v;
+      fbar.v_ncl[i] = fbar.v + cv_normal_l*sqrt(v)/sqrt((double) n);
+      fbar.v_ncu[i] = fbar.v + cv_normal_u*sqrt(v)/sqrt((double) n);
 
       //
       // Compute confidence interval for forecast standard deviation,
@@ -780,10 +781,11 @@ void CNTInfo::compute_ci() {
       else      fstdev.v_ncu[i] = sqrt(v);
 
       //
-      // Compute confidence interval for observation mean
+      // Compute confidence interval for observation mean using VIF
       //
-      obar.v_ncl[i] = obar.v + cv_normal_l*ostdev.v/sqrt((double) n);
-      obar.v_ncu[i] = obar.v + cv_normal_u*ostdev.v/sqrt((double) n);
+      v = obar.vif*ostdev.v*ostdev.v;
+      obar.v_ncl[i] = obar.v + cv_normal_l*sqrt(v)/sqrt((double) n);
+      obar.v_ncu[i] = obar.v + cv_normal_u*sqrt(v)/sqrt((double) n);
 
       //
       // Compute confidence interval for observation standard deviation
@@ -814,10 +816,11 @@ void CNTInfo::compute_ci() {
       }
 
       //
-      // Compute confidence interval for mean error
+      // Compute confidence interval for mean error using VIF
       //
-      me.v_ncl[i] = me.v + cv_normal_l*estdev.v/sqrt((double) n);
-      me.v_ncu[i] = me.v + cv_normal_u*estdev.v/sqrt((double) n);
+      v = me.vif*estdev.v*estdev.v;
+      me.v_ncl[i] = me.v + cv_normal_l*sqrt(v)/sqrt((double) n);
+      me.v_ncu[i] = me.v + cv_normal_u*sqrt(v)/sqrt((double) n);
 
       //
       // Compute confidence interval for the error standard deviation
@@ -1773,7 +1776,8 @@ void PCTInfo::compute_ci() {
    //
    for(i=0; i<n_alpha; i++) {
 
-      baser.v = pct.baser_ci(alpha[i], baser.v_ncl[i], baser.v_ncu[i]);
+      compute_proportion_ci(baser.v, pct.n(), alpha[i], baser.vif,
+                            baser.v_ncl[i], baser.v_ncu[i]);
 
       halfwidth = pct.brier_ci_halfwidth(alpha[i]);
       brier.v_ncl[i] = brier.v - halfwidth;
