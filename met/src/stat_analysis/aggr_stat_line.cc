@@ -54,8 +54,8 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
 
    // Keep track of scores for each time for computing VIF
    unixtime ut;
-   NumArray valid_ts, baser_ts, acc_ts;
-   NumArray pody_ts, podn_ts, far_ts, csi_ts, hk_ts, odds_ts;
+   NumArray valid_ts, baser_ts, fmean_ts, acc_ts;
+   NumArray pody_ts, podn_ts, pofd_ts, far_ts, csi_ts, hk_ts;
 
    //
    // Initialize the Contingency Table counts
@@ -144,13 +144,14 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
             // Append the stats
             //
             baser_ts.add(cts_tmp.baser.v);
+            fmean_ts.add(cts_tmp.fmean.v);
             acc_ts.add(cts_tmp.acc.v);
             pody_ts.add(cts_tmp.pody.v);
             podn_ts.add(cts_tmp.podn.v);
+            pofd_ts.add(cts_tmp.pofd.v);
             far_ts.add(cts_tmp.far.v);
             csi_ts.add(cts_tmp.csi.v);
             hk_ts.add(cts_tmp.hk.v);
-            odds_ts.add(cts_tmp.odds.v);
          }
 
          if(j.dr_out) *(j.dr_out) << line;
@@ -200,25 +201,27 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
       // Sort the stats into time order
       //
       baser_ts.reorder(valid_ts);
+      fmean_ts.reorder(valid_ts);
       acc_ts.reorder(valid_ts);
       pody_ts.reorder(valid_ts);
       podn_ts.reorder(valid_ts);
+      pofd_ts.reorder(valid_ts);
       far_ts.reorder(valid_ts);
       csi_ts.reorder(valid_ts);
       hk_ts.reorder(valid_ts);
-      odds_ts.reorder(valid_ts);
 
       //
       // Compute the lag 1 autocorrelation
       //
-      cts_info.baser.corr = stats_lag1_autocorrelation(baser_ts);
-      cts_info.acc.corr   = stats_lag1_autocorrelation(acc_ts);
-      cts_info.pody.corr  = stats_lag1_autocorrelation(pody_ts);
-      cts_info.podn.corr  = stats_lag1_autocorrelation(podn_ts);
-      cts_info.far.corr   = stats_lag1_autocorrelation(far_ts);
-      cts_info.csi.corr   = stats_lag1_autocorrelation(csi_ts);
-      cts_info.hk.corr    = stats_lag1_autocorrelation(hk_ts);
-      cts_info.odds.corr  = stats_lag1_autocorrelation(odds_ts);
+      cts_info.baser.vif = compute_vif(baser_ts);
+      cts_info.fmean.vif = compute_vif(fmean_ts);
+      cts_info.acc.vif   = compute_vif(acc_ts);
+      cts_info.pody.vif  = compute_vif(pody_ts);
+      cts_info.podn.vif  = compute_vif(podn_ts);
+      cts_info.pofd.vif  = compute_vif(pofd_ts);
+      cts_info.far.vif   = compute_vif(far_ts);
+      cts_info.csi.vif   = compute_vif(csi_ts);
+      cts_info.hk.vif    = compute_vif(hk_ts);
    }
 
    return;
@@ -389,7 +392,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
       //
       // Compute the lag 1 autocorrelation
       //
-      mcts_info.acc.corr = stats_lag1_autocorrelation(acc_ts);
+      mcts_info.acc.vif = compute_vif(acc_ts);
    }
 
    return;
@@ -565,8 +568,8 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
       //
       // Compute the lag 1 autocorrelation
       //
-      pct_info.baser.corr = stats_lag1_autocorrelation(baser_ts);
-      pct_info.brier.corr = stats_lag1_autocorrelation(brier_ts);
+      pct_info.baser.vif = compute_vif(baser_ts);
+      pct_info.brier.vif = compute_vif(brier_ts);
    }
 
    return;
@@ -586,8 +589,7 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
 
    // Keep track of scores for each time for computing VIF
    unixtime ut;
-   NumArray valid_ts, fbar_ts, fstdev_ts, obar_ts, ostdev_ts;
-   NumArray pr_corr_ts, me_ts, estdev_ts;
+   NumArray valid_ts, fbar_ts, obar_ts, me_ts;
    CNTInfo cnt_tmp;
 
    //
@@ -673,12 +675,8 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
             // Append the stats
             //
             fbar_ts.add(cnt_tmp.fbar.v);
-            fstdev_ts.add(cnt_tmp.fstdev.v);
             obar_ts.add(cnt_tmp.obar.v);
-            ostdev_ts.add(cnt_tmp.ostdev.v);
-            pr_corr_ts.add(cnt_tmp.pr_corr.v);
             me_ts.add(cnt_tmp.me.v);
-            estdev_ts.add(cnt_tmp.estdev.v);
          }
 
          if(j.dr_out) *(j.dr_out) << line;
@@ -708,23 +706,15 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
       // Sort the stats into time order
       //
       fbar_ts.reorder(valid_ts);
-      fstdev_ts.reorder(valid_ts);
       obar_ts.reorder(valid_ts);
-      ostdev_ts.reorder(valid_ts);
-      pr_corr_ts.reorder(valid_ts);
       me_ts.reorder(valid_ts);
-      estdev_ts.reorder(valid_ts);
 
       //
       // Compute the lag 1 autocorrelation
       //
-      cnt_info.fbar.corr = stats_lag1_autocorrelation(fbar_ts);
-      cnt_info.fstdev.corr = stats_lag1_autocorrelation(fstdev_ts);
-      cnt_info.obar.corr = stats_lag1_autocorrelation(obar_ts);
-      cnt_info.ostdev.corr = stats_lag1_autocorrelation(ostdev_ts);
-      cnt_info.pr_corr.corr = stats_lag1_autocorrelation(pr_corr_ts);
-      cnt_info.me.corr = stats_lag1_autocorrelation(me_ts);
-      cnt_info.estdev.corr = stats_lag1_autocorrelation(estdev_ts);
+      cnt_info.fbar.vif = compute_vif(fbar_ts);
+      cnt_info.obar.vif = compute_vif(obar_ts);
+      cnt_info.me.vif   = compute_vif(me_ts);
    }
 
    return;
@@ -1626,6 +1616,26 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
    } // end while
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double compute_vif(NumArray &na) {
+   double corr, vif;
+
+   // Compute the lag1 autocorrelation
+   corr = stats_lag1_autocorrelation(na);
+
+   // Compute the variance inflation factor
+   vif = 1 + 2.0*abs(corr) - 2.0*abs(corr)/na.n_elements();
+
+   // JHG, remove this
+   int i;
+   cout << "JHG: VIF = " << vif << ", LAG1 = " << corr << "\n";
+   for(i=0; i<na.n_elements(); i++) cout << na[i] << ", ";
+   cout << "\n" << flush;
+
+   return(vif);
 }
 
 ////////////////////////////////////////////////////////////////////////
