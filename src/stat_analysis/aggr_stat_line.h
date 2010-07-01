@@ -133,6 +133,8 @@ extern void aggr_orank_lines(
                STATAnalysisJob &, NumArray &,
                int &, int &, int);
 
+extern double compute_vif(NumArray &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __AGGR_STAT_LINE_H__
