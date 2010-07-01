@@ -1779,7 +1779,9 @@ void PCTInfo::compute_ci() {
       compute_proportion_ci(baser.v, pct.n(), alpha[i], baser.vif,
                             baser.v_ncl[i], baser.v_ncu[i]);
 
+      // Compute brier CI using the VIF
       halfwidth = pct.brier_ci_halfwidth(alpha[i]);
+      halfwidth *= sqrt(brier.vif);
       brier.v_ncl[i] = brier.v - halfwidth;
       brier.v_ncu[i] = brier.v + halfwidth;
    } // end for i
