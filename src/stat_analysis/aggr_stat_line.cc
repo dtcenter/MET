@@ -688,7 +688,7 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
    //
    // Compute the auto-correlations for VIF
    //
-   if(line.type() == stat_sl1l2 && j.vif_flag) {
+   if(j.out_line_type == stat_cnt && j.vif_flag) {
 
       //
       // Sort the valid times
