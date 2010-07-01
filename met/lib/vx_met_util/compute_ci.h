@@ -33,7 +33,7 @@ extern void compute_wald_ci(double p, int n, double alpha,
 extern void compute_wilson_ci(double p, int n, double alpha,
    double vif, double &p_cl, double &p_cu);
 
-extern void compute_woolf_ci(double odds, double alpha, double vif,
+extern void compute_woolf_ci(double odds, double alpha,
    int fy_oy, int fy_on, int fn_oy, int fn_on,
    double &odds_cl, double &odds_cu);
 

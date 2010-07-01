@@ -81,9 +81,9 @@ void CIInfo::init_from_scratch() {
 
 void CIInfo::clear() {
 
-   n    = 0;
-   v    = bad_data_double;
-   corr = 0.0;
+   n   = 0;
+   v   = bad_data_double;
+   vif = 1.0;
 
    if(v_ncl) { delete [] v_ncl; v_ncl = (double *) 0; }
    if(v_ncu) { delete [] v_ncu; v_ncu = (double *) 0; }
@@ -99,8 +99,8 @@ void CIInfo::clear() {
 void CIInfo::set_bad_data() {
    int i;
 
-   v    = bad_data_double;
-   corr = 0.0;
+   v   = bad_data_double;
+   vif = 1.0;
 
    for(i=0; i<n; i++) {
       v_ncl[i] = v_ncu[i] = bad_data_double;
@@ -119,8 +119,8 @@ void CIInfo::assign(const CIInfo &c) {
 
    allocate_n_alpha(c.n);
 
-   v    = c.v;
-   corr = c.corr;
+   v   = c.v;
+   vif = c.vif;
 
    for(i=0; i<c.n; i++) {
       v_ncl[i] = c.v_ncl[i];
@@ -352,34 +352,34 @@ void CTSInfo::compute_ci() {
       // Compute confidence intervals for the scores based on
       // proportions
       //
-      compute_proportion_ci(baser.v, cts.n(), alpha[i], baser.corr,
+      compute_proportion_ci(baser.v, cts.n(), alpha[i], baser.vif,
                             baser.v_ncl[i], baser.v_ncu[i]);
-      compute_proportion_ci(fmean.v, cts.n(), alpha[i], fmean.corr,
+      compute_proportion_ci(fmean.v, cts.n(), alpha[i], fmean.vif,
                             fmean.v_ncl[i], fmean.v_ncu[i]);
-      compute_proportion_ci(acc.v, cts.n(), alpha[i], acc.corr,
+      compute_proportion_ci(acc.v, cts.n(), alpha[i], acc.vif,
                             acc.v_ncl[i], acc.v_ncu[i]);
-      compute_proportion_ci(pody.v, cts.n(), alpha[i], pody.corr,
+      compute_proportion_ci(pody.v, cts.n(), alpha[i], pody.vif,
                             pody.v_ncl[i], pody.v_ncu[i]);
-      compute_proportion_ci(podn.v, cts.n(), alpha[i], podn.corr,
+      compute_proportion_ci(podn.v, cts.n(), alpha[i], podn.vif,
                             podn.v_ncl[i], podn.v_ncu[i]);
-      compute_proportion_ci(pofd.v, cts.n(), alpha[i], pofd.corr,
+      compute_proportion_ci(pofd.v, cts.n(), alpha[i], pofd.vif,
                             pofd.v_ncl[i], pofd.v_ncu[i]);
-      compute_proportion_ci(far.v, cts.n(), alpha[i], far.corr,
+      compute_proportion_ci(far.v, cts.n(), alpha[i], far.vif,
                             far.v_ncl[i], far.v_ncu[i]);
-      compute_proportion_ci(csi.v, cts.n(), alpha[i], csi.corr,
+      compute_proportion_ci(csi.v, cts.n(), alpha[i], csi.vif,
                             csi.v_ncl[i], csi.v_ncu[i]);
 
       //
       // Compute a confidence interval for Hanssen and Kuipers discriminant
       //
-      compute_hk_ci(hk.v, alpha[i], hk.corr,
+      compute_hk_ci(hk.v, alpha[i], hk.vif,
                     cts.fy_oy(), cts.fy_on(), cts.fn_oy(), cts.fn_on(),
                     hk.v_ncl[i], hk.v_ncu[i]);
 
       //
       // Compute a confidence interval for the odds ratio
       //
-      compute_woolf_ci(odds.v, alpha[i], odds.corr,
+      compute_woolf_ci(odds.v, alpha[i],
                        cts.fy_oy(), cts.fy_on(), cts.fn_oy(), cts.fn_on(),
                        odds.v_ncl[i], odds.v_ncu[i]);
    } // end for i
@@ -541,7 +541,7 @@ void MCTSInfo::compute_ci() {
       // Compute confidence intervals for the scores based on
       // proportions
       //
-      compute_proportion_ci(acc.v, cts.total(), alpha[i], acc.corr,
+      compute_proportion_ci(acc.v, cts.total(), alpha[i], acc.vif,
                             acc.v_ncl[i], acc.v_ncu[i]);
    } // end for i
 
