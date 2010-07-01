@@ -478,7 +478,7 @@ double Nx2ContingencyTable::baser_ci(double alpha,
 
    v = baser();
 
-   compute_proportion_ci(v, n(), alpha, 0.0, cl, cu);
+   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
    return(v);
 }
