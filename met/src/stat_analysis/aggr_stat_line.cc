@@ -1629,12 +1629,6 @@ double compute_vif(NumArray &na) {
    // Compute the variance inflation factor
    vif = 1 + 2.0*abs(corr) - 2.0*abs(corr)/na.n_elements();
 
-   // JHG, remove this
-   int i;
-   cout << "JHG: VIF = " << vif << ", LAG1 = " << corr << "\n";
-   for(i=0; i<na.n_elements(); i++) cout << na[i] << ", ";
-   cout << "\n" << flush;
-
    return(vif);
 }
 
