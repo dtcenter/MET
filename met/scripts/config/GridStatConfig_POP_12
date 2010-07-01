@@ -57,7 +57,8 @@ obs_field[]  = [ "APCP/A12" ];
 //    'eq' for equal to      'ne' for not equal to
 //    'gt' for greater than  'ge' for greater than or equal to
 //
-// NOTE: Thresholds for probabilities must be preceeded by "ge".
+// NOTE: Thresholds for probabilities must begin with 0.0, end with 1.0,
+//       and be preceeded by "ge".
 //
 // e.g. fcst_thresh[] = [ "gt0.0 ge5.0", "gt0.0", "lt80.0 ge80.0" ];
 //
