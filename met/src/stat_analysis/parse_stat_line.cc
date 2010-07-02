@@ -228,9 +228,13 @@ void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_mpr_line(STATLine &l, MPRData &m_data) {
+   int prob_gc;
+   double prob_lo, prob_hi;
 
-   m_data.fcst_gc = str_to_grib_code(l.get_item(fcst_var_offset));
-   m_data.obs_gc  = str_to_grib_code(l.get_item(obs_var_offset));
+   m_data.fcst_gc = str_to_grib_code(l.get_item(fcst_var_offset),
+                                     prob_gc, prob_lo, prob_hi);
+   m_data.obs_gc  = str_to_grib_code(l.get_item(obs_var_offset),
+                                     prob_gc, prob_lo, prob_hi);
    m_data.total   = atoi(l.get_item(mpr_total_offset));
    m_data.index   = atoi(l.get_item(mpr_index_offset));
    strcpy(m_data.obs_sid, l.get_item(mpr_obs_sid_offset));
