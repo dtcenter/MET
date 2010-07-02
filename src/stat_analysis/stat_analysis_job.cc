@@ -1150,7 +1150,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
       write_job_nbrcts(j, in_lt, nbrcts_info, out_at);
    }
    else if(in_lt == stat_mpr) {
-      write_job_mpr(j, in_lt, cts_info, cnt_info,
+      write_job_mpr(j, in_lt, cts_info, mcts_info, cnt_info,
                     sl1l2_info, pct_info, out_at);
    }
    else if(in_lt == stat_orank) {
@@ -1550,10 +1550,10 @@ void write_job_nbrcts(STATAnalysisJob &j, STATLineType in_lt,
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
-                   CTSInfo &cts_info, CNTInfo &cnt_info,
-                   SL1L2Info &sl1l2_info, PCTInfo &pct_info,
-                   AsciiTable &out_at) {
-   int n_thresh;
+                   CTSInfo &cts_info, MCTSInfo &mcts_info,
+                   CNTInfo &cnt_info, SL1L2Info &sl1l2_info,
+                   PCTInfo &pct_info, AsciiTable &out_at) {
+   int n_thresh, n_cat;
 
    //
    // Construct the output line
@@ -1614,6 +1614,45 @@ void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
          //
          out_at.set_entry(1, 0,  "CTS:");
          write_cts_cols(cts_info, 0, out_at, 1, 1);
+
+         break;
+
+      case(stat_mctc):
+
+         //
+         // Get the column names
+         //
+         n_cat = mcts_info.cts.nrows();
+         out_at.set_size(2, get_n_mctc_columns(n_cat)+1);
+         setup_table(out_at);
+         out_at.set_entry(0, 0,  "COL_NAME:");
+         write_header_row(mctc_columns, n_mctc_columns, 0,
+                          out_at, 0, 1);
+
+         //
+         // Write the MCTC row
+         //
+         out_at.set_entry(1, 0,  "MCTC:");
+         write_mctc_cols(mcts_info, out_at, 1, 1);
+
+         break;
+
+      case(stat_mcts):
+
+         //
+         // Get the column names
+         //
+         out_at.set_size(2, n_mcts_columns+1);
+         setup_table(out_at);
+         out_at.set_entry(0, 0,  "COL_NAME:");
+         write_header_row(mcts_columns, n_mcts_columns, 0,
+                          out_at, 0, 1);
+
+         //
+         // Write the MCTS row
+         //
+         out_at.set_entry(1, 0,  "MCTS:");
+         write_mcts_cols(mcts_info, 0, out_at, 1, 1);
 
          break;
 

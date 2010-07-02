@@ -82,7 +82,7 @@ extern void write_job_nbrcts(STATAnalysisJob &, STATLineType,
                NBRCTSInfo &, AsciiTable &);
 
 extern void write_job_mpr(STATAnalysisJob &, STATLineType,
-               CTSInfo &, CNTInfo &, SL1L2Info &, PCTInfo &,
+               CTSInfo &, MCTSInfo &, CNTInfo &, SL1L2Info &, PCTInfo &,
                AsciiTable &);
 
 ////////////////////////////////////////////////////////////////////////
