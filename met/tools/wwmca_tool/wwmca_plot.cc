@@ -92,15 +92,15 @@ static void grid_to_page(double x_grid, double y_grid, double & x_page, double &
 
 static bool region_ok(const MapRegion0 &, const char hemisphere);
 
-static void draw_map(PostScriptFile &, const char hemisphere);
+static void draw_map(PSfile &, const char hemisphere);
 
-static void draw_region(PostScriptFile &, const MapRegion0 &);
+static void draw_region(PSfile &, const MapRegion0 &);
 
-static void draw_latlon_grid(PostScriptFile &, const char hemisphere);
+static void draw_latlon_grid(PSfile &, const char hemisphere);
 
-static void draw_parallel(PostScriptFile & plot, double lat);
+static void draw_parallel(PSfile & plot, double lat);
 
-static void draw_meridian(PostScriptFile & plot, const char hemisphere, double lon);
+static void draw_meridian(PSfile & plot, const char hemisphere, double lon);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -193,7 +193,7 @@ ConcatString short_name;
 ConcatString output_filename;
 Pgm image;
 RenderInfo info;
-PostScriptFile plot;
+PSfile plot;
 
 
 if ( !(f.read(filename)) )  {
@@ -409,7 +409,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_map(PostScriptFile & plot, const char hemisphere)
+void draw_map(PSfile & plot, const char hemisphere)
 
 {
 
@@ -449,7 +449,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_region(PostScriptFile & plot, const MapRegion0 & r)
+void draw_region(PSfile & plot, const MapRegion0 & r)
 
 {
 
@@ -479,7 +479,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_latlon_grid(PostScriptFile & plot, const char hemisphere)
+void draw_latlon_grid(PSfile & plot, const char hemisphere)
 
 {
 
@@ -532,7 +532,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_parallel(PostScriptFile & plot, double lat)
+void draw_parallel(PSfile & plot, double lat)
 
 {
 
@@ -570,7 +570,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_meridian(PostScriptFile & plot, const char hemisphere, double lon)
+void draw_meridian(PSfile & plot, const char hemisphere, double lon)
 
 {
 
