@@ -90,11 +90,11 @@ static Color value_to_color(int value);
 
 static void grid_to_page(double x_grid, double y_grid, double & x_page, double & y_page);
 
-static bool region_ok(const MapRegion0 &, const char hemisphere);
+static bool region_ok(const MapRegion &, const char hemisphere);
 
 static void draw_map(PSfile &, const char hemisphere);
 
-static void draw_region(PSfile &, const MapRegion0 &);
+static void draw_region(PSfile &, const MapRegion &);
 
 static void draw_latlon_grid(PSfile &, const char hemisphere);
 
@@ -393,7 +393,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool region_ok(const MapRegion0 & r, const char hemisphere)
+bool region_ok(const MapRegion & r, const char hemisphere)
 
 {
 
@@ -413,7 +413,7 @@ void draw_map(PSfile & plot, const char hemisphere)
 
 {
 
-MapRegion0 r;
+MapRegion r;
 ifstream in;
 ConcatString filename;
 
@@ -449,7 +449,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_region(PSfile & plot, const MapRegion0 & r)
+void draw_region(PSfile & plot, const MapRegion & r)
 
 {
 
