@@ -32,7 +32,7 @@ static const int afwa_ny = 1024;
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool is_afwa_cloud_pct_filename(const char * filename, char & Hemisphere, Unixtime & Valid);
+static bool is_afwa_cloud_pct_filename(const char * filename, char & Hemisphere, unixtime & Valid);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -132,7 +132,7 @@ Filename.clear();
 
 Hemisphere = 'N';
 
-Valid = (Unixtime) 0;
+Valid = (unixtime) 0;
 
 return;
 
@@ -348,7 +348,7 @@ return ( n );
    //  example: WWMCA_TOTAL_CLOUD_PCT_NH_2009081718
    //
 
-bool is_afwa_cloud_pct_filename(const char * filename, char & Hemisphere, Unixtime & Valid)
+bool is_afwa_cloud_pct_filename(const char * filename, char & Hemisphere, unixtime & Valid)
 
 {
 
