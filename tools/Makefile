@@ -15,10 +15,12 @@
 # Optional flags to disable the compilation of MET tools
 # Specify a non-zero value to disable the compilation of the tool
 DISABLE_PLOT_POINT_OBS = 0
+DISABLE_WWMCA_TOOL     = 0
 
 ###############################################################################
 
 PLOT_POINT_OBS	= plot_point_obs
+WWMCA_TOOL     = wwmca_tool
 
 ###############################################################################
 
@@ -35,8 +37,12 @@ targets:
 ifeq ($(DISABLE_PLOT_POINT_OBS), 0)
 	@ cd $(PLOT_POINT_OBS);	 $(MAKE) $(PRINT_OPTS)
 endif
+ifeq ($(DISABLE_WWMCA_TOOL), 0)
+	@ cd $(WWMCA_TOOL);  $(MAKE) $(PRINT_OPTS)
+endif
 
 clean:
-	@ cd $(PLOT_POINT_OBS);	 $(MAKE) clean $(PRINT_OPTS)
+	@ cd $(PLOT_POINT_OBS);   $(MAKE) clean $(PRINT_OPTS)
+	@ cd $(WWMCA_TOOL);       $(MAKE) clean $(PRINT_OPTS)
 
 .PHONY: $(FAKES)
