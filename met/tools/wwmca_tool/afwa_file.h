@@ -39,7 +39,7 @@ class AfwaCloudPctFile {
 
       char Hemisphere;  //  'N' or 'S'
 
-      Unixtime Valid;
+      unixtime Valid;
 
    public:
 
@@ -61,7 +61,7 @@ class AfwaCloudPctFile {
       int nx() const;
       int ny() const;
 
-      Unixtime valid() const;
+      unixtime valid() const;
 
       char hemisphere() const;
 
@@ -71,7 +71,7 @@ class AfwaCloudPctFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline Unixtime AfwaCloudPctFile::valid      () const { return ( Valid ); }
+inline unixtime AfwaCloudPctFile::valid      () const { return ( Valid ); }
 inline char     AfwaCloudPctFile::hemisphere () const { return ( Hemisphere ); }
 
 inline int      AfwaCloudPctFile::operator()(int x, int y) const { return ( get_value(x, y) ); }
