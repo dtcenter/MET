@@ -38,6 +38,7 @@
 #include "vx_util/thresh_array.h"
 #include "vx_util/memory.h"
 #include "vx_util/fix_float.h"
+#include "vx_util/command_line.h"
 
 
 ////////////////////////////////////////////////////////////////////////
