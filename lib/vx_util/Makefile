@@ -36,6 +36,7 @@ OBJECTS  =  ascii_table.o \
 	threshold.o \
 	vx_endian.o  \
 	fix_float.o  \
+	command_line.o  \
 
 
 OPT_FLAGS=
@@ -124,6 +125,9 @@ vx_endian.o: vx_endian.cc
 
 fix_float.o: fix_float.cc fix_float.h
 	$(CXX) fix_float.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(LIB_DIR)
+
+command_line.o: command_line.cc command_line.h
+	$(CXX) command_line.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(LIB_DIR)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)

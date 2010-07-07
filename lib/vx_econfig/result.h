@@ -90,7 +90,7 @@ class Result {
 
       operator int          () const;
       operator double       () const;
-      // operator const char * () const;
+      operator const char * () const;
 
 };
 
