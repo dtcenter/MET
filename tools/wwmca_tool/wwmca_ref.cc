@@ -710,6 +710,7 @@ Ave_Interp ave;
 Nearest_Interp nearest;
 Min_Interp mini;
 Max_Interp maxi;
+Result r;
 
 
 width = Config->interp_width();
@@ -718,7 +719,10 @@ good_percent = Config->good_percent();
 
 n_good_needed = nint(ceil(0.01*good_percent*width));
 
-method = (const char *) Config->interp_method();
+r = Config->interp_method();
+
+method = r.sval();
+
 
    //
    //  get to work
@@ -798,11 +802,17 @@ char * c = (char *) 0;
 char * p = (char *) 0;
 const char delim [] = " ";
 ConcatString s;
-ConcatString gridinfo_string = (const char *) (Config->To_Grid());
+ConcatString gridinfo_string;
+Result r;
 bool status = false;
 Grid * G = (Grid *) 0;
 
 
+
+
+r = Config->To_Grid();
+
+gridinfo_string = r.sval();
 
 grid_strings.clear();
 
