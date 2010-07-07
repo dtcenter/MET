@@ -17,7 +17,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util/vx_util.h"
-#include "vx_util/vx_cal.h"
+#include "vx_cal/vx_cal.h"
 
 #include "afwa_file.h"
 
