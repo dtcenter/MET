@@ -32,6 +32,7 @@ using namespace std;
 #include "vx_plot_util/vx_plot_util.h"
 
 #include "afwa_file.h"
+#include "wwmca_grids.h"
 
 
 ////////////////////////////////////////////////////////////////////////

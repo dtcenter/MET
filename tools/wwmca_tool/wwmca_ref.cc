@@ -18,7 +18,9 @@ using namespace std;
 #include "min_interp.h"
 #include "nearest_interp.h"
 #include "gridhemisphere_to_string.h"
-#include "grid_output.h"
+#include "wwmca_grids.h"
+
+#include "vx_met_util/grid_output.h"
 
 
 ////////////////////////////////////////////////////////////////////////
