@@ -1532,7 +1532,7 @@ void STATAnalysisJob::process_mask_grid() {
    //
    // Locate the requested grid
    //
-   if(find_grid_by_name(mask_grid, grid_mask) != 0) {
+   if(!find_grid_by_name(mask_grid, grid_mask)) {
       cerr << "\n\nERROR: process_mask_grid() -> "
            << "Can't find requested masking grid name \""
            << mask_grid << "\".\n\n" << flush;

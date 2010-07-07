@@ -455,7 +455,7 @@ void process_config() {
 
       apply_mask_grid = 1;
 
-      if(find_grid_by_name(conf.mask_grid().sval(), grid_mask) != 0) {
+      if(!find_grid_by_name(conf.mask_grid().sval(), grid_mask)) {
          cerr << "\n\nERROR: process_config_file() -> "
               << "the mask_grid requested \""
               << conf.mask_grid().sval()
