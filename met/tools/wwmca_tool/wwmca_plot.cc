@@ -246,7 +246,7 @@ scale = calc_mag((double) Nx, (double) Ny, view_width, view_height);
 
 grid_to_page(0.0, 0.0, info.x_ll, info.y_ll);
 
-info.set_magnification(scale);
+info.magnification = scale;
 
 info.bw = 1;
 
