@@ -84,7 +84,7 @@ static void set_outdir(const StringArray &);
 
 static void process(const char * filename);
 
-static void make_image(const AfwaCloudPctFile &, Pxm &);
+static void make_image(const AfwaCloudPctFile &, PxmBase &);
 
 static Color value_to_color(int value);
 
@@ -232,8 +232,8 @@ plot.open(output_filename);
 
 plot.pagenumber(1);
 
-plot.setlinecap(1);
-plot.setlinejoin(1);
+plot.file() << " 1 setlinecap\n";
+plot.file() << " 1 setlinejoin\n";
 
 plot.setlinewidth(1.0);
 
@@ -312,7 +312,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void make_image(const AfwaCloudPctFile & f, Pxm & image)
+void make_image(const AfwaCloudPctFile & f, PxmBase & image)
 
 {
 
