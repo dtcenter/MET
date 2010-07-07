@@ -119,7 +119,7 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 
 wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) wwmca_plot.cc afwa_file.o $(FLAGS) -o wwmca_plot -DDATA_DIR=\"$(DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lmap0 -lrender -lvx_ps -lvx_pxm -lvx_color -lvx_data_grids -lvx_cal -lvx_util -lvx_math -lm
+	$(COMPILER) wwmca_plot.cc afwa_file.o $(FLAGS) -o wwmca_plot -DDATA_DIR=\"$(DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lvx_plot_util -lrender -lvx_ps -lvx_pxm -lvx_color -lvx_data_grids -lvx_cal -lvx_util -lvx_math -lm
 	rm -f $(BIN_DIR)/wwmca_plot
 	cp wwmca_plot $(BIN_DIR)
 
