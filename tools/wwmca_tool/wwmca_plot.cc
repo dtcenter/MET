@@ -25,6 +25,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util/vx_util.h"
+#include "vx_math/vx_math.h"
 #include "vx_pxm/vx_pxm.h"
 #include "vx_ps/vx_ps.h"
 #include "vx_render/vx_render.h"
@@ -458,9 +459,9 @@ double x_page, y_page, x_grid, y_grid;
 
 plot.newpath();
 
-for (j=0; j<(r.n_points()); ++j)  {
+for (j=0; j<(r.n_points); ++j)  {
 
-   grid->latlon_to_xy(r.lat(j), r.lon(j), x_grid, y_grid);
+   grid->latlon_to_xy(r.lat[j], r.lon[j], x_grid, y_grid);
 
    grid_to_page(x_grid, y_grid, x_page, y_page);
 

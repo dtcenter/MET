@@ -26,6 +26,8 @@
 #include "vx_math/constants.h"
 #include "vx_math/pwl_interpolate.h"
 #include "vx_math/is_bad_data.h"
+#include "vx_math/affine.h"
+#include "vx_math/viewgravity_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -15,10 +15,13 @@
 TARGETS  = libvx_math.a
 
 OBJECTS  =  hist.o \
-	nint.o \
-	nti.o \
-	ptile.o \
-	pwl_interpolate.o
+            nint.o \
+            nti.o \
+            ptile.o \
+            pwl_interpolate.o  \
+            affine.o  \
+            viewgravity_to_string.o  \
+
 
 OPT_FLAGS=
 
@@ -55,6 +58,16 @@ ptile.o: ptile.cc
 
 pwl_interpolate.o: pwl_interpolate.cc
 	$(CXX) pwl_interpolate.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+
+viewgravity_to_string.o: viewgravity_to_string.h viewgravity_to_string.cc
+	$(CXX) viewgravity_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+
+affine.o: affine.h affine.cc
+	$(CXX) affine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+
+
+
+
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
