@@ -43,6 +43,7 @@ double lat, lon;
 InterpolationValue iv;
 char junk[256];
 ConcatString s;
+Result r;
 const LambertData & ldata = *(ginfo.lc);
 
 
@@ -89,7 +90,9 @@ lon_var->add_att("units",      "degrees_east");
 lon_var->add_att("long_name",  "Longitude");
 lon_var->add_att("_FillValue", -9999.f);
 
-s = (const char *) Config->variable_name();
+r = Config->variable_name();
+
+s = r.sval();
 
 ncfile->add_var((const char *) s, ncFloat, lat_dim, lon_dim);
 data_var = ncfile->get_var((const char *) s);
@@ -98,15 +101,21 @@ j = Config->grib_code();
 
 data_var->add_att("grib_code",   j);
 
-s = (const char *) Config->units();
+r = Config->units();
+
+s = r.sval();
 
 data_var->add_att("units",      (const char *) s);
 
-s = (const char *) Config->long_name();
+r = Config->long_name();
+
+s = r.sval();
 
 data_var->add_att("long_name",  (const char *) s);
 
-s = (const char *) Config->level();
+r = Config->level();
+
+s = r.sval();
 
 data_var->add_att("level",      (const char *) s);
 
