@@ -1,0 +1,148 @@
+
+
+########################################################################
+
+
+TARGETS   = wwmca_regrid wwmca_plot
+
+
+OBJECTS   = afwa_file.o                 \
+            grid_output.o               \
+            interp_base.o               \
+            min_interp.o                \
+            max_interp.o                \
+            ave_interp.o                \
+            nearest_interp.o            \
+            wwmca_config.o              \
+            gridhemisphere_to_string.o  \
+            wwmca_ref.o                 \
+            nc_output.o                 \
+
+
+########################################################################
+
+
+COMPILER        = g++
+
+FLAGS           = -g -Wall -Wshadow
+
+STUFF_DIR       = $(CODETREE_DIR)/randy
+
+INC_DIR         = $(STUFF_DIR)/include
+
+LIB_DIR         = $(STUFF_DIR)/lib
+
+BIN_DIR         = $(STUFF_DIR)/bin
+
+CONFIG_DIR      = ./config
+
+
+########################################################################
+
+
+   ##
+   ##  the whole enchilada
+   ##
+
+
+all: $(OBJECTS) $(TARGETS)
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+afwa_file.o: afwa_file.h afwa_file.cc
+	@ echo
+	$(COMPILER) afwa_file.cc                 -c $(FLAGS) -I$(INC_DIR)
+
+
+interp_base.o: interp_base.h interp_base.cc
+	@ echo
+	$(COMPILER) interp_base.cc               -c $(FLAGS) -I$(INC_DIR)
+
+
+min_interp.o: min_interp.h min_interp.cc interp_base.o
+	@ echo
+	$(COMPILER) min_interp.cc                -c $(FLAGS) -I$(INC_DIR)
+
+
+max_interp.o: max_interp.h max_interp.cc interp_base.o
+	@ echo
+	$(COMPILER) max_interp.cc                -c $(FLAGS) -I$(INC_DIR)
+
+
+ave_interp.o: ave_interp.h ave_interp.cc interp_base.o
+	@ echo
+	$(COMPILER) ave_interp.cc                -c $(FLAGS) -I$(INC_DIR)
+
+
+nearest_interp.o: nearest_interp.h nearest_interp.cc interp_base.o
+	@ echo
+	$(COMPILER) nearest_interp.cc            -c $(FLAGS) -I$(INC_DIR)
+
+
+wwmca_config.o: wwmca_config.h wwmca_config.cc
+	@ echo
+	$(COMPILER) wwmca_config.cc              -c $(FLAGS) -I$(INC_DIR)
+
+
+gridhemisphere_to_string.o: gridhemisphere_to_string.h gridhemisphere_to_string.cc
+	@ echo
+	$(COMPILER) gridhemisphere_to_string.cc  -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
+
+
+wwmca_ref.o: wwmca_ref.h wwmca_ref.cc gridhemisphere_to_string.o wwmca_config.o
+	@ echo
+	$(COMPILER) wwmca_ref.cc                 -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
+
+
+nc_output.o: nc_output.cc wwmca_ref.o
+	@ echo
+	$(COMPILER) nc_output.cc                 -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
+
+
+grid_output.o: grid_output.h grid_output.cc
+	@ echo
+	$(COMPILER) grid_output.cc               -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
+
+
+########################################################################
+
+
+   ##
+   ##  executables
+   ##
+
+
+wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
+	@ echo
+	$(COMPILER) wwmca_regrid.cc $(OBJECTS) $(FLAGS) -o wwmca_regrid -I$(INC_DIR) -I$(NETCDF_INC_DIR) -L$(LIB_DIR) -L$(NETCDF_LIB_DIR) -lnetcdf_c++ -lnetcdf -leconfig -lgrid -lcal -lmisc -lvx_math -lm
+
+
+wwmca_plot: wwmca_plot.cc $(OBJECTS)
+	@ echo
+	$(COMPILER) wwmca_plot.cc afwa_file.o $(FLAGS) -o wwmca_plot -DDATA_DIR=\"$(DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lmap0 -lrender -lps -lpxm -lvx_color -lgrid -lcal -lmisc -lvx_math -lz -lm
+
+
+########################################################################
+
+
+   ##
+   ##  cleanup
+   ##
+
+
+clean:
+	@ echo
+	rm -f *.a *.o *.ps *.png *.ppm *.pgm temp junk core log a.out $(OBJECTS) $(TARGETS)
+
+
+########################################################################
+
+
