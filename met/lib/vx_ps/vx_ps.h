@@ -113,6 +113,9 @@ class PSfile {
       virtual void moveto(double, double);
       virtual void lineto(double, double);
 
+      virtual void translate (double, double);
+      virtual void rotate    (double);
+
       virtual void fill();
       virtual void clip();
       virtual void stroke();

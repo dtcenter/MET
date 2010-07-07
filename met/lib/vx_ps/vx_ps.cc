@@ -679,6 +679,38 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void PSfile::translate(double dx, double dy)
+
+{
+
+File->precision(5);
+
+file() << " " << dx << " " << dy << " translate\n";
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::rotate(double angle)
+
+{
+
+File->precision(5);
+
+file() << " " << angle << " rotate\n";
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void PSfile::newpath()
 
 {
