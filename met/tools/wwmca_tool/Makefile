@@ -26,15 +26,11 @@ COMPILER        = g++
 
 FLAGS           = -g -Wall -Wshadow
 
-STUFF_DIR       = $(CODETREE_DIR)/randy
+INC_DIR         = ../../lib
 
-INC_DIR         = $(STUFF_DIR)/include
+LIB_DIR         = ../../lib
 
-LIB_DIR         = $(STUFF_DIR)/lib
-
-BIN_DIR         = $(STUFF_DIR)/bin
-
-CONFIG_DIR      = ./config
+BIN_DIR         = ../..//bin
 
 
 ########################################################################
