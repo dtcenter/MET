@@ -7,7 +7,6 @@ TARGETS   = wwmca_regrid wwmca_plot
 
 
 OBJECTS   = afwa_file.o                 \
-            grid_output.o               \
             interp_base.o               \
             min_interp.o                \
             max_interp.o                \
@@ -103,11 +102,6 @@ nc_output.o: nc_output.cc wwmca_ref.o
 	$(COMPILER) nc_output.cc                 -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
 
 
-grid_output.o: grid_output.h grid_output.cc
-	@ echo
-	$(COMPILER) grid_output.cc               -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
-
-
 ########################################################################
 
 
@@ -118,12 +112,16 @@ grid_output.o: grid_output.h grid_output.cc
 
 wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) wwmca_regrid.cc $(OBJECTS) $(FLAGS) -o wwmca_regrid -I$(INC_DIR) -I$(NETCDF_INC_DIR) -L$(LIB_DIR) -L$(NETCDF_LIB_DIR) -lnetcdf_c++ -lnetcdf -leconfig -lgrid -lcal -lmisc -lvx_math -lm
+	$(COMPILER) wwmca_regrid.cc $(OBJECTS) $(FLAGS) -o wwmca_regrid -I$(INC_DIR) -I$(NETCDF_INC_DIR) -L$(LIB_DIR) -L$(NETCDF_LIB_DIR) -lnetcdf_c++ -lnetcdf -lvx_econfig -lvx_met_util -lvx_data_grids -lvx_cal -lvx_util -lvx_math -lm
+	rm -f $(BIN_DIR)/wwmca_regrid
+	cp wwmca_regrid $(BIN_DIR)
 
 
 wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) wwmca_plot.cc afwa_file.o $(FLAGS) -o wwmca_plot -DDATA_DIR=\"$(DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lmap0 -lrender -lps -lpxm -lvx_color -lgrid -lcal -lmisc -lvx_math -lz -lm
+	$(COMPILER) wwmca_plot.cc afwa_file.o $(FLAGS) -o wwmca_plot -DDATA_DIR=\"$(DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lmap0 -lrender -lvx_ps -lvx_pxm -lvx_color -lvx_data_grids -lvx_cal -lvx_util -lvx_math -lm
+	rm -f $(BIN_DIR)/wwmca_plot
+	cp wwmca_plot $(BIN_DIR)
 
 
 ########################################################################
@@ -137,6 +135,8 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 clean:
 	@ echo
 	rm -f *.a *.o *.ps *.png *.ppm *.pgm temp junk core log a.out $(OBJECTS) $(TARGETS)
+	rm -f $(BIN_DIR)/wwmca_plot
+	rm -f $(BIN_DIR)/wwmca_regrid
 
 
 ########################################################################
