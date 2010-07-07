@@ -20,7 +20,7 @@ DISABLE_WWMCA_TOOL     = 0
 ###############################################################################
 
 PLOT_POINT_OBS	= plot_point_obs
-WWMCA_TOOL     = wwmca_tool
+WWMCA_TOOL_DIR = wwmca_tool
 
 ###############################################################################
 
@@ -41,7 +41,7 @@ ifeq ($(DISABLE_WWMCA_TOOL), 0)
 	@ echo
 	@ echo "*** Making wwmca tools ***"
 	@ echo
-	@ cd $(WWMCA_TOOL);  $(MAKE) $(PRINT_OPTS)
+	@ cd $(WWMCA_TOOL_DIR);  $(MAKE) $(PRINT_OPTS)
 	@ echo
 	@ echo "*** Finished Making wwmca tools ***"
 	@ echo

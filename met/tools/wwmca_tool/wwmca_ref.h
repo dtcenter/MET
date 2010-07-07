@@ -18,7 +18,7 @@
 #include "interp_base.h"
 #include "wwmca_config.h"
 
-#include "vx_data_grids/vx_data_grids.h"
+#include "vx_data_grids/grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
