@@ -20,6 +20,7 @@ using namespace std;
 #include "vx_cal/vx_cal.h"
 
 #include "afwa_file.h"
+#include "wwmca_grids.h"
 
 
 ////////////////////////////////////////////////////////////////////////
