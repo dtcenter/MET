@@ -89,17 +89,17 @@ wwmca_config.o: wwmca_config.h wwmca_config.cc
 
 gridhemisphere_to_string.o: gridhemisphere_to_string.h gridhemisphere_to_string.cc
 	@ echo
-	$(COMPILER) gridhemisphere_to_string.cc  -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
+	$(COMPILER) gridhemisphere_to_string.cc  -c $(FLAGS) -I$(INC_DIR) $(NETCDF_INCS)
 
 
 wwmca_ref.o: wwmca_ref.h wwmca_ref.cc gridhemisphere_to_string.o wwmca_config.o
 	@ echo
-	$(COMPILER) wwmca_ref.cc                 -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
+	$(COMPILER) wwmca_ref.cc                 -c $(FLAGS) -I$(INC_DIR) $(NETCDF_INCS)
 
 
 nc_output.o: nc_output.cc wwmca_ref.o
 	@ echo
-	$(COMPILER) nc_output.cc                 -c $(FLAGS) -I$(INC_DIR) -I$(NETCDF_INC_DIR)
+	$(COMPILER) nc_output.cc                 -c $(FLAGS) -I$(INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -112,7 +112,7 @@ nc_output.o: nc_output.cc wwmca_ref.o
 
 wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) wwmca_regrid.cc $(OBJECTS) $(FLAGS) -o wwmca_regrid -I$(INC_DIR) -I$(NETCDF_INC_DIR) -L$(LIB_DIR) -L$(NETCDF_LIB_DIR) -lnetcdf_c++ -lnetcdf -lvx_econfig -lvx_met_util -lvx_data_grids -lvx_cal -lvx_util -lvx_math -lm
+	$(COMPILER) wwmca_regrid.cc $(OBJECTS) $(FLAGS) -o wwmca_regrid -I$(INC_DIR) $(NETCDF_INCS) -L$(LIB_DIR) $(NETCDF_LIBS) -lnetcdf_c++ -lnetcdf -lvx_econfig -lvx_met_util -lvx_data_grids -lvx_cal -lvx_util -lvx_math -lm
 	rm -f $(BIN_DIR)/wwmca_regrid
 	cp wwmca_regrid $(BIN_DIR)
 
