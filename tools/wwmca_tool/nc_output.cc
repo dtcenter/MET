@@ -11,7 +11,8 @@ using namespace std;
 #include <cmath>
 
 #include "wwmca_ref.h"
-#include "grid_output.h"
+
+#include "vx_met_util/grid_output.h"
 
 
 ////////////////////////////////////////////////////////////////////////

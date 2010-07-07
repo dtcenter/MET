@@ -38,7 +38,13 @@ ifeq ($(DISABLE_PLOT_POINT_OBS), 0)
 	@ cd $(PLOT_POINT_OBS);	 $(MAKE) $(PRINT_OPTS)
 endif
 ifeq ($(DISABLE_WWMCA_TOOL), 0)
+	@ echo
+	@ echo "*** Making wwmca tools ***"
+	@ echo
 	@ cd $(WWMCA_TOOL);  $(MAKE) $(PRINT_OPTS)
+	@ echo
+	@ echo "*** Finished Making wwmca tools ***"
+	@ echo
 endif
 
 clean:

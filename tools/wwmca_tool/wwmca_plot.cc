@@ -24,12 +24,12 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_util.h"
-#include "vx_pxm.h"
-#include "vx_ps.h"
-#include "vx_render.h"
-#include "vx_data_grids.h"
-#include "vx_plot_util.h"
+#include "vx_util/vx_util.h"
+#include "vx_pxm/vx_pxm.h"
+#include "vx_ps/vx_ps.h"
+#include "vx_render/vx_render.h"
+#include "vx_data_grids/vx_data_grids.h"
+#include "vx_plot_util/vx_plot_util.h"
 
 #include "afwa_file.h"
 
