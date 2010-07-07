@@ -54,7 +54,7 @@ void parse_grid_mask(const char *mask_grid_str, const Grid &grid,
       //
       // Search for the grid name in the predefined grids
       //
-      if(find_grid_by_name(mask_name, mask_grid) != 0) {
+      if(!find_grid_by_name(mask_name, mask_grid)) {
          cerr << "\n\nERROR: parse_grid_mask() -> "
               << "the mask_grid requested \"" << mask_grid_str
               << "\" is not defined.\n\n" << flush;
@@ -76,7 +76,7 @@ void parse_grid_mask(const char *mask_grid_str,
    //
    // Search the predefined grids
    //
-   if(find_grid_by_name(mask_grid_str, mask_grid) != 0) {
+   if(!find_grid_by_name(mask_grid_str, mask_grid)) {
       cerr << "\n\nERROR: parse_grid_mask() -> "
            << "the mask_grid requested \"" << mask_grid_str
            << "\" is not defined.\n\n" << flush;
