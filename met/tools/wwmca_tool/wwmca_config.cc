@@ -30,7 +30,7 @@ using namespace std;
 #include <cmath>
 
 #include "wwmca_config.h"
-#include "icodecell_to_result.h"
+#include "vx_econfig/icodecell_to_result.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -18,7 +18,7 @@
 #include "ave_interp.h"
 #include "nearest_interp.h"
 
-#include "grid.h"
+#include "vx_data_grids/vx_data_grids.h"
 
 
 ////////////////////////////////////////////////////////////////////////
