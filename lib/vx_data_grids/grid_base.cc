@@ -683,7 +683,7 @@ if ( !(g2.rep) )  return ( false );
 ConcatString s1, s2;
 
 s1 = g1.rep->serialize();
-s1 = g2.rep->serialize();
+s2 = g2.rep->serialize();
 
 return ( s1 == s2 );
 
