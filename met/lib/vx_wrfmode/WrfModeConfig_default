@@ -17,13 +17,13 @@ model = "WRF";
 grid_res = 4;
 
 //
-// Specify the fields to be used in the verification.  The forecast and
+// Specify the field to be used in the verification.  The forecast and
 // observation fields may be specified separately.
 //
-// Each field is specified as a grib code or corresponding grib code
+// The field is specified as a grib code or corresponding grib code
 // abbreviation followed by an accumulation or vertical level indicator.
 //
-// Each verification field is specified as one of the following:
+// The verification field is specified as one of the following:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
 //    GC/PNNN for pressure level NNN in hPa
@@ -34,7 +34,7 @@ grid_res = 4;
 //    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
-// e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+// e.g. fcst_field = "61/A3";
 //
 fcst_field = "APCP/A3";
 obs_field  = "APCP/A3";
