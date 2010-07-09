@@ -49,6 +49,6 @@ endif
 
 clean:
 	@ cd $(PLOT_POINT_OBS);   $(MAKE) clean $(PRINT_OPTS)
-	@ cd $(WWMCA_TOOL);       $(MAKE) clean $(PRINT_OPTS)
+	@ cd $(WWMCA_TOOL_DIR);   $(MAKE) clean $(PRINT_OPTS)
 
 .PHONY: $(FAKES)
