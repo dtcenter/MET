@@ -521,8 +521,8 @@ int is_hh(const char * text)
 
 {
 
-// Allow 2 or 3 digits for the number of hours
-if ( strlen(text) != 2 && strlen(text) != 3 )  return ( 0 );
+// Allow 1, 2, or 3 digits for the number of hours
+if ( strlen(text) < 1 || strlen(text) > 3 )  return ( 0 );
 
 unsigned int j;
 
