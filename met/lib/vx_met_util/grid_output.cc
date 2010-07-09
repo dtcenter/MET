@@ -303,7 +303,7 @@ ncfile->add_att("hemisphere", junk);
 
 sprintf(junk, "%f degrees_north", data.scale_lat);
 
-ncfile->add_att("scal_lat", junk);
+ncfile->add_att("scale_lat", junk);
 
    //
    //  lat_pin
