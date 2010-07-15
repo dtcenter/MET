@@ -194,12 +194,20 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
 
    // Advance the pointer past the 'A', 'Z', 'P', 'R', or 'L'
    ptr++;
-   lvl_1 = atoi(ptr);
+
+   // For accumulation intervals store the level as the number of seconds
+   if(lvl_type == AccumLevel) lvl_1 = timestring_to_sec(ptr);
+   else                       lvl_1 = atoi(ptr);
 
    // Look for a '-' and a second level indicator
    ptr2 = strchr(ptr, '-');
-   if(ptr2 != NULL) lvl_2 = atoi(++ptr2);
-   else             lvl_2 = lvl_1;
+   if(ptr2 != NULL) {
+      if(lvl_type == AccumLevel) lvl_2 = timestring_to_sec(++ptr2);
+      else                       lvl_2 = atoi(++ptr2);
+   }
+   else{
+      lvl_2 = lvl_1;
+   }
 
    // Only allow ranges for PresLevel and VertLevel
    if(lvl_type != PresLevel &&
@@ -248,11 +256,16 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
    // Get the GRIB code abbreviation string
    get_grib_code_abbr(code, ptv, tmp_str);
 
-   // For a non-zero accumulation interval, append _HH to the
-   // abbreviation string
+   // For a non-zero accumulation interval, append a timestring
    if(lvl_type == AccumLevel && lvl_1 > 0) {
-      sprintf(tmp2_str, "%s_%.2i", tmp_str, lvl_1);
-      strcpy(tmp_str, tmp2_str);
+
+      // Append the accumulation interval, _HH or _HHMMSS
+      if(lvl_1 % sec_per_hour == 0) sprintf(tmp2_str, "%.2i", lvl_1/sec_per_hour);
+      else                          sec_to_hhmmss(lvl_1, tmp2_str);
+
+      // Store the abbreviation string
+      sprintf(tmp3_str, "%s_%s", tmp_str, tmp2_str);
+      strcpy(tmp_str, tmp3_str);
    }
 
    // For probability fields, append probability information

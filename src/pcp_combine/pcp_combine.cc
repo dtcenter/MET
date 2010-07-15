@@ -446,8 +446,8 @@ void sum_grib_files(GribRecord &rec) {
    //
    gc_info.code = grib_code;
    gc_info.lvl_type = AccumLevel;
-   gc_info.lvl_1 = in_accum/sec_per_hour;
-   gc_info.lvl_2 = in_accum/sec_per_hour;
+   gc_info.lvl_1 = in_accum;
+   gc_info.lvl_2 = in_accum;
 
    //
    // Compute the number of forecast precipitation files to be found,
@@ -893,8 +893,8 @@ void get_field(const char *in_file, int accum, WrfData &wd,
    //
    gc_info.code = grib_code;
    gc_info.lvl_type = AccumLevel;
-   gc_info.lvl_1 = accum/sec_per_hour;
-   gc_info.lvl_2 = accum/sec_per_hour;
+   gc_info.lvl_1 = accum;
+   gc_info.lvl_2 = accum;
 
    //
    // Open the grib file specified
@@ -936,7 +936,8 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
                   GribRecord &rec) {
    int yr, mon, day, hr, min, sec;
    unixtime ut;
-   char var_str[max_str_len], tmp_str[max_str_len];
+   char var_str[max_str_len];
+   char tmp_str[max_str_len], tmp2_str[max_str_len];
    char attribute_str[PATH_MAX];
    char command_str[max_str_len];
    char time_str[max_str_len];
@@ -1007,11 +1008,23 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    lat_dim = f_out->add_dim("lat", (long) grid.ny());
    lon_dim = f_out->add_dim("lon", (long) grid.nx());
 
-   // Select a name for the variable
+   // Define a name for the variable
    // If the accumulation time is non-zero, append it to the variable name
    get_grib_code_abbr(grib_code, grib_ptv, tmp_str);
-   if(nc_accum <= 0) strcpy(var_str, tmp_str);
-   else              sprintf(var_str, "%s_%.2i", tmp_str, nc_accum/sec_per_hour);
+
+   // For no accumulation interval, append nothing
+   if(nc_accum <= 0) {
+      strcpy(var_str, tmp_str);
+   }
+   // For an hourly accumulation interval, append _HH
+   else if(nc_accum % sec_per_hour == 0) {
+      sprintf(var_str, "%s_%.2i", tmp_str, nc_accum/sec_per_hour);
+   }
+   // For any other accumulation interval, append _HHMMSS
+   else {
+      sec_to_hhmmss(nc_accum, tmp2_str);
+      sprintf(var_str, "%s_%s", tmp_str, tmp2_str);
+   }
 
    // Define Variable
    pcp_var = f_out->add_var(var_str, ncFloat, lat_dim, lon_dim);
@@ -1044,7 +1057,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    pcp_var->add_att("valid_time", time_str);
    pcp_var->add_att("valid_time_ut", (long int) nc_valid);
 
-   sprintf(time_str, "%i hours", nc_accum/sec_per_hour);
+   sec_to_hhmmss(nc_accum, time_str);
    pcp_var->add_att("accum_time", time_str);
    pcp_var->add_att("accum_time_sec", nc_accum);
 

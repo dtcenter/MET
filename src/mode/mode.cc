@@ -455,13 +455,12 @@ void process_fcst_obs_files() {
 
          // Check that the accumulation interval matches what was
          // requested in the config file
-         if(fcst_wd.get_accum_time() != fcst_gci.lvl_1*sec_per_hour) {
+         if(fcst_wd.get_accum_time() != fcst_gci.lvl_1) {
             cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "accumulation time of "
-                 << fcst_wd.get_accum_time()/sec_per_hour
-                 << " hours in the forecast file (" << fcst_file
+                 << "accumulation time of " << fcst_wd.get_accum_time()
+                 << " seconds in the forecast file (" << fcst_file
                  << ") does not match the " << fcst_gci.lvl_1
-                 << " hour accumulation time requested in the config "
+                 << " seconds accumulation time requested in the config "
                  << "file.\n\n" << flush;
             exit(1);
          }
@@ -543,13 +542,12 @@ void process_fcst_obs_files() {
 
          // Check that the accumulation interval matches what was
          // requested in the config file
-         if(obs_wd.get_accum_time() != obs_gci.lvl_1*sec_per_hour) {
-            cerr << "\n\nERROR: process_obs_obs_files() -> "
-                 << "accumulation time of "
-                 << obs_wd.get_accum_time()/sec_per_hour
-                 << " hours in the observation file (" << obs_file
+         if(obs_wd.get_accum_time() != obs_gci.lvl_1) {
+            cerr << "\n\nERROR: process_fcst_obs_files() -> "
+                 << "accumulation time of " << obs_wd.get_accum_time()
+                 << " seconds in the observation file (" << obs_file
                  << ") does not match the " << obs_gci.lvl_1
-                 << " hour accumulation time requested in the config "
+                 << " seconds accumulation time requested in the config "
                  << "file.\n\n" << flush;
             exit(1);
          }

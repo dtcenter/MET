@@ -217,7 +217,7 @@ int read_netcdf_status(NcFile *f_in, const char *var_name, char *lvl_name,
               << var_name << "\" variable.\n\n" << flush;
          return(1);
       }
-      accum = sec_per_hour*atoi(time_att->as_string(0));
+      accum = timestring_to_sec(time_att->as_string(0));
    }
 
    //
