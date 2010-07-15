@@ -197,7 +197,7 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info,
          // accumulation equals n
          //
          if(gc_info.lvl_type == AccumLevel && pds_ptr->tri == 4 &&
-            l1 == (accum/sec_per_hour)     && l2 == (accum/sec_per_hour)) break;
+            l1 == accum && l2 == accum) break;
 
          //
          // Find the level value for this record
