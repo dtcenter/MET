@@ -650,7 +650,7 @@ void open_netcdf() {
    obs_arr_var->add_att("gc_long_name",
       "grib code corresponding to the observation type");
    obs_arr_var->add_att("lvl_long_name",
-      "pressure level (hPa) or accumulation interval (h)");
+      "pressure level (hPa) or accumulation interval (sec)");
    obs_arr_var->add_att("hgt_long_name",
                         "height in meters above sea level (msl)");
    obs_arr_var->add_att("ob_long_name", "observation value");

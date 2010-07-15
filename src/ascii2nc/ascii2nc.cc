@@ -19,6 +19,8 @@
 //   000    01-22-08  Halley Gotway  New
 //   001    09-16-08  Halley Gotway  Keep track of the header values and
 //                    only write out a header record when they change.
+//   002    07-15-10  Halley Gotway  Store accumulation intervals in
+//                    seconds rather than hours.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -359,7 +361,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
    obs_arr_var->add_att("columns", "hdr_id gc lvl hgt ob");
    obs_arr_var->add_att("hdr_id_long_name", "index of matching header data");
    obs_arr_var->add_att("gc_long_name", "grib code corresponding to the observation type");
-   obs_arr_var->add_att("lvl_long_name", "pressure level (hPa) or accumulation interval (h)");
+   obs_arr_var->add_att("lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
    obs_arr_var->add_att("hgt_long_name", "height in meters above sea level (msl)");
    obs_arr_var->add_att("ob_long_name", "observation value");
 
@@ -502,7 +504,11 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       //
       obs_arr[0] = i_hdr;       // Header ID
       obs_arr[1] = atof(dl[6]); // Grib Code
-      obs_arr[2] = atof(dl[7]); // Level: pressure level or accumulation interval
+
+      // Level: pressure level (hPa) or accumulation interval (sec) for precip
+      if(is_precip_code(obs_arr[1])) obs_arr[2] = timestring_to_sec(dl[7]);
+      else                           obs_arr[2] = atof(dl[7]);
+
       obs_arr[3] = atof(dl[8]); // Meters above sea level
       obs_arr[4] = atof(dl[9]); // Observation Value
 
@@ -568,7 +574,7 @@ void usage(int argc, char *argv[]) {
         << "\t\tGrib_Code Level Height(msl) Observation_Value\n\n"
 
         << "\t\twhere\t\"Level\" is the pressure level (hPa) or "
-        << "accumulation interval (h).\n"
+        << "accumulation interval (hh[_mmss]).\n"
         << "\t\t\t\"Height\" is meters above sea level for the "
         << "observation (msl).\n\n"
 
