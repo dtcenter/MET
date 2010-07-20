@@ -31,6 +31,8 @@ LIB_DIR         = ../../lib
 
 BIN_DIR         = ../../bin
 
+MAP_DATA_DIR    = ../../data/map
+
 
 ########################################################################
 
@@ -119,7 +121,7 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 
 wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) wwmca_plot.cc afwa_file.o $(FLAGS) -o wwmca_plot -DDATA_DIR=\"$(DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lvx_plot_util -lvx_render -lvx_ps -lvx_afm -lvx_pxm -lvx_color -lvx_data_grids -lvx_nav -lvx_cal -lvx_util -lvx_math -lm
+	$(COMPILER) wwmca_plot.cc afwa_file.o $(FLAGS) -o wwmca_plot -DMAP_DATA_DIR=\"$(MAP_DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lvx_plot_util -lvx_render -lvx_ps -lvx_afm -lvx_pxm -lvx_color -lvx_data_grids -lvx_nav -lvx_cal -lvx_util -lvx_math -lm
 	rm -f $(BIN_DIR)/wwmca_plot
 	cp wwmca_plot $(BIN_DIR)
 

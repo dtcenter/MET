@@ -9,7 +9,7 @@ static const int gray_max         = 255;
 static const double h_margin      = 40.0;
 static const double v_margin      = 80.0;
 
-static const char map_filename [] = "other/map/group1";   //  relative to DATA_DIR
+static const char map_filename [] = "group1";   //  relative to MAP_DATA_DIR
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -418,7 +418,7 @@ MapRegion r;
 ifstream in;
 ConcatString filename;
 
-filename << DATA_DIR << '/' << map_filename;
+filename << MAP_DATA_DIR << '/' << map_filename;
 
 in.open(filename);
 
