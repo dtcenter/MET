@@ -44,7 +44,6 @@ MODULE_TYPE = progcpp
 # vx_econfig macros and targets
 #
 include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
 
 all:
 	@ echo
@@ -84,6 +83,8 @@ ensemble_stat_Conf.o: ensemble_stat_Conf.cc
 ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
 	$(CXX) -c ensemble_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
+
+include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
 
 clean:
 	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)

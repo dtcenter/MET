@@ -47,7 +47,6 @@ MODULE_TYPE = progcpp
 # vx_econfig macros and targets
 #
 include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
 
 all:
 	@ echo
@@ -96,6 +95,8 @@ readpb.o: readpb.f
 
 dumppb.o: dumppb.f
 	$(FC) -c dumppb.f $(FC_FLAGS) $(OPT_FLAGS)
+
+include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
 
 clean:
 	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)
