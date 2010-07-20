@@ -31,7 +31,7 @@ LIB_DIR         = ../../lib
 
 BIN_DIR         = ../../bin
 
-MAP_DATA_DIR    = $(MET_BASE_DIR)/data/map
+MAP_DATA_DIR    = $(MET_BASE)/data/map
 
 
 ########################################################################
