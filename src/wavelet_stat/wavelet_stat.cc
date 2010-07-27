@@ -20,7 +20,6 @@
 //   002    05/27/10  Halley Gotway  Add -fcst_valid, -fcst_lead,
 //                    -obs_valid, and -obs_lead command line options.
 //   003    06/30/10  Halley Gotway  Enhance grid equality checks.
-//   004    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -815,12 +814,6 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
          exit(1);
       }
    }
-
-   // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, y_dim, x_dim, grid);
 
    return;
 }
