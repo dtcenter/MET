@@ -35,6 +35,63 @@ return;
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
+                         const Grid &grid) {
+   int i, x, y;
+   double lat, lon;
+   NcVar *lat_var  = (NcVar *) 0;
+   NcVar *lon_var  = (NcVar *) 0;
+   float *lat_data = (float *) 0;
+   float *lon_data = (float *) 0;
+
+   // Define Variables
+   lat_var = f_out->add_var("lat", ncFloat, lat_dim, lon_dim);
+   lon_var = f_out->add_var("lon", ncFloat, lat_dim, lon_dim);
+
+   // Add variable attributes
+   lat_var->add_att("long_name", "latitude");
+   lat_var->add_att("units", "degrees_north");
+   lat_var->add_att("standard_name", "latitude");
+
+   lon_var->add_att("long_name", "longitude");
+   lon_var->add_att("units", "degrees_east");
+   lon_var->add_att("standard_name", "longitude");
+
+   // Allocate space for lat/lon values
+   lat_data = new float [grid.nx()*grid.ny()];
+   lon_data = new float [grid.nx()*grid.ny()];
+
+   // Compute lat/lon values
+   for(x=0; x<grid.nx(); x++) {
+      for(y=0; y<grid.ny(); y++) {
+
+         grid.xy_to_latlon(x, y, lat, lon);
+         i = two_to_one(grid.nx(), grid.ny(), x, y);
+
+         // Multiple by -1.0 to convert from degrees west to degrees east
+         lat_data[i] = (float) lat;
+         lon_data[i] = (float) -1.0*lon;
+      }
+   }
+
+   // Write the lat data
+   if(!lat_var->put(&lat_data[0], grid.ny(), grid.nx())) {
+      cerr << "\n\nERROR: write_netcdf_latlon() -> "
+           << "error with lat_var->put\n\n" << flush;
+      exit(1);
+   }
+
+   // Write the lon data
+   if(!lon_var->put(&lon_data[0], grid.ny(), grid.nx())) {
+      cerr << "\n\nERROR: write_netcdf_latlon() -> "
+           << "error with lon_var->put\n\n" << flush;
+      exit(1);
+   }
+
+   return;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
