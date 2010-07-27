@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    10/23/08  Halley Gotway   New
+//   001    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -274,6 +275,9 @@ void write_netcdf() {
    // Define Dimensions
    lat_dim = f_out->add_dim("lat", (long) grid.ny());
    lon_dim = f_out->add_dim("lon", (long) grid.nx());
+
+   // Add the lat/lon variables
+   write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
    // Define Variables
    sprintf(var_str, "%s", poly_mask.name());

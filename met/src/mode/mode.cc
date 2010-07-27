@@ -36,6 +36,7 @@
 //                    from the output file naming convention.
 //   007    05/11/10  Halley Gotway  Plot polyline lines thicker.
 //   008    06/30/10  Halley Gotway  Enhance grid equality checks.
+//   009    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -3070,6 +3071,9 @@ void write_obj_netcdf() {
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);
+
+   // Add the lat/lon variables
+   write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
    // Define Variables
    fcst_raw_var = f_out->add_var("fcst_obj_raw", ncFloat, lat_dim, lon_dim);
