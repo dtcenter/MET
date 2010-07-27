@@ -37,6 +37,8 @@
 //   007    06/25/10  Halley Gotway  Allow times to be specified in
 //                    HH[MMSS] and YYYYMMDD[_HH[MMSS]] format.
 //   008    06/30/10  Halley Gotway  Enhance grid equality checks.
+//   009    07/27/10  Halley Gotway  Enhance to allow addition of any
+//                    number of input files/accumulation intervals.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +75,7 @@ static const char *default_pcp_dir = ".";
 static const char *default_reg_exp = ".*";
 
 // Run Command enumeration
-enum RunCommand { sum = 0, add = 1, subtract = 2 };
+enum RunCommand { sum = 0, add = 1, sub = 2 };
 
 // Variables for top-level command line arguments
 static RunCommand run_command = sum;
@@ -95,32 +97,30 @@ static StringArray  pcp_dir;
 static ConcatString pcp_reg_exp(default_reg_exp);
 
 // Variables for the add and subtract commands
-static ConcatString in_file1;
-static int          accum1;
-static ConcatString in_file2;
-static int          accum2;
-
-// Grid definition
-static Grid grid;
+static ConcatString *in_file;
+static int          *accum;
+static int           n_files;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void   process_command_line(int, char **);
-static void   process_sum_args(int, char **, int);
-static void   process_add_subtract_args(int, char **, int);
+static void process_command_line(int, char **);
 
-static void   do_sum_command(int, char **);
-static void   sum_grib_files(GribRecord &);
-static int    search_pcp_dir(const char *, const unixtime, char *&);
-static void   check_file_time(char *, unixtime, int &);
+static void process_sum_args(int, char **, int);
+static void process_add_sub_args(int, char **, int);
 
-static void   do_add_subtract_command(int, char **);
-static void   get_field(const char *, int, WrfData &, unixtime &, unixtime &,
-                        GribRecord &);
+static void do_sum_command(int, char **);
+static void do_add_command(int, char **);
+static void do_sub_command(int, char **);
 
-static void   write_netcdf(unixtime, unixtime, int, GribRecord &);
-static void   clean_up();
-static void   usage(int, char **);
+static void sum_grib_files(Grid &, GribRecord &);
+static int  search_pcp_dir(const char *, const unixtime, char *&);
+static void check_file_time(char *, unixtime, int &);
+static void get_field(const char *, int, WrfData &, unixtime &, unixtime &,
+                      Grid &, GribRecord &);
+
+static void write_netcdf(unixtime, unixtime, int, Grid &, GribRecord &);
+static void clean_up();
+static void usage(int, char **);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -139,8 +139,9 @@ int main(int argc, char *argv[]) {
    //
    // Perform the requested job command
    //
-   if(run_command == sum) do_sum_command(argc, argv);
-   else                   do_add_subtract_command(argc, argv);
+   if     (run_command == sum) do_sum_command(argc, argv);
+   else if(run_command == add) do_add_command(argc, argv);
+   else                        do_sub_command(argc, argv);
 
    return(0);
 }
@@ -153,7 +154,7 @@ void process_command_line(int argc, char **argv) {
    //
    // Check for the minimum number of arguments
    //
-   if(argc < 6) {
+   if(argc < 4) {
       usage(argc, argv);
       exit(1);
    }
@@ -178,7 +179,7 @@ void process_command_line(int argc, char **argv) {
          i_args      = i+1;
       }
       else if(strcmp(argv[i], "-subtract") == 0) {
-         run_command = subtract;
+         run_command = sub;
          i_args      = i+1;
       }
       else if(strcmp(argv[i], "-gc") == 0) {
@@ -199,7 +200,7 @@ void process_command_line(int argc, char **argv) {
    // Process the specific command arguments
    //
    if(run_command == sum) process_sum_args(argc, argv, i_args);
-   else                   process_add_subtract_args(argc, argv, i_args);
+   else                   process_add_sub_args(argc, argv, i_args);
 
    //
    // If pcp_dir is not set, set it to the current directory.
@@ -288,46 +289,53 @@ void process_sum_args(int argc, char **argv, int i_args) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_add_subtract_args(int argc, char **argv, int i_args) {
+void process_add_sub_args(int argc, char **argv, int i_args) {
+   int i;
 
    //
-   // Check the number of arguments provided
+   // Check for a minimum of two addition arguments
    //
-   if(i_args + 5 > argc) {
-      cerr << "\n\nERROR: process_add_subtract_args() -> "
+   if( (run_command == add && i_args + 2 > argc) ||
+       (run_command == sub && i_args + 5 > argc) ) {
+      cerr << "\n\nERROR: process_add_sub_args() -> "
            << "Not enough arguments provided.\n\n" << flush;
       usage(argc, argv);
       exit(1);
    }
 
    //
-   // Parse the add and subtract arguments
+   // Figure out the number of files provided
    //
+   for(i=i_args, n_files=0; i<argc; i++) {
+
+      // Only check accumulation interval for enough args
+      if(i+1 < argc) {
+         if(!is_hh(argv[i+1]) && !is_hhmmss(argv[i+1])) break;
+         else {
+            n_files++; // Increment file count
+            i++;       // Advance past next file
+         }
+      }
+   } // end for i
 
    //
-   // Input file 1
+   // Allocate memory for file names and accumulations
    //
-   in_file1 = argv[i_args];
+   in_file = new ConcatString [n_files];
+   accum   = new int [n_files];
 
    //
-   // Input accumulation 1
+   // Store the input files and accumulations
    //
-   accum1 = timestring_to_sec(argv[i_args+1]);
+   for(i=0; i<n_files; i++) {
+      in_file[i] = argv[i_args + i*2];
+      accum[i]   = timestring_to_sec(argv[i_args + i*2 + 1]);
+   }
 
    //
-   // Input file 2
+   // Store the output file
    //
-   in_file2 = argv[i_args+2];
-
-   //
-   // Input accumulation 2
-   //
-   accum2 = timestring_to_sec(argv[i_args+3]);
-
-   //
-   // Out file
-   //
-   out_file = argv[i_args+4];
+   out_file = argv[i_args + n_files*2];
 
    return;
 }
@@ -335,6 +343,7 @@ void process_add_subtract_args(int argc, char **argv, int i_args) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_sum_command(int argc, char **argv) {
+   Grid grid;
    GribRecord rec;
    int lead_time;
    char init_time_str[max_str_len], valid_time_str[max_str_len];
@@ -405,7 +414,7 @@ void do_sum_command(int argc, char **argv) {
    //
    // Find and sum up the matching precipitation files
    //
-   sum_grib_files(rec);
+   sum_grib_files(grid, rec);
 
    //
    // Write the combined precipitation field out in NetCDF format
@@ -413,15 +422,15 @@ void do_sum_command(int argc, char **argv) {
    if(verbosity > 0) {
       cout << "Writing output file: " << out_file << "\n" << flush;
    }
-   write_netcdf(init_time, valid_time, out_accum, rec);
+   write_netcdf(init_time, valid_time, out_accum, grid, rec);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void sum_grib_files(GribRecord &rec) {
-   int i, j, n, n_files, x, y;
+void sum_grib_files(Grid &grid, GribRecord &rec) {
+   int i, j, n, x, y;
    char valid_str[max_str_len];
    char in_accum_str[max_str_len], out_accum_str[max_str_len];
    double v;
@@ -714,9 +723,136 @@ void check_file_time(char *file, unixtime pcp_valid, int &i_gc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_add_subtract_command(int argc, char **argv) {
+void do_add_command(int argc, char **argv) {
+   WrfData wd;
+   GribRecord rec;
+   Grid grid1, grid2;
+   unixtime init_time1, init_time2;
+   unixtime valid_time1, valid_time2;
+   unixtime nc_init_time, nc_valid_time;
+   int i, x, y, n, nc_accum;
+   double v;
+   char init_time1_str[max_str_len], init_time2_str[max_str_len];
+   char valid_time1_str[max_str_len], valid_time2_str[max_str_len];
+   char accum1_str[max_str_len], accum2_str[max_str_len];
+
+   if(verbosity > 0) {
+      cout << "Performing addition command for " << n_files
+           << " files.\n" << flush;
+   }
+
+   //
+   // Loop through each of the input files
+   //
+   for(i=0; i<n_files; i++) {
+
+      //
+      // Initialize for the first file
+      //
+      if(i == 0) {
+
+         //
+         // Read current field
+         //
+         if(verbosity > 0) {
+            cout << "Reading input file: " << in_file[0] << "\n" << flush;
+         }
+         get_field(in_file[i].text(), accum[i], wd, init_time1, valid_time1, grid1, rec);
+
+         //
+         // Build time strings
+         //
+         unix_to_yyyymmdd_hhmmss(init_time1, init_time1_str);
+         unix_to_yyyymmdd_hhmmss(valid_time1, valid_time1_str);
+         sec_to_hhmmss(accum[i], accum1_str);
+
+         // Initialize output times
+         nc_init_time  = init_time1;
+         nc_valid_time = valid_time1;
+         nc_accum      = accum[i];
+
+         //
+         // Allocate space to store the sums and initialize
+         //
+         pcp_data = new float [grid1.nx()*grid1.ny()];
+         for(n=0; n<grid1.nx()*grid1.ny(); n++) pcp_data[n] = 0.0;
+      }
+      //
+      // Perform checks for multiple files
+      //
+      else {
+
+         //
+         // Read current field
+         //
+         if(verbosity > 0) {
+            cout << "Reading input file: " << in_file[i] << "\n" << flush;
+         }
+         get_field(in_file[i].text(), accum[i], wd, init_time2, valid_time2, grid2, rec);
+
+         //
+         // Build time strings
+         //
+         unix_to_yyyymmdd_hhmmss(init_time2, init_time2_str);
+         unix_to_yyyymmdd_hhmmss(valid_time2, valid_time2_str);
+         sec_to_hhmmss(accum[i], accum2_str);
+
+         //
+         // Check for the same grid dimensions
+         //
+         if(!(grid1 == grid2)) {
+            cerr << "\n\nERROR: do_add_command() -> "
+                 << "the two input fields must be on the same grid\n\n"
+                 << flush;
+            exit(1);
+         }
+
+         // Output init time
+         if(nc_init_time != init_time2) nc_init_time = (unixtime) 0;
+
+         // Output valid time
+         if(nc_valid_time < valid_time2) nc_valid_time = valid_time2;
+
+         // Output accumulation time
+         nc_accum += accum[i];
+
+      }
+   } // end for i
+
+   //
+   // Increment sums for each grid point
+   //
+   for(x=0; x<grid1.nx(); x++) {
+      for(y=0; y<grid1.ny(); y++) {
+
+         n = wd.two_to_one(x, y);
+         v = wd.get_xy_double(x, y);
+
+         // Check for bad data
+         if(is_bad_data(v)) pcp_data[n] = bad_data_double;
+         // Otherwise, increment sums
+         else               pcp_data[n] += v;
+
+      } // end for y
+   } // end for x
+
+   //
+   // Write the combined precipitation field out in NetCDF format
+   //
+   if(verbosity > 0) {
+      cout << "Writing output file: " << out_file << "\n" << flush;
+   }
+   write_netcdf(nc_init_time, nc_valid_time, nc_accum, grid1, rec);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_sub_command(int argc, char **argv) {
    WrfData wd1, wd2;
    GribRecord rec;
+   Grid grid1, grid2;
    unixtime init_time1, init_time2;
    unixtime valid_time1, valid_time2;
    unixtime nc_init_time, nc_valid_time;
@@ -727,17 +863,27 @@ void do_add_subtract_command(int argc, char **argv) {
    char accum1_str[max_str_len], accum2_str[max_str_len];
 
    //
+   // Check for exactly two input files
+   //
+   if(n_files != 2) {
+      cerr << "\n\nERROR: do_sub_command() -> "
+           << "you must specify exactly two input files for subtraction\n\n"
+           << flush;
+      exit(1);
+   }
+
+   //
    // Read the two specified Grib files
    //
    if(verbosity > 0) {
-      cout << "Reading input file: " << in_file1 << "\n" << flush;
+      cout << "Reading input file: " << in_file[0] << "\n" << flush;
    }
-   get_field(in_file1.text(), accum1, wd1, init_time1, valid_time1, rec);
+   get_field(in_file[0].text(), accum[0], wd1, init_time1, valid_time1, grid1, rec);
 
    if(verbosity > 0) {
-      cout << "Reading input file: " << in_file2 << "\n" << flush;
+      cout << "Reading input file: " << in_file[1] << "\n" << flush;
    }
-   get_field(in_file2.text(), accum2, wd2, init_time2, valid_time2, rec);
+   get_field(in_file[1].text(), accum[1], wd2, init_time2, valid_time2, grid2, rec);
 
    //
    // Build time strings
@@ -746,15 +892,14 @@ void do_add_subtract_command(int argc, char **argv) {
    unix_to_yyyymmdd_hhmmss(init_time2, init_time2_str);
    unix_to_yyyymmdd_hhmmss(valid_time1, valid_time1_str);
    unix_to_yyyymmdd_hhmmss(valid_time2, valid_time2_str);
-   sec_to_hhmmss(accum1, accum1_str);
-   sec_to_hhmmss(accum2, accum2_str);
+   sec_to_hhmmss(accum[0], accum1_str);
+   sec_to_hhmmss(accum[1], accum2_str);
 
    //
    // Check for the same grid dimensions
    //
-   if(wd1.get_nx() != wd2.get_nx() ||
-      wd1.get_ny() != wd2.get_ny()) {
-      cerr << "\n\nERROR: do_add_subtract_command() -> "
+   if(!(grid1 == grid2)) {
+      cerr << "\n\nERROR: do_sub_command() -> "
            << "the two input fields must be on the same grid\n\n"
            << flush;
       exit(1);
@@ -762,84 +907,45 @@ void do_add_subtract_command(int argc, char **argv) {
 
    //
    // Compute output accumulation, initialization, and valid times
-   // for the add command.
-   //
-   if(run_command == add) {
-
-      if(verbosity > 0) {
-         cout << "Performing addition command.\n" << flush;
-      }
-
-      // Output valid time
-      nc_valid_time = max(valid_time1, valid_time2);
-
-      //
-      // Output initialization time
-      // If the init times don't match, assume these are observations
-      // and set the output init time to zero.
-      //
-      if(init_time1 != init_time2) {
-         nc_init_time = (unixtime) 0;
-      }
-      else {
-         nc_init_time = min(init_time1, init_time2);
-      }
-
-      //
-      // Output accumulation time
-      //
-      nc_accum = accum1 + accum2;
-   }
-   //
-   // Compute output accumulation, initialization, and valid times
    // for the subtract command.
    //
-   else if(run_command == subtract) {
-
-      if(verbosity > 0) {
-         cout << "Performing subtraction command.\n" << flush;
-      }
-
-      //
-      // Output valid time
-      //
-      nc_valid_time = valid_time1;
-
-      //
-      // Output initialization time
-      // Error if init_time1 != init_time2.
-      //
-      if(init_time1 != init_time2) {
-         cerr << "\n\nERROR: do_add_subtract_command() -> "
-              << "init_time1 (" << init_time1_str
-              <<  ") must be equal to init_time2 (" << init_time2_str
-              << ") for subtraction.\n" << flush;
-         exit(1);
-      }
-      nc_init_time = init_time1;
-
-      //
-      // Output accumulation time
-      // Error if accum1 < accum2.
-      //
-      if(accum1 < accum2) {
-         cerr << "\n\nERROR: do_add_subtract_command() -> "
-              << "accum1 (" << accum1_str
-              <<  ") must be greater than accum2 ("
-              << accum2_str << ") for subtraction.\n" << flush;
-         exit(1);
-      }
-      nc_accum = accum1 - accum2;
-   }
-   else {
-      cerr << "\n\nERROR: do_add_subtract_command() -> "
-           << "unexpected run command: " << run_command
-           << "\n\n" << flush;
-      exit(1);
+   if(verbosity > 0) {
+      cout << "Performing subtraction command.\n" << flush;
    }
 
    //
-   // Allocate space to store the sums or differences
+   // Output valid time
+   //
+   nc_valid_time = valid_time1;
+
+   //
+   // Output initialization time
+   // Error if init_time1 != init_time2.
+   //
+   if(init_time1 != init_time2) {
+      cerr << "\n\nERROR: do_sub_command() -> "
+           << "init_time1 (" << init_time1_str
+           <<  ") must be equal to init_time2 (" << init_time2_str
+           << ") for subtraction.\n" << flush;
+      exit(1);
+   }
+   nc_init_time = init_time1;
+
+   //
+   // Output accumulation time
+   // Error if accum1 < accum2.
+   //
+   if(accum[0] < accum[1]) {
+      cerr << "\n\nERROR: do_sub_command() -> "
+           << "accum1 (" << accum1_str
+           <<  ") must be greater than accum2 ("
+           << accum2_str << ") for subtraction.\n" << flush;
+      exit(1);
+   }
+   nc_accum = accum[0] - accum[1];
+
+   //
+   // Allocate space to store the differences
    //
    pcp_data = new float [wd1.get_nx()*wd1.get_ny()];
 
@@ -857,9 +963,6 @@ void do_add_subtract_command(int argc, char **argv) {
          if(is_bad_data(v1) ||
             is_bad_data(v2))         v = bad_data_double;
 
-         // Perform addition
-         else if(run_command == add) v = v1 + v2;
-
          // Perform subtraction
          else                        v = v1 - v2;
 
@@ -875,15 +978,16 @@ void do_add_subtract_command(int argc, char **argv) {
    if(verbosity > 0) {
       cout << "Writing output file: " << out_file << "\n" << flush;
    }
-   write_netcdf(nc_init_time, nc_valid_time, nc_accum, rec);
+   write_netcdf(nc_init_time, nc_valid_time, nc_accum, grid1, rec);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_field(const char *in_file, int accum, WrfData &wd,
-               unixtime &init_ut, unixtime &valid_ut, GribRecord &rec) {
+void get_field(const char *get_file, int get_accum, WrfData &wd,
+               unixtime &init_ut, unixtime &valid_ut,
+               Grid &grid, GribRecord &rec) {
    GribFile grib_file;
    int bms_flag, rec_accum;
    char accum_str[max_str_len];
@@ -891,17 +995,17 @@ void get_field(const char *in_file, int accum, WrfData &wd,
    //
    // Setup the GCInfo object
    //
-   gc_info.code = grib_code;
+   gc_info.code     = grib_code;
    gc_info.lvl_type = AccumLevel;
-   gc_info.lvl_1 = accum;
-   gc_info.lvl_2 = accum;
+   gc_info.lvl_1    = get_accum;
+   gc_info.lvl_2    = get_accum;
 
    //
    // Open the grib file specified
    //
-   if( !(grib_file.open(in_file)) ) {
+   if( !(grib_file.open(get_file)) ) {
       cerr << "\n\nERROR: get_field() -> "
-           << "can't open grib file: " << in_file
+           << "can't open grib file: " << get_file
            << "\n\n" << flush;
       exit(1);
    }
@@ -912,12 +1016,12 @@ void get_field(const char *in_file, int accum, WrfData &wd,
    if(get_grib_record(grib_file, rec, gc_info, wd,
                       grid, verbosity) != 0) {
 
-      sec_to_hhmmss(accum, accum_str);
+      sec_to_hhmmss(get_accum, accum_str);
 
       cerr << "\n\nERROR: get_field() -> "
            << "can't find grib code " << grib_code
            << " with accumulation of " << accum_str
-           << " in GRIB file: " << in_file
+           << " in GRIB file: " << get_file
            << "\n\n" << flush;
       exit(1);
    }
@@ -933,7 +1037,7 @@ void get_field(const char *in_file, int accum, WrfData &wd,
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
-                  GribRecord &rec) {
+                  Grid &grid, GribRecord &rec) {
    int yr, mon, day, hr, min, sec;
    unixtime ut;
    char var_str[max_str_len];
@@ -978,24 +1082,21 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    if(run_command == sum) {
       sec_to_hhmmss(in_accum, accum1_str);
       sprintf(command_str,
-              "Sum: Files with accumulations of %s.",
-              accum1_str);
+              "Sum: %i files with accumulations of %s.",
+              n_files, accum1_str);
    }
    else if(run_command == add) {
-      sec_to_hhmmss(accum1, accum1_str);
-      sec_to_hhmmss(accum2, accum2_str);
+      sec_to_hhmmss(in_accum, accum1_str);
       sprintf(command_str,
-              "Addition: %s with accumulation of %s plus %s with accumulation of %s.",
-              in_file1.text(), accum1_str,
-              in_file2.text(), accum2_str);
+              "Addition: %i files.", n_files);
    }
    else { // run_command == subtract
-      sec_to_hhmmss(accum1, accum1_str);
-      sec_to_hhmmss(accum2, accum2_str);
+      sec_to_hhmmss(accum[0], accum1_str);
+      sec_to_hhmmss(accum[1], accum2_str);
       sprintf(command_str,
               "Subtraction: %s with accumulation of %s minus %s with accumulation of %s.",
-              in_file1.text(), accum1_str,
-              in_file2.text(), accum2_str);
+              in_file[0].text(), accum1_str,
+              in_file[1].text(), accum2_str);
    }
    f_out->add_att("RunCommand", command_str);
 
@@ -1007,6 +1108,9 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    // Define Dimensions
    lat_dim = f_out->add_dim("lat", (long) grid.ny());
    lon_dim = f_out->add_dim("lon", (long) grid.nx());
+
+   // Add the lat/lon variables
+   write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
    // Define a name for the variable
    // If the accumulation time is non-zero, append it to the variable name
@@ -1167,7 +1271,30 @@ void usage(int argc, char *argv[]) {
         << "\t\t\tNote: Set init_time to 00000000_000000 when summing "
         << "observation files.\n\n"
 
-        << "\tADD_ARGS and SUBTRACT_ARGS:\n"
+        << "\tADD_ARGS:\n"
+        << "\t\tin_file1\n"
+        << "\t\taccum1\n"
+        << "\t\t...\n"
+        << "\t\tin_filen\n"
+        << "\t\taccumn\n"
+        << "\t\tout_file\n\n"
+
+        << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
+        << "file to be used (required).\n"
+
+        << "\t\t\t\"accum1\" indicates the accumulation interval "
+        << "to be used from in_file1 in HH[MMSS] format (required).\n"
+
+        << "\t\t\t\"in_filen\" indicates additional input GRIB files to be "
+        << "added together (optional).\n"
+
+        << "\t\t\t\"accumn\" indicates the accumulation interval "
+        << "to be used in HH[MMSS] format (optional).\n"
+
+        << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
+        << "be written (required).\n\n"
+
+        << "\tSUBTRACT_ARGS:\n"
         << "\t\tin_file1\n"
         << "\t\taccum1\n"
         << "\t\tin_file2\n"
