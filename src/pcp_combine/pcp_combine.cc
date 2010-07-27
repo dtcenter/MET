@@ -39,6 +39,7 @@
 //   008    06/30/10  Halley Gotway  Enhance grid equality checks.
 //   009    07/27/10  Halley Gotway  Enhance to allow addition of any
 //                    number of input files/accumulation intervals.
+//                    Add lat/lon variables to NetCDF.
 //
 ////////////////////////////////////////////////////////////////////////
 

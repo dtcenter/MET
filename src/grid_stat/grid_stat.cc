@@ -57,6 +57,7 @@
 //   019    06/08/10  Halley Gotway  Add support for multi-category
 //                    contingency tables.
 //   020    06/30/10  Halley Gotway  Enhance grid equality checks.
+//   021    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1192,6 +1193,9 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
+
+   // Add the lat/lon variables
+   write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
 
    return;
 }

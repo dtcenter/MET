@@ -1436,6 +1436,9 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
 
+   // Add the lat/lon variables
+   write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+
    // Append to the list of output files
    out_nc_file_list.add(out_nc_file);
 
