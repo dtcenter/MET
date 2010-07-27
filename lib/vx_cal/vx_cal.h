@@ -101,6 +101,22 @@ extern  int      timestring_to_sec(const char *);
 ////////////////////////////////////////////////////////////////////////
 
 
+extern  int is_yyyymmdd(const char * text);
+
+extern  int is_yyyymmddhh(const char * text);
+
+extern  int is_yyyymmdd_hh(const char * text);
+
+extern  int is_yyyymmdd_hhmmss(const char * text);
+
+extern  int is_hhmmss(const char * text);
+
+extern  int is_hh(const char * text);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern const char * day_name[];
 
 extern const char * short_day_name[];
