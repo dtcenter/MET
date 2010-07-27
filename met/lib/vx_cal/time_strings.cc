@@ -26,22 +26,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static int is_yyyymmdd(const char * text);
-
-static int is_yyyymmddhh(const char * text);
-
-static int is_yyyymmdd_hh(const char * text);
-
-static int is_yyyymmdd_hhmmss(const char * text);
-
-static int is_hhmmss(const char * text);
-
-static int is_hh(const char * text);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void sec_to_hhmmss(int in_sec, char *str)
 
 {
