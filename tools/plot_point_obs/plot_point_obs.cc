@@ -55,7 +55,7 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char  *program_name = "point_stat";
+static const char  *program_name = "plot_point_obs";
 static const Color  c_map(25, 25, 25);
 static const double l_width = 0.5;
 
