@@ -19,6 +19,8 @@
 //                    aggr_orank_lines.
 //   002    06/09/10  Halley Gotway   Add aggr_mctc_lines.
 //   003    06/21/10  Halley Gotway   Add support for vif_flag.
+//   004    07/28/10  Halley Gotway   Write out lines prior to error
+//                    checking and add input line to error messages.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +75,11 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
       if(j.is_keeper(line)) {
 
          //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
          // Zero out the contingecy table object
          //
          ct.zero_out();
@@ -99,8 +106,9 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
                statlinetype_to_string(line.type(), line_type);
                cerr << "\n\nERROR: aggr_contable_lines() -> "
                     << "line type value of " << line_type
-                    << " not currently supported for the aggregation "
-                    << "job!\n\n" << flush;
+                    << " not currently supported for the aggregation job!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n"
+                    << flush;
                throw(1);
          } // end switch
 
@@ -153,8 +161,6 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
             csi_ts.add(cts_tmp.csi.v);
             hk_ts.add(cts_tmp.hk.v);
          }
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
@@ -258,6 +264,11 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
       if(j.is_keeper(line)) {
 
          //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
          // Initialize
          //
          mct.clear();
@@ -276,8 +287,9 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
                statlinetype_to_string(line.type(), line_type);
                cerr << "\n\nERROR: aggr_mctc_lines() -> "
                     << "line type value of " << line_type
-                    << " not currently supported for the aggregation "
-                    << "job!\n\n" << flush;
+                    << " not currently supported for the aggregation job!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n"
+                    << flush;
                throw(1);
          } // end switch
 
@@ -348,8 +360,6 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
             //
             acc_ts.add(mcts_tmp.acc.v);
          }
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
@@ -429,6 +439,11 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
       if(j.is_keeper(line)) {
 
          //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
          // Initialize
          //
          pct.clear();
@@ -447,8 +462,9 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
                statlinetype_to_string(line.type(), line_type);
                cerr << "\n\nERROR: aggr_nx2_contable_lines() -> "
                     << "line type value of " << line_type
-                    << " not currently supported for the aggregation "
-                    << "job!\n\n" << flush;
+                    << " not currently supported for the aggregation job!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n"
+                    << flush;
                throw(1);
          } // end switch
 
@@ -536,8 +552,6 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
             brier_ts.add(pct_tmp.brier.v);
          }
 
-         if(j.dr_out) *(j.dr_out) << line;
-
          n_out++;
       }
    } // end while
@@ -608,6 +622,11 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
       if(j.is_keeper(line)) {
 
          //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
          // Switch on the line type.
          // For each partial sum line type, clear out the object,
          // parse the new line, and add it to running sum.
@@ -640,7 +659,8 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
 
             default:
                cerr << "\n\nERROR: aggr_partial_sum_lines() -> "
-                    << "should only encounter partial sum line types!\n\n"
+                    << "should only encounter partial sum line types!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n"
                     << flush;
                throw(1);
          } // end switch
@@ -678,8 +698,6 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
             obar_ts.add(cnt_tmp.obar.v);
             me_ts.add(cnt_tmp.me.v);
          }
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
@@ -752,6 +770,11 @@ void aggr_vl1l2_wdir(const char *jobstring, LineDataFile &f,
       if(j.is_keeper(line)) {
 
          //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
          // Switch on the line type.
          // For each partial sum line type, clear out the object,
          // parse the new line, and add it to running sum.
@@ -792,12 +815,11 @@ void aggr_vl1l2_wdir(const char *jobstring, LineDataFile &f,
 
             default:
                cerr << "\n\nERROR: aggr_vl1l2_wdir() -> "
-                    << "should only encounter partial sum line types!\n\n"
+                    << "should only encounter partial sum line types!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n"
                     << flush;
                throw(1);
          } // end switch
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
@@ -835,6 +857,11 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
       if(j.is_keeper(line)) {
 
          //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
          // Switch on the line type.
          //
          switch(line.type()) {
@@ -866,8 +893,10 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
                else if(fcst_gc != m.fcst_gc ||
                        obs_gc  != m.obs_gc) {
                   cerr << "\n\nERROR: read_mpr_lines() -> "
-                       << "the forecast variable type or observation "
-                       << "variable type should remain the same!\n\n"
+                       << "both the forecast variable type and observation "
+                       << "variable type must remain constant!  Try setting "
+                       << "\"-fcst_var\" and/or \"-obs_var\".\n"
+                       << "ERROR occurred on STAT line:\n" << line << "\n\n"
                        << flush;
                   throw(1);
                }
@@ -883,12 +912,11 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
 
             default:
                cerr << "\n\nERROR: read_mpr_lines() -> "
-                    << "should only encounter MPR line types!\n\n"
+                    << "should only encounter MPR line types!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n"
                     << flush;
                throw(1);
          } // end switch
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
@@ -1270,6 +1298,11 @@ void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
       if(j.is_keeper(line)) {
 
          //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
          // Switch on the line type.
          //
          switch(line.type()) {
@@ -1327,7 +1360,8 @@ void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
                           << "\"-column_min NSCALE n\" and "
                           << "\"-column_max NSCALE n\" options to "
                           << "filter out only those lines you'd like "
-                          << "to aggregate!\n\n"
+                          << "to aggregate!\n"
+                          << "ERROR occurred on STAT line:\n" << line << "\n\n"
                           << flush;
                      throw(1);
                   }
@@ -1364,12 +1398,11 @@ void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
 
             default:
                cerr << "\n\nERROR: aggr_isc_lines() -> "
-                    << "should only encounter ISC line types!\n\n"
+                    << "should only encounter ISC line types!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n"
                     << flush;
                throw(1);
          } // end switch
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
@@ -1498,9 +1531,16 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
 
       if(j.is_keeper(line)) {
 
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
          if(line.type() != stat_rhist) {
             cerr << "\n\nERROR: aggr_rhist_lines() -> "
-                 << "should only encounter ranked histogram (RHIST) line types!\n\n"
+                 << "should only encounter ranked histogram "
+                 << "(RHIST) line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n"
                  << flush;
             throw(1);
          }
@@ -1535,8 +1575,6 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
             }
          }
 
-         if(j.dr_out) *(j.dr_out) << line;
-
          n_out++;
       }
    } // end while
@@ -1567,9 +1605,16 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
 
       if(j.is_keeper(line)) {
 
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
          if(line.type() != stat_orank) {
             cerr << "\n\nERROR: aggr_orank_lines() -> "
-                 << "should only encounter observation rank (ORANK) line types!\n\n"
+                 << "should only encounter observation rank "
+                 << "(ORANK) line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n"
                  << flush;
             throw(1);
          }
@@ -1608,8 +1653,6 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
          //
          i = o_data.rank - 1;
          rhist_na.set(i, rhist_na[i] + 1);
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }

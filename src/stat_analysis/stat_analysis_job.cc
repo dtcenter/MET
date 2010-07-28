@@ -170,6 +170,9 @@ void do_job_filter(const char *jobstring, LineDataFile &f,
 
       if(j.is_keeper(line)) {
 
+         //
+         // Write line to dump file
+         //
          if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
@@ -257,11 +260,14 @@ void do_job_summary(const char *jobstring, LineDataFile &f,
 
       if(j.is_keeper(line)) {
 
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
          v = atof(line.get_item(offset));
 
          if(!is_bad_data(v)) v_array.add(v);
-
-         if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
       }
@@ -2012,7 +2018,7 @@ double compute_go_index(const char *jobstring, LineDataFile &f,
          else if(line.fcst_lead() == sec_per_hour * 24) i = 1;
          else if(line.fcst_lead() == sec_per_hour * 36) i = 2;
          else if(line.fcst_lead() == sec_per_hour * 48) i = 3;
-         else                                          continue;
+         else                                           continue;
 
          //
          // The GO Index is computed from the following 12 combinations
@@ -2135,6 +2141,9 @@ double compute_go_index(const char *jobstring, LineDataFile &f,
          else
             continue;
 
+         //
+         // Write line to dump file
+         //
          if(j.dr_out) *(j.dr_out) << line;
 
          n_out++;
