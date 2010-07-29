@@ -114,10 +114,14 @@ Data = data;
 void LatLonGrid::latlon_to_xy(double lat, double lon, double &x, double &y) const
 
 {
+double n;
 
 y = (lat - lat_ll)/delta_lat;
 
-x = (lon_ll - lon)/delta_lon;
+n = lon_ll - lon;
+x = n - 360.0*floor(n/360.0);
+x /= delta_lon;
+
 
 return;
 
