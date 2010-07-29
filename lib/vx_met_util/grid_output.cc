@@ -27,12 +27,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const double fill_value = -9999.0;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 static void lambert_grid_output       (const GridInfo &, NcFile * ncfile);
 static void latlon_grid_output        (const GridInfo &, NcFile * ncfile);
 static void stereographic_grid_output (const GridInfo &, NcFile * ncfile);

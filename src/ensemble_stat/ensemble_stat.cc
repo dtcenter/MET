@@ -669,7 +669,6 @@ int process_point_ens(int i_ens) {
               << "unsupported forecast file type: "
               << ens_file_list[i_ens] << "\n\n" << flush;
          return(1);
-         break;
    }
 
    // Loop through each of the fields to be verified and extract
@@ -1275,7 +1274,6 @@ int read_field(const char *file_name, const GCInfo &gci, WrfData &wd,
               << "unsupported file type: "
               << file_name << "\n\n" << flush;
          return(1);
-         break;
    }
 
    // Set the grid, if not already set
