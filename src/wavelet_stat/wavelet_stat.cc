@@ -20,6 +20,8 @@
 //   002    05/27/10  Halley Gotway  Add -fcst_valid, -fcst_lead,
 //                    -obs_valid, and -obs_lead command line options.
 //   003    06/30/10  Halley Gotway  Enhance grid equality checks.
+//   004    08/09/10  Halley Gotway  Add valid time variable attributes
+//                    to NetCDF output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1512,6 +1514,7 @@ void compute_energy(const double *arr, int n, double &en) {
 void write_nc_raw(const double *fdata, const double *odata, int n,
                   int i_gc, int i_tile) {
    int i, d;
+   int mon, day, yr, hr, min, sec;
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
@@ -1519,6 +1522,7 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
    char obs_var_name[max_str_len];
    char diff_var_name[max_str_len];
    char tmp_str[max_str_len];
+   char time_str[max_str_len];
 
    // Build the variable names
    sprintf(fcst_var_name, "FCST_%s_%s_%s_%s_RAW",
@@ -1548,19 +1552,10 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
       diff_var = nc_out->add_var(diff_var_name, ncFloat,
                                  tile_dim, x_dim, y_dim);
 
-      // Add variable attributes for the forecast field
-      fcst_var->add_att("type", "Forecast");
-      fcst_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      fcst_var->add_att("long_name", tmp_str);
-      fcst_var->add_att("level", shc.get_fcst_lev());
-      get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      fcst_var->add_att("units", tmp_str);
-      fcst_var->add_att("_FillValue", bad_data_float);
+      // Compute observation valid time string
+      unix_to_mdyhms(obs_valid_ut, mon, day, yr, hr, min, sec);
+      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+              yr, mon, day, hr, min, sec);
 
       // Add variable attributes for the observation field
       obs_var->add_att("type", "Observation");
@@ -1575,6 +1570,29 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
                          tmp_str);
       obs_var->add_att("units", tmp_str);
       obs_var->add_att("_FillValue", bad_data_float);
+      obs_var->add_att("valid_time", time_str);
+      obs_var->add_att("valid_time_ut", (long int) obs_valid_ut);
+
+      // Compute forecast valid time string
+      unix_to_mdyhms(fcst_valid_ut, mon, day, yr, hr, min, sec);
+      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+              yr, mon, day, hr, min, sec);
+
+      // Add variable attributes for the forecast field
+      fcst_var->add_att("type", "Forecast");
+      fcst_var->add_att("name", shc.get_fcst_var());
+      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      fcst_var->add_att("long_name", tmp_str);
+      fcst_var->add_att("level", shc.get_fcst_lev());
+      get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      fcst_var->add_att("units", tmp_str);
+      fcst_var->add_att("_FillValue", bad_data_float);
+      fcst_var->add_att("valid_time", time_str);
+      fcst_var->add_att("valid_time_ut", (long int) fcst_valid_ut);
 
       // Add variable attributes for the difference field
       diff_var->add_att("type", "Difference (F-O)");
@@ -1600,6 +1618,8 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
                          tmp_str);
       diff_var->add_att("obs_units", tmp_str);
       diff_var->add_att("_FillValue", bad_data_float);
+      diff_var->add_att("valid_time", time_str);
+      diff_var->add_att("valid_time_ut", (long int) fcst_valid_ut);
    }
    // Otherwise, retrieve the previously defined variables
    else {
@@ -1681,6 +1701,7 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
                   int i_gc, int i_tile, int i_scale,
                   SingleThresh &fcst_st, SingleThresh &obs_st) {
    int i, d;
+   int mon, day, yr, hr, min, sec;
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
@@ -1688,7 +1709,7 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
    char obs_var_name[max_str_len];
    char diff_var_name[max_str_len];
    char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len], time_str[max_str_len];
 
    // Get the string for the threshold applied
    fcst_st.get_abbr_str(fcst_thresh_str);
@@ -1728,18 +1749,10 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
       diff_var = nc_out->add_var(diff_var_name, ncFloat,
                                  tile_dim, scale_dim, x_dim, y_dim);
 
-      // Add variable attributes for the forecast field
-      fcst_var->add_att("type", "Forecast");
-      fcst_var->add_att("name", shc.get_fcst_var());
-      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
-                         conf_info.conf.grib_ptv().ival(),
-                         tmp_str);
-      fcst_var->add_att("long_name", tmp_str);
-      fcst_var->add_att("level", shc.get_fcst_lev());
-      fcst_var->add_att("threshold", fcst_thresh_str);
-      fcst_var->add_att("scale_0", "binary");
-      fcst_var->add_att("scale_n", "scale 2^(n-1)");
-      fcst_var->add_att("_FillValue", bad_data_float);
+      // Compute observation valid time string
+      unix_to_mdyhms(obs_valid_ut, mon, day, yr, hr, min, sec);
+      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+              yr, mon, day, hr, min, sec);
 
       // Add variable attributes for the observation field
       obs_var->add_att("type", "Observation");
@@ -1753,6 +1766,28 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
       obs_var->add_att("scale_0", "binary");
       obs_var->add_att("scale_n", "scale 2^(n-1)");
       obs_var->add_att("_FillValue", bad_data_float);
+      obs_var->add_att("valid_time", time_str);
+      obs_var->add_att("valid_time_ut", (long int) obs_valid_ut);
+
+      // Compute forecast valid time string
+      unix_to_mdyhms(fcst_valid_ut, mon, day, yr, hr, min, sec);
+      sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+              yr, mon, day, hr, min, sec);
+
+      // Add variable attributes for the forecast field
+      fcst_var->add_att("type", "Forecast");
+      fcst_var->add_att("name", shc.get_fcst_var());
+      get_grib_code_name(conf_info.fcst_gci[i_gc].code,
+                         conf_info.conf.grib_ptv().ival(),
+                         tmp_str);
+      fcst_var->add_att("long_name", tmp_str);
+      fcst_var->add_att("level", shc.get_fcst_lev());
+      fcst_var->add_att("threshold", fcst_thresh_str);
+      fcst_var->add_att("scale_0", "binary");
+      fcst_var->add_att("scale_n", "scale 2^(n-1)");
+      fcst_var->add_att("_FillValue", bad_data_float);
+      fcst_var->add_att("valid_time", time_str);
+      fcst_var->add_att("valid_time_ut", (long int) fcst_valid_ut);
 
       // Add variable attributes for the difference field
       diff_var->add_att("type", "Difference (F-O)");
@@ -1782,6 +1817,9 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
       diff_var->add_att("scale_0", "binary");
       diff_var->add_att("scale_n", "scale 2^(n-1)");
       diff_var->add_att("_FillValue", bad_data_float);
+      diff_var->add_att("valid_time", time_str);
+      diff_var->add_att("valid_time_ut", (long int) fcst_valid_ut);
+
    }
    // Otherwise, retrieve the previously defined variables
    else {
