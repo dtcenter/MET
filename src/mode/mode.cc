@@ -37,6 +37,8 @@
 //   007    05/11/10  Halley Gotway  Plot polyline lines thicker.
 //   008    06/30/10  Halley Gotway  Enhance grid equality checks.
 //   009    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
+//   010    08/09/10  Halley Gotway  Add valid time variable attributes
+//                    to NetCDF output.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -3063,8 +3065,6 @@ void write_obj_netcdf() {
            out_file.text(), time_str, hostname_str);
    f_out->add_att("FileOrigins", attribute_str);
 
-   f_out->add_att("Projection", grid.name());
-
    // Define Dimensions
    lat_dim = f_out->add_dim("lat", (long) grid.ny());
    lon_dim = f_out->add_dim("lon", (long) grid.nx());
@@ -3084,24 +3084,49 @@ void write_obj_netcdf() {
    obs_obj_var = f_out->add_var("obs_obj_id", ncInt, lat_dim, lon_dim);
    obs_clus_var = f_out->add_var("obs_clus_id", ncInt, lat_dim, lon_dim);
 
-   // Add variable attributes
+   // Compute forecast valid time string
+   ut = engine.fcst_raw->get_valid_time();
+   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
+   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+           yr, mon, day, hr, min, sec);
+
+   // Add forecast variable attributes
    fcst_raw_var->add_att("long_name", "Forecast Object Raw Values");
    fcst_raw_var->add_att("_FillValue", bad_data_float);
+   fcst_raw_var->add_att("valid_time", time_str);
+   fcst_raw_var->add_att("valid_time_ut", (long int) ut);
 
    fcst_obj_var->add_att("long_name", "Forecast Object ID");
    fcst_obj_var->add_att("_FillValue", bad_data_int);
+   fcst_obj_var->add_att("valid_time", time_str);
+   fcst_obj_var->add_att("valid_time_ut", (long int) ut);
 
    fcst_clus_var->add_att("long_name", "Forecast Cluster Object ID");
    fcst_clus_var->add_att("_FillValue", bad_data_int);
+   fcst_clus_var->add_att("valid_time", time_str);
+   fcst_clus_var->add_att("valid_time_ut", (long int) ut);
 
+   // Compute observation valid time string
+   ut = engine.obs_raw->get_valid_time();
+   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
+   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
+           yr, mon, day, hr, min, sec);
+
+   // Add observation variable attributes
    obs_raw_var->add_att("long_name", "Observation Object Raw Values");
    obs_raw_var->add_att("_FillValue", bad_data_float);
+   obs_raw_var->add_att("valid_time", time_str);
+   obs_raw_var->add_att("valid_time_ut", (long int) ut);
 
    obs_obj_var->add_att("long_name", "Observation Object ID");
    obs_obj_var->add_att("_FillValue", bad_data_int);
+   obs_obj_var->add_att("valid_time", time_str);
+   obs_obj_var->add_att("valid_time_ut", (long int) ut);
 
    obs_clus_var->add_att("long_name", "Observation Cluster Object ID");
    obs_clus_var->add_att("_FillValue", bad_data_int);
+   obs_clus_var->add_att("valid_time", time_str);
+   obs_clus_var->add_att("valid_time_ut", (long int) ut);
 
    //
    // Allocate memory for the raw values and object ID's for each grid box
