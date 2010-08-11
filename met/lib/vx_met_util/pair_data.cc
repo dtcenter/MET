@@ -379,6 +379,7 @@ void PairBase::clear() {
    lon_na.clear();
    x_na.clear();
    y_na.clear();
+   vld_ta.clear();
    lvl_na.clear();
    elv_na.clear();
    o_na.clear();
@@ -444,16 +445,45 @@ void PairBase::set_interp_wdth(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int PairBase::has_obs_rec(const char *sid,
+                          double lat, double lon,
+                          double x, double y,
+                          double lvl, double elv, int &i_obs) {
+   int i, status = 0;
+
+   //
+   // Check for an existing record of this observation
+   //
+   for(i=0, i_obs=-1; i<n_obs; i++) {
+
+      if(strcmp(sid_sa[i], sid) == 0 &&
+         is_eq(lat_na[i], lat) &&
+         is_eq(lon_na[i], lon) &&
+         is_eq(lvl_na[i], lvl) &&
+         is_eq(elv_na[i], elv)) {
+         status = 1;
+         i_obs = i;
+         break;
+      }
+   } // end for
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairBase::add_obs(const char *sid,
                        double lat, double lon,
-                       double x, double y,
+                       double x, double y, unixtime ut,
                        double lvl, double elv,
                        double o) {
+
    sid_sa.add(sid);
    lat_na.add(lat);
    lon_na.add(lon);
    x_na.add(x);
    y_na.add(y);
+   vld_ta.add(ut);
    lvl_na.add(lvl);
    elv_na.add(elv);
    o_na.add(o);
@@ -473,12 +503,67 @@ void PairBase::add_obs(double x, double y, double o) {
    lon_na.add(bad_data_double);
    x_na.add(x);
    y_na.add(y);
+   vld_ta.add(bad_data_int);
    lvl_na.add(bad_data_double);
    elv_na.add(bad_data_double);
    o_na.add(o);
 
    // Increment the number of observations
    n_obs += 1;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_obs(int i_obs, const char *sid,
+                       double lat, double lon,
+                       double x, double y, unixtime ut,
+                       double lvl, double elv,
+                       double o) {
+
+   if(i_obs < 0 || i_obs >= n_obs) {
+      cerr << "\n\nERROR: PairBase::set_obs() -> "
+           << "range check error: " << i_obs << " not in (0, "
+           << n_obs << ").\n\n"
+           << flush;
+       exit(1);
+   }
+
+   sid_sa.set(i_obs, sid);
+   lat_na.set(i_obs, lat);
+   lon_na.set(i_obs, lon);
+   x_na.set(i_obs, x);
+   y_na.set(i_obs, y);
+   vld_ta.set(i_obs, ut);
+   lvl_na.set(i_obs, lvl);
+   elv_na.set(i_obs, elv);
+   o_na.set(i_obs, o);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_obs(int i_obs, double x, double y, double o) {
+
+   if(i_obs < 0 || i_obs >= n_obs) {
+      cerr << "\n\nERROR: PairBase::set_obs() -> "
+           << "range check error: " << i_obs << " not in (0, "
+           << n_obs << ").\n\n"
+           << flush;
+       exit(1);
+   }
+
+   sid_sa.set(i_obs, na_str);
+   lat_na.set(i_obs, bad_data_double);
+   lon_na.set(i_obs, bad_data_double);
+   x_na.set(i_obs, x);
+   y_na.set(i_obs, y);
+   vld_ta.set(i_obs, bad_data_int);
+   lvl_na.set(i_obs, bad_data_double);
+   elv_na.set(i_obs, bad_data_double);
+   o_na.set(i_obs, o);
 
    return;
 }
@@ -558,7 +643,8 @@ void PairData::assign(const PairData &pd) {
 
    for(i=0; i<pd.n_pair; i++) {
       add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
-               pd.x_na[i], pd.y_na[i], pd.lvl_na[i], pd.elv_na[i],
+               pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
+               pd.lvl_na[i], pd.elv_na[i],
                pd.f_na[i], pd.c_na[i], pd.o_na[i]);
    }
 
@@ -568,16 +654,41 @@ void PairData::assign(const PairData &pd) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairData::add_pair(const char *sid, double lat, double lon,
-                        double x, double y, double lvl, double elv,
+                        double x, double y, unixtime ut,
+                        double lvl, double elv,
                         double f, double c, double o) {
 
-   PairBase::add_obs(sid, lat, lon, x, y, lvl, elv, o);
+   PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv, o);
 
    f_na.add(f);
    c_na.add(c);
 
    // Increment the number of pairs
    n_pair += 1;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairData::set_pair(int i_pair, const char *sid,
+                        double lat, double lon,
+                        double x, double y, unixtime ut,
+                        double lvl, double elv,
+                        double f, double c, double o) {
+
+   if(i_pair < 0 || i_pair >= n_pair) {
+      cerr << "\n\nERROR: PairData::set_pair() -> "
+           << "range check error: " << i_pair << " not in (0, "
+           << n_pair << ").\n\n"
+           << flush;
+       exit(1);
+   }
+
+   PairBase::set_obs(i_pair, sid, lat, lon, x, y, ut, lvl, elv, o);
+
+   f_na.set(i_pair, f);
+   c_na.set(i_pair, c);
 
    return;
 }
@@ -628,6 +739,7 @@ void GCPairData::init_from_scratch() {
    rej_typ      = (int ***) 0;
    rej_mask     = (int ***) 0;
    rej_fcst     = (int ***) 0;
+   rej_mult     = (int ***) 0;
 
    clear();
 
@@ -642,6 +754,7 @@ void GCPairData::clear() {
    fcst_gci.clear();
    obs_gci.clear();
 
+   fcst_ut       = (unixtime) 0;
    beg_ut        = (unixtime) 0;
    end_ut        = (unixtime) 0;
 
@@ -675,6 +788,7 @@ void GCPairData::clear() {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
+            rej_mult[i][j][k] = 0;
          }
       }
    }
@@ -692,6 +806,7 @@ void GCPairData::assign(const GCPairData &gc_pd) {
    set_fcst_gci(gc_pd.fcst_gci);
    set_obs_gci(gc_pd.obs_gci);
 
+   fcst_ut  = gc_pd.fcst_ut;
    beg_ut   = gc_pd.beg_ut;
    end_ut   = gc_pd.end_ut;
 
@@ -699,6 +814,7 @@ void GCPairData::assign(const GCPairData &gc_pd) {
    rej_typ  = gc_pd.rej_typ;
    rej_mask = gc_pd.rej_mask;
    rej_fcst = gc_pd.rej_fcst;
+   rej_mult = gc_pd.rej_mult;
 
    interp_thresh = gc_pd.interp_thresh;
 
@@ -720,10 +836,11 @@ void GCPairData::assign(const GCPairData &gc_pd) {
       for(j=0; j<gc_pd.n_mask; j++) {
          for(k=0; k<gc_pd.n_interp; k++) {
 
-            pd[i][j][k] = gc_pd.pd[i][j][k];
+            pd[i][j][k]       = gc_pd.pd[i][j][k];
             rej_typ[i][j][k]  = gc_pd.rej_typ[i][j][k];
             rej_mask[i][j][k] = gc_pd.rej_mask[i][j][k];
             rej_fcst[i][j][k] = gc_pd.rej_fcst[i][j][k];
+            rej_mult[i][j][k] = gc_pd.rej_mult[i][j][k];
          }
       }
    }
@@ -830,6 +947,15 @@ void GCPairData::set_climo_wd_ptr(int i, WrfData *wd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void GCPairData::set_fcst_ut(const unixtime ut) {
+
+   fcst_ut = ut;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void GCPairData::set_beg_ut(const unixtime ut) {
 
    beg_ut = ut;
@@ -861,23 +987,27 @@ void GCPairData::set_pd_size(int types, int masks, int interps) {
    rej_typ  = new int **      [n_msg_typ];
    rej_mask = new int **      [n_msg_typ];
    rej_fcst = new int **      [n_msg_typ];
+   rej_mult = new int **      [n_msg_typ];
 
    for(i=0; i<n_msg_typ; i++) {
       pd[i]       = new PairData * [n_mask];
       rej_typ[i]  = new int *      [n_mask];
       rej_mask[i] = new int *      [n_mask];
       rej_fcst[i] = new int *      [n_mask];
+      rej_mult[i] = new int *      [n_mask];
 
       for(j=0; j<n_mask; j++) {
          pd[i][j]       = new PairData [n_interp];
          rej_typ[i][j]  = new int      [n_interp];
          rej_mask[i][j] = new int      [n_interp];
          rej_fcst[i][j] = new int      [n_interp];
+         rej_mult[i][j] = new int      [n_interp];
 
          for(k=0; k<n_interp; k++) {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
+            rej_mult[i][j][k] = 0;
          } // end for k
       } // end for j
    } // end for i
@@ -950,8 +1080,9 @@ void GCPairData::set_interp(int i_interp, InterpMthd mthd, int wdth) {
 
 void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
                          char  *hdr_sid_str, unixtime hdr_ut,
-                         float *obs_arr,     Grid &gr) {
-   int i, j, k, x, y;
+                         float *obs_arr,     Grid &gr,
+                         int    mult_obs_flag) {
+   int i, j, k, x, y, i_obs;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt;
    double fcst_v, climo_v, obs_v;
@@ -1156,9 +1287,68 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
             climo_v = compute_interp(0, obs_x, obs_y, k,
                          obs_lvl, climo_lvl_below, climo_lvl_above);
 
+            // Check for duplicate observations
+            if(mult_obs_flag > 0 &&
+               pd[i][j][k].has_obs_rec(hdr_sid_str, hdr_lat, hdr_lon,
+                                       obs_x, obs_y, obs_lvl, obs_hgt,
+                                       i_obs)) {
+
+               // Switch on the mult_obs_flag options
+               switch(mult_obs_flag) {
+
+                  // Use closest valid time
+                  case 1:
+                     if(abs((int) (fcst_ut - hdr_ut)) <
+                        abs((int) (fcst_ut - pd[i][j][k].vld_ta[i_obs]))) {
+
+                        pd[i][j][k].set_pair(i_obs, hdr_sid_str,
+                                             hdr_lat, hdr_lon,
+                                             obs_x, obs_y, hdr_ut,
+                                             obs_lvl, obs_hgt,
+                                             fcst_v, climo_v, obs_v);
+                     }
+                     break;
+
+                  // Use the minimum value
+                  case 2:
+                     if(obs_v < pd[i][j][k].o_na[i_obs]) {
+
+                        pd[i][j][k].set_pair(i_obs, hdr_sid_str,
+                                             hdr_lat, hdr_lon,
+                                             obs_x, obs_y, hdr_ut,
+                                             obs_lvl, obs_hgt,
+                                             fcst_v, climo_v, obs_v);
+                     }
+                     break;
+
+                  // Use the maximum value
+                  case 3:
+                     if(obs_v > pd[i][j][k].o_na[i_obs]) {
+
+                        pd[i][j][k].set_pair(i_obs, hdr_sid_str,
+                                             hdr_lat, hdr_lon,
+                                             obs_x, obs_y, hdr_ut,
+                                             obs_lvl, obs_hgt,
+                                             fcst_v, climo_v, obs_v);
+                     }
+                     break;
+
+                  default:
+                     cerr << "\n\nERROR: GCPairData::add_obs() -> "
+                          << "unexpected mult_obs_flag value of "
+                          << mult_obs_flag << ".\n\n" << flush;
+                     exit(1);
+                     break;
+               } // end switch
+
+               inc_count(rej_mult, i, j, k);
+               continue;
+            }
+
             // Add the forecast, climatological, and observation data
-            pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon, obs_x, obs_y,
-                                 obs_lvl, obs_hgt, fcst_v, climo_v, obs_v);
+            pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon,
+                                 obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
+                                 fcst_v, climo_v, obs_v);
 
          } // end for k
       } // end for j
@@ -1434,6 +1624,7 @@ void EnsPairData::assign(const EnsPairData &pd) {
    lon_na = pd.lon_na;
    x_na   = pd.x_na;
    y_na   = pd.y_na;
+   vld_ta = pd.vld_ta;
    lvl_na = pd.lvl_na;
    elv_na = pd.elv_na;
    n_pair = pd.n_pair;
@@ -1616,6 +1807,7 @@ void GCEnsPairData::clear() {
    fcst_gci.clear();
    obs_gci.clear();
 
+   fcst_ut       = (unixtime) 0;
    beg_ut        = (unixtime) 0;
    end_ut        = (unixtime) 0;
 
@@ -1652,6 +1844,7 @@ void GCEnsPairData::assign(const GCEnsPairData &gc_pd) {
    set_fcst_gci(gc_pd.fcst_gci);
    set_obs_gci(gc_pd.obs_gci);
 
+   fcst_ut = gc_pd.fcst_ut;
    beg_ut  = gc_pd.beg_ut;
    end_ut  = gc_pd.end_ut;
 
@@ -1735,6 +1928,15 @@ void GCEnsPairData::set_fcst_lvl(int i, double lvl) {
 void GCEnsPairData::set_fcst_wd_ptr(int i, WrfData *wd_ptr) {
 
    fcst_wd_ptr[i] = wd_ptr;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GCEnsPairData::set_fcst_ut(const unixtime ut) {
+
+   fcst_ut = ut;
 
    return;
 }
@@ -1862,10 +2064,9 @@ void GCEnsPairData::set_ens_size() {
 
 void GCEnsPairData::add_obs(float *hdr_arr, const char *hdr_typ_str,
                             const char  *hdr_sid_str, unixtime hdr_ut,
-                            float *obs_arr, Grid &gr) {
-
-
-   int i, j, k, x, y;
+                            float *obs_arr, Grid &gr,
+                            int mult_obs_flag) {
+   int i, j, k, x, y, i_obs;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt;
    double obs_v;
@@ -1973,11 +2174,64 @@ void GCEnsPairData::add_obs(float *hdr_arr, const char *hdr_typ_str,
          // Add the observation for each interpolation method
          for(k=0; k<n_interp; k++) {
 
+            // Check for duplicate observations
+            if(mult_obs_flag > 0 &&
+               pd[i][j][k].has_obs_rec(hdr_sid_str, hdr_lat, hdr_lon,
+                                       obs_x, obs_y, obs_lvl, obs_hgt,
+                                       i_obs)) {
+
+               // Switch on the mult_obs_flag options
+               switch(mult_obs_flag) {
+
+                  // Use closest valid time
+                  case 1:
+                     if(abs((int) (fcst_ut - hdr_ut)) <
+                        abs((int) (fcst_ut - pd[i][j][k].vld_ta[i_obs]))) {
+
+                        pd[i][j][k].set_obs(i_obs, hdr_sid_str,
+                                            hdr_lat, hdr_lon,
+                                            obs_x, obs_y, hdr_ut,
+                                            obs_lvl, obs_hgt, obs_v);
+                     }
+                     break;
+
+                  // Use the minimum value
+                  case 2:
+                     if(obs_v < pd[i][j][k].o_na[i_obs]) {
+
+                        pd[i][j][k].set_obs(i_obs, hdr_sid_str,
+                                            hdr_lat, hdr_lon,
+                                            obs_x, obs_y, hdr_ut,
+                                            obs_lvl, obs_hgt, obs_v);
+                     }
+                     break;
+
+                  // Use the maximum value
+                  case 3:
+                     if(obs_v > pd[i][j][k].o_na[i_obs]) {
+
+                        pd[i][j][k].set_obs(i_obs, hdr_sid_str,
+                                            hdr_lat, hdr_lon,
+                                            obs_x, obs_y, hdr_ut,
+                                            obs_lvl, obs_hgt, obs_v);
+                     }
+                     break;
+
+                  default:
+                     cerr << "\n\nERROR: GCEnsPairData::add_obs() -> "
+                          << "unexpected mult_obs_flag value of "
+                          << mult_obs_flag << ".\n\n" << flush;
+                     exit(1);
+                     break;
+               } // end switch
+
+               continue;
+            }
+
             // Add the observation value
             pd[i][j][k].add_obs(hdr_sid_str, hdr_lat, hdr_lon,
-                                obs_x, obs_y, obs_lvl, obs_hgt,
-                                obs_v);
-
+                                obs_x, obs_y, hdr_ut, obs_lvl,
+                                obs_hgt, obs_v);
          } // end for k
       } // end for j
    } // end for i
