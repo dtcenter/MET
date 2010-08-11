@@ -1683,6 +1683,10 @@ void write_mpr_row(StatHdrColumns &shc, const PairData *pd_ptr,
    // Write a line for each matched pair
    for(i=0; i<pd_ptr->n_pair; i++) {
 
+      // Set the observation valid time
+      shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
+      shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
+
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
 
@@ -1801,6 +1805,10 @@ void write_orank_row(StatHdrColumns &shc, const EnsPairData *pd_ptr,
 
    // Write a line for each ensemble pair
    for(i=0; i<pd_ptr->n_pair; i++) {
+
+      // Set the observation valid time
+      shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
+      shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
 
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
