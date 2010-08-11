@@ -25,6 +25,7 @@ OBJECTS  =  date_to_mjd.o \
 	mdyhms_to_unix.o \
 	mjd_to_date.o \
 	time_strings.o \
+	time_array.o \
 	unix_to_mdyhms.o
 
 OPT_FLAGS=
@@ -79,6 +80,9 @@ mjd_to_date.o: mjd_to_date.cc
 
 time_strings.o: time_strings.cc
 	$(CXX) time_strings.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+
+time_array.o: time_array.cc
+	$(CXX) time_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
 unix_to_mdyhms.o: unix_to_mdyhms.cc
 	$(CXX) unix_to_mdyhms.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)

@@ -142,6 +142,7 @@ static const int Sunday    = 7;
 
 
 #include "vx_cal/holiday.h"
+#include "vx_cal/time_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
