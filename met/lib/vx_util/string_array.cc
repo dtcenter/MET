@@ -344,6 +344,39 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void StringArray::set(int i, const char * text)
+
+{
+
+if ( (i < 0) || (i >= Nelements) )  {
+
+   cerr << "\n\n  StringArray::set(int, const char *) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+int n = strlen(text);
+
+if ( n > MaxLength )  MaxLength = n;
+
+if ( s[i] )  { delete [] s[i];  s[i] = (char *) 0; }
+
+s[i] = new char [1 + n];
+
+strcpy(s[i], text);
+
+s[i][n] = (char) 0;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int StringArray::has(const char * text) const
 
 {
