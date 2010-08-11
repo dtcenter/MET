@@ -20,7 +20,7 @@
    //
    //     Created from config file "EnsembleStatConfig_default"
    //
-   //     on May 21, 2010    2:39 pm  MDT
+   //     on August 11, 2010    9:56 am  MDT
    //
 
 
@@ -86,6 +86,8 @@ class ensemble_stat_Conf {
       const SymbolTableEntry * _interp_thresh_entry;
 
       const SymbolTableEntry * _output_flag_entry;
+
+      const SymbolTableEntry * _mult_obs_flag_entry;
 
       const SymbolTableEntry * _rng_type_entry;
 
@@ -192,6 +194,9 @@ class ensemble_stat_Conf {
       Result output_flag(int);   //  1-dimensional array, indices from 0 to 12
 
       int n_output_flag_elements();
+
+
+      Result mult_obs_flag();
 
 
       Result rng_type();
