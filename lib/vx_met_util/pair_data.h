@@ -122,6 +122,7 @@ class PairBase {
       NumArray    lon_na;  // Longitude [n_obs]
       NumArray    x_na;    // X [n_obs]
       NumArray    y_na;    // Y [n_obs]
+      TimeArray   vld_ta;  // Valid time [n_obs]
       NumArray    lvl_na;  // Level [n_obs]
       NumArray    elv_na;  // Elevation [n_obs]
       NumArray    o_na;    // Observation value [n_obs]
@@ -139,9 +140,17 @@ class PairBase {
       void set_interp_mthd(InterpMthd);
       void set_interp_wdth(int);
 
+      int  has_obs_rec(const char *, double, double, double, double,
+                       double, double, int &);
+
       void add_obs(const char *, double, double, double, double,
-                   double, double, double);
+                   unixtime, double, double, double);
       void add_obs(double, double, double);
+
+      void set_obs(int, const char *, double, double, double, double,
+                   unixtime, double, double, double);
+      void set_obs(int, double, double, double);
+
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -177,7 +186,10 @@ class PairData : public PairBase {
       void clear();
 
       void add_pair(const char *, double, double, double, double,
-                    double, double, double, double, double);
+                    unixtime, double, double, double, double, double);
+
+      void set_pair(int, const char *, double, double, double, double,
+                    unixtime, double, double, double, double, double);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -270,6 +282,7 @@ class GCPairData {
 
       //////////////////////////////////////////////////////////////////
 
+      unixtime fcst_ut;        // Forecast valid time
       unixtime beg_ut;         // Beginning of valid time window
       unixtime end_ut;         // End of valid time window
 
@@ -300,6 +313,7 @@ class GCPairData {
       int ***rej_typ;       // Reject based on message type
       int ***rej_mask;      // Reject based on masking region
       int ***rej_fcst;      // Reject forecast bad data
+      int ***rej_mult;      // Reject multiple observations for a station
 
       //////////////////////////////////////////////////////////////////
 
@@ -317,6 +331,7 @@ class GCPairData {
       void set_climo_lvl(int, double);
       void set_climo_wd_ptr(int, WrfData *);
 
+      void set_fcst_ut(const unixtime);
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
@@ -328,7 +343,7 @@ class GCPairData {
       void set_interp(int, const char *, int);
       void set_interp(int, InterpMthd, int);
 
-      void add_obs(float *, char *, char *, unixtime, float *, Grid &);
+      void add_obs(float *, char *, char *, unixtime, float *, Grid &, int);
 
       void find_vert_lvl(int, double, int &, int &);
 
@@ -389,6 +404,7 @@ class GCEnsPairData {
 
       //////////////////////////////////////////////////////////////////
 
+      unixtime fcst_ut;        // Ensemble valid time
       unixtime beg_ut;         // Beginning of valid time window
       unixtime end_ut;         // End of valid time window
 
@@ -418,6 +434,7 @@ class GCEnsPairData {
       void set_fcst_lvl(int, double);
       void set_fcst_wd_ptr(int, WrfData *);
 
+      void set_fcst_ut(const unixtime);
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
@@ -432,7 +449,8 @@ class GCEnsPairData {
       // Call set_ens_size before add_ens
       void set_ens_size();
 
-      void add_obs(float *, const char *, const char *, unixtime, float *, Grid &);
+      void add_obs(float *, const char *, const char *, unixtime,
+                   float *, Grid &, int);
       void add_ens();
       void add_miss();
 
