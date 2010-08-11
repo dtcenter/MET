@@ -461,6 +461,16 @@ interp_thresh = 1.0;
 output_flag[] = [ 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 ];
 
 //
+// Flag to indicate how multiple point observation values at a single station
+// during the matching time window should be handled.
+//    (0) Use all observation values.
+//    (1) Use the observation closest to the forecast valid time.
+//    (2) Use the minimum observation value.
+//    (3) Use the maximum observation value.
+//
+mult_obs_flag = 1;
+
+//
 // Flag to indicate whether Kendall's Tau and Spearman's Rank Correlation
 // Coefficients should be computed.  Computing them over large datasets is
 // computationally intensive and slows down the runtime execution significantly.

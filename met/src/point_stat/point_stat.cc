@@ -60,6 +60,8 @@
 //   019    06/15/10  Halley Gotway  Dump reason codes for why
 //                    point observations were rejected.
 //   020    06/30/10  Halley Gotway  Enhance grid equality checks.
+//   021    08/11/10  Halley Gotway  Add mult_obs_flag to handle
+//                    multiple obs falling in the time window.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -748,7 +750,8 @@ void process_grib_codes() {
          end_ut = file_ut + conf_info.conf.end_ds().ival();
       }
 
-      // Store the valid time window for this GCPairData object
+      // Store the valid times for this GCPairData object
+      conf_info.gc_pd[i].set_fcst_ut(fcst_valid_ut);
       conf_info.gc_pd[i].set_beg_ut(beg_ut);
       conf_info.gc_pd[i].set_end_ut(end_ut);
 
@@ -977,7 +980,8 @@ void process_obs_file(int i_nc) {
 
          // Attempt to add the observation to the conf_info.gc_pd object
          conf_info.gc_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                    hdr_ut, obs_arr, grid);
+                                    hdr_ut, obs_arr, grid,
+                                    conf_info.conf.mult_obs_flag().ival());
       }
    } // end for i_obs
 
@@ -1103,6 +1107,7 @@ void process_scores() {
                        << "Rejected: message type   = " << conf_info.gc_pd[i].rej_typ[j][k][l] << "\n"
                        << "Rejected: masking region = " << conf_info.gc_pd[i].rej_mask[j][k][l] << "\n"
                        << "Rejected: bad fcst value = " << conf_info.gc_pd[i].rej_fcst[j][k][l] << "\n"
+                       << "Rejected: multiple obs   = " << conf_info.gc_pd[i].rej_mult[j][k][l] << "\n"
                        << flush;
                }
 
@@ -1116,6 +1121,10 @@ void process_scores() {
                      conf_info.conf.output_flag(i_mpr).ival(),
                      stat_at, i_stat_row,
                      txt_at[i_mpr], i_txt_row[i_mpr]);
+
+                  // Reset the observation valid time
+                  shc.set_obs_valid_beg(conf_info.gc_pd[i].beg_ut);
+                  shc.set_obs_valid_end(conf_info.gc_pd[i].end_ut);
                }
 
                // Compute CTS scores

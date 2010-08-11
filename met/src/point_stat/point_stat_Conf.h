@@ -20,7 +20,7 @@
    //
    //     Created from config file "PointStatConfig_default"
    //
-   //     on July 1, 2010    12:39 pm  MDT
+   //     on August 11, 2010    10:26 am  MDT
    //
 
 
@@ -96,6 +96,8 @@ class point_stat_Conf {
       const SymbolTableEntry * _interp_thresh_entry;
 
       const SymbolTableEntry * _output_flag_entry;
+
+      const SymbolTableEntry * _mult_obs_flag_entry;
 
       const SymbolTableEntry * _rank_corr_flag_entry;
 
@@ -223,6 +225,9 @@ class point_stat_Conf {
       Result output_flag(int);   //  1-dimensional array, indices from 0 to 15
 
       int n_output_flag_elements();
+
+
+      Result mult_obs_flag();
 
 
       Result rank_corr_flag();

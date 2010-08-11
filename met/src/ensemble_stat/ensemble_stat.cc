@@ -602,7 +602,8 @@ void process_point_obs(int i_nc) {
 
          // Attempt to add the observation to the conf_info.gc_pd object
          conf_info.gc_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                    hdr_ut, obs_arr, grid);
+                                    hdr_ut, obs_arr, grid,
+                                    conf_info.conf.mult_obs_flag().ival());
       }
    } // end for i_obs
 
@@ -855,6 +856,10 @@ void process_point_scores() {
                      conf_info.conf.output_flag(i_orank).ival(),
                      stat_at, i_stat_row,
                      txt_at[i_orank], i_txt_row[i_orank]);
+
+                  // Reset the observation valid time
+                  shc.set_obs_valid_beg(conf_info.gc_pd[i].beg_ut);
+                  shc.set_obs_valid_end(conf_info.gc_pd[i].end_ut);
                }
 
                // Compute RHIST scores
