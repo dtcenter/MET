@@ -55,7 +55,7 @@ class TimeArray {
 
       void clear();
 
-      double operator[](int) const;
+      unixtime operator[](int) const;
 
       int  has(unixtime) const;
       void add(unixtime);

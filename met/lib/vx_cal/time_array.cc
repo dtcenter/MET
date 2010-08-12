@@ -177,7 +177,7 @@ if ( !u )  {
 
 int j;
 
-memset(u, 0, n*sizeof(double));
+memset(u, 0, n*sizeof(unixtime));
 
 if ( e )  {
 
@@ -204,7 +204,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double TimeArray::operator[](int n) const
+unixtime TimeArray::operator[](int n) const
 
 {
 
