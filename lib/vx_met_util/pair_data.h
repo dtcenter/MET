@@ -313,7 +313,6 @@ class GCPairData {
       int ***rej_typ;       // Reject based on message type
       int ***rej_mask;      // Reject based on masking region
       int ***rej_fcst;      // Reject forecast bad data
-      int ***rej_mult;      // Reject multiple observations for a station
 
       //////////////////////////////////////////////////////////////////
 
@@ -343,7 +342,7 @@ class GCPairData {
       void set_interp(int, const char *, int);
       void set_interp(int, InterpMthd, int);
 
-      void add_obs(float *, char *, char *, unixtime, float *, Grid &, int);
+      void add_obs(float *, char *, char *, unixtime, float *, Grid &);
 
       void find_vert_lvl(int, double, int &, int &);
 
@@ -450,7 +449,7 @@ class GCEnsPairData {
       void set_ens_size();
 
       void add_obs(float *, const char *, const char *, unixtime,
-                   float *, Grid &, int);
+                   float *, Grid &);
       void add_ens();
       void add_miss();
 

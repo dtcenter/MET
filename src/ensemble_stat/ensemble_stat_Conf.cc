@@ -13,7 +13,7 @@
    //
    //     Created from config file "EnsembleStatConfig_default"
    //
-   //     on August 11, 2010    9:56 am  MDT
+   //     on August 18, 2010    12:09 pm  MDT
    //
 
 
@@ -165,8 +165,6 @@ _vld_data_thresh_entry = (const SymbolTableEntry *) 0;
   _interp_thresh_entry = (const SymbolTableEntry *) 0;
 
     _output_flag_entry = (const SymbolTableEntry *) 0;
-
-  _mult_obs_flag_entry = (const SymbolTableEntry *) 0;
 
        _rng_type_entry = (const SymbolTableEntry *) 0;
 
@@ -437,19 +435,6 @@ if ( !_e && Panic )  {
 }
 
 _output_flag_entry = _e;
-
-
-_e = _m.find("mult_obs_flag");
-
-if ( !_e && Panic )  {
-
-   cerr << "\n\n  ensemble_stat_Conf::read(const char *) -> can't get symbol table entry for variable \"mult_obs_flag\"\n\n";
-
-   exit ( 1 );
-
-}
-
-_mult_obs_flag_entry = _e;
 
 
 _e = _m.find("rng_type");
@@ -1403,31 +1388,6 @@ _n = _a->size(0);
    //
 
 return ( _n );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Result ensemble_stat_Conf::mult_obs_flag()
-
-{
-
-Result _temp_result;
-
-if ( !_mult_obs_flag_entry && !Panic )  return ( _temp_result );
-
-IcodeCell _cell;
-
-_m.run( *_mult_obs_flag_entry );
-
-_cell = _m.pop();
-
-icodecell_to_result(_cell, _temp_result);
-
-
-return ( _temp_result );
 
 }
 

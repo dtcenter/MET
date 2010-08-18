@@ -739,7 +739,6 @@ void GCPairData::init_from_scratch() {
    rej_typ      = (int ***) 0;
    rej_mask     = (int ***) 0;
    rej_fcst     = (int ***) 0;
-   rej_mult     = (int ***) 0;
 
    clear();
 
@@ -788,7 +787,6 @@ void GCPairData::clear() {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
-            rej_mult[i][j][k] = 0;
          }
       }
    }
@@ -814,7 +812,6 @@ void GCPairData::assign(const GCPairData &gc_pd) {
    rej_typ  = gc_pd.rej_typ;
    rej_mask = gc_pd.rej_mask;
    rej_fcst = gc_pd.rej_fcst;
-   rej_mult = gc_pd.rej_mult;
 
    interp_thresh = gc_pd.interp_thresh;
 
@@ -840,7 +837,6 @@ void GCPairData::assign(const GCPairData &gc_pd) {
             rej_typ[i][j][k]  = gc_pd.rej_typ[i][j][k];
             rej_mask[i][j][k] = gc_pd.rej_mask[i][j][k];
             rej_fcst[i][j][k] = gc_pd.rej_fcst[i][j][k];
-            rej_mult[i][j][k] = gc_pd.rej_mult[i][j][k];
          }
       }
    }
@@ -987,27 +983,23 @@ void GCPairData::set_pd_size(int types, int masks, int interps) {
    rej_typ  = new int **      [n_msg_typ];
    rej_mask = new int **      [n_msg_typ];
    rej_fcst = new int **      [n_msg_typ];
-   rej_mult = new int **      [n_msg_typ];
 
    for(i=0; i<n_msg_typ; i++) {
       pd[i]       = new PairData * [n_mask];
       rej_typ[i]  = new int *      [n_mask];
       rej_mask[i] = new int *      [n_mask];
       rej_fcst[i] = new int *      [n_mask];
-      rej_mult[i] = new int *      [n_mask];
 
       for(j=0; j<n_mask; j++) {
          pd[i][j]       = new PairData [n_interp];
          rej_typ[i][j]  = new int      [n_interp];
          rej_mask[i][j] = new int      [n_interp];
          rej_fcst[i][j] = new int      [n_interp];
-         rej_mult[i][j] = new int      [n_interp];
 
          for(k=0; k<n_interp; k++) {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
-            rej_mult[i][j][k] = 0;
          } // end for k
       } // end for j
    } // end for i
@@ -1080,9 +1072,8 @@ void GCPairData::set_interp(int i_interp, InterpMthd mthd, int wdth) {
 
 void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
                          char  *hdr_sid_str, unixtime hdr_ut,
-                         float *obs_arr,     Grid &gr,
-                         int    mult_obs_flag) {
-   int i, j, k, x, y, i_obs;
+                         float *obs_arr,     Grid &gr) {
+   int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt;
    double fcst_v, climo_v, obs_v;
@@ -1286,64 +1277,6 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
             // Compute the interpolated climotological value
             climo_v = compute_interp(0, obs_x, obs_y, k,
                          obs_lvl, climo_lvl_below, climo_lvl_above);
-
-            // Check for duplicate observations
-            if(mult_obs_flag > 0 &&
-               pd[i][j][k].has_obs_rec(hdr_sid_str, hdr_lat, hdr_lon,
-                                       obs_x, obs_y, obs_lvl, obs_hgt,
-                                       i_obs)) {
-
-               // Switch on the mult_obs_flag options
-               switch(mult_obs_flag) {
-
-                  // Use closest valid time
-                  case 1:
-                     if(abs((int) (fcst_ut - hdr_ut)) <
-                        abs((int) (fcst_ut - pd[i][j][k].vld_ta[i_obs]))) {
-
-                        pd[i][j][k].set_pair(i_obs, hdr_sid_str,
-                                             hdr_lat, hdr_lon,
-                                             obs_x, obs_y, hdr_ut,
-                                             obs_lvl, obs_hgt,
-                                             fcst_v, climo_v, obs_v);
-                     }
-                     break;
-
-                  // Use the minimum value
-                  case 2:
-                     if(obs_v < pd[i][j][k].o_na[i_obs]) {
-
-                        pd[i][j][k].set_pair(i_obs, hdr_sid_str,
-                                             hdr_lat, hdr_lon,
-                                             obs_x, obs_y, hdr_ut,
-                                             obs_lvl, obs_hgt,
-                                             fcst_v, climo_v, obs_v);
-                     }
-                     break;
-
-                  // Use the maximum value
-                  case 3:
-                     if(obs_v > pd[i][j][k].o_na[i_obs]) {
-
-                        pd[i][j][k].set_pair(i_obs, hdr_sid_str,
-                                             hdr_lat, hdr_lon,
-                                             obs_x, obs_y, hdr_ut,
-                                             obs_lvl, obs_hgt,
-                                             fcst_v, climo_v, obs_v);
-                     }
-                     break;
-
-                  default:
-                     cerr << "\n\nERROR: GCPairData::add_obs() -> "
-                          << "unexpected mult_obs_flag value of "
-                          << mult_obs_flag << ".\n\n" << flush;
-                     exit(1);
-                     break;
-               } // end switch
-
-               inc_count(rej_mult, i, j, k);
-               continue;
-            }
 
             // Add the forecast, climatological, and observation data
             pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon,
@@ -2064,9 +1997,8 @@ void GCEnsPairData::set_ens_size() {
 
 void GCEnsPairData::add_obs(float *hdr_arr, const char *hdr_typ_str,
                             const char  *hdr_sid_str, unixtime hdr_ut,
-                            float *obs_arr, Grid &gr,
-                            int mult_obs_flag) {
-   int i, j, k, x, y, i_obs;
+                            float *obs_arr, Grid &gr) {
+   int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt;
    double obs_v;
@@ -2173,60 +2105,6 @@ void GCEnsPairData::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
          // Add the observation for each interpolation method
          for(k=0; k<n_interp; k++) {
-
-            // Check for duplicate observations
-            if(mult_obs_flag > 0 &&
-               pd[i][j][k].has_obs_rec(hdr_sid_str, hdr_lat, hdr_lon,
-                                       obs_x, obs_y, obs_lvl, obs_hgt,
-                                       i_obs)) {
-
-               // Switch on the mult_obs_flag options
-               switch(mult_obs_flag) {
-
-                  // Use closest valid time
-                  case 1:
-                     if(abs((int) (fcst_ut - hdr_ut)) <
-                        abs((int) (fcst_ut - pd[i][j][k].vld_ta[i_obs]))) {
-
-                        pd[i][j][k].set_obs(i_obs, hdr_sid_str,
-                                            hdr_lat, hdr_lon,
-                                            obs_x, obs_y, hdr_ut,
-                                            obs_lvl, obs_hgt, obs_v);
-                     }
-                     break;
-
-                  // Use the minimum value
-                  case 2:
-                     if(obs_v < pd[i][j][k].o_na[i_obs]) {
-
-                        pd[i][j][k].set_obs(i_obs, hdr_sid_str,
-                                            hdr_lat, hdr_lon,
-                                            obs_x, obs_y, hdr_ut,
-                                            obs_lvl, obs_hgt, obs_v);
-                     }
-                     break;
-
-                  // Use the maximum value
-                  case 3:
-                     if(obs_v > pd[i][j][k].o_na[i_obs]) {
-
-                        pd[i][j][k].set_obs(i_obs, hdr_sid_str,
-                                            hdr_lat, hdr_lon,
-                                            obs_x, obs_y, hdr_ut,
-                                            obs_lvl, obs_hgt, obs_v);
-                     }
-                     break;
-
-                  default:
-                     cerr << "\n\nERROR: GCEnsPairData::add_obs() -> "
-                          << "unexpected mult_obs_flag value of "
-                          << mult_obs_flag << ".\n\n" << flush;
-                     exit(1);
-                     break;
-               } // end switch
-
-               continue;
-            }
 
             // Add the observation value
             pd[i][j][k].add_obs(hdr_sid_str, hdr_lat, hdr_lon,
