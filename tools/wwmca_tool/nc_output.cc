@@ -47,6 +47,7 @@ Result r;
 const LambertData & ldata = *(ginfo.lc);
 
 
+valid_time = nh->valid();
 
 issue_time = valid_time;
 

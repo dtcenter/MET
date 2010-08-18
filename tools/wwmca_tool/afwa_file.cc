@@ -376,20 +376,21 @@ for (j=25; j<=34; ++j)  {
 
 int month, day, year, hour;
 char junk[256];
+const char * c = short_name + 25;
 
-substring(short_name, junk, 0, 3);
+substring(c, junk, 0, 3);
 
 year = atoi(junk);
 
-substring(short_name, junk, 4, 5);
+substring(c, junk, 4, 5);
 
 month = atoi(junk);
 
-substring(short_name, junk, 6, 7);
+substring(c, junk, 6, 7);
 
 day = atoi(junk);
 
-substring(short_name, junk, 8, 9);
+substring(c, junk, 8, 9);
 
 hour = atoi(junk);
 
