@@ -320,7 +320,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << "(optional).\n"
 
      << "\t\t\"-out filename\" specifies the file name to which "
-     << "output should written rather than the screen (optional).\n"
+     << "output should be written rather than the screen (optional).\n"
 
      << "\t\t\"-help\" prints this usage statement (optional).\n"
 

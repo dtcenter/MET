@@ -939,7 +939,7 @@ void usage() {
         << "use of wildcards (at least one required).\n"
 
         << "\t\t\"-out filename\" specifies a file name to which "
-        << "output should written rather than the screen (optional).\n"
+        << "output should be written rather than the screen (optional).\n"
 
         << "\t\t\"-tmp_dir path\" specifies the directory into which "
         << "temporary files should be written (optional).\n"
