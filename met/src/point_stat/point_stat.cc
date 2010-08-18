@@ -60,8 +60,6 @@
 //   019    06/15/10  Halley Gotway  Dump reason codes for why
 //                    point observations were rejected.
 //   020    06/30/10  Halley Gotway  Enhance grid equality checks.
-//   021    08/11/10  Halley Gotway  Add mult_obs_flag to handle
-//                    multiple obs falling in the time window.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -980,8 +978,7 @@ void process_obs_file(int i_nc) {
 
          // Attempt to add the observation to the conf_info.gc_pd object
          conf_info.gc_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                    hdr_ut, obs_arr, grid,
-                                    conf_info.conf.mult_obs_flag().ival());
+                                    hdr_ut, obs_arr, grid);
       }
    } // end for i_obs
 
@@ -1107,7 +1104,6 @@ void process_scores() {
                        << "Rejected: message type   = " << conf_info.gc_pd[i].rej_typ[j][k][l] << "\n"
                        << "Rejected: masking region = " << conf_info.gc_pd[i].rej_mask[j][k][l] << "\n"
                        << "Rejected: bad fcst value = " << conf_info.gc_pd[i].rej_fcst[j][k][l] << "\n"
-                       << "Rejected: multiple obs   = " << conf_info.gc_pd[i].rej_mult[j][k][l] << "\n"
                        << flush;
                }
 

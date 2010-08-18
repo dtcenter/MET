@@ -289,16 +289,6 @@ interp_thresh = 1.0;
 output_flag[] = [ 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
 
 //
-// Flag to indicate how multiple point observation values at a single station
-// during the matching time window should be handled.
-//    (0) Use all observation values.
-//    (1) Use the observation closest to the forecast valid time.
-//    (2) Use the minimum observation value.
-//    (3) Use the maximum observation value.
-//
-mult_obs_flag = 1;
-
-//
 // When computing observation ranks, in the case of ties, randomly choose
 // the rank from all possible values.  Specify the name of the random
 // number generator to be used.  See the MET Users Guide for a list of

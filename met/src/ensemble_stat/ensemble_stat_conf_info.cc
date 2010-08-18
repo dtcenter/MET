@@ -418,19 +418,6 @@ void EnsembleStatConfInfo::process_config() {
       exit(1);
    }
 
-   //
-   // Conf: mult_obs_flag
-   //
-   if(conf.mult_obs_flag().ival() < 0 &&
-      conf.mult_obs_flag().ival() > 3) {
-
-      cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
-           << "The mult_obs_flag (" << conf.mult_obs_flag().ival()
-           << ") must be set between 0 and 3.\n\n"
-           << flush;
-      exit(1);
-   }
-
    return;
 }
 

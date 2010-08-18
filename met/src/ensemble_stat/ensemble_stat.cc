@@ -602,8 +602,7 @@ void process_point_obs(int i_nc) {
 
          // Attempt to add the observation to the conf_info.gc_pd object
          conf_info.gc_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                    hdr_ut, obs_arr, grid,
-                                    conf_info.conf.mult_obs_flag().ival());
+                                    hdr_ut, obs_arr, grid);
       }
    } // end for i_obs
 
