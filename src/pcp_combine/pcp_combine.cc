@@ -1216,8 +1216,8 @@ void usage(int argc, char *argv[]) {
         << "arguments provided.\n"
 
         << "\t\t\"-add add_args\" indicates that accumulations from "
-        << "two files should be added together using the arguments "
-        << "provided.\n"
+        << "one or more files should be added together using the "
+        << "arguments provided.\n"
 
         << "\t\t\"-subtract subtract_args\" indicates that "
         << "accumulations from two files should be subtracted using "
