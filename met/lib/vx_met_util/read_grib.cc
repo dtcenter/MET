@@ -400,8 +400,8 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
             // Check if the record falls within the requested
             // level range
             //
-            if((char2_to_int(pds_ptr->level_info) > l1) &&
-               (char2_to_int(pds_ptr->level_info) < l2))
+            if((char2_to_int(pds_ptr->level_info) >= l1) &&
+               (char2_to_int(pds_ptr->level_info) <= l2))
             {
                // Retain this record
                i_rec[n_rec]  = i;
