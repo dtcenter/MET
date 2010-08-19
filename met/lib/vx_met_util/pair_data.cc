@@ -1265,18 +1265,32 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
          // Compute the interpolated values
          for(k=0; k<n_interp; k++) {
 
-            // Compute the interpolated forecast value
-            fcst_v = compute_interp(1, obs_x, obs_y, k,
-                        obs_lvl, fcst_lvl_below, fcst_lvl_above);
+            // Compute the interpolated forecast value using the pressure level
+            if(fcst_gci.lvl_type == PresLevel) {
+               fcst_v = compute_interp(1, obs_x, obs_y, k,
+                           obs_lvl, fcst_lvl_below, fcst_lvl_above);
+            }
+            // Interpolate using the height value
+            else {
+               fcst_v = compute_interp(1, obs_x, obs_y, k,
+                           obs_hgt, fcst_lvl_below, fcst_lvl_above);
+            }
 
             if(is_bad_data(fcst_v)) {
                inc_count(rej_fcst, i, j, k);
                continue;
             }
 
-            // Compute the interpolated climotological value
-            climo_v = compute_interp(0, obs_x, obs_y, k,
-                         obs_lvl, climo_lvl_below, climo_lvl_above);
+            // Compute the interpolated climatological value using the pressure level
+            if(fcst_gci.lvl_type == PresLevel) {
+               climo_v = compute_interp(0, obs_x, obs_y, k,
+                            obs_lvl, climo_lvl_below, climo_lvl_above);
+            }
+            // Interpolate using the height value
+            else {
+               climo_v = compute_interp(0, obs_x, obs_y, k,
+                            obs_hgt, climo_lvl_below, climo_lvl_above);
+            }
 
             // Add the forecast, climatological, and observation data
             pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon,
@@ -2408,6 +2422,15 @@ double compute_vert_pinterp(double v1, double prs1,
       exit(1);
    }
 
+   // Check that the to_prs falls between the limits
+   if( !(to_prs >= prs1 && to_prs <= prs2) &&
+       !(to_prs <= prs1 && to_prs >= prs2) ) {
+      cout << "WARNING: compute_vert_pinterp() -> "
+           << "the interpolation pressure, " << to_prs
+           << ", should fall between the pressure limits, "
+           << prs1 << " and " << prs2 << "\n";
+   }
+
    v_interp = v1 + ((v2-v1)*log(prs1/to_prs)/log(prs1/prs2));
 
    return(v_interp);
@@ -2429,6 +2452,15 @@ double compute_vert_zinterp(double v1, double lvl1,
       cerr << "\n\nERROR: compute_vert_zinterp() -> "
            << "level shouldn't be <= zero!\n\n" << flush;
       exit(1);
+   }
+
+   // Check that the to_lvl falls between the limits
+   if( !(to_lvl >= lvl1 && to_lvl <= lvl2) &&
+       !(to_lvl <= lvl1 && to_lvl >= lvl2) ) {
+      cout << "WARNING: compute_vert_zinterp() -> "
+           << "the interpolation level, " << to_lvl
+           << ", should fall between the level limits, "
+           << lvl1 << " and " << lvl2 << "\n";
    }
 
    d1 = abs(lvl1 - to_lvl);
