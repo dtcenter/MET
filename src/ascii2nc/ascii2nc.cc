@@ -362,7 +362,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
    obs_arr_var->add_att("hdr_id_long_name", "index of matching header data");
    obs_arr_var->add_att("gc_long_name", "grib code corresponding to the observation type");
    obs_arr_var->add_att("lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
-   obs_arr_var->add_att("hgt_long_name", "height in meters above sea level (msl)");
+   obs_arr_var->add_att("hgt_long_name", "height in meters above sea level or ground level (msl or agl)");
    obs_arr_var->add_att("ob_long_name", "observation value");
 
    //
@@ -571,12 +571,12 @@ void usage(int argc, char *argv[]) {
         << "consists of 10 columns:\n"
         << "\t\tMessage_Type Station_ID Valid_Time(YYYYMMDD_HHMMSS)\n"
         << "\t\tLat(Deg North) Lon(Deg East) Elevation(msl)\n"
-        << "\t\tGrib_Code Level Height(msl) Observation_Value\n\n"
+        << "\t\tGrib_Code Level Height(msl or agl) Observation_Value\n\n"
 
         << "\t\twhere\t\"Level\" is the pressure level (hPa) or "
         << "accumulation interval (hh[_mmss]).\n"
-        << "\t\t\t\"Height\" is meters above sea level for the "
-        << "observation (msl).\n\n"
+        << "\t\t\t\"Height\" is meters above sea level or above ground level for the "
+        << "observation (msl or agl).\n\n"
 
         << "\t\t\tUse a value of \"" << bad_data_int
         << "\" to indicate missing data.\n\n"
