@@ -20,7 +20,7 @@
    //
    //     Created from config file "PointStatConfig_default"
    //
-   //     on August 18, 2010    12:00 pm  MDT
+   //     on August 20, 2010    1:58 pm  MDT
    //
 
 
