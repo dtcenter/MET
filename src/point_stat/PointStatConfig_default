@@ -32,6 +32,7 @@ end_ds =  5400;
 // Each verification field is specified as one of the following:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
+//    GC/ZNNN-NNN for a range of vertical levels (MSL or AGL)
 //    GC/PNNN for pressure level NNN in hPa
 //    GC/PNNN-NNN for a range of pressure levels in hPa
 //    GC/LNNN for a generic level type
