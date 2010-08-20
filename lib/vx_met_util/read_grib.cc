@@ -274,7 +274,7 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
    int gc, l1, l2;
    GCInfo gc_tmp;
    int rec_below, rec_above;
-   int lvl_below, lvl_above;
+   int lvl_below, lvl_above, lvl_type;
    double dist_below, dist_above;
    GribRecord r;
    int bms_flag, accum;
@@ -338,6 +338,7 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
       //
       // Initialize
       //
+      lvl_type  = -1;
       rec_below = rec_above = -1;
       lvl_below = lvl_above = -1;
       dist_below = dist_above = 1.0e30;
@@ -403,11 +404,23 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
             if((char2_to_int(pds_ptr->level_info) >= l1) &&
                (char2_to_int(pds_ptr->level_info) <= l2))
             {
+
+               //
+               // Check for a consistent level type
+               //
+               if(lvl_type == -1) lvl_type = pds_ptr->type;
+               else if(pds_ptr->type != lvl_type) continue;
+
                // Retain this record
                i_rec[n_rec]  = i;
                i_lvl[n_rec] = char2_to_int(pds_ptr->level_info);
                n_rec++;
             }
+
+            //
+            // Check for a consistent level type
+            //
+            if(lvl_type != -1 && lvl_type != pds_ptr->type) continue;
 
             //
             // Look for one level below the range
@@ -424,7 +437,7 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
             // Look for one level above the range
             //
             if((char2_to_int(pds_ptr->level_info) >= l2) &&
-               (char2_to_int(pds_ptr->level_info - l2) < dist_above))
+               (char2_to_int(pds_ptr->level_info) - l2 < dist_above))
             {
                dist_above = char2_to_int(pds_ptr->level_info) - l2;
                rec_above  = i;
@@ -582,6 +595,7 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
    int x_dir, y_dir, order_flag;
    float v, v_min, v_max;
    unixtime init_ut, valid_ut;
+   char init_str[max_str_len], valid_str[max_str_len], accum_str[max_str_len];
 
    //
    // Read the record indicated
@@ -590,20 +604,14 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
    grib_file >> grib_record;
 
    if(verbosity > 3) {
-      cout << "GRIB RECORD:\n" << grib_record << "\n" << flush;
+      cout << "GRIB Record " << i_rec+1
+           << ":\n" << grib_record << "\n" << flush;
    }
 
    //
    // Read the Product Description Section
    //
    read_pds(grib_record, bms_flag, init_ut, valid_ut, accum);
-
-   if(verbosity > 2) {
-      cout << "Grib Record Index = " << i_rec+1 << "\n"
-           << "Initialization time = " << init_ut << "\n"
-           << "Valid time = " << valid_ut << "\n"
-           << "Accumulation time = " << accum << "\n" << flush;
-   }
 
    //
    // Read the Grid Description Section
@@ -654,8 +662,21 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
    }
 
    if(verbosity > 2) {
-      cout << "Grib Record (min, max) = ("
-           << v_min << ", " << v_max << ")\n" << flush;
+
+      //
+      // Compute time strings
+      //
+      unix_to_yyyymmdd_hhmmss(init_ut, init_str);
+      unix_to_yyyymmdd_hhmmss(valid_ut, valid_str);
+      sec_to_hhmmss(accum, accum_str);
+
+      cout << "GRIB Record " << i_rec+1
+           << ": Init = " << init_str
+           << ", Valid = " << valid_str
+           << ", Accum = " << accum_str
+           << ", Min = " << v_min
+           << ", Max = " << v_max
+           << "\n" << flush;
    }
 
    //
