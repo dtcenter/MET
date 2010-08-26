@@ -1430,6 +1430,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    sprintf(attribute_str, "File %s generated %s UTC on host %s",
            out_nc_file.text(), time_str, hostname_str);
    nc_out->add_att("FileOrigins", attribute_str);
+   nc_out->add_att("MET_version", met_version);
 
    // Define Dimensions
    lat_dim = nc_out->add_dim("lat",   (long) grid.ny());

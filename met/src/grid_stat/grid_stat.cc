@@ -1185,6 +1185,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
    sprintf(attribute_str, "File %s generated %s UTC on host %s",
            out_nc_file.text(), time_str, hostname_str);
    nc_out->add_att("FileOrigins", attribute_str);
+   nc_out->add_att("MET_version", met_version);
    nc_out->add_att("Difference", "Forecast Value - Observation Value");
 
    // Define Dimensions

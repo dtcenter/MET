@@ -374,6 +374,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
    sprintf(attribute_str, "File %s generated %s UTC on host %s by the ASCII2NC tool",
            ncfile.text(), tmp_str, hostname_str);
    f_out->add_att("FileOrigins", attribute_str);
+   f_out->add_att("MET_version", met_version);
 
    if(verbosity > 1) {
       cout << "Processing " << nrow << " observations.\n" << flush;

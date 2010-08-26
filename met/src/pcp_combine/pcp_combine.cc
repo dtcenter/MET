@@ -1079,6 +1079,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    sprintf(attribute_str, "File %s generated %s UTC on host %s by the PCP-Combine tool",
            out_file.text(), time_str, hostname_str);
    f_out->add_att("FileOrigins", attribute_str);
+   f_out->add_att("MET_version", met_version);
 
    if(run_command == sum) {
       sec_to_hhmmss(in_accum, accum1_str);

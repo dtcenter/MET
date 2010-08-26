@@ -268,6 +268,7 @@ void write_netcdf() {
            "File %s generated %s UTC on host %s by the %s tool from the polyline file %s",
            out_file.text(), time_str, hostname_str, program_name, poly_file.text());
    f_out->add_att("FileOrigins", attribute_str);
+   f_out->add_att("MET_version", met_version);
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);

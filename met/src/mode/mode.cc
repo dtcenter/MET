@@ -3064,6 +3064,7 @@ void write_obj_netcdf() {
    sprintf(attribute_str, "File %s generated %s UTC on host %s",
            out_file.text(), time_str, hostname_str);
    f_out->add_att("FileOrigins", attribute_str);
+   f_out->add_att("MET_version", met_version);
 
    // Define Dimensions
    lat_dim = f_out->add_dim("lat", (long) grid.ny());
