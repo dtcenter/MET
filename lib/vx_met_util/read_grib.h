@@ -34,10 +34,10 @@ extern int    find_grib_record(GribFile &, const GCInfo &,
                                const unixtime, const int);
 
 extern int    find_grib_record_levels(GribFile &, const GCInfo &,
-                                      int *, int *);
+                                      NumArray &, NumArray &);
 extern int    find_grib_record_levels(GribFile &, const GCInfo &,
                                       const unixtime, const int,
-                                      int *, int *);
+                                      NumArray &, NumArray &);
 
 extern void   read_grib_record(const char *, GribRecord &, int,
                                const GCInfo &, WrfData &, Grid &, int);

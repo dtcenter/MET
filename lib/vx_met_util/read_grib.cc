@@ -259,21 +259,21 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info,
 ///////////////////////////////////////////////////////////////////////////////
 
 int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
-                            int *i_rec, int *i_lvl) {
+                            NumArray &rec_na, NumArray &lvl_na) {
 
    return(find_grib_record_levels(grib_file, gc_info, (unixtime) 0,
-                                  bad_data_int, i_rec, i_lvl));
+                                  bad_data_int, rec_na, lvl_na));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
                             const unixtime req_vld_ut, const int req_lead_sec,
-                            int *i_rec, int *i_lvl) {
+                            NumArray &rec_na, NumArray &lvl_na) {
    int i, j, n_rec;
    int gc, l1, l2;
    GCInfo gc_tmp;
-   int rec_below, rec_above;
+   int i_rec, rec_below, rec_above;
    int lvl_below, lvl_above, lvl_type;
    double dist_below, dist_above;
    GribRecord r;
@@ -286,6 +286,8 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
    // Initialize
    //
    gc_tmp = gc_info;
+   rec_na.clear();
+   lvl_na.clear();
 
    //
    // Store the code and level info
@@ -305,27 +307,30 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
    }
 
    //
+   // Attempt to find a single record
+   //
+   i_rec = find_grib_record(grib_file, gc_tmp, req_vld_ut, req_lead_sec);
+
+   //
    // If l1 = l2, only need to find a single GRIB record at that level
    //
    if(l1 == l2) {
-      i_rec[0] = find_grib_record(grib_file, gc_tmp, req_vld_ut, req_lead_sec);
-      i_lvl[0] = l1;
-      if(i_rec[0] < 0) n_rec = 0;
-      else             n_rec = 1;
+      rec_na.add(i_rec);
+      lvl_na.add(l1);
+      if(rec_na[0] < 0) n_rec = 0;
+      else              n_rec = 1;
    }
 
    //
    // If l1 != l2, attempt to find a single GRIB record containing this range
    // of levels.
    //
-   else if(l1 != l2 &&
-           (i_rec[0] = find_grib_record(grib_file, gc_tmp,
-                                        req_vld_ut, req_lead_sec)) >= 0) {
+   else if(l1 != l2 && i_rec >= 0) {
 
       //
       // Store the level as the midpoint
       //
-      i_lvl[0] = nint((l1 + l2)/2.0);
+      rec_na.add(nint((l1 + l2)/2.0));
       n_rec = 1;
    }
 
@@ -412,8 +417,8 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
                else if(pds_ptr->type != lvl_type) continue;
 
                // Retain this record
-               i_rec[n_rec]  = i;
-               i_lvl[n_rec] = char2_to_int(pds_ptr->level_info);
+               rec_na.add(i);
+               lvl_na.add(char2_to_int(pds_ptr->level_info));
                n_rec++;
             }
 
@@ -450,14 +455,14 @@ int find_grib_record_levels(GribFile &grib_file, const GCInfo &gc_info,
       // If records were found, add the records above and below the range
       //
       if(n_rec > 0) {
-         if(rec_below != -1) {
-            i_rec[n_rec] = rec_below;
-            i_lvl[n_rec] = lvl_below;
+         if(rec_below != -1 && !rec_na.has(rec_below)) {
+            rec_na.add(rec_below);
+            lvl_na.add(lvl_below);
             n_rec++;
          }
-         if(rec_above != -1) {
-            i_rec[n_rec] = rec_above;
-            i_lvl[n_rec] = lvl_above;
+         if(rec_above != -1 && !rec_na.has(rec_above)) {
+            rec_na.add(rec_above);
+            lvl_na.add(lvl_above);
             n_rec++;
          }
       }
