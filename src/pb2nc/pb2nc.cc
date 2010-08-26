@@ -638,6 +638,7 @@ void open_netcdf() {
            "File %s generated %s UTC on host %s by the PB2NC tool",
            ncfile.text(), tmp_str, hostname_str);
    f_out->add_att("FileOrigins", attribute_str);
+   f_out->add_att("MET_version", met_version);
 
    //
    // Add variable attributes
