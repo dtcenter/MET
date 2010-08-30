@@ -64,8 +64,7 @@ static void process_grid_scores   (WrfData *&, WrfData &, WrfData &,
                                    EnsPairData &);
 
 static void parse_ens_file_list(const char *);
-static int  read_field(const char *, const GCInfo &, WrfData &, int);
-static int  read_ens_field(const char *, const GCInfo &, WrfData &);
+static void set_grid(const Grid &);
 static void clear_counts(const WrfData &, int);
 static void track_counts(const WrfData &, int);
 
@@ -297,9 +296,12 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_ensemble() {
-   int i, j, miss_flag, n_miss, n_vld;
+   int i, j, n_miss, n_vld;
+   bool status;
    double t;
+   Grid data_grid;
    WrfData ens_wd;
+   char tmp_str[max_str_len], tmp2_str[max_str_len];
 
    // Loop through each of the ensemble fields to be processed
    for(i=0; i<conf_info.get_n_ens_var(); i++) {
@@ -317,12 +319,45 @@ void process_ensemble() {
 
          // If the current forecast file is valid, read the field
          if(ens_file_vld[j]) {
-            miss_flag = read_ens_field(ens_file_list[j],
-                                       conf_info.ens_gci[i], ens_wd);
+
+            // Read the gridded data from the input forecast file
+            status = read_field(ens_file_list[j], conf_info.ens_gci[i],
+                                ens_valid_search_ut, ens_lead_search_sec,
+                                ens_wd, data_grid, verbosity);
 
             // Track the missing and valid counts
-            if(miss_flag) n_miss++;
-            else          n_vld++;
+            if(!status) {
+               n_miss++;
+               continue;
+            }
+            else {
+               n_vld++;
+            }
+
+            // Set the grid
+            set_grid(data_grid);
+
+            // Store the ensemble valid time, if not already set
+            if(ens_valid_ut == (unixtime) 0) {
+               ens_valid_ut = ens_wd.get_valid_time();
+            }
+            // Check to make sure that the valid time doesn't change
+            else {
+
+               if(ens_valid_ut != ens_wd.get_valid_time()) {
+
+                  unix_to_yyyymmdd_hhmmss(ens_valid_ut, tmp_str);
+                  unix_to_yyyymmdd_hhmmss(ens_wd.get_valid_time(), tmp2_str);
+
+                  cerr << "\n\n***WARNING***: process_ensemble() -> "
+                       << "The valid time has changed, "
+                       << tmp_str << " != " << tmp2_str << ": "
+                       << ens_file_list[j] << "\n\n" << flush;
+               }
+            }
+
+            // Store the lead time
+            ens_lead_na.add(ens_wd.get_lead_time());
          }
          else {
            n_miss++;
@@ -339,7 +374,7 @@ void process_ensemble() {
          }
 
          // Continue if the current field is missing
-         if(miss_flag) continue;
+         if(!status) continue;
 
          // Create a NetCDF file to store the ensemble output
          if(nc_out == (NcFile *) 0)
@@ -617,15 +652,9 @@ void process_point_obs(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 int process_point_ens(int i_ens) {
-   int i, j, miss_flag;
-   int n_fcst_rec,  fcst_rec[max_n_rec], fcst_lvl[max_n_rec];
+   int i, j, n_fcst_rec;
+   NumArray fcst_lvl_na;
    Grid data_grid;
-   GCInfo gc_info;
-   GribRecord rec;
-
-   FileType fcst_ftype;
-   GribFile fcst_gb_file;
-   NcFile  *fcst_nc_file = (NcFile *) 0;
    WrfData *fcst_wd  = (WrfData *) 0;
 
    if(verbosity > 1) {
@@ -634,72 +663,27 @@ int process_point_ens(int i_ens) {
            << ens_file_list[i_ens] << "\n" << flush;
    }
 
-   // Switch based on the forecast file type
-   fcst_ftype = get_file_type(ens_file_list[i_ens]);
-
-   switch(fcst_ftype) {
-
-      // GRIB file type
-      case(GbFileType):
-
-         // Open the GRIB file
-         if(!(fcst_gb_file.open(ens_file_list[i_ens]))) {
-            cout << "\n\n***WARNING***: process_point_ens() -> "
-                 << "can't open GRIB forecast file: "
-                 << ens_file_list[i_ens] << "\n\n" << flush;
-            return(1);
-         }
-         break;
-
-      // NetCDF file type
-      case(NcFileType):
-
-         // Open the NetCDF File
-         fcst_nc_file = new NcFile(ens_file_list[i_ens]);
-         if(!fcst_nc_file->is_valid()) {
-            cerr << "\n\n***WARNING***: process_point_ens() -> "
-                 << "can't open NetCDF forecast file: "
-                 << ens_file_list[i_ens] << "\n\n" << flush;
-            return(1);
-         }
-         break;
-
-      default:
-         cout << "\n\n***WARNING***: process_point_ens() -> "
-              << "unsupported forecast file type: "
-              << ens_file_list[i_ens] << "\n\n" << flush;
-         return(1);
-   }
-
    // Loop through each of the fields to be verified and extract
-   // the data needed for verification
+   // the forecast fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      // Process the forecast file in NetCDF format
-      if(fcst_ftype == NcFileType) {
-         n_fcst_rec = 1;
-      }
-      // GRIB format
-      // Compute a list of GRIB records for this GRIB code which
-      // fall within the requested range of levels from the forecast
-      // and climatological data, including one level above and one
-      // level below the range
-      else {
-         n_fcst_rec = find_grib_record_levels(fcst_gb_file,
-                         conf_info.gc_pd[i].fcst_gci,
-                         fcst_rec, fcst_lvl);
+      // Read the gridded data from the input forecast file
+      n_fcst_rec = read_field_levels(ens_file_list[i_ens], conf_info.gc_pd[i].fcst_gci,
+                                     ens_valid_search_ut, ens_lead_search_sec,
+                                     fcst_wd, fcst_lvl_na, data_grid, verbosity);
 
-         if(n_fcst_rec == 0) {
-            cout << "\n\n***WARNING***: process_point_ens() -> "
-                 << "no records matching GRIB code "
-                 << conf_info.gc_pd[i].fcst_gci.code
-                 << " with level indicator of "
-                 << conf_info.gc_pd[i].fcst_gci.lvl_str
-                 << " found in GRIB file: "
-                 << ens_file_list[i_ens] << "\n" << flush;
-            return(1);
-         }
+      // Check for zero fields
+      if(n_fcst_rec == 0) {
+         cout << "\n\n***WARNING***: process_point_ens() -> "
+              << "no records matching "
+              << conf_info.gc_pd[i].fcst_gci.info_str
+              << " found in file: "
+              << ens_file_list[i_ens] << "\n" << flush;
+         return(1);
       }
+
+      // Set the grid
+      set_grid(data_grid);
 
       // Dump out the number of levels found
       if(verbosity > 1) {
@@ -709,34 +693,14 @@ int process_point_ens(int i_ens) {
               << " forecast levels.\n" << flush;
       }
 
-      // Allocate space to store the forecast fields
-      if(n_fcst_rec > 0) fcst_wd = new WrfData [n_fcst_rec];
-
       // Set the number of pointers to the raw forecast field
       conf_info.gc_pd[i].set_n_fcst(n_fcst_rec);
 
-      // Initialize the GCInfo object
-      gc_info = conf_info.gc_pd[i].fcst_gci;
-
-      // Read in the forecast fields for this GRIB code
+      // Set the forecast fields
       for(j=0; j<n_fcst_rec; j++) {
 
-         // When retrieving multiple single records, set the current
-         // level value for the record to retrieve.
-         if(n_fcst_rec > 1) {
-            gc_info.lvl_1 = fcst_lvl[j];
-            gc_info.lvl_2 = fcst_lvl[j];
-         }
-
-         // Read the current field from the current forecast file
-         miss_flag = read_field(ens_file_list[i_ens], gc_info,
-                                fcst_wd[j], 1);
-
-         // If a field is missing, return with bad status
-         if(miss_flag > 0) return(1);
-
          // Store information for the raw forecast fields
-         conf_info.gc_pd[i].set_fcst_lvl(j, fcst_lvl[j]);
+         conf_info.gc_pd[i].set_fcst_lvl(j, fcst_lvl_na[j]);
          conf_info.gc_pd[i].set_fcst_wd_ptr(j, &fcst_wd[j]);
       } // end for j
 
@@ -746,17 +710,7 @@ int process_point_ens(int i_ens) {
       // Delete allocated WrfData objects
       if(fcst_wd) { delete [] fcst_wd; fcst_wd = (WrfData *) 0; }
 
-   } // end i
-
-   // Close the forecast file
-   if(fcst_ftype == NcFileType) {
-      fcst_nc_file->close();
-      delete fcst_nc_file;
-      fcst_nc_file = (NcFile *) 0;
-   }
-   else if(fcst_ftype == GbFileType) {
-      fcst_gb_file.close();
-   }
+   } // end for i
 
    return(0);
 }
@@ -884,11 +838,14 @@ void process_point_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_vx() {
-   int i, j, k, n_miss, miss_flag;
+   int i, j, k, n_miss;
+   bool status;
    double t;
    char tmp_str[max_str_len];
    WrfData *fcst_wd, *fcst_wd_smooth;
    WrfData  obs_wd,   obs_wd_smooth;
+   unixtime valid_ut;
+   Grid data_grid;
    EnsPairData pd;
    NumArray rhist_na;
 
@@ -943,9 +900,20 @@ void process_grid_vx() {
 
          // If the current ensemble file is valid, read the field
          if(ens_file_vld[j]) {
-            n_miss += read_field(ens_file_list[j],
-                                 conf_info.gc_pd[i].fcst_gci,
-                                 fcst_wd[j], 1);
+
+            // Read the gridded data from the input forecast file
+            status = read_field(ens_file_list[j], conf_info.gc_pd[j].fcst_gci,
+                                ens_valid_search_ut, ens_lead_search_sec,
+                                fcst_wd[j], data_grid, verbosity);
+
+            // Count the number of missing files
+            if(!status) {
+               n_miss++;
+               continue;
+            }
+
+            // Set the grid
+            set_grid(data_grid);
          }
          else {
             n_miss++;
@@ -970,13 +938,22 @@ void process_grid_vx() {
       // Read the observation file
       for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
 
-         // Attempt to read the field from the current observation file
-         miss_flag = read_field(grid_obs_file_list[j],
-                                conf_info.gc_pd[i].obs_gci,
-                                obs_wd, 0);
+         // Get the valid time to be extracted
+         if(obs_valid_beg_ut == obs_valid_end_ut) {
+            valid_ut = obs_valid_beg_ut;
+         }
+         else {
+            valid_ut = (unixtime) 0;
+         }
+
+         // Read the gridded data from the input observation file
+         status = read_field(grid_obs_file_list[j], conf_info.gc_pd[i].obs_gci,
+                             valid_ut, obs_lead_sec,
+                             obs_wd, data_grid, verbosity);
 
          // If found, break out of the loop
-         if(!miss_flag) break;
+         if(!status) n_miss++;
+         else        break;
       }
 
       // Check if the observation field was found
@@ -1189,96 +1166,7 @@ void parse_ens_file_list(const char *fcst_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int read_field(const char *file_name, const GCInfo &gci, WrfData &wd,
-               int ens_flag) {
-   FileType ftype = NoFileType;
-   GribFile gb_file;
-   NcFile  *nc_file = (NcFile *) 0;
-   int status;
-   char tmp_str[max_str_len];
-   Grid gr;
-   GribRecord rec;
-   unixtime valid_ut;
-   int lead_sec;
-
-   if(ens_flag) {
-      valid_ut = ens_valid_search_ut;
-      lead_sec = ens_lead_search_sec;
-   }
-   else {
-      if(obs_valid_beg_ut == obs_valid_end_ut) {
-         valid_ut = obs_valid_beg_ut;
-      }
-      else {
-         valid_ut = (unixtime) 0;
-      }
-      lead_sec = obs_lead_sec;
-   }
-
-   // Switch based on the file type
-   ftype = get_file_type(file_name);
-
-   switch(ftype) {
-
-      // GRIB file type
-      case(GbFileType):
-
-         // Open the GRIB file
-         if(!(gb_file.open(file_name))) {
-            cout << "\n\n***WARNING***: read_field() -> "
-                 << "can't open GRIB file: "
-                 << file_name << "\n\n" << flush;
-            return(1);
-         }
-
-         // Retrieve the requested field
-         status = get_grib_record(gb_file, rec, gci, valid_ut,
-                                  lead_sec, wd, gr, verbosity);
-
-         if(status != 0) {
-            cout << "\n\n***WARNING***: read_field() -> "
-                 << "can't retrieve \"" << gci.info_str
-                 << "\" field from GRIB file: "
-                 << file_name << "\n\n" << flush;
-            return(1);
-         }
-
-         break;
-
-      // NetCDF file type
-      case(NcFileType):
-
-         // Open the NetCDF File
-         nc_file = new NcFile(file_name);
-         if(!nc_file->is_valid()) {
-            cout << "\n\n***WARNING***: read_field() -> "
-                 << "can't open NetCDF file: "
-                 << file_name << "\n\n" << flush;
-            return(1);
-         }
-
-         // Retrieve the requested field
-         status = read_netcdf_status(nc_file, gci.abbr_str.text(),
-                                     tmp_str, wd, gr, verbosity);
-
-         if(status != 0) {
-            cout << "\n\n***WARNING***: read_field() -> "
-                 << "can't retrieve \""
-                 << gci.info_str
-                 << "\" field from NetCDF file: "
-                 << file_name << "\n\n" << flush;
-            return(1);
-         }
-
-         break;
-
-      // Unsupported file type
-      default:
-         cout << "\n\n***WARNING***: read_field() -> "
-              << "unsupported file type: "
-              << file_name << "\n\n" << flush;
-         return(1);
-   }
+void set_grid(const Grid &gr) {
 
    // Set the grid, if not already set
    if(grid.nx() == 0 && grid.ny() == 0) {
@@ -1287,48 +1175,14 @@ int read_field(const char *file_name, const GCInfo &gci, WrfData &wd,
    // Check to make sure that the grid doesn't change
    else {
       if(!(grid == gr)) {
-         cerr << "\n\nERROR: read_field() -> "
-              << "All data files must be on the same grid: "
-              << file_name << "\n\n" << flush;
+         cerr << "\n\nERROR: set_field() -> "
+              << "All data files must be on the same grid!\n\n"
+              << flush;
          exit(1);
       }
    }
 
-   return(0);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int read_ens_field(const char *file_name, const GCInfo &gci,
-                   WrfData &wd) {
-   int miss_flag;
-   char tmp_str[max_str_len], tmp2_str[max_str_len];
-
-   // Read the forecast field
-   miss_flag = read_field(file_name, gci, wd, 1);
-
-   // Store the ensemble valid time, if not already set
-   if(ens_valid_ut == (unixtime) 0) {
-      ens_valid_ut = wd.get_valid_time();
-   }
-   // Check to make sure that the valid time doesn't change
-   else {
-      if(ens_valid_ut != wd.get_valid_time()) {
-
-         unix_to_yyyymmdd_hhmmss(ens_valid_ut, tmp_str);
-         unix_to_yyyymmdd_hhmmss(wd.get_valid_time(), tmp2_str);
-
-         cerr << "\n\n***WARNING***: read_ens_field() -> "
-              << "The valid time has changed, "
-              << tmp_str << " != " << tmp2_str << ": "
-              << file_name << "\n\n" << flush;
-      }
-   }
-
-   // Store the lead time
-   ens_lead_na.add(wd.get_lead_time());
-
-   return(miss_flag);
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1401,11 +1255,7 @@ void track_counts(const WrfData &wd, int i_gc) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
-   int mon, day, yr, hr, min, sec;
    ConcatString out_nc_file;
-   char attribute_str[PATH_MAX], time_str[max_str_len];
-   char hostname_str[max_str_len];
-   unixtime ut;
 
    // Create output NetCDF file name
    build_outfile_name(ens_valid_ut, suffix, out_nc_file);
@@ -1420,24 +1270,15 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
       exit(1);
    }
 
-   ut = time(NULL);
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-           yr, mon, day, hr, min, sec);
+   // Add global attributes
+   write_netcdf_global(nc_out, out_nc_file.text(), program_name);
 
-   gethostname(hostname_str, max_str_len);
-
-   sprintf(attribute_str, "File %s generated %s UTC on host %s",
-           out_nc_file.text(), time_str, hostname_str);
-   nc_out->add_att("FileOrigins", attribute_str);
-   nc_out->add_att("MET_version", met_version);
+   // Add the projection information
+   write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
    lat_dim = nc_out->add_dim("lat",   (long) grid.ny());
    lon_dim = nc_out->add_dim("lon",   (long) grid.nx());
-
-   // Add the projection information
-   write_netcdf_proj(nc_out, grid);
 
    // Add the lat/lon variables
    write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
