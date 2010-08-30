@@ -25,17 +25,18 @@
 
 #include <netcdf.hh>
 
-#include "grid.h"
-#include "pxm.h"
+#include "vx_data_grids/grid.h"
+#include "vx_pxm/vx_pxm.h"
+#include "vx_cal/vx_cal.h"
+#include "vx_util/vx_util.h"
 
-#include "var_info.h"
-#include "long_array.h"
+#include "vx_gdata/var_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int pinterp_star = -12345;
+static const int vx_gdata_star = -12345;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,11 +72,11 @@ class PinterpFile {
 
       int Ntimes;
 
-      Unixtime * Time;  //  allocated
+      unixtime * Time;  //  allocated
 
-      Unixtime InitTime;
+      unixtime InitTime;
 
-      Unixtime valid_time (int) const;
+      unixtime valid_time (int) const;
       int      lead_time  (int) const;   //  seconds
 
          //
@@ -116,6 +117,9 @@ class PinterpFile {
       double data(NcVar *, const LongArray &) const;
 
       bool data(NcVar *, const LongArray &, Pgm &, double & pressure) const;
+
+      bool data(const char *, const LongArray &, Pgm &, double & pressure) const;
+
 
 };
 

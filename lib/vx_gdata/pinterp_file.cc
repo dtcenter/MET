@@ -23,10 +23,10 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math.h"
+#include "vx_math/vx_math.h"
 
-#include "pinterp_file.h"
-#include "get_pinterp_grid.h"
+#include "vx_gdata/pinterp_file.h"
+#include "vx_gdata/get_pinterp_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ static const int max_pinterp_args       = 30;
 
 static int get_int_var(NcFile *, const char * var_name, int index);
 
-static Unixtime parse_init_time(const char *);
+static unixtime parse_init_time(const char *);
 
 static Color value_to_color(double);
 
@@ -110,7 +110,7 @@ Dim = (NcDim **) 0;
 
 Var = (VarInfo *) 0;
 
-Time = (Unixtime *) 0;
+Time = (unixtime *) 0;
 
 close();
 
@@ -130,7 +130,7 @@ if ( Nc )  { delete Nc;  Nc = (NcFile *) 0; }
 
 if ( Dim )  { delete [] Dim;  Dim = (NcDim **) 0; }
 
-if ( Time )  { delete [] Time;  Time = (Unixtime *) 0; }
+if ( Time )  { delete [] Time;  Time = (unixtime *) 0; }
 
 Ndims = 0;
 
@@ -142,7 +142,7 @@ Nvars = 0;
 
 if ( Var )  { delete [] Var;  Var = (VarInfo *) 0; }
 
-InitTime = (Unixtime) 0;
+InitTime = (unixtime) 0;
 
 Ntimes = 0;
 
@@ -220,7 +220,7 @@ for (j=0; j<Ndims; ++j)  {
 
 if ( Ntimes == 0 )  { close();  return ( false ); }
 
-Time = new Unixtime [Ntimes];
+Time = new unixtime [Ntimes];
 
 for (j=0; j<Ntimes; ++j)  {
 
@@ -400,7 +400,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Unixtime PinterpFile::valid_time(int n) const
+unixtime PinterpFile::valid_time(int n) const
 
 {
 
@@ -433,7 +433,7 @@ if ( (n < 0) || (n >= Ntimes) )  {
 
 }
 
-Unixtime dt = Time[n] - InitTime;
+unixtime dt = Time[n] - InitTime;
 
 return ( (int) dt );
 
@@ -527,6 +527,29 @@ return ( d[0] );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool PinterpFile::data(const char *var_name, const LongArray & a, Pgm & image, double & pressure) const
+
+{
+
+int j;
+bool found = false;
+
+for ( j=0; j<Nvars; j++ )  {
+
+   if ( var_name == Var[j].name )  found = true;
+
+}
+
+if ( found )  found = data(Var[j].var, a, image, pressure);
+
+return ( found );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool PinterpFile::data(NcVar * v, const LongArray & a, Pgm & image, double & pressure) const
 
 {
@@ -611,7 +634,7 @@ count = 0;
 
 for (j=0; j<(a.n_elements()); ++j)  {
 
-   if ( a[j] == pinterp_star )  {
+   if ( a[j] == vx_gdata_star )  {
 
       ++count;
 
@@ -734,12 +757,12 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
-Unixtime parse_init_time(const char * s)
+unixtime parse_init_time(const char * s)
 
 {
 
 int j;
-Unixtime t;
+unixtime t;
 int month, day, year, hour, minute, second;
 
 
@@ -803,7 +826,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
    k = a[j];
 
-   if ( (k < 0) && (k != pinterp_star) )  return ( false );
+   if ( (k < 0) && (k != vx_gdata_star) )  return ( false );
 
 }
 
