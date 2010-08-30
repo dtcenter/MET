@@ -27,6 +27,7 @@
 #include "vx_util/indent.h"
 #include "vx_util/int_array.h"
 #include "vx_util/is_number.h"
+#include "vx_util/long_array.h"
 #include "vx_util/make_path.h"
 #include "vx_util/num_array.h"
 #include "vx_util/ordinal.h"
