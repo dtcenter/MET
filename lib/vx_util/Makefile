@@ -24,6 +24,7 @@ OBJECTS  =  ascii_table.o \
 	indent.o \
 	int_array.o \
 	is_number.o \
+	long_array.o \
 	make_path.o \
 	memory.o \
 	num_array.o \
@@ -89,6 +90,9 @@ int_array.o: int_array.cc
 
 is_number.o: is_number.cc
 	$(CXX) is_number.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+
+long_array.o: long_array.cc
+	$(CXX) long_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
 make_path.o: make_path.cc
 	$(CXX) make_path.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
