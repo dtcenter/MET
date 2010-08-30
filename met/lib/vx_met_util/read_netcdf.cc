@@ -231,7 +231,7 @@ void read_netcdf(NcFile *f_in, const char *var_name, char *lvl_name,
 ///////////////////////////////////////////////////////////////////////////////
 
 int read_netcdf_status(NcFile *f_in, const char *var_name, char *lvl_name,
-                WrfData &wd, Grid &gr, int verbosity) {
+                       WrfData &wd, Grid &gr, int verbosity) {
    double v, v_min, v_max;
    int i, x, y, accum;
    unixtime init_ut, valid_ut;
