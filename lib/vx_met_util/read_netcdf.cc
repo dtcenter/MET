@@ -444,7 +444,7 @@ return;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-bool has_att(NcFile * ncfile, const char * name)
+bool has_att(NcFile * ncfile, const char * att_name)
 
 {
 
@@ -466,7 +466,7 @@ for ( i=0; i<n; i++ )  {
 
    }
 
-   if ( strcmp(att->as_string(0), name) == 0 )  {
+   if ( strcmp(att->name(), att_name) == 0 )  {
 
       status = true;
       break;
