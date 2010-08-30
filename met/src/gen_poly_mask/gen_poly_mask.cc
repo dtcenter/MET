@@ -226,14 +226,8 @@ void process_poly_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf() {
-   int yr, mon, day, hr, min, sec;
-   unixtime ut;
    int n, x, y, in_count, out_count;
    double lat, lon;
-
-   char attribute_str[PATH_MAX];
-   char time_str[max_str_len];
-   char hostname_str[max_str_len];
    char var_str[max_str_len];
 
    int *mask_data = (int *)   0;
@@ -258,17 +252,7 @@ void write_netcdf() {
    }
 
    // Add global attributes
-   ut = time(NULL);
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i", yr, mon, day, hr, min, sec);
-
-   gethostname(hostname_str, max_str_len);
-
-   sprintf(attribute_str,
-           "File %s generated %s UTC on host %s by the %s tool from the polyline file %s",
-           out_file.text(), time_str, hostname_str, program_name, poly_file.text());
-   f_out->add_att("FileOrigins", attribute_str);
-   f_out->add_att("MET_version", met_version);
+   write_netcdf_global(f_out, out_file.text(), program_name);
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);
