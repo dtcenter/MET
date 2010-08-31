@@ -107,15 +107,9 @@ static const int unmatched_id = -1;
 static ConcatString match_config_file;
 static ConcatString merge_config_file;
 
-// Input forecast GRIB or NetCDF files
+// Input files
 static ConcatString fcst_file;
-static GribFile     fcst_gb_file;
-static NcFile      *fcst_nc_file = (NcFile *) 0;
-
-// Input observation GRIB or NetCDF files
 static ConcatString obs_file;
-static GribFile     obs_gb_file;
-static NcFile      *obs_nc_file = (NcFile *) 0;
 
 static unixtime     fcst_valid_ut = (unixtime) 0;
 static int          fcst_lead_sec = bad_data_int;
@@ -133,10 +127,6 @@ static BoundingBox xy_bb;
 static BoundingBox ll_bb;
 static ConcatString out_dir;
 static char met_data_dir[PATH_MAX];
-
-// Input file types
-static FileType fcst_ftype = NoFileType;
-static FileType obs_ftype  = NoFileType;
 
 // Grib Codes to be verified for the forecast and observation fields
 static GCInfo fcst_gci, obs_gci;
@@ -384,188 +374,49 @@ void process_command_line(int argc, char **argv) {
 ///////////////////////////////////////////////////////////////////////
 
 void process_fcst_obs_files() {
-   int status;
+   WrfData fcst_wd, obs_wd;
+   Grid fcst_grid, obs_grid;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    char merge_str[max_str_len];
-   char fcst_var[max_str_len], obs_var[max_str_len];
-   char fcst_lvl[max_str_len], obs_lvl[max_str_len];
-   char fcst_unit[max_str_len], obs_unit[max_str_len];
-   Grid fcst_grid, obs_grid;
-   GribRecord fcst_r, obs_r;
-   WrfData fcst_wd, obs_wd;
-   Section1_Header *pds_ptr;
+   bool status;
 
-   // Switch based on the forecast file type
-   fcst_ftype = get_file_type(fcst_file);
+   //
+   // Read the gridded data from the input forecast file
+   //
+   status = read_field(fcst_file, fcst_gci,
+                       fcst_valid_ut, fcst_lead_sec,
+                       fcst_wd, fcst_grid, verbosity);
 
-   switch(fcst_ftype) {
-
-      // GRIB file type
-      case(GbFileType):
-
-         // Open the GRIB file
-         if(!(fcst_gb_file.open(fcst_file))) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open GRIB forecast file: "
-                 << fcst_file << "\n\n" << flush;
-            exit(1);
-         }
-
-         if(verbosity > 1) {
-            cout << "Searching GRIB forecast file for GRIB code "
-                 << fcst_gci.code << " with accumulation/level "
-                 << "indicator of " << fcst_gci.lvl_str
-                 << ".\n" << flush;
-         }
-
-         status = get_grib_record(fcst_gb_file, fcst_r,
-                                  fcst_gci, fcst_valid_ut, fcst_lead_sec,
-                                  fcst_wd, fcst_grid, verbosity);
-
-         if(status != 0) {
-            cerr << "\n\nERROR: main() -> "
-                 << "grib code " << fcst_gci.code
-                 << " with accumulation/level indicator of "
-                 << fcst_gci.lvl_str << " not found in GRIB file: "
-                 << fcst_file << "\n" << flush;
-            exit(1);
-         }
-
-         //
-         // Get the forecast level name
-         //
-         pds_ptr = (Section1_Header *) fcst_r.pds;
-         get_grib_level_str(pds_ptr->type, pds_ptr->level_info,
-                            fcst_lvl);
-
-         break;
-
-      // NetCDF file type
-      case(NcFileType):
-
-         // Open the NetCDF File
-         fcst_nc_file = new NcFile(fcst_file);
-         if(!fcst_nc_file->is_valid()) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open NetCDF forecast file: "
-                 << fcst_file << "\n\n" << flush;
-            exit(1);
-         }
-
-         // Read the NetCDF field
-         read_netcdf(fcst_nc_file, fcst_gci.abbr_str.text(), fcst_lvl,
-                     fcst_wd, fcst_grid, verbosity);
-
-         // Check that the accumulation interval matches what was
-         // requested in the config file
-         if(fcst_wd.get_accum_time() != fcst_gci.lvl_1) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "accumulation time of " << fcst_wd.get_accum_time()
-                 << " seconds in the forecast file (" << fcst_file
-                 << ") does not match the " << fcst_gci.lvl_1
-                 << " seconds accumulation time requested in the config "
-                 << "file.\n\n" << flush;
-            exit(1);
-         }
-
-         break;
-
-      default:
-         cerr << "\n\nERROR: process_fcst_obs_files() -> "
-              << "unsupport forecast file type: "
-              << fcst_file << "\n\n" << flush;
-         exit(1);
-         break;
+   if(!status) {
+      cout << "\n\nERROR:: process_fcst_obs_files() -> "
+           << fcst_gci.info_str << " not found in file: " << fcst_file
+           << "\n\n" << flush;
+      exit(1);
    }
 
+   //
    // Store the forecast lead and valid times
+   //
    if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = fcst_wd.get_valid_time();
    if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = fcst_wd.get_lead_time();
 
-   // Switch based on the observation file type
-   obs_ftype = get_file_type(obs_file);
+   //
+   // Read the gridded data from the input observation file
+   //
+   status = read_field(obs_file, obs_gci,
+                       obs_valid_ut, obs_lead_sec,
+                       obs_wd, obs_grid, verbosity);
 
-   switch(obs_ftype) {
-
-      // GRIB file type
-      case(GbFileType):
-
-         // Open the GRIB file
-         if(!(obs_gb_file.open(obs_file))) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open GRIB observation file: "
-                 << obs_file << "\n\n" << flush;
-            exit(1);
-         }
-
-         if(verbosity > 1) {
-            cout << "Searching GRIB observation file for GRIB code "
-                 << obs_gci.code << " with accumulation/level "
-                 << "indicator of " << obs_gci.lvl_str
-                 << ".\n" << flush;
-         }
-
-         status = get_grib_record(obs_gb_file, obs_r,
-                                  obs_gci, obs_valid_ut, obs_lead_sec,
-                                  obs_wd, obs_grid, verbosity);
-
-         if(status != 0) {
-            cerr << "\n\nERROR: main() -> "
-                 << "grib code " << obs_gci.code
-                 << " with accumulation/level indicator of "
-                 << obs_gci.lvl_str << " not found in GRIB file: "
-                 << obs_file << "\n" << flush;
-            exit(1);
-         }
-
-         //
-         // Get the observation level name
-         //
-         pds_ptr = (Section1_Header *) obs_r.pds;
-         get_grib_level_str(pds_ptr->type, pds_ptr->level_info,
-                            obs_lvl);
-
-         break;
-
-      // NetCDF file type
-      case(NcFileType):
-
-         // Open the NetCDF File
-         obs_nc_file = new NcFile(obs_file);
-         if(!obs_nc_file->is_valid()) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open NetCDF observation file: "
-                 << obs_file << "\n\n" << flush;
-            exit(1);
-         }
-
-         // Read the NetCDF field
-         read_netcdf(obs_nc_file, obs_gci.abbr_str.text(), obs_lvl,
-                     obs_wd, obs_grid, verbosity);
-
-         // Check that the accumulation interval matches what was
-         // requested in the config file
-         if(obs_wd.get_accum_time() != obs_gci.lvl_1) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "accumulation time of " << obs_wd.get_accum_time()
-                 << " seconds in the observation file (" << obs_file
-                 << ") does not match the " << obs_gci.lvl_1
-                 << " seconds accumulation time requested in the config "
-                 << "file.\n\n" << flush;
-            exit(1);
-         }
-
-         break;
-
-      default:
-         cerr << "\n\nERROR: process_fcst_obs_files() -> "
-              << "unsupport observation file type: "
-              << obs_file << "\n\n" << flush;
-         exit(1);
-         break;
+   if(!status) {
+      cout << "\n\nERROR:: process_fcst_obs_files() -> "
+           << obs_gci.info_str << " not found in file: " << obs_file
+           << "\n\n" << flush;
+      exit(1);
    }
 
+   //
    // Store the observation lead and valid times
+   //
    if(obs_valid_ut == (unixtime) 0) obs_valid_ut = obs_wd.get_valid_time();
    if(is_bad_data(obs_lead_sec))    obs_lead_sec = obs_wd.get_lead_time();
 
@@ -573,7 +424,7 @@ void process_fcst_obs_files() {
    // Check that the grids match
    //
    if(!(fcst_grid == obs_grid)) {
-      cerr << "\n\nERROR: main() -> "
+      cerr << "\n\nERROR: process_fcst_obs_files() -> "
            << "The forecast and observation grids do not match.\n\n"
            << flush;
       exit(1);
@@ -588,7 +439,7 @@ void process_fcst_obs_files() {
       unix_to_yyyymmdd_hhmmss(fcst_valid_ut, tmp_str);
       unix_to_yyyymmdd_hhmmss(obs_valid_ut, tmp2_str);
 
-      cout << "\n***WARNING***: main() -> "
+      cout << "\n***WARNING***: process_fcst_obs_files() -> "
            << "Forecast and observation valid times do not match "
            << tmp_str << " != " << tmp2_str << ".\n\n" << flush;
    }
@@ -603,39 +454,32 @@ void process_fcst_obs_files() {
       sec_to_hhmmss(fcst_wd.get_accum_time(), tmp_str);
       sec_to_hhmmss(obs_wd.get_accum_time(), tmp2_str);
 
-      cout << "\n***WARNING***: main() -> "
+      cout << "\n***WARNING***: process_fcst_obs_files() -> "
            << "Forecast and observation accumulation times do not match "
            << tmp_str << " != " << tmp2_str << ".\n\n" << flush;
    }
 
    //
-   // Setup the forecast field name and units
-   //
-   strcpy(fcst_var, fcst_gci.abbr_str.text());
-   get_grib_code_unit(fcst_gci.code, engine.wconf.grib_ptv().ival(),
-                      fcst_unit);
-
-   //
-   // Setup the observation field name and units
-   //
-   strcpy(obs_var, obs_gci.abbr_str.text());
-   get_grib_code_unit(obs_gci.code, engine.wconf.grib_ptv().ival(),
-                      obs_unit);
-
-   //
    // Store the forecast and observation variable, level, and units.
    //
-   strcpy(engine.fcst_var_str,  fcst_var);
-   strcpy(engine.fcst_lvl_str,  fcst_lvl);
-   strcpy(engine.fcst_unit_str, fcst_unit);
-   strcpy(engine.obs_var_str,   obs_var);
-   strcpy(engine.obs_lvl_str,   obs_lvl);
-   strcpy(engine.obs_unit_str,  obs_unit);
+   strcpy(engine.fcst_var_str,  fcst_gci.abbr_str.text());
+   strcpy(engine.fcst_lvl_str,  fcst_gci.lvl_str.text());
+   get_grib_code_unit(fcst_gci.code, engine.wconf.grib_ptv().ival(),
+                      tmp_str);
+   strcpy(engine.fcst_unit_str, tmp_str);
+
+   strcpy(engine.obs_var_str,   obs_gci.abbr_str.text());
+   strcpy(engine.obs_lvl_str,   obs_gci.lvl_str.text());
+   get_grib_code_unit(obs_gci.code, engine.wconf.grib_ptv().ival(),
+                      tmp_str);
+   strcpy(engine.obs_unit_str, tmp_str);
 
    if(verbosity > 0) {
-      cout << "Forecast Field: " << fcst_var << " at " << fcst_lvl
+      cout << "Forecast Field: "
+           << engine.fcst_var_str << " at " << engine.fcst_lvl_str
            << "\n"
-           << "Observation Field: " << obs_var << " at " << obs_lvl
+           << "Observation Field: "
+           << engine.obs_var_str << " at " << engine.obs_lvl_str
            << "\n" << flush;
    }
 
@@ -3004,9 +2848,7 @@ void write_obj_netcdf() {
    unixtime ut;
 
    ConcatString out_file;
-   char         attribute_str[PATH_MAX];
-   char         time_str[max_str_len];
-   char         hostname_str[max_str_len];
+   char   time_str[max_str_len];
 
    float *fcst_raw_data  = (float *) 0;
    int   *fcst_obj_data  = (int *)   0;
@@ -3055,23 +2897,15 @@ void write_obj_netcdf() {
       exit(1);
    }
 
-   ut = time(NULL);
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i", yr, mon, day, hr, min, sec);
+   // Add global attributes
+   write_netcdf_global(f_out, out_file.text(), program_name);
 
-   gethostname(hostname_str, max_str_len);
-
-   sprintf(attribute_str, "File %s generated %s UTC on host %s",
-           out_file.text(), time_str, hostname_str);
-   f_out->add_att("FileOrigins", attribute_str);
-   f_out->add_att("MET_version", met_version);
+   // Add the projection information
+   write_netcdf_proj(f_out, grid);
 
    // Define Dimensions
    lat_dim = f_out->add_dim("lat", (long) grid.ny());
    lon_dim = f_out->add_dim("lon", (long) grid.nx());
-
-   // Add the projection information
-   write_netcdf_proj(f_out, grid);
 
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
