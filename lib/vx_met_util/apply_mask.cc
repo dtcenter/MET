@@ -362,7 +362,8 @@ void process_netcdf_mask(const char *file_name, const char *field_name,
    // Parse out the Grid definition
    read_netcdf_grid(nc_file, mask_grid, 0);
 
-   // If no variable name provided, find the first 2-dimensional variable
+   // If no variable name provided, find the first 2-dimensional variable,
+   // skipping lat and lon
    if(strlen(field_name) == 0) {
 
       // Search for the first 2-dimensional variable
@@ -378,8 +379,11 @@ void process_netcdf_mask(const char *file_name, const char *field_name,
             exit(1);
          }
 
-         // Check the number of dimensions
-         if(mask_var->num_dims() == 2) break;
+         // Check the number of dimensions, skipping lat and lon
+         if(mask_var->num_dims() == 2 &&
+            strcmp(mask_var->name(), "lat") != 0 &&
+            strcmp(mask_var->name(), "lon") != 0 ) break;
+
       } // end for
 
       // Check whether a suitable variable was found
