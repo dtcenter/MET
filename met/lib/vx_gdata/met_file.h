@@ -14,8 +14,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MET_PINTERP_FILE_H__
-#define  __MET_PINTERP_FILE_H__
+#ifndef  __MET_FILE_H__
+#define  __MET_FILE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -35,20 +35,24 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class PinterpFile {
+class MetNcFile {
 
    private:
 
       void init_from_scratch();
 
-      PinterpFile(const PinterpFile &);
-      PinterpFile & operator=(const PinterpFile &);
+      MetNcFile(const MetNcFile &);
+      MetNcFile & operator=(const MetNcFile &);
+
+      void get_times(const NcVar *);
+
+      void get_level(VarInfo &);
 
 
    public:
 
-      PinterpFile();
-     ~PinterpFile();
+      MetNcFile();
+     ~MetNcFile();
 
       bool open(const char * filename);
 
@@ -63,14 +67,11 @@ class PinterpFile {
          //  time
          //
 
-      int Ntimes;
-
-      Unixtime * Time;  //  allocated
+      Unixtime ValidTime;
 
       Unixtime InitTime;
 
-      Unixtime valid_time (int) const;
-      int      lead_time  (int) const;   //  seconds
+      int      lead_time () const;   //  seconds
 
          //
          //  dimensions
@@ -84,8 +85,6 @@ class PinterpFile {
 
       NcDim * Xdim;   //  not allocated
       NcDim * Ydim;   //  not allocated
-      NcDim * Zdim;   //  not allocated
-      NcDim * Tdim;   //  not allocated
 
          //
          //  variables
@@ -94,8 +93,6 @@ class PinterpFile {
       int Nvars;
 
       VarInfo * Var;    //  allocated
-
-      int PressureIndex;   //  index into Var array
 
          //
          //  Grid
@@ -109,9 +106,9 @@ class PinterpFile {
 
       double data(NcVar *, const LongArray &) const;
 
-      bool data(NcVar *, const LongArray &, Pgm &, double & pressure) const;
+      bool data(NcVar *, const LongArray &, Pgm &) const;
 
-      bool data(const char *, const LongArray &, Pgm &, double & pressure) const;
+      bool data(const char *, const LongArray &, Pgm &) const;
 
 };
 
@@ -119,7 +116,7 @@ class PinterpFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MET_PINTERP_FILE_H__  */
+#endif   /*  __MET_FILE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

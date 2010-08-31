@@ -27,29 +27,26 @@ using namespace std;
 
 #include <netcdf.hh>
 
-#include "is_pinterp_file.h"
+#include "is_met_nc_file.h"
 #include "is_netcdf_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char title_string  [] = "TITLE";
-
-static const char target_string [] = "ON PRES LEVELS";
+static const char att_string [] = "MET tool";
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_pinterp_file(const char * filename)
+bool is_met_nc_file(const char * filename)
 
 {
 
 if ( !filename )  return ( false );
 
 int j, n;
-bool found = false;
 NcFile f (filename);
 NcAtt * att = (NcAtt *) 0;
 
@@ -60,34 +57,26 @@ NcAtt * att = (NcAtt *) 0;
 if ( ! is_netcdf_file(filename) )  return ( false );
 
    //
-   //  look for the target string in the TITLE global attribute
+   //  look for att_string in the global attributes
    //
 
 if ( ! f.is_valid() )  return ( false );
 
 n = f.num_atts();
 
-found = false;
-
 for (j=0; j<n; ++j)  {
 
    att = f.get_att(j);
 
-   if ( strcmp(att->name(), "TITLE") == 0 )  {
-
-      if ( strstr(att->as_string(0), target_string) )  { found = true;  break; }
-
-   }
+   if ( strcmp(att->name(), att_string) == 0 )  return ( true );
 
 }
-
-if ( !found )  return ( false );
 
    //
    //  done
    //
 
-return ( true );
+return ( false );
 
 }
 
