@@ -21,7 +21,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "var_info.h"
+#include "vx_gdata/var_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////

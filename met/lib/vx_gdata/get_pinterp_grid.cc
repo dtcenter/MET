@@ -24,9 +24,9 @@ using namespace std;
 
 #include <netcdf.hh>
 
-#include "vx_math.h"
+#include "vx_math/vx_math.h"
 
-#include "get_pinterp_grid.h"
+#include "vx_gdata/get_pinterp_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
