@@ -1039,14 +1039,10 @@ void get_field(const char *get_file, int get_accum, WrfData &wd,
 
 void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
                   Grid &grid, GribRecord &rec) {
-   int yr, mon, day, hr, min, sec;
-   unixtime ut;
    char var_str[max_str_len];
    char tmp_str[max_str_len], tmp2_str[max_str_len];
-   char attribute_str[PATH_MAX];
    char command_str[max_str_len];
    char time_str[max_str_len];
-   char hostname_str[max_str_len];
    char accum1_str[max_str_len], accum2_str[max_str_len];
    Section1_Header *pds_ptr;
 
@@ -1070,16 +1066,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    }
 
    // Add global attributes
-   ut = time(NULL);
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i", yr, mon, day, hr, min, sec);
-
-   gethostname(hostname_str, max_str_len);
-
-   sprintf(attribute_str, "File %s generated %s UTC on host %s by the PCP-Combine tool",
-           out_file.text(), time_str, hostname_str);
-   f_out->add_att("FileOrigins", attribute_str);
-   f_out->add_att("MET_version", met_version);
+   write_netcdf_global(f_out, out_file.text(), program_name);
 
    if(run_command == sum) {
       sec_to_hhmmss(in_accum, accum1_str);
@@ -1153,13 +1140,11 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    //
    if(nc_init == (unixtime) 0) nc_init = nc_valid;
 
-   unix_to_mdyhms(nc_init, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i", yr, mon, day, hr, min, sec);
+   unix_to_yyyymmdd_hhmmss(nc_init, time_str);
    pcp_var->add_att("init_time", time_str);
    pcp_var->add_att("init_time_ut", (long int) nc_init);
 
-   unix_to_mdyhms(nc_valid, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i", yr, mon, day, hr, min, sec);
+   unix_to_yyyymmdd_hhmmss(nc_valid, time_str);
    pcp_var->add_att("valid_time", time_str);
    pcp_var->add_att("valid_time_ut", (long int) nc_valid);
 
