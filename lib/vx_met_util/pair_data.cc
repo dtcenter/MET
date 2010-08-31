@@ -22,6 +22,7 @@ using namespace std;
 #include "vx_met_util/constants.h"
 #include "vx_met_util/conversions.h"
 #include "vx_util/vx_util.h"
+#include "vx_gdata/vx_gdata.h"
 #include "vx_grib_classes/grib_strings.h"
 #include "vx_wrfdata/vx_wrfdata.h"
 #include "vx_gsl_prob/vx_gsl_prob.h"
@@ -103,6 +104,12 @@ void GCInfo::clear() {
    pcode      = 0;
    pthresh_lo = bad_data_double;
    pthresh_hi = bad_data_double;
+   lvl_dim    = bad_data_int;
+
+   // Initialize to contain two stars
+   dim_la.clear();
+   dim_la.add(vx_gdata_star);
+   dim_la.add(vx_gdata_star);
 
    return;
 }
@@ -128,12 +135,27 @@ void GCInfo::assign(const GCInfo &c) {
    pthresh_lo = c.pthresh_lo;
    pthresh_hi = c.pthresh_hi;
 
+   lvl_dim    = c.lvl_dim;
+   dim_la     = c.dim_la;
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void GCInfo::set_gcinfo(const char *c, int ptv) {
+
+   // If a slash is used, assume GRIB input.
+   if(strchr(c, '/') != NULL) set_gcinfo_grib(c, ptv);
+   // Otherwise, assume NetCDF input.
+   else                       set_gcinfo_nc(c);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GCInfo::set_gcinfo_grib(const char *c, int ptv) {
    char tmp_str[max_str_len], tmp2_str[max_str_len], tmp3_str[max_str_len];
    char *ptr, *ptr2, *save_ptr;
    int j;
@@ -146,7 +168,7 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
 
    // Retreive the GRIB code value
    if((ptr = strtok_r(tmp_str, "/", &save_ptr)) == NULL) {
-      cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
+      cerr << "\n\nERROR: GCInfo::set_gcinfo_grib() -> "
            << "bad GRIB code specified \""
            << c << "\".\n\n" << flush;
       exit(1);
@@ -157,7 +179,7 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
 
    // Retrieve the level value
    if((ptr = strtok_r(NULL, "/", &save_ptr)) == NULL) {
-      cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
+      cerr << "\n\nERROR: GCInfo::set_gcinfo_grib() -> "
            << "each GRIB code specified must be followed by an "
            << "accumulation, level, or presssure level indicator \""
            << c << "\".\n\n" << flush;
@@ -168,7 +190,7 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
    if(*ptr != 'A' && *ptr != 'Z' &&
       *ptr != 'P' && *ptr != 'R' &&
       *ptr != 'L') {
-      cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
+      cerr << "\n\nERROR: GCInfo::set_gcinfo_grib() -> "
            << "each GRIB code specified (" << c
            << ") must be followed by level information "
            << "that begins with:\n"
@@ -213,7 +235,7 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
    if(lvl_type != PresLevel &&
       lvl_type != VertLevel &&
       lvl_1    != lvl_2) {
-      cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
+      cerr << "\n\nERROR: GCInfo::set_gcinfo_grib() -> "
            << "ranges of levels are only supported for pressure levels "
            << "(P) and vertical levels (Z).\n"
            << flush;
@@ -247,7 +269,7 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
 
       if(strncasecmp(ptr, "PROB", strlen("PROB")) == 0) pflag = 1;
       else {
-         cout << "WARNING: GCInfo::set_gcinfo() -> "
+         cout << "WARNING: GCInfo::set_gcinfo_grib() -> "
               << "unrecognized flag value \"" << ptr
               << "\" for GRIB code \"" << c << "\".\n" << flush;
       }
@@ -300,6 +322,87 @@ void GCInfo::set_gcinfo(const char *c, int ptv) {
    // Set the info_str
    sprintf(tmp_str, "%s/%s", abbr_str.text(), lvl_str.text());
    set_info_str(tmp_str);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GCInfo::set_gcinfo_nc(const char *c) {
+   char tmp_str[max_str_len];
+   char *ptr, *ptr2, *ptr3, *save_ptr;
+
+   // Initialize
+   clear();
+
+   // Initialize the temp string
+   strcpy(tmp_str, c);
+
+   // Set the GRIB code
+   code = -1;
+
+   // Retreive the NetCDF variable name
+   if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == NULL) {
+      cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
+           << "bad NetCDF variable name specified \""
+           << c << "\".\n\n" << flush;
+      exit(1);
+   }
+
+   // Set the abbr_str
+   set_abbr_str(ptr);
+
+   // Retreive the NetCDF variable name
+   if((ptr = strtok_r(NULL, "()", &save_ptr)) == NULL) {
+      cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
+           << "bad NetCDF variable name specified \""
+           << c << "\".\n\n" << flush;
+      exit(1);
+   }
+
+   // Set the lvl_str
+   set_lvl_str(ptr);
+
+   // Set the info_str to the input string
+   set_info_str(c);
+
+   // If dimensions are specified, clear the default value
+   if(strchr(ptr, ',') != NULL) dim_la.clear();
+
+   // Parse the dimensions
+   while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
+
+      // Check for wildcards
+      if(strchr(ptr2, '*') != NULL) dim_la.add(vx_gdata_star);
+      else {
+
+         // Check for a range of levels
+         if((ptr3 = strchr(ptr2, '-')) != NULL) {
+
+            // Check if a range has already been supplied
+            if(!is_bad_data(lvl_dim)) {
+               cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
+                    << "only one dimension can have a range for NetCDF variable \""
+                    << c << "\".\n\n" << flush;
+               exit(1);
+            }
+            // Store the dimension of the range and limits
+            else {
+               dim_la.add(-1);
+               lvl_dim = dim_la.n_elements();
+               lvl_1 = atoi(ptr2);
+               lvl_2 = atoi(++ptr3);
+            }
+         }
+         // Single level
+         else {
+            dim_la.add(atoi(ptr2));
+         }
+      }
+
+      // Set ptr to NULL for next call to strtok
+      ptr = NULL;
+   }
 
    return;
 }
