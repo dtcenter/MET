@@ -75,11 +75,17 @@ class GCInfo {
       double       pthresh_lo;
       double       pthresh_hi;
 
+      // Entries for handling NetCDF input strings
+      LongArray    dim_la;
+      int          lvl_dim;
+
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void set_gcinfo(const char *, int);
+      void set_gcinfo_grib(const char *, int);
+      void set_gcinfo_nc(const char *);
       void set_abbr_str(const char *);
       void set_lvl_str(const char *);
       void set_info_str(const char *);
