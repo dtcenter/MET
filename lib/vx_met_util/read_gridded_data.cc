@@ -46,9 +46,9 @@ static int read_levels_pinterp(const char *, GCInfo &, unixtime, int,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int read_field(const char *file_name, GCInfo &gci,
-               unixtime valid_ut, int lead_sec,
-               WrfData &wd, Grid &gr, int verbosity) {
+bool read_field(const char *file_name, GCInfo &gci,
+                unixtime valid_ut, int lead_sec,
+                WrfData &wd, Grid &gr, int verbosity) {
    FileType ftype = NoFileType;
    bool status = false;
 
@@ -116,11 +116,13 @@ bool read_field_grib(const char *file_name, GCInfo &gci,
                             wd, gr, verbosity);
 
    // Get the level name
-   pds_ptr = (Section1_Header *) rec.pds;
-   get_grib_level_str(pds_ptr->type, pds_ptr->level_info, lvl_str);
+   if(status) {
 
-   // Set the GCInfo object's level string
-   gci.set_lvl_str(lvl_str);
+      // Set the GCInfo object's level string
+      pds_ptr = (Section1_Header *) rec.pds;
+      get_grib_level_str(pds_ptr->type, pds_ptr->level_info, lvl_str);
+      gci.set_lvl_str(lvl_str);
+   }
 
    return(status);
 }
@@ -254,7 +256,8 @@ int read_levels_grib(const char *file_name, GCInfo &gci,
    GribRecord rec;
    Grid data_grid;
    GCInfo gc_info;
-   int i, n_rec, status;
+   int i, n_rec;
+   bool status;
    NumArray rec_na;
 
    // Initialize
@@ -300,7 +303,7 @@ int read_levels_grib(const char *file_name, GCInfo &gci,
                                valid_ut, lead_sec,
                                wd[i], data_grid, verbosity);
 
-      if(status != 0) {
+      if(!status) {
          cerr << "\n\nERROR: read_levels_grib() -> "
               << "no records matching GRIB code "
               << gc_info.code << " with level indicator of "
@@ -347,7 +350,8 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
    GribRecord rec;
    Grid data_grid;
    GCInfo gc_info;
-   int i, n_rec, status;
+   int i, n_rec;
+   bool status;
    NumArray rec_na;
 
    // Initialize
@@ -391,7 +395,7 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
                                valid_ut, lead_sec,
                                wd[i], data_grid, verbosity);
 
-      if(status != 0) {
+      if(!status) {
          cerr << "\n\nERROR: read_levels_grib() -> "
               << "no records matching GRIB code "
               << gc_info.code << " with level indicator of "

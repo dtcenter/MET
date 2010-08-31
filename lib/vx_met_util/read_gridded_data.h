@@ -22,11 +22,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern int read_field(const char *, GCInfo &, unixtime, int,
-                      WrfData &, Grid &, int);
+extern bool read_field(const char *, GCInfo &, unixtime, int,
+                       WrfData &, Grid &, int);
 
-extern int read_field_levels(const char *, GCInfo &, unixtime, int,
-                             WrfData *&, NumArray &, Grid &, int);
+extern int  read_field_levels(const char *, GCInfo &, unixtime, int,
+                              WrfData *&, NumArray &, Grid &, int);
 
 ////////////////////////////////////////////////////////////////////////
 
