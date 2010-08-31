@@ -20,7 +20,7 @@
 
 static const int vx_gdata_star = -12345;
 
-static const double my_bad_data_double  = -9999.0;
+// static const double my_bad_data_double  = -9999.0;
 
 
 ////////////////////////////////////////////////////////////////////////
