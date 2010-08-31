@@ -25,74 +25,47 @@ using namespace std;
 #include <fcntl.h>
 #include <cmath>
 
-#include <netcdf.hh>
 
-#include "is_pinterp_file.h"
-#include "is_netcdf_file.h"
+////////////////////////////////////////////////////////////////////////
+
+
+static const char netcdf_magic  [] = "CDF";
+
+static const int netcdf_magic_len  = strlen(netcdf_magic);
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char title_string  [] = "TITLE";
-
-static const char target_string [] = "ON PRES LEVELS";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool is_pinterp_file(const char * filename)
+bool is_netcdf_file(const char * filename)
 
 {
 
-if ( !filename )  return ( false );
+int fd = -1;
+int n_read;
+char buf[netcdf_magic_len];
 
-int j, n;
-bool found = false;
-NcFile f (filename);
-NcAtt * att = (NcAtt *) 0;
 
-   //
-   //  check that it's a netcdf file
-   //
+if ( (fd = open(filename, O_RDONLY)) < 0 )  return ( false );
 
-if ( ! is_netcdf_file(filename) )  return ( false );
+n_read = read(fd, buf, netcdf_magic_len);
 
-   //
-   //  look for the target string in the TITLE global attribute
-   //
+close(fd);  fd = -1;
 
-if ( ! f.is_valid() )  return ( false );
+if ( n_read != netcdf_magic_len )  return ( false );
 
-n = f.num_atts();
+if ( strncmp(buf, netcdf_magic, netcdf_magic_len) == 0 )  return ( true );
 
-found = false;
-
-for (j=0; j<n; ++j)  {
-
-   att = f.get_att(j);
-
-   if ( strcmp(att->name(), "TITLE") == 0 )  {
-
-      if ( strstr(att->as_string(0), target_string) )  { found = true;  break; }
-
-   }
-
-}
-
-if ( !found )  return ( false );
 
    //
    //  done
    //
 
-return ( true );
+return ( false );
 
 }
 
 
 ////////////////////////////////////////////////////////////////////////
-
 
 

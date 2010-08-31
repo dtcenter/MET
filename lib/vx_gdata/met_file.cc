@@ -9,8 +9,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -26,36 +24,28 @@ using namespace std;
 #include "vx_math.h"
 
 #include "vx_gdata_util.h"
-#include "pinterp_file.h"
-#include "get_pinterp_grid.h"
+#include "met_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char x_dim_name         [] = "west_east";
-static const char y_dim_name         [] = "south_north";
-static const char z_dim_name         [] = "num_metgrid_levels";
-static const char t_dim_name         [] = "Time";
+static const char x_dim_name          [] = "lon";
+static const char y_dim_name          [] = "lat";
 
-static const char  month_var_name    [] = "month";
-static const char    day_var_name    [] = "day";
-static const char   year_var_name    [] = "year";
-static const char   hour_var_name    [] = "hour";
-static const char minute_var_name    [] = "minute";
-static const char second_var_name    [] = "second";
+static const char lat_var_name        [] = "lat";
+static const char lon_var_name        [] = "lon";
 
-static const char pressure_var_name  [] = "pressure";
+static const char valid_time_att_name [] = "valid_time_ut";
+static const char  init_time_att_name [] = "init_time_ut";
 
-static const char init_time_att_name [] = "SIMULATION_START_DATE";
+static const char  level_att_name     [] = "level";
 
-static const int max_pinterp_args       = 30;
+static const int  max_met_args           = 30;
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-static Unixtime parse_init_time(const char *);
 
 static Color value_to_color(double);
 
@@ -64,14 +54,14 @@ static Color value_to_color(double);
 
 
    //
-   //  Code for class PinterpFile
+   //  Code for class MetNcFile
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-PinterpFile::PinterpFile()
+MetNcFile::MetNcFile()
 
 {
 
@@ -83,7 +73,7 @@ init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-PinterpFile::~PinterpFile()
+MetNcFile::~MetNcFile()
 
 {
 
@@ -95,7 +85,7 @@ close();
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::init_from_scratch()
+void MetNcFile::init_from_scratch()
 
 {
 
@@ -104,8 +94,6 @@ Nc = (NcFile *) 0;
 Dim = (NcDim **) 0;
 
 Var = (VarInfo *) 0;
-
-Time = (Unixtime *) 0;
 
 close();
 
@@ -117,7 +105,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::close()
+void MetNcFile::close()
 
 {
 
@@ -125,23 +113,18 @@ if ( Nc )  { delete Nc;  Nc = (NcFile *) 0; }
 
 if ( Dim )  { delete [] Dim;  Dim = (NcDim **) 0; }
 
-if ( Time )  { delete [] Time;  Time = (Unixtime *) 0; }
-
 Ndims = 0;
 
 DimNames.clear();
 
-Xdim = Ydim = Zdim = Tdim = (NcDim *) 0;
+Xdim = Ydim = (NcDim *) 0;
 
 Nvars = 0;
 
 if ( Var )  { delete [] Var;  Var = (VarInfo *) 0; }
 
-InitTime = (Unixtime) 0;
-
-Ntimes = 0;
-
-PressureIndex = -1;
+ValidTime = (Unixtime) 0;
+InitTime  = (Unixtime) 0;
 
    //
    //  done
@@ -155,15 +138,14 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::open(const char * filename)
+bool MetNcFile::open(const char * filename)
 
 {
 
 int j, k;
-int month, day, year, hour, minute, second;
 const char * c = (const char *) 0;
+bool times_ok = false;
 NcVar * v   = (NcVar *) 0;
-NcAtt * att = (NcAtt *) 0;
 
 
 close();
@@ -176,7 +158,9 @@ if ( !(Nc->is_valid()) )  { close();  return ( false ); }
    //  grid
    //
 
-if ( ! get_pinterp_grid(*Nc, grid) )  { close();  return ( false ); }
+// if ( ! get_met_grid(*Nc, grid) )  { close();  return ( false ); }
+
+read_netcdf_grid(Nc, grid, 0);
 
    //
    //  dimensions
@@ -192,8 +176,6 @@ for (j=0; j<Ndims; ++j)  {
 
    Dim[j] = Nc->get_dim(j);
 
-   if ( strcmp(Dim[j]->name(), "Time") == 0 )  Ntimes = Dim[j]->size();
-
    DimNames.add(Dim[j]->name());
 
 }
@@ -204,35 +186,8 @@ for (j=0; j<Ndims; ++j)  {
 
    if ( strcmp(c, x_dim_name) == 0 )  Xdim = Dim[j];
    if ( strcmp(c, y_dim_name) == 0 )  Ydim = Dim[j];
-   if ( strcmp(c, z_dim_name) == 0 )  Zdim = Dim[j];
-   if ( strcmp(c, t_dim_name) == 0 )  Tdim = Dim[j];
 
 }
-
-   //
-   //  times
-   //
-
-if ( Ntimes == 0 )  { close();  return ( false ); }
-
-Time = new Unixtime [Ntimes];
-
-for (j=0; j<Ntimes; ++j)  {
-
-   month  = get_int_var(Nc,  month_var_name, j);
-   day    = get_int_var(Nc,    day_var_name, j);
-   year   = get_int_var(Nc,   year_var_name, j);
-   hour   = get_int_var(Nc,   hour_var_name, j);
-   minute = get_int_var(Nc, minute_var_name, j);
-   second = get_int_var(Nc, second_var_name, j);
-
-   Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
-
-}   //  for j
-
-att = Nc->get_att(init_time_att_name);
-
-InitTime = parse_init_time(att->as_string(0));
 
    //
    //  variables
@@ -242,19 +197,27 @@ Nvars = Nc->num_vars();
 
 Var = new VarInfo [Nvars];
 
+
 for (j=0; j<Nvars; ++j)  {
 
    v = Nc->get_var(j);
+
+   times_ok = true;
 
    Var[j].var = v;
 
    Var[j].name = v->name();
 
+   if ( Var[j].name == lat_var_name )  times_ok = false;
+   if ( Var[j].name == lon_var_name )  times_ok = false;
+
    Var[j].Ndims = v->num_dims();
 
    Var[j].Dims = new NcDim * [Var[j].Ndims];
 
-   if ( strcmp(v->name(), pressure_var_name) == 0 )  PressureIndex = j;
+   get_level(Var[j]);
+
+   if ( times_ok )  get_times(Var[j].var);
 
    for (k=0; k<(Var[j].Ndims); ++k)  {
 
@@ -262,8 +225,6 @@ for (j=0; j<Nvars; ++j)  {
 
       if ( Var[j].Dims[k] == Xdim )  Var[j].x_slot = k;
       if ( Var[j].Dims[k] == Ydim )  Var[j].y_slot = k;
-      if ( Var[j].Dims[k] == Zdim )  Var[j].z_slot = k;
-      if ( Var[j].Dims[k] == Tdim )  Var[j].t_slot = k;
 
    }   //  for k
 
@@ -281,7 +242,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::dump(ostream & out, int depth) const
+void MetNcFile::dump(ostream & out, int depth) const
 
 {
 
@@ -315,24 +276,6 @@ out << prefix << "\n";
 
 out << prefix << "Xdim = " << (Xdim ? Xdim->name() : "(nul)") << "\n";
 out << prefix << "Ydim = " << (Ydim ? Ydim->name() : "(nul)") << "\n";
-out << prefix << "Zdim = " << (Zdim ? Zdim->name() : "(nul)") << "\n";
-out << prefix << "Tdim = " << (Zdim ? Tdim->name() : "(nul)") << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "Ntimes = " << Ntimes << "\n";
-
-for (j=0; j<Ntimes; ++j)  {
-
-   out << p2 << "Time # " << j << " = ";
-
-   unix_to_mdyhms(Time[j], month, day, year, hour, minute, second);
-
-   sprintf(junk, "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
-
-   out << junk << "\n";
-
-}
 
 out << prefix << "\n";
 
@@ -356,8 +299,6 @@ for (j=0; j<Nvars; ++j)  {
 
            if ( Var[j].Dims[k] == Xdim )  out << 'X';
       else if ( Var[j].Dims[k] == Ydim )  out << 'Y';
-      else if ( Var[j].Dims[k] == Zdim )  out << 'Z';
-      else if ( Var[j].Dims[k] == Tdim )  out << 'T';
       else                                out << Var[j].Dims[k]->name();
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
@@ -369,9 +310,7 @@ for (j=0; j<Nvars; ++j)  {
    out << p3 << "Slots (X, Y, Z, T) = (";
 
    if ( Var[j].x_slot >= 0 ) out << Var[j].x_slot; else out << '_';  out << ", ";
-   if ( Var[j].y_slot >= 0 ) out << Var[j].y_slot; else out << '_';  out << ", ";
-   if ( Var[j].z_slot >= 0 ) out << Var[j].z_slot; else out << '_';  out << ", ";
-   if ( Var[j].t_slot >= 0 ) out << Var[j].t_slot; else out << '_';
+   if ( Var[j].y_slot >= 0 ) out << Var[j].y_slot; else out << '_';
 
    out << ")\n";
 
@@ -395,40 +334,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Unixtime PinterpFile::valid_time(int n) const
+int MetNcFile::lead_time() const
 
 {
 
-if ( (n < 0) || (n >= Ntimes) )  {
-
-   cerr << "\n\n  PinterpFile::valid_time(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-
-return ( Time [n] );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int PinterpFile::lead_time(int n) const
-
-{
-
-if ( (n < 0) || (n >= Ntimes) )  {
-
-   cerr << "\n\n  PinterpFile::lead_time(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-Unixtime dt = Time[n] - InitTime;
+Unixtime dt = ValidTime - InitTime;
 
 return ( (int) dt );
 
@@ -438,13 +348,13 @@ return ( (int) dt );
 ////////////////////////////////////////////////////////////////////////
 
 
-double PinterpFile::data(NcVar * var, const LongArray & a) const
+double MetNcFile::data(NcVar * var, const LongArray & a) const
 
 {
 
 if ( !args_ok(a) )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
         << "bad arguments:\n";
 
    a.dump(cerr);
@@ -455,7 +365,7 @@ if ( !args_ok(a) )  {
 
 if ( var->num_dims() != a.n_elements() )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
         << "needed " << (var->num_dims()) << " arguments for variable "
         << (var->name()) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -463,9 +373,9 @@ if ( var->num_dims() != a.n_elements() )  {
 
 }
 
-if ( var->num_dims() >= max_pinterp_args )  {
+if ( var->num_dims() >= max_met_args )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
         << " too may arguments for variable \"" << (var->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -476,13 +386,13 @@ int j;
 float f[2];
 double d[2];
 bool status;
-long counts[max_pinterp_args];
+long counts[max_met_args];
 
 for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
 
 if ( !(var->set_cur((long *) a)) )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
         << " can't set corner for variable \"" << (var->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -501,7 +411,7 @@ switch ( var->type() )  {
       break;
 
    default:
-      cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+      cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
            << " bad type for variable \"" << (var->name()) << "\"\n\n";
       exit ( 1 );
       break;
@@ -522,13 +432,13 @@ return ( d[0] );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(NcVar * v, const LongArray & a, Pgm & image, double & pressure) const
+bool MetNcFile::data(NcVar * v, const LongArray & a, Pgm & image) const
 
 {
 
 if ( !args_ok(a) )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &, WrfData &) const -> "
         << "bad arguments:\n";
 
    a.dump(cerr);
@@ -539,7 +449,7 @@ if ( !args_ok(a) )  {
 
 if ( v->num_dims() != a.n_elements() )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &, WrfData &) -> "
         << "needed " << (v->num_dims()) << " arguments for variable "
         << (v->name()) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -547,9 +457,9 @@ if ( v->num_dims() != a.n_elements() )  {
 
 }
 
-if ( v->num_dims() >= max_pinterp_args )  {
+if ( v->num_dims() >= max_met_args )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &, WrfData &) -> "
         << " too may arguments for variable \"" << (v->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -562,7 +472,6 @@ int x, y;
 double value;
 bool found = false;
 VarInfo * var = (VarInfo *) 0;
-VarInfo * P   = (VarInfo *) 0;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
@@ -573,13 +482,9 @@ image.clear();
 
 image.set_size_xy(Nx, Ny);
 
-pressure = my_bad_data_double;
-
    //
    //  find varinfo's
    //
-
-if ( PressureIndex >= 0 )  P = Var + PressureIndex;
 
 found = false;
 
@@ -591,7 +496,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &, WrfData &) const -> "
         << "variable " << (v->name()) << " not found!\n\n";
 
    exit ( 1 );
@@ -612,7 +517,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       if ( (j != var->x_slot) && (j != var->y_slot) )  {
 
-         cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
+         cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &, WrfData &) const -> "
               << " star found in bad slot\n\n";
 
          exit ( 1 );
@@ -625,7 +530,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
 if ( count != 2 )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &, WrfData &) const -> "
         << " bad star count ... " << count << "\n\n";
 
    exit ( 1 );
@@ -638,11 +543,10 @@ if ( count != 2 )  {
 
 const int x_slot = var->x_slot;
 const int y_slot = var->y_slot;
-const int z_slot = var->z_slot;
 
-if ( (x_slot < 0) || (y_slot < 0) || (z_slot < 0) )  {
+if ( (x_slot < 0) || (y_slot < 0) )  {
 
-   cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
+   cerr << "\n\n  MetNcFile::data(NcVar *, const LongArray &, WrfData &) const -> "
         << " bad x|y|z slot\n\n";
 
    exit ( 1 );
@@ -671,20 +575,6 @@ for (x=0; x<Nx; ++x)  {
 
 }   //  for x
 
-   //
-   //  get the pressure
-   //
-
-if ( P )  {
-
-   LongArray c;
-
-   c.add(a[z_slot]);
-
-   pressure = data(P->var, c);
-
-}
-
 
    //
    //  done
@@ -698,11 +588,11 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(const char * var_name, const LongArray & a, Pgm & image, double & pressure) const
+bool MetNcFile::data(const char * var_name, const LongArray & a, Pgm & image) const
 
 {
 
-int j;
+int j; 
 bool found = false;
 
 for (j=0; j<Nvars; ++j)  {
@@ -713,7 +603,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  return ( false );
 
-found = data(Var[j].var, a, image, pressure);
+found = data(Var[j].var, a, image);
 
    //
    //  done
@@ -727,31 +617,89 @@ return ( found );
 ////////////////////////////////////////////////////////////////////////
 
 
+void MetNcFile::get_times(const NcVar * var)
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+bool valid_time_found = false;
+bool  init_time_found = false;
+
+
+n = var->num_atts();
+
+for (j=0; j<n; ++j)  {
+
+   att = var->get_att(j);
+
+   if ( strcmp(att->name(), valid_time_att_name) == 0 )  {
+
+      valid_time_found = true;
+
+      ValidTime = att->as_int(0);
+
+   }
+
+   if ( strcmp(att->name(), init_time_att_name) == 0 )  {
+
+      init_time_found = true;
+
+      InitTime = att->as_int(0);
+
+   }
+
+   if ( valid_time_found && init_time_found )  break;
+
+}   //  for j
+
+
+if ( !(valid_time_found && init_time_found) )  {
+
+   cerr << "\n\n  MetNcFile::get_times(const NcVar *) -> "
+        << "can't get init and/or valid times for variable "
+        << (var->name()) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+
    //
-   //  Code for misc functions
+   //  done
    //
+
+return;
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-Unixtime parse_init_time(const char * s)
+void MetNcFile::get_level(VarInfo & info)
 
 {
 
-int j;
-Unixtime t;
-int month, day, year, hour, minute, second;
+int j, n;
+NcAtt * att = (NcAtt *) 0;
 
 
-j = sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d", 
-               &year, &month, &day, &hour, &minute, &second);
+info.level.clear();
 
-if ( j != 6 )  {
+n = info.var->num_atts();
 
-   cerr << "\n\n  parse_init_time(const char *) -> bad time string ... \"" << s << "\"\n\n";
+for (j=0; j<n; ++j)  {
 
-   exit ( 1 );
+   att = info.var->get_att(j);
+
+   if ( strcmp(level_att_name, att->as_string(0)) == 0 )  {
+
+      info.level == att->as_string(0);
+
+      return;
+
+   }
 
 }
 
@@ -759,11 +707,17 @@ if ( j != 6 )  {
    //  done
    //
 
-t = mdyhms_to_unix(month, day, year, hour, minute, second);
-
-return ( t );
+return;
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for misc functions
+   //
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -785,6 +739,9 @@ if ( k <   0 )  k = 0;
 
 color.set_gray(k);
 
+   //
+   //  done
+   //
 
 return ( color );
 
@@ -792,8 +749,6 @@ return ( color );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 
 
 

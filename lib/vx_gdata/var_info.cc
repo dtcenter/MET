@@ -21,7 +21,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_gdata/var_info.h"
+#include "var_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -113,6 +113,8 @@ var = (NcVar *) 0;   //  don't delete
 
 name.clear();
 
+level.clear();
+
 Ndims = 0;
 
 if ( Dims )  { delete [] Dims;  Dims = (NcDim **) 0; }
@@ -146,6 +148,9 @@ out << prefix << "name = ";
 
 if ( name.length() > 0 )  out << '\"' << name << '\"';
 else                      out << "(nul)";
+
+if ( level.length() > 0 )  out << '\"' << level << '\"';
+else                       out << "(nul)";
 
 out << "\n";
 
@@ -191,6 +196,8 @@ clear();
 var = i.var;
 
 name = i.name;
+
+level = i.level;
 
 Ndims = i.Ndims;
 

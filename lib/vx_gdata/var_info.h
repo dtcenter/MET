@@ -23,7 +23,7 @@
 
 #include <netcdf.hh>
 
-#include "vx_util/vx_util.h"
+#include "misc.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -52,6 +52,8 @@ class VarInfo {
       NcVar * var;   //  not allocated
 
       ConcatString name;
+
+      ConcatString level;   // nul if N/A
 
       int Ndims;
 
