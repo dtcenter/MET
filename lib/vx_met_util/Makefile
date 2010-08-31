@@ -21,6 +21,7 @@ OBJECTS  = apply_mask.o        \
            met_stats.o         \
            pair_data.o         \
            grid_output.o       \
+           read_gridded_data.o \
            read_netcdf.o       \
            write_netcdf.o      \
            read_grib.o         \
@@ -66,10 +67,13 @@ met_stats.o: met_stats.cc
 	$(CXX) met_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
 
 pair_data.o: pair_data.cc
-	$(CXX) pair_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS)
+	$(CXX) pair_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 read_grib.o: read_grib.cc
 	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
+
+read_gridded_data.o: read_gridded_data.cc
+	$(CXX) read_gridded_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 read_netcdf.o: read_netcdf.cc
 	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
