@@ -96,17 +96,9 @@ static const int n_txt_columns[n_txt] = {
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Input Forecast file
+// Input files
 static ConcatString fcst_file;
-static GribFile     fcst_gb_file;
-static NcFile      *fcst_nc_file = (NcFile *) 0;
-static FileType     fcst_ftype   = NoFileType;
-
-// Input Observation file
 static ConcatString obs_file;
-static GribFile     obs_gb_file;
-static NcFile      *obs_nc_file = (NcFile *) 0;
-static FileType     obs_ftype   = NoFileType;
 
 // Input Config file
 static ConcatString     config_file;

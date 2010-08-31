@@ -93,9 +93,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_command_line  (int, char **);
-static void process_fcst_obs_files();
-static void process_scores        ();
+static void process_command_line(int, char **);
+static void process_scores      ();
 
 static void setup_first_pass(const WrfData &, const Grid &);
 static void setup_txt_files (unixtime, int);
@@ -139,9 +138,6 @@ int main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
-
-   // Process the forecast and observation input files
-   process_fcst_obs_files();
 
    // Compute the scores and write them out
    process_scores();
@@ -227,91 +223,9 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fcst_obs_files() {
-
-   // Switch based on the forecast file type
-   fcst_ftype = get_file_type(fcst_file);
-
-   switch(fcst_ftype) {
-
-      // GRIB file type
-      case(GbFileType):
-
-         // Open the GRIB file
-         if(!(fcst_gb_file.open(fcst_file))) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open GRIB forecast file: "
-                 << fcst_file << "\n\n" << flush;
-            exit(1);
-         }
-         break;
-
-      // NetCDF file type
-      case(NcFileType):
-
-         // Open the NetCDF File
-         fcst_nc_file = new NcFile(fcst_file);
-         if(!fcst_nc_file->is_valid()) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open NetCDF forecast file: "
-                 << fcst_file << "\n\n" << flush;
-            exit(1);
-         }
-         break;
-
-      default:
-         cerr << "\n\nERROR: process_fcst_obs_files() -> "
-              << "unsupported forecast file type: "
-              << fcst_file << "\n\n" << flush;
-         exit(1);
-         break;
-   }
-
-   // Switch based on the observation file type
-   obs_ftype = get_file_type(obs_file);
-
-   switch(obs_ftype) {
-
-      // GRIB file type
-      case(GbFileType):
-
-         // Open the GRIB file
-         if(!(obs_gb_file.open(obs_file))) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open GRIB observation file: "
-                 << obs_file << "\n\n" << flush;
-            exit(1);
-         }
-         break;
-
-      // NetCDF file type
-      case(NcFileType):
-
-         // Open the NetCDF File
-         obs_nc_file = new NcFile(obs_file);
-         if(!obs_nc_file->is_valid()) {
-            cerr << "\n\nERROR: process_fcst_obs_files() -> "
-                 << "can't open NetCDF observation file: "
-                 << obs_file << "\n\n" << flush;
-            exit(1);
-         }
-         break;
-
-      default:
-         cerr << "\n\nERROR: process_fcst_obs_files() -> "
-              << "unsupported observation file type: "
-              << obs_file << "\n\n" << flush;
-         exit(1);
-         break;
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void process_scores() {
-   int i, j, k, m, n, status;
+   int i, j, k, m, n;
+   bool status;
    int max_scal_t, max_prob_t, wind_t, frac_t;
 
    WrfData fcst_wd,        obs_wd;
@@ -355,29 +269,17 @@ void process_scores() {
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      // Continue based on the forecast file type
-      if(fcst_ftype == GbFileType) {
+      // Read the gridded data from the input forecast file
+      status = read_field(fcst_file, conf_info.fcst_gci[i],
+                          fcst_valid_ut, fcst_lead_sec,
+                          fcst_wd, fcst_grid, verbosity);
 
-         status = get_grib_record(fcst_gb_file, fcst_r,
-                                  conf_info.fcst_gci[i],
-                                  fcst_valid_ut, fcst_lead_sec,
-                                  fcst_wd, fcst_grid, verbosity);
-
-         if(status != 0) {
-            cout << "***WARNING***: process_scores() -> "
-                 << conf_info.fcst_gci[i].info_str
-                 << " not found in GRIB file: " << fcst_file
-                 << "\n" << flush;
-            continue;
-         }
-      }
-      // fcst_ftype == NcFileType
-      else {
-
-         read_netcdf(fcst_nc_file,
-                     conf_info.fcst_gci[i].abbr_str.text(),
-                     tmp_str,
-                     fcst_wd, fcst_grid, verbosity);
+      if(!status) {
+         cout << "***WARNING***: process_scores() -> "
+              << conf_info.fcst_gci[i].info_str
+              << " not found in file: " << fcst_file
+              << "\n" << flush;
+         continue;
       }
 
       // Store the forecast lead and valid times
@@ -395,29 +297,17 @@ void process_scores() {
       shc.set_fcst_valid_beg(fcst_valid_ut);
       shc.set_fcst_valid_end(fcst_valid_ut);
 
-      // Continue based on the forecast file type
-      if(obs_ftype == GbFileType) {
+      // Read the gridded data from the input observation file
+      status = read_field(obs_file, conf_info.obs_gci[i],
+                          obs_valid_ut, obs_lead_sec,
+                          obs_wd, obs_grid, verbosity);
 
-         status = get_grib_record(obs_gb_file, obs_r,
-                                  conf_info.obs_gci[i],
-                                  obs_valid_ut, obs_lead_sec,
-                                  obs_wd, obs_grid, verbosity);
-
-         if(status != 0) {
-            cout << "***WARNING***: process_scores() -> "
-                 << conf_info.obs_gci[i].info_str
-                 << " not found in GRIB file: " << obs_file
-                 << "\n" << flush;
-            continue;
-         }
-      }
-      // obs_ftype == NcFileType
-      else {
-
-         read_netcdf(obs_nc_file,
-                     conf_info.obs_gci[i].abbr_str.text(),
-                     tmp_str,
-                     obs_wd, obs_grid, verbosity);
+      if(!status) {
+         cout << "***WARNING***: process_scores() -> "
+              << conf_info.obs_gci[i].info_str
+              << " not found in file: " << obs_file
+              << "\n" << flush;
+         continue;
       }
 
       // Store the observation lead and valid times
@@ -1157,10 +1047,6 @@ void setup_table(AsciiTable &at) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(unixtime valid_ut, int lead_sec) {
-   int mon, day, yr, hr, min, sec;
-   char attribute_str[PATH_MAX], time_str[max_str_len];
-   char hostname_str[max_str_len];
-   unixtime ut;
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
@@ -1175,25 +1061,16 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
       exit(1);
    }
 
-   ut = time(NULL);
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-           yr, mon, day, hr, min, sec);
-
-   gethostname(hostname_str, max_str_len);
-
-   sprintf(attribute_str, "File %s generated %s UTC on host %s",
-           out_nc_file.text(), time_str, hostname_str);
-   nc_out->add_att("FileOrigins", attribute_str);
-   nc_out->add_att("MET_version", met_version);
+   // Add global attributes
+   write_netcdf_global(nc_out, out_nc_file.text(), program_name);
    nc_out->add_att("Difference", "Forecast Value - Observation Value");
+
+   // Add the projection information
+   write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
    lat_dim = nc_out->add_dim("lat", (long) grid.ny());
    lon_dim = nc_out->add_dim("lon", (long) grid.nx());
-
-   // Add the projection information
-   write_netcdf_proj(nc_out, grid);
 
    // Add the lat/lon variables
    write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
@@ -2021,26 +1898,6 @@ void clean_up() {
       nc_out->close();
       delete nc_out;
       nc_out = (NcFile *) 0;
-   }
-
-   // Close the forecast file
-   if(fcst_ftype == NcFileType) {
-      fcst_nc_file->close();
-      delete fcst_nc_file;
-      fcst_nc_file = (NcFile *) 0;
-   }
-   else if(fcst_ftype == GbFileType) {
-      fcst_gb_file.close();
-   }
-
-   // Close the observation file
-   if(obs_ftype == NcFileType) {
-      obs_nc_file->close();
-      delete obs_nc_file;
-      obs_nc_file = (NcFile *) 0;
-   }
-   else if(obs_ftype == GbFileType) {
-      obs_gb_file.close();
    }
 
    // Deallocate memory for the random number generator
