@@ -586,10 +586,6 @@ void process_config() {
 ////////////////////////////////////////////////////////////////////////
 
 void open_netcdf() {
-   int yr, mon, day, hr, min, sec;
-   char attribute_str[PATH_MAX];
-   char hostname_str[max_str_len];
-   char tmp_str[max_str_len];
 
    //
    // Create the output netCDF file for writing
@@ -630,15 +626,7 @@ void open_netcdf() {
    //
    // Add global attributes
    //
-   unix_to_mdyhms(time(NULL), mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-           yr, mon, day, hr, min, sec);
-   gethostname(hostname_str, max_str_len);
-   sprintf(attribute_str,
-           "File %s generated %s UTC on host %s by the PB2NC tool",
-           ncfile.text(), tmp_str, hostname_str);
-   f_out->add_att("FileOrigins", attribute_str);
-   f_out->add_att("MET_version", met_version);
+   write_netcdf_global(f_out, ncfile.text(), program_name);
 
    //
    // Add variable attributes
