@@ -95,7 +95,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line    (int, char **);
-static void process_fcst_climo_files();
 static void setup_first_pass        (const WrfData &, const Grid &);
 
 static void setup_txt_files();
@@ -104,7 +103,7 @@ static void setup_table    (AsciiTable &);
 static void build_outfile_name(unixtime, int, const char *,
                                ConcatString &);
 
-static void process_grib_codes();
+static void process_fcst_climo_files();
 static void process_obs_file(int);
 static void process_scores();
 
@@ -135,9 +134,6 @@ int main(int argc, char *argv[]) {
 
    // Process the forecast and climo files
    process_fcst_climo_files();
-
-   // Process each of the GRIB codes to be verified
-   process_grib_codes();
 
    // Process each observation netCDF file
    for(i=0; i<obs_file.n_elements(); i++) {
@@ -256,93 +252,6 @@ void process_command_line(int argc, char **argv) {
          cout << "Observation File: " << obs_file[i] << "\n" << flush;
       }
    }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_fcst_climo_files() {
-
-   // Switch based on the forecast file type
-   fcst_ftype = get_file_type(fcst_file);
-
-   switch(fcst_ftype) {
-
-      // GRIB file type
-      case(GbFileType):
-
-         // Open the GRIB file
-         if(!(fcst_gb_file.open(fcst_file))) {
-            cerr << "\n\nERROR: process_fcst_climo_files() -> "
-                 << "can't open GRIB forecast file: "
-                 << fcst_file << "\n\n" << flush;
-            exit(1);
-         }
-         break;
-
-      // NetCDF file type
-      case(NcFileType):
-
-         // Open the NetCDF File
-         fcst_nc_file = new NcFile(fcst_file);
-         if(!fcst_nc_file->is_valid()) {
-            cerr << "\n\nERROR: process_fcst_climo_files() -> "
-                 << "can't open NetCDF forecast file: "
-                 << fcst_file << "\n\n" << flush;
-            exit(1);
-         }
-         break;
-
-      default:
-         cerr << "\n\nERROR: process_fcst_climo_files() -> "
-              << "unsupport forecast file type: "
-              << fcst_file << "\n\n" << flush;
-         exit(1);
-         break;
-   }
-
-   // Open the climo file if specified
-   if(climo_flag) {
-
-      // Switch based on the forecast file type
-      climo_ftype = get_file_type(climo_file);
-
-      switch(climo_ftype) {
-
-         // GRIB file type
-         case(GbFileType):
-
-            // Open the GRIB file
-            if(!(climo_gb_file.open(climo_file))) {
-               cerr << "\n\nERROR: process_climo_climo_files() -> "
-                    << "can't open GRIB climatology file: "
-                    << climo_file << "\n\n" << flush;
-               exit(1);
-            }
-            break;
-
-         // NetCDF file type
-         case(NcFileType):
-
-            // Open the NetCDF File
-            climo_nc_file = new NcFile(climo_file);
-            if(!climo_nc_file->is_valid()) {
-               cerr << "\n\nERROR: process_climo_climo_files() -> "
-                    << "can't open NetCDF climatology file: "
-                    << climo_file << "\n\n" << flush;
-               exit(1);
-            }
-            break;
-
-         default:
-            cerr << "\n\nERROR: process_climo_climo_files() -> "
-                 << "unsupport climatology file type: "
-                 << climo_file << "\n\n" << flush;
-            exit(1);
-            break;
-      }
-   } // end if climo_flag
 
    return;
 }
@@ -565,24 +474,20 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_grib_codes() {
-   int i, j, status;
-   int n_fcst_rec,  fcst_rec[max_n_rec], fcst_lvl[max_n_rec];
-   int n_climo_rec, climo_rec[max_n_rec], climo_lvl[max_n_rec];
-   Grid data_grid;
-   GCInfo gc_info;
-   GribRecord rec;
+void process_fcst_climo_files() {
+   int i, j;
+   int n_fcst_rec, n_climo_rec;
+   NumArray fcst_lvl_na, climo_lvl_na;
+   Grid fcst_grid, climo_grid;
    unixtime file_ut, beg_ut, end_ut;
-   char tmp_str[max_str_len];
 
    // Allocate space to store the forecast and climo fields for each
    // GRIB code.
    fcst_wd  = new WrfData * [conf_info.get_n_vx()];
    climo_wd = new WrfData * [conf_info.get_n_vx()];
 
-   // Loop through each of the GRIB codes to be verified and extract
-   // the forecast and climatological fields from the GRIB files needed
-   // for verification
+   // Loop through each of the fields to be verified and extract
+   // the forecast and climatological fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Initialize the WrfData pointers
@@ -596,30 +501,35 @@ void process_grib_codes() {
               << ".\n" << flush;
       }
 
-      // Process the forecast file in NetCDF format
-      if(fcst_ftype == NcFileType) {
-         n_fcst_rec = 1;
+      // Read the gridded data from the input forecast file
+      n_fcst_rec = read_field_levels(fcst_file, conf_info.gc_pd[i].fcst_gci,
+                                     fcst_valid_ut, fcst_lead_sec,
+                                     fcst_wd[i], fcst_lvl_na, fcst_grid, verbosity);
+
+      // Check for zero fields
+      if(n_fcst_rec == 0) {
+         cerr << "\n\nERROR: process_fcst_climo_files() -> "
+              << "no records matching "
+              << conf_info.gc_pd[i].fcst_gci.info_str
+              << " found in file: "
+              << fcst_file << "\n" << flush;
+         exit(1);
       }
-      // GRIB format
-      // Compute a list of GRIB records for this GRIB code which
-      // fall within the requested range of levels from the forecast
-      // and climatological data, including one level above and one
-      // level below the range
+
+      // If the grid is unset, process it
+      if(grid.nx() == 0 && grid.ny() == 0) {
+
+         // Setup the first pass through the data
+         setup_first_pass(fcst_wd[i][0], fcst_grid);
+      }
+      // Check to make sure that the grid has not changed
       else {
 
-         n_fcst_rec = find_grib_record_levels(fcst_gb_file,
-                         conf_info.gc_pd[i].fcst_gci,
-                         fcst_valid_ut, fcst_lead_sec,
-                         fcst_rec, fcst_lvl);
-
-         if(n_fcst_rec == 0) {
-            cerr << "\n\nERROR: process_grib_codes() -> "
-                 << "no records matching GRIB code "
-                 << conf_info.gc_pd[i].fcst_gci.code
-                 << " with level indicator of "
-                 << conf_info.gc_pd[i].fcst_gci.lvl_str
-                 << " found in GRIB file: "
-                 << fcst_file << "\n" << flush;
+         if(!(fcst_grid == grid)) {
+            cerr << "\n\nERROR: process_fcst_climo_files() -> "
+                 << "The forecast grid has changed for field "
+                 << conf_info.gc_pd[i].fcst_gci.info_str << ".\n\n"
+                 << flush;
             exit(1);
          }
       }
@@ -627,26 +537,18 @@ void process_grib_codes() {
       // Process the climo file if specified
       if(climo_flag) {
 
-         // NetCDF format
-         if(climo_ftype == NcFileType) {
-            n_climo_rec = 1;
-         }
-         // GRIB format
-         else {
-            n_climo_rec = find_grib_record_levels(climo_gb_file,
-                             conf_info.gc_pd[i].fcst_gci,
-                             climo_rec, climo_lvl);
+         // Read the gridded data from the input forecast file
+         n_climo_rec = read_field_levels(climo_file, conf_info.gc_pd[i].fcst_gci,
+                                         fcst_valid_ut, fcst_lead_sec,
+                                         climo_wd[i], climo_lvl_na, climo_grid, verbosity);
 
-            if(n_climo_rec == 0) {
-               cerr << "\n\nERROR: process_grib_codes() -> "
-                    << "no records matching GRIB code "
-                    << conf_info.gc_pd[i].fcst_gci.code
-                    << " with level indicator of "
-                    << conf_info.gc_pd[i].fcst_gci.lvl_str
-                    << " found in GRIB file: "
-                    << fcst_file << "\n" << flush;
-               exit(1);
-            }
+         // Check that the grid has not changed
+         if(!(climo_grid == grid)) {
+            cerr << "\n\nERROR: process_fcst_climo_files() -> "
+                 << "The climatology grid has changed for field "
+                 << conf_info.gc_pd[i].fcst_gci.info_str << ".\n\n"
+                 << flush;
+            exit(1);
          }
       }
       // No climo file specified
@@ -654,84 +556,19 @@ void process_grib_codes() {
          n_climo_rec = 0;
       }
 
-      // Dump out the number of levels found
-      if(verbosity > 1) {
-         cout << "For "
-              << conf_info.gc_pd[i].fcst_gci.info_str
-              << " found " << n_fcst_rec
-              << " forecast levels and " << n_climo_rec
-              << " climatology levels.\n" << flush;
+      // Store information for the raw forecast fields
+      conf_info.gc_pd[i].set_n_fcst(n_fcst_rec);
+      for(j=0; j<n_fcst_rec; j++) {
+         conf_info.gc_pd[i].set_fcst_lvl(j, fcst_lvl_na[j]);
+         conf_info.gc_pd[i].set_fcst_wd_ptr(j, &fcst_wd[i][j]);
       }
 
-      // Allocate space to store the forecast and climo fields
-      if(n_fcst_rec > 0) fcst_wd[i]  = new WrfData [n_fcst_rec];
-      if(n_fcst_rec > 0) climo_wd[i] = new WrfData [n_climo_rec];
-
-      // Set the number of pointers to the raw forecast and climo fields
-      conf_info.gc_pd[i].set_n_fcst(n_fcst_rec);
+      // Store information for the raw climo fields
       conf_info.gc_pd[i].set_n_climo(n_climo_rec);
-
-      // Read in the forecast fields for this GRIB code
-      for(j=0; j<n_fcst_rec; j++) {
-
-         // NetCDF format
-         if(fcst_ftype == NcFileType) {
-            read_netcdf(fcst_nc_file,
-                        conf_info.gc_pd[i].fcst_gci.abbr_str.text(),
-                        tmp_str,
-                        fcst_wd[i][j], data_grid, verbosity);
-         }
-         // GRIB format
-         else {
-
-            // Initialize the GCInfo object
-            gc_info = conf_info.gc_pd[i].fcst_gci;
-
-            // Set the current level value for the record to retrieve.
-            gc_info.lvl_1 = fcst_lvl[j];
-            gc_info.lvl_2 = fcst_lvl[j];
-
-            status = get_grib_record(fcst_gb_file, rec, gc_info,
-                                     fcst_valid_ut, fcst_lead_sec,
-                                     fcst_wd[i][j], data_grid,
-                                     verbosity);
-
-            if(status != 0) {
-               cerr << "\n\nERROR: process_grib_codes() -> "
-                    << "no records matching GRIB code "
-                    << conf_info.gc_pd[i].fcst_gci.code
-                    << " with level indicator of "
-                    << conf_info.gc_pd[i].fcst_gci.lvl_str
-                    << " found in GRIB file: "
-                    << fcst_file << "\n" << flush;
-               exit(1);
-            }
-         }
-
-         // If the grid is unset, process it
-         if(grid.nx() == 0 && grid.ny() == 0) {
-
-            // Setup the first pass through the data
-            setup_first_pass(fcst_wd[i][j], data_grid);
-         }
-         // For multiple verification fields, check to make sure that the
-         // grid dimensions don't change
-         else {
-
-            // Check that the grid has not changed
-            if(!(data_grid == grid)) {
-               cerr << "\n\nERROR: process_grib_codes() -> "
-                    << "The forecast grid has changed for GRIB code "
-                    << conf_info.gc_pd[i].fcst_gci.code << ".\n\n"
-                    << flush;
-               exit(1);
-            }
-         }
-
-         // Store information for the raw forecast fields
-         conf_info.gc_pd[i].set_fcst_lvl(j, fcst_lvl[j]);
-         conf_info.gc_pd[i].set_fcst_wd_ptr(j, &fcst_wd[i][j]);
-      } // end for j
+      for(j=0; j<n_climo_rec; j++) {
+         conf_info.gc_pd[i].set_climo_lvl(j, climo_lvl_na[j]);
+         conf_info.gc_pd[i].set_climo_wd_ptr(j, &climo_wd[i][j]);
+      }
 
       // Get the valid time for the first field
       file_ut = fcst_wd[i][0].get_valid_time();
@@ -761,52 +598,15 @@ void process_grib_codes() {
          }
       } // end for j
 
-      // Read in the climatology fields for this GRIB code
-      for(j=0; j<n_climo_rec; j++) {
+      // Dump out the number of levels found
+      if(verbosity > 1) {
+         cout << "For "
+              << conf_info.gc_pd[i].fcst_gci.info_str
+              << " found " << n_fcst_rec
+              << " forecast levels and " << n_climo_rec
+              << " climatology levels.\n" << flush;
+      }
 
-         // NetCDF format
-         if(climo_ftype == NcFileType) {
-            read_netcdf(climo_nc_file,
-                        conf_info.gc_pd[i].fcst_gci.abbr_str.text(),
-                        tmp_str,
-                        climo_wd[i][j], data_grid, verbosity);
-         }
-         // GRIB format
-         else {
-            gc_info = conf_info.gc_pd[i].fcst_gci;
-            gc_info.lvl_1 = climo_lvl[j];
-            gc_info.lvl_2 = climo_lvl[j];
-
-            status = get_grib_record(climo_gb_file, rec,
-                                     gc_info, climo_wd[i][j],
-                                     data_grid, verbosity);
-
-            if(status != 0) {
-               cerr << "\n\nERROR: process_grib_codes() -> "
-                    << "no records matching GRIB code "
-                    << conf_info.gc_pd[i].fcst_gci.code
-                    << " with level indicator of "
-                    << conf_info.gc_pd[i].fcst_gci.lvl_str
-                    << " found in GRIB file: "
-                    << climo_file << "\n" << flush;
-               exit(1);
-            }
-         }
-
-         // Check that the grid has not changed
-         if(!(data_grid == grid)) {
-            cerr << "\n\nERROR: process_grib_codes() -> "
-                 << "The climatology grid has changed for GRIB code "
-                 << conf_info.gc_pd[i].fcst_gci.code << ".\n\n"
-                 << flush;
-            exit(1);
-         }
-
-         // Store information for the raw climo fields
-         conf_info.gc_pd[i].set_climo_lvl(j, climo_lvl[j]);
-         conf_info.gc_pd[i].set_climo_wd_ptr(j, &climo_wd[i][j]);
-
-      } // end for j
    } // end for i
 
    if(verbosity > 1) {
@@ -1866,26 +1666,6 @@ void clean_up() {
 
    // Close the output text files that were open for writing
    finish_txt_files();
-
-   // Close the forecast file
-   if(fcst_ftype == NcFileType) {
-      fcst_nc_file->close();
-      delete fcst_nc_file;
-      fcst_nc_file = (NcFile *) 0;
-   }
-   else if(fcst_ftype == GbFileType) {
-      fcst_gb_file.close();
-   }
-
-   // Close the climatology file
-   if(climo_flag && climo_ftype == NcFileType) {
-      climo_nc_file->close();
-      delete climo_nc_file;
-      climo_nc_file = (NcFile *) 0;
-   }
-   else if(climo_flag && climo_ftype == GbFileType) {
-      climo_gb_file.close();
-   }
 
    // Deallocate memory
    for(i=0; i<conf_info.get_n_vx(); i++) {
