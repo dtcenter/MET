@@ -76,14 +76,14 @@ static void build_outfile_name(unixtime, const char *,
                                ConcatString &);
 
 static void write_ens_nc(int, WrfData &);
-static void write_ens_var_float(int, float *, const char *, WrfData &);
-static void write_ens_var_int(int, int *, const char *, WrfData &);
+static void write_ens_var_float(int, float *, const char *, WrfData &, const char *);
+static void write_ens_var_int(int, int *, const char *, WrfData &, const char *);
 
 static void write_orank_nc(EnsPairData &, WrfData &, int, int, int);
-static void write_orank_var_float(int, int, int, float *, const char *, WrfData &);
-static void write_orank_var_int(int, int, int, int *, const char *, WrfData &);
+static void write_orank_var_float(int, int, int, float *, const char *, WrfData &, const char *);
+static void write_orank_var_int(int, int, int, int *, const char *, WrfData &, const char *);
 
-static void add_var_att(int, NcVar *, int, WrfData &);
+static void add_var_att(int, NcVar *, int, WrfData &, const char *);
 
 static void finish_txt_files();
 static void clean_up();
@@ -1517,42 +1517,50 @@ void write_ens_nc(int i_gc, WrfData &wd) {
 
    // Add the ensemble mean if requested
    if(conf_info.conf.output_flag(i_nc_mean).ival()) {
-      write_ens_var_float(i_gc, ens_mean, "ENS_MEAN", wd);
+      write_ens_var_float(i_gc, ens_mean, "ENS_MEAN", wd,
+                          "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation if requested
    if(conf_info.conf.output_flag(i_nc_stdev).ival()) {
-      write_ens_var_float(i_gc, ens_stdev, "ENS_STDEV", wd);
+      write_ens_var_float(i_gc, ens_stdev, "ENS_STDEV", wd,
+                          "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation if requested
    if(conf_info.conf.output_flag(i_nc_minus).ival()) {
-      write_ens_var_float(i_gc, ens_minus, "ENS_MINUS", wd);
+      write_ens_var_float(i_gc, ens_minus, "ENS_MINUS", wd,
+                          "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation if requested
    if(conf_info.conf.output_flag(i_nc_plus).ival()) {
-      write_ens_var_float(i_gc, ens_plus, "ENS_PLUS", wd);
+      write_ens_var_float(i_gc, ens_plus, "ENS_PLUS", wd,
+                          "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value if requested
    if(conf_info.conf.output_flag(i_nc_min).ival()) {
-      write_ens_var_float(i_gc, ens_min, "ENS_MIN", wd);
+      write_ens_var_float(i_gc, ens_min, "ENS_MIN", wd,
+                          "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value if requested
    if(conf_info.conf.output_flag(i_nc_max).ival()) {
-      write_ens_var_float(i_gc, ens_max, "ENS_MAX", wd);
+      write_ens_var_float(i_gc, ens_max, "ENS_MAX", wd,
+                          "Ensemble Maximum");
    }
 
    // Add the ensemble range if requested
    if(conf_info.conf.output_flag(i_nc_range).ival()) {
-      write_ens_var_float(i_gc, ens_range, "ENS_RANGE", wd);
+      write_ens_var_float(i_gc, ens_range, "ENS_RANGE", wd,
+                          "Ensemble Range");
    }
 
    // Add the ensemble valid data count if requested
    if(conf_info.conf.output_flag(i_nc_vld).ival()) {
-      write_ens_var_int(i_gc, ens_vld, "ENS_VLD", wd);
+      write_ens_var_int(i_gc, ens_vld, "ENS_VLD", wd,
+                        "Ensemble Valid Data Count");
    }
 
    // Add the ensemble relative frequencies if requested
@@ -1578,7 +1586,8 @@ void write_ens_nc(int i_gc, WrfData &wd) {
          } // end for j
 
          // Write the ensemble relative frequency
-         write_ens_var_float(i_gc, ens_freq, var_str, wd);
+         write_ens_var_float(i_gc, ens_freq, var_str, wd,
+                             "Ensemble Relative Frequency");
 
       } // end for i
    } // end if
@@ -1599,7 +1608,8 @@ void write_ens_nc(int i_gc, WrfData &wd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(int i_gc, float *ens_data, const char *var_str, WrfData &wd) {
+void write_ens_var_float(int i_gc, float *ens_data, const char *var_str,
+                         WrfData &wd, const char *long_name_str) {
    NcVar *ens_var;
    char ens_var_name[max_str_len];
 
@@ -1610,7 +1620,7 @@ void write_ens_var_float(int i_gc, float *ens_data, const char *var_str, WrfData
    ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_gc, ens_var, 0, wd);
+   add_var_att(i_gc, ens_var, 0, wd, long_name_str);
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
@@ -1625,7 +1635,8 @@ void write_ens_var_float(int i_gc, float *ens_data, const char *var_str, WrfData
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(int i_gc, int *ens_data, const char *var_str, WrfData &wd) {
+void write_ens_var_int(int i_gc, int *ens_data, const char *var_str,
+                       WrfData &wd, const char *long_name_str) {
    NcVar *ens_var;
    char ens_var_name[max_str_len];
 
@@ -1636,7 +1647,7 @@ void write_ens_var_int(int i_gc, int *ens_data, const char *var_str, WrfData &wd
    ens_var = nc_out->add_var(ens_var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_gc, ens_var, 1, wd);
+   add_var_att(i_gc, ens_var, 1, wd, long_name_str);
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
@@ -1686,13 +1697,16 @@ void write_orank_nc(EnsPairData &pd, WrfData &wd,
    } // end for i
 
    // Add the observation values
-   write_orank_var_float(i_gc, i_interp, i_mask, obs_v, "OBS", wd);
+   write_orank_var_float(i_gc, i_interp, i_mask, obs_v, "OBS", wd,
+                         "Observation Value");
 
    // Add the observation ranks
-   write_orank_var_int(i_gc, i_interp, i_mask, obs_rank, "OBS_RANK", wd);
+   write_orank_var_int(i_gc, i_interp, i_mask, obs_rank, "OBS_RANK", wd,
+                       "Observation Rank");
 
    // Add the number of valid ensemble members
-   write_orank_var_int(i_gc, i_interp, i_mask, ens_vld, "ENS_VLD", wd);
+   write_orank_var_int(i_gc, i_interp, i_mask, ens_vld, "ENS_VLD", wd,
+                       "Ensemble Valid Data Count");
 
    // Deallocate and clean up
    if(obs_v)    { delete [] obs_v;    obs_v    = (float *) 0; }
@@ -1705,7 +1719,8 @@ void write_orank_nc(EnsPairData &pd, WrfData &wd,
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_var_float(int i_gc, int i_interp, int i_mask,
-                           float *data, const char *var_str, WrfData &wd) {
+                           float *data, const char *var_str,
+                           WrfData &wd, const char *long_name_str) {
    NcVar *nc_var;
    int wdth;
    char var_name[max_str_len], mthd_str[max_str_len];
@@ -1738,7 +1753,7 @@ void write_orank_var_float(int i_gc, int i_interp, int i_mask,
    nc_var = nc_out->add_var(var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_gc, nc_var, 0, wd);
+   add_var_att(i_gc, nc_var, 0, wd, long_name_str);
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
@@ -1754,7 +1769,8 @@ void write_orank_var_float(int i_gc, int i_interp, int i_mask,
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_var_int(int i_gc, int i_interp, int i_mask,
-                         int *data, const char *var_str, WrfData &wd) {
+                         int *data, const char *var_str,
+                         WrfData &wd, const char *long_name_str) {
    NcVar *nc_var;
    int wdth;
    char var_name[max_str_len], mthd_str[max_str_len];
@@ -1787,7 +1803,7 @@ void write_orank_var_int(int i_gc, int i_interp, int i_mask,
    nc_var = nc_out->add_var(var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_gc, nc_var, 1, wd);
+   add_var_att(i_gc, nc_var, 1, wd, long_name_str);
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
@@ -1802,35 +1818,46 @@ void write_orank_var_int(int i_gc, int i_interp, int i_mask,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att(int i_gc, NcVar *ens_var, int flag, WrfData &wd) {
+void add_var_att(int i_gc, NcVar *ens_var, int flag,
+                 WrfData &wd, const char *long_name_str) {
    char tmp_str[max_str_len];
    unixtime ut;
-   int mon, day, yr, hr, min, sec;
+   int sec;
+
+   // Construct the long name
+   sprintf(tmp_str, "%s at %s %s",
+      conf_info.ens_gci[i_gc].abbr_str.text(),
+      conf_info.ens_gci[i_gc].lvl_str.text(),
+      long_name_str);
 
    // Add variable attributes
-   get_grib_code_abbr(conf_info.ens_gci[i_gc].code,
-                      conf_info.conf.grib_ptv().ival(),
-                      tmp_str);
-   ens_var->add_att("name", tmp_str);
-   get_grib_code_unit(conf_info.ens_gci[i_gc].code,
-                      conf_info.conf.grib_ptv().ival(),
-                      tmp_str);
-   ens_var->add_att("units", tmp_str);
-   get_grib_code_name(conf_info.ens_gci[i_gc].code,
-                      conf_info.conf.grib_ptv().ival(),
-                      tmp_str);
+   ens_var->add_att("units", conf_info.ens_gci[i_gc].unit_str.text());
    ens_var->add_att("long_name", tmp_str);
    ens_var->add_att("level", conf_info.ens_gci[i_gc].lvl_str.text());
 
    if(flag) ens_var->add_att("_FillValue", bad_data_int);
    else     ens_var->add_att("_FillValue", bad_data_float);
 
+   // Initialization time
+   ut  = wd.get_valid_time();
+   sec = wd.get_lead_time();
+   ut -= sec;
+   unix_to_yyyymmdd_hhmmss(ut, tmp_str);
+   ens_var->add_att("init_time", tmp_str);
+   ens_var->add_att("init_time_ut", (long int) ut);
+
+   // Valid time
    ut = wd.get_valid_time();
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-           yr, mon, day, hr, min, sec);
+   unix_to_yyyymmdd_hhmmss(ut, tmp_str);
    ens_var->add_att("valid_time", tmp_str);
    ens_var->add_att("valid_time_ut", (long int) ut);
+
+   // Accum time
+   if((sec = wd.get_accum_time()) > 0) {
+      sec_to_hhmmss(sec, tmp_str);
+      ens_var->add_att("accum_time", tmp_str);
+      ens_var->add_att("accum_time_sec", (long int) sec);
+   }
 
    return;
 }
