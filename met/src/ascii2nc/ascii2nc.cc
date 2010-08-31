@@ -307,11 +307,7 @@ void open_met_ascii(LineDataFile &f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
-   int mon, day, yr, hr, min, sec;
    int i_obs, i_hdr;
-   char tmp_str[max_str_len];
-   char hostname_str[max_str_len];
-   char attribute_str[PATH_MAX];
    DataLine dl;
 
    ConcatString hdr_typ, prev_hdr_typ;
@@ -368,13 +364,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
    //
    // Add global attributes
    //
-   unix_to_mdyhms(time(NULL), mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2i", yr, mon, day, hr, min, sec);
-   gethostname(hostname_str, max_str_len);
-   sprintf(attribute_str, "File %s generated %s UTC on host %s by the ASCII2NC tool",
-           ncfile.text(), tmp_str, hostname_str);
-   f_out->add_att("FileOrigins", attribute_str);
-   f_out->add_att("MET_version", met_version);
+   write_netcdf_global(f_out, ncfile.text(), program_name);
 
    if(verbosity > 1) {
       cout << "Processing " << nrow << " observations.\n" << flush;
