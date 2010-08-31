@@ -48,14 +48,14 @@ extern int two_to_one_grib_1_1_1(Grid &, int, int);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int has_grib_code(GribFile &grib_file, int gc) {
+bool has_grib_code(GribFile &grib_file, int gc) {
    int i;
-   int found = 0;
+   bool found = false;
 
    for(i=0; i<grib_file.n_records(); i++) {
 
       if(grib_file.gribcode(i) == gc) {
-         found = 1;
+         found = true;
          break;
       }
    }
@@ -65,9 +65,9 @@ int has_grib_code(GribFile &grib_file, int gc) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
-                    const GCInfo &gc_info,
-                    WrfData &wd, Grid &gr, int &verbosity) {
+bool get_grib_record(GribFile &grib_file, GribRecord &grib_record,
+                     const GCInfo &gc_info,
+                     WrfData &wd, Grid &gr, int &verbosity) {
 
    return(get_grib_record(grib_file, grib_record, gc_info,
                           (unixtime) 0, bad_data_int, wd, gr, verbosity));
@@ -75,10 +75,10 @@ int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
-                    const GCInfo &gc_info, const unixtime req_vld_ut,
-                    const int req_lead_sec,
-                    WrfData &wd, Grid &gr, int &verbosity) {
+bool get_grib_record(GribFile &grib_file, GribRecord &grib_record,
+                     const GCInfo &gc_info, const unixtime req_vld_ut,
+                     const int req_lead_sec,
+                     WrfData &wd, Grid &gr, int &verbosity) {
    int i_rec, gc;
 
    // Store the GRIB code
@@ -89,7 +89,7 @@ int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
 
    // If the GRIB record is not found and can't be derived
    if(i_rec < 0 && gc != wdir_grib_code && gc != wind_grib_code) {
-      return(-1);
+      return(false);
    }
 
    // Derive the wind direction
@@ -105,7 +105,7 @@ int get_grib_record(GribFile &grib_file, GribRecord &grib_record,
       read_grib_record(grib_file, grib_record, i_rec, gc_info, wd, gr, verbosity);
    }
 
-   return(0);
+   return(true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1259,15 +1259,16 @@ double decode_lat_lon(const unsigned char *p, int n) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int all_bits_set(const unsigned char *p, int n) {
-   int status, i;
+bool all_bits_set(const unsigned char *p, int n) {
+   int i;
+   bool status;
    unsigned char c;
 
    //
    // Check whether or not all the bits in the unsigned char are set to 1
    //
 
-   status = 1;
+   status = true;
 
    for(i=0; i<n; i++) {
 
@@ -1318,7 +1319,7 @@ void get_level_info(const GribRecord &r, int &l1, int &l2) {
 //
 //////////////////////////////////////////////////////////////////////////////
 
-int is_grid_relative(const GribRecord &r) {
+bool is_grid_relative(const GribRecord &r) {
    unsigned char res_flag;
 
    // LatLon
@@ -1348,7 +1349,7 @@ int is_grid_relative(const GribRecord &r) {
    // Return whether the 5th bit of the res_flag (Octet 17) is on, which
    // indicates that U and V are defined relative to the grid
    //
-   return(get_bit_from_octet(res_flag, 5));
+   return(get_bit_from_octet(res_flag, 5) == 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////

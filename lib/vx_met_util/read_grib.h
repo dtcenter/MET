@@ -21,11 +21,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern int    has_grib_code(GribFile &, int);
+extern bool   has_grib_code(GribFile &, int);
 
-extern int    get_grib_record(GribFile &, GribRecord &, const GCInfo &,
+extern bool   get_grib_record(GribFile &, GribRecord &, const GCInfo &,
                               WrfData &, Grid &, int &);
-extern int    get_grib_record(GribFile &, GribRecord &, const GCInfo &,
+extern bool   get_grib_record(GribFile &, GribRecord &, const GCInfo &,
                               const unixtime, const int,
                               WrfData &, Grid &, int &);
 
@@ -65,11 +65,11 @@ extern void   read_pds_prob(GribRecord &, int &, double &, double &);
 
 extern double decode_lat_lon(const unsigned char *, int);
 
-extern int    all_bits_set(const unsigned char *, int);
+extern bool   all_bits_set(const unsigned char *, int);
 
 extern void   get_level_info(const GribRecord &, int &, int &);
 
-extern int    is_grid_relative(const GribRecord &);
+extern bool   is_grid_relative(const GribRecord &);
 
 extern int    get_bit_from_octet(unsigned char, int);
 
