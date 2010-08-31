@@ -55,9 +55,10 @@ class GCInfo {
 
       //////////////////////////////////////////////////////////////////
 
-      ConcatString abbr_str; // GRIB code abbreviation string
+      ConcatString abbr_str; // Abbreviation string
       ConcatString lvl_str;  // Level defined in config file
       ConcatString info_str; // abbr_str/lvl_str
+      ConcatString unit_str; // Units
 
       int          code;     // GRIB code itself
 
@@ -89,6 +90,7 @@ class GCInfo {
       void set_abbr_str(const char *);
       void set_lvl_str(const char *);
       void set_info_str(const char *);
+      void set_unit_str(const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////
