@@ -20,6 +20,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+extern void write_netcdf_global(NcFile *, const char *, const char *);
 extern void write_netcdf_proj(NcFile *, const Grid &);
 extern void write_netcdf_latlon(NcFile *, NcDim *, NcDim *, const Grid &);
 

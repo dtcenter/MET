@@ -23,6 +23,33 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void write_netcdf_global(NcFile * f_out, const char *file_name,
+                         const char *program_name)
+
+{
+
+int yr, mon, day, hr, min, sec;
+char attribute_str[PATH_MAX];
+char hostname_str[max_str_len];
+char time_str[max_str_len];
+
+unix_to_mdyhms(time(NULL), mon, day, yr, hr, min, sec);
+sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
+        yr, mon, day, hr, min, sec);
+gethostname(hostname_str, max_str_len);
+sprintf(attribute_str,
+        "File %s generated %s UTC on host %s by the MET %s tool",
+        file_name, time_str, hostname_str, program_name);
+f_out->add_att("FileOrigins", attribute_str);
+f_out->add_att("MET_version", met_version);
+f_out->add_att("MET_tool", program_name);
+
+return;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void write_netcdf_proj(NcFile * f_out, const Grid & grid)
 
 {
