@@ -90,9 +90,6 @@ static const int n_txt_columns[n_txt] = {
    n_pjc_columns,    n_prc_columns,    n_mpr_columns
 };
 
-// Maximum number of GRIB records
-static const int max_n_rec = 300;
-
 // Observation header length
 static const int hdr_arr_len = 3;
 
@@ -105,19 +102,9 @@ static const int obs_arr_len = 5;
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Input Forecast file
+// Input files
 static ConcatString fcst_file;
-static GribFile     fcst_gb_file;
-static NcFile      *fcst_nc_file = (NcFile *) 0;
-static FileType     fcst_ftype   = NoFileType;
-
-// Input Climatology file
 static ConcatString climo_file;
-static GribFile     climo_gb_file;
-static NcFile      *climo_nc_file = (NcFile *) 0;
-static FileType     climo_ftype   = NoFileType;
-
-// Input Observation file
 static StringArray  obs_file;
 
 // Input Config file
