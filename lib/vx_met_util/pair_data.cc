@@ -94,6 +94,7 @@ void GCInfo::clear() {
    abbr_str.clear();
    lvl_str.clear();
    info_str.clear();
+   unit_str.clear();
 
    code       = 0;
    lvl_type   = NoLevel;
@@ -123,6 +124,7 @@ void GCInfo::assign(const GCInfo &c) {
    abbr_str   = c.abbr_str;
    lvl_str    = c.lvl_str;
    info_str   = c.info_str;
+   unit_str   = c.unit_str;
 
    code       = c.code;
 
@@ -323,6 +325,10 @@ void GCInfo::set_gcinfo_grib(const char *c, int ptv) {
    sprintf(tmp_str, "%s/%s", abbr_str.text(), lvl_str.text());
    set_info_str(tmp_str);
 
+   // Set the unit_str
+   get_grib_code_unit(code, ptv, tmp_str);
+   set_unit_str(tmp_str);
+
    return;
 }
 
@@ -404,6 +410,9 @@ void GCInfo::set_gcinfo_nc(const char *c) {
       ptr = NULL;
    }
 
+   // Set the unit_str
+   set_unit_str(na_str);
+
    return;
 }
 
@@ -436,6 +445,17 @@ void GCInfo::set_info_str(const char *c) {
    info_str.clear();
 
    info_str = c;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GCInfo::set_unit_str(const char *c) {
+
+   unit_str.clear();
+
+   unit_str = c;
 
    return;
 }
