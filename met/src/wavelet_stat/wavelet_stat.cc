@@ -742,10 +742,6 @@ void setup_table(AsciiTable &at) {
 
 void setup_nc_file(unixtime valid_ut, int lead_sec) {
    int i, x, y;
-   int yr, mon, day, hr, min, sec;
-   char attribute_str[max_str_len], time_str[max_str_len];
-   char hostname_str[max_str_len];
-   unixtime ut;
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, ".nc", out_nc_file);
@@ -760,16 +756,8 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
       exit(1);
    }
 
-   ut = time(NULL);
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i", yr, mon, day, hr, min, sec);
-
-   gethostname(hostname_str, max_str_len);
-
-   sprintf(attribute_str, "File %s generated %s UTC on host %s",
-           out_nc_file.text(), time_str, hostname_str);
-   nc_out->add_att("FileOrigins", attribute_str);
-   nc_out->add_att("MET_version", met_version);
+   // Add global attributes
+   write_netcdf_global(nc_out, out_nc_file.text(), program_name);
    nc_out->add_att("Difference", "Forecast Value - Observation Value");
 
    // Set the NetCDF dimensions
