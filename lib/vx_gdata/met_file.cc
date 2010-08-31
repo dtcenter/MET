@@ -21,10 +21,11 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math.h"
+#include "vx_math/vx_math.h"
+#include "vx_met_util/vx_met_util.h"
 
-#include "vx_gdata_util.h"
-#include "met_file.h"
+#include "vx_gdata/vx_gdata_util.h"
+#include "vx_gdata/met_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -123,8 +124,8 @@ Nvars = 0;
 
 if ( Var )  { delete [] Var;  Var = (VarInfo *) 0; }
 
-ValidTime = (Unixtime) 0;
-InitTime  = (Unixtime) 0;
+ValidTime = (unixtime) 0;
+InitTime  = (unixtime) 0;
 
    //
    //  done
@@ -338,7 +339,7 @@ int MetNcFile::lead_time() const
 
 {
 
-Unixtime dt = ValidTime - InitTime;
+unixtime dt = ValidTime - InitTime;
 
 return ( (int) dt );
 

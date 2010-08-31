@@ -25,11 +25,11 @@
 
 #include <netcdf.hh>
 
-#include "grid.h"
-#include "pxm.h"
+#include "vx_data_grids/grid.h"
+#include "vx_pxm/vx_pxm.h"
+#include "vx_util/long_array.h"
 
-#include "var_info.h"
-#include "long_array.h"
+#include "vx_gdata/var_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,11 +65,11 @@ class PinterpFile {
 
       int Ntimes;
 
-      Unixtime * Time;  //  allocated
+      unixtime * Time;  //  allocated
 
-      Unixtime InitTime;
+      unixtime InitTime;
 
-      Unixtime valid_time (int) const;
+      unixtime valid_time (int) const;
       int      lead_time  (int) const;   //  seconds
 
          //

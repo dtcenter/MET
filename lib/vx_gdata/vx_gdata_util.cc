@@ -10,7 +10,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_gdata_util.h"
+#include "vx_gdata/vx_gdata_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////

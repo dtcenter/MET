@@ -25,12 +25,12 @@
 
 #include <netcdf.hh>
 
-#include "grid.h"
-#include "pxm.h"
+#include "vx_pxm/vx_pxm.h"
+#include "vx_util/long_array.h"
+#include "vx_data_grids/grid.h"
+#include "vx_cal/vx_cal.h"
 
-#include "var_info.h"
-#include "long_array.h"
-
+#include "vx_gdata/var_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -67,9 +67,9 @@ class MetNcFile {
          //  time
          //
 
-      Unixtime ValidTime;
+      unixtime ValidTime;
 
-      Unixtime InitTime;
+      unixtime InitTime;
 
       int      lead_time () const;   //  seconds
 

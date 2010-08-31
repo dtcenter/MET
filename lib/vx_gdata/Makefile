@@ -15,10 +15,13 @@
 TARGETS  = libvx_gdata.a
 
 OBJECTS  = get_pinterp_grid.o \
+           is_met_nc_file.o   \
+           is_netcdf_file.o   \
            is_pinterp_file.o  \
+           met_file.o         \
            pinterp_file.o     \
-           var_info.o
-
+           var_info.o         \
+           vx_gdata_util.o
 
 OPT_FLAGS=
 
@@ -44,14 +47,26 @@ libvx_gdata.a: $(OBJECTS)
 get_pinterp_grid.o: get_pinterp_grid.cc
 	$(CXX) get_pinterp_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
 
+is_met_nc_file.o: is_met_nc_file.cc
+	$(CXX) is_met_nc_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+
+is_netcdf_file.o: is_netcdf_file.cc
+	$(CXX) is_netcdf_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+
 is_pinterp_file.o: is_pinterp_file.cc
 	$(CXX) is_pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+
+met_file.o: met_file.cc
+	$(CXX) met_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 pinterp_file.o: pinterp_file.cc
 	$(CXX) pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
 
 var_info.o: var_info.cc
 	$(CXX) var_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+
+vx_gdata_util.o: vx_gdata_util.cc
+	$(CXX) vx_gdata_util.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
