@@ -1831,7 +1831,7 @@ void add_var_att(int i_gc, NcVar *ens_var, int flag,
       long_name_str);
 
    // Add variable attributes
-   ens_var->add_att("units", conf_info.ens_gci[i_gc].unit_str.text());
+   ens_var->add_att("units", conf_info.ens_gci[i_gc].units_str.text());
    ens_var->add_att("long_name", tmp_str);
    ens_var->add_att("level", conf_info.ens_gci[i_gc].lvl_str.text());
 
