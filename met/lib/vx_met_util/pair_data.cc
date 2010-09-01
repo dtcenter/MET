@@ -105,7 +105,6 @@ void GCInfo::clear() {
    pcode      = 0;
    pthresh_lo = bad_data_double;
    pthresh_hi = bad_data_double;
-   lvl_dim    = bad_data_int;
 
    // Initialize to contain two stars
    dim_la.clear();
@@ -137,7 +136,6 @@ void GCInfo::assign(const GCInfo &c) {
    pthresh_lo = c.pthresh_lo;
    pthresh_hi = c.pthresh_hi;
 
-   lvl_dim    = c.lvl_dim;
    dim_la     = c.dim_la;
 
    return;
@@ -386,7 +384,7 @@ void GCInfo::set_gcinfo_nc(const char *c) {
          if((ptr3 = strchr(ptr2, '-')) != NULL) {
 
             // Check if a range has already been supplied
-            if(!is_bad_data(lvl_dim)) {
+            if(dim_la.has(range_flag)) {
                cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
                     << "only one dimension can have a range for NetCDF variable \""
                     << c << "\".\n\n" << flush;
@@ -394,8 +392,7 @@ void GCInfo::set_gcinfo_nc(const char *c) {
             }
             // Store the dimension of the range and limits
             else {
-               dim_la.add(-1);
-               lvl_dim = dim_la.n_elements();
+               dim_la.add(range_flag);
                lvl_1 = atoi(ptr2);
                lvl_2 = atoi(++ptr3);
             }
