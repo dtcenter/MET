@@ -79,6 +79,8 @@ class NumArray {
       double mean() const;
       double sum() const;
       double mode() const;
+      double min() const;
+      double max() const;
 
       int n_elements() const;
 
