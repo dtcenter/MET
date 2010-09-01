@@ -26,7 +26,7 @@
 #include <netcdf.hh>
 
 #include "vx_data_grids/grid.h"
-#include "vx_pxm/vx_pxm.h"
+#include "vx_wrfdata/vx_wrfdata.h"
 #include "vx_util/long_array.h"
 
 #include "vx_gdata/var_info.h"
@@ -109,9 +109,9 @@ class PinterpFile {
 
       double data(NcVar *, const LongArray &) const;
 
-      bool data(NcVar *, const LongArray &, Pgm &, double & pressure) const;
+      bool data(NcVar *, const LongArray &, WrfData &, double & pressure) const;
 
-      bool data(const char *, const LongArray &, Pgm &, double & pressure) const;
+      bool data(const char *, const LongArray &, WrfData &, double & pressure) const;
 
 };
 

@@ -39,16 +39,11 @@ static const char lon_var_name        [] = "lon";
 
 static const char valid_time_att_name [] = "valid_time_ut";
 static const char  init_time_att_name [] = "init_time_ut";
+static const char accum_time_att_name [] = "accum_time_sec";
 
 static const char  level_att_name     [] = "level";
 
 static const int  max_met_args           = 30;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static Color value_to_color(double);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -349,6 +344,143 @@ return ( (int) dt );
 ////////////////////////////////////////////////////////////////////////
 
 
+unixtime MetNcFile::var_init_time(const NcVar * var) const
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+unixtime ut = (unixtime) 0;
+
+n = var->num_atts();
+
+for (j=0; j<n; ++j)  {
+
+   att = var->get_att(j);
+
+   if ( strcmp(att->name(), init_time_att_name) == 0 )  {
+
+      ut = (unixtime) att->as_int(0);
+
+      break;
+
+   }
+
+}   //  for j
+
+   //
+   //  done
+   //
+
+return(ut);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime MetNcFile::var_valid_time(const NcVar * var) const
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+unixtime ut = (unixtime) 0;
+
+n = var->num_atts();
+
+for (j=0; j<n; ++j)  {
+
+   att = var->get_att(j);
+
+   if ( strcmp(att->name(), valid_time_att_name) == 0 )  {
+
+      ut = (unixtime) att->as_int(0);
+
+      break;
+
+   }
+
+}   //  for j
+
+   //
+   //  done
+   //
+
+return ( ut );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int MetNcFile::var_lead_time(const NcVar * var) const
+
+{
+
+unixtime init_ut, valid_ut;
+int sec;
+
+init_ut  = var_init_time(var);
+valid_ut = var_valid_time(var);
+
+if ( init_ut == (unixtime) 0 || valid_ut == (unixtime) 0 )  {
+   sec = 0;
+}
+else {
+   sec = (int) valid_ut - init_ut;
+}
+
+   //
+   //  done
+   //
+
+return ( sec );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int MetNcFile::var_accum_time(const NcVar * var) const
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+int sec = 0;
+
+n = var->num_atts();
+
+for (j=0; j<n; ++j)  {
+
+   att = var->get_att(j);
+
+   if ( strcmp(att->name(), accum_time_att_name) == 0 )  {
+
+      sec = att->as_int(0);
+
+      break;
+
+   }
+
+}   //  for j
+
+   //
+   //  done
+   //
+
+return ( sec );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double MetNcFile::data(NcVar * var, const LongArray & a) const
 
 {
@@ -433,7 +565,7 @@ return ( d[0] );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetNcFile::data(NcVar * v, const LongArray & a, Pgm & image) const
+bool MetNcFile::data(NcVar * v, const LongArray & a, WrfData & wd) const
 
 {
 
@@ -476,12 +608,11 @@ VarInfo * var = (VarInfo *) 0;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
-Color color;
 
 
-image.clear();
+wd.clear();
 
-image.set_size_xy(Nx, Ny);
+wd.set_size(Nx, Ny);
 
    //
    //  find varinfo's
@@ -568,14 +699,19 @@ for (x=0; x<Nx; ++x)  {
 
       value = data(v, b);
 
-      color = value_to_color(value);
-
-      image.putxy(color, x, y);
+      wd.put_xy_double(value, x, y);
 
    }   //  for y
 
 }   //  for x
 
+   //
+   //  store the times
+   //
+
+   wd.set_valid_time(var_valid_time(v));
+   wd.set_lead_time(var_lead_time(v));
+   wd.set_accum_time(var_accum_time(v));
 
    //
    //  done
@@ -589,11 +725,11 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetNcFile::data(const char * var_name, const LongArray & a, Pgm & image) const
+bool MetNcFile::data(const char * var_name, const LongArray & a, WrfData & wd) const
 
 {
 
-int j; 
+int j;
 bool found = false;
 
 for (j=0; j<Nvars; ++j)  {
@@ -604,7 +740,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  return ( false );
 
-found = data(Var[j].var, a, image);
+found = data(Var[j].var, a, wd);
 
    //
    //  done
@@ -714,42 +850,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for misc functions
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Color value_to_color(double v)
-
-{
-
-Color color;
-int k;
-
-k = nint(v);
-
-k = (k*255)/100;
-
-if ( k > 255 )  k = 255;
-if ( k <   0 )  k = 0;
-
-color.set_gray(k);
-
-   //
-   //  done
-   //
-
-return ( color );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-

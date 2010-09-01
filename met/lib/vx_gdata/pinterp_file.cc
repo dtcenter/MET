@@ -58,8 +58,6 @@ static const int max_pinterp_args       = 30;
 
 static unixtime parse_init_time(const char *);
 
-static Color value_to_color(double);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -523,7 +521,7 @@ return ( d[0] );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(NcVar * v, const LongArray & a, Pgm & image, double & pressure) const
+bool PinterpFile::data(NcVar * v, const LongArray & a, WrfData & wd, double & pressure) const
 
 {
 
@@ -567,12 +565,11 @@ VarInfo * P   = (VarInfo *) 0;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
-Color color;
+unixtime ut;
 
+wd.clear();
 
-image.clear();
-
-image.set_size_xy(Nx, Ny);
+wd.set_size(Nx, Ny);
 
 pressure = bad_data_double;
 
@@ -640,6 +637,7 @@ if ( count != 2 )  {
 const int x_slot = var->x_slot;
 const int y_slot = var->y_slot;
 const int z_slot = var->z_slot;
+const int t_slot = var->t_slot;
 
 if ( (x_slot < 0) || (y_slot < 0) || (z_slot < 0) )  {
 
@@ -664,9 +662,7 @@ for (x=0; x<Nx; ++x)  {
 
       value = data(v, b);
 
-      color = value_to_color(value);
-
-      image.putxy(color, x, y);
+      wd.put_xy_double(value, x, y);
 
    }   //  for y
 
@@ -686,6 +682,13 @@ if ( P )  {
 
 }
 
+   //
+   //  store the times
+   //
+
+   ut = valid_time(t_slot);
+   wd.set_valid_time(ut);
+   wd.set_lead_time((int) ut - InitTime);
 
    //
    //  done
@@ -699,7 +702,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(const char * var_name, const LongArray & a, Pgm & image, double & pressure) const
+bool PinterpFile::data(const char * var_name, const LongArray & a, WrfData & wd, double & pressure) const
 
 {
 
@@ -714,7 +717,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  return ( false );
 
-found = data(Var[j].var, a, image, pressure);
+found = data(Var[j].var, a, wd, pressure);
 
    //
    //  done
@@ -768,33 +771,3 @@ return ( t );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-Color value_to_color(double v)
-
-{
-
-Color color;
-int k;
-
-k = nint(v);
-
-k = (k*255)/100;
-
-if ( k > 255 )  k = 255;
-if ( k <   0 )  k = 0;
-
-color.set_gray(k);
-
-
-return ( color );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-
-
