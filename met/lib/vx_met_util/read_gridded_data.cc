@@ -137,6 +137,7 @@ bool read_field_pinterp(const char *file_name, GCInfo &gci,
    PinterpFile nc_file;
    ConcatString lvl_str, units_str;
    bool status = false;
+   double pressure;
    char time_str[max_str_len], time2_str[max_str_len];
 
    // Open the p_interp NetCDF File
@@ -149,7 +150,7 @@ bool read_field_pinterp(const char *file_name, GCInfo &gci,
 
    // Read the data
    status = nc_file.data(gci.abbr_str, gci.dim_la,
-                         wd, lvl_str, units_str);
+                         wd, pressure, units_str);
 
    if(status) {
 
@@ -184,9 +185,14 @@ bool read_field_pinterp(const char *file_name, GCInfo &gci,
       }
 
       // Set the GCInfo object's level and units strings
+      lvl_str.clear();
+      lvl_str << "P" << pressure;
       gci.set_lvl_str(lvl_str);
       gci.set_units_str(units_str);
    }
+
+   // Store the grid definition
+   gr = nc_file.grid;
 
    // Close the file
    nc_file.close();
@@ -252,6 +258,9 @@ bool read_field_met(const char *file_name, GCInfo &gci,
       gci.set_lvl_str(lvl_str);
       gci.set_units_str(units_str);
    }
+
+   // Store the grid definition
+   gr = nc_file.grid;
 
    // Close the file
    nc_file.close();
@@ -397,6 +406,9 @@ int read_levels_grib(const char *file_name, GCInfo &gci,
 
    } // end for i
 
+   // Close the file
+   gb_file.close();
+
    return(n_rec);
 }
 
@@ -404,92 +416,118 @@ int read_levels_grib(const char *file_name, GCInfo &gci,
 
 int read_levels_pinterp(const char *file_name, GCInfo &gci,
                         unixtime valid_ut, int lead_sec,
-                        WrfData *&wd, NumArray &lvl_na,
-                        Grid &gr, int verbosity) {
+                        WrfData *&wd, NumArray &lvl_na, Grid &gr,
+                        int verbosity) {
+   PinterpFile nc_file;
+   ConcatString lvl_str, units_str;
+   bool found;
+   int i_dim, i, n_lvl;
+   double pressure;
+   LongArray lvl_dim_la;
+   bool status = false;
+   char time_str[max_str_len], time2_str[max_str_len];
 
-// JHG, work here
-
-   cerr << "\n\nERROR: read_levels_pinterp() -> "
-        << "SHOULD NOT BE CALLED YET!\n\n" << flush;
-   exit(1);
-
-   GribFile gb_file;
-   GribRecord rec;
-   Grid data_grid;
-   GCInfo gc_info;
-   int i, n_rec;
-   bool status;
-   NumArray rec_na;
-
-   // Initialize
-   lvl_na.clear();
-
-   // Open the GRIB file
-   if(!(gb_file.open(file_name))) {
-      cerr << "\n\nERROR: read_levels_grib() -> "
-           << "can't open GRIB file: "
+   // Open the p_interp NetCDF File
+   if(!nc_file.open(file_name)) {
+      cerr << "\n\nERROR: read_field_pinterp() -> "
+           << "can't open p_interp NetCDF file: "
            << file_name << "\n\n" << flush;
       exit(1);
    }
 
-   // Determine the number of records
-   n_rec = find_grib_record_levels(gb_file, gci,
-                                   valid_ut, lead_sec,
-                                   rec_na, lvl_na);
+   // Find the dimension that has the range flag set
+   for(i_dim=0; i_dim<gci.dim_la.n_elements(); i_dim++) {
+      if(gci.dim_la[i_dim] == range_flag) {
+         found = true;
+         break;
+      }
+   }
 
-   if(n_rec == 0) {
-      cerr << "\n\nERROR: read_levels_grib() -> "
-           << "no GRIB records matching "
-           << gci.info_str << " found in GRIB file: "
-           << file_name << "\n" << flush;
+   // Check for no range flag
+   if(!found) {
+      cerr << "\n\nERROR: read_levels_pinterp() -> "
+           << "no range specified for parsing " << gci.info_str
+           << " from the p_interp NetCDF file " << file_name
+           << "\n\n" << flush;
       exit(1);
    }
 
+   // Compute the number of levels
+   n_lvl = gci.lvl_2 - gci.lvl_1 + 1;
+
    // Allocate space to store the fields
-   if(n_rec > 0) wd = new WrfData [n_rec];
+   if(n_lvl > 0) wd = new WrfData [n_lvl];
 
-   // Loop through and read each GRIB record
-   for(i=0; i<n_rec; i++) {
+   // Initialize
+   lvl_dim_la = gci.dim_la;
+   lvl_na.clear();
 
-      // Initialize the GCInfo object
-      gc_info = gci;
+   // Loop through each of levels specified in the range
+   for(i=0; i<n_lvl; i++) {
 
-      // Set the current level value for the record to retrieve.
-      gc_info.lvl_1 = lvl_na[i];
-      gc_info.lvl_2 = lvl_na[i];
+      // Set the current level
+      lvl_dim_la[i_dim] = gci.lvl_1 + 1;
 
-      status = get_grib_record(gb_file, rec, gc_info,
-                               valid_ut, lead_sec,
-                               wd[i], data_grid, verbosity);
+      // Read the data
+      status = nc_file.data(gci.abbr_str, lvl_dim_la,
+                            wd[i], pressure, units_str);
 
-      if(!status) {
-         cerr << "\n\nERROR: read_levels_grib() -> "
-              << "no records matching GRIB code "
-              << gc_info.code << " with level indicator of "
-              << gc_info.lvl_str << " found in GRIB file: "
-              << file_name << "\n" << flush;
+      // Check for bad status
+      if(status) {
+         cerr << "\n\nERROR: read_levels_pinterp() -> "
+              << "error reading " << gci.info_str
+              << " from the p_interp NetCDF file " << file_name
+              << "\n\n" << flush;
+      }
+
+      // Check that the valid time matches the request
+      if(valid_ut > 0 && valid_ut != wd[i].get_valid_time()) {
+
+         // Compute time strings
+         unix_to_yyyymmdd_hhmmss(wd[i].get_valid_time(), time_str);
+         unix_to_yyyymmdd_hhmmss(valid_ut,               time2_str);
+
+         cerr << "\n\nERROR: read_levels_pinterp() -> "
+              << "the valid time for the " << gci.info_str
+              << " variable in the p_interp NetCDF file "
+              << file_name << " does not match the requested valid time: ("
+              << time_str << " != " << time2_str << "\n\n" << flush;
          exit(1);
       }
 
-      // Set the grid if unset
-      if(gr.nx() == 0 && gr.ny() == 0) {
-         gr = data_grid;
-      }
-      // Otherwise, check to make sure the grid doesn't change
-      else {
+      // Check that the lead time matches the request
+      if(lead_sec > 0 && lead_sec != wd[i].get_lead_time()) {
 
-         if(!(data_grid == gr)) {
-            cerr << "\n\nERROR: read_levels_grib() -> "
-                 << "The grid has changed for GRIB code "
-                 << gc_info.code << ".\n\n"
-                 << flush;
-            exit(1);
-         }
+         // Compute time strings
+         sec_to_hhmmss(wd[i].get_valid_time(), time_str);
+         sec_to_hhmmss(valid_ut,               time2_str);
+
+         cerr << "\n\nERROR: read_levels_pinterp() -> "
+              << "the lead time for the " << gci.info_str
+              << " variable in the p_interp NetCDF file "
+              << file_name << " does not match the requested lead time: ("
+              << time_str << " != " << time2_str << "\n\n" << flush;
+         exit(1);
       }
+
+      // Store the pressure level
+      lvl_na.add(pressure);
 
    } // end for i
 
-   return(n_rec);
+   // Set the GCInfo object's level and units strings
+   lvl_str.clear();
+   lvl_str << "P" << lvl_na.max() << "-" << lvl_na.min();
+   gci.set_lvl_str(lvl_str);
+   gci.set_units_str(units_str);
+
+   // Store the grid definition
+   gr = nc_file.grid;
+
+   // Close the file
+   nc_file.close();
+
+   return(n_lvl);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
