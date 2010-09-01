@@ -113,7 +113,7 @@ class PinterpFile {
       bool data(NcVar *, const LongArray &, WrfData &, double & pressure) const;
 
       bool data(const char *, const LongArray &, WrfData &,
-                ConcatString &, ConcatString &) const;
+                double & pressure, ConcatString &) const;
 
 };
 
