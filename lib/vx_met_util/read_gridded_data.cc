@@ -115,14 +115,16 @@ bool read_field_grib(const char *file_name, GCInfo &gci,
    status = get_grib_record(gb_file, rec, gci, valid_ut, lead_sec,
                             wd, gr, verbosity);
 
-   // Get the level name
    if(status) {
 
-      // Set the GCInfo object's level string
+      // Reset the GCInfo object's level string
       pds_ptr = (Section1_Header *) rec.pds;
       get_grib_level_str(pds_ptr->type, pds_ptr->level_info, lvl_str);
       gci.set_lvl_str(lvl_str);
    }
+
+   // Close the file
+   gb_file.close();
 
    return(status);
 }
@@ -132,15 +134,13 @@ bool read_field_grib(const char *file_name, GCInfo &gci,
 bool read_field_pinterp(const char *file_name, GCInfo &gci,
                         unixtime valid_ut, int lead_sec,
                         WrfData &wd, Grid &gr, int verbosity) {
-   PinterpFile p_file;
-   char lvl_str[max_str_len];
-   double prs;
+   PinterpFile nc_file;
+   ConcatString lvl_str, units_str;
    bool status = false;
-   Pgm image;
-// JHG, PPMImage needs to change to WrfData
+   char time_str[max_str_len], time2_str[max_str_len];
 
    // Open the p_interp NetCDF File
-   if(!p_file.open(file_name)) {
+   if(!nc_file.open(file_name)) {
       cerr << "\n\nERROR: read_field_pinterp() -> "
            << "can't open p_interp NetCDF file: "
            << file_name << "\n\n" << flush;
@@ -148,44 +148,113 @@ bool read_field_pinterp(const char *file_name, GCInfo &gci,
    }
 
    // Read the data
-   status = p_file.data(gci.abbr_str.text(), gci.dim_la, image, prs);
+   status = nc_file.data(gci.abbr_str, gci.dim_la,
+                         wd, lvl_str, units_str);
 
-   // Set the GCInfo object's level string
-   gci.set_lvl_str(lvl_str);
+   if(status) {
+
+      // Check that the valid time matches the request
+      if(valid_ut > 0 && valid_ut != wd.get_valid_time()) {
+
+         // Compute time strings
+         unix_to_yyyymmdd_hhmmss(wd.get_valid_time(), time_str);
+         unix_to_yyyymmdd_hhmmss(valid_ut,            time2_str);
+
+         cerr << "\n\nERROR: read_field_pinterp() -> "
+              << "the valid time for the " << gci.info_str
+              << " variable in the p_interp NetCDF file "
+              << file_name << " does not match the requested valid time: ("
+              << time_str << " != " << time2_str << "\n\n" << flush;
+         exit(1);
+      }
+
+      // Check that the lead time matches the request
+      if(lead_sec > 0 && lead_sec != wd.get_lead_time()) {
+
+         // Compute time strings
+         sec_to_hhmmss(wd.get_valid_time(), time_str);
+         sec_to_hhmmss(valid_ut,            time2_str);
+
+         cerr << "\n\nERROR: read_field_pinterp() -> "
+              << "the lead time for the " << gci.info_str
+              << " variable in the p_interp NetCDF file "
+              << file_name << " does not match the requested lead time: ("
+              << time_str << " != " << time2_str << "\n\n" << flush;
+         exit(1);
+      }
+
+      // Set the GCInfo object's level and units strings
+      gci.set_lvl_str(lvl_str);
+      gci.set_units_str(units_str);
+   }
 
    // Close the file
-   p_file.close();
+   nc_file.close();
 
    return(status);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// JHG, this function will change with changes from Randy
-
 bool read_field_met(const char *file_name, GCInfo &gci,
                     unixtime valid_ut, int lead_sec,
                     WrfData &wd, Grid &gr, int verbosity) {
-   NcFile *nc_file = (NcFile *) 0;
-   char lvl_str[max_str_len];
+   MetNcFile nc_file;
+   ConcatString lvl_str, units_str;
    bool status = false;
+   char time_str[max_str_len], time2_str[max_str_len];
 
-   // Open the NetCDF File
-   nc_file = new NcFile(file_name);
-
-   if(!nc_file->is_valid()) {
+   // Open the MET NetCDF File
+   if(!nc_file.open(file_name)) {
       cerr << "\n\nERROR: read_field_met() -> "
-           << "can't open NetCDF file: "
+           << "can't open MET NetCDF file: "
            << file_name << "\n\n" << flush;
       exit(1);
    }
 
-   // Read the requested NetCDF data
-   status = (read_netcdf_status(nc_file, gci.abbr_str.text(),
-                                lvl_str, wd, gr, verbosity) == 0);
+   // Read the data
+   status = nc_file.data(gci.abbr_str, gci.dim_la,
+                         wd, lvl_str, units_str);
 
-   // Set the GCInfo object's level string
-   gci.set_lvl_str(lvl_str);
+   if(status) {
+
+      // Check that the valid time matches the request
+      if(valid_ut > 0 && valid_ut != wd.get_valid_time()) {
+
+         // Compute time strings
+         unix_to_yyyymmdd_hhmmss(wd.get_valid_time(), time_str);
+         unix_to_yyyymmdd_hhmmss(valid_ut,            time2_str);
+
+         cerr << "\n\nERROR: read_field_met() -> "
+              << "the valid time for the " << gci.info_str
+              << " variable in the MET NetCDF file "
+              << file_name << " does not match the requested valid time: ("
+              << time_str << " != " << time2_str << "\n\n" << flush;
+         exit(1);
+      }
+
+      // Check that the lead time matches the request
+      if(lead_sec > 0 && lead_sec != wd.get_lead_time()) {
+
+         // Compute time strings
+         sec_to_hhmmss(wd.get_valid_time(), time_str);
+         sec_to_hhmmss(valid_ut,            time2_str);
+
+         cerr << "\n\nERROR: read_field_met() -> "
+              << "the lead time for the " << gci.info_str
+              << " variable in the MET NetCDF file "
+              << file_name << " does not match the requested lead time: ("
+              << time_str << " != " << time2_str << "\n\n" << flush;
+         exit(1);
+      }
+
+      // Set the GCInfo object's level and units string
+      gci.set_lvl_str(lvl_str);
+      gci.set_units_str(units_str);
+   }
+
+   // Close the file
+   nc_file.close();
 
    return(status);
 }
@@ -262,8 +331,6 @@ int read_levels_grib(const char *file_name, GCInfo &gci,
 
    // Initialize
    lvl_na.clear();
-
-   // JHG work here and read multiple records
 
    // Open the GRIB file
    if(!(gb_file.open(file_name))) {
