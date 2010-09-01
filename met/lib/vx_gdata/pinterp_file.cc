@@ -707,13 +707,12 @@ return ( true );
 
 
 bool PinterpFile::data(const char * var_name, const LongArray & a, WrfData & wd,
-                       ConcatString &level_str, ConcatString &units_str) const
+                       double & pressure, ConcatString & units_str) const
 
 {
 
 int j;
 bool found = false;
-double pressure;
 
 for (j=0; j<Nvars; ++j)  {
 
@@ -726,11 +725,9 @@ if ( !found )  return ( false );
 found = data(Var[j].var, a, wd, pressure);
 
    //
-   //  store the level and units
+   //  store the units
    //
 
-   level_str.clear();
-   level_str << "P" << pressure;
    units_str = Var[j].units;
 
    //
