@@ -325,7 +325,7 @@ void process_scores() {
       // Check that the grids match
       //
       if(!(fcst_grid == obs_grid)) {
-         cerr << "\n\nERROR: main() -> "
+         cerr << "\n\nERROR: process_scores() -> "
               << "The forecast and observation grids do not match "
               << "for field " << i+1 << ".\n\n" << flush;
          exit(1);
