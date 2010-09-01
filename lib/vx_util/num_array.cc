@@ -667,4 +667,61 @@ return(v);
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::min() const
+
+{
+
+int j;
+
+if(Nelements < 1) {
+   cerr << "\n\nNumArray::min() -> "
+        << "the array cannot be zero length\n\n"
+        << flush;
+   exit(1);
+}
+
+double min_v = e[0];
+
+for(j=0; j<Nelements; j++) {
+   if(is_bad_data(j)) continue;
+   if(e[j] < min_v) min_v = e[j];
+}
+
+return(min_v);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::max() const
+
+{
+
+int j;
+
+if(Nelements < 1) {
+   cerr << "\n\nNumArray::max() -> "
+        << "the array cannot be zero length\n\n"
+        << flush;
+   exit(1);
+}
+
+double max_v = e[0];
+
+for(j=0; j<Nelements; j++) {
+   if(is_bad_data(j)) continue;
+   if(e[j] > max_v) max_v = e[j];
+}
+
+return(max_v);
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////
