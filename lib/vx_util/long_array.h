@@ -64,6 +64,8 @@ class LongArray {
 
       int n_elements() const;
 
+      int has(const long) const;
+
       void add(const long &);
       void add(const LongArray &);
 

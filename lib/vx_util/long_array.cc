@@ -282,6 +282,26 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+int LongArray::has(const long l) const
+
+{
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   if ( e[j] == l )  return ( 1 );
+
+}
+
+return ( 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 long & LongArray::operator[](int n) const
 
 {
