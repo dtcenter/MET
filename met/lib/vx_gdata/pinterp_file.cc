@@ -50,6 +50,8 @@ static const char pressure_var_name  [] = "pressure";
 
 static const char init_time_att_name [] = "SIMULATION_START_DATE";
 
+static const char units_att_name     [] = "units";
+
 static const int max_pinterp_args       = 30;
 
 
@@ -252,6 +254,8 @@ for (j=0; j<Nvars; ++j)  {
    Var[j].Ndims = v->num_dims();
 
    Var[j].Dims = new NcDim * [Var[j].Ndims];
+
+   get_units(Var[j]);
 
    if ( strcmp(v->name(), pressure_var_name) == 0 )  PressureIndex = j;
 
@@ -686,7 +690,7 @@ if ( P )  {
    //  store the times
    //
 
-   ut = valid_time(t_slot);
+   ut = valid_time(a[t_slot]);
    wd.set_valid_time(ut);
    wd.set_lead_time((int) ut - InitTime);
 
@@ -702,12 +706,14 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(const char * var_name, const LongArray & a, WrfData & wd, double & pressure) const
+bool PinterpFile::data(const char * var_name, const LongArray & a, WrfData & wd,
+                       ConcatString &level_str, ConcatString &units_str) const
 
 {
 
 int j;
 bool found = false;
+double pressure;
 
 for (j=0; j<Nvars; ++j)  {
 
@@ -720,10 +726,56 @@ if ( !found )  return ( false );
 found = data(Var[j].var, a, wd, pressure);
 
    //
+   //  store the level and units
+   //
+
+   level_str.clear();
+   level_str << "P" << pressure;
+   units_str = Var[j].units;
+
+   //
    //  done
    //
 
 return ( found );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PinterpFile::get_units(VarInfo & info)
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+
+
+info.units.clear();
+
+n = info.var->num_atts();
+
+for (j=0; j<n; ++j)  {
+
+   att = info.var->get_att(j);
+
+   if ( strcmp(units_att_name, att->as_string(0)) == 0 )  {
+
+      info.units = att->as_string(0);
+
+      return;
+
+   }
+
+}
+
+   //
+   //  done
+   //
+
+return;
 
 }
 

@@ -42,6 +42,7 @@ static const char  init_time_att_name [] = "init_time_ut";
 static const char accum_time_att_name [] = "accum_time_sec";
 
 static const char  level_att_name     [] = "level";
+static const char  units_att_name     [] = "units";
 
 static const int  max_met_args           = 30;
 
@@ -212,6 +213,8 @@ for (j=0; j<Nvars; ++j)  {
    Var[j].Dims = new NcDim * [Var[j].Ndims];
 
    get_level(Var[j]);
+   get_units(Var[j]);
+   get_accum(Var[j]);
 
    if ( times_ok )  get_times(Var[j].var);
 
@@ -337,143 +340,6 @@ int MetNcFile::lead_time() const
 unixtime dt = ValidTime - InitTime;
 
 return ( (int) dt );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-unixtime MetNcFile::var_init_time(const NcVar * var) const
-
-{
-
-int j, n;
-NcAtt * att = (NcAtt *) 0;
-unixtime ut = (unixtime) 0;
-
-n = var->num_atts();
-
-for (j=0; j<n; ++j)  {
-
-   att = var->get_att(j);
-
-   if ( strcmp(att->name(), init_time_att_name) == 0 )  {
-
-      ut = (unixtime) att->as_int(0);
-
-      break;
-
-   }
-
-}   //  for j
-
-   //
-   //  done
-   //
-
-return(ut);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-unixtime MetNcFile::var_valid_time(const NcVar * var) const
-
-{
-
-int j, n;
-NcAtt * att = (NcAtt *) 0;
-unixtime ut = (unixtime) 0;
-
-n = var->num_atts();
-
-for (j=0; j<n; ++j)  {
-
-   att = var->get_att(j);
-
-   if ( strcmp(att->name(), valid_time_att_name) == 0 )  {
-
-      ut = (unixtime) att->as_int(0);
-
-      break;
-
-   }
-
-}   //  for j
-
-   //
-   //  done
-   //
-
-return ( ut );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int MetNcFile::var_lead_time(const NcVar * var) const
-
-{
-
-unixtime init_ut, valid_ut;
-int sec;
-
-init_ut  = var_init_time(var);
-valid_ut = var_valid_time(var);
-
-if ( init_ut == (unixtime) 0 || valid_ut == (unixtime) 0 )  {
-   sec = 0;
-}
-else {
-   sec = (int) valid_ut - init_ut;
-}
-
-   //
-   //  done
-   //
-
-return ( sec );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int MetNcFile::var_accum_time(const NcVar * var) const
-
-{
-
-int j, n;
-NcAtt * att = (NcAtt *) 0;
-int sec = 0;
-
-n = var->num_atts();
-
-for (j=0; j<n; ++j)  {
-
-   att = var->get_att(j);
-
-   if ( strcmp(att->name(), accum_time_att_name) == 0 )  {
-
-      sec = att->as_int(0);
-
-      break;
-
-   }
-
-}   //  for j
-
-   //
-   //  done
-   //
-
-return ( sec );
 
 }
 
@@ -706,14 +572,6 @@ for (x=0; x<Nx; ++x)  {
 }   //  for x
 
    //
-   //  store the times
-   //
-
-   wd.set_valid_time(var_valid_time(v));
-   wd.set_lead_time(var_lead_time(v));
-   wd.set_accum_time(var_accum_time(v));
-
-   //
    //  done
    //
 
@@ -725,7 +583,8 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetNcFile::data(const char * var_name, const LongArray & a, WrfData & wd) const
+bool MetNcFile::data(const char * var_name, const LongArray & a, WrfData & wd,
+                     ConcatString &level_str, ConcatString &units_str) const
 
 {
 
@@ -741,6 +600,21 @@ for (j=0; j<Nvars; ++j)  {
 if ( !found )  return ( false );
 
 found = data(Var[j].var, a, wd);
+
+   //
+   //  store the times
+   //
+
+   wd.set_valid_time ( ValidTime );
+   wd.set_lead_time  ( lead_time() );
+   wd.set_accum_time ( Var[j].AccumTime );
+
+   //
+   //  store the level and units
+   //
+
+   level_str = Var[j].level;
+   units_str = Var[j].units;
 
    //
    //  done
@@ -832,7 +706,83 @@ for (j=0; j<n; ++j)  {
 
    if ( strcmp(level_att_name, att->as_string(0)) == 0 )  {
 
-      info.level == att->as_string(0);
+      info.level = att->as_string(0);
+
+      return;
+
+   }
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MetNcFile::get_units(VarInfo & info)
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+
+
+info.units.clear();
+
+n = info.var->num_atts();
+
+for (j=0; j<n; ++j)  {
+
+   att = info.var->get_att(j);
+
+   if ( strcmp(units_att_name, att->as_string(0)) == 0 )  {
+
+      info.units = att->as_string(0);
+
+      return;
+
+   }
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MetNcFile::get_accum(VarInfo & info)
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+
+
+info.AccumTime = 0;
+
+n = info.var->num_atts();
+
+for (j=0; j<n; ++j)  {
+
+   att = info.var->get_att(j);
+
+   if ( strcmp(accum_time_att_name, att->as_string(0)) == 0 )  {
+
+      info.AccumTime = att->as_int(0);
 
       return;
 

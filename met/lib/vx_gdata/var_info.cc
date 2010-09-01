@@ -115,6 +115,10 @@ name.clear();
 
 level.clear();
 
+units.clear();
+
+AccumTime = 0;
+
 Ndims = 0;
 
 if ( Dims )  { delete [] Dims;  Dims = (NcDim **) 0; }
@@ -151,6 +155,11 @@ else                      out << "(nul)";
 
 if ( level.length() > 0 )  out << '\"' << level << '\"';
 else                       out << "(nul)";
+
+if ( units.length() > 0 )  out << '\"' << units << '\"';
+else                       out << "(nul)";
+
+out << prefix << "AccumTime = " << AccumTime;
 
 out << "\n";
 
@@ -198,6 +207,10 @@ var = i.var;
 name = i.name;
 
 level = i.level;
+
+units = i.units;
+
+AccumTime = i.AccumTime;
 
 Ndims = i.Ndims;
 

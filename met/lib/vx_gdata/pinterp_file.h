@@ -44,6 +44,7 @@ class PinterpFile {
       PinterpFile(const PinterpFile &);
       PinterpFile & operator=(const PinterpFile &);
 
+      void get_units(VarInfo &);
 
    public:
 
@@ -111,7 +112,8 @@ class PinterpFile {
 
       bool data(NcVar *, const LongArray &, WrfData &, double & pressure) const;
 
-      bool data(const char *, const LongArray &, WrfData &, double & pressure) const;
+      bool data(const char *, const LongArray &, WrfData &,
+                ConcatString &, ConcatString &) const;
 
 };
 
