@@ -47,6 +47,8 @@ class MetNcFile {
       void get_times(const NcVar *);
 
       void get_level(VarInfo &);
+      void get_units(VarInfo &);
+      void get_accum(VarInfo &);
 
 
    public:
@@ -72,11 +74,6 @@ class MetNcFile {
       unixtime InitTime;
 
       int      lead_time () const;   //  seconds
-
-      unixtime var_init_time(const NcVar *) const;
-      unixtime var_valid_time(const NcVar *) const;
-      int      var_lead_time(const NcVar *) const;
-      int      var_accum_time(const NcVar *) const;
 
 
          //
@@ -114,7 +111,8 @@ class MetNcFile {
 
       bool data(NcVar *, const LongArray &, WrfData &) const;
 
-      bool data(const char *, const LongArray &, WrfData &) const;
+      bool data(const char *, const LongArray &, WrfData &,
+                ConcatString &, ConcatString &) const;
 
 };
 

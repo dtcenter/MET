@@ -55,6 +55,10 @@ class VarInfo {
 
       ConcatString level;   // nul if N/A
 
+      ConcatString units;   // nul if N/A
+
+      int AccumTime;        // seconds
+
       int Ndims;
 
       NcDim ** Dims; //  allocated
