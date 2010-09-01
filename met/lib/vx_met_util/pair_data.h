@@ -55,16 +55,16 @@ class GCInfo {
 
       //////////////////////////////////////////////////////////////////
 
-      ConcatString abbr_str; // Abbreviation string
-      ConcatString lvl_str;  // Level defined in config file
-      ConcatString info_str; // abbr_str/lvl_str
-      ConcatString unit_str; // Units
+      ConcatString abbr_str;  // Abbreviation string
+      ConcatString lvl_str;   // Level string
+      ConcatString info_str;  // Info string: abbr_str/lvl_str
+      ConcatString units_str; // Units string
 
-      int          code;     // GRIB code itself
+      int          code;      // GRIB code itself
 
-      LevelType    lvl_type; // Type of level specified
-      int          lvl_1;    // First level defined
-      int          lvl_2;    // Second level in case of a range
+      LevelType    lvl_type;  // Type of level specified
+      int          lvl_1;     // First level defined
+      int          lvl_2;     // Second level in case of a range
 
       // Flag to indicate whether this field should be used in
       // vector calculations
@@ -90,7 +90,7 @@ class GCInfo {
       void set_abbr_str(const char *);
       void set_lvl_str(const char *);
       void set_info_str(const char *);
-      void set_unit_str(const char *);
+      void set_units_str(const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////
