@@ -25,7 +25,7 @@
 
 #include <netcdf.hh>
 
-#include "vx_pxm/vx_pxm.h"
+#include "vx_wrfdata/vx_wrfdata.h"
 #include "vx_util/long_array.h"
 #include "vx_data_grids/grid.h"
 #include "vx_cal/vx_cal.h"
@@ -73,6 +73,12 @@ class MetNcFile {
 
       int      lead_time () const;   //  seconds
 
+      unixtime var_init_time(const NcVar *) const;
+      unixtime var_valid_time(const NcVar *) const;
+      int      var_lead_time(const NcVar *) const;
+      int      var_accum_time(const NcVar *) const;
+
+
          //
          //  dimensions
          //
@@ -106,9 +112,9 @@ class MetNcFile {
 
       double data(NcVar *, const LongArray &) const;
 
-      bool data(NcVar *, const LongArray &, Pgm &) const;
+      bool data(NcVar *, const LongArray &, WrfData &) const;
 
-      bool data(const char *, const LongArray &, Pgm &) const;
+      bool data(const char *, const LongArray &, WrfData &) const;
 
 };
 
