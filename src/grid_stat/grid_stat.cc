@@ -122,6 +122,7 @@ static void do_nbrcnt(NBRCNTInfo &, int, int, int,
 
 static void write_nc(const WrfData &, const WrfData &,
                      int, InterpMthd, int);
+static void add_var_att(NcVar *, const char *, const char *);
 
 static void finish_txt_files();
 
@@ -387,16 +388,16 @@ void process_scores() {
       }
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.fcst_gci[i].abbr_str.text());
+      shc.set_fcst_var(conf_info.fcst_gci[i].abbr_str);
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.fcst_gci[i].lvl_str.text());
+      shc.set_fcst_lev(conf_info.fcst_gci[i].lvl_str);
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.obs_gci[i].abbr_str.text());
+      shc.set_obs_var(conf_info.obs_gci[i].abbr_str);
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.obs_gci[i].lvl_str.text());
+      shc.set_obs_lev(conf_info.obs_gci[i].lvl_str);
 
       if(verbosity > 1) {
          cout << "\n" << sep_str << "\n\n" << flush;
@@ -641,10 +642,10 @@ void process_scores() {
                } // end for m
 
                // Reset the forecast variable name
-               shc.set_fcst_var(conf_info.fcst_gci[i].abbr_str.text());
+               shc.set_fcst_var(conf_info.fcst_gci[i].abbr_str);
 
                // Reset the observation variable name
-               shc.set_obs_var(conf_info.obs_gci[i].abbr_str.text());
+               shc.set_obs_var(conf_info.obs_gci[i].abbr_str);
 
             } // end Compute VL1L2
 
@@ -1062,7 +1063,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.text(), program_name);
+   write_netcdf_global(nc_out, out_nc_file, program_name);
    nc_out->add_att("Difference", "Forecast Value - Observation Value");
 
    // Add the projection information
@@ -1094,7 +1095,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    str.clear();
 
    // Append the output directory and program name
-   str << out_dir.text() << "/" << program_name;
+   str << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
    if(strlen(conf_info.conf.output_prefix().sval()) > 0)
@@ -1657,28 +1658,24 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          fcst_var_sa.add(fcst_var_name);
 
          // Add variable attributes for the forecast field
-         fcst_var->add_att("name", shc.get_fcst_var());
-         get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         fcst_var->add_att("units", tmp_str);
-         get_grib_code_name(conf_info.fcst_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         fcst_var->add_att("long_name", tmp_str);
-         fcst_var->add_att("i_level", shc.get_fcst_lev());
-
+         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         add_var_att(fcst_var, "units", conf_info.fcst_gci[i_gc].units_str.text());
+         sprintf(tmp_str, "%s at %s",
+                 conf_info.fcst_gci[i_gc].abbr_str.text(),
+                 conf_info.fcst_gci[i_gc].lvl_str.text());
+         add_var_att(fcst_var, "long_name", tmp_str);
+         add_var_att(fcst_var, "level", shc.get_fcst_lev());
          fcst_var->add_att("_FillValue", bad_data_float);
 
          ut = fcst_wd.get_valid_time();
          unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
          sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
                  yr, mon, day, hr, min, sec);
-         fcst_var->add_att("valid_time", time_str);
+         add_var_att(fcst_var, "valid_time", time_str);
          fcst_var->add_att("valid_time_ut", (long int) ut);
 
-         fcst_var->add_att("masking_region", conf_info.mask_name[i]);
-         fcst_var->add_att("smoothing_method", mthd_str);
+         add_var_att(fcst_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att(fcst_var, "smoothing_method", mthd_str);
          fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
       } // end fcst_flag
 
@@ -1693,32 +1690,28 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          obs_var_sa.add(obs_var_name);
 
          // Add variable attributes for the observation field
-         obs_var->add_att("name", shc.get_obs_var());
-         get_grib_code_unit(conf_info.obs_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         obs_var->add_att("units", tmp_str);
-         get_grib_code_name(conf_info.obs_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         obs_var->add_att("long_name", tmp_str);
-         obs_var->add_att("i_level", shc.get_obs_lev());
-
+         add_var_att(obs_var, "name", shc.get_obs_var());
+         add_var_att(obs_var, "units", conf_info.obs_gci[i_gc].units_str.text());
+         sprintf(tmp_str, "%s at %s",
+                 conf_info.obs_gci[i_gc].abbr_str.text(),
+                 conf_info.obs_gci[i_gc].lvl_str.text());
+         add_var_att(obs_var, "long_name", tmp_str);
+         add_var_att(obs_var, "level", shc.get_obs_lev());
          obs_var->add_att("_FillValue", bad_data_float);
 
          ut = obs_wd.get_valid_time();
          unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
          sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
                  yr, mon, day, hr, min, sec);
-         obs_var->add_att("valid_time", time_str);
+         add_var_att(obs_var, "valid_time", time_str);
          obs_var->add_att("valid_time_ut", (long int) ut);
 
-         obs_var->add_att("masking_region", conf_info.mask_name[i]);
-         obs_var->add_att("smoothing_method", mthd_str);
+         add_var_att(obs_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att(obs_var, "smoothing_method", mthd_str);
          obs_var->add_att("smoothing_neighborhood", wdth*wdth);
       } // end obs_flag
 
-      // Set up the observation variable if not already defined
+      // Set up the difference variable if not already defined
       if(diff_flag) {
 
          // Define the difference variable
@@ -1729,46 +1722,33 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          diff_var_sa.add(diff_var_name);
 
          // Add variable attributes for the difference field
-         sprintf(tmp_str, "%s_minus_%s",
-            shc.get_fcst_var(), shc.get_obs_var());
-         diff_var->add_att("name", tmp_str);
-         get_grib_code_unit(conf_info.fcst_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         diff_var->add_att("fcst_units", tmp_str);
-         get_grib_code_name(conf_info.fcst_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         diff_var->add_att("fcst_long_name", tmp_str);
-         diff_var->add_att("fcst_i_level", shc.get_fcst_lev());
-         get_grib_code_unit(conf_info.obs_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         diff_var->add_att("obs_units", tmp_str);
-         get_grib_code_name(conf_info.obs_gci[i_gc].code,
-                            conf_info.conf.grib_ptv().ival(),
-                            tmp_str);
-         diff_var->add_att("obs_long_name", tmp_str);
-         diff_var->add_att("obs_i_level", shc.get_obs_lev());
-
+         sprintf(tmp_str, "Forecast %s minus Observed %s",
+                 shc.get_fcst_var(), shc.get_obs_var());
+         add_var_att(diff_var, "name", tmp_str);
+         sprintf(tmp_str, "%s and %s",
+                 conf_info.fcst_gci[i_gc].units_str.text(),
+                 conf_info.obs_gci[i_gc].units_str.text());
+         add_var_att(diff_var, "units", tmp_str);
+         sprintf(tmp_str, "%s at %s and %s at %s",
+                 conf_info.fcst_gci[i_gc].abbr_str.text(),
+                 conf_info.fcst_gci[i_gc].lvl_str.text(),
+                 conf_info.obs_gci[i_gc].abbr_str.text(),
+                 conf_info.obs_gci[i_gc].lvl_str.text());
+         add_var_att(diff_var, "long_name", tmp_str);
+         sprintf(tmp_str, "%s and %s",
+                 shc.get_fcst_lev(), shc.get_obs_lev());
+         add_var_att(diff_var, "level", tmp_str);
          diff_var->add_att("_FillValue", bad_data_float);
-
-         ut = fcst_wd.get_valid_time();
-         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-                 yr, mon, day, hr, min, sec);
-         diff_var->add_att("fcst_valid_time", time_str);
-         diff_var->add_att("fcst_valid_time_ut", (long int) ut);
 
          ut = obs_wd.get_valid_time();
          unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
          sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
                  yr, mon, day, hr, min, sec);
-         diff_var->add_att("obs_valid_time", time_str);
-         diff_var->add_att("obs_valid_time_ut", (long int) ut);
+         add_var_att(diff_var, "valid_time", time_str);
+         diff_var->add_att("valid_time_ut", (long int) ut);
 
-         diff_var->add_att("masking_region", conf_info.mask_name[i]);
-         diff_var->add_att("smoothing_method", mthd_str);
+         add_var_att(diff_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att(diff_var, "smoothing_method", mthd_str);
          diff_var->add_att("smoothing_neighborhood", wdth*wdth);
       } // end diff_flag
 
@@ -1847,6 +1827,16 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
    if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }
    if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
    if(diff_data) { delete [] diff_data; diff_data = (float *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void add_var_att(NcVar *var, const char *att_name, const char *att_value) {
+
+   if(att_value) var->add_att(att_name, att_value);
+   else          var->add_att(att_name, na_str);
 
    return;
 }
