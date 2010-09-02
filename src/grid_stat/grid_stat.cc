@@ -1659,12 +1659,12 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
 
          // Add variable attributes for the forecast field
          add_var_att(fcst_var, "name", shc.get_fcst_var());
-         add_var_att(fcst_var, "units", conf_info.fcst_gci[i_gc].units_str.text());
          sprintf(tmp_str, "%s at %s",
                  conf_info.fcst_gci[i_gc].abbr_str.text(),
                  conf_info.fcst_gci[i_gc].lvl_str.text());
          add_var_att(fcst_var, "long_name", tmp_str);
          add_var_att(fcst_var, "level", shc.get_fcst_lev());
+         add_var_att(fcst_var, "units", conf_info.fcst_gci[i_gc].units_str.text());
          fcst_var->add_att("_FillValue", bad_data_float);
 
          ut = fcst_wd.get_valid_time();
@@ -1691,12 +1691,12 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
 
          // Add variable attributes for the observation field
          add_var_att(obs_var, "name", shc.get_obs_var());
-         add_var_att(obs_var, "units", conf_info.obs_gci[i_gc].units_str.text());
          sprintf(tmp_str, "%s at %s",
                  conf_info.obs_gci[i_gc].abbr_str.text(),
                  conf_info.obs_gci[i_gc].lvl_str.text());
          add_var_att(obs_var, "long_name", tmp_str);
          add_var_att(obs_var, "level", shc.get_obs_lev());
+         add_var_att(obs_var, "units", conf_info.obs_gci[i_gc].units_str.text());
          obs_var->add_att("_FillValue", bad_data_float);
 
          ut = obs_wd.get_valid_time();
@@ -1725,10 +1725,6 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          sprintf(tmp_str, "Forecast %s minus Observed %s",
                  shc.get_fcst_var(), shc.get_obs_var());
          add_var_att(diff_var, "name", tmp_str);
-         sprintf(tmp_str, "%s and %s",
-                 conf_info.fcst_gci[i_gc].units_str.text(),
-                 conf_info.obs_gci[i_gc].units_str.text());
-         add_var_att(diff_var, "units", tmp_str);
          sprintf(tmp_str, "%s at %s and %s at %s",
                  conf_info.fcst_gci[i_gc].abbr_str.text(),
                  conf_info.fcst_gci[i_gc].lvl_str.text(),
@@ -1738,6 +1734,10 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          sprintf(tmp_str, "%s and %s",
                  shc.get_fcst_lev(), shc.get_obs_lev());
          add_var_att(diff_var, "level", tmp_str);
+         sprintf(tmp_str, "%s and %s",
+                 conf_info.fcst_gci[i_gc].units_str.text(),
+                 conf_info.obs_gci[i_gc].units_str.text());
+         add_var_att(diff_var, "units", tmp_str);
          diff_var->add_att("_FillValue", bad_data_float);
 
          ut = obs_wd.get_valid_time();
