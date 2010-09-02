@@ -464,15 +464,11 @@ void process_fcst_obs_files() {
    //
    strcpy(engine.fcst_var_str,  fcst_gci.abbr_str.text());
    strcpy(engine.fcst_lvl_str,  fcst_gci.lvl_str.text());
-   get_grib_code_unit(fcst_gci.code, engine.wconf.grib_ptv().ival(),
-                      tmp_str);
-   strcpy(engine.fcst_unit_str, tmp_str);
+   strcpy(engine.fcst_unit_str, fcst_gci.units_str);
 
    strcpy(engine.obs_var_str,   obs_gci.abbr_str.text());
    strcpy(engine.obs_lvl_str,   obs_gci.lvl_str.text());
-   get_grib_code_unit(obs_gci.code, engine.wconf.grib_ptv().ival(),
-                      tmp_str);
-   strcpy(engine.obs_unit_str, tmp_str);
+   strcpy(engine.obs_unit_str,  obs_gci.units_str);
 
    if(verbosity > 0) {
       cout << "Forecast Field: "
