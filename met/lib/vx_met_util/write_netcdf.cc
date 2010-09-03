@@ -120,6 +120,60 @@ void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    return;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
+void write_netcdf_var_times(NcVar *var, const WrfData &wd) {
+   unixtime ut;
+   int sec;
+   char time_str[max_str_len];
 
+   // Init time
+   ut = wd.get_init_time();
+   unix_to_yyyymmdd_hhmmss(ut, time_str);
+   var->add_att("init_time", time_str);
+   var->add_att("init_time_ut", (long int) ut);
+
+   // Valid time
+   ut = wd.get_valid_time();
+   unix_to_yyyymmdd_hhmmss(ut, time_str);
+   var->add_att("valid_time", time_str);
+   var->add_att("valid_time_ut", (long int) ut);
+
+   // Accumulation time
+   if((sec = wd.get_accum_time()) > 0) {
+      sec_to_hhmmss(sec, time_str);
+      var->add_att("accum_time", time_str);
+      var->add_att("accum_time_sec", sec);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void write_netcdf_var_times(NcVar *var, const unixtime init_ut,
+                            const unixtime valid_ut, const int accum_sec) {
+   char time_str[max_str_len];
+
+   // Init time
+   unix_to_yyyymmdd_hhmmss(init_ut, time_str);
+   var->add_att("init_time", time_str);
+   var->add_att("init_time_ut", (long int) init_ut);
+
+   // Valid time
+   unix_to_yyyymmdd_hhmmss(valid_ut, time_str);
+   var->add_att("valid_time", time_str);
+   var->add_att("valid_time_ut", (long int) valid_ut);
+
+   // Accumulation time
+   if(accum_sec > 0) {
+      sec_to_hhmmss(accum_sec, time_str);
+      var->add_att("accum_time", time_str);
+      var->add_att("accum_time_sec", accum_sec);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
