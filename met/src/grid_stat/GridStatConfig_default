@@ -201,9 +201,9 @@ interp_method[] = [ "UW_MEAN" ];
 
 //
 // Specify a comma-separated list of box widths to be used by the interpolation
-// techniques listed above.  A value of 1 indicates that no smoothing should be
-// performed.  For a value of n greater than 1, the n*n grid points around each
-// point will be used to smooth the data fields.
+// techniques listed above.  All values must be odd.  A value of 1 indicates
+// that no smoothing should be performed.  For values greater than 1, the n*n
+// grid points around each point will be used to smooth the data fields.
 //
 // e.g. interp_width = [ 1, 3, 5 ];
 //
@@ -230,10 +230,10 @@ interp_flag = 1;
 interp_thresh = 1.0;
 
 //
-// Specify a comma-separated list of box widths to be used to define
-// the neighborhood size for the neighborhood verification methods.
-// For a value of n greater than 1, the n*n grid points around each point
-// will be used to define the neighborhood.
+// Specify a comma-separated list of box widths to be used to define the
+// neighborhood size for the neighborhood verification methods. All values
+// must be odd.  For values greater than 1, the n*n grid points around each
+// point will be used to define the neighborhood.
 //
 // e.g. nbr_width = [ 3, 5 ];
 //
