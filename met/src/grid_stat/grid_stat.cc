@@ -759,12 +759,6 @@ void process_scores() {
                              conf_info.mask_wd[m],
                              f_na, o_na);
 
-                  // Continue if no pairs were found
-                  if(f_na.n_elements() == 0) continue;
-
-                  // Set the mask name
-                  shc.set_mask(conf_info.mask_name[m]);
-
                   if(verbosity > 1) {
 
                      conf_info.fcst_ta[i][k].get_str(
@@ -786,6 +780,12 @@ void process_scores() {
                           << ", using " << f_na.n_elements()
                           << " pairs.\n" << flush;
                   }
+
+                  // Continue if no pairs were found
+                  if(f_na.n_elements() == 0) continue;
+
+                  // Set the mask name
+                  shc.set_mask(conf_info.mask_name[m]);
 
                   // Compute NBRCTS scores
                   if(conf_info.conf.output_flag(i_nbrctc).ival() ||
@@ -1554,18 +1554,16 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
 void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
               int i_gc, InterpMthd mthd, int wdth) {
-   int i, n, x, y, mon, day, yr, hr, min, sec;
+   int i, n, x, y;
    int fcst_flag, obs_flag, diff_flag;
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
    double fval, oval;
-   unixtime ut;
    NcVar *fcst_var, *obs_var, *diff_var;
    char fcst_var_name[max_str_len], obs_var_name[max_str_len];
    char mthd_str[max_str_len];
    char diff_var_name[max_str_len];
-   char time_str[max_str_len];
    char tmp_str[max_str_len];
 
    // Get the interpolation method string
@@ -1665,15 +1663,8 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          add_var_att(fcst_var, "long_name", tmp_str);
          add_var_att(fcst_var, "level", shc.get_fcst_lev());
          add_var_att(fcst_var, "units", conf_info.fcst_gci[i_gc].units_str.text());
+         write_netcdf_var_times(fcst_var, fcst_wd);
          fcst_var->add_att("_FillValue", bad_data_float);
-
-         ut = fcst_wd.get_valid_time();
-         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-                 yr, mon, day, hr, min, sec);
-         add_var_att(fcst_var, "valid_time", time_str);
-         fcst_var->add_att("valid_time_ut", (long int) ut);
-
          add_var_att(fcst_var, "masking_region", conf_info.mask_name[i]);
          add_var_att(fcst_var, "smoothing_method", mthd_str);
          fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
@@ -1697,15 +1688,8 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
          add_var_att(obs_var, "long_name", tmp_str);
          add_var_att(obs_var, "level", shc.get_obs_lev());
          add_var_att(obs_var, "units", conf_info.obs_gci[i_gc].units_str.text());
+         write_netcdf_var_times(obs_var, obs_wd);
          obs_var->add_att("_FillValue", bad_data_float);
-
-         ut = obs_wd.get_valid_time();
-         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-                 yr, mon, day, hr, min, sec);
-         add_var_att(obs_var, "valid_time", time_str);
-         obs_var->add_att("valid_time_ut", (long int) ut);
-
          add_var_att(obs_var, "masking_region", conf_info.mask_name[i]);
          add_var_att(obs_var, "smoothing_method", mthd_str);
          obs_var->add_att("smoothing_neighborhood", wdth*wdth);
@@ -1739,14 +1723,8 @@ void write_nc(const WrfData &fcst_wd, const WrfData &obs_wd,
                  conf_info.obs_gci[i_gc].units_str.text());
          add_var_att(diff_var, "units", tmp_str);
          diff_var->add_att("_FillValue", bad_data_float);
-
-         ut = obs_wd.get_valid_time();
-         unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-         sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-                 yr, mon, day, hr, min, sec);
-         add_var_att(diff_var, "valid_time", time_str);
-         diff_var->add_att("valid_time_ut", (long int) ut);
-
+         write_netcdf_var_times(diff_var, fcst_wd);
+         diff_var->add_att("_FillValue", bad_data_float);
          add_var_att(diff_var, "masking_region", conf_info.mask_name[i]);
          add_var_att(diff_var, "smoothing_method", mthd_str);
          diff_var->add_att("smoothing_neighborhood", wdth*wdth);

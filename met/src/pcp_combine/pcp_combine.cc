@@ -1042,7 +1042,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    char var_str[max_str_len];
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    char command_str[max_str_len];
-   char time_str[max_str_len];
    char accum1_str[max_str_len], accum2_str[max_str_len];
    Section1_Header *pds_ptr;
 
@@ -1142,17 +1141,10 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    //
    if(nc_init == (unixtime) 0) nc_init = nc_valid;
 
-   unix_to_yyyymmdd_hhmmss(nc_init, time_str);
-   pcp_var->add_att("init_time", time_str);
-   pcp_var->add_att("init_time_ut", (long int) nc_init);
-
-   unix_to_yyyymmdd_hhmmss(nc_valid, time_str);
-   pcp_var->add_att("valid_time", time_str);
-   pcp_var->add_att("valid_time_ut", (long int) nc_valid);
-
-   sec_to_hhmmss(nc_accum, time_str);
-   pcp_var->add_att("accum_time", time_str);
-   pcp_var->add_att("accum_time_sec", nc_accum);
+   //
+   // Write out the times
+   //
+   write_netcdf_var_times(pcp_var, nc_init, nc_valid, nc_accum);
 
    //
    // Write the precip data

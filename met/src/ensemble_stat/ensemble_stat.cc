@@ -1821,8 +1821,6 @@ void write_orank_var_int(int i_gc, int i_interp, int i_mask,
 void add_var_att(int i_gc, NcVar *ens_var, int flag,
                  WrfData &wd, const char *long_name_str) {
    char tmp_str[max_str_len];
-   unixtime ut;
-   int sec;
 
    // Construct the long name
    sprintf(tmp_str, "%s at %s %s",
@@ -1838,26 +1836,8 @@ void add_var_att(int i_gc, NcVar *ens_var, int flag,
    if(flag) ens_var->add_att("_FillValue", bad_data_int);
    else     ens_var->add_att("_FillValue", bad_data_float);
 
-   // Initialization time
-   ut  = wd.get_valid_time();
-   sec = wd.get_lead_time();
-   ut -= sec;
-   unix_to_yyyymmdd_hhmmss(ut, tmp_str);
-   ens_var->add_att("init_time", tmp_str);
-   ens_var->add_att("init_time_ut", (long int) ut);
-
-   // Valid time
-   ut = wd.get_valid_time();
-   unix_to_yyyymmdd_hhmmss(ut, tmp_str);
-   ens_var->add_att("valid_time", tmp_str);
-   ens_var->add_att("valid_time_ut", (long int) ut);
-
-   // Accum time
-   if((sec = wd.get_accum_time()) > 0) {
-      sec_to_hhmmss(sec, tmp_str);
-      ens_var->add_att("accum_time", tmp_str);
-      ens_var->add_att("accum_time_sec", (long int) sec);
-   }
+   // Write out times
+   write_netcdf_var_times(ens_var, wd);
 
    return;
 }
