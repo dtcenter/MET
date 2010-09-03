@@ -183,6 +183,7 @@ class WrfData : public Shape {
       int get_nx() const;
       int get_ny() const;
 
+      unixtime get_init_time() const;
       unixtime get_valid_time() const;
 
       int get_lead_time() const;
@@ -364,6 +365,7 @@ class Partition {
 inline double WrfData::get_m() const { return ( m ); }
 inline double WrfData::get_b() const { return ( b ); }
 
+inline unixtime WrfData::get_init_time() const { return ( (unixtime) (valid_time - lead_time) ); }
 inline unixtime WrfData::get_valid_time() const { return ( valid_time ); }
 inline int WrfData::get_lead_time() const { return ( lead_time ); }
 inline int WrfData::get_accum_time() const { return ( accum_time ); }
