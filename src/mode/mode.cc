@@ -2840,11 +2840,7 @@ void write_obj_stats() {
 
 void write_obj_netcdf() {
    int n, x, y;
-   int mon, day, yr, hr, min, sec;
-   unixtime ut;
-
    ConcatString out_file;
-   char   time_str[max_str_len];
 
    float *fcst_raw_data  = (float *) 0;
    int   *fcst_obj_data  = (int *)   0;
@@ -2915,49 +2911,31 @@ void write_obj_netcdf() {
    obs_obj_var = f_out->add_var("obs_obj_id", ncInt, lat_dim, lon_dim);
    obs_clus_var = f_out->add_var("obs_clus_id", ncInt, lat_dim, lon_dim);
 
-   // Compute forecast valid time string
-   ut = engine.fcst_raw->get_valid_time();
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-           yr, mon, day, hr, min, sec);
-
    // Add forecast variable attributes
    fcst_raw_var->add_att("long_name", "Forecast Object Raw Values");
+   write_netcdf_var_times(fcst_raw_var, *engine.fcst_raw);
    fcst_raw_var->add_att("_FillValue", bad_data_float);
-   fcst_raw_var->add_att("valid_time", time_str);
-   fcst_raw_var->add_att("valid_time_ut", (long int) ut);
 
    fcst_obj_var->add_att("long_name", "Forecast Object ID");
+   write_netcdf_var_times(fcst_obj_var, *engine.fcst_raw);
    fcst_obj_var->add_att("_FillValue", bad_data_int);
-   fcst_obj_var->add_att("valid_time", time_str);
-   fcst_obj_var->add_att("valid_time_ut", (long int) ut);
 
    fcst_clus_var->add_att("long_name", "Forecast Cluster Object ID");
+   write_netcdf_var_times(fcst_clus_var, *engine.fcst_raw);
    fcst_clus_var->add_att("_FillValue", bad_data_int);
-   fcst_clus_var->add_att("valid_time", time_str);
-   fcst_clus_var->add_att("valid_time_ut", (long int) ut);
-
-   // Compute observation valid time string
-   ut = engine.obs_raw->get_valid_time();
-   unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i-%.2i-%.2i %.2i:%.2i:%.2i",
-           yr, mon, day, hr, min, sec);
 
    // Add observation variable attributes
    obs_raw_var->add_att("long_name", "Observation Object Raw Values");
+   write_netcdf_var_times(obs_raw_var, *engine.obs_raw);
    obs_raw_var->add_att("_FillValue", bad_data_float);
-   obs_raw_var->add_att("valid_time", time_str);
-   obs_raw_var->add_att("valid_time_ut", (long int) ut);
 
    obs_obj_var->add_att("long_name", "Observation Object ID");
+   write_netcdf_var_times(obs_obj_var, *engine.obs_raw);
    obs_obj_var->add_att("_FillValue", bad_data_int);
-   obs_obj_var->add_att("valid_time", time_str);
-   obs_obj_var->add_att("valid_time_ut", (long int) ut);
 
    obs_clus_var->add_att("long_name", "Observation Cluster Object ID");
+   write_netcdf_var_times(obs_clus_var, *engine.obs_raw);
    obs_clus_var->add_att("_FillValue", bad_data_int);
-   obs_clus_var->add_att("valid_time", time_str);
-   obs_clus_var->add_att("valid_time_ut", (long int) ut);
 
    //
    // Allocate memory for the raw values and object ID's for each grid box
