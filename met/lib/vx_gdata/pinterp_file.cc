@@ -758,7 +758,7 @@ for (j=0; j<n; ++j)  {
 
    att = info.var->get_att(j);
 
-   if ( strcmp(units_att_name, att->as_string(0)) == 0 )  {
+   if ( strcmp(units_att_name, att->name()) == 0 )  {
 
       info.units = att->as_string(0);
 

@@ -704,7 +704,7 @@ for (j=0; j<n; ++j)  {
 
    att = info.var->get_att(j);
 
-   if ( strcmp(level_att_name, att->as_string(0)) == 0 )  {
+   if ( strcmp(level_att_name, att->name()) == 0 )  {
 
       info.level = att->as_string(0);
 
@@ -742,7 +742,7 @@ for (j=0; j<n; ++j)  {
 
    att = info.var->get_att(j);
 
-   if ( strcmp(units_att_name, att->as_string(0)) == 0 )  {
+   if ( strcmp(units_att_name, att->name()) == 0 )  {
 
       info.units = att->as_string(0);
 
@@ -780,7 +780,7 @@ for (j=0; j<n; ++j)  {
 
    att = info.var->get_att(j);
 
-   if ( strcmp(accum_time_att_name, att->as_string(0)) == 0 )  {
+   if ( strcmp(accum_time_att_name, att->name()) == 0 )  {
 
       info.AccumTime = att->as_int(0);
 
