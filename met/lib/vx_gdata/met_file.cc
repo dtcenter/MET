@@ -468,17 +468,13 @@ if ( v->num_dims() >= max_met_args )  {
 
 int j, count;
 int x, y;
-double value;
+double value, value_min, value_max;
 bool found = false;
 VarInfo * var = (VarInfo *) 0;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
 
-
-wd.clear();
-
-wd.set_size(Nx, Ny);
 
    //
    //  find varinfo's
@@ -552,6 +548,41 @@ if ( (x_slot < 0) || (y_slot < 0) )  {
 }
 
    //
+   //  get the min/max data values
+   //
+
+value_min =  1.0e30;
+value_max = -1.0e30;
+
+for (x=0; x<Nx; ++x)  {
+
+   b[x_slot] = x;
+
+   for (y=0; y<Ny; ++y)  {
+
+      b[y_slot] = y;
+
+      value = data(v, b);
+
+      if ( !is_bad_data(value) )  {
+         if ( value > value_max ) value_max = value;
+         if ( value < value_min ) value_min = value;
+      }
+
+   }   //  for y
+
+}   //  for x
+
+   //
+   //  set up the WrfData object
+   //
+
+wd.clear();
+wd.set_size(Nx, Ny);
+wd.set_b(value_min);
+wd.set_m( (double) (value_max-value_min)/wrfdata_int_data_max);
+
+   //
    //  get the data
    //
 
@@ -605,16 +636,16 @@ found = data(Var[j].var, a, wd);
    //  store the times
    //
 
-   wd.set_valid_time ( ValidTime );
-   wd.set_lead_time  ( lead_time() );
-   wd.set_accum_time ( Var[j].AccumTime );
+wd.set_valid_time ( ValidTime );
+wd.set_lead_time  ( lead_time() );
+wd.set_accum_time ( Var[j].AccumTime );
 
    //
    //  store the level and units
    //
 
-   level_str = Var[j].level;
-   units_str = Var[j].units;
+level_str = Var[j].level;
+units_str = Var[j].units;
 
    //
    //  done
