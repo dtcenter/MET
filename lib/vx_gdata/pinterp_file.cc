@@ -562,7 +562,7 @@ if ( v->num_dims() >= max_pinterp_args )  {
 
 int j, count;
 int x, y;
-double value;
+double value, value_min, value_max;
 bool found = false;
 VarInfo * var = (VarInfo *) 0;
 VarInfo * P   = (VarInfo *) 0;
@@ -570,10 +570,6 @@ const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
 unixtime ut;
-
-wd.clear();
-
-wd.set_size(Nx, Ny);
 
 pressure = bad_data_double;
 
@@ -653,6 +649,44 @@ if ( (x_slot < 0) || (y_slot < 0) || (z_slot < 0) )  {
 }
 
    //
+   //  get the min/max data values
+   //
+
+value_min =  1.0e30;
+value_max = -1.0e30;
+
+for (x=0; x<Nx; ++x)  {
+
+   b[x_slot] = x;
+
+   for (y=0; y<Ny; ++y)  {
+
+      b[y_slot] = y;
+
+      value = data(v, b);
+
+      if ( !is_bad_data(value) )  {
+         if ( value > value_max ) value_max = value;
+         if ( value < value_min ) value_min = value;
+      }
+
+   }   //  for y
+
+}   //  for x
+
+   //
+   //  set up the WrfData object
+   //
+
+wd.clear();
+wd.set_size(Nx, Ny);
+wd.set_b(value_min);
+wd.set_m( (double) (value_max-value_min)/wrfdata_int_data_max);
+ut = valid_time(a[t_slot]);
+wd.set_valid_time(ut);
+wd.set_lead_time((int) ut - InitTime);
+
+   //
    //  get the data
    //
 
@@ -685,14 +719,6 @@ if ( P )  {
    pressure = data(P->var, c);
 
 }
-
-   //
-   //  store the times
-   //
-
-   ut = valid_time(a[t_slot]);
-   wd.set_valid_time(ut);
-   wd.set_lead_time((int) ut - InitTime);
 
    //
    //  done
@@ -728,7 +754,7 @@ found = data(Var[j].var, a, wd, pressure);
    //  store the units
    //
 
-   units_str = Var[j].units;
+units_str = Var[j].units;
 
    //
    //  done
