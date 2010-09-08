@@ -18,6 +18,7 @@
 //   000    11-03-06  Halley Gotway
 //   001    08-19-08  R. Bullock     Fix convex hull routine.
 //   002    08-26-09  Halley Gotway  Fix zero_border routine.
+//   003    09-08-10  Halley Gotway  Optimize fractional_coverage routine.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -42,6 +43,7 @@ using namespace std;
 #include "vx_wrfdata/vx_wrfdata.h"
 #include "vx_wrfdata/shape.h"
 #include "vx_util/vx_util.h"
+#include "vx_met_util/vx_met_util.h"
 #include "vx_math/vx_math.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3397,10 +3399,11 @@ int mask_double_double(NumArray &na1, NumArray &na2, double d) {
 
 WrfData fractional_coverage(const WrfData &wd, int wdth, SingleThresh t,
                             double vld_t) {
-   int x, y, x_ll, y_ll, xx, yy;
+   int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
    double v;
    int count_vld, count_thr;
    WrfData frac_wd;
+   NumArray box_na;
 
    // Check that width is set to 1 or greater
    if(wdth < 1) {
@@ -3417,39 +3420,108 @@ WrfData fractional_coverage(const WrfData &wd, int wdth, SingleThresh t,
    frac_wd.set_m(1.0/wrfdata_int_data_max);
    frac_wd.set_b(0.0);
 
-   // Compute the fractional coverage meeting the threshold criteria for
-   // each point
+   // Compute the box half-width
+   half_width = (wdth - 1)/2;
+
+   // Initialize the box
+   for(i=0; i<wdth*wdth; i++) box_na.add(bad_data_int);
+
+   // Compute the fractional coverage meeting the threshold criteria
    for(x=0; x<wd.get_nx(); x++) {
+
+      // Find the lower-left x-coordinate of the neighborhood
+      x_ll = x - half_width;
+
       for(y=0; y<wd.get_ny(); y++) {
 
-         // Initialize counts
-         count_vld = count_thr = 0;
+         // Find the lower-left y-coordinate of the neighborhood
+         y_ll = y - half_width;
+         y_ur = y + half_width;
 
-         // The neighborhood width must be odd, find the lower-left
-         // corner of the neighborhood
-         x_ll = x - (wdth - 1)/2;
-         y_ll = y - (wdth - 1)/2;
+         // Initialize the box for this new column
+         if(y == 0) {
 
-         for(xx=x_ll; xx<x_ll+wdth; xx++) {
+            // Initialize counts
+            count_vld = count_thr = 0;
 
-            if(xx < 0 || xx >= wd.get_nx()) continue;
+            for(i=0; i<wdth; i++) {
 
-            for(yy=y_ll; yy<y_ll+wdth; yy++) {
+               xx = x_ll + i;
 
-               if(yy < 0 || yy >= wd.get_ny())  continue;
-               if(wd.is_bad_xy(xx, yy))         continue;
+               for(j=0; j<wdth; j++) {
 
-               v = wd.get_xy_double(xx, yy);
+                  yy = y_ll + j;
 
-               // Increment the count of valid data points
-               count_vld++;
+                  n = two_to_one(wdth, wdth, i, j);
 
-               // Check the value of v to see if it meets the
-               // threshold criteria
-               if(t.check(v)) count_thr++;
+                  // Check for being off the grid
+                  if(xx < 0 || xx >= wd.get_nx() ||
+                     yy < 0 || yy >= wd.get_ny()) {
+                     k = bad_data_int;
+                  }
+                  // Check the value of v to see if it meets the threshold criteria
+                  else {
+                     v = wd.get_xy_double(xx, yy);
+                     if(is_bad_data(v))  k = bad_data_int;
+                     else if(t.check(v)) k = 1;
+                     else                k = 0;
+                  }
+                  box_na.set(n, k);
 
-            } // for yy
-         } // for xx
+                  // Increment the counts
+                  if(!is_bad_data(k)) {
+                     count_vld += 1;
+                     count_thr += k;
+                  }
+
+               } // end for j
+            } // end for i
+         } // end if
+
+         // Otherwise, update one row of the box
+         else {
+
+            // Compute the row of the neighborhood box to be updated
+            j = (y - 1) % wdth;
+
+            for(i=0; i<wdth; i++) {
+
+               // Index into the box
+               n = two_to_one(wdth, wdth, i, j);
+
+               // Get x and y values to be checked
+               xx = x_ll + i;
+               yy = y_ur;
+
+               // Decrement counts for data to be replaced
+               k = box_na[n];
+               if(!is_bad_data(k)) {
+                  count_vld -= 1;
+                  count_thr -= k;
+               }
+
+               // Check for being off the grid
+               if(xx < 0 || xx >= wd.get_nx() ||
+                  yy < 0 || yy >= wd.get_ny()) {
+                  k = bad_data_int;
+               }
+               // Check the value of v to see if it meets the threshold criteria
+               else {
+                  v = wd.get_xy_double(xx, yy);
+                  if(is_bad_data(v))  k = bad_data_int;
+                  else if(t.check(v)) k = 1;
+                  else                k = 0;
+               }
+               box_na.set(n, k);
+
+               // Increment the counts
+               if(!is_bad_data(k)) {
+                  count_vld += 1;
+                  count_thr += k;
+               }
+
+            } // end for i
+         } // end else
 
          // Check whether enough valid grid points were found
          if((double) count_vld/(wdth*wdth) < vld_t ||

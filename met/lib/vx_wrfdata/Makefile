@@ -58,7 +58,7 @@ polyline.o: polyline.cc
 	$(CXX) polyline.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS)
 
 vx_wrfdata.o: vx_wrfdata.cc
-	$(CXX) vx_wrfdata.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+	$(CXX) vx_wrfdata.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
