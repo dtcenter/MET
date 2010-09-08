@@ -339,6 +339,9 @@ void GCInfo::set_gcinfo_nc(const char *c) {
    // Initialize
    clear();
 
+   // Set the info_str to the input string
+   set_info_str(c);
+
    // Initialize the temp string
    strcpy(tmp_str, c);
 
@@ -356,56 +359,56 @@ void GCInfo::set_gcinfo_nc(const char *c) {
    // Set the abbr_str
    set_abbr_str(ptr);
 
-   // Retreive the NetCDF variable name
-   if((ptr = strtok_r(NULL, "()", &save_ptr)) == NULL) {
-      cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
-           << "bad NetCDF variable name specified \""
-           << c << "\".\n\n" << flush;
-      exit(1);
+   // Retreive the NetCDF level specification
+   ptr = strtok_r(NULL, "()", &save_ptr);
+
+   // If there's no level specification, assume (*, *)
+   if(ptr == NULL) {
+      set_lvl_str("*,*");
    }
+   // Otherwise, parse the rest of the string
+   else {
 
-   // Set the lvl_str
-   set_lvl_str(ptr);
+      // Set the level string
+      set_lvl_str(ptr);
 
-   // Set the info_str to the input string
-   set_info_str(c);
+      // If dimensions are specified, clear the default value
+      if(strchr(ptr, ',') != NULL) dim_la.clear();
 
-   // If dimensions are specified, clear the default value
-   if(strchr(ptr, ',') != NULL) dim_la.clear();
+      // Parse the dimensions
+      while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
 
-   // Parse the dimensions
-   while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
-
-      // Check for wildcards
-      if(strchr(ptr2, '*') != NULL) dim_la.add(vx_gdata_star);
-      else {
-
-         // Check for a range of levels
-         if((ptr3 = strchr(ptr2, '-')) != NULL) {
-
-            // Check if a range has already been supplied
-            if(dim_la.has(range_flag)) {
-               cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
-                    << "only one dimension can have a range for NetCDF variable \""
-                    << c << "\".\n\n" << flush;
-               exit(1);
-            }
-            // Store the dimension of the range and limits
-            else {
-               dim_la.add(range_flag);
-               lvl_1 = atoi(ptr2);
-               lvl_2 = atoi(++ptr3);
-            }
-         }
-         // Single level
+         // Check for wildcards
+         if(strchr(ptr2, '*') != NULL) dim_la.add(vx_gdata_star);
          else {
-            dim_la.add(atoi(ptr2));
-         }
-      }
 
-      // Set ptr to NULL for next call to strtok
-      ptr = NULL;
-   }
+            // Check for a range of levels
+            if((ptr3 = strchr(ptr2, '-')) != NULL) {
+
+               // Check if a range has already been supplied
+               if(dim_la.has(range_flag)) {
+                  cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
+                       << "only one dimension can have a range for NetCDF variable \""
+                       << c << "\".\n\n" << flush;
+                  exit(1);
+               }
+               // Store the dimension of the range and limits
+               else {
+                  dim_la.add(range_flag);
+                  lvl_1 = atoi(ptr2);
+                  lvl_2 = atoi(++ptr3);
+               }
+            }
+            // Single level
+            else {
+               dim_la.add(atoi(ptr2));
+            }
+         }
+
+         // Set ptr to NULL for next call to strtok
+         ptr = NULL;
+      }
+   } // end while
 
    // Set the units_str
    set_units_str(na_str);
