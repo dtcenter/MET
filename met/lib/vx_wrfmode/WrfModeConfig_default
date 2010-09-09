@@ -17,13 +17,15 @@ model = "WRF";
 grid_res = 4;
 
 //
-// Specify the field to be used in the verification.  The forecast and
-// observation fields may be specified separately.
+// Specify the fields to be verified.  The forecast and  observation fields
+// may be specified separately.  If the obs_field parameter is left blank,
+// it will default to the contents of fcst_field.
 //
-// The field is specified as a grib code or corresponding grib code
-// abbreviation followed by an accumulation or vertical level indicator.
+// The field is specified as a GRIB code or abbreviation followed by an
+// accumulation or vertical level indicator for GRIB files or as a variable name
+// followed by a list of dimensions for NetCDF files output from p_interp or MET.
 //
-// The verification field is specified as one of the following:
+// Specifying verification fields for GRIB files:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
 //    GC/PNNN for pressure level NNN in hPa
@@ -34,7 +36,14 @@ grid_res = 4;
 //    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
-// e.g. fcst_field = "61/A3";
+// Specifying verification fields for NetCDF files:
+//    var_name(i,...,j,*,*) for a single field
+//    Where var_name is the name of the NetCDF variable,
+//    and i,...,j specifies fixed dimension values,
+//    and *,* specifies the two dimensions for the gridded field.
+//
+// e.g. fcst_field = "61/A3"; for GRIB input
+// e.g. fcst_field = "RAINC(0,*,*)"; for NetCDF input
 //
 fcst_field = "APCP/A3";
 obs_field  = "APCP/A3";

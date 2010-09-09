@@ -14,8 +14,8 @@
 
 CXX         = /usr/bin/g++
 CXX_FLAGS   = -Wall -static -g
-SVNROOT     = ../../../..
-MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
+SVNROOT     = ../../../../..
+MET_LIB_DIR = $(SVNROOT)/code/trunk/met/lib
 
 ###############################################################################
 
@@ -46,8 +46,7 @@ MODULE_TYPE=library
 #
 # vx_econfig macros and targets
 #
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
+include $(SVNROOT)/code/build/make_include/rap_make_vx_econfig_macros
 
 vx_wrfmode_all:
 	@ echo
@@ -74,6 +73,8 @@ interest.o: interest.cc
 
 set.o: set.cc
 	$(CXX) set.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+
+include $(SVNROOT)/code/build/make_include/rap_make_vx_econfig_targets
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)

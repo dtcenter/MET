@@ -15,10 +15,11 @@ model = "WRF";
 // observation fields may be specified separately.  If the obs_field parameter
 // is left blank, it will default to the contents of fcst_field.
 //
-// Each field is specified as a grib code or corresponding grib code
-// abbreviation followed by an accumulation or vertical level indicator.
+// Each field is specified as a GRIB code or abbreviation followed by an
+// accumulation or vertical level indicator for GRIB files or as a variable name
+// followed by a list of dimensions for NetCDF files output from p_interp or MET.
 //
-// Each verification field is specified as one of the following:
+// Specifying verification fields for GRIB files:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
 //    GC/PNNN for pressure level NNN in hPa
@@ -29,13 +30,20 @@ model = "WRF";
 //    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
+// Specifying verification fields for NetCDF files:
+//    var_name(i,...,j,*,*) for a single field
+//    Where var_name is the name of the NetCDF variable,
+//    and i,...,j specifies fixed dimension values,
+//    and *,* specifies the two dimensions for the gridded field.
+//
 //    NOTE: To verify winds as vectors rather than scalars,
 //          specify UGRD (or 33) followd by VGRD (or 34) with the
 //          same level values.
 //
 //    NOTE: To process a probability field, add "/PROB", such as "POP/Z0/PROB".
 //
-// e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+// e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ]; for GRIB input
+// e.g. fcst_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)" ]; for NetCDF input
 //
 fcst_field[] = [ "61/A24" ];
 obs_field[]  = [];
@@ -202,9 +210,9 @@ interp_method[] = [ "UW_MEAN" ];
 
 //
 // Specify a comma-separated list of box widths to be used by the interpolation
-// techniques listed above.  A value of 1 indicates that no smoothing should be
-// performed.  For a value of n greater than 1, the n*n grid points around each
-// point will be used to smooth the data fields.
+// techniques listed above.  All values must be odd.  A value of 1 indicates
+// that no smoothing should be performed.  For values greater than 1, the n*n
+// grid points around each point will be used to smooth the data fields.
 //
 // e.g. interp_width = [ 1, 3, 5 ];
 //
@@ -231,10 +239,10 @@ interp_flag = 1;
 interp_thresh = 1.0;
 
 //
-// Specify a comma-separated list of box widths to be used to define
-// the neighborhood size for the neighborhood verification methods.
-// For a value of n greater than 1, the n*n grid points around each point
-// will be used to define the neighborhood.
+// Specify a comma-separated list of box widths to be used to define the
+// neighborhood size for the neighborhood verification methods. All values
+// must be odd.  For values greater than 1, the n*n grid points around each
+// point will be used to define the neighborhood.
 //
 // e.g. nbr_width = [ 3, 5 ];
 //

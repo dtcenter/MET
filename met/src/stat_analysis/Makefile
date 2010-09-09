@@ -14,8 +14,8 @@
 
 CXX         = /usr/bin/g++
 CXX_FLAGS   = -Wall -Wshadow -static -g
-SVNROOT     = ../../../..
-MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
+SVNROOT     = ../../../../..
+MET_LIB_DIR = $(SVNROOT)/code/trunk/met/lib
 
 ###############################################################################
 
@@ -45,7 +45,7 @@ MODULE_TYPE = progcpp
 #
 # vx_econfig macros and targets
 #
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
+include $(SVNROOT)/code/build/make_include/rap_make_vx_econfig_macros
 
 all:
 	@ echo
@@ -94,7 +94,7 @@ stat_analysis_job.o: stat_analysis_job.cc
 	$(CXX) -c stat_analysis_job.cc $(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
 
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
+include $(SVNROOT)/code/build/make_include/rap_make_vx_econfig_targets
 
 clean:
 	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)
