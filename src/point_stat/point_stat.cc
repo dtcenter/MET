@@ -453,7 +453,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    str.clear();
 
    // Append the output directory and program name
-   str << out_dir.text() << "/" << program_name;
+   str << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
    if(strlen(conf_info.conf.output_prefix().sval()) > 0)
@@ -827,16 +827,16 @@ void process_scores() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.gc_pd[i].fcst_gci.abbr_str.text());
+      shc.set_fcst_var(conf_info.gc_pd[i].fcst_gci.abbr_str);
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.gc_pd[i].fcst_gci.lvl_str.text());
+      shc.set_fcst_lev(conf_info.gc_pd[i].fcst_gci.lvl_str);
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.gc_pd[i].obs_gci.abbr_str.text());
+      shc.set_obs_var(conf_info.gc_pd[i].obs_gci.abbr_str);
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.gc_pd[i].obs_gci.lvl_str.text());
+      shc.set_obs_lev(conf_info.gc_pd[i].obs_gci.lvl_str);
 
       // Point to the first forecast field
       wd_ptr = conf_info.gc_pd[i].fcst_wd_ptr[0];
@@ -1107,10 +1107,10 @@ void process_scores() {
                   } // end for m
 
                   // Reset the forecast variable name
-                  shc.set_fcst_var(conf_info.gc_pd[i].fcst_gci.abbr_str.text());
+                  shc.set_fcst_var(conf_info.gc_pd[i].fcst_gci.abbr_str);
 
                   // Reset the observation variable name
-                  shc.set_obs_var(conf_info.gc_pd[i].obs_gci.abbr_str.text());
+                  shc.set_obs_var(conf_info.gc_pd[i].obs_gci.abbr_str);
 
                } // end Compute VL1L2 and VAL1L2
 
