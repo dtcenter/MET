@@ -99,8 +99,6 @@ bool read_field_grib(const char *file_name, GCInfo &gci,
                      WrfData &wd, Grid &gr, int verbosity) {
    GribFile gb_file;
    GribRecord rec;
-   Section1_Header *pds_ptr;
-   char lvl_str[max_str_len];
    bool status = false;
 
    // Open the GRIB file
@@ -114,14 +112,6 @@ bool read_field_grib(const char *file_name, GCInfo &gci,
    // Read the requested GRIB record
    status = get_grib_record(gb_file, rec, gci, valid_ut, lead_sec,
                             wd, gr, verbosity);
-
-   if(status) {
-
-      // Reset the GCInfo object's level string
-      pds_ptr = (Section1_Header *) rec.pds;
-      get_grib_level_str(pds_ptr->type, pds_ptr->level_info, lvl_str);
-      gci.set_lvl_str(lvl_str);
-   }
 
    // Close the file
    gb_file.close();
@@ -421,7 +411,7 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
    PinterpFile nc_file;
    ConcatString lvl_str, units_str;
    bool found;
-   int i_dim, i, n_lvl;
+   int i_dim, i, n_lvl, lvl_min, lvl_max;
    double pressure;
    LongArray lvl_dim_la;
    bool status = false;
@@ -517,7 +507,10 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
 
    // Set the GCInfo object's level and units strings
    lvl_str.clear();
-   lvl_str << "P" << lvl_na.max() << "-" << lvl_na.min();
+   lvl_min = nint(lvl_na.min());
+   lvl_max = nint(lvl_na.max());
+   if(lvl_min == lvl_max) lvl_str << "P" << lvl_na.max();
+   else                   lvl_str << "P" << lvl_max << "-" << lvl_min;
    gci.set_lvl_str(lvl_str);
    gci.set_units_str(units_str);
 
