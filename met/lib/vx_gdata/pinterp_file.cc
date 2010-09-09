@@ -54,11 +54,15 @@ static const char units_att_name     [] = "units";
 
 static const int max_pinterp_args       = 30;
 
+static const double pinterp_missing     = 1.0e35;
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static unixtime parse_init_time(const char *);
+
+static bool is_bad_data_pinterp(double);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -665,7 +669,7 @@ for (x=0; x<Nx; ++x)  {
 
       value = data(v, b);
 
-      if ( !is_bad_data(value) )  {
+      if ( !is_bad_data_pinterp( value ) ) {
          if ( value > value_max ) value_max = value;
          if ( value < value_min ) value_min = value;
       }
@@ -699,6 +703,8 @@ for (x=0; x<Nx; ++x)  {
       b[y_slot] = y;
 
       value = data(v, b);
+
+      if ( is_bad_data_pinterp( value ) ) value = bad_data_double;
 
       wd.put_xy_double(value, x, y);
 
@@ -841,6 +847,19 @@ if ( j != 6 )  {
 t = mdyhms_to_unix(month, day, year, hour, minute, second);
 
 return ( t );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_bad_data_pinterp(double v)
+
+{
+
+if ( v < pinterp_missing )  return ( false );
+else                        return ( true  );
 
 }
 
