@@ -15,20 +15,30 @@ model = "WRF";
 //
 
 //
-// Specify a comma-separated list of ensemble fields to be computed.
-// Each field is specified as a GRIB code or corresponding GRIB code
-// abbreviation followed by an accumulation or vertical level indicator.
+// Specify a comma-separated list of ensemble fields to be computed. Each field
+// is specified as a GRIB code or abbreviation followed by an accumulation or
+// vertical level indicator for GRIB files or as a variable name followed by a
+// list of dimensions for NetCDF files output from p_interp or MET.
 //
-// Each ensemble field is specified as one of the following:
+// Specifying ensemble fields for GRIB files:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
 //    GC/PNNN for pressure level NNN in hPa
+//    GC/PNNN-NNN for a range of pressure levels in hPa
 //    GC/LNNN for a generic level type
 //    GC/RNNN for a specific GRIB record number
-//    Where GC is the number of or abbreviation for the GRIB code.
+//    Where GC is the number of or abbreviation for the grib code
+//    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
-// e.g. ens_field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+// Specifying ensemble fields for NetCDF files:
+//    var_name(i,...,j,*,*) for a single field
+//    Where var_name is the name of the NetCDF variable,
+//    and i,...,j specifies fixed dimension values,
+//    and *,* specifies the two dimensions for the gridded field.
+//
+// e.g. ens_field[] = [ "61/A3", "RH/L10" ]; for GRIB input
+// e.g. ens_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)" ]; for NetCDF input
 //
 ens_field[] = [ "61/A24", "REFC/L0", "UGRD/Z10", "VGRD/Z10", "WIND/Z10" ];
 
@@ -77,26 +87,34 @@ vld_data_thresh = 1.0;
 //
 
 //
-// Specify a comma-separated list of ensemble fields to be verified. The
-// forecast and observation fields may be specified separately. If the
+// Specify a comma-separated list of ensemble fields to be verified.  The
+// forecast and observation fields may be specified separately.  If the
 // obs_field parameter is left blank, it will default to the contents of
 // fcst_field.
 //
-// Each field is specified as a GRIB code or corresponding GRIB code
-// abbreviation followed by an accumulation or vertical level indicator.
+// Each field is specified as a GRIB code or abbreviation followed by an
+// accumulation or vertical level indicator for GRIB files or as a variable name
+// followed by a list of dimensions for NetCDF files output from p_interp or MET.
 //
-// Each ensemble verification field is specified as one of the following:
+// Specifying verification fields for GRIB files:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
-//    GC/ZNNN-NNN for a range of vertical levels (MSL or AGL)
 //    GC/PNNN for pressure level NNN in hPa
 //    GC/PNNN-NNN for a range of pressure levels in hPa
 //    GC/LNNN for a generic level type
 //    GC/RNNN for a specific GRIB record number
-//    Where GC is the number of or abbreviation for the GRIB code.
+//    Where GC is the number of or abbreviation for the grib code
+//    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
-// e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ];
+// Specifying verification fields for NetCDF files:
+//    var_name(i,...,j,*,*) for a single field
+//    Where var_name is the name of the NetCDF variable,
+//    and i,...,j specifies fixed dimension values,
+//    and *,* specifies the two dimensions for the gridded field.
+//
+// e.g. fcst_field[] = [ "61/A3", "RH/L10" ]; for GRIB input
+// e.g. fcst_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)" ]; for NetCDF input
 //
 fcst_field[] = [ "61/A24" ];
 obs_field[]  = [];

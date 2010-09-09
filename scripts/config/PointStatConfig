@@ -26,10 +26,11 @@ end_ds =  5400;
 // observation fields may be specified separately.  If the obs_field parameter
 // is left blank, it will default to the contents of fcst_field.
 //
-// Each field is specified as a grib code or corresponding grib code
-// abbreviation followed by an accumulation or vertical level indicator.
+// Each field is specified as a GRIB code or abbreviation followed by an
+// accumulation or vertical level indicator for GRIB files or as a variable name
+// followed by a list of dimensions for NetCDF files output from p_interp or MET.
 //
-// Each verification field is specified as one of the following:
+// Specifying verification fields for GRIB files:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
 //    GC/ZNNN-NNN for a range of vertical levels (MSL or AGL)
@@ -41,13 +42,22 @@ end_ds =  5400;
 //    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
+// Specifying verification fields for NetCDF files:
+//    var_name(i,...,j,*,*) for a single field
+//    var_name(i-j,*,*) for a range of fields
+//    Where var_name is the name of the NetCDF variable,
+//    and i,...,j specifies fixed dimension values,
+//    and i-j specifies a range of values for a single dimension,
+//    and *,* specifies the two dimensions for the gridded field.
+//
 //    NOTE: To verify winds as vectors rather than scalars,
 //          specify UGRD (or 33) followed by VGRD (or 34) with the
 //          same level values.
 //
 //    NOTE: To process a probability field, add "/PROB", such as "POP/Z0/PROB".
 //
-// e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ];
+// e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ]; for a GRIB input
+// e.g. fcst_field[] = [ "QVAPOR(0,5,*,*)", "TT(0,5,*,*)" ]; for NetCDF input
 //
 fcst_field[] = [ "TMP/P750-900", "UGRD/Z10", "VGRD/Z10" ];
 obs_field[]  = [];

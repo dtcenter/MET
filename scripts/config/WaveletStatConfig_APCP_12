@@ -15,10 +15,11 @@ model = "WRF";
 // observation fields may be specified separately.  If the obs_field parameter
 // is left blank, it will default to the contents of fcst_field.
 //
-// Each field is specified as a grib code or corresponding grib code
-// abbreviation followed by an accumulation or vertical level indicator.
+// Each field is specified as a GRIB code or abbreviation followed by an
+// accumulation or vertical level indicator for GRIB files or as a variable name
+// followed by a list of dimensions for NetCDF files output from p_interp or MET.
 //
-// Each verification field is specified as one of the following:
+// Specifying verification fields for GRIB files:
 //    GC/ANNN for accumulation interval NNN
 //    GC/ZNNN for vertical level NNN
 //    GC/PNNN for pressure level NNN in hPa
@@ -29,7 +30,14 @@ model = "WRF";
 //    to be verified.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
-// e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ];
+// Specifying verification fields for NetCDF files:
+//    var_name(i,...,j,*,*) for a single field
+//    Where var_name is the name of the NetCDF variable,
+//    and i,...,j specifies fixed dimension values,
+//    and *,* specifies the two dimensions for the gridded field.
+//
+// e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ]; for GRIB input
+// e.g. fcst_field[] = [ "QVAPOR(0,5,*,*)", "TT(0,5,*,*)" ]; for NetCDF input
 //
 fcst_field[] = [ "61/A12" ];
 obs_field[]  = [];
