@@ -142,7 +142,7 @@ bool read_field_pinterp(const char *file_name, GCInfo &gci,
    status = nc_file.data(gci.abbr_str, gci.dim_la,
                          wd, pressure, units_str);
 
-   if(status) {
+   if(!status) {
 
       // Check that the valid time matches the request
       if(valid_ut > 0 && valid_ut != wd.get_valid_time()) {
@@ -212,7 +212,7 @@ bool read_field_met(const char *file_name, GCInfo &gci,
    status = nc_file.data(gci.abbr_str, gci.dim_la,
                          wd, lvl_str, units_str);
 
-   if(status) {
+   if(!status) {
 
       // Check that the valid time matches the request
       if(valid_ut > 0 && valid_ut != wd.get_valid_time()) {
@@ -456,14 +456,14 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
    for(i=0; i<n_lvl; i++) {
 
       // Set the current level
-      lvl_dim_la[i_dim] = gci.lvl_1 + 1;
+      lvl_dim_la[i_dim] = gci.lvl_1 + i;
 
       // Read the data
       status = nc_file.data(gci.abbr_str, lvl_dim_la,
                             wd[i], pressure, units_str);
 
       // Check for bad status
-      if(status) {
+      if(!status) {
          cerr << "\n\nERROR: read_levels_pinterp() -> "
               << "error reading " << gci.info_str
               << " from the p_interp NetCDF file " << file_name
@@ -509,7 +509,7 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
    lvl_str.clear();
    lvl_min = nint(lvl_na.min());
    lvl_max = nint(lvl_na.max());
-   if(lvl_min == lvl_max) lvl_str << "P" << lvl_na.max();
+   if(lvl_min == lvl_max) lvl_str << "P" << lvl_min;
    else                   lvl_str << "P" << lvl_max << "-" << lvl_min;
    gci.set_lvl_str(lvl_str);
    gci.set_units_str(units_str);
