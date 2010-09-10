@@ -68,10 +68,11 @@ GCInfo & GCInfo::operator=(const GCInfo &c) {
 int GCInfo::operator==(const GCInfo &c) {
    int match = 0;
 
-   if(code     == c.code &&
+   if(abbr_str == c.abbr_str &&
+      code     == c.code     &&
       lvl_type == c.lvl_type &&
-      lvl_1    == c.lvl_1 &&
-      lvl_2    == c.lvl_2 &&
+      lvl_1    == c.lvl_1    &&
+      lvl_2    == c.lvl_2    &&
       vflag    == c.vflag) match = 1;
 
    return(match);
