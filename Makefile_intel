@@ -157,6 +157,7 @@ VX_COLOR	= $(LIB_DIR)/vx_color
 VX_CONTABLE	= $(LIB_DIR)/vx_contable
 VX_DATA_GRIDS	= $(LIB_DIR)/vx_data_grids
 VX_ECONFIG	= $(LIB_DIR)/vx_econfig
+VX_GDATA	= $(LIB_DIR)/vx_gdata
 VX_GNOMON	= $(LIB_DIR)/vx_gnomon
 VX_GRIB_CLASSES	= $(LIB_DIR)/vx_grib_classes
 VX_GSL_PROB	= $(LIB_DIR)/vx_gsl_prob
@@ -201,6 +202,7 @@ libs:
 	@ cd $(VX_CONTABLE);	 $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_DATA_GRIDS);	 $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_ECONFIG);	 $(MAKE) $(PRINT_OPTS)
+	@ cd $(VX_GDATA);	 $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_GNOMON);	 $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_GRIB_CLASSES); $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_GSL_PROB);	 $(MAKE) $(PRINT_OPTS)
@@ -262,6 +264,7 @@ clean:
 	@ cd $(VX_CONTABLE);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(VX_DATA_GRIDS);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(VX_ECONFIG);	 $(MAKE) clean $(PRINT_OPTS)
+	@ cd $(VX_GDATA);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(VX_GNOMON);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(VX_GRIB_CLASSES); $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(VX_GSL_PROB);	 $(MAKE) clean $(PRINT_OPTS)
