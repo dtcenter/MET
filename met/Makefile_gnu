@@ -202,7 +202,7 @@ libs:
 	@ cd $(VX_CONTABLE);      $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_DATA_GRIDS);    $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_ECONFIG);       $(MAKE) $(PRINT_OPTS)
-	@ cd $(VX_GDATA);	 $(MAKE) $(PRINT_OPTS)
+	@ cd $(VX_GDATA);	  $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_GNOMON);        $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_GRIB_CLASSES);  $(MAKE) $(PRINT_OPTS)
 	@ cd $(VX_GSL_PROB);      $(MAKE) $(PRINT_OPTS)
