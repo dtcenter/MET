@@ -643,10 +643,10 @@ const int y_slot = var->y_slot;
 const int z_slot = var->z_slot;
 const int t_slot = var->t_slot;
 
-if ( (x_slot < 0) || (y_slot < 0) || (z_slot < 0) )  {
+if ( (x_slot < 0) || (y_slot < 0) )  {
 
    cerr << "\n\n  PinterpFile::data(NcVar *, const LongArray &, WrfData &, double &) const -> "
-        << " bad x|y|z slot\n\n";
+        << " bad x|y slot\n\n";
 
    exit ( 1 );
 
@@ -689,6 +689,7 @@ wd.set_m( (double) (value_max-value_min)/wrfdata_int_data_max);
 ut = valid_time(a[t_slot]);
 wd.set_valid_time(ut);
 wd.set_lead_time((int) ut - InitTime);
+wd.set_accum_time(0);
 
    //
    //  get the data
@@ -716,7 +717,7 @@ for (x=0; x<Nx; ++x)  {
    //  get the pressure
    //
 
-if ( P )  {
+if ( P && z_slot > 0 )  {
 
    LongArray c;
 
