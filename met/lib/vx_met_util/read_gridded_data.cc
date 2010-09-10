@@ -142,7 +142,7 @@ bool read_field_pinterp(const char *file_name, GCInfo &gci,
    status = nc_file.data(gci.abbr_str, gci.dim_la,
                          wd, pressure, units_str);
 
-   if(!status) {
+   if(status) {
 
       // Check that the valid time matches the request
       if(valid_ut > 0 && valid_ut != wd.get_valid_time()) {
@@ -176,9 +176,11 @@ bool read_field_pinterp(const char *file_name, GCInfo &gci,
 
       // Set the GCInfo object's level and units strings
       lvl_str.clear();
-      lvl_str << "P" << pressure;
+      if(!is_bad_data(pressure)) lvl_str << "P" << nint(pressure);
+      else                       lvl_str << na_str;
       gci.set_lvl_str(lvl_str);
-      gci.set_units_str(units_str);
+      if(strlen(units_str) > 0)  gci.set_units_str(units_str);
+      else                       gci.set_units_str(na_str);
    }
 
    // Store the grid definition
@@ -212,7 +214,7 @@ bool read_field_met(const char *file_name, GCInfo &gci,
    status = nc_file.data(gci.abbr_str, gci.dim_la,
                          wd, lvl_str, units_str);
 
-   if(!status) {
+   if(status) {
 
       // Check that the valid time matches the request
       if(valid_ut > 0 && valid_ut != wd.get_valid_time()) {
@@ -245,8 +247,10 @@ bool read_field_met(const char *file_name, GCInfo &gci,
       }
 
       // Set the GCInfo object's level and units string
-      gci.set_lvl_str(lvl_str);
-      gci.set_units_str(units_str);
+      if(strlen(lvl_str) > 0)   gci.set_lvl_str(lvl_str);
+      else                      gci.set_lvl_str(na_str);
+      if(strlen(units_str) > 0) gci.set_units_str(units_str);
+      else                      gci.set_units_str(na_str);
    }
 
    // Store the grid definition
@@ -512,7 +516,8 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
    if(lvl_min == lvl_max) lvl_str << "P" << lvl_min;
    else                   lvl_str << "P" << lvl_max << "-" << lvl_min;
    gci.set_lvl_str(lvl_str);
-   gci.set_units_str(units_str);
+   if(strlen(units_str) > 0) gci.set_units_str(units_str);
+   else                      gci.set_units_str(na_str);
 
    // Store the grid definition
    gr = nc_file.grid;
