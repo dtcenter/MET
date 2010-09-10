@@ -462,12 +462,12 @@ void process_fcst_obs_files() {
    //
    // Store the forecast and observation variable, level, and units.
    //
-   strcpy(engine.fcst_var_str,  fcst_gci.abbr_str.text());
-   strcpy(engine.fcst_lvl_str,  fcst_gci.lvl_str.text());
+   strcpy(engine.fcst_var_str,  fcst_gci.abbr_str);
+   strcpy(engine.fcst_lvl_str,  fcst_gci.lvl_str);
    strcpy(engine.fcst_unit_str, fcst_gci.units_str);
 
-   strcpy(engine.obs_var_str,   obs_gci.abbr_str.text());
-   strcpy(engine.obs_lvl_str,   obs_gci.lvl_str.text());
+   strcpy(engine.obs_var_str,   obs_gci.abbr_str);
+   strcpy(engine.obs_lvl_str,   obs_gci.lvl_str);
    strcpy(engine.obs_unit_str,  obs_gci.units_str);
 
    if(verbosity > 0) {
