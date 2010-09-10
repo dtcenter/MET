@@ -14,7 +14,7 @@
 
 CXX         = /usr/bin/g++
 CXX_FLAGS   = -Wall -Wshadow -static -g
-SVNROOT     = ../../../../..
+SVNROOT     = ../../../..
 MET_LIB_DIR = $(SVNROOT)/code/trunk/met/lib
 
 ###############################################################################
@@ -46,7 +46,7 @@ MODULE_TYPE = progcpp
 #
 # vx_econfig macros and targets
 #
-include $(SVNROOT)/code/build/make_include/rap_make_vx_econfig_macros
+include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
 
 all:
 	@ echo
@@ -96,7 +96,7 @@ readpb.o: readpb.f
 dumppb.o: dumppb.f
 	$(FC) -c dumppb.f $(FC_FLAGS) $(OPT_FLAGS)
 
-include $(SVNROOT)/code/build/make_include/rap_make_vx_econfig_targets
+include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
 
 clean:
 	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)
