@@ -87,7 +87,7 @@ class GCInfo {
 
       void set_gcinfo(const char *, int, FileType);
       void set_gcinfo_grib(const char *, int);
-      void set_gcinfo_nc(const char *);
+      void set_gcinfo_nc(const char *, int);
       void set_abbr_str(const char *);
       void set_lvl_str(const char *);
       void set_info_str(const char *);
