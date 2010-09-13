@@ -89,20 +89,21 @@ void WaveletStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void WaveletStatConfInfo::read_config(const char *file_name) {
+void WaveletStatConfInfo::read_config(const char *file_name,
+                                      FileType ftype, FileType otype) {
 
    // Call the config read routine
    conf.read(file_name);
 
    // Process the configuration file
-   process_config();
+   process_config(ftype, otype);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void WaveletStatConfInfo::process_config() {
+void WaveletStatConfInfo::process_config(FileType ftype, FileType otype) {
    int i, k;
    gsl_wavelet_type wvlt_type;
 
@@ -154,7 +155,7 @@ void WaveletStatConfInfo::process_config() {
    // Parse the fcst_field information
    for(i=0; i<n_vx; i++) {
       fcst_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
-         conf.grib_ptv().ival());
+         conf.grib_ptv().ival(), ftype);
 
       // No support for WDIR
       if(fcst_gci[i].code == wdir_grib_code) {
@@ -191,11 +192,11 @@ void WaveletStatConfInfo::process_config() {
       // If obs_field is empty, use fcst_field
       if(conf.n_obs_field_elements() == 0) {
          obs_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
-            conf.grib_ptv().ival());
+            conf.grib_ptv().ival(), otype);
       }
       else {
          obs_gci[i].set_gcinfo(conf.obs_field(i).sval(),
-            conf.grib_ptv().ival());
+            conf.grib_ptv().ival(), otype);
       }
 
       // No support for WDIR

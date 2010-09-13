@@ -249,6 +249,7 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    int i;
    char tmp_str[PATH_MAX];
+   FileType ftype, otype;
 
    // Set the default output directory
    replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
@@ -263,6 +264,10 @@ void process_command_line(int argc, char **argv) {
    fcst_file         = argv[1];
    obs_file          = argv[2];
    match_config_file = argv[3];
+
+   // Determine the input file types
+   ftype = get_file_type(fcst_file);
+   otype = get_file_type(obs_file);
 
    //
    // Set the merge config file to the match config file by default
@@ -343,9 +348,9 @@ void process_command_line(int argc, char **argv) {
    // and observation GRIB codes.
    //
    fcst_gci.set_gcinfo(engine.wconf.fcst_field().sval(),
-      engine.wconf.grib_ptv().ival());
+      engine.wconf.grib_ptv().ival(), ftype);
    obs_gci.set_gcinfo(engine.wconf.obs_field().sval(),
-      engine.wconf.grib_ptv().ival());
+      engine.wconf.grib_ptv().ival(), otype);
 
    //
    // Check to make sure that MODE can be run on the GRIB codes specified

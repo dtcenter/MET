@@ -103,20 +103,21 @@ void GridStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatConfInfo::read_config(const char *file_name) {
+void GridStatConfInfo::read_config(const char *file_name,
+                                   FileType ftype, FileType otype) {
 
    // Call the config read routine
    conf.read(file_name);
 
    // Process the configuration file
-   process_config();
+   process_config(ftype, otype);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatConfInfo::process_config() {
+void GridStatConfInfo::process_config(FileType ftype, FileType otype) {
    int i, j, n, n_mthd, n_wdth;
    InterpMthd im;
 
@@ -168,7 +169,7 @@ void GridStatConfInfo::process_config() {
    // Parse the fcst field information
    for(i=0; i<n_vx; i++) {
       fcst_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
-         conf.grib_ptv().ival());
+         conf.grib_ptv().ival(), ftype);
 
       // No support for WDIR
       if(fcst_gci[i].code == wdir_grib_code) {
@@ -205,11 +206,11 @@ void GridStatConfInfo::process_config() {
       // If obs_field is empty, use fcst_field
       if(conf.n_obs_field_elements() == 0) {
          obs_gci[i].set_gcinfo(conf.fcst_field(i).sval(),
-            conf.grib_ptv().ival());
+            conf.grib_ptv().ival(), otype);
       }
       else {
          obs_gci[i].set_gcinfo(conf.obs_field(i).sval(),
-            conf.grib_ptv().ival());
+            conf.grib_ptv().ival(), otype);
       }
 
       // No support for WDIR
@@ -366,7 +367,7 @@ void GridStatConfInfo::process_config() {
       // Parse the obs threshold information
       for(i=0; i<n_vx; i++) {
 
-         // If obs_thresh is emptpy, use fcst_thresh
+         // If obs_thresh is empty, use fcst_thresh
          if(conf.n_obs_thresh_elements() == 0) {
             obs_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
          }
@@ -453,7 +454,7 @@ void GridStatConfInfo::process_config() {
    // Conf: obs_wind_thresh
    //
 
-   // If obs_wind_thresh is emptpy, use fcst_wind_thresh
+   // If obs_wind_thresh is empty, use fcst_wind_thresh
    if(conf.n_obs_wind_thresh_elements() == 0) {
      obs_wind_ta = fcst_wind_ta;
    }

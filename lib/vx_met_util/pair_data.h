@@ -11,6 +11,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include "vx_met_util/file_type.h"
 #include "vx_util/vx_util.h"
 #include "vx_data_grids/grid.h"
 #include "vx_wrfdata/vx_wrfdata.h"
@@ -84,7 +85,7 @@ class GCInfo {
 
       void clear();
 
-      void set_gcinfo(const char *, int);
+      void set_gcinfo(const char *, int, FileType);
       void set_gcinfo_grib(const char *, int);
       void set_gcinfo_nc(const char *);
       void set_abbr_str(const char *);

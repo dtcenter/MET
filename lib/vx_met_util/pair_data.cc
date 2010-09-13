@@ -144,12 +144,27 @@ void GCInfo::assign(const GCInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GCInfo::set_gcinfo(const char *c, int ptv) {
+void GCInfo::set_gcinfo(const char *c, int ptv, FileType type) {
 
-   // If a slash is used, assume GRIB input.
-   if(strchr(c, '/') != NULL) set_gcinfo_grib(c, ptv);
-   // Otherwise, assume NetCDF input.
-   else                       set_gcinfo_nc(c);
+   // Switch on the file type
+   switch(type) {
+
+      case(GbFileType):
+         set_gcinfo_grib(c, ptv);
+         break;
+
+      case(NcFileType):
+         set_gcinfo_nc(c);
+         break;
+
+      default:
+         cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
+              << "unsupported input file type \""
+              << c << "\".\n\n" << flush;
+         exit(1);
+         break;
+
+   } // end switch
 
    return;
 }
@@ -340,9 +355,6 @@ void GCInfo::set_gcinfo_nc(const char *c) {
    // Initialize
    clear();
 
-   // Set the info_str to the input string
-   set_info_str(c);
-
    // Initialize the temp string
    strcpy(tmp_str, c);
 
@@ -350,7 +362,7 @@ void GCInfo::set_gcinfo_nc(const char *c) {
    code = -1;
 
    // Retreive the NetCDF variable name
-   if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == NULL) {
+   if((ptr = strtok_r(tmp_str, "()/", &save_ptr)) == NULL) {
       cerr << "\n\nERROR: GCInfo::set_gcinfo_nc() -> "
            << "bad NetCDF variable name specified \""
            << c << "\".\n\n" << flush;
@@ -360,15 +372,15 @@ void GCInfo::set_gcinfo_nc(const char *c) {
    // Set the abbr_str
    set_abbr_str(ptr);
 
-   // Retreive the NetCDF level specification
-   ptr = strtok_r(NULL, "()", &save_ptr);
-
    // If there's no level specification, assume (*, *)
-   if(ptr == NULL) {
+   if(strchr(c, '(') == NULL) {
       set_lvl_str("*,*");
    }
-   // Otherwise, parse the rest of the string
+   // Parse the level specification
    else {
+
+      // Retreive the NetCDF level specification
+      ptr = strtok_r(NULL, "()", &save_ptr);
 
       // Set the level string
       set_lvl_str(ptr);
@@ -408,8 +420,15 @@ void GCInfo::set_gcinfo_nc(const char *c) {
 
          // Set ptr to NULL for next call to strtok
          ptr = NULL;
-      }
-   } // end while
+      } // end while
+   } // end else
+
+   // Check for "/PROB" to indicate a probability forecast
+   if(strstr(c, "/PROB") != NULL) pflag = 1;
+
+   // Set the info_str
+   sprintf(tmp_str, "%s(%s)", abbr_str.text(), lvl_str.text());
+   set_info_str(tmp_str);
 
    // Set the units_str
    set_units_str(na_str);

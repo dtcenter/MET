@@ -118,6 +118,7 @@ void process_command_line(int argc, char **argv) {
    int i;
    struct stat results;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
+   FileType ftype, otype;
 
    // Set default output directory
    out_dir << MET_BASE << "/out/ensemble_stat";
@@ -205,6 +206,11 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
+   // Determine the input file types
+   ftype = get_file_type(ens_file_list[0]);
+   if(grid_obs_flag) otype = get_file_type(grid_obs_file_list[0]);
+   else              otype = GbFileType;
+
    // Check that the end_ut >= beg_ut
    if(obs_valid_beg_ut != (unixtime) 0 &&
       obs_valid_end_ut != (unixtime) 0 &&
@@ -221,7 +227,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Read the config file
-   conf_info.read_config(config_file);
+   conf_info.read_config(config_file, ftype, otype);
 
    // Set the model name
    shc.set_model(conf_info.conf.model().sval());

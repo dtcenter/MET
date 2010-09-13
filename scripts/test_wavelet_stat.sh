@@ -13,5 +13,5 @@ echo "*** Running Wavelet-Stat on APCP using netCDF input for both forecast and 
 ../bin/wavelet_stat \
    ../out/pcp_combine/sample_fcst_12L_2005080800V_12A.nc \
    ../out/pcp_combine/sample_obs_2005080800V_12A.nc \
-   config/WaveletStatConfig_APCP_12 \
+   config/WaveletStatConfig_APCP_12_NC \
    -outdir ../out/wavelet_stat -v 2

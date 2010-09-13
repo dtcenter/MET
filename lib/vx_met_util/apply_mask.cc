@@ -304,7 +304,7 @@ void process_grib_mask(const char *file_name, const char *field_name,
    }
 
    // Parse the field name into a GCInfo object
-   gci.set_gcinfo(field_name, 1);
+   gci.set_gcinfo(field_name, 1, GbFileType);
 
    // Read the GRIB record
    status = get_grib_record(gb_file, rec,

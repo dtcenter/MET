@@ -154,6 +154,7 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    int i;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
+   FileType ftype;
 
    out_dir << MET_BASE << "/out/point_stat";
 
@@ -168,6 +169,9 @@ void process_command_line(int argc, char **argv) {
    fcst_file  = argv[1];
    obs_file.add(argv[2]);
    config_file = argv[3];
+
+   // Determine the input file types
+   ftype = get_file_type(fcst_file);
 
    // Parse command line arguments
    for(i=0; i<argc; i++) {
@@ -232,7 +236,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Read the config file
-   conf_info.read_config(config_file);
+   conf_info.read_config(config_file, ftype);
 
    // Set the model name
    shc.set_model(conf_info.conf.model().sval());

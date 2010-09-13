@@ -39,8 +39,8 @@ model = "WRF";
 // e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ]; for GRIB input
 // e.g. fcst_field[] = [ "QVAPOR(0,5,*,*)", "TT(0,5,*,*)" ]; for NetCDF input
 //
-fcst_field[] = [ "61/A12" ];
-obs_field[]  = [ "APCP_12(*,*)" ];
+fcst_field[] = [ "APCP_12(*,*)" ];
+obs_field[]  = [];
 
 //
 // Specify a comma-separated list of groups of thresholds to be applied to the

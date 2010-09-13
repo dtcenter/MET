@@ -96,20 +96,21 @@ void EnsembleStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::read_config(const char *file_name) {
+void EnsembleStatConfInfo::read_config(const char *file_name,
+                                       FileType ftype, FileType otype) {
 
    // Call the config read routine
    conf.read(file_name);
 
    // Process the configuration file
-   process_config();
+   process_config(ftype, otype);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_config() {
+void EnsembleStatConfInfo::process_config(FileType ftype, FileType otype) {
    int i, j, n, n_mthd, n_wdth;
    GCInfo gci;
 
@@ -161,7 +162,7 @@ void EnsembleStatConfInfo::process_config() {
    // Parse the ensemble field information
    for(i=0; i<n_ens_var; i++) {
       ens_gci[i].set_gcinfo(conf.ens_field(i).sval(),
-         conf.grib_ptv().ival());
+         conf.grib_ptv().ival(), ftype);
    }
 
    //
@@ -237,7 +238,7 @@ void EnsembleStatConfInfo::process_config() {
       // Parse the fcst field information
       for(i=0; i<n_vx; i++) {
          gci.set_gcinfo(conf.fcst_field(i).sval(),
-            conf.grib_ptv().ival());
+            conf.grib_ptv().ival(), ftype);
 
          gc_pd[i].set_fcst_gci(gci);
       }
@@ -263,14 +264,14 @@ void EnsembleStatConfInfo::process_config() {
       // Parse the obs field information
       for(i=0; i<n_vx; i++) {
 
-         // If obs_field is emptpy, use fcst_field
+         // If obs_field is empty, use fcst_field
          if(conf.n_obs_field_elements() == 0) {
             gci.set_gcinfo(conf.fcst_field(i).sval(),
-               conf.grib_ptv().ival());
+               conf.grib_ptv().ival(), otype);
          }
          else {
             gci.set_gcinfo(conf.obs_field(i).sval(),
-               conf.grib_ptv().ival());
+               conf.grib_ptv().ival(), otype);
          }
 
          gc_pd[i].set_obs_gci(gci);
