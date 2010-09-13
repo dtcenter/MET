@@ -82,8 +82,8 @@ class WaveletStatConfInfo {
 
       void clear();
 
-      void read_config   (const char *);
-      void process_config();
+      void read_config   (const char *, FileType, FileType);
+      void process_config(FileType, FileType);
       void process_tiles (const Grid &, int);
       void center_tiles  (int, int);
       void pad_tiles     (int, int);

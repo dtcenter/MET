@@ -46,7 +46,7 @@ grid_res = 40;
 // e.g. fcst_field = "RAINC(0,*,*)"; for NetCDF input
 //
 fcst_field = "APCP/A24";
-obs_field  = "APCP/A24";
+obs_field  = "APCP_24(*,*)";
 
 //
 // If the mask_missing_flag is set, the missing data in one field will

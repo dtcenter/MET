@@ -112,20 +112,21 @@ void PointStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::read_config(const char *file_name) {
+void PointStatConfInfo::read_config(const char *file_name,
+                                    FileType ftype) {
 
    // Call the config read routine
    conf.read(file_name);
 
    // Process the configuration file
-   process_config();
+   process_config(ftype);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::process_config() {
+void PointStatConfInfo::process_config(FileType ftype) {
    int i, j, n, n_mthd, n_wdth;
    GCInfo gci;
 
@@ -177,7 +178,7 @@ void PointStatConfInfo::process_config() {
    // Parse the fcst field information
    for(i=0; i<n_vx; i++) {
       gci.set_gcinfo(conf.fcst_field(i).sval(),
-         conf.grib_ptv().ival());
+         conf.grib_ptv().ival(), ftype);
 
       // No support for WDIR
       if(gci.code == wdir_grib_code) {
@@ -210,14 +211,14 @@ void PointStatConfInfo::process_config() {
    // Parse the obs field information
    for(i=0; i<n_vx; i++) {
 
-      // If obs_field is emptpy, use fcst_field
+      // If obs_field is empty, use fcst_field
       if(conf.n_obs_field_elements() == 0) {
          gci.set_gcinfo(conf.fcst_field(i).sval(),
-            conf.grib_ptv().ival());
+            conf.grib_ptv().ival(), GbFileType);
       }
       else {
          gci.set_gcinfo(conf.obs_field(i).sval(),
-            conf.grib_ptv().ival());
+            conf.grib_ptv().ival(), GbFileType);
       }
 
       // No support for WDIR
@@ -396,7 +397,7 @@ void PointStatConfInfo::process_config() {
       // Parse the obs threshold information
       for(i=0; i<n_vx; i++) {
 
-         // If obs_thresh is emptpy, use fcst_thresh
+         // If obs_thresh is empty, use fcst_thresh
          if(conf.n_obs_thresh_elements() == 0) {
             obs_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
          }
@@ -483,7 +484,7 @@ void PointStatConfInfo::process_config() {
    // Conf: obs_wind_thresh
    //
 
-   // If obs_wind_thresh is emptpy, use fcst_wind_thresh
+   // If obs_wind_thresh is empty, use fcst_wind_thresh
    if(conf.n_obs_wind_thresh_elements() == 0) {
      obs_wind_ta = fcst_wind_ta;
    }

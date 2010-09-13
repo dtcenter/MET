@@ -108,8 +108,8 @@ class GridStatConfInfo {
 
       void clear();
 
-      void read_config   (const char *);
-      void process_config();
+      void read_config   (const char *, FileType, FileType);
+      void process_config(FileType, FileType);
       void process_masks (const Grid &);
 
       // Dump out the counts

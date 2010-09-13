@@ -45,7 +45,7 @@ model = "WRF";
 // e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ]; for GRIB input
 // e.g. fcst_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)" ]; for NetCDF input
 //
-fcst_field[] = [ "61/A12" ];
+fcst_field[] = [ "APCP_12(*,*)" ];
 obs_field[]  = [];
 
 //
