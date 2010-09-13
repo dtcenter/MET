@@ -154,7 +154,7 @@ void GCInfo::set_gcinfo(const char *c, int ptv, FileType type) {
          break;
 
       case(NcFileType):
-         set_gcinfo_nc(c);
+         set_gcinfo_nc(c, ptv);
          break;
 
       default:
@@ -348,7 +348,7 @@ void GCInfo::set_gcinfo_grib(const char *c, int ptv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GCInfo::set_gcinfo_nc(const char *c) {
+void GCInfo::set_gcinfo_nc(const char *c, int ptv) {
    char tmp_str[max_str_len];
    char *ptr, *ptr2, *ptr3, *save_ptr;
 
@@ -358,8 +358,12 @@ void GCInfo::set_gcinfo_nc(const char *c) {
    // Initialize the temp string
    strcpy(tmp_str, c);
 
-   // Set the GRIB code
-   code = -1;
+   // Attempt to determine a GRIB code for this string
+   if((ptr = strtok(tmp_str, "()/_")) == NULL) code = -1;
+   else                                        code = str_to_grib_code(ptr, ptv);
+
+   // Re-initialize the temp string
+   strcpy(tmp_str, c);
 
    // Retreive the NetCDF variable name
    if((ptr = strtok_r(tmp_str, "()/", &save_ptr)) == NULL) {
