@@ -908,7 +908,7 @@ void process_grid_vx() {
          if(ens_file_vld[j]) {
 
             // Read the gridded data from the input forecast file
-            status = read_field(ens_file_list[j], conf_info.gc_pd[j].fcst_gci,
+            status = read_field(ens_file_list[j], conf_info.gc_pd[i].fcst_gci,
                                 ens_valid_search_ut, ens_lead_search_sec,
                                 fcst_wd[j], data_grid, verbosity);
 
