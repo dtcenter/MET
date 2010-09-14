@@ -208,14 +208,16 @@ static const char * isc_columns [] = {
 };
 
 static const char * rhist_columns [] = {
-   "TOTAL",       "N_RANK",   "RANK_"
+   "TOTAL",       "CRPS",        "IGN",
+   "N_RANK",      "RANK_"
 };
 
 static const char * orank_columns [] = {
    "TOTAL",       "INDEX",       "OBS_SID",
    "OBS_LAT",     "OBS_LON",     "OBS_LVL",
-   "OBS_ELV",     "OBS",         "RANK",
-   "N_ENS_VLD",   "N_ENS",       "ENS_"
+   "OBS_ELV",     "OBS",         "PIT",
+   "RANK",        "N_ENS_VLD",   "N_ENS",
+   "ENS_"
 };
 
 static const char * job_sum_columns [] = {
@@ -280,8 +282,8 @@ inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_pstd_columns  (int n) { return(12 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
-inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
-inline int get_n_orank_columns (int n) { return(11 + n);               } // n = N_ENS
+inline int get_n_rhist_columns (int n) { return(4  + n);               } // n = N_RANK
+inline int get_n_orank_columns (int n) { return(12 + n);               } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -357,7 +359,7 @@ extern void write_mpr_row   (StatHdrColumns &, const PairData *, int,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, int,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_rhist_row (StatHdrColumns &, const NumArray &, int,
+extern void write_rhist_row (StatHdrColumns &, const EnsPairData *, int,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_orank_row (StatHdrColumns &, const EnsPairData *, int,
                              AsciiTable &, int &, AsciiTable &, int &);
@@ -389,7 +391,7 @@ extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
 extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
 extern void write_mpr_cols   (const PairData *,    int, AsciiTable &, int, int);
 extern void write_isc_cols   (const ISCInfo &,     int, AsciiTable &, int, int);
-extern void write_rhist_cols (const NumArray &,         AsciiTable &, int, int);
+extern void write_rhist_cols (const EnsPairData *,      AsciiTable &, int, int);
 extern void write_orank_cols (const EnsPairData *, int, AsciiTable &, int, int);
 
 ////////////////////////////////////////////////////////////////////////

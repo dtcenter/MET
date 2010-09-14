@@ -262,6 +262,8 @@ interp_thresh = 1.0;
 //
 //    (1) STAT and RHIST Text Files, Ranked Histograms:
 //           Total (TOTAL),
+//           Continuous Ranked Probability Score (CRPS),
+//           Ignorance Score (IGN),
 //           Number of ranks used (N_RANK),
 //           Count of observations with current rank (RANK_i)
 //           NOTE: Previous column is repeated for each rank used (N_RANK)
@@ -275,6 +277,7 @@ interp_thresh = 1.0;
 //           Observation Level (OBS_LVL),
 //           Observation Elevation (OBS_ELV),
 //           Observation Value (OBS),
+//           Probability Integral Transform (PIT),
 //           Observation Rank (RANK),
 //           Number of valid Ensemble Values (N_ENS_VLD),
 //           Total Number of Ensemble Values (N_ENS),
