@@ -26,6 +26,8 @@ extern double znorm  (double x);
 
 extern double zinv   (double y);
 
+extern double dnorm  (double x);
+
 ////////////////////////////////////////////////////////////////////////
 
    //
@@ -35,6 +37,8 @@ extern double zinv   (double y);
 extern double normal_cdf     (double x, double mu, double sigma);
 
 extern double normal_cdf_inv (double y, double mu, double sigma);
+
+extern double normal_pdf     (double y, double sigma);
 
 ////////////////////////////////////////////////////////////////////////
 

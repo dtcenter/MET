@@ -54,6 +54,20 @@ return ( x );
 
 ////////////////////////////////////////////////////////////////////////
 
+double dnorm(double x)
+
+{
+
+double y;
+
+y = gsl_ran_ugaussian_pdf(x);
+
+return ( y );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double normal_cdf(double x, double mu, double sigma)
 
 {
@@ -77,6 +91,20 @@ double x;
 x = mu + gsl_cdf_gaussian_Pinv(y, sigma);
 
 return ( x );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double normal_pdf(double x, double sigma)
+
+{
+
+double y;
+
+y = gsl_ran_gaussian_pdf(x, sigma);
+
+return ( y );
 
 }
 
