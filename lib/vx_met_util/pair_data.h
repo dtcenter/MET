@@ -224,10 +224,15 @@ class EnsPairData : public PairBase {
       //////////////////////////////////////////////////////////////////
 
       // Ensemble, valid count, and rank values
-      NumArray *e_na;    // Ensemble values [n_pair][n_ens]
-      NumArray  v_na;    // Number of valid ensemble values [n_pair]
-      NumArray  r_na;    // Observation ranks [n_pair]
+      NumArray *e_na;     // Ensemble values [n_pair][n_ens]
+      NumArray  v_na;     // Number of valid ensemble values [n_pair]
+      NumArray  r_na;     // Observation ranks [n_pair]
+      NumArray  crps_na;  // Continuous Ranked Probability Score [n_pair]
+      NumArray  ign_na;   // Ignorance Score [n_pair]
+      NumArray  pit_na;   // Probability Integral Transform [n_pair]
       int       n_pair;
+
+      NumArray  rhist_na; // Ranked Histogram [n_ens]
 
       //////////////////////////////////////////////////////////////////
 
@@ -237,7 +242,9 @@ class EnsPairData : public PairBase {
       void set_size();
 
       void compute_rank(int, const gsl_rng *);
-      void compute_rhist(int, NumArray &);
+      void compute_stats(int);
+      void compute_rhist(int);
+      void compute_crps_ign_pit(int);
 };
 
 ////////////////////////////////////////////////////////////////////////

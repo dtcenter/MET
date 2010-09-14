@@ -726,7 +726,6 @@ int process_point_ens(int i_ens) {
 void process_point_scores() {
    EnsPairData *pd_ptr;
    int i, j, k, l;
-   NumArray rhist_na;
 
    if(verbosity > 1) {
       cout << "\n" << sep_str << "\n\n"
@@ -808,6 +807,9 @@ void process_point_scores() {
                // Continue if there are no points
                if(pd_ptr->n_pair == 0) continue;
 
+               // Compute ensemble statistics
+               pd_ptr->compute_stats(n_ens_vld);
+
                // Write out the ORANK lines
                if(conf_info.conf.output_flag(i_orank).ival()) {
 
@@ -824,10 +826,7 @@ void process_point_scores() {
                // Compute RHIST scores
                if(conf_info.conf.output_flag(i_rhist).ival()) {
 
-                  // Compute the ranked histogram
-                  pd_ptr->compute_rhist(n_ens_vld, rhist_na);
-
-                  write_rhist_row(shc, rhist_na,
+                  write_rhist_row(shc, pd_ptr,
                      conf_info.conf.output_flag(i_rhist).ival(),
                      stat_at, i_stat_row,
                      txt_at[i_rhist], i_txt_row[i_rhist]);
@@ -853,7 +852,6 @@ void process_grid_vx() {
    unixtime valid_ut;
    Grid data_grid;
    EnsPairData pd;
-   NumArray rhist_na;
 
    if(verbosity > 1) {
       cout << "\n" << sep_str << "\n\n"
@@ -1056,13 +1054,13 @@ void process_grid_vx() {
             // Continue if there are no points
             if(pd.n_pair == 0) continue;
 
+            // Compute ensemble statistics
+            pd.compute_stats(n_ens_vld);
+
             // Compute RHIST scores
             if(conf_info.conf.output_flag(i_rhist).ival()) {
 
-               // Compute the ranked histogram
-               pd.compute_rhist(n_ens_vld, rhist_na);
-
-               write_rhist_row(shc, rhist_na,
+               write_rhist_row(shc, &pd,
                   conf_info.conf.output_flag(i_rhist).ival(),
                   stat_at, i_stat_row,
                   txt_at[i_rhist], i_txt_row[i_rhist]);
@@ -1675,17 +1673,20 @@ void write_orank_nc(EnsPairData &pd, WrfData &wd,
    // Arrays for storing observation rank data
    float *obs_v    = (float *) 0;
    int   *obs_rank = (int *)   0;
+   float *obs_pit  = (float *) 0;
    int   *ens_vld  = (int *)   0;
 
    // Allocate memory for storing ensemble data
    obs_v    = new float [grid.nx()*grid.ny()];
    obs_rank = new int   [grid.nx()*grid.ny()];
+   obs_pit  = new float [grid.nx()*grid.ny()];
    ens_vld  = new int   [grid.nx()*grid.ny()];
 
    // Initialize
    for(i=0; i<grid.nx()*grid.ny(); i++) {
       obs_v[i]    = bad_data_float;
       obs_rank[i] = bad_data_int;
+      obs_pit[i]  = bad_data_float;
       ens_vld[i]  = bad_data_int;
    }
 
@@ -1698,6 +1699,7 @@ void write_orank_nc(EnsPairData &pd, WrfData &wd,
       // Store the observation value, rank, and number of valid ensembles
       obs_v[n]    = pd.o_na[i];
       obs_rank[n] = nint(pd.r_na[i]);
+      obs_pit[n]  = pd.pit_na[i];
       ens_vld[n]  = nint(pd.v_na[i]);
 
    } // end for i
@@ -1710,6 +1712,10 @@ void write_orank_nc(EnsPairData &pd, WrfData &wd,
    write_orank_var_int(i_gc, i_interp, i_mask, obs_rank, "OBS_RANK", wd,
                        "Observation Rank");
 
+   // Add the probability integral transforms
+   write_orank_var_float(i_gc, i_interp, i_mask, obs_pit, "OBS_PIT", wd,
+                         "Probability Integral Transform");
+
    // Add the number of valid ensemble members
    write_orank_var_int(i_gc, i_interp, i_mask, ens_vld, "ENS_VLD", wd,
                        "Ensemble Valid Data Count");
@@ -1717,6 +1723,7 @@ void write_orank_nc(EnsPairData &pd, WrfData &wd,
    // Deallocate and clean up
    if(obs_v)    { delete [] obs_v;    obs_v    = (float *) 0; }
    if(obs_rank) { delete [] obs_rank; obs_rank = (int   *) 0; }
+   if(obs_pit)  { delete [] obs_pit;  obs_pit  = (float *) 0; }
    if(ens_vld)  { delete [] ens_vld;  ens_vld  = (int   *) 0; }
 
    return;

@@ -1693,6 +1693,10 @@ void EnsPairData::clear() {
 
    v_na.clear();
    r_na.clear();
+   crps_na.clear();
+   ign_na.clear();
+   pit_na.clear();
+   rhist_na.clear();
 
    n_pair = 0;
 
@@ -1713,18 +1717,22 @@ void EnsPairData::assign(const EnsPairData &pd) {
    set_interp_mthd(pd.interp_mthd);
    set_interp_wdth(pd.interp_wdth);
 
-   sid_sa = pd.sid_sa;
-   lat_na = pd.lat_na;
-   lon_na = pd.lon_na;
-   x_na   = pd.x_na;
-   y_na   = pd.y_na;
-   vld_ta = pd.vld_ta;
-   lvl_na = pd.lvl_na;
-   elv_na = pd.elv_na;
-   n_pair = pd.n_pair;
-   o_na   = pd.o_na;
-   v_na   = pd.v_na;
-   r_na   = pd.r_na;
+   sid_sa   = pd.sid_sa;
+   lat_na   = pd.lat_na;
+   lon_na   = pd.lon_na;
+   x_na     = pd.x_na;
+   y_na     = pd.y_na;
+   vld_ta   = pd.vld_ta;
+   lvl_na   = pd.lvl_na;
+   elv_na   = pd.elv_na;
+   n_pair   = pd.n_pair;
+   o_na     = pd.o_na;
+   v_na     = pd.v_na;
+   r_na     = pd.r_na;
+   crps_na  = pd.crps_na;
+   ign_na   = pd.ign_na;
+   pit_na   = pd.pit_na;
+   rhist_na = pd.rhist_na;
 
    n_obs  = pd.n_obs;
    n_pair = pd.n_pair;
@@ -1820,11 +1828,32 @@ void EnsPairData::compute_rank(int n_vld_ens, const gsl_rng *rng_ptr) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute ensemble statistics, including ranked histograms, continuous
+// ranked probability scores, igrnorance scores, and probability
+// integral transforms.  This should be called after compute_ranks()
+// since the computations make use of the number of valid ensemble
+// members.
+//
+/////////////////////////////////////////////////////////////////////////
 
-void EnsPairData::compute_rhist(int n_vld_ens, NumArray &rhist_na) {
+void EnsPairData::compute_stats(int n_vld_ens) {
+
+   // Compute the ranked histogram
+   compute_rhist(n_vld_ens);
+
+   // Compute the ensemble statistics
+   compute_crps_ign_pit(n_vld_ens);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsPairData::compute_rhist(int n_vld_ens) {
    int i, rank;
 
-   // Clear the input ranked histogram
+   // Clear the ranked histogram
    rhist_na.clear();
 
    // Initialize the histogram counts to 0
@@ -1839,6 +1868,56 @@ void EnsPairData::compute_rhist(int n_vld_ens, NumArray &rhist_na) {
 
       // Increment the histogram counts
       if(!is_bad_data(rank)) rhist_na.set(rank-1, rhist_na[rank-1]+1);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsPairData::compute_crps_ign_pit(int n_vld_ens) {
+   int i;
+   double m, s, z, v;
+
+   // Clear the CRPS array
+   crps_na.clear();
+
+   // Loop through the pairs and compute CRPS for each
+   for(i=0; i<n_pair; i++) {
+
+      // Don't compute if any of the ensemble members are missing
+      if(nint(v_na[i]) != n_vld_ens) {
+         crps_na.add(bad_data_double);
+         ign_na.add(bad_data_double);
+         pit_na.add(bad_data_double);
+         continue;
+      }
+
+      // Mean and standard deviation of the ensemble values
+      e_na[i].compute_mean_stdev(m, s);
+
+      // Check for divide by zero
+      if(is_eq(s, 0.0)) {
+         crps_na.add(bad_data_double);
+         ign_na.add(bad_data_double);
+         pit_na.add(bad_data_double);
+         continue;
+      }
+
+      z = (o_na[i] - m)/s;
+
+      // Compute CRPS
+      v = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
+      crps_na.add(v);
+
+      // Compute IGN
+      v = 0.5*log(2.0*pi*s*s) + (o_na[i] - m)*(o_na[i] - m)/(2.0*s*s);
+      ign_na.add(v);
+
+      // Compute PIT
+      v = normal_cdf(o_na[i], m, s);
+      pit_na.add(v);
 
    } // end for i
 

@@ -445,8 +445,10 @@ inline int prc_pofd_offset(int i)        { return(nhc + 2 + 3*i + 2); }
 // RHIST Line Type offsets
 //
 static const int rhist_total_offset      = nhc + 0;
-static const int rhist_n_rank_offset     = nhc + 1;
-inline int rhist_rank_offset(int i)      { return(nhc + 2 + i); }
+static const int rhist_crps_offset       = nhc + 1;
+static const int rhist_ign_offset        = nhc + 2;
+static const int rhist_n_rank_offset     = nhc + 3;
+inline int rhist_rank_offset(int i)      { return(nhc + 4 + i); }
 
 //
 // ORANK Line Type offsets
@@ -459,10 +461,11 @@ static const int orank_obs_lon_offset    = nhc + 4;
 static const int orank_obs_lvl_offset    = nhc + 5;
 static const int orank_obs_elv_offset    = nhc + 6;
 static const int orank_obs_offset        = nhc + 7;
-static const int orank_rank_offset       = nhc + 8;
-static const int orank_n_ens_vld_offset  = nhc + 9;
-static const int orank_n_ens_offset      = nhc + 10;
-inline int orank_ens_offset(int i)       { return(nhc + 11 + i); }
+static const int orank_pit_offset        = nhc + 8;
+static const int orank_rank_offset       = nhc + 9;
+static const int orank_n_ens_vld_offset  = nhc + 10;
+static const int orank_n_ens_offset      = nhc + 11;
+inline int orank_ens_offset(int i)       { return(nhc + 12 + i); }
 
 ////////////////////////////////////////////////////////////////////////
 
