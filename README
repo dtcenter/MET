@@ -1,4 +1,4 @@
-Model Evaluation Tools METv2.0 (April 07, 2009)
+Model Evaluation Tools METv3.0 (September 21, 2010)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -173,8 +173,9 @@ subdirectory.
 
 - When make is finished, type 'CNTRL-C' to quit the tail.
 
-- If sucessful, this will create 10 executables in the bin directory:
+- If sucessful, this will create 11 executables in the bin directory:
    - ascii2nc
+   - ensemble_stat 
    - gen_poly_mask
    - grid_stat
    - mode
@@ -185,7 +186,7 @@ subdirectory.
    - stat_analysis
    - wavelet_stat
 
-- Type 'ls bin' to check for the presence of the 10 executables.
+- Type 'ls bin' to check for the presence of the 11 executables.
 
 - Type 'cd scripts' to enter the scripts directory
 
@@ -202,6 +203,9 @@ subdirectory.
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 3.0 Release Notes:
+-------------------------
 
 Version 2.0 Release Notes:
 -------------------------
