@@ -1828,27 +1828,6 @@ void EnsPairData::compute_rank(int n_vld_ens, const gsl_rng *rng_ptr) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Compute ensemble statistics, including ranked histograms, continuous
-// ranked probability scores, igrnorance scores, and probability
-// integral transforms.  This should be called after compute_ranks()
-// since the computations make use of the number of valid ensemble
-// members.
-//
-/////////////////////////////////////////////////////////////////////////
-
-void EnsPairData::compute_stats(int n_vld_ens) {
-
-   // Compute the ranked histogram
-   compute_rhist(n_vld_ens);
-
-   // Compute the ensemble statistics
-   compute_crps_ign_pit(n_vld_ens);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void EnsPairData::compute_rhist(int n_vld_ens) {
    int i, rank;
@@ -1876,9 +1855,9 @@ void EnsPairData::compute_rhist(int n_vld_ens) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsPairData::compute_crps_ign_pit(int n_vld_ens) {
+void EnsPairData::compute_stats(int n_vld_ens) {
    int i;
-   double m, s, z, v;
+   double crps, ign, pit;
 
    // Clear the CRPS array
    crps_na.clear();
@@ -1894,30 +1873,13 @@ void EnsPairData::compute_crps_ign_pit(int n_vld_ens) {
          continue;
       }
 
-      // Mean and standard deviation of the ensemble values
-      e_na[i].compute_mean_stdev(m, s);
+      // Compute the stats
+      compute_crps_ign_pit(o_na[i], e_na[i], crps, ign, pit);
 
-      // Check for divide by zero
-      if(is_eq(s, 0.0)) {
-         crps_na.add(bad_data_double);
-         ign_na.add(bad_data_double);
-         pit_na.add(bad_data_double);
-         continue;
-      }
-
-      z = (o_na[i] - m)/s;
-
-      // Compute CRPS
-      v = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
-      crps_na.add(v);
-
-      // Compute IGN
-      v = 0.5*log(2.0*pi*s*s) + (o_na[i] - m)*(o_na[i] - m)/(2.0*s*s);
-      ign_na.add(v);
-
-      // Compute PIT
-      v = normal_cdf(o_na[i], m, s);
-      pit_na.add(v);
+      // Store the stats
+      crps_na.add(crps);
+      ign_na.add(ign);
+      pit_na.add(pit);
 
    } // end for i
 
@@ -2696,6 +2658,38 @@ double compute_vert_zinterp(double v1, double lvl1,
    v_interp = v1*d1/(d1+d2) + v2*d2/(d1+d2);
 
    return(v_interp);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_crps_ign_pit(double obs, const NumArray &ens_na,
+                          double &crps, double &ign, double &pit) {
+   double m, s, z;
+
+   // Mean and standard deviation of the ensemble values
+   ens_na.compute_mean_stdev(m, s);
+
+   // Check for divide by zero
+   if(is_eq(s, 0.0)) {
+      crps = bad_data_double;
+      ign  = bad_data_double;
+      pit  = bad_data_double;
+   }
+   else {
+
+      z = (obs - m)/s;
+
+      // Compute CRPS
+      crps = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
+
+      // Compute IGN
+      ign = 0.5*log(2.0*pi*s*s) + (obs - m)*(obs - m)/(2.0*s*s);
+
+      // Compute PIT
+      pit = normal_cdf(obs, m, s);
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

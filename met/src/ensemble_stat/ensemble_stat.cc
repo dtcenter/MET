@@ -808,6 +808,7 @@ void process_point_scores() {
                if(pd_ptr->n_pair == 0) continue;
 
                // Compute ensemble statistics
+               pd_ptr->compute_rhist(n_ens_vld);
                pd_ptr->compute_stats(n_ens_vld);
 
                // Write out the ORANK lines
@@ -1055,6 +1056,7 @@ void process_grid_vx() {
             if(pd.n_pair == 0) continue;
 
             // Compute ensemble statistics
+            pd.compute_rhist(n_ens_vld);
             pd.compute_stats(n_ens_vld);
 
             // Compute RHIST scores

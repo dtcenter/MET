@@ -56,6 +56,7 @@ struct MPRData {
 // Ranked Histogram (RHIST) data structure
 struct RHISTData {
    int total, n_rank;
+   double crps, ign;
    NumArray rank_na;
 };
 
@@ -63,7 +64,7 @@ struct RHISTData {
 struct ORANKData {
    int total, index;
    char obs_sid[max_str_len];
-   double obs_lat, obs_lon, obs_lvl, obs_elv, obs;
+   double obs_lat, obs_lon, obs_lvl, obs_elv, obs, pit;
    int rank, n_ens_vld, n_ens;
    NumArray ens_na;
 };

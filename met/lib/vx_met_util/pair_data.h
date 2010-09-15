@@ -242,9 +242,8 @@ class EnsPairData : public PairBase {
       void set_size();
 
       void compute_rank(int, const gsl_rng *);
-      void compute_stats(int);
       void compute_rhist(int);
-      void compute_crps_ign_pit(int);
+      void compute_stats(int);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -485,6 +484,11 @@ class GCEnsPairData {
 extern double compute_horz_interp(WrfData *, double, double, int, int, double);
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);
+
+////////////////////////////////////////////////////////////////////////
+
+extern void   compute_crps_ign_pit(double, const NumArray &,
+                                   double &, double &, double &);
 
 ////////////////////////////////////////////////////////////////////////
 

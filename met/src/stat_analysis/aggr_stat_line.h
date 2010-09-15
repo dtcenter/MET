@@ -125,12 +125,12 @@ extern void aggr_isc_lines(
 
 extern void aggr_rhist_lines(
                const char *, LineDataFile &,
-               STATAnalysisJob &, NumArray &,
+               STATAnalysisJob &, EnsPairData &,
                int &, int &, int);
 
 extern void aggr_orank_lines(
                const char *, LineDataFile &,
-               STATAnalysisJob &, NumArray &,
+               STATAnalysisJob &, EnsPairData &,
                int &, int &, int);
 
 extern double compute_vif(NumArray &);
