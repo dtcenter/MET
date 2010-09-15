@@ -379,15 +379,15 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
    STATLine line;
    STATLineType lt;
 
-   CTSInfo    cts_info;
-   MCTSInfo   mcts_info;
-   CNTInfo    cnt_info;
-   SL1L2Info  sl1l2_info;
-   VL1L2Info  vl1l2_info;
-   PCTInfo    pct_info;
-   NBRCTSInfo nbrcts_info;
-   ISCInfo    isc_info;
-   NumArray   rhist_na;
+   CTSInfo     cts_info;
+   MCTSInfo    mcts_info;
+   CNTInfo     cnt_info;
+   SL1L2Info   sl1l2_info;
+   VL1L2Info   vl1l2_info;
+   PCTInfo     pct_info;
+   NBRCTSInfo  nbrcts_info;
+   ISCInfo     isc_info;
+   EnsPairData ens_pd;
 
    AsciiTable out_at;
    int i, n_thresh, n_cat;
@@ -511,7 +511,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
    // Sum the RHIST line types
    //
    else if(lt == stat_rhist) {
-      aggr_rhist_lines(jobstring, f, j, rhist_na, n_in, n_out, verbosity);
+      aggr_rhist_lines(jobstring, f, j, ens_pd, n_in, n_out, verbosity);
    }
 
    //
@@ -734,16 +734,16 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
          //
          // Get the column names
          //
-         out_at.set_size(2, get_n_rhist_columns(rhist_na.n_elements())+1);
+         out_at.set_size(2, get_n_rhist_columns(ens_pd.rhist_na.n_elements())+1);
          setup_table(out_at);
          out_at.set_entry(0, 0,  "COL_NAME:");
-         write_rhist_header_row(0, rhist_na.n_elements(), out_at, 0, 1);
+         write_rhist_header_row(0, ens_pd.rhist_na.n_elements(), out_at, 0, 1);
 
          //
          // Write the RHIST row
          //
          out_at.set_entry(1, 0,  "RHIST:");
-         write_rhist_cols(rhist_na, out_at, 1, 1);
+         write_rhist_cols(&ens_pd, out_at, 1, 1);
 
          break;
 
@@ -781,17 +781,17 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    STATLine line;
    STATLineType in_lt, out_lt;
 
-   CTSInfo    cts_info;
-   MCTSInfo   mcts_info;
-   CNTInfo    cnt_info;
-   SL1L2Info  sl1l2_info;
-   VL1L2Info  vl1l2_info;
-   PCTInfo    pct_info;
-   NBRCTSInfo nbrcts_info;
-   ISCInfo    isc_info;
-   NumArray   f_na, o_na, c_na;
-   NumArray   uf_na, vf_na, uo_na, vo_na;
-   NumArray   rhist_na;
+   CTSInfo     cts_info;
+   MCTSInfo    mcts_info;
+   CNTInfo     cnt_info;
+   SL1L2Info   sl1l2_info;
+   VL1L2Info   vl1l2_info;
+   PCTInfo     pct_info;
+   NBRCTSInfo  nbrcts_info;
+   ISCInfo     isc_info;
+   NumArray    f_na, o_na, c_na;
+   NumArray    uf_na, vf_na, uo_na, vo_na;
+   EnsPairData ens_pd;
 
    int fcst_gc, obs_gc;
    AsciiTable out_at;
@@ -1116,7 +1116,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
    // Compute a ranked histogram from the observation ranks lines.
    //
    else if(in_lt == stat_orank) {
-      aggr_orank_lines(jobstring, f, j, rhist_na,
+      aggr_orank_lines(jobstring, f, j, ens_pd,
                        n_in, n_out, verbosity);
    }
 
@@ -1164,16 +1164,16 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
       //
       // Get the column names
       //
-      out_at.set_size(2, get_n_rhist_columns(rhist_na.n_elements())+1);
+      out_at.set_size(2, get_n_rhist_columns(ens_pd.rhist_na.n_elements())+1);
       setup_table(out_at);
       out_at.set_entry(0, 0,  "COL_NAME:");
-      write_rhist_header_row(0, rhist_na.n_elements(), out_at, 0, 1);
+      write_rhist_header_row(0, ens_pd.rhist_na.n_elements(), out_at, 0, 1);
 
       //
       // Write the RHIST row
       //
       out_at.set_entry(1, 0,  "RHIST:");
-      write_rhist_cols(rhist_na, out_at, 1, 1);
+      write_rhist_cols(&ens_pd, out_at, 1, 1);
    }
 
    //

@@ -275,6 +275,8 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    int i;
 
    r_data.total  = atoi(l.get_item(rhist_total_offset));
+   r_data.crps   = atof(l.get_item(rhist_crps_offset));
+   r_data.ign    = atof(l.get_item(rhist_ign_offset));
    r_data.n_rank = atoi(l.get_item(rhist_n_rank_offset));
 
    r_data.rank_na.clear();
@@ -300,12 +302,14 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    o_data.obs_lvl   = atof(l.get_item(orank_obs_lvl_offset));
    o_data.obs_elv   = atof(l.get_item(orank_obs_elv_offset));
    o_data.obs       = atof(l.get_item(orank_obs_offset));
+   o_data.pit       = atof(l.get_item(orank_pit_offset));
 
    o_data.rank      = atoi(l.get_item(orank_rank_offset));
    o_data.n_ens_vld = atoi(l.get_item(orank_n_ens_vld_offset));
    o_data.n_ens     = atoi(l.get_item(orank_n_ens_offset));
 
    // Parse out ENS_i
+   o_data.ens_na.clear();
    for(i=0; i<o_data.n_ens; i++) {
       o_data.ens_na.add(atof(l.get_item(orank_ens_offset(i))));
    }

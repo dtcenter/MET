@@ -1511,16 +1511,18 @@ void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
-                      STATAnalysisJob &j, NumArray &rhist_na,
+                      STATAnalysisJob &j, EnsPairData &ens_pd,
                       int &n_in, int &n_out, int verbosity) {
    STATLine line;
    RHISTData r_data;
+   double crps_num, crps_den, ign_num, ign_den;
    int i;
 
    //
-   // Initialize the NumArray
+   // Initialize
    //
-   rhist_na.clear();
+   ens_pd.clear();
+   crps_num = crps_den = ign_num = ign_den = 0.0;
 
    //
    // Process the STAT lines
@@ -1553,31 +1555,55 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
          //
          // Check for N_RANK remaining constant
          //
-         if(rhist_na.n_elements() > 0 &&
-            rhist_na.n_elements() != r_data.n_rank) {
+         if(ens_pd.rhist_na.n_elements() > 0 &&
+            ens_pd.rhist_na.n_elements() != r_data.n_rank) {
             cerr << "\n\nERROR: aggr_rhist_lines() -> "
                  << "the \"N_RANK\" column must remain constant ("
-                 << rhist_na.n_elements() << " != " << r_data.n_rank
+                 << ens_pd.rhist_na.n_elements() << " != " << r_data.n_rank
                  << ").  Try setting \"-column_eq N_RANK n\".\n\n"
                  << flush;
             throw(1);
          }
 
          //
-         // Aggregate the counts
+         // Aggregate the ranked histgram counts
          //
-         if(rhist_na.n_elements() == 0) {
-            rhist_na = r_data.rank_na;
+         if(ens_pd.rhist_na.n_elements() == 0) {
+            ens_pd.rhist_na = r_data.rank_na;
          }
          else {
-            for(i=0; i<rhist_na.n_elements(); i++) {
-               rhist_na.set(i, rhist_na[i] + r_data.rank_na[i]);
+            for(i=0; i<ens_pd.rhist_na.n_elements(); i++) {
+               ens_pd.rhist_na.set(i, ens_pd.rhist_na[i] + r_data.rank_na[i]);
             }
+         }
+
+         //
+         // Store running sums for CRPS
+         //
+         if(!is_bad_data(r_data.crps)) {
+            crps_num += r_data.total * r_data.crps;
+            crps_den += r_data.total;
+         }
+
+         //
+         // Store running sums for IGN
+         //
+         if(!is_bad_data(r_data.ign)) {
+            ign_num += r_data.total * r_data.ign;
+            ign_den += r_data.total;
          }
 
          n_out++;
       }
    } // end while
+
+   // Compute weighted-mean for CRPS
+   if(crps_den > 0) ens_pd.crps_na.add(crps_num/crps_den);
+   else             ens_pd.crps_na.add(bad_data_double);
+
+   // Compute weighted-mean for IGN
+   if(ign_den > 0) ens_pd.ign_na.add(ign_num/ign_den);
+   else            ens_pd.ign_na.add(bad_data_double);
 
    return;
 }
@@ -1585,16 +1611,17 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_orank_lines(const char *jobstring, LineDataFile &f,
-                      STATAnalysisJob &j, NumArray &rhist_na,
+                      STATAnalysisJob &j, EnsPairData &ens_pd,
                       int &n_in, int &n_out, int verbosity) {
    STATLine line;
    ORANKData o_data;
    int i;
+   double crps, ign, pit;
 
    //
-   // Initialize the NumArray
+   // Initialize
    //
-   rhist_na.clear();
+   ens_pd.clear();
 
    //
    // Process the STAT lines
@@ -1632,9 +1659,9 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
          //
          // Check for N_ENS remaining constant
          //
-         if(rhist_na.n_elements() > 0 &&
-            rhist_na.n_elements() != o_data.n_ens+1) {
-            cerr << "\n\nERROR: aggr_rhist_lines() -> "
+         if(ens_pd.rhist_na.n_elements() > 0 &&
+            ens_pd.rhist_na.n_elements() != o_data.n_ens+1) {
+            cerr << "\n\nERROR: aggr_orank_lines() -> "
                  << "the \"N_ENS\" column must remain constant.  "
                  << "Try setting \"-column_eq N_ENS n\".\n\n"
                  << flush;
@@ -1642,17 +1669,25 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
          }
 
          //
-         // Initialize the counts
+         // Initialize the ranked histogram counts
          //
-         if(rhist_na.n_elements() == 0) {
-            for(i=0; i<o_data.n_ens+1; i++) rhist_na.add(0);
+         if(ens_pd.rhist_na.n_elements() == 0) {
+            for(i=0; i<o_data.n_ens+1; i++) ens_pd.rhist_na.add(0);
          }
 
          //
          // Aggregate the ranks
          //
          i = o_data.rank - 1;
-         rhist_na.set(i, rhist_na[i] + 1);
+         ens_pd.rhist_na.set(i, ens_pd.rhist_na[i] + 1);
+
+         //
+         // Store the CRPS and IGN values
+         //
+         compute_crps_ign_pit(o_data.obs, o_data.ens_na, crps, ign, pit);
+         ens_pd.crps_na.add(crps);
+         ens_pd.ign_na.add(ign);
+         ens_pd.pit_na.add(pit);
 
          n_out++;
       }
