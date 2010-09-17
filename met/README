@@ -152,8 +152,6 @@ subdirectory.
    - Set "FC_LIBS" to link to any additional libraries required for the Fortran
      compiler.
 
-   - Set "PRINT_OPTS" to the print options to be used for make.
-
    - Set "NETCDF_BASE", "NETCDF_INCS", and "NETCDF_LIBS" to point to the
      location of the NetCDF library.
 
@@ -175,7 +173,7 @@ subdirectory.
 
 - If sucessful, this will create 11 executables in the bin directory:
    - ascii2nc
-   - ensemble_stat 
+   - ensemble_stat
    - gen_poly_mask
    - grid_stat
    - mode
@@ -199,6 +197,10 @@ subdirectory.
 - When the test script is finished, type 'CNTRL-C' to quit the tail.
 
 - Look in ../out to find the output files for these tests.
+
+- In particular, check that the PB2NC tool ran without error.  If there was an
+  error, try adding or removing "-DBLOCK4" from the ARCH_FLAGS line in the
+  top-level Makefile.  Then rebuild MET, being sure to run "make clean" first.
 
 ================================================================================
 Release Notes
