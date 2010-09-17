@@ -22,6 +22,7 @@ using namespace std;
 
 #include <iostream>
 #include <fstream>
+#include <string.h>
 
 #include "vx_grib_classes/grib_strings.h"
 
