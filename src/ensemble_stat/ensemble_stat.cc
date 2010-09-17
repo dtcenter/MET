@@ -1465,7 +1465,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 
 void write_ens_nc(int i_gc, WrfData &wd) {
    int i, j;
-   double t;
+   double t, v;
    char thresh_str[max_str_len], var_str[max_str_len];
 
    // Arrays for storing ensemble data
@@ -1517,7 +1517,9 @@ void write_ens_nc(int i_gc, WrfData &wd) {
          ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
          ens_min[i]   = (float) na_min[i];
          ens_max[i]   = (float) na_max[i];
-         ens_range[i] = (float) na_max[i] - na_min[i];
+         v = na_max[i] - na_min[i];
+         if(is_eq(v, 0.0)) v = 0;
+         ens_range[i] = (float) v;
       }
    } // end for i
 
