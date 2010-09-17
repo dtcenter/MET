@@ -302,7 +302,10 @@ int read_field_levels(const char *file_name, GCInfo &gci,
 
             // Read the requested NetCDF data
             status = read_field_met(file_name, gci, valid_ut, lead_sec,
-                                    wd[1], gr, verbosity);
+                                    wd[0], gr, verbosity);
+
+            // Add a single level value
+            lvl_na.add(bad_data_double);
          }
 
          break;
