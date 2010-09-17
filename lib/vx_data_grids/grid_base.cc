@@ -505,7 +505,9 @@ void Grid::detach()
 
 if ( !rep )  return;
 
-if ( --(rep->refCount) <= 0 )  { delete rep;  rep = (GridRep *) 0; }
+if ( --(rep->refCount) <= 0 )  { delete rep;  }
+
+rep = (GridRep *) 0;
 
 return;
 
