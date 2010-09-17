@@ -13,6 +13,7 @@ using namespace std;
 #include "wwmca_ref.h"
 
 #include "vx_met_util/grid_output.h"
+#include "vx_met_util/write_netcdf.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,6 +65,12 @@ if ( !(ncfile->is_valid()) )  {
    exit ( 1 );
 
 }
+
+   //
+   //  global attributes
+   //
+
+write_netcdf_global(ncfile, output_filename, "wwmca_regrid");
 
    //
    //  dimensions

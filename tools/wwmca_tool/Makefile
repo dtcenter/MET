@@ -97,7 +97,7 @@ wwmca_ref.o: wwmca_ref.h wwmca_ref.cc gridhemisphere_to_string.o wwmca_config.o
 
 nc_output.o: nc_output.cc wwmca_ref.o
 	@ echo
-	$(CXX) nc_output.cc                 -c $(CXX_FLAGS) -I$(INC_DIR) $(NETCDF_INCS)
+	$(CXX) nc_output.cc                 -c $(CXX_FLAGS) -I$(INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
 
 
 ########################################################################
