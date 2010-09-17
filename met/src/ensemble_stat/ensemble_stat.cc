@@ -1148,11 +1148,21 @@ void process_grid_scores(WrfData *&fcst_wd, WrfData &obs_wd,
 void parse_ens_file_list(const char *fcst_file) {
    char tmp_str[PATH_MAX];
    ifstream f_in;
+   FileType type;
+
+   // Check the input file type
+   type = get_file_type(fcst_file);
+   if(type != NoFileType) {
+      cerr << "\n\nERROR: parse_ens_file_list() -> "
+           << "the input ensemble file list \"" << fcst_file
+           << "\" is not correct." << "\n\n" << flush;
+      exit(1);
+   }
 
    // Open the ensemble file list
    f_in.open(fcst_file);
    if(!f_in) {
-      cerr << "\n\nparse_ens_file_list() -> "
+      cerr << "\n\nERROR: parse_ens_file_list() -> "
            << "can't open input ensemble file list \"" << fcst_file
            << "\" for reading\n\n" << flush;
       exit(1);
