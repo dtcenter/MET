@@ -200,12 +200,13 @@ void EnsembleStatConfInfo::process_config(FileType ftype, FileType otype) {
    //
 
    // Check that the valid ensemble threshold is between 0 and 1.
-   if(conf.vld_ens_thresh().dval() < 0.0 ||
-      conf.vld_ens_thresh().dval() > 1.0) {
+   if(conf.vld_ens_thresh().dval() <= 0.0 ||
+      conf.vld_ens_thresh().dval() >  1.0) {
 
          cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
               << "The valid ensemble threshold value must be set "
-              << "between 0 and 1.\n\n" << flush;
+              << "greater than 0 and less than or equal to 1.\n\n"
+              << flush;
          exit(1);
    }
 
@@ -214,12 +215,13 @@ void EnsembleStatConfInfo::process_config(FileType ftype, FileType otype) {
    //
 
    // Check that the valid ensemble threshold is between 0 and 1.
-   if(conf.vld_data_thresh().dval() < 0.0 ||
-      conf.vld_data_thresh().dval() > 1.0) {
+   if(conf.vld_data_thresh().dval() <= 0.0 ||
+      conf.vld_data_thresh().dval() >  1.0) {
 
          cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
               << "The valid data threshold value must be set "
-              << "between 0 and 1.\n\n" << flush;
+              << "greater than 0 and less than or equal to 1.\n\n"
+              << flush;
          exit(1);
    }
 
