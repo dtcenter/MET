@@ -310,7 +310,7 @@ void process_grib_mask(const char *file_name, const char *field_name,
    status = get_grib_record(gb_file, rec,
                             gci, mask_wd, mask_grid, v);
 
-   if(status != 0) {
+   if(!status) {
       cerr << "\n\nERROR: parse_grib_mask() -> "
            << "can't find " << field_name << " field in the GRIB file: "
            << file_name << "\n\n" << flush;
