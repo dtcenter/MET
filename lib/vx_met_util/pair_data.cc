@@ -1603,7 +1603,7 @@ double GCPairData::compute_interp(int fcst_flag,
 void GCPairData::inc_count(int ***&rej, int i) {
    int j, k;
 
-   for(j=0; j<n_msg_typ; j++) {
+   for(j=0; j<n_mask; j++) {
       for(k=0; k<n_interp; k++) {
          rej[i][j][k]++;
       }
