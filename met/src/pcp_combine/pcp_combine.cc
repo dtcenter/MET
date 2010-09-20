@@ -1014,8 +1014,8 @@ void get_field(const char *get_file, int get_accum, WrfData &wd,
    //
    // Find the requested field and accumulation interval
    //
-   if(get_grib_record(grib_file, rec, gc_info, wd,
-                      grid, verbosity) != 0) {
+   if(!get_grib_record(grib_file, rec, gc_info, wd,
+                       grid, verbosity)) {
 
       sec_to_hhmmss(get_accum, accum_str);
 
