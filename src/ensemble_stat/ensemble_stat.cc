@@ -333,6 +333,12 @@ void process_ensemble() {
 
             // Track the missing and valid counts
             if(!status) {
+
+               cout << "\n\n***WARNING***: process_ensemble() -> "
+                    << "Cannot find \"" << conf_info.ens_gci[i].info_str
+                    << "\" field in ensemble file: " << ens_file_list[j]
+                    << "\n\n" << flush;
+
                n_miss++;
                continue;
             }
@@ -355,7 +361,7 @@ void process_ensemble() {
                   unix_to_yyyymmdd_hhmmss(ens_valid_ut, tmp_str);
                   unix_to_yyyymmdd_hhmmss(ens_wd.get_valid_time(), tmp2_str);
 
-                  cerr << "\n\n***WARNING***: process_ensemble() -> "
+                  cout << "\n\n***WARNING***: process_ensemble() -> "
                        << "The valid time has changed, "
                        << tmp_str << " != " << tmp2_str << ": "
                        << ens_file_list[j] << "\n\n" << flush;
@@ -366,7 +372,12 @@ void process_ensemble() {
             ens_lead_na.add(ens_wd.get_lead_time());
          }
          else {
-           n_miss++;
+
+            cout << "\n\n***WARNING***: process_ensemble() -> "
+                 << "Cannot read ensemble file: "
+                 << ens_file_list[j] << "\n\n" << flush;
+
+            n_miss++;
          }
 
          // Check if the number of missing fields exceeds the threshold
@@ -374,8 +385,8 @@ void process_ensemble() {
          if((double) n_miss/n_ens > t) {
             cerr << "\n\nERROR: process_ensemble_files() -> "
                  << n_miss << " missing fields exceeds the maximum "
-                 << "allowable specified in the configuration file.\n\n"
-                 << flush;
+                 << "allowable specified by \"vld_ens_thresh\" "
+                 << "in the configuration file.\n\n" << flush;
             exit(1);
          }
 
@@ -394,6 +405,16 @@ void process_ensemble() {
          track_counts(ens_wd, i);
 
       } // end for j
+
+      // Check if the number of missing fields exceeds the threshold
+      t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
+      if((double) n_miss/n_ens > t) {
+         cerr << "\n\nERROR: process_ensemble_files() -> "
+              << n_miss << " missing fields exceeds the maximum "
+              << "allowable specified by \"vld_ens_thresh\" "
+              << "in the configuration file.\n\n" << flush;
+         exit(1);
+      }
 
       // Write out the ensemble information to a NetCDF file
       write_ens_nc(i, ens_wd);
