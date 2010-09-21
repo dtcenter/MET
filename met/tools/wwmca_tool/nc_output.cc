@@ -45,7 +45,9 @@ InterpolationValue iv;
 char junk[256];
 ConcatString s;
 Result r;
-const LambertData & ldata = *(ginfo.lc);
+// const LambertData & ldata = *(ginfo.lc);
+const int Nx = ToGrid->nx();
+const int Ny = ToGrid->ny();
 
 
 valid_time = nh->valid();
@@ -158,9 +160,9 @@ grid_output(ginfo, ncfile);
    //  fill in lat/lon values
    //
 
-for (x=0; x<(ldata.nx); ++x)  {
+for (x=0; x<Nx; ++x)  {
 
-   for (y=0; y<(ldata.ny); ++y)  {
+   for (y=0; y<Ny; ++y)  {
 
       ToGrid->xy_to_latlon((double) x, (double) y, lat, lon);
 
@@ -188,9 +190,9 @@ for (x=0; x<(ldata.nx); ++x)  {
    //  fill in data values
    //
 
-for (x=0; x<(ldata.nx); ++x)  {
+for (x=0; x<Nx; ++x)  {
 
-   for (y=0; y<(ldata.ny); ++y)  {
+   for (y=0; y<Ny; ++y)  {
 
       iv = get_interpolated_value(x, y);
 
