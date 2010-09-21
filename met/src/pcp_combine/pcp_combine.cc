@@ -1,3 +1,4 @@
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2007
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -1127,11 +1128,11 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    pcp_var->add_att("long_name", var_str);
 
    // Ouput level string
-   if(out_accum%sec_per_hour == 0) {
-      sprintf(var_str, "A%i", out_accum/sec_per_hour);
+   if(nc_accum%sec_per_hour == 0) {
+      sprintf(var_str, "A%i", nc_accum/sec_per_hour);
    }
    else {
-      sec_to_hhmmss(out_accum, tmp_str);
+      sec_to_hhmmss(nc_accum, tmp_str);
       sprintf(var_str, "A%s", tmp_str);
    }
    pcp_var->add_att("level", var_str);
