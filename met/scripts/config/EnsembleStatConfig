@@ -309,7 +309,7 @@ interp_thresh = 1.0;
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file
 //
-// Values for flags (4) though (12) are interpreted as follows:
+// Values for flags (3) though (12) are interpreted as follows:
 //    (0) Do not write this field to the NetCDF file.
 //    (1) Write this field to the NetCDF file.
 //

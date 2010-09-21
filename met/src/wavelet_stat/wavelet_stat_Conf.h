@@ -20,7 +20,7 @@
    //
    //     Created from config file "WaveletStatConfig_default"
    //
-   //     on September 9, 2010    3:26 pm  MDT
+   //     on September 21, 2010    10:31 am  MDT
    //
 
 

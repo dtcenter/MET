@@ -142,7 +142,7 @@ wavelet_k = 2;
 //        value indicates that this NetCDF file should be produced.  A value
 //        of 0 indicates that it should not be produced.
 //
-// Values for flag (1) are interpreted as follows:
+// The value for flag (1) is interpreted as follows:
 //    (0) Do not generate output of this type
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file

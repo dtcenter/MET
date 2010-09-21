@@ -452,7 +452,7 @@ cov_thresh[] = [ "ge0.5" ];
 //        this NetCDF file should be produced.  A value of 0
 //        indicates that it should not be produced.
 //
-// Values for flags (1) through (8) are interpreted as follows:
+// Values for flags (1) through (15) are interpreted as follows:
 //    (0) Do not generate output of this type
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file
