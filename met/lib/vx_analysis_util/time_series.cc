@@ -125,6 +125,37 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void TimeSeries::assign(const TimeSeries & ts)
+
+{
+
+clear();
+
+TimeStart = ts.TimeStart;
+
+TimeDelta = ts.TimeDelta;
+
+Nelements = ts.Nelements;
+
+Value     = new double [ Nelements ];
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   Value[j] = ts.Value[j];
+
+}
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void TimeSeries::dump(ostream & out, int depth) const
 
 {
