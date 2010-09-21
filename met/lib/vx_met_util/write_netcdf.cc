@@ -12,6 +12,7 @@
 using namespace std;
 
 #include <cstdio>
+#include <ctime>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
