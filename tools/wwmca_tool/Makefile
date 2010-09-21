@@ -110,14 +110,34 @@ nc_output.o: nc_output.cc wwmca_ref.o
 
 wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	@ echo
-	$(CXX) wwmca_regrid.cc $(OBJECTS) $(CXX_FLAGS) -o wwmca_regrid -I$(INC_DIR) $(NETCDF_INCS) -L$(LIB_DIR) $(NETCDF_LIBS) -lnetcdf_c++ -lnetcdf -lvx_econfig -lvx_met_util -lvx_data_grids -lvx_cal -lvx_util -lvx_math -lm
+	$(CXX) -o wwmca_regrid wwmca_regrid.cc $(OBJECTS) \
+	$(CXX_FLAGS) $(OPT_FLAGS) \
+	-I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
+	-L$(LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-lvx_met_util -lvx_analysis_util -lvx_gdata -lvx_wrfdata -lvx_met_util \
+	-lvx_contable -lvx_grib_classes \
+	-lvx_econfig -lvx_gsl_prob -lgsl \
+	-lvx_plot_util  -lvx_render -lvx_pxm -lvx_color -lvx_ps -lvx_afm \
+	-lvx_data_grids -lvx_gnomon -lvx_nav -lvx_cal -lvx_util -lvx_math -lm \
+	-lnetcdf_c++ -lnetcdf \
+	$(CXX_LIBS)
 	rm -f $(BIN_DIR)/wwmca_regrid
 	cp wwmca_regrid $(BIN_DIR)
 
 
 wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
-	$(CXX) wwmca_plot.cc afwa_file.o $(CXX_FLAGS) -o wwmca_plot -DMAP_DATA_DIR=\"$(MAP_DATA_DIR)\" -I$(INC_DIR) -L$(LIB_DIR) -lvx_plot_util -lvx_render -lvx_ps -lvx_afm -lvx_pxm -lvx_color -lvx_data_grids -lvx_nav -lvx_cal -lvx_util -lvx_math -lm
+	$(CXX) -o wwmca_plot wwmca_plot.cc afwa_file.o \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMAP_DATA_DIR=\"$(MAP_DATA_DIR)\" \
+	-I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
+	-L$(LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-lvx_met_util -lvx_analysis_util -lvx_gdata -lvx_wrfdata -lvx_met_util \
+	-lvx_contable -lvx_grib_classes \
+	-lvx_econfig -lvx_gsl_prob -lgsl \
+	-lvx_plot_util  -lvx_render -lvx_pxm -lvx_color -lvx_ps -lvx_afm \
+	-lvx_data_grids -lvx_gnomon -lvx_nav -lvx_cal -lvx_util -lvx_math -lm \
+	-lnetcdf_c++ -lnetcdf \
+	$(CXX_LIBS)
 	rm -f $(BIN_DIR)/wwmca_plot
 	cp wwmca_plot $(BIN_DIR)
 

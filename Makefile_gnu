@@ -253,7 +253,7 @@ ifeq ($(DISABLE_MODE_ANALYSIS), 0)
 	@ cd $(MODE_ANALYSIS);	 $(MAKE) $(PRINT_OPTS)
 endif
 ifeq ($(DISABLE_TOOLS), 0)
-	@ cd $(TOOLS_DIR);	 $(MAKE) all $(PRINT_OPTS)
+	@ cd $(TOOLS_DIR);	 $(MAKE) $(PRINT_OPTS)
 endif
 
 clean:
