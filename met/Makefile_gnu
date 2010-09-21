@@ -23,7 +23,7 @@
 MAKE         = /usr/bin/make
 
 # Architecture flags
-ARCH_FLAGS   = # -DBLOCK4
+ARCH_FLAGS   = -DBLOCK4
 
 # Path to the C++ Compiler
 # C++ compiler flags
