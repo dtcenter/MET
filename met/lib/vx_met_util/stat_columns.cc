@@ -571,11 +571,11 @@ int get_orank_column_offset(const char *col_name) {
    if(!found) {
 
       // ENS_i
-      if(strncasecmp(orank_columns[13], col_name,
-                     strlen(orank_columns[13])) == 0) {
+      if(strncasecmp(orank_columns[12], col_name,
+                     strlen(orank_columns[12])) == 0) {
          found  = 1;
          i      = parse_thresh_index(col_name);
-         offset = n_header_columns + 13 + (i-1);
+         offset = n_header_columns + 12 + (i-1);
       }
    }
 
