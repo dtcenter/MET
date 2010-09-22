@@ -304,6 +304,14 @@ int read_field_levels(const char *file_name, GCInfo &gci,
             status = read_field_met(file_name, gci, valid_ut, lead_sec,
                                     wd[0], gr, verbosity);
 
+            if(!status) {
+               cerr << "\n\nERROR: read_levels() -> "
+                    << "no record matching "
+                    << gci.info_str << " found in NetCDF file: "
+                    << file_name << "\n" << flush;
+               exit(1);
+            }
+
             // Add a single level value
             lvl_na.add(bad_data_double);
          }
