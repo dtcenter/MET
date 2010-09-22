@@ -211,6 +211,15 @@ void PointStatConfInfo::process_config(FileType ftype) {
    // Parse the obs field information
    for(i=0; i<n_vx; i++) {
 
+      // If obs_field is empty and the forecast file type is NetCDF, error out
+      if(conf.n_obs_field_elements() == 0 &&
+         ftype == NcFileType) {
+         cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
+           << "When using a gridded NetCDF forecast file, \"obs_field\" cannot be blank.  "
+           << "You must specify the verifying observations using a GRIB code.\n\n" << flush;
+         exit(1);
+      }
+
       // If obs_field is empty, use fcst_field
       if(conf.n_obs_field_elements() == 0) {
          gci.set_gcinfo(conf.fcst_field(i).sval(),
