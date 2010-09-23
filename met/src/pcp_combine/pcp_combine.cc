@@ -196,6 +196,28 @@ void process_command_line(int argc, char **argv) {
          verbosity = atoi(argv[i+1]);
          i++;
       }
+
+      //
+      // Optional sum arguments
+      //
+      else if(strcmp(argv[i], "-pcpdir") == 0) {
+         pcp_dir.add(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-pcprx") == 0) {
+         pcp_reg_exp = argv[i+1];
+         i++;
+      }
+
+      //
+      // Unrecognized flags
+      //
+      else if(argv[i][0] == '-') {
+         cerr << "\n\nERROR: process_command_line() -> "
+              << "Unrecognized command line argument: " << argv[i]
+              << "\n\n" << flush;
+         exit(1);
+      }
    }
 
    //
@@ -220,7 +242,6 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_sum_args(int argc, char **argv, int i_args) {
-   int i;
 
    //
    // Check the number of arguments provided
@@ -272,18 +293,14 @@ void process_sum_args(int argc, char **argv, int i_args) {
    out_file = argv[i_args+4];
 
    //
-   // Check for the optional sum arguments
+   // Check that accumulation intervals are greater than zero
    //
-   for(i=0; i<argc; i++) {
-
-      if(strcmp(argv[i], "-pcpdir") == 0) {
-         pcp_dir.add(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-pcprx") == 0) {
-         pcp_reg_exp = argv[i+1];
-         i++;
-      }
+   if(in_accum <= 0 || out_accum <= 0) {
+      cerr << "\n\nERROR: process_sum_args() -> "
+           << "The input accumulation interval (" << argv[i_args+1] 
+           << ") and output accumulation interval (" << argv[i_args+3]
+           << ") must be greater than zero.\n\n" << flush;
+      exit(1);
    }
 
    return;
