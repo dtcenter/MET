@@ -288,6 +288,27 @@ find_grid_hemisphere();
 
 
    //
+   //  check that the hemispheres are defined
+   //
+
+if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !nh ) {
+
+   cerr << "\n\n  WwmcaRegridder::set_config() -> missing northern hemisphere data must be specified using the \"-nh\" argument\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ( Hemi == south_hemisphere || Hemi == both_hemispheres ) && !sh ) {
+
+   cerr << "\n\n  WwmcaRegridder::set_config() -> missing southern hemisphere data must be specified using the \"-sh\" argument\n\n";
+
+   exit ( 1 );
+
+}
+
+
+   //
    //  done
    //
 
