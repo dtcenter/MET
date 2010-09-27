@@ -565,7 +565,7 @@ void usage(int argc, char *argv[]) {
         << "\t\tGrib_Code Level Height(msl or agl) Observation_Value\n\n"
 
         << "\t\twhere\t\"Level\" is the pressure level (hPa) or "
-        << "accumulation interval (hh[_mmss]).\n"
+        << "accumulation interval (HH[MMSS]).\n"
         << "\t\t\t\"Height\" is meters above sea level or above ground level for the "
         << "observation (msl or agl).\n\n"
 
