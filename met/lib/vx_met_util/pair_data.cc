@@ -247,13 +247,14 @@ void GCInfo::set_gcinfo_grib(const char *c, int ptv) {
       lvl_2 = lvl_1;
    }
 
-   // Only allow ranges for PresLevel and VertLevel
+   // Allow ranges for PresLevel, VertLevel, and NoLevel
    if(lvl_type != PresLevel &&
       lvl_type != VertLevel &&
+      lvl_type != NoLevel &&
       lvl_1    != lvl_2) {
       cerr << "\n\nERROR: GCInfo::set_gcinfo_grib() -> "
            << "ranges of levels are only supported for pressure levels "
-           << "(P) and vertical levels (Z).\n"
+           << "(P), vertical levels (Z), and generic levels (L).\n\n"
            << flush;
       exit(1);
    }
