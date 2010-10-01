@@ -2043,8 +2043,8 @@ double compute_go_index(const char *jobstring, LineDataFile &f,
          if(strcmp(line.fcst_var(), "WIND") == 0 &&
             strcmp(line.obs_var(),  "WIND") == 0) {
 
-            if(strncmp(line.fcst_lev(), "Z10", strlen("Z10")) == 0 &&
-               strncmp(line.obs_lev(),  "Z10", strlen("Z10")) == 0)
+            if(strcmp(line.fcst_lev(), "Z10") == 0 &&
+               strcmp(line.obs_lev(),  "Z10") == 0)
                ws_sfc[i] += s_info;
 
             else if(strcmp(line.fcst_lev(), "P850") == 0 &&
@@ -2069,8 +2069,8 @@ double compute_go_index(const char *jobstring, LineDataFile &f,
          else if(strcmp(line.fcst_var(), "DPT") == 0 &&
                  strcmp(line.obs_var(),  "DPT") == 0) {
 
-            if(strncmp(line.fcst_lev(), "Z2", strlen("Z2")) == 0 &&
-               strncmp(line.obs_lev(),  "Z2", strlen("Z2")) == 0)
+            if(strcmp(line.fcst_lev(), "Z2") == 0 &&
+               strcmp(line.obs_lev(),  "Z2") == 0)
                td_sfc[i] += s_info;
 
             else if(strcmp(line.fcst_lev(), "P850") == 0 &&
@@ -2095,8 +2095,8 @@ double compute_go_index(const char *jobstring, LineDataFile &f,
          else if(strcmp(line.fcst_var(), "TMP") == 0 &&
                  strcmp(line.obs_var(),  "TMP") == 0) {
 
-            if(strncmp(line.fcst_lev(), "Z2", strlen("Z2")) == 0 &&
-               strncmp(line.obs_lev(),  "Z2", strlen("Z2")) == 0)
+            if(strcmp(line.fcst_lev(), "Z2") == 0 &&
+               strcmp(line.obs_lev(),  "Z2") == 0)
                tt_sfc[i] += s_info;
 
             else if(strcmp(line.fcst_lev(), "P400") == 0 &&
@@ -2127,8 +2127,8 @@ double compute_go_index(const char *jobstring, LineDataFile &f,
          else if(strcmp(line.fcst_var(), "PRMSL") == 0 &&
                  strcmp(line.obs_var(),  "PRMSL") == 0) {
 
-            if(strncmp(line.fcst_lev(), "Z0", strlen("Z0")) == 0 &&
-               strncmp(line.obs_lev(),  "Z0", strlen("Z0")) == 0)
+            if(strcmp(line.fcst_lev(), "Z0") == 0 &&
+               strcmp(line.obs_lev(),  "Z0") == 0)
                slp[i] += s_info;
 
             else
