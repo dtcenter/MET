@@ -288,8 +288,8 @@ const char * c = DataLine::get_item(k);
    // Check for the NA string and interpret it as bad data
    //
 
-if ( strncmp(c, na_str, strlen(na_str)) == 0 ) return ( bad_data_str );
-else                                           return ( c );
+if ( strcmp(c, na_str) == 0 ) return ( bad_data_str );
+else                          return ( c );
 
 }
 
