@@ -122,8 +122,8 @@ void SingleThresh::set(const char *str) {
    //
    // Check for bad data
    //
-   if(strncmp(str, na_str,       strlen(na_str)      ) == 0 ||
-      strncmp(str, bad_data_str, strlen(bad_data_str)) == 0 ) {
+   if(strcmp(str, na_str      ) == 0 ||
+      strcmp(str, bad_data_str) == 0) {
 
       type = thresh_na;
       thresh = 0.0;
