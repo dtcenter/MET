@@ -1073,6 +1073,7 @@ if ( (H != 'N') && (H != 'S') )  {
 
 }
 
+/*
 if ( H == 'S' )  {
 
    cerr << "\n\n  WwmcaRegridder::parse_stereographic_grid() -> South hemisphere grids not yet supported\n\n";
@@ -1080,6 +1081,7 @@ if ( H == 'S' )  {
    exit ( 1 );
 
 }
+*/
 
 
    //
@@ -1087,6 +1089,8 @@ if ( H == 'S' )  {
    //
 
 sdata->name = "To (stereographic)";
+
+sdata->hemisphere = H;
 
 sdata->scale_lat = lat_scale;
 
