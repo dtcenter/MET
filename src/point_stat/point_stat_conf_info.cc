@@ -956,8 +956,8 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
 
       default:
          cerr << "\n\nERROR: PointStatConfInfo::n_txt_row(int) -> "
-              << "unexpected output type index value: " << i << "\n\n"
-              << flush;
+              << "unexpected output type index value: " << i_txt_row
+              << "\n\n" << flush;
          exit(1);
          break;
    }
