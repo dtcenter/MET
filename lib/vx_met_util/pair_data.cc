@@ -1290,9 +1290,10 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
          return;
       }
    }
-   // For vertical levels, check for a surface message type or if the
-   // observation height falls within the requested range.
-   else if(obs_gci.lvl_type == VertLevel) {
+   // For all other level types (RecNumber, NoLevel), check
+   // for a surface message type or if the observation height falls
+   // within the requested range.
+   else {
 
       if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
          (obs_hgt < obs_gci.lvl_1 ||
