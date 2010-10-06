@@ -1290,10 +1290,9 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
          return;
       }
    }
-   // For all other level types (RecNumber, NoLevel), check
-   // for a surface message type or if the observation height falls
-   // within the requested range.
-   else {
+   // For vertical levels, check for a surface message type or if the
+   // observation height falls within the requested range.
+   else if(obs_gci.lvl_type == VertLevel) {
 
       if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
          (obs_hgt < obs_gci.lvl_1 ||
@@ -1302,11 +1301,14 @@ void GCPairData::add_obs(float *hdr_arr,     char *hdr_typ_str,
          return;
       }
    }
-   // For all other level types (RecNumber, NoLevel), check
-   // if the observation height falls within the requested range.
+   // For all other level types (RecNumber, NoLevel), check for a
+   // surface message type or if the observation height falls within
+   // the requested range.
    else {
-      if(obs_hgt < obs_gci.lvl_1 ||
-         obs_hgt > obs_gci.lvl_2) {
+
+      if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
+         (obs_hgt < obs_gci.lvl_1 ||
+          obs_hgt > obs_gci.lvl_2)) {
          rej_lvl++;
          return;
       }
