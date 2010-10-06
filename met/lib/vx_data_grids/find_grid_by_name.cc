@@ -151,6 +151,23 @@ static const int n_ncep_st_grids = sizeof(ncep_st_grids)/sizeof(*ncep_st_grids);
 
 
    //
+   //  misc stereographic grids
+   //
+
+
+static const StereographicData misc_st_grids [] = {
+
+   { "wwmca_north", 'N',  60.0,  90.0, 0.0, 511.0, 511.0,   80.0, 23.79848,  6367.47, 1024, 1024 }, 
+   { "wwmca_south", 'S', -60.0, -90.0, 0.0, 511.0, 511.0, -100.0, 23.79848,  6367.47, 1024, 1024 }, 
+
+};
+
+
+static const int n_misc_st_grids = sizeof(misc_st_grids)/sizeof(*misc_st_grids);
+////////////////////////////////////////////////////////////////////////
+
+
+   //
    //  NCEP Lambert grids
    //
 
@@ -308,6 +325,21 @@ for (j=0; j<n_ncep_st_grids; ++j)  {
 
 }
 
+   //
+   //  try misc stereographic grids
+   //
+
+for (j=0; j<n_misc_st_grids; ++j)  {
+
+   if ( strcmp(name, misc_st_grids[j].name) == 0 )  {
+
+      i.set( misc_st_grids[j] );
+
+      return ( true );
+
+   }
+
+}
 
    //
    //  try ncep lambert grids
