@@ -159,8 +159,8 @@ void GCInfo::set_gcinfo(const char *c, int ptv, FileType type) {
 
       default:
          cerr << "\n\nERROR: GCInfo::set_gcinfo() -> "
-              << "unsupported input file type \""
-              << c << "\".\n\n" << flush;
+              << "can't set the GCInfo \"" << c
+              << "\" due to unsupported input file type.\n\n" << flush;
          exit(1);
          break;
 
