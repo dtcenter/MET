@@ -38,6 +38,16 @@ FileType get_file_type(const char *filename) {
    char ext_str[max_str_len];
    int i;
 
+   //
+   // Check that the file exists
+   //
+   if(access(filename, F_OK) != 0) {
+      cerr << "\n\nERROR: get_file_type() -> "
+           << "can't access file \"" << filename
+           << "\"\n\n" << flush;
+      exit(1);
+   }
+
    // Strip off the extension from the file name, if one exists, and compare
    // to the known file extensions.
    if((ptr = strrchr(filename, '.')) != NULL) {
