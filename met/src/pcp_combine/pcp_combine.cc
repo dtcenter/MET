@@ -1313,7 +1313,7 @@ void usage(int argc, char *argv[]) {
         << "to be used from in_file1 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"in_file2\" indicates the name of the second input GRIB "
-        << "file to be added to or subtracted from in_file1 (required).\n"
+        << "file to be subtracted from in_file1 (required).\n"
 
         << "\t\t\t\"accum2\" indicates the accumulation interval "
         << "to be used from in_file2 in HH[MMSS] format (required).\n"
