@@ -395,7 +395,7 @@ void usage(int argc, char *argv[]) {
         << "plotted (optional).\n"
         << "\t\t\"-data_dir path\" indicates the MET data directory "
         << "to be used (optional).\n"
-        << "\t\t\"-dim lat_ll lon_ll width\" defines the "
+        << "\t\t\"-dim lat_ll lon_ll lat_ur lon_ur\" defines the "
         << "lat/lon box to be plotted (optional).\n\n"
         << flush;
 
