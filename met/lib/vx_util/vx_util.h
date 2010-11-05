@@ -34,6 +34,7 @@
 #include "vx_util/string_array.h"
 #include "vx_util/string_fxns.h"
 #include "vx_util/substring.h"
+#include "vx_util/temp_file.h"
 #include "vx_util/vx_endian.h"
 #include "vx_util/threshold.h"
 #include "vx_util/thresh_array.h"

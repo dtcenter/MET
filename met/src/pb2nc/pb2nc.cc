@@ -212,10 +212,10 @@ static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
 
 extern "C" {
    void numpbmsg_(int *, int *);
-   void openpb_(char *, int *);
+   void openpb_(const char *, int *);
    void readpb_(int *, char *, int *, int *, int *, double[mxr8pm],
                 double[mxr8vt][mxr8vn][mxr8lv][mxr8pm]);
-   void dumppb_(char *, int *, const char *, int *,
+   void dumppb_(const char *, int *, const char *, int *,
                 const char *, int *, int *);
 }
 
@@ -655,14 +655,13 @@ void process_pbfile(int i_pb) {
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_pb_rpt, rej_in_rpt, rej_itp, rej_nobs;
    int lv, ev, kk, len1, len2;
-   pid_t p;
 
    double   x, y;
 
    unixtime file_ut = (unixtime) 0;
    unixtime msg_ut, beg_ut, end_ut;
 
-   char     file_name[PATH_MAX], blk_file[PATH_MAX];
+   ConcatString file_name, blk_prefix, blk_file;
    char     prefix[max_str_len];
    char     time_str[max_str_len], time_str2[max_str_len];
 
@@ -686,14 +685,14 @@ void process_pbfile(int i_pb) {
    //
    // Set the file name for the PrepBufr file
    //
-   strcpy(file_name, pbfile[i_pb]);
+   file_name << pbfile[i_pb];
 
    //
    // Build the temporary block file name
    //
-   p = getpid();
-   sprintf(blk_file, "%s/pb2nc_%i_%i_blk.pb",
-           conf.tmp_dir().sval(), p, i_pb);
+   blk_prefix << conf.tmp_dir().sval() << "/" << "tmp_pb2nc_blk";
+   blk_file = make_temp_file_name(blk_prefix, '\0');
+
    if(verbosity > 1) {
       cout << "Blocking PrepBufr file to:\t" << blk_file
            << "\n" << flush;
@@ -768,12 +767,7 @@ void process_pbfile(int i_pb) {
       //
       // Delete the temporary blocked file
       //
-      if(remove(blk_file) != 0) {
-         cerr << "\n\nERROR: process_pbfile() -> "
-              << "can't remove temporary blocked file \"" << blk_file
-              << "\"\n\n" << flush;
-         exit(1);
-      }
+      remove_temp_file(blk_file);
 
       return;
    }
@@ -1330,12 +1324,7 @@ void process_pbfile(int i_pb) {
    //
    // Delete the temporary blocked file
    //
-   if(remove(blk_file) != 0) {
-      cerr << "\n\nERROR: process_pbfile() -> "
-           << "can't remove temporary blocked file \"" << blk_file
-           << "\"\n\n" << flush;
-      exit(1);
-   }
+   remove_temp_file(blk_file);
 
    if(i_msg <= 0) {
       cout << "***WARNING*** process_pbfile() -> "

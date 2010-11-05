@@ -746,7 +746,6 @@ void set_default_job() {
 
 void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
-   pid_t p;
 
    //
    // Initialize
@@ -769,12 +768,6 @@ void process_search_dirs() {
    }
 
    //
-   // Build the temp file name
-   //
-   p = getpid();
-   tmp_file << "tmp_" << (int) p << ".stat";
-
-   //
    // Open up the temp file for storing the intermediate STAT line data
    //
 
@@ -787,7 +780,15 @@ void process_search_dirs() {
       else                          tmp_dir = default_tmp_dir;
    }
 
-   tmp_path << tmp_dir << "/" << tmp_file;
+   //
+   // Build the temp file name
+   //
+   tmp_file << tmp_dir << "/" << "tmp_stat_analysis";
+   tmp_path = make_temp_file_name(tmp_file, '\0');
+
+   //
+   // Open the temp file
+   //
    tmp_out.open(tmp_path);
    if(!tmp_out) {
       cerr << "\n\nERROR: process_search_dirs() -> "
@@ -909,13 +910,7 @@ void clean_up() {
    //
    // Delete the temp file
    //
-   if(remove(tmp_path) != 0) {
-      cerr << "\n\nERROR: clean_up() -> "
-           << "can't remove temporary file \"" << tmp_path
-           << "\"\n\n" << flush;
-
-      exit(1);
-   }
+   remove_temp_file(tmp_path);
 
    return;
 }

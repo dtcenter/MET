@@ -33,6 +33,7 @@ OBJECTS  =  ascii_table.o \
 	string_array.o \
 	string_fxns.o \
 	substring.o \
+	temp_file.o \
 	thresh_array.o \
 	threshold.o \
 	vx_endian.o  \
@@ -117,6 +118,9 @@ string_fxns.o: string_fxns.cc
 
 substring.o: substring.cc
 	$(CXX) substring.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+
+temp_file.o: temp_file.cc
+	$(CXX) temp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
 thresh_array.o: thresh_array.cc
 	$(CXX) thresh_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
