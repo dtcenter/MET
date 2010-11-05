@@ -12,8 +12,9 @@
 using namespace std;
 
 #include <cstdio>
-#include <iostream>
+#include <errno.h>
 #include <fstream>
+#include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -262,13 +263,12 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    CTSInfo *cts_tmp;
-   pid_t p;
 
    //
    // Temp file streams for categorical statistics
    //
    ofstream *cts_i_out, *cts_r_out;
-   char **cts_i_file, **cts_r_file;
+   ConcatString *cts_i_file, *cts_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -309,11 +309,9 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    cts_tmp    = new CTSInfo [n_cts];
    cts_i_out  = new ofstream [n_cts];
    cts_r_out  = new ofstream [n_cts];
-   cts_i_file = new char * [n_cts];
-   cts_r_file = new char * [n_cts];
+   cts_i_file = new ConcatString [n_cts];
+   cts_r_file = new ConcatString [n_cts];
    for(i=0; i<n_cts; i++) {
-      cts_i_file[i]              = new char [max_str_len];
-      cts_r_file[i]              = new char [max_str_len];
       cts_tmp[i].cts_fcst_thresh = cts_info[i].cts_fcst_thresh;
       cts_tmp[i].cts_obs_thresh  = cts_info[i].cts_obs_thresh;
 
@@ -322,10 +320,14 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
    for(i=0; i<n_cts; i++) {
-      sprintf(cts_i_file[i], "%s/tmp_%i_cts_i_%i.txt", tmp_dir, p, i);
-      sprintf(cts_r_file[i], "%s/tmp_%i_cts_r_%i.txt", tmp_dir, p, i);
+      prefix.clear();
+      prefix << tmp_dir << "/tmp_cts_i_" << i;
+      cts_i_file[i] = make_temp_file_name(prefix, '\0');
+
+      prefix.clear();
+      prefix << tmp_dir << "/tmp_cts_r_" << i;
+      cts_r_file[i] = make_temp_file_name(prefix, '\0');
    }
 
    //
@@ -564,8 +566,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Attempt to delete temp files
       //
       for(i=0; i<n_cts; i++) {
-         remove(cts_i_file[i]);
-         remove(cts_r_file[i]);
+         remove_temp_file(cts_i_file[i]);
+         remove_temp_file(cts_r_file[i]);
       }
 
       exit(i_err);
@@ -575,32 +577,18 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Delete temp files
    //
    for(i=0; i<n_cts; i++) {
-      if(remove(cts_i_file[i]) != 0 || remove(cts_r_file[i]) != 0) {
-      cerr << "\n\nERROR: compute_stats_ci_bca() -> "
-           << "can't delete one or more temporary files:\n"
-           << cts_i_file[i] << "\n"
-           << cts_r_file[i] << "\n\n" << flush;
-
-      exit(1);
-      }
+      remove_temp_file(cts_i_file[i]);
+      remove_temp_file(cts_r_file[i]);
    }
 
    //
    // Deallocate memory
    //
-   if(cts_tmp)   { delete [] cts_tmp;   cts_tmp   = (CTSInfo *) 0;  }
-   if(cts_i_out) { delete [] cts_i_out; cts_i_out = (ofstream *) 0; }
-   if(cts_r_out) { delete [] cts_r_out; cts_r_out = (ofstream *) 0; }
-   for(i=0; i<n_cts; i++) {
-      if(cts_i_file[i]) {
-         delete [] cts_i_file[i]; cts_i_file[i] = (char *) 0;
-      }
-      if(cts_r_file[i]) {
-         delete [] cts_r_file[i]; cts_r_file[i] = (char *) 0;
-      }
-   }
-   if(cts_i_file) { delete [] cts_i_file; cts_i_file = (char **) 0; }
-   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (char **) 0; }
+   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
+   if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     0; }
+   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
+   if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) 0; }
+   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
 
    return;
 }
@@ -628,14 +616,12 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    MCTSInfo mcts_tmp;
-   pid_t p;
 
    //
    // Temp file streams for categorical statistics
    //
    ofstream mcts_i_out, mcts_r_out;
-   char mcts_i_file[max_str_len];
-   char mcts_r_file[max_str_len];
+   ConcatString mcts_i_file, mcts_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -675,9 +661,13 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
-   sprintf(mcts_i_file, "%s/tmp_%i_mcts_i.txt", tmp_dir, p);
-   sprintf(mcts_r_file, "%s/tmp_%i_mcts_r.txt", tmp_dir, p);
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_mcts_i";
+   mcts_i_file = make_temp_file_name(prefix, '\0');
+
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_mcts_r";
+   mcts_r_file = make_temp_file_name(prefix, '\0');
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -792,8 +782,8 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp files
       //
-      remove(mcts_i_file);
-      remove(mcts_r_file);
+      remove_temp_file(mcts_i_file);
+      remove_temp_file(mcts_r_file);
 
       exit(i_err);
    } // end catch block
@@ -801,13 +791,8 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Delete temp files
    //
-   if(remove(mcts_i_file) != 0 || remove(mcts_r_file) != 0) {
-      cerr << "\n\nERROR: compute_stats_ci_bca() -> "
-           << "can't delete one or more temporary files:\n"
-           << mcts_i_file << "\n"
-           << mcts_r_file << "\n\n" << flush;
-      exit(1);
-   }
+   remove_temp_file(mcts_i_file);
+   remove_temp_file(mcts_r_file);
 
    return;
 }
@@ -835,14 +820,13 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    int n, i;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   CNTInfo  cnt_tmp;
-   pid_t p;
+   CNTInfo cnt_tmp;
 
    //
    // Temp file streams for continuous statistics
    //
    ofstream cnt_i_out, cnt_r_out;
-   char cnt_i_file[max_str_len], cnt_r_file[max_str_len];
+   ConcatString cnt_i_file, cnt_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -878,9 +862,13 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
-   sprintf(cnt_i_file, "%s/tmp_%i_cnt_i.txt", tmp_dir, p);
-   sprintf(cnt_r_file, "%s/tmp_%i_cnt_r.txt", tmp_dir, p);
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_cnt_i";
+   cnt_i_file = make_temp_file_name(prefix, '\0');
+
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_cnt_r";
+   cnt_r_file = make_temp_file_name(prefix, '\0');
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -1153,8 +1141,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp files
       //
-      remove(cnt_i_file);
-      remove(cnt_r_file);
+      remove_temp_file(cnt_i_file);
+      remove_temp_file(cnt_r_file);
 
       exit(i_err);
    } // end catch block
@@ -1162,14 +1150,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Delete temp files
    //
-   if(remove(cnt_i_file) != 0 || remove(cnt_r_file) != 0) {
-      cerr << "\n\nERROR: compute_cnt_stats_ci_bca() -> "
-           << "can't delete one or more temporary files:\n"
-           << cnt_i_file << "\n"
-           << cnt_r_file << "\n\n" << flush;
-
-      exit(1);
-   }
+   remove_temp_file(cnt_i_file);
+   remove_temp_file(cnt_r_file);
 
    return;
 }
@@ -1193,13 +1175,12 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, sr_na;
    CTSInfo *cts_tmp;
-   pid_t p;
 
    //
    // Temp file streams for categorical statistics
    //
    ofstream *cts_r_out;
-   char **cts_r_file;
+   ConcatString *cts_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -1244,9 +1225,8 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    cts_tmp    = new CTSInfo [n_cts];
    cts_r_out  = new ofstream [n_cts];
-   cts_r_file = new char * [n_cts];
+   cts_r_file = new ConcatString [n_cts];
    for(i=0; i<n_cts; i++) {
-      cts_r_file[i]              = new char [max_str_len];
       cts_tmp[i].cts_fcst_thresh = cts_info[i].cts_fcst_thresh;
       cts_tmp[i].cts_obs_thresh  = cts_info[i].cts_obs_thresh;
    }
@@ -1254,9 +1234,10 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
    for(i=0; i<n_cts; i++) {
-      sprintf(cts_r_file[i], "%s/tmp_%i_cts_r_%i.txt", tmp_dir, p, i);
+      prefix.clear();
+      prefix << tmp_dir << "/tmp_cts_r_" << i;
+      cts_r_file[i] = make_temp_file_name(prefix, '\0');
    }
 
    //
@@ -1464,7 +1445,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp files
       //
-      for(i=0; i<n_cts; i++) remove(cts_r_file[i]);
+      for(i=0; i<n_cts; i++) remove_temp_file(cts_r_file[i]);
 
       exit(i_err);
    } // end catch block
@@ -1473,26 +1454,15 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Delete temp files
    //
    for(i=0; i<n_cts; i++) {
-      if(remove(cts_r_file[i]) != 0) {
-         cerr << "\n\nERROR: compute_cts_stats_ci_perc() -> "
-              << "can't delete the temporary file:\n"
-              << cts_r_file[i] << "\n\n" << flush;
-
-         exit(1);
-      }
+      remove_temp_file(cts_r_file[i]);
    }
 
    //
    // Deallocate memory
    //
-   if(cts_tmp)   { delete [] cts_tmp;   cts_tmp   = (CTSInfo *) 0;  }
-   if(cts_r_out) { delete [] cts_r_out; cts_r_out = (ofstream *) 0; }
-   for(i=0; i<n_cts; i++) {
-      if(cts_r_file[i]) {
-         delete [] cts_r_file[i]; cts_r_file[i] = (char *) 0;
-      }
-   }
-   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (char **) 0; }
+   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
+   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
+   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
 
    return;
 }
@@ -1516,13 +1486,12 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, sr_na;
    MCTSInfo mcts_tmp;
-   pid_t p;
 
    //
    // Temp file streams for categorical statistics
    //
    ofstream mcts_r_out;
-   char mcts_r_file[max_str_len];
+   ConcatString mcts_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -1565,10 +1534,11 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    mcts_tmp = mcts_info;
 
    //
-   // Build the temp file name
+   // Build the temp file names
    //
-   p = getpid();
-   sprintf(mcts_r_file, "%s/tmp_%i_mcts_r.txt", tmp_dir, p);
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_mcts_r";
+   mcts_r_file = make_temp_file_name(prefix, '\0');
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -1665,7 +1635,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp file
       //
-      remove(mcts_r_file);
+      remove_temp_file(mcts_r_file);
 
       exit(i_err);
    } // end catch block
@@ -1673,13 +1643,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Delete temp file
    //
-   if(remove(mcts_r_file) != 0) {
-      cerr << "\n\nERROR: compute_mcts_stats_ci_perc() -> "
-           << "can't delete the temporary file:\n"
-           << mcts_r_file << "\n\n" << flush;
-
-      exit(1);
-   }
+   remove_temp_file(mcts_r_file);
 
    return;
 }
@@ -1703,13 +1667,12 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, sr_na;
    CNTInfo  cnt_tmp;
-   pid_t p;
 
    //
    // Temp file streams for continuous statistics
    //
    ofstream cnt_r_out;
-   char cnt_r_file[max_str_len];
+   ConcatString cnt_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -1750,8 +1713,9 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
-   sprintf(cnt_r_file, "%s/tmp_%i_cnt_r.txt", tmp_dir, p);
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_cnt_r";
+   cnt_r_file = make_temp_file_name(prefix, '\0');
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -1994,7 +1958,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp files
       //
-      remove(cnt_r_file);
+      remove_temp_file(cnt_r_file);
 
       exit(i_err);
    } // end catch block
@@ -2002,13 +1966,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Delete temp files
    //
-   if(remove(cnt_r_file) != 0) {
-      cerr << "\n\nERROR: compute_cnt_stats_ci_perc() -> "
-           << "can't delete the temporary file:\n"
-           << cnt_r_file << "\n\n" << flush;
-
-      exit(1);
-   }
+   remove_temp_file(cnt_r_file);
 
    return;
 }
@@ -2025,13 +1983,12 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCTSInfo *nbrcts_tmp;
-   pid_t p;
 
    //
    // Temp file streams for categorical statistics
    //
    ofstream *nbrcts_i_out, *nbrcts_r_out;
-   char **nbrcts_i_file, **nbrcts_r_file;
+   ConcatString *nbrcts_i_file, *nbrcts_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2073,11 +2030,9 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    nbrcts_tmp    = new NBRCTSInfo [n_nbrcts];
    nbrcts_i_out  = new ofstream [n_nbrcts];
    nbrcts_r_out  = new ofstream [n_nbrcts];
-   nbrcts_i_file = new char * [n_nbrcts];
-   nbrcts_r_file = new char * [n_nbrcts];
+   nbrcts_i_file = new ConcatString [n_nbrcts];
+   nbrcts_r_file = new ConcatString [n_nbrcts];
    for(i=0; i<n_nbrcts; i++) {
-      nbrcts_i_file[i]                       = new char [max_str_len];
-      nbrcts_r_file[i]                       = new char [max_str_len];
       nbrcts_tmp[i].cts_info.cts_fcst_thresh = nbrcts_info[i].cts_info.cts_fcst_thresh;
       nbrcts_tmp[i].cts_info.cts_obs_thresh  = nbrcts_info[i].cts_info.cts_obs_thresh;
       nbrcts_tmp[i].raw_fcst_thresh          = nbrcts_info[i].raw_fcst_thresh;
@@ -2088,12 +2043,14 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
    for(i=0; i<n_nbrcts; i++) {
-      sprintf(nbrcts_i_file[i], "%s/tmp_%i_nbrcts_i_%i.txt",
-              tmp_dir, p, i);
-      sprintf(nbrcts_r_file[i], "%s/tmp_%i_nbrcts_r_%i.txt",
-              tmp_dir, p, i);
+      prefix.clear();
+      prefix << tmp_dir << "/tmp_nbrcts_i_" << i;
+      nbrcts_i_file[i] = make_temp_file_name(prefix, '\0');
+
+      prefix.clear();
+      prefix << tmp_dir << "/tmp_nbrcts_r_" << i;
+      nbrcts_r_file[i] = make_temp_file_name(prefix, '\0');
    }
 
    //
@@ -2332,8 +2289,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Attempt to delete temp files
       //
       for(i=0; i<n_nbrcts; i++) {
-         remove(nbrcts_i_file[i]);
-         remove(nbrcts_r_file[i]);
+         remove_temp_file(nbrcts_i_file[i]);
+         remove_temp_file(nbrcts_r_file[i]);
       }
 
       exit(i_err);
@@ -2343,32 +2300,18 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Delete temp files
    //
    for(i=0; i<n_nbrcts; i++) {
-      if(remove(nbrcts_i_file[i]) != 0 || remove(nbrcts_r_file[i]) != 0) {
-      cerr << "\n\nERROR: compute_nbrcts_stats_ci_bca() -> "
-           << "can't delete one or more temporary files:\n"
-           << nbrcts_i_file[i] << "\n"
-           << nbrcts_r_file[i] << "\n\n" << flush;
-
-      exit(1);
-      }
+      remove_temp_file(nbrcts_i_file[i]);
+      remove_temp_file(nbrcts_r_file[i]);
    }
 
    //
    // Deallocate memory
    //
-   if(nbrcts_tmp)   { delete [] nbrcts_tmp;   nbrcts_tmp   = (NBRCTSInfo *) 0;  }
-   if(nbrcts_i_out) { delete [] nbrcts_i_out; nbrcts_i_out = (ofstream *) 0; }
-   if(nbrcts_r_out) { delete [] nbrcts_r_out; nbrcts_r_out = (ofstream *) 0; }
-   for(i=0; i<n_nbrcts; i++) {
-      if(nbrcts_i_file[i]) {
-         delete [] nbrcts_i_file[i]; nbrcts_i_file[i] = (char *) 0;
-      }
-      if(nbrcts_r_file[i]) {
-         delete [] nbrcts_r_file[i]; nbrcts_r_file[i] = (char *) 0;
-      }
-   }
-   if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (char **) 0; }
-   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (char **) 0; }
+   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
+   if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     0; }
+   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
+   if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) 0; }
+   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
 
    return;
 }
@@ -2385,13 +2328,12 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCNTInfo  nbrcnt_tmp;
-   pid_t p;
 
    //
    // Temp file streams for continuous statistics
    //
    ofstream nbrcnt_i_out, nbrcnt_r_out;
-   char nbrcnt_i_file[max_str_len], nbrcnt_r_file[max_str_len];
+   ConcatString nbrcnt_i_file, nbrcnt_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2425,9 +2367,13 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
-   sprintf(nbrcnt_i_file, "%s/tmp_%i_nbrcnt_i.txt", tmp_dir, p);
-   sprintf(nbrcnt_r_file, "%s/tmp_%i_nbrcnt_r.txt", tmp_dir, p);
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_nbrcnt_i";
+   nbrcnt_i_file = make_temp_file_name(prefix, '\0');
+
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_nbrcnt_r";
+   nbrcnt_r_file = make_temp_file_name(prefix, '\0');
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -2516,8 +2462,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp files
       //
-      remove(nbrcnt_i_file);
-      remove(nbrcnt_r_file);
+      remove_temp_file(nbrcnt_i_file);
+      remove_temp_file(nbrcnt_r_file);
 
       exit(i_err);
    } // end catch block
@@ -2525,14 +2471,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Delete temp files
    //
-   if(remove(nbrcnt_i_file) != 0 || remove(nbrcnt_r_file) != 0) {
-      cerr << "\n\nERROR: compute_nbrcnt_stats_ci_bca() -> "
-           << "can't delete one or more temporary files:\n"
-           << nbrcnt_i_file << "\n"
-           << nbrcnt_r_file << "\n\n" << flush;
-
-      exit(1);
-   }
+   remove_temp_file(nbrcnt_i_file);
+   remove_temp_file(nbrcnt_r_file);
 
    return;
 }
@@ -2550,13 +2490,12 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCTSInfo *nbrcts_tmp;
-   pid_t p;
 
    //
    // Temp file streams for categorical statistics
    //
    ofstream *nbrcts_r_out;
-   char **nbrcts_r_file;
+   ConcatString *nbrcts_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2597,9 +2536,8 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    nbrcts_tmp    = new NBRCTSInfo [n_nbrcts];
    nbrcts_r_out  = new ofstream [n_nbrcts];
-   nbrcts_r_file = new char * [n_nbrcts];
+   nbrcts_r_file = new ConcatString [n_nbrcts];
    for(i=0; i<n_nbrcts; i++) {
-      nbrcts_r_file[i]                       = new char [max_str_len];
       nbrcts_tmp[i].cts_info.cts_fcst_thresh = nbrcts_info[i].cts_info.cts_fcst_thresh;
       nbrcts_tmp[i].cts_info.cts_obs_thresh  = nbrcts_info[i].cts_info.cts_obs_thresh;
       nbrcts_tmp[i].raw_fcst_thresh          = nbrcts_info[i].raw_fcst_thresh;
@@ -2610,9 +2548,11 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
-   for(i=0; i<n_nbrcts; i++)
-      sprintf(nbrcts_r_file[i], "%s/tmp_%i_nbrcts_r_%i.txt", tmp_dir, p, i);
+   for(i=0; i<n_nbrcts; i++) {
+      prefix.clear();
+      prefix << tmp_dir << "/tmp_nbrcts_r_" << i;
+      nbrcts_r_file[i] = make_temp_file_name(prefix, '\0');
+   }
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -2820,7 +2760,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp files
       //
-      for(i=0; i<n_nbrcts; i++) remove(nbrcts_r_file[i]);
+      for(i=0; i<n_nbrcts; i++) remove_temp_file(nbrcts_r_file[i]);
 
       exit(i_err);
    } // end catch block
@@ -2829,26 +2769,15 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Delete temp files
    //
    for(i=0; i<n_nbrcts; i++) {
-      if(remove(nbrcts_r_file[i]) != 0) {
-      cerr << "\n\nERROR: compute_nbrcts_stats_ci_perc() -> "
-           << "can't delete the temporary file:\n"
-           << nbrcts_r_file[i] << "\n\n" << flush;
-
-      exit(1);
-      }
+      remove_temp_file(nbrcts_r_file[i]);
    }
 
    //
    // Deallocate memory
    //
-   if(nbrcts_tmp)   { delete [] nbrcts_tmp;   nbrcts_tmp   = (NBRCTSInfo *) 0;  }
-   if(nbrcts_r_out) { delete [] nbrcts_r_out; nbrcts_r_out = (ofstream *) 0; }
-   for(i=0; i<n_nbrcts; i++) {
-      if(nbrcts_r_file[i]) {
-         delete [] nbrcts_r_file[i]; nbrcts_r_file[i] = (char *) 0;
-      }
-   }
-   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (char **) 0; }
+   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
+   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
+   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
 
    return;
 }
@@ -2866,13 +2795,12 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCNTInfo  nbrcnt_tmp;
-   pid_t p;
 
    //
    // Temp file streams for continuous statistics
    //
    ofstream nbrcnt_r_out;
-   char nbrcnt_r_file[max_str_len];
+   ConcatString nbrcnt_r_file, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2906,8 +2834,9 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Build the temp file names
    //
-   p = getpid();
-   sprintf(nbrcnt_r_file, "%s/tmp_%i_nbrcnt_r.txt", tmp_dir, p);
+   prefix.clear();
+   prefix << tmp_dir << "/tmp_nbrcnt_r";
+   nbrcnt_r_file = make_temp_file_name(prefix, '\0');
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -2982,7 +2911,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Attempt to delete temp files
       //
-      remove(nbrcnt_r_file);
+      remove_temp_file(nbrcnt_r_file);
 
       exit(i_err);
    } // end catch block
@@ -2990,13 +2919,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Delete temp files
    //
-   if(remove(nbrcnt_r_file) != 0) {
-      cerr << "\n\nERROR: compute_nbrcnt_stats_ci_perc() -> "
-           << "can't delete the temporary file:\n"
-           << nbrcnt_r_file << "\n\n" << flush;
-
-      exit(1);
-   }
+   remove_temp_file(nbrcnt_r_file);
 
    return;
 }
