@@ -877,7 +877,7 @@ void process_stat_file(const char *filename, int &n_read, int &n_keep) {
 
 void process_job(const char * jobstring, int n_job) {
    STATAnalysisJob job;
-   char full_jobstring[1024];
+   ConcatString full_jobstring;
 
    //
    // Initialize to the default job

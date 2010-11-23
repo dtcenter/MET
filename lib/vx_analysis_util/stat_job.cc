@@ -1244,29 +1244,29 @@ void STATAnalysisJob::close_dump_row_file() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void STATAnalysisJob::get_jobstring(char *js) {
+void STATAnalysisJob::get_jobstring(ConcatString &js) {
    int i;
    char junk[512];
    STATLineType type;
 
    // Initialize the jobstring
-   strcpy(js, "");
+   js.clear();
 
    // job type
    statjobtype_to_string(job_type, junk);
-   sprintf(js, "-job %s", junk);
+   js << "-job " << junk;
 
    // model
    if(model.n_elements() > 0) {
       for(i=0; i<model.n_elements(); i++)
-         sprintf(js, "%s -model %s", js, model[i]);
+         js << "-model " << model[i];
    }
 
    // fcst_lead
    if(fcst_lead.n_elements() > 0) {
       for(i=0; i<fcst_lead.n_elements(); i++) {
          sec_to_hhmmss(nint(fcst_lead[i]), junk);
-         sprintf(js, "%s -fcst_lead %s", js, junk);
+         js << "-fcst_lead " << junk;
       }
    }
 
@@ -1274,55 +1274,55 @@ void STATAnalysisJob::get_jobstring(char *js) {
    if(obs_lead.n_elements() > 0) {
       for(i=0; i<obs_lead.n_elements(); i++) {
          sec_to_hhmmss(nint(obs_lead[i]), junk);
-         sprintf(js, "%s -obs_lead %s", js, junk);
+         js << "-obs_lead " << junk;
       }
    }
 
    // fcst_valid_beg and fcst_valid_end
    if(fcst_valid_beg > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_valid_beg, junk);
-      sprintf(js, "%s -fcst_valid_beg %s", js, junk);
+      js << "-fcst_valid_beg " << junk;
    }
    if(fcst_valid_end > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_valid_end, junk);
-      sprintf(js, "%s -fcst_valid_end %s", js, junk);
+      js << "-fcst_valid_end " << junk;
    }
 
    // obs_valid_beg and obs_valid_end
    if(obs_valid_beg > 0) {
       unix_to_yyyymmdd_hhmmss(obs_valid_beg, junk);
-      sprintf(js, "%s -obs_valid_beg %s", js, junk);
+      js << "-obs_valid_beg " << junk;
    }
    if(obs_valid_end > 0) {
       unix_to_yyyymmdd_hhmmss(obs_valid_end, junk);
-      sprintf(js, "%s -obs_valid_end %s", js, junk);
+      js << "-obs_valid_end " << junk;
    }
 
    // fcst_init_beg and fcst_init_end
    if(fcst_init_beg > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_init_beg, junk);
-      sprintf(js, "%s -fcst_init_beg %s", js, junk);
+      js << "-fcst_init_beg " << junk;
    }
    if(fcst_init_end > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_init_end, junk);
-      sprintf(js, "%s -fcst_init_end %s", js, junk);
+      js << "-fcst_init_end " << junk;
    }
 
    // obs_init_beg and obs_init_end
    if(obs_init_beg > 0) {
       unix_to_yyyymmdd_hhmmss(obs_init_beg, junk);
-      sprintf(js, "%s -obs_init_beg %s", js, junk);
+      js << "-obs_init_beg " << junk;
    }
    if(obs_init_end > 0) {
       unix_to_yyyymmdd_hhmmss(obs_init_end, junk);
-      sprintf(js, "%s -obs_init_end %s", js, junk);
+      js << "-obs_init_end " << junk;
    }
 
    // fcst_init_hour
    if(fcst_init_hour.n_elements() > 0) {
       for(i=0; i<fcst_init_hour.n_elements(); i++) {
          sec_to_hhmmss(nint(fcst_init_hour[i]), junk);
-         sprintf(js, "%s -fcst_init_hour %s", js, junk);
+         js << "-fcst_init_hour " << junk;
       }
    }
 
@@ -1330,63 +1330,63 @@ void STATAnalysisJob::get_jobstring(char *js) {
    if(obs_init_hour.n_elements() > 0) {
       for(i=0; i<obs_init_hour.n_elements(); i++) {
          sec_to_hhmmss(nint(obs_init_hour[i]), junk);
-         sprintf(js, "%s -obs_init_hour %s", js, junk);
+         js << "-obs_init_hour " << junk;
       }
    }
 
    // fcst_var
    if(fcst_var.n_elements() > 0) {
       for(i=0; i<fcst_var.n_elements(); i++)
-         sprintf(js, "%s -fcst_var %s", js, fcst_var[i]);
+         js << "-fcst_var " << fcst_var[i];
    }
 
    // obs_var
    if(obs_var.n_elements() > 0) {
       for(i=0; i<obs_var.n_elements(); i++)
-         sprintf(js, "%s -obs_var %s", js, obs_var[i]);
+         js << "-obs_var " << obs_var[i];
    }
 
    // fcst_lev
    if(fcst_lev.n_elements() > 0) {
       for(i=0; i<fcst_lev.n_elements(); i++)
-         sprintf(js, "%s -fcst_lev %s", js, fcst_lev[i]);
+         js << "-fcst_lev " << fcst_lev[i];
    }
 
    // obs_lev
    if(obs_lev.n_elements() > 0) {
       for(i=0; i<obs_lev.n_elements(); i++)
-         sprintf(js, "%s -obs_lev %s", js, obs_lev[i]);
+         js << "-obs_lev " << obs_lev[i];
    }
 
    // obtype
    if(obtype.n_elements() > 0) {
       for(i=0; i<obtype.n_elements(); i++)
-         sprintf(js, "%s -obtype %s", js, obtype[i]);
+         js << "-obtype " << obtype[i];
    }
 
    // vx_mask
    if(vx_mask.n_elements() > 0) {
       for(i=0; i<vx_mask.n_elements(); i++)
-         sprintf(js, "%s -vx_mask %s", js, vx_mask[i]);
+         js << "-vx_mask " << vx_mask[i];
    }
 
    // interp_mthd
    if(interp_mthd.n_elements() > 0) {
       for(i=0; i<interp_mthd.n_elements(); i++)
-         sprintf(js, "%s -interp_mthd %s", js, interp_mthd[i]);
+         js << "-interp_mthd " << interp_mthd[i];
    }
 
    // interp_pnts
    if(interp_pnts.n_elements() > 0) {
       for(i=0; i<interp_pnts.n_elements(); i++)
-         sprintf(js, "%s -interp_pnts %i", js, nint(interp_pnts[i]));
+         js << "-interp_pnts " << nint(interp_pnts[i]);
    }
 
    // fcst_thresh
    if(fcst_thresh.n_elements() > 0) {
       for(i=0; i<fcst_thresh.n_elements(); i++) {
          fcst_thresh[i].get_str(junk);
-         sprintf(js, "%s -fcst_thresh %s", js, junk);
+         js << "-fcst_thresh " << junk;
       }
    }
 
@@ -1394,7 +1394,7 @@ void STATAnalysisJob::get_jobstring(char *js) {
    if(obs_thresh.n_elements() > 0) {
       for(i=0; i<obs_thresh.n_elements(); i++) {
          obs_thresh[i].get_str(junk);
-         sprintf(js, "%s -obs_thresh %s", js, junk);
+         js << "-obs_thresh " << junk;
       }
    }
 
@@ -1402,14 +1402,14 @@ void STATAnalysisJob::get_jobstring(char *js) {
    if(cov_thresh.n_elements() > 0) {
       for(i=0; i<cov_thresh.n_elements(); i++) {
          cov_thresh[i].get_str(junk);
-         sprintf(js, "%s -cov_thresh %s", js, junk);
+         js << "-cov_thresh " << junk;
       }
    }
 
    // alpha
    if(alpha.n_elements() > 0) {
       for(i=0; i<alpha.n_elements(); i++)
-         sprintf(js, "%s -alpha %f", js, alpha[i]);
+         js << "-alpha " << alpha[i];
    }
 
    // line_type
@@ -1417,54 +1417,54 @@ void STATAnalysisJob::get_jobstring(char *js) {
       for(i=0; i<line_type.n_elements(); i++) {
          type = string_to_statlinetype(line_type[i]);
          statlinetype_to_string(type, junk);
-         sprintf(js, "%s -line_type %s", js, junk);
+         js << "-line_type " << junk;
       }
    }
 
    // column_min
    if(column_min_name.n_elements() > 0) {
       for(i=0; i<column_min_name.n_elements(); i++)
-         sprintf(js, "%s -column_min %s %f", js,
-                 column_min_name[i], column_min_value[i]);
+         js << "-column_min " << column_min_name[i]
+            << " " << column_min_value[i];
    }
 
    // column_max
    if(column_max_name.n_elements() > 0) {
       for(i=0; i<column_max_name.n_elements(); i++)
-         sprintf(js, "%s -column_max %s %f", js,
-                 column_max_name[i], column_max_value[i]);
+         js << "-column_max " << column_max_name[i]
+            << " " << column_max_value[i];
    }
 
    // column_str
    if(column_str_name.n_elements() > 0) {
       for(i=0; i<column_str_name.n_elements(); i++)
-         sprintf(js, "%s -column_str %s %s", js,
-                 column_str_name[i], column_str_value[i]);
+         js << "-column_str " << column_str_name[i]
+            << " " << column_str_value[i];
    }
 
    // dump_row
-   if(dump_row) sprintf(js, "%s -dump_row %s", js, dump_row);
+   if(dump_row) js << "-dump_row " << dump_row;
 
    // column
-   if(column) sprintf(js, "%s -column %s", js, column);
+   if(column) js << "-column " << column;
 
    // mask_grid
-   if(mask_grid) sprintf(js, "%s -mask_grid %s", js, mask_grid);
+   if(mask_grid) js << "-mask_grid " << mask_grid;
 
    // mask_poly
-   if(mask_poly) sprintf(js, "%s -mask_poly %s", js, mask_poly);
+   if(mask_poly) js << "-mask_poly " << mask_poly;
 
    // out_line_type
    if(out_line_type != no_stat_line_type) {
       statlinetype_to_string(out_line_type, junk);
-      sprintf(js, "%s -out_line_type %s", js, junk);
+      js << "-out_line_type " << junk;
    }
 
    // out_fcst_thresh
    if(out_fcst_thresh.n_elements() > 0) {
       for(i=0; i<out_fcst_thresh.n_elements(); i++) {
          out_fcst_thresh[i].get_str(junk);
-         sprintf(js, "%s -out_fcst_thresh %s", js, junk);
+         js << "-out_fcst_thresh " << junk;
       }
    }
 
@@ -1472,7 +1472,7 @@ void STATAnalysisJob::get_jobstring(char *js) {
    if(out_obs_thresh.n_elements() > 0) {
       for(i=0; i<out_obs_thresh.n_elements(); i++) {
          out_obs_thresh[i].get_str(junk);
-         sprintf(js, "%s -out_obs_thresh %s", js, junk);
+         js << "-out_obs_thresh " << junk;
       }
    }
 
@@ -1486,7 +1486,7 @@ void STATAnalysisJob::get_jobstring(char *js) {
        out_line_type == stat_nbrcnt) {
 
       // out_alpha
-      sprintf(js, "%s -out_alpha %f", js, out_alpha);
+      js << "-out_alpha " << out_alpha;
    }
 
    // Jobs which perform bootstrapping
@@ -1500,11 +1500,11 @@ void STATAnalysisJob::get_jobstring(char *js) {
           out_line_type == stat_nbrcnt)) {
 
          // Bootstrap Information
-         sprintf(js, "%s -boot_interval %i", js, boot_interval);
-         sprintf(js, "%s -boot_rep_prop %f", js, boot_rep_prop);
-         sprintf(js, "%s -n_boot_rep %i",    js, n_boot_rep);
-         sprintf(js, "%s -boot_rng %s",      js, boot_rng);
-         sprintf(js, "%s -boot_seed %s",     js, boot_seed);
+         js << "-boot_interval " << boot_interval;
+         js << "-boot_rep_prop " << boot_rep_prop;
+         js << "-n_boot_rep "    << n_boot_rep;
+         js << "-boot_rng "      << boot_rng;
+         js << "-boot_seed "     << boot_seed;
       }
    }
 
@@ -1512,14 +1512,14 @@ void STATAnalysisJob::get_jobstring(char *js) {
    if(out_line_type == stat_cnt) {
 
       // rank_corr_flag
-      sprintf(js, "%s -rank_corr_flag %i", js, rank_corr_flag);
+      js << "-rank_corr_flag " << rank_corr_flag;
    }
 
    // Variance inflation factor for time series
    if(vif_flag) {
 
       // vif_flag
-      sprintf(js, "%s -vif_flag %i", js, vif_flag);
+      js << "-vif_flag " << vif_flag;
    }
 
    return;
