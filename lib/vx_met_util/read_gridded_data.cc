@@ -448,15 +448,6 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
       }
    }
 
-   // Check for no range flag
-   if(!found) {
-      cerr << "\n\nERROR: read_levels_pinterp() -> "
-           << "no range specified for parsing " << gci.info_str
-           << " from the p_interp NetCDF file " << file_name
-           << "\n\n" << flush;
-      exit(1);
-   }
-
    // Compute the number of levels
    n_lvl = gci.lvl_2 - gci.lvl_1 + 1;
 
@@ -471,7 +462,7 @@ int read_levels_pinterp(const char *file_name, GCInfo &gci,
    for(i=0; i<n_lvl; i++) {
 
       // Set the current level
-      lvl_dim_la[i_dim] = gci.lvl_1 + i;
+      if(found) lvl_dim_la[i_dim] = gci.lvl_1 + i;
 
       // Read the data
       status = nc_file.data(gci.abbr_str, lvl_dim_la,
