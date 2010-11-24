@@ -47,13 +47,9 @@ extern void   read_single_grib_record(GribFile &, GribRecord &, int,
                                       WrfData &, Grid &, int);
 
 extern void   derive_wdir_record(GribFile &, GribRecord &, WrfData &,
-                                 Grid &, const GCInfo &, int);
-extern void   derive_wdir_record(GribFile &, GribRecord &, WrfData &,
                                  Grid &, const GCInfo &,
                                  const unixtime, const int, int);
 
-extern void   derive_wind_record(GribFile &, GribRecord &, WrfData &,
-                                 Grid &, const GCInfo &, int);
 extern void   derive_wind_record(GribFile &, GribRecord &, WrfData &,
                                  Grid &, const GCInfo &,
                                  const unixtime, const int, int);
