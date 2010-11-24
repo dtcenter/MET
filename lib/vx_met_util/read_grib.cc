@@ -94,11 +94,13 @@ bool get_grib_record(GribFile &grib_file, GribRecord &grib_record,
 
    // Derive the wind direction
    if(i_rec < 0 && gc == wdir_grib_code) {
-      derive_wdir_record(grib_file, grib_record, wd, gr, gc_info, verbosity);
+      derive_wdir_record(grib_file, grib_record, wd, gr, gc_info,
+                         req_vld_ut, req_lead_sec, verbosity);
    }
    // Derive the wind speed
    else if(i_rec < 0 && gc == wind_grib_code) {
-      derive_wind_record(grib_file, grib_record, wd, gr, gc_info, verbosity);
+      derive_wind_record(grib_file, grib_record, wd, gr, gc_info,
+                         req_vld_ut, req_lead_sec, verbosity);
    }
    // Read the GRIB record found
    else {
@@ -728,17 +730,6 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
 
 void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
                         WrfData &wd, Grid &gr, const GCInfo &gc_info,
-                        int verbosity) {
-
-   derive_wdir_record(grib_file, grib_record, wd, gr, gc_info,
-                      (unixtime) 0, bad_data_int, verbosity);
-
-   return;
-}
-///////////////////////////////////////////////////////////////////////////////
-
-void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
-                        WrfData &wd, Grid &gr, const GCInfo &gc_info,
                         const unixtime req_vld_ut, const int req_lead_sec,
                         int verbosity) {
    int u_rec, v_rec, x, y, nx, ny, n;
@@ -850,18 +841,6 @@ void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
    } // end for x
 
    if(data) { delete data; data = (double *) 0; }
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
-                        WrfData &wd, Grid &gr, const GCInfo &gc_info,
-                        int verbosity) {
-
-   derive_wind_record(grib_file, grib_record, wd, gr, gc_info,
-                      (unixtime) 0, bad_data_int, verbosity);
 
    return;
 }
