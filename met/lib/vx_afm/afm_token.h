@@ -20,8 +20,8 @@
 
 #include <iostream>
 
-#include "vx_afm/afm_token_types.h"
-#include "vx_afm/afm_keywords.h"
+#include "afm_token_types.h"
+#include "afm_keywords.h"
 
 
 ////////////////////////////////////////////////////////////////////////

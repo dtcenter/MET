@@ -20,9 +20,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_afm/afm_token.h"
-#include "vx_afm/afmtokentype_to_string.h"
-#include "vx_afm/afmkeyword_to_string.h"
+#include "afm_token.h"
+#include "afmtokentype_to_string.h"
+#include "afmkeyword_to_string.h"
 
 #include "vx_util/vx_util.h"
 

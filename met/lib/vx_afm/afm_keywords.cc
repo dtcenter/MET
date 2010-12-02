@@ -20,7 +20,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_afm/afm_keywords.h"
+#include "afm_keywords.h"
 
 
 ////////////////////////////////////////////////////////////////////////

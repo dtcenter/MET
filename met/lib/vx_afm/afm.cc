@@ -21,11 +21,11 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_afm/afm.h"
-#include "vx_afm/afm_line.h"
-#include "vx_afm/afm_token.h"
+#include "afm.h"
+#include "afm_line.h"
+#include "afm_token.h"
 
-#include "vx_util/vx_util.h"
+#include "vx_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////
