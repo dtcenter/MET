@@ -6,62 +6,115 @@
 # ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-###############################################################################
+########################################################################
 #
 # Makefile for the vx_afm library
 #
-###############################################################################
+########################################################################
 
-TARGETS  = libvx_afm.a
 
-OBJECTS  =  afm.o \
-	afm_keywords.o \
-	afm_line.o \
-	afm_token.o \
-	afmkeyword_to_string.o \
-	afmtokentype_to_string.o
+EXECUTABLES =
 
-OPT_FLAGS=
 
-FAKES    = vx_afm_all vx_afm_lib clean
+OBJECTS     = afm.o                     \
+              afm_keywords.o            \
+              afm_line.o                \
+              afm_token.o               \
+              afmkeyword_to_string.o    \
+              afmtokentype_to_string.o  \
 
-LIB_DIR  = ..
 
-vx_afm_all:
+LIBRARIES   = libvx_afm.a
+
+
+########################################################################
+
+
+HEADERS     = afm.h                     \
+              afm_keywords.h            \
+              afmkeyword_to_string.h    \
+              afm_line.h                \
+              afm_token.h               \
+              afm_token_types.h         \
+              afmtokentype_to_string.h  \
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Making vx_afm Library ***"
+	@ echo "*** Finished making vx_afm library ***"
 	@ echo
-	@ $(MAKE) vx_afm_lib  $(PRINT_OPTS)
-	cp $(TARGETS) ../.
 
-vx_afm_lib: libvx_afm.a
-	@ echo
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+afm.o: afm.cc
+	$(CXX) afm.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+afm_keywords.o: afm_keywords.cc
+	$(CXX) afm_keywords.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+afm_line.o: afm_line.cc
+	$(CXX) afm_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+afm_token.o: afm_token.cc
+	$(CXX) afm_token.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+afmkeyword_to_string.o: afmkeyword_to_string.cc
+	$(CXX) afmkeyword_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+afmtokentype_to_string.o: afmtokentype_to_string.cc
+	$(CXX) afmtokentype_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+
+########################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
 
 libvx_afm.a: $(OBJECTS)
 	ar -rs libvx_afm.a $(OBJECTS)
 	ranlib libvx_afm.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_afm.a
+	cp libvx_afm.a $(MET_LIB_DIR)
 
-afm.o: afm.cc
-	$(CXX) afm.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
-afm_keywords.o: afm_keywords.cc
-	$(CXX) afm_keywords.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+########################################################################
 
-afm_line.o: afm_line.cc
-	$(CXX) afm_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
-afm_token.o: afm_token.cc
-	$(CXX) afm_token.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+   ##
+   ##  executables
+   ##
 
-afmkeyword_to_string.o: afmkeyword_to_string.cc
-	$(CXX) afmkeyword_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
 
-afmtokentype_to_string.o: afmtokentype_to_string.cc
-	$(CXX) afmtokentype_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+########################################################################
+
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_afm.a
 
-.PHONY: $(FAKES)
+
+########################################################################
+
+
+.PHONY: all clean
+
+
+########################################################################
 
 

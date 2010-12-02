@@ -28,7 +28,7 @@ using namespace std;
 
 #include <string.h>
 
-#include "vx_afm/afmtokentype_to_string.h"
+#include "afmtokentype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

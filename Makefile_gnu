@@ -293,5 +293,6 @@ clean:
 	@ cd $(TOOLS_DIR);	 $(MAKE) clean $(PRINT_OPTS)
 	@ cd $(OUT_DIR);	 rm -f */*
 	rm -r -f *.a *.o junk temp core log c.ps a.out
+	rm -f include/*.h
 
 .PHONY: $(FAKES)

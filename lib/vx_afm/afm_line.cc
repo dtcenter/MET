@@ -21,8 +21,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_afm/afm_line.h"
-#include "vx_util/vx_util.h"
+#include "afm_line.h"
+#include "vx_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////
