@@ -19,7 +19,7 @@ using namespace std;
 #include <ctime>
 #include <cmath>
 
-#include "vx_gsl_prob/gsl_randist.h"
+#include "gsl_randist.h"
 
 ////////////////////////////////////////////////////////////////////////
 

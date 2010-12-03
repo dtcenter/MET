@@ -16,7 +16,7 @@ using namespace std;
 #include <cstdlib>
 #include <cmath>
 
-#include "vx_gsl_prob/gsl_wavelet2d.h"
+#include "gsl_wavelet2d.h"
 
 ////////////////////////////////////////////////////////////////////////
 //

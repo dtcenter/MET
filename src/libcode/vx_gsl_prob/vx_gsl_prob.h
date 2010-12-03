@@ -14,11 +14,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_gsl_prob/gsl_cdf.h"
-#include "vx_gsl_prob/gsl_bvn.h"
-#include "vx_gsl_prob/gsl_randist.h"
-#include "vx_gsl_prob/gsl_statistics.h"
-#include "vx_gsl_prob/gsl_wavelet2d.h"
+#include "gsl_cdf.h"
+#include "gsl_bvn.h"
+#include "gsl_randist.h"
+#include "gsl_statistics.h"
+#include "gsl_wavelet2d.h"
 
 ////////////////////////////////////////////////////////////////////////
 

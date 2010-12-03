@@ -19,7 +19,7 @@ using namespace std;
 #include <ctime>
 #include <cmath>
 
-#include "vx_gsl_prob/gsl_statistics.h"
+#include "gsl_statistics.h"
 
 ////////////////////////////////////////////////////////////////////////
 

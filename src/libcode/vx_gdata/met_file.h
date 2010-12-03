@@ -25,12 +25,12 @@
 
 #include <netcdf.hh>
 
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_util/long_array.h"
-#include "vx_data_grids/grid.h"
-#include "vx_cal/vx_cal.h"
+#include "vx_wrfdata.h"
+#include "long_array.h"
+#include "grid.h"
+#include "vx_cal.h"
 
-#include "vx_gdata/var_info.h"
+#include "var_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 

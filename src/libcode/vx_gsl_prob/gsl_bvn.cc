@@ -16,7 +16,7 @@ using namespace std;
 #include <cstdlib>
 #include <cmath>
 
-#include "vx_gsl_prob/gsl_bvn.h"
+#include "gsl_bvn.h"
 
 ////////////////////////////////////////////////////////////////////////
 

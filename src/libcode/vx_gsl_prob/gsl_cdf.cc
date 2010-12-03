@@ -16,7 +16,7 @@ using namespace std;
 #include <cstdlib>
 #include <cmath>
 
-#include "vx_gsl_prob/gsl_cdf.h"
+#include "gsl_cdf.h"
 
 #include "gsl/gsl_randist.h"
 
