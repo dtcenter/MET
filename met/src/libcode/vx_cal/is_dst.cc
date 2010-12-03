@@ -19,7 +19,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_cal/vx_cal.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////

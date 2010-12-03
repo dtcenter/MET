@@ -12,7 +12,7 @@
 
 #include <netcdf.hh>
 
-#include "vx_util/long_array.h"
+#include "long_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////

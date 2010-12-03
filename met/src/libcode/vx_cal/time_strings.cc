@@ -20,7 +20,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_cal/vx_cal.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -23,12 +23,12 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_cal/vx_cal.h"
+#include "vx_math.h"
+#include "vx_cal.h"
 
-#include "vx_gdata/vx_gdata_util.h"
-#include "vx_gdata/pinterp_file.h"
-#include "vx_gdata/get_pinterp_grid.h"
+#include "vx_gdata_util.h"
+#include "pinterp_file.h"
+#include "get_pinterp_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////

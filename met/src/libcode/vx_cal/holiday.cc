@@ -17,8 +17,8 @@ using namespace std;
 #include <iostream>
 #include <stdlib.h>
 
-#include "vx_cal/vx_cal.h"
-#include "vx_cal/holiday.h"
+#include "vx_cal.h"
+#include "holiday.h"
 
 
 ////////////////////////////////////////////////////////////////////////

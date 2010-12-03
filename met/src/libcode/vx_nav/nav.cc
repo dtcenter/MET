@@ -15,8 +15,8 @@ using namespace std;
 
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_nav/nav.h"
+#include "vx_math.h"
+#include "nav.h"
 
 
 //////////////////////////////////////////////////////////////////

@@ -27,8 +27,8 @@ using namespace std;
 
 #include <netcdf.hh>
 
-#include "vx_gdata/is_met_nc_file.h"
-#include "vx_gdata/is_netcdf_file.h"
+#include "is_met_nc_file.h"
+#include "is_netcdf_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////

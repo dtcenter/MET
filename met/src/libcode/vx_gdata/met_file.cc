@@ -21,11 +21,11 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_met_util/vx_met_util.h"
+#include "vx_math.h"
+#include "vx_met_util.h"
 
-#include "vx_gdata/vx_gdata_util.h"
-#include "vx_gdata/met_file.h"
+#include "vx_gdata_util.h"
+#include "met_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////

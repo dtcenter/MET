@@ -13,14 +13,14 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_gdata/get_pinterp_grid.h"
-#include "vx_gdata/is_met_nc_file.h"
-#include "vx_gdata/is_netcdf_file.h"
-#include "vx_gdata/is_pinterp_file.h"
-#include "vx_gdata/met_file.h"
-#include "vx_gdata/pinterp_file.h"
-#include "vx_gdata/var_info.h"
-#include "vx_gdata/vx_gdata_util.h"
+#include "get_pinterp_grid.h"
+#include "is_met_nc_file.h"
+#include "is_netcdf_file.h"
+#include "is_pinterp_file.h"
+#include "met_file.h"
+#include "pinterp_file.h"
+#include "var_info.h"
+#include "vx_gdata_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
