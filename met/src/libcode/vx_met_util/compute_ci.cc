@@ -20,12 +20,12 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_met_util/compute_ci.h"
-#include "vx_met_util/constants.h"
-#include "vx_math/constants.h"
-#include "vx_gsl_prob/vx_gsl_prob.h"
-#include "vx_analysis_util/vx_analysis_util.h"
+#include "vx_math.h"
+#include "compute_ci.h"
+#include "constants.h"
+#include "constants.h"
+#include "vx_gsl_prob.h"
+#include "vx_analysis_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 

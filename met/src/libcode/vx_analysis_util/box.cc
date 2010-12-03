@@ -19,9 +19,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_analysis_util/box.h"
-#include "vx_math/ptile.h"
-#include "vx_util/vx_util.h"
+#include "box.h"
+#include "ptile.h"
+#include "vx_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -19,7 +19,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_analysis_util/analysis_utils.h"
+#include "analysis_utils.h"
 
 
 ////////////////////////////////////////////////////////////////////////

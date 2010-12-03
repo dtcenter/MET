@@ -16,8 +16,8 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_met_util/constants.h"
-#include "vx_met_util/stat_columns.h"
+#include "constants.h"
+#include "stat_columns.h"
 
 ////////////////////////////////////////////////////////////////////////
 

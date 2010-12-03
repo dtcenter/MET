@@ -16,7 +16,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util/vx_met_util.h"
+#include "vx_met_util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

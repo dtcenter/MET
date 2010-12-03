@@ -35,7 +35,7 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_plot_util/vx_plot_util.h"
+#include "vx_plot_util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

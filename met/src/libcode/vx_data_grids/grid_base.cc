@@ -23,9 +23,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/grid_base.h"
-#include "vx_data_grids/find_grid_by_name.h"
+#include "vx_util.h"
+#include "grid_base.h"
+#include "find_grid_by_name.h"
 
 
 ////////////////////////////////////////////////////////////////////////

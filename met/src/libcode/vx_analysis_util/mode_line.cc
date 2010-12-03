@@ -25,11 +25,11 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_analysis_util/mode_line.h"
-#include "vx_analysis_util/analysis_utils.h"
-#include "vx_analysis_util/mode_columns.h"
+#include "mode_line.h"
+#include "analysis_utils.h"
+#include "mode_columns.h"
 
-#include "vx_math/constants.h"
+#include "constants.h"
 
 
 ////////////////////////////////////////////////////////////////////////

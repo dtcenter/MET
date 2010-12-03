@@ -17,15 +17,15 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util/pair_data.h"
-#include "vx_met_util/compute_ci.h"
-#include "vx_met_util/constants.h"
-#include "vx_met_util/conversions.h"
-#include "vx_util/vx_util.h"
-#include "vx_gdata/vx_gdata.h"
-#include "vx_grib_classes/grib_strings.h"
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_gsl_prob/vx_gsl_prob.h"
+#include "pair_data.h"
+#include "compute_ci.h"
+#include "constants.h"
+#include "conversions.h"
+#include "vx_util.h"
+#include "vx_gdata.h"
+#include "grib_strings.h"
+#include "vx_wrfdata.h"
+#include "vx_gsl_prob.h"
 
 ////////////////////////////////////////////////////////////////////////
 //

@@ -19,11 +19,11 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_met_util/stat_columns.h"
-#include "vx_met_util/apply_mask.h"
-#include "vx_analysis_util/analysis_utils.h"
-#include "vx_analysis_util/stat_job.h"
+#include "vx_math.h"
+#include "stat_columns.h"
+#include "apply_mask.h"
+#include "analysis_utils.h"
+#include "stat_job.h"
 
 ////////////////////////////////////////////////////////////////////////
 

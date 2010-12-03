@@ -30,7 +30,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_data_grids/grid.h"
+#include "grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////

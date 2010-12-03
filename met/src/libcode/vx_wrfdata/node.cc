@@ -26,8 +26,8 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_wrfdata/node.h"
-#include "vx_math/vx_math.h"
+#include "node.h"
+#include "vx_math.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //

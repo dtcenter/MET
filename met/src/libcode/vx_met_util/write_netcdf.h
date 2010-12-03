@@ -15,8 +15,8 @@
 
 #include "netcdf.hh"
 
-#include "vx_data_grids/grid.h"
-#include "vx_met_util/vx_met_util.h"
+#include "grid.h"
+#include "vx_met_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 

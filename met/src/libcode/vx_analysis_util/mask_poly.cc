@@ -20,9 +20,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
-#include "vx_math/vx_math.h"
-#include "vx_analysis_util/mask_poly.h"
+#include "vx_util.h"
+#include "vx_math.h"
+#include "mask_poly.h"
 
 
 ////////////////////////////////////////////////////////////////////////
