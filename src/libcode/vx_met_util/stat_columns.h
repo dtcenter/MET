@@ -16,8 +16,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "vx_met_util/met_stats.h"
-#include "vx_met_util/stat_hdr_columns.h"
+#include "met_stats.h"
+#include "stat_hdr_columns.h"
 
 ////////////////////////////////////////////////////////////////////////
 

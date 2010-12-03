@@ -17,12 +17,12 @@
 
 #include <iostream>
 
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/grid.h"
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_cal/vx_cal.h"
-#include "vx_analysis_util/stat_line.h"
-#include "vx_analysis_util/mask_poly.h"
+#include "vx_util.h"
+#include "grid.h"
+#include "vx_wrfdata.h"
+#include "vx_cal.h"
+#include "stat_line.h"
+#include "mask_poly.h"
 
 ////////////////////////////////////////////////////////////////////////
 

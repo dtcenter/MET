@@ -18,12 +18,12 @@ using namespace std;
 
 #include "netcdf.hh"
 
-#include "vx_met_util/read_gridded_data.h"
-#include "vx_met_util/pair_data.h"
-#include "vx_met_util/read_grib.h"
-#include "vx_met_util/read_netcdf.h"
-#include "vx_grib_classes/grib_classes.h"
-#include "vx_gdata/vx_gdata.h"
+#include "read_gridded_data.h"
+#include "pair_data.h"
+#include "read_grib.h"
+#include "read_netcdf.h"
+#include "grib_classes.h"
+#include "vx_gdata.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

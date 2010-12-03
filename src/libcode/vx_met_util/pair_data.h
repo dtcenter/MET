@@ -11,12 +11,12 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_met_util/file_type.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/grid.h"
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_contable/vx_contable.h"
-#include "vx_gsl_prob/vx_gsl_prob.h"
+#include "file_type.h"
+#include "vx_util.h"
+#include "grid.h"
+#include "vx_wrfdata.h"
+#include "vx_contable.h"
+#include "vx_gsl_prob.h"
 
 ////////////////////////////////////////////////////////////////////////
 

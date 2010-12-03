@@ -22,7 +22,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_met_util/grid_output.h"
+#include "grid_output.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -21,12 +21,12 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_util/ascii_table.h"
+#include "ascii_table.h"
 
-#include "vx_analysis_util/analysis_utils.h"
-#include "vx_analysis_util/mode_job.h"
-#include "vx_analysis_util/mode_columns.h"
-#include "vx_analysis_util/by_case_info.h"
+#include "analysis_utils.h"
+#include "mode_job.h"
+#include "mode_columns.h"
+#include "by_case_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////

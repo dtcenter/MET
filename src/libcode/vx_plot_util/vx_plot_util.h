@@ -24,11 +24,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_ps/vx_ps.h"
-#include "vx_pxm/vx_pxm.h"
-#include "vx_nav/nav.h"
-#include "vx_data_grids/grid.h"
-#include "vx_util/vx_util.h"
+#include "vx_ps.h"
+#include "vx_pxm.h"
+#include "nav.h"
+#include "grid.h"
+#include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

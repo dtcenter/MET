@@ -21,14 +21,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_data_grids/grid_base.h"
+#include "grid_base.h"
 
-#include "vx_data_grids/st_grid.h"
-#include "vx_data_grids/lc_grid.h"
-#include "vx_data_grids/latlon_grid.h"
-#include "vx_data_grids/merc_grid.h"
+#include "st_grid.h"
+#include "lc_grid.h"
+#include "latlon_grid.h"
+#include "merc_grid.h"
 
-#include "vx_data_grids/find_grid_by_name.h"
+#include "find_grid_by_name.h"
 
 
 ////////////////////////////////////////////////////////////////////////

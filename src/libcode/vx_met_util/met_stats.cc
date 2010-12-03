@@ -17,14 +17,14 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util/met_stats.h"
-#include "vx_met_util/pair_data.h"
-#include "vx_met_util/compute_ci.h"
-#include "vx_met_util/constants.h"
-#include "vx_met_util/conversions.h"
-#include "vx_util/vx_util.h"
-#include "vx_grib_classes/grib_strings.h"
-#include "vx_wrfdata/vx_wrfdata.h"
+#include "met_stats.h"
+#include "pair_data.h"
+#include "compute_ci.h"
+#include "constants.h"
+#include "conversions.h"
+#include "vx_util.h"
+#include "grib_strings.h"
+#include "vx_wrfdata.h"
 
 ////////////////////////////////////////////////////////////////////////
 //

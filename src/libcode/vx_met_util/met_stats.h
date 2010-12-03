@@ -11,11 +11,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_met_util/pair_data.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/grid.h"
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_contable/vx_contable.h"
+#include "pair_data.h"
+#include "vx_util.h"
+#include "grid.h"
+#include "vx_wrfdata.h"
+#include "vx_contable.h"
 
 ////////////////////////////////////////////////////////////////////////
 

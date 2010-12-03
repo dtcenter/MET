@@ -1,68 +1,117 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2007
+# ** Copyright UCAR (c) 1992 - 2011
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
 # ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-###############################################################################
+########################################################################
 #
 # Makefile for the vx_wrfdata library
 #
-###############################################################################
-
-TARGETS  = libvx_wrfdata.a
-
-OBJECTS  =  filterbox.o \
-	interpmthd.o \
-	moments.o \
-	node.o \
-	polyline.o \
-	vx_wrfdata.o
-
-OPT_FLAGS=
-
-FAKES    = vx_wrfdata_all vx_wrfdata_lib clean
-
-LIB_DIR  = ..
+########################################################################
 
 
-vx_wrfdata_all:
-	@ echo
-	@ echo "*** Making vx_wrfdata Library ***"
-	@ echo
-	@ $(MAKE) vx_wrfdata_lib  $(PRINT_OPTS)
-	cp $(TARGETS) ../.
+EXECUTABLES =
 
-vx_wrfdata_lib: libvx_wrfdata.a
-	@ echo
+
+OBJECTS     = filterbox.o  \
+              interpmthd.o \
+              moments.o    \
+              node.o       \
+              polyline.o   \
+              vx_wrfdata.o
+
+
+LIBRARIES   = libvx_wrfdata.a
+
+
+########################################################################
+
+
+HEADERS     = filterbox.h  \
+              interpmthd.h \
+              moments.h    \
+              node.h       \
+              polyline.h   \
+              shape.h      \
+              vx_wrfdata.h
+																								  
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+filterbox.o: filterbox.cc
+	$(CXX) filterbox.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+interpmthd.o: interpmthd.cc
+	$(CXX) interpmthd.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+moments.o: moments.cc
+	$(CXX) moments.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+node.o: node.cc
+	$(CXX) node.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+polyline.o: polyline.cc
+	$(CXX) polyline.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+vx_wrfdata.o: vx_wrfdata.cc
+	$(CXX) vx_wrfdata.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+
+########################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
 
 libvx_wrfdata.a: $(OBJECTS)
 	ar -rs libvx_wrfdata.a $(OBJECTS)
 	ranlib libvx_wrfdata.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_wrfdata.a
+	cp libvx_wrfdata.a $(MET_LIB_DIR)
 
-filterbox.o: filterbox.cc
-	$(CXX) filterbox.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
 
-interpmthd.o: interpmthd.cc
-	$(CXX) interpmthd.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+########################################################################
 
-moments.o: moments.cc
-	$(CXX) moments.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
 
-node.o: node.cc
-	$(CXX) node.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+   ##
+   ##  executables
+   ##
 
-polyline.o: polyline.cc
-	$(CXX) polyline.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS)
 
-vx_wrfdata.o: vx_wrfdata.cc
-	$(CXX) vx_wrfdata.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS)
+########################################################################
+
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_wrfdata.a
 
-.PHONY: $(FAKES)
+
+########################################################################
+
+
+.PHONY: all clean
+
+
+########################################################################
 
 

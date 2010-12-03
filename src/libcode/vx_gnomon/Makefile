@@ -1,45 +1,91 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2007
+# ** Copyright UCAR (c) 1992 - 2011
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
 # ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-###############################################################################
+########################################################################
 #
 # Makefile for the vx_gnomon library
 #
-###############################################################################
+########################################################################
 
-TARGETS  = libvx_gnomon.a
 
-OBJECTS  =  gnomon.o
+EXECUTABLES =
 
-OPT_FLAGS=
 
-FAKES    = vx_gnomon_all vx_gnomon_lib clean
+OBJECTS     = gnomon.o
 
-LIB_DIR  = ..
 
-vx_gnomon_all:
-	@ echo
-	@ echo "*** Making vx_gnomon Library ***"
-	@ echo
-	@ $(MAKE) vx_gnomon_lib  $(PRINT_OPTS)
-	cp $(TARGETS) ../.
+LIBRARIES   = libvx_gnomon.a
 
-vx_gnomon_lib: libvx_gnomon.a
-	@ echo
+
+########################################################################
+
+
+HEADERS     = gnomon.h
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+gnomon.o: gnomon.cc
+	$(CXX) gnomon.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+
+
+########################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
 
 libvx_gnomon.a: $(OBJECTS)
 	ar -rs libvx_gnomon.a $(OBJECTS)
 	ranlib libvx_gnomon.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_gnomon.a
+	cp libvx_gnomon.a $(MET_LIB_DIR)
 
-gnomon.o: gnomon.cc
-	$(CXX) gnomon.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+
+########################################################################
+
+
+   ##
+   ##  executables
+   ##
+
+
+########################################################################
+
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_gnomon.a
 
-.PHONY: $(FAKES)
+
+########################################################################
+
+
+.PHONY: all clean
+
+
+########################################################################
+
+

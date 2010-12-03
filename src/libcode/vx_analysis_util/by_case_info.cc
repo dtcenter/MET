@@ -18,11 +18,11 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_analysis_util/by_case_info.h"
-#include "vx_analysis_util/analysis_utils.h"
-#include "vx_analysis_util/mode_atts.h"
-#include "vx_analysis_util/mode_columns.h"
-#include "vx_util/indent.h"
+#include "by_case_info.h"
+#include "analysis_utils.h"
+#include "mode_atts.h"
+#include "mode_columns.h"
+#include "indent.h"
 
 
 ////////////////////////////////////////////////////////////////////////

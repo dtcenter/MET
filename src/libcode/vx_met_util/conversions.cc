@@ -17,10 +17,10 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util/conversions.h"
-#include "vx_met_util/constants.h"
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_math/vx_math.h"
+#include "conversions.h"
+#include "constants.h"
+#include "vx_wrfdata.h"
+#include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
 //

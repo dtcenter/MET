@@ -13,12 +13,12 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_met_util/constants.h"
-#include "vx_met_util/met_stats.h"
-#include "vx_wrfdata/interpmthd.h"
-#include "vx_util/vx_util.h"
-#include "vx_cal/vx_cal.h"
-#include "vx_math/vx_math.h"
+#include "constants.h"
+#include "met_stats.h"
+#include "interpmthd.h"
+#include "vx_util.h"
+#include "vx_cal.h"
+#include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
 

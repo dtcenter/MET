@@ -37,12 +37,12 @@
 
 #include <iostream>
 
-#include "vx_util/vx_util.h"
-#include "vx_cal/vx_cal.h"
+#include "vx_util.h"
+#include "vx_cal.h"
 
-#include "vx_util/int_array.h"
-#include "vx_analysis_util/mask_poly.h"
-#include "vx_analysis_util/mode_line.h"
+#include "int_array.h"
+#include "mask_poly.h"
+#include "mode_line.h"
 
 
 ////////////////////////////////////////////////////////////////////////

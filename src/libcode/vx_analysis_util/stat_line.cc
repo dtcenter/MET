@@ -25,11 +25,11 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_met_util/stat_columns.h"
-#include "vx_analysis_util/stat_line.h"
-#include "vx_analysis_util/stat_offsets.h"
-#include "vx_analysis_util/analysis_utils.h"
-#include "vx_analysis_util/stat_offsets.h"
+#include "stat_columns.h"
+#include "stat_line.h"
+#include "stat_offsets.h"
+#include "analysis_utils.h"
+#include "stat_offsets.h"
 
 
 ////////////////////////////////////////////////////////////////////////

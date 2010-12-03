@@ -20,14 +20,14 @@
 
 #include <iostream>
 
-#include "vx_util/vx_util.h"
-#include "vx_util/int_array.h"
-#include "vx_util/double_array.h"
-#include "vx_cal/vx_cal.h"
+#include "vx_util.h"
+#include "int_array.h"
+#include "double_array.h"
+#include "vx_cal.h"
 
-#include "vx_analysis_util/mode_line.h"
-#include "vx_analysis_util/mode_atts.h"
-#include "vx_analysis_util/by_case_info.h"
+#include "mode_line.h"
+#include "mode_atts.h"
+#include "by_case_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////

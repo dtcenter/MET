@@ -17,7 +17,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util/read_netcdf.h"
+#include "read_netcdf.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

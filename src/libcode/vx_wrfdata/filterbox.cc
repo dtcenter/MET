@@ -27,8 +27,8 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
-#include "vx_wrfdata/filterbox.h"
-#include "vx_math/vx_math.h"
+#include "filterbox.h"
+#include "vx_math.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

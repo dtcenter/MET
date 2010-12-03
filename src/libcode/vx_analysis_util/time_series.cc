@@ -19,8 +19,8 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_analysis_util/time_series.h"
-#include "vx_util/vx_util.h"
+#include "time_series.h"
+#include "vx_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////

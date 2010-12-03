@@ -25,9 +25,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
+#include "vx_util.h"
 
-#include "vx_analysis_util/data_line.h"
+#include "data_line.h"
 
 
 ////////////////////////////////////////////////////////////////////////

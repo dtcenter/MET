@@ -19,8 +19,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util/write_netcdf.h"
-#include "vx_met_util/grid_output.h"
+#include "write_netcdf.h"
+#include "grid_output.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

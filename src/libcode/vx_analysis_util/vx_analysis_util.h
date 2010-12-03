@@ -15,19 +15,19 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_analysis_util/analysis_utils.h"
-#include "vx_analysis_util/box.h"
-#include "vx_analysis_util/by_case_info.h"
-#include "vx_analysis_util/data_line.h"
-#include "vx_analysis_util/mask_poly.h"
-#include "vx_analysis_util/mode_atts.h"
-#include "vx_analysis_util/mode_columns.h"
-#include "vx_analysis_util/mode_job.h"
-#include "vx_analysis_util/mode_line.h"
-#include "vx_analysis_util/time_series.h"
-#include "vx_analysis_util/stat_job.h"
-#include "vx_analysis_util/stat_line.h"
-#include "vx_analysis_util/stat_offsets.h"
+#include "analysis_utils.h"
+#include "box.h"
+#include "by_case_info.h"
+#include "data_line.h"
+#include "mask_poly.h"
+#include "mode_atts.h"
+#include "mode_columns.h"
+#include "mode_job.h"
+#include "mode_line.h"
+#include "time_series.h"
+#include "stat_job.h"
+#include "stat_line.h"
+#include "stat_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
 

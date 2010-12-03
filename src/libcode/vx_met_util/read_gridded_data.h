@@ -13,12 +13,12 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_met_util/constants.h"
-#include "vx_met_util/file_type.h"
-#include "vx_met_util/pair_data.h"
-#include "vx_data_grids/grid.h"
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_math/vx_math.h"
+#include "constants.h"
+#include "file_type.h"
+#include "pair_data.h"
+#include "grid.h"
+#include "vx_wrfdata.h"
+#include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
 

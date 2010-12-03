@@ -16,7 +16,7 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
-#include "vx_wrfdata/interpmthd.h"
+#include "interpmthd.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

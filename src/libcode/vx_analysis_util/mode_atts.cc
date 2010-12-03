@@ -38,8 +38,8 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_analysis_util/mode_atts.h"
-#include "vx_analysis_util/analysis_utils.h"
+#include "mode_atts.h"
+#include "analysis_utils.h"
 
 
 ////////////////////////////////////////////////////////////////////////

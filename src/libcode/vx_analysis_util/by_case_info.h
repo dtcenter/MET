@@ -20,8 +20,8 @@
 
 #include <iostream>
 
-#include "vx_analysis_util/mode_line.h"
-#include "vx_cal/vx_cal.h"
+#include "mode_line.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -31,8 +31,8 @@ static const double cf = 57.2957795130823208768;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_math/trig.h"
-#include "vx_gnomon/gnomon.h"
+#include "trig.h"
+#include "gnomon.h"
 
 
 ////////////////////////////////////////////////////////////////////////

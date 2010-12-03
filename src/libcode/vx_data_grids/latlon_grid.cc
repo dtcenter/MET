@@ -24,9 +24,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_math/vx_math.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/latlon_grid.h"
+#include "vx_math.h"
+#include "vx_util.h"
+#include "latlon_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////

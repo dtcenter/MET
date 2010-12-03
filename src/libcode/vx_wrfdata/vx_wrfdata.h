@@ -26,12 +26,12 @@
 
 using namespace std;
 
-#include "vx_wrfdata/shape.h"
-#include "vx_wrfdata/filterbox.h"
-#include "vx_wrfdata/polyline.h"
-#include "vx_wrfdata/node.h"
-#include "vx_wrfdata/interpmthd.h"
-#include "vx_cal/vx_cal.h"
+#include "shape.h"
+#include "filterbox.h"
+#include "polyline.h"
+#include "node.h"
+#include "interpmthd.h"
+#include "vx_cal.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

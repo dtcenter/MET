@@ -17,7 +17,7 @@ using namespace std;
 #include <cmath>
 #include <regex.h>
 
-#include "vx_met_util/vx_met_util.h"
+#include "vx_met_util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
