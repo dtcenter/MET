@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -17,7 +17,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "vx_util/temp_file.h"
+#include "temp_file.h"
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -22,7 +22,7 @@ using namespace std;
 #include <cmath>
 #include <regex.h>
 
-#include "vx_util/string_fxns.h"
+#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////

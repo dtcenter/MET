@@ -1,3 +1,11 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2011
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -13,8 +21,8 @@ using namespace std;
 #include <fcntl.h>
 #include <cmath>
 
-#include "vx_pb_util/copy_bytes.h"
-#include "vx_pb_util/do_unblocking.h"
+#include "copy_bytes.h"
+#include "do_unblocking.h"
 
 
 //////////////////////////////////////////////////////////////////////////////////

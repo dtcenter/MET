@@ -1,3 +1,11 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2011
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -10,8 +18,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_util/concat_string.h"
-#include "vx_util/string_array.h"
+#include "concat_string.h"
+#include "string_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////

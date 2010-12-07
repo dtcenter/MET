@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,16 +18,16 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_math/trig.h"
-#include "vx_math/nint.h"
-#include "vx_math/nti.h"
-#include "vx_math/hist.h"
-#include "vx_math/ptile.h"
-#include "vx_math/constants.h"
-#include "vx_math/pwl_interpolate.h"
-#include "vx_math/is_bad_data.h"
-#include "vx_math/affine.h"
-#include "vx_math/viewgravity_to_string.h"
+#include "trig.h"
+#include "nint.h"
+#include "nti.h"
+#include "hist.h"
+#include "ptile.h"
+#include "constants.h"
+#include "pwl_interpolate.h"
+#include "is_bad_data.h"
+#include "affine.h"
+#include "viewgravity_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////
