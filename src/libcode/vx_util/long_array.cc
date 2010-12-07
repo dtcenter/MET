@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2010
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,8 +23,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
-#include "vx_util/long_array.h"
+#include "vx_util.h"
+#include "long_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////

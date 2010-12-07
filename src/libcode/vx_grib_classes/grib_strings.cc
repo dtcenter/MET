@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -22,10 +22,10 @@ using namespace std;
 #include <fcntl.h>
 #include <cmath>
 
-#include "vx_grib_classes/grib_classes.h"
-#include "vx_grib_classes/grib_strings.h"
-#include "vx_math/vx_math.h"
-#include "vx_util/vx_util.h"
+#include "grib_classes.h"
+#include "grib_strings.h"
+#include "vx_math.h"
+#include "vx_util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

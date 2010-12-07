@@ -1,56 +1,101 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2007
+# ** Copyright UCAR (c) 1992 - 2011
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
 # ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-###############################################################################
+########################################################################
 #
 # Makefile for the vx_contable library
 #
-###############################################################################
-
-TARGETS  = libvx_contable.a
-
-OBJECTS  =  vx_contable.o \
-	vx_contable_stats.o \
-	vx_nx2.o
-
-OPT_FLAGS=
-
-FAKES    = vx_contable_all vx_contable_lib clean
-
-LIB_DIR  = ..
+########################################################################
 
 
-vx_contable_all:
+EXECUTABLES = 
+
+OBJECTS     =  vx_contable.o       \
+	            vx_contable_stats.o \
+	            vx_nx2.o
+
+LIBRARIES   =  libvx_contable.a
+
+
+########################################################################
+
+
+HEADERS     =  vx_contable.h 
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Making vx_contable Library ***"
-	@ echo
-	@ $(MAKE) vx_contable_lib  $(PRINT_OPTS)
-	cp $(TARGETS) ../.
-
-vx_contable_lib: libvx_contable.a
+	@ echo "*** Finished making vx_contable Library ***"
 	@ echo
 
-libvx_contable.a: $(OBJECTS)
-	ar -rs libvx_contable.a $(OBJECTS)
-	ranlib libvx_contable.a
+
+########################################################################
+
+
+	##
+	## objects
+	##
+
 
 vx_contable.o: vx_contable.cc
-	$(CXX) vx_contable.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR)
+	$(CXX) vx_contable.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 vx_contable_stats.o: vx_contable_stats.cc
-	$(CXX) vx_contable_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) vx_contable_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS) $(NETCDF_INCS)
 
 vx_nx2.o: vx_nx2.cc
-	$(CXX) vx_nx2.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) vx_nx2.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS) $(NETCDF_INCS)
+
+
+########################################################################
+
+
+	##
+	## libraries
+	##
+
+
+libvx_contable.a: $(OBJECTS)
+   ar -rs libvx_contable.a $(OBJECTS)
+   ranlib libvx_contable.a
+   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+   cp $(HEADERS) $(MET_INC_DIR)
+   rm -f $(MET_LIB_DIR)/libvx_contable.a
+   cp libvx_contable.a $(MET_LIB_DIR)
+
+
+########################################################################
+
+
+	##
+	## executables
+	##
+
+
+
+########################################################################
+
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_contable.a
 
-.PHONY: $(FAKES)
+
+########################################################################
+
+
+.PHONY: all clean
+
+
+########################################################################
 
 

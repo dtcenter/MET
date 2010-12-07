@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,9 +27,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
+#include "vx_util.h"
 
-#include "vx_contable/vx_contable.h"
+#include "vx_contable.h"
 
 
 ////////////////////////////////////////////////////////////////////////
