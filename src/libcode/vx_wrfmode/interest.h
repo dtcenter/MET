@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include "vx_wrfdata/vx_wrfdata.h"
+#include "vx_wrfdata.h"
 
 ////////////////////////////////////////////////////////////////////////
 

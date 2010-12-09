@@ -20,13 +20,13 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_econfig/celltype_to_string.h"
-#include "vx_econfig/stetype_to_string.h"
+#include "celltype_to_string.h"
+#include "stetype_to_string.h"
 
-#include "vx_econfig/builtin.h"
-#include "vx_util/indent.h"
-#include "vx_econfig/pwl.h"
-#include "vx_econfig/machine.h"
+#include "builtin.h"
+#include "indent.h"
+#include "pwl.h"
+#include "machine.h"
 
 
 ////////////////////////////////////////////////////////////////////////

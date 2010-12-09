@@ -112,12 +112,12 @@ using namespace std;
 #include <cmath>
 
 
-#include "vx_util/vx_util.h"
-#include "vx_math/nint.h"
+#include "vx_util.h"
+#include "nint.h"
 
-#include "vx_color/vx_color_parser.h"
-#include "vx_color/vx_clist.h"
-#include "vx_color/vx_color.h"
+#include "vx_color_parser.h"
+#include "vx_clist.h"
+#include "vx_color.h"
 
 
 ////////////////////////////////////////////////////////////////////////

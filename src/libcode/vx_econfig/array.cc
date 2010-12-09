@@ -19,7 +19,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_econfig/array.h"
+#include "array.h"
 
 
 ////////////////////////////////////////////////////////////////////////

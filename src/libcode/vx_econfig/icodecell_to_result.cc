@@ -18,9 +18,9 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_econfig/icodecell_to_result.h"
-#include "vx_econfig/celltype_to_string.h"
-#include "vx_econfig/resulttype_to_string.h"
+#include "icodecell_to_result.h"
+#include "celltype_to_string.h"
+#include "resulttype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -118,15 +118,15 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_econfig/scanner_stuff.h"
+#include "scanner_stuff.h"
 
-#include "vx_econfig/builtin.h"
-#include "vx_econfig/idstack.h"
-#include "vx_econfig/icode.h"
-#include "vx_econfig/symtab.h"
-#include "vx_econfig/pwl.h"
-#include "vx_econfig/machine.h"
-#include "vx_econfig/celltype_to_string.h"
+#include "builtin.h"
+#include "idstack.h"
+#include "icode.h"
+#include "symtab.h"
+#include "pwl.h"
+#include "machine.h"
+#include "celltype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

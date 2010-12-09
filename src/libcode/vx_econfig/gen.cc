@@ -23,8 +23,8 @@ using namespace std;
 #include <time.h>
 #include <cmath>
 
-#include "vx_econfig/gen.h"
-#include "vx_econfig/stetype_to_string.h"
+#include "gen.h"
+#include "stetype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

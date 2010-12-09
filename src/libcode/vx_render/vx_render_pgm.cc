@@ -19,7 +19,7 @@ using namespace std;
 #include <cstdlib>
 #include <string.h>
 
-#include "vx_render/vx_render.h"
+#include "vx_render.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -19,7 +19,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_econfig/algline.h"
+#include "algline.h"
 
 
 ////////////////////////////////////////////////////////////////////////

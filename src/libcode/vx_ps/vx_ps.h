@@ -21,8 +21,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "vx_afm/afm.h"
-#include "vx_ps/vx_ps_text.h"
+#include "afm.h"
+#include "vx_ps_text.h"
 
 
 //////////////////////////////////////////////////////////////

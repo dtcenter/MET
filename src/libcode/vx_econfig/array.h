@@ -30,7 +30,7 @@ class ArrayInfo;   //  forward reference
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_util/indent.h"
+#include "indent.h"
 
 
 

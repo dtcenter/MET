@@ -19,10 +19,10 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
-#include "vx_math/vx_math.h"
-#include "vx_econfig/result.h"
-#include "vx_econfig/resulttype_to_string.h"
+#include "vx_util.h"
+#include "vx_math.h"
+#include "result.h"
+#include "resulttype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@ using namespace std;
 
 #include <string.h>
 
-#include "vx_econfig/builtin_to_string.h"
+#include "builtin_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

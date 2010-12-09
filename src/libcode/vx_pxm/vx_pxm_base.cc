@@ -20,9 +20,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_pxm/vx_pxm_base.h"
+#include "vx_pxm_base.h"
 
-#include "vx_util/vx_util.h"
+#include "vx_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////

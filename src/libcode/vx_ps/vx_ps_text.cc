@@ -19,8 +19,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
-#include "vx_ps/vx_ps_text.h"
+#include "vx_util.h"
+#include "vx_ps_text.h"
 
 
 ////////////////////////////////////////////////////////////////////////

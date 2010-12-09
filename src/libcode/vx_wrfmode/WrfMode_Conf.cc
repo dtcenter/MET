@@ -30,7 +30,7 @@ using namespace std;
 #include <cmath>
 
 #include "WrfMode_Conf.h"
-#include "vx_econfig/icodecell_to_result.h"
+#include "icodecell_to_result.h"
 
 
 ////////////////////////////////////////////////////////////////////////

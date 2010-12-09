@@ -28,7 +28,7 @@ using namespace std;
 
 #include <string.h>
 
-#include "vx_econfig/stetype_to_string.h"
+#include "stetype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

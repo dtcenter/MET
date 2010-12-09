@@ -18,16 +18,16 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_ps/vx_ps.h"
+#include "vx_ps.h"
 
-#include "vx_pxm/vx_pxm.h"
+#include "vx_pxm.h"
 
-#include "vx_render/vx_renderinfo.h"
-#include "vx_render/vx_ascii85_filter.h"
-#include "vx_render/vx_bit_filter.h"
-#include "vx_render/vx_hex_filter.h"
-#include "vx_render/vx_psout_filter.h"
-#include "vx_render/vx_rle_filter.h"
+#include "vx_renderinfo.h"
+#include "vx_ascii85_filter.h"
+#include "vx_bit_filter.h"
+#include "vx_hex_filter.h"
+#include "vx_psout_filter.h"
+#include "vx_rle_filter.h"
 
 
 ////////////////////////////////////////////////////////////////////////

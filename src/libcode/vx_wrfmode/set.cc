@@ -26,7 +26,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_wrfmode/set.h"
+#include "set.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
