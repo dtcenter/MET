@@ -18,9 +18,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_wrfmode/engine.h"
-#include "vx_wrfmode/mode_columns.h"
-#include "vx_util/vx_util.h"
+#include "engine.h"
+#include "mode_columns.h"
+#include "vx_util.h"
 
 ///////////////////////////////////////////////////////////////////////
 

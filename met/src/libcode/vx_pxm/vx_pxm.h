@@ -18,14 +18,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_color/vx_color.h"
+#include "vx_color.h"
 
-#include "vx_pxm/vx_pxm_base.h"
+#include "vx_pxm_base.h"
 
-#include "vx_pxm/vx_pbm.h"
-#include "vx_pxm/vx_pgm.h"
-#include "vx_pxm/vx_pcm.h"
-#include "vx_pxm/vx_ppm.h"
+#include "vx_pbm.h"
+#include "vx_pgm.h"
+#include "vx_pcm.h"
+#include "vx_ppm.h"
 
 
 ////////////////////////////////////////////////////////////////////////

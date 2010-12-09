@@ -505,13 +505,13 @@ using namespace std;
 #include <iostream>
 #include <stdlib.h>
 
-#include "vx_econfig/scanner_stuff.h"   //  must be included before econfig.tab.h
-#include "vx_econfig/idstack.h"         //  must be included before econfig.tab.h
-#include "vx_econfig/icode.h"           //  must be included before econfig.tab.h
-#include "vx_econfig/symtab.h"
-#include "vx_econfig/machine.h"
+#include "scanner_stuff.h"   //  must be included before econfig.tab.h
+#include "idstack.h"         //  must be included before econfig.tab.h
+#include "icode.h"           //  must be included before econfig.tab.h
+#include "symtab.h"
+#include "machine.h"
 
-#include "vx_econfig/econfig.h"
+#include "econfig.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -27,9 +27,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util/vx_met_util.h"
-#include "vx_wrfmode/interest.h"
-#include "vx_math/vx_math.h"
+#include "vx_met_util.h"
+#include "interest.h"
+#include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
 

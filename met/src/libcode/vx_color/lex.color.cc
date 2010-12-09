@@ -488,10 +488,10 @@ using namespace std;
 
 #include <iostream>
 
-#include "vx_color/vx_color_parser.h"   //  this must be included before cfile.tab.h
-#include "vx_color/vx_clist.h"
+#include "vx_color_parser.h"   //  this must be included before cfile.tab.h
+#include "vx_clist.h"
 
-#include "vx_color/cfile.tab.h"
+#include "cfile.tab.h"
 
 
 

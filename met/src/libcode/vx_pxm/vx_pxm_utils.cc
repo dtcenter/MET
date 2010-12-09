@@ -19,8 +19,8 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_pxm/vx_pxm_base.h"
-#include "vx_pxm/vx_pxm_utils.h"
+#include "vx_pxm_base.h"
+#include "vx_pxm_utils.h"
 
 
 ////////////////////////////////////////////////////////////////////////

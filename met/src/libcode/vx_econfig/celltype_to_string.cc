@@ -28,7 +28,7 @@ using namespace std;
 
 #include <string.h>
 
-#include "vx_econfig/celltype_to_string.h"
+#include "celltype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

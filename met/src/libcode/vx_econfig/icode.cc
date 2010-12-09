@@ -20,11 +20,11 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_econfig/builtin.h"
-#include "vx_util/indent.h"
-#include "vx_econfig/icode.h"
+#include "builtin.h"
+#include "indent.h"
+#include "icode.h"
 
-#include "vx_econfig/celltype_to_string.h"
+#include "celltype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -23,11 +23,11 @@ using namespace std;
 #include <sys/types.h>
 #include <fcntl.h>
 
-#include "vx_pxm/vx_pgm.h"
-#include "vx_pxm/vx_pxm_utils.h"
+#include "vx_pgm.h"
+#include "vx_pxm_utils.h"
 
-#include "vx_util/vx_util.h"
-#include "vx_math/vx_math.h"
+#include "vx_util.h"
+#include "vx_math.h"
 
 
 ////////////////////////////////////////////////////////////////////////

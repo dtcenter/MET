@@ -13,10 +13,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_wrfmode/engine.h"
-#include "vx_wrfmode/interest.h"
-#include "vx_wrfmode/mode_columns.h"
-#include "vx_wrfmode/set.h"
+#include "engine.h"
+#include "interest.h"
+#include "mode_columns.h"
+#include "set.h"
 
 ////////////////////////////////////////////////////////////////////////
 

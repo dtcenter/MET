@@ -31,7 +31,7 @@ using namespace std;
 #include <memory.h>
 #include <cmath>
 
-#include "vx_ps/vx_ps.h"
+#include "vx_ps.h"
 
 
 ////////////////////////////////////////////////////////////////////////

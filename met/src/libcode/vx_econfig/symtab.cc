@@ -29,12 +29,12 @@ using namespace std;
 #include <errno.h>
 #include <cmath>
 
-#include "vx_util/indent.h"
-#include "vx_econfig/algline.h"
-#include "vx_econfig/symtab.h"
+#include "indent.h"
+#include "algline.h"
+#include "symtab.h"
 
-#include "vx_econfig/celltype_to_string.h"
-#include "vx_econfig/stetype_to_string.h"
+#include "celltype_to_string.h"
+#include "stetype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

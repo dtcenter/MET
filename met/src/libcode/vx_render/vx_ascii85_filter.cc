@@ -19,7 +19,7 @@ using namespace std;
 #include <cstdlib>
 #include <string.h>
 
-#include "vx_render/vx_ascii85_filter.h"
+#include "vx_ascii85_filter.h"
 
 
 ////////////////////////////////////////////////////////////////////////

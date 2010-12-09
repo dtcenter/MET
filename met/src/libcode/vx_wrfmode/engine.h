@@ -13,15 +13,15 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "vx_wrfmode/interest.h"
-#include "vx_wrfmode/set.h"
-#include "vx_wrfmode/WrfMode_Conf.h"
+#include "interest.h"
+#include "set.h"
+#include "WrfMode_Conf.h"
 
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_math/vx_math.h"
-#include "vx_color/vx_color.h"
-#include "vx_data_grids/grid.h"
-#include "vx_met_util/vx_met_util.h"
+#include "vx_wrfdata.h"
+#include "vx_math.h"
+#include "vx_color.h"
+#include "grid.h"
+#include "vx_met_util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //

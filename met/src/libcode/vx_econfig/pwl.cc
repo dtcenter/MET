@@ -20,8 +20,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util/indent.h"
-#include "vx_econfig/pwl.h"
+#include "indent.h"
+#include "pwl.h"
 
 
 ////////////////////////////////////////////////////////////////////////

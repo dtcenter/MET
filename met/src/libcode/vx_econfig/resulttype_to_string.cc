@@ -28,7 +28,7 @@ using namespace std;
 
 #include <string.h>
 
-#include "vx_econfig/resulttype_to_string.h"
+#include "resulttype_to_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

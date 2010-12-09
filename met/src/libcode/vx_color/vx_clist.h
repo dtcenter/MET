@@ -20,7 +20,7 @@
 
 #include <iostream>
 
-#include "vx_color/vx_color_parser.h"
+#include "vx_color_parser.h"
 
 
 ////////////////////////////////////////////////////////////////////////

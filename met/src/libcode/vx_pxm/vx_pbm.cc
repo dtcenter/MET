@@ -24,9 +24,9 @@ using namespace std;
 #include <sys/types.h>
 #include <fcntl.h>
 
-#include "vx_util/indent.h"
-#include "vx_pxm/vx_pbm.h"
-#include "vx_pxm/vx_pxm_utils.h"
+#include "indent.h"
+#include "vx_pbm.h"
+#include "vx_pxm_utils.h"
 
 
 ////////////////////////////////////////////////////////////////////////
