@@ -17,9 +17,9 @@ EXECUTALBES =
 
 
 OBJECTS     =  pblock.o \
-	            do_blocking.o \
-	            do_unblocking.o \
-	            copy_bytes.o
+               do_blocking.o \
+               do_unblocking.o \
+               copy_bytes.o
 
 
 LIBRARIES   =  libvx_pb_util.a
@@ -77,10 +77,10 @@ copy_bytes.o: copy_bytes.cc
 libvx_pb_util.a: $(OBJECTS)
 	ar -rs libvx_pb_util.a $(OBJECTS)
 	ranlib libvx_pb_util.a
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   cp $(HEADERS) $(MET_INC_DIR)
-   rm -f $(MET_LIB_DIR)/libvx_pb_util.a
-   cp libvx_pb_util.a $(MET_LIB_DIR)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_pb_util.a
+	cp libvx_pb_util.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -95,9 +95,9 @@ libvx_pb_util.a: $(OBJECTS)
 
 
 clean:
-   rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   rm -f $(MET_LIB_DIR)/libvx_pb_util.a
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_pb_util.a
 
 
 ########################################################################

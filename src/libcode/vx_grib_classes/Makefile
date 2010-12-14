@@ -17,7 +17,7 @@ EXECUTABLES =
 
 
 OBJECTS     =  grib_classes.o \
-	            grib_strings.o
+               grib_strings.o
 
 
 LIBRARIES   = libvx_grib_classes.a
@@ -27,7 +27,7 @@ LIBRARIES   = libvx_grib_classes.a
 
 
 HEADERS     =  grib_classes.h \
-	            grib_strings.h
+               grib_strings.h
 
 
 ########################################################################
@@ -65,10 +65,10 @@ grib_strings.o: grib_strings.cc
 libvx_grib_classes.a: $(OBJECTS)
 	ar -rs libvx_grib_classes.a $(OBJECTS)
 	ranlib libvx_grib_classes.a
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   cp $(HEADERS) $(MET_INC_DIR)
-   rm -f $(MET_LIB_DIR)/libvx_grib_classes.a
-   cp libvx_grib_classes.a $(MET_LIB_DIR)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_grib_classes.a
+	cp libvx_grib_classes.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -83,9 +83,9 @@ libvx_grib_classes.a: $(OBJECTS)
 
 
 clean:
-   rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   rm -f $(MET_LIB_DIR)/libvx_grib_classes.a
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_grib_classes.a
 
 
 ########################################################################

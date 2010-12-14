@@ -17,30 +17,30 @@ EXECUTABLES =
 
 
 OBJECTS     =  ascii_table.o \
-	            asciitablejust_to_string.o \
-	           	bitarray.o \
-	           	boundingbox.o \
-	           	comma_string.o \
-	           	concat_string.o \
-	            double_array.o \
-	            indent.o \
-	           	int_array.o \
-	            is_number.o \
-	            long_array.o \
-	            make_path.o \
-	           	memory.o \
-	            num_array.o \
-	            ordinal.o \
-	            roman_numeral.o \
-	           	string_array.o \
-	           	string_fxns.o \
-	           	substring.o \
-	           	temp_file.o \
-	           	thresh_array.o \
-	           	threshold.o \
-	           	vx_endian.o \
-	           	fix_float.o \
-	           	command_line.o \
+               asciitablejust_to_string.o \
+           	bitarray.o \
+           	boundingbox.o \
+           	comma_string.o \
+           	concat_string.o \
+               double_array.o \
+               indent.o \
+           	int_array.o \
+               is_number.o \
+               long_array.o \
+               make_path.o \
+           	memory.o \
+               num_array.o \
+               ordinal.o \
+               roman_numeral.o \
+           	string_array.o \
+           	string_fxns.o \
+           	substring.o \
+           	temp_file.o \
+           	thresh_array.o \
+           	threshold.o \
+           	vx_endian.o \
+           	fix_float.o \
+           	command_line.o \
 
 LIBRARIES   =  libvx_util.a
 
@@ -49,31 +49,31 @@ LIBRARIES   =  libvx_util.a
 
 
 HEADERS     =  ascii_table.h \
-	            asciitablejust_to_string.h \
-	           	bitarray.h \
-	           	boundingbox.h \
-	           	comma_string.h \
-	           	concat_string.h \
-	            double_array.h \
-	            indent.h \
-	           	int_array.h \
-	            is_number.h \
-	            long_array.h \
-	            make_path.h \
-	           	memory.h \
-	            num_array.h \
-	            ordinal.h \
-	            roman_numeral.h \
-	           	string_array.h \
-	           	string_fxns.h \
-	           	substring.h \
-	           	temp_file.h \
-	           	thresh_array.h \
-	           	threshold.h \
-	           	vx_endian.h \
-	           	fix_float.h \
-	           	command_line.h \
-	            vx_util.h
+               asciitablejust_to_string.h \
+           	bitarray.h \
+           	boundingbox.h \
+           	comma_string.h \
+           	concat_string.h \
+               double_array.h \
+               indent.h \
+           	int_array.h \
+               is_number.h \
+               long_array.h \
+               make_path.h \
+           	memory.h \
+               num_array.h \
+               ordinal.h \
+               roman_numeral.h \
+           	string_array.h \
+           	string_fxns.h \
+           	substring.h \
+           	temp_file.h \
+           	thresh_array.h \
+           	threshold.h \
+           	vx_endian.h \
+           	fix_float.h \
+           	command_line.h \
+               vx_util.h
 
  
 ########################################################################
@@ -175,10 +175,10 @@ command_line.o: command_line.cc command_line.h
 libvx_util.a: $(OBJECTS)
 	ar -rs libvx_util.a $(OBJECTS)
 	ranlib libvx_util.a
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   cp $(HEADERS) $(MET_INC_DIR)
-   rm -f $(MET_LIB_DIR)/libvx_util.a
-   cp libvx_util.a $(MET_LIB_DIR)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_util.a
+	cp libvx_util.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -193,9 +193,9 @@ libvx_util.a: $(OBJECTS)
 
 
 clean:
-   rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   rm -f $(MET_LIB_DIR)/libvx_util.a
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_util.a
 
 
 ########################################################################
