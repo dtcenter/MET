@@ -47,7 +47,7 @@ scope.o: scope.h scope.cc info.o
 
 code.o: code.h code.cc info.o
 	@ echo
-	$(CXX) code.cc     -c $(FLAGS) -I$(INC_DIR)
+	$(CXX) code.cc     -c $(FLAGS) -I$(MET_INC_DIR)
 
 
 enum.tab.c: enum.y info.o code.o scope.o
@@ -92,7 +92,7 @@ lex.yy.o: lex.yy.c
 
 enum_to_string: enum_to_string.cc lex.yy.o enum.tab.o $(OBJECTS)
 	@ echo
-	$(CXX) enum_to_string.cc lex.yy.o enum.tab.o info.o code.o scope.o $(FLAGS) -o enum_to_string -I$(INC_DIR) -L$(LIB_DIR) -lcal -lm
+	$(CXX) enum_to_string.cc lex.yy.o enum.tab.o info.o code.o scope.o $(FLAGS) -o enum_to_string -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lcal -lm
 
 
 ########################################################################

@@ -24,7 +24,7 @@ using namespace std;
 #include "code.h"
 #include "scope.h"
 
-#include "cal.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////
