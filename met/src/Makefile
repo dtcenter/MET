@@ -5,7 +5,7 @@
 
 all:
 	@ echo
-	@ cd vx_econfig ; $(MAKE) $(PRINT_OPTS)
+	@ cd basic      ; $(MAKE) $(PRINT_OPTS)
 	@ cd libcode    ; $(MAKE) $(PRINT_OPTS)
 	@ cd tools      ; $(MAKE) $(PRINT_OPTS)
 
@@ -15,7 +15,7 @@ all:
 
 clean:
 	@ echo
-	@ cd vx_econfig ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd basic      ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd libcode    ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd tools      ; $(MAKE) $(PRINT_OPTS) clean
 
