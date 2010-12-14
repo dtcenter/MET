@@ -67,18 +67,19 @@ F2C_LIBNAME  =
 
 # Optional flags to disable the compilation of MET tools
 # Specify a non-zero value to disable the compilation of the tool
-DISABLE_PCP_COMBINE   = 0
-DISABLE_GEN_POLY_MASK = 0
-DISABLE_MODE          = 0
-DISABLE_GRID_STAT     = 0
-DISABLE_PB2NC         = 0
-DISABLE_ASCII2NC      = 0
-DISABLE_POINT_STAT    = 0
-DISABLE_WAVELET_STAT  = 0
-DISABLE_ENSEMBLE_STAT = 0
-DISABLE_STAT_ANALYSIS = 0
-DISABLE_MODE_ANALYSIS = 0
-DISABLE_TOOLS         = 1
+DISABLE_PCP_COMBINE    = 0
+DISABLE_GEN_POLY_MASK  = 0
+DISABLE_MODE           = 0
+DISABLE_GRID_STAT      = 0
+DISABLE_PB2NC          = 0
+DISABLE_ASCII2NC       = 0
+DISABLE_POINT_STAT     = 0
+DISABLE_WAVELET_STAT   = 0
+DISABLE_ENSEMBLE_STAT  = 0
+DISABLE_STAT_ANALYSIS  = 0
+DISABLE_MODE_ANALYSIS  = 0
+DISABLE_PLOT_POINT_OBS = 0
+DISABLE_WWMCA          = 0
 
 ###############################################################################
 
