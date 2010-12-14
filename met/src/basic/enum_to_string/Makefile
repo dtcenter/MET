@@ -92,7 +92,7 @@ lex.yy.o: lex.yy.c
 
 enum_to_string: enum_to_string.cc lex.yy.o enum.tab.o $(OBJECTS)
 	@ echo
-	$(CXX) enum_to_string.cc lex.yy.o enum.tab.o info.o code.o scope.o $(FLAGS) -o enum_to_string -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lcal -lm
+	$(CXX) enum_to_string.cc lex.yy.o enum.tab.o info.o code.o scope.o $(FLAGS) -o enum_to_string -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_cal -lm
 
 
 ########################################################################
