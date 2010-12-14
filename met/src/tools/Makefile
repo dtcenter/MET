@@ -1,54 +1,69 @@
-# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2005
-# ** University Corporation for Atmospheric Research(UCAR)
-# ** National Center for Atmospheric Research(NCAR)
-# ** Research Applications Lab (RAL)
-# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-###############################################################################
-#
-# Makefile for the tools directory
-#
-###############################################################################
 
-# Optional flags to disable the compilation of MET tools
-# Specify a non-zero value to disable the compilation of the tool
-DISABLE_PLOT_POINT_OBS = 0
-DISABLE_WWMCA_TOOL     = 0
+########################################################################
 
-###############################################################################
-
-PLOT_POINT_OBS	= plot_point_obs
-WWMCA_TOOL_DIR = wwmca_tool
-
-###############################################################################
 
 all:
-	@ echo
-	@ echo "*** Making tools directory ***"
-	@ echo
-	@ $(MAKE) targets $(PRINT_OPTS)
-	@ echo
-	@ echo "*** Finished Making tools directory ***"
-	@ echo
+ifneq ($(DISABLE_ASCII2NC), 0)
+	@ cd ascii2nc       ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_ENSEMBLE_STAT), 0)
+	@ cd ensemble_stat  ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_GEN_POLY_MASK), 0)
+	@ cd gen_poly_mask  ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_GRID_STAT), 0)
+	@ cd grid_stat      ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_MODE), 0)
+	@ cd mode           ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_MODE_ANALYSIS), 0)
+	@ cd mode_analysis  ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_PB2NC), 0)
+	@ cd pb2nc          ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_PCP_COMBINE), 0)
+	@ cd pcp_combine    ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_POINT_STAT), 0)
+	@ cd point_stat     ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_STAT_ANALYSIS), 0)
+	@ cd stat_analysis  ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_WAVELET_STAT), 0)
+	@ cd wavelet_stat   ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_PLOT_POINT_OBS), 0)
+	@ cd plot_point_obs ; $(MAKE) $(PRINT_OPTS)
+endif
+ifneq ($(DISABLE_WWMCA), 0)
+	@ cd wwmca_tool     ; $(MAKE) $(PRINT_OPTS)
+endif
 
-targets:
-ifeq ($(DISABLE_PLOT_POINT_OBS), 0)
-	@ cd $(PLOT_POINT_OBS);	 $(MAKE) $(PRINT_OPTS)
-endif
-ifeq ($(DISABLE_WWMCA_TOOL), 0)
-	@ echo
-	@ echo "*** Making wwmca tools ***"
-	@ echo
-	@ cd $(WWMCA_TOOL_DIR);  $(MAKE) $(PRINT_OPTS)
-	@ echo
-	@ echo "*** Finished Making wwmca tools ***"
-	@ echo
-endif
+
+########################################################################
+
 
 clean:
-	@ cd $(PLOT_POINT_OBS);   $(MAKE) clean $(PRINT_OPTS)
-	@ cd $(WWMCA_TOOL_DIR);   $(MAKE) clean $(PRINT_OPTS)
+	@ cd ascii2nc       ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd ensemble_stat  ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd gen_poly_mask  ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd grid_stat      ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd mode           ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd mode_analysis  ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd pb2nc          ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd pcp_combine    ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd point_stat     ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd stat_analysis  ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd wavelet_stat   ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd plot_point_obs ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd wwmca_tool     ; $(MAKE) $(PRINT_OPTS) clean
 
-.PHONY: $(FAKES)
+
+########################################################################
+
+
