@@ -55,7 +55,7 @@ extern ScopeStack ss;
 
 extern ScopeStackElement sse;
 
-extern Unixtime generation_gmt;
+extern unixtime generation_gmt;
 
 
    //
@@ -79,7 +79,7 @@ bool do_reverse            = false;
 
 bool verbose               = true;
 
-Unixtime generation_gmt    = (Unixtime) 0;
+unixtime generation_gmt    = (unixtime) 0;
 
 const char * program_name  = (const char *) 0;
 
