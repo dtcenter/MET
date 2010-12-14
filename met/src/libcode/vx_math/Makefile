@@ -94,10 +94,10 @@ affine.o: affine.h affine.cc
 libvx_math.a: $(OBJECTS)
 	ar -rs libvx_math.a $(OBJECTS)
 	ranlib libvx_math.a
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   cp $(HEADERS) $(MET_INC_DIR)
-   rm -f $(MET_LIB_DIR)/libvx_math.a
-   cp libvx_math.a $(MET_LIB_DIR)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_math.a
+	cp libvx_math.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -112,9 +112,9 @@ libvx_math.a: $(OBJECTS)
 
 
 clean:
-   rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   rm -f $(MET_LIB_DIR)/libvx_math.a
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_math.a
 
 
 ########################################################################

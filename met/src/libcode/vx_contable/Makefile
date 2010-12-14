@@ -16,8 +16,8 @@
 EXECUTABLES = 
 
 OBJECTS     =  vx_contable.o       \
-	            vx_contable_stats.o \
-	            vx_nx2.o
+               vx_contable_stats.o \
+               vx_nx2.o
 
 LIBRARIES   =  libvx_contable.a
 
@@ -64,12 +64,12 @@ vx_nx2.o: vx_nx2.cc
 
 
 libvx_contable.a: $(OBJECTS)
-   ar -rs libvx_contable.a $(OBJECTS)
-   ranlib libvx_contable.a
-   cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-   cp $(HEADERS) $(MET_INC_DIR)
-   rm -f $(MET_LIB_DIR)/libvx_contable.a
-   cp libvx_contable.a $(MET_LIB_DIR)
+	ar -rs libvx_contable.a $(OBJECTS)
+	ranlib libvx_contable.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_contable.a
+	cp libvx_contable.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -78,7 +78,6 @@ libvx_contable.a: $(OBJECTS)
 	##
 	## executables
 	##
-
 
 
 ########################################################################
