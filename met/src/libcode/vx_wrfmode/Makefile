@@ -7,62 +7,74 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ########################################################################
-#
-# Makefile for the vx_wrfmode library
-#
+
+   ##
+   ## Makefile for the vx_wrfmode library
+   ##
+
 ########################################################################
 
-CXX         = /usr/bin/g++
-CXX_FLAGS   = -Wall -static -g
-SVNROOT     = ../../../..
-MET_LIB_DIR = $(SVNROOT)/trunk/met/lib
+
+EXECUTABLES = 
+
+
+OBJECTS     = WrfMode_Conf.o \
+              engine.o       \
+              interest.o     \
+              set.o          \
+
+
+LIBRARIES   = libvx_wrfmode.a
+
+
+GEN_SOURCES = WrfMode_Conf.h   \
+              WrfMode_Conf.cc  \
+
+
+########################################################################
+
+
+HEADERS = engine.h        \
+          interest.h      \
+          mode_columns.h  \
+          set.h           \
+          vx_wrfmode.h    \
+          WrfMode_Conf.h  \
+
 
 ###############################################################################
 
-TARGETS  = libvx_wrfmode.a
 
-OBJECTS  =  WrfMode_Conf.o \
-	engine.o \
-	interest.o \
-	set.o
-
-OPT_FLAGS=
-
-FAKES    = vx_wrfmode_all vx_wrfmode_lib clean
-
-LIB_DIR  = ..
-
-VX_ECONFIG_LIBNAME = vx_wrfmode
-VX_ECONFIG_CLASS = WrfMode
-VX_ECONFIG_EXAMPLE_PARM = WrfModeConfig_default
-VX_ECONFIG_IS_RAP_LIB = false
-VX_ECONFIG_HEADER_SUFFIX = h
-VX_ECONFIG_PANIC = true
-
-TARGET_FILE = ../libvx_wrfmode.a
-
-MODULE_TYPE=library
-
-#
-# vx_econfig macros and targets
-#
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
-
-vx_wrfmode_all:
-	@ echo
-	@ echo "*** Making vx_wrfmode Library ***"
-	@ echo
-	@ $(MAKE) vx_wrfmode_lib  $(PRINT_OPTS)
-	cp $(TARGETS) ../.
-
-vx_wrfmode_lib: libvx_wrfmode.a
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 
-libvx_wrfmode.a: $(OBJECTS)
-	ar -rs libvx_wrfmode.a $(OBJECTS)
-	ranlib libvx_wrfmode.a
 
-WrfMode_Conf.o: WrfMode_Conf.cc
+###############################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+
+WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
+	@ echo
+	@ rm -f WrfMode_Conf.h WrfMode_Conf.cc
+	$(ECONFIG_CODEGEN) -class WrfMode_Conf -outfile WrfMode_Conf $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
+
+
+###############################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+WrfMode_Conf.o: WrfMode_Conf.h WrfMode_Conf.cc
 	$(CXX) WrfMode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(LIB_DIR) $(NETCDF_INCS)
 
 engine.o: engine.cc
@@ -74,11 +86,42 @@ interest.o: interest.cc
 set.o: set.cc
 	$(CXX) set.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
 
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
+
+###############################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
+libvx_wrfmode.a: $(OBJECTS)
+	ar -rs libvx_wrfmode.a $(OBJECTS)
+	ranlib libvx_wrfmode.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_wrfmode.a
+	cp libvx_wrfmode.a $(MET_LIB_DIR)
+
+
+###############################################################################
+
+
+   ##
+   ##  executables
+   ##
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(TARGETS) ../$(TARGETS)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_wrfmode.a
 
-.PHONY: $(FAKES)
+
+###############################################################################
+
+
+.PHONY: all clean
+
+
+###############################################################################
 
 
