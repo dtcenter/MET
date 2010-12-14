@@ -5,6 +5,7 @@
 
 all:
 	@ cd vx_cal           ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_util          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_econfig       ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_math          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS)
@@ -23,7 +24,6 @@ all:
 	@ cd vx_ps            ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_pxm           ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_render        ; $(MAKE) $(PRINT_OPTS)
-	@ cd vx_util          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_wrfdata       ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_wrfmode       ; $(MAKE) $(PRINT_OPTS)
 
