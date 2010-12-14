@@ -65,21 +65,21 @@ F2C_INCS     =
 F2C_LIBS     =
 F2C_LIBNAME  =
 
-# Optional flags to disable the compilation of MET tools
-# Specify a non-zero value to disable the compilation of the tool
-DISABLE_PCP_COMBINE    = 0
-DISABLE_GEN_POLY_MASK  = 0
-DISABLE_MODE           = 0
-DISABLE_GRID_STAT      = 0
-DISABLE_PB2NC          = 0
-DISABLE_ASCII2NC       = 0
-DISABLE_POINT_STAT     = 0
-DISABLE_WAVELET_STAT   = 0
-DISABLE_ENSEMBLE_STAT  = 0
-DISABLE_STAT_ANALYSIS  = 0
-DISABLE_MODE_ANALYSIS  = 0
-DISABLE_PLOT_POINT_OBS = 0
-DISABLE_WWMCA          = 0
+# Optional flags to enable the compilation of MET tools
+# Specify a zero value to disable the compilation of the tool
+ENABLE_PCP_COMBINE    = 1
+ENABLE_GEN_POLY_MASK  = 1
+ENABLE_MODE           = 1
+ENABLE_GRID_STAT      = 1
+ENABLE_PB2NC          = 1
+ENABLE_ASCII2NC       = 1
+ENABLE_POINT_STAT     = 1
+ENABLE_WAVELET_STAT   = 1
+ENABLE_ENSEMBLE_STAT  = 1
+ENABLE_STAT_ANALYSIS  = 1
+ENABLE_MODE_ANALYSIS  = 1
+ENABLE_PLOT_POINT_OBS = 1
+ENABLE_WWMCA          = 1
 
 ###############################################################################
 

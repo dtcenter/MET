@@ -33,19 +33,19 @@ export F2C_LIBNAME
 
 ###############################################################################
 
-export DISABLE_PCP_COMBINE
-export DISABLE_GEN_POLY_MASK
-export DISABLE_MODE
-export DISABLE_GRID_STAT
-export DISABLE_PB2NC
-export DISABLE_ASCII2NC
-export DISABLE_POINT_STAT
-export DISABLE_WAVELET_STAT
-export DISABLE_ENSEMBLE_STAT
-export DISABLE_STAT_ANALYSIS
-export DISABLE_MODE_ANALYSIS
-export DISABLE_PLOT_POINT_OBS
-export DISABLE_WWMCA
+export ENABLE_PCP_COMBINE
+export ENABLE_GEN_POLY_MASK
+export ENABLE_MODE
+export ENABLE_GRID_STAT
+export ENABLE_PB2NC
+export ENABLE_ASCII2NC
+export ENABLE_POINT_STAT
+export ENABLE_WAVELET_STAT
+export ENABLE_ENSEMBLE_STAT
+export ENABLE_STAT_ANALYSIS
+export ENABLE_MODE_ANALYSIS
+export ENABLE_PLOT_POINT_OBS
+export ENABLE_WWMCA
 
 ###############################################################################
 
