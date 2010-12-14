@@ -18,6 +18,12 @@ OBJECTS   = afwa_file.o                 \
             nc_output.o                 \
 
 
+GEN_SOURCES = gridhemisphere_to_string.h   \
+              gridhemisphere_to_string.cc  \
+              wwmca_config.h               \
+              wwmca_config.cc              \
+
+
 ########################################################################
 
 
@@ -40,6 +46,30 @@ MAP_DATA_DIR    = $(MET_BASE)/data/map
 
 all: $(OBJECTS) $(TARGETS)
 	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+
+gridhemisphere_to_string.h gridhemisphere_to_string.cc: wwmca_ref.h
+	@ echo
+	@ rm -f gridhemisphere_to_string.h gridhemisphere_to_string.cc
+	$(ENUM_TO_STRING) wwmca_ref.h
+
+
+wwmca_config.h wwmca_config.cc: $(CONFIG_TEMPLATE_DIR)/wwmca_config_template
+	@ echo
+	@ rm -f wwmca_config.h wwmca_config.cc
+	$(ECONFIG_CODEGEN) wwmca_ref.h -class WwmcaConfig -outfile wwmca_config $(CONFIG_TEMPLATE_DIR)/wwmca_config_template
 
 
 ########################################################################
@@ -155,6 +185,7 @@ clean:
 	rm -f *.a *.o *.ps *.png *.ppm *.pgm temp junk core log a.out $(OBJECTS) $(TARGETS)
 	rm -f $(BIN_DIR)/wwmca_plot
 	rm -f $(BIN_DIR)/wwmca_regrid
+	rm -f $(GEN_SOURCES)
 
 
 ########################################################################
