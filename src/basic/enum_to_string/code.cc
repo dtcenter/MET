@@ -54,7 +54,7 @@ extern bool do_reverse;
 
 extern bool verbose;
 
-extern Unixtime generation_gmt;
+extern unixtime generation_gmt;
 
 extern const char * header_filename;
 
@@ -625,7 +625,7 @@ void warning(ofstream & f)
 
 int j;
 int month, day, year, hour, minute, second;
-Unixtime t;
+unixtime t;
 char junk[256];
 const char * ampm = "am";
 const char * zone = "MST";
