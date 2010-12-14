@@ -108,12 +108,12 @@ vx_uc_queue.o: vx_uc_queue.cc
 
 
 libvx_render.a: $(OBJECTS)
-     ar -rs libvx_render.a $(OBJECTS)
-     ranlib libvx_render.a
-     cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-     cp $(HEADERS) $(MET_INC_DIR)
-     rm -f $(MET_LIB_DIR)/libvx_render.a
-     cp libvx_render.a $(MET_LIB_DIR)
+	ar -rs libvx_render.a $(OBJECTS)
+	ranlib libvx_render.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_render.a
+	cp libvx_render.a $(MET_LIB_DIR)
 
 
 ########################################################################
