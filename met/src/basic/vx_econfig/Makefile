@@ -196,7 +196,6 @@ clean:
 	rm -f builtin_to_string.h builtin_to_string.cc
 	rm -f resulttype_to_string.h resulttype_to_string.cc
 	rm -f T.h T.hh T.cc T.o
-	cd test ; make $(PRINT_OPTION) clean
 	rm -f $(MET_BIN_DIR)/econfig_codegen
 
 
