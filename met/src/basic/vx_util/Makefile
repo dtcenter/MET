@@ -124,7 +124,7 @@ concat_string.o: concat_string.cc
 	$(CXX) concat_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 double_array.o: double_array.cc
-	$(CXX) double_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) double_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
 
 indent.o: indent.cc
 	$(CXX) indent.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
@@ -145,7 +145,7 @@ memory.o: memory.cc
 	$(CXX) memory.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 num_array.o: num_array.cc
-	$(CXX) num_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) num_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
 
 ordinal.o: ordinal.cc
 	$(CXX) ordinal.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
@@ -166,7 +166,7 @@ temp_file.o: temp_file.cc
 	$(CXX) temp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 thresh_array.o: thresh_array.cc
-	$(CXX) thresh_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) thresh_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
 
 threshold.o: threshold.cc
 	$(CXX) threshold.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
