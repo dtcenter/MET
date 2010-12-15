@@ -38,6 +38,16 @@ OBJECTS     = algline.o               \
 LIBRARIES   = libvx_econfig.a
 
 
+GEN_SOURCES = builtin_to_string.h      \
+              builtin_to_string.cc     \
+              celltype_to_string.h     \
+              celltype_to_string.cc    \
+              resulttype_to_string.h   \
+              resulttype_to_string.cc  \
+              stetype_to_string.h      \
+              stetype_to_string.cc     \
+
+
 ########################################################################
 
 
@@ -65,6 +75,32 @@ HEADERS     = algline.h               \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
+
+
+########################################################################
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+builtin_to_string.h builtin_to_string.cc: builtin.h
+	@ rm -f builtin_to_string.h builtin_to_string.cc
+	$(ENUM_TO_STRING) builtin.h
+
+
+celltype_to_string.h celltype_to_string.cc: icode.h
+	@ rm -f celltype_to_string.h celltype_to_string.cc
+	$(ENUM_TO_STRING) icode.h
+
+
+resulttype_to_string.h resulttype_to_string.cc: result.h
+	@ rm -f resulttype_to_string.h resulttype_to_string.cc
+	$(ENUM_TO_STRING) result.h
+
+
+stetype_to_string.h stetype_to_string.cc: symtab.h
+	@ rm -f stetype_to_string.h stetype_to_string.cc
+	$(ENUM_TO_STRING) symtab.h
 
 
 ########################################################################
@@ -158,6 +194,7 @@ clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_econfig.a
+	rm -f $(GEN_SOURCES)
 
 
 ########################################################################
