@@ -127,7 +127,7 @@ void get_grib_code_list_str(int k, int grib_code, int ptv, char *str) {
    //
    // Check if we have a match
    //
-   if(match > 0) {
+   if(match >= 0) {
 
       switch(k) {
          case(0): // GRIB Code Name
