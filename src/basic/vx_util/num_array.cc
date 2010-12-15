@@ -21,6 +21,7 @@ using namespace std;
 
 
 #include "num_array.h"
+#include "indent.h"
 
 #include "is_bad_data.h"
 #include "ptile.h"
