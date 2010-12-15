@@ -36,41 +36,34 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 info.o: info.h info.cc
-	@ echo
 	$(CXX) info.cc     -c $(FLAGS)
 
 
 scope.o: scope.h scope.cc info.o
-	@ echo
 	$(CXX) scope.cc    -c $(FLAGS)
 
 
 code.o: code.h code.cc info.o
-	@ echo
 	$(CXX) code.cc     -c $(FLAGS) -I$(MET_INC_DIR)
 
 
 enum.tab.c: enum.y info.o code.o scope.o
-	@ echo
 	$(YACC) enum.y
 
 
 enum.tab.o: enum.tab.c
-	@ echo
 	$(CXX) enum.tab.c  -c $(FLAGS)
 
 
 lex.yy.c: enum.l enum.tab.o code.o scope.o
-	@ echo
 	$(LEX) enum.l
-	rm -f temp
-	mv lex.yy.c temp
-	sed "s/static void yyunput/void yy_ets_unput/" temp > lex.yy.c
-	rm -f temp
+	@ rm -f temp
+	@ mv lex.yy.c temp
+	@ sed "s/static void yyunput/void yy_ets_unput/" temp > lex.yy.c
+	@ rm -f temp
 
 
 lex.yy.o: lex.yy.c
-	@ echo
 	$(CXX) lex.yy.c    -c $(FLAGS)
 
 
