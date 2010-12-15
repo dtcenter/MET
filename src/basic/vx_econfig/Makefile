@@ -48,12 +48,18 @@ HEADERS      = algline.h               \
                icodecell_to_result.h   \
 
 
+GEN_SOURCES = celltype_to_string.h celltype_to_string.cc      \
+              stetype_to_string.h stetype_to_string.cc        \
+              builtin_to_string.h builtin_to_string.cc        \
+              resulttype_to_string.h resulttype_to_string.cc  \
+
+
 ########################################################################
 
 
-YACC             = bison -d -t -v -p econfig
+YACC        = bison -d -t -v -p econfig
 
-LEX              = flex --prefix=econfig
+LEX         = flex --prefix=econfig
 
 
 ########################################################################
@@ -66,27 +72,40 @@ all: $(OBJECTS) $(LIBRARIES) econfig_codegen
 ########################################################################
 
 
-   ##
-   ##  objects
-   ##
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
 
 celltype_to_string.h celltype_to_string.cc: icode.h
 	@ rm -f celltype_to_string.h celltype_to_string.cc
 	$(ENUM_TO_STRING) icode.h
 
-celltype_to_string.o: celltype_to_string.h celltype_to_string.cc
-	$(CXX) celltype_to_string.cc   -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
 stetype_to_string.h stetype_to_string.cc: symtab.h
 	@ rm -f stetype_to_string.h stetype_to_string.cc
 	$(ENUM_TO_STRING) symtab.h
 
-stetype_to_string.o: stetype_to_string.h stetype_to_string.cc
-	$(CXX) stetype_to_string.cc    -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
 builtin_to_string.h builtin_to_string.cc: builtin.h
 	@ rm -f builtin_to_string.h builtin_to_string.cc
 	$(ENUM_TO_STRING) builtin.h
+
+resulttype_to_string.h resulttype_to_string.cc: result.h
+	@ rm -f resulttype_to_string.h resulttype_to_string.cc
+	$(ENUM_TO_STRING) result.h
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+celltype_to_string.o: celltype_to_string.h celltype_to_string.cc
+	$(CXX) celltype_to_string.cc   -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+
+stetype_to_string.o: stetype_to_string.h stetype_to_string.cc
+	$(CXX) stetype_to_string.cc    -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 builtin_to_string.o: builtin_to_string.h builtin_to_string.cc
 	$(CXX) builtin_to_string.cc    -c $(CXX_FLAGS)
@@ -131,10 +150,6 @@ lex.econfig.c: econfig.l econfig.tab.o scanner_stuff.h icode.o symtab.o machine.
 
 lex.econfig.o: lex.econfig.c
 	$(CXX) lex.econfig.c           -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
-resulttype_to_string.h resulttype_to_string.cc: result.h
-	@ rm -f resulttype_to_string.h resulttype_to_string.cc
-	$(ENUM_TO_STRING) result.h
 
 resulttype_to_string.o: resulttype_to_string.h resulttype_to_string.cc
 	$(CXX) resulttype_to_string.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
@@ -186,14 +201,8 @@ clean:
 	@ echo
 	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	rm -f econfig.output econfig.tab.c econfig.tab.h
-	rm -f econfig_codegen
 	rm -f lex.econfig.c
-	rm -f temp1 temp2
-	rm -f celltype_to_string.h celltype_to_string.cc
-	rm -f stetype_to_string.h stetype_to_string.cc
-	rm -f builtin_to_string.h builtin_to_string.cc
-	rm -f resulttype_to_string.h resulttype_to_string.cc
-	rm -f T.h T.hh T.cc T.o
+	rm -f $(GEN_SOURCES)
 	rm -f $(MET_BIN_DIR)/econfig_codegen
 	rm -f $(MET_LIB_DIR)/libeconfig.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
