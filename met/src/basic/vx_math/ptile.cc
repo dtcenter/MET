@@ -20,6 +20,8 @@ using namespace std;
 
 
 #include "ptile.h"
+#include "is_bad_data.h"
+
 #include "nint.h"
 
 
