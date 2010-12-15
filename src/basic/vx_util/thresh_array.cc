@@ -15,7 +15,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util.h"
+#include "thresh_array.h"
 
 ////////////////////////////////////////////////////////////////////////
 

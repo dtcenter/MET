@@ -45,6 +45,10 @@ OBJECTS     =  ascii_table.o \
 LIBRARIES   =  libvx_util.a
 
 
+GEN_SOURCES = asciitablejust_to_string.h   \
+              asciitablejust_to_string.cc  \
+
+
 ########################################################################
 
 
@@ -83,6 +87,19 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished making vx_util Library ***"
 	@ echo
+
+
+########################################################################
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+
+asciitablejust_to_string.h asciitablejust_to_string.cc: ascii_table.h
+	@ echo
+	@ rm -f asciitablejust_to_string.h asciitablejust_to_string.cc
+	$(ENUM_TO_STRING) ascii_table.h
 
 
 ########################################################################
@@ -196,6 +213,7 @@ clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_util.a
+	rm -f asciitablejust_to_string.h asciitablejust_to_string.cc
 
 
 ########################################################################
