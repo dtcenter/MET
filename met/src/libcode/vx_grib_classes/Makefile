@@ -48,10 +48,10 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 grib_classes.o: grib_classes.cc
-	$(CXX) grib_classes.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) grib_classes.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 grib_strings.o: grib_strings.cc
-	$(CXX) grib_strings.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) grib_strings.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

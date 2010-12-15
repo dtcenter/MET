@@ -58,28 +58,28 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 get_pinterp_grid.o: get_pinterp_grid.cc
-	$(CXX) get_pinterp_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) get_pinterp_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 is_met_nc_file.o: is_met_nc_file.cc
-	$(CXX) is_met_nc_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) is_met_nc_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 is_netcdf_file.o: is_netcdf_file.cc
-	$(CXX) is_netcdf_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) is_netcdf_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 is_pinterp_file.o: is_pinterp_file.cc
-	$(CXX) is_pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) is_pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 met_file.o: met_file.cc
-	$(CXX) met_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) met_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 pinterp_file.o: pinterp_file.cc
-	$(CXX) pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 var_info.o: var_info.cc
-	$(CXX) var_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) var_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_gdata_util.o: vx_gdata_util.cc
-	$(CXX) vx_gdata_util.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_gdata_util.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

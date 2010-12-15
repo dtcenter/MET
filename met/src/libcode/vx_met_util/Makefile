@@ -71,46 +71,46 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 apply_mask.o: apply_mask.cc
-	$(CXX) apply_mask.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) apply_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 compute_ci.o: compute_ci.cc
-	$(CXX) compute_ci.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) compute_ci.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 conversions.o: conversions.cc
-	$(CXX) conversions.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) conversions.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 file_type.o: file_type.cc
-	$(CXX) file_type.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) file_type.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 grid_output.o: grid_output.cc
-	$(CXX) grid_output.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) grid_output.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 met_stats.o: met_stats.cc
-	$(CXX) met_stats.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) met_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 pair_data.o: pair_data.cc
-	$(CXX) pair_data.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) pair_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 read_grib.o: read_grib.cc
-	$(CXX) read_grib.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 read_gridded_data.o: read_gridded_data.cc
-	$(CXX) read_gridded_data.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) read_gridded_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 read_netcdf.o: read_netcdf.cc
-	$(CXX) read_netcdf.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 stat_columns.o: stat_columns.cc
-	$(CXX) stat_columns.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) stat_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 stat_hdr_columns.o: stat_hdr_columns.cc
-	$(CXX) stat_hdr_columns.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) stat_hdr_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 two_to_one.o: two_to_one.cc
-	$(CXX) two_to_one.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) two_to_one.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 write_netcdf.o: write_netcdf.cc
-	$(CXX) write_netcdf.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
