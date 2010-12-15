@@ -19,7 +19,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_math.h"
+#include "is_bad_data.h"
+#include "ptile.h"
 
 #include "double_array.h"
 #include "indent.h"
