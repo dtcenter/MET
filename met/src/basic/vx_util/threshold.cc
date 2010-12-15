@@ -18,7 +18,8 @@ using namespace std;
 #include <cmath>
 
 #include "threshold.h"
-#include "vx_math.h"
+#include "is_bad_data.h"
+#include "constants.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
