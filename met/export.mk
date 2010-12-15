@@ -50,13 +50,10 @@ export ENABLE_WWMCA
 ###############################################################################
 
 export MET_BASE_DIR
-
 export MET_LIB_DIR
-
 export MET_INC_DIR
-
 export MET_SRC_DIR
-
+export MET_BIN_DIR
 export MET_OUTPUT_DIR
 
 ###############################################################################

@@ -157,10 +157,8 @@ gen.o: gen.h gen.cc machine.o result.o
 
 
 libeconfig.a: $(OBJECTS)
-	@ echo
-	$(ARCHIVE) libeconfig.a $(OBJECTS)
+	ar -rs libeconfig.a $(OBJECTS)
 	ranlib libeconfig.a
-	@
 	rm -f $(MET_LIB_DIR)/libeconfig.a
 	cp libeconfig.a $(MET_LIB_DIR)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
@@ -176,9 +174,9 @@ libeconfig.a: $(OBJECTS)
 
 econfig_codegen: econfig_codegen.cc libeconfig.a
 	@ echo
-	$(CXX) econfig_codegen.cc -o econfig_codegen $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -leconfig -lcal -lmisc -lm
-	@ rm -f $(MET_BIN_DIR)/econfig_codegen
-	@ cp econfig_codegen $(MET_BIN_DIR)
+	$(CXX) econfig_codegen.cc -o econfig_codegen $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -leconfig -lvx_cal -lvx_util -lm
+	rm -f $(MET_BIN_DIR)/econfig_codegen
+	cp econfig_codegen $(MET_BIN_DIR)
 
 
 ########################################################################
@@ -197,6 +195,8 @@ clean:
 	rm -f resulttype_to_string.h resulttype_to_string.cc
 	rm -f T.h T.hh T.cc T.o
 	rm -f $(MET_BIN_DIR)/econfig_codegen
+	rm -f $(MET_LIB_DIR)/libeconfig.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 
 
 ########################################################################
