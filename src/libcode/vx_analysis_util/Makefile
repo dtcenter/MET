@@ -16,17 +16,17 @@
 EXECUTABLES =
 
 
-OBJECTS     = analysis_utils.cc         \
-              box.cc                    \
-              by_case_info.cc           \
-              data_line.cc              \
-              mask_poly.cc              \
-              mode_atts.cc              \
-              mode_job.cc               \
-              mode_line.cc              \
-              stat_job.cc               \
-              stat_line.cc              \
-              time_series.cc
+OBJECTS     = analysis_utils.o         \
+              box.o                    \
+              by_case_info.o           \
+              data_line.o              \
+              mask_poly.o              \
+              mode_atts.o              \
+              mode_job.o               \
+              mode_line.o              \
+              stat_job.o               \
+              stat_line.o              \
+              time_series.o            \
 
 
 LIBRARIES   = libvx_analysis_util.a
