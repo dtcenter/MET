@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "string_array.h"
+#include "indent.h"
 
 
 ////////////////////////////////////////////////////////////////////////
