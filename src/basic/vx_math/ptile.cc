@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 
+#include "ptile.h"
 #include "nint.h"
 
 
