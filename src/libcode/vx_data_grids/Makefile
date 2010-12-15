@@ -57,22 +57,22 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 find_grid_by_name.o: find_grid_by_name.cc
-	$(CXX) find_grid_by_name.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) find_grid_by_name.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 grid_base.o: grid_base.cc
-	$(CXX) grid_base.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) grid_base.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 latlon_grid.o: latlon_grid.cc
-	$(CXX) latlon_grid.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) latlon_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 lc_grid.o: lc_grid.cc
-	$(CXX) lc_grid.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) lc_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 merc_grid.o: merc_grid.cc
-	$(CXX) merc_grid.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) merc_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 st_grid.o: st_grid.cc
-	$(CXX) st_grid.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) st_grid.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 
 ########################################################################
