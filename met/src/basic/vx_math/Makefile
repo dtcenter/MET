@@ -28,6 +28,10 @@ OBJECTS     =  hist.o \
 LIBRARIES   = libvx_math.a
 
 
+GEN_SOURCES = viewgravity_to_string.cc  \
+              viewgravity_to_string.h   \
+
+
 ########################################################################
 
 
@@ -51,6 +55,18 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished making vx_math Library ***"
 	@ echo
+
+
+########################################################################
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+viewgravity_to_string.cc viewgravity_to_string.h: affine.h
+	@ echo
+	@ rm -f viewgravity_to_string.cc viewgravity_to_string.h
+	$(ENUM_TO_STRING) affine.h
 
 
 ########################################################################
@@ -115,6 +131,7 @@ clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_math.a
+	rm -f viewgravity_to_string.cc viewgravity_to_string.h
 
 
 ########################################################################

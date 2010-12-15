@@ -77,7 +77,7 @@ HEADERS     =  ascii_table.h \
            	vx_endian.h \
            	fix_float.h \
            	command_line.h \
-               vx_util.h
+               vx_util.h \
 
  
 ########################################################################
