@@ -75,52 +75,52 @@ celltype_to_string.h celltype_to_string.cc: icode.h
 	$(ENUM_TO_STRING) icode.h
 
 celltype_to_string.o: celltype_to_string.h celltype_to_string.cc
-	$(COMPILER) celltype_to_string.cc   -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) celltype_to_string.cc   -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 stetype_to_string.h stetype_to_string.cc: symtab.h
 	@ rm -f stetype_to_string.h stetype_to_string.cc
 	$(ENUM_TO_STRING) symtab.h
 
 stetype_to_string.o: stetype_to_string.h stetype_to_string.cc
-	$(COMPILER) stetype_to_string.cc    -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) stetype_to_string.cc    -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 builtin_to_string.h builtin_to_string.cc: builtin.h
 	@ rm -f builtin_to_string.h builtin_to_string.cc
 	$(ENUM_TO_STRING) builtin.h
 
 builtin_to_string.o: builtin_to_string.h builtin_to_string.cc
-	$(COMPILER) builtin_to_string.cc    -c $(FLAGS)
+	$(CXX) builtin_to_string.cc    -c $(CXX_FLAGS)
 
 idstack.o: idstack.h idstack.cc
-	$(COMPILER) idstack.cc              -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) idstack.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 icode.o: icode.h icode.cc scanner_stuff.h celltype_to_string.o pwl.o builtin.o
-	$(COMPILER) icode.cc                -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) icode.cc                -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 symtab.o: symtab.h symtab.cc scanner_stuff.h stetype_to_string.o celltype_to_string.o pwl.o algline.o builtin.o array.o
-	$(COMPILER) symtab.cc               -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) symtab.cc               -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 array.o: array.h array.cc icode.o
-	$(COMPILER) array.cc                -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) array.cc                -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 builtin.o: builtin.h builtin.cc
-	$(COMPILER) builtin.cc              -c $(FLAGS)
+	$(CXX) builtin.cc              -c $(CXX_FLAGS)
 
 pwl.o: pwl.h pwl.cc
-	$(COMPILER) pwl.cc                  -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) pwl.cc                  -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 algline.o: algline.h algline.cc
-	$(COMPILER) algline.cc              -c $(FLAGS)
+	$(CXX) algline.cc              -c $(CXX_FLAGS)
 
 machine.o: machine.h machine.cc symtab.o icode.o scanner_stuff.h celltype_to_string.o stetype_to_string.o builtin_to_string.o builtin.o
-	$(COMPILER) machine.cc              -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) machine.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 econfig.tab.c: econfig.y scanner_stuff.h icode.o symtab.o machine.o idstack.o builtin.o celltype_to_string.o
 	$(YACC) econfig.y
 
 econfig.tab.o: econfig.tab.c
 	@ echo
-	$(COMPILER) econfig.tab.c           -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) econfig.tab.c           -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 lex.econfig.c: econfig.l econfig.tab.o scanner_stuff.h icode.o symtab.o machine.o
 	$(LEX) econfig.l
@@ -130,23 +130,23 @@ lex.econfig.c: econfig.l econfig.tab.o scanner_stuff.h icode.o symtab.o machine.
 	rm -f temp
 
 lex.econfig.o: lex.econfig.c
-	$(COMPILER) lex.econfig.c           -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) lex.econfig.c           -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 resulttype_to_string.h resulttype_to_string.cc: result.h
 	@ rm -f resulttype_to_string.h resulttype_to_string.cc
 	$(ENUM_TO_STRING) result.h
 
 resulttype_to_string.o: resulttype_to_string.h resulttype_to_string.cc
-	$(COMPILER) resulttype_to_string.cc -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) resulttype_to_string.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 result.o: result.h result.cc
-	$(COMPILER) result.cc               -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) result.cc               -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 icodecell_to_result.o: icodecell_to_result.h icodecell_to_result.cc icode.o result.o celltype_to_string.o resulttype_to_string.o
-	$(COMPILER) icodecell_to_result.cc  -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) icodecell_to_result.cc  -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 gen.o: gen.h gen.cc machine.o result.o
-	$(COMPILER) gen.cc                  -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) gen.cc                  -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 ########################################################################
 
@@ -176,9 +176,9 @@ libeconfig.a: $(OBJECTS)
 
 econfig_codegen: econfig_codegen.cc libeconfig.a
 	@ echo
-	$(COMPILER) econfig_codegen.cc -o econfig_codegen $(FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -leconfig -lcal -lmisc -lm
-	@ rm -f $(BIN_DIR)/econfig_codegen
-	@ cp econfig_codegen $(BIN_DIR)
+	$(CXX) econfig_codegen.cc -o econfig_codegen $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -leconfig -lcal -lmisc -lm
+	@ rm -f $(MET_BIN_DIR)/econfig_codegen
+	@ cp econfig_codegen $(MET_BIN_DIR)
 
 
 ########################################################################
@@ -197,7 +197,7 @@ clean:
 	rm -f resulttype_to_string.h resulttype_to_string.cc
 	rm -f T.h T.hh T.cc T.o
 	cd test ; make $(PRINT_OPTION) clean
-	rm -f $(BIN_DIR)/econfig_codegen
+	rm -f $(MET_BIN_DIR)/econfig_codegen
 
 
 ########################################################################
