@@ -78,7 +78,7 @@ viewgravity_to_string.cc viewgravity_to_string.h: affine.h
 
 
 hist.o: hist.cc
-	$(CXX) hist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) hist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 nint.o: nint.cc
 	$(CXX) nint.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
@@ -96,7 +96,7 @@ viewgravity_to_string.o: viewgravity_to_string.h viewgravity_to_string.cc
 	$(CXX) viewgravity_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 affine.o: affine.h affine.cc
-	$(CXX) affine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) affine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
