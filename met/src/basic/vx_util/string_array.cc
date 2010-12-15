@@ -20,7 +20,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util.h"
+#include "string_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////

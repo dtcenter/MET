@@ -20,7 +20,7 @@ using namespace std;
 #include <cmath>
 
 
-#include "vx_util.h"
+#include "num_array.h"
 #include "vx_math.h"
 
 
