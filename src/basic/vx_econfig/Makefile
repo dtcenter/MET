@@ -1,0 +1,207 @@
+
+
+########################################################################
+
+
+EXECUTABLES  = econfig_codegen
+
+
+LIBRARIES    = libeconfig.a
+
+
+
+OBJECTS      = pwl.o                   \
+               algline.o               \
+               icode.o                 \
+               idstack.o               \
+               symtab.o                \
+               builtin.o               \
+               machine.o               \
+               array.o                 \
+               celltype_to_string.o    \
+               stetype_to_string.o     \
+               builtin_to_string.o     \
+               econfig.tab.o           \
+               lex.econfig.o           \
+               resulttype_to_string.o  \
+               result.o                \
+               icodecell_to_result.o   \
+               gen.o                   \
+
+
+
+HEADERS      = algline.h               \
+               array.h                 \
+               builtin.h               \
+               icode.h                 \
+               idstack.h               \
+               machine.h               \
+               pwl.h                   \
+               scanner_stuff.h         \
+               symtab.h                \
+               result.h                \
+               resulttype_to_string.h  \
+               builtin_to_string.h     \
+               celltype_to_string.h    \
+               stetype_to_string.h     \
+               gen.h                   \
+               icodecell_to_result.h   \
+
+
+########################################################################
+
+
+YACC             = bison -d -t -v -p econfig
+
+LEX              = flex --prefix=econfig
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) econfig_codegen
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+celltype_to_string.h celltype_to_string.cc: icode.h
+	@ rm -f celltype_to_string.h celltype_to_string.cc
+	$(ENUM_TO_STRING) icode.h
+
+celltype_to_string.o: celltype_to_string.h celltype_to_string.cc
+	$(COMPILER) celltype_to_string.cc   -c $(FLAGS) -I$(MET_INC_DIR)
+
+stetype_to_string.h stetype_to_string.cc: symtab.h
+	@ rm -f stetype_to_string.h stetype_to_string.cc
+	$(ENUM_TO_STRING) symtab.h
+
+stetype_to_string.o: stetype_to_string.h stetype_to_string.cc
+	$(COMPILER) stetype_to_string.cc    -c $(FLAGS) -I$(MET_INC_DIR)
+
+builtin_to_string.h builtin_to_string.cc: builtin.h
+	@ rm -f builtin_to_string.h builtin_to_string.cc
+	$(ENUM_TO_STRING) builtin.h
+
+builtin_to_string.o: builtin_to_string.h builtin_to_string.cc
+	$(COMPILER) builtin_to_string.cc    -c $(FLAGS)
+
+idstack.o: idstack.h idstack.cc
+	$(COMPILER) idstack.cc              -c $(FLAGS) -I$(MET_INC_DIR)
+
+icode.o: icode.h icode.cc scanner_stuff.h celltype_to_string.o pwl.o builtin.o
+	$(COMPILER) icode.cc                -c $(FLAGS) -I$(MET_INC_DIR)
+
+symtab.o: symtab.h symtab.cc scanner_stuff.h stetype_to_string.o celltype_to_string.o pwl.o algline.o builtin.o array.o
+	$(COMPILER) symtab.cc               -c $(FLAGS) -I$(MET_INC_DIR)
+
+array.o: array.h array.cc icode.o
+	$(COMPILER) array.cc                -c $(FLAGS) -I$(MET_INC_DIR)
+
+builtin.o: builtin.h builtin.cc
+	$(COMPILER) builtin.cc              -c $(FLAGS)
+
+pwl.o: pwl.h pwl.cc
+	$(COMPILER) pwl.cc                  -c $(FLAGS) -I$(MET_INC_DIR)
+
+algline.o: algline.h algline.cc
+	$(COMPILER) algline.cc              -c $(FLAGS)
+
+machine.o: machine.h machine.cc symtab.o icode.o scanner_stuff.h celltype_to_string.o stetype_to_string.o builtin_to_string.o builtin.o
+	$(COMPILER) machine.cc              -c $(FLAGS) -I$(MET_INC_DIR)
+
+econfig.tab.c: econfig.y scanner_stuff.h icode.o symtab.o machine.o idstack.o builtin.o celltype_to_string.o
+	$(YACC) econfig.y
+
+econfig.tab.o: econfig.tab.c
+	@ echo
+	$(COMPILER) econfig.tab.c           -c $(FLAGS) -I$(MET_INC_DIR)
+
+lex.econfig.c: econfig.l econfig.tab.o scanner_stuff.h icode.o symtab.o machine.o
+	$(LEX) econfig.l
+	rm -f temp
+	mv lex.econfig.c temp
+	sed "s/static void yyunput/void yy_econfig_unput/" temp > lex.econfig.c
+	rm -f temp
+
+lex.econfig.o: lex.econfig.c
+	$(COMPILER) lex.econfig.c           -c $(FLAGS) -I$(MET_INC_DIR)
+
+resulttype_to_string.h resulttype_to_string.cc: result.h
+	@ rm -f resulttype_to_string.h resulttype_to_string.cc
+	$(ENUM_TO_STRING) result.h
+
+resulttype_to_string.o: resulttype_to_string.h resulttype_to_string.cc
+	$(COMPILER) resulttype_to_string.cc -c $(FLAGS) -I$(MET_INC_DIR)
+
+result.o: result.h result.cc
+	$(COMPILER) result.cc               -c $(FLAGS) -I$(MET_INC_DIR)
+
+icodecell_to_result.o: icodecell_to_result.h icodecell_to_result.cc icode.o result.o celltype_to_string.o resulttype_to_string.o
+	$(COMPILER) icodecell_to_result.cc  -c $(FLAGS) -I$(MET_INC_DIR)
+
+gen.o: gen.h gen.cc machine.o result.o
+	$(COMPILER) gen.cc                  -c $(FLAGS) -I$(MET_INC_DIR)
+
+########################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
+
+libeconfig.a: $(OBJECTS)
+	@ echo
+	$(ARCHIVE) libeconfig.a $(OBJECTS)
+	ranlib libeconfig.a
+	@
+	rm -f $(MET_LIB_DIR)/libeconfig.a
+	cp libeconfig.a $(MET_LIB_DIR)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+
+
+########################################################################
+
+
+   ##
+   ##  executables
+   ##
+
+econfig_codegen: econfig_codegen.cc libeconfig.a
+	@ echo
+	$(COMPILER) econfig_codegen.cc -o econfig_codegen $(FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -leconfig -lcal -lmisc -lm
+	@ rm -f $(BIN_DIR)/econfig_codegen
+	@ cp econfig_codegen $(BIN_DIR)
+
+
+########################################################################
+
+
+clean:
+	@ echo
+	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f econfig.output econfig.tab.c econfig.tab.h
+	rm -f econfig_codegen
+	rm -f lex.econfig.c
+	rm -f temp1 temp2
+	rm -f celltype_to_string.h celltype_to_string.cc
+	rm -f stetype_to_string.h stetype_to_string.cc
+	rm -f builtin_to_string.h builtin_to_string.cc
+	rm -f resulttype_to_string.h resulttype_to_string.cc
+	rm -f T.h T.hh T.cc T.o
+	cd test ; make $(PRINT_OPTION) clean
+	rm -f $(BIN_DIR)/econfig_codegen
+
+
+########################################################################
+
+
+
+
