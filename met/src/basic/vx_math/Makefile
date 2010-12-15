@@ -95,7 +95,7 @@ pwl_interpolate.o: pwl_interpolate.cc
 viewgravity_to_string.o: viewgravity_to_string.h viewgravity_to_string.cc
 	$(CXX) viewgravity_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
-affine.o: affine.h affine.cc
+affine.o: affine.h affine.cc viewgravity_to_string.cc viewgravity_to_string.h
 	$(CXX) affine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
