@@ -42,10 +42,10 @@ using namespace std;
 
 #include "netcdf.hh"
 
-#include "vx_analysis_util/vx_analysis_util.h"
-#include "vx_met_util/vx_met_util.h"
-#include "vx_cal/vx_cal.h"
-#include "vx_math/vx_math.h"
+#include "vx_analysis_util.h"
+#include "vx_met_util.h"
+#include "vx_cal.h"
+#include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
 
