@@ -24,6 +24,7 @@ using namespace std;
 #include <cmath>
 
 #include "long_array.h"
+#include "indent.h"
 
 
 ////////////////////////////////////////////////////////////////////////
