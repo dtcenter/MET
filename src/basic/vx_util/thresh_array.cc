@@ -17,6 +17,7 @@ using namespace std;
 
 #include "thresh_array.h"
 #include "indent.h"
+#include "concat_string.h"
 
 ////////////////////////////////////////////////////////////////////////
 
