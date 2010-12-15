@@ -54,22 +54,22 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 filterbox.o: filterbox.cc
-	$(CXX) filterbox.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) filterbox.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 interpmthd.o: interpmthd.cc
-	$(CXX) interpmthd.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) interpmthd.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 moments.o: moments.cc
-	$(CXX) moments.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) moments.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 node.o: node.cc
-	$(CXX) node.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) node.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 polyline.o: polyline.cc
-	$(CXX) polyline.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) polyline.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 vx_wrfdata.o: vx_wrfdata.cc
-	$(CXX) vx_wrfdata.o $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_wrfdata.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 
 ########################################################################
