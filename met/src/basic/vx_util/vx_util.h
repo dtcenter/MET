@@ -42,6 +42,7 @@
 #include "memory.h"
 #include "fix_float.h"
 #include "command_line.h"
+#include "file_exists.h"
 
 
 ////////////////////////////////////////////////////////////////////////

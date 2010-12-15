@@ -18,10 +18,7 @@ using namespace std;
 #include <unistd.h>
 
 #include "temp_file.h"
-
-////////////////////////////////////////////////////////////////////////
-
-static bool temp_file_exists(const char *);
+#include "file_exists.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +56,7 @@ ConcatString make_temp_file_name(const char *prefix, const char *suffix) {
       s << pid << '_' << i;
       if(suffix) s << '_' << suffix;
 
-   } while(temp_file_exists(s));
+   } while(file_exists(s));
 
    return(s);
 }
@@ -85,14 +82,3 @@ void remove_temp_file(const char *file_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool temp_file_exists(const char *path) {
-   int status;
-
-   status = access(path, F_OK);
-
-   if(status == 0) return(true);
-
-   return(false);
-}
-
-////////////////////////////////////////////////////////////////////////
