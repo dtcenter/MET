@@ -16,6 +16,7 @@ using namespace std;
 #include <cmath>
 
 #include "thresh_array.h"
+#include "indent.h"
 
 ////////////////////////////////////////////////////////////////////////
 
