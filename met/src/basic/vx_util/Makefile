@@ -169,7 +169,7 @@ thresh_array.o: thresh_array.cc
 	$(CXX) thresh_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
 
 threshold.o: threshold.cc
-	$(CXX) threshold.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) threshold.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
 
 vx_endian.o: vx_endian.cc
 	$(CXX) vx_endian.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c
