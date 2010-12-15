@@ -3,7 +3,7 @@
 ###############################################################################
 
    ##
-   ## Begin Variables to be modified before building
+   ##  Begin Variables to be modified before building
    ##
 
 ###############################################################################
@@ -12,36 +12,37 @@
 MAKE         = /usr/bin/make
 
 # Architecture flags
-ARCH_FLAGS   = -DBLOCK4
+ARCH_FLAGS   = # -DBLOCK4
 
 # Path to the C++ Compiler
 # C++ compiler flags
 # Any additional required libraries
-CXX          = /set/this/path/to/g++
+CXX          = /usr/bin/g++
 CXX_FLAGS    = -Wall -Wshadow -static # -g -m32
 CXX_LIBS     =
 
 # Path to the Fortran Compiler
 # Fortran compiler flags
 # Any additional required libraries
-FC           = /set/this/path/to/gfortran
+FC           = /usr/bin/gfortran
 FC_FLAGS     = -Wall -Wshadow -static -ff2c # -g -m32
 FC_LIBS      = -lgfortran
 
 # Make print options
-PRINT_OPTS   = --no-print-directory
+#PRINT_OPTS   = --no-print-directory
+PRINT_OPTS   =
 
 # Top level directory for the NetCDF library
 # NetCDF include directory specified as: -I/your/include/path
 # NetCDF library directory specified as: -L/your/library/path
-NETCDF_BASE  = /set/this/path/to/netcdf
+NETCDF_BASE  = /usr/local/netcdf-3.6.3/gcc-4.3.1/
 NETCDF_INCS  = -I$(NETCDF_BASE)/include
 NETCDF_LIBS  = -L$(NETCDF_BASE)/lib
 
 # Top level directory for BUFRLIB
 # BUFRLIB include directory specified as: -I/your/include/path
 # BUFRLIB library directory specified as: -L/your/library/path
-BUFR_BASE    = /set/this/path/to/bufrlib
+BUFR_BASE    = ../bufrlib/bufrlib
 BUFR_INCS    = -I$(BUFR_BASE)
 BUFR_LIBS    = -L$(BUFR_BASE)
 
@@ -49,7 +50,7 @@ BUFR_LIBS    = -L$(BUFR_BASE)
 # installed in a standard location.
 # GSL include directory specified as: -I/your/include/path
 # GSL library directory specified as: -L/your/library/path
-GSL_BASE     = /set/this/path/to/gsl
+GSL_BASE     = /d1/bullock/kd2/bullock/otherlibs/gsl/gsl-1.12
 GSL_INCS     = -I$(GSL_BASE)/include
 GSL_LIBS     = -L$(GSL_BASE)/lib
 
@@ -65,8 +66,8 @@ F2C_INCS     =
 F2C_LIBS     =
 F2C_LIBNAME  =
 
-# Optional flags to enable the compilation of MET tools
-# Specify a zero value to disable the compilation of the tool
+# Optional flags to disable the compilation of MET tools
+# Specify a non-zero value to disable the compilation of the tool
 ENABLE_PCP_COMBINE    = 0
 ENABLE_GEN_POLY_MASK  = 0
 ENABLE_MODE           = 0
