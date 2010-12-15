@@ -123,7 +123,7 @@ builtin_to_string.o: builtin_to_string.cc
 	$(CXX) builtin_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 celltype_to_string.o: celltype_to_string.cc
-	$(CXX) celltype_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) celltype_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 econfig.o: econfig.cc
 	$(CXX) econfig.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
