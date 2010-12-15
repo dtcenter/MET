@@ -25,6 +25,7 @@ using namespace std;
 
 #include "is_bad_data.h"
 #include "ptile.h"
+#include "nint.h"
 
 
 ////////////////////////////////////////////////////////////////////////
