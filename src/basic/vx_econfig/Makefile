@@ -78,7 +78,7 @@ algline.o: algline.cc
 	$(CXX) algline.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 array.o: array.cc
-	$(CXX) array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 builtin.o: builtin.cc
 	$(CXX) builtin.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
@@ -99,22 +99,22 @@ gen.o: gen.cc
 	$(CXX) gen.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 icode.o: icode.cc
-	$(CXX) icode.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) icode.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 icodecell_to_result.o: icodecell_to_result.cc
 	$(CXX) icodecell_to_result.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 idstack.o: idstack.cc
-	$(CXX) idstack.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) idstack.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 machine.o: machine.cc
 	$(CXX) machine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 pwl.o: pwl.cc
-	$(CXX) pwl.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) pwl.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 result.o: result.cc
-	$(CXX) result.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) result.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 resulttype_to_string.o: resulttype_to_string.cc
 	$(CXX) resulttype_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
@@ -123,7 +123,7 @@ stetype_to_string.o: stetype_to_string.cc
 	$(CXX) stetype_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 symtab.o: symtab.cc
-	$(CXX) symtab.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) symtab.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
