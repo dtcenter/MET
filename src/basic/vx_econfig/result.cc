@@ -11,7 +11,6 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "misc.h"
 #include "vx_math.h"
 #include "result.h"
 #include "resulttype_to_string.h"

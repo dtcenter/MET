@@ -94,7 +94,7 @@ enum_to_string: enum_to_string.cc lex.yy.o enum.tab.o $(OBJECTS)
 clean:
 	@ echo
 	rm -f *.a *.o temp junk core log a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-
+	rm -f enum.tab.c enum.output lex.yy.c
 
 ########################################################################
 

@@ -13,7 +13,8 @@
 #
 ###############################################################################
 
-include user_defs.mk
+#include user_defs.mk
+include user_defs_dev.mk
 include met_defs.mk
 include export.mk
 

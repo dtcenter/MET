@@ -12,7 +12,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "misc.h"
+#include "vx_util.h"
 #include "gen.h"
 
 
