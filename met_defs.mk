@@ -19,7 +19,7 @@ MET_INC_DIR    = $(MET_BASE_DIR)/include
 
 MET_SRC_DIR    = $(MET_BASE_DIR)/src
 
-MET_BIN_DIR    = $(MET_BASE_DIR)/base
+MET_BIN_DIR    = $(MET_BASE_DIR)/bin
 
 MET_OUTPUT_DIR = $(MET_BASE_DIR)/out
 

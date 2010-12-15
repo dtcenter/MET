@@ -65,7 +65,7 @@ class CodeGenerator {
 
       const char * sep;
 
-      Unixtime GenerationTime;
+      unixtime GenerationTime;
 
       const char * zone_name;   //  not allocated
 

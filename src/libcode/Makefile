@@ -4,7 +4,6 @@
 
 
 all:
-	@ cd vx_econfig       ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_contable      ; $(MAKE) $(PRINT_OPTS)
@@ -29,7 +28,6 @@ all:
 
 
 clean:
-	@ cd vx_econfig       ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_contable      ; $(MAKE) $(PRINT_OPTS) clean

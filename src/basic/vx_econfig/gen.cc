@@ -357,7 +357,7 @@ void CodeGenerator::warning(ostream & out)
 
 int month, day, year, hour, minute, second;
 char junk[256];
-Unixtime t;
+unixtime t;
 const char * ampm = (const char *) 0;
 
 
