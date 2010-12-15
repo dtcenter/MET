@@ -21,7 +21,9 @@ using namespace std;
 
 
 #include "num_array.h"
-#include "vx_math.h"
+
+#include "is_bad_data.h"
+#include "ptile.h"
 
 
 ////////////////////////////////////////////////////////////////////////
