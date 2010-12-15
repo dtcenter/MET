@@ -4,10 +4,7 @@
 
 
 all:
-	@ cd vx_cal           ; $(MAKE) $(PRINT_OPTS)
-	@ cd vx_util          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_econfig       ; $(MAKE) $(PRINT_OPTS)
-	@ cd vx_math          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_contable      ; $(MAKE) $(PRINT_OPTS)
@@ -32,9 +29,7 @@ all:
 
 
 clean:
-	@ cd vx_cal           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_econfig       ; $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_math          ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_contable      ; $(MAKE) $(PRINT_OPTS) clean
@@ -51,7 +46,6 @@ clean:
 	@ cd vx_ps            ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_pxm           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_render        ; $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_util          ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_wrfdata       ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_wrfmode       ; $(MAKE) $(PRINT_OPTS) clean
 
