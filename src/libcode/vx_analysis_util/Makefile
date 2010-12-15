@@ -66,37 +66,37 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 analysis_utils.o: analysis_utils.cc
-	$(CXX) analysis_utils.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) analysis_utils.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 box.o: box.cc
-	$(CXX) box.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) box.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 by_case_info.o: by_case_info.cc
-	$(CXX) by_case_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) by_case_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 data_line.o: data_line.cc
-	$(CXX) data_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) data_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 mask_poly.o: mask_poly.cc
-	$(CXX) mask_poly.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) mask_poly.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 mode_atts.o: mode_atts.cc
-	$(CXX) mode_atts.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) mode_atts.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 mode_job.o: mode_job.cc
-	$(CXX) mode_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) mode_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 mode_line.o: mode_line.cc
-	$(CXX) mode_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) mode_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 stat_job.o: stat_job.cc
-	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 stat_line.o: stat_line.cc
-	$(CXX) stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 time_series.o: time_series.cc
-	$(CXX) time_series.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) time_series.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
