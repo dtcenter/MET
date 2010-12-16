@@ -72,7 +72,7 @@ pcp_combine: pcp_combine.cc
 	-lvx_data_grids -lvx_gnomon -lvx_nav -lvx_cal -lvx_util -lvx_math -lm \
 	-lnetcdf_c++ -lnetcdf \
 	$(CXX_LIBS)
-	cp pcp_combine $(MET_BIN_DIR)/.
+	cp pcp_combine $(MET_BIN_DIR)
 
 
 ###############################################################################
@@ -86,7 +86,7 @@ clean:
 ###############################################################################
 
 
-.PHONY: all clean 
+.PHONY: all clean
 
 
 ###############################################################################
