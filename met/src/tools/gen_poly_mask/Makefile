@@ -71,7 +71,7 @@ gen_poly_mask: gen_poly_mask.cc
 	-lvx_data_grids -lvx_gnomon -lvx_nav -lvx_cal -lvx_util -lvx_math -lm \
 	-lnetcdf_c++ -lnetcdf \
 	$(CXX_LIBS)
-	cp gen_poly_mask $(MET_BIN_DIR)/.
+	cp gen_poly_mask $(MET_BIN_DIR)
 
 
 ###############################################################################
