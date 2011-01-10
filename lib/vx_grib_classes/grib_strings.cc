@@ -92,7 +92,7 @@ void get_grib_code_list(int grib_code, int ptv,
             break;
 
          default:
-            cerr << "\n\nERRROR: get_grib_code_list() -> "
+            cerr << "\n\nERROR: get_grib_code_list() -> "
                  << "unsupported GRIB parameter table version number of "
                  << ptv << ".  The supported version numbers are 2, 128, "
                  << "129, 130, 131, 133, 140, 141.\n\n" << flush;
@@ -143,7 +143,7 @@ void get_grib_code_list_str(int k, int grib_code, int ptv, char *str) {
             break;
 
          default:
-            cerr << "\n\nERRROR: get_grib_code_list_str() -> "
+            cerr << "\n\nERROR: get_grib_code_list_str() -> "
                  << "unexpected value for k: " << k
                  << "\n\n" << flush;
             exit(1);
@@ -212,7 +212,7 @@ void get_grib_level_list_str(int k, int grib_level, char *str) {
             break;
 
          default:
-            cerr << "\n\nERRROR: get_grib_level_list_str() -> "
+            cerr << "\n\nERROR: get_grib_level_list_str() -> "
                  << "unexpected value for k: " << k
                  << "\n\n" << flush;
             exit(1);
