@@ -102,9 +102,10 @@ void compute_wald_ci(double p, int n, double alpha, double vif,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_wilson_ci(double p, int n, double alpha, double vif,
+void compute_wilson_ci(double p, int n_int, double alpha, double vif,
                        double &p_cl, double &p_cu) {
    double v, cv_normal_l, cv_normal_u;
+   long long n = n_int;
 
    if(is_bad_data(p)) {
       p_cl = p_cu = bad_data_double;
