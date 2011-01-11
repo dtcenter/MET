@@ -1254,19 +1254,19 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
 
    // job type
    statjobtype_to_string(job_type, junk);
-   js << "-job " << junk;
+   js << "-job " << junk << " ";
 
    // model
    if(model.n_elements() > 0) {
       for(i=0; i<model.n_elements(); i++)
-         js << "-model " << model[i];
+         js << "-model " << model[i] << " ";
    }
 
    // fcst_lead
    if(fcst_lead.n_elements() > 0) {
       for(i=0; i<fcst_lead.n_elements(); i++) {
          sec_to_hhmmss(nint(fcst_lead[i]), junk);
-         js << "-fcst_lead " << junk;
+         js << "-fcst_lead " << junk << " ";
       }
    }
 
@@ -1274,55 +1274,55 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
    if(obs_lead.n_elements() > 0) {
       for(i=0; i<obs_lead.n_elements(); i++) {
          sec_to_hhmmss(nint(obs_lead[i]), junk);
-         js << "-obs_lead " << junk;
+         js << "-obs_lead " << junk << " ";
       }
    }
 
    // fcst_valid_beg and fcst_valid_end
    if(fcst_valid_beg > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_valid_beg, junk);
-      js << "-fcst_valid_beg " << junk;
+      js << "-fcst_valid_beg " << junk << " ";
    }
    if(fcst_valid_end > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_valid_end, junk);
-      js << "-fcst_valid_end " << junk;
+      js << "-fcst_valid_end " << junk << " ";
    }
 
    // obs_valid_beg and obs_valid_end
    if(obs_valid_beg > 0) {
       unix_to_yyyymmdd_hhmmss(obs_valid_beg, junk);
-      js << "-obs_valid_beg " << junk;
+      js << "-obs_valid_beg " << junk << " ";
    }
    if(obs_valid_end > 0) {
       unix_to_yyyymmdd_hhmmss(obs_valid_end, junk);
-      js << "-obs_valid_end " << junk;
+      js << "-obs_valid_end " << junk << " ";
    }
 
    // fcst_init_beg and fcst_init_end
    if(fcst_init_beg > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_init_beg, junk);
-      js << "-fcst_init_beg " << junk;
+      js << "-fcst_init_beg " << junk << " ";
    }
    if(fcst_init_end > 0) {
       unix_to_yyyymmdd_hhmmss(fcst_init_end, junk);
-      js << "-fcst_init_end " << junk;
+      js << "-fcst_init_end " << junk << " ";
    }
 
    // obs_init_beg and obs_init_end
    if(obs_init_beg > 0) {
       unix_to_yyyymmdd_hhmmss(obs_init_beg, junk);
-      js << "-obs_init_beg " << junk;
+      js << "-obs_init_beg " << junk << " ";
    }
    if(obs_init_end > 0) {
       unix_to_yyyymmdd_hhmmss(obs_init_end, junk);
-      js << "-obs_init_end " << junk;
+      js << "-obs_init_end " << junk << " ";
    }
 
    // fcst_init_hour
    if(fcst_init_hour.n_elements() > 0) {
       for(i=0; i<fcst_init_hour.n_elements(); i++) {
          sec_to_hhmmss(nint(fcst_init_hour[i]), junk);
-         js << "-fcst_init_hour " << junk;
+         js << "-fcst_init_hour " << junk << " ";
       }
    }
 
@@ -1330,63 +1330,63 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
    if(obs_init_hour.n_elements() > 0) {
       for(i=0; i<obs_init_hour.n_elements(); i++) {
          sec_to_hhmmss(nint(obs_init_hour[i]), junk);
-         js << "-obs_init_hour " << junk;
+         js << "-obs_init_hour " << junk << " ";
       }
    }
 
    // fcst_var
    if(fcst_var.n_elements() > 0) {
       for(i=0; i<fcst_var.n_elements(); i++)
-         js << "-fcst_var " << fcst_var[i];
+         js << "-fcst_var " << fcst_var[i] << " ";
    }
 
    // obs_var
    if(obs_var.n_elements() > 0) {
       for(i=0; i<obs_var.n_elements(); i++)
-         js << "-obs_var " << obs_var[i];
+         js << "-obs_var " << obs_var[i] << " ";
    }
 
    // fcst_lev
    if(fcst_lev.n_elements() > 0) {
       for(i=0; i<fcst_lev.n_elements(); i++)
-         js << "-fcst_lev " << fcst_lev[i];
+         js << "-fcst_lev " << fcst_lev[i] << " ";
    }
 
    // obs_lev
    if(obs_lev.n_elements() > 0) {
       for(i=0; i<obs_lev.n_elements(); i++)
-         js << "-obs_lev " << obs_lev[i];
+         js << "-obs_lev " << obs_lev[i] << " ";
    }
 
    // obtype
    if(obtype.n_elements() > 0) {
       for(i=0; i<obtype.n_elements(); i++)
-         js << "-obtype " << obtype[i];
+         js << "-obtype " << obtype[i] << " ";
    }
 
    // vx_mask
    if(vx_mask.n_elements() > 0) {
       for(i=0; i<vx_mask.n_elements(); i++)
-         js << "-vx_mask " << vx_mask[i];
+         js << "-vx_mask " << vx_mask[i] << " ";
    }
 
    // interp_mthd
    if(interp_mthd.n_elements() > 0) {
       for(i=0; i<interp_mthd.n_elements(); i++)
-         js << "-interp_mthd " << interp_mthd[i];
+         js << "-interp_mthd " << interp_mthd[i] << " ";
    }
 
    // interp_pnts
    if(interp_pnts.n_elements() > 0) {
       for(i=0; i<interp_pnts.n_elements(); i++)
-         js << "-interp_pnts " << nint(interp_pnts[i]);
+         js << "-interp_pnts " << nint(interp_pnts[i]) << " ";
    }
 
    // fcst_thresh
    if(fcst_thresh.n_elements() > 0) {
       for(i=0; i<fcst_thresh.n_elements(); i++) {
          fcst_thresh[i].get_str(junk);
-         js << "-fcst_thresh " << junk;
+         js << "-fcst_thresh " << junk << " ";
       }
    }
 
@@ -1394,7 +1394,7 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
    if(obs_thresh.n_elements() > 0) {
       for(i=0; i<obs_thresh.n_elements(); i++) {
          obs_thresh[i].get_str(junk);
-         js << "-obs_thresh " << junk;
+         js << "-obs_thresh " << junk << " ";
       }
    }
 
@@ -1402,14 +1402,14 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
    if(cov_thresh.n_elements() > 0) {
       for(i=0; i<cov_thresh.n_elements(); i++) {
          cov_thresh[i].get_str(junk);
-         js << "-cov_thresh " << junk;
+         js << "-cov_thresh " << junk << " ";
       }
    }
 
    // alpha
    if(alpha.n_elements() > 0) {
       for(i=0; i<alpha.n_elements(); i++)
-         js << "-alpha " << alpha[i];
+         js << "-alpha " << alpha[i] << " ";
    }
 
    // line_type
@@ -1417,7 +1417,7 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
       for(i=0; i<line_type.n_elements(); i++) {
          type = string_to_statlinetype(line_type[i]);
          statlinetype_to_string(type, junk);
-         js << "-line_type " << junk;
+         js << "-line_type " << junk << " ";
       }
    }
 
@@ -1425,46 +1425,46 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
    if(column_min_name.n_elements() > 0) {
       for(i=0; i<column_min_name.n_elements(); i++)
          js << "-column_min " << column_min_name[i]
-            << " " << column_min_value[i];
+            << " " << column_min_value[i] << " ";
    }
 
    // column_max
    if(column_max_name.n_elements() > 0) {
       for(i=0; i<column_max_name.n_elements(); i++)
          js << "-column_max " << column_max_name[i]
-            << " " << column_max_value[i];
+            << " " << column_max_value[i] << " ";
    }
 
    // column_str
    if(column_str_name.n_elements() > 0) {
       for(i=0; i<column_str_name.n_elements(); i++)
          js << "-column_str " << column_str_name[i]
-            << " " << column_str_value[i];
+            << " " << column_str_value[i] << " ";
    }
 
    // dump_row
-   if(dump_row) js << "-dump_row " << dump_row;
+   if(dump_row) js << "-dump_row " << dump_row << " ";
 
    // column
-   if(column) js << "-column " << column;
+   if(column) js << "-column " << column << " ";
 
    // mask_grid
-   if(mask_grid) js << "-mask_grid " << mask_grid;
+   if(mask_grid) js << "-mask_grid " << mask_grid << " ";
 
    // mask_poly
-   if(mask_poly) js << "-mask_poly " << mask_poly;
+   if(mask_poly) js << "-mask_poly " << mask_poly << " ";
 
    // out_line_type
    if(out_line_type != no_stat_line_type) {
       statlinetype_to_string(out_line_type, junk);
-      js << "-out_line_type " << junk;
+      js << "-out_line_type " << junk << " ";
    }
 
    // out_fcst_thresh
    if(out_fcst_thresh.n_elements() > 0) {
       for(i=0; i<out_fcst_thresh.n_elements(); i++) {
          out_fcst_thresh[i].get_str(junk);
-         js << "-out_fcst_thresh " << junk;
+         js << "-out_fcst_thresh " << junk << " ";
       }
    }
 
@@ -1472,7 +1472,7 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
    if(out_obs_thresh.n_elements() > 0) {
       for(i=0; i<out_obs_thresh.n_elements(); i++) {
          out_obs_thresh[i].get_str(junk);
-         js << "-out_obs_thresh " << junk;
+         js << "-out_obs_thresh " << junk << " ";
       }
    }
 
@@ -1486,7 +1486,7 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
        out_line_type == stat_nbrcnt) {
 
       // out_alpha
-      js << "-out_alpha " << out_alpha;
+      js << "-out_alpha " << out_alpha << " ";
    }
 
    // Jobs which perform bootstrapping
@@ -1500,11 +1500,15 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
           out_line_type == stat_nbrcnt)) {
 
          // Bootstrap Information
-         js << "-boot_interval " << boot_interval;
-         js << "-boot_rep_prop " << boot_rep_prop;
-         js << "-n_boot_rep "    << n_boot_rep;
-         js << "-boot_rng "      << boot_rng;
-         js << "-boot_seed "     << boot_seed;
+         js << "-boot_interval " << boot_interval << " ";
+         js << "-boot_rep_prop " << boot_rep_prop << " ";
+         js << "-n_boot_rep "    << n_boot_rep    << " ";
+         js << "-boot_rng "      << boot_rng      << " ";
+         if(strlen(boot_seed) == 0) {
+            js << "-boot_seed '' ";
+         } else {
+            js << "-boot_seed "  << boot_seed     << " ";
+         }
       }
    }
 
@@ -1512,14 +1516,14 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
    if(out_line_type == stat_cnt) {
 
       // rank_corr_flag
-      js << "-rank_corr_flag " << rank_corr_flag;
+      js << "-rank_corr_flag " << rank_corr_flag << " ";
    }
 
    // Variance inflation factor for time series
    if(vif_flag) {
 
       // vif_flag
-      js << "-vif_flag " << vif_flag;
+      js << "-vif_flag " << vif_flag << " ";
    }
 
    return;
