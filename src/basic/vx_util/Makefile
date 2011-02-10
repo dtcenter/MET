@@ -42,6 +42,7 @@ OBJECTS     =  ascii_table.o \
            	fix_float.o \
            	command_line.o \
            	file_exists.o \
+           	two_to_one.o \
 
 LIBRARIES   =  libvx_util.a
 
@@ -79,6 +80,7 @@ HEADERS     =  ascii_table.h \
            	fix_float.h \
            	command_line.h \
            	file_exists.h \
+               two_to_one.h \
                vx_util.h \
 
  
@@ -184,6 +186,9 @@ command_line.o: command_line.cc command_line.h
 
 file_exists.o: file_exists.cc file_exists.h
 	$(CXX) file_exists.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c
+
+two_to_one.o: two_to_one.cc two_to_one.h
+	$(CXX) two_to_one.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c
 
 
 ########################################################################

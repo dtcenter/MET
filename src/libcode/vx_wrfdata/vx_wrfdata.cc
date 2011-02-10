@@ -43,7 +43,6 @@ using namespace std;
 #include "vx_wrfdata.h"
 #include "shape.h"
 #include "vx_util.h"
-#include "vx_met_util.h"
 #include "vx_math.h"
 
 ///////////////////////////////////////////////////////////////////////////////
