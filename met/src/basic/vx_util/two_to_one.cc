@@ -18,7 +18,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-int two_to_one(const int const nx, const int ny, const int x, const int y)
+int two_to_one(const int nx, const int ny, const int x, const int y)
 
 {
 
