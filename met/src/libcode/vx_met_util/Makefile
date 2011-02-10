@@ -28,7 +28,6 @@ OBJECTS     = apply_mask.o        \
               read_netcdf.o       \
               stat_columns.o      \
               stat_hdr_columns.o  \
-              two_to_one.o        \
               write_netcdf.o
 																																																	
 
@@ -51,7 +50,6 @@ HEADERS     = apply_mask.h        \
               read_netcdf.h       \
               stat_columns.h      \
               stat_hdr_columns.h  \
-              two_to_one.h        \
               vx_met_util.h       \
               write_netcdf.h
 
@@ -105,9 +103,6 @@ stat_columns.o: stat_columns.cc
 
 stat_hdr_columns.o: stat_hdr_columns.cc
 	$(CXX) stat_hdr_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-two_to_one.o: two_to_one.cc
-	$(CXX) two_to_one.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 write_netcdf.o: write_netcdf.cc
 	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)

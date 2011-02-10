@@ -9,28 +9,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
-#include <iostream>
-#include <stdlib.h>
-
-#include "two_to_one.h"
+#ifndef  __VX_TWO_TO_ONE_H__
+#define  __VX_TWO_TO_ONE_H__
 
 ////////////////////////////////////////////////////////////////////////
 
-int two_to_one(int nx, int ny, int x, int y) {
-   int n;
+extern int two_to_one(const int const nx, const int ny, const int x, const int y);
 
-   if ( (x < 0) || (x >= nx) || (y < 0) || (y >= ny) ) {
-      cerr << "\n\nERROR: two_to_one() -> "
-           << "range check error: (nx, ny) = (" << nx << ", " << ny
-           << "), (x, y) = (" << x << ", " << y << ")\n\n" << flush;
-      exit(1);
-   }
+////////////////////////////////////////////////////////////////////////
 
-   n = y*nx + x;
-
-   return(n);
-}
+#endif   //  __VX_TWO_TO_ONE_H__
 
 ////////////////////////////////////////////////////////////////////////

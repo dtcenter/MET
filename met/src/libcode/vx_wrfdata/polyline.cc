@@ -31,7 +31,6 @@ using namespace std;
 #include "polyline.h"
 #include "vx_math.h"
 #include "vx_util.h"
-#include "vx_met_util.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
