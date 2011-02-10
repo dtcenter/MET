@@ -21,7 +21,7 @@ OBJECTS     = find_grid_by_name.o \
               latlon_grid.o       \
               lc_grid.o           \
               merc_grid.o         \
-              st_grid.o
+              st_grid.o           \
 
 
 LIBRARIES   = libvx_data_grids.a
@@ -39,7 +39,8 @@ HEADERS     = find_grid_by_name.h \
               lc_grid.h           \
               merc_grid_defs.h    \
               merc_grid.h         \
-              st_grid_defs.h
+              st_grid_defs.h      \
+              st_grid.h           \
 																																						  
 
 ########################################################################
