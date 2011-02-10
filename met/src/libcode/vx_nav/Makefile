@@ -19,7 +19,7 @@ EXECUTABLES =
 OBJECTS     = nav.o
 
 
-LIBRARIES   = libvx_nav .a
+LIBRARIES   = libvx_nav.a
 
 
 ########################################################################
@@ -55,11 +55,11 @@ nav.o: nav.cc
 
 
 libvx_nav.a: $(OBJECTS)
-	ar -rs libvx_nav .a $(OBJECTS)
-	ranlib libvx_nav .a
+	ar -rs libvx_nav.a $(OBJECTS)
+	ranlib libvx_nav.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	cp $(HEADERS) $(MET_INC_DIR)
-	rm -f $(MET_LIB_DIR)/libvx_nav .a
+	rm -f $(MET_LIB_DIR)/libvx_nav.a
 	cp libvx_nav .a $(MET_LIB_DIR)
 
 
@@ -77,7 +77,7 @@ libvx_nav.a: $(OBJECTS)
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-	rm -f $(MET_LIB_DIR)/libvx_afm.a
+	rm -f $(MET_LIB_DIR)/libvx_nav.a
 
 
 ########################################################################

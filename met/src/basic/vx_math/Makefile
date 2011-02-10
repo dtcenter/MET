@@ -16,7 +16,8 @@
 EXECUTABLES =
 
 
-OBJECTS     =  hist.o \
+OBJECTS     =  angles.o  \
+               hist.o \
                nint.o \
                nti.o \
                ptile.o \
@@ -38,6 +39,7 @@ GEN_SOURCES = viewgravity_to_string.cc  \
 HEADERS     =  constants.h \
                is_bad_data.h \
                trig.h \
+               angles.h  \
                hist.h \
                nint.h \
                nti.h \
@@ -76,6 +78,9 @@ viewgravity_to_string.cc viewgravity_to_string.h: affine.h
    ##  objects
    ##
 
+
+angles.o: angles.cc
+	$(CXX) angles.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 hist.o: hist.cc
 	$(CXX) hist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
