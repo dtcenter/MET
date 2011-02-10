@@ -19,6 +19,7 @@
 
 
 #include "trig.h"
+#include "angles.h"
 #include "nint.h"
 #include "nti.h"
 #include "hist.h"
