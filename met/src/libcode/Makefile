@@ -4,7 +4,6 @@
 
 
 all:
-	@ cd vx_math          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_data_grids    ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_grib_classes  ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_wrfdata       ; $(MAKE) $(PRINT_OPTS)
@@ -29,7 +28,6 @@ all:
 
 
 clean:
-	@ cd vx_math          ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_contable      ; $(MAKE) $(PRINT_OPTS) clean
