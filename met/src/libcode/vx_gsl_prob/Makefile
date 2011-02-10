@@ -58,13 +58,13 @@ gsl_cdf.o: gsl_cdf.cc
 	$(CXX) gsl_cdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
 
 gsl_randist.o: gsl_randist.cc
-	$(CXX) gsl_randist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
+	$(CXX) gsl_randist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS)
 
 gsl_statistics.o: gsl_statistics.cc
-	$(CXX) gsl_statistics.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
+	$(CXX) gsl_statistics.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS)
 
 gsl_wavelet2d.o: gsl_wavelet2d.cc
-	$(CXX) gsl_wavelet2d.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
+	$(CXX) gsl_wavelet2d.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS)
 
 
 ########################################################################
