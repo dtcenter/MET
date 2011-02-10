@@ -19,10 +19,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 extern void   rescale_probability(WrfData &);
-extern double rescale_lon(double);
-extern double rescale_deg(double, double, double);
-extern double angle_between(double, double);
-extern double angle_difference(double, double, double, double);
 
 extern double convert_gpm_to_msl(double, double);
 extern double convert_p_t_z_to_prmsl(double, double, double, double);
@@ -31,10 +27,7 @@ extern double convert_p_w_to_vp(double, double);
 extern double convert_vp_to_dpt(double);
 extern double convert_t_to_svp(double);
 extern double convert_vp_svp_to_rh(double, double);
-extern double convert_u_v_to_wdir(double, double);
-extern double convert_u_v_to_wind(double, double);
-extern void   convert_u_v_to_unit(double, double, double &, double &);
-extern void   convert_u_v_to_unit(double &, double &);
+
 extern double gop_by_lat(double);
 
 ////////////////////////////////////////////////////////////////////////
