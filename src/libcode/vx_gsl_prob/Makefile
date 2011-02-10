@@ -20,7 +20,7 @@ OBJECTS     = gsl_bvn.o         \
               gsl_cdf.o         \
               gsl_randist.o     \
               gsl_statistics.o  \
-              gsl_wavelet2d.o
+              gsl_wavelet2d.o   \
 
 
 LIBRARIES   = libvx_gsl_prob.a
@@ -34,7 +34,7 @@ HEADERS     = gsl_bvn.h         \
               gsl_randist.h     \
               gsl_statistics.h  \
               gsl_wavelet2d.h   \
-              vx_gsl_prob.h
+              vx_gsl_prob.h     \
 
 
 ########################################################################
@@ -52,19 +52,19 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 gsl_bvn.o: gsl_bvn.cc
-	$(CXX) gsl_bvn.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) gsl_bvn.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
 
 gsl_cdf.o: gsl_cdf.cc
-	$(CXX) gsl_cdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) gsl_cdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
 
 gsl_randist.o: gsl_randist.cc
-	$(CXX) gsl_randist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) gsl_randist.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
 
 gsl_statistics.o: gsl_statistics.cc
-	$(CXX) gsl_statistics.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) gsl_statistics.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
 
 gsl_wavelet2d.o: gsl_wavelet2d.cc
-	$(CXX) gsl_wavelet2d.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) gsl_wavelet2d.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS)
 
 
 ########################################################################

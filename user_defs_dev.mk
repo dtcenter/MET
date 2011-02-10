@@ -50,7 +50,7 @@ BUFR_LIBS    = -L$(BUFR_BASE)
 # installed in a standard location.
 # GSL include directory specified as: -I/your/include/path
 # GSL library directory specified as: -L/your/library/path
-GSL_BASE     = /d1/bullock/kd2/bullock/otherlibs/gsl/gsl-1.12
+GSL_BASE     = /d1/bullock/otherlibs/gsl/gsl-1.12
 GSL_INCS     = -I$(GSL_BASE)/include
 GSL_LIBS     = -L$(GSL_BASE)/lib
 
