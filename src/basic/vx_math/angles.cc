@@ -13,9 +13,15 @@ using namespace std;
 //////////////////////////////////////////////////////////////////
 
 
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
 #include <cmath>
 
 #include "angles.h"
+
+#include "trig.h"
+#include "is_bad_data.h"
 
 
 //////////////////////////////////////////////////////////////////
