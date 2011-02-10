@@ -54,22 +54,22 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 filterbox.o: filterbox.cc
-	$(CXX) filterbox.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) filterbox.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 interpmthd.o: interpmthd.cc
-	$(CXX) interpmthd.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) interpmthd.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 moments.o: moments.cc
-	$(CXX) moments.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) moments.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 node.o: node.cc
-	$(CXX) node.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) node.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 polyline.o: polyline.cc
-	$(CXX) polyline.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) polyline.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_wrfdata.o: vx_wrfdata.cc
-	$(CXX) vx_wrfdata.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_wrfdata.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

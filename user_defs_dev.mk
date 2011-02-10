@@ -35,7 +35,7 @@ PRINT_OPTS   =
 # Top level directory for the NetCDF library
 # NetCDF include directory specified as: -I/your/include/path
 # NetCDF library directory specified as: -L/your/library/path
-NETCDF_BASE  = /usr/local/netcdf-3.6.3/gcc-4.3.1/
+NETCDF_BASE  = /usr/local/netcdf-3.6.3/gcc-4.3.1
 NETCDF_INCS  = -I$(NETCDF_BASE)/include
 NETCDF_LIBS  = -L$(NETCDF_BASE)/lib
 
