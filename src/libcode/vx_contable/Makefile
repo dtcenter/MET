@@ -46,10 +46,10 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 vx_contable.o: vx_contable.cc
-	$(CXX) vx_contable.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_contable.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_contable_stats.o: vx_contable_stats.cc
-	$(CXX) vx_contable_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) vx_contable_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 vx_nx2.o: vx_nx2.cc
 	$(CXX) vx_nx2.cc $(CXX_FLAGS) $(OPT_FLAGS) -c $(GSL_INCS) $(NETCDF_INCS)
