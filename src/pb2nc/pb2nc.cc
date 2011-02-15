@@ -34,6 +34,8 @@
 //                    valid_end options.
 //   006    06-01-10  Halley Gotway  Pass flags to dumppb to only dump
 //                    observation for reqeusted message types.
+//   007    02-15-11  Halley Gotway  Fix event_stack bug for which the
+//                    logic was reversed.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1118,7 +1120,7 @@ void process_pbfile(int i_pb) {
             }
 
             //
-            // Retrieve the data level category from the bottom of the
+            // Retrieve the data level category from the top of the
             // event stack: ev = 0
             //
             if(evns[kk][0][lv][6] > r8bfms) {
@@ -1479,8 +1481,10 @@ int get_event_index(int flag, int i_var, int i_lvl) {
    //
    // Check the event_stack_flag to determine if the top or bottom
    // of the event stack is to be used
+   //   Top of the stack:    ev = 0
+   //   Bottom of the stack: ev > 0
    //
-   if(!conf.event_stack_flag().ival()) {
+   if(conf.event_stack_flag().ival() == 1) {
       ev = 0;
    }
    //
