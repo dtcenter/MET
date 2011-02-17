@@ -1484,7 +1484,7 @@ int get_event_index(int flag, int i_var, int i_lvl) {
    //   Top of the stack:    ev = 0
    //   Bottom of the stack: ev > 0
    //
-   if(conf.event_stack_flag().ival() == 1) {
+   if(flag == 1) {
       ev = 0;
    }
    //
