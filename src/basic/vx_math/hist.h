@@ -64,8 +64,6 @@ class Histogram {
 
       void clear();
 
-      void dump(ostream &, int indent_depth = 0) const;
-
       void set_nbd(int n, double b, double d);  //  Nbins, Bottom, Delta
 
          //

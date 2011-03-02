@@ -20,7 +20,6 @@ using namespace std;
 #include <cmath>
 
 
-#include "vx_util.h"
 #include "hist.h"
 #include "nint.h"
 
@@ -130,48 +129,6 @@ is_empty = 1;
 TooBigCount = TooSmallCount = 0;
 
 MaxValue = MinValue = 0.0;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Histogram::dump(ostream & out, int indent_depth) const
-
-{
-
-Indent prefix;
-
-prefix.depth = indent_depth;
-
-
-out << prefix << "Histogram dump ...\n";
-out << prefix << "Nbins           = " << Nbins              << "\n";
-out << prefix << "Bottom          = " << Bottom             << "\n";
-out << prefix << "Delta           = " << Delta              << "\n";
-out << prefix << "is_empty        = " << is_empty           << "\n";
-out << prefix << "min value       = " << MinValue           << "\n";
-out << prefix << "max value       = " << MaxValue           << "\n";
-out << prefix << "too big count   = " << TooBigCount        << "\n";
-out << prefix << "too small count = " << TooSmallCount      << "\n";
-out << prefix << "total bin count = " << total_bin_count()  << "\n";
-out << prefix << "max bin count   = " << max_bin_count()    << "\n";
-
-int j;
-
-++(prefix.depth);
-
-for (j=0; j<Nbins; ++j)  {
-
-   cout << prefix << "Count[" << j << "] = " << (Count[j]) << "\n";
-
-}
-
-
-out.flush();
 
 return;
 
@@ -381,32 +338,5 @@ return ( m );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for misc functions
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-ostream & operator<<(ostream & out, const Histogram & h)
-
-{
-
-h.dump(out);
-
-
-return ( out );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 
