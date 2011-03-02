@@ -18,8 +18,6 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_util.h"
-
 #include "trig.h"
 
 #include "affine.h"
@@ -140,45 +138,6 @@ width = v.width;
 
 height = v.height;
 
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ViewBox::dump(ostream & out, int depth) const
-
-{
-
-Indent prefix(depth);
-
-
-out << prefix << "x_ll   = " << x_ll   << "\n";
-out << prefix << "y_ll   = " << y_ll   << "\n";
-
-out << prefix << "width  = " << width  << "\n";
-out << prefix << "height = " << height << "\n";
-
-
-if ( height == 0.0 )  {
-
-   out << prefix << "aspect = (undefined)\n";
-
-} else {
-
-   out << prefix << "aspect = " << aspect() << "\n";
-
-}
-
-
-   //
-   //  done
-   //
-
-out.flush();
 
 return;
 
@@ -550,63 +509,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Affine::dump(ostream & out, int depth) const
-
-{
-
-Indent prefix(depth);
-
-
-out << prefix << "\n";
-
-out << prefix << "m11 = " << M11 << "\n";
-out << prefix << "m12 = " << M12 << "\n";
-out << prefix << "m21 = " << M21 << "\n";
-out << prefix << "m22 = " << M22 << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "tx  = " << TX  << "\n";
-out << prefix << "ty  = " << TY  << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "det = " << Det << "\n";
-
-out << prefix << "\n";
-
-if ( is_conformal() )  {
-
-   double scale, angle;
-
-   scale = sqrt(Det);   //  the is_conformal() function checks that Det >= 0
-
-   angle = atan2d(M12, M11);   //  M11 = scale*cos(angle), M12 = scale*sin(angle)
-
-   out << prefix << "Is Conformal\n";
-   out << prefix << "   Calculated Angle = " << angle << "\n";
-   out << prefix << "   Calculated Scale = " << scale << "\n";
-
-} else {
-
-   out << prefix << "Not Conformal\n";
-
-}
-
-   //
-   //  done
-   //
-
-out.flush();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void Affine::set_three_points(double u1, double v1, double u2, double v2, double u3, double v3,
                               double x1, double y1, double x2, double y2, double x3, double y3)
 
@@ -844,33 +746,6 @@ Scale = c.Scale;
 TX = c.TX;
 TY = c.TY;
 
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ConformalAffine::dump(ostream & out, int depth) const
-
-{
-
-Indent prefix(depth);
-
-out << prefix << "\n";
-
-out << prefix << "Angle    = " << Angle    << "\n";
-out << prefix << "Scale    = " << Scale    << "\n";
-out << prefix << "Tx       = " << TX       << "\n";
-out << prefix << "Ty       = " << TY       << "\n";
-
-   //
-   //  done
-   //
-
-out.flush();
 
 return;
 

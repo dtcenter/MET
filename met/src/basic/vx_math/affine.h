@@ -73,8 +73,6 @@ class ViewBox {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
-
       double x_ll;
       double y_ll;
 
@@ -97,8 +95,6 @@ class GeneralAffine {
       virtual ~GeneralAffine();
 
       virtual void clear() = 0;
-
-      virtual void dump(ostream &, int depth = 0) const = 0;
 
       virtual double m11() const = 0;
       virtual double m12() const = 0;
@@ -171,9 +167,6 @@ class Affine : public GeneralAffine {
       Affine & operator=(const Affine &);
 
       void clear();  //  set to identity
-
-      virtual void dump(ostream &, int depth = 0) const;
-
 
 
       void set_mb(double _m11, double _m12, double _m21, double _m22, double _b1, double _b2);
@@ -300,8 +293,6 @@ class ConformalAffine : public GeneralAffine {
       ConformalAffine & operator=(const ConformalAffine &);
 
       void clear();
-
-      void dump (ostream &, int depth = 0) const;
 
 
       void set_scale(double);

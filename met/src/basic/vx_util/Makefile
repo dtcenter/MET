@@ -134,10 +134,10 @@ concat_string.o: concat_string.cc
 	$(CXX) concat_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 conversions.o: conversions.cc
-	$(CXX) conversions.cc $(CXX_FLAGS) $(OPT_FLAGS) -c  -I../vx_math
+	$(CXX) conversions.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 double_array.o: double_array.cc
-	$(CXX) double_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
+	$(CXX) double_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 file_type.o: file_type.cc
 	$(CXX) file_type.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
@@ -161,7 +161,7 @@ memory.o: memory.cc
 	$(CXX) memory.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 num_array.o: num_array.cc
-	$(CXX) num_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
+	$(CXX) num_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 ordinal.o: ordinal.cc
 	$(CXX) ordinal.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
@@ -182,10 +182,10 @@ temp_file.o: temp_file.cc
 	$(CXX) temp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 thresh_array.o: thresh_array.cc
-	$(CXX) thresh_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
+	$(CXX) thresh_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 threshold.o: threshold.cc
-	$(CXX) threshold.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I../vx_math
+	$(CXX) threshold.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_endian.o: vx_endian.cc
 	$(CXX) vx_endian.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c
