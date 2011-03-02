@@ -20,8 +20,6 @@ using namespace std;
 #include "met_stats.h"
 #include "pair_data.h"
 #include "compute_ci.h"
-#include "constants.h"
-#include "conversions.h"
 #include "vx_util.h"
 #include "grib_strings.h"
 #include "vx_wrfdata.h"

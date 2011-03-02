@@ -18,7 +18,7 @@ using namespace std;
 #include "vx_contable.h"
 #include "vx_util.h"
 #include "vx_math.h"
-#include "vx_met_util.h"
+#include "compute_ci.h"
 
 ////////////////////////////////////////////////////////////////////////
 //

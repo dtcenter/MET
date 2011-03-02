@@ -36,7 +36,7 @@ GEN_SOURCES = viewgravity_to_string.cc  \
 ########################################################################
 
 
-HEADERS     =  constants.h \
+HEADERS     =  math_constants.h \
                is_bad_data.h \
                trig.h \
                angles.h  \

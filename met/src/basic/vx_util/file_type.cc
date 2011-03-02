@@ -11,12 +11,13 @@
 using namespace std;
 
 #include <iostream>
+#include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
 
-#include "vx_met_util.h"
+#include "file_type.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +36,7 @@ int      has_substr             (const char *, int, const char *);
 FileType get_file_type(const char *filename) {
    FileType f_type = NoFileType;
    const char *ptr = (char *) 0;
-   char ext_str[max_str_len];
+   char ext_str[512];
    int i;
 
    //
