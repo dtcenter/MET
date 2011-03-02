@@ -13,8 +13,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "constants.h"
-#include "met_stats.h"
 #include "interpmthd.h"
 #include "vx_util.h"
 #include "vx_cal.h"

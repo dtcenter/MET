@@ -16,8 +16,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "met_stats.h"
 #include "stat_hdr_columns.h"
+#include "met_stats.h"
 
 ////////////////////////////////////////////////////////////////////////
 
