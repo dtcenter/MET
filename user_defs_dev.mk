@@ -35,14 +35,14 @@ PRINT_OPTS   =
 # Top level directory for the NetCDF library
 # NetCDF include directory specified as: -I/your/include/path
 # NetCDF library directory specified as: -L/your/library/path
-NETCDF_BASE  = /usr/local/netcdf-3.6.3/gcc-4.3.1
+NETCDF_BASE  = ${NETCDF}
 NETCDF_INCS  = -I$(NETCDF_BASE)/include
 NETCDF_LIBS  = -L$(NETCDF_BASE)/lib
 
 # Top level directory for BUFRLIB
 # BUFRLIB include directory specified as: -I/your/include/path
 # BUFRLIB library directory specified as: -L/your/library/path
-BUFR_BASE    = /var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/bufrlib/bufrlib_gnu
+BUFR_BASE    = ${BUFRLIB}
 BUFR_INCS    = -I$(BUFR_BASE)
 BUFR_LIBS    = -L$(BUFR_BASE)
 
@@ -50,7 +50,7 @@ BUFR_LIBS    = -L$(BUFR_BASE)
 # installed in a standard location.
 # GSL include directory specified as: -I/your/include/path
 # GSL library directory specified as: -L/your/library/path
-GSL_BASE     = /d1/johnhg/MET/MET_releases/external_libs/gsl/gsl-1.14_gnu
+GSL_BASE     = ${GSL}
 GSL_INCS     = -I$(GSL_BASE)/include
 GSL_LIBS     = -L$(GSL_BASE)/lib
 
@@ -80,7 +80,7 @@ ENABLE_ENSEMBLE_STAT  = 0
 ENABLE_STAT_ANALYSIS  = 0
 ENABLE_MODE_ANALYSIS  = 0
 ENABLE_PLOT_POINT_OBS = 0
-ENABLE_WWMCA          = 1
+ENABLE_WWMCA          = 0
 
 ###############################################################################
 
