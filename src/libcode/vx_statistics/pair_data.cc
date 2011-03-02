@@ -19,10 +19,8 @@ using namespace std;
 
 #include "pair_data.h"
 #include "compute_ci.h"
-#include "constants.h"
 #include "conversions.h"
 #include "vx_util.h"
-#include "vx_gdata.h"
 #include "grib_strings.h"
 #include "vx_wrfdata.h"
 #include "vx_gsl_prob.h"

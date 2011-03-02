@@ -8,7 +8,8 @@ all:
 	@ cd vx_grib_classes  ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_wrfdata       ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_gsl_prob      ; $(MAKE) $(PRINT_OPTS)
-	@ cd vx_contable      ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_statistics    ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_stat_out      ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_met_util      ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_gdata         ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS)
@@ -30,7 +31,8 @@ all:
 clean:
 	@ cd vx_analysis_util ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_contable      ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_statistics    ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_stat_out      ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_data_grids    ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_gdata         ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_gnomon        ; $(MAKE) $(PRINT_OPTS) clean

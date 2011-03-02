@@ -28,7 +28,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_contable.h"
-#include "vx_met_util.h"
+#include "compute_ci.h"
 
 #include "gsl/gsl_cdf.h"
 

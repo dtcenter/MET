@@ -42,7 +42,7 @@ NETCDF_LIBS  = -L$(NETCDF_BASE)/lib
 # Top level directory for BUFRLIB
 # BUFRLIB include directory specified as: -I/your/include/path
 # BUFRLIB library directory specified as: -L/your/library/path
-BUFR_BASE    = ../bufrlib/bufrlib
+BUFR_BASE    = /var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/bufrlib/bufrlib_gnu
 BUFR_INCS    = -I$(BUFR_BASE)
 BUFR_LIBS    = -L$(BUFR_BASE)
 
@@ -50,7 +50,7 @@ BUFR_LIBS    = -L$(BUFR_BASE)
 # installed in a standard location.
 # GSL include directory specified as: -I/your/include/path
 # GSL library directory specified as: -L/your/library/path
-GSL_BASE     = /d1/bullock/otherlibs/gsl/gsl-1.12
+GSL_BASE     = /d1/johnhg/MET/MET_releases/external_libs/gsl/gsl-1.14_gnu
 GSL_INCS     = -I$(GSL_BASE)/include
 GSL_LIBS     = -L$(GSL_BASE)/lib
 

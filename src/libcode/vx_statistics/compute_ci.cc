@@ -22,10 +22,9 @@ using namespace std;
 
 #include "vx_math.h"
 #include "compute_ci.h"
-#include "constants.h"
-#include "constants.h"
+#include "math_constants.h"
+#include "data_line.h"
 #include "vx_gsl_prob.h"
-#include "vx_analysis_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
