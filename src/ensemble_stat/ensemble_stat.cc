@@ -1004,6 +1004,7 @@ void process_grid_vx() {
          // Check for allowable smoothing operation
          if(conf_info.interp_mthd[j] == im_dw_mean ||
             conf_info.interp_mthd[j] == im_ls_fit  ||
+            conf_info.interp_mthd[j] == im_bilin   ||
             conf_info.interp_mthd[j] == im_nbrhd) {
 
             interpmthd_to_string(conf_info.interp_mthd[j], tmp_str);

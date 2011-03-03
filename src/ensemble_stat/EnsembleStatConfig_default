@@ -218,6 +218,7 @@ mask_sid = "";
 //    UW_MEAN = Unweighted mean in the neighborhood
 //    DW_MEAN = Distance-weighted mean in the neighborhood
 //    LS_FIT  = Least-squares fit in the neighborhood
+//    BILIN   = Bilinear interpolation using the 4 closest points
 //
 // e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
 //
@@ -340,4 +341,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V3.0";
+version = "V3.0.1";

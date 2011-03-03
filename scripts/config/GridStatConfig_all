@@ -198,11 +198,8 @@ boot_seed = "";
 //    MEDIAN  = Median in the neighborhood
 //    UW_MEAN = Unweighted mean in the neighborhood
 //
-//    NOTE: The distance-weighted mean (DW_MEAN) is not an option here since
-//          it will have no effect on a gridded field.
-//
-//    NOTE: The least-squares fit (LS_FIT) is not an option here since
-//          it reduces to an unweighted mean on a grid.
+//    NOTE: The distance-weighted mean (DW_MEAN), least-squares fit (LS_FIT),
+//          and bilinear interpolation (BILIN) are not options here.
 //
 // e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
 //
@@ -489,4 +486,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V3.0";
+version = "V3.0.1";
