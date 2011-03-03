@@ -2585,6 +2585,10 @@ double compute_horz_interp(WrfData *wd_ptr,
                            interp_thresh);
          break;
 
+      case(im_bilin):   // Bilinear interpolation
+         v = interp_bilin(*wd_ptr, x_ll, y_ll);
+         break;
+
       default:
          cerr << "\n\nERROR: compute_horz_interp() -> "
               << "unexpected interpolation method encountered: "

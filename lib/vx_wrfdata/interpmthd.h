@@ -39,7 +39,8 @@ enum InterpMthd {
    im_uw_mean = 4,
    im_dw_mean = 5,
    im_ls_fit  = 6,
-   im_nbrhd   = 7
+   im_nbrhd   = 7,
+   im_bilin   = 8
 };
 
 //
@@ -53,6 +54,7 @@ static const char im_uw_mean_str[] = "UW_MEAN";
 static const char im_dw_mean_str[] = "DW_MEAN";
 static const char im_ls_fit_str[]  = "LS_FIT";
 static const char im_nbrhd_str[]   = "NBRHD";
+static const char im_bilin_str[]   = "BILIN";
 
 ///////////////////////////////////////////////////////////////////////////////
 

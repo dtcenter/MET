@@ -19,6 +19,7 @@
 //   001    08-19-08  R. Bullock     Fix convex hull routine.
 //   002    08-26-09  Halley Gotway  Fix zero_border routine.
 //   003    09-08-10  Halley Gotway  Optimize fractional_coverage routine.
+//   004    02-22-11  Halley Gotway  Add bilinear interpolation option.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -3584,11 +3585,9 @@ WrfData smooth_field(const WrfData &wd, InterpMthd mthd, int wdth, double t) {
                v = interp_uw_mean(wd, x_ll, y_ll, wdth, t);
                break;
 
-            // Distance-weighted mean is omitted here since it is not
-            // an option for gridded data
-
-            // Least-squares fit is omitted here since it is not
-            // an option for gridded data
+            // Distance-weighted mean, least-squares fit, and bilinear
+            // interpolation are omitted here since they are not
+            // options for gridded data
 
             default:
                cerr << "\n\nERROR: smooth_field() -> "
@@ -3886,6 +3885,47 @@ double interp_ls_fit(const WrfData &wd, int x_ll, int y_ll, int wdth,
    }
 
    return(z);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute bilinear interpolation.
+//
+////////////////////////////////////////////////////////////////////////
+
+double interp_bilin(const WrfData &wd, double obs_x, double obs_y) {
+   int x, y;
+   double bilin_v, dx, dy;
+   double wtsw, wtse, wtnw, wtne;
+
+   x = floor(obs_x);
+   y = floor(obs_y);
+
+   // Compute dx and dy
+   dx = obs_x - x;
+   dy = obs_y - y;
+
+   // Compute weights for 4 corner points
+   wtsw = (1.0-dx) * (1.0-dy);
+   wtse = dx * (1.0-dy);
+   wtnw = (1.0-dx) * dy;
+   wtne = dx * dy;
+
+   // Compute interpolated value
+   if(wd.is_bad_xy(x,   y)   ||
+      wd.is_bad_xy(x+1, y)   ||
+      wd.is_bad_xy(x,   y+1) ||
+      wd.is_bad_xy(x+1, y+1)) {
+      bilin_v = bad_data_double;
+   }
+   else {
+      bilin_v = wtsw * wd.get_xy_double(x,   y)   +
+                wtse * wd.get_xy_double(x+1, y)   +
+                wtnw * wd.get_xy_double(x,   y+1) +
+                wtne * wd.get_xy_double(x+1, y+1);
+   }
+
+   return(bilin_v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
