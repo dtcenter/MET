@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char met_version[]     = "V3.0";
+static const char met_version[]     = "V3.0.1";
 static const char met_base_str[]    = "MET_BASE";
 static const char txt_file_ext[]    = ".txt";
 static const char stat_file_ext[]   = ".stat";
@@ -58,8 +58,8 @@ static const char onlysf_str[]         = "ONLYSF";
 static const char onlysf_msg_typ_str[] = "ADPSFC SFCSHP";
 
 // String containing all interpolation methods
-static const char all_interp_mthd_str[] = 
-   "MIN MAX MEDIAN UW_MEAN DW_MEAN LS_FIT";
+static const char all_interp_mthd_str[] =
+   "MIN MAX MEDIAN UW_MEAN DW_MEAN LS_FIT BILIN";
 
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
@@ -84,6 +84,12 @@ static const int default_precision = 5;
 static const double const_a     = 1.0/273.15;
 static const double const_b     = 2500000.0/461.5;
 static const double const_c     = 6.11;
+
+// Constants used in deriving RH
+static const double const_pq0   = 379.90516;
+static const double const_a2    = 17.2693882;
+static const double const_a3    = 273.16;
+static const double const_a4    = 35.86;
 
 // Constants used in deriving PRMSL
 static const double const_tmb   = 288.15;  // kelvin

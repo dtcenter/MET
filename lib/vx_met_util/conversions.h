@@ -31,6 +31,7 @@ extern double convert_p_w_to_vp(double, double);
 extern double convert_vp_to_dpt(double);
 extern double convert_t_to_svp(double);
 extern double convert_vp_svp_to_rh(double, double);
+extern double convert_p_q_t_to_rh(double, double, double);
 extern double convert_u_v_to_wdir(double, double);
 extern double convert_u_v_to_wind(double, double);
 extern void   convert_u_v_to_unit(double, double, double &, double &);
