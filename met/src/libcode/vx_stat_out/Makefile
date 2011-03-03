@@ -16,9 +16,8 @@
 EXECUTABLES =
 
 
-OBJECTS     = stat_columns.o       \
-		stat_hdr_columns.o \
-		write_netcdf.o
+OBJECTS     = stat_columns.o      \
+              stat_hdr_columns.o  \
 
 
 LIBRARIES   = libvx_stat_out.a
@@ -27,9 +26,8 @@ LIBRARIES   = libvx_stat_out.a
 ########################################################################
 
 
-HEADERS     = stat_columns.h       \
-		stat_hdr_columns.h \
-		write_netcdf.h
+HEADERS     = stat_columns.h      \
+              stat_hdr_columns.h  \
 
 
 ########################################################################
@@ -51,9 +49,6 @@ stat_columns.o: stat_columns.cc
 
 stat_hdr_columns.o: stat_hdr_columns.cc
 	$(CXX) stat_hdr_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS)
-
-write_netcdf.o: write_netcdf.cc
-	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################
