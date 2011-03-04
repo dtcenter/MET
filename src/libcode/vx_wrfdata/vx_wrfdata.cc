@@ -3606,6 +3606,63 @@ WrfData smooth_field(const WrfData &wd, InterpMthd mthd, int wdth, double t) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Check the range of probability values and make sure it's either
+// [0, 1] or [0, 100].  If it's [0, 100], rescale to [0, 1].
+//
+////////////////////////////////////////////////////////////////////////
+
+void rescale_probability(WrfData &wd) {
+   double v, min_v, max_v;
+   int x, y;
+   WrfData tmp_wd;
+
+   // Get the min/max values in the field
+   min_v = wd.int_to_double(0);
+   max_v = wd.int_to_double(wrfdata_int_data_max);
+
+   // Check for a valid range of values
+   if(min_v < 0.0 || max_v > 100.0) {
+      cerr << "\n\nERROR: rescale_probability() -> "
+           << "invalid range of data for a probability field: ["
+           << min_v << ", " << max_v << "].\n\n" << flush;
+      exit(1);
+
+   }
+
+   // Check to see if the data needs to be rescaled from
+   // [0, 100] to [0, 1]
+   if(max_v > 1.0) {
+
+      // Initialize
+      tmp_wd = wd;
+
+      // Set the m and b values
+      tmp_wd.set_m(1.0/(double) wrfdata_int_data_max);
+      tmp_wd.set_b(0.0);
+
+      // Divide each of the values by 100
+      for(x=0; x<wd.get_nx(); x++) {
+         for(y=0; y<wd.get_ny(); y++) {
+
+            // Check for bad data
+            if(wd.is_bad_xy(x, y)) {
+               tmp_wd.put_xy_int(bad_data_flag, x, y);
+            }
+            else {
+               v = wd.get_xy_double(x, y);
+               tmp_wd.put_xy_double(v/100.0, x, y);
+            }
+         } // end for y
+      } // end for x
+
+      wd = tmp_wd;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 double interp_min(const WrfData &wd, int x_ll, int y_ll, int wdth, double t) {
    int x, y, count;

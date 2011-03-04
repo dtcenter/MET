@@ -37,13 +37,15 @@ HEADERS     = filterbox.h  \
               polyline.h   \
               shape.h      \
               vx_wrfdata.h
-																								  
+
 
 ########################################################################
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-
+	@ echo
+	@ echo "*** Finished making vx_wrfdata Library ***"
+	@ echo
 
 ########################################################################
 
