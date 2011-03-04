@@ -75,7 +75,7 @@ static const int boot_perc_flag = 1;
 
 static const int max_str_len  = 512;
 static const int max_line_len = 2048;
-static const double grib_earth_radius_km = 6367.47;
+static const double grib_earth_radius_km = 6371.20;
 static const int default_precision = 5;
 
 ////////////////////////////////////////////////////////////////////////

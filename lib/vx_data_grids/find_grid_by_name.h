@@ -27,6 +27,17 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+//
+// Radius of the earth in km as defined in the NCEP w3 library, which
+// differs from the radius defined in the GRIB specification as
+// 6367.47km.
+//
+static const double ncep_earth_radius_km = 6371.20;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern bool find_grid_by_name(const char *, Grid &);
 
 extern bool find_grid_by_name(const char *, GridInfo &);
