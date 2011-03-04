@@ -430,6 +430,8 @@ extern WrfData fractional_coverage(const WrfData &, int, SingleThresh, double);
 extern WrfData smooth_field(const WrfData &, InterpMthd mthd, int wdth,
                             double t);
 
+extern void rescale_probability(WrfData &);
+
 extern double interp_min    (const WrfData &, int, int, int, double);
 extern double interp_max    (const WrfData &, int, int, int, double);
 extern double interp_median (const WrfData &, int, int, int, double);
