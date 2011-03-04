@@ -53,7 +53,8 @@ void read_netcdf_grid(NcFile * f_in, Grid & gr, int verbosity) {
       get_att(f_in, proj_att, "MET_version");
 
       // Check to see if it matches the current version
-      if(strcmp(proj_att->as_string(0), met_version) == 0) v3_flag = true;
+      if(strncasecmp(proj_att->as_string(0), met_version,
+         strlen(proj_att->as_string(0))) == 0) v3_flag = true;
    }
 
    // Parse the projection information based on the version
