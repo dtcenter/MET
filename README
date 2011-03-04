@@ -218,7 +218,9 @@ Version 3.0.1 Release Notes:
       observations in the Point-Stat and Ensemble-Stat tools.
     - Modify the algorithm used to derive relative humidity for point
       observations in the PB2NC tool to be consistent with the method used by
-      the NCEP Unified-PostProcessor.
+      the NCEP Unified-PostProcessor (UPP).
+    - Change the assumed radius of the earth from 6367.47km to 6371.20km to be
+      consistent with NCEP's w3 library used by WRF and UPP, including copygb.
 
 Version 3.0 Release Notes:
 -------------------------
