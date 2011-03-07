@@ -29,8 +29,6 @@ using namespace std;
 #include "analysis_utils.h"
 #include "mode_columns.h"
 
-#include "constants.h"
-
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -15,7 +15,6 @@
 
 #include "apply_mask.h"
 #include "compute_ci.h"
-#include "constants.h"
 #include "met_stats.h"
 #include "pair_data.h"
 #include "read_grib.h"

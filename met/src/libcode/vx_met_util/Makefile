@@ -33,7 +33,6 @@ LIBRARIES   = libvx_met_util.a
 
 HEADERS     = apply_mask.h        \
               compute_ci.h        \
-              constants.h         \
               conversions.h       \
               file_type.h         \
               grid_output.h       \

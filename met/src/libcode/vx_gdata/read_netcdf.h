@@ -15,7 +15,6 @@
 
 #include "netcdf.hh"
 
-#include "constants.h"
 #include "grid.h"
 #include "vx_wrfdata.h"
 #include "vx_math.h"

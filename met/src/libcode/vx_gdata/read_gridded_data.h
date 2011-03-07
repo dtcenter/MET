@@ -13,7 +13,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "constants.h"
 #include "file_type.h"
 #include "pair_data.h"
 #include "grid.h"

@@ -13,7 +13,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "constants.h"
 #include "grib_classes.h"
 #include "grid.h"
 #include "vx_wrfdata.h"

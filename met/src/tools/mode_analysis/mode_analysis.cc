@@ -37,7 +37,6 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util/vx_util.h"
-#include "vx_met_util/constants.h"
 
 #include "vx_analysis_util/mode_columns.h"
 #include "vx_analysis_util/mode_job.h"
