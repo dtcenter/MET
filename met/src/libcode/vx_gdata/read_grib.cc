@@ -19,6 +19,8 @@ using namespace std;
 #include "grib_classes.h"
 #include "grid.h"
 
+#include "read_grib.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
