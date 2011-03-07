@@ -64,6 +64,7 @@ HEADERS     =  util_constants.h \
 		boundingbox.h \
 		comma_string.h \
 		concat_string.h \
+		constants.h \
 		conversions.h \
 		data_line.h \
 		double_array.h \

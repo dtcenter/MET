@@ -22,7 +22,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_math.h"
-#include "vx_met_util.h"
+#include "read_netcdf.h"
 
 #include "vx_gdata_util.h"
 #include "met_file.h"
