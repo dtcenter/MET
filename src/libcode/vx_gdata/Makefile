@@ -94,7 +94,7 @@ vx_gdata_util.o: vx_gdata_util.cc
 
 
 read_grib.o: read_grib.cc
-	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 read_gridded_data.o: read_gridded_data.cc
 	$(CXX) read_gridded_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
