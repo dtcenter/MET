@@ -20,7 +20,6 @@ OBJECTS     = apply_mask.o        \
               compute_ci.o        \
               conversions.o       \
               file_type.o         \
-              grid_output.o       \
               met_stats.o         \
               pair_data.o         \
 
@@ -35,7 +34,6 @@ HEADERS     = apply_mask.h        \
               compute_ci.h        \
               conversions.h       \
               file_type.h         \
-              grid_output.h       \
               met_stats.h         \
               pair_data.h         \
 
@@ -65,9 +63,6 @@ conversions.o: conversions.cc
 
 file_type.o: file_type.cc
 	$(CXX) file_type.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-grid_output.o: grid_output.cc
-	$(CXX) grid_output.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 met_stats.o: met_stats.cc
 	$(CXX) met_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)

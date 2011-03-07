@@ -27,6 +27,7 @@ OBJECTS     = get_pinterp_grid.o   \
               read_grib.o          \
               read_gridded_data.o  \
               read_netcdf.o        \
+              grid_output.o        \
               write_netcdf.o       \
 
 
@@ -48,6 +49,7 @@ HEADERS     = get_pinterp_grid.h   \
               read_grib.h          \
               read_gridded_data.h  \
               read_netcdf.h        \
+              grid_output.h        \
               write_netcdf.h       \
 
 
@@ -101,6 +103,9 @@ read_gridded_data.o: read_gridded_data.cc
 
 read_netcdf.o: read_netcdf.cc
 	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+grid_output.o: grid_output.cc
+	$(CXX) grid_output.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 write_netcdf.o: write_netcdf.cc
 	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
