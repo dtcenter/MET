@@ -94,16 +94,16 @@ vx_gdata_util.o: vx_gdata_util.cc
 
 
 read_grib.o: read_grib.cc
-	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 read_gridded_data.o: read_gridded_data.cc
-	$(CXX) read_gridded_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) read_gridded_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 read_netcdf.o: read_netcdf.cc
-	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 write_netcdf.o: write_netcdf.cc
-	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################

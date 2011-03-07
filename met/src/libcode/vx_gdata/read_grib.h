@@ -17,6 +17,7 @@
 #include "grid.h"
 #include "vx_wrfdata.h"
 #include "vx_math.h"
+#include "pair_data.h"
 
 ////////////////////////////////////////////////////////////////////////
 
