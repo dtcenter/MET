@@ -34,6 +34,9 @@ HEADERS     = stat_columns.h      \
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_stat_out Library ***"
+	@ echo
 
 
 ########################################################################
