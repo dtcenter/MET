@@ -23,13 +23,7 @@ OBJECTS     = apply_mask.o        \
               grid_output.o       \
               met_stats.o         \
               pair_data.o         \
-              read_grib.o         \
-              read_gridded_data.o \
-              read_netcdf.o       \
-              stat_columns.o      \
-              stat_hdr_columns.o  \
-              write_netcdf.o
-																																																	
+
 
 LIBRARIES   = libvx_met_util.a
 
@@ -45,13 +39,6 @@ HEADERS     = apply_mask.h        \
               grid_output.h       \
               met_stats.h         \
               pair_data.h         \
-              read_grib.h         \
-              read_gridded_data.h \
-              read_netcdf.h       \
-              stat_columns.h      \
-              stat_hdr_columns.h  \
-              vx_met_util.h       \
-              write_netcdf.h
 
 
 ########################################################################
@@ -88,24 +75,6 @@ met_stats.o: met_stats.cc
 
 pair_data.o: pair_data.cc
 	$(CXX) pair_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-read_grib.o: read_grib.cc
-	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-read_gridded_data.o: read_gridded_data.cc
-	$(CXX) read_gridded_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-read_netcdf.o: read_netcdf.cc
-	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-stat_columns.o: stat_columns.cc
-	$(CXX) stat_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-stat_hdr_columns.o: stat_hdr_columns.cc
-	$(CXX) stat_hdr_columns.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-write_netcdf.o: write_netcdf.cc
-	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
