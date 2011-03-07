@@ -16,14 +16,18 @@
 EXECUTABLES =
 
 
-OBJECTS     = get_pinterp_grid.o  \
-              is_met_nc_file.o    \
-              is_netcdf_file.o    \
-              is_pinterp_file.o   \
-              met_file.o          \
-              pinterp_file.o      \
-              var_info.o          \
-              vx_gdata_util.o
+OBJECTS     = get_pinterp_grid.o   \
+              is_met_nc_file.o     \
+              is_netcdf_file.o     \
+              is_pinterp_file.o    \
+              met_file.o           \
+              pinterp_file.o       \
+              var_info.o           \
+              vx_gdata_util.o      \
+              read_grib.o          \
+              read_gridded_data.o  \
+              read_netcdf.o        \
+              write_netcdf.o       \
 
 
 LIBRARIES   = libvx_gdata.a
@@ -32,15 +36,19 @@ LIBRARIES   = libvx_gdata.a
 ########################################################################
 
 
-HEADERS     = get_pinterp_grid.h  \
-              is_met_nc_file.h    \
-              is_netcdf_file.h    \
-              is_pinterp_file.h   \
-              met_file.h          \
-              pinterp_file.h      \
-              var_info.h          \
-              vx_gdata.h          \
-              vx_gdata_util.h
+HEADERS     = get_pinterp_grid.h   \
+              is_met_nc_file.h     \
+              is_netcdf_file.h     \
+              is_pinterp_file.h    \
+              met_file.h           \
+              pinterp_file.h       \
+              var_info.h           \
+              vx_gdata.h           \
+              vx_gdata_util.h      \
+              read_grib.h          \
+              read_gridded_data.h  \
+              read_netcdf.h        \
+              write_netcdf.h       \
 
 
 ########################################################################
@@ -80,6 +88,19 @@ var_info.o: var_info.cc
 
 vx_gdata_util.o: vx_gdata_util.cc
 	$(CXX) vx_gdata_util.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+
+
+read_grib.o: read_grib.cc
+	$(CXX) read_grib.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+
+read_gridded_data.o: read_gridded_data.cc
+	$(CXX) read_gridded_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+
+read_netcdf.o: read_netcdf.cc
+	$(CXX) read_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+
+write_netcdf.o: write_netcdf.cc
+	$(CXX) write_netcdf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
