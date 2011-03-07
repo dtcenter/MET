@@ -17,79 +17,79 @@ EXECUTABLES =
 
 
 OBJECTS     =  ascii_table.o \
-		asciitablejust_to_string.o \
-		bitarray.o \
-		boundingbox.o \
-		comma_string.o \
-		concat_string.o \
-		conversions.o \
-		data_line.o \
-		double_array.o \
-		file_type.o \
-		indent.o \
-		int_array.o \
-		is_number.o \
-		long_array.o \
-		make_path.o \
-		memory.o \
-		num_array.o \
-		ordinal.o \
-		roman_numeral.o \
-		string_array.o \
-		string_fxns.o \
-		substring.o \
-		temp_file.o \
-		thresh_array.o \
-		threshold.o \
-		vx_endian.o \
-		fix_float.o \
-		command_line.o \
-		file_exists.o \
-		two_to_one.o \
+               asciitablejust_to_string.o \
+               bitarray.o \
+               boundingbox.o \
+               comma_string.o \
+               concat_string.o \
+               conversions.o \
+               data_line.o \
+               double_array.o \
+               file_type.o \
+               indent.o \
+               int_array.o \
+               is_number.o \
+               long_array.o \
+               make_path.o \
+               memory.o \
+               num_array.o \
+               ordinal.o \
+               roman_numeral.o \
+               string_array.o \
+               string_fxns.o \
+               substring.o \
+               temp_file.o \
+               thresh_array.o \
+               threshold.o \
+               vx_endian.o \
+               fix_float.o \
+               command_line.o \
+               file_exists.o \
+               two_to_one.o \
+
 
 LIBRARIES   =  libvx_util.a
 
 
 GEN_SOURCES = asciitablejust_to_string.h   \
-		asciitablejust_to_string.cc  \
+              asciitablejust_to_string.cc  \
 
 
 ########################################################################
 
 
 HEADERS     =  util_constants.h \
-		ascii_table.h \
-		asciitablejust_to_string.h \
-		bitarray.h \
-		boundingbox.h \
-		comma_string.h \
-		concat_string.h \
-		constants.h \
-		conversions.h \
-		data_line.h \
-		double_array.h \
-		file_type.h \
-		indent.h \
-		int_array.h \
-		is_number.h \
-		long_array.h \
-		make_path.h \
-		memory.h \
-		num_array.h \
-		ordinal.h \
-		roman_numeral.h \
-		string_array.h \
-		string_fxns.h \
-		substring.h \
-		temp_file.h \
-		thresh_array.h \
-		threshold.h \
-		vx_endian.h \
-		fix_float.h \
-		command_line.h \
-		file_exists.h \
-		two_to_one.h \
-		vx_util.h \
+               ascii_table.h \
+               asciitablejust_to_string.h \
+               bitarray.h \
+               boundingbox.h \
+               comma_string.h \
+               concat_string.h \
+               conversions.h \
+               data_line.h \
+               double_array.h \
+               file_type.h \
+               indent.h \
+               int_array.h \
+               is_number.h \
+               long_array.h \
+               make_path.h \
+               memory.h \
+               num_array.h \
+               ordinal.h \
+               roman_numeral.h \
+               string_array.h \
+               string_fxns.h \
+               substring.h \
+               temp_file.h \
+               thresh_array.h \
+               threshold.h \
+               vx_endian.h \
+               fix_float.h \
+               command_line.h \
+               file_exists.h \
+               two_to_one.h \
+               vx_util.h \
 
 ########################################################################
 
