@@ -16,7 +16,7 @@
 #include "netcdf.hh"
 
 #include "grid.h"
-#include "vx_met_util.h"
+#include "vx_wrfdata.h"
 
 ////////////////////////////////////////////////////////////////////////
 
