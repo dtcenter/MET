@@ -84,13 +84,13 @@ met_file.o: met_file.cc
 	$(CXX) met_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 pinterp_file.o: pinterp_file.cc
-	$(CXX) pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) pinterp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 var_info.o: var_info.cc
-	$(CXX) var_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) var_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 vx_gdata_util.o: vx_gdata_util.cc
-	$(CXX) vx_gdata_util.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) vx_gdata_util.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 read_grib.o: read_grib.cc
