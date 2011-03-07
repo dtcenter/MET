@@ -55,6 +55,9 @@ HEADERS     = get_pinterp_grid.h   \
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+     @ echo
+     @ echo "*** Finished making vx_gdata Library ***"
+     @ echo
 
 
 ########################################################################
