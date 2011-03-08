@@ -17,15 +17,16 @@
 
 #include "ensemble_stat_Conf.h"
 
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_met_util/vx_met_util.h"
-#include "vx_data_grids/grid.h"
-#include "vx_util/vx_util.h"
-#include "vx_cal/vx_cal.h"
-#include "vx_math/vx_math.h"
-#include "vx_contable/vx_contable.h"
-#include "vx_gsl_prob/vx_gsl_prob.h"
-#include "vx_econfig/result.h"
+#include "vx_wrfdata.h"
+#include "grid.h"
+#include "vx_util.h"
+#include "vx_cal.h"
+#include "vx_math.h"
+#include "vx_contable.h"
+#include "vx_gsl_prob.h"
+#include "result.h"
+#include "pair_data.h"
+#include "apply_mask.h"
 
 ////////////////////////////////////////////////////////////////////////
 
