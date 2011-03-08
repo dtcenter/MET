@@ -15,13 +15,13 @@ OBJECTS   = afwa_file.o                 \
             wwmca_config.o              \
             gridhemisphere_to_string.o  \
             wwmca_ref.o                 \
-            nc_output.o                 \
+            nc_output.o
 
 
 GEN_SOURCES = gridhemisphere_to_string.h   \
               gridhemisphere_to_string.cc  \
               wwmca_config.h               \
-              wwmca_config.cc              \
+              wwmca_config.cc
 
 
 ########################################################################
@@ -182,10 +182,9 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 
 clean:
 	@ echo
-	rm -f *.a *.o *.ps *.png *.ppm *.pgm temp junk core log a.out $(OBJECTS) $(TARGETS)
+	rm -f *.a *.o *.ps *.png *.ppm *.pgm temp junk core log a.out $(OBJECTS) $(TARGETS) $(GEN_SOURCES)
 	rm -f $(BIN_DIR)/wwmca_plot
 	rm -f $(BIN_DIR)/wwmca_regrid
-	rm -f $(GEN_SOURCES)
 
 
 ########################################################################
