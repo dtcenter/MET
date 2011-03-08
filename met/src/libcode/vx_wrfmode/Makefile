@@ -15,20 +15,20 @@
 ########################################################################
 
 
-EXECUTABLES = 
+EXECUTABLES =
 
 
 OBJECTS     = WrfMode_Conf.o \
               engine.o       \
               interest.o     \
-              set.o          \
+              set.o
 
 
 LIBRARIES   = libvx_wrfmode.a
 
 
-GEN_SOURCES = WrfMode_Conf.h   \
-              WrfMode_Conf.cc  \
+GEN_SOURCES = WrfMode_Conf.h  \
+              WrfMode_Conf.cc
 
 
 ########################################################################
@@ -39,13 +39,15 @@ HEADERS = engine.h        \
           mode_columns.h  \
           set.h           \
           vx_wrfmode.h    \
-          WrfMode_Conf.h  \
+          WrfMode_Conf.h
 
 
 ###############################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_wrfmode Library ***"
 	@ echo
 
 
@@ -75,16 +77,16 @@ WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
 
 
 WrfMode_Conf.o: WrfMode_Conf.h WrfMode_Conf.cc
-	$(CXX) WrfMode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(LIB_DIR) $(NETCDF_INCS)
+	$(CXX) WrfMode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 engine.o: engine.cc
-	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS)
+	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(MET_INC_DIR)
 
 interest.o: interest.cc
-	$(CXX) interest.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS)
+	$(CXX) interest.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 set.o: set.cc
-	$(CXX) set.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(LIB_DIR) $(NETCDF_INCS)
+	$(CXX) set.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ###############################################################################

@@ -11,9 +11,9 @@
    //     Do not edit by hand
    //
    //
-   //     Created from config file "WrfModeConfig_default"
+   //     Created by econfig_codegen from config file "/d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/config_templates/WrfModeConfig_default"
    //
-   //     on September 9, 2010    3:40 pm  MDT
+   //     on March 8, 2011    11:55 am  MST
    //
 
 
@@ -31,12 +31,6 @@ using namespace std;
 
 #include "WrfMode_Conf.h"
 #include "icodecell_to_result.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int Panic = 1;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -277,6 +271,8 @@ void WrfMode_Conf::read(const char * _config_filename)
 
 {
 
+clear();
+
 const SymbolTableEntry * _e = (const SymbolTableEntry *) 0;
 
    //
@@ -291,7 +287,7 @@ _m.read(_config_filename);
 
 _e = _m.find("model");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"model\"\n\n";
 
@@ -304,7 +300,7 @@ _model_entry = _e;
 
 _e = _m.find("grid_res");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"grid_res\"\n\n";
 
@@ -317,7 +313,7 @@ _grid_res_entry = _e;
 
 _e = _m.find("fcst_field");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_field\"\n\n";
 
@@ -330,7 +326,7 @@ _fcst_field_entry = _e;
 
 _e = _m.find("obs_field");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_field\"\n\n";
 
@@ -343,7 +339,7 @@ _obs_field_entry = _e;
 
 _e = _m.find("mask_missing_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"mask_missing_flag\"\n\n";
 
@@ -356,7 +352,7 @@ _mask_missing_flag_entry = _e;
 
 _e = _m.find("mask_grid");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"mask_grid\"\n\n";
 
@@ -369,7 +365,7 @@ _mask_grid_entry = _e;
 
 _e = _m.find("mask_grid_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"mask_grid_flag\"\n\n";
 
@@ -382,7 +378,7 @@ _mask_grid_flag_entry = _e;
 
 _e = _m.find("mask_poly");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"mask_poly\"\n\n";
 
@@ -395,7 +391,7 @@ _mask_poly_entry = _e;
 
 _e = _m.find("mask_poly_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"mask_poly_flag\"\n\n";
 
@@ -408,7 +404,7 @@ _mask_poly_flag_entry = _e;
 
 _e = _m.find("fcst_raw_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_raw_thresh\"\n\n";
 
@@ -421,7 +417,7 @@ _fcst_raw_thresh_entry = _e;
 
 _e = _m.find("obs_raw_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_raw_thresh\"\n\n";
 
@@ -434,7 +430,7 @@ _obs_raw_thresh_entry = _e;
 
 _e = _m.find("fcst_conv_radius");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_conv_radius\"\n\n";
 
@@ -447,7 +443,7 @@ _fcst_conv_radius_entry = _e;
 
 _e = _m.find("obs_conv_radius");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_conv_radius\"\n\n";
 
@@ -460,7 +456,7 @@ _obs_conv_radius_entry = _e;
 
 _e = _m.find("bad_data_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"bad_data_thresh\"\n\n";
 
@@ -473,7 +469,7 @@ _bad_data_thresh_entry = _e;
 
 _e = _m.find("fcst_conv_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_conv_thresh\"\n\n";
 
@@ -486,7 +482,7 @@ _fcst_conv_thresh_entry = _e;
 
 _e = _m.find("obs_conv_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_conv_thresh\"\n\n";
 
@@ -499,7 +495,7 @@ _obs_conv_thresh_entry = _e;
 
 _e = _m.find("fcst_area_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_area_thresh\"\n\n";
 
@@ -512,7 +508,7 @@ _fcst_area_thresh_entry = _e;
 
 _e = _m.find("obs_area_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_area_thresh\"\n\n";
 
@@ -525,7 +521,7 @@ _obs_area_thresh_entry = _e;
 
 _e = _m.find("fcst_inten_perc");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_inten_perc\"\n\n";
 
@@ -538,7 +534,7 @@ _fcst_inten_perc_entry = _e;
 
 _e = _m.find("fcst_inten_perc_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_inten_perc_thresh\"\n\n";
 
@@ -551,7 +547,7 @@ _fcst_inten_perc_thresh_entry = _e;
 
 _e = _m.find("obs_inten_perc");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_inten_perc\"\n\n";
 
@@ -564,7 +560,7 @@ _obs_inten_perc_entry = _e;
 
 _e = _m.find("obs_inten_perc_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_inten_perc_thresh\"\n\n";
 
@@ -577,7 +573,7 @@ _obs_inten_perc_thresh_entry = _e;
 
 _e = _m.find("fcst_merge_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_merge_thresh\"\n\n";
 
@@ -590,7 +586,7 @@ _fcst_merge_thresh_entry = _e;
 
 _e = _m.find("obs_merge_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_merge_thresh\"\n\n";
 
@@ -603,7 +599,7 @@ _obs_merge_thresh_entry = _e;
 
 _e = _m.find("fcst_merge_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_merge_flag\"\n\n";
 
@@ -616,7 +612,7 @@ _fcst_merge_flag_entry = _e;
 
 _e = _m.find("obs_merge_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_merge_flag\"\n\n";
 
@@ -629,7 +625,7 @@ _obs_merge_flag_entry = _e;
 
 _e = _m.find("match_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"match_flag\"\n\n";
 
@@ -642,7 +638,7 @@ _match_flag_entry = _e;
 
 _e = _m.find("max_centroid_dist");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"max_centroid_dist\"\n\n";
 
@@ -655,7 +651,7 @@ _max_centroid_dist_entry = _e;
 
 _e = _m.find("centroid_dist_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"centroid_dist_weight\"\n\n";
 
@@ -668,7 +664,7 @@ _centroid_dist_weight_entry = _e;
 
 _e = _m.find("boundary_dist_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"boundary_dist_weight\"\n\n";
 
@@ -681,7 +677,7 @@ _boundary_dist_weight_entry = _e;
 
 _e = _m.find("convex_hull_dist_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"convex_hull_dist_weight\"\n\n";
 
@@ -694,7 +690,7 @@ _convex_hull_dist_weight_entry = _e;
 
 _e = _m.find("angle_diff_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"angle_diff_weight\"\n\n";
 
@@ -707,7 +703,7 @@ _angle_diff_weight_entry = _e;
 
 _e = _m.find("area_ratio_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"area_ratio_weight\"\n\n";
 
@@ -720,7 +716,7 @@ _area_ratio_weight_entry = _e;
 
 _e = _m.find("int_area_ratio_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"int_area_ratio_weight\"\n\n";
 
@@ -733,7 +729,7 @@ _int_area_ratio_weight_entry = _e;
 
 _e = _m.find("complexity_ratio_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"complexity_ratio_weight\"\n\n";
 
@@ -746,7 +742,7 @@ _complexity_ratio_weight_entry = _e;
 
 _e = _m.find("intensity_percentile");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"intensity_percentile\"\n\n";
 
@@ -759,7 +755,7 @@ _intensity_percentile_entry = _e;
 
 _e = _m.find("intensity_ratio_weight");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"intensity_ratio_weight\"\n\n";
 
@@ -772,7 +768,7 @@ _intensity_ratio_weight_entry = _e;
 
 _e = _m.find("centroid_dist_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"centroid_dist_if\"\n\n";
 
@@ -785,7 +781,7 @@ _centroid_dist_if_entry = _e;
 
 _e = _m.find("boundary_dist_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"boundary_dist_if\"\n\n";
 
@@ -798,7 +794,7 @@ _boundary_dist_if_entry = _e;
 
 _e = _m.find("convex_hull_dist_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"convex_hull_dist_if\"\n\n";
 
@@ -811,7 +807,7 @@ _convex_hull_dist_if_entry = _e;
 
 _e = _m.find("angle_diff_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"angle_diff_if\"\n\n";
 
@@ -824,7 +820,7 @@ _angle_diff_if_entry = _e;
 
 _e = _m.find("corner");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"corner\"\n\n";
 
@@ -837,7 +833,7 @@ _corner_entry = _e;
 
 _e = _m.find("ratio_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"ratio_if\"\n\n";
 
@@ -850,7 +846,7 @@ _ratio_if_entry = _e;
 
 _e = _m.find("area_ratio_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"area_ratio_if\"\n\n";
 
@@ -863,7 +859,7 @@ _area_ratio_if_entry = _e;
 
 _e = _m.find("int_area_ratio_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"int_area_ratio_if\"\n\n";
 
@@ -876,7 +872,7 @@ _int_area_ratio_if_entry = _e;
 
 _e = _m.find("complexity_ratio_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"complexity_ratio_if\"\n\n";
 
@@ -889,7 +885,7 @@ _complexity_ratio_if_entry = _e;
 
 _e = _m.find("intensity_ratio_if");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"intensity_ratio_if\"\n\n";
 
@@ -902,7 +898,7 @@ _intensity_ratio_if_entry = _e;
 
 _e = _m.find("aspect_ratio_conf");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"aspect_ratio_conf\"\n\n";
 
@@ -915,7 +911,7 @@ _aspect_ratio_conf_entry = _e;
 
 _e = _m.find("area_ratio_conf");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"area_ratio_conf\"\n\n";
 
@@ -928,7 +924,7 @@ _area_ratio_conf_entry = _e;
 
 _e = _m.find("total_interest_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"total_interest_thresh\"\n\n";
 
@@ -941,7 +937,7 @@ _total_interest_thresh_entry = _e;
 
 _e = _m.find("print_interest_thresh");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"print_interest_thresh\"\n\n";
 
@@ -954,7 +950,7 @@ _print_interest_thresh_entry = _e;
 
 _e = _m.find("met_data_dir");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"met_data_dir\"\n\n";
 
@@ -967,7 +963,7 @@ _met_data_dir_entry = _e;
 
 _e = _m.find("fcst_raw_color_table");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_raw_color_table\"\n\n";
 
@@ -980,7 +976,7 @@ _fcst_raw_color_table_entry = _e;
 
 _e = _m.find("obs_raw_color_table");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_raw_color_table\"\n\n";
 
@@ -993,7 +989,7 @@ _obs_raw_color_table_entry = _e;
 
 _e = _m.find("fcst_raw_plot_min");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_raw_plot_min\"\n\n";
 
@@ -1006,7 +1002,7 @@ _fcst_raw_plot_min_entry = _e;
 
 _e = _m.find("fcst_raw_plot_max");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"fcst_raw_plot_max\"\n\n";
 
@@ -1019,7 +1015,7 @@ _fcst_raw_plot_max_entry = _e;
 
 _e = _m.find("obs_raw_plot_min");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_raw_plot_min\"\n\n";
 
@@ -1032,7 +1028,7 @@ _obs_raw_plot_min_entry = _e;
 
 _e = _m.find("obs_raw_plot_max");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"obs_raw_plot_max\"\n\n";
 
@@ -1045,7 +1041,7 @@ _obs_raw_plot_max_entry = _e;
 
 _e = _m.find("stride_length");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"stride_length\"\n\n";
 
@@ -1058,7 +1054,7 @@ _stride_length_entry = _e;
 
 _e = _m.find("mode_color_table");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"mode_color_table\"\n\n";
 
@@ -1071,7 +1067,7 @@ _mode_color_table_entry = _e;
 
 _e = _m.find("zero_border_size");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"zero_border_size\"\n\n";
 
@@ -1084,7 +1080,7 @@ _zero_border_size_entry = _e;
 
 _e = _m.find("plot_valid_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"plot_valid_flag\"\n\n";
 
@@ -1097,7 +1093,7 @@ _plot_valid_flag_entry = _e;
 
 _e = _m.find("plot_gcarc_flag");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"plot_gcarc_flag\"\n\n";
 
@@ -1110,7 +1106,7 @@ _plot_gcarc_flag_entry = _e;
 
 _e = _m.find("grib_ptv");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"grib_ptv\"\n\n";
 
@@ -1123,7 +1119,7 @@ _grib_ptv_entry = _e;
 
 _e = _m.find("output_prefix");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"output_prefix\"\n\n";
 
@@ -1136,7 +1132,7 @@ _output_prefix_entry = _e;
 
 _e = _m.find("version");
 
-if ( !_e && Panic )  {
+if ( !_e )  {
 
    cerr << "\n\n  WrfMode_Conf::read(const char *) -> can't get symbol table entry for variable \"version\"\n\n";
 
@@ -1160,14 +1156,34 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void WrfMode_Conf::st_dump(ostream & _out, int _depth) const
+
+{
+
+_m.st_dump(_out, _depth);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 Result WrfMode_Conf::model()
 
 {
 
+if ( !_model_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::model() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_model_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_model_entry );
@@ -1189,10 +1205,16 @@ Result WrfMode_Conf::grid_res()
 
 {
 
+if ( !_grid_res_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::grid_res() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_grid_res_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_grid_res_entry );
@@ -1214,10 +1236,16 @@ Result WrfMode_Conf::fcst_field()
 
 {
 
+if ( !_fcst_field_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_field() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_field_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_field_entry );
@@ -1239,10 +1267,16 @@ Result WrfMode_Conf::obs_field()
 
 {
 
+if ( !_obs_field_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_field() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_field_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_field_entry );
@@ -1264,10 +1298,16 @@ Result WrfMode_Conf::mask_missing_flag()
 
 {
 
+if ( !_mask_missing_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::mask_missing_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_mask_missing_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_mask_missing_flag_entry );
@@ -1289,10 +1329,16 @@ Result WrfMode_Conf::mask_grid()
 
 {
 
+if ( !_mask_grid_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::mask_grid() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_mask_grid_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_mask_grid_entry );
@@ -1314,10 +1360,16 @@ Result WrfMode_Conf::mask_grid_flag()
 
 {
 
+if ( !_mask_grid_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::mask_grid_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_mask_grid_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_mask_grid_flag_entry );
@@ -1339,10 +1391,16 @@ Result WrfMode_Conf::mask_poly()
 
 {
 
+if ( !_mask_poly_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::mask_poly() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_mask_poly_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_mask_poly_entry );
@@ -1364,10 +1422,16 @@ Result WrfMode_Conf::mask_poly_flag()
 
 {
 
+if ( !_mask_poly_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::mask_poly_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_mask_poly_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_mask_poly_flag_entry );
@@ -1389,10 +1453,16 @@ Result WrfMode_Conf::fcst_raw_thresh()
 
 {
 
+if ( !_fcst_raw_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_raw_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_raw_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_raw_thresh_entry );
@@ -1414,10 +1484,16 @@ Result WrfMode_Conf::obs_raw_thresh()
 
 {
 
+if ( !_obs_raw_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_raw_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_raw_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_raw_thresh_entry );
@@ -1439,10 +1515,16 @@ Result WrfMode_Conf::fcst_conv_radius()
 
 {
 
+if ( !_fcst_conv_radius_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_conv_radius() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_conv_radius_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_conv_radius_entry );
@@ -1464,10 +1546,16 @@ Result WrfMode_Conf::obs_conv_radius()
 
 {
 
+if ( !_obs_conv_radius_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_conv_radius() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_conv_radius_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_conv_radius_entry );
@@ -1489,10 +1577,16 @@ Result WrfMode_Conf::bad_data_thresh()
 
 {
 
+if ( !_bad_data_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::bad_data_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_bad_data_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_bad_data_thresh_entry );
@@ -1514,10 +1608,16 @@ Result WrfMode_Conf::fcst_conv_thresh()
 
 {
 
+if ( !_fcst_conv_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_conv_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_conv_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_conv_thresh_entry );
@@ -1539,10 +1639,16 @@ Result WrfMode_Conf::obs_conv_thresh()
 
 {
 
+if ( !_obs_conv_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_conv_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_conv_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_conv_thresh_entry );
@@ -1564,10 +1670,16 @@ Result WrfMode_Conf::fcst_area_thresh()
 
 {
 
+if ( !_fcst_area_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_area_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_area_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_area_thresh_entry );
@@ -1589,10 +1701,16 @@ Result WrfMode_Conf::obs_area_thresh()
 
 {
 
+if ( !_obs_area_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_area_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_area_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_area_thresh_entry );
@@ -1614,10 +1732,16 @@ Result WrfMode_Conf::fcst_inten_perc()
 
 {
 
+if ( !_fcst_inten_perc_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_inten_perc() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_inten_perc_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_inten_perc_entry );
@@ -1639,10 +1763,16 @@ Result WrfMode_Conf::fcst_inten_perc_thresh()
 
 {
 
+if ( !_fcst_inten_perc_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_inten_perc_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_inten_perc_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_inten_perc_thresh_entry );
@@ -1664,10 +1794,16 @@ Result WrfMode_Conf::obs_inten_perc()
 
 {
 
+if ( !_obs_inten_perc_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_inten_perc() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_inten_perc_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_inten_perc_entry );
@@ -1689,10 +1825,16 @@ Result WrfMode_Conf::obs_inten_perc_thresh()
 
 {
 
+if ( !_obs_inten_perc_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_inten_perc_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_inten_perc_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_inten_perc_thresh_entry );
@@ -1714,10 +1856,16 @@ Result WrfMode_Conf::fcst_merge_thresh()
 
 {
 
+if ( !_fcst_merge_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_merge_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_merge_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_merge_thresh_entry );
@@ -1739,10 +1887,16 @@ Result WrfMode_Conf::obs_merge_thresh()
 
 {
 
+if ( !_obs_merge_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_merge_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_merge_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_merge_thresh_entry );
@@ -1764,10 +1918,16 @@ Result WrfMode_Conf::fcst_merge_flag()
 
 {
 
+if ( !_fcst_merge_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_merge_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_merge_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_merge_flag_entry );
@@ -1789,10 +1949,16 @@ Result WrfMode_Conf::obs_merge_flag()
 
 {
 
+if ( !_obs_merge_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_merge_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_merge_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_merge_flag_entry );
@@ -1814,10 +1980,16 @@ Result WrfMode_Conf::match_flag()
 
 {
 
+if ( !_match_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::match_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_match_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_match_flag_entry );
@@ -1839,10 +2011,16 @@ Result WrfMode_Conf::max_centroid_dist()
 
 {
 
+if ( !_max_centroid_dist_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::max_centroid_dist() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_max_centroid_dist_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_max_centroid_dist_entry );
@@ -1864,10 +2042,16 @@ Result WrfMode_Conf::centroid_dist_weight()
 
 {
 
+if ( !_centroid_dist_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::centroid_dist_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_centroid_dist_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_centroid_dist_weight_entry );
@@ -1889,10 +2073,16 @@ Result WrfMode_Conf::boundary_dist_weight()
 
 {
 
+if ( !_boundary_dist_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::boundary_dist_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_boundary_dist_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_boundary_dist_weight_entry );
@@ -1914,10 +2104,16 @@ Result WrfMode_Conf::convex_hull_dist_weight()
 
 {
 
+if ( !_convex_hull_dist_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::convex_hull_dist_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_convex_hull_dist_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_convex_hull_dist_weight_entry );
@@ -1939,10 +2135,16 @@ Result WrfMode_Conf::angle_diff_weight()
 
 {
 
+if ( !_angle_diff_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::angle_diff_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_angle_diff_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_angle_diff_weight_entry );
@@ -1964,10 +2166,16 @@ Result WrfMode_Conf::area_ratio_weight()
 
 {
 
+if ( !_area_ratio_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::area_ratio_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_area_ratio_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_area_ratio_weight_entry );
@@ -1989,10 +2197,16 @@ Result WrfMode_Conf::int_area_ratio_weight()
 
 {
 
+if ( !_int_area_ratio_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::int_area_ratio_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_int_area_ratio_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_int_area_ratio_weight_entry );
@@ -2014,10 +2228,16 @@ Result WrfMode_Conf::complexity_ratio_weight()
 
 {
 
+if ( !_complexity_ratio_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::complexity_ratio_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_complexity_ratio_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_complexity_ratio_weight_entry );
@@ -2039,10 +2259,16 @@ Result WrfMode_Conf::intensity_percentile()
 
 {
 
+if ( !_intensity_percentile_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::intensity_percentile() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_intensity_percentile_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_intensity_percentile_entry );
@@ -2064,10 +2290,16 @@ Result WrfMode_Conf::intensity_ratio_weight()
 
 {
 
+if ( !_intensity_ratio_weight_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::intensity_ratio_weight() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_intensity_ratio_weight_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_intensity_ratio_weight_entry );
@@ -2089,10 +2321,16 @@ Result WrfMode_Conf::centroid_dist_if(const Result & _r)
 
 {
 
+if ( !_centroid_dist_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::centroid_dist_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_centroid_dist_if_entry && !Panic )  return ( _temp_result );
-
 double _x, _y;
 const PiecewiseLinear & _pwl_f = *(_centroid_dist_if_entry->pl);
 
@@ -2115,10 +2353,16 @@ Result WrfMode_Conf::boundary_dist_if(const Result & _r)
 
 {
 
+if ( !_boundary_dist_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::boundary_dist_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_boundary_dist_if_entry && !Panic )  return ( _temp_result );
-
 double _x, _y;
 const PiecewiseLinear & _pwl_f = *(_boundary_dist_if_entry->pl);
 
@@ -2141,10 +2385,16 @@ Result WrfMode_Conf::convex_hull_dist_if(const Result & _r)
 
 {
 
+if ( !_convex_hull_dist_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::convex_hull_dist_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_convex_hull_dist_if_entry && !Panic )  return ( _temp_result );
-
 double _x, _y;
 const PiecewiseLinear & _pwl_f = *(_convex_hull_dist_if_entry->pl);
 
@@ -2167,10 +2417,16 @@ Result WrfMode_Conf::angle_diff_if(const Result & _r)
 
 {
 
+if ( !_angle_diff_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::angle_diff_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_angle_diff_if_entry && !Panic )  return ( _temp_result );
-
 double _x, _y;
 const PiecewiseLinear & _pwl_f = *(_angle_diff_if_entry->pl);
 
@@ -2193,10 +2449,16 @@ Result WrfMode_Conf::corner()
 
 {
 
+if ( !_corner_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::corner() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_corner_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_corner_entry );
@@ -2218,10 +2480,16 @@ Result WrfMode_Conf::ratio_if(const Result & _r)
 
 {
 
+if ( !_ratio_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::ratio_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_ratio_if_entry && !Panic )  return ( _temp_result );
-
 double _x, _y;
 const PiecewiseLinear & _pwl_f = *(_ratio_if_entry->pl);
 
@@ -2244,10 +2512,16 @@ Result WrfMode_Conf::area_ratio_if(const Result & _r_0)
 
 {
 
+if ( !_area_ratio_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::area_ratio_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_area_ratio_if_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 
@@ -2289,10 +2563,16 @@ Result WrfMode_Conf::int_area_ratio_if(const Result & _r)
 
 {
 
+if ( !_int_area_ratio_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::int_area_ratio_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_int_area_ratio_if_entry && !Panic )  return ( _temp_result );
-
 double _x, _y;
 const PiecewiseLinear & _pwl_f = *(_int_area_ratio_if_entry->pl);
 
@@ -2315,10 +2595,16 @@ Result WrfMode_Conf::complexity_ratio_if(const Result & _r_0)
 
 {
 
+if ( !_complexity_ratio_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::complexity_ratio_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_complexity_ratio_if_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 
@@ -2360,10 +2646,16 @@ Result WrfMode_Conf::intensity_ratio_if(const Result & _r_0)
 
 {
 
+if ( !_intensity_ratio_if_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::intensity_ratio_if() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_intensity_ratio_if_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 
@@ -2405,10 +2697,16 @@ Result WrfMode_Conf::aspect_ratio_conf(const Result & _r_0)
 
 {
 
+if ( !_aspect_ratio_conf_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::aspect_ratio_conf() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_aspect_ratio_conf_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 
@@ -2450,10 +2748,16 @@ Result WrfMode_Conf::area_ratio_conf(const Result & _r_0)
 
 {
 
+if ( !_area_ratio_conf_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::area_ratio_conf() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_area_ratio_conf_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 
@@ -2495,10 +2799,16 @@ Result WrfMode_Conf::total_interest_thresh()
 
 {
 
+if ( !_total_interest_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::total_interest_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_total_interest_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_total_interest_thresh_entry );
@@ -2520,10 +2830,16 @@ Result WrfMode_Conf::print_interest_thresh()
 
 {
 
+if ( !_print_interest_thresh_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::print_interest_thresh() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_print_interest_thresh_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_print_interest_thresh_entry );
@@ -2545,10 +2861,16 @@ Result WrfMode_Conf::met_data_dir()
 
 {
 
+if ( !_met_data_dir_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::met_data_dir() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_met_data_dir_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_met_data_dir_entry );
@@ -2570,10 +2892,16 @@ Result WrfMode_Conf::fcst_raw_color_table()
 
 {
 
+if ( !_fcst_raw_color_table_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_raw_color_table() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_raw_color_table_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_raw_color_table_entry );
@@ -2595,10 +2923,16 @@ Result WrfMode_Conf::obs_raw_color_table()
 
 {
 
+if ( !_obs_raw_color_table_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_raw_color_table() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_raw_color_table_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_raw_color_table_entry );
@@ -2620,10 +2954,16 @@ Result WrfMode_Conf::fcst_raw_plot_min()
 
 {
 
+if ( !_fcst_raw_plot_min_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_raw_plot_min() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_raw_plot_min_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_raw_plot_min_entry );
@@ -2645,10 +2985,16 @@ Result WrfMode_Conf::fcst_raw_plot_max()
 
 {
 
+if ( !_fcst_raw_plot_max_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::fcst_raw_plot_max() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_fcst_raw_plot_max_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_fcst_raw_plot_max_entry );
@@ -2670,10 +3016,16 @@ Result WrfMode_Conf::obs_raw_plot_min()
 
 {
 
+if ( !_obs_raw_plot_min_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_raw_plot_min() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_raw_plot_min_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_raw_plot_min_entry );
@@ -2695,10 +3047,16 @@ Result WrfMode_Conf::obs_raw_plot_max()
 
 {
 
+if ( !_obs_raw_plot_max_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::obs_raw_plot_max() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_obs_raw_plot_max_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_obs_raw_plot_max_entry );
@@ -2720,10 +3078,16 @@ Result WrfMode_Conf::stride_length()
 
 {
 
+if ( !_stride_length_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::stride_length() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_stride_length_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_stride_length_entry );
@@ -2745,10 +3109,16 @@ Result WrfMode_Conf::mode_color_table()
 
 {
 
+if ( !_mode_color_table_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::mode_color_table() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_mode_color_table_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_mode_color_table_entry );
@@ -2770,10 +3140,16 @@ Result WrfMode_Conf::zero_border_size()
 
 {
 
+if ( !_zero_border_size_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::zero_border_size() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_zero_border_size_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_zero_border_size_entry );
@@ -2795,10 +3171,16 @@ Result WrfMode_Conf::plot_valid_flag()
 
 {
 
+if ( !_plot_valid_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::plot_valid_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_plot_valid_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_plot_valid_flag_entry );
@@ -2820,10 +3202,16 @@ Result WrfMode_Conf::plot_gcarc_flag()
 
 {
 
+if ( !_plot_gcarc_flag_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::plot_gcarc_flag() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_plot_gcarc_flag_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_plot_gcarc_flag_entry );
@@ -2845,10 +3233,16 @@ Result WrfMode_Conf::grib_ptv()
 
 {
 
+if ( !_grib_ptv_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::grib_ptv() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_grib_ptv_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_grib_ptv_entry );
@@ -2870,10 +3264,16 @@ Result WrfMode_Conf::output_prefix()
 
 {
 
+if ( !_output_prefix_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::output_prefix() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_output_prefix_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_output_prefix_entry );
@@ -2895,10 +3295,16 @@ Result WrfMode_Conf::version()
 
 {
 
+if ( !_version_entry )  {
+
+   cerr << "\n\n   WrfMode_Conf::version() -> no symbol table entry found!\n\n";
+
+   exit ( 1 );
+
+}
+
+
 Result _temp_result;
-
-if ( !_version_entry && !Panic )  return ( _temp_result );
-
 IcodeCell _cell;
 
 _m.run( *_version_entry );

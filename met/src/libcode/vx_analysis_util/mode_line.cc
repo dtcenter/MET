@@ -28,6 +28,7 @@ using namespace std;
 #include "mode_line.h"
 #include "analysis_utils.h"
 #include "mode_columns.h"
+#include "math_constants.h"
 
 
 ////////////////////////////////////////////////////////////////////////

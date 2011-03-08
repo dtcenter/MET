@@ -488,6 +488,8 @@ using namespace std;
 
 #include <iostream>
 
+#include "scanner_stuff.h"
+
 #include "vx_color_parser.h"   //  this must be included before cfile.tab.h
 #include "vx_clist.h"
 

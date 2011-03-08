@@ -16,7 +16,7 @@
 EXECUTABLES =
 
 
-OBJECTS     = plot_util.o
+OBJECTS     = vx_plot_util.o
 
 
 LIBRARIES   = libvx_plot_util.a
@@ -25,13 +25,16 @@ LIBRARIES   = libvx_plot_util.a
 ########################################################################
 
 
-HEADERS     = plot_util.h
+HEADERS     = vx_plot_util.h
 
 
 ########################################################################
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_plot_util Library ***"
+	@ echo
 
 
 ########################################################################
@@ -42,8 +45,8 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
 
 
-plot_util.o: plot_util.cc
-	$(CXX) plot_util.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+vx_plot_util.o: vx_plot_util.cc
+	$(CXX) vx_plot_util.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(MET_INC_DIR)
 
 
 ########################################################################

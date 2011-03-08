@@ -32,6 +32,9 @@ HEADERS     = nav.h
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_nav Library ***"
+	@ echo
 
 
 ########################################################################
@@ -43,7 +46,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 nav.o: nav.cc
-	$(CXX) nav.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) nav.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
@@ -60,7 +63,7 @@ libvx_nav.a: $(OBJECTS)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	cp $(HEADERS) $(MET_INC_DIR)
 	rm -f $(MET_LIB_DIR)/libvx_nav.a
-	cp libvx_nav .a $(MET_LIB_DIR)
+	cp libvx_nav.a $(MET_LIB_DIR)
 
 
 ########################################################################

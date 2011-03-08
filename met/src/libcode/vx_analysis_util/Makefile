@@ -90,7 +90,7 @@ mode_line.o: mode_line.cc
 	$(CXX) mode_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 stat_job.o: stat_job.cc
-	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)  $(GSL_INCS)
 
 stat_line.o: stat_line.cc
 	$(CXX) stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)

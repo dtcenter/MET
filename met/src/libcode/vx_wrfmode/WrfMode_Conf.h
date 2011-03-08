@@ -18,9 +18,9 @@
    //     Do not edit by hand
    //
    //
-   //     Created from config file "WrfModeConfig_default"
+   //     Created by econfig_codegen from config file "/d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/config_templates/WrfModeConfig_default"
    //
-   //     on September 9, 2010    3:40 pm  MDT
+   //     on March 8, 2011    11:55 am  MST
    //
 
 
@@ -202,204 +202,141 @@ class WrfMode_Conf {
 
       void read(const char * config_filename);
 
+      void st_dump(ostream &, int = 0) const;   //  dump machine symbol table
+
          //
          //  Symbol Access
          //
 
       Result model();
 
-
       Result grid_res();
-
 
       Result fcst_field();
 
-
       Result obs_field();
-
 
       Result mask_missing_flag();
 
-
       Result mask_grid();
-
 
       Result mask_grid_flag();
 
-
       Result mask_poly();
-
 
       Result mask_poly_flag();
 
-
       Result fcst_raw_thresh();
-
 
       Result obs_raw_thresh();
 
-
       Result fcst_conv_radius();
-
 
       Result obs_conv_radius();
 
-
       Result bad_data_thresh();
-
 
       Result fcst_conv_thresh();
 
-
       Result obs_conv_thresh();
-
 
       Result fcst_area_thresh();
 
-
       Result obs_area_thresh();
-
 
       Result fcst_inten_perc();
 
-
       Result fcst_inten_perc_thresh();
-
 
       Result obs_inten_perc();
 
-
       Result obs_inten_perc_thresh();
-
 
       Result fcst_merge_thresh();
 
-
       Result obs_merge_thresh();
-
 
       Result fcst_merge_flag();
 
-
       Result obs_merge_flag();
-
 
       Result match_flag();
 
-
       Result max_centroid_dist();
-
 
       Result centroid_dist_weight();
 
-
       Result boundary_dist_weight();
-
 
       Result convex_hull_dist_weight();
 
-
       Result angle_diff_weight();
-
 
       Result area_ratio_weight();
 
-
       Result int_area_ratio_weight();
-
 
       Result complexity_ratio_weight();
 
-
       Result intensity_percentile();
-
 
       Result intensity_ratio_weight();
 
-
       Result centroid_dist_if(const Result &);   //  pwl function
-
 
       Result boundary_dist_if(const Result &);   //  pwl function
 
-
       Result convex_hull_dist_if(const Result &);   //  pwl function
-
 
       Result angle_diff_if(const Result &);   //  pwl function
 
-
       Result corner();
-
 
       Result ratio_if(const Result &);   //  pwl function
 
-
       Result area_ratio_if(const Result &);   //  function of 1 variable
-
 
       Result int_area_ratio_if(const Result &);   //  pwl function
 
-
       Result complexity_ratio_if(const Result &);   //  function of 1 variable
-
 
       Result intensity_ratio_if(const Result &);   //  function of 1 variable
 
-
       Result aspect_ratio_conf(const Result &);   //  function of 1 variable
-
 
       Result area_ratio_conf(const Result &);   //  function of 1 variable
 
-
       Result total_interest_thresh();
-
 
       Result print_interest_thresh();
 
-
       Result met_data_dir();
-
 
       Result fcst_raw_color_table();
 
-
       Result obs_raw_color_table();
-
 
       Result fcst_raw_plot_min();
 
-
       Result fcst_raw_plot_max();
-
 
       Result obs_raw_plot_min();
 
-
       Result obs_raw_plot_max();
-
 
       Result stride_length();
 
-
       Result mode_color_table();
-
 
       Result zero_border_size();
 
-
       Result plot_valid_flag();
-
 
       Result plot_gcarc_flag();
 
-
       Result grib_ptv();
 
-
       Result output_prefix();
-
 
       Result version();
 
