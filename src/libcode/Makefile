@@ -13,9 +13,9 @@ all:
 	@ cd vx_gdata         ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_gnomon        ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_nav           ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_pb_util       ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_afm           ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_ps            ; $(MAKE) $(PRINT_OPTS)
-	@ cd vx_pb_util       ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_pxm           ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_plot_util     ; $(MAKE) $(PRINT_OPTS)
@@ -38,9 +38,9 @@ clean:
 	@ cd vx_gdata         ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_gnomon        ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_nav           ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_pb_util       ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_afm           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_ps            ; $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_pb_util       ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_color         ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_pxm           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_plot_util     ; $(MAKE) $(PRINT_OPTS) clean
