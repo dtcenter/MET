@@ -43,9 +43,10 @@ using namespace std;
 #include "netcdf.hh"
 
 #include "vx_analysis_util.h"
-#include "vx_met_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+#include "write_netcdf.h"
+#include "met_stats.h"
 
 ////////////////////////////////////////////////////////////////////////
 

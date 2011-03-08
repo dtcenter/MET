@@ -1,94 +1,129 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 # ** Copyright UCAR (c) 1992 - 2011
-# ** University Corporation for Atmospheric Research(UCAR)
-# ** National Center for Atmospheric Research(NCAR)
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
 # ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ########################################################################
 #
-# Makefile for the ensemble_stat application
+# Makefile for the ensemble_stat tool
 #
 ########################################################################
 
-CXX         = /usr/bin/g++
-CXX_FLAGS   = -Wall -Wshadow -static -g
-SVNROOT     = ../../../..
-MET_LIB_DIR = $(SVNROOT)/code/trunk/met/lib
+
+EXECUTABLES = ensemble_stat
+
+
+OBJECTS     = ensemble_stat_Conf.o      \
+              ensemble_stat_conf_info.o \
+              ensemble_stat.o
+
+
+LIBRARIES   =
+
+
+GEN_SOURCES = ensemble_stat_Conf.h  \
+              ensemble_stat_Conf.cc
+
 
 ########################################################################
 
-TARGETS		= ensemble_stat
 
-OBJECTS		= ensemble_stat_Conf.o \
-		  ensemble_stat_conf_info.o
+HEADERS     = ensemble_stat_conf_info.h \
+              ensemble_stat.h
 
-OPT_FLAGS		=
 
-FAKES		= all clean objects targets
+########################################################################
 
-LIB_DIR		= ../../lib
 
-INC_DIR		= ../../lib
-
-VX_ECONFIG_CLASS = ensemble_stat
-VX_ECONFIG_EXAMPLE_PARM = EnsembleStatConfig_default
-VX_ECONFIG_IS_RAP_LIB = false
-VX_ECONFIG_HEADER_SUFFIX = h
-VX_ECONFIG_PANIC = true
-
-MODULE_TYPE = progcpp
-
-#
-# vx_econfig macros and targets
-#
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_macros
-
-all:
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Making ensemble_stat application ***"
-	@ echo
-	@ $(MAKE) objects $(PRINT_OPTS)
-	@ $(MAKE) targets $(PRINT_OPTS)
-	@ echo
-	@ echo "*** Finished Making ensemble_stat application ***"
+	@ echo "*** Finished making ensemble_stat application ***"
 	@ echo
 
-objects: $(OBJECTS)
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
-targets: $(TARGETS)
-	@ echo
 
-ensemble_stat: ensemble_stat.cc
-	@echo
-	$(CXX) -o $(TARGETS) ensemble_stat.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE)\" \
-	-I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
-	-L$(LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
-	-lvx_contable -lvx_met_util -lvx_analysis_util \
-	-lvx_gdata -lvx_wrfdata -lvx_contable -lvx_met_util -lvx_grib_classes \
-	-lvx_econfig -lvx_gsl_prob -lgsl \
-	-lvx_plot_util  -lvx_render -lvx_pxm -lvx_color -lvx_ps -lvx_afm \
-	-lvx_data_grids -lvx_gnomon -lvx_nav -lvx_cal -lvx_util -lvx_math -lm \
-	-lnetcdf_c++ -lnetcdf \
-	$(CXX_LIBS)
-	cp $(TARGETS) ../../bin/.
+ensemble_stat_Conf.h ensemble_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
+	@ echo
+	@ rm -f ensemble_stat_Conf.h ensemble_stat_Conf.cc
+	$(ECONFIG_CODEGEN) -class ensemble_stat_Conf -outfile ensemble_stat_Conf $(CONFIG_TEMPLATE_DIR)/EnsembleStatConfig_default
+
+
+########################################################################
+
+   ##
+   ##  objects
+   ##
+
 
 ensemble_stat_Conf.o: ensemble_stat_Conf.cc
-	$(CXX) -c ensemble_stat_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) \
-	-I$(INC_DIR)
+	$(CXX) ensemble_stat_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
-	$(CXX) -c ensemble_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) \
-	-I$(INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
+	$(CXX) ensemble_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
-include $(SVNROOT)/build/make_include/rap_make_vx_econfig_targets
+ensemble_stat.o: ensemble_stat.cc
+	$(CXX) ensemble_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+
+
+########################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
+
+########################################################################
+
+
+   ##
+   ##  executables
+   ##
+
+
+ensemble_stat: $(OBJECTS)
+	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE)\" \
+	-I$(MET_LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \
+	-lvx_plot_util -lvx_pxm -lvx_ps -lvx_afm -lvx_pb_util \
+	-lvx_nav -lvx_gnomon -lvx_gdata -lvx_stat_out -lvx_statistics \
+	-lvx_gsl_prob -lvx_wrfdata -lvx_grib_classes -lvx_data_grids \
+	-lvx_util -lvx_math -lvx_cal \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl \
+	$(CXX_LIBS)
+	cp $(EXECUTABLES) $(MET_BIN_DIR)
+
+
+########################################################################
+
 
 clean:
-	rm -r -f *.a *.o junk temp core log c.ps a.out $(TARGETS) ../../bin/$(TARGETS)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_BIN_DIR)/ensemble_stat
 
-.PHONY: $(FAKES)
+
+########################################################################
+
+
+.PHONY: all clean
+
+
+########################################################################
 
 
