@@ -28,7 +28,7 @@ OBJECTS     = get_pinterp_grid.o   \
               read_gridded_data.o  \
               read_netcdf.o        \
               grid_output.o        \
-              write_netcdf.o       \
+              write_netcdf.o
 
 
 LIBRARIES   = libvx_gdata.a
@@ -50,7 +50,7 @@ HEADERS     = get_pinterp_grid.h   \
               read_gridded_data.h  \
               read_netcdf.h        \
               grid_output.h        \
-              write_netcdf.h       \
+              write_netcdf.h
 
 
 ########################################################################

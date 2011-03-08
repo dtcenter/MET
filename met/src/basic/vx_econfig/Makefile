@@ -26,7 +26,7 @@ OBJECTS      = pwl.o                   \
                resulttype_to_string.o  \
                result.o                \
                icodecell_to_result.o   \
-               gen.o                   \
+               gen.o
 
 
 
@@ -45,13 +45,13 @@ HEADERS      = algline.h               \
                celltype_to_string.h    \
                stetype_to_string.h     \
                gen.h                   \
-               icodecell_to_result.h   \
+               icodecell_to_result.h
 
 
 GEN_SOURCES = celltype_to_string.h celltype_to_string.cc      \
               stetype_to_string.h stetype_to_string.cc        \
               builtin_to_string.h builtin_to_string.cc        \
-              resulttype_to_string.h resulttype_to_string.cc  \
+              resulttype_to_string.h resulttype_to_string.cc
 
 
 ########################################################################
@@ -66,6 +66,8 @@ LEX         = flex --prefix=econfig
 
 
 all: $(OBJECTS) $(LIBRARIES) econfig_codegen
+	@ echo
+	@ echo "*** Finished making econfig_codegen Library ***"
 	@ echo
 
 

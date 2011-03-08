@@ -27,7 +27,7 @@ OBJECTS     = vx_ascii85_filter.o \
               vx_render_ppm.o     \
               vx_renderinfo.o     \
               vx_rle_filter.o     \
-              vx_uc_queue.o       \
+              vx_uc_queue.o
 
 
 LIBRARIES   = libvx_render.a
@@ -44,7 +44,7 @@ HEADERS     = vx_ascii85_filter.h  \
               vx_render.h          \
               vx_renderinfo.h      \
               vx_rle_filter.h      \
-              vx_uc_queue.h 
+              vx_uc_queue.h
 
 
 ########################################################################
