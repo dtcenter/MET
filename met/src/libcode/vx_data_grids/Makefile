@@ -47,7 +47,9 @@ HEADERS     = find_grid_by_name.h \
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-
+	@ echo
+	@ echo "*** Finished making vx_data_grids Library ***"
+	@ echo
 
 ########################################################################
 

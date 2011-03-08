@@ -42,7 +42,7 @@ HEADERS     = gsl_bvn.h         \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_gsk_prob Library ***"
+	@ echo "*** Finished making vx_gsl_prob Library ***"
 	@ echo
 
 
