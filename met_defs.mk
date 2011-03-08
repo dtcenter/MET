@@ -11,23 +11,27 @@
 ########################################################################
 
 
-MET_BASE_DIR   = $(PWD)
+MET_BASE_DIR        = $(PWD)
 
-MET_LIB_DIR    = $(MET_BASE_DIR)/lib
+MET_LIB_DIR         = $(MET_BASE_DIR)/lib
 
-MET_INC_DIR    = $(MET_BASE_DIR)/include
+MET_INC_DIR         = $(MET_BASE_DIR)/include
 
-MET_SRC_DIR    = $(MET_BASE_DIR)/src
+MET_SRC_DIR         = $(MET_BASE_DIR)/src
 
-MET_BIN_DIR    = $(MET_BASE_DIR)/bin
+MET_BIN_DIR         = $(MET_BASE_DIR)/bin
 
-MET_OUTPUT_DIR = $(MET_BASE_DIR)/out
+MET_OUTPUT_DIR      = $(MET_BASE_DIR)/out
 
 
 ########################################################################
 
 
-ENUM_TO_STRING = $(MET_SRC_DIR)/basic/enum_to_string/enum_to_string
+ENUM_TO_STRING      = $(MET_SRC_DIR)/basic/enum_to_string/enum_to_string
+
+ECONFIG_CODEGEN     = $(MET_SRC_DIR)/basic/vx_econfig/econfig_codegen
+
+CONFIG_TEMPLATE_DIR = $(MET_BASE_DIR)/config_templates
 
 
 ########################################################################

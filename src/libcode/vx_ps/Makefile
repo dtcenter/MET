@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2007
+# ** Copyright UCAR (c) 1992 - 2011
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -17,7 +17,7 @@ EXECUTABLES =
 
 
 OBJECTS     = vx_ps.o       \
-              vx_ps_text.o  \
+              vx_ps_text.o
 
 
 LIBRARIES   = libvx_ps.a
@@ -27,13 +27,15 @@ LIBRARIES   = libvx_ps.a
 
 
 HEADERS     = vx_ps.h       \
-              vx_ps_text.h  \
+              vx_ps_text.h
 
 
 ########################################################################
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_ps Library ***"
 	@ echo
 
 
@@ -46,10 +48,10 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 vx_ps.o: vx_ps.cc
-	$(CXX) vx_ps.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\"
+	$(CXX) vx_ps.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE)\"
 
 vx_ps_text.o: vx_ps_text.cc
-	$(CXX) vx_ps_text.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_ps_text.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

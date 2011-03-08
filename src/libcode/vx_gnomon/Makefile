@@ -32,6 +32,9 @@ HEADERS     = gnomon.h
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_gnomon Library ***"
+	@ echo
 
 
 ########################################################################
@@ -43,7 +46,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 gnomon.o: gnomon.cc
-	$(CXX) gnomon.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) gnomon.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

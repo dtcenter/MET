@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2007
+# ** Copyright UCAR (c) 1992 - 2011
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = 
+EXECUTABLES =
 
 
 OBJECTS     = vx_pbm.o        \
@@ -21,7 +21,7 @@ OBJECTS     = vx_pbm.o        \
               vx_pgm.o        \
               vx_ppm.o        \
               vx_pxm_base.o   \
-              vx_pxm_utils.o  \
+              vx_pxm_utils.o
 
 
 LIBRARIES   = libvx_pxm.a
@@ -36,13 +36,15 @@ HEADERS     = vx_pbm.h        \
               vx_ppm.h        \
               vx_pxm_base.h   \
               vx_pxm.h        \
-              vx_pxm_utils.h  \
+              vx_pxm_utils.h
 
 
 ########################################################################
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_pxm Library ***"
 	@ echo
 
 
@@ -55,22 +57,22 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 vx_pbm.o: vx_pbm.cc
-	$(CXX) vx_pbm.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_pbm.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_pcm.o: vx_pcm.cc
-	$(CXX) vx_pcm.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_pcm.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_pgm.o: vx_pgm.cc
-	$(CXX) vx_pgm.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_pgm.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_ppm.o: vx_ppm.cc
-	$(CXX) vx_ppm.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_ppm.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_pxm_base.o: vx_pxm_base.cc
-	$(CXX) vx_pxm_base.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_pxm_base.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 vx_pxm_utils.o: vx_pxm_utils.cc
-	$(CXX) vx_pxm_utils.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) vx_pxm_utils.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

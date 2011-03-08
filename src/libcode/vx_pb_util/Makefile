@@ -13,26 +13,25 @@
 ########################################################################
 
 
-EXECUTALBES =
+EXECUTABLES =
 
 
-OBJECTS     =  pblock.o \
-               do_blocking.o \
+OBJECTS     =  pblock.o        \
+               do_blocking.o   \
                do_unblocking.o \
                copy_bytes.o
 
 
-LIBRARIES   =  libvx_pb_util.a
-
+LIBRARIES   = libvx_pb_util.a
 
 
 ########################################################################
 
 
-HEADERS     =  pblock.h \
-               do_blocking.h \
+HEADERS     =  pblock.h        \
+               do_blocking.h   \
                do_unblocking.h \
-               copy_bytes.h \
+               copy_bytes.h    \
                vx_pb_util.h
 
 
@@ -54,16 +53,16 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 pblock.o: pblock.cc
-	$(CXX) pblock.cc $(ARCH_FLAGS) $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) pblock.cc $(ARCH_FLAGS) $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 do_blocking.o: do_blocking.cc
-	$(CXX) do_blocking.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) do_blocking.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 do_unblocking.o: do_unblocking.cc
-	$(CXX) do_unblocking.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) do_unblocking.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 copy_bytes.o: copy_bytes.cc
-	$(CXX) copy_bytes.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
+	$(CXX) copy_bytes.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
@@ -103,11 +102,9 @@ clean:
 ########################################################################
 
 
-
 .PHONY: all clean
 
 
 ########################################################################
-
 
 

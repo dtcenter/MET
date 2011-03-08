@@ -114,6 +114,7 @@ using namespace std;
 
 #include "vx_util.h"
 #include "nint.h"
+#include "scanner_stuff.h"
 
 #include "vx_color_parser.h"
 #include "vx_clist.h"

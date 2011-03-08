@@ -59,6 +59,8 @@ export MET_OUTPUT_DIR
 ###############################################################################
 
 export ENUM_TO_STRING
+export ECONFIG_CODEGEN 
+export CONFIG_TEMPLATE_DIR 
 
 ###############################################################################
 
