@@ -23,14 +23,14 @@ OBJECTS     =  angles.o  \
                ptile.o \
                pwl_interpolate.o \
                affine.o \
-               viewgravity_to_string.o \
+               viewgravity_to_string.o
 
 
 LIBRARIES   = libvx_math.a
 
 
 GEN_SOURCES = viewgravity_to_string.cc  \
-              viewgravity_to_string.h   \
+              viewgravity_to_string.h
 
 
 ########################################################################

@@ -20,7 +20,7 @@ OBJECTS     = gsl_bvn.o         \
               gsl_cdf.o         \
               gsl_randist.o     \
               gsl_statistics.o  \
-              gsl_wavelet2d.o   \
+              gsl_wavelet2d.o
 
 
 LIBRARIES   = libvx_gsl_prob.a
@@ -34,13 +34,16 @@ HEADERS     = gsl_bvn.h         \
               gsl_randist.h     \
               gsl_statistics.h  \
               gsl_wavelet2d.h   \
-              vx_gsl_prob.h     \
+              vx_gsl_prob.h
 
 
 ########################################################################
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_gsk_prob Library ***"
+	@ echo
 
 
 ########################################################################

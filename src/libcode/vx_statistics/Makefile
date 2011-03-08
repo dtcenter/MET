@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = 
+EXECUTABLES =
 
 OBJECTS     =  vx_contable.o        \
 		vx_contable_stats.o \
@@ -47,9 +47,9 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 ########################################################################
 
 
-	##
-	## objects
-	##
+   ##
+   ## objects
+   ##
 
 
 vx_contable.o: vx_contable.cc
@@ -74,9 +74,9 @@ pair_data.o: pair_data.cc
 ########################################################################
 
 
-	##
-	## libraries
-	##
+   ##
+   ## libraries
+   ##
 
 
 libvx_statistics.a: $(OBJECTS)
@@ -91,9 +91,9 @@ libvx_statistics.a: $(OBJECTS)
 ########################################################################
 
 
-	##
-	## executables
-	##
+   ##
+   ## executables
+   ##
 
 
 ########################################################################

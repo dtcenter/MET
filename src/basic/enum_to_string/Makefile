@@ -25,7 +25,8 @@ LEX         = flex
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-
+	@ echo "*** Finished making enum_to_string Library ***"
+	@ echo
 
 ########################################################################
 

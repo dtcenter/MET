@@ -17,7 +17,7 @@ EXECUTABLES =
 
 
 OBJECTS     = stat_columns.o      \
-              stat_hdr_columns.o  \
+              stat_hdr_columns.o
 
 
 LIBRARIES   = libvx_stat_out.a
@@ -27,7 +27,7 @@ LIBRARIES   = libvx_stat_out.a
 
 
 HEADERS     = stat_columns.h      \
-              stat_hdr_columns.h  \
+              stat_hdr_columns.h
 
 
 ########################################################################
