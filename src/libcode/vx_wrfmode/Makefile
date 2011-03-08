@@ -61,7 +61,6 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 gen_sources: $(GEN_SOURCES)
 	@ echo
 
-
 WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
 	@ echo
 	@ rm -f WrfMode_Conf.h WrfMode_Conf.cc
@@ -75,6 +74,8 @@ WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
    ##  objects
    ##
 
+objects: $(OBJECTS)
+	@ echo
 
 WrfMode_Conf.o: WrfMode_Conf.h WrfMode_Conf.cc
 	$(CXX) WrfMode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
@@ -121,9 +122,8 @@ clean:
 ###############################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean objects gen_sources
 
 
 ###############################################################################
-
 

@@ -20,7 +20,7 @@
    //
    //     Created by econfig_codegen from config file "/d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/config_templates/WrfModeConfig_default"
    //
-   //     on March 8, 2011    11:55 am  MST
+   //     on March 8, 2011    12:18 pm  MST
    //
 
 

@@ -16,12 +16,7 @@
 EXECUTABLES =
 
 
-OBJECTS     = apply_mask.o        \
-              compute_ci.o        \
-              conversions.o       \
-              file_type.o         \
-              met_stats.o         \
-              pair_data.o         \
+OBJECTS     = apply_mask.o
 
 
 LIBRARIES   = libvx_met_util.a
@@ -30,18 +25,16 @@ LIBRARIES   = libvx_met_util.a
 ########################################################################
 
 
-HEADERS     = apply_mask.h        \
-              compute_ci.h        \
-              conversions.h       \
-              file_type.h         \
-              met_stats.h         \
-              pair_data.h         \
+HEADERS     = apply_mask.h
 
 
 ########################################################################
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_met_util Library ***"
+	@ echo
 
 
 ########################################################################
@@ -53,22 +46,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 apply_mask.o: apply_mask.cc
-	$(CXX) apply_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-compute_ci.o: compute_ci.cc
-	$(CXX) compute_ci.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-conversions.o: conversions.cc
-	$(CXX) conversions.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-file_type.o: file_type.cc
-	$(CXX) file_type.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-met_stats.o: met_stats.cc
-	$(CXX) met_stats.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-pair_data.o: pair_data.cc
-	$(CXX) pair_data.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) apply_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -112,5 +90,4 @@ clean:
 
 
 ########################################################################
-
 

@@ -26,7 +26,7 @@ OBJECTS     = analysis_utils.o         \
               mode_line.o              \
               stat_job.o               \
               stat_line.o              \
-              time_series.o            \
+              time_series.o
 
 
 LIBRARIES   = libvx_analysis_util.a
@@ -55,6 +55,9 @@ HEADERS     = analysis_utils.h          \
 
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished making vx_analysis_util Library ***"
+	@ echo
 
 
 ########################################################################
@@ -90,10 +93,10 @@ mode_line.o: mode_line.cc
 	$(CXX) mode_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 stat_job.o: stat_job.cc
-	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)  $(GSL_INCS)
+	$(CXX) stat_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS)
 
 stat_line.o: stat_line.cc
-	$(CXX) stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS)
 
 time_series.o: time_series.cc
 	$(CXX) time_series.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
@@ -140,5 +143,4 @@ clean:
 
 
 ########################################################################
-
 
