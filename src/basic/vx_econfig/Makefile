@@ -201,10 +201,9 @@ econfig_codegen: econfig_codegen.cc libeconfig.a
 
 clean:
 	@ echo
-	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	rm -f econfig.output econfig.tab.c econfig.tab.h
 	rm -f lex.econfig.c
-	rm -f $(GEN_SOURCES)
 	rm -f $(MET_BIN_DIR)/econfig_codegen
 	rm -f $(MET_LIB_DIR)/libeconfig.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
