@@ -40,7 +40,7 @@ HEADERS     = ensemble_stat_conf_info.h \
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making ensemble_stat application ***"
+	@ echo "*** Finished making ensemble_stat tool ***"
 	@ echo
 
 
@@ -75,7 +75,7 @@ ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
 	$(CXX) ensemble_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 ensemble_stat.o: ensemble_stat.cc
-	$(CXX) ensemble_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE)\" $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) ensemble_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -96,7 +96,7 @@ ensemble_stat.o: ensemble_stat.cc
 
 ensemble_stat: $(OBJECTS)
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE)\" \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \

@@ -62,7 +62,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 pcp_combine: pcp_combine.cc
 	@echo
 	$(CXX) -o pcp_combine pcp_combine.cc \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE)\" \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(NET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \

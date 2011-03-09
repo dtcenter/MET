@@ -46,7 +46,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 apply_mask.o: apply_mask.cc
-	$(CXX) apply_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) apply_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
