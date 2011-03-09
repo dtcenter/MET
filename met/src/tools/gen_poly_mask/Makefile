@@ -39,12 +39,14 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
 
 gen_poly_mask.o: gen_poly_mask.cc
+	@ echo
 	$(CXX) gen_poly_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -65,6 +67,7 @@ gen_poly_mask.o: gen_poly_mask.cc
 
 
 gen_poly_mask: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \

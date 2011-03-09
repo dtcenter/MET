@@ -31,9 +31,7 @@ GEN_SOURCES = wavelet_stat_Conf.h  \
 ########################################################################
 
 
-HEADERS     = wavelet_stat_Conf.h      \
-              wavelet_stat_conf_info.h \
-              wavelet_stat.h
+HEADERS     =
 
 
 ########################################################################
@@ -51,6 +49,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  generated sources
    ##
+
 
 gen_sources: $(GEN_SOURCES)
 	@ echo
@@ -70,12 +69,17 @@ wavelet_stat_Conf.h wavelet_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WaveletStatConf
 
 
 wavelet_stat_Conf.o: wavelet_stat_Conf.cc
+	@ echo
 	$(CXX) wavelet_stat_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 wavelet_stat_conf_info.o: wavelet_stat_conf_info.cc
+	@ echo
 	$(CXX) wavelet_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 wavelet_stat.o: wavelet_stat.cc
+	@ echo
 	$(CXX) wavelet_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -96,6 +100,7 @@ wavelet_stat.o: wavelet_stat.cc
 
 
 wavelet_stat: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
@@ -115,7 +120,6 @@ wavelet_stat: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/wavelet_stat
 
 

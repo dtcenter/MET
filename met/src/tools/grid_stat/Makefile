@@ -31,9 +31,7 @@ GEN_SOURCES = grid_stat_Conf.h  \
 ########################################################################
 
 
-HEADERS     = grid_stat_Conf.h      \
-              grid_stat_conf_info.h \
-              grid_stat.h
+HEADERS     =
 
 
 ########################################################################
@@ -64,18 +62,24 @@ grid_stat_Conf.h grid_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/GridStatConfig_defaul
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
 
 grid_stat_Conf.o: grid_stat_Conf.cc
+	@ echo
 	$(CXX) grid_stat_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 grid_stat_conf_info.o: grid_stat_conf_info.cc
+	@ echo
 	$(CXX) grid_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 grid_stat.o: grid_stat.cc
+	@ echo
 	$(CXX) grid_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -96,6 +100,7 @@ grid_stat.o: grid_stat.cc
 
 
 grid_stat: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
@@ -115,7 +120,6 @@ grid_stat: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/grid_stat
 
 

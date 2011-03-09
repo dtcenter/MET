@@ -41,17 +41,8 @@ GEN_SOURCES = gridhemisphere_to_string.h   \
 ########################################################################
 
 
-HEADERS     = afwa_file.h                 \
-              ave_interp.h                \
-              gridhemisphere_to_string.h  \
-              interp_base.h               \
-              max_interp.h                \
-              min_interp.h                \
-              nearest_interp.h            \
-              wwmca_regrid_Conf.          \
-              wwmca_grids.h               \
-              wwmca_ref.h                 \
-              wwmca_utils.h
+HEADERS     =
+
 
 ########################################################################
 
@@ -86,6 +77,7 @@ wwmca_regrid_Conf.h wwmca_regrid_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WWMCARegridConf
 
 
 ########################################################################
+
 
    ##
    ##  objects
@@ -195,7 +187,6 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/wwmca_regrid
 	rm -f $(MET_BIN_DIR)/wwmca_plot
 

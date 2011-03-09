@@ -31,8 +31,7 @@ GEN_SOURCES = mode_analysis_Conf.h  \
 ########################################################################
 
 
-HEADERS     = mode_analysis_Conf.h \
-              config_to_att.h
+HEADERS     =
 
 
 ########################################################################
@@ -51,6 +50,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##  generated sources
    ##
 
+
 gen_sources: $(GEN_SOURCES)
 	@ echo
 
@@ -63,18 +63,24 @@ mode_analysis_Conf.h mode_analysis_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
 
 mode_analysis_Conf.o: mode_analysis_Conf.cc
+	@ echo
 	$(CXX) mode_analysis_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
+
 config_to_att.o: config_to_att.cc
+	@ echo
 	$(CXX) config_to_att.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
+
 mode_analysis.o: mode_analysis.cc
+	@ echo
 	$(CXX) mode_analysis.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -95,6 +101,7 @@ mode_analysis.o: mode_analysis.cc
 
 
 mode_analysis: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
@@ -114,7 +121,6 @@ mode_analysis: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/mode_analysis
 
 

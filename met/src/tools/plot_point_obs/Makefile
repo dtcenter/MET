@@ -39,12 +39,14 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
 
 plot_point_obs.o: plot_point_obs.cc
+	@ echo
 	$(CXX) plot_point_obs.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -65,6 +67,7 @@ plot_point_obs.o: plot_point_obs.cc
 
 
 plot_point_obs: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \

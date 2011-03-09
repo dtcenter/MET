@@ -46,6 +46,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 ascii2nc.o: ascii2nc.cc
+	@ echo
 	$(CXX) ascii2nc.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -66,6 +67,7 @@ ascii2nc.o: ascii2nc.cc
 
 
 ascii2nc: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
@@ -85,7 +87,6 @@ ascii2nc: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/ascii2nc
 
 

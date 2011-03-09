@@ -34,7 +34,7 @@ GEN_SOURCES = pb2nc_Conf.h  \
 ########################################################################
 
 
-HEADERS     = pb2nc_Conf.h
+HEADERS     =
 
 
 ########################################################################
@@ -65,27 +65,41 @@ pb2nc_Conf.h pb2nc_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
+
 pb2nc_Conf.o: pb2nc_Conf.cc
+	@ echo
 	$(CXX) pb2nc_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 numpbmsg.o: numpbmsg.f
+	@ echo
 	$(FC) numpbmsg.f $(FC_FLAGS) $(OPT_FLAGS) -c
 
+
 openpb.o: openpb.f
+	@ echo
 	$(FC) openpb.f $(FC_FLAGS) $(OPT_FLAGS) -c
 
+
 readpb.o: readpb.f
+	@ echo
 	$(FC) readpb.f $(FC_FLAGS) $(OPT_FLAGS) -c
 
+
 dumppb.o: dumppb.f
+	@ echo
 	$(FC) dumppb.f $(FC_FLAGS) $(OPT_FLAGS) -c
 
+
 pb2nc.o: pb2nc.cc
+	@ echo
 	$(CXX) pb2nc.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
+
 
 ########################################################################
 
@@ -123,7 +137,6 @@ pb2nc: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/pb2nc
 
 

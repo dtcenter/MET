@@ -39,12 +39,14 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
 
 pcp_combine.o: pcp_combine.cc
+	@ echo
 	$(CXX) pcp_combine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -65,6 +67,7 @@ pcp_combine.o: pcp_combine.cc
 
 
 pcp_combine: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
