@@ -58,14 +58,16 @@ using namespace std;
 
 #include "pb2nc_Conf.h"
 
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_data_grids/grid.h"
-#include "vx_util/vx_util.h"
-#include "vx_pb_util/vx_pb_util.h"
-#include "vx_met_util/vx_met_util.h"
-#include "vx_analysis_util/mask_poly.h"
-#include "vx_cal/vx_cal.h"
-#include "vx_math/vx_math.h"
+#include "vx_wrfdata.h"
+#include "grid.h"
+#include "vx_gdata.h"
+#include "vx_grib_classes.h"
+#include "vx_util.h"
+#include "vx_pb_util.h"
+#include "vx_met_util.h"
+#include "vx_analysis_util.h"
+#include "vx_cal.h"
+#include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
 
