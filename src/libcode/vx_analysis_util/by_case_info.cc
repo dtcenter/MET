@@ -21,7 +21,7 @@ using namespace std;
 #include "by_case_info.h"
 #include "analysis_utils.h"
 #include "mode_atts.h"
-#include "mode_columns.h"
+#include "mode_analysis_columns.h"
 #include "indent.h"
 
 
