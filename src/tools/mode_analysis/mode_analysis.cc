@@ -36,12 +36,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
-
-#include "vx_analysis_util/mode_columns.h"
-#include "vx_analysis_util/mode_job.h"
-#include "vx_analysis_util/mode_atts.h"
-#include "vx_analysis_util/analysis_utils.h"
+#include "vx_util.h"
+#include "vx_analysis_util.h"
 
 #include "mode_analysis_Conf.h"
 #include "config_to_att.h"
