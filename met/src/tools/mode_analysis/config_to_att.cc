@@ -32,7 +32,6 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_analysis_util/analysis_utils.h"
 
 #include "config_to_att.h"
 

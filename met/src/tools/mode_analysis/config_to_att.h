@@ -27,7 +27,7 @@
 
 
 #include "mode_analysis_Conf.h"
-#include "vx_analysis_util/mode_atts.h"
+#include "vx_analysis_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////
