@@ -26,8 +26,9 @@ LIBRARIES   = libvx_grib_classes.a
 ########################################################################
 
 
-HEADERS     =  grib_classes.h \
-               grib_strings.h
+HEADERS     =  grib_classes.h    \
+               grib_strings.h    \
+               vx_grib_classes.h
 
 
 ########################################################################
