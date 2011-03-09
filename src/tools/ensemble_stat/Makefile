@@ -55,7 +55,7 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-ensemble_stat_Conf.h ensemble_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
+ensemble_stat_Conf.h ensemble_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/EnsembleStatConfig_default
 	@ echo
 	@ rm -f ensemble_stat_Conf.h ensemble_stat_Conf.cc
 	$(ECONFIG_CODEGEN) -class ensemble_stat_Conf -outfile ensemble_stat_Conf $(CONFIG_TEMPLATE_DIR)/EnsembleStatConfig_default
