@@ -152,9 +152,9 @@ extern ColorTable *   the_table;
 
 ColorList clist;
 
-int LineNumber                      = 1;
+int color_LineNumber                      = 1;
 
-int column                          = 1;
+int color_column                          = 1;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1929,17 +1929,17 @@ char line[512];
 ifstream in;
 
 
-c = (int) (column - strlen(colortext));
+c = (int) (color_column - strlen(colortext));
 
 cout << "\n\n"
      << "  syntax error in file \"" << input_filename << "\"\n\n"
-     << "      line   = " << LineNumber << "\n\n"
+     << "      line   = " << color_LineNumber << "\n\n"
      << "      column = " << c << "\n\n"
      << "      text   = \"" << colortext << "\"\n\n";
 
 in.open(input_filename);
 
-for (j=1; j<LineNumber; ++j)  {   //  j starts at one here, not zero
+for (j=1; j<color_LineNumber; ++j)  {   //  j starts at one here, not zero
 
    in.getline(line, sizeof(line));
 

@@ -36,9 +36,9 @@ extern "C" {
 }
 
 
-extern int LineNumber;
+extern int econfig_LineNumber;
 
-extern int column;
+extern int econfig_column;
 
 extern Machine machine;
 
@@ -103,24 +103,24 @@ IDENTIFIER ({LETTER})({LETTER}|{DIGIT})*
 %%
 
 
-";"                                 { ++column;    return ( ';' ); }
+";"                                 { ++econfig_column;    return ( ';' ); }
 
-"{"                                 { ++column;    return ( '{' ); }
-"}"                                 { ++column;    return ( '}' ); }
-"["                                 { ++column;    return ( '[' ); }
-"]"                                 { ++column;    return ( ']' ); }
-"="                                 { ++column;    return ( '=' ); }
-","                                 { ++column;    return ( ',' ); }
-"("                                 { ++column;    return ( '(' ); }
-")"                                 { ++column;    return ( ')' ); }
+"{"                                 { ++econfig_column;    return ( '{' ); }
+"}"                                 { ++econfig_column;    return ( '}' ); }
+"["                                 { ++econfig_column;    return ( '[' ); }
+"]"                                 { ++econfig_column;    return ( ']' ); }
+"="                                 { ++econfig_column;    return ( '=' ); }
+","                                 { ++econfig_column;    return ( ',' ); }
+"("                                 { ++econfig_column;    return ( '(' ); }
+")"                                 { ++econfig_column;    return ( ')' ); }
 
 
-"+"                                 { ++column;    return ( '+' ); }
-"-"                                 { ++column;    return ( '-' ); }
-"*"                                 { ++column;    return ( '*' ); }
-"/"                                 { ++column;    return ( '/' ); }
+"+"                                 { ++econfig_column;    return ( '+' ); }
+"-"                                 { ++econfig_column;    return ( '-' ); }
+"*"                                 { ++econfig_column;    return ( '*' ); }
+"/"                                 { ++econfig_column;    return ( '/' ); }
 
-"^"                                 { ++column;    return ( '^' ); }
+"^"                                 { ++econfig_column;    return ( '^' ); }
 
 
 "\""                                { do_quoted_string();  return ( QUOTED_STRING ); }
@@ -151,15 +151,15 @@ IDENTIFIER ({LETTER})({LETTER}|{DIGIT})*
 
 
 
-"\n"                                { ++LineNumber;  column = 1; }
+"\n"                                { ++econfig_LineNumber;  econfig_column = 1; }
 
 
 
-{WS}                                { ++column; }
+{WS}                                { ++econfig_column; }
 
 <<EOF>>                             { if ( do_eof() )  return ( 0 ); }
 
-.                                   { ++column; }
+.                                   { ++econfig_column; }
 
 
 %%
@@ -172,7 +172,7 @@ int do_id()
 
 {
 
-column += strlen(econfigtext);
+econfig_column += strlen(econfigtext);
 
 if ( strcmp(econfigtext, "print") == 0 )  return ( PRINT );
 
@@ -194,7 +194,7 @@ void do_int()
 
 {
 
-column += strlen(econfigtext);
+econfig_column += strlen(econfigtext);
 
 econfiglval.num.is_int = 1;
 
@@ -212,7 +212,7 @@ void do_float()
 
 {
 
-column += strlen(econfigtext);
+econfig_column += strlen(econfigtext);
 
 econfiglval.num.is_int = 0;
 
@@ -301,13 +301,13 @@ int c;
 
 c = yyinput();
 
-++column;
+++econfig_column;
 
 if ( c == '\n' )  {
 
-   ++LineNumber;
+   ++econfig_LineNumber;
 
-   column = 1;
+   econfig_column = 1;
 
 }
 
@@ -461,7 +461,7 @@ econfig_scan_string(value);
    //  done
    //
 
-column += 3;
+econfig_column += 3;
 
 return;
 

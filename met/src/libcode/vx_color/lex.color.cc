@@ -506,9 +506,9 @@ extern "C" {
 
 }
 
-extern int LineNumber;
+extern int color_LineNumber;
 
-extern int column;
+extern int color_column;
 
 extern ColorList clist;
 
@@ -782,32 +782,32 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 89 "cfile.l"
-{ ++column;    return ( ',' ); }
+{ ++color_column;    return ( ',' ); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 92 "cfile.l"
-{ ++column;    return ( '{' ); }
+{ ++color_column;    return ( '{' ); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 93 "cfile.l"
-{ ++column;    return ( '}' ); }
+{ ++color_column;    return ( '}' ); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 95 "cfile.l"
-{ ++column;    return ( '(' ); }
+{ ++color_column;    return ( '(' ); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 96 "cfile.l"
-{ ++column;    return ( ')' ); }
+{ ++color_column;    return ( ')' ); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 98 "cfile.l"
-{ ++column;    return ( '=' ); }
+{ ++color_column;    return ( '=' ); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
@@ -858,17 +858,17 @@ case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
 #line 130 "cfile.l"
-{ ++LineNumber;  column = 1; }
+{ ++color_LineNumber;  color_column = 1; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 134 "cfile.l"
-{ ++column; }
+{ ++color_column; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 136 "cfile.l"
-{ ++column; }
+{ ++color_column; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
@@ -1853,7 +1853,7 @@ int do_id()
 
 {
 
-column += strlen(colortext);
+color_column += strlen(colortext);
 
 
 if ( strcmp(colortext, "blend"    ) == 0 )  return ( BLEND     );
@@ -1886,7 +1886,7 @@ void do_int()
 
 {
 
-column += strlen(colortext);
+color_column += strlen(colortext);
 
 colorlval.ival = atoi(colortext);
 
@@ -1902,7 +1902,7 @@ void do_float()
 
 {
 
-column += strlen(colortext);
+color_column += strlen(colortext);
 
 colorlval.dval = atof(colortext);
 
@@ -1989,13 +1989,13 @@ int c;
 
 c = yyinput();
 
-++column;
+++color_column;
 
 if ( c == '\n' )  {
 
-   ++LineNumber;
+   ++color_LineNumber;
 
-   column = 1;
+   color_column = 1;
 
 }
 
