@@ -29,7 +29,7 @@
 //   004    02/04/08  Halley Gotway  Modify to read new format of the
 //                    intermediate NetCDF point-observation format.
 //   005    02/11/08  Halley Gotway  Remove BIAS from the CNT line
-//          since it's the same as the ME.
+//                    since it's the same as the ME.
 //   006    02/12/08  Halley Gotway  Fix bug in writing COP line to
 //                    write out OY and ON rather than FY and FN.
 //   007    02/12/08  Halley Gotway  Enable Point-Stat to read the
@@ -77,18 +77,6 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#include "netcdf.hh"
-#include "vx_grib_classes/grib_classes.h"
-
-#include "vx_wrfdata/vx_wrfdata.h"
-#include "vx_met_util/vx_met_util.h"
-#include "vx_data_grids/grid.h"
-#include "vx_util/vx_util.h"
-#include "vx_cal/vx_cal.h"
-#include "vx_math/vx_math.h"
-#include "vx_contable/vx_contable.h"
-#include "vx_gsl_prob/vx_gsl_prob.h"
 
 #include "point_stat.h"
 
