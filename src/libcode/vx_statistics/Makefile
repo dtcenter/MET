@@ -32,7 +32,8 @@ LIBRARIES   =  libvx_statistics.a
 HEADERS     =  vx_contable.h      \
 		compute_ci.h      \
 		met_stats.h       \
-		pair_data.h
+		pair_data.h       \
+		vx_statistics.h
 
 
 ########################################################################

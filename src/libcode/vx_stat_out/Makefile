@@ -27,7 +27,8 @@ LIBRARIES   = libvx_stat_out.a
 
 
 HEADERS     = stat_columns.h      \
-              stat_hdr_columns.h
+              stat_hdr_columns.h  \
+              vx_stat_out.h
 
 
 ########################################################################
