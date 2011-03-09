@@ -34,6 +34,7 @@ all:
 clean:
 	cd src ; $(MAKE) clean $(PRINT_OPTS)
 	rm -r -f *.a *.o junk temp core log c.ps a.out
+	rm -f out/*/*
 	rm -f include/*.h
 
 ########################################################################
