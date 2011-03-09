@@ -19,6 +19,8 @@ using namespace std;
 #include <sys/types.h>
 
 #include "grid_stat_conf_info.h"
+#include "grib_strings.h"
+#include "apply_mask.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
