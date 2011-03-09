@@ -45,7 +45,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 gen_poly_mask.o: gen_poly_mask.cc
-	$(CXX) gen_poly_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) gen_poly_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -66,7 +66,7 @@ gen_poly_mask.o: gen_poly_mask.cc
 
 gen_poly_mask: $(OBJECTS)
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
+	$(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(MET_LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \
