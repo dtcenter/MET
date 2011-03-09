@@ -31,7 +31,8 @@ GEN_SOURCES = ensemble_stat_Conf.h  \
 ########################################################################
 
 
-HEADERS     = ensemble_stat_conf_info.h \
+HEADERS     = ensemble_stat_Conf.h      \
+              ensemble_stat_conf_info.h \
               ensemble_stat.h
 
 

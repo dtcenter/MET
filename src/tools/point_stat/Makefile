@@ -31,7 +31,8 @@ GEN_SOURCES = point_stat_Conf.h  \
 ########################################################################
 
 
-HEADERS     = point_stat_conf_info.h \
+HEADERS     = point_stat_Conf.h      \
+              point_stat_conf_info.h \
               point_stat.h
 
 
