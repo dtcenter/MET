@@ -36,7 +36,6 @@ using namespace std;
 #include "stat_analysis_job.h"
 #include "parse_stat_line.h"
 #include "aggr_stat_line.h"
-#include "vx_met_util/vx_met_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
