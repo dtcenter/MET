@@ -31,7 +31,8 @@ GEN_SOURCES = grid_stat_Conf.h  \
 ########################################################################
 
 
-HEADERS     = grid_stat_conf_info.h \
+HEADERS     = grid_stat_Conf.h      \
+              grid_stat_conf_info.h \
               grid_stat.h
 
 
