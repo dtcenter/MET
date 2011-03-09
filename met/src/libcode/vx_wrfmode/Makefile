@@ -45,7 +45,7 @@ HEADERS = engine.h        \
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_wrfmode Library ***"
+	@ echo "*** Finished Making the vx_wrfmode Library ***"
 	@ echo
 
 

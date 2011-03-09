@@ -44,7 +44,7 @@ HEADERS     = afm.h                     \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_afm Library ***"
+	@ echo "*** Finished Making the vx_afm Library ***"
 	@ echo
 
 

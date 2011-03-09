@@ -16,15 +16,14 @@
 EXECUTABLES = grid_stat
 
 
-OBJECTS     = grid_stat_Conf.o      \
-              grid_stat_conf_info.o \
-              grid_stat.o
+OBJECTS     = grid_stat_Conf.o       \
+              grid_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = grid_stat_Conf.h  \
+GEN_SOURCES = grid_stat_Conf.h   \
               grid_stat_Conf.cc
 
 
@@ -39,7 +38,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making grid_stat tool ***"
+	@ echo "*** Finished Making the grid_stat Tool ***"
 	@ echo
 
 
@@ -78,11 +77,6 @@ grid_stat_conf_info.o: grid_stat_conf_info.cc
 	$(CXX) grid_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
-grid_stat.o: grid_stat.cc
-	@ echo
-	$(CXX) grid_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
-
-
 ########################################################################
 
 
@@ -99,9 +93,9 @@ grid_stat.o: grid_stat.cc
    ##
 
 
-grid_stat: $(OBJECTS)
+grid_stat: grid_stat.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) grid_stat.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

@@ -56,7 +56,7 @@ HEADERS     = analysis_utils.h          \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_analysis_util Library ***"
+	@ echo "*** Finished Making the vx_analysis_util Library ***"
 	@ echo
 
 

@@ -40,7 +40,7 @@ HEADERS     = cfile.tab.h        \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_color Library ***"
+	@ echo "*** Finished Making the vx_color Library ***"
 	@ echo
 
 

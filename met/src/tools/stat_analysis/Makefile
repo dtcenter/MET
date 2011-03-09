@@ -16,17 +16,16 @@
 EXECUTABLES = stat_analysis
 
 
-OBJECTS     = stat_analysis_Conf.o \
-              aggr_stat_line.o     \
-              parse_stat_line.o    \
-              stat_analysis_job.o  \
-              stat_analysis.o
+OBJECTS     = stat_analysis_Conf.o  \
+              aggr_stat_line.o      \
+              parse_stat_line.o     \
+              stat_analysis_job.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = stat_analysis_Conf.h  \
+GEN_SOURCES = stat_analysis_Conf.h   \
               stat_analysis_Conf.cc
 
 
@@ -41,7 +40,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making stat_analysis tool ***"
+	@ echo "*** Finished Making the stat_analysis Tool ***"
 	@ echo
 
 
@@ -91,11 +90,6 @@ stat_analysis_job.o: stat_analysis_job.cc
 	$(CXX) stat_analysis_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
-stat_analysis.o: stat_analysis.cc
-	@ echo
-	$(CXX) stat_analysis.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
-
-
 ########################################################################
 
 
@@ -112,9 +106,9 @@ stat_analysis.o: stat_analysis.cc
    ##
 
 
-stat_analysis: $(OBJECTS)
+stat_analysis: stat_analysis.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) stat_analysis.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

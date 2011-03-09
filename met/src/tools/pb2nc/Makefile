@@ -16,18 +16,17 @@
 EXECUTABLES = pb2nc
 
 
-OBJECTS     = pb2nc_Conf.o \
-              numpbmsg.o   \
-              openpb.o     \
-              readpb.o     \
-              dumppb.o     \
-              pb2nc.o
+OBJECTS     = pb2nc_Conf.o  \
+              numpbmsg.o    \
+              openpb.o      \
+              readpb.o      \
+              dumppb.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = pb2nc_Conf.h  \
+GEN_SOURCES = pb2nc_Conf.h   \
               pb2nc_Conf.cc
 
 
@@ -42,7 +41,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making pb2nc tool ***"
+	@ echo "*** Finished Making the pb2nc Tool ***"
 	@ echo
 
 
@@ -96,11 +95,6 @@ dumppb.o: dumppb.f
 	$(FC) dumppb.f $(FC_FLAGS) $(OPT_FLAGS) -c
 
 
-pb2nc.o: pb2nc.cc
-	@ echo
-	$(CXX) pb2nc.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
-
-
 ########################################################################
 
 
@@ -117,8 +111,8 @@ pb2nc.o: pb2nc.cc
    ##
 
 
-pb2nc: $(OBJECTS)
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+pb2nc: pb2nc.cc $(OBJECTS)
+	$(CXX) -o $(EXECUTABLES) pb2nc.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(BUFR_INCS) $(F2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(BUFR_LIBS) $(F2C_LIBS) \

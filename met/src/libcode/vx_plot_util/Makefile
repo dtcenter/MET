@@ -33,7 +33,7 @@ HEADERS     = vx_plot_util.h
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_plot_util Library ***"
+	@ echo "*** Finished Making the vx_plot_util Library ***"
 	@ echo
 
 
