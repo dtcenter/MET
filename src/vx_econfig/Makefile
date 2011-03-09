@@ -55,7 +55,7 @@ vx_econfig_gen: vx_econfig_gen.cc
 	@echo
 	$(CXX) -o $(TARGETS) vx_econfig_gen.cc  \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
-	-I$(LIB_DIR) -L$(LIB_DIR) -I$(MET_LIB_DIR) -L$(MET_LIB_DIR) \
+	-I$(LIB_DIR) -L$(LIB_DIR) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
         -lvx_econfig -lvx_cal -lvx_util \
 	$(CXX_LIBS)
 	cp $(TARGETS) ../../bin/.
@@ -95,7 +95,7 @@ vx_econfig_gen: vx_econfig_gen.cc
 	@echo
 	$(CXX) -o $(TARGETS) vx_econfig_gen.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
-	-I$(LIB_DIR) -L$(LIB_DIR) -I$(MET_LIB_DIR) -L$(MET_LIB_DIR) \
+	-I$(LIB_DIR) -L$(LIB_DIR) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
         -lvx_econfig -lvx_cal -lvx_util \
 	$(CXX_LIBS)
 	cp $(TARGETS) ../../bin/.
