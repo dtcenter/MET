@@ -33,11 +33,7 @@ GEN_SOURCES = stat_analysis_Conf.h  \
 ########################################################################
 
 
-HEADERS     = stat_analysis_Conf.h \
-              aggr_stat_line.h     \
-              parse_stat_line.h    \
-              stat_analysis_job.h  \
-              stat_analysis.h
+HEADERS     =
 
 
 ########################################################################
@@ -56,6 +52,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##  generated sources
    ##
 
+
 gen_sources: $(GEN_SOURCES)
 	@ echo
 
@@ -68,24 +65,34 @@ stat_analysis_Conf.h stat_analysis_Conf.cc: $(CONFIG_TEMPLATE_DIR)/STATAnalysisC
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
 
 stat_analysis_Conf.o: stat_analysis_Conf.cc
+	@ echo
 	$(CXX) stat_analysis_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 aggr_stat_line.o: aggr_stat_line.cc
+	@ echo
 	$(CXX) aggr_stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 parse_stat_line.o: parse_stat_line.cc
+	@ echo
 	$(CXX) parse_stat_line.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 stat_analysis_job.o: stat_analysis_job.cc
+	@ echo
 	$(CXX) stat_analysis_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 stat_analysis.o: stat_analysis.cc
+	@ echo
 	$(CXX) stat_analysis.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -106,6 +113,7 @@ stat_analysis.o: stat_analysis.cc
 
 
 stat_analysis: $(OBJECTS)
+	@ echo
 	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
@@ -125,7 +133,6 @@ stat_analysis: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/stat_analysis
 
 

@@ -31,9 +31,7 @@ GEN_SOURCES = point_stat_Conf.h  \
 ########################################################################
 
 
-HEADERS     = point_stat_Conf.h      \
-              point_stat_conf_info.h \
-              point_stat.h
+HEADERS     =
 
 
 ########################################################################
@@ -52,6 +50,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##  generated sources
    ##
 
+
 gen_sources: $(GEN_SOURCES)
 	@ echo
 
@@ -64,18 +63,24 @@ point_stat_Conf.h point_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PointStatConfig_def
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
 
 
 point_stat_Conf.o: point_stat_Conf.cc
+	@ echo
 	$(CXX) point_stat_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 point_stat_conf_info.o: point_stat_conf_info.cc
+	@ echo
 	$(CXX) point_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
+
 point_stat.o: point_stat.cc
+	@ echo
 	$(CXX) point_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -115,7 +120,6 @@ point_stat: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/point_stat
 
 
