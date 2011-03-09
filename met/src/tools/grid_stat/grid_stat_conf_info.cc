@@ -20,7 +20,7 @@ using namespace std;
 
 #include "grid_stat_conf_info.h"
 #include "grib_strings.h"
-#include "apply_mask.h"
+#include "vx_met_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
