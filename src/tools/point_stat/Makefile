@@ -64,7 +64,7 @@ targets: $(TARGETS)
 point_stat: point_stat.cc
 	@echo
 	$(CXX) -o $(TARGETS) point_stat.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE)\" \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \

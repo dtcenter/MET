@@ -38,12 +38,13 @@ using namespace std;
 #include "grib_classes.h"
 
 #include "vx_wrfdata.h"
-#include "vx_met_util.h"
 #include "mask_poly.h"
 #include "grid.h"
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+#include "file_type.h"
+#include "vx_gdata.h"
 
 ////////////////////////////////////////////////////////////////////////
 

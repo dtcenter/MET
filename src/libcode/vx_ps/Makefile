@@ -48,7 +48,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 vx_ps.o: vx_ps.cc
-	$(CXX) vx_ps.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE)\"
+	$(CXX) vx_ps.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\"
 
 vx_ps_text.o: vx_ps_text.cc
 	$(CXX) vx_ps_text.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)

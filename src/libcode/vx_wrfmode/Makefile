@@ -80,7 +80,7 @@ WrfMode_Conf.o: WrfMode_Conf.h WrfMode_Conf.cc
 	$(CXX) WrfMode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 engine.o: engine.cc
-	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(MET_INC_DIR)
+	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 interest.o: interest.cc
 	$(CXX) interest.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)

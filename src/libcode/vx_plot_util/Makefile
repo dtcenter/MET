@@ -46,7 +46,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 vx_plot_util.o: vx_plot_util.cc
-	$(CXX) vx_plot_util.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(MET_INC_DIR)
+	$(CXX) vx_plot_util.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 
 ########################################################################
