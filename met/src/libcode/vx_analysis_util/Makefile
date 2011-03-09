@@ -41,7 +41,7 @@ HEADERS     = analysis_utils.h          \
               data_line.h               \
               mask_poly.h               \
               mode_atts.h               \
-              mode_columns.h            \
+              mode_analysis_columns.h   \
               mode_job.h                \
               mode_line.h               \
               stat_job.h                \

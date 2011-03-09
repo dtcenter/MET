@@ -68,6 +68,7 @@ using namespace std;
 #include "vx_gdata.h"
 #include "vx_math.h"
 #include "vx_statistics.h"
+#include "vx_met_util.h"
 
 #include "vx_color.h"
 #include "vx_ps.h"

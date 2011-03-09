@@ -25,7 +25,7 @@ using namespace std;
 
 #include "analysis_utils.h"
 #include "mode_job.h"
-#include "mode_columns.h"
+#include "mode_analysis_columns.h"
 #include "by_case_info.h"
 
 
