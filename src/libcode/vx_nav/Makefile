@@ -33,7 +33,7 @@ HEADERS     = nav.h
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_nav Library ***"
+	@ echo "*** Finished Making the vx_nav Library ***"
 	@ echo
 
 

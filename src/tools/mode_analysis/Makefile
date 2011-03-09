@@ -16,15 +16,14 @@
 EXECUTABLES = mode_analysis
 
 
-OBJECTS     = mode_analysis_Conf.o      \
-              config_to_att.o \
-              mode_analysis.o
+OBJECTS     = mode_analysis_Conf.o  \
+              config_to_att.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = mode_analysis_Conf.h  \
+GEN_SOURCES = mode_analysis_Conf.h   \
               mode_analysis_Conf.cc
 
 
@@ -39,7 +38,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making mode_analysis tool ***"
+	@ echo "*** Finished Making the mode_analysis Tool ***"
 	@ echo
 
 
@@ -79,11 +78,6 @@ config_to_att.o: config_to_att.cc
 	$(CXX) config_to_att.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
-mode_analysis.o: mode_analysis.cc
-	@ echo
-	$(CXX) mode_analysis.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
-
-
 ########################################################################
 
 
@@ -100,9 +94,9 @@ mode_analysis.o: mode_analysis.cc
    ##
 
 
-mode_analysis: $(OBJECTS)
+mode_analysis: mode_analysis.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) mode_analysis.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

@@ -49,7 +49,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making wwmca_regrid and wwmca_plot tools ***"
+	@ echo "*** Finished Making the wwmca_regrid and wwmca_plot Tools ***"
 	@ echo
 
 

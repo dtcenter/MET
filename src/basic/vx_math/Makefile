@@ -55,7 +55,7 @@ HEADERS     =  math_constants.h \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_math Library ***"
+	@ echo "*** Finished Making the vx_math Library ***"
 	@ echo
 
 

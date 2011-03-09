@@ -16,7 +16,7 @@
 EXECUTABLES = pcp_combine
 
 
-OBJECTS     = pcp_combine.o
+OBJECTS     =
 
 
 LIBRARIES   =
@@ -33,7 +33,7 @@ HEADERS     =
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making pcp_combine tool ***"
+	@ echo "*** Finished Making the pcp_combine Tool ***"
 	@ echo
 
 
@@ -43,11 +43,6 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  objects
    ##
-
-
-pcp_combine.o: pcp_combine.cc
-	@ echo
-	$(CXX) pcp_combine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -66,9 +61,9 @@ pcp_combine.o: pcp_combine.cc
    ##
 
 
-pcp_combine: $(OBJECTS)
+pcp_combine: pcp_combine.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) pcp_combine.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

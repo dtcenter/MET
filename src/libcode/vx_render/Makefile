@@ -52,7 +52,7 @@ HEADERS     = vx_ascii85_filter.h  \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_render Library ***"
+	@ echo "*** Finished Making the vx_render Library ***"
 	@ echo
 
 

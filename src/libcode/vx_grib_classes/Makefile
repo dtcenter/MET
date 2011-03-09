@@ -36,7 +36,7 @@ HEADERS     =  grib_classes.h    \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_grib_classes Library ***"
+	@ echo "*** Finished Making the vx_grib_classes Library ***"
 	@ echo
 
 

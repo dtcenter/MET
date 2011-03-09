@@ -67,7 +67,7 @@ LEX         = flex --prefix=econfig
 
 all: $(OBJECTS) $(LIBRARIES) econfig_codegen
 	@ echo
-	@ echo "*** Finished making econfig_codegen Library ***"
+	@ echo "*** Finished Making the econfig_codegen Library ***"
 	@ echo
 
 

@@ -44,7 +44,7 @@ HEADERS     = filterbox.h  \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_wrfdata Library ***"
+	@ echo "*** Finished Making the vx_wrfdata Library ***"
 	@ echo
 
 ########################################################################

@@ -16,15 +16,14 @@
 EXECUTABLES = ensemble_stat
 
 
-OBJECTS     = ensemble_stat_Conf.o      \
-              ensemble_stat_conf_info.o \
-              ensemble_stat.o
+OBJECTS     = ensemble_stat_Conf.o       \
+              ensemble_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = ensemble_stat_Conf.h  \
+GEN_SOURCES = ensemble_stat_Conf.h   \
               ensemble_stat_Conf.cc
 
 
@@ -39,7 +38,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making ensemble_stat tool ***"
+	@ echo "*** Finished Making the ensemble_stat Tool ***"
 	@ echo
 
 
@@ -78,11 +77,6 @@ ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
 	$(CXX) ensemble_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
-ensemble_stat.o: ensemble_stat.cc
-	@ echo
-	$(CXX) ensemble_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
-
-
 ########################################################################
 
 
@@ -99,9 +93,9 @@ ensemble_stat.o: ensemble_stat.cc
    ##
 
 
-ensemble_stat: $(OBJECTS)
+ensemble_stat: ensemble_stat.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) ensemble_stat.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

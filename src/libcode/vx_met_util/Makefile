@@ -34,7 +34,7 @@ HEADERS     = apply_mask.h \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_met_util Library ***"
+	@ echo "*** Finished Making the vx_met_util Library ***"
 	@ echo
 
 

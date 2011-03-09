@@ -16,15 +16,14 @@
 EXECUTABLES = point_stat
 
 
-OBJECTS     = point_stat_Conf.o      \
-              point_stat_conf_info.o \
-              point_stat.o
+OBJECTS     = point_stat_Conf.o       \
+              point_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = point_stat_Conf.h  \
+GEN_SOURCES = point_stat_Conf.h   \
               point_stat_Conf.cc
 
 
@@ -39,7 +38,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making point_stat tool ***"
+	@ echo "*** Finished Making the point_stat Tool ***"
 	@ echo
 
 
@@ -79,11 +78,6 @@ point_stat_conf_info.o: point_stat_conf_info.cc
 	$(CXX) point_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
-point_stat.o: point_stat.cc
-	@ echo
-	$(CXX) point_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
-
-
 ########################################################################
 
 
@@ -100,8 +94,8 @@ point_stat.o: point_stat.cc
    ##
 
 
-point_stat: $(OBJECTS)
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+point_stat: point_stat.cc $(OBJECTS)
+	$(CXX) -o $(EXECUTABLES) point_stat.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

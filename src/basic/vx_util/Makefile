@@ -96,7 +96,7 @@ HEADERS     =  util_constants.h \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_util Library ***"
+	@ echo "*** Finished Making the vx_util Library ***"
 	@ echo
 
 

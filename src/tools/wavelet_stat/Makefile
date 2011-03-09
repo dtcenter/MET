@@ -16,15 +16,14 @@
 EXECUTABLES = wavelet_stat
 
 
-OBJECTS     = wavelet_stat_Conf.o      \
-              wavelet_stat_conf_info.o \
-              wavelet_stat.o
+OBJECTS     = wavelet_stat_Conf.o       \
+              wavelet_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = wavelet_stat_Conf.h  \
+GEN_SOURCES = wavelet_stat_Conf.h   \
               wavelet_stat_Conf.cc
 
 
@@ -39,7 +38,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making wavelet_stat tool ***"
+	@ echo "*** Finished Making the wavelet_stat Tool ***"
 	@ echo
 
 
@@ -63,6 +62,7 @@ wavelet_stat_Conf.h wavelet_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WaveletStatConf
 
 ########################################################################
 
+
    ##
    ##  objects
    ##
@@ -76,11 +76,6 @@ wavelet_stat_Conf.o: wavelet_stat_Conf.cc
 wavelet_stat_conf_info.o: wavelet_stat_conf_info.cc
 	@ echo
 	$(CXX) wavelet_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
-
-
-wavelet_stat.o: wavelet_stat.cc
-	@ echo
-	$(CXX) wavelet_stat.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -99,9 +94,9 @@ wavelet_stat.o: wavelet_stat.cc
    ##
 
 
-wavelet_stat: $(OBJECTS)
+wavelet_stat: wavelet_stat.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) wavelet_stat.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

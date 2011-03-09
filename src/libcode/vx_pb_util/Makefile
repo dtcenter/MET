@@ -40,7 +40,7 @@ HEADERS     =  pblock.h        \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_pb_util Library ***"
+	@ echo "*** Finished Making the vx_pb_util Library ***"
 	@ echo
 
 

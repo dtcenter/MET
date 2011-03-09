@@ -35,7 +35,7 @@ HEADERS     = vx_ps.h       \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_ps Library ***"
+	@ echo "*** Finished Making the vx_ps Library ***"
 	@ echo
 
 

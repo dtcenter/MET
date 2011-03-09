@@ -16,7 +16,7 @@
 EXECUTABLES = plot_point_obs
 
 
-OBJECTS     = plot_point_obs.o
+OBJECTS     =
 
 
 LIBRARIES   =
@@ -33,7 +33,7 @@ HEADERS     =
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making plot_point_obs tool ***"
+	@ echo "*** Finished Making the plot_point_obs Tool ***"
 	@ echo
 
 
@@ -43,11 +43,6 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  objects
    ##
-
-
-plot_point_obs.o: plot_point_obs.cc
-	@ echo
-	$(CXX) plot_point_obs.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\" $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -66,9 +61,9 @@ plot_point_obs.o: plot_point_obs.cc
    ##
 
 
-plot_point_obs: $(OBJECTS)
+plot_point_obs: plot_point_obs.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) plot_point_obs.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

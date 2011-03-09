@@ -47,7 +47,7 @@ HEADERS     = holiday.h         \
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making vx_cal Library ***"
+	@ echo "*** Finished Making the vx_cal Library ***"
 	@ echo
 
 

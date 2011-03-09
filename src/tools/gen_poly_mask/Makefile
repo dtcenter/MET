@@ -16,7 +16,7 @@
 EXECUTABLES = gen_poly_mask
 
 
-OBJECTS     = gen_poly_mask.o
+OBJECTS     =
 
 
 LIBRARIES   =
@@ -33,7 +33,7 @@ HEADERS     =
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making gen_poly_mask tool ***"
+	@ echo "*** Finished Making the gen_poly_mask Tool ***"
 	@ echo
 
 
@@ -43,11 +43,6 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  objects
    ##
-
-
-gen_poly_mask.o: gen_poly_mask.cc
-	@ echo
-	$(CXX) gen_poly_mask.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -66,9 +61,9 @@ gen_poly_mask.o: gen_poly_mask.cc
    ##
 
 
-gen_poly_mask: $(OBJECTS)
+gen_poly_mask: gen_poly_mask.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) gen_poly_mask.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \

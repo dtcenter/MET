@@ -16,7 +16,7 @@
 EXECUTABLES = ascii2nc
 
 
-OBJECTS     = ascii2nc.o
+OBJECTS     =
 
 
 LIBRARIES   =
@@ -33,7 +33,7 @@ HEADERS     =
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making ascii2nc tool ***"
+	@ echo "*** Finished Making the ascii2nc Tool ***"
 	@ echo
 
 
@@ -43,11 +43,6 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  objects
    ##
-
-
-ascii2nc.o: ascii2nc.cc
-	@ echo
-	$(CXX) ascii2nc.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -66,9 +61,9 @@ ascii2nc.o: ascii2nc.cc
    ##
 
 
-ascii2nc: $(OBJECTS)
+ascii2nc: ascii2nc.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) ascii2nc.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
