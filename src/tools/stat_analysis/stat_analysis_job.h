@@ -35,8 +35,10 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "vx_met_util/vx_met_util.h"
-#include "vx_analysis_util/stat_job.h"
+#include "vx_met_util.h"
+#include "vx_analysis_util.h"
+#include "vx_statistics.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 

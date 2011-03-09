@@ -37,10 +37,11 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "vx_analysis_util/vx_analysis_util.h"
-#include "vx_util/vx_util.h"
-#include "vx_met_util/vx_met_util.h"
-#include "vx_contable/vx_contable.h"
+#include "vx_analysis_util.h"
+#include "vx_grib_classes.h"
+#include "vx_util.h"
+#include "vx_met_util.h"
+#include "vx_statistics.h"
 
 ////////////////////////////////////////////////////////////////////////
 
