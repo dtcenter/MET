@@ -102,7 +102,7 @@ return ( no_hemisphere );   //  this shouldn't happen
 ////////////////////////////////////////////////////////////////////////
 
 
-Interpolator * get_interpolator(WwmcaConfig & config)
+Interpolator * get_interpolator(wwmca_regrid_Conf & config)
 
 {
 

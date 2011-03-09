@@ -12,9 +12,9 @@
 
 #include <iostream>
 
-#include "vx_cal/vx_cal.h"
-#include "vx_util/vx_util.h"
-#include "vx_data_grids/grid.h"
+#include "vx_cal.h"
+#include "vx_util.h"
+#include "grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////

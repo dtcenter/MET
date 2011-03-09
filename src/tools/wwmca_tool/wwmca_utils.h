@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "wwmca_config.h"
+#include "wwmca_regrid_Conf.h"
 
 #include "interp_base.h"
 #include "max_interp.h"
@@ -18,7 +18,7 @@
 #include "ave_interp.h"
 #include "nearest_interp.h"
 
-#include "vx_data_grids/grid.h"
+#include "grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ extern GridHemisphere find_grid_hemisphere(const Grid &);
    //
 
 
-extern Interpolator * get_interpolator(WwmcaConfig &);
+extern Interpolator * get_interpolator(wwmca_regrid_Conf &);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -16,8 +16,8 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
-#include "vx_cal/vx_cal.h"
+#include "vx_util.h"
+#include "vx_cal.h"
 
 #include "afwa_file.h"
 #include "wwmca_grids.h"
