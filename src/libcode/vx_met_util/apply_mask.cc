@@ -17,7 +17,9 @@ using namespace std;
 #include <cmath>
 #include <regex.h>
 
-#include "vx_met_util.h"
+#include "apply_mask.h"
+#include "vx_statistics.h"
+#include "vx_gdata.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

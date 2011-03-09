@@ -22,11 +22,10 @@
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
-#include "vx_contable.h"
 #include "vx_gsl_prob.h"
 #include "result.h"
-#include "pair_data.h"
-#include "apply_mask.h"
+#include "vx_statistics.h"
+#include "vx_met_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
