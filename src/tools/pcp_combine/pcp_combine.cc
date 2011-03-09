@@ -61,9 +61,11 @@ using namespace std;
 
 #include "netcdf.hh"
 
-#include "grib_classes.h"
+#include "vx_grib_classes.h"
+#include "vx_gdata.h"
 #include "vx_met_util.h"
 #include "grid.h"
+#include "vx_statistics.h"
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"

@@ -33,7 +33,7 @@ HEADERS     =
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished making gen_poly_mask application ***"
+	@ echo "*** Finished making gen_poly_mask tool ***"
 	@ echo
 
 
