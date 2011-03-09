@@ -20,7 +20,7 @@ using namespace std;
 #include "gridhemisphere_to_string.h"
 #include "wwmca_grids.h"
 
-#include "vx_met_util/grid_output.h"
+#include "grid_output.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ ToGrid = (const Grid *) 0;
 
 interp = (Interpolator *) 0;
 
-Config = (WwmcaConfig *) 0;
+Config = (wwmca_regrid_Conf *) 0;
 
 
 
@@ -107,7 +107,7 @@ Hemi = no_hemisphere;
 
 grid_strings.clear();
 
-Config = (WwmcaConfig *) 0;
+Config = (wwmca_regrid_Conf *) 0;
 
 ConfigFilename.clear();
 
@@ -243,7 +243,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void WwmcaRegridder::set_config(WwmcaConfig & wc, const char * config_filename)
+void WwmcaRegridder::set_config(wwmca_regrid_Conf & wc, const char * config_filename)
 
 {
 
@@ -259,7 +259,7 @@ get_interpolator();
 
 if ( !interp )  {
 
-   cerr << "\n\n  WwmcaRegridder::set_config(WwmcaConfig &) -> bad interpolator specification in config file\"" << ConfigFilename << "\"\n\n";
+   cerr << "\n\n  WwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad interpolator specification in config file\"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -273,7 +273,7 @@ get_grid();
 
 if ( !ToGrid )  {
 
-   cerr << "\n\n  WwmcaRegridder::set_config(WwmcaConfig &) -> bad \"to\" grid specification in config file\"" << ConfigFilename << "\"\n\n";
+   cerr << "\n\n  WwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad \"to\" grid specification in config file\"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 

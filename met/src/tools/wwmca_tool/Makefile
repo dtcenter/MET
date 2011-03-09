@@ -79,10 +79,10 @@ gridhemisphere_to_string.h gridhemisphere_to_string.cc: wwmca_ref.h
 	$(ENUM_TO_STRING) wwmca_ref.h
 
 
-wwmca_regrid_Conf.h wwmca_regrid_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WWMCAConfig_default
+wwmca_regrid_Conf.h wwmca_regrid_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WWMCARegridConfig_default
 	@ echo
 	@ rm -f wwmca_config.h wwmca_config.cc
-	$(ECONFIG_CODEGEN) -class wwmca_regrid_Conf -outfile wwmca_regrid_Conf $(CONFIG_TEMPLATE_DIR)/WWMCAConfig_default
+	$(ECONFIG_CODEGEN) -class wwmca_regrid_Conf -outfile wwmca_regrid_Conf $(CONFIG_TEMPLATE_DIR)/WWMCARegridConfig_default
 
 
 ########################################################################
@@ -177,7 +177,7 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o wwmca_plot wwmca_plot.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \

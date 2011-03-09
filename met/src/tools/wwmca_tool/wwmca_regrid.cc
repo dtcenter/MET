@@ -10,9 +10,9 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_util/vx_util.h"
+#include "vx_util.h"
 
-#include "wwmca_config.h"
+#include "wwmca_regrid_Conf.h"
 #include "wwmca_ref.h"
 
 
@@ -42,7 +42,7 @@ static CommandLine cline;
 
 static WwmcaRegridder regridder;
 
-static WwmcaConfig config;
+static wwmca_regrid_Conf config;
 
 static ConcatString config_filename;
 
