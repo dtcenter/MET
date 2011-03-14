@@ -1973,11 +1973,9 @@ void usage(int argc, char *argv[]) {
         << "\t[-outdir path]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"n_ens\" is the number of ensemble members "
-        << "(required).\n"
-
-        << "\t\t\"ens_file_1 ... ens_file_n\" is a list of ensemble "
-        << "member file names (required).\n"
+        << "\twhere\t\"n_ens ens_file_1 ... ens_file_n\" is the number "
+        << "of ensemble members followed by a list of ensemble member "
+        << "file names (required).\n"
 
         << "\t\t\"ens_file_list\" is an ASCII file containing a list "
         << "of ensemble member file names (required).\n"
