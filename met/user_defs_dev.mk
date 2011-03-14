@@ -18,14 +18,14 @@ ARCH_FLAGS   = -DBLOCK4
 # C++ compiler flags
 # Any additional required libraries
 CXX          = /usr/bin/g++
-CXX_FLAGS    = -Wall -Wshadow -static # -g -m32
+CXX_FLAGS    = -Wall -Wshadow -static -g # -m32
 CXX_LIBS     =
 
 # Path to the Fortran Compiler
 # Fortran compiler flags
 # Any additional required libraries
 FC           = /usr/bin/gfortran
-FC_FLAGS     = -Wall -Wshadow -static -ff2c # -g -m32
+FC_FLAGS     = -Wall -Wshadow -static -ff2c -g # -m32
 FC_LIBS      = -lgfortran
 
 # Make print options
