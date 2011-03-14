@@ -2586,7 +2586,7 @@ double compute_horz_interp(WrfData *wd_ptr,
          break;
 
       case(im_bilin):   // Bilinear interpolation
-         v = interp_bilin(*wd_ptr, x_ll, y_ll);
+         v = interp_bilin(*wd_ptr, obs_x, obs_y);
          break;
 
       default:
