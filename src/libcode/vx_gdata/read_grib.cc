@@ -40,15 +40,6 @@ static void gds_to_stereographic (const Section2_Header & gds, StereographicData
 
 static int (*two_to_one_grib)(Grid &, int, int);
 
-extern int two_to_one_grib_0_0_0(Grid &, int, int);
-extern int two_to_one_grib_0_0_1(Grid &, int, int);
-extern int two_to_one_grib_0_1_0(Grid &, int, int);
-extern int two_to_one_grib_0_1_1(Grid &, int, int);
-extern int two_to_one_grib_1_0_0(Grid &, int, int);
-extern int two_to_one_grib_1_0_1(Grid &, int, int);
-extern int two_to_one_grib_1_1_0(Grid &, int, int);
-extern int two_to_one_grib_1_1_1(Grid &, int, int);
-
 ///////////////////////////////////////////////////////////////////////////////
 
 bool has_grib_code(GribFile &grib_file, int gc) {
@@ -1308,7 +1299,7 @@ bool is_grid_relative(const GribRecord &r) {
    if(r.gds->type == 0) {
       res_flag = r.gds->grid_type.latlon_grid.res_flag;
    }
-   // Mercator 
+   // Mercator
    else if(r.gds->type == 1) {
       res_flag = r.gds->grid_type.mercator.res_flag;
    }

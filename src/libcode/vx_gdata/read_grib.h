@@ -76,6 +76,15 @@ extern void   rotate_uv_grid_to_earth(const Grid &,
 extern void   rotate_wdir_grid_to_earth(const Grid &,
                                         const WrfData &, WrfData &);
 
+extern int two_to_one_grib_0_0_0(Grid &, int, int);
+extern int two_to_one_grib_0_0_1(Grid &, int, int);
+extern int two_to_one_grib_0_1_0(Grid &, int, int);
+extern int two_to_one_grib_0_1_1(Grid &, int, int);
+extern int two_to_one_grib_1_0_0(Grid &, int, int);
+extern int two_to_one_grib_1_0_1(Grid &, int, int);
+extern int two_to_one_grib_1_1_0(Grid &, int, int);
+extern int two_to_one_grib_1_1_1(Grid &, int, int);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __VX_READ_GRIB_RECORD_H__
