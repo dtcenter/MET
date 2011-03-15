@@ -20,20 +20,25 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class AfwaCloudPctFile {
+static const int afwa_nx = 1024;
+static const int afwa_ny = 1024;
 
-   private:
+
+////////////////////////////////////////////////////////////////////////
+
+
+class AfwaDataFile {
+
+   protected:
 
       void init_from_scratch();
 
-      void assign(const AfwaCloudPctFile &);
+      void assign(const AfwaDataFile &);
 
       int two_to_one(int, int) const;
 
 
       const Grid * grid;   //  allocated
-
-      unsigned char * Buf;
 
       ConcatString Filename;
 
@@ -43,20 +48,18 @@ class AfwaCloudPctFile {
 
    public:
 
-      AfwaCloudPctFile();
-     ~AfwaCloudPctFile();
-      AfwaCloudPctFile(const AfwaCloudPctFile &);
-      AfwaCloudPctFile & operator=(const AfwaCloudPctFile &);
-
-      bool read(const char * filename);
+      AfwaDataFile();
+      virtual ~AfwaDataFile();
+      AfwaDataFile(const AfwaDataFile &);
+      AfwaDataFile & operator=(const AfwaDataFile &);
 
       void clear();
 
-      int operator()(int x, int y) const;
-
-      int get_value(int x, int y) const;
-
       bool xy_is_ok(int x, int y) const;
+
+      //
+      // inline member functions
+      //
 
       int nx() const;
       int ny() const;
@@ -65,16 +68,25 @@ class AfwaCloudPctFile {
 
       char hemisphere() const;
 
+      //
+      // pure virtual member functions
+      //
+
+      virtual bool read(const char * filename) = 0;
+
+      virtual int operator()(int x, int y) const = 0;
+
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-inline unixtime AfwaCloudPctFile::valid      () const { return ( Valid ); }
-inline char     AfwaCloudPctFile::hemisphere () const { return ( Hemisphere ); }
+inline int AfwaDataFile::nx() const { return ( afwa_nx ); }
+inline int AfwaDataFile::ny() const { return ( afwa_ny ); }
 
-inline int      AfwaCloudPctFile::operator()(int x, int y) const { return ( get_value(x, y) ); }
+inline unixtime AfwaDataFile::valid      () const { return ( Valid ); }
+inline char     AfwaDataFile::hemisphere () const { return ( Hemisphere ); }
 
 
 ////////////////////////////////////////////////////////////////////////

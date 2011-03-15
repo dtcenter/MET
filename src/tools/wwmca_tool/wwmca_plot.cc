@@ -22,6 +22,7 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <cstdio>
+#include <string.h>
 #include <cmath>
 
 #include "vx_util.h"
@@ -33,6 +34,8 @@ using namespace std;
 #include "vx_plot_util.h"
 
 #include "afwa_file.h"
+#include "afwa_cp_file.h"
+#include "afwa_pt_file.h"
 #include "wwmca_grids.h"
 
 
@@ -45,6 +48,8 @@ using namespace std;
 
 
 static ConcatString output_directory;
+
+static int max_minutes;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,9 +88,13 @@ static void usage();
 
 static void set_outdir(const StringArray &);
 
+static void set_max_minutes(const StringArray &);
+
 static void process(const char * filename);
 
-static void make_image(const AfwaCloudPctFile &, PxmBase &);
+static void set_pixel_time_filename(const char *, char *);
+
+static void make_image(const AfwaCloudPctFile &, const AfwaPixelTimeFile &, PxmBase &);
 
 static Color value_to_color(int value);
 
@@ -119,6 +128,8 @@ cline.set(argc, argv);
 cline.set_usage(usage);
 
 cline.add(set_outdir, "-outdir", 1);
+
+cline.add(set_max_minutes, "-max", 1);
 
 cline.parse();
 
@@ -159,7 +170,7 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " [ -outdir path ] wwmca_cloud_pct_file_list\n\n";
+cerr << "\n\n   usage:  " << program_name << " [ -outdir path ] [ -max max_minutes ] wwmca_cloud_pct_file_list\n\n";
 
 exit ( 1 );
 
@@ -185,19 +196,35 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void set_max_minutes(const StringArray & a)
+
+{
+
+max_minutes = atoi(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void process(const char * filename)
 
 {
 
-AfwaCloudPctFile f;
+AfwaCloudPctFile f_cp;
+AfwaPixelTimeFile f_pt;
 ConcatString short_name;
 ConcatString output_filename;
+char * pt_filename = (char *) 0;
 Pgm image;
 RenderInfo info;
 PSfile plot;
 
 
-if ( !(f.read(filename)) )  {
+if ( !(f_cp.read(filename)) )  {
 
    cerr << "\n\n  " << program_name << ": unable to open input file \"" << filename << "\"\n\n";
 
@@ -205,13 +232,30 @@ if ( !(f.read(filename)) )  {
 
 }
 
-if ( f.hemisphere() == 'N' )  grid = &nh;
+if ( f_cp.hemisphere() == 'N' )  grid = &nh;
 else                          grid = &sh;
 
 Nx = grid->nx();
 Ny = grid->ny();
 
 short_name = get_short_name(filename);
+
+// allocate space for the pixel time filename (make it slightly
+// larger than the input filename to ensure that it is large enough)
+pt_filename = new char [strlen(filename) + 10];
+
+// create pixel time filename and read it in
+set_pixel_time_filename(filename, pt_filename);
+
+if ( !(f_pt.read(pt_filename)) )  {
+
+   cerr << "\n\n  " << program_name << ": unable to open pixel time file \"" << pt_filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+if (pt_filename)  {delete [] pt_filename; pt_filename = (char *) 0; }
 
 if ( output_directory.length() > 0 )  output_filename << output_directory << '/';
 
@@ -221,7 +265,7 @@ output_filename << short_name << ".ps";
    //  make the background image
    //
 
-make_image(f, image);
+make_image(f_cp, f_pt, image);
 
 // image.write("a.pgm");
 
@@ -277,7 +321,7 @@ plot.clip();
    //  draw the map
    //
 
-draw_map(plot, f.hemisphere());
+draw_map(plot, f_cp.hemisphere());
 
    //
    //  unclip
@@ -289,7 +333,7 @@ plot.grestore();
    //  draw lat/lon grid
    //
 
-draw_latlon_grid(plot, f.hemisphere());
+draw_latlon_grid(plot, f_cp.hemisphere());
 
    //
    //  annotate
@@ -313,7 +357,41 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void make_image(const AfwaCloudPctFile & f, PxmBase & image)
+// create the pixel time filename from the cloud pct filename
+void set_pixel_time_filename(const char * cp_name, char * pt_name)
+{
+   ConcatString short_cp_name;
+   static const char * pt_name_start = "WWMCA_PIXL_TIME_MEANS";
+   int cp_length, short_cp_length;
+   int i, j;
+
+   // get the short name of the cloud percent file
+   short_cp_name = get_short_name(cp_name);
+
+   // get the lengths of the cloud percent filename including path and without path
+   cp_length = strlen(cp_name);
+   short_cp_length = short_cp_name.length();
+
+   // copy the path to the files
+   for (i = 0; i < (cp_length - short_cp_length); i++)
+      pt_name[i] = cp_name[i];
+
+   // now create the new pixel time filename which consists of the pt_name_start and the
+   // rest of the cp_name after removing its start (WWMCA_TOTAL_CLOUD_PCT)
+   strcpy(pt_name + i, pt_name_start);
+
+   for (j = i + strlen(pt_name_start); j < cp_length; j++)
+      pt_name[j] = cp_name[j];
+
+   pt_name[j] = '\0';  // null terminate the string
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void make_image(const AfwaCloudPctFile & f_cp, const AfwaPixelTimeFile & f_pt, PxmBase & image)
 
 {
 
@@ -331,7 +409,10 @@ for (x=0; x<Nx; ++x)  {
 
    for (y=0; y<Ny; ++y)  {
 
-      value = f(x, y);
+      if ((f_pt.pixel_age_sec(x, y) * 60) < max_minutes)
+         value = f_cp(x, y);
+      else
+         value = 0;
 
       color = value_to_color(value);
 
@@ -399,7 +480,7 @@ bool region_ok(const MapRegion & r, const char hemisphere)
 {
 
 // if ( (hemisphere == 'N') && (r.lat_max() < -21.0) )  return ( false );
-// 
+//
 // if ( (hemisphere == 'S') && (r.lat_min() >  21.0) )  return ( false );
 
 return ( true );

@@ -15,6 +15,8 @@
 #include <netcdf.hh>
 
 #include "afwa_file.h"
+#include "afwa_cp_file.h"
+#include "afwa_pt_file.h"
 #include "interp_base.h"
 #include "wwmca_regrid_Conf.h"
 
@@ -63,7 +65,9 @@ class WwmcaRegridder {
       void parse_mercator_grid();
 
 
-      InterpolationValue do_single_hemi(int to_x, int to_y, const Grid * From, const AfwaCloudPctFile & cloud) const;
+      InterpolationValue do_single_hemi(int to_x, int to_y, const Grid * From,
+                                        const AfwaCloudPctFile & cloud,
+                                        const AfwaPixelTimeFile & pixel) const;
 
       InterpolationValue do_both_hemi(int to_x, int to_y) const;
 
@@ -78,8 +82,11 @@ class WwmcaRegridder {
       const Grid * NHgrid;           //  allocated
       const Grid * SHgrid;           //  allocated
 
-      const AfwaCloudPctFile * nh;   //  allocated
-      const AfwaCloudPctFile * sh;   //  allocated
+      const AfwaCloudPctFile * cp_nh;   //  allocated
+      const AfwaCloudPctFile * cp_sh;   //  allocated
+
+      const AfwaPixelTimeFile * pt_nh;   //  allocated
+      const AfwaPixelTimeFile * pt_sh;   //  allocated
 
       const Grid * ToGrid;           //  allocated
 
@@ -99,9 +106,11 @@ class WwmcaRegridder {
 
       void dump(ostream &, int = 0) const;
 
+      void set_cp_nh_file(const char *);
+      void set_cp_sh_file(const char *);
 
-      void set_nh_file(const char *);
-      void set_sh_file(const char *);
+      void set_pt_nh_file(const char *);
+      void set_pt_sh_file(const char *);
 
       void set_config(wwmca_regrid_Conf &, const char * filename);
 
