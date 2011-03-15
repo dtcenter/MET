@@ -68,8 +68,11 @@ void WwmcaRegridder::init_from_scratch()
 NHgrid = new Grid (wwmca_north_data);
 SHgrid = new Grid (wwmca_south_data);
 
-nh = (const AfwaCloudPctFile *) 0;
-sh = (const AfwaCloudPctFile *) 0;
+cp_nh = (const AfwaCloudPctFile *) 0;
+cp_sh = (const AfwaCloudPctFile *) 0;
+
+pt_nh = (const AfwaPixelTimeFile *) 0;
+pt_sh = (const AfwaPixelTimeFile *) 0;
 
 ToGrid = (const Grid *) 0;
 
@@ -96,8 +99,11 @@ void WwmcaRegridder::clear()
 // if ( NHgrid )  { delete NHgrid;  NHgrid = (const Grid *) 0; }
 // if ( SHgrid )  { delete SHgrid;  SHgrid = (const Grid *) 0; }
 
-if ( nh )  { delete nh;  nh = (const AfwaCloudPctFile *) 0; }
-if ( sh )  { delete sh;  sh = (const AfwaCloudPctFile *) 0; }
+if ( cp_nh )  { delete cp_nh;  cp_nh = (const AfwaCloudPctFile *) 0; }
+if ( cp_sh )  { delete cp_sh;  cp_sh = (const AfwaCloudPctFile *) 0; }
+
+if ( pt_nh )  { delete pt_nh;  pt_nh = (const AfwaPixelTimeFile *) 0; }
+if ( pt_sh )  { delete pt_sh;  pt_sh = (const AfwaPixelTimeFile *) 0; }
 
 if ( ToGrid )  { delete ToGrid;  ToGrid = (const Grid *) 0; }
 
@@ -152,11 +158,11 @@ if ( SHgrid )  {
 
 } else out << prefix << "SHgrid = (nul)\n";
 
-if ( nh )  out << prefix << "nh set\n";
-else       out << prefix << "nh not set\n";
+if ( cp_nh )  out << prefix << "nh set\n";
+else          out << prefix << "nh not set\n";
 
-if ( sh )  out << prefix << "sh set\n";
-else       out << prefix << "sh not set\n";
+if ( cp_sh )  out << prefix << "sh set\n";
+else          out << prefix << "sh not set\n";
 
 if ( ToGrid ) {
 
@@ -195,7 +201,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void WwmcaRegridder::set_nh_file(const char * filename)
+void WwmcaRegridder::set_cp_nh_file(const char * filename)
 
 {
 
@@ -203,13 +209,13 @@ AfwaCloudPctFile * f = new AfwaCloudPctFile;
 
 if ( !(f->read(filename)) )  {
 
-   cerr << "\n\n  WwmcaRegridder::set_nh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
+   cerr << "\n\n  WwmcaRegridder::set_cp_nh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-nh = (const AfwaCloudPctFile *) f;  f = (AfwaCloudPctFile *) 0;
+cp_nh = (const AfwaCloudPctFile *) f;  f = (AfwaCloudPctFile *) 0;
 
 return;
 
@@ -219,7 +225,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void WwmcaRegridder::set_sh_file(const char * filename)
+void WwmcaRegridder::set_cp_sh_file(const char * filename)
 
 {
 
@@ -227,13 +233,61 @@ AfwaCloudPctFile * f = new AfwaCloudPctFile;
 
 if ( !(f->read(filename)) )  {
 
-   cerr << "\n\n  WwmcaRegridder::set_sh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
+   cerr << "\n\n  WwmcaRegridder::set_cp_sh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-sh = (const AfwaCloudPctFile *) f;  f = (AfwaCloudPctFile *) 0;
+cp_sh = (const AfwaCloudPctFile *) f;  f = (AfwaCloudPctFile *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void WwmcaRegridder::set_pt_nh_file(const char * filename)
+
+{
+
+AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
+
+if ( !(f->read(filename)) )  {
+
+   cerr << "\n\n  WwmcaRegridder::set_pt_nh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+pt_nh = (const AfwaPixelTimeFile *) f;  f = (AfwaPixelTimeFile *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void WwmcaRegridder::set_pt_sh_file(const char * filename)
+
+{
+
+AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
+
+if ( !(f->read(filename)) )  {
+
+   cerr << "\n\n  WwmcaRegridder::set_pt_sh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+pt_sh = (const AfwaPixelTimeFile *) f;  f = (AfwaPixelTimeFile *) 0;
 
 return;
 
@@ -291,7 +345,7 @@ find_grid_hemisphere();
    //  check that the hemispheres are defined
    //
 
-if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !nh ) {
+if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !cp_nh ) {
 
    cerr << "\n\n  WwmcaRegridder::set_config() -> missing northern hemisphere data must be specified using the \"-nh\" argument\n\n";
 
@@ -299,7 +353,7 @@ if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !nh ) {
 
 }
 
-if ( ( Hemi == south_hemisphere || Hemi == both_hemispheres ) && !sh ) {
+if ( ( Hemi == south_hemisphere || Hemi == both_hemispheres ) && !cp_sh ) {
 
    cerr << "\n\n  WwmcaRegridder::set_config() -> missing southern hemisphere data must be specified using the \"-sh\" argument\n\n";
 
@@ -347,11 +401,11 @@ InterpolationValue value;
 switch ( Hemi )  {
 
    case north_hemisphere:
-      value = do_single_hemi(to_x, to_y, NHgrid, *nh);
+      value = do_single_hemi(to_x, to_y, NHgrid, *cp_nh, *pt_nh);
       break;
 
    case south_hemisphere:
-      value = do_single_hemi(to_x, to_y, SHgrid, *sh);
+      value = do_single_hemi(to_x, to_y, SHgrid, *cp_sh, *pt_sh);
       break;
 
    case both_hemispheres:
@@ -375,7 +429,7 @@ return ( value );
 ////////////////////////////////////////////////////////////////////////
 
 
-InterpolationValue WwmcaRegridder::do_single_hemi(int to_x0, int to_y0, const Grid * From, const AfwaCloudPctFile & cloud) const
+InterpolationValue WwmcaRegridder::do_single_hemi(int to_x0, int to_y0, const Grid * From, const AfwaCloudPctFile & cloud, const AfwaPixelTimeFile & pixel) const
 
 {
 
@@ -406,7 +460,8 @@ from_y0 = nint(dy);
 
 if ( I.width() == 1 )  {
 
-   if ( cloud.xy_is_ok(from_x0, from_y0) )  {
+   if ( cloud.xy_is_ok(from_x0, from_y0) &&
+        ((pixel.pixel_age_sec(from_x0, from_y0) * 60) < (int) Config->max_minutes()))  {
 
       iv.ok = true;
 
@@ -442,7 +497,8 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
       sub_y  = yy + wm1o2;
 
-      if ( !(cloud.xy_is_ok(from_x, from_y)) )  {
+      if ( !(cloud.xy_is_ok(from_x, from_y) &&
+             ((pixel.pixel_age_sec(from_x0, from_y0) * 60) < (int) Config->max_minutes())) )  {
 
          I.put_bad(sub_x, sub_y);
 
@@ -453,7 +509,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
          I.put_good(sub_x, sub_y, t);
 
       }
-      
+
    }   //  for yy
 
 }   //  for xx
@@ -489,6 +545,8 @@ int xx, yy, sub_x, sub_y, from_x, from_y, wm1o2;
 InterpolationValue iv;
 const AfwaCloudPctFile  * cloud_this  = (const AfwaCloudPctFile *) 0;
 const AfwaCloudPctFile  * cloud_other = (const AfwaCloudPctFile *) 0;
+const AfwaPixelTimeFile  * pixel_this  = (const AfwaPixelTimeFile *) 0;
+const AfwaPixelTimeFile  * pixel_other = (const AfwaPixelTimeFile *) 0;
 const Grid * From_this  = (const Grid *) 0;
 const Grid * From_other = (const Grid *) 0;
 
@@ -502,16 +560,22 @@ ToGrid->xy_to_latlon((double) to_x0, (double) to_y0, lat0, lon0);
 
 if ( lat0 >= 0.0 )  {
 
-   cloud_this  = nh;
-   cloud_other = sh;
+   cloud_this  = cp_nh;
+   cloud_other = cp_sh;
+
+   pixel_this  = pt_nh;
+   pixel_other = pt_sh;
 
    From_this  = NHgrid;
    From_other = SHgrid;
 
 } else {
 
-   cloud_this  = sh;
-   cloud_other = nh;
+   cloud_this  = cp_sh;
+   cloud_other = cp_nh;
+
+   pixel_this  = pt_nh;
+   pixel_other = pt_sh;
 
    From_this  = SHgrid;
    From_other = NHgrid;
@@ -530,11 +594,12 @@ from_y0 = nint(dy0);
 
 if ( I.width() == 1 )  {
 
-   if ( cloud_this->xy_is_ok(from_x0, from_y0) )  {
+   if ( cloud_this->xy_is_ok(from_x0, from_y0) &&
+        ((pixel_this->pixel_age_sec(from_x0, from_y0) * 60) < (int) Config->max_minutes()))  {
 
       iv.ok = true;
 
-      iv.value = (double) (cloud_this->get_value(from_x0, from_y0));
+      iv.value = (double) (cloud_this->cloud_pct(from_x0, from_y0));
 
    } else {
 
@@ -570,13 +635,19 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
       if ( lat*lat0 >= 0 )  {   //  same hemisphere
 
-         t = cloud_this->get_value(from_x, from_y);
+         if ((pixel_this->pixel_age_sec(from_x, from_y) * 60) < (int) Config->max_minutes())
+            t = cloud_this->cloud_pct(from_x, from_y);
+         else
+            t = 0.0;
 
       } else {
 
          From_other->latlon_to_xy(lat, lon, dx, dy);
 
-         t = cloud_other->get_value(nint(dx), nint(dy));
+         if ((pixel_other->pixel_age_sec(nint(dx), nint(dy)) * 60) < (int) Config->max_minutes())
+            t = cloud_other->cloud_pct(nint(dx), nint(dy));
+         else
+            t = 0.0;
 
       }
 
@@ -640,7 +711,7 @@ for (j=0; j<Nx; ++j)  {
 
 }
 
-if ( nh && sh )  { Hemi = both_hemispheres;  return; }
+if ( cp_nh && cp_sh )  { Hemi = both_hemispheres;  return; }
 
    //
    //  left, right
@@ -662,7 +733,7 @@ for (j=0; j<Ny; ++j)  {
 
 }
 
-if ( nh && sh )  { Hemi = both_hemispheres;  return; }
+if ( cp_nh && cp_sh )  { Hemi = both_hemispheres;  return; }
 
 if ( Width == 1 )  {
 
@@ -1073,7 +1144,6 @@ if ( (H != 'N') && (H != 'S') )  {
 
 }
 
-/*
 if ( H == 'S' )  {
 
    cerr << "\n\n  WwmcaRegridder::parse_stereographic_grid() -> South hemisphere grids not yet supported\n\n";
@@ -1081,7 +1151,6 @@ if ( H == 'S' )  {
    exit ( 1 );
 
 }
-*/
 
 
    //
@@ -1089,8 +1158,6 @@ if ( H == 'S' )  {
    //
 
 sdata->name = "To (stereographic)";
-
-sdata->hemisphere = H;
 
 sdata->scale_lat = lat_scale;
 

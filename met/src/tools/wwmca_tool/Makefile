@@ -18,6 +18,8 @@ EXECUTABLES = wwmca_regrid \
 
 
 OBJECTS     = afwa_file.o                 \
+              afwa_cp_file.o              \
+              afwa_pt_file.o              \
               interp_base.o               \
               min_interp.o                \
               max_interp.o                \
@@ -72,7 +74,7 @@ gridhemisphere_to_string.h gridhemisphere_to_string.cc: wwmca_ref.h
 
 wwmca_regrid_Conf.h wwmca_regrid_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WWMCARegridConfig_default
 	@ echo
-	@ rm -f wwmca_config.h wwmca_config.cc
+	@ rm -f wwmca_regrid_Conf.h wwmca_regrid_Conf.cc
 	$(ECONFIG_CODEGEN) -class wwmca_regrid_Conf -outfile wwmca_regrid_Conf $(CONFIG_TEMPLATE_DIR)/WWMCARegridConfig_default
 
 
@@ -87,6 +89,16 @@ wwmca_regrid_Conf.h wwmca_regrid_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WWMCARegridConf
 afwa_file.o: afwa_file.h afwa_file.cc
 	@ echo
 	$(CXX) afwa_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+
+
+afwa_cp_file.o: afwa_cp_file.h afwa_cp_file.cc
+	@ echo
+	$(CXX) afwa_cp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+
+
+afwa_pt_file.o: afwa_pt_file.h afwa_pt_file.cc
+	@ echo
+	$(CXX) afwa_pt_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 
 interp_base.o: interp_base.h interp_base.cc

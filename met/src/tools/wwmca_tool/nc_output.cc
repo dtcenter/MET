@@ -50,7 +50,7 @@ const int Nx = ToGrid->nx();
 const int Ny = ToGrid->ny();
 
 
-valid_time = nh->valid();
+valid_time = cp_nh->valid();
 
 issue_time = valid_time;
 
