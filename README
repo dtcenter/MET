@@ -215,12 +215,16 @@ Version 3.0.1 Release Notes:
 - What's New:
     - Distribute latest set of bug fixes for METv3.0.
     - Add support for the biliear interpolation method when verifying with point
-      observations in the Point-Stat and Ensemble-Stat tools.
+      observations in the Point-Stat and Ensemble-Stat tools.  This
+      interpolation option is specified in the configuration files by setting
+      the interp_mthd to BILIN.
     - Modify the algorithm used to derive relative humidity for point
       observations in the PB2NC tool to be consistent with the method used by
       the NCEP Unified-PostProcessor (UPP).
-    - Change the assumed radius of the earth from 6367.47km to 6371.20km to be
+    - Change the assumed radius of the earth from 6367.47 km to 6371.20 km to be
       consistent with NCEP's w3 library used by WRF and UPP, including copygb.
+    - Ensure that the METv3.0.1 software is fully compatible with output from
+      METv3.0.
 
 Version 3.0 Release Notes:
 -------------------------
