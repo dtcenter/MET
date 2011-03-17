@@ -125,8 +125,7 @@ void GridStatConfInfo::process_config(FileType ftype, FileType otype) {
    // Conf: version
    //
 
-   if(strncasecmp(conf.version().sval(), met_version,
-      strlen(conf.version().sval())) != 0) {
+   if(strcasecmp(conf.version().sval(), met_version) != 0) {
 
       cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
            << "The version number listed in the config file ("
@@ -563,11 +562,11 @@ void GridStatConfInfo::process_config(FileType ftype, FileType otype) {
 
       im = string_to_interpmthd(conf.interp_method(i).sval());
 
-      if(im == im_dw_mean || im == im_ls_fit || im == im_bilin) {
+      if(im == im_dw_mean || im == im_ls_fit) {
 
          cerr << "\n\nERROR: GridStatConfInfo::process_config() -> "
-              << "The interpolation method may not be set to DW_MEAN, "
-              << "LS_FIT, or BILIN for grid_stat.\n\n" << flush;
+              << "The interpolation method may not be set to DW_MEAN "
+              << "or LS_FIT for grid_stat.\n\n" << flush;
          exit(1);
       }
    }

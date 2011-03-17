@@ -16,7 +16,6 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-03-07  Halley Gotway
-//   001    02-22-11  Halley Gotway  Add bilinear interpolation option.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -439,7 +438,6 @@ extern double interp_dw_mean(const WrfData &, int, int, int, double, double,
                              int, double);
 extern double interp_ls_fit (const WrfData &, int, int, int, double, double,
                              double);
-extern double interp_bilin  (const WrfData &, double, double);
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -311,35 +311,6 @@ double convert_vp_svp_to_rh(double vp, double svp) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Relative humidity derivation method used by the NCEP
-// Unified-PostProcessor.  Derivation References:
-//   Cuijpers, J. W. M., P. G. Duynkerke, 1993
-//      Large Eddy Simulation of Trade Wind Cumulus Clouds
-//      J. Atmos. Sci., 50, 3894-3908
-//   Murray, F. W., 1967
-//      On the Computation of Saturation Vapor Pressure
-//      J. Appl. Meteor., 6, 203-204
-//
-////////////////////////////////////////////////////////////////////////
-
-double convert_p_q_t_to_rh(double p, double q, double t) {
-   double rh, qc;
-
-   if(is_eq(p, bad_data_double) ||
-      is_eq(q, bad_data_double) ||
-      is_eq(t, bad_data_double) )
-      rh = bad_data_double;
-   else {
-      qc = const_pq0/p*exp(const_a2*(t-const_a3)/(t-const_a4));
-      rh = q/qc*100.0;
-      if(rh > 100.0) rh = 100.0;
-   }
-
-   return(rh);
-}
-
-////////////////////////////////////////////////////////////////////////
 
 double convert_u_v_to_wdir(double u, double v) {
    double wdir;

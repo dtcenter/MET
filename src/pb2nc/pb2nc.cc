@@ -36,8 +36,6 @@
 //                    observation for reqeusted message types.
 //   007    02-15-11  Halley Gotway  Fix event_stack bug for which the
 //                    logic was reversed.
-//   008    02-28-11  Halley Gotway  Modify relative humidity derivation
-//                    to match the Unified-PostProcessor.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -420,8 +418,7 @@ void process_config() {
    // Conf: version
    //
 
-   if(strncasecmp(conf.version().sval(), met_version,
-      strlen(conf.version().sval())) != 0) {
+   if(strcasecmp(conf.version().sval(), met_version) != 0) {
 
       cerr << "\n\nERROR: process_config() -> "
            << "The version number listed in the config file ("
@@ -1699,7 +1696,7 @@ int keep_level_category(int category) {
 
 float derive_grib_code(int gc, float *pqtzuv, double lat) {
    float result;
-   double p, q, t, z, u, v, w, vp;
+   double p, q, t, z, u, v, w, vp, svp;
 
    switch(gc) {
 
@@ -1740,7 +1737,10 @@ float derive_grib_code(int gc, float *pqtzuv, double lat) {
          p      = (double) pqtzuv[0];
          q      = (double) pqtzuv[1];
          t      = (double) pqtzuv[2];
-         result = (float) convert_p_q_t_to_rh(p, q, t);
+         w      = convert_q_to_w(q);
+         vp     = convert_p_w_to_vp(p, w);
+         svp    = convert_t_to_svp(t);
+         result = (float) convert_vp_svp_to_rh(vp, svp);
          break;
 
       //

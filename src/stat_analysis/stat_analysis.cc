@@ -252,8 +252,7 @@ void sanity_check() {
    // Conf: version
    //
 
-   if(strncasecmp(conf.version().sval(), met_version,
-      strlen(conf.version().sval())) != 0) {
+   if(strcasecmp(conf.version().sval(), met_version) != 0) {
 
       cerr << "\n\nERROR: sanity_check() -> "
            << "The version number listed in the config file ("

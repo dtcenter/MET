@@ -31,7 +31,6 @@ void interpmthd_to_string(const InterpMthd m, char *out) {
       case(im_dw_mean): strcpy(out, im_dw_mean_str); break;
       case(im_ls_fit):  strcpy(out, im_ls_fit_str);  break;
       case(im_nbrhd):   strcpy(out, im_nbrhd_str);   break;
-      case(im_bilin):   strcpy(out, im_bilin_str);   break;
 
       default:
          strcpy(out, im_na_str);
@@ -53,7 +52,6 @@ InterpMthd string_to_interpmthd(const char *mthd_str) {
    else if(strcmp(mthd_str, im_dw_mean_str) == 0) m = im_dw_mean;
    else if(strcmp(mthd_str, im_ls_fit_str)  == 0) m = im_ls_fit;
    else if(strcmp(mthd_str, im_nbrhd_str)   == 0) m = im_nbrhd;
-   else if(strcmp(mthd_str, im_bilin_str)   == 0) m = im_bilin;
    else                                           m = im_na;
 
    return(m);

@@ -111,8 +111,7 @@ void WaveletStatConfInfo::process_config(FileType ftype, FileType otype) {
    // Conf: version
    //
 
-   if(strncasecmp(conf.version().sval(), met_version,
-      strlen(conf.version().sval())) != 0) {
+   if(strcasecmp(conf.version().sval(), met_version) != 0) {
 
       cerr << "\n\nERROR: WaveletStatConfInfo::process_config() -> "
            << "The version number listed in the config file ("
