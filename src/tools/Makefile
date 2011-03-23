@@ -25,6 +25,7 @@ endif
 ifeq ($(ENABLE_PB2NC), 1)
 	@ cd pb2nc          ; $(MAKE) $(PRINT_OPTS)
 endif
+	@ cd pbtime         ; $(MAKE) $(PRINT_OPTS)
 ifeq ($(ENABLE_PCP_COMBINE), 1)
 	@ cd pcp_combine    ; $(MAKE) $(PRINT_OPTS)
 endif
@@ -56,6 +57,7 @@ clean:
 	@ cd mode           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd mode_analysis  ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd pb2nc          ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd pbtime         ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd pcp_combine    ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd point_stat     ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd stat_analysis  ; $(MAKE) $(PRINT_OPTS) clean
