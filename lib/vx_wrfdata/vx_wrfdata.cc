@@ -3912,10 +3912,14 @@ double interp_bilin(const WrfData &wd, double obs_x, double obs_y) {
    wtne = dx * dy;
 
    // Compute interpolated value
-   if(wd.is_bad_xy(x,   y)   ||
-      wd.is_bad_xy(x+1, y)   ||
-      wd.is_bad_xy(x,   y+1) ||
-      wd.is_bad_xy(x+1, y+1)) {
+   if(x < 0 || x+1 >= wd.get_nx() ||
+      y < 0 || y+1 >= wd.get_ny()) {
+      bilin_v = bad_data_double;
+   }
+   else if(wd.is_bad_xy(x,   y)   ||
+           wd.is_bad_xy(x+1, y)   ||
+           wd.is_bad_xy(x,   y+1) ||
+           wd.is_bad_xy(x+1, y+1)) {
       bilin_v = bad_data_double;
    }
    else {
