@@ -603,6 +603,7 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
    float v, v_min, v_max;
    unixtime init_ut, valid_ut;
    char init_str[max_str_len], valid_str[max_str_len], accum_str[max_str_len];
+   NumArray tmp_data;
 
    //
    // Read the record indicated
@@ -639,6 +640,31 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
    else if( x_dir &&  y_dir &&  order_flag) two_to_one_grib = two_to_one_grib_1_1_1;
 
    //
+   // Store the data in a temporary NumArray object.  If a bitmap section is
+   // present, fill with bad_data_float values where the bms_bit is 0.
+   //
+   for(i=0, count=0; i<gr.nx()*gr.ny(); i++) {
+
+      // Bitmap section present and bms_bit turned on.
+      if(bms_flag && grib_record.bms_bit(i) > 0) {
+         v = (float) grib_record.data_value(count);
+         count++;
+      }
+      // Bitmap section present and bms_bit turned off.
+      else if(bms_flag && grib_record.bms_bit(i) <= 0) {
+         v = bad_data_float;
+      }
+      // No bitmap section present.
+      else {
+         v = (float) grib_record.data_value(i);
+      }
+
+      // Add the value to tmp_data
+      tmp_data.add(v);
+
+   }
+
+   //
    // Read through the data to find the min/max values
    //
    v_min = 1.0e30;
@@ -648,20 +674,7 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
       for(x=0; x<gr.nx(); x++) {
 
          i = two_to_one_grib(gr, x, y);
-
-         //
-         // Check bitmap for non-zero data at this point
-         //
-         if(bms_flag && grib_record.bms_bit(i) > 0) {
-            v = (float) grib_record.data_value(count);
-            count++;
-         }
-         else if(bms_flag && grib_record.bms_bit(i) <= 0) {
-            v = bad_data_float;
-         }
-         else { // !bms_flag
-            v = (float) grib_record.data_value(i);
-         }
+         v = (float) tmp_data[i];
 
          if(!is_bad_data(v) && v > v_max) v_max = v;
          if(!is_bad_data(v) && v < v_min) v_min = v;
@@ -704,20 +717,7 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
       for(x=0; x<gr.nx(); x++) {
 
          i = two_to_one_grib(gr, x, y);
-
-         //
-         // Check bitmap for non-zero data at this point
-         //
-         if(bms_flag && grib_record.bms_bit(i) > 0) {
-            v = (float) grib_record.data_value(count);
-            count++;
-         }
-         else if(bms_flag && grib_record.bms_bit(i) <= 0) {
-            v = bad_data_float;
-         }
-         else { // !bms_flag
-            v = (float) grib_record.data_value(i);
-         }
+         v = (float) tmp_data[i];
 
          wd.put_xy_int(wd.double_to_int(v), x, y);
       }
@@ -1305,7 +1305,7 @@ bool is_grid_relative(const GribRecord &r) {
    if(r.gds->type == 0) {
       res_flag = r.gds->grid_type.latlon_grid.res_flag;
    }
-   // Mercator 
+   // Mercator
    else if(r.gds->type == 1) {
       res_flag = r.gds->grid_type.mercator.res_flag;
    }
