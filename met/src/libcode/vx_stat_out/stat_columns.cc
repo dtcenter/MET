@@ -2855,7 +2855,7 @@ void write_prc_cols(const PCTInfo &pct_info,
       pct_info.pct.nrows() + 1);
 
    //
-   // Write THRESH, OY, ON for each row of the Nx2 table
+   // Write THRESH, PODY, POFD for each row of the Nx2 table
    //
    for(i=0, col=c+2; i<pct_info.pct.nrows(); i++) {
 
