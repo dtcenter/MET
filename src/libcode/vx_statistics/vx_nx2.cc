@@ -668,17 +668,15 @@ if ( (row < 0) || (row >= Nrows) )  {
 
 }
 
-int py_o1, py_o2;
-const int N = n();
+double num, denom;
 double x;
 
-py_o1 =    event_count_by_row(row);
-py_o2 = nonevent_count_by_row(row);
+num   = (double) event_count_by_row(row);
 
-x = (double) (py_o1 + py_o2);
+denom = num + nonevent_count_by_row(row);
 
-if (N == 0) x  = bad_data_double;
-else        x /= N;
+if(is_eq(denom, 0.0)) x = bad_data_double;
+else                  x = num/denom;
 
 return ( x );
 
@@ -694,21 +692,23 @@ double Nx2ContingencyTable::row_refinement(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   cerr << "\n\n  Nx2ContingencyTable::row_calibration(int) const -> range check error\n\n";
+   cerr << "\n\n  Nx2ContingencyTable::row_refinement(int) const -> range check error\n\n";
 
    exit ( 1 );
 
 }
 
-double num, denom;
+int py_o1, py_o2;
+const int N = n();
 double x;
 
-num   = (double) event_count_by_row(row);
+py_o1 =    event_count_by_row(row);
+py_o2 = nonevent_count_by_row(row);
 
-denom = num + nonevent_count_by_row(row);
+x = (double) (py_o1 + py_o2);
 
-if(is_eq(denom, 0.0)) x = bad_data_double;
-else                  x = num/denom;
+if (N == 0) x  = bad_data_double;
+else        x /= N;
 
 return ( x );
 
@@ -797,7 +797,7 @@ int sy, sn;
 
 sy = sn = 0;
 
-for (j=0; j<=row; ++j)  {
+for (j=(row + 1); j<Nrows; ++j)  {
 
    sy +=    event_count_by_row(j);
    sn += nonevent_count_by_row(j);
@@ -811,7 +811,7 @@ tt.set_fy_on(sn);
 
 sy = sn = 0;
 
-for (j=(row + 1); j<Nrows; ++j)  {
+for (j=0; j<=row; ++j)  {
 
    sy +=    event_count_by_row(j);
    sn += nonevent_count_by_row(j);
