@@ -839,21 +839,21 @@ int j;
 TTContingencyTable ct;
 double area, x_prev, y_prev, x, y;
 
-x_prev = y_prev = 0.0;
+x_prev = y_prev = 1.0;
 
-for(j=0, area=0; j<Nrows; ++j)  {
+for(j=0, area=0.0; j<Nrows; ++j)  {
 
    // 2x2 Contingency Table for this row
    ct = roc_point_by_row(j);
 
    // Retrieve the ROC point for this row
-   x = ct.pod_yes();
-   y = ct.pofd();
+   x = ct.pofd();
+   y = ct.pod_yes();
 
    if(is_bad_data(x) || is_bad_data(y)) continue;
 
    // Compute area under the curve using the trapezoid rule
-   area += (x - x_prev)*(y + y_prev)*0.5;
+   area += (x_prev - x)*(y_prev + y)*0.5;
 
    // Save current ROC point as the previous point
    x_prev = x;
