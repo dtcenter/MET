@@ -67,7 +67,7 @@ F2C_LIBS     =
 F2C_LIBNAME  =
 
 # Optional flags to disable the compilation of MET tools
-# Specify a non-zero value to disable the compilation of the tool
+# Specify a non-zero value to enable the compilation of the tool
 ENABLE_PCP_COMBINE    = 1
 ENABLE_GEN_POLY_MASK  = 1
 ENABLE_MODE           = 1
