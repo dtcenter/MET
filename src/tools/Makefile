@@ -44,6 +44,9 @@ endif
 ifeq ($(ENABLE_WWMCA), 1)
 	@ cd wwmca_tool     ; $(MAKE) $(PRINT_OPTS)
 endif
+ifeq ($(ENABLE_MADIS2NC), 1)
+	@ cd madis2nc       ; $(MAKE) $(PRINT_OPTS)
+endif
 
 
 ########################################################################
@@ -64,6 +67,7 @@ clean:
 	@ cd wavelet_stat   ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd plot_point_obs ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd wwmca_tool     ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd madis2nc       ; $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
