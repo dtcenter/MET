@@ -47,6 +47,7 @@ export ENABLE_STAT_ANALYSIS
 export ENABLE_MODE_ANALYSIS
 export ENABLE_PLOT_POINT_OBS
 export ENABLE_WWMCA
+export ENABLE_MADIS2NC
 
 ###############################################################################
 

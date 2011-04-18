@@ -82,6 +82,7 @@ ENABLE_STAT_ANALYSIS  = 1
 ENABLE_MODE_ANALYSIS  = 1
 ENABLE_PLOT_POINT_OBS = 1
 ENABLE_WWMCA          = 1
+ENABLE_MADIS2NC       = 1
 
 ###############################################################################
 
