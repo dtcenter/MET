@@ -41,6 +41,7 @@
 //   009    07/27/10  Halley Gotway  Enhance to allow addition of any
 //                    number of input files/accumulation intervals.
 //                    Add lat/lon variables to NetCDF.
+//   010    04/19/11  Halley Gotway  Bugfix for -add option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -610,6 +611,7 @@ void sum_grib_files(Grid &grid, GribRecord &rec) {
             }
          }
       } // end else
+
    } // end for i
 
    //
@@ -838,24 +840,24 @@ void do_add_command(int argc, char **argv) {
          nc_accum += accum[i];
 
       }
+
+      //
+      // Increment sums for each grid point
+      //
+      for(x=0; x<grid1.nx(); x++) {
+         for(y=0; y<grid1.ny(); y++) {
+
+            n = wd.two_to_one(x, y);
+            v = wd.get_xy_double(x, y);
+
+            // Check for bad data
+            if(is_bad_data(v)) pcp_data[n] = bad_data_double;
+            // Otherwise, increment sums
+            else               pcp_data[n] += v;
+
+         } // end for y
+      } // end for x
    } // end for i
-
-   //
-   // Increment sums for each grid point
-   //
-   for(x=0; x<grid1.nx(); x++) {
-      for(y=0; y<grid1.ny(); y++) {
-
-         n = wd.two_to_one(x, y);
-         v = wd.get_xy_double(x, y);
-
-         // Check for bad data
-         if(is_bad_data(v)) pcp_data[n] = bad_data_double;
-         // Otherwise, increment sums
-         else               pcp_data[n] += v;
-
-      } // end for y
-   } // end for x
 
    //
    // Write the combined precipitation field out in NetCDF format
