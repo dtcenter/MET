@@ -1,6 +1,6 @@
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,6 +41,7 @@
 //   009    07/27/10  Halley Gotway  Enhance to allow addition of any
 //                    number of input files/accumulation intervals.
 //                    Add lat/lon variables to NetCDF.
+//   010    04/19/11  Halley Gotway  Bugfix for -add option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -836,24 +837,25 @@ void do_add_command(int argc, char **argv) {
          nc_accum += accum[i];
 
       }
+
+      //
+      // Increment sums for each grid point
+      //
+      for(x=0; x<grid1.nx(); x++) {
+         for(y=0; y<grid1.ny(); y++) {
+
+            n = wd.two_to_one(x, y);
+            v = wd.get_xy_double(x, y);
+
+            // Check for bad data
+            if(is_bad_data(v)) pcp_data[n] = bad_data_double;
+            // Otherwise, increment sums
+            else               pcp_data[n] += v;
+
+         } // end for y
+      } // end for x
+
    } // end for i
-
-   //
-   // Increment sums for each grid point
-   //
-   for(x=0; x<grid1.nx(); x++) {
-      for(y=0; y<grid1.ny(); y++) {
-
-         n = wd.two_to_one(x, y);
-         v = wd.get_xy_double(x, y);
-
-         // Check for bad data
-         if(is_bad_data(v)) pcp_data[n] = bad_data_double;
-         // Otherwise, increment sums
-         else               pcp_data[n] += v;
-
-      } // end for y
-   } // end for x
 
    //
    // Write the combined precipitation field out in NetCDF format
@@ -1313,7 +1315,7 @@ void usage(int argc, char *argv[]) {
         << "to be used from in_file1 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"in_file2\" indicates the name of the second input GRIB "
-        << "file to be added to or subtracted from in_file1 (required).\n"
+        << "file to be subtracted from in_file1 (required).\n"
 
         << "\t\t\t\"accum2\" indicates the accumulation interval "
         << "to be used from in_file2 in HH[MMSS] format (required).\n"
