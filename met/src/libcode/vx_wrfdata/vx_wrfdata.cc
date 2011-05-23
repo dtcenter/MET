@@ -3622,7 +3622,7 @@ void rescale_probability(WrfData &wd) {
    max_v = wd.int_to_double(wrfdata_int_data_max);
 
    // Check for a valid range of values
-   if(min_v < 0.0 || max_v > 100.0) {
+   if(min_v < 0.0-1.0e-5 || max_v > 100.0+1.0e-5) {
       cerr << "\n\nERROR: rescale_probability() -> "
            << "invalid range of data for a probability field: ["
            << min_v << ", " << max_v << "].\n\n" << flush;
