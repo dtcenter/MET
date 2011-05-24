@@ -2096,7 +2096,8 @@ void Engine::process_engine_config() {
    // Check the version number of the config file
    //
 
-   if(strcasecmp(wconf.version().sval(), met_version) != 0) {
+   if(strncasecmp(wconf.version().sval(), met_version,
+      strlen(wconf.version().sval())) != 0) {
 
       cerr << "\n\nERROR: Engine::process_engine_config() -> "
            << "The version number listed in the config file ("
