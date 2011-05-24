@@ -127,14 +127,16 @@ void PointStatConfInfo::read_config(const char *file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_config(FileType ftype) {
-   int i, j, n, n_mthd, n_wdth;
+   int i, j, n, n_mthd, n_wdth, a, b;
    GCInfo gci;
+   InterpMthd im;
 
    //
    // Conf: version
    //
 
-   if(strcasecmp(conf.version().sval(), met_version) != 0) {
+   if(strncasecmp(conf.version().sval(), met_version,
+      strlen(conf.version().sval())) != 0) {
 
       cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
            << "The version number listed in the config file ("
@@ -638,11 +640,18 @@ void PointStatConfInfo::process_config(FileType ftype) {
       exit(1);
    }
 
-   // Do error checking and compute the total number of
-   // interpolations to be performed
+   // Compute the number of interpolation methods to be used
    n_interp = 0;
-   for(i=0; i<n_wdth; i++) {
 
+   // Check for nearest neighbor special case
+   for(i=0, a=n_wdth; i<n_wdth; i++) {
+
+      if(conf.interp_width(i).ival() == 1) {
+         a--;
+         n_interp++;
+      }
+
+      // Perform error checking on widths
       if(conf.interp_width(i).ival() < 1) {
          cerr << "\n\nERROR: PointStatConfInfo::process_config() -> "
               << "The interpolation width values must be set "
@@ -650,30 +659,63 @@ void PointStatConfInfo::process_config(FileType ftype) {
               << conf.interp_width(i).ival() << ").\n\n" << flush;
          exit(1);
       }
-
-      if(conf.interp_width(i).ival() == 1) n_interp += 1;
-      if(conf.interp_width(i).ival() >  1) n_interp += n_mthd;
    }
+
+   // Check for bilinear interpolation special case
+   for(i=0, b=n_mthd; i<n_mthd; i++) {
+
+      im = string_to_interpmthd(conf.interp_method(i).sval());
+
+      if(im == im_bilin) {
+         b--;
+         n_interp++;
+      }
+   }
+
+   // Compute n_interp
+   n_interp += a*b;
 
    // Allocate space for the interpolation methods and widths
    interp_mthd = new InterpMthd [n_interp];
    interp_wdth = new int        [n_interp];
 
-   // Set each interpolation method and width
-   for(i=0, n=0; i<n_wdth; i++) {
+   // Initialize the interpolation method count
+   n = 0;
 
-      // For an interpolation width of 1, set the method the method to
-      // unweighted mean - which is really just nearest neighbor
+   // Check for the nearest neighbor special case
+   for(i=0; i<n_wdth; i++) {
       if(conf.interp_width(i).ival() == 1) {
          interp_mthd[n] = im_uw_mean;
-         interp_wdth[n] = conf.interp_width(i).ival();
+         interp_wdth[n] = 1;
          n++;
-         continue;
       }
+   }
 
+   // Check for the bilinear interpolation special case
+   for(i=0; i<n_mthd; i++) {
+      im = string_to_interpmthd(conf.interp_method(i).sval());
+      if(im == im_bilin) {
+         interp_mthd[n] = im_bilin;
+         interp_wdth[n] = 2;
+         n++;
+      }
+   }
+
+   // Loop through the interpolation widths
+   for(i=0; i<n_wdth; i++) {
+
+      // Skip the nearest neighbor case
+      if(conf.interp_width(i).ival() == 1) continue;
+
+      // Loop through the interpolation methods
       for(j=0; j<n_mthd; j++) {
-         interp_mthd[n] =
-            string_to_interpmthd(conf.interp_method(j).sval());
+         im = string_to_interpmthd(conf.interp_method(j).sval());
+
+         // Skip the bilinear interpolation case
+         if(im == im_bilin) continue;
+
+         // Store the interpolation method and width
+         interp_mthd[n] = im;
          interp_wdth[n] = conf.interp_width(i).ival();
          n++;
       }
