@@ -1502,6 +1502,8 @@ Polyline WrfData::single_outline_angle(int n) const {
                         boundary.v[index[(start_i+j)%n]]);
    }
 
+   if(index) { delete [] index; index = (int *) 0; }
+
    return(outline);
 }
 
