@@ -24,6 +24,7 @@ TARGETS		= pb2nc
 OBJECTS		= pb2nc_Conf.o \
 		  numpbmsg.o \
 		  openpb.o \
+		  closepb.o \
 		  readpb.o \
 		  dumppb.o
 
@@ -89,6 +90,9 @@ numpbmsg.o: numpbmsg.f
 
 openpb.o: openpb.f
 	$(FC) -c openpb.f $(FC_FLAGS) $(OPT_FLAGS)
+
+closepb.o: closepb.f
+	$(FC) -c closepb.f $(FC_FLAGS) $(OPT_FLAGS)
 
 readpb.o: readpb.f
 	$(FC) -c readpb.f $(FC_FLAGS) $(OPT_FLAGS)

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -38,6 +38,8 @@
 //                    logic was reversed.
 //   008    02-28-11  Halley Gotway  Modify relative humidity derivation
 //                    to match the Unified-PostProcessor.
+//   009    06-01-11  Halley Gotway  Call closebp for input file
+//                    descriptor.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -217,6 +219,7 @@ static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
 extern "C" {
    void numpbmsg_(int *, int *);
    void openpb_(const char *, int *);
+   void closepb_(int *);
    void readpb_(int *, char *, int *, int *, int *, double[mxr8pm],
                 double[mxr8vt][mxr8vn][mxr8lv][mxr8pm]);
    void dumppb_(const char *, int *, const char *, int *,
@@ -1325,6 +1328,11 @@ void process_pbfile(int i_pb) {
            << n_file_obs << "\n"
            << flush;
    }
+
+   //
+   // Close the PREPBUFR file
+   //
+   closepb_(&unit);
 
    //
    // Delete the temporary blocked file
