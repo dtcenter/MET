@@ -297,14 +297,6 @@ int str_to_grib_code(const char *c) {
    if(gc == -1) gc = str_to_grib_code(c, 140);
    if(gc == -1) gc = str_to_grib_code(c, 141);
 
-   // Check if a matching GRIB code was found
-   if(gc == -1) {
-      cerr << "\n\nERROR: str_to_grib_code() -> "
-           << "can't find GRIB code corresponding to string \""
-           << c << "\".\n\n" << flush;
-      exit(1);
-   }
-
    return(gc);
 }
 
@@ -392,14 +384,6 @@ int str_to_grib_code(const char *c, int &pcode,
    if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 133);
    if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 140);
    if(gc == -1) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 141);
-
-   // Check if a matching GRIB code was found
-   if(gc == -1) {
-      cerr << "\n\nERROR: str_to_grib_code() -> "
-           << "can't find GRIB code corresponding to string \""
-           << c << "\".\n\n" << flush;
-      exit(1);
-   }
 
    return(gc);
 }
