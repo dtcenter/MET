@@ -1945,9 +1945,8 @@ double compute_stdev(double sum, double sum_sq, int n) {
 
       v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
 
-      if(is_eq(v, 0.0)) sigma = 0.0;
-      else if(v < 0)    sigma = bad_data_double;
-      else              sigma = sqrt(v);
+      if(v < 0) sigma = bad_data_double;
+      else      sigma = sqrt(v);
    }
 
    return(sigma);
