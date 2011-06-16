@@ -32,13 +32,13 @@ inline int is_bad_data(int a)  {
 }
 
 inline int is_bad_data(double a) {
-   if(abs((long double) (a - bad_data_double)) < 10E-5) return(1);
-   else                                                 return(0);
+   if(abs((long double) (a - bad_data_double)) < default_tol) return(1);
+   else                                                       return(0);
 }
 
 inline int is_bad_data(float a) {
-   if(abs((long double) (a - bad_data_float)) < 10E-5) return(1);
-   else                                                return(0);
+   if(abs((long double) (a - bad_data_float)) < default_tol) return(1);
+   else                                                      return(0);
 }
 
 inline int is_eq(double a, double b, double tol) {
@@ -47,7 +47,7 @@ inline int is_eq(double a, double b, double tol) {
 }
 
 inline int is_eq(double a, double b) {
-   return(is_eq(a, b, 10E-5));
+   return(is_eq(a, b, default_tol));
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -87,6 +87,13 @@ static const double bad_data_double       = -9999.0;
 static const char   bad_data_str[]        = "-9999";
 static const char   na_str[]              = "NA";
 
+   //
+   //  Default tolerance to determine if two number of close enough
+   //  to be considered equal
+   //
+
+static const double default_tol           = 10E-10;
+
 ////////////////////////////////////////////////////////////////////////
 
 
