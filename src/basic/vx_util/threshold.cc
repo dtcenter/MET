@@ -259,22 +259,22 @@ int SingleThresh::check(double v) {
    switch(type) {
 
       case thresh_lt: // less than
-         if(v < thresh)        r = 1;
+         if(!is_eq(v, thresh) && v < thresh) r = 1;
          break;
       case thresh_le: // less than or equal to
-         if(v <= thresh)       r = 1;
+         if( is_eq(v, thresh) || v < thresh) r = 1;
          break;
       case thresh_eq: // equal to
-         if(is_eq(v, thresh))  r = 1;
+         if( is_eq(v, thresh))               r = 1;
          break;
       case thresh_ne: // not equal to
-         if(!is_eq(v, thresh)) r = 1;
+         if(!is_eq(v, thresh))               r = 1;
          break;
       case thresh_gt: // greater than
-         if(v > thresh)        r = 1;
+         if(!is_eq(v, thresh) && v > thresh) r = 1;
          break;
       case thresh_ge: // greater than or equal to
-         if(v >= thresh)       r = 1;
+         if( is_eq(v, thresh) || v > thresh) r = 1;
          break;
 
       default:
