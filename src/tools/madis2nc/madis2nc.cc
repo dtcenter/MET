@@ -12,11 +12,13 @@
 //
 //   Description:
 //      Parse MADIS NetCDF files containing surface point observations
-//      and reformat them for use by MET.
+//      and reformat them for use by MET.  Initial release provides
+//      support for METAR and RAOB MADIS types.  Support for additional
+//      MADIS types should be added.
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    07-14-09  Contributed    New
+//   000    07-21-11  Halley Gotway  Adapted from contributed code.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,76 +44,54 @@ using namespace std;
 #include "vx_met_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+#include "write_netcdf.h"
+#include "madis2nc.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-// Constants
-static const char *program_name = "madis2nc";
-static const float fill_value   = -9999.f;
-static const int   strl_len     = 16; // Length of "YYYYMMDD_HHMMSS"
-static const int   hdr_arr_len  = 3;  // Observation header length
-static const int   obs_arr_len  = 5;  // Observation values length
+static void initialize();
+static void process_command_line(int, char **);
+static void process_madis_file(const char *);
+static void clean_up();
 
-// Strings for input file: these are for metar files:
-const char *in_recNum_str;
-const char *in_fillValue_str;
-const char *in_reportType_str;
-const char *in_stationName_str;
-const char *in_timeObs_str;
-const char *in_latitude_str;
-const char *in_longitude_str;
-const char *in_elevation_str;
-const char *in_visibility_str;
-const char *in_seaLevelPress_str;
-const char *in_temperature_str;
-const char *in_dewpoint_str;
-const char *in_windDir_str;
-const char *in_windSpeed_str;
-const char *in_windGust_str;
-const char *in_minTemp24Hour_str;
-const char *in_maxTemp24Hour_str;
-const char *in_precip1Hour_str;
-const char *in_precip3Hour_str;
-const char *in_precip6Hour_str;
-const char *in_precip24Hour_str;
-const char *in_snowCover_str;
+static void setup_netcdf_out(int nhdr);
 
-// Corresponding GRIB code values
-const int   in_visibility_gc     = 20;
-const int   in_seaLevelPress_gc  = 2;
-const int   in_temperature_gc    = 11;
-const int   in_dewpoint_gc       = 17;
-const int   in_windDir_gc        = 31;
-const int   in_windSpeed_gc      = 32;
-const int   in_windGust_gc       = 180;
-const int   in_minTemp24Hour_gc  = 16;
-const int   in_maxTemp24Hour_gc  = 15;
-const int   in_precip_gc         = 61; // Convert from m to mm
-const int   in_snowCover_gc      = 66;
+static int    get_nc_dim(NcFile *&f_in, const char *);
+static NcVar *get_nc_var(NcFile *&f_in, const char *);
+static void   get_nc_var_att(NcVar *&, const char *, float &);
 
-// Strings for out file
-const char* out_hdr_typ_str = "hdr_typ";
-const char* out_hdr_sid_str = "hdr_sid";
-const char* out_hdr_vld_str = "hdr_vld";
-const char* out_hdr_arr_str = "hdr_arr";
-const char* out_obs_arr_str = "obs_arr";
+static void   get_nc_var_val(NcVar *&, const long *cur, int len, ConcatString &);
+static void   get_nc_var_val(NcVar *&, const long *cur, const long *dim, double &);
+static void   get_nc_var_val(NcVar *&, const long *cur, const long *dim, float &);
+static void   get_nc_var_val(NcVar *&, const long *cur, const long *dim, char &);
+static void   get_nc_var_val(NcVar *&, const long *cur, const long *dim, int &);
 
-// Variables for command line arguments
-static ConcatString awfile;
-static ConcatString ncfile;
-static int verbosity = 2;
+static void   put_nc_var_val(NcVar *&, int i, const ConcatString &);
+static void   put_nc_var_arr(NcVar *&, int i, int len, const float *);
 
-////////////////////////////////////////////////////////////////////////
+static int    get_num_lvl(NcVar *&, const char *dim_str,
+                          const long *cur, const long *dim);
+static float  get_nc_obs(NcFile *&f_in, const char *in_str,
+                         const long *cur, const long *dim,
+                         int &n_rej_fill, int &n_rej_qc);
+static void   process_obs(NcFile *&f_in, const char *in_str,
+                          const long *cur, const long *dim,
+                          const int gc, const float conversion,
+                          float *obs_arr, int &i_obs,
+                          int &n_rej_fill, int &n_rej_qc);
 
-static void write_data(NcFile *&, NcFile *&);
-static void write_obs_arr(NcFile *&f_in, const int, const char *,
-                          const int, const float, NcVar *&, int &, const float);
+static MadisType get_madis_type(NcFile *&f_in);
+static void      convert_wind_wdir_to_u_v(float wind, float wdir,
+                                          float &u, float &v);
+
+static void process_madis_metar(NcFile *&f_in);
+static void process_madis_raob(NcFile *&f_in);
+
 static void usage(int, char **);
 
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
-   int i;
 
    //
    // Set handler to be called for memory allocation error
@@ -119,10 +99,44 @@ int main(int argc, char *argv[]) {
    set_new_handler(oom);
 
    //
-   // Input and output files
+   // Initialize static variables
    //
-   NcFile *f_in  = (NcFile *) 0; 
-   NcFile *f_out = (NcFile *) 0;
+   initialize();
+
+   //
+   // Process the command line arguments
+   //
+   process_command_line(argc, argv);
+
+   //
+   // Process the MADIS file
+   //
+   process_madis_file(mdfile);
+
+   //
+   // Deallocate memory and clean up
+   //
+   clean_up();
+
+   return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void initialize() {
+
+   mdfile.clear();
+   ncfile.clear();
+   qc_dd_sa.clear();
+   lvl_dim_sa.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_command_line(int argc, char **argv) {
+   int i;
 
    //
    // Check for the correct number of arguments
@@ -135,7 +149,7 @@ int main(int argc, char *argv[]) {
    //
    // Store the input MADIS file name and the output NetCDF file name
    //
-   awfile = argv[1];
+   mdfile = argv[1];
    ncfile = argv[2];
 
    //
@@ -143,28 +157,80 @@ int main(int argc, char *argv[]) {
    //
    for(i=0; i<argc; i++) {
 
-      if(strcmp(argv[i], "-v") == 0) {
+      if(strcmp(argv[i], "-type") == 0) {
+
+         //
+         // Parse the MADIS type
+         //
+         if(strcasecmp(argv[i+1], metar_str) == 0) {
+            mtype = madis_metar;
+         }
+         else if(strcasecmp(argv[i+1], raob_str) == 0) {
+            mtype = madis_raob;
+         }
+         else {
+            cerr << "\n\nERROR: process_command_line() -> "
+                 << "MADIS type \"" << argv[i+1]
+                 << "\" not currently supported.\n\n" << flush;
+            exit(1);
+         }
+         i++;
+      }
+      if(strcmp(argv[i], "-qc_dd") == 0) {
+
+         //
+         // Parse the list of QC flags to be used
+         //
+         qc_dd_sa.parse_wsss(argv[i+1]);
+         i++;
+      }
+      if(strcmp(argv[i], "-lvl_dim") == 0) {
+
+         //
+         // Parse the list vertical level dimensions to be processed
+         //
+         lvl_dim_sa.parse_wsss(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-rec_beg") == 0) {
+         rec_beg = atoi(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-rec_end") == 0) {
+         rec_end = atoi(argv[i+1]);
+         i++;
+      }
+      else if(strcmp(argv[i], "-v") == 0) {
          verbosity = atoi(argv[i+1]);
          i++;
       }
       else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: main() -> "
+         cerr << "\n\nERROR: process_command_line() -> "
               << "unrecognized command line switch: "
               << argv[i] << "\n\n" << flush;
          exit(1);
       }
    } // end for i
 
-   //
-   // Open the input MADIS NetCDF file for reading
-   //
-   if(verbosity > 0) cout << "Reading: " << awfile << "\n" << flush;
+   return;
+}
 
-   f_in = new NcFile(awfile);
+////////////////////////////////////////////////////////////////////////
 
+void process_madis_file(const char *madis_file) {
+
+   // Print out current file name
+   if(verbosity > 0) {
+      cout << "Reading MADIS File:\t" << madis_file << "\n" << flush;
+   }
+
+   // Open the input NetCDF file
+   NcFile *f_in = new NcFile(madis_file);
+
+   // Check for a valid file
    if(!f_in->is_valid()) {
-      cerr << "\n\nERROR: main() -> "
-           << "can't open input NetCDF file \"" << awfile
+      cerr << "\n\nERROR: process_madis_file() -> "
+           << "can't open input NetCDF file \"" << madis_file
            << "\" for reading.\n\n" << flush;
       f_in->close();
       delete f_in;
@@ -173,333 +239,119 @@ int main(int argc, char *argv[]) {
       exit(1);
    }
 
-   //
-   // Open the output NetCDF file for writing
-   //
-   if(verbosity > 0) cout << "Writing: " << ncfile << "\n" << flush;
+   // If the MADIS type is not already set, try to guess.
+   if(mtype == madis_none) mtype = get_madis_type(f_in);
 
-   f_out = new NcFile(ncfile, NcFile::Replace);
+   // Switch on the MADIS type and process accordingly.
+   switch(mtype) {
+      case(madis_metar):
+         process_madis_metar(f_in);
+         break;
+      case(madis_raob):
+         process_madis_raob(f_in);
+         break;
 
-   if(!f_out->is_valid()) {
-      cerr << "\n\nERROR: main() -> "
-           << "can't open output NetCDF file \"" << ncfile
-           << "\" for writing.\n\n" << flush;
-      f_out->close();
-      delete f_out;
-      f_out = (NcFile *) 0;
-
-      exit(1);
+      case(madis_coop):
+      case(madis_HDW):
+      case(madis_HDW1h):
+      case(madis_hydro):
+      case(madis_POES):
+      case(madis_acars):
+      case(madis_acarsProfiles):
+      case(madis_maritime):
+      case(madis_mesonet):
+      case(madis_profiler):
+      case(madis_radiometer):
+      case(madis_sao):
+      case(madis_satrad):
+      case(madis_snow):
+      case(madis_none):
+      default:
+         cerr << "\n\nERROR: process_madis_file() -> "
+              << "MADIS type (" << mtype
+              << ") not currently supported.\n\n" << flush;
+         exit(1);
+         break;
    }
 
-   //
-   // Process the MADIS observations
-   //
-   write_data(f_in, f_out);
+   // Close the input NetCDF file
+   if(f_in) {
+      f_in->close();
+      delete f_in;
+      f_in = (NcFile *) 0;
+   }
 
-   return(0);
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_data(NcFile *&f_in, NcFile *&f_out) {
-   int mon, day, yr, hr, min, sec;
-   int nhdr, i_obs, i_hdr;
-   char tmp_str[max_str_len];
-   char hostname_str[max_str_len];
-   char attribute_str[PATH_MAX];
-   DataLine dl;
-   double ut;
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
-   float hdr_arr[hdr_arr_len];
-
-   /////////////////////////////////////////////////////////////////////
+void clean_up() {
 
    //
-   // Define input NetCDF dimensions and variables
+   // Close the output NetCDF file
    //
-   NcDim *in_recNum_dim        = (NcDim *) 0; // Record number dimension
+   if(f_out) {
+      f_out->close();
+      delete f_out;
+      f_out = (NcFile *) 0;
+   }
 
-   // Header variables
-   NcVar *in_reportType_var    = (NcVar *) 0;
-   NcVar *in_stationName_var   = (NcVar *) 0;
-   NcVar *in_timeObs_var       = (NcVar *) 0;
-   NcVar *in_latitude_var      = (NcVar *) 0;
-   NcVar *in_longitude_var     = (NcVar *) 0;
-   NcVar *in_elevation_var     = (NcVar *) 0;
+   return;
+}
 
-   // Strings for input file: these are common for all MADIS files:
-   in_recNum_str        = "recNum";
-   in_fillValue_str     = "_FillValue";
-   in_stationName_str   = "stationName";
-   in_latitude_str      = "latitude";
-   in_longitude_str     = "longitude";
+////////////////////////////////////////////////////////////////////////
 
-   // get "title" attribute:
-   NcAtt *id_att = f_in->get_att("title");
-   if(!id_att || !id_att->is_valid()) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't get the \"title\" attribute \n" << flush;
+void setup_netcdf_out(int nhdr) {
+
+   //
+   // Create the output netCDF file for writing
+   //
+   if(verbosity > 0) {
+      cout << "Writing MET File:\t" << ncfile << "\n" << flush;
+   }
+   f_out = new NcFile(ncfile, NcFile::Replace);
+
+   //
+   // Check for a valid file
+   //
+   if(!f_out->is_valid()) {
+      cerr << "\n\nERROR: setup_netcdf_out() -> "
+           << "trouble opening output file: " << ncfile << "\n\n";
+      f_out->close();
+      delete f_out;
+      f_out = (NcFile *) 0;
       exit(1);
    }
-   NcValues *id_val=id_att->values();
-   strcpy(tmp_str,(char *)id_val->base());
-   if(verbosity > 1) {
-      cout << "Retrieved global attribute \"title\"=" << tmp_str << "\n" << flush;
-   }
-   enum madis_type {UNSUPPORTED,ACARS,ACARSPROFILES,COOP,HYDRO,MARITIME,MESONET,METAR,SAO,SNOW};
-   enum madis_type found_id=UNSUPPORTED;
-   if (strncmp(tmp_str, "MADIS ACARS data", 16) == 0) {
-     //TBD: add support for this type
-     found_id = ACARS;
-// Strings for input file: these are for acars files:
-     in_stationName_str   = "origAirport";
-     in_reportType_str    = "destAirport";
-     hdr_typ = "ACARS"; //ignore stationType, encode all as "ACARS"
-     in_timeObs_str       = "timeObs";
-     in_elevation_str     = "indAltitude";
-     in_visibility_str    = "NA";
-     in_seaLevelPress_str = "NA";
-     in_temperature_str   = "temperature";
-     in_dewpoint_str      = "dewpoint";
-     in_windDir_str       = "windDir";
-     in_windSpeed_str     = "windSpeed";
-     in_windGust_str      = "NA";
-     in_minTemp24Hour_str = "NA";
-     in_maxTemp24Hour_str = "NA";
-     in_precip1Hour_str   = "NA";
-     in_precip3Hour_str   = "NA";
-     in_precip6Hour_str   = "NA";
-     in_precip24Hour_str  = "NA";
-     in_snowCover_str     = "NA";
-   }
-   if (strncmp(tmp_str, "MADIS ACARS profile data", 24) == 0) {
-     //TBD: add support for this type
-     found_id = ACARSPROFILES;
-// Strings for input file: these are for acars files:
-     in_reportType_str    = "profileAirport";
-     in_stationName_str   = "locationName";
-     hdr_typ = "PROACARS"; //ignore stationType, encode all as "PROACARS"
-     in_timeObs_str       = "profileTime";
-     in_elevation_str     = "altitude";
-     in_visibility_str    = "NA";
-     in_seaLevelPress_str = "NA";
-     in_temperature_str   = "temperature";
-     in_dewpoint_str      = "dewpoint";
-     in_windDir_str       = "windDir";
-     in_windSpeed_str     = "windSpeed";
-     in_windGust_str      = "NA";
-     in_minTemp24Hour_str = "NA";
-     in_maxTemp24Hour_str = "NA";
-     in_precip1Hour_str   = "NA";
-     in_precip3Hour_str   = "NA";
-     in_precip6Hour_str   = "NA";
-     in_precip24Hour_str  = "NA";
-     in_snowCover_str     = "NA";
-   }
-   if (strncmp(tmp_str, "MADIS - Meteorological Surface - Modernized NWS Cooperative Observer", 68) == 0) {
-     //TBD: add support for this type
-     found_id = COOP;
-// Strings for input file: these are for coop files:
-     in_reportType_str    = "stationType";
-     hdr_typ = "MSONET"; //ignore stationType, encode all as "MSONET"
-     in_timeObs_str       = "observationTime";
-     in_elevation_str     = "elevation";
-     in_visibility_str    = "NA";
-     in_seaLevelPress_str = "NA";
-     in_temperature_str   = "temperature";
-     in_dewpoint_str      = "NA";
-     in_windDir_str       = "windDir";
-     in_windSpeed_str     = "windSpeed";
-     in_windGust_str      = "windGust";
-     in_minTemp24Hour_str = "minDailyTemp";
-     in_maxTemp24Hour_str = "maxDailyTemp";
-     in_precip1Hour_str   = "NA";
-     in_precip3Hour_str   = "NA";
-     in_precip6Hour_str   = "NA";
-     in_precip24Hour_str  = "precipAccum";
-     in_snowCover_str     = "NA";
-   }
-   if (strncmp(tmp_str, "MADIS - Hydrological Surface", 28) == 0) {
-     //TBD: add support for this type
-     found_id = HYDRO;
-// Strings for input file: these are for hydro files:
-     in_reportType_str    = "stationType";
-     hdr_typ = "MSONET"; //ignore stationType, encode all as "MSONET"
-     in_timeObs_str       = "observationTime";
-     in_elevation_str     = "elevation";
-     in_visibility_str    = "NA";
-     in_seaLevelPress_str = "NA";
-     in_temperature_str   = "NA";
-     in_dewpoint_str      = "NA";
-     in_windDir_str       = "NA";
-     in_windSpeed_str     = "NA";
-     in_windGust_str      = "NA";
-     in_minTemp24Hour_str = "NA";
-     in_maxTemp24Hour_str = "NA";
-     in_precip1Hour_str   = "precip1hr";
-     in_precip3Hour_str   = "precip3hr";
-     in_precip6Hour_str   = "precip6hr";
-     in_precip24Hour_str  = "precip24hr";
-     in_snowCover_str     = "NA";
-   }
-   if (strncmp(tmp_str, "MADIS - Meteorological Surface - Maritime", 41) == 0) {
-     //TBD: add support for this type
-     found_id = MARITIME;
-// Strings for input file: these are for mesonet files:
-     in_reportType_str    = "stationName";
-     hdr_typ = "MSONET"; //ignore stationType, encode all as "MSONET"
-     in_timeObs_str       = "timeObs";
-     in_elevation_str     = "elevation";
-     in_visibility_str    = "visibility";
-     in_seaLevelPress_str = "seaLevelPress";
-     in_temperature_str   = "temperature";
-     in_dewpoint_str      = "dewpoint";
-     in_windDir_str       = "windDir";
-     in_windSpeed_str     = "windSpeed";
-     in_windGust_str      = "windGust";
-     in_minTemp24Hour_str = "NA";
-     in_maxTemp24Hour_str = "NA";
-     in_precip1Hour_str   = "precip1Hour";
-     in_precip3Hour_str   = "NA";
-     in_precip6Hour_str   = "precip1Hour";
-     in_precip24Hour_str  = "precip24Hour";
-     in_snowCover_str     = "NA";
-   }
-   if (strncmp(tmp_str, "MADIS - Meteorological Surface - Integrated Mesonet", 51) == 0) {
-     found_id = MESONET;
-// Strings for input file: these are for mesonet files:
-     in_reportType_str    = "stationType";
-     hdr_typ = "MSONET"; //ignore stationType, encode all as "MSONET"
-     in_timeObs_str       = "observationTime";
-     in_elevation_str     = "elevation";
-     in_visibility_str    = "visibility";
-     in_seaLevelPress_str = "seaLevelPressure";
-     in_temperature_str   = "temperature";
-     in_dewpoint_str      = "dewpoint";
-     in_windDir_str       = "windDir";
-     in_windSpeed_str     = "windSpeed";
-     in_windGust_str      = "windGust";
-     in_minTemp24Hour_str = "NA";
-     in_maxTemp24Hour_str = "NA";
-     in_precip1Hour_str   = "NA";
-     in_precip3Hour_str   = "NA";
-     in_precip6Hour_str   = "NA";
-     in_precip24Hour_str  = "NA";
-     in_snowCover_str     = "NA";
-   }
-   if (strncmp(tmp_str, "MADIS - Meteorological Surface - METAR", 38) == 0) {
-     found_id = METAR;
-     in_reportType_str    = "reportType";
-     in_timeObs_str       = "timeObs";
-     in_elevation_str     = "elevation";
-     in_visibility_str    = "visibility";
-     in_seaLevelPress_str = "seaLevelPress";
-     in_temperature_str   = "temperature";
-     in_dewpoint_str      = "dewpoint";
-     in_windDir_str       = "windDir";
-     in_windSpeed_str     = "windSpeed";
-     in_windGust_str      = "windGust";
-     in_minTemp24Hour_str = "minTemp24Hour";
-     in_maxTemp24Hour_str = "maxTemp24Hour";
-     in_precip1Hour_str   = "precip1Hour";
-     in_precip3Hour_str   = "precip3Hour";
-     in_precip6Hour_str   = "precip6Hour";
-     in_precip24Hour_str  = "precip24Hour";
-     in_snowCover_str     = "snowCover"; // surface_snow_amount, in m
-   }
-   if (strncmp(tmp_str, "MADIS - Meteorological Surface - SAO", 36) == 0) {
-     //TBD: add support for this type
-     found_id = SAO;
-     in_reportType_str    = "reportType";
-     in_timeObs_str       = "timeObs";
-     in_elevation_str     = "elevation";
-     in_visibility_str    = "visibility";
-     in_seaLevelPress_str = "seaLevelPress";
-     in_temperature_str   = "temperature";
-     in_dewpoint_str      = "dewpoint";
-     in_windDir_str       = "windDir";
-     in_windSpeed_str     = "windSpeed";
-     in_windGust_str      = "windGust";
-     in_minTemp24Hour_str = "minTemp24Hour";
-     in_maxTemp24Hour_str = "maxTemp24Hour";
-     in_precip1Hour_str   = "precip1Hour";
-     in_precip3Hour_str   = "precip3Hour";
-     in_precip6Hour_str   = "precip6Hour";
-     in_precip24Hour_str  = "precip24Hour";
-     in_snowCover_str     = "NA";
-   }
-   if (strncmp(tmp_str, "MADIS - Snow", 12) == 0) {
-     //TBD: add support for this type
-     found_id = SNOW;
-     in_reportType_str    = "stationType";
-     hdr_typ = "MSONET"; //ignore stationType, encode all as "MSONET"
-     in_timeObs_str       = "observationTime";
-     in_elevation_str     = "elevation";
-     in_visibility_str    = "NA";
-     in_seaLevelPress_str = "NA";
-     in_temperature_str   = "NA";
-     in_dewpoint_str      = "NA";
-     in_windDir_str       = "NA";
-     in_windSpeed_str     = "NA";
-     in_windGust_str      = "NA";
-     in_minTemp24Hour_str = "NA";
-     in_maxTemp24Hour_str = "NA";
-     in_precip1Hour_str   = "NA";
-     in_precip3Hour_str   = "NA";
-     in_precip6Hour_str   = "NA";
-     in_precip24Hour_str  = "NA";
-     in_snowCover_str     = "snowDepth"; // surface_snow_amount, in mm
-   }
-   if(found_id == UNSUPPORTED) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "Unsupported MADIS \"title\" attribute \"" << tmp_str << "\" from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
-   //
-   // Retrieve the record number from the input file.
-   //
-   if(!(in_recNum_dim = f_in->get_dim(in_recNum_str))) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't read \"" << in_recNum_str << "\" dimension from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
-   nhdr = in_recNum_dim->size();
-
-   if(verbosity > 1) {
-      cout << "Processing " << nhdr << " records.\n" << flush;
-   }
-
-   /////////////////////////////////////////////////////////////////////
 
    //
-   // Define output NetCDF dimensions
+   // Define netCDF dimensions
    //
-   NcDim *strl_dim    = f_out->add_dim("mxstr", (long) strl_len);
-   NcDim *hdr_arr_dim = f_out->add_dim("hdr_arr_len", (long) hdr_arr_len);
-   NcDim *obs_arr_dim = f_out->add_dim("obs_arr_len", (long) obs_arr_len);
-   NcDim *hdr_dim     = f_out->add_dim("nhdr", (long) nhdr);
-   NcDim *obs_dim     = f_out->add_dim("nobs"); // unlimited dimension
+   strl_dim    = f_out->add_dim("mxstr", (long) strl_len);
+   hdr_arr_dim = f_out->add_dim("hdr_arr_len", (long) hdr_arr_len);
+   obs_arr_dim = f_out->add_dim("obs_arr_len", (long) obs_arr_len);
+   obs_dim     = f_out->add_dim("nobs"); // unlimited dimension
+   hdr_dim     = f_out->add_dim("nhdr", (long) nhdr);
 
    //
-   // Define output NetCDF variables
+   // Define netCDF variables
    //
-   NcVar *hdr_typ_var = f_out->add_var(out_hdr_typ_str, ncChar, hdr_dim, strl_dim);
-   NcVar *hdr_sid_var = f_out->add_var(out_hdr_sid_str, ncChar, hdr_dim, strl_dim);
-   NcVar *hdr_vld_var = f_out->add_var(out_hdr_vld_str, ncChar, hdr_dim, strl_dim);
-   NcVar *hdr_arr_var = f_out->add_var(out_hdr_arr_str, ncFloat, hdr_dim, hdr_arr_dim);
-   NcVar *obs_arr_var = f_out->add_var(out_obs_arr_str, ncFloat, obs_dim, obs_arr_dim);
+   hdr_typ_var = f_out->add_var("hdr_typ", ncChar,  hdr_dim, strl_dim);
+   hdr_sid_var = f_out->add_var("hdr_sid", ncChar,  hdr_dim, strl_dim);
+   hdr_vld_var = f_out->add_var("hdr_vld", ncChar,  hdr_dim, strl_dim);
+   hdr_arr_var = f_out->add_var("hdr_arr", ncFloat, hdr_dim, hdr_arr_dim);
+   obs_arr_var = f_out->add_var("obs_arr", ncFloat, obs_dim, obs_arr_dim);
 
    //
-   // Add attributes to the NetCDF variables
+   // Add variable attributes
    //
    hdr_typ_var->add_att("long_name", "message type");
    hdr_sid_var->add_att("long_name", "station identification");
    hdr_vld_var->add_att("long_name", "valid time");
    hdr_vld_var->add_att("units", "YYYYMMDD_HHMMSS");
 
-   hdr_arr_var->add_att("long_name", "array of observation station header values");
+   hdr_arr_var->add_att("long_name",
+                        "array of observation station header values");
    hdr_arr_var->add_att("_fill_value", fill_value);
    hdr_arr_var->add_att("columns", "lat lon elv");
    hdr_arr_var->add_att("lat_long_name", "latitude");
@@ -512,77 +364,427 @@ void write_data(NcFile *&f_in, NcFile *&f_out) {
    obs_arr_var->add_att("long_name", "array of observation values");
    obs_arr_var->add_att("_fill_value", fill_value);
    obs_arr_var->add_att("columns", "hdr_id gc lvl hgt ob");
-   obs_arr_var->add_att("hdr_id_long_name", "index of matching header data");
-   obs_arr_var->add_att("gc_long_name", "grib code corresponding to the observation type");
-   obs_arr_var->add_att("lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
-   obs_arr_var->add_att("hgt_long_name", "height in meters above sea level (msl)");
+   obs_arr_var->add_att("hdr_id_long_name",
+                        "index of matching header data");
+   obs_arr_var->add_att("gc_long_name",
+      "grib code corresponding to the observation type");
+   obs_arr_var->add_att("lvl_long_name",
+      "pressure level (hPa) or accumulation interval (sec)");
+   obs_arr_var->add_att("hgt_long_name",
+                        "height in meters above sea level (msl)");
    obs_arr_var->add_att("ob_long_name", "observation value");
 
    //
    // Add global attributes
    //
-   unix_to_mdyhms(time(NULL), mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2i", yr, mon, day, hr, min, sec);
-   gethostname(hostname_str, max_str_len);
-   sprintf(attribute_str, "File %s generated %s UTC on host %s by the madis2nc tool",
-           ncfile.text(), tmp_str, hostname_str);
-   f_out->add_att("FileOrigins", attribute_str);
-   f_out->add_att("MET_version", met_version);
-   f_out->add_att("MET_tool", program_name);
+   write_netcdf_global(f_out, ncfile.text(), program_name);
 
-   /////////////////////////////////////////////////////////////////////
+   return;
+}
 
-   //
-   // Retrieve the input variables
-   //
-   if(!(in_reportType_var = f_in->get_var(in_reportType_str))) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't read \"" << in_reportType_str << "\" variable from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
+////////////////////////////////////////////////////////////////////////
 
-   if(!(in_stationName_var = f_in->get_var(in_stationName_str))) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't read \"" << in_stationName_str << "\" variable from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
-
-   if(!(in_timeObs_var = f_in->get_var(in_timeObs_str))) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't read \"" << in_timeObs_str << "\" variable from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
-
-   if(!(in_latitude_var = f_in->get_var(in_latitude_str))) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't read \"" << in_latitude_str << "\" variable from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
-
-   if(!(in_longitude_var = f_in->get_var(in_longitude_str))) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't read \"" << in_longitude_str << "\" variable from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
-
-   if(!(in_elevation_var = f_in->get_var(in_elevation_str))) {
-      cerr << "\n\nERROR: write_data() -> "
-           << "can't read \"" << in_elevation_str << "\" variable from "
-           << "NetCDF file: " << awfile << "\n\n" << flush;
-      exit(1);
-   }
-
-   /////////////////////////////////////////////////////////////////////
+int get_nc_dim(NcFile *&f_in, const char *dim_str) {
+   NcDim *dim;
 
    //
-   // Process the header data
+   // Retrieve the dimension from the NetCDF file.
    //
-   for(i_hdr=0; i_hdr<nhdr; i_hdr++) {
+   if(!(dim = f_in->get_dim(dim_str))) {
+      cerr << "\n\nERROR: get_nc_dim() -> "
+           << "can't read \"" << dim_str << "\" dimension.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   return(dim->size());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NcVar *get_nc_var(NcFile *&f_in, const char *var_str) {
+   NcVar *var;
+
+   //
+   // Retrieve the variable from the NetCDF file.
+   //
+   if(!(var = f_in->get_var(var_str))) {
+      cerr << "\n\nERROR: get_nc_var() -> "
+           << "can't read \"" << var_str << "\" variable.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   return(var);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_var_att(NcVar *&var, const char *att_str, float &d) {
+   NcAtt *att;
+
+   //
+   // Retrieve the NetCDF variable attribute.
+   //
+   if(!(att = var->get_att(att_str)) || !att->is_valid()) {
+      cerr << "\n\nERROR: get_nc_var_att(float) -> "
+           << "can't read attribute \"" << att_str
+           << "\" from \"" << var->name() << "\" variable.\n\n"
+           << flush;
+      exit(1);
+   }
+   d = att->as_float(0);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_var_val(NcVar *&var, const long *cur,
+                    int len, ConcatString &tmp_cs) {
+   char tmp_str[max_str_len];
+
+   //
+   // Retrieve the character array value from the NetCDF variable.
+   //
+   if(!var->set_cur((long *) cur) || !var->get(&tmp_str[0], 1, len)) {
+      cerr << "\n\nERROR: get_nc_var_val(ConcatString) -> "
+           << "can't read data from \"" << var->name()
+           << "\" variable.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   //
+   // Store the character array as a ConcatString
+   //
+   tmp_cs = tmp_str;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
+                    float &d) {
+
+   //
+   // Retrieve the float value from the NetCDF variable.
+   //
+   if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
+      cerr << "\n\nERROR: get_nc_var_val(float) -> "
+           << "can't read data from \"" << var->name()
+           << "\" variable.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
+                    double &d) {
+
+   //
+   // Retrieve the double value from the NetCDF variable.
+   //
+   if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
+      cerr << "\n\nERROR: get_nc_var_val(double) -> "
+           << "can't read data from \"" << var->name()
+           << "\" variable.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
+                    char &d) {
+
+   //
+   // Retrieve the character value from the NetCDF variable.
+   //
+   if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
+      cerr << "\n\nERROR: get_nc_var_val(char) -> "
+           << "can't read data from \"" << var->name()
+           << "\" variable.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
+                    int &d) {
+
+   //
+   // Retrieve the character value from the NetCDF variable.
+   //
+   if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
+      cerr << "\n\nERROR: get_nc_var_val(int) -> "
+           << "can't read data from \"" << var->name()
+           << "\" variable.\n\n"
+           << flush;
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void put_nc_var_val(NcVar *&var, int i, const ConcatString &str) {
+
+   //
+   // Store the character array in the NetCDF variable.
+   //
+   if(!var->set_cur(i, (long) 0) ||
+      !var->put(str, (long) 1, (long) str.length())) {
+      cerr << "\n\nERROR: put_nc_var_val(ConcatString) -> "
+           << "can't write data to \"" << var->name()
+           << "\" variable for record number " << i << ".\n\n"
+           << flush;
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void put_nc_var_arr(NcVar *&var, int i, int len, const float *arr) {
+
+   //
+   // Store the array of floats in the NetCDF variable.
+   //
+   if(!var->set_cur(i, (long) 0) ||
+      !var->put(arr, (long) 1, (long) len)) {
+      cerr << "\n\nERROR: put_nc_var_arr(float) -> "
+           << "can't write data to \"" << var->name()
+           << "\" variable for record number " << i << ".\n\n"
+           << flush;
+      exit(1);
+   }
+
+   if(verbosity > 2) {
+      int j;
+      cout << "    [WRITE]  " << var->name() << "[" << i << "]:";
+      for(j=0; j<len; j++) cout << " " << arr[j];
+      cout << "\n" << flush;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_num_lvl(NcVar *&var, const char *dim_str,
+                const long *cur, const long *dim) {
+   int d;
+
+   //
+   // If vertical level dimensions were specified on the command line
+   // but did not include this one, return 0.
+   //
+   if(lvl_dim_sa.n_elements() == 0 || lvl_dim_sa.has(dim_str)) {
+      get_nc_var_val(var, cur, dim, d);
+   }
+   else {
+      d = 0;
+   }
+
+   return(d);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+float get_nc_obs(NcFile *&f_in, const char *in_str,
+                 const long *cur, const long *dim,
+                 int &n_rej_fill, int &n_rej_qc) {
+   float v, in_fill_value;
+   ConcatString in_dd_str, dd_str;
+   char dd;
+
+   //
+   // Setup the QC search string.
+   //
+   in_dd_str = in_str;
+   in_dd_str << "DD";
+
+   //
+   // Retrieve the input and DD variables
+   //
+   NcVar *in_var    = get_nc_var(f_in, in_str);
+   NcVar *in_var_dd = get_nc_var(f_in, in_dd_str);
+
+   //
+   // Retrieve the fill value
+   //
+   get_nc_var_att(in_var, in_fillValue_str, in_fill_value);
+
+   //
+   // Retrieve the values
+   //
+   get_nc_var_val(in_var, cur, dim, v);
+   get_nc_var_val(in_var_dd, cur, dim, dd);
+   dd_str << dd;
+
+   //
+   // Check for missing data
+   //
+   if(v == in_fill_value) {
+      v = bad_data_float;
+      n_rej_fill++;
+   }
+
+   //
+   // Check quality control flag
+   //
+   if(!is_bad_data(v)  &&
+      qc_dd_sa.n_elements() > 0 &&
+      !qc_dd_sa.has(dd_str)) {
+      v = bad_data_float;
+      n_rej_qc++;
+   }
+
+   if(verbosity > 2) {
+
+      ConcatString status;
+      if(is_bad_data(v)) status << "REJECT";
+      else               status << "ACCPET";
+
+      cout << "    [" << status << "] " << in_str
+           << ": value = " << v
+           << ", qc = " << dd_str
+           << "\n" << flush;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_obs(NcFile *&f_in, const char *in_str,
+                 const long *cur, const long *dim,
+                 const int in_gc, const float conversion,
+                 float *obs_arr, int &i_obs,
+                 int &n_rej_fill, int &n_rej_qc) {
+   //
+   // Store the GRIB code
+   //
+   obs_arr[1] = in_gc;
+
+   //
+   // Get the observation value and store it
+   //
+   obs_arr[4] = get_nc_obs(f_in, in_str, cur, dim, n_rej_fill, n_rej_qc);
+
+   //
+   // Check for bad data and apply conversion factor
+   //
+   if(!is_bad_data(obs_arr[4])) {
+      obs_arr[4] *= conversion;
+      put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+      i_obs++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MadisType get_madis_type(NcFile *&f_in) {
+
+   //
+   // FUTURE WORK: Interrogate the MADIS file and determine it's type.
+   //
+   return(madis_none);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void convert_wind_wdir_to_u_v(float wind, float wdir,
+                              float &u, float &v) {
+   //
+   // Convert wind direction and speed to U and V
+   //
+   if(is_bad_data(wind) || is_bad_data(wdir)) {
+      u = v = bad_data_float;
+   }
+   else {
+      u = (float) -1.0*wind*sind(wdir);
+      v = (float) -1.0*wind*cosd(wdir);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_madis_metar(NcFile *&f_in) {
+   int nhdr, i_obs, n_rej_fill, n_rej_qc;
+   long i_hdr;
+   int hdr_typ_len, hdr_sid_len;
+   double tmp_dbl;
+   char tmp_str[max_str_len];
+   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float wdir, wind, ugrd, vgrd;
+
+   //
+   // Input header variables
+   //
+   NcVar *in_hdr_typ_var = get_nc_var(f_in, "reportType");
+   NcVar *in_hdr_sid_var = get_nc_var(f_in, "stationName");
+   NcVar *in_hdr_vld_var = get_nc_var(f_in, "timeObs");
+   NcVar *in_hdr_lat_var = get_nc_var(f_in, "latitude");
+   NcVar *in_hdr_lon_var = get_nc_var(f_in, "longitude");
+   NcVar *in_hdr_elv_var = get_nc_var(f_in, "elevation");
+
+   //
+   // Retrieve applicable dimensions
+   //
+   hdr_typ_len = get_nc_dim(f_in, "maxRepLen");
+   hdr_sid_len = get_nc_dim(f_in, "maxStaNamLen");
+   nhdr        = get_nc_dim(f_in, in_recNum_str);
+   if(rec_end == 0) rec_end = nhdr;
+
+   //
+   // Setup the output NetCDF file
+   //
+   setup_netcdf_out(nhdr);
+
+   if(verbosity > 1) {
+      cout << "Processing METAR recs\t= " << rec_end - rec_beg
+           << "\n" << flush;
+   }
+
+   //
+   // Initialize variables for processing observations
+   //
+   conversion = 1.0;
+   i_obs = n_rej_fill = n_rej_qc = 0;
+
+   //
+   // Arrays of longs for indexing into NetCDF variables
+   //
+   long *cur = new long [2];
+   cur[0] = cur[1] = 0;
+   long *dim = new long [1];
+   dim[0] = 1;
+
+   //
+   // Loop through each record and get the header data.
+   //
+   for(i_hdr=rec_beg; i_hdr<rec_end; i_hdr++) {
 
       //
       // Mapping of NetCDF variable names from input to output:
@@ -595,360 +797,641 @@ void write_data(NcFile *&f_in, NcFile *&f_out) {
       // hdr_arr[2](Elv)           = elevation
       //
 
-      //
-      // Retrieve Header Type
-      //
-     int rep_len=6;
-     if (found_id == SAO) rep_len=5;
-      if(!in_reportType_var->set_cur((long) i_hdr)
-      || !in_reportType_var->get(&tmp_str[0], 1, rep_len)) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't read \"" << in_reportType_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
-
-      if (found_id == METAR) {
-        // Use ADPDFC if it matches METAR string, otherwise use value from file
-        if(strncmp(tmp_str, "METAR", 6) == 0 ||
-           strncmp(tmp_str, "SPECI", 6) == 0) hdr_typ = "ADPSFC";
-        else                                  hdr_typ = tmp_str;
-      }
-      // TBD: add handling for other types (right now use constant value set above)
+      if(verbosity > 2) cout << "Record Number: " << i_hdr << "\n";
 
       //
-      // Store Header Type
+      // Use cur to index into the NetCDF variables.
       //
-      if(!hdr_typ_var->set_cur(i_hdr, (long) 0) ||
-         !hdr_typ_var->put(hdr_typ, (long) 1, (long) hdr_typ.length())) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't write \"" << out_hdr_typ_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
+      cur[0] = i_hdr;
 
       //
-      // Retrieve Station ID
+      // Process the header type.
+      // For METAR or SPECI, encode as ADPSFC.
+      // Otherwise, use value from file.
       //
-      if(!in_stationName_var->set_cur((long) i_hdr)
-      || !in_stationName_var->get(&tmp_str[0], 1, 5)) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't read \"" << in_stationName_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
-      hdr_sid = tmp_str;
+      get_nc_var_val(in_hdr_typ_var, cur, hdr_typ_len, hdr_typ);
+      if(hdr_typ == metar_str || hdr_typ == "SPECI") hdr_typ = "ADPSFC";
+      put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
 
       //
-      // Store Station ID
+      // Process the station name.
       //
-      if(!hdr_sid_var->set_cur(i_hdr, (long) 0) ||
-         !hdr_sid_var->put(hdr_sid, (long) 1, (long) hdr_sid.length())) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't write \"" << out_hdr_sid_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
+      get_nc_var_val(in_hdr_sid_var, cur, hdr_sid_len, hdr_sid);
+      put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
 
       //
-      // Retrieve Valid Time
+      // Process the observation time.
       //
-      if(!in_timeObs_var->set_cur((long) i_hdr) ||
-         !in_timeObs_var->get(&ut, 1)) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't read \"" << in_timeObs_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
-      unix_to_yyyymmdd_hhmmss((unixtime) ut, tmp_str);
+      get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
       hdr_vld = tmp_str;
+      put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
 
       //
-      // Store Valid Time
+      // Process the latitude, longitude, and elevation.
       //
-      if(!hdr_vld_var->set_cur(i_hdr, (long) 0) ||
-         !hdr_vld_var->put(hdr_vld, (long) 1, (long) hdr_vld.length())) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't write \"" << out_hdr_vld_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
+      get_nc_var_val(in_hdr_lat_var, cur, dim, hdr_arr[0]);
+      get_nc_var_val(in_hdr_lon_var, cur, dim, hdr_arr[1]);
+      get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
+
+      //
+      // Write the header array to the output file.
+      //
+      put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+
+      //
+      // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
+      //
+      obs_arr[0] = (float) i_hdr;   // Index into header array
+      obs_arr[2] = bad_data_float;  // Level: accum(sec) or pressure
+      obs_arr[3] = bad_data_float;  // Height
+
+      // Sea Level Pressure
+      process_obs(f_in, "seaLevelPress", cur, dim, 2, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Visibility
+      process_obs(f_in, "visibility", cur, dim, 20, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Temperature
+      process_obs(f_in, "temperature", cur, dim, 11, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Dewpoint
+      process_obs(f_in, "dewpoint", cur, dim, 7, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Wind Direction
+      process_obs(f_in, "windDir", cur, dim, 31, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+      wdir = obs_arr[4];
+
+      // Wind Speed
+      process_obs(f_in, "windSpeed", cur, dim, 32, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+      wind = obs_arr[4];
+
+      // Convert the wind direction and speed into U and V components
+      convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
+
+      // Write U-component of wind
+      obs_arr[1] = 33;
+      obs_arr[4] = ugrd;
+      if(!is_bad_data(ugrd)) {
+         put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+         i_obs++;
       }
 
-      //
-      // Retrieve Latitude
-      //
-      if(!in_latitude_var->set_cur((long) i_hdr) ||
-         !in_latitude_var->get(&hdr_arr[0], 1)) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't read \"" << in_latitude_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
+      // Write V-component of wind
+      obs_arr[1] = 34;
+      obs_arr[4] = vgrd;
+      if(!is_bad_data(vgrd)) {
+         put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+         i_obs++;
       }
 
-      //
-      // Retrieve Longitude
-      //
-      if(!in_longitude_var->set_cur((long) i_hdr) ||
-         !in_longitude_var->get(&hdr_arr[1], 1)) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't read \"" << in_longitude_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
+      // Wind Gust
+      process_obs(f_in, "windGust", cur, dim, 180, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
-      //
-      // Retrieve Elevation
-      //
-      if(!in_elevation_var->set_cur((long) i_hdr) ||
-         !in_elevation_var->get(&hdr_arr[2], 1)) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't read \"" << in_elevation_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
+      // Min Temperature - 24 Hour
+      process_obs(f_in, "minTemp24Hour", cur, dim, 16, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
-      //
-      // Store Header Array
-      //
-      if(!hdr_arr_var->set_cur(i_hdr, (long) 0) ||
-         !hdr_arr_var->put(hdr_arr, (long) 1, (long) hdr_arr_len)) {
-         cerr << "\n\nERROR: write_data() -> "
-              << "can't write \"" << out_hdr_arr_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
-   } // end for
+      // Max Temperature - 24 Hour
+      process_obs(f_in, "maxTemp24Hour", cur, dim, 15, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
-   //
-   // Retrieve and store each of the data values
-   //
-   i_obs = 0;
-   float conversion=1.0;
+      conversion = 1000.0;
+      // Precipitation - 1 Hour
+      obs_arr[2] = 1.0*sec_per_hour;
+      process_obs(f_in, "precip1Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
-   // Sea Level Pressure
-   write_obs_arr(f_in, nhdr, in_seaLevelPress_str, in_seaLevelPress_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
+      // Precipitation - 3 Hour
+      obs_arr[2] = 3.0*sec_per_hour;
+      process_obs(f_in, "precip3Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
-   // Visibility
-   write_obs_arr(f_in, nhdr, in_visibility_str, in_visibility_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
+      // Precipitation - 6 Hour
+      obs_arr[2] = 6.0*sec_per_hour;
+      process_obs(f_in, "precip6Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
-   // Temperature
-   write_obs_arr(f_in, nhdr, in_temperature_str, in_temperature_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
+      // Precipitation - 24 Hour
+      obs_arr[2] = 24.0*sec_per_hour;
+      process_obs(f_in, "precip24Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
-   // Dewpoint
-   write_obs_arr(f_in, nhdr, in_dewpoint_str, in_dewpoint_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
-
-   // Wind Direction
-   write_obs_arr(f_in, nhdr, in_windDir_str, in_windDir_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
-
-   // Wind Speed
-   write_obs_arr(f_in, nhdr, in_windSpeed_str, in_windSpeed_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
-
-   // Wind Gust
-   write_obs_arr(f_in, nhdr, in_windGust_str, in_windGust_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
-
-   // Min Temperature - 24 Hour
-   write_obs_arr(f_in, nhdr, in_minTemp24Hour_str, in_minTemp24Hour_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
-
-   // Max Temperature - 24 Hour
-   write_obs_arr(f_in, nhdr, in_maxTemp24Hour_str, in_maxTemp24Hour_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
-
-   conversion = 1000.0;
-   // Precipitation - 1 Hour
-   write_obs_arr(f_in, nhdr, in_precip1Hour_str, in_precip_gc,
-                 1.0*sec_per_hour, obs_arr_var, i_obs, conversion);
-
-   // Precipitation - 3 Hour
-   write_obs_arr(f_in, nhdr, in_precip3Hour_str, in_precip_gc,
-                 3.0*sec_per_hour, obs_arr_var, i_obs, conversion);
-
-   // Precipitation - 6 Hour
-   write_obs_arr(f_in, nhdr, in_precip6Hour_str, in_precip_gc,
-                 6.0*sec_per_hour, obs_arr_var, i_obs, conversion);
-
-   // Precipitation - 24 Hour
-   write_obs_arr(f_in, nhdr, in_precip24Hour_str, in_precip_gc,
-                 24.0*sec_per_hour, obs_arr_var, i_obs, conversion);
-
-   // Snow Cover
-   conversion = 1.0;
-   if (found_id == SNOW) conversion=1./1000.;
-   write_obs_arr(f_in, nhdr, in_snowCover_str, in_snowCover_gc,
-                 bad_data_float, obs_arr_var, i_obs, conversion);
+      conversion = 1.0;
+      // Snow Cover
+      obs_arr[2] = bad_data_float;
+      process_obs(f_in, "snowCover", cur, dim, 66, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+   } // end for i_hdr
 
    if(verbosity > 1) {
-      cout << "Finished processing " << i_obs << " observations from "
-           << nhdr << " records.\n" << flush;
+      cout << "Rejected based on QC\t= " << n_rej_qc << "\n"
+           << "Rejected based on fill\t= " << n_rej_fill << "\n"
+           << "Retained or derived\t= " << i_obs << "\n"
+           << flush;
    }
 
    //
-   // Close the output NetCDF file
+   // Cleanup
    //
-   f_out->close();
-   delete f_out;
-   f_out = (NcFile *) 0;
-
-   //
-   // Close the input NetCDF file
-   //
-   f_in->close();
-   delete f_in;
-   f_in = (NcFile *) 0;
+   if(cur) { delete [] cur; cur = (long *) 0; }
+   if(dim) { delete [] dim; dim = (long *) 0; }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_obs_arr(NcFile *&f_in, const int nhdr,
-                   const char *in_str, const int in_gc, const float in_lvl,
-                   NcVar *&obs_arr_var, int &i_obs, const float conversion) {
-   int i_hdr;
-   NcVar *in_var   = (NcVar *) 0;
-   NcVar *in_varqca   = (NcVar *) 0;
-   NcVar *in_varqcr   = (NcVar *) 0;
-   NcAtt *fill_att = (NcAtt *) 0;
-   float obs_arr[obs_arr_len], in_fill_value;
-   int qca, qcr, qcfail=0,i_fill=0,i_write=0;
-
-   if (strncmp(in_str,"NA",2) == 0)
-     return;
+void process_madis_raob(NcFile *&f_in) {
+   int nhdr, nlvl, i_lvl, i_obs;
+   int n_rej_fill, n_rej_qc, n;
+   long i_hdr;
+   int hdr_sid_len;
+   double tmp_dbl;
+   char tmp_str[max_str_len];
+   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float wdir, wind, ugrd, vgrd;
 
    //
-   // Retrieve the input variable and qca and qcr variables
+   // Input header variables:
+   // Note: hdr_typ is always set to ADPUPA
    //
-   if(!(in_var = f_in->get_var(in_str))) {
-      cerr << "\n\nERROR: write_obs_arr() -> "
-           << "can't read \"" << in_str << "\" variable.\n\n" << flush;
-      exit(1);
-   }
-   char *qca_str=new char[strlen((const char*)in_str)+3];
-   strcpy(qca_str,(const char*)in_str);
-   strcat(qca_str,"QCA");
-   if(!(in_varqca = f_in->get_var(qca_str))) {
-      cerr << "\n\nERROR: write_obs_arr() -> "
-           << "can't read \"" << qca_str << "\" variable.\n\n" << flush;
-      exit(1);
-   }
-   char *qcr_str=new char[strlen((const char*)in_str)+3];
-   strcpy(qcr_str,(const char*)in_str);
-   strcat(qcr_str,"QCR");
-   if(!(in_varqcr = f_in->get_var(qcr_str))) {
-      cerr << "\n\nERROR: write_obs_arr() -> "
-           << "can't read \"" << qcr_str << "\" variable.\n\n" << flush;
-      exit(1);
-   }
+   NcVar *in_hdr_sid_var = get_nc_var(f_in, "staName");
+   NcVar *in_hdr_vld_var = get_nc_var(f_in, "synTime");
+   NcVar *in_hdr_lat_var = get_nc_var(f_in, "staLat");
+   NcVar *in_hdr_lon_var = get_nc_var(f_in, "staLon");
+   NcVar *in_hdr_elv_var = get_nc_var(f_in, "staElev");
 
    //
-   // Retrieve the fill value
+   // Variables for vertical level sizes
    //
-   fill_att = in_var->get_att(in_fillValue_str);
-   if(!fill_att || !fill_att->is_valid()) {
-      cerr << "\n\nERROR: write_obs_arr() -> "
-           << "can't get the \"" << in_fillValue_str
-           << "\" attribute for variable \"" << in_str
-           << "\"\n\n" << flush;
-      exit(1);
-   }
-   in_fill_value = fill_att->as_float(0);
-
-   // Store the GRIB code and height
-   obs_arr[1] = in_gc;
-   obs_arr[2] = in_lvl;
-   obs_arr[3] = bad_data_float;
+   NcVar *in_man_var    = get_nc_var(f_in, "numMand");
+   NcVar *in_sigt_var   = get_nc_var(f_in, "numSigT");
+   NcVar *in_sigw_var   = get_nc_var(f_in, "numSigW");
+   NcVar *in_sigprw_var = get_nc_var(f_in, "numSigPresW");
+   NcVar *in_trop_var   = get_nc_var(f_in, "numTrop");
+   NcVar *in_maxw_var   = get_nc_var(f_in, "numMwnd");
 
    //
-   // Process each observation value
+   // Retrieve applicable dimensions
    //
-   for(i_hdr=0; i_hdr<nhdr; i_hdr++) {
+   hdr_sid_len  = get_nc_dim(f_in, "staNameLen");
+   nhdr         = get_nc_dim(f_in, in_recNum_str);
+   if(rec_end == 0) rec_end = nhdr;
 
-      // Store the header id
-      obs_arr[0] = i_hdr;
+   //
+   // Setup the output NetCDF file
+   //
+   setup_netcdf_out(nhdr);
 
-      //
-      // Retrieve the values
-      //
-      if(!in_var->set_cur((long) i_hdr) ||
-         !in_var->get(&obs_arr[4], 1)) {
-         cerr << "\n\nERROR: write_obs_arr() -> "
-              << "can't read \"" << in_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
-      if(!in_varqca->set_cur((long) i_hdr) ||
-         !in_varqca->get(&qca, 1)) {
-         cerr << "\n\nERROR: write_obs_arr() -> "
-              << "can't read \"" << qca_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
-      if(!in_varqcr->set_cur((long) i_hdr) ||
-         !in_varqcr->get(&qcr, 1)) {
-         cerr << "\n\nERROR: write_obs_arr() -> "
-              << "can't read \"" << qcr_str
-              << "\" data for record number "
-              << i_hdr << "\n\n" << flush;
-         exit(1);
-      }
-
-      //
-      // Continue if data is missing
-      //
-      if(obs_arr[4] == in_fill_value) continue;
-      if (qca == 0 || qcr != 0) {
-        qcfail++;
-        obs_arr[4]=fill_value; //missing-fill obs with failed qc
-      }
-      if(obs_arr[4] == fill_value) continue; // also skip bad data
-
-      //
-      // Apply conversion factor, if any:
-      //
-      obs_arr[4] *= conversion;
-
-      //
-      // Store values
-      //
-      if(!obs_arr_var->set_cur(i_obs, (long) 0) ||
-         !obs_arr_var->put(obs_arr, (long) 1, (long) obs_arr_len)) {
-         cerr << "\n\nERROR: write_obs_arr() -> "
-              << "can't write \"" << out_obs_arr_str
-              << "\" data for variable \"" << in_str
-              << "\" and record number " << i_hdr
-              << ".\n\n" << flush;
-         exit(1);
-      }
-
-      // Increment the observation count
-      i_obs++;
-      i_write++;
+   if(verbosity > 1) {
+      cout << "Processing RAOB recs\t= " << rec_end - rec_beg
+           << "\n" << flush;
    }
-   i_fill=nhdr-qcfail-i_write;
-   if (verbosity > 1) {
-     cout << "For " << in_str << " processed " << nhdr << " records, "
-          << qcfail << " failed qc, " << i_fill << " were missing-filled, "
-          << i_write << " were written out\n" << flush;
+
+   //
+   // Initialize variables for processing observations
+   //
+   conversion = 1.0;
+   i_obs = n_rej_fill = n_rej_qc = 0;
+
+   //
+   // Arrays of longs for indexing into NetCDF variables
+   //
+   long *cur = new long [3];
+   cur[0] = cur[1] = cur[2] = 0;
+   long *dim = new long [3];
+   dim[0] = dim[1] = dim[2] = 1;
+
+   //
+   // Loop through each record and get the header data.
+   //
+   for(i_hdr=rec_beg; i_hdr<rec_end; i_hdr++) {
+
+      //
+      // Mapping of NetCDF variable names from input to output:
+      // Output                    = Input
+      // hdr_typ                   = NA - always set to ADPUPA
+      // hdr_sid                   = staName (staNameLen = 50)
+      // hdr_vld (YYYYMMDD_HHMMSS) = synTime (unixtime) - synoptic time
+      // hdr_arr[0](Lat)           = staLat
+      // hdr_arr[1](Lon)           = staLon
+      // hdr_arr[2](Elv)           = staElev
+      //
+
+      if(verbosity > 2) cout << "Record Number: " << i_hdr << "\n";
+
+      //
+      // Use cur to index into the NetCDF variables.
+      //
+      cur[0] = i_hdr;
+      cur[1] = 0;
+
+      //
+      // Process the header type.
+      // For RAOB, store as ADPUPA.
+      //
+      hdr_typ = "ADPUPA";
+      put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
+
+      //
+      // Process the station name.
+      //
+      get_nc_var_val(in_hdr_sid_var, cur, hdr_sid_len, hdr_sid);
+      put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
+
+      //
+      // Process the observation time.
+      //
+      get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
+      hdr_vld = tmp_str;
+      put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
+
+      //
+      // Process the latitude, longitude, and elevation.
+      //
+      get_nc_var_val(in_hdr_lat_var, cur, dim, hdr_arr[0]);
+      get_nc_var_val(in_hdr_lon_var, cur, dim, hdr_arr[1]);
+      get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
+
+      //
+      // Write the header array to the output file.
+      //
+      put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+
+      //
+      // Initialize the observation array: hdr_id
+      //
+      obs_arr[0] = (float) i_hdr;
+
+      //
+      // Loop through the mandatory levels
+      //
+      nlvl = get_num_lvl(in_man_var, "manLevel", cur, dim);
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         if(verbosity > 2) {
+            cout << "  Mandatory Level: " << i_lvl << "\n";
+         }
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+
+         //
+         // Get the pressure and height for this level
+         //
+         obs_arr[2] = get_nc_obs(f_in, "prMan", cur, dim, n, n);
+         obs_arr[3] = get_nc_obs(f_in, "htMan", cur, dim, n, n);
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         // Pressure
+         process_obs(f_in, "prMan", cur, dim, 1, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Height
+         process_obs(f_in, "htMan", cur, dim, 7, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Temperature
+         process_obs(f_in, "tpMan", cur, dim, 11, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Dewpoint
+         process_obs(f_in, "tdMan", cur, dim, 17, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Wind Direction
+         process_obs(f_in, "wdMan", cur, dim, 31, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wdir = obs_arr[4];
+
+         // Wind Speed
+         process_obs(f_in, "wsMan", cur, dim, 32, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wind = obs_arr[4];
+
+         // Convert the wind direction and speed into U and V components
+         convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
+
+         // Write U-component of wind
+         obs_arr[1] = 33;
+         obs_arr[4] = ugrd;
+         if(!is_bad_data(ugrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+         // Write V-component of wind
+         obs_arr[1] = 34;
+         obs_arr[4] = vgrd;
+         if(!is_bad_data(vgrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+      } // end for i_lvl
+
+      //
+      // Loop through the significant levels wrt T
+      //
+      nlvl = get_num_lvl(in_sigt_var, "sigTLevel", cur, dim);
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         if(verbosity > 2) {
+            cout << "  Significant T Level: " << i_lvl << "\n";
+         }
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+
+         //
+         // Get the pressure and height for this level
+         //
+         obs_arr[2] = get_nc_obs(f_in, "prSigT", cur, dim, n, n);
+         obs_arr[3] = bad_data_float;
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         // Temperature
+         process_obs(f_in, "tpSigT", cur, dim, 11, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Dewpoint
+         process_obs(f_in, "tdSigT", cur, dim, 17, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      } // end for i_lvl
+
+      //
+      // Loop through the significant levels wrt W
+      //
+      nlvl = get_num_lvl(in_sigw_var, "sigWLevel", cur, dim);
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         if(verbosity > 2) {
+            cout << "  Significant W Level: " << i_lvl << "\n";
+         }
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+
+         //
+         // Get the pressure and height for this level
+         //
+         obs_arr[2] = bad_data_float;
+         obs_arr[3] = get_nc_obs(f_in, "htSigW", cur, dim, n, n);
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         // Wind Direction
+         process_obs(f_in, "wdSigW", cur, dim, 31, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wdir = obs_arr[4];
+
+         // Wind Speed
+         process_obs(f_in, "wsSigW", cur, dim, 32, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wind = obs_arr[4];
+
+         // Convert the wind direction and speed into U and V components
+         convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
+
+         // Write U-component of wind
+         obs_arr[1] = 33;
+         obs_arr[4] = ugrd;
+         if(!is_bad_data(ugrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+         // Write V-component of wind
+         obs_arr[1] = 34;
+         obs_arr[4] = vgrd;
+         if(!is_bad_data(vgrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+      } // end for i_lvl
+
+      //
+      // Loop through the significant levels wrt W-by-P
+      //
+      nlvl = get_num_lvl(in_sigprw_var, "sigPresWLevel", cur, dim);
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         if(verbosity > 2) {
+            cout << "  Significant W-by-P Level: " << i_lvl << "\n";
+         }
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+
+         //
+         // Get the pressure and height for this level
+         //
+         obs_arr[2] = get_nc_obs(f_in, "prSigW", cur, dim, n, n);
+         obs_arr[3] = bad_data_float;
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         // Wind Direction
+         process_obs(f_in, "wdSigPrW", cur, dim, 31, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wdir = obs_arr[4];
+
+         // Wind Speed
+         process_obs(f_in, "wsSigPrW", cur, dim, 32, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wind = obs_arr[4];
+
+         // Convert the wind direction and speed into U and V components
+         convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
+
+         // Write U-component of wind
+         obs_arr[1] = 33;
+         obs_arr[4] = ugrd;
+         if(!is_bad_data(ugrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+         // Write V-component of wind
+         obs_arr[1] = 34;
+         obs_arr[4] = vgrd;
+         if(!is_bad_data(vgrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+      } // end for i_lvl
+
+      //
+      // Loop through the tropopause levels
+      //
+      nlvl = get_num_lvl(in_trop_var, "mTropNum", cur, dim);
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         if(verbosity > 2) {
+            cout << "  Tropopause Level: " << i_lvl << "\n";
+         }
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+
+         //
+         // Get the pressure and height for this level
+         //
+         obs_arr[2] = get_nc_obs(f_in, "prTrop", cur, dim, n, n);
+         obs_arr[3] = bad_data_float;
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         // Temperature
+         process_obs(f_in, "tpTrop", cur, dim, 11, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Dewpoint
+         process_obs(f_in, "tdTrop", cur, dim, 17, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Wind Direction
+         process_obs(f_in, "wdTrop", cur, dim, 31, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wdir = obs_arr[4];
+
+         // Wind Speed
+         process_obs(f_in, "wsTrop", cur, dim, 32, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wind = obs_arr[4];
+
+         // Convert the wind direction and speed into U and V components
+         convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
+
+         // Write U-component of wind
+         obs_arr[1] = 33;
+         obs_arr[4] = ugrd;
+         if(!is_bad_data(ugrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+         // Write V-component of wind
+         obs_arr[1] = 34;
+         obs_arr[4] = vgrd;
+         if(!is_bad_data(vgrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+      } // end for i_lvl
+
+      //
+      // Loop through the maximum wind levels
+      //
+      nlvl = get_num_lvl(in_maxw_var, "mWndNum", cur, dim);
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         if(verbosity > 2) {
+            cout << "  Maximum Wind Level: " << i_lvl << "\n";
+         }
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+
+         //
+         // Get the pressure and height for this level
+         //
+         obs_arr[2] = get_nc_obs(f_in, "prMaxW", cur, dim, n, n);
+         obs_arr[3] = bad_data_float;
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         // Wind Direction
+         process_obs(f_in, "wdMaxW", cur, dim, 31, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wdir = obs_arr[4];
+
+         // Wind Speed
+         process_obs(f_in, "wsMaxW", cur, dim, 32, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+         wind = obs_arr[4];
+
+         // Convert the wind direction and speed into U and V components
+         convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
+
+         // Write U-component of wind
+         obs_arr[1] = 33;
+         obs_arr[4] = ugrd;
+         if(!is_bad_data(ugrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+         // Write V-component of wind
+         obs_arr[1] = 34;
+         obs_arr[4] = vgrd;
+         if(!is_bad_data(vgrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            i_obs++;
+         }
+
+      } // end for i_lvl
+
+   } // end for i_hdr
+
+   if(verbosity > 1) {
+      cout << "Rejected based on QC\t= " << n_rej_qc << "\n"
+           << "Rejected based on fill\t= " << n_rej_fill << "\n"
+           << "Retained or derived\t= " << i_obs << "\n"
+           << flush;
    }
+
+   //
+   // Cleanup
+   //
+   if(cur) { delete [] cur; cur = (long *) 0; }
+   if(dim) { delete [] dim; dim = (long *) 0; }
 
    return;
 }
@@ -961,6 +1444,11 @@ void usage(int argc, char *argv[]) {
         << program_name << "\n"
         << "\tmadis_file\n"
         << "\tout_file\n"
+        << "\t[-type str]\n"
+        << "\t[-qc_dd list]\n"
+        << "\t[-lvl_dim list]\n"
+        << "\t[-rec_beg n]\n"
+        << "\t[-rec_end n]\n"
         << "\t[-v level]\n\n"
 
         << "\twhere\t\"madis_file\" is the MADIS NetCDF point "
@@ -968,8 +1456,24 @@ void usage(int argc, char *argv[]) {
 
         << "\t\t\"out_file\" is the output NetCDF file (required).\n"
 
+        << "\t\t\"-type str\" specifies the type of MADIS observations "
+        << "(metar or raob) (optional).\n"
+
+        << "\t\t\"-qc_dd list\" specifies a whitespace-separated list of "
+        << "QC flag values to be accepted (Z C S V X Q K G or B) "
+        << "(optional).\n"
+
+        << "\t\t\"-lvl_dim list\" specifies a whitespace-separated list of "
+        << "vertical level dimensions to be processed. (optional).\n"
+
+        << "\t\t\"-rec_beg n\" specifies the index of the first "
+        << "MADIS record to process, zero-based (optional).\n"
+
+        << "\t\t\"-rec_end n\" specifies the index of the last "
+        << "MADIS record to process, zero-based (optional).\n"
+
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << verbosity << ") (optional: 0 - none; 1 - minimal; 2 - summary).\n\n"
+        << verbosity << ") (optional).\n\n"
 
         << flush;
 
