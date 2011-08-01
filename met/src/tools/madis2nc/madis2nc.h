@@ -94,6 +94,7 @@ static StringArray  qc_dd_sa;
 static StringArray  lvl_dim_sa;
 static int          rec_beg = 0;
 static int          rec_end = 0;
+static ConcatString argv_str;
 static int          verbosity = 2;
 
 ////////////////////////////////////////////////////////////////////////
