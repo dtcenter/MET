@@ -81,6 +81,7 @@ static void   process_obs(NcFile *&f_in, const char *in_str,
                           int &n_rej_fill, int &n_rej_qc);
 
 static MadisType get_madis_type(NcFile *&f_in);
+static void      parse_css(const char *, StringArray &);
 static void      convert_wind_wdir_to_u_v(float wind, float wdir,
                                           float &u, float &v);
 
@@ -153,9 +154,15 @@ void process_command_line(int argc, char **argv) {
    ncfile = argv[2];
 
    //
+   // Store command line arguments to be written to output file.
+   //
+   argv_str = argv[0];
+   for(i=1; i<argc; i++) argv_str << " " << argv[i];
+
+   //
    // Parse command line arguments
    //
-   for(i=0; i<argc; i++) {
+   for(i=3; i<argc; i++) {
 
       if(strcmp(argv[i], "-type") == 0) {
 
@@ -176,20 +183,20 @@ void process_command_line(int argc, char **argv) {
          }
          i++;
       }
-      if(strcmp(argv[i], "-qc_dd") == 0) {
+      else if(strcmp(argv[i], "-qc_dd") == 0) {
 
          //
          // Parse the list of QC flags to be used
          //
-         qc_dd_sa.parse_wsss(argv[i+1]);
+         parse_css(argv[i+1], qc_dd_sa);
          i++;
       }
-      if(strcmp(argv[i], "-lvl_dim") == 0) {
+      else if(strcmp(argv[i], "-lvl_dim") == 0) {
 
          //
          // Parse the list vertical level dimensions to be processed
          //
-         lvl_dim_sa.parse_wsss(argv[i+1]);
+         parse_css(argv[i+1], lvl_dim_sa);
          i++;
       }
       else if(strcmp(argv[i], "-rec_beg") == 0) {
@@ -204,10 +211,11 @@ void process_command_line(int argc, char **argv) {
          verbosity = atoi(argv[i+1]);
          i++;
       }
-      else if(argv[i][0] == '-') {
+      else {
          cerr << "\n\nERROR: process_command_line() -> "
-              << "unrecognized command line switch: "
+              << "unrecognized command line argument: "
               << argv[i] << "\n\n" << flush;
+         usage(argc, argv);
          exit(1);
       }
    } // end for i
@@ -378,6 +386,11 @@ void setup_netcdf_out(int nhdr) {
    // Add global attributes
    //
    write_netcdf_global(f_out, ncfile.text(), program_name);
+
+   //
+   // Add the command line arguments that were applied.
+   //
+   f_out->add_att("RunCommand", argv_str);
 
    return;
 }
@@ -707,6 +720,33 @@ MadisType get_madis_type(NcFile *&f_in) {
    // FUTURE WORK: Interrogate the MADIS file and determine it's type.
    //
    return(madis_none);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_css(const char *in_str, StringArray &sa) {
+   int i, n;
+   char tmp_str[max_str_len];
+
+   //
+   // FUTURE WORK: This function could become a member function of
+   // StringArray.
+   //
+
+   strcpy(tmp_str, in_str);
+
+   //
+   // Replace comma's with spaces.
+   //
+   for(i=0, n=strlen(in_str); i<n; i++)
+      if(tmp_str[i] == ',') tmp_str[i] = ' ';
+
+   //
+   // Parse white-space separated text.
+   //
+   sa.parse_wsss(tmp_str);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1459,11 +1499,11 @@ void usage(int argc, char *argv[]) {
         << "\t\t\"-type str\" specifies the type of MADIS observations "
         << "(metar or raob) (optional).\n"
 
-        << "\t\t\"-qc_dd list\" specifies a whitespace-separated list of "
-        << "QC flag values to be accepted (Z C S V X Q K G or B) "
+        << "\t\t\"-qc_dd list\" specifies a comma-separated list of "
+        << "QC flag values to be accepted (Z,C,S,V,X,Q,K,G,B) "
         << "(optional).\n"
 
-        << "\t\t\"-lvl_dim list\" specifies a whitespace-separated list of "
+        << "\t\t\"-lvl_dim list\" specifies a comma-separated list of "
         << "vertical level dimensions to be processed. (optional).\n"
 
         << "\t\t\"-rec_beg n\" specifies the index of the first "
