@@ -306,8 +306,8 @@ void process_mask_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf() {
-   int n, x, y, in_count, out_count;
-   double lat, lon, mask_x, mask_y;
+   int n, x, y, xx, yy, in_count, out_count;
+   double lat, lon, x_dbl, y_dbl;
    char var_str[max_str_len];
 
    int *mask_data = (int *)   0;
@@ -361,20 +361,23 @@ void write_netcdf() {
          grid.xy_to_latlon(x, y, lat, lon);
          n = two_to_one(grid.nx(), grid.ny(), x, y);
 
-         // Check if Lat/Lon is inside the masking polyline or grid
-
          // Grid masking
          if(grid_mask.nx() > 0 && grid_mask.ny() > 0) {
 
-            grid_mask.latlon_to_xy(lat, lon, mask_x, mask_y);
-            if(mask_x > 0 && mask_x <= grid_mask.nx() &&
-               mask_y > 0 && mask_y <= grid_mask.ny()) {
-               mask_data[n] = 1;
-               in_count++;
-            }
-            else {
+            // Convert the lat/lon to x/y
+            grid_mask.latlon_to_xy(lat, lon, x_dbl, y_dbl);
+            xx = nint(x_dbl);
+            yy = nint(y_dbl);
+
+            // Check if the lat/lon is off the grid
+            if(xx < 0 || xx >= grid_mask.nx() ||
+               yy < 0 || yy >= grid_mask.ny()) {
                mask_data[n] = 0;
                out_count++;
+            }
+            else {
+               mask_data[n] = 1;
+               in_count++;
             }
          }
          // Polyline masking
