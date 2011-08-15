@@ -19,6 +19,7 @@ EXECUTABLES = pb2nc
 OBJECTS     = pb2nc_Conf.o  \
               numpbmsg.o    \
               openpb.o      \
+              closepb.o     \
               readpb.o      \
               dumppb.o
 
@@ -83,6 +84,11 @@ numpbmsg.o: numpbmsg.f
 openpb.o: openpb.f
 	@ echo
 	$(FC) openpb.f $(FC_FLAGS) $(OPT_FLAGS) -c
+
+
+closepb.o: closepb.f
+	@ echo
+	$(FC) closepb.f $(FC_FLAGS) $(OPT_FLAGS) -c
 
 
 readpb.o: readpb.f
