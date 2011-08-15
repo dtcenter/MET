@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2007
+// ** Copyright UCAR (c) 1992 - 2011
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -38,6 +38,8 @@
 //                    logic was reversed.
 //   008    02-28-11  Halley Gotway  Modify relative humidity derivation
 //                    to match the Unified-PostProcessor.
+//   009    06-01-11  Halley Gotway  Call closebp for input file
+//                     descriptor.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -60,16 +62,14 @@ using namespace std;
 
 #include "pb2nc_Conf.h"
 
-#include "vx_wrfdata.h"
-#include "grid.h"
-#include "vx_gdata.h"
-#include "vx_grib_classes.h"
-#include "vx_util.h"
-#include "vx_pb_util.h"
-#include "vx_met_util.h"
-#include "vx_analysis_util.h"
-#include "vx_cal.h"
-#include "vx_math.h"
+#include "vx_wrfdata/vx_wrfdata.h"
+#include "vx_data_grids/grid.h"
+#include "vx_util/vx_util.h"
+#include "vx_pb_util/vx_pb_util.h"
+#include "vx_met_util/vx_met_util.h"
+#include "vx_analysis_util/mask_poly.h"
+#include "vx_cal/vx_cal.h"
+#include "vx_math/vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -219,6 +219,7 @@ static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
 extern "C" {
    void numpbmsg_(int *, int *);
    void openpb_(const char *, int *);
+   void closepb_(int *);
    void readpb_(int *, char *, int *, int *, int *, double[mxr8pm],
                 double[mxr8vt][mxr8vn][mxr8lv][mxr8pm]);
    void dumppb_(const char *, int *, const char *, int *,
@@ -1329,6 +1330,11 @@ void process_pbfile(int i_pb) {
    }
 
    //
+   // Close the PREPBUFR file
+   //
+   closepb_(&unit);
+
+   //
    // Delete the temporary blocked file
    //
    remove_temp_file(blk_file);
@@ -1489,7 +1495,7 @@ int get_event_index(int flag, int i_var, int i_lvl) {
    //   Top of the stack:    ev = 0
    //   Bottom of the stack: ev > 0
    //
-   if(flag == 1) {
+   if(conf.event_stack_flag().ival() == 1) {
       ev = 0;
    }
    //
