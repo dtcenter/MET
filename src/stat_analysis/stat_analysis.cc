@@ -23,6 +23,8 @@
 //                    correlations.
 //   002    06/21/10  Halley Gotway   Add the vif_flag to correct normal
 //                    CI's for time series aggregations.
+//   003    08/15/11  Oldenburg       Fix a bug related to parsing the
+//                    config file alpha value list
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -681,7 +683,7 @@ void set_default_job() {
 
    for(i=0; i<n; i++) {
       r = conf.alpha(i);
-      default_job.alpha.add(r.ival());
+      default_job.alpha.add(r.dval());
    }
 
    //
