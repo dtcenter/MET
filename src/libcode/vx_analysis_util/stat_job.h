@@ -61,14 +61,17 @@ enum STATJobType {
 
    stat_job_go_index  = 4, // Compute the GO Index.
 
-   no_stat_job_type   = 5  // Default value
+   stat_job_ss_index  = 5, // Compute the Skill Score Index.
+
+   no_stat_job_type   = 6  // Default value
 };
 
-static const int n_statjobtypes = 6;
+static const int n_statjobtypes = 7;
 
 static const char * const statjobtype_str[n_statjobtypes] = {
    "filter",         "summary",  "aggregate",
-   "aggregate_stat", "go_index", "NA"
+   "aggregate_stat", "go_index", "ss_index",
+   "NA"
 };
 
 extern const char *statjobtype_to_string(const STATJobType);
@@ -102,7 +105,6 @@ class STATAnalysisJob {
 
       int  set_job_type (const char *);
       void set_dump_row (const char *);
-      void set_column   (const char *);
       void set_mask_grid(const char *);
       void set_mask_poly(const char *);
       void set_boot_rng (const char *);
@@ -159,6 +161,8 @@ class STATAnalysisJob {
       NumArray    alpha;
 
       StringArray line_type;
+      StringArray column;
+      NumArray    weight;
 
       StringArray column_min_name;
       NumArray    column_min_value;
@@ -175,7 +179,6 @@ class STATAnalysisJob {
 
       char        *dump_row; // dump rows used to a file
       ofstream    *dr_out;   // output file stream for dump row
-      char        *column;   // data column to be summarized
 
       STATLineType out_line_type;   // output line type
       ThreshArray  out_fcst_thresh; // output forecast threshold(s)

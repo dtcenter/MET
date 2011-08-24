@@ -75,7 +75,6 @@ void STATAnalysisJob::init_from_scratch() {
 
    dump_row  = (char *)     0;
    dr_out    = (ofstream *) 0;
-   column    = (char *)     0;
    mask_grid = (char *)     0;
    mask_poly = (char *)     0;
    boot_rng  = (char *)     0;
@@ -90,6 +89,7 @@ void STATAnalysisJob::init_from_scratch() {
    vx_mask.set_ignore_case(1);
    interp_mthd.set_ignore_case(1);
    line_type.set_ignore_case(1);
+   column.set_ignore_case(1);
    column_min_name.set_ignore_case(1);
    column_max_name.set_ignore_case(1);
    column_str_name.set_ignore_case(1);
@@ -138,6 +138,8 @@ void STATAnalysisJob::clear() {
    alpha.clear();
 
    line_type.clear();
+   column.clear();
+   weight.clear();
 
    column_min_name.clear();
    column_min_value.clear();
@@ -149,7 +151,6 @@ void STATAnalysisJob::clear() {
    column_str_value.clear();
 
    if(dump_row) { delete [] dump_row; dump_row = (char *)    0; }
-   if(column)   { delete [] column;   column   = (char *)    0; }
 
    close_dump_row_file();
 
@@ -221,6 +222,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    alpha            = aj.alpha;
 
    line_type        = aj.line_type;
+   column           = aj.column;
+   weight           = aj.weight;
 
    column_min_name  = aj.column_min_name;
    column_min_value = aj.column_min_value;
@@ -245,7 +248,6 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    vif_flag         = aj.vif_flag;
 
    set_dump_row (aj.dump_row);
-   set_column   (aj.column);
    set_mask_grid(aj.mask_grid);
    set_mask_poly(aj.mask_poly);
    set_boot_rng (aj.boot_rng);
@@ -349,6 +351,12 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "line_type ...\n";
    line_type.dump(out, depth + 1);
 
+   out << prefix << "column ...\n";
+   column.dump(out, depth + 1);
+
+   out << prefix << "weight ...\n";
+   weight.dump(out, depth + 1);
+
    out << prefix << "column_min_name ...\n";
    column_min_name.dump(out, depth + 1);
 
@@ -369,9 +377,6 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "dump_row = " << prefix
        << dump_row << "\n";
-
-   out << prefix << "column = " << prefix
-       << column << "\n";
 
    out << prefix << "mask_grid = " << prefix
        << mask_grid << "\n";
@@ -852,6 +857,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          alpha.clear();
       else if(strcmp(jc_array[i], "-line_type"     ) == 0)
          line_type.clear();
+      else if(strcmp(jc_array[i], "-column"        ) == 0)
+         column.clear();
+      else if(strcmp(jc_array[i], "-weight"        ) == 0)
+         weight.clear();
       else if(strcmp(jc_array[i], "-column_min"    ) == 0) {
          column_min_name.clear();
          column_min_value.clear();
@@ -995,6 +1004,14 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          line_type.add(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-column") == 0) {
+         column.add(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-weight") == 0) {
+         weight.add(atof(jc_array[i+1]));
+         i++;
+      }
       else if(strcmp(jc_array[i], "-column_min") == 0) {
          column_min_name.add(jc_array[i+1]);
          column_min_value.add(atof(jc_array[i+2]));
@@ -1023,7 +1040,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-column") == 0) {
-         set_column(jc_array[i+1]);
+         column.add(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-mask_grid") == 0) {
@@ -1123,20 +1140,6 @@ void STATAnalysisJob::set_dump_row(const char *c) {
    return;
 }
 
-////////////////////////////////////////////////////////////////////////
-
-void STATAnalysisJob::set_column(const char *c) {
-
-   if(column) { delete [] column; column = (char *) 0; }
-
-   if(!c) return;
-
-   column = new char [strlen(c) + 1];
-
-   strcpy(column, c);
-
-   return;
-}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1421,6 +1424,20 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
       }
    }
 
+   // column
+   if(column.n_elements() > 0) {
+      for(i=0; i<column.n_elements(); i++) {
+         js << "-column " << column[i] << " ";
+      }
+   }
+
+   // weight
+   if(weight.n_elements() > 0) {
+      for(i=0; i<weight.n_elements(); i++) {
+         js << "-weight " << weight[i] << " ";
+      }
+   }
+
    // column_min
    if(column_min_name.n_elements() > 0) {
       for(i=0; i<column_min_name.n_elements(); i++)
@@ -1444,9 +1461,6 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
 
    // dump_row
    if(dump_row) js << "-dump_row " << dump_row << " ";
-
-   // column
-   if(column) js << "-column " << column << " ";
 
    // mask_grid
    if(mask_grid) js << "-mask_grid " << mask_grid << " ";
@@ -1636,6 +1650,8 @@ STATJobType string_to_statjobtype(const char *str) {
       t = stat_job_aggr_stat;
    else if(strcasecmp(str, statjobtype_str[4]) == 0)
       t = stat_job_go_index;
+   else if(strcasecmp(str, statjobtype_str[5]) == 0)
+      t = stat_job_ss_index;
    else
       t = no_stat_job_type;
 

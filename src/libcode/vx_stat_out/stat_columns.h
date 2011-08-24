@@ -233,6 +233,10 @@ static const char * job_go_columns [] = {
    "GO_INDEX"
 };
 
+static const char * job_ss_columns [] = {
+   "SS_INDEX"
+};
+
 static const char * job_wdir_columns [] = {
    "TOTAL",
    "FBAR",        "OBAR",        "ME",           "MAE"
@@ -270,6 +274,7 @@ static const int n_nbrcnt_columns   = sizeof(nbrcnt_columns)/sizeof(*nbrcnt_colu
 static const int n_isc_columns      = sizeof(isc_columns)/sizeof(*isc_columns);
 static const int n_job_sum_columns  = sizeof(job_sum_columns)/sizeof(*job_sum_columns);
 static const int n_job_go_columns   = sizeof(job_go_columns)/sizeof(*job_go_columns);
+static const int n_job_ss_columns   = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
 static const int n_job_wdir_columns = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
 
 static const int n_rhist_columns    = sizeof(rhist_columns)/sizeof(*rhist_columns);

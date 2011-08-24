@@ -20,6 +20,8 @@
 //   002    06/09/10  Halley Gotway   Add aggregate MCTC lines and
 //                    aggregate_stat MCTC to MCTS.
 //   003    06/21/10  Halley Gotway   Add support for vif_flag.
+//   004    08/16/11  Halley Gotway   Reimplementation of GO Index job
+//                    with addition of generalized Skill Score Index
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -31,7 +33,10 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/param.h>
 #include <unistd.h>
+
+#include "stat_analysis_Conf.h"
 
 #include "stat_analysis_job.h"
 #include "parse_stat_line.h"
@@ -39,9 +44,333 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_job(const char *jobstring, STATAnalysisJob &j, int n_job,
-            const char *tmp_dir, const char *tmp_path,
-            ofstream *sa_out, int verbosity) {
+void set_job_from_config(stat_analysis_Conf &c, STATAnalysisJob &j) {
+   int i, n;
+   Result r;
+
+   //
+   // Get info from config file and store in the job
+   //
+
+   //
+   // model
+   //
+   n = c.n_model_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.model(i);
+      j.model.add(r.sval());
+   }
+
+   //
+   // fcst_lead
+   //
+   n = c.n_fcst_lead_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.fcst_lead(i);
+      j.fcst_lead.add(timestring_to_sec(r.sval()));
+   }
+
+   //
+   // obs_lead
+   //
+   n = c.n_obs_lead_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.obs_lead(i);
+      j.obs_lead.add(timestring_to_sec(r.sval()));
+   }
+
+   //
+   // fcst_valid_beg
+   //
+   r = c.fcst_valid_beg();
+
+   if(strlen(r.sval()) > 0)
+      j.fcst_valid_beg = timestring_to_unix(r.sval());
+
+   //
+   // fcst_valid_end
+   //
+   r = c.fcst_valid_end();
+
+   if(strlen(r.sval()) > 0)
+      j.fcst_valid_end = timestring_to_unix(r.sval());
+
+   //
+   // obs_valid_beg
+   //
+   r = c.obs_valid_beg();
+
+   if(strlen(r.sval()) > 0)
+      j.obs_valid_beg = timestring_to_unix(r.sval());
+
+   //
+   // obs_valid_end
+   //
+   r = c.obs_valid_end();
+
+   if(strlen(r.sval()) > 0)
+      j.obs_valid_end = timestring_to_unix(r.sval());
+
+   //
+   // fcst_init_beg
+   //
+   r = c.fcst_init_beg();
+
+   if(strlen(r.sval()) > 0)
+      j.fcst_init_beg = timestring_to_unix(r.sval());
+
+   //
+   // fcst_init_end
+   //
+   r = c.fcst_init_end();
+
+   if(strlen(r.sval()) > 0)
+      j.fcst_init_end = timestring_to_unix(r.sval());
+
+   //
+   // obs_init_beg
+   //
+   r = c.obs_init_beg();
+
+   if(strlen(r.sval()) > 0)
+      j.obs_init_beg = timestring_to_unix(r.sval());
+
+   //
+   // obs_init_end
+   //
+   r = c.obs_init_end();
+
+   if(strlen(r.sval()) > 0)
+      j.obs_init_end = timestring_to_unix(r.sval());
+
+   //
+   // fcst_init_hour
+   //
+   n = c.n_fcst_init_hour_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.fcst_init_hour(i);
+      j.fcst_init_hour.add(timestring_to_sec(r.sval()));
+   }
+
+   //
+   // obs_init_hour
+   //
+   n = c.n_obs_init_hour_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.obs_init_hour(i);
+      j.obs_init_hour.add(timestring_to_sec(r.sval()));
+   }
+
+   //
+   // fcst_var
+   //
+   n = c.n_fcst_var_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.fcst_var(i);
+      j.fcst_var.add(r.sval());
+   }
+
+   //
+   // obs_var
+   //
+   n = c.n_obs_var_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.obs_var(i);
+      j.obs_var.add(r.sval());
+   }
+
+   //
+   // fcst_lev
+   //
+   n = c.n_fcst_lev_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.fcst_lev(i);
+      j.fcst_lev.add(r.sval());
+   }
+
+   //
+   // obs_lev
+   //
+   n = c.n_obs_lev_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.obs_lev(i);
+      j.obs_lev.add(r.sval());
+   }
+
+   //
+   // obtype
+   //
+   n = c.n_obtype_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.obtype(i);
+      j.obtype.add(r.sval());
+   }
+
+   //
+   // vx_mask
+   //
+   n = c.n_vx_mask_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.vx_mask(i);
+      j.vx_mask.add(r.sval());
+   }
+
+   //
+   // interp_mthd
+   //
+   n = c.n_interp_mthd_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.interp_mthd(i);
+      j.interp_mthd.add(r.sval());
+   }
+
+   //
+   // interp_pnts
+   //
+   n = c.n_interp_pnts_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.interp_pnts(i);
+      j.interp_pnts.add(r.ival());
+   }
+
+   //
+   // fcst_thresh
+   //
+   n = c.n_fcst_thresh_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.fcst_thresh(i);
+      j.fcst_thresh.add(r.sval());
+   }
+
+   //
+   // obs_thresh
+   //
+   n = c.n_obs_thresh_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.obs_thresh(i);
+      j.obs_thresh.add(r.sval());
+   }
+
+   //
+   // cov_thresh
+   //
+   n = c.n_cov_thresh_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.cov_thresh(i);
+      j.cov_thresh.add(r.sval());
+   }
+
+   //
+   // alpha
+   //
+   n = c.n_alpha_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.alpha(i);
+      j.alpha.add(r.dval());
+   }
+
+   //
+   // line_type
+   //
+   n = c.n_line_type_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.line_type(i);
+      j.line_type.add(r.sval());
+   }
+
+   //
+   // column
+   //
+   n = c.n_column_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.column(i);
+      j.column.add(r.sval());
+   }
+
+   //
+   // weight
+   //
+   n = c.n_weight_elements();
+
+   for(i=0; i<n; i++) {
+      r = c.weight(i);
+      j.weight.add(r.dval());
+   }
+
+   //
+   // No settings in the default job for column_min_name,
+   // column_min_value, column_max_name, and column_max_value since
+   // those are strictly job command options.
+   //
+
+   //
+   // out_out_alpha
+   //
+   j.out_alpha = c.out_alpha().dval();
+
+   //
+   // boot_interval
+   //
+   j.boot_interval = c.boot_interval().ival();
+
+   //
+   // boot_rep_prop
+   //
+   j.boot_rep_prop = c.boot_rep_prop().dval();
+
+   //
+   // n_boot_rep
+   //
+   j.n_boot_rep = c.n_boot_rep().ival();
+
+   //
+   // boot_rng
+   //
+   j.set_boot_rng(c.boot_rng().sval());
+
+   //
+   // boot_seed
+   //
+   j.set_boot_seed(c.boot_seed().sval());
+
+   //
+   // rank_corr_flag
+   //
+   j.rank_corr_flag = c.rank_corr_flag().ival();
+
+   //
+   // vif_flag
+   //
+   j.vif_flag = c.vif_flag().ival();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
+            int n_job, const ConcatString &tmp_dir,
+            const ConcatString &tmp_path, ofstream *sa_out,
+            int verbosity) {
    LineDataFile f;
    int n_in, n_out;
 
@@ -52,7 +381,6 @@ void do_job(const char *jobstring, STATAnalysisJob &j, int n_job,
       cerr << "\n\nERROR: do_job() -> "
            << "can't open the temporary file \"" << tmp_path
            << "\" for reading!\n\n" << flush;
-
       throw(1);
    }
 
@@ -109,11 +437,15 @@ void do_job(const char *jobstring, STATAnalysisJob &j, int n_job,
                          verbosity);
          break;
 
+      case(stat_job_ss_index):
+         do_job_ss_index(jobstring, f, j, n_in, n_out, sa_out,
+                         verbosity);
+         break;
+
       default:
          cerr << "\n\nERROR: do_job() -> "
               << "jobtype value of " << j.job_type
               << " not currently supported!\n\n" << flush;
-
          throw(1);
    }
 
@@ -142,10 +474,10 @@ void do_job(const char *jobstring, STATAnalysisJob &j, int n_job,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_filter(const char *jobstring, LineDataFile &f,
+void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
                    STATAnalysisJob &j, int &n_in, int &n_out,
                    ofstream *sa_out, int verbosity) {
-   char out_line[max_line_len];
+   ConcatString out_line;
    STATLine line;
 
    //
@@ -156,7 +488,6 @@ void do_job_filter(const char *jobstring, LineDataFile &f,
            << "this function may only be called when using the "
            << "-dump_row option in the job command line: "
            << jobstring << "\n\n" << flush;
-
       throw(1);
    }
 
@@ -181,7 +512,7 @@ void do_job_filter(const char *jobstring, LineDataFile &f,
    //
    // Build a simple output line
    //
-   sprintf(out_line, "%-15s %s", "FILTER:", jobstring);
+   out_line << "FILTER:        " << jobstring;
 
    //
    // Write the filter line generated
@@ -199,7 +530,7 @@ void do_job_filter(const char *jobstring, LineDataFile &f,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_summary(const char *jobstring, LineDataFile &f,
+void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     STATAnalysisJob &j, int &n_in, int &n_out,
                     ofstream *sa_out, int verbosity) {
    STATLine line;
@@ -221,22 +552,20 @@ void do_job_summary(const char *jobstring, LineDataFile &f,
            << "specify a single line type from which to select a "
            << "statistic to summarize: " << jobstring << "\n\n"
            << flush;
-
-         throw(1);
+      throw(1);
    }
 
    //
    // Check that the -column option has been supplied
    //
-   if(j.column == (char *) 0) {
+   if(j.column.n_elements() != 1) {
       cerr << "\n\nERROR: do_job_summary()-> "
            << "this function may only be called when the "
            << "\"-column\" option has been used to specify a "
            << "single column from which to select a statistic "
            << "to summarize: " << jobstring << "\n\n"
            << flush;
-
-         throw(1);
+      throw(1);
    }
 
    //
@@ -248,7 +577,7 @@ void do_job_summary(const char *jobstring, LineDataFile &f,
    // Based on the line type and the column name selected, determine
    // the column offset to use.
    //
-   offset = determine_column_offset(lt, j.column);
+   offset = determine_column_offset(lt, j.column[0]);
 
    //
    // Process the STAT lines
@@ -372,7 +701,7 @@ void do_job_summary(const char *jobstring, LineDataFile &f,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_aggr(const char *jobstring, LineDataFile &f,
+void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
                  STATAnalysisJob &j, int &n_in, int &n_out,
                  ofstream *sa_out, int verbosity) {
    STATLine line;
@@ -401,8 +730,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
            << "specify a single line type over which to perform the "
            << "aggregation: " << jobstring << "\n\n"
            << flush;
-
-         throw(1);
+      throw(1);
    }
 
    //
@@ -425,7 +753,6 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, ISC, RHIST\n\n"
            << flush;
-
       throw(1);
    }
 
@@ -499,8 +826,7 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
               << "one tile name to be used with the \"-vx_mask\" "
               << "option: " << jobstring << "\n\n"
               << flush;
-
-            throw(1);
+         throw(1);
       }
 
       aggr_isc_lines(jobstring, f, j, isc_info, n_in, n_out, verbosity);
@@ -753,7 +1079,6 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
                << statlinetype_to_string(line.type())
               << " not currently supported for the aggregation "
               << "job!\n\n" << flush;
-
          throw(1);
    } // end switch
 
@@ -773,9 +1098,9 @@ void do_job_aggr(const char *jobstring, LineDataFile &f,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
+void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                       STATAnalysisJob &j, int &n_in, int &n_out,
-                      ofstream *sa_out, const char *tmp_dir,
+                      ofstream *sa_out, const ConcatString &tmp_dir,
                       int verbosity) {
    STATLine line;
    STATLineType in_lt, out_lt;
@@ -806,8 +1131,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
            << "specify a single line type over which to perform the "
            << "aggregation: " << jobstring << "\n\n"
            << flush;
-
-         throw(1);
+      throw(1);
    }
 
    //
@@ -867,7 +1191,6 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
            << statlinetype_to_string(in_lt) << "\" and "
            << "\"-out_line_type " << statlinetype_to_string(out_lt)
            << "\"\n\n" << flush;
-
       throw(1);
    }
 
@@ -951,7 +1274,6 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
                  << "CTS the \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must be specified "
                  << "exactly once.\n\n" << flush;
-
             throw(1);
          }
       }
@@ -970,7 +1292,6 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
                  << "\"-out_obs_thresh\" options must be specified "
                  << "the same number of times and at least twice.\n\n"
                  << flush;
-
             throw(1);
          }
 
@@ -990,7 +1311,7 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
                     << "the thresholds must be monotonically "
                     << "increasing and be of the same inequality type "
                     << "(lt, le, gt, or ge).\n\n" << flush;
-               exit(1);
+               throw(1);
             }
          } // end for
       }
@@ -1008,7 +1329,6 @@ void do_job_aggr_stat(const char *jobstring, LineDataFile &f,
                  << "when \"-out_line_type\" is set to PCT, PSTD, "
                  << "PJC, or PRC, the \"-out_obs_thresh\" option "
                  << "must be specified exactly once.\n\n" << flush;
-
             throw(1);
          }
 
@@ -1285,7 +1605,6 @@ void write_job_cnt(STATAnalysisJob &j, STATLineType in_lt,
          cerr << "\n\nERROR: write_job_cnt() -> "
               << "unexpected line type value of " << in_lt
               << "\n\n" << flush;
-
          throw(1);
    } // end switch
 
@@ -1405,7 +1724,6 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
          cerr << "\n\nERROR: write_job_wdir() -> "
               << "unexpected line type value of " << in_lt
               << "\n\n" << flush;
-
          throw(1);
    } // end switch
 
@@ -1509,7 +1827,6 @@ void write_job_pct(STATAnalysisJob &j, STATLineType in_lt,
          cerr << "\n\nERROR: write_job_pct() -> "
               << "unexpected line type value of " << in_lt
               << "\n\n" << flush;
-
          throw(1);
    } // end switch
 
@@ -1800,7 +2117,6 @@ void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
               << "line type value of " << j.out_line_type
               << " not currently supported for the aggregation "
               << "job!\n\n" << flush;
-
          throw(1);
    } // end switch
 
@@ -1810,57 +2126,49 @@ void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
 ////////////////////////////////////////////////////////////////////////
 //
 // The do_job_go_index() routine is used to compute the GO Index.
-// The GO Index is a weighted sum of the RMSE's for 12 different
-// forecast parameters with lead times of 12, 24, 36, and 48 hours.
-//
-// The weights are based on lead time and are one of two sets of
-// values:
-// a: 4, 3, 2, 1 for lead times of 12, 24, 36, and 48 hours
-// b: 8, 6, 4, 2 for lead times of 12, 24, 36, and 48 hours
-//
-// The 12 forecast parameters and corresponding sets of weights are
-// as follows:
-// (4) Wind Speed at the surface (b), 850 mb (a), 400 mb (a),
-//     and 250 mb (a)
-// (4) Dewpoint at the surface (b), 850 mb (b), 700 mb (b),
-//     and 400 mb (b)
-// (2) Temperature at the surface(b) and 400 mb (a)
-// (1) Geopotential height at 400 mb (a)
-// (1) Sea Level Pressure (b)
-//
-// The RMSE values are computed from the partial sums in the SL1L2
-// STAT lines as follows:
-// rmse = sqrt( (sum(f*f) + sum(o*o) - 2*sum(f*o))/N )
+// The GO Index is a special case of the Skill Score Index consisting
+// of a predefined set of variables, levels, lead times, statistics,
+// and weights.
+// For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
+// - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
+// - Dewpoint Temperature at the surface(b), 850(b), 700(b), 400(b) mB
+// - Temperature at the surface(b), 400(a) mB
+// - Height at 400(a) mB
+// - Sea Level Pressure(b)
+// Where (a) means weights of 4, 3, 2, 1 for the lead times, and
+//       (b) means weights of 8, 6, 4, 2 for the lead times.
+// The RMSE values are dervied from the partial sums in the SL1L2 lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_go_index(const char *jobstring, LineDataFile &f,
+void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
                      STATAnalysisJob &j, int &n_in, int &n_out,
                      ofstream *sa_out, int verbosity) {
-   STATLine line;
+   stat_analysis_Conf go_conf;
    double go_index;
    AsciiTable out_at;
+   char config_file[PATH_MAX];
 
    //
-   // When computing the GO Index, a single initialization time must
-   // be set for the job. i.e. fcst_init_beg = fcst_init_end
+   // Read in the STATAnalysis config file which defines the GO Index.
    //
-   if(j.fcst_init_beg == 0 ||
-      j.fcst_init_end == 0 ||
-      j.fcst_init_beg != j.fcst_init_end) {
-      cerr << "\n\nERROR: do_job_go_index() -> "
-           << "when computing the GO Index, the -fcst_init_beg and "
-           << "-fcst_init_end job command line options must be set to "
-           << "the same value.\n\n"
-           << "\n\n" << flush;
-
-      throw(1);
+   replace_string(met_base_str, MET_BASE,
+                  go_index_config_file, config_file);
+   if(verbosity > 2) {
+      cout << "Reading Config: " << config_file << "\n" << flush;
    }
+   go_conf.read(config_file);
 
    //
-   // Compute GO Index
+   // Parse the contents of the GO Index config file into the job.
    //
-   go_index = compute_go_index(jobstring, f, j, n_in, n_out, verbosity);
+   set_job_from_config(go_conf, j);
+
+   //
+   // Compute the GO Index as a special case of the Skill Score Index
+   //
+   go_index = compute_ss_index(jobstring, f, j, n_in, n_out,
+                               verbosity);
 
    //
    // Check for no matching STAT lines
@@ -1885,6 +2193,67 @@ void do_job_go_index(const char *jobstring, LineDataFile &f,
    //
    out_at.set_entry(1, 0,  "GO_INDEX:");
    out_at.set_entry(1, 1,  go_index);
+
+   //
+   // Write the Ascii Table and the job command line
+   //
+   write_jobstring(jobstring, sa_out);
+   write_table(out_at, sa_out);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// The do_job_ss_index() routine is used to compute the generalized
+// Skill Score Index.  This job can be configured to compute a weighted
+// average of skill scores derived from a configurable set of variables,
+// levels, lead times, and statistics.  The skill score index is
+// computed using two models, a forecast model and a reference model.
+// For each statistic in the index, a skill score is computed as:
+//   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
+// Where S is the statistic.
+// Next, a weighted average is computed over all the skill scores.
+// Lastly, an index value is computed as:
+//   Index = sqrt(1/(1-SS[avg]))
+// Where SS[avg] is the weighted average of skill scores.
+//
+////////////////////////////////////////////////////////////////////////
+
+void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
+                     STATAnalysisJob &j, int &n_in, int &n_out,
+                     ofstream *sa_out, int verbosity) {
+   double ss_index;
+   AsciiTable out_at;
+
+   //
+   // Compute the Skill Score Index
+   //
+   ss_index = compute_ss_index(jobstring, f, j, n_in, n_out, verbosity);
+
+   //
+   // Check for no matching STAT lines
+   //
+   if(n_out == 0) {
+      cout << "WARNING: do_job_ss_index() -> "
+           << "no matching STAT lines found for job: " << jobstring
+           << "\n" << flush;
+      return;
+   }
+
+   //
+   // Get the column names
+   //
+   out_at.set_size(2, n_job_sum_columns+1);
+   setup_table(out_at);
+   out_at.set_entry(0, 0,  "COL_NAME:");
+   write_header_row(job_ss_columns, n_job_ss_columns, 0, out_at, 0, 1);
+
+   //
+   // Write the data row
+   //
+   out_at.set_entry(1, 0,  "SS_INDEX:");
+   out_at.set_entry(1, 1,  ss_index);
 
    //
    // Write the Ascii Table and the job command line
@@ -1932,10 +2301,10 @@ void write_table(AsciiTable &at, ofstream *sa_out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_jobstring(const char *jobstring, ofstream *sa_out) {
-   char out_line[max_line_len];
+void write_jobstring(const ConcatString &jobstring, ofstream *sa_out) {
+   ConcatString out_line;
 
-   sprintf(out_line, "%-15s %s", "JOB_LIST:", jobstring);
+   out_line << "JOB_LIST:      " << jobstring;
 
    write_line(out_line, sa_out);
 
@@ -1944,7 +2313,7 @@ void write_jobstring(const char *jobstring, ofstream *sa_out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_line(const char *str, ofstream *sa_out) {
+void write_line(const ConcatString &str, ofstream *sa_out) {
 
    if(sa_out) *(sa_out) << str << "\n" << flush;
    else       cout      << str << "\n" << flush;
@@ -1954,330 +2323,553 @@ void write_line(const char *str, ofstream *sa_out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double compute_go_index(const char *jobstring, LineDataFile &f,
+double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
                         STATAnalysisJob &j, int &n_in, int &n_out,
                         int verbosity) {
    STATLine line;
-   SL1L2Info s_info;
-   int i;
-   double go_index, go_sum, weight_sum;
+   SL1L2Info si;
+   TTContingencyTable ct;
+   CNTInfo fcst_cnt, ref_cnt;
+   bool keep;
+   int i, n_terms;
+   double fcst_stat, ref_stat, ss, ss_sum, weight_sum;
+   double ss_avg, ss_index;
 
    //
-   // SL1L2Info objects to hold the counts for each variable and level
-   // combination and each of the 4 lead times (12, 24, 36, and 48 hr)
+   // Check that the -model option has been supplied exactly 2 times.
+   // The first is the forecast model and the second is the reference.
    //
-   SL1L2Info ws_sfc[4],      ws_850[4];
-   double    ws_sfc_rmse[4], ws_850_rmse[4];
-   SL1L2Info ws_400[4],      ws_250[4];
-   double    ws_400_rmse[4], ws_250_rmse[4];
-   SL1L2Info td_sfc[4],      td_850[4];
-   double    td_sfc_rmse[4], td_850_rmse[4];
-   SL1L2Info td_700[4],      td_400[4];
-   double    td_700_rmse[4], td_400_rmse[4];
-   SL1L2Info tt_sfc[4],      tt_400[4];
-   double    tt_sfc_rmse[4], tt_400_rmse[4];
-   SL1L2Info ht_400[4],      slp[4];
-   double    ht_400_rmse[4], slp_rmse[4];
-
-   const double a_weight[4] = { 4.0, 3.0, 2.0, 1.0 };
-   const double b_weight[4] = { 8.0, 6.0, 4.0, 2.0 };
-
-   //
-   // Initialize the RMSE values
-   //
-   for(i=0; i<4; i++) {
-      ws_sfc_rmse[i] = ws_850_rmse[i] = 0.0;
-      ws_400_rmse[i] = ws_250_rmse[i] = 0.0;
-      td_sfc_rmse[i] = td_850_rmse[i] = 0.0;
-      td_700_rmse[i] = td_400_rmse[i] = 0.0;
-      tt_sfc_rmse[i] = tt_400_rmse[i] = 0.0;
-      ht_400_rmse[i] = slp_rmse   [i] = 0.0;
+   if(j.model.n_elements() != 2) {
+      cerr << "\n\nERROR: compute_ss_index()-> "
+           << "this job may only be called when the \"-model\" option "
+           << "has been used exactly twice to specify the forecast "
+           << "model followed by the reference model: "
+           << jobstring << "\n\n"
+           << flush;
+      throw(1);
    }
+
+   //
+   // Use the length of the fcst_var array to infer the number of terms.
+   //
+   if((n_terms = j.fcst_var.n_elements()) < 1) {
+      cerr << "\n\nERROR: compute_ss_index()-> "
+           << "you must define the Skill Score Index to be computed "
+           << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
+           << "\"-line_type\", \"-column\", and \"-weight\" options: "
+           << jobstring << "\n\n"
+           << flush;
+      throw(1);
+   }
+
+   //
+   // Check that the required elements are of the same length.
+   //
+   if(n_terms != j.fcst_lev.n_elements()  ||
+      n_terms != j.fcst_lead.n_elements() ||
+      n_terms != j.line_type.n_elements() ||
+      n_terms != j.column.n_elements()    ||
+      n_terms != j.weight.n_elements()) {
+      cerr << "\n\nERROR: compute_ss_index()-> "
+           << "all filtering parameters for defining the Skill Score "
+           << "Index must be of the same length.  Check \"-fcst_var\", "
+           << "\"-fcst_lev\", \"-fcst_lead\", \"-line_type\", "
+           << "\"-column\", and \"-weight\" options: "
+           << jobstring << "\n\n"
+           << flush;
+      throw(1);
+   }
+
+   //
+   // Define arrays of jobs for each term in the Skill Score Index.
+   // Separate arrays for the forecast and reference models.
+   //
+   STATAnalysisJob *fcst_job, *ref_job;
+   fcst_job = new STATAnalysisJob [n_terms];
+   ref_job  = new STATAnalysisJob [n_terms];
+
+   //
+   // Define arrays of objects to store the partial sums or contingency
+   // table counts for each term in the Skill Score Index.
+   //
+   SL1L2Info *fcst_si,  *ref_si;
+   CTSInfo   *fcst_cts, *ref_cts;
+   fcst_si  = new SL1L2Info [n_terms];
+   ref_si   = new SL1L2Info [n_terms];
+   fcst_cts = new CTSInfo   [n_terms];
+   ref_cts  = new CTSInfo   [n_terms];
+
+   //
+   // Define array of line types to be aggregated for each term in the
+   // Skill Score Index.
+   //
+   STATLineType *job_lt;
+   job_lt = new STATLineType [n_terms];
+
+   //
+   // Arrays to keep track of the number of stat lines per term
+   //
+   NumArray n_fcst_lines, n_ref_lines;
+
+   if(verbosity > 2) {
+      cout << "Forecast Model  = " << j.model[0] << "\n"
+           << "Reference Model = " << j.model[1] << "\n"
+           << flush;
+   }
+
+   //
+   // Set up the job for each term in the index.
+   //
+   for(i=0; i<n_terms; i++) {
+
+      //
+      // Initialize the counts
+      //
+      n_fcst_lines.add(0);
+      n_ref_lines.add(0);
+
+      //
+      // Initialize to the full Skill Score Index job
+      //
+      fcst_job[i] = j;
+
+      //
+      // model
+      //
+      fcst_job[i].model.clear();
+      fcst_job[i].model.add(j.model[0]);
+
+      //
+      // fcst_lead
+      //
+      if(j.fcst_lead.n_elements() == n_terms) {
+         fcst_job[i].fcst_lead.clear();
+         fcst_job[i].fcst_lead.add(j.fcst_lead[i]);
+      }
+
+      //
+      // obs_lead
+      //
+      if(j.obs_lead.n_elements() == n_terms) {
+         fcst_job[i].obs_lead.clear();
+         fcst_job[i].obs_lead.add(j.obs_lead[i]);
+      }
+
+      //
+      // fcst_init_hour
+      //
+      if(j.fcst_init_hour.n_elements() == n_terms) {
+         fcst_job[i].fcst_init_hour.clear();
+         fcst_job[i].fcst_init_hour.add(j.fcst_init_hour[i]);
+      }
+
+      //
+      // obs_init_hour
+      //
+      if(j.obs_init_hour.n_elements() == n_terms) {
+         fcst_job[i].obs_init_hour.clear();
+         fcst_job[i].obs_init_hour.add(j.obs_init_hour[i]);
+      }
+
+      //
+      // fcst_var
+      //
+      if(j.fcst_var.n_elements() == n_terms) {
+         fcst_job[i].fcst_var.clear();
+         fcst_job[i].fcst_var.add(j.fcst_var[i]);
+      }
+
+      //
+      // obs_var
+      //
+      if(j.obs_var.n_elements() == n_terms) {
+         fcst_job[i].obs_var.clear();
+         fcst_job[i].obs_var.add(j.obs_var[i]);
+      }
+
+      //
+      // fcst_lev
+      //
+      if(j.fcst_lev.n_elements() == n_terms) {
+         fcst_job[i].fcst_lev.clear();
+         fcst_job[i].fcst_lev.add(j.fcst_lev[i]);
+      }
+
+      //
+      // obs_lev
+      //
+      if(j.obs_lev.n_elements() == n_terms) {
+         fcst_job[i].obs_lev.clear();
+         fcst_job[i].obs_lev.add(j.obs_lev[i]);
+      }
+
+      //
+      // obtype
+      //
+      if(j.obtype.n_elements() == n_terms) {
+         fcst_job[i].obtype.clear();
+         fcst_job[i].obtype.add(j.obtype[i]);
+      }
+
+      //
+      // vx_mask
+      //
+      if(j.vx_mask.n_elements() == n_terms) {
+         fcst_job[i].vx_mask.clear();
+         fcst_job[i].vx_mask.add(j.vx_mask[i]);
+      }
+
+      //
+      // interp_mthd
+      //
+      if(j.interp_mthd.n_elements() == n_terms) {
+         fcst_job[i].interp_mthd.clear();
+         fcst_job[i].interp_mthd.add(j.interp_mthd[i]);
+      }
+
+      //
+      // interp_pnts
+      //
+      if(j.interp_pnts.n_elements() == n_terms) {
+         fcst_job[i].interp_pnts.clear();
+         fcst_job[i].interp_pnts.add(j.interp_pnts[i]);
+      }
+
+      //
+      // fcst_thresh
+      //
+      if(j.fcst_thresh.n_elements() == n_terms) {
+         fcst_job[i].fcst_thresh.clear();
+         fcst_job[i].fcst_thresh.add(j.fcst_thresh[i]);
+      }
+
+      //
+      // obs_thresh
+      //
+      if(j.obs_thresh.n_elements() == n_terms) {
+         fcst_job[i].obs_thresh.clear();
+         fcst_job[i].obs_thresh.add(j.obs_thresh[i]);
+      }
+
+      //
+      // line_type
+      //
+      if(j.line_type.n_elements() == n_terms) {
+         fcst_job[i].line_type.clear();
+         fcst_job[i].line_type.add(j.line_type[i]);
+
+         job_lt[i] = string_to_statlinetype(j.line_type[i]);
+         if(job_lt[i] != stat_sl1l2 && job_lt[i] != stat_ctc) {
+            cerr << "\n\nERROR: compute_ss_index() -> "
+                 << "a Skill Score Index can only be computed using "
+                 << "statistics derived from SL1L2 or CTC line types."
+                 << "\n\n" << flush;
+            throw(1);
+         }
+      }
+
+      //
+      // column
+      //
+      if(j.column.n_elements() == n_terms) {
+         fcst_job[i].column.clear();
+         fcst_job[i].column.add(j.column[i]);
+      }
+
+      //
+      // weight
+      //
+      if(j.weight.n_elements() == n_terms) {
+         fcst_job[i].weight.clear();
+         fcst_job[i].weight.add(j.weight[i]);
+      }
+
+      //
+      // Set the reference model job identical to the forecast model
+      // job but with a different model name.
+      //
+      ref_job[i] = fcst_job[i];
+      ref_job[i].model.set(0, j.model[1]);
+
+   } // end for i
 
    //
    // Process the STAT lines
    //
+   n_in = n_out = 0;
    while(f >> line) {
 
       n_in++;
 
-      if(j.is_keeper(line)) {
+      //
+      // Loop through the jobs to see if this line should be kept
+      //
+      keep = 0;
+      for(i=0; i<n_terms; i++) {
 
          //
-         // The GO Index is computed only from STAT line type SL1L2.
+         // Check the forecast model job
          //
-         if(string_to_statlinetype(line.line_type()) != stat_sl1l2 )
-            continue;
+         if(fcst_job[i].is_keeper(line)) {
+            keep = 1;
+            n_fcst_lines.set(i, n_fcst_lines[i]+1);
 
-         //
-         // Determine the lead time.  The GO Index is only computed
-         // using lead times of 12, 24, 36, and 48 hours.
-         //
-         if(     line.fcst_lead() == sec_per_hour * 12) i = 0;
-         else if(line.fcst_lead() == sec_per_hour * 24) i = 1;
-         else if(line.fcst_lead() == sec_per_hour * 36) i = 2;
-         else if(line.fcst_lead() == sec_per_hour * 48) i = 3;
-         else                                           continue;
-
-         //
-         // The GO Index is computed from the following 12 combinations
-         // of variable type and level:
-         // Wind Speed:    (4) WIND SFC (Z10), WIND P850, WIND P400,
-         //                    WIND P250
-         // Dew Point:     (4) DPT  SFC (Z2),  DPT  P850, DPT  P700,
-         //                    DPT  P400
-         // Temperature:   (2) TMP  SFC (Z2),  TMP  P400
-         // Height:        (1) HGT  P400
-         // Sea Level Prs: (1) PRMSL SFC (Z0)
-         //
+            if(job_lt[i] == stat_sl1l2) {
+               si.clear();
+               parse_sl1l2_line(line, si);
+               fcst_si[i] += si;
+            }
+            else if(job_lt[i] == stat_ctc) {
+               ct.zero_out();
+               parse_ctc_ctable(line, ct);
+               fcst_cts[i].cts.set_fy_oy(fcst_cts[i].cts.fy_oy() +
+                                         ct.fy_oy());
+               fcst_cts[i].cts.set_fy_on(fcst_cts[i].cts.fy_on() +
+                                         ct.fy_on());
+               fcst_cts[i].cts.set_fn_oy(fcst_cts[i].cts.fn_oy() +
+                                         ct.fn_oy());
+               fcst_cts[i].cts.set_fn_on(fcst_cts[i].cts.fn_on() +
+                                         ct.fn_on());
+            }
+         } // end if fcst_job
 
          //
-         // Parse the line into an SL1L2Info object
+         // Check the reference model job
          //
-         parse_sl1l2_line(line, s_info);
+         if(ref_job[i].is_keeper(line)) {
+            keep = 1;
+            n_ref_lines.set(i, n_ref_lines[i]+1);
 
-         //
-         // Handle the WIND variable type
-         //
-         if(strcmp(line.fcst_var(), "WIND") == 0 &&
-            strcmp(line.obs_var(),  "WIND") == 0) {
+            if(job_lt[i] == stat_sl1l2) {
+               si.clear();
+               parse_sl1l2_line(line, si);
+               ref_si[i] += si;
+            }
+            else if(job_lt[i]== stat_ctc) {
+               ct.zero_out();
+               parse_ctc_ctable(line, ct);
+               ref_cts[i].cts.set_fy_oy(ref_cts[i].cts.fy_oy() +
+                                        ct.fy_oy());
+               ref_cts[i].cts.set_fy_on(ref_cts[i].cts.fy_on() +
+                                        ct.fy_on());
+               ref_cts[i].cts.set_fn_oy(ref_cts[i].cts.fn_oy() +
+                                        ct.fn_oy());
+               ref_cts[i].cts.set_fn_on(ref_cts[i].cts.fn_on() +
+                                        ct.fn_on());
+            }
+         } // end if ref_job
+      } // end for i
 
-            if(strcmp(line.fcst_lev(), "Z10") == 0 &&
-               strcmp(line.obs_lev(),  "Z10") == 0)
-               ws_sfc[i] += s_info;
-
-            else if(strcmp(line.fcst_lev(), "P850") == 0 &&
-                    strcmp(line.obs_lev(),  "P850") == 0)
-               ws_850[i] += s_info;
-
-            else if(strcmp(line.fcst_lev(), "P400") == 0 &&
-                    strcmp(line.obs_lev(),  "P400") == 0)
-               ws_400[i] += s_info;
-
-            else if(strcmp(line.fcst_lev(), "P250") == 0 &&
-                    strcmp(line.obs_lev(),  "P250") == 0)
-               ws_250[i] += s_info;
-
-            else
-               continue;
-         }
-
-         //
-         // Handle the DPT variable type
-         //
-         else if(strcmp(line.fcst_var(), "DPT") == 0 &&
-                 strcmp(line.obs_var(),  "DPT") == 0) {
-
-            if(strcmp(line.fcst_lev(), "Z2") == 0 &&
-               strcmp(line.obs_lev(),  "Z2") == 0)
-               td_sfc[i] += s_info;
-
-            else if(strcmp(line.fcst_lev(), "P850") == 0 &&
-                    strcmp(line.obs_lev(),  "P850") == 0)
-               td_850[i] += s_info;
-
-            else if(strcmp(line.fcst_lev(), "P700") == 0 &&
-                    strcmp(line.obs_lev(),  "P700") == 0)
-               td_700[i] += s_info;
-
-            else if(strcmp(line.fcst_lev(), "P400") == 0 &&
-                    strcmp(line.obs_lev(),  "P400") == 0)
-               td_400[i] += s_info;
-
-            else
-               continue;
-         }
-
-         //
-         // Handle the TMP variable type
-         //
-         else if(strcmp(line.fcst_var(), "TMP") == 0 &&
-                 strcmp(line.obs_var(),  "TMP") == 0) {
-
-            if(strcmp(line.fcst_lev(), "Z2") == 0 &&
-               strcmp(line.obs_lev(),  "Z2") == 0)
-               tt_sfc[i] += s_info;
-
-            else if(strcmp(line.fcst_lev(), "P400") == 0 &&
-                    strcmp(line.obs_lev(),  "P400") == 0)
-               tt_400[i] += s_info;
-
-            else
-               continue;
-         }
-
-         //
-         // Handle the HGT variable type
-         //
-         else if(strcmp(line.fcst_var(), "HGT") == 0 &&
-                 strcmp(line.obs_var(),  "HGT") == 0) {
-
-            if(strcmp(line.fcst_lev(), "P400") == 0 &&
-               strcmp(line.obs_lev(),  "P400") == 0)
-               ht_400[i] += s_info;
-
-            else
-               continue;
-         }
-
-         //
-         // Handle the PRMSL variable type
-         //
-         else if(strcmp(line.fcst_var(), "PRMSL") == 0 &&
-                 strcmp(line.obs_var(),  "PRMSL") == 0) {
-
-            if(strcmp(line.fcst_lev(), "Z0") == 0 &&
-               strcmp(line.obs_lev(),  "Z0") == 0)
-               slp[i] += s_info;
-
-            else
-               continue;
-         }
-
-         //
-         // Handle all other variable types
-         //
-         else
-            continue;
-
-         //
-         // Write line to dump file
-         //
+      //
+      // Write line to dump file
+      //
+      if(keep) {
          if(j.dr_out) *(j.dr_out) << line;
-
          n_out++;
       }
+
    } // end while
 
    //
-   // Compute the RMSE values for each SL1L2Info object
+   // Loop through the terms and compute a skill score for each.
    //
-   for(i=0; i<4; i++) {
-      ws_sfc_rmse[i] = compute_sl1l2_rmse(ws_sfc[i],
-                                          "WIND", "Z10",  (i+1)*12);
-      ws_850_rmse[i] = compute_sl1l2_rmse(ws_850[i],
-                                          "WIND",  "P850", (i+1)*12);
-      ws_400_rmse[i] = compute_sl1l2_rmse(ws_400[i],
-                                          "WIND",  "P400", (i+1)*12);
-      ws_250_rmse[i] = compute_sl1l2_rmse(ws_250[i],
-                                          "WIND",  "P250", (i+1)*12);
-      td_sfc_rmse[i] = compute_sl1l2_rmse(td_sfc[i],
-                                          "DPT",   "Z2",   (i+1)*12);
-      td_850_rmse[i] = compute_sl1l2_rmse(td_850[i],
-                                          "DPT",   "P850", (i+1)*12);
-      td_700_rmse[i] = compute_sl1l2_rmse(td_700[i],
-                                          "DPT",   "P700", (i+1)*12);
-      td_400_rmse[i] = compute_sl1l2_rmse(td_400[i],
-                                          "DPT",   "P400", (i+1)*12);
-      tt_sfc_rmse[i] = compute_sl1l2_rmse(tt_sfc[i],
-                                          "TMP",   "Z2",   (i+1)*12);
-      tt_400_rmse[i] = compute_sl1l2_rmse(tt_400[i],
-                                          "TMP",   "P400", (i+1)*12);
-      ht_400_rmse[i] = compute_sl1l2_rmse(ht_400[i],
-                                          "HGT",   "P400", (i+1)*12);
-      slp_rmse[i]    = compute_sl1l2_rmse(slp[i],
-                                          "PRMSL", "Z0",   (i+1)*12);
+   ss = ss_sum = weight_sum = 0.0;
+   for(i=0; i<n_terms; i++) {
+
+      //
+      // Compute continuous stats for the current term
+      //
+      if(job_lt[i] == stat_sl1l2) {
+         fcst_cnt.clear();
+         compute_cntinfo(fcst_si[i], 0, fcst_cnt);
+         ref_cnt.clear();
+         compute_cntinfo(ref_si[i], 0, ref_cnt);
+      }
+      //
+      // Compute categorical stats for the current term
+      //
+      else if(job_lt[i]== stat_ctc) {
+         fcst_cts[i].compute_stats();
+         ref_cts[i].compute_stats();
+      }
+
+      //
+      // Extract the statistic to be used in defining the skill score.
+      // Continuous (only stats derived from SL1L2 lines):
+      //    PR_CORR, ME, ESTDEV, MBIAS, MSE, BCRMSE, RMSE
+      // Categorical:
+      //    BASER, FMEAN, ACC, FBIAS, PODY, PODN, POFD, FAR, CSI, GSS,
+      //    HK, HSS, ODDS
+      //
+
+      fcst_stat = ref_stat = bad_data_double;
+
+      if(strcasecmp(fcst_job[i].column[0], "PR_CORR") == 0) {
+         fcst_stat = fcst_cnt.pr_corr.v;
+         ref_stat  = ref_cnt.pr_corr.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "ME") == 0) {
+         fcst_stat = fcst_cnt.me.v;
+         ref_stat  = ref_cnt.me.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "ESTDEV") == 0) {
+         fcst_stat = fcst_cnt.estdev.v;
+         ref_stat  = ref_cnt.estdev.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "MBIAS") == 0) {
+         fcst_stat = fcst_cnt.mbias.v;
+         ref_stat  = ref_cnt.mbias.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "MSE") == 0) {
+         fcst_stat = fcst_cnt.mse.v;
+         ref_stat  = ref_cnt.mse.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "BCRMSE") == 0) {
+         fcst_stat = fcst_cnt.bcmse.v;
+         ref_stat  = ref_cnt.bcmse.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "RMSE") == 0) {
+         fcst_stat = fcst_cnt.rmse.v;
+         ref_stat  = ref_cnt.rmse.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "BASER") == 0) {
+         fcst_stat = fcst_cts[i].baser.v;
+         ref_stat  = ref_cts[i].baser.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "FMEAN") == 0) {
+         fcst_stat = fcst_cts[i].fmean.v;
+         ref_stat  = ref_cts[i].fmean.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "ACC") == 0) {
+         fcst_stat = fcst_cts[i].acc.v;
+         ref_stat  = ref_cts[i].acc.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "FBIAS") == 0) {
+         fcst_stat = fcst_cts[i].fbias.v;
+         ref_stat  = ref_cts[i].fbias.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "PODY") == 0) {
+         fcst_stat = fcst_cts[i].pody.v;
+         ref_stat  = ref_cts[i].pody.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "PODN") == 0) {
+         fcst_stat = fcst_cts[i].podn.v;
+         ref_stat  = ref_cts[i].podn.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "POFD") == 0) {
+         fcst_stat = fcst_cts[i].pofd.v;
+         ref_stat  = ref_cts[i].pofd.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "FAR") == 0) {
+         fcst_stat = fcst_cts[i].far.v;
+         ref_stat  = ref_cts[i].far.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "CSI") == 0) {
+         fcst_stat = fcst_cts[i].csi.v;
+         ref_stat  = ref_cts[i].csi.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "GSS") == 0) {
+         fcst_stat = fcst_cts[i].gss.v;
+         ref_stat  = ref_cts[i].gss.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "HK") == 0) {
+         fcst_stat = fcst_cts[i].hk.v;
+         ref_stat  = ref_cts[i].hk.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "HSS") == 0) {
+         fcst_stat = fcst_cts[i].hss.v;
+         ref_stat  = ref_cts[i].hss.v;
+      }
+      else if(strcasecmp(fcst_job[i].column[0], "ODDS") == 0) {
+         fcst_stat = fcst_cts[i].odds.v;
+         ref_stat  = ref_cts[i].odds.v;
+      }
+
+      //
+      // Check for conditions when a skill score cannot be computed.
+      //
+      if(n_fcst_lines[i] == 0   || n_ref_lines[i] == 0   ||
+         is_bad_data(fcst_stat) || is_bad_data(ref_stat) ||
+         is_eq(ref_stat, 0.0)) {
+         ss = bad_data_double;
+      }
+      //
+      // Compute the skill score and keep a running sum of the skill
+      // scores and weights.
+      //
+      else {
+         ss = 1.0 - (fcst_stat*fcst_stat)/(ref_stat*ref_stat);
+         ss_sum     += ss*fcst_job[i].weight[0];
+         weight_sum += fcst_job[i].weight[0];
+      }
+
+      if(verbosity > 2) {
+         cout << "Skill Score Index Term " << i+1
+              << ": fcst_var = " << fcst_job[i].fcst_var[0]
+              << ", fcst_lev = " << fcst_job[i].fcst_lev[0]
+              << ", fcst_lead_sec = " << fcst_job[i].fcst_lead[0]
+              << ", line_type = " << fcst_job[i].line_type[0]
+              << ", column = " << fcst_job[i].column[0]
+              << ", n_fcst = " << n_fcst_lines[i]
+              << ", n_ref = " << n_ref_lines[i]
+              << ", fcst = " << fcst_stat
+              << ", ref = " << ref_stat
+              << ", skill = " << ss
+              << ", weight = " << fcst_job[i].weight[0] << "\n"
+              << flush;
+      }
+
+      //
+      // Check the the number of aggregated lines differ.
+      //
+      if(n_fcst_lines[i] != n_ref_lines[i]) {
+         cout << "WARNING: compute_ss_index() -> "
+              << "the number of aggregated forecast and reference lines "
+              << "differ (" << n_fcst_lines[i] << " != " << n_ref_lines[i]
+              << ") for term " << i+1 << ".\n"
+              << flush;
+      }
+
+      if(is_bad_data(ss)) {
+         cout << "WARNING: compute_ss_index() -> "
+              << "can't compute skill score for term " << i+1 << ".\n"
+              << flush;
+      }
+
+   } // end for i
+
+   //
+   // Compute the weighted average of the skill scores.
+   //
+   if(is_eq(weight_sum, 0.0)) ss_avg = bad_data_double;
+   else                       ss_avg = ss_sum/weight_sum;
+
+   //
+   // Compute the Skill Score Index value.
+   //
+   if(is_bad_data(ss_avg) ||
+      is_eq(ss_avg, 1.0)) ss_index = bad_data_double;
+   else                   ss_index = sqrt(1.0/(1.0 - ss_avg));
+
+   if(verbosity > 2) {
+      cout << "Skill Score Index Weighted Average = " << ss_avg << "\n"
+           << "Skill Score Index Value = " << ss_index << "\n"
+           << flush;
    }
 
    //
-   // Compute GO Index value
+   // Clean up allocated memory.
    //
-   go_sum     = 0.0;
-   weight_sum = 0.0;
-   go_index   = 0.0;
+   if(fcst_job) { delete [] fcst_job; fcst_job = (STATAnalysisJob *) 0; }
+   if(ref_job)  { delete [] ref_job;  ref_job  = (STATAnalysisJob *) 0; }
+   if(fcst_si)  { delete [] fcst_si;  fcst_si  = (SL1L2Info *)       0; }
+   if(ref_si)   { delete [] ref_si;   ref_si   = (SL1L2Info *)       0; }
+   if(fcst_cts) { delete [] fcst_cts; fcst_cts = (CTSInfo *)         0; }
+   if(ref_cts)  { delete [] ref_cts;  ref_cts  = (CTSInfo *)         0; }
+   if(job_lt)   { delete [] job_lt;   job_lt   = (STATLineType *)    0; }
 
-   for(i=0; i<4; i++) {
-
-      if(ws_sfc[i].scount > 0) {
-         go_sum     += ws_sfc_rmse[i] * b_weight[i];
-         weight_sum += b_weight[i];
-      }
-
-      if(ws_850[i].scount > 0) {
-         go_sum     += ws_850_rmse[i] * a_weight[i];
-         weight_sum += a_weight[i];
-      }
-
-      if(ws_400[i].scount > 0) {
-         go_sum     += ws_400_rmse[i] * a_weight[i];
-         weight_sum += a_weight[i];
-      }
-
-      if(ws_250[i].scount > 0) {
-         go_sum     += ws_250_rmse[i] * a_weight[i];
-         weight_sum += a_weight[i];
-      }
-
-      if(td_sfc[i].scount > 0) {
-         go_sum     += td_sfc_rmse[i] * b_weight[i];
-         weight_sum += b_weight[i];
-      }
-
-      if(td_850[i].scount > 0) {
-         go_sum     += td_850_rmse[i] * b_weight[i];
-         weight_sum += b_weight[i];
-      }
-
-      if(td_700[i].scount > 0) {
-         go_sum     += td_700_rmse[i] * b_weight[i];
-         weight_sum += b_weight[i];
-      }
-
-      if(td_400[i].scount > 0) {
-         go_sum     += td_400_rmse[i] * b_weight[i];
-         weight_sum += b_weight[i];
-      }
-
-      if(tt_sfc[i].scount > 0) {
-         go_sum     += tt_sfc_rmse[i] * b_weight[i];
-         weight_sum += b_weight[i];
-      }
-
-      if(tt_400[i].scount > 0) {
-         go_sum     += tt_400_rmse[i] * a_weight[i];
-         weight_sum += a_weight[i];
-      }
-
-      if(ht_400[i].scount > 0) {
-         go_sum     += ht_400_rmse[i] * a_weight[i];
-         weight_sum += a_weight[i];
-      }
-
-      if(slp[i].scount > 0) {
-         go_sum     += slp_rmse[i] * b_weight[i];
-         weight_sum += b_weight[i];
-      }
-   }
-   if(is_eq(weight_sum, 0.0)) go_index = bad_data_double;
-   else                       go_index = go_sum/weight_sum;
-
-   return(go_index);
+   return(ss_index);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-double compute_sl1l2_rmse(SL1L2Info &s_info, const char *var,
-                        const char *lvl, int lead_hr) {
-   int n;
-   double ff_sum, oo_sum, fo_sum, rmse;
-
-   n = s_info.scount;
-
-   if(n == 0) {
-      cout << "WARNING: compute_sl1l2_rmse() -> "
-           << "no matching STAT lines for GO Index variable \"" << var
-           << "\" at level \"" << lvl << "\" for lead time of \""
-           << lead_hr << "\" hours.\n" << flush;
-      return(0.0);
-   }
-
-   ff_sum = s_info.ffbar*s_info.scount;
-   oo_sum = s_info.oobar*s_info.scount;
-   fo_sum = s_info.fobar*s_info.scount;
-
-   rmse = sqrt( (ff_sum + oo_sum - 2.0*fo_sum)/(double) n);
-
-   return(rmse);
-}
-
-////////////////////////////////////////////////////////////////////////

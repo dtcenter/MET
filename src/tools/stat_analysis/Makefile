@@ -87,7 +87,7 @@ parse_stat_line.o: parse_stat_line.cc
 
 stat_analysis_job.o: stat_analysis_job.cc
 	@ echo
-	$(CXX) stat_analysis_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) stat_analysis_job.cc $(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -109,7 +109,7 @@ stat_analysis_job.o: stat_analysis_job.cc
 stat_analysis: stat_analysis.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) stat_analysis.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \

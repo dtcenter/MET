@@ -163,6 +163,18 @@ alpha[] = [];
 //
 line_type[] = [];
 
+//
+// Specify the column(s) to be used in the summary or Skill Score Index jobs.
+// e.g. column[] = [ "RMSE" ];
+//
+column[] = [];
+
+//
+// Specify the weights to be used in the Skill Score Index job.
+// e.g. weight[] = [ 4.0, 3.0, 2.0, 1.0 ];
+//
+weight[] = [];
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Analysis job list.
@@ -199,7 +211,6 @@ line_type[] = [];
 //          -line_type FHO, CTC, MCTC,
 //                     SL1L2, SAL1L2, VL1L2, VAL1L2,
 //                     PCT, NBRCTC, ISC, RHIST
-//
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
@@ -226,16 +237,39 @@ line_type[] = [];
 //          Additional Optional Args for -line_type MPR:
 //             -mask_grid, -mask_poly
 //
+//       "ss_index"
+//          The skill score index job can be configured to compute a weighted
+//          average of skill scores derived from a configurable set of
+//          variables, levels, lead times, and statistics.  The skill score
+//          index is computed using two models, a forecast model and a
+//          reference model.  For each statistic in the index, a skill score
+//          is computed as:
+//             SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
+//          Where S is the statistic.
+//          Next, a weighted average is computed over all the skill scores.
+//          Lastly, an index value is computed as:
+//             Index = sqrt(1/(1-SS[avg]))
+//          Where SS[avg] is the weighted average of skill scores.
+//          Required Args:
+//             Exactly 2 entries for -model, the forecast model and reference
+//             For each term of the index:
+//             -fcst_var, -fcst_lev, -fcst_lead, -line_type, -column, -weight
+//             Where -line_type is CNT or CTS and -column is the statistic.
+//             Optionally, specify other filters for each term, -fcst_thresh.
+//
 //       "go_index"
-//          To compute the GO Index for the data.  Note that all twelve of the
-//          following fields must be present in the data with lead times of
-//          12, 24, 36, and 48 hours to compute the GO Index:
-//          Wind Speed at the surface, 850 mB, 400 mB, and 250 mB
-//          Dewpoint Temperature at the surface, 850 mB, 700 mB, and 400 mB
-//          Temperature at the surface, and 400 mB
-//          Height at 400 mB
-//          Sea Level Pressure
-//          Required Args: -fcst_init_beg, -fcst_init_end (set equal)
+//          The GO Index is a special case of the Skill Score Index consisting
+//          of a predefined set of variables, levels, lead times, statistics,
+//          and weights.
+//          For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
+//          - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
+//          - Dewpoint Temperature at the surface(b), 850(b), 700(b), 400(b) mB
+//          - Temperature at the surface(b), 400(a) mB
+//          - Height at 400(a) mB
+//          - Sea Level Pressure(b)
+//          Where (a) means weights of 4, 3, 2, 1 for the lead times, and
+//          (b) means weights of 8, 6, 4, 2 for the lead times.
+//          Required Args: None
 //
 //    Job command FILTERING options to further refine the STAT data:
 //       Each optional argument may be used in the job specification multiple
@@ -269,6 +303,8 @@ line_type[] = [];
 //       "-cov_thresh     t"
 //       "-alpha          a"
 //       "-line_type      type"
+//       "-column         name"
+//       "-weight         value"
 //
 //   Job command FILTERING options used when the -line_type has been set to a
 //   single value.  These options take two arguments, the name of the data
@@ -286,7 +322,6 @@ line_type[] = [];
 //   these options may only be used ONCE per analysis job:
 //
 //       "-dump_row        path"
-//       "-column          name"
 //
 //       "-mask_grid       name"
 //       "-mask_poly       file"
