@@ -15,6 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/17/08  Halley Gotway   New
+//   001    08/16/11  Halley Gotway   Reimplementation of GO Index job
+//                    with addition of generalized Skill Score Index
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,23 +44,35 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void do_job(const char *, STATAnalysisJob &, int,
-                   const char *, const char *, ofstream *, int);
+static const char * go_index_config_file =
+   "MET_BASE/data/config/STATAnalysisConfig_GO_Index";
 
-extern void do_job_filter(const char *, LineDataFile &,
+////////////////////////////////////////////////////////////////////////
+
+extern void set_job_from_config(stat_analysis_Conf &,
+               STATAnalysisJob &);
+
+extern void do_job(const ConcatString &, STATAnalysisJob &, int,
+                const ConcatString &, const ConcatString &,
+                ofstream *, int);
+
+extern void do_job_filter(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *, int);
 
-extern void do_job_summary(const char *, LineDataFile &,
+extern void do_job_summary(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *, int);
 
-extern void do_job_aggr(const char *, LineDataFile &,
+extern void do_job_aggr(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *, int);
 
-extern void do_job_aggr_stat(const char *, LineDataFile &,
+extern void do_job_aggr_stat(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *,
-               const char *, int);
+               const ConcatString &, int);
 
-extern void do_job_go_index(const char *, LineDataFile &,
+extern void do_job_go_index(const ConcatString &, LineDataFile &,
+               STATAnalysisJob &, int &, int &, ofstream *, int);
+
+extern void do_job_ss_index(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *, int);
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,17 +104,14 @@ extern void write_job_mpr(STATAnalysisJob &, STATLineType,
 ////////////////////////////////////////////////////////////////////////
 
 extern void setup_table    (AsciiTable &);
-extern void write_table    (AsciiTable&,  ofstream *);
-extern void write_jobstring(const char *, ofstream *);
-extern void write_line     (const char *, ofstream *);
+extern void write_table    (AsciiTable &,  ofstream *);
+extern void write_jobstring(const ConcatString &, ofstream *);
+extern void write_line     (const ConcatString &, ofstream *);
 
 ////////////////////////////////////////////////////////////////////////
 
-extern double compute_go_index(const char *, LineDataFile &,
+extern double compute_ss_index(const ConcatString &, LineDataFile &,
                  STATAnalysisJob &, int &, int &, int);
-
-extern double compute_sl1l2_rmse(SL1L2Info &,
-                 const char *, const char *, int);
 
 ////////////////////////////////////////////////////////////////////////
 
