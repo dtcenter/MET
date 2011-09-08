@@ -866,6 +866,14 @@ return(area);
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute a confidence interval for the Brier Score.
+// Reference:
+// Bradley, A.A, S.S. Schwartz, and T. Hashino, 2008:
+// Sampling Uncertainty and Confidence Intervals for the Brier Score
+// and Brier Skill Score.  Weather and Forecasting, 23, 992-1006.
+//
+////////////////////////////////////////////////////////////////////////
 
 
 double Nx2ContingencyTable::brier_ci_halfwidth(double alpha) const
