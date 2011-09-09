@@ -15,6 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    02/01/10  Halley Gotway   New
+//   001    09/09/11  Halley Gotway   Call set_grid after reading
+//                    gridded observation files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -980,7 +982,14 @@ void process_grid_vx() {
 
          // If found, break out of the loop
          if(!status) n_miss++;
-         else        break;
+         else {
+
+            // Set the grid
+            set_grid(data_grid);
+
+            break;
+         }
+
       }
 
       // Check if the observation field was found
