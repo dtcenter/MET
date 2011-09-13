@@ -565,7 +565,12 @@ for(j=0; j<Nelements; j++) {
 mn  = s/count;
 
 if(count > 1) {
-   stdev = sqrt((s_sq - s*s/(double) count)/((double) (count - 1)));
+
+   // Check for slightly negative precision error
+   double d = (s_sq - s*s/(double) count)/((double) (count - 1));
+   if(is_eq(d, 0.0)) d = 0;
+   stdev = sqrt(d);
+
 }
 else {
    stdev = bad_data_double;
