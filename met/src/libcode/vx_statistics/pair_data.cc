@@ -2676,7 +2676,7 @@ void compute_crps_ign_pit(double obs, const NumArray &ens_na,
    ens_na.compute_mean_stdev(m, s);
 
    // Check for divide by zero
-   if(is_eq(s, 0.0)) {
+   if(is_bad_data(m) || is_bad_data(s) || is_eq(s, 0.0)) {
       crps = bad_data_double;
       ign  = bad_data_double;
       pit  = bad_data_double;
