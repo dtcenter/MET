@@ -92,7 +92,9 @@ static const char   na_str[]              = "NA";
    //  to be considered equal
    //
 
-static const double default_tol           = 10E-10;
+static const double tight_tol             = 10E-10;
+static const double loose_tol             = 10E-5;
+static const double default_tol           = tight_tol;
 
 ////////////////////////////////////////////////////////////////////////
 
