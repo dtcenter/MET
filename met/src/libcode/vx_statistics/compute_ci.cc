@@ -3146,7 +3146,6 @@ void compute_bca_interval(double s, NumArray &si_na,
       // sorting the array of replicates and taking the a1-th and the
       // a2-th percentile of the data.
       //
-      sr_na.sort_array();
       s_bcl = sr_na.percentile_array(a1);
       s_bcu = sr_na.percentile_array(a2);
    }
@@ -3184,7 +3183,6 @@ void compute_perc_interval(double s, NumArray &sr_na,
    // sorting the array of replicates and taking the a1-th and the
    // a2-th percentile of the data.
    //
-   sr_na.sort_array();
    s_bcl = sr_na.percentile_array(a1);
    s_bcu = sr_na.percentile_array(a2);
 
