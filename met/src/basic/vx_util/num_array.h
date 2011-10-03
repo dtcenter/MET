@@ -46,6 +46,8 @@ class NumArray {
 
       int Nalloc;
 
+      bool Sorted;
+
    public:
 
       NumArray();
