@@ -18,7 +18,6 @@ EXECUTABLES =
 
 OBJECTS     =  ascii_table.o \
                asciitablejust_to_string.o \
-               bitarray.o \
                boundingbox.o \
                comma_string.o \
                concat_string.o \
@@ -60,7 +59,6 @@ GEN_SOURCES = asciitablejust_to_string.h   \
 HEADERS     =  util_constants.h \
                ascii_table.h \
                asciitablejust_to_string.h \
-               bitarray.h \
                boundingbox.h \
                comma_string.h \
                concat_string.h \
@@ -124,9 +122,6 @@ ascii_table.o: ascii_table.cc
 
 asciitablejust_to_string.o: asciitablejust_to_string.cc
 	$(CXX) asciitablejust_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
-
-bitarray.o: bitarray.cc
-	$(CXX) bitarray.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
 
 boundingbox.o: boundingbox.cc
 	$(CXX) boundingbox.cc $(CXX_FLAGS) $(OPT_FLAGS) -c
