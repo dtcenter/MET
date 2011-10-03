@@ -615,7 +615,6 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Compute the summary information for this collection of values:
    // min, max, v10, v25, v50, 75, v90
    //
-   v_array.sort_array();
    min = v_array.percentile_array(0.00);
    v10 = v_array.percentile_array(0.10);
    v25 = v_array.percentile_array(0.25);
