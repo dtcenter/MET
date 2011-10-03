@@ -20,7 +20,6 @@
 
 #include "ascii_table.h"
 #include "asciitablejust_to_string.h"
-#include "bitarray.h"
 #include "boundingbox.h"
 #include "command_line.h"
 #include "comma_string.h"
