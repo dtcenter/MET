@@ -24,7 +24,6 @@ OBJECTS     =  ascii_table.o \
                concat_string.o \
                conversions.o \
                data_line.o \
-               double_array.o \
                file_type.o \
                indent.o \
                int_array.o \
@@ -67,7 +66,6 @@ HEADERS     =  util_constants.h \
                concat_string.h \
                conversions.h \
                data_line.h \
-               double_array.h \
                file_type.h \
                indent.h \
                int_array.h \
@@ -141,9 +139,6 @@ concat_string.o: concat_string.cc
 
 conversions.o: conversions.cc
 	$(CXX) conversions.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
-
-double_array.o: double_array.cc
-	$(CXX) double_array.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
 
 file_type.o: file_type.cc
 	$(CXX) file_type.cc $(CXX_FLAGS) $(OPT_FLAGS) -c

@@ -22,7 +22,6 @@
 
 #include "vx_util.h"
 #include "int_array.h"
-#include "double_array.h"
 #include "vx_cal.h"
 
 #include "mode_line.h"
@@ -69,7 +68,7 @@ class BasicModeAnalysisJob {
       virtual void do_job(const StringArray & mode_files) = 0;
 
 
-      DoubleArray * accums;
+      NumArray * accums;
 
       ModeAttributes atts;
 

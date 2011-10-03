@@ -27,7 +27,6 @@
 #include "concat_string.h"
 #include "conversions.h"
 #include "data_line.h"
-#include "double_array.h"
 #include "file_exists.h"
 #include "file_type.h"
 #include "fix_float.h"

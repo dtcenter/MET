@@ -104,7 +104,7 @@ void BasicModeAnalysisJob::init_from_scratch()
 
 {
 
-accums = (DoubleArray *) 0;
+accums = (NumArray *) 0;
 
 clear();
 
@@ -124,7 +124,7 @@ atts.clear();
 
 columns.clear();
 
-if ( accums )  { delete [] accums;  accums = (DoubleArray *) 0; }
+if ( accums )  { delete [] accums;  accums = (NumArray *) 0; }
 
 n_lines_read = n_lines_kept = 0;
 
@@ -152,7 +152,7 @@ columns = a.columns;
 
 if ( a.accums )  {
 
-   accums = new DoubleArray [a.columns.n_elements()];
+   accums = new NumArray [a.columns.n_elements()];
 
    int j;
 
@@ -410,6 +410,7 @@ const int Nfields = columns.n_elements();
 if ( Nfields == 0 )  return;
 
 int j, k, r, m;
+double mean, stdev;
 char junk[256];
 AsciiTable table;
 const int ncols = 12;
@@ -439,13 +440,6 @@ table.set_entry(r, k++, "Sum");
 
 for (j=0; j<Nfields; ++j)  {
 
-   accums[j].do_stats();
-
-}
-
-
-for (j=0; j<Nfields; ++j)  {
-
    k = 0;
 
    r = j + 2;
@@ -461,25 +455,27 @@ for (j=0; j<Nfields; ++j)  {
    sprintf(junk, "%.2f", accums[j].max());
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.2f", accums[j].mean());
+   accums[j].compute_mean_stdev(mean, stdev);
+
+   sprintf(junk, "%.2f", mean);
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.2f", accums[j].std_dev());
+   sprintf(junk, "%.2f", stdev);
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.2f", accums[j].p10());
+   sprintf(junk, "%.2f", accums[j].percentile_array(0.10));
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.2f", accums[j].p25());
+   sprintf(junk, "%.2f", accums[j].percentile_array(0.25));
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.2f", accums[j].p50());
+   sprintf(junk, "%.2f", accums[j].percentile_array(0.50));
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.2f", accums[j].p75());
+   sprintf(junk, "%.2f", accums[j].percentile_array(0.75));
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.2f", accums[j].p90());
+   sprintf(junk, "%.2f", accums[j].percentile_array(0.90));
    table.set_entry(r, k++, junk);
 
    sprintf(junk, "%.2f", accums[j].sum());
@@ -556,7 +552,7 @@ if ( Nfiles == 0 )  return;
    //  allocate the accumulation registers
    //
 
-if ( Nfields > 0 )  accums = new DoubleArray [Nfields];
+if ( Nfields > 0 )  accums = new NumArray [Nfields];
 
    //
    //  loop through the files
