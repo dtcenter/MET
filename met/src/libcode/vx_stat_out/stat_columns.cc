@@ -2821,7 +2821,7 @@ void write_pjc_cols(const PCTInfo &pct_info,
       col++;
 
       at.set_entry(r, col, // BASER
-         pct_info.pct.row_nonevent_likelihood(i));
+         pct_info.pct.row_obar(i));
       col++;
    }
 
