@@ -559,6 +559,26 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
+int StringArray::length(int k) const
+
+{
+
+if ( (k < 0) || (k >= Nelements) )  {
+
+   cerr << "\n\n  StringArray::length(int) const -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( strlen(s[k]) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
