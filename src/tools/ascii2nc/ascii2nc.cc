@@ -21,6 +21,8 @@
 //                    only write out a header record when they change.
 //   002    07-15-10  Halley Gotway  Store accumulation intervals in
 //                    seconds rather than hours.
+//   003    10-12-11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +49,7 @@ using namespace std;
 #include "vx_math.h"
 #include "write_netcdf.h"
 #include "met_stats.h"
+#include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -79,11 +82,14 @@ static int nrow      = 0;
 static void open_netcdf(NcFile *&);
 static void open_met_ascii(LineDataFile &);
 static void write_met_obs(LineDataFile &, NcFile *&);
-static void usage(int, char **);
+static void usage();
+static void set_format(const StringArray &);
+static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+   CommandLine cline;
    int i;
 
    //
@@ -98,49 +104,44 @@ int main(int argc, char *argv[]) {
    NcFile       *f_out = (NcFile *) 0;
 
    //
-   // Check for the correct number of arguments
+   // check for zero arguments
    //
-   if(argc < 3) {
-      usage(argc, argv);
-      exit(1);
-   }
+   if (argc == 1)
+      usage();
 
    //
-   // Store the input ASCII file name and the output NetCDF file name
+   // parse the command line into tokens
    //
-   asfile = argv[1];
-   ncfile = argv[2];
+   cline.set(argc, argv);
 
    //
-   // Parse command line arguments
+   // set the usage function
    //
-   for(i=0; i<argc; i++) {
+   cline.set_usage(usage);
 
-      if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
+   //
+   // add the options function calls
+   //
+   cline.add(set_format, "-format", 1);
+   cline.add(set_verbosity, "-v", 1);
 
-      if(strcmp(argv[i], "-format") == 0) {
+   //
+   // parse the command line
+   //
+   cline.parse();
 
-         if(strcmp(met_fmt_str, argv[i+1]) == 0) {
-            ascii_format = met_point;
-         }
-         else {
-            cerr << "\n\nmain() -> "
-                 << "unsupported ASCII observation format \""
-                 << argv[i+1] << "\".\n\n" << flush;
-            exit(1);
-         }
-         i++;
-      }
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: main() -> "
-              << "unrecognized command line switch: "
-              << argv[i] << "\n\n" << flush;
-         exit(1);
-      }
-   } // end for i
+   //
+   // Check for error. There should be two arguments left; the ascii filename
+   // and the netCDF filename.
+   //
+   if (cline.n() != 2)
+      usage();
+
+   //
+   // save the ascii and netCDF filenames
+   //
+   asfile = cline[0];
+   ncfile = cline[1];
 
    //
    // Open the NetCDF observation file for writing
@@ -535,7 +536,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
@@ -575,7 +576,30 @@ void usage(int argc, char *argv[]) {
 
         << flush;
 
-   return;
+   exit (1);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_format(const StringArray & a)
+{
+   if(strcmp(met_fmt_str, a[0]) == 0) {
+      ascii_format = met_point;
+   }
+   else {
+      cerr << "\n\nmain() -> "
+           << "unsupported ASCII observation format \""
+           << a[0] << "\".\n\n" << flush;
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
