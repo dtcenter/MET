@@ -1,10 +1,13 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2011
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
+   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+   // ** Copyright UCAR (c) 1992 - 2012
+   // ** University Corporation for Atmospheric Research (UCAR)
+   // ** National Center for Atmospheric Research (NCAR)
+   // ** Research Applications Lab (RAL)
+   // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 
 
 
@@ -22,6 +25,7 @@ using namespace std;
 #include "indent.h"
 #include "string_fxns.h"
 #include "command_line.h"
+#include "is_number.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -548,6 +552,8 @@ ProgramName.clear();
 
 Usage = (UsageFunction) 0;
 
+AllowNumbers = true;
+
 }
 
 
@@ -567,6 +573,8 @@ options = c.options;
 ProgramName = c.ProgramName;
 
 Usage = c.Usage;
+
+AllowNumbers = c.AllowNumbers;
 
 return;
 
@@ -592,6 +600,8 @@ args.dump(out, depth + 1);
 out << "Options ...\n";
 
 options.dump(out, depth + 1);
+
+out << "AllowNumbers = " << ( AllowNumbers ? "true" : "false" ) << "\n";;
 
 return;
 
@@ -667,7 +677,7 @@ return ( c );
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 int CommandLine::has_option(int & index) const
 
 {
@@ -679,7 +689,7 @@ status = args.has_option(index);
 return ( status );
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -689,15 +699,24 @@ int CommandLine::next_option() const
 {
 
 int j, N;
+char c;
 
 
 N = args.n_elements();
 
 for (j=0; j<N; ++j)  {
 
-   if ( args[j][0] == '-' )   return ( j );
+   c = args[j][0];
 
-}
+   if ( c == '-' )  {
+
+       if ( AllowNumbers && is_number(args[j]) )  continue;
+
+       return ( j );
+
+   }
+
+}   //  for j
 
    //
    //  nope
@@ -756,6 +775,20 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+int CommandLine::length(int k) const
+
+{
+
+return ( args.length(k) );
+
+return ( 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void CommandLine::parse()
 
 {
@@ -766,7 +799,7 @@ const char *  c = (const char *) 0;
 const char * cc = (const char *) 0;
 
 
-while ( args.has_option(j) )  {
+while ( (j = next_option()) >= 0 )  {
 
    c = args[j];
 
@@ -775,6 +808,8 @@ while ( args.has_option(j) )  {
       //
 
    if ( (strcmp(c, "-help") == 0) || (strcmp(c, "--help") == 0) )  do_help();
+
+   if ( AllowNumbers && is_number(c) )  continue;
 
       //
       //  look up entry in options array
@@ -814,7 +849,7 @@ while ( args.has_option(j) )  {
 
       cc = args[m];
 
-      if ( *cc == '-' )  {   //  we ran into another command-line switch
+      if ( (*cc == '-') && !is_number(cc) )  {   //  we ran into another command-line switch
 
          cerr << "\n\n  " << ProgramName << ": too few arguments to command-line switch \"" << c << "\"\n\n";
 

@@ -72,6 +72,8 @@ class StringArray {
 
       int max_length() const;
 
+      int length(int) const;
+
       int has(const char *) const;
 
       int has(const char *, int & index) const;

@@ -1,10 +1,13 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2011
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
+   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+   // ** Copyright UCAR (c) 1992 - 2012
+   // ** University Corporation for Atmospheric Research (UCAR)
+   // ** National Center for Atmospheric Research (NCAR)
+   // ** Research Applications Lab (RAL)
+   // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 
 
 
@@ -138,6 +141,8 @@ class CommandLine {
 
       UsageFunction Usage;
 
+      bool AllowNumbers;   //  default: true
+
    public:
 
       CommandLine();
@@ -149,22 +154,37 @@ class CommandLine {
 
       void dump(ostream &, int depth = 0) const;
 
+         //
+         //  set stuff
+         //
+
       void set(int argc, char ** argv);   //  includes argv[0]
 
       void set_usage(UsageFunction);
+
+      void set_allow_numbers(bool);
+
+         //
+         //  get stuff
+         //
 
       int n() const;  //  # of elements
 
       int max_length() const;
 
-      void shift_down(int pos, int k);
+      int length(int) const;   //  length of jth arg
 
-      int has_option(int & index) const;
+      // bool has_option(int & index) const;
 
       int next_option() const;   //  -1 if no option found, else index into array
 
-      const char * operator[](int) const;
+         //
+         //  do stuff
+         //
 
+      void shift_down(int pos, int k);
+
+      const char * operator[](int) const;
 
       void parse();
 
@@ -181,6 +201,8 @@ inline int CommandLine::n() const { return ( args.n_elements() ); }
 inline int CommandLine::max_length() const { return ( args.max_length() ); }
 
 inline void CommandLine::set_usage(UsageFunction f) { Usage = f;  return; }
+
+inline void CommandLine::set_allow_numbers(bool tf) { AllowNumbers = tf;  return; }
 
 
 ////////////////////////////////////////////////////////////////////////
