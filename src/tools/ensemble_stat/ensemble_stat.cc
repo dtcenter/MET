@@ -17,6 +17,8 @@
 //   000    02/01/10  Halley Gotway   New
 //   001    09/09/11  Halley Gotway   Call set_grid after reading
 //                    gridded observation files.
+//   002    10/13/11  Holmes          Added use of command line class to
+//                                    parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +93,17 @@ static void add_var_att(int, NcVar *, int, WrfData &, const char *);
 static void finish_txt_files();
 static void clean_up();
 
-static void usage(int, char **);
+static void usage();
+
+static void set_grid_obs(const StringArray &);
+static void set_point_obs(const StringArray &);
+static void set_ens_valid(const StringArray &);
+static void set_ens_lead(const StringArray &);
+static void set_obs_valid_beg(const StringArray &);
+static void set_obs_valid_end(const StringArray &);
+static void set_obs_lead(const StringArray &);
+static void set_outdir(const StringArray &);
+static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -122,92 +134,101 @@ void process_command_line(int argc, char **argv) {
    struct stat results;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    FileType ftype, otype;
+   CommandLine cline;
 
    // Set default output directory
    out_dir << MET_BASE << "/out/ensemble_stat";
 
-   if(argc < 3) {
-      usage(argc, argv);
-      exit(1);
+   //
+   // check for zero arguments
+   //
+   if (argc == 1)
+      usage();
+
+   //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
+
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_grid_obs, "-grid_obs", 1);
+   cline.add(set_point_obs, "-point_obs", 1);
+   cline.add(set_ens_valid, "-ens_valid", 1);
+   cline.add(set_ens_lead, "-ens_lead", 1);
+   cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
+   cline.add(set_obs_valid_end, "-obs_valid_end", 1);
+   cline.add(set_obs_lead, "-obs_lead", 1);
+   cline.add(set_outdir, "-outdir", 1);
+   cline.add(set_verbosity, "-v", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. There should be either a number followed by that
+   // number of filenames or a single filename and a config filename.
+   //
+   if (cline.n() < 2)
+      usage();
+
+   if (cline.n() == 2)
+   {
+      //
+      // it should be a filename and then a config filename
+      //
+      if (is_integer(cline[0]) == 0)
+         parse_ens_file_list(cline[0]);
+      else
+         usage();
+
    }
+   else
+   {
+      //
+      // More than two arguments. Check that the first is an integer
+      // followed by that number of filenames and a config filename.
+      //
+      if (is_integer(cline[0]) == 1)
+      {
+         n_ens = atoi(cline[0]);
 
-   // If the next argument is a number, it should be followed by a list
-   // of files for each ensemble members
-   if(is_number(argv[1]) == 1) {
+         if (n_ens <= 0)
+         {
+            cerr << "\n\nERROR: process_command_line() -> "
+                 << "the number of ensemble member files must be >= 1 ("
+                 << n_ens << ")\n\n" << flush;
+            exit(1);
+         }
 
-      n_ens = atoi(argv[1]);
+         if ((cline.n() - 2) == n_ens)
+         {
+            //
+            // Add each of the ensemble members to the list of files.
+            //
+            for(i = 1; i < n_ens; i++)
+               ens_file_list.add(cline[i]);
 
-      if(n_ens <= 0) {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "the number of ensemble member files must be >= 1 ("
-              << n_ens << ")\n\n" << flush;
-         exit(1);
+         }
+         else
+            usage();
+
       }
 
-      // Add each of the ensemble members to the list of files
-      for(i=2; i<2+n_ens; i++) {
-         ens_file_list.add(argv[i]);
-      }
-   }
-   // Otherwise, the next argument is a file containing a list of
-   // ensemble member file names
-   else {
-      i=1;
-      parse_ens_file_list(argv[i]);
-      i++;
    }
 
+   //
    // Store the config file name
-   config_file = argv[i];
-
-   // Parse command line arguments
-   for(i=0; i<argc; i++) {
-
-      if(strcmp(argv[i], "-grid_obs") == 0) {
-         grid_obs_file_list.add(argv[i+1]);
-         grid_obs_flag = 1;
-         i++;
-      }
-      else if(strcmp(argv[i], "-point_obs") == 0) {
-         point_obs_file_list.add(argv[i+1]);
-         point_obs_flag = 1;
-         i++;
-      }
-      else if(strcmp(argv[i], "-ens_valid") == 0) {
-         ens_valid_search_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-ens_lead") == 0) {
-         ens_lead_search_sec = timestring_to_sec(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_valid_beg") == 0) {
-         obs_valid_beg_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_valid_end") == 0) {
-         obs_valid_end_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_lead") == 0) {
-         obs_lead_sec = timestring_to_sec(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-outdir") == 0) {
-         out_dir = argv[i+1];
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "unrecognized command line switch: "
-              << argv[i] << "\n\n" << flush;
-         exit(1);
-      }
-   }
+   //
+   config_file = cline[cline.n() - 1];
 
    // Determine the input file types
    ftype = get_file_type(ens_file_list[0]);
@@ -1965,7 +1986,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2023,7 +2044,72 @@ void usage(int argc, char *argv[]) {
         << "\n\tNOTE: The ensemble members and gridded observations "
         << "must be on the same grid.\n\n" << flush;
 
-   return;
+   exit (1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_grid_obs(const StringArray & a)
+{
+   grid_obs_file_list.add(a[0]);
+   grid_obs_flag = 1;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_point_obs(const StringArray & a)
+{
+   point_obs_file_list.add(a[0]);
+   point_obs_flag = 1;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_ens_valid(const StringArray & a)
+{
+   ens_valid_search_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_ens_lead(const StringArray & a)
+{
+   ens_lead_search_sec = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_valid_beg(const StringArray & a)
+{
+   obs_valid_beg_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_valid_end(const StringArray & a)
+{
+   obs_valid_end_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_lead(const StringArray & a)
+{
+   obs_lead_sec = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_outdir(const StringArray & a)
+{
+   out_dir = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
