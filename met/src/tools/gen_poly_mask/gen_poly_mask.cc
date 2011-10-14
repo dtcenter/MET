@@ -19,6 +19,8 @@
 //   002    08/04/11  Halley Gotway  Enhance to allow the masking area
 //                    to be specified as a lat/lon polyline file or
 //                    gridded data file.  Also, add -name option.
+//   003    10/13/11  Holmes          Added use of command line class to
+//                                    parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -80,7 +82,10 @@ static void process_command_line(int, char **);
 static void process_data_file();
 static void process_mask_file();
 static void write_netcdf();
-static void usage(int, char **);
+static void usage();
+static void set_mask_name(const StringArray &);
+static void set_rec(const StringArray &);
+static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -108,40 +113,47 @@ int main(int argc, char *argv[]) {
 
 void process_command_line(int argc, char **argv) {
    int i;
+   CommandLine cline;
 
-   if(argc < 4) {
-      usage(argc, argv);
-      exit(1);
-   }
+   //
+   // check for zero arguments
+   //
+   if (argc == 1)
+      usage();
+
+   //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
+
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_mask_name, "-name", 1);
+   cline.add(set_rec, "-rec", 1);
+   cline.add(set_verbosity, "-v", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. There should be three arguments left; the data
+   // filename, the mask filename, and the netCDF filename.
+   //
+   if (cline.n() != 3)
+      usage();
 
    // Store the arguments
-   data_file = argv[1];
-   mask_file = argv[2];
-   out_file  = argv[3];
-   mask_name.clear();
-
-   // Parse command line arguments
-   for(i=0; i<argc; i++) {
-
-      if(strcmp(argv[i], "-name") == 0) {
-         mask_name << argv[i+1];
-         i++;
-      }
-      else if(strcmp(argv[i], "-rec") == 0) {
-         i_rec = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "unrecognized command line switch: "
-              << argv[i] << "\n\n" << flush;
-         exit(1);
-      }
-   }
+   data_file = cline[0];
+   mask_file = cline[1];
+   out_file  = cline[2];
 
    // List the input files
    if(verbosity > 0) {
@@ -425,7 +437,7 @@ void write_netcdf() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -460,7 +472,30 @@ void usage(int argc, char *argv[]) {
 
         << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_mask_name(const StringArray & a)
+{
+   mask_name.clear();
+   mask_name = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_rec(const StringArray & a)
+{
+   i_rec = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
