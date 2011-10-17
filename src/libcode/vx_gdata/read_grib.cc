@@ -1022,6 +1022,18 @@ void read_pds(GribRecord &r, int &bms_flag,
          sec_per_fcst_unit = sec_per_day*365.0*100.0;
          break;
 
+      case 10: // 3 hours
+         sec_per_fcst_unit = sec_per_hour*3.0;
+         break;
+
+      case 11: // 6 hours
+         sec_per_fcst_unit = sec_per_hour*6.0;
+         break;
+
+      case 12: // 12 hours
+         sec_per_fcst_unit = sec_per_hour*12.0;
+         break;
+
       case 13: // 15 minutes
          sec_per_fcst_unit = sec_per_minute*15.0;
          break;
