@@ -90,7 +90,6 @@ static void set_verbosity(const StringArray &);
 
 int main(int argc, char *argv[]) {
    CommandLine cline;
-   int i;
 
    //
    // Set handler to be called for memory allocation error
