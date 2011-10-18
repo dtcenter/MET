@@ -112,7 +112,6 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   int i;
    CommandLine cline;
 
    //
