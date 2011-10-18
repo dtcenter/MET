@@ -19,6 +19,9 @@
 //                    gridded observation files.
 //   002    10/13/11  Holmes          Added use of command line class to
 //                                    parse the command line arguments.
+//   003    10/18/11  Halley Gotway   When the user requests verification
+//                    in the config file, check that obs files have been
+//                    specified on the command line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -230,10 +233,15 @@ void process_command_line(int argc, char **argv) {
    //
    config_file = cline[cline.n() - 1];
 
-   // Determine the input file types
+   // Determine the input forecast file type
    ftype = get_file_type(ens_file_list[0]);
-   if(grid_obs_flag) otype = get_file_type(grid_obs_file_list[0]);
-   else              otype = GbFileType;
+
+   // Determine the input observation file type
+   if( (grid_obs_file_list.n_elements() +
+        point_obs_file_list.n_elements()) == 0)
+                          otype = NoFileType;
+   else if(grid_obs_flag) otype = get_file_type(grid_obs_file_list[0]);
+   else                   otype = GbFileType;
 
    // Check that the end_ut >= beg_ut
    if(obs_valid_beg_ut != (unixtime) 0 &&
