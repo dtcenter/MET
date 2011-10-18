@@ -39,6 +39,8 @@
 //   009    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
 //   010    08/09/10  Halley Gotway  Add valid time variable attributes
 //                    to NetCDF output.
+//   011    10/28/11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -216,7 +218,19 @@ static void write_bdy_netcdf(NcFile *);
 static void write_fcst_bdy_netcdf(NcFile *);
 static void write_obs_bdy_netcdf(NcFile *);
 static void write_ct_stats();
-static void usage(int, char **);
+static void usage();
+static void set_config_merge_file(const StringArray &);
+static void set_fcst_valid_time(const StringArray &);
+static void set_fcst_lead_time(const StringArray &);
+static void set_obs_valid_time(const StringArray &);
+static void set_obs_lead_time(const StringArray &);
+static void set_outdir(const StringArray &);
+static void set_plot(const StringArray &);
+static void set_obj_plot(const StringArray &);
+static void set_obj_stat(const StringArray &);
+static void set_ct_stat(const StringArray &);
+static void set_verbosity(const StringArray &);
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -248,7 +262,7 @@ int main(int argc, char *argv[]) {
 ///////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   int i;
+   CommandLine cline;
    char tmp_str[PATH_MAX];
    FileType ftype, otype;
 
@@ -256,78 +270,67 @@ void process_command_line(int argc, char **argv) {
    replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
    out_dir << tmp_str;
 
-   if(argc < 4) {
-      usage(argc, argv);
-      exit(1);
-   }
+   //
+   // check for zero arguments
+   //
+   if (argc == 1)
+      usage();
 
+   //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
+
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_config_merge_file, "-config_merge", 1);
+   cline.add(set_fcst_valid_time, "-fcst_valid", 1);
+   cline.add(set_fcst_lead_time, "-fcst_lead", 1);
+   cline.add(set_obs_valid_time, "-obs_valid", 1);
+   cline.add(set_obs_lead_time, "-obs_lead", 1);
+   cline.add(set_outdir, "-outdir", 1);
+   cline.add(set_plot, "-plot", 0);
+   cline.add(set_obj_plot, "-obj_plot", 0);
+   cline.add(set_obj_stat, "-obj_stat", 0);
+   cline.add(set_ct_stat, "-ct_stat", 0);
+   cline.add(set_verbosity, "-v", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. There should be three arguments left; the
+   // forecast filename, the observation filename, and the config
+   // filename.
+   //
+   if (cline.n() != 3)
+      usage();
+
+   //
    // Store the input forecast and observation file names
-   fcst_file         = argv[1];
-   obs_file          = argv[2];
-   match_config_file = argv[3];
+   //
+   fcst_file = cline[0];
+   obs_file = cline[1];
+   match_config_file = cline[2];
 
    // Determine the input file types
    ftype = get_file_type(fcst_file);
    otype = get_file_type(obs_file);
 
    //
-   // Set the merge config file to the match config file by default
-   // but it may be overridden using the optional arguments
+   // If the merge config file was not set using the optional
+   // arguments, then set it to the match config file
    //
-   merge_config_file = match_config_file;
-
-   //
-   // Parse command line arguments
-   //
-   for(i=0; i<argc; i++) {
-
-      if(strcmp(argv[i], "-config_merge") == 0) {
-         merge_config_file = argv[i+1];
-         i++;
-      }
-      else if(strcmp(argv[i], "-fcst_valid") == 0) {
-         fcst_valid_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-fcst_lead") == 0) {
-         fcst_lead_sec = timestring_to_sec(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_valid") == 0) {
-         obs_valid_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_lead") == 0) {
-         obs_lead_sec = timestring_to_sec(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-outdir") == 0) {
-         out_dir = argv[i+1];
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-plot") == 0) {
-         plot_flag = 0;
-      }
-      else if(strcmp(argv[i], "-obj_stat") == 0) {
-         obj_stat_flag = 0;
-      }
-      else if(strcmp(argv[i], "-obj_plot") == 0) {
-         obj_plot_flag = 0;
-      }
-      else if(strcmp(argv[i], "-ct_stat") == 0) {
-         ct_stat_flag = 0;
-      }
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: main() -> "
-              << "unrecognized command line switch: "
-              << argv[i] << "\n\n" << flush;
-         exit(1);
-      }
-   }
+   if (merge_config_file.length() == 0)
+      merge_config_file = match_config_file;
 
    //
    // Read the match config file
@@ -667,7 +670,7 @@ void check_engine_config() {
       check_reg_exp(ws_reg_exp, engine.wconf.model().sval()) == true) {
 
       cerr << "\n\nERROR: check_engine_config() -> "
-           << "The model name (\"" << engine.wconf.model().sval() 
+           << "The model name (\"" << engine.wconf.model().sval()
            << "\") must be non-empty and contain no embedded "
            << "whitespace.\n\n" << flush;
       exit(1);
@@ -3682,7 +3685,7 @@ void check_xy_ll(int x, int y) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -3750,7 +3753,85 @@ void usage(int argc, char *argv[]) {
         << "\n\tNOTE: The forecast and observation fields must be "
         << "on the same grid.\n\n" << flush;
 
-   return;
+   exit (1);
 }
 
 ///////////////////////////////////////////////////////////////////////
+
+void set_config_merge_file(const StringArray & a)
+{
+   merge_config_file = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_fcst_valid_time(const StringArray & a)
+{
+   fcst_valid_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_fcst_lead_time(const StringArray & a)
+{
+   fcst_lead_sec = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_valid_time(const StringArray & a)
+{
+   obs_valid_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_lead_time(const StringArray & a)
+{
+   obs_lead_sec = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_outdir(const StringArray & a)
+{
+   out_dir = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_plot(const StringArray &)
+{
+   plot_flag = 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obj_plot(const StringArray &)
+{
+   obj_plot_flag = 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obj_stat(const StringArray &)
+{
+   obj_stat_flag = 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_ct_stat(const StringArray &)
+{
+   ct_stat_flag = 0;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
