@@ -19,6 +19,8 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    07-21-11  Halley Gotway  Adapted from contributed code.
+//   001    10/18/11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -88,7 +90,13 @@ static void      convert_wind_wdir_to_u_v(float wind, float wdir,
 static void process_madis_metar(NcFile *&f_in);
 static void process_madis_raob(NcFile *&f_in);
 
-static void usage(int, char **);
+static void usage();
+static void set_type(const StringArray &);
+static void set_qc_dd(const StringArray &);
+static void set_lvl_dim(const StringArray &);
+static void set_rec_beg(const StringArray &);
+static void set_rec_end(const StringArray &);
+static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -137,21 +145,14 @@ void initialize() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
+   CommandLine cline;
    int i;
 
    //
-   // Check for the correct number of arguments
+   // check for zero arguments
    //
-   if(argc < 3) {
-      usage(argc, argv);
-      exit(1);
-   }
-
-   //
-   // Store the input MADIS file name and the output NetCDF file name
-   //
-   mdfile = argv[1];
-   ncfile = argv[2];
+   if (argc == 1)
+      usage();
 
    //
    // Store command line arguments to be written to output file.
@@ -160,65 +161,42 @@ void process_command_line(int argc, char **argv) {
    for(i=1; i<argc; i++) argv_str << " " << argv[i];
 
    //
-   // Parse command line arguments
+   // parse the command line into tokens
    //
-   for(i=3; i<argc; i++) {
+   cline.set(argc, argv);
 
-      if(strcmp(argv[i], "-type") == 0) {
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
 
-         //
-         // Parse the MADIS type
-         //
-         if(strcasecmp(argv[i+1], metar_str) == 0) {
-            mtype = madis_metar;
-         }
-         else if(strcasecmp(argv[i+1], raob_str) == 0) {
-            mtype = madis_raob;
-         }
-         else {
-            cerr << "\n\nERROR: process_command_line() -> "
-                 << "MADIS type \"" << argv[i+1]
-                 << "\" not currently supported.\n\n" << flush;
-            exit(1);
-         }
-         i++;
-      }
-      else if(strcmp(argv[i], "-qc_dd") == 0) {
+   //
+   // add the options function calls
+   //
+   cline.add(set_type, "-type", 1);
+   cline.add(set_qc_dd, "-qc_dd", 1);
+   cline.add(set_lvl_dim, "-lvl_dim", 1);
+   cline.add(set_rec_beg, "-rec_beg", 1);
+   cline.add(set_rec_end, "-rec_end", 1);
+   cline.add(set_verbosity, "-v", 1);
 
-         //
-         // Parse the list of QC flags to be used
-         //
-         parse_css(argv[i+1], qc_dd_sa);
-         i++;
-      }
-      else if(strcmp(argv[i], "-lvl_dim") == 0) {
+   //
+   // parse the command line
+   //
+   cline.parse();
 
-         //
-         // Parse the list vertical level dimensions to be processed
-         //
-         parse_css(argv[i+1], lvl_dim_sa);
-         i++;
-      }
-      else if(strcmp(argv[i], "-rec_beg") == 0) {
-         rec_beg = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-rec_end") == 0) {
-         rec_end = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
-      else {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "unrecognized command line argument: "
-              << argv[i] << "\n\n" << flush;
-         usage(argc, argv);
-         exit(1);
-      }
-   } // end for i
+   //
+   // Check for error. There should be two arguments left; the
+   // madis filename and the output filename.
+   //
+   if (cline.n() != 2)
+      usage();
+
+   //
+   // Store the input MADIS file name and the output NetCDF file name
+   //
+   mdfile = cline[0];
+   ncfile = cline[1];
 
    return;
 }
@@ -1478,7 +1456,7 @@ void process_madis_raob(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
@@ -1517,7 +1495,70 @@ void usage(int argc, char *argv[]) {
 
         << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_type(const StringArray & a)
+{
+   //
+   // Parse the MADIS type
+   //
+   if(strcasecmp(a[0], metar_str) == 0) {
+      mtype = madis_metar;
+   }
+   else if(strcasecmp(a[0], raob_str) == 0) {
+      mtype = madis_raob;
+   }
+   else {
+      cerr << "\n\nERROR: process_command_line() -> "
+           << "MADIS type \"" << a[0]
+           << "\" not currently supported.\n\n" << flush;
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_qc_dd(const StringArray & a)
+{
+   //
+   // Parse the list of QC flags to be used
+   //
+   parse_css(a[0], qc_dd_sa);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_lvl_dim(const StringArray & a)
+{
+   //
+   // Parse the list vertical level dimensions to be processed
+   //
+   parse_css(a[0], lvl_dim_sa);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_rec_beg(const StringArray & a)
+{
+   rec_beg = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_rec_end(const StringArray & a)
+{
+   rec_end = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
