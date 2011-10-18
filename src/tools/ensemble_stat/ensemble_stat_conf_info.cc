@@ -265,6 +265,16 @@ void EnsembleStatConfInfo::process_config(FileType ftype, FileType otype) {
 
    if(n_vx != 0) {
 
+      // Check that at least one observation file has been specified
+      if(otype == NoFileType) {
+
+         cerr << "\n\nERROR: EnsembleStatConfInfo::process_config() -> "
+              << "Verification has been requested but no observation "
+              << "files have been specified.\n\n"
+              << flush;
+         exit(1);
+      }
+
       // Parse the obs field information
       for(i=0; i<n_vx; i++) {
 
