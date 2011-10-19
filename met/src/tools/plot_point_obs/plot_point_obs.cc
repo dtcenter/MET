@@ -18,6 +18,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    06-10-10  Halley Gotway   New
+//   001    10/19/11  Holmes          Added use of command line class to
+//                                    parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -68,16 +70,25 @@ static const double l_width = 0.5;
 static char        met_data_dir[PATH_MAX];
 static Grid        grid("G004");
 static BoundingBox ll_bb, xy_bb;
+static StringArray ityp;
+static IntArray    ivar;
+static double      lat_ll, lon_ll, lat_ur, lon_ur;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static void draw_border(PSfile &, BoundingBox &);
 static void draw_map(PSfile &, BoundingBox &);
-static void usage(int, char **);
+static void usage();
+static void set_grib_code(const StringArray &);
+static void set_msg_type(const StringArray &);
+static void set_data_dir(const StringArray &);
+static void set_dim(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+   CommandLine cline;
    ConcatString nc_file, ps_file;
    char hdr_typ_str[max_str_len];
    float *hdr_arr, *obs_arr;
@@ -85,14 +96,13 @@ int main(int argc, char *argv[]) {
    PSfile plot;
    BoundingBox dim;
    double lat, lon, page_x, page_y;
-   double lat_ll, lon_ll, lat_ur, lon_ur;
-   IntArray ivar, ihdr;
-   StringArray ityp;
+   IntArray ihdr;
 
-   if(argc < 3) {
-      usage(argc, argv);
-      return(0);
-   }
+   //
+   // check for zero arguments
+   //
+   if (argc == 1)
+      usage();
 
    //
    // Initialize the x/y bounding box to the whole grid
@@ -110,40 +120,41 @@ int main(int argc, char *argv[]) {
    sprintf(met_data_dir, "%s/data", MET_BASE);
 
    //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
+
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_grib_code, "-gc", 1);
+   cline.add(set_msg_type, "-msg_typ", 1);
+   cline.add(set_data_dir, "-data_dir", 1);
+   cline.add(set_dim, "-dim", 4);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. There should be two arguments left; the
+   // netCDF point observation filename and the output PostScript
+   // filename.
+   //
+   if (cline.n() != 2)
+      usage();
+
+   //
    // Store the input arguments
    //
-   nc_file << argv[1];
-   ps_file << argv[2];
-
-   //
-   // Parse optional command line arguments
-   //
-   for(i=0; i<argc; i++) {
-      if(strcmp(argv[i], "-gc") == 0) {
-         ivar.add(atoi(argv[i+1]));
-         i++;
-      }
-      else if(strcmp(argv[i], "-msg_typ") == 0) {
-         ityp.add(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-data_dir") == 0) {
-         strcpy(met_data_dir, argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-dim") == 0) {
-         lat_ll = atof(argv[i+1]);
-         lon_ll = atof(argv[i+2])*-1.0;
-         lat_ur = atof(argv[i+3]);
-         lon_ur = atof(argv[i+4])*-1.0;
-         i+=4;
-
-         grid.latlon_to_xy(lat_ll, lon_ll, xy_bb.x_ll, xy_bb.y_ll);
-         grid.latlon_to_xy(lat_ur, lon_ur, xy_bb.x_ur, xy_bb.y_ur);
-         xy_bb.height = xy_bb.y_ur - xy_bb.y_ll;
-         xy_bb.width  = xy_bb.x_ur - xy_bb.x_ll;
-      }
-   }
+   nc_file = cline[0];
+   ps_file = cline[1];
 
    //
    // Declare NetCDF file, dimensions, and variables
@@ -375,7 +386,7 @@ static void draw_map(PSfile &p, BoundingBox &dim) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\nUsage: " << program_name << "\n"
         << "\tnc_file\n"
@@ -399,7 +410,44 @@ void usage(int argc, char *argv[]) {
         << "lat/lon box to be plotted (optional).\n\n"
         << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_grib_code(const StringArray & a)
+{
+   ivar.add(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_msg_type(const StringArray & a)
+{
+   ityp.add(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_data_dir(const StringArray & a)
+{
+   strcpy(met_data_dir, a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_dim(const StringArray & a)
+{
+   lat_ll = atof(a[0]);
+   lon_ll = atof(a[1])*-1.0;
+   lat_ur = atof(a[2]);
+   lon_ur = atof(a[3])*-1.0;
+
+   grid.latlon_to_xy(lat_ll, lon_ll, xy_bb.x_ll, xy_bb.y_ll);
+   grid.latlon_to_xy(lat_ur, lon_ur, xy_bb.x_ur, xy_bb.y_ur);
+   xy_bb.height = xy_bb.y_ur - xy_bb.y_ll;
+   xy_bb.width  = xy_bb.x_ur - xy_bb.x_ll;
+}
+
+////////////////////////////////////////////////////////////////////////
+
