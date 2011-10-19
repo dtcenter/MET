@@ -40,6 +40,8 @@
 //                    to match the Unified-PostProcessor.
 //   009    06-01-11  Halley Gotway  Call closebp for input file
 //                     descriptor.
+//   010    10/28/11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -253,7 +255,13 @@ static int    keep_level_category(int);
 
 static float  derive_grib_code(int, float *, double);
 
-static void   usage(int, char **);
+static void   usage();
+static void   set_pbfile(const StringArray &);
+static void   set_valid_beg_time(const StringArray &);
+static void   set_valid_end_time(const StringArray &);
+static void   set_nmsg(const StringArray &);
+static void   set_dump_path(const StringArray &);
+static void   set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -318,16 +326,14 @@ void initialize() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   int i;
+   CommandLine cline;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
 
    //
-   // Check for the minimum number of arguments
+   // check for zero arguments
    //
-   if(argc < 4) {
-      usage(argc, argv);
-      exit(1);
-   }
+   if (argc == 1)
+      usage();
 
    //
    // Initialize retention times
@@ -335,50 +341,45 @@ void process_command_line(int argc, char **argv) {
    valid_beg_ut = valid_end_ut = (unixtime) 0;
 
    //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
+
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_pbfile, "-pbfile", 1);
+   cline.add(set_valid_beg_time, "-valid_beg", 1);
+   cline.add(set_valid_end_time, "-valid_end", 1);
+   cline.add(set_nmsg, "-nmsg", 1);
+   cline.add(set_dump_path, "-dump", 1);
+   cline.add(set_verbosity, "-v", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. There should be three arguments left; the
+   // PrepBufr filename, the netCDF output filename, and the config
+   // filename.
+   //
+   if (cline.n() != 3)
+      usage();
+
+   //
    // Store the input PrepBufr filename, the output
    // netCDF file name, and the config file name
    //
-   pbfile.add(argv[1]);
-   ncfile      = argv[2];
-   config_file = argv[3];
-
-   //
-   // Parse command line arguments
-   //
-   for(i=0; i<argc; i++) {
-
-      if(strcmp(argv[i], "-pbfile") == 0) {
-         pbfile.add(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-valid_beg") == 0) {
-         valid_beg_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-valid_end") == 0) {
-         valid_end_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-nmsg") == 0) {
-         nmsg = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-dump") == 0) {
-         dump_flag = 1;
-         dump_dir = argv[i+1];
-         i++;
-      }
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "unrecognized command line switch: "
-              << argv[i] << "\n\n" << flush;
-         exit(1);
-      }
-   }
+   pbfile.add(cline[0]);
+   ncfile = cline[1];
+   config_file = cline[2];
 
    //
    // Parse the PB2NC config file
@@ -1783,7 +1784,7 @@ float derive_grib_code(int gc, float *pqtzuv, double lat) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1831,7 +1832,51 @@ void usage(int argc, char *argv[]) {
 
         << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_pbfile(const StringArray & a)
+{
+   pbfile.add(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_beg_time(const StringArray & a)
+{
+   valid_beg_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_end_time(const StringArray & a)
+{
+   valid_end_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_nmsg(const StringArray & a)
+{
+   nmsg = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_dump_path(const StringArray & a)
+{
+   dump_flag = 1;
+   dump_dir = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
