@@ -60,6 +60,8 @@
 //   019    06/15/10  Halley Gotway  Dump reason codes for why
 //                    point observations were rejected.
 //   020    06/30/10  Halley Gotway  Enhance grid equality checks.
+//   021    10/20/11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -107,7 +109,18 @@ static void finish_txt_files();
 
 static void clean_up();
 
-static void usage(int, char **);
+static void usage();
+static void set_climo_file(const StringArray &);
+static void set_point_obs(const StringArray &);
+static void set_ncfile(const StringArray &);
+static void set_fcst_valid_time(const StringArray &);
+static void set_fcst_lead_time(const StringArray &);
+static void set_obs_valid_beg_time(const StringArray &);
+static void set_obs_valid_end_time(const StringArray &);
+static void set_valid_beg_time(const StringArray &);
+static void set_valid_end_time(const StringArray &);
+static void set_outdir(const StringArray &);
+static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -140,73 +153,68 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
+   CommandLine cline;
    int i;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    FileType ftype;
 
    out_dir << MET_BASE << "/out/point_stat";
 
-   if(argc < 4) {
-      usage(argc, argv);
-      exit(1);
-   }
+   //
+   // check for zero arguments
+   //
+   if (argc == 1)
+      usage();
 
    climo_file = "none";
 
+   //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
+
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_climo_file, "-climo", 1);
+   cline.add(set_point_obs, "-point_obs", 1);
+   cline.add(set_ncfile, "-ncfile", 1);
+   cline.add(set_fcst_valid_time, "-fcst_valid", 1);
+   cline.add(set_fcst_lead_time, "-fcst_lead", 1);
+   cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
+   cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
+   cline.add(set_valid_beg_time, "-valid_beg", 1);
+   cline.add(set_valid_end_time, "-valid_end", 1);
+   cline.add(set_outdir, "-outdir", 1);
+   cline.add(set_verbosity, "-v", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. There should be three arguments left; the
+   // forecast filename, the observation filename, and the config
+   // filename.
+   //
+   if (cline.n() != 3)
+      usage();
+
+   //
    // Store the input forecast and observation file names
-   fcst_file  = argv[1];
-   obs_file.add(argv[2]);
-   config_file = argv[3];
+   //
+   fcst_file = cline[0];
+   obs_file.add(cline[1]);
+   config_file = cline[2];
 
    // Determine the input file types
    ftype = get_file_type(fcst_file);
-
-   // Parse command line arguments
-   for(i=0; i<argc; i++) {
-
-      if(strcmp(argv[i], "-point_obs") == 0 ||
-         strcmp(argv[i], "-ncfile")    == 0) {
-         obs_file.add(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-climo") == 0) {
-         climo_file = argv[i+1];
-         climo_flag = 1;
-         i++;
-      }
-      else if(strcmp(argv[i], "-fcst_valid") == 0) {
-         fcst_valid_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-fcst_lead") == 0) {
-         fcst_lead_sec = timestring_to_sec(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_valid_beg") == 0 ||
-              strcmp(argv[i], "-valid_beg")     == 0) {
-         obs_valid_beg_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_valid_end") == 0 ||
-              strcmp(argv[i], "-valid_end")     == 0) {
-         obs_valid_end_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-outdir") == 0) {
-         out_dir = argv[i+1];
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "unrecognized command line switch: "
-              << argv[i] << "\n\n" << flush;
-         exit(1);
-      }
-   }
 
    // Check that the end_ut >= beg_ut
    if(obs_valid_beg_ut != (unixtime) 0 &&
@@ -1687,7 +1695,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1746,7 +1754,86 @@ void usage(int argc, char *argv[]) {
 
         << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_climo_file(const StringArray & a)
+{
+   climo_file = a[0];
+   climo_flag = 1;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_point_obs(const StringArray & a)
+{
+   obs_file.add(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_ncfile(const StringArray & a)
+{
+   obs_file.add(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_fcst_valid_time(const StringArray & a)
+{
+   fcst_valid_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_fcst_lead_time(const StringArray & a)
+{
+   fcst_lead_sec = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_valid_beg_time(const StringArray & a)
+{
+   obs_valid_beg_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_valid_end_time(const StringArray & a)
+{
+   obs_valid_end_ut = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_beg_time(const StringArray & a)
+{
+   obs_valid_beg_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_end_time(const StringArray & a)
+{
+   obs_valid_end_ut = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_outdir(const StringArray & a)
+{
+   out_dir = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
