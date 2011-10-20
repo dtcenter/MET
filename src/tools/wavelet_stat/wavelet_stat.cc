@@ -22,6 +22,8 @@
 //   003    06/30/10  Halley Gotway  Enhance grid equality checks.
 //   004    08/09/10  Halley Gotway  Add valid time variable attributes
 //                    to NetCDF output.
+//   005    10/20/11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -108,7 +110,15 @@ static void draw_tiles(PSfile *, BoundingBox &, int, int, int);
 static void render_image(PSfile *, const WrfData &, BoundingBox &, int);
 static void render_tile(PSfile *, const double *, int, int, BoundingBox &);
 
-static void usage(int, char **);
+static void usage();
+static void set_fcst_valid_time(const StringArray &);
+static void set_fcst_lead_time(const StringArray &);
+static void set_obs_valid_time(const StringArray &);
+static void set_obs_lead_time(const StringArray &);
+static void set_outdir(const StringArray &);
+static void set_postscript(const StringArray &);
+static void set_netcdf(const StringArray &);
+static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +142,7 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   int i;
+   CommandLine cline;
    char tmp_str[PATH_MAX];
    FileType ftype, otype;
 
@@ -140,62 +150,57 @@ void process_command_line(int argc, char **argv) {
    replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
    out_dir << tmp_str;
 
-   if(argc < 4) {
-      usage(argc, argv);
-      exit(1);
-   }
+   //
+   // check for zero arguments
+   //
+   if (argc == 1)
+      usage();
 
+   //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
+
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_fcst_valid_time, "-fcst_valid", 1);
+   cline.add(set_fcst_lead_time, "-fcst_lead", 1);
+   cline.add(set_obs_valid_time, "-obs_valid", 1);
+   cline.add(set_obs_lead_time, "-obs_lead", 1);
+   cline.add(set_outdir, "-outdir", 1);
+   cline.add(set_postscript, "-ps", 0);
+   cline.add(set_netcdf, "-nc", 0);
+   cline.add(set_verbosity, "-v", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. There should be three arguments left; the
+   // forecast filename, the observation filename, and the config
+   // filename.
+   //
+   if (cline.n() != 3)
+      usage();
+
+   //
    // Store the input forecast and observation file names
-   fcst_file   = argv[1];
-   obs_file    = argv[2];
-   config_file = argv[3];
+   //
+   fcst_file = cline[0];
+   obs_file = cline[1];
+   config_file = cline[2];
 
    // Determine the input file types
    ftype = get_file_type(fcst_file);
    otype = get_file_type(obs_file);
-
-   // Parse command line arguments
-   for(i=0; i<argc; i++) {
-
-      if(strcmp(argv[i], "-fcst_valid") == 0) {
-         fcst_valid_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-fcst_lead") == 0) {
-         fcst_lead_sec = timestring_to_sec(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_valid") == 0) {
-         obs_valid_ut = timestring_to_unix(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-obs_lead") == 0) {
-         obs_lead_sec = timestring_to_sec(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-outdir") == 0) {
-         out_dir = argv[i+1];
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-ps") == 0) {
-         ps_flag = 0;
-         i++;
-      }
-      else if(strcmp(argv[i], "-nc") == 0) {
-         nc_flag = 0;
-         i++;
-      }
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "unrecognized command line switch: "
-              << argv[i] << "\n\n" << flush;
-         exit(1);
-      }
-   }
 
    // Read the config file
    conf_info.read_config(config_file, ftype, otype);
@@ -2877,7 +2882,7 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2932,7 +2937,64 @@ void usage(int argc, char *argv[]) {
         << "\n\tNOTE: The forecast and observation fields must be "
         << "on the same grid.\n\n" << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_fcst_valid_time(const StringArray & a)
+{
+   fcst_valid_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_fcst_lead_time(const StringArray & a)
+{
+   fcst_lead_sec = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_valid_time(const StringArray & a)
+{
+   obs_valid_ut = timestring_to_unix(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_lead_time(const StringArray & a)
+{
+   obs_lead_sec = timestring_to_sec(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_outdir(const StringArray & a)
+{
+   out_dir = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_postscript(const StringArray &)
+{
+   ps_flag = 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_netcdf(const StringArray &)
+{
+   nc_flag = 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
