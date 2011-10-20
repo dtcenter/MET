@@ -42,6 +42,8 @@
 //                    number of input files/accumulation intervals.
 //                    Add lat/lon variables to NetCDF.
 //   010    04/19/11  Halley Gotway  Bugfix for -add option.
+//   022    10/20/11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -110,12 +112,12 @@ static int           n_files;
 
 static void process_command_line(int, char **);
 
-static void process_sum_args(int, char **, int);
-static void process_add_sub_args(int, char **, int);
+static void process_sum_args(const CommandLine &);
+static void process_add_sub_args(const CommandLine &);
 
-static void do_sum_command(int, char **);
-static void do_add_command(int, char **);
-static void do_sub_command(int, char **);
+static void do_sum_command();
+static void do_add_command();
+static void do_sub_command();
 
 static void sum_grib_files(Grid &, GribRecord &);
 static int  search_pcp_dir(const char *, const unixtime, char *&);
@@ -125,7 +127,15 @@ static void get_field(const char *, int, WrfData &, unixtime &, unixtime &,
 
 static void write_netcdf(unixtime, unixtime, int, Grid &, GribRecord &);
 static void clean_up();
-static void usage(int, char **);
+static void usage();
+static void set_sum(const StringArray &);
+static void set_add(const StringArray &);
+static void set_subtract(const StringArray &);
+static void set_grib_code(const StringArray &);
+static void set_ptv_num(const StringArray &);
+static void set_verbosity(const StringArray &);
+static void set_pcpdir(const StringArray &);
+static void set_pcprx(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -144,9 +154,9 @@ int main(int argc, char *argv[]) {
    //
    // Perform the requested job command
    //
-   if     (run_command == sum) do_sum_command(argc, argv);
-   else if(run_command == add) do_add_command(argc, argv);
-   else                        do_sub_command(argc, argv);
+   if     (run_command == sum) do_sum_command();
+   else if(run_command == add) do_add_command();
+   else                        do_sub_command();
 
    return(0);
 }
@@ -154,80 +164,81 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   int i, i_args;
+   CommandLine cline;
 
    //
-   // Check for the minimum number of arguments
+   // check for zero arguments
    //
-   if(argc < 4) {
-      usage(argc, argv);
-      exit(1);
-   }
+   if (argc == 1)
+      usage();
 
    //
    // Default to running the sum command
    //
    run_command = sum;
-   i_args      = 1;
 
    //
-   // Process the top-level command line arguments
+   // parse the command line into tokens
    //
-   for(i=0; i<argc; i++) {
+   cline.set(argc, argv);
 
-      if(strcmp(argv[i], "-sum") == 0) {
-         run_command = sum;
-         i_args      = i+1;
-      }
-      else if(strcmp(argv[i], "-add") == 0) {
-         run_command = add;
-         i_args      = i+1;
-      }
-      else if(strcmp(argv[i], "-subtract") == 0) {
-         run_command = sub;
-         i_args      = i+1;
-      }
-      else if(strcmp(argv[i], "-gc") == 0) {
-         grib_code = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-ptv") == 0) {
-         grib_ptv = atoi(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         verbosity = atoi(argv[i+1]);
-         i++;
-      }
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
 
-      //
-      // Optional sum arguments
-      //
-      else if(strcmp(argv[i], "-pcpdir") == 0) {
-         pcp_dir.add(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-pcprx") == 0) {
-         pcp_reg_exp = argv[i+1];
-         i++;
-      }
+   //
+   // add the options function calls
+   //
+   cline.add(set_sum, "-sum", 0);
+   cline.add(set_add, "-add", 0);
+   cline.add(set_subtract, "-subtract", 0);
+   cline.add(set_grib_code, "-gc", 1);
+   cline.add(set_ptv_num, "-ptv", 1);
+   cline.add(set_verbosity, "-v", 1);
+   cline.add(set_pcpdir, "-pcpdir", 1);
+   cline.add(set_pcprx, "-pcprx", 1);
 
-      //
-      // Unrecognized flags
-      //
-      else if(argv[i][0] == '-') {
-         cerr << "\n\nERROR: process_command_line() -> "
-              << "Unrecognized command line argument: " << argv[i]
-              << "\n\n" << flush;
-         exit(1);
-      }
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   //
+   // Check for error. Depending on the type of command, there should
+   // be a different number of arguments left. For the sum command
+   // there should be five arguments left: the init_time, the in_accum,
+   // the valid_time, the out_accum, and the out_file. For the add
+   // command there should be at least three arguments left: in_file1,
+   // accum1, [in_file2, accum2, ..., in_filen, accumn], and the
+   // out_file. For the subtract command there should be five
+   // arguments left: in_file1, accum1, in_file2, accum2, and
+   // out_file.
+   //
+   if (run_command == sum)
+   {
+      if (cline.n() != 5)
+         usage();
+
+   }
+   else if (run_command == add)
+   {
+      if (cline.n() < 3)
+         usage();
+
+   }
+   else
+   {
+      if (cline.n() != 5)
+         usage();
+
    }
 
    //
    // Process the specific command arguments
    //
-   if(run_command == sum) process_sum_args(argc, argv, i_args);
-   else                   process_add_sub_args(argc, argv, i_args);
+   if(run_command == sum) process_sum_args(cline);
+   else                   process_add_sub_args(cline);
 
    //
    // If pcp_dir is not set, set it to the current directory.
@@ -244,17 +255,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_sum_args(int argc, char **argv, int i_args) {
-
-   //
-   // Check the number of arguments provided
-   //
-   if(i_args + 5 > argc) {
-      cerr << "\n\nERROR: process_sum_args() -> "
-           << "Not enough arguments provided.\n\n" << flush;
-      usage(argc, argv);
-      exit(1);
-   }
+void process_sum_args(const CommandLine & cline) {
 
    //
    // Parse the sum arguments
@@ -263,45 +264,45 @@ void process_sum_args(int argc, char **argv, int i_args) {
    //
    // Init time
    //
-   if(strcmp(argv[i_args], zero_time_str) == 0) {
+   if(strcmp(cline[0], zero_time_str) == 0) {
       init_time = (unixtime) 0;
    }
    else {
-      init_time = timestring_to_unix(argv[i_args]);
+      init_time = timestring_to_unix(cline[0]);
    }
 
    //
    // Input accumulation
    //
-   in_accum = timestring_to_sec(argv[i_args+1]);
+   in_accum = timestring_to_sec(cline[1]);
 
    //
    // Valid time
    //
-   if(strcmp(argv[i_args+2], zero_time_str) == 0) {
+   if(strcmp(cline[2], zero_time_str) == 0) {
       valid_time = (unixtime) 0;
    }
    else {
-      valid_time = timestring_to_unix(argv[i_args+2]);
+      valid_time = timestring_to_unix(cline[2]);
    }
 
    //
    // Output accumulation
    //
-   out_accum = timestring_to_sec(argv[i_args+3]);
+   out_accum = timestring_to_sec(cline[3]);
 
    //
    // Out file
    //
-   out_file = argv[i_args+4];
+   out_file = cline[4];
 
    //
    // Check that accumulation intervals are greater than zero
    //
    if(in_accum <= 0 || out_accum <= 0) {
       cerr << "\n\nERROR: process_sum_args() -> "
-           << "The input accumulation interval (" << argv[i_args+1] 
-           << ") and output accumulation interval (" << argv[i_args+3]
+           << "The input accumulation interval (" << cline[1]
+           << ") and output accumulation interval (" << cline[3]
            << ") must be greater than zero.\n\n" << flush;
       exit(1);
    }
@@ -311,28 +312,17 @@ void process_sum_args(int argc, char **argv, int i_args) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_add_sub_args(int argc, char **argv, int i_args) {
+void process_add_sub_args(const CommandLine & cline) {
    int i;
-
-   //
-   // Check for a minimum of two addition arguments
-   //
-   if( (run_command == add && i_args + 2 > argc) ||
-       (run_command == sub && i_args + 5 > argc) ) {
-      cerr << "\n\nERROR: process_add_sub_args() -> "
-           << "Not enough arguments provided.\n\n" << flush;
-      usage(argc, argv);
-      exit(1);
-   }
 
    //
    // Figure out the number of files provided
    //
-   for(i=i_args, n_files=0; i<argc; i++) {
+   for(i=0, n_files=0; i<cline.n(); i++) {
 
       // Only check accumulation interval for enough args
-      if(i+1 < argc) {
-         if(!is_hh(argv[i+1]) && !is_hhmmss(argv[i+1])) break;
+      if(i+1 < cline.n()) {
+         if(!is_hh(cline[i+1]) && !is_hhmmss(cline[i+1])) break;
          else {
             n_files++; // Increment file count
             i++;       // Advance past next file
@@ -350,21 +340,21 @@ void process_add_sub_args(int argc, char **argv, int i_args) {
    // Store the input files and accumulations
    //
    for(i=0; i<n_files; i++) {
-      in_file[i] = argv[i_args + i*2];
-      accum[i]   = timestring_to_sec(argv[i_args + i*2 + 1]);
+      in_file[i] = cline[i*2];
+      accum[i]   = timestring_to_sec(cline[i*2 + 1]);
    }
 
    //
    // Store the output file
    //
-   out_file = argv[i_args + n_files*2];
+   out_file = cline[n_files*2];
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sum_command(int argc, char **argv) {
+void do_sum_command() {
    Grid grid;
    GribRecord rec;
    int lead_time;
@@ -746,7 +736,7 @@ void check_file_time(char *file, unixtime pcp_valid, int &i_gc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_add_command(int argc, char **argv) {
+void do_add_command() {
    WrfData wd;
    GribRecord rec;
    Grid grid1, grid2;
@@ -872,7 +862,7 @@ void do_add_command(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sub_command(int argc, char **argv) {
+void do_sub_command() {
    WrfData wd1, wd2;
    GribRecord rec;
    Grid grid1, grid2;
@@ -1208,7 +1198,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int argc, char *argv[]) {
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1327,7 +1317,64 @@ void usage(int argc, char *argv[]) {
 
         << "\n" << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_sum(const StringArray &)
+{
+   run_command = sum;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_add(const StringArray &)
+{
+   run_command = add;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_subtract(const StringArray &)
+{
+   run_command = sub;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_grib_code(const StringArray & a)
+{
+   grib_code = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_ptv_num(const StringArray & a)
+{
+   grib_ptv = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   verbosity = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_pcpdir(const StringArray & a)
+{
+   pcp_dir.add(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_pcprx(const StringArray & a)
+{
+   pcp_reg_exp = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
