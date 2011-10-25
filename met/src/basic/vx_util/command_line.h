@@ -1,16 +1,5 @@
 
 
-   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-   // ** Copyright UCAR (c) 1992 - 2012
-   // ** University Corporation for Atmospheric Research (UCAR)
-   // ** National Center for Atmospheric Research (NCAR)
-   // ** Research Applications Lab (RAL)
-   // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -58,7 +47,7 @@ class CLOptionInfo {   //  command-line option info
 
       ConcatString option_text;
 
-      int Nargs;
+      int Nargs;   //  -1 for arbitrary number
 
       CLSetFunction f;   //  not allocated
 
@@ -131,7 +120,11 @@ class CommandLine {
       void assign(const CommandLine &);
 
 
-      void do_help();
+      void do_help() const;
+
+      void get_n_args(StringArray &, const int Nargs, const char * switch_name, const int pos);
+
+      int  get_unlimited_args(StringArray &, const int pos);
 
       StringArray args;
 
@@ -141,7 +134,11 @@ class CommandLine {
 
       UsageFunction Usage;
 
-      bool AllowNumbers;   //  default: true
+      bool AllowNumbers;   //  default: false
+
+      bool AllowUnrecognizedSwitches;   //  default: false
+
+      bool is_switch(const char *) const;
 
    public:
 
@@ -162,7 +159,9 @@ class CommandLine {
 
       void set_usage(UsageFunction);
 
-      void set_allow_numbers(bool);
+      void allow_numbers();
+
+      void allow_unrecognized_switches();
 
          //
          //  get stuff
@@ -176,7 +175,7 @@ class CommandLine {
 
       // bool has_option(int & index) const;
 
-      int next_option() const;   //  -1 if no option found, else index into array
+      int next_option(int & index) const;   //  -1 if no option found
 
          //
          //  do stuff
@@ -202,7 +201,9 @@ inline int CommandLine::max_length() const { return ( args.max_length() ); }
 
 inline void CommandLine::set_usage(UsageFunction f) { Usage = f;  return; }
 
-inline void CommandLine::set_allow_numbers(bool tf) { AllowNumbers = tf;  return; }
+inline void CommandLine::allow_numbers() { AllowNumbers = true;  return; }
+
+inline void CommandLine::allow_unrecognized_switches() { AllowUnrecognizedSwitches = true;  return; }
 
 
 ////////////////////////////////////////////////////////////////////////

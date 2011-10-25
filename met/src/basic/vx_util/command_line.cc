@@ -1,16 +1,5 @@
 
 
-   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-   // ** Copyright UCAR (c) 1992 - 2012
-   // ** University Corporation for Atmospheric Research (UCAR)
-   // ** National Center for Atmospheric Research (NCAR)
-   // ** Research Applications Lab (RAL)
-   // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -22,7 +11,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "indent.h"
+#include "vx_util.h"
 #include "string_fxns.h"
 #include "command_line.h"
 #include "is_number.h"
@@ -552,7 +541,9 @@ ProgramName.clear();
 
 Usage = (UsageFunction) 0;
 
-AllowNumbers = true;
+AllowNumbers = false;
+
+AllowUnrecognizedSwitches = false;
 
 }
 
@@ -588,20 +579,30 @@ void CommandLine::dump(ostream & out, int depth) const
 
 {
 
-out << "Program Name = ";
+Indent prefix(depth);
+
+
+out << prefix << "Program Name = ";
 
 if ( ProgramName.length() > 0 )  out << '\"' << ProgramName << "\"\n";
 else                             out << "(nul)\n";
 
-out << "Args ...\n";
+out << prefix << "\n";
+
+out << prefix << "Args ...\n";
 
 args.dump(out, depth + 1);
 
-out << "Options ...\n";
+out << prefix << "\n";
+
+out << prefix << "Options ...\n";
 
 options.dump(out, depth + 1);
 
-out << "AllowNumbers = " << ( AllowNumbers ? "true" : "false" ) << "\n";;
+out << prefix << "\n";
+
+out << prefix << "AllowNumbers              = " << ( AllowNumbers ? "true" : "false" ) << "\n";;
+out << prefix << "AllowUnrecognizedSwitches = " << ( AllowUnrecognizedSwitches ? "true" : "false" ) << "\n";;
 
 return;
 
@@ -694,25 +695,42 @@ return ( status );
 ////////////////////////////////////////////////////////////////////////
 
 
-int CommandLine::next_option() const
+int CommandLine::next_option(int & option_index) const
 
 {
 
 int j, N;
-char c;
+const char * name = (const char *) 0;
 
 
 N = args.n_elements();
 
 for (j=0; j<N; ++j)  {
 
-   c = args[j][0];
+   name = args[j];
 
-   if ( c == '-' )  {
+   if ( is_switch(name) )  {
 
-       if ( AllowNumbers && is_number(args[j]) )  continue;
+      if ( (strcmp(name, "-help") == 0) || (strcmp(name, "--help") == 0) )  do_help();   //  doesn't return
 
-       return ( j );
+      option_index = options.lookup(args[j]);
+
+      if ( option_index >= 0 )  return ( j );
+
+        //
+        //  option not recognized
+        //
+
+      if ( AllowUnrecognizedSwitches )  continue;
+      else {
+
+         cerr << "\n\n  CommandLine::next_option() -> unrecognized command-line switch \"" << args[j] << "\"\n\n";
+
+         exit ( 1 );
+
+      }
+
+      return ( j );
 
    }
 
@@ -753,7 +771,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CommandLine::do_help()
+void CommandLine::do_help() const
 
 {
 
@@ -793,33 +811,19 @@ void CommandLine::parse()
 
 {
 
-int j, k, m, index;
+int j, index;
+int N, M;
 StringArray a;
-const char *  c = (const char *) 0;
-const char * cc = (const char *) 0;
+const char * switch_name = (const char *) 0;
 
 
-while ( (j = next_option()) >= 0 )  {
+while ( (j = next_option(index)) >= 0 )  {
 
-   c = args[j];
-
-      //
-      //  see if it's "-help" or "--help"
-      //
-
-   if ( (strcmp(c, "-help") == 0) || (strcmp(c, "--help") == 0) )  do_help();
-
-   if ( AllowNumbers && is_number(c) )  continue;
-
-      //
-      //  look up entry in options array
-      //
-
-   index = options.lookup(c);
+   switch_name = args[j];
 
    if ( index < 0 )  {
 
-      cerr << "\n\n  " << ProgramName << ": unrecognized command-line switch: \"" << c << "\"\n\n";
+      cerr << "\n\n  " << ProgramName << ": unrecognized command-line switch: \"" << switch_name << "\"\n\n";
 
       if ( Usage )  Usage();
 
@@ -831,39 +835,21 @@ while ( (j = next_option()) >= 0 )  {
       //  set up the arguments
       //
 
-   a.clear();
+   N = options[index].Nargs;
 
-   for (k=0; k<(options[index].Nargs); ++k)  {
+   if ( N < 0 )  {
 
-      m = j + k + 1;
+      M = get_unlimited_args (a, j + 1);
 
-      if ( m >= args.n_elements() )  {
+   } else {
 
-         cerr << "\n\n  " << ProgramName << ": too few arguments to command-line switch \"" << c << "\"\n\n";
+      M = N;
 
-         if ( Usage )  Usage();
+      get_n_args(a, N, switch_name, j + 1);
 
-         exit ( 1 );
+   }
 
-      }
-
-      cc = args[m];
-
-      if ( (*cc == '-') && !is_number(cc) )  {   //  we ran into another command-line switch
-
-         cerr << "\n\n  " << ProgramName << ": too few arguments to command-line switch \"" << c << "\"\n\n";
-
-         if ( Usage )  Usage();
-
-         exit ( 1 );
-
-      }
-
-      a.add(cc);
-
-   }   //  for k
-
-   args.shift_down(j, options[index].Nargs + 1);
+   args.shift_down(j, M + 1);
 
       //
       //  call the function
@@ -878,6 +864,121 @@ while ( (j = next_option()) >= 0 )  {
    //
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CommandLine::get_n_args(StringArray & a, const int Nargs, const char * switch_name, const int pos)
+
+{
+
+a.clear();
+
+if ( Nargs == 0 )  return;
+
+int j, k;
+const char * c = (const char *) 0;
+
+
+for (j=0; j<Nargs; ++j)  {
+
+   k = j + pos;
+
+   if ( k >= args.n_elements() )  {
+
+      cerr << "\n\n  CommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   c = args[k];
+
+   if ( is_switch(c) )  {
+
+      cerr << "\n\n  CommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   a.add(c);
+
+}   //  for j
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int CommandLine::get_unlimited_args(StringArray & a, const int pos)
+
+{
+
+int k, count;
+const char * c = (const char *) 0;
+
+
+a.clear();
+
+count = 0;
+
+while ( 1 )  {
+
+   k = pos + count;
+
+   if ( k >= args.n_elements() )  return ( count );
+
+   c = args[k];
+
+   if ( is_switch(c) )  return ( count );
+
+   a.add(c);
+
+   ++count;
+
+}   //  while
+
+
+   //
+   //  done
+   //
+
+return ( count );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool CommandLine::is_switch(const char * text) const
+
+{
+
+if ( !text || !(*text) )  {
+
+   cerr << "\n\n  CommandLine::is_switch(const char *) const -> empty string!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( text[0] != '-' )  return ( false );
+
+if ( AllowNumbers && is_number(text) )  return ( false );
+
+return ( true );
 
 }
 
