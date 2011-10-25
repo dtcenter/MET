@@ -185,7 +185,7 @@ boot_rng = "mt19937";
 // intervals.  If left unspecified, the seed will change for each run and
 // the computed bootstrap confidence intervals will not be reproducable.
 //
-boot_seed = "";
+boot_seed = "1";
 
 //
 // Specify a comma-separated list of interpolation method(s) to be used for
