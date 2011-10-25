@@ -327,7 +327,7 @@ rng_type = "mt19937";
 // If left unspecified, the random number generator seed will change for
 // each run and the assignment of ranks will not be reproducable.
 //
-rng_seed = "";
+rng_seed = "1";
 
 //
 // Specify the GRIB Table 2 parameter table version number to be used
