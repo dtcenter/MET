@@ -239,14 +239,15 @@ void parse_command_line(int &argc, char **argv) {
       //
       // Store the remaining options as the STAT Command Line job
       //
-      strcpy(command_line_job, cmd_line_job);
+      if (cmd_line_job.length() > 0)
+         strcpy(command_line_job, cmd_line_job);
    } // end if
 
    //
    // Check for at least one search file or directory
    //
    if(search_dirs.n_elements() == 0) {
-      cerr << "\n\nERROR: sanity_check() -> "
+      cerr << "\n\nERROR: parse_command_line() -> "
            << "no STAT search files or directories specified!\n\n"
            << flush;
 
