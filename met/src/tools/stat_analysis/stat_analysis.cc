@@ -92,7 +92,7 @@ int main(int argc, char * argv []) {
    // If a config file was specified, set up the default job using the
    // config file.
    //
-   if(config_file != (char *) 0) {
+   if(config_file.length() != 0) {
 
       //
       // Read the config file
@@ -130,7 +130,7 @@ int main(int argc, char * argv []) {
       // If a config file was specified, process the jobs in the config
       // file.
       //
-      if(config_file != (char *) 0) {
+      if(config_file.length() != 0) {
 
          n = conf.n_jobs_elements();
 
@@ -179,7 +179,7 @@ void parse_command_line(int &argc, char **argv) {
    if (argc == 1)
       usage();
 
-   config_file = (char *) 0;
+   config_file.erase();
 
    //
    // parse the command line into tokens
@@ -218,7 +218,7 @@ void parse_command_line(int &argc, char **argv) {
    // If no config file was specified, parse out the STAT Analysis job
    // command from the command line.
    //
-   if(config_file == (char *) 0) {
+   if(config_file.length() == 0) {
 
       cmd_line_job.erase();
 
@@ -463,7 +463,7 @@ void process_search_dirs() {
    //
    // For command line jobs parse the filtering criteria to be used.
    //
-   if(config_file == (char *) 0) {
+   if(config_file.length() == 0) {
 
       //
       // Parse the command line job options.
@@ -501,7 +501,7 @@ void process_search_dirs() {
    // use the config file setting or default setting.
    //
    if(tmp_dir.length() == 0) {
-      if(config_file != (char *) 0) tmp_dir = conf.tmp_dir().sval();
+      if(config_file.length() != 0) tmp_dir = conf.tmp_dir().sval();
       else                          tmp_dir = default_tmp_dir;
    }
 
