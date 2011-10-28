@@ -27,6 +27,8 @@
 //                    config file alpha value list
 //   004    08/16/11  Halley Gotway   Reimplementation of GO Index job
 //                    with addition of generalized Skill Score Index
+//   005    10/26/11  Holmes         Added use of command line class to
+//                                   parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -51,6 +53,11 @@ using namespace std;
 static void parse_command_line(int &argc, char **argv);
 static void sanity_check();
 static void usage();
+static void set_lookin_path(const StringArray &);
+static void set_out_filename(const StringArray &);
+static void set_tmp_dir(const StringArray &);
+static void set_verbosity_level(const StringArray &);
+static void set_config_file(const StringArray &);
 static void process_search_dirs();
 static void process_stat_file(const char *, const STATAnalysisJob &,
                               int &, int &);
@@ -64,7 +71,6 @@ static void set_config(const char *);
 static void set_search_dir(const char *);
 static void set_out_file(const char *);
 static void set_verbosity(int);
-static int  is_switch(const char *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -150,7 +156,6 @@ int main(int argc, char * argv []) {
 
       clean_up();
       usage();
-      exit(j);
    }
 
    //
@@ -164,53 +169,50 @@ int main(int argc, char * argv []) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_command_line(int &argc, char **argv) {
+   CommandLine cline;
+   ConcatString cmd_line_job;
    int i;
 
    //
-   // Check for the minimum number of required arguments
+   // check for zero arguments
    //
-   if(argc < 5) {
+   if (argc == 1)
       usage();
-      exit(1);
-   }
 
-   //
-   // Parse the command line arguments
-   //
    config_file = (char *) 0;
 
-   for(i=1; i<argc; i++) {
+   //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
 
-      if(strcmp(argv[i], "-config") == 0){
-         set_config(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-lookin") == 0) {
-         while(i+1<argc && !is_switch(argv[i+1])) {
-            set_search_dir(argv[i+1]);
-            i++;
-         }
-      }
-      else if(strcmp(argv[i], "-out") == 0) {
-         set_out_file(argv[i+1]);
-         i++;
-      }
-      else if(strcmp(argv[i], "-tmp_dir") == 0) {
+   //
+   // Allow for unrecognized command line switches.
+   // This must be called after set above since set calls
+   // clear which would reset this to false.
+   // This allows us to be able to handle single jobs on
+   // the command line.
+   //
+   cline.allow_unrecognized_switches();
 
-         tmp_dir << argv[i+1];
-         if(opendir(tmp_dir) == NULL ) {
-            cerr << "\n\nERROR: parse_command_line() -> "
-                 << "Cannot access the tmp_dir temporary directory: "
-                 << tmp_dir << "\n\n" << flush;
-            exit(1);
-         }
-         i++;
-      }
-      else if(strcmp(argv[i], "-v") == 0) {
-         set_verbosity(atoi(argv[i+1]));
-         i++;
-      }
-   } // end for
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_lookin_path, "-lookin", -1);
+   cline.add(set_out_filename, "-out", 1);
+   cline.add(set_tmp_dir, "-tmp_dir", 1);
+   cline.add(set_verbosity_level, "-v", 1);
+   cline.add(set_config_file, "-config", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
 
    //
    // If no config file was specified, parse out the STAT Analysis job
@@ -218,34 +220,26 @@ void parse_command_line(int &argc, char **argv) {
    //
    if(config_file == (char *) 0) {
 
-      for(i=1; i<argc; i++) {
+      cmd_line_job.erase();
+
+      for(i=0; i<cline.n(); i++) {
 
          //
-         // Skip the command line options not specific to the
-         // STAT Analysis job
+         // build the command line back up from the leftover arguments
          //
-         if(strcmp(argv[i], "-out") == 0 ||
-            strcmp(argv[i], "-v") == 0) {
-            i++;
-            continue;
-         }
-         else if(strcmp(argv[i], "-lookin") == 0) {
+         cmd_line_job << cline[i];
 
-            while(i+1<argc && !is_switch(argv[i+1])) i++;
-
-            continue;
-         }
          //
-         // Store the remaining options as the STAT Command Line job
+         // add a space between arguments, except for the last argument
          //
-         else {
-            if(strlen(command_line_job) == 0)
-               sprintf(command_line_job, "%s", argv[i]);
-            else
-               sprintf(command_line_job, "%s %s",
-                       command_line_job, argv[i]);
-         }
+         if (i + 1 != cline.n())
+            cmd_line_job << ' ';
       } // end for
+
+      //
+      // Store the remaining options as the STAT Command Line job
+      //
+      strcpy(command_line_job, cmd_line_job);
    } // end if
 
    return;
@@ -430,17 +424,6 @@ void set_verbosity(int i) {
    verbosity = i;
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int is_switch(const char *c) {
-   int r;
-
-   if(strlen(c) > 0 && c[0] == '-') r = 1;
-   else                             r = 0;
-
-   return(r);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -695,7 +678,51 @@ void usage() {
 
         << flush;
 
-   return;
+   exit (1);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_lookin_path(const StringArray & a)
+{
+   for (int i = 0; i < a.n_elements(); i++)
+      set_search_dir(a[i]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_out_filename(const StringArray & a)
+{
+   set_out_file(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_tmp_dir(const StringArray & a)
+{
+   tmp_dir << a[0];
+   if(opendir(tmp_dir) == NULL ) {
+      cerr << "\n\nERROR: parse_command_line() -> "
+           << "Cannot access the tmp_dir temporary directory: "
+           << tmp_dir << "\n\n" << flush;
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity_level(const StringArray & a)
+{
+   set_verbosity(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_config_file(const StringArray & a)
+{
+   set_config(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
