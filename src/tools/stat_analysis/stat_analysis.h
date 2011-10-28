@@ -62,11 +62,11 @@ static StringArray search_dirs;
 static StringArray files;
 
 // Output file set with -out
-static const char *out_file = (const char *) 0;
+static ConcatString out_file;
 static ofstream   *sa_out   = (ofstream *) 0;
 
 // Config file set with -config
-static const char *config_file = (const char *) 0;
+static ConcatString config_file;
 
 // Logging verbosity set with -v
 static int verbosity = 1;
