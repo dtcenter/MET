@@ -242,6 +242,17 @@ void parse_command_line(int &argc, char **argv) {
       strcpy(command_line_job, cmd_line_job);
    } // end if
 
+   //
+   // Check for at least one search file or directory
+   //
+   if(search_dirs.n_elements() == 0) {
+      cerr << "\n\nERROR: sanity_check() -> "
+           << "no STAT search files or directories specified!\n\n"
+           << flush;
+
+      exit(1);
+   }
+
    return;
 }
 
@@ -261,17 +272,6 @@ void sanity_check() {
            << "The version number listed in the config file ("
            << conf.version().sval() << ") does not match the version "
            << "of the code (" << met_version << ").\n\n" << flush;
-      exit(1);
-   }
-
-   //
-   // Check for at least one search file or directory
-   //
-   if(search_dirs.n_elements() == 0) {
-      cerr << "\n\nERROR: sanity_check() -> "
-           << "no STAT search files or directories specified!\n\n"
-           << flush;
-
       exit(1);
    }
 
