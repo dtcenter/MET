@@ -217,7 +217,7 @@ void process_command_line(int argc, char **argv) {
             //
             // Add each of the ensemble members to the list of files.
             //
-            for(i = 1; i < n_ens; i++)
+            for(i = 1; i <= n_ens; i++)
                ens_file_list.add(cline[i]);
 
          }
