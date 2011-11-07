@@ -22,6 +22,8 @@
 //                                    apect_ratio min/max options,
 //                                    fcst/obs init_time min/max options,
 //                                    fcst/obs init_hour options
+//   002    11/07/11  Holmes          Added use of command line class to
+//                                    parse the command line arguments.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,8 +58,6 @@ static mode_analysis_Conf config;
 
 static const char * const program_name = "mode_analysis";
 
-static StringArray cline;
-
 static StringArray mode_files;
 
 static StringArray lookin_dirs;
@@ -72,9 +72,18 @@ static int debug = 0;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void parse_command_line();
+static void parse_command_line(int, char **);
 
 static void usage();
+
+static void set_lookin_path(const StringArray &);
+static void set_summary_jobtype(const StringArray &);
+static void set_bycase_jobtype(const StringArray &);
+static void set_column_name(const StringArray &);
+static void set_dump_row(const StringArray &);
+static void set_out_filename(const StringArray &);
+static void set_config_filename(const StringArray &);
+static void set_debug_option(const StringArray &);
 
 static void set_summary ();
 static void set_bycase  ();
@@ -101,22 +110,10 @@ int main(int argc, char * argv [])
 // Set handler to be called for memory allocation error
 set_new_handler(oom);
 
-if ( argc == 1 )  { usage();  exit(1); }
-
-int j;
-
-   //
-   //  setup
-   //
-
-for (j=1; j<argc; ++j)  {
-
-   cline.add(argv[j]);
-
-}
+if ( argc == 1 )  { usage(); }
 
 
-parse_command_line();
+parse_command_line(argc, argv);
 
 cout << "\n\n";
 
@@ -170,46 +167,50 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-void parse_command_line()
+void parse_command_line(int argc, char **argv)
 
 {
 
+CommandLine cline;
+StringArray cmd_line;
 int j;
-const char * c = (const char *) 0;
 
    //
-   //  get analysis options
+   // parse the command line into tokens
    //
+cline.set(argc, argv);
 
-j = 0;
+   //
+   // Allow for unrecognized command line switches.
+   // This must be called after set above since set calls
+   // clear which would reset this to false.
+   // This allows us to be able to handle single jobs on
+   // the command line.
+   //
+cline.allow_unrecognized_switches();
 
-while ( j < (cline.n_elements()) )  {
+   //
+   // set the usage function
+   //
+cline.set_usage(usage);
 
-   c = cline[j];
+   //
+   // add the options function calls
+   //
+cline.add(set_lookin_path, "-lookin", 1);
+cline.add(set_summary_jobtype, "-summary", 0);
+cline.add(set_bycase_jobtype, "-bycase", 0);
+cline.add(set_column_name, "-column", 1);
+cline.add(set_dump_row, "-dump_row", 1);
+cline.add(set_out_filename, "-out", 1);
+cline.add(set_config_filename, "-config", 1);
+cline.add(set_debug_option, "-debug", 0);
 
-   if ( c[0] != '-' )  { ++j;  continue; }
+   //
+   // parse the command line
+   //
+cline.parse();
 
-        if ( strcmp(c, "-lookin"    ) == 0 )  { set_lookin   (cline[j + 1]);  cline.shift_down(j, 2); }
-   else if ( strcmp(c, "-config"    ) == 0 )  { set_config   (cline[j + 1]);  cline.shift_down(j, 2); }
-   else if ( strcmp(c, "-out"       ) == 0 )  { set_outfile  (cline[j + 1]);  cline.shift_down(j, 2); }
-   else if ( strcmp(c, "-debug"     ) == 0 )  { set_debug    ();              cline.shift_down(j, 1); }
-   else if ( strcmp(c, "-help"      ) == 0 )  { usage();                      exit ( 1 );             }
-
-   else if ( strcmp(c, "-summary"   ) == 0 )  { set_summary  ();              cline.shift_down(j, 1); }
-   else if ( strcmp(c, "-bycase"    ) == 0 )  { set_bycase   ();              cline.shift_down(j, 1); }
-   else if ( strcmp(c, "-column"    ) == 0 )  { add_field    (cline[j + 1]);  cline.shift_down(j, 2); }
-   else if ( strcmp(c, "-dump_row")   == 0 )  { set_dumpfile (cline[j + 1]);  cline.shift_down(j, 2); }
-
-
-
-
-      //
-      //  no more options of interest here
-      //
-
-   else ++j;
-
-}   //  while
 
 if ( !job )  {
 
@@ -219,21 +220,35 @@ if ( !job )  {
 
 }
 
+   //
+   // fill a StringArray with the rest of the command line arguments
+   // to parse as of old below. All that should remain are the
+   // MODE FILE LIST and the MODE LINE OPTIONS if there are any of
+   // either.
+   //
+
+cmd_line.clear();
+
+for (j=0; j<(cline.n()); ++j)  {
+
+   cmd_line.add(cline[j]);
+
+}
 
    //
    //  get mode attribute options
    //
 
-job->atts.parse_command_line(cline);
+job->atts.parse_command_line(cmd_line);
 
    //
    //  that should be all the options
    //
 
-if ( cline.has_option(j) )  {
+if ( cmd_line.has_option(j) )  {
 
    cerr << "\n\n  " << program_name << " -> unrecognized switch: \""
-        << cline[j] << "\"\n\n";
+        << cmd_line[j] << "\"\n\n";
 
    exit  ( 1 );
 
@@ -243,9 +258,9 @@ if ( cline.has_option(j) )  {
    //  the rest must be mode output filenames
    //
 
-if ( cline.n_elements() != 0 )  {
+if ( cmd_line.n_elements() != 0 )  {
 
-   mode_files.add(cline);
+   mode_files.add(cmd_line);
 
 }
 
@@ -334,7 +349,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
 
 mode_atts_usage(cout);
 
-return;
+exit (1);
 
 }
 
@@ -547,5 +562,114 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void set_lookin_path(const StringArray & a)
+
+{
+
+set_lookin(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_summary_jobtype(const StringArray &)
+{
+
+set_summary();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_bycase_jobtype(const StringArray &)
+
+{
+
+set_bycase();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_column_name(const StringArray & a)
+
+{
+
+add_field(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_dump_row(const StringArray & a)
+
+{
+
+set_dumpfile(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_out_filename(const StringArray & a)
+
+{
+
+set_outfile(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_config_filename(const StringArray & a)
+
+{
+
+set_config(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_debug_option(const StringArray &)
+
+{
+
+set_debug();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 
