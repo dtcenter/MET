@@ -60,10 +60,10 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
+WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 	@ echo
 	@ rm -f WrfMode_Conf.h WrfMode_Conf.cc
-	$(ECONFIG_CODEGEN) -class WrfMode_Conf -outfile WrfMode_Conf $(CONFIG_TEMPLATE_DIR)/WrfModeConfig_default
+	$(ECONFIG_CODEGEN) -class WrfMode_Conf -outfile WrfMode_Conf $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 
 
 ########################################################################
