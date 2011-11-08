@@ -14,7 +14,7 @@
 
 TARGETS  = libvx_wrfmode.a
 
-OBJECTS  =  WrfMode_Conf.o \
+OBJECTS  =  mode_Conf.o \
 	engine.o \
 	interest.o \
 	set.o
@@ -40,8 +40,8 @@ libvx_wrfmode.a: $(OBJECTS)
 	ar -rs libvx_wrfmode.a $(OBJECTS)
 	ranlib libvx_wrfmode.a
 
-WrfMode_Conf.o: WrfMode_Conf.cc
-	$(CXX) WrfMode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(LIB_DIR) $(NETCDF_INCS)
+mode_Conf.o: mode_Conf.cc
+	$(CXX) mode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(LIB_DIR) $(NETCDF_INCS)
 
 engine.o: engine.cc
 	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -DMET_BASE=\"$(MET_BASE)\" -I$(LIB_DIR) $(NETCDF_INCS) $(GSL_INCS)
