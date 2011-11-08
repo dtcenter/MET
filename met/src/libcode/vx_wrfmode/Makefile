@@ -16,7 +16,7 @@
 EXECUTABLES =
 
 
-OBJECTS     = WrfMode_Conf.o \
+OBJECTS     = mode_Conf.o \
               engine.o       \
               interest.o     \
               set.o
@@ -25,8 +25,8 @@ OBJECTS     = WrfMode_Conf.o \
 LIBRARIES   = libvx_wrfmode.a
 
 
-GEN_SOURCES = WrfMode_Conf.h  \
-              WrfMode_Conf.cc
+GEN_SOURCES = mode_Conf.h  \
+              mode_Conf.cc
 
 
 ########################################################################
@@ -37,7 +37,7 @@ HEADERS = engine.h        \
           mode_columns.h  \
           set.h           \
           vx_wrfmode.h    \
-          WrfMode_Conf.h
+          mode_Conf.h
 
 
 ########################################################################
@@ -60,10 +60,10 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
+mode_Conf.h mode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 	@ echo
-	@ rm -f WrfMode_Conf.h WrfMode_Conf.cc
-	$(ECONFIG_CODEGEN) -class WrfMode_Conf -outfile WrfMode_Conf $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
+	@ rm -f mode_Conf.h mode_Conf.cc
+	$(ECONFIG_CODEGEN) -class mode_Conf -outfile mode_Conf $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 
 
 ########################################################################
@@ -76,8 +76,8 @@ WrfMode_Conf.h WrfMode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 objects: $(OBJECTS)
 	@ echo
 
-WrfMode_Conf.o: WrfMode_Conf.h WrfMode_Conf.cc
-	$(CXX) WrfMode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+mode_Conf.o: mode_Conf.h mode_Conf.cc
+	$(CXX) mode_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 engine.o: engine.cc
 	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)

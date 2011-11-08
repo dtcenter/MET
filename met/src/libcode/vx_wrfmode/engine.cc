@@ -2211,18 +2211,18 @@ int Engine::get_unmatched_obs(int area) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-double total_interest(WrfMode_Conf &wmc, int dist_flag,
+double total_interest(mode_Conf &mc, int dist_flag,
                       const PairFeature &p) {
    double t;
 
-   t = total_interest_print(wmc, dist_flag, p, (ostream *) 0);
+   t = total_interest_print(mc, dist_flag, p, (ostream *) 0);
 
    return(t);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
+double total_interest_print(mode_Conf &mc, int dist_flag,
                             const PairFeature &p, ostream *out) {
    double attribute;
    double interest, weight;
@@ -2240,14 +2240,14 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    //
    ////////////////////////////////////////////////////////////////////
 
-   if(dist_flag && p.centroid_dist > wmc.max_centroid_dist().ival()) {
+   if(dist_flag && p.centroid_dist > mc.max_centroid_dist().ival()) {
       total = bad_data_double;
 
       if(out) {
          (*out) << "Total Interest = " << total << "\n"
                 << "Centroid Distance (" << p.centroid_dist
                 << ") > Max Centroid Distance ("
-                << wmc.max_centroid_dist().ival() << ")\n";
+                << mc.max_centroid_dist().ival() << ")\n";
       }
       return(total);
    }
@@ -2262,9 +2262,9 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.centroid_dist;
-   interest    = wmc.centroid_dist_if(attribute);
-   confidence  = wmc.area_ratio_conf(p.area_ratio);
-   weight      = wmc.centroid_dist_weight().dval();
+   interest    = mc.centroid_dist_if(attribute);
+   confidence  = mc.area_ratio_conf(p.area_ratio);
+   weight      = mc.centroid_dist_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2287,9 +2287,9 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.boundary_dist;
-   interest    = wmc.boundary_dist_if(attribute);
+   interest    = mc.boundary_dist_if(attribute);
    confidence  = 1.0;
-   weight      = wmc.boundary_dist_weight().dval();
+   weight      = mc.boundary_dist_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2312,9 +2312,9 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.convex_hull_dist;
-   interest    = wmc.convex_hull_dist_if(attribute);
+   interest    = mc.convex_hull_dist_if(attribute);
    confidence  = 1.0;
-   weight      = wmc.convex_hull_dist_weight().dval();
+   weight      = mc.convex_hull_dist_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2337,13 +2337,13 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.angle_diff;
-   interest    = wmc.angle_diff_if(attribute);
+   interest    = mc.angle_diff_if(attribute);
    aspect_obs  = p.Obs->aspect_ratio;
    aspect_fcst = p.Fcst->aspect_ratio;
-   conf_obs    = wmc.aspect_ratio_conf(aspect_obs);
-   conf_fcst   = wmc.aspect_ratio_conf(aspect_fcst);
+   conf_obs    = mc.aspect_ratio_conf(aspect_obs);
+   conf_fcst   = mc.aspect_ratio_conf(aspect_fcst);
    confidence  = sqrt(conf_obs*conf_fcst);
-   weight      = wmc.angle_diff_weight().dval();
+   weight      = mc.angle_diff_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2366,9 +2366,9 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.area_ratio;
-   interest    = wmc.area_ratio_if(attribute);
+   interest    = mc.area_ratio_if(attribute);
    confidence  = 1.0;
-   weight      = wmc.area_ratio_weight().dval();
+   weight      = mc.area_ratio_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2391,9 +2391,9 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = (p.intersection_area)/(min(p.Obs->area, p.Fcst->area));
-   interest    = wmc.int_area_ratio_if(attribute);
+   interest    = mc.int_area_ratio_if(attribute);
    confidence  = 1.0;
-   weight      = wmc.int_area_ratio_weight().dval();
+   weight      = mc.int_area_ratio_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2420,14 +2420,14 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    complexity_fcst = p.Fcst->complexity;
    // Both complexities are non-zero
    if(complexity_obs > 0 && complexity_fcst > 0) {
-      interest  = wmc.complexity_ratio_if(attribute);
+      interest  = mc.complexity_ratio_if(attribute);
    }
    // At least one complexity is zero
    else {
-      interest  = wmc.ratio_if(attribute);
+      interest  = mc.ratio_if(attribute);
    }
    confidence  = 1.0;
-   weight      = wmc.complexity_ratio_weight().dval();
+   weight      = mc.complexity_ratio_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2450,9 +2450,9 @@ double total_interest_print(WrfMode_Conf &wmc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.percentile_intensity_ratio;
-   interest    = wmc.intensity_ratio_if(attribute);
+   interest    = mc.intensity_ratio_if(attribute);
    confidence  = 1.0;
-   weight      = wmc.intensity_ratio_weight().dval();
+   weight      = mc.intensity_ratio_weight().dval();
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
