@@ -24,12 +24,15 @@ const char * program_name = (const char *) 0;   //  external linkage
 
 ////////////////////////////////////////////////////////////////////////
 
+
 static const char * class_name = (const char *) 0;
 
 static const char * file_prefix = (const char *) 0;
 
-static int Panic = 1;  //  have generated class panic if not all expected 
-                       //  symbols are found in a config file
+static bool Panic = true;  //  have generated class panic if not all expected 
+                           //  symbols are found in a config file
+
+static bool allow_multiple_reads = false;
 
 static int hh = 0;
 
@@ -48,6 +51,8 @@ static void set_class_name(const char *);
 static void set_file_prefix(const char *);
 
 static void set_nopanic();
+
+static void set_multiple_reads();
 
 static void set_hh();
 
@@ -74,6 +79,8 @@ codegen.set_file_prefix(file_prefix);
 if ( hh )  codegen.set_hh();
 
 if ( !Panic )  codegen.set_nopanic();
+
+codegen.set_multiple_reads(allow_multiple_reads);
 
 
 codegen.process(argv[1]);
@@ -113,10 +120,11 @@ do {
 
    if ( !found )  break;
 
-        if ( strcmp(argv[j], "-class"   ) == 0 )  { set_class_name  (argv[j + 1]);  shift_down(argc, argv, j, 2); }
-   else if ( strcmp(argv[j], "-outfile" ) == 0 )  { set_file_prefix (argv[j + 1]);  shift_down(argc, argv, j, 2); }
-   else if ( strcmp(argv[j], "-nopanic" ) == 0 )  { set_nopanic     ();             shift_down(argc, argv, j, 1); }
-   else if ( strcmp(argv[j], "-hh"      ) == 0 )  { set_hh          ();             shift_down(argc, argv, j, 1); }
+        if ( strcmp(argv[j], "-class"                ) == 0 )  { set_class_name     (argv[j + 1]);  shift_down(argc, argv, j, 2); }
+   else if ( strcmp(argv[j], "-outfile"              ) == 0 )  { set_file_prefix    (argv[j + 1]);  shift_down(argc, argv, j, 2); }
+   else if ( strcmp(argv[j], "-nopanic"              ) == 0 )  { set_nopanic        ();             shift_down(argc, argv, j, 1); }
+   else if ( strcmp(argv[j], "-allow_multiple_reads" ) == 0 )  { set_multiple_reads ();             shift_down(argc, argv, j, 1); }
+   else if ( strcmp(argv[j], "-hh"                   ) == 0 )  { set_hh             ();             shift_down(argc, argv, j, 1); }
    else {
 
       cout << "\n\n  unrecognized switch: \"" << argv[j] << "\"\n\n";
@@ -169,12 +177,15 @@ void usage()
 
 {
 
-cerr << "\n\n  usage: " << program_name
-     << " -class name"
-     << " -outfile name"
-     << " [ -nopanic ]"
-     << " [ -hh ]"
-     << " config_filename"
+const char * tab = "            ";
+
+cerr << "\n\n  usage: " << program_name << "\n"
+     << tab << " [ -allow_multiple_reads ]\n"
+     << tab << " [ -nopanic ]\n"
+     << tab << " [ -hh ]\n"
+     << tab << "     -class name\n"
+     << tab << "     -outfile name\n"
+     << tab << "     config_filename\n"
      << "\n\n";
 
 
@@ -218,7 +229,21 @@ void set_nopanic()
 
 {
 
-Panic = 0;
+Panic = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_multiple_reads()
+
+{
+
+allow_multiple_reads = true;
 
 return;
 
