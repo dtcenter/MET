@@ -150,6 +150,8 @@ HH = false;
 
 Panic = true;
 
+AllowMultipleReads = false;
+
 
 clear();
 
@@ -178,6 +180,8 @@ zone_name = (const char *) 0;
 HH = false;
 
 Panic = true;
+
+AllowMultipleReads = false;
 
 return;
 
@@ -271,6 +275,20 @@ void CodeGenerator::set_nopanic()
 {
 
 Panic = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CodeGenerator::set_multiple_reads(bool tf)
+
+{
+
+AllowMultipleReads = tf;
 
 return;
 
@@ -376,8 +394,8 @@ else               ampm = "am";
 
 hour = 1 + (hour + 11)%12;
 
-sprintf(junk, "%s %d, %d    %d:%02d %s  %s", 
-               month_name[month], day, year, hour, minute, 
+sprintf(junk, "%s %d, %d    %d:%02d %s  %s",
+               month_name[month], day, year, hour, minute,
                ampm, zone_name);
 
 
@@ -418,7 +436,7 @@ char junk[256];
 
 
 
-if ( machine.sts.n_tables() != 1 )  { 
+if ( machine.sts.n_tables() != 1 )  {
 
    cerr << "\n\n  CodeGenerator::do_header() -> wrong number of symbol tables on the stack ... "
         << machine.sts.n_tables() << "\n\n";
@@ -516,7 +534,7 @@ out << "         //\n"
     << "         //  symbol table entries for variables (not allocated)\n"
     << "         //\n"
     << "\n\n";
-  
+
 
 for (j=0; j<(symtab.n_entries()); ++j)  {
 
@@ -1084,9 +1102,12 @@ out << "\n\n"
     << "void " << ClassName << "::read(const char * _config_filename)\n"
     << "\n"
     << "{\n"
-    << "\n"
-    << "clear();\n"
     << "\n";
+
+if ( AllowMultipleReads )  out << "//  clear();   //  allow multiple reads\n";
+else                       out << "clear();\n";
+
+out << "\n";
 
 if ( Panic )  out << "const SymbolTableEntry * _e = (const SymbolTableEntry *) 0;\n";
 
@@ -1305,7 +1326,7 @@ out << "\n\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found!\\n\\n\";\n"
+    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for variable \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1352,7 +1373,7 @@ out << "\n\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found!\\n\\n\";\n"
+    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for piecewise-linear function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1412,7 +1433,7 @@ out << ")\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found!\\n\\n\";\n"
+    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1513,7 +1534,7 @@ out << ")\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found!\\n\\n\";\n"
+    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for array \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1599,7 +1620,7 @@ out << ")\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found!\\n\\n\";\n"
+    << "   cerr << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for array n_elements function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"

@@ -73,6 +73,8 @@ class CodeGenerator {
 
       bool Panic;
 
+      bool AllowMultipleReads;
+
    public:
 
       CodeGenerator();
@@ -82,11 +84,13 @@ class CodeGenerator {
 
       void set_class_name(const char *);
 
-      void set_file_prefix(const char *); 
+      void set_file_prefix(const char *);
 
       void set_hh();
 
       void set_nopanic();
+
+      void set_multiple_reads(bool);
 
       void process(const char * config_filename);
 
