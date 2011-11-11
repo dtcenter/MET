@@ -24,6 +24,8 @@
 //                                    fcst/obs init_hour options
 //   002    11/07/11  Holmes          Added use of command line class to
 //                                    parse the command line arguments.
+//   003    11/10/11  Holmes          Added code to enable reading of
+//                                    multiple config files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -31,9 +33,11 @@ using namespace std;
 
 #include <iostream>
 #include <fstream>
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
@@ -47,6 +51,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static const char * default_config_filename = "MET_BASE/data/config/MODEAnalysisConfig_default";
 
 static ConcatString config_filename;
 
@@ -107,6 +113,8 @@ int main(int argc, char * argv [])
 
 {
 
+char default_conf_file[PATH_MAX];
+
 // Set handler to be called for memory allocation error
 set_new_handler(oom);
 
@@ -127,7 +135,16 @@ if ( debug )  {
 
 if ( config_filename.length() > 0 )  {
 
+      //
+      // first read the default config file and then read the user's
+      //
+   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   config.read(default_conf_file);
+   if (debug)
+      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
    config.read(config_filename);
+   if (debug)
+      cout << "\n\n  Reading user config file \"" << config_filename << "\"\n\n" << flush;
 
    config_to_att(config, config_atts);
 
