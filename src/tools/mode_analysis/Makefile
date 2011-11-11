@@ -57,7 +57,7 @@ gen_sources: $(GEN_SOURCES)
 mode_analysis_Conf.h mode_analysis_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEAnalysisConfig_default
 	@ echo
 	@ rm -f mode_analysis_Conf.h mode_analysis_Conf.cc
-	$(ECONFIG_CODEGEN) -class mode_analysis_Conf -outfile mode_analysis_Conf -nopanic $(CONFIG_TEMPLATE_DIR)/MODEAnalysisConfig_default
+	$(ECONFIG_CODEGEN) -class mode_analysis_Conf -outfile mode_analysis_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/MODEAnalysisConfig_default
 
 
 ########################################################################
