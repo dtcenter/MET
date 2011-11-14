@@ -42,8 +42,10 @@
 //                    number of input files/accumulation intervals.
 //                    Add lat/lon variables to NetCDF.
 //   010    04/19/11  Halley Gotway  Bugfix for -add option.
-//   022    10/20/11  Holmes         Added use of command line class to
+//   011    10/20/11  Holmes         Added use of command line class to
 //                                   parse the command line arguments.
+//   012    11/14/11  Halley Gotway  Bugfix for -add option when
+//                     when handling missing data values.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -591,13 +593,16 @@ void sum_grib_files(Grid &grid, GribRecord &rec) {
                n = wd.two_to_one(x, y);
                v = wd.get_xy_double(x, y);
 
+               // Check for bad data
                if(is_bad_data(pcp_data[n]) ||
                   is_bad_data(v)) {
                   pcp_data[n] = bad_data_float;
                }
+               // Otherwise, increment sums
                else {
                   pcp_data[n] += v;
                }
+
             }
          }
       } // end else
@@ -841,9 +846,14 @@ void do_add_command() {
             v = wd.get_xy_double(x, y);
 
             // Check for bad data
-            if(is_bad_data(v)) pcp_data[n] = bad_data_double;
+            if(is_bad_data(pcp_data[n]) ||
+               is_bad_data(v)) {
+               pcp_data[n] = bad_data_float;
+            }
             // Otherwise, increment sums
-            else               pcp_data[n] += v;
+            else {
+               pcp_data[n] += v;
+            }
 
          } // end for y
       } // end for x
@@ -870,7 +880,7 @@ void do_sub_command() {
    unixtime valid_time1, valid_time2;
    unixtime nc_init_time, nc_valid_time;
    int x, y, n, nc_accum;
-   double v1, v2, v;
+   double v1, v2;
    char init_time1_str[max_str_len], init_time2_str[max_str_len];
    char valid_time1_str[max_str_len], valid_time2_str[max_str_len];
    char accum1_str[max_str_len], accum2_str[max_str_len];
@@ -974,13 +984,13 @@ void do_sub_command() {
 
          // Check for bad data
          if(is_bad_data(v1) ||
-            is_bad_data(v2))         v = bad_data_double;
-
-         // Perform subtraction
-         else                        v = v1 - v2;
-
-         // Store the new value
-         pcp_data[n] = v;
+            is_bad_data(v2)) {
+            pcp_data[n] = bad_data_float;
+         }
+         // Otherwise, perform subtraction
+         else {
+            pcp_data[n] = v1 - v2;
+         }
 
       } // end for y
    } // end for x
