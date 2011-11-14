@@ -57,7 +57,7 @@ gen_sources: $(GEN_SOURCES)
 wavelet_stat_Conf.h wavelet_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WaveletStatConfig_default
 	@ echo
 	@ rm -f wavelet_stat_Conf.h wavelet_stat_Conf.cc
-	$(ECONFIG_CODEGEN) -class wavelet_stat_Conf -outfile wavelet_stat_Conf $(CONFIG_TEMPLATE_DIR)/WaveletStatConfig_default
+	$(ECONFIG_CODEGEN) -class wavelet_stat_Conf -outfile wavelet_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/WaveletStatConfig_default
 
 
 ########################################################################

@@ -56,7 +56,7 @@ gen_sources: $(GEN_SOURCES)
 grid_stat_Conf.h grid_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/GridStatConfig_default
 	@ echo
 	@ rm -f grid_stat_Conf.h grid_stat_Conf.cc
-	$(ECONFIG_CODEGEN) -class grid_stat_Conf -outfile grid_stat_Conf $(CONFIG_TEMPLATE_DIR)/GridStatConfig_default
+	$(ECONFIG_CODEGEN) -class grid_stat_Conf -outfile grid_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/GridStatConfig_default
 
 
 ########################################################################

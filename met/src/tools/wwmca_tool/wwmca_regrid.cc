@@ -8,12 +8,19 @@ using namespace std;
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <cmath>
 
 #include "vx_util.h"
 
 #include "wwmca_regrid_Conf.h"
 #include "wwmca_ref.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char * default_config_filename = "MET_BASE/data/config/WWMCARegridConfig_default";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -70,6 +77,9 @@ int main(int argc, char * argv [])
 
 {
 
+char default_conf_file[PATH_MAX];
+
+
 program_name = get_short_name(argv[0]);
 
 if ( argc == 1 )  usage();
@@ -90,8 +100,16 @@ if ( cline.n() != 0 )  usage();
 sanity_check();
 
    //
-   // read config file
+   // read the default config file first and then read the user's
    //
+
+replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+
+cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+
+config.read(default_conf_file);
+
+cout << "\n\n  Reading user config file \"" << config_filename << "\"\n\n" << flush;
 
 config.read(config_filename);
 

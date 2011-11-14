@@ -27,8 +27,10 @@
 //                    config file alpha value list
 //   004    08/16/11  Halley Gotway   Reimplementation of GO Index job
 //                    with addition of generalized Skill Score Index
-//   005    10/26/11  Holmes         Added use of command line class to
-//                                   parse the command line arguments.
+//   005    10/26/11  Holmes          Added use of command line class to
+//                                    parse the command line arguments.
+//   006    11/14/11  Holmes          Added code to enable reading of
+//                                    multiple config files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -77,6 +79,7 @@ static void set_verbosity(int);
 int main(int argc, char * argv []) {
    int i, n;
    Result r;
+   char default_conf_file[PATH_MAX];
 
    //
    // Set handler to be called for memory allocation error
@@ -95,9 +98,14 @@ int main(int argc, char * argv []) {
    if(config_file.length() != 0) {
 
       //
-      // Read the config file
+      // Read the default config file first and then read the user's
       //
-      if(verbosity > 2) {
+      replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+      if(verbosity > 0) {
+         cout << "Reading Default Config: " << default_conf_file << "\n" << flush;
+      }
+      conf.read(default_conf_file);
+      if(verbosity > 0) {
          cout << "Reading Config: " << config_file << "\n" << flush;
       }
       conf.read(config_file);
