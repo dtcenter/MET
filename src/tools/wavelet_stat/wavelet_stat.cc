@@ -17,13 +17,15 @@
 //   000    04/02/08  Halley Gotway   New
 //   001    11/05/09  Halley Gotway   Generalize to compare two
 //                    different fcst and obs fields.
-//   002    05/27/10  Halley Gotway  Add -fcst_valid, -fcst_lead,
+//   002    05/27/10  Halley Gotway   Add -fcst_valid, -fcst_lead,
 //                    -obs_valid, and -obs_lead command line options.
-//   003    06/30/10  Halley Gotway  Enhance grid equality checks.
-//   004    08/09/10  Halley Gotway  Add valid time variable attributes
+//   003    06/30/10  Halley Gotway   Enhance grid equality checks.
+//   004    08/09/10  Halley Gotway   Add valid time variable attributes
 //                    to NetCDF output.
-//   005    10/20/11  Holmes         Added use of command line class to
-//                                   parse the command line arguments.
+//   005    10/20/11  Holmes          Added use of command line class to
+//                                    parse the command line arguments.
+//   006    11/14/11  Holmes          Added code to enable reading of
+//                                    multiple config files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -145,6 +147,7 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    char tmp_str[PATH_MAX];
    FileType ftype, otype;
+   char default_conf_file[PATH_MAX];
 
    // Set the default output directory
    replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
@@ -202,7 +205,13 @@ void process_command_line(int argc, char **argv) {
    ftype = get_file_type(fcst_file);
    otype = get_file_type(obs_file);
 
-   // Read the config file
+   // Read the default config file first and then read the user's
+   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   if (verbosity > 0)
+      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+   conf_info.read_config(default_conf_file, ftype, otype);
+   if (verbosity > 0)
+      cout << "\n\n  Reading user config file \"" << config_file << "\"\n\n" << flush;
    conf_info.read_config(config_file, ftype, otype);
 
    // Set the MET data directory

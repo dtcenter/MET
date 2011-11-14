@@ -57,7 +57,7 @@ gen_sources: $(GEN_SOURCES)
 point_stat_Conf.h point_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PointStatConfig_default
 	@ echo
 	@ rm -f point_stat_Conf.h point_stat_Conf.cc
-	$(ECONFIG_CODEGEN) -class point_stat_Conf -outfile point_stat_Conf $(CONFIG_TEMPLATE_DIR)/PointStatConfig_default
+	$(ECONFIG_CODEGEN) -class point_stat_Conf -outfile point_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/PointStatConfig_default
 
 
 ########################################################################

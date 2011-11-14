@@ -60,7 +60,7 @@ gen_sources: $(GEN_SOURCES)
 pb2nc_Conf.h pb2nc_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
 	@ echo
 	@ rm -f pb2nc_Conf.h pb2nc_Conf.cc
-	$(ECONFIG_CODEGEN) -class pb2nc_Conf -outfile pb2nc_Conf $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
+	$(ECONFIG_CODEGEN) -class pb2nc_Conf -outfile pb2nc_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
 
 
 ########################################################################

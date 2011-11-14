@@ -60,6 +60,8 @@
 //   021    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
 //   022    10/28/11  Holmes         Added use of command line class to
 //                                   parse the command line arguments.
+//   023    11/14/11  Holmes         Added code to enable reading of
+//                                   multiple config files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -149,6 +151,7 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    FileType ftype, otype;
+   char default_conf_file[PATH_MAX];
 
    out_dir << MET_BASE << "/out/grid_stat";
 
@@ -202,7 +205,13 @@ void process_command_line(int argc, char **argv) {
    ftype = get_file_type(fcst_file);
    otype = get_file_type(obs_file);
 
-   // Read the config file
+   // Read the default config file first and then read the user's
+   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   if (verbosity > 0)
+      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+   conf_info.read_config(default_conf_file, ftype, otype);
+   if (verbosity > 0)
+      cout << "\n\n  Reading user config file \"" << config_file << "\"\n\n" << flush;
    conf_info.read_config(config_file, ftype, otype);
 
    // Set the model name

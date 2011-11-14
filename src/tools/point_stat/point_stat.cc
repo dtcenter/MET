@@ -62,6 +62,8 @@
 //   020    06/30/10  Halley Gotway  Enhance grid equality checks.
 //   021    10/20/11  Holmes         Added use of command line class to
 //                                   parse the command line arguments.
+//   022    11/14/11  Holmes         Added code to enable reading of
+//                                   multiple config files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -157,6 +159,7 @@ void process_command_line(int argc, char **argv) {
    int i;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    FileType ftype;
+   char default_conf_file[PATH_MAX];
 
    out_dir << MET_BASE << "/out/point_stat";
 
@@ -231,7 +234,13 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   // Read the config file
+   // Read the default config file first and then read the user's
+   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   if (verbosity > 0)
+      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+   conf_info.read_config(default_conf_file, ftype);
+   if (verbosity > 0)
+      cout << "\n\n  Reading user config file \"" << config_file << "\"\n\n" << flush;
    conf_info.read_config(config_file, ftype);
 
    // Set the model name

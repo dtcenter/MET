@@ -59,7 +59,7 @@ gen_sources: $(GEN_SOURCES)
 stat_analysis_Conf.h stat_analysis_Conf.cc: $(CONFIG_TEMPLATE_DIR)/STATAnalysisConfig_default
 	@ echo
 	@ rm -f stat_analysis_Conf.h stat_analysis_Conf.cc
-	$(ECONFIG_CODEGEN) -class stat_analysis_Conf -outfile stat_analysis_Conf $(CONFIG_TEMPLATE_DIR)/STATAnalysisConfig_default
+	$(ECONFIG_CODEGEN) -class stat_analysis_Conf -outfile stat_analysis_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/STATAnalysisConfig_default
 
 
 ########################################################################

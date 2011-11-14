@@ -22,6 +22,8 @@
 //   003    10/18/11  Halley Gotway   When the user requests verification
 //                    in the config file, check that obs files have been
 //                    specified on the command line.
+//   004    11/14/11  Holmes          Added code to enable reading of
+//                                    multiple config files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -138,6 +140,8 @@ void process_command_line(int argc, char **argv) {
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    FileType ftype, otype;
    CommandLine cline;
+   char default_conf_file[PATH_MAX];
+
 
    // Set default output directory
    out_dir << MET_BASE << "/out/ensemble_stat";
@@ -258,7 +262,13 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   // Read the config file
+   // Read the default config file first and then read the user's
+   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   if (verbosity > 0)
+      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+   conf_info.read_config(default_conf_file, ftype, otype);
+   if (verbosity > 0)
+      cout << "\n\n  Reading user config file \"" << config_file << "\"\n\n" << flush;
    conf_info.read_config(config_file, ftype, otype);
 
    // Set the model name

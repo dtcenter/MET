@@ -75,7 +75,7 @@ gridhemisphere_to_string.h gridhemisphere_to_string.cc: wwmca_ref.h
 wwmca_regrid_Conf.h wwmca_regrid_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WWMCARegridConfig_default
 	@ echo
 	@ rm -f wwmca_regrid_Conf.h wwmca_regrid_Conf.cc
-	$(ECONFIG_CODEGEN) -class wwmca_regrid_Conf -outfile wwmca_regrid_Conf $(CONFIG_TEMPLATE_DIR)/WWMCARegridConfig_default
+	$(ECONFIG_CODEGEN) -class wwmca_regrid_Conf -outfile wwmca_regrid_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/WWMCARegridConfig_default
 
 
 ########################################################################
@@ -165,7 +165,7 @@ nc_output.o: nc_output.cc wwmca_ref.o
 wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o wwmca_regrid wwmca_regrid.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_analysis_util -lvx_met_util -lvx_wrfmode -lvx_render \

@@ -16,7 +16,7 @@
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
 //   001    05/03/10  Halley Gotway   Add fcst/obs/diff variable name
-//                    arrays to keep track of NetCDF variables. 
+//                    arrays to keep track of NetCDF variables.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -61,6 +61,8 @@ using namespace std;
 // Constants
 //
 ////////////////////////////////////////////////////////////////////////
+
+static const char * default_config_filename = "MET_BASE/data/config/GridStatConfig_default";
 
 static const char * program_name = "grid_stat";
 

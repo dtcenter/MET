@@ -42,6 +42,8 @@
 //                     descriptor.
 //   010    10/28/11  Holmes         Added use of command line class to
 //                                   parse the command line arguments.
+//   011    11/14/11  Holmes         Added code to enable reading of
+//                                   multiple config files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -80,6 +82,8 @@ using namespace std;
 //
 // Constants
 //
+
+static const char * default_config_filename = "MET_BASE/data/config/PB2NCConfig_default";
 
 static const char *program_name = "pb2nc";
 
@@ -328,6 +332,7 @@ void initialize() {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    char tmp_str[max_str_len], tmp2_str[max_str_len];
+   char default_conf_file[PATH_MAX];
 
    //
    // check for zero arguments
@@ -382,8 +387,14 @@ void process_command_line(int argc, char **argv) {
    config_file = cline[2];
 
    //
-   // Parse the PB2NC config file
+   // Read the default config file first and then read the user's
    //
+   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   if (verbosity > 0) {
+      cout << "Reading Default Config File:\t" << default_conf_file
+           << "\n" << flush;
+   }
+   conf.read(default_conf_file);
    if(verbosity > 0) {
       cout << "Reading Config File:\t" << config_file
            << "\n" << flush;

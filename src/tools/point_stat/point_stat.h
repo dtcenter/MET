@@ -63,6 +63,8 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
+static const char * default_config_filename = "MET_BASE/data/config/PointStatConfig_default";
+
 static const char * program_name = "point_stat";
 
 // Text file abbreviations
