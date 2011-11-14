@@ -42,6 +42,8 @@
 //                    number of input files/accumulation intervals.
 //                    Add lat/lon variables to NetCDF.
 //   010    04/19/11  Halley Gotway  Bugfix for -add option.
+//   011    11/14/11  Halley Gotway  Bugfix for -add option when
+//                     when handling missing data values.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -848,9 +850,14 @@ void do_add_command(int argc, char **argv) {
             v = wd.get_xy_double(x, y);
 
             // Check for bad data
-            if(is_bad_data(v)) pcp_data[n] = bad_data_double;
+            if(is_bad_data(pcp_data[n]) ||
+               is_bad_data(v)) {
+               pcp_data[n] = bad_data_float;
+            }
             // Otherwise, increment sums
-            else               pcp_data[n] += v;
+            else {
+               pcp_data[n] += v;
+            }
 
          } // end for y
       } // end for x
