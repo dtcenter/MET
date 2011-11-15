@@ -19,7 +19,6 @@ using namespace std;
 #include <sys/types.h>
 
 #include "point_stat_conf_info.h"
-#include "util_constants.h"
 
 ////////////////////////////////////////////////////////////////////////
 
