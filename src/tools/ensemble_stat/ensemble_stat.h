@@ -63,6 +63,10 @@ using namespace std;
 
 static const char * program_name = "ensemble_stat";
 
+// Default configuration file name
+static const char * default_config_filename =
+   "MET_BASE/data/config/EnsembleStatConfig_default";
+
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
    "rhist", "orank"

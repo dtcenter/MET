@@ -21,12 +21,6 @@ using namespace std;
 #include "wavelet_stat_conf_info.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-// Default configuration file name
-static const char * default_config_filename =
-   "MET_BASE/data/config/WaveletStatConfig_default";
-
-////////////////////////////////////////////////////////////////////////
 //
 //  Code for class WaveletStatConfInfo
 //
@@ -97,17 +91,15 @@ void WaveletStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void WaveletStatConfInfo::read_config(const char *file_name,
+void WaveletStatConfInfo::read_config(const char *default_file_name,
+                                      const char *user_file_name,
                                       FileType ftype, FileType otype) {
-   char default_conf_file[PATH_MAX];
 
    // Read the default config file
-   replace_string(met_base_str, MET_BASE,
-                  default_config_filename, default_conf_file);
-   conf.read(default_conf_file);
+   conf.read(default_file_name);
 
    // Read the user-specified config file
-   conf.read(file_name);
+   conf.read(user_file_name);
 
    // Process the configuration file
    process_config(ftype, otype);

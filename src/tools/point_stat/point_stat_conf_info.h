@@ -109,7 +109,7 @@ class PointStatConfInfo {
 
       void clear();
 
-      void read_config   (const char *, FileType);
+      void read_config   (const char *, const char *, FileType);
       void process_config(FileType);
       void process_masks (const Grid &);
       void set_gc_pd     ();
