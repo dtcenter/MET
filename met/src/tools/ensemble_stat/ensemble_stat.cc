@@ -140,6 +140,7 @@ void process_command_line(int argc, char **argv) {
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    FileType ftype, otype;
    CommandLine cline;
+   char default_config_file[PATH_MAX];
 
    // Set default output directory
    out_dir << MET_BASE << "/out/ensemble_stat";
@@ -260,8 +261,18 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   // Read the config file
-   conf_info.read_config(config_file, ftype, otype);
+   // Create the default config file name
+   replace_string(met_base_str, MET_BASE,
+                  default_config_filename, default_config_file);
+
+   // List the config files
+   if(verbosity > 0) {
+      cout << "Default Config File: " << default_config_file << "\n"
+           << "User Config File: "    << config_file << "\n" << flush;
+   }
+
+   // Read the config files
+   conf_info.read_config(default_config_file, config_file, ftype, otype);
 
    // Set the model name
    shc.set_model(conf_info.conf.model().sval());
@@ -276,9 +287,6 @@ void process_command_line(int argc, char **argv) {
 
    // List the input files
    if(verbosity > 0) {
-
-      cout << "Configuration File:\n"
-           << "   " << config_file << "\n" << flush;
 
       cout << "Ensemble Files["
            << ens_file_list.n_elements() << "]:\n" << flush;

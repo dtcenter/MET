@@ -151,6 +151,7 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    FileType ftype, otype;
+   char default_config_file[PATH_MAX];
 
    out_dir << MET_BASE << "/out/grid_stat";
 
@@ -204,8 +205,18 @@ void process_command_line(int argc, char **argv) {
    ftype = get_file_type(fcst_file);
    otype = get_file_type(obs_file);
 
-   // Read the config file
-   conf_info.read_config(config_file, ftype, otype);
+   // Create the default config file name
+   replace_string(met_base_str, MET_BASE,
+                  default_config_filename, default_config_file);
+
+   // List the config files
+   if(verbosity > 0) {
+      cout << "Default Config File: " << default_config_file << "\n"
+           << "User Config File: "    << config_file << "\n" << flush;
+   }
+
+   // Read the config files
+   conf_info.read_config(default_config_file, config_file, ftype, otype);
 
    // Set the model name
    shc.set_model(conf_info.conf.model().sval());
@@ -218,8 +229,7 @@ void process_command_line(int argc, char **argv) {
    // List the input files
    if(verbosity > 0) {
       cout << "Forecast File: " << fcst_file   << "\n"
-           << "Observation File: " << obs_file    << "\n"
-           << "Configuration File: " << config_file << "\n" << flush;
+           << "Observation File: " << obs_file    << "\n" << flush;
    }
 
    return;

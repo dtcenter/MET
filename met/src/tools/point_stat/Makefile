@@ -75,8 +75,7 @@ point_stat_Conf.o: point_stat_Conf.cc
 
 point_stat_conf_info.o: point_stat_conf_info.cc
 	@ echo
-	$(CXX) point_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-	-c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) point_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################

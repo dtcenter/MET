@@ -74,8 +74,7 @@ ensemble_stat_Conf.o: ensemble_stat_Conf.cc
 
 ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
 	@ echo
-	$(CXX) ensemble_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-	-c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) ensemble_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
