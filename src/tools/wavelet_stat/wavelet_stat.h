@@ -63,8 +63,6 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char * default_config_filename = "MET_BASE/data/config/WaveletStatConfig_default";
-
 static const char * program_name = "wavelet_stat";
 
 static const char * default_out_dir = "MET_BASE/out/wavelet_stat";

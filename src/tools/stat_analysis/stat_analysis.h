@@ -49,9 +49,10 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char * default_config_filename = "MET_BASE/data/config/STATAnalysisConfig_default";
-
 static const char * program_name = "stat_analysis";
+
+static const char * default_config_filename =
+   "MET_BASE/data/config/STATAnalysisConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
 //

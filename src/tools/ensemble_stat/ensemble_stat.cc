@@ -140,8 +140,6 @@ void process_command_line(int argc, char **argv) {
    char tmp_str[max_str_len], tmp2_str[max_str_len];
    FileType ftype, otype;
    CommandLine cline;
-   char default_conf_file[PATH_MAX];
-
 
    // Set default output directory
    out_dir << MET_BASE << "/out/ensemble_stat";
@@ -262,13 +260,7 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   // Read the default config file first and then read the user's
-   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
-   if (verbosity > 0)
-      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
-   conf_info.read_config(default_conf_file, ftype, otype);
-   if (verbosity > 0)
-      cout << "\n\n  Reading user config file \"" << config_file << "\"\n\n" << flush;
+   // Read the config file
    conf_info.read_config(config_file, ftype, otype);
 
    // Set the model name

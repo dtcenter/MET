@@ -396,7 +396,7 @@ void process_command_line(int argc, char **argv) {
    }
    conf.read(default_conf_file);
    if(verbosity > 0) {
-      cout << "Reading Config File:\t" << config_file
+      cout << "Reading User Config File:\t" << config_file
            << "\n" << flush;
    }
    conf.read(config_file);
