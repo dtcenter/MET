@@ -41,6 +41,8 @@
 //                    to NetCDF output.
 //   011    10/28/11  Holmes         Added use of command line class to
 //                                   parse the command line arguments.
+//   012    11/15/11  Holmes         Added code to enable reading of
+//                                   multiple config files.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -101,6 +103,8 @@ enum EngineType {
 };
 
 ///////////////////////////////////////////////////////////////////////
+
+static const char * default_config_filename = "MET_BASE/data/config/MODEConfig_default";
 
 static const char * default_out_dir = "MET_BASE/out/mode";
 
@@ -265,6 +269,7 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    char tmp_str[PATH_MAX];
    FileType ftype, otype;
+   char default_conf_file[PATH_MAX];
 
    // Set the default output directory
    replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
@@ -333,8 +338,18 @@ void process_command_line(int argc, char **argv) {
       merge_config_file = match_config_file;
 
    //
-   // Read the match config file
+   // Read the default config file first and then read the user's match config file
    //
+   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+
+   if (verbosity > 0)
+      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+
+   engine.wconf.read(default_conf_file);
+
+   if (verbosity > 0)
+      cout << "\n\n  Reading user config file \"" << match_config_file << "\"\n\n" << flush;
+
    engine.wconf.read(match_config_file);
 
    //
