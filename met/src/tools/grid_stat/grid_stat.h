@@ -62,8 +62,6 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char * default_config_filename = "MET_BASE/data/config/GridStatConfig_default";
-
 static const char * program_name = "grid_stat";
 
 // Text file abbreviations
