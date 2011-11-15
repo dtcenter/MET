@@ -63,7 +63,7 @@ gen_sources: $(GEN_SOURCES)
 mode_Conf.h mode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 	@ echo
 	@ rm -f mode_Conf.h mode_Conf.cc
-	$(ECONFIG_CODEGEN) -class mode_Conf -outfile mode_Conf $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
+	$(ECONFIG_CODEGEN) -class mode_Conf -outfile mode_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 
 
 ########################################################################
