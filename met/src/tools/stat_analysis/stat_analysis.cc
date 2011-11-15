@@ -106,7 +106,7 @@ int main(int argc, char * argv []) {
       }
       conf.read(default_conf_file);
       if(verbosity > 0) {
-         cout << "Reading Config: " << config_file << "\n" << flush;
+         cout << "Reading User Config: " << config_file << "\n" << flush;
       }
       conf.read(config_file);
 

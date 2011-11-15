@@ -21,6 +21,12 @@ using namespace std;
 #include "ensemble_stat_conf_info.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+// Default configuration file name
+static const char * default_config_filename =
+   "MET_BASE/data/config/EnsembleStatConfig_default";
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class EnsembleStatConfInfo
 //
@@ -98,8 +104,14 @@ void EnsembleStatConfInfo::clear() {
 
 void EnsembleStatConfInfo::read_config(const char *file_name,
                                        FileType ftype, FileType otype) {
+   char default_conf_file[PATH_MAX];
 
-   // Call the config read routine
+   // Read the default config file
+   replace_string(met_base_str, MET_BASE,
+                  default_config_filename, default_conf_file);
+   conf.read(default_conf_file);
+
+   // Read the user-specified config file
    conf.read(file_name);
 
    // Process the configuration file
