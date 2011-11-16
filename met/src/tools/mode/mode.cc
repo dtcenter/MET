@@ -110,7 +110,8 @@ static const char * default_out_dir = "MET_BASE/out/mode";
 
 static const int unmatched_id = -1;
 
-// Input configuration file
+// Input configuration files
+static ConcatString default_config_file;
 static ConcatString match_config_file;
 static ConcatString merge_config_file;
 
@@ -269,7 +270,6 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    char tmp_str[PATH_MAX];
    FileType ftype, otype;
-   char default_conf_file[PATH_MAX];
 
    // Set the default output directory
    replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
@@ -278,7 +278,7 @@ void process_command_line(int argc, char **argv) {
    //
    // check for zero arguments
    //
-   if (argc == 1)
+   if(argc == 1)
       usage();
 
    //
@@ -316,7 +316,7 @@ void process_command_line(int argc, char **argv) {
    // forecast filename, the observation filename, and the config
    // filename.
    //
-   if (cline.n() != 3)
+   if(cline.n() != 3)
       usage();
 
    //
@@ -334,22 +334,28 @@ void process_command_line(int argc, char **argv) {
    // If the merge config file was not set using the optional
    // arguments, then set it to the match config file
    //
-   if (merge_config_file.length() == 0)
+   if(merge_config_file.length() == 0)
       merge_config_file = match_config_file;
 
    //
    // Read the default config file first and then read the user's match config file
    //
-   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   replace_string(met_base_str, MET_BASE,
+                  default_config_filename, tmp_str);
+   default_config_file = tmp_str;
 
-   if (verbosity > 0)
-      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+   // List the config files
+   if(verbosity > 0) {
+      cout << "Default Config File: " << default_config_file << "\n"
+           << "Match Config File: " << match_config_file << "\n"
+           << "Merge Config File: " << merge_config_file << "\n"
+           << flush;
+   }
 
-   engine.wconf.read(default_conf_file);
-
-   if (verbosity > 0)
-      cout << "\n\n  Reading user config file \"" << match_config_file << "\"\n\n" << flush;
-
+   //
+   // Read the default and match config files
+   //
+   engine.wconf.read(default_config_file);
    engine.wconf.read(match_config_file);
 
    //
@@ -387,8 +393,6 @@ void process_command_line(int argc, char **argv) {
    if(verbosity > 0) {
       cout << "Forecast File: " << fcst_file << "\n"
            << "Observation File: " << obs_file << "\n"
-           << "Match Config File: " << match_config_file << "\n"
-           << "Merge Config File: " << merge_config_file << "\n"
            << flush;
    }
 
@@ -560,7 +564,7 @@ void process_fcst_obs_files() {
 
          cout << "Performing merging (" << merge_str << ") in the forecast field.\n" << flush;
       }
-      engine.do_fcst_merging(merge_config_file);
+      engine.do_fcst_merging(default_config_file, merge_config_file);
 
       if(verbosity > 0) {
 
@@ -575,7 +579,7 @@ void process_fcst_obs_files() {
 
          cout << "Performing merging (" << merge_str << ") in the observation field.\n" << flush;
       }
-      engine.do_obs_merging(merge_config_file);
+      engine.do_obs_merging(default_config_file, merge_config_file);
 
       if(verbosity > 0) {
          cout << "Remaining: " << engine.n_fcst << " forecast objects "

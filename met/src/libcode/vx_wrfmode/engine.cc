@@ -658,7 +658,7 @@ void Engine::do_obs_splitting() {
 
 void Engine::do_fcst_merging() {
 
-   do_fcst_merging("");
+   do_fcst_merging("", "");
 
    return;
 }
@@ -667,24 +667,27 @@ void Engine::do_fcst_merging() {
 
 void Engine::do_obs_merging() {
 
-   do_obs_merging("");
+   do_obs_merging("", "");
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_merging(const char *config_merge) {
+void Engine::do_fcst_merging(const char *default_config,
+                             const char *merge_config) {
 
    if(need_fcst_thresh) do_fcst_thresholding();
 
    if(!need_fcst_merge) return;
 
    if(wconf.fcst_merge_flag().ival() == 1 ||
-      wconf.fcst_merge_flag().ival() == 3)   do_fcst_merge_thresh();
+      wconf.fcst_merge_flag().ival() == 3)
+      do_fcst_merge_thresh();
 
    if(wconf.fcst_merge_flag().ival() == 2 ||
-      wconf.fcst_merge_flag().ival() == 3)   do_fcst_merge_engine(config_merge);
+      wconf.fcst_merge_flag().ival() == 3)
+      do_fcst_merge_engine(default_config, merge_config);
 
    //
    // Done
@@ -699,17 +702,20 @@ void Engine::do_fcst_merging(const char *config_merge) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_merging(const char *config_merge) {
+void Engine::do_obs_merging(const char *default_config,
+                            const char *merge_config) {
 
    if(need_obs_thresh) do_obs_thresholding();
 
    if(!need_obs_merge) return;
 
    if(wconf.obs_merge_flag().ival() == 1 ||
-      wconf.obs_merge_flag().ival() == 3)   do_obs_merge_thresh();
+      wconf.obs_merge_flag().ival() == 3)
+      do_obs_merge_thresh();
 
    if(wconf.obs_merge_flag().ival() == 2 ||
-      wconf.obs_merge_flag().ival() == 3)   do_obs_merge_engine(config_merge);
+      wconf.obs_merge_flag().ival() == 3)
+      do_obs_merge_engine(default_config, merge_config);
 
    //
    // Done
@@ -1258,7 +1264,8 @@ void Engine::do_obs_merge_thresh() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_merge_engine(const char *config_file) {
+void Engine::do_fcst_merge_engine(const char *default_config,
+                                  const char *merge_config) {
    int i, j;
    WrfData fcst_merge_split;
    char tmp_str[max_str_len];
@@ -1287,8 +1294,9 @@ void Engine::do_fcst_merge_engine(const char *config_file) {
    // Specify the configuration for the forecast merging fuzzy engine
    //
    fcst_engine->ctable = ctable;
-   if(config_file) {
-      fcst_engine->wconf.read(config_file);
+   if(default_config && merge_config) {
+      fcst_engine->wconf.read(default_config);
+      fcst_engine->wconf.read(merge_config);
       fcst_engine->process_engine_config();
       replace_string(met_base_str, MET_BASE,
                      fcst_engine->wconf.mode_color_table().sval(), tmp_str);
@@ -1436,7 +1444,8 @@ void Engine::do_fcst_merge_engine(const char *config_file) {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_merge_engine(const char *config_file) {
+void Engine::do_obs_merge_engine(const char *default_config,
+                                 const char *merge_config) {
    int i, j;
    WrfData obs_merge_split;
    char tmp_str[max_str_len];
@@ -1466,8 +1475,9 @@ void Engine::do_obs_merge_engine(const char *config_file) {
    // Specify the configuration for the observation merging fuzzy engine
    //
    obs_engine->ctable = ctable;
-   if(config_file) {
-      obs_engine->wconf.read(config_file);
+   if(default_config && merge_config) {
+      obs_engine->wconf.read(default_config);
+      obs_engine->wconf.read(merge_config);
       obs_engine->process_engine_config();
       replace_string(met_base_str, MET_BASE,
                      obs_engine->wconf.mode_color_table().sval(),

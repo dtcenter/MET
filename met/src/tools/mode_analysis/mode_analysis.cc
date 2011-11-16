@@ -139,12 +139,12 @@ if ( config_filename.length() > 0 )  {
       // first read the default config file and then read the user's
       //
    replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+   if (debug)
+      cout << "Reading Default Config File: " << default_conf_file << "\n" << flush;
    config.read(default_conf_file);
    if (debug)
-      cout << "\n\n  Reading default config file \"" << default_conf_file << "\"\n\n" << flush;
+      cout << "Reading User Config File: " << config_filename << "\n" << flush;
    config.read(config_filename);
-   if (debug)
-      cout << "\n\n  Reading user config file \"" << config_filename << "\"\n\n" << flush;
 
    config_to_att(config, config_atts);
 
