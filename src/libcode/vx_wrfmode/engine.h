@@ -187,8 +187,10 @@ class Engine {
       void do_fcst_merging();
       void do_obs_merging();
 
-      void do_fcst_merging(const char *);
-      void do_obs_merging(const char *);
+      void do_fcst_merging(const char *default_config,
+                           const char *merge_config);
+      void do_obs_merging(const char *default_config,
+                          const char *merge_config);
 
       void do_matching();
 
@@ -219,8 +221,10 @@ class Engine {
       // using a Fuzzy Engine
       //
 
-      void do_fcst_merge_engine(const char *);
-      void do_obs_merge_engine(const char *);
+      void do_fcst_merge_engine(const char *default_config,
+                                const char *merge_config);
+      void do_obs_merge_engine(const char *default_config,
+                               const char *merge_config);
 
       //
       // Perform match between the forecast and observation field
