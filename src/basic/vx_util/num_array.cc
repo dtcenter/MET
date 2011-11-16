@@ -546,7 +546,7 @@ double NumArray::percentile_array(double t)
 
 {
 
-double v;
+double v = bad_data_double;
 
 //
 // Ensure that the array is sorted before computing the percentile.
@@ -661,8 +661,9 @@ double NumArray::mode() const
 {
 
 int j, k, max_n, max_j;
-double v;
 NumArray uniq_v, uniq_n;
+
+double v = bad_data_double;
 
 for(j=0; j<Nelements; j++) {
 
@@ -709,14 +710,9 @@ double NumArray::min() const
 
 {
 
-int j;
+if(Nelements == 0) return(bad_data_double);
 
-if(Nelements < 1) {
-   cerr << "\n\nNumArray::min() -> "
-        << "the array cannot be zero length\n\n"
-        << flush;
-   exit(1);
-}
+int j;
 
 double min_v = e[0];
 
@@ -737,14 +733,9 @@ double NumArray::max() const
 
 {
 
-int j;
+if(Nelements == 0) return(bad_data_double);
 
-if(Nelements < 1) {
-   cerr << "\n\nNumArray::max() -> "
-        << "the array cannot be zero length\n\n"
-        << flush;
-   exit(1);
-}
+int j;
 
 double max_v = e[0];
 

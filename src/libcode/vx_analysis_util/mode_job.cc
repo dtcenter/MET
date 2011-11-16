@@ -22,6 +22,7 @@ using namespace std;
 #include <cmath>
 
 #include "ascii_table.h"
+#include "math_constants.h"
 
 #include "analysis_utils.h"
 #include "mode_job.h"
@@ -418,6 +419,9 @@ const int ncols = 12;
 
 table.set_size(Nfields + 2, ncols);
 
+table.set_bad_data_value(bad_data_double);
+table.set_bad_data_str(na_str);
+
 table.set_ics(3);
 
 k = 0;
@@ -445,41 +449,20 @@ for (j=0; j<Nfields; ++j)  {
    r = j + 2;
 
    table.set_entry(r, k++, lc_mode_columns[columns[j]]);
-
-   sprintf(junk, "%i", accums[j].n_elements());
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].min());
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].max());
-   table.set_entry(r, k++, junk);
+   table.set_entry(r, k++, accums[j].n_elements());
+   table.set_entry(r, k++, accums[j].min());
+   table.set_entry(r, k++, accums[j].max());
 
    accums[j].compute_mean_stdev(mean, stdev);
+   table.set_entry(r, k++, mean);
+   table.set_entry(r, k++, stdev);
 
-   sprintf(junk, "%.2f", mean);
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", stdev);
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].percentile_array(0.10));
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].percentile_array(0.25));
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].percentile_array(0.50));
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].percentile_array(0.75));
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].percentile_array(0.90));
-   table.set_entry(r, k++, junk);
-
-   sprintf(junk, "%.2f", accums[j].sum());
-   table.set_entry(r, k++, junk);
+   table.set_entry(r, k++, accums[j].percentile_array(0.10));
+   table.set_entry(r, k++, accums[j].percentile_array(0.25));
+   table.set_entry(r, k++, accums[j].percentile_array(0.50));
+   table.set_entry(r, k++, accums[j].percentile_array(0.75));
+   table.set_entry(r, k++, accums[j].percentile_array(0.90));
+   table.set_entry(r, k++, accums[j].sum());
 
 }
 
@@ -807,6 +790,9 @@ AsciiTable table;
 
 
 table.set_size(Nrows, Ncols);
+
+table.set_bad_data_value(bad_data_double);
+table.set_bad_data_str(na_str);
 
 table.set_ics(3);
 

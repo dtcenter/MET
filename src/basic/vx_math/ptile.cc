@@ -59,11 +59,15 @@ double percentile(const double *ordered_array, int n, double t)
 {
 
 int index;
-double p, delta;
+double delta; 
+double p = bad_data_double;
 
-index = nint(floor((n - 1)*t));
-delta = (n-1)*t - index;
-p = (1 - delta)*ordered_array[index] + delta*ordered_array[index+1];
+if ( n > 0 ) {
+   index = nint(floor((n - 1)*t));
+   delta = (n-1)*t - index;
+   p = (1 - delta)*ordered_array[index] + delta*ordered_array[index+1];
+}
+
 return ( p );
 
 }
