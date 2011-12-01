@@ -74,6 +74,7 @@ bool get_grib_record(GribFile &grib_file, GribRecord &grib_record,
                      const int req_lead_sec,
                      WrfData &wd, Grid &gr, int &verbosity) {
    int i_rec, gc;
+   bool status;
 
    // Store the GRIB code
    gc = gc_info.code;
@@ -88,20 +89,22 @@ bool get_grib_record(GribFile &grib_file, GribRecord &grib_record,
 
    // Derive the wind direction
    if(i_rec < 0 && gc == wdir_grib_code) {
-      derive_wdir_record(grib_file, grib_record, wd, gr, gc_info,
-                         req_vld_ut, req_lead_sec, verbosity);
+      status = derive_wdir_record(grib_file, grib_record, wd, gr, gc_info,
+                                  req_vld_ut, req_lead_sec, verbosity);
    }
    // Derive the wind speed
    else if(i_rec < 0 && gc == wind_grib_code) {
-      derive_wind_record(grib_file, grib_record, wd, gr, gc_info,
-                         req_vld_ut, req_lead_sec, verbosity);
+      status = derive_wind_record(grib_file, grib_record, wd, gr, gc_info,
+                                  req_vld_ut, req_lead_sec, verbosity);
    }
    // Read the GRIB record found
    else {
-      read_grib_record(grib_file, grib_record, i_rec, gc_info, wd, gr, verbosity);
+      status = true;
+      read_grib_record(grib_file, grib_record, i_rec, gc_info,
+                       wd, gr, verbosity);
    }
 
-   return(true);
+   return(status);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -722,7 +725,7 @@ void read_single_grib_record(GribFile &grib_file, GribRecord &grib_record,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
+bool derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
                         WrfData &wd, Grid &gr, const GCInfo &gc_info,
                         const unixtime req_vld_ut, const int req_lead_sec,
                         int verbosity) {
@@ -750,11 +753,11 @@ void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
    v_rec = find_grib_record(grib_file, vgrd_info, req_vld_ut, req_lead_sec);
 
    if(u_rec < 0 || v_rec < 0) {
-      cerr << "\n\nERROR: derive_wdir_record() -> "
+      cerr << "\n\n***WARNING***: derive_wdir_record() -> "
            << "can't find the UGRD and/or VGRD record for level values "
            << l1 << " and " << l2 << " when trying to derive the wind "
            << "direction field\n\n" << flush;
-      exit(1);
+      return(false);
    }
 
    //
@@ -769,10 +772,10 @@ void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
    //
    if(u_wd.get_nx() != v_wd.get_nx() ||
       u_wd.get_ny() != v_wd.get_ny()) {
-      cerr << "\n\nERROR: derive_wdir_record() -> "
+      cerr << "\n\n***WARNING***: derive_wdir_record() -> "
            << "the grid dimensions for the U and V components don't match"
            << ".\n\n" << flush;
-      exit(1);
+      return(false);
    }
 
    //
@@ -836,12 +839,12 @@ void derive_wdir_record(GribFile &grib_file, GribRecord &grib_record,
 
    if(data) { delete data; data = (double *) 0; }
 
-   return;
+   return(true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
+bool derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
                         WrfData &wd, Grid &gr, const GCInfo &gc_info,
                         const unixtime req_vld_ut, const int req_lead_sec,
                         int verbosity) {
@@ -868,11 +871,11 @@ void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
    v_rec = find_grib_record(grib_file, vgrd_info, req_vld_ut, req_lead_sec);
 
    if(u_rec < 0 || v_rec < 0) {
-      cerr << "\n\nERROR: derive_wind_record() -> "
+      cerr << "\n\n***WARNING***: derive_wind_record() -> "
            << "can't find the UGRD and/or VGRD record for level values "
            << l1 << " and " << l2 << " when trying to derive the wind speed "
            << "field\n\n" << flush;
-      exit(1);
+      return(false);
    }
 
    //
@@ -887,10 +890,10 @@ void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
    //
    if(u_wd.get_nx() != v_wd.get_nx() ||
       u_wd.get_ny() != v_wd.get_ny()) {
-      cerr << "\n\nERROR: derive_wind_record() -> "
+      cerr << "\n\n***WARNING***: derive_wind_record() -> "
            << "the grid dimensions for the U and V components don't match"
            << ".\n\n" << flush;
-      exit(1);
+      return(false);
    }
 
    //
@@ -954,7 +957,7 @@ void derive_wind_record(GribFile &grib_file, GribRecord &grib_record,
 
    if(data) { delete data; data = (double *) 0; }
 
-   return;
+   return(true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
