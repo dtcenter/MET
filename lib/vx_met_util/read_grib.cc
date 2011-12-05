@@ -190,8 +190,8 @@ int find_grib_record(GribFile &grib_file, const GCInfo &gc_info,
             read_pds_prob(r, pcode, pthresh_lo, pthresh_hi);
 
             if(gc_info.pcode != pcode ||
-               !is_eq(gc_info.pthresh_lo, pthresh_lo) ||
-               !is_eq(gc_info.pthresh_hi, pthresh_hi)) continue;
+               !is_eq(gc_info.pthresh_lo, pthresh_lo, 10E-5) ||
+               !is_eq(gc_info.pthresh_hi, pthresh_hi, 10E-5)) continue;
          }
 
          //
