@@ -1983,8 +1983,10 @@ void clean_up() {
    if(vx_flag) finish_txt_files();
 
    // List the output NetCDF files
-   for(i=0; i<out_nc_file_list.n_elements(); i++) {
-      cout << "Output file: " << out_nc_file_list[i] << "\n" << flush;
+   if(verbosity > 0) {
+      for(i=0; i<out_nc_file_list.n_elements(); i++) {
+         cout << "Output file: " << out_nc_file_list[i] << "\n" << flush;
+      }
    }
 
    // Deallocate threshold count arrays
