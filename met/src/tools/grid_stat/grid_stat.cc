@@ -62,6 +62,8 @@
 //                                   parse the command line arguments.
 //   023    11/14/11  Holmes         Added code to enable reading of
 //                                   multiple config files.
+//   024    12/09/11  Halley Gotway  When zero matched pairs are found
+//                    print the status message before continuing.
 //
 ////////////////////////////////////////////////////////////////////////
 
