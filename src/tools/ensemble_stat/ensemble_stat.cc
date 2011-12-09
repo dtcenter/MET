@@ -24,6 +24,9 @@
 //                    specified on the command line.
 //   004    11/14/11  Holmes          Added code to enable reading of
 //                                    multiple config files.
+//   005    12/09/11  Halley Gotway   When gridded observations are
+//          missing, print a warning and continue rather than exiting
+//          with error status.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1033,11 +1036,11 @@ void process_grid_vx() {
 
       // Check if the observation field was found
       if(n_miss == grid_obs_file_list.n_elements()) {
-         cerr << "\n\nERROR: process_grid_vx() -> "
+         cout << "\n\n***WARNING***: process_grid_vx() -> "
               << conf_info.gc_pd[i].obs_gci.info_str
               << " not found in observation files.\n"
               << flush;
-         exit(1);
+         continue;
       }
 
       // Set the observation lead time
