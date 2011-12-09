@@ -467,9 +467,6 @@ void process_scores() {
                        conf_info.mask_wd[k],
                        f_na, o_na);
 
-            // Continue if no pairs were found
-            if(f_na.n_elements() == 0) continue;
-
             // Set the mask name
             shc.set_mask(conf_info.mask_name[k]);
 
@@ -486,6 +483,9 @@ void process_scores() {
                     << ", using " << f_na.n_elements() << " pairs.\n"
                     << flush;
             }
+
+            // Continue if no pairs were found
+            if(f_na.n_elements() == 0) continue;
 
             // Compute CTS scores
             if(conf_info.fcst_gci[i].pflag == 0 &&
