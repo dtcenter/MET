@@ -1,0 +1,221 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default wavelet_stat configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Specify a name to designate the model being verified.  This name will be
+// written to the second column of the ASCII output generated.
+//
+model = "WRF";
+
+//
+// Specify a comma-separated list of fields to be verified.  The forecast and
+// observation fields may be specified separately.  If the obs_field parameter
+// is left blank, it will default to the contents of fcst_field.
+//
+// Each field is specified as a GRIB code or abbreviation followed by an
+// accumulation or vertical level indicator for GRIB files or as a variable name
+// followed by a list of dimensions for NetCDF files output from p_interp or MET.
+//
+// Specifying verification fields for GRIB files:
+//    GC/ANNN for accumulation interval NNN
+//    GC/ZNNN for vertical level NNN
+//    GC/PNNN for pressure level NNN in hPa
+//    GC/PNNN-NNN for a range of pressure levels in hPa
+//    GC/LNNN for a generic level type
+//    GC/RNNN for a specific GRIB record number
+//    Where GC is the number of or abbreviation for the grib code
+//    to be verified.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+// Specifying verification fields for NetCDF files:
+//    var_name(i,...,j,*,*) for a single field
+//    Where var_name is the name of the NetCDF variable,
+//    and i,...,j specifies fixed dimension values,
+//    and *,* specifies the two dimensions for the gridded field.
+//
+// e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ]; for GRIB input
+// e.g. fcst_field[] = [ "QVAPOR(0,5,*,*)", "TT(0,5,*,*)" ]; for NetCDF input
+//
+fcst_field[] = [ "61/A12" ];
+obs_field[]  = [ "APCP_12(*,*)" ];
+
+//
+// Specify a comma-separated list of groups of thresholds to be applied to the
+// fields listed above.  Thresholds for the forecast and observation fields
+// may be specified separately.  If the obs_thresh parameter is left blank,
+// it will default to the contents of fcst_thresh.
+//
+// At least one threshold must be provided for each field listed above.  The
+// lengths of the "fcst_field" and "fcst_thresh" arrays must match, as must
+// lengths of the "obs_field" and "obs_thresh" arrays.  To apply multiple
+// thresholds to a field, separate the threshold values with a space.
+//
+// Each threshold must be preceded by a two letter indicator for the type of
+// thresholding to be performed:
+//    'lt' for less than     'le' for less than or equal to
+//    'eq' for equal to      'ne' for not equal to
+//    'gt' for greater than  'ge' for greater than or equal to
+//
+// e.g. fcst_thresh[] = [ "gt80", "gt273" ];
+//
+fcst_thresh[] = [ "gt0.0 ge5.0" ];
+obs_thresh[]  = [];
+
+//
+// If the mask_missing_flag is set, the missing data in one field will
+// be used to mask the other field as follows:
+// (0) Do not apply
+// (1) Mask the forecast field with the missing data in the observation field
+// (2) Mask the observation field using the missing data in the forecast field
+// (3) Mask both fields using the missing data in the other field
+//
+mask_missing_flag = 0;
+
+//
+// Specify a flag value to determine how to perform the grid decomposition.
+// Wavelets may only be applied to datasets that are n by n where n is an
+// integer power of 2.  This flag determines how the grid decomposition is
+// to be handled, as follows:
+//    0 = Tile the input data using tiles of dimension n by n where n
+//        is the largest integer power of 2 less than the smallest
+//        dimension of the input data.  Center as many tiles as possible
+//        without allowing overlap.
+//    1 = Tile the input data using the tiles specified below.
+//    2 = Pad the input data out to the nearest integer power of 2.
+//
+grid_decomp_flag = 0;
+
+//
+// Specify tiling parameters to be used when the grid_decomp_flag is set
+// to 2.  The tile_xll and tile_yll arrays are used to specify the
+// lower-left (x, y) coordinates of the tiles.  The tile_n parameter
+// specifies the dimension for all tiles and must be an integer power of 2.
+//
+tile_xll[] = [0];
+tile_yll[] = [0];
+tile_dim   = 0;
+
+//
+// Specify a flag value to determine the wavelet to be used.  The flag
+// values are interpreted as follows:
+//    0 = Haar wavelet
+//    1 = Centered-Haar wavelet
+//    2 = Daubechies wavelet
+//    3 = Centered-Daubechies wavelet
+//    4 = Bspline wavelet
+//    5 = Centered-Bspline wavelet
+//
+wavelet_flag = 0;
+
+//
+// Specify the member of the wavelet family to be used.
+// Supported member numbers for Haar wavelets:
+//    k = 2
+// Supported member numbers for Daubechies wavelets:
+//    k = 4, 6, 8, 10, 12, 14, 16, 18, 20
+// Supported member numbers for Bspline wavelets:
+//    k = 103, 105, 202, 204, 206, 208, 301, 303, 305, 307, 309
+//
+wavelet_k = 2;
+
+//
+// Specify flags to indicate the type of data to be output:
+//    (1) STAT and ISC Text Files, Intensity Scale Data:
+//           Total (TOTAL),
+//           Number of Scales (NSCALE),
+//           Mean Squared Error (MSE),
+//           Intensity-Scale Skill Score (ISC),
+//           Forecast Energy Squared (FENERGY2),
+//           Observation Energy Squared (OENERGY2),
+//           Base Rate (BASER),
+//           Frequency Bias (FBIAS)
+//
+//    (2) NetCDF File containing fields for the raw data, thresholded data,
+//        and thresholded data decomposed by scale.  A non-zero value indicates
+//        that this NetCDF file should be produced.  A value of 0 indicates
+//        that it should not be produced.
+//
+//    (3) PostScript File containing plots summarizing the method.  A non-zero
+//        value indicates that this NetCDF file should be produced.  A value
+//        of 0 indicates that it should not be produced.
+//
+// The value for flag (1) is interpreted as follows:
+//    (0) Do not generate output of this type
+//    (1) Write output to a STAT file
+//    (2) Write output to a STAT file and a text file
+//
+output_flag[] = [ 2, 1, 1 ];
+
+////////////////////////////////////////////////////////////////////////
+//
+// Plotting Information
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// The location of the data directory containing data files used for
+// plotting.
+//
+// MET_BASE may be used in the path for the data directory.
+//
+met_data_dir = "MET_BASE/data";
+
+//
+// Color table files to be used for plotting the raw and difference
+// fields.  If the values in these color tables range from 0 to 1, the
+// colors will be rescaled to match the range of the raw data.
+// Otherwise, the values specified in the colortable will be used.
+// Use a value of -9999 to specify a color for the missing data other
+// than the default of white.
+//
+// MET_BASE may be used in the path for the colortable file.
+//
+fcst_raw_color_table = "MET_BASE/data/colortables/met_default.ctable";
+obs_raw_color_table  = "MET_BASE/data/colortables/met_default.ctable";
+wvlt_color_table     = "MET_BASE/data/colortables/NCL_colortables/BlWhRe.ctable";
+
+//
+// Min and max data values to be plotted for the forecast and
+// observation fields.  If set to non-zero values, the forecast and
+// observation raw color tables specified above will be rescaled to
+// match the specified range.
+//
+fcst_raw_plot_min = 0.0;
+fcst_raw_plot_max = 0.0;
+obs_raw_plot_min  = 0.0;
+obs_raw_plot_max  = 0.0;
+
+//
+// Min and max data values to be plotted for the decomposed wavelet
+// fields.  If set to non-zero values, the wavelet color table
+// specified above will be rescaled to match the specified range.
+//
+wvlt_plot_min = -1.0;
+wvlt_plot_max =  1.0;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Misc
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// Specify the GRIB Table 2 parameter table version number to be used
+// for interpreting GRIB codes.
+// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+grib_ptv = 2;
+
+//
+// Prefix to be used for the output file names.
+//
+output_prefix = "";
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V3.0";

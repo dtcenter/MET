@@ -1,0 +1,32 @@
+
+////////////////////////////////////////////////////////////////////////
+
+#ifndef  __DATA_2D_UTILS_H__
+#define  __DATA_2D_UTILS_H__
+
+////////////////////////////////////////////////////////////////////////
+
+#include "vx_grid.h"
+#include "data_plane.h"
+
+////////////////////////////////////////////////////////////////////////
+
+extern bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
+                        DataPlane &wdir);
+
+extern bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
+                        DataPlane &wind);
+
+extern void rotate_wdir_grid_to_earth(const DataPlane &wdir2d,
+                                      const Grid &,
+                                      DataPlane &wdir2d_rot);
+
+extern bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
+                                    const Grid &,
+                                    DataPlane &u2d_rot, DataPlane &v2d_rot);
+
+////////////////////////////////////////////////////////////////////////
+
+#endif   /*  __DATA_2D_UTILS_H__  */
+
+////////////////////////////////////////////////////////////////////////
