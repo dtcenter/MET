@@ -1,0 +1,142 @@
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2011
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+########################################################################
+#
+# Makefile for the grid_stat tool
+#
+########################################################################
+
+
+EXECUTABLES = grid_stat
+
+
+OBJECTS     = grid_stat_Conf.o       \
+              grid_stat_conf_info.o
+
+
+LIBRARIES   =
+
+
+GEN_SOURCES = grid_stat_Conf.h   \
+              grid_stat_Conf.cc
+
+
+########################################################################
+
+
+HEADERS     =
+
+
+########################################################################
+
+
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished Making the grid_stat Tool ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+
+grid_stat_Conf.h grid_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/GridStatConfig_default
+	@ echo
+	@ rm -f grid_stat_Conf.h grid_stat_Conf.cc
+	$(ECONFIG_CODEGEN) -class grid_stat_Conf -outfile grid_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/GridStatConfig_default
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+grid_stat_Conf.o: grid_stat_Conf.cc
+	@ echo
+	$(CXX) grid_stat_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+
+
+grid_stat_conf_info.o: grid_stat_conf_info.cc
+	@ echo
+	$(CXX) grid_stat_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+
+
+########################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
+
+########################################################################
+
+
+   ##
+   ##  executables
+   ##
+
+
+grid_stat: grid_stat.cc $(OBJECTS)
+	@ echo
+	$(CXX) -o $(EXECUTABLES) grid_stat.cc $(OBJECTS) \
+	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-lvx_stat_out \
+	-lvx_statistics \
+	-lvx_shapedata \
+	-lvx_gsl_prob \
+	-lvx_analysis_util \
+	-lvx_data2d_factory \
+	-lvx_data2d_grib \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d \
+	-lvx_nc_util \
+	-lvx_grid \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_econfig \
+	-lvx_util \
+	-lvx_color \
+	-lvx_log \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl \
+	$(CXX_LIBS)
+	cp $(EXECUTABLES) $(MET_BIN_DIR)
+
+
+########################################################################
+
+
+clean:
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
+	rm -f $(MET_BIN_DIR)/grid_stat
+
+
+########################################################################
+
+
+.PHONY: all clean
+
+
+########################################################################
+
+

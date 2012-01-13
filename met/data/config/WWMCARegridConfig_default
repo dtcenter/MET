@@ -1,0 +1,106 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  sample WWMCA regridding tool config file
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Name
+   //
+   //       or
+   //
+   //  lambert  Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1 [ standard_parallel 2]
+   //
+   //       or
+   //
+   //  stereo   Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
+   //
+   //       or
+   //
+   //  latlon   Nx Ny lat_ll lon_ll delta_lat delta_lon
+   //
+   //       or
+   //
+   //  mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+   //
+
+
+To_Grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  which interpolation method to use
+   //
+
+interp_method = "average";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  interpolation width:  must be odd and >= 1
+   //
+   //       a value of 1 always uses "nearest neighbor" interpolation
+   //
+   //       regardless of the "interp_method" value above
+   //
+
+interp_width  = 5;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  what fraction of the values in the interpolation square
+   //
+   //    need to be "good" in order to return a "good" result?
+   //
+
+good_percent  = 0;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  info on data field for netcdf output file
+   //
+
+
+variable_name = "Cloud_Pct";
+
+grib_code     = 100;   //  well, why not?
+
+units         = "percent";
+
+long_name     = "cloud cover percent";
+
+level         = "SFC";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  maximum pixel age in minutes
+   //
+
+max_minutes   = 120;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+

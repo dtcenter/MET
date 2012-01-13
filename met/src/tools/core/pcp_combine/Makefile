@@ -1,0 +1,106 @@
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2011
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+########################################################################
+#
+# Makefile for the pcp_combine tool
+#
+########################################################################
+
+
+EXECUTABLES = pcp_combine
+
+
+OBJECTS     =
+
+
+LIBRARIES   =
+
+
+########################################################################
+
+
+HEADERS     =
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	@ echo
+	@ echo "*** Finished Making the pcp_combine Tool ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  objects
+   ##
+
+
+########################################################################
+
+
+   ##
+   ##  libraries
+   ##
+
+
+########################################################################
+
+
+   ##
+   ##  executables
+   ##
+
+
+pcp_combine: pcp_combine.cc $(OBJECTS)
+	@ echo
+	$(CXX) -o $(EXECUTABLES) pcp_combine.cc $(OBJECTS) \
+	$(CXX_FLAGS) \
+     -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
+     -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+     -lvx_data2d \
+     -lvx_data2d_grib \
+     -lvx_data2d_factory \
+     -lvx_data2d_nc_met \
+     -lvx_nc_util \
+     -lvx_data2d \
+     -lvx_data2d_nc_pinterp \
+     -lvx_grid \
+     -lvx_util \
+     -lvx_math \
+     -lvx_cal \
+     -lvx_log  \
+     -lvx_color  \
+     -lm -lnetcdf_c++ -lnetcdf \
+     $(CXX_LIBS)
+	cp $(EXECUTABLES) $(MET_BIN_DIR)
+
+
+
+
+########################################################################
+
+
+clean:
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f $(MET_BIN_DIR)/pcp_combine
+
+
+########################################################################
+
+
+.PHONY: all clean
+
+
+########################################################################
+
+

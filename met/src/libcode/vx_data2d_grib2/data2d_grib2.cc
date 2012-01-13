@@ -1,0 +1,98 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+using namespace std;
+
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <cmath>
+
+#include "data2d_grib2.h"
+#include "vx_math.h"
+#include "vx_log.h"
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class MetGrib2DataFile
+//
+////////////////////////////////////////////////////////////////////////
+
+MetGrib2DataFile::MetGrib2DataFile() {
+
+   grib2_init_from_scratch();
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MetGrib2DataFile::~MetGrib2DataFile() {
+
+   close();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MetGrib2DataFile::MetGrib2DataFile(const MetGrib2DataFile &) {
+
+   mlog << Error << "\n\n  MetGrib2DataFile::MetGrib2DataFile(const MetGrib2DataFile &) -> "
+        << "should never be called!\n\n";
+   exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MetGrib2DataFile & MetGrib2DataFile::operator=(const MetGrib2DataFile &) {
+
+   mlog << Error << "\n\n  MetGrib2DataFile::operator=(const MetGrib2DataFile &) -> "
+        << "should never be called!\n\n";
+   exit(1);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MetGrib2DataFile::grib2_init_from_scratch() {
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MetGrib2DataFile::close() {
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool MetGrib2DataFile::open(const char * _filename) {
+
+   return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MetGrib2DataFile::dump(ostream & out, int depth) const {
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+
+   return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
+                                       DataPlaneArray &plane_array) {
+   return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
