@@ -9,11 +9,9 @@
 ###############################################################################
 #
 # Makefile for the Model Evaluation Tools Project
-# for use with the GNU Compilers
 #
 ###############################################################################
 
-#include user_defs.mk
 include user_defs_dev.mk
 include met_defs.mk
 include export.mk

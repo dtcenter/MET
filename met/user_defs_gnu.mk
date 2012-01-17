@@ -18,33 +18,31 @@ ARCH_FLAGS   = -DBLOCK4
 # Path to the C++ Compiler
 # C++ compiler flags
 # Any additional required libraries
-CXX          = /usr/bin/g++
-CXX_FLAGS    = -Wall -Wshadow -static -g
-#CXX_FLAGS    = -Wall -Wshadow -static -O3
+CXX          = /set/this/path/to/g++
+CXX_FLAGS    = -Wall -Wshadow -static # -g -m32
 CXX_LIBS     =
 
 # Path to the Fortran Compiler
 # Fortran compiler flags
 # Any additional required libraries
-FC           = /usr/bin/gfortran
-FC_FLAGS     = -Wall -Wshadow -static -ff2c -g # -m32
+FC           = /set/this/path/to/gfortran
+FC_FLAGS     = -Wall -Wshadow -static -ff2c # -g -m32
 FC_LIBS      = -lgfortran
 
 # Make print options
-#PRINT_OPTS   = --no-print-directory
-PRINT_OPTS   =
+PRINT_OPTS   = --no-print-directory
 
 # Top level directory for the NetCDF library
 # NetCDF include directory specified as: -I/your/include/path
 # NetCDF library directory specified as: -L/your/library/path
-NETCDF_BASE  = ${NETCDF}
+NETCDF_BASE  = /set/this/path/to/netcdf
 NETCDF_INCS  = -I$(NETCDF_BASE)/include
 NETCDF_LIBS  = -L$(NETCDF_BASE)/lib
 
 # Top level directory for BUFRLIB
 # BUFRLIB include directory specified as: -I/your/include/path
 # BUFRLIB library directory specified as: -L/your/library/path
-BUFR_BASE    = ${BUFRLIB}
+BUFR_BASE    = /set/this/path/to/bufrlib
 BUFR_INCS    = -I$(BUFR_BASE)
 BUFR_LIBS    = -L$(BUFR_BASE)
 
@@ -52,7 +50,7 @@ BUFR_LIBS    = -L$(BUFR_BASE)
 # installed in a standard location.
 # GSL include directory specified as: -I/your/include/path
 # GSL library directory specified as: -L/your/library/path
-GSL_BASE     = ${GSL}
+GSL_BASE     = /set/this/path/to/gsl
 GSL_INCS     = -I$(GSL_BASE)/include
 GSL_LIBS     = -L$(GSL_BASE)/lib
 
@@ -85,9 +83,6 @@ ENABLE_POINT_STAT      = 1
 ENABLE_STAT_ANALYSIS   = 1
 ENABLE_WAVELET_STAT    = 1
 ENABLE_WWMCA           = 1
-
-# Flags to compile support for additional file formats
-WITH_GRIB2             = 1
 
 ###############################################################################
 

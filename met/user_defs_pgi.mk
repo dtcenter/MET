@@ -3,7 +3,8 @@
 ###############################################################################
 
    ##
-   ## Begin Variables to be modified before building
+   ##  Begin Variables to be modified before building
+   ##  Default settings for The Portland Group (PGI) compilers
    ##
 
 ###############################################################################
@@ -17,16 +18,16 @@ ARCH_FLAGS   = -DBLOCK4
 # Path to the C++ Compiler
 # C++ compiler flags
 # Any additional required libraries
-CXX          = /set/this/path/to/g++
-CXX_FLAGS    = -Wall -Wshadow -static # -g -m32
+CXX          = /set/this/path/to/pgCC
+CXX_FLAGS    = -Bstatic # -g
 CXX_LIBS     =
 
 # Path to the Fortran Compiler
 # Fortran compiler flags
 # Any additional required libraries
-FC           = /set/this/path/to/gfortran
-FC_FLAGS     = -Wall -Wshadow -static -ff2c # -g -m32
-FC_LIBS      = -lgfortran
+FC           = /set/this/path/to/pgf77
+FC_FLAGS     = -Bstatic # -g
+FC_LIBS      = -lpgftnrtl -lrt -lpthread
 
 # Make print options
 PRINT_OPTS   = --no-print-directory
@@ -59,27 +60,29 @@ GSL_LIBS     = -L$(GSL_BASE)/lib
 # F2C library directory containing libf2c.a or libg2c.a and specified as:
 # -L/your/library/path
 # Name of the library to be used: -lf2c or -lg2c
-# NOTE: Only required for the GNU g77 Fortran compiler
+# NOTE: Not typically required for the PGI pgf77 Fortran compiler
 F2C_BASE     =
 F2C_INCS     =
 F2C_LIBS     =
 F2C_LIBNAME  =
 
-# Optional flags to enable the compilation of MET tools
-# Specify a zero value to disable the compilation of the tool
-ENABLE_PCP_COMBINE    = 1
-ENABLE_GEN_POLY_MASK  = 1
-ENABLE_MODE           = 1
-ENABLE_GRID_STAT      = 1
-ENABLE_PB2NC          = 1
-ENABLE_ASCII2NC       = 1
-ENABLE_POINT_STAT     = 1
-ENABLE_WAVELET_STAT   = 1
-ENABLE_ENSEMBLE_STAT  = 1
-ENABLE_STAT_ANALYSIS  = 1
-ENABLE_MODE_ANALYSIS  = 1
-ENABLE_PLOT_POINT_OBS = 1
-ENABLE_WWMCA          = 1
+# Optional flags to disable the compilation of MET tools
+# Specify a non-zero value to enable the compilation of the tool
+ENABLE_ASCII2NC        = 1
+ENABLE_ENSEMBLE_STAT   = 1
+ENABLE_GEN_POLY_MASK   = 1
+ENABLE_GRID_STAT       = 1
+ENABLE_MADIS2NC        = 1
+ENABLE_MODE            = 1
+ENABLE_MODE_ANALYSIS   = 1
+ENABLE_PB2NC           = 1
+ENABLE_PCP_COMBINE     = 1
+ENABLE_PLOT_DATA_PLANE = 1
+ENABLE_PLOT_POINT_OBS  = 1
+ENABLE_POINT_STAT      = 1
+ENABLE_STAT_ANALYSIS   = 1
+ENABLE_WAVELET_STAT    = 1
+ENABLE_WWMCA           = 1
 
 ###############################################################################
 
