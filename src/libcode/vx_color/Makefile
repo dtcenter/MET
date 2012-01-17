@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,22 +16,25 @@
 EXECUTABLES =
 
 
-OBJECTS     = cfile.tab.o   \
-              lex.color.o   \
-              color.o       \
-              color_list.o  \
+OBJECTS     = cfile.tab.o \
+              lex.color.o \
+              color.o \
+              color_list.o \
               color_table.o
 
 
 LIBRARIES   = libvx_color.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     = cfile.tab.h    \
-              color.h        \
-              color_list.h   \
+HEADERS     = cfile.tab.h \
+              color.h \
+              color_list.h \
               color_parser.h \
               vx_color.h
 
@@ -39,9 +42,21 @@ HEADERS     = cfile.tab.h    \
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_color Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -106,9 +121,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

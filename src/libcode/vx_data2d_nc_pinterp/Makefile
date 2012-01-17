@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -15,9 +15,9 @@
 
 EXECUTABLES =
               
-OBJECTS     = get_pinterp_grid.o        \
-              pinterp_file.o            \
-              var_info_nc_pinterp.o     \
+OBJECTS     = get_pinterp_grid.o \
+              pinterp_file.o \
+              var_info_nc_pinterp.o \
               data2d_nc_pinterp_utils.o \
               data2d_nc_pinterp.o
 
@@ -31,11 +31,11 @@ GEN_SOURCES =
 ########################################################################
 
 
-HEADERS     = get_pinterp_grid.h        \
-              pinterp_file.h            \
-              var_info_nc_pinterp.h     \
+HEADERS     = get_pinterp_grid.h \
+              pinterp_file.h \
+              var_info_nc_pinterp.h \
               data2d_nc_pinterp_utils.h \
-              data2d_nc_pinterp.h       \
+              data2d_nc_pinterp.h \
               vx_data2d_nc_pinterp.h
 
 
@@ -49,6 +49,11 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 ########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
 
 
 gen_sources: $(GEN_SOURCES)
@@ -106,6 +111,7 @@ libvx_data2d_nc_pinterp.a: $(OBJECTS)
 
 ########################################################################
 
+
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
@@ -115,7 +121,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
+

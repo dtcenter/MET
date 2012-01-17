@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,32 +16,47 @@
 EXECUTABLES =
 
 
-OBJECTS     = nc_var_info.o   \
-              nc_utils.o      \
-              write_netcdf.o  \
-              grid_output.o   \
+OBJECTS     = nc_var_info.o \
+              nc_utils.o \
+              write_netcdf.o \
+              grid_output.o
 
 
 LIBRARIES   = libvx_nc_util.a
+
+
+GEN_SOURCES =
 
 
 ########################################################################
 
 
 HEADERS     = nc_constants.h \
-              nc_var_info.h  \
-              nc_utils.h     \
+              nc_var_info.h \
+              nc_utils.h \
               write_netcdf.h \
-              grid_output.h  \
-              vx_nc_util.h   \
+              grid_output.h \
+              vx_nc_util.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_nc_util Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -106,9 +121,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,27 +16,42 @@
 EXECUTABLES = test_map_region
 
 
-OBJECTS     = map_region.o    \
-              vx_plot_util.o  \
-	      data_plane_plot.o
+OBJECTS     = map_region.o \
+              vx_plot_util.o \
+              data_plane_plot.o
 
 LIBRARIES   = libvx_plot_util.a
 
 
-########################################################################
-
-
-HEADERS     = map_region.h    \
-              vx_plot_util.h  \
-	      data_plane_plot.h
+GEN_SOURCES =
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+HEADERS     = map_region.h \
+              vx_plot_util.h \
+              data_plane_plot.h
+
+
+########################################################################
+
+
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_plot_util Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -82,7 +97,11 @@ libvx_plot_util.a: $(OBJECTS)
    ##
 
 test_map_region: test_map_region.cc $(LIBRARIES)
-	$(CXX) test_map_region.cc $(CXX_FLAGS) $(ARCH_FLAGS) -o test_map_region -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_plot_util -lvx_util -lvx_log -lm
+	$(CXX) test_map_region.cc $(CXX_FLAGS) $(ARCH_FLAGS) -o test_map_region -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_plot_util \
+	-lvx_util \
+	-lvx_log \
+	-lm
 
 
 ########################################################################
@@ -97,9 +116,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

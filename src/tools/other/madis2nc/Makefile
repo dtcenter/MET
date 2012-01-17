@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -22,6 +22,9 @@ OBJECTS     =
 LIBRARIES   =
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
@@ -31,9 +34,21 @@ HEADERS     =
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the madis2nc Tool ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -68,7 +83,7 @@ madis2nc: madis2nc.cc $(OBJECTS)
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_nc_util \
-	-lvx_grid  \
+	-lvx_grid \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
@@ -89,9 +104,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

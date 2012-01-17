@@ -16,16 +16,16 @@
 EXECUTABLES = stat_analysis
 
 
-OBJECTS     = stat_analysis_Conf.o  \
-              aggr_stat_line.o      \
-              parse_stat_line.o     \
+OBJECTS     = stat_analysis_Conf.o \
+              aggr_stat_line.o \
+              parse_stat_line.o \
               stat_analysis_job.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = stat_analysis_Conf.h   \
+GEN_SOURCES = stat_analysis_Conf.h \
               stat_analysis_Conf.cc
 
 
@@ -155,9 +155,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

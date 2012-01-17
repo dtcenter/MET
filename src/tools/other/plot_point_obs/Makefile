@@ -22,6 +22,9 @@ OBJECTS     =
 LIBRARIES   =
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
@@ -31,9 +34,21 @@ HEADERS     =
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the plot_point_obs Tool ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -87,7 +102,8 @@ plot_point_obs: plot_point_obs.cc $(OBJECTS)
 	-lvx_econfig \
 	-lvx_math \
 	-lvx_cal \
-	-lvx_util -lvx_log \
+	-lvx_util \
+	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
@@ -104,9 +120,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

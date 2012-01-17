@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,7 +16,7 @@
 EXECUTABLES =
 
 
-OBJECTS     =  angles.o  \
+OBJECTS     =  angles.o \
                hist.o \
                nint.o \
                nti.o \
@@ -29,7 +29,7 @@ OBJECTS     =  angles.o  \
 LIBRARIES   = libvx_math.a
 
 
-GEN_SOURCES = viewgravity_to_string.cc  \
+GEN_SOURCES = viewgravity_to_string.cc \
               viewgravity_to_string.h
 
 
@@ -39,7 +39,7 @@ GEN_SOURCES = viewgravity_to_string.cc  \
 HEADERS     =  math_constants.h \
                is_bad_data.h \
                trig.h \
-               angles.h  \
+               angles.h \
                hist.h \
                nint.h \
                nti.h \
@@ -53,7 +53,7 @@ HEADERS     =  math_constants.h \
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_math Library ***"
 	@ echo
@@ -62,8 +62,15 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 ########################################################################
 
 
+   ##
+   ##  generated sources
+   ##  call make all since this library is used by source code
+   ##  generation tools
+   ##
+
+
 gen_sources: $(GEN_SOURCES)
-	@ echo
+	@ make all
 
 viewgravity_to_string.cc viewgravity_to_string.h: affine.h
 	@ echo
@@ -141,7 +148,7 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################

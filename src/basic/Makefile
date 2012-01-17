@@ -1,9 +1,15 @@
-
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2012
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ########################################################################
 
 
-all: $(OBJECTS) $(OBJECTS) $(EXECUTABLES)
+all:
 	@ echo
 	@ cd vx_log         && make $(PRINT_OPTS)
 	@ cd vx_cal         && make $(PRINT_OPTS)
@@ -28,4 +34,16 @@ clean:
 
 ########################################################################
 
+
+gen_sources:
+	@ echo
+	@ cd vx_log         && make $(PRINT_OPTS) gen_sources
+	@ cd vx_cal         && make $(PRINT_OPTS) gen_sources
+	@ cd enum_to_string && make $(PRINT_OPTS) gen_sources
+	@ cd vx_math        && make $(PRINT_OPTS) gen_sources
+	@ cd vx_util        && make $(PRINT_OPTS) gen_sources
+	@ cd vx_econfig     && make $(PRINT_OPTS) gen_sources
+
+
+########################################################################
 

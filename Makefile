@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research(UCAR)
 # ** National Center for Atmospheric Research(NCAR)
 # ** Research Applications Lab (RAL)
@@ -37,10 +37,14 @@ clean:
 	rm -f lib/*.a
 	rm -f lib/*.so
 
+###############################################################################
+
+gen_sources:
+	cd src ; $(MAKE) gen_sources $(PRINT_OPTS)
+
 ########################################################################
 
-.PHONY: all clean libs targets gen_sources
+.PHONY: all clean gen_sources
 
 ########################################################################
-
 

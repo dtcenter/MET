@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -13,15 +13,15 @@
 ########################################################################
 
 
-EXECUTABLES = test_read_grib1      \
+EXECUTABLES = test_read_grib1 \
               test_vx_data2d_grib
 
 
-OBJECTS     = grib_classes.o       \
-              grib_strings.o       \
-              grib_utils.o         \
-              var_info_grib.o      \
-              data2d_grib_utils.o  \
+OBJECTS     = grib_classes.o \
+              grib_strings.o \
+              grib_utils.o \
+              var_info_grib.o \
+              data2d_grib_utils.o \
               data2d_grib.o
 
 
@@ -34,11 +34,11 @@ GEN_SOURCES =
 ########################################################################
 
 
-HEADERS     = grib_classes.h       \
-              grib_strings.h       \
-              grib_utils.h         \
-              var_info_grib.h      \
-              data2d_grib_utils.h  \
+HEADERS     = grib_classes.h \
+              grib_strings.h \
+              grib_utils.h \
+              var_info_grib.h \
+              data2d_grib_utils.h \
               data2d_grib.h \
               vx_data2d_grib.h
 
@@ -53,6 +53,11 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 ########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
 
 
 gen_sources: $(GEN_SOURCES)
@@ -116,16 +121,28 @@ test_vx_data2d_grib: $(LIBRARIES) test_vx_data2d_grib.cc
 	-I$(MET_INC_DIR) \
 	-L$(MET_LIB_DIR) \
 	-lvx_data2d_grib \
-	-lvx_data2d -lvx_grid -lvx_util \
-	-lvx_math -lvx_cal -lvx_log
+	-lvx_data2d \
+	-lvx_grid \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log
 
 
 test_read_grib1: test_read_grib1.cc $(LIBRARIES)
 	@ echo
-	$(CXX) test_read_grib1.cc $(CXX_FLAGS) -o test_read_grib1 -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_data2d_grib -lvx_data2d -lvx_grid -lvx_util -lvx_math -lvx_cal -lvx_log
+	$(CXX) test_read_grib1.cc $(CXX_FLAGS) -o test_read_grib1 -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_data2d_grib \
+	-lvx_data2d \
+	-lvx_grid \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log
 
 
 ########################################################################
+
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
@@ -136,7 +153,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
+

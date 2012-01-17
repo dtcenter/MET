@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -13,55 +13,56 @@
 ########################################################################
 
 
-EXECUTABLES  = econfig_codegen
+EXECUTABLES = econfig_codegen
 
 
-LIBRARIES    = libvx_econfig.a
+OBJECTS     = pwl.o \
+              algline.o \
+              icode.o \
+              idstack.o \
+              symtab.o \
+              builtin.o \
+              machine.o \
+              array.o \
+              celltype_to_string.o \
+              stetype_to_string.o \
+              builtin_to_string.o \
+              econfig.tab.o \
+              lex.econfig.o \
+              resulttype_to_string.o \
+              result.o \
+              icodecell_to_result.o \
+              gen.o
 
 
-
-OBJECTS      = pwl.o                   \
-               algline.o               \
-               icode.o                 \
-               idstack.o               \
-               symtab.o                \
-               builtin.o               \
-               machine.o               \
-               array.o                 \
-               celltype_to_string.o    \
-               stetype_to_string.o     \
-               builtin_to_string.o     \
-               econfig.tab.o           \
-               lex.econfig.o           \
-               resulttype_to_string.o  \
-               result.o                \
-               icodecell_to_result.o   \
-               gen.o
+LIBRARIES   = libvx_econfig.a
 
 
-
-HEADERS      = algline.h               \
-               array.h                 \
-               builtin.h               \
-               icode.h                 \
-               idstack.h               \
-               machine.h               \
-               pwl.h                   \
-               scanner_stuff.h         \
-               symtab.h                \
-               result.h                \
-               resulttype_to_string.h  \
-               builtin_to_string.h     \
-               celltype_to_string.h    \
-               stetype_to_string.h     \
-               gen.h                   \
-               icodecell_to_result.h
-
-
-GEN_SOURCES = celltype_to_string.h celltype_to_string.cc      \
-              stetype_to_string.h stetype_to_string.cc        \
-              builtin_to_string.h builtin_to_string.cc        \
+GEN_SOURCES = celltype_to_string.h celltype_to_string.cc \
+              stetype_to_string.h stetype_to_string.cc \
+              builtin_to_string.h builtin_to_string.cc \
               resulttype_to_string.h resulttype_to_string.cc
+
+
+########################################################################
+
+
+HEADERS     = algline.h \
+              array.h \
+              builtin.h \
+              icode.h \
+              idstack.h \
+              machine.h \
+              pwl.h \
+              scanner_stuff.h \
+              symtab.h \
+              result.h \
+              resulttype_to_string.h \
+              builtin_to_string.h \
+              celltype_to_string.h \
+              stetype_to_string.h \
+              gen.h \
+              icodecell_to_result.h
 
 
 ########################################################################
@@ -75,7 +76,7 @@ LEX         = flex --prefix=econfig
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) econfig_codegen
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the econfig_codegen Library ***"
 	@ echo
@@ -84,8 +85,14 @@ all: $(OBJECTS) $(LIBRARIES) econfig_codegen
 ########################################################################
 
 
+   ##
+   ##  generated sources
+   ##  call make all since this library does source code generation
+   ##
+
+
 gen_sources: $(GEN_SOURCES)
-	@ echo
+	@ make all
 
 
 celltype_to_string.h celltype_to_string.cc: icode.h
@@ -201,7 +208,12 @@ libvx_econfig.a: $(OBJECTS)
 
 econfig_codegen: econfig_codegen.cc libvx_econfig.a
 	@ echo
-	$(CXX) econfig_codegen.cc -o econfig_codegen $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_econfig -lvx_cal -lvx_util -lvx_log -lm
+	$(CXX) econfig_codegen.cc -o econfig_codegen $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_econfig \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_log \
+	-lm
 	rm -f $(MET_BIN_DIR)/econfig_codegen
 	cp econfig_codegen $(MET_BIN_DIR)
 
@@ -221,4 +233,9 @@ clean:
 
 ########################################################################
 
+
+.PHONY: all clean gen_sources
+
+
+########################################################################
 

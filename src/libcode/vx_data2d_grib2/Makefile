@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -11,6 +11,9 @@
 # Makefile for the vx_data2d_grib2 library
 #
 ########################################################################
+
+
+EXECUTABLES =
 
 
 OBJECTS     = var_info_grib2.o \
@@ -40,6 +43,11 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 ########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
 
 
 gen_sources: $(GEN_SOURCES)
@@ -90,7 +98,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
+

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,14 +16,14 @@
 EXECUTABLES = ensemble_stat
 
 
-OBJECTS     = ensemble_stat_Conf.o       \
+OBJECTS     = ensemble_stat_Conf.o \
               ensemble_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = ensemble_stat_Conf.h   \
+GEN_SOURCES = ensemble_stat_Conf.h \
               ensemble_stat_Conf.cc
 
 
@@ -134,9 +134,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

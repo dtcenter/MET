@@ -1,15 +1,41 @@
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2012
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
+########################################################################
+#
+# Makefile for the enum_to_string library
+#
 ########################################################################
 
 
 EXECUTABLES = enum_to_string
 
+
+OBJECTS     = enum.tab.o \
+              lex.yy.o \
+              info.o \
+              code.o \
+              scope.o
+
+
 LIBRARIES   = 
 
-OBJECTS     = enum.tab.o lex.yy.o info.o code.o scope.o
 
-HEADERS     = code.h enum.tab.h info.h scope.h
+GEN_SOURCES =
+
+
+########################################################################
+
+
+HEADERS     = code.h \
+              enum.tab.h \
+              info.h \
+              scope.h
 
 
 ########################################################################
@@ -23,10 +49,24 @@ LEX         = flex
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making enum_to_string***"
 	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##  call make all since this library does source code generation
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
+	@ make all
+
 
 ########################################################################
 
@@ -100,6 +140,12 @@ clean:
 	rm -f enum.tab.c enum.output lex.yy.c
 	rm -f $(MET_BIN_DIR)/enum_to_string
 
+
 ########################################################################
 
+
+.PHONY: all clean gen_sources
+
+
+########################################################################
 

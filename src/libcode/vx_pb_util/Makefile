@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,8 +16,8 @@
 EXECUTABLES =
 
 
-OBJECTS     =  pblock.o        \
-               do_blocking.o   \
+OBJECTS     =  pblock.o \
+               do_blocking.o \
                do_unblocking.o \
                copy_bytes.o
 
@@ -25,22 +25,37 @@ OBJECTS     =  pblock.o        \
 LIBRARIES   = libvx_pb_util.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     =  pblock.h        \
-               do_blocking.h   \
+HEADERS     =  pblock.h \
+               do_blocking.h \
                do_unblocking.h \
-               copy_bytes.h    \
+               copy_bytes.h \
                vx_pb_util.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_pb_util Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -102,9 +117,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

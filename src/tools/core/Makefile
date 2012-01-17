@@ -1,4 +1,10 @@
-
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2012
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ########################################################################
 
@@ -10,13 +16,12 @@ endif
 ifeq ($(ENABLE_GRID_STAT), 1)
 	@ cd grid_stat      ; $(MAKE) $(PRINT_OPTS)
 endif
-# ifeq ($(ENABLE_MODE), 1)
+ifeq ($(ENABLE_MODE), 1)
 	@ cd mode           ; $(MAKE) $(PRINT_OPTS)
-# endif
+endif
 ifeq ($(ENABLE_MODE_ANALYSIS), 1)
 	@ cd mode_analysis  ; $(MAKE) $(PRINT_OPTS)
 endif
-# 	@ cd pbtime         ; $(MAKE) $(PRINT_OPTS)
 ifeq ($(ENABLE_PCP_COMBINE), 1)
 	@ cd pcp_combine    ; $(MAKE) $(PRINT_OPTS)
 endif
@@ -48,3 +53,15 @@ clean:
 ########################################################################
 
 
+gen_sources:
+	@ cd ensemble_stat  ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd grid_stat      ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd mode           ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd mode_analysis  ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd pcp_combine    ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd point_stat     ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd stat_analysis  ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd wavelet_stat   ; $(MAKE) $(PRINT_OPTS) gen_sources
+
+
+########################################################################

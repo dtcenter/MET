@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -22,6 +22,9 @@ OBJECTS     =
 LIBRARIES   =
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
@@ -31,9 +34,21 @@ HEADERS     =
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the pcp_combine Tool ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -65,26 +80,24 @@ pcp_combine: pcp_combine.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) pcp_combine.cc $(OBJECTS) \
 	$(CXX_FLAGS) \
-     -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
-     -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
-     -lvx_data2d \
-     -lvx_data2d_grib \
-     -lvx_data2d_factory \
-     -lvx_data2d_nc_met \
-     -lvx_nc_util \
-     -lvx_data2d \
-     -lvx_data2d_nc_pinterp \
-     -lvx_grid \
-     -lvx_util \
-     -lvx_math \
-     -lvx_cal \
-     -lvx_log  \
-     -lvx_color  \
-     -lm -lnetcdf_c++ -lnetcdf \
-     $(CXX_LIBS)
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-lvx_data2d \
+	-lvx_data2d_grib \
+	-lvx_data2d_factory \
+	-lvx_data2d_nc_met \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_data2d_nc_pinterp \
+	-lvx_grid \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lvx_color \
+	-lm -lnetcdf_c++ -lnetcdf \
+	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
-
-
 
 
 ########################################################################
@@ -98,9 +111,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

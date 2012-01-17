@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -21,7 +21,7 @@ OBJECTS     = level_info.o \
               grdfiletype_to_string.o \
               leveltype_to_string.o \
               data_class.o \
-              data2d_utils.o  \
+              data2d_utils.o
 
 
 LIBRARIES   = libvx_data2d.a
@@ -56,6 +56,11 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 ########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
 
 
 gen_sources: $(GEN_SOURCES)
@@ -136,9 +141,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -15,10 +15,10 @@
 
 EXECUTABLES = test_read_nc_met
               
-OBJECTS     = get_met_grid.o        \
-              met_file.o            \
-              var_info_nc_met.o     \
-              data2d_nc_met.o       \
+OBJECTS     = get_met_grid.o \
+              met_file.o \
+              var_info_nc_met.o \
+              data2d_nc_met.o
 
 
 LIBRARIES   = libvx_data2d_nc_met.a
@@ -30,13 +30,11 @@ GEN_SOURCES =
 ########################################################################
 
 
-HEADERS     = get_met_grid.h        \
-              met_file.h            \
-              var_info_nc_met.h     \
-              data2d_nc_met.h       \
+HEADERS     = get_met_grid.h \
+              met_file.h \
+              var_info_nc_met.h \
+              data2d_nc_met.h \
               vx_data2d_nc_met.h
-
-#data2d_nc_met_utils.h \
 
 
 ########################################################################
@@ -49,6 +47,11 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 ########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
 
 
 gen_sources: $(GEN_SOURCES)
@@ -105,13 +108,19 @@ test_read_nc_met: $(LIBRARIES) test_read_nc_met.cc
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
-	-lvx_data2d_nc_met -lvx_nc_util \
-	-lvx_data2d -lvx_grid -lvx_util \
-	-lvx_math -lvx_cal -lvx_log \
+	-lvx_data2d_nc_met \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_grid \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
 	-lnetcdf_c++ -lnetcdf
 
 
 ########################################################################
+
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
@@ -122,7 +131,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
+
