@@ -4,47 +4,45 @@
 
    ##
    ##  Begin Variables to be modified before building
-   ##  Default settings for GNU compilers
+   ##  Default settings for IBM compilers
    ##
 
 ###############################################################################
 
 # Path to GNU Make command
-MAKE         = /usr/bin/make
+MAKE         = /usr/local/bin/gmake
 
 # Architecture flags
-ARCH_FLAGS   = -DBLOCK4
+ARCH_FLAGS   = -DIBM -DBIGENDIAN -DBLOCK4
 
 # Path to the C++ Compiler
 # C++ compiler flags
 # Any additional required libraries
-CXX          = /usr/bin/g++
-CXX_FLAGS    = -Wall -Wshadow -static -g
-#CXX_FLAGS    = -Wall -Wshadow -static -O3
+CXX          = /set/this/path/to/xlC
+CXX_FLAGS    = # -g -qfullpath
 CXX_LIBS     =
 
 # Path to the Fortran Compiler
 # Fortran compiler flags
 # Any additional required libraries
-FC           = /usr/bin/gfortran
-FC_FLAGS     = -Wall -Wshadow -static -ff2c -g # -m32
-FC_LIBS      = -lgfortran
+FC           = /set/this/path/to/xlf
+FC_FLAGS     = -qextname # -g -qfullpath
+FC_LIBS      = -lxlf90
 
 # Make print options
-#PRINT_OPTS   = --no-print-directory
-PRINT_OPTS   =
+PRINT_OPTS   = --no-print-directory
 
 # Top level directory for the NetCDF library
 # NetCDF include directory specified as: -I/your/include/path
 # NetCDF library directory specified as: -L/your/library/path
-NETCDF_BASE  = ${NETCDF}
+NETCDF_BASE  = /set/this/path/to/netcdf
 NETCDF_INCS  = -I$(NETCDF_BASE)/include
 NETCDF_LIBS  = -L$(NETCDF_BASE)/lib
 
 # Top level directory for BUFRLIB
 # BUFRLIB include directory specified as: -I/your/include/path
 # BUFRLIB library directory specified as: -L/your/library/path
-BUFR_BASE    = ${BUFRLIB}
+BUFR_BASE    = /set/this/path/to/bufrlib
 BUFR_INCS    = -I$(BUFR_BASE)
 BUFR_LIBS    = -L$(BUFR_BASE)
 
@@ -52,7 +50,7 @@ BUFR_LIBS    = -L$(BUFR_BASE)
 # installed in a standard location.
 # GSL include directory specified as: -I/your/include/path
 # GSL library directory specified as: -L/your/library/path
-GSL_BASE     = ${GSL}
+GSL_BASE     = /set/this/path/to/gsl
 GSL_INCS     = -I$(GSL_BASE)/include
 GSL_LIBS     = -L$(GSL_BASE)/lib
 
@@ -62,11 +60,11 @@ GSL_LIBS     = -L$(GSL_BASE)/lib
 # F2C library directory containing libf2c.a or libg2c.a and specified as:
 # -L/your/library/path
 # Name of the library to be used: -lf2c or -lg2c
-# NOTE: Only required for the GNU g77 Fortran compiler
-F2C_BASE     =
-F2C_INCS     =
-F2C_LIBS     =
-F2C_LIBNAME  =
+# NOTE: Typically required for the IBM xlf Fortran compiler
+F2C_BASE     = /set/this/path/to/libf2c
+F2C_INCS     = -I$(F2C_BASE)
+F2C_LIBS     = -L$(F2C_BASE)
+F2C_LIBNAME  = -lf2c
 
 # Optional flags to disable the compilation of MET tools
 # Specify a non-zero value to enable the compilation of the tool
@@ -85,9 +83,6 @@ ENABLE_POINT_STAT      = 1
 ENABLE_STAT_ANALYSIS   = 1
 ENABLE_WAVELET_STAT    = 1
 ENABLE_WWMCA           = 1
-
-# Flags to compile support for additional file formats
-WITH_GRIB2             = 1
 
 ###############################################################################
 
