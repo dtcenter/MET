@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,47 +16,49 @@
 EXECUTABLES =
 
 
-OBJECTS     = filterbox.o  \
-              moments.o    \
-              node.o       \
-              polyline.o   \
-              shapedata.o  \
-              set.o        \
-              interest.o   \
-              mode_Conf.o  \
-              engine.o     \
+OBJECTS     = filterbox.o \
+              moments.o \
+              node.o \
+              polyline.o \
+              shapedata.o \
+              set.o \
+              interest.o \
+              mode_Conf.o \
+              engine.o
 
 
 LIBRARIES   = libvx_shapedata.a
 
 
-GEN_SOURCES = mode_Conf.h   \
-              mode_Conf.cc  \
-
-########################################################################
-
-
-HEADERS     = filterbox.h     \
-              moments.h       \
-              node.h          \
-              polyline.h      \
-              shape.h         \
-              shapedata.h     \
-              set.h           \
-              interest.h      \
-              mode_columns.h  \
-              engine.h        \
-              mode_Conf.h     \
-              vx_shapedata.h  \
+GEN_SOURCES = mode_Conf.h \
+              mode_Conf.cc
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+HEADERS     = filterbox.h \
+              moments.h \
+              node.h \
+              polyline.h \
+              shape.h \
+              shapedata.h \
+              set.h \
+              interest.h \
+              mode_columns.h \
+              engine.h \
+              mode_Conf.h \
+              vx_shapedata.h
+
+
+########################################################################
+
+
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_shapedata Library ***"
 	@ echo
+
 
 ########################################################################
 
@@ -65,10 +67,15 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##  generated sources
    ##
 
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
 mode_Conf.h mode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 	@ echo
 	@ rm -f mode_Conf.h mode_Conf.cc
 	$(ECONFIG_CODEGEN) -class mode_Conf -outfile mode_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
+
 
 ########################################################################
 
@@ -104,6 +111,7 @@ mode_Conf.o: mode_Conf.h mode_Conf.cc
 
 engine.o: engine.h engine.cc
 	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
 
 ########################################################################
 
@@ -143,7 +151,7 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################

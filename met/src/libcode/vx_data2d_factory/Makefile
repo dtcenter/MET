@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -58,6 +58,11 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 ########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
 
 
 gen_sources: $(GEN_SOURCES)
@@ -127,18 +132,27 @@ test_is_grib: $(LIBRARIES) test_is_grib.cc
 	$(CXX_FLAGS) -I$(MET_INC_DIR) \
 	-I$(MET_INC_DIR) \
 	-L$(MET_LIB_DIR) \
-	-lvx_data2d_factory -lvx_cal -lvx_util -lvx_log
+	-lvx_data2d_factory \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_log
 
 test_var_info: $(LIBRARIES) test_var_info.cc
 	$(CXX) -o test_var_info test_var_info.cc \
 	$(CXX_FLAGS) -I$(MET_INC_DIR) \
 	-I$(MET_INC_DIR) \
 	-L$(MET_LIB_DIR) \
-	-lvx_data2d_factory -lvx_data2d \
+	-lvx_data2d_factory \
+	-lvx_data2d \
 	-lvx_data2d_grib \
-	-lvx_data2d_nc_met -lvx_data2d_nc_pinterp -lvx_nc_util \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_util -lvx_math -lvx_cal -lvx_log
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log
 
 test_factory: $(LIBRARIES) test_factory.cc
 	$(CXX) -o test_factory test_factory.cc \
@@ -147,10 +161,15 @@ test_factory: $(LIBRARIES) test_factory.cc
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
 	-lvx_data2d_factory -lvx_data2d \
 	-lvx_data2d_grib \
-	-lvx_data2d_nc_met -lvx_data2d_nc_pinterp -lvx_nc_util \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_util -lvx_math -lvx_cal -lvx_log \
-        -lnetcdf_c++ -lnetcdf
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lnetcdf_c++ -lnetcdf
 
 
 ########################################################################
@@ -165,9 +184,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

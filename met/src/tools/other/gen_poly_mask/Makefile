@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -22,6 +22,9 @@ OBJECTS     =
 LIBRARIES   =
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
@@ -31,9 +34,21 @@ HEADERS     =
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the gen_poly_mask Tool ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -67,17 +82,18 @@ gen_poly_mask: gen_poly_mask.cc $(OBJECTS)
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
-	-lvx_analysis_util  \
-	-lvx_data2d_factory  \
+	-lvx_analysis_util \
+	-lvx_data2d_factory \
 	-lvx_data2d_grib \
-	-lvx_data2d_nc_met  \
-	-lvx_data2d_nc_pinterp  \
-	-lvx_data2d  \
-	-lvx_nc_util  \
-	-lvx_grid  \
-	-lvx_math  \
-	-lvx_cal  \
-	-lvx_log -lvx_util \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d \
+	-lvx_nc_util \
+	-lvx_grid \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
@@ -94,7 +110,7 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################

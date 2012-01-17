@@ -16,18 +16,18 @@
 EXECUTABLES = pb2nc
 
 
-OBJECTS     = pb2nc_Conf.o  \
-              numpbmsg.o    \
-              openpb.o      \
-              closepb.o     \
-              readpb.o      \
+OBJECTS     = pb2nc_Conf.o \
+              numpbmsg.o \
+              openpb.o \
+              closepb.o \
+              readpb.o \
               dumppb.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = pb2nc_Conf.h   \
+GEN_SOURCES = pb2nc_Conf.h \
               pb2nc_Conf.cc
 
 
@@ -52,6 +52,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  generated sources
    ##
+
 
 gen_sources: $(GEN_SOURCES)
 	@ echo
@@ -122,13 +123,31 @@ pb2nc: pb2nc.cc $(OBJECTS)
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(BUFR_INCS) $(F2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(BUFR_LIBS) $(F2C_LIBS) \
-	-lvx_data2d_factory -lvx_data2d_grib \
-	-lvx_data2d_nc_met -lvx_data2d_nc_pinterp -lvx_nc_util -lvx_data2d \
-	-lvx_analysis_util -lvx_render \
-	-lvx_plot_util -lvx_pxm -lvx_color -lvx_ps -lvx_afm -lvx_pb_util \
-	-lvx_nav -lvx_gnomon -lvx_stat_out -lvx_statistics \
-	-lvx_gsl_prob -lvx_grid \
-	-lvx_econfig -lvx_util -lvx_math -lvx_cal -lvx_log \
+	-lvx_data2d_factory \
+	-lvx_data2d_grib \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_analysis_util \
+	-lvx_render \
+	-lvx_plot_util \
+	-lvx_pxm \
+	-lvx_color \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_pb_util \
+	-lvx_nav \
+	-lvx_gnomon \
+	-lvx_stat_out \
+	-lvx_statistics \
+	-lvx_gsl_prob \
+	-lvx_grid \
+	-lvx_econfig \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lbufr \
         $(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
@@ -145,9 +164,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

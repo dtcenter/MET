@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -13,17 +13,20 @@
 ########################################################################
 
 
-EXECUTABLES = chk4copyright         \
-              reformat_map_data     \
-              reformat_county_data  \
-	      pbtime
+EXECUTABLES = chk4copyright \
+              reformat_map_data \
+              reformat_county_data \
+              pbtime
 
 
 OBJECTS     = openpb.o \
-	      readpb.o
+              readpb.o
 
 
 LIBRARIES   =
+
+
+GEN_SOURCES =
 
 
 ########################################################################
@@ -35,9 +38,21 @@ HEADERS     =
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the dev_utils Tools ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -78,21 +93,27 @@ readpb.o: ../other/pb2nc/readpb.f
 chk4copyright: chk4copyright.cc $(LIBRARIES)
 	@ echo
 	$(CXX) chk4copyright.cc -o chk4copyright $(CXX_FLAGS) $(ARCH_FLAGS) \
-	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_log
+	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_util \
+	-lvx_log
 	cp chk4copyright $(MET_BIN_DIR)
 
 
 reformat_map_data: reformat_map_data.cc $(LIBRARIES)
 	@ echo
 	$(CXX) reformat_map_data.cc -o reformat_map_data $(CXX_FLAGS) $(ARCH_FLAGS) \
-	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_log
+	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_util \
+	-lvx_log
 	cp reformat_map_data $(MET_BIN_DIR)
 
 
 reformat_county_data: reformat_county_data.cc $(LIBRARIES)
 	@ echo
 	$(CXX) reformat_county_data.cc -o reformat_county_data $(CXX_FLAGS) $(ARCH_FLAGS) \
-	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_log
+	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_util \
+	-lvx_log
 	cp reformat_county_data $(MET_BIN_DIR)
 
 
@@ -102,7 +123,11 @@ pbtime: pbtime.cc $(OBJECTS)
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) $(BUFR_INCS) $(F2C_INCS) \
 	-L$(MET_LIB_DIR) $(BUFR_LIBS) $(F2C_LIBS) \
-	-lvx_pb_util -lvx_cal -lvx_util -lvx_log -lbufr \
+	-lvx_pb_util \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_log \
+	-lbufr \
         $(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
 	cp pbtime $(MET_BIN_DIR)
 
@@ -121,9 +146,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

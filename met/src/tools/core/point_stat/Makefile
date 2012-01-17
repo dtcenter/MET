@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -13,26 +13,17 @@
 ########################################################################
 
 
-ifeq ($(WITH_GRIB2), 1)
-        OPT_LIBS  += -lvx_data2d_grib2
-        OPT_FLAGS += -DWITH_GRIB2
-endif
-
-
-########################################################################
-
-
 EXECUTABLES = point_stat
 
 
-OBJECTS     = point_stat_Conf.o       \
+OBJECTS     = point_stat_Conf.o \
               point_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = point_stat_Conf.h   \
+GEN_SOURCES = point_stat_Conf.h \
               point_stat_Conf.cc
 
 
@@ -142,9 +133,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -17,39 +17,55 @@ EXECUTABLES =
 
 
 OBJECTS     = find_grid_by_name.o \
-              grid_base.o         \
-              latlon_grid.o       \
-              lc_grid.o           \
-              merc_grid.o         \
+              grid_base.o \
+              latlon_grid.o \
+              lc_grid.o \
+              merc_grid.o \
               st_grid.o
 
 
 LIBRARIES   = libvx_grid.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
 HEADERS     = find_grid_by_name.h \
-              grid_base.h         \
-              vx_grid.h           \
-              latlon_grid_defs.h  \
-              latlon_grid.h       \
-              lc_grid_defs.h      \
-              lc_grid.h           \
-              merc_grid_defs.h    \
-              merc_grid.h         \
-              st_grid_defs.h      \
+              grid_base.h \
+              vx_grid.h \
+              latlon_grid_defs.h \
+              latlon_grid.h \
+              lc_grid_defs.h \
+              lc_grid.h \
+              merc_grid_defs.h \
+              merc_grid.h \
+              st_grid_defs.h \
               st_grid.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_grid Library ***"
 	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
 
 ########################################################################
 
@@ -115,9 +131,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,33 +16,48 @@
 EXECUTABLES =
 
 
-OBJECTS     = gsl_bvn.o         \
-              gsl_cdf.o         \
-              gsl_randist.o     \
-              gsl_statistics.o  \
+OBJECTS     = gsl_bvn.o \
+              gsl_cdf.o \
+              gsl_randist.o \
+              gsl_statistics.o \
               gsl_wavelet2d.o
 
 
 LIBRARIES   = libvx_gsl_prob.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     = gsl_bvn.h         \
-              gsl_cdf.h         \
-              gsl_randist.h     \
-              gsl_statistics.h  \
-              gsl_wavelet2d.h   \
+HEADERS     = gsl_bvn.h \
+              gsl_cdf.h \
+              gsl_randist.h \
+              gsl_statistics.h \
+              gsl_wavelet2d.h \
               vx_gsl_prob.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_gsl_prob Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -107,9 +122,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

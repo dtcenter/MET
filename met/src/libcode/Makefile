@@ -1,3 +1,10 @@
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2012
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ########################################################################
 
@@ -58,3 +65,29 @@ clean:
 ########################################################################
 
 
+gen_sources:
+	@ cd vx_grid              ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_nc_util           ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_data2d            ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_data2d_grib       ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_data2d_grib2      ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_data2d_nc_met     ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_data2d_nc_pinterp ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_gsl_prob          ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_gnomon            ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_nav               ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_pb_util           ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_afm               ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_ps                ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_color             ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_pxm               ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_plot_util         ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_render            ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_shapedata         ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_statistics        ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_stat_out          ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_analysis_util     ; $(MAKE) $(PRINT_OPTS) gen_sources
+
+
+########################################################################

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,14 +16,14 @@
 EXECUTABLES = mode_analysis
 
 
-OBJECTS     = mode_analysis_Conf.o       \
+OBJECTS     = mode_analysis_Conf.o \
               config_to_att.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = mode_analysis_Conf.h   \
+GEN_SOURCES = mode_analysis_Conf.h \
               mode_analysis_Conf.cc
 
 
@@ -89,8 +89,6 @@ config_to_att.o: config_to_att.cc
 ########################################################################
 
 
-
-
    ##
    ##  executables
    ##
@@ -103,11 +101,11 @@ mode_analysis: mode_analysis.cc $(OBJECTS)
 	-I$(MET_INC_DIR) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(GSL_LIBS) \
 	-lvx_analysis_util \
-	-lvx_cal  \
+	-lvx_cal \
 	-lvx_econfig \
-	-lvx_util  \
-	-lvx_math  \
-   -lvx_log  \
+	-lvx_util \
+	-lvx_math \
+	-lvx_log \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
 
@@ -123,9 +121,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

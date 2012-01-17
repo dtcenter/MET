@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -22,6 +22,9 @@ OBJECTS     =
 LIBRARIES   =
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
@@ -31,9 +34,21 @@ HEADERS     =
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the MODE Tool ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -66,32 +81,32 @@ mode: mode.cc $(OBJECTS)
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
-     -lvx_shapedata  \
+	-lvx_shapedata \
 	-lvx_analysis_util \
-     -lvx_data2d_factory  \
-     -lvx_data2d_grib  \
-     -lvx_data2d_nc_met  \
-     -lvx_data2d_nc_pinterp  \
-     -lvx_nc_util  \
-     -lvx_data2d  \
-     -lvx_render \
+	-lvx_data2d_factory \
+	-lvx_data2d_grib \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_render \
 	-lvx_plot_util \
-     -lvx_pxm \
-     -lvx_color \
-     -lvx_ps \
-     -lvx_afm \
-     -lvx_pb_util \
+	-lvx_pxm \
+	-lvx_color \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_pb_util \
 	-lvx_nav \
-     -lvx_gnomon \
-     -lvx_stat_out \
-     -lvx_statistics \
+	-lvx_gnomon \
+	-lvx_stat_out \
+	-lvx_statistics \
 	-lvx_gsl_prob \
 	-lvx_econfig \
-     -lvx_grid  \
-     -lvx_util \
-     -lvx_math \
-     -lvx_cal \
-     -lvx_log \
+	-lvx_grid \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
@@ -108,9 +123,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

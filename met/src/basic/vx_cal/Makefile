@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,36 +16,53 @@
 EXECUTABLES =
 
 
-OBJECTS     = date_to_mjd.o     \
-              day_dif.o         \
-              day_of_week.o     \
-              doyhms_to_unix.o  \
-              is_dst.o          \
-              is_leap_year.o    \
-              mdyhms_to_unix.o  \
-              mjd_to_date.o     \
-              time_array.o      \
-              time_strings.o    \
+OBJECTS     = date_to_mjd.o \
+              day_dif.o \
+              day_of_week.o \
+              doyhms_to_unix.o \
+              is_dst.o \
+              is_leap_year.o \
+              mdyhms_to_unix.o \
+              mjd_to_date.o \
+              time_array.o \
+              time_strings.o \
               unix_to_mdyhms.o
 
 
 LIBRARIES   = libvx_cal.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     = time_array.h      \
+HEADERS     = time_array.h \
               vx_cal.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_cal Library ***"
 	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##  call make all since this library is used by source code
+   ##  generation tools
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
+	@ make all
 
 
 ########################################################################
@@ -127,9 +144,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

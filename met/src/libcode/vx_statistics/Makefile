@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -15,38 +15,40 @@
 
 EXECUTABLES =
 
-OBJECTS     =  apply_mask.o         \
-               compute_ci.o         \
-               contable.o           \
-               contable_stats.o     \
-               contable_nx2.o       \
-               met_stats.o          \
-               pair_base.o          \
-               pair_data_point.o    \
-               pair_data_ensemble.o \
-                              
+OBJECTS     =  apply_mask.o \
+               compute_ci.o \
+               contable.o \
+               contable_stats.o \
+               contable_nx2.o \
+               met_stats.o \
+               pair_base.o \
+               pair_data_point.o \
+               pair_data_ensemble.o
 
 
 LIBRARIES   =  libvx_statistics.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     =  apply_mask.h         \
-               compute_ci.h         \
-               contable.h           \
-               met_stats.h          \
-               pair_base.h          \
-               pair_data_point.h    \
+HEADERS     =  apply_mask.h \
+               compute_ci.h \
+               contable.h \
+               met_stats.h \
+               pair_base.h \
+               pair_data_point.h \
                pair_data_ensemble.h \
-               vx_statistics.h      \
+               vx_statistics.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_statistics Library ***"
 	@ echo
@@ -56,7 +58,19 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
    ##
-   ## objects
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  objects
    ##
 
 
@@ -92,7 +106,7 @@ pair_data_ensemble.o: pair_data_ensemble.cc
 
 
    ##
-   ## libraries
+   ##  libraries
    ##
 
 
@@ -109,7 +123,7 @@ libvx_statistics.a: $(OBJECTS)
 
 
    ##
-   ## executables
+   ##  executables
    ##
 
 
@@ -125,9 +139,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,14 +16,14 @@
 EXECUTABLES = wavelet_stat
 
 
-OBJECTS     = wavelet_stat_Conf.o       \
+OBJECTS     = wavelet_stat_Conf.o \
               wavelet_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = wavelet_stat_Conf.h   \
+GEN_SOURCES = wavelet_stat_Conf.h \
               wavelet_stat_Conf.cc
 
 
@@ -140,9 +140,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

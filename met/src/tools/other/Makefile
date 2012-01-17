@@ -1,4 +1,10 @@
-
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+# ** Copyright UCAR (c) 1992 - 2012
+# ** University Corporation for Atmospheric Research (UCAR)
+# ** National Center for Atmospheric Research (NCAR)
+# ** Research Applications Lab (RAL)
+# ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+# *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ########################################################################
 
@@ -28,4 +34,16 @@ clean:
 
 ########################################################################
 
+
+gen_sources:
+	cd gen_poly_mask ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd plot_data_plane ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd plot_point_obs ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd ascii2nc ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd madis2nc ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd pb2nc ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd wwmca_tool ; $(MAKE) $(PRINT_OPTS) gen_sources
+
+
+########################################################################
 

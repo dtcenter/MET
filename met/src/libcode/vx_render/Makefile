@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -17,42 +17,57 @@ EXECUTABLES =
 
 
 OBJECTS     = ascii85_filter.o \
-              bit_filter.o     \
-              hex_filter.o     \
-              ps_filter.o      \
-              psout_filter.o   \
-              render_pbm.o     \
-              render_pcm.o     \
-              render_pgm.o     \
-              render_ppm.o     \
-              renderinfo.o     \
-              rle_filter.o     \
+              bit_filter.o \
+              hex_filter.o \
+              ps_filter.o \
+              psout_filter.o \
+              render_pbm.o \
+              render_pcm.o \
+              render_pgm.o \
+              render_ppm.o \
+              renderinfo.o \
+              rle_filter.o \
               uc_queue.o
 
 
 LIBRARIES   = libvx_render.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     = ascii85_filter.h  \
-              bit_filter.h      \
-              hex_filter.h      \
-              ps_filter.h       \
-              psout_filter.h    \
-              vx_render.h       \
-              renderinfo.h      \
-              rle_filter.h      \
+HEADERS     = ascii85_filter.h \
+              bit_filter.h \
+              hex_filter.h \
+              ps_filter.h \
+              psout_filter.h \
+              vx_render.h \
+              renderinfo.h \
+              rle_filter.h \
               uc_queue.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_render Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -138,9 +153,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

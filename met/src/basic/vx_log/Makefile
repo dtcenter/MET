@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -41,7 +41,7 @@ HEADERS     =  concat_string.h \
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_log Library ***"
 	@ echo
@@ -50,8 +50,14 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 ########################################################################
 
 
+   ##
+   ##  generated sources
+   ##  call maks all since this library does source code generation
+   ##
+
+
 gen_sources: $(GEN_SOURCES)
-	@ echo
+	@ make all
 
 
 ########################################################################
@@ -117,7 +123,7 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################

@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -13,8 +13,8 @@
 ########################################################################
 
 
-EXECUTABLES =  test_command_line  \
-               test_data_plane    \
+EXECUTABLES =  test_command_line \
+               test_data_plane
 
 
 OBJECTS     =  ascii_table.o \
@@ -41,18 +41,18 @@ OBJECTS     =  ascii_table.o \
                command_line.o \
                file_exists.o \
                filename_suffix.o \
-               data_plane.o  \
-               data_plane_util.o  \
+               data_plane.o \
+               data_plane_util.o \
                interp_mthd.o \
                interp_util.o \
-               two_to_one.o \
+               two_to_one.o
 
 
 LIBRARIES   =  libvx_util.a
 
 
-GEN_SOURCES = asciitablejust_to_string.h   \
-              asciitablejust_to_string.cc  \
+GEN_SOURCES = asciitablejust_to_string.h \
+              asciitablejust_to_string.cc
 
 
 ########################################################################
@@ -88,13 +88,13 @@ HEADERS     =  util_constants.h \
                interp_mthd.h \
                two_to_one.h \
                interp_util.h \
-               vx_util.h  \
+               vx_util.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_util Library ***"
 	@ echo
@@ -103,8 +103,15 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 ########################################################################
 
 
+   ##
+   ##  generated sources
+   ##  call make all since this library is used by source code
+   ##  generation tools
+   ##
+
+
 gen_sources: $(GEN_SOURCES)
-	@ echo
+	@ make all
 
 
 asciitablejust_to_string.h asciitablejust_to_string.cc: ascii_table.h
@@ -234,12 +241,17 @@ libvx_util.a: $(OBJECTS)
 
 test_command_line: test_command_line.cc $(LIBRARIES)
 	@ echo
-	$(CXX) test_command_line.cc -o test_command_line $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_log
+	$(CXX) test_command_line.cc -o test_command_line $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_util \
+	-lvx_log
 
 
 test_data_plane: test_data_plane.cc $(LIBRARIES)
 	@ echo
-	$(CXX) test_data_plane.cc -o test_data_plane $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_log -lvx_util -lvx_cal
+	$(CXX) test_data_plane.cc -o test_data_plane $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_util \
+	-lvx_cal \
+	-lvx_log
 
 
 ########################################################################
@@ -254,9 +266,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

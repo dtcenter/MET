@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,35 +16,50 @@
 EXECUTABLES =
 
 
-OBJECTS     = pbm.o        \
-              pcm.o        \
-              pgm.o        \
-              ppm.o        \
-              pxm_base.o   \
+OBJECTS     = pbm.o \
+              pcm.o \
+              pgm.o \
+              ppm.o \
+              pxm_base.o \
               pxm_utils.o
 
 
 LIBRARIES   = libvx_pxm.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     = pbm.h        \
-              pcm.h        \
-              pgm.h        \
-              ppm.h        \
-              pxm_base.h   \
-              pxm_utils.h  \
+HEADERS     = pbm.h \
+              pcm.h \
+              pgm.h \
+              ppm.h \
+              pxm_base.h \
+              pxm_utils.h \
               vx_pxm.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_pxm Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -112,9 +127,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

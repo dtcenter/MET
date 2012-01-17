@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,35 +16,50 @@
 EXECUTABLES =
 
 
-OBJECTS     = afm.o                     \
-              afm_keywords.o            \
-              afm_line.o                \
-              afm_token.o               \
-              afmkeyword_to_string.o    \
+OBJECTS     = afm.o \
+              afm_keywords.o \
+              afm_line.o \
+              afm_token.o \
+              afmkeyword_to_string.o \
               afmtokentype_to_string.o
 
 
 LIBRARIES   = libvx_afm.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     = afm.h                     \
-              afm_keywords.h            \
-              afmkeyword_to_string.h    \
-              afm_line.h                \
-              afm_token.h               \
-              afm_token_types.h         \
+HEADERS     = afm.h \
+              afm_keywords.h \
+              afmkeyword_to_string.h \
+              afm_line.h \
+              afm_token.h \
+              afm_token_types.h \
               afmtokentype_to_string.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_afm Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -112,9 +127,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

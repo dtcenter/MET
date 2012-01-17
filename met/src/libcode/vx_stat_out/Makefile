@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,27 +16,42 @@
 EXECUTABLES =
 
 
-OBJECTS     = stat_columns.o      \
-              stat_hdr_columns.o  \
+OBJECTS     = stat_columns.o \
+              stat_hdr_columns.o
 
 
 LIBRARIES   = libvx_stat_out.a
 
 
-########################################################################
-
-
-HEADERS     = stat_columns.h      \
-              stat_hdr_columns.h  \
-              vx_stat_out.h       \
+GEN_SOURCES =
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+HEADERS     = stat_columns.h \
+              stat_hdr_columns.h \
+              vx_stat_out.h
+
+
+########################################################################
+
+
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_stat_out Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -92,9 +107,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

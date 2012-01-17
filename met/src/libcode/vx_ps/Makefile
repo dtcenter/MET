@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -13,37 +13,37 @@
 ########################################################################
 
 
-EXECUTABLES = test_ps  \
+EXECUTABLES = test_ps
 
 
-OBJECTS     = documentmedia_to_string.o        \
-              documentorientation_to_string.o  \
-              vx_ps.o                          \
-              ps_text.o                        \
+OBJECTS     = documentmedia_to_string.o \
+              documentorientation_to_string.o \
+              vx_ps.o \
+              ps_text.o
 
 
 LIBRARIES   = libvx_ps.a
 
 
-GENERATED_SOURCES = documentmedia_to_string.h         \
-                    documentmedia_to_string.cc        \
-                    documentorientation_to_string.h   \
-                    documentorientation_to_string.cc  \
+GEN_SOURCES = documentmedia_to_string.h \
+              documentmedia_to_string.cc \
+              documentorientation_to_string.h \
+              documentorientation_to_string.cc
 
 
 ########################################################################
 
 
-HEADERS     = documentmedia_to_string.h        \
-              documentorientation_to_string.h  \
-              vx_ps.h                          \
-              ps_text.h                     \
+HEADERS     = documentmedia_to_string.h \
+              documentorientation_to_string.h \
+              vx_ps.h \
+              ps_text.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_ps Library ***"
 	@ echo
@@ -52,7 +52,17 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 ########################################################################
 
 
-$(GENERATED_SOURCES): vx_ps.h
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
+	@ echo
+
+$(GEN_SOURCES): vx_ps.h
+	@ echo
+	@ rm -f $(GEN_SOURCES)
 	$(ENUM_TO_STRING) -concat_string vx_ps.h
 
 
@@ -72,7 +82,7 @@ documentorientation_to_string.o: documentorientation_to_string.h documentorienta
 	$(CXX) documentorientation_to_string.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\"
 
 
-vx_ps.o: vx_ps.cc $(GENERATED_SOURCES)
+vx_ps.o: vx_ps.cc $(GEN_SOURCES)
 	$(CXX) vx_ps.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\"
 
 
@@ -106,7 +116,12 @@ libvx_ps.a: $(OBJECTS)
 
 
 test_ps: test_ps.cc $(LIBRARIES)
-	$(CXX) test_ps.cc $(CXX_FLAGS) $(ARCH_FLAGS) -o test_ps -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_ps -lvx_afm -lvx_util -lvx_log -lm
+	$(CXX) test_ps.cc $(CXX_FLAGS) $(ARCH_FLAGS) -o test_ps -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_util \
+	-lvx_log \
+	-lm
 
 ########################################################################
 
@@ -115,15 +130,14 @@ clean:
 	rm -f *.a *.o *.ps temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_ps.a
-	rm -f $(GENERATED_SOURCES)
+	rm -f $(GEN_SOURCES)
 
 
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

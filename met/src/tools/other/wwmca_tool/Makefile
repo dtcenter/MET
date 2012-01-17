@@ -17,26 +17,26 @@ EXECUTABLES = wwmca_regrid \
               wwmca_plot
 
 
-OBJECTS     = afwa_file.o                 \
-              afwa_cp_file.o              \
-              afwa_pt_file.o              \
-              interp_base.o               \
-              min_interp.o                \
-              max_interp.o                \
-              ave_interp.o                \
-              nearest_interp.o            \
-              wwmca_regrid_Conf.o         \
-              gridhemisphere_to_string.o  \
-              wwmca_ref.o                 \
+OBJECTS     = afwa_file.o \
+              afwa_cp_file.o \
+              afwa_pt_file.o \
+              interp_base.o \
+              min_interp.o \
+              max_interp.o \
+              ave_interp.o \
+              nearest_interp.o \
+              wwmca_regrid_Conf.o \
+              gridhemisphere_to_string.o \
+              wwmca_ref.o \
               nc_output.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = gridhemisphere_to_string.h   \
-              gridhemisphere_to_string.cc  \
-              wwmca_regrid_Conf.h          \
+GEN_SOURCES = gridhemisphere_to_string.h \
+              gridhemisphere_to_string.cc \
+              wwmca_regrid_Conf.h \
               wwmca_regrid_Conf.cc
 
 
@@ -61,6 +61,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  generated sources
    ##
+
 
 gen_sources: $(GEN_SOURCES)
 	@ echo
@@ -168,12 +169,29 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
-	-lvx_analysis_util -lvx_statistics \
-	-lvx_data2d_factory -lvx_data2d_grib \
-	-lvx_data2d_nc_met -lvx_data2d_nc_pinterp -lvx_nc_util -lvx_data2d \
-	-lvx_plot_util -lvx_render -lvx_pxm -lvx_color -lvx_ps -lvx_afm \
-	-lvx_nav -lvx_gnomon -lvx_grid -lvx_econfig \
-	-lvx_util -lvx_math -lvx_cal -lvx_log -lm -lnetcdf_c++ -lnetcdf \
+	-lvx_analysis_util \
+	-lvx_statistics \
+	-lvx_data2d_factory \
+	-lvx_data2d_grib \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_plot_util \
+	-lvx_render \
+	-lvx_pxm \
+	-lvx_color \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_nav \
+	-lvx_gnomon \
+	-lvx_grid \
+	-lvx_econfig \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm -lnetcdf_c++ -lnetcdf \
 	$(CXX_LIBS)
 	cp wwmca_regrid $(MET_BIN_DIR)
 
@@ -184,12 +202,29 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
-	-lvx_analysis_util -lvx_statistics \
-	-lvx_data2d_factory -lvx_data2d_grib \
-	-lvx_data2d_nc_met -lvx_data2d_nc_pinterp -lvx_nc_util -lvx_data2d \
-	-lvx_plot_util -lvx_render -lvx_pxm -lvx_color -lvx_ps -lvx_afm \
-	-lvx_nav -lvx_gnomon -lvx_grid -lvx_econfig \
-	-lvx_util -lvx_math -lvx_cal -lvx_log -lm -lnetcdf_c++ -lnetcdf \
+	-lvx_analysis_util \
+	-lvx_statistics \
+	-lvx_data2d_factory \
+	-lvx_data2d_grib \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_plot_util \
+	-lvx_render \
+	-lvx_pxm \
+	-lvx_color \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_nav \
+	-lvx_gnomon \
+	-lvx_grid \
+	-lvx_econfig \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm -lnetcdf_c++ -lnetcdf \
 	$(CXX_LIBS)
 	cp wwmca_plot $(MET_BIN_DIR)
 
@@ -206,9 +241,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 

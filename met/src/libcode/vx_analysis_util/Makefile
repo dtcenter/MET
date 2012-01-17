@@ -1,5 +1,5 @@
 # *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-# ** Copyright UCAR (c) 1992 - 2011
+# ** Copyright UCAR (c) 1992 - 2012
 # ** University Corporation for Atmospheric Research (UCAR)
 # ** National Center for Atmospheric Research (NCAR)
 # ** Research Applications Lab (RAL)
@@ -16,43 +16,58 @@
 EXECUTABLES =
 
 
-OBJECTS     = analysis_utils.o         \
-              by_case_info.o           \
-              mask_poly.o              \
-              mode_atts.o              \
-              mode_job.o               \
-              mode_line.o              \
-              stat_job.o               \
-              stat_line.o              \
+OBJECTS     = analysis_utils.o \
+              by_case_info.o \
+              mask_poly.o \
+              mode_atts.o \
+              mode_job.o \
+              mode_line.o \
+              stat_job.o \
+              stat_line.o \
               time_series.o
 
 
 LIBRARIES   = libvx_analysis_util.a
 
 
+GEN_SOURCES =
+
+
 ########################################################################
 
 
-HEADERS     = analysis_utils.h          \
-              by_case_info.h            \
-              mask_poly.h               \
-              mode_atts.h               \
-              mode_analysis_columns.h   \
-              mode_job.h                \
-              mode_line.h               \
-              stat_job.h                \
-              stat_line.h               \
-              stat_offsets.h            \
-              time_series.h             \
+HEADERS     = analysis_utils.h \
+              by_case_info.h \
+              mask_poly.h \
+              mode_atts.h \
+              mode_analysis_columns.h \
+              mode_job.h \
+              mode_line.h \
+              stat_job.h \
+              stat_line.h \
+              stat_offsets.h \
+              time_series.h \
               vx_analysis_util.h
 
 
 ########################################################################
 
 
-all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_analysis_util Library ***"
+	@ echo
+
+
+########################################################################
+
+
+   ##
+   ##  generated sources
+   ##
+
+
+gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
@@ -129,9 +144,8 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean
+.PHONY: all clean gen_sources
 
 
 ########################################################################
-
 
