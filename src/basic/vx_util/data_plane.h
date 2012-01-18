@@ -22,6 +22,8 @@
 
 class DataPlane {
 
+   friend class ShapeData;
+
    private:
 
       void init_from_scratch();

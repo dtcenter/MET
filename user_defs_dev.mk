@@ -21,7 +21,7 @@ ARCH_FLAGS   = -DBLOCK4
 CXX          = /usr/bin/g++
 CXX_FLAGS    = -Wall -Wshadow -static -g
 #CXX_FLAGS    = -Wall -Wshadow -static -O3
-CXX_LIBS     =
+#CXX_LIBS     =
 
 # Path to the Fortran Compiler
 # Fortran compiler flags

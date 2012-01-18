@@ -1,3 +1,5 @@
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2012
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -41,6 +43,12 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+#define  STANDARD_XY_YO_N(Nx, x, y) ((y)*(Nx) + (x))
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -418,95 +426,163 @@ void ShapeData::conv_filter(const FilterBox &box) {
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
-void ShapeData::conv_filter_circ(int diameter, double bd_thresh) {
-   int x, y, xx, yy, u, v;
-   int count, bd_count;
-   double center, cur, sum;
-   double ratio;
-   const int dm1o2 = (diameter - 1)/2;
-   FilterBox box;
-   DataPlane d = data;
+void ShapeData::conv_filter_circ(int diameter, double bd_thresh)
 
-   if((diameter%2 == 0) || (diameter < 3)) {
-      mlog << Error << "\n\n ShapeData::conv_filter_circ() -> "
-           << "diameter must be odd and >= 3 ... diameter = "
-           << diameter << "\n\n";
-      exit(1);
+{
+
+int x, y, xx, yy, u, v;
+int dn, fn, nn;
+int vpr, upr;
+int count, bd_count;
+double center, cur, sum;
+double dx, dy, dist;
+double ratio;
+const int nx = data.nx();
+const int ny = data.ny();
+bool * f = (bool *) 0;
+bool center_bad = false;
+DataPlane in_data = data;
+const bool bd_thresh_zero = is_eq(bd_thresh, 0.0);
+
+
+if ( (diameter%2 == 0) || (diameter < 3) )  {
+
+   mlog << Error << "\n\n ShapeData::conv_filter_circ() -> "
+        << "diameter must be odd and >= 3 ... diameter = "
+        << diameter << "\n\n";
+
+   exit(1);
+
+}
+
+const int radius = (diameter - 1)/2;
+
+const double * in  = in_data.Data;
+      double * out = data.Data;
+
+f = new bool [diameter*diameter];
+
+   //
+   //  set up the filter
+   //
+
+for (y=0; y<diameter; ++y)  {
+
+   dy = y - radius;
+
+   for (x=0; x<diameter; ++x)  {
+
+      dx = x - radius;
+
+      dist = sqrt( dx*dx + dy*dy );
+
+      fn = STANDARD_XY_YO_N(diameter, x, y) ;
+
+      f[fn] = (dist <= radius);
+
    }
 
-   //
-   //  We're not using the values, just whether a particular (x, y) is on or off
-   //
-   box.set_cylinder_volume(dm1o2, 1.0);
+}
 
-   for(x=0; x<data.nx(); x++) {
-      for(y=0; y<data.ny(); y++) {
+   //
+   //  do the convolution
+   //
+
+dn = -1;
+
+for(y=0; y<ny; y++) {
+
+   for(x=0; x<nx; x++) {
+
+      ++dn;
 
          //
          // If the bad data threshold is set to zero and the center of the
          // convolution radius contains bad data, set the convolved value to
          // bad data and continue.
          //
-         center = data(x, y);
-         if(::is_bad_data(center) && is_eq(bd_thresh, 0.0)) {
-            d.set(bad_data_double, x, y);
-            continue;
-         }
 
-         sum = 0.0;
-         count = 0;
-         bd_count = 0;
+      center = in[dn];
 
-         for(u=box.get_xmin(); u<=box.get_xmax(); u++) {
+      center_bad = ::is_bad_data(center);
+
+      if ( center_bad && bd_thresh_zero ) { out[dn] = bad_data_double;  continue; }
+
+      sum      = 0.0;
+      count    = 0;
+      bd_count = 0;
+
+      for (v=-radius; v<=radius; ++v) {
+
+         yy = y + v;
+
+         if ( (yy < 0) || (yy >= ny) )  continue;
+
+         vpr = v + radius;
+
+         for(u=-radius; u<=radius; ++u) {
 
             xx = x + u;
 
-            for(v=box.get_ymin(); v<=box.get_ymax(); v++) {
+            if ( (xx < 0) || (xx >= nx) )  continue;
 
-               yy = y + v;
+            upr = u + radius;
 
-               if((xx < 0) || (yy < 0) || (xx >= data.nx()) || (yy >= data.ny())) continue;
-               if(!(box.is_on(u, v)))  continue;
+            fn = STANDARD_XY_YO_N(diameter, upr, vpr);
 
-               cur = data(xx, yy);
+            if ( !(f[fn]) )  continue;
 
-               if( ::is_bad_data(cur) ) { bd_count++; continue; }
+            nn = STANDARD_XY_YO_N(nx, xx, yy) ;
 
-               sum += cur;
+            cur = in[nn];
 
-               count++;
-            } // for v
-         } // for u
+            if( ::is_bad_data(cur) ) { bd_count++;  continue; }
+
+            sum += cur;
+
+            count++;
+
+         } // for v
+
+      } // for u
 
          //
          //  If the center of the convolution contains bad data and the ratio
          //  of bad data in the convolution area is too high, set the convoled
          //  value to the minimum value.
          //
-         ratio = (double) bd_count/(bd_count + count);
-         if(::is_bad_data(center) && ratio > bd_thresh) {
-            sum = bad_data_double;
-         }
-         else if(count == 0) {
-            sum = bad_data_double;
-         }
-         else {
-            sum /= count;
-         }
 
-         d.set(sum, x, y);
-      } // for y
-   } // for x
+      if ( count == 0 )  sum = bad_data_double;
+      else {
 
-   // Reset data to d
-   data = d;
+         ratio = ((double) bd_count)/(bd_count + count);
 
-   return;
+         if ( center_bad && (ratio > bd_thresh) )  sum = bad_data_double;
+         else                                      sum /= count;
+
+      }
+
+      out[dn] = sum;
+
+   } // for y
+
+} // for x
+
+   //
+   //  done
+   //
+
+if ( f )  { delete [] f;   f = (bool *) 0; }
+
+return;
+
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+
 
 Polyline ShapeData::convex_hull() const {
    int j, k, n, y;
