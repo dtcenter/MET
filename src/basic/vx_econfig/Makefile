@@ -54,7 +54,6 @@ HEADERS     = algline.h \
               idstack.h \
               machine.h \
               pwl.h \
-              scanner_stuff.h \
               symtab.h \
               result.h \
               resulttype_to_string.h \
@@ -132,10 +131,10 @@ builtin_to_string.o: builtin_to_string.h builtin_to_string.cc
 idstack.o: idstack.h idstack.cc
 	$(CXX) idstack.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-icode.o: icode.h icode.cc scanner_stuff.h celltype_to_string.o pwl.o builtin.o
+icode.o: icode.h icode.cc celltype_to_string.o pwl.o builtin.o
 	$(CXX) icode.cc                -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-symtab.o: symtab.h symtab.cc scanner_stuff.h stetype_to_string.o celltype_to_string.o pwl.o algline.o builtin.o array.o
+symtab.o: symtab.h symtab.cc stetype_to_string.o celltype_to_string.o pwl.o algline.o builtin.o array.o
 	$(CXX) symtab.cc               -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 array.o: array.h array.cc icode.o
@@ -150,17 +149,17 @@ pwl.o: pwl.h pwl.cc
 algline.o: algline.h algline.cc
 	$(CXX) algline.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-machine.o: machine.h machine.cc symtab.o icode.o scanner_stuff.h celltype_to_string.o stetype_to_string.o builtin_to_string.o builtin.o
+machine.o: machine.h machine.cc symtab.o icode.o celltype_to_string.o stetype_to_string.o builtin_to_string.o builtin.o
 	$(CXX) machine.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-econfig.tab.c: econfig.y scanner_stuff.h icode.o symtab.o machine.o idstack.o builtin.o celltype_to_string.o
+econfig.tab.c: econfig.y icode.o symtab.o machine.o idstack.o builtin.o celltype_to_string.o
 	$(YACC) econfig.y
 
 econfig.tab.o: econfig.tab.c
 	@ echo
 	$(CXX) econfig.tab.c           -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-lex.econfig.c: econfig.l econfig.tab.o scanner_stuff.h icode.o symtab.o machine.o
+lex.econfig.c: econfig.l econfig.tab.o icode.o symtab.o machine.o
 	$(LEX) econfig.l
 	rm -f temp
 	mv lex.econfig.c temp

@@ -23,7 +23,7 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "scanner_stuff.h"
+#include "is_number.h"
 
 #include "builtin.h"
 #include "idstack.h"

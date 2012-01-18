@@ -128,7 +128,7 @@ pbtime: pbtime.cc $(OBJECTS)
 	-lvx_util \
 	-lvx_log \
 	-lbufr \
-        $(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
+	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
 	cp pbtime $(MET_BIN_DIR)
 
 

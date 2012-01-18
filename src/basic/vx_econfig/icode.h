@@ -23,7 +23,7 @@ class IcodeVector;   //  forward reference
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "scanner_stuff.h"
+#include "is_number.h"
 
 
 

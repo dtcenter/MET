@@ -112,9 +112,9 @@ using namespace std;
 #include <cmath>
 
 
-#include "vx_log.h"
 #include "nint.h"
-#include "scanner_stuff.h"
+#include "vx_util.h"
+#include "vx_log.h"
 
 #include "color_parser.h"
 #include "color_list.h"

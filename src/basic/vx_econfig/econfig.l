@@ -17,7 +17,7 @@ using namespace std;
 #include <iostream>
 #include <stdlib.h>
 
-#include "scanner_stuff.h"   //  must be included before econfig.tab.h
+#include "is_number.h"       //  must be included before econfig.tab.h
 #include "idstack.h"         //  must be included before econfig.tab.h
 #include "icode.h"           //  must be included before econfig.tab.h
 #include "symtab.h"
