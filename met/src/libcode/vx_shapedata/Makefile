@@ -13,18 +13,18 @@
 ########################################################################
 
 
-EXECUTABLES =
+EXECUTABLES = test_conv  \
 
 
 OBJECTS     = filterbox.o \
-              moments.o \
-              node.o \
-              polyline.o \
+              moments.o   \
+              node.o      \
+              polyline.o  \
               shapedata.o \
-              set.o \
-              interest.o \
+              set.o       \
+              interest.o  \
               mode_Conf.o \
-              engine.o
+              engine.o    \
 
 
 LIBRARIES   = libvx_shapedata.a
@@ -97,8 +97,8 @@ node.o: node.h node.cc
 polyline.o: polyline.h polyline.cc
 	$(CXX) polyline.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
-shapedata.o: shapedata.h shapedata.cc
-	$(CXX) shapedata.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+shapedata.o: shapedata.h shapedata.cc conv_old.inc conv_new.inc
+	$(CXX) shapedata.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
 set.o: set.h set.cc
 	$(CXX) set.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
@@ -137,6 +137,9 @@ libvx_shapedata.a: $(OBJECTS)
    ##  executables
    ##
 
+
+test_conv: test_conv.cc $(LIBRARIES)
+	$(CXX) test_conv.cc $(CXX_FLAGS) -o test_conv -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_pxm -lvx_shapedata -lvx_color -lvx_util -lvx_math -lvx_cal -lvx_log -lm
 
 ########################################################################
 

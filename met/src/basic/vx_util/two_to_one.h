@@ -74,7 +74,7 @@ class TwoOne {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline void TwoOne::one_to_two (const int Nx, const int Ny, const int n, int & x, int & y) const
+inline void TwoOne::one_to_two (const int _Nx, const int _Ny, const int _n, int & _x, int & _y) const
 
 {
 
@@ -86,7 +86,7 @@ if ( !OT )  {
 
 }
 
-OT (Nx, Ny, n, x, y);
+OT (_Nx, _Ny, _n, _x, _y);
 
 return;
 
@@ -96,7 +96,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TwoOne::two_to_one (const int Nx, const int Ny, const int x, const int y) const
+inline int TwoOne::two_to_one (const int _Nx, const int _Ny, const int _x, const int _y) const
 
 {
 
@@ -108,7 +108,7 @@ if ( !TO )  {
 
 }
 
-return ( TO(Nx, Ny, x, y) );
+return ( TO(_Nx, _Ny, _x, _y) );
 
 }
 
