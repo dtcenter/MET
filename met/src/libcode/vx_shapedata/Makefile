@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = test_conv  \
+EXECUTABLES =
 
 
 OBJECTS     = filterbox.o \
@@ -97,7 +97,7 @@ node.o: node.h node.cc
 polyline.o: polyline.h polyline.cc
 	$(CXX) polyline.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
-shapedata.o: shapedata.h shapedata.cc conv_old.inc conv_new.inc
+shapedata.o: shapedata.h shapedata.cc
 	$(CXX) shapedata.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
 set.o: set.h set.cc
@@ -137,9 +137,6 @@ libvx_shapedata.a: $(OBJECTS)
    ##  executables
    ##
 
-
-test_conv: test_conv.cc $(LIBRARIES)
-	$(CXX) test_conv.cc $(CXX_FLAGS) -o test_conv -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_pxm -lvx_shapedata -lvx_color -lvx_util -lvx_math -lvx_cal -lvx_log -lm
 
 ########################################################################
 
