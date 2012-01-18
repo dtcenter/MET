@@ -39,6 +39,7 @@ clean:
 	rm -r -f *.a *.o junk temp core log c.ps a.out
 	rm -f out/*/*
 	rm -f include/*.h
+	rm -f bin/*
 	rm -f lib/*.a
 	rm -f lib/*.so
 
