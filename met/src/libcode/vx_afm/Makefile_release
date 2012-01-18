@@ -8,7 +8,7 @@
 
 ########################################################################
 #
-# Makefile for the vx_nav library
+# Makefile for the vx_afm library
 #
 ########################################################################
 
@@ -16,39 +16,35 @@
 EXECUTABLES =
 
 
-OBJECTS     = nav.o
+OBJECTS     = afm.o \
+              afm_keywords.o \
+              afm_line.o \
+              afm_token.o \
+              afmkeyword_to_string.o \
+              afmtokentype_to_string.o
 
 
-LIBRARIES   = libvx_nav.a
-
-
-GEN_SOURCES =
-
-
-########################################################################
-
-
-HEADERS     = nav.h
+LIBRARIES   = libvx_afm.a
 
 
 ########################################################################
 
 
-all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+HEADERS     = afm.h \
+              afm_keywords.h \
+              afmkeyword_to_string.h \
+              afm_line.h \
+              afm_token.h \
+              afm_token_types.h \
+              afmtokentype_to_string.h
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making the vx_nav Library ***"
-	@ echo
-
-
-########################################################################
-
-
-   ##
-   ##  generated sources
-   ##
-
-
-gen_sources: $(GEN_SOURCES)
+	@ echo "*** Finished Making the vx_afm Library ***"
 	@ echo
 
 
@@ -60,8 +56,23 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 
-nav.o: nav.cc
-	$(CXX) nav.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+afm.o: afm.cc
+	$(CXX) afm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+
+afm_keywords.o: afm_keywords.cc
+	$(CXX) afm_keywords.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+
+afm_line.o: afm_line.cc
+	$(CXX) afm_line.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+
+afm_token.o: afm_token.cc
+	$(CXX) afm_token.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+
+afmkeyword_to_string.o: afmkeyword_to_string.cc
+	$(CXX) afmkeyword_to_string.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+
+afmtokentype_to_string.o: afmtokentype_to_string.cc
+	$(CXX) afmtokentype_to_string.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
@@ -72,13 +83,13 @@ nav.o: nav.cc
    ##
 
 
-libvx_nav.a: $(OBJECTS)
-	ar -rs libvx_nav.a $(OBJECTS) 2>&1
-	ranlib libvx_nav.a
+libvx_afm.a: $(OBJECTS)
+	ar -rs libvx_afm.a $(OBJECTS) 2>&1
+	ranlib libvx_afm.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	cp $(HEADERS) $(MET_INC_DIR)
-	rm -f $(MET_LIB_DIR)/libvx_nav.a
-	cp libvx_nav.a $(MET_LIB_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_afm.a
+	cp libvx_afm.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -95,13 +106,13 @@ libvx_nav.a: $(OBJECTS)
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-	rm -f $(MET_LIB_DIR)/libvx_nav.a
+	rm -f $(MET_LIB_DIR)/libvx_afm.a
 
 
 ########################################################################
 
 
-.PHONY: all clean gen_sources
+.PHONY: all clean
 
 
 ########################################################################

@@ -8,25 +8,31 @@
 
 ########################################################################
 #
-# Makefile for the ensemble_stat tool
+# Makefile for the vx_log library
 #
 ########################################################################
 
 
-EXECUTABLES = ensemble_stat
+EXECUTABLES =  test_logger
 
 
-OBJECTS     = ensemble_stat_Conf.o \
-              ensemble_stat_conf_info.o
+OBJECTS     =  concat_string.o \
+               indent.o \
+               logger.o \
+               string_array.o
 
 
-LIBRARIES   =
+LIBRARIES   =  libvx_log.a
 
 
 ########################################################################
 
 
-HEADERS     =
+HEADERS     =  concat_string.h \
+               indent.h \
+               logger.h \
+               string_array.h \
+               vx_log.h
 
 
 ########################################################################
@@ -34,7 +40,7 @@ HEADERS     =
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making the ensemble_stat Tool ***"
+	@ echo "*** Finished Making the vx_log Library ***"
 	@ echo
 
 
@@ -46,14 +52,17 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
 
 
-ensemble_stat_Conf.o: ensemble_stat_Conf.cc
-	@ echo
-	$(CXX) ensemble_stat_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+concat_string.o: concat_string.cc
+	$(CXX) concat_string.cc $(CXX_FLAGS) -c
 
+indent.o: indent.cc
+	$(CXX) indent.cc $(CXX_FLAGS) -c
 
-ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
-	@ echo
-	$(CXX) ensemble_stat_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+logger.o: logger.cc logger.h
+	$(CXX) logger.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+
+string_array.o: string_array.cc
+	$(CXX) string_array.cc $(CXX_FLAGS) -c
 
 
 ########################################################################
@@ -64,6 +73,15 @@ ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
    ##
 
 
+libvx_log.a: $(OBJECTS)
+	ar -rs libvx_log.a $(OBJECTS) 2>&1
+	ranlib libvx_log.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_log.a
+	cp libvx_log.a $(MET_LIB_DIR)
+
+
 ########################################################################
 
 
@@ -72,33 +90,10 @@ ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
    ##
 
 
-ensemble_stat: ensemble_stat.cc $(OBJECTS)
+test_logger: test_logger.cc $(LIBRARIES)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) ensemble_stat.cc $(OBJECTS) \
-	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_shapedata \
-	-lvx_gsl_prob \
-	-lvx_analysis_util \
-	-lvx_data2d_factory \
-	-lvx_data2d_grib \
-	-lvx_data2d_nc_met \
-	-lvx_data2d_nc_pinterp \
-	-lvx_data2d \
-	-lvx_nc_util \
-	-lvx_grid \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_econfig \
-	-lvx_util \
-	-lvx_color \
-	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl \
-	$(CXX_LIBS)
-	cp $(EXECUTABLES) $(MET_BIN_DIR)
+	$(CXX) test_logger.cc -o test_logger $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_log
 
 
 ########################################################################
@@ -106,7 +101,8 @@ ensemble_stat: ensemble_stat.cc $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-	rm -f $(MET_BIN_DIR)/ensemble_stat
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_log.a
 
 
 ########################################################################
