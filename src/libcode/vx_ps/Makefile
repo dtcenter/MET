@@ -127,10 +127,9 @@ test_ps: test_ps.cc $(LIBRARIES)
 
 
 clean:
-	rm -f *.a *.o *.ps temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f *.a *.o *.ps temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_ps.a
-	rm -f $(GEN_SOURCES)
 
 
 ########################################################################

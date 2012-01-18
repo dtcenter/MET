@@ -138,6 +138,7 @@ clean:
 	@ echo
 	rm -f *.a *.o temp junk core log a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	rm -f enum.tab.c enum.output lex.yy.c
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_BIN_DIR)/enum_to_string
 
 
