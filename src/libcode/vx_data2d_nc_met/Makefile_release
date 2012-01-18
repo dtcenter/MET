@@ -13,8 +13,9 @@
 ########################################################################
 
 
-EXECUTABLES = test_read_nc_met
-              
+EXECUTABLES =
+
+
 OBJECTS     = get_met_grid.o \
               met_file.o \
               var_info_nc_met.o \
@@ -88,27 +89,13 @@ libvx_data2d_nc_met.a: $(OBJECTS)
    ##  executables
    ##
 
-test_read_nc_met: $(LIBRARIES) test_read_nc_met.cc
-	$(CXX) -o test_read_nc_met test_read_nc_met.cc \
-	$(CXX_FLAGS) \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
-	-lvx_data2d_nc_met \
-	-lvx_nc_util \
-	-lvx_data2d \
-	-lvx_grid \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lnetcdf_c++ -lnetcdf
-
 
 ########################################################################
 
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f test_read_nc_met
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_data2d_nc_met.a
 

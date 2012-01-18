@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = test_map_region
+EXECUTABLES =
 
 
 OBJECTS     = map_region.o \
@@ -81,19 +81,13 @@ libvx_plot_util.a: $(OBJECTS)
    ##  executables
    ##
 
-test_map_region: test_map_region.cc $(LIBRARIES)
-	$(CXX) test_map_region.cc $(CXX_FLAGS) $(ARCH_FLAGS) -o test_map_region -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
-	-lvx_plot_util \
-	-lvx_util \
-	-lvx_log \
-	-lm
-
 
 ########################################################################
 
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f test_map_region
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_plot_util.a
 

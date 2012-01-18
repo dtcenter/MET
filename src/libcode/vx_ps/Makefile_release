@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = test_ps
+EXECUTABLES =
 
 
 OBJECTS     = documentmedia_to_string.o \
@@ -92,19 +92,12 @@ libvx_ps.a: $(OBJECTS)
    ##
 
 
-test_ps: test_ps.cc $(LIBRARIES)
-	$(CXX) test_ps.cc $(CXX_FLAGS) $(ARCH_FLAGS) -o test_ps -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_util \
-	-lvx_log \
-	-lm
-
 ########################################################################
 
 
 clean:
 	rm -f *.a *.o *.ps temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f test_ps
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_ps.a
 
