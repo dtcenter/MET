@@ -156,7 +156,7 @@ int main(int argc, char * argv []) {
    }
    catch(int j) { // Catch an error
 
-      mlog << Error << "\n\nmain() -> "
+      mlog << Error << "\n\n  main() -> "
            << "encountered an error value of " << j
            << ".  Calling clean_up() and usage() before exiting.\n\n";
 
@@ -254,7 +254,7 @@ void parse_command_line(int &argc, char **argv) {
    // Check for at least one search file or directory
    //
    if(search_dirs.n_elements() == 0) {
-      mlog << Error << "\n\nparse_command_line() -> "
+      mlog << Error << "\n\n  parse_command_line() -> "
            << "no STAT search files or directories specified!\n\n";
 
       exit(1);
@@ -275,7 +275,7 @@ void sanity_check() {
    if(strncasecmp(conf.version().sval(), met_version,
       strlen(conf.version().sval())) != 0) {
 
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "The version number listed in the config file ("
            << conf.version().sval() << ") does not match the version "
            << "of the code (" << met_version << ").\n\n";
@@ -289,7 +289,7 @@ void sanity_check() {
    ut_end = timestring_to_unix(conf.fcst_valid_end().sval());
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "fcst_valid_beg is after fcst_valid_end: "
            << conf.fcst_valid_beg().sval() << " > "
            << conf.fcst_valid_end().sval() << "!\n\n";
@@ -304,7 +304,7 @@ void sanity_check() {
    ut_end = timestring_to_unix(conf.obs_valid_end().sval());
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "obs_valid_beg is after obs_valid_end: "
            << conf.obs_valid_beg().sval() << " > "
            << conf.obs_valid_end().sval() << "!\n\n";
@@ -319,7 +319,7 @@ void sanity_check() {
    ut_end = timestring_to_unix(conf.fcst_init_end().sval());
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "fcst_init_beg is after fcst_init_end: "
            << conf.fcst_init_beg().sval() << " > "
            << conf.fcst_init_end().sval() << "!\n\n";
@@ -334,7 +334,7 @@ void sanity_check() {
    ut_end = timestring_to_unix(conf.obs_init_end().sval());
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "obs_init_beg is after obs_init_end: "
            << conf.obs_init_beg().sval() << " > "
            << conf.obs_init_end().sval() << "!\n\n";
@@ -347,7 +347,7 @@ void sanity_check() {
    //
    if(conf.rank_corr_flag().ival() != 0 &&
       conf.rank_corr_flag().ival() != 1) {
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "The rank_corr_flag (" << conf.rank_corr_flag().ival()
            << ") must be set to 0 or 1.\n\n";
       exit(1);
@@ -358,7 +358,7 @@ void sanity_check() {
    //
    if(conf.vif_flag().ival() != 0 &&
       conf.vif_flag().ival() != 1) {
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "The vif_flag (" << conf.vif_flag().ival()
            << ") must be set to 0 or 1.\n\n";
       exit(1);
@@ -368,7 +368,7 @@ void sanity_check() {
    // Conf: tmp_dir
    //
    if(opendir(conf.tmp_dir().sval()) == NULL ) {
-      mlog << Error << "\n\nsanity_check() -> "
+      mlog << Error << "\n\n  sanity_check() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << conf.tmp_dir().sval() << "\n\n";
       exit(1);
@@ -408,7 +408,7 @@ void set_out_file(const char *path) {
    sa_out->open(out_file);
 
    if(!(*sa_out)) {
-      mlog << Error << "\n\nset_out_file()-> "
+      mlog << Error << "\n\n  set_out_file()-> "
            << "can't open the output file \"" << out_file
            << "\" for writing!\n\n";
       exit(1);
@@ -450,7 +450,7 @@ void process_search_dirs() {
    n = files.n_elements();
 
    if(n == 0) {
-      mlog << Error << "\n\nprocess_search_dirs() -> "
+      mlog << Error << "\n\n  process_search_dirs() -> "
            << "no STAT files found in the directories specified!\n\n";
 
       throw(1);
@@ -517,7 +517,7 @@ void process_search_dirs() {
    //
    tmp_out.open(tmp_path);
    if(!tmp_out) {
-      mlog << Error << "\n\nprocess_search_dirs() -> "
+      mlog << Error << "\n\n  process_search_dirs() -> "
            << "can't open the temporary file \"" << tmp_path
            << "\" for writing!\n\n";
 
@@ -567,7 +567,7 @@ void process_stat_file(const char *filename, const STATAnalysisJob &j,
    STATLine line;
 
    if(!(f.open(filename))) {
-      mlog << Error << "\n\nprocess_stat_file() -> "
+      mlog << Error << "\n\n  process_stat_file() -> "
            << "unable to open input stat file \""
            << filename << "\"\n\n";
 
@@ -632,9 +632,9 @@ void process_job(const char * jobstring, int n_job) {
 void clean_up() {
 
    //
-   // Delete the temp file
+   // Delete the temp file if it exists
    //
-   remove_temp_file(tmp_path);
+   if(tmp_path) remove_temp_file(tmp_path);
 
    return;
 }
@@ -705,7 +705,7 @@ void set_tmp_dir(const StringArray & a)
 {
    tmp_dir << a[0];
    if(opendir(tmp_dir) == NULL ) {
-      mlog << Error << "\n\nparse_command_line() -> "
+      mlog << Error << "\n\n  parse_command_line() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << tmp_dir << "\n\n";
       exit(1);
