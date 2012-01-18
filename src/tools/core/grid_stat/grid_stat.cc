@@ -1573,7 +1573,8 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       obs_var_name.clear();
       obs_var_name << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name();
+                   << conf_info.obs_info[i_vx]->level_name() << "_"
+                   << conf_info.mask_name[i];
 
       // Append smoothing information
       if((wdth > 1) &&
@@ -1590,7 +1591,8 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                     << conf_info.fcst_info[i_vx]->name() << "_"
                     << conf_info.fcst_info[i_vx]->level_name() << "_"
                     << conf_info.obs_info[i_vx]->name() << "_"
-                    << conf_info.obs_info[i_vx]->level_name();
+                    << conf_info.obs_info[i_vx]->level_name() << "_"
+                    << conf_info.mask_name[i];
       
       // Append smoothing information
       if(wdth > 1) {
