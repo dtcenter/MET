@@ -379,54 +379,6 @@ double ShapeData::complexity() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::conv_filter(const FilterBox &box) {
-   int x, y, xx, yy, u, v;
-   int count;
-   double sum, cur;
-   DataPlane d = data;
-
-   for (x=0; x<data.nx(); ++x) {
-      for (y=0; y<data.ny(); ++y) {
-
-         sum = 0.0;
-         count = 0;
-
-         for (u=box.get_xmin(); u<=box.get_xmax(); ++u) {
-            xx = x + u;
-
-            for (v=box.get_ymin(); v<=box.get_ymax(); ++v) {
-               yy = y + v;
-
-               if ( (xx < 0) || (xx >= data.nx()) ||
-                    (yy < 0) || (yy >= data.ny()) )
-                  continue;
-
-               if ( !(box.is_on(u, v)) )
-                  continue;
-
-               cur = data(x, y);
-
-               if( ::is_bad_data(cur) ) cur = 0.0;
-
-               sum += cur*(box.get_value(u, v));
-
-               ++count;
-            } // for v
-         } // for u
-
-         if ( count == 0 )  sum = bad_data_double;
-
-         d.set(sum, x, y);
-      } // for y
-   } // for x
-
-   // Reset data to d
-   data = d;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void ShapeData::conv_filter_circ(int diameter, double bd_thresh)
 

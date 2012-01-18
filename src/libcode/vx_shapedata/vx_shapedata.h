@@ -21,7 +21,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "filterbox.h"
 #include "moments.h"
 #include "node.h"
 #include "polyline.h"
