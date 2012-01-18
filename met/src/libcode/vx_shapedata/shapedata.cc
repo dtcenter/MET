@@ -882,19 +882,7 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
 void ShapeData::zero_field()
 
 {
-
-//  JHG, work on me
-
-   int x, y;
-
-   // Only search the bounding box of the polyline to increase efficiency
-
-   for(x=0; x<data.nx(); x++) {
-      for(y=0; y<data.ny(); y++) {
-
-         data.set(0, x, y);
-      }
-   }
+   data.set_constant(0.0);
 
    return;
 }
@@ -1326,9 +1314,6 @@ int get_step_case(bool lr, bool ur, bool ul, bool ll) {
 void apply_mask(ShapeData &f, ShapeData &mask)
 
 {
-
- // JHG, work on me
-
    int x, y;
 
    if(f.data.nx() != mask.data.nx() ||
@@ -1432,7 +1417,6 @@ void ShapeData::threshold_area(SingleThresh t) {
 void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThresh t)
 
 {
- // JHG, work on me
    int i, n, x, y, v_int, n_obj_inten;
    ShapeData s;
    double *obj_inten = (double *) 0, obj_inten_sum;
@@ -1523,7 +1507,6 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
 ShapeData split(const ShapeData &wfd, int &n_shapes)
 
 {
- // JHG, work on me
    int k, x, y;
    int s;
    int xx, yy, numx, numy;
@@ -1666,8 +1649,6 @@ ShapeData split(const ShapeData &wfd, int &n_shapes)
 ShapeData select(const ShapeData &id, int n)
 
 {
-
- // JHG, work on me
    int k, x, y;
    int nx, ny;
    int count;

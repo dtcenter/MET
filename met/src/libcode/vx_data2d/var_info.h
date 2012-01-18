@@ -18,7 +18,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// JHG, varinfo stuff should include vertical interpolation method type (linear or linear in log)
 static const char * const CONFIG_FileType     = "FileType";
 static const char * const CONFIG_Init         = "Init_Time";  // YYYYMMDD[_HH[MMSS]]
 static const char * const CONFIG_Valid        = "Valid_Time"; // YYYYMMDD[_HH[MMSS]]
