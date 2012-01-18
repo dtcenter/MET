@@ -72,9 +72,9 @@ void remove_temp_file(const char *file_name) {
    //
    if((errno = remove(file_name)) != 0) {
       mlog << Error << "\n\n  remove_temp_file() -> "
-           << "can't delete temporary file:\n"
-           << file_name << "\n"
-           << strerror(errno) << "\n";
+           << "can't delete temporary file: \""
+           << (file_name ? file_name : "(nul)") << "\" ("
+           << strerror(errno) << ")\n\n";
       exit(1);
    }
 
