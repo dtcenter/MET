@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES =  test_logger
+EXECUTABLES =
 
 
 OBJECTS     =  concat_string.o \
@@ -90,17 +90,12 @@ libvx_log.a: $(OBJECTS)
    ##
 
 
-test_logger: test_logger.cc $(LIBRARIES)
-	@ echo
-	$(CXX) test_logger.cc -o test_logger $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
-	-lvx_log
-
-
 ########################################################################
 
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f test_logger
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_log.a
 
