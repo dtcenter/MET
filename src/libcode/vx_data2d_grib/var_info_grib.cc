@@ -309,6 +309,20 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
    // Set the name
    tmp_str = get_grib_code_abbr(Code, PTV);
    set_req_name(tmp_str);
+
+   if(Level.type() == LevelType_Accum) {
+      int intAccum = nint(Level.upper());
+
+      // For an hourly accumulation interval, append _HH
+      if(intAccum % sec_per_hour == 0) {
+         tmp_str << '_' << HH(intAccum/sec_per_hour);
+      }
+
+      // For any other accumulation interval, append _HHMMSS
+      else {
+         tmp_str << '_' << sec_to_hhmmss(intAccum);
+      }
+   }
    set_name(tmp_str);
 
    // Set the long name
