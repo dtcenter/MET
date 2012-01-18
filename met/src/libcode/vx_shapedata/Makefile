@@ -16,8 +16,7 @@
 EXECUTABLES =
 
 
-OBJECTS     = filterbox.o \
-              moments.o   \
+OBJECTS     = moments.o   \
               node.o      \
               polyline.o  \
               shapedata.o \
@@ -25,7 +24,6 @@ OBJECTS     = filterbox.o \
               interest.o  \
               mode_Conf.o \
               engine.o    \
-
 
 LIBRARIES   = libvx_shapedata.a
 
@@ -37,8 +35,7 @@ GEN_SOURCES = mode_Conf.h \
 ########################################################################
 
 
-HEADERS     = filterbox.h \
-              moments.h \
+HEADERS     = moments.h \
               node.h \
               polyline.h \
               shape.h \
@@ -84,9 +81,6 @@ mode_Conf.h mode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
    ##  objects
    ##
 
-
-filterbox.o: filterbox.h filterbox.cc
-	$(CXX) filterbox.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 moments.o: moments.h moments.cc
 	$(CXX) moments.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)

@@ -30,7 +30,6 @@ using namespace std;
 
 #include "moments.h"
 #include "vx_util.h"
-#include "filterbox.h"
 #include "polyline.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,7 +131,6 @@ class ShapeData {
       //  object operations
       //
 
-      void conv_filter(const FilterBox &);
       void conv_filter_circ(int diameter, double bd_thresh);  // diameter must be an odd number
 
       void threshold(double t);
