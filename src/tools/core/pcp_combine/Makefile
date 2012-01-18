@@ -104,7 +104,7 @@ pcp_combine: pcp_combine.cc $(OBJECTS)
 
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	rm -f $(MET_BIN_DIR)/pcp_combine
 
 

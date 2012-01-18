@@ -136,7 +136,7 @@ libvx_analysis_util.a: $(OBJECTS)
 
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_analysis_util.a
 
