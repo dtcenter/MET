@@ -116,4 +116,4 @@ boot_seed        = "";
 rank_corr_flag   = 1;
 vif_flag         = 0;
 tmp_dir          = "/tmp";
-version          = "V3.0";
+version          = "V3.1";

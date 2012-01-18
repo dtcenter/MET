@@ -500,4 +500,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V3.0";
+version = "V3.1";

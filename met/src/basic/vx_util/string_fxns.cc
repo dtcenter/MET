@@ -37,7 +37,7 @@ bool match_met_version(const char * check_version) {
    // Check if the check version matches the first significant digit
    // of the MET version.
    //
-   if(strncasecmp(check_version, met_version, strlen("METv3") ) == 0)
+   if(strncasecmp(check_version, met_version, strlen("Vn.") ) == 0)
       match = true;
 
    return(match);
@@ -173,7 +173,7 @@ bool check_reg_exp(const char *reg_exp_str, const char *test_str)
 ////////////////////////////////////////////////////////////////////////
 
 
-int num_tokens(const char *test_str, const char *sep_str)
+int num_tokens(const char *test_str, const char *separator)
 
 {
    int n;
@@ -200,7 +200,7 @@ int num_tokens(const char *test_str, const char *sep_str)
    //
    // Compute the number of tokens in the string
    //
-   c = strtok(temp_str, sep_str);
+   c = strtok(temp_str, separator);
 
    //
    // Check for an empty string
@@ -211,7 +211,7 @@ int num_tokens(const char *test_str, const char *sep_str)
    //
    // Parse remaining tokens
    //
-   while((c = strtok(0, sep_str)) != NULL) n++;
+   while((c = strtok(0, separator)) != NULL) n++;
 
    if(temp_str) { delete [] temp_str; temp_str = (char *) 0; }
 
