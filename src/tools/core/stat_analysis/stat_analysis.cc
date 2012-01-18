@@ -272,15 +272,7 @@ void sanity_check() {
    // Conf: version
    //
 
-   if(strncasecmp(conf.version().sval(), met_version,
-      strlen(conf.version().sval())) != 0) {
-
-      mlog << Error << "\n\n  sanity_check() -> "
-           << "The version number listed in the config file ("
-           << conf.version().sval() << ") does not match the version "
-           << "of the code (" << met_version << ").\n\n";
-      exit(1);
-   }
+   check_met_version(conf.version().sval());
 
    //
    // Check for fcst_valid_beg > fcst_valid_end

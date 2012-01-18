@@ -22,8 +22,47 @@ using namespace std;
 #include <cmath>
 #include <regex.h>
 
+#include "util_constants.h"
 #include "string_fxns.h"
 #include "vx_log.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool match_met_version(const char * check_version) {
+   bool match = false;
+
+   //
+   // Check if the check version matches the first significant digit
+   // of the MET version.
+   //
+   if(strncasecmp(check_version, met_version, strlen("METv3") ) == 0)
+      match = true;
+
+   return(match);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void check_met_version(const char * check_version) {
+
+   //
+   // Error if the check version does not match the MET version.
+   //
+   if(!(match_met_version(check_version))) {
+
+      mlog << Error << "\n\n  check_met_version() -> "
+           << "The version number listed in the config file ("
+           << check_version << ") is not compatible with the current "
+           << "version of the code (" << met_version << ").\n\n";
+      exit(1);
+   }
+
+   return;
+}
 
 
 ////////////////////////////////////////////////////////////////////////

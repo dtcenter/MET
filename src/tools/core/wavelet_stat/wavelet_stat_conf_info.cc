@@ -126,15 +126,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    // Conf: version
    //
 
-   if(strncasecmp(conf.version().sval(), met_version,
-      strlen(conf.version().sval())) != 0) {
-
-      mlog << Error << "\n\nWaveletStatConfInfo::process_config() -> "
-           << "The version number listed in the config file ("
-           << conf.version().sval() << ") does not match the version "
-           << "of the code (" << met_version << ").\n\n";
-      exit(1);
-   }
+   check_met_version(conf.version().sval());
 
    //
    // Conf: model

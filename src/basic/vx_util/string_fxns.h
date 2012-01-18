@@ -18,6 +18,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+extern void check_met_version(const char *);
+
+extern bool match_met_version(const char *);
+
 extern const char * get_short_name(const char * path);
 
 extern void append_char(char *, const char);
