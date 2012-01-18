@@ -1703,7 +1703,7 @@ Dcolor color_lookup(int index)
 
 if ( (index < 0) || (index >= clist.n_elements()) )  {
 
-   mlog << Error << "\n\n  color_lookup(int) -> bad index ... " << index << "\n\n";
+   mlog << Error << "\n  color_lookup(int) -> bad index ... " << index << "\n\n";
 
    exit ( 1 );
 
@@ -1777,7 +1777,7 @@ void assign_color_2(int index, const Dcolor & d)
 
 if ( (index < 0) || (index >= clist.n_elements()) )  {
 
-   mlog << Error << "\n\n  void assign_color_2(int, const Dcolor &) -> bad index ... " << index << "\n\n";
+   mlog << Error << "\n  void assign_color_2(int, const Dcolor &) -> bad index ... " << index << "\n\n";
 
    exit ( 1 );
 
@@ -1931,7 +1931,7 @@ ifstream in;
 
 c = (int) (color_column - strlen(colortext));
 
-mlog << Error << "\n\n"
+mlog << Error << "\n  "
      << "  syntax error in file \"" << input_filename << "\"\n\n"
      << "      line   = " << color_LineNumber << "\n\n"
      << "      column = " << c << "\n\n"
@@ -1952,7 +1952,7 @@ in.close();
 
 
 
-mlog << Error << "\n\n"
+mlog << Error << "\n  "
      << line
      << "\n";
 
@@ -1975,7 +1975,7 @@ for (j=1; j<=line_len; ++j)  {   //  j starts a one here, not zero
 
 
 
-mlog << Error << "\n\n";
+mlog << Error << "\n  ";
 
 cout.flush();
 

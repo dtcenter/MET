@@ -298,7 +298,7 @@ if ( config_filename.length() == 0 )  {
 
    trouble = true;
 
-   mlog << Error << "\n\n  " << program_name << ": no config file set!\n\n";
+   mlog << Error << "\n  " << program_name << ": no config file set!\n\n";
 
    // exit ( 1 );
 
@@ -312,7 +312,7 @@ if ( output_filename.length() == 0 )  {
 
    trouble = true;
 
-   mlog << Error << "\n\n  " << program_name << ": no output file set!\n\n";
+   mlog << Error << "\n  " << program_name << ": no output file set!\n\n";
 
    // exit ( 1 );
 
@@ -327,7 +327,7 @@ if ( (cp_nh_filename.length() == 0) && (cp_sh_filename.length() == 0) &&
 
    trouble = true;
 
-   mlog << Error << "\n\n  " << program_name << ": no input file(s) set!\n\n";
+   mlog << Error << "\n  " << program_name << ": no input file(s) set!\n\n";
 
    // exit ( 1 );
 
@@ -339,7 +339,7 @@ if (cp_nh_filename.length() != 0)  {
 
       trouble = true;
 
-      mlog << Error << "\n\n  " << program_name << ": missing the pixel time file!\n\n";
+      mlog << Error << "\n  " << program_name << ": missing the pixel time file!\n\n";
 
       // exit ( 1 );
 
@@ -352,7 +352,7 @@ if (cp_sh_filename.length() != 0)  {
 
       trouble = true;
 
-      mlog << Error << "\n\n  " << program_name << ": missing the pixel time file!\n\n";
+      mlog << Error << "\n  " << program_name << ": missing the pixel time file!\n\n";
 
       // exit ( 1 );
 

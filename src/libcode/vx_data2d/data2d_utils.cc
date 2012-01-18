@@ -27,7 +27,7 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
    // Check that the dimensions match
    //
    if(u2d.nx() != v2d.nx() || u2d.ny() != v2d.ny()) {
-      mlog << Warning << "\n\nderive_wdir() -> "
+      mlog << Warning << "\n  derive_wdir() -> "
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";
@@ -86,7 +86,7 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
    // Check that the dimensions match
    //
    if(u2d.nx() != v2d.nx() || u2d.ny() != v2d.ny()) {
-      mlog << Warning << "\n\nderive_wind() -> "
+      mlog << Warning << "\n  derive_wind() -> "
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";
@@ -199,7 +199,7 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
    // Check that the dimensions match
    //
    if(u2d.nx() != v2d.nx() || u2d.ny() != v2d.ny()) {
-      mlog << Warning << "\n\nrotate_uv_grid_to_earth() -> "
+      mlog << Warning << "\n  rotate_uv_grid_to_earth() -> "
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";

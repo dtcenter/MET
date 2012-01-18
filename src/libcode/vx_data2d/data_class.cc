@@ -166,7 +166,7 @@ const Grid & Met2dDataFile::grid() const
 
 if ( ! _Grid )  {
 
-   mlog << Error << "\n\n  Met2dDataFile::grid() -> no grid defined!\n\n";
+   mlog << Error << "\n  Met2dDataFile::grid() -> no grid defined!\n\n";
 
    exit ( 1 );
 

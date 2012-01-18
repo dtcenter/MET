@@ -211,7 +211,7 @@ AfwaCloudPctFile * f = new AfwaCloudPctFile;
 
 if ( !(f->read(filename)) )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_cp_nh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_cp_nh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -235,7 +235,7 @@ AfwaCloudPctFile * f = new AfwaCloudPctFile;
 
 if ( !(f->read(filename)) )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_cp_sh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_cp_sh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -259,7 +259,7 @@ AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
 
 if ( !(f->read(filename)) )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_pt_nh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_pt_nh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -283,7 +283,7 @@ AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
 
 if ( !(f->read(filename)) )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_pt_sh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_pt_sh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -315,7 +315,7 @@ get_interpolator();
 
 if ( !interp )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad interpolator specification in config file\"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad interpolator specification in config file\"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -329,7 +329,7 @@ get_grid();
 
 if ( !ToGrid )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad \"to\" grid specification in config file\"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad \"to\" grid specification in config file\"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -349,7 +349,7 @@ find_grid_hemisphere();
 
 if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !cp_nh ) {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_config() -> missing northern hemisphere data must be specified using the \"-nh\" argument\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_config() -> missing northern hemisphere data must be specified using the \"-nh\" argument\n\n";
 
    exit ( 1 );
 
@@ -357,7 +357,7 @@ if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !cp_nh ) {
 
 if ( ( Hemi == south_hemisphere || Hemi == both_hemispheres ) && !cp_sh ) {
 
-   mlog << Error << "\n\n  WwmcaRegridder::set_config() -> missing southern hemisphere data must be specified using the \"-sh\" argument\n\n";
+   mlog << Error << "\n  WwmcaRegridder::set_config() -> missing southern hemisphere data must be specified using the \"-sh\" argument\n\n";
 
    exit ( 1 );
 
@@ -416,7 +416,7 @@ switch ( Hemi )  {
 
    default:
       gridhemisphere_to_string(Hemi, junk);
-      mlog << Error << "\n\n  WwmcaRegridder::get_interpolated_value(int x, int y) const -> bad hemisphere ... " << junk << "\n\n";
+      mlog << Error << "\n  WwmcaRegridder::get_interpolated_value(int x, int y) const -> bad hemisphere ... " << junk << "\n\n";
       exit ( 1 );
       break;
 
@@ -940,7 +940,7 @@ if ( grid_strings.n_elements() == 1 )  {
 
    if ( !status || !(ginfo.ok()) )  {
 
-      mlog << Error << "\n\n  WwmcaRegridder::get_grid() -> can't find any grid with name \"" << grid_strings[0] << "\"\n\n";
+      mlog << Error << "\n  WwmcaRegridder::get_grid() -> can't find any grid with name \"" << grid_strings[0] << "\"\n\n";
 
       exit ( 1 );
 
@@ -969,7 +969,7 @@ else if ( s == "stereo"   )  parse_stereographic_grid();
 else if ( s == "mercator" )  parse_mercator_grid();
 else {
 
-mlog << Error << "\n\n  WwmcaRegridder::get_grid() -> can't create grid from config file string \""
+mlog << Error << "\n  WwmcaRegridder::get_grid() -> can't create grid from config file string \""
      << gridinfo_string << "\"\n\n";
 
 exit ( 1 );
@@ -1000,7 +1000,7 @@ const int N = grid_strings.n_elements();
 
 if ( (N < 9) || (N > 10) )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::parse_lambert_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::parse_lambert_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -1093,7 +1093,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 10 )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::parse_stereographic_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::parse_stereographic_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -1130,7 +1130,7 @@ c          = grid_strings[j++];
 
 if ( strlen(c) != 1 )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::parse_stereographic_grid() -> bad hemisphere in grid spec in config file \"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::parse_stereographic_grid() -> bad hemisphere in grid spec in config file \"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -1140,7 +1140,7 @@ H = *c;
 
 if ( (H != 'N') && (H != 'S') )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::parse_stereographic_grid() -> bad hemisphere in grid spec in config file \"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::parse_stereographic_grid() -> bad hemisphere in grid spec in config file \"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -1148,7 +1148,7 @@ if ( (H != 'N') && (H != 'S') )  {
 
 if ( H == 'S' )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::parse_stereographic_grid() -> South hemisphere grids not yet supported\n\n";
+   mlog << Error << "\n  WwmcaRegridder::parse_stereographic_grid() -> South hemisphere grids not yet supported\n\n";
 
    exit ( 1 );
 
@@ -1214,7 +1214,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 7 )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::parse_latlon_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::parse_latlon_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -1292,7 +1292,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 7 )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::parse_mercator_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\n  WwmcaRegridder::parse_mercator_grid() -> bad grid spec in config file \"" << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 

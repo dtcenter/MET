@@ -813,7 +813,7 @@ void VxPairDataEnsemble::find_vert_lvl(double obs_lvl,
    }
    // Check if an error occurred
    else if(is_eq(dist_below, 1.0e30) && is_eq(dist_above, 1.0e30)) {
-      mlog << Error << "\n\n  VxPairDataEnsemble::find_vert_lvl() -> "
+      mlog << Error << "\n  VxPairDataEnsemble::find_vert_lvl() -> "
            << "could not find a level above and/or below the "
            << "observation level of " << obs_lvl << ".\n\n";
       exit(1);

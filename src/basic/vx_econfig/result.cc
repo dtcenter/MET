@@ -245,7 +245,7 @@ switch ( Type )  {
 
 
    default:
-      mlog << Error << "\n\n  Result::dump() const -> "
+      mlog << Error << "\n  Result::dump() const -> "
            << "don't know how to dump type \""
            << resulttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
@@ -368,7 +368,7 @@ switch ( Type )  {
       break;
 
    default:
-      mlog << Error << "\n\n  Result::ival() const -> "
+      mlog << Error << "\n  Result::ival() const -> "
            << "bad type ... \"" << resulttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -408,7 +408,7 @@ switch ( Type )  {
       break;
 
    default:   
-      mlog << Error << "\n\n  Result::ival() const -> "
+      mlog << Error << "\n  Result::ival() const -> "
            << "bad type ... \"" << resulttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -447,7 +447,7 @@ switch ( Type )  {
       break;
 
    default:
-      mlog << Error << "\n\n  Result::dval() const -> "
+      mlog << Error << "\n  Result::dval() const -> "
            << "bad type ... \"" << resulttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -470,7 +470,7 @@ const char * Result::sval() const
 
 if ( Type != result_string )  {
 
-   mlog << Error << "\n\n  Result::sval() const -> "
+   mlog << Error << "\n  Result::sval() const -> "
         << "bad type ... \"" << resulttype_to_string(Type) << "\"\n\n";
 
    exit ( 1 );

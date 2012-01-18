@@ -262,7 +262,7 @@ for (j=0; j<n_mode_columns; ++j)  {
 
 }
 
-mlog << Error << "\n\n  BasicModeAnalysisJob::add_column_by_name(const char *) -> "
+mlog << Error << "\n  BasicModeAnalysisJob::add_column_by_name(const char *) -> "
      << "bad column name \"" << name << "\"\n\n";
 
 exit ( 1 );
@@ -282,7 +282,7 @@ void BasicModeAnalysisJob::add_column_by_number(int k)
 
 if ( (k < 0) || (k >= n_mode_columns) )  {
 
-   mlog << Error << "\n\n  BasicModeAnalysisJob::add_column_by_number(int) -> "
+   mlog << Error << "\n  BasicModeAnalysisJob::add_column_by_number(int) -> "
         << "bad column number -> " << k << "\n\n";
 
    exit ( 1 );
@@ -524,7 +524,7 @@ setup();
 
 if ( Nfields == 0 )  {
 
-   mlog << Error << "\n\n  SummaryJob::do_job() -> "
+   mlog << Error << "\n  SummaryJob::do_job() -> "
         << "no columns specified!\n\n";
 
    exit ( 1 );
@@ -588,7 +588,7 @@ ModeLine L;
 
 if ( !(in.open(path)) )  {
 
-   mlog << Error << "\n\n  SummaryJob::process_mode_file(const char *) -> "
+   mlog << Error << "\n  SummaryJob::process_mode_file(const char *) -> "
         << "can't open mode file \"" << path << "\" for reading\n\n";
 
    exit  ( 1 );
@@ -883,7 +883,7 @@ void ByCaseJob::setup()
 if ( !atts.is_single_toggle_set ||
      (atts.is_single_toggle_set && !atts.is_single) )  {
 
-   mlog << Warning << "\n\n  The -bycase job should always be run with "
+   mlog << Warning << "\n  The -bycase job should always be run with "
         << "the -single option!\n\n";
 
 }
@@ -894,7 +894,7 @@ if ( !atts.is_single_toggle_set ||
 
 if ( !atts.is_simple_toggle_set )  {
 
-   mlog << Warning << "\n\n  The -bycase job should always be run with "
+   mlog << Warning << "\n  The -bycase job should always be run with "
         << "the -simple or -cluster option!\n\n";
 
 }
@@ -1003,7 +1003,7 @@ const int column_index = fcst_valid_column;
 
 if ( !(in.open(mode_filename)) )  {
 
-   mlog << Error << "\n\n  ByCaseJob::process_mode_file() -> "
+   mlog << Error << "\n  ByCaseJob::process_mode_file() -> "
         << "can't open mode file \"" << mode_filename << "\" for reading\n\n";
 
    exit  ( 1 );
@@ -1067,7 +1067,7 @@ const char * c = (const char *) 0;
 
 if ( !(in.open(mode_filename)) )  {
 
-   mlog << Error << "\n\n  get_times_from_file() -> "
+   mlog << Error << "\n  get_times_from_file() -> "
         << "can't open mode file \"" << mode_filename << "\" for reading\n\n";
 
    exit  ( 1 );

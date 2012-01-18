@@ -91,7 +91,7 @@ while ( 1 )  {
 
    if ( k >= (max_comment_length - 2) )  {
 
-      mlog << Error << "\n\n  void get_comment(ifstream &, char *) -> comment too long!\n\n";
+      mlog << Error << "\n  void get_comment(ifstream &, char *) -> comment too long!\n\n";
 
       exit ( 1 );
 

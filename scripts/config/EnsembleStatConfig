@@ -40,7 +40,7 @@ model = "WRF";
 // e.g. ens_field[] = [ "61/A3", "RH/L10" ]; for GRIB input
 // e.g. ens_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)" ]; for NetCDF input
 //
-ens_field[] = [ "61/A24", "REFC/L0", "UGRD/Z10", "VGRD/Z10" ];
+ens_field[] = [ "61/A24", "REFC/L0", "UGRD/Z10", "VGRD/Z10", "WIND/Z10" ];
 
 //
 // Specify a comma-separated list of groups of thresholds to be applied to the
@@ -58,7 +58,7 @@ ens_field[] = [ "61/A24", "REFC/L0", "UGRD/Z10", "VGRD/Z10" ];
 //
 // e.g. ens_thresh[] = [ "gt0.0 ge5.0", "gt0.0", "lt80.0 ge80.0" ];
 //
-ens_thresh[] = [ "gt0.0 ge10.0", "ge35.0", "ge5.0", "ge5.0" ];
+ens_thresh[] = [ "gt0.0 ge10.0", "ge35.0", "ge5.0", "ge5.0", "ge5.0" ];
 
 //
 // When summarizing the ensemble, compute a ratio of the number of valid

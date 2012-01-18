@@ -230,7 +230,7 @@ void Moments::scale(double s1, double s2) {
 void Moments::centroid(double &xbar, double &ybar) const {
 
    if(is_eq(area, 0.0)) {
-      mlog << Error << "\n\nERROR: Moments::centroid -> "
+      mlog << Error << "\n  Moments::centroid -> "
            << "divide by zero: area = " << area << "\n\n";
 
       exit(1);

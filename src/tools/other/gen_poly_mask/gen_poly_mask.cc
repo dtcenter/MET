@@ -185,7 +185,7 @@ datafile = factory.new_met_2d_data_file(data_filename);
 
 if ( !datafile )  {
 
-   mlog << Error << "\n\n  process_data_file() -> "
+   mlog << Error << "\n  process_data_file() -> "
         << "can't open data file \"" << data_filename << "\"\n\n";
 
    exit ( 1 );
@@ -283,7 +283,7 @@ void write_netcdf()
    f_out = new NcFile(out_filename, NcFile::Replace);
 
    if(!f_out->is_valid()) {
-      mlog << Error << " write_netcdf() -> "
+      mlog << Error << "\n  write_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
       f_out->close();
@@ -360,7 +360,7 @@ void write_netcdf()
    } // end for x
 
    if(!mask_var->put(&mask_data[0], grid.ny(), grid.nx())) {
-      mlog << Error << " write_netcdf() -> "
+      mlog << Error << "\n  write_netcdf() -> "
            << "error with mask_var->put\n\n";
       exit(1);
    }

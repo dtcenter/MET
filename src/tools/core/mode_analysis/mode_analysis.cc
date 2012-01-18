@@ -225,7 +225,7 @@ cline.parse();
 
 if ( !job )  {
 
-   mlog << Error << "\n\nparse_command_line() -> no job type set!\n\n";
+   mlog << Error << "\n  parse_command_line() -> no job type set!\n\n";
 
    exit ( 1 );
 
@@ -258,7 +258,7 @@ job->atts.parse_command_line(cmd_line);
 
 if ( cmd_line.has_option(j) )  {
 
-   mlog << Error << "\n\n" << program_name << " -> unrecognized switch: \""
+   mlog << Error << "\n  " << program_name << " -> unrecognized switch: \""
         << cmd_line[j] << "\"\n\n";
 
    exit  ( 1 );
@@ -292,7 +292,7 @@ for (j=0; j<(lookin_dirs.n_elements()); ++j)  {
 
 if ( mode_files.n_elements() <= 0 )  {
 
-   mlog << Error << "\n\nparse_command_line() -> at least one MODE file must be specified! "
+   mlog << Error << "\n  parse_command_line() -> at least one MODE file must be specified! "
         << "Use the -lookin option.\n\n";
 
    exit ( 1 );
@@ -382,7 +382,7 @@ void set_summary()
 
 if ( job )  {
 
-   mlog << Error << "\n\nset_summary() -> job type already set!\n\n";
+   mlog << Error << "\n  set_summary() -> job type already set!\n\n";
 
    exit ( 1 );
 
@@ -405,7 +405,7 @@ void set_bycase()
 
 if ( job )  {
 
-   mlog << Error << "\n\nset_bycase() -> job type already set!\n\n";
+   mlog << Error << "\n  set_bycase() -> job type already set!\n\n";
 
    exit ( 1 );
 
@@ -442,7 +442,7 @@ void add_field(const char * name)
 
 if ( !job )  {
 
-   mlog << Error << "\n\nadd_field(const char *) -> no job type set!\n\n";
+   mlog << Error << "\n  add_field(const char *) -> no job type set!\n\n";
 
    exit ( 1 );
 
@@ -474,7 +474,7 @@ void set_dumpfile(const char * path)
 
 if ( dumpfile )  {
 
-   mlog << Error << "\n\nset_dumpfile(const char * path) -> output dump file already specified!\n\n";
+   mlog << Error << "\n  set_dumpfile(const char * path) -> output dump file already specified!\n\n";
 
    exit ( 1 );
 
@@ -486,7 +486,7 @@ dumpfile->open(path);
 
 if ( !(*dumpfile) )  {
 
-   mlog << Error << "\n\nset_dumpfile(const char * path) -> can't open dump file \""
+   mlog << Error << "\n  set_dumpfile(const char * path) -> can't open dump file \""
         << path << "\" for output\n\n";
 
    exit ( 1 );
@@ -507,7 +507,7 @@ void set_outfile(const char * path)
 
 if ( outfile )  {
 
-   mlog << Error << "\n\nvoid set_outfile(const char *) -> output file already set\n\n";
+   mlog << Error << "\n  void set_outfile(const char *) -> output file already set\n\n";
 
    exit ( 1 );
 
@@ -519,7 +519,7 @@ outfile->open(path);
 
 if ( !(*outfile) )  {
 
-   mlog << Error << "\n\nset_outfile(const char * path) -> unable to open output file \""
+   mlog << Error << "\n  set_outfile(const char * path) -> unable to open output file \""
         << path << "\"\n\n";
 
    exit ( 1 );
@@ -542,7 +542,7 @@ struct stat s;
 
 if ( stat(path, &s) < 0 )  {
 
-   mlog << Error << "\n\nset_lookin() -> can't stat \"" << path << "\"\n\n";
+   mlog << Error << "\n  set_lookin() -> can't stat \"" << path << "\"\n\n";
 
    exit ( 1 );
 
@@ -552,7 +552,7 @@ if ( stat(path, &s) < 0 )  {
 else if ( S_ISDIR(s.st_mode) )  lookin_dirs.add(path);
 else {
 
-   mlog << Error << "\n\nset_lookin() -> bad type for \"" << path << "\"\n\n";
+   mlog << Error << "\n  set_lookin() -> bad type for \"" << path << "\"\n\n";
 
    exit ( 1 );
 

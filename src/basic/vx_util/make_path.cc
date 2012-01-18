@@ -103,7 +103,7 @@ if ( status < 0 )  {
 
    if ( errno == ENOTDIR )  {
 
-      mlog << Error << "\n\n  path component not directory!\n\n";
+      mlog << Error << "\n  path component not directory!\n\n";
 
       exit ( 1 );
 
@@ -115,7 +115,7 @@ if ( status < 0 )  {
       //  must be some obscure error
       //
 
-   mlog << Error << " path_exists() -> error ... "
+   mlog << Error << "\n  path_exists() -> error ... "
         << strerror(errno) << "\n\n";
 
    exit ( 1 );

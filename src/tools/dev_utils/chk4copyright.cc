@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 
       if (copyright_notice_filename.length() == 0)
       {
-         mlog << Error << "\n\n  no copyright notice filename given on command line or set in the environment variable COPYRIGHT_NOTICE!\n\n";
+         mlog << Error << "\n  no copyright notice filename given on command line or set in the environment variable COPYRIGHT_NOTICE!\n\n";
          usage();
       }
    }
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 
 void usage()
 {
-   mlog << Error << "\n\n  Usage: " << program_name << "\n"
+   mlog << Error << "\n  Usage: " << program_name << "\n"
         << "          -dir DirectoryPath\n"
         << "          [-notice CopyrightNoticeFilename ]\n"
         << "          [-quiet ]\n\n";
@@ -232,7 +232,7 @@ void process_directory(const char * dir_name)
          //
       if ((dir = opendir(tmp_directory)) == NULL)
       {
-         mlog << Error << "\n\n  process_directory() -> the directory \"/tmp\" does not exist.\n\n";
+         mlog << Error << "\n  process_directory() -> the directory \"/tmp\" does not exist.\n\n";
          exit (1);
       }
 
@@ -247,7 +247,7 @@ void process_directory(const char * dir_name)
       //
    if ((dir = opendir(dir_name)) == NULL)
    {
-      mlog << Error << "\n\n  process_directory() -> can't open directory \"" << dir_name << "\"\n\n";
+      mlog << Error << "\n  process_directory() -> can't open directory \"" << dir_name << "\"\n\n";
       exit (1);
    }
 
@@ -317,7 +317,7 @@ void process_directory(const char * dir_name)
 
             if (fd == -1)
             {
-               mlog << Error << "\n\n  process_directory() -> unable to open file \""
+               mlog << Error << "\n  process_directory() -> unable to open file \""
                     << new_filename << "\"\n\n";
                exit (1);
             }

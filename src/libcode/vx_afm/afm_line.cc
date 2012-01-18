@@ -231,7 +231,7 @@ if ( is_integer(tok_pointer) )  {
 
    tok.type = afm_token_name;
 
-   // mlog << Error << "\n\n  AfmLine::nexttoken() -> bad token ... \""
+   // mlog << Error << "\n  AfmLine::nexttoken() -> bad token ... \""
    //      << tok_pointer << "\"\n\n";
    //
    // exit ( 1 );

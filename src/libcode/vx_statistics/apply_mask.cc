@@ -53,7 +53,7 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
       // Search for the grid name in the predefined grids
       //
       if(!find_grid_by_name(mask_name, mask_grid)) {
-         mlog << Error << "\n\n  parse_grid_mask() -> "
+         mlog << Error << "\n  parse_grid_mask() -> "
               << "the mask_grid requested \"" << mask_grid_str
               << "\" is not defined.\n\n";
          exit(1);
@@ -96,7 +96,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
    // Store the masking file name
    if((ptr = strtok(mask_poly_path, " ")) == NULL) {
-      mlog << Error << "\n\n  parse_poly_mask() -> "
+      mlog << Error << "\n  parse_poly_mask() -> "
            << "must supply a file name to be used.\n\n";
       exit(1);
    }
@@ -124,7 +124,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
       // Check that the masking grid matches the input grid
       if(!(mtddf->grid() == grid)) {
-         mlog << Error << "\n\n  parse_poly_mask() -> "
+         mlog << Error << "\n  parse_poly_mask() -> "
               << "the masking grid does not match the input grid.\n\n";
          exit(1);
       }
@@ -194,7 +194,7 @@ void parse_sid_mask(const char *mask_sid_file, StringArray &mask_sid) {
    in.open(tmp_file);
 
    if(!in) {
-      mlog << Error << "\n\n  parse_sid_mask() -> "
+      mlog << Error << "\n  parse_sid_mask() -> "
            << "Can't open the mask station ID file specified ("
            << tmp_file << ").\n\n";
       exit(1);
@@ -220,7 +220,7 @@ void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
    // If the masking grid's dimensions are zero, there's nothing to be done
    //
    if(mask_grid.nx() == 0 || mask_grid.ny() == 0) {
-      mlog << Warning << "\n\n  void apply_grid_mask() -> "
+      mlog << Warning << "\n  void apply_grid_mask() -> "
            << "no grid masking applied since the masking grid "
            << "specified is empty.\n\n";
       return;
@@ -263,7 +263,7 @@ void apply_poly_mask_xy(const Polyline &poly, DataPlane &dp) {
    // defined and there is nothing to do
    //
    if(poly.n_points < 3) {
-      mlog << Warning << "\n\n  void apply_poly_mask_xy() -> "
+      mlog << Warning << "\n  void apply_poly_mask_xy() -> "
            << "no polyline masking applied since the masking polyline "
            << "contains fewer than 3 points.\n\n";
       return;
@@ -301,7 +301,7 @@ void apply_poly_mask_latlon(const Polyline &poly, const Grid &grid, DataPlane &d
    // defined and there is nothing to do
    //
    if(poly.n_points < 3) {
-      mlog << Warning << "\n\n  void apply_poly_mask_latlon() -> "
+      mlog << Warning << "\n  void apply_poly_mask_latlon() -> "
            << "no polyline masking applied since the masking polyline "
            << "contains fewer than 3 points.\n\n";
       return;

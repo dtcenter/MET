@@ -831,7 +831,7 @@ u = strchr(c, '_');
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  ModeLine::pair_obj_numbers() const -> "
+   mlog << Error << "\n  ModeLine::pair_obj_numbers() const -> "
         << "underscore char not found in object id: \"" << c << "\"\n\n";
 
    exit ( 1 );
@@ -1597,7 +1597,7 @@ directory = opendir(directory_path);
 
 if ( !directory )  {
 
-   mlog << Error << "\n\n  get_mode_filenames_from_dir() -> "
+   mlog << Error << "\n  get_mode_filenames_from_dir() -> "
         << "can't open directory path \"" << directory_path << "\"\n\n";
 
    exit ( 1 );
@@ -1613,7 +1613,7 @@ while ( (entry = readdir(directory)) != NULL )  {
 
    if ( stat(entry_path, &sbuf) < 0 )  {
 
-      mlog << Error << "\n\n  get_mode_filenames_from_dir() -> "
+      mlog << Error << "\n  get_mode_filenames_from_dir() -> "
            << "can't stat \"" << entry_path << "\"\n\n";
 
       exit ( 1 );

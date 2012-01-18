@@ -137,7 +137,7 @@ void PairDataPoint::set_pair(int i_pair, const char *sid,
                              double f, double c, double o) {
 
    if(i_pair < 0 || i_pair >= n_pair) {
-      mlog << Error << "\n\n  PairDataPoint::set_pair() -> "
+      mlog << Error << "\n  PairDataPoint::set_pair() -> "
            << "range check error: " << i_pair << " not in (0, "
            << n_pair << ").\n\n"
           ;
@@ -763,7 +763,7 @@ void VxPairDataPoint::find_fcst_vert_lvl(double obs_lvl,
    // Check if an error occurred
    else if(is_eq(dist_below, 1.0e30) && is_eq(dist_above, 1.0e30)) {
 
-      mlog << Error << "\n\n  VxPairDataPoint::find_fcst_vert_lvl() -> "
+      mlog << Error << "\n  VxPairDataPoint::find_fcst_vert_lvl() -> "
            << "could not find a level above and/or below the "
            << "observation level of " << obs_lvl << ".\n\n"
           ;
@@ -824,7 +824,7 @@ void VxPairDataPoint::find_climo_vert_lvl(double obs_lvl,
    // Check if an error occurred
    else if(is_eq(dist_below, 1.0e30) && is_eq(dist_above, 1.0e30)) {
 
-      mlog << Error << "\n\n  VxPairDataPoint::find_climo_vert_lvl() -> "
+      mlog << Error << "\n  VxPairDataPoint::find_climo_vert_lvl() -> "
            << "could not find a level above and/or below the "
            << "observation level of " << obs_lvl << ".\n\n"
           ;

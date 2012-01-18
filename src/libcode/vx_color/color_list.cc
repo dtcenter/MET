@@ -345,7 +345,7 @@ u = new ClistEntry [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  ColorList::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  ColorList::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -477,7 +477,7 @@ ClistEntry ColorList::operator[](int n) const
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\n\n  Clist::operator[](int) const -> range check error\n\n";
+   mlog << Error << "\n  Clist::operator[](int) const -> range check error\n\n";
 
    exit ( 1 );
 

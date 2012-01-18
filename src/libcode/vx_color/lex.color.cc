@@ -2065,7 +2065,7 @@ while ( 1 )  {
 
    if ( (n + 1) >= (int) sizeof(line) )  {
 
-      mlog << Error << "\n\n  do_quoted_string() -> string too long! ... c = \"" << c << "\"\n\n";
+      mlog << Error << "\n  do_quoted_string() -> string too long! ... c = \"" << c << "\"\n\n";
 
       exit ( 1 );
 

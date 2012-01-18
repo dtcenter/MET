@@ -74,7 +74,7 @@ switch ( mode )  {
       break;
 
    default:
-      mlog << Error << "\n\n  RunLengthEncodeFilter::eat(unsigned char) -> bad mode\n\n";
+      mlog << Error << "\n  RunLengthEncodeFilter::eat(unsigned char) -> bad mode\n\n";
       exit ( 1 );
       break;
 
@@ -220,7 +220,7 @@ void RunLengthEncodeFilter::dump_run(int length)
 
 if ( (length < 2) || (length > 128) )  {
 
-   mlog << Error << "\n\n  RunLengthEncodeFilter::do_run() -> bad length ... " << length << "\n\n";
+   mlog << Error << "\n  RunLengthEncodeFilter::do_run() -> bad length ... " << length << "\n\n";
 
    exit ( 1 );
 

@@ -227,7 +227,7 @@ u = new char [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  ConcatString::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  ConcatString::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -382,7 +382,7 @@ void ConcatString::set_precision(int k)
 
 if ( (k < 0) || (k > concat_string_max_precision) )  {
 
-   mlog << Error << "\n\n  ConcatString::set_precision(int) -> bad value\n\n";
+   mlog << Error << "\n  ConcatString::set_precision(int) -> bad value\n\n";
 
    exit ( 1 );
 
@@ -528,7 +528,7 @@ u = new char [1 + Length];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  ConcatString::split(const char *) const -> memory allocation error\n\n";
+   mlog << Error << "\n  ConcatString::split(const char *) const -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -582,7 +582,7 @@ u = new char [1 + Length];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  ConcatString::ws_strip() -> memory allocation error\n\n";
+   mlog << Error << "\n  ConcatString::ws_strip() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -818,7 +818,7 @@ switch ( c )  {
    case cs_clear:  a.clear();  break;
 
    default:
-      mlog << Error << "\n\n  operator<<(ostream &, CSInlineCommand) -> bad CSInlineCommand value\n\n";
+      mlog << Error << "\n  operator<<(ostream &, CSInlineCommand) -> bad CSInlineCommand value\n\n";
       exit ( 1 );
       break;
 

@@ -64,7 +64,7 @@ ncfile = new NcFile (output_filename, NcFile::Replace);
 
 if ( !(ncfile->is_valid()) )  {
 
-   mlog << Error << "\n\n  WwmcaRegridder::do_lambert_output(const char * output_filename) -> Netcdf file is not valid!\n\n";
+   mlog << Error << "\n  WwmcaRegridder::do_lambert_output(const char * output_filename) -> Netcdf file is not valid!\n\n";
 
    exit ( 1 );
 

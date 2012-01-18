@@ -1366,7 +1366,7 @@ in->open(filename);
 
 if ( !(*in) )  {
 
-   mlog << Error << "\n\n  Afm::read() -> unable to open input file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  Afm::read() -> unable to open input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -1391,7 +1391,7 @@ while ( (*in) >> line )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::read() -> expecting keyword!\n\n";
+      mlog << Error << "\n  Afm::read() -> expecting keyword!\n\n";
 
       tok.dump(cerr);
 
@@ -1408,7 +1408,7 @@ while ( (*in) >> line )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::read() -> bad keyword\n\n";
+         mlog << Error << "\n  Afm::read() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;
@@ -1500,7 +1500,7 @@ while ( (*in) >> line )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::do_startfontmetrics() -> expecting keyword!\n\n";
+      mlog << Error << "\n  Afm::do_startfontmetrics() -> expecting keyword!\n\n";
 
       tok.dump(cerr);
 
@@ -1610,7 +1610,7 @@ while ( (*in) >> line )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::do_startfontmetrics() -> bad keyword\n\n";
+         mlog << Error << "\n  Afm::do_startfontmetrics() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;
@@ -1653,7 +1653,7 @@ while ( (*in) >> line )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::do_startcharmetrics() -> expecting keyword!\n\n";
+      mlog << Error << "\n  Afm::do_startcharmetrics() -> expecting keyword!\n\n";
 
       tok.dump(cerr);
 
@@ -1668,7 +1668,7 @@ while ( (*in) >> line )  {
 
       case afm_keyword_C:
          if ( n > n_cms )  {
-            mlog << Error << "\n\n  Afm::do_startcharmetrics() -> too many char metrics!\n\n";
+            mlog << Error << "\n  Afm::do_startcharmetrics() -> too many char metrics!\n\n";
             exit ( 1 );
          }
          do_c(line, n);
@@ -1677,7 +1677,7 @@ while ( (*in) >> line )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::do_startcharmetrics() -> bad keyword\n\n";
+         mlog << Error << "\n  Afm::do_startcharmetrics() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;
@@ -1720,7 +1720,7 @@ while ( (*in) >> line )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::do_startkerndata() -> expecting keyword!\n\n";
+      mlog << Error << "\n  Afm::do_startkerndata() -> expecting keyword!\n\n";
 
       tok.dump(cerr);
 
@@ -1742,7 +1742,7 @@ while ( (*in) >> line )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::do_startkerndata() -> bad keyword\n\n";
+         mlog << Error << "\n  Afm::do_startkerndata() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;
@@ -1788,7 +1788,7 @@ while ( (*in) >> line )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::do_startkernpairs() -> expecting keyword!\n\n";
+      mlog << Error << "\n  Afm::do_startkernpairs() -> expecting keyword!\n\n";
 
       tok.dump(cerr);
 
@@ -1800,7 +1800,7 @@ while ( (*in) >> line )  {
 
       case afm_keyword_KPX:
          if ( n > n_kern_pairs )  {
-            mlog << Error << "\n\n  Afm::do_startkernpairs() -> too many kern pairs!\n\n";
+            mlog << Error << "\n  Afm::do_startkernpairs() -> too many kern pairs!\n\n";
             exit ( 1 );
          }
          tok = line.nexttoken();
@@ -1817,7 +1817,7 @@ while ( (*in) >> line )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::do_startkernpairs() -> bad keyword\n\n";
+         mlog << Error << "\n  Afm::do_startkernpairs() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;
@@ -1865,7 +1865,7 @@ while ( (*in) >> line )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::do_startcomposites() -> expecting keyword!\n\n";
+      mlog << Error << "\n  Afm::do_startcomposites() -> expecting keyword!\n\n";
 
       tok.dump(cerr);
 
@@ -1881,7 +1881,7 @@ while ( (*in) >> line )  {
 
       case afm_keyword_CC:
          if ( n > n_composites )  {
-            mlog << Error << "\n\n  Afm::do_startcomposites() -> bad composite count\n\n";
+            mlog << Error << "\n  Afm::do_startcomposites() -> bad composite count\n\n";
             exit ( 1 );
          }
          do_cc(line, n);
@@ -1890,7 +1890,7 @@ while ( (*in) >> line )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::do_startcomposites() -> bad keyword\n\n";
+         mlog << Error << "\n  Afm::do_startcomposites() -> bad keyword\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;
@@ -1944,7 +1944,7 @@ while ( 1 )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::do_c(AfmLine &) -> bad token (1)\n\n";
+      mlog << Error << "\n  Afm::do_c(AfmLine &) -> bad token (1)\n\n";
 
       tok.dump(cerr);
 
@@ -1977,7 +1977,7 @@ while ( 1 )  {
 
       case afm_keyword_L:
          if ( n_liginfos >= max_liginfos )  {
-            mlog << Error << "\n\n  Afm::do_c(AfmLine &) -> too many ligatures for char \""
+            mlog << Error << "\n  Afm::do_c(AfmLine &) -> too many ligatures for char \""
                  << (c.name) << "\"\n\n";
             exit ( 1 );
          }
@@ -1990,7 +1990,7 @@ while ( 1 )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::do_c(AfmLine &) -> bad token (2)\n\n";
+         mlog << Error << "\n  Afm::do_c(AfmLine &) -> bad token (2)\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;
@@ -2067,7 +2067,7 @@ while ( 1 )  {
 
    if ( tok.type != afm_token_keyword )  {
 
-      mlog << Error << "\n\n  Afm::do_cc(AfmLine &) -> bad token (1)\n\n";
+      mlog << Error << "\n  Afm::do_cc(AfmLine &) -> bad token (1)\n\n";
 
       tok.dump(cerr);
 
@@ -2079,7 +2079,7 @@ while ( 1 )  {
 
       case afm_keyword_PCC:
          if ( n_pcc > c.n_parts )  {
-            mlog << Error << "\n\n  Afm::do_cc(AfmLine &) -> too many composite parts!\n\n";
+            mlog << Error << "\n  Afm::do_cc(AfmLine &) -> too many composite parts!\n\n";
             exit ( 1 );
          }
          tok = line.nexttoken();
@@ -2094,7 +2094,7 @@ while ( 1 )  {
 
 
       default:
-         mlog << Error << "\n\n  Afm::do_c(AfmLine &) -> bad token (2)\n\n";
+         mlog << Error << "\n  Afm::do_c(AfmLine &) -> bad token (2)\n\n";
          tok.dump(cerr);
          exit ( 1 );
          break;

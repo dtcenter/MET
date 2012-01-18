@@ -145,7 +145,7 @@ n = strlen(text);
 
 if ( n >= (alg_line_size - 1) )  {
 
-   mlog << Error << "\n\n  AlgLine::start(const char *) -> text too long!\n\n";
+   mlog << Error << "\n  AlgLine::start(const char *) -> text too long!\n\n";
 
    exit ( 1 );
 
@@ -188,7 +188,7 @@ n = strlen(text);
 
 if ( n >= L )  {
 
-   mlog << Error << "\n\n  AlgLine::prepend(const char *) -> text too long!\n\n";
+   mlog << Error << "\n  AlgLine::prepend(const char *) -> text too long!\n\n";
 
    exit ( 1 );
 
@@ -230,7 +230,7 @@ n = strlen(text);
 
 if ( (R + 1 + n) >= (alg_line_size - 1) )  {
 
-   mlog << Error << "\n\n  AlgLine::append(const char *) -> text too long!\n\n";
+   mlog << Error << "\n  AlgLine::append(const char *) -> text too long!\n\n";
 
    exit ( 1 );
 
@@ -428,7 +428,7 @@ void AlgLineStack::push(const AlgLine & a)
 
 if ( Depth >= max_algline_stack_depth )  {
 
-   mlog << Error << "\n\n  AlgLineStack::push(const AlgLine &) -> stack full!\n\n";
+   mlog << Error << "\n  AlgLineStack::push(const AlgLine &) -> stack full!\n\n";
 
    exit ( 1 );
 
@@ -453,7 +453,7 @@ const AlgLine & AlgLineStack::pop()
 
 if ( Depth <= 0 )  {
 
-   mlog << Error << "\n\n  AlgLineStack::pop() -> stack empty!\n\n";
+   mlog << Error << "\n  AlgLineStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 

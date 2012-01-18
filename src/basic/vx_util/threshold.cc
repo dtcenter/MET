@@ -173,7 +173,7 @@ void SingleThresh::set(const char *str) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  SingleThresh::set() -> "
+      mlog << Error << "\n  SingleThresh::set() -> "
            << "each threshold value must be preceeded by one of "
            << "\"lt, le, eq, ne, gt, ge\" or \"<, <=, =, !=, >, >=\" "
            << "to indicate the type of thresholding to be performed \""
@@ -303,7 +303,7 @@ bool SingleThresh::check(double v) const {
          break;
 
       default:
-         mlog << Error << "\n\n  SingleThresh::check() -> "
+         mlog << Error << "\n  SingleThresh::check() -> "
               << "unexpected threshold indicator value of "
               << type << ".\n\n";
          exit(1); 

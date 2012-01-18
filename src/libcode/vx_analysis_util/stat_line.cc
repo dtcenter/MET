@@ -879,7 +879,7 @@ for (j=0; j<N; ++j)  {
 
    if ( stat(search_dirs[j], &sbuf) < 0 )  {
 
-      mlog << Error << "\n\n  get_stat_filenames() -> "
+      mlog << Error << "\n  get_stat_filenames() -> "
            << "can't stat \"" << search_dirs[j] << "\"\n\n";
 
       exit ( 1 );
@@ -927,7 +927,7 @@ directory = opendir(directory_path);
 
 if ( !directory )  {
 
-   mlog << Error << "\n\n  get_stat_filenames_from_dir() -> "
+   mlog << Error << "\n  get_stat_filenames_from_dir() -> "
         << "can't open directory path \"" << directory_path << "\"\n\n";
 
    exit ( 1 );
@@ -943,7 +943,7 @@ while ( (entry = readdir(directory)) != NULL )  {
 
    if ( stat(entry_path, &sbuf) < 0 )  {
 
-      mlog << Error << "\n\n  get_stat_filenames_from_dir() -> "
+      mlog << Error << "\n  get_stat_filenames_from_dir() -> "
            << "can't stat \"" << entry_path << "\"\n\n";
 
       exit ( 1 );
@@ -1128,7 +1128,7 @@ switch(type) {
       break;
 
    default:
-      mlog << Error << "\n\n  determine_column_offset() -> "
+      mlog << Error << "\n  determine_column_offset() -> "
            << "unexpected line type value of " << type << "\n\n";
 
       exit ( 1 );

@@ -254,7 +254,7 @@ double interp_ls_fit(const DataPlane &dp, int x_ll, int y_ll, int wdth,
    double u, v, z;
 
    if(N < 2) {
-      mlog << Error << "\n\n interp_ls_fit() -> "
+      mlog << Error << "\n  interp_ls_fit() -> "
            << "the interpolation width (" << N
            << ") must be set >= 2\n\n";
 

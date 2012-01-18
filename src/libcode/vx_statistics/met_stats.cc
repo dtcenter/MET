@@ -143,7 +143,7 @@ void CIInfo::allocate_n_alpha(int i) {
       v_bcu = new double [n];
 
       if(!v_ncl || !v_ncu || !v_bcl || !v_bcu) {
-         mlog << Error << "\n\n  CIInfo::allocate_n_alpha() -> "
+         mlog << Error << "\n  CIInfo::allocate_n_alpha() -> "
               << "Memory allocation error!\n\n";
         exit(1);
       }
@@ -277,7 +277,7 @@ void CTSInfo::allocate_n_alpha(int i) {
       alpha = new double [n_alpha];
 
       if(!alpha) {
-         mlog << Error << "\n\n  CTSInfo::allocate_n() -> "
+         mlog << Error << "\n  CTSInfo::allocate_n() -> "
               << "Memory allocation error!\n\n";
         exit(1);
       }
@@ -483,7 +483,7 @@ void MCTSInfo::allocate_n_alpha(int i) {
       alpha = new double [n_alpha];
 
       if(!alpha) {
-         mlog << Error << "\n\n  MCTSInfo::allocate_n() -> "
+         mlog << Error << "\n  MCTSInfo::allocate_n() -> "
               << "Memory allocation error!\n\n";
         exit(1);
       }
@@ -674,7 +674,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       alpha = new double [n_alpha];
 
       if(!alpha) {
-         mlog << Error << "\n\n  CNTInfo::allocate_n_alpha() -> "
+         mlog << Error << "\n  CNTInfo::allocate_n_alpha() -> "
               << "Memory allocation error!\n\n";
         exit(1);
       }
@@ -1557,7 +1557,7 @@ void ISCInfo::allocate_n_scale(int i) {
       oen_scale = new double [n_scale+1];
 
       if(!mse_scale || !isc_scale || !fen_scale || !oen_scale) {
-         mlog << Error << "\n\n  ISCInfo::allocate_n_scale() -> "
+         mlog << Error << "\n  ISCInfo::allocate_n_scale() -> "
               << "Memory allocation error!\n\n";
         exit(1);
       }
@@ -1740,7 +1740,7 @@ void PCTInfo::allocate_n_alpha(int i) {
       alpha = new double [n_alpha];
 
       if(!alpha) {
-         mlog << Error << "\n\n  PCTInfo::allocate_n() -> "
+         mlog << Error << "\n  PCTInfo::allocate_n() -> "
               << "Memory allocation error!\n\n";
         exit(1);
       }
@@ -2023,7 +2023,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    if(f_na.n_elements() != o_na.n_elements() ||
       f_na.n_elements() == 0) {
-      mlog << Error << "\n\n  compute_cntinfo() -> "
+      mlog << Error << "\n  compute_cntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "non-zero length!\n\n";
       throw(1);
@@ -2212,7 +2212,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
 
       if(n_f_rank != n_o_rank) {
 
-         mlog << Error << "\n\n  compute_cntinfo() -> "
+         mlog << Error << "\n  compute_cntinfo() -> "
               << "n_f_rank does not equal n_o_rank!\n\n"
              ;
          throw(1);
@@ -2324,7 +2324,7 @@ void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_i_cntinfo() -> "
+      mlog << Error << "\n  compute_i_cntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
@@ -2334,7 +2334,7 @@ void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
    }
 
    if(skip < 0 || skip > n) {
-      mlog << Error << "\n\n  compute_i_cntinfo() -> "
+      mlog << Error << "\n  compute_i_cntinfo() -> "
            << "the skip index (" << skip << ") is out of bounds!\n\n"
           ;
       throw(1);
@@ -2370,7 +2370,7 @@ void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_ctsinfo() -> "
+      mlog << Error << "\n  compute_ctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
@@ -2432,7 +2432,7 @@ void compute_i_ctsinfo(const NumArray &f_na, const NumArray &o_na,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_i_ctsinfo() -> "
+      mlog << Error << "\n  compute_i_ctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
@@ -2442,7 +2442,7 @@ void compute_i_ctsinfo(const NumArray &f_na, const NumArray &o_na,
    }
 
    if(skip < 0 || skip > n) {
-      mlog << Error << "\n\n  compute_i_ctsinfo() -> "
+      mlog << Error << "\n  compute_i_ctsinfo() -> "
            << "the skip index (" << skip << ") is out of bounds!\n\n"
           ;
       throw(1);
@@ -2478,7 +2478,7 @@ void compute_mctsinfo(const NumArray &f_na, const NumArray &o_na,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_mctsinfo() -> "
+      mlog << Error << "\n  compute_mctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
@@ -2539,7 +2539,7 @@ void compute_i_mctsinfo(const NumArray &f_na, const NumArray &o_na,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_i_mctsinfo() -> "
+      mlog << Error << "\n  compute_i_mctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
@@ -2549,7 +2549,7 @@ void compute_i_mctsinfo(const NumArray &f_na, const NumArray &o_na,
    }
 
    if(skip < 0 || skip > n) {
-      mlog << Error << "\n\n  compute_i_mctsinfo() -> "
+      mlog << Error << "\n  compute_i_mctsinfo() -> "
            << "the skip index (" << skip << ") is out of bounds!\n\n"
           ;
       throw(1);
@@ -2585,7 +2585,7 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_pctinfo() -> "
+      mlog << Error << "\n  compute_pctinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
@@ -2660,7 +2660,7 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    if(f_na.n_elements() != o_na.n_elements() ||
       f_na.n_elements() == 0) {
-      mlog << Error << "\n\n  compute_nbrcntinfo() -> "
+      mlog << Error << "\n  compute_nbrcntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "non-zero length!\n\n";
       throw(1);
@@ -2724,7 +2724,7 @@ void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_i_nbrcntinfo() -> "
+      mlog << Error << "\n  compute_i_nbrcntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
@@ -2734,7 +2734,7 @@ void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    }
 
    if(skip < 0 || skip > n) {
-      mlog << Error << "\n\n  compute_i_nbrcntinfo() -> "
+      mlog << Error << "\n  compute_i_nbrcntinfo() -> "
            << "the skip index (" << skip << ") is out of bounds!\n\n"
           ;
       throw(1);
@@ -2863,7 +2863,7 @@ void compute_i_mean_stdev(const NumArray &v_na,
    n = v_na.n_elements();
 
    if(skip < 0 || skip > n) {
-      mlog << Error << "\n\n  compute_i_mean_stdev() -> "
+      mlog << Error << "\n  compute_i_mean_stdev() -> "
            << "the skip index (" << skip << ") is out of bounds!\n\n"
           ;
       exit(1);

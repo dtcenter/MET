@@ -137,7 +137,7 @@ void usage()
 
 {
 
-mlog << Error << "\n\n  usage:  " << program_name << " [ -xyz x y z ] [ -verbose ] file_list\n\n";
+mlog << Error << "\n  usage:  " << program_name << " [ -xyz x y z ] [ -verbose ] file_list\n\n";
 
 exit ( 1 );
 

@@ -176,7 +176,7 @@ void UCQueue::enqueue(unsigned char u)
 
 if ( NElements >= ucqueue_size )  {
 
-   mlog << Error << "\n\n  UCQueue::enqueue() -> queue full!\n\n";
+   mlog << Error << "\n  UCQueue::enqueue() -> queue full!\n\n";
 
    exit ( 1 );
 
@@ -208,7 +208,7 @@ unsigned char UCQueue::dequeue()
 
 if ( NElements == 0 )  {
 
-   mlog << Error << "\n\n  UCQueue::dequeue() -> queue empty!\n\n";
+   mlog << Error << "\n  UCQueue::dequeue() -> queue empty!\n\n";
 
    exit ( 1 );
 

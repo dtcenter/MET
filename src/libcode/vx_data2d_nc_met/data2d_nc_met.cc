@@ -38,7 +38,7 @@ MetNcMetDataFile::~MetNcMetDataFile() {
 
 MetNcMetDataFile::MetNcMetDataFile(const MetNcMetDataFile &) {
 
-   mlog << Error << "\n\n  MetNcMetDataFile::MetNcMetDataFile(const MetNcMetDataFile &) -> "
+   mlog << Error << "\n  MetNcMetDataFile::MetNcMetDataFile(const MetNcMetDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 }
@@ -47,7 +47,7 @@ MetNcMetDataFile::MetNcMetDataFile(const MetNcMetDataFile &) {
 
 MetNcMetDataFile & MetNcMetDataFile::operator=(const MetNcMetDataFile &) {
 
-   mlog << Error << "\n\n  MetNcMetDataFile::operator=(const MetNcMetDataFile &) -> "
+   mlog << Error << "\n  MetNcMetDataFile::operator=(const MetNcMetDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 
@@ -83,7 +83,7 @@ bool MetNcMetDataFile::open(const char * _filename) {
    MetNc = new MetNcFile;
    
    if(!MetNc->open(_filename)) {
-      mlog << Error << "\n\n  MetNcMetDataFile::open(const char *) -> "
+      mlog << Error << "\n  MetNcMetDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
 
@@ -148,8 +148,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
          data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
 
-         mlog << Warning
-              << "\n\n  MetNcMetDataFile::data_plane() -> "
+         mlog << Warning << "\n  MetNcMetDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the valid "
               << "time does not match the requested valid time: ("
               << data_time_str << " != " << req_time_str << ")\n\n";
@@ -163,8 +162,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          req_time_str  = sec_to_hhmmss(vinfo.lead());
          data_time_str = sec_to_hhmmss(plane.lead());
 
-         mlog << Warning
-              << "\n\n  MetNcMetDataFile::data_plane() -> "
+         mlog << Warning << "\n  MetNcMetDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the lead "
               << "time does not match the requested lead time: ("
               << data_time_str << " != " << req_time_str << ")\n\n";

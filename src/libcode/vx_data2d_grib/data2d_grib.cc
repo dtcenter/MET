@@ -57,7 +57,7 @@ MetGrib1DataFile::MetGrib1DataFile(const MetGrib1DataFile &)
 
 {
 
-mlog << Error << "\n\n  MetGrib1DataFile::MetGrib1DataFile(const MetGrib1DataFile &) -> "
+mlog << Error << "\n  MetGrib1DataFile::MetGrib1DataFile(const MetGrib1DataFile &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
@@ -76,7 +76,7 @@ MetGrib1DataFile & MetGrib1DataFile::operator=(const MetGrib1DataFile &)
 
 {
 
-mlog << Error << "\n\n  MetGrib1DataFile::operator=(const MetGrib1DataFile &) -> "
+mlog << Error << "\n  MetGrib1DataFile::operator=(const MetGrib1DataFile &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
@@ -141,7 +141,7 @@ GF = new GribFile;
 
 if ( ! (GF->open(_filename)) )  {
 
-   mlog << Error << "\n\n  MetGrib1DataFile::open(const char *) -> "
+   mlog << Error << "\n  MetGrib1DataFile::open(const char *) -> "
         << "unable to open grib1 file \"" << _filename << "\"\n\n";
 
    // exit ( 1 );
@@ -273,7 +273,7 @@ bool MetGrib1DataFile::read_record(const int n)
    //
 if ( (n < 0) || (n > GF->n_records()) )  {
 
-mlog << Error << "\n\n  MetGrib1DataFile::read_record() -> "
+mlog << Error << "\n  MetGrib1DataFile::read_record() -> "
      << "range check error ... n = " << n << "\n\n";
 
 exit ( 1 );
@@ -290,7 +290,7 @@ GF->seek_record(n);
    //
 if ( ! ( (*GF) >> CurrentRecord) )  {
 
-mlog << Error << "\n\n  MetGrib1DataFile::read_record() -> "
+mlog << Error << "\n  MetGrib1DataFile::read_record() -> "
      << "trouble reading record number " << n << "\n\n";
 
 return (false);
@@ -316,7 +316,7 @@ int MetGrib1DataFile::read_record(const VarInfoGrib & v)
 
 if ( !GF )  {
 
-   mlog << Error << "\n\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> "
+   mlog << Error << "\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> "
         << "no grib file open!\n\n";
 
    // exit ( 1 );
@@ -337,7 +337,7 @@ for (j=0; j<(GF->n_records()); ++j)  {
 
    if ( ! read_record(j) )  {
 
-      mlog << Error << "\n\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> trouble reading record!\n\n";
+      mlog << Error << "\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> trouble reading record!\n\n";
 
       // exit ( 1 );
 
@@ -377,7 +377,7 @@ if ( j_match >= 0 )  {
 
    if ( ! read_record(j_match) )  {
 
-      mlog << Error << "\n\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> "
+      mlog << Error << "\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> "
            << "trouble reading record!\n\n";
 
       // exit ( 1 );
@@ -501,7 +501,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
          plane_array.add(cur_plane, (double) lower, (double) upper);
 
          if(!status) {
-            mlog << Warning << "\n\n  MetGrib1DataFile::data_plane_array() -> "
+            mlog << Warning << "\n  MetGrib1DataFile::data_plane_array() -> "
                  << "Can't read record number " << i+1
                  << " from GRIB file \"" << filename() << "\".\n\n";
             continue;

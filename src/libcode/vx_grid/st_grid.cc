@@ -93,7 +93,7 @@ switch ( data.hemisphere )  {
    case 'S':  IsNorthHemisphere = false;  break;
 
    default:
-      mlog << Error << "\n\n  StereographicGrid::StereographicGrid(const StereographicData &) -> bad hemisphere ...\""
+      mlog << Error << "\n  StereographicGrid::StereographicGrid(const StereographicData &) -> bad hemisphere ...\""
            << (data.hemisphere) << "\"\n\n";
       exit ( 1 );
       break;
@@ -576,7 +576,7 @@ rep = new StereographicGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\n\n  Grid::set(const StereographicData &) -> memory allocation error\n\n";
+   mlog << Error << "\n  Grid::set(const StereographicData &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -602,7 +602,7 @@ rep = new StereographicGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\n\n  Grid::set(const StereoType2Data &) -> memory allocation error\n\n";
+   mlog << Error << "\n  Grid::set(const StereoType2Data &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -628,7 +628,7 @@ rep = new StereographicGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\n\n  Grid::set(const StereoType3Data &) -> memory allocation error\n\n";
+   mlog << Error << "\n  Grid::set(const StereoType3Data &) -> memory allocation error\n\n";
 
    exit ( 1 );
 

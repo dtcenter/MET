@@ -176,8 +176,8 @@ Top    = _T;
 
 if ( (width() < 0.0) || (height() < 0.0) )  {
 
-   mlog << Error
-        << "\n\n  Box::set_lrbt() -> width and/or height negative!\n\n";
+   mlog << Error << "\n  Box::set_lrbt() -> "
+        << "width and/or height negative!\n\n";
 
    exit ( 1 );
 }
@@ -372,7 +372,8 @@ calc_det();
 
 if ( fabs(Det) < 1.0e-7 )  {
 
-   mlog << Error << "\n\n  Affine::set_mb() -> determinant nearly zero!\n\n";
+   mlog << Error << "\n  Affine::set_mb() -> "
+        << "determinant nearly zero!\n\n";
 
    exit ( 1 );
 
@@ -570,7 +571,8 @@ D =   u1*(v2 - v3)
 
 if ( D == 0.0 )  {
 
-   mlog << Error << "\n\n  Affine::set_three_points() -> collinear (u, v) points!\n\n";
+   mlog << Error << "\n  Affine::set_three_points() -> "
+        << "collinear (u, v) points!\n\n";
 
    exit ( 1 );
 
@@ -605,7 +607,8 @@ calc_det();
 
 if ( fabs(Det) < 1.0e-7 )  {
 
-   mlog << Error << "\n\n  Affine::set_three_points() -> (x, y) points nearly collinear!\n\n";
+   mlog << Error << "\n  Affine::set_three_points() -> "
+        << "(x, y) points nearly collinear!\n\n";
 
    exit ( 1 );
 
@@ -802,7 +805,8 @@ void ConformalAffine::set_scale(double s)
 
 if ( s <= 0.0 )  {
 
-   mlog << Error << "\n\n  ConformalAffine::set_scale(double) -> scale must be strictly positive!\n\n";
+   mlog << Error << "\n  ConformalAffine::set_scale(double) -> "
+        << "scale must be strictly positive!\n\n";
 
    exit ( 1 );
 
@@ -1019,8 +1023,8 @@ switch ( g )  {
 
 
    default:
-      mlog << Error << "\n\n  ConformalAffine::set() -> bad gravity ... "
-           << viewgravity_to_string(g) << "\n\n";
+      mlog << Error << "\n  ConformalAffine::set() -> "
+           << "bad gravity ... " << viewgravity_to_string(g) << "\n\n";
       exit ( 1 );
       break;
 

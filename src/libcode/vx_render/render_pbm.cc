@@ -32,7 +32,7 @@ void render(PSfile & plot, const Pbm & pbm, const RenderInfo & info)
 
 if ( !(info.is_bw()) )  {
 
-   mlog << Error << "\n\n  render_bw() -> bad info.bw\n\n";
+   mlog << Error << "\n  render_bw() -> bad info.bw\n\n";
 
    exit ( 1 );
 
@@ -59,7 +59,7 @@ ny = pbm.ny();
 
 if ( info.n_filters() == 0 )  {
 
-   mlog << Error << "\n\n  render_color_24() -> must have at least one filter\n\n";
+   mlog << Error << "\n  render_color_24() -> must have at least one filter\n\n";
 
    exit ( 1 );
 
@@ -100,7 +100,7 @@ for (j=0; j<(info.n_filters()); ++j)  {
          break;
 
       default:
-         mlog << Error << "\n\n  render_color_24() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
+         mlog << Error << "\n  render_color_24() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
          break;
 
@@ -156,7 +156,7 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
          break;
 
       default:
-         mlog << Error << "\n\n  render() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
+         mlog << Error << "\n  render() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
          break;
 
