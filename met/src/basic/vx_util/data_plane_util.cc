@@ -49,7 +49,7 @@ void rescale_probability(DataPlane &dp) {
    // Check for a valid range of probability values.
    //
    if(min_v < 0.0-loose_tol || max_v > 100.0+loose_tol) {
-      mlog << Error << "\n\n  rescale_probability() -> "
+      mlog << Error << "\n  rescale_probability() -> "
            << "invalid range of data for a probability field: ["
            << min_v << ", " << max_v << "].\n\n";
       exit(1);
@@ -136,7 +136,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
             // options for gridded data
 
             default:
-               mlog << Error << "\n\n smooth_field() -> "
+               mlog << Error << "\n  smooth_field() -> "
                     << "unexpected interpolation method encountered: "
                     << mthd << "\n\n";
                exit(1);
@@ -173,7 +173,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    
    // Check that width is set to 1 or greater
    if(wdth < 1) {
-      mlog << Error << "\n\n fractional_coverage() -> "
+      mlog << Error << "\n  fractional_coverage() -> "
            << "width must be set to a value of 1 or greater.\n\n";
       exit(1);
    }
@@ -325,7 +325,7 @@ void apply_mask(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       fcst_dp.nx() != mask_dp.nx() ||
       fcst_dp.ny() != mask_dp.ny()) {
 
-      mlog << Error << "\n\n apply_mask() -> "
+      mlog << Error << "\n  apply_mask() -> "
            << "data dimensions do not match\n\n";
       exit(1);
    }

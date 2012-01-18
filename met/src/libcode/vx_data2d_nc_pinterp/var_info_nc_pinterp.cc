@@ -165,7 +165,7 @@ void VarInfoNcPinterp::set_magic(const ConcatString &s) {
 
    // Retreive the NetCDF variable name
    if((ptr = strtok_r(tmp_str, "()/", &save_ptr)) == NULL) {
-      mlog << Error << "\n\nVarInfoNcPinterp::set_magic() -> "
+      mlog << Error << "\n  VarInfoNcPinterp::set_magic() -> "
            << "bad NetCDF variable name specified \""
            << s << "\".\n\n";
       exit(1);
@@ -209,7 +209,7 @@ void VarInfoNcPinterp::set_magic(const ConcatString &s) {
 
                // Check if a range has already been supplied
                if(Dimension.has(range_flag)) {
-                  mlog << Error << "\n\nVarInfoNcPinterp::set_magic() -> "
+                  mlog << Error << "\n  VarInfoNcPinterp::set_magic() -> "
                        << "only one dimension can have a range for NetCDF variable \""
                        << s << "\".\n\n";
                   exit(1);

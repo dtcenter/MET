@@ -123,7 +123,7 @@ int main(int argc, char * argv[])
 
    if (!met_ptr)
    {
-      mlog << Error << "\n\n  " << program_name << " -> file \""
+      mlog << Error << "\n  " << program_name << " -> file \""
            << InputFilename << "\" not a valid data file\n\n";
       exit (1);
    }
@@ -132,7 +132,7 @@ int main(int argc, char * argv[])
 
    if (!var_ptr)
    {
-      mlog << Error << "\n\n  " << program_name << " -> unable to determine filetype of \""
+      mlog << Error << "\n  " << program_name << " -> unable to determine filetype of \""
            << InputFilename << "\"\n\n";
       exit (1);
    }
@@ -147,7 +147,7 @@ int main(int argc, char * argv[])
       //
    if (!met_ptr->open(InputFilename))
    {
-      mlog << Error << "\n\n  " << program_name << " -> can't open file \""
+      mlog << Error << "\n  " << program_name << " -> can't open file \""
            << InputFilename << "\"\n\n";
       exit (1);
    }
@@ -157,7 +157,7 @@ int main(int argc, char * argv[])
       //
    if (!met_ptr->data_plane(*var_ptr, data_plane))
    {
-      mlog << Error << "\n\n  " << program_name << " -> trouble getting \""
+      mlog << Error << "\n  " << program_name << " -> trouble getting \""
            << MagicString << "\" from file \"" << InputFilename << "\"\n\n";
       exit (1);
    }

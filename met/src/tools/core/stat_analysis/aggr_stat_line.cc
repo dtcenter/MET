@@ -105,7 +105,7 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
 
             default:
                statlinetype_to_string(line.type(), line_type);
-               mlog << Error << "\n\naggr_contable_lines() -> "
+               mlog << Error << "\n  aggr_contable_lines() -> "
                     << "line type value of " << line_type
                     << " not currently supported for the aggregation job!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -131,7 +131,7 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
             ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
 
             if(valid_ts.has((double) ut)) {
-               mlog << Warning << "aggr_contable_lines() -> "
+               mlog << Warning << "\n  aggr_contable_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
                     << "valid times.\n";
@@ -178,7 +178,7 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
    // Check for the minimum length of time series
    //
    if(j.vif_flag && valid_ts.n_elements() < min_time_series) {
-      mlog << Warning << "aggr_contable_lines() -> "
+      mlog << Warning << "\n  aggr_contable_lines() -> "
            << "the variance inflation factor adjustment can only "
            << "be computed for at least " << min_time_series
            << " unique valid times.\n";
@@ -196,7 +196,7 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
       n = valid_ts.rank_array(n_ties);
 
       if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\n\naggr_contable_lines() -> "
+         mlog << Error << "\n  aggr_contable_lines() -> "
               << "should be no ties in the valid time array!\n\n";
          throw(1);
       }
@@ -282,7 +282,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
 
             default:
                statlinetype_to_string(line.type(), line_type);
-               mlog << Error << "\n\naggr_mctc_lines() -> "
+               mlog << Error << "\n  aggr_mctc_lines() -> "
                     << "line type value of " << line_type
                     << " not currently supported for the aggregation job!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -302,7 +302,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
             // The size of the contingency table must remain the same
             //
             if(mcts_info.cts.nrows() != mct.nrows()) {
-               mlog << Error << "\n\naggr_mctc_lines() -> "
+               mlog << Error << "\n  aggr_mctc_lines() -> "
                     << "when aggregating MCTC lines the size of the "
                     << "contingency table must remain the same for all "
                     << "lines.  Try setting \"-column_eq N_CAT n\", "
@@ -334,7 +334,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
             ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
 
             if(valid_ts.has((double) ut)) {
-               mlog << Warning << "aggr_mctc_lines() -> "
+               mlog << Warning << "\n  aggr_mctc_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
                     << "valid times.\n";
@@ -365,7 +365,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
    // Check for the minimum length of time series
    //
    if(j.vif_flag && valid_ts.n_elements() < min_time_series) {
-      mlog << Warning << "aggr_mctc_lines() -> "
+      mlog << Warning << "\n  aggr_mctc_lines() -> "
            << "the variance inflation factor adjustment can only "
            << "be computed for at least " << min_time_series
            << " unique valid times.\n";
@@ -383,7 +383,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
       n = valid_ts.rank_array(n_ties);
 
       if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\n\naggr_mctc_lines() -> "
+         mlog << Error << "\n  aggr_mctc_lines() -> "
               << "should be no ties in the valid time array!\n\n";
          throw(1);
       }
@@ -453,7 +453,7 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
 
             default:
                statlinetype_to_string(line.type(), line_type);
-               mlog << Error << "\n\naggr_nx2_contable_lines() -> "
+               mlog << Error << "\n  aggr_nx2_contable_lines() -> "
                     << "line type value of " << line_type
                     << " not currently supported for the aggregation job!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -473,7 +473,7 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
             // The number of thresholds must remain the same
             //
             if(pct_info.pct.nrows() != pct.nrows()) {
-               mlog << Error << "\n\naggr_nx2_contable_lines() -> "
+               mlog << Error << "\n  aggr_nx2_contable_lines() -> "
                     << "when aggregating PCT lines the number of "
                     << "thresholds must remain the same for all lines, "
                     << pct_info.pct.nrows() << " != " << pct.nrows()
@@ -487,7 +487,7 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
                // The threshold values must remain the same
                //
                if(pct_info.pct.threshold(i) != pct.threshold(i)) {
-                  mlog << Error << "\n\naggr_nx2_contable_lines() -> "
+                  mlog << Error << "\n  aggr_nx2_contable_lines() -> "
                        << "when aggregating PCT lines the threshold "
                        << "values must remain the same for all lines, "
                        << pct_info.pct.threshold(i) << " != "
@@ -520,7 +520,7 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
             ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
 
             if(valid_ts.has((double) ut)) {
-               mlog << Warning << "aggr_nx2_contable_lines() -> "
+               mlog << Warning << "\n  aggr_nx2_contable_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
                     << "valid times.\n";
@@ -559,7 +559,7 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
       n = valid_ts.rank_array(n_ties);
 
       if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\n\naggr_nx2_contable_lines() -> "
+         mlog << Error << "\n  aggr_nx2_contable_lines() -> "
               << "should be no ties in the valid time array!\n\n";
          throw(1);
       }
@@ -648,7 +648,7 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
                break;
 
             default:
-               mlog << Error << "\n\naggr_partial_sum_lines() -> "
+               mlog << Error << "\n  aggr_partial_sum_lines() -> "
                     << "should only encounter partial sum line types!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -665,7 +665,7 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
             ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
 
             if(valid_ts.has((double) ut)) {
-               mlog << Warning << "aggr_partial_sum_lines() -> "
+               mlog << Warning << "\n  aggr_partial_sum_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
                     << "valid times.\n";
@@ -703,7 +703,7 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
       n = valid_ts.rank_array(n_ties);
 
       if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\n\naggr_partial_sum_lines() -> "
+         mlog << Error << "\n  aggr_partial_sum_lines() -> "
               << "should be no ties in the valid time array!\n\n";
          throw(1);
       }
@@ -801,7 +801,7 @@ void aggr_vl1l2_wdir(const char *jobstring, LineDataFile &f,
                break;
 
             default:
-               mlog << Error << "\n\naggr_vl1l2_wdir() -> "
+               mlog << Error << "\n  aggr_vl1l2_wdir() -> "
                     << "should only encounter partial sum line types!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -877,7 +877,7 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
                }
                else if(fcst_gc != m.fcst_gc ||
                        obs_gc  != m.obs_gc) {
-                  mlog << Error << "\n\nread_mpr_lines() -> "
+                  mlog << Error << "\n  read_mpr_lines() -> "
                        << "both the forecast variable type and observation "
                        << "variable type must remain constant!  Try setting "
                        << "\"-fcst_var\" and/or \"-obs_var\".\n"
@@ -895,7 +895,7 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
                break;
 
             default:
-               mlog << Error << "\n\nread_mpr_lines() -> "
+               mlog << Error << "\n  read_mpr_lines() -> "
                     << "should only encounter MPR line types!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -960,7 +960,7 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
    // Store the thresholds to be applied.
    //
    if(j.out_fcst_thresh.n_elements() == 0) {
-      mlog << Error << "\n\naggr_mpr_lines_cts() -> "
+      mlog << Error << "\n  aggr_mpr_lines_cts() -> "
            << "when computing CTS lines, \"-out_fcst_thresh\" must be "
            << "used.\n\n";
       throw(1);
@@ -970,7 +970,7 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
    }
 
    if(j.out_obs_thresh.n_elements() == 0) {
-      mlog << Error << "\n\naggr_mpr_lines_cts() -> "
+      mlog << Error << "\n  aggr_mpr_lines_cts() -> "
            << "when computing CTS lines, \"-out_obs_thresh\" must be "
            << "used.\n\n";
       throw(1);
@@ -1342,7 +1342,7 @@ void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
                else {
 
                   if(isc_aggr.n_scale != isc_info.n_scale) {
-                     mlog << Error << "\n\naggr_isc_lines() -> "
+                     mlog << Error << "\n  aggr_isc_lines() -> "
                           << "the number of scales must remain constant "
                           << "when aggregating ISC lines.  Use the "
                           << "\"-column_min NSCALE n\" and "
@@ -1384,7 +1384,7 @@ void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
                break;
 
             default:
-               mlog << Error << "\n\naggr_isc_lines() -> "
+               mlog << Error << "\n  aggr_isc_lines() -> "
                     << "should only encounter ISC line types!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -1525,7 +1525,7 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
          if(j.dr_out) *(j.dr_out) << line;
 
          if(line.type() != stat_rhist) {
-            mlog << Error << "\n\naggr_rhist_lines() -> "
+            mlog << Error << "\n  aggr_rhist_lines() -> "
                  << "should only encounter ranked histogram "
                  << "(RHIST) line types!\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -1542,7 +1542,7 @@ void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
          //
          if(ens_pd.rhist_na.n_elements() > 0 &&
             ens_pd.rhist_na.n_elements() != r_data.n_rank) {
-            mlog << Error << "\n\naggr_rhist_lines() -> "
+            mlog << Error << "\n  aggr_rhist_lines() -> "
                  << "the \"N_RANK\" column must remain constant ("
                  << ens_pd.rhist_na.n_elements() << " != " << r_data.n_rank
                  << ").  Try setting \"-column_eq N_RANK n\".\n\n";
@@ -1622,7 +1622,7 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
          if(j.dr_out) *(j.dr_out) << line;
 
          if(line.type() != stat_orank) {
-            mlog << Error << "\n\naggr_orank_lines() -> "
+            mlog << Error << "\n  aggr_orank_lines() -> "
                  << "should only encounter observation rank "
                  << "(ORANK) line types!\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -1644,7 +1644,7 @@ void aggr_orank_lines(const char *jobstring, LineDataFile &f,
          //
          if(ens_pd.rhist_na.n_elements() > 0 &&
             ens_pd.rhist_na.n_elements() != o_data.n_ens+1) {
-            mlog << Error << "\n\naggr_orank_lines() -> "
+            mlog << Error << "\n  aggr_orank_lines() -> "
                  << "the \"N_ENS\" column must remain constant.  "
                  << "Try setting \"-column_eq N_ENS n\".\n\n";
             throw(1);

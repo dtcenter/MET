@@ -194,7 +194,7 @@ if ( !(is_afwa_pixel_time_filename(filename, Hemisphere, Valid)) )  {
 
    clear();
 
-   mlog << Error << "\n\n  AfwaPixelTimeFile::read(const char *) -> can't parse filename \"" << filename << "\"\n\n";
+   mlog << Error << "\n  AfwaPixelTimeFile::read(const char *) -> can't parse filename \"" << filename << "\"\n\n";
 
    return ( false );
 
@@ -208,7 +208,7 @@ int n_read, bytes;
 
 if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
-   mlog << Error << "\n\n  AfwaPixelTimeFile::read(const char *) -> can't open file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  AfwaPixelTimeFile::read(const char *) -> can't open file \"" << filename << "\"\n\n";
 
    //  exit ( 1 );
 
@@ -222,7 +222,7 @@ Buf = new unsigned char [bytes];
 
 if ( (n_read = ::read(fd, Buf, bytes)) != bytes )  {
 
-   mlog << Error << "\n\n  AfwaPixelTimeFile::read(const char *) -> read error on file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  AfwaPixelTimeFile::read(const char *) -> read error on file \"" << filename << "\"\n\n";
 
    //  exit ( 1 );
 

@@ -37,7 +37,7 @@ MetGrib2DataFile::~MetGrib2DataFile() {
 
 MetGrib2DataFile::MetGrib2DataFile(const MetGrib2DataFile &) {
 
-   mlog << Error << "\n\n  MetGrib2DataFile::MetGrib2DataFile(const MetGrib2DataFile &) -> "
+   mlog << Error << "\n  MetGrib2DataFile::MetGrib2DataFile(const MetGrib2DataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 }
@@ -46,7 +46,7 @@ MetGrib2DataFile::MetGrib2DataFile(const MetGrib2DataFile &) {
 
 MetGrib2DataFile & MetGrib2DataFile::operator=(const MetGrib2DataFile &) {
 
-   mlog << Error << "\n\n  MetGrib2DataFile::operator=(const MetGrib2DataFile &) -> "
+   mlog << Error << "\n  MetGrib2DataFile::operator=(const MetGrib2DataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 

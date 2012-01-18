@@ -172,7 +172,7 @@ void GridInfo::create_grid(Grid & g) const
 
 if ( !(ok()) )  {
 
-   mlog << Error << "\n\n  GridInfo::create_grid(Grid &) const -> bad gridinfo\n\n";
+   mlog << Error << "\n  GridInfo::create_grid(Grid &) const -> bad gridinfo\n\n";
 
    exit ( 1 );
 
@@ -467,7 +467,7 @@ bool status = find_grid_by_name(_name, *this);
 
 if ( !status )  {
 
-   mlog << Error << "\n\n  Grid::set(const char *) -> grid lookup failed for name \"" << _name << "\"\n\n";
+   mlog << Error << "\n  Grid::set(const char *) -> grid lookup failed for name \"" << _name << "\"\n\n";
 
    exit ( 1 );
 
@@ -632,7 +632,7 @@ GridInfo Grid::info() const
 
 if ( !rep )  {
 
-   mlog << Error << "\n\n  Grid::info() const -> empty grid!\n\n";
+   mlog << Error << "\n  Grid::info() const -> empty grid!\n\n";
 
    exit ( 1 );
 
@@ -652,7 +652,7 @@ double Grid::rot_grid_to_earth(int x, int y) const
 
 if ( !rep )  {
 
-   mlog << Error << "\n\n  Grid::rot_grid_to_earth() const -> empty grid!\n\n";
+   mlog << Error << "\n  Grid::rot_grid_to_earth() const -> empty grid!\n\n";
 
    exit ( 1 );
 

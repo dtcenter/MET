@@ -164,7 +164,7 @@ long * u = new long [n];
 
 if ( !u )  {
 
-   mlog << Error << "LongArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  LongArray::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -227,7 +227,7 @@ void LongArray::set_alloc_inc(int n)
 
 if ( n < 0 )  {
 
-   mlog << Error << "LongArray::set_alloc_int(int) -> bad value ... " << n << "\n\n";
+   mlog << Error << "\n  LongArray::set_alloc_int(int) -> bad value ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -308,7 +308,7 @@ long & LongArray::operator[](int n) const
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\n\n  LongArray::operator[](int) -> range check error ... " << n << "\n\n";
+   mlog << Error << "\n  LongArray::operator[](int) -> range check error ... " << n << "\n\n";
 
    exit ( 1 );
 }

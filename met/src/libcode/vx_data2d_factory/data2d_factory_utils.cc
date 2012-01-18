@@ -57,7 +57,7 @@ GrdFileType type = FileType_None;
 
 if ( ! file_exists(filename) )  {
   
-   mlog << Error << "\n\n  grd_file_type() -> "
+   mlog << Error << "\n  grd_file_type() -> "
         << "file does not exist \"" << filename << "\"\n\n";
    exit(1);
 

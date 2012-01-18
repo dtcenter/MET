@@ -222,7 +222,7 @@ do {
 }  while ( cor >= tol );
 
 
-// mlog << Error << "\n\n  F_cdf_inv() -> not yet implemented\n\n";
+// mlog << Error << "\n  F_cdf_inv() -> not yet implemented\n\n";
 // 
 // exit ( 1 );
 

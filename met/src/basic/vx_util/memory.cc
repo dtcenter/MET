@@ -23,7 +23,7 @@ using namespace std;
 
 void oom() {
 
-   mlog << Error << "\n\n  out of memory!  Exiting!\n\n";
+   mlog << Error << "\n  out of memory!  Exiting!\n\n";
    exit(1);
 
    return;

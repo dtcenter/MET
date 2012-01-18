@@ -140,7 +140,7 @@ n = strlen(text);
 
 if ( n >= (max_id_size - 1) )  {
 
-   mlog << Error << "\n\n  void Identifier::set(const char *) string too long!\n\n";
+   mlog << Error << "\n  void Identifier::set(const char *) string too long!\n\n";
 
    exit ( 1 );
 
@@ -310,7 +310,7 @@ void IdentifierQueue::push(const Identifier & id)
 
 if ( Nelements >= max_id_queue_size )  {
 
-   mlog << Error << "\n\n  void IdentifierQueue::push(const Identifier &) -> queue full!\n\n";
+   mlog << Error << "\n  void IdentifierQueue::push(const Identifier &) -> queue full!\n\n";
 
    exit ( 1 );
 
@@ -336,7 +336,7 @@ Identifier IdentifierQueue::pop()
 
 if ( Nelements == 0 )  {
 
-   mlog << Error << "\n\n  IdentifierQueue::pop() -> queue empty!\n\n";
+   mlog << Error << "\n  IdentifierQueue::pop() -> queue empty!\n\n";
 
    exit ( 1 );
 
@@ -509,7 +509,7 @@ inew = new Identifier [k];
 
 if ( !inew )  {
 
-   mlog << Error << "\n\n  void IdentifierArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  void IdentifierArray::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -537,7 +537,7 @@ const Identifier & IdentifierArray::operator[](int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  IdentifierArray::operator[](int) -> range check error!\n\n";
+   mlog << Error << "\n  IdentifierArray::operator[](int) -> range check error!\n\n";
 
    exit ( 1 );
 

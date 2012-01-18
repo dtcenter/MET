@@ -252,7 +252,7 @@ Npoints = line_count(filename);
 
 if ( Npoints < 0 )  {
 
-   mlog << Error << "\n\n  MaskPoly::load() -> "
+   mlog << Error << "\n  MaskPoly::load() -> "
         << "can't determine line count in file \""
         << filename << "\"\n\n";
 
@@ -276,7 +276,7 @@ in.open(filename);
 
 if ( !in )  {
 
-   mlog << Error << "\n\n  MaskPoly::load() -> "
+   mlog << Error << "\n  MaskPoly::load() -> "
         << "can't open mask poly file \""
         << filename << "\"\n\n";
 
@@ -308,7 +308,7 @@ for (j=0; j<Npoints; ++j)  {
 
    if ( !in )  {
 
-      mlog << Error << "\n\n  MaskPoly::load() -> "
+      mlog << Error << "\n  MaskPoly::load() -> "
            << "read error in mask poly file \""
            << filename << "\"\n\n";
 
@@ -320,7 +320,7 @@ for (j=0; j<Npoints; ++j)  {
 
    if ( k != 2 )  {
 
-      mlog << Error << "\n\n  MaskPoly::load() -> "
+      mlog << Error << "\n  MaskPoly::load() -> "
            << "read error in mask poly file \""
            << filename << "\"\n\n";
 
@@ -336,7 +336,7 @@ for (j=0; j<Npoints; ++j)  {
 
    if ( 90.0 - abs(Lat[j]) < 1.0 ) {
 
-      mlog << Error << "\n\n  MaskPoly::load() -> "
+      mlog << Error << "\n  MaskPoly::load() -> "
            << "encountered latitude value too close to a pole, (Lat, Lon) = ("
            << a << ", " << b << ") in mask poly file \"" << filename << "\"\n\n";
 

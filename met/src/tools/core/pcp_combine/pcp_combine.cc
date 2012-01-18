@@ -344,7 +344,7 @@ void process_sum_args(const CommandLine & cline)
    // Check that accumulation intervals are greater than zero
    //
    if(in_accum <= 0 || out_accum <= 0) {
-      mlog << Error << "\n\n  process_sum_args() -> "
+      mlog << Error << "\n  process_sum_args() -> "
            << "The input accumulation interval (" << cline[1]
            << ") and output accumulation interval (" << cline[3]
            << ") must be greater than zero.\n\n";
@@ -434,7 +434,7 @@ void do_sum_command()
    // the lead time, except when init_time = 0 for observations.
    //
    if(out_accum > lead_time && init_time != (unixtime) 0) {
-      mlog << Error << "\n\n  do_sum_command() -> "
+      mlog << Error << "\n  do_sum_command() -> "
            << "The output accumulation time (" << out_accum_str
            << ") cannot be greater than the lead time ("
            << lead_time_str << ").\n\n";
@@ -446,7 +446,7 @@ void do_sum_command()
    // accumulation time.
    //
    if(out_accum%in_accum != 0) {
-      mlog << Error << "\n\n  do_sum_command() -> "
+      mlog << Error << "\n  do_sum_command() -> "
            << "The output accumulation time (" << out_accum_str
            << ") must be divisible by the input accumulation "
            << "time (" << in_accum_str << ").\n\n";
@@ -458,7 +458,7 @@ void do_sum_command()
    // accumulation time except when init_time = 0 for observations.
    //
    if(lead_time%in_accum != 0 && init_time != (unixtime) 0) {
-      mlog << Error << "\n\n  do_sum_command() -> "
+      mlog << Error << "\n  do_sum_command() -> "
            << "The lead time (" << lead_time_str
            << ") must be divisible by the input accumulation time ("
            << in_accum_str << ").\n\n";
@@ -560,7 +560,7 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
 
          valid_str = unix_to_yyyymmdd_hhmmss(pcp_times[i]);
 
-         mlog << Error << "\n\n  sum_grib_files() -> "
+         mlog << Error << "\n  sum_grib_files() -> "
               << "Cannot find a file with a valid time of "
               << valid_str << " and accumulation time of "
               << in_accum_str << " matching the regular "
@@ -602,7 +602,7 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
          // Check to make sure the grid stays the same
          //
          if(!(grid == gr)) {
-            mlog << Error << "\n\n  sum_grib_files() -> "
+            mlog << Error << "\n  sum_grib_files() -> "
                  << "The grid must remain the same for all "
                  << "data files.\n\n";
             exit(1);
@@ -664,7 +664,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
    // the correct valid and accumulation times.
    //
    if((dp = opendir(cur_dir)) == NULL ) {
-      mlog << Error << "\n\n  search_pcp_dir() -> "
+      mlog << Error << "\n  search_pcp_dir() -> "
            << "Cannot open precipitation directory "
            << cur_dir << "\n\n";
       exit(1);
@@ -702,7 +702,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
    } // end while
 
    if(closedir(dp) < 0) {
-      mlog << Error << "\n\n  search_pcp_dir() -> "
+      mlog << Error << "\n  search_pcp_dir() -> "
            << "Cannot close precipitation directory "
            << cur_dir << "\n\n";
       exit(1);
@@ -728,7 +728,7 @@ void check_file_time(const char *file, unixtime pcp_valid, int &i_gc)
    // Open the precipitation grib file
    //
    if( !(grib_file.open(file)) ) {
-      mlog << Warning << "\n\n  check_file_time() -> "
+      mlog << Warning << "\n  check_file_time() -> "
            << "can't open precipitation grib file: "
            << file << "\n\n";
       return;
@@ -843,7 +843,7 @@ i = 0;
       // Check for the same grid dimensions
       //
       if( grid1 != grid2 ) {
-         mlog << Error << "\n\n  do_add_command() -> "
+         mlog << Error << "\n  do_add_command() -> "
               << "the two input fields must be on the same grid.\n\n";
          exit(1);
       }
@@ -916,7 +916,7 @@ void do_sub_command()
    // Check for exactly two input files
    //
    if(n_files != 2) {
-      mlog << Error << "\n\n  do_sub_command() -> "
+      mlog << Error << "\n  do_sub_command() -> "
            << "you must specify exactly two input files for subtraction.\n\n";
       exit(1);
    }
@@ -948,7 +948,7 @@ void do_sub_command()
    // Check for the same grid dimensions
    //
    if( grid1 != grid2 ) {
-      mlog << Error << "\n\n  do_sub_command() -> "
+      mlog << Error << "\n  do_sub_command() -> "
            << "the two input fields must be on the same grid.\n\n";
       exit(1);
    }
@@ -969,7 +969,7 @@ void do_sub_command()
    // Error if init_time1 != init_time2.
    //
    if(init_time1 != init_time2) {
-      mlog << Error << "\n\n  do_sub_command() -> "
+      mlog << Error << "\n  do_sub_command() -> "
            << "init_time1 (" << init_time1_str
            <<  ") must be equal to init_time2 (" << init_time2_str
            << ") for subtraction.\n\n";
@@ -982,7 +982,7 @@ void do_sub_command()
    // Error if accum1 < accum2.
    //
    if(accum[0] < accum[1]) {
-      mlog << Error << "\n\n  do_sub_command() -> "
+      mlog << Error << "\n  do_sub_command() -> "
            << "accum1 (" << accum1_str
            <<  ") must be greater than accum2 ("
            << accum2_str << ") for subtraction.\n\n";
@@ -1046,7 +1046,7 @@ datafile = factory.new_met_2d_data_file(filename);
 
 if ( !datafile )  {
 
-   mlog << Error << "\n\n  get_field() -> "
+   mlog << Error << "\n  get_field() -> "
         << "can't open data file \"" << filename
         << "\"\n\n";
 
@@ -1061,7 +1061,7 @@ var.set_init   (init_ut);
 
 if ( ! datafile->data_plane(var, plane) )  {
 
-   mlog << Error << "\n\n  get_field() -> "
+   mlog << Error << "\n  get_field() -> "
         << "can't get data plane from file \"" << filename
         << "\"\n\n";
 
@@ -1101,7 +1101,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    f_out = new NcFile(out_filename, NcFile::Replace);
 
    if(!f_out->is_valid()) {
-      mlog << Error << "\n\n  write_netcdf() -> "
+      mlog << Error << "\n  write_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
       f_out->close();
@@ -1218,7 +1218,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    //
    if(!pcp_var->put(plane.data(), plane.ny(), plane.nx())) {
 
-      mlog << Error << "\n\n  write_netcdf() -> "
+      mlog << Error << "\n  write_netcdf() -> "
            << "error with pcp_var->put()\n\n";
       exit(1);
    }

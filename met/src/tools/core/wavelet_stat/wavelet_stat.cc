@@ -205,14 +205,14 @@ void process_command_line(int argc, char **argv) {
 
    // Read the input forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file))) {
-      mlog << Error << "\n\n  Trouble reading forecast file \""
+      mlog << Error << "\n  \n\n  Trouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Read the input observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file))) {
-      mlog << Error << "\n\n  Trouble reading observation file \""
+      mlog << Error << "\n  \n\n  Trouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
    }
@@ -227,7 +227,7 @@ void process_command_line(int argc, char **argv) {
       fcst_grid_info = fcst_mtddf->grid().serialize();
       obs_grid_info  = obs_mtddf->grid().serialize();
 
-      mlog << Error << "\n\n  process_scores() -> "
+      mlog << Error << "\n  \n\n  process_scores() -> "
            << "The forecast and observation grids do not match: "
            << fcst_grid_info << " != " << obs_grid_info << "\n\n";
       exit(1);
@@ -288,7 +288,7 @@ void process_scores() {
       status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
 
       if(!status) {
-         mlog << Warning << "process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << conf_info.fcst_info[i]->magic_str()
               << " not found in file: " << fcst_file << "\n";
          continue;
@@ -309,7 +309,7 @@ void process_scores() {
       status = obs_mtddf->data_plane(*conf_info.obs_info[i], obs_dp);
 
       if(!status) {
-         mlog << Warning << "process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << conf_info.obs_info[i]->magic_str()
               << " not found in file: " << obs_file << "\n\n";
          continue;
@@ -329,7 +329,7 @@ void process_scores() {
       // Check that the valid times match
       if(fcst_valid_ut != obs_valid_ut) {
 
-         mlog << Warning << "process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << "Forecast and observation valid times do not match "
               << unix_to_yyyymmdd_hhmmss(fcst_valid_ut) << " != " <<
               unix_to_yyyymmdd_hhmmss(obs_valid_ut) << " for "
@@ -342,7 +342,7 @@ void process_scores() {
          conf_info.obs_info[i]->level().type()  == LevelType_Accum &&
          fcst_dp.accum()       != obs_dp.accum()) {
 
-         mlog << Warning << "process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << "Forecast and observation accumulation times "
               << "do not match " << sec_to_hhmmss(fcst_dp.accum())
               << " != " << sec_to_hhmmss(obs_dp.accum())
@@ -643,7 +643,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
    nc_out = new NcFile(out_nc_file, NcFile::Replace);
 
    if(!nc_out || !nc_out->is_valid()) {
-      mlog << Error << "\n\nsetup_nc_file() -> "
+      mlog << Error << "\n  \n\n  setup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
       exit(1);
@@ -715,7 +715,7 @@ void setup_ps_file(unixtime valid_ut, int lead_sec) {
    n_page = 1;
 
    if(!ps_out) {
-      mlog << Error << "\n\nsetup_ps_file() -> "
+      mlog << Error << "\n  \n\n  setup_ps_file() -> "
            << "trouble opening output PostScript file "
            << out_ps_file << "\n\n";
       exit(1);
@@ -881,7 +881,7 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       x_ur < 0 || x_ur > fcst_dp.nx() ||
       y_ur < 0 || y_ur > fcst_dp.ny()) {
 
-      mlog << Error << "\n\nget_tile() -> "
+      mlog << Error << "\n  \n\n  get_tile() -> "
            << "invalid tile extends off the grid: "
            << "(x_ll, y_ll, dim) = (" << x_ll << ", " << y_ll << ", "
            << conf_info.get_tile_dim() << ") and (nx, ny) = ("
@@ -955,7 +955,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    // Check the NumArray lengths
    n = f_na.n_elements();
    if(n != o_na.n_elements()) {
-      mlog << Error << "\n\ndo_intensity_scale() -> "
+      mlog << Error << "\n  \n\n  do_intensity_scale() -> "
            << "the forecast and observation arrays must have equal "
            << "length.\n\n";
       exit(1);
@@ -963,7 +963,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
    // Check that the number of points = tile_dim * tile_dim
    if(n != (conf_info.get_tile_dim() * conf_info.get_tile_dim())) {
-      mlog << Error << "\n\nprocess_scores() -> "
+      mlog << Error << "\n  \n\n  process_scores() -> "
            << "the number of points (" << n << ") should equal the "
            << "tile dimension squared ("
            << conf_info.get_tile_dim() * conf_info.get_tile_dim()
@@ -1498,7 +1498,7 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
    // Write out the forecast field
    if(!fcst_var->set_cur(i_tile, 0, 0) ||
       !fcst_var->put(&fcst_data[0], 1, d, d)) {
-      mlog << Error << "\n\nwrite_nc_raw() -> "
+      mlog << Error << "\n  \n\n  write_nc_raw() -> "
            << "error with the fcst_var->put for field "
            << shc.get_fcst_var() << "\n\n";
       exit(1);
@@ -1507,7 +1507,7 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
    // Write out the observation field
    if(!obs_var->set_cur(i_tile, 0, 0) ||
       !obs_var->put(&obs_data[0], 1, d, d)) {
-      mlog << Error << "\n\nwrite_nc_raw() -> "
+      mlog << Error << "\n  \n\n  write_nc_raw() -> "
            << "error with the obs_var->put for field "
            << shc.get_obs_var() << "\n\n";
       exit(1);
@@ -1516,7 +1516,7 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
    // Write out the difference field
    if(!diff_var->set_cur(i_tile, 0, 0) ||
       !diff_var->put(&diff_data[0], 1, d, d)) {
-      mlog << Error << "\n\nwrite_nc_raw() -> "
+      mlog << Error << "\n  \n\n  write_nc_raw() -> "
            << "error with the diff_var->put for field "
            << shc.get_fcst_var() << "\n\n";
       exit(1);
@@ -1684,7 +1684,7 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
    // Write out the forecast field
    if(!fcst_var->set_cur(i_tile, i_scale+1, 0, 0) ||
       !fcst_var->put(&fcst_data[0], 1, 1, d, d)) {
-      mlog << Error << "write_nc_wav() -> "
+      mlog << Error << "\n  write_nc_wav() -> "
            << "error with the fcst_var->put for field "
            << shc.get_fcst_var() << "\n\n";
       exit(1);
@@ -1693,7 +1693,7 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
    // Write out the observation field
    if(!obs_var->set_cur(i_tile, i_scale+1, 0, 0) ||
       !obs_var->put(&obs_data[0], 1, 1, d, d)) {
-      mlog << Error << "write_nc_wav() -> "
+      mlog << Error << "\n  write_nc_wav() -> "
            << "error with the obs_var->put for field "
            << shc.get_obs_var() << "\n\n";
       exit(1);
@@ -1702,7 +1702,7 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
    // Write out the difference field
    if(!diff_var->set_cur(i_tile, i_scale+1, 0, 0) ||
       !diff_var->put(&diff_data[0], 1, 1, d, d)) {
-      mlog << Error << "write_nc()_wav -> "
+      mlog << Error << "\n  write_nc()_wav -> "
            << "error with the diff_var->put for field "
            << shc.get_fcst_var() << "\n\n";
       exit(1);

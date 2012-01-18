@@ -245,7 +245,7 @@ switch ( type )  {
 
 
    default:
-      mlog << Error << "\n\n  AfmToken::as_double() const -> bad token type!\n\n";
+      mlog << Error << "\n  AfmToken::as_double() const -> bad token type!\n\n";
       dump(cerr);
       exit ( 1 );
       break;

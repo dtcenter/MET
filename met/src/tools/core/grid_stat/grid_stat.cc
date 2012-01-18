@@ -212,14 +212,14 @@ void process_command_line(int argc, char **argv) {
 
    // Read the input forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file))) {
-      mlog << Error << "\n\n  Trouble reading forecast file \""
+      mlog << Error << "\n  Trouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Read the input observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file))) {
-      mlog << Error << "\n\n  Trouble reading observation file \""
+      mlog << Error << "\n  Trouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
    }
@@ -234,7 +234,7 @@ void process_command_line(int argc, char **argv) {
       fcst_grid_info = fcst_mtddf->grid().serialize();
       obs_grid_info  = obs_mtddf->grid().serialize();
       
-      mlog << Error << "\n\n  process_scores() -> "
+      mlog << Error << "\n  process_scores() -> "
            << "The forecast and observation grids do not match: "
            << fcst_grid_info << " != " << obs_grid_info << "\n\n";
       exit(1);
@@ -322,7 +322,7 @@ void process_scores() {
       status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
 
       if(!status) {
-         mlog << Warning << "\n\n  process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << conf_info.fcst_info[i]->magic_str()
               << " not found in file: " << fcst_file
               << "\n\n";
@@ -348,7 +348,7 @@ void process_scores() {
       status = obs_mtddf->data_plane(*conf_info.obs_info[i], obs_dp);
 
       if(!status) {
-         mlog << Warning << "\n\n  process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << conf_info.obs_info[i]->magic_str()
               << " not found in file: " << obs_file
               << "\n\n";
@@ -369,7 +369,7 @@ void process_scores() {
       // Check that the valid times match
       if(fcst_valid_ut != obs_valid_ut) {
 
-         mlog << Warning << "\n\n  process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << "Forecast and observation valid times do not match "
               << unix_to_yyyymmdd_hhmmss(fcst_valid_ut) << " != "
               << unix_to_yyyymmdd_hhmmss(obs_valid_ut) << " for "
@@ -382,7 +382,7 @@ void process_scores() {
          conf_info.obs_info[i]->level().type()  == LevelType_Accum &&
          fcst_dp.accum() != obs_dp.accum()) {
 
-         mlog << Warning << "\n\n  process_scores() -> "
+         mlog << Warning << "\n  process_scores() -> "
               << "Forecast and observation accumulation times "
               << "do not match " << sec_to_hhmmss(fcst_dp.accum())
               << " != " << sec_to_hhmmss(obs_dp.accum())
@@ -1054,7 +1054,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
    nc_out = new NcFile(out_nc_file, NcFile::Replace);
 
    if(!nc_out->is_valid()) {
-      mlog << Error << "\n\n  setup_nc_file() -> "
+      mlog << Error << "\n  setup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
       exit(1);
@@ -1268,7 +1268,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       uf_na.n_elements() != uo_na.n_elements() ||
       vf_na.n_elements() != uf_na.n_elements()) {
 
-      mlog << Error << "\n\n  do_vl1l2() -> "
+      mlog << Error << "\n  do_vl1l2() -> "
            << "the number of UGRD pairs != the number of VGRD pairs: "
            << vf_na.n_elements() << " != " << uf_na.n_elements()
            << "\n\n";
@@ -1734,7 +1734,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       // Write out the forecast field
       if(fcst_flag) {
          if(!fcst_var->put(&fcst_data[0], grid.ny(), grid.nx())) {
-            mlog << Error << "\n\n  write_nc() -> "
+            mlog << Error << "\n  write_nc() -> "
                  << "error with the fcst_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
                  << " and masking region " << conf_info.mask_name[i]
@@ -1746,7 +1746,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       // Write out the observation field
       if(obs_flag) {
          if(!obs_var->put(&obs_data[0], grid.ny(), grid.nx())) {
-            mlog << Error << "\n\n  write_nc() -> "
+            mlog << Error << "\n  write_nc() -> "
                  << "error with the obs_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
                  << " and masking region " << conf_info.mask_name[i]
@@ -1758,7 +1758,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       // Write out the difference field
       if(diff_flag) {
          if(!diff_var->put(&diff_data[0], grid.ny(), grid.nx())) {
-            mlog << Error << "\n\n  write_nc() -> "
+            mlog << Error << "\n  write_nc() -> "
                  << "error with the diff_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
                  << " and masking region " << conf_info.mask_name[i]

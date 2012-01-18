@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
 
       if (!met_ptr)
       {
-         mlog << Error << "\n\n  " << program_name << " -> file \""
+         mlog << Error << "\n  " << program_name << " -> file \""
             << data_plane_filename << "\" not a valid data file\n\n";
          exit (1);
       }
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
    f_in = new NcFile(nc_file);
 
    if(!f_in || !f_in->is_valid()) {
-      mlog << Error << "\n\nmain() -> trouble opening netCDF file "
+      mlog << Error << "\n  main() -> trouble opening netCDF file "
            << nc_file << "\n\n";
       f_in->close();
       delete f_in;
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
       !hdr_arr_var || !hdr_arr_var->is_valid() ||
       !hdr_typ_var || !hdr_typ_var->is_valid() ||
       !obs_arr_var || !obs_arr_var->is_valid()) {
-      mlog << Error << "\n\nmain() -> trouble reading netCDF file "
+      mlog << Error << "\n  main() -> trouble reading netCDF file "
            << nc_file << "\n\n";
       exit(1);
    }
@@ -342,7 +342,7 @@ int main(int argc, char *argv[]) {
 
       if(!obs_arr_var->set_cur(i, 0) ||
          !obs_arr_var->get(obs_arr, 1, obs_arr_dim->size())) {
-         mlog << Error << "\n\nmain() -> trouble getting obs_arr\n\n";
+         mlog << Error << "\n  main() -> trouble getting obs_arr\n\n";
          exit(1);
       }
       if(obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10) break;
@@ -363,7 +363,7 @@ int main(int argc, char *argv[]) {
       //
       if(!hdr_typ_var->set_cur(h-1, 0) ||
          !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\n\nmain() -> trouble getting hdr_typ\n\n";
+         mlog << Error << "\n  main() -> trouble getting hdr_typ\n\n";
          exit(1);
       }
 

@@ -173,7 +173,7 @@ void open_netcdf(NcFile *&f_out) {
    // Create the output netCDF file for writing
    //
    if(!f_out->is_valid()) {
-      mlog << Error << "\n\n  open_netcdf() -> "
+      mlog << Error << "\n  open_netcdf() -> "
            << "can't open output NetCDF file \"" << ncfile
            << "\" for writing\n\n";
       f_out->close();
@@ -201,7 +201,7 @@ void open_met_ascii(LineDataFile &f_in) {
    // Open the input ASCII observation file
    //
    if(!f_in.open(asfile)) {
-      mlog << Error << "\n\n  open_met_ascii() -> "
+      mlog << Error << "\n  open_met_ascii() -> "
            << "can't open input ASCII file \"" << asfile
            << "\" for reading\n\n";
       exit(1);
@@ -222,14 +222,14 @@ void open_met_ascii(LineDataFile &f_in) {
       // Check that the line contains the expected number of columns
       //
       if(dl.n_items() != n_met_col) {
-         mlog << Error << "\n\n  open_met_ascii() -> "
+         mlog << Error << "\n  open_met_ascii() -> "
               << "line number " << nrow << " doesn't contain the "
               << "expected number of columns (" << n_met_col
               << "):\n";
 
          dl.dump(cout);
 
-         mlog << Error << "\n\n";
+         mlog << Error << "\n  ";
          exit(1);
       }
 
@@ -371,14 +371,14 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       // Check that the line contains the expected number of columns
       //
       if(dl.n_items() != n_met_col) {
-         mlog << Error << "\n\n  write_met_obs() -> "
+         mlog << Error << "\n  write_met_obs() -> "
               << "line number " << i_obs+1 << " doesn't contain the "
               << "expected number of columns (" << n_met_col
               << "):\n";
 
          dl.dump(cout);
 
-         mlog << Error << "\n\n";
+         mlog << Error << "\n  ";
          exit(1);
       }
 
@@ -434,7 +434,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       //
       if(!hdr_typ_var->set_cur(i_hdr, (long) 0) ||
          !hdr_typ_var->put(hdr_typ, (long) 1, (long) hdr_typ.length())) {
-         mlog << Error << "\n\n  write_met_obs() -> "
+         mlog << Error << "\n  write_met_obs() -> "
               << "error writing the message type to the netCDF file\n\n";
          exit(1);
       }
@@ -444,7 +444,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       //
       if(!hdr_sid_var->set_cur(i_hdr, (long) 0) ||
          !hdr_sid_var->put(hdr_sid, (long) 1, (long) hdr_sid.length())) {
-         mlog << Error << "\n\n  write_met_obs() -> "
+         mlog << Error << "\n  write_met_obs() -> "
               << "error writing the station id to the netCDF file\n\n";
          exit(1);
       }
@@ -454,7 +454,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       // time format: YYYYMMDD_HHMMSS
       //
       if(check_reg_exp(yyyymmdd_hhmmss_reg_exp, hdr_vld) != true) {
-         mlog << Error << "\n\n  write_met_obs() -> "
+         mlog << Error << "\n  write_met_obs() -> "
               << "valid time is not in the expected YYYYMMDD_HHMMSS format: "
               << hdr_vld << "/n/n";
          exit(1);
@@ -462,7 +462,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
 
       if(!hdr_vld_var->set_cur(i_hdr, (long) 0) ||
          !hdr_vld_var->put(hdr_vld, (long) 1, (long) hdr_vld.length())) {
-         mlog << Error << "\n\n  write_met_obs() -> "
+         mlog << Error << "\n  write_met_obs() -> "
               << "error writing the valid time to the netCDF file\n\n";
          exit(1);
       }
@@ -472,7 +472,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       //
       if(!hdr_arr_var->set_cur(i_hdr, (long) 0) ||
          !hdr_arr_var->put(hdr_arr, (long) 1, (long) hdr_arr_len) ) {
-         mlog << Error << "\n\n  main() -> "
+         mlog << Error << "\n  main() -> "
               << "error writing the header array to the netCDF file\n\n";
          exit(1);
       }
@@ -492,7 +492,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
 
       if(!obs_arr_var->set_cur(i_obs, (long) 0) ||
          !obs_arr_var->put(obs_arr, (long) 1, (long) obs_arr_len) ) {
-         mlog << Error << "\n\n  main() -> "
+         mlog << Error << "\n  main() -> "
               << "error writing the observation array to the netCDF file\n\n";
          exit(1);
       }
@@ -572,7 +572,7 @@ void set_format(const StringArray & a)
       ascii_format = met_point;
    }
    else {
-      mlog << Error << "\n\n  set_format() -> "
+      mlog << Error << "\n  set_format() -> "
            << "unsupported ASCII observation format \""
            << a[0] << "\".\n\n";
       exit(1);

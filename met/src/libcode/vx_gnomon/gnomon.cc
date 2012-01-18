@@ -175,7 +175,7 @@ void GnomonicProjection::set_center(double lat, double lon)
 
 if ( fabs(lat) > 89.0 )  {
 
-   mlog << Error << "\n\n  GnomonicProjection::set_center() -> given center point is too close to the poles\n\n";
+   mlog << Error << "\n  GnomonicProjection::set_center() -> given center point is too close to the poles\n\n";
 
    exit ( 1 );
 

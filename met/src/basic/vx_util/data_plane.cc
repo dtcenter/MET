@@ -157,7 +157,7 @@ void DataPlane::set_size(int x, int y) {
    Data = new double [Nxy];
 
    if(!Data) {
-      mlog << Error << "\n\nvoid DataPlane::set_size() -> "
+      mlog << Error << "\n  void DataPlane::set_size() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -186,7 +186,7 @@ void DataPlane::set_constant(double v) {
    // memset(Data, v, Nx*Ny*sizeof(double));
 
    if(!Data) {
-      mlog << Error << "\n\n  DataPlane::set_constant(double) -> "
+      mlog << Error << "\n  DataPlane::set_constant(double) -> "
            << "no data buffer allocated!\n\n";
       exit(1);
    }
@@ -265,7 +265,7 @@ int DataPlane::two_to_one(int x, int y) const {
    int n;
 
    if((x < 0) || (x >= Nx) || (y < 0) || (y >= Ny)) {
-      mlog << Error << "\n\nDataPlane::two_to_one() -> "
+      mlog << Error << "\n  DataPlane::two_to_one() -> "
            << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
            << "), (x, y) = (" << x << ", " << y << ")\n\n";
       exit(1);
@@ -281,7 +281,7 @@ int DataPlane::two_to_one(int x, int y) const {
 void DataPlane::one_to_two(int n, int &x, int &y) const {
 
    if(n < 0 || n >= Nxy) {
-      mlog << Error << "\n\nDataPlane::one_to_two() -> "
+      mlog << Error << "\n  DataPlane::one_to_two() -> "
            << "range check error: n = " << n << "but Nx*Ny = " << Nxy
            << "\n\n";
       exit(1);
@@ -612,7 +612,7 @@ if ( Nplanes == 0 )  return;
 
 if ( (p.nx() != Plane[0]->nx()) || (p.ny() != Plane[0]->ny()) )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::check_xy_size(const DataPlane &) const -> wrong size!\n\n";
+   mlog << Error << "\n  DataPlaneArray::check_xy_size(const DataPlane &) const -> wrong size!\n\n";
 
    exit ( 1 );
 
@@ -632,7 +632,7 @@ double DataPlaneArray::data(int p, int x, int y) const
 
 if ( (p < 0) || (p >= Nplanes) )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::data() -> range check error!\n\n";
+   mlog << Error << "\n  DataPlaneArray::data() -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -654,7 +654,7 @@ void DataPlaneArray::set_alloc_inc(int n)
 
 if ( n <= 0 )  {
 
-   mlog << Error << "\n\n  void DataPlaneArray::set_alloc_inc(int) -> bad value ... " << n << "\n\n";
+   mlog << Error << "\n  void DataPlaneArray::set_alloc_inc(int) -> bad value ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -676,7 +676,7 @@ void DataPlaneArray::set_levels(int n, double _low, double _up)
 
 if ( (n < 0) || (n >= Nplanes) )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::set_levels(int, double, double) -> bad level index ... " << n << "\n\n";
+   mlog << Error << "\n  DataPlaneArray::set_levels(int, double, double) -> bad level index ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -684,7 +684,7 @@ if ( (n < 0) || (n >= Nplanes) )  {
 
 if ( _low > _up )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::set_levels(int, double, double) -> lowtom level > up level!\n\n";
+   mlog << Error << "\n  DataPlaneArray::set_levels(int, double, double) -> lowtom level > up level!\n\n";
 
    exit ( 1 );
 }
@@ -706,7 +706,7 @@ void DataPlaneArray::levels(int n, double & _low, double & _up) const
 
 if ( (n < 0) || (n >= Nplanes) )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::level(int, double &, double &) -> bad plane index ... " << n << "\n\n";
+   mlog << Error << "\n  DataPlaneArray::level(int, double &, double &) -> bad plane index ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -752,7 +752,7 @@ int DataPlaneArray::nx() const
 
 if ( Nplanes == 0 )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::nx() const -> array is empty!\n\n";
+   mlog << Error << "\n  DataPlaneArray::nx() const -> array is empty!\n\n";
 
    exit ( 1 );
 
@@ -772,7 +772,7 @@ int DataPlaneArray::ny() const
 
 if ( Nplanes == 0 )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::ny() const -> array is empty!\n\n";
+   mlog << Error << "\n  DataPlaneArray::ny() const -> array is empty!\n\n";
 
    exit ( 1 );
 
@@ -830,7 +830,7 @@ double DataPlaneArray::lower(int n) const
 
 if ( (n < 0) || (n >= Nplanes) )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::lower(int) const -> bad plane index ... " << n << "\n\n";
+   mlog << Error << "\n  DataPlaneArray::lower(int) const -> bad plane index ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -850,7 +850,7 @@ double DataPlaneArray::upper(int n) const
 
 if ( (n < 0) || (n >= Nplanes) )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::upper(int) const -> bad plane index ... " << n << "\n\n";
+   mlog << Error << "\n  DataPlaneArray::upper(int) const -> bad plane index ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -870,7 +870,7 @@ DataPlane & DataPlaneArray::operator[](int n) const
 
 if ( (n < 0) || (n >= Nplanes) )  {
 
-   mlog << Error << "\n\n  DataPlaneArray::operator[](int) const -> bad plane index ... " << n << "\n\n";
+   mlog << Error << "\n  DataPlaneArray::operator[](int) const -> bad plane index ... " << n << "\n\n";
 
    exit ( 1 );
 

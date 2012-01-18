@@ -189,8 +189,8 @@ File->open(filename);
 
 if ( !(*File) )  {
 
-   mlog << Error << "\n\n  PSfile::open(const char *) -> unable to open file \""
-        << filename << "\"\n\n";
+   mlog << Error << "\n  PSfile::open(const char *) -> "
+        << "unable to open file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -423,7 +423,8 @@ void PSfile::choose_font(int n, double s, const char * data_dir)
 
 if ( (n < 0) || (n >= total_vx_ps_fonts) )  {
 
-   mlog << Error << "\n\n  PSfile::choose_font() -> bad font number -> " << n << "\n\n";
+   mlog << Error << "\n  PSfile::choose_font() -> "
+        << "bad font number -> " << n << "\n\n";
 
    exit ( 1 );
 
@@ -431,7 +432,8 @@ if ( (n < 0) || (n >= total_vx_ps_fonts) )  {
 
 if ( s <= 0.0 )  {
 
-   mlog << Error << "\n\n  PSfile::choose_font() -> bad font size -> " << s << "\n\n";
+   mlog << Error << "\n  PSfile::choose_font() -> "
+        << "bad font size -> " << s << "\n\n";
 
    exit ( 1 );
 
@@ -450,7 +452,8 @@ path << data_dir << '/' << afm_directory << '/' << junk << ".afm";
 
 if ( !(afm->read(path)) )  {
 
-   mlog << Error << "\n\n  PSfile::choose_font() -> unable to read afm file \"" << path << "\"\n\n";
+   mlog << Error << "\n  PSfile::choose_font() -> "
+        << "unable to read afm file \"" << path << "\"\n\n";
 
    exit ( 1 );
 
@@ -501,7 +504,8 @@ void PSfile::write_centered_text(int center, int fill_flag,
 
 if ( (center != 1) && (center != 2) )  {
 
-   mlog << Error << "\n\n  PSfile::write_centered_text() -> center flag must be 1 or 2\n\n";
+   mlog << Error << "\n  PSfile::write_centered_text() -> "
+        << "center flag must be 1 or 2\n\n";
 
    exit ( 1 );
 
@@ -510,7 +514,8 @@ if ( (center != 1) && (center != 2) )  {
 
 if ( (fill_flag != 0) && (fill_flag != 1) )  {
 
-   mlog << Error << "\n\n  PSfile::write_centered_text() -> fill flag must be 0 or 1\n\n";
+   mlog << Error << "\n  PSfile::write_centered_text() -> "
+        << "fill flag must be 0 or 1\n\n";
 
    exit ( 1 );
 
@@ -649,8 +654,8 @@ switch ( fill_flag )  {
    case  1:  file() << "show";                   break;
 
    default:
-      mlog << Error << "\n\n  PSfile::write_single_node() -> unrecognized fill flag: \""
-           << fill_flag << "\"\n\n";
+      mlog << Error << "\n  PSfile::write_single_node() -> "
+           << "unrecognized fill flag: \"" << fill_flag << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -1166,9 +1171,9 @@ j = afm.lookup_cm(ascii_code);
 
 if ( j < 0 )  {
 
-   mlog << Error << "\n\n  handle_char() -> no char metric for ascii code " << ascii_code
-        << " in font " << (afm.FontName)
-        << "\n\n";
+   mlog << Error << "\n  handle_char() -> "
+        << "no char metric for ascii code " << ascii_code
+        << " in font " << (afm.FontName) << "\n\n";
 
    exit ( 1 );
 
@@ -1326,8 +1331,8 @@ if ( strcmp(c, "Letter") == 0 )  return ( MediaLetter );
 
 if ( strcmp(c, "A4") == 0 )  return ( MediaA4 );
 
-mlog << Error
-     << "default_media() -> bad value \"" << c << "\" for environment variable "
+mlog << Error << "\n  default_media() -> "
+     << "bad value \"" << c << "\" for environment variable "
      << papersize_env << "\n\n";
 
 exit ( 1 );

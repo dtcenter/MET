@@ -526,7 +526,7 @@ for (j=0; j<(Nentries - 1); ++j)  {
    //  should never get here
    //
 
-mlog << Error << "\n\n  ColorTable::interp(double) const -> confused!\n\n";
+mlog << Error << "\n  ColorTable::interp(double) const -> confused!\n\n";
 
 exit ( 1 );
 
@@ -552,7 +552,7 @@ if ( (colorin = fopen(input_filename, "r")) == NULL )  {
 
    colorin = (FILE *) 0;
 
-   mlog << Error << "\n\n  ColorTable::read(const char *) -> failed to read colortable file \""
+   mlog << Error << "\n  ColorTable::read(const char *) -> failed to read colortable file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
@@ -571,7 +571,7 @@ status = colorparse();
 
 if ( status )  {
 
-   mlog << Error << "\n\n  ColorTable::read(const char *) -> failed to read colortable file \""
+   mlog << Error << "\n  ColorTable::read(const char *) -> failed to read colortable file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
@@ -612,7 +612,7 @@ out.open(filename);
 
 if ( !out )  {
 
-   mlog << Error << "\n\n  ColorTable::write() -> unable to open output file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  ColorTable::write() -> unable to open output file \"" << filename << "\"\n\n";
 
    // exit ( 1 );
 
@@ -666,7 +666,7 @@ void ColorTable::set_gamma(double g)
 
 if ( g <= 0.0 )  {
 
-   mlog << Error << "\n\n  void ColorTable::set_gamma(double) -> bad gamma value ... "
+   mlog << Error << "\n  void ColorTable::set_gamma(double) -> bad gamma value ... "
         << g << "\n\n";
 
    exit ( 1 );
@@ -806,7 +806,7 @@ u = new CtableEntry [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  ColorTable::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  ColorTable::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -907,7 +907,7 @@ CtableEntry ColorTable::operator[](int n) const
 
 if ( (n < 0) || (n >= Nentries) )  {
 
-   mlog << Error << "\n\n  CtableEntry ColorTable::operator[](int) const  -> range check error\n\n";
+   mlog << Error << "\n  CtableEntry ColorTable::operator[](int) const  -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1034,7 +1034,7 @@ double v_lo, v_hi, old_v_lo, old_v_hi, new_v_lo, new_v_hi;
 
 if(Nentries <= 0) {
 
-   mlog << Error << "\n\n  CtableEntry ColorTable::rescale(double, double, double) -> "
+   mlog << Error << "\n  CtableEntry ColorTable::rescale(double, double, double) -> "
         << "the colortable must be non-empty to call rescale.\n\n";
 
    exit ( 1 );
@@ -1120,7 +1120,7 @@ j = sscanf(line, "%lf%d%d%d", &x, &r, &g, &b);
 
 if ( j != 4 )  {
 
-   mlog << Error << "\n\n  operator>>(ostream &, CtableEntry &) -> bad line (j = " << j << " ... \""
+   mlog << Error << "\n  operator>>(ostream &, CtableEntry &) -> bad line (j = " << j << " ... \""
         << line << "\"\n\n";
 
    exit ( 1 );

@@ -62,7 +62,7 @@ init_from_scratch();
 
 if ( !read(filename) )  {
 
-   mlog << Error << "\n\n  Pcm::Pcm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
+   mlog << Error << "\n  Pcm::Pcm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -188,7 +188,7 @@ if ( trouble )  {
 
    clear();
 
-   mlog << Error << "\n\n  Pcm::assign() -> memory allocation error\n\n";
+   mlog << Error << "\n  Pcm::assign() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -288,7 +288,7 @@ k = colormap_index(color);
 
 if ( k < 0 )  {
 
-   mlog << Error << "\n\n  Pcm::putrc() -> requested color not in colormap!\n\n";
+   mlog << Error << "\n  Pcm::putrc() -> requested color not in colormap!\n\n";
 
    exit ( 1 );
 
@@ -389,7 +389,7 @@ in.open(filename);
 
 if ( !in )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> unable to read image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\n  Pcm::read() -> unable to read image file \"" << filename << "\"\n\n";
 
    return ( 0 );
 
@@ -403,7 +403,7 @@ Name = new char [1 + strlen(filename)];
 
 if ( !Name )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> can't allocate memory for file name\n\n";
+   mlog << Warning << "\n  Pcm::read() -> can't allocate memory for file name\n\n";
 
    clear();
 
@@ -422,7 +422,7 @@ in.get(c2);
 
 if ( !in )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\n  Pcm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
    clear();
 
@@ -432,7 +432,7 @@ if ( !in )  {
 
 if ( (c1 != 'P') || (c2 != '9') )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\n  Pcm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
 
    clear();
 
@@ -471,7 +471,7 @@ Ncolors = maxval + 1;
 /*
 if ( maxval != 255 )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> bad maxval: \"" << maxval << "\"\n\n";
+   mlog << Warning << "\n  Pcm::read() -> bad maxval: \"" << maxval << "\"\n\n";
 
    clear();
 
@@ -488,7 +488,7 @@ Colormap = new Color [Ncolors];
 
 if ( !Colormap )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> can't allocate memory for colormap!\n\n";
+   mlog << Warning << "\n  Pcm::read() -> can't allocate memory for colormap!\n\n";
 
    clear();
 
@@ -508,7 +508,7 @@ for (j=0; j<Ncolors; ++j)  {
 
    if ( !in )  {
 
-      mlog << Warning << "\n\n  Pcm::read() -> trouble reading colormap data\n\n";
+      mlog << Warning << "\n  Pcm::read() -> trouble reading colormap data\n\n";
 
       clear();
 
@@ -528,7 +528,7 @@ n = Nrows*Ncols;
 
 if ( !(data = new unsigned char [n]) )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> memory allocation error\n\n";
+   mlog << Warning << "\n  Pcm::read() -> memory allocation error\n\n";
 
    clear();
 
@@ -538,7 +538,7 @@ if ( !(data = new unsigned char [n]) )  {
 
 if ( !in.read((char *) data, n) )  {
 
-   mlog << Warning << "\n\n  Pcm::read() -> trouble reading image data\n\n";
+   mlog << Warning << "\n  Pcm::read() -> trouble reading image data\n\n";
 
    clear();
 
@@ -576,7 +576,7 @@ out.open(filename);
 
 if ( !out )  {
 
-   mlog << Warning << "\n\n  Pcm::write() -> unable to open output file \"" << filename << "\"\n\n";
+   mlog << Warning << "\n  Pcm::write() -> unable to open output file \"" << filename << "\"\n\n";
 
    return ( 0 );
 
@@ -607,7 +607,7 @@ out << Ncols << " " << Nrows << "\n"
 
 if ( !out )  {
 
-   mlog << Warning << "\n\n  Pcm::write() -> trouble writing header\n\n";
+   mlog << Warning << "\n  Pcm::write() -> trouble writing header\n\n";
 
    return ( 0 );
 
@@ -635,7 +635,7 @@ for (j=0; j<n; ++j)  out.put(data[j]);
 
 if ( !out )  {
 
-   mlog << Warning << "\n\n  Pcm::write() -> trouble writing data\n\n";
+   mlog << Warning << "\n  Pcm::write() -> trouble writing data\n\n";
 
    return ( 0 );
 
@@ -665,7 +665,7 @@ data = new unsigned char [NR*NC];
 
 if ( !data )  {
 
-   mlog << Error << "\n\n  Pcm::set_size(int, int) -> memory allocation error\n\n";
+   mlog << Error << "\n  Pcm::set_size(int, int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -710,7 +710,7 @@ void Pcm::reverse_video()
 
 if ( !data )  {
 
-   mlog << Error << "\n\n  void Pcm::reverse_video() -> bad image\n\n";
+   mlog << Error << "\n  void Pcm::reverse_video() -> bad image\n\n";
 
    exit ( 1 );
 
@@ -772,7 +772,7 @@ bytes = (Nrows)*(Ncols);
 
 if ( !(u = new unsigned char [bytes]) )  {
 
-   mlog << Error << "\n\n  Pcm::rotate(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  Pcm::rotate(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -852,7 +852,7 @@ Color Pcm::colormap(int n) const
 
 if ( (n < 0) || (n >= Ncolors) )  {
 
-   mlog << Error << "\n\n  Pcm::colormap(int) -> range check error ... value = " << n << "\n\n";
+   mlog << Error << "\n  Pcm::colormap(int) -> range check error ... value = " << n << "\n\n";
 
    exit ( 1 );
 
@@ -876,7 +876,7 @@ Colormap = new Color [n];
 
 if ( !Colormap )  {
 
-   mlog << Error << "\n\n  Pcm::set_colormap() -> memory allocation error\n\n";
+   mlog << Error << "\n  Pcm::set_colormap() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -900,7 +900,7 @@ void Pcm::autocrop()
 
 {
 
-mlog << Error << "\n\n  void Pcm::autocrop() -> not yet implemented\n\n";
+mlog << Error << "\n  void Pcm::autocrop() -> not yet implemented\n\n";
 
 exit ( 1 );
 
@@ -920,7 +920,7 @@ void Pcm::gamma(double g)
 
 if ( g <= 0.0 )  {
 
-   mlog << Error << "\n\n  void Pcm::gamma(double) -> bad value for gamma ... \"" << g << "\"\n\n";
+   mlog << Error << "\n  void Pcm::gamma(double) -> bad value for gamma ... \"" << g << "\"\n\n";
 
    exit ( 1 );
 

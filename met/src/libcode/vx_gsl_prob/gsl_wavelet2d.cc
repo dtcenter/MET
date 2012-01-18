@@ -33,7 +33,7 @@ gsl_wavelet * wavelet_set(gsl_wavelet_type *t, int k) {
    // Allocate space for the wavelet specified
    //
    if(!(w = gsl_wavelet_alloc(t, k))) {
-      mlog << Error << "\n\nwavelet_set() -> "
+      mlog << Error << "\n  wavelet_set() -> "
            << "error allocating the specified wavelet!\n\n";
       exit(1);
    }
@@ -83,7 +83,7 @@ gsl_wavelet_workspace * wavelet_workspace_set(int n) {
    // Allocate space for the wavelet_workspace specified
    //
    if(!(work = gsl_wavelet_workspace_alloc(n))) {
-      mlog << Error << "\n\nwavelet_workspace_set() -> "
+      mlog << Error << "\n  wavelet_workspace_set() -> "
            << "error allocating the wavelet workspace of size "
            << n << "!\n\n";
       exit(1);
@@ -124,7 +124,7 @@ void wavelet2d_transform(const gsl_wavelet *w, double *data,
 
    if(gsl_wavelet2d_transform(w, data, n, nrow, ncol, gsl_dir, work)
       != GSL_SUCCESS) {
-      mlog << Error << "\n\nwavelet2d_transform() -> "
+      mlog << Error << "\n  wavelet2d_transform() -> "
            << "error performing the standard wavelet transform!\n\n";
       exit(1);
    }
@@ -140,7 +140,7 @@ void wavelet2d_transform_forward(const gsl_wavelet *w, double *data,
 
    if(gsl_wavelet2d_transform_forward(w, data, n, nrow, ncol, work)
       != GSL_SUCCESS) {
-      mlog << Error << "\n\nwavelet2d_transform_forward() -> "
+      mlog << Error << "\n  wavelet2d_transform_forward() -> "
            << "error performing the standard forward wavelet "
            << "transform!\n\n";
       exit(1);
@@ -157,7 +157,7 @@ void wavelet2d_transform_inverse(const gsl_wavelet *w, double *data,
 
    if(gsl_wavelet2d_transform_inverse(w, data, n, nrow, ncol, work)
       != GSL_SUCCESS) {
-      mlog << Error << "\n\nwavelet2d_transform_inverse() -> "
+      mlog << Error << "\n  wavelet2d_transform_inverse() -> "
            << "error performing the standard inverse wavelet "
            << "transform!\n\n";
       exit(1);
@@ -181,7 +181,7 @@ void wavelet2d_nstransform(const gsl_wavelet *w, double *data,
 
    if(gsl_wavelet2d_nstransform(w, data, n, nrow, ncol, gsl_dir, work)
       != GSL_SUCCESS) {
-      mlog << Error << "\n\nwavelet2d_nstransform() -> "
+      mlog << Error << "\n  wavelet2d_nstransform() -> "
            << "error performing the non-standard wavelet "
            << "transform!\n\n";
       exit(1);
@@ -198,7 +198,7 @@ void wavelet2d_nstransform_forward(const gsl_wavelet *w, double *data,
 
    if(gsl_wavelet2d_nstransform_forward(w, data, n, nrow, ncol, work)
       != GSL_SUCCESS) {
-      mlog << Error << "\n\nwavelet2d_nstransform_forward() -> "
+      mlog << Error << "\n  wavelet2d_nstransform_forward() -> "
            << "error performing the non-standard forward wavelet "
            << "transform!\n\n";
       exit(1);
@@ -215,7 +215,7 @@ void wavelet2d_nstransform_inverse(const gsl_wavelet *w, double *data,
 
    if(gsl_wavelet2d_nstransform_inverse(w, data, n, nrow, ncol, work)
       != GSL_SUCCESS) {
-      mlog << Error << "\n\nwavelet2d_nstransform_inverse() -> "
+      mlog << Error << "\n  wavelet2d_nstransform_inverse() -> "
            << "error performing the non-standard inverse wavelet "
            << "transform!\n\n";
       exit(1);

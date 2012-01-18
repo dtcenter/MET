@@ -293,7 +293,7 @@ CLOptionInfo * u = new CLOptionInfo [n];
 
 if ( !u )  {
 
-   mlog << Error << "CLOptionInfoArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  CLOptionInfoArray::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -357,7 +357,7 @@ void CLOptionInfoArray::set_alloc_inc(int n)
 
 if ( n < 0 )  {
 
-   mlog << Error << "CLOptionInfoArray::set_alloc_int(int) -> bad value ... " << n << "\n\n";
+   mlog << Error << "\n  CLOptionInfoArray::set_alloc_int(int) -> bad value ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -418,7 +418,7 @@ CLOptionInfo & CLOptionInfoArray::operator[](int n) const
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "CLOptionInfoArray::operator[](int) -> range check error ... " << n << "\n\n";
+   mlog << Error << "\n  CLOptionInfoArray::operator[](int) -> range check error ... " << n << "\n\n";
 
    exit ( 1 );
 }
@@ -724,7 +724,7 @@ for (j=0; j<N; ++j)  {
       if ( AllowUnrecognizedSwitches )  continue;
       else {
 
-         mlog << Error << "\n\n  CommandLine::next_option() -> unrecognized command-line switch \"" << args[j] << "\"\n\n";
+         mlog << Error << "\n  CommandLine::next_option() -> unrecognized command-line switch \"" << args[j] << "\"\n\n";
 
          exit ( 1 );
 
@@ -778,7 +778,7 @@ void CommandLine::do_help() const
 if ( Usage )  Usage();
 else {
 
-   mlog << Error << "\n\n  " << ProgramName << ": no usage message available ... sorry.\n\n";
+   mlog << Error << "\n  " << ProgramName << ": no usage message available ... sorry.\n\n";
 
 }
 
@@ -823,7 +823,7 @@ while ( (j = next_option(index)) >= 0 )  {
 
    if ( index < 0 )  {
 
-      mlog << Error << "\n\n  " << ProgramName << ": unrecognized command-line switch: \"" << switch_name << "\"\n\n";
+      mlog << Error << "\n  " << ProgramName << ": unrecognized command-line switch: \"" << switch_name << "\"\n\n";
 
       if ( Usage )  Usage();
 
@@ -889,7 +889,7 @@ for (j=0; j<Nargs; ++j)  {
 
    if ( k >= args.n_elements() )  {
 
-      mlog << Error << "\n\n  CommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
+      mlog << Error << "\n  CommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
 
       exit ( 1 );
 
@@ -899,7 +899,7 @@ for (j=0; j<Nargs; ++j)  {
 
    if ( is_switch(c) )  {
 
-      mlog << Error << "\n\n  CommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
+      mlog << Error << "\n  CommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
 
       exit ( 1 );
 
@@ -968,7 +968,7 @@ bool CommandLine::is_switch(const char * text) const
 
 if ( !text || !(*text) )  {
 
-   mlog << Error << "\n\n  CommandLine::is_switch(const char *) const -> empty string!\n\n";
+   mlog << Error << "\n  CommandLine::is_switch(const char *) const -> empty string!\n\n";
 
    exit ( 1 );
 

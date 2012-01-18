@@ -50,7 +50,7 @@ while ( (rec_size1 = read_pad(in, padsize)) > 0 )  {
 
    if ( rec_size1 != rec_size2 )  {
 
-      mlog << Error << "\n\n  do_unblocking() -> "
+      mlog << Error << "\n  do_unblocking() -> "
            << "first and second record sizes don't match!\n\n";
 
       exit ( 1 );
@@ -96,7 +96,7 @@ switch ( padsize )  {
       break;
 
    default:
-      mlog << Error << "\n\n  read_pad() -> "
+      mlog << Error << "\n  read_pad() -> "
            << "bad pad size\n\n";
       exit ( 1 );
       break;
@@ -110,7 +110,7 @@ if ( n_read == 0 )  return ( 0 );
 
 if ( (n_read < 0) || ((n_read > 0) && (n_read != bytes)) )  {
 
-      mlog << Error << "\n\n  read_pad() -> "
+      mlog << Error << "\n  read_pad() -> "
            << "read error\n\n";
 
    exit ( 1 );
@@ -129,7 +129,7 @@ switch ( padsize )  {
       break;
 
    default:
-      mlog << Error << "\n\n  read_pad() -> "
+      mlog << Error << "\n  read_pad() -> "
            << "bad pad size\n\n";
       exit ( 1 );
       break;

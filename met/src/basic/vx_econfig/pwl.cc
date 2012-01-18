@@ -193,7 +193,7 @@ v = new double [n];
 
 if ( !u || !v )  {
 
-   mlog << Error << "\n\n  PiecewiseLinear::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  PiecewiseLinear::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -278,7 +278,7 @@ double PiecewiseLinear::x(int k) const
 
 if ( (k < 0) || (k >= N) )  {
 
-   mlog << Error << "\n\n  PiecewiseLinear::x(int) -> range check error\n\n";
+   mlog << Error << "\n  PiecewiseLinear::x(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -298,7 +298,7 @@ double PiecewiseLinear::y(int k) const
 
 if ( (k < 0) || (k >= N) )  {
 
-   mlog << Error << "\n\n  PiecewiseLinear::y(int) -> range check error\n\n";
+   mlog << Error << "\n  PiecewiseLinear::y(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -337,7 +337,7 @@ for (j=0; j<(N - 1); ++j)  {
    //  flow of control should not reach this point
    //
 
-mlog << Error << "\n\n  PiecewiseLinear::operator()(double) -> error in \""
+mlog << Error << "\n  PiecewiseLinear::operator()(double) -> error in \""
      << Name << "\"! ... t = " << t << "\n\n";
 
 exit ( 1 );

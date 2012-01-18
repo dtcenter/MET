@@ -92,7 +92,7 @@ if ( gds.type == latlon_type )  {
 
 } else {
 
-   mlog << Error << "\n\nERROR: gds_to_grid() -> "
+   mlog << Error << "\n  gds_to_grid() -> "
         << "Grid type " << ((int) (gds.type))
         << " not currently supported.\n\n";
    exit(1);
@@ -143,7 +143,7 @@ if ( gds.type == latlon_type )  {
 
 } else {
 
-   mlog << Error << "\n\nERROR: gds_to_order() -> "
+   mlog << Error << "\n  gds_to_order() -> "
         << "Grid type " << ((int) (gds.type))
         << " not currently supported.\n\n";
    exit(1);

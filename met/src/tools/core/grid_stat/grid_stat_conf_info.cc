@@ -145,7 +145,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(strlen(conf.model().sval()) == 0 ||
       check_reg_exp(ws_reg_exp, conf.model().sval()) == true) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "The model name (\"" << conf.model().sval()
            << "\") must be non-empty and contain no embedded "
            << "whitespace.\n\n";
@@ -168,7 +168,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
 
    if(n_vx == 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "At least one value must be provided "
            << "for fcst_field.\n\n";
       exit(1);
@@ -192,7 +192,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       // No support for wind direction
       if(fcst_info[i]->is_wind_direction()) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "the wind direction field may not be verified "
               << "using grid_stat.\n\n";
          exit(1);
@@ -208,7 +208,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(conf.n_obs_field_elements() != 0 &&
       conf.n_obs_field_elements() != n_vx) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "The length of obs_field must be the same as the "
            << "length of fcst_field.\n\n";
       exit(1);
@@ -240,7 +240,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       // No support for wind direction
       if(obs_info[i]->is_wind_direction()) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "the wind direction field may not be verified "
               << "using grid_stat.\n\n";
          exit(1);
@@ -250,7 +250,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Check that the observation field does not contain probabilities
    for(i=0; i<n_vx; i++) {
       if(obs_info[i]->p_flag()) {
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The observation field cannot contain probabilities."
               << "\n\n";
          exit(1);
@@ -315,7 +315,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       // Check that the number of forecast threshold levels matches n_vx
       if(conf.n_fcst_thresh_elements() != n_vx) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The number fcst_thresh entries provided must match the "
               << "number of fields provided in fcst_field.\n\n";
          exit(1);
@@ -335,7 +335,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
                !is_eq(fcst_ta[i][0].thresh,   0.0) ||
                !is_eq(fcst_ta[i][n-1].thresh, 1.0)) {
 
-               mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+               mlog << Error << "\n  GridStatConfInfo::process_config() -> "
                     << "When verifying a probability field, you must "
                     << "select at least 3 thresholds beginning with 0.0 "
                     << "and ending with 1.0.\n\n";
@@ -346,7 +346,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
 
                // Check that all threshold types are greater than or equal to
                if(fcst_ta[i][j].type != thresh_ge) {
-                  mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+                  mlog << Error << "\n  GridStatConfInfo::process_config() -> "
                        << "When verifying a probability field, all "
                        << "thresholds must be set as equal to, "
                        << "using \"ge\" or \">=\".\n\n";
@@ -357,7 +357,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
                if(fcst_ta[i][j].thresh < 0.0 ||
                   fcst_ta[i][j].thresh > 1.0) {
 
-                  mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+                  mlog << Error << "\n  GridStatConfInfo::process_config() -> "
                        << "When verifying a probability field, all "
                        << "thresholds must be between 0 and 1.\n\n";
                   exit(1);
@@ -375,7 +375,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       if(conf.n_obs_thresh_elements() != 0 &&
          conf.n_obs_thresh_elements() != n_vx) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The number obs_thresh entries provided must match the "
               << "number of fields provided in obs_field.\n\n";
          exit(1);
@@ -404,7 +404,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
          if(!fcst_info[i]->p_flag() &&
             fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
 
-            mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+            mlog << Error << "\n  GridStatConfInfo::process_config() -> "
                  << "The number of thresholds for each field in "
                  << "fcst_thresh must match the number of thresholds "
                  << "for each field in obs_thresh.\n\n";
@@ -429,7 +429,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
                   obs_ta[i][j].type    == thresh_eq              ||
                   obs_ta[i][j].type    == thresh_ne) {
 
-                  mlog << Error << "\n\n  PointStatConfInfo::process_config() -> "
+                  mlog << Error << "\n  PointStatConfInfo::process_config() -> "
                        << "when verifying using multi-category contingency "
                        << "tables, the thresholds must be monotonically "
                        << "increasing and be of the same inequality type "
@@ -484,7 +484,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
 
    // Check that the number of wind speed thresholds match
    if(fcst_wind_ta.n_elements() != obs_wind_ta.n_elements()) {
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "The number of thresholds in fcst_wind_thresh must match "
            << "the number of thresholds in obs_wind_thresh.\n\n";
       exit(1);
@@ -497,7 +497,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Check that at least one alpha value is provided
    if((n_ci_alpha = conf.n_ci_alpha_elements()) == 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "At least one confidence interval alpha value must be "
            << "specified.\n\n";
       exit(1);
@@ -508,7 +508,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       if(conf.ci_alpha(i).dval() <= 0.0 ||
          conf.ci_alpha(i).dval() >= 1.0) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "All confidence interval alpha values ("
               << conf.ci_alpha(i).dval() << ") must be greater than 0 "
               << "and less than 1.\n\n";
@@ -524,7 +524,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(conf.boot_interval().ival() != boot_bca_flag &&
       conf.boot_interval().ival() != boot_perc_flag) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "The boot_interval parameter must be set to "
            << boot_bca_flag << " or "
            << boot_perc_flag << "!\n\n";
@@ -539,7 +539,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(conf.boot_rep_prop().dval() <= 0.0 ||
       conf.boot_rep_prop().dval() > 1.0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "The boot_rep_prop parameter must be set between "
            << "0 and 1!\n\n";
       exit(1);
@@ -552,7 +552,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Check that n_boot_rep is set > 0
    if(conf.n_boot_rep().dval() < 0.0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "The number of bootstrap resamples (n_boot_rep) "
            << "must be set to a value >= 0.\n\n";
       exit(1);
@@ -565,7 +565,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Check that at least one interpolation method is provided
    if((n_mthd = conf.n_interp_method_elements()) <= 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "At least one interpolation method must be provided.\n\n";
       exit(1);
    }
@@ -580,7 +580,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
          method == InterpMthd_LS_Fit  ||
          method == InterpMthd_Bilin) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The interpolation method may not be set to DW_MEAN, "
               << "LS_FIT, or BILIN for grid_stat.\n\n";
          exit(1);
@@ -594,7 +594,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Check that at least one interpolation width is provided
    if((n_wdth = conf.n_interp_width_elements()) <= 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "At least one interpolation width must be provided.\n\n";
       exit(1);
    }
@@ -607,7 +607,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       if(conf.interp_width(i).ival() < 1 ||
          conf.interp_width(i).ival()%2 == 0) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The interpolation width must be set "
               << "to odd values greater than or equal to 1 ("
               << conf.interp_width(i).ival() << ").\n\n";
@@ -650,7 +650,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(conf.interp_flag().dval() < 1.0 ||
       conf.interp_flag().dval() > 3.0) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The interpolation threshold value must be set "
               << "between 1 and 3.\n\n";
          exit(1);
@@ -664,7 +664,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(conf.interp_thresh().dval() < 0.0 ||
       conf.interp_thresh().dval() > 1.0) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The interpolation threshold value must be set "
               << "between 0 and 1.\n\n";
          exit(1);
@@ -677,7 +677,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Check that at least one neighborhood width is provided
    if((n_nbr_wdth = conf.n_nbr_width_elements()) <= 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "At least one neighborhood width must be provided.\n\n";
       exit(1);
    }
@@ -688,7 +688,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       if(conf.nbr_width(i).ival() < 1 ||
          conf.nbr_width(i).ival()%2 == 0) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The neighborhood width must be set "
               << "to odd values greater than or equal to 1 ("
               << conf.nbr_width(i).ival() << ").\n\n";
@@ -704,7 +704,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(conf.nbr_thresh().dval() < 0.0 ||
       conf.nbr_thresh().dval() > 1.0) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The neighborhood threshold value must be set "
               << "between 0 and 1.\n\n";
          exit(1);
@@ -717,7 +717,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Check that at least one neighborhood fractional threshold is provided
    if((n_cov_thresh = conf.n_cov_thresh_elements()) <= 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "At least one neighborhood coverage threshold value "
            << "must be provided.\n\n";
       exit(1);
@@ -732,7 +732,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
       if(frac_ta[i].thresh < 0.0 ||
          frac_ta[i].thresh > 1.0) {
 
-         mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+         mlog << Error << "\n  GridStatConfInfo::process_config() -> "
               << "The neighborhood fraction threshold value must be set "
               << "between 0 and 1.\n\n";
          exit(1);
@@ -746,7 +746,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Make sure the output_flag is the expected length
    if(conf.n_output_flag_elements() != n_out) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "Found " << conf.n_output_flag_elements()
            << " elements in the output_flag but expected " << n_out
            << ".\n\n";
@@ -760,7 +760,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
 
    if(n == 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "At least one output STAT type must be requested.\n\n";
       exit(1);
    }
@@ -771,7 +771,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    if(conf.rank_corr_flag().ival() != 0 &&
       conf.rank_corr_flag().ival() != 1) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "The rank_corr_flag (" << conf.rank_corr_flag().ival()
            << ") must be set to 0 or 1.\n\n";
       exit(1);
@@ -781,7 +781,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut,
    // Conf: tmp_dir
    //
    if(opendir(conf.tmp_dir().sval()) == NULL ) {
-      mlog << Error << "\n\n  GridStatConfInfo::process_config() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_config() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << conf.tmp_dir().sval() << "\n\n";
       exit(1);
@@ -803,7 +803,7 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
    // Check that at least one verification masking region is provided
    if(n_mask == 0) {
 
-      mlog << Error << "\n\n  GridStatConfInfo::process_masks() -> "
+      mlog << Error << "\n  GridStatConfInfo::process_masks() -> "
            << "At least one grid or polyline verification masking "
            << "region must be provided.\n\n";
       exit(1);
@@ -936,7 +936,7 @@ int GridStatConfInfo::n_txt_row(int i) {
          break;
 
       default:
-         mlog << Error << "\n\n  GridStatConfInfo::n_txt_row(int) -> "
+         mlog << Error << "\n  GridStatConfInfo::n_txt_row(int) -> "
               << "unexpected output type index value: " << i << "\n\n";
          exit(1);
          break;

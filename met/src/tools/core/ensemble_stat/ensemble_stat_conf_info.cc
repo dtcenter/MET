@@ -131,7 +131,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    if(strlen(conf.model().sval()) == 0 ||
       check_reg_exp(ws_reg_exp, conf.model().sval()) == true) {
 
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "The model name (\"" << conf.model().sval() 
            << "\") must be non-empty and contain no embedded "
            << "whitespace.\n\n";
@@ -154,7 +154,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
 
    if(n_ens_var == 0) {
 
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "At least one value must be provided "
            << "for ens_field.\n\n";
       exit(1);
@@ -185,7 +185,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    if(conf.output_flag(i_nc_freq).ival() != 0 &&
       conf.n_ens_thresh_elements()       != n_ens_var) {
 
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "When computing ensemble relative frequencies, "
            << "the number of ens_thresh levels provided must match "
            << "the number of fields provided in ens_field.\n\n";
@@ -213,7 +213,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    if(conf.vld_ens_thresh().dval() <= 0.0 ||
       conf.vld_ens_thresh().dval() >  1.0) {
 
-         mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
               << "The valid ensemble threshold value must be set "
               << "greater than 0 and less than or equal to 1.\n\n";
          exit(1);
@@ -227,7 +227,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    if(conf.vld_data_thresh().dval() <= 0.0 ||
       conf.vld_data_thresh().dval() >  1.0) {
 
-         mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
               << "The valid data threshold value must be set "
               << "greater than 0 and less than or equal to 1.\n\n";
          exit(1);
@@ -270,7 +270,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    if(conf.n_obs_field_elements() != 0 &&
       conf.n_obs_field_elements() != n_vx) {
 
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "The length of obs_field must be the same as the "
            << "length of fcst_field.\n\n";
       exit(1);
@@ -286,7 +286,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
 
          // If obs_field is empty and the forecast file type is not GRIB1, error out
          if(conf.n_obs_field_elements() == 0 && etype != FileType_Gb1) {
-            mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+            mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
                  << "When the forecast file is not GRIB1, \"obs_field\" cannot be blank.  "
                  << "You must specify the verifying observations following the GRIB1 convention.\n\n";
             exit(1);
@@ -294,7 +294,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
 
          // Check that at least one observation file has been specified
          if(otype == FileType_None) {
-            mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+            mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
                  << "Verification has been requested but no observation "
                  << "files have been specified.\n\n";
             exit(1);
@@ -320,7 +320,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
             (vx_pd[i].obs_info->level().lower() <  vx_pd[i].fcst_info->level().lower() ||
              vx_pd[i].obs_info->level().upper() >  vx_pd[i].fcst_info->level().upper())) {
 
-            mlog << Warning << "\n\n  EnsembleStatConfInfo::process_config() -> "
+            mlog << Warning << "\n  EnsembleStatConfInfo::process_config() -> "
                  << "The range of requested observation pressure levels "
                  << "is not contained within the range of requested "
                  << "forecast pressure levels.  No vertical interpolation "
@@ -341,7 +341,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
 
    // Check that at least one PrepBufr message type is provided
    if(n_vx > 0 && n_msg_typ == 0) {
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "At least one PrepBufr message type must be provided.\n\n";
       exit(1);
    }
@@ -356,7 +356,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
       for(i=0; i<n_msg_typ; i++) {
 
          if(strstr(vld_msg_typ_str, msg_typ[i]) == NULL) {
-            mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+            mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
                  << "Invalid message type string provided ("
                  << conf.message_type(i).sval() << ").\n\n";
             exit(1);
@@ -374,7 +374,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    // Check that at least one interpolation method is provided
    if(n_vx > 0 && n_mthd == 0) {
 
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "At least one interpolation method must be provided.\n\n";
       exit(1);
    }
@@ -389,7 +389,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    // Check that at least one interpolation width is provided
    if(n_vx > 0 && n_wdth == 0) {
 
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "At least one interpolation width must be provided.\n\n";
       exit(1);
    }
@@ -409,7 +409,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
 
          // Perform error checking on widths
          if(conf.interp_width(i).ival() < 1) {
-            mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+            mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
                  << "The interpolation width values must be set "
                  << "greater than or equal to 1 ("
                  << conf.interp_width(i).ival() << ").\n\n";
@@ -486,7 +486,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    if(conf.interp_thresh().dval() < 0.0 ||
       conf.interp_thresh().dval() > 1.0) {
 
-         mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
               << "The interpolation threshold value must be set "
               << "between 0 and 1.\n\n";
          exit(1);
@@ -499,7 +499,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    // Make sure the output_flag is the expected length
    if(conf.n_output_flag_elements() != n_out) {
 
-      mlog << Error << "\n\n  EnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n  EnsembleStatConfInfo::process_config() -> "
            << "Found " << conf.n_output_flag_elements()
            << " elements in the output_flag but expected " << n_out
            << ".\n\n";
@@ -530,7 +530,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
    // Check that at least one verification masking region is provided
    if(n_mask == 0) {
-      mlog << Error << "\n\n  EnsemblesStatConfInfo::process_masks() -> "
+      mlog << Error << "\n  EnsemblesStatConfInfo::process_masks() -> "
            << "At least one grid, polyline, or station ID "
            << "masking region must be provided.\n\n";
       exit(1);

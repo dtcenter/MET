@@ -249,7 +249,7 @@ const char * DataLine::get_item(int k) const
 
 if ( (k < 0) || (k >= N_items) )  {
 
-   mlog << Error << "\n\n  DataLine::get_item(int) -> range check error\n\n";
+   mlog << Error << "\n  DataLine::get_item(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -301,7 +301,7 @@ u = new char [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  DataLine::extend_char() -> memory allocation error\n\n";
+   mlog << Error << "\n  DataLine::extend_char() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -353,7 +353,7 @@ u = new int [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  DataLine::extend_int() -> memory allocation error\n\n";
+   mlog << Error << "\n  DataLine::extend_int() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -535,7 +535,7 @@ LineDataFile::LineDataFile(const LineDataFile &)
 
 {
 
-mlog << Error << "\n\n  LineDataFile::LineDataFile(const LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\n  LineDataFile::LineDataFile(const LineDataFile &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -549,7 +549,7 @@ LineDataFile & LineDataFile::operator=(const LineDataFile &)
 
 {
 
-mlog << Error << "\n\n  LineDataFile::operator=(const LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\n  LineDataFile::operator=(const LineDataFile &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -593,7 +593,7 @@ in = new ifstream;
 
 if ( !in )  {
 
-   mlog << Error << "\n\n  LineDataFile::open(const char *) -> can't allocate input stream\n\n";
+   mlog << Error << "\n  LineDataFile::open(const char *) -> can't allocate input stream\n\n";
 
    exit ( 1 );
 
@@ -603,7 +603,7 @@ in->open(path);
 
 if ( !(*in) )  {
 
-   // mlog << Error << "\n\n  LineDataFile::open(const char *) -> can't open file \"" << path << "\"\n\n";
+   // mlog << Error << "\n  LineDataFile::open(const char *) -> can't open file \"" << path << "\"\n\n";
 
    // exit ( 1 );
 

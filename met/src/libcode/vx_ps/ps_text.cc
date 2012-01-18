@@ -307,7 +307,7 @@ u = new char [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  VxpstextNode::extend(int) -> memory allocation error!\n\n";
+   mlog << Error << "\n  VxpstextNode::extend(int) -> memory allocation error!\n\n";
 
    exit ( 1 );
 
@@ -376,7 +376,7 @@ int k = cm.ascii_code;
 
 if ( (k < 0) || (k > 255) )  {
 
-   mlog << Error << "\n\n  VxpsTextNode::add_char() -> bad byte value ... " << k << "\n\n";
+   mlog << Error << "\n  VxpsTextNode::add_char() -> bad byte value ... " << k << "\n\n";
 
    exit ( 1 );
 
@@ -568,7 +568,7 @@ void VxpsTextNode::add_link()
 
 if ( next )  {
 
-   mlog << Error << "\n\n  VxpsTextNode::add_link() -> link already present!\n\n";
+   mlog << Error << "\n  VxpsTextNode::add_link() -> link already present!\n\n";
 
    exit ( 1 );
 
@@ -617,7 +617,7 @@ void base_8_string(int k, char * out)
 
 if ( (k < 0) || (k > 255) )  {
 
-   mlog << Error << "\n\n  base_8_string() -> bad value ... " << k << "\n\n";
+   mlog << Error << "\n  base_8_string() -> bad value ... " << k << "\n\n";
 
    exit ( 1 );
 

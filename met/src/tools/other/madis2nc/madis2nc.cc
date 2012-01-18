@@ -219,7 +219,7 @@ void process_madis_file(const char *madis_file) {
 
    // Check for a valid file
    if(!f_in->is_valid()) {
-      mlog << Error << "\n\nprocess_madis_file() -> "
+      mlog << Error << "\n  process_madis_file() -> "
            << "can't open input NetCDF file \"" << madis_file
            << "\" for reading.\n\n";
       f_in->close();
@@ -257,7 +257,7 @@ void process_madis_file(const char *madis_file) {
       case(madis_snow):
       case(madis_none):
       default:
-         mlog << Error << "\n\nprocess_madis_file() -> "
+         mlog << Error << "\n  process_madis_file() -> "
               << "MADIS type (" << mtype
               << ") not currently supported.\n\n";
          exit(1);
@@ -304,7 +304,7 @@ void setup_netcdf_out(int nhdr) {
    // Check for a valid file
    //
    if(!f_out->is_valid()) {
-      mlog << Error << "\n\nsetup_netcdf_out() -> "
+      mlog << Error << "\n  setup_netcdf_out() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
       f_out->close();
       delete f_out;
@@ -384,7 +384,7 @@ int get_nc_dim(NcFile *&f_in, const char *dim_str) {
    // Retrieve the dimension from the NetCDF file.
    //
    if(!(dim = f_in->get_dim(dim_str))) {
-      mlog << Error << "\n\nget_nc_dim() -> "
+      mlog << Error << "\n  get_nc_dim() -> "
            << "can't read \"" << dim_str << "\" dimension.\n\n";
       exit(1);
    }
@@ -401,7 +401,7 @@ NcVar *get_nc_var(NcFile *&f_in, const char *var_str) {
    // Retrieve the variable from the NetCDF file.
    //
    if(!(var = f_in->get_var(var_str))) {
-      mlog << Error << "\n\nget_nc_var() -> "
+      mlog << Error << "\n  get_nc_var() -> "
            << "can't read \"" << var_str << "\" variable.\n\n";
       exit(1);
    }
@@ -418,7 +418,7 @@ void get_nc_var_att(NcVar *&var, const char *att_str, float &d) {
    // Retrieve the NetCDF variable attribute.
    //
    if(!(att = var->get_att(att_str)) || !att->is_valid()) {
-      mlog << Error << "\n\nget_nc_var_att(float) -> "
+      mlog << Error << "\n  get_nc_var_att(float) -> "
            << "can't read attribute \"" << att_str
            << "\" from \"" << var->name() << "\" variable.\n\n";
       exit(1);
@@ -438,7 +438,7 @@ void get_nc_var_val(NcVar *&var, const long *cur,
    // Retrieve the character array value from the NetCDF variable.
    //
    if(!var->set_cur((long *) cur) || !var->get(&tmp_str[0], 1, len)) {
-      mlog << Error << "\n\nget_nc_var_val(ConcatString) -> "
+      mlog << Error << "\n  get_nc_var_val(ConcatString) -> "
            << "can't read data from \"" << var->name()
            << "\" variable.\n\n";
       exit(1);
@@ -461,7 +461,7 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
    // Retrieve the float value from the NetCDF variable.
    //
    if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
-      mlog << Error << "\n\nget_nc_var_val(float) -> "
+      mlog << Error << "\n  get_nc_var_val(float) -> "
            << "can't read data from \"" << var->name()
            << "\" variable.\n\n";
       exit(1);
@@ -479,7 +479,7 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
    // Retrieve the double value from the NetCDF variable.
    //
    if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
-      mlog << Error << "\n\nget_nc_var_val(double) -> "
+      mlog << Error << "\n  get_nc_var_val(double) -> "
            << "can't read data from \"" << var->name()
            << "\" variable.\n\n";
       exit(1);
@@ -497,7 +497,7 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
    // Retrieve the character value from the NetCDF variable.
    //
    if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
-      mlog << Error << "\n\nget_nc_var_val(char) -> "
+      mlog << Error << "\n  get_nc_var_val(char) -> "
            << "can't read data from \"" << var->name()
            << "\" variable.\n\n";
       exit(1);
@@ -515,7 +515,7 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
    // Retrieve the character value from the NetCDF variable.
    //
    if(!var->set_cur((long *) cur) || !var->get(&d, (long *) dim)) {
-      mlog << Error << "\n\nget_nc_var_val(int) -> "
+      mlog << Error << "\n  get_nc_var_val(int) -> "
            << "can't read data from \"" << var->name()
            << "\" variable.\n\n";
       exit(1);
@@ -533,7 +533,7 @@ void put_nc_var_val(NcVar *&var, int i, const ConcatString &str) {
    //
    if(!var->set_cur(i, (long) 0) ||
       !var->put(str, (long) 1, (long) str.length())) {
-      mlog << Error << "\n\nput_nc_var_val(ConcatString) -> "
+      mlog << Error << "\n  put_nc_var_val(ConcatString) -> "
            << "can't write data to \"" << var->name()
            << "\" variable for record number " << i << ".\n\n";
       exit(1);
@@ -551,7 +551,7 @@ void put_nc_var_arr(NcVar *&var, int i, int len, const float *arr) {
    //
    if(!var->set_cur(i, (long) 0) ||
       !var->put(arr, (long) 1, (long) len)) {
-      mlog << Error << "\n\nput_nc_var_arr(float) -> "
+      mlog << Error << "\n  put_nc_var_arr(float) -> "
            << "can't write data to \"" << var->name()
            << "\" variable for record number " << i << ".\n\n";
       exit(1);
@@ -1476,7 +1476,7 @@ void set_type(const StringArray & a)
       mtype = madis_raob;
    }
    else {
-      mlog << Error << "\n\nprocess_command_line() -> "
+      mlog << Error << "\n  process_command_line() -> "
             << "MADIS type \"" << a[0]
             << "\" not currently supported.\n\n";
       exit(1);

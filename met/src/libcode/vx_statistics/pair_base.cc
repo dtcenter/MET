@@ -212,7 +212,7 @@ void PairBase::set_obs(int i_obs, const char *sid,
                        double o) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\n\n  PairBase::set_obs() -> "
+      mlog << Error << "\n  PairBase::set_obs() -> "
            << "range check error: " << i_obs << " not in (0, "
            << n_obs << ").\n\n"
           ;
@@ -237,7 +237,7 @@ void PairBase::set_obs(int i_obs, const char *sid,
 void PairBase::set_obs(int i_obs, double x, double y, double o) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\n\n  PairBase::set_obs() -> "
+      mlog << Error << "\n  PairBase::set_obs() -> "
            << "range check error: " << i_obs << " not in (0, "
            << n_obs << ").\n\n"
           ;

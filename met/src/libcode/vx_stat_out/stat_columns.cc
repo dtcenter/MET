@@ -54,7 +54,7 @@ int get_column_offset(const char **arr, int n_cols, const char *col_name) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_column_offset() -> "
+      mlog << Error << "\n  get_column_offset() -> "
            << "no match found in the indicated array for the column name "
            << "specified: \"" << col_name << "\"\n\n";
       throw(1);
@@ -113,7 +113,7 @@ int get_mctc_column_offset(const char *col_name, int n_cat) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_mctc_column_offset() -> "
+      mlog << Error << "\n  get_mctc_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -193,7 +193,7 @@ int get_pct_column_offset(const char *col_name) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_pct_column_offset() -> "
+      mlog << Error << "\n  get_pct_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -259,7 +259,7 @@ int get_pstd_column_offset(const char *col_name) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_pstd_column_offset() -> "
+      mlog << Error << "\n  get_pstd_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -373,7 +373,7 @@ int get_pjc_column_offset(const char *col_name) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_pjc_column_offset() -> "
+      mlog << Error << "\n  get_pjc_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -453,7 +453,7 @@ int get_prc_column_offset(const char *col_name) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_prc_column_offset() -> "
+      mlog << Error << "\n  get_prc_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -515,7 +515,7 @@ int get_rhist_column_offset(const char *col_name) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_rhist_column_offset() -> "
+      mlog << Error << "\n  get_rhist_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -580,7 +580,7 @@ int get_orank_column_offset(const char *col_name) {
    }
 
    if(!found) {
-      mlog << Error << "\n\n  get_orank_column_offset() -> "
+      mlog << Error << "\n  get_orank_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -597,7 +597,7 @@ int parse_thresh_index(const char *col_name) {
 
    if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
    else {
-      mlog << Error << "\n\n  parse_thresh_index() -> "
+      mlog << Error << "\n  parse_thresh_index() -> "
            << "unexpected column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -616,7 +616,7 @@ void parse_row_col(const char *col_name, int &r, int &c) {
 
    if((ptr = strrchr(col_name, '_')) != NULL) c = atoi(++ptr);
    else {
-      mlog << Error << "\n\n  parse_row_col() -> "
+      mlog << Error << "\n  parse_row_col() -> "
            << "unexpected column name specified: \""
            << col_name << "\"\n\n";
       throw(1);
@@ -634,7 +634,7 @@ void open_txt_file(ofstream *&out, const char *file_name) {
    out->open(file_name);
 
    if(!(*out)) {
-      mlog << Error << "\n\n  open_txt_file()-> "
+      mlog << Error << "\n  open_txt_file()-> "
            << "can't open the output file \"" << file_name
            << "\" for writing!\n\n";
       exit(1);

@@ -275,7 +275,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_cts_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_cts_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -344,7 +344,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          cts_i_out[i].open(cts_i_file[i]);
          cts_r_out[i].open(cts_r_file[i]);
          if(!cts_i_out[i] || !cts_r_out[i]) {
-            mlog << Error << "\n\n  compute_cts_stats_ci_bca() -> "
+            mlog << Error << "\n  compute_cts_stats_ci_bca() -> "
                  << "can't open one or more temporary files for writing:\n"
                  << cts_i_file[i] << "\n"
                  << cts_r_file[i] << "\n\n";
@@ -558,7 +558,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_cts_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_cts_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -628,7 +628,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_mcts_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_mcts_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -682,7 +682,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       mcts_i_out.open(mcts_i_file);
       mcts_r_out.open(mcts_r_file);
       if(!mcts_i_out || !mcts_r_out) {
-         mlog << Error << "\n\n  compute_mcts_stats_ci_bca() -> "
+         mlog << Error << "\n  compute_mcts_stats_ci_bca() -> "
               << "can't open one or more temporary files for writing:\n"
               << mcts_i_file << "\n"
               << mcts_r_file << "\n\n";
@@ -775,7 +775,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_mcts_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_mcts_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -833,7 +833,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_cnt_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_cnt_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -883,7 +883,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       cnt_i_out.open(cnt_i_file);
       cnt_r_out.open(cnt_r_file);
       if(!cnt_i_out || !cnt_r_out) {
-         mlog << Error << "\n\n  compute_cnt_stats_ci_bca() -> "
+         mlog << Error << "\n  compute_cnt_stats_ci_bca() -> "
               << "can't open one or more temporary files for writing:\n"
               << cnt_i_file << "\n"
               << cnt_r_file << "\n\n";
@@ -1134,7 +1134,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_cnt_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_cnt_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -1187,7 +1187,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_cts_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_cts_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -1253,7 +1253,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
       for(i=0; i<n_cts; i++) {
          cts_r_out[i].open(cts_r_file[i]);
          if(!cts_r_out[i]) {
-            mlog << Error << "\n\n  compute_cts_stats_ci_perc() -> "
+            mlog << Error << "\n  compute_cts_stats_ci_perc() -> "
                  << "can't open the temporary file for writing:\n"
                  << cts_r_file[i] << "\n\n";
             throw(1);
@@ -1438,7 +1438,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_cts_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_cts_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -1498,7 +1498,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_mcts_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_mcts_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -1552,7 +1552,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       mcts_r_out.open(mcts_r_file);
       if(!mcts_r_out) {
-         mlog << Error << "\n\n  compute_mcts_stats_ci_perc() -> "
+         mlog << Error << "\n  compute_mcts_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
               << mcts_r_file << "\n\n";
          throw(1);
@@ -1628,7 +1628,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_mcts_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_mcts_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -1679,7 +1679,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_cnt_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_cnt_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -1729,7 +1729,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       cnt_r_out.open(cnt_r_file);
       if(!cnt_r_out) {
-         mlog << Error << "\n\n  compute_cnt_stats_ci_perc() -> "
+         mlog << Error << "\n  compute_cnt_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
               << cnt_r_file << "\n\n";
          throw(1);
@@ -1951,7 +1951,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_cnt_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_cnt_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -1995,7 +1995,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_nbrcts_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_nbrcts_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -2067,7 +2067,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          nbrcts_i_out[i].open(nbrcts_i_file[i]);
          nbrcts_r_out[i].open(nbrcts_r_file[i]);
          if(!nbrcts_i_out[i] || !nbrcts_r_out[i]) {
-            mlog << Error << "\n\n  compute_nbrcts_stats_ci_bca() -> "
+            mlog << Error << "\n  compute_nbrcts_stats_ci_bca() -> "
                  << "can't open one or more temporary files for writing:\n"
                  << nbrcts_i_file[i] << "\n"
                  << nbrcts_r_file[i] << "\n\n";
@@ -2281,7 +2281,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_nbrcts_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_nbrcts_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -2340,7 +2340,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_nbrcnt_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_nbrcnt_stats_ci_bca() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -2388,7 +2388,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       nbrcnt_i_out.open(nbrcnt_i_file);
       nbrcnt_r_out.open(nbrcnt_r_file);
       if(!nbrcnt_i_out || !nbrcnt_r_out) {
-         mlog << Error << "\n\n  compute_nbrcnt_stats_ci_bca() -> "
+         mlog << Error << "\n  compute_nbrcnt_stats_ci_bca() -> "
               << "can't open one or more temporary files for writing:\n"
               << nbrcnt_i_file << "\n"
               << nbrcnt_r_file << "\n\n";
@@ -2455,7 +2455,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_nbrcnt_stats_ci_bca() -> "
+      mlog << Error << "\n  compute_nbrcnt_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -2502,7 +2502,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_nbrcts_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_nbrcts_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -2567,7 +2567,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
       for(i=0; i<n_nbrcts; i++) {
          nbrcts_r_out[i].open(nbrcts_r_file[i]);
          if(!nbrcts_r_out[i]) {
-            mlog << Error << "\n\n  compute_nbrcts_stats_ci_perc() -> "
+            mlog << Error << "\n  compute_nbrcts_stats_ci_perc() -> "
                  << "can't open the temporary file for writing:\n"
                  << nbrcts_r_file[i] << "\n\n";
             throw(1);
@@ -2753,7 +2753,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_nbrcts_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_nbrcts_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -2807,7 +2807,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Check that the forecast and observation arrays of the same length
    //
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\n\n  compute_nbrcnt_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_nbrcnt_stats_ci_perc() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       exit(1);
@@ -2850,7 +2850,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       nbrcnt_r_out.open(nbrcnt_r_file);
       if(!nbrcnt_r_out) {
-         mlog << Error << "\n\n  compute_nbrcnt_stats_ci_perc() -> "
+         mlog << Error << "\n  compute_nbrcnt_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
               << nbrcnt_r_file << "\n\n";
          throw(1);
@@ -2904,7 +2904,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    catch(int i_err) {
 
-      mlog << Error << "\n\n  compute_nbrcnt_stats_ci_perc() -> "
+      mlog << Error << "\n  compute_nbrcnt_stats_ci_perc() -> "
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
@@ -3263,7 +3263,7 @@ void read_ldf(const char *file_name, int col, NumArray &na) {
    // Open up the input file for reading
    //
    if(!ldf_in.open(file_name)) {
-      mlog << Error << "\n\n  read_ldf() -> "
+      mlog << Error << "\n  read_ldf() -> "
            << "can't open file: " << file_name << "\n\n"
           ;
       throw(1);

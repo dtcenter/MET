@@ -222,7 +222,7 @@ void process_command_line(int argc, char **argv) {
       obs_valid_end_ut != (unixtime) 0 &&
       obs_valid_beg_ut > obs_valid_end_ut) {
 
-      mlog << Error << "\n\n  process_command_line() -> "
+      mlog << Error << "\n  process_command_line() -> "
            << "the ending time ("
            << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
            << ") must be greater than the beginning time ("
@@ -240,7 +240,7 @@ void process_command_line(int argc, char **argv) {
 
    // Read the input forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file))) {
-      mlog << Error << "\n\n  Trouble reading forecast file \""
+      mlog << Error << "\n  Trouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
@@ -251,7 +251,7 @@ void process_command_line(int argc, char **argv) {
    // Read the input climo file
    if(climo_flag) {
       if(!(climo_mtddf = mtddf_factory.new_met_2d_data_file(climo_file))) {
-         mlog << Error << "\n\n  Trouble reading climatology file \""
+         mlog << Error << "\n  Trouble reading climatology file \""
               << climo_file << "\"\n\n";
          exit(1);
       }
@@ -534,7 +534,7 @@ void process_fcst_climo_files() {
 
       // Check for zero fields
       if(n_fcst == 0) {
-         mlog << Error << "\n\n  process_fcst_climo_files() -> "
+         mlog << Error << "\n  process_fcst_climo_files() -> "
               << "no fields matching "
               << conf_info.vx_pd[i].fcst_info->magic_str()
               << " found in file: "
@@ -550,7 +550,7 @@ void process_fcst_climo_files() {
       else {
 
          if(!(fcst_mtddf->grid() == grid)) {
-            mlog << Error << "\n\n  process_fcst_climo_files() -> "
+            mlog << Error << "\n  process_fcst_climo_files() -> "
                  << "The forecast grid has changed for field "
                  << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n\n";
             exit(1);
@@ -565,7 +565,7 @@ void process_fcst_climo_files() {
 
          // Check that the grid has not changed
          if(!(climo_mtddf->grid() == grid)) {
-            mlog << Error << "\n\n  process_fcst_climo_files() -> "
+            mlog << Error << "\n  process_fcst_climo_files() -> "
                  << "The climatology grid has changed for field "
                  << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n\n";
             exit(1);
@@ -647,7 +647,7 @@ void process_obs_file(int i_nc) {
       delete obs_in;
       obs_in = (NcFile *) 0;
 
-      mlog << Warning << "\n\n  process_obs_file() -> "
+      mlog << Warning << "\n  process_obs_file() -> "
            << "can't open observation netCDF file: "
            << obs_file[i_nc] << "\n\n";
       return;
@@ -673,7 +673,7 @@ void process_obs_file(int i_nc) {
    if(!strl_dim || !strl_dim->is_valid() ||
       !obs_dim  || !obs_dim->is_valid()  ||
       !hdr_dim  || !hdr_dim->is_valid()) {
-      mlog << Error << "\n\n  process_obs_file() -> "
+      mlog << Error << "\n  process_obs_file() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
            << "dimensions from netCDF file: "
            << obs_file[i_nc] << "\n\n";
@@ -692,7 +692,7 @@ void process_obs_file(int i_nc) {
       !hdr_sid_var || !hdr_sid_var->is_valid() ||
       !hdr_vld_var || !hdr_vld_var->is_valid() ||
       !hdr_arr_var || !hdr_arr_var->is_valid()) {
-      mlog << Error << "\n\n  process_obs_file() -> "
+      mlog << Error << "\n  process_obs_file() -> "
            << "can't read \"obs_arr\", \"hdr_typ\", \"hdr_sid\", "
            << "\"hdr_vld\", or \"hdr_arr\" variables from netCDF file: "
            << obs_file[i_nc] << "\n\n";
@@ -710,7 +710,7 @@ void process_obs_file(int i_nc) {
       // Read the current observation message
       if(!obs_arr_var->set_cur((long) i_obs)
       || !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
-         mlog << Error << "\n\n  process_obs_file() -> "
+         mlog << Error << "\n  process_obs_file() -> "
               << "can't read the record for observation "
               << "number " << i_obs << "\n\n";
          exit(1);
@@ -732,7 +732,7 @@ void process_obs_file(int i_nc) {
          if(!is_eq(obs_arr[0], prev_obs_arr[0]) ||
             !is_eq(obs_arr[2], prev_obs_arr[2]) ||
             !is_eq(obs_arr[3], prev_obs_arr[3])) {
-            mlog << Error << "\n\n  process_obs_file() -> "
+            mlog << Error << "\n  process_obs_file() -> "
                  << "when computing vector winds, each UGRD "
                  << "observation must be followed by a VGRD "
                  << "observation with the same header and at the "
@@ -744,7 +744,7 @@ void process_obs_file(int i_nc) {
       // Read the corresponding header array for this observation
       if(!hdr_arr_var->set_cur((long) (obs_arr[0])) ||
          !hdr_arr_var->get(hdr_arr, 1, hdr_arr_len)) {
-         mlog << Error << "\n\n  process_obs_file() -> "
+         mlog << Error << "\n  process_obs_file() -> "
               << "can't read the header array record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -753,7 +753,7 @@ void process_obs_file(int i_nc) {
       // Read the corresponding header type for this observation
       if(!hdr_typ_var->set_cur((long) (obs_arr[0])) ||
          !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\n\n  process_obs_file() -> "
+         mlog << Error << "\n  process_obs_file() -> "
               << "can't read the message type record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -762,7 +762,7 @@ void process_obs_file(int i_nc) {
       // Read the corresponding header Station ID for this observation
       if(!hdr_sid_var->set_cur((long) (obs_arr[0])) ||
          !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
-         mlog << Error << "\n\n  process_obs_file() -> "
+         mlog << Error << "\n  process_obs_file() -> "
               << "can't read the station ID record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -771,7 +771,7 @@ void process_obs_file(int i_nc) {
       // Read the corresponding valid time for this observation
       if(!hdr_vld_var->set_cur((long) (obs_arr[0])) ||
          !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
-         mlog << Error << "\n\n  process_obs_file() -> "
+         mlog << Error << "\n  process_obs_file() -> "
               << "can't read the valid time for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -1392,7 +1392,7 @@ void do_sl1l2(SL1L2Info &s_info, int i_vx, PairDataPoint *pd_ptr) {
    }
 
    if(s_info.scount == 0) {
-      mlog << Error << "\n\n  do_sl1l2() -> "
+      mlog << Error << "\n  do_sl1l2() -> "
            << "count is zero!\n\n";
       exit(1);
    }
@@ -1434,7 +1434,7 @@ void do_vl1l2(VL1L2Info *&v_info,
 
    // Check that the number of pairs are the same
    if(ugrd_pd_ptr->n_pair != vgrd_pd_ptr->n_pair) {
-      mlog << Error << "\n\n  do_vl1l2() -> "
+      mlog << Error << "\n  do_vl1l2() -> "
            << "the number of UGRD pairs != the number of VGRD pairs: "
            << ugrd_pd_ptr->n_pair << " != " << vgrd_pd_ptr->n_pair
            << "\n\n";

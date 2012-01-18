@@ -86,7 +86,7 @@ CodeGenerator::CodeGenerator(const CodeGenerator & g)
 
 {
 
-mlog << Error << "\n\n  CodeGenerator::CodeGenerator(const CodeGenerator &) -> should never be called\n\n";
+mlog << Error << "\n  CodeGenerator::CodeGenerator(const CodeGenerator &) -> should never be called\n\n";
 
 exit ( 1 );
 
@@ -104,7 +104,7 @@ CodeGenerator & CodeGenerator::operator=(const CodeGenerator & g)
 
 {
 
-mlog << Error << "\n\n  CodeGenerator::operator=(const CodeGenerator &) -> should never be called\n\n";
+mlog << Error << "\n  CodeGenerator::operator=(const CodeGenerator &) -> should never be called\n\n";
 
 exit ( 1 );
 
@@ -307,7 +307,7 @@ set_config_filename(config_filename);
 
 if ( !ClassName )  {
 
-   mlog << Error << "\n\n  CodeGenerator::process() -> no class name set\n\n";
+   mlog << Error << "\n  CodeGenerator::process() -> no class name set\n\n";
 
    exit ( 1 );
 
@@ -316,7 +316,7 @@ if ( !ClassName )  {
 
 if ( !FilePrefix )  {
 
-   mlog << Error << "\n\n  CodeGenerator::process() -> no file prefix set\n\n";
+   mlog << Error << "\n  CodeGenerator::process() -> no file prefix set\n\n";
 
    exit ( 1 );
 
@@ -437,7 +437,7 @@ const char * suffix = (const char *) 0;
 
 if ( machine.sts.n_tables() != 1 )  {
 
-   mlog << Error << "\n\n  CodeGenerator::do_header() -> wrong number of symbol tables on the stack ... "
+   mlog << Error << "\n  CodeGenerator::do_header() -> wrong number of symbol tables on the stack ... "
         << machine.sts.n_tables() << "\n\n";
 
    exit ( 1 );
@@ -484,7 +484,7 @@ out.open(output_filename);
 
 if ( !out )  {
 
-   mlog << Error << "\n\n  CodeGenerator::do_header() -> unable to open output file \""
+   mlog << Error << "\n  CodeGenerator::do_header() -> unable to open output file \""
         << output_filename << "\"\n\n";
 
    exit ( 1 );
@@ -644,7 +644,7 @@ for (j=0; j<(symtab.n_entries()); ++j)  {
 
 
       default:
-         mlog << Error << "\n\n  CodeGenerator::do_header() -> "
+         mlog << Error << "\n  CodeGenerator::do_header() -> "
               << "don't know how to handle symbol table entries of type \""
               << stetype_to_string(entry->type) << "\"\n\n";
          exit ( 1 );
@@ -839,7 +839,7 @@ out.open(output_filename);
 
 if ( !out )  {
 
-   mlog << Error << "\n\n  CodeGenerator::do_header() -> unable to open output file \""
+   mlog << Error << "\n  CodeGenerator::do_header() -> unable to open output file \""
         << output_filename << "\"\n\n";
 
    exit ( 1 );
@@ -935,7 +935,7 @@ out << "\n\n"
     << "\n"
     << "{\n"
     << "\n"
-    << "mlog << Error << \"\\n\\n  " << ClassName << "::" << ClassName << "(const " << ClassName << " &) -> should never be called!\\n\\n\";\n"
+    << "mlog << Error << \"\\n  " << ClassName << "::" << ClassName << "(const " << ClassName << " &) -> should never be called!\\n\\n\";\n"
     << "\n"
     << "exit ( 1 );\n"
     << "\n"
@@ -973,7 +973,7 @@ out << "\n\n"
     << "\n"
     << "{\n"
     << "\n"
-    << "mlog << Error << \"\\n\\n  " << ClassName << "::" << "operator=(const " << ClassName << " &) -> should never be called!\\n\\n\";\n"
+    << "mlog << Error << \"\\n  " << ClassName << "::" << "operator=(const " << ClassName << " &) -> should never be called!\\n\\n\";\n"
     << "\n"
     << "exit ( 1 );\n"
     << "\n"
@@ -1136,7 +1136,7 @@ for (j=0; j<(symtab.n_entries()); ++j)  {
           << "\n"
           << "if ( !_e )  {\n"
           << "\n"
-          << "   mlog << Error << \"\\n\\n  " << ClassName << "::read(const char *) -> can't get symbol table entry for variable \\\"" << (entry->name) << "\\\"\\n\\n\";\n"
+          << "   mlog << Error << \"\\n  " << ClassName << "::read(const char *) -> can't get symbol table entry for variable \\\"" << (entry->name) << "\\\"\\n\\n\";\n"
           << "\n"
           << "   exit ( 1 );\n"
           << "\n"
@@ -1239,7 +1239,7 @@ switch ( entry->type )  {
 
 
    default:
-      mlog << Error << "\n\n  CodeGenerator::do_member_for_symbol() -> "
+      mlog << Error << "\n  CodeGenerator::do_member_for_symbol() -> "
            << "don't know how to generate code for symbols of type \""
            << stetype_to_string(entry->type) << "\"\n\n";
       exit ( 1 );
@@ -1323,7 +1323,7 @@ out << "\n\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   mlog << Error << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for variable \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
+    << "   mlog << Error << \"\\n  " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for variable \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1370,7 +1370,7 @@ out << "\n\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   mlog << Error << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for piecewise-linear function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
+    << "   mlog << Error << \"\\n  " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for piecewise-linear function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1430,7 +1430,7 @@ out << ")\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   mlog << Error << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
+    << "   mlog << Error << \"\\n  " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1531,7 +1531,7 @@ out << ")\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   mlog << Error << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for array \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
+    << "   mlog << Error << \"\\n  " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for array \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"
@@ -1617,7 +1617,7 @@ out << ")\n"
 
 out << "if ( !_" << (entry->name) << "_entry )  {\n"
     << "\n"
-    << "   mlog << Error << \"\\n\\n   " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for array n_elements function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
+    << "   mlog << Error << \"\\n  " << ClassName << "::" << (entry->name) << "() -> no symbol table entry found for array n_elements function \\\"" << (entry->name) << "\\\"!\\n\\n\";\n"
     << "\n"
     << "   exit ( 1 );\n"
     << "\n"

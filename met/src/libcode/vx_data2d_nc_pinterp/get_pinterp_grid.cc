@@ -399,7 +399,7 @@ att = nc.get_att(name);
 
 if ( (att->type() != ncDouble) && (att->type() != ncFloat) )  {
 
-   mlog << Error << "\n\n  get_att_as_double(NcFile &, const char * name) -> can't get attribute \"" << name << "\"\n\n";
+   mlog << Error << "\n  get_att_as_double(NcFile &, const char * name) -> can't get attribute \"" << name << "\"\n\n";
 
    exit ( 1 );
 

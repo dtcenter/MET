@@ -148,7 +148,7 @@ v = new IcodeVector * [Nalloc];
 
 if ( !v )  {
 
-   mlog << Error << "\n\n  void ArrayInfo::assign(const ArrayInfo &) -> memory allocation error\n\n";
+   mlog << Error << "\n  void ArrayInfo::assign(const ArrayInfo &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -213,7 +213,7 @@ int ArrayInfo::size(int k) const
 
 if ( (k < 0) || (k >= Dim) )  {
 
-   mlog << Error << "\n\n  int ArrayInfo::size(int) const -> range check error\n\n";
+   mlog << Error << "\n  int ArrayInfo::size(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -241,7 +241,7 @@ for (j=0; j<Dim; ++j)  {
 
    if ( (k < 0) || (k >= sizes[j]) )  {
 
-      mlog << Error << "\n\n  ArrayInfo::indices_to_n() const -> range check error in array indice(s)\n\n";
+      mlog << Error << "\n  ArrayInfo::indices_to_n() const -> range check error in array indice(s)\n\n";
 
       exit ( 1 );
 
@@ -304,7 +304,7 @@ void ArrayInfo::set(const int * s, int d)
 
 if ( d > max_array_dim )  {
 
-   mlog << Error << "\n\n  ArrayInfo::set_sizes(const int *, int) -> bad dimension\n\n";
+   mlog << Error << "\n  ArrayInfo::set_sizes(const int *, int) -> bad dimension\n\n";
 
    exit ( 1 );
 
@@ -327,7 +327,7 @@ v = new IcodeVector * [Nalloc];
 
 if ( !v )  {
 
-   mlog << Error << "\n\n  void ArrayInfo::set(const int *, int) -> memory allocation error\n\n";
+   mlog << Error << "\n  void ArrayInfo::set(const int *, int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -351,7 +351,7 @@ void ArrayInfo::put(int n, const IcodeVector & icv)
 
 if ( (n < 0) || (n >= Nalloc) )  {
 
-   mlog << Error << "\n\n  void ArrayInfo::put(int, const IcodeVector &) -> range check error\n\n";
+   mlog << Error << "\n  void ArrayInfo::put(int, const IcodeVector &) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -362,7 +362,7 @@ if ( !(v[n]) )  v[n] = new IcodeVector;
 
 if ( !(v[n]) )  {
 
-   mlog << Error << "\n\n  void ArrayInfo::put(int, const IcodeVector &) -> range check error\n\n";
+   mlog << Error << "\n  void ArrayInfo::put(int, const IcodeVector &) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -404,7 +404,7 @@ const IcodeVector * ArrayInfo::get(int n) const
 
 if ( (n < 0) || (n >= Nalloc) )  {
 
-   mlog << Error << "\n\n  void ArrayInfo::get(int) -> range check error\n\n";
+   mlog << Error << "\n  void ArrayInfo::get(int) -> range check error\n\n";
 
    exit ( 1 );
 

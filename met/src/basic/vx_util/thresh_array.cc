@@ -156,7 +156,7 @@ void ThreshArray::extend(int n) {
 SingleThresh ThreshArray::operator[](int n) const {
 
    if((n < 0) || (n >= Nelements)) {
-      mlog << Error << "\n\n  ThreshArray::operator[](int) const -> "
+      mlog << Error << "\n  ThreshArray::operator[](int) const -> "
            << "range check error!\n\n";
       exit(1);
 
@@ -337,7 +337,7 @@ int ThreshArray::check(double v) const {
          t[i].type   == thresh_eq     ||
          t[i].type   == thresh_ne) {
 
-         mlog << Error << "\n\n  ThreshArray::check(double) const -> "
+         mlog << Error << "\n  ThreshArray::check(double) const -> "
               << "thresholds must be monotonically increasing and be of "
               << "the same inequality type (lt, le, gt, or ge)."
               << "\n\n";

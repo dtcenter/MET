@@ -69,7 +69,7 @@ bds = new Section4_Header;
 
 if ( !is || !gds || !bms || !bds )  {
 
-   mlog << Error << "\n\n  GribRecord::GribRecord() -> memory allocation error\n\n";
+   mlog << Error << "\n  GribRecord::GribRecord() -> memory allocation error\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribRecord::GribRecord() -> memory allocation error\n\n");
@@ -160,7 +160,7 @@ bds = new Section4_Header;
 
 if ( !is || !pds || !gds || !bms || !bds )  {
 
-   mlog << Error << "\n\n  GribRecord::GribRecord(const GribRecord &) -> memory allocation error\n\n";
+   mlog << Error << "\n  GribRecord::GribRecord(const GribRecord &) -> memory allocation error\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribRecord::GribRecord(const GribRecord &) -> memory allocation error\n\n");
@@ -330,7 +330,7 @@ unsigned char *u = new unsigned char [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  GribRecord::extend_data(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  GribRecord::extend_data(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribRecord::extend_data(int) -> memory allocation error\n\n");
@@ -369,7 +369,7 @@ unsigned char *u = new unsigned char [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n\n  GribRecord::extend_bitmap(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  GribRecord::extend_bitmap(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribRecord::extend_bitmap(int) -> memory allocation error\n\n");
@@ -527,7 +527,7 @@ int GribRecord::bms_bit(int n) const
 
 if ( (n < 0) || (gds_flag && (nx > 0) && (ny > 0) && (n >= nx*ny)) )  {
 
-   mlog << Error << "\n\n  GribRecord::bms_bit(int) -> range check error ... n = " << n << "\n\n";
+   mlog << Error << "\n  GribRecord::bms_bit(int) -> range check error ... n = " << n << "\n\n";
 
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
@@ -663,7 +663,7 @@ r = new RecordInfo [n_alloc];
 
 if ( !r )  {
 
-   mlog << Error << "\n\n  void GribFileRep::record_extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n  void GribFileRep::record_extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  void GribFileRep::record_extend(int) -> memory allocation error\n\n");
@@ -743,7 +743,7 @@ close();
 
 if ( !(rep = new GribFileRep) )  {
 
-   mlog << Error << "\n\n  GribFile::open(char *) -> memory allocation error\n\n";
+   mlog << Error << "\n  GribFile::open(char *) -> memory allocation error\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribFile::open(char *) -> memory allocation error\n\n");
@@ -764,7 +764,7 @@ while ( (j >= 0) && (filename[j] != '/') )   --j;
 
 if ( !(rep->name = new char [1 + strlen(filename + j)]) )  {
 
-   mlog << Error << "\n\n  GribFile::open(const char *) -> memory allocation error 1\n\n";
+   mlog << Error << "\n  GribFile::open(const char *) -> memory allocation error 1\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribFile::open(const char *) -> memory allocation error 1\n\n");
@@ -777,7 +777,7 @@ rep->issue = rep->lead = 0;
 
 if ( (rep->fd = ::open(filename, O_RDONLY)) < 0 )  {
 
-   mlog << Error << "\n\n  GribFile::open(const char *) -> unable to open grib file " << filename << "\n\n";
+   mlog << Error << "\n  GribFile::open(const char *) -> unable to open grib file " << filename << "\n\n";
 
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
@@ -790,7 +790,7 @@ if ( (rep->fd = ::open(filename, O_RDONLY)) < 0 )  {
 
 if ( !(rep->buf = new unsigned char [gribfile_buf_size]) )  {
 
-   mlog << Error << "\n\n  GribFile::open(const char *) -> memory allocation error 2\n\n";
+   mlog << Error << "\n  GribFile::open(const char *) -> memory allocation error 2\n\n";
 
    exit ( 1 );
 //   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribFile::open(const char *) -> memory allocation error 2\n\n");
@@ -928,7 +928,7 @@ memcpy(g.is, rep->buf, 8);
 
 if ( (n_read < 0) || (n_read != bytes) )  {
 
-   mlog << Error << "\n\n  GribFile::read_record() -> error reading section 0 header ... nread = " << n_read << "\n\n";
+   mlog << Error << "\n  GribFile::read_record() -> error reading section 0 header ... nread = " << n_read << "\n\n";
 
    return ( -1 );
 
@@ -938,7 +938,7 @@ if ( strncmp(g.is->grib_name, "GRIB", 4) != 0 )  {
 
    int pos2 = lseek(rep->fd, 0L, SEEK_END);
 
-   mlog << Error << "\n\n  GribFile::read_record(GribRecord &) -> \"GRIB\" magic cookie not found in grib record\n\n"
+   mlog << Error << "\n  GribFile::read_record(GribRecord &) -> \"GRIB\" magic cookie not found in grib record\n\n"
         << "     reading record number " << (rep->n_records) << ", bytes left in file = "
         << (pos2 - file_pos) << "\n\n";
 
@@ -955,7 +955,7 @@ g.record_lseek_offset = file_pos;
 
 if ( s > (rep->buf_size) )  {
 
-   mlog << Error << "\n\n  GribFile::read_record(GribRecord &) -> "
+   mlog << Error << "\n  GribFile::read_record(GribRecord &) -> "
         << "found a grib record larger than the buffer size.\n\n"
         << "  Increase the buffer to at least " << s << " bytes.\n\n\n";
 
@@ -972,7 +972,7 @@ if ( read(8, s - 8) == 0 )  return ( 0 );
 
 if ( strncmp((char *) (rep->buf + (s - 4)), "7777", 4) != 0 )  {
 
-   mlog << Error << "\n\n  GribFile::read_record(GribRecord &) -> trailing \"7777\" not found in grib record\n\n";
+   mlog << Error << "\n  GribFile::read_record(GribRecord &) -> trailing \"7777\" not found in grib record\n\n";
 
 //   exit ( 1 );
 //   throw GribError(missing_trail_7777_error, __LINE__, __FILE__, "\n\n  GribFile::read_record(GribRecord &) -> trailing \"7777\" not found in grib record\n\n");
@@ -1135,7 +1135,7 @@ g.b_value = t*(g.r_value);
 
 if ( (g.bds->flag) & 128 )  {
 
-   mlog << Error << "\n\n  GribFile::read_record(GribRecord &) -> Spherical Harmonic data not implemented.\n\n";
+   mlog << Error << "\n  GribFile::read_record(GribRecord &) -> Spherical Harmonic data not implemented.\n\n";
 
    exit ( 1 );
 //   throw GribError(spher_harm_not_impl_error, __LINE__, __FILE__, "\n\n  GribFile::read_record(GribRecord &) -> Spherical Harmonic data not implemented.\n\n");
@@ -1144,7 +1144,7 @@ if ( (g.bds->flag) & 128 )  {
 
 if ( (g.bds->flag) & 64 )  {
 
-   mlog << Error << "\n\n  GribFile::read_record(GribRecord &) -> Second order packing not implemented.\n\n";
+   mlog << Error << "\n  GribFile::read_record(GribRecord &) -> Second order packing not implemented.\n\n";
 
    exit ( 1 );
 //   throw GribError(second_ord_pkg_not_impl_error, __LINE__, __FILE__, "\n\n  GribFile::read_record(GribRecord &) -> Second order packing not implemented.\n\n");
@@ -1155,7 +1155,7 @@ g.word_size = (int) (g.bds->size);
 
 if ( g.word_size > 32 )  {
 
-   mlog << Error << "\n\n  GribFile::read_record(GribRecord &) -> Binary data word size of "
+   mlog << Error << "\n  GribFile::read_record(GribRecord &) -> Binary data word size of "
         << g.word_size << " found\n\n"
         << "   Binary data word sizes > 32 bits are not implemented.\n\n";
 
@@ -1217,7 +1217,7 @@ n_read = ::read(rep->fd, (char *) (rep->buf), rep->buf_size);
 
 if ( n_read == 0 )  {
 
-   mlog << Error << "\n\n  GribFile::skip_header() -> "
+   mlog << Error << "\n  GribFile::skip_header() -> "
         << "\"GRIB\" magic cookie not found in grib file!!\n\n";
 
    return ( 0 );
@@ -1227,7 +1227,7 @@ if ( n_read == 0 )  {
 
 if ( n_read < 0 )  {
 
-//   mlog << Error << "\n\n  GribFile::skip_header() -> "
+//   mlog << Error << "\n  GribFile::skip_header() -> "
 //        << "file read error\n\n";
 
    return ( 0 );
@@ -1245,7 +1245,7 @@ for (j=0; j<=min(grib_search_bytes, (n_read - 4)); ++j)  {
 
 if ( !found ) {
 
-   mlog << Error << "\n\n  GribFile::skip_header() -> "
+   mlog << Error << "\n  GribFile::skip_header() -> "
         << "can't find \"GRIB\" magic cookie\n\n";
 
    return ( 0 );
@@ -1306,7 +1306,7 @@ int n_read;
 
 if ( (n_read = ::read(rep->fd, (char *) rep->buf, rep->buf_size)) < 0 )  {
 
-   mlog << Error << "\n\n  GribFile::read() -> file read error\n\n";
+   mlog << Error << "\n  GribFile::read() -> file read error\n\n";
 
    exit ( 1 );
 //   throw GribError(file_read_error, __LINE__, __FILE__, "\n\n  GribFile::read() -> file read error\n\n");
@@ -1329,7 +1329,7 @@ int n_read;
 
 if ( bytes > rep->buf_size )  {
 
-   mlog << Error << "\n\n  GribFile::read(int) -> can't read " << bytes
+   mlog << Error << "\n  GribFile::read(int) -> can't read " << bytes
         << " bytes into a " << (rep->buf_size) << " byte buffer\n\n";
 
    exit ( 1 );
@@ -1343,7 +1343,7 @@ if ( bytes > rep->buf_size )  {
 
 if ( (n_read = ::read(rep->fd, (char *) rep->buf, bytes)) < 0 )  {
 
-   mlog << Error << "\n\n  GribFile::read() -> file read error\n\n";
+   mlog << Error << "\n  GribFile::read() -> file read error\n\n";
 
    exit ( 1 );
 //   throw GribError(file_read_error, __LINE__, __FILE__, "\n\n  GribFile::read() -> file read error\n\n");
@@ -1366,7 +1366,7 @@ int n_read;
 
 if ( (buffer_offset + bytes) > (rep->buf_size) )  {
 
-   mlog << Error << "\n\n  GribFile::read(int, int) -> requested read would overflow buffer\n\n";
+   mlog << Error << "\n  GribFile::read(int, int) -> requested read would overflow buffer\n\n";
 
    exit ( 1 );
 //   throw GribError(read_overflow_error, __LINE__, __FILE__, "\n\n  GribFile::read(int, int) -> requested read would overflow buffer\n\n");
@@ -1377,7 +1377,7 @@ n_read = ::read(rep->fd, (rep->buf + buffer_offset), bytes);
 
 if ( n_read != bytes )  {
 
-   mlog << Error << "\n\n  GribFile::read() -> file read error ... requested " << bytes << " bytes, got " << n_read << "\n\n";
+   mlog << Error << "\n  GribFile::read() -> file read error ... requested " << bytes << " bytes, got " << n_read << "\n\n";
 
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
@@ -1404,7 +1404,7 @@ int n_read;
 
 if ( (n_read = ::read(rep->fd, c, bytes)) < 0 )  {
 
-   mlog << Error << "\n\n  GribFile::read() -> file read error\n\n";
+   mlog << Error << "\n  GribFile::read() -> file read error\n\n";
 
    exit ( 1 );
 //   throw GribError(file_read_error, __LINE__, __FILE__, "\n\n  GribFile::read() -> file read error\n\n");
@@ -1453,7 +1453,7 @@ int GribFile::record_offset(int n)
 
 if ( (n < 0) || (n >= (rep->n_records)) )  {
 
-   mlog << Error << "\n\n  GribFile::record_offset(int) -> range check error\n\n";
+   mlog << Error << "\n  GribFile::record_offset(int) -> range check error\n\n";
 
    exit ( 1 );
 //   throw GribError(range_chk_error, __LINE__, __FILE__, "\n\n  GribFile::record_offset(int) -> range check error\n\n");
@@ -1474,7 +1474,7 @@ int GribFile::gribcode(int n)
 
 if ( (n < 0) || (n >= (rep->n_records)) )  {
 
-   mlog << Error << "\n\n  GribFile::gribcode(int) -> range check error\n\n";
+   mlog << Error << "\n  GribFile::gribcode(int) -> range check error\n\n";
 
    exit ( 1 );
 //   throw GribError(range_chk_error, __LINE__, __FILE__, "\n\n  GribFile::gribcode(int) -> range check error\n\n");
@@ -1533,7 +1533,7 @@ void GribFile::seek_record(int n)
 
 if ( (n < 0) || (n >= (rep->n_records)) )  {
 
-   mlog << Error << "\n\n  GribFile::seek_record(int) -> range check error\n\n";
+   mlog << Error << "\n  GribFile::seek_record(int) -> range check error\n\n";
 
    exit ( 1 );
 //   throw GribError(range_chk_error, __LINE__, __FILE__, "\n\n  GribFile::seek_record(int) -> range check error\n\n");
@@ -2067,7 +2067,7 @@ if ( n_read == 0 )  return ( -1 );
 
 if ( n_read < 0 )  {
 
-   mlog << Error << "\n\n  find_magic_cookie(int) -> trouble reading file\n\n";
+   mlog << Error << "\n  find_magic_cookie(int) -> trouble reading file\n\n";
 
    exit ( 1 );
 //   throw GribError(file_read_error, __LINE__, __FILE__, "\n\n  find_magic_cookie(int) -> trouble reading file\n\n");
@@ -2103,7 +2103,7 @@ switch ( pds->fcst_unit )  {
    case 254: multiplier =         1;  break;   //  seconds
 
    default:
-      mlog << Error << "\n\n  calc_lead_time(Section1_Header *) -> bad value for fcst unit: " << (pds->fcst_unit) << "\n\n";
+      mlog << Error << "\n  calc_lead_time(Section1_Header *) -> bad value for fcst unit: " << (pds->fcst_unit) << "\n\n";
       exit ( 1 );
 //      char temp_str[max_temp_str_length];
 
