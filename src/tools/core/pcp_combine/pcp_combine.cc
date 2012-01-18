@@ -1184,7 +1184,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    pcp_var = f_out->add_var((const char *) var_str, ncFloat, lat_dim, lon_dim);
 
    // Add variable attributes
-   var_str = get_grib_code_abbr(grib_code, grib_ptv);
    pcp_var->add_att("name",  (const char *) var_str);
    var_str = get_grib_code_name(grib_code, grib_ptv);
    pcp_var->add_att("long_name", (const char *) var_str);
