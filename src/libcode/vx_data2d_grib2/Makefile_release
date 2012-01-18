@@ -8,7 +8,7 @@
 
 ########################################################################
 #
-# Makefile for the vx_nav library
+# Makefile for the vx_data2d_grib2 library
 #
 ########################################################################
 
@@ -16,39 +16,26 @@
 EXECUTABLES =
 
 
-OBJECTS     = nav.o
+OBJECTS     = var_info_grib2.o \
+              data2d_grib2.o
 
 
-LIBRARIES   = libvx_nav.a
-
-
-GEN_SOURCES =
-
-
-########################################################################
-
-
-HEADERS     = nav.h
+LIBRARIES   = libvx_data2d_grib2.a
 
 
 ########################################################################
 
 
-all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+HEADERS     = var_info_grib2.h \
+              data2d_grib2.h
+
+
+########################################################################
+
+
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making the vx_nav Library ***"
-	@ echo
-
-
-########################################################################
-
-
-   ##
-   ##  generated sources
-   ##
-
-
-gen_sources: $(GEN_SOURCES)
+	@ echo "*** Finished Making the vx_data2d_grib2 Library ***"
 	@ echo
 
 
@@ -60,8 +47,11 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 
-nav.o: nav.cc
-	$(CXX) nav.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+var_info_grib2.o: var_info_grib2.cc
+	$(CXX) var_info_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+
+data2d_grib2.o: data2d_grib2.cc
+	$(CXX) data2d_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
@@ -72,21 +62,13 @@ nav.o: nav.cc
    ##
 
 
-libvx_nav.a: $(OBJECTS)
-	ar -rs libvx_nav.a $(OBJECTS) 2>&1
-	ranlib libvx_nav.a
+libvx_data2d_grib2.a: $(OBJECTS)
+	ar -rs libvx_data2d_grib2.a $(OBJECTS) 2>&1
+	ranlib libvx_data2d_grib2.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	cp $(HEADERS) $(MET_INC_DIR)
-	rm -f $(MET_LIB_DIR)/libvx_nav.a
-	cp libvx_nav.a $(MET_LIB_DIR)
-
-
-########################################################################
-
-
-   ##
-   ##  executables
-   ##
+	rm -f $(MET_LIB_DIR)/libvx_data2d_grib2.a
+	cp libvx_data2d_grib2.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -95,13 +77,13 @@ libvx_nav.a: $(OBJECTS)
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
-	rm -f $(MET_LIB_DIR)/libvx_nav.a
+	rm -f $(MET_LIB_DIR)/libvx_data2d_grib2.a
 
 
 ########################################################################
 
 
-.PHONY: all clean gen_sources
+.PHONY: all clean
 
 
 ########################################################################

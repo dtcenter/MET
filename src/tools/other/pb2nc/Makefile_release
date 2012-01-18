@@ -27,10 +27,6 @@ OBJECTS     = pb2nc_Conf.o \
 LIBRARIES   =
 
 
-GEN_SOURCES = pb2nc_Conf.h \
-              pb2nc_Conf.cc
-
-
 ########################################################################
 
 
@@ -40,28 +36,10 @@ HEADERS     =
 ########################################################################
 
 
-all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the pb2nc Tool ***"
 	@ echo
-
-
-########################################################################
-
-
-   ##
-   ##  generated sources
-   ##
-
-
-gen_sources: $(GEN_SOURCES)
-	@ echo
-
-
-pb2nc_Conf.h pb2nc_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
-	@ echo
-	@ rm -f pb2nc_Conf.h pb2nc_Conf.cc
-	$(ECONFIG_CODEGEN) -class pb2nc_Conf -outfile pb2nc_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
 
 
 ########################################################################
@@ -157,14 +135,14 @@ pb2nc: pb2nc.cc $(OBJECTS)
 
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	rm -f $(MET_BIN_DIR)/pb2nc
 
 
 ########################################################################
 
 
-.PHONY: all clean gen_sources
+.PHONY: all clean
 
 
 ########################################################################
