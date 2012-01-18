@@ -158,6 +158,7 @@ libvx_econfig.a: $(OBJECTS)
 clean:
 	@ echo
 	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f econfig_codegen $(MET_BIN_DIR)/econfig_codegen
 	rm -f $(MET_LIB_DIR)/libvx_econfig.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 
