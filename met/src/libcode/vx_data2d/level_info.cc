@@ -110,12 +110,22 @@ void LevelInfo::dump(ostream &out) const {
 
    // Dump out the contents
    out << "LevelInfo::dump():\n"
-       << "  Type    = " << leveltype_to_string(Type) << "\n"
-       << "  ReqName = " << (ReqName ? ReqName : "(nul)") << "\n"
-       << "  Name    = " << (Name ? Name : "(nul)") << "\n"
-       << "  Units   = " << (Units ? Units : "(nul)") << "\n"
-       << "  Upper   = " << Upper << "\n"
-       << "  Lower   = " << Lower << "\n";
+          << "  Type    = " << leveltype_to_string(Type) << "\n";
+   if(ReqName)
+      out << "  ReqName = " << ReqName << "\n";
+   else
+      out << "  ReqName = (nul)\n";
+   if(Name)
+      out << "  Name    = " << Name << "\n";
+   else
+      out << "  Name    = (nul)\n";
+   if(Units)
+      out << "  Units   = " << Units << "\n";
+   else
+      out << "  Units   = (nul)\n";
+
+      out << "  Upper   = " << Upper << "\n"
+          << "  Lower   = " << Lower << "\n";
 
    return;
 }
