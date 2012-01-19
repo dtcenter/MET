@@ -109,7 +109,7 @@ void LevelInfo::clear() {
 void LevelInfo::dump(ostream &out) const {
 
    // Dump out the contents
-   out << "LevelInfo::dump():\n"
+      out << "LevelInfo::dump():\n"
           << "  Type    = " << leveltype_to_string(Type) << "\n";
    if(ReqName)
       out << "  ReqName = " << ReqName << "\n";
