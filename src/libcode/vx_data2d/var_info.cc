@@ -142,19 +142,40 @@ void VarInfo::dump(ostream &out) const {
    else                  lead_str = sec_to_hhmmss(Lead);
 
    // Dump out the contents
-   out << "VarInfo::dump():\n"
-       << "  MagicStr = " << (MagicStr ? MagicStr : "(nul)") << "\n"
-       << "  ReqName  = " << (ReqName ? ReqName : "(nul)") << "\n"
-       << "  Name     = " << (Name ? Name : "(nul)") << "\n"
-       << "  LongName = " << (LongName ? LongName : "(nul)") << "\n"
-       << "  Units    = " << (Units ? Units : "(nul)") << "\n"
-       << "  PFlag    = " << PFlag << "\n"
-       << "  PName    = " << (PName ? PName : "(nul)") << "\n"
-       << "  PUnits   = " << (PUnits ? PUnits : "(nul)") << "\n"
-       << "  VFlag    = " << VFlag << "\n"
-       << "  Init     = " << init_str << " (" << Init << ")\n"
-       << "  Valid    = " << valid_str << " (" << Valid << ")\n"
-       << "  Lead     = " << lead_str << " (" << Lead << ")\n";
+      out << "VarInfo::dump():\n";
+   if(MagicStr)
+      out << "  MagicStr = " << MagicStr << "\n";
+   else
+      out << "  MagicStr = (nul)\n";
+   if(ReqName)
+      out << "  ReqName  = " << ReqName << "\n";
+   else
+      out << "  ReqName  = (nul)\n";
+   if(Name)
+      out << "  Name     = " << Name << "\n";
+   else
+      out << "  Name     = (nul)\n";
+   if(LongName)
+      out << "  LongName = " << LongName << "\n";
+   else
+      out << "  LongName = (nul)\n";
+   if(Units)
+      out << "  Units    = " << Units << "\n";
+   else
+      out << "  Units    = (nul)\n";
+      out << "  PFlag    = " << PFlag << "\n";
+   if(PName)
+      out << "  PName    = " << PName << "\n";
+   else
+      out << "  PName    = (nul)\n";
+   if(PUnits)
+      out << "  PUnits   = " << PUnits << "\n";
+   else
+      out << "  PUnits   = (nul)\n";
+      out << "  VFlag    = " << VFlag << "\n"
+          << "  Init     = " << init_str << " (" << Init << ")\n"
+          << "  Valid    = " << valid_str << " (" << Valid << ")\n"
+          << "  Lead     = " << lead_str << " (" << Lead << ")\n";
 
    Level.dump(out);
 
