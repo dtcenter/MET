@@ -30,7 +30,7 @@ FC_FLAGS     = -qextname # -g -qfullpath
 FC_LIBS      = -lxlf90
 
 # Make print options
-PRINT_OPTS   = --no-print-directory
+PRINT_OPTS   =
 
 # Top level directory for the NetCDF library
 # NetCDF include directory specified as: -I/your/include/path

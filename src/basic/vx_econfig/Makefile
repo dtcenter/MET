@@ -91,7 +91,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 gen_sources: $(GEN_SOURCES)
-	@ make all
+	@ $(MAKE) all
 
 
 celltype_to_string.h celltype_to_string.cc: icode.h

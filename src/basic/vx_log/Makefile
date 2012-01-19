@@ -52,12 +52,12 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
    ##
    ##  generated sources
-   ##  call maks all since this library does source code generation
+   ##  call make all since this library does source code generation
    ##
 
 
 gen_sources: $(GEN_SOURCES)
-	@ make all
+	@ $(MAKE) all
 
 
 ########################################################################
