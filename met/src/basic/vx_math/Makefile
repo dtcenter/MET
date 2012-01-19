@@ -70,7 +70,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 gen_sources: $(GEN_SOURCES)
-	@ make all
+	@ $(MAKE) all
 
 viewgravity_to_string.cc viewgravity_to_string.h: affine.h
 	@ echo

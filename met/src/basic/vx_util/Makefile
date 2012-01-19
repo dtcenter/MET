@@ -111,7 +111,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 gen_sources: $(GEN_SOURCES)
-	@ make all
+	@ $(MAKE) all
 
 
 asciitablejust_to_string.h asciitablejust_to_string.cc: ascii_table.h

@@ -62,7 +62,7 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 gen_sources: $(GEN_SOURCES)
-	@ make all
+	@ $(MAKE) all
 
 
 ########################################################################
