@@ -101,11 +101,13 @@ int main(int argc, char *argv[]) {
    ConcatString nc_file, ps_file;
    char met_data_dir[PATH_MAX];
    char hdr_typ_str[max_str_len];
+   char hdr_sid_str[max_str_len];
+   char hdr_vld_str[max_str_len];
    float *hdr_arr, *obs_arr;
-   int i, h, v, count;
+   int i, h, v, plot_count, skip_count;
    PSfile plot;
    Box page, view, map_box;
-   double lat, lon, page_x, page_y, mag;
+   double lat, lon, grid_x, grid_y, page_x, page_y, mag;
    IntArray ihdr;
    Color black;
 
@@ -171,6 +173,10 @@ int main(int argc, char *argv[]) {
    //
    if (data_plane_filename.length() > 0)
    {
+     
+      mlog << Debug(1) << "Retrieving grid from file: "
+           << data_plane_filename << "\n";
+     
       //
       // instantiate a Met2dDataFile object using the data_2d_factory
       // and get the grid info from the file.
@@ -183,12 +189,14 @@ int main(int argc, char *argv[]) {
       if (!met_ptr)
       {
          mlog << Error << "\n  " << program_name << " -> file \""
-            << data_plane_filename << "\" not a valid data file\n\n";
+              << data_plane_filename << "\" not a valid data file\n\n";
          exit (1);
       }
 
       grid = met_ptr->grid();
 
+   } else {
+      mlog << Debug(1) << "Using default global grid.\n";
    }
 
    //
@@ -204,6 +212,8 @@ int main(int argc, char *argv[]) {
 
    NcVar *hdr_arr_var = (NcVar *) 0;
    NcVar *hdr_typ_var = (NcVar *) 0;
+   NcVar *hdr_sid_var = (NcVar *) 0;
+   NcVar *hdr_vld_var = (NcVar *) 0;
    NcVar *obs_arr_var = (NcVar *) 0;
 
    //
@@ -236,18 +246,22 @@ int main(int argc, char *argv[]) {
 
    hdr_arr_var = f_in->get_var("hdr_arr");
    hdr_typ_var = f_in->get_var("hdr_typ");
+   hdr_sid_var = f_in->get_var("hdr_sid");
+   hdr_vld_var = f_in->get_var("hdr_vld");
    obs_arr_var = f_in->get_var("obs_arr");
 
    if(!hdr_arr_dim || !hdr_arr_dim->is_valid() ||
       !obs_arr_dim || !obs_arr_dim->is_valid() ||
-      !nhdr_dim    || !nhdr_dim->is_valid() ||
-      !nobs_dim    || !nobs_dim->is_valid() ||
-      !strl_dim    || !strl_dim->is_valid() ||
+      !nhdr_dim    || !nhdr_dim->is_valid()    ||
+      !nobs_dim    || !nobs_dim->is_valid()    ||
+      !strl_dim    || !strl_dim->is_valid()    ||
       !hdr_arr_var || !hdr_arr_var->is_valid() ||
       !hdr_typ_var || !hdr_typ_var->is_valid() ||
+      !hdr_sid_var || !hdr_sid_var->is_valid() ||
+      !hdr_vld_var || !hdr_vld_var->is_valid() ||
       !obs_arr_var || !obs_arr_var->is_valid()) {
-      mlog << Error << "\n  main() -> trouble reading netCDF file "
-           << nc_file << "\n\n";
+      mlog << Error << "\n  main() -> "
+           << "trouble reading netCDF file " << nc_file << "\n\n";
       exit(1);
    }
 
@@ -337,7 +351,7 @@ int main(int argc, char *argv[]) {
    // variable type.
    //
    plot.setrgbcolor(1.0, 0.0, 0.0);
-   count = 0;
+   plot_count = skip_count = 0;
    for(i=0; i<nobs_dim->size(); i++) {
 
       if(!obs_arr_var->set_cur(i, 0) ||
@@ -363,7 +377,28 @@ int main(int argc, char *argv[]) {
       //
       if(!hdr_typ_var->set_cur(h-1, 0) ||
          !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\n  main() -> trouble getting hdr_typ\n\n";
+         mlog << Error << "\n  main() -> "
+              << "trouble getting hdr_typ\n\n";
+         exit(1);
+      }
+
+      //
+      // Get the corresponding header station id
+      //
+      if(!hdr_sid_var->set_cur(h-1, 0) ||
+         !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
+         mlog << Error << "\n  main() -> "
+              << "trouble getting hdr_sid\n\n";
+         exit(1);
+      }
+
+      //
+      // Get the corresponding header valid time
+      //
+      if(!hdr_vld_var->set_cur(h-1, 0) ||
+         !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
+         mlog << Error << "\n  main() -> "
+              << "trouble getting hdr_vld\n\n";
          exit(1);
       }
 
@@ -371,7 +406,6 @@ int main(int argc, char *argv[]) {
       // Check if we want to plot this message type.
       //
       if(ityp.n_elements() > 0 && !ityp.has(hdr_typ_str)) continue;
-
 
       //
       // Only plot a circle if one hasn't been plotted for this
@@ -390,17 +424,50 @@ int main(int argc, char *argv[]) {
          lat = (double) hdr_arr[0];
          lon = (double) (-1.0*hdr_arr[1]);
 
-         latlon_to_pagexy(grid, grid_bb, lat, lon, page_x, page_y, map_box);
+         //
+         // Convert lat/lon to grid x/y
+         //
+         grid.latlon_to_xy(lat, lon, grid_x, grid_y);
+
+         //
+         // If the current point is off the grid, increment the skip count
+         //
+         if(grid_x < 0 || grid_x >= grid.nx() ||
+            grid_y < 0 || grid_y >= grid.ny()) {
+            skip_count++;
+            ihdr.add(h);
+            continue;
+         }
+
+         //
+         // Convert grid x/y to page x/y
+         //
+         gridxy_to_pagexy(grid, grid_bb, grid_x, grid_y, page_x, page_y, map_box);
+
+         //
+         // Draw a circle at this point and increment the plot count
+         //
          plot.circle(page_x, page_y, 0.5, 0);
          plot.fill();
 
+         //
+         // Dump out the location being plotted
+         //
+         mlog << Debug(3)
+              << "[" << plot_count + 1
+              << "] Plotting location [ type, sid, valid, lat, lon, elevation ] = [ "
+              << hdr_typ_str << ", " << hdr_sid_str << ", " << hdr_vld_str << ", "
+              << hdr_arr[0] << ", " << hdr_arr[1] << ", " << hdr_arr[2] << " ]\n";
+         
          ihdr.add(h);
-         count++;
+         plot_count++;
       }
    } // end for i
    plot.grestore();
 
-   mlog << Debug(1) << "Finished plotting " << count << " locations.\n";
+   mlog << Debug(2)
+        << "Finished plotting " << plot_count << " locations.\n"
+        << "Skipped " << skip_count << " locations off the grid.\n";
 
    plot.showpage();
 
