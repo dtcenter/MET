@@ -29,7 +29,7 @@ static const int MinimumMessageLevel   = -1;
 
 static const int DefaultMessageLevel   = -1;
 
-static const int DefaultVerbosityLevel =  1;
+static const int DefaultVerbosityLevel =  2;
 
 static const int ErrorMessageLevel     = -1;
 

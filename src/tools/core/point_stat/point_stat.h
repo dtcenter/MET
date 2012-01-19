@@ -118,7 +118,6 @@ static int          fcst_lead_sec    = bad_data_int;
 static unixtime     obs_valid_beg_ut = (unixtime) 0;
 static unixtime     obs_valid_end_ut = (unixtime) 0;
 static ConcatString out_dir;
-static int          default_verbosity = 2;
 static bool         climo_flag       = false;
 
 ////////////////////////////////////////////////////////////////////////

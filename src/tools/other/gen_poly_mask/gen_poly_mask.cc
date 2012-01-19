@@ -69,9 +69,6 @@ static ConcatString mask_filename;
 static ConcatString out_filename;
 static ConcatString mask_name;
 
-// Logging level
-static int default_verbosity = 2;
-
 // Masking polyline
 static MaskPoly poly_mask;
 
@@ -97,9 +94,6 @@ program_name = get_short_name(argv[0]);
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);
-
-   // Initialize the verbosity to the default_verbosity
-   mlog.set_verbosity_level(default_verbosity);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -418,7 +412,7 @@ void usage()
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << default_verbosity << ") (optional).\n\n"
+        << mlog.verbosity_level() << ") (optional).\n\n"
 
         << flush;
 
