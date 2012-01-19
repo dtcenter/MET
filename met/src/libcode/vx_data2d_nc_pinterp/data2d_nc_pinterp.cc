@@ -167,8 +167,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       // Set the VarInfo object's level string for pressure levels
       if(!is_bad_data(pressure)) {
-         level_str.clear();
-         level_str << "P" << nint(pressure);
+         level_str << cs_erase << "P" << nint(pressure);
          vinfo.set_level_name(level_str);
       }
    }
@@ -281,11 +280,10 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
    // Check for a missing value, a single pressure level, or a range
    // of pressure levels
    plane_array.level_range(min_level, max_level);
-   level_str.clear();
    if(is_bad_data(min_level) ||
-      is_bad_data(max_level))           level_str << na_str;
-   else if(is_eq(min_level, max_level)) level_str << "P" << nint(min_level);
-   else                                 level_str << "P" << nint(max_level)
+      is_bad_data(max_level))           level_str << cs_erase << na_str;
+   else if(is_eq(min_level, max_level)) level_str << cs_erase << "P" << nint(min_level);
+   else                                 level_str << cs_erase << "P" << nint(max_level)
                                                   << "-" << nint(min_level);
    vinfo.set_level_name(level_str);
    

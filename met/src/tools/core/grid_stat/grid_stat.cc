@@ -1089,11 +1089,8 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    // Create output file name
    //
 
-   // Initialize
-   str.clear();
-
    // Append the output directory and program name
-   str << out_dir << "/" << program_name;
+   str << cs_erase << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
    if(strlen(conf_info.conf.output_prefix().sval()) > 0)
@@ -1554,8 +1551,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    for(i=0; i<conf_info.get_n_mask(); i++) {
 
       // Build the forecast variable name
-      fcst_var_name.clear();
-      fcst_var_name << "FCST_"
+      fcst_var_name << cs_erase << "FCST_"
                     << conf_info.fcst_info[i_vx]->name() << "_"
                     << conf_info.fcst_info[i_vx]->level_name() << "_"
                     << conf_info.mask_name[i];
@@ -1570,8 +1566,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       }
 
       // Build the observation variable name
-      obs_var_name.clear();
-      obs_var_name << "OBS_"
+      obs_var_name << cs_erase << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
                    << conf_info.obs_info[i_vx]->level_name() << "_"
                    << conf_info.mask_name[i];
@@ -1586,8 +1581,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       }
 
       // Build the difference variable name
-      diff_var_name.clear();
-      diff_var_name << "DIFF_"
+      diff_var_name << cs_erase << "DIFF_"
                     << conf_info.fcst_info[i_vx]->name() << "_"
                     << conf_info.fcst_info[i_vx]->level_name() << "_"
                     << conf_info.obs_info[i_vx]->name() << "_"
@@ -1622,8 +1616,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
          // Add variable attributes for the forecast field
          add_var_att(fcst_var, "name", shc.get_fcst_var());
-         att_str.clear();
-         att_str << conf_info.fcst_info[i_vx]->name()
+         att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
                  << " at "
                  << conf_info.fcst_info[i_vx]->level_name();
          add_var_att(fcst_var, "long_name", att_str);
@@ -1648,8 +1641,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
          // Add variable attributes for the observation field
          add_var_att(obs_var, "name", shc.get_obs_var());
-         att_str.clear();
-         att_str << conf_info.obs_info[i_vx]->name()
+         att_str << cs_erase << conf_info.obs_info[i_vx]->name()
                  << " at "
                  << conf_info.obs_info[i_vx]->level_name();
          add_var_att(obs_var, "long_name", att_str);
@@ -1673,21 +1665,17 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
          diff_var_sa.add(diff_var_name);
 
          // Add variable attributes for the difference field
-         att_str.clear();
-         att_str << "Forecast " << shc.get_fcst_var()
+         att_str << cs_erase << "Forecast " << shc.get_fcst_var()
                  << " minus Observed " << shc.get_obs_var();
          add_var_att(diff_var, "name", att_str);
-         att_str.clear();
-         att_str << conf_info.fcst_info[i_vx]->name() << " at "
+         att_str << cs_erase << conf_info.fcst_info[i_vx]->name() << " at "
                  << conf_info.fcst_info[i_vx]->level_name() << " and "
                  << conf_info.obs_info[i_vx]->name() << " at "
                  << conf_info.obs_info[i_vx]->level_name();
          add_var_att(diff_var, "long_name", att_str);
-         att_str.clear();
-         att_str << shc.get_fcst_lev() << " and " << shc.get_obs_lev();
+         att_str << cs_erase << shc.get_fcst_lev() << " and " << shc.get_obs_lev();
          add_var_att(diff_var, "level", att_str);
-         att_str.clear();
-         att_str << conf_info.fcst_info[i_vx]->units() << " and "
+         att_str << cs_erase << conf_info.fcst_info[i_vx]->units() << " and "
                  << conf_info.obs_info[i_vx]->units();
          add_var_att(diff_var, "units", att_str);
          diff_var->add_att("_FillValue", bad_data_float);

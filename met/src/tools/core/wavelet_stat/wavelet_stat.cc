@@ -736,11 +736,8 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    // Create output file name
    //
 
-   // Initialize
-   str.clear();
-
    // Append the output directory and program name
-   str << out_dir.text() << "/" << program_name;
+   str << cs_erase << out_dir.text() << "/" << program_name;
 
    // Append the output prefix, if defined
    if(strlen(conf_info.conf.output_prefix().sval()) > 0)
