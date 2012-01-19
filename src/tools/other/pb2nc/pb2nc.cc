@@ -598,7 +598,7 @@ void open_netcdf() {
    //
    // Create the output netCDF file for writing
    //
-   mlog << Debug(1) << "Creating NetCDF File:\t" << ncfile << "\n";
+   mlog << Debug(1) << "Creating NetCDF File:\t\t" << ncfile << "\n";
    f_out = new NcFile(ncfile, NcFile::Replace);
 
    //
@@ -807,7 +807,7 @@ void process_pbfile(int i_pb) {
             unix_to_mdyhms(file_ut, mon, day, yr, hr, min, sec);
             sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
                     yr, mon, day, hr, min, sec);
-            mlog << Debug(2) << "PrepBufr Time Center:\t" << time_str
+            mlog << Debug(2) << "PrepBufr Time Center:\t\t" << time_str
                  << "\n";
 
          //
@@ -843,7 +843,7 @@ void process_pbfile(int i_pb) {
             strcpy(time_str2, "NO_END_TIME");
          }
 
-         mlog << Debug(2) << "Searching Time Window:\t" << time_str << " to "
+         mlog << Debug(2) << "Searching Time Window:\t\t" << time_str << " to "
               << time_str2 << "\n";
 
          mlog << Debug(2) << "Processing " << npbmsg
