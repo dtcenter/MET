@@ -92,7 +92,7 @@ polyline.o: polyline.h polyline.cc
 	$(CXX) polyline.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 shapedata.o: shapedata.h shapedata.cc
-	$(CXX) shapedata.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
+	$(CXX) shapedata.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 set.o: set.h set.cc
 	$(CXX) set.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)

@@ -32,12 +32,7 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#ifdef IBM
-   #include <fcntl.h>
-#else
-   #include <sys/fcntl.h>
-#endif
+#include <fcntl.h>
 
 #include "shapedata.h"
 #include "vx_log.h"

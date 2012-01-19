@@ -152,22 +152,22 @@ algline.o: algline.h algline.cc
 machine.o: machine.h machine.cc symtab.o icode.o celltype_to_string.o stetype_to_string.o builtin_to_string.o builtin.o
 	$(CXX) machine.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-econfig.tab.c: econfig.y icode.o symtab.o machine.o idstack.o builtin.o celltype_to_string.o
+econfig.tab.cc: econfig.y icode.o symtab.o machine.o idstack.o builtin.o celltype_to_string.o
 	$(YACC) econfig.y
+	mv econfig.tab.c econfig.tab.cc
 
-econfig.tab.o: econfig.tab.c
-	@ echo
-	$(CXX) econfig.tab.c           -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+econfig.tab.o: econfig.tab.cc
+	$(CXX) econfig.tab.cc          -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-lex.econfig.c: econfig.l econfig.tab.o icode.o symtab.o machine.o
+lex.econfig.cc: econfig.l econfig.tab.o icode.o symtab.o machine.o
 	$(LEX) econfig.l
 	rm -f temp
 	mv lex.econfig.c temp
-	sed "s/static void yyunput/void yy_econfig_unput/" temp > lex.econfig.c
+	sed "s/static void yyunput/void yy_econfig_unput/" temp > lex.econfig.cc
 	rm -f temp
 
-lex.econfig.o: lex.econfig.c
-	$(CXX) lex.econfig.c           -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+lex.econfig.o: lex.econfig.cc
+	$(CXX) lex.econfig.cc          -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 resulttype_to_string.o: resulttype_to_string.h resulttype_to_string.cc
 	$(CXX) resulttype_to_string.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
@@ -223,8 +223,8 @@ econfig_codegen: econfig_codegen.cc libvx_econfig.a
 clean:
 	@ echo
 	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	rm -f econfig.output econfig.tab.c econfig.tab.h
-	rm -f lex.econfig.c
+	rm -f econfig.output econfig.tab.cc econfig.tab.h
+	rm -f lex.econfig.cc
 	rm -f $(MET_BIN_DIR)/econfig_codegen
 	rm -f $(MET_LIB_DIR)/libvx_econfig.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
