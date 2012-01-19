@@ -443,7 +443,7 @@ void usage() {
         << "\tps_file\n"
         << "\t[-gc code]\n"
         << "\t[-msg_typ name]\n"
-        << "\t[-data_file name]\n\n"
+        << "\t[-data_file name]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
