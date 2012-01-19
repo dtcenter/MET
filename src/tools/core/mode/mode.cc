@@ -2736,11 +2736,8 @@ void build_outfile_name(const char *suffix, ConcatString &str) {
    // Create output file name
    //
 
-   // Initialize
-   str.clear();
-
    // Append the output directory and program name
-   str << out_dir.text() << "/" << program_name;
+   str << cs_erase << out_dir.text() << "/" << program_name;
 
    // Append the output prefix, if defined
    if(strlen(engine.wconf.output_prefix().sval()) > 0)

@@ -1513,11 +1513,8 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
    // Create output file name
    //
 
-   // Initialize
-   str.clear();
-
    // Append the output directory and program name
-   str << out_dir.text() << "/" << program_name;
+   str << cs_erase << out_dir.text() << "/" << program_name;
 
    // Append the output prefix, if defined
    if(strlen(conf_info.conf.output_prefix().sval()) > 0)
@@ -1696,8 +1693,7 @@ void write_ens_var_float(int i_vx, float *ens_data, const char *var_str,
    ConcatString ens_var_name;
 
    // Construct the variable name
-   ens_var_name.clear();
-   ens_var_name << conf_info.ens_info[i_vx]->name() << "_"
+   ens_var_name << cs_erase << conf_info.ens_info[i_vx]->name() << "_"
                 << conf_info.ens_info[i_vx]->level_name() << "_"
                 << var_str;
    ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
@@ -1724,8 +1720,7 @@ void write_ens_var_int(int i_vx, int *ens_data, const char *var_str,
    ConcatString ens_var_name;
 
    // Construct the variable name
-   ens_var_name.clear();
-   ens_var_name << conf_info.ens_info[i_vx]->name() << "_"
+   ens_var_name << cs_erase << conf_info.ens_info[i_vx]->name() << "_"
                 << conf_info.ens_info[i_vx]->level_name() << "_"
                 << var_str;
    ens_var = nc_out->add_var(ens_var_name, ncInt, lat_dim, lon_dim);
@@ -1823,8 +1818,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    wdth     = conf_info.interp_wdth[i_interp];
 
    // Build the orank variable name
-   var_name.clear();
-   var_name << conf_info.vx_pd[i_vx].obs_info->name() << "_"
+   var_name << cs_erase << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
             << conf_info.mask_name[i_mask];
 
@@ -1868,8 +1862,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    wdth     = conf_info.interp_wdth[i_interp];
 
    // Build the orank variable name
-   var_name.clear();
-   var_name << conf_info.vx_pd[i_vx].obs_info->name() << "_"
+   var_name << cs_erase << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
             << conf_info.mask_name[i_mask];
 
