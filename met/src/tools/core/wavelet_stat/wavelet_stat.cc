@@ -127,9 +127,6 @@ int main(int argc, char *argv[]) {
    // Set handler to be called for memory allocation error
    set_new_handler(oom);
 
-   // Initialize the verbosity to the default_verbosity
-   mlog.set_verbosity_level(default_verbosity);
-
    // Process the command line arguments
    process_command_line(argc, argv);
 
@@ -2840,7 +2837,7 @@ void usage() {
         << "\t\t\"-nc\" disables the NetCDF output file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << default_verbosity << ") (optional).\n"
+        << mlog.verbosity_level() << ") (optional).\n"
 
         << "\n\tNOTE: The forecast and observation fields must be "
         << "on the same grid.\n\n" << flush;

@@ -206,7 +206,7 @@ class Logger
          // be output to cerr.
          // Values of 1 or more will print DEBUG messages to cout if the
          // message level is less than or equal to the verbosity level.
-         // The verbosity level defaults to 1.
+         // The verbosity level defaults to 2.
          //
       int VerbosityLevel;
 

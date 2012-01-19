@@ -125,7 +125,6 @@ static unixtime     obs_valid_end_ut    = (unixtime) 0;
 static int          obs_lead_sec        = bad_data_int;
 
 static ConcatString out_dir;
-static int          default_verbosity = 2;
 
 ////////////////////////////////////////////////////////////////////////
 //

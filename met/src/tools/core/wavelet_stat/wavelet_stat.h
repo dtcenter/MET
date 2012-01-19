@@ -106,7 +106,6 @@ static int          obs_lead_sec  = bad_data_int;
 // Optional arguments
 static ConcatString out_dir;
 static ConcatString met_data_dir;
-static int          default_verbosity = 2;
 
 ////////////////////////////////////////////////////////////////////////
 //
