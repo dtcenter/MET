@@ -359,7 +359,6 @@ void process_ensemble() {
    int i, j, n_miss, n_vld;
    bool status;
    double t;
-   Grid data_grid;
    DataPlane ens_dp;
 
    // Loop through each of the ensemble fields to be processed
@@ -731,7 +730,6 @@ int process_point_ens(int i_ens) {
    int i, n_fcst;
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
-   Grid data_grid;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing ensemble file: "
@@ -766,7 +764,7 @@ int process_point_ens(int i_ens) {
       }
 
       // Set the grid
-      set_grid(data_grid);
+      set_grid(ens_mtddf->grid());
 
       // Dump out the number of levels found
       mlog << Debug(2) << "For "
@@ -907,7 +905,6 @@ void process_grid_vx() {
    DataPlane *fcst_dp, *fcst_dp_smooth;
    DataPlane  obs_dp,   obs_dp_smooth;
    unixtime valid_ut;
-   Grid data_grid;
    PairDataEnsemble pd;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1690,7 +1687,8 @@ void write_ens_var_float(int i_vx, float *ens_data, const char *var_str,
    ConcatString ens_var_name;
 
    // Construct the variable name
-   ens_var_name << cs_erase << conf_info.ens_info[i_vx]->name() << "_"
+   ens_var_name << cs_erase << var_str << "_"
+                << conf_info.ens_info[i_vx]->name() << "_"
                 << conf_info.ens_info[i_vx]->level_name() << "_"
                 << var_str;
    ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
@@ -1717,7 +1715,8 @@ void write_ens_var_int(int i_vx, int *ens_data, const char *var_str,
    ConcatString ens_var_name;
 
    // Construct the variable name
-   ens_var_name << cs_erase << conf_info.ens_info[i_vx]->name() << "_"
+   ens_var_name << cs_erase << var_str << "_"
+                << conf_info.ens_info[i_vx]->name() << "_"
                 << conf_info.ens_info[i_vx]->level_name() << "_"
                 << var_str;
    ens_var = nc_out->add_var(ens_var_name, ncInt, lat_dim, lon_dim);
@@ -1815,7 +1814,8 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    wdth     = conf_info.interp_wdth[i_interp];
 
    // Build the orank variable name
-   var_name << cs_erase << conf_info.vx_pd[i_vx].obs_info->name() << "_"
+   var_name << cs_erase << var_str << "_"
+            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
             << conf_info.mask_name[i_mask];
 
@@ -1859,7 +1859,8 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    wdth     = conf_info.interp_wdth[i_interp];
 
    // Build the orank variable name
-   var_name << cs_erase << conf_info.vx_pd[i_vx].obs_info->name() << "_"
+   var_name << cs_erase << var_str << "_"
+            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
             << conf_info.mask_name[i_mask];
 
