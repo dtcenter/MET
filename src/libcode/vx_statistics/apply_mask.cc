@@ -37,6 +37,9 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
                      DataPlane &mask_dp, ConcatString &mask_name) {
    Grid mask_grid;
 
+   mlog << Debug(4) << "parse_grid_mask() -> "
+        << " parsing grid mask \"" << mask_grid_str << "\"\n";
+
    // Initialize the DataPlane masking object by turning all points on
    mask_dp.set_size(grid.nx(), grid.ny());
    mask_dp.set_constant(mask_on_value);
@@ -82,6 +85,9 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    char magic_str[PATH_MAX], thresh_str[PATH_MAX];
    SingleThresh st;
    char *ptr;
+
+   mlog << Debug(4) << "parse_poly_mask() -> "
+        << " parsing poly mask \"" << mask_poly_str << "\"\n";
 
    // 2D Data file
    Met2dDataFileFactory mtddf_factory;
@@ -159,6 +165,9 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
                        DataPlane &mask_dp, ConcatString &mask_name) {
    Polyline mask_poly;
 
+   mlog << Debug(4) << "parse_poly_mask() -> "
+        << " parsing poly mask file \"" << file_name << "\"\n";
+
    // Initialize the DataPlane masking object by turning all points on
    mask_dp.set_size(grid.nx(), grid.ny());
    mask_dp.set_constant(mask_on_value);
@@ -183,6 +192,9 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
 void parse_sid_mask(const char *mask_sid_file, StringArray &mask_sid) {
    ifstream in;
    char tmp_file[PATH_MAX], sid_str[PATH_MAX];
+
+   mlog << Debug(4) << "parse_sid_mask() -> "
+        << " parsing station ID mask file \"" << mask_sid_file << "\"\n";
 
    // Replace any instances of MET_BASE with it's expanded value
    replace_string(met_base_str, MET_BASE, mask_sid_file, tmp_file);
