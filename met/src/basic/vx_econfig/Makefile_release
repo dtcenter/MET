@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = econfig_codegen
+EXECUTABLES =
 
 
 OBJECTS     = pwl.o \
@@ -152,17 +152,6 @@ libvx_econfig.a: $(OBJECTS)
    ##
    ##  executables
    ##
-
-econfig_codegen: econfig_codegen.cc libvx_econfig.a
-	@ echo
-	$(CXX) econfig_codegen.cc -o econfig_codegen $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
-	-lvx_econfig \
-	-lvx_cal \
-	-lvx_util \
-	-lvx_log \
-	-lm
-	rm -f $(MET_BIN_DIR)/econfig_codegen
-	cp econfig_codegen $(MET_BIN_DIR)
 
 
 ########################################################################
