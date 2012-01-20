@@ -10,13 +10,27 @@
 
 
 all:
+ifeq ($(ENABLE_GEN_POLY_MASK), 1)
 	cd gen_poly_mask ; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_PLOT_DATA_PLANE), 1)
 	cd plot_data_plane ; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_PLOT_POINT_OBS), 1)
 	cd plot_point_obs ; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_ASCII2NC), 1)
 	cd ascii2nc ; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_MADIS2NC), 1)
 	cd madis2nc ; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_PB2NC), 1)
 	cd pb2nc ; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_WWMCA), 1)
 	cd wwmca_tool ; $(MAKE) $(PRINT_OPTS)
+endif
 
 
 ########################################################################
