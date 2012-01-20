@@ -11,12 +11,12 @@
 
 all:
 	@ echo
-	@ cd vx_log         && $(MAKE) $(PRINT_OPTS)
-	@ cd vx_cal         && $(MAKE) $(PRINT_OPTS)
-	@ cd enum_to_string && $(MAKE) $(PRINT_OPTS)
-	@ cd vx_math        && $(MAKE) $(PRINT_OPTS)
-	@ cd vx_util        && $(MAKE) $(PRINT_OPTS)
-	@ cd vx_econfig     && $(MAKE) $(PRINT_OPTS)
+	@ cd vx_log         ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_cal         ; $(MAKE) $(PRINT_OPTS)
+	@ cd enum_to_string ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_math        ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_util        ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_econfig     ; $(MAKE) $(PRINT_OPTS)
 
 
 ########################################################################
@@ -24,12 +24,12 @@ all:
 
 clean:
 	@ echo
-	@ cd vx_log         && $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_cal         && $(MAKE) $(PRINT_OPTS) clean
-	@ cd enum_to_string && $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_math        && $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_util        && $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_econfig     && $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_log         ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_cal         ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd enum_to_string ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_math        ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_util        ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_econfig     ; $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
@@ -37,12 +37,12 @@ clean:
 
 gen_sources:
 	@ echo
-	@ cd vx_log         && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_cal         && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd enum_to_string && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_math        && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_util        && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_econfig     && $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_log         ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_cal         ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd enum_to_string ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_math        ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_util        ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_econfig     ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################
