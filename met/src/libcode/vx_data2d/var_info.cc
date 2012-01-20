@@ -23,10 +23,10 @@ using namespace std;
 #include <stdlib.h>
 #include <strings.h>
 
-#include "vx_cal.h"
-#include "is_bad_data.h"
-
 #include "var_info.h"
+
+#include "vx_cal.h"
+#include "vx_math.h"
 #include "vx_log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,40 +142,19 @@ void VarInfo::dump(ostream &out) const {
    else                  lead_str = sec_to_hhmmss(Lead);
 
    // Dump out the contents
-      out << "VarInfo::dump():\n";
-   if(MagicStr)
-      out << "  MagicStr = " << MagicStr << "\n";
-   else
-      out << "  MagicStr = (nul)\n";
-   if(ReqName)
-      out << "  ReqName  = " << ReqName << "\n";
-   else
-      out << "  ReqName  = (nul)\n";
-   if(Name)
-      out << "  Name     = " << Name << "\n";
-   else
-      out << "  Name     = (nul)\n";
-   if(LongName)
-      out << "  LongName = " << LongName << "\n";
-   else
-      out << "  LongName = (nul)\n";
-   if(Units)
-      out << "  Units    = " << Units << "\n";
-   else
-      out << "  Units    = (nul)\n";
-      out << "  PFlag    = " << PFlag << "\n";
-   if(PName)
-      out << "  PName    = " << PName << "\n";
-   else
-      out << "  PName    = (nul)\n";
-   if(PUnits)
-      out << "  PUnits   = " << PUnits << "\n";
-   else
-      out << "  PUnits   = (nul)\n";
-      out << "  VFlag    = " << VFlag << "\n"
-          << "  Init     = " << init_str << " (" << Init << ")\n"
-          << "  Valid    = " << valid_str << " (" << Valid << ")\n"
-          << "  Lead     = " << lead_str << " (" << Lead << ")\n";
+   out << "VarInfo::dump():\n"
+       << "  MagicStr = " << (MagicStr ? MagicStr : nul_str) << "\n"
+       << "  ReqName  = " << (ReqName ? ReqName : nul_str) << "\n"
+       << "  Name     = " << (Name ? Name : nul_str) << "\n"
+       << "  LongName = " << (LongName ? LongName : nul_str) << "\n"
+       << "  Units    = " << (Units ? Units : nul_str) << "\n"
+       << "  PFlag    = " << PFlag << "\n"
+       << "  PName    = " << (PName ? PName : nul_str) << "\n"
+       << "  PUnits   = " << (PUnits ? PUnits : nul_str) << "\n"
+       << "  VFlag    = " << VFlag << "\n"
+       << "  Init     = " << init_str << " (" << Init << ")\n"
+       << "  Valid    = " << valid_str << " (" << Valid << ")\n"
+       << "  Lead     = " << lead_str << " (" << Lead << ")\n";
 
    Level.dump(out);
 

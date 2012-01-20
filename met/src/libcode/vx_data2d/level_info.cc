@@ -22,8 +22,9 @@ using namespace std;
 #include <map>
 
 #include "level_info.h"
-
 #include "leveltype_to_string.h"
+
+#include "vx_math.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -109,23 +110,13 @@ void LevelInfo::clear() {
 void LevelInfo::dump(ostream &out) const {
 
    // Dump out the contents
-      out << "LevelInfo::dump():\n"
-          << "  Type    = " << leveltype_to_string(Type) << "\n";
-   if(ReqName)
-      out << "  ReqName = " << ReqName << "\n";
-   else
-      out << "  ReqName = (nul)\n";
-   if(Name)
-      out << "  Name    = " << Name << "\n";
-   else
-      out << "  Name    = (nul)\n";
-   if(Units)
-      out << "  Units   = " << Units << "\n";
-   else
-      out << "  Units   = (nul)\n";
-
-      out << "  Upper   = " << Upper << "\n"
-          << "  Lower   = " << Lower << "\n";
+   out << "LevelInfo::dump():\n"
+       << "  Type    = " << leveltype_to_string(Type) << "\n"
+       << "  ReqName = " << (ReqName ? ReqName : nul_str) << "\n"
+       << "  Name    = " << (Name ? Name : nul_str) << "\n"
+       << "  Units   = " << (Units ? Units : nul_str) << "\n"
+       << "  Upper   = " << Upper << "\n"
+       << "  Lower   = " << Lower << "\n";
 
    return;
 }
