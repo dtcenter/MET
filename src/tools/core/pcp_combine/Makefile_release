@@ -68,8 +68,8 @@ pcp_combine: pcp_combine.cc $(OBJECTS)
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_data2d \
+   -lvx_data2d_factory \
 	-lvx_data2d_grib \
-	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_nc_util \
 	-lvx_data2d \
