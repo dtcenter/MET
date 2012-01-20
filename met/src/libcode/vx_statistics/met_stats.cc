@@ -2117,7 +2117,8 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute percentiles of the error
    //
-   cnt_info.e10.v = err_na.percentile_array(0.10);
+	err_na.sort_array();   
+	cnt_info.e10.v = err_na.percentile_array(0.10);
    cnt_info.e25.v = err_na.percentile_array(0.25);
    cnt_info.e50.v = err_na.percentile_array(0.50);
    cnt_info.e75.v = err_na.percentile_array(0.75);
