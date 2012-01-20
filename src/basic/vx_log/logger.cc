@@ -532,70 +532,75 @@ Logger & Logger::operator<<(const char * s)
 
    memset(tmp, 0, sizeof(tmp));
 
-   len = strlen(s);
-
       //
-      // Check that s exists and that it is nonempty
+      // Check that s exists
       //
-   if (!s || !(*s))
+   if (!s)
    {
       cerr << "\n\n  Logger & operator<<(const char * s) -> s does not exist!\n\n";
       exit (1);
    }
 
+   len = strlen(s);
+
    if (len == 0)
    {
-      cerr << "\n\n  Logger & operator<<(const char * s) -> s is empty!\n\n";
-      exit (1);
+      //
+      // if the length of s is zero, then print "(NUL)"
+      //
+      messages.add("(NUL)\n");
    }
-
-      //
-      // Search through s, looking for newline characters. Copy each
-      // non_newline character to msg. When we reach a newline character
-      // put it in msg, then put that msg into the StringArray messages,
-      // clear msg, and continue. When we have found all the sub-messages
-      // in s, then write them out to the appropriate places putting a
-      // message type header at the beginning of each line.
-      //
-   for (i = 0; i < len; i++)
+   else
    {
          //
-         // put the next character into the ConcatString msg
+         // Search through s, looking for newline characters. Copy each
+         // non_newline character to msg. When we reach a newline character
+         // put it in msg, then put that msg into the StringArray messages,
+         // clear msg, and continue. When we have found all the sub-messages
+         // in s, then write them out to the appropriate places putting a
+         // message type header at the beginning of each line.
          //
-      tmp[0] = s[i];
-      msg.add(tmp);
-
-      if (s[i] == '\n')
+      for (i = 0; i < len; i++)
       {
             //
-            // this was a newline, so
-            // put msg into the StringArray messages
+            // put the next character into the ConcatString msg
             //
-         messages.add(msg);
+         tmp[0] = s[i];
+         msg.add(tmp);
 
-            //
-            // clear msg, and continue checking s
-            //
-         msg.clear();
+         if (s[i] == '\n')
+         {
+               //
+               // this was a newline, so
+               // put msg into the StringArray messages
+               //
+            messages.add(msg);
+
+               //
+               // clear msg, and continue checking s
+               //
+            msg.clear();
+
+         }
 
       }
 
-   }
-
-      //
-      // Check if the last string did not end in '\n'.
-      // If it did not then we need to add it to messages.
-      //
-   if (msg.length() > 0)
-   {
-      if (msg[msg.length() - 1] != '\n')
+         //
+         // Check if the last string did not end in '\n'.
+         // If it did not then we need to add it to messages.
+         //
+      if (msg.length() > 0)
       {
-         messages.add(msg);
-         msg.clear();
+         if (msg[msg.length() - 1] != '\n')
+         {
+            messages.add(msg);
+            msg.clear();
+
+         }
 
       }
 
-   }
+   }  // end of else s is not empty
 
       //
       // now we've broken the string s up into substrings each of

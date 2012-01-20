@@ -32,6 +32,8 @@ int main(int argc, char * argv[])
 
    mlog.open_log_file(infile);
 
+   mlog << Debug(1) << "";  // try sending an empty string and see if it prints "(NUL)"
+
    mlog << level(-1) << "\n\n  Test error message\n\n";
 
    mlog << level(0) << "\n\n  Test warning message\n\n";
