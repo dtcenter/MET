@@ -546,9 +546,9 @@ Logger & Logger::operator<<(const char * s)
    if (len == 0)
    {
       //
-      // if the length of s is zero, then print "(NUL)"
+      // if the length of s is zero, then print "(nul)"
       //
-      messages.add("(NUL)\n");
+      messages.add("(nul)\n");
    }
    else
    {
