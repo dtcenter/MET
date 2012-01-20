@@ -578,7 +578,8 @@ void process_fcst_obs_files()
    //
    // Set up the engine with these raw fields
    //
-   mlog << Debug(1) << "Identifying objects in the forecast and observation fields...\n";
+   mlog << Debug(2)
+        << "Identifying objects in the forecast and observation fields...\n";
 
    engine.set(fcst_wd, obs_wd);
 
@@ -590,7 +591,7 @@ void process_fcst_obs_files()
    }
 
    if(plot_flag || obj_stat_flag || obj_plot_flag) {
-      mlog << Debug(1)
+      mlog << Debug(2)
            << "Identified: " << engine.n_fcst << " forecast objects "
            << "and " << engine.n_obs << " observation objects.\n";
 
@@ -605,7 +606,8 @@ void process_fcst_obs_files()
          else
             strcpy(merge_str, "no merging");
 
-         mlog << Debug(1) << "Performing merging (" << merge_str << ") in the forecast field.\n";
+         mlog << Debug(2)
+              << "Performing merging (" << merge_str << ") in the forecast field.\n";
       }
 
       engine.do_fcst_merging(default_config_file, merge_config_file);
@@ -621,15 +623,17 @@ void process_fcst_obs_files()
          else
             strcpy(merge_str, "no merging");
 
-         mlog << Debug(1) << "Performing merging (" << merge_str << ") in the observation field.\n";
+         mlog << Debug(2)
+              << "Performing merging (" << merge_str << ") in the observation field.\n";
       }
       engine.do_obs_merging(default_config_file, merge_config_file);
 
-      mlog << Debug(1)
+      mlog << Debug(2)
            << "Remaining: " << engine.n_fcst << " forecast objects "
            << "and " << engine.n_obs << " observation objects.\n";
 
-      mlog << Debug(1) << "Performing matching between the forecast and observation fields.\n";
+      mlog << Debug(2)
+           << "Performing matching between the forecast and observation fields.\n";
 
       //
       // Do the matching of objects between fields
@@ -970,7 +974,8 @@ void compute_ct_stats() {
    int i, x, y;
    ShapeData fcst_mask, obs_mask;
 
-   mlog << Debug(1) << "Computing contingency table statistics...\n";
+   mlog << Debug(2)
+        << "Computing contingency table statistics...\n";
 
    for(i=0; i<n_cts; i++) {
 
@@ -2941,8 +2946,6 @@ void write_obj_netcdf() {
    obs_raw_var = f_out->add_var("obs_obj_raw", ncFloat, lat_dim, lon_dim);
    obs_obj_var = f_out->add_var("obs_obj_id", ncInt, lat_dim, lon_dim);
    obs_clus_var = f_out->add_var("obs_clus_id", ncInt, lat_dim, lon_dim);
-
-   // JHG, add name attribute for all the fcst and obs variables - it's just the variable name
    
    // Add forecast variable attributes
    fcst_raw_var->add_att("long_name", "Forecast Object Raw Values");
