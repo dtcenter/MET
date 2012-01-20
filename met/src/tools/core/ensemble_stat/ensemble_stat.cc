@@ -78,14 +78,19 @@ static void build_outfile_name(unixtime, const char *,
                                ConcatString &);
 
 static void write_ens_nc(int, DataPlane &);
-static void write_ens_var_float(int, float *, const char *, DataPlane &, const char *);
-static void write_ens_var_int(int, int *, const char *, DataPlane &, const char *);
+static void write_ens_var_float(int, float *, DataPlane &,
+                                const char *, const char *);
+static void write_ens_var_int(int, int *, DataPlane &,
+                              const char *, const char *);
 
 static void write_orank_nc(PairDataEnsemble &, DataPlane &, int, int, int);
-static void write_orank_var_float(int, int, int, float *, const char *, DataPlane &, const char *);
-static void write_orank_var_int(int, int, int, int *, const char *, DataPlane &, const char *);
+static void write_orank_var_float(int, int, int, float *, DataPlane &,
+                                  const char *, const char *);
+static void write_orank_var_int(int, int, int, int *, DataPlane &,
+                                const char *, const char *);
 
-static void add_var_att(int, NcVar *, int, DataPlane &, const char *);
+static void add_var_att(int, NcVar *, bool is_int, DataPlane &,
+                        const char *, const char *);
 
 static void finish_txt_files();
 static void clean_up();
@@ -1531,7 +1536,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 void write_ens_nc(int i_vx, DataPlane &dp) {
    int i, j;
    double t, v;
-   char thresh_str[max_str_len], var_str[max_str_len];
+   char thresh_str[max_str_len], type_str[max_str_len];
 
    // Arrays for storing ensemble data
    float *ens_mean  = (float *) 0;
@@ -1590,49 +1595,57 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
 
    // Add the ensemble mean if requested
    if(conf_info.conf.output_flag(i_nc_mean).ival()) {
-      write_ens_var_float(i_vx, ens_mean, "ENS_MEAN", dp,
+      write_ens_var_float(i_vx, ens_mean, dp,
+                          "ENS_MEAN",
                           "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation if requested
    if(conf_info.conf.output_flag(i_nc_stdev).ival()) {
-      write_ens_var_float(i_vx, ens_stdev, "ENS_STDEV", dp,
+      write_ens_var_float(i_vx, ens_stdev, dp,
+                          "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation if requested
    if(conf_info.conf.output_flag(i_nc_minus).ival()) {
-      write_ens_var_float(i_vx, ens_minus, "ENS_MINUS", dp,
+      write_ens_var_float(i_vx, ens_minus, dp,
+                          "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation if requested
    if(conf_info.conf.output_flag(i_nc_plus).ival()) {
-      write_ens_var_float(i_vx, ens_plus, "ENS_PLUS", dp,
+      write_ens_var_float(i_vx, ens_plus, dp,
+                          "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value if requested
    if(conf_info.conf.output_flag(i_nc_min).ival()) {
-      write_ens_var_float(i_vx, ens_min, "ENS_MIN", dp,
+      write_ens_var_float(i_vx, ens_min, dp,
+                          "ENS_MIN",
                           "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value if requested
    if(conf_info.conf.output_flag(i_nc_max).ival()) {
-      write_ens_var_float(i_vx, ens_max, "ENS_MAX", dp,
+      write_ens_var_float(i_vx, ens_max, dp,
+                          "ENS_MAX",
                           "Ensemble Maximum");
    }
 
    // Add the ensemble range if requested
    if(conf_info.conf.output_flag(i_nc_range).ival()) {
-      write_ens_var_float(i_vx, ens_range, "ENS_RANGE", dp,
+      write_ens_var_float(i_vx, ens_range, dp,
+                          "ENS_RANGE",
                           "Ensemble Range");
    }
 
    // Add the ensemble valid data count if requested
    if(conf_info.conf.output_flag(i_nc_vld).ival()) {
-      write_ens_var_int(i_vx, ens_vld, "ENS_VLD", dp,
+      write_ens_var_int(i_vx, ens_vld, dp,
+                        "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
 
@@ -1643,7 +1656,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
       for(i=0; i<conf_info.ens_ta[i_vx].n_elements(); i++) {
 
          conf_info.ens_ta[i_vx][i].get_abbr_str(thresh_str);
-         sprintf(var_str, "ENS_FREQ_%s", thresh_str);
+         sprintf(type_str, "ENS_FREQ_%s", thresh_str);
 
          // Store the data
          for(j=0; j<count_na.n_elements(); j++) {
@@ -1659,7 +1672,8 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
          } // end for j
 
          // Write the ensemble relative frequency
-         write_ens_var_float(i_vx, ens_freq, var_str, dp,
+         write_ens_var_float(i_vx, ens_freq, dp,
+                             type_str,
                              "Ensemble Relative Frequency");
 
       } // end for i
@@ -1681,20 +1695,36 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(int i_vx, float *ens_data, const char *var_str,
-                         DataPlane &dp, const char *long_name_str) {
+void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
+                         const char *type_str,
+                         const char *long_name_str) {
    NcVar *ens_var;
-   ConcatString ens_var_name;
+   ConcatString ens_var_name, name_str;
 
    // Construct the variable name
-   ens_var_name << cs_erase << var_str << "_"
+   ens_var_name << cs_erase
                 << conf_info.ens_info[i_vx]->name() << "_"
                 << conf_info.ens_info[i_vx]->level_name() << "_"
-                << var_str;
+                << type_str;
    ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
 
+   //
+   // Construct the variable name attribute
+   // For the ensemble mean, just use the variable name.
+   // For all other fields, append the field type.
+   //
+   if(strcmp(type_str, "ENS_MEAN") == 0) {
+      name_str << cs_erase
+               << conf_info.ens_info[i_vx]->name();
+   }
+   else {
+      name_str << cs_erase
+               << conf_info.ens_info[i_vx]->name() << "_"
+               << type_str;
+   }
+   
    // Add the variable attributes
-   add_var_att(i_vx, ens_var, 0, dp, long_name_str);
+   add_var_att(i_vx, ens_var, false, dp, name_str, long_name_str);
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
@@ -1709,20 +1739,26 @@ void write_ens_var_float(int i_vx, float *ens_data, const char *var_str,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(int i_vx, int *ens_data, const char *var_str,
-                       DataPlane &dp, const char *long_name_str) {
+void write_ens_var_int(int i_vx, int *ens_data, DataPlane &dp,
+                       const char *type_str,
+                       const char *long_name_str) {
    NcVar *ens_var;
-   ConcatString ens_var_name;
+   ConcatString ens_var_name, name_str;
 
    // Construct the variable name
-   ens_var_name << cs_erase << var_str << "_"
+   ens_var_name << cs_erase
                 << conf_info.ens_info[i_vx]->name() << "_"
                 << conf_info.ens_info[i_vx]->level_name() << "_"
-                << var_str;
+                << type_str;
    ens_var = nc_out->add_var(ens_var_name, ncInt, lat_dim, lon_dim);
 
+   // Construct the variable name attribute
+   name_str << cs_erase
+            << conf_info.ens_info[i_vx]->name() << "_"
+            << type_str;
+   
    // Add the variable attributes
-   add_var_att(i_vx, ens_var, 1, dp, long_name_str);
+   add_var_att(i_vx, ens_var, true, dp, name_str, long_name_str);
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
@@ -1776,19 +1812,23 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
    } // end for i
 
    // Add the observation values
-   write_orank_var_float(i_vx, i_interp, i_mask, obs_v, "OBS", dp,
+   write_orank_var_float(i_vx, i_interp, i_mask, obs_v, dp,
+                         "OBS",
                          "Observation Value");
 
    // Add the observation ranks
-   write_orank_var_int(i_vx, i_interp, i_mask, obs_rank, "OBS_RANK", dp,
+   write_orank_var_int(i_vx, i_interp, i_mask, obs_rank, dp,
+                       "OBS_RANK",
                        "Observation Rank");
 
    // Add the probability integral transforms
-   write_orank_var_float(i_vx, i_interp, i_mask, obs_pit, "OBS_PIT", dp,
+   write_orank_var_float(i_vx, i_interp, i_mask, obs_pit, dp,
+                         "OBS_PIT",
                          "Probability Integral Transform");
 
    // Add the number of valid ensemble members
-   write_orank_var_int(i_vx, i_interp, i_mask, ens_vld, "ENS_VLD", dp,
+   write_orank_var_int(i_vx, i_interp, i_mask, ens_vld, dp,
+                       "ENS_VLD",
                        "Ensemble Valid Data Count");
 
    // Deallocate and clean up
@@ -1803,36 +1843,43 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_var_float(int i_vx, int i_interp, int i_mask,
-                           float *data, const char *var_str,
-                           DataPlane &dp, const char *long_name_str) {
+                           float *data, DataPlane &dp,
+                           const char *type_str,
+                           const char *long_name_str) {
    NcVar *nc_var;
    int wdth;
-   ConcatString mthd_str, var_name;
+   ConcatString mthd_str, var_name, name_str;
 
    // Get the interpolation method string and width
    mthd_str = interpmthd_to_string(conf_info.interp_mthd[i_interp]);
    wdth     = conf_info.interp_wdth[i_interp];
 
    // Build the orank variable name
-   var_name << cs_erase << var_str << "_"
+   var_name << cs_erase
             << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
+            << type_str << "_"
+            << conf_info.mask_name[i_mask];
+
+   // Construct the variable name attribute
+   name_str << cs_erase
+            << conf_info.ens_info[i_vx]->name() << "_"
+            << type_str << "_"
             << conf_info.mask_name[i_mask];
 
    // Append smoothing information
    if((wdth > 1) &&
       (conf_info.conf.interp_flag().ival() == 2 ||
        conf_info.conf.interp_flag().ival() == 3)) {
-      var_name << "_"
-               << mthd_str << "_"
-               << wdth*wdth;
+      var_name << "_" << mthd_str << "_" << wdth*wdth;
+      name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
 
    // Define the variable
    nc_var = nc_out->add_var(var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_vx, nc_var, 0, dp, long_name_str);
+   add_var_att(i_vx, nc_var, false, dp, name_str, long_name_str);
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
@@ -1848,36 +1895,43 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_var_int(int i_vx, int i_interp, int i_mask,
-                         int *data, const char *var_str,
-                         DataPlane &dp, const char *long_name_str) {
+                         int *data, DataPlane &dp,
+                         const char *type_str,
+                         const char *long_name_str) {
    NcVar *nc_var;
    int wdth;
-   ConcatString mthd_str, var_name;
+   ConcatString mthd_str, var_name, name_str;
 
    // Get the interpolation method string and width
    mthd_str = interpmthd_to_string(conf_info.interp_mthd[i_interp]);
    wdth     = conf_info.interp_wdth[i_interp];
 
    // Build the orank variable name
-   var_name << cs_erase << var_str << "_"
+   var_name << cs_erase
             << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
+            << type_str << "_"
+            << conf_info.mask_name[i_mask];
+
+   // Construct the variable name attribute
+   name_str << cs_erase
+            << conf_info.ens_info[i_vx]->name() << "_"
+            << type_str << "_"
             << conf_info.mask_name[i_mask];
 
    // Append smoothing information
    if((wdth > 1) &&
       (conf_info.conf.interp_flag().ival() == 2 ||
        conf_info.conf.interp_flag().ival() == 3)) {
-      var_name << "_"
-               << mthd_str << "_"
-               << wdth*wdth;
+      var_name << "_" << mthd_str << "_" << wdth*wdth;
+      name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
 
    // Define the variable
    nc_var = nc_out->add_var(var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_vx, nc_var, 1, dp, long_name_str);
+   add_var_att(i_vx, nc_var, true, dp, name_str, long_name_str);
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
@@ -1892,27 +1946,27 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att(int i_vx, NcVar *ens_var, int flag,
-                 DataPlane &dp, const char *long_name_str) {
+void add_var_att(int i_vx, NcVar *nc_var, bool is_int, DataPlane &dp,
+                 const char *name_str, const char *long_name_str) {
    ConcatString att_str;
 
    // Construct the long name
-   att_str << conf_info.ens_info[i_vx]->name() << " at "
+   att_str << cs_erase
+           << conf_info.ens_info[i_vx]->name() << " at "
            << conf_info.ens_info[i_vx]->level_name() << " "
            << long_name_str;
 
-   // JHG, must add a name attribute
-
    // Add variable attributes
-   ens_var->add_att("units", conf_info.ens_info[i_vx]->units());
-   ens_var->add_att("long_name", att_str);
-   ens_var->add_att("level", conf_info.ens_info[i_vx]->level_name());
+   nc_var->add_att("name", name_str);
+   nc_var->add_att("long_name", att_str);
+   nc_var->add_att("level", conf_info.ens_info[i_vx]->level_name());
+   nc_var->add_att("units", conf_info.ens_info[i_vx]->units());
 
-   if(flag) ens_var->add_att("_FillValue", bad_data_int);
-   else     ens_var->add_att("_FillValue", bad_data_float);
+   if(is_int) nc_var->add_att("_FillValue", bad_data_int);
+   else       nc_var->add_att("_FillValue", bad_data_float);
 
    // Write out times
-   write_netcdf_var_times(ens_var, dp);
+   write_netcdf_var_times(nc_var, dp);
 
    return;
 }
