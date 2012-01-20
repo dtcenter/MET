@@ -36,7 +36,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making the plot_point_obs Tool ***"
+	@ echo "*** Finished Making the plot_data_plane Tool ***"
 	@ echo
 
 
