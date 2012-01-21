@@ -792,8 +792,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    char *c    = (char *) 0;
    char *lp   = (char *) 0;
    const char delim [] = " ";
-   int n = strlen(jobstring);
-   int i, k;
+   int i, k, n;
+
+   // If jobstring is null, simply return;
+   if(jobstring) n = strlen(jobstring);
+   else          return;
 
    // Job Command Line Array
    StringArray jc_array;
@@ -1242,16 +1245,12 @@ void STATAnalysisJob::close_dump_row_file() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// The pointer passed in must contain enough space to hold the contents
-// of the jobstring to be computed.
-//
-////////////////////////////////////////////////////////////////////////
 
-void STATAnalysisJob::get_jobstring(ConcatString &js) {
+ConcatString STATAnalysisJob::get_jobstring() const {
    int i;
    char junk[512];
    STATLineType type;
+   ConcatString js;
 
    // Initialize the jobstring
    js.clear();
@@ -1541,7 +1540,7 @@ void STATAnalysisJob::get_jobstring(ConcatString &js) {
       js << "-vif_flag " << vif_flag << " ";
    }
 
-   return;
+   return(js);
 }
 
 ////////////////////////////////////////////////////////////////////////

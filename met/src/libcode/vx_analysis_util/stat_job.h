@@ -113,7 +113,7 @@ class STATAnalysisJob {
       void open_dump_row_file ();
       void close_dump_row_file();
 
-      void get_jobstring(ConcatString &);
+      ConcatString get_jobstring() const;
 
       //
       // Job Type

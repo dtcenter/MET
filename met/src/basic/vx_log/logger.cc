@@ -532,26 +532,18 @@ Logger & Logger::operator<<(const char * s)
 
    memset(tmp, 0, sizeof(tmp));
 
-      //
-      // Check that s exists
-      //
-   if (!s)
-   {
-      cerr << "\n\n  Logger & operator<<(const char * s) -> s does not exist!\n\n";
-      exit (1);
-   }
-
-   len = strlen(s);
-
-   if (len == 0)
+   if (!s || !*s)
    {
       //
-      // if the length of s is zero, then print "(nul)"
+      // if s is null or the length of s is zero, then print "(nul)"
       //
       messages.add("(nul)");
    }
    else
    {
+
+      len = strlen(s);
+      
          //
          // Search through s, looking for newline characters. Copy each
          // non_newline character to msg. When we reach a newline character
