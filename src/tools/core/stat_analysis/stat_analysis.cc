@@ -31,6 +31,8 @@
 //                                    parse the command line arguments.
 //   006    11/14/11  Holmes          Added code to enable reading of
 //                                    multiple config files.
+//   007    01/20/12  Halley Gotway   Modify logic so that command line
+//                    job options override config file job options.
 //
 ////////////////////////////////////////////////////////////////////////
 
