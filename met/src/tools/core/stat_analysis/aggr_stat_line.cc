@@ -134,7 +134,7 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
                mlog << Warning << "\n  aggr_contable_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
-                    << "valid times.\n";
+                    << "valid times.\n\n";
                j.vif_flag = 0;
             }
             else {
@@ -181,7 +181,7 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
       mlog << Warning << "\n  aggr_contable_lines() -> "
            << "the variance inflation factor adjustment can only "
            << "be computed for at least " << min_time_series
-           << " unique valid times.\n";
+           << " unique valid times.\n\n";
       j.vif_flag = 0;
    }
 
@@ -337,7 +337,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
                mlog << Warning << "\n  aggr_mctc_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
-                    << "valid times.\n";
+                    << "valid times.\n\n";
                j.vif_flag = 0;
             }
             else {
@@ -368,7 +368,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
       mlog << Warning << "\n  aggr_mctc_lines() -> "
            << "the variance inflation factor adjustment can only "
            << "be computed for at least " << min_time_series
-           << " unique valid times.\n";
+           << " unique valid times.\n\n";
       j.vif_flag = 0;
    }
 
@@ -523,7 +523,7 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
                mlog << Warning << "\n  aggr_nx2_contable_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
-                    << "valid times.\n";
+                    << "valid times.\n\n";
                j.vif_flag = 0;
             }
             else {
@@ -668,7 +668,7 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
                mlog << Warning << "\n  aggr_partial_sum_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
-                    << "valid times.\n";
+                    << "valid times.\n\n";
                j.vif_flag = 0;
             }
             else {

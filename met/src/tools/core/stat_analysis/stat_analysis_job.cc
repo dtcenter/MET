@@ -594,7 +594,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    if(v_array.n_elements() == 0) {
       mlog << Warning << "\n  do_job_summary() -> "
            << "no valid data found in the STAT lines for job: "
-           << jobstring << "\n";
+           << jobstring << "\n\n";
       return;
    }
 
@@ -828,7 +828,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    if(n_out == 0) {
       mlog << Warning << "\n  do_job_aggr() -> "
            << "no matching STAT lines found for job: " << jobstring
-           << "\n";
+           << "\n\n";
       return;
    }
 
@@ -1421,7 +1421,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    if(n_out == 0) {
       mlog << Warning << "\n  do_job_aggr_stat() -> "
            << "no matching STAT lines found for job: " << jobstring
-           << "\n";
+           << "\n\n";
       return;
    }
 
@@ -2149,7 +2149,7 @@ void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
    if(n_out == 0) {
       mlog << Warning << "\n  do_job_go_index() -> "
            << "no matching STAT lines found for job: " << jobstring
-           << "\n";
+           << "\n\n";
       return;
    }
 
@@ -2210,7 +2210,7 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    if(n_out == 0) {
       mlog << Warning << "\n  do_job_ss_index() -> "
            << "no matching STAT lines found for job: " << jobstring
-           << "\n";
+           << "\n\n";
       return;
    }
 
@@ -2789,12 +2789,12 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
          mlog << Warning << "\n  compute_ss_index() -> "
               << "the number of aggregated forecast and reference lines "
               << "differ (" << n_fcst_lines[i] << " != " << n_ref_lines[i]
-              << ") for term " << i+1 << ".\n";
+              << ") for term " << i+1 << ".\n\n";
       }
 
       if(is_bad_data(ss)) {
          mlog << Warning << "\n  compute_ss_index() -> "
-              << "can't compute skill score for term " << i+1 << ".\n";
+              << "can't compute skill score for term " << i+1 << ".\n\n";
       }
 
    } // end for i
