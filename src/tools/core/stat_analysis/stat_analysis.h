@@ -70,9 +70,8 @@ static ofstream   *sa_out   = (ofstream *) 0;
 // Config file set with -config
 static ConcatString config_file;
 
-
 // Job command which may be set on the command line
-static char command_line_job[PATH_MAX] = "";
+static ConcatString command_line_job_options;
 
 ////////////////////////////////////////////////////////////////////////
 //

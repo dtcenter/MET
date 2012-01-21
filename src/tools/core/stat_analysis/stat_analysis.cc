@@ -115,12 +115,26 @@ int main(int argc, char * argv []) {
       sanity_check();
 
       //
-      // Setup the default job using the options specified in the config
-      // file
+      // Setup the default job using the config file options
       //
       default_job.clear();
       set_job_from_config(conf, default_job);
+
+      //
+      // Write out conet
+      //
+      mlog << Debug(4)
+           << "Default Job from the config file: \""
+           << default_job.get_jobstring() << "\"\n";
    }
+
+   //
+   // Amend the default job using command line options
+   //
+   mlog << Debug(4)
+        << "Amending default job with command line options: \""
+        << command_line_job_options << "\"\n";
+   default_job.parse_job_command(command_line_job_options);
 
    //
    // Enclose within a try block to catch any run time errors, and
@@ -150,7 +164,7 @@ int main(int argc, char * argv []) {
       // Otherwise, process the job specified on the command line.
       //
       else {
-         process_job(command_line_job, 1);
+         process_job(command_line_job_options, 1);
       }
 
    }
@@ -176,7 +190,6 @@ int main(int argc, char * argv []) {
 
 void parse_command_line(int &argc, char **argv) {
    CommandLine cline;
-   ConcatString cmd_line_job;
    int i;
 
    //
@@ -222,33 +235,23 @@ void parse_command_line(int &argc, char **argv) {
    cline.parse();
 
    //
-   // If no config file was specified, parse out the STAT Analysis job
-   // command from the command line.
+   // Parse any remaining command line arguments into a job string
    //
-   if(config_file.length() == 0) {
+   command_line_job_options.erase();
 
-      cmd_line_job.erase();
-
-      for(i=0; i<cline.n(); i++) {
-
-         //
-         // build the command line back up from the leftover arguments
-         //
-         cmd_line_job << cline[i];
-
-         //
-         // add a space between arguments, except for the last argument
-         //
-         if (i + 1 != cline.n())
-            cmd_line_job << ' ';
-      } // end for
+   for(i=0; i<cline.n(); i++) {
+     
+      //
+      // store current argument
+      //
+      command_line_job_options << cline[i];
 
       //
-      // Store the remaining options as the STAT Command Line job
+      // add a space between arguments, except for the last argument
       //
-      if (cmd_line_job.length() > 0)
-         strcpy(command_line_job, cmd_line_job);
-   } // end if
+      if (i + 1 != cline.n()) command_line_job_options << ' ';
+
+   } // end for
 
    //
    // Check for at least one search file or directory
@@ -425,7 +428,6 @@ void set_verbosity(int i) {
 
 void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
-   STATAnalysisJob filter_job;
    stat_analysis_Conf go_conf;
    char go_conf_file[PATH_MAX];
 
@@ -449,41 +451,25 @@ void process_search_dirs() {
    }
 
    //
-   // Set the file searching job to the default job.
+   // If this is a GO Index job use the GO Index filtering criteria.
    //
-   filter_job = default_job;
-
-   //
-   // For command line jobs parse the filtering criteria to be used.
-   //
-   if(config_file.length() == 0) {
+   if(default_job.job_type == stat_job_go_index) {
 
       //
-      // Parse the command line job options.
+      // Read in the STATAnalysis config file which defines
+      // the GO Index.
       //
-      filter_job.parse_job_command(command_line_job);
+      replace_string(met_base_str, MET_BASE,
+                     go_index_config_file, go_conf_file);
+      go_conf.read(go_conf_file);
 
       //
-      // If this is a GO Index job use the GO Index filtering criteria.
+      // Parse the contents of the GO Index config file into the
+      // search job.
       //
-      if(filter_job.job_type == stat_job_go_index) {
+      set_job_from_config(go_conf, default_job);
 
-         //
-         // Read in the STATAnalysis config file which defines
-         // the GO Index.
-         //
-         replace_string(met_base_str, MET_BASE,
-                        go_index_config_file, go_conf_file);
-         go_conf.read(go_conf_file);
-
-         //
-         // Parse the contents of the GO Index config file into the
-         // search job.
-         //
-         set_job_from_config(go_conf, filter_job);
-
-      } // end if go_index
-   } // end if config_file
+   } // end if go_index
 
    //
    // Open up the temp file for storing the intermediate STAT line data
@@ -540,7 +526,7 @@ void process_search_dirs() {
 
       }
 
-      process_stat_file(files[i], filter_job, n_read, n_keep);
+      process_stat_file(files[i], default_job, n_read, n_keep);
    }
 
    mlog << Debug(2) << "STAT Lines read     = " << n_read << "\n";
@@ -603,18 +589,28 @@ void process_job(const char * jobstring, int n_job) {
    //
    // Parse the job command line options
    //
+   mlog << Debug(4)
+        << "\nInitializing Job " << n_job << " with: \""
+        << jobstring << "\"\n";
    job.parse_job_command(jobstring);
+   
+   //
+   // Amend the current job using any command line options
+   //
+   mlog << Debug(4)
+        << "Amending Job " << n_job << " with command line options: \""
+        << command_line_job_options << "\"\n";
+   job.parse_job_command(command_line_job_options);
 
    //
    // Get the full jobstring
    //
-   job.get_jobstring(full_jobstring);
+   full_jobstring = job.get_jobstring();
 
    //
    // Do the job
    //
-   do_job(full_jobstring, job, n_job, tmp_dir, tmp_path,
-          sa_out);
+   do_job(full_jobstring, job, n_job, tmp_dir, tmp_path, sa_out);
 
    return;
 }
