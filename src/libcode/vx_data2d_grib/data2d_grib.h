@@ -35,6 +35,10 @@ class MetGrib1DataFile : public Met2dDataFile {
 
       DataPlane Plane;
 
+      bool data_plane_winds(VarInfoGrib &, DataPlane &);
+
+      bool data_plane_scalar(VarInfoGrib &, DataPlane &, GribRecord &);
+
    public:
 
       MetGrib1DataFile();
