@@ -147,6 +147,7 @@ test_var_info: $(LIBRARIES) test_var_info.cc
 	-lvx_data2d_grib \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_util \
@@ -159,10 +160,11 @@ test_factory: $(LIBRARIES) test_factory.cc
 	$(CXX_FLAGS) -I$(MET_INC_DIR) \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
-	-lvx_data2d_factory -lvx_data2d \
+	-lvx_data2d_factory \
 	-lvx_data2d_grib \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_util \
