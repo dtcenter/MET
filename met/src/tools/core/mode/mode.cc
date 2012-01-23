@@ -137,7 +137,7 @@ static Engine engine;
 static Grid grid;
 static Box xy_bb;
 static ConcatString out_dir;
-static char met_data_dir[PATH_MAX];
+static ConcatString met_data_dir;
 
 // Grib Codes to be verified for the forecast and observation fields
 static VarInfo * fcst_info = (VarInfo *) 0;
@@ -269,17 +269,21 @@ int main(int argc, char *argv[])
 
 ///////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+void process_command_line(int argc, char **argv)
+
+{
+
    CommandLine cline;
    ConcatString grib_ptv_str;
-   char tmp_str[PATH_MAX];
+   ConcatString s;
    GrdFileType ftype = FileType_None;
    GrdFileType otype = FileType_None;
    VarInfoFactory vfactory;
 
    // Set the default output directory
-   replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
-   out_dir << tmp_str;
+   s = default_out_dir;
+   s.replace(met_base_str, MET_BASE);
+   out_dir << s;
 
    //
    // check for zero arguments
@@ -349,9 +353,9 @@ void process_command_line(int argc, char **argv) {
    //
    // Read the default config file first and then read the user's match config file
    //
-   replace_string(met_base_str, MET_BASE,
-                  default_config_filename, tmp_str);
-   default_config_file = tmp_str;
+   s = default_config_filename;
+   s.replace(met_base_str, MET_BASE);
+   default_config_file = s;
 
    // List the config files
    mlog << Debug(1)
@@ -536,13 +540,13 @@ void process_fcst_obs_files()
    //
    // Store the forecast and observation variable, level, and units.
    //
-   strcpy(engine.fcst_var_str,  (const char *) fcst_info->name());
-   strcpy(engine.fcst_lvl_str,  (const char *) fcst_info->level_name());
-   strcpy(engine.fcst_unit_str, (const char *) fcst_info->units());
+   engine.fcst_var_str  = (const char *) fcst_info->name();
+   engine.fcst_lvl_str  = (const char *) fcst_info->level_name();
+   engine.fcst_unit_str = (const char *) fcst_info->units();
 
-   strcpy(engine.obs_var_str,   (const char *) obs_info->name());
-   strcpy(engine.obs_lvl_str,   (const char *) obs_info->level_name());
-   strcpy(engine.obs_unit_str,  (const char *) obs_info->units());
+   engine.obs_var_str   = (const char *) obs_info->name();
+   engine.obs_lvl_str   = (const char *) obs_info->level_name();
+   engine.obs_unit_str  = (const char *) obs_info->units();
 
    mlog << Debug(1)
         << "Forecast Field: "
@@ -719,9 +723,12 @@ void process_output() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void check_engine_config() {
+void check_engine_config()
+
+{
+
    ColorTable ct_test;
-   char tmp_str[PATH_MAX];
+   ConcatString s;
 
    // Check that the model name is not empty
    if(strlen(engine.wconf.model().sval()) == 0 ||
@@ -904,26 +911,29 @@ void check_engine_config() {
    }
 
    // Get the MET Data directory from which to read the plotting data files
-   replace_string(met_base_str, MET_BASE, engine.wconf.met_data_dir().sval(), met_data_dir);
+   met_data_dir = engine.wconf.met_data_dir().sval();
+   met_data_dir.replace(met_base_str, MET_BASE);
 
    // Check that fcst_raw_color_table can be read
    ct_test.clear();
-   replace_string(met_base_str, MET_BASE, engine.wconf.fcst_raw_color_table().sval(), tmp_str);
-   if(!ct_test.read(tmp_str)) {
+   s = engine.wconf.fcst_raw_color_table().sval();
+   s.replace(met_base_str, MET_BASE);
+   if(!ct_test.read(s)) {
       mlog << Error << "\n  check_engine_config() -> "
            << "cannot read fcst_raw_color_table file ("
-           << tmp_str
+           << s
            << ")\n\n";
       exit(1);
    }
 
    // Check that obs_raw_color_table can be read
    ct_test.clear();
-   replace_string(met_base_str, MET_BASE, engine.wconf.obs_raw_color_table().sval(), tmp_str);
-   if(!ct_test.read(tmp_str)) {
+   s = engine.wconf.obs_raw_color_table().sval();
+   s.replace(met_base_str, MET_BASE);
+   if(!ct_test.read(s)) {
       mlog << Error << "\n  check_engine_config() -> "
            << "cannot read obs_raw_color_table file ("
-           << tmp_str
+           << s
            << ")\n\n";
       exit(1);
    }
@@ -938,11 +948,12 @@ void check_engine_config() {
 
    // Check that mode_color_table can be read
    ct_test.clear();
-   replace_string(met_base_str, MET_BASE, engine.wconf.mode_color_table().sval(), tmp_str);
-   if(!ct_test.read(tmp_str)) {
+   s = engine.wconf.mode_color_table().sval();
+   s.replace(met_base_str, MET_BASE);
+   if(!ct_test.read(s)) {
       mlog << Error << "\n  check_engine_config() -> "
            << "cannot read mode_color_table file ("
-           << tmp_str
+           << s
            << ")\n\n";
       exit(1);
    }
@@ -1055,7 +1066,7 @@ void set_plot_dims(int nx, int ny) {
 void plot_engine() {
    PSfile plot;
    double dmin, dmax;
-   char tmp_str[PATH_MAX];
+   ConcatString s;
    ConcatString ps_file;
 
    //
@@ -1078,18 +1089,18 @@ void plot_engine() {
    //
    // Load the raw forecast color table
    //
-   replace_string(met_base_str, MET_BASE,
-                  engine.wconf.fcst_raw_color_table().sval(), tmp_str);
-   mlog << Debug(1) << "Loading forecast raw color table: " << tmp_str << "\n";
-   fcst_ct.read(tmp_str);
+   s = engine.wconf.fcst_raw_color_table().sval();
+   s.replace(met_base_str, MET_BASE);
+   mlog << Debug(1) << "Loading forecast raw color table: " << s << "\n";
+   fcst_ct.read(s);
 
    //
    // Load the raw observation color table
    //
-   replace_string(met_base_str, MET_BASE,
-                  engine.wconf.obs_raw_color_table().sval(), tmp_str);
-   mlog << Debug(1) << "Loading observation raw color table: " << tmp_str << "\n";
-   obs_ct.read(tmp_str);
+   s = engine.wconf.obs_raw_color_table().sval();
+   s.replace(met_base_str, MET_BASE);
+   mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
+   obs_ct.read(s);
 
    //
    // If the forecast and observation fields are the same and if the range
@@ -1163,10 +1174,10 @@ void plot_engine() {
    plot.open(ps_file);
    n_page = 1;
 
-   sprintf(tmp_str, "MODE: %s at %s vs %s at %s",
-           engine.fcst_var_str, engine.fcst_lvl_str,
-           engine.obs_var_str, engine.obs_lvl_str);
-   plot_engine(plot, engine, FOEng, tmp_str);
+   s << cs_erase
+     << "MODE: " << engine.fcst_var_str << " at " << engine.fcst_lvl_str
+     << " vs "   << engine.obs_var_str  << " at " << engine.obs_lvl_str;
+   plot_engine(plot, engine, FOEng, s);
 
    if(engine.wconf.fcst_merge_flag().ival() == 1 ||
       engine.wconf.fcst_merge_flag().ival() == 3 ) {
@@ -1199,13 +1210,17 @@ void plot_engine() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title) {
+void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
+
+{
+
    Box dim;
-   char label[max_str_len];
+   ConcatString label;
+   char junk[1024];
    char fcst_str[max_str_len], fcst_short_str[max_str_len];
    char obs_str[max_str_len], obs_short_str[max_str_len];
    char thresh_str[max_str_len];
-   char tmp_str[max_str_len], tmp2_str[max_str_len], tmp3_str[max_str_len];
+   ConcatString tmp_str, tmp2_str, tmp3_str;
    double v_tab, h_tab, h_tab_a, h_tab_b, h_tab_c, v;
    bool draw_line;
    int i, mon, day, yr, hr, minute, sec;
@@ -1335,23 +1350,23 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       if(eng.info[i].interest_value < eng.wconf.total_interest_thresh().dval()
       && draw_line == false) {
 
-         sprintf(label, "%s", "----------------------------------");
          p.write_centered_text(1, 1, h_tab_3 + 4.5*plot_text_sep,
-                               v_tab, 0.5, 0.5, label);
+                               v_tab, 0.5, 0.5, "----------------------------------");
          draw_line = true;
          v_tab -= plot_text_sep;
       }
 
-      sprintf(label, "%i", eng.info[i].fcst_number);
-      p.write_centered_text(1, 1, h_tab_3 + 1.5*plot_text_sep,
-                            v_tab, 0.5, 0.5, label);
+      label << cs_erase << eng.info[i].fcst_number;
+      p.write_centered_text(1, 1, h_tab_3 + 1.5*plot_text_sep, v_tab, 0.5, 0.5, label);
 
-      sprintf(label, "%i", eng.info[i].obs_number);
-      p.write_centered_text(1, 1, h_tab_3 + 4.5*plot_text_sep,
-                            v_tab, 0.5, 0.5, label);
+      label << cs_erase << eng.info[i].obs_number;
+      p.write_centered_text(1, 1, h_tab_3 + 4.5*plot_text_sep, v_tab, 0.5, 0.5, label);
 
-      if(eng.info[i].interest_value < 0) sprintf(label, na_str);
-      else sprintf(label, "%.4f", eng.info[i].interest_value);
+      if ( eng.info[i].interest_value < 0 ) label = na_str;
+      else {
+         label.set_precision(4);
+         label << cs_erase << eng.info[i].interest_value;
+      }
       p.write_centered_text(1, 1, h_tab_3 + 7.5*plot_text_sep,
                             v_tab, 0.5, 0.5, label);
 
@@ -1421,19 +1436,19 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    unix_to_mdyhms(eng.fcst_raw->data.valid() -
                   eng.fcst_raw->data.lead(),
                   mon, day, yr, hr, minute, sec);
-   sprintf(label, "%.4i%.2i%.2i", yr, mon, day);
-   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2i:%.2i:%.2i", hr, minute, sec);
+   snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
+   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
    p.write_centered_text(1, 1, h_tab_b, v_tab-plot_text_sep,
-                         0.0, 0.5, label);
+                         0.0, 0.5, junk);
    unix_to_mdyhms(eng.obs_raw->data.valid() -
                   eng.obs_raw->data.lead(),
                   mon, day, yr, hr, minute, sec);
-   sprintf(label, "%.4i%.2i%.2i", yr, mon, day);
-   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2i:%.2i:%.2i", hr, minute, sec);
+   snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
+   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
    p.write_centered_text(1, 1, h_tab_c, v_tab-plot_text_sep,
-                         0.0, 0.5, label);
+                         0.0, 0.5, junk);
    v_tab -= 2.0*plot_text_sep;
 
    //
@@ -1442,18 +1457,18 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Valid:");
    unix_to_mdyhms(eng.fcst_raw->data.valid(),
                   mon, day, yr, hr, minute, sec);
-   sprintf(label, "%.4i%.2i%.2i", yr, mon, day);
-   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2i:%.2i:%.2i", hr, minute, sec);
+   snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
+   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
    p.write_centered_text(1, 1, h_tab_b, v_tab-plot_text_sep,
-                         0.0, 0.5, label);
+                         0.0, 0.5, junk);
    unix_to_mdyhms(eng.obs_raw->data.valid(),
                   mon, day, yr, hr, minute, sec);
-   sprintf(label, "%.4i%.2i%.2i", yr, mon, day);
-   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2i:%.2i:%.2i", hr, minute, sec);
+   snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
+   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
    p.write_centered_text(1, 1, h_tab_c, v_tab-plot_text_sep,
-                         0.0, 0.5, label);
+                         0.0, 0.5, junk);
    v_tab -= 2.0*plot_text_sep;
 
    //
@@ -1461,11 +1476,11 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Accum:");
    sec_to_hms(eng.fcst_raw->data.accum(), hr, minute, sec);
-   sprintf(label, "%.2i:%.2i:%.2i", hr, minute, sec);
-   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
+   snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
+   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
    sec_to_hms(eng.obs_raw->data.accum(), hr, minute, sec);
-   sprintf(label, "%.2i:%.2i:%.2i", hr, minute, sec);
-   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+   snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
+   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
    ////////////////////////////////////////////////////////////////////
@@ -1485,10 +1500,10 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Centroid/Boundary:");
-   sprintf(label, "%.2f", eng.wconf.centroid_dist_weight().dval());
-   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2f", eng.wconf.boundary_dist_weight().dval());
-   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.centroid_dist_weight().dval());
+   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.boundary_dist_weight().dval());
+   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
    //
@@ -1496,10 +1511,10 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Convex Hull/Angle:");
-   sprintf(label, "%.2f", eng.wconf.convex_hull_dist_weight().dval());
-   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2f", eng.wconf.angle_diff_weight().dval());
-   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.convex_hull_dist_weight().dval());
+   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.angle_diff_weight().dval());
+   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
    //
@@ -1507,10 +1522,10 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Area/Intersection Area:");
-   sprintf(label, "%.2f", eng.wconf.area_ratio_weight().dval());
-   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2f", eng.wconf.int_area_ratio_weight().dval());
-   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.area_ratio_weight().dval());
+   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.int_area_ratio_weight().dval());
+   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
    //
@@ -1518,10 +1533,10 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Complexity/Intensity:");
-   sprintf(label, "%.2f", eng.wconf.complexity_ratio_weight().dval());
-   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-   sprintf(label, "%.2f", eng.wconf.intensity_ratio_weight().dval());
-   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.complexity_ratio_weight().dval());
+   p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.intensity_ratio_weight().dval());
+   p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
    //
@@ -1529,9 +1544,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Total Interest Thresh:");
-   sprintf(label, "%.2f", eng.wconf.total_interest_thresh().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.total_interest_thresh().dval());
    p.write_centered_text(1, 1, (h_tab_b+h_tab_c)/2.0, v_tab, 0.0, 0.5,
-                         label);
+                         junk);
    v_tab -= plot_text_sep;
 
    ////////////////////////////////////////////////////////////////////
@@ -1559,27 +1574,27 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Mask M/G/P:");
       if(eng.wconf.mask_missing_flag().ival() == 1 ||
-         eng.wconf.mask_missing_flag().ival() == 3) sprintf(tmp_str, "on");
-      else                                          sprintf(tmp_str, "off");
+         eng.wconf.mask_missing_flag().ival() == 3) tmp_str = "on";
+      else                                          tmp_str = "off";
       if(eng.wconf.mask_grid_flag().ival() == 1 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    sprintf(tmp2_str, "on");
-      else                                          sprintf(tmp2_str, "off");
+         eng.wconf.mask_grid_flag().ival() == 3)    tmp2_str = "on";
+      else                                          tmp2_str = "off";
       if(eng.wconf.mask_grid_flag().ival() == 1 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    sprintf(tmp3_str, "on");
-      else                                          sprintf(tmp3_str, "off");
-      sprintf(label, "%s/%s/%s", tmp_str, tmp2_str, tmp3_str);
+         eng.wconf.mask_grid_flag().ival() == 3)    tmp3_str = "on";
+      else                                          tmp3_str = "off";
+      label << cs_erase << tmp_str << '/' << tmp2_str << '/' << tmp3_str;
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
 
       if(eng.wconf.mask_missing_flag().ival() == 2 ||
-         eng.wconf.mask_missing_flag().ival() == 3) sprintf(tmp_str, "on");
-      else                                          sprintf(tmp_str, "off");
+         eng.wconf.mask_missing_flag().ival() == 3) tmp_str = "on";
+      else                                          tmp_str = "off";
       if(eng.wconf.mask_grid_flag().ival() == 2 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    sprintf(tmp2_str, "on");
-      else                                          sprintf(tmp2_str, "off");
+         eng.wconf.mask_grid_flag().ival() == 3)    tmp2_str = "on";
+      else                                          tmp2_str = "off";
       if(eng.wconf.mask_grid_flag().ival() == 2 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    sprintf(tmp3_str, "on");
-      else                                          sprintf(tmp3_str, "off");
-      sprintf(label, "%s/%s/%s", tmp_str, tmp2_str, tmp3_str);
+         eng.wconf.mask_grid_flag().ival() == 3)    tmp3_str = "on";
+      else                                          tmp3_str = "off";
+      label << cs_erase << tmp_str << '/' << tmp2_str << '/' << tmp3_str;
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
 
       v_tab -= plot_text_sep;
@@ -1598,10 +1613,10 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Convolution Radius
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Conv Radius:");
-      sprintf(label, "%.0i gs", eng.wconf.fcst_conv_radius().ival());
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%.0i gs", eng.wconf.obs_conv_radius().ival());
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%.0i gs", eng.wconf.fcst_conv_radius().ival());
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%.0i gs", eng.wconf.obs_conv_radius().ival());
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
@@ -1619,11 +1634,11 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Area Thresh:");
       eng.fcst_area_thresh.get_str(thresh_str, 0);
-      sprintf(label, "%s gs", thresh_str);
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%s gs", thresh_str);
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
       eng.obs_area_thresh.get_str(thresh_str, 0);
-      sprintf(label, "%s gs", thresh_str);
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%s gs", thresh_str);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
@@ -1632,22 +1647,24 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       p.write_centered_text(1, 1, h_tab_a, v_tab,
                            0.0, 0.5, "Inten Thresh:");
 
-      if(     nint(eng.wconf.fcst_inten_perc().ival()) == 101) sprintf(tmp_str, "mean");
-      else if(nint(eng.wconf.fcst_inten_perc().ival()) == 102) sprintf(tmp_str, "sum");
+      if(     nint(eng.wconf.fcst_inten_perc().ival()) == 101) tmp_str = "mean";
+      else if(nint(eng.wconf.fcst_inten_perc().ival()) == 102) tmp_str = "sum";
       else {
-         sprintf(tmp_str, "p%.0i", eng.wconf.fcst_inten_perc().ival());
+         snprintf(junk, sizeof(junk), "p%.0i", eng.wconf.fcst_inten_perc().ival());
+         tmp_str = junk;
       }
       eng.fcst_inten_perc_thresh.get_str(thresh_str, 2);
-      sprintf(label, "%s%s", tmp_str, thresh_str);
+      label << cs_erase << tmp_str << thresh_str;
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
 
-      if(     nint(eng.wconf.obs_inten_perc().ival()) == 101) sprintf(tmp_str, "mean");
-      else if(nint(eng.wconf.obs_inten_perc().ival()) == 102) sprintf(tmp_str, "sum");
+      if(     nint(eng.wconf.obs_inten_perc().ival()) == 101) tmp_str = "mean";
+      else if(nint(eng.wconf.obs_inten_perc().ival()) == 102) tmp_str = "sum";
       else {
-         sprintf(tmp_str, "p%.0i", eng.wconf.obs_inten_perc().ival());
+         snprintf(junk, sizeof(junk), "p%.0i", eng.wconf.obs_inten_perc().ival());
+         tmp_str = junk;
       }
       eng.obs_inten_perc_thresh.get_str(thresh_str, 2);
-      sprintf(label, "%s%s", tmp_str, thresh_str);
+      label << cs_erase << tmp_str << thresh_str;
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
       v_tab -= plot_text_sep;
 
@@ -1671,16 +1688,16 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Merging flag
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Merging:");
-      if(eng.wconf.fcst_merge_flag().ival() == 0)       sprintf(label, "none");
-      else if(eng.wconf.fcst_merge_flag().ival() == 1)  sprintf(label, "thresh");
-      else if(eng.wconf.fcst_merge_flag().ival() == 2)  sprintf(label, "engine");
-      else if(eng.wconf.fcst_merge_flag().ival() == 3)  sprintf(label, "thresh/engine");
+      if(eng.wconf.fcst_merge_flag().ival() == 0)       label = "none";
+      else if(eng.wconf.fcst_merge_flag().ival() == 1)  label = "thresh";
+      else if(eng.wconf.fcst_merge_flag().ival() == 2)  label = "engine";
+      else if(eng.wconf.fcst_merge_flag().ival() == 3)  label = "thresh/engine";
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
 
-      if(eng.wconf.obs_merge_flag().ival() == 0)        sprintf(label, "none");
-      else if(eng.wconf.obs_merge_flag().ival() == 1)   sprintf(label, "thresh");
-      else if(eng.wconf.obs_merge_flag().ival() == 2)   sprintf(label, "engine");
-      else if(eng.wconf.obs_merge_flag().ival() == 3)   sprintf(label, "thresh/engine");
+      if(eng.wconf.obs_merge_flag().ival() == 0)        label = "none";
+      else if(eng.wconf.obs_merge_flag().ival() == 1)   label = "thresh";
+      else if(eng.wconf.obs_merge_flag().ival() == 2)   label = "engine";
+      else if(eng.wconf.obs_merge_flag().ival() == 3)   label = "thresh/engine";
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
       v_tab -= plot_text_sep;
 
@@ -1688,10 +1705,10 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Matching scheme
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Matching:");
-      if(eng.wconf.match_flag().ival() == 0)      sprintf(label, "none");
-      else if(eng.wconf.match_flag().ival() == 1) sprintf(label, "match/merge");
-      else if(eng.wconf.match_flag().ival() == 2) sprintf(label, "match/fcst merge");
-      else if(eng.wconf.match_flag().ival() == 3) sprintf(label, "match/no merge");
+      if(eng.wconf.match_flag().ival() == 0)      label = "none";
+      else if(eng.wconf.match_flag().ival() == 1) label = "match/merge";
+      else if(eng.wconf.match_flag().ival() == 2) label = "match/fcst merge";
+      else if(eng.wconf.match_flag().ival() == 3) label = "match/no merge";
       p.write_centered_text(1, 1, (h_tab_b+h_tab_c)/2.0, v_tab, 0.0, 0.5, label);
       v_tab -= plot_text_sep;
 
@@ -1705,46 +1722,46 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Simple objects counts (Matched Simples/Unmatched Simples)
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Simple/M/U:");
-      sprintf(label, "%i/%i/%i", eng.n_fcst,
+      snprintf(junk, sizeof(junk), "%i/%i/%i", eng.n_fcst,
               eng.get_matched_fcst(0), eng.get_unmatched_fcst(0));
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%i/%i/%i", eng.n_obs,
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%i/%i/%i", eng.n_obs,
               eng.get_matched_obs(0), eng.get_unmatched_obs(0));
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
       // Area counts
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Area:");
-      sprintf(label, "%i gs",
+      snprintf(junk, sizeof(junk), "%i gs",
               eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%i gs",
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%i gs",
               eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
       // Area counts (Matched Simple/Unmatched Simples)
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Area M/U:");
-      sprintf(label, "%i/%i",
+      snprintf(junk, sizeof(junk), "%i/%i",
               eng.get_matched_fcst(1),  eng.get_unmatched_fcst(1));
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%i/%i",
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%i/%i",
               eng.get_matched_obs(1),  eng.get_unmatched_obs(1));
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
       // Cluster object counts
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Cluster:");
-      sprintf(label, "%i", eng.collection.n_sets);
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%i", eng.collection.n_sets);
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       /////////////////////////////////////////////////////////////////
@@ -1758,11 +1775,11 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "MMI:");
       v = interest_percentile(eng, 50.0, 1);
-      sprintf(label, "%.4f", v);
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%.4f", v);
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
       v = interest_percentile(eng, 50.0, 2);
-      sprintf(label, "%.4f", v);
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%.4f", v);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
@@ -1770,8 +1787,8 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "MMI (F+O):");
       v = interest_percentile(eng, 50.0, 3);
-      sprintf(label, "%.4f", v);
-      p.write_centered_text(1, 1, (h_tab_b+h_tab_c)/2.0, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%.4f", v);
+      p.write_centered_text(1, 1, (h_tab_b+h_tab_c)/2.0, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
    }
@@ -1796,32 +1813,32 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Simple objects counts
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Simple:");
-      sprintf(label, "%i", eng.n_fcst);
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%i", eng.n_obs);
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%i", eng.n_fcst);
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%i", eng.n_obs);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
       // Area counts
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Area:");
-      sprintf(label, "%i gs",
+      snprintf(junk, sizeof(junk), "%i gs",
               eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%i gs",
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%i gs",
               eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
       //
       // Cluster object counts
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Cluster:");
-      sprintf(label, "%i", eng.collection.n_sets);
-      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
-      sprintf(label, "%i", eng.collection.n_sets);
-      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
+      snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
+      p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
+      snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
+      p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
    }
 
@@ -1954,7 +1971,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       v_tab = page_height - 2.0*v_margin;
       set_dim(dim, v_tab - lg_plot_height, v_tab, h_tab_cen);
 
-      sprintf(tmp_str, "%s Objects with %s Outlines", fcst_str, obs_str);
+      tmp_str << cs_erase << fcst_str << " Objects with " << obs_str << " Outlines";
       p.choose_font(31, 24.0, met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, dim.top() + plot_text_sep/2.0,
                             0.5, 0.5, tmp_str);
@@ -1973,7 +1990,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       v_tab = v_tab - lg_plot_height - 2.0*v_margin;
       set_dim(dim, v_tab - lg_plot_height, v_tab, h_tab_cen);
 
-      sprintf(tmp_str, "%s Objects with %s Outlines", obs_str, fcst_str);
+      tmp_str << cs_erase << obs_str << " Objects with " << fcst_str << " Outlines";
       p.choose_font(31, 24.0, met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, dim.top() + plot_text_sep/2.0,
                             0.5, 0.5, tmp_str);
@@ -2006,10 +2023,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       v_tab = page_height - 2.0*v_margin;
       set_dim(dim, v_tab - lg_plot_height, v_tab, h_tab_cen);
 
-      sprintf(label, "Cluster Object Information");
       p.choose_font(31, 24.0, met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, dim.top() + plot_text_sep/2.0,
-                            0.5, 0.5, label);
+                            0.5, 0.5, "Cluster Object Information");
 
       p.choose_font(31, 18.0, met_data_dir);
       p.write_centered_text(1, 1, h_tab_a, 727.0, 0.5, 0.5, fcst_str);
@@ -2120,68 +2136,71 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
          h_tab = h_margin;
 
          // Cluster ID
-         sprintf(label, "%i", i+1);
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%i", i+1);
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Centroid Distance
-         sprintf(label, "%.2f", eng.pair_clus[i].centroid_dist);
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].centroid_dist);
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Angle Difference
-         sprintf(label, "%.2f", eng.pair_clus[i].angle_diff);
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].angle_diff);
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Forecast Area
-         sprintf(label, "%i", nint(eng.pair_clus[i].Fcst[0].area));
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].Fcst[0].area));
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Observation Area
-         sprintf(label, "%i", nint(eng.pair_clus[i].Obs[0].area));
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].Obs[0].area));
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Intersection Area
-         sprintf(label, "%i", nint(eng.pair_clus[i].intersection_area));
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].intersection_area));
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Union Area
-         sprintf(label, "%i", nint(eng.pair_clus[i].union_area));
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].union_area));
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Symmetric Difference
-         sprintf(label, "%i", nint(eng.pair_clus[i].symmetric_diff));
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].symmetric_diff));
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Forecast median intensity
-         sprintf(label, "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p50);
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p50);
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Observation median intensity
-         sprintf(label, "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p50);
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p50);
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Forecast 90th percentile of intensity
-         sprintf(label, "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p90);
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p90);
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Observation median intensity
-         sprintf(label, "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p90);
-         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
+         snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p90);
+         p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, junk);
          h_tab += 3.0*plot_text_sep;
 
          // Total Interest
-         if(eng.info_clus[i].interest_value < 0) sprintf(label, na_str);
-         else sprintf(label, "%.4f", eng.info_clus[i].interest_value);
+         if(eng.info_clus[i].interest_value < 0) label = na_str;
+         else {
+            snprintf(junk, sizeof(junk), "%.4f", eng.info_clus[i].interest_value);
+            label = junk;
+         }
          p.write_centered_text(1, 1, h_tab, v_tab, 0.0, 0.5, label);
          h_tab += 3.0*plot_text_sep;
 
@@ -2436,7 +2455,7 @@ void plot_simple_ids(PSfile &p, Engine &eng, Box &dim, int fcst) {
 
       p.setrgbcolor(c.red()/255.0, c.green()/255.0, c.blue()/255.0);
       p.choose_font(28, 16.0, met_data_dir);
-      sprintf(label, "%i", i+1);
+      snprintf(label, sizeof(label), "%i", i+1);
       p.write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
 
       // Draw outline in black
@@ -2495,7 +2514,7 @@ void draw_convex_hulls(PSfile &p, Engine &eng, const Box &dim,
 
          p.setrgbcolor(c.red()/255.0, c.green()/255.0, c.blue()/255.0);
          p.choose_font(28, 16.0, met_data_dir);
-         sprintf(label, "%i", i+1);
+         snprintf(label, sizeof(label), "%i", i+1);
          p.write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
 
          // Draw outline in black
@@ -2711,10 +2730,10 @@ void plot_colorbar(PSfile &p, Box &dim, int fcst) {
         // has been rescaled
         //
         if(ct_ptr->rescale_flag) {
-           sprintf(label, "%.2f", (*ct_ptr)[i].value_low());
+           snprintf(label, sizeof(label), "%.2f", (*ct_ptr)[i].value_low());
         }
         else {
-           sprintf(label, "%g", (*ct_ptr)[i].value_low());
+           snprintf(label, sizeof(label), "%g", (*ct_ptr)[i].value_low());
         }
 
         p.write_centered_text(2, 1,  x_ll + bar_width + 2.0,
@@ -2742,7 +2761,7 @@ void build_outfile_name(const char *suffix, ConcatString &str) {
    //
 
    // Append the output directory and program name
-   str << cs_erase << out_dir.text() << "/" << program_name;
+   str << cs_erase << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
    if(strlen(engine.wconf.output_prefix().sval()) > 0)
@@ -2753,7 +2772,7 @@ void build_outfile_name(const char *suffix, ConcatString &str) {
    unix_to_mdyhms(engine.fcst_raw->data.valid(),
                   mon, day, yr, hr, min, sec);
    sec_to_hms(engine.fcst_raw->data.accum(), a_hr, a_min, a_sec);
-   sprintf(tmp_str,
+   snprintf(tmp_str, sizeof(tmp_str), 
            "%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV_%.2i%.2i%.2iA",
            l_hr, l_min, l_sec,
            yr, mon, day, hr, min, sec,

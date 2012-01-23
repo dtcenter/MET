@@ -27,6 +27,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static bool is_empty(const char *);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class ConcatString
    //
@@ -284,6 +290,22 @@ strcpy(s + Length, a);
 
 Length += n;
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ConcatString::add(const char c)
+
+{
+
+extend(Length + 5);   //  just to make sure
+
+s[Length++] = c;
 
 return;
 
@@ -696,6 +718,69 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ConcatString::replace(const char * target, const char * replacement)
+
+{
+
+if ( empty() )  {
+
+   cerr << "\n\n  ConcatString::replace(const char * target, const char * replacement) -> empty string!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ::is_empty(target) || ::is_empty(replacement) )  {
+
+   cerr << "\n\n  ConcatString::replace(const char * target, const char * replacement) -> target and/or replacement string is empty\n\n";
+
+   exit ( 1 );
+
+}
+
+const char * c = (const char *) 0;
+
+if ( (c = getenv(replacement)) != NULL )  replacement = c;
+
+
+const int target_len = strlen(target);
+ConcatString A;
+const char * S = s;
+const char * end = s + Length;
+
+while ( S < end )  {
+
+   if ( (c = strstr(S, target)) != NULL )  {
+
+      while ( S < c )  A.add(*S++);
+
+      A << replacement;
+
+      S += target_len;
+
+   } else {
+
+      while ( S < end )  A.add(*S++);
+
+   }
+
+}
+
+if ( A.nonempty() )  assign(A);
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -795,7 +880,7 @@ ConcatString & operator<<(ConcatString & a, double x)
 
 char junk[512];
 
-sprintf(junk, a.float_format(), x);
+snprintf(junk, sizeof(junk), a.float_format(), x);
 
 a.add(junk);
 
@@ -1115,6 +1200,18 @@ if ( a.empty() || !text )  return ( false );
 int status = strcmp(text, a.text());
 
 return ( status < 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_empty(const char * text)
+
+{
+
+return ( (text == NULL) || (*text == 0) );
 
 }
 
