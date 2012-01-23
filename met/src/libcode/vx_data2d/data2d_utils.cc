@@ -23,6 +23,9 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
+   mlog << Debug(3)
+        << "Deriving wind direction from U and V wind components.\n";
+   
    //
    // Check that the dimensions match
    //
@@ -35,10 +38,10 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
    }
 
    //
-   // Initialize
+   // Initialize by setting to u2d
    //
-   wdir2d.clear();
-   wdir2d.set_size(nx, ny);
+   wdir2d = u2d;
+   wdir2d.set_constant(bad_data_double);
 
    //
    // Compute the wind direction
@@ -82,6 +85,9 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
+   mlog << Debug(3)
+        << "Deriving wind speed from U and V wind components.\n";
+
    //
    // Check that the dimensions match
    //
@@ -94,10 +100,10 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
    }
 
    //
-   // Initialize
+   // Initialize by setting to u2d
    //
-   wind2d.clear();
-   wind2d.set_size(nx, ny);
+   wind2d = u2d;
+   wind2d.set_constant(bad_data_double);
 
    //
    // Compute the wind direction
@@ -141,11 +147,14 @@ void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
    const int nx = wdir2d.nx();
    const int ny = wdir2d.ny();
 
+   mlog << Debug(3)
+        << "Rotating wind direction from grid-relative to earth-relative.\n";
+
    //
-   // Initialize
+   // Initialize by setting to u2d
    //
-   wdir2d_rot.clear();
-   wdir2d_rot.set_size(nx, ny);
+   wdir2d_rot = wdir2d;
+   wdir2d_rot.set_constant(bad_data_double);
 
    //
    // Rotate the wind direction
@@ -195,6 +204,9 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
+   mlog << Debug(3)
+        << "Rotating U and V wind components from grid-relative to earth-relative.\n";
+   
    //
    // Check that the dimensions match
    //
@@ -209,10 +221,10 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
    //
    // Initialize
    //
-   u2d_rot.clear();
-   v2d_rot.clear();
-   u2d_rot.set_size(nx, ny);
-   v2d_rot.set_size(nx, ny);
+   u2d_rot = u2d;
+   v2d_rot = v2d;
+   u2d_rot.set_constant(bad_data_double);
+   v2d_rot.set_constant(bad_data_double);
 
    //
    // Compute rotated U and V
