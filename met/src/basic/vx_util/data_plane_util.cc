@@ -168,7 +168,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
    mlog << Debug(3)
         << "Computing fractional coverage field using the " << t.get_str()
-        << "threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
+        << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
         << "(" << wdth*wdth << ") interpolation method.\n";
    
    // Check that width is set to 1 or greater

@@ -422,7 +422,7 @@ void process_ensemble() {
                        << "The valid time has changed, "
                        << unix_to_yyyymmdd_hhmmss(ens_valid_ut)
                        << " != " << unix_to_yyyymmdd_hhmmss(ens_dp.valid())
-                       << "in \"" << ens_file_list[j] << "\"\n\n";
+                       << " in \"" << ens_file_list[j] << "\"\n\n";
                }
             }
 
