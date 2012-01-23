@@ -126,6 +126,8 @@ class ConcatString {
 
       void add(const char *);
 
+      void add(const char);
+
       void add(const ConcatString &);
 
       void chomp();   //  removes possible trailing newline
@@ -152,6 +154,10 @@ class ConcatString {
       void elim_trailing_whitespace();
 
       int format(const char *format, ...);
+
+      void replace(const char * target, const char * replacement);   //  replace all occurences of target with replacement
+                                                                     //  if "replacement" is an environment variable, use 
+                                                                     //  it's value
 
 };
 

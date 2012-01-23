@@ -274,12 +274,12 @@ class Engine {
       // Data
       //
 
-      char fcst_var_str[max_str_len];
-      char obs_var_str[max_str_len];
-      char fcst_lvl_str[max_str_len];
-      char obs_lvl_str[max_str_len];
-      char fcst_unit_str[max_str_len];
-      char obs_unit_str[max_str_len];
+      ConcatString fcst_var_str;
+      ConcatString obs_var_str;
+      ConcatString fcst_lvl_str;
+      ConcatString obs_lvl_str;
+      ConcatString fcst_unit_str;
+      ConcatString obs_unit_str;
 
       int need_fcst_filter;
       int need_obs_filter;

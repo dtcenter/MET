@@ -229,39 +229,55 @@ int num_tokens(const char *test_str, const char *separator)
 //
 ////////////////////////////////////////////////////////////////////////
 
-void replace_string(const char *old_str, const char *new_str,
-                    const char *in_str, char *out_str) {
-   char *ptr;
-   const char *new_ptr;
-   char tmp_str[1024];
+void replace_string(const char * old_str, const char * new_str, const char * in_str, char * out_str)
 
-   //
-   // Initialize out_str to the contents of in_str
-   //
+{
+
+   char * ptr = (char *) 0;
+   const char * new_ptr = (const char *) 0;
+   char tmp_str[1024];
+   const int old_len = strlen(old_str);
+
+   cout << "replace_string()\n";
+   cout << "replace_string() -> old_str = \"" << old_str << "\"\n";
+   cout << "replace_string() -> new_str = \"" << new_str << "\"\n";
+   cout << "replace_string() ->  in_str = \"" <<  in_str << "\"\n";
+   // cout << "replace_string() -> out_str = \"" << out_str << "\"\n";
+   cout.flush();
+
+      //
+      // Initialize out_str to the contents of in_str
+      //
+
    strcpy(out_str, in_str);
 
-   //
-   // Check to see if old_str is defined as an environment variable.
-   // If so, use the value of the environment variable, if not, use the
-   // value of new_str.
-   //
-   if((new_ptr = getenv(old_str)) == NULL) new_ptr = new_str;
+      //
+      // Check to see if old_str is defined as an environment variable.
+      // If so, use the value of the environment variable, if not, use the
+      // value of new_str.
+      //
 
-   //
-   // Replace any instances of old_str with the contents of new_str
-   //
-   while((ptr = strstr(out_str, old_str)) != NULL) {
-
-      strcpy(tmp_str, ptr+strlen(old_str));
+   if ( (new_ptr = getenv(old_str)) == NULL )  new_ptr = new_str;
 
       //
-      // Replace the old_str with the contents of new_str and
-      // tack on the remaining portion of the string
+      // Replace any instances of old_str with the contents of new_str
       //
+
+   while ( (ptr = strstr(out_str, old_str)) != NULL )  {
+
+      strcpy(tmp_str, ptr + old_len);
+
+         //
+         // Replace the old_str with the contents of new_str and
+         // tack on the remaining portion of the string
+         //
+
       sprintf(ptr, "%s%s", new_ptr, tmp_str);
+
    } // end while
 
-   return;
+return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
