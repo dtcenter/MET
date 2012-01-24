@@ -223,6 +223,7 @@ mask_sid = "";
 //    UW_MEAN = Unweighted mean in the neighborhood
 //    DW_MEAN = Distance-weighted mean in the neighborhood
 //    LS_FIT  = Least-squares fit in the neighborhood
+//    BILIN   = Bilinear interpolation using the 4 closest points
 //
 // e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
 //

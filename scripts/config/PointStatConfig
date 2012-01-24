@@ -242,6 +242,7 @@ boot_seed = "1";
 //    UW_MEAN = Unweighted mean in the neighborhood
 //    DW_MEAN = Distance-weighted mean in the neighborhood
 //    LS_FIT  = Least-squares fit in the neighborhood
+//    BILIN   = Bilinear interpolation using the 4 closest points
 //
 // In all cases, vertical interpolation is performed in the natural log
 // of pressure of the levels above and below the observation.
