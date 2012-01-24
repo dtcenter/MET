@@ -206,11 +206,11 @@ void parse_sid_mask(const char *mask_sid_file, StringArray &mask_sid)
    mlog << Debug(4) << "parse_sid_mask() -> "
         << " parsing station ID mask file \"" << mask_sid_file << "\"\n";
 
+   // Check for an empty length string
+   if(strlen(mask_sid_file) == 0) return;
+        
    // Replace any instances of MET_BASE with it's expanded value
    tmp_file = replace_path(mask_sid_file);
-
-   // Check for an empty length string
-   if( tmp_file.empty() ) return;
 
    // Open the mask station id file specified
    in.open(tmp_file);
