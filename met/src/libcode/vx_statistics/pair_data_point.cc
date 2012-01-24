@@ -200,6 +200,10 @@ void VxPairDataPoint::init_from_scratch() {
    rej_mask     = (int ***) 0;
    rej_fcst     = (int ***) 0;
 
+   n_msg_typ    = 0;
+   n_mask       = 0;
+   n_interp     = 0;
+   
    clear();
 
    return;
