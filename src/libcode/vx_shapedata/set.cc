@@ -126,9 +126,8 @@ void FcstObsSet::add_fcst(int k) {
    if( has_fcst(k) ) return;
 
    if( n_fcst >= max_fcst_numbers ) {
-      mlog << Error
-           << "FcstObsSet::add_fcst(int) -> "
-	      << "too many fcst numbers!\n\n";
+      mlog << Error << "\nFcstObsSet::add_fcst(int) -> "
+           << "too many fcst numbers!\n\n";
 
       exit(1);
    }
@@ -145,9 +144,8 @@ void FcstObsSet::add_obs(int k) {
    if( has_obs(k) ) return;
 
    if( n_obs >= max_obs_numbers ) {
-      mlog << Error
-           << "FcstObsSet::add_obs(int) -> "
-	   << "too many obs numbers!\n\n";
+      mlog << Error << "\nFcstObsSet::add_obs(int) -> "
+           << "too many obs numbers!\n\n";
 
       exit(1);
    }
@@ -228,8 +226,7 @@ void SetCollection::add_pair(int fcst, int obs) {
    int j;
 
    if( n_sets >= max_fcst_obs_sets ) {
-      mlog << Error
-           << "SetCollection::add_pair(int, int) -> "
+      mlog << Error << "\nSetCollection::add_pair(int, int) -> "
            << "too many sets!\n\n";
 
       exit(1);

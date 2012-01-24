@@ -357,7 +357,7 @@ void mask_bad_data(DataPlane &dp, const DataPlane &dp_mask) {
    if(dp.nx() != dp_mask.nx() ||
       dp.ny() != dp_mask.ny() ) {
 
-      mlog << Error << "\n\nmask_bad_data() -> "
+      mlog << Error << "\nmask_bad_data() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }

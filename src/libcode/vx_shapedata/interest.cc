@@ -611,8 +611,7 @@ void get_percentiles(DistributionPercentiles &ptile,
    v = new double [n_values];
 
    if(!v) {
-      mlog << Error
-           << "get_percentiles() -> "
+      mlog << Error << "\nget_percentiles() -> "
            << "memory allocation error\n\n";
       exit(1);
    }

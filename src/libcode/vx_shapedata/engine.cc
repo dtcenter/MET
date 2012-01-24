@@ -156,8 +156,7 @@ Engine::~Engine() {
 
 Engine::Engine(const Engine &eng) {
 
-   mlog << Error
-        << "Engine::Engine(const Engine &) -> "
+   mlog << Error << "\nEngine::Engine(const Engine &) -> "
         << "should never be called!\n\n";
    exit(1);
 }
@@ -166,8 +165,7 @@ Engine::Engine(const Engine &eng) {
 
 Engine & Engine::operator=(const Engine & eng) {
 
-   mlog << Error
-        << "Engine::operator=(const Engine &) -> "
+   mlog << Error << "\nEngine::operator=(const Engine &) -> "
         << "should never be called\n\n";
    exit(1);
 }
@@ -236,8 +234,7 @@ void Engine::init_from_scratch() {
 
    if(!fcst_single || !obs_single || !pair ||
       !fcst_clus   || !obs_clus   || !pair_clus) {
-      mlog << Error
-          << "Engine::init_from_scratch() -> "
+      mlog << Error << "\nEngine::init_from_scratch() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -686,8 +683,7 @@ void Engine::do_matching() {
    if(!need_match) return;
 
    if(wconf.match_flag().ival() == 0) {
-      mlog << Warning
-           << "Engine::do_matching() -> "
+      mlog << Warning << "\nEngine::do_matching() -> "
            << "no matching requested in configuration file\n";
 
                                                     do_no_match();
@@ -699,8 +695,7 @@ void Engine::do_matching() {
    else if(wconf.match_flag().ival() == 3)        do_match_only();
 
    else {
-      mlog << Error
-           << "Engine::do_matching() -> "
+      mlog << Error << "\nEngine::do_matching() -> "
            << "invalid match_flag value specified.  match_flag must be "
            << "between 0 and 3.\n\n";
       exit(1);
@@ -744,8 +739,7 @@ void Engine::do_no_match() {
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
 
-      mlog << Error
-           << "Engine::do_no_match() -> "
+      mlog << Error << "\nEngine::do_no_match() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -758,8 +752,7 @@ void Engine::do_no_match() {
 
    if(!fcst_shape || !obs_shape) {
 
-      mlog << Error
-           << "Engine::do_no_match() -> "
+      mlog << Error << "\nEngine::do_no_match() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -809,8 +802,7 @@ void Engine::do_match_merge() {
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
 
-      mlog << Error
-           << "Engine::do_match_merge() -> "
+      mlog << Error << "\nEngine::do_match_merge() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -823,8 +815,7 @@ void Engine::do_match_merge() {
 
    if(!fcst_shape || !obs_shape) {
 
-      mlog << Error
-           << "Engine::do_match_merge() -> "
+      mlog << Error << "\nEngine::do_match_merge() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -916,8 +907,7 @@ void Engine::do_match_merge() {
    //
    if(collection.n_sets > ctable.n_entries()) {
 
-      mlog << Error
-           << "Engine::do_match_merge() -> "
+      mlog << Error << "\nEngine::do_match_merge() -> "
            << "not enough colors ... need at least " << (collection.n_sets)
            << "\n\n";
       exit(1);
@@ -977,8 +967,7 @@ void Engine::do_fcst_merge_thresh() {
 
    if(n_fcst >= max_singles) {
 
-      mlog << Error
-           << "Engine::do_fcst_merge_thresh() -> "
+      mlog << Error << "\nEngine::do_fcst_merge_thresh() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_fcst << "\n\n";
       exit(1);
@@ -1009,8 +998,7 @@ void Engine::do_fcst_merge_thresh() {
 
    if(!fcst_shape || !fcst_merge_shape) {
 
-      mlog << Error
-           << "Engine::do_fcst_merge_thresh() -> "
+      mlog << Error << "\nEngine::do_fcst_merge_thresh() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1108,8 +1096,7 @@ void Engine::do_obs_merge_thresh() {
 
    if(n_obs >= max_singles) {
 
-      mlog << Error
-           << "Engine::do_obs_merge_thresh() -> "
+      mlog << Error << "\nEngine::do_obs_merge_thresh() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_obs << "\n\n";
       exit(1);
@@ -1140,8 +1127,7 @@ void Engine::do_obs_merge_thresh() {
 
    if(!obs_shape || !obs_merge_shape) {
 
-      mlog << Error
-           << "Engine::do_obs_merge_thresh() -> "
+      mlog << Error << "\nEngine::do_obs_merge_thresh() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1235,8 +1221,7 @@ void Engine::do_fcst_merge_engine(const char *default_config,
    do_fcst_splitting();
 
    if(n_fcst >= max_singles) {
-      mlog << Error
-           << "Engine::do_fcst_merge_engine() -> "
+      mlog << Error << "\nEngine::do_fcst_merge_engine() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_fcst << "\n\n";
       exit(1);
@@ -1248,8 +1233,7 @@ void Engine::do_fcst_merge_engine(const char *default_config,
    fcst_engine = new Engine;
 
    if(!fcst_engine) {
-      mlog << Error
-           << "Engine::do_fcst_merge_engine() -> "
+      mlog << Error << "\nEngine::do_fcst_merge_engine() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1417,8 +1401,7 @@ void Engine::do_obs_merge_engine(const char *default_config,
 
    if(n_obs >= max_singles) {
 
-      mlog << Error
-           << "Engine::do_obs_merge_engine() -> "
+      mlog << Error << "\nEngine::do_obs_merge_engine() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_obs << "\n\n";
       exit(1);
@@ -1430,8 +1413,7 @@ void Engine::do_obs_merge_engine(const char *default_config,
    obs_engine = new Engine;
 
    if(!obs_engine) {
-      mlog << Error
-           << "Engine::do_obs_merge_engine() -> "
+      mlog << Error << "\nEngine::do_obs_merge_engine() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1601,8 +1583,7 @@ void Engine::do_match_fcst_merge() {
    do_obs_splitting();
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-      mlog << Error
-           << "Engine::do_match_fcst_merge() -> "
+      mlog << Error << "\nEngine::do_match_fcst_merge() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -1614,8 +1595,7 @@ void Engine::do_match_fcst_merge() {
    obs_shape = new ShapeData [n_obs];
 
    if(!fcst_shape || !obs_shape) {
-      mlog << Error
-           << "Engine::do_match_fcst_merge() -> "
+      mlog << Error << "\nEngine::do_match_fcst_merge() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1711,8 +1691,7 @@ void Engine::do_match_fcst_merge() {
    // Assign the colors
    //
    if(collection.n_sets > ctable.n_entries()) {
-      mlog << Error
-           << "Engine::do_match_fcst_merge() -> "
+      mlog << Error << "\nEngine::do_match_fcst_merge() -> "
            << "not enough colors ... need at least " << (collection.n_sets)
            << "\n\n";
       exit(1);
@@ -1770,8 +1749,7 @@ void Engine::do_match_only() {
    do_obs_splitting();
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-      mlog << Error
-           << "Engine::do_match_only() -> "
+      mlog << Error << "\nEngine::do_match_only() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -1783,8 +1761,7 @@ void Engine::do_match_only() {
    obs_shape = new ShapeData [n_obs];
 
    if(!fcst_shape || !obs_shape) {
-      mlog << Error
-           << "Engine::do_match_only() -> "
+      mlog << Error << "\nEngine::do_match_only() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1879,8 +1856,7 @@ void Engine::do_match_only() {
    // Assign the colors
    //
    if(collection.n_sets > ctable.n_entries()) {
-      mlog << Error
-           << "Engine::do_match_only() -> "
+      mlog << Error << "\nEngine::do_match_only() -> "
            << "not enough colors ... need at least " << (collection.n_sets)
            << "\n\n";
       exit(1);
@@ -2019,8 +1995,7 @@ void Engine::do_cluster_features() {
 
    if(!fcst_clus_shape || !obs_clus_shape) {
 
-      mlog << Error
-           << "Engine::do_cluster_features() -> "
+      mlog << Error << "\nEngine::do_cluster_features() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -2742,8 +2717,7 @@ void write_fcst_single(Engine &eng, const int n, const Grid &grid,
    char tmp_str[max_str_len];
 
    if(n >= eng.n_fcst) {
-      mlog << Error
-           << "write_fcst_single(const Engine &, int, "
+      mlog << Error << "\nwrite_fcst_single(const Engine &, int, "
            << "AsciiTable, int) -> "
            << n << " >= number of fcst, " << eng.n_fcst << "\n\n";
       exit(1);
@@ -2862,8 +2836,7 @@ void write_obs_single(Engine &eng, const int n, const Grid &grid,
    char tmp_str[max_str_len];
 
    if(n >= eng.n_obs) {
-      mlog << Error
-           << "write_obs_single(const Engine &, int, "
+      mlog << Error << "\nwrite_obs_single(const Engine &, int, "
            << "AsciiTable, int) -> "
            << n << " >= number of obs, " << eng.n_obs << "\n\n";
       exit(1);
@@ -2981,8 +2954,7 @@ void write_pair(Engine &eng, const int n_f, const int n_o,
    char tmp_str[max_str_len];
 
    if(n_f >= eng.n_fcst || n_o >= eng.n_obs) {
-      mlog << Error 
-           << "write_pair(const Engine &, int, int, "
+      mlog << Error << "\nwrite_pair(const Engine &, int, int, "
            << "AsciiTable &, const int) -> "
            << n_f << " >= number of fcst, " << eng.n_fcst << " or "
            << n_o << " >= number of obs, " << eng.n_obs << "\n\n";
@@ -3376,8 +3348,7 @@ void calc_fcst_clus_ch_mask(const Engine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_fcst_clus_split) {
-      mlog << Error
-           << "calc_fcst_clus_ch_mask -> "
+      mlog << Error << "\ncalc_fcst_clus_ch_mask -> "
            << "should not be called with need_fcst_clus_split set to true\n\n";
 
       exit(1);
@@ -3440,8 +3411,7 @@ void calc_obs_clus_ch_mask(const Engine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_obs_clus_split) {
-      mlog << Error
-           << "calc_obs_clus_ch_mask -> "
+      mlog << Error << "\ncalc_obs_clus_ch_mask -> "
            << "should not be called with need_obs_clus_split set to true\n\n";
       exit(1);
    }
