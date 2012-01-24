@@ -723,9 +723,9 @@ bool is_grid_relative(const GribRecord &r) {
       res_flag = r.gds->grid_type.stereographic.res_flag;
    }
    else {
-      cerr << "\n\nERROR: is_grid_relative() -> "
+      mlog << Error << "\n  is_grid_relative() -> "
            << "Unsupported grid type value: " << r.gds->type
-           << "\n\n" << flush;
+           << "\n\n";
       exit(1);
    }
 
@@ -747,8 +747,8 @@ int get_bit_from_octet(unsigned char u, int bit) {
 
    if((bit < 1) || (bit > 8)) {
 
-      cerr << "\n\nERROR: get_bit_from_octet() -> "
-           << "bad bit number\n\n" << flush;
+      mlog << Error << "\n  get_bit_from_octet() -> "
+           << "bad bit number\n\n";
       exit(1);
    }
 
