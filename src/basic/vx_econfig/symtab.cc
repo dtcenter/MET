@@ -1708,7 +1708,6 @@ while ( pos < v.length() )  {
          s.push(a);
          break;
 
-
             //
             //  prec = 4;
             //
@@ -1720,10 +1719,6 @@ while ( pos < v.length() )  {
          a.prec = 4;
          s.push(a);
          break;
-
-         break;
-
-
 
       default:
          mlog << Error << "\n  SymbolTable::algebraic_dump_icv(ostream &) const -> "
@@ -1777,7 +1772,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const SymbolTableEntry * const SymbolTable::entry(int k) const
+const SymbolTableEntry * SymbolTable::entry(int k) const
 
 {
 

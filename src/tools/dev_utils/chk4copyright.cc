@@ -413,7 +413,6 @@ void process_directory(const char * dir_name)
 int get_line(int & fd, ConcatString & s)
 {
    char buf[2];
-   int n_bytes_read;
    int n_bytes_to_read = 1;
 
    memset(buf, 0, sizeof(buf));
@@ -423,7 +422,7 @@ int get_line(int & fd, ConcatString & s)
       // is not a newline, then add the character read in to the
       // line.
       //
-   while ((n_bytes_read = read(fd, buf, n_bytes_to_read)) > 0)
+   while (read(fd, buf, n_bytes_to_read) > 0)
    {
       if (buf[0] == '\n')
          return (1);

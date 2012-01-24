@@ -949,12 +949,6 @@ for (j=0; j<n; ++j)  {
 
 }
 
-out << "else {\n"
-    << "\n"
-    << "   " << "return ( false );   //  this final \"else\" clause isn't strictly needed\n"
-    << "\n"
-    << "}\n\n";
-
 out << "   //\n"
     << "   //  nope\n"
     << "   //\n"

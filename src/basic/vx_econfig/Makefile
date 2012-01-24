@@ -167,7 +167,7 @@ lex.econfig.cc: econfig.l econfig.tab.o icode.o symtab.o machine.o
 	rm -f temp
 
 lex.econfig.o: lex.econfig.cc
-	$(CXX) lex.econfig.cc          -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+	$(CXX) lex.econfig.cc          -c $(CXX_FLAGS) -I$(MET_INC_DIR) > /dev/null 2>&1
 
 resulttype_to_string.o: resulttype_to_string.h resulttype_to_string.cc
 	$(CXX) resulttype_to_string.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)

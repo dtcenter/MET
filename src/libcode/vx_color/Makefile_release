@@ -54,10 +54,10 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 cfile.tab.o: cfile.tab.cc
-	$(CXX) cfile.tab.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) cfile.tab.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
 
 lex.color.o: lex.color.cc
-	$(CXX) lex.color.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) lex.color.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
 
 color.o: color.cc
 	$(CXX) color.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)

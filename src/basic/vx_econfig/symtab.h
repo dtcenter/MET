@@ -199,7 +199,7 @@ class SymbolTable {
 
       SymbolTableEntry * find(const char *) const;
 
-      const SymbolTableEntry * const entry(int) const;
+      const SymbolTableEntry * entry(int) const;
 
       int n_entries() const;
 
