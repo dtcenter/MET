@@ -254,7 +254,7 @@ double interp_ls_fit(const DataPlane &dp, int x_ll, int y_ll, int wdth,
    double u, v, z;
 
    if(N < 2) {
-      mlog << Error << "\n\ninterp_ls_fit() -> "
+      mlog << Error << "\ninterp_ls_fit() -> "
            << "the interpolation width (" << N
            << ") must be set >= 2\n\n";
 
@@ -407,7 +407,7 @@ double compute_horz_interp(const DataPlane &dp,
          break;
 
       default:
-         mlog << Error << "\n\ncompute_horz_interp() -> "
+         mlog << Error << "\ncompute_horz_interp() -> "
               << "unexpected interpolation method encountered: "
               << mthd << "\n\n";
          exit(1);
@@ -430,7 +430,7 @@ double compute_vert_pinterp(double v1, double prs1,
    double v_interp;
 
    if(prs1 <= 0.0 || prs2 <= 0.0 || to_prs <= 0.0) {
-      mlog << Error << "\n\ncompute_vert_pinterp() -> "
+      mlog << Error << "\ncompute_vert_pinterp() -> "
            << "pressure shouldn't be <= zero!\n\n";
       exit(1);
    }
@@ -438,10 +438,10 @@ double compute_vert_pinterp(double v1, double prs1,
    // Check that the to_prs falls between the limits
    if( !(to_prs >= prs1 && to_prs <= prs2) &&
        !(to_prs <= prs1 && to_prs >= prs2) ) {
-      mlog << Warning << "compute_vert_pinterp() -> "
+      mlog << Warning << "\ncompute_vert_pinterp() -> "
            << "the interpolation pressure, " << to_prs
            << ", should fall between the pressure limits, "
-           << prs1 << " and " << prs2 << "\n";
+           << prs1 << " and " << prs2 << "\n\n";
    }
 
    v_interp = v1 + ((v2-v1)*log(prs1/to_prs)/log(prs1/prs2));
@@ -462,7 +462,7 @@ double compute_vert_zinterp(double v1, double lvl1,
    double d1, d2, v_interp;
 
    if(lvl1 <= 0.0 || lvl2 <= 0.0 || to_lvl <= 0.0) {
-      mlog << Error << "\n\ncompute_vert_zinterp() -> "
+      mlog << Error << "\ncompute_vert_zinterp() -> "
            << "level shouldn't be <= zero!\n\n";
       exit(1);
    }
@@ -470,10 +470,10 @@ double compute_vert_zinterp(double v1, double lvl1,
    // Check that the to_lvl falls between the limits
    if( !(to_lvl >= lvl1 && to_lvl <= lvl2) &&
        !(to_lvl <= lvl1 && to_lvl >= lvl2) ) {
-      mlog << Warning << "compute_vert_zinterp() -> "
+      mlog << Warning << "\ncompute_vert_zinterp() -> "
            << "the interpolation level, " << to_lvl
            << ", should fall between the level limits, "
-           << lvl1 << " and " << lvl2 << "\n";
+           << lvl1 << " and " << lvl2 << "\n\n";
    }
 
    d1 = abs(lvl1 - to_lvl);

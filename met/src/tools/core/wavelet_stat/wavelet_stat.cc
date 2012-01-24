@@ -678,7 +678,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
       if(!x_ll_var->set_cur(i) ||
          !x_ll_var->put(&x, 1)) {
 
-         mlog << Error << "\n\nsetup_nc_file() -> "
+         mlog << Error << "\nsetup_nc_file() -> "
               << "error with the x_ll-var->put"
               << "\n\n";
          exit(1);
@@ -688,7 +688,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
       if(!y_ll_var->set_cur(i) ||
          !y_ll_var->put(&y, 1)) {
 
-         mlog << Error << "\n\nsetup_nc_file() -> "
+         mlog << Error << "\nsetup_nc_file() -> "
               << "error with the y_ll-var->put"
               << "\n\n";
          exit(1);

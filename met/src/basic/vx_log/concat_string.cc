@@ -702,7 +702,7 @@ status = vsprintf(s, fmt, vl);
 
 if( status >= Nalloc - 2 ){
 
-   mlog << Error << "\n ConcatString::format() -> overwrote buffer.\n\n";
+   mlog << Error << "\nConcatString::format() -> overwrote buffer.\n\n";
 
    exit(1);
 

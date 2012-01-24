@@ -152,7 +152,7 @@ bool check_reg_exp(const char *reg_exp_str, const char *test_str)
    regex_t *preg = &buffer;
 
    if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
-      mlog << Error << "\n\tcheck_reg_exp(char *, char *) -> "
+      mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
            << "regcomp error for \""
            << reg_exp_str << "\" and \"" << test_str << "\"\n\n";
 
