@@ -911,7 +911,6 @@ void process_grid_vx() {
    double t;
    DataPlane *fcst_dp, *fcst_dp_smooth;
    DataPlane  obs_dp,   obs_dp_smooth;
-   unixtime valid_ut;
    PairDataEnsemble pd;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1009,14 +1008,6 @@ void process_grid_vx() {
 
       // Read the observation file
       for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
-
-         // Get the valid time to be extracted
-         if(obs_valid_beg_ut == obs_valid_end_ut) {
-            valid_ut = obs_valid_beg_ut;
-         }
-         else {
-            valid_ut = (unixtime) 0;
-         }
 
          // Deallocate the data file pointer, if necessary
          if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
