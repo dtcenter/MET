@@ -34,8 +34,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char title_string  [] = "TITLE";
-
 static const char target_string [] = "ON PRES LEVELS";
 
 

@@ -201,7 +201,7 @@ if ( Hemisphere == 'N' )  grid = new Grid(wwmca_north_data);
 else                      grid = new Grid(wwmca_south_data);
 
 int fd = -1;
-int n_read, bytes;
+int bytes;
 
 if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
