@@ -799,8 +799,6 @@ int CommandLine::length(int k) const
 
 return ( args.length(k) );
 
-return ( 0 );
-
 }
 
 
@@ -937,11 +935,11 @@ while ( 1 )  {
 
    k = pos + count;
 
-   if ( k >= args.n_elements() )  return ( count );
+   if ( k >= args.n_elements() )  break;
 
    c = args[k];
 
-   if ( is_switch(c) )  return ( count );
+   if ( is_switch(c) )  break;
 
    a.add(c);
 
