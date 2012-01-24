@@ -47,14 +47,14 @@ bool get_var_att(NcVar *var, const ConcatString &att_name,
 
 bool get_var_units(NcVar *var, ConcatString &att_val) {
   
-   return(get_var_att(var, "units_att_name", att_val));
+   return(get_var_att(var, units_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_var_level(NcVar *var, ConcatString &att_val) {
 
-   return(get_var_att(var, "level_att_name", att_val));
+   return(get_var_att(var, level_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////

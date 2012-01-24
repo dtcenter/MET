@@ -214,7 +214,6 @@ void process_directory(const char * dir_name)
    ConcatString command;
    int fd;
    int pid;
-   int status;
    bool notice_found = false;
 
       //
@@ -368,7 +367,7 @@ void process_directory(const char * dir_name)
                   // to a temporary file
                   //
                command << cs_erase << "cp " << copyright_notice_filename << ' ' << tmp_filename;
-               status = system(command);
+               system(command);
 
                command << cs_erase << "cp " << copyright_notice_filename << ' ' << " tmpfile";
 
@@ -377,20 +376,20 @@ void process_directory(const char * dir_name)
                   // to the temporary file
                   //
                command << cs_erase << "cat " << new_filename << " >> " << tmp_filename;
-               status = system(command);
+               system(command);
 
                   //
                   // create the command to copy the temporary file
                   // back to the name of the .h or .cc file
                   //
                command << cs_erase << "cp " << tmp_filename  << ' ' << new_filename;
-               status = system(command);
+               system(command);
 
                   //
                   // remove the temporary file
                   //
                command << cs_erase << "rm " << tmp_filename;
-               status = system(command);
+               system(command);
             }
 
          }  // end of if this is a .h or .cc file

@@ -425,6 +425,14 @@ switch ( var->type() )  {
 }   //  switch
 
 
+if ( !status )  {
+
+   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
+        << " bad status for var->get()\n\n";
+
+   exit ( 1 );
+}
+
 
    //
    //  done

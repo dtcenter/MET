@@ -514,9 +514,7 @@ double lc_der_func(double lat, double Cone)
 
 {
 
-double a, r;
-
-r = lc_func(lat, Cone);
+double a;
 
 a = -(Cone/cosd(lat))*lc_func(lat, Cone);
 

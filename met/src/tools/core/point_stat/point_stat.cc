@@ -606,9 +606,8 @@ void process_fcst_climo_files() {
       // Dump out the number of levels found
       mlog << Debug(2)
            << "For " << conf_info.vx_pd[i].fcst_info->magic_str()
-           << " found " << fcst_dpa.n_planes()
-           << " forecast levels and " << climo_dpa.n_planes()
-           << " climatology levels.\n";
+           << " found " << n_fcst << " forecast levels and "
+           << n_climo << " climatology levels.\n";
 
    } // end for i
 

@@ -48,8 +48,6 @@ static const char *program_name = "pbtime";
 
 // Constants used to interface to Fortran subroutines
 
-// Missing value for BUFR data
-static const double r8bfms      = 1.0E10;
 // Maximum number of BUFR parameters
 static const int mxr8pm         = 10;
 // Maximum number of BUFR levels
@@ -58,13 +56,6 @@ static const int mxr8lv         = 255;
 static const int mxr8vn         = 10;
 // Maximum number of BUFR variable types
 static const int mxr8vt         = 6;
-
-// Length of the "YYYYMMDD_HHMMSS" string
-static const int strl_len       = 16;
-// Observation header length
-static const int hdr_arr_len    = 3;
-// Observation values length
-static const int obs_arr_len    = 5;
 
 // File unit number for opening the PrepBufr file
 static int file_unit            = 11;

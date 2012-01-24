@@ -50,7 +50,6 @@ bool is_bufr_file(const char * filename)
 
 {
 
-int n_read;
 int fd = -1;
 char buf[buf_size];
 
@@ -72,7 +71,7 @@ if ( (fd = open(filename, O_RDONLY)) < 0 )  {
    //  read first few bytes
    //
 
-if ( (n_read = read(fd, buf, buf_size)) != buf_size )  {
+if ( read(fd, buf, buf_size) != buf_size )  {
 
    mlog << Error << "\n  is_bufr_file() -> unable to read header from input file \"" << filename << "\"\n\n";
 
