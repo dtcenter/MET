@@ -265,7 +265,7 @@ switch ( Orientation )  {
    case OrientationLandscape:  orientation_string = "Landscape";  break;
    
    default:
-      cerr << "\n\n  void PSfile::do_prolog() -> bad document orientation ... "
+      mlog << Error << "\n  void PSfile::do_prolog() -> bad document orientation ... "
            << documentorientation_to_string(Orientation) << "\n\n";
       exit ( 1 );
       break;
@@ -278,7 +278,7 @@ switch ( Media )  {
    case MediaA4:      media_string = "A4";      break;
 
    default:
-      cerr << "\n\n  void PSfile::do_prolog() -> bad document media ... "
+      mlog << Error << "\n  void PSfile::do_prolog() -> bad document media ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
       break;
@@ -1047,7 +1047,7 @@ switch ( Media )  {
       break;
 
    default:
-      cerr << "\n\n  PSfile::set_media(DocumentMedia) -> bad media size ... "
+      mlog << Error << "\n  PSfile::set_media(DocumentMedia) -> bad media size ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
       break;
