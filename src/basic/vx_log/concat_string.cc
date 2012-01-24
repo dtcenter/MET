@@ -702,7 +702,7 @@ status = vsprintf(s, fmt, vl);
 
 if( status >= Nalloc - 2 ){
 
-   cerr << "ERROR: ConcatString::format() overwrote buffer\n";
+   mlog << Error << "\n ConcatString::format() -> overwrote buffer.\n\n";
 
    exit(1);
 
@@ -724,7 +724,7 @@ void ConcatString::replace(const char * target, const char * replacement)
 
 if ( empty() )  {
 
-   cerr << "\n\n  ConcatString::replace(const char * target, const char * replacement) -> empty string!\n\n";
+   mlog << Error << "\n  ConcatString::replace(const char * target, const char * replacement) -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -732,7 +732,7 @@ if ( empty() )  {
 
 if ( ::is_empty(target) || ::is_empty(replacement) )  {
 
-   cerr << "\n\n  ConcatString::replace(const char * target, const char * replacement) -> target and/or replacement string is empty\n\n";
+   mlog << Error << "\n  ConcatString::replace(const char * target, const char * replacement) -> target and/or replacement string is empty\n\n";
 
    exit ( 1 );
 
