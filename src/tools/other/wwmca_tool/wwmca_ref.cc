@@ -1299,7 +1299,6 @@ if ( N != 7 )  {
 }
 
 int j;
-int Nx, Ny;
 double lat_ll, lon_ll, lat_ur, lon_ur;
 
 
@@ -1308,9 +1307,6 @@ j = 1;
    //
    //  get info from the strings
    //
-
-Nx     = atoi(grid_strings[j++]);
-Ny     = atoi(grid_strings[j++]);
 
 lat_ll = atof(grid_strings[j++]);
 lon_ll = atof(grid_strings[j++]);
