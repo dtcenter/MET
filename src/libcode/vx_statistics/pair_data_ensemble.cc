@@ -324,6 +324,10 @@ void VxPairDataEnsemble::init_from_scratch() {
    obs_info     = (VarInfoGrib *) 0;
    pd           = (PairDataEnsemble ***) 0;
 
+   n_msg_typ    = 0;
+   n_mask       = 0;
+   n_interp     = 0;
+   
    clear();
 
    return;
