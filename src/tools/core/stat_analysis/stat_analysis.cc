@@ -84,7 +84,7 @@ static void set_verbosity(int);
 int main(int argc, char * argv []) {
    int i, n;
    Result r;
-   char default_conf_file[PATH_MAX];
+   ConcatString default_conf_file;
 
    //
    // Set handler to be called for memory allocation error
@@ -105,7 +105,7 @@ int main(int argc, char * argv []) {
       //
       // Read the default config file first and then read the user's
       //
-      replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+      default_conf_file = replace_path(default_config_filename);
       mlog << Debug(1) << "Reading Default Config: " << default_conf_file << "\n";
       conf.read(default_conf_file);
       mlog << Debug(1) << "Reading User Config: " << config_file << "\n";
@@ -431,7 +431,7 @@ void set_verbosity(int i) {
 void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
    stat_analysis_Conf go_conf;
-   char go_conf_file[PATH_MAX];
+   ConcatString go_conf_file;
 
    //
    // Initialize
@@ -461,8 +461,7 @@ void process_search_dirs() {
       // Read in the STATAnalysis config file which defines
       // the GO Index.
       //
-      replace_string(met_base_str, MET_BASE,
-                     go_index_config_file, go_conf_file);
+      go_conf_file = replace_path(go_index_config_file);
       go_conf.read(go_conf_file);
 
       //

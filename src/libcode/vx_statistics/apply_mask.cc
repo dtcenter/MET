@@ -80,8 +80,13 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
-                     DataPlane &mask_dp, ConcatString &mask_name) {
-   char mask_poly_path[PATH_MAX], file_name[PATH_MAX];
+                     DataPlane &mask_dp, ConcatString &mask_name)
+
+{
+
+   ConcatString s;
+   char mask_poly_path[PATH_MAX];
+   char file_name[PATH_MAX];
    char magic_str[PATH_MAX], thresh_str[PATH_MAX];
    SingleThresh st;
    char *ptr;
@@ -98,7 +103,8 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    VarInfo *info = (VarInfo *) 0;
 
    // Replace any instances of MET_BASE with it's expanded value
-   replace_string(met_base_str, MET_BASE, mask_poly_str, mask_poly_path);
+   s = replace_path(mask_poly_str);
+   strncpy(mask_poly_path, s, sizeof(mask_poly_path) - 1);
 
    // Store the masking file name
    if((ptr = strtok(mask_poly_path, " ")) == NULL) {
@@ -189,18 +195,22 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void parse_sid_mask(const char *mask_sid_file, StringArray &mask_sid) {
+void parse_sid_mask(const char *mask_sid_file, StringArray &mask_sid)
+
+{
+
    ifstream in;
-   char tmp_file[PATH_MAX], sid_str[PATH_MAX];
+   ConcatString tmp_file;
+   char sid_str[PATH_MAX];
 
    mlog << Debug(4) << "parse_sid_mask() -> "
         << " parsing station ID mask file \"" << mask_sid_file << "\"\n";
 
    // Replace any instances of MET_BASE with it's expanded value
-   replace_string(met_base_str, MET_BASE, mask_sid_file, tmp_file);
+   tmp_file = replace_path(mask_sid_file);
 
    // Check for an empty length string
-   if(strlen(tmp_file) == 0) return;
+   if( tmp_file.empty() ) return;
 
    // Open the mask station id file specified
    in.open(tmp_file);

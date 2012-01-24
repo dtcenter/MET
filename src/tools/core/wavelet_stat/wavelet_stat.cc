@@ -141,16 +141,18 @@ int main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+void process_command_line(int argc, char **argv)
+
+{
+
    CommandLine cline;
-   char tmp_str[PATH_MAX];
+   ConcatString path;
    GrdFileType ftype, otype;
    ConcatString fcst_grid_info, obs_grid_info;
-   char default_config_file[PATH_MAX];
+   ConcatString default_config_file;
 
    // Set the default output directory
-   replace_string(met_base_str, MET_BASE, default_out_dir, tmp_str);
-   out_dir << tmp_str;
+   out_dir = replace_path(default_out_dir);
 
    //
    // check for zero arguments
@@ -235,8 +237,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Create the default config file name
-   replace_string(met_base_str, MET_BASE,
-                  default_config_filename, default_config_file);
+   default_config_file = replace_path(default_config_filename);
 
    // List the config files
    mlog << Debug(1)
@@ -249,9 +250,7 @@ void process_command_line(int argc, char **argv) {
                          otype, obs_valid_ut, obs_lead_sec);
 
    // Set the MET data directory
-   replace_string(met_base_str, MET_BASE, conf_info.conf.met_data_dir().sval(),
-                  tmp_str);
-   met_data_dir = tmp_str;
+   met_data_dir = replace_path(conf_info.conf.met_data_dir().sval());
 
    // Set the model name
    shc.set_model(conf_info.conf.model().sval());
@@ -1797,7 +1796,8 @@ void plot_ps_raw(const DataPlane &fcst_dp,
                  const DataPlane &obs_dp_fill,
                  int i_gc) {
    ConcatString label;
-   char tmp_str[PATH_MAX];
+   ConcatString tmp_str;
+   char junk[1024];
    char fcst_str[max_str_len], fcst_short_str[max_str_len];
    char obs_str[max_str_len], obs_short_str[max_str_len];
    double v_tab, h_tab_a, h_tab_b;
@@ -1828,24 +1828,21 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    // Load the raw forecast color table
    //
-   replace_string(met_base_str, MET_BASE,
-                  conf_info.conf.fcst_raw_color_table().sval(), tmp_str);
+   tmp_str = replace_path(conf_info.conf.fcst_raw_color_table().sval());
    mlog << Debug(2) << "Loading forecast raw color table: " << tmp_str << "\n";
    fcst_ct.read(tmp_str);
 
    //
    // Load the raw observation color table
    //
-   replace_string(met_base_str, MET_BASE,
-                  conf_info.conf.obs_raw_color_table().sval(), tmp_str);
+   tmp_str = replace_path(conf_info.conf.obs_raw_color_table().sval());
    mlog << Debug(2) << "Loading observation raw color table: " << tmp_str << "\n";
    obs_ct.read(tmp_str);
 
    //
    // Load the wavelet color table
    //
-   replace_string(met_base_str, MET_BASE,
-                  conf_info.conf.wvlt_color_table().sval(), tmp_str);
+   tmp_str = replace_path(conf_info.conf.wvlt_color_table().sval());
    mlog << Debug(2) << "Loading wavelet color table: " << tmp_str << "\n";
    wvlt_ct.read(tmp_str);
 
@@ -1927,7 +1924,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
    ps_out->pagenumber(n_page);
 
-   sprintf(tmp_str, "Wavelet-Stat: %s vs %s ",
+   snprintf(junk, sizeof(junk), "Wavelet-Stat: %s vs %s ",
            conf_info.fcst_info[i_gc]->magic_str().text(),
            conf_info.obs_info[i_gc]->magic_str().text());
 
@@ -2521,7 +2518,7 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
      //
      // Add text
      //
-     sprintf(label, "%.1f", v);
+     snprintf(label, sizeof(label), "%.1f", v);
      p->write_centered_text(2, 1,  x_ll + 0.5*bar_width,
                             y_ll + 0.5*bar_height, 0.5, 0.5, label);
 

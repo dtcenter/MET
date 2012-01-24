@@ -99,7 +99,7 @@ static void set_verbosity(const StringArray &);
 int main(int argc, char *argv[]) {
    CommandLine cline;
    ConcatString nc_file, ps_file;
-   char met_data_dir[PATH_MAX];
+   ConcatString met_data_dir;
    char hdr_typ_str[max_str_len];
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
    //
    // Initialize the data directory using MET_BASE
    //
-   replace_string(met_base_str, MET_BASE, default_met_data_dir, met_data_dir);
+   met_data_dir = replace_path(default_met_data_dir);
 
    //
    // parse the command line into tokens

@@ -18,6 +18,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "concat_string.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern void check_met_version(const char *);
 
 extern bool match_met_version(const char *);
@@ -32,11 +38,10 @@ extern bool check_reg_exp(const char *, const char *);
 
 extern int num_tokens(const char *, const char *);
 
-extern void replace_string(const char *old_str, const char *new_str, 
-                           const char *in_str, char *out_str);
-
 extern bool has_prefix(const char **prefix_list, int n_prefix,
                        const char *str);
+
+extern ConcatString replace_path(const char * path);
 
 
 ////////////////////////////////////////////////////////////////////////

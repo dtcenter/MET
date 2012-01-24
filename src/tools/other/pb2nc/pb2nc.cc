@@ -331,8 +331,8 @@ void initialize() {
 
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
-   char tmp_str[max_str_len], tmp2_str[max_str_len];
-   char default_conf_file[PATH_MAX];
+   ConcatString tmp_str, tmp2_str;
+   ConcatString path;
 
    //
    // check for zero arguments
@@ -390,10 +390,11 @@ void process_command_line(int argc, char **argv) {
    //
    // Read the default config file first and then read the user's
    //
-   replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
-   mlog << Debug(1) << "Reading Default Config File:\t" << default_conf_file
+
+   path = replace_path(default_config_filename);
+   mlog << Debug(1) << "Reading Default Config File:\t" << path
         << "\n";
-   conf.read(default_conf_file);
+   conf.read(path);
    mlog << Debug(1) << "Reading User Config File:\t" << config_file
         << "\n";
    conf.read(config_file);
@@ -405,8 +406,8 @@ void process_command_line(int argc, char **argv) {
       valid_end_ut != (unixtime) 0 &&
       valid_beg_ut > valid_end_ut) {
 
-      unix_to_yyyymmdd_hhmmss(valid_beg_ut, tmp_str);
-      unix_to_yyyymmdd_hhmmss(valid_end_ut, tmp2_str);
+      tmp_str  = unix_to_yyyymmdd_hhmmss(valid_beg_ut);
+      tmp2_str = unix_to_yyyymmdd_hhmmss(valid_end_ut);
 
       mlog << Error << "\n  process_command_line() -> "
            << "the ending time (" << tmp2_str
@@ -428,7 +429,7 @@ void process_command_line(int argc, char **argv) {
 
 void process_config() {
    int i, n;
-   char tmp_str[PATH_MAX];
+   ConcatString tmp_str;
 
    //
    // Conf: version
@@ -481,8 +482,7 @@ void process_config() {
    // Replace any instances of MET_BASE in mask_poly with it's
    // expanded value
    //
-   replace_string(met_base_str, MET_BASE,
-                  conf.mask_poly().sval(), tmp_str);
+   tmp_str = replace_path(conf.mask_poly().sval());
 
    //
    // Process the mask_poly string as a file.

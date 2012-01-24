@@ -281,9 +281,7 @@ void process_command_line(int argc, char **argv)
    VarInfoFactory vfactory;
 
    // Set the default output directory
-   s = default_out_dir;
-   s.replace(met_base_str, MET_BASE);
-   out_dir << s;
+   out_dir = replace_path(default_out_dir);
 
    //
    // check for zero arguments
@@ -353,9 +351,7 @@ void process_command_line(int argc, char **argv)
    //
    // Read the default config file first and then read the user's match config file
    //
-   s = default_config_filename;
-   s.replace(met_base_str, MET_BASE);
-   default_config_file = s;
+   default_config_file = replace_path(default_config_filename);
 
    // List the config files
    mlog << Debug(1)
@@ -911,13 +907,11 @@ void check_engine_config()
    }
 
    // Get the MET Data directory from which to read the plotting data files
-   met_data_dir = engine.wconf.met_data_dir().sval();
-   met_data_dir.replace(met_base_str, MET_BASE);
+   met_data_dir = replace_path(engine.wconf.met_data_dir().sval());
 
    // Check that fcst_raw_color_table can be read
    ct_test.clear();
-   s = engine.wconf.fcst_raw_color_table().sval();
-   s.replace(met_base_str, MET_BASE);
+   s = replace_path(engine.wconf.fcst_raw_color_table().sval());
    if(!ct_test.read(s)) {
       mlog << Error << "\n  check_engine_config() -> "
            << "cannot read fcst_raw_color_table file ("
@@ -928,8 +922,7 @@ void check_engine_config()
 
    // Check that obs_raw_color_table can be read
    ct_test.clear();
-   s = engine.wconf.obs_raw_color_table().sval();
-   s.replace(met_base_str, MET_BASE);
+   s = replace_path(engine.wconf.obs_raw_color_table().sval());
    if(!ct_test.read(s)) {
       mlog << Error << "\n  check_engine_config() -> "
            << "cannot read obs_raw_color_table file ("
@@ -948,8 +941,7 @@ void check_engine_config()
 
    // Check that mode_color_table can be read
    ct_test.clear();
-   s = engine.wconf.mode_color_table().sval();
-   s.replace(met_base_str, MET_BASE);
+   s = replace_path(engine.wconf.mode_color_table().sval());
    if(!ct_test.read(s)) {
       mlog << Error << "\n  check_engine_config() -> "
            << "cannot read mode_color_table file ("
@@ -1089,16 +1081,14 @@ void plot_engine() {
    //
    // Load the raw forecast color table
    //
-   s = engine.wconf.fcst_raw_color_table().sval();
-   s.replace(met_base_str, MET_BASE);
+   s = replace_path(engine.wconf.fcst_raw_color_table().sval());
    mlog << Debug(1) << "Loading forecast raw color table: " << s << "\n";
    fcst_ct.read(s);
 
    //
    // Load the raw observation color table
    //
-   s = engine.wconf.obs_raw_color_table().sval();
-   s.replace(met_base_str, MET_BASE);
+   s = replace_path(engine.wconf.obs_raw_color_table().sval());
    mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
    obs_ct.read(s);
 

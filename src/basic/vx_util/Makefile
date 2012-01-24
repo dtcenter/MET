@@ -186,7 +186,7 @@ roman_numeral.o: roman_numeral.cc
 	$(CXX) roman_numeral.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 string_fxns.o: string_fxns.cc
-	$(CXX) string_fxns.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) string_fxns.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\"
 
 substring.o: substring.cc
 	$(CXX) substring.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
