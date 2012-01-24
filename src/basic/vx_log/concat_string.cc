@@ -722,13 +722,8 @@ void ConcatString::replace(const char * target, const char * replacement)
 
 {
 
-if ( empty() )  {
+if ( empty() )  return;
 
-   mlog << Error << "\n  ConcatString::replace(const char * target, const char * replacement) -> empty string!\n\n";
-
-   exit ( 1 );
-
-}
 
 if ( ::is_empty(target) || ::is_empty(replacement) )  {
 
