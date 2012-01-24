@@ -3,6 +3,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char copyright_filename [] = "src/tools/dev_utils/copyright_notice.txt";   //  relative to MET_BASE_DIR
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 using namespace std;
 
 #include <iostream>
@@ -23,6 +29,12 @@ using namespace std;
 
 
 extern const char * program_name;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void insert_copyright(ofstream &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -491,6 +503,8 @@ if ( !out )  {
 
 }
 
+insert_copyright(out);
+
 mlog << Debug(1) << program_name << ":  Generating header file \"" << output_filename << "\"\n";
 
 out << "\n\n"
@@ -845,6 +859,8 @@ if ( !out )  {
    exit ( 1 );
 
 }
+
+insert_copyright(out);
 
 mlog << Debug(1) << program_name << ":  Generating source file \"" << output_filename << "\"\n";
 
@@ -1656,6 +1672,51 @@ out << "\n"
     << "\n\n"
     << sep;
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void insert_copyright(ofstream & out)
+
+{
+
+ifstream in;
+char c;
+char path[1024];
+
+snprintf(path, sizeof(path), "%s/%s", MET_BASE_DIR, copyright_filename);
+
+in.open(path);
+
+if ( !in )  {
+
+   cerr << "\n\n  insert_copyright(ofstream &) -> unable to open copyright file \""
+        << path << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+while ( in.get(c) )  out.put(c);
+
+   //
+   //  done
+   //
+
+in.close();
 
 return;
 
