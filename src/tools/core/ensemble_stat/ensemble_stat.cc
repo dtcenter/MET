@@ -1000,8 +1000,10 @@ void process_grid_vx() {
          }
       } // end for j
 
-      // Create a NetCDF file to store the verification matched pairs
-      if(nc_out == (NcFile *) 0)
+      // If requested in the config file, create a NetCDF file to store
+      // the verification matched pairs
+      if(conf_info.conf.output_flag(i_nc_orank).ival() &&
+         nc_out == (NcFile *) 0)
          setup_nc_file(fcst_dp[j].valid(), fcst_dp[j].lead(),
                        "_orank.nc");
 
