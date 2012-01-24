@@ -107,7 +107,7 @@ char buf[buf_size];
 
 if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
-   mlog << Error << "\n  check_grib() -> unable to open input file \"" << filename << "\"\n\n";
+   mlog << Error << "\ncheck_grib() -> unable to open input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -121,7 +121,7 @@ if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
 if ( read(fd, buf, buf_size) != buf_size )  {
 
-   mlog << Error << "\n  check_grib() -> unable to read header from input file \"" << filename << "\"\n\n";
+   mlog << Error << "\ncheck_grib() -> unable to read header from input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 

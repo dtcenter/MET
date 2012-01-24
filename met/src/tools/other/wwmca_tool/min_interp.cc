@@ -165,7 +165,7 @@ InterpolationValue Min_Interp::operator()(double x, double y) const
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Min_Interp::operator()(double x, double y) const -> no data!\n\n";
+   mlog << Error << "\nMin_Interp::operator()(double x, double y) const -> no data!\n\n";
 
    exit ( 1 );
 

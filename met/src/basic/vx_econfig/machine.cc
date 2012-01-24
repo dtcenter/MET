@@ -155,7 +155,7 @@ IcodeCell Machine::pop()
 
 if ( depth() == 0 )  {
 
-   mlog << Error << "\n  Machine::pop() -> stack empty!\n\n";
+   mlog << Error << "\nMachine::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 
@@ -252,7 +252,7 @@ while ( pos < v.length() )  {
          if ( e )   {
             run ( *e );
          } else {
-            mlog << Error << "\n  Machine::run(const IcodeVector &) -> undefined identifier ... \""
+            mlog << Error << "\nMachine::run(const IcodeVector &) -> undefined identifier ... \""
                  << (cell.name) << "\"\n\n";
             exit ( 1 );
          }
@@ -270,7 +270,7 @@ while ( pos < v.length() )  {
       case op_store:
       case op_recall:
       default:
-         mlog << Error << "\n  Machine::run(const IcodeVector &) -> "
+         mlog << Error << "\nMachine::run(const IcodeVector &) -> "
               << "bad icode cell type ... \"" << celltype_to_string(cell.type) << "\"\n\n";
          exit ( 1 );
          break;
@@ -338,7 +338,7 @@ switch ( e.type )  {
       break;
 
    default:
-      mlog << Error << "\n  void Machine::run(const SymbolTableEntry &) -> "
+      mlog << Error << "\nvoid Machine::run(const SymbolTableEntry &) -> "
            << "bad type ... \"" << stetype_to_string(e.type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -368,7 +368,7 @@ operand1 = cstack.pop();
 
 if ( !operand1.is_numeric() || !operand2.is_numeric() )  {
 
-   mlog << Error << "\n  void Machine::do_add() -> can't add non-numeric types!\n\n";
+   mlog << Error << "\nvoid Machine::do_add() -> can't add non-numeric types!\n\n";
 
    exit ( 1 );
 
@@ -437,7 +437,7 @@ operand1 = cstack.pop();
 
 if ( !operand1.is_numeric() || !operand2.is_numeric() )  {
 
-   mlog << Error << "\n  void Machine::do_add() -> can't subtract non-numeric types!\n\n";
+   mlog << Error << "\nvoid Machine::do_add() -> can't subtract non-numeric types!\n\n";
 
    exit ( 1 );
 
@@ -506,7 +506,7 @@ operand1 = cstack.pop();
 
 if ( !operand1.is_numeric() || !operand2.is_numeric() )  {
 
-   mlog << Error << "\n  void Machine::do_add() -> can't multiply non-numeric types!\n\n";
+   mlog << Error << "\nvoid Machine::do_add() -> can't multiply non-numeric types!\n\n";
 
    exit ( 1 );
 
@@ -578,7 +578,7 @@ operand1 = cstack.pop();
 
 if ( !operand1.is_numeric() || !operand2.is_numeric() )  {
 
-   mlog << Error << "\n  void Machine::do_add() -> can't divide non-numeric types!\n\n";
+   mlog << Error << "\nvoid Machine::do_add() -> can't divide non-numeric types!\n\n";
 
    exit ( 1 );
 
@@ -597,7 +597,7 @@ if ( (operand1.type == integer) && (operand2.type == integer) )  {
 
    if ( j == 0 )  {
 
-      mlog << Error << "\n  void Machine::do_divide() -> integer division by zero!\n\n";
+      mlog << Error << "\nvoid Machine::do_divide() -> integer division by zero!\n\n";
 
       exit ( 1 );
 
@@ -625,7 +625,7 @@ else                              y = operand2.d;
 
 if ( y == 0.0 )  {
 
-   mlog << Error << "\n  void Machine::do_divide() -> floating-point division by zero!\n\n";
+   mlog << Error << "\nvoid Machine::do_divide() -> floating-point division by zero!\n\n";
 
    exit ( 1 );
 
@@ -665,7 +665,7 @@ operand1 = cstack.pop();
 
 if ( !operand1.is_numeric() || !operand2.is_numeric() )  {
 
-   mlog << Error << "\n  void Machine::do_power() -> can't exponentiate non-numeric types!\n\n";
+   mlog << Error << "\nvoid Machine::do_power() -> can't exponentiate non-numeric types!\n\n";
 
    exit ( 1 );
 
@@ -706,7 +706,7 @@ operand = cstack.pop();
 
 if ( !operand.is_numeric() )  {
 
-   mlog << Error << "\n  void Machine::do_power() -> can't square non-numeric types!\n\n";
+   mlog << Error << "\nvoid Machine::do_power() -> can't square non-numeric types!\n\n";
 
    exit ( 1 );
 
@@ -760,7 +760,7 @@ operand = cstack.pop();
 
 if ( !operand.is_numeric() )  {
 
-   mlog << Error << "\n  void Machine::do_add() -> can't negate non-numeric type!\n\n";
+   mlog << Error << "\nvoid Machine::do_add() -> can't negate non-numeric type!\n\n";
 
    exit ( 1 );
 
@@ -869,7 +869,7 @@ operand = cstack.pop();
 
 if ( !operand.is_numeric() )  {
 
-   mlog << Error << "\n  Machine::do_pwl(const PL *) -> can't apply pwl to non-numeric argument!\n\n";
+   mlog << Error << "\nMachine::do_pwl(const PL *) -> can't apply pwl to non-numeric argument!\n\n";
 
    exit ( 1 );
 
@@ -948,7 +948,7 @@ for (j=(n - 1); j>=0; --j)  {   //  reverse order here
       case identifier:
          u = sts.find(cell.name);
          if ( !u )  {
-            mlog << Error << "\n  Machine::do_function_call(const SymbolTableEntry &) -> "
+            mlog << Error << "\nMachine::do_function_call(const SymbolTableEntry &) -> "
                  << "undefined name on stack ... \"" << (cell.name) << "\"\n\n";
             exit ( 1 );
          }
@@ -956,7 +956,7 @@ for (j=(n - 1); j>=0; --j)  {   //  reverse order here
          goto start;
 
       default:
-         mlog << Error << "\n  Machine::do_function_call(const SymbolTableEntry &) -> "
+         mlog << Error << "\nMachine::do_function_call(const SymbolTableEntry &) -> "
               << "bad cell type on stack ... \"" << celltype_to_string(cell.type) << "\"\n\n";
          exit ( 1 );
          break;
@@ -1028,7 +1028,7 @@ for (j=(dim - 1); j>=0; --j)  {   //  reverse order here
       case identifier:
          u = sts.find(cell.name);
          if ( !u )  {
-            mlog << Error << "\n  Machine::do_array(const SymbolTableEntry &) -> "
+            mlog << Error << "\nMachine::do_array(const SymbolTableEntry &) -> "
                  << "undefined name on stack ... \"" << (cell.name) << "\"\n\n";
             exit ( 1 );
          }
@@ -1036,7 +1036,7 @@ for (j=(dim - 1); j>=0; --j)  {   //  reverse order here
          goto start;
 
       default:
-         mlog << Error << "\n  Machine::do_array(const SymbolTableEntry &) -> "
+         mlog << Error << "\nMachine::do_array(const SymbolTableEntry &) -> "
               << "bad cell type on stack ... \"" << celltype_to_string(cell.type) << "\"\n\n";
          exit ( 1 );
          break;
@@ -1092,7 +1092,7 @@ if ( is_builtin(Name, index) )  {
 
    if ( binfo[index].n_vars != 1 )  {
 
-      mlog << Error << "\n  Machine::func(const char * Name, double) -> bad signature\n\n";
+      mlog << Error << "\nMachine::func(const char * Name, double) -> bad signature\n\n";
 
       exit ( 1 );
 
@@ -1108,7 +1108,7 @@ if ( is_builtin(Name, index) )  {
 
    if ( !e )  {
 
-      mlog << Error << "\n  Machine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
+      mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
 
       exit ( 1 );
 
@@ -1127,7 +1127,7 @@ if ( is_builtin(Name, index) )  {
          break;
 
       default:
-         mlog << Error << "\n  Machine::func(const char * Name, double) -> function \"" << Name << "\" not a function!\n\n";
+         mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not a function!\n\n";
          exit ( 1 );
          break;
 
@@ -1139,7 +1139,7 @@ if ( is_builtin(Name, index) )  {
 
 if ( !result.is_numeric() )  {
 
-   mlog << Error << "\n  Machine::func(const char * Name, double) -> non-numeric result!\n\n";
+   mlog << Error << "\nMachine::func(const char * Name, double) -> non-numeric result!\n\n";
 
    exit ( 1 );
 
@@ -1184,7 +1184,7 @@ if ( is_builtin(Name, index) )  {
 
    if ( binfo[index].n_vars != 2 )  {
 
-      mlog << Error << "\n  Machine::func(const char * Name, double) -> bad signature\n\n";
+      mlog << Error << "\nMachine::func(const char * Name, double) -> bad signature\n\n";
 
       exit ( 1 );
 
@@ -1200,7 +1200,7 @@ if ( is_builtin(Name, index) )  {
 
    if ( !e )  {
 
-      mlog << Error << "\n  Machine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
+      mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
 
       exit ( 1 );
 
@@ -1219,7 +1219,7 @@ if ( is_builtin(Name, index) )  {
          break;
 
       default:
-         mlog << Error << "\n  Machine::func(const char * Name, double) -> function \"" << Name << "\" not a function!\n\n";
+         mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not a function!\n\n";
          exit ( 1 );
          break;
 
@@ -1231,7 +1231,7 @@ if ( is_builtin(Name, index) )  {
 
 if ( !result.is_numeric() )  {
 
-   mlog << Error << "\n  Machine::func(const char * Name, double) -> non-numeric result!\n\n";
+   mlog << Error << "\nMachine::func(const char * Name, double) -> non-numeric result!\n\n";
 
    exit ( 1 );
 
@@ -1278,7 +1278,7 @@ if ( is_builtin(Name, index) )  {
 
    if ( binfo[index].n_vars != n )  {
 
-      mlog << Error << "\n  Machine::func(const char * Name, double) -> bad signature\n\n";
+      mlog << Error << "\nMachine::func(const char * Name, double) -> bad signature\n\n";
 
       exit ( 1 );
 
@@ -1294,7 +1294,7 @@ if ( is_builtin(Name, index) )  {
 
    if ( !e )  {
 
-      mlog << Error << "\n  Machine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
+      mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
 
       exit ( 1 );
 
@@ -1313,7 +1313,7 @@ if ( is_builtin(Name, index) )  {
          break;
 
       default:
-         mlog << Error << "\n  Machine::func(const char * Name, double) -> function \"" << Name << "\" not a function!\n\n";
+         mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not a function!\n\n";
          exit ( 1 );
          break;
 
@@ -1325,7 +1325,7 @@ if ( is_builtin(Name, index) )  {
 
 if ( !result.is_numeric() )  {
 
-   mlog << Error << "\n  Machine::func(const char * Name, double) -> non-numeric result!\n\n";
+   mlog << Error << "\nMachine::func(const char * Name, double) -> non-numeric result!\n\n";
 
    exit ( 1 );
 
@@ -1358,7 +1358,7 @@ u = sts.find(Name);
 
 if ( !u )  {
 
-   mlog << Error << "\n  Machine::eval(const char *) -> undefined identifier ... \""
+   mlog << Error << "\nMachine::eval(const char *) -> undefined identifier ... \""
         << Name << "\"\n\n";
 
    exit ( 1 );
@@ -1405,7 +1405,7 @@ bison_input_filename = filename;
 
 if ( (econfigin = fopen(filename, "r")) == NULL )  {
 
-   mlog << Error << "\n  Machine::read() -> unable to open input file \"" << filename << "\"\n\n";
+   mlog << Error << "\nMachine::read() -> unable to open input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -1418,7 +1418,7 @@ parse_status = econfigparse();
 
 if ( parse_status != 0 )  {
 
-   mlog << Error << "\n  Machine::read() -> parse status is nonzero! ... = " << parse_status << "\n\n";
+   mlog << Error << "\nMachine::read() -> parse status is nonzero! ... = " << parse_status << "\n\n";
 
    exit ( 1 );
 
@@ -1465,7 +1465,7 @@ if ( info.id == builtin_sign )  { do_sign();  return; }
 else if ( info.n_vars == 2 )  do_builtin_2(info);
 else {
 
-   mlog << Error << "\n  Machine::do_builtin(int) -> bad signature\n\n";
+   mlog << Error << "\nMachine::do_builtin(int) -> bad signature\n\n";
 
    exit ( 1 );
 
@@ -1496,7 +1496,7 @@ operand = cstack.pop();
 
 if ( !(operand.is_numeric()) )  {
 
-   mlog << Error << "\n  Machine::do_builtin_1(const BuiltinInfo &) -> non-numeric operand!\n\n";
+   mlog << Error << "\nMachine::do_builtin_1(const BuiltinInfo &) -> non-numeric operand!\n\n";
 
    exit ( 1 );
 
@@ -1562,7 +1562,7 @@ operand1 = cstack.pop();
 
 if ( !(operand1.is_numeric()) || !(operand2.is_numeric()) )  {
 
-   mlog << Error << "\n  Machine::do_builtin_2(const BuiltinInfo &) -> non-numeric operand!\n\n";
+   mlog << Error << "\nMachine::do_builtin_2(const BuiltinInfo &) -> non-numeric operand!\n\n";
 
    exit ( 1 );
 
@@ -1624,7 +1624,7 @@ operand = cstack.pop();
 
 if ( !(operand.is_numeric()) )  {
 
-   mlog << Error << "\n  Machine::do_nint() -> non-numeric operand!\n\n";
+   mlog << Error << "\nMachine::do_nint() -> non-numeric operand!\n\n";
 
    exit ( 1 );
 
@@ -1683,7 +1683,7 @@ operand = cstack.pop();
 
 if ( !(operand.is_numeric()) )  {
 
-   mlog << Error << "\n  Machine::do_sign() -> non-numeric operand!\n\n";
+   mlog << Error << "\nMachine::do_sign() -> non-numeric operand!\n\n";
 
    exit ( 1 );
 
@@ -1793,7 +1793,7 @@ for (t=0; t<(sts.n_tables()); ++t)  {
             eval(entry->name);
             cell = pop();
             if ( !(cell.is_numeric()) )  {
-               mlog << Error << "\n  void Machine::dump_numerical_constants() const -> non-numeric result!\n\n";
+               mlog << Error << "\nvoid Machine::dump_numerical_constants() const -> non-numeric result!\n\n";
                exit ( 1 );
             }
             if ( cell.type == integer )  {

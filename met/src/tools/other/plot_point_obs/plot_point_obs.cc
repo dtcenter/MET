@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 
       if (!met_ptr)
       {
-         mlog << Error << "\n  " << program_name << " -> file \""
+         mlog << Error << "\n" << program_name << " -> file \""
               << data_plane_filename << "\" not a valid data file\n\n";
          exit (1);
       }
@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
    f_in = new NcFile(nc_file);
 
    if(!f_in || !f_in->is_valid()) {
-      mlog << Error << "\n  main() -> trouble opening netCDF file "
+      mlog << Error << "\nmain() -> trouble opening netCDF file "
            << nc_file << "\n\n";
       f_in->close();
       delete f_in;
@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
       !hdr_sid_var || !hdr_sid_var->is_valid() ||
       !hdr_vld_var || !hdr_vld_var->is_valid() ||
       !obs_arr_var || !obs_arr_var->is_valid()) {
-      mlog << Error << "\n  main() -> "
+      mlog << Error << "\nmain() -> "
            << "trouble reading netCDF file " << nc_file << "\n\n";
       exit(1);
    }
@@ -356,7 +356,7 @@ int main(int argc, char *argv[]) {
 
       if(!obs_arr_var->set_cur(i, 0) ||
          !obs_arr_var->get(obs_arr, 1, obs_arr_dim->size())) {
-         mlog << Error << "\n  main() -> trouble getting obs_arr\n\n";
+         mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }
       if(obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10) break;
@@ -377,7 +377,7 @@ int main(int argc, char *argv[]) {
       //
       if(!hdr_typ_var->set_cur(h-1, 0) ||
          !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\n  main() -> "
+         mlog << Error << "\nmain() -> "
               << "trouble getting hdr_typ\n\n";
          exit(1);
       }
@@ -387,7 +387,7 @@ int main(int argc, char *argv[]) {
       //
       if(!hdr_sid_var->set_cur(h-1, 0) ||
          !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
-         mlog << Error << "\n  main() -> "
+         mlog << Error << "\nmain() -> "
               << "trouble getting hdr_sid\n\n";
          exit(1);
       }
@@ -397,7 +397,7 @@ int main(int argc, char *argv[]) {
       //
       if(!hdr_vld_var->set_cur(h-1, 0) ||
          !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
-         mlog << Error << "\n  main() -> "
+         mlog << Error << "\nmain() -> "
               << "trouble getting hdr_vld\n\n";
          exit(1);
       }

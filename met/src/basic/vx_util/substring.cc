@@ -32,7 +32,7 @@ void substring(const char * text, char * out, int first, int last)
 
 if ( first > last )  {
 
-   mlog << Error << "\n  substring() -> bad input values!\n\n";
+   mlog << Error << "\nsubstring() -> bad input values!\n\n";
 
    exit ( 1 );
 

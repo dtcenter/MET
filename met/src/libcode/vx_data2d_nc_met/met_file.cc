@@ -354,7 +354,7 @@ double MetNcFile::data(NcVar * var, const LongArray & a) const
 
 if ( !args_ok(a) )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
         << "bad arguments:\n";
 
    a.dump(cerr);
@@ -365,7 +365,7 @@ if ( !args_ok(a) )  {
 
 if ( var->num_dims() != a.n_elements() )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
         << "needed " << (var->num_dims()) << " arguments for variable "
         << (var->name()) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -375,7 +375,7 @@ if ( var->num_dims() != a.n_elements() )  {
 
 if ( var->num_dims() >= max_met_args )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
         << " too may arguments for variable \"" << (var->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -393,7 +393,7 @@ for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
 
 if ( !(var->set_cur((long *) a)) )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
         << " can't set corner for variable \"" << (var->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -417,7 +417,7 @@ switch ( var->type() )  {
       break;
       
    default:
-      mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
+      mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
            << " bad type for variable \"" << (var->name()) << "\"\n\n";
       exit ( 1 );
       break;
@@ -427,7 +427,7 @@ switch ( var->type() )  {
 
 if ( !status )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
         << " bad status for var->get()\n\n";
 
    exit ( 1 );
@@ -452,7 +452,7 @@ bool MetNcFile::data(NcVar * v, const LongArray & a, DataPlane & plane) const
 
 if ( !args_ok(a) )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
         << "bad arguments:\n";
 
    a.dump(cerr);
@@ -463,7 +463,7 @@ if ( !args_ok(a) )  {
 
 if ( v->num_dims() != a.n_elements() )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
         << "needed " << (v->num_dims()) << " arguments for variable "
         << (v->name()) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -473,7 +473,7 @@ if ( v->num_dims() != a.n_elements() )  {
 
 if ( v->num_dims() >= max_met_args )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
         << " too may arguments for variable \"" << (v->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -505,7 +505,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
         << "variable " << (v->name()) << " not found!\n\n";
 
    exit ( 1 );
@@ -526,7 +526,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       if ( (j != var->x_slot) && (j != var->y_slot) )  {
 
-         mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+         mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
               << " star found in bad slot\n\n";
 
          exit ( 1 );
@@ -539,7 +539,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
 if ( count != 2 )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
         << " bad star count ... " << count << "\n\n";
 
    exit ( 1 );
@@ -555,7 +555,7 @@ const int y_slot = var->y_slot;
 
 if ( (x_slot < 0) || (y_slot < 0) )  {
 
-   mlog << Error << "\n  MetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
         << " bad x|y|z slot\n\n";
 
    exit ( 1 );

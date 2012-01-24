@@ -188,7 +188,7 @@ void Nx2ContingencyTable::set_size(int NR, int NC)
 
 if ( NC != 2 )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::set_size(int, int) -> must have 2 columns!\n\n";
+   mlog << Error << "\nNx2ContingencyTable::set_size(int, int) -> must have 2 columns!\n\n";
 
    exit ( 1 );
 
@@ -210,7 +210,7 @@ int Nx2ContingencyTable::value_to_row(double t) const
 
 if ( !Thresholds )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::value_to_row(double) const -> thresholds array not set!\n\n";
+   mlog << Error << "\nNx2ContingencyTable::value_to_row(double) const -> thresholds array not set!\n\n";
 
    exit ( 1 );
 
@@ -245,7 +245,7 @@ void Nx2ContingencyTable::set_thresholds(const double * Values)
 
 if ( !E )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::set_thresholds(const double *) -> table empty!\n\n";
+   mlog << Error << "\nNx2ContingencyTable::set_thresholds(const double *) -> table empty!\n\n";
 
    exit ( 1 );
 
@@ -271,7 +271,7 @@ double Nx2ContingencyTable::threshold(int k) const
 
 if ( !Thresholds )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::threshold(int) const -> no thresholds set!\n\n";
+   mlog << Error << "\nNx2ContingencyTable::threshold(int) const -> no thresholds set!\n\n";
 
    exit ( 1 );
 
@@ -279,7 +279,7 @@ if ( !Thresholds )  {
 
 if ( (k < 0) || (k > Nrows) )  {   //  there are Nrows + 1 thresholds
 
-   mlog << Error << "\n  Nx2ContingencyTable::threshold(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::threshold(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -303,7 +303,7 @@ r = value_to_row(t);
 
 if ( r < 0 )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::inc_event(double) -> bad value ... " << t << "\n\n";
+   mlog << Error << "\nNx2ContingencyTable::inc_event(double) -> bad value ... " << t << "\n\n";
 
    exit ( 1 );
 
@@ -329,7 +329,7 @@ r = value_to_row(t);
 
 if ( r < 0 )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::inc_nonevent(double) -> bad value ... " << t << "\n\n";
+   mlog << Error << "\nNx2ContingencyTable::inc_nonevent(double) -> bad value ... " << t << "\n\n";
 
    exit ( 1 );
 
@@ -355,7 +355,7 @@ r = value_to_row(t);
 
 if ( r < 0 )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::event_count_by_thresh(double) -> bad value ... " << t << "\n\n";
+   mlog << Error << "\nNx2ContingencyTable::event_count_by_thresh(double) -> bad value ... " << t << "\n\n";
 
    exit ( 1 );
 
@@ -383,7 +383,7 @@ r = value_to_row(t);
 
 if ( r < 0 )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::nonevent_count_by_thresh(double) -> bad value ... " << t << "\n\n";
+   mlog << Error << "\nNx2ContingencyTable::nonevent_count_by_thresh(double) -> bad value ... " << t << "\n\n";
 
    exit ( 1 );
 
@@ -445,7 +445,7 @@ double Nx2ContingencyTable::row_proby(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::row_proby(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::row_proby(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -599,7 +599,7 @@ const int N = n();
 
 if ( N == 0 )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::brier_score() const -> table empty!\n\n";
+   mlog << Error << "\nNx2ContingencyTable::brier_score() const -> table empty!\n\n";
 
    exit ( 1 );
 
@@ -663,7 +663,7 @@ double Nx2ContingencyTable::row_calibration(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::row_calibration(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::row_calibration(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -693,7 +693,7 @@ double Nx2ContingencyTable::row_refinement(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::row_refinement(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::row_refinement(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -725,7 +725,7 @@ double Nx2ContingencyTable::row_event_likelihood(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::row_event_likelihood(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::row_event_likelihood(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -754,7 +754,7 @@ double Nx2ContingencyTable::row_nonevent_likelihood(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::row_nonevent_likelihood(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::row_nonevent_likelihood(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -785,7 +785,7 @@ TTContingencyTable tt;
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\n  Nx2ContingencyTable::roc_point_by_row(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::roc_point_by_row(int) const -> range check error\n\n";
 
    exit ( 1 );
 

@@ -565,7 +565,7 @@ rep = new LambertGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\n  Grid::set(const LambertData &) -> memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const LambertData &) -> memory allocation error\n\n";
 
    exit ( 1 );
 

@@ -72,7 +72,7 @@ void draw_map_data(const Grid &gr, const Box &gr_bb, PSfile &p,
    in.open(map_data_file);
 
    if(!in) {
-      mlog << Error << "\n  draw_map_data() -> unable to open map data file \""
+      mlog << Error << "\ndraw_map_data() -> unable to open map data file \""
            << map_data_file << "\"\n\n";
       exit(1);
    }

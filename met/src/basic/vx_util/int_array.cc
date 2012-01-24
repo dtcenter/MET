@@ -175,7 +175,7 @@ u = new int [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n  void IntArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nvoid IntArray::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -252,7 +252,7 @@ int IntArray::operator[](int n) const
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\n  IntArray::operator[](int) const -> range check error\n\n";
+   mlog << Error << "\nIntArray::operator[](int) const -> range check error\n\n";
 
    exit ( 1 );
 

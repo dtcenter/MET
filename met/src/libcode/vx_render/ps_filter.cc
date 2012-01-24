@@ -65,7 +65,7 @@ void PSFilter::eat(unsigned char c)
 if ( next )  next->eat(c);
 else {
 
-   mlog << Error << "\n  PSFilter::eat(unsigned char) -> null next pointer\n\n";
+   mlog << Error << "\nPSFilter::eat(unsigned char) -> null next pointer\n\n";
 
    exit ( 1 );
 
@@ -86,7 +86,7 @@ void PSFilter::eod()
 if ( next )  next->eod();
 else {
 
-   mlog << Error << "\n  PSFilter::eod() -> null next pointer\n\n";
+   mlog << Error << "\nPSFilter::eod() -> null next pointer\n\n";
 
    exit ( 1 );
 

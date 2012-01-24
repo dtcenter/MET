@@ -189,7 +189,7 @@ File->open(filename);
 
 if ( !(*File) )  {
 
-   mlog << Error << "\n  PSfile::open(const char *) -> "
+   mlog << Error << "\nPSfile::open(const char *) -> "
         << "unable to open file \"" << filename << "\"\n\n";
 
    exit ( 1 );
@@ -265,7 +265,7 @@ switch ( Orientation )  {
    case OrientationLandscape:  orientation_string = "Landscape";  break;
    
    default:
-      mlog << Error << "\n  void PSfile::do_prolog() -> bad document orientation ... "
+      mlog << Error << "\nvoid PSfile::do_prolog() -> bad document orientation ... "
            << documentorientation_to_string(Orientation) << "\n\n";
       exit ( 1 );
       break;
@@ -278,7 +278,7 @@ switch ( Media )  {
    case MediaA4:      media_string = "A4";      break;
 
    default:
-      mlog << Error << "\n  void PSfile::do_prolog() -> bad document media ... "
+      mlog << Error << "\nvoid PSfile::do_prolog() -> bad document media ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
       break;
@@ -423,7 +423,7 @@ void PSfile::choose_font(int n, double s, const char * data_dir)
 
 if ( (n < 0) || (n >= total_vx_ps_fonts) )  {
 
-   mlog << Error << "\n  PSfile::choose_font() -> "
+   mlog << Error << "\nPSfile::choose_font() -> "
         << "bad font number -> " << n << "\n\n";
 
    exit ( 1 );
@@ -432,7 +432,7 @@ if ( (n < 0) || (n >= total_vx_ps_fonts) )  {
 
 if ( s <= 0.0 )  {
 
-   mlog << Error << "\n  PSfile::choose_font() -> "
+   mlog << Error << "\nPSfile::choose_font() -> "
         << "bad font size -> " << s << "\n\n";
 
    exit ( 1 );
@@ -452,7 +452,7 @@ path << data_dir << '/' << afm_directory << '/' << junk << ".afm";
 
 if ( !(afm->read(path)) )  {
 
-   mlog << Error << "\n  PSfile::choose_font() -> "
+   mlog << Error << "\nPSfile::choose_font() -> "
         << "unable to read afm file \"" << path << "\"\n\n";
 
    exit ( 1 );
@@ -504,7 +504,7 @@ void PSfile::write_centered_text(int center, int fill_flag,
 
 if ( (center != 1) && (center != 2) )  {
 
-   mlog << Error << "\n  PSfile::write_centered_text() -> "
+   mlog << Error << "\nPSfile::write_centered_text() -> "
         << "center flag must be 1 or 2\n\n";
 
    exit ( 1 );
@@ -514,7 +514,7 @@ if ( (center != 1) && (center != 2) )  {
 
 if ( (fill_flag != 0) && (fill_flag != 1) )  {
 
-   mlog << Error << "\n  PSfile::write_centered_text() -> "
+   mlog << Error << "\nPSfile::write_centered_text() -> "
         << "fill flag must be 0 or 1\n\n";
 
    exit ( 1 );
@@ -654,7 +654,7 @@ switch ( fill_flag )  {
    case  1:  file() << "show";                   break;
 
    default:
-      mlog << Error << "\n  PSfile::write_single_node() -> "
+      mlog << Error << "\nPSfile::write_single_node() -> "
            << "unrecognized fill flag: \"" << fill_flag << "\"\n\n";
       exit ( 1 );
       break;
@@ -1047,7 +1047,7 @@ switch ( Media )  {
       break;
 
    default:
-      mlog << Error << "\n  PSfile::set_media(DocumentMedia) -> bad media size ... "
+      mlog << Error << "\nPSfile::set_media(DocumentMedia) -> bad media size ... "
            << documentmedia_to_string(Media) << "\n\n";
       exit ( 1 );
       break;
@@ -1171,7 +1171,7 @@ j = afm.lookup_cm(ascii_code);
 
 if ( j < 0 )  {
 
-   mlog << Error << "\n  handle_char() -> "
+   mlog << Error << "\nhandle_char() -> "
         << "no char metric for ascii code " << ascii_code
         << " in font " << (afm.FontName) << "\n\n";
 
@@ -1331,7 +1331,7 @@ if ( strcmp(c, "Letter") == 0 )  return ( MediaLetter );
 
 if ( strcmp(c, "A4") == 0 )  return ( MediaA4 );
 
-mlog << Error << "\n  default_media() -> "
+mlog << Error << "\ndefault_media() -> "
      << "bad value \"" << c << "\" for environment variable "
      << papersize_env << "\n\n";
 

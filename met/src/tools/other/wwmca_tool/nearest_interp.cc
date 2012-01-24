@@ -164,7 +164,7 @@ InterpolationValue Nearest_Interp::operator()(double x, double y) const
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Nearest_Interp::operator()(double x, double y) const -> no data!\n\n";
+   mlog << Error << "\nNearest_Interp::operator()(double x, double y) const -> no data!\n\n";
 
    exit ( 1 );
 
@@ -185,7 +185,7 @@ iy = nint(floor(v + 0.5));
 
 // if ( (ix < 0) || (ix >= Width) || (iy < 0) || (iy >= Width) )  {
 // 
-//    mlog << Error << "\n  Nearest_Interp::operator()(double x, double y) const -> range check error\n\n";
+//    mlog << Error << "\nNearest_Interp::operator()(double x, double y) const -> range check error\n\n";
 // 
 //    exit ( 1 );
 // 

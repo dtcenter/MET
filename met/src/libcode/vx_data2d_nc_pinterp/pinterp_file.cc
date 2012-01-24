@@ -422,7 +422,7 @@ unixtime PinterpFile::valid_time(int n) const
 
 if ( (n < 0) || (n >= Ntimes) )  {
 
-   mlog << Error << "\n  PinterpFile::valid_time(int) const -> "
+   mlog << Error << "\nPinterpFile::valid_time(int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );
@@ -444,7 +444,7 @@ int PinterpFile::lead_time(int n) const
 
 if ( (n < 0) || (n >= Ntimes) )  {
 
-   mlog << Error << "\n  PinterpFile::lead_time(int) const -> "
+   mlog << Error << "\nPinterpFile::lead_time(int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );
@@ -467,7 +467,7 @@ double PinterpFile::data(NcVar * var, const LongArray & a) const
 
 if ( !args_ok(a) )  {
 
-   mlog << Error << "\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
         << "bad arguments:\n";
 
    a.dump(cerr);
@@ -478,7 +478,7 @@ if ( !args_ok(a) )  {
 
 if ( var->num_dims() != a.n_elements() )  {
 
-   mlog << Error << "\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
         << "needed " << (var->num_dims()) << " arguments for variable "
         << (var->name()) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -488,7 +488,7 @@ if ( var->num_dims() != a.n_elements() )  {
 
 if ( var->num_dims() >= max_pinterp_args )  {
 
-   mlog << Error << "\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
         << " too may arguments for variable \"" << (var->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -505,7 +505,7 @@ for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
 
 if ( !(var->set_cur((long *) a)) )  {
 
-   mlog << Error << "\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
         << " can't set corner for variable \"" << (var->name()) << "\"\n\n";
 
    exit ( 1 );
@@ -524,7 +524,7 @@ switch ( var->type() )  {
       break;
 
    default:
-      mlog << Error << "\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+      mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
            << " bad type for variable \"" << (var->name()) << "\"\n\n";
       exit ( 1 );
       break;
@@ -534,7 +534,7 @@ switch ( var->type() )  {
 
 if ( !status )  {
 
-   mlog << Error << "\n  PinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
         << " bad status for var->get()\n\n";
 
    exit ( 1 );
@@ -559,7 +559,7 @@ bool PinterpFile::data(NcVar * v, const LongArray & a, DataPlane & plane, double
 
 if ( !args_ok(a) )  {
 
-   mlog << Warning << "\n  PinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << "bad arguments:\n";
 
    a.dump(cerr);
@@ -570,7 +570,7 @@ if ( !args_ok(a) )  {
 
 if ( v->num_dims() != a.n_elements() )  {
 
-   mlog << Warning << "\n  PinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << "needed " << (v->num_dims()) << " arguments for variable "
         << (v->name()) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -580,7 +580,7 @@ if ( v->num_dims() != a.n_elements() )  {
 
 if ( v->num_dims() >= max_pinterp_args )  {
 
-   mlog << Warning << "\n  PinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << " too may arguments for variable \"" << (v->name()) << "\"\n\n";
 
    return ( false );
@@ -616,7 +616,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  {
 
-   mlog << Warning << "\n  PinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << "variable " << (v->name()) << " not found!\n\n";
 
    return ( false );
@@ -637,7 +637,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       if ( (j != var->x_slot) && (j != var->y_slot) )  {
 
-         mlog << Warning << "\n  PinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+         mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
               << " star found in bad slot\n\n";
 
          return ( false );
@@ -650,7 +650,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
 if ( count != 2 )  {
 
-   mlog << Warning << "\n  PinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << " bad star count ... " << count << "\n\n";
 
    return ( false );
@@ -668,7 +668,7 @@ const int z_slot = var->z_slot;
 
 if ( (x_slot < 0) || (y_slot < 0) )  {
 
-   mlog << Warning << "\n  PinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << " bad x|y slot\n\n";
 
    return ( false );
@@ -811,7 +811,7 @@ j = sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d",
 
 if ( j != 6 )  {
 
-   mlog << Error << "\n  parse_init_time(const char *) -> "
+   mlog << Error << "\nparse_init_time(const char *) -> "
         << "bad time string ... \"" << s << "\"\n\n";
 
    exit ( 1 );

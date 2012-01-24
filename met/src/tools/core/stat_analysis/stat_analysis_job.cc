@@ -379,7 +379,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    // Open up the temp file for reading the intermediate STAT line data
    //
    if(!f.open(tmp_path)) {
-      mlog << Error << "\n  do_job() -> "
+      mlog << Error << "\ndo_job() -> "
            << "can't open the temporary file \"" << tmp_path
            << "\" for reading!\n\n";
       throw(1);
@@ -434,7 +434,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
          break;
 
       default:
-         mlog << Error << "\n  do_job() -> "
+         mlog << Error << "\ndo_job() -> "
               << "jobtype value of " << j.job_type
               << " not currently supported!\n\n";
          throw(1);
@@ -473,7 +473,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -dump_row option has been supplied
    //
    if(!j.dump_row) {
-      mlog << Error << "\n  do_job_filter()-> "
+      mlog << Error << "\ndo_job_filter()-> "
            << "this function may only be called when using the "
            << "-dump_row option in the job command line: "
            << jobstring << "\n\n";
@@ -535,7 +535,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -line_type option has been supplied only once
    //
    if(j.line_type.n_elements() != 1) {
-      mlog << Error << "\n  do_job_summary()-> "
+      mlog << Error << "\ndo_job_summary()-> "
            << "this function may only be called when the "
            << "\"-line_type\" option has been used exactly once to "
            << "specify a single line type from which to select a "
@@ -547,7 +547,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -column option has been supplied
    //
    if(j.column.n_elements() != 1) {
-      mlog << Error << "\n  do_job_summary()-> "
+      mlog << Error << "\ndo_job_summary()-> "
            << "this function may only be called when the "
            << "\"-column\" option has been used to specify a "
            << "single column from which to select a statistic "
@@ -592,7 +592,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Check for no matching STAT lines
    //
    if(v_array.n_elements() == 0) {
-      mlog << Warning << "\n  do_job_summary() -> "
+      mlog << Warning << "\ndo_job_summary() -> "
            << "no valid data found in the STAT lines for job: "
            << jobstring << "\n\n";
       return;
@@ -710,7 +710,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -line_type option has been supplied only once
    //
    if(j.line_type.n_elements() != 1) {
-      mlog << Error << "\n  do_job_aggr()-> "
+      mlog << Error << "\ndo_job_aggr()-> "
            << "this function may only be called when the "
            << "\"-line_type\" option has been used exactly once to "
            << "specify a single line type over which to perform the "
@@ -732,7 +732,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_val1l2 && lt != stat_pct   &&
       lt != stat_nbrctc && lt != stat_isc   &&
       lt != stat_rhist) {
-      mlog << Error << "\n  do_job_aggr()-> "
+      mlog << Error << "\ndo_job_aggr()-> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
@@ -805,7 +805,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       // Check that the -line_type option has been supplied only once
       //
       if(j.vx_mask.n_elements() == 0) {
-         mlog << Error << "\n  do_job_aggr()-> "
+         mlog << Error << "\ndo_job_aggr()-> "
               << "when aggregating ISC lines you must select at least "
               << "one tile name to be used with the \"-vx_mask\" "
               << "option: " << jobstring << "\n\n";
@@ -826,7 +826,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Check for no matching STAT lines
    //
    if(n_out == 0) {
-      mlog << Warning << "\n  do_job_aggr() -> "
+      mlog << Warning << "\ndo_job_aggr() -> "
            << "no matching STAT lines found for job: " << jobstring
            << "\n\n";
       return;
@@ -1057,7 +1057,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
 
       default:
 
-         mlog << Error << "\n  do_job_aggr() -> "
+         mlog << Error << "\ndo_job_aggr() -> "
               << "line type value of "
                << statlinetype_to_string(line.type())
               << " not currently supported for the aggregation "
@@ -1107,7 +1107,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -line_type option has been supplied only once
    //
    if(j.line_type.n_elements() != 1) {
-      mlog << Error << "\n  do_job_aggr_stat()-> "
+      mlog << Error << "\ndo_job_aggr_stat()-> "
            << "this function may only be called when the "
            << "\"-line_type\" option has been used exactly once to "
            << "specify a single line type over which to perform the "
@@ -1167,7 +1167,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
           ) i = 1;
    else {
 
-      mlog << Error << "\n  do_job_aggr_stat()-> "
+      mlog << Error << "\ndo_job_aggr_stat()-> "
            << "invalid combination of \"-line_type "
            << statlinetype_to_string(in_lt) << "\" and "
            << "\"-out_line_type " << statlinetype_to_string(out_lt)
@@ -1250,7 +1250,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
          if(j.out_fcst_thresh.n_elements() != 1 ||
             j.out_obs_thresh.n_elements()  != 1) {
-            mlog << Error << "\n  do_job_aggr_stat()-> "
+            mlog << Error << "\ndo_job_aggr_stat()-> "
                  << "when \"-out_line_type\" is set to FHO, CTC, or "
                  << "CTS the \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must be specified "
@@ -1267,7 +1267,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
          if(j.out_fcst_thresh.n_elements() <= 1 ||
             j.out_fcst_thresh.n_elements() != j.out_obs_thresh.n_elements()) {
-            mlog << Error << "\n  do_job_aggr_stat()-> "
+            mlog << Error << "\ndo_job_aggr_stat()-> "
                  << "when \"-out_line_type\" is set to MCTC or MCTS "
                  << "the \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must be specified "
@@ -1286,7 +1286,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                j.out_obs_thresh[i].type    == thresh_eq              ||
                j.out_obs_thresh[i].type    == thresh_ne) {
 
-               mlog << Error << "\n  do_job_aggr_stat() -> "
+               mlog << Error << "\ndo_job_aggr_stat() -> "
                     << "when \"-out_line_type\" is set to MCTC or MCTS "
                     << "the thresholds must be monotonically "
                     << "increasing and be of the same inequality type "
@@ -1305,7 +1305,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          out_lt == stat_prc) {
 
          if(j.out_obs_thresh.n_elements()  != 1) {
-            mlog << Error << "\n  do_job_aggr_stat()-> "
+            mlog << Error << "\ndo_job_aggr_stat()-> "
                  << "when \"-out_line_type\" is set to PCT, PSTD, "
                  << "PJC, or PRC, the \"-out_obs_thresh\" option "
                  << "must be specified exactly once.\n\n";
@@ -1319,7 +1319,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             !is_eq(j.out_fcst_thresh[0].thresh,   0.0) ||
             !is_eq(j.out_fcst_thresh[n-1].thresh, 1.0)) {
 
-            mlog << Error << "\n  do_job_aggr_stat() -> "
+            mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "When verifying a probability field, you must "
                  << "use the \"-out_fcst_thresh\" option to select "
                  << "at least 3 probability thresholds beginning with "
@@ -1331,7 +1331,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
             // Check that all threshold types are >=
             if(j.out_fcst_thresh[i].type != thresh_ge) {
-               mlog << Error << "\n  do_job_aggr_stat() -> "
+               mlog << Error << "\ndo_job_aggr_stat() -> "
                     << "When verifying a probability field, all "
                     << "forecast probability thresholds must be set "
                     << "as greater than or equal to with \"ge\" or "
@@ -1343,7 +1343,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             if(j.out_fcst_thresh[i].thresh < 0.0 ||
                j.out_fcst_thresh[i].thresh > 1.0) {
 
-               mlog << Error << "\n  do_job_aggr_stat() -> "
+               mlog << Error << "\ndo_job_aggr_stat() -> "
                     << "When verifying a probability field, all "
                     << "forecast probability thresholds must be "
                     << "between 0 and 1.\n\n";
@@ -1419,7 +1419,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Check for no matching STAT lines
    //
    if(n_out == 0) {
-      mlog << Warning << "\n  do_job_aggr_stat() -> "
+      mlog << Warning << "\ndo_job_aggr_stat() -> "
            << "no matching STAT lines found for job: " << jobstring
            << "\n\n";
       return;
@@ -1578,7 +1578,7 @@ void write_job_cnt(STATAnalysisJob &j, STATLineType in_lt,
          break;
 
       default:
-         mlog << Error << "\n  write_job_cnt() -> "
+         mlog << Error << "\nwrite_job_cnt() -> "
               << "unexpected line type value of " << in_lt
               << "\n\n";
          throw(1);
@@ -1617,7 +1617,7 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
       uo_na.n_elements() != vo_na.n_elements() ||
       uf_na.n_elements() != uo_na.n_elements()) {
 
-      mlog << Error << "\n  write_job_wdir()-> "
+      mlog << Error << "\nwrite_job_wdir()-> "
            << "the number of U and V forecast and observation points "
            << "must be the same.\n\n";
       throw(1);
@@ -1697,7 +1697,7 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
          break;
 
       default:
-         mlog << Error << "\n  write_job_wdir() -> "
+         mlog << Error << "\nwrite_job_wdir() -> "
               << "unexpected line type value of " << in_lt
               << "\n\n";
          throw(1);
@@ -1800,7 +1800,7 @@ void write_job_pct(STATAnalysisJob &j, STATLineType in_lt,
          break;
 
       default:
-         mlog << Error << "\n  write_job_pct() -> "
+         mlog << Error << "\nwrite_job_pct() -> "
               << "unexpected line type value of " << in_lt
               << "\n\n";
          throw(1);
@@ -2089,7 +2089,7 @@ void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
 
       default:
 
-         mlog << Error << "\n  write_job_mpr() -> "
+         mlog << Error << "\nwrite_job_mpr() -> "
               << "line type value of " << j.out_line_type
               << " not currently supported for the aggregation "
               << "job!\n\n";
@@ -2146,7 +2146,7 @@ void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
    // Check for no matching STAT lines
    //
    if(n_out == 0) {
-      mlog << Warning << "\n  do_job_go_index() -> "
+      mlog << Warning << "\ndo_job_go_index() -> "
            << "no matching STAT lines found for job: " << jobstring
            << "\n\n";
       return;
@@ -2207,7 +2207,7 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Check for no matching STAT lines
    //
    if(n_out == 0) {
-      mlog << Warning << "\n  do_job_ss_index() -> "
+      mlog << Warning << "\ndo_job_ss_index() -> "
            << "no matching STAT lines found for job: " << jobstring
            << "\n\n";
       return;
@@ -2311,7 +2311,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // The first is the forecast model and the second is the reference.
    //
    if(j.model.n_elements() != 2) {
-      mlog << Error << "\n  compute_ss_index()-> "
+      mlog << Error << "\ncompute_ss_index()-> "
            << "this job may only be called when the \"-model\" option "
            << "has been used exactly twice to specify the forecast "
            << "model followed by the reference model: "
@@ -2323,7 +2323,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Use the length of the fcst_var array to infer the number of terms.
    //
    if((n_terms = j.fcst_var.n_elements()) < 1) {
-      mlog << Error << "\n  compute_ss_index()-> "
+      mlog << Error << "\ncompute_ss_index()-> "
            << "you must define the Skill Score Index to be computed "
            << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
            << "\"-line_type\", \"-column\", and \"-weight\" options: "
@@ -2339,7 +2339,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       n_terms != j.line_type.n_elements() ||
       n_terms != j.column.n_elements()    ||
       n_terms != j.weight.n_elements()) {
-      mlog << Error << "\n  compute_ss_index()-> "
+      mlog << Error << "\ncompute_ss_index()-> "
            << "all filtering parameters for defining the Skill Score "
            << "Index must be of the same length.  Check \"-fcst_var\", "
            << "\"-fcst_lev\", \"-fcst_lead\", \"-line_type\", "
@@ -2525,7 +2525,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
 
          job_lt[i] = string_to_statlinetype(j.line_type[i]);
          if(job_lt[i] != stat_sl1l2 && job_lt[i] != stat_ctc) {
-            mlog << Error << "\n  compute_ss_index() -> "
+            mlog << Error << "\ncompute_ss_index() -> "
                  << "a Skill Score Index can only be computed using "
                  << "statistics derived from SL1L2 or CTC line types."
                  << "\n\n";
@@ -2785,14 +2785,14 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       // Check the the number of aggregated lines differ.
       //
       if(n_fcst_lines[i] != n_ref_lines[i]) {
-         mlog << Warning << "\n  compute_ss_index() -> "
+         mlog << Warning << "\ncompute_ss_index() -> "
               << "the number of aggregated forecast and reference lines "
               << "differ (" << n_fcst_lines[i] << " != " << n_ref_lines[i]
               << ") for term " << i+1 << ".\n\n";
       }
 
       if(is_bad_data(ss)) {
-         mlog << Warning << "\n  compute_ss_index() -> "
+         mlog << Warning << "\ncompute_ss_index() -> "
               << "can't compute skill score for term " << i+1 << ".\n\n";
       }
 

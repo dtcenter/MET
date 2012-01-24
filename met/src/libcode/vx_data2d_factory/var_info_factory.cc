@@ -60,7 +60,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType t) {
 #ifdef WITH_GRIB2
          vi = new VarInfoGrib2;
 #else
-         mlog << Error << "\n  VarInfoFactory::new_var_info() -> "
+         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "Support for GRIB2 has not been compiled!\n\n";
          exit(1);
 #endif
@@ -77,14 +77,14 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType t) {
       case FileType_NcCF:
       case FileType_HdfEos:
 
-         mlog << Error << "\n  VarInfoFactory::new_var_info() -> "
+         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "Support for GrdFileType = " << grdfiletype_to_string(t)
               << " not yet implemented!\n\n";
          exit(1);
          break;
 
       default:
-         mlog << Error << "\n  VarInfoFactory::new_var_info() -> "
+         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "unsupported gridded data file type \"" << t
               << "\"\n\n";
          exit(1);

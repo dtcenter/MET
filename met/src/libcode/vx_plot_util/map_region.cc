@@ -168,7 +168,7 @@ r.clear();
    // check that the number of points to read in is not greater than the size
    // of the arrays to hold the lat/lon point values
    if(r.n_points > max_region_points) {
-      mlog << Error << "\n  operator>>(ifstream &, MapRegion &) ->"
+      mlog << Error << "\noperator>>(ifstream &, MapRegion &) ->"
            << "map region has too many points\n\n";
       exit (1);
    }

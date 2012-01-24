@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
    // Read command line arguments
    if(argc != 2) {
-      mlog << Error << "\n  Must supply the name of a gridded data file to process.\n\n";
+      mlog << Error << "\nMust supply the name of a gridded data file to process.\n\n";
       exit(1);
    }
 

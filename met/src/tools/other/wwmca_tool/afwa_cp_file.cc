@@ -191,7 +191,7 @@ if ( !(is_afwa_cloud_pct_filename(filename, Hemisphere, Valid)) )  {
 
    clear();
 
-   mlog << Error << "\n  AfwaCloudPctFile::read(const char *) -> can't parse filename \"" << filename << "\"\n\n";
+   mlog << Error << "\nAfwaCloudPctFile::read(const char *) -> can't parse filename \"" << filename << "\"\n\n";
 
    return ( false );
 
@@ -205,7 +205,7 @@ int bytes;
 
 if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
-   mlog << Error << "\n  AfwaCloudPctFile::read(const char *) -> can't open file \"" << filename << "\"\n\n";
+   mlog << Error << "\nAfwaCloudPctFile::read(const char *) -> can't open file \"" << filename << "\"\n\n";
 
    //  exit ( 1 );
 
@@ -219,7 +219,7 @@ Buf = new unsigned char [bytes];
 
 if ( ::read(fd, Buf, bytes) != bytes )  {
 
-   mlog << Error << "\n  AfwaCloudPctFile::read(const char *) -> read error on file \"" << filename << "\"\n\n";
+   mlog << Error << "\nAfwaCloudPctFile::read(const char *) -> read error on file \"" << filename << "\"\n\n";
 
    //  exit ( 1 );
 

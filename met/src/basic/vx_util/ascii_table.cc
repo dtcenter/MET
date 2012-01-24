@@ -198,7 +198,7 @@ int AsciiTable::rc_to_n(int r, int c) const
 
 if ( !e )  {
 
-   mlog << Error << "\n  AsciiTable::rc_to_n() -> empty table!\n\n";
+   mlog << Error << "\nAsciiTable::rc_to_n() -> empty table!\n\n";
 
    exit ( 1 );
 
@@ -206,7 +206,7 @@ if ( !e )  {
 
 if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
 
-   mlog << Error << "\n  "
+   mlog << Error << "\n"
         << "  AsciiTable::rc_to_n() -> range check error ... \n"
         << "                           (Nrows, Ncols) = (" << Nrows << ", " << Ncols << ")\n"
         << "                           (r, c) = (" << r << ", " << c << ")\n"
@@ -300,7 +300,7 @@ void AsciiTable::set_size(const int NR, const int NC)
 
 if ( (NR <= 0) || (NC <= 0) )  {
 
-   mlog << Error << "\n  AsciiTable::set_size() -> bad size\n\n";
+   mlog << Error << "\nAsciiTable::set_size() -> bad size\n\n";
 
    exit ( 1 );
 
@@ -315,7 +315,7 @@ e = new char * [NRC];
 
 if ( !e )  {
 
-   mlog << Error << "\n  AsciiTable::set_size_rc() -> memory allocation error 1\n\n";
+   mlog << Error << "\nAsciiTable::set_size_rc() -> memory allocation error 1\n\n";
 
    exit ( 1 );
 
@@ -330,7 +330,7 @@ ColWidth = new int [Ncols];
 
 if ( !ColWidth )  {
 
-   mlog << Error << "\n  AsciiTable::set_size_rc() -> memory allocation error 2\n\n";
+   mlog << Error << "\nAsciiTable::set_size_rc() -> memory allocation error 2\n\n";
 
    exit ( 1 );
 
@@ -350,7 +350,7 @@ Just = new AsciiTableJust [Nrows*Ncols];
 
 if ( !Just )  {
 
-   mlog << Error << "\n  AsciiTable::set_size_rc() -> memory allocation error 3\n\n";
+   mlog << Error << "\nAsciiTable::set_size_rc() -> memory allocation error 3\n\n";
 
    exit ( 1 );
 
@@ -376,7 +376,7 @@ void AsciiTable::set_ics(int value)
 
 if ( (value < 0) || (value > max_ics) )  {
 
-   mlog << Error << "\n  AsciiTable::set_ics(int) -> bad value ... " << value << "\n\n";
+   mlog << Error << "\nAsciiTable::set_ics(int) -> bad value ... " << value << "\n\n";
 
    exit ( 1 );
 
@@ -400,7 +400,7 @@ void AsciiTable::set_ics(int col_left, int value)
 
 if ( (value < 0) || (value > max_ics) )  {
 
-   mlog << Error << "\n  AsciiTable::set_ics(int, int) -> bad value ... " << value << "\n\n";
+   mlog << Error << "\nAsciiTable::set_ics(int, int) -> bad value ... " << value << "\n\n";
 
    exit ( 1 );
 
@@ -408,7 +408,7 @@ if ( (value < 0) || (value > max_ics) )  {
 
 if ( (col_left < 0) || (col_left >= (Ncols - 1)) )  {
 
-   mlog << Error << "\n  AsciiTable::set_ics(int, int) -> bad column ... " << col_left << "\n\n";
+   mlog << Error << "\nAsciiTable::set_ics(int, int) -> bad column ... " << col_left << "\n\n";
 
    exit ( 1 );
 
@@ -431,7 +431,7 @@ int AsciiTable::inter_column_space(int col_left) const
 
 if ( (col_left < 0) || (col_left >= (Ncols - 1)) )  {
 
-   mlog << Error << "\n  AsciiTable::inter_column_space() -> bad column ... " << col_left << "\n\n";
+   mlog << Error << "\nAsciiTable::inter_column_space() -> bad column ... " << col_left << "\n\n";
 
    exit ( 1 );
 
@@ -453,7 +453,7 @@ void AsciiTable::set_irs(int value)
 
 if ( (value < 0) || (value > max_irs) )  {
 
-   mlog << Error << "\n  AsciiTable::set_irs(int) -> bad value ... " << value << "\n\n";
+   mlog << Error << "\nAsciiTable::set_irs(int) -> bad value ... " << value << "\n\n";
 
    exit ( 1 );
 
@@ -477,7 +477,7 @@ void AsciiTable::set_irs(int row_top, int value)
 
 if ( (value < 0) || (value > max_irs) )  {
 
-   mlog << Error << "\n  AsciiTable::set_irs(int, int) -> bad value ... " << value << "\n\n";
+   mlog << Error << "\nAsciiTable::set_irs(int, int) -> bad value ... " << value << "\n\n";
 
    exit ( 1 );
 
@@ -485,7 +485,7 @@ if ( (value < 0) || (value > max_irs) )  {
 
 if ( (row_top < 0) || (row_top >= (Nrows - 1)) )  {
 
-   mlog << Error << "\n  AsciiTable::set_irs(int, int) -> bad row ... " << row_top << "\n\n";
+   mlog << Error << "\nAsciiTable::set_irs(int, int) -> bad row ... " << row_top << "\n\n";
 
    exit ( 1 );
 
@@ -507,7 +507,7 @@ int AsciiTable::inter_row_space(int row_top) const
 
 if ( (row_top < 0) || (row_top >= (Nrows - 1)) )  {
 
-   mlog << Error << "\n  AsciiTable::inter_row_space(int) -> bad row ... " << row_top << "\n\n";
+   mlog << Error << "\nAsciiTable::inter_row_space(int) -> bad row ... " << row_top << "\n\n";
 
    exit ( 1 );
 
@@ -529,7 +529,7 @@ void AsciiTable::set_table_indent(int value)
 
 if ( (value < 0) || (value > max_table_indent) )  {
 
-   mlog << Error << "\n  AsciiTable::set_table_indent(int) -> bad value\n\n";
+   mlog << Error << "\nAsciiTable::set_table_indent(int) -> bad value\n\n";
 
    exit ( 1 );
 
@@ -579,7 +579,7 @@ void AsciiTable::set_precision(int k)
 
 if ( (k < 0) || (k > ascii_table_max_precision) )  {
 
-   mlog << Error << "\n  AsciiTable::set_precision(int) -> bad value\n\n";
+   mlog << Error << "\nAsciiTable::set_precision(int) -> bad value\n\n";
 
    exit ( 1 );
 
@@ -696,7 +696,7 @@ void AsciiTable::set_column_just(const int c, const AsciiTableJust just)
 
 if ( (c < 0) || (c >= Ncols) )  {
 
-   mlog << Error << "\n  AsciiTable::set_col_just() -> range check error!\n\n";
+   mlog << Error << "\nAsciiTable::set_col_just() -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -726,7 +726,7 @@ void AsciiTable::set_row_just(const int r, const AsciiTableJust just)
 
 if ( (r < 0) || (r >= Nrows) )  {
 
-   mlog << Error << "\n  AsciiTable::set_row_just() -> range check error!\n\n";
+   mlog << Error << "\nAsciiTable::set_row_just() -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -811,7 +811,7 @@ e[n] = new char [1 + k];
 
 if ( !(e[n]) )  {
 
-   mlog << Error << "\n  AsciiTable::set_entry() -> memory allocation error\n\n";
+   mlog << Error << "\nAsciiTable::set_entry() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -944,7 +944,7 @@ if ( !e )  return ( 0 );
 
 if ( (k < 0) || (k >= Ncols) )  {
 
-   mlog << Error << "\n  AsciiTable::col_width(int) const -> range check error\n\n";
+   mlog << Error << "\nAsciiTable::col_width(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -990,7 +990,7 @@ bool AsciiTable::row_is_blank(int r) const
 
 if ( (r < 0) || (r >= Nrows) )  {
 
-   mlog << Error << "\n  AsciiTable::row_is_blank(int) const -> range check error\n\n";
+   mlog << Error << "\nAsciiTable::row_is_blank(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1236,7 +1236,7 @@ void justified_item(const char * text, const int field_width, const char pad, co
 
 if ( field_width <= 0 )  {
 
-   mlog << Error << "\n  justified_item() -> field_width must be > 0\n\n";
+   mlog << Error << "\njustified_item() -> field_width must be > 0\n\n";
 
    exit ( 1 );
 
@@ -1245,7 +1245,7 @@ if ( field_width <= 0 )  {
 
 if ( !out )  {
 
-   mlog << Error << "\n  justified_item() -> null output string\n\n";
+   mlog << Error << "\njustified_item() -> null output string\n\n";
 
    exit ( 1 );
 
@@ -1281,7 +1281,7 @@ if ( len == 0 )  return;
 
 if ( len > field_width )  {
 
-   mlog << Error << "\n  justified_item() -> item too wide for field\n\n";
+   mlog << Error << "\njustified_item() -> item too wide for field\n\n";
 
    exit ( 1 );
 
@@ -1300,7 +1300,7 @@ switch ( just )  {
    case CenterJust:  offset = (field_width - len)/2;   break;
 
    default:
-      mlog << Error << "\n  justified_item() -> bad justification value\n\n";
+      mlog << Error << "\njustified_item() -> bad justification value\n\n";
       exit ( 1 );
       break;
 

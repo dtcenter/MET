@@ -319,7 +319,7 @@ void substring_vx_cal(const char * text, char * out, int first, int last)
 
 if ( first > last )  {
 
-   mlog << Error << "\n  substring_vx_cal() -> bad input values!\n\n";
+   mlog << Error << "\nsubstring_vx_cal() -> bad input values!\n\n";
 
    exit ( 1 );
 
@@ -399,7 +399,7 @@ else if ( is_yyyymmddhh      (text) )  t = yyyymmddhh_to_unix      (text);
 else if ( is_yyyymmdd        (text) )  t = yyyymmdd_to_unix        (text);
 else {
 
-   mlog << Error << "\n  timestring_to_unix(const char *) -> can't parse date/time string \"" << text << "\"\n\n";
+   mlog << Error << "\ntimestring_to_unix(const char *) -> can't parse date/time string \"" << text << "\"\n\n";
 
    exit ( 1 );
 
@@ -535,7 +535,7 @@ else if ( is_hhmmss (text)  )  t = hhmmss_to_sec(text);
 else if ( is_hh     (text)  )  t = hms_to_sec(atoi(text), 0, 0);
 else {
 
-   mlog << Error << "\n  timestring_to_sec(const char *) -> can't parse time string \"" << text << "\"\n\n";
+   mlog << Error << "\ntimestring_to_sec(const char *) -> can't parse time string \"" << text << "\"\n\n";
 
    exit ( 1 );
 

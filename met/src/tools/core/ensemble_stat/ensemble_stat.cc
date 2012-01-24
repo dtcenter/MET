@@ -210,7 +210,7 @@ void process_command_line(int argc, char **argv)
 
          if (n_ens <= 0)
          {
-            mlog << Error << "\n  process_command_line() -> "
+            mlog << Error << "\nprocess_command_line() -> "
                  << "the number of ensemble member files must be >= 1 ("
                  << n_ens << ")\n\n";
             exit(1);
@@ -239,7 +239,7 @@ void process_command_line(int argc, char **argv)
 
    // Read the first input ensemble file
    if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0]))) {
-      mlog << Error << "\n  process_command_line() -> "
+      mlog << Error << "\nprocess_command_line() -> "
            << "Trouble reading ensemble file \""
            << ens_file_list[0] << "\"\n\n";
       exit(1);
@@ -255,7 +255,7 @@ void process_command_line(int argc, char **argv)
 
       // Read the first gridded observation file
       if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0]))) {
-         mlog << Error << "\n  process_command_line() -> "
+         mlog << Error << "\nprocess_command_line() -> "
               << "Trouble reading gridded observation file \""
               << grid_obs_file_list[0] << "\"\n\n";
          exit(1);
@@ -270,7 +270,7 @@ void process_command_line(int argc, char **argv)
       obs_valid_end_ut != (unixtime) 0 &&
       obs_valid_beg_ut > obs_valid_end_ut) {
 
-      mlog << Error << "\n  process_command_line() -> "
+      mlog << Error << "\nprocess_command_line() -> "
            << "the ending time (" << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
            << ") must be greater than the beginning time ("
            << unix_to_yyyymmdd_hhmmss(obs_valid_beg_ut) << ").\n\n";
@@ -334,7 +334,7 @@ void process_command_line(int argc, char **argv)
    for(i=0; i<ens_file_list.n_elements(); i++) {
 
       if(stat(ens_file_list[i], &results) != 0) {
-         mlog << Warning << "\n  process_command_line() -> "
+         mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input ensemble file: "
               << ens_file_list[i] << "\n\n";
          ens_file_vld.add(0);
@@ -386,7 +386,7 @@ void process_ensemble() {
            
             // Read the current ensemble file
             if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j]))) {
-               mlog << Error << "\n  process_ensemble() -> "
+               mlog << Error << "\nprocess_ensemble() -> "
                     << "Trouble reading ensemble file \""
                     << ens_file_list[j] << "\"\n\n";
                exit(1);
@@ -397,7 +397,7 @@ void process_ensemble() {
 
             // Track the missing and valid counts
             if(!status) {
-               mlog << Warning << "\n  process_ensemble() -> "
+               mlog << Warning << "\nprocess_ensemble() -> "
                     << conf_info.ens_info[i]->magic_str()
                     << " not found in file \"" << ens_file_list[j]
                     << "\"\n\n";
@@ -420,7 +420,7 @@ void process_ensemble() {
 
                if(ens_valid_ut != ens_dp.valid()) {
 
-                  mlog << Warning << "\n  process_ensemble() -> "
+                  mlog << Warning << "\nprocess_ensemble() -> "
                        << "The valid time has changed, "
                        << unix_to_yyyymmdd_hhmmss(ens_valid_ut)
                        << " != " << unix_to_yyyymmdd_hhmmss(ens_dp.valid())
@@ -433,7 +433,7 @@ void process_ensemble() {
          }
          else {
 
-            mlog << Warning << "\n  process_ensemble() -> "
+            mlog << Warning << "\nprocess_ensemble() -> "
                  << "Cannot read ensemble file \""
                  << ens_file_list[j] << "\"\n\n";
 
@@ -443,7 +443,7 @@ void process_ensemble() {
          // Check if the number of missing fields exceeds the threshold
          t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
          if((double) n_miss/n_ens > t) {
-            mlog << Error << "\n  process_ensemble_files() -> "
+            mlog << Error << "\nprocess_ensemble_files() -> "
                  << n_miss << " missing fields exceeds the maximum "
                  << "allowable specified by \"vld_ens_thresh\" "
                  << "in the configuration file.\n\n";
@@ -469,7 +469,7 @@ void process_ensemble() {
       // Check if the number of missing fields exceeds the threshold
       t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
       if((double) n_miss/n_ens > t) {
-         mlog << Error << "\n  process_ensemble_files() -> "
+         mlog << Error << "\nprocess_ensemble_files() -> "
               << n_miss << " missing fields exceeds the maximum "
               << "allowable specified by \"vld_ens_thresh\" "
               << "in the configuration file.\n\n";
@@ -498,7 +498,7 @@ void process_vx() {
 
       if(point_obs_file_list.n_elements() == 0 &&
          grid_obs_file_list.n_elements()  == 0) {
-         mlog << Error << "\n  process_vx() -> "
+         mlog << Error << "\nprocess_vx() -> "
               << " when \"fcst_field\" is non-empty, you must use "
               << "\"-point_obs\" and/or \"-grid_obs\" to specify the "
               << "verifying observations.\n\n";
@@ -565,7 +565,7 @@ void process_point_vx() {
       // Check if the number of missing fields exceeds the threshold
       t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
       if((double) n_miss/n_ens > t) {
-         mlog << Error << "\n  process_point_vx() -> "
+         mlog << Error << "\nprocess_point_vx() -> "
               << n_miss << " missing fields exceeds the maximum "
               << "allowable specified in the configuration file.\n\n";
          exit(1);
@@ -606,7 +606,7 @@ void process_point_obs(int i_nc) {
       delete obs_in;
       obs_in = (NcFile *) 0;
 
-      mlog << Warning << "\n  process_point_obs() -> "
+      mlog << Warning << "\nprocess_point_obs() -> "
            << "can't open observation netCDF file: "
            << point_obs_file_list[i_nc] << "\n\n";
       return;
@@ -632,7 +632,7 @@ void process_point_obs(int i_nc) {
    if(!strl_dim || !strl_dim->is_valid() ||
       !obs_dim  || !obs_dim->is_valid()  ||
       !hdr_dim  || !hdr_dim->is_valid()) {
-      mlog << Error << "\n  process_point_obs() -> "
+      mlog << Error << "\nprocess_point_obs() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
            << "dimensions from netCDF file: "
            << point_obs_file_list[i_nc] << "\n\n";
@@ -651,7 +651,7 @@ void process_point_obs(int i_nc) {
       !hdr_sid_var || !hdr_sid_var->is_valid() ||
       !hdr_vld_var || !hdr_vld_var->is_valid() ||
       !hdr_arr_var || !hdr_arr_var->is_valid()) {
-      mlog << Error << "\n  process_point_obs() -> "
+      mlog << Error << "\nprocess_point_obs() -> "
            << "can't read \"obs_arr\", \"hdr_typ\", \"hdr_sid\", "
            << "\"hdr_vld\", or \"hdr_arr\" variables from netCDF file: "
            << point_obs_file_list[i_nc] << "\n\n";
@@ -668,7 +668,7 @@ void process_point_obs(int i_nc) {
       // Read the current observation message
       if(!obs_arr_var->set_cur((long) i_obs)
       || !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
-         mlog << Error << "\n  process_point_obs() -> "
+         mlog << Error << "\nprocess_point_obs() -> "
               << "can't read the record for observation "
               << "number " << i_obs << "\n\n";
          exit(1);
@@ -677,7 +677,7 @@ void process_point_obs(int i_nc) {
       // Read the corresponding header array for this observation
       if(!hdr_arr_var->set_cur((long) (obs_arr[0])) ||
          !hdr_arr_var->get(hdr_arr, 1, hdr_arr_len)) {
-         mlog << Error << "\n  process_point_obs() -> "
+         mlog << Error << "\nprocess_point_obs() -> "
               << "can't read the header array record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -686,7 +686,7 @@ void process_point_obs(int i_nc) {
       // Read the corresponding header type for this observation
       if(!hdr_typ_var->set_cur((long) (obs_arr[0])) ||
          !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\n  process_point_obs() -> "
+         mlog << Error << "\nprocess_point_obs() -> "
               << "can't read the message type record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -695,7 +695,7 @@ void process_point_obs(int i_nc) {
       // Read the corresponding header Station ID for this observation
       if(!hdr_sid_var->set_cur((long) (obs_arr[0])) ||
          !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
-         mlog << Error << "\n  process_point_obs() -> "
+         mlog << Error << "\nprocess_point_obs() -> "
               << "can't read the station ID record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -704,7 +704,7 @@ void process_point_obs(int i_nc) {
       // Read the corresponding valid time for this observation
       if(!hdr_vld_var->set_cur((long) (obs_arr[0])) ||
          !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
-         mlog << Error << "\n  process_point_obs() -> "
+         mlog << Error << "\nprocess_point_obs() -> "
               << "can't read the valid time for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
@@ -751,7 +751,7 @@ int process_point_ens(int i_ens) {
 
       // Read the current ensemble file
       if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[i_ens]))) {
-         mlog << Error << "\n  process_point_ens() -> "
+         mlog << Error << "\nprocess_point_ens() -> "
               << "Trouble reading ensemble file \""
               << ens_file_list[i_ens] << "\"\n\n";
          exit(1);
@@ -762,7 +762,7 @@ int process_point_ens(int i_ens) {
 
       // Check for zero fields
       if(n_fcst == 0) {
-         mlog << Warning << "\n  process_point_ens() -> "
+         mlog << Warning << "\nprocess_point_ens() -> "
               << "no fields matching "
               << conf_info.vx_pd[i].fcst_info->magic_str()
               << " found in file: "
@@ -967,7 +967,7 @@ void process_grid_vx() {
 
             // Read the current ensemble file
             if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j]))) {
-               mlog << Error << "\n  process_grid_vx() -> "
+               mlog << Error << "\nprocess_grid_vx() -> "
                     << "Trouble reading ensemble file \""
                     << ens_file_list[j] << "\"\n\n";
                exit(1);
@@ -992,7 +992,7 @@ void process_grid_vx() {
          // Check if the number of missing fields exceeds the threshold
          t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
          if((double) n_miss/n_ens > t) {
-            mlog << Error << "\n  process_grid_vx() -> "
+            mlog << Error << "\nprocess_grid_vx() -> "
                  << n_miss << " missing fields exceeds the maximum "
                  << "allowable specified in the configuration file.\n\n";
             exit(1);
@@ -1014,7 +1014,7 @@ void process_grid_vx() {
 
          // Read the current gridded observation file
          if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[j]))) {
-            mlog << Error << "\n  process_grid_vx() -> "
+            mlog << Error << "\nprocess_grid_vx() -> "
                  << "Trouble reading gridded observation file \""
                  << grid_obs_file_list[j] << "\"\n\n";
             exit(1);
@@ -1036,7 +1036,7 @@ void process_grid_vx() {
 
       // Check if the observation field was found
       if(n_miss == grid_obs_file_list.n_elements()) {
-         mlog << Warning << "\n  process_grid_vx() -> "
+         mlog << Warning << "\nprocess_grid_vx() -> "
               << conf_info.vx_pd[i].obs_info->magic_str()
               << " not found in observation files.\n";
          continue;
@@ -1058,7 +1058,7 @@ void process_grid_vx() {
             conf_info.interp_mthd[j] == InterpMthd_Bilin   ||
             conf_info.interp_mthd[j] == InterpMthd_Nbrhd) {
 
-            mlog << Warning << "\n  process_grid_vx() -> "
+            mlog << Warning << "\nprocess_grid_vx() -> "
                  << interpmthd_to_string(conf_info.interp_mthd[j])
                  << " smoothing option not supported for gridded observations.\n";
             continue;
@@ -1221,7 +1221,7 @@ void parse_ens_file_list(const char *fcst_file) {
    // Open the ensemble file list
    f_in.open(fcst_file);
    if(!f_in) {
-      mlog << Error << "\n  parse_ens_file_list() -> "
+      mlog << Error << "\nparse_ens_file_list() -> "
            << "can't open input ensemble file list \"" << fcst_file
            << "\" for reading\n\n";
       exit(1);
@@ -1250,7 +1250,7 @@ void set_grid(const Grid &gr) {
    // Check to make sure that the grid doesn't change
    else {
       if(!(grid == gr)) {
-         mlog << Error << "\n  set_grid() -> "
+         mlog << Error << "\nset_grid() -> "
               << "All data files must be on the same grid!\n\n";
          exit(1);
       }
@@ -1338,7 +1338,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    nc_out = new NcFile(out_nc_file, NcFile::Replace);
 
    if(!nc_out->is_valid()) {
-      mlog << Error << "\n  setup_nc_file() -> "
+      mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
       exit(1);
@@ -1723,7 +1723,7 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\n  write_ens_var_float() -> "
+      mlog << Error << "\nwrite_ens_var_float() -> "
            << "error in ens_var->put for the " << ens_var_name
            << " field.\n\n";
       exit(1);
@@ -1757,7 +1757,7 @@ void write_ens_var_int(int i_vx, int *ens_data, DataPlane &dp,
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\n  write_ens_var_int() -> "
+      mlog << Error << "\nwrite_ens_var_int() -> "
            << "error in ens_var->put for the " << ens_var_name
            << " field.\n\n";
       exit(1);
@@ -1878,7 +1878,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\n  write_orank_var_float() -> "
+      mlog << Error << "\nwrite_orank_var_float() -> "
            << "error in nc_var->put for the " << var_name
            << " field.\n\n";
       exit(1);
@@ -1930,7 +1930,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\n  write_orank_var_int() -> "
+      mlog << Error << "\nwrite_orank_var_int() -> "
            << "error in nc_var->put for the " << var_name
            << " field.\n\n";
       exit(1);

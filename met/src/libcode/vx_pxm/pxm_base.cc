@@ -167,7 +167,7 @@ int PxmBase::rc_to_n(int r, int c) const
 
 if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
 
-   mlog << Error << "\n  PxmBase::rc_to_n() -> range check error\n\n";
+   mlog << Error << "\nPxmBase::rc_to_n() -> range check error\n\n";
 
    exit ( 1 );
 
@@ -192,7 +192,7 @@ void PxmBase::n_to_rc(int n, int & r, int & c) const
 
 if ( (n < 0) || (n >= (Nrows*Ncols)) )  {
 
-   mlog << Error << "\n  PxmBase::n_to_rc() -> range check error\n\n";
+   mlog << Error << "\nPxmBase::n_to_rc() -> range check error\n\n";
 
    exit ( 1 );
 
@@ -239,7 +239,7 @@ const char * PxmBase::comment(int n) const
 
 if ( (n < 0) || (n >= Ncomments) )  {
 
-   mlog << Error << "\n  PxmBase::comment(int) const -> range check error!\n\n";
+   mlog << Error << "\nPxmBase::comment(int) const -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -260,7 +260,7 @@ void PxmBase::add_comment(const char * text)
 
 if ( Ncomments >= max_comments )  {
 
-   mlog << Error << "\n  void PxmBase::add_comment(const char *) -> too meny comments!\n\n";
+   mlog << Error << "\nvoid PxmBase::add_comment(const char *) -> too meny comments!\n\n";
 
    exit ( 1 );
 

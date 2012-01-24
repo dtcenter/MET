@@ -220,7 +220,7 @@ switch ( e.type )  {
 
 
    default:
-      mlog << Error << "\n  SymbolTableEntry::assign(const SymbolTableEntry &) -> "
+      mlog << Error << "\nSymbolTableEntry::assign(const SymbolTableEntry &) -> "
            << "unrecognized type \"" << stetype_to_string(e.type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -621,7 +621,7 @@ switch ( type )  {
 
 
    default:
-      mlog << Error << "\n  SymbolTableEntry::dump() const -> "
+      mlog << Error << "\nSymbolTableEntry::dump() const -> "
            << "unrecognized type \"" << stetype_to_string(type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -808,7 +808,7 @@ u = new SymbolTableEntry * [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n  SymbolTable::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nSymbolTable::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -906,7 +906,7 @@ Entry[Nentries] = new SymbolTableEntry;
 
 if ( !(Entry[Nentries]) )  {
 
-   mlog << Error << "\n  SymbolTable::store(const RpnObject *, const char *) -> memory allocation error\n\n";
+   mlog << Error << "\nSymbolTable::store(const RpnObject *, const char *) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -1088,7 +1088,7 @@ poset.open(temp_filename_1);
 
 if ( !poset )  {
 
-   mlog << Error << "\n  void SymbolTable::algebraic_dump(ostream &) const -> can't open poset file\n\n";
+   mlog << Error << "\nvoid SymbolTable::algebraic_dump(ostream &) const -> can't open poset file\n\n";
 
    exit ( 1 );
 
@@ -1156,7 +1156,7 @@ for (j=0; j<Nentries; ++j)  {
 
 
       default:
-         mlog << Error << "\n  SymbolTable::algebraic_dump(ostream &) const -> "
+         mlog << Error << "\nSymbolTable::algebraic_dump(ostream &) const -> "
               << "unrecognized symbol table entry type ... \""
               << stetype_to_string(Entry[j]->type) << "\"\n\n";
          exit ( 1 );
@@ -1176,7 +1176,7 @@ if ( file_exists(temp_filename_2) )  {
 
    if ( unlink(temp_filename_2) < 0 )  {
 
-      mlog << Error << "\n  SymbolTable::algebraic_dump(ostream &) const -> unable to remove temp file \""
+      mlog << Error << "\nSymbolTable::algebraic_dump(ostream &) const -> unable to remove temp file \""
            << temp_filename_2 << "\" ... "
            // << sys_errlist[errno]
            << strerror(errno)
@@ -1195,7 +1195,7 @@ status = system(command);
 
 if ( status )  {
 
-   mlog << Error << "\n  SymbolTable::algebraic_dump(ostream &) const -> command \""
+   mlog << Error << "\nSymbolTable::algebraic_dump(ostream &) const -> command \""
         << command << "\" failed!\n\n";
 
    exit ( 1 );
@@ -1212,7 +1212,7 @@ in.open(temp_filename_2);
 
 if ( !in )  {
 
-   mlog << Error << "\n  SymbolTable::algebraic_dump(ostream &) const -> unable to open temp file \""
+   mlog << Error << "\nSymbolTable::algebraic_dump(ostream &) const -> unable to open temp file \""
         << temp_filename_2 << "\"\n\n";
 
    exit ( 1 );
@@ -1227,7 +1227,7 @@ while ( in.getline(line, sizeof(line)) )  {
 
    if ( !e )  {
 
-      mlog << Error << "\n  SymbolTable::algebraic_dump(ostream &) const -> unable find symbol table entry for \""
+      mlog << Error << "\nSymbolTable::algebraic_dump(ostream &) const -> unable find symbol table entry for \""
            << line << "\"\n\n";
 
       exit ( 1 );
@@ -1290,7 +1290,7 @@ switch ( e->type )  {
       break;
 
    default:
-      mlog << Error << "\n  SymbolTable::algebraic_dump_entry(ostream &) const -> "
+      mlog << Error << "\nSymbolTable::algebraic_dump_entry(ostream &) const -> "
            << "unrecognized type \"" << stetype_to_string(e->type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -1530,7 +1530,7 @@ while ( pos < v.length() )  {
             e = find(cell->name);
 
             if ( !e )  {
-               mlog << Error << "\n  SymbolTable::algebraic_dump_icv() -> symbol \"" << (cell->name) << "\" not found!\n\n";
+               mlog << Error << "\nSymbolTable::algebraic_dump_icv() -> symbol \"" << (cell->name) << "\" not found!\n\n";
                exit ( 1 );
             }
 
@@ -1581,7 +1581,7 @@ while ( pos < v.length() )  {
 
 
                default:
-                  mlog << Error << "\n  SymbolTable::algebraic_dump_icv() -> "
+                  mlog << Error << "\nSymbolTable::algebraic_dump_icv() -> "
                        << "symbol \"" << (e->name) << "\" has bad type ... \""
                        << stetype_to_string(e->type) << "\"\n\n";
                   exit ( 1 );
@@ -1613,7 +1613,7 @@ while ( pos < v.length() )  {
                   a.prepend(cell->name);
                   a.prec = 1000;
                } else {
-                  mlog << Error << "\n  SymbolTable::algebraic_dump_icv() -> "
+                  mlog << Error << "\nSymbolTable::algebraic_dump_icv() -> "
                        << "symbol \"" << (cell->name) << "\" has bad type ... \""
                        << celltype_to_string(cell->type) << "\"\n\n";
                   exit ( 1 );
@@ -1721,7 +1721,7 @@ while ( pos < v.length() )  {
          break;
 
       default:
-         mlog << Error << "\n  SymbolTable::algebraic_dump_icv(ostream &) const -> "
+         mlog << Error << "\nSymbolTable::algebraic_dump_icv(ostream &) const -> "
               << "unrecognized icode cell type ... \""
               << celltype_to_string(cell->type) << "\"\n\n";
          exit ( 1 );
@@ -1741,7 +1741,7 @@ while ( pos < v.length() )  {
 
 if ( s.depth() != 1 )  {
 
-   mlog << Error << "\n  SymbolTable::algebraic_dump_icv(ostream &, const IcodeVector &) const -> bad stack depth ... "
+   mlog << Error << "\nSymbolTable::algebraic_dump_icv(ostream &, const IcodeVector &) const -> bad stack depth ... "
         << (s.depth()) << "\n\n";
 
    while ( s.depth() > 0 )  {
@@ -1778,7 +1778,7 @@ const SymbolTableEntry * SymbolTable::entry(int k) const
 
 if ( (k < 0) || (k >= Nentries) )  {
 
-   mlog << Error << "\n  const SymbolTableEntry & SymbolTable::entry(int) const -> range check error\n\n";
+   mlog << Error << "\nconst SymbolTableEntry & SymbolTable::entry(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1879,7 +1879,7 @@ Table[0] = new SymbolTable;
 
 if ( !(Table[0]) )  {
 
-   mlog << Error << "\n  void SymbolTableStack::init_from_scratch() -> memory allocation error!\n\n";
+   mlog << Error << "\nvoid SymbolTableStack::init_from_scratch() -> memory allocation error!\n\n";
 
    exit ( 1 );
 
@@ -1961,7 +1961,7 @@ u = new SymbolTable * [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n  SymbolTableStack::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nSymbolTableStack::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -2015,7 +2015,7 @@ void SymbolTableStack::pop()
 
 if ( Ntables <= 1 )  {
 
-   mlog << Error << "\n  SymbolTableStack::pop() -> can't pop off the last table!\n\n";
+   mlog << Error << "\nSymbolTableStack::pop() -> can't pop off the last table!\n\n";
 
    exit ( 1 );
 
@@ -2184,7 +2184,7 @@ const SymbolTable & SymbolTableStack::table(int k) const
 
 if ( (k < 0) || (k >= Ntables) )  {
 
-   mlog << Error << "\n  const SymbolTable & SymbolTableStack::table(int) const -> range check error\n\n";
+   mlog << Error << "\nconst SymbolTable & SymbolTableStack::table(int) const -> range check error\n\n";
 
    exit ( 1 );
 

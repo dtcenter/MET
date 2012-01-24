@@ -263,7 +263,7 @@ int Interpolator::two_to_one(int x, int y) const
 
 if ( (x < 0) || (x >= Width) || (y < 0) || (y >= Width) )  {
 
-   mlog << Error << "\n  Interpolator::two_to_one(int x, int y) -> range check error ... "
+   mlog << Error << "\nInterpolator::two_to_one(int x, int y) -> range check error ... "
         << "Width = " << Width << ",  (x, y) = "
         << '(' << x << ", " << y << ")\n\n";
 
@@ -289,7 +289,7 @@ void Interpolator::put_good(int x, int y, double value)
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Interpolator::put_good(int x, int y, double value) -> null data pointer!\n\n";
+   mlog << Error << "\nInterpolator::put_good(int x, int y, double value) -> null data pointer!\n\n";
 
    exit ( 1 );
 
@@ -315,7 +315,7 @@ void Interpolator::put_bad(int x, int y)
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Interpolator::put_bad(int x, int y, double value) -> null data pointer!\n\n";
+   mlog << Error << "\nInterpolator::put_bad(int x, int y, double value) -> null data pointer!\n\n";
 
    exit ( 1 );
 
@@ -343,7 +343,7 @@ clear();
 
 if ( (W < 1) || (W%2 == 0) )  {
 
-   mlog << Error << "\n  Interpolator::set_size(int) -> bad value ... " << W << "\n\n";
+   mlog << Error << "\nInterpolator::set_size(int) -> bad value ... " << W << "\n\n";
 
    exit ( 1 );
 
@@ -369,7 +369,7 @@ void Interpolator::set_ngood_needed(int n)
 
 if ( (n < 0) || (n >= (Width*Width)) )  {
 
-   mlog << Error << "\n  Interpolator::set_ngood_needed(int) -> bad value ... " << n << "\n\n";
+   mlog << Error << "\nInterpolator::set_ngood_needed(int) -> bad value ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -391,7 +391,7 @@ int Interpolator::n_good() const
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Interpolator::n_good() -> null data pointer!\n\n";
+   mlog << Error << "\nInterpolator::n_good() -> null data pointer!\n\n";
 
    exit ( 1 );
 
@@ -423,7 +423,7 @@ int Interpolator::n_bad() const
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Interpolator::n_bad() -> null data pointer!\n\n";
+   mlog << Error << "\nInterpolator::n_bad() -> null data pointer!\n\n";
 
    exit ( 1 );
 

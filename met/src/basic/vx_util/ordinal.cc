@@ -92,7 +92,7 @@ switch ( n )  {
          //
          //  should never happen
          //
-      mlog << Error << "\n  ordinal_suffix() -> totally confused!\n\n";
+      mlog << Error << "\nordinal_suffix() -> totally confused!\n\n";
       exit ( 1 );
       break;
 

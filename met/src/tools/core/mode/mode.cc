@@ -399,7 +399,7 @@ void process_command_line(int argc, char **argv)
    // Check to make sure that MODE can be run on the GRIB codes specified
    //
    if(fcst_info->is_wind_direction() || obs_info->is_wind_direction()) {
-      mlog << Error << "\n  main() -> "
+      mlog << Error << "\nmain() -> "
            << "mode may not be run on a wind direction field.\n\n";
       exit(1);
    }
@@ -437,7 +437,7 @@ void process_fcst_obs_files()
 
    if ( !fcst_mtddf )  {
 
-      mlog << Error << "\n  process_fcst_obs_files() -> "
+      mlog << Error << "\nprocess_fcst_obs_files() -> "
            << "can't open data file \"" << fcst_file << "\"\n\n";
 
       exit ( 1 );
@@ -446,7 +446,7 @@ void process_fcst_obs_files()
 
    if ( ! (fcst_mtddf->data_plane(*fcst_info, fcst_wd.data)) )  {
 
-      mlog << Error << "\n  process_fcst_obs_files() -> "
+      mlog << Error << "\nprocess_fcst_obs_files() -> "
            << "can't get data from file \"" << fcst_file << "\"\n\n";
 
       exit ( 1 );
@@ -467,7 +467,7 @@ void process_fcst_obs_files()
 
    if ( !obs_mtddf )  {
 
-      mlog << Error << "\n  process_fcst_obs_files() -> "
+      mlog << Error << "\nprocess_fcst_obs_files() -> "
            << "can't open data file \"" << obs_file << "\"\n\n";
 
       exit ( 1 );
@@ -476,7 +476,7 @@ void process_fcst_obs_files()
 
    if ( ! (obs_mtddf->data_plane(*obs_info, obs_wd.data)) )  {
 
-      mlog << Error << "\n  process_fcst_obs_files() -> "
+      mlog << Error << "\nprocess_fcst_obs_files() -> "
            << "can't get data from file \"" << obs_file << "\"\n\n";
 
       exit ( 1 );
@@ -493,7 +493,7 @@ void process_fcst_obs_files()
    // Check that the grids match
    //
    if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
-      mlog << Error << "\n  process_fcst_obs_files() -> "
+      mlog << Error << "\nprocess_fcst_obs_files() -> "
            << "The forecast and observation grids do not match.\n\n";
       exit(1);
    }
@@ -513,7 +513,7 @@ void process_fcst_obs_files()
       unix_to_yyyymmdd_hhmmss(fcst_valid_ut, tmp_str);
       unix_to_yyyymmdd_hhmmss(obs_valid_ut, tmp2_str);
 
-      mlog << Warning << "\n  process_fcst_obs_files() -> "
+      mlog << Warning << "\nprocess_fcst_obs_files() -> "
            << "Forecast and observation valid times do not match "
            << tmp_str << " != " << tmp2_str << ".\n\n";
    }
@@ -528,7 +528,7 @@ void process_fcst_obs_files()
       sec_to_hhmmss(fcst_wd.data.accum(), tmp_str);
       sec_to_hhmmss(obs_wd.data.accum(), tmp2_str);
 
-      mlog << Warning << "\n  process_fcst_obs_files() -> "
+      mlog << Warning << "\nprocess_fcst_obs_files() -> "
            << "Forecast and observation accumulation times do not match "
            << tmp_str << " != " << tmp2_str << ".\n\n";
    }
@@ -730,7 +730,7 @@ void check_engine_config()
    if(strlen(engine.wconf.model().sval()) == 0 ||
       check_reg_exp(ws_reg_exp, engine.wconf.model().sval()) == true) {
 
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The model name (\"" << engine.wconf.model().sval()
            << "\") must be non-empty and contain no embedded "
            << "whitespace.\n\n";
@@ -739,7 +739,7 @@ void check_engine_config()
 
    // Check that grid_res is > 0
    if(engine.wconf.grid_res().dval() <= 0) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "grid_res (" << engine.wconf.grid_res().dval()
            << ") must be set > 0 in the configuration file\n\n";
       exit(1);
@@ -748,7 +748,7 @@ void check_engine_config()
    // Check that mask_missing_flag is set between 0 and 3
    if(engine.wconf.mask_missing_flag().ival() < 0 ||
       engine.wconf.mask_missing_flag().ival() > 3) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The mask_missing_flag (" << engine.wconf.mask_missing_flag().ival()
            << ") must be set between 0 and 3\n\n";
       exit(1);
@@ -757,7 +757,7 @@ void check_engine_config()
    // Check that mask_grid_flag is set between 0 and 3
    if(engine.wconf.mask_grid_flag().ival() < 0 ||
       engine.wconf.mask_grid_flag().ival() > 3) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The mask_grid_flag (" << engine.wconf.mask_grid_flag().ival()
            << ") must be set between 0 and 3\n\n";
       exit(1);
@@ -766,7 +766,7 @@ void check_engine_config()
    // Check that mask_poly_flag is set between 0 and 3
    if(engine.wconf.mask_poly_flag().ival() < 0 ||
       engine.wconf.mask_poly_flag().ival() > 3) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The mask_poly_flag (" << engine.wconf.mask_poly_flag().ival()
            << ") must be set between 0 and 3\n\n";
       exit(1);
@@ -775,7 +775,7 @@ void check_engine_config()
    // Check that fcst_conv_radius and obs_conv_radius are non-negative
    if(engine.wconf.fcst_conv_radius().ival() < 0 ||
       engine.wconf.obs_conv_radius().ival() < 0) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "fcst_conv_radius (" << engine.wconf.fcst_conv_radius().ival()
            << ") and obs_conv_radius (" << engine.wconf.obs_conv_radius().ival()
            << ") must be non-negative\n\n";
@@ -786,7 +786,7 @@ void check_engine_config()
    if(verbosity > 0 &&
       (engine.fcst_area_thresh.thresh < 0 ||
        engine.obs_area_thresh.thresh < 0)) {
-      mlog << Warning << "\n  check_engine_config() -> "
+      mlog << Warning << "\ncheck_engine_config() -> "
            << "fcst_area_thresh (" << engine.wconf.fcst_area_thresh().ival()
            << ") and obs_area_thresh (" << engine.wconf.obs_area_thresh().ival()
            << ") should be non-negative\n\n";
@@ -795,7 +795,7 @@ void check_engine_config()
    // Check that fcst_merge_flag is set between 0 and 3
    if(engine.wconf.fcst_merge_flag().ival() < 0 ||
       engine.wconf.fcst_merge_flag().ival() > 3) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The fcst_merge_flag (" << engine.wconf.fcst_merge_flag().ival()
            << ") must be set between 0 and 3\n\n";
       exit(1);
@@ -804,7 +804,7 @@ void check_engine_config()
    // Check that obs_merge_flag is set between 0 and 3
    if(engine.wconf.obs_merge_flag().ival() < 0 ||
       engine.wconf.obs_merge_flag().ival() > 3) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The obs_merge_flag (" << engine.wconf.obs_merge_flag().ival()
            << ") must be set between 0 and 3\n\n";
       exit(1);
@@ -813,7 +813,7 @@ void check_engine_config()
    // Check that match_flag is set between 0 and 3
    if(engine.wconf.match_flag().ival() < 0 ||
       engine.wconf.match_flag().ival() > 3) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The match_flag (" << engine.wconf.match_flag().ival()
            << ") must be set between 0 and 3\n\n";
       exit(1);
@@ -823,7 +823,7 @@ void check_engine_config()
    if(engine.wconf.match_flag().ival() == 0 &&
       (engine.wconf.fcst_merge_flag().ival() != 0 ||
        engine.wconf.obs_merge_flag().ival() != 0) ) {
-      mlog << Warning << "\n  check_engine_config() -> "
+      mlog << Warning << "\ncheck_engine_config() -> "
            << "when matching is disabled (match_flag = " << engine.wconf.match_flag().ival()
            << ") but merging is requested (fcst_merge_flag = " << engine.wconf.fcst_merge_flag().ival()
            << ", obs_merge_flag = " << engine.wconf.obs_merge_flag().ival()
@@ -833,7 +833,7 @@ void check_engine_config()
    // Check that max_centroid_dist is > 0
    if(verbosity > 0 &&
       engine.wconf.max_centroid_dist().dval() <= 0) {
-      mlog << Warning << "\n  check_engine_config() -> "
+      mlog << Warning << "\ncheck_engine_config() -> "
            << "max_centroid_dist (" << engine.wconf.max_centroid_dist().dval()
            << ") should be set > 0\n\n";
    }
@@ -848,7 +848,7 @@ void check_engine_config()
       engine.wconf.complexity_ratio_weight().dval() < 0 ||
       engine.wconf.intensity_ratio_weight().dval() < 0) {
 
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "All of the fuzzy engine weights must be >= 0\n\n";
       exit(1);
    }
@@ -865,7 +865,7 @@ void check_engine_config()
        + engine.wconf.complexity_ratio_weight().dval()
        + engine.wconf.intensity_ratio_weight().dval()), 0.0)) {
 
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "When matching is requested, the sum of the fuzzy engine "
            << "weights cannot be 0\n\n";
       exit(1);
@@ -874,7 +874,7 @@ void check_engine_config()
    // Check that intensity_percentile >= 0 and <= 100
    if(engine.wconf.intensity_percentile().ival() < 0 ||
       engine.wconf.intensity_percentile().ival() > 100) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "intensity_percentile (" << engine.wconf.intensity_percentile().ival()
            << ") must be >= 0 and <= 100\n\n";
       exit(1);
@@ -883,7 +883,7 @@ void check_engine_config()
    // Check that total_interest_thresh >= 0 and <= 1
    if(engine.wconf.total_interest_thresh().dval() < 0 ||
       engine.wconf.total_interest_thresh().dval() > 1) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "total_interest_thresh (" << engine.wconf.total_interest_thresh().dval()
            << ") must be >= 0 and <= 1\n\n";
       exit(1);
@@ -892,7 +892,7 @@ void check_engine_config()
    // Check that print_interest_thresh >= 0 and <= 1
    if(engine.wconf.print_interest_thresh().dval() < 0 ||
       engine.wconf.print_interest_thresh().dval() > 1) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "print_interest_thresh (" << engine.wconf.print_interest_thresh().dval()
            << ") must be >= 0 and <= 1\n\n";
       exit(1);
@@ -900,7 +900,7 @@ void check_engine_config()
 
    // Check that zero_border_size >= 1
    if(engine.wconf.zero_border_size().ival() < 1) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "zero_border_size (" << engine.wconf.zero_border_size().ival()
            << ") must be >= 1\n\n";
       exit(1);
@@ -913,7 +913,7 @@ void check_engine_config()
    ct_test.clear();
    s = replace_path(engine.wconf.fcst_raw_color_table().sval());
    if(!ct_test.read(s)) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "cannot read fcst_raw_color_table file ("
            << s
            << ")\n\n";
@@ -924,7 +924,7 @@ void check_engine_config()
    ct_test.clear();
    s = replace_path(engine.wconf.obs_raw_color_table().sval());
    if(!ct_test.read(s)) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "cannot read obs_raw_color_table file ("
            << s
            << ")\n\n";
@@ -933,7 +933,7 @@ void check_engine_config()
 
    // Check that the stride length is set >= 1
    if((stride = engine.wconf.stride_length().ival()) < 1) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "stride_length must be set >= 1: " << stride
            << "\n\n";
       exit(1);
@@ -943,7 +943,7 @@ void check_engine_config()
    ct_test.clear();
    s = replace_path(engine.wconf.mode_color_table().sval());
    if(!ct_test.read(s)) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "cannot read mode_color_table file ("
            << s
            << ")\n\n";
@@ -953,7 +953,7 @@ void check_engine_config()
    // Check that plot_valid_flag is set between 0 and 1
    if(engine.wconf.plot_valid_flag().ival() < 0 ||
       engine.wconf.plot_valid_flag().ival() > 1) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The plot_valid_flag (" << engine.wconf.plot_valid_flag().ival()
            << ") must be set to 0 or 1\n\n";
       exit(1);
@@ -962,7 +962,7 @@ void check_engine_config()
    // Check that plot_gcarc_flag is set between 0 and 1
    if(engine.wconf.plot_gcarc_flag().ival() < 0 ||
       engine.wconf.plot_gcarc_flag().ival() > 1) {
-      mlog << Error << "\n  check_engine_config() -> "
+      mlog << Error << "\ncheck_engine_config() -> "
            << "The plot_gcarc_flag (" << engine.wconf.plot_gcarc_flag().ival()
            << ") must be set to 0 or 1\n\n";
       exit(1);
@@ -2793,7 +2793,7 @@ void write_obj_stats() {
    out.open(stat_file);
 
    if(!out) {
-      mlog << Error << "\n  write_obj_stats() -> "
+      mlog << Error << "\nwrite_obj_stats() -> "
            << "unable to open stats output file \""
            << stat_file << "\"\n\n";
       exit(1);
@@ -2827,7 +2827,7 @@ void write_obj_stats() {
       out.open(stat_file);
 
       if(!out) {
-         mlog << Error << "\n  write_obj_stats() -> "
+         mlog << Error << "\nwrite_obj_stats() -> "
               << "unable to open stats output file \""
               << stat_file << "\"\n\n";
          exit(1);
@@ -2859,7 +2859,7 @@ void write_obj_stats() {
       out.open(stat_file);
 
       if(!out) {
-         mlog << Error << "\n  write_obj_stats() -> "
+         mlog << Error << "\nwrite_obj_stats() -> "
               << "unable to open stats output file \""
               << stat_file << "\"\n\n";
          exit(1);
@@ -2925,7 +2925,7 @@ void write_obj_netcdf() {
    f_out = new NcFile(out_file, NcFile::Replace);
 
    if(!f_out->is_valid()) {
-      mlog << Error << "\n  write_obj_netcdf() -> trouble opening output file "
+      mlog << Error << "\nwrite_obj_netcdf() -> trouble opening output file "
            << out_file << "\n\n";
       f_out->close();
       delete f_out;
@@ -3056,7 +3056,7 @@ void write_obj_netcdf() {
    if( !fcst_raw_var->put(&fcst_raw_data[0], grid.ny(), grid.nx()) ||
        !obs_raw_var->put(&obs_raw_data[0], grid.ny(), grid.nx()) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
       exit(1);
    }
@@ -3067,7 +3067,7 @@ void write_obj_netcdf() {
    if( !fcst_obj_var->put(&fcst_obj_data[0], grid.ny(), grid.nx()) ||
        !obs_obj_var->put(&obs_obj_data[0], grid.ny(), grid.nx()) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
       exit(1);
    }
@@ -3078,7 +3078,7 @@ void write_obj_netcdf() {
    if( !fcst_clus_var->put(&fcst_clus_data[0], grid.ny(), grid.nx()) ||
        !obs_clus_var->put(&obs_clus_data[0], grid.ny(), grid.nx()) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
       exit(1);
    }
@@ -3129,7 +3129,7 @@ void write_bdy_netcdf(NcFile *f_out) {
    if( !n_fcst_obj_var->put(&engine.n_fcst) ||
        !n_obs_obj_var->put(&engine.n_obs) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with the n_fcst_obj_var-> or "
            << "n_obs_obj_var->put\n\n";
       exit(1);
@@ -3239,7 +3239,7 @@ void write_fcst_bdy_netcdf(NcFile *f_out) {
    if( !obj_bdy_start_var->put(&bdy_start[0], engine.n_fcst) ||
        !obj_bdy_npts_var->put(&bdy_npts[0], engine.n_fcst) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with the obj_bdy_start_var->put or "
            << "obj_bdy_npts_var->put\n\n";
       exit(1);
@@ -3251,7 +3251,7 @@ void write_fcst_bdy_netcdf(NcFile *f_out) {
    if( !bdy_lat_var->put(&bdy_lat[0], n_pts) ||
        !bdy_lon_var->put(&bdy_lon[0], n_pts) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with bdy_lat_var->put "
            << "or bdy_lon_var->put\n\n";
       exit(1);
@@ -3263,7 +3263,7 @@ void write_fcst_bdy_netcdf(NcFile *f_out) {
    if( !bdy_x_var->put(&bdy_x[0], n_pts) ||
        !bdy_y_var->put(&bdy_y[0], n_pts) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with bdy_x_var->put "
            << "or bdy_y_var->put\n\n";
       exit(1);
@@ -3376,7 +3376,7 @@ void write_obs_bdy_netcdf(NcFile *f_out) {
    if( !obj_bdy_start_var->put(&bdy_start[0], engine.n_obs) ||
        !obj_bdy_npts_var->put(&bdy_npts[0], engine.n_obs) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with the obj_bdy_start_var->put or "
            << "obj_bdy_npts_var->put\n\n";
       exit(1);
@@ -3388,7 +3388,7 @@ void write_obs_bdy_netcdf(NcFile *f_out) {
    if( !bdy_lat_var->put(&bdy_lat[0], n_pts) ||
        !bdy_lon_var->put(&bdy_lon[0], n_pts) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with bdy_lat_var->put "
            << "or bdy_lon_var->put\n\n";
       exit(1);
@@ -3400,7 +3400,7 @@ void write_obs_bdy_netcdf(NcFile *f_out) {
    if( !bdy_x_var->put(&bdy_x[0], n_pts) ||
        !bdy_y_var->put(&bdy_y[0], n_pts) ) {
 
-      mlog << Error << "\n  write_obj_netcdf() -> "
+      mlog << Error << "\nwrite_obj_netcdf() -> "
            << "error with bdy_x_var->put "
            << "or bdy_y_var->put\n\n";
       exit(1);
@@ -3439,7 +3439,7 @@ void write_ct_stats() {
    out.open(stat_file);
 
    if(!out) {
-      mlog << Error << "\n  write_ct_stats() -> "
+      mlog << Error << "\nwrite_ct_stats() -> "
            << "unable to open stats output file \""
            << stat_file << "\"\n\n";
       exit(1);

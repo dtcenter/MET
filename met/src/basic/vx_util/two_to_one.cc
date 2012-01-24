@@ -215,7 +215,7 @@ int two_to_one_0_0_0(const int Nx, const int Ny, const int x, const int y)  // +
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_0_0_0() -> "
+   mlog << Error << "\ntwo_to_one_0_0_0() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -235,7 +235,7 @@ int two_to_one_0_0_1(const int Nx, const int Ny, const int x, const int y)  // +
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_0_0_1() -> "
+   mlog << Error << "\ntwo_to_one_0_0_1() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -256,7 +256,7 @@ int two_to_one_0_1_0(const int Nx, const int Ny, const int x, const int y)  // +
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_0_1_0() -> "
+   mlog << Error << "\ntwo_to_one_0_1_0() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -277,7 +277,7 @@ int two_to_one_0_1_1(const int Nx, const int Ny, const int x, const int y) // +x
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_0_1_1() -> "
+   mlog << Error << "\ntwo_to_one_0_1_1() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", "
         << Ny << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -297,7 +297,7 @@ int two_to_one_1_0_0(const int Nx, const int Ny, const int x, const int y)  // -
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_1_0_0() -> "
+   mlog << Error << "\ntwo_to_one_1_0_0() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -317,7 +317,7 @@ int two_to_one_1_0_1(const int Nx, const int Ny, const int x, const int y)  // -
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_1_0_1() -> "
+   mlog << Error << "\ntwo_to_one_1_0_1() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -337,7 +337,7 @@ int two_to_one_1_1_0(const int Nx, const int Ny, const int x, const int y)  // -
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_1_1_0() -> "
+   mlog << Error << "\ntwo_to_one_1_1_0() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -357,7 +357,7 @@ int two_to_one_1_1_1(const int Nx, const int Ny, const int x, const int y)  // -
 
 if( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) ) {
 
-   mlog << Error << "\n  two_to_one_1_1_1() -> "
+   mlog << Error << "\ntwo_to_one_1_1_1() -> "
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), (x, y) = (" << x << ", " << y << ")\n\n";
 
@@ -379,7 +379,7 @@ void one_to_two_0_0_0(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_0_0_0() -> " 
+   mlog << Error << "\none_to_two_0_0_0() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), n = " << n << "\n\n";
 
@@ -407,7 +407,7 @@ void one_to_two_0_0_1(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_0_0_1() -> " 
+   mlog << Error << "\none_to_two_0_0_1() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), n = " << n << "\n\n";
 
@@ -435,7 +435,7 @@ void one_to_two_0_1_0(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_0_1_0() -> " 
+   mlog << Error << "\none_to_two_0_1_0() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), n = " << n << "\n\n";
 
@@ -463,7 +463,7 @@ void one_to_two_0_1_1(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_0_1_1() -> " 
+   mlog << Error << "\none_to_two_0_1_1() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), n = " << n << "\n\n";
 
@@ -491,7 +491,7 @@ void one_to_two_1_0_0(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_1_0_0() -> " 
+   mlog << Error << "\none_to_two_1_0_0() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), n = " << n << "\n\n";
 
@@ -519,7 +519,7 @@ void one_to_two_1_0_1(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_1_0_1() -> " 
+   mlog << Error << "\none_to_two_1_0_1() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), n = " << n << "\n\n";
 
@@ -547,7 +547,7 @@ void one_to_two_1_1_0(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_1_1_0() -> " 
+   mlog << Error << "\none_to_two_1_1_0() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", " << Ny
         << "), n = " << n << "\n\n";
 
@@ -575,7 +575,7 @@ void one_to_two_1_1_1(const int Nx, const int Ny, const int n, int & x, int & y)
 
 if ( (n < 0) || (n >= Nx*Ny) )  {
 
-   mlog << Error << "\n  one_to_two_1_1_1() -> " 
+   mlog << Error << "\none_to_two_1_1_1() -> " 
         << "range check error: (Nx, Ny) = (" << Nx << ", "
         << Ny << "), n = " << n << "\n\n";
 
@@ -606,7 +606,7 @@ bool check = ( is_zero_one(xdir) && is_zero_one(ydir) && is_zero_one(order) );
 
 if ( !check )  {
 
-   mlog << Error << "\n  get_two_to_one() -> "
+   mlog << Error << "\nget_two_to_one() -> "
         << "bad arguments!\n\n";
 
    exit ( 1 );
@@ -632,7 +632,7 @@ switch ( k )  {
    case 7:  f = two_to_one_1_1_1;  break;
 
    default:
-      mlog << Error << "\n  get_two_to_one() -> "
+      mlog << Error << "\nget_two_to_one() -> "
            << "bad input values\n\n";
       exit ( 1 );
       break;
@@ -659,7 +659,7 @@ bool check = ( is_zero_one(xdir) && is_zero_one(ydir) && is_zero_one(order) );
 
 if ( !check )  {
 
-   mlog << Error << "\n  get_one_to_two() -> "
+   mlog << Error << "\nget_one_to_two() -> "
         << "bad arguments!\n\n";
 
    exit ( 1 );
@@ -685,7 +685,7 @@ switch ( k )  {
    case 7:  f = one_to_two_1_1_1;  break;
 
    default:
-      mlog << Error << "\n  get_one_to_two() -> "
+      mlog << Error << "\nget_one_to_two() -> "
            << "bad input values\n\n";
       exit ( 1 );
       break;

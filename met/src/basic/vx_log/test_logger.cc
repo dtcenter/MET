@@ -56,18 +56,18 @@ int main(int argc, char * argv[])
 
    mlog << level(2) << "\n\n  Can it print a bool: " << b << "?\n\n";
 
-   mlog << Error << "\n  New type error message\n\n";
+   mlog << Error << "\nNew type error message\n\n";
 
-   mlog << Warning << "\n  New type warning message\n\n";
+   mlog << Warning << "\nNew type warning message\n\n";
 
    mlog << Debug(1) << "\n\n  New type debug level 1 message\n\n";
    mlog << Debug(2) << "\n\n  New type debug level 2 message\n\n";
    mlog << Debug(3) << "\n\n  New type debug level 3 message\n\n";
    mlog << Debug(4) << "\n\n  New type debug level 4 message\n\n";
 
-   mlog << Error << "\n  New type err msg " << "with more than " << 1 << " message\n\n";
+   mlog << Error << "\nNew type err msg " << "with more than " << 1 << " message\n\n";
 
-   mlog << Warning << "\n  New type warn msg " << "with more than " << 1 << " message\n\n";
+   mlog << Warning << "\nNew type warn msg " << "with more than " << 1 << " message\n\n";
 
    mlog << Debug(1) << "\n\n  New type dbg msg " << "with more than " << 1 << " message\n\n";
 

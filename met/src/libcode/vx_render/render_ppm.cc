@@ -44,7 +44,7 @@ Color color;
 
 if ( info.n_filters() == 0 )  {
 
-   mlog << Error << "\n  render() -> must have at least one filter\n\n";
+   mlog << Error << "\nrender() -> must have at least one filter\n\n";
 
    exit ( 1 );
 
@@ -72,7 +72,7 @@ for (j=0; j<(info.n_filters()); ++j)  {
          break;
 
       default:
-         mlog << Error << "\n  render() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
+         mlog << Error << "\nrender() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
          break;
 
@@ -128,7 +128,7 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
          break;
 
       default:
-         mlog << Error << "\n  render() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
+         mlog << Error << "\nrender() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
          break;
 

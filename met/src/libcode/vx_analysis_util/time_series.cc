@@ -213,7 +213,7 @@ double TimeSeries::operator()(int index) const
 
 if ( (index < 0) || (index >= Nelements) )  {
 
-   mlog << Error << "\n  TimeSeries::operator()(int) const -> "
+   mlog << Error << "\nTimeSeries::operator()(int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );
@@ -234,7 +234,7 @@ void TimeSeries::put(double x, int index)
 
 if ( (index < 0) || (index >= Nelements) )  {
 
-   mlog << Error << "\n  TimeSeries::put(double, int) const -> "
+   mlog << Error << "\nTimeSeries::put(double, int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );

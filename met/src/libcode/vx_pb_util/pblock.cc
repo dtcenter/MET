@@ -36,7 +36,7 @@ void pblock(const char *infile, const char *outfile, Action action) {
    // Open the input file
    //
    if( (in = open(infile, O_RDONLY)) < 0)  {
-      mlog << Error << "\n  pblock() -> "
+      mlog << Error << "\npblock() -> "
            << "unable to open input file \"" << infile << "\"\n\n";
 
       exit(1);
@@ -46,7 +46,7 @@ void pblock(const char *infile, const char *outfile, Action action) {
    // Open the output file
    //
    if( (out = open(outfile, O_WRONLY | O_CREAT, 0644)) < 0)  {
-      mlog << Error << "\n  pblock() -> "
+      mlog << Error << "\npblock() -> "
            << "unable to open output file \"" << outfile << "\"\n\n";
 
       exit(1);
@@ -75,7 +75,7 @@ void pblock(const char *infile, const char *outfile, Action action) {
          break;
 
       default:
-         mlog << Error << "\n  pblock() ->"
+         mlog << Error << "\npblock() ->"
               << "unexpected action requested!\n\n";
 
          exit(1);

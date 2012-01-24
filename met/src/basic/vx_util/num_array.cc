@@ -174,7 +174,7 @@ u = new double [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n  void NumArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nvoid NumArray::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -247,7 +247,7 @@ double NumArray::operator[](int n) const
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\n  NumArray::operator[](int) const -> "
+   mlog << Error << "\nNumArray::operator[](int) const -> "
        << "range check error\n\n";
 
    exit ( 1 );
@@ -384,7 +384,7 @@ void NumArray::set(int n, double d)
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\n  NumArray::set(int, double) -> range check error\n\n";
+   mlog << Error << "\nNumArray::set(int, double) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -420,7 +420,7 @@ void NumArray::reorder(const NumArray &i_na) {
 
    // Check that the index array is of the correct length
    if(i_na.n_elements() != Nelements) {
-      mlog << Error << "\n  NumArray::reorder(const NumArray &) -> "
+      mlog << Error << "\nNumArray::reorder(const NumArray &) -> "
            << "the index and sorting arrays must have the same length\n\n";
       exit(1);
    }
@@ -433,7 +433,7 @@ void NumArray::reorder(const NumArray &i_na) {
       j = nint(i_na[i]) - 1;
 
       if(j<0 || j>=i_na.n_elements()) {
-         mlog << Error << "\n  NumArray::reorder(const NumArray &) -> "
+         mlog << Error << "\nNumArray::reorder(const NumArray &) -> "
               << "index out of bounds: " << j << "\n\n";
          exit(1);
       }
@@ -475,7 +475,7 @@ data_rank = new double [Nelements];
 
 if ( !data || !data_loc || !data_rank )  {
 
-   mlog << Error << "\n  int NumArray::rank_array() -> memory allocation error\n\n";
+   mlog << Error << "\nint NumArray::rank_array() -> memory allocation error\n\n";
    exit ( 1 );
 
 }

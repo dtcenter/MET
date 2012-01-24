@@ -121,7 +121,7 @@ void Polyline::set_name(const char *n) {
       name = new char [strlen(n)+1];
 
       if(!name) {
-         mlog << Error << "\n  Polyline::set_name(const char *) -> "
+         mlog << Error << "\nPolyline::set_name(const char *) -> "
               << "memory allocation error 1" << "\n\n";
 
          exit(1);
@@ -159,7 +159,7 @@ void Polyline::extend_points(int n) {
       v = new double [n];
 
       if(!u || !v) {
-         mlog << Error << "\n  Polyline::extend_points(int) -> "
+         mlog << Error << "\nPolyline::extend_points(int) -> "
 	      << "memory allocation error 1" << "\n\n";
 
          exit(1);
@@ -180,7 +180,7 @@ void Polyline::extend_points(int n) {
    vv = new double [n];
 
    if(!uu || !vv) {
-      mlog << Error << "\n  Polyline::extend_points(int) -> "
+      mlog << Error << "\nPolyline::extend_points(int) -> "
            << "memory allocation error 2" << "\n\n";
 
       exit(1);
@@ -274,7 +274,7 @@ double Polyline::angle() const {
    double a, sa, Ixx, Ixy, Iyy, x_bar, y_bar;
 
    if(n_points < 3) {
-      mlog << Error << "\n  Polyline::angle() -> "
+      mlog << Error << "\nPolyline::angle() -> "
 	   << "not enough points!\n\n";
 
       exit(1);
@@ -822,7 +822,7 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
    // Parse out the first token, the name of the polyline
    c = strtok(tmp_str, " ");
    if(!c) {
-      mlog << Error << "\n  parse_latlon_poly_str() -> "
+      mlog << Error << "\nparse_latlon_poly_str() -> "
            << "The polyline string supplied ("
            << poly_str << ") is empty.\n\n";
       exit(1);
@@ -835,7 +835,7 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
       lat = atof(c);
 
       if((c = strtok(0, " ")) == NULL) {
-         mlog << Error << "\n  parse_latlon_poly_str() -> "
+         mlog << Error << "\nparse_latlon_poly_str() -> "
               << "The mask_poly string ("
               << poly_str << ") must contain an even number of entries.\n\n";
          exit(1);
@@ -852,7 +852,7 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
    }
 
    if(poly.n_points < 3) {
-      mlog << Error << "\n  parse_latlon_poly_str() -> "
+      mlog << Error << "\nparse_latlon_poly_str() -> "
            << "The polyline string supplied ("
            << poly_str << ") must contain at least 3 pairs of points "
            << "to define a masking region.\n\n";
@@ -880,7 +880,7 @@ void parse_latlon_poly_file(const char *poly_file, Polyline &poly) {
    in.open(poly_file);
 
    if(!in) {
-      mlog << Error << "\n  parse_latlon_poly_file() -> "
+      mlog << Error << "\nparse_latlon_poly_file() -> "
            << "Can't open the polyline file specified ("
            << poly_file << ").\n\n";
       exit(1);
@@ -911,7 +911,7 @@ void parse_latlon_poly_file(const char *poly_file, Polyline &poly) {
    in.close();
 
    if(poly.n_points < 3) {
-      mlog << Error << "\n  parse_latlon_poly_file() -> "
+      mlog << Error << "\nparse_latlon_poly_file() -> "
            << "The polyline file supplied ("
            << poly_file << ") must contain at least 3 pairs of points "
            << "to define a masking region.\n\n";
@@ -939,7 +939,7 @@ void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
    // Parse out the first token, the name of the polyline
    c = strtok(tmp_str, " ");
    if(!c) {
-      mlog << Error << "\n  parse_xy_poly_str() -> "
+      mlog << Error << "\nparse_xy_poly_str() -> "
            << "The polyline string supplied ("
            << poly_str << ") is empty.\n\n";
       exit(1);
@@ -952,7 +952,7 @@ void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
       x = atof(c);
 
       if((c = strtok(0, " ")) == NULL) {
-         mlog << Error << "\n  parse_xy_poly_str() -> "
+         mlog << Error << "\nparse_xy_poly_str() -> "
               << "The mask_poly string ("
               << poly_str << ") must contain an even number of entries.\n\n";
       }
@@ -983,7 +983,7 @@ void parse_xy_poly_file(const char *poly_file, Polyline &poly) {
    in.open(poly_file);
 
    if(!in) {
-      mlog << Error << "\n  parse_xy_poly_file() -> "
+      mlog << Error << "\nparse_xy_poly_file() -> "
            << "Can't open the polyline file specified ("
            << poly_file << ").\n\n";
       exit(1);

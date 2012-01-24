@@ -63,7 +63,7 @@ void rng_set(gsl_rng *&r, const char *rng_name, const char *rng_seed) {
    r = gsl_rng_alloc(T);
 
    if(r == NULL) {
-      mlog << Error << "\n  rng_set() -> "
+      mlog << Error << "\nrng_set() -> "
            << "error allocating the random number generator!\n\n";
       exit(1);
    }
@@ -130,7 +130,7 @@ void ran_choose(const gsl_rng *r, double *src,  int n,
                                   double *dest, int k) {
 
    if(k > n) {
-      mlog << Error << "\n  ran_choose() -> "
+      mlog << Error << "\nran_choose() -> "
            << "the length of the subsample (" << k
            << ") must be less than or equal to the array length ("
            << n << ")!\n\n";

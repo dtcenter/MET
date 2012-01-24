@@ -69,7 +69,7 @@ init_from_scratch();
 
 if ( !read(filename) )  {
 
-   mlog << Error << "\n  Pgm::Pgm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
+   mlog << Error << "\nPgm::Pgm(const char *filename) -> failed to read file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -269,7 +269,7 @@ in.open(filename);
 
 if ( !in )  {
 
-   mlog << Warning << "\n  Pgm::read() -> unable to read image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\nPgm::read() -> unable to read image file \"" << filename << "\"\n\n";
 
    return ( 0 );
 
@@ -283,7 +283,7 @@ Name = new char [1 + strlen(filename)];
 
 if ( !Name )  {
 
-   mlog << Warning << "\n  Pgm::read() -> can't allocate memory for file name\n\n";
+   mlog << Warning << "\nPgm::read() -> can't allocate memory for file name\n\n";
 
    clear();
 
@@ -302,7 +302,7 @@ in.get(c2);
 
 if ( !in )  {
 
-   mlog << Warning << "\n  Pgm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\nPgm::read() -> unable to read magic cookie in image file \"" << filename << "\"\n\n";
 
    clear();
 
@@ -312,7 +312,7 @@ if ( !in )  {
 
 if ( (c1 != 'P') || (c2 != '5') )  {
 
-   mlog << Warning << "\n  Pgm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
+   mlog << Warning << "\nPgm::read() -> bad magic number in image file \"" << filename << "\"\n\n";
 
    clear();
 
@@ -348,7 +348,7 @@ maxval = parse_number(in);
 
 if ( maxval != 255 )  {
 
-   mlog << Warning << "\n  Pgm::read() -> bad maxval: \"" << maxval << "\"\n\n";
+   mlog << Warning << "\nPgm::read() -> bad maxval: \"" << maxval << "\"\n\n";
 
    clear();
 
@@ -364,7 +364,7 @@ n = Nrows*Ncols;
 
 if ( !(data = new unsigned char [n]) )  {
 
-   mlog << Warning << "\n  Pgm::read() -> memory allocation error\n\n";
+   mlog << Warning << "\nPgm::read() -> memory allocation error\n\n";
 
    clear();
 
@@ -374,7 +374,7 @@ if ( !(data = new unsigned char [n]) )  {
 
 if ( !in.read((char *) data, n) )  {
 
-   mlog << Warning << "\n  Pgm::read() -> trouble reading image data\n\n";
+   mlog << Warning << "\nPgm::read() -> trouble reading image data\n\n";
 
    clear();
 
@@ -412,7 +412,7 @@ out.open(filename);
 
 if ( !out )  {
 
-   mlog << Warning << "\n  Pgm::write() -> unable to open output file \"" << filename << "\"\n\n";
+   mlog << Warning << "\nPgm::write() -> unable to open output file \"" << filename << "\"\n\n";
 
    return ( 0 );
 
@@ -442,7 +442,7 @@ out << Ncols << " " << Nrows << "\n255\n";
 
 if ( !out )  {
 
-   mlog << Warning << "\n  Pgm::write() -> trouble writing header\n\n";
+   mlog << Warning << "\nPgm::write() -> trouble writing header\n\n";
 
    return ( 0 );
 
@@ -458,7 +458,7 @@ for (j=0; j<n; ++j)  out.put(data[j]);
 
 if ( !out )  {
 
-   mlog << Warning << "\n  Pgm::write() -> trouble writing data\n\n";
+   mlog << Warning << "\nPgm::write() -> trouble writing data\n\n";
 
    return ( 0 );
 
@@ -520,7 +520,7 @@ data = new unsigned char [NR*NC];
 
 if ( !data )  {
 
-   mlog << Error << "\n  Pgm::set_size(int, int) -> memory allocation error\n\n";
+   mlog << Error << "\nPgm::set_size(int, int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -567,7 +567,7 @@ void Pgm::reverse_video()
 
 if ( !data )  {
 
-   mlog << Error << "\n  void Pgm::reverse_video() -> bad image\n\n";
+   mlog << Error << "\nvoid Pgm::reverse_video() -> bad image\n\n";
 
    exit ( 1 );
 
@@ -629,7 +629,7 @@ bytes = (Nrows)*(Ncols);
 
 if ( !(u = new unsigned char [bytes]) )  {
 
-   mlog << Error << "\n  Pgm::rotate(int) -> memory allocation error\n\n";
+   mlog << Error << "\nPgm::rotate(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -737,7 +737,7 @@ if (    ( row_top   >= Nrows    )
      || ( col_left  >= col_right )
      || ( row_top   >= row_bot   ) )  {
 
-   mlog << Error << "\n  void Pgm::autocrop() -> bad image\n\n";
+   mlog << Error << "\nvoid Pgm::autocrop() -> bad image\n\n";
 
    exit ( 1 );
 
@@ -785,7 +785,7 @@ void Pgm::gamma(double g)
 
 if ( g <= 0.0 )  {
 
-   mlog << Error << "\n  void Pgm::gamma(double) -> bad value for gamma ... \"" << g << "\"\n\n";
+   mlog << Error << "\nvoid Pgm::gamma(double) -> bad value for gamma ... \"" << g << "\"\n\n";
 
    exit ( 1 );
 

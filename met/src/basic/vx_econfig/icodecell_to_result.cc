@@ -50,7 +50,7 @@ switch ( cell.type )  {
 
 
    default:
-      mlog << Error << "\n  icodecell_to_result() -> "
+      mlog << Error << "\nicodecell_to_result() -> "
            << "don't know how to handle icode cell type \""
            << celltype_to_string(cell.type) << "\"\n\n";
       exit ( 1 );
@@ -96,7 +96,7 @@ switch ( result.type() )  {
 
 
    default:
-      mlog << Error << "\n  result_to_icodecell() -> "
+      mlog << Error << "\nresult_to_icodecell() -> "
            << "don't know how to handle result type \""
            << resulttype_to_string(result.type()) << "\"\n\n";
       exit ( 1 );

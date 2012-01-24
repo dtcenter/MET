@@ -54,7 +54,7 @@ while ( bytes_left > 0 )  {
 
    if ( (n_read = read(in, buf, bytes)) != bytes )  {
 
-      mlog << Error << "\n  copy_bytes() -> "
+      mlog << Error << "\ncopy_bytes() -> "
            << "read error, n_read = " << n_read << "\n\n";
 
       exit ( 1 );
@@ -63,7 +63,7 @@ while ( bytes_left > 0 )  {
 
    if ( (n_written = write(out, buf, bytes)) != bytes )  {
 
-      mlog << Error << "\n  copy_bytes() -> "
+      mlog << Error << "\ncopy_bytes() -> "
            << "write error, n_written = " << n_written << "\n\n";
 
       exit ( 1 );
