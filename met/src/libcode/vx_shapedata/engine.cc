@@ -301,9 +301,7 @@ void Engine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
    set_fcst(fcst_wd);
    set_obs(obs_wd);
 
-   path = wconf.mode_color_table().sval();
-
-   path.replace(met_base_str, MET_BASE);
+   path = replace_path(wconf.mode_color_table().sval());
 
    ctable.read(path);
 
@@ -1264,8 +1262,7 @@ void Engine::do_fcst_merge_engine(const char *default_config,
       fcst_engine->wconf.read(default_config);
       fcst_engine->wconf.read(merge_config);
       fcst_engine->process_engine_config();
-      path = fcst_engine->wconf.mode_color_table().sval();
-      path.replace(met_base_str, MET_BASE);
+      path = replace_path(fcst_engine->wconf.mode_color_table().sval());
       fcst_engine->ctable.read(path);
    }
 
@@ -1447,8 +1444,7 @@ void Engine::do_obs_merge_engine(const char *default_config,
       obs_engine->wconf.read(default_config);
       obs_engine->wconf.read(merge_config);
       obs_engine->process_engine_config();
-      path = obs_engine->wconf.mode_color_table().sval();
-      path.replace(met_base_str, MET_BASE);
+      path = replace_path(obs_engine->wconf.mode_color_table().sval());
       obs_engine->ctable.read(path);
    }
 

@@ -69,7 +69,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
    Box page, view, map_box;
    Color black;
    ConcatString short_filename;
-   char data_dir[PATH_MAX];
+   ConcatString data_dir;
    char junk[64];
    int i;
    double mag;
@@ -82,7 +82,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       //
       // By default, set the data_dir to MET_BASE/data
       //
-   replace_string(met_base_str, MET_BASE, default_met_data_dir, data_dir);
+   data_dir = replace_path(default_met_data_dir);
 
       //
       // open the PostScript file using the default media

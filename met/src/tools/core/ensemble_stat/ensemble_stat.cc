@@ -132,13 +132,16 @@ int main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+void process_command_line(int argc, char **argv)
+
+{
+
    int i;
    struct stat results;
    GrdFileType etype, otype;
    unixtime obs_valid_ut;
    CommandLine cline;
-   char default_config_file[PATH_MAX];
+   ConcatString default_config_file;
 
    // Set default output directory
    out_dir << MET_BASE << "/out/ensemble_stat";
@@ -275,8 +278,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Create the default config file name
-   replace_string(met_base_str, MET_BASE,
-                  default_config_filename, default_config_file);
+   default_config_file = replace_path(default_config_filename);
 
    // List the config files
    mlog << Debug(1)

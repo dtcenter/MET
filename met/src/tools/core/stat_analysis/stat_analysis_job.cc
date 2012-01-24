@@ -2123,13 +2123,12 @@ void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
    stat_analysis_Conf go_conf;
    double go_index;
    AsciiTable out_at;
-   char config_file[PATH_MAX];
+   ConcatString config_file;
 
    //
    // Read in the STATAnalysis config file which defines the GO Index.
    //
-   replace_string(met_base_str, MET_BASE,
-                  go_index_config_file, config_file);
+   config_file = replace_path(go_index_config_file);
    mlog << Debug(3) << "Reading Config: " << config_file << "\n";
    go_conf.read(config_file);
 

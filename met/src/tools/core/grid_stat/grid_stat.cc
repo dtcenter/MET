@@ -159,7 +159,7 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString fcst_grid_info, obs_grid_info;
-   char default_config_file[PATH_MAX];
+   ConcatString path;
 
    out_dir << MET_BASE << "/out/grid_stat";
 
@@ -242,16 +242,16 @@ void process_command_line(int argc, char **argv) {
    }
    
    // Create the default config file name
-   replace_string(met_base_str, MET_BASE,
-                  default_config_filename, default_config_file);
+
+   path = replace_path(default_config_filename);
 
    // List the config files
    mlog << Debug(1)
-        << "Default Config File: " << default_config_file << "\n"
+        << "Default Config File: " << path << "\n"
         << "User Config File: "    << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file,
+   conf_info.read_config(path, config_file,
                          ftype, fcst_valid_ut, fcst_lead_sec,
                          otype, obs_valid_ut, obs_lead_sec);
 

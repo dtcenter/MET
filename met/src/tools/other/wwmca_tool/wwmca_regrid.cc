@@ -80,7 +80,7 @@ int main(int argc, char * argv [])
 
 {
 
-char default_conf_file[PATH_MAX];
+ConcatString path;
 
 
 program_name = get_short_name(argv[0]);
@@ -108,11 +108,11 @@ sanity_check();
    // read the default config file first and then read the user's
    //
 
-replace_string(met_base_str, MET_BASE, default_config_filename, default_conf_file);
+path = replace_path(default_config_filename);
 
-mlog << Debug(1) << "Reading Default Config File: " << default_conf_file << "\n";
+mlog << Debug(1) << "Reading Default Config File: " << path << "\n";
 
-config.read(default_conf_file);
+config.read(path);
 
 mlog << Debug(1) << "Reading User Config File: " << config_filename << "\n";
 

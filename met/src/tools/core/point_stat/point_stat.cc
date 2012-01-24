@@ -163,7 +163,7 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    int i;
    GrdFileType ftype;
-   char default_config_file[PATH_MAX];
+   ConcatString default_config_file;
 
    out_dir << MET_BASE << "/out/point_stat";
 
@@ -255,8 +255,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Create the default config file name
-   replace_string(met_base_str, MET_BASE,
-                  default_config_filename, default_config_file);
+   default_config_file = replace_path(default_config_filename);
 
    // List the config files
    mlog << Debug(1)
