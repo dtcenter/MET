@@ -217,7 +217,7 @@ bytes = afwa_nx*afwa_ny*cloud_pct_record_size;
 
 Buf = new unsigned char [bytes];
 
-if ( (n_read = ::read(fd, Buf, bytes)) != bytes )  {
+if ( ::read(fd, Buf, bytes) != bytes )  {
 
    mlog << Error << "\n  AfwaCloudPctFile::read(const char *) -> read error on file \"" << filename << "\"\n\n";
 

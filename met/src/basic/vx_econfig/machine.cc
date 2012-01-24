@@ -954,7 +954,6 @@ for (j=(n - 1); j>=0; --j)  {   //  reverse order here
          }
          eval(cell.name);
          goto start;
-         break;
 
       default:
          mlog << Error << "\n  Machine::do_function_call(const SymbolTableEntry &) -> "
@@ -1035,7 +1034,6 @@ for (j=(dim - 1); j>=0; --j)  {   //  reverse order here
          }
          eval(cell.name);
          goto start;
-         break;
 
       default:
          mlog << Error << "\n  Machine::do_array(const SymbolTableEntry &) -> "

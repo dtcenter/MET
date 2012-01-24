@@ -105,7 +105,7 @@ lex.yy.c: enum.l enum.tab.o code.o scope.o
 
 
 lex.yy.o: lex.yy.c
-	$(CXX) lex.yy.c    -c $(FLAGS)
+	$(CXX) lex.yy.c    -c $(FLAGS) > /dev/null 2>&1
 
 
 ########################################################################
