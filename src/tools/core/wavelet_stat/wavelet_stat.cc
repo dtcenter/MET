@@ -678,9 +678,9 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
       if(!x_ll_var->set_cur(i) ||
          !x_ll_var->put(&x, 1)) {
 
-         cerr << "\n\nERROR: setup_nc_file() -> "
+         mlog << Error << "\n\nsetup_nc_file() -> "
               << "error with the x_ll-var->put"
-              << "\n\n" << flush;
+              << "\n\n";
          exit(1);
       }
 
@@ -688,9 +688,9 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
       if(!y_ll_var->set_cur(i) ||
          !y_ll_var->put(&y, 1)) {
 
-         cerr << "\n\nERROR: setup_nc_file() -> "
+         mlog << Error << "\n\nsetup_nc_file() -> "
               << "error with the y_ll-var->put"
-              << "\n\n" << flush;
+              << "\n\n";
          exit(1);
       }
    }
@@ -806,7 +806,7 @@ void fill_bad_data(DataPlane &dp, double fill_val) {
    } // end for x
 
    if(count > 0) {
-      mlog << Debug(2) << "Replaced " << count << " bad data values out of "
+      mlog << "Replaced " << count << " bad data values out of "
            << dp.nx()*dp.ny()
            << " points with fill value of "
            << fill_val << ".\n";
