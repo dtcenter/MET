@@ -127,7 +127,7 @@ icodecell_to_result.o: icodecell_to_result.h icodecell_to_result.cc icode.o resu
 	$(CXX) icodecell_to_result.cc  -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 gen.o: gen.h gen.cc machine.o result.o
-	$(CXX) gen.cc                  -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+	$(CXX) gen.cc                  -c $(CXX_FLAGS) -I$(MET_INC_DIR) -DMET_BASE_DIR=\"$(MET_BASE_DIR)\"
 
 ########################################################################
 
