@@ -54,7 +54,7 @@ void check_met_version(const char * check_version) {
    //
    if(!(match_met_version(check_version))) {
 
-      mlog << Error << "\n  check_met_version() -> "
+      mlog << Error << "\ncheck_met_version() -> "
            << "The version number listed in the config file ("
            << check_version << ") is not compatible with the current "
            << "version of the code (" << met_version << ").\n\n";
@@ -152,7 +152,7 @@ bool check_reg_exp(const char *reg_exp_str, const char *test_str)
    regex_t *preg = &buffer;
 
    if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
-      mlog << Error << "\n  \tcheck_reg_exp(char *, char *) -> "
+      mlog << Error << "\n\tcheck_reg_exp(char *, char *) -> "
            << "regcomp error for \""
            << reg_exp_str << "\" and \"" << test_str << "\"\n\n";
 
@@ -191,7 +191,7 @@ int num_tokens(const char *test_str, const char *separator)
    temp_str = new char[strlen(test_str) + 1];
 
    if(!temp_str) {
-      mlog << Error << "\n  num_tokens() -> "
+      mlog << Error << "\nnum_tokens() -> "
            << "memory allocation error\n\n";
       exit(1);
    }

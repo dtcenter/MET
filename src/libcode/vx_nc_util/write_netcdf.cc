@@ -108,14 +108,14 @@ void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
    // Write the lat data
    if(!lat_var->put(&lat_data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\n  write_netcdf_latlon() -> "
+      mlog << Error << "\nwrite_netcdf_latlon() -> "
            << "error with lat_var->put\n\n";
       exit(1);
    }
 
    // Write the lon data
    if(!lon_var->put(&lon_data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\n  write_netcdf_latlon() -> "
+      mlog << Error << "\nwrite_netcdf_latlon() -> "
            << "error with lon_var->put\n\n";
       exit(1);
    }

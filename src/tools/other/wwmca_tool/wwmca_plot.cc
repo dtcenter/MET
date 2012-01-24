@@ -281,7 +281,7 @@ double x_ll, y_ll;
 
 if ( !(f_cp.read(filename)) )  {
 
-   mlog << Error << "\n  " << program_name << ": unable to open input file \"" << filename << "\"\n\n";
+   mlog << Error << "\n" << program_name << ": unable to open input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -304,7 +304,7 @@ set_pixel_time_filename(filename, pt_filename);
 
 if ( !(f_pt.read(pt_filename)) )  {
 
-   mlog << Error << "\n  " << program_name << ": unable to open pixel time file \"" << pt_filename << "\"\n\n";
+   mlog << Error << "\n" << program_name << ": unable to open pixel time file \"" << pt_filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -562,7 +562,7 @@ in.open(filename);
 
 if ( !in )  {
 
-   mlog << Error << "\n  " << program_name <<  ": unable to open map data file \"" << filename <<  "\"\n\n";
+   mlog << Error << "\n" << program_name <<  ": unable to open map data file \"" << filename <<  "\"\n\n";
 
    exit ( 1 );
 

@@ -76,7 +76,7 @@ while ( find_magic_cookie(in) >= 0 )  {
 
    if ( (n_written = write(out, buf, nullpad)) != nullpad )  {
 
-      mlog << Error << "\n  do_blocking() -> "
+      mlog << Error << "\ndo_blocking() -> "
            << "write error in null-padding, n_written = " << n_written << "\n\n";
 
       exit ( 1 );
@@ -128,7 +128,7 @@ switch ( padsize )  {
       break;
 
    default:
-      mlog << Error << "\n  write_pad() -> "
+      mlog << Error << "\nwrite_pad() -> "
            << "bad pad size\n\n";
       exit ( 1 );
       break;
@@ -137,7 +137,7 @@ switch ( padsize )  {
 
 if ( (n_written = write(fd, b, bytes)) != bytes )  {
 
-   mlog << Error << "\n  write_pad() -> "
+   mlog << Error << "\nwrite_pad() -> "
         << "write error, n_written = " << n_written << "\n\n";
 
    exit ( 1 );
@@ -193,7 +193,7 @@ if ( n_read == 0 )  return ( -1 );
 
 if ( n_read < 0 )  {
 
-   mlog << Error << "\n  find_magic_cookie() -> "
+   mlog << Error << "\nfind_magic_cookie() -> "
         << "trouble reading file\n\n";
 
    exit ( 1 );
@@ -225,7 +225,7 @@ int edition_number;
 
 if ( (pos = lseek(fd, 0L, SEEK_CUR)) < 0 )  {
 
-   mlog << Error << "\n  get_record_size() -> "
+   mlog << Error << "\nget_record_size() -> "
         << "lseek error (1)\n\n";
 
    exit ( 1 );
@@ -240,7 +240,7 @@ bytes = (int) sizeof(tempbuf);
 
 if ( (n_read = read(fd, tempbuf, bytes)) != bytes )  {
 
-   mlog << Error << "\n  get_record_size() -> "
+   mlog << Error << "\nget_record_size() -> "
         << "read error, n_read = " << n_read << "\n\n";
 
    exit ( 1 );
@@ -255,7 +255,7 @@ edition_number = (int) (tempbuf[7]);
 
 if ( edition_number < 2 )  {
 
-   mlog << Error << "\n  get_record_size() -> "
+   mlog << Error << "\nget_record_size() -> "
         << "This program works only on prepbufr records\n"
         << "with edition number >= 2.  The edition number\n"
         << "of this record is " << edition_number
@@ -285,7 +285,7 @@ rec_size = 256*rec_size + tempbuf[6];
 
 if ( lseek(fd, pos, SEEK_SET) < 0 )  {
 
-   mlog << Error << "\n  get_record_size() -> "
+   mlog << Error << "\nget_record_size() -> "
         << "lseek error (2)\n\n";
 
    exit ( 1 );

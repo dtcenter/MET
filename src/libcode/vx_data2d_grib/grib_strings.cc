@@ -93,7 +93,7 @@ void get_grib_code_list(int grib_code, int ptv,
             break;
 
          default:
-            mlog << Error << "\n  get_grib_code_list() -> "
+            mlog << Error << "\nget_grib_code_list() -> "
                  << "unsupported GRIB parameter table version number of "
                  << ptv << ".  The supported version numbers are 2, 128, "
                  << "129, 130, 131, 133, 140, 141.\n\n";
@@ -146,7 +146,7 @@ ConcatString get_grib_code_list_str(int k, int grib_code, int ptv)
             break;
 
          default:
-            mlog << Error << "\n  get_grib_code_list_str() -> "
+            mlog << Error << "\nget_grib_code_list_str() -> "
                  << "unexpected value for k: " << k
                  << "\n\n";
             exit(1);
@@ -222,7 +222,7 @@ ConcatString get_grib_level_list_str(int k, int grib_level)
             break;
 
          default:
-            mlog << Error << "\n  get_grib_level_list_str() -> "
+            mlog << Error << "\nget_grib_level_list_str() -> "
                  << "unexpected value for k: " << k
                  << "\n\n";
             exit(1);
@@ -428,7 +428,7 @@ int str_to_grib_code(const char *c, int &pcode,
 
    // Retrieve the first token containing the GRIB code info
    if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == NULL) {
-      mlog << Error << "\n  str_to_grib_code() -> "
+      mlog << Error << "\nstr_to_grib_code() -> "
            << "problems parsing the string \""
            << c << "\".\n\n";
       exit(1);
@@ -504,7 +504,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
       else         pthresh_lo = atof(ptr);
    }
    else {
-      mlog << Error << "\n  str_to_prob_info() -> "
+      mlog << Error << "\nstr_to_prob_info() -> "
            << "problems parsing the string \""
            << c << "\".\n\n";
       exit(1);

@@ -196,7 +196,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
 
    // Retreive the GRIB code value
    if((ptr = strtok_r(junk, "/", &save_ptr)) == NULL) {
-      mlog << Error << "\n  VarInfoGrib::set_magic() -> "
+      mlog << Error << "\nVarInfoGrib::set_magic() -> "
            << "bad GRIB code specified \""
            << s << "\".\n\n";
       exit(1);
@@ -207,7 +207,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
 
    // Retrieve the level value
    if((ptr = strtok_r(NULL, "/", &save_ptr)) == NULL) {
-      mlog << Error << "\n  VarInfoGrib::set_magic() -> "
+      mlog << Error << "\nVarInfoGrib::set_magic() -> "
            << "each GRIB code specified must be followed by an "
            << "accumulation, level, or presssure level indicator \""
            << s << "\".\n\n";
@@ -218,7 +218,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
    if(*ptr != 'A' && *ptr != 'Z' &&
       *ptr != 'P' && *ptr != 'R' &&
       *ptr != 'L') {
-      mlog << Error << "\n  VarInfoGrib::set_magic() -> "
+      mlog << Error << "\nVarInfoGrib::set_magic() -> "
            << "each GRIB code specified (" << s
            << ") must be followed by level information "
            << "that begins with:\n"
@@ -265,7 +265,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
       lt != LevelType_Vert &&
       lt != LevelType_None &&
       Level.lower() != Level.upper()) {
-      mlog << Error << "\n  VarInfoGrib::set_magic() -> "
+      mlog << Error << "\nVarInfoGrib::set_magic() -> "
            << "ranges of levels are only supported for pressure levels "
            << "(P), vertical levels (Z), and generic levels (L).\n\n";
       exit(1);
@@ -300,7 +300,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
 
       if(strncasecmp(ptr, "PROB", strlen("PROB")) == 0) PFlag = 1;
       else {
-         mlog << Warning << "\n  VarInfoGrib::set_magic() -> "
+         mlog << Warning << "\nVarInfoGrib::set_magic() -> "
               << "unrecognized flag value \"" << ptr
               << "\" for GRIB code \"" << s << "\".\n";
       }

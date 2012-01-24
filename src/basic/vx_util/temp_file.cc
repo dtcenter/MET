@@ -39,7 +39,7 @@ ConcatString make_temp_file_name(const char *prefix, const char *suffix) {
       i++;
 
       if(i > max_tries) {
-         mlog << Error << "\n  make_temp_file_name() -> "
+         mlog << Error << "\nmake_temp_file_name() -> "
               << "failed to make temporary file name:\n"
               << s << "\n\n";
          exit(1);
@@ -71,7 +71,7 @@ void remove_temp_file(const char *file_name) {
    // Attempt to remove the file and print out any error message
    //
    if((errno = remove(file_name)) != 0) {
-      mlog << Error << "\n  remove_temp_file() -> "
+      mlog << Error << "\nremove_temp_file() -> "
            << "can't delete temporary file: \""
            << (file_name ? file_name : "(nul)") << "\" ("
            << strerror(errno) << ")\n\n";

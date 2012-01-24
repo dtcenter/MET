@@ -263,7 +263,7 @@ const char * StringArray::operator[](int n) const
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\n  StringArray::operator[](int) const -> range check error!\n\n";
+   mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -352,7 +352,7 @@ void StringArray::set(int i, const char * text)
 
 if ( (i < 0) || (i >= Nelements) )  {
 
-   mlog << Error << "\n  StringArray::set(int, const char *) -> range check error\n\n";
+   mlog << Error << "\nStringArray::set(int, const char *) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -483,7 +483,7 @@ void StringArray::shift_down(int pos, int shift)
 
 if ( (pos < 0) || (pos >= Nelements) )  {
 
-   mlog << Error << "\n  StringArray::shift_down() -> bad value for pos\n\n";
+   mlog << Error << "\nStringArray::shift_down() -> bad value for pos\n\n";
 
    exit ( 1 );
 
@@ -491,7 +491,7 @@ if ( (pos < 0) || (pos >= Nelements) )  {
 
 if ( (shift <= 0) || ((pos + shift) > Nelements) )  {
 
-   mlog << Error << "\n  StringArray::shift_down() -> bad value for shift\n\n";
+   mlog << Error << "\nStringArray::shift_down() -> bad value for shift\n\n";
 
    exit ( 1 );
 
@@ -566,7 +566,7 @@ int StringArray::length(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n  StringArray::length(int) const -> range check error\n\n";
+   mlog << Error << "\nStringArray::length(int) const -> range check error\n\n";
 
    exit ( 1 );
 

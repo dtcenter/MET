@@ -131,7 +131,7 @@ NcAtt * proj_att = (NcAtt *) 0;
       ConcatString junk;
       junk << proj_att->as_string(0);
      
-      mlog << Error << "\n  read_netcdf_grid_v3() -> "
+      mlog << Error << "\nread_netcdf_grid_v3() -> "
            << "Projection type " << junk
            << " not currently supported.\n\n";
 
@@ -206,7 +206,7 @@ NcAtt * proj_att = (NcAtt *) 0;
       ConcatString junk;
       junk << proj_att->as_string(0);
      
-      mlog << Error << "\n  read_netcdf_grid_v2() -> "
+      mlog << Error << "\nread_netcdf_grid_v2() -> "
            << "Projection type " << junk
            << " not currently supported.\n\n";
 
@@ -264,7 +264,7 @@ att = ncfile->get_att(name);
 
 if ( !att )  {
 
-   mlog << Error << "\n  get_att() -> \"" << name << "\" attribute not found.\n\n";
+   mlog << Error << "\nget_att() -> \"" << name << "\" attribute not found.\n\n";
 
    exit ( 1 );
 
@@ -294,7 +294,7 @@ for ( i=0; i<n; i++ )  {
 
    if ( !att )  {
 
-      mlog << Error << "\n  has_att() -> "
+      mlog << Error << "\nhas_att() -> "
            << "can't read attribute number " << i << ".\n\n";
 
       exit ( 1 );

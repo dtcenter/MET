@@ -202,7 +202,7 @@ int Histogram::bin_count(int k) const
 
 if ( (k < 0) || (k >= Nbins) )  {
 
-   mlog << Error << "\n  Histogram::bin_count(int) const -> range check error!\n\n";
+   mlog << Error << "\nHistogram::bin_count(int) const -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -222,7 +222,7 @@ void Histogram::add(double value)
 
 if ( Nbins == 0 )  {
 
-   mlog << Error << "\n  Histogram::add(int) -> histogram has no bins!\n\n";
+   mlog << Error << "\nHistogram::add(int) -> histogram has no bins!\n\n";
 
    exit ( 1 );
 

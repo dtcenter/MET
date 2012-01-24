@@ -39,7 +39,7 @@ MetNcPinterpDataFile::~MetNcPinterpDataFile() {
 
 MetNcPinterpDataFile::MetNcPinterpDataFile(const MetNcPinterpDataFile &) {
 
-   mlog << Error << "\n  MetNcPinterpDataFile::MetNcPinterpDataFile(const MetNcPinterpDataFile &) -> "
+   mlog << Error << "\nMetNcPinterpDataFile::MetNcPinterpDataFile(const MetNcPinterpDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 }
@@ -48,7 +48,7 @@ MetNcPinterpDataFile::MetNcPinterpDataFile(const MetNcPinterpDataFile &) {
 
 MetNcPinterpDataFile & MetNcPinterpDataFile::operator=(const MetNcPinterpDataFile &) {
 
-   mlog << Error << "\n  MetNcPinterpDataFile::operator=(const MetNcPinterpDataFile &) -> "
+   mlog << Error << "\nMetNcPinterpDataFile::operator=(const MetNcPinterpDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 
@@ -84,7 +84,7 @@ bool MetNcPinterpDataFile::open(const char * _filename) {
    PinterpNc = new PinterpFile;
    
    if(!PinterpNc->open(_filename)) {
-      mlog << Error << "\n  MetNcPinterpDataFile::open(const char *) -> "
+      mlog << Error << "\nMetNcPinterpDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
 
@@ -138,7 +138,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
          data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
 
-         mlog << Warning << "\n  MetNcPinterpDataFile::data_plane() -> "
+         mlog << Warning << "\nMetNcPinterpDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the valid "
               << "time does not match the requested valid time: ("
               << data_time_str << " != " << req_time_str << ")\n\n";
@@ -152,7 +152,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          req_time_str  = sec_to_hhmmss(vinfo.lead());
          data_time_str = sec_to_hhmmss(plane.lead());
 
-         mlog << Warning << "\n  MetNcPinterpDataFile::data_plane() -> "
+         mlog << Warning << "\nMetNcPinterpDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the lead "
               << "time does not match the requested lead time: ("
               << data_time_str << " != " << req_time_str << ")\n\n";
@@ -205,7 +205,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
 
    // If the range flag was not found, return 0 matches
    if(!found) {
-      mlog << Warning << "\n  MetNcPinterpDataFile::data_plane_array() -> "
+      mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
            << "no range flag found in magic string \""
            << vinfo.magic_str() << "\"\n\n";
 
@@ -241,7 +241,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
             req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
             data_time_str = unix_to_yyyymmdd_hhmmss(cur_plane.valid());
 
-            mlog << Warning << "\n  MetNcPinterpDataFile::data_plane_array() -> "
+            mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
                  << "for \"" << vinfo.req_name() << "\" variable, the valid "
                  << "time does not match the requested valid time: ("
                  << data_time_str << " != " << req_time_str << ")\n\n";
@@ -255,7 +255,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
             req_time_str  = sec_to_hhmmss(vinfo.lead());
             data_time_str = sec_to_hhmmss(cur_plane.lead());
 
-            mlog << Warning << "\n  MetNcPinterpDataFile::data_plane_array() -> "
+            mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
                  << "for \"" << vinfo.req_name() << "\" variable, the lead "
                  << "time does not match the requested lead time: ("
                  << data_time_str << " != " << req_time_str << ")\n\n";

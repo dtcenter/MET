@@ -409,7 +409,7 @@ void process_command_line(int argc, char **argv) {
       tmp_str  = unix_to_yyyymmdd_hhmmss(valid_beg_ut);
       tmp2_str = unix_to_yyyymmdd_hhmmss(valid_end_ut);
 
-      mlog << Error << "\n  process_command_line() -> "
+      mlog << Error << "\nprocess_command_line() -> "
            << "the ending time (" << tmp2_str
            << ") must be greater than the beginning time ("
            << tmp_str << ").\n\n";
@@ -453,7 +453,7 @@ void process_config() {
    // Check that the end_ds >= beg_ds
    //
    if(conf.beg_ds().ival() > conf.end_ds().ival()) {
-      mlog << Error << "\n  process_config_file() -> "
+      mlog << Error << "\nprocess_config_file() -> "
            << "the ending time offset (end_ds) must be greater "
            << "than the starting time offset (beg_ds).\n\n";
       exit(1);
@@ -467,7 +467,7 @@ void process_config() {
       apply_mask_grid = 1;
 
       if(!find_grid_by_name(conf.mask_grid().sval(), grid_mask)) {
-         mlog << Error << "\n  process_config_file() -> "
+         mlog << Error << "\nprocess_config_file() -> "
               << "the mask_grid requested \""
               << conf.mask_grid().sval()
               << "\" is not defined.\n\n";
@@ -501,7 +501,7 @@ void process_config() {
    // Check that the end_elev >= beg_elev
    //
    if(conf.end_elev().dval() < conf.beg_elev().dval()) {
-      mlog << Error << "\n  process_config_file() -> "
+      mlog << Error << "\nprocess_config_file() -> "
            << "the ending elevation (end_elev) cannot be set "
            << "less than the starting elevation (beg_elev).\n\n";
       exit(1);
@@ -511,7 +511,7 @@ void process_config() {
    // Check that the end_level >= beg_level
    //
    if(conf.end_level().dval() < conf.beg_level().dval()) {
-      mlog << Error << "\n  process_config_file() -> "
+      mlog << Error << "\nprocess_config_file() -> "
            << "the ending vertical level (end_level) cannot be set "
            << "less than the starting vertical level(beg_level).\n\n";
       exit(1);
@@ -525,7 +525,7 @@ void process_config() {
 
       if(conf.pb_report_type(i).ival() < 100 ||
          conf.pb_report_type(i).ival() > 300) {
-         mlog << Error << "\n  process_config_file() -> "
+         mlog << Error << "\nprocess_config_file() -> "
               << "the pb_report_type values must be in the valid "
               << "range of 100 through 300.\n\n";
          exit(1);
@@ -538,7 +538,7 @@ void process_config() {
    //
    n_obs_gc = conf.n_obs_grib_code_elements();
    if(n_obs_gc == 0) {
-      mlog << Error << "\n  process_config() -> "
+      mlog << Error << "\nprocess_config() -> "
            << "At least grib code or grib code abbreviation must be "
            << "provided for obs_grib_code.\n\n";
       exit(1);
@@ -556,7 +556,7 @@ void process_config() {
    //
    if(conf.quality_mark_thresh().ival() < 0 ||
       conf.quality_mark_thresh().ival() > 15) {
-      mlog << Error << "\n  process_config_file() -> "
+      mlog << Error << "\nprocess_config_file() -> "
            << "the quality_mark_thresh must be in the valid range "
            << "of 0 through 15.\n\n";
       exit(1);
@@ -571,7 +571,7 @@ void process_config() {
 
       if(conf.level_category(i).ival() < 0 ||
          conf.level_category(i).ival() > 7) {
-         mlog << Error << "\n  process_config_file() -> "
+         mlog << Error << "\nprocess_config_file() -> "
               << "the level_category values must be in the valid "
               << "range of 0 through 7.\n\n";
          exit(1);
@@ -582,7 +582,7 @@ void process_config() {
    // Check to make sure that the temporary directory exists
    //
    if(opendir(conf.tmp_dir().sval()) == NULL ) {
-      mlog << Error << "\n  process_config_file() -> "
+      mlog << Error << "\nprocess_config_file() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << conf.tmp_dir().sval() << "\n\n";
       exit(1);
@@ -605,7 +605,7 @@ void open_netcdf() {
    // Check for a valid file
    //
    if(!f_out->is_valid()) {
-      mlog << Error << "\n  open_netcdf() -> "
+      mlog << Error << "\nopen_netcdf() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
 
       f_out->close();
@@ -719,7 +719,7 @@ void process_pbfile(int i_pb) {
       //  file
       //
       if(pbfile.n_elements() > 1) {
-         mlog << Error << "\n  process_pbfile() -> "
+         mlog << Error << "\nprocess_pbfile() -> "
               << "the \"-dump\" and \"-pbfile\" options may not be "
               << "used together.  Only one PrepBufr file may be dump "
               << "to ASCII at a time.\n\n";
@@ -759,7 +759,7 @@ void process_pbfile(int i_pb) {
    // Check for zero messages to process
    //
    if(npbmsg <= 0) {
-      mlog << Warning << "\n  process_pbfile() -> "
+      mlog << Warning << "\nprocess_pbfile() -> "
            << "No PrepBufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
@@ -850,7 +850,7 @@ void process_pbfile(int i_pb) {
               << " PrepBufr messages...\n";
       }
       else if(file_ut != msg_ut) {
-         mlog << Error << "\n  process_pbfile() -> "
+         mlog << Error << "\nprocess_pbfile() -> "
               << "the observation time should remain the same for "
               << "all PrepBufr messages: " << msg_ut << " != "
               << file_ut << "\n\n";
@@ -1178,7 +1178,7 @@ void process_pbfile(int i_pb) {
             if(!obs_arr_var->set_cur(n_total_obs, (long) 0) ||
                !obs_arr_var->put(obs_arr, (long) 1,
                                  (long) obs_arr_len)) {
-               mlog << Error << "\n  process_pbfile() -> "
+               mlog << Error << "\nprocess_pbfile() -> "
                     << "error writing the observation array to the "
                     << "netCDF file\n\n";
                exit(1);
@@ -1238,7 +1238,7 @@ void process_pbfile(int i_pb) {
                if(!obs_arr_var->set_cur(n_total_obs, (long) 0) ||
                   !obs_arr_var->put(obs_arr, (long) 1,
                                    (long) obs_arr_len) ) {
-                  mlog << Error << "\n  main() -> "
+                  mlog << Error << "\nmain() -> "
                        << "error writing the derive observation array "
                        << "to the netCDF file\n\n";
                   exit(1);
@@ -1324,7 +1324,7 @@ void process_pbfile(int i_pb) {
    remove_temp_file(blk_file);
 
    if(i_msg <= 0) {
-      mlog << Warning << "\n  process_pbfile() -> "
+      mlog << Warning << "\nprocess_pbfile() -> "
            << "No PrepBufr messages retained from file: "
            << pbfile[i_pb] << "\n\n";
       return;
@@ -1343,14 +1343,14 @@ void write_netcdf_hdr_data() {
    // Check for no messages retained
    //
    if(hdr_typ_sa.n_elements() <= 0) {
-      mlog << Error << "\n  write_netcdf_hdr_data() -> "
+      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
            << "No PrepBufr messages retained.  Nothing to write.\n\n";
 
       //
       // Delete the NetCDF file
       //
       if(remove(ncfile) != 0) {
-         mlog << Error << "\n  write_netcdf_hdr_data() -> "
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
               << "can't remove output NetCDF file \"" << ncfile
               << "\"\n\n";
          exit(1);
@@ -1400,7 +1400,7 @@ void write_netcdf_hdr_data() {
       if(!hdr_typ_var->set_cur(i, (long) 0) ||
          !hdr_typ_var->put(hdr_typ_sa[i], (long) 1,
                            (long) strlen(hdr_typ_sa[i]))) {
-         mlog << Error << "\n  write_netcdf_hdr_data() -> "
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
               << "error writing the prepbufr message type string to "
               << "the netCDF file\n\n";
          exit(1);
@@ -1412,7 +1412,7 @@ void write_netcdf_hdr_data() {
       if(!hdr_sid_var->set_cur(i, (long) 0) ||
          !hdr_sid_var->put(hdr_sid_sa[i], (long) 1,
                            (long) strlen(hdr_sid_sa[i]))) {
-         mlog << Error << "\n  write_netcdf_hdr_data() -> "
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
               << "error writing the station id string to the "
               << "netCDF file\n\n";
          exit(1);
@@ -1424,7 +1424,7 @@ void write_netcdf_hdr_data() {
       if(!hdr_vld_var->set_cur(i, (long) 0) ||
          !hdr_vld_var->put(hdr_vld_sa[i], (long) 1,
                            (long) strlen(hdr_vld_sa[i]))) {
-         mlog << Error << "\n  write_netcdf_hdr_data() -> "
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
               << "error writing the valid time to the "
               << "netCDF file\n\n";
          exit(1);
@@ -1441,7 +1441,7 @@ void write_netcdf_hdr_data() {
       if(!hdr_arr_var->set_cur(i, (long) 0) ||
          !hdr_arr_var->put(hdr_arr, (long) 1,
                            (long) hdr_arr_len)) {
-         mlog << Error << "\n  write_netcdf_hdr_data() -> "
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
               << "error writing the header array to the "
               << "netCDF file\n\n";
          exit(1);

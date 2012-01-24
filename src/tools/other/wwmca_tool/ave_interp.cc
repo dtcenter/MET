@@ -164,7 +164,7 @@ InterpolationValue Ave_Interp::operator()(double x, double y) const
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Ave_Interp::operator()(double x, double y) const -> no data!\n\n";
+   mlog << Error << "\nAve_Interp::operator()(double x, double y) const -> no data!\n\n";
 
    exit ( 1 );
 

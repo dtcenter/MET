@@ -90,7 +90,7 @@ void bezouti(int a, int b, int & x, int & y)
 
 if ( (a == 0) || (b == 0) )  {
 
-   mlog << Error << "\n  bezouti() -> neither a nor b can be zero!\n\n";
+   mlog << Error << "\nbezouti() -> neither a nor b can be zero!\n\n";
 
    exit ( 1 );
 

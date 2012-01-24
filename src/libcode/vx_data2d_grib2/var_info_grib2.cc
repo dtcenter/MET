@@ -229,7 +229,7 @@ void VarInfoGrib2::set_pair(const ConcatString &key, const ConcatString &val) {
 void VarInfoGrib2::set_magic(const ConcatString &s) {
 
    // This functionality is not supported for GRIB2.
-   mlog << Error << "\n  VarInfoGrib2::set_magic() -> "
+   mlog << Error << "\nVarInfoGrib2::set_magic() -> "
         << "This function is not supported for the GRIB2 file type!\n\n";
    exit(1);
 
@@ -241,7 +241,7 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
 bool VarInfoGrib2::is_precipitation() const {
 
    // This functionality is not supported for GRIB2.
-   mlog << Error << "\n  VarInfoGrib2::is_precipitation() -> "
+   mlog << Error << "\nVarInfoGrib2::is_precipitation() -> "
         << "This function is not yet implemented for the GRIB2 file type!\n\n";
    exit(1);
 
@@ -253,7 +253,7 @@ bool VarInfoGrib2::is_precipitation() const {
 bool VarInfoGrib2::is_specific_humidity() const {
 
    // This functionality is not supported for GRIB2.
-   mlog << Error << "\n  VarInfoGrib2::is_specific_humidity() -> "
+   mlog << Error << "\nVarInfoGrib2::is_specific_humidity() -> "
         << "This function is not yet implemented for the GRIB2 file type!\n\n";
    exit(1);
 
@@ -265,7 +265,7 @@ bool VarInfoGrib2::is_specific_humidity() const {
 bool VarInfoGrib2::is_u_wind() const {
 
    // This functionality is not supported for GRIB2.
-   mlog << Error << "\n  VarInfoGrib2::is_u_wind() -> "
+   mlog << Error << "\nVarInfoGrib2::is_u_wind() -> "
         << "This function is not yet implemented for the GRIB2 file type!\n\n";
    exit(1);
 
@@ -277,7 +277,7 @@ bool VarInfoGrib2::is_u_wind() const {
 bool VarInfoGrib2::is_v_wind() const {
 
    // This functionality is not supported for GRIB2.
-   mlog << Error << "\n  VarInfoGrib2::is_v_wind() -> "
+   mlog << Error << "\nVarInfoGrib2::is_v_wind() -> "
         << "This function is not yet implemented for the GRIB2 file type!\n\n";
    exit(1);
 
@@ -289,7 +289,7 @@ bool VarInfoGrib2::is_v_wind() const {
 bool VarInfoGrib2::is_wind_speed() const {
 
    // This functionality is not supported for GRIB2.
-   mlog << Error << "\n  VarInfoGrib2::is_wind_speed() -> "
+   mlog << Error << "\nVarInfoGrib2::is_wind_speed() -> "
         << "This function is not yet implemented for the GRIB2 file type!\n\n";
    exit(1);
 
@@ -301,7 +301,7 @@ bool VarInfoGrib2::is_wind_speed() const {
 bool VarInfoGrib2::is_wind_direction() const {
 
    // This functionality is not supported for GRIB2.
-   mlog << Error << "\n  VarInfoGrib2::is_wind_direction() -> "
+   mlog << Error << "\nVarInfoGrib2::is_wind_direction() -> "
         << "This function is not yet implemented for the GRIB2 file type!\n\n";
    exit(1);
 

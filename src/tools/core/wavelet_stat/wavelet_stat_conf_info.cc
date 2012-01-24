@@ -135,7 +135,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    if(strlen(conf.model().sval()) == 0 ||
       check_reg_exp(ws_reg_exp, conf.model().sval()) == true) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "The model name (\"" << conf.model().sval()
            << "\") must be non-empty and contain no embedded "
            << "whitespace.\n\n";
@@ -158,7 +158,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
 
    if(n_vx == 0) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "At least one value must be provided "
            << "for fcst_field.\n\n";
       exit(1);
@@ -182,7 +182,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
       // No support for WDIR
       if(fcst_info[i]->is_wind_direction()) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "the wind direction field may not be verified "
               << "using wavelet_stat.\n\n";
          exit(1);
@@ -198,7 +198,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    if(conf.n_obs_field_elements() != 0 &&
       conf.n_obs_field_elements() != n_vx) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "The length of obs_field must be the same as the "
            << "length of fcst_field.\n\n";
       exit(1);
@@ -230,7 +230,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
       // No support for wind direction
       if(obs_info[i]->is_wind_direction()) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "the wind direction field may not be verified "
               << "using grid_stat.\n\n";
          exit(1);
@@ -244,7 +244,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    // Check that the number of forecast threshold levels matches n_vx
    if(conf.n_fcst_thresh_elements() != n_vx) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "The number of fcst_thresh levels provided must match the "
            << "number of fields provided in fcst_field.\n\n";
       exit(1);
@@ -267,7 +267,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    if(conf.n_obs_thresh_elements() != 0 &&
       conf.n_obs_thresh_elements() != n_vx) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "The number obs_thresh levels provided must match the "
            << "number of fields provided in obs_field.\n\n";
       exit(1);
@@ -296,7 +296,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
       // Check for the same number of fcst and obs thresholds
       if(fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "The number of thresholds for each field in "
               << "fcst_thresh must match the number of thresholds "
               << "for each field in obs_thresh.\n\n";
@@ -315,7 +315,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
 
    if(i < 0 || i > 3) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "The mask_missing_flag must be set to an integer value "
            << "between 0 and 3!\n\n";
       exit(1);
@@ -329,7 +329,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
 
    if(i < 0 || i > 2) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "The grid decomposition flag must be set "
            << "between 0 and 2.\n\n";
       exit(1);
@@ -346,7 +346,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
       //
       if(conf.n_tile_xll_elements() != conf.n_tile_yll_elements()) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "The number of entries in tile_xll must match "
               << "the number of entries in tile_yll.\n\n";
          exit(1);
@@ -357,7 +357,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
       //
       if((n_scale = get_pow2(conf.tile_dim().ival())) < 0) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "The tile_dim parameter must be set to an integer "
               << "power of 2 when requesting tiling.\n\n";
          exit(1);
@@ -371,7 +371,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    i = conf.wavelet_flag().ival();
 
    if(i < 0 || i > 6) {
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "The wavelet_flag must be set to an integer value "
            << "between 0 and 6!\n\n";
       exit(1);
@@ -406,7 +406,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
 
       default:
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "Unexpected flag value of " << i << "!\n\n";
          exit(1);
          break;
@@ -422,7 +422,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    if(i == 0 || i == 1) {
       if(k != 2) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "For Haar wavelets, wavelet_k must be set to 2.\n\n";
          exit(1);
       }
@@ -431,7 +431,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    else if(i == 2 || i == 3) {
       if(k < 4 || k > 20 || k%2 == 1) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "For Daubechies wavelets, wavelet_k must be set to "
               << "an even integer between 4 and 20.\n\n";
          exit(1);
@@ -443,7 +443,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
          k != 208 && k != 301 && k != 303 && k != 305 && k != 307 &&
          k != 309) {
 
-         mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "For Daubechies wavelets, wavelet_k must be set to "
               << "one of: 103, 105, 202, 204, 206, 208, 301, 303, 305, "
               << "307, 309.\n\n";
@@ -461,7 +461,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    // Make sure the output_flag is the expected length
    if(conf.n_output_flag_elements() != n_out) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "Unexpected number of elements in the output_flag "
            << "parameter.\n\n";
       exit(1);
@@ -470,7 +470,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    // Check that at least one output STAT type is requested
    if(conf.output_flag(0).ival() <= flag_no_out) {
 
-      mlog << Error << "\n  WaveletStatConfInfo::process_config() -> "
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
            << "At least one output STAT type must be requested.\n\n";
       exit(1);
    }
@@ -550,7 +550,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
          break;
 
       default:
-         mlog << Error << "\n  WaveletStatConfInfo::process_tiles() -> "
+         mlog << Error << "\nWaveletStatConfInfo::process_tiles() -> "
               << "unexpected value for grid_decomp_flag: "
               << conf.grid_decomp_flag().ival() << "\n\n";
          exit(1);

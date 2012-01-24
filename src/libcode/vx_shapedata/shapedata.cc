@@ -114,7 +114,7 @@ void ShapeData::assign(const ShapeData &d) {
 int ShapeData::x_left(int y) const {
 
    if((y < 0) || (y >= data.ny())) {
-      mlog << Error << "\n  ShapeData::x_left(int) -> "
+      mlog << Error << "\nShapeData::x_left(int) -> "
            << "range check error\n\n";
       exit(1);
    }
@@ -133,7 +133,7 @@ int ShapeData::x_left(int y) const {
 int ShapeData::x_right(int y) const {
 
    if((y < 0) || (y >= data.ny())) {
-      mlog << Error << "\n  ShapeData::x_right(int) -> "
+      mlog << Error << "\nShapeData::x_right(int) -> "
            << "range check error\n\n";
       exit(1);
    }
@@ -352,7 +352,7 @@ double ShapeData::complexity() const {
    count = s_area();
 
    if(count == 0) {
-      mlog << Error << "\n  ShapeData::complexity() const -> "
+      mlog << Error << "\nShapeData::complexity() const -> "
            << "empty shape!\n\n";
       exit(1);
    }
@@ -396,7 +396,7 @@ const bool bd_thresh_zero = is_eq(bd_thresh, 0.0);
 
 if ( (diameter%2 == 0) || (diameter < 3) )  {
 
-   mlog << Error << "\n  ShapeData::conv_filter_circ() -> "
+   mlog << Error << "\nShapeData::conv_filter_circ() -> "
         << "diameter must be odd and >= 3 ... diameter = "
         << diameter << "\n\n";
 
@@ -546,7 +546,7 @@ Polyline ShapeData::convex_hull() const {
 
    if(area() <= 0) {
 
-      mlog << Error << "\n  convex_hull(Polyline &) -> "
+      mlog << Error << "\nconvex_hull(Polyline &) -> "
            << "attempting to fit convex hull to a shape with area = 0\n\n";
       exit(1);
    }
@@ -558,7 +558,7 @@ Polyline ShapeData::convex_hull() const {
 
    if ( !Index )  {
 
-      mlog << Error << "\n  convex_hull(Polyline &) -> "
+      mlog << Error << "\nconvex_hull(Polyline &) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -607,7 +607,7 @@ Polyline ShapeData::convex_hull() const {
 
    if ( j < 0 )  {
 
-      mlog << Error << "\n  convex_hull(Polyline &) -> "
+      mlog << Error << "\nconvex_hull(Polyline &) -> "
            << "can't find lowest point\n\n";
       exit(1);
    }
@@ -663,7 +663,7 @@ Polyline ShapeData::convex_hull() const {
 
    if ( j < 0 )  {
 
-      mlog << Error << "\n  convex_hull(Polyline &) -> "
+      mlog << Error << "\nconvex_hull(Polyline &) -> "
            << "can't find next hull point\n\n";
       exit(1);
    }
@@ -969,7 +969,7 @@ void Cell::add(int k) {
    if ( has(k) )  return;
 
    if ( n >= max_cell_elements ) {
-      mlog << Error << "\n  void Cell::add() -> "
+      mlog << Error << "\nvoid Cell::add() -> "
            << "too many elements!\n\n";
       exit(1);
    }
@@ -1075,7 +1075,7 @@ void Partition::merge_cells(int j_1, int j_2) {
    int j_min, j_max;
 
    if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
-      mlog << Error << "\n  Partition::merge_cells() -> "
+      mlog << Error << "\nPartition::merge_cells() -> "
            << "range check error\n\n";
       exit(1);
    }
@@ -1115,7 +1115,7 @@ void Partition::merge_values(int v1, int v2) {
    j_2 = which_cell(v2);
 
    if ( (j_1 < 0) || (j_2 < 0) ) {
-      mlog << Error << "\n  void Partition::merge_values() -> "
+      mlog << Error << "\nvoid Partition::merge_values() -> "
            << "bad values: (v1, v2) = (" << v1 << ", " << v2
            << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
       return;
@@ -1133,7 +1133,7 @@ void Partition::add(int k) {
    if ( has(k) )  return;
 
    if ( n >= max_cells ) {
-      mlog << Error << "\n  void Partition::add() -> "
+      mlog << Error << "\nvoid Partition::add() -> "
            << "too many cells!\n\n";
       exit(1);
    }
@@ -1212,7 +1212,7 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
          break;
 
       default:
-         mlog << Error << "\n  boundary_step() -> "
+         mlog << Error << "\nboundary_step() -> "
               << "bad direction: " << direction << "\n\n";
          exit(1);
          break;
@@ -1246,7 +1246,7 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
 
       default:
 
-         mlog << Error << "\n  boundary_step() -> "
+         mlog << Error << "\nboundary_step() -> "
               << "bad step case: "
               << get_step_case(lr, ur, ul, ll) << "\n\n";
          exit(1);
@@ -1295,7 +1295,7 @@ int get_step_case(bool lr, bool ur, bool ul, bool ll) {
    // Otherwise, combination is invalid
    //
    else {
-      mlog << Error << "\n  get_step_case() -> "
+      mlog << Error << "\nget_step_case() -> "
            << "invalid combination: (lr, ur, ul, ll) = (" << lr << ", "
            << ur << ", " << ul << ", " << ll << ")\n\n";
       exit(1);
@@ -1314,7 +1314,7 @@ void apply_mask(ShapeData &f, ShapeData &mask)
    if(f.data.nx() != mask.data.nx() ||
       f.data.ny() != mask.data.ny() ) {
 
-      mlog << Error << "\n  apply_mask() -> "
+      mlog << Error << "\napply_mask() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
@@ -1420,7 +1420,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
    const int ny = data.ny();
 
    if(perc < 0 || perc > 102) {
-      mlog << Error << "\n  ShapeData:threshold_intensity() -> "
+      mlog << Error << "\nShapeData:threshold_intensity() -> "
            << "the intensity percentile requested must be between 0 and 102.\n\n";
       exit(1);
    }
@@ -1767,7 +1767,7 @@ int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
    if(f1.data.nx() != f2.data.nx() ||
       f1.data.ny() != f2.data.ny() ) {
 
-      mlog << Error << "\n  ShapeData_intersection() -> "
+      mlog << Error << "\nShapeData_intersection() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }

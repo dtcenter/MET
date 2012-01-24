@@ -403,7 +403,7 @@ double ContingencyTable::gaccuracy() const {
 
    if ( Nrows != Ncols )  {
 
-      mlog << Error << "\n  ContingencyTable::gaccuracy() -> table not square!\n\n";
+      mlog << Error << "\nContingencyTable::gaccuracy() -> table not square!\n\n";
 
       exit ( 1 );
 
@@ -429,7 +429,7 @@ double ContingencyTable::gheidke()const  //  Reference: Eq. 7.11, page 249 in Wi
 
 if ( Nrows != Ncols )  {
 
-   mlog << Error << "\n  ContingencyTable::gheidke() -> table not square!\n\n";
+   mlog << Error << "\nContingencyTable::gheidke() -> table not square!\n\n";
 
    exit ( 1 );
 
@@ -439,7 +439,7 @@ const int N = total();
 
 if ( N == 0 )  {
 
-   mlog << Error << "\n  ContingencyTable::gheidke() -> table empty!\n\n";
+   mlog << Error << "\nContingencyTable::gheidke() -> table empty!\n\n";
 
    exit ( 1 );
 
@@ -512,7 +512,7 @@ double ContingencyTable::gkuiper()const  //  Reference: Eq. 7.13, page 250 in Wi
 
 if ( Nrows != Ncols )  {
 
-   mlog << Error << "\n  ContingencyTable::gkuiper() -> table not square!\n\n";
+   mlog << Error << "\nContingencyTable::gkuiper() -> table not square!\n\n";
 
    exit ( 1 );
 
@@ -522,7 +522,7 @@ const int N = total();
 
 if ( N == 0 )  {
 
-   mlog << Error << "\n  ContingencyTable::gkuiper() -> table empty!\n\n";
+   mlog << Error << "\nContingencyTable::gkuiper() -> table empty!\n\n";
 
    exit ( 1 );
 
@@ -610,7 +610,7 @@ double ContingencyTable::gerrity() const  //  Reference: Pages 84-91 in
 
 if ( Nrows != Ncols )  {
 
-   mlog << Error << "\n  ContingencyTable::gerrity() -> table not square!\n\n";
+   mlog << Error << "\nContingencyTable::gerrity() -> table not square!\n\n";
 
    exit ( 1 );
 
@@ -620,7 +620,7 @@ const int N = total();
 
 if ( N == 0 )  {
 
-   mlog << Error << "\n  ContingencyTable::gerrity() -> table empty!\n\n";
+   mlog << Error << "\nContingencyTable::gerrity() -> table empty!\n\n";
 
    exit ( 1 );
 

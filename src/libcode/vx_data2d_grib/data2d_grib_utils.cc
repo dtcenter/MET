@@ -353,7 +353,7 @@ void read_pds(const GribRecord &r, int &bms_flag,
    // Check PDS for flag for the presence of a GDS and BMS section
    //
    if(!(pds->flag & 128)) {
-      mlog << Error << "\n  read_pds() -> "
+      mlog << Error << "\nread_pds() -> "
            << "No Grid Description Section present in the "
            << "grib record.\n\n";
       exit(1);
@@ -429,7 +429,7 @@ void read_pds(const GribRecord &r, int &bms_flag,
          break;
 
       default:
-         mlog << Error << "\n  read_pds() -> "
+         mlog << Error << "\nread_pds() -> "
               << "unexpected time unit of "
               << (int) pds->fcst_unit << ".\n\n";
          exit(1);
@@ -490,7 +490,7 @@ void read_pds(const GribRecord &r, int &bms_flag,
           break;
 
       default:
-         mlog << Error << "\n  read_pds() -> "
+         mlog << Error << "\nread_pds() -> "
               << "unexpected time range indicator of "
               << (int) pds->tri << ".\n\n";
          exit(1);
@@ -558,7 +558,7 @@ for ( j=0; j<n_grib_level_list; ++j ) {
    //
    
 if ( j == n_grib_level_list )  {
-   mlog << Error << "\n  read_pds_level() -> "
+   mlog << Error << "\nread_pds_level() -> "
         << " can't find the level type for GRIB record!\n\n";
    exit(1);
 }

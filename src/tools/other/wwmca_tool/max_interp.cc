@@ -165,7 +165,7 @@ InterpolationValue Max_Interp::operator()(double x, double y) const
 
 if ( !Data )  {
 
-   mlog << Error << "\n  Max_Interp::operator()(double x, double y) const -> no data!\n\n";
+   mlog << Error << "\nMax_Interp::operator()(double x, double y) const -> no data!\n\n";
 
    exit ( 1 );
 

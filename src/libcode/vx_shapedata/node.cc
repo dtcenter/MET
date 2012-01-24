@@ -136,7 +136,7 @@ void Node::add_child(const Polyline *poly) {
 
       if(!child) {
 
-         mlog << Error << "\n  Node::add_child() -> "
+         mlog << Error << "\nNode::add_child() -> "
               << "memory allocation error\n\n";
 
          exit(1);
@@ -162,7 +162,7 @@ void Node::add_child(const Polyline *poly) {
 
       if(!n_ptr->sibling) {
 
-         mlog << Error << "\n  Node::add_child() -> "
+         mlog << Error << "\nNode::add_child() -> "
 	      << "memory allocation error\n\n";
 
          exit(1);
@@ -209,7 +209,7 @@ Node *Node::get_child(int n) const {
 
    if( n >= (children_count = n_children()) ) {
 
-      mlog << Error << "\n  Node::get_child(int) -> "
+      mlog << Error << "\nNode::get_child(int) -> "
 	   << "attempting to access child number " << n << " when only " 
 	   << children_count << " exist\n\n";
 
@@ -291,7 +291,7 @@ double Node::angle() const {
 
    if(p.n_points < 3 && n_children() == 0) {
 
-      mlog << Error << "\n  Node::angle() -> "
+      mlog << Error << "\nNode::angle() -> "
 	   << "not enough points!\n\n";
 
       exit(1);
@@ -504,7 +504,7 @@ double node_dist(const Node &a, const Node &b) {
    num_b = b.n_children();
 
    if(num_a == 0 || num_b == 0) {
-      mlog << Error << "\n  double node_dist(Node &, Node &) -> "
+      mlog << Error << "\ndouble node_dist(Node &, Node &) -> "
            << "encountered empty node tree\n\n";
 
       exit(1);
@@ -541,7 +541,7 @@ double node_polyline_dist(const Node &a, const Polyline &b) {
    num_a = a.n_children();
 
    if(num_a == 0) {
-      mlog << Error << "\n  double node_polyline_dist(Node &, Node &) -> "
+      mlog << Error << "\ndouble node_polyline_dist(Node &, Node &) -> "
            << "encountered empty node tree\n\n";
 
       exit(1);

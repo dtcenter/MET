@@ -892,7 +892,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       if(strcmp(jc_array[i], "-job") == 0) {
 
          if(set_job_type(jc_array[i+1]) != 0) {
-            mlog << Error << "\n  STATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
+            mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
 
@@ -1100,7 +1100,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else {
-         mlog << Error << "\n  STATAnalysisJob::parse_job_command() -> "
+         mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
               << "unrecognized switch \"" << jc_array[i]
               << "\" in job command line: "
               << jobstring << "\n\n";
@@ -1221,7 +1221,7 @@ void STATAnalysisJob::open_dump_row_file() {
    dr_out->open(dump_row);
 
    if(!(*dr_out)) {
-      mlog << Error << "\n  STATAnalysisJob::open_dump_row_file()-> "
+      mlog << Error << "\nSTATAnalysisJob::open_dump_row_file()-> "
            << "can't open the output file \"" << dump_row
            << "\" for writing!\n\n";
 
@@ -1551,7 +1551,7 @@ void STATAnalysisJob::process_mask_grid() {
    // Locate the requested grid
    //
    if(!find_grid_by_name(mask_grid, grid_mask)) {
-      mlog << Error << "\n  STATAnalysisJob::process_mask_grid() -> "
+      mlog << Error << "\nSTATAnalysisJob::process_mask_grid() -> "
            << "Can't find requested masking grid name \""
            << mask_grid << "\".\n\n";
 

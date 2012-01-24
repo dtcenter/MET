@@ -45,7 +45,7 @@ void grid_output(const GridInfo & info, NcFile * ncfile)
 
 if ( !(info.ok()) )  {
 
-   mlog << Error << "\n  grid_output(const GridInfo &, NcFile *) -> bad grid info!\n\n";
+   mlog << Error << "\ngrid_output(const GridInfo &, NcFile *) -> bad grid info!\n\n";
 
    exit ( 1 );
 
@@ -57,7 +57,7 @@ else if ( info.ll )  latlon_grid_output        (info, ncfile);
 else if ( info.m  )  mercator_grid_output      (info, ncfile);
 else {
 
-   mlog << Error << "\n  grid_output(const GridInfo &, NcFile *) -> can't determine projection!\n\n";
+   mlog << Error << "\ngrid_output(const GridInfo &, NcFile *) -> can't determine projection!\n\n";
 
    exit ( 1 );
 

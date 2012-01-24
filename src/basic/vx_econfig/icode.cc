@@ -240,7 +240,7 @@ switch ( type )  {
    case floating_point:  x = d;             break;
 
    default:
-      mlog << Error << "\n  IcodeCell::as_double() const -> "
+      mlog << Error << "\nIcodeCell::as_double() const -> "
            << "bad type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -269,7 +269,7 @@ switch ( type )  {
    case floating_point:  k = my_nint(d);   break;
 
    default:
-      mlog << Error << "\n  IcodeCell::as_int() const -> "
+      mlog << Error << "\nIcodeCell::as_int() const -> "
            << "bad type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -346,7 +346,7 @@ switch ( type )  {
       break;
 
    default:
-      mlog << Error << "\n  IcodeCell::dump() -> "
+      mlog << Error << "\nIcodeCell::dump() -> "
            << "unrecognized type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -594,7 +594,7 @@ u = new IcodeCell [n];
 
 if ( !u )  {
 
-   mlog << Error << "\n  void IcodeVector::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nvoid IcodeVector::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -634,7 +634,7 @@ const IcodeCell & IcodeVector::operator[](int n) const
 
 if ( (n < 0) || (n >= Ncells) )  {
 
-   mlog << Error << "\n  IcodeVector::operator[](int) -> range check error!\n\n";
+   mlog << Error << "\nIcodeVector::operator[](int) -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -654,7 +654,7 @@ const IcodeCell & IcodeVector::cell(int n) const
 
 if ( (n < 0) || (n >= Ncells) )  {
 
-   mlog << Error << "\n  IcodeVector::cell(int) -> range check error!\n\n";
+   mlog << Error << "\nIcodeVector::cell(int) -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -877,7 +877,7 @@ void CellStack::push(const IcodeCell & c)
 
 if ( Depth >= cell_stack_size )  {
 
-   mlog << Error << "\n  void CellStack::push(const CellStack &) -> stack full!\n\n";
+   mlog << Error << "\nvoid CellStack::push(const CellStack &) -> stack full!\n\n";
 
    exit ( 1 );
 
@@ -899,7 +899,7 @@ IcodeCell CellStack::pop()
 
 if ( Depth <= 0 )  {
 
-   mlog << Error << "\n  CellStack::pop() -> stack empty!\n\n";
+   mlog << Error << "\nCellStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 
@@ -919,7 +919,7 @@ const IcodeCell & CellStack::peek() const
 
 if ( Depth <= 0 )  {
 
-   mlog << Error << "\n  CellStack::peek() -> stack empty!\n\n";
+   mlog << Error << "\nCellStack::peek() -> stack empty!\n\n";
 
    exit ( 1 );
 
@@ -940,7 +940,7 @@ void CellStack::dump_cell(ostream & out, int n, int indent_depth) const
 
 if ( n >= Depth )  {
 
-   mlog << Error << "\n  CellStack::write_cell_to_screen(int, int) const -> specified level greater than stack depth\n\n";
+   mlog << Error << "\nCellStack::write_cell_to_screen(int, int) const -> specified level greater than stack depth\n\n";
 
    exit ( 1 );
 
@@ -1070,7 +1070,7 @@ for (j=0; j<Depth; ++j)  {
 
    if ( !(v[j]) )  {
 
-      mlog << Error << "\n  ICVStack::assign(const ICVStack &) -> memory allocation error\n\n";
+      mlog << Error << "\nICVStack::assign(const ICVStack &) -> memory allocation error\n\n";
 
       exit ( 1 );
 
@@ -1095,7 +1095,7 @@ void ICVStack::push(const IcodeVector & V)
 
 if ( Depth >= icv_stack_size )  {
 
-   mlog << Error << "\n  ICVStack::push(const IcodeVector &) -> stack full!\n\n";
+   mlog << Error << "\nICVStack::push(const IcodeVector &) -> stack full!\n\n";
 
    exit ( 1 );
 
@@ -1105,7 +1105,7 @@ v[Depth] = new IcodeVector;
 
 if ( !(v[Depth]) )  {
 
-   mlog << Error << "\n  ICVStack::push(const IcodeVector &) -> memory allocation error\n\n";
+   mlog << Error << "\nICVStack::push(const IcodeVector &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -1128,7 +1128,7 @@ IcodeVector ICVStack::pop()
 
 if ( Depth <= 0 )  {
 
-   mlog << Error << "\n  ICVStack::pop() -> stack empty!\n\n";
+   mlog << Error << "\nICVStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 
@@ -1160,7 +1160,7 @@ IcodeVector * ICVStack::peek()
 
 if ( Depth <= 0 )  {
 
-   mlog << Error << "\n  ICVStack::pop() -> stack empty!\n\n";
+   mlog << Error << "\nICVStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 
@@ -1344,7 +1344,7 @@ void ICVQueue::push(const IcodeVector & icv)
 
 if ( Nelements >= icv_stack_size )  {
 
-   mlog << Error << "\n  ICVQueue::push(const IcodeVector &) -> queue is full!\n\n";
+   mlog << Error << "\nICVQueue::push(const IcodeVector &) -> queue is full!\n\n";
 
    exit ( 1 );
 
@@ -1370,7 +1370,7 @@ IcodeVector ICVQueue::pop()
 
 if ( Nelements == 0 )  {
 
-   mlog << Error << "\n  ICVQueue::pop() -> queue empty!\n\n";
+   mlog << Error << "\nICVQueue::pop() -> queue empty!\n\n";
 
    exit ( 1 );
 
@@ -1521,7 +1521,7 @@ IcodeVector & ICVArray::operator[](int k)
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n  IcodeVector & ICVArray::operator[](int) -> range check error!\n\n";
+   mlog << Error << "\nIcodeVector & ICVArray::operator[](int) -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -1542,7 +1542,7 @@ void ICVArray::add(const IcodeVector & icv)
 
 if ( Nelements >= icv_array_size )  {
 
-   mlog << Error << "\n  ICVArray::add(const IcodeVector &) -> array full!\n\n";
+   mlog << Error << "\nICVArray::add(const IcodeVector &) -> array full!\n\n";
 
    exit ( 1 );
 

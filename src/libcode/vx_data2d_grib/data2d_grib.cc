@@ -65,7 +65,7 @@ MetGrib1DataFile::MetGrib1DataFile(const MetGrib1DataFile &)
 
 {
 
-mlog << Error << "\n  MetGrib1DataFile::MetGrib1DataFile(const MetGrib1DataFile &) -> "
+mlog << Error << "\nMetGrib1DataFile::MetGrib1DataFile(const MetGrib1DataFile &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
@@ -84,7 +84,7 @@ MetGrib1DataFile & MetGrib1DataFile::operator=(const MetGrib1DataFile &)
 
 {
 
-mlog << Error << "\n  MetGrib1DataFile::operator=(const MetGrib1DataFile &) -> "
+mlog << Error << "\nMetGrib1DataFile::operator=(const MetGrib1DataFile &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
@@ -149,7 +149,7 @@ GF = new GribFile;
 
 if ( ! (GF->open(_filename)) )  {
 
-   mlog << Error << "\n  MetGrib1DataFile::open(const char *) -> "
+   mlog << Error << "\nMetGrib1DataFile::open(const char *) -> "
         << "unable to open grib1 file \"" << _filename << "\"\n\n";
 
    // exit ( 1 );
@@ -281,7 +281,7 @@ bool MetGrib1DataFile::read_record(const int n)
    //
 if ( (n < 0) || (n > GF->n_records()) )  {
 
-mlog << Error << "\n  MetGrib1DataFile::read_record() -> "
+mlog << Error << "\nMetGrib1DataFile::read_record() -> "
      << "range check error ... n = " << n << "\n\n";
 
 exit ( 1 );
@@ -298,7 +298,7 @@ GF->seek_record(n);
    //
 if ( ! ( (*GF) >> CurrentRecord) )  {
 
-mlog << Error << "\n  MetGrib1DataFile::read_record() -> "
+mlog << Error << "\nMetGrib1DataFile::read_record() -> "
      << "trouble reading record number " << n << "\n\n";
 
 return (false);
@@ -324,7 +324,7 @@ int MetGrib1DataFile::read_record(const VarInfoGrib & v)
 
 if ( !GF )  {
 
-   mlog << Error << "\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> "
+   mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> "
         << "no grib file open!\n\n";
 
    // exit ( 1 );
@@ -345,7 +345,7 @@ for (j=0; j<(GF->n_records()); ++j)  {
 
    if ( ! read_record(j) )  {
 
-      mlog << Error << "\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> trouble reading record!\n\n";
+      mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> trouble reading record!\n\n";
 
       // exit ( 1 );
 
@@ -385,7 +385,7 @@ if ( j_match >= 0 )  {
 
    if ( ! read_record(j_match) )  {
 
-      mlog << Error << "\n  MetGrib1DataFile::read_record(const VarInfoGrib &) -> "
+      mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> "
            << "trouble reading record!\n\n";
 
       // exit ( 1 );
@@ -431,7 +431,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
          // Check for more than one matching data_plane
          if(n_planes > 1) {
-            mlog << Warning << "\n  MetGrib1DataFile::data_plane() -> "
+            mlog << Warning << "\nMetGrib1DataFile::data_plane() -> "
                  << "Found " << n_planes << " matches for VarInfo \""
                  << vinfo.magic_str() << "\" in GRIB file \"" << filename()
                  << "\".  Using the first match found.\n\n";
@@ -441,7 +441,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    // Check for bad status
    if(!status) {
-      mlog << Warning << "\n  MetGrib1DataFile::data_plane() -> "
+      mlog << Warning << "\nMetGrib1DataFile::data_plane() -> "
            << "No exact match found for VarInfo \""
            << vinfo.magic_str() << "\" in GRIB file \""
            << filename() << "\".\n\n";
@@ -513,7 +513,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
          if(!status) {
             cur_plane.clear();
             lower = upper = bad_data_double;
-            mlog << Warning << "\n  MetGrib1DataFile::data_plane_array() -> "
+            mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
                  << "Can't read record number " << i+1
                  << " from GRIB file \"" << filename() << "\".\n\n";
             continue;
@@ -552,7 +552,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
          // Derive wind speed or direction
          if(u_plane_array.n_planes() != v_plane_array.n_planes()) {
-            mlog << Warning << "\n  MetGrib1DataFile::data_plane_array() -> "
+            mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
                  << "when deriving winds, the number of U-wind records ("
                  << u_plane_array.n_planes() << ") does not match the "
                  << "number of V-wind record (" << v_plane_array.n_planes()
@@ -567,7 +567,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
             if(u_plane_array.lower(i) != v_plane_array.lower(i) ||
                u_plane_array.upper(i) != v_plane_array.upper(i)) {
                  
-               mlog << Warning << "\n  MetGrib1DataFile::data_plane_array() -> "
+               mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
                     << "when deriving winds for level " << i+1
                     << ", the U-wind levels ("
                     << u_plane_array.lower(i) << ", " << u_plane_array.upper(i)
@@ -687,7 +687,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
    } // end for loop
 
    if(!status) {
-      mlog << Warning << "\n  MetGrib1DataFile::data_plane_scalar() -> "
+      mlog << Warning << "\nMetGrib1DataFile::data_plane_scalar() -> "
            << "No exact match found for VarInfo \""
            << vinfo_grib.magic_str() << "\" in GRIB file \""
            << filename() << "\".\n\n";
@@ -723,7 +723,7 @@ bool is_grid_relative(const GribRecord &r) {
       res_flag = r.gds->grid_type.stereographic.res_flag;
    }
    else {
-      mlog << Error << "\n  is_grid_relative() -> "
+      mlog << Error << "\nis_grid_relative() -> "
            << "Unsupported grid type value: " << r.gds->type
            << "\n\n";
       exit(1);
@@ -747,7 +747,7 @@ int get_bit_from_octet(unsigned char u, int bit) {
 
    if((bit < 1) || (bit > 8)) {
 
-      mlog << Error << "\n  get_bit_from_octet() -> "
+      mlog << Error << "\nget_bit_from_octet() -> "
            << "bad bit number\n\n";
       exit(1);
    }

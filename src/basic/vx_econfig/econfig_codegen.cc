@@ -128,7 +128,7 @@ do {
    else if ( strcmp(argv[j], "-hh"                   ) == 0 )  { set_hh             ();             shift_down(argc, argv, j, 1); }
    else {
 
-      mlog << Error << "\n  unrecognized switch: \"" << argv[j] << "\"\n\n";
+      mlog << Error << "\nunrecognized switch: \"" << argv[j] << "\"\n\n";
 
       exit ( 1 );
 
@@ -180,7 +180,7 @@ void usage()
 
 const char * tab = "            ";
 
-mlog << Error << "\n  usage: " << program_name << "\n"
+mlog << Error << "\nusage: " << program_name << "\n"
      << tab << " [ -allow_multiple_reads ]\n"
      << tab << " [ -nopanic ]\n"
      << tab << " [ -hh ]\n"

@@ -33,7 +33,7 @@ program_name = get_short_name(argv[0]);
 
 if ( argc != 2 )  {
 
-   mlog << Error << "\n  usage:  " << program_name << " filename\n\n";
+   mlog << Error << "\nusage:  " << program_name << " filename\n\n";
 
    exit ( 1 );
 
@@ -65,7 +65,7 @@ if ( !status1 && !status2 )  {
 
 if ( status1 && status2 )  {
 
-   mlog << Error << "\n  there must be a problem ... the code says it's BOTH grib1 and grib2 !!!\n\n";
+   mlog << Error << "\nthere must be a problem ... the code says it's BOTH grib1 and grib2 !!!\n\n";
 
    exit ( 1 );
 

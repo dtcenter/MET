@@ -52,7 +52,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
 #ifdef WITH_GRIB2
          mtddf = new MetGrib2DataFile;
 #else
-         mlog << Error << "\n  Met2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "Support for GRIB2 has not been compiled!\n\n";
          exit(1);
 #endif
@@ -69,7 +69,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
       case FileType_NcCF:
       case FileType_HdfEos:
 
-         mlog << Error << "\n  Met2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "Support for GrdFileType = \"" << grdfiletype_to_string(t)
               << "\" not yet implemented!\n\n";
          exit(1);
@@ -77,7 +77,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
 
       case FileType_Bufr:
 
-         mlog << Error << "\n  Met2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "cannot use this factory to read files of type \""
               << grdfiletype_to_string(t) << "\"\n\n";
          exit(1);
@@ -89,7 +89,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
          break;
 
       default:
-         mlog << Error << "\n  Met2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "unsupported gridded data file type \"" << t
               << "\"\n\n";
          exit(1);

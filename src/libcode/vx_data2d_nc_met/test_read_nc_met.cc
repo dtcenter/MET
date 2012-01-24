@@ -42,7 +42,7 @@ MetNcMetDataFile f;
 
 if ( ! f.open(argv[1]) )  {
 
-   mlog << Error << "\n  " << program_name << ": trouble opening NetCDF file \"" << argv[1] << "\"\n\n";
+   mlog << Error << "\n" << program_name << ": trouble opening NetCDF file \"" << argv[1] << "\"\n\n";
 
    exit ( 1 );
 

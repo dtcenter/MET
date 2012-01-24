@@ -159,7 +159,7 @@ void RenderInfo::add_filter(const int k)
 
 if ( Nfilters > max_filters )  {
 
-   mlog << Error << "\n  RenderInfo::add_filter() -> "
+   mlog << Error << "\nRenderInfo::add_filter() -> "
         << "too many filters!\n\n";
 
    exit ( 1 );
@@ -197,7 +197,7 @@ void RenderInfo::set_mag(double _x_mag, double _y_mag)
 
 if ( (_x_mag <= 0.0) || (_y_mag <= 0.0) )  {
 
-   mlog << Error << "\n  RenderInfo::set_mag(double, double) -> "
+   mlog << Error << "\nRenderInfo::set_mag(double, double) -> "
         << "bad magnification value\n\n";
 
    exit ( 1 );
@@ -249,7 +249,7 @@ int RenderInfo::filter(int n) const
 
 if ( (n < 0) || (n >= Nfilters) )  {
 
-   mlog << Error << "\n  RenderInfo::filter(int) const -> "
+   mlog << Error << "\nRenderInfo::filter(int) const -> "
         << "range check error!\n\n";
 
    exit ( 1 );

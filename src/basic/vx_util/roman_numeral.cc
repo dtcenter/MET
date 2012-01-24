@@ -55,7 +55,7 @@ void roman_numeral(int n, char * out, const int lower_case_flag)
 
 if ( (n < roman_numeral_min) || (n > roman_numeral_max) )  {
 
-   mlog << Error << "\n  roman_numeral() -> range check error!\n\n";
+   mlog << Error << "\nroman_numeral() -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -176,7 +176,7 @@ switch ( n/modulus )  {
       break;
 
    default:  //  shouldn't ever happen
-      mlog << Error << "\n  rn_add() -> can't handle integer " << n << "\n";
+      mlog << Error << "\nrn_add() -> can't handle integer " << n << "\n";
       exit ( 1 );
       break;
 

@@ -150,7 +150,7 @@ switch ( Hemisphere )  {
       break;
 
    default:
-      mlog << Error << "\n  AfwaDataFile::assign(const AfwaDataFile &) -> bad hemisphere ... " << Hemisphere << "\n\n";
+      mlog << Error << "\nAfwaDataFile::assign(const AfwaDataFile &) -> bad hemisphere ... " << Hemisphere << "\n\n";
       exit ( 1 );
       break;
 
@@ -190,7 +190,7 @@ int AfwaDataFile::two_to_one(int x, int y) const
 
 if ( (x < 0) || (x >= afwa_nx) || (y < 0) || (y >= afwa_ny) )  {
 
-   mlog << Error << "\n  AfwaDataFile::two_to_one(int, int) const -> range check error\n\n";
+   mlog << Error << "\nAfwaDataFile::two_to_one(int, int) const -> range check error\n\n";
 
    exit ( 1 );
 

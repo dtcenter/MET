@@ -289,7 +289,7 @@ table = new char [w*h];
 
 if ( !table )  {
 
-   mlog << Error << "\n  ContingencyTable::dump() -> memory allocation error\n\n";
+   mlog << Error << "\nContingencyTable::dump() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -467,7 +467,7 @@ clear();
 
 if ( (NR < 2) || (NC < 2) )  {
 
-   mlog << Error << "\n  ContingencyTable::set_size() -> # rows and # cols must be at least 2!\n\n";
+   mlog << Error << "\nContingencyTable::set_size() -> # rows and # cols must be at least 2!\n\n";
 
    exit ( 1 );
 
@@ -481,7 +481,7 @@ E = new int [n];
 
 if ( !E )  {
 
-   mlog << Error << "\n  ContingencyTable::set_size() -> memory allocation error\n\n";
+   mlog << Error << "\nContingencyTable::set_size() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -524,7 +524,7 @@ int ContingencyTable::rc_to_n(int r, int c) const
 
 if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
 
-   mlog << Error << "\n  ContingencyTable::rc_to_n() -> range check error!\n\n";
+   mlog << Error << "\nContingencyTable::rc_to_n() -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -614,7 +614,7 @@ int ContingencyTable::row_total(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\n  ContingencyTable::row_total() -> range check error!\n\n";
+   mlog << Error << "\nContingencyTable::row_total() -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -650,7 +650,7 @@ int ContingencyTable::col_total(int col) const
 
 if ( (col < 0) || (col >= Ncols) )  {
 
-   mlog << Error << "\n  ContingencyTable::col_total() -> range check error!\n\n";
+   mlog << Error << "\nContingencyTable::col_total() -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -762,7 +762,7 @@ TTContingencyTable ContingencyTable::condition_on(int k) const
 
 if ( Nrows != Ncols )  {
 
-   mlog << Error << "\n  ContingencyTable::condition_on() -> table not square!\n\n";
+   mlog << Error << "\nContingencyTable::condition_on() -> table not square!\n\n";
 
    exit ( 1 );
 
@@ -770,7 +770,7 @@ if ( Nrows != Ncols )  {
 
 if ( (k < 0) || (k >= Nrows) )  {
 
-   mlog << Error << "\n  ContingencyTable::condition_on() -> range check error\n\n";
+   mlog << Error << "\nContingencyTable::condition_on() -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1615,7 +1615,7 @@ void TTContingencyTable::set_size(int N)
 
 {
 
-mlog << Error << "\n  TTContingencyTable::set_size(int) -> 2 x 2 tables cannot be resized!\n\n";
+mlog << Error << "\nTTContingencyTable::set_size(int) -> 2 x 2 tables cannot be resized!\n\n";
 
 exit ( 1 );
 
@@ -1631,7 +1631,7 @@ void TTContingencyTable::set_size(int NR, int NC)
 
 {
 
-mlog << Error << "\n  TTContingencyTable::set_size(int, int) -> 2 x 2 tables cannot be resized!\n\n";
+mlog << Error << "\nTTContingencyTable::set_size(int, int) -> 2 x 2 tables cannot be resized!\n\n";
 
 exit ( 1 );
 
