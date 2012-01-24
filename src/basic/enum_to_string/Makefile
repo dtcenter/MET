@@ -85,7 +85,7 @@ scope.o: scope.h scope.cc info.o
 
 
 code.o: code.h code.cc info.o
-	$(CXX) code.cc     -c $(FLAGS) -I$(MET_INC_DIR)
+	$(CXX) code.cc     -c $(FLAGS) -I$(MET_INC_DIR) -DMET_BASE_DIR=\"$(MET_BASE_DIR)\" 
 
 
 enum.tab.c: enum.y info.o code.o scope.o

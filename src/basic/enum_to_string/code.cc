@@ -7,6 +7,8 @@ static const bool do_name_len_decl              = true;
 
 static const bool echo_pound_define_after_endif = true;
 
+static const char copyright_filename         [] = "src/tools/dev_utils/copyright_notice.txt";   //  relative to MET_BASE_DIR
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -81,6 +83,8 @@ static void warning(ofstream &);
 static void patch_name(char * len_name);
 
 static void make_array(const EnumInfo &, ostream &);
+
+static void insert_copyright(ofstream &);
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -182,6 +186,8 @@ if ( !f )  {
    //
    //  get to work
    //
+
+insert_copyright(f);
 
 f << "\n\n"
   << sep
@@ -379,6 +385,8 @@ if ( !f )  {
    //  get to work
    //
 
+insert_copyright(f);
+
 f << "\n\n"
   << sep
   << "\n\n";
@@ -542,6 +550,8 @@ if ( !out )  {
    //  get to work
    //
 
+insert_copyright(out);
+
 out << "\n\n"
     << sep
     << "\n\n";
@@ -657,6 +667,8 @@ if ( !out )  {
    //
    //  get to work
    //
+
+insert_copyright(out);
 
 out << "\n\n"
     << sep
@@ -1212,4 +1224,40 @@ return;
 
 /////////////////////////////////////////////////////////////////////////
 
+
+void insert_copyright(ofstream & out)
+
+{
+
+ifstream in;
+char c;
+char path[1024];
+
+snprintf(path, sizeof(path), "%s/%s", MET_BASE_DIR, copyright_filename);
+
+in.open(path);
+
+if ( !in )  {
+
+   cerr << "\n\n  insert_copyright(ofstream &) -> unable to open copyright file \"" 
+        << path << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+while ( in.get(c) )  out.put(c);
+
+   //
+   //  done
+   //
+
+in.close();
+
+return;
+
+}
+
+
+/////////////////////////////////////////////////////////////////////////
 
