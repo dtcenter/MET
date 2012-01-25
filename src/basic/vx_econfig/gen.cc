@@ -687,7 +687,7 @@ if ( !Panic )  {
       entry = symtab.entry(j);
 
       out << "inline bool " << ClassName << "::has_" << (entry->name) << "() const "
-          << "{ return ( _" << (entry->name) << "_entry != 0 ); };"
+          << "{ return ( _" << (entry->name) << "_entry != 0 ); }"
           << "\n\n";
 
    }   //  for j
