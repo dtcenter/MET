@@ -152,9 +152,6 @@ void VarInfoNcMet::set_magic(const ConcatString &s) {
    char tmp_str[max_str_len];
    char *ptr, *ptr2, *ptr3, *save_ptr;
 
-   // Initialize
-   clear();
-
    // Store the magic string
    MagicStr = s;
 
