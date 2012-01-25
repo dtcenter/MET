@@ -1797,7 +1797,6 @@ void plot_ps_raw(const DataPlane &fcst_dp,
                  int i_gc) {
    ConcatString label;
    ConcatString tmp_str;
-   char junk[1024];
    char fcst_str[max_str_len], fcst_short_str[max_str_len];
    char obs_str[max_str_len], obs_short_str[max_str_len];
    double v_tab, h_tab_a, h_tab_b;
@@ -1924,13 +1923,12 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
    ps_out->pagenumber(n_page);
 
-   snprintf(junk, sizeof(junk), "Wavelet-Stat: %s vs %s ",
-           conf_info.fcst_info[i_gc]->magic_str().text(),
-           conf_info.obs_info[i_gc]->magic_str().text());
+   label.format("Wavelet-Stat: %s vs %s",
+                conf_info.fcst_info[i_gc]->magic_str().text(),
+                conf_info.obs_info[i_gc]->magic_str().text());
 
    ps_out->choose_font(31, 24.0);
-   ps_out->write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5,
-                               tmp_str);
+   ps_out->write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5, label);
 
    strcpy(fcst_str, "Forecast");
    strcpy(fcst_short_str, "Fcst");
@@ -2213,8 +2211,8 @@ void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
    isc_info.cts_obs_thresh.get_str(obs_thresh_str, 2);
 
    label.format("Wavelet-Stat: %s %s vs %s %s",
-           conf_info.fcst_info[i_gc]->magic_str().text(), fcst_thresh_str,
-           conf_info.obs_info[i_gc]->magic_str().text(), obs_thresh_str);
+                conf_info.fcst_info[i_gc]->magic_str().text(), fcst_thresh_str,
+                conf_info.obs_info[i_gc]->magic_str().text(), obs_thresh_str);
 
    ps_out->choose_font(31, 24.0);
    v_tab -= 1.0*plot_text_sep;
