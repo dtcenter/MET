@@ -256,7 +256,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                yy = y_ur;
 
                // Decrement counts for data to be replaced
-               k = box_na[n];
+               k = nint(box_na[n]);
                if(!is_bad_data(k)) {
                   count_vld -= 1;
                   count_thr -= k;

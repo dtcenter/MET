@@ -674,7 +674,7 @@ for(j=0; j<Nelements; j++) {
    else {
 
       for(k=0; k<uniq_v.n_elements(); k++) {
-         if(uniq_v[k] == e[j]) {
+         if(is_eq(uniq_v[k], e[j])) {
             uniq_n.set(k, uniq_n[k] + 1);
             break;
          }
@@ -687,7 +687,7 @@ for(j=0; j<Nelements; j++) {
 for(j=0, max_n=0, max_j=-1; j<uniq_n.n_elements(); j++) {
 
    if((uniq_n[j] >  max_n) ||
-      (uniq_n[j] == max_n && max_j >= 0 && uniq_v[j] < uniq_v[max_j])) {
+      (is_eq(uniq_n[j], max_n) && max_j >= 0 && uniq_v[j] < uniq_v[max_j])) {
       max_n = nint(uniq_n[j]);
       max_j = j;
    }

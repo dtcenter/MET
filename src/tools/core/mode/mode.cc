@@ -3002,7 +3002,7 @@ void write_obj_netcdf() {
          //
          if(engine.fcst_split->is_nonzero(x, y) ) {
             fcst_raw_data[n] = engine.fcst_raw->data(x, y);
-            fcst_obj_data[n] = engine.fcst_split->data(x, y);
+            fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
          }
          else {
             fcst_raw_data[n] = bad_data_float;
@@ -3011,7 +3011,7 @@ void write_obj_netcdf() {
 
          if(engine.obs_split->is_nonzero(x, y) ) {
             obs_raw_data[n] = engine.obs_raw->data(x, y);
-            obs_obj_data[n] = engine.obs_split->data(x, y);
+            obs_obj_data[n] = nint(engine.obs_split->data(x, y));
          }
          else {
             obs_raw_data[n] = bad_data_float;
@@ -3024,7 +3024,7 @@ void write_obj_netcdf() {
 
          // Write the index of the cluster object
          if(engine.fcst_clus_split->data(x, y) > 0) {
-            fcst_clus_data[n] = engine.fcst_clus_split->data(x, y);
+            fcst_clus_data[n] = nint(engine.fcst_clus_split->data(x, y));
          }
          // Write a value of 0 for unmatched simple objects
          else if(engine.fcst_split->data(x, y) > 0) {
@@ -3037,7 +3037,7 @@ void write_obj_netcdf() {
 
          // Write the index of the cluster object
          if(engine.obs_clus_split->data(x, y) > 0) {
-            obs_clus_data[n] = engine.obs_clus_split->data(x, y);
+            obs_clus_data[n] = nint(engine.obs_clus_split->data(x, y));
          }
          // Write a value of 0 for unmatched simple objects
          else if(engine.obs_split->data(x, y) > 0) {

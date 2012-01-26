@@ -237,7 +237,7 @@ void PairDataEnsemble::compute_rhist(int n_vld_ens) {
    for(i=0; i<r_na.n_elements(); i++) {
 
       // Get the current rank
-      rank = r_na[i];
+      rank = nint(r_na[i]);
 
       // Increment the histogram counts
       if(!is_bad_data(rank)) rhist_na.set(rank-1, rhist_na[rank-1]+1);
