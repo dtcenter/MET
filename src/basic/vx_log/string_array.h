@@ -68,6 +68,8 @@ class StringArray {
 
       void set(int i, const char *);
 
+      void insert(int i, const char *);
+
       int n_elements() const;
 
       int max_length() const;

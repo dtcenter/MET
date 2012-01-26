@@ -379,6 +379,43 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void StringArray::insert(int i, const char * text)
+
+{
+
+if ( (i < 0) || (i > Nelements) )  {
+
+   mlog << Error << "\nStringArray::insert(int, const char *) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+int n = strlen(text);
+
+if ( n > MaxLength )  MaxLength = n;
+
+extend(Nelements + 1);
+
+int j;
+
+for (j=Nelements; j>i; --j) s[j] = s[j-1];
+
+s[i] = 0;
+
+set(i, text);
+
+++Nelements;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int StringArray::has(const char * text) const
 
 {
