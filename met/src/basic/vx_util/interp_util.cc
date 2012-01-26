@@ -314,8 +314,8 @@ double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
    double bilin_v, dx, dy;
    double wtsw, wtse, wtnw, wtne;
 
-   x = floor(obs_x);
-   y = floor(obs_y);
+   x = nint(floor(obs_x));
+   y = nint(floor(obs_y));
 
    // Compute dx and dy
    dx = obs_x - x;

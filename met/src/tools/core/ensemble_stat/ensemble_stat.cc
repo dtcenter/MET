@@ -801,7 +801,7 @@ void process_point_scores() {
    setup_txt_files();
 
    // Store the forecast lead time
-   shc.set_fcst_lead_sec(ens_lead_na.mode());
+   shc.set_fcst_lead_sec(nint(ens_lead_na.mode()));
 
    // Store the forecast valid time
    shc.set_fcst_valid_beg(ens_valid_ut);
@@ -926,7 +926,7 @@ void process_grid_vx() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Set the forecast lead time
-      shc.set_fcst_lead_sec(ens_lead_na.mode());
+      shc.set_fcst_lead_sec(nint(ens_lead_na.mode()));
 
       // Set the forecast valid time
       shc.set_fcst_valid_beg(ens_valid_ut);
@@ -1576,7 +1576,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
       }
       else {
          // Compute ensemble summary
-         ens_mean[i]  = (float) sum_na[i]/count_na[i];
+         ens_mean[i]  = (float) (sum_na[i]/count_na[i]);
          ens_stdev[i] = (float) compute_stdev(sum_na[i], sum_sq_na[i], ens_vld[i]);
          ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
          ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
@@ -1799,9 +1799,9 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
                                nint(pd.x_na[i]), nint(pd.y_na[i]));
 
       // Store the observation value, rank, and number of valid ensembles
-      obs_v[n]    = pd.o_na[i];
+      obs_v[n]    = (float) pd.o_na[i];
       obs_rank[n] = nint(pd.r_na[i]);
-      obs_pit[n]  = pd.pit_na[i];
+      obs_pit[n]  = (float) pd.pit_na[i];
       ens_vld[n]  = nint(pd.v_na[i]);
 
    } // end for i
