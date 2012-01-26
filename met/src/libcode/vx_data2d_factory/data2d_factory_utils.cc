@@ -10,6 +10,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include "data2d_factory_utils.h"
 #include "is_grib_file.h"
 #include "is_met_nc_file.h"
 #include "is_netcdf_file.h"

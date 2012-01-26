@@ -16,7 +16,7 @@ static const char  units_att_name     [] = "units";
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_var_att(NcVar *var, const ConcatString &att_name,
+bool get_var_att(const NcVar *var, const ConcatString &att_name,
                  ConcatString &att_val) {
    int i, n;
    NcAtt *att = (NcAtt *) 0;
@@ -45,14 +45,14 @@ bool get_var_att(NcVar *var, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_var_units(NcVar *var, ConcatString &att_val) {
+bool get_var_units(const NcVar *var, ConcatString &att_val) {
   
    return(get_var_att(var, units_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_var_level(NcVar *var, ConcatString &att_val) {
+bool get_var_level(const NcVar *var, ConcatString &att_val) {
 
    return(get_var_att(var, level_att_name, att_val));
 }

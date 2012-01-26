@@ -30,12 +30,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-extern void get_grib_code_list(int, int &, const GribCodeData *&);
-extern ConcatString get_grib_code_list_str(int, int, int);
-extern ConcatString get_grib_level_list_str(int, int);
-
-///////////////////////////////////////////////////////////////////////////////
-
 void get_grib_code_list(int grib_code, int ptv,
                         int &n, const GribCodeData *&ptr) {
 

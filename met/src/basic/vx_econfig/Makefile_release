@@ -100,7 +100,7 @@ array.o: array.h array.cc icode.o
 	$(CXX) array.cc                -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 builtin.o: builtin.h builtin.cc
-	$(CXX) builtin.cc              -c $(CXX_FLAGS)
+	$(CXX) builtin.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 pwl.o: pwl.h pwl.cc
 	$(CXX) pwl.cc                  -c $(CXX_FLAGS) -I$(MET_INC_DIR)

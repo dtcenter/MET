@@ -617,7 +617,7 @@ float get_nc_obs(NcFile *&f_in, const char *in_str,
    //
    // Check for missing data
    //
-   if(v == in_fill_value) {
+   if(is_eq(v, in_fill_value)) {
       v = bad_data_float;
       n_rej_fill++;
    }

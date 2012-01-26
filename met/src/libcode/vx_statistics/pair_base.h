@@ -28,7 +28,7 @@ class PairBase {
    public:
 
       PairBase();
-      ~PairBase();
+      virtual ~PairBase();
 
       //////////////////////////////////////////////////////////////////
 
