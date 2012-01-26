@@ -401,11 +401,11 @@ int j;
 
 for (j=Nelements; j>i; --j) s[j] = s[j-1];
 
+++Nelements;
+
 s[i] = 0;
 
 set(i, text);
-
-++Nelements;
 
 
 return;
