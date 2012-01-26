@@ -451,7 +451,6 @@ void NumArray::reorder(const NumArray &i_na) {
       if(j<0 || j>=i_na.n_elements()) {
          mlog << Error << "\nNumArray::reorder(const NumArray &) -> "
               << "index out of bounds: " << j << "\n\n";
-              << flush;
          exit(1);
       }
 
