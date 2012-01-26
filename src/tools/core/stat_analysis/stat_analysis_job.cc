@@ -1665,8 +1665,8 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
       me   += angle;
       mae  += abs(angle);
    }
-   if(me  != bad_data_double) me  /= n_out;
-   if(mae != bad_data_double) mae /= n_out;
+   if(!is_eq(me,  bad_data_double)) me  /= n_out;
+   if(!is_eq(mae, bad_data_double)) mae /= n_out;
 
    //
    // Write the mean wind direction statistics
@@ -2753,8 +2753,8 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // Check for conditions when a skill score cannot be computed.
       //
-      if(n_fcst_lines[i] == 0   || n_ref_lines[i] == 0   ||
-         is_bad_data(fcst_stat) || is_bad_data(ref_stat) ||
+      if(nint(n_fcst_lines[i]) == 0 || nint(n_ref_lines[i]) == 0   ||
+         is_bad_data(fcst_stat)     || is_bad_data(ref_stat) ||
          is_eq(ref_stat, 0.0)) {
          ss = bad_data_double;
       }
@@ -2784,7 +2784,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // Check the the number of aggregated lines differ.
       //
-      if(n_fcst_lines[i] != n_ref_lines[i]) {
+      if(nint(n_fcst_lines[i]) != nint(n_ref_lines[i])) {
          mlog << Warning << "\ncompute_ss_index() -> "
               << "the number of aggregated forecast and reference lines "
               << "differ (" << n_fcst_lines[i] << " != " << n_ref_lines[i]

@@ -12,15 +12,10 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
+#include "is_bad_data.h"
+#include "trig.h"
+
 #include "builtin.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const double deg_per_rad = 45.0/atan(1.0);
-
-static const double rad_per_deg = 1.0/deg_per_rad;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -320,7 +315,7 @@ if ( a < 0 )  a = b - a;
 
 if ( b < 0 )  b = -b;
 
-if ( b == 0.0 )  return ( a );
+if ( is_eq(b, 0.0) )  return ( a );
 
 double c;
 

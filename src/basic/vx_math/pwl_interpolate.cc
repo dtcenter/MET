@@ -17,6 +17,8 @@ using namespace std;
 #include <cstdlib>
 #include <cmath>
 
+#include "pwl_interpolate.h"
+
 #include "is_bad_data.h"
 
 

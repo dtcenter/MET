@@ -16,6 +16,7 @@ using namespace std;
 #include "stetype_to_string.h"
 
 #include "builtin.h"
+#include "is_bad_data.h"
 #include "vx_log.h"
 #include "pwl.h"
 #include "machine.h"
@@ -191,7 +192,7 @@ void Machine::run(const IcodeVector & v)
 
 int pos;
 IcodeCell cell;
-SymbolTableEntry * e = (SymbolTableEntry *) 0;
+SymbolTableEntry * entry = (SymbolTableEntry *) 0;
 
 
 pos = 0;
@@ -248,9 +249,9 @@ while ( pos < v.length() )  {
          break;
 
       case identifier:
-         e = sts.find(cell.name);
-         if ( e )   {
-            run ( *e );
+         entry = sts.find(cell.name);
+         if ( entry )   {
+            run ( *entry );
          } else {
             mlog << Error << "\nMachine::run(const IcodeVector &) -> undefined identifier ... \""
                  << (cell.name) << "\"\n\n";
@@ -301,7 +302,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::run(const SymbolTableEntry & e)
+void Machine::run(const SymbolTableEntry & entry)
 
 {
 
@@ -309,37 +310,37 @@ IcodeCell cell;
 
 
 
-switch ( e.type )  {
+switch ( entry.type )  {
 
    case ste_integer:
-      cell.set_integer(e.i);
+      cell.set_integer(entry.i);
       cstack.push(cell);
       break;
 
    case ste_double:
-      cell.set_double(e.d);
+      cell.set_double(entry.d);
       cstack.push(cell);
       break;
 
    case ste_variable:
-      run( *(e.v) );
+      run( *(entry.v) );
       break;
 
    case ste_pwl:
-      do_pwl( *(e.pl) );
+      do_pwl( *(entry.pl) );
       break;
 
    case ste_function:
-      do_function_call(e);
+      do_function_call(entry);
       break;
 
    case ste_array:
-      do_array(e);
+      do_array(entry);
       break;
 
    default:
       mlog << Error << "\nvoid Machine::run(const SymbolTableEntry &) -> "
-           << "bad type ... \"" << stetype_to_string(e.type) << "\"\n\n";
+           << "bad type ... \"" << stetype_to_string(entry.type) << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -623,7 +624,7 @@ else                              x = operand1.d;
 if ( operand2.type == integer )   y = (double) (operand2.val);
 else                              y = operand2.d;
 
-if ( y == 0.0 )  {
+if ( is_eq(y, 0.0) )  {
 
    mlog << Error << "\nvoid Machine::do_divide() -> floating-point division by zero!\n\n";
 
@@ -827,12 +828,12 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::store(const SymbolTableEntry & e)
+void Machine::store(const SymbolTableEntry & entry)
 
 {
 
 
-sts.store(e);
+sts.store(entry);
 
 
 return;
@@ -904,7 +905,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_function_call(const SymbolTableEntry & e)
+void Machine::do_function_call(const SymbolTableEntry & entry)
 
 {
 
@@ -912,7 +913,7 @@ int j, n;
 IcodeCell cell;
 SymbolTableEntry ee;
 SymbolTableEntry * u = (SymbolTableEntry *) 0;
-IdentifierArray & a = *(e.local_vars);
+IdentifierArray & a = *(entry.local_vars);
 
 
 
@@ -922,7 +923,7 @@ n = a.n_elements();
    //  push the temporary scope onto the symbol table stack
    //
 
-sts.push(e.st);
+sts.push(entry.st);
 
    //
    //  store the values, starting from the bottom of the stack, 
@@ -969,7 +970,7 @@ for (j=(n - 1); j>=0; --j)  {   //  reverse order here
    //  run the function program
    //
 
-run( *(e.v) );
+run( *(entry.v) );
 
    //
    //  remove the temporary scope
@@ -989,7 +990,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_array(const SymbolTableEntry & e)
+void Machine::do_array(const SymbolTableEntry & entry)
 
 {
 
@@ -1007,7 +1008,7 @@ memset(indices, 0, sizeof(indices));
    //     of the indices
    //
 
-dim = e.ai->dim();
+dim = entry.ai->dim();
 
 for (j=(dim - 1); j>=0; --j)  {   //  reverse order here
 
@@ -1050,7 +1051,7 @@ for (j=(dim - 1); j>=0; --j)  {   //  reverse order here
    //  get the formula for the array entry
    //
 
-v = e.ai->get(indices);
+v = entry.ai->get(indices);
 
    //
    //  run the formula
@@ -1077,7 +1078,7 @@ double Machine::func(const char * Name, double x)
 int index;
 double y;
 IcodeCell operand, result;
-SymbolTableEntry * e = (SymbolTableEntry *) 0;
+SymbolTableEntry * entry = (SymbolTableEntry *) 0;
 
 
 operand.set_double(x);
@@ -1104,9 +1105,9 @@ if ( is_builtin(Name, index) )  {
 
 } else {
 
-   e = sts.find(Name);
+   entry = sts.find(Name);
 
-   if ( !e )  {
+   if ( !entry )  {
 
       mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
 
@@ -1114,15 +1115,15 @@ if ( is_builtin(Name, index) )  {
 
    }
 
-   switch ( e->type )  {
+   switch ( entry->type )  {
 
       case ste_function:
-         do_function_call(*e);
+         do_function_call(*entry);
          result = cstack.pop();
          break;
 
       case ste_pwl:
-         do_pwl( *(e->pl) );
+         do_pwl( *(entry->pl) );
          result = cstack.pop();
          break;
 
@@ -1167,7 +1168,7 @@ double Machine::func(const char * Name, double x, double y)
 int index;
 double z;
 IcodeCell operand, result;
-SymbolTableEntry * e = (SymbolTableEntry *) 0;
+SymbolTableEntry * entry = (SymbolTableEntry *) 0;
 
 
 operand.set_double(x);
@@ -1196,9 +1197,9 @@ if ( is_builtin(Name, index) )  {
 
 } else {
 
-   e = sts.find(Name);
+   entry = sts.find(Name);
 
-   if ( !e )  {
+   if ( !entry )  {
 
       mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
 
@@ -1206,15 +1207,15 @@ if ( is_builtin(Name, index) )  {
 
    }
 
-   switch ( e->type )  {
+   switch ( entry->type )  {
 
       case ste_function:
-         do_function_call(*e);
+         do_function_call(*entry);
          result = cstack.pop();
          break;
 
       case ste_pwl:
-         do_pwl( *(e->pl) );
+         do_pwl( *(entry->pl) );
          result = cstack.pop();
          break;
 
@@ -1260,7 +1261,7 @@ int j;
 int index;
 double z;
 IcodeCell operand, result;
-SymbolTableEntry * e = (SymbolTableEntry *) 0;
+SymbolTableEntry * entry = (SymbolTableEntry *) 0;
 
 
 for (j=0; j<n; ++j)  {
@@ -1290,9 +1291,9 @@ if ( is_builtin(Name, index) )  {
 
 } else {
 
-   e = sts.find(Name);
+   entry = sts.find(Name);
 
-   if ( !e )  {
+   if ( !entry )  {
 
       mlog << Error << "\nMachine::func(const char * Name, double) -> function \"" << Name << "\" not defined!\n\n";
 
@@ -1300,15 +1301,15 @@ if ( is_builtin(Name, index) )  {
 
    }
 
-   switch ( e->type )  {
+   switch ( entry->type )  {
 
       case ste_function:
-         do_function_call(*e);
+         do_function_call(*entry);
          result = cstack.pop();
          break;
 
       case ste_pwl:
-         do_pwl( *(e->pl) );
+         do_pwl( *(entry->pl) );
          result = cstack.pop();
          break;
 
@@ -1721,7 +1722,7 @@ void Machine::dump_constants(ostream & out)
 
 {
 
-int t, e;
+int t, j;
 int k, max_len;
 int count;
 IcodeCell cell;
@@ -1734,9 +1735,9 @@ max_len = 0;
 
 for (t=0; t<(sts.n_tables()); ++t)  {
 
-   for (e=0; e<(sts.table(t).n_entries()); ++e)  {
+   for (j=0; j<(sts.table(t).n_entries()); ++j)  {
 
-      entry = sts.table(t).entry(e);
+      entry = sts.table(t).entry(j);
 
       switch ( entry->type )  {
 
@@ -1763,9 +1764,9 @@ count = 0;
 
 for (t=0; t<(sts.n_tables()); ++t)  {
 
-   for (e=0; e<(sts.table(t).n_entries()); ++e)  {
+   for (j=0; j<(sts.table(t).n_entries()); ++j)  {
 
-      entry = sts.table(t).entry(e);
+      entry = sts.table(t).entry(j);
 
       switch ( entry->type )  {
 

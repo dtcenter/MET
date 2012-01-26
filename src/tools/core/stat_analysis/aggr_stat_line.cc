@@ -486,7 +486,7 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
                //
                // The threshold values must remain the same
                //
-               if(pct_info.pct.threshold(i) != pct.threshold(i)) {
+               if(!is_eq(pct_info.pct.threshold(i), pct.threshold(i))) {
                   mlog << Error << "\naggr_nx2_contable_lines() -> "
                        << "when aggregating PCT lines the threshold "
                        << "values must remain the same for all lines, "

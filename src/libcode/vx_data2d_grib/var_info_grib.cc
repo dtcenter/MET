@@ -261,7 +261,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
    if(lt != LevelType_Pres &&
       lt != LevelType_Vert &&
       lt != LevelType_None &&
-      Level.lower() != Level.upper()) {
+      !is_eq(Level.lower(), Level.upper())) {
       mlog << Error << "\nVarInfoGrib::set_magic() -> "
            << "ranges of levels are only supported for pressure levels "
            << "(P), vertical levels (Z), and generic levels (L).\n\n";
@@ -273,7 +273,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
    if(lt == LevelType_Pres) {
 
       // If the levels are the same, reset the level name
-      if(Level.lower() == Level.upper()) {
+      if(is_eq(Level.lower(), Level.upper())) {
          tmp2_str << cs_erase << 'P' << nint(Level.lower());
          Level.set_req_name(tmp2_str);
          Level.set_name(tmp2_str);

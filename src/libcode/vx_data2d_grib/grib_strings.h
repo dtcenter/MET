@@ -1040,6 +1040,13 @@ int str_to_grib_code(const char *, int &, double &, double &, int);
 
 int str_to_prob_info(const char *, double &, double &, int);
 
+void get_grib_code_list(int, int, int &, const GribCodeData *&);
+ConcatString get_grib_code_list_str(int, int, int);
+ConcatString get_grib_level_list_str(int, int);
+
+///////////////////////////////////////////////////////////////////////////////
+
+
 
 ////////////////////////////////////////////////////////////////////////
 

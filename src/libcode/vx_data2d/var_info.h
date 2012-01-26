@@ -54,7 +54,7 @@ class VarInfo
    public:
 
       VarInfo();
-      ~VarInfo();
+      virtual ~VarInfo();
       VarInfo(const VarInfo &);
       VarInfo & operator=(const VarInfo &);
 

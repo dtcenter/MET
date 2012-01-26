@@ -184,7 +184,7 @@ int main(int argc, char * argv[])
          //
          // Next check if the user has given a data range to use.
          //
-      if ((PlotRangeMin != 0.0) || (PlotRangeMax != 0.0))
+      if (!is_eq(PlotRangeMin, 0.0) || !is_eq(PlotRangeMax, 0.0))
       {
          data_min = PlotRangeMin;
          data_max = PlotRangeMax;

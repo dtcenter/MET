@@ -19,14 +19,14 @@ ARCH_FLAGS   = -DBLOCK4
 # C++ compiler flags
 # Any additional required libraries
 CXX          = /set/this/path/to/icc
-CXX_FLAGS    = -Wall -Wshadow -static # -g
+CXX_FLAGS    = -Wshadow -static # -g
 CXX_LIBS     =
 
 # Path to the Fortran Compiler
 # Fortran compiler flags
 # Any additional required libraries
 FC           = /set/this/path/to/ifort
-FC_FLAGS     = -Wall -Wshadow -static -ff2c # -g
+FC_FLAGS     = -static # -g
 FC_LIBS      = -lifcore
 
 # Make print options

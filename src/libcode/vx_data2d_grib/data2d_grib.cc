@@ -250,7 +250,7 @@ bool MetGrib1DataFile::data_ok(int x, int y) const
 
 const double value = get(x, y);
 
-return ( value != bad_data_double );
+return ( !is_bad_data(value) );
 
 }
 
@@ -564,8 +564,8 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
          for(i=0; i<u_plane_array.n_planes(); i++) {
 
             // Check that the current level values match
-            if(u_plane_array.lower(i) != v_plane_array.lower(i) ||
-               u_plane_array.upper(i) != v_plane_array.upper(i)) {
+            if(!is_eq(u_plane_array.lower(i), v_plane_array.lower(i)) ||
+               !is_eq(u_plane_array.upper(i), v_plane_array.upper(i))) {
                  
                mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
                     << "when deriving winds for level " << i+1

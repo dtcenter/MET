@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 #include "trig.h"
+#include "is_bad_data.h"
 
 #include "affine.h"
 #include "viewgravity_to_string.h"
@@ -569,7 +570,7 @@ D =   u1*(v2 - v3)
     + u3*(v1 - v2);
 
 
-if ( D == 0.0 )  {
+if ( is_eq(D, 0.0) )  {
 
    mlog << Error << "\nAffine::set_three_points() -> "
         << "collinear (u, v) points!\n\n";

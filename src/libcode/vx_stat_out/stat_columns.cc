@@ -3300,7 +3300,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    }
 
    return;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -3364,6 +3364,6 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    }
 
    return;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////

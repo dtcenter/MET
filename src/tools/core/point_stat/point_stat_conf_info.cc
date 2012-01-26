@@ -249,7 +249,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut
       // range of obs_field pressure levels is wholly contained in the
       // fcst levels.  If not, print a warning message.
       if(vx_pd[i].fcst_info->level().type()  == LevelType_Pres &&
-         vx_pd[i].fcst_info->level().lower() != vx_pd[i].fcst_info->level().upper() &&
+         !is_eq(vx_pd[i].fcst_info->level().lower(), vx_pd[i].fcst_info->level().upper()) &&
          (vx_pd[i].obs_info->level().lower() <  vx_pd[i].fcst_info->level().lower() ||
           vx_pd[i].obs_info->level().upper() >  vx_pd[i].fcst_info->level().upper())) {
 

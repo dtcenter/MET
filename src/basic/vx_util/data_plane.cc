@@ -337,7 +337,7 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
 
       value = Data[j];
 
-      if(value == bad_data_double) continue;
+      if(is_bad_data(value)) continue;
 
       if(first_set) {
          data_min = data_max = value;

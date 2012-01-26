@@ -39,7 +39,7 @@ class Met2dData {
    public:
 
       Met2dData();
-     ~Met2dData();
+      virtual ~Met2dData();
 
       void mtdd_clear();
 
@@ -89,7 +89,7 @@ class Met2dDataFile : public Met2dData {
    public:
 
       Met2dDataFile();
-     ~Met2dDataFile();
+      virtual ~Met2dDataFile();
 
       void mtddf_clear();
 
