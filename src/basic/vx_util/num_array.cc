@@ -117,6 +117,8 @@ if ( e )  { delete [] e;  e = (double *) 0; }
 
 Nelements = Nalloc = 0;
 
+Sorted = false;
+
 return;
 
 }
@@ -144,6 +146,8 @@ for (j=0; j<(a.Nelements); ++j)  {
 }
 
 Nelements = a.Nelements;
+
+Sorted = a.Sorted;
 
 
 return;
@@ -218,6 +222,7 @@ Indent prefix(depth);
 
 out << prefix << "Nelements = " << Nelements << "\n";
 out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Sorted    = " << (Sorted ? "true" : "false") << "\n";
 
 int j;
 
@@ -317,6 +322,8 @@ void NumArray::add(int k)
 
 add((double) k);
 
+Sorted = false;
+
 return;
 
 }
@@ -332,6 +339,8 @@ void NumArray::add(double d)
 extend(Nelements + 1);
 
 e[Nelements++] = d;
+
+Sorted = false;
 
 return;
 
@@ -355,6 +364,7 @@ for (j=0; j<(a.Nelements); ++j)  {
 
 }
 
+Sorted = false;
 
 return;
 
@@ -369,6 +379,8 @@ void NumArray::set(int n, int k)
 {
 
 set(n, (double) k);
+
+Sorted = false;
 
 return;
 
@@ -392,6 +404,8 @@ if ( (n < 0) || (n >= Nelements) )  {
 
 e[n] = d;
 
+Sorted = false;
+
 return;
 
 }
@@ -405,6 +419,8 @@ void NumArray::sort_array()
 {
 
 sort(e, Nelements);
+
+Sorted = true;
 
 return;
 
@@ -435,12 +451,15 @@ void NumArray::reorder(const NumArray &i_na) {
       if(j<0 || j>=i_na.n_elements()) {
          mlog << Error << "\nNumArray::reorder(const NumArray &) -> "
               << "index out of bounds: " << j << "\n\n";
+              << flush;
          exit(1);
       }
 
       // Add the elements in the indexed order
       add(tmp_na[j]);
    }
+
+   Sorted = false;
 
    return;
 }
@@ -476,6 +495,7 @@ data_rank = new double [Nelements];
 if ( !data || !data_loc || !data_rank )  {
 
    mlog << Error << "\nint NumArray::rank_array() -> memory allocation error\n\n";
+
    exit ( 1 );
 
 }
@@ -511,6 +531,8 @@ if(data)      { delete [] data;      data      = (double *) 0; }
 if(data_loc)  { delete [] data_loc;  data_loc  = (int *) 0;    }
 if(data_rank) { delete [] data_rank; data_rank = (double *) 0; }
 
+Sorted = false;
+
 return ( n );
 
 }
@@ -524,6 +546,11 @@ double NumArray::percentile_array(double t)
 {
 
 double v = bad_data_double;
+
+//
+// Ensure that the array is sorted before computing the percentile.
+//
+if ( !Sorted ) sort_array();
 
 v = percentile(e, Nelements, t);
 
