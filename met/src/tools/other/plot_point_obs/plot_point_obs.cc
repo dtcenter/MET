@@ -375,7 +375,7 @@ int main(int argc, char *argv[]) {
       //
       // Get the corresponding header message type
       //
-      if(!hdr_typ_var->set_cur(h-1, 0) ||
+      if(!hdr_typ_var->set_cur(h, 0) ||
          !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
          mlog << Error << "\nmain() -> "
               << "trouble getting hdr_typ\n\n";
@@ -385,7 +385,7 @@ int main(int argc, char *argv[]) {
       //
       // Get the corresponding header station id
       //
-      if(!hdr_sid_var->set_cur(h-1, 0) ||
+      if(!hdr_sid_var->set_cur(h, 0) ||
          !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
          mlog << Error << "\nmain() -> "
               << "trouble getting hdr_sid\n\n";
@@ -395,7 +395,7 @@ int main(int argc, char *argv[]) {
       //
       // Get the corresponding header valid time
       //
-      if(!hdr_vld_var->set_cur(h-1, 0) ||
+      if(!hdr_vld_var->set_cur(h, 0) ||
          !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
          mlog << Error << "\nmain() -> "
               << "trouble getting hdr_vld\n\n";
@@ -416,7 +416,7 @@ int main(int argc, char *argv[]) {
          //
          // Get the header for this observation
          //
-         hdr_arr_var->set_cur(h-1, 0);
+         hdr_arr_var->set_cur(h, 0);
          hdr_arr_var->get(hdr_arr, 1, hdr_arr_dim->size());
 
          if(hdr_arr[0] >= 1.0E10 && hdr_arr[1] >= 1.0E10) break;
