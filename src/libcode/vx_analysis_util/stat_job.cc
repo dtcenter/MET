@@ -826,58 +826,68 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    for(i=0; i<jc_array.n_elements(); i++) {
 
-      if(     strcmp(jc_array[i], "-model"         ) == 0)
+      if(     strcmp(jc_array[i], "-model"          ) == 0)
          model.clear();
-      else if(strcmp(jc_array[i], "-fcst_lead"     ) == 0)
+      else if(strcmp(jc_array[i], "-fcst_lead"      ) == 0)
          fcst_lead.clear();
-      else if(strcmp(jc_array[i], "-obs_lead"      ) == 0)
+      else if(strcmp(jc_array[i], "-obs_lead"       ) == 0)
          obs_lead.clear();
-      else if(strcmp(jc_array[i], "-fcst_init_hour") == 0)
+      else if(strcmp(jc_array[i], "-fcst_init_hour" ) == 0)
          fcst_init_hour.clear();
-      else if(strcmp(jc_array[i], "-obs_init_hour" ) == 0)
+      else if(strcmp(jc_array[i], "-obs_init_hour"  ) == 0)
          obs_init_hour.clear();
-      else if(strcmp(jc_array[i], "-fcst_var"      ) == 0)
+      else if(strcmp(jc_array[i], "-fcst_var"       ) == 0)
          fcst_var.clear();
-      else if(strcmp(jc_array[i], "-fcst_lev"      ) == 0)
+      else if(strcmp(jc_array[i], "-fcst_lev"       ) == 0)
          fcst_lev.clear();
-      else if(strcmp(jc_array[i], "-obs_var"       ) == 0)
+      else if(strcmp(jc_array[i], "-obs_var"        ) == 0)
          obs_var.clear();
-      else if(strcmp(jc_array[i], "-obs_lev"       ) == 0)
+      else if(strcmp(jc_array[i], "-obs_lev"        ) == 0)
          obs_lev.clear();
-      else if(strcmp(jc_array[i], "-obtype"        ) == 0)
+      else if(strcmp(jc_array[i], "-obtype"         ) == 0)
          obtype.clear();
-      else if(strcmp(jc_array[i], "-vx_mask"       ) == 0)
+      else if(strcmp(jc_array[i], "-vx_mask"        ) == 0)
          vx_mask.clear();
-      else if(strcmp(jc_array[i], "-interp_mthd"   ) == 0)
+      else if(strcmp(jc_array[i], "-interp_mthd"    ) == 0)
          interp_mthd.clear();
-      else if(strcmp(jc_array[i], "-interp_pnts"   ) == 0)
+      else if(strcmp(jc_array[i], "-interp_pnts"    ) == 0)
          interp_pnts.clear();
-      else if(strcmp(jc_array[i], "-fcst_thresh"   ) == 0)
+      else if(strcmp(jc_array[i], "-fcst_thresh"    ) == 0)
          fcst_thresh.clear();
-      else if(strcmp(jc_array[i], "-obs_thresh"    ) == 0)
+      else if(strcmp(jc_array[i], "-obs_thresh"     ) == 0)
          obs_thresh.clear();
-      else if(strcmp(jc_array[i], "-cov_thresh"    ) == 0)
+      else if(strcmp(jc_array[i], "-cov_thresh"     ) == 0)
          cov_thresh.clear();
-      else if(strcmp(jc_array[i], "-alpha"         ) == 0)
+      else if(strcmp(jc_array[i], "-alpha"          ) == 0)
          alpha.clear();
-      else if(strcmp(jc_array[i], "-line_type"     ) == 0)
+      else if(strcmp(jc_array[i], "-line_type"      ) == 0)
          line_type.clear();
-      else if(strcmp(jc_array[i], "-column"        ) == 0)
+      else if(strcmp(jc_array[i], "-column"         ) == 0)
          column.clear();
-      else if(strcmp(jc_array[i], "-weight"        ) == 0)
+      else if(strcmp(jc_array[i], "-weight"         ) == 0)
          weight.clear();
-      else if(strcmp(jc_array[i], "-column_min"    ) == 0) {
+      else if(strcmp(jc_array[i], "-column_min"     ) == 0) {
          column_min_name.clear();
          column_min_value.clear();
       }
-      else if(strcmp(jc_array[i], "-column_max"    ) == 0) {
+      else if(strcmp(jc_array[i], "-column_max"     ) == 0) {
          column_max_name.clear();
          column_max_value.clear();
       }
-      else if(strcmp(jc_array[i], "-column_str"    ) == 0) {
+      else if(strcmp(jc_array[i], "-column_eq"      ) == 0) {
+         column_min_name.clear();
+         column_min_value.clear();
+         column_max_name.clear();
+         column_max_value.clear();
+      }
+      else if(strcmp(jc_array[i], "-column_str"     ) == 0) {
          column_str_name.clear();
          column_str_value.clear();
       }
+      else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0)
+         out_fcst_thresh.clear();
+      else if(strcmp(jc_array[i], "-out_obs_thresh" ) == 0)
+         out_obs_thresh.clear();
    }
 
    //
@@ -1041,10 +1051,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       }
       else if(strcmp(jc_array[i], "-dump_row") == 0) {
          set_dump_row(jc_array[i+1]);
-         i++;
-      }
-      else if(strcmp(jc_array[i], "-column") == 0) {
-         column.add(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-mask_grid") == 0) {
