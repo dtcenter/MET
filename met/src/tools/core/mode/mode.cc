@@ -128,7 +128,6 @@ static int          fcst_lead_sec = bad_data_int;
 static unixtime     obs_valid_ut  = (unixtime) 0;
 static int          obs_lead_sec  = bad_data_int;
 
-static int verbosity = 1;
 static const int n_cts = 3;
 static const char *cts_str[n_cts] = {"RAW", "FILTER", "OBJECT"};
 static TTContingencyTable cts[n_cts];
@@ -232,6 +231,7 @@ static void set_plot(const StringArray &);
 static void set_obj_plot(const StringArray &);
 static void set_obj_stat(const StringArray &);
 static void set_ct_stat(const StringArray &);
+static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
 
@@ -312,6 +312,7 @@ void process_command_line(int argc, char **argv)
    cline.add(set_obj_plot, "-obj_plot", 0);
    cline.add(set_obj_stat, "-obj_stat", 0);
    cline.add(set_ct_stat, "-ct_stat", 0);
+   cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
 
    //
@@ -595,37 +596,32 @@ void process_fcst_obs_files()
            << "Identified: " << engine.n_fcst << " forecast objects "
            << "and " << engine.n_obs << " observation objects.\n";
 
-      if(verbosity > 0) {
+      if(engine.wconf.fcst_merge_flag().ival() == 1)
+         strcpy(merge_str, "threshold merging");
+      else if(engine.wconf.fcst_merge_flag().ival() == 2)
+         strcpy(merge_str, "engine merging");
+      else if(engine.wconf.fcst_merge_flag().ival() == 3)
+         strcpy(merge_str, "threshold merging and engine merging");
+      else
+         strcpy(merge_str, "no merging");
 
-         if(engine.wconf.fcst_merge_flag().ival() == 1)
-            strcpy(merge_str, "threshold merging");
-         else if(engine.wconf.fcst_merge_flag().ival() == 2)
-            strcpy(merge_str, "engine merging");
-         else if(engine.wconf.fcst_merge_flag().ival() == 3)
-            strcpy(merge_str, "threshold merging and engine merging");
-         else
-            strcpy(merge_str, "no merging");
-
-         mlog << Debug(2)
-              << "Performing merging (" << merge_str << ") in the forecast field.\n";
-      }
+      mlog << Debug(2)
+           << "Performing merging (" << merge_str << ") in the forecast field.\n";
 
       engine.do_fcst_merging(default_config_file, merge_config_file);
 
-      if(verbosity > 0) {
+      if(engine.wconf.obs_merge_flag().ival() == 1)
+         strcpy(merge_str, "threshold merging");
+      else if(engine.wconf.obs_merge_flag().ival() == 2)
+         strcpy(merge_str, "engine merging");
+      else if(engine.wconf.obs_merge_flag().ival() == 3)
+         strcpy(merge_str, "threshold merging and engine merging");
+      else
+         strcpy(merge_str, "no merging");
 
-         if(engine.wconf.obs_merge_flag().ival() == 1)
-            strcpy(merge_str, "threshold merging");
-         else if(engine.wconf.obs_merge_flag().ival() == 2)
-            strcpy(merge_str, "engine merging");
-         else if(engine.wconf.obs_merge_flag().ival() == 3)
-            strcpy(merge_str, "threshold merging and engine merging");
-         else
-            strcpy(merge_str, "no merging");
+      mlog << Debug(2)
+           << "Performing merging (" << merge_str << ") in the observation field.\n";
 
-         mlog << Debug(2)
-              << "Performing merging (" << merge_str << ") in the observation field.\n";
-      }
       engine.do_obs_merging(default_config_file, merge_config_file);
 
       mlog << Debug(2)
@@ -783,9 +779,8 @@ void check_engine_config()
    }
 
    // Check that fcst_area_thresh and obs_area_thresh are non-negative
-   if(verbosity > 0 &&
-      (engine.fcst_area_thresh.thresh < 0 ||
-       engine.obs_area_thresh.thresh < 0)) {
+   if(engine.fcst_area_thresh.thresh < 0 ||
+      engine.obs_area_thresh.thresh  < 0) {
       mlog << Warning << "\ncheck_engine_config() -> "
            << "fcst_area_thresh (" << engine.wconf.fcst_area_thresh().ival()
            << ") and obs_area_thresh (" << engine.wconf.obs_area_thresh().ival()
@@ -831,8 +826,7 @@ void check_engine_config()
    }
 
    // Check that max_centroid_dist is > 0
-   if(verbosity > 0 &&
-      engine.wconf.max_centroid_dist().dval() <= 0) {
+   if(engine.wconf.max_centroid_dist().dval() <= 0) {
       mlog << Warning << "\ncheck_engine_config() -> "
            << "max_centroid_dist (" << engine.wconf.max_centroid_dist().dval()
            << ") should be set > 0\n\n";
@@ -3693,6 +3687,7 @@ void usage() {
         << "\t[-obj_plot]\n"
         << "\t[-obj_stat]\n"
         << "\t[-ct_stat]\n"
+        << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
         << "\twhere\t\"fcst_file\" is a forecast file in either GRIB "
@@ -3736,8 +3731,11 @@ void usage() {
         << "\t\t\"-ct_stat\" disables the output of the contingency "
         << "table standard statistics file (optional).\n"
 
+        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "file (optional).\n"
+
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << verbosity << ") (optional).\n"
+        << mlog.verbosity_level() << ") (optional).\n"
 
         << "\n\tNOTE: The forecast and observation fields must be "
         << "on the same grid.\n\n";
@@ -3815,11 +3813,22 @@ void set_ct_stat(const StringArray &)
    ct_stat_flag = 0;
 }
 
-///////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
+void set_logfile(const StringArray & a)
+{
+   ConcatString filename;
+
+   filename = a[0];
+
+   mlog.open_log_file(filename);
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a)
 {
-   verbosity = atoi(a[0]);
+   mlog.set_verbosity_level(atoi(a[0]));
 }
 
 ////////////////////////////////////////////////////////////////////////
