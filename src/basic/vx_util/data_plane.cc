@@ -85,7 +85,7 @@ void DataPlane::assign(const DataPlane &d) {
 
    set_size(d.nx(), d.ny());
 
-   memcpy(Data, d.Data, Nxy*sizeof(double *));
+   memcpy(Data, d.Data, Nxy*sizeof(double));
 
    InitTime  = d.init();
    ValidTime = d.valid();
@@ -182,8 +182,6 @@ void DataPlane::set(double v, int x, int y) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::set_constant(double v) {
-
-   // memset(Data, v, Nx*Ny*sizeof(double));
 
    if(!Data) {
       mlog << Error << "\nDataPlane::set_constant(double) -> "
