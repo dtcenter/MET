@@ -337,7 +337,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
       if( (int) Level.lower() % sec_per_hour == 0)
          tmp2_str << cs_erase << HH((int) Level.lower()/sec_per_hour);
       else
-         tmp2_str = sec_to_hhmmss(Level.lower());
+         tmp2_str = sec_to_hhmmss(nint(Level.lower()));
 
       // Store the abbreviation string
       tmp3_str << cs_erase << tmp_str << '_' << tmp2_str;
