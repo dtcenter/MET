@@ -424,7 +424,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
           ( vinfo.level().type() != LevelType_Pres &&
             vinfo.level().type() != LevelType_Vert )
         ) {
-     
+
          // Store the first data_plane
          plane  = plane_array[0];
          status = true;
@@ -512,7 +512,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
          if(!status) {
             cur_plane.clear();
-            lower = upper = bad_data_double;
+            lower = upper = bad_data_int;
             mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
                  << "Can't read record number " << i+1
                  << " from GRIB file \"" << filename() << "\".\n\n";
