@@ -15,7 +15,6 @@ ifeq ($(ENABLE_GEN_POLY_MASK), 1)
 endif
 ifeq ($(ENABLE_PLOT_DATA_PLANE), 1)
 	cd plot_data_plane  ; $(MAKE) $(PRINT_OPTS)
-	cd test_fft         ; $(MAKE) $(PRINT_OPTS)
 endif
 ifeq ($(ENABLE_PLOT_POINT_OBS), 1)
 	cd plot_point_obs   ; $(MAKE) $(PRINT_OPTS)
@@ -40,7 +39,6 @@ endif
 clean:
 	cd gen_poly_mask    ; $(MAKE) $(PRINT_OPTS) clean
 	cd plot_data_plane  ; $(MAKE) $(PRINT_OPTS) clean
-	cd test_fft         ; $(MAKE) $(PRINT_OPTS) clean
 	cd plot_point_obs   ; $(MAKE) $(PRINT_OPTS) clean
 	cd ascii2nc         ; $(MAKE) $(PRINT_OPTS) clean
 	cd madis2nc         ; $(MAKE) $(PRINT_OPTS) clean
