@@ -184,6 +184,9 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
    char junk2[max_str_len];
    LevelType lt;
 
+   // Validate the magic string
+   VarInfo::set_magic(s);
+
    // Store the magic string
    MagicStr = s;
 

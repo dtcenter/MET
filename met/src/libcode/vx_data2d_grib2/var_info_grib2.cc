@@ -228,6 +228,9 @@ void VarInfoGrib2::set_pair(const ConcatString &key, const ConcatString &val) {
 
 void VarInfoGrib2::set_magic(const ConcatString &s) {
 
+   // Validate the magic_string
+   VarInfo::set_magic(s);
+
    // This functionality is not supported for GRIB2.
    mlog << Error << "\nVarInfoGrib2::set_magic() -> "
         << "This function is not supported for the GRIB2 file type!\n\n";

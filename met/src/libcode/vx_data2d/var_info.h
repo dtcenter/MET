@@ -94,7 +94,7 @@ class VarInfo
          //
 
       virtual void set_pair(const ConcatString &key, const ConcatString &val);
-      virtual void set_magic(const ConcatString &) = 0;
+      virtual void set_magic(const ConcatString &);
 
       void set_req_name(const char *);
       void set_name(const char *);
