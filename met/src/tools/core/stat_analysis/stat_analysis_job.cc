@@ -1645,6 +1645,14 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
    vo   = vo_na.sum()/vo_na.n_elements();
    obar = convert_u_v_to_wdir(uo, vo);
 
+   mlog << Debug(4) << "write_job_wdir() -> "
+        << "ROW_MEAN_WDIR: average forecast direction (u, v) = ("
+        << uf << ", "  << vf << ") = " << fbar << " degrees\n";
+
+   mlog << Debug(4) << "write_job_wdir() -> "
+        << "ROW_MEAN_WDIR: average observed direction (u, v) = ("
+        << uo << ", "  << vo << ") = " << obar << " degrees\n";
+   
    //
    // Compute the mean error and the mean absolute error
    // from the unit vectors
@@ -1655,6 +1663,14 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
       angle = angle_difference(uf_na[i], vf_na[i],
                                uo_na[i], vo_na[i]);
 
+      if(mlog.verbosity_level() > 3) {
+         mlog << Debug(4) << "write_job_wdir() -> "
+              << "ROW_MEAN_WDIR: [" << i+1 << "] difference of forecast direction "
+              << convert_u_v_to_wdir(uf_na[i], vf_na[i]) << " - observed direction "
+              << convert_u_v_to_wdir(uo_na[i], vo_na[i]) << " = "
+              << angle << " degrees\n";
+      }
+                               
       // Check for bad data
       if(is_eq(angle, bad_data_double)) {
          me  = bad_data_double;
@@ -1711,6 +1727,14 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
    me   = angle_difference(uf, vf, uo, vo);
    mae  = bad_data_double;
 
+   mlog << Debug(4) << "write_job_wdir() -> "
+        << "AGGR_WDIR: aggregated forecast direction (u, v) = ("
+        << uf << ", "  << vf << ") = " << fbar << " degrees\n";
+
+   mlog << Debug(4) << "write_job_wdir() -> "
+        << "AGGR_WDIR: aggregated observed direction (u, v) = ("
+        << uo << ", "  << vo << ") = " << obar << " degrees\n";
+   
    //
    // Write the aggregated wind direction statistics
    //
