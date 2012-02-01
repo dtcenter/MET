@@ -317,4 +317,18 @@ bool VarInfoNcPinterp::is_wind_direction() const {
    return(false);
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfoNcPinterp::is_grid_relative() const {
+
+   //
+   // Check to see if the VarInfo name matches any of expected Pinterp
+   // variables that should be rotated from grid-relative to earth-relative.
+   //
+   return(has_prefix(pinterp_grid_relative_names,
+                     n_pinterp_grid_relative_names,
+                     Name));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
