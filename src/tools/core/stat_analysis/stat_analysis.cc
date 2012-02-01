@@ -123,7 +123,7 @@ int main(int argc, char * argv []) {
       set_job_from_config(conf, default_job);
 
       //
-      // Write out conet
+      // Write out the default job
       //
       mlog << Debug(4)
            << "Default Job from the config file: \""

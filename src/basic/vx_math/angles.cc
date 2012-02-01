@@ -158,8 +158,8 @@ convert_u_v_to_unit(uo, vo);
 
    // Compute sums
 
-a = vf*uo - uf*vo;
-b = uf*uo + vf*vo;
+a = vo*uf - uo*vf;
+b = uo*uf + vo*vf;
 
    // Only compute the angle between if both terms are non-zero
 
