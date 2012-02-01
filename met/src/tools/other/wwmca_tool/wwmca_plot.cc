@@ -466,7 +466,7 @@ for (x=0; x<Nx; ++x)  {
 
    for (y=0; y<Ny; ++y)  {
 
-      if ((f_pt.pixel_age_sec(x, y) * 60) < max_minutes)
+      if ((f_pt.pixel_age_sec(x, y) / 60) < max_minutes)
          value = f_cp(x, y);
       else
          value = 0;
