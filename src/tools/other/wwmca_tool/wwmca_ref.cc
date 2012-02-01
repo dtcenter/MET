@@ -463,7 +463,7 @@ from_y0 = nint(dy);
 if ( I.width() == 1 )  {
 
    if ( cloud.xy_is_ok(from_x0, from_y0) &&
-        ((pixel.pixel_age_sec(from_x0, from_y0) * 60) < (int) Config->max_minutes()))  {
+        ((pixel.pixel_age_sec(from_x0, from_y0) / 60) < (int) Config->max_minutes()))  {
 
       iv.ok = true;
 
@@ -500,7 +500,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
       sub_y  = yy + wm1o2;
 
       if ( !(cloud.xy_is_ok(from_x, from_y) &&
-             ((pixel.pixel_age_sec(from_x0, from_y0) * 60) < (int) Config->max_minutes())) )  {
+             ((pixel.pixel_age_sec(from_x0, from_y0) / 60) < (int) Config->max_minutes())) )  {
 
          I.put_bad(sub_x, sub_y);
 
@@ -597,7 +597,7 @@ from_y0 = nint(dy0);
 if ( I.width() == 1 )  {
 
    if ( cloud_this->xy_is_ok(from_x0, from_y0) &&
-        ((pixel_this->pixel_age_sec(from_x0, from_y0) * 60) < (int) Config->max_minutes()))  {
+        ((pixel_this->pixel_age_sec(from_x0, from_y0) / 60) < (int) Config->max_minutes()))  {
 
       iv.ok = true;
 
@@ -637,7 +637,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
       if ( lat*lat0 >= 0 )  {   //  same hemisphere
 
-         if ((pixel_this->pixel_age_sec(from_x, from_y) * 60) < (int) Config->max_minutes())
+         if ((pixel_this->pixel_age_sec(from_x, from_y) / 60) < (int) Config->max_minutes())
             t = cloud_this->cloud_pct(from_x, from_y);
          else
             t = 0.0;
@@ -646,7 +646,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
          From_other->latlon_to_xy(lat, lon, dx, dy);
 
-         if ((pixel_other->pixel_age_sec(nint(dx), nint(dy)) * 60) < (int) Config->max_minutes())
+         if ((pixel_other->pixel_age_sec(nint(dx), nint(dy)) / 60) < (int) Config->max_minutes())
             t = cloud_other->cloud_pct(nint(dx), nint(dy));
          else
             t = 0.0;
