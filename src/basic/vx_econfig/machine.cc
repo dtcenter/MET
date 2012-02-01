@@ -35,6 +35,10 @@ extern int econfigdebug;
 
 extern const char * bison_input_filename;
 
+extern int econfig_LineNumber;
+
+extern int econfig_ColumnNumber;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1401,6 +1405,10 @@ void Machine::read(const char * filename)
 bison_machine = this;
 
 bison_input_filename = filename;
+
+econfig_LineNumber   = 1;
+
+econfig_ColumnNumber = 1;
 
 // econfigdebug = 0;
 
