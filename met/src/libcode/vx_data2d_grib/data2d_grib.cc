@@ -606,8 +606,8 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// This function retrieves a single data plane as requested in the
-// VarInfo object and rotates winds if necessary.
+// This function rotates the wind data that's passed in from
+// grid-relative to earth-relative.
 //
 ////////////////////////////////////////////////////////////////////////
 
