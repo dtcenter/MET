@@ -286,3 +286,18 @@ void VarInfo::set_pair(const ConcatString &key, const ConcatString &val) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_magic(const ConcatString &mag) {
+
+   //  verify that there are no embedded spaces
+   if( (unsigned int)mag.length() != strcspn(mag, " \t") ){
+      mlog << Error << "\nVarInfo::set_magic() -> "
+           << "embedded whitespace found in magic string \""
+           << mag << "\".\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
