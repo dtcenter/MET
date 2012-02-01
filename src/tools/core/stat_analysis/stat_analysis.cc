@@ -131,18 +131,18 @@ int main(int argc, char * argv []) {
    }
 
    //
-   // Amend the default job using command line options
-   //
-   mlog << Debug(4)
-        << "Amending default job with command line options: \""
-        << command_line_job_options << "\"\n";
-   default_job.parse_job_command(command_line_job_options);
-
-   //
    // Enclose within a try block to catch any run time errors, and
    // delete the temp file before exiting.
    //
    try {
+
+      //
+      // Amend the default job using command line options
+      //
+      mlog << Debug(4)
+           << "Amending default job with command line options: \""
+           << command_line_job_options << "\"\n";
+      default_job.parse_job_command(command_line_job_options);
 
       //
       // Process the STAT files found in the search directories.
