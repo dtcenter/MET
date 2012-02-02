@@ -144,7 +144,8 @@ void process_command_line(int argc, char **argv)
    ConcatString default_config_file;
 
    // Set default output directory
-   out_dir << MET_BASE << "/out/ensemble_stat";
+   // out_dir << MET_BASE << "/out/ensemble_stat";
+   out_dir = ".";
 
    //
    // check for zero arguments

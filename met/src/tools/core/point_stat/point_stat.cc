@@ -65,6 +65,8 @@
 //   022    11/14/11  Holmes         Added code to enable reading of
 //                                   multiple config files.
 //
+//   022    02/02/12  Bullock        set default output directory to "."
+//
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -165,7 +167,7 @@ void process_command_line(int argc, char **argv) {
    GrdFileType ftype;
    ConcatString default_config_file;
 
-   out_dir << MET_BASE << "/out/point_stat";
+   out_dir = ".";
 
    //
    // check for zero arguments

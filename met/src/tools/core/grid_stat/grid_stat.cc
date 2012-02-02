@@ -65,6 +65,8 @@
 //   024    12/09/11  Halley Gotway  When zero matched pairs are found
 //                    print the status message before continuing.
 //
+//   025    02/02/12  Bullock        Changed default output directory to "."
+//
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -161,7 +163,7 @@ void process_command_line(int argc, char **argv) {
    ConcatString fcst_grid_info, obs_grid_info;
    ConcatString path;
 
-   out_dir << MET_BASE << "/out/grid_stat";
+   out_dir = ".";
 
    //
    // check for zero arguments
