@@ -110,7 +110,8 @@ enum EngineType {
 
 static const char * default_config_filename = "MET_BASE/data/config/MODEConfig_default";
 
-static const char * default_out_dir = "MET_BASE/out/mode";
+// static const char * default_out_dir = "MET_BASE/out/mode";
+static const char * default_out_dir = ".";
 
 static const int unmatched_id = -1;
 

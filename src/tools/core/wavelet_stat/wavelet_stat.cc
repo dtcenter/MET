@@ -2821,7 +2821,7 @@ void usage() {
         << "the observation lead time to be used (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output directory ("
-        << out_dir << ") (optional).\n"
+        << default_out_dir << ") (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
