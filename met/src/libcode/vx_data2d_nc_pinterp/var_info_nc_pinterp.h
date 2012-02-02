@@ -123,7 +123,10 @@ static const int n_pinterp_v_wind_names =
 
 //
 // List of wind variable names that should be rotated from grid-relative
-// to earth-relative.
+// to earth-relative.  MET is not able to read winds from Pinterp files since
+// they are defined on a staggered grid.  If the code is enhanced to do so,
+// the data in these variables should be rotated from grid-relative to
+// earth-relative prior to verifying.
 // Taken from the WRF version 3.2 Registry.EM file
 //
 
