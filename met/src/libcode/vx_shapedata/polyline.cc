@@ -782,8 +782,22 @@ double min_dist_linesegment(double px, double py, double qx, double qy,
 
    rmp = sqrt( rmpx*rmpx + rmpy*rmpy );
 
-   cx = qmpx/qmp;
-   cy = qmpy/qmp;
+   //
+   // If qmp == 0, then px == qx and py == qy
+   // Compute distance between (px, py) and (x_test, y_test)
+   //
+
+   if ( is_eq(qmp, 0.0) )  {
+
+      dx = x_test - qx;
+      dy = y_test - qy;
+
+      return ( sqrt( dx*dx + dy*dy ) );
+   }
+   else {
+      cx = qmpx/qmp;
+      cy = qmpy/qmp;
+   }
 
    t0 = rmpx*cx + rmpy*cy;
 
