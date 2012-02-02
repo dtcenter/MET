@@ -119,6 +119,7 @@ int main(int argc, char * argv[])
       // instantiate the Met2dDataFile object using the data_2d_factory
       // and the VarInfo object using the var_info_factory
       //
+   mlog << Debug(1)  << "Opening data file: " << InputFilename << "\n";
    met_ptr = m_factory.new_met_2d_data_file(InputFilename);
 
    if (!met_ptr)
@@ -196,6 +197,7 @@ int main(int argc, char * argv[])
       //
       // plot the image
       //
+   mlog << Debug(1)  << "Creating postscript file: " << OutputFilename << "\n";
    data_plane_plot(InputFilename, OutputFilename, grid, TitleString, color_table, data_plane);
 
       //
