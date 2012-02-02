@@ -1260,7 +1260,7 @@ c = (int) (econfig_ColumnNumber - strlen(econfigtext));
 cout << "\n\n"
      << "   config() -> syntax error in file \"" << bison_input_filename << "\"\n\n"
      << "      line   = " << econfig_LineNumber << "\n\n"
-     << "      econfig_ColumnNumber = " << c << "\n\n"
+     << "      column = " << c << "\n\n"
      << "      text   = \"" << econfigtext << "\"\n\n";
 
 in.open(bison_input_filename);
