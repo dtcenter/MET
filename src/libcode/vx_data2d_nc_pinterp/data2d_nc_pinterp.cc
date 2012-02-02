@@ -110,13 +110,11 @@ void MetNcPinterpDataFile::dump(ostream & out, int depth) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// JHG, need to handle rotating winds from grid to earth relative and deriving
-// wind speed and direction
 
 bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    bool status = false;
    double pressure;
-   ConcatString req_time_str, data_time_str, level_str;
+   ConcatString level_str;
    VarInfoNcPinterp * vinfo_nc = (VarInfoNcPinterp *) &vinfo;
    NcVarInfo *info;
 
@@ -134,28 +132,22 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       // Check that the valid time matches the request
       if(vinfo.valid() > 0 && vinfo.valid() != plane.valid()) {
 
-         // Compute time strings
-         req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
-         data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
-
          mlog << Warning << "\nMetNcPinterpDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the valid "
               << "time does not match the requested valid time: ("
-              << data_time_str << " != " << req_time_str << ")\n\n";
+              << unix_to_yyyymmdd_hhmmss(plane.valid()) << " != "
+              << unix_to_yyyymmdd_hhmmss(vinfo.valid()) << ")\n\n";
          status = false;
       }
 
       // Check that the lead time matches the request
       if(vinfo.lead() > 0 && vinfo.lead() != plane.lead()) {
 
-         // Compute time strings
-         req_time_str  = sec_to_hhmmss(vinfo.lead());
-         data_time_str = sec_to_hhmmss(plane.lead());
-
          mlog << Warning << "\nMetNcPinterpDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the lead "
               << "time does not match the requested lead time: ("
-              << data_time_str << " != " << req_time_str << ")\n\n";
+              << sec_to_hhmmss(plane.lead()) << " != "
+              << sec_to_hhmmss(vinfo.lead()) << ")\n\n";
          status = false;
       }
 
@@ -176,13 +168,11 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// JHG, need to handle rotating winds from grid to earth relative and deriving
-// wind speed and direction
 
 int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
                                            DataPlaneArray &plane_array) {
    int i, i_dim, n_level, status, lower, upper;
-   ConcatString req_time_str, data_time_str, level_str;
+   ConcatString level_str;
    double pressure, min_level, max_level;
    bool found = false;
    VarInfoNcPinterp *vinfo_nc = (VarInfoNcPinterp *) &vinfo;
@@ -237,28 +227,22 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
          // Check that the valid time matches the request
          if(vinfo.valid() > 0 && vinfo.valid() != cur_plane.valid()) {
 
-            // Compute time strings
-            req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
-            data_time_str = unix_to_yyyymmdd_hhmmss(cur_plane.valid());
-
             mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
                  << "for \"" << vinfo.req_name() << "\" variable, the valid "
                  << "time does not match the requested valid time: ("
-                 << data_time_str << " != " << req_time_str << ")\n\n";
+                 << unix_to_yyyymmdd_hhmmss(cur_plane.valid()) << " != "
+                 << unix_to_yyyymmdd_hhmmss(vinfo.valid()) << ")\n\n";
             status = false;
          }
 
          // Check that the lead time matches the request
          if(vinfo.lead() > 0 && vinfo.lead() != cur_plane.lead()) {
 
-            // Compute time strings
-            req_time_str  = sec_to_hhmmss(vinfo.lead());
-            data_time_str = sec_to_hhmmss(cur_plane.lead());
-
             mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
                  << "for \"" << vinfo.req_name() << "\" variable, the lead "
                  << "time does not match the requested lead time: ("
-                 << data_time_str << " != " << req_time_str << ")\n\n";
+                 << sec_to_hhmmss(cur_plane.lead()) << " != "
+                 << sec_to_hhmmss(vinfo.lead()) << ")\n\n";
             status = false;
          }
       }
