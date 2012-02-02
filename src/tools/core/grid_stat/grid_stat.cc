@@ -265,8 +265,8 @@ void process_command_line(int argc, char **argv) {
 
    // List the input files
    mlog << Debug(1)
-        << "Forecast File: " << fcst_file   << "\n"
-        << "Observation File: " << obs_file    << "\n";
+        << "Forecast File: "    << fcst_file << "\n"
+        << "Observation File: " << obs_file  << "\n";
 
    return;
 }
