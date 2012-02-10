@@ -78,9 +78,8 @@ if ( type != FileType_None )  return ( type );
 
      if ( is_grib1_file   (filename) ) type = FileType_Gb1;
 else if ( is_grib2_file   (filename) ) type = FileType_Gb2;
-else if ( is_met_nc_file  (filename) ) type = FileType_NcMet;
 else if ( is_pinterp_file (filename) ) type = FileType_NcPinterp;
-else if ( is_netcdf_file  (filename) ) type = FileType_General_Netcdf;
+else if ( is_netcdf_file  (filename) ) type = FileType_NcMet;
 else if ( is_bufr_file    (filename) ) type = FileType_Bufr;
 else                                   type = FileType_None;
 
