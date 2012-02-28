@@ -79,12 +79,12 @@ mode: mode.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) mode.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+   -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+   -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
 	-lvx_nc_util \
@@ -107,7 +107,7 @@ mode: mode.cc $(OBJECTS)
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
 
