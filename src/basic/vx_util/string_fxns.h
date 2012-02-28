@@ -43,6 +43,10 @@ extern bool has_prefix(const char **prefix_list, int n_prefix,
 
 extern ConcatString replace_path(const char * path);
 
+extern int regex_apply(const char* pat, int num_mat, const char* str, char** &mat);
+
+extern void regex_clean(char** &mat);
+
 
 ////////////////////////////////////////////////////////////////////////
 

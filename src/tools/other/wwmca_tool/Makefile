@@ -167,8 +167,8 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o wwmca_regrid wwmca_regrid.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-   -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-   -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
@@ -204,8 +204,8 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o wwmca_plot wwmca_plot.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map\" \
-   -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-   -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \

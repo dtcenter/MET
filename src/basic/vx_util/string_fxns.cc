@@ -267,3 +267,53 @@ return ( s );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
+{
+   //  compile the regex pattern
+   int rc = 0, num_act = 0, num_pmat = ( 0 == num_mat ? 1 : num_mat );
+   regex_t *re = new regex_t;
+   regmatch_t pmatch[num_pmat];
+   if( 0 != (rc = regcomp(re, pat, REG_EXTENDED)) ){
+      mlog << Error << "\napply_regex - regcomp() error: " << rc << "\n\n";
+      exit(1);
+   }
+
+   //  apply the pattern to the input string
+   rc = regexec(re, str, num_pmat, pmatch, 0);
+
+   //  if the match succeeded and captures were requested, build a list
+   if( 0 == rc  ){
+
+      //  count the actual number of matches
+      for(int i=0; i < num_mat; i++){ if( -1 != pmatch[i].rm_so ) num_act++; }
+
+      if( 0 < num_mat ){
+         //  store the matched strings in a null-terminated list
+         string str_dat = str;
+         mat = new char*[num_act + 1];
+         for(int i=0; i < num_act; i++){
+            int mat_len = pmatch[i].rm_eo - pmatch[i].rm_so;
+            mat[i] = new char[mat_len + 1];
+            strcpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data());
+         }
+         mat[num_act] = NULL;
+      }
+
+   } else {
+      mat = NULL;
+   }
+
+   regfree(re);
+   return num_act;
+}
+
+void regex_clean(char** &mat)
+{
+   if( !mat ) return;
+   for(int i=0; mat[i] != NULL; i++) delete [] mat[i];
+   delete [] mat;
+   mat = NULL;
+}
+
+

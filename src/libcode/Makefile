@@ -14,7 +14,9 @@ all:
 	@ cd vx_nc_util           ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_data2d            ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_data2d_grib       ; $(MAKE) $(PRINT_OPTS)
+ifeq ($(WITH_GRIB2), 1)
 	@ cd vx_data2d_grib2      ; $(MAKE) $(PRINT_OPTS)
+endif
 	@ cd vx_data2d_nc_met     ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_data2d_nc_pinterp ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS)
@@ -42,7 +44,9 @@ clean:
 	@ cd vx_nc_util           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_data2d            ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_data2d_grib       ; $(MAKE) $(PRINT_OPTS) clean
+ifeq ($(WITH_GRIB2), 1)
 	@ cd vx_data2d_grib2      ; $(MAKE) $(PRINT_OPTS) clean
+endif
 	@ cd vx_data2d_nc_met     ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_data2d_nc_pinterp ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS) clean
@@ -70,7 +74,9 @@ gen_sources:
 	@ cd vx_nc_util           ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_data2d            ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_data2d_grib       ; $(MAKE) $(PRINT_OPTS) gen_sources
+ifeq ($(WITH_GRIB2), 1)
 	@ cd vx_data2d_grib2      ; $(MAKE) $(PRINT_OPTS) gen_sources
+endif
 	@ cd vx_data2d_nc_met     ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_data2d_nc_pinterp ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS) gen_sources

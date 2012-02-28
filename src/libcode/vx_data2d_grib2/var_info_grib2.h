@@ -5,8 +5,14 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "var_info.h"
+#include <stdlib.h>
+#include <string.h>
+#include <map>
 
+using namespace std;
+
+#include "vx_util.h"
+#include "var_info.h"
 #include "data_file_type.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,6 +62,11 @@ class VarInfoGrib2 : public VarInfo
 
       void init_from_scratch();
       void assign(const VarInfoGrib2 &);
+
+      void init_var_maps();
+
+      map<string,string> map_id;
+      map<string,string> map_code;
 
    public:
       VarInfoGrib2();
@@ -108,6 +119,19 @@ class VarInfoGrib2 : public VarInfo
       bool is_v_wind()            const;
       bool is_wind_speed()        const;
       bool is_wind_direction()    const;
+
+
+         //
+         // GRIB2 table lookups
+         //
+
+      static LevelType   g2_lty_to_level_type(int lt);
+      static double      g2_time_range_unit_to_sec(int ind);
+      const char*        g2_id_lookup(const char* id);
+      int                g2_id_count(const char* id);
+      const char*        g2_code_lookup(const char* code);
+      int                g2_code_count(const char* code);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,6 +146,15 @@ inline int         VarInfoGrib2::parm()       const { return(Parm);         }
 inline int         VarInfoGrib2::process()    const { return(Process);      }
 inline int         VarInfoGrib2::ens_type()   const { return(EnsType);      }
 inline int         VarInfoGrib2::der_type()   const { return(DerType);      }
+
+inline const char* VarInfoGrib2::g2_id_lookup(const char* id)     { return map_id[id].data();     }
+inline int         VarInfoGrib2::g2_id_count(const char* id)      { return map_id.count(id);      }
+inline const char* VarInfoGrib2::g2_code_lookup(const char* code) { return map_code[code].data(); }
+inline int         VarInfoGrib2::g2_code_count(const char* code)  { return map_code.count(code);  }
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

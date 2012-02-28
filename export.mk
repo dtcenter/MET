@@ -31,6 +31,9 @@ export F2C_INCS
 export F2C_LIBS
 export F2C_LIBNAME
 
+export GRIB2C_INCS
+export GRIB2C_LIBS
+
 ###############################################################################
 
 export ENABLE_ASCII2NC
@@ -43,6 +46,7 @@ export ENABLE_MODE_ANALYSIS
 export ENABLE_PB2NC
 export ENABLE_PCP_COMBINE
 export ENABLE_PLOT_DATA_PLANE
+export ENABLE_PLOT_G2
 export ENABLE_PLOT_POINT_OBS
 export ENABLE_POINT_STAT
 export ENABLE_STAT_ANALYSIS
@@ -52,6 +56,8 @@ export ENABLE_WWMCA
 ###############################################################################
 
 export WITH_GRIB2
+export G2SUP_LIBS
+export GRIB2_LIBS
 
 ###############################################################################
 

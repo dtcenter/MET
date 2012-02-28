@@ -80,8 +80,8 @@ gen_poly_mask: gen_poly_mask.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) gen_poly_mask.cc $(OBJECTS) \
 	$(CXX_FLAGS) \
-   -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-   -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \

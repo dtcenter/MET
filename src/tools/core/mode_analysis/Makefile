@@ -98,8 +98,8 @@ mode_analysis: mode_analysis.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) mode_analysis.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-   -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-   -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \

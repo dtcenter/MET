@@ -24,7 +24,9 @@ using namespace std;
 
 #include "var_info_factory.h"
 #include "var_info_grib.h"
-#include "var_info_grib2.h"
+#ifdef WITH_GRIB2
+  #include "var_info_grib2.h"
+#endif
 #include "var_info_nc_met.h"
 #include "var_info_nc_pinterp.h"
 
@@ -71,6 +73,7 @@ int main(int argc, char *argv[]) {
    vi_g2->set_pair(CONFIG_Valid, "20120102_00");
    vi_g2->set_pair(CONFIG_Lead, "033000");
 
+#ifdef WITH_GRIB2
    vi_g2->set_pair(CONFIG_GRIB2_Discipline, "1");
    vi_g2->set_pair(CONFIG_GRIB2_MTable, "2");
    vi_g2->set_pair(CONFIG_GRIB2_LTable, "3");
@@ -80,6 +83,7 @@ int main(int argc, char *argv[]) {
    vi_g2->set_pair(CONFIG_GRIB2_Process, "7");
    vi_g2->set_pair(CONFIG_GRIB2_EnsType, "8");
    vi_g2->set_pair(CONFIG_GRIB2_DerType, "9");
+#endif
 
    // Set up a NetCDF object
    vi_nc->set_pair(CONFIG_FileType, "FileType_NcMet");
