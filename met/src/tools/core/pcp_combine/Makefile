@@ -80,11 +80,11 @@ pcp_combine: pcp_combine.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) pcp_combine.cc $(OBJECTS) \
 	$(CXX_FLAGS) \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_data2d \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_nc_util \
 	-lvx_data2d \

@@ -92,14 +92,18 @@ is_grib_file.o: is_grib_file.h is_grib_file.cc
 is_bufr_file.o: is_bufr_file.h is_bufr_file.cc
 	$(CXX) is_bufr_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
+#	$(CXX) var_info_factory.cc $(CXX_FLAGS) -DWITH_GRIB2=$(WITH_GRIB2) -c 
 var_info_factory.o: var_info_factory.cc
-	$(CXX) var_info_factory.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) var_info_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c \
+		-I$(MET_INC_DIR) $(GRIB2C_INCS) $(GRIB2C_LIBS) $(G2SUP_LIBS)
 
 data2d_factory_utils.o: data2d_factory_utils.h data2d_factory_utils.cc
 	$(CXX) data2d_factory_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
+#	$(CXX) data2d_factory.cc $(CXX_FLAGS) -DWITH_GRIB2=$(WITH_GRIB2) -c 
 data2d_factory.o: data2d_factory.cc
-	$(CXX) data2d_factory.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) data2d_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c \
+		-I$(MET_INC_DIR) $(NETCDF_INCS) $(GRIB2C_INCS) $(GRIB2C_LIBS) $(G2SUP_LIBS)
 
 
 ########################################################################
@@ -137,14 +141,15 @@ test_is_grib: $(LIBRARIES) test_is_grib.cc
 	-lvx_util \
 	-lvx_log
 
+#	$(CXX_FLAGS) -DWITH_GRIB2=$(WITH_GRIB2) 
 test_var_info: $(LIBRARIES) test_var_info.cc
 	$(CXX) -o test_var_info test_var_info.cc \
-	$(CXX_FLAGS) -I$(MET_INC_DIR) \
-	-I$(MET_INC_DIR) \
-	-L$(MET_LIB_DIR) \
+	$(CXX_FLAGS) $(ARCH_FLAGS) \
+	-I$(MET_INC_DIR) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(GRIB2C_LIBS) \
 	-lvx_data2d_factory \
 	-lvx_data2d \
-	-lvx_data2d_grib \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d \
@@ -158,10 +163,10 @@ test_var_info: $(LIBRARIES) test_var_info.cc
 test_factory: $(LIBRARIES) test_factory.cc
 	$(CXX) -o test_factory test_factory.cc \
 	$(CXX_FLAGS) -I$(MET_INC_DIR) \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GRIB2C_LIBS) \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d \
@@ -171,7 +176,7 @@ test_factory: $(LIBRARIES) test_factory.cc
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lnetcdf_c++ -lnetcdf
+	-lgrib2c -ljasper -lpng -lz -lm -lnetcdf_c++ -lnetcdf
 
 
 ########################################################################

@@ -9,10 +9,36 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <stdlib.h>
+#include <vector>
 
 #include "data_plane.h"
 #include "data_class.h"
 #include "var_info_grib2.h"
+
+extern "C" {
+  #include "grib2.h"
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+typedef struct {
+   long ByteOffset;
+   int NumFields;
+   int RecNum;
+   int FieldNum;
+   int Discipline;
+   int PdsTmpl;
+   int ParmCat;
+   int Parm;
+   int LvlTyp;
+   double LvlVal1;
+   double LvlVal2;
+   int RangeTyp;
+   int RangeVal;
+} Grib2Record;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -26,6 +52,33 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       MetGrib2DataFile(const MetGrib2DataFile &);
       MetGrib2DataFile & operator=(const MetGrib2DataFile &);
+
+      FILE *FileGrib2;
+
+      vector <Grib2Record*> RecList;
+
+      int ScanMode;
+
+
+      //
+      //  utilities to read a GRIB2 information
+      //
+
+      bool read_data_plane(DataPlane &plane, gribfield  *gfld);
+
+      void read_grid(gribfield *gfld);
+
+      long read_grib2_record( long offset,
+                              g2int unpack,
+                              g2int ifld,
+                              gribfield* &gfld,
+                              unsigned char* &cgrib,
+                              g2int &numfields
+                            );
+
+      void read_grib2_record_list();
+
+      void update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec);
 
    public:
 

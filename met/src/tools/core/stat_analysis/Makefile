@@ -110,8 +110,8 @@ stat_analysis: stat_analysis.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) stat_analysis.cc $(OBJECTS) \
 	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-   -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-   -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \

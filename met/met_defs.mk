@@ -37,3 +37,17 @@ CONFIG_TEMPLATE_DIR = $(MET_BASE_DIR)/data/config
 ########################################################################
 
 
+   ##
+   ##  GRIB2 support
+   ##
+
+
+ifeq ($(WITH_GRIB2), 1)
+	ARCH_FLAGS := $(ARCH_FLAGS) -DWITH_GRIB2
+	G2SUP_LIBS = -lgrib2c -ljasper -lpng -lz
+	GRIB2_LIBS = -lvx_data2d_grib2 $(G2SUP_LIBS)
+else
+	G2SUP_LIBS =
+	GRIB2_LIBS =
+endif
+

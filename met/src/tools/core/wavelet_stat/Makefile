@@ -98,8 +98,8 @@ wavelet_stat: wavelet_stat.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o $(EXECUTABLES) wavelet_stat.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-   -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-   -L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
