@@ -121,12 +121,12 @@ dumppb.o: dumppb.f
 pb2nc: pb2nc.cc $(OBJECTS)
 	$(CXX) -o $(EXECUTABLES) pb2nc.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(BUFR_INCS) $(F2C_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(BUFR_LIBS) $(F2C_LIBS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(BUFR_INCS) $(F2C_INCS) $(GRIB2C_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(BUFR_LIBS) $(F2C_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
 	-lvx_nc_util \
@@ -150,7 +150,7 @@ pb2nc: pb2nc.cc $(OBJECTS)
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lbufr \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas -lbufr \
 	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
 
