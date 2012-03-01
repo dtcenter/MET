@@ -903,8 +903,8 @@ void do_sub_command()
 
    DataPlane plus, minus, difference;
    Grid grid1, grid2;
-   unixtime init_time1, init_time2;
-   unixtime valid_time1, valid_time2;
+   unixtime init_time1 = 0, init_time2 = 0;
+   unixtime valid_time1 = 0, valid_time2 = 0;
    unixtime nc_init_time, nc_valid_time;
    int x, y, nc_accum;
    double v_plus, v_minus;
