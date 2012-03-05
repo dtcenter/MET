@@ -65,7 +65,9 @@
 //   022    11/14/11  Holmes         Added code to enable reading of
 //                                   multiple config files.
 //
-//   022    02/02/12  Bullock        set default output directory to "."
+//   022    02/02/12  Bullock        Set default output directory to "."
+//   023    03/05/12  Halley Gotway  Fix bug in processing command line
+//                    for setting valid end times.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1768,7 +1770,7 @@ void set_obs_valid_beg_time(const StringArray & a)
 
 void set_obs_valid_end_time(const StringArray & a)
 {
-   obs_valid_end_ut = timestring_to_sec(a[0]);
+   obs_valid_end_ut = timestring_to_unix(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1782,7 +1784,7 @@ void set_valid_beg_time(const StringArray & a)
 
 void set_valid_end_time(const StringArray & a)
 {
-   obs_valid_end_ut = timestring_to_sec(a[0]);
+   obs_valid_end_ut = timestring_to_unix(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
