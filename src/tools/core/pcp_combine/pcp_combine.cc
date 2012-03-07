@@ -88,8 +88,6 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_data2d_grib.h"
 #include "grib_classes.h"
-// #include "vx_gdata.h"
-// #include "vx_met_util.h"
 #include "vx_nc_util.h"
 #include "vx_grid.h"
 #include "vx_statistics.h"
