@@ -1,4 +1,4 @@
 #!/bin/sh
 
-./plot_data_plane ../../../data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb ./tmp_rec15.ps "TMP/R15" -title "Temperature from Record 15"
+./plot_data_plane ../../../../data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb ./tmp_rec15.ps "TMP/R15" -title "Temperature from Record 15"
 
