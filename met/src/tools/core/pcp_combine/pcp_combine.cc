@@ -61,6 +61,9 @@
 //
 //   013    12/21/11  Bullock        Ported to new repository.
 //
+//   014    03/07/12  Halley Gotway  Bugfix in get_field() function and
+//                                   remove unnecessary time strings.
+//
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -144,10 +147,9 @@ static void sum_grib_files(Grid &, DataPlane &);
 static int  search_pcp_dir(const char *, const unixtime, ConcatString &);
 static void check_file_time(const char *, unixtime, int &);
 
-static void get_field(const char * filename, 
-                      int get_accum, unixtime & init_ut, unixtime & valid_ut, 
-                      Grid & grid, 
-                      DataPlane & plane);
+static void get_field(const char * filename, const int get_accum,
+                      const unixtime get_init_ut, const unixtime get_valid_ut,
+                      Grid & grid, DataPlane & plane);
 
 static void write_netcdf(unixtime, unixtime, int, const Grid &, const DataPlane &);
 
@@ -404,9 +406,7 @@ void do_sum_command()
    DataPlane plane;
    Grid grid;
    int lead_time;
-   ConcatString init_time_str, valid_time_str;
-   ConcatString in_accum_str, out_accum_str;
-   ConcatString lead_time_str;
+   ConcatString init_time_str;
 
    //
    // Compute the lead time
@@ -414,30 +414,27 @@ void do_sum_command()
    lead_time = valid_time - init_time;
 
    //
-   // Build time strings
+   // Build init time string
    //
    if(init_time != 0) init_time_str = unix_to_yyyymmdd_hhmmss(init_time);
    else               init_time_str = zero_time_str;
 
-   in_accum_str   = sec_to_hhmmss(in_accum);
-   valid_time_str = unix_to_yyyymmdd_hhmmss(valid_time);
-   out_accum_str  = sec_to_hhmmss(out_accum);
-   lead_time_str  = sec_to_hhmmss(lead_time);
-
    mlog << Debug(2)
         << "Performing sum command: "
         << "Init/In_Accum/Valid/Out_Accum Times = "
-        << init_time_str  << "/" << in_accum_str  << "/"
-        << valid_time_str << "/" << out_accum_str << "\n";
+        << init_time_str  << "/" << sec_to_hhmmss(in_accum)  << "/"
+        << unix_to_yyyymmdd_hhmmss(valid_time) << "/"
+        << sec_to_hhmmss(out_accum) << "\n";
+
    //
    // Check that the output accumulation time is not greater than
    // the lead time, except when init_time = 0 for observations.
    //
    if(out_accum > lead_time && init_time != (unixtime) 0) {
       mlog << Error << "\ndo_sum_command() -> "
-           << "The output accumulation time (" << out_accum_str
+           << "The output accumulation time (" << sec_to_hhmmss(out_accum)
            << ") cannot be greater than the lead time ("
-           << lead_time_str << ").\n\n";
+           << sec_to_hhmmss(lead_time) << ").\n\n";
       exit(1);
    }
 
@@ -447,9 +444,9 @@ void do_sum_command()
    //
    if(out_accum%in_accum != 0) {
       mlog << Error << "\ndo_sum_command() -> "
-           << "The output accumulation time (" << out_accum_str
+           << "The output accumulation time (" << sec_to_hhmmss(out_accum)
            << ") must be divisible by the input accumulation "
-           << "time (" << in_accum_str << ").\n\n";
+           << "time (" << sec_to_hhmmss(in_accum) << ").\n\n";
       exit(1);
    }
 
@@ -459,9 +456,9 @@ void do_sum_command()
    //
    if(lead_time%in_accum != 0 && init_time != (unixtime) 0) {
       mlog << Error << "\ndo_sum_command() -> "
-           << "The lead time (" << lead_time_str
+           << "The lead time (" << sec_to_hhmmss(lead_time)
            << ") must be divisible by the input accumulation time ("
-           << in_accum_str << ").\n\n";
+           << sec_to_hhmmss(in_accum) << ").\n\n";
       exit(1);
    }
 
@@ -488,20 +485,12 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
 {
 
    int i, j, x, y;
-   ConcatString valid_str;
-   ConcatString in_accum_str, out_accum_str;
    DataPlane part;
    double v_sum, v_part;
    Grid gr;
    unixtime     * pcp_times = (unixtime) 0;
    int          * pcp_recs  = (int *) 0;
    ConcatString * pcp_files = (ConcatString *) 0;
-
-   //
-   // Build time strings
-   //
-   in_accum_str  = sec_to_hhmmss(in_accum);
-   out_accum_str = sec_to_hhmmss(out_accum);
 
    //
    // Compute the number of forecast precipitation files to be found,
@@ -514,9 +503,9 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
 
    mlog << Debug(2)
         << "Searching for " << n_files << " files "
-        << "with accumulation times of " << in_accum_str
+        << "with accumulation times of " << sec_to_hhmmss(in_accum)
         << " to sum to a total accumulation time of "
-        << out_accum_str << ".\n";
+        << sec_to_hhmmss(out_accum) << ".\n";
 
    //
    // Compute the valid times for the precipitation files
@@ -540,11 +529,9 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
 
          if( pcp_recs[i] != -1 )  {
 
-            valid_str = unix_to_yyyymmdd_hhmmss(pcp_times[i]);
-
             mlog << Debug(1)
                  << "[" << (i+1) << "] File " << pcp_files[i]
-                 << " matches valid time of " << valid_str
+                 << " matches valid time of " << unix_to_yyyymmdd_hhmmss(pcp_times[i])
                  << "\n";
 
             break;
@@ -558,12 +545,11 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
       //
       if(pcp_recs[i] == -1) {
 
-         valid_str = unix_to_yyyymmdd_hhmmss(pcp_times[i]);
-
          mlog << Error << "\nsum_grib_files() -> "
               << "Cannot find a file with a valid time of "
-              << valid_str << " and accumulation time of "
-              << in_accum_str << " matching the regular "
+              << unix_to_yyyymmdd_hhmmss(pcp_times[i])
+              << " and accumulation time of "
+              << sec_to_hhmmss(in_accum) << " matching the regular "
               << "expression \"" << pcp_reg_exp << "\"\n\n";
          exit(1);
       }
@@ -782,23 +768,12 @@ void do_add_command()
    Grid grid1, grid2;
    DataPlane total, part;
    double total_value, part_value;
-   unixtime init_time1, init_time2;
-   unixtime valid_time1, valid_time2;
    unixtime nc_init_time, nc_valid_time;
    int i, x, y, nc_accum;
-   ConcatString init_time1_str, init_time2_str;
-   ConcatString valid_time1_str, valid_time2_str;
-   ConcatString accum1_str, accum2_str;
 
    mlog << Debug(2)
         << "Performing addition command for " << n_files
         << " files.\n";
-
-   //
-   //  initialize some stuff with info from the first file
-   //
-
-i = 0;
 
    //
    // Read current field
@@ -806,19 +781,12 @@ i = 0;
    mlog << Debug(1) 
         << "Reading input file: " << in_file[0] << "\n";
 
-   get_field(in_file[i], accum[i], init_time1, valid_time1, grid1, total);
-
-   //
-   // Build time strings
-   //
-   init_time1_str  = unix_to_yyyymmdd_hhmmss(init_time1);
-   valid_time1_str = unix_to_yyyymmdd_hhmmss(valid_time1);
-   accum1_str      = sec_to_hhmmss(accum[i]);
+   get_field(in_file[0], accum[0], 0, 0, grid1, total);
 
    // Initialize output times
-   nc_init_time  = init_time1;
-   nc_valid_time = valid_time1;
-   nc_accum      = accum[i];
+   nc_init_time  = total.init();
+   nc_valid_time = total.valid();
+   nc_accum      = accum[0];
 
    //
    // Loop through the rest of the input files
@@ -830,14 +798,7 @@ i = 0;
       //
       mlog << Debug(1) << "Reading input file: " << in_file[i] << "\n";
 
-      get_field(in_file[i].text(), accum[i], init_time2, valid_time2, grid2, part);
-
-      //
-      // Build time strings
-      //
-      init_time2_str  = unix_to_yyyymmdd_hhmmss(init_time2);
-      valid_time2_str = unix_to_yyyymmdd_hhmmss(valid_time2);
-      accum2_str      = sec_to_hhmmss(accum[i]);
+      get_field(in_file[i].text(), accum[i], 0, 0, grid2, part);
 
       //
       // Check for the same grid dimensions
@@ -849,10 +810,10 @@ i = 0;
       }
 
       // Output init time
-      if(nc_init_time != init_time2) nc_init_time = (unixtime) 0;
+      if(nc_init_time != part.init()) nc_init_time = (unixtime) 0;
 
       // Output valid time
-      if(nc_valid_time < valid_time2) nc_valid_time = valid_time2;
+      if(nc_valid_time < part.valid()) nc_valid_time = part.valid();
 
       // Output accumulation time
       nc_accum += accum[i];
@@ -903,14 +864,9 @@ void do_sub_command()
 
    DataPlane plus, minus, difference;
    Grid grid1, grid2;
-   unixtime init_time1 = 0, init_time2 = 0;
-   unixtime valid_time1 = 0, valid_time2 = 0;
    unixtime nc_init_time, nc_valid_time;
    int x, y, nc_accum;
    double v_plus, v_minus;
-   ConcatString init_time1_str, init_time2_str;
-   ConcatString valid_time1_str, valid_time2_str;
-   ConcatString accum1_str, accum2_str;
 
    //
    // Check for exactly two input files
@@ -927,22 +883,12 @@ void do_sub_command()
    mlog << Debug(1) 
         << "Reading input file: " << in_file[0] << "\n";
 
-   get_field(in_file[0], accum[0], init_time1, valid_time1, grid1, plus);
+   get_field(in_file[0], accum[0], 0, 0, grid1, plus);
 
    mlog << Debug(1) 
         << "Reading input file: " << in_file[1] << "\n";
 
-   get_field(in_file[1], accum[1], init_time2, valid_time2, grid2, minus);
-
-   //
-   // Build time strings
-   //
-   init_time1_str  = unix_to_yyyymmdd_hhmmss(init_time1);
-   init_time2_str  = unix_to_yyyymmdd_hhmmss(init_time2);
-   valid_time1_str = unix_to_yyyymmdd_hhmmss(valid_time1);
-   valid_time2_str = unix_to_yyyymmdd_hhmmss(valid_time2);
-   accum1_str      = sec_to_hhmmss(accum[0]);
-   accum2_str      = sec_to_hhmmss(accum[1]);
+   get_field(in_file[1], accum[1], 0, 0, grid2, minus);
 
    //
    // Check for the same grid dimensions
@@ -962,20 +908,21 @@ void do_sub_command()
    //
    // Output valid time
    //
-   nc_valid_time = valid_time1;
+   nc_valid_time = plus.valid();
 
    //
    // Output initialization time
    // Error if init_time1 != init_time2.
    //
-   if(init_time1 != init_time2) {
+   if(plus.init() != minus.init()) {
       mlog << Error << "\ndo_sub_command() -> "
-           << "init_time1 (" << init_time1_str
-           <<  ") must be equal to init_time2 (" << init_time2_str
+           << "init_time1 (" << unix_to_yyyymmdd_hhmmss(plus.init())
+           <<  ") must be equal to init_time2 ("
+           << unix_to_yyyymmdd_hhmmss(minus.init())
            << ") for subtraction.\n\n";
       exit(1);
    }
-   nc_init_time = init_time1;
+   nc_init_time = plus.init();
 
    //
    // Output accumulation time
@@ -983,9 +930,9 @@ void do_sub_command()
    //
    if(accum[0] < accum[1]) {
       mlog << Error << "\ndo_sub_command() -> "
-           << "accum1 (" << accum1_str
+           << "accum1 (" << sec_to_hhmmss(accum[0])
            <<  ") must be greater than accum2 ("
-           << accum2_str << ") for subtraction.\n\n";
+           << sec_to_hhmmss(accum[1]) << ") for subtraction.\n\n";
       exit(1);
    }
    nc_accum = accum[0] - accum[1];
@@ -1031,10 +978,9 @@ void do_sub_command()
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_field(const char * filename, 
-               int get_accum, unixtime & init_ut, unixtime & valid_ut, 
-               Grid & grid, 
-               DataPlane & plane)
+void get_field(const char * filename, const int get_accum,
+               const unixtime get_init_ut, const unixtime get_valid_ut,
+               Grid & grid, DataPlane & plane)
 
 {
 
@@ -1054,10 +1000,13 @@ if ( !datafile )  {
 
 }
 
+   //
+   // Initialize the VarInfo object and store the requested
+   // timing information
+   //
 var.set_magic(make_magic(grib_code, grib_ptv, get_accum));
-
-var.set_valid  (valid_ut);
-var.set_init   (init_ut);
+var.set_valid(get_valid_ut);
+var.set_init(get_init_ut);
 
 if ( ! datafile->data_plane(var, plane) )  {
 
@@ -1090,7 +1039,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    ConcatString var_str;
    ConcatString tmp_str, tmp2_str;
    ConcatString command_str;
-   ConcatString accum1_str, accum2_str;
 
    NcFile *f_out   = (NcFile *) 0;
    NcDim  *lat_dim = (NcDim *)  0;
@@ -1115,15 +1063,11 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    if(run_command == sum) {
 
-      accum1_str = sec_to_hhmmss(in_accum);
-
       command_str << cs_erase 
                   << "Sum: " << n_files << " files with accumulations of " 
-                  << accum1_str << '.';
+                  << sec_to_hhmmss(in_accum) << '.';
 
    } else if(run_command == add) {
-
-      accum1_str = sec_to_hhmmss(in_accum);
 
       command_str << cs_erase 
                   << "Addition: " << n_files << " files.";
@@ -1131,19 +1075,15 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    }
    else { // run_command == subtract
 
-      accum1_str = sec_to_hhmmss(accum[0]);
-
-      accum2_str = sec_to_hhmmss(accum[1]);
-
       command_str << cs_erase
                   << "Subtraction: "
                   << in_file[0]
                   << " with accumulation of "
-                  << accum1_str
+                  << sec_to_hhmmss(accum[0])
                   << " minus "
                   << in_file[1]
                   << " with accumulation of "
-                  << accum2_str << '.';
+                  << sec_to_hhmmss(accum[1]) << '.';
 
    }
 
