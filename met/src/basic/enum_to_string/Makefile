@@ -77,15 +77,15 @@ gen_sources: $(GEN_SOURCES)
 
 
 info.o: info.h info.cc
-	$(CXX) info.cc     -c $(FLAGS)
+	$(CXX) info.cc     -c $(CXX_FLAGS)
 
 
 scope.o: scope.h scope.cc info.o
-	$(CXX) scope.cc    -c $(FLAGS)
+	$(CXX) scope.cc    -c $(CXX_FLAGS)
 
 
 code.o: code.h code.cc info.o
-	$(CXX) code.cc     -c $(FLAGS) -I$(MET_INC_DIR) -DMET_BASE_DIR=\"$(MET_BASE_DIR)\" 
+	$(CXX) code.cc     -c $(CXX_FLAGS) -I$(MET_INC_DIR) -DMET_BASE_DIR=\"$(MET_BASE_DIR)\"
 
 
 enum.tab.c: enum.y info.o code.o scope.o
@@ -93,7 +93,7 @@ enum.tab.c: enum.y info.o code.o scope.o
 
 
 enum.tab.o: enum.tab.c
-	$(CXX) enum.tab.c  -c $(FLAGS)
+	$(CXX) enum.tab.c  -c $(CXX_FLAGS)
 
 
 lex.yy.c: enum.l enum.tab.o code.o scope.o
@@ -105,7 +105,7 @@ lex.yy.c: enum.l enum.tab.o code.o scope.o
 
 
 lex.yy.o: lex.yy.c
-	$(CXX) lex.yy.c    -c $(FLAGS) > /dev/null 2>&1
+	$(CXX) lex.yy.c    -c $(CXX_FLAGS) > /dev/null 2>&1
 
 
 ########################################################################
@@ -126,7 +126,7 @@ lex.yy.o: lex.yy.c
 
 enum_to_string: enum_to_string.cc lex.yy.o enum.tab.o $(OBJECTS)
 	@ echo
-	$(CXX) enum_to_string.cc lex.yy.o enum.tab.o info.o code.o scope.o $(FLAGS) -o enum_to_string -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_cal -lm
+	$(CXX) enum_to_string.cc lex.yy.o enum.tab.o info.o code.o scope.o $(CXX_FLAGS) -o enum_to_string -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_cal -lm
 	rm -f $(MET_BIN_DIR)/enum_to_string
 	cp enum_to_string $(MET_BIN_DIR)
 
