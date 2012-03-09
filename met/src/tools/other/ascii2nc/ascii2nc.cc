@@ -456,7 +456,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       if(check_reg_exp(yyyymmdd_hhmmss_reg_exp, hdr_vld) != true) {
          mlog << Error << "\nwrite_met_obs() -> "
               << "valid time is not in the expected YYYYMMDD_HHMMSS format: "
-              << hdr_vld << "/n/n";
+              << hdr_vld << "\n\n";
          exit(1);
       }
 
