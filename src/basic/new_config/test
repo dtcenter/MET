@@ -1,0 +1,89 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Test config file
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+   //
+   //  dictionary
+   //
+
+fcst = {
+
+   valid = 1234567890;
+
+   lead = 3600;
+
+   field = "TMP";
+
+   filename = "/home/user/data/file.nc";
+
+      //
+      //  dictionary inside dictionary
+      //
+
+   other = {
+
+     hello = 5;
+
+     there = "There!";
+
+     threshs = [ >= 15, <= 25, < 10, > 150 ];
+
+   }
+
+}
+
+   //
+   //  assign dictionary
+   //
+
+obs = fcst;
+
+
+/*
+
+   commented out
+
+*/
+
+   //
+   //  boolean
+   //
+
+ignore_user = true;
+
+
+
+ptv_flag = 5;
+
+yabba = "doo";
+
+thresholds = [ >= 15, <= 25, < 10, > 150 ];
+
+fields = [ "TMP", "UWIND", "RH" ];
+
+   //  algebraic function
+
+centroid_dist_if (x) = 3*x^2 + 2;
+
+   //  piecewise-linear function
+
+other_if (x) = { (0, 0) (1, 1) (5, 1) }
+
+   //
+   //  environment variables
+   //
+
+path = "$(MY_MET_BIN_DIR)/stuff";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
