@@ -20,6 +20,8 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
+#include "vx_cal.h"
+
 #include "scanner_stuff.h"
 
 
@@ -71,18 +73,25 @@ const char *      bison_input_filename  = (const char *) 0;
 
    Comparison cval;
 
+   unixtime tval;
+
 }
 
 
 %token IDENTIFIER QUOTED_STRING INTEGER FLOAT BOOLEAN
-%token COMPARISON
+%token COMPARISON TIMESTAMP
 
 
 %type <text> IDENTIFIER QUOTED_STRING
+
 %type <nval> FLOAT
 %type <nval> INTEGER BOOLEAN
 %type <nval> number
+
 %type <cval> COMPARISON
+
+%type <tval> TIMESTAMP
+
 
 %left '+' '-'
 %left '*' '/'
@@ -100,6 +109,7 @@ assignment_list : assignment
 
 assignment : IDENTIFIER '=' number ';'
            | IDENTIFIER '=' BOOLEAN ';'
+           | IDENTIFIER '=' TIMESTAMP ';'
            | IDENTIFIER '=' IDENTIFIER ';'
            | IDENTIFIER '=' QUOTED_STRING ';'
            | IDENTIFIER '=' dictionary

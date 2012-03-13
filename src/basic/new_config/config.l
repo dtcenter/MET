@@ -16,6 +16,8 @@ using namespace std;
 
 #include <iostream>
 
+#include "vx_cal.h"
+
 #include "scanner_stuff.h"   //  must be included before config.tab.h
 
 #include "config.tab.h"
@@ -68,6 +70,10 @@ static void patch_env(char * text);
 
 static void get_env_text(const char * line, char * env_text, int len);
 
+static void do_timestamp1();
+static void do_timestamp2();
+static void do_timestamp3();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,6 +122,12 @@ IDENTIFIER ({LETTER})({LETTER}|{DIGIT})*
 "="                                 { ++Column;  return ( configtext[0] ); }
 ";"                                 { ++Column;  return ( configtext[0] ); }
 ","                                 { ++Column;  return ( configtext[0] ); }
+
+
+{DIGIT}{8}"_"{DIGIT}{2}             { do_timestamp1();  return ( TIMESTAMP ); }
+{DIGIT}{8}"_"{DIGIT}{4}             { do_timestamp2();  return ( TIMESTAMP ); }
+{DIGIT}{8}"_"{DIGIT}{6}             { do_timestamp3();  return ( TIMESTAMP ); }
+
 
 
 "\""                                { do_quoted_string();  return ( QUOTED_STRING ); }
@@ -612,6 +624,93 @@ memset(env_text, 0, len);
 
 strncpy(env_text, line + 2, n);
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_timestamp1()   //  YYYYMMDD_HH
+
+{
+
+int j;
+int month, day, year, hour;
+
+j = sscanf(configtext, "%4d%2d%2d_%2d", &year, &month, &day, &hour);
+
+if ( j != 4 )  {
+
+   cerr << "\n\n  do_timestamp1() -> can't parse string \"" << configtext << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+configlval.tval = mdyhms_to_unix(month, day, year, hour, 0, 0);
+
+Column += strlen(configtext);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_timestamp2()   //  YYYYMMDD_HHMM
+
+{
+
+int j;
+int month, day, year, hour, minute;
+
+j = sscanf(configtext, "%4d%2d%2d_%2d%2d", &year, &month, &day, &hour, &minute);
+
+if ( j != 5 )  {
+
+   cerr << "\n\n  do_timestamp2() -> can't parse string \"" << configtext << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+configlval.tval = mdyhms_to_unix(month, day, year, hour, minute, 0);
+
+Column += strlen(configtext);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_timestamp3()   //  YYYYMMDD_HHMMSS
+
+{
+
+int j;
+int month, day, year, hour, minute, second;
+
+j = sscanf(configtext, "%4d%2d%2d_%2d%2d%2d", &year, &month, &day, &hour, &minute, &second);
+
+if ( j != 6 )  {
+
+   cerr << "\n\n  do_timestamp3() -> can't parse string \"" << configtext << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+configlval.tval = mdyhms_to_unix(month, day, year, hour, minute, second);
+
+Column += strlen(configtext);
 
 return;
 

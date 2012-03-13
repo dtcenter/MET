@@ -70,7 +70,7 @@ config.tab.c: config.y scanner_stuff.h
 
 config.tab.o: config.tab.c
 	@ echo
-	$(COMPILER) config.tab.c -c $(FLAGS)
+	$(COMPILER) config.tab.c -c $(FLAGS) -I$(MET_INC_DIR)
 
 
 lex.config.c: config.l config.tab.o scanner_stuff.h
@@ -80,7 +80,7 @@ lex.config.c: config.l config.tab.o scanner_stuff.h
 
 lex.config.o: lex.config.c
 	@ echo
-	$(COMPILER) lex.config.c -c -g
+	$(COMPILER) lex.config.c -c -g -I$(MET_INC_DIR)
 
 
 ########################################################################
@@ -101,7 +101,7 @@ lex.config.o: lex.config.c
 
 test_read: test_read.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) test_read.cc lex.config.o config.tab.o $(FLAGS) -o test_read -lm
+	$(COMPILER) test_read.cc lex.config.o config.tab.o $(FLAGS) -o test_read -L$(MET_LIB_DIR) -lvx_cal -lm
 
 
 ########################################################################
