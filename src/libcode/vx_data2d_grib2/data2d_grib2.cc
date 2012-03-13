@@ -492,12 +492,12 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
       //  build a LatLonData struct with the projection information
       LatLonData data;
       data.name         = latlon_proj_type;
-      data.delta_lat    = (double)(gfld->igdtmpl[16]) / 1000000;
-      data.delta_lon    = (double)(gfld->igdtmpl[17]) / 1000000;
+      data.delta_lat    = (double)gfld->igdtmpl[16] / 1000000.0;
+      data.delta_lon    = (double)gfld->igdtmpl[17] / 1000000.0;
       data.Nlat         = gfld->igdtmpl[8];
       data.Nlon         = gfld->igdtmpl[7];
-      data.lat_ll       = ((double)(gfld->igdtmpl[11]) / 1000000) - (double)data.Nlat * data.delta_lat;
-      data.lon_ll       = 360 - (double)(gfld->igdtmpl[12]) / 1000000;
+      data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0) - (double)data.Nlat * data.delta_lat;
+      data.lon_ll       = 360 - (double)gfld->igdtmpl[12] / 1000000.0;
 
       //  set the data grid information
       n_x = data.Nlon;
@@ -536,13 +536,13 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
       StereographicData data;
       data.name         = stereographic_proj_type;
       data.hemisphere   = hem;
-      data.scale_lat    = (double)(gfld->igdtmpl[12]) / 1000000;
-      data.lat_pin      = (double)(gfld->igdtmpl[9]) / 1000000;
-      data.lon_pin      = 360 - (double)(gfld->igdtmpl[10]) / 1000000;
+      data.scale_lat    = (double)gfld->igdtmpl[12] / 1000000.0;
+      data.lat_pin      = (double)gfld->igdtmpl[9] / 1000000.0;
+      data.lon_pin      = 360 - (double)gfld->igdtmpl[10] / 1000000.0;
       data.x_pin        = 0;     //PGO depends on ScanMode?
       data.y_pin        = 0;
-      data.lon_orient   = 360 - (double)(gfld->igdtmpl[13]) / 1000000;
-      data.d_km         = gfld->igdtmpl[14] / 1000000;
+      data.lon_orient   = 360 - (double)gfld->igdtmpl[13] / 1000000.0;
+      data.d_km         = (double)gfld->igdtmpl[14] / 1000000.0;
       data.r_km         = r_km;
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
@@ -576,10 +576,10 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
 
       MercatorData data;
       data.name   = mercator_proj_type;
-      data.lat_ll = (double)(gfld->igdtmpl[8]) / 1000000;   //PGO depends on ScanMode?
-      data.lon_ll = (double)(gfld->igdtmpl[9]) / 1000000;
-      data.lat_ur = (double)(gfld->igdtmpl[12]) / 1000000;
-      data.lon_ur = (double)(gfld->igdtmpl[13]) / 1000000;
+      data.lat_ll = (double)gfld->igdtmpl[8] / 1000000.0;   //PGO depends on ScanMode?
+      data.lon_ll = (double)gfld->igdtmpl[9] / 1000000.0;
+      data.lat_ur = (double)gfld->igdtmpl[12] / 1000000.0;
+      data.lon_ur = (double)gfld->igdtmpl[13] / 1000000.0;
       data.ny     = gfld->igdtmpl[7];
       data.nx     = gfld->igdtmpl[8];
 
@@ -608,15 +608,15 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
       //  build a LambertData struct with the projection information
       LambertData data;
       data.name         = lambert_proj_type;
-      data.scale_lat_1  = gfld->igdtmpl[18] / 1000000;
-      data.scale_lat_2  = gfld->igdtmpl[19] / 1000000;
-      data.lat_pin      = gfld->igdtmpl[9]  / 1000000;
-      data.lon_pin      = 360 - gfld->igdtmpl[10] / 1000000;
+      data.scale_lat_1  = (double)gfld->igdtmpl[18] / 1000000.0;
+      data.scale_lat_2  = (double)gfld->igdtmpl[19] / 1000000.0;
+      data.lat_pin      = (double)gfld->igdtmpl[9]  / 1000000.0;
+      data.lon_pin      = 360 - (double)gfld->igdtmpl[10] / 1000000.0;
       data.x_pin        = 0;     //PGO depends on ScanMode?
       data.y_pin        = 0;
-      data.lon_orient   = 360 - gfld->igdtmpl[13] / 1000000;
-      data.d_km         = gfld->igdtmpl[14] / 1000000;
-      data.r_km         = r_km;
+      data.lon_orient   = 360 - (double)gfld->igdtmpl[13] / 1000000.0;
+      data.d_km         = (double)gfld->igdtmpl[14] / 1000000.0;
+      data.r_km         = 6371.20;  //PGO jimmied...  r_km;
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
 
@@ -661,13 +661,6 @@ bool MetGrib2DataFile::read_data_plane( DataPlane &plane,
    int n_x = _Grid->nx();
    int n_y = _Grid->ny();
 
-   //  verify the scan mode
-   if( 7 < ScanMode ){
-      mlog << Error << "MetGrib2DataFile::data_plane() found unrecognized ScanMode ("
-           << ScanMode << ")\n\n";
-      exit(1);
-   }
-
    //  determine whether or not the data bitmap applies
    bool apply_bmap = ( 0 == gfld->ibmap || 254 == gfld->ibmap );
 
@@ -687,14 +680,14 @@ bool MetGrib2DataFile::read_data_plane( DataPlane &plane,
          //  determine the data index, depending on the scan mode
          int idx_data;
          switch(ScanMode){
-         case 0:  idx_data = (n_y - y - 1)*n_x + x;               break;
-         case 1:  idx_data = (n_y - y - 1)*n_x + (n_x - x - 1);   break;
-         case 2:  idx_data =             y*n_x + x;               break;
-         case 3:  idx_data =             y*n_x + (n_x - x - 1);   break;
-         case 4:  idx_data =             x*n_y + (n_y - y - 1);   break;
-         case 5:  idx_data = (n_x - x - 1)*n_y + (n_x - x - 1);   break;
-         case 6:  idx_data =             x*n_y + y;               break;
-         case 7:  idx_data = (n_x - x - 1)*n_y + y;               break;
+         case 0:   /* 0000 0000 */ idx_data = (n_y - y - 1)*n_x + x;               break;
+         case 128: /* 1000 0000 */ idx_data = (n_y - y - 1)*n_x + (n_x - x - 1);   break;
+         case 64:  /* 0100 0000 */ idx_data =             y*n_x + x;               break;
+         case 192: /* 1100 0000 */ idx_data =             y*n_x + (n_x - x - 1);   break;
+         case 32:  /* 0010 0000 */ idx_data =             x*n_y + (n_y - y - 1);   break;
+         case 160: /* 1010 0000 */ idx_data = (n_x - x - 1)*n_y + (n_x - x - 1);   break;
+         case 96:  /* 0110 0000 */ idx_data =             x*n_y + y;               break;
+         case 224: /* 1110 0000 */ idx_data = (n_x - x - 1)*n_y + y;               break;
          default:
             mlog << Error << "MetGrib2DataFile::data_plane() found unrecognized ScanMode ("
                  << ScanMode << ")\n\n";
@@ -703,7 +696,7 @@ bool MetGrib2DataFile::read_data_plane( DataPlane &plane,
 
          //  add the current value to the data plane, if it contains valid data
          plane.set(
-            apply_bmap && 0 != gfld->bmap[idx_data] ?
+            !apply_bmap || 0 != gfld->bmap[idx_data] ?
                (float)gfld->fld[idx_data] :
                bad_data_float,
             x,
