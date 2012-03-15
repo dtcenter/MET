@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <map>
+#include <vector>
 
 using namespace std;
 
@@ -32,6 +33,35 @@ static const char * const CONFIG_GRIB2_Process    = "GRIB2_Process";
 static const char * const CONFIG_GRIB2_EnsType    = "GRIB2_EnsType";
 static const char * const CONFIG_GRIB2_DerType    = "GRIB2_DerType";
 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Functionality and data members related to GRIB2 indexes and parameter
+//    names - intended to be later factored into a class that reads flat files
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void init_var_maps();
+
+extern map<string,string> map_id;
+extern multimap<string,string> map_code;
+
+
+//
+// GRIB2 table lookups
+//
+
+const char*        g2_id_parm(const char* id);
+const char*        g2_id_lookup(const char* id);
+int                g2_id_count(const char* id);
+vector<string>     g2_code_lookup(const char* code);
+int                g2_code_count(const char* code);
+
+inline const char* g2_id_lookup (const char* id)    { return map_id[id].data();     }
+inline int         g2_id_count  (const char* id)    { return map_id.count(id);      }
+inline int         g2_code_count(const char* code)  { return map_code.count(code);  }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class VarInfoGrib2 : public VarInfo
@@ -44,6 +74,8 @@ class VarInfoGrib2 : public VarInfo
          //
 
       // QUESTION: How many of these are necessary for filtering input records?
+
+      int Record;     // Record number of interest
 
       // Section 0
       int Discipline; // Discipline of Processed Data
@@ -63,11 +95,6 @@ class VarInfoGrib2 : public VarInfo
       void init_from_scratch();
       void assign(const VarInfoGrib2 &);
 
-      void init_var_maps();
-
-      map<string,string> map_id;
-      map<string,string> map_code;
-
    public:
       VarInfoGrib2();
       ~VarInfoGrib2();
@@ -82,6 +109,7 @@ class VarInfoGrib2 : public VarInfo
          //
 
       GrdFileType file_type()   const;
+      int         record()      const;
       int         discipline()  const;
       int         m_table()     const;
       int         l_table()     const;
@@ -120,23 +148,15 @@ class VarInfoGrib2 : public VarInfo
       bool is_wind_speed()        const;
       bool is_wind_direction()    const;
 
-
-         //
-         // GRIB2 table lookups
-         //
-
-      static LevelType   g2_lty_to_level_type(int lt);
-      static double      g2_time_range_unit_to_sec(int ind);
-      const char*        g2_id_lookup(const char* id);
-      int                g2_id_count(const char* id);
-      const char*        g2_code_lookup(const char* code);
-      int                g2_code_count(const char* code);
+      static LevelType g2_lty_to_level_type(int lt);
+      static double    g2_time_range_unit_to_sec(int ind);
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 inline GrdFileType VarInfoGrib2::file_type()  const { return(FileType_Gb2); }
+inline int         VarInfoGrib2::record()     const { return(Record);   }
 inline int         VarInfoGrib2::discipline() const { return(Discipline);   }
 inline int         VarInfoGrib2::m_table()    const { return(MTable);       }
 inline int         VarInfoGrib2::l_table()    const { return(LTable);       }
@@ -146,11 +166,6 @@ inline int         VarInfoGrib2::parm()       const { return(Parm);         }
 inline int         VarInfoGrib2::process()    const { return(Process);      }
 inline int         VarInfoGrib2::ens_type()   const { return(EnsType);      }
 inline int         VarInfoGrib2::der_type()   const { return(DerType);      }
-
-inline const char* VarInfoGrib2::g2_id_lookup(const char* id)     { return map_id[id].data();     }
-inline int         VarInfoGrib2::g2_id_count(const char* id)      { return map_id.count(id);      }
-inline const char* VarInfoGrib2::g2_code_lookup(const char* code) { return map_code[code].data(); }
-inline int         VarInfoGrib2::g2_code_count(const char* code)  { return map_code.count(code);  }
 
 ////////////////////////////////////////////////////////////////////////
 

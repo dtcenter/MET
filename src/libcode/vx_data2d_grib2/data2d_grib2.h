@@ -31,6 +31,7 @@ typedef struct {
    int FieldNum;
    int Discipline;
    int PdsTmpl;
+   ConcatString ParmName;
    int ParmCat;
    int Parm;
    int LvlTyp;

@@ -74,6 +74,8 @@ void MetGrib2DataFile::grib2_init_from_scratch() {
 
    ScanMode = -1;
 
+   init_var_maps();
+
    return;
 }
 
@@ -132,20 +134,30 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
        it++ ) {
 
       bool rec_match = false;
-      if( vinfo_g2->discipline() == (*it)->Discipline &&
-          vinfo_g2->parm_cat()   == (*it)->ParmCat    &&
-          vinfo_g2->parm()       == (*it)->Parm       ){
+
+      //  test for a record number match
+      if( vinfo_g2->record() == (*it)->RecNum ){
+         rec_match = true;
+      }
+
+      //  test for a index match
+      else if(
+               ( vinfo_g2->discipline() == (*it)->Discipline &&
+                 vinfo_g2->parm_cat()   == (*it)->ParmCat    &&
+                 vinfo_g2->parm()       == (*it)->Parm       ) ||
+               vinfo_g2->name() == (*it)->ParmName
+             ){
 
          if( LevelType_Accum == vinfo_lty ){
 
-            double sec_accum_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (*it)->RangeTyp );
+            double sec_accum_unit = vinfo_g2->g2_time_range_unit_to_sec( (*it)->RangeTyp );
             rec_match = (lvl1 == (*it)->RangeVal * (int)sec_accum_unit);
 
          } else if( LevelType_RecNumber == vinfo_lty && lvl1 == (*it)->RecNum ){
 
             rec_match = true;
 
-         } else if( vinfo_lty == VarInfoGrib2::g2_lty_to_level_type((*it)->LvlTyp) ){
+         } else if( vinfo_lty == vinfo_g2->g2_lty_to_level_type((*it)->LvlTyp) ){
 
             double rec_lvl1 = (double)((*it)->LvlVal1);
             double rec_lvl2 = (double)((*it)->LvlVal1);
@@ -167,7 +179,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    time( &time_seek );
    sec_to_hms( (int)time_seek - (int)time_start, hh, mm, ss );
    sprintf(time_buf, "Seek time: %02d:%02d:%02d", hh, mm, ss);
-   mlog << Debug(3) << time_buf << "\n";
+   mlog << Debug(4) << time_buf << "\n";
 
    //  verify that a single record was found
    if( 1 < listMatch.size() ){
@@ -194,7 +206,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    update_var_info(vinfo_g2, listMatch[0]);
    if( -1 == read_grib2_record(offset, 1, 1, gfld, cgrib, numfields) ){
-      mlog << Error << "MetGrib2DataFile::data_plane() - failed to read record at offset "
+      mlog << Error << "\nMetGrib2DataFile::data_plane() - failed to read record at offset "
            << offset << " and field number " << listMatch[0]->FieldNum << "\n\n";
       exit(1);
    }
@@ -206,7 +218,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    time( &time_read );
    sec_to_hms( (int)time_read - (int)time_seek, hh, mm, ss );
    sprintf(time_buf, "Read time:  %02d:%02d:%02d", hh, mm, ss);
-   mlog << Debug(3) << time_buf << "\n";
+   mlog << Debug(4) << time_buf << "\n";
 
    g2_free(gfld);
    delete [] cgrib;
@@ -240,20 +252,30 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
       bool rec_match_ex = false;
       bool rec_match_rn = false;
-      if( vinfo_g2->discipline() == (*it)->Discipline &&
-          vinfo_g2->parm_cat()   == (*it)->ParmCat    &&
-          vinfo_g2->parm()       == (*it)->Parm       ){
+
+      //  test for a record number match
+      if( vinfo_g2->record() == (*it)->RecNum ){
+         rec_match_ex = true;
+      }
+
+      //  test for a index match
+      else if(
+               ( vinfo_g2->discipline() == (*it)->Discipline &&
+                 vinfo_g2->parm_cat()   == (*it)->ParmCat    &&
+                 vinfo_g2->parm()       == (*it)->Parm       ) ||
+               vinfo_g2->name() == (*it)->ParmName
+             ){
 
          if( LevelType_Accum == vinfo_lty ){
 
-            double sec_accum_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (*it)->RangeTyp );
+            double sec_accum_unit = vinfo_g2->g2_time_range_unit_to_sec( (*it)->RangeTyp );
             rec_match_ex = (lvl1 == (*it)->RangeVal * (int)sec_accum_unit);
 
          } else if( LevelType_RecNumber == vinfo_lty && lvl1 == (*it)->RecNum ){
 
             rec_match_ex = true;
 
-         } else if( vinfo_lty == VarInfoGrib2::g2_lty_to_level_type((*it)->LvlTyp) ){
+         } else if( vinfo_lty == vinfo_g2->g2_lty_to_level_type((*it)->LvlTyp) ){
 
             double rec_lvl1 = (double)((*it)->LvlVal1);
             double rec_lvl2 = (double)((*it)->LvlVal1);
@@ -268,7 +290,6 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
       }
 
-
       if( rec_match_ex )                 listMatchExact.push_back(*it);
       if( rec_match_ex || rec_match_rn ) listMatchRange.push_back(*it);
 
@@ -278,7 +299,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    time( &time_seek );
    sec_to_hms( (int)time_seek - (int)time_start, hh, mm, ss );
    sprintf(time_buf, "Seek time: %02d:%02d:%02d", hh, mm, ss);
-   mlog << Debug(3) << time_buf << "\n";
+   mlog << Debug(4) << time_buf << "\n";
 
    //  verify that a single record was found
    if( 1 < listMatchExact.size() ){
@@ -305,7 +326,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
    update_var_info(vinfo_g2, listMatchExact[0]);
    if( -1 == read_grib2_record(offset, 1, 1, gfld, cgrib, numfields) ){
-      mlog << Error << "MetGrib2DataFile::data_plane() - failed to read record at offset "
+      mlog << Error << "\nMetGrib2DataFile::data_plane() - failed to read record at offset "
            << offset << " and field number " << listMatchExact[0]->FieldNum << "\n\n";
       exit(1);
    }
@@ -319,7 +340,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    time( &time_read );
    sec_to_hms( (int)time_read - (int)time_seek, hh, mm, ss );
    sprintf(time_buf, "Read time:  %02d:%02d:%02d", hh, mm, ss);
-   mlog << Debug(3) << time_buf << "\n";
+   mlog << Debug(4) << time_buf << "\n";
 
    g2_free(gfld);
    delete [] cgrib;
@@ -331,10 +352,10 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
 void MetGrib2DataFile::update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec){
    ConcatString parm_id = "";
-   parm_id << rec->ParmCat << "_" << rec->Parm;
+   parm_id << rec->Discipline << "_" << rec->ParmCat << "_" << rec->Parm;
 
-   if( !vinfo->g2_id_count( parm_id ) ){
-      mlog << Error << "MetGrib2DataFile::update_var_info() - no record found with id "
+   if( !g2_id_count( parm_id ) ){
+      mlog << Error << "\nMetGrib2DataFile::update_var_info() - no record found with id "
            << parm_id << "\n\n";
       exit(1);
    }
@@ -342,9 +363,9 @@ void MetGrib2DataFile::update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec){
    //  parse the variable name from the table information
    char** mat = NULL;
    const char* pat_mag = "^([^\\|]+)\\s+\\|\\s+([^\\|]+)\\s+\\|\\s+(.+\\S)\\s*$";
-   if( 4 != regex_apply(pat_mag, 4, vinfo->g2_id_lookup( parm_id ), mat) ){
-      mlog << Error << "\nVarInfoGrib2::set_magic - failed to parse GRIB2 table map_id information '"
-           << vinfo->g2_id_lookup( parm_id ) << "'\n\n";
+   if( 4 != regex_apply(pat_mag, 4, g2_id_lookup( parm_id ), mat) ){
+      mlog << Error << "\nMetGrib2DataFile::update_var_info - failed to parse GRIB2 table "
+           << "map_id information '" << g2_id_lookup( parm_id ) << "'\n\n";
       exit(1);
    }
 
@@ -408,6 +429,11 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->LvlVal2      = gfld->ipdtmpl[14];
          rec->RangeTyp     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
          rec->RangeVal     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
+
+         ConcatString id;
+         id << rec->Discipline << "_" << rec->ParmCat << "_" << rec->Parm;
+         rec->ParmName = g2_id_parm(id);
+
          RecList.push_back(rec);
 
          g2_free(gfld);
@@ -425,7 +451,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
    time( &time_read );
    sec_to_hms( (int)time_read - (int)time_start, hh, mm, ss );
    sprintf(time_buf, "Table build time: %02d:%02d:%02d", hh, mm, ss);
-   mlog << Debug(3) << time_buf << "\n";
+   mlog << Debug(4) << time_buf << "\n";
 
 }
 
