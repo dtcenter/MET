@@ -3,20 +3,24 @@
 ########################################################################
 
 
-EXECUTABLES = test_read  \
+EXECUTABLES = test_config  \
 
 
 ########################################################################
 
 
-OBJECTS     = config.tab.o  \
-              lex.config.o  \
+OBJECTS     = configobjecttype_to_string.o  \
+              dictionary.o                  \
+              config.tab.o                  \
+              lex.config.o                  \
+              config_file.o                 \
 
 
 ########################################################################
 
 
-GEN_SOURCES =
+GEN_SOURCES = configobjecttype_to_string.h   \
+              configobjecttype_to_string.cc  \
 
 
 ########################################################################
@@ -63,7 +67,23 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
 
 
-config.tab.c: config.y scanner_stuff.h
+configobjecttype_to_string.h configobjecttype_to_string.cc: object_types.h
+	@ echo
+	@ rm -f configobjecttype_to_string.h configobjecttype_to_string.cc
+	@ $(ENUM_TO_STRING) -concat_string object_types.h
+
+
+configobjecttype_to_string.o: configobjecttype_to_string.h configobjecttype_to_string.cc
+	@ echo
+	$(COMPILER) configobjecttype_to_string.cc -c $(FLAGS) -I$(MET_INC_DIR)
+
+
+dictionary.o: dictionary.h dictionary.cc configobjecttype_to_string.o
+	@ echo
+	$(COMPILER) dictionary.cc -c $(FLAGS) -I$(MET_INC_DIR)
+
+
+config.tab.c: config.y scanner_stuff.h dictionary.o
 	@ echo
 	$(YACC) config.y
 
@@ -77,10 +97,14 @@ lex.config.c: config.l config.tab.o scanner_stuff.h
 	@ echo
 	$(LEX) config.l
 
-
 lex.config.o: lex.config.c
 	@ echo
 	$(COMPILER) lex.config.c -c -g -I$(MET_INC_DIR)
+
+
+config_file.o: config_file.h config_file.cc configobjecttype_to_string.o dictionary.o config.tab.o lex.config.o
+	@ echo
+	$(COMPILER) config_file.cc -c -g -I$(MET_INC_DIR)
 
 
 ########################################################################
@@ -99,9 +123,9 @@ lex.config.o: lex.config.c
    ##
 
 
-test_read: test_read.cc $(OBJECTS)
+test_config: test_config.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) test_read.cc lex.config.o config.tab.o $(FLAGS) -o test_read -L$(MET_LIB_DIR) -lvx_cal -lm
+	$(COMPILER) test_config.cc config_file.o dictionary.o configobjecttype_to_string.o lex.config.o config.tab.o $(FLAGS) -o test_config -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_cal -lvx_log -lm
 
 
 ########################################################################

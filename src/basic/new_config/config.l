@@ -16,11 +16,13 @@ using namespace std;
 
 #include <iostream>
 
-#include "vx_cal.h"
+#include "vx_log.h"   //  must be included before config.tab.h
 
 #include "scanner_stuff.h"   //  must be included before config.tab.h
 
 #include "config.tab.h"
+
+#include "dictionary.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -36,11 +38,13 @@ extern int LineNumber;
 
 extern int Column;
 
+extern DictionaryStack * dict_stack;
+
+extern bool is_lhs;
+
 
 ////////////////////////////////////////////////////////////////////////
 
-
-static int comment_depth = 0;
 
 static bool reading_string = false;
 
@@ -64,15 +68,9 @@ static void do_float();
 
 static void do_quoted_string();
 
-static void do_env();
-
 static void patch_env(char * text);
 
 static void get_env_text(const char * line, char * env_text, int len);
-
-static void do_timestamp1();
-static void do_timestamp2();
-static void do_timestamp3();
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,21 +79,21 @@ static void do_timestamp3();
 %}
 
 
-DIGIT     [0-9]
+DIGIT       [0-9]
 
-DIGITS    [0-9]+
+DIGITS      {DIGIT}+
 
-LETTER    [A-Z]|[a-z]|"_"
+LETTER      [A-Z]|[a-z]|"_"
 
-LETTERS   ([A-Z]|[a-z]|"_")+
+LETTERS     {LETTER}+
 
-WS        " "|"\t"
+IDENTIFIER  {LETTER}({LETTER}|{DIGIT})*
 
-EXP       (e|E)(-?){DIGITS}
+EXP         (e|E)(-?){DIGITS}
 
-OPT_EXP   {EXP}?
+OPT_EXP     {EXP}?
 
-IDENTIFIER ({LETTER})({LETTER}|{DIGIT})*
+WS          [ \n\t]*
 
 
 %%
@@ -108,7 +106,7 @@ IDENTIFIER ({LETTER})({LETTER}|{DIGIT})*
 
 "["                                 { ++Column;  return ( configtext[0] ); }
 "]"                                 { ++Column;  return ( configtext[0] ); }
-"{"                                 { ++Column;  return ( configtext[0] ); }
+"{"                                 { ++Column;  is_lhs = true;  dict_stack->push(); return ( configtext[0] ); }
 "}"                                 { ++Column;  return ( configtext[0] ); }
 "("                                 { ++Column;  return ( configtext[0] ); }
 ")"                                 { ++Column;  return ( configtext[0] ); }
@@ -124,15 +122,8 @@ IDENTIFIER ({LETTER})({LETTER}|{DIGIT})*
 ","                                 { ++Column;  return ( configtext[0] ); }
 
 
-{DIGIT}{8}"_"{DIGIT}{2}             { do_timestamp1();  return ( TIMESTAMP ); }
-{DIGIT}{8}"_"{DIGIT}{4}             { do_timestamp2();  return ( TIMESTAMP ); }
-{DIGIT}{8}"_"{DIGIT}{6}             { do_timestamp3();  return ( TIMESTAMP ); }
-
-
 
 "\""                                { do_quoted_string();  return ( QUOTED_STRING ); }
-
-"${"{IDENTIFIER}"}"                 { do_env(); }
 
 {IDENTIFIER}                        { return ( do_id() ); }
 
@@ -228,13 +219,13 @@ void do_c_comment()
 {
 
 int c1, c2;
+int comment_depth;
 
 
 c1 = nextchar();
 c2 = nextchar();
 
 comment_depth = 1;
-
 
 while ( 1 )  {
 
@@ -256,7 +247,9 @@ while ( 1 )  {
 
 }
 
-
+   //
+   //  done
+   //
 
 return;
 
@@ -278,13 +271,16 @@ else if ( strcmp(configtext, "<=") == 0 )  configlval.cval = comparison_le;
 else if ( strcmp(configtext, ">=") == 0 )  configlval.cval = comparison_ge;
 else {
 
-   cerr << "\n\n  do_comp() -> bad comparison operator ... \"" << configtext << "\"\n\n";
+   mlog << Error
+        << "\n\n  do_comp() -> bad comparison operator ... \"" << configtext << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-
+   //
+   //  done
+   //
 
 return ( COMPARISON );
 
@@ -300,11 +296,7 @@ void do_int()
 
 Column += strlen(configtext);
 
-configlval.nval.is_int = true;
-
-configlval.nval.i = atoi(configtext);
-
-configlval.nval.d = 0.0;
+set_int(configlval.nval, atoi(configtext));
 
 return;
 
@@ -320,11 +312,7 @@ void do_float()
 
 Column += strlen(configtext);
 
-configlval.nval.is_int = false;
-
-configlval.nval.d = atof(configtext);
-
-configlval.nval.i = 0;
+set_double(configlval.nval, atof(configtext));
 
 return;
 
@@ -391,7 +379,8 @@ while ( 1 )  {
 
    if ( (n + 1) >= (int) sizeof(line) )  {
 
-      cerr << "\n\n  do_quoted_string() -> string too long! ... c = \"" << c << "\"\n\n";
+      mlog << Error
+           << "\n\n  do_quoted_string() -> string too long! ... c = \"" << c << "\"\n\n";
 
       exit ( 1 );
 
@@ -426,77 +415,44 @@ int do_id()
 
 Column += strlen(configtext);
 
+   //
+   //  boolean?
+   //
+
 if ( strcmp(configtext, "true"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
 if ( strcmp(configtext, "false" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
+
+   //
+   //  number?
+   //
+
+const DictionaryEntry * e = dict_stack->lookup(configtext);
+
+if ( e && (e->is_number()) && (! is_lhs) )  {
+
+   if ( e->type() == IntegerType )  {
+
+      set_int(configlval.nval, e->i_value());
+
+      return ( INTEGER ); 
+
+   } else {
+
+      set_double(configlval.nval, e->d_value());
+
+      return ( FLOAT ); 
+
+   }
+
+}
+
+   //
+   //  nope
+   //
 
 strncpy(configlval.text, configtext, sizeof(configlval.text) - 1);
 
 return ( IDENTIFIER );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void do_env()
-
-{
-
-int n;
-char junk[256];
-char * value = (char *) 0;
-
-
-
-memset(junk, 0, sizeof(junk));
-
-n = strlen(yytext);
-
-if ( n >= (int) (sizeof(junk) - 1) )  {
-
-   cerr << "\n\n  do_env() -> environment variable name too long\n\n";
-
-   exit ( 1 );
-
-}
-
-strncpy(junk, yytext + 2, sizeof(junk) - 1);
-
-junk[n - 3] = (char) 0;
-
-// cout << "environment variable \"" << junk << "\"\n" << flush;
-
-value = getenv(junk);
-
-if ( !value )  {
-
-   cerr << "\n\n  do_env() -> can't get value of environment variable \"" << junk << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-// static const int max_buf_stack_size = 2;
-//
-// static YY_BUFFER_STATE buf_stack[max_buf_stack_size];
-//
-// static int buf_stack_depth = 0;
-
-file_buffer = YY_CURRENT_BUFFER;
-
-reading_string = true;
-
-config_scan_string(value);
-
-
-   //
-   //  done
-   //
-
-Column += 3;
-
-return;
 
 }
 
@@ -513,7 +469,6 @@ char c, cc;
 char line[max_id_length + 1];
 char env_text[max_id_length + 1];
 const char * e = (const char *) 0;
-
 
 memset(line, 0, sizeof(line));
 
@@ -543,7 +498,8 @@ for (j=0; j<n; ++j)  {
 
          if ( !e )  {
 
-            cerr << "\n\n  patch_env() -> environment variable \"" << env_text << "\" not found!\n\n";
+            mlog << Error
+                 << "\n\n  patch_env() -> environment variable \"" << env_text << "\" not found!\n\n";
 
             exit ( 1 );
 
@@ -553,7 +509,8 @@ for (j=0; j<n; ++j)  {
 
          if ( (k + nn) >= max_id_length )  {
 
-            cerr << "\n\n  patch_env() -> replacement text for environment variable \"" << env_text << "\" too long!\n\n";
+            mlog << Error
+                 << "\n\n  patch_env() -> replacement text for environment variable \"" << env_text << "\" too long!\n\n";
 
             exit ( 1 );
 
@@ -572,7 +529,8 @@ for (j=0; j<n; ++j)  {
 
    if ( k >= max_id_length )  {
 
-      cerr << "\n\n  patch_env() -> string too long!\n\n";
+      mlog << Error
+           << "\n\n  patch_env() -> string too long!\n\n";
 
       exit ( 1 );
 
@@ -604,7 +562,8 @@ const char * c = strchr(line + 2, '}');
 
 if ( !c )  {
 
-   cerr << "\n\n  get_env_text() -> closing bracket not found in string \"" << line << "\"\n\n";
+   mlog << Error
+        << "\n\n  get_env_text() -> closing bracket not found in string \"" << line << "\"\n\n";
 
    exit ( 1 );
 
@@ -614,7 +573,8 @@ int n = (int) (c - (line + 2));
 
 if ( n >= len )  {
 
-   cerr << "\n\n  get_env_text() -> environment variable text too long in \"" << line << "\"\n\n";
+   mlog << Error
+        << "\n\n  get_env_text() -> environment variable text too long in \"" << line << "\"\n\n";
 
    exit ( 1 );
 
@@ -624,93 +584,6 @@ memset(env_text, 0, len);
 
 strncpy(env_text, line + 2, n);
 
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void do_timestamp1()   //  YYYYMMDD_HH
-
-{
-
-int j;
-int month, day, year, hour;
-
-j = sscanf(configtext, "%4d%2d%2d_%2d", &year, &month, &day, &hour);
-
-if ( j != 4 )  {
-
-   cerr << "\n\n  do_timestamp1() -> can't parse string \"" << configtext << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-configlval.tval = mdyhms_to_unix(month, day, year, hour, 0, 0);
-
-Column += strlen(configtext);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void do_timestamp2()   //  YYYYMMDD_HHMM
-
-{
-
-int j;
-int month, day, year, hour, minute;
-
-j = sscanf(configtext, "%4d%2d%2d_%2d%2d", &year, &month, &day, &hour, &minute);
-
-if ( j != 5 )  {
-
-   cerr << "\n\n  do_timestamp2() -> can't parse string \"" << configtext << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-configlval.tval = mdyhms_to_unix(month, day, year, hour, minute, 0);
-
-Column += strlen(configtext);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void do_timestamp3()   //  YYYYMMDD_HHMMSS
-
-{
-
-int j;
-int month, day, year, hour, minute, second;
-
-j = sscanf(configtext, "%4d%2d%2d_%2d%2d%2d", &year, &month, &day, &hour, &minute, &second);
-
-if ( j != 6 )  {
-
-   cerr << "\n\n  do_timestamp3() -> can't parse string \"" << configtext << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-configlval.tval = mdyhms_to_unix(month, day, year, hour, minute, second);
-
-Column += strlen(configtext);
 
 return;
 

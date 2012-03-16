@@ -109,6 +109,8 @@ class ConcatString {
 
       const char * text() const;
 
+      const char * contents() const;   //  returns "(nul)" if the string is empty
+
       int length() const;   //  not including trailing nul
 
       int precision() const;

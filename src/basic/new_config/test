@@ -16,9 +16,9 @@
 
 fcst = {
 
-   valid = 20120322_12;
+   valid = "20120322_12";
 
-   lead = 3600;
+   lead = "360000";
 
    field = "TMP";
 
@@ -69,19 +69,15 @@ thresholds = [ >= 15, <= 25, < 10, > 150 ];
 
 fields = [ "TMP", "UWIND", "RH" ];
 
-   //  algebraic function
-
-centroid_dist_if (x) = 3*x^2 + 2;
-
    //  piecewise-linear function
 
-other_if (x) = { (0, 0) (1, 1) (5, 1) }
+other_if = [ (0, 0) (1, 1) (5, 1) ];
 
    //
    //  environment variables
    //
 
-path = "$(MY_MET_BIN_DIR)/stuff";
+path = "${MY_MET_BIN_DIR}/stuff";
 
 
 ////////////////////////////////////////////////////////////////////////
