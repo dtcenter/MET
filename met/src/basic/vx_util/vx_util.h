@@ -48,6 +48,8 @@
 #include "threshold.h"
 #include "util_constants.h"
 #include "two_to_one.h"
+#include "bool_to_string.h"
+#include "empty_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////

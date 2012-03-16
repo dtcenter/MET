@@ -88,7 +88,10 @@ HEADERS     =  util_constants.h \
                interp_mthd.h \
                two_to_one.h \
                interp_util.h \
-               vx_util.h
+               bool_to_string.h \
+               empty_string.h \
+               vx_util.h  \
+
 
 
 ########################################################################
