@@ -337,20 +337,20 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
    else                      lt = LevelType_None;
    Level.set_type(lt);
 
-   //  set the name
-   ConcatString lvl_name = "";
-   lvl_name << lvl_type.data() << lvl1_str.data();
-   if( -1 != lvl2 ) lvl_name << "-" << lvl2_str.data();
-   Level.set_req_name(lvl_name);
-   Level.set_name(lvl_name);
-
-   //  arrange the pressure level values appropriately
+   //  arrange the level values appropriately
    lvl2 = ( lvl2 != lvl1 ? lvl2 : -1 );
-   if( -1 != lvl2 && lvl2 < lvl1 ){
+   if( lvl_type == "P" && -1 != lvl2 && lvl2 < lvl1 ){
       int lvl_tmp = lvl2;
       lvl2 = lvl1;
       lvl1 = lvl_tmp;
    }
+
+   //  set the level name
+   ConcatString lvl_name;
+   if( lvl2 != -1 ) lvl_name.format("%s%d-%d", lvl_type.data(), lvl2, lvl1);
+   else             lvl_name.format("%s%d",    lvl_type.data(), lvl1);
+   Level.set_req_name(lvl_name);
+   Level.set_name(lvl_name);
 
    //  set the lower limit
    if(lt == LevelType_Accum) Level.set_lower(timestring_to_sec( lvl1_str.data() ));
@@ -365,7 +365,8 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
    }
 
    //  set the upper level value
-   Level.set_upper( -1 == lvl2 ? lvl1 : lvl2 );
+   if(lt == LevelType_Accum) Level.set_upper(timestring_to_sec( lvl1_str.data() ));
+   else                      Level.set_upper(-1 == lvl2 ? lvl1 : lvl2);
 
    //  if the level type is a record number, set the data member
    Record = ( lt == LevelType_RecNumber ? lvl1 : -1 );

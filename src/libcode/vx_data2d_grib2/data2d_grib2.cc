@@ -185,18 +185,19 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    if( 1 < listMatch.size() ){
       ConcatString msg = "";
       for(size_t i=0; i < listMatch.size(); i++) msg << (i ? ", " : "") << listMatch[i]->RecNum;
-      mlog << Error << "MetGrib2DataFile::data_plane() - multiple matching records found for '"
+      mlog << Warning << "MetGrib2DataFile::data_plane() - Multiple matching records found for '"
            << vinfo_g2->magic_str() << "' - " << msg << "\n\n";
-      exit(1);
    } else if( 1 > listMatch.size() ){
-      mlog << Error << "MetGrib2DataFile::data_plane() - no matching record found for '"
+      mlog << Warning << "MetGrib2DataFile::data_plane() - No matching record found for '"
            << vinfo_g2->magic_str() << "'\n\n";
-      exit(1);
+      return false;
    }
 
    //  report the matched record
-   mlog << Debug(3) << "Matched record " << listMatch[0]->RecNum << " - "
-        << listMatch[0]->NumFields << " field(s)\n";
+   mlog << Debug(3) << "MetGrib2DataFile::data_plane() - Found exact match for \""
+        << vinfo_g2->magic_str() << "\" in GRIB2 record " << listMatch[0]->RecNum
+        << " field " << listMatch[0]->FieldNum << " of GRIB2 file \""
+        << Filename << "\"\n";
 
    //  read the record
    gribfield  *gfld;
@@ -206,7 +207,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    update_var_info(vinfo_g2, listMatch[0]);
    if( -1 == read_grib2_record(offset, 1, 1, gfld, cgrib, numfields) ){
-      mlog << Error << "\nMetGrib2DataFile::data_plane() - failed to read record at offset "
+      mlog << Error << "\nMetGrib2DataFile::data_plane() - Failed to read record at offset "
            << offset << " and field number " << listMatch[0]->FieldNum << "\n\n";
       exit(1);
    }
@@ -301,51 +302,95 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    sprintf(time_buf, "Seek time: %02d:%02d:%02d", hh, mm, ss);
    mlog << Debug(4) << time_buf << "\n";
 
-   //  verify that a single record was found
+   vector<Grib2Record*> listRead = listMatchExact;
+
+   //  if multiple exact matches were found, bail
    if( 1 < listMatchExact.size() ){
       ConcatString msg = "";
       for(size_t i=0; i < listMatchExact.size(); i++) msg << (i ? ", " : "") << listMatchExact[i]->RecNum;
-      mlog << Error << "MetGrib2DataFile::data_plane() - multiple matching records found for '"
-           << vinfo_g2->magic_str() << "' - " << msg << "\n\n";
-      exit(1);
-   } else if( 1 > listMatchExact.size() ){
-      mlog << Error << "MetGrib2DataFile::data_plane() - no matching record found for '"
+      mlog << Warning << "\nMetGrib2DataFile::data_plane_array() - Multiple exact matching records found for \""
+           << vinfo_g2->magic_str() << "\" - records " << msg << "\n\n";
+
+      listRead[0] = listMatchExact[0];
+   }
+
+   //  if a single exact match was found, read it
+   else if( 1 == listMatchExact.size() ){
+
+      //  report the matched record
+      mlog << Debug(3) << "MetGrib2DataFile::data_plane_array() - Found exact match for \""
+           << vinfo_g2->magic_str() << "\" in GRIB2 record " << listMatchExact[0]->RecNum
+           << " field " << listMatchExact[0]->FieldNum << " of GRIB2 file \""
+           << Filename << "\"\n";
+
+   }
+
+   //  if range matches were found, read them
+   else if( 0 < listMatchRange.size() ){
+
+      ConcatString msg = "";
+      for(size_t i=0; i < listMatchRange.size(); i++) msg << (i ? ", " : "") << listMatchRange[i]->RecNum;
+      mlog << Debug(3) << "MetGrib2DataFile::data_plane_array() - Found range match for \""
+           << vinfo_g2->magic_str() << "\" in GRIB2 records " << msg << " of GRIB2 file \""
+           << Filename << "\"\n";
+
+      listRead = listMatchRange;
+
+   }
+
+   //  if nothing was found, bail
+   else {
+
+      mlog << Warning << "\nMetGrib2DataFile::data_plane_array() - no matching record found for '"
            << vinfo_g2->magic_str() << "'\n\n";
-      exit(1);
+      return 0;
+
    }
 
-   //  report the matched record
-   mlog << Debug(3) << "Matched record " << listMatchExact[0]->RecNum << " - "
-        << listMatchExact[0]->NumFields << " field(s)\n";
+   //  read the matched data planes into a data plane array
+   int num_read = 0;
+   for( vector<Grib2Record*>::iterator it = listRead.begin();
+       it < listRead.end();
+       it++ ) {
 
-   //  read the record
-   gribfield  *gfld;
-   unsigned char *cgrib;
-   long offset = listMatchExact[0]->ByteOffset;
-   g2int numfields;
+      //  read the record
+      gribfield  *gfld;
+      unsigned char *cgrib;
+      long offset = (*it)->ByteOffset;
+      g2int numfields;
 
-   update_var_info(vinfo_g2, listMatchExact[0]);
-   if( -1 == read_grib2_record(offset, 1, 1, gfld, cgrib, numfields) ){
-      mlog << Error << "\nMetGrib2DataFile::data_plane() - failed to read record at offset "
-           << offset << " and field number " << listMatchExact[0]->FieldNum << "\n\n";
-      exit(1);
+      update_var_info(vinfo_g2, (*it));
+      if( -1 == read_grib2_record(offset, 1, 1, gfld, cgrib, numfields) ){
+         mlog << Error << "\nMetGrib2DataFile::data_plane_array() - failed to read "
+              << "record at offset " << offset << " and field number "
+              << (*it)->FieldNum << "\n\n";
+         exit(1);
+      }
+
+      //  build the data plane
+      DataPlane plane;
+      num_read += read_data_plane(plane, gfld) ? 1 : 0;
+
+      //  add the data plane to the array at the specified level(s)
+      double lvl_lower = (double)(*it)->LvlVal1, lvl_upper = (double)(*it)->LvlVal2;
+      if( LevelType_Pres == vinfo_g2->g2_lty_to_level_type((*it)->LvlTyp) ){
+         lvl_lower = ( (double)(*it)->LvlVal1 ) / 100.0;
+         lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
+      }
+      plane_array.add(plane, lvl_lower, lvl_upper);
+
+      //  print the read time
+      time( &time_read );
+      sec_to_hms( (int)time_read - (int)time_seek, hh, mm, ss );
+      sprintf(time_buf, "Read time:  %02d:%02d:%02d", hh, mm, ss);
+      mlog << Debug(4) << time_buf << "\n";
+
+      g2_free(gfld);
+      delete [] cgrib;
+
    }
 
-   //  build the data plane
-   DataPlane plane;
-   bool read_success = read_data_plane(plane, gfld);
-   plane_array.add(plane, listMatchExact[0]->LvlVal1, listMatchExact[0]->LvlVal2);
-
-   //  print the read time
-   time( &time_read );
-   sec_to_hms( (int)time_read - (int)time_seek, hh, mm, ss );
-   sprintf(time_buf, "Read time:  %02d:%02d:%02d", hh, mm, ss);
-   mlog << Debug(4) << time_buf << "\n";
-
-   g2_free(gfld);
-   delete [] cgrib;
-
-   return read_success;
+   return num_read;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -355,7 +400,7 @@ void MetGrib2DataFile::update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec){
    parm_id << rec->Discipline << "_" << rec->ParmCat << "_" << rec->Parm;
 
    if( !g2_id_count( parm_id ) ){
-      mlog << Error << "\nMetGrib2DataFile::update_var_info() - no record found with id "
+      mlog << Error << "\nMetGrib2DataFile::update_var_info() - No record found with id "
            << parm_id << "\n\n";
       exit(1);
    }
@@ -370,16 +415,26 @@ void MetGrib2DataFile::update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec){
    }
 
    //  set the var_info parameter info
-   ConcatString name  = mat[1]; name.ws_strip();  vinfo->set_name     ( name  );
+   ConcatString name  = mat[1]; name.ws_strip();
+   if( name == "APCP" ){
+      int accum = atoi( sec_to_hhmmss( (int)vinfo->level().lower() ).text() );
+      if( 0 == accum % 10000 ) accum /= 10000;
+      ConcatString name_apcp;
+      name_apcp.format("%s_%02d", name.text(), accum);
+      name = name_apcp.text();
+   }
+   vinfo->set_name( name );
    ConcatString units = mat[2]; units.ws_strip(); vinfo->set_units    ( units );
    ConcatString lname = mat[3]; lname.ws_strip(); vinfo->set_long_name( lname );
 
    //  set the level name
+   /*
    ConcatString lvl_name = "";
    int lvl_val = (int)(vinfo->level().type() == LevelType_Pres ? rec->LvlVal1 / 100 : rec->LvlVal1);
    lvl_name << vinfo->level().name() << lvl_val;
    vinfo->level().set_req_name( lvl_name );
    vinfo->level().set_name( lvl_name );
+   */
 
    regex_clean(mat);
 
@@ -419,14 +474,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ByteOffset   = offset;
          rec->NumFields    = (int)numfields;
          rec->RecNum       = rec_num;
-         rec->FieldNum     = i+1;
+         rec->FieldNum     = i;
          rec->Discipline   = gfld->discipline;
          rec->PdsTmpl      = gfld->ipdtnum;
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->LvlTyp       = gfld->ipdtmpl[9];
          rec->LvlVal1      = gfld->ipdtmpl[11];
-         rec->LvlVal2      = gfld->ipdtmpl[14];
+         rec->LvlVal2      = 255 != gfld->ipdtmpl[12] ? gfld->ipdtmpl[14] : rec->LvlVal1;
          rec->RangeTyp     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
          rec->RangeVal     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
 
@@ -532,7 +587,7 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(3) << "\n"
+      mlog << Debug(4) << "\n"
            << "Latitude/Longitude Grid Data:\n"
            << "     lat_ll: " << data.lat_ll << "\n"
            << "     lon_ll: " << data.lon_ll << "\n"
@@ -580,7 +635,7 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(3) << "\n"
+      mlog << Debug(4) << "\n"
            << "Stereographic Grid Data:\n"
            << "  hemisphere: " << data.hemisphere << "\n"
            << "   scale_lat: " << data.scale_lat << "\n"
@@ -616,7 +671,7 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(3) << "\n"
+      mlog << Debug(4) << "\n"
            << "Mercator Data:\n"
            << "  lat_ll: " << data.lat_ll << "\n"
            << "  lon_ll: " << data.lon_ll << "\n"
@@ -653,7 +708,7 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(3) << "\n"
+      mlog << Debug(4) << "\n"
            << "Lambert Conformal Grid Data:\n"
            << "  scale_lat_1: " << data.scale_lat_1 << "\n"
            << "  scale_lat_2: " << data.scale_lat_2 << "\n"
@@ -738,7 +793,8 @@ bool MetGrib2DataFile::read_data_plane( DataPlane &plane,
 
    //  initialize the forecast time information
    unixtime ValidTime = -1;
-   unixtime InitTime = -1;
+   unixtime InitTime  = -1;
+   unixtime LeadTime  = -1;
    unixtime ref_time = mdyhms_to_unix(gfld->idsect[6], gfld->idsect[7], gfld->idsect[5],
                                       gfld->idsect[8], gfld->idsect[9], gfld->idsect[10]);
 
@@ -754,18 +810,40 @@ bool MetGrib2DataFile::read_data_plane( DataPlane &plane,
          exit(1);
    }
 
-   //  determine the time unit of the lead time and calculate it
-   double sec_lead_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (int)gfld->ipdtmpl[7] );
-   if( 0 >= sec_lead_unit ){
-      mlog << Error << "\nMetGrib2DataFile::data_plane() found unexpected lead time unit of "
-           << gfld->ipdtmpl[7] << "\n\n";
-      exit(1);
-   }
-   unixtime LeadTime = sec_lead_unit * gfld->ipdtmpl[8];
+   //  calculate the lead, valid and init time depending on the PDS template
+   //  template 0 is typically non-accum fields
+   if( 0 == gfld->ipdtnum ){
 
-   //  set the forecast time information
-   if( -1 == ValidTime )   ValidTime = InitTime  + LeadTime;
-   if( -1 == InitTime  )   InitTime  = ValidTime - LeadTime;
+      //  determine the time unit of the lead time and calculate it
+      double sec_lead_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (int)gfld->ipdtmpl[7] );
+      if( 0 >= sec_lead_unit ){
+         mlog << Error << "\nMetGrib2DataFile::data_plane() found unexpected lead time unit of "
+              << gfld->ipdtmpl[7] << "\n\n";
+         exit(1);
+      }
+      LeadTime = sec_lead_unit * gfld->ipdtmpl[8];
+
+      //  set the forecast time information
+      if( -1 == ValidTime )   ValidTime = InitTime  + LeadTime;
+      if( -1 == InitTime  )   InitTime  = ValidTime - LeadTime;
+
+   }
+
+   //  template 8 is typically accum fields
+   else if( 8 == gfld->ipdtnum ){
+
+      ValidTime = mdyhms_to_unix(gfld->ipdtmpl[16], gfld->ipdtmpl[17], gfld->ipdtmpl[15],
+                                 gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[20]);
+
+      if( -1 == InitTime ){
+         mlog << Error << "\nMetGrib2DataFile::data_plane() - Init time not set when calculating "
+              << "APCP valid time\n\n";
+         exit(1);
+      }
+
+      LeadTime = ValidTime - InitTime;
+
+   }
    plane.set_init  ( InitTime );
    plane.set_valid ( ValidTime );
    plane.set_lead  ( LeadTime );
@@ -779,7 +857,7 @@ bool MetGrib2DataFile::read_data_plane( DataPlane &plane,
    //  print a report
    double plane_min, plane_max;
    plane.data_range(plane_min, plane_max);
-   mlog << Debug(3) << "\n"
+   mlog << Debug(4) << "\n"
         << "Data plane information:\n"
         << "    plane min: " << plane_min << "\n"
         << "    plane max: " << plane_max << "\n"
