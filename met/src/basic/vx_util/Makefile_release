@@ -56,10 +56,12 @@ LIBRARIES   =  libvx_util.a
 HEADERS     =  util_constants.h \
                ascii_table.h \
                asciitablejust_to_string.h \
+							 bool_to_string.h \
                check_endian.h \
                comma_string.h \
                conversions.h \
                data_line.h \
+							 empty_string.h \
                grib_constants.h \
                int_array.h \
                is_number.h \
