@@ -39,6 +39,7 @@ typedef struct {
    double LvlVal2;
    int RangeTyp;
    int RangeVal;
+   int ResCompFlag;
 } Grib2Record;
 
 
@@ -57,6 +58,9 @@ class MetGrib2DataFile : public Met2dDataFile {
       FILE *FileGrib2;
 
       vector <Grib2Record*> RecList;
+
+      map<string,string> PairMap;
+      map<string,Grib2Record*> NameRecMap;
 
       int ScanMode;
 
@@ -80,6 +84,11 @@ class MetGrib2DataFile : public Met2dDataFile {
       void read_grib2_record_list();
 
       void update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec);
+
+      DataPlane check_uv_rotation( VarInfoGrib2 *vinfo,
+                                   Grib2Record *rec,
+                                   DataPlane plane
+                                 );
 
    public:
 
@@ -113,6 +122,8 @@ class MetGrib2DataFile : public Met2dDataFile {
       void close ();
 
       void dump(ostream &, int = 0) const;
+
+      static const char* build_magic(Grib2Record *rec);
 
 };
 
