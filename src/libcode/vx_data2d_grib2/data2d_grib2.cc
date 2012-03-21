@@ -20,6 +20,7 @@ using namespace std;
 #include <list>
 
 #include "data2d_grib2.h"
+#include "vx_data2d.h"
 #include "vx_math.h"
 #include "vx_log.h"
 
@@ -75,6 +76,9 @@ void MetGrib2DataFile::grib2_init_from_scratch() {
    ScanMode = -1;
 
    init_var_maps();
+
+   PairMap["UGRD"] = "VGRD";
+   PairMap["VGRD"] = "UGRD";
 
    return;
 }
@@ -140,12 +144,12 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          rec_match = true;
       }
 
-      //  test for a index match
+      //  test for a index/parameter match
       else if(
                ( vinfo_g2->discipline() == (*it)->Discipline &&
                  vinfo_g2->parm_cat()   == (*it)->ParmCat    &&
                  vinfo_g2->parm()       == (*it)->Parm       ) ||
-               vinfo_g2->name() == (*it)->ParmName
+               vinfo_g2->name()         == (*it)->ParmName
              ){
 
          if( LevelType_Accum == vinfo_lty ){
@@ -206,7 +210,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    g2int numfields;
 
    update_var_info(vinfo_g2, listMatch[0]);
-   if( -1 == read_grib2_record(offset, 1, 1, gfld, cgrib, numfields) ){
+   if( -1 == read_grib2_record(offset, 1, listMatch[0]->FieldNum, gfld, cgrib, numfields) ){
       mlog << Error << "\nMetGrib2DataFile::data_plane() - Failed to read record at offset "
            << offset << " and field number " << listMatch[0]->FieldNum << "\n\n";
       exit(1);
@@ -214,6 +218,9 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    //  build the data plane
    bool read_success = read_data_plane(plane, gfld);
+
+   //  check the data plane for wind rotation
+   plane = check_uv_rotation(vinfo_g2, listMatch[0], plane);
 
    //  print the read time
    time( &time_read );
@@ -264,7 +271,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
                ( vinfo_g2->discipline() == (*it)->Discipline &&
                  vinfo_g2->parm_cat()   == (*it)->ParmCat    &&
                  vinfo_g2->parm()       == (*it)->Parm       ) ||
-               vinfo_g2->name() == (*it)->ParmName
+               vinfo_g2->name()         == (*it)->ParmName
              ){
 
          if( LevelType_Accum == vinfo_lty ){
@@ -359,7 +366,10 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
       long offset = (*it)->ByteOffset;
       g2int numfields;
 
+      //  update the VarInfo object with the details of the current record
       update_var_info(vinfo_g2, (*it));
+
+      //  read the grib2 record
       if( -1 == read_grib2_record(offset, 1, 1, gfld, cgrib, numfields) ){
          mlog << Error << "\nMetGrib2DataFile::data_plane_array() - failed to read "
               << "record at offset " << offset << " and field number "
@@ -371,9 +381,12 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
       DataPlane plane;
       num_read += read_data_plane(plane, gfld) ? 1 : 0;
 
+      //  check the data plane for wind rotation
+      plane = check_uv_rotation(vinfo_g2, *it, plane);
+
       //  add the data plane to the array at the specified level(s)
       double lvl_lower = (double)(*it)->LvlVal1, lvl_upper = (double)(*it)->LvlVal2;
-      if( LevelType_Pres == vinfo_g2->g2_lty_to_level_type((*it)->LvlTyp) ){
+      if( LevelType_Pres == VarInfoGrib2::g2_lty_to_level_type((*it)->LvlTyp) ){
          lvl_lower = ( (double)(*it)->LvlVal1 ) / 100.0;
          lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
       }
@@ -442,6 +455,55 @@ void MetGrib2DataFile::update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec){
 
 ////////////////////////////////////////////////////////////////////////
 
+DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *rec, DataPlane plane){
+
+   //  if the field is present in the pair map, find the corresponding record
+   string parm_name = vinfo->name().text();
+   if( PairMap.count( parm_name ) && (rec->ResCompFlag & 8) ){
+      ConcatString pair_mag = build_magic( rec );
+      pair_mag.replace(parm_name.data(), PairMap[parm_name].data());
+
+      if( NameRecMap.count( pair_mag.text() ) ){
+
+         Grib2Record* rec_pair = NameRecMap[pair_mag.text()];
+
+         //  read the record
+         gribfield  *gfld_pair;
+         unsigned char *cgrib_pair;
+         long offset_pair = rec_pair->ByteOffset;
+         g2int numfields_pair;
+
+         if( -1 == read_grib2_record(offset_pair, 1, rec_pair->FieldNum, gfld_pair, cgrib_pair, numfields_pair) ){
+            mlog << Error << "\nMetGrib2DataFile::data_plane_array() - failed to read "
+                 << "pair record at offset " << rec->ByteOffset << " and field number "
+                 << rec_pair->FieldNum << "\n\n";
+            exit(1);
+         }
+
+         //  build the data plane
+         DataPlane plane_pair;
+         read_data_plane(plane_pair, gfld_pair);
+
+         mlog << Debug(3) << "MetGrib2DataFile::data_plane_array() - Found pair match \""
+              << pair_mag << "\" in GRIB2 record " << rec_pair->RecNum << " field "
+              << rec_pair->FieldNum << "\n";
+
+         //  rotate the winds
+         DataPlane u2d, v2d, u2d_rot, v2d_rot;
+         if( 'U' == parm_name.at(0) ){ u2d = plane;  v2d = plane_pair; }
+         else                        { v2d = plane;  u2d = plane_pair; }
+         rotate_uv_grid_to_earth(u2d, v2d, *_Grid, u2d_rot, v2d_rot);
+         if( 'U' == parm_name.at(0) ){ plane = u2d_rot; }
+         else                        { plane = v2d_rot; }
+      }
+
+   }
+
+   return plane;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void MetGrib2DataFile::read_grib2_record_list() {
 
    gribfield  *gfld;
@@ -459,8 +521,10 @@ void MetGrib2DataFile::read_grib2_record_list() {
    //  read all the records into the record list, pulling grid information from the first
    while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, cgrib, numfields)) ){
 
+      //  read the grid information, if necessary
       if( !_Grid || 1 > _Grid->nx() || 1 > _Grid->ny() ) read_grid(gfld);
 
+      //  treat each field of the record as a separate record
       for(int i=1; i <= numfields; i++){
 
          //  validate the PDS template number
@@ -470,6 +534,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
             exit(1);
          }
 
+         //  store the record information
          Grib2Record *rec = new Grib2Record;
          rec->ByteOffset   = offset;
          rec->NumFields    = (int)numfields;
@@ -479,25 +544,34 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->PdsTmpl      = gfld->ipdtnum;
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
-         rec->LvlTyp       = gfld->ipdtmpl[9];
+         rec->LvlTyp       = (8 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
          rec->LvlVal1      = gfld->ipdtmpl[11];
          rec->LvlVal2      = 255 != gfld->ipdtmpl[12] ? gfld->ipdtmpl[14] : rec->LvlVal1;
          rec->RangeTyp     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
          rec->RangeVal     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
+         rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
 
+         //  build the parameter "name"
          ConcatString id;
          id << rec->Discipline << "_" << rec->ParmCat << "_" << rec->Parm;
          rec->ParmName = g2_id_parm(id);
 
+         //  add the record to the list
          RecList.push_back(rec);
+
+         //PGO - build data structure for U/V wind pairs
+         string rec_mag = build_magic(rec);
+         NameRecMap[rec_mag] = rec;
 
          g2_free(gfld);
          delete [] cgrib;
 
-         if( i <= numfields ) read_grib2_record(offset, 0, i, gfld, cgrib, numfields);
+         //  if there are more fields in the current record, read the next one
+         if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, cgrib, numfields);
 
       }
 
+      //  set for the next record
       rec_num++;
       offset = offset_next;
    }
@@ -651,7 +725,7 @@ void MetGrib2DataFile::read_grid( gribfield *gfld ){
    }
 
    //  mercator
-   else if( 20 == gfld->igdtnum ){
+   else if( 10 == gfld->igdtnum ){
 
       ScanMode = gfld->igdtmpl[14];
 
@@ -869,3 +943,40 @@ bool MetGrib2DataFile::read_data_plane( DataPlane &plane,
 
    return(true);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+const char* MetGrib2DataFile::build_magic(Grib2Record *rec){
+
+   ConcatString lvl = "";
+   int lvl_val1 = (int)rec->LvlVal1, lvl_val2 = (int)rec->LvlVal2;
+   switch( VarInfoGrib2::g2_lty_to_level_type(rec->LvlTyp) ){
+		case LevelType_Accum:
+		   lvl = "A";
+		   lvl_val1 = rec->RangeVal * (int)VarInfoGrib2::g2_time_range_unit_to_sec(rec->RangeTyp);
+		   lvl_val1 = atoi( sec_to_hhmmss( lvl_val1 ) );
+		   lvl_val1 = (0 == lvl_val1 % 10000 ? lvl_val1 / 10000 : lvl_val1);
+		   lvl_val2 = lvl_val1;
+		   break;
+		case LevelType_Vert:       lvl = "Z";     break;
+		case LevelType_RecNumber:  lvl = "R";     break;
+		case LevelType_None:       lvl = "L";     break;
+      case LevelType_Pres:
+         lvl = "P";
+         lvl_val1 /= 100;
+         lvl_val2 /= 100;
+         break;
+      default: break;
+   }
+
+   ConcatString ret;
+   if( rec->LvlVal1 == rec->LvlVal2 ){
+      ret.format("%s/%s%d", rec->ParmName.text(), lvl.text(), lvl_val1);
+   } else {
+      ret.format("%s/%s%d-%d", rec->ParmName.text(), lvl.text(), lvl_val1, lvl_val2);
+   }
+
+   string ret_str = ret.text();
+   return ret_str.data();
+}
+

@@ -316,4 +316,48 @@ void regex_clean(char** &mat)
    mat = NULL;
 }
 
+////////////////////////////////////////////////////////////////////////
 
+const char* str_replace(const char* data, const char* old, const char* repl){
+   string str = data;
+   size_t pos = str.find( old );
+   if( string::npos == pos ) return "";
+   str.replace(pos, strlen(old), repl);
+   return str.data();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char* str_replace_all(const char* data, const char* old, const char* repl){
+   string str = data;
+   while( string::npos != str.find(old) ) str = str_replace(str.c_str(), old, repl);
+   return str.c_str();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char* str_format(const char *fmt, ...){
+   va_list vl;
+   va_start(vl, fmt);
+   char *buf = new char[max_str_len];
+   int status = vsprintf(buf, fmt, vl);
+   va_end(vl);
+
+   if( status >= max_str_len - 1 ){
+      mlog << Error << "\nstr_format() - overwrote buffer\n\n";
+      exit(1);
+   }
+
+   string ret = buf;
+   delete [] buf;
+   return ret.data();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char* str_trim(const char *str){
+   string dat = str;
+   while( ' ' == dat.at(0) )              dat.replace(0,              1, "");
+   while( ' ' == dat.at(dat.size() - 1) ) dat.replace(dat.size() - 1, 1, "");
+   return dat.c_str();
+}
