@@ -48,10 +48,10 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 
 var_info_grib2.o: var_info_grib2.cc
-	$(CXX) var_info_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) var_info_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GRIB2C_INCS)
 
 data2d_grib2.o: data2d_grib2.cc
-	$(CXX) data2d_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) data2d_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GRIB2C_INCS)
 
 
 ########################################################################
