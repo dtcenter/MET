@@ -82,7 +82,8 @@ data2d_factory_utils.o: data2d_factory_utils.h data2d_factory_utils.cc
 	$(CXX) data2d_factory_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 data2d_factory.o: data2d_factory.cc
-	$(CXX) data2d_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) data2d_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) \
+		$(NETCDF_INCS) $(GRIB2C_INCS)
 
 
 ########################################################################
