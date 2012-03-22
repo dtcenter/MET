@@ -92,7 +92,6 @@ is_grib_file.o: is_grib_file.h is_grib_file.cc
 is_bufr_file.o: is_bufr_file.h is_bufr_file.cc
 	$(CXX) is_bufr_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
-#	$(CXX) var_info_factory.cc $(CXX_FLAGS) -DWITH_GRIB2=$(WITH_GRIB2) -c 
 var_info_factory.o: var_info_factory.cc
 	$(CXX) var_info_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c \
 		-I$(MET_INC_DIR) $(GRIB2C_INCS) $(GRIB2C_LIBS) $(G2SUP_LIBS)
@@ -100,7 +99,6 @@ var_info_factory.o: var_info_factory.cc
 data2d_factory_utils.o: data2d_factory_utils.h data2d_factory_utils.cc
 	$(CXX) data2d_factory_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
-#	$(CXX) data2d_factory.cc $(CXX_FLAGS) -DWITH_GRIB2=$(WITH_GRIB2) -c 
 data2d_factory.o: data2d_factory.cc
 	$(CXX) data2d_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c \
 		-I$(MET_INC_DIR) $(NETCDF_INCS) $(GRIB2C_INCS) $(GRIB2C_LIBS) $(G2SUP_LIBS)
@@ -141,7 +139,6 @@ test_is_grib: $(LIBRARIES) test_is_grib.cc
 	-lvx_util \
 	-lvx_log
 
-#	$(CXX_FLAGS) -DWITH_GRIB2=$(WITH_GRIB2) 
 test_var_info: $(LIBRARIES) test_var_info.cc
 	$(CXX) -o test_var_info test_var_info.cc \
 	$(CXX_FLAGS) $(ARCH_FLAGS) \
