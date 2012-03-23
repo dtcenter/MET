@@ -91,7 +91,7 @@ double interp_max(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
 ////////////////////////////////////////////////////////////////////////
 
 double interp_median(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
-   double *data;
+   double *data = (double *) 0;
    int x, y, count;
    double v, median_v;
 
@@ -170,7 +170,8 @@ double interp_uw_mean(const DataPlane &dp, int x_ll, int y_ll, int wdth, double 
 
 double interp_dw_mean(const DataPlane &dp, int x_ll, int y_ll, int wdth,
                       double obs_x, double obs_y, int i_pow, double t) {
-   double *data, *dist;
+   double *data = (double *) 0;
+   double *dist = (double *) 0;
    int i, x, y, count;
    double v, dw_mean_v, w, wght_sum;
 

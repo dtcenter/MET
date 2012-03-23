@@ -25,7 +25,7 @@ using namespace std;
 
 double stats_lag1_autocorrelation(const NumArray &na) {
    double corr;
-   double *src;
+   double *src = (double *) 0;
    int n, i;
 
    n   = na.n_elements();

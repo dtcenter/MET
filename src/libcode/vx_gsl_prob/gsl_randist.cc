@@ -35,7 +35,7 @@ static int get_seed();
 ////////////////////////////////////////////////////////////////////////
 
 void rng_set(gsl_rng *&r, const char *rng_name, const char *rng_seed) {
-   const gsl_rng_type * T;
+   const gsl_rng_type * T = (const gsl_rng_type *) 0;
    int seed;
    char seed_str[256];
 
@@ -103,7 +103,7 @@ void ran_shuffle(const gsl_rng *r, double *base, int n) {
 
 void ran_shuffle(const gsl_rng *r, NumArray &na) {
    int n, i;
-   double *arr;
+   double *arr = (double *) 0;
 
    n   = na.n_elements();
    arr = new double [n];
@@ -147,7 +147,7 @@ void ran_choose(const gsl_rng *r, double *src,  int n,
 void ran_choose(const gsl_rng *r, NumArray &src_na,
                                   NumArray &dest_na, int k) {
    int n, i;
-   double *src, *dest;
+   double *src = (double *) 0, *dest = (double *) 0;
 
    n    = src_na.n_elements();
    src  = new double [n];
@@ -186,7 +186,7 @@ void ran_sample(const gsl_rng *r, double *src,  int n,
 void ran_sample(const gsl_rng *r, NumArray &src_na,
                                   NumArray &dest_na, int k) {
    int n, i;
-   double *src, *dest;
+   double *src = (double *) 0, *dest = (double *) 0;
 
    n    = src_na.n_elements();
    src  = new double [n];
@@ -209,7 +209,7 @@ void ran_sample(const gsl_rng *r, NumArray &src_na,
 
 int get_seed() {
    int curr_time;
-   unsigned char *u, t;
+   unsigned char *u = (unsigned char *) 0, t;
 
    // Get the current time
    curr_time = time(NULL);

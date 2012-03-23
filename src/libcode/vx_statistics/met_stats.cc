@@ -1959,8 +1959,8 @@ double compute_stdev(double sum, double sum_sq, int n) {
 
 int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int &ties) {
    int x, y, n, i;
-   double *data, v;
-   int *data_loc;
+   double *data = (double *) 0, v;
+   int *data_loc = (int *) 0;
 
    // Arrays to store the raw data values to be ranked, their locations,
    // and their computed ranks.  The ranks are stored as doubles since

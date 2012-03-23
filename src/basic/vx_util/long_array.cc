@@ -160,7 +160,9 @@ if ( n <= Nalloc )  return;
 n = AllocInc*( (n + AllocInc - 1)/AllocInc );
 
 int j;
-long * u = new long [n];
+long * u = (long *) 0;
+
+u = new long [n];
 
 if ( !u )  {
 
@@ -169,6 +171,8 @@ if ( !u )  {
    exit ( 1 );
 
 }
+
+memset(u, 0, n*sizeof(long));
 
 for(j=0; j<Nelements; ++j)  {
 

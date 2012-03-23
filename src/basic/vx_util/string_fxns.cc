@@ -99,7 +99,7 @@ return ( short_name );
 void append_char(char *str, const char c)
 
 {
-   char *ptr;
+   char *ptr = (char *) 0;
 
    //
    // If the specified characater does not already exist at the
@@ -125,7 +125,7 @@ void append_char(char *str, const char c)
 void strip_char(char *str, const char c)
 
 {
-   char *ptr;
+   char *ptr = (char *) 0;
 
    //
    // If the specified character exists at the end of the string,
@@ -177,7 +177,7 @@ int num_tokens(const char *test_str, const char *separator)
 
 {
    int n;
-   char *temp_str;
+   char *temp_str = (char *) 0;
    char *c = (char *) 0;
 
    //

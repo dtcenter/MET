@@ -826,7 +826,7 @@ double min_dist_linesegment(double px, double py, double qx, double qy,
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
-   char *tmp_str;
+   char *tmp_str = (char *) 0;
    char *c = (char *) 0;
    double lat, lon;
 
@@ -943,7 +943,7 @@ void parse_latlon_poly_file(const char *poly_file, Polyline &poly) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
-   char *tmp_str;
+   char *tmp_str = (char *) 0;
    char *c = (char *) 0;
    double x, y;
 

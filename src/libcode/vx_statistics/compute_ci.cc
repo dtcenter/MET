@@ -263,13 +263,13 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    int n, i, j;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   CTSInfo *cts_tmp;
+   CTSInfo *cts_tmp = (CTSInfo *) 0;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *cts_i_out, *cts_r_out;
-   ConcatString *cts_i_file, *cts_r_file, prefix;
+   ofstream *cts_i_out = (ofstream *) 0, *cts_r_out = (ofstream *) 0;
+   ConcatString *cts_i_file = (ConcatString *) 0, *cts_r_file = (ConcatString *) 0, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -1169,13 +1169,13 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    int n, i, j, m;
    double s;
    NumArray i_na, ir_na, sr_na;
-   CTSInfo *cts_tmp;
+   CTSInfo *cts_tmp = (CTSInfo *) 0;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *cts_r_out;
-   ConcatString *cts_r_file, prefix;
+   ofstream *cts_r_out = (ofstream *) 0;
+   ConcatString *cts_r_file = (ConcatString *) 0, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -1974,13 +1974,13 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    int n, i, j;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   NBRCTSInfo *nbrcts_tmp;
+   NBRCTSInfo *nbrcts_tmp = (NBRCTSInfo *) 0;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *nbrcts_i_out, *nbrcts_r_out;
-   ConcatString *nbrcts_i_file, *nbrcts_r_file, prefix;
+   ofstream *nbrcts_i_out = (ofstream *) 0, *nbrcts_r_out = (ofstream *) 0;
+   ConcatString *nbrcts_i_file = (ConcatString *) 0, *nbrcts_r_file = (ConcatString *) 0, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2477,13 +2477,13 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    int n, i, j;
    double s;
    NumArray i_na, ir_na, sr_na;
-   NBRCTSInfo *nbrcts_tmp;
+   NBRCTSInfo *nbrcts_tmp = ( NBRCTSInfo *) 0;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *nbrcts_r_out;
-   ConcatString *nbrcts_r_file, prefix;
+   ofstream *nbrcts_r_out = (ofstream *) 0;
+   ConcatString *nbrcts_r_file = (ConcatString *) 0, prefix;
 
    //
    // Check that the forecast and observation arrays of the same length

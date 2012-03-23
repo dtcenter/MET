@@ -410,7 +410,7 @@ int str_to_grib_code(const char *c, int &pcode,
                      double &pthresh_lo, double &pthresh_hi, int ptv) {
    int gc = bad_data_int;
    char tmp_str[512];
-   char *ptr, *save_ptr;
+   char *ptr = (char *) 0, *save_ptr = (char *) 0;
 
    // Parse out strings of the form:
    //    PROB
@@ -450,7 +450,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
                      int ptv) {
    int gc = bad_data_int, i, n_lt, n_gt;
    char tmp_str[512];
-   char *ptr, *save_ptr;
+   char *ptr = (char *) 0, *save_ptr = (char *) 0;
    SingleThresh st;
 
    // Parse out strings of the form:
