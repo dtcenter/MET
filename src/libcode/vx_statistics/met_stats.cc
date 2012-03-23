@@ -1471,9 +1471,9 @@ void ISCInfo::clear() {
    n_scale  = 0;
 
    if(mse_scale) { delete [] mse_scale; mse_scale = (double *) 0; }
-   if(isc_scale) { delete [] mse_scale; mse_scale = (double *) 0; }
-   if(fen_scale) { delete [] mse_scale; mse_scale = (double *) 0; }
-   if(oen_scale) { delete [] mse_scale; mse_scale = (double *) 0; }
+   if(isc_scale) { delete [] isc_scale; isc_scale = (double *) 0; }
+   if(fen_scale) { delete [] fen_scale; fen_scale = (double *) 0; }
+   if(oen_scale) { delete [] oen_scale; oen_scale = (double *) 0; }
 
    return;
 }
