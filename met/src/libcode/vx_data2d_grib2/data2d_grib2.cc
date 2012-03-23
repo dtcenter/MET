@@ -528,7 +528,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
       for(int i=1; i <= numfields; i++){
 
          //  validate the PDS template number
-         if( 0 != gfld->ipdtnum && 8 != gfld->ipdtnum ){
+         if( 0 != gfld->ipdtnum && 8 != gfld->ipdtnum && 9 != gfld->ipdtnum ){
             mlog << Error << "\nMetGrib2DataFile::data_plane() - unexpected PDS template number ("
                  << gfld->ipdtnum << ")\n\n";
             exit(1);
@@ -550,6 +550,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->RangeTyp     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
          rec->RangeVal     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
          rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
+
+         //  store the probability information, if appropriate
+         if( 9 == gfld->ipdtnum ){
+            rec->ProbLower = (double)(gfld->ipdtmpl[19]) / pow( 10, (double)(gfld->ipdtmpl[18]) );
+            rec->ProbUpper = (double)(gfld->ipdtmpl[21]) / pow( 10, (double)(gfld->ipdtmpl[20]) );
+         }
 
          //  build the parameter "name"
          ConcatString id;
@@ -598,8 +604,7 @@ long MetGrib2DataFile::read_grib2_record( long offset,
    //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/download/g2clib.documentation
 
    //  g2c fields
-   g2int  listsec0[3], listsec1[13], numlocal;
-   long   lskip, lgrib;
+   g2int  listsec0[3], listsec1[13], numlocal, lskip, lgrib;
    int    retval, ierr;
    size_t  lengrib;
 
