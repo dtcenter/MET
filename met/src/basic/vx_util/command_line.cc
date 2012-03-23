@@ -296,7 +296,9 @@ if ( n <= Nalloc )  return;
 n = AllocInc*( (n + AllocInc - 1)/AllocInc );
 
 int j;
-CLOptionInfo * u = new CLOptionInfo [n];
+CLOptionInfo * u = (CLOptionInfo *) 0;
+
+u = new CLOptionInfo [n];
 
 if ( !u )  {
 

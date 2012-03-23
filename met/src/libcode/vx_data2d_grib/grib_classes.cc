@@ -886,7 +886,7 @@ int m, d, y, hh, mm;
 int D, E;
 int file_pos;
 int bytes_processed;
-unsigned char *c, c3[3];
+unsigned char *c = (unsigned char *) 0, c3[3];
 double t;
 float r[4];
 uint4 ibm;
@@ -1270,7 +1270,7 @@ void GribFile::index_records()
 {
 
 GribRecord g;
-Section1_Header *pds_ptr;
+Section1_Header *pds_ptr = (Section1_Header *) 0;
 
 rep->record_extend(1);
 

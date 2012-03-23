@@ -112,8 +112,9 @@ if ( n <= 1 )  return(0);
 
 int i, j, ties_current, ties_total, tie_rank_start = 0, tie_rank_end;
 double tie_rank_mean;
-RankInfo *rank_info;
-double *ordered_array, prev_v, v;
+RankInfo *rank_info = (RankInfo *) 0;
+double *ordered_array = (double *) 0;
+double prev_v, v;
 
 rank_info = new RankInfo [n];
 ordered_array = new double [n];

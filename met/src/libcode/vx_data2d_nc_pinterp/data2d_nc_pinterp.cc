@@ -116,7 +116,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    double pressure;
    ConcatString level_str;
    VarInfoNcPinterp * vinfo_nc = (VarInfoNcPinterp *) &vinfo;
-   NcVarInfo *info;
+   NcVarInfo *info = (NcVarInfo *) 0;
 
    // Initialize the data plane
    plane.clear();
@@ -177,7 +177,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
    bool found = false;
    VarInfoNcPinterp *vinfo_nc = (VarInfoNcPinterp *) &vinfo;
    LongArray dim = vinfo_nc->dimension();
-   NcVarInfo *info;
+   NcVarInfo *info = (NcVarInfo *) 0;
 
    LongArray cur_dim;
    DataPlane cur_plane;

@@ -114,7 +114,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    bool status = false;
    ConcatString req_time_str, data_time_str;
    VarInfoNcMet * vinfo_nc = (VarInfoNcMet *) &vinfo;
-   NcVarInfo *info;
+   NcVarInfo *info = (NcVarInfo *) 0;
    int i;
 
    // Initialize the data plane

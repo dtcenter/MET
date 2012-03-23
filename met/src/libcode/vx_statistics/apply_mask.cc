@@ -89,7 +89,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    char file_name[PATH_MAX];
    char magic_str[PATH_MAX], thresh_str[PATH_MAX];
    SingleThresh st;
-   char *ptr;
+   char *ptr = (char *) 0;
 
    mlog << Debug(4) << "parse_poly_mask() -> "
         << " parsing poly mask \"" << mask_poly_str << "\"\n";

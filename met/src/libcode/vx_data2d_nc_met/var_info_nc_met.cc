@@ -150,7 +150,7 @@ void VarInfoNcMet::set_pair(const ConcatString &key, const ConcatString &val) {
 
 void VarInfoNcMet::set_magic(const ConcatString &s) {
    char tmp_str[max_str_len];
-   char *ptr, *ptr2, *ptr3, *save_ptr;
+   char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
 
    // Validate the magic string
    VarInfo::set_magic(s);
