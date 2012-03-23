@@ -40,6 +40,8 @@ typedef struct {
    int RangeTyp;
    int RangeVal;
    int ResCompFlag;
+   double ProbLower;
+   double ProbUpper;
 } Grib2Record;
 
 
