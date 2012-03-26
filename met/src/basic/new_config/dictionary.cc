@@ -13,7 +13,6 @@ using namespace std;
 #include "indent.h"
 #include "bool_to_string.h"
 #include "empty_string.h"
-#include "vx_log.h"
 
 #include "dictionary.h"
 #include "configobjecttype_to_string.h"
@@ -157,8 +156,7 @@ switch ( e.Type )  {
       break;
 
    default:
-      mlog << Error
-           << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
+      cerr << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(e.Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -213,8 +211,7 @@ switch ( Type )  {
       break;
 
    default:
-      mlog << Error
-           << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
+      cerr << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -243,8 +240,7 @@ void DictionaryEntry::set_name (const char * _name)
 
 if ( empty(_name) )  {
 
-   mlog << Error
-        << "\n\n  DictionaryEntry::set_name (const char *) -> empty string!\n\n";
+   cerr << "\n\n  DictionaryEntry::set_name (const char *) -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -314,8 +310,7 @@ set_name(_name);
 
 if ( empty(_text) )  {
 
-   mlog << Error
-        << "\n\n  DictionaryEntry::set_string() -> empty string!\n\n";
+   cerr << "\n\n  DictionaryEntry::set_string() -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -381,8 +376,7 @@ int DictionaryEntry::i_value() const
 
 if ( Type != IntegerType )  {
 
-   mlog << Error
-        << "\n\n  DictionaryEntry::i_value() -> bad type\n\n";
+   cerr << "\n\n  DictionaryEntry::i_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -403,8 +397,7 @@ double DictionaryEntry::d_value() const
 
 if ( Type != FloatType )  {
 
-   mlog << Error
-        << "\n\n  DictionaryEntry::d_value() -> bad type\n\n";
+   cerr << "\n\n  DictionaryEntry::d_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -425,8 +418,7 @@ bool DictionaryEntry::b_value() const
 
 if ( Type != BooleanType )  {
 
-   mlog << Error
-        << "\n\n  DictionaryEntry::b_value() -> bad type\n\n";
+   cerr << "\n\n  DictionaryEntry::b_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -447,8 +439,7 @@ const ConcatString * DictionaryEntry::string_value() const
 
 if ( Type != StringType )  {
 
-   mlog << Error
-        << "\n\n  DictionaryEntry::string_value() -> bad type\n\n";
+   cerr << "\n\n  DictionaryEntry::string_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -469,8 +460,7 @@ Dictionary * DictionaryEntry::dictionary_value() const
 
 if ( Type != DictionaryType )  {
 
-   mlog << Error
-        << "\n\n  DictionaryEntry::dictionary_value() -> bad type\n\n";
+   cerr << "\n\n  DictionaryEntry::dictionary_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -553,6 +543,8 @@ void Dictionary::init_from_scratch()
 
 e = (DictionaryEntry **) 0;
 
+Parent = (const Dictionary *) 0;
+
 Nentries = 0;
 
 Nalloc = 0;
@@ -589,6 +581,8 @@ Nentries = 0;
 
 Nalloc = 0;
 
+Parent = (const Dictionary *) 0;
+
 return;
 
 }
@@ -615,6 +609,7 @@ for (j=0; j<(d.Nentries); ++j)  {
 
 }
 
+Parent = d.Parent;
 
    //
    //  done
@@ -635,6 +630,8 @@ void Dictionary::dump(ostream & out, int depth) const
 Indent prefix(depth);
 
 out << prefix << "Nentries = " << Nentries << "\n";
+
+out << prefix << "Parent   = " << (void *) Parent << "\n";
 
 int j;
 
@@ -798,8 +795,7 @@ const DictionaryEntry * Dictionary::operator[](int n) const
 
 if ( (n < 0) || (n >= Nentries) )  {
 
-   mlog << Error 
-        << "\n\n  Dictionary::operator[](int) const -> range check error\n\n";
+   cerr << "\n\n  Dictionary::operator[](int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -820,6 +816,10 @@ const DictionaryEntry * Dictionary::lookup(const char * name) const
 
 int j;
 
+   //
+   //  try current dictionary
+   //
+
 for (j=0; j<Nentries; ++j)  {
 
    if ( e[j]->Name == name )  {
@@ -831,10 +831,40 @@ for (j=0; j<Nentries; ++j)  {
 }
 
    //
+   //  try parent
+   //
+
+const DictionaryEntry * E = (const DictionaryEntry *) 0;
+
+if ( Parent )  E = Parent->lookup(name);
+
+   //
    //  done
    //
 
-return ( (const DictionaryEntry *) 0 );
+return ( E );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Dictionary::set_parent(const Dictionary * D)
+
+{
+
+if ( D == this )  {
+
+   cerr << "\n\n  Dictionary::set_parent(const Dictionary *) -> dictionary can't be it's own parent!\n\n";
+
+   exit ( 1 );
+
+}
+
+Parent = D;
+
+return;
 
 }
 
@@ -856,8 +886,7 @@ DictionaryStack::DictionaryStack()
 
 // init_from_scratch();
 
-mlog << Error
-     << "\n\n  DictionaryStack::DictionaryStack() -> should never be called!\n\n";
+cerr << "\n\n  DictionaryStack::DictionaryStack() -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -903,8 +932,7 @@ DictionaryStack::DictionaryStack(const DictionaryStack & s)
 // 
 // assign(s);
 
-mlog << Error
-     << "\n\n  DictionaryStack::DictionaryStack(const DictionaryStack &) -> should never be called!\n\n";
+cerr << "\n\n  DictionaryStack::DictionaryStack(const DictionaryStack &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -922,8 +950,7 @@ DictionaryStack & DictionaryStack::operator=(const DictionaryStack & s)
 // 
 // assign(s);
 
-mlog << Error
-     << "\n\n  DictionaryStack::operator=(const DictionaryStack &) -> should never be called!\n\n";
+cerr << "\n\n  DictionaryStack::operator=(const DictionaryStack &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -1060,8 +1087,7 @@ void DictionaryStack::push()
 
 if ( Nelements >= max_dictionary_depth )  {
 
-   mlog << Error
-        << "\n\n  DictionaryStack::push() -> stack full!\n\n";
+   cerr << "\n\n  DictionaryStack::push() -> stack full!\n\n";
 
    exit ( 1 );
 
@@ -1083,8 +1109,7 @@ void DictionaryStack::pop(const char * name)
 
 if ( Nelements < 2 )  {
 
-   mlog << Error
-        << "\n\n  DictionaryStack::pop() -> stack empty!\n\n";
+   cerr << "\n\n  DictionaryStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 

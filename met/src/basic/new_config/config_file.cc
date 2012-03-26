@@ -14,7 +14,6 @@ using namespace std;
 #include "indent.h"
 #include "empty_string.h"
 #include "bool_to_string.h"
-#include "vx_log.h"
 
 #include "config_file.h"
 
@@ -145,9 +144,11 @@ void MetConfig::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "Filename = \"" << Filename.contents() << "\"\n";
+out << prefix << "Filename ... ";
 
-out << prefix << "Debug    = \"" << bool_to_string(Debug) << "\"\n";
+Filename.dump(out, depth + 1);
+
+out << prefix << "Debug    = "   << bool_to_string(Debug) << "\n";
 
 out << prefix << "Entries ...\n";
 
@@ -204,8 +205,7 @@ bool MetConfig::read(const char * name)
 
 if ( empty(name) )  {
 
-   mlog << Error
-        << "\n\n  MetConfig::read(const char *) -> empty filename!\n\n";
+   cerr << "\n\n  MetConfig::read(const char *) -> empty filename!\n\n";
 
    exit ( 1 );
 
@@ -219,14 +219,13 @@ bison_input_filename = name;
 
 dict_stack = &DS;
 
-Filename = name;
+Filename.add(name);
 
 configdebug = (Debug ? 1 : 0);
 
 if ( (configin = fopen(bison_input_filename, "r")) == NULL )  {
 
-   mlog << Error
-        << "\n\n  MetConfig::read(const char *) -> unable to open input file \"" << Filename << "\"\n\n";
+   cerr << "\n\n  MetConfig::read(const char *) -> unable to open input file \"" << name << "\"\n\n";
 
    exit ( 1 );
 
@@ -238,7 +237,7 @@ parse_status = configparse();
 
 if ( parse_status != 0 )  {
 
-   // mlog << Error << "\n\n  " << program_name << " -> parse status is nonzero!\n\n";
+   // cerr << "\n\n  " << program_name << " -> parse status is nonzero!\n\n";
    // 
    // exit ( 1 );
 
@@ -248,11 +247,10 @@ if ( parse_status != 0 )  {
 
 if ( DS.n_elements() != 1 )  {
 
-   mlog << Error
-        << "\n\n  MetConfig::read(const char *) -> should be only one dictionary left after parsing! ...("
+   cout << "\n\n  MetConfig::read(const char *) -> should be only one dictionary left after parsing! ...("
         << DS.n_elements() << ")\n\n";
 
-   // DS.dump(cout);
+   DS.dump(cout);
 
    exit ( 1 );
 

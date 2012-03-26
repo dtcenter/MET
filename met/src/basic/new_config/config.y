@@ -20,8 +20,6 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include "vx_log.h"
-
 #include "scanner_stuff.h"
 #include "dictionary.h"
 
@@ -345,16 +343,14 @@ switch ( op )  {
    case '*':  C = A * B;  break;
    case '/':
       if ( B == 0.0 )  {
-         mlog << Error
-              << "\n\n  do_op() -> division by zero!\n\n";
+         cerr << "\n\n  do_op() -> division by zero!\n\n";
          exit ( 1 );
       }
       C = A / B;
       break;
 
    default:
-      mlog << Error
-           << "\n\n  do_op() -> bad operator ... \"" << op << "\"\n\n";
+      cerr << "\n\n  do_op() -> bad operator ... \"" << op << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -391,16 +387,14 @@ switch ( op )  {
    case '*':  C = A * B;  break;
    case '/':
       if ( B == 0 )  {
-         mlog << Error
-              << "\n\n  do_integer_op() -> division by zero!\n\n";
+         cerr << "\n\n  do_integer_op() -> division by zero!\n\n";
          exit ( 1 );
       }
       C = A / B;
       break;
 
    default:
-      mlog << Error
-           << "\n\n  do_integer_op() -> bad operator ... \"" << op << "\"\n\n";
+      cerr << "\n\n  do_integer_op() -> bad operator ... \"" << op << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -501,8 +495,7 @@ const DictionaryEntry * e = dict_stack->lookup(RHS);
 
 if ( !e )  {
 
-   mlog << Error
-        << "\n\n  do_assign_id() -> identifier \"" << RHS << "\" not defined in this scope!\n\n";
+   cerr << "\n\n  do_assign_id() -> identifier \"" << RHS << "\" not defined in this scope!\n\n";
 
    exit ( 1 );
 

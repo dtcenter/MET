@@ -20,7 +20,6 @@ enum ConfigObjectType {
    DictionaryType, 
    FunctionType, 
    ThresholdType, 
-   TimestampType, 
 
    no_config_object_type, 
 
