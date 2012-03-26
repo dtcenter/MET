@@ -125,7 +125,7 @@ config_file.o: config_file.h config_file.cc configobjecttype_to_string.o diction
 
 test_config: test_config.cc $(OBJECTS)
 	@ echo
-	$(COMPILER) test_config.cc config_file.o dictionary.o configobjecttype_to_string.o lex.config.o config.tab.o $(FLAGS) -o test_config -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_cal -lvx_log -lm
+	$(COMPILER) test_config.cc config_file.o dictionary.o configobjecttype_to_string.o lex.config.o config.tab.o $(FLAGS) -o test_config -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_math -lvx_cal -lvx_log -lm
 
 
 ########################################################################
