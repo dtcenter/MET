@@ -25,6 +25,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "pwl.h"
+#include "is_bad_data.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -467,6 +468,73 @@ y = y_0 + (x - x_0)*m;
 
 
 return ( y );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  function to perform piecewise linear interpolation
+   //
+
+
+int pwl_interpolate(const double * y, const double * x, int n, double x_in, double & y_out)
+
+{
+
+int j;
+double m;
+
+
+y_out = 0.0;
+
+if ( x_in < x[0] )  {   //  don't like this
+
+   y_out = y[0];
+
+   return ( 1 );
+
+}
+
+   //
+   //  find bottom level for interpolation
+   //
+
+j = n - 1;
+
+while ( (j >= 0) && (x[j] > x_in) )  --j;
+
+   //
+   //  range check
+   //
+
+if ( j < 0 )  { y_out = y[0];  return ( 0 ); }
+
+if ( j >= (n - 1) )  { y_out = y[n - 1];   return ( 0 ); }
+
+   //
+   //  interpolate
+   //
+
+if ( is_eq(x[j + 1], x[j]) ) {
+
+   y_out = y[j];
+
+} else {
+
+   m = (y[j + 1] - y[j])/(x[j + 1] - x[j]);
+
+   y_out = y[j] + m*(x_in - x[j]);
+
+}
+
+   //
+   //  done
+   //
+
+return ( 1 );
 
 }
 

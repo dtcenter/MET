@@ -107,6 +107,12 @@ inline const char * PiecewiseLinear::name() const { return ( (const char *) Name
 ////////////////////////////////////////////////////////////////////////
 
 
+extern int pwl_interpolate(const double * y, const double * x, int n, double x_in, double & y_out);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   /*  __PIECEWISE_LINEAR_H__  */
 
 
