@@ -660,7 +660,9 @@ Indent prefix(depth);
 
 out << prefix << "Nentries = " << Nentries << "\n";
 
+out << prefix << "Address  = " << (void *) this   << "\n";
 out << prefix << "Parent   = " << (void *) Parent << "\n";
+
 
 int j;
 
