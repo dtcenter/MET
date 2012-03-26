@@ -16,8 +16,7 @@
 EXECUTABLES = econfig_codegen
 
 
-OBJECTS     = pwl.o \
-              algline.o \
+OBJECTS     = algline.o \
               icode.o \
               idstack.o \
               symtab.o \
@@ -53,7 +52,6 @@ HEADERS     = algline.h \
               icode.h \
               idstack.h \
               machine.h \
-              pwl.h \
               symtab.h \
               result.h \
               resulttype_to_string.h \
@@ -131,10 +129,10 @@ builtin_to_string.o: builtin_to_string.h builtin_to_string.cc
 idstack.o: idstack.h idstack.cc
 	$(CXX) idstack.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-icode.o: icode.h icode.cc celltype_to_string.o pwl.o builtin.o
+icode.o: icode.h icode.cc celltype_to_string.o builtin.o
 	$(CXX) icode.cc                -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
-symtab.o: symtab.h symtab.cc stetype_to_string.o celltype_to_string.o pwl.o algline.o builtin.o array.o
+symtab.o: symtab.h symtab.cc stetype_to_string.o celltype_to_string.o algline.o builtin.o array.o
 	$(CXX) symtab.cc               -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 array.o: array.h array.cc icode.o
@@ -142,9 +140,6 @@ array.o: array.h array.cc icode.o
 
 builtin.o: builtin.h builtin.cc
 	$(CXX) builtin.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
-pwl.o: pwl.h pwl.cc
-	$(CXX) pwl.cc                  -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 algline.o: algline.h algline.cc
 	$(CXX) algline.cc              -c $(CXX_FLAGS) -I$(MET_INC_DIR)
@@ -211,6 +206,7 @@ econfig_codegen: econfig_codegen.cc libvx_econfig.a
 	-lvx_econfig \
 	-lvx_cal \
 	-lvx_util \
+	-lvx_math \
 	-lvx_log \
 	-lm
 	rm -f $(MET_BIN_DIR)/econfig_codegen

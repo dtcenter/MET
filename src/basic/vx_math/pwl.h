@@ -43,6 +43,8 @@ class PiecewiseLinear {
 
    protected:
 
+      void extend(int);
+
       int N;
 
       int n_alloc;
@@ -60,21 +62,21 @@ class PiecewiseLinear {
       PiecewiseLinear(const PiecewiseLinear &);
       PiecewiseLinear & operator=(const PiecewiseLinear &);
 
-
-
       PiecewiseLinear(const char *, int Npoints, const double * XX, const double * YY);
 
       void clear();
 
-      void add_point(double, double);
+      void dump(ostream &, int depth = 0) const;
 
-      void extend(int);
+         //
+         //  set stuff
+         //
 
       void set_name(const char *);
 
-
-
-      double operator()(double) const;
+         //
+         //  get stuff
+         //
 
       int n_points() const;
 
@@ -83,8 +85,13 @@ class PiecewiseLinear {
 
       const char * name() const;
 
+         //
+         //  do stuff
+         //
 
-      void dump(ostream &, int depth = 0) const;
+      void add_point(double, double);
+
+      double operator()(double) const;
 
 };
 

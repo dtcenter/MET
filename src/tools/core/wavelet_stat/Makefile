@@ -119,9 +119,9 @@ wavelet_stat: wavelet_stat.cc $(OBJECTS)
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_math \
 	-lvx_cal \
 	-lvx_econfig \
+	-lvx_math \
 	-lvx_util \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
