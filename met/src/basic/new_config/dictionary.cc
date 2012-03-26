@@ -159,6 +159,10 @@ switch ( e.Type )  {
       set_array(e.Name, *(e.Dict));
       break;
 
+   case ThresholdType:
+      set_threshold(e.Name, *(e.Thresh));
+      break;
+
    default:
       cerr << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(e.Type) << "\"\n\n";
@@ -215,13 +219,16 @@ switch ( Type )  {
       Dict->dump(out, depth + 1);
       break;
 
+   case ThresholdType:
+      out << prefix << "Value = \n";
+      Thresh->dump(out, depth + 1);
+      break;
+
    default:
       cerr << "\n\n  DictionaryEntry::dump(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
       break;
-
-
 
 }   //  switch
 
@@ -366,6 +373,29 @@ set_name(_name);
 Dict = new Dictionary;
 
 *Dict = d;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryEntry::set_threshold(const char * _name, const SingleThresh & t)
+
+{
+
+clear();
+
+Type = ThresholdType;
+
+set_name(_name);
+
+Thresh = new SingleThresh;
+
+*Thresh = t;
+
 
 return;
 
