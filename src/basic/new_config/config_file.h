@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include "string_array.h"
+
 #include "dictionary.h"
 
 
@@ -26,7 +28,7 @@ class MetConfig {
 
       void assign(const MetConfig &);
 
-      ConcatString Filename;
+      StringArray Filename;
 
       Dictionary Dict;
 
@@ -53,7 +55,7 @@ class MetConfig {
          //  get stuff
          //
 
-      ConcatString filename() const;
+      StringArray filename() const;
 
       bool debug() const;
 
@@ -65,15 +67,13 @@ class MetConfig {
 
       const DictionaryEntry * lookup(const char * name) const;
 
-
-
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString MetConfig::filename() const { return ( Filename ); }
+inline StringArray MetConfig::filename() const { return ( Filename ); }
 
 inline bool MetConfig::debug() const { return ( Debug ); }
 

@@ -139,6 +139,8 @@ class Dictionary {
 
       DictionaryEntry ** e;   // allocated
 
+      const Dictionary * Parent;   //  not allocated
+
    public:
 
       Dictionary();
@@ -154,6 +156,8 @@ class Dictionary {
          //  set stuff
          //
 
+      void set_parent(const Dictionary *);
+
          //
          //  get stuff
          //
@@ -161,6 +165,8 @@ class Dictionary {
       int n_entries() const;
 
       const DictionaryEntry * operator[](int) const;
+
+      const Dictionary * parent() const;
 
          //
          //  do stuff
