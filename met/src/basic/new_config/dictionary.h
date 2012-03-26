@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class Dictionary;   //  forward reference
+class Dictionary;        //  forward reference
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,6 @@ class DictionaryEntry {
       void assign(const DictionaryEntry &);
 
 
-
       ConfigObjectType Type;
 
       ConcatString Name;
@@ -46,9 +45,10 @@ class DictionaryEntry {
       double Dval;
       bool Bval;
 
-      ConcatString * Text;   //  allocated
+      ConcatString * Text;           //  allocated
 
-      Dictionary * Dict;     //  allocated
+      Dictionary * Dict;             //  allocated
+                                     //  also used for arrays
 
 
    public:
@@ -66,13 +66,14 @@ class DictionaryEntry {
          //  set stuff
          //
 
-      void set_int        (const char * _name, int);
-      void set_double     (const char * _name, double);
-      void set_boolean    (const char * _name, bool);
-      void set_string     (const char * _name, const char * _text);
-      void set_dictionary (const char * _name, const Dictionary &);
+      void set_int          (const char * _name, int);
+      void set_double       (const char * _name, double);
+      void set_boolean      (const char * _name, bool);
+      void set_string       (const char * _name, const char * _text);
+      void set_dict         (const char * _name, const Dictionary &);
+      void set_array        (const char * _name, const Dictionary &);
 
-      void set_name       (const char *);
+      void set_name         (const char *);
 
          //
          //  get stuff
@@ -131,6 +132,8 @@ class Dictionary {
       void assign(const Dictionary &);
 
       void extend(int);
+
+      void patch_parents() const;
 
 
       int Nentries;
@@ -235,7 +238,7 @@ class DictionaryStack {
 
      int n_elements() const;
 
-     // const Dictionary * top() const;
+     const Dictionary * top() const;
 
          //
          //  do stuff
@@ -244,6 +247,8 @@ class DictionaryStack {
       void push();
 
       void pop(const char * name);
+
+      void erase_top();
 
       void store(const DictionaryEntry &);
 

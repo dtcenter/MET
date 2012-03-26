@@ -16,8 +16,8 @@ enum ConfigObjectType {
    FloatType, 
    BooleanType, 
    StringType, 
-   ArrayType, 
    DictionaryType, 
+   ArrayType, 
    FunctionType, 
    ThresholdType, 
 
