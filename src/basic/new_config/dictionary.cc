@@ -152,7 +152,11 @@ switch ( e.Type )  {
       break;
 
    case DictionaryType:
-      set_dictionary(e.Name, *(e.Dict));
+      set_dict(e.Name, *(e.Dict));
+      break;
+
+   case ArrayType:
+      set_array(e.Name, *(e.Dict));
       break;
 
    default:
@@ -205,13 +209,14 @@ switch ( Type )  {
       out << prefix << "Value = \"" << (*Text) << "\"\n";
       break;
 
-   case DictionaryType:
+   case DictionaryType:   //  fall through
+   case ArrayType:        //  fall through
       out << prefix << "Value = \n";
       Dict->dump(out, depth + 1);
       break;
 
    default:
-      cerr << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
+      cerr << "\n\n  DictionaryEntry::dump(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -348,13 +353,35 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_dictionary(const char * _name, const Dictionary & d)
+void DictionaryEntry::set_dict(const char * _name, const Dictionary & d)
 
 {
 
 clear();
 
 Type = DictionaryType;
+
+set_name(_name);
+
+Dict = new Dictionary;
+
+*Dict = d;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryEntry::set_array(const char * _name, const Dictionary & d)
+
+{
+
+clear();
+
+Type = ArrayType;
 
 set_name(_name);
 
@@ -610,6 +637,8 @@ for (j=0; j<(d.Nentries); ++j)  {
 }
 
 Parent = d.Parent;
+
+patch_parents();
 
    //
    //  done
@@ -872,6 +901,37 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void Dictionary::patch_parents() const
+
+{
+
+int j;
+Dictionary * d = (Dictionary *) 0;
+
+for (j=0; j<Nentries; ++j)  {
+
+   if ( e[j]->type() != DictionaryType )  continue;
+
+   d = e[j]->dictionary_value();
+
+   d->set_parent(this);
+
+   d->patch_parents();
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class DictionaryStack
    //
@@ -1066,7 +1126,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
+
 const Dictionary * DictionaryStack::top() const
 
 {
@@ -1076,7 +1136,31 @@ if ( Nelements == 0 )  return ( (const Dictionary *) 0 );
 return ( D[Nelements - 1] );
 
 }
-*/
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryStack::erase_top()
+
+{
+
+if ( Nelements <= 1 )  {
+
+   cerr << "\n\n  DictionaryStack::erase_top() -> can't erase bottom-level dictionary!\n\n";
+
+   exit ( 1 );
+
+}
+
+delete D[Nelements - 1];   D[Nelements - 1] = (Dictionary *) 0;
+
+--Nelements;
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1117,7 +1201,7 @@ if ( Nelements < 2 )  {
 
 DictionaryEntry entry;
 
-entry.set_dictionary(name, *(D[Nelements - 1]));
+entry.set_dict(name, *(D[Nelements - 1]));
 
 D[Nelements - 2]->store(entry);
 

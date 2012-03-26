@@ -36,6 +36,12 @@ extern const char * bison_input_filename;
 
 extern DictionaryStack * dict_stack;
 
+extern int LineNumber;
+
+extern int Column;
+
+extern bool is_lhs;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -219,6 +225,12 @@ bison_input_filename = name;
 
 dict_stack = &DS;
 
+LineNumber = 1;
+
+Column     = 1;
+
+is_lhs     = true;
+
 Filename.add(name);
 
 configdebug = (Debug ? 1 : 0);
@@ -263,6 +275,12 @@ if ( DS.n_elements() != 1 )  {
 bison_input_filename = (const char *) 0;
 
 dict_stack = (DictionaryStack *) 0;
+
+LineNumber = 1;
+
+Column     = 1;
+
+is_lhs     = true;
 
 return ( true );
 

@@ -57,7 +57,7 @@ const char *      bison_input_filename  = (const char *) 0;
 
 DictionaryStack * dict_stack            = (DictionaryStack *) 0;
 
-bool is_lhs = true;
+bool              is_lhs                = true;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -66,6 +66,10 @@ bool is_lhs = true;
    //
    //  static definitions
    //
+
+static bool is_array = false;
+
+static Dictionary Array;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,6 +93,10 @@ static void do_assign_string  (const char * name, const char * text);
 static void do_assign_id      (const char * LHS, const char * RHS);
 
 static void do_assign_dict    (const char * name);
+
+static void do_dict();
+
+static void do_dict_array(const char * LHS);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -114,7 +122,7 @@ static void do_assign_dict    (const char * name);
 %token COMPARISON
 
 
-%type <text> IDENTIFIER QUOTED_STRING assign_prefix
+%type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix
 
 %type <nval> INTEGER FLOAT number expression
 
@@ -137,14 +145,17 @@ assignment_list : assignment                    { is_lhs = true; }
                 ;
 
 
-assignment : assign_prefix BOOLEAN       ';'           { do_assign_boolean ($1, $2); }
-           | assign_prefix QUOTED_STRING ';'           { do_assign_string  ($1, $2); }
-           | assign_prefix expression    ';'           { do_assign_exp     ($1, $2); }
-           | assign_prefix IDENTIFIER    ';'           { do_assign_id      ($1, $2); }
-           | assign_prefix '[' string_list    ']' ';'  { }
-           | assign_prefix '[' threshold_list ']' ';'  { }
-           | assign_prefix dictionary                  { do_assign_dict($1); }
-           | assign_prefix piecewise_linear  ';'       { }
+assignment : assign_prefix BOOLEAN       ';'            { do_assign_boolean ($1, $2); }
+           | assign_prefix QUOTED_STRING ';'            { do_assign_string  ($1, $2); }
+           | assign_prefix expression    ';'            { do_assign_exp     ($1, $2); }
+           | assign_prefix IDENTIFIER    ';'            { do_assign_id      ($1, $2); }
+           | assign_prefix dictionary                   { do_assign_dict($1); }
+           | assign_prefix piecewise_linear  ';'        { }
+
+           | array_prefix string_list     ']' ';'       { is_array = false; }
+           | array_prefix threshold_list  ']' ';'       { is_array = false; }
+           | array_prefix dictionary_list ']' ';'       { do_dict_array($1); is_array = false; }
+
            ;
 
 
@@ -152,8 +163,17 @@ assign_prefix : IDENTIFIER '=' { is_lhs = false;  strcpy($$, $1); }
               ;
 
 
-dictionary : '{' assignment_list '}' { }
+array_prefix : assign_prefix '['     { is_lhs = false;  is_array = true;  Array.clear(); strcpy($$, $1); }
+             ;
+
+
+dictionary : '{' assignment_list '}'  { do_dict(); }
            ;
+
+
+dictionary_list : dictionary
+                | dictionary_list ',' dictionary
+                ;
 
 
 string_list : QUOTED_STRING
@@ -520,6 +540,53 @@ void do_assign_dict (const char * name)
 {
 
 dict_stack->pop(name);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_dict()
+
+{
+
+if ( ! is_array )  return;
+
+DictionaryEntry e;
+ConcatString name;
+
+name << "entry_" << Array.n_entries();
+
+e.set_dict(name, *(dict_stack->top()));
+
+dict_stack->erase_top();
+
+Array.store(e);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_dict_array(const char * LHS)
+
+{
+
+DictionaryEntry e;
+
+e.set_array(LHS, Array);
+
+dict_stack->store(e);
+
+Array.clear();
+
+is_array = false;
 
 return;
 
