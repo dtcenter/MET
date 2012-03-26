@@ -261,6 +261,7 @@ class Logger
       void open_log_file(ConcatString &);
 
       Logger & operator<<(const char *);
+      Logger & operator<<(string);
       Logger & operator<<(const int);
       Logger & operator<<(const long);
       Logger & operator<<(const long long);
@@ -284,6 +285,14 @@ inline ConcatString Logger::log_filename() const { return (LogFilename); }
 inline int Logger::verbosity_level() const { return (VerbosityLevel); }
 
 inline bool Logger::is_open() const { return (out != 0); }
+
+inline Logger & Logger::operator<<(string s){ return *this << s.c_str(); }
+
+
+//////////////////////////////////////////////////////////////////
+
+
+
 
 
 //////////////////////////////////////////////////////////////////

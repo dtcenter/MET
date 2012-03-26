@@ -265,7 +265,6 @@ return ( s );
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)

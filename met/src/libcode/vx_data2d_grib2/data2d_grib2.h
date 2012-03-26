@@ -42,7 +42,7 @@ typedef struct {
    int FieldNum;
    int Discipline;
    int PdsTmpl;
-   ConcatString ParmName;
+   string ParmName;
    int ParmCat;
    int Parm;
    int LvlTyp;
@@ -70,7 +70,7 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       FILE *FileGrib2;
 
-      vector <Grib2Record*> RecList;
+      vector<Grib2Record*> RecList;
 
       map<string,string> PairMap;
       map<string,Grib2Record*> NameRecMap;
@@ -82,9 +82,15 @@ class MetGrib2DataFile : public Met2dDataFile {
       //  utilities to read a GRIB2 information
       //
 
-      bool read_data_plane(DataPlane &plane, gribfield  *gfld);
 
-      void read_grid(gribfield *gfld);
+      void find_record_matches( VarInfoGrib2* vinfo,
+                                vector<Grib2Record*> &listMatchExact,
+                                vector<Grib2Record*> &listMatchRange
+                              );
+
+      bool read_grib2_record_data_plane(Grib2Record *rec, DataPlane &plane);
+
+      void read_grib2_grid(gribfield *gfld);
 
       long read_grib2_record( long offset,
                               g2int unpack,
@@ -96,12 +102,13 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       void read_grib2_record_list();
 
-      void update_var_info(VarInfoGrib2* vinfo, Grib2Record *rec);
-
       DataPlane check_uv_rotation( VarInfoGrib2 *vinfo,
                                    Grib2Record *rec,
                                    DataPlane plane
                                  );
+
+      DataPlaneArray check_derived( VarInfoGrib2 *vinfo );
+
 
    public:
 
@@ -125,6 +132,7 @@ class MetGrib2DataFile : public Met2dDataFile {
          //  retrieve all matching data planes
 
       int data_plane_array(VarInfo &, DataPlaneArray &);
+
 
          //
          //  do stuff

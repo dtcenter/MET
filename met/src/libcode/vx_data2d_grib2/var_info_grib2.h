@@ -62,7 +62,7 @@ extern multimap<string,string> map_code;
 // GRIB2 table lookups
 //
 
-const char*        g2_id_parm(const char* id);
+string             g2_id_parm(const char* id);
 const char*        g2_id_lookup(const char* id);
 int                g2_id_count(const char* id);
 vector<string>     g2_code_lookup(const char* code);
@@ -138,6 +138,7 @@ class VarInfoGrib2 : public VarInfo
       void set_pair(const ConcatString &key, const ConcatString &val);
       void set_magic(const ConcatString &);
 
+      void set_record(int);
       void set_discipline(int);
       void set_m_table(int);
       void set_l_table(int);
