@@ -16,11 +16,14 @@ using namespace std;
 
 #include <iostream>
 
+#include "threshold.h" //  must be included before config.tab.h
+
 #include "scanner_stuff.h"   //  must be included before config.tab.h
 
 #include "config.tab.h"
 
 #include "dictionary.h"
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,10 +266,10 @@ int do_comp()
 
 Column += strlen(configtext);
 
-     if ( strcmp(configtext, "<" ) == 0 )  configlval.cval = comparison_lt;
-else if ( strcmp(configtext, ">" ) == 0 )  configlval.cval = comparison_gt;
-else if ( strcmp(configtext, "<=") == 0 )  configlval.cval = comparison_le;
-else if ( strcmp(configtext, ">=") == 0 )  configlval.cval = comparison_ge;
+     if ( strcmp(configtext, "<" ) == 0 )  configlval.cval = thresh_lt;
+else if ( strcmp(configtext, ">" ) == 0 )  configlval.cval = thresh_gt;
+else if ( strcmp(configtext, "<=") == 0 )  configlval.cval = thresh_le;
+else if ( strcmp(configtext, ">=") == 0 )  configlval.cval = thresh_ge;
 else {
 
    cerr << "\n\n  do_comp() -> bad comparison operator ... \"" << configtext << "\"\n\n";

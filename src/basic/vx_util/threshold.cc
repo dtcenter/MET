@@ -61,13 +61,12 @@ SingleThresh & SingleThresh::operator=(const SingleThresh &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int SingleThresh::operator==(const SingleThresh &st) {
-   int match = 0;
+bool SingleThresh::operator==(const SingleThresh &st)
 
-   if(is_eq(thresh, st.thresh) &&
-      type == st.type) match = 1;
+{
 
-   return(match);
+return (is_eq(thresh, st.thresh) && (type == st.type));
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -312,6 +311,30 @@ bool SingleThresh::check(double v) const {
 
    return(status);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleThresh::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+out << prefix << "thresh = " << thresh << "\n";
+out << prefix << "type   = " << type   << "\n";
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 //

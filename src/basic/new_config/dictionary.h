@@ -15,6 +15,7 @@
 #include "object_types.h"
 
 #include "concat_string.h"
+#include "threshold.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,6 +51,7 @@ class DictionaryEntry {
       Dictionary * Dict;             //  allocated
                                      //  also used for arrays
 
+      SingleThresh * Thresh;         //  allocated
 
    public:
 
@@ -72,6 +74,7 @@ class DictionaryEntry {
       void set_string       (const char * _name, const char * _text);
       void set_dict         (const char * _name, const Dictionary &);
       void set_array        (const char * _name, const Dictionary &);
+      void set_threshold    (const char * _name, const SingleThresh &);
 
       void set_name         (const char *);
 

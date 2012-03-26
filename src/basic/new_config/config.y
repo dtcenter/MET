@@ -22,6 +22,7 @@ using namespace std;
 
 #include "scanner_stuff.h"
 #include "dictionary.h"
+#include "threshold.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -100,6 +101,8 @@ static void do_string(const char *);
 
 static void do_array(const char * LHS);
 
+static void do_thresh(const ThreshType, const Number &);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -115,7 +118,7 @@ static void do_array(const char * LHS);
 
    bool bval;
 
-   Comparison cval;
+   ThreshType cval;
 
 }
 
@@ -188,7 +191,7 @@ threshold_list : threshold
                ;
 
 
-threshold : COMPARISON number
+threshold : COMPARISON number { do_thresh($1, $2); }
           ;
 
 
@@ -613,6 +616,42 @@ e.set_string(name, text);
 
 DArray.store(e);
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_thresh(const ThreshType t, const Number & n)
+
+{
+
+if ( !is_array )  {
+
+   cerr << "\n\n  do_thresh(const ThreshType, const Number &) -> thresholds should only appear in arrays!\n\n";
+
+   exit ( 1 );
+
+}
+
+DictionaryEntry e;
+SingleThresh T;
+ConcatString name;
+
+name << "entry_" << DArray.n_entries();
+
+T.set(as_double(n), t);
+
+e.set_threshold(name, T);
+
+DArray.store(e);
+
+   //
+   //  done
+   //
 
 return;
 

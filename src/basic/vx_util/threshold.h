@@ -12,6 +12,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include "concat_string.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,7 +58,10 @@ class SingleThresh {
       ~SingleThresh();
       SingleThresh(const SingleThresh &);
       SingleThresh & operator=(const SingleThresh &);
-      int operator==(const SingleThresh &);
+
+      void dump(ostream &, int = 0) const;
+
+      bool operator==(const SingleThresh &);
 
       double     thresh; // Threshold value
       ThreshType type;   // Threshold type

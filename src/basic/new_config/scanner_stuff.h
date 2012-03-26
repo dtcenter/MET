@@ -16,22 +16,6 @@ static const int max_id_length = 256;
 ////////////////////////////////////////////////////////////////////////
 
 
-enum Comparison {
-
-   comparison_lt, 
-   comparison_gt, 
-
-   comparison_le, 
-   comparison_ge, 
-
-   no_comparison
-
-};
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 struct Number {
 
    bool is_int;
