@@ -25,7 +25,7 @@
 #include "hist.h"
 #include "ptile.h"
 #include "math_constants.h"
-#include "pwl_interpolate.h"
+#include "pwl.h"
 #include "is_bad_data.h"
 #include "affine.h"
 #include "viewgravity_to_string.h"
