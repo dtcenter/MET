@@ -2376,7 +2376,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Define arrays of jobs for each term in the Skill Score Index.
    // Separate arrays for the forecast and reference models.
    //
-   STATAnalysisJob *fcst_job, *ref_job;
+   STATAnalysisJob *fcst_job = (STATAnalysisJob *) 0, *ref_job = (STATAnalysisJob *) 0;
    fcst_job = new STATAnalysisJob [n_terms];
    ref_job  = new STATAnalysisJob [n_terms];
 
@@ -2384,8 +2384,8 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Define arrays of objects to store the partial sums or contingency
    // table counts for each term in the Skill Score Index.
    //
-   SL1L2Info *fcst_si,  *ref_si;
-   CTSInfo   *fcst_cts, *ref_cts;
+   SL1L2Info *fcst_si = (SL1L2Info *) 0,  *ref_si = (SL1L2Info *) 0;
+   CTSInfo   *fcst_cts = (CTSInfo *) 0, *ref_cts = (CTSInfo *) 0;
    fcst_si  = new SL1L2Info [n_terms];
    ref_si   = new SL1L2Info [n_terms];
    fcst_cts = new CTSInfo   [n_terms];
@@ -2395,7 +2395,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Define array of line types to be aggregated for each term in the
    // Skill Score Index.
    //
-   STATLineType *job_lt;
+   STATLineType *job_lt = (STATLineType *) 0;
    job_lt = new STATLineType [n_terms];
 
    //

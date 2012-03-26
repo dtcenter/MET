@@ -274,7 +274,7 @@ void process_scores() {
    DataPlane fcst_dp_fill, obs_dp_fill;
 
    NumArray f_na, o_na;
-   ISCInfo **isc_info, isc_aggr;
+   ISCInfo **isc_info = (ISCInfo **) 0, isc_aggr;
    Grid fcst_grid, obs_grid;
 
    // Loop through each of the fields to be verified
@@ -935,10 +935,10 @@ int get_tile_tot_count() {
 
 void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
                         ISCInfo *&isc_info, int i_gc, int i_tile) {
-   double *f_dat, *o_dat; // Raw and thresholded binary fields
-   double *f_dwt, *o_dwt; // Discrete wavelet transformations
-   double *f_scl, *o_scl; // Binary field decomposed by scale
-   double *diff;          // Difference field
+   double *f_dat = (double *) 0, *o_dat = (double *) 0; // Raw and thresholded binary fields
+   double *f_dwt = (double *) 0, *o_dwt = (double *) 0; // Discrete wavelet transformations
+   double *f_scl = (double *) 0, *o_scl = (double *) 0; // Binary field decomposed by scale
+   double *diff = (double *) 0;                         // Difference field
    double mse, fen, oen;
    int n, ns, n_isc;
    int bnd, row, col;
@@ -2458,7 +2458,7 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    int i;
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll, step, v;
-   ColorTable *ct_ptr;
+   ColorTable *ct_ptr = (ColorTable *) 0;
    Color c;
 
    //
@@ -2649,8 +2649,8 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    int x, y, grid_x, grid_y;
    double mag;
    Color c;
-   Color *c_fill_ptr;
-   ColorTable *ct_ptr;
+   Color *c_fill_ptr = (Color *) 0;
+   ColorTable *ct_ptr = (ColorTable *) 0;
 
    //
    // Set up pointers to the appropriate colortable and fill color
@@ -2736,8 +2736,8 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
    int i, x, y;
    double mag;
    Color c;
-   Color *c_fill_ptr;
-   ColorTable *ct_ptr;
+   Color *c_fill_ptr = (Color *) 0;
+   ColorTable *ct_ptr = (ColorTable *) 0;
 
    //
    // Set up pointers to the appropriate colortable and fill color

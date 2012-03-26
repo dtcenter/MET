@@ -942,7 +942,7 @@ void aggr_mpr_lines_ctc(STATAnalysisJob &j,
 void aggr_mpr_lines_cts(STATAnalysisJob &j,
                         const NumArray &f_na, const NumArray &o_na,
                         CTSInfo &cts_info, const char *tmp_dir) {
-   CTSInfo *cts_info_ptr;
+   CTSInfo *cts_info_ptr = (CTSInfo *) 0;
    gsl_rng *rng_ptr = (gsl_rng *) 0;
 
    //

@@ -2308,8 +2308,8 @@ void render_image(PSfile &p, Engine &eng, EngineType eng_type,
    int x, y, v_int;
    double mag, v;
    Color c;
-   Color *c_fill_ptr;
-   ColorTable *ct_ptr;
+   Color *c_fill_ptr = (Color *) 0;
+   ColorTable *ct_ptr = (ColorTable *) 0;
 
    //
    // Set up pointers to the appropriate colortable and fill color values
@@ -2650,7 +2650,7 @@ void plot_colorbar(PSfile &p, Box &dim, int fcst) {
    int i, n_colors;
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll;
-   ColorTable *ct_ptr;
+   ColorTable *ct_ptr = (ColorTable *) 0;
    Color c;
 
    //

@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
    char hdr_typ_str[max_str_len];
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
-   float *hdr_arr, *obs_arr;
+   float *hdr_arr = (float *) 0, *obs_arr = (float *) 0;
    int i, h, v, plot_count, skip_count;
    PSfile plot;
    Box page, view, map_box;
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
       // instantiate a Met2dDataFile object using the data_2d_factory
       // and get the grid info from the file.
       //
-      Met2dDataFile * met_ptr;
+      Met2dDataFile * met_ptr = (Met2dDataFile *) 0;
       Met2dDataFileFactory m_factory;
       
       met_ptr = m_factory.new_met_2d_data_file(data_plane_filename);

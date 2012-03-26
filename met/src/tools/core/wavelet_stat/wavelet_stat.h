@@ -142,7 +142,7 @@ static int          i_stat_row;
 
 // Optional ISC output file
 static ConcatString isc_file;
-static ofstream    *isc_out;
+static ofstream    *isc_out = (ofstream *) 0;
 static AsciiTable   isc_at;
 static int          i_isc_row;
 

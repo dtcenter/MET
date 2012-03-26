@@ -291,12 +291,12 @@ void process_scores() {
    NumArray f_u_wind_na, o_u_wind_na;
 
    CNTInfo     cnt_info;
-   CTSInfo    *cts_info;
+   CTSInfo    *cts_info = (CTSInfo    *) 0;
    MCTSInfo    mcts_info;
-   VL1L2Info  *vl1l2_info;
+   VL1L2Info  *vl1l2_info = (VL1L2Info  *) 0;
    NBRCNTInfo  nbrcnt_info;
-   NBRCTSInfo *nbrcts_info;
-   PCTInfo    *pct_info;
+   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
+   PCTInfo    *pct_info = (PCTInfo    *) 0;
 
    // Allocate enough space for the CTSInfo objects
    max_scal_t  = conf_info.get_max_n_scal_thresh();
@@ -1533,7 +1533,7 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
    double fval, oval;
-   NcVar *fcst_var, *obs_var, *diff_var;
+   NcVar *fcst_var = (NcVar *) 0, *obs_var = (NcVar *) 0, *diff_var = (NcVar *) 0;
    ConcatString fcst_var_name, obs_var_name, diff_var_name;
    ConcatString att_str, mthd_str;
 
