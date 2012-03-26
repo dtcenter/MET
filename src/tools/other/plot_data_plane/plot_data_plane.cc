@@ -96,9 +96,9 @@ static void set_verbosity(const StringArray &);
 
 int main(int argc, char * argv[])
 {
-   Met2dDataFile * met_ptr;
+   Met2dDataFile * met_ptr = (Met2dDataFile * ) 0;
    Met2dDataFileFactory m_factory;
-   VarInfo * var_ptr;
+   VarInfo * var_ptr = (VarInfo * ) 0;
    VarInfoFactory v_factory;
    DataPlane data_plane;
    Grid grid;

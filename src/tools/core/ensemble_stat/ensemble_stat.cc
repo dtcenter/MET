@@ -593,7 +593,7 @@ void process_point_obs(int i_nc) {
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
    unixtime hdr_ut;
-   NcFile *obs_in;
+   NcFile *obs_in = (NcFile *) 0;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing point observation file: "
@@ -793,7 +793,7 @@ int process_point_ens(int i_ens) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_scores() {
-   PairDataEnsemble *pd_ptr;
+   PairDataEnsemble *pd_ptr = (PairDataEnsemble *) 0;
    int i, j, k, l;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -910,7 +910,7 @@ void process_grid_vx() {
    int i, j, k, n_miss;
    bool status;
    double t;
-   DataPlane *fcst_dp, *fcst_dp_smooth;
+   DataPlane *fcst_dp = (DataPlane *) 0, *fcst_dp_smooth = (DataPlane *) 0;
    DataPlane  obs_dp,   obs_dp_smooth;
    PairDataEnsemble pd;
 
@@ -1694,7 +1694,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
 void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
-   NcVar *ens_var;
+   NcVar *ens_var = (NcVar *) 0;
    ConcatString ens_var_name, name_str;
 
    // Construct the variable name
@@ -1738,7 +1738,7 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
 void write_ens_var_int(int i_vx, int *ens_data, DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
-   NcVar *ens_var;
+   NcVar *ens_var = (NcVar *) 0;
    ConcatString ens_var_name, name_str;
 
    // Construct the variable name
@@ -1842,7 +1842,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
                            float *data, DataPlane &dp,
                            const char *type_str,
                            const char *long_name_str) {
-   NcVar *nc_var;
+   NcVar *nc_var = (NcVar *) 0;
    int wdth;
    ConcatString mthd_str, var_name, name_str;
 
@@ -1894,7 +1894,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
                          int *data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
-   NcVar *nc_var;
+   NcVar *nc_var = (NcVar *) 0;
    int wdth;
    ConcatString mthd_str, var_name, name_str;
 

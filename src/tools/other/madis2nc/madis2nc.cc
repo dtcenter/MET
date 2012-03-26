@@ -373,7 +373,7 @@ void setup_netcdf_out(int nhdr) {
 ////////////////////////////////////////////////////////////////////////
 
 int get_nc_dim(NcFile *&f_in, const char *dim_str) {
-   NcDim *dim;
+   NcDim *dim = (NcDim *) 0;
 
    //
    // Retrieve the dimension from the NetCDF file.
@@ -390,7 +390,7 @@ int get_nc_dim(NcFile *&f_in, const char *dim_str) {
 ////////////////////////////////////////////////////////////////////////
 
 NcVar *get_nc_var(NcFile *&f_in, const char *var_str) {
-   NcVar *var;
+   NcVar *var = (NcVar *) 0;
 
    //
    // Retrieve the variable from the NetCDF file.
@@ -407,7 +407,7 @@ NcVar *get_nc_var(NcFile *&f_in, const char *var_str) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_nc_var_att(NcVar *&var, const char *att_str, float &d) {
-   NcAtt *att;
+   NcAtt *att = (NcAtt *) 0;
 
    //
    // Retrieve the NetCDF variable attribute.

@@ -631,7 +631,7 @@ void process_obs_file(int i_nc) {
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
    unixtime hdr_ut;
-   NcFile *obs_in;
+   NcFile *obs_in = (NcFile *) 0;
 
    // Open the observation file as a NetCDF file.
    // The observation file must be in NetCDF format as the
@@ -798,13 +798,13 @@ void process_obs_file(int i_nc) {
 
 void process_scores() {
    int i, j, k, l, m, max_scal_t, max_prob_t, wind_t;
-   PairDataPoint  *pd_ptr;
-   CTSInfo   *cts_info;
+   PairDataPoint  *pd_ptr = (PairDataPoint *) 0;
+   CTSInfo   *cts_info = (CTSInfo *) 0;
    MCTSInfo   mcts_info;
    CNTInfo    cnt_info;
    SL1L2Info  sl1l2_info;
-   VL1L2Info *vl1l2_info;
-   PCTInfo   *pct_info;
+   VL1L2Info *vl1l2_info = (VL1L2Info *) 0;
+   PCTInfo   *pct_info = (PCTInfo *) 0;
 
    mlog << Debug(2)
         << "\n" << sep_str << "\n\n";

@@ -486,7 +486,7 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
    DataPlane part;
    double v_sum, v_part;
    Grid gr;
-   unixtime     * pcp_times = (unixtime) 0;
+   unixtime     * pcp_times = (unixtime *) 0;
    int          * pcp_recs  = (int *) 0;
    ConcatString * pcp_files = (ConcatString *) 0;
 
