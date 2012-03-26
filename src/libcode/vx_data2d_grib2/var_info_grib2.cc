@@ -153,6 +153,13 @@ void VarInfoGrib2::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfoGrib2::set_record(int v) {
+   Record = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoGrib2::set_discipline(int v) {
    Discipline = v;
    return;
@@ -250,7 +257,7 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
    char** mat = NULL;
    const char* pat_mag = "([^/]+)/([ALPRZ])([0-9]+)(\\-[0-9]+)?";
    if( 4 > (num_mat = regex_apply(pat_mag, 5, s, mat)) ){
-      mlog << Error << "\nVarInfoGrib2::set_magic - failed to parse magic string '"
+      mlog << Error << "\nVarInfoGrib2::set_magic() - failed to parse magic string '"
            << s << "'\n\n";
       exit(1);
    }
@@ -268,62 +275,58 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
    regex_clean(mat);
 
    //  determine if the requested parameter name is actually a grib2 parameter table code
+   ConcatString parm_vals = "";
    if( 4 == regex_apply("^([0-9]+)_([0-9]+)_([0-9]+)$", 4, parm_name.data(), mat) ){
 
       //  make sure the parameter table codes are valid
       if( !g2_id_count(parm_name.data()) ){
-         mlog << Error << "\nVarInfoGrib2::set_magic - unrecognized GRIB2 parameter table indexes '"
+         mlog << Error << "\nVarInfoGrib2::set_magic() - unrecognized GRIB2 parameter table indexes '"
               << parm_name.data() << "'\n\n";
          exit(1);
       }
 
       //  assign the parameter category and code
-      Discipline = atoi(mat[1]);
-      ParmCat    = atoi(mat[2]);
-      Parm       = atoi(mat[3]);
-      regex_clean(mat);
+      parm_vals = g2_id_lookup(parm_name.data());
+      set_discipline( atoi(mat[1]) );
+      set_parm_cat  ( atoi(mat[2]) );
+      set_parm      ( atoi(mat[3]) );
+      set_name      ( g2_id_parm(parm_name.data()).c_str() );
 
-      Name = g2_id_parm(parm_name.data());
+      regex_clean(mat);
    }
 
    //  otherwise, attempt to find the parameter name in the map_code table
    else {
 
-      //int num_parm_idx = VarInfoGrib2::map_code.count(parm_name.data());
       int num_parm_idx = g2_code_count(parm_name.data());
 
       //  validate the table and field number
       if( !num_parm_idx ){
-         mlog << Error << "\nVarInfoGrib2::set_magic - unrecognized GRIB2 field abbreviation '"
+         mlog << Error << "\nVarInfoGrib2::set_magic() - unrecognized GRIB2 field abbreviation '"
               << parm_name.data() << "'\n\n";
          exit(1);
       }
-      Name = parm_name.data();
+      set_name( parm_name.data() );
+
+      //  retrieve the index values for the parameter abbreviation
+      string parm_code = "";
+      multimap<string,string>::iterator it = map_code.find(parm_name);
+      parm_code = (*it).second;
+      parm_vals = g2_id_lookup( parm_code.c_str() );
+
+      //  parse the table and field number
+      if( 4 != regex_apply("^([0-9]+)_([0-9]+)_([0-9]+)$", 4, parm_code.c_str(), mat) ){
+         mlog << Error << "\nVarInfoGrib2::set_magic() - failed to parse GRIB2 table code for string '"
+              << Name << "'\n\n";
+         exit(1);
+      }
 
       //  if the parameter abbreviation maps to a single index, set the VarInfo data members
-      if( 1 == num_parm_idx ){
+      set_discipline( 1 == num_parm_idx ? atoi(mat[1]) : -1 );
+      set_parm_cat  ( 1 == num_parm_idx ? atoi(mat[2]) : -1 );
+      set_parm      ( 1 == num_parm_idx ? atoi(mat[3]) : -1 );
 
-         //  retrieve the index values for the parameter abbreviation
-         string parm_code = "";
-         multimap<string,string>::iterator it = map_code.find(parm_name);
-         parm_code = (*it).second;
-
-         //  parse the table and field number
-         if( 4 != regex_apply("^([0-9]+)_([0-9]+)_([0-9]+)$", 4, parm_code.data(), mat) ){
-            mlog << Error << "\nVarInfoGrib2::set_magic - failed to parse GRIB2 table code for string '"
-                 << Name << "'\n\n";
-            exit(1);
-         }
-         Discipline = atoi(mat[1]);
-         ParmCat    = atoi(mat[2]);
-         Parm       = atoi(mat[3]);
-         regex_clean(mat);
-
-      } else {
-         Discipline = -1;
-         ParmCat    = -1;
-         Parm       = -1;
-      }
+      regex_clean(mat);
 
    }
 
@@ -369,7 +372,36 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
    else                      Level.set_upper(-1 == lvl2 ? lvl1 : lvl2);
 
    //  if the level type is a record number, set the data member
-   Record = ( lt == LevelType_RecNumber ? lvl1 : -1 );
+   set_record( lt == LevelType_RecNumber ? lvl1 : -1 );
+
+   //  set the name, units and long name
+   set_units("");
+   set_long_name("");
+   if( parm_vals != "" ){
+
+      //  parse the variable name from the table information
+      if( 4 != regex_apply("^(.+)\\|(.+)\\|(.+)$", 4, parm_vals.text(), mat) ){
+         mlog << Error << "\nVarInfoGrib2::set_magic() - failed to parse GRIB2 table "
+              << "map_id information '" << parm_vals.text() << "'\n\n";
+         exit(1);
+      }
+
+      //  set the var_info parameter info
+      ConcatString name_parm  = mat[1]; name_parm.ws_strip();
+      if( name_parm == "APCP" ){
+         int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
+         if( 0 == accum % 10000 ) accum /= 10000;
+         ConcatString name_apcp;
+         name_apcp.format("%s_%02d", name_parm.text(), accum);
+         name_parm = name_apcp.text();
+      }
+      set_name( name_parm );
+      ConcatString units_parm = mat[2]; units_parm.ws_strip(); set_units    ( units_parm );
+      ConcatString lname_parm = mat[3]; lname_parm.ws_strip(); set_long_name( lname_parm );
+
+      regex_clean(mat);
+
+   }
 
    return;
 }
@@ -392,7 +424,7 @@ vector<string> g2_code_lookup(const char* code){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-const char* g2_id_parm(const char* id){
+string g2_id_parm(const char* id){
 
    //  verify the id
    if( !g2_id_count( id ) ){
@@ -412,7 +444,7 @@ const char* g2_id_parm(const char* id){
 
    string ret = mat[0];
    regex_clean(mat);
-   return ret.data();
+   return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -440,7 +472,6 @@ bool VarInfoGrib2::is_u_wind() const {
 
 bool VarInfoGrib2::is_v_wind() const {
 
-   // This functionality is not supported for GRIB2.
    return(false);
 }
 
