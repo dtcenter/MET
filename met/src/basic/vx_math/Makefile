@@ -22,6 +22,7 @@ OBJECTS     =  angles.o \
                nti.o \
                ptile.o \
                pwl_interpolate.o \
+               pwl.o \
                affine.o \
                viewgravity_to_string.o
 
@@ -45,6 +46,7 @@ HEADERS     =  math_constants.h \
                nti.h \
                ptile.h \
                pwl_interpolate.h \
+               pwl.h \
                affine.h \
                viewgravity_to_string.h \
                vx_math.h
@@ -103,6 +105,9 @@ ptile.o: ptile.cc
 
 pwl_interpolate.o: pwl_interpolate.cc
 	$(CXX) pwl_interpolate.cc $(CXX_FLAGS) -c
+
+pwl.o: pwl.h pwl.cc
+	$(CXX) pwl.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 viewgravity_to_string.o: viewgravity_to_string.h viewgravity_to_string.cc
 	$(CXX) viewgravity_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
