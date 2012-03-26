@@ -265,9 +265,11 @@ void process_directory(const char * dir_name)
    while ((pde = readdir(dir)) != NULL)
    {
          //
-         // check if this is the directory "." or ".."
+         // check if this is the directory "." or ".." and also skip
+         // the .svn directories
          //
-      if ((strcmp(pde->d_name, ".") == 0) || (strcmp(pde->d_name, "..") == 0))
+      if ((strcmp(pde->d_name, ".") == 0) || (strcmp(pde->d_name, "..") == 0) ||
+          (strcmp(pde->d_name, ".svn") == 0))
          continue;  // don't loop forever
 
          //
@@ -368,8 +370,6 @@ void process_directory(const char * dir_name)
                   //
                command << cs_erase << "cp " << copyright_notice_filename << ' ' << tmp_filename;
                system(command);
-
-               command << cs_erase << "cp " << copyright_notice_filename << ' ' << " tmpfile";
 
                   //
                   // create the command to append the .h or .cc file
