@@ -69,7 +69,7 @@ bool              is_lhs                = true;
 
 static bool is_array = false;
 
-static Dictionary Array;
+static Dictionary DArray;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,9 @@ static void do_assign_dict    (const char * name);
 
 static void do_dict();
 
-static void do_dict_array(const char * LHS);
+static void do_string(const char *);
+
+static void do_array(const char * LHS);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -152,9 +154,9 @@ assignment : assign_prefix BOOLEAN       ';'            { do_assign_boolean ($1,
            | assign_prefix dictionary                   { do_assign_dict($1); }
            | assign_prefix piecewise_linear  ';'        { }
 
-           | array_prefix string_list     ']' ';'       { is_array = false; }
-           | array_prefix threshold_list  ']' ';'       { is_array = false; }
-           | array_prefix dictionary_list ']' ';'       { do_dict_array($1); is_array = false; }
+           | array_prefix string_list     ']' ';'       { do_array($1); }
+           | array_prefix threshold_list  ']' ';'       { do_array($1); }
+           | array_prefix dictionary_list ']' ';'       { do_array($1); }
 
            ;
 
@@ -163,7 +165,7 @@ assign_prefix : IDENTIFIER '=' { is_lhs = false;  strcpy($$, $1); }
               ;
 
 
-array_prefix : assign_prefix '['     { is_lhs = false;  is_array = true;  Array.clear(); strcpy($$, $1); }
+array_prefix : assign_prefix '['     { is_lhs = false;  is_array = true;  DArray.clear(); strcpy($$, $1); }
              ;
 
 
@@ -176,8 +178,8 @@ dictionary_list : dictionary
                 ;
 
 
-string_list : QUOTED_STRING
-            | string_list ',' QUOTED_STRING
+string_list : QUOTED_STRING                  { do_string($1); }
+            | string_list ',' QUOTED_STRING  { do_string($3); }
             ;
 
 
@@ -558,13 +560,13 @@ if ( ! is_array )  return;
 DictionaryEntry e;
 ConcatString name;
 
-name << "entry_" << Array.n_entries();
+name << "entry_" << DArray.n_entries();
 
 e.set_dict(name, *(dict_stack->top()));
 
 dict_stack->erase_top();
 
-Array.store(e);
+DArray.store(e);
 
 return;
 
@@ -574,19 +576,43 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_dict_array(const char * LHS)
+void do_array(const char * LHS)
 
 {
 
 DictionaryEntry e;
 
-e.set_array(LHS, Array);
+e.set_array(LHS, DArray);
 
 dict_stack->store(e);
 
-Array.clear();
+DArray.clear();
 
 is_array = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_string(const char * text)
+
+{
+
+if ( ! is_array )  return;
+
+DictionaryEntry e;
+ConcatString name;
+
+name << "entry_" << DArray.n_entries();
+
+e.set_string(name, text);
+
+DArray.store(e);
+
 
 return;
 
