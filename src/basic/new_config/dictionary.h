@@ -16,6 +16,7 @@
 
 #include "concat_string.h"
 #include "threshold.h"
+#include "pwl.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,6 +54,8 @@ class DictionaryEntry {
 
       SingleThresh * Thresh;         //  allocated
 
+      PiecewiseLinear * PWL;         //  allocated
+
    public:
 
       DictionaryEntry();
@@ -75,6 +78,7 @@ class DictionaryEntry {
       void set_dict         (const char * _name, const Dictionary &);
       void set_array        (const char * _name, const Dictionary &);
       void set_threshold    (const char * _name, const SingleThresh &);
+      void set_pwl          (const char * _name, const PiecewiseLinear &);
 
       void set_name         (const char *);
 
@@ -92,8 +96,13 @@ class DictionaryEntry {
 
       const ConcatString * string_value () const;
 
-      // const Dictionary * dictionary_value () const;
-      Dictionary * dictionary_value () const;
+      Dictionary * dict_value () const;
+
+      Dictionary * array_value () const;
+
+      SingleThresh * thresh_value() const;
+
+      PiecewiseLinear * pwl_value() const;
 
          //
          //  do stuff

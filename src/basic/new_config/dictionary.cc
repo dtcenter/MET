@@ -91,6 +91,10 @@ Text = (ConcatString *) 0;
 
 Dict = (Dictionary *) 0;
 
+Thresh = (SingleThresh *) 0;
+
+PWL = (PiecewiseLinear *) 0;
+
 clear();
 
 return;
@@ -114,6 +118,8 @@ Bval = false;
 if ( Text )  { delete Text;  Text = (ConcatString *) 0; }
 
 if ( Dict )  { delete Dict;  Dict = (Dictionary *) 0; }
+
+if ( Thresh )  { delete Thresh;  Thresh = (SingleThresh *) 0; }
 
    //
    //  done
@@ -161,6 +167,10 @@ switch ( e.Type )  {
 
    case ThresholdType:
       set_threshold(e.Name, *(e.Thresh));
+      break;
+
+   case FunctionType:
+      set_pwl(e.Name, *(e.PWL));
       break;
 
    default:
@@ -222,6 +232,12 @@ switch ( Type )  {
    case ThresholdType:
       out << prefix << "Value = \n";
       Thresh->dump(out, depth + 1);
+      break;
+
+
+   case FunctionType:
+      out << prefix << "Value = \n";
+      PWL->dump(out, depth + 1);
       break;
 
    default:
@@ -382,6 +398,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void DictionaryEntry::set_pwl(const char * _name, const PiecewiseLinear & _pwl)
+
+{
+
+clear();
+
+Type = FunctionType;
+
+set_name(_name);
+
+PWL = new PiecewiseLinear;
+
+PWL->set_name(_name);
+
+*PWL = _pwl;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void DictionaryEntry::set_threshold(const char * _name, const SingleThresh & t)
 
 {
@@ -511,13 +551,13 @@ return ( Text );
 ////////////////////////////////////////////////////////////////////////
 
 
-Dictionary * DictionaryEntry::dictionary_value() const
+Dictionary * DictionaryEntry::dict_value() const
 
 {
 
 if ( Type != DictionaryType )  {
 
-   cerr << "\n\n  DictionaryEntry::dictionary_value() -> bad type\n\n";
+   cerr << "\n\n  DictionaryEntry::dict_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -525,6 +565,69 @@ if ( Type != DictionaryType )  {
 
 
 return ( Dict );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Dictionary * DictionaryEntry::array_value() const
+
+{
+
+if ( Type != ArrayType )  {
+
+   cerr << "\n\n  DictionaryEntry::array_value() -> bad type\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( Dict );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+SingleThresh * DictionaryEntry::thresh_value() const
+
+{
+
+if ( Type != ThresholdType )  {
+
+   cerr << "\n\n  DictionaryEntry::thresh_value() -> bad type\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( Thresh );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PiecewiseLinear * DictionaryEntry::pwl_value() const
+
+{
+
+if ( Type != FunctionType )  {
+
+   cerr << "\n\n  DictionaryEntry::pwl_value() -> bad type\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( PWL );
 
 }
 
@@ -790,7 +893,7 @@ if ( found )  {
 
    if ( e[j]->is_dictionary() && entry.is_dictionary() )  {
 
-      e[j]->dictionary_value()->store( *(entry.dictionary_value()) );
+      e[j]->dict_value()->store( *(entry.dict_value()) );
 
    } else {
 
@@ -944,7 +1047,7 @@ for (j=0; j<Nentries; ++j)  {
 
    if ( e[j]->type() != DictionaryType )  continue;
 
-   d = e[j]->dictionary_value();
+   d = e[j]->dict_value();
 
    d->set_parent(this);
 

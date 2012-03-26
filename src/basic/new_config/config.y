@@ -23,6 +23,7 @@ using namespace std;
 #include "scanner_stuff.h"
 #include "dictionary.h"
 #include "threshold.h"
+#include "pwl.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,8 @@ static bool is_array = false;
 
 static Dictionary DArray;
 
+static PiecewiseLinear pwl;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -102,6 +105,10 @@ static void do_string(const char *);
 static void do_array(const char * LHS);
 
 static void do_thresh(const ThreshType, const Number &);
+
+static void add_point(const Number &, const Number &);
+
+static void do_pwl(const char * LHS);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -150,16 +157,16 @@ assignment_list : assignment                    { is_lhs = true; }
                 ;
 
 
-assignment : assign_prefix BOOLEAN       ';'            { do_assign_boolean ($1, $2); }
-           | assign_prefix QUOTED_STRING ';'            { do_assign_string  ($1, $2); }
-           | assign_prefix expression    ';'            { do_assign_exp     ($1, $2); }
-           | assign_prefix IDENTIFIER    ';'            { do_assign_id      ($1, $2); }
-           | assign_prefix dictionary                   { do_assign_dict($1); }
-           | assign_prefix piecewise_linear  ';'        { }
+assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean ($1, $2); }
+           | assign_prefix QUOTED_STRING    ';'        { do_assign_string  ($1, $2); }
+           | assign_prefix expression       ';'        { do_assign_exp     ($1, $2); }
+           | assign_prefix IDENTIFIER       ';'        { do_assign_id      ($1, $2); }
+           | assign_prefix dictionary                  { do_assign_dict($1); }
+           | assign_prefix piecewise_linear ';'        { do_pwl($1); }
 
-           | array_prefix string_list     ']' ';'       { do_array($1); }
-           | array_prefix threshold_list  ']' ';'       { do_array($1); }
-           | array_prefix dictionary_list ']' ';'       { do_array($1); }
+           | array_prefix string_list     ']' ';'      { do_array($1); }
+           | array_prefix threshold_list  ']' ';'      { do_array($1); }
+           | array_prefix dictionary_list ']' ';'      { do_array($1); }
 
            ;
 
@@ -211,7 +218,7 @@ expression : number                                     { $$ = $1; }
            ;
 
 
-piecewise_linear : '[' point_list ']'   { }
+piecewise_linear : '[' point_list ']'   { is_array = false; }
                  ;
 
 
@@ -220,7 +227,7 @@ point_list : point              { }
            ;
 
 
-point : '(' number ',' number ')'   { }   //  { add_point(); }
+point : '(' number ',' number ')'   { add_point($2, $4); }
 
 
 
@@ -652,6 +659,49 @@ DArray.store(e);
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void add_point(const Number & x, const Number & y)
+
+{
+
+pwl.add_point(as_double(x), as_double(y));
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_pwl(const char * LHS)
+
+{
+
+cout << "\n\n  in do_pwl()\n\n" << flush;
+
+DictionaryEntry e;
+
+e.set_pwl(LHS, pwl);
+
+dict_stack->store(e);
+
+
+   //
+   //  done
+   //
+
+pwl.clear();
+
+is_array = false;
 
 return;
 
