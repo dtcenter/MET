@@ -822,8 +822,6 @@ void do_add_command()
       // Increment sums for each grid point
       //
 
-      total.set_constant(bad_data_float);
-
       for(x=0; x<(part.nx()); x++) {
 
          for(y=0; y<(part.ny()); y++) {
