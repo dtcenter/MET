@@ -4,6 +4,7 @@
 
 
 EXECUTABLES = test_config  \
+              test_lookup  \
 
 
 ########################################################################
@@ -146,6 +147,11 @@ libvx_config.a: $(OBJECTS)
 test_config: test_config.cc $(OBJECTS) $(LIBRARIES)
 	@ echo
 	$(COMPILER) test_config.cc $(FLAGS) -o test_config -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_config -lvx_util -lvx_math -lvx_cal -lvx_log -lm
+
+
+test_lookup: test_lookup.cc $(OBJECTS) $(LIBRARIES)
+	@ echo
+	$(COMPILER) test_lookup.cc $(FLAGS) -o test_lookup -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_config -lvx_util -lvx_math -lvx_cal -lvx_log -lm
 
 
 ########################################################################
