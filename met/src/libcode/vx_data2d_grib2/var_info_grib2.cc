@@ -537,6 +537,8 @@ void init_var_maps(){
 
    //PGO these will be parsed and read in from a flat file
 
+   map_id.clear();
+
    map_id[       "0_0_0"] = "TMP         | K                   | Temperature";
    map_id[       "0_0_1"] = "VTMP        | K                   | Virtual Temperature";
    map_id[       "0_0_2"] = "POT         | K                   | Potential Temperature";
@@ -1265,6 +1267,8 @@ void init_var_maps(){
    map_id[    "10_191_0"] = "TSEC        | s                   | Seconds Prior To Initial Reference Time (Defined In Section 1)";
    map_id[    "10_191_1"] = "MOSF        | m^3/s               | Meridional Overturning Stream Function";
    map_id[ "255_255_255"] = "IMGD        | -                   | Image data";
+
+   map_code.clear();
 
    map_code.insert( pair<string,string>(     "TMP", "0_0_0") );
    map_code.insert( pair<string,string>(    "VTMP", "0_0_1") );
