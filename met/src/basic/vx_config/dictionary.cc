@@ -220,7 +220,9 @@ switch ( Type )  {
       break;
 
    case StringType:
-      out << prefix << "Value = \"" << (*Text) << "\"\n";
+      out << prefix << "Value = ";
+      if ( Text->empty() )  out << "(nul)\n";
+      else                  out << '\"' << (*Text) << "\"\n";
       break;
 
    case DictionaryType:   //  fall through
@@ -336,6 +338,7 @@ Type = StringType;
 
 set_name(_name);
 
+/*
 if ( empty(_text) )  {
 
    cerr << "\n\n  DictionaryEntry::set_string() -> empty string!\n\n";
@@ -343,10 +346,11 @@ if ( empty(_text) )  {
    exit ( 1 );
 
 }
+*/
 
 Text = new ConcatString;
 
-*Text = _text;
+if ( nonempty(_text) )  *Text = _text;
 
 return;
 

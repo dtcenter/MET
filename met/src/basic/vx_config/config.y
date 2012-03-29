@@ -102,6 +102,8 @@ static void do_dict();
 
 static void do_string(const char *);
 
+static void do_number(const Number &);
+
 static void do_array(const char * LHS);
 
 static void do_thresh(const ThreshType, const Number &);
@@ -164,6 +166,7 @@ assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean ($1, 
            | assign_prefix dictionary                  { do_assign_dict($1); }
            | assign_prefix piecewise_linear ';'        { do_pwl($1); }
 
+           | array_prefix number_list     ']' ';'      { do_array($1); }
            | array_prefix string_list     ']' ';'      { do_array($1); }
            | array_prefix threshold_list  ']' ';'      { do_array($1); }
            | array_prefix dictionary_list ']' ';'      { do_array($1); }
@@ -208,6 +211,11 @@ threshold : COMPARISON number { do_thresh($1, $2); }
 number : INTEGER { }
        | FLOAT   { }
        ;
+
+
+number_list : number                   { do_number($1); }
+            | number_list ',' number   { do_number($3); }
+            ;
 
 
 expression : number                                     { $$ = $1; }
@@ -623,6 +631,31 @@ ConcatString name;
 name << "entry_" << DArray.n_entries();
 
 e.set_string(name, text);
+
+DArray.store(e);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_number(const Number & number)
+
+{
+
+if ( ! is_array )  return;
+
+DictionaryEntry e;
+ConcatString name;
+
+name << "entry_" << DArray.n_entries();
+
+if ( number.is_int )  e.set_int    (name, number.i);
+else                  e.set_double (name, number.d);
 
 DArray.store(e);
 
