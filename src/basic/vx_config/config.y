@@ -179,9 +179,12 @@ array_prefix : assign_prefix '['     { is_lhs = false;  is_array = true;  DArray
              ;
 
 
-dictionary : '{' assignment_list '}'  { do_dict(); }
+dictionary : '{' assignment_list '}'  opt_semi { do_dict(); }
            ;
 
+opt_semi : ';'
+         |  /*  nothing  */
+         ;
 
 dictionary_list : dictionary
                 | dictionary_list ',' dictionary
