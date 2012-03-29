@@ -19,6 +19,17 @@ OBJECTS     = configobjecttype_to_string.o  \
 ########################################################################
 
 
+HEADERS = config_file.h                 \
+          configobjecttype_to_string.h  \
+          config.tab.h                  \
+          dictionary.h                  \
+          object_types.h                \
+          scanner_stuff.h               \
+
+
+########################################################################
+
+
 GEN_SOURCES = configobjecttype_to_string.h   \
               configobjecttype_to_string.cc  \
 
@@ -26,7 +37,7 @@ GEN_SOURCES = configobjecttype_to_string.h   \
 ########################################################################
 
 
-LIBRARIES   =
+LIBRARIES   = libvx_config.a  \
 
 
 ########################################################################
@@ -115,6 +126,15 @@ config_file.o: config_file.h config_file.cc configobjecttype_to_string.o diction
    ##
 
 
+libvx_config.a: $(OBJECTS)
+	ar -rs libvx_config.a $(OBJECTS) 2>&1
+	ranlib libvx_config.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_config.a
+	cp libvx_config.a $(MET_LIB_DIR)
+
+
 ########################################################################
 
 
@@ -123,9 +143,9 @@ config_file.o: config_file.h config_file.cc configobjecttype_to_string.o diction
    ##
 
 
-test_config: test_config.cc $(OBJECTS)
+test_config: test_config.cc $(OBJECTS) $(LIBRARIES)
 	@ echo
-	$(COMPILER) test_config.cc config_file.o dictionary.o configobjecttype_to_string.o lex.config.o config.tab.o $(FLAGS) -o test_config -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_util -lvx_math -lvx_cal -lvx_log -lm
+	$(COMPILER) test_config.cc $(FLAGS) -o test_config -I$(MET_INC_DIR) -L$(MET_LIB_DIR) -lvx_config -lvx_util -lvx_math -lvx_cal -lvx_log -lm
 
 
 ########################################################################
@@ -135,6 +155,7 @@ clean:
 	@ echo
 	rm -f config.output config.tab.c config.tab.h lex.config.c
 	rm -f *.a *.o temp junk core log a.out $(OBJECTS) $(EXECUTABLES) $(LIBRARIES)
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 
 
 ########################################################################
