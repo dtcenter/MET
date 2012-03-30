@@ -170,6 +170,7 @@ assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean ($1, 
            | array_prefix string_list     ']' ';'      { do_array($1); }
            | array_prefix threshold_list  ']' ';'      { do_array($1); }
            | array_prefix dictionary_list ']' ';'      { do_array($1); }
+           | array_prefix ']' ';'                      { do_array($1); }
 
            ;
 
