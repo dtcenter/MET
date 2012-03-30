@@ -45,6 +45,7 @@ gen_sources:
 	@ cd vx_math        ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_util        ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_econfig     ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_config      ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################
