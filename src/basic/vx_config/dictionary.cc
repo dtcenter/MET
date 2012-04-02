@@ -982,19 +982,80 @@ const DictionaryEntry * Dictionary::lookup(const char * name) const
 
 {
 
+if ( Nentries == 0 )  return ( (const DictionaryEntry *) 0 );
+
 int j;
+StringArray scope;
+ConcatString Name = name;
+const DictionaryEntry * E = (const DictionaryEntry *) 0;
+const Dictionary * D = this;
+
+
+   //
+   //  resolve scope, if needed
+   //
+
+scope = Name.split(".");
+
+if ( scope.n_elements() == 1 )  {
+
+   return ( lookup_simple(name) );
+
+}
+
+for (j=0; j<(scope.n_elements() - 1); ++j)  {
+
+   E = D->lookup(scope[j]);
+
+   if ( !E )  return ( (const DictionaryEntry *) 0 );
+
+   if ( ! E->is_dictionary() )  return ( (const DictionaryEntry *) 0 );
+
+   D = E->dict_value();
+
+}
 
    //
    //  try current dictionary
    //
 
+const char * stub = scope[scope.n_elements() - 1];
+
+E = D->lookup_simple(stub);
+
+if ( E )  return ( E );
+
+   //
+   //  try parent
+   //
+
+E = (const DictionaryEntry *) 0;
+
+if ( Parent )  E = Parent->lookup(name);
+
+   //
+   //  done
+   //
+
+return ( E );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const DictionaryEntry * Dictionary::lookup_simple(const char * name) const
+
+{
+
+if ( Nentries == 0 )  return ( (const DictionaryEntry *) 0 );
+
+int j;
+
 for (j=0; j<Nentries; ++j)  {
 
-   if ( e[j]->Name == name )  {
-
-      return ( e[j] );
-
-   }
+   if ( e[j]->Name == name )  return ( e[j] );   
 
 }
 

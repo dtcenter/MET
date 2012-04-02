@@ -112,7 +112,7 @@ void MetConfig::clear()
 
 Filename.clear();
 
-Dict.clear();
+Dictionary::clear();
 
 Debug = false;
 
@@ -132,7 +132,7 @@ clear();
 
 Filename = c.Filename;
 
-Dict = c.Dict;
+Dictionary::assign(*this);
 
 Debug = c.Debug;
 
@@ -158,7 +158,7 @@ out << prefix << "Debug    = "   << bool_to_string(Debug) << "\n";
 
 out << prefix << "Entries ...\n";
 
-Dict.dump(out, depth + 1);
+Dictionary::dump(out, depth + 1);
 
 
    //
@@ -189,22 +189,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry *  MetConfig::lookup(const char * name) const
-
-{
-
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
-
-e = Dict.lookup(name);
-
-return ( e );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 bool MetConfig::read(const char * name)
 
 {
@@ -219,7 +203,7 @@ if ( empty(name) )  {
 
 // clear();
 
-DictionaryStack DS(Dict);
+DictionaryStack DS(*this);
 
 bison_input_filename = name;
 
@@ -283,6 +267,24 @@ Column     = 1;
 is_lhs     = true;
 
 return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const DictionaryEntry * MetConfig::lookup(const char * name)
+
+{
+
+const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+e = Dictionary::lookup(name);
+
+LastLookupStatus = (e != 0);
+
+return ( e );
 
 }
 

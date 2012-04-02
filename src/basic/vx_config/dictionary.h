@@ -137,7 +137,7 @@ static const int dictionary_alloc_inc = 100;
 
 class Dictionary {
 
-   private:
+   protected:
 
       void init_from_scratch();
 
@@ -146,6 +146,8 @@ class Dictionary {
       void extend(int);
 
       void patch_parents() const;
+
+      virtual const DictionaryEntry * lookup_simple(const char * name) const;   //  no scope
 
 
       int Nentries;
@@ -159,13 +161,13 @@ class Dictionary {
    public:
 
       Dictionary();
-     ~Dictionary();
+      virtual ~Dictionary();
       Dictionary(const Dictionary &);
       Dictionary & operator=(const Dictionary &);
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      virtual void dump(ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -177,21 +179,21 @@ class Dictionary {
          //  get stuff
          //
 
-      int n_entries() const;
+      virtual int n_entries() const;
 
-      const DictionaryEntry * operator[](int) const;
+      virtual const DictionaryEntry * operator[](int) const;
 
-      const Dictionary * parent() const;
+      virtual const Dictionary * parent() const;
 
          //
          //  do stuff
          //
 
-      void store(const DictionaryEntry &);
+      virtual void store(const DictionaryEntry &);
 
-      void store(const Dictionary &);
+      virtual void store(const Dictionary &);
 
-      const DictionaryEntry * lookup(const char * name) const;
+      virtual const DictionaryEntry * lookup(const char * name) const;
 
 };
 
@@ -200,6 +202,8 @@ class Dictionary {
 
 
 inline int Dictionary::n_entries() const { return ( Nentries ); }
+
+inline const Dictionary * Dictionary::parent() const { return ( Parent ); }
 
 
 ////////////////////////////////////////////////////////////////////////
