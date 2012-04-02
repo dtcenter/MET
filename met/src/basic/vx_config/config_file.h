@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class MetConfig {
+class MetConfig : public Dictionary {
 
    private:
 
@@ -30,9 +30,9 @@ class MetConfig {
 
       StringArray Filename;
 
-      Dictionary Dict;
-
       bool Debug;
+
+      bool LastLookupStatus;
 
    public:
 
@@ -59,13 +59,17 @@ class MetConfig {
 
       bool debug() const;
 
+      bool last_lookup_status () const;
+
          //
          //  do stuff
          //
 
       bool read(const char * filename);
 
-      const DictionaryEntry * lookup(const char * name) const;
+      const DictionaryEntry * lookup(const char * name);
+
+
 
 };
 
@@ -76,6 +80,8 @@ class MetConfig {
 inline StringArray MetConfig::filename() const { return ( Filename ); }
 
 inline bool MetConfig::debug() const { return ( Debug ); }
+
+inline bool MetConfig::last_lookup_status() const { return ( LastLookupStatus ); }
 
 
 ////////////////////////////////////////////////////////////////////////
