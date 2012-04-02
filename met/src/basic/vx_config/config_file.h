@@ -20,6 +20,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+static const bool default_config_error_out = true;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class MetConfig : public Dictionary {
 
    private:
@@ -69,6 +75,14 @@ class MetConfig : public Dictionary {
 
       const DictionaryEntry * lookup(const char * name);
 
+         //
+         //  convenience functions
+         //
+
+      bool         lookup_bool   (const char * name, bool error_out = default_config_error_out);
+      int          lookup_int    (const char * name, bool error_out = default_config_error_out);
+      double       lookup_double (const char * name, bool error_out = default_config_error_out);
+      ConcatString lookup_string (const char * name, bool error_out = default_config_error_out);
 
 
 };

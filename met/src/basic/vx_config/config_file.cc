@@ -12,8 +12,10 @@ using namespace std;
 #include <cmath>
 
 #include "indent.h"
+#include "vx_log.h"
 #include "empty_string.h"
 #include "bool_to_string.h"
+#include "is_bad_data.h"
 
 #include "config_file.h"
 
@@ -285,6 +287,144 @@ e = Dictionary::lookup(name);
 LastLookupStatus = (e != 0);
 
 return ( e );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool MetConfig::lookup_bool(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == BooleanType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\n\n  MetConfig::lookup_bool() -> lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( false );
+
+}
+
+return ( Entry->b_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int MetConfig::lookup_int(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == IntegerType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\n\n  MetConfig::lookup_int() -> lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( bad_data_int );
+
+}
+
+return ( Entry->i_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double MetConfig::lookup_double(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == FloatType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\n\n  MetConfig::lookup_double() -> lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( bad_data_double );
+
+}
+
+return ( Entry->d_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString MetConfig::lookup_string(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == StringType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\n\n  MetConfig::lookup_string() -> lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   ConcatString s;
+
+   return ( s );
+
+}
+
+return ( *(Entry->string_value()) );
 
 }
 

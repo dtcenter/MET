@@ -11,8 +11,10 @@ using namespace std;
 #include <cmath>
 
 #include "indent.h"
+#include "vx_log.h"
 #include "bool_to_string.h"
 #include "empty_string.h"
+#include "is_bad_data.h"
 
 #include "dictionary.h"
 #include "configobjecttype_to_string.h"
@@ -53,13 +55,13 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-DictionaryEntry::DictionaryEntry(const DictionaryEntry & e)
+DictionaryEntry::DictionaryEntry(const DictionaryEntry & entry)
 
 {
 
 init_from_scratch();
 
-assign(e);
+assign(entry);
 
 }
 
@@ -67,13 +69,13 @@ assign(e);
 ////////////////////////////////////////////////////////////////////////
 
 
-DictionaryEntry & DictionaryEntry::operator=(const DictionaryEntry & e)
+DictionaryEntry & DictionaryEntry::operator=(const DictionaryEntry & entry)
 
 {
 
-if ( this == &e )  return ( * this );
+if ( this == &entry )  return ( * this );
 
-assign(e);
+assign(entry);
 
 return ( * this );
 
@@ -133,49 +135,49 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::assign(const DictionaryEntry & e)
+void DictionaryEntry::assign(const DictionaryEntry & entry)
 
 {
 
 clear();
 
-switch ( e.Type )  {
+switch ( entry.Type )  {
 
    case IntegerType:
-      set_int(e.Name, e.Ival);
+      set_int(entry.Name, entry.Ival);
       break;
 
    case FloatType:
-      set_double(e.Name, e.Dval);
+      set_double(entry.Name, entry.Dval);
       break;
 
    case BooleanType:
-      set_boolean(e.Name, e.Bval);
+      set_boolean(entry.Name, entry.Bval);
       break;
 
    case StringType:
-      set_string(e.Name, *(e.Text));
+      set_string(entry.Name, *(entry.Text));
       break;
 
    case DictionaryType:
-      set_dict(e.Name, *(e.Dict));
+      set_dict(entry.Name, *(entry.Dict));
       break;
 
    case ArrayType:
-      set_array(e.Name, *(e.Dict));
+      set_array(entry.Name, *(entry.Dict));
       break;
 
    case ThresholdType:
-      set_threshold(e.Name, *(e.Thresh));
+      set_threshold(entry.Name, *(entry.Thresh));
       break;
 
    case FunctionType:
-      set_pwl(e.Name, *(e.PWL));
+      set_pwl(entry.Name, *(entry.PWL));
       break;
 
    default:
       cerr << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
-           << configobjecttype_to_string(e.Type) << "\"\n\n";
+           << configobjecttype_to_string(entry.Type) << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -462,6 +464,32 @@ set_name(_name);
 Dict = new Dictionary;
 
 *Dict = d;
+
+   //
+   //  zero out parents for dictionaries in array
+   //
+
+int j;
+const DictionaryEntry * E = (const DictionaryEntry *) 0;
+Dictionary * D = (Dictionary *) 0;
+Dictionary & DD = *Dict;
+
+for (j=0; j<(Dict->n_entries()); ++j)  {
+
+   E = DD[j];
+
+   if ( ! (E->is_dictionary()) )  continue;
+
+   D = E->dict_value();
+
+   D->set_parent(0);
+
+}
+
+
+   //
+   //  done
+   //
 
 return;
 
@@ -1440,13 +1468,13 @@ const DictionaryEntry * DictionaryStack::lookup(const char * name) const
 if ( Nelements == 0 )  return ( (const DictionaryEntry *) 0 );
 
 int j;
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * E = (const DictionaryEntry *) 0;
 
 for (j=(Nelements - 1); j>=0; --j)  {
 
-   e = D[j]->lookup(name);
+   E = D[j]->lookup(name);
 
-   if ( e )  return ( e );
+   if ( E )  return ( E );
 
 }
 
