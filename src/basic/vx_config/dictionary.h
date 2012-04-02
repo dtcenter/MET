@@ -131,6 +131,8 @@ inline bool DictionaryEntry::is_dictionary() const { return ( Type == Dictionary
 
 static const int dictionary_alloc_inc = 100;
 
+static const bool default_dict_error_out = true;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -184,6 +186,7 @@ class Dictionary {
       virtual const DictionaryEntry * operator[](int) const;
 
       virtual const Dictionary * parent() const;
+
 
          //
          //  do stuff
