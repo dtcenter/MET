@@ -245,7 +245,9 @@ switch ( Type )  {
       break;
 
    default:
-      cerr << "\n\n  DictionaryEntry::dump(const DictionaryEntry &) -> bad object type ... \""
+      mlog << Error
+           << "\nDictionaryEntry::dump(const DictionaryEntry &) -> "
+           << "bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -272,7 +274,9 @@ void DictionaryEntry::set_name (const char * _name)
 
 if ( empty(_name) )  {
 
-   cerr << "\n\n  DictionaryEntry::set_name (const char *) -> empty string!\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::set_name (const char *) -> "
+        << "empty string!\n\n";
 
    exit ( 1 );
 
@@ -339,16 +343,6 @@ clear();
 Type = StringType;
 
 set_name(_name);
-
-/*
-if ( empty(_text) )  {
-
-   cerr << "\n\n  DictionaryEntry::set_string() -> empty string!\n\n";
-
-   exit ( 1 );
-
-}
-*/
 
 Text = new ConcatString;
 
@@ -505,7 +499,8 @@ int DictionaryEntry::i_value() const
 
 if ( Type != IntegerType )  {
 
-   cerr << "\n\n  DictionaryEntry::i_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::i_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -526,7 +521,8 @@ double DictionaryEntry::d_value() const
 
 if ( Type != FloatType )  {
 
-   cerr << "\n\n  DictionaryEntry::d_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::d_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -547,7 +543,8 @@ bool DictionaryEntry::b_value() const
 
 if ( Type != BooleanType )  {
 
-   cerr << "\n\n  DictionaryEntry::b_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::b_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -568,7 +565,8 @@ const ConcatString * DictionaryEntry::string_value() const
 
 if ( Type != StringType )  {
 
-   cerr << "\n\n  DictionaryEntry::string_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::string_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -589,7 +587,8 @@ Dictionary * DictionaryEntry::dict_value() const
 
 if ( Type != DictionaryType )  {
 
-   cerr << "\n\n  DictionaryEntry::dict_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::dict_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -610,7 +609,8 @@ Dictionary * DictionaryEntry::array_value() const
 
 if ( Type != ArrayType )  {
 
-   cerr << "\n\n  DictionaryEntry::array_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::array_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -631,7 +631,8 @@ SingleThresh * DictionaryEntry::thresh_value() const
 
 if ( Type != ThresholdType )  {
 
-   cerr << "\n\n  DictionaryEntry::thresh_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::thresh_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -652,7 +653,8 @@ PiecewiseLinear * DictionaryEntry::pwl_value() const
 
 if ( Type != FunctionType )  {
 
-   cerr << "\n\n  DictionaryEntry::pwl_value() -> bad type\n\n";
+   mlog << Error
+        << "\nDictionaryEntry::pwl_value() -> bad type\n\n";
 
    exit ( 1 );
 
@@ -991,7 +993,9 @@ const DictionaryEntry * Dictionary::operator[](int n) const
 
 if ( (n < 0) || (n >= Nentries) )  {
 
-   cerr << "\n\n  Dictionary::operator[](int) const -> range check error\n\n";
+   mlog << Error
+        << "\nDictionary::operator[](int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -1113,7 +1117,9 @@ void Dictionary::set_parent(const Dictionary * D)
 
 if ( D == this )  {
 
-   cerr << "\n\n  Dictionary::set_parent(const Dictionary *) -> dictionary can't be it's own parent!\n\n";
+   mlog << Error
+       << "\nDictionary::set_parent(const Dictionary *) -> "
+       << "dictionary can't be it's own parent!\n\n";
 
    exit ( 1 );
 
@@ -1174,7 +1180,9 @@ DictionaryStack::DictionaryStack()
 
 // init_from_scratch();
 
-cerr << "\n\n  DictionaryStack::DictionaryStack() -> should never be called!\n\n";
+mlog << Error
+     << "\nDictionaryStack::DictionaryStack() -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -1220,7 +1228,9 @@ DictionaryStack::DictionaryStack(const DictionaryStack & s)
 // 
 // assign(s);
 
-cerr << "\n\n  DictionaryStack::DictionaryStack(const DictionaryStack &) -> should never be called!\n\n";
+mlog << Error
+     << "\nDictionaryStack::DictionaryStack(const DictionaryStack &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -1238,7 +1248,9 @@ DictionaryStack & DictionaryStack::operator=(const DictionaryStack & s)
 // 
 // assign(s);
 
-cerr << "\n\n  DictionaryStack::operator=(const DictionaryStack &) -> should never be called!\n\n";
+mlog << Error
+     << "\nDictionaryStack::operator=(const DictionaryStack &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -1375,7 +1387,9 @@ void DictionaryStack::erase_top()
 
 if ( Nelements <= 1 )  {
 
-   cerr << "\n\n  DictionaryStack::erase_top() -> can't erase bottom-level dictionary!\n\n";
+   mlog << Error
+        << "\nDictionaryStack::erase_top() -> "
+        << "can't erase bottom-level dictionary!\n\n";
 
    exit ( 1 );
 
@@ -1399,7 +1413,8 @@ void DictionaryStack::push()
 
 if ( Nelements >= max_dictionary_depth )  {
 
-   cerr << "\n\n  DictionaryStack::push() -> stack full!\n\n";
+   mlog << Error
+        << "\nDictionaryStack::push() -> stack full!\n\n";
 
    exit ( 1 );
 
@@ -1421,7 +1436,8 @@ void DictionaryStack::pop(const char * name)
 
 if ( Nelements < 2 )  {
 
-   cerr << "\n\n  DictionaryStack::pop() -> stack empty!\n\n";
+   mlog << Error
+        << "\nDictionaryStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 

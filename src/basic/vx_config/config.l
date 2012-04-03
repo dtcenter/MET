@@ -16,6 +16,8 @@ using namespace std;
 
 #include <iostream>
 
+#include "vx_log.h"
+
 #include "threshold.h" //  must be included before config.tab.h
 
 #include "scanner_stuff.h"   //  must be included before config.tab.h
@@ -272,7 +274,9 @@ else if ( strcmp(configtext, "<=") == 0 )  configlval.cval = thresh_le;
 else if ( strcmp(configtext, ">=") == 0 )  configlval.cval = thresh_ge;
 else {
 
-   cerr << "\n\n  do_comp() -> bad comparison operator ... \"" << configtext << "\"\n\n";
+   mlog << Error
+        << "\ndo_comp() -> bad comparison operator ... \""
+        << configtext << "\"\n\n";
 
    exit ( 1 );
 
@@ -379,7 +383,9 @@ while ( 1 )  {
 
    if ( (n + 1) >= (int) sizeof(line) )  {
 
-      cerr << "\n\n  do_quoted_string() -> string too long! ... c = \"" << c << "\"\n\n";
+      mlog << Error
+           << "\ndo_quoted_string() -> string too long! ... c = \""
+           << c << "\"\n\n";
 
       exit ( 1 );
 
@@ -497,7 +503,9 @@ for (j=0; j<n; ++j)  {
 
          if ( !e )  {
 
-            cerr << "\n\n  patch_env() -> environment variable \"" << env_text << "\" not found!\n\n";
+            mlog << Error
+                 << "\npatch_env() -> environment variable \""
+                 << env_text << "\" not found!\n\n";
 
             exit ( 1 );
 
@@ -507,7 +515,10 @@ for (j=0; j<n; ++j)  {
 
          if ( (k + nn) >= max_id_length )  {
 
-            cerr << "\n\n  patch_env() -> replacement text for environment variable \"" << env_text << "\" too long!\n\n";
+            mlog << Error
+                 << "\npatch_env() -> "
+                 << "replacement text for environment variable \""
+                 << env_text << "\" too long!\n\n";
 
             exit ( 1 );
 
@@ -526,7 +537,8 @@ for (j=0; j<n; ++j)  {
 
    if ( k >= max_id_length )  {
 
-      cerr << "\n\n  patch_env() -> string too long!\n\n";
+      mlog << Error
+           << "\npatch_env() -> string too long!\n\n";
 
       exit ( 1 );
 
@@ -558,7 +570,9 @@ const char * c = strchr(line + 2, '}');
 
 if ( !c )  {
 
-   cerr << "\n\n  get_env_text() -> closing bracket not found in string \"" << line << "\"\n\n";
+   mlog << Error
+        << "\nget_env_text() -> closing bracket not found in string \""
+        << line << "\"\n\n";
 
    exit ( 1 );
 
@@ -568,7 +582,9 @@ int n = (int) (c - (line + 2));
 
 if ( n >= len )  {
 
-   cerr << "\n\n  get_env_text() -> environment variable text too long in \"" << line << "\"\n\n";
+   mlog << Error
+        << "\nget_env_text() -> environment variable text too long in \""
+        << line << "\"\n\n";
 
    exit ( 1 );
 
