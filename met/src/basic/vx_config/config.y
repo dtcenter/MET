@@ -20,6 +20,7 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
+#include "vx_log.h"
 #include "scanner_stuff.h"
 #include "dictionary.h"
 #include "threshold.h"
@@ -266,15 +267,17 @@ int line_len, text_len;
 int c;
 char line[512];
 ifstream in;
+ConcatString msg;
 
 
 c = (int) (Column - strlen(configtext));
 
-cout << "\n\n"
-     << "   yyerror() -> syntax error in file \"" << bison_input_filename << "\"\n\n"
-     << "      line   = " << LineNumber << "\n\n"
-     << "      column = " << c << "\n\n"
-     << "      text   = \"" << configtext << "\"\n\n";
+mlog << Error
+     << "\n"
+     << "yyerror() -> syntax error in file \"" << bison_input_filename << "\"\n\n"
+     << "   line   = " << LineNumber << "\n\n"
+     << "   column = " << c << "\n\n"
+     << "   text   = \"" << configtext << "\"\n\n";
 
 in.open(bison_input_filename);
 
@@ -291,9 +294,8 @@ in.close();
 
 
 
-cout << "\n\n"
-     << line
-     << "\n";
+mlog << Error
+     << "\n" << line << "\n";
 
 line_len = strlen(line);
 
@@ -302,18 +304,17 @@ text_len = strlen(configtext);
 j1 = c;
 j2 = c + text_len - 1;
 
-
+msg.erase();
 for (j=1; j<=line_len; ++j)  {   //  j starts at one here, not zero
 
-   if ( (j >= j1) && (j <= j2) )  cout.put('^');
-   else                           cout.put('_');
+   if ( (j >= j1) && (j <= j2) )  msg << '^';
+   else                           msg << '_';
 
 }
 
+mlog << Error
+     << msg << "\n\n";
 
-cout << "\n\n";
-
-cout.flush();
 
 exit ( 1 );
 
@@ -387,14 +388,18 @@ switch ( op )  {
    case '*':  C = A * B;  break;
    case '/':
       if ( B == 0.0 )  {
-         cerr << "\n\n  do_op() -> division by zero!\n\n";
+         mlog << Error
+              << "\ndo_op() -> "
+              << "division by zero!\n\n";
          exit ( 1 );
       }
       C = A / B;
       break;
 
    default:
-      cerr << "\n\n  do_op() -> bad operator ... \"" << op << "\"\n\n";
+      mlog << Error
+           << "\ndo_op() -> "
+           << "bad operator ... \"" << op << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -431,14 +436,18 @@ switch ( op )  {
    case '*':  C = A * B;  break;
    case '/':
       if ( B == 0 )  {
-         cerr << "\n\n  do_integer_op() -> division by zero!\n\n";
+         mlog << Error
+              << "\ndo_integer_op() -> "
+              << "division by zero!\n\n";
          exit ( 1 );
       }
       C = A / B;
       break;
 
    default:
-      cerr << "\n\n  do_integer_op() -> bad operator ... \"" << op << "\"\n\n";
+      mlog << Error
+           << "\ndo_integer_op() -> "
+           << "bad operator ... \"" << op << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -539,7 +548,10 @@ const DictionaryEntry * e = dict_stack->lookup(RHS);
 
 if ( !e )  {
 
-   cerr << "\n\n  do_assign_id() -> identifier \"" << RHS << "\" not defined in this scope!\n\n";
+   mlog << Error
+        << "\ndo_assign_id() -> "
+        << "identifier \"" << RHS
+        << "\" not defined in this scope!\n\n";
 
    exit ( 1 );
 
@@ -675,7 +687,9 @@ void do_thresh(const ThreshType t, const Number & n)
 
 if ( !is_array )  {
 
-   cerr << "\n\n  do_thresh(const ThreshType, const Number &) -> thresholds should only appear in arrays!\n\n";
+   mlog << Error
+        << "\ndo_thresh(const ThreshType, const Number &) -> "
+        << "thresholds should only appear in arrays!\n\n";
 
    exit ( 1 );
 
@@ -722,8 +736,6 @@ return;
 void do_pwl(const char * LHS)
 
 {
-
-cout << "\n\n  in do_pwl()\n\n" << flush;
 
 DictionaryEntry e;
 

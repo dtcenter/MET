@@ -197,7 +197,9 @@ bool MetConfig::read(const char * name)
 
 if ( empty(name) )  {
 
-   cerr << "\n\n  MetConfig::read(const char *) -> empty filename!\n\n";
+   mlog << Error
+        << "\nMetConfig::read(const char *) -> "
+        << "empty filename!\n\n";
 
    exit ( 1 );
 
@@ -223,7 +225,9 @@ configdebug = (Debug ? 1 : 0);
 
 if ( (configin = fopen(bison_input_filename, "r")) == NULL )  {
 
-   cerr << "\n\n  MetConfig::read(const char *) -> unable to open input file \"" << name << "\"\n\n";
+   mlog << Error
+        << "\nMetConfig::read(const char *) -> "
+        << "unable to open input file \"" << name << "\"\n\n";
 
    exit ( 1 );
 
@@ -235,17 +239,15 @@ parse_status = configparse();
 
 if ( parse_status != 0 )  {
 
-   // cerr << "\n\n  " << program_name << " -> parse status is nonzero!\n\n";
-   // 
-   // exit ( 1 );
-
    return ( false );
 
 }
 
 if ( DS.n_elements() != 1 )  {
 
-   cout << "\n\n  MetConfig::read(const char *) -> should be only one dictionary left after parsing! ...("
+   mlog << Error 
+        << "\nMetConfig::read(const char *) -> "
+        << "should be only one dictionary left after parsing! ...("
         << DS.n_elements() << ")\n\n";
 
    DS.dump(cout);
