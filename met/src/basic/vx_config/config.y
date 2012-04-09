@@ -91,9 +91,10 @@ static Number do_integer_op(char op, const Number & a, const Number & b);
 static Number do_negate(const Number &);
 
 
-static void do_assign_boolean (const char * name, bool);
-static void do_assign_exp     (const char * name, const Number &);
-static void do_assign_string  (const char * name, const char * text);
+static void do_assign_boolean   (const char * name, bool);
+static void do_assign_exp       (const char * name, const Number &);
+static void do_assign_string    (const char * name, const char * text);
+static void do_assign_threshold (const char * name);
 
 static void do_assign_id      (const char * LHS, const char * RHS);
 
@@ -166,6 +167,7 @@ assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean ($1, 
            | assign_prefix IDENTIFIER       ';'        { do_assign_id      ($1, $2); }
            | assign_prefix dictionary                  { do_assign_dict($1); }
            | assign_prefix piecewise_linear ';'        { do_pwl($1); }
+           | assign_prefix threshold        ';'        { do_assign_threshold($1); }
 
            | array_prefix number_list     ']' ';'      { do_array($1); }
            | array_prefix string_list     ']' ';'      { do_array($1); }
@@ -502,6 +504,37 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void do_assign_threshold(const char * name)
+
+{
+
+DictionaryEntry e;
+
+if ( DArray.n_entries() != 1 )  {
+
+   cerr << "\n\n  do_assign_threshold() -> too many elements in dictionary array!\n\n";
+
+   exit ( 1 );
+
+}
+
+e = *(DArray[0]);
+
+e.set_name(name);
+
+DArray.clear();
+
+dict_stack->store(e);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void do_assign_exp(const char * name, const Number & n)
 
 {
@@ -684,7 +717,7 @@ return;
 void do_thresh(const ThreshType t, const Number & n)
 
 {
-
+/*
 if ( !is_array )  {
 
    mlog << Error
@@ -694,6 +727,7 @@ if ( !is_array )  {
    exit ( 1 );
 
 }
+*/
 
 DictionaryEntry e;
 SingleThresh T;
