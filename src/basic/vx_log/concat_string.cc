@@ -978,7 +978,7 @@ bool operator==(const char * text, const ConcatString & a)
 
 {
 
-if ( !text || a.empty() )  return ( false );
+if ( !text || !a.text() )  return ( false );
 
 int status = strcmp(text, a.text());
 

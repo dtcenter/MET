@@ -71,6 +71,10 @@ class MetNcPinterpDataFile : public Met2dDataFile {
 
       int data_plane_array(VarInfo &, DataPlaneArray &);
 
+         //  retrieve the index of the first matching record
+
+      int index(VarInfo &);
+
          //
          //  do stuff
          //

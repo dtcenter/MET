@@ -771,3 +771,7 @@ int get_bit_from_octet(unsigned char u, int bit) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int MetGrib1DataFile::index(VarInfo &vinfo){
+   return -1;
+}

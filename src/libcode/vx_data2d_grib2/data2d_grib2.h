@@ -37,6 +37,7 @@ extern "C" {
 
 typedef struct {
    long ByteOffset;
+   int Index;
    int NumFields;
    int RecNum;
    int FieldNum;
@@ -53,6 +54,10 @@ typedef struct {
    int ResCompFlag;
    double ProbLower;
    double ProbUpper;
+   unixtime InitTime;
+   unixtime ValidTime;
+   int LeadTime;
+   int Accum;
 } Grib2Record;
 
 
@@ -133,6 +138,9 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       int data_plane_array(VarInfo &, DataPlaneArray &);
 
+         //  retrieve the index of the first matching record
+
+      int index(VarInfo &);
 
          //
          //  do stuff
