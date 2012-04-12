@@ -105,6 +105,8 @@ WS          [ \n\t]*
 ">"                                 { return ( do_comp() ); }
 "<="                                { return ( do_comp() ); }
 ">="                                { return ( do_comp() ); }
+"=="                                { return ( do_comp() ); }
+"!="                                { return ( do_comp() ); }
 
 
 "["                                 { ++Column;  return ( configtext[0] ); }
@@ -272,6 +274,8 @@ Column += strlen(configtext);
 else if ( strcmp(configtext, ">" ) == 0 )  configlval.cval = thresh_gt;
 else if ( strcmp(configtext, "<=") == 0 )  configlval.cval = thresh_le;
 else if ( strcmp(configtext, ">=") == 0 )  configlval.cval = thresh_ge;
+else if ( strcmp(configtext, "==") == 0 )  configlval.cval = thresh_eq;
+else if ( strcmp(configtext, "!=") == 0 )  configlval.cval = thresh_ne;
 else {
 
    mlog << Error
