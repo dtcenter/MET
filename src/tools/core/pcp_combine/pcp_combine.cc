@@ -824,13 +824,11 @@ void do_add_command()
         << "Reading input file: " << in_file[0] << "\n";
 
 
-   //PGO get_field(in_file[0], accum[0], 0, 0, grid1, total);
    get_field(in_file[0], accum_mag[0], 0, 0, grid1, total);
 
    // Initialize output times
    nc_init_time  = total.init();
    nc_valid_time = total.valid();
-   //PGO nc_accum      = accum[0];
    nc_accum = total.accum();
 
    //
