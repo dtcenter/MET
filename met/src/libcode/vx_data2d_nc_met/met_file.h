@@ -114,6 +114,8 @@ class MetNcFile {
 
       bool data(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
+      NcVarInfo* find_var_name(const char * var_name) const;
+
 };
 
 

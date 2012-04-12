@@ -92,6 +92,8 @@ class MetGrib1DataFile : public Met2dDataFile {
 
       int data_plane_array(VarInfo &, DataPlaneArray &);
       
+      int index(VarInfo &);
+
 };
 
 

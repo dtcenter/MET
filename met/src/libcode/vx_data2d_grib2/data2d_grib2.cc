@@ -39,6 +39,8 @@ extern "C" {
   #include "grib2.h"
 }
 
+static bool print_grid = false;
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
@@ -202,6 +204,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    plane = check_uv_rotation(vinfo_g2, listMatch[0], plane);
 
    return read_success;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -295,6 +298,7 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
    }
 
    return num_read;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -321,6 +325,13 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       bool rec_match_ex = false;
       bool rec_match_rn = false;
 
+      //  test the timing information
+      if( (!is_bad_data(vinfo->lead())  && vinfo->lead()  != (*it)->LeadTime)  ||
+          (vinfo->valid()               && vinfo->valid() != (*it)->ValidTime) ||
+          (vinfo->init()                && vinfo->init()  != (*it)->InitTime)  ){
+         continue;
+      }
+
       //  test for a record number match
       if( vinfo->record() == (*it)->RecNum ){
          rec_match_ex = true;
@@ -337,8 +348,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          //  accumulation level type
          if( LevelType_Accum == vinfo_lty ){
 
-            double sec_accum_unit = vinfo->g2_time_range_unit_to_sec( (*it)->RangeTyp );
-            rec_match_ex = (lvl1 == (*it)->RangeVal * (int)sec_accum_unit);
+            rec_match_ex = (lvl1 == (*it)->Accum);
 
          }
 
@@ -408,6 +418,7 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
    else                        { plane = v2d_rot; }
 
    return plane;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -464,6 +475,7 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
    }
 
    return array_ret;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -474,13 +486,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
    unsigned char *cgrib;
    long offset = 0, offset_next;
    g2int numfields;
-   int rec_num = 1;
-
-   //  start the timer
-   time_t time_start, time_read;
-   int hh, mm, ss;
-   char time_buf[64];
-   time( &time_start );
+   int idx = 0, rec_num = 1;
 
    //  read all the records into the record list, pulling grid information from the first
    while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, cgrib, numfields)) ){
@@ -501,6 +507,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  store the record information
          Grib2Record *rec = new Grib2Record;
          rec->ByteOffset   = offset;
+         rec->Index        = idx++;
          rec->NumFields    = (int)numfields;
          rec->RecNum       = rec_num;
          rec->FieldNum     = i;
@@ -515,11 +522,67 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->RangeVal     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
          rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
 
+         //  initialize the forecast time information
+         rec->ValidTime = -1;
+         rec->InitTime  = -1;
+         rec->LeadTime  = -1;
+         unixtime ref_time = mdyhms_to_unix(gfld->idsect[6], gfld->idsect[7], gfld->idsect[5],
+                                            gfld->idsect[8], gfld->idsect[9], gfld->idsect[10]);
+
+         //  parse the time reference indicator (Table 1.2)
+         switch( gfld->idsect[4] ){
+            case 0:     rec->ValidTime = ref_time;      break;      //  Analysis
+            case 1:     rec->InitTime  = ref_time;      break;      //  Start of Forecast
+            case 2:     rec->ValidTime = ref_time;      break;      //  Verifying Time of Forecast
+            case 3:     rec->ValidTime = ref_time;      break;      //  Observation Time
+            default:
+               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - found unexpected "
+                    << "time reference indicator of " << gfld->ipdtmpl[4] << ".\n\n";
+               exit(1);
+         }
+
+         //  depending on the template number, determine the reference times
+         if( 8 == gfld->ipdtnum ){
+
+            if( -1 != rec->ValidTime ){
+               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - accum valid time "
+                    << "unexpectedly set for record " << rec->RecNum << " field " << rec->FieldNum
+                    << "\n\n";
+               exit(1);
+            }
+
+            rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[16], gfld->ipdtmpl[17], gfld->ipdtmpl[15],
+                                            gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[20]);
+            rec->LeadTime = rec->ValidTime - rec->InitTime;
+
+         } else {
+
+            //  determine the time unit of the lead time and calculate it
+            double sec_lead_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (int)gfld->ipdtmpl[7] );
+            if( 0 >= sec_lead_unit ){
+               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - found unexpected "
+                    << "lead time unit of " << gfld->ipdtmpl[7] << "\n\n";
+               exit(1);
+            }
+            rec->LeadTime = sec_lead_unit * gfld->ipdtmpl[8];
+
+            //  set the forecast time information
+            if     ( -1 == rec->ValidTime )   rec->ValidTime = rec->InitTime  + rec->LeadTime;
+            else if( -1 == rec->InitTime  )   rec->InitTime  = rec->ValidTime - rec->LeadTime;
+
+         }
+
          //  store the probability information, if appropriate
          if( 9 == gfld->ipdtnum ){
             rec->ProbLower = (double)(gfld->ipdtmpl[19]) / pow( 10, (double)(gfld->ipdtmpl[18]) );
             rec->ProbUpper = (double)(gfld->ipdtmpl[21]) / pow( 10, (double)(gfld->ipdtmpl[20]) );
          }
+
+         //  set the accumulation interval
+         g2int range_typ = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
+         g2int range_val = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
+         double sec_accum_unit = VarInfoGrib2::g2_time_range_unit_to_sec( range_typ );
+         rec->Accum = range_val * (int)sec_accum_unit;
 
          //  build the parameter "name"
          ConcatString id;
@@ -529,9 +592,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  add the record to the list
          RecList.push_back(rec);
 
-         //PGO - build data structure for U/V wind pairs
-         string rec_mag = build_magic(rec);
-         NameRecMap[rec_mag] = rec;
+         //  build data structure for U/V wind pairs
+         NameRecMap[build_magic(rec)] = rec;
 
          g2_free(gfld);
          delete [] cgrib;
@@ -546,12 +608,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
       offset = offset_next;
 
    }  //  END:  while( read_grib2_record() )
-
-   //  report the timer
-   time( &time_read );
-   sec_to_hms( (int)time_read - (int)time_start, hh, mm, ss );
-   sprintf(time_buf, "Table build time: %02d:%02d:%02d", hh, mm, ss);
-   mlog << Debug(4) << time_buf << "\n";
 
 }
 
@@ -598,14 +654,16 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(4) << "\n"
-           << "Latitude/Longitude Grid Data:\n"
-           << "     lat_ll: " << data.lat_ll << "\n"
-           << "     lon_ll: " << data.lon_ll << "\n"
-           << "  delta_lat: " << data.delta_lat << "\n"
-           << "  delta_lon: " << data.delta_lon << "\n"
-           << "       Nlat: " << data.Nlat << "\n"
-           << "       Nlon: " << data.Nlon << "\n\n";
+      if( print_grid ){
+         mlog << Debug(4) << "\n"
+              << "Latitude/Longitude Grid Data:\n"
+              << "     lat_ll: " << data.lat_ll << "\n"
+              << "     lon_ll: " << data.lon_ll << "\n"
+              << "  delta_lat: " << data.delta_lat << "\n"
+              << "  delta_lon: " << data.delta_lon << "\n"
+              << "       Nlat: " << data.Nlat << "\n"
+              << "       Nlon: " << data.Nlon << "\n\n";
+      }
 
    }
 
@@ -647,19 +705,21 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(4) << "\n"
-           << "Stereographic Grid Data:\n"
-           << "  hemisphere: " << data.hemisphere << "\n"
-           << "   scale_lat: " << data.scale_lat << "\n"
-           << "     lat_pin: " << data.lat_pin << "\n"
-           << "     lon_pin: " << data.lon_pin << "\n"
-           << "       x_pin: " << data.x_pin << "\n"
-           << "       y_pin: " << data.y_pin << "\n"
-           << "  lon_orient: " << data.lon_orient << "\n"
-           << "        d_km: " << data.d_km << "\n"
-           << "        r_km: " << data.r_km << "\n"
-           << "          nx: " << data.nx << "\n"
-           << "          ny: " << data.ny << "\n\n";
+      if( print_grid ){
+         mlog << Debug(4) << "\n"
+              << "Stereographic Grid Data:\n"
+              << "  hemisphere: " << data.hemisphere << "\n"
+              << "   scale_lat: " << data.scale_lat << "\n"
+              << "     lat_pin: " << data.lat_pin << "\n"
+              << "     lon_pin: " << data.lon_pin << "\n"
+              << "       x_pin: " << data.x_pin << "\n"
+              << "       y_pin: " << data.y_pin << "\n"
+              << "  lon_orient: " << data.lon_orient << "\n"
+              << "        d_km: " << data.d_km << "\n"
+              << "        r_km: " << data.r_km << "\n"
+              << "          nx: " << data.nx << "\n"
+              << "          ny: " << data.ny << "\n\n";
+      }
 
    }
 
@@ -684,14 +744,16 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(4) << "\n"
-           << "Mercator Data:\n"
-           << "  lat_ll: " << data.lat_ll << "\n"
-           << "  lon_ll: " << data.lon_ll << "\n"
-           << "  lat_ur: " << data.lat_ur << "\n"
-           << "  lon_ur: " << data.lon_ur << "\n"
-           << "      ny: " << data.ny << "\n"
-           << "      nx: " << data.nx << "\n\n";
+      if( print_grid ){
+         mlog << Debug(4) << "\n"
+              << "Mercator Data:\n"
+              << "  lat_ll: " << data.lat_ll << "\n"
+              << "  lon_ll: " << data.lon_ll << "\n"
+              << "  lat_ur: " << data.lat_ur << "\n"
+              << "  lon_ur: " << data.lon_ur << "\n"
+              << "      ny: " << data.ny << "\n"
+              << "      nx: " << data.nx << "\n\n";
+      }
 
    }
 
@@ -722,19 +784,21 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       //  store the grid information
       _Grid->set(data);
 
-      mlog << Debug(4) << "\n"
-           << "Lambert Conformal Grid Data:\n"
-           << "  scale_lat_1: " << data.scale_lat_1 << "\n"
-           << "  scale_lat_2: " << data.scale_lat_2 << "\n"
-           << "      lat_pin: " << data.lat_pin << "\n"
-           << "      lon_pin: " << data.lon_pin << "\n"
-           << "        x_pin: " << data.x_pin << "\n"
-           << "        y_pin: " << data.y_pin << "\n"
-           << "   lon_orient: " << data.lon_orient << "\n"
-           << "         d_km: " << data.d_km << "\n"
-           << "         r_km: " << data.r_km << "\n"
-           << "           nx: " << data.nx << "\n"
-           << "           ny: " << data.ny << "\n\n";
+      if( print_grid ){
+         mlog << Debug(4) << "\n"
+              << "Lambert Conformal Grid Data:\n"
+              << "  scale_lat_1: " << data.scale_lat_1 << "\n"
+              << "  scale_lat_2: " << data.scale_lat_2 << "\n"
+              << "      lat_pin: " << data.lat_pin << "\n"
+              << "      lon_pin: " << data.lon_pin << "\n"
+              << "        x_pin: " << data.x_pin << "\n"
+              << "        y_pin: " << data.y_pin << "\n"
+              << "   lon_orient: " << data.lon_orient << "\n"
+              << "         d_km: " << data.d_km << "\n"
+              << "         r_km: " << data.r_km << "\n"
+              << "           nx: " << data.nx << "\n"
+              << "           ny: " << data.ny << "\n\n";
+      }
 
    }
 
@@ -814,81 +878,11 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
       }
    }
 
-
-   //
-   //  * * * *  parse time information  * * * *
-   //
-
-   //  initialize the forecast time information
-   unixtime ValidTime = -1;
-   unixtime InitTime  = -1;
-   unixtime LeadTime  = -1;
-   unixtime ref_time = mdyhms_to_unix(gfld->idsect[6], gfld->idsect[7], gfld->idsect[5],
-                                      gfld->idsect[8], gfld->idsect[9], gfld->idsect[10]);
-
-   //  parse the time reference indicator
-   switch( gfld->idsect[4] ){
-      case 0:     ValidTime = ref_time;      break;      //  Analysis
-      case 1:     InitTime  = ref_time;      break;      //  Start of Forecast
-      case 2:     ValidTime = ref_time;      break;      //  Verifying Time of Forecast
-      case 3:     ValidTime = ref_time;      break;      //  Observation Time
-      default:
-         mlog << Error << "\nMetGrib2DataFile::data_plane() found unexpected time reference "
-              << " indicator of " << gfld->ipdtmpl[4] << ".\n\n";
-         exit(1);
-   }
-
-   //  calculate the lead, valid and init time depending on the PDS template
-   //  template 0 is typically non-accum fields
-   if( 0 == gfld->ipdtnum ){
-
-      //  determine the time unit of the lead time and calculate it
-      double sec_lead_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (int)gfld->ipdtmpl[7] );
-      if( 0 >= sec_lead_unit ){
-         mlog << Error << "\nMetGrib2DataFile::data_plane() found unexpected lead time unit of "
-              << gfld->ipdtmpl[7] << "\n\n";
-         exit(1);
-      }
-      LeadTime = sec_lead_unit * gfld->ipdtmpl[8];
-
-      //  set the forecast time information
-      if( -1 == ValidTime )   ValidTime = InitTime  + LeadTime;
-      if( -1 == InitTime  )   InitTime  = ValidTime - LeadTime;
-
-   }
-
-   //  template 8 is typically accum fields
-   else if( 8 == gfld->ipdtnum ){
-
-      ValidTime = mdyhms_to_unix(gfld->ipdtmpl[16], gfld->ipdtmpl[17], gfld->ipdtmpl[15],
-                                 gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[20]);
-
-      if( -1 == InitTime ){
-         mlog << Error << "\nMetGrib2DataFile::data_plane() - Init time not set when calculating "
-              << "APCP valid time\n\n";
-         exit(1);
-      }
-
-      LeadTime = ValidTime - InitTime;
-
-   }
-
-   //  template 9 is typically probabilistic fields
-   else if( 8 == gfld->ipdtnum ){
-
-      //PGO: handle probabilistic field time information
-
-   }
-
-   plane.set_init  ( InitTime );
-   plane.set_valid ( ValidTime );
-   plane.set_lead  ( LeadTime );
-
-   //  set the accumulation interval
-   g2int range_typ = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
-   g2int range_val = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
-   double sec_accum_unit = VarInfoGrib2::g2_time_range_unit_to_sec( range_typ );
-   plane.set_accum ( range_val * (int)sec_accum_unit );
+   //  set the time information
+   plane.set_init  ( rec->InitTime  );
+   plane.set_valid ( rec->ValidTime );
+   plane.set_lead  ( rec->LeadTime  );
+   plane.set_accum ( rec->Accum     );
 
    //  print a report
    double plane_min, plane_max;
@@ -898,15 +892,15 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
         << "    plane min: " << plane_min << "\n"
         << "    plane max: " << plane_max << "\n"
         << "    scan mode: " << ScanMode << "\n"
-        << "   valid time: " << unix_to_yyyymmdd_hhmmss(ValidTime) << "\n"
-        << "    lead time: " << sec_to_hhmmss(LeadTime)  << "\n"
-        << "    init time: " << unix_to_yyyymmdd_hhmmss(InitTime)  << "\n"
+        << "   valid time: " << unix_to_yyyymmdd_hhmmss(rec->ValidTime) << "\n"
+        << "    lead time: " << sec_to_hhmmss(rec->LeadTime)  << "\n"
+        << "    init time: " << unix_to_yyyymmdd_hhmmss(rec->InitTime)  << "\n"
         << "  bitmap flag: " << gfld->ibmap << "\n\n";
 
    g2_free(gfld);
    delete [] cgrib;
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -980,3 +974,12 @@ const char* MetGrib2DataFile::build_magic(Grib2Record *rec){
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+int MetGrib2DataFile::index( VarInfo &vinfo ){
+
+   vector<Grib2Record*> listMatchExact, listMatchRange;
+   find_record_matches((VarInfoGrib2*)(&vinfo), listMatchExact, listMatchRange);
+   return 1 > listMatchExact.size() ? -1 : listMatchExact[0]->Index;
+
+}

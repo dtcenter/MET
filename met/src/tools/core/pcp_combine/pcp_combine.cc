@@ -75,6 +75,7 @@ using namespace std;
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -124,10 +125,12 @@ static unixtime     valid_time;
 static int          out_accum;
 static StringArray  pcp_dir;
 static ConcatString pcp_reg_exp = default_reg_exp;
+static ConcatString user_magic = "";
 
 // Variables for the add and subtract commands
 static ConcatString *in_file = (ConcatString *) 0;
 static int          *accum = (int *) 0;
+static StringArray   accum_mag;
 static int           n_files;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,6 +152,10 @@ static void get_field(const char * filename, const int get_accum,
                       const unixtime get_init_ut, const unixtime get_valid_ut,
                       Grid & grid, DataPlane & plane);
 
+static void get_field(const char * filename, const char * fld_accum_mag,
+                      const unixtime get_init_ut, const unixtime get_valid_ut,
+                      Grid & grid, DataPlane & plane);
+
 static void write_netcdf(unixtime, unixtime, int, const Grid &, const DataPlane &);
 
 static bool is_timestring(const char *);
@@ -165,6 +172,8 @@ static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
+static void set_user_magic(const StringArray & a);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -236,6 +245,7 @@ void process_command_line(int argc, char **argv)
    cline.add(set_verbosity, "-v",        1);
    cline.add(set_pcpdir,    "-pcpdir",   1);
    cline.add(set_pcprx,     "-pcprx",    1);
+   cline.add(set_user_magic,"-mag",      1);
 
    //
    // parse the command line
@@ -367,7 +377,7 @@ void process_add_sub_args(const CommandLine & cline)
    //
    for(i=0, n_files=0; i<(cline.n() - 1); i+=2) { // Only check accumulation interval for enough args
 
-      if ( ! is_timestring(cline[i + 1]) )  break;
+      //PGO if ( ! is_timestring(cline[i + 1]) )  break;
 
       n_files++; // Increment file count
 
@@ -384,7 +394,8 @@ void process_add_sub_args(const CommandLine & cline)
    //
    for(i=0; i<n_files; i++) {
       in_file[i] = cline[i*2];
-      accum[i]   = timestring_to_sec(cline[i*2 + 1]);
+      //accum[i]   = timestring_to_sec(cline[i*2 + 1]);
+      accum_mag.add( cline[i*2 + 1] );
    }
 
    //
@@ -679,10 +690,43 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
          // valid, lead, and accumulation times.
          //
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
-         check_file_time(cur_file, cur_ut, i_rec);
 
-         if(i_rec != -1) break;
+         Met2dDataFileFactory factory;
+         Met2dDataFile * datafile = (Met2dDataFile *) 0;
+         VarInfoFactory var_fac;
+         VarInfo* var;
+
+         //  create a data file object
+         datafile = factory.new_met_2d_data_file(cur_file);
+         if( !datafile ){
+            mlog << Debug(4) << "search_pcp_dir() - can't open data file \"" << cur_file << "\"\n";
+            return -1;
+         }
+
+         //  create a VarInfo object from the data file
+         var = var_fac.new_var_info(datafile->file_type());
+         if( !var ){
+            mlog << Debug(4) << "search_pcp_dir() -> unable to determine filetype of \"" << cur_file << "\"\n";
+            return -1;
+         }
+
+         // initialize the VarInfo object and store the requested timing information
+         if( !user_magic.empty() ){
+            mlog << Debug(4) << "Retrieving field using magic string '" << user_magic << "'\n";
+            var->set_magic( user_magic );
+         } else {
+            mlog << Debug(4) << "Retrieving field using accumulation of " << in_accum << "\n";
+            var->set_magic( make_magic(grib_code, grib_ptv, in_accum) );
+         }
+         var->set_valid(cur_ut);
+         var->set_init(init_time);
+         var->set_lead(cur_ut - init_time);
+
+         //  look for a VarInfo record match in the data file
+         if( -1 != (i_rec = datafile->index(*var)) ) break;
+
       } // end if
+
    } // end while
 
    if(closedir(dp) < 0) {
@@ -779,12 +823,15 @@ void do_add_command()
    mlog << Debug(1) 
         << "Reading input file: " << in_file[0] << "\n";
 
-   get_field(in_file[0], accum[0], 0, 0, grid1, total);
+
+   //PGO get_field(in_file[0], accum[0], 0, 0, grid1, total);
+   get_field(in_file[0], accum_mag[0], 0, 0, grid1, total);
 
    // Initialize output times
    nc_init_time  = total.init();
    nc_valid_time = total.valid();
-   nc_accum      = accum[0];
+   //PGO nc_accum      = accum[0];
+   nc_accum = total.accum();
 
    //
    // Loop through the rest of the input files
@@ -796,7 +843,7 @@ void do_add_command()
       //
       mlog << Debug(1) << "Reading input file: " << in_file[i] << "\n";
 
-      get_field(in_file[i].text(), accum[i], 0, 0, grid2, part);
+      get_field(in_file[i].text(), accum_mag[0], 0, 0, grid2, part);
 
       //
       // Check for the same grid dimensions
@@ -814,7 +861,7 @@ void do_add_command()
       if(nc_valid_time < part.valid()) nc_valid_time = part.valid();
 
       // Output accumulation time
-      nc_accum += accum[i];
+      nc_accum += total.accum();
 
       //
       // Increment sums for each grid point
@@ -879,12 +926,12 @@ void do_sub_command()
    mlog << Debug(1) 
         << "Reading input file: " << in_file[0] << "\n";
 
-   get_field(in_file[0], accum[0], 0, 0, grid1, plus);
+   get_field(in_file[0], accum_mag[0], 0, 0, grid1, plus);
 
    mlog << Debug(1) 
         << "Reading input file: " << in_file[1] << "\n";
 
-   get_field(in_file[1], accum[1], 0, 0, grid2, minus);
+   get_field(in_file[1], accum_mag[1], 0, 0, grid2, minus);
 
    //
    // Check for the same grid dimensions
@@ -924,14 +971,14 @@ void do_sub_command()
    // Output accumulation time
    // Error if accum1 < accum2.
    //
-   if(accum[0] < accum[1]) {
+   if(plus.accum() < minus.accum()) {
       mlog << Error << "\ndo_sub_command() -> "
-           << "accum1 (" << sec_to_hhmmss(accum[0])
+           << "accum1 (" << sec_to_hhmmss(plus.accum())
            <<  ") must be greater than accum2 ("
-           << sec_to_hhmmss(accum[1]) << ") for subtraction.\n\n";
+           << sec_to_hhmmss(minus.accum()) << ") for subtraction.\n\n";
       exit(1);
    }
-   nc_accum = accum[0] - accum[1];
+   nc_accum = plus.accum() - minus.accum();
 
    //
    // Allocate space to store the differences
@@ -979,49 +1026,66 @@ void get_field(const char * filename, const int get_accum,
                Grid & grid, DataPlane & plane)
 
 {
-
-Met2dDataFileFactory factory;
-Met2dDataFile * datafile = (Met2dDataFile *) 0;
-VarInfoGrib var;
-
-datafile = factory.new_met_2d_data_file(filename);
-
-if ( !datafile )  {
-
-   mlog << Error << "\nget_field() -> "
-        << "can't open data file \"" << filename
-        << "\"\n\n";
-
-   exit ( 1 );
-
+   get_field(filename, sec_to_hhmmss(get_accum), get_init_ut, get_valid_ut, grid, plane);
 }
 
-   //
-   // Initialize the VarInfo object and store the requested
-   // timing information
-   //
-var.set_magic(make_magic(grib_code, grib_ptv, get_accum));
-var.set_valid(get_valid_ut);
-var.set_init(get_init_ut);
+void get_field(const char * filename, const char * fld_accum_mag,
+               const unixtime get_init_ut, const unixtime get_valid_ut,
+               Grid & grid, DataPlane & plane)
 
-if ( ! datafile->data_plane(var, plane) )  {
+{
 
-   mlog << Error << "\nget_field() -> "
-        << "can't get data plane from file \"" << filename
-        << "\"\n\n";
+   Met2dDataFileFactory factory;
+   Met2dDataFile * datafile = (Met2dDataFile *) 0;
+   VarInfoFactory var_fac;
+   VarInfo* var;
 
-   exit ( 1 );
-}
+   //  open the data file and build a VarInfo object
+   datafile = factory.new_met_2d_data_file(filename);
+   if( !datafile ){
+      mlog << Error << "\nget_field() -> can't open data file \"" << filename
+           << "\"\n\n";
+      exit ( 1 );
+   }
 
-grid = datafile->grid();
+   var = var_fac.new_var_info(datafile->file_type());
+   if( !var ){
+      mlog << Error << "\nget_field() -> unable to determine filetype of \""
+           << filename << "\"\n\n";
+      exit (1);
+   }
 
-   //
-   //  done
-   //
+   //  attempt to parse the input accum/magic string as an accum
+   ConcatString magic = !user_magic.empty() ? user_magic : "";
+   int get_accum = 0;
+   if( is_timestring(fld_accum_mag) ) get_accum = timestring_to_sec(fld_accum_mag);
+   else                               magic     = fld_accum_mag;
 
-if ( datafile )  { delete datafile;  datafile = (Met2dDataFile *) 0; }
+   //  use the user-specified magic string, if available, otherwise assume GRIB
+   if( !magic.empty() ){
+      mlog << Debug(4) << "Retrieving field using magic string '" << magic << "'\n";
+      var->set_magic( magic );
+   } else {
+      mlog << Debug(4) << "Retrieving field using accumulation of " << fld_accum_mag << "\n";
+      var->set_magic( make_magic(grib_code, grib_ptv, get_accum) );
+   }
 
-return;
+   //  set the VarInfo timing object
+   var->set_valid(get_valid_ut);
+   var->set_init(get_init_ut);
+
+   //  read the record of interest into a DataPlane object
+   if( ! datafile->data_plane(*var, plane) ){
+      mlog << Error << "\nget_field() -> can't get data plane from file \"" << filename
+           << "\"\n\n";
+      exit ( 1 );
+   }
+
+   grid = datafile->grid();
+
+   if ( datafile )  { delete datafile;  datafile = (Met2dDataFile *) 0; }
+
+   return;
 
 }
 
@@ -1212,7 +1276,8 @@ void usage()
         << "\t[-gc code]\n"
         << "\t[-ptv number]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-mag magic_str]\n\n"
 
         << "\twhere\t\"-sum sum_args\" indicates that accumulations "
         << "from multiple files should be summed up using the "
@@ -1237,7 +1302,10 @@ void usage()
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << verbosity << ") (optional).\n\n"
+        << verbosity << ") (optional).\n"
+
+        << "\t\t\"-mag magic_str\" magic string to use when searching for records "
+        << "in input files (optional).\n\n"
 
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
         << "the default behavior.\n\n"
@@ -1280,44 +1348,44 @@ void usage()
 
         << "\tADD_ARGS:\n"
         << "\t\tin_file1\n"
-        << "\t\taccum1\n"
+        << "\t\taccum1/mag1\n"
         << "\t\t...\n"
         << "\t\tin_filen\n"
-        << "\t\taccumn\n"
+        << "\t\taccumn/magn\n"
         << "\t\tout_file\n\n"
 
         << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
         << "file to be used (required).\n"
 
-        << "\t\t\t\"accum1\" indicates the accumulation interval "
-        << "to be used from in_file1 in HH[MMSS] format (required).\n"
+        << "\t\t\t\"accum1/mag1\" indicates the accumulation interval or magic string "
+        << "to be used from in_file1 in HH[MMSS] format for interval (required).\n"
 
         << "\t\t\t\"in_filen\" indicates additional input GRIB files to be "
         << "added together (optional).\n"
 
-        << "\t\t\t\"accumn\" indicates the accumulation interval "
-        << "to be used in HH[MMSS] format (optional).\n"
+        << "\t\t\t\"accumn/magn\" indicates the accumulation interval or magic string "
+        << "to be used in HH[MMSS] format for interval (optional).\n"
 
         << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
         << "be written (required).\n\n"
 
         << "\tSUBTRACT_ARGS:\n"
         << "\t\tin_file1\n"
-        << "\t\taccum1\n"
+        << "\t\taccum1/mag1\n"
         << "\t\tin_file2\n"
-        << "\t\taccum2\n"
+        << "\t\taccum2/mag2\n"
         << "\t\tout_file\n\n"
 
         << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
         << "file to be used (required).\n"
 
-        << "\t\t\t\"accum1\" indicates the accumulation interval "
+        << "\t\t\t\"accum1/mag1\" indicates the accumulation interval or magic string "
         << "to be used from in_file1 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"in_file2\" indicates the name of the second input GRIB "
         << "file to be subtracted from in_file1 (required).\n"
 
-        << "\t\t\t\"accum2\" indicates the accumulation interval "
+        << "\t\t\t\"accum2/mag2\" indicates the accumulation interval or magic string "
         << "to be used from in_file2 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
@@ -1393,6 +1461,13 @@ void set_pcpdir(const StringArray & a)
 void set_pcprx(const StringArray & a)
 {
    pcp_reg_exp = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_user_magic(const StringArray & a)
+{
+   user_magic = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////

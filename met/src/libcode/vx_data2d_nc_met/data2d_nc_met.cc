@@ -212,3 +212,15 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int MetNcMetDataFile::index(VarInfo &vinfo){
+
+   if( NULL == MetNc->find_var_name( vinfo.name() ) ) return -1;
+
+   if( ( vinfo.valid() && MetNc->ValidTime   != vinfo.valid() ) ||
+       ( vinfo.init()  && MetNc->InitTime    != vinfo.init()  ) ||
+       ( vinfo.lead()  && MetNc->lead_time() != vinfo.lead()  ) )
+      return -1;
+
+   return 0;
+}

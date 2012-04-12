@@ -141,6 +141,10 @@ class Met2dDataFile : public Met2dData {
       
       virtual int data_plane_array(VarInfo &, DataPlaneArray &) = 0;
 
+         //  retrieve the indexes of the first matching data plane
+
+      virtual int index(VarInfo &) = 0;
+
 };
 
 

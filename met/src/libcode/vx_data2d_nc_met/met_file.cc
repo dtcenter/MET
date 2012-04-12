@@ -607,22 +607,13 @@ bool MetNcFile::data(const char * var_name, const LongArray & a, DataPlane & pla
 
 {
 
-int j;
-bool found = false;
+info = find_var_name(var_name);
 
-for (j=0; j<Nvars; ++j)  {
-
-   if ( Var[j].name == var_name )  {
-      found = true;
-      info = &Var[j];
-      break;
-   }
-
-}
+bool found = ( NULL != info );
 
 if ( !found )  return ( false );
 
-found = data(Var[j].var, a, plane);
+found = data(info->var, a, plane);
 
    //
    //  store the times
@@ -631,7 +622,7 @@ found = data(Var[j].var, a, plane);
 plane.set_init  ( ValidTime - lead_time() );
 plane.set_valid ( ValidTime );
 plane.set_lead  ( lead_time() );
-plane.set_accum ( Var[j].AccumTime );
+plane.set_accum ( info->AccumTime );
 
    //
    //  done
@@ -641,9 +632,16 @@ return ( found );
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
+NcVarInfo* MetNcFile::find_var_name(const char * var_name) const {
+
+   for(int i=0; i < Nvars; i++) if( Var[i].name == var_name ) return &Var[i];
+
+   return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void MetNcFile::get_times(const NcVar * var)
 
