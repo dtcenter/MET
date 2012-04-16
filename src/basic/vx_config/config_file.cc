@@ -312,7 +312,8 @@ if ( !Entry || !is_correct_type )  {
    if ( error_out )  {
 
       mlog << Error
-           << "\n\n  MetConfig::lookup_bool() -> lookup failed for name \"" << name << "\"\n\n";
+           << "\nMetConfig::lookup_bool() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
 
       exit ( 1 );
 
@@ -346,7 +347,8 @@ if ( !Entry || !is_correct_type )  {
    if ( error_out )  {
 
       mlog << Error
-           << "\n\n  MetConfig::lookup_int() -> lookup failed for name \"" << name << "\"\n\n";
+           << "\nMetConfig::lookup_int() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
 
       exit ( 1 );
 
@@ -380,7 +382,8 @@ if ( !Entry || !is_correct_type )  {
    if ( error_out )  {
 
       mlog << Error
-           << "\n\n  MetConfig::lookup_double() -> lookup failed for name \"" << name << "\"\n\n";
+           << "\nMetConfig::lookup_double() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
 
       exit ( 1 );
 
@@ -391,6 +394,82 @@ if ( !Entry || !is_correct_type )  {
 }
 
 return ( Entry->d_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+NumArray MetConfig::lookup_num_array(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+const Dictionary * Dict = (const Dictionary *) 0;
+ConfigObjectType Type = no_config_object_type;
+bool is_correct_type = false;
+NumArray array;
+
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nMetConfig::lookup_num_array() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( array );
+
+}
+
+   //
+   //  Retrieve the array dictionary
+   //
+
+Dict = Entry->array_value();
+
+   //
+   //  Check the array type.
+   //  Error out if array contains unexpected type.
+   //
+
+if ( Dict->n_entries() > 0 )  {
+
+   Type = (*Dict)[0]->type();
+  
+   if( Type != IntegerType && Type != FloatType )  {
+
+      mlog << Error
+           << "\nMetConfig::lookup_num_array() -> "
+           << "array \"" << name
+           << "\" does not contain numeric entries.\n\n";
+
+      exit ( 1 );
+
+   }
+}
+
+   //
+   //  Populate the NumArray with integers or doubles
+   //
+
+for (int i=0; i<Dict->n_entries(); i++)  {
+
+   if( Type == IntegerType)  array.add((*Dict)[i]->i_value());
+   else                      array.add((*Dict)[i]->d_value());
+
+}
+
+return ( array );
 
 }
 
@@ -414,7 +493,8 @@ if ( !Entry || !is_correct_type )  {
    if ( error_out )  {
 
       mlog << Error
-           << "\n\n  MetConfig::lookup_string() -> lookup failed for name \"" << name << "\"\n\n";
+           << "\nMetConfig::lookup_string() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
 
       exit ( 1 );
 
@@ -434,6 +514,182 @@ return ( *(Entry->string_value()) );
 ////////////////////////////////////////////////////////////////////////
 
 
+StringArray MetConfig::lookup_string_array(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+const Dictionary * Dict = (const Dictionary *) 0;
+bool is_correct_type = false;
+StringArray array;
+
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nMetConfig::lookup_string_array() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( array );
+
+}
+
+   //
+   //  Retrieve the array dictionary
+   //
+   
+Dict = Entry->array_value();
+
+   //
+   //  Check the array type.
+   //  Error out if array contains unexpected type.
+   //
+
+if ( Dict->n_entries() > 0 )  {
+
+   if( (*Dict)[0]->type() != StringType )  {
+  
+      mlog << Error
+           << "\nMetConfig::lookup_string_array() -> "
+           << "array \"" << name
+           << "\" does not contain StringType.\n\n";
+
+      exit ( 1 );
+
+   }
+}
+
+   //
+   //  Populate the StringArray
+   //
+   
+for (int i=0; i<Dict->n_entries(); i++)  {
+
+   array.add(*(*Dict)[i]->string_value());
+   
+}
+
+return ( array );
+
+}
 
 
+////////////////////////////////////////////////////////////////////////
 
+
+SingleThresh MetConfig::lookup_thresh(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == ThresholdType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nMetConfig::lookup_thresh() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   SingleThresh s;
+
+   return ( s );
+
+}
+
+return ( *(Entry->thresh_value()) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshArray MetConfig::lookup_thresh_array(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+const Dictionary * Dict = (const Dictionary *) 0;
+bool is_correct_type = false;
+ThreshArray array;
+
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nMetConfig::lookup_thresh_array() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( array );
+
+}
+
+   //
+   //  Retrieve the array dictionary
+   //
+
+Dict = Entry->array_value();
+
+   //
+   //  Check the array type.
+   //  Error out if array contains unexpected type.
+   //
+
+if ( Dict->n_entries() > 0 )  {
+
+   if( (*Dict)[0]->type() != ThresholdType )  {
+
+      mlog << Error
+           << "\nMetConfig::lookup_thresh_array() -> "
+           << "array \"" << name
+           << "\" does not contain ThreshType.\n\n";
+
+      exit ( 1 );
+
+   }
+}
+
+   //
+   //  Populate the ThreshArray
+   //
+
+for (int i=0; i<Dict->n_entries(); i++)  {
+
+   array.add(*(*Dict)[i]->thresh_value());
+
+}
+
+return ( array );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
