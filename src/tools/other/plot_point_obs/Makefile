@@ -100,9 +100,9 @@ plot_point_obs: plot_point_obs.cc $(OBJECTS)
 	-lvx_gsl_prob \
 	-lvx_grid \
 	-lvx_econfig \
-	-lvx_math \
 	-lvx_cal \
 	-lvx_util \
+	-lvx_math \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
