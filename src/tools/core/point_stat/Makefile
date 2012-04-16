@@ -16,15 +16,13 @@
 EXECUTABLES = point_stat
 
 
-OBJECTS     = point_stat_Conf.o \
-              point_stat_conf_info.o
+OBJECTS     = point_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = point_stat_Conf.h \
-              point_stat_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -54,23 +52,12 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-point_stat_Conf.h point_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PointStatConfig_default
-	@ echo
-	@ rm -f point_stat_Conf.h point_stat_Conf.cc
-	$(ECONFIG_CODEGEN) -class point_stat_Conf -outfile point_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/PointStatConfig_default
-
-
 ########################################################################
 
 
    ##
    ##  objects
    ##
-
-
-point_stat_Conf.o: point_stat_Conf.cc
-	@ echo
-	$(CXX) point_stat_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 point_stat_conf_info.o: point_stat_conf_info.cc
@@ -112,9 +99,9 @@ point_stat: point_stat.cc $(OBJECTS)
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_cal \
-	-lvx_econfig \
-	-lvx_math \
+	-lvx_config \
 	-lvx_util \
+	-lvx_math \
 	-lvx_log \
 	-lvx_color \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \

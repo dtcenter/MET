@@ -56,12 +56,12 @@ end_ds =  5400;
 //
 //    NOTE: To process a probability field, add "/PROB", such as "POP/Z0/PROB".
 //
-// e.g. fcst_field[] = [ "SPFH/P500", "TMP/P500" ]; for a GRIB input
-// e.g. fcst_field[] = [ "QVAPOR(0,5,*,*)", "TT(0,5,*,*)" ]; for NetCDF input
+// e.g. fcst_field = [ "SPFH/P500", "TMP/P500" ]; for a GRIB input
+// e.g. fcst_field = [ "QVAPOR(0,5,*,*)", "TT(0,5,*,*)" ]; for NetCDF input
 //
-fcst_field[] = [ "SPFH/P500", "TMP/P500", "HGT/P500",
-                 "UGRD/P500", "VGRD/P500" ];
-obs_field[]  = [];
+fcst_field = [ "SPFH/P500", "TMP/P500", "HGT/P500",
+               "UGRD/P500", "VGRD/P500" ];
+obs_field  = [];
 
 //
 // Specify a comma-separated list of groups of thresholds to be applied to the
@@ -83,10 +83,10 @@ obs_field[]  = [];
 // NOTE: Thresholds for probabilities must begin with 0.0, end with 1.0,
 //       and be preceeded by "ge".
 //
-// e.g. fcst_thresh[] = [ "gt80", "gt273" ];
+// e.g. fcst_thresh = [ "gt80", "gt273" ];
 //
-fcst_thresh[] = [ "gt80", "gt273", "gt0.0", "gt5.0", "gt5.0" ];
-obs_thresh[]  = [];
+fcst_thresh = [ "gt80", "gt273", "gt0.0", "gt5.0", "gt5.0" ];
+obs_thresh  = [];
 
 //
 // Specify a comma-separated list of thresholds to be used when computing
@@ -105,10 +105,10 @@ obs_thresh[]  = [];
 //    'gt' for greater than  'ge' for greater than or equal to
 //    'NA' for no threshold
 //
-// e.g. fcst_wind_thresh[] = [ "NA", "ge1.0" ];
+// e.g. fcst_wind_thresh = [ "NA", "ge1.0" ];
 //
-fcst_wind_thresh[] = [ "NA" ];
-obs_wind_thresh[]  = [];
+fcst_wind_thresh = [ >=0.0 ];
+obs_wind_thresh  = [];
 
 //
 // Specify a comma-separated list of PrepBufr message types with which
@@ -124,9 +124,9 @@ obs_wind_thresh[]  = [];
 //    ONLYSF (= ADPSFC, SFCSHP)
 // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 //
-// e.g. message_type[] = [ "ADPUPA", "AIRCAR" ];
+// e.g. message_type = [ "ADPUPA", "AIRCAR" ];
 //
-message_type[] = [ "ADPUPA" ];
+message_type = [ "ADPUPA" ];
 
 //
 // Specify a comma-separated list of grids to be used in masking the data over
@@ -136,9 +136,9 @@ message_type[] = [ "ADPUPA" ];
 // entire domain.
 // http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
 //
-// e.g. mask_grid[] = [ "FULL" ];
+// e.g. mask_grid = [ "FULL" ];
 //
-mask_grid[] = [ "FULL" ];
+mask_grid = [ "FULL" ];
 
 //
 // Specify a comma-separated list of masking regions to be applied.
@@ -166,12 +166,12 @@ mask_grid[] = [ "FULL" ];
 //
 // MET_BASE may be used in the path for the files above.
 //
-// e.g. mask_poly[] = [ "MET_BASE/data/poly/EAST.poly",
+// e.g. mask_poly = [ "MET_BASE/data/poly/EAST.poly",
 //                      "poly_mask.ncf",
 //                      "sample.nc APCP",
 //                      "sample.grb HGT/Z0 gt100.0" ];
 //
-mask_poly[] = [];
+mask_poly = [];
 
 //
 // Specify the name of an ASCII file containing a space-separated list of
@@ -190,9 +190,9 @@ mask_sid = "";
 // Specify a comma-separated list of values for alpha to be used when computing
 // confidence intervals.  Values of alpha must be between 0 and 1.
 //
-// e.g. ci_alpha[] = [ 0.05, 0.10 ];
+// e.g. ci_alpha = [ 0.05, 0.10 ];
 //
-ci_alpha[] = [ 0.05 ];
+ci_alpha = [ 0.05 ];
 
 //
 // Specify the method to be used for computing bootstrap confidence intervals.
@@ -248,9 +248,9 @@ boot_seed = "";
 // In all cases, vertical interpolation is performed in the natural log
 // of pressure of the levels above and below the observation.
 //
-// e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
+// e.g. interp_method = [ "UW_MEAN", "MEDIAN" ];
 //
-interp_method[] = [ "UW_MEAN" ];
+interp_method = [ "UW_MEAN" ];
 
 //
 // Specify a comma-separated list of box widths to be used by the
@@ -261,7 +261,7 @@ interp_method[] = [ "UW_MEAN" ];
 //
 // e.g. interp_width = [ 1, 3, 5 ];
 //
-interp_width[] = [ 1 ];
+interp_width = [ 1 ];
 
 //
 // When interpolating, compute a ratio of the number of valid data points
@@ -470,7 +470,7 @@ interp_thresh = 1.0;
 //    (1) Write output to a STAT file
 //    (2) Write output to a STAT file and a text file
 //
-output_flag[] = [ 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 ];
+output_flag = [ 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 ];
 
 //
 // Flag to indicate whether Kendall's Tau and Spearman's Rank Correlation
