@@ -20,6 +20,7 @@ using namespace std;
 #include <cmath>
 
 #include "int_array.h"
+#include "nint.h"
 #include "vx_log.h"
 
 
@@ -85,6 +86,22 @@ IntArray & IntArray::operator=(const IntArray & a)
 if ( this == &a )  return ( * this );
 
 assign(a);
+
+return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+IntArray & IntArray::operator=(const NumArray & a)
+
+{
+
+clear();
+
+for(int j=0; j<a.n_elements(); ++j) add(nint(a[j]));
 
 return ( * this );
 

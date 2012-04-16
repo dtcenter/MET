@@ -20,6 +20,8 @@
 
 #include <iostream>
 
+#include "num_array.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +55,7 @@ class IntArray {
      ~IntArray();
       IntArray(const IntArray &);
       IntArray & operator=(const IntArray &);
+      IntArray & operator=(const NumArray &);
 
       void clear();
 
