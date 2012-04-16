@@ -195,10 +195,8 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void parse_sid_mask(const char *mask_sid_file, StringArray &mask_sid)
-
-{
-
+void parse_sid_mask(const ConcatString &mask_sid_file,
+                    StringArray &mask_sid) {
    ifstream in;
    ConcatString tmp_file;
    char sid_str[PATH_MAX];
@@ -207,7 +205,7 @@ void parse_sid_mask(const char *mask_sid_file, StringArray &mask_sid)
         << " parsing station ID mask file \"" << mask_sid_file << "\"\n";
 
    // Check for an empty length string
-   if(strlen(mask_sid_file) == 0) return;
+   if(mask_sid_file.empty()) return;
         
    // Replace any instances of MET_BASE with it's expanded value
    tmp_file = replace_path(mask_sid_file);
