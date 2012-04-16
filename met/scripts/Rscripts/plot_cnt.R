@@ -213,7 +213,7 @@ case_list <- unique(data$index)
 
 # Open up the output device
 print(paste("Writing:", out_file))
-pdf(out_file, height=8.5, width=11)
+pdf(out_file, height=8.5, width=11, useDingbats=FALSE)
 
 # Loop through each of the cases and create plots
 for(i in 1:length(case_list)) {
