@@ -1,0 +1,36 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Defintion of constants used throughout MET configuration files.
+//
+// This file should not be modified.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+// File types
+GRIB1        = 1;
+NETCDF_MET   = 2;
+NETCDF_PINT  = 3;
+GRIB2        = 4;
+
+// Interpolation method
+MIN          = 1;
+MAX          = 2;
+MEDIAN       = 3;
+UW_MEAN      = 4;
+DW_MEAN      = 5;
+LS_FIT       = 6;
+BILIN        = 7;
+
+// Interpolation types
+FCST         = 1;
+OBS          = 2;
+BOTH         = 3;
+
+// Output flag values
+NONE         = 1;
+STAT         = 2;
+BOTH         = 3;
+
+// Bootstrapping interval type
+PCTILE       = 1;
+BCA          = 2;
