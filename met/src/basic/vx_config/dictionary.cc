@@ -176,7 +176,8 @@ switch ( entry.Type )  {
       break;
 
    default:
-      cerr << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
+      mlog << Error
+           << "\n\n  DictionaryEntry::assign(const DictionaryEntry &) -> bad object type ... \""
            << configobjecttype_to_string(entry.Type) << "\"\n\n";
       exit ( 1 );
       break;
@@ -828,7 +829,9 @@ Indent prefix(depth);
 out << prefix << "Nentries = " << Nentries << "\n";
 
 out << prefix << "Address  = " << (void *) this   << "\n";
+
 out << prefix << "Parent   = " << (void *) Parent << "\n";
+// if ( Parent )  out << "   (" << Parent->name() << ")\n";
 
 
 int j;
@@ -1141,18 +1144,37 @@ void Dictionary::patch_parents() const
 
 int j;
 Dictionary * d = (Dictionary *) 0;
+ConfigObjectType t = no_config_object_type;
+
 
 for (j=0; j<Nentries; ++j)  {
 
-   if ( e[j]->type() != DictionaryType )  continue;
+   d = (Dictionary *) 0;
 
-   d = e[j]->dict_value();
+   t = e[j]->type();
+
+   switch ( t )  {
+
+      case DictionaryType:
+         d = e[j]->dict_value();
+         break;
+
+      case ArrayType:
+         d = e[j]->array_value();
+         break;
+
+      default:
+        break;
+
+   }   //  switch
+
+   if ( !d )  continue;
 
    d->set_parent(this);
 
    d->patch_parents();
 
-}
+}   //  for j
 
    //
    //  done
