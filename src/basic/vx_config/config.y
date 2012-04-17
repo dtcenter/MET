@@ -512,7 +512,8 @@ DictionaryEntry e;
 
 if ( DArray.n_entries() != 1 )  {
 
-   cerr << "\n\n  do_assign_threshold() -> too many elements in dictionary array!\n\n";
+   mlog << Error
+        << "\n\n  do_assign_threshold() -> too many elements in dictionary array!\n\n";
 
    exit ( 1 );
 
