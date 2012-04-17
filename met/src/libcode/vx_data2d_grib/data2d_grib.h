@@ -84,7 +84,7 @@ class MetGrib1DataFile : public Met2dDataFile {
 
       void dump(ostream &, int depth = 0) const;
 
-      bool read_record(const int);
+      bool read_record(const int, const bool read_plane = true);
 
       int read_record(const VarInfoGrib &);   //  returns match count (>=0), or -1 on error
 

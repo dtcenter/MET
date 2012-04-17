@@ -719,7 +719,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
          }
          var->set_valid(cur_ut);
          var->set_init(init_time);
-         var->set_lead(cur_ut - init_time);
+         var->set_lead(init_time ? cur_ut - init_time : 0);
 
          //  look for a VarInfo record match in the data file
          if( -1 != (i_rec = datafile->index(*var)) ) break;

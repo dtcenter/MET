@@ -283,7 +283,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetGrib1DataFile::read_record(const int n)
+bool MetGrib1DataFile::read_record(const int n, const bool read_plane /* = true */)
 
 {
 
@@ -319,7 +319,7 @@ return (false);
    //
    // put the current record into the plane
    //
-get_data_plane(CurrentRecord, Plane);
+if( read_plane ) get_data_plane(CurrentRecord, Plane);
 
 return (true);
 
@@ -775,12 +775,39 @@ int get_bit_from_octet(unsigned char u, int bit) {
 int MetGrib1DataFile::index(VarInfo &vinfo){
 
    int rec = -1;
-   if( -1 == (rec = read_record( *( (VarInfoGrib*)(&vinfo) ) )) )
-      return -1;
+   VarInfoGrib vinfo_g = *( (VarInfoGrib*)(&vinfo) );
 
-   if( ( vinfo.valid() && Plane.valid() != vinfo.valid() ) ||
-       ( vinfo.init()  && Plane.init()  != vinfo.init()  ) ||
-       ( vinfo.lead()  && Plane.lead()  != vinfo.lead()  ) )
+   //  check the GRIB file
+   if( !GF )  {
+      mlog << Error << "\nMetGrib1DataFile::index(const VarInfoGrib &) -> "
+           << "no grib file open!\n\n";
+      return -1;
+   }
+
+   //  look at records until a match is found
+   for (rec=0; rec < GF->n_records(); rec++){
+
+      //  read only the header information
+      if( ! read_record(rec, false) ){
+         mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> trouble reading record!\n\n";
+         return -1;
+      }
+
+      //  if an exact match is found, break
+      if( is_exact_match(vinfo_g, CurrentRecord) ) break;
+
+   }
+
+   //  read the time information for the matched record
+   int bms_flag = 0, accum = 0;
+   unixtime init_ut, valid_ut;
+   read_pds(CurrentRecord, bms_flag, init_ut, valid_ut, accum);
+   int lead = valid_ut - init_ut;
+
+   //  check the record time information
+   if( ( vinfo.valid() && valid_ut != vinfo.valid() ) ||
+       ( vinfo.init()  && init_ut  != vinfo.init()  ) ||
+       ( vinfo.lead()  && lead     != vinfo.lead()  ) )
       return -1;
 
    return rec;
