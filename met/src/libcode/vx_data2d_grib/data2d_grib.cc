@@ -773,5 +773,15 @@ int get_bit_from_octet(unsigned char u, int bit) {
 ////////////////////////////////////////////////////////////////////////
 
 int MetGrib1DataFile::index(VarInfo &vinfo){
-   return -1;
+
+   int rec = -1;
+   if( -1 == (rec = read_record( *( (VarInfoGrib*)(&vinfo) ) )) )
+      return -1;
+
+   if( ( vinfo.valid() && Plane.valid() != vinfo.valid() ) ||
+       ( vinfo.init()  && Plane.init()  != vinfo.init()  ) ||
+       ( vinfo.lead()  && Plane.lead()  != vinfo.lead()  ) )
+      return -1;
+
+   return rec;
 }
