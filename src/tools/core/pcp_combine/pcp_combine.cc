@@ -146,7 +146,6 @@ static void do_sub_command();
 
 static void sum_grib_files(Grid &, DataPlane &);
 static int  search_pcp_dir(const char *, const unixtime, ConcatString &);
-static void check_file_time(const char *, unixtime, int &);
 
 static void get_field(const char * filename, const int get_accum,
                       const unixtime get_init_ut, const unixtime get_valid_ut,
@@ -737,68 +736,6 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
    }
 
    return(i_rec);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void check_file_time(const char *file, unixtime pcp_valid, int &i_gc)
-
-{
-
-   GribFile grib_file;
-   GribRecord rec;
-   int i, bms_flag, file_accum;
-   unixtime file_init, file_valid;
-
-   i_gc = -1;
-
-   //
-   // Open the precipitation grib file
-   //
-   if( !(grib_file.open(file)) ) {
-      mlog << Warning << "\ncheck_file_time() -> "
-           << "can't open precipitation grib file: "
-           << file << "\n\n";
-      return;
-   }
-
-   //
-   // Find the grib record containing the accumulated precipitation.
-   // A Grib file may contain multiple records of accumulated
-   // precipitation.  Search grid records for one with the expected
-   // accumulation interval.
-   //
-   for(i=0; i< grib_file.n_records(); i++) {
-
-      if(grib_file.gribcode(i) != grib_code)  continue;
-
-      //
-      // Read the record containing accumulated precip
-      //
-      grib_file.seek_record(i);
-      grib_file >> rec;
-
-      //
-      // Read the Product Description Section
-      //
-      read_pds(rec, bms_flag, file_init, file_valid, file_accum);
-
-      //
-      // The file matches if the issuance times, valid times, and
-      // accumulation times match
-      //
-      if((file_init == init_time || init_time == (unixtime) 0) &&
-         (file_valid == pcp_valid) &&
-         (file_accum == in_accum)) {
-         i_gc = i;
-         break;
-      }
-
-   } // end for
-
-   grib_file.close();
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
