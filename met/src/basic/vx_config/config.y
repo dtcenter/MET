@@ -641,6 +641,8 @@ if ( DD.n_entries() > 0 )  {
 
    dict_stack->store(e);
 
+   DD.clear();
+
 } else {
 
    dict_stack->pop_dict(name);
