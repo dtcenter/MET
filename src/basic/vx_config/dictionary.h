@@ -67,6 +67,8 @@ class DictionaryEntry {
 
       void dump(ostream & out, int = 0) const;
 
+      void dump_config_format(ostream & out, int = 0) const;
+
          //
          //  set stuff
          //
@@ -110,6 +112,7 @@ class DictionaryEntry {
 
       bool is_number     () const;
       bool is_dictionary () const;
+      bool is_array      () const;
 
 };
 
@@ -124,6 +127,8 @@ inline ConcatString DictionaryEntry::name() const { return ( Name ); }
 inline bool DictionaryEntry::is_number() const { return ( (Type == IntegerType) || (Type == FloatType) ); }
 
 inline bool DictionaryEntry::is_dictionary() const { return ( Type == DictionaryType ); }
+
+inline bool DictionaryEntry::is_array() const { return ( Type == ArrayType ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -156,6 +161,8 @@ class Dictionary {
 
       int Nalloc;
 
+      bool IsArray;
+
       DictionaryEntry ** e;   // allocated
 
       const Dictionary * Parent;   //  not allocated
@@ -171,11 +178,15 @@ class Dictionary {
 
       virtual void dump(ostream &, int = 0) const;
 
+      virtual void dump_config_format(ostream & out, int = 0) const;
+
          //
          //  set stuff
          //
 
       void set_parent(const Dictionary *);
+
+      void set_is_array(bool = true);
 
          //
          //  get stuff
@@ -187,6 +198,7 @@ class Dictionary {
 
       virtual const Dictionary * parent() const;
 
+      virtual bool is_array() const;
 
          //
          //  do stuff
@@ -207,6 +219,10 @@ class Dictionary {
 inline int Dictionary::n_entries() const { return ( Nentries ); }
 
 inline const Dictionary * Dictionary::parent() const { return ( Parent ); }
+
+inline void Dictionary::set_is_array(bool __tf) { IsArray = __tf;  return; }
+
+inline bool Dictionary::is_array() const { return ( IsArray ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -247,33 +263,40 @@ class DictionaryStack {
 
       void dump(ostream &, int = 0) const;
 
+      void dump_config_format(ostream & out, int = 0) const;
+
          //
          //  set stuff
          //
+
+      void set_top_is_array(bool);
 
          //
          //  get stuff
          //
 
-     int n_elements() const;
+      int n_elements() const;
 
-     const Dictionary * top() const;
+      const Dictionary * top() const;
+
+      bool top_is_array() const;
 
          //
          //  do stuff
          //
 
       void push();
+      void push_array();
 
-      void pop(const char * name);
+      void pop_dict    (const char * name);
+
+      void pop_element (const char * name);
 
       void erase_top();
 
       void store(const DictionaryEntry &);
 
       const DictionaryEntry * lookup(const char * name) const;
-
-
 
 };
 

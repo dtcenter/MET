@@ -109,10 +109,12 @@ WS          [ \n\t]*
 "!="                                { return ( do_comp() ); }
 
 
-"["                                 { ++Column;  return ( configtext[0] ); }
+"["                                 { ++Column;  is_lhs = true;  dict_stack->push_array();  return ( configtext[0] ); }
+"{"                                 { ++Column;  is_lhs = true;  dict_stack->push();        return ( configtext[0] ); }
+
 "]"                                 { ++Column;  return ( configtext[0] ); }
-"{"                                 { ++Column;  is_lhs = true;  dict_stack->push(); return ( configtext[0] ); }
 "}"                                 { ++Column;  return ( configtext[0] ); }
+
 "("                                 { ++Column;  return ( configtext[0] ); }
 ")"                                 { ++Column;  return ( configtext[0] ); }
 
@@ -430,6 +432,19 @@ Column += strlen(configtext);
 
 if ( strcmp(configtext, "true"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
 if ( strcmp(configtext, "false" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
+
+   //
+   //  comparison?
+   //
+
+if ( strcmp(configtext, "lt" ) == 0 )  { configlval.cval = thresh_lt;  return ( COMPARISON ); }
+if ( strcmp(configtext, "le" ) == 0 )  { configlval.cval = thresh_le;  return ( COMPARISON ); }
+
+if ( strcmp(configtext, "gt" ) == 0 )  { configlval.cval = thresh_gt;  return ( COMPARISON ); }
+if ( strcmp(configtext, "ge" ) == 0 )  { configlval.cval = thresh_ge;  return ( COMPARISON ); }
+
+if ( strcmp(configtext, "ne" ) == 0 )  { configlval.cval = thresh_ne;  return ( COMPARISON ); }
+if ( strcmp(configtext, "eq" ) == 0 )  { configlval.cval = thresh_eq;  return ( COMPARISON ); }
 
    //
    //  number?

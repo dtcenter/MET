@@ -70,11 +70,9 @@ bool              is_lhs                = true;
    //  static definitions
    //
 
-static bool is_array = false;
-
-static Dictionary DArray;
-
 static PiecewiseLinear pwl;
+
+static Dictionary DD;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -106,7 +104,7 @@ static void do_string(const char *);
 
 static void do_number(const Number &);
 
-static void do_array(const char * LHS);
+// static void do_array(const char * LHS);
 
 static void do_thresh(const ThreshType, const Number &);
 
@@ -155,43 +153,40 @@ static void do_pwl(const char * LHS);
 
 %%
 
-
 assignment_list : assignment                    { is_lhs = true; }
                 | assignment_list assignment    { is_lhs = true; }
                 ;
 
 
 assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean ($1, $2); }
-           | assign_prefix QUOTED_STRING    ';'        { do_assign_string  ($1, $2); }
            | assign_prefix expression       ';'        { do_assign_exp     ($1, $2); }
            | assign_prefix IDENTIFIER       ';'        { do_assign_id      ($1, $2); }
-           | assign_prefix dictionary                  { do_assign_dict($1); }
-           | assign_prefix piecewise_linear ';'        { do_pwl($1); }
-           | assign_prefix threshold        ';'        { do_assign_threshold($1); }
+           | assign_prefix piecewise_linear ';'        { do_pwl            ($1); }
 
-           | array_prefix number_list     ']' ';'      { do_array($1); }
-           | array_prefix string_list     ']' ';'      { do_array($1); }
-           | array_prefix threshold_list  ']' ';'      { do_array($1); }
-           | array_prefix dictionary_list ']' ';'      { do_array($1); }
-           | array_prefix ']' ';'                      { do_array($1); }
+           | assign_prefix threshold        ';'        { do_assign_threshold ($1); }
+           | assign_prefix QUOTED_STRING    ';'        { do_assign_string    ($1, $2); }
+           | assign_prefix dictionary                  { do_assign_dict      ($1); }
+
+           | array_prefix number_list     ']' ';'      { do_assign_dict($1); }
+           | array_prefix string_list     ']' ';'      { do_assign_dict($1); }
+           | array_prefix threshold_list  ']' ';'      { do_assign_dict($1); }
+           | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
+           | array_prefix ']' ';'                      { do_assign_dict($1); }
 
            ;
 
 
-assign_prefix : IDENTIFIER '=' { is_lhs = false;  strcpy($$, $1); }
+assign_prefix : IDENTIFIER '='     { is_lhs = false;  strcpy($$, $1); }
               ;
 
 
-array_prefix : assign_prefix '['     { is_lhs = false;  is_array = true;  DArray.clear(); strcpy($$, $1); }
+array_prefix : assign_prefix '['   { is_lhs = false;  strcpy($$, $1); }
              ;
 
 
-dictionary : '{' assignment_list '}'  opt_semi { do_dict(); }
+dictionary : '{' assignment_list '}'  opt_semi  { do_dict(); }
            ;
 
-opt_semi : ';'
-         |  /*  nothing  */
-         ;
 
 dictionary_list : dictionary
                 | dictionary_list ',' dictionary
@@ -222,6 +217,11 @@ number_list : number                   { do_number($1); }
             ;
 
 
+opt_semi : ';'
+         |  /*  nothing  */
+         ;
+
+
 expression : number                                     { $$ = $1; }
            | expression '+' expression                  { $$ = do_op('+', $1, $3); }
            | expression '-' expression                  { $$ = do_op('-', $1, $3); }
@@ -233,7 +233,7 @@ expression : number                                     { $$ = $1; }
            ;
 
 
-piecewise_linear : '[' point_list ']'   { is_array = false; }
+piecewise_linear : '[' point_list ']'   { }
                  ;
 
 
@@ -508,25 +508,7 @@ void do_assign_threshold(const char * name)
 
 {
 
-DictionaryEntry e;
-
-if ( DArray.n_entries() != 1 )  {
-
-   mlog << Error
-        << "\n\n  do_assign_threshold() -> too many elements in dictionary array!\n\n";
-
-   exit ( 1 );
-
-}
-
-e = *(DArray[0]);
-
-e.set_name(name);
-
-DArray.clear();
-
-dict_stack->store(e);
-
+dict_stack->pop_element(name);
 
 return;
 
@@ -605,36 +587,31 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_assign_dict (const char * name)
-
-{
-
-dict_stack->pop(name);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void do_dict()
 
 {
 
-if ( ! is_array )  return;
+cout << "   in do_dict()\n\n\n";
 
-DictionaryEntry e;
-ConcatString name;
-
-name << "entry_" << DArray.n_entries();
-
-e.set_dict(name, *(dict_stack->top()));
+DD = *(dict_stack->top());
 
 dict_stack->erase_top();
 
-DArray.store(e);
+if ( ! dict_stack->top_is_array() )  return;
+
+DictionaryEntry e;
+
+e.set_dict(0, DD);
+
+dict_stack->store(e);
+
+DD.clear();
+
+// dict_stack->pop_dict(0);
+
+dict_stack->dump(cout);
+cout << "   in do_dict()\n\n\n";
+cout.flush();
 
 return;
 
@@ -644,19 +621,27 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_array(const char * LHS)
+void do_assign_dict (const char * name)
 
 {
 
-DictionaryEntry e;
+// const bool is_array = dict_stack->top_is_array();
 
-e.set_array(LHS, DArray);
+// cout << "\n\n  in do_assign_dict() ... DD.n_entries() = " << DD.n_entries() << "\n\n" << flush;
 
-dict_stack->store(e);
+if ( DD.n_entries() > 0 )  {
 
-DArray.clear();
+   DictionaryEntry e;
 
-is_array = false;
+   e.set_dict(name, DD);
+
+   dict_stack->store(e);
+
+} else {
+
+   dict_stack->pop_dict(name);
+
+}
 
 return;
 
@@ -670,16 +655,11 @@ void do_string(const char * text)
 
 {
 
-if ( ! is_array )  return;
-
 DictionaryEntry e;
-ConcatString name;
 
-name << "entry_" << DArray.n_entries();
+e.set_string(0, text);
 
-e.set_string(name, text);
-
-DArray.store(e);
+dict_stack->store(e);
 
 
 return;
@@ -694,17 +674,12 @@ void do_number(const Number & number)
 
 {
 
-if ( ! is_array )  return;
-
 DictionaryEntry e;
-ConcatString name;
 
-name << "entry_" << DArray.n_entries();
+if ( number.is_int )  e.set_int    (0, number.i);
+else                  e.set_double (0, number.d);
 
-if ( number.is_int )  e.set_int    (name, number.i);
-else                  e.set_double (name, number.d);
-
-DArray.store(e);
+dict_stack->store(e);
 
 
 return;
@@ -718,29 +693,17 @@ return;
 void do_thresh(const ThreshType t, const Number & n)
 
 {
-/*
-if ( !is_array )  {
 
-   mlog << Error
-        << "\ndo_thresh(const ThreshType, const Number &) -> "
-        << "thresholds should only appear in arrays!\n\n";
-
-   exit ( 1 );
-
-}
-*/
+if ( !dict_stack->top_is_array() )  return;
 
 DictionaryEntry e;
 SingleThresh T;
-ConcatString name;
-
-name << "entry_" << DArray.n_entries();
 
 T.set(as_double(n), t);
 
-e.set_threshold(name, T);
+e.set_threshold(0, T);
 
-DArray.store(e);
+dict_stack->store(e);
 
    //
    //  done
@@ -784,8 +747,6 @@ dict_stack->store(e);
    //
 
 pwl.clear();
-
-is_array = false;
 
 return;
 

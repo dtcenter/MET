@@ -87,6 +87,10 @@ config.dump(cout);
 
 cout << "\n\n";
 
+config.dump_config_format(cout);
+
+cout << "\n\n";
+
    //
    //  done
    //

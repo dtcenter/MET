@@ -23,6 +23,18 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char config_tab [] = "   ";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static ConcatString config_prefix(int depth);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class DictionaryEntry
    //
@@ -164,7 +176,8 @@ switch ( entry.Type )  {
       break;
 
    case ArrayType:
-      set_array(entry.Name, *(entry.Dict));
+      // set_array(entry.Name, *(entry.Dict));
+      set_dict(entry.Name, *(entry.Dict));
       break;
 
    case ThresholdType:
@@ -211,43 +224,113 @@ out << prefix << "Type  = " << configobjecttype_to_string(Type) << "\n";
 switch ( Type )  {
 
    case IntegerType:
-      out << prefix << "Value = " << Ival << "\n";
+      out << prefix << "Integer Value = " << Ival << "\n";
       break;
 
    case FloatType:
-      out << prefix << "Value = " << Dval << "\n";
+      out << prefix << "Float Value = " << Dval << "\n";
       break;
 
    case BooleanType:
-      out << prefix << "Value = " << bool_to_string(Bval) << "\n";
+      out << prefix << "Boolean Value = " << bool_to_string(Bval) << "\n";
       break;
 
    case StringType:
-      out << prefix << "Value = ";
+      out << prefix << "String Value = ";
       if ( Text->empty() )  out << "(nul)\n";
       else                  out << '\"' << (*Text) << "\"\n";
       break;
 
    case DictionaryType:   //  fall through
    case ArrayType:        //  fall through
-      out << prefix << "Value = \n";
+      out << prefix << "Dict/Array Value = \n";
       Dict->dump(out, depth + 1);
       break;
 
    case ThresholdType:
-      out << prefix << "Value = \n";
+      out << prefix << "Thresh Value = \n";
       Thresh->dump(out, depth + 1);
       break;
 
 
    case FunctionType:
-      out << prefix << "Value = \n";
+      out << prefix << "Function Value = \n";
       PWL->dump(out, depth + 1);
       break;
 
    default:
       mlog << Error
            << "\nDictionaryEntry::dump(const DictionaryEntry &) -> "
+           << "bad object type ... \""
+           << configobjecttype_to_string(Type) << "\"\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryEntry::dump_config_format(ostream & out, int depth) const
+
+{
+
+const ConcatString s = config_prefix(depth);
+
+out << s;
+
+if ( Name.nonempty() )  out << Name << " = ";
+
+switch ( Type )  {
+
+   case IntegerType:
+      out << Ival << ";\n";
+      break;
+
+   case FloatType:
+      out << Dval << ";\n";
+      break;
+
+   case BooleanType:
+      out << bool_to_string(Bval) << ";\n";
+      break;
+
+   case StringType:
+      if ( Text->empty() )  out << "(nul);\n";
+      else                  out << '\"' << (*Text) << "\";\n";
+      break;
+
+
+   case DictionaryType:
+      out << "{\n";
+      Dict->dump_config_format(out, depth + 1);
+      out << s << "}\n";
+      break;
+
+   case ArrayType:
+      out << "[\n";
+      Dict->dump_config_format(out, depth + 1);
+      out << s << "];\n";
+      break;
+
+
+
+
+
+   default:
+      mlog << Error
+           << "\nDictionaryEntry::dump_config_format(const DictionaryEntry &) -> "
            << "bad object type ... \""
            << configobjecttype_to_string(Type) << "\"\n\n";
       exit ( 1 );
@@ -301,7 +384,7 @@ clear();
 
 Type = IntegerType;
 
-set_name(_name);
+if ( nonempty(_name) )   set_name(_name);
 
 Ival = k;
 
@@ -322,7 +405,7 @@ clear();
 
 Type = FloatType;
 
-set_name(_name);
+if ( nonempty(_name) )  set_name(_name);
 
 Dval = x;
 
@@ -343,7 +426,7 @@ clear();
 
 Type = StringType;
 
-set_name(_name);
+if ( nonempty(_name) )  set_name(_name);
 
 Text = new ConcatString;
 
@@ -365,7 +448,7 @@ clear();
 
 Type = BooleanType;
 
-set_name(_name);
+if ( nonempty(_name) )  set_name(_name);
 
 Bval = tf;
 
@@ -383,9 +466,10 @@ void DictionaryEntry::set_dict(const char * _name, const Dictionary & d)
 
 clear();
 
-Type = DictionaryType;
+if ( d.is_array() )  Type = ArrayType;
+else                 Type = DictionaryType;
 
-set_name(_name);
+if ( nonempty(_name) )  set_name(_name);
 
 Dict = new Dictionary;
 
@@ -407,7 +491,7 @@ clear();
 
 Type = FunctionType;
 
-set_name(_name);
+if ( nonempty(_name) )  set_name(_name);
 
 PWL = new PiecewiseLinear;
 
@@ -431,7 +515,7 @@ clear();
 
 Type = ThresholdType;
 
-set_name(_name);
+if ( nonempty(_name) )  set_name(_name);
 
 Thresh = new SingleThresh;
 
@@ -445,7 +529,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void DictionaryEntry::set_array(const char * _name, const Dictionary & d)
 
 {
@@ -489,7 +573,7 @@ for (j=0; j<(Dict->n_entries()); ++j)  {
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -740,6 +824,7 @@ e = (DictionaryEntry **) 0;
 
 Parent = (const Dictionary *) 0;
 
+
 Nentries = 0;
 
 Nalloc = 0;
@@ -776,6 +861,8 @@ Nentries = 0;
 
 Nalloc = 0;
 
+IsArray = false;
+
 Parent = (const Dictionary *) 0;
 
 return;
@@ -792,17 +879,21 @@ void Dictionary::assign(const Dictionary & d)
 
 clear();
 
-if ( d.Nentries == 0 )  return;
+if ( d.Nentries > 0 )  {
 
-extend(d.Nentries);
+   extend(d.Nentries);
 
-int j;
+   int j;
 
-for (j=0; j<(d.Nentries); ++j)  {
+   for (j=0; j<(d.Nentries); ++j)  {
 
-   store( *(d.e[j]) );
+      store( *(d.e[j]) );
+
+   }
 
 }
+
+IsArray = d.IsArray;
 
 Parent = d.Parent;
 
@@ -833,16 +924,47 @@ out << prefix << "Address  = " << (void *) this   << "\n";
 out << prefix << "Parent   = " << (void *) Parent << "\n";
 // if ( Parent )  out << "   (" << Parent->name() << ")\n";
 
+out << prefix << "IsArray  = " << bool_to_string(IsArray) << "\n";
 
 int j;
 
 for (j=0; j<Nentries; ++j)  {
 
-   out << prefix << "Entry[" << j << "] ...\n";
+   out << prefix << "Dictionary Entry[" << j << "] ...\n";
 
    e[j]->dump(out, depth + 1);
 
 }
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Dictionary::dump_config_format(ostream & out, int depth) const
+
+{
+
+int j;
+const ConcatString s = config_prefix(depth);
+
+for (j=0; j<Nentries; ++j)  {
+
+   // out << s << "Entry " << j << "...\n\n";
+
+   e[j]->dump_config_format(out, depth + 1);
+
+}
+
 
    //
    //  done
@@ -901,7 +1023,6 @@ return;
 void Dictionary::store(const DictionaryEntry & entry)
 
 {
-
 
    //
    //  first see if we've already got an entry by that name
@@ -1368,7 +1489,7 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   out << prefix << "Element [" << j << "] ...\n";
+   out << prefix << "Stack Element [" << j << "] ...\n";
 
    D[j]->dump(out, depth + 1);
 
@@ -1382,6 +1503,91 @@ for (j=0; j<Nelements; ++j)  {
 out.flush();
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryStack::dump_config_format(ostream & out, int depth) const
+
+{
+
+int j;
+const ConcatString s = config_prefix(depth);
+
+for (j=0; j<Nelements; ++j)  {
+
+   out << s << "Stack Element " << j << "...\n\n";
+
+   D[j]->dump_config_format(out, depth + 1);
+
+}
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryStack::set_top_is_array(bool tf)
+
+{
+
+if ( Nelements == 0 )  {
+
+   mlog << Error
+        << "\n\n  DictionaryStack::set_top_is_array() -> stack empty!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+if ( Nelements == 1 )  {
+
+   mlog << Error
+        << "\n\n  DictionaryStack::set_top_is_array() -> can't set bottom-level dictionary to array!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+D[Nelements - 1]->set_is_array(true);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool DictionaryStack::top_is_array() const
+
+{
+
+if ( Nelements == 0 )  {
+
+   mlog << Error
+        << "\n\n  DictionaryStack::top_is_array() -> stack empty!\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( D[Nelements - 1]->is_array() );
 
 }
 
@@ -1442,6 +1648,8 @@ if ( Nelements >= max_dictionary_depth )  {
 
 }
 
+cout << "\n\n  In DictionaryStack::push() ...\n\n\n" << flush;
+
 D[Nelements++] = new Dictionary;
 
 return;
@@ -1452,14 +1660,32 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryStack::pop(const char * name)
+void DictionaryStack::push_array()
+
+{
+
+// cout << "\n\n  In DictionaryStack::push_array() ...\n\n\n" << flush;
+
+push();
+
+D[Nelements - 1]->set_is_array(true);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryStack::pop_dict(const char * name)
 
 {
 
 if ( Nelements < 2 )  {
 
    mlog << Error
-        << "\nDictionaryStack::pop() -> stack empty!\n\n";
+        << "\nDictionaryStack::pop_dict() -> stack empty!\n\n";
 
    exit ( 1 );
 
@@ -1467,9 +1693,49 @@ if ( Nelements < 2 )  {
 
 DictionaryEntry entry;
 
-entry.set_dict(name, *(D[Nelements - 1]));
+entry.set_dict (name, *(D[Nelements - 1]));
 
 D[Nelements - 2]->store(entry);
+
+delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) 0;
+
+--Nelements;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryStack::pop_element(const char * name)
+
+{
+
+if ( Nelements < 2 )  {
+
+   mlog << Error
+        << "\nDictionaryStack::pop_element() -> stack empty!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( D[Nelements - 1]->n_entries() != 1 )  {
+
+   mlog << Error
+        << "\nDictionaryStack::pop_element() -> toplevel dictionary has more than one element!\n\n";
+
+   exit ( 1 );
+
+}
+
+DictionaryEntry E = *(D[Nelements - 1]->operator[](0));
+
+E.set_name(name);
+
+D[Nelements - 2]->store(E);
 
 delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) 0;
 
@@ -1521,6 +1787,38 @@ for (j=(Nelements - 1); j>=0; --j)  {
    //
 
 return ( (const DictionaryEntry *) 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString config_prefix(int depth)
+
+{
+
+
+int j;
+ConcatString s;
+
+if ( depth == 0 )   { s << ' ';  return ( s ); }
+
+for (j=0; j<depth; ++j)  {
+
+   s << config_tab;
+
+}
+
+return ( s );
 
 }
 
