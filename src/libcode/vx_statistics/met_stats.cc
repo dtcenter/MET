@@ -808,8 +808,8 @@ void CNTInfo::compute_ci() {
          v = 0.5*log((1 + pr_corr.v)/(1 - pr_corr.v));
          cl = v + cv_normal_l/sqrt((double) (n-3));
          cu = v + cv_normal_u/sqrt((double) (n-3));
-         pr_corr.v_ncl[i] = (pow(e, 2*cl) - 1)/(pow(e, 2*cl) + 1);
-         pr_corr.v_ncu[i] = (pow(e, 2*cu) - 1)/(pow(e, 2*cu) + 1);
+         pr_corr.v_ncl[i] = (pow(vx_math_e, 2*cl) - 1)/(pow(vx_math_e, 2*cl) + 1);
+         pr_corr.v_ncu[i] = (pow(vx_math_e, 2*cu) - 1)/(pow(vx_math_e, 2*cu) + 1);
       }
 
       //

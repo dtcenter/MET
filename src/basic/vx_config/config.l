@@ -17,6 +17,7 @@ using namespace std;
 #include <iostream>
 
 #include "vx_log.h"
+#include "math_constants.h"
 
 #include "threshold.h" //  must be included before config.tab.h
 
@@ -25,7 +26,6 @@ using namespace std;
 #include "config.tab.h"
 
 #include "dictionary.h"
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -107,6 +107,7 @@ WS          [ \n\t]*
 ">="                                { return ( do_comp() ); }
 "=="                                { return ( do_comp() ); }
 "!="                                { return ( do_comp() ); }
+"NA"                                { return ( do_comp() ); }
 
 
 "["                                 { ++Column;  is_lhs = true;  dict_stack->push_array();  return ( configtext[0] ); }
@@ -270,14 +271,19 @@ int do_comp()
 
 {
 
+int return_value;
+
 Column += strlen(configtext);
 
-     if ( strcmp(configtext, "<" ) == 0 )  configlval.cval = thresh_lt;
-else if ( strcmp(configtext, ">" ) == 0 )  configlval.cval = thresh_gt;
-else if ( strcmp(configtext, "<=") == 0 )  configlval.cval = thresh_le;
-else if ( strcmp(configtext, ">=") == 0 )  configlval.cval = thresh_ge;
-else if ( strcmp(configtext, "==") == 0 )  configlval.cval = thresh_eq;
-else if ( strcmp(configtext, "!=") == 0 )  configlval.cval = thresh_ne;
+     if ( strcmp(configtext, "<" ) == 0 )  { configlval.cval = thresh_lt;  return_value = COMPARISON; }
+else if ( strcmp(configtext, ">" ) == 0 )  { configlval.cval = thresh_gt;  return_value = COMPARISON; }
+else if ( strcmp(configtext, "<=") == 0 )  { configlval.cval = thresh_le;  return_value = COMPARISON; }
+else if ( strcmp(configtext, ">=") == 0 )  { configlval.cval = thresh_ge;  return_value = COMPARISON; }
+else if ( strcmp(configtext, "==") == 0 )  { configlval.cval = thresh_eq;  return_value = COMPARISON; }
+else if ( strcmp(configtext, "!=") == 0 )  { configlval.cval = thresh_ne;  return_value = COMPARISON; }
+
+else if ( strcmp(configtext, na_str) == 0 )  { configlval.cval = thresh_na;  return_value = NA_COMPARISON; }
+
 else {
 
    mlog << Error
@@ -292,7 +298,7 @@ else {
    //  done
    //
 
-return ( COMPARISON );
+return ( return_value );
 
 }
 
@@ -445,6 +451,8 @@ if ( strcmp(configtext, "ge" ) == 0 )  { configlval.cval = thresh_ge;  return ( 
 
 if ( strcmp(configtext, "ne" ) == 0 )  { configlval.cval = thresh_ne;  return ( COMPARISON ); }
 if ( strcmp(configtext, "eq" ) == 0 )  { configlval.cval = thresh_eq;  return ( COMPARISON ); }
+
+if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return ( NA_COMPARISON ); }
 
    //
    //  number?

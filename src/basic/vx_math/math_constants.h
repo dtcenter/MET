@@ -39,7 +39,7 @@ static const double flattening      = 1.0/298.257;
 
 static const int standard_time_zone = 7;   //  mountain standard time
 
-static const double e               = 2.7182818284590452354;
+static const double vx_math_e       = exp(1.0);
 
    //
    //  Conversion factors
