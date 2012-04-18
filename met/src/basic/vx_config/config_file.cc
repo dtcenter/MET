@@ -152,13 +152,15 @@ void MetConfig::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "Filename ... ";
+out << prefix << "Filename ... \n";
 
 Filename.dump(out, depth + 1);
 
+out << prefix << "\n";
+
 out << prefix << "Debug    = "   << bool_to_string(Debug) << "\n";
 
-out << prefix << "Entries ...\n";
+out << prefix << "Config File Entries ...\n";
 
 Dictionary::dump(out, depth + 1);
 
@@ -243,6 +245,8 @@ if ( parse_status != 0 )  {
 
 }
 
+// DS.pop_dict("base");
+
 if ( DS.n_elements() != 1 )  {
 
    mlog << Error 
@@ -251,6 +255,12 @@ if ( DS.n_elements() != 1 )  {
         << DS.n_elements() << ")\n\n";
 
    DS.dump(cout);
+   DS.dump_config_format(cout);
+
+   mlog << Error 
+        << "\n"
+        << "  parse failed!\n"
+        << "\n";
 
    exit ( 1 );
 
