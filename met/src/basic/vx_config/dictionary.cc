@@ -23,7 +23,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char config_tab [] = "   ";
+static const char config_tab [] = "  ";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,6 +324,26 @@ switch ( Type )  {
       out << s << "];\n";
       break;
 
+   case ThresholdType:
+      switch ( Thresh->type )  {
+
+         case thresh_na:  out << "NA";  break;
+         case thresh_lt:  out << "<";   break;
+         case thresh_le:  out << "<=";  break;
+         case thresh_eq:  out << "==";  break;
+         case thresh_ne:  out << "!=";  break;
+         case thresh_gt:  out << ">";   break;
+         case thresh_ge:  out << ">=";  break;
+
+         default:
+         mlog << Error 
+              << "DictionaryEntry::dump_config_format() -> bad threshold type ... " << Thresh->type << "\n";
+         exit ( 1 );
+         break;
+
+      }  //  switch
+      out << Thresh->thresh << ";\n";
+      break;
 
 
 
@@ -1648,7 +1668,7 @@ if ( Nelements >= max_dictionary_depth )  {
 
 }
 
-cout << "\n\n  In DictionaryStack::push() ...\n\n\n" << flush;
+// cout << "\n\n  In DictionaryStack::push() ...\n\n\n" << flush;
 
 D[Nelements++] = new Dictionary;
 

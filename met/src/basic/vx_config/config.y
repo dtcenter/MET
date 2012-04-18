@@ -591,7 +591,7 @@ void do_dict()
 
 {
 
-cout << "   in do_dict()\n\n\n";
+// cout << "   in do_dict()\n\n\n";
 
 DD = *(dict_stack->top());
 
@@ -609,9 +609,9 @@ DD.clear();
 
 // dict_stack->pop_dict(0);
 
-dict_stack->dump(cout);
-cout << "   in do_dict()\n\n\n";
-cout.flush();
+// dict_stack->dump(cout);
+// cout << "   in do_dict()\n\n\n";
+// cout.flush();
 
 return;
 
