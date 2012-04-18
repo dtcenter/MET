@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
+#include "math_constants.h"
 #include "scanner_stuff.h"
 #include "dictionary.h"
 #include "threshold.h"
@@ -108,6 +109,8 @@ static void do_number(const Number &);
 
 static void do_thresh(const ThreshType, const Number &);
 
+static void do_na_thresh();
+
 static void add_point(const Number &, const Number &);
 
 static void do_pwl(const char * LHS);
@@ -133,7 +136,7 @@ static void do_pwl(const char * LHS);
 
 
 %token IDENTIFIER QUOTED_STRING INTEGER FLOAT BOOLEAN
-%token COMPARISON
+%token COMPARISON NA_COMPARISON
 
 
 %type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix
@@ -142,7 +145,7 @@ static void do_pwl(const char * LHS);
 
 %type <bval> BOOLEAN
 
-%type <cval> COMPARISON
+%type <cval> COMPARISON NA_COMPARISON
 
 
 %left '+' '-'
@@ -204,6 +207,7 @@ threshold_list : threshold
 
 
 threshold : COMPARISON number { do_thresh($1, $2); }
+          | NA_COMPARISON { do_na_thresh(); }
           ;
 
 
@@ -700,6 +704,33 @@ DictionaryEntry e;
 SingleThresh T;
 
 T.set(as_double(n), t);
+
+e.set_threshold(0, T);
+
+dict_stack->store(e);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_na_thresh()
+
+{
+
+if ( !dict_stack->top_is_array() )  return;
+
+DictionaryEntry e;
+SingleThresh T;
+
+T.set(na_str);
 
 e.set_threshold(0, T);
 

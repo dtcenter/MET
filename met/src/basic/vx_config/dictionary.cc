@@ -327,13 +327,14 @@ switch ( Type )  {
    case ThresholdType:
       switch ( Thresh->type )  {
 
-         case thresh_na:  out << "NA";  break;
          case thresh_lt:  out << "<";   break;
          case thresh_le:  out << "<=";  break;
          case thresh_eq:  out << "==";  break;
          case thresh_ne:  out << "!=";  break;
          case thresh_gt:  out << ">";   break;
          case thresh_ge:  out << ">=";  break;
+
+         case thresh_na:  out << na_str;  break;
 
          default:
          mlog << Error 
@@ -342,7 +343,8 @@ switch ( Type )  {
          break;
 
       }  //  switch
-      out << Thresh->thresh << ";\n";
+      if ( Thresh->type != thresh_na )  out << Thresh->thresh;
+      out << ";\n";
       break;
 
 

@@ -125,7 +125,7 @@ double convert_t_to_svp(double t) {
    if(is_eq(t, bad_data_double) || is_eq(t, 0.0))
       svp = bad_data_double;
    else
-      svp = const_c*(pow(e, const_b*(const_a - 1.0/t)));
+      svp = const_c*(pow(vx_math_e, const_b*(const_a - 1.0/t)));
 
    return(svp);
 }
