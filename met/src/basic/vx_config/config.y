@@ -161,10 +161,10 @@ assignment_list : assignment                    { is_lhs = true; }
                 ;
 
 
-assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean ($1, $2); }
-           | assign_prefix expression       ';'        { do_assign_exp     ($1, $2); }
-           | assign_prefix IDENTIFIER       ';'        { do_assign_id      ($1, $2); }
-           | assign_prefix piecewise_linear ';'        { do_pwl            ($1); }
+assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean   ($1, $2); }
+           | assign_prefix expression       ';'        { do_assign_exp       ($1, $2); }
+           | assign_prefix IDENTIFIER       ';'        { do_assign_id        ($1, $2); }
+           | assign_prefix piecewise_linear ';'        { do_pwl              ($1); }
 
            | assign_prefix threshold        ';'        { do_assign_threshold ($1); }
            | assign_prefix QUOTED_STRING    ';'        { do_assign_string    ($1, $2); }

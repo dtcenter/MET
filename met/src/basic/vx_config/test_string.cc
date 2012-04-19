@@ -84,7 +84,7 @@ if ( ! status )  {
 
 }
 
-s = "b = 10.o.;";
+s = "b = 10;";
 
 status = config.read_string(s);
 

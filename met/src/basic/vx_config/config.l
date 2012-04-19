@@ -116,8 +116,8 @@ WS          [ \n\t]*
 "NA"                                { return ( do_comp() ); }
 
 
-"["                                 { ++Column;  is_lhs = true;  dict_stack->push_array();  return ( configtext[0] ); }
-"{"                                 { ++Column;  is_lhs = true;  dict_stack->push();        return ( configtext[0] ); }
+"["                                 { ++Column;  is_lhs = false;  dict_stack->push_array();  return ( configtext[0] ); }
+"{"                                 { ++Column;  is_lhs = false;  dict_stack->push();        return ( configtext[0] ); }
 
 "]"                                 { ++Column;  return ( configtext[0] ); }
 "}"                                 { ++Column;  return ( configtext[0] ); }
