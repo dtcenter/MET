@@ -75,6 +75,8 @@ class MetConfig : public Dictionary {
 
       bool read(const char * filename);
 
+      bool read_string(const char *);
+
       const DictionaryEntry * lookup(const char * name);
 
          //

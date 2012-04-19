@@ -44,6 +44,9 @@ extern int Column;
 
 extern bool is_lhs;
 
+extern void start_string_scan  (const char *);
+extern void finish_string_scan ();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -221,7 +224,7 @@ Column     = 1;
 
 is_lhs     = true;
 
-Filename.add(name);
+Filename.add(bison_input_filename);
 
 configdebug = (Debug ? 1 : 0);
 
@@ -244,6 +247,109 @@ if ( parse_status != 0 )  {
    return ( false );
 
 }
+
+// DS.pop_dict("base");
+
+if ( DS.n_elements() != 1 )  {
+
+   mlog << Error 
+        << "\nMetConfig::read(const char *) -> "
+        << "should be only one dictionary left after parsing! ...("
+        << DS.n_elements() << ")\n\n";
+
+   DS.dump(cout);
+   DS.dump_config_format(cout);
+
+   mlog << Error 
+        << "\n"
+        << "  parse failed!\n"
+        << "\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  done
+   //
+
+bison_input_filename = (const char *) 0;
+
+dict_stack = (DictionaryStack *) 0;
+
+LineNumber = 1;
+
+Column     = 1;
+
+is_lhs     = true;
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool MetConfig::read_string(const char * s)
+
+{
+
+if ( empty(s) )  {
+
+   mlog << Error
+        << "\nMetConfig::read_string() -> "
+        << "empty string!\n\n";
+
+   exit ( 1 );
+
+}
+
+// clear();
+
+DictionaryStack DS(*this);
+
+bison_input_filename = "string";
+
+dict_stack = &DS;
+
+LineNumber = 1;
+
+Column     = 1;
+
+is_lhs     = true;
+
+Filename.add(bison_input_filename);
+
+configdebug = (Debug ? 1 : 0);
+
+start_string_scan(s);
+
+/*
+if ( (configin = fopen(bison_input_filename, "r")) == NULL )  {
+
+   mlog << Error
+        << "\nMetConfig::read(const char *) -> "
+        << "unable to open input file \"" << name << "\"\n\n";
+
+   exit ( 1 );
+
+}
+*/
+
+int parse_status;
+
+parse_status = configparse();
+
+if ( parse_status != 0 )  {
+
+   return ( false );
+
+}
+
+finish_string_scan ();
+
+// yy_delete_buffer(bp);
 
 // DS.pop_dict("base");
 
