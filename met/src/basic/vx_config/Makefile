@@ -17,6 +17,7 @@ EXECUTABLES = test_config   \
               test_lookup   \
               test_lookup2  \
               test_lookup3  \
+              test_string   \
 
 
 OBJECTS     = configobjecttype_to_string.o \
@@ -172,6 +173,16 @@ test_lookup2: test_lookup2.cc $(OBJECTS) $(LIBRARIES)
 
 test_lookup3: test_lookup3.cc $(OBJECTS) $(LIBRARIES)
 	$(CXX) test_lookup3.cc -o test_lookup3 $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm  \
+
+
+test_string: test_string.cc $(OBJECTS) $(LIBRARIES)
+	$(CXX) test_string.cc -o test_string $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_config \
 	-lvx_util \
 	-lvx_math \

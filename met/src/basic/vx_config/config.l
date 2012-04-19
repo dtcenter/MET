@@ -17,6 +17,7 @@ using namespace std;
 #include <iostream>
 
 #include "vx_log.h"
+#include "empty_string.h"
 #include "math_constants.h"
 
 #include "threshold.h" //  must be included before config.tab.h
@@ -45,6 +46,9 @@ extern DictionaryStack * dict_stack;
 
 extern bool is_lhs;
 
+extern void start_string_scan  (const char *);
+extern void finish_string_scan ();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -52,6 +56,8 @@ extern bool is_lhs;
 static bool reading_string = false;
 
 static YY_BUFFER_STATE file_buffer = (YY_BUFFER_STATE) 0;
+
+static YY_BUFFER_STATE string_buffer = 0;   //  used for string parsing
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -628,6 +634,50 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void start_string_scan(const char * s)
+
+{
+
+if ( empty(s) )  {
+
+   cerr << "\n\n  void start_string_scan(const char *) -> empty string!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+string_buffer = config_scan_string(s);
+
+config_switch_to_buffer(string_buffer);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void finish_string_scan()
+
+{
+
+config_delete_buffer(string_buffer);
+
+string_buffer = 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 
 
