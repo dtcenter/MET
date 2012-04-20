@@ -809,3 +809,38 @@ return ( array );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+Dictionary *MetConfig::lookup_dictionary(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == DictionaryType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nMetConfig::lookup_dictionary() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( (Dictionary *) 0 );
+
+}
+
+return ( Entry->dict_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////

@@ -24,7 +24,8 @@ OBJECTS     = configobjecttype_to_string.o \
               dictionary.o \
               config.tab.o \
               lex.config.o \
-              config_file.o
+              config_file.o \
+              config_util.o
 
 
 LIBRARIES   = libvx_config.a
@@ -42,7 +43,10 @@ HEADERS     = config_file.h \
               config.tab.h \
               dictionary.h \
               object_types.h \
-              scanner_stuff.h
+              scanner_stuff.h \
+              config_util.h \
+              config_constants.h \
+              vx_config.h
 
 
 ########################################################################
@@ -114,6 +118,10 @@ lex.config.o: lex.config.c
 
 config_file.o: config_file.h config_file.cc configobjecttype_to_string.o dictionary.o config.tab.o lex.config.o
 	$(CXX) config_file.cc -c -g -I$(MET_INC_DIR)
+
+
+config_util.o: config_util.h config_util.cc
+	$(CXX) config_util.cc -c -g -I$(MET_INC_DIR)
 
 
 ########################################################################
