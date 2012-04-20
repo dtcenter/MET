@@ -58,26 +58,26 @@ static const char conf_netcdf_met[]  = "NETCDF_MET";
 static const char conf_netcdf_pint[] = "NETCDF_PINT";
 
 // Interpolation methods
-static const char conf_min     = "MIN";
-static const char conf_max     = "MAX";
-static const char conf_median  = "MEDIAN";
-static const char conf_uw_mean = "UW_MEAN";
-static const char conf_dw_mean = "DW_MEAN";
-static const char conf_ls_fit  = "LS_FIT";
-static const char conf_bilin   = "BILIN";
+static const char conf_min[]     = "MIN";
+static const char conf_max[]     = "MAX";
+static const char conf_median[]  = "MEDIAN";
+static const char conf_uw_mean[] = "UW_MEAN";
+static const char conf_dw_mean[] = "DW_MEAN";
+static const char conf_ls_fit[]  = "LS_FIT";
+static const char conf_bilin[]   = "BILIN";
 
 // Interpolation types
-static const char conf_fcst = "FCST";
-static const char conf_obs  = "OBS";
-static const char conf_both = "BOTH";
+static const char conf_fcst[] = "FCST";
+static const char conf_obs[]  = "OBS";
+static const char conf_both[] = "BOTH";
 
 // Output flag values
-static const char conf_none = "NONE";
-static const char conf_stat = "STAT";
+static const char conf_none[] = "NONE";
+static const char conf_stat[] = "STAT";
 
 // Bootstrapping interval type
-static const char conf_pctile = "PCTILE";
-static const char conf_bca    = "BCA";
+static const char conf_pctile[] = "PCTILE";
+static const char conf_bca[]    = "BCA";
 
 ////////////////////////////////////////////////////////////////////////
 
