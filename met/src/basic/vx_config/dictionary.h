@@ -14,13 +14,19 @@
 
 #include "object_types.h"
 
-#include "concat_string.h"
-#include "threshold.h"
+#include "num_array.h"
+#include "string_array.h"
+#include "thresh_array.h"
 #include "pwl.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static const bool default_dictionary_error_out = true;
+
+
+////////////////////////////////////////////////////////////////////////
 
 class Dictionary;        //  forward reference
 
@@ -152,9 +158,9 @@ class Dictionary {
 
       void extend(int);
 
-      void patch_parents() const;
+      void patch_parents();
 
-      virtual const DictionaryEntry * lookup_simple(const char * name) const;   //  no scope
+      virtual const DictionaryEntry * lookup_simple(const char * name);   //  no scope
 
 
       int Nentries;
@@ -165,7 +171,9 @@ class Dictionary {
 
       DictionaryEntry ** e;   // allocated
 
-      const Dictionary * Parent;   //  not allocated
+      Dictionary * Parent;   //  not allocated
+
+      bool LastLookupStatus;      
 
    public:
 
@@ -184,7 +192,7 @@ class Dictionary {
          //  set stuff
          //
 
-      void set_parent(const Dictionary *);
+      void set_parent(Dictionary *);
 
       void set_is_array(bool = true);
 
@@ -200,6 +208,8 @@ class Dictionary {
 
       virtual bool is_array() const;
 
+      bool last_lookup_status () const;      
+
          //
          //  do stuff
          //
@@ -208,7 +218,21 @@ class Dictionary {
 
       virtual void store(const Dictionary &);
 
-      virtual const DictionaryEntry * lookup(const char * name) const;
+      virtual const DictionaryEntry * lookup(const char * name);
+
+         //
+         //  convenience functions
+         //
+
+      bool         lookup_bool         (const char * name, bool error_out = default_dictionary_error_out);
+      int          lookup_int          (const char * name, bool error_out = default_dictionary_error_out);
+      double       lookup_double       (const char * name, bool error_out = default_dictionary_error_out);
+      NumArray     lookup_num_array    (const char * name, bool error_out = default_dictionary_error_out);
+      ConcatString lookup_string       (const char * name, bool error_out = default_dictionary_error_out);
+      StringArray  lookup_string_array (const char * name, bool error_out = default_dictionary_error_out);
+      SingleThresh lookup_thresh       (const char * name, bool error_out = default_dictionary_error_out);
+      ThreshArray  lookup_thresh_array (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary * lookup_dictionary   (const char * name, bool error_out = default_dictionary_error_out);
 
 };
 
@@ -223,6 +247,8 @@ inline const Dictionary * Dictionary::parent() const { return ( Parent ); }
 inline void Dictionary::set_is_array(bool __tf) { IsArray = __tf;  return; }
 
 inline bool Dictionary::is_array() const { return ( IsArray ); }
+
+inline bool Dictionary::last_lookup_status() const { return ( LastLookupStatus ); }
 
 
 ////////////////////////////////////////////////////////////////////////
