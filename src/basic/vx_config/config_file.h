@@ -91,6 +91,7 @@ class MetConfig : public Dictionary {
       StringArray  lookup_string_array (const char * name, bool error_out = default_config_error_out);
       SingleThresh lookup_thresh       (const char * name, bool error_out = default_config_error_out);
       ThreshArray  lookup_thresh_array (const char * name, bool error_out = default_config_error_out);
+      Dictionary * lookup_dictionary   (const char * name, bool error_out = default_config_error_out);
 
 };
 

@@ -1,0 +1,29 @@
+////////////////////////////////////////////////////////////////////////
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2012
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+////////////////////////////////////////////////////////////////////////
+
+#ifndef  __CONFIG_UTIL_H__
+#define  __CONFIG_UTIL_H__
+
+////////////////////////////////////////////////////////////////////////
+
+#include "config_constants.h"
+#include "config_file.h"
+
+////////////////////////////////////////////////////////////////////////
+
+extern ConcatString parse_conf_version    (MetConfig *conf);
+extern ConcatString parse_conf_model      (MetConfig *conf);
+
+////////////////////////////////////////////////////////////////////////
+
+#endif   /*  __CONFIG_UTIL_H__  */
+
+////////////////////////////////////////////////////////////////////////
