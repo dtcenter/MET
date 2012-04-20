@@ -844,7 +844,7 @@ void Dictionary::init_from_scratch()
 
 e = (DictionaryEntry **) 0;
 
-Parent = (const Dictionary *) 0;
+Parent = (Dictionary *) 0;
 
 
 Nentries = 0;
@@ -885,7 +885,7 @@ Nalloc = 0;
 
 IsArray = false;
 
-Parent = (const Dictionary *) 0;
+Parent = (Dictionary *) 0;
 
 return;
 
@@ -1156,17 +1156,23 @@ return ( e[n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry * Dictionary::lookup(const char * name) const
+const DictionaryEntry * Dictionary::lookup(const char * name)
 
 {
 
-if ( Nentries == 0 )  return ( (const DictionaryEntry *) 0 );
+  
+if ( Nentries == 0 )  {
+  
+   LastLookupStatus = false;
+   
+   return ( (const DictionaryEntry *) 0 );
+}
 
 int j;
 StringArray scope;
 ConcatString Name = name;
 const DictionaryEntry * E = (const DictionaryEntry *) 0;
-const Dictionary * D = this;
+Dictionary * D = this;
 
 
    //
@@ -1185,9 +1191,19 @@ for (j=0; j<(scope.n_elements() - 1); ++j)  {
 
    E = D->lookup(scope[j]);
 
-   if ( !E )  return ( (const DictionaryEntry *) 0 );
+   if ( !E )  {
+     
+      LastLookupStatus = false;
+      
+      return ( (const DictionaryEntry *) 0 );
+   }
 
-   if ( ! E->is_dictionary() )  return ( (const DictionaryEntry *) 0 );
+   if ( ! E->is_dictionary() )  {
+
+      LastLookupStatus = false;
+
+      return ( (const DictionaryEntry *) 0 );
+   }
 
    D = E->dict_value();
 
@@ -1201,7 +1217,12 @@ const char * stub = scope[scope.n_elements() - 1];
 
 E = D->lookup_simple(stub);
 
-if ( E )  return ( E );
+if ( E )  {
+
+   LastLookupStatus = (E != 0);
+   
+   return ( E );
+}
 
    //
    //  try parent
@@ -1215,6 +1236,8 @@ if ( Parent )  E = Parent->lookup(name);
    //  done
    //
 
+LastLookupStatus = (E != 0);
+
 return ( E );
 
 }
@@ -1223,17 +1246,27 @@ return ( E );
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry * Dictionary::lookup_simple(const char * name) const
+const DictionaryEntry * Dictionary::lookup_simple(const char * name)
 
 {
 
-if ( Nentries == 0 )  return ( (const DictionaryEntry *) 0 );
+if ( Nentries == 0 )  {
+
+   LastLookupStatus = false;
+   
+   return ( (const DictionaryEntry *) 0 );
+}
 
 int j;
 
 for (j=0; j<Nentries; ++j)  {
 
-   if ( e[j]->Name == name )  return ( e[j] );   
+   if ( e[j]->Name == name )  {
+
+      LastLookupStatus = (e[j] != 0);
+
+      return ( e[j] );
+   }
 
 }
 
@@ -1249,6 +1282,8 @@ if ( Parent )  E = Parent->lookup(name);
    //  done
    //
 
+LastLookupStatus = (E != 0);
+
 return ( E );
 
 }
@@ -1257,7 +1292,7 @@ return ( E );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Dictionary::set_parent(const Dictionary * D)
+void Dictionary::set_parent(Dictionary * D)
 
 {
 
@@ -1281,7 +1316,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Dictionary::patch_parents() const
+void Dictionary::patch_parents()
 
 {
 
@@ -1324,6 +1359,440 @@ for (j=0; j<Nentries; ++j)  {
    //
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Dictionary::lookup_bool(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == BooleanType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_bool() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( false );
+
+}
+
+return ( Entry->b_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int Dictionary::lookup_int(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == IntegerType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_int() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( bad_data_int );
+
+}
+
+return ( Entry->i_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Dictionary::lookup_double(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == FloatType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_double() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( bad_data_double );
+
+}
+
+return ( Entry->d_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+NumArray Dictionary::lookup_num_array(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+const Dictionary * Dict = (const Dictionary *) 0;
+ConfigObjectType Type = no_config_object_type;
+bool is_correct_type = false;
+NumArray array;
+
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_num_array() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( array );
+
+}
+
+   //
+   //  Retrieve the array dictionary
+   //
+
+Dict = Entry->array_value();
+
+   //
+   //  Check the array type.
+   //  Error out if array contains unexpected type.
+   //
+
+if ( Dict->n_entries() > 0 )  {
+
+   Type = (*Dict)[0]->type();
+
+   if( Type != IntegerType && Type != FloatType )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_num_array() -> "
+           << "array \"" << name
+           << "\" does not contain numeric entries.\n\n";
+
+      exit ( 1 );
+
+   }
+}
+
+   //
+   //  Populate the NumArray with integers or doubles
+   //
+
+for (int i=0; i<Dict->n_entries(); i++)  {
+
+   if( Type == IntegerType)  array.add((*Dict)[i]->i_value());
+   else                      array.add((*Dict)[i]->d_value());
+
+}
+
+return ( array );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString Dictionary::lookup_string(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == StringType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_string() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   ConcatString s;
+
+   return ( s );
+
+}
+
+return ( *(Entry->string_value()) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+StringArray Dictionary::lookup_string_array(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+const Dictionary * Dict = (const Dictionary *) 0;
+bool is_correct_type = false;
+StringArray array;
+
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_string_array() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( array );
+
+}
+
+   //
+   //  Retrieve the array dictionary
+   //
+
+Dict = Entry->array_value();
+
+   //
+   //  Check the array type.
+   //  Error out if array contains unexpected type.
+   //
+
+if ( Dict->n_entries() > 0 )  {
+
+   if( (*Dict)[0]->type() != StringType )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_string_array() -> "
+           << "array \"" << name
+           << "\" does not contain StringType.\n\n";
+
+      exit ( 1 );
+
+   }
+}
+
+   //
+   //  Populate the StringArray
+   //
+
+for (int i=0; i<Dict->n_entries(); i++)  {
+
+   array.add(*(*Dict)[i]->string_value());
+
+}
+
+return ( array );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+SingleThresh Dictionary::lookup_thresh(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == ThresholdType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_thresh() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   SingleThresh s;
+
+   return ( s );
+
+}
+
+return ( *(Entry->thresh_value()) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshArray Dictionary::lookup_thresh_array(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+const Dictionary * Dict = (const Dictionary *) 0;
+bool is_correct_type = false;
+ThreshArray array;
+
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_thresh_array() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( array );
+
+}
+
+   //
+   //  Retrieve the array dictionary
+   //
+
+Dict = Entry->array_value();
+
+   //
+   //  Check the array type.
+   //  Error out if array contains unexpected type.
+   //
+
+if ( Dict->n_entries() > 0 )  {
+
+   if( (*Dict)[0]->type() != ThresholdType )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_thresh_array() -> "
+           << "array \"" << name
+           << "\" does not contain ThreshType.\n\n";
+
+      exit ( 1 );
+
+   }
+}
+
+   //
+   //  Populate the ThreshArray
+   //
+
+for (int i=0; i<Dict->n_entries(); i++)  {
+
+   array.add(*(*Dict)[i]->thresh_value());
+
+}
+
+return ( array );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Dictionary *Dictionary::lookup_dictionary(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == DictionaryType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_dictionary() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( (Dictionary *) 0 );
+
+}
+
+return ( Entry->dict_value() );
 
 }
 
