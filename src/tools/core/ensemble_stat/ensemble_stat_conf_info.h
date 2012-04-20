@@ -86,6 +86,8 @@ class EnsembleStatConfInfo {
 
       ConcatString *msg_typ;      // Array of message types [n_msg_typ]
 
+      int          duplicate_flag; // Duplicate observation behavior
+
       InterpMthd   *interp_mthd;  // Array for interpolation methods [n_interp]
       int          *interp_wdth;  // Array for interpolation widths [n_interp]
 

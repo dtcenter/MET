@@ -11,6 +11,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <map>
+#include <utility>
+
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,6 +59,16 @@ class PairBase {
       NumArray    o_na;    // Observation value [n_obs]
       int         n_obs;   // Number of observations
 
+      unixtime   fcst_ut;  // Forecast valid time
+
+      bool check_unique;   // Check for duplicates, keeping unique obs
+      bool check_single;   // Check for duplicates, keeping single obs
+
+      map<string,int>         map_unique;      // Storage for unique obs
+      multimap<string,string> map_unique_sid;  // Storage for unique obs sids
+      map<string,string>      map_single;      // Storage for single obs
+      multimap<string,string> map_single_val;  // Storage for single obs values
+
       //////////////////////////////////////////////////////////////////
 
       void clear();
@@ -68,10 +81,14 @@ class PairBase {
       void set_interp_mthd(InterpMthd);
       void set_interp_dpth(int);
 
+      void set_fcst_ut(unixtime ut);
+      void set_check_unique(bool check);
+      void set_check_single(bool check);
+
       int  has_obs_rec(const char *, double, double, double, double,
                        double, double, int &);
 
-      void add_obs(const char *, double, double, double, double,
+      bool add_obs(const char *, double, double, double, double,
                    unixtime, double, double, double);
       void add_obs(double, double, double);
 
@@ -79,6 +96,7 @@ class PairBase {
                    unixtime, double, double, double);
       void set_obs(int, double, double, double);
 
+      void print_duplicate_report();
 };
 
 ////////////////////////////////////////////////////////////////////////

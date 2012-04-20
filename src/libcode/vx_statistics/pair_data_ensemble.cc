@@ -449,6 +449,15 @@ void VxPairDataEnsemble::set_fcst_ut(const unixtime ut) {
 
    fcst_ut = ut;
 
+   //  set the fcst_ut for all PairBase instances, used for duplicate logic
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].set_fcst_ut(ut);
+         }
+      }
+   }
+
    return;
 }
 
@@ -841,6 +850,35 @@ int VxPairDataEnsemble::get_n_pair() {
    }
 
    return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_duplicate_flag(int duplicate_flag) {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].set_check_unique(duplicate_flag == 1);
+            pd[i][j][k].set_check_single(duplicate_flag == 2);
+         }
+      }
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::print_duplicate_report() {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].print_duplicate_report();
+         }
+      }
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////

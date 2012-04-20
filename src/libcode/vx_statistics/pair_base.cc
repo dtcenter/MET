@@ -75,6 +75,14 @@ void PairBase::clear() {
 
    n_obs = 0;
 
+   fcst_ut = 0;
+
+   check_unique = false;
+   check_single = false;
+
+   map_unique.clear();
+   map_single.clear();
+
    return;
 }
 
@@ -134,6 +142,33 @@ void PairBase::set_interp_dpth(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::set_fcst_ut(unixtime ut){
+
+   fcst_ut = ut;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_check_unique(bool check){
+
+   check_unique = check;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_check_single(bool check){
+
+   check_single = check;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int PairBase::has_obs_rec(const char *sid,
                           double lat, double lon,
                           double x, double y,
@@ -161,11 +196,87 @@ int PairBase::has_obs_rec(const char *sid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_obs(const char *sid,
+bool PairBase::add_obs(const char *sid,
                        double lat, double lon,
                        double x, double y, unixtime ut,
                        double lvl, double elv,
                        double o) {
+
+   if( check_unique ){
+
+      //  build a uniqueness test key
+      string unq_key = str_format("%.4f_%.4f_%d_%.2f_%.2f_%.4f",
+            lat,     //  lat
+            lon,     //  lon
+            ut,      //  valid time
+            lvl,     //  level
+            elv,     //  elevation
+            o);      //  obs value
+
+      //  add the station id to the reporting map
+      if( 3 <= mlog.verbosity_level() )
+         map_unique_sid.insert( pair<string,string>(unq_key, sid) );
+
+      //  if the key is already present in the map, do not add the obs
+      if( 0 < map_unique.count(unq_key) ) return false;
+
+      //  add the key to the map
+      map_unique[unq_key] = n_obs;
+
+   } else if( check_single ){
+
+      //  build a uniqueness test key
+      string sng_key = str_format("%.3f_%.3f_%.2f_%.2f",
+            lat,     //  lat
+            lon,     //  lon
+            lvl,     //  level
+            elv);    //  elevation
+
+      //  add a single value reporting string to the reporting map
+      if( 3 <= mlog.verbosity_level() ){
+         string sng_val = str_format("%s_%d_%.4f",
+               sid,     //  station id
+               ut,      //  valid time
+               o);      //  obs value
+         map_single_val.insert( pair<string,string>(sng_key, sng_val) );
+      }
+
+      //  if the key is not present in the duplicate map, add it to the map
+      if( 1 > map_single.count(sng_key) ){
+         map_single[sng_key] = str_format("%d_%d", n_obs, abs(fcst_ut - ut));
+      }
+
+      //  if the key is present, use the one with the closest valid time to the forecast
+      else {
+
+         //  parse the single duplicate value string
+         char** mat = NULL;
+         string sng_val = map_single[sng_key];
+         if( 3 != regex_apply("^([0-9]+)_([0-9]+)$", 3, sng_val.c_str(), mat) ){
+            mlog << Error << "\nPairBase::add_obs() - regex_apply failed to parse '"
+                 << map_single[sng_key].c_str() << "'\n\n";
+            exit(1);
+         }
+
+         int obs_idx = atoi(mat[1]);
+         int ut_diff = atoi(mat[2]);
+         regex_clean(mat);
+
+         //  if the current observation is closer to the forecast valid time, use it instead
+         if( ut_diff > abs(fcst_ut - ut) ){
+            sid_sa.set(obs_idx, sid);
+            x_na  .set(obs_idx, x);
+            y_na  .set(obs_idx, y);
+            vld_ta.set(obs_idx, ut);
+            o_na  .set(obs_idx, o);
+
+            map_single[sng_key] = str_format("%d_%d", obs_idx, abs(fcst_ut - ut));
+         }
+
+         return false;
+      }
+
+   }
 
    sid_sa.add(sid);
    lat_na.add(lat);
@@ -180,7 +291,122 @@ void PairBase::add_obs(const char *sid,
    // Increment the number of pairs
    n_obs += 1;
 
-   return;
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::print_duplicate_report(){
+
+   /*
+    * * * *  Unique duplicates  * * * *
+    */
+   if( check_unique ){
+
+      if( 3 > mlog.verbosity_level() || ! map_unique_sid.size() ) return;
+
+      //  iterate over the keys in the unique station id map
+      mlog << Debug(3) << "\nDuplicate point observations for -unique setting:\n";
+      for( map<string,int>::iterator it_unique = map_unique.begin();
+           it_unique != map_unique.end(); ++it_unique ){
+
+         //  parse and format the unique key string
+         char** mat = NULL;
+         const char* pat = "^([^_]+)_([^_]+)_([^_]+)_([^_]+)_([^_]+)_([^_]+)$";
+         string key_unique_sid = (*it_unique).first;
+         if( 7 != regex_apply(pat, 7, key_unique_sid.c_str(), mat) ){
+            mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
+                 << "to parse '" << key_unique_sid.c_str() << "'\n\n";
+            exit(1);
+         }
+         string msg_key = str_format(
+                             "[lat: %s  lon: %s  valid: %s  lev: %s  elv: %s  ob_val: %s]",
+                             mat[1], mat[2], unix_to_yyyymmdd_hhmmss( atoi(mat[3]) ).text(),
+                             mat[4], mat[5], mat[6]);
+         regex_clean(mat);
+
+         string msg = "    " + msg_key + " - Station IDs: ";
+
+         //  print the station ids for the current key
+         int num_sid = 0;
+         pair<multimap<string,string>::iterator, multimap<string,string>::iterator> unique_sid;
+         unique_sid = map_unique_sid.equal_range(key_unique_sid);
+         for( multimap<string,string>::iterator it_sid = unique_sid.first;
+              it_sid != unique_sid.second; ++it_sid)
+            msg += (num_sid++ ? ", " : "") + (*it_sid).second;
+
+         if( 1 < num_sid ) mlog << Debug(3) << msg.c_str() << "\n";
+
+      }
+
+      mlog << Debug(3) << "\n";
+
+   }
+
+
+   /*
+    * * * *  Single duplicates  * * * *
+    */
+   else if( check_single ){
+
+      if( 3 > mlog.verbosity_level() || ! map_single_val.size() ) return;
+
+      //  iterate over the keys in the unique station id map
+      mlog << Debug(3) << "\nDuplicate point observations for -single setting:\n";
+      for( map<string,string>::iterator it_single = map_single.begin();
+            it_single != map_single.end(); ++it_single ){
+
+         int num_val = 0;
+         string key_single_val = (*it_single).first;
+
+         //  parse the single key string
+         char** mat = NULL;
+         if( 5 != regex_apply("^([^_]+)_([^_]+)_([^_]+)_([^_]+)$", 5, key_single_val.c_str(), mat) ){
+            mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
+                 << "to parse '" << key_single_val.c_str() << "'\n\n";
+            exit(1);
+         }
+         string msg_key = str_format("[lat: %s  lon: %s  lev: %s  elv: %s]",
+                                     mat[1], mat[2], mat[3], mat[4]);
+         regex_clean(mat);
+
+         //  parse the single key value
+         if( 3 != regex_apply("^([^_]+)_([^_]+)$", 3, (*it_single).second.c_str(), mat) ){
+            mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
+                 << "to parse '" << (*it_single).second.c_str() << "'\n\n";
+            exit(1);
+         }
+         string msg_val = str_format("%s (HHMMSS)", sec_to_hhmmss( atoi(mat[2]) ).text());
+         regex_clean(mat);
+
+         string msg = "  " + msg_key + " - used point ob with valid time offset of " + msg_val;
+
+         //  parse and print the point obs information for the current key
+         pair<multimap<string,string>::iterator, multimap<string,string>::iterator> single_val;
+         single_val = map_single_val.equal_range(key_single_val);
+         for( multimap<string,string>::iterator it_val = single_val.first;
+              it_val != single_val.second; ++it_val, num_val++){
+
+            if( 4 != regex_apply("^([^_]+)_([^_]+)_([^_]+)$", 4, (*it_val).second.c_str(), mat) ){
+               mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
+                    << "to parse '" << (*it_single).second.c_str() << "'\n\n";
+               exit(1);
+            }
+            string msg_ob = str_format("[sid: %6s  vld: %s  ob_val: %8s]",
+                                        mat[1], unix_to_yyyymmdd_hhmmss( atoi(mat[2]) ).text(), mat[3]);
+            regex_clean(mat);
+            msg += "\n    " + msg_ob;
+
+         }
+
+         if( 1 < num_val ) mlog << Debug(3) << msg.c_str() << "\n\n";
+
+      }
+
+      mlog << Debug(3) << "\n";
+
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////
