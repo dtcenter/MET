@@ -117,7 +117,7 @@ void PairDataPoint::add_pair(const char *sid, double lat, double lon,
                              double lvl, double elv,
                              double f, double c, double o) {
 
-   PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv, o);
+   if( ! PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv, o) ) return;
 
    f_na.add(f);
    c_na.add(c);
@@ -353,6 +353,15 @@ void VxPairDataPoint::set_climo_dpa(const DataPlaneArray &dpa) {
 void VxPairDataPoint::set_fcst_ut(const unixtime ut) {
 
    fcst_ut = ut;
+
+   //  set the fcst_ut for all PairBase instances, used for duplicate logic
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].set_fcst_ut(ut);
+         }
+      }
+   }
 
    return;
 }
@@ -853,6 +862,35 @@ int VxPairDataPoint::get_n_pair() {
    }
 
    return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_duplicate_flag(int duplicate_flag) {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].set_check_unique(duplicate_flag == 1);
+            pd[i][j][k].set_check_single(duplicate_flag == 2);
+         }
+      }
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::print_duplicate_report() {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].print_duplicate_report();
+         }
+      }
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////

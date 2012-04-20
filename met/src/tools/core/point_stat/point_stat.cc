@@ -785,7 +785,11 @@ void process_obs_file(int i_nc) {
          conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
                                     hdr_ut, obs_arr, grid);
       }
+
    } // end for i_obs
+
+   //  print the duplicate report
+   for(j=0; j < conf_info.get_n_vx(); j++) conf_info.vx_pd[j].print_duplicate_report();
 
    // Deallocate and clean up
    obs_in->close();

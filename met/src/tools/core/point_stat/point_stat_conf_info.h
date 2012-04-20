@@ -95,6 +95,7 @@ class PointStatConfInfo {
       DataPlane *      mask_dp;        // Array for masking regions [n_mask]
       StringArray      mask_sid;       // Masking station id's
       NumArray         ci_alpha;       // Alpha value for confidence intervals
+      int              duplicate_flag; // Duplicate observation behavior
       int              boot_interval;  // Bootstrap CI type
       double           boot_rep_prop;  // Bootstrap replicate proportion
       int              n_boot_rep;     // Number of bootstrap replicates

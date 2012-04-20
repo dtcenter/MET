@@ -572,6 +572,19 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
    }
 
    //
+   // Conf: duplicate_flag
+   //
+   duplicate_flag = conf.lookup_int("duplicate_flag");
+
+   // Check that duplicate_flag is valid
+   if( duplicate_flag < 0 || duplicate_flag > 2 ) {
+      mlog << Error << "\nPointStatConfInfo::process_config() -> "
+           << "The duplicate_flag setting must be either NONE, UNIQUE or "
+           << "SINGLE\n\n";
+      exit(1);
+   }
+
+   //
    // Conf: boot_interval
    //
    boot_interval = conf.lookup_int("boot_interval");
@@ -844,6 +857,9 @@ void PointStatConfInfo::set_vx_pd() {
       for(j=0; j<n_interp; j++)
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
    } // end for i
+
+   //  set the duplicate flag for each pair data object
+   for(j=0; j < n_vx; j++) vx_pd[j].set_duplicate_flag(duplicate_flag);
 
    return;
 }

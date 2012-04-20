@@ -207,6 +207,24 @@ mask_poly[] = [];
 mask_sid = "";
 
 //
+// Specify the technique used to detect and handle duplicate point
+// observations.  Three techniques are currently supported:
+//
+//   NONE   = use all point observations (legacy behavior)
+//   UNIQUE = if two or more observations match identically except 
+//              in the station ID field, only use a single observation
+//   SINGLE = if two or more observations appear at a single location
+//              (lat, lon, level, elv), use only the observation that
+//              has the valid time closest to the forecast valid time
+//
+// The reporting mechanism for this feature can be activated by specifying
+// a verbosity level of three or higher.  The report will show information
+// about where duplicates were detected and which observations were used
+// in those cases.
+//
+duplicate_flag = 0;
+
+//
 // Specify a comma-separated list of interpolation method(s) to be used for
 // point observations.  For gridded observations, this serves to smooth
 // the data fields prior to verifying them.  The value at each grid point is

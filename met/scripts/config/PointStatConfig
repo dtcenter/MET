@@ -173,6 +173,24 @@ mask_grid = [ "DTC165", "DTC166" ];
 mask_poly = [ "MET_BASE/data/poly/LMV.poly" ];
 
 //
+// Specify the technique used to detect and handle duplicate point
+// observations.  Three techniques are currently supported:
+//
+//   NONE   = use all point observations (legacy behavior)
+//   UNIQUE = if two or more observations match identically except 
+//              in the station ID field, only use a single observation
+//   SINGLE = if two or more observations appear at a single location
+//              (lat, lon, level, elv), use only the observation that
+//              has the valid time closest to the forecast valid time
+//
+// The reporting mechanism for this feature can be activated by specifying
+// a verbosity level of three or higher.  The report will show information
+// about where duplicates were detected and which observations were used
+// in those cases.
+//
+duplicate_flag = 0; 
+
+//
 // Specify the name of an ASCII file containing a space-separated list of
 // station ID's at which to perform verification.  Each station ID specified
 // is treated as an individual masking region.

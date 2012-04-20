@@ -365,6 +365,19 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
    }
 
    //
+   // Conf: duplicate_flag
+   //
+   duplicate_flag = conf.duplicate_flag().ival();
+
+   // Check that duplicate_flag is valid
+   if( duplicate_flag < 0 || duplicate_flag > 2 ) {
+      mlog << Error << "\nPointStatConfInfo::process_config() -> "
+           << "The duplicate_flag setting must be either NONE, UNIQUE or "
+           << "SINGLE\n\n";
+      exit(1);
+   }
+
+   //
    // Conf: interp_method
    //
 
@@ -591,6 +604,9 @@ void EnsembleStatConfInfo::set_vx_pd() {
       for(j=0; j<n_interp; j++)
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
    } // end for i
+
+   //  set the duplicate flag for each pair data object
+   for(j=0; j < n_vx; j++) vx_pd[j].set_duplicate_flag(duplicate_flag);
 
    return;
 }

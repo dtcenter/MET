@@ -539,6 +539,7 @@ void process_point_vx() {
 
    // Store the valid time window
    for(i=0; i<conf_info.get_n_vx(); i++) {
+      conf_info.vx_pd[i].set_fcst_ut(ens_valid_ut);
       conf_info.vx_pd[i].set_beg_ut(obs_valid_beg_ut);
       conf_info.vx_pd[i].set_end_ut(obs_valid_end_ut);
    }
@@ -723,6 +724,9 @@ void process_point_obs(int i_nc) {
                                     hdr_ut, obs_arr, grid);
       }
    } // end for i_obs
+
+   //  print the duplicate report
+   for(j=0; j < conf_info.get_n_vx(); j++) conf_info.vx_pd[j].print_duplicate_report();
 
    // Deallocate and clean up
    obs_in->close();
