@@ -281,13 +281,20 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    //  apply the pattern to the input string
    rc = regexec(re, str, num_pmat, pmatch, 0);
 
-   //  if the match succeeded and captures were requested, build a list
-   if( 0 == rc  ){
+   //  if the match succeeded, build the data for return
+   if( 0 == rc ){
 
-      //  count the actual number of matches
-      for(int i=0; i < num_mat; i++){ if( -1 != pmatch[i].rm_so ) num_act++; }
+      //  if no captures were requested, return the match status
+      if( 1 > num_mat ){
+         num_act = num_pmat;
+      }
 
-      if( 0 < num_mat ){
+      //  otherwise, build a list of captured strings
+      else {
+
+         //  count the actual number of matches
+         for(int i=0; i < num_mat; i++){ if( -1 != pmatch[i].rm_so ) num_act++; }
+
          //  store the matched strings in a null-terminated list
          string str_dat = str;
          mat = new char*[num_act + 1];
@@ -297,8 +304,8 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
             strcpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data());
          }
          mat[num_act] = NULL;
-      }
 
+      }
    } else {
       mat = NULL;
    }

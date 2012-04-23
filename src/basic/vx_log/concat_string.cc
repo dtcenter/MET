@@ -183,6 +183,20 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+char ConcatString::char_at(const int idx) const
+
+{
+
+   if( 0 > idx || Length <= idx ) return '\0';
+
+   return s[idx];
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ConcatString::assign(const ConcatString & c)
 
 {
@@ -709,6 +723,8 @@ if( status >= Nalloc - 2 ){
 }
 
 va_end(vl);
+
+Length = strlen(s);
 
 return status;
 
