@@ -40,6 +40,7 @@ OBJECTS     =  ascii_table.o \
                fix_float.o \
                command_line.o \
                file_exists.o \
+               file_linecount.o \
                filename_suffix.o \
                data_plane.o \
                data_plane_util.o \
@@ -82,6 +83,7 @@ HEADERS     =  util_constants.h \
                fix_float.h \
                command_line.h \
                file_exists.h \
+               file_linecount.h \
                filename_suffix.h \
                data_plane.h \
                data_plane_util.h \
@@ -211,6 +213,9 @@ command_line.o: command_line.cc command_line.h
 
 file_exists.o: file_exists.cc file_exists.h
 	$(CXX) file_exists.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+
+file_linecount.o: file_linecount.cc file_linecount.h
+	$(CXX) file_linecount.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 filename_suffix.o: filename_suffix.cc filename_suffix.h
 	$(CXX) filename_suffix.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)

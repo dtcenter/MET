@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES =
+EXECUTABLES = test_table_lookup  \
 
 
 OBJECTS     = level_info.o \
@@ -21,7 +21,8 @@ OBJECTS     = level_info.o \
               grdfiletype_to_string.o \
               leveltype_to_string.o \
               data_class.o \
-              data2d_utils.o
+              data2d_utils.o  \
+              table_lookup.o  \
 
 
 LIBRARIES   = libvx_data2d.a
@@ -43,7 +44,8 @@ HEADERS     = data_file_type.h \
               leveltype_to_string.h \
               data_class.h \
               data2d_utils.h \
-              vx_data2d.h
+              table_lookup.h \
+              vx_data2d.h   \
 
 
 ########################################################################
@@ -103,6 +105,8 @@ data_class.o: data_class.h data_class.cc
 data2d_utils.o: data2d_utils.h data2d_utils.cc
 	$(CXX) data2d_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
+table_lookup.o: table_lookup.h table_lookup.cc
+	$(CXX) table_lookup.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 ########################################################################
 
@@ -128,6 +132,21 @@ libvx_data2d.a: $(OBJECTS)
    ##  executables
    ##
 
+
+test_table_lookup: test_table_lookup.cc libvx_data2d.a
+	@ echo
+	$(CXX) -o test_table_lookup test_table_lookup.cc $(OBJECTS) \
+	$(CXX_FLAGS) \
+	-I$(MET_INC_DIR) \
+	-L$(MET_LIB_DIR) \
+	-lvx_cal \
+	-lvx_config \
+	-lvx_log \
+	-lvx_data2d \
+	-lvx_util \
+	-lvx_math \
+	$(CXX_LIBS)
+	cp test_table_lookup $(MET_BIN_DIR)
 
 ########################################################################
 

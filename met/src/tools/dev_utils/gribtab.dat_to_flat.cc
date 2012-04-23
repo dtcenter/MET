@@ -58,6 +58,8 @@ if ( ! in )  {
 
 count = 0;
 
+cout << "GRIB2\n";
+
 while ( in.getline(line, sizeof(line)) )  {
 
    // cout << "\n count = " << (++count) << "\n" << flush;
