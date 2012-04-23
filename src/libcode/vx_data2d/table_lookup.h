@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include "concat_string.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +22,7 @@ class Grib2TableEntry {
 
    private:
 
-      init_from_scratch();
+      void init_from_scratch();
 
       void assign(const Grib2TableEntry &);
 
@@ -57,26 +59,37 @@ class Grib2TableEntry {
          //  do stuff
          //
 
+      bool parse_line(const char *);
+
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class Grib2FlatFile {
+class TableFlatFile {
 
    private:
 
-      Grib2TableEntry * e;   //  elements ... allocated
+      void init_from_scratch();
+
+      void assign(const TableFlatFile &); 
+
+      bool read_grib2(istream &);
+
+      // Grib1TableEntry * g1e;   //  elements ... allocated
+      Grib2TableEntry * g2e;   //  elements ... allocated
 
       int Nelements;
 
+      ConcatString Filename;
+
    public:
 
-      Grib2FlatFile();
-     ~Grib2FlatFile();
-      Grib2FlatFile(const Grib2FlatFile &);
-      Grib2FlatFile & operator=(const Grib2FlatFile &);
+      TableFlatFile();
+     ~TableFlatFile();
+      TableFlatFile(const TableFlatFile &);
+      TableFlatFile & operator=(const TableFlatFile &);
 
       void clear();
 
@@ -90,16 +103,28 @@ class Grib2FlatFile {
          //  get stuff
          //
 
-      bool lookup(int a, int b, int c, Grib2TableEntry &);
+      ConcatString filename() const;
 
-      bool lookup(const char * part_name, Grib2TableEntry &, int & n_matches);
+      int n_elements() const;
 
          //
          //  do stuff
          //
 
+      bool read(const char * filename);
+
+      bool lookup_grib2(int a, int b, int c, Grib2TableEntry &);
+      bool lookup_grib2(const char * parm_name, Grib2TableEntry &, int & n_matches);
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int TableFlatFile::n_elements() const { return ( Nelements ); }
+
+inline ConcatString TableFlatFile::filename() const { return ( Filename ); }
 
 
 ////////////////////////////////////////////////////////////////////////

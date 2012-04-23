@@ -790,6 +790,34 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool ConcatString::read_line(istream & in)
+
+{
+
+char c;
+
+
+erase();
+
+do {
+
+   in.get(c);
+
+   if ( !in )  return ( false );
+
+   add(c);
+
+} while ( c != '\n' );
+
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

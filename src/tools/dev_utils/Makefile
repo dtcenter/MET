@@ -145,7 +145,7 @@ gribtab.dat_to_flat: gribtab.dat_to_flat.cc $(OBJECTS)
 	-lvx_log \
 	-lbufr \
 	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
-	cp pbtime $(MET_BIN_DIR)
+	cp gribtab.dat_to_flat $(MET_BIN_DIR)
 
 
 ########################################################################
