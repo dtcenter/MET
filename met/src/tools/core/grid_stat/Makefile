@@ -112,6 +112,7 @@ grid_stat: grid_stat.cc $(OBJECTS)
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_cal \
 	-lvx_econfig \
 	-lvx_math \

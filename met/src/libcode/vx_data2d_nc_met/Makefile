@@ -112,6 +112,7 @@ test_read_nc_met: $(LIBRARIES) test_read_nc_met.cc
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

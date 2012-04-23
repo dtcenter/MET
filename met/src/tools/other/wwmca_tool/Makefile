@@ -191,6 +191,7 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	-lvx_gsl_prob \
 	-lvx_econfig \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
@@ -228,6 +229,7 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	-lvx_gsl_prob \
 	-lvx_econfig \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

@@ -84,6 +84,7 @@ madis2nc: madis2nc.cc $(OBJECTS)
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_nc_util \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

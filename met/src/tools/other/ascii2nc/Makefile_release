@@ -69,6 +69,7 @@ ascii2nc: ascii2nc.cc $(OBJECTS)
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
 	-lvx_nc_util \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_util \

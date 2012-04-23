@@ -17,6 +17,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "var_info.h"
+#include "vx_config.h"
 
 #include "data_file_type.h"
 
@@ -84,6 +85,7 @@ class VarInfoGrib : public VarInfo
 
       void set_pair(const ConcatString &key, const ConcatString &val);
       void set_magic(const ConcatString &);
+      void set_dict(Dictionary &);
 
       void set_ptv(int);
       void set_code(int);

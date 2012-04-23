@@ -97,6 +97,7 @@ plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	-lvx_nav \
 	-lvx_gnomon \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

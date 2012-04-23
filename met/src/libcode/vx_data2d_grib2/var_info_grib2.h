@@ -23,6 +23,7 @@
 
 using namespace std;
 
+#include "vx_config.h"
 #include "vx_util.h"
 #include "var_info.h"
 #include "data_file_type.h"
@@ -137,6 +138,7 @@ class VarInfoGrib2 : public VarInfo
 
       void set_pair(const ConcatString &key, const ConcatString &val);
       void set_magic(const ConcatString &);
+      void set_dict(const Dictionary &);
 
       void set_record(int);
       void set_discipline(int);

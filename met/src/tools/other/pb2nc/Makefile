@@ -146,6 +146,7 @@ pb2nc: pb2nc.cc $(OBJECTS)
 	-lvx_econfig \
 	-lvx_pb_util \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

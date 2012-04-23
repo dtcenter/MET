@@ -75,6 +75,7 @@ pcp_combine: pcp_combine.cc $(OBJECTS)
 	-lvx_data2d \
 	-lvx_data2d_nc_pinterp \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
