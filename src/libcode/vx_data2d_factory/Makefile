@@ -136,6 +136,7 @@ test_is_grib: $(LIBRARIES) test_is_grib.cc
 	-L$(MET_LIB_DIR) \
 	-lvx_data2d_factory \
 	-lvx_cal \
+	-lvx_config \
 	-lvx_util \
 	-lvx_log
 
@@ -152,6 +153,7 @@ test_var_info: $(LIBRARIES) test_var_info.cc
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
@@ -169,6 +171,7 @@ test_factory: $(LIBRARIES) test_factory.cc
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

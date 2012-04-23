@@ -112,6 +112,7 @@ stat_analysis: stat_analysis.cc $(OBJECTS)
 	-lvx_gnomon \
 	-lvx_gsl_prob \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_econfig \
 	-lvx_math \
 	-lvx_cal \

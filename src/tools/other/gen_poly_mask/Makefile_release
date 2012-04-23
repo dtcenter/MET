@@ -89,6 +89,7 @@ gen_poly_mask: gen_poly_mask.cc $(OBJECTS)
 	-lvx_gsl_prob \
 	-lvx_econfig \
 	-lvx_grid \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

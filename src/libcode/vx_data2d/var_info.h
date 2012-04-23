@@ -20,6 +20,7 @@
 #include "level_info.h"
 #include "threshold.h"
 #include "vx_cal.h"
+#include "vx_config.h"
 
 #include "data_file_type.h"
 
@@ -41,6 +42,8 @@ class VarInfo
    protected:
 
       ConcatString MagicStr;  // Requested magic string
+      Dictionary   Dict;      // Requested fcst/obs dictionary of fields
+
       ConcatString ReqName;   // Requested parameter name
       ConcatString Name;      // Name of parameter
       ConcatString Units;     // Units for parameter
@@ -106,6 +109,7 @@ class VarInfo
 
       virtual void set_pair(const ConcatString &key, const ConcatString &val);
       virtual void set_magic(const ConcatString &);
+      void set_dict(Dictionary &);
 
       void set_req_name(const char *);
       void set_name(const char *);

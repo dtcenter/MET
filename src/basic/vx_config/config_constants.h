@@ -22,6 +22,7 @@ enum StatOutputType {
 ////////////////////////////////////////////////////////////////////////
 
 // Structure to store all possible output_flag entries
+/*
 struct OutputFlag {
    StatOutputType fho, ctc, cts;          // Categorical lines
    StatOutputType mctc, mcts;             // Multi-category lines
@@ -33,6 +34,7 @@ struct OutputFlag {
    StatOutputType isc;                    // Intensity-scale line
    StatOutputType rhist, orank;           // Ensemble lines
 };
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
