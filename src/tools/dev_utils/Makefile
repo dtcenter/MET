@@ -16,7 +16,8 @@
 EXECUTABLES = chk4copyright \
               reformat_map_data \
               reformat_county_data \
-              pbtime
+              pbtime  \
+              gribtab.dat_to_flat  \
 
 
 OBJECTS     = openpb.o \
@@ -132,6 +133,21 @@ pbtime: pbtime.cc $(OBJECTS)
 	cp pbtime $(MET_BIN_DIR)
 
 
+gribtab.dat_to_flat: gribtab.dat_to_flat.cc $(OBJECTS)
+	@ echo
+	$(CXX) -o gribtab.dat_to_flat gribtab.dat_to_flat.cc $(OBJECTS) \
+	$(CXX_FLAGS) \
+	-I$(MET_INC_DIR) $(BUFR_INCS) $(F2C_INCS) \
+	-L$(MET_LIB_DIR) $(BUFR_LIBS) $(F2C_LIBS) \
+	-lvx_pb_util \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_log \
+	-lbufr \
+	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
+	cp pbtime $(MET_BIN_DIR)
+
+
 ########################################################################
 
 
@@ -141,6 +157,7 @@ clean:
 	rm -f $(MET_BIN_DIR)/reformat_map_data
 	rm -f $(MET_BIN_DIR)/reformat_county_data
 	rm -f $(MET_BIN_DIR)/pbtime
+	rm -f $(MET_BIN_DIR)/gribtab.dat_to_flat
 
 
 ########################################################################

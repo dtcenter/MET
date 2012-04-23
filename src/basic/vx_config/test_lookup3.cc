@@ -5,7 +5,7 @@
 
 static const bool debug = false;
 
-static const char input_filename [] = "tt";
+static const char input_filename [] = "john";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,11 +76,19 @@ if ( ! status )  {
 const DictionaryEntry * e = config.lookup("fcst.field");
 Dictionary * f = e->array_value();
 
-const DictionaryEntry * ee = f->operator[](1);
+const DictionaryEntry * ee = f->operator[](2);
 Dictionary * ff = ee->dict_value();
 
 
-const DictionaryEntry * eee = ff->lookup("level");
+const DictionaryEntry * eee = ff->lookup("GRIB1_ptv");
+
+if ( ! eee )  {
+
+   cerr << "\n\n  " << program_name << ": lookup failed!\n\n";
+
+   exit ( 1 );
+
+}
 
 eee->dump(cout);
 
