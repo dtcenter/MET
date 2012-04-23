@@ -273,6 +273,8 @@ if ( DS.n_elements() != 1 )  {
    //  done
    //
 
+patch_parents();
+
 bison_input_filename = (const char *) 0;
 
 dict_stack = (DictionaryStack *) 0;
