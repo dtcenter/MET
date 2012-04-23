@@ -248,6 +248,18 @@ void VarInfoNcPinterp::set_magic(const ConcatString &s) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfoNcPinterp::set_dict(Dictionary & dict) {
+
+   ConcatString mag;
+   mag.format("%s%s", dict.lookup_string("name").text(),
+                      dict.lookup_string("level").text());
+   set_magic(mag);
+   set_req_name( dict.lookup_string("name") );
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool VarInfoNcPinterp::is_precipitation() const {
 
    //

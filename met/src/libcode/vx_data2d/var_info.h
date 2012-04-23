@@ -109,7 +109,7 @@ class VarInfo
 
       virtual void set_pair(const ConcatString &key, const ConcatString &val);
       virtual void set_magic(const ConcatString &);
-      void set_dict(Dictionary &);
+      virtual void set_dict(Dictionary &);
 
       void set_req_name(const char *);
       void set_name(const char *);

@@ -138,7 +138,7 @@ class VarInfoGrib2 : public VarInfo
 
       void set_pair(const ConcatString &key, const ConcatString &val);
       void set_magic(const ConcatString &);
-      void set_dict(const Dictionary &);
+      void set_dict(Dictionary &);
 
       void set_record(int);
       void set_discipline(int);

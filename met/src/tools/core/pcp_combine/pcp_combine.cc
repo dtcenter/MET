@@ -125,7 +125,7 @@ static unixtime     valid_time;
 static int          out_accum;
 static StringArray  pcp_dir;
 static ConcatString pcp_reg_exp = default_reg_exp;
-static ConcatString user_magic = "";
+static ConcatString user_dict = "";
 
 // Variables for the add and subtract commands
 static ConcatString *in_file = (ConcatString *) 0;
@@ -171,7 +171,7 @@ static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
-static void set_user_magic(const StringArray & a);
+static void set_user_dict(const StringArray & a);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -244,7 +244,7 @@ void process_command_line(int argc, char **argv)
    cline.add(set_verbosity, "-v",        1);
    cline.add(set_pcpdir,    "-pcpdir",   1);
    cline.add(set_pcprx,     "-pcprx",    1);
-   cline.add(set_user_magic,"-mag",      1);
+   cline.add(set_user_dict, "-config",   1);
 
    //
    // parse the command line
@@ -709,13 +709,30 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
             return -1;
          }
 
-         // initialize the VarInfo object and store the requested timing information
-         if( !user_magic.empty() ){
-            mlog << Debug(4) << "Retrieving field using magic string '" << user_magic << "'\n";
-            var->set_magic( user_magic );
+         //  initialize the VarInfo object and store the requested timing information
+         if( !user_dict.empty() ){
+
+            //  if the user-specified config string contains an '=', parse it as a config string
+            char** mat = NULL;
+            if( regex_apply(".+=.+", 0, user_dict, mat) ){
+               mlog << Debug(4) << "Retrieving field using config string'" << user_dict << "'\n";
+               MetConfig config;
+               config.read_string( user_dict );
+               var->set_dict( config );
+            }
+
+            //  otherwise, parse it as a magic string
+            else {
+               mlog << Debug(4) << "Retrieving field using magic string '" << user_dict << "'\n";
+               var->set_magic( user_dict );
+            }
+
          } else {
+
+            //  build a magic string
             mlog << Debug(4) << "Retrieving field using accumulation of " << in_accum << "\n";
             var->set_magic( make_magic(grib_code, grib_ptv, in_accum) );
+
          }
          var->set_valid(cur_ut);
          var->set_init(init_time);
@@ -991,15 +1008,29 @@ void get_field(const char * filename, const char * fld_accum_mag,
    }
 
    //  attempt to parse the input accum/magic string as an accum
-   ConcatString magic = !user_magic.empty() ? user_magic : "";
+   ConcatString config_str = !user_dict.empty() ? user_dict : "";
    int get_accum = 0;
-   if( is_timestring(fld_accum_mag) ) get_accum = timestring_to_sec(fld_accum_mag);
-   else                               magic     = fld_accum_mag;
+   if( is_timestring(fld_accum_mag) ) get_accum  = timestring_to_sec(fld_accum_mag);
+   else                               config_str = fld_accum_mag;
 
-   //  use the user-specified magic string, if available, otherwise assume GRIB
-   if( !magic.empty() ){
-      mlog << Debug(4) << "Retrieving field using magic string '" << magic << "'\n";
-      var->set_magic( magic );
+   //  use the user-specified config string, if available, otherwise assume GRIB
+   if( !config_str.empty() ){
+
+      //  if the user-specified config string contains an '=', parse it as a config string
+      char** mat = NULL;
+      if( regex_apply(".+=.+", 0, config_str, mat) ){
+         mlog << Debug(4) << "Retrieving field using config string '" << config_str << "'\n";
+         MetConfig config;
+         config.read_string( config_str );
+         var->set_dict( config );
+      }
+
+      //  otherwise, parse it as a magic string
+      else {
+         mlog << Debug(4) << "Retrieving field using magic string '" << config_str << "'\n";
+         var->set_magic( config_str );
+      }
+
    } else {
       mlog << Debug(4) << "Retrieving field using accumulation of " << fld_accum_mag << "\n";
       var->set_magic( make_magic(grib_code, grib_ptv, get_accum) );
@@ -1212,7 +1243,7 @@ void usage()
         << "\t[-ptv number]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
-        << "\t[-mag magic_str]\n\n"
+        << "\t[-config config_str]\n\n"
 
         << "\twhere\t\"-sum sum_args\" indicates that accumulations "
         << "from multiple files should be summed up using the "
@@ -1239,11 +1270,14 @@ void usage()
         << "\t\t\"-v level\" overrides the default level of logging ("
         << verbosity << ") (optional).\n"
 
-        << "\t\t\"-mag magic_str\" magic string to use when searching for records "
-        << "in input files (optional).\n\n"
+        << "\t\t\"-config config_str\" configuration string to use when "
+        << "searching for records in input files (optional).\n\n"
 
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
-        << "the default behavior.\n\n"
+        << "the default behavior.\n"
+
+        << "\t\tNote: For \"-add\" and \"-subtract\", the accumulation intervals"
+        << "may be substituted with config file strings.\n\n"
 
         << "\tSUM_ARGS:\n"
         << "\t\tinit_time\n"
@@ -1283,45 +1317,45 @@ void usage()
 
         << "\tADD_ARGS:\n"
         << "\t\tin_file1\n"
-        << "\t\taccum1/mag1\n"
+        << "\t\taccum1\n"
         << "\t\t...\n"
         << "\t\tin_filen\n"
-        << "\t\taccumn/magn\n"
+        << "\t\taccumn\n"
         << "\t\tout_file\n\n"
 
         << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
         << "file to be used (required).\n"
 
-        << "\t\t\t\"accum1/mag1\" indicates the accumulation interval or magic string "
-        << "to be used from in_file1 in HH[MMSS] format for interval (required).\n"
+        << "\t\t\t\"accum1\" indicates the accumulation interval to be used "
+        << "from in_file1 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"in_filen\" indicates additional input GRIB files to be "
         << "added together (optional).\n"
 
-        << "\t\t\t\"accumn/magn\" indicates the accumulation interval or magic string "
-        << "to be used in HH[MMSS] format for interval (optional).\n"
+        << "\t\t\t\"accumn\" indicates the accumulation interval to be used "
+        << "from in_filen in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
         << "be written (required).\n\n"
 
         << "\tSUBTRACT_ARGS:\n"
         << "\t\tin_file1\n"
-        << "\t\taccum1/mag1\n"
+        << "\t\taccum1\n"
         << "\t\tin_file2\n"
-        << "\t\taccum2/mag2\n"
+        << "\t\taccum2\n"
         << "\t\tout_file\n\n"
 
         << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
         << "file to be used (required).\n"
 
-        << "\t\t\t\"accum1/mag1\" indicates the accumulation interval or magic string "
-        << "to be used from in_file1 in HH[MMSS] format (required).\n"
+        << "\t\t\t\"accum1\" indicates the accumulation interval to be used "
+        << "from in_file1 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"in_file2\" indicates the name of the second input GRIB "
         << "file to be subtracted from in_file1 (required).\n"
 
-        << "\t\t\t\"accum2/mag2\" indicates the accumulation interval or magic string "
-        << "to be used from in_file2 in HH[MMSS] format (required).\n"
+        << "\t\t\t\"accum2\" indicates the accumulation interval to be used "
+        << "from in_file2 in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
         << "be written (required).\n"
@@ -1400,9 +1434,9 @@ void set_pcprx(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_user_magic(const StringArray & a)
+void set_user_dict(const StringArray & a)
 {
-   user_magic = a[0];
+   user_dict = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////

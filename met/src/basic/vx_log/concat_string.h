@@ -122,6 +122,8 @@ class ConcatString {
       bool empty() const;
       bool nonempty() const;
 
+      char char_at(const int idx) const;
+
          //
          //  do stuff
          //
@@ -181,7 +183,6 @@ inline int          ConcatString::alloc_inc()    const { return ( AllocInc ); }
 
 inline bool         ConcatString::empty()        const { return ( Length == 0 ); }
 inline bool         ConcatString::nonempty()     const { return ( Length > 0 ); }
-
 
 inline              ConcatString::operator const char * () const { return ( s ); }
 

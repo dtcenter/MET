@@ -62,6 +62,7 @@ class VarInfoNcMet : public VarInfo
 
       void set_pair(const ConcatString &key, const ConcatString &val);
       void set_magic(const ConcatString &);
+      void set_dict(Dictionary &s);
 
       void add_dimension(int dim);
 

@@ -214,6 +214,7 @@ class VarInfoNcPinterp : public VarInfo
 
       void set_pair(const ConcatString &key, const ConcatString &val);
       void set_magic(const ConcatString &);
+      void set_dict(Dictionary &);
 
       void add_dimension(int dim);
       void set_dimension(int i_dim, int dim);

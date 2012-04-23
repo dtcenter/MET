@@ -304,7 +304,7 @@ void VarInfo::set_magic(const ConcatString &mag) {
 
 void VarInfo::set_dict(Dictionary &dict) {
 
-   set_name ( dict.lookup_string("name", false)  );
+   set_name( dict.lookup_string("name", false)  );
 
    return;
 }

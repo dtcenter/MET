@@ -389,21 +389,11 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
 
 void VarInfoGrib::set_dict(Dictionary & dict) {
 
-   double prob_lo, prob_hi;
-   LevelType lt;
-
-   //  store the fcst/obs dictionary
-   Dict = dict;
-
-   //  determine the GRIB1 parameter table version, defaulting to 2
-   int ptv = dict.lookup_int("GRIB1_ptv");
-   PTV = (bad_data_int == ptv? 2 : ptv);
-
-   //  store the code value and parse any probability info
-   ConcatString parm = dict.lookup_string("name", false);
-   if( "" != parm )  Code = str_to_grib_code(parm, PCode, prob_lo, prob_hi);
-   else              Code = dict.lookup_int("GRIB1_rec");
-
+   ConcatString mag;
+   mag.format("%s/%s", dict.lookup_string("name").text(),
+                       dict.lookup_string("level").text());
+   set_magic(mag);
+   set_req_name( dict.lookup_string("name") );
 
 }
 
