@@ -149,8 +149,6 @@ out << prefix << "Index values = ("
               << index_b << ", "
               << index_c << ")\n";
 
-out << prefix << 
-
 out << prefix << "parm_name = " << parm_name.contents() << "\n";
 
 out << prefix << "full_name = " << full_name.contents() << "\n";
