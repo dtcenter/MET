@@ -44,7 +44,7 @@ extern FILE *econfigin;
 
 extern int econfigdebug;
 
-extern const char * bison_input_filename;
+extern const char * econfig_bison_input_filename;
 
 extern int econfig_LineNumber;
 
@@ -1415,7 +1415,7 @@ void Machine::read(const char * filename)
 
 bison_machine = this;
 
-bison_input_filename = filename;
+econfig_bison_input_filename = filename;
 
 econfig_LineNumber   = 1;
 
@@ -1451,7 +1451,7 @@ if ( parse_status != 0 )  {
 
 bison_machine = (Machine *) 0;
 
-bison_input_filename = (const char *) 0;
+econfig_bison_input_filename = (const char *) 0;
 
 fclose(econfigin);
 

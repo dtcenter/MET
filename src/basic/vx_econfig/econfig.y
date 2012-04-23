@@ -55,7 +55,7 @@ extern char *         econfigtext;
 
 extern Machine *      bison_machine;
 
-extern const char *   bison_input_filename;
+extern const char *   econfig_bison_input_filename;
 
 
    //
@@ -69,7 +69,7 @@ int econfig_ColumnNumber            = 1;
 
 Machine *     bison_machine         = (Machine *) 0;
 
-const char *  bison_input_filename  = (const char *) 0;
+const char *  econfig_bison_input_filename  = (const char *) 0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1258,12 +1258,12 @@ ifstream in;
 c = (int) (econfig_ColumnNumber - strlen(econfigtext));
 
 cout << "\n\n"
-     << "   config() -> syntax error in file \"" << bison_input_filename << "\"\n\n"
+     << "   config() -> syntax error in file \"" << econfig_bison_input_filename << "\"\n\n"
      << "      line   = " << econfig_LineNumber << "\n\n"
      << "      column = " << c << "\n\n"
      << "      text   = \"" << econfigtext << "\"\n\n";
 
-in.open(bison_input_filename);
+in.open(econfig_bison_input_filename);
 
 for (j=1; j<econfig_LineNumber; ++j)  {   //  j starts at one here, not zero
 
