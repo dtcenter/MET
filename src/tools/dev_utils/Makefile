@@ -18,6 +18,7 @@ EXECUTABLES = chk4copyright \
               reformat_county_data \
               pbtime  \
               gribtab.dat_to_flat  \
+              nceptab_to_flat  \
 
 
 OBJECTS     = openpb.o \
@@ -146,6 +147,21 @@ gribtab.dat_to_flat: gribtab.dat_to_flat.cc $(OBJECTS)
 	-lbufr \
 	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
 	cp gribtab.dat_to_flat $(MET_BIN_DIR)
+
+
+nceptab_to_flat: nceptab_to_flat.cc $(OBJECTS)
+	@ echo
+	$(CXX) -o nceptab_to_flat nceptab_to_flat.cc $(OBJECTS) \
+	$(CXX_FLAGS) \
+	-I$(MET_INC_DIR) $(BUFR_INCS) $(F2C_INCS) \
+	-L$(MET_LIB_DIR) $(BUFR_LIBS) $(F2C_LIBS) \
+	-lvx_pb_util \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_log \
+	-lbufr \
+	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
+	cp nceptab_to_flat $(MET_BIN_DIR)
 
 
 ########################################################################

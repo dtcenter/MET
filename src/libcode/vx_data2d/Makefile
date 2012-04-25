@@ -13,7 +13,8 @@
 ########################################################################
 
 
-EXECUTABLES = test_table_lookup  \
+EXECUTABLES = test_table_lookup   \
+              dump_default_table  \
 
 
 OBJECTS     = level_info.o \
@@ -106,7 +107,7 @@ data2d_utils.o: data2d_utils.h data2d_utils.cc
 	$(CXX) data2d_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 table_lookup.o: table_lookup.h table_lookup.cc
-	$(CXX) table_lookup.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) table_lookup.cc $(CXX_FLAGS) -c -DMET_BASE_DIR=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 ########################################################################
 
@@ -147,6 +148,22 @@ test_table_lookup: test_table_lookup.cc libvx_data2d.a
 	-lvx_math \
 	$(CXX_LIBS)
 	cp test_table_lookup $(MET_BIN_DIR)
+
+
+dump_default_table: dump_default_table.cc libvx_data2d.a
+	@ echo
+	$(CXX) -o dump_default_table dump_default_table.cc $(OBJECTS) \
+	$(CXX_FLAGS) \
+	-I$(MET_INC_DIR) \
+	-L$(MET_LIB_DIR) \
+	-lvx_cal \
+	-lvx_config \
+	-lvx_log \
+	-lvx_data2d \
+	-lvx_util \
+	-lvx_math \
+	$(CXX_LIBS)
+	cp dump_default_table $(MET_BIN_DIR)
 
 ########################################################################
 
