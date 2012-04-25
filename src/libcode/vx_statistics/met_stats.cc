@@ -635,7 +635,7 @@ void CNTInfo::assign(const CNTInfo &c) {
 
    n = c.n;
    allocate_n_alpha(c.n_alpha);
-   for(i=0; i<c.n; i++) { alpha[i] = c.alpha[i]; }
+   for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
 
    fbar        = c.fbar;
    fstdev      = c.fstdev;
@@ -1321,6 +1321,23 @@ NBRCNTInfo & NBRCNTInfo::operator=(const NBRCNTInfo &c) {
    if(this == &c) return(*this);
 
    assign(c);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
+
+   NBRCNTInfo n_info;
+
+   n_info.cnt_info.n = cnt_info.n + c.cnt_info.n;
+   if( n_info.cnt_info.n ){
+      n_info.fbs.v = (cnt_info.n*fbs.v + c.cnt_info.n*c.fbs.v) / n_info.cnt_info.n;
+      n_info.fss.v = (cnt_info.n*fss.v + c.cnt_info.n*c.fss.v) / n_info.cnt_info.n;
+   }
+
+   assign(n_info);
 
    return(*this);
 }

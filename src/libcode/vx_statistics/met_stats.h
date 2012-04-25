@@ -305,6 +305,7 @@ class NBRCNTInfo {
       ~NBRCNTInfo();
       NBRCNTInfo(const NBRCNTInfo &);
       NBRCNTInfo & operator=(const NBRCNTInfo &);
+      NBRCNTInfo & operator+=(const NBRCNTInfo &);
 
       // Neighborhood width used
       int nbr_wdth;

@@ -700,8 +700,11 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    VL1L2Info        vl1l2_info;
    PCTInfo          pct_info;
    NBRCTSInfo       nbrcts_info;
+   NBRCNTInfo       nbrcnt_info;
    ISCInfo          isc_info;
    PairDataEnsemble ens_pd;
+
+   nbrcnt_info.allocate_n_alpha(1);
 
    AsciiTable out_at;
    int i, n_thresh, n_cat;
@@ -726,17 +729,17 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check that a valid line type has been selected
    //
-   if(lt != stat_fho    && lt != stat_ctc   &&
-      lt != stat_mctc   && lt != stat_sl1l2 &&
-      lt != stat_sal1l2 && lt != stat_vl1l2 &&
-      lt != stat_val1l2 && lt != stat_pct   &&
-      lt != stat_nbrctc && lt != stat_isc   &&
-      lt != stat_rhist) {
+   if(lt != stat_fho    && lt != stat_ctc    &&
+      lt != stat_mctc   && lt != stat_sl1l2  &&
+      lt != stat_sal1l2 && lt != stat_vl1l2  &&
+      lt != stat_val1l2 && lt != stat_pct    &&
+      lt != stat_nbrctc && lt != stat_nbrcnt &&
+      lt != stat_rhist  && lt != stat_isc) {
       mlog << Error << "\ndo_job_aggr()-> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
-           << "\tPCT, NBRCTC, ISC, RHIST\n\n";
+           << "\tPCT, NBRCTC, NBRCNT, ISC, RHIST\n\n";
       throw(1);
    }
 
@@ -771,10 +774,11 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    else if(lt == stat_sl1l2  ||
            lt == stat_sal1l2 ||
            lt == stat_vl1l2  ||
-           lt == stat_val1l2) {
+           lt == stat_val1l2 ||
+           lt == stat_nbrcnt) {
       aggr_partial_sum_lines(jobstring, f, j,
                              sl1l2_info, vl1l2_info, cnt_info,
-                             lt, n_in, n_out);
+                             nbrcnt_info, lt, n_in, n_out);
    }
 
    //
@@ -1010,6 +1014,25 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
 
          break;
 
+      case(stat_nbrcnt):
+
+         //
+         // Get the column names
+         //
+         out_at.set_size(2, n_nbrcnt_columns+1);
+         setup_table(out_at);
+         out_at.set_entry(0, 0,  "COL_NAME:");
+         write_header_row(nbrcnt_columns, n_nbrcnt_columns, 0,
+                          out_at, 0, 1);
+
+         //
+         // Write the NBRCTC row
+         //
+         out_at.set_entry(1, 0,  "NBRCNT:");
+         write_nbrcnt_cols(nbrcnt_info, 0, out_at, 1, 1);
+
+         break;
+
       case(stat_isc):
 
          //
@@ -1094,6 +1117,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    VL1L2Info        vl1l2_info;
    PCTInfo          pct_info;
    NBRCTSInfo       nbrcts_info;
+   NBRCNTInfo       nbrcnt_info;
    ISCInfo          isc_info;
    NumArray         f_na, o_na, c_na;
    NumArray         uf_na, vf_na, uo_na, vo_na;
@@ -1202,7 +1226,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
            in_lt == stat_sal1l2) {
       aggr_partial_sum_lines(jobstring, f, j,
                              sl1l2_info, vl1l2_info, cnt_info,
-                             in_lt, n_in, n_out);
+                             nbrcnt_info, in_lt, n_in, n_out);
    }
 
    //

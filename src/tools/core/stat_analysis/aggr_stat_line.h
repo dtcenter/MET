@@ -66,7 +66,7 @@ extern void aggr_nx2_contable_lines(
 extern void aggr_partial_sum_lines(
                const char *, LineDataFile &,
                STATAnalysisJob &, SL1L2Info &, VL1L2Info &, CNTInfo &,
-               STATLineType, int &, int &);
+               NBRCNTInfo &, STATLineType, int &, int &);
 
 extern void aggr_vl1l2_wdir(
                const char *, LineDataFile &, STATAnalysisJob &,
