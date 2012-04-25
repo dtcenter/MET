@@ -6,6 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Allow TRUE and FALSE to be either case
+TRUE         = true;
+FALSE        = false;
+
 // File types
 GRIB1        = 1;
 NETCDF_MET   = 2;
@@ -34,3 +38,9 @@ BOTH         = 3;
 // Bootstrapping interval type
 PCTILE       = 1;
 BCA          = 2;
+
+// Duplicate flag settings
+UNIQUE       = 2;
+SINGLE       = 3;
+
+
