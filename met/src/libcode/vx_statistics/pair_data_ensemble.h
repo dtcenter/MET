@@ -161,7 +161,7 @@ class VxPairDataEnsemble {
 
       int  get_n_pair();
 
-      void set_duplicate_flag(int duplicate_flag);
+      void set_duplicate_flag(DuplicateType duplicate_flag);
       void print_duplicate_report();
 
       double compute_interp(double, double, int, double, int, int);
