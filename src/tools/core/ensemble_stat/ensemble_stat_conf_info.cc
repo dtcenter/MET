@@ -606,7 +606,7 @@ void EnsembleStatConfInfo::set_vx_pd() {
    } // end for i
 
    //  set the duplicate flag for each pair data object
-   for(j=0; j < n_vx; j++) vx_pd[j].set_duplicate_flag(duplicate_flag);
+   for(j=0; j < n_vx; j++) vx_pd[j].set_duplicate_flag((DuplicateType) duplicate_flag);
 
    return;
 }
