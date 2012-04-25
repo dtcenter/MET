@@ -870,6 +870,101 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool TableFlatFile::lookup_grib1(int code, int table_number, Grib1TableEntry & e)
+
+{
+
+int j;
+
+e.clear();
+
+for (j=0; j<N_grib1_elements; ++j)  {
+
+   if ( (g1e[j].code == code) && (g1e[j].table_number == table_number) )  {
+
+      e = g1e[j];
+
+      return ( true );
+
+   }
+
+}
+
+return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool TableFlatFile::lookup_grib1(int code, Grib1TableEntry & e)   //  assumes table_number = 2;
+
+{
+
+const int table_number = 2;
+bool status = false;
+
+status = lookup_grib1(code, table_number, e);
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool TableFlatFile::lookup_grib1(int table_number, const char * parm_name, Grib1TableEntry & e, int & n_matches)
+
+{
+
+e.clear();
+
+n_matches = 0;
+
+int j;
+
+for (j=0; j<N_grib1_elements; ++j)  {
+
+   if ( g1e[j].table_number != table_number )  continue;
+
+   if ( g1e[j].parm_name != parm_name )  continue;
+
+   if ( n_matches == 0 )  e = g1e[j];
+
+   ++n_matches;
+
+}
+
+
+
+return ( (n_matches > 0) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool TableFlatFile::lookup_grib1(const char * parm_name, Grib1TableEntry & e)   //  assumes table number is 2
+
+{
+
+const int table_number = 2;
+bool status = false;
+int n_matches;
+
+status = lookup_grib1(table_number, parm_name, e, n_matches);
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool TableFlatFile::lookup_grib2(int a, int b, int c, Grib2TableEntry & e)
 
 {
