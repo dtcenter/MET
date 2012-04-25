@@ -168,7 +168,7 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    int i;
    GrdFileType ftype;
-   ConcatString default_config_file;
+   ConcatString default_config_file, config_const_file;
 
    out_dir = ".";
 
@@ -259,13 +259,13 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   // Create the default config file name
+   // Create the default config file names
    default_config_file = replace_path(default_config_filename);
 
    // List the config files
    mlog << Debug(1)
         << "Default Config File: " << default_config_file << "\n"
-        << "User Config File: "    << config_file << "\n";
+        << "User Config File: " << config_file << "\n";
 
    // Read the config files
    conf_info.read_config(default_config_file, config_file,
@@ -377,7 +377,7 @@ void setup_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
-      if(conf_info.output_flag[i] >= flag_txt_out) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Initialize file stream
          txt_out[i] = (ofstream *) 0;
@@ -860,10 +860,10 @@ void process_scores() {
       shc.set_obs_valid_end(conf_info.vx_pd[i].end_ut);
 
       // Loop through the message types
-      for(j=0; j<conf_info.get_n_msg_typ(); j++) {
+      for(j=0; j<conf_info.get_n_msg_typ(i); j++) {
 
          // Store the message type
-         shc.set_msg_typ(conf_info.msg_typ[j]);
+         shc.set_msg_typ(conf_info.msg_typ[i][j]);
 
          // Loop through the verification masking regions
          for(k=0; k<conf_info.get_n_mask(); k++) {
@@ -910,7 +910,7 @@ void process_scores() {
                if(pd_ptr->n_pair == 0) continue;
 
                // Write out the MPR lines
-               if(conf_info.output_flag[i_mpr]) {
+               if(conf_info.output_flag[i_mpr] != STATOutputType_None) {
 
                   write_mpr_row(shc, pd_ptr,
                      conf_info.output_flag[i_mpr],
@@ -925,9 +925,9 @@ void process_scores() {
                // Compute CTS scores
                if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
                    conf_info.fcst_ta[i].n_elements() > 0 &&
-                  (conf_info.output_flag[i_fho] ||
-                   conf_info.output_flag[i_ctc] ||
-                   conf_info.output_flag[i_cts])) {
+                  (conf_info.output_flag[i_fho] != STATOutputType_None ||
+                   conf_info.output_flag[i_ctc] != STATOutputType_None ||
+                   conf_info.output_flag[i_cts] != STATOutputType_None)) {
 
                   // Initialize
                   for(m=0; m<max_scal_t; m++) cts_info[m].clear();
@@ -939,7 +939,7 @@ void process_scores() {
                   for(m=0; m<conf_info.fcst_ta[i].n_elements(); m++) {
 
                      // Write out FHO
-                     if(conf_info.output_flag[i_fho] &&
+                     if(conf_info.output_flag[i_fho] != STATOutputType_None &&
                         cts_info[m].cts.n() > 0) {
 
                         write_fho_row(shc, cts_info[m],
@@ -949,7 +949,7 @@ void process_scores() {
                      }
 
                      // Write out CTC
-                     if(conf_info.output_flag[i_ctc] &&
+                     if(conf_info.output_flag[i_ctc] != STATOutputType_None &&
                         cts_info[m].cts.n() > 0) {
 
                         write_ctc_row(shc, cts_info[m],
@@ -959,7 +959,7 @@ void process_scores() {
                      }
 
                      // Write out CTS
-                     if(conf_info.output_flag[i_cts] &&
+                     if(conf_info.output_flag[i_cts] != STATOutputType_None &&
                         cts_info[m].cts.n() > 0) {
 
                         write_cts_row(shc, cts_info[m],
@@ -973,8 +973,8 @@ void process_scores() {
                // Compute MCTS scores
                if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
                    conf_info.fcst_ta[i].n_elements() > 1 &&
-                  (conf_info.output_flag[i_mctc] ||
-                   conf_info.output_flag[i_mcts])) {
+                  (conf_info.output_flag[i_mctc] != STATOutputType_None ||
+                   conf_info.output_flag[i_mcts] != STATOutputType_None)) {
 
                   // Initialize
                   mcts_info.clear();
@@ -983,7 +983,7 @@ void process_scores() {
                   do_mcts(mcts_info, i, pd_ptr);
 
                   // Write out MCTC
-                  if(conf_info.output_flag[i_mctc] &&
+                  if(conf_info.output_flag[i_mctc] != STATOutputType_None &&
                      mcts_info.cts.total() > 0) {
 
                      write_mctc_row(shc, mcts_info,
@@ -993,7 +993,7 @@ void process_scores() {
                   }
 
                   // Write out MCTS
-                  if(conf_info.output_flag[i_mcts] &&
+                  if(conf_info.output_flag[i_mcts] != STATOutputType_None &&
                      mcts_info.cts.total() > 0) {
 
                      write_mcts_row(shc, mcts_info,
@@ -1005,7 +1005,7 @@ void process_scores() {
 
                // Compute CNT scores
                if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
-                   conf_info.output_flag[i_cnt]) {
+                   conf_info.output_flag[i_cnt] != STATOutputType_None) {
 
                   // Initialize
                   cnt_info.clear();
@@ -1014,7 +1014,7 @@ void process_scores() {
                   do_cnt(cnt_info, i, pd_ptr);
 
                   // Write out CNT
-                  if(conf_info.output_flag[i_cnt] &&
+                  if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
                      cnt_info.n > 0) {
 
                      write_cnt_row(shc, cnt_info,
@@ -1028,8 +1028,8 @@ void process_scores() {
                // vflag is not set
                if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
                   !conf_info.vx_pd[i].fcst_info->v_flag() &&
-                  (conf_info.output_flag[i_sl1l2] ||
-                   conf_info.output_flag[i_sal1l2])) {
+                  (conf_info.output_flag[i_sl1l2]  != STATOutputType_None ||
+                   conf_info.output_flag[i_sal1l2] != STATOutputType_None)) {
 
                   // Initialize
                   sl1l2_info.zero_out();
@@ -1038,7 +1038,7 @@ void process_scores() {
                   do_sl1l2(sl1l2_info, i, pd_ptr);
 
                   // Write out SL1L2
-                  if(conf_info.output_flag[i_sl1l2] &&
+                  if(conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
                      sl1l2_info.scount > 0) {
 
                      write_sl1l2_row(shc, sl1l2_info,
@@ -1048,7 +1048,7 @@ void process_scores() {
                   }
 
                   // Write out SAL1L2
-                  if(conf_info.output_flag[i_sal1l2] &&
+                  if(conf_info.output_flag[i_sal1l2] != STATOutputType_None &&
                      sl1l2_info.sacount > 0) {
 
                      write_sal1l2_row(shc, sl1l2_info,
@@ -1061,8 +1061,8 @@ void process_scores() {
                // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
                if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
                    conf_info.vx_pd[i].fcst_info->v_flag() &&
-                  (conf_info.output_flag[i_vl1l2] ||
-                   conf_info.output_flag[i_val1l2]) &&
+                  (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
+                   conf_info.output_flag[i_val1l2] != STATOutputType_None) &&
                    i > 0 &&
                    conf_info.vx_pd[i].fcst_info->is_v_wind() &&
                    conf_info.vx_pd[i-1].fcst_info->is_u_wind()) {
@@ -1085,7 +1085,7 @@ void process_scores() {
                   for(m=0; m<conf_info.fcst_wind_ta.n_elements(); m++) {
 
                      // Write out VL1L2
-                     if(conf_info.output_flag[i_vl1l2] &&
+                     if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
                         vl1l2_info[m].vcount > 0) {
 
                         write_vl1l2_row(shc, vl1l2_info[m],
@@ -1095,7 +1095,7 @@ void process_scores() {
                      }
 
                      // Write out VAL1L2
-                     if(conf_info.output_flag[i_val1l2] &&
+                     if(conf_info.output_flag[i_val1l2] != STATOutputType_None &&
                         vl1l2_info[m].vacount > 0) {
 
                         write_val1l2_row(shc, vl1l2_info[m],
@@ -1115,10 +1115,10 @@ void process_scores() {
 
                // Compute PCT counts and scores
                if(conf_info.vx_pd[i].fcst_info->p_flag() &&
-                  (conf_info.output_flag[i_pct]  ||
-                   conf_info.output_flag[i_pstd] ||
-                   conf_info.output_flag[i_pjc]  ||
-                   conf_info.output_flag[i_prc])) {
+                  (conf_info.output_flag[i_pct]  != STATOutputType_None ||
+                   conf_info.output_flag[i_pstd] != STATOutputType_None ||
+                   conf_info.output_flag[i_pjc]  != STATOutputType_None ||
+                   conf_info.output_flag[i_prc]  != STATOutputType_None)) {
 
                   // Initialize
                   for(m=0; m<max_prob_t; m++) pct_info[m].clear();
@@ -1130,7 +1130,7 @@ void process_scores() {
                   for(m=0; m<max_prob_t; m++) {
 
                      // Write out PCT
-                     if(conf_info.output_flag[i_pct] &&
+                     if(conf_info.output_flag[i_pct] != STATOutputType_None &&
                         pct_info[m].pct.n() > 0) {
 
                         write_pct_row(shc, pct_info[m],
@@ -1140,7 +1140,7 @@ void process_scores() {
                      }
 
                      // Write out PSTD
-                     if(conf_info.output_flag[i_pstd] &&
+                     if(conf_info.output_flag[i_pstd] != STATOutputType_None &&
                         pct_info[m].pct.n() > 0) {
 
                         write_pstd_row(shc, pct_info[m],
@@ -1150,7 +1150,7 @@ void process_scores() {
                      }
 
                      // Write out PJC
-                     if(conf_info.output_flag[i_pjc] &&
+                     if(conf_info.output_flag[i_pjc] != STATOutputType_None &&
                         pct_info[m].pct.n() > 0) {
 
                         write_pjc_row(shc, pct_info[m],
@@ -1160,7 +1160,7 @@ void process_scores() {
                      }
 
                      // Write out PRC
-                     if(conf_info.output_flag[i_prc] &&
+                     if(conf_info.output_flag[i_prc] != STATOutputType_None &&
                         pct_info[m].pct.n() > 0) {
 
                         write_prc_row(shc, pct_info[m],
@@ -1632,7 +1632,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.output_flag[i] >= flag_txt_out) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {

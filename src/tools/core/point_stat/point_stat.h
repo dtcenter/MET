@@ -62,14 +62,11 @@ static const char * program_name = "point_stat";
 static const char * default_config_filename =
    "MET_BASE/data/config/PointStatConfig_default";
 
-// Text file abbreviations
-static const char *txt_file_abbr[n_txt] = {
-   "fho",    "ctc",    "cts",
-   "mctc",   "mcts",   "cnt",
-   "sl1l2",  "sal1l2", "vl1l2",
-   "val1l2", "pct",    "pstd",
-   "pjc",    "prc",    "mpr"
-};
+// Observation header length
+static const int hdr_arr_len = 3;
+
+// Observation values length
+static const int obs_arr_len = 5;
 
 // Header columns
 static const char **txt_columns[n_txt] = {
@@ -89,11 +86,14 @@ static const int n_txt_columns[n_txt] = {
    n_pjc_columns,    n_prc_columns,    n_mpr_columns
 };
 
-// Observation header length
-static const int hdr_arr_len = 3;
-
-// Observation values length
-static const int obs_arr_len = 5;
+// Text file abbreviations
+static const char *txt_file_abbr[n_txt] = {
+   "fho",    "ctc",    "cts",
+   "mctc",   "mcts",   "cnt",
+   "sl1l2",  "sal1l2", "vl1l2",
+   "val1l2", "pct",    "pstd",
+   "pjc",    "prc",    "mpr"
+};
 
 ////////////////////////////////////////////////////////////////////////
 //

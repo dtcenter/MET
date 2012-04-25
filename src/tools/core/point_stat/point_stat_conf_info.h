@@ -15,8 +15,7 @@
 
 #include <iostream>
 
-#include "config_file.h"
-
+#include "vx_config.h"
 #include "vx_data2d.h"
 #include "vx_grid.h"
 #include "vx_util.h"
@@ -24,6 +23,7 @@
 #include "vx_math.h"
 #include "vx_gsl_prob.h"
 #include "vx_statistics.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,11 +47,13 @@ static const int i_mpr       = 14;
 static const int n_txt       = 15;
 static const int n_out       = 15;
 
-// Enumeration to store possible output flag values
-enum OutputFlag {
-   flag_no_out   = 0,
-   flag_stat_out = 1,
-   flag_txt_out  = 2
+// Text file type
+static const STATLineType txt_file_type[n_txt] = {
+   stat_fho,    stat_ctc,    stat_cts,
+   stat_mctc,   stat_mcts,   stat_cnt,
+   stat_sl1l2,  stat_sal1l2, stat_vl1l2,
+   stat_val1l2, stat_pct,    stat_pstd,
+   stat_pjc,    stat_prc,    stat_mpr
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,40 +83,38 @@ class PointStatConfInfo {
       MetConfig conf;
 
       // Store data parsed from the Point-Stat configuration object
-      ConcatString     model;          // Model name
-      int              beg_ds;         // Begin observation time window offset
-      int              end_ds;         // End observation time window offset
-      StringArray      fcst_field;     // Forecast magic strings [n_vx]
-      StringArray      obs_field;      // Observation magic strings [n_vx]
-      StringArray      fcst_thresh;    // Array for fcst thresholds [n_vx]
-      StringArray      obs_thresh;     // Array for obs thresholds [n_vx]
-      ThreshArray      fcst_wind_ta;   // Wind speed fcst thresholds
-      ThreshArray      obs_wind_ta;    // Wind speed obs thresholds
-      StringArray      msg_typ;        // Array of message types
-      StringArray      mask_name;      // Masking region names [n_mask]
-      DataPlane *      mask_dp;        // Array for masking regions [n_mask]
-      StringArray      mask_sid;       // Masking station id's
-      NumArray         ci_alpha;       // Alpha value for confidence intervals
-      int              duplicate_flag; // Duplicate observation behavior
-      int              boot_interval;  // Bootstrap CI type
-      double           boot_rep_prop;  // Bootstrap replicate proportion
-      int              n_boot_rep;     // Number of bootstrap replicates
-      ConcatString     boot_rng;       // GSL random number generator
-      ConcatString     boot_seed;      // GSL RNG seed value
-      StringArray      conf_mthd;      // Array for interpolation methods
-      IntArray         conf_wdth;      // Array for interpolation widths
-      double           interp_thresh;  // Proportion of valid data values
-      IntArray         output_flag;    // Flag for each output line type
-      int              rank_corr_flag; // Flag for computing rank correlations
-      ConcatString     tmp_dir;        // Directory for temporary files
-      ConcatString     output_prefix;  // String to customize output file names      
-      ConcatString     version;        // Config file version
+      ConcatString     model;              // Model name
+      int              beg_ds;             // Begin observation time window offset
+      int              end_ds;             // End observation time window offset
+      StringArray      fcst_field;         // Forecast magic strings [n_vx]
+      StringArray      obs_field;          // Observation magic strings [n_vx]
+      StringArray      fcst_thresh;        // Array for fcst thresholds [n_vx]
+      StringArray      obs_thresh;         // Array for obs thresholds [n_vx]
+      ThreshArray      fcst_wind_ta;       // Wind speed fcst thresholds
+      ThreshArray      obs_wind_ta;        // Wind speed obs thresholds
+      StringArray *    msg_typ;            // Array of message types [n_vx]
+      StringArray      mask_name;          // Masking region names [n_mask]
+      DataPlane *      mask_dp;            // Array for masking regions [n_mask]
+      StringArray      mask_sid;           // Masking station id's
+      NumArray         ci_alpha;           // Alpha value for confidence intervals
+      DuplicateType    duplicate_flag;     // Duplicate observation behavior
+      BootIntervalType boot_interval;      // Bootstrap CI type
+      double           boot_rep_prop;      // Bootstrap replicate proportion
+      int              n_boot_rep;         // Number of bootstrap replicates
+      ConcatString     boot_rng;           // GSL random number generator
+      ConcatString     boot_seed;          // GSL RNG seed value
+      STATOutputType   output_flag[n_txt]; // Flag for each output line type
+      bool             rank_corr_flag;     // Flag for computing rank correlations
+      ConcatString     tmp_dir;            // Directory for temporary files
+      ConcatString     output_prefix;      // String to customize output file names
+      ConcatString     version;            // Config file version
 
-      ThreshArray *     fcst_ta;       // Array for fcst thresholds [n_vx]
-      ThreshArray *     obs_ta;        // Array for obs thresholds [n_vx]
-      InterpMthd *      interp_mthd;   // Array for interpolation methods [n_interp]
-      IntArray          interp_wdth;   // Array for interpolation widths [n_interp]
-      VxPairDataPoint * vx_pd;         // Array pair data [n_vx]
+      ThreshArray *     fcst_ta;           // Array for fcst thresholds [n_vx]
+      ThreshArray *     obs_ta;            // Array for obs thresholds [n_vx]
+      double            interp_thresh;     // Proportion of valid data values
+      InterpMthd *      interp_mthd;       // Array for interpolation methods [n_interp]
+      IntArray          interp_wdth;       // Array for interpolation widths [n_interp]
+      VxPairDataPoint * vx_pd;             // Array pair data [n_vx]
       
       PointStatConfInfo();
      ~PointStatConfInfo();
@@ -132,7 +132,7 @@ class PointStatConfInfo {
       int get_n_vx_scal()         const;
       int get_n_vx_vect()         const;
       int get_n_vx_prob()         const;
-      int get_n_msg_typ()         const;
+      int get_n_msg_typ(int i)    const;
       int get_n_mask()            const;
       int get_n_mask_area()       const;
       int get_n_mask_sid()        const;
@@ -158,7 +158,6 @@ inline int PointStatConfInfo::get_n_vx()          const { return(n_vx);         
 inline int PointStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);                 }
 inline int PointStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                 }
 inline int PointStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                 }
-inline int PointStatConfInfo::get_n_msg_typ()     const { return(msg_typ.n_elements());      }
 inline int PointStatConfInfo::get_n_mask()        const { return(n_mask);                    }
 inline int PointStatConfInfo::get_n_mask_area()   const { return(n_mask_area);               }
 inline int PointStatConfInfo::get_n_mask_sid()    const { return(mask_sid.n_elements());     }
