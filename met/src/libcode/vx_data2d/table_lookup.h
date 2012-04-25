@@ -18,6 +18,54 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+class Grib1TableEntry {
+
+   private:
+
+      void init_from_scratch();
+
+      void assign(const Grib1TableEntry &);
+
+   public:
+
+      Grib1TableEntry();
+     ~Grib1TableEntry();
+      Grib1TableEntry(const Grib1TableEntry &);
+      Grib1TableEntry & operator=(const Grib1TableEntry &);
+
+      void clear();
+
+      void dump(ostream &, int = 0) const;
+
+      int code;
+      int table_number;
+
+      ConcatString parm_name;
+
+      ConcatString full_name;
+
+      ConcatString units;   //  could be empty
+
+         //
+         //  set stuff
+         //
+
+         //
+         //  get stuff
+         //
+
+         //
+         //  do stuff
+         //
+
+      bool parse_line(const char *);
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class Grib2TableEntry {
 
    private:
@@ -75,19 +123,19 @@ class TableFlatFile {
 
       void assign(const TableFlatFile &); 
 
-      bool read_grib2(istream &);
+      bool read_grib1(istream &, const char * filename);
+      bool read_grib2(istream &, const char * filename);
 
-      // Grib1TableEntry * g1e;   //  elements ... allocated
+      Grib1TableEntry * g1e;   //  elements ... allocated
       Grib2TableEntry * g2e;   //  elements ... allocated
 
-      int Nelements;
-
-      ConcatString Filename;
+      int N_grib1_elements;
+      int N_grib2_elements;
 
    public:
 
       TableFlatFile();
-      TableFlatFile(int);
+      TableFlatFile(int);   //  reads defaults
      ~TableFlatFile();
       TableFlatFile(const TableFlatFile &);
       TableFlatFile & operator=(const TableFlatFile &);
@@ -104,9 +152,8 @@ class TableFlatFile {
          //  get stuff
          //
 
-      ConcatString filename() const;
-
-      int n_elements() const;
+      int n_grib1_elements() const;
+      int n_grib2_elements() const;
 
          //
          //  do stuff
@@ -123,9 +170,8 @@ class TableFlatFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TableFlatFile::n_elements() const { return ( Nelements ); }
-
-inline ConcatString TableFlatFile::filename() const { return ( Filename ); }
+inline int TableFlatFile::n_grib1_elements() const { return ( N_grib1_elements ); }
+inline int TableFlatFile::n_grib2_elements() const { return ( N_grib2_elements ); }
 
 
 ////////////////////////////////////////////////////////////////////////
