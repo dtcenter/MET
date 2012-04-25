@@ -1481,8 +1481,10 @@ ConfigObjectType Type = no_config_object_type;
 bool is_correct_type = false;
 NumArray array;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
-
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType   ||
+                                 Entry->type() == IntegerType ||
+                                 Entry->type() == FloatType);
+                                 
 LastLookupStatus = is_correct_type;
 
 if ( !Entry || !is_correct_type )  {
@@ -1499,6 +1501,30 @@ if ( !Entry || !is_correct_type )  {
 
    return ( array );
 
+}
+
+   //
+   //  Store a single integer and return
+   //
+
+if ( Entry->type() == IntegerType )  {
+  
+   array.add( Entry->i_value() );
+
+   return ( array );
+   
+}
+
+   //
+   //  Store a single double and return
+   //
+
+if ( Entry->type() == FloatType )  {
+
+   array.add( Entry->d_value() );
+
+   return ( array );
+   
 }
 
    //
@@ -1593,7 +1619,8 @@ const Dictionary * Dict = (const Dictionary *) 0;
 bool is_correct_type = false;
 StringArray array;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType ||
+                                 Entry->type() == StringType);
 
 LastLookupStatus = is_correct_type;
 
@@ -1608,6 +1635,18 @@ if ( !Entry || !is_correct_type )  {
       exit ( 1 );
 
    }
+
+   return ( array );
+
+}
+
+   //
+   //  Store a single string and return
+   //
+   
+if ( Entry->type() == StringType )  {
+
+   array.add( *(Entry->string_value()) );
 
    return ( array );
 
@@ -1702,7 +1741,8 @@ const Dictionary * Dict = (const Dictionary *) 0;
 bool is_correct_type = false;
 ThreshArray array;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType || 
+                                 Entry->type() == ThresholdType);
 
 LastLookupStatus = is_correct_type;
 
@@ -1717,6 +1757,18 @@ if ( !Entry || !is_correct_type )  {
       exit ( 1 );
 
    }
+
+   return ( array );
+
+}
+
+   //
+   //  Store a single threshold and return
+   //
+
+if ( Entry->type() == ThresholdType )  {
+
+   array.add( *(Entry->thresh_value()) );
 
    return ( array );
 
@@ -1793,6 +1845,41 @@ if ( !Entry || !is_correct_type )  {
 }
 
 return ( Entry->dict_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Dictionary *Dictionary::lookup_array(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_array() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( (Dictionary *) 0 );
+
+}
+
+return ( Entry->array_value() );
 
 }
 
