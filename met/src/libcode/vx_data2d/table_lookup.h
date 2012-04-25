@@ -87,6 +87,7 @@ class TableFlatFile {
    public:
 
       TableFlatFile();
+      TableFlatFile(int);
      ~TableFlatFile();
       TableFlatFile(const TableFlatFile &);
       TableFlatFile & operator=(const TableFlatFile &);
@@ -125,6 +126,12 @@ class TableFlatFile {
 inline int TableFlatFile::n_elements() const { return ( Nelements ); }
 
 inline ConcatString TableFlatFile::filename() const { return ( Filename ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern TableFlatFile GribTable;
 
 
 ////////////////////////////////////////////////////////////////////////
