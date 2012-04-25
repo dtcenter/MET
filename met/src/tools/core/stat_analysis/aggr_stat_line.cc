@@ -585,10 +585,12 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
 void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
                             STATAnalysisJob &j, SL1L2Info &sl1l2_info,
                             VL1L2Info &vl1l2_info, CNTInfo &cnt_info,
-                            STATLineType lt, int &n_in, int &n_out) {
+                            NBRCNTInfo &nbrcnt_info, STATLineType lt,
+                            int &n_in, int &n_out) {
    STATLine line;
    SL1L2Info s;
    VL1L2Info v;
+   NBRCNTInfo c;
    int n, n_ties;
 
    // Keep track of scores for each time for computing VIF
@@ -601,6 +603,7 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
    //
    sl1l2_info.clear();
    vl1l2_info.clear();
+   nbrcnt_info.clear();
 
    //
    // Process the STAT lines
@@ -647,6 +650,12 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
                vl1l2_info += v;
                break;
 
+            case(stat_nbrcnt):
+               c.clear();
+               parse_nbrcnt_line(line, c);
+               nbrcnt_info += c;
+               break;
+
             default:
                mlog << Error << "\naggr_partial_sum_lines() -> "
                     << "should only encounter partial sum line types!\n"
@@ -691,6 +700,10 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
          n_out++;
       }
    } // end while
+
+
+   //  initialize the aggregated nbrcnt CIs
+   nbrcnt_info.allocate_n_alpha(1);
 
    //
    // Compute the auto-correlations for VIF

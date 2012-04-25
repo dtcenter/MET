@@ -83,6 +83,7 @@ extern void parse_val1l2_line  (STATLine &, VL1L2Info &);
 
 extern void parse_mpr_line     (STATLine &, MPRData &);
 extern void parse_isc_line     (STATLine &, ISCInfo &, int &);
+extern void parse_nbrcnt_line  (STATLine &, NBRCNTInfo &);
 extern void parse_rhist_line   (STATLine &, RHISTData &);
 extern void parse_orank_line   (STATLine &, ORANKData &);
 

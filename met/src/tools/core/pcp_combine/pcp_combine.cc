@@ -376,8 +376,6 @@ void process_add_sub_args(const CommandLine & cline)
    //
    for(i=0, n_files=0; i<(cline.n() - 1); i+=2) { // Only check accumulation interval for enough args
 
-      //PGO if ( ! is_timestring(cline[i + 1]) )  break;
-
       n_files++; // Increment file count
 
    } // end for i

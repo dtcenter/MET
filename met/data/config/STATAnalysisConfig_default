@@ -210,7 +210,7 @@ weight[] = [];
 //          types may be aggregated:
 //          -line_type FHO, CTC, MCTC,
 //                     SL1L2, SAL1L2, VL1L2, VAL1L2,
-//                     PCT, NBRCTC, ISC, RHIST
+//                     PCT, NBRCTC, NBRCNT, ISC, RHIST
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
