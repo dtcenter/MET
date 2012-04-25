@@ -180,7 +180,7 @@ test_lookup2: test_lookup2.cc $(OBJECTS) $(LIBRARIES)
 
 
 test_lookup3: test_lookup3.cc $(OBJECTS) $(LIBRARIES)
-	$(CXX) test_lookup3.cc -o test_lookup3 $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	$(CXX) test_lookup3.cc -g -o test_lookup3 $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_config \
 	-lvx_util \
 	-lvx_math \
