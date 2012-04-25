@@ -233,6 +233,7 @@ class Dictionary {
       SingleThresh lookup_thresh       (const char * name, bool error_out = default_dictionary_error_out);
       ThreshArray  lookup_thresh_array (const char * name, bool error_out = default_dictionary_error_out);
       Dictionary * lookup_dictionary   (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary * lookup_array        (const char * name, bool error_out = default_dictionary_error_out);
 
 };
 
