@@ -123,14 +123,20 @@ class TableFlatFile {
 
       void assign(const TableFlatFile &); 
 
-      bool read_grib1(istream &, const char * filename);
-      bool read_grib2(istream &, const char * filename);
+      bool read_grib1(istream &, const char * filename, const int n);
+      bool read_grib2(istream &, const char * filename, const int n);
 
-      Grib1TableEntry * g1e;   //  elements ... allocated
-      Grib2TableEntry * g2e;   //  elements ... allocated
+      void extend_grib1(int);
+      void extend_grib2(int);
+
+      Grib1TableEntry ** g1e;   //  elements ... allocated
+      Grib2TableEntry ** g2e;   //  elements ... allocated
 
       int N_grib1_elements;
       int N_grib2_elements;
+
+      int N_grib1_alloc;
+      int N_grib2_alloc;
 
    public:
 
@@ -161,6 +167,7 @@ class TableFlatFile {
 
       bool read(const char * filename);
 
+
       bool lookup_grib1(int code, int table_number, Grib1TableEntry &);
 
       bool lookup_grib1(int code,               Grib1TableEntry &);   //  assumes table_number is 2
@@ -183,6 +190,9 @@ inline int TableFlatFile::n_grib2_elements() const { return ( N_grib2_elements )
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  Global instance of TableFlatFile
+   //
 
 extern TableFlatFile GribTable;
 
