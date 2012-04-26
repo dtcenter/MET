@@ -77,7 +77,7 @@ extern void aggr_vl1l2_wdir(
 extern void read_mpr_lines(
                const char *, LineDataFile &,
                STATAnalysisJob &,
-               int &, int &,
+               ConcatString &, ConcatString &,
                NumArray &, NumArray &, NumArray &,
                int &, int &);
 
@@ -103,7 +103,7 @@ extern void aggr_mpr_lines_mcts(
 
 extern void aggr_mpr_lines_cnt(
                STATAnalysisJob &,
-               int, int,
+               const ConcatString, const ConcatString,
                const NumArray &, const NumArray &,
                CNTInfo &, const char *);
 

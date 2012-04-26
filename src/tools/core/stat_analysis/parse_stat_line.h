@@ -45,9 +45,10 @@ using namespace std;
 
 // Matched Pair (MPR) data structure
 struct MPRData {
-   int fcst_gc, obs_gc;
+   ConcatString fcst_var;
+   ConcatString obs_var;
    int total, index;
-   char obs_sid[max_str_len];
+   ConcatString obs_sid;
    double obs_lat, obs_lon, obs_lvl, obs_elv;
    double fcst, obs, climo;
 };
@@ -62,7 +63,7 @@ struct RHISTData {
 // Observation Rank (ORANK) data structure
 struct ORANKData {
    int total, index;
-   char obs_sid[max_str_len];
+   ConcatString obs_sid;
    double obs_lat, obs_lon, obs_lvl, obs_elv, obs, pit;
    int rank, n_ens_vld, n_ens;
    NumArray ens_na;
