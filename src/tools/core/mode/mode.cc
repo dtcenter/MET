@@ -462,6 +462,11 @@ void process_fcst_obs_files()
    if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = fcst_wd.data.lead();
 
    //
+   // For probability fields, rescale from [0, 100] to [0, 1]
+   //
+   if(fcst_info->p_flag()) rescale_probability(fcst_wd.data);
+   
+   //
    // Read the gridded data from the input observation file
    //
 
@@ -491,6 +496,11 @@ void process_fcst_obs_files()
    if(obs_valid_ut == (unixtime) 0) obs_valid_ut = obs_wd.data.valid();
    if(is_bad_data(obs_lead_sec))    obs_lead_sec = obs_wd.data.lead();
 
+   //
+   // For probability fields, rescale from [0, 100] to [0, 1]
+   //
+   if(obs_info->p_flag()) rescale_probability(obs_wd.data);
+   
    //
    // Check that the grids match
    //
