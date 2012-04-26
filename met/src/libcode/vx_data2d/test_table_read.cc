@@ -29,28 +29,34 @@ int main(int argc, char * argv [])
 
 program_name = get_short_name(argv[0]);
 
-if ( argc != 2 )  {
+if ( argc == 1 )  {
 
-   cerr << "\n\n  usage:  " << program_name << " flat_file\n\n";
+   cerr << "\n\n  usage:  " << program_name << " flat_file_list\n\n";
 
    exit ( 1 );
 
 }
 
-ConcatString input_filename = argv[1];
-
+int j;
 TableFlatFile f;
 bool status = false;
+const char * input_filename = (const char *) 0;
 
-status = f.read(input_filename);
+for (j=1; j<argc; ++j)  {   //  j starts at one, here
 
-if ( !status )  {
+   input_filename = argv[j];
 
-   cerr << "\n\n  " << program_name << ":  trouble reading flat file \"" << input_filename << "\"\n\n";
+   status = f.read(input_filename);
 
-   exit ( 1 );
+   if ( !status )  {
 
-}
+      cerr << "\n\n  " << program_name << ":  trouble reading flat file \"" << input_filename << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+}   //  for j
 
 f.dump(cout);
 

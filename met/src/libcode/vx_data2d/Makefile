@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = test_table_lookup   \
+EXECUTABLES = test_table_read     \
               dump_default_table  \
 
 
@@ -134,9 +134,9 @@ libvx_data2d.a: $(OBJECTS)
    ##
 
 
-test_table_lookup: test_table_lookup.cc libvx_data2d.a
+test_table_read: test_table_read.cc libvx_data2d.a
 	@ echo
-	$(CXX) -o test_table_lookup test_table_lookup.cc $(OBJECTS) \
+	$(CXX) -o test_table_read test_table_read.cc $(OBJECTS) \
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) \
 	-L$(MET_LIB_DIR) \
@@ -147,7 +147,7 @@ test_table_lookup: test_table_lookup.cc libvx_data2d.a
 	-lvx_util \
 	-lvx_math \
 	$(CXX_LIBS)
-	cp test_table_lookup $(MET_BIN_DIR)
+	cp test_table_read $(MET_BIN_DIR)
 
 
 dump_default_table: dump_default_table.cc libvx_data2d.a

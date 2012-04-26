@@ -40,13 +40,23 @@ using namespace std;
 
 ConcatString program_name;
 
+CommandLine cline;
+
+static bool table_number_set = false;
+
+static int table_number = 0;
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
+static void usage();
+
+static void set_table_number(const StringArray &);
+
 static void process(const char * filename);
 
-static bool parse_line(const char * line, int table_number);
+static bool parse_line(const char * line);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -58,21 +68,23 @@ int main(int argc, char * argv [])
 
 program_name = get_short_name(argv[0]);
 
-if ( argc == 1 )  {
+cline.set(argc, argv);
 
-   cerr << "\n\n   usage: " << program_name << " path_to_nceptab_xxx.c [ others ...]\n\n";
+cline.set_usage(usage);
 
-   exit ( 1 );
+cline.add(set_table_number, "-table_number", 1);
 
-}
+cline.parse();
+
+if ( cline.n() == 0 )  usage();
 
 int j;
 
 cout << "GRIB1\n";
 
-for (j=1; j<argc; ++j)  {   //  j starts at one, here
+for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here
 
-   process(argv[j]);
+   process(cline[j]);
 
 }
 
@@ -88,11 +100,42 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
+void usage()
+
+{
+
+cerr << "\n\n   usage: " << program_name << " nceptab_source_file.c [ more such files ...]\n\n";
+
+exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_table_number(const StringArray & a)
+
+{
+
+table_number = atoi(a[0]);
+
+table_number_set = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void process(const char * input_filename)
 
 {
 
-int table_number;
 ConcatString line;
 ifstream in;
 bool found = false;
@@ -102,12 +145,16 @@ const char * short_name = get_short_name(input_filename);
    //  grab the table number from the filename
    //
 
-if ( sscanf(short_name, "nceptab_%d.c", &table_number) != 1 )  {
+if ( ! table_number_set )  {
 
-   mlog << Error
-        << "\n\n  " << program_name << ": can't get table number from filename \"" << short_name << "\"\n\n";
+   if ( sscanf(short_name, "nceptab_%d.c", &table_number) != 1 )  {
 
-   exit ( 1 );
+      mlog << Error
+           << "\n\n  " << program_name << ": can't get table number from filename \"" << short_name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
 
 }
 
@@ -158,7 +205,7 @@ while ( 1 )  {
 
    line.read_line(in);
 
-   if ( ! parse_line(line, table_number) )  break;
+   if ( ! parse_line(line) )  break;
 
 }
 
@@ -176,7 +223,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_line(const char * line, int table_number)
+bool parse_line(const char * line)
 
 {
 

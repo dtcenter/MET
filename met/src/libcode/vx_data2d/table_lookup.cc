@@ -592,8 +592,8 @@ void TableFlatFile::init_from_scratch()
 
 {
 
-g1e = (Grib1TableEntry *) 0;
-g2e = (Grib2TableEntry *) 0;
+g1e = (Grib1TableEntry **) 0;
+g2e = (Grib2TableEntry **) 0;
 
 clear();
 
@@ -607,11 +607,38 @@ void TableFlatFile::clear()
 
 {
 
-if ( g1e )  { delete [] g1e; g1e = (Grib1TableEntry *) 0; }
-if ( g2e )  { delete [] g2e; g2e = (Grib2TableEntry *) 0; }
+int j;
+
+if ( g1e )  { 
+
+   for (j=0; j<N_grib1_elements; ++j)  {
+
+      if ( g1e[j] )  { delete g1e[j];  g1e[j] = (Grib1TableEntry *) 0; }
+
+   }
+
+   delete [] g1e; g1e = (Grib1TableEntry **) 0;
+
+}
+
+
+if ( g2e )  { 
+
+   for (j=0; j<N_grib2_elements; ++j)  {
+
+      if ( g2e[j] )  { delete g2e[j];  g2e[j] = (Grib2TableEntry *) 0; }
+
+   }
+
+   delete [] g2e; g2e = (Grib2TableEntry* *) 0;
+
+}
 
 N_grib1_elements = 0;
 N_grib2_elements = 0;
+
+N_grib1_alloc = 0;
+N_grib2_alloc = 0;
 
 return;
 
@@ -634,7 +661,7 @@ for (j=0; j<N_grib1_elements; ++j)  {
 
    out << prefix << "Grib1 Element # " << j << " ...\n";
 
-   g1e[j].dump(out, depth + 1);
+   g1e[j]->dump(out, depth + 1);
 
 }
 
@@ -644,7 +671,7 @@ for (j=0; j<N_grib2_elements; ++j)  {
 
    out << prefix << "Grib2 Element # " << j << " ...\n";
 
-   g2e[j].dump(out, depth + 1);
+   g2e[j]->dump(out, depth + 1);
 
 }
 
@@ -663,18 +690,20 @@ void TableFlatFile::assign(const TableFlatFile & f)
 
 clear();
 
+int j;
+
 
 if ( f.N_grib1_elements != 0 )  {
 
-   N_grib1_elements = f.N_grib1_elements;
+   N_grib1_elements = N_grib1_alloc = f.N_grib1_elements;
 
-   g1e = new Grib1TableEntry [N_grib1_elements];
-
-   int j;
+   g1e = new Grib1TableEntry * [N_grib1_elements];
 
    for (j=0; j<N_grib1_elements; ++j)  {
 
-      g1e[j] = f.g1e[j];
+      g1e[j] = new Grib1TableEntry;
+
+      *(g1e[j]) = *(f.g1e[j]);
 
    }
 
@@ -682,19 +711,97 @@ if ( f.N_grib1_elements != 0 )  {
 
 if ( f.N_grib2_elements != 0 )  {
 
-   N_grib2_elements = f.N_grib2_elements;
+   N_grib2_elements = N_grib2_alloc = f.N_grib2_elements;
 
-   g2e = new Grib2TableEntry [N_grib2_elements];
-
-   int j;
+   g2e = new Grib2TableEntry * [N_grib2_elements];
 
    for (j=0; j<N_grib2_elements; ++j)  {
 
-      g2e[j] = f.g2e[j];
+      g2e[j] = new Grib2TableEntry;
+
+      *(g2e[j]) = *(f.g2e[j]);
 
    }
 
 }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void TableFlatFile::extend_grib1(int n)
+
+{
+
+if ( n <= N_grib1_alloc )  return;
+
+int j;
+Grib1TableEntry ** u = (Grib1TableEntry **) 0;
+
+u = new Grib1TableEntry * [n];
+
+for (j=0; j<n; ++j)  u[j] = (Grib1TableEntry *) 0;
+
+if ( N_grib1_elements > 0 )  {
+
+   for (j=0; j<N_grib1_elements; ++j)  u[j] = g1e[j];
+
+   delete [] g1e;  g1e = (Grib1TableEntry **) 0;
+
+}
+
+g1e = u;
+
+u = (Grib1TableEntry **) 0;
+
+   //
+   //  done
+   //
+
+N_grib1_alloc = n;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void TableFlatFile::extend_grib2(int n)
+
+{
+
+if ( n <= N_grib2_alloc )  return;
+
+int j;
+Grib2TableEntry ** u = (Grib2TableEntry **) 0;
+
+u = new Grib2TableEntry * [n];
+
+for (j=0; j<n; ++j)  u[j] = (Grib2TableEntry *) 0;
+
+if ( N_grib2_elements > 0 )  {
+
+   for (j=0; j<N_grib2_elements; ++j)  u[j] = g2e[j];
+
+   delete [] g2e;  g2e = (Grib2TableEntry **) 0;
+
+}
+
+g2e = u;
+
+u = (Grib2TableEntry **) 0;
+
+   //
+   //  done
+   //
+
+N_grib2_alloc = n;
 
 return;
 
@@ -744,8 +851,8 @@ line.read_line(in);
 
 line.chomp('\n');
 
-     if ( line == "GRIB1" )  { N_grib1_elements = n_lines - 1;  return ( read_grib1(in, filename) ); }
-else if ( line == "GRIB2" )  { N_grib2_elements = n_lines - 1;  return ( read_grib2(in, filename) ); }
+     if ( line == "GRIB1" )  { return ( read_grib1(in, filename, n_lines - 1) ); }
+else if ( line == "GRIB2" )  { return ( read_grib2(in, filename, n_lines - 1) ); }
 else {
 
    mlog << Error 
@@ -770,7 +877,7 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool TableFlatFile::read_grib1(istream & in, const char * filename)
+bool TableFlatFile::read_grib1(istream & in, const char * filename, const int n)
 
 {
 
@@ -778,9 +885,31 @@ int j;
 ConcatString line;
 bool status = false;
 
-g1e = new Grib1TableEntry [N_grib1_elements];
+   //
+   //  make room for the new elements
+   //
 
-for (j=0; j<N_grib1_elements; ++j)  {
+extend_grib1(N_grib1_elements + n);
+
+   //
+   //  shuffle all the old elements to the end of the array, 
+   //
+   //   so that the new stuff gets prepended 
+   //
+
+for (j=(N_grib1_elements - 1); j>=0; --j)  {
+
+   g1e[j + n] = g1e[j];
+
+}
+
+for (j=0; j<n; ++j)  g1e[j] = (Grib1TableEntry *) 0;
+
+   //
+   //  read the new elements
+   //
+
+for (j=0; j<n; ++j)  {
 
    status = line.read_line(in);
 
@@ -793,7 +922,9 @@ for (j=0; j<N_grib1_elements; ++j)  {
 
    }
 
-   status = g1e[j].parse_line(line);
+   g1e[j] = new Grib1TableEntry;
+
+   status = g1e[j]->parse_line(line);
 
    if ( ! status )  {
 
@@ -812,6 +943,8 @@ for (j=0; j<N_grib1_elements; ++j)  {
    //  done
    //
 
+N_grib1_elements += n;
+
 return ( true );
 
 }
@@ -820,7 +953,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool TableFlatFile::read_grib2(istream & in, const char * filename)
+bool TableFlatFile::read_grib2(istream & in, const char * filename, const int n)
 
 {
 
@@ -828,9 +961,31 @@ int j;
 ConcatString line;
 bool status = false;
 
-g2e = new Grib2TableEntry [N_grib2_elements];
+   //
+   //  make room for the new elements
+   //
 
-for (j=0; j<N_grib2_elements; ++j)  {
+extend_grib2(N_grib2_elements + n);
+
+   //
+   //  shuffle all the old elements to the end of the array, 
+   //
+   //   so that the new stuff gets prepended 
+   //
+
+for (j=(N_grib2_elements - 1); j>=0; --j)  {
+
+   g2e[j + n] = g2e[j];
+
+}
+
+for (j=0; j<n; ++j)  g2e[j] = (Grib2TableEntry *) 0;
+
+   //
+   //  read the new elements
+   //
+
+for (j=0; j<n; ++j)  {
 
    status = line.read_line(in);
 
@@ -843,7 +998,9 @@ for (j=0; j<N_grib2_elements; ++j)  {
 
    }
 
-   status = g2e[j].parse_line(line);
+   g2e[j] = new Grib2TableEntry;
+
+   status = g2e[j]->parse_line(line);
 
    if ( ! status )  {
 
@@ -861,6 +1018,8 @@ for (j=0; j<N_grib2_elements; ++j)  {
    //
    //  done
    //
+
+N_grib2_elements += n;
 
 return ( true );
 
@@ -880,9 +1039,9 @@ e.clear();
 
 for (j=0; j<N_grib1_elements; ++j)  {
 
-   if ( (g1e[j].code == code) && (g1e[j].table_number == table_number) )  {
+   if ( (g1e[j]->code == code) && (g1e[j]->table_number == table_number) )  {
 
-      e = g1e[j];
+      e = *(g1e[j]);
 
       return ( true );
 
@@ -927,11 +1086,11 @@ int j;
 
 for (j=0; j<N_grib1_elements; ++j)  {
 
-   if ( g1e[j].table_number != table_number )  continue;
+   if ( g1e[j]->table_number != table_number )  continue;
 
-   if ( g1e[j].parm_name != parm_name )  continue;
+   if ( g1e[j]->parm_name != parm_name )  continue;
 
-   if ( n_matches == 0 )  e = g1e[j];
+   if ( n_matches == 0 )  e = *(g1e[j]);
 
    ++n_matches;
 
@@ -975,9 +1134,9 @@ e.clear();
 
 for (j=0; j<N_grib2_elements; ++j)  {
 
-   if ( (g2e[j].index_a == a) && (g2e[j].index_b == b) && (g2e[j].index_c == c) )  {
+   if ( (g2e[j]->index_a == a) && (g2e[j]->index_b == b) && (g2e[j]->index_c == c) )  {
 
-      e = g2e[j];
+      e = *(g2e[j]);
 
       return ( true );
 
@@ -1005,9 +1164,9 @@ int j;
 
 for (j=0; j<N_grib2_elements; ++j)  {
 
-   if ( g2e[j].parm_name != parm_name )  continue;
+   if ( g2e[j]->parm_name != parm_name )  continue;
 
-   if ( n_matches == 0 )  e = g2e[j];
+   if ( n_matches == 0 )  e = *(g2e[j]);
 
    ++n_matches;
 
