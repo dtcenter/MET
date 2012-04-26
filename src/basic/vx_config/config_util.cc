@@ -286,8 +286,9 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    Dictionary *type_dict = (Dictionary *) 0;
    MetConfig conf;
    InterpInfo info;
+   NumArray mthd_na, wdth_na;
    ConcatString method;
-   int i, v, width;
+   int i, j, k, width;
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename));
@@ -306,61 +307,70 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    // Conf: interp.type
    type_dict = dict->lookup_array(conf_interp_type);
 
-   // Store the number of interpolation types
-   info.n_interp = type_dict->n_entries();
-
-   // Check that at least one interpolation type is provided
-   if(info.n_interp == 0) {
+   // Check for at least one interpolation type
+   if(type_dict->n_entries() == 0) {
       mlog << Error << "\nparse_conf_interp() -> "
            << "At least one interpolation type must be provided.\n\n";
       exit(1);
    }
    
    // Loop over the interpolation type dictionary entries
-   for(i=0; i<type_dict->n_entries(); i++) {
+   for(i=0, info.n_interp=0; i<type_dict->n_entries(); i++) {
 
-      // Get the method for the current entry
-      v = (*type_dict)[i]->dict_value()->lookup_int(conf_method);
+      // Get the methods and widths for the current entry
+      mthd_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_method);
+      wdth_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_width);
 
-      // Convert integer to enumerated InterpMthd
-           if(v == conf.lookup_int(interpmthd_min_str))     method = interpmthd_min_str;
-      else if(v == conf.lookup_int(interpmthd_max_str))     method = interpmthd_max_str;
-      else if(v == conf.lookup_int(interpmthd_median_str))  method = interpmthd_median_str;
-      else if(v == conf.lookup_int(interpmthd_uw_mean_str)) method = interpmthd_uw_mean_str;
-      else if(v == conf.lookup_int(interpmthd_dw_mean_str)) method = interpmthd_dw_mean_str;
-      else if(v == conf.lookup_int(interpmthd_ls_fit_str))  method = interpmthd_ls_fit_str;
-      else if(v == conf.lookup_int(interpmthd_nbrhd_str))   method = interpmthd_nbrhd_str;
-      else if(v == conf.lookup_int(interpmthd_bilin_str))   method = interpmthd_bilin_str;
-      else {
-         mlog << Error << "\nparse_conf_interval() -> "
-              << "Unexpected config file value of " << v << " for \""
-              << conf_method << "\".\n\n";
-         exit(1);
-      }
+      // Loop over the methods
+      for(j=0; j<mthd_na.n_elements(); j++) {
+      
+         // Convert integer to enumerated InterpMthd
+              if(mthd_na[j] == conf.lookup_int(interpmthd_min_str))     method = interpmthd_min_str;
+         else if(mthd_na[j] == conf.lookup_int(interpmthd_max_str))     method = interpmthd_max_str;
+         else if(mthd_na[j] == conf.lookup_int(interpmthd_median_str))  method = interpmthd_median_str;
+         else if(mthd_na[j] == conf.lookup_int(interpmthd_uw_mean_str)) method = interpmthd_uw_mean_str;
+         else if(mthd_na[j] == conf.lookup_int(interpmthd_dw_mean_str)) method = interpmthd_dw_mean_str;
+         else if(mthd_na[j] == conf.lookup_int(interpmthd_ls_fit_str))  method = interpmthd_ls_fit_str;
+         else if(mthd_na[j] == conf.lookup_int(interpmthd_nbrhd_str))   method = interpmthd_nbrhd_str;
+         else if(mthd_na[j] == conf.lookup_int(interpmthd_bilin_str))   method = interpmthd_bilin_str;
+         else {
+            mlog << Error << "\nparse_conf_interval() -> "
+                 << "Unexpected config file value of " << mthd_na[j]
+                 << " for \"" << conf_method << "\".\n\n";
+            exit(1);
+         }
 
-      // Get the width for the current entry
-      width = (*type_dict)[i]->dict_value()->lookup_int(conf_width);
+         // Loop over the widths
+         for(k=0; k<wdth_na.n_elements(); k++) {
 
-      // Check for the nearest neighbor special case
-      if(width == 1 && strcmp(method, interpmthd_uw_mean_str) != 0) {
-         mlog << Warning << "\nparse_conf_interp() -> "
-              << "For neareast neighbor interpolation method, resetting "
-              << "method from \"" << method << "\" to \""
-              << interpmthd_uw_mean_str << "\" since width = 1.\n\n";
-         method = interpmthd_uw_mean_str;
-      }
+            // Store the current width
+            width = wdth_na[k];
+           
+            // Check for the nearest neighbor special case
+            if(width == 1 && strcmp(method, interpmthd_uw_mean_str) != 0) {
+               mlog << Warning << "\nparse_conf_interp() -> "
+                    << "For neareast neighbor interpolation method, "
+                    << "resetting method from \"" << method << "\" to \""
+                    << interpmthd_uw_mean_str
+                    << "\" since the interpolation width is 1.\n\n";
+               method = interpmthd_uw_mean_str;
+            }
 
-      // Check for the bilinear interpolation special case
-      if(strcmp(method, interpmthd_bilin_str) == 0 && width != 2) {
-         mlog << Warning << "\nparse_conf_interp() -> "
-              << "For bilinear interpolation method, resetting "
-              << "width from \"" << width << "\" to \"2\".\n\n";
-         width = 2;
-      }
+            // Check for the bilinear interpolation special case
+            if(width != 2 && strcmp(method, interpmthd_bilin_str) == 0) {
+               mlog << Warning << "\nparse_conf_interp() -> "
+                    << "For bilinear interpolation method, resetting "
+                    << "width from \"" << width << "\" to \"2\".\n\n";
+               width = 2;
+            }
 
-      // Add the current entries
-      info.method.add(method);
-      info.width.add(width);
+            // Add the current entries
+            info.n_interp += 1;
+            info.method.add(method);
+            info.width.add(width);
+
+         } // end for k
+      } // end for j
    } // end for i
 
    return(info);
