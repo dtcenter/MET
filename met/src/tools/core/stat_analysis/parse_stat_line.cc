@@ -246,23 +246,19 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &v_info) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_mpr_line(STATLine &l, MPRData &m_data) {
-   int prob_gc;
-   double prob_lo, prob_hi;
 
-   m_data.fcst_gc = str_to_grib_code(l.get_item(fcst_var_offset),
-                                     prob_gc, prob_lo, prob_hi);
-   m_data.obs_gc  = str_to_grib_code(l.get_item(obs_var_offset),
-                                     prob_gc, prob_lo, prob_hi);
-   m_data.total   = atoi(l.get_item(mpr_total_offset));
-   m_data.index   = atoi(l.get_item(mpr_index_offset));
-   strcpy(m_data.obs_sid, l.get_item(mpr_obs_sid_offset));
-   m_data.obs_lat = atof(l.get_item(mpr_obs_lat_offset));
-   m_data.obs_lon = atof(l.get_item(mpr_obs_lon_offset));
-   m_data.obs_lvl = atof(l.get_item(mpr_obs_lvl_offset));
-   m_data.obs_elv = atof(l.get_item(mpr_obs_elv_offset));
-   m_data.fcst    = atof(l.get_item(mpr_fcst_offset));
-   m_data.obs     = atof(l.get_item(mpr_obs_offset));
-   m_data.climo   = atof(l.get_item(mpr_climo_offset));
+   m_data.fcst_var = l.get_item(fcst_var_offset);
+   m_data.obs_var  = l.get_item(obs_var_offset);
+   m_data.total    = atoi(l.get_item(mpr_total_offset));
+   m_data.index    = atoi(l.get_item(mpr_index_offset));
+   m_data.obs_sid  = l.get_item(mpr_obs_sid_offset);
+   m_data.obs_lat  = atof(l.get_item(mpr_obs_lat_offset));
+   m_data.obs_lon  = atof(l.get_item(mpr_obs_lon_offset));
+   m_data.obs_lvl  = atof(l.get_item(mpr_obs_lvl_offset));
+   m_data.obs_elv  = atof(l.get_item(mpr_obs_elv_offset));
+   m_data.fcst     = atof(l.get_item(mpr_fcst_offset));
+   m_data.obs      = atof(l.get_item(mpr_obs_offset));
+   m_data.climo    = atof(l.get_item(mpr_climo_offset));
 
    return;
 }
@@ -314,7 +310,7 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
 
    o_data.total     = atoi(l.get_item(orank_total_offset));
    o_data.index     = atoi(l.get_item(orank_index_offset));
-   strcpy(o_data.obs_sid, l.get_item(orank_obs_sid_offset));
+   o_data.obs_sid   = l.get_item(orank_obs_sid_offset);
    o_data.obs_lat   = atof(l.get_item(orank_obs_lat_offset));
    o_data.obs_lon   = atof(l.get_item(orank_obs_lon_offset));
    o_data.obs_lvl   = atof(l.get_item(orank_obs_lvl_offset));

@@ -1123,7 +1123,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    NumArray         uf_na, vf_na, uo_na, vo_na;
    PairDataEnsemble ens_pd;
 
-   int fcst_gc, obs_gc;
+   ConcatString fcst_var, obs_var;
    AsciiTable out_at;
    int i, n;
 
@@ -1379,7 +1379,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       //
       // Parse the input MPR lines
       //
-      read_mpr_lines(jobstring, f, j, fcst_gc, obs_gc,
+      read_mpr_lines(jobstring, f, j, fcst_var, obs_var,
                      f_na, o_na, c_na,
                      n_in, n_out);
 
@@ -1412,7 +1412,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       // When -out_line_type CNT
       //
       else if(out_lt == stat_cnt) {
-         aggr_mpr_lines_cnt(j, fcst_gc, obs_gc, f_na, o_na, cnt_info, tmp_dir);
+         aggr_mpr_lines_cnt(j, fcst_var, obs_var, f_na, o_na, cnt_info, tmp_dir);
       }
       //
       // When -out_line_type SL1L2, SAL1L2

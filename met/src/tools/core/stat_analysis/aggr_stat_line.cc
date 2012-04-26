@@ -35,9 +35,15 @@ using namespace std;
 #include <unistd.h>
 
 #include "vx_log.h"
+#include "vx_data2d_grib.h"
+#include "vx_data2d_nc_pinterp.h"
 
 #include "aggr_stat_line.h"
 #include "parse_stat_line.h"
+
+////////////////////////////////////////////////////////////////////////
+
+extern bool is_precip_var_name(const ConcatString &s);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -53,7 +59,6 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
    TTContingencyTable ct;
    CTSInfo cts_tmp;
    int fy_oy, fy_on, fn_oy, fn_on, n, n_ties;
-   char line_type[max_str_len];
 
    // Keep track of scores for each time for computing VIF
    unixtime ut;
@@ -104,9 +109,8 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
                break;
 
             default:
-               statlinetype_to_string(line.type(), line_type);
                mlog << Error << "\naggr_contable_lines() -> "
-                    << "line type value of " << line_type
+                    << "line type value of " << statlinetype_to_string(line.type())
                     << " not currently supported for the aggregation job!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -239,7 +243,6 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
    STATLine line;
    ContingencyTable mct;
    MCTSInfo mcts_tmp;
-   char line_type[max_str_len];
    int i, k, cur, n, n_ties;
 
    // Keep track of scores for each time for computing VIF
@@ -281,9 +284,8 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
                break;
 
             default:
-               statlinetype_to_string(line.type(), line_type);
                mlog << Error << "\naggr_mctc_lines() -> "
-                    << "line type value of " << line_type
+                    << "line type value of " << statlinetype_to_string(line.type())
                     << " not currently supported for the aggregation job!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -410,7 +412,6 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
    STATLine line;
    Nx2ContingencyTable pct;
    PCTInfo pct_tmp;
-   char line_type[max_str_len];
    int i, oy, on, n, n_ties;
 
    // Keep track of scores for each time for computing VIF
@@ -452,9 +453,8 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
                break;
 
             default:
-               statlinetype_to_string(line.type(), line_type);
                mlog << Error << "\naggr_nx2_contable_lines() -> "
-                    << "line type value of " << line_type
+                    << "line type value of " << statlinetype_to_string(line.type())
                     << " not currently supported for the aggregation job!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -831,7 +831,7 @@ void aggr_vl1l2_wdir(const char *jobstring, LineDataFile &f,
 
 void read_mpr_lines(const char *jobstring, LineDataFile &f,
                     STATAnalysisJob &j,
-                    int &fcst_gc, int &obs_gc,
+                    ConcatString &fcst_var, ConcatString &obs_var,
                     NumArray &f_na, NumArray &o_na, NumArray &c_na,
                     int &n_in, int &n_out) {
    STATLine line;
@@ -843,7 +843,8 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
    f_na.clear();
    o_na.clear();
    c_na.clear();
-   fcst_gc = obs_gc = 0;
+   fcst_var.clear();
+   obs_var.clear();
 
    //
    // Process the STAT lines
@@ -882,14 +883,13 @@ void read_mpr_lines(const char *jobstring, LineDataFile &f,
                if(is_bad_data(m.fcst) || is_bad_data(m.obs)) continue;
 
                //
-               // Store or check the GRIB codes
+               // Store or check the variable names
                //
-               if(fcst_gc == 0 || obs_gc == 0) {
-                  fcst_gc = m.fcst_gc;
-                  obs_gc  = m.obs_gc;
+               if(fcst_var.empty() || obs_var.empty()) {
+                  fcst_var = m.fcst_var;
+                  obs_var  = m.obs_var;
                }
-               else if(fcst_gc != m.fcst_gc ||
-                       obs_gc  != m.obs_gc) {
+               else if(fcst_var != m.fcst_var || obs_var  != m.obs_var) {
                   mlog << Error << "\nread_mpr_lines() -> "
                        << "both the forecast variable type and observation "
                        << "variable type must remain constant!  Try setting "
@@ -1105,7 +1105,7 @@ void aggr_mpr_lines_mcts(STATAnalysisJob &j,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_mpr_lines_cnt(STATAnalysisJob &j,
-                        int fcst_gc, int obs_gc,
+                        const ConcatString fcst_var, const ConcatString obs_var,
                         const NumArray &f_na, const NumArray &o_na,
                         CNTInfo &cnt_info, const char *tmp_dir) {
    gsl_rng *rng_ptr = (gsl_rng *) 0;
@@ -1117,11 +1117,10 @@ void aggr_mpr_lines_cnt(STATAnalysisJob &j,
    if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
 
    //
-   // Set the precip flag based on the forecast and observation
-   // GRIB codes.
+   // Set the precip flag based on fcst_var and obs_var
    //
-   if(is_precip_grib_code(fcst_gc) &&
-      is_precip_grib_code(obs_gc)) precip_flag = true;
+   if(is_precip_var_name(fcst_var) && is_precip_var_name(obs_var))
+      precip_flag = true;
 
    //
    // Store the out_alpha value
@@ -1703,6 +1702,18 @@ double compute_vif(NumArray &na) {
    vif = 1 + 2.0*abs(corr) - 2.0*abs(corr)/na.n_elements();
 
    return(vif);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_precip_var_name(const ConcatString &s) {
+  
+   bool match = has_prefix(pinterp_precipitation_names,
+                           n_pinterp_precipitation_names, s) ||
+                has_prefix(grib_precipitation_abbr,
+                           n_grib_precipitation_abbr, s);
+
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////
