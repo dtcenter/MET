@@ -61,7 +61,7 @@ if ( make_lowercase )  {
    while ( *s )  {
   
       t = (char) tolower(*s++);
-      suffix.add( &t );
+      suffix.add( t );
 
    }
 
