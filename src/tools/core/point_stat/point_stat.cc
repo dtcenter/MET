@@ -69,6 +69,8 @@
 //   023    03/05/12  Halley Gotway  Fix bug in processing command line
 //                    for setting valid end times.
 //   024    04/16/12  Halley Gotway  Switch to using vx_config library.
+//   025    04/27/12  Halley Gotway  Move -fcst_lead and -fcst_valid
+//                                   command line options to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -124,8 +126,6 @@ static void usage();
 static void set_climo_file(const StringArray &);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
-static void set_fcst_valid_time(const StringArray &);
-static void set_fcst_lead_time(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
 static void set_obs_valid_end_time(const StringArray &);
 static void set_valid_beg_time(const StringArray &);
@@ -196,8 +196,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_climo_file, "-climo", 1);
    cline.add(set_point_obs, "-point_obs", 1);
    cline.add(set_ncfile, "-ncfile", 1);
-   cline.add(set_fcst_valid_time, "-fcst_valid", 1);
-   cline.add(set_fcst_lead_time, "-fcst_lead", 1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
    cline.add(set_valid_beg_time, "-valid_beg", 1);
@@ -268,8 +266,7 @@ void process_command_line(int argc, char **argv) {
         << "User Config File: " << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file,
-                         ftype, fcst_valid_ut, fcst_lead_sec);
+   conf_info.read_config(default_config_file, config_file, ftype);
 
    // Set the model name
    shc.set_model(conf_info.model);
@@ -1675,8 +1672,6 @@ void usage() {
         << "\tconfig_file\n"
         << "\t[-climo climo_file]\n"
         << "\t[-point_obs file]\n"
-        << "\t[-fcst_valid time]\n"
-        << "\t[-fcst_lead time]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
         << "\t[-outdir path]\n"
@@ -1703,12 +1698,6 @@ void usage() {
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
-
-        << "\t\t\"-fcst_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the forecast valid time to be verified (optional).\n"
-
-        << "\t\t\"-fcst_lead time\" in HH[MMSS] format sets "
-        << "the forecast lead time to be verified (optional).\n"
 
         << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "beginning of the matching time window (optional).\n"
@@ -1748,20 +1737,6 @@ void set_point_obs(const StringArray & a)
 void set_ncfile(const StringArray & a)
 {
    obs_file.add(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_fcst_valid_time(const StringArray & a)
-{
-   fcst_valid_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_fcst_lead_time(const StringArray & a)
-{
-   fcst_lead_sec = timestring_to_sec(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
