@@ -121,9 +121,8 @@ class PointStatConfInfo {
 
       void clear();
 
-      void read_config   (const char *, const char *,
-                          GrdFileType, unixtime, int);
-      void process_config(GrdFileType, unixtime, int);
+      void read_config   (const char *, const char *, GrdFileType);
+      void process_config(GrdFileType);
       void process_masks (const Grid &);
       void set_vx_pd     ();
 

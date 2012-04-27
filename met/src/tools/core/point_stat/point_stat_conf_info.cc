@@ -117,7 +117,7 @@ void PointStatConfInfo::clear() {
 
 void PointStatConfInfo::read_config(const char *default_file_name,
                                     const char *user_file_name,
-                                    GrdFileType ftype, unixtime fcst_valid_ut, int fcst_lead_sec) {
+                                    GrdFileType ftype) {
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename));
@@ -129,16 +129,14 @@ void PointStatConfInfo::read_config(const char *default_file_name,
    conf.read(user_file_name);
 
    // Process the configuration file
-   process_config(ftype, fcst_valid_ut, fcst_lead_sec);
+   process_config(ftype);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::process_config(GrdFileType ftype,
-                                       unixtime fcst_valid_ut,
-                                       int fcst_lead_sec) {
+void PointStatConfInfo::process_config(GrdFileType ftype) {
    int i, j, n;
    ConcatString s;
    StringArray sa;
@@ -247,12 +245,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
               << "Parsed observation field number " << i+1 << ":\n";
          vx_pd[i].obs_info->dump(cout);
       }
-
-      // JHG, remove these command line options in lieu of the config file parameters
-
-      // Set the requested timing information      
-      if(fcst_valid_ut > 0)           vx_pd[i].fcst_info->set_valid(fcst_valid_ut);
-      if(!is_bad_data(fcst_lead_sec)) vx_pd[i].fcst_info->set_lead(fcst_lead_sec);
       
       // No support for wind direction
       if(vx_pd[i].fcst_info->is_wind_direction() ||
