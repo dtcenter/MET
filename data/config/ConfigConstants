@@ -12,9 +12,9 @@ FALSE        = false;
 
 // File types
 GRIB1        = 1;
-NETCDF_MET   = 2;
-NETCDF_PINT  = 3;
-GRIB2        = 4;
+GRIB2        = 2;
+NETCDF_MET   = 3;
+NETCDF_PINT  = 4;
 
 // Interpolation method
 MIN          = 1;
