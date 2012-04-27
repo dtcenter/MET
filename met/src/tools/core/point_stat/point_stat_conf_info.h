@@ -121,7 +121,7 @@ class PointStatConfInfo {
 
       void clear();
 
-      void read_config   (const char *, const char *, GrdFileType);
+      void read_config   (const char *, const char *);
       void process_config(GrdFileType);
       void process_masks (const Grid &);
       void set_vx_pd     ();

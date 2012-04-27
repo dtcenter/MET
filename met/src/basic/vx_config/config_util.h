@@ -19,11 +19,18 @@
 
 #include "config_constants.h"
 #include "config_file.h"
+#include "data_file_type.h"
+
+////////////////////////////////////////////////////////////////////////
+
+// Global MetConfig object containing config value constants
+static MetConfig conf_const(replace_path(config_const_filename));
 
 ////////////////////////////////////////////////////////////////////////
 
 extern ConcatString  parse_conf_version    (Dictionary *dict);
 extern ConcatString  parse_conf_model      (Dictionary *dict);
+extern GrdFileType   parse_conf_file_type  (Dictionary *dict);
 extern map<STATLineType,STATOutputType>
                      parse_conf_output_flag(Dictionary *dict);
 extern int           parse_conf_n_vx(Dictionary *dict);

@@ -39,13 +39,16 @@ using namespace std;
 //
 // List of file name extensions corresponding to these file types
 //
-static const char *gb_file_ext [] = { "grib", "grb", "gb" };
+static const char *gb_file_ext [] = { ".grib", ".grb", ".gb" };
 static const int   n_gb_file_ext  = sizeof(gb_file_ext)/sizeof(*gb_file_ext);
 
-// static const char *nc_file_ext [] = { "netcdf", "ncf", "nc" };
+static const char *gb2_file_ext [] = { ".grib2", ".grb2", ".gb2" };
+static const int   n_gb2_file_ext  = sizeof(gb2_file_ext)/sizeof(*gb2_file_ext);
+
+// static const char *nc_file_ext [] = { ".netcdf", ".ncf", ".nc" };
 // static const int   n_nc_file_ext  = sizeof(nc_file_ext)/sizeof(*nc_file_ext);
 
-static const char *bf_file_ext [] = { "bufr", "bfr", "prepbufr", "pb" };
+static const char *bf_file_ext [] = { ".bufr", ".bfr", ".prepbufr", ".pb" };
 static const int   n_bf_file_ext  = sizeof(bf_file_ext)/sizeof(*bf_file_ext);
 
 
@@ -122,6 +125,16 @@ if ( suffix.empty() ) return ( FileType_None );
 for (j=0; j<n_gb_file_ext; ++j)  {
 
    if ( suffix == gb_file_ext[j] )  return ( FileType_Gb1 );
+
+}
+
+   //
+   //  grib2 ?
+   //
+
+for (j=0; j<n_gb2_file_ext; ++j)  {
+
+   if ( suffix == gb2_file_ext[j] )  return ( FileType_Gb2 );
 
 }
 

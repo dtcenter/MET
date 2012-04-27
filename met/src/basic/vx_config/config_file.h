@@ -36,6 +36,7 @@ class MetConfig : public Dictionary {
      ~MetConfig();
       MetConfig(const MetConfig &);
       MetConfig & operator=(const MetConfig &);
+      MetConfig(const char *filename);
 
       void clear();
 

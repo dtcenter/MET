@@ -138,67 +138,73 @@ enum DuplicateType {
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char config_const_filename[] =
-   "MET_BASE/data/config/ConfigConstants";
+static const char config_const_filename[] = "MET_BASE/data/config/ConfigConstants";
 
 //
 // Constants for parameter names used in configuartion files
 //
 
-static const char conf_version[]          = "version";
-static const char conf_model[]            = "model";
-static const char conf_output_flag[]      = "output_flag";
-static const char conf_fcst_field[]       = "fcst.field";
-static const char conf_obs_field[]        = "obs.field";
-static const char conf_level[]            = "level";
-static const char conf_message_type[]     = "message_type";
-static const char conf_thresh[]           = "thresh";
-static const char conf_fcst_wind_thresh[] = "fcst.wind_thresh";
-static const char conf_obs_wind_thresh[]  = "obs.wind_thresh";
-static const char conf_mask_grid[]        = "mask.grid";
-static const char conf_mask_poly[]        = "mask.poly";
-static const char conf_mask_sid[]         = "mask.sid";
-static const char conf_ci_alpha[]         = "ci_alpha";
-static const char conf_boot_interval[]    = "boot.interval";
-static const char conf_boot_rep_prop[]    = "boot.rep_prop";
-static const char conf_boot_n_rep[]       = "boot.n_rep";
-static const char conf_boot_rng[]         = "boot.rng";
-static const char conf_boot_seed[]        = "boot.seed";
-static const char conf_interp_thresh[]    = "interp.thresh";
-static const char conf_interp_type[]      = "interp.type";
-static const char conf_method[]           = "method";
-static const char conf_width[]            = "width";
-static const char conf_duplicate_flag[]   = "duplicate_flag";
-static const char conf_rank_corr_flag[]   = "rank_corr_flag";
-static const char conf_tmp_dir[]          = "tmp_dir";
-static const char conf_output_prefix[]    = "output_prefix";
+static const char conf_key_version[]          = "version";
+static const char conf_key_model[]            = "model";
+static const char conf_key_output_flag[]      = "output_flag";
+static const char conf_key_fcst[]             = "fcst";
+static const char conf_key_obs[]              = "obs";
+static const char conf_key_fcst_field[]       = "fcst.field";
+static const char conf_key_obs_field[]        = "obs.field";
+static const char conf_key_file_type[]        = "file_type";
+static const char conf_key_init_time[]        = "init_time";  // YYYYMMDD[_HH[MMSS]]
+static const char conf_key_valid_time[]       = "valid_time"; // YYYYMMDD[_HH[MMSS]]
+static const char conf_key_lead_time[]        = "lead_time";  // HH[MMSS]
+static const char conf_key_name[]             = "name";
+static const char conf_key_level[]            = "level";
+static const char conf_key_message_type[]     = "message_type";
+static const char conf_key_thresh[]           = "thresh";
+static const char conf_key_fcst_wind_thresh[] = "fcst.wind_thresh";
+static const char conf_key_obs_wind_thresh[]  = "obs.wind_thresh";
+static const char conf_key_mask_grid[]        = "mask.grid";
+static const char conf_key_mask_poly[]        = "mask.poly";
+static const char conf_key_mask_sid[]         = "mask.sid";
+static const char conf_key_ci_alpha[]         = "ci_alpha";
+static const char conf_key_boot_interval[]    = "boot.interval";
+static const char conf_key_boot_rep_prop[]    = "boot.rep_prop";
+static const char conf_key_boot_n_rep[]       = "boot.n_rep";
+static const char conf_key_boot_rng[]         = "boot.rng";
+static const char conf_key_boot_seed[]        = "boot.seed";
+static const char conf_key_interp_thresh[]    = "interp.thresh";
+static const char conf_key_interp_type[]      = "interp.type";
+static const char conf_key_method[]           = "method";
+static const char conf_key_width[]            = "width";
+static const char conf_key_duplicate_flag[]   = "duplicate_flag";
+static const char conf_key_rank_corr_flag[]   = "rank_corr_flag";
+static const char conf_key_tmp_dir[]          = "tmp_dir";
+static const char conf_key_output_prefix[]    = "output_prefix";
 
 //
 // Constants for parameter values used in configuartion files
 //
 
 // File types
-static const char conf_grib1[]       = "GRIB1";
-static const char conf_grib2[]       = "GRIB2";
-static const char conf_netcdf_met[]  = "NETCDF_MET";
-static const char conf_netcdf_pint[] = "NETCDF_PINT";
+static const char conf_val_grib1[]       = "GRIB1";
+static const char conf_val_grib2[]       = "GRIB2";
+static const char conf_val_netcdf_met[]  = "NETCDF_MET";
+static const char conf_val_netcdf_pint[] = "NETCDF_PINT";
 
 // Output flag values
-static const char conf_none[] = "NONE";
-static const char conf_stat[] = "STAT";
+static const char conf_val_none[] = "NONE";
+static const char conf_val_stat[] = "STAT";
 
 // Bootstrapping interval type
-static const char conf_pctile[] = "PCTILE";
-static const char conf_bca[]    = "BCA";
+static const char conf_val_pctile[] = "PCTILE";
+static const char conf_val_bca[]    = "BCA";
 
 // Interpolation types
-static const char conf_fcst[] = "FCST";
-static const char conf_obs[]  = "OBS";
-static const char conf_both[] = "BOTH";
+static const char conf_val_fcst[] = "FCST";
+static const char conf_val_obs[]  = "OBS";
+static const char conf_val_both[] = "BOTH";
 
 // Duplicate flag values
-static const char conf_unique[] = "UNIQUE";
-static const char conf_single[] = "SINGLE";
+static const char conf_val_unique[] = "UNIQUE";
+static const char conf_val_single[] = "SINGLE";
 
 ////////////////////////////////////////////////////////////////////////
 

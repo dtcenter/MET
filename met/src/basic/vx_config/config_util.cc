@@ -23,7 +23,7 @@ using namespace std;
 ConcatString parse_conf_version(Dictionary *dict) {
    ConcatString s;
 
-   s = dict->lookup_string(conf_version);
+   s = dict->lookup_string(conf_key_version);
 
    check_met_version(s);
 
@@ -35,7 +35,7 @@ ConcatString parse_conf_version(Dictionary *dict) {
 ConcatString parse_conf_model(Dictionary *dict) {
    ConcatString s;
 
-   s = dict->lookup_string(conf_model);
+   s = dict->lookup_string(conf_key_model);
 
    // Check that it's non-empty and contains no whitespace
    if(s.empty() || check_reg_exp(ws_reg_exp, s) == true) {
@@ -50,19 +50,41 @@ ConcatString parse_conf_model(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+GrdFileType parse_conf_file_type(Dictionary *dict) {
+   GrdFileType t = FileType_None;
+   int v;
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_file_type, false);
+
+   if(dict->last_lookup_status()) {
+      // Convert integer to enumerated GrdFileType
+           if(v == conf_const.lookup_int(conf_val_grib1))       t = FileType_Gb1;
+      else if(v == conf_const.lookup_int(conf_val_grib2))       t = FileType_Gb2;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_met))  t = FileType_NcMet;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_pint)) t = FileType_NcPinterp;
+      else {
+         mlog << Error << "\nparse_conf_file_type() -> "
+              << "Unexpected config file value of " << v << " for \""
+              << conf_key_file_type << "\".\n\n";
+         exit(1);
+      }
+   } 
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
    Dictionary *out_dict = (Dictionary *) 0;
    map<STATLineType,STATOutputType> output_map;
-   MetConfig conf;
    STATLineType line_type;
    STATOutputType output_type;
    int i, v;
 
    // Get the output flag dictionary
-   out_dict = dict->lookup_dictionary(conf_output_flag);
-
-   // Read the config file constants
-   conf.read(replace_path(config_const_filename));
+   out_dict = dict->lookup_dictionary(conf_key_output_flag);
    
    // Loop over the output flag dictionary entries
    for(i=0; i<out_dict->n_entries(); i++) {
@@ -74,13 +96,13 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
       v = out_dict->lookup_int((*out_dict)[i]->name());
 
       // Convert integer to enumerated STATOutputType
-           if(v == conf.lookup_int(conf_none)) output_type = STATOutputType_None;
-      else if(v == conf.lookup_int(conf_stat)) output_type = STATOutputType_Stat;
-      else if(v == conf.lookup_int(conf_both)) output_type = STATOutputType_Both;
+           if(v == conf_const.lookup_int(conf_val_none)) output_type = STATOutputType_None;
+      else if(v == conf_const.lookup_int(conf_val_stat)) output_type = STATOutputType_Stat;
+      else if(v == conf_const.lookup_int(conf_val_both)) output_type = STATOutputType_Both;
       else {
          mlog << Error << "\nparse_conf_output_flag() -> "
               << "Unexpected config file value of " << v << " for \""
-              << conf_output_flag << "." << (*out_dict)[i]->name()
+              << conf_key_output_flag << "." << (*out_dict)[i]->name()
               << "\".\n\n";
          exit(1);
       }
@@ -113,7 +135,7 @@ int parse_conf_n_vx(Dictionary *dict) {
    for(i=0,total=0; i<dict->n_entries(); i++) {
 
       // Increment count by the length of the level array
-      total += (*dict)[i]->dict_value()->lookup_string_array(conf_level).n_elements();
+      total += (*dict)[i]->dict_value()->lookup_string_array(conf_key_level).n_elements();
    }
 
    return(total);
@@ -142,7 +164,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    for(i=0,total=0; i<dict->n_entries(); i++) {
 
       // Increment count by the length of the level array
-      lvl     = (*dict)[i]->dict_value()->lookup_string_array(conf_level);
+      lvl     = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level);
       total  += lvl.n_elements();
 
       // Check if we're in the correct entry
@@ -152,7 +174,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
          i_dict = (*(*dict)[i]->dict_value());
 
          // Set up the new entry, taking only a single level value
-         entry.set_string(conf_level, lvl[index-(total-lvl.n_elements())]);
+         entry.set_string(conf_key_level, lvl[index-(total-lvl.n_elements())]);
 
          // Store the new entry
          i_dict.store(entry);
@@ -170,7 +192,7 @@ StringArray parse_conf_message_type(Dictionary *dict) {
    StringArray sa;
    int i;
 
-   sa = dict->lookup_string_array(conf_message_type);
+   sa = dict->lookup_string_array(conf_key_message_type);
 
    // Check that at least one PrepBufr message type is provided
    if(sa.n_elements() == 0) {
@@ -199,7 +221,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
    NumArray na;
    int i;
 
-   na = dict->lookup_num_array(conf_ci_alpha);
+   na = dict->lookup_num_array(conf_key_ci_alpha);
 
    // Check that at least one alpha value is provided
    if(na.n_elements() == 0) {
@@ -226,55 +248,51 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
 ////////////////////////////////////////////////////////////////////////
 
 BootInfo parse_conf_boot(Dictionary *dict) {
-   MetConfig conf;
    BootInfo info;
    int v;
 
-   // Read the config file constants
-   conf.read(replace_path(config_const_filename));
-
    // Conf: boot.interval
-   v = dict->lookup_int(conf_boot_interval);
+   v = dict->lookup_int(conf_key_boot_interval);
 
    // Convert integer to enumerated BootIntervalType
-        if(v == conf.lookup_int(conf_bca))    info.interval = BootIntervalType_BCA;
-   else if(v == conf.lookup_int(conf_pctile)) info.interval = BootIntervalType_Percentile;
+        if(v == conf_const.lookup_int(conf_val_bca))    info.interval = BootIntervalType_BCA;
+   else if(v == conf_const.lookup_int(conf_val_pctile)) info.interval = BootIntervalType_Percentile;
    else {
       mlog << Error << "\nparse_conf_boot() -> "
            << "Unexpected config file value of " << v << " for \""
-           << conf_boot_interval << "\".\n\n";
+           << conf_key_boot_interval << "\".\n\n";
       exit(1);
    }
 
    // Conf: boot.rep_prop
-   info.rep_prop = dict->lookup_double(conf_boot_rep_prop);
+   info.rep_prop = dict->lookup_double(conf_key_boot_rep_prop);
 
    // Check that it is between 0 and 1
    if(info.rep_prop <= 0.0 || info.rep_prop > 1.0) {
       mlog << Error << "\nparse_conf_boot() -> "
-           << "The \"" << conf_boot_rep_prop
+           << "The \"" << conf_key_boot_rep_prop
            << "\" parameter (" << info.rep_prop
            << ")must be between 0 and 1!\n\n";
       exit(1);
    }
 
    // Conf: boot.n_rep
-   info.n_rep = dict->lookup_int(conf_boot_n_rep);
+   info.n_rep = dict->lookup_int(conf_key_boot_n_rep);
 
    // Check n_rep >= 0
    if(info.n_rep < 0) {
       mlog << Error << "\nparse_conf_boot() -> "
            << "The number of bootstrap resamples in the \""
-           << conf_boot_n_rep << "\" parameter (" << info.n_rep
+           << conf_key_boot_n_rep << "\" parameter (" << info.n_rep
            << ") must be >= 0.\n\n";
       exit(1);
    }
 
    // Conf: boot_rng
-   info.rng = dict->lookup_string(conf_boot_rng);
+   info.rng = dict->lookup_string(conf_key_boot_rng);
 
    // Conf: boot_seed
-   info.seed = dict->lookup_string(conf_boot_seed);
+   info.seed = dict->lookup_string(conf_key_boot_seed);
 
    return(info);
 }
@@ -284,28 +302,24 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 
 InterpInfo parse_conf_interp(Dictionary *dict) {
    Dictionary *type_dict = (Dictionary *) 0;
-   MetConfig conf;
    InterpInfo info;
    NumArray mthd_na, wdth_na;
    ConcatString method;
    int i, j, k, width;
 
-   // Read the config file constants
-   conf.read(replace_path(config_const_filename));
-
    // Conf: interp.thresh
-   info.thresh = dict->lookup_double(conf_interp_thresh);
+   info.thresh = dict->lookup_double(conf_key_interp_thresh);
 
    // Check that the interpolation threshold is between 0 and 1.
    if(info.thresh < 0.0 || info.thresh > 1.0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "The \"" << conf_interp_thresh << "\" parameter ("
+           << "The \"" << conf_key_interp_thresh << "\" parameter ("
            << info.thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
    }   
 
    // Conf: interp.type
-   type_dict = dict->lookup_array(conf_interp_type);
+   type_dict = dict->lookup_array(conf_key_interp_type);
 
    // Check for at least one interpolation type
    if(type_dict->n_entries() == 0) {
@@ -318,25 +332,25 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    for(i=0, info.n_interp=0; i<type_dict->n_entries(); i++) {
 
       // Get the methods and widths for the current entry
-      mthd_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_method);
-      wdth_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_width);
+      mthd_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_key_method);
+      wdth_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_key_width);
 
       // Loop over the methods
       for(j=0; j<mthd_na.n_elements(); j++) {
       
          // Convert integer to enumerated InterpMthd
-              if(mthd_na[j] == conf.lookup_int(interpmthd_min_str))     method = interpmthd_min_str;
-         else if(mthd_na[j] == conf.lookup_int(interpmthd_max_str))     method = interpmthd_max_str;
-         else if(mthd_na[j] == conf.lookup_int(interpmthd_median_str))  method = interpmthd_median_str;
-         else if(mthd_na[j] == conf.lookup_int(interpmthd_uw_mean_str)) method = interpmthd_uw_mean_str;
-         else if(mthd_na[j] == conf.lookup_int(interpmthd_dw_mean_str)) method = interpmthd_dw_mean_str;
-         else if(mthd_na[j] == conf.lookup_int(interpmthd_ls_fit_str))  method = interpmthd_ls_fit_str;
-         else if(mthd_na[j] == conf.lookup_int(interpmthd_nbrhd_str))   method = interpmthd_nbrhd_str;
-         else if(mthd_na[j] == conf.lookup_int(interpmthd_bilin_str))   method = interpmthd_bilin_str;
+              if(mthd_na[j] == conf_const.lookup_int(interpmthd_min_str))     method = interpmthd_min_str;
+         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_max_str))     method = interpmthd_max_str;
+         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_median_str))  method = interpmthd_median_str;
+         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_uw_mean_str)) method = interpmthd_uw_mean_str;
+         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_dw_mean_str)) method = interpmthd_dw_mean_str;
+         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_ls_fit_str))  method = interpmthd_ls_fit_str;
+         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_nbrhd_str))   method = interpmthd_nbrhd_str;
+         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_bilin_str))   method = interpmthd_bilin_str;
          else {
             mlog << Error << "\nparse_conf_interval() -> "
                  << "Unexpected config file value of " << mthd_na[j]
-                 << " for \"" << conf_method << "\".\n\n";
+                 << " for \"" << conf_key_method << "\".\n\n";
             exit(1);
          }
 
@@ -379,24 +393,20 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 ////////////////////////////////////////////////////////////////////////
 
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
-   MetConfig conf;
    DuplicateType t;
    int v;
-
-   // Read the config file constants
-   conf.read(replace_path(config_const_filename));
    
    // Get the integer flag value for the current entry
-   v = dict->lookup_int(conf_duplicate_flag);
+   v = dict->lookup_int(conf_key_duplicate_flag);
       
    // Convert integer to enumerated DuplicateType
-        if(v == conf.lookup_int(conf_none))   t = DuplicateType_None;
-   else if(v == conf.lookup_int(conf_unique)) t = DuplicateType_Unique;
-   else if(v == conf.lookup_int(conf_single)) t = DuplicateType_Single;
+        if(v == conf_const.lookup_int(conf_val_none))   t = DuplicateType_None;
+   else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType_Unique;
+   else if(v == conf_const.lookup_int(conf_val_single)) t = DuplicateType_Single;
    else {
       mlog << Error << "\nparse_conf_duplicate_flag() -> "
            << "Unexpected config file value of " << v << " for \""
-           << conf_duplicate_flag << "\".\n\n";
+           << conf_key_duplicate_flag << "\".\n\n";
       exit(1);
    }
 
@@ -409,12 +419,12 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    ConcatString s;
 
    // Read the temporary directory
-   s = dict->lookup_string(conf_tmp_dir);
+   s = dict->lookup_string(conf_key_tmp_dir);
 
    // Make sure that it exists
    if(opendir(s) == NULL ) {
       mlog << Error << "\nparse_conf_tmp_dir() -> "
-           << "Cannot access the \"" << conf_tmp_dir << "\" directory: "
+           << "Cannot access the \"" << conf_key_tmp_dir << "\" directory: "
            << s << "\n\n";
       exit(1);
    }

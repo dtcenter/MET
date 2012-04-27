@@ -230,32 +230,11 @@ void process_command_line(int argc, char **argv) {
            << ").\n\n";
       exit(1);
    }
-   
-   //
+
    // Store the input forecast and observation file names
-   //
    fcst_file = cline[0];
    obs_file.insert(0, cline[1]);
    config_file = cline[2];
-
-   // Read the input forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file))) {
-      mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Store the input forecast data file type
-   ftype = fcst_mtddf->file_type();
-
-   // Read the input climo file
-   if(climo_flag) {
-      if(!(climo_mtddf = mtddf_factory.new_met_2d_data_file(climo_file))) {
-         mlog << Error << "\nTrouble reading climatology file \""
-              << climo_file << "\"\n\n";
-         exit(1);
-      }
-   }
 
    // Create the default config file names
    default_config_file = replace_path(default_config_filename);
@@ -266,7 +245,34 @@ void process_command_line(int argc, char **argv) {
         << "User Config File: " << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file, ftype);
+   conf_info.read_config(default_config_file, config_file);
+
+   // Get the forecast file type from config, if present
+   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst, false));
+
+   // Read forecast file
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+      mlog << Error << "\nTrouble reading forecast file \""
+           << fcst_file << "\"\n\n";
+      exit(1);
+   }
+
+   // Store the forecast file type
+   ftype = fcst_mtddf->file_type();
+
+   // Read the climo file
+   if(climo_flag) {
+     
+      // Read climatology file
+      if(!(climo_mtddf = mtddf_factory.new_met_2d_data_file(climo_file, ftype))) {
+         mlog << Error << "\nTrouble reading climatology file \""
+              << climo_file << "\"\n\n";
+         exit(1);
+      }
+   }
+
+   // Process the configuration
+   conf_info.process_config(ftype);   
 
    // Set the model name
    shc.set_model(conf_info.model);
