@@ -21,6 +21,7 @@ EXECUTABLES = test_config   \
 
 
 OBJECTS     = configobjecttype_to_string.o \
+              grdfiletype_to_string.o \
               dictionary.o \
               config.tab.o \
               lex.config.o \
@@ -31,7 +32,9 @@ OBJECTS     = configobjecttype_to_string.o \
 LIBRARIES   = libvx_config.a
 
 
-GEN_SOURCES = configobjecttype_to_string.h \
+GEN_SOURCES = grdfiletype_to_string.cc \
+              grdfiletype_to_string.h \
+              configobjecttype_to_string.h \
               configobjecttype_to_string.cc
 
 
@@ -40,6 +43,8 @@ GEN_SOURCES = configobjecttype_to_string.h \
 
 HEADERS     = config_file.h \
               configobjecttype_to_string.h \
+              grdfiletype_to_string.h \
+              data_file_type.h \
               config.tab.h \
               dictionary.h \
               object_types.h \
@@ -84,6 +89,11 @@ configobjecttype_to_string.h configobjecttype_to_string.cc: object_types.h
 	@ rm -f configobjecttype_to_string.h configobjecttype_to_string.cc
 	@ $(ENUM_TO_STRING) -concat_string object_types.h
 
+grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
+	@ echo
+	@ rm -f grdfiletype_to_string.cc grdfiletype_to_string.h
+	$(ENUM_TO_STRING) -concat_string -reverse data_file_type.h
+
 
 ########################################################################
 
@@ -95,6 +105,10 @@ configobjecttype_to_string.h configobjecttype_to_string.cc: object_types.h
 
 configobjecttype_to_string.o: configobjecttype_to_string.h configobjecttype_to_string.cc
 	$(CXX) configobjecttype_to_string.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+
+
+grdfiletype_to_string.o: grdfiletype_to_string.h grdfiletype_to_string.cc
+	$(CXX) grdfiletype_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 dictionary.o: dictionary.h dictionary.cc configobjecttype_to_string.o

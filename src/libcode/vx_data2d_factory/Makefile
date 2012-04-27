@@ -14,7 +14,6 @@
 
 
 EXECUTABLES = test_is_grib \
-              test_var_info \
               test_factory
 
 
@@ -138,25 +137,6 @@ test_is_grib: $(LIBRARIES) test_is_grib.cc
 	-lvx_cal \
 	-lvx_config \
 	-lvx_util \
-	-lvx_log
-
-test_var_info: $(LIBRARIES) test_var_info.cc
-	$(CXX) -o test_var_info test_var_info.cc \
-	$(CXX_FLAGS) $(ARCH_FLAGS) \
-	-I$(MET_INC_DIR) $(GRIB2C_INCS) \
-	-L$(MET_LIB_DIR) $(GRIB2C_LIBS) \
-	-lvx_data2d_factory \
-	-lvx_data2d \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_met \
-	-lvx_data2d_nc_pinterp \
-	-lvx_data2d \
-	-lvx_nc_util \
-	-lvx_grid \
-	-lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
 	-lvx_log
 
 test_factory: $(LIBRARIES) test_factory.cc

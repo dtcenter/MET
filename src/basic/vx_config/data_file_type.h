@@ -8,26 +8,34 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MET_2D_DATA_FILE_FACTORY_H__
-#define __MET_2D_DATA_FILE_FACTORY_H__
+
+#ifndef  __DATA_FILE_TYPE_H__
+#define  __DATA_FILE_TYPE_H__
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "data_class.h"
-#include "concat_string.h"
 
-///////////////////////////////////////////////////////////////////////////////
+   //
+   // Enumeration of supported gridded file types
+   //
 
-class Met2dDataFileFactory
+enum GrdFileType
 {
-   public:
-      static Met2dDataFile *new_met_2d_data_file(GrdFileType type);
-      static Met2dDataFile *new_met_2d_data_file(const char *filename);
-      static Met2dDataFile *new_met_2d_data_file(const char *filename, GrdFileType type);
+   FileType_None,           // Default
+   FileType_Gb1,            // GRIB version 1
+   FileType_Gb2,            // GRIB version 2
+   FileType_NcMet,          // NetCDF MET format
+   FileType_General_Netcdf, // NetCDF
+   FileType_NcPinterp,      // NetCDF output of WRF-ARW pinterp tool
+   FileType_NcCF,           // NetCDF Climate-Forecast Convention
+   FileType_HdfEos,         // Hierarchical Data Format - Earth Observing System
+   FileType_Bufr            // Bufr or PrepBufr format
 };
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif  // __MET_2D_DATA_FILE_FACTORY_H__
+#endif   /*  __DATA_FILE_TYPE_H__  */
 
 ///////////////////////////////////////////////////////////////////////////////

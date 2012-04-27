@@ -1,13 +1,10 @@
-
-
-   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-   // ** Copyright UCAR (c) 1992 - 2012
-   // ** University Corporation for Atmospheric Research (UCAR)
-   // ** National Center for Atmospheric Research (NCAR)
-   // ** Research Applications Lab (RAL)
-   // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-   // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2012
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -23,17 +20,6 @@
 #include "vx_config.h"
 
 #include "data_file_type.h"
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//  Keywords expected to be used in the configuration file.
-//
-///////////////////////////////////////////////////////////////////////////////
-
-static const char * const CONFIG_FileType     = "FileType";
-static const char * const CONFIG_Init         = "Init_Time";  // YYYYMMDD[_HH[MMSS]]
-static const char * const CONFIG_Valid        = "Valid_Time"; // YYYYMMDD[_HH[MMSS]]
-static const char * const CONFIG_Lead         = "Lead_Time";  // HH[MMSS]
 
 ///////////////////////////////////////////////////////////////////////////////
 

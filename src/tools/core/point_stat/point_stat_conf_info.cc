@@ -116,8 +116,7 @@ void PointStatConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::read_config(const char *default_file_name,
-                                    const char *user_file_name,
-                                    GrdFileType ftype) {
+                                    const char *user_file_name) {
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename));
@@ -127,9 +126,6 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
    // Read the user-specified config file
    conf.read(user_file_name);
-
-   // Process the configuration file
-   process_config(ftype);
 
    return;
 }
@@ -177,7 +173,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    if((signed int) output_map.size() != n_txt) {
       mlog << Error << "\nPointStatConfInfo::process_config() -> "
            << "Unexpected number of entries found in \""
-           << conf_output_flag << "\" ("
+           << conf_key_output_flag << "\" ("
            << (signed int) output_map.size()
            << " != " << n_txt << ").\n\n";
       exit(1);
@@ -197,8 +193,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    }
 
    // Conf: fcst.field and obs.field
-   fcst_dict = conf.lookup_array(conf_fcst_field);
-   obs_dict  = conf.lookup_array(conf_obs_field);   
+   fcst_dict = conf.lookup_array(conf_key_fcst_field);
+   obs_dict  = conf.lookup_array(conf_key_obs_field);
 
    // Determine the number of fields (name/level) to be verified
    n_vx = parse_conf_n_vx(fcst_dict);
@@ -206,9 +202,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    // Check for a valid number of verification tasks
    if(n_vx == 0 || parse_conf_n_vx(obs_dict) != n_vx) {
       mlog << Error << "\nPointStatConfInfo::process_config() -> "
-           << "The number of verification tasks in \"" << conf_obs_field
+           << "The number of verification tasks in \"" << conf_key_obs_field
            << "\" must be non-zero and match the number in \""
-           << conf_fcst_field << "\".\n\n";
+           << conf_key_fcst_field << "\".\n\n";
       exit(1);
    }
 
@@ -334,8 +330,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
         
          // Conf: thresh
-         fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_thresh);
-         obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_thresh);
+         fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_thresh);
+         obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_thresh);
          
          // Dump the contents of the current thresholds
          if(mlog.verbosity_level() >= 5) {
@@ -415,10 +411,10 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    }
 
    // Conf: fcst.wind_thresh
-   fcst_wind_ta = conf.lookup_thresh_array(conf_fcst_wind_thresh);
+   fcst_wind_ta = conf.lookup_thresh_array(conf_key_fcst_wind_thresh);
 
    // Conf: obs.wind_thresh
-   obs_wind_ta = conf.lookup_thresh_array(conf_obs_wind_thresh);
+   obs_wind_ta = conf.lookup_thresh_array(conf_key_obs_wind_thresh);
 
    // Check that the number of wind speed thresholds match
    if(fcst_wind_ta.n_elements() != obs_wind_ta.n_elements()) {
@@ -454,13 +450,13 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    duplicate_flag = parse_conf_duplicate_flag(&conf);
 
    // Conf: rank_corr_flag
-   rank_corr_flag = conf.lookup_bool(conf_rank_corr_flag);
+   rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
 
    // Conf: output_prefix
-   output_prefix = conf.lookup_string(conf_output_prefix);
+   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    return;
 }
@@ -473,12 +469,12 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
    ConcatString sid_file, s;
 
    // Retrieve the area masks
-   mask_grid = conf.lookup_string_array(conf_mask_grid);
-   mask_poly = conf.lookup_string_array(conf_mask_poly);
+   mask_grid = conf.lookup_string_array(conf_key_mask_grid);
+   mask_poly = conf.lookup_string_array(conf_key_mask_poly);
    n_mask_area = mask_grid.n_elements() + mask_poly.n_elements();
 
    // Retrieve the station masks
-   sid_file = conf.lookup_string(conf_mask_sid);
+   sid_file = conf.lookup_string(conf_key_mask_sid);
    parse_sid_mask(sid_file, mask_sid);
 
    // Save the total number masks as a sum of the masking areas and

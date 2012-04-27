@@ -19,34 +19,29 @@ EXECUTABLES = test_table_read     \
 
 OBJECTS     = level_info.o \
               var_info.o \
-              grdfiletype_to_string.o \
               leveltype_to_string.o \
               data_class.o \
-              data2d_utils.o  \
-              table_lookup.o  \
+              data2d_utils.o \
+              table_lookup.o
 
 
 LIBRARIES   = libvx_data2d.a
 
 
-GEN_SOURCES = grdfiletype_to_string.cc \
-              grdfiletype_to_string.h \
-              leveltype_to_string.cc \
+GEN_SOURCES = leveltype_to_string.cc \
               leveltype_to_string.h
 
 
 ########################################################################
 
 
-HEADERS     = data_file_type.h \
-              level_info.h \
+HEADERS     = level_info.h \
               var_info.h \
-              grdfiletype_to_string.h \
               leveltype_to_string.h \
               data_class.h \
               data2d_utils.h \
               table_lookup.h \
-              vx_data2d.h   \
+              vx_data2d.h
 
 
 ########################################################################
@@ -69,11 +64,6 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 gen_sources: $(GEN_SOURCES)
 	@ echo
 
-grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
-	@ echo
-	@ rm -f grdfiletype_to_string.cc grdfiletype_to_string.h
-	$(ENUM_TO_STRING) -concat_string -reverse data_file_type.h
-
 leveltype_to_string.cc leveltype_to_string.h: level_info.h
 	@ echo
 	@ rm -f leveltype_to_string.cc leveltype_to_string.h
@@ -94,9 +84,6 @@ level_info.o: level_info.cc
 var_info.o: var_info.cc
 	$(CXX) var_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
-grdfiletype_to_string.o: grdfiletype_to_string.h grdfiletype_to_string.cc
-	$(CXX) grdfiletype_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
-
 leveltype_to_string.o: leveltype_to_string.h leveltype_to_string.cc
 	$(CXX) leveltype_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
@@ -108,6 +95,7 @@ data2d_utils.o: data2d_utils.h data2d_utils.cc
 
 table_lookup.o: table_lookup.h table_lookup.cc
 	$(CXX) table_lookup.cc $(CXX_FLAGS) -c -DMET_BASE_DIR=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
 
 ########################################################################
 

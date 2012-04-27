@@ -274,13 +274,8 @@ void VarInfo::set_lead(int s) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+ 
 void VarInfo::set_pair(const ConcatString &key, const ConcatString &val) {
-
-   // Look for the common keywords.
-   if(strcasecmp(key, CONFIG_Init    ) == 0) { Init  = timestring_to_unix(val);      }
-   if(strcasecmp(key, CONFIG_Valid   ) == 0) { Valid = timestring_to_unix(val);      }
-   if(strcasecmp(key, CONFIG_Lead    ) == 0) { Lead  = timestring_to_sec(val);       }
 
    return;
 }
@@ -303,8 +298,22 @@ void VarInfo::set_magic(const ConcatString &mag) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_dict(Dictionary &dict) {
+   ConcatString s;
 
-   set_name( dict.lookup_string("name", false)  );
+   // Set the name but error out if not present
+   set_name(dict.lookup_string(conf_key_name));
+   
+   // Set init time, if present
+   s = dict.lookup_string(conf_key_init_time, false);
+   if(dict.last_lookup_status()) set_init(timestring_to_unix(s));
+
+   // Set valid time, if present
+   s = dict.lookup_string(conf_key_valid_time, false);
+   if(dict.last_lookup_status()) set_valid(timestring_to_unix(s));
+
+   // Set lead time, if present
+   s = dict.lookup_string(conf_key_lead_time, false);
+   if(dict.last_lookup_status()) set_lead(timestring_to_sec(s));
 
    return;
 }

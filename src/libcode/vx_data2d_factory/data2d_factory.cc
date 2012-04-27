@@ -14,6 +14,7 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
+#include <exception>
 
 #include "data2d_factory.h"
 #include "data2d_factory_utils.h"
@@ -34,7 +35,7 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
    //
@@ -42,7 +43,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
    // The Met2dDataFile object is allocated and needs to be deleted by caller.
    //
    
-   switch(t) {
+   switch(type) {
 
       case FileType_Gb1:
          mtddf = new MetGrib1DataFile;
@@ -70,7 +71,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
       case FileType_HdfEos:
 
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
-              << "Support for GrdFileType = \"" << grdfiletype_to_string(t)
+              << "Support for GrdFileType = \"" << grdfiletype_to_string(type)
               << "\" not yet implemented!\n\n";
          exit(1);
          break;
@@ -79,7 +80,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
 
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "cannot use this factory to read files of type \""
-              << grdfiletype_to_string(t) << "\"\n\n";
+              << grdfiletype_to_string(type) << "\"\n\n";
          exit(1);
          break;
 
@@ -90,7 +91,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
 
       default:
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
-              << "unsupported gridded data file type \"" << t
+              << "unsupported gridded data file type \"" << type
               << "\"\n\n";
          exit(1);
          break;
@@ -102,7 +103,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(ConcatString filename) {
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename) {
    GrdFileType type;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -114,8 +115,41 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(ConcatString filename
    //
    // Create a new data file object and call open if the point is non-zero
    //
-   mtddf = new_met_2d_data_file(type);
-   if(mtddf) mtddf->open(filename);
+   if((mtddf = new_met_2d_data_file(type))) {
+      if(!(mtddf->open(filename))) {
+         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
+              << "error opening file \"" << filename << "\"\n\n";
+         exit(1);
+      }
+   }
+
+   return(mtddf);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type) {
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   //
+   // Use the file type, if valid
+   //
+   if(type != FileType_None) {
+      if((mtddf = new_met_2d_data_file(type))) {
+         if(!(mtddf->open(filename))) {
+            mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
+                 << "error opening file \"" << filename << "\"\n\n";
+            exit(1);
+         }
+      }
+   }
+
+   //
+   // Otherwise determine the type from the file name
+   //
+   else {
+      mtddf = new_met_2d_data_file(filename);
+   }
 
    return(mtddf);
 }

@@ -16,6 +16,7 @@
 #include "config_file.h"
 #include "config_util.h"
 #include "dictionary.h"
+#include "data_file_type.h"
 
 ////////////////////////////////////////////////////////////////////////
 
