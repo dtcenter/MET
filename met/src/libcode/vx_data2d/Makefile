@@ -135,7 +135,6 @@ test_table_read: test_table_read.cc libvx_data2d.a
 	-lvx_util \
 	-lvx_math \
 	$(CXX_LIBS)
-	cp test_table_read $(MET_BIN_DIR)
 
 
 dump_default_table: dump_default_table.cc libvx_data2d.a
@@ -151,7 +150,7 @@ dump_default_table: dump_default_table.cc libvx_data2d.a
 	-lvx_util \
 	-lvx_math \
 	$(CXX_LIBS)
-	cp dump_default_table $(MET_BIN_DIR)
+
 
 ########################################################################
 
