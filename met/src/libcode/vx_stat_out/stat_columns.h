@@ -325,49 +325,49 @@ extern void write_prc_header_row   (int, int, AsciiTable &, int, int);
 extern void write_rhist_header_row (int, int, AsciiTable &, int, int);
 extern void write_orank_header_row (int, int, AsciiTable &, int, int);
 
-extern void write_fho_row   (StatHdrColumns &, const CTSInfo &, int,
+extern void write_fho_row   (StatHdrColumns &, const CTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_ctc_row   (StatHdrColumns &, const CTSInfo &, int,
+extern void write_ctc_row   (StatHdrColumns &, const CTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_cts_row   (StatHdrColumns &, const CTSInfo &, int,
+extern void write_cts_row   (StatHdrColumns &, const CTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_mctc_row  (StatHdrColumns &, const MCTSInfo &, int,
+extern void write_mctc_row  (StatHdrColumns &, const MCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_mcts_row  (StatHdrColumns &, const MCTSInfo &, int,
+extern void write_mcts_row  (StatHdrColumns &, const MCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_cnt_row   (StatHdrColumns &, const CNTInfo &, int,
+extern void write_cnt_row   (StatHdrColumns &, const CNTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_sl1l2_row (StatHdrColumns &, const CNTInfo &, int,
+extern void write_sl1l2_row (StatHdrColumns &, const CNTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_sl1l2_row (StatHdrColumns &, const SL1L2Info &, int,
+extern void write_sl1l2_row (StatHdrColumns &, const SL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_sal1l2_row(StatHdrColumns &, const SL1L2Info &, int,
+extern void write_sal1l2_row(StatHdrColumns &, const SL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_vl1l2_row (StatHdrColumns &, const VL1L2Info &, int,
+extern void write_vl1l2_row (StatHdrColumns &, const VL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_val1l2_row(StatHdrColumns &, const VL1L2Info &, int,
+extern void write_val1l2_row(StatHdrColumns &, const VL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_pct_row   (StatHdrColumns &, const PCTInfo &, int,
+extern void write_pct_row   (StatHdrColumns &, const PCTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_pstd_row  (StatHdrColumns &, const PCTInfo &, int,
+extern void write_pstd_row  (StatHdrColumns &, const PCTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_pjc_row   (StatHdrColumns &, const PCTInfo &, int,
+extern void write_pjc_row   (StatHdrColumns &, const PCTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_prc_row   (StatHdrColumns &, const PCTInfo &, int,
+extern void write_prc_row   (StatHdrColumns &, const PCTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_nbrctc_row(StatHdrColumns &, const NBRCTSInfo &, int,
+extern void write_nbrctc_row(StatHdrColumns &, const NBRCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_nbrcts_row(StatHdrColumns &, const NBRCTSInfo &, int,
+extern void write_nbrcts_row(StatHdrColumns &, const NBRCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_nbrcnt_row(StatHdrColumns &, const NBRCNTInfo &, int,
+extern void write_nbrcnt_row(StatHdrColumns &, const NBRCNTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, int,
+extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, int,
+extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, int,
+extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_orank_row (StatHdrColumns &, const PairDataEnsemble *, int,
+extern void write_orank_row (StatHdrColumns &, const PairDataEnsemble *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 
 ////////////////////////////////////////////////////////////////////////
