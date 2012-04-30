@@ -109,6 +109,7 @@ void MetGrib2DataFile::close() {
 
 bool MetGrib2DataFile::open(const char * _filename) {
 
+   //  attempt to opent he
    Filename = _filename;
    if( NULL == (FileGrib2 = fopen(Filename, "r")) ){
       mlog << Error << "\nMetGrib2DataFile::open() - unable to open input GRIB2 file "
@@ -118,7 +119,12 @@ bool MetGrib2DataFile::open(const char * _filename) {
 
    if( 1 > RecList.size() ) read_grib2_record_list();
 
-   return(true);
+   bool status = ( 0 < RecList.size() );
+   if( !status ){
+      mlog << Warning << "GRIB2 records not found in input file '" << Filename << "'\n";
+   }
+
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
