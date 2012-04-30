@@ -118,10 +118,10 @@ struct BootInfo {
 //
 
 struct InterpInfo {
-   double      thresh;   // Valid data interpolation threshold
-   int         n_interp; // Number of interpolation types   
-   StringArray method;   // Interpolation methods
-   IntArray    width;    // Interpolation widths
+   double      vld_thresh; // Valid data interpolation threshold
+   int         n_interp;   // Number of interpolation types   
+   StringArray method;     // Interpolation methods
+   IntArray    width;      // Interpolation widths
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -144,40 +144,40 @@ static const char config_const_filename[] = "MET_BASE/data/config/ConfigConstant
 // Constants for parameter names used in configuartion files
 //
 
-static const char conf_key_version[]          = "version";
-static const char conf_key_model[]            = "model";
-static const char conf_key_output_flag[]      = "output_flag";
-static const char conf_key_fcst[]             = "fcst";
-static const char conf_key_obs[]              = "obs";
-static const char conf_key_fcst_field[]       = "fcst.field";
-static const char conf_key_obs_field[]        = "obs.field";
-static const char conf_key_file_type[]        = "file_type";
-static const char conf_key_init_time[]        = "init_time";  // YYYYMMDD[_HH[MMSS]]
-static const char conf_key_valid_time[]       = "valid_time"; // YYYYMMDD[_HH[MMSS]]
-static const char conf_key_lead_time[]        = "lead_time";  // HH[MMSS]
-static const char conf_key_name[]             = "name";
-static const char conf_key_level[]            = "level";
-static const char conf_key_message_type[]     = "message_type";
-static const char conf_key_thresh[]           = "thresh";
-static const char conf_key_fcst_wind_thresh[] = "fcst.wind_thresh";
-static const char conf_key_obs_wind_thresh[]  = "obs.wind_thresh";
-static const char conf_key_mask_grid[]        = "mask.grid";
-static const char conf_key_mask_poly[]        = "mask.poly";
-static const char conf_key_mask_sid[]         = "mask.sid";
-static const char conf_key_ci_alpha[]         = "ci_alpha";
-static const char conf_key_boot_interval[]    = "boot.interval";
-static const char conf_key_boot_rep_prop[]    = "boot.rep_prop";
-static const char conf_key_boot_n_rep[]       = "boot.n_rep";
-static const char conf_key_boot_rng[]         = "boot.rng";
-static const char conf_key_boot_seed[]        = "boot.seed";
-static const char conf_key_interp_thresh[]    = "interp.thresh";
-static const char conf_key_interp_type[]      = "interp.type";
-static const char conf_key_method[]           = "method";
-static const char conf_key_width[]            = "width";
-static const char conf_key_duplicate_flag[]   = "duplicate_flag";
-static const char conf_key_rank_corr_flag[]   = "rank_corr_flag";
-static const char conf_key_tmp_dir[]          = "tmp_dir";
-static const char conf_key_output_prefix[]    = "output_prefix";
+static const char conf_key_version[]           =  "version";
+static const char conf_key_model[]             =  "model";
+static const char conf_key_output_flag[]       =  "output_flag";
+static const char conf_key_fcst[]              =  "fcst";
+static const char conf_key_obs[]               =  "obs";
+static const char conf_key_fcst_field[]        =  "fcst.field";
+static const char conf_key_obs_field[]         =  "obs.field";
+static const char conf_key_file_type[]         =  "file_type";
+static const char conf_key_init_time[]         =  "init_time";  // YYYYMMDD[_HH[MMSS]]
+static const char conf_key_valid_time[]        =  "valid_time"; // YYYYMMDD[_HH[MMSS]]
+static const char conf_key_lead_time[]         =  "lead_time";  // HH[MMSS]
+static const char conf_key_name[]              =  "name";
+static const char conf_key_level[]             =  "level";
+static const char conf_key_message_type[]      =  "message_type";
+static const char conf_key_cat_thresh[]        =  "cat_thresh";
+static const char conf_key_fcst_wind_thresh[]  =  "fcst.wind_thresh";
+static const char conf_key_obs_wind_thresh[]   =  "obs.wind_thresh";
+static const char conf_key_mask_grid[]         =  "mask.grid";
+static const char conf_key_mask_poly[]         =  "mask.poly";
+static const char conf_key_mask_sid[]          =  "mask.sid";
+static const char conf_key_ci_alpha[]          =  "ci_alpha";
+static const char conf_key_boot_interval[]     =  "boot.interval";
+static const char conf_key_boot_rep_prop[]     =  "boot.rep_prop";
+static const char conf_key_boot_n_rep[]        =  "boot.n_rep";
+static const char conf_key_boot_rng[]          =  "boot.rng";
+static const char conf_key_boot_seed[]         =  "boot.seed";
+static const char conf_key_interp_vld_thresh[] =  "interp.vld_thresh";
+static const char conf_key_interp_type[]       =  "interp.type";
+static const char conf_key_method[]            =  "method";
+static const char conf_key_width[]             =  "width";
+static const char conf_key_duplicate_flag[]    =  "duplicate_flag";
+static const char conf_key_rank_corr_flag[]    =  "rank_corr_flag";
+static const char conf_key_tmp_dir[]           =  "tmp_dir";
+static const char conf_key_output_prefix[]     =  "output_prefix";
 
 //
 // Constants for parameter values used in configuartion files

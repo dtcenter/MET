@@ -330,8 +330,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
         
          // Conf: thresh
-         fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_thresh);
-         obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_thresh);
+         fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_cat_thresh);
+         obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_cat_thresh);
          
          // Dump the contents of the current thresholds
          if(mlog.verbosity_level() >= 5) {
@@ -437,7 +437,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: interp
    interp_info   = parse_conf_interp(&conf);
-   interp_thresh = interp_info.thresh;
+   interp_thresh = interp_info.vld_thresh;
    n_interp      = interp_info.n_interp;
    interp_wdth   = interp_info.width;
 
