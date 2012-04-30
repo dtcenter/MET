@@ -15,7 +15,7 @@ fcst = {
 
    wind_thresh = [ NA ];
    
-   message_type = [ "ADPSFC", "ADPUPA" ];
+   message_type = [ "ADPUPA", "ADPSFC" ];
 
    field = [
       {
