@@ -26,14 +26,15 @@ LS_FIT       = 6;
 BILIN        = 7;
 
 // Interpolation types
-FCST         = 1;
-OBS          = 2;
-BOTH         = 3;
+NONE         = 1;
+BOTH         = 2;
+FCST         = 3;
+OBS          = 4;
 
 // Output flag values
 NONE         = 1;
-STAT         = 2;
-BOTH         = 3;
+BOTH         = 2;
+STAT         = 3;
 
 // Bootstrapping interval type
 PCTILE       = 1;
@@ -42,5 +43,3 @@ BCA          = 2;
 // Duplicate flag settings
 UNIQUE       = 2;
 SINGLE       = 3;
-
-

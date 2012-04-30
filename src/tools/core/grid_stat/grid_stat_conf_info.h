@@ -15,8 +15,7 @@
 
 #include <iostream>
 
-#include "grid_stat_Conf.h"
-
+#include "vx_config.h"
 #include "vx_data2d.h"
 #include "vx_grid.h"
 #include "vx_util.h"
@@ -24,7 +23,7 @@
 #include "vx_math.h"
 #include "vx_gsl_prob.h"
 #include "vx_statistics.h"
-#include "result.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -44,16 +43,16 @@ static const int i_prc    = 11;
 static const int i_nbrctc = 12;
 static const int i_nbrcts = 13;
 static const int i_nbrcnt = 14;
-static const int i_nc     = 15;
 
 static const int n_txt    = 15;
-static const int n_out    = 16;
 
-// Enumeration to store possible output flag values
-enum OutputFlag {
-   flag_no_out   = 0,
-   flag_stat_out = 1,
-   flag_txt_out  = 2
+// Text file type
+static const STATLineType txt_file_type[n_txt] = {
+   stat_fho,    stat_ctc,    stat_cts,
+   stat_mctc,   stat_mcts,   stat_cnt,
+   stat_sl1l2,  stat_vl1l2,  stat_pct,
+   stat_pstd,   stat_pjc,    stat_prc,
+   stat_nbrctc, stat_nbrcts, stat_nbrcnt
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -70,12 +69,7 @@ class GridStatConfInfo {
       int n_vx_vect;     // Number of vector fields to be verified
       int n_vx_prob;     // Number of probability fields to be verified
       int n_mask;        // Number of masking regions
-
-      int n_wind_thresh; // Number of wind speed thresholds
       int n_interp;      // Number of interpolation methods
-      int n_nbr_wdth;    // Number of neighborhood sizes
-      int n_cov_thresh;  // Number of coverage thresholds
-      int n_ci_alpha;    // Number of alpha values
 
       int max_n_scal_thresh;      // Maximum number of scalar thresholds
       int max_n_prob_fcst_thresh; // Maximum fcst prob thresholds
@@ -84,35 +78,45 @@ class GridStatConfInfo {
    public:
 
       // Grid-Stat configuration object
-      grid_stat_Conf conf;
+      MetConfig conf;
 
-      // Various objects to store the data that's parsed from the
-      // Grid-Stat configuration object
-      VarInfo     **fcst_info;   // Array of pointers for fcst VarInfo [n_vx]
-      VarInfo     **obs_info;    // Array of pointers for obs VarInfo [n_vx]
-      ThreshArray  *fcst_ta;     // Array for fcst thresholds [n_vx]
-      ThreshArray  *obs_ta;      // Array for obs thresholds [n_vx]
-
-      ThreshArray  fcst_wind_ta; // Wind speed fcst thresholds [n_interp]
-      ThreshArray  obs_wind_ta;  // Wind speed obs thresholds [n_interp]
-
-      InterpMthd   *interp_mthd;  // Array for interpolation methods [n_mask]
-      int          *interp_wdth;  // Array for interpolation widths [n_mask]
-      DataPlane    *mask_dp;      // Array for masking regions [n_mask]
-      ConcatString *mask_name;    // Masking region names [n_mask]
-
-      ThreshArray   frac_ta;      // Neighborhood coverage thresholds
+      // Store data parsed from the Grid-Stat configuration object
+      ConcatString     model;              // Model name
+      VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
+      VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_vx]
+      ThreshArray *    fcst_ta;            // Array for fcst thresholds [n_vx]
+      ThreshArray *    obs_ta;             // Array for obs thresholds [n_vx]
+      ThreshArray      fcst_wind_ta;       // Wind speed fcst thresholds
+      ThreshArray      obs_wind_ta;        // Wind speed obs thresholds
+      StringArray      mask_name;          // Masking region names [n_mask]
+      DataPlane *      mask_dp;            // Array for masking regions [n_mask]
+      NumArray         ci_alpha;           // Alpha value for confidence intervals
+      BootIntervalType boot_interval;      // Bootstrap CI type
+      double           boot_rep_prop;      // Bootstrap replicate proportion
+      int              n_boot_rep;         // Number of bootstrap replicates
+      ConcatString     boot_rng;           // GSL random number generator
+      ConcatString     boot_seed;          // GSL RNG seed value
+      FieldType        interp_field;       // How to apply interpolation options
+      double           interp_thresh;      // Proportion of valid data values
+      InterpMthd *     interp_mthd;        // Array for interpolation methods [n_mask]
+      IntArray         interp_wdth;        // Array for interpolation widths [n_mask]
+      double           nbrhd_thresh;       // Proportion of valid data values
+      IntArray         nbrhd_wdth;         // Array for neighborhood widths
+      ThreshArray      nbrhd_cov_ta;       // Neighborhood coverage thresholds
+      STATOutputType   output_flag[n_txt]; // Flag for each output line type
+      bool             nc_pairs_flag;      // Flag for the output NetCDF pairs file
+      bool             rank_corr_flag;     // Flag for computing rank correlations
+      ConcatString     tmp_dir;            // Directory for temporary files
+      ConcatString     output_prefix;      // String to customize output file name
+      ConcatString     version;            // Config file version
 
       GridStatConfInfo();
      ~GridStatConfInfo();
 
       void clear();
 
-      void read_config   (const char *, const char *,
-                          GrdFileType, unixtime, int,
-                          GrdFileType, unixtime, int);
-      void process_config(GrdFileType, unixtime, int,
-                          GrdFileType, unixtime, int);
+      void read_config   (const char *, const char *);
+      void process_config(GrdFileType, GrdFileType);
       void process_masks (const Grid &);
 
       // Dump out the counts
@@ -123,7 +127,7 @@ class GridStatConfInfo {
       int get_n_mask()        const;
       int get_n_wind_thresh() const;
       int get_n_interp()      const;
-      int get_n_nbr_wdth()    const;
+      int get_n_nbrhd_wdth()  const;
       int get_n_cov_thresh()  const;
       int get_n_ci_alpha()    const;
       int get_vflag()         const;
@@ -141,18 +145,18 @@ class GridStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GridStatConfInfo::get_n_vx()          const { return(n_vx);              }
-inline int GridStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);         }
-inline int GridStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);         }
-inline int GridStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);         }
-inline int GridStatConfInfo::get_n_mask()        const { return(n_mask);            }
-inline int GridStatConfInfo::get_n_wind_thresh() const { return(n_wind_thresh);     }
-inline int GridStatConfInfo::get_n_interp()      const { return(n_interp);          }
-inline int GridStatConfInfo::get_n_nbr_wdth()    const { return(n_nbr_wdth);        }
-inline int GridStatConfInfo::get_n_cov_thresh()  const { return(n_cov_thresh); }
-inline int GridStatConfInfo::get_n_ci_alpha()    const { return(n_ci_alpha);        }
-inline int GridStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);     }
-inline int GridStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);     }
+inline int GridStatConfInfo::get_n_vx()          const { return(n_vx);                      }
+inline int GridStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);                 }
+inline int GridStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                 }
+inline int GridStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                 }
+inline int GridStatConfInfo::get_n_mask()        const { return(n_mask);                    }
+inline int GridStatConfInfo::get_n_wind_thresh() const { return(fcst_wind_ta.n_elements()); }
+inline int GridStatConfInfo::get_n_interp()      const { return(n_interp);                  }
+inline int GridStatConfInfo::get_n_nbrhd_wdth()  const { return(nbrhd_wdth.n_elements());   }
+inline int GridStatConfInfo::get_n_cov_thresh()  const { return(nbrhd_cov_ta.n_elements()); }
+inline int GridStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());     }
+inline int GridStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);             }
+inline int GridStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);             }
 
 inline int GridStatConfInfo::get_max_n_scal_thresh() const {
    return(max_n_scal_thresh);

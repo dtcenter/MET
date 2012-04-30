@@ -301,25 +301,49 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 ////////////////////////////////////////////////////////////////////////
 
 InterpInfo parse_conf_interp(Dictionary *dict) {
+   Dictionary *interp_dict = (Dictionary *) 0;
    Dictionary *type_dict = (Dictionary *) 0;
    InterpInfo info;
    NumArray mthd_na, wdth_na;
    ConcatString method;
-   int i, j, k, width;
+   int i, j, k, v, width;
 
-   // Conf: interp.vld_thresh
-   info.vld_thresh = dict->lookup_double(conf_key_interp_vld_thresh);
+   // Conf: interp
+   interp_dict = dict->lookup_dictionary(conf_key_interp);
+
+   // Conf: field - may be missing
+   v = interp_dict->lookup_int(conf_key_field, false);
+
+   // If found, interpret value
+   if(interp_dict->last_lookup_status()) {
+
+      // Convert integer to enumerated FieldType   
+           if(v == conf_const.lookup_int(conf_val_none)) info.field = FieldType_None;
+      else if(v == conf_const.lookup_int(conf_val_both)) info.field = FieldType_Both;
+      else if(v == conf_const.lookup_int(conf_val_fcst)) info.field = FieldType_Fcst;
+      else if(v == conf_const.lookup_int(conf_val_obs))  info.field = FieldType_Obs;
+      else {
+         mlog << Error << "\nparse_conf_interp() -> "
+              << "Unexpected config file value of " << v << " for \""
+              << conf_key_interp << "." << conf_key_field << "\".\n\n";
+         exit(1);
+      }
+   }
+   
+   // Conf: vld_thresh
+   info.vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
 
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "The \"" << conf_key_interp_vld_thresh << "\" parameter ("
-           << info.vld_thresh << ") must be set between 0 and 1.\n\n";
+           << "The \"" << conf_key_interp << "." << conf_key_vld_thresh
+           << "\" parameter (" << info.vld_thresh
+           << ") must be set between 0 and 1.\n\n";
       exit(1);
    }   
 
-   // Conf: interp.type
-   type_dict = dict->lookup_array(conf_key_interp_type);
+   // Conf: type
+   type_dict = interp_dict->lookup_array(conf_key_type);
 
    // Check for at least one interpolation type
    if(type_dict->n_entries() == 0) {
@@ -387,6 +411,73 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       } // end for j
    } // end for i
 
+   return(info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
+   Dictionary *nbrhd_dict = (Dictionary *) 0;
+   NbrhdInfo info;
+   int i;
+
+   // Conf: nbrhd
+   nbrhd_dict = dict->lookup_dictionary(conf_key_nbrhd);
+
+   // Conf: vld_thresh
+   info.vld_thresh = nbrhd_dict->lookup_double(conf_key_vld_thresh);
+
+   // Check that the interpolation threshold is between 0 and 1.
+   if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
+      mlog << Error << "\nparse_conf_nbrhd() -> "
+           << "The \"" << conf_key_nbrhd << "." << conf_key_vld_thresh
+           << "\" parameter (" << info.vld_thresh
+           << ") must be set between 0 and 1.\n\n";
+      exit(1);
+   }
+
+   // Conf: width
+   info.width = nbrhd_dict->lookup_num_array(conf_key_width);
+
+   // Check that at least one neighborhood width is provided
+   if(info.width.n_elements() == 0) {
+      mlog << Error << "\nparse_conf_nbrhd() -> "
+           << "At least one neighborhood width must be provided.\n\n";
+      exit(1);
+   }
+
+   // Check for valid widths
+   for(i=0; i<info.width.n_elements(); i++) {
+
+      if(info.width[i] < 1 || info.width[i]%2 == 0) {
+         mlog << Error << "\nparse_conf_nbrhd() -> "
+              << "The neighborhood widths must be odd values greater "
+              << "than or equal to 1 (" << info.width[i] << ").\n\n";
+         exit(1);
+      }
+   }
+   
+   // Conf: cov_thresh
+   info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh);
+
+   // Check that at least one neighborhood coverage threshold is provided
+   if(info.cov_ta.n_elements() == 0) {
+      mlog << Error << "\nparse_conf_nbrhd() -> "
+           << "At least one neighborhood coverage threshold must be provided.\n\n";
+      exit(1);
+   }
+
+   // Check for valid coverage thresholds
+   for(i=0; i<info.cov_ta.n_elements(); i++) {
+
+      if(info.cov_ta[i].thresh < 0.0 || info.cov_ta[i].thresh > 1.0) {
+         mlog << Error << "\nparse_conf_nbrhd() -> "
+              << "The neighborhood coverage threshold value must be set "
+              << "between 0 and 1.\n\n";
+         exit(1);
+      }
+   }
+   
    return(info);
 }
 

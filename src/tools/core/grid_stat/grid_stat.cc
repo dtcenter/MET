@@ -59,13 +59,16 @@
 //   020    06/30/10  Halley Gotway  Enhance grid equality checks.
 //   021    07/27/10  Halley Gotway  Add lat/lon variables to NetCDF.
 //   022    10/28/11  Holmes         Added use of command line class to
-//                                   parse the command line arguments.
+//                    parse the command line arguments.
 //   023    11/14/11  Holmes         Added code to enable reading of
-//                                   multiple config files.
+//                    multiple config files.
 //   024    12/09/11  Halley Gotway  When zero matched pairs are found
 //                    print the status message before continuing.
-//
 //   025    02/02/12  Bullock        Changed default output directory to "."
+//   026    04/30/12  Halley Gotway  Switch to using vx_config library.
+//   027    04/30/12  Halley Gotway  Move -fcst_valid, -fcst_lead,
+//                    -obs_valid, and -obs_lead command line options
+//                    to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,10 +131,6 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
-static void set_fcst_valid_time(const StringArray &);
-static void set_fcst_lead_time(const StringArray &);
-static void set_obs_valid_time(const StringArray &);
-static void set_obs_lead_time(const StringArray &);
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
@@ -160,8 +159,8 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
+   ConcatString default_config_file;
    ConcatString fcst_grid_info, obs_grid_info;
-   ConcatString path;
 
    out_dir = ".";
 
@@ -184,10 +183,6 @@ void process_command_line(int argc, char **argv) {
    //
    // add the options function calls
    //
-   cline.add(set_fcst_valid_time, "-fcst_valid", 1);
-   cline.add(set_fcst_lead_time, "-fcst_lead", 1);
-   cline.add(set_obs_valid_time, "-obs_valid", 1);
-   cline.add(set_obs_lead_time, "-obs_lead", 1);
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
@@ -245,25 +240,47 @@ void process_command_line(int argc, char **argv) {
    
    // Create the default config file name
 
-   path = replace_path(default_config_filename);
+   default_config_file = replace_path(default_config_filename);
 
    // List the config files
    mlog << Debug(1)
-        << "Default Config File: " << path << "\n"
+        << "Default Config File: " << default_config_file << "\n"
         << "User Config File: "    << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(path, config_file,
-                         ftype, fcst_valid_ut, fcst_lead_sec,
-                         otype, obs_valid_ut, obs_lead_sec);
+   conf_info.read_config(default_config_file, config_file);
+
+   // Get the forecast and observation file types from config, if present
+   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst, false));
+   otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs,  false));
+
+   // Read forecast file
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+      mlog << Error << "\nTrouble reading forecast file \""
+           << fcst_file << "\"\n\n";
+      exit(1);
+   }
+
+   // Read observation file
+   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, ftype))) {
+      mlog << Error << "\nTrouble reading observation file \""
+           << obs_file << "\"\n\n";
+      exit(1);
+   }   
+
+   // Store the input file types
+   ftype = fcst_mtddf->file_type();
+   otype = obs_mtddf->file_type();
+
+   // Process the configuration
+   conf_info.process_config(ftype, otype);
 
    // Set the model name
-   shc.set_model(conf_info.conf.model().sval());
+   shc.set_model(conf_info.model);
 
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
-   rng_set(rng_ptr, conf_info.conf.boot_rng().sval(),
-           conf_info.conf.boot_seed().sval());
+   rng_set(rng_ptr, conf_info.boot_rng, conf_info.boot_seed);
 
    // List the input files
    mlog << Debug(1)
@@ -307,7 +324,7 @@ void process_scores() {
    vl1l2_info  = new VL1L2Info [wind_t];
 
    // Allocate enough space for the NBRCTS objects
-   frac_t      = conf_info.frac_ta.n_elements();
+   frac_t      = conf_info.nbrhd_cov_ta.n_elements();
    nbrcts_info = new NBRCTSInfo [frac_t];
 
    // Allocate enough space for the PCTInfo objects
@@ -433,12 +450,12 @@ void process_scores() {
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 
          // If requested in the config file, smooth the forecast field
-         if(conf_info.conf.interp_flag().ival() == 1 ||
-            conf_info.conf.interp_flag().ival() == 3) {
+         if(conf_info.interp_field == FieldType_Fcst ||
+            conf_info.interp_field == FieldType_Both) {
             smooth_field(fcst_dp, fcst_dp_smooth,
                          conf_info.interp_mthd[j],
                          conf_info.interp_wdth[j],
-                         conf_info.conf.interp_thresh().dval());
+                         conf_info.interp_thresh);
          }
          // Do not smooth the forecast field
          else {
@@ -446,12 +463,12 @@ void process_scores() {
          }
 
          // If requested in the config file, smooth the observation field
-         if(conf_info.conf.interp_flag().ival() == 2 ||
-            conf_info.conf.interp_flag().ival() == 3) {
+         if(conf_info.interp_field == FieldType_Obs ||
+            conf_info.interp_field == FieldType_Both) {
             smooth_field(obs_dp, obs_dp_smooth,
                          conf_info.interp_mthd[j],
                          conf_info.interp_wdth[j],
-                         conf_info.conf.interp_thresh().dval());
+                         conf_info.interp_thresh);
          }
          // Do not smooth the observation field
          else {
@@ -485,9 +502,9 @@ void process_scores() {
             // Compute CTS scores
             if(!conf_info.fcst_info[i]->p_flag()      &&
                 conf_info.fcst_ta[i].n_elements() > 0 &&
-               (conf_info.conf.output_flag(i_fho).ival() ||
-                conf_info.conf.output_flag(i_ctc).ival() ||
-                conf_info.conf.output_flag(i_cts).ival())) {
+               (conf_info.output_flag[i_fho] != STATOutputType_None ||
+                conf_info.output_flag[i_ctc] != STATOutputType_None ||
+                conf_info.output_flag[i_cts] != STATOutputType_None)) {
 
                // Initialize
                for(m=0; m<max_scal_t; m++) cts_info[m].clear();
@@ -499,31 +516,31 @@ void process_scores() {
                for(m=0; m<conf_info.fcst_ta[i].n_elements(); m++) {
 
                   // Write out FHO
-                  if(conf_info.conf.output_flag(i_fho).ival() &&
+                  if(conf_info.output_flag[i_fho] != STATOutputType_None &&
                      cts_info[m].cts.n() > 0) {
 
                      write_fho_row(shc, cts_info[m],
-                        conf_info.conf.output_flag(i_fho).ival(),
+                        conf_info.output_flag[i_fho] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_fho], i_txt_row[i_fho]);
                   }
 
                   // Write out CTC
-                  if(conf_info.conf.output_flag(i_ctc).ival() &&
+                  if(conf_info.output_flag[i_ctc] != STATOutputType_None &&
                      cts_info[m].cts.n() > 0) {
 
                      write_ctc_row(shc, cts_info[m],
-                        conf_info.conf.output_flag(i_ctc).ival(),
+                        conf_info.output_flag[i_ctc] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_ctc], i_txt_row[i_ctc]);
                   }
 
                   // Write out CTS
-                  if(conf_info.conf.output_flag(i_cts).ival() &&
+                  if(conf_info.output_flag[i_cts] != STATOutputType_None &&
                      cts_info[m].cts.n() > 0) {
 
                      write_cts_row(shc, cts_info[m],
-                        conf_info.conf.output_flag(i_cts).ival(),
+                        conf_info.output_flag[i_cts] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_cts], i_txt_row[i_cts]);
                   }
@@ -533,8 +550,8 @@ void process_scores() {
             // Compute MCTS scores
             if(!conf_info.fcst_info[i]->p_flag()      &&
                 conf_info.fcst_ta[i].n_elements() > 1 &&
-               (conf_info.conf.output_flag(i_mctc).ival() ||
-                conf_info.conf.output_flag(i_mcts).ival())) {
+               (conf_info.output_flag[i_mctc] != STATOutputType_None ||
+                conf_info.output_flag[i_mcts] != STATOutputType_None)) {
 
                // Initialize
                mcts_info.clear();
@@ -543,21 +560,21 @@ void process_scores() {
                do_mcts(mcts_info, i, f_na, o_na);
 
                // Write out MCTC
-               if(conf_info.conf.output_flag(i_mctc).ival() &&
+               if(conf_info.output_flag[i_mctc] != STATOutputType_None &&
                   mcts_info.cts.total() > 0) {
 
                   write_mctc_row(shc, mcts_info,
-                     conf_info.conf.output_flag(i_mctc).ival(),
+                     conf_info.output_flag[i_mctc] == STATOutputType_Both,
                      stat_at, i_stat_row,
                      txt_at[i_mctc], i_txt_row[i_mctc]);
                }
 
                // Write out MCTS
-               if(conf_info.conf.output_flag(i_mcts).ival() &&
+               if(conf_info.output_flag[i_mcts] != STATOutputType_None &&
                   mcts_info.cts.total() > 0) {
 
                   write_mcts_row(shc, mcts_info,
-                     conf_info.conf.output_flag(i_mcts).ival(),
+                     conf_info.output_flag[i_mcts] == STATOutputType_Both,
                      stat_at, i_stat_row,
                      txt_at[i_mcts], i_txt_row[i_mcts]);
                }
@@ -565,8 +582,8 @@ void process_scores() {
 
             // Compute CNT scores
             if(!conf_info.fcst_info[i]->p_flag() &&
-               (conf_info.conf.output_flag(i_cnt).ival() ||
-                conf_info.conf.output_flag(i_sl1l2).ival())) {
+               (conf_info.output_flag[i_cnt] != STATOutputType_None ||
+                conf_info.output_flag[i_sl1l2] != STATOutputType_None)) {
 
                // Initialize
                cnt_info.clear();
@@ -575,22 +592,22 @@ void process_scores() {
                do_cnt(cnt_info, i, f_na, o_na);
 
                // Write out CNT
-               if(conf_info.conf.output_flag(i_cnt).ival() &&
+               if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
                   cnt_info.n > 0) {
 
                   write_cnt_row(shc, cnt_info,
-                     conf_info.conf.output_flag(i_cnt).ival(),
+                     conf_info.output_flag[i_cnt] == STATOutputType_Both,
                      stat_at, i_stat_row,
                      txt_at[i_cnt], i_txt_row[i_cnt]);
                }
 
                // Write out SL1L2 as long as the vflag is not set
                if(!conf_info.fcst_info[i]->v_flag() &&
-                  conf_info.conf.output_flag(i_sl1l2).ival() &&
+                  conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
                   cnt_info.n > 0) {
 
                   write_sl1l2_row(shc, cnt_info,
-                     conf_info.conf.output_flag(i_sl1l2).ival(),
+                     conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
                      stat_at, i_stat_row,
                      txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
                }
@@ -600,7 +617,7 @@ void process_scores() {
             // Compute VL1L2 partial sums for UGRD,VGRD
             if(!conf_info.fcst_info[i]->p_flag() &&
                 conf_info.fcst_info[i]->v_flag() &&
-               conf_info.conf.output_flag(i_vl1l2).ival() &&
+               conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
                i > 0 &&
                conf_info.fcst_info[i]->is_v_wind() &&
                conf_info.fcst_info[i-1]->is_u_wind()) {
@@ -618,12 +635,12 @@ void process_scores() {
                smooth_field(fcst_u_wind_dp, fcst_u_wind_dp_smooth,
                             conf_info.interp_mthd[j],
                             conf_info.interp_wdth[j],
-                            conf_info.conf.interp_thresh().dval());
+                            conf_info.interp_thresh);
 
                 smooth_field(obs_u_wind_dp, obs_u_wind_dp_smooth,
                              conf_info.interp_mthd[j],
                              conf_info.interp_wdth[j],
-                             conf_info.conf.interp_thresh().dval());
+                             conf_info.interp_thresh);
 
                // Apply the current mask to the UGRD fields
                apply_mask(fcst_u_wind_dp_smooth, obs_u_wind_dp_smooth,
@@ -638,11 +655,11 @@ void process_scores() {
                for(m=0; m<conf_info.fcst_wind_ta.n_elements(); m++) {
 
                   // Write out VL1L2
-                  if(conf_info.conf.output_flag(i_vl1l2).ival() &&
+                  if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
                      vl1l2_info[m].vcount > 0) {
 
                      write_vl1l2_row(shc, vl1l2_info[m],
-                        conf_info.conf.output_flag(i_vl1l2).ival(),
+                        conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
                   }
@@ -658,10 +675,10 @@ void process_scores() {
 
             // Compute PCT counts and scores
             if(conf_info.fcst_info[i]->p_flag() &&
-               (conf_info.conf.output_flag(i_pct).ival()  ||
-                conf_info.conf.output_flag(i_pstd).ival() ||
-                conf_info.conf.output_flag(i_pjc).ival()  ||
-                conf_info.conf.output_flag(i_prc).ival())) {
+               (conf_info.output_flag[i_pct] != STATOutputType_None  ||
+                conf_info.output_flag[i_pstd] != STATOutputType_None ||
+                conf_info.output_flag[i_pjc] != STATOutputType_None  ||
+                conf_info.output_flag[i_prc] != STATOutputType_None)) {
 
                // Initialize
                for(m=0; m<max_prob_t; m++) pct_info[m].clear();
@@ -673,41 +690,41 @@ void process_scores() {
                for(m=0; m<max_prob_t; m++) {
 
                   // Write out PCT
-                  if(conf_info.conf.output_flag(i_pct).ival() &&
+                  if(conf_info.output_flag[i_pct] != STATOutputType_None &&
                      pct_info[m].pct.n() > 0) {
 
                      write_pct_row(shc, pct_info[m],
-                        conf_info.conf.output_flag(i_pct).ival(),
+                        conf_info.output_flag[i_pct] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_pct], i_txt_row[i_pct]);
                   }
 
                   // Write out PSTD
-                  if(conf_info.conf.output_flag(i_pstd).ival() &&
+                  if(conf_info.output_flag[i_pstd] != STATOutputType_None &&
                      pct_info[m].pct.n() > 0) {
 
                      write_pstd_row(shc, pct_info[m],
-                        conf_info.conf.output_flag(i_pstd).ival(),
+                        conf_info.output_flag[i_pstd] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_pstd], i_txt_row[i_pstd]);
                   }
 
                   // Write out PJC
-                  if(conf_info.conf.output_flag(i_pjc).ival() &&
+                  if(conf_info.output_flag[i_pjc] != STATOutputType_None &&
                      pct_info[m].pct.n() > 0) {
 
                      write_pjc_row(shc, pct_info[m],
-                        conf_info.conf.output_flag(i_pjc).ival(),
+                        conf_info.output_flag[i_pjc] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_pjc], i_txt_row[i_pjc]);
                   }
 
                   // Write out PRC
-                  if(conf_info.conf.output_flag(i_prc).ival() &&
+                  if(conf_info.output_flag[i_prc] != STATOutputType_None &&
                      pct_info[m].pct.n() > 0) {
 
                      write_prc_row(shc, pct_info[m],
-                        conf_info.conf.output_flag(i_prc).ival(),
+                        conf_info.output_flag[i_prc] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_prc], i_txt_row[i_prc]);
                   }
@@ -719,7 +736,7 @@ void process_scores() {
          // Write out the smoothed forecast, observation, and difference
          // fields in netCDF format for each GRIB code if requested in
          // the config file
-         if(conf_info.conf.output_flag(i_nc).ival())
+         if(conf_info.nc_pairs_flag)
             write_nc(fcst_dp_smooth, obs_dp_smooth, i,
                      conf_info.interp_mthd[j],
                      conf_info.interp_wdth[j]);
@@ -729,33 +746,33 @@ void process_scores() {
       // Loop through and apply the Neighborhood methods for each of the
       // neighborhood widths if requested in the config file
       if(!conf_info.fcst_info[i]->p_flag() &&
-         (conf_info.conf.output_flag(i_nbrctc).ival() ||
-          conf_info.conf.output_flag(i_nbrcts).ival() ||
-          conf_info.conf.output_flag(i_nbrcnt).ival())) {
+         (conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
+          conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
+          conf_info.output_flag[i_nbrcnt] != STATOutputType_None)) {
 
          // Initialize
          for(j=0; j<frac_t; j++) nbrcts_info[j].clear();
 
          // Loop through and apply each of the neighborhood widths
-         for(j=0; j<conf_info.get_n_nbr_wdth(); j++) {
+         for(j=0; j<conf_info.get_n_nbrhd_wdth(); j++) {
 
             // Store the interpolation method and width being applied
             shc.set_interp_mthd(InterpMthd_Nbrhd);
-            shc.set_interp_wdth(conf_info.conf.nbr_width(j).ival());
+            shc.set_interp_wdth(conf_info.nbrhd_wdth[j]);
 
             // Loop through and apply each of the raw threshold values
             for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
 
                // Compute the thresholded fractional coverage field
                fractional_coverage(fcst_dp, fcst_dp_smooth,
-                                   conf_info.conf.nbr_width(j).ival(),
+                                   conf_info.nbrhd_wdth[j],
                                    conf_info.fcst_ta[i][k],
-                                   conf_info.conf.nbr_thresh().dval());
+                                   conf_info.nbrhd_thresh);
 
                fractional_coverage(obs_dp, obs_dp_smooth,
-                                   conf_info.conf.nbr_width(j).ival(),
+                                   conf_info.nbrhd_wdth[j],
                                    conf_info.obs_ta[i][k],
-                                   conf_info.conf.nbr_thresh().dval());
+                                   conf_info.nbrhd_thresh);
 
                // Loop through the masks to be applied
                for(m=0; m<conf_info.get_n_mask(); m++) {
@@ -787,36 +804,36 @@ void process_scores() {
                   shc.set_mask(conf_info.mask_name[m]);
 
                   // Compute NBRCTS scores
-                  if(conf_info.conf.output_flag(i_nbrctc).ival() ||
-                     conf_info.conf.output_flag(i_nbrcts).ival()) {
+                  if(conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
+                     conf_info.output_flag[i_nbrcts] != STATOutputType_None) {
 
                      // Initialize
-                     for(n=0; n<conf_info.frac_ta.n_elements(); n++) {
+                     for(n=0; n<conf_info.nbrhd_cov_ta.n_elements(); n++) {
                         nbrcts_info[n].clear();
                      }
 
                      do_nbrcts(nbrcts_info, i, j, k, f_na, o_na);
 
                      // Loop through all of the thresholds
-                     for(n=0; n<conf_info.frac_ta.n_elements(); n++) {
+                     for(n=0; n<conf_info.nbrhd_cov_ta.n_elements(); n++) {
 
                         // Only write out if n > 0
                         if(nbrcts_info[n].cts_info.cts.n() > 0) {
 
                            // Write out NBRCTC
-                           if(conf_info.conf.output_flag(i_nbrctc).ival()) {
+                           if(conf_info.output_flag[i_nbrctc] != STATOutputType_None) {
 
                               write_nbrctc_row(shc, nbrcts_info[n],
-                                 conf_info.conf.output_flag(i_nbrctc).ival(),
+                                 conf_info.output_flag[i_nbrctc] == STATOutputType_Both,
                                  stat_at, i_stat_row,
                                  txt_at[i_nbrctc], i_txt_row[i_nbrctc]);
                            }
 
                            // Write out NBRCTS
-                           if(conf_info.conf.output_flag(i_nbrcts).ival()) {
+                           if(conf_info.output_flag[i_nbrcts] != STATOutputType_None) {
 
                               write_nbrcts_row(shc, nbrcts_info[n],
-                                 conf_info.conf.output_flag(i_nbrcts).ival(),
+                                 conf_info.output_flag[i_nbrcts] == STATOutputType_Both,
                                  stat_at, i_stat_row,
                                  txt_at[i_nbrcts], i_txt_row[i_nbrcts]);
                            }
@@ -825,7 +842,7 @@ void process_scores() {
                   } // end compute NBRCTS
 
                   // Compute NBRCNT scores
-                  if(conf_info.conf.output_flag(i_nbrcnt).ival()) {
+                  if(conf_info.output_flag[i_nbrcnt] != STATOutputType_None) {
 
                      // Initialize
                      nbrcnt_info.clear();
@@ -833,11 +850,11 @@ void process_scores() {
                      do_nbrcnt(nbrcnt_info, i, j, k, f_na, o_na);
 
                      // Write out NBRCNT
-                     if(conf_info.conf.output_flag(i_nbrcnt).ival() &&
-                        nbrcnt_info.cnt_info.n > 0) {
+                     if(nbrcnt_info.cnt_info.n > 0 &&
+                        conf_info.output_flag[i_nbrcnt]) {
 
                         write_nbrcnt_row(shc, nbrcnt_info,
-                           conf_info.conf.output_flag(i_nbrcnt).ival(),
+                           conf_info.output_flag[i_nbrcnt] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_nbrcnt], i_txt_row[i_nbrcnt]);
                      }
@@ -874,9 +891,7 @@ void setup_first_pass(const DataPlane &dp) {
 
    // If requested, create a NetCDF file to store the matched pairs and
    // difference fields for each GRIB code and masking region
-   if(conf_info.conf.output_flag(i_nc).ival() != flag_no_out) {
-      setup_nc_file(dp.valid(), dp.lead());
-   }
+   if(conf_info.nc_pairs_flag) setup_nc_file(dp.valid(), dp.lead());
 
    return;
 }
@@ -943,7 +958,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    for(i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
-      if(conf_info.conf.output_flag(i).ival() >= flag_txt_out) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Initialize file stream
          txt_out[i] = (ofstream *) 0;
@@ -1092,8 +1107,8 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    str << cs_erase << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
-   if(strlen(conf_info.conf.output_prefix().sval()) > 0)
-      str << "_" << conf_info.conf.output_prefix().sval();
+   if(conf_info.output_prefix.nonempty())
+      str << "_" << conf_info.output_prefix;
 
    // Append the timing information
    sec_to_hms(lead_sec, l_hr, l_min, l_sec);
@@ -1124,7 +1139,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
       cts_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
       for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
-         cts_info[i].alpha[j] = conf_info.conf.ci_alpha(j).dval();
+         cts_info[i].alpha[j] = conf_info.ci_alpha[j];
       }
    }
 
@@ -1134,22 +1149,19 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.conf.boot_interval().ival() == boot_bca_flag) {
+   if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_cts_stats_ci_bca(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
+         conf_info.n_boot_rep,
          cts_info, n_cts,
-         conf_info.conf.output_flag(i_cts).ival(),
-         conf_info.conf.rank_corr_flag().ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_cts] != STATOutputType_None,
+         conf_info.rank_corr_flag, conf_info.tmp_dir);
    }
    else {
       compute_cts_stats_ci_perc(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
-         conf_info.conf.boot_rep_prop().dval(),
+         conf_info.n_boot_rep, conf_info.boot_rep_prop,
          cts_info, n_cts,
-         conf_info.conf.output_flag(i_cts).ival(),
-         conf_info.conf.rank_corr_flag().ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_cts] != STATOutputType_None,
+         conf_info.rank_corr_flag, conf_info.tmp_dir);
    }
 
    return;
@@ -1170,7 +1182,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    mcts_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
 
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
-      mcts_info.alpha[i] = conf_info.conf.ci_alpha(i).dval();
+      mcts_info.alpha[i] = conf_info.ci_alpha[i];
    }
 
    mlog << Debug(2) << "Computing Multi-Category Statistics.\n";
@@ -1184,22 +1196,19 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    // Compute the stats, normal confidence intervals, and bootstrap
    // bootstrap confidence intervals
    //
-   if(conf_info.conf.boot_interval().ival() == boot_bca_flag) {
+   if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
+         conf_info.n_boot_rep,
          mcts_info,
-         conf_info.conf.output_flag(i_mcts).ival(),
-         conf_info.conf.rank_corr_flag().ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_mcts] != STATOutputType_None,
+         conf_info.rank_corr_flag, conf_info.tmp_dir);
    }
    else {
       compute_mcts_stats_ci_perc(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
-         conf_info.conf.boot_rep_prop().dval(),
+         conf_info.n_boot_rep, conf_info.boot_rep_prop,
          mcts_info,
-         conf_info.conf.output_flag(i_mcts).ival(),
-         conf_info.conf.rank_corr_flag().ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_mcts] != STATOutputType_None,
+         conf_info.rank_corr_flag, conf_info.tmp_dir);
    }
 
    return;
@@ -1216,7 +1225,7 @@ void do_cnt(CNTInfo &cnt_info, int i_vx,
    //
    cnt_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
-      cnt_info.alpha[i] = conf_info.conf.ci_alpha(i).dval();
+      cnt_info.alpha[i] = conf_info.ci_alpha[i];
    }
 
    mlog << Debug(2) << "Computing Continuous Statistics.\n";
@@ -1225,26 +1234,23 @@ void do_cnt(CNTInfo &cnt_info, int i_vx,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.conf.boot_interval().ival() == boot_bca_flag) {
+   if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na,
          conf_info.fcst_info[i_vx]->is_precipitation() &
          conf_info.obs_info[i_vx]->is_precipitation(),
-         conf_info.conf.n_boot_rep().ival(),
+         conf_info.n_boot_rep,
          cnt_info,
-         conf_info.conf.output_flag(i_cnt).ival(),
-         conf_info.conf.rank_corr_flag().ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_cnt] != STATOutputType_None,
+         conf_info.rank_corr_flag, conf_info.tmp_dir);
    }
    else {
       compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na,
          conf_info.fcst_info[i_vx]->is_precipitation() &
          conf_info.obs_info[i_vx]->is_precipitation(),
-         conf_info.conf.n_boot_rep().ival(),
-         conf_info.conf.boot_rep_prop().dval(),
+         conf_info.n_boot_rep, conf_info.boot_rep_prop,
          cnt_info,
-         conf_info.conf.output_flag(i_cnt).ival(),
-         conf_info.conf.rank_corr_flag().ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_cnt] != STATOutputType_None,
+         conf_info.rank_corr_flag, conf_info.tmp_dir);
    }
 
    return;
@@ -1393,15 +1399,14 @@ void do_pct(PCTInfo *&pct_info, int i_vx,
       pct_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
       for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
-         pct_info[i].alpha[j] = conf_info.conf.ci_alpha(j).dval();
+         pct_info[i].alpha[j] = conf_info.ci_alpha[j];
       }
 
       //
       // Compute the probabilistic counts and statistics
       //
-      compute_pctinfo(f_na, o_na,
-            conf_info.conf.output_flag(i_pstd).ival(),
-            pct_info[i]);
+      compute_pctinfo(f_na, o_na, conf_info.output_flag[i_pstd],
+                      pct_info[i]);
    } // end for i
 
    return;
@@ -1417,7 +1422,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    //
    // Set up the NBRCTSInfo thresholds and alpha values
    //
-   n_nbrcts = conf_info.frac_ta.n_elements();
+   n_nbrcts = conf_info.nbrhd_cov_ta.n_elements();
    for(i=0; i<n_nbrcts; i++) {
 
       nbrcts_info[i].raw_fcst_thresh =
@@ -1425,17 +1430,16 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
       nbrcts_info[i].raw_obs_thresh =
          conf_info.obs_ta[i_vx][i_thresh];
       nbrcts_info[i].frac_thresh =
-         conf_info.frac_ta[i];
+         conf_info.nbrhd_cov_ta[i];
 
       nbrcts_info[i].cts_info.cts_fcst_thresh =
-         conf_info.frac_ta[i];
+         conf_info.nbrhd_cov_ta[i];
       nbrcts_info[i].cts_info.cts_obs_thresh =
-         conf_info.frac_ta[i];
+         conf_info.nbrhd_cov_ta[i];
       nbrcts_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
       for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
-         nbrcts_info[i].cts_info.alpha[j] =
-            conf_info.conf.ci_alpha(j).dval();
+         nbrcts_info[i].cts_info.alpha[j] = conf_info.ci_alpha[j];
       }
    }
 
@@ -1443,8 +1447,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    // Keep track of the neighborhood width
    //
    for(i=0; i<n_nbrcts; i++) {
-      nbrcts_info[i].nbr_wdth =
-         conf_info.conf.nbr_width(i_wdth).ival();
+      nbrcts_info[i].nbr_wdth = conf_info.nbrhd_wdth[i_wdth];
    }
 
    mlog << Debug(2) << "Computing Neighborhood Categorical Statistics.\n";
@@ -1453,20 +1456,19 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.conf.boot_interval().ival() == boot_bca_flag) {
+   if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_nbrcts_stats_ci_bca(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
+         conf_info.n_boot_rep,
          nbrcts_info, n_nbrcts,
-         conf_info.conf.output_flag(i_nbrcts).ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_nbrcts] != STATOutputType_None,
+         conf_info.tmp_dir);
    }
    else {
       compute_nbrcts_stats_ci_perc(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
-         conf_info.conf.boot_rep_prop().dval(),
+         conf_info.n_boot_rep, conf_info.boot_rep_prop,
          nbrcts_info, n_nbrcts,
-         conf_info.conf.output_flag(i_nbrcts).ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_nbrcts] != STATOutputType_None,
+         conf_info.tmp_dir);
    }
 
    return;
@@ -1489,14 +1491,13 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
    nbrcnt_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
-      nbrcnt_info.cnt_info.alpha[i] = conf_info.conf.ci_alpha(i).dval();
+      nbrcnt_info.cnt_info.alpha[i] = conf_info.ci_alpha[i];
    }
 
    //
    // Keep track of the neighborhood width
    //
-   nbrcnt_info.nbr_wdth =
-      conf_info.conf.nbr_width(i_wdth).ival();
+   nbrcnt_info.nbr_wdth = conf_info.nbrhd_wdth[i_wdth];
 
    mlog << Debug(2) << "Computing Neighborhood Continuous Statistics.\n";
 
@@ -1504,20 +1505,19 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.conf.boot_interval().ival() == boot_bca_flag) {
+   if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_nbrcnt_stats_ci_bca(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
+         conf_info.n_boot_rep,
          nbrcnt_info,
-         conf_info.conf.output_flag(i_nbrcnt).ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_nbrcnt] != STATOutputType_None,
+         conf_info.tmp_dir);
    }
    else {
       compute_nbrcnt_stats_ci_perc(rng_ptr, f_na, o_na,
-         conf_info.conf.n_boot_rep().ival(),
-         conf_info.conf.boot_rep_prop().dval(),
+         conf_info.n_boot_rep, conf_info.boot_rep_prop,
          nbrcnt_info,
-         conf_info.conf.output_flag(i_nbrcnt).ival(),
-         conf_info.conf.tmp_dir().sval());
+         conf_info.output_flag[i_nbrcnt] != STATOutputType_None,
+         conf_info.tmp_dir);
    }
 
    return;
@@ -1557,11 +1557,9 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       
       // Append smoothing information
       if((wdth > 1) &&
-         (conf_info.conf.interp_flag().ival() == 1 ||
-          conf_info.conf.interp_flag().ival() == 3)) {
-         fcst_var_name << "_"
-                       << mthd_str << "_"
-                       << wdth*wdth;
+         (conf_info.interp_field == FieldType_Fcst ||
+          conf_info.interp_field == FieldType_Both)) {
+         fcst_var_name << "_" << mthd_str << "_" << wdth*wdth;
       }
 
       // Build the observation variable name
@@ -1572,11 +1570,9 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
       // Append smoothing information
       if((wdth > 1) &&
-         (conf_info.conf.interp_flag().ival() == 2 ||
-          conf_info.conf.interp_flag().ival() == 3)) {
-         obs_var_name << "_"
-                      << mthd_str << "_"
-                      << wdth*wdth;
+         (conf_info.interp_field == FieldType_Obs ||
+          conf_info.interp_field == FieldType_Both)) {
+         obs_var_name << "_" << mthd_str << "_" << wdth*wdth;
       }
 
       // Build the difference variable name
@@ -1790,7 +1786,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.conf.output_flag(i).ival() >= flag_txt_out) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {
@@ -1810,8 +1806,8 @@ void clean_up() {
    // Close the output text files that were open for writing
    finish_txt_files();
 
-   // Close the output NetCDF file as long as it was opened
-   if(nc_out && conf_info.conf.output_flag(i_nc).ival()) {
+   // Close the output NetCDF file
+   if(nc_out) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
@@ -1842,10 +1838,6 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
-        << "\t[-fcst_valid time]\n"
-        << "\t[-fcst_lead time]\n"
-        << "\t[-obs_valid time]\n"
-        << "\t[-obs_lead time]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
@@ -1858,18 +1850,6 @@ void usage() {
 
         << "\t\t\"config_file\" is a GridStatConfig file containing "
         << "the desired configuration settings (required).\n"
-
-        << "\t\t\"-fcst_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the forecast valid time to be verified (optional).\n"
-
-        << "\t\t\"-fcst_lead time\" in HH[MMSS] format sets "
-        << "the forecast lead time to be verified (optional).\n"
-
-        << "\t\t\"-obs_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the observation valid time to be used (optional).\n"
-
-        << "\t\t\"-obs_lead time\" in HH[MMSS] format sets "
-        << "the observation lead time to be used (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output directory "
         << "(" << out_dir << ") (optional).\n"
@@ -1884,34 +1864,6 @@ void usage() {
         << "on the same grid.\n\n";
 
    exit(1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_fcst_valid_time(const StringArray & a)
-{
-   fcst_valid_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_fcst_lead_time(const StringArray & a)
-{
-   fcst_lead_sec = timestring_to_sec(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_valid_time(const StringArray & a)
-{
-   obs_valid_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_lead_time(const StringArray & a)
-{
-   obs_lead_sec = timestring_to_sec(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
