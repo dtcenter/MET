@@ -62,6 +62,7 @@ void PointStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::clear() {
+   int i;
 
    // Set counts to zero
    n_vx          = 0;
@@ -79,28 +80,25 @@ void PointStatConfInfo::clear() {
    // Initialize values
    model.clear();
    beg_ds = end_ds = bad_data_int;
-   fcst_field.clear();
-   obs_field.clear();
-   fcst_thresh.clear();
-   obs_thresh.clear();
    fcst_wind_ta.clear();
    obs_wind_ta.clear();
    mask_name.clear();
    mask_sid.clear();
    ci_alpha.clear();
-   duplicate_flag = DuplicateType_None;
    boot_interval = BootIntervalType_None;
    boot_rep_prop = bad_data_double;
    n_boot_rep = bad_data_int;
    boot_rng.clear();
    boot_seed.clear();
    interp_thresh = bad_data_double;
+   interp_wdth.clear();
+   duplicate_flag = DuplicateType_None;   
    rank_corr_flag = false;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
 
-   interp_wdth.clear();
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    // Deallocate memory
    if(fcst_ta)     { delete [] fcst_ta;     fcst_ta     = (ThreshArray *)      0; }
@@ -202,19 +200,20 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    // Check for a valid number of verification tasks
    if(n_vx == 0 || parse_conf_n_vx(obs_dict) != n_vx) {
       mlog << Error << "\nPointStatConfInfo::process_config() -> "
-           << "The number of verification tasks in \"" << conf_key_obs_field
+           << "The number of verification tasks in \""
+           << conf_key_obs_field
            << "\" must be non-zero and match the number in \""
            << conf_key_fcst_field << "\".\n\n";
       exit(1);
    }
 
-   // Allocate space to store the GRIB code and threshold information
+   // Allocate space based on the number of verification tasks
    vx_pd   = new VxPairDataPoint [n_vx];
    fcst_ta = new ThreshArray     [n_vx];
    obs_ta  = new ThreshArray     [n_vx];   
    msg_typ = new StringArray     [n_vx];
    
-   // Parse the fcst field information
+   // Parse the fcst and obs field information
    for(i=0; i<n_vx; i++) {
      
       // Allocate new VarInfo objects
@@ -257,8 +256,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       // fcst levels.  If not, print a warning message.
       if(vx_pd[i].fcst_info->level().type() == LevelType_Pres &&
          !is_eq(vx_pd[i].fcst_info->level().lower(), vx_pd[i].fcst_info->level().upper()) &&
-         (vx_pd[i].obs_info->level().lower() <  vx_pd[i].fcst_info->level().lower() ||
-          vx_pd[i].obs_info->level().upper() >  vx_pd[i].fcst_info->level().upper())) {
+         (vx_pd[i].obs_info->level().lower() < vx_pd[i].fcst_info->level().lower() ||
+          vx_pd[i].obs_info->level().upper() > vx_pd[i].fcst_info->level().upper())) {
 
          mlog << Warning
               << "\nPointStatConfInfo::process_config() -> "
@@ -273,8 +272,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       // Check that the observation field does not contain probabilities
       if(vx_pd[i].obs_info->p_flag()) {
          mlog << Error << "\nPointStatConfInfo::process_config() -> "
-              << "The observation field cannot contain probabilities."
-              << "\n\n";
+              << "The observation field cannot contain probabilities.\n\n";
          exit(1);
       }
    } // end for i
@@ -359,9 +357,10 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
             fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
 
             mlog << Error << "\nPointStatConfInfo::process_config() -> "
-                 << "The number of thresholds for each field in "
-                 << "\"fcst.thresh\" must match the number of thresholds "
-                 << "for each field in \"obs.thresh\".\n\n";
+                 << "The number of thresholds for each field in \"fcst."
+                 << conf_key_cat_thresh
+                 << "\" must match the number of thresholds for each "
+                 << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
             exit(1);
          }
 
@@ -394,7 +393,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
          }
 
          // Look for the maximum number of thresholds for scalar fields
-         if(vx_pd[i].fcst_info->p_flag() == 0) {
+         if(!vx_pd[i].fcst_info->p_flag()) {
 
             if(fcst_ta[i].n_elements() > max_n_scal_thresh)
                max_n_scal_thresh = fcst_ta[i].n_elements();

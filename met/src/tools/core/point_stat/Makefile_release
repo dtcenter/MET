@@ -85,10 +85,10 @@ point_stat: point_stat.cc $(OBJECTS)
 	-lvx_grid \
 	-lvx_cal \
 	-lvx_config \
-	-lvx_math \
 	-lvx_util \
-	-lvx_log \
+	-lvx_math \
 	-lvx_color \
+	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)

@@ -61,16 +61,15 @@
 //                    point observations were rejected.
 //   020    06/30/10  Halley Gotway  Enhance grid equality checks.
 //   021    10/20/11  Holmes         Added use of command line class to
-//                                   parse the command line arguments.
+//                    parse the command line arguments.
 //   022    11/14/11  Holmes         Added code to enable reading of
-//                                   multiple config files.
-//
-//   022    02/02/12  Bullock        Set default output directory to "."
-//   023    03/05/12  Halley Gotway  Fix bug in processing command line
+//                    multiple config files.
+//   023    02/02/12  Bullock        Set default output directory to "."
+//   024    03/05/12  Halley Gotway  Fix bug in processing command line
 //                    for setting valid end times.
-//   024    04/16/12  Halley Gotway  Switch to using vx_config library.
-//   025    04/27/12  Halley Gotway  Move -fcst_lead and -fcst_valid
-//                                   command line options to config file.
+//   025    04/16/12  Halley Gotway  Switch to using vx_config library.
+//   026    04/27/12  Halley Gotway  Move -fcst_valid and -fcst_lead
+//                    command line options to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -168,7 +167,7 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    int i;
    GrdFileType ftype;
-   ConcatString default_config_file, config_const_file;
+   ConcatString default_config_file;
 
    out_dir = ".";
 
@@ -242,7 +241,7 @@ void process_command_line(int argc, char **argv) {
    // List the config files
    mlog << Debug(1)
         << "Default Config File: " << default_config_file << "\n"
-        << "User Config File: " << config_file << "\n";
+        << "User Config File: "    << config_file << "\n";
 
    // Read the config files
    conf_info.read_config(default_config_file, config_file);
@@ -279,8 +278,7 @@ void process_command_line(int argc, char **argv) {
 
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
-   rng_set(rng_ptr, conf_info.boot_rng,
-           conf_info.boot_seed);
+   rng_set(rng_ptr, conf_info.boot_rng, conf_info.boot_seed);
 
    // List the input files
    mlog << Debug(1)
@@ -916,7 +914,7 @@ void process_scores() {
                if(conf_info.output_flag[i_mpr] != STATOutputType_None) {
 
                   write_mpr_row(shc, pd_ptr,
-                     conf_info.output_flag[i_mpr],
+                     conf_info.output_flag[i_mpr] == STATOutputType_Both,
                      stat_at, i_stat_row,
                      txt_at[i_mpr], i_txt_row[i_mpr]);
 
@@ -946,7 +944,7 @@ void process_scores() {
                         cts_info[m].cts.n() > 0) {
 
                         write_fho_row(shc, cts_info[m],
-                           conf_info.output_flag[i_fho],
+                           conf_info.output_flag[i_fho] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_fho], i_txt_row[i_fho]);
                      }
@@ -956,7 +954,7 @@ void process_scores() {
                         cts_info[m].cts.n() > 0) {
 
                         write_ctc_row(shc, cts_info[m],
-                           conf_info.output_flag[i_ctc],
+                           conf_info.output_flag[i_ctc] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_ctc], i_txt_row[i_ctc]);
                      }
@@ -966,7 +964,7 @@ void process_scores() {
                         cts_info[m].cts.n() > 0) {
 
                         write_cts_row(shc, cts_info[m],
-                           conf_info.output_flag[i_cts],
+                           conf_info.output_flag[i_cts] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_cts], i_txt_row[i_cts]);
                      }
@@ -990,7 +988,7 @@ void process_scores() {
                      mcts_info.cts.total() > 0) {
 
                      write_mctc_row(shc, mcts_info,
-                        conf_info.output_flag[i_mctc],
+                        conf_info.output_flag[i_mctc] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_mctc], i_txt_row[i_mctc]);
                   }
@@ -1000,7 +998,7 @@ void process_scores() {
                      mcts_info.cts.total() > 0) {
 
                      write_mcts_row(shc, mcts_info,
-                        conf_info.output_flag[i_mcts],
+                        conf_info.output_flag[i_mcts] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_mcts], i_txt_row[i_mcts]);
                   }
@@ -1021,7 +1019,7 @@ void process_scores() {
                      cnt_info.n > 0) {
 
                      write_cnt_row(shc, cnt_info,
-                        conf_info.output_flag[i_cnt],
+                        conf_info.output_flag[i_cnt] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_cnt], i_txt_row[i_cnt]);
                   }
@@ -1045,7 +1043,7 @@ void process_scores() {
                      sl1l2_info.scount > 0) {
 
                      write_sl1l2_row(shc, sl1l2_info,
-                        conf_info.output_flag[i_sl1l2],
+                        conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
                   }
@@ -1055,7 +1053,7 @@ void process_scores() {
                      sl1l2_info.sacount > 0) {
 
                      write_sal1l2_row(shc, sl1l2_info,
-                        conf_info.output_flag[i_sal1l2],
+                        conf_info.output_flag[i_sal1l2] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
                   }
@@ -1092,7 +1090,7 @@ void process_scores() {
                         vl1l2_info[m].vcount > 0) {
 
                         write_vl1l2_row(shc, vl1l2_info[m],
-                           conf_info.output_flag[i_vl1l2],
+                           conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
                      }
@@ -1102,7 +1100,7 @@ void process_scores() {
                         vl1l2_info[m].vacount > 0) {
 
                         write_val1l2_row(shc, vl1l2_info[m],
-                           conf_info.output_flag[i_val1l2],
+                           conf_info.output_flag[i_val1l2] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_val1l2], i_txt_row[i_val1l2]);
                      }
@@ -1137,7 +1135,7 @@ void process_scores() {
                         pct_info[m].pct.n() > 0) {
 
                         write_pct_row(shc, pct_info[m],
-                           conf_info.output_flag[i_pct],
+                           conf_info.output_flag[i_pct] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_pct], i_txt_row[i_pct]);
                      }
@@ -1147,7 +1145,7 @@ void process_scores() {
                         pct_info[m].pct.n() > 0) {
 
                         write_pstd_row(shc, pct_info[m],
-                           conf_info.output_flag[i_pstd],
+                           conf_info.output_flag[i_pstd] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_pstd], i_txt_row[i_pstd]);
                      }
@@ -1157,7 +1155,7 @@ void process_scores() {
                         pct_info[m].pct.n() > 0) {
 
                         write_pjc_row(shc, pct_info[m],
-                           conf_info.output_flag[i_pjc],
+                           conf_info.output_flag[i_pjc] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_pjc], i_txt_row[i_pjc]);
                      }
@@ -1167,7 +1165,7 @@ void process_scores() {
                         pct_info[m].pct.n() > 0) {
 
                         write_prc_row(shc, pct_info[m],
-                           conf_info.output_flag[i_prc],
+                           conf_info.output_flag[i_prc] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_prc], i_txt_row[i_prc]);
                      }
@@ -1227,7 +1225,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
       compute_cts_stats_ci_bca(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
          conf_info.n_boot_rep,
          cts_info, n_cts,
-         conf_info.output_flag[i_cts],
+         conf_info.output_flag[i_cts] != STATOutputType_None,
          conf_info.rank_corr_flag,
          conf_info.tmp_dir);
    }
@@ -1236,7 +1234,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
          conf_info.n_boot_rep,
          conf_info.boot_rep_prop,
          cts_info, n_cts,
-         conf_info.output_flag[i_cts],
+         conf_info.output_flag[i_cts] != STATOutputType_None,
          conf_info.rank_corr_flag,
          conf_info.tmp_dir);
    }
@@ -1279,7 +1277,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
       compute_mcts_stats_ci_bca(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
          conf_info.n_boot_rep,
          mcts_info,
-         conf_info.output_flag[i_mcts],
+         conf_info.output_flag[i_mcts] != STATOutputType_None,
          conf_info.rank_corr_flag,
          conf_info.tmp_dir);
    }
@@ -1288,7 +1286,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
          conf_info.n_boot_rep,
          conf_info.boot_rep_prop,
          mcts_info,
-         conf_info.output_flag[i_mcts],
+         conf_info.output_flag[i_mcts] != STATOutputType_None,
          conf_info.rank_corr_flag,
          conf_info.tmp_dir);
    }
@@ -1328,7 +1326,7 @@ void do_cnt(CNTInfo &cnt_info, int i_vx, PairDataPoint *pd_ptr) {
          conf_info.vx_pd[i_vx].obs_info->is_precipitation(),
          conf_info.n_boot_rep,
          cnt_info,
-         conf_info.output_flag[i_cnt],
+         conf_info.output_flag[i_cnt] != STATOutputType_None,
          conf_info.rank_corr_flag,
          conf_info.tmp_dir);
    }
