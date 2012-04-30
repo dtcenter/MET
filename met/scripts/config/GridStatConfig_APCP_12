@@ -1,489 +1,92 @@
 ////////////////////////////////////////////////////////////////////////////////
-//
-// Default grid_stat configuration file
-//
-////////////////////////////////////////////////////////////////////////////////
 
-//
-// Specify a name to designate the model being verified.  This name will be
-// written to the second column of the ASCII output generated.
-//
 model = "WRF";
 
-//
-// Specify a comma-separated list of fields to be verified.  The forecast and
-// observation fields may be specified separately.  If the obs_field parameter
-// is left blank, it will default to the contents of fcst_field.
-//
-// Each field is specified as a GRIB code or abbreviation followed by an
-// accumulation or vertical level indicator for GRIB files or as a variable name
-// followed by a list of dimensions for NetCDF files output from p_interp or MET.
-//
-// Specifying verification fields for GRIB files:
-//    GC/ANNN for accumulation interval NNN
-//    GC/ZNNN for vertical level NNN
-//    GC/PNNN for pressure level NNN in hPa
-//    GC/PNNN-NNN for a range of pressure levels in hPa
-//    GC/LNNN for a generic level type
-//    GC/RNNN for a specific GRIB record number
-//    Where GC is the number of or abbreviation for the grib code
-//    to be verified.
-// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-//
-// Specifying verification fields for NetCDF files:
-//    var_name(i,...,j,*,*) for a single field
-//    Where var_name is the name of the NetCDF variable,
-//    and i,...,j specifies fixed dimension values,
-//    and *,* specifies the two dimensions for the gridded field.
-//
-//    NOTE: To verify winds as vectors rather than scalars,
-//          specify UGRD (or 33) followd by VGRD (or 34) with the
-//          same level values.
-//
-//    NOTE: To process a probability field, add "/PROB", such as "POP/Z0/PROB".
-//
-// e.g. fcst_field[] = [ "61/A3", "APCP/A24", "RH/L10" ]; for GRIB input
-// e.g. fcst_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)" ]; for NetCDF input
-//
-fcst_field[] = [ "APCP_12(*,*)" ];
-obs_field[]  = [];
+////////////////////////////////////////////////////////////////////////////////
 
-//
-// Specify a comma-separated list of groups of thresholds to be applied to the
-// fields listed above.  Thresholds for the forecast and observation fields
-// may be specified separately.  If the obs_thresh parameter is left blank,
-// it will default to the content of fcst_thresh.
-//
-// At least one threshold must be provided for each field listed above.  The
-// lengths of the "fcst_field" and "fcst_thresh" arrays must match, as must
-// lengths of the "obs_field" and "obs_thresh" arrays.  To apply multiple
-// thresholds to a field, separate the threshold values with a space.
-//
-// Each threshold must be preceded by a two letter indicator for the type of
-// thresholding to be performed:
-//    'lt' for less than     'le' for less than or equal to
-//    'eq' for equal to      'ne' for not equal to
-//    'gt' for greater than  'ge' for greater than or equal to
-//
-// NOTE: Thresholds for probabilities must begin with 0.0, end with 1.0,
-//       and be preceeded by "ge".
-//
-// e.g. fcst_thresh[] = [ "gt0.0 ge5.0", "gt0.0", "lt80.0 ge80.0" ];
-//
-fcst_thresh[] = [ "gt0.0 ge5.0" ];
-obs_thresh[]  = [];
+fcst = {
 
-//
-// Specify a comma-separated list of thresholds to be used when computing
-// VL1L2 partial sums for winds.  The thresholds are applied to the wind speed
-// values derived from each U/V pair.  Only those U/V pairs which meet the wind
-// speed threshold criteria are retained.  If the obs_wind_thresh parameter is
-// left blank, it will default to the contents of fcst_wind_thresh.
-//
-// To apply multiple wind speed thresholds, separate the threshold values with a
-// space.  Use "NA" to indicate that no wind speed threshold should be applied.
-//
-// Each threshold must be preceded by a two letter indicator for the type of
-// thresholding to be performed:
-//    'lt' for less than     'le' for less than or equal to
-//    'eq' for equal to      'ne' for not equal to
-//    'gt' for greater than  'ge' for greater than or equal to
-//    'NA' for no threshold
-//
-// e.g. fcst_wind_thresh[] = [ "NA", "ge1.0" ];
-//
-fcst_wind_thresh[] = [ "NA" ];
-obs_wind_thresh[]  = [];
+   wind_thresh = [ NA ];
 
-//
-// Specify a comma-separated list of grids to be used in masking the data over
-// which to perform scoring.  An empty list indicates that no masking grid
-// should be performed.  The standard NCEP grids are named "GNNN" where NNN
-// indicates the three digit grid number.  Enter "FULL" to score over the
-// entire domain.
-// http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
-//
-// e.g. mask_grid[] = [ "FULL" ];
-//
-mask_grid[] = [ "DTC165", "DTC166" ];
+   field = [
+      {
+        name       = "APCP_12";
+        level      = [ "(*,*)" ];
+        cat_thresh = [ >0.0, >=5.0 ];
+      }
+   ];
 
-//
-// Specify a comma-separated list of masking regions to be applied.
-// An empty list indicates that no additional masks should be used.
-// The masking regions may be defined in one of 4 ways:
-//
-// (1) An ASCII file containing a lat/lon polygon.
-//     Latitude in degrees north and longitude in degrees east.
-//     By default, the first and last polygon points are connected.
-//     e.g. "MET_BASE/data/poly/EAST.poly" which consists of n points:
-//          "poly_name lat1 lon1 lat2 lon2... latn lonn"
-//
-// (2) The NetCDF output of the gen_poly_mask tool.
-//
-// (3) A NetCDF data file, followed by the name of the NetCDF variable
-//     to be used, and optionally, a threshold to be applied to the field.
-//     e.g. "sample.nc var_name gt0.00"
-//
-// (4) A GRIB data file, followed by a description of the field
-//     to be used, and optionally, a threshold to be applied to the field.
-//     e.g. "sample.grb APCP/A3 gt0.00"
-//
-// Any NetCDF or GRIB file used must have the same grid dimensions as the
-// data being verified.
-//
-// MET_BASE may be used in the path for the files above.
-//
-// e.g. mask_poly[] = [ "MET_BASE/data/poly/EAST.poly",
-//                      "poly_mask.ncf",
-//                      "sample.nc APCP",
-//                      "sample.grb HGT/Z0 gt100.0" ];
-//
-mask_poly[] = [ "MET_BASE/out/gen_poly_mask/CONUS_poly.nc",
-                "MET_BASE/data/poly/LMV.poly" ];
+};
+obs = fcst;
 
-//
-// Specify a comma-separated list of values for alpha to be used when computing
-// confidence intervals.  Values of alpha must be between 0 and 1.
-//
-// e.g. ci_alpha[] = [ 0.05, 0.10 ];
-//
-ci_alpha[] = [ 0.10, 0.05 ];
+////////////////////////////////////////////////////////////////////////////////
 
-//
-// Specify the method to be used for computing bootstrap confidence intervals.
-// The value for this is interpreted as follows:
-//    (0) Use the BCa interval method (computationally intensive)
-//    (1) Use the percentile interval method
-//
-boot_interval = 1;
+mask = {
+   grid = [ "DTC165", "DTC166" ];
+   poly = [ "MET_BASE/out/gen_poly_mask/CONUS_poly.nc",
+            "MET_BASE/data/poly/LMV.poly" ];
+};
 
-//
-// Specify a proportion between 0 and 1 to define the replicate sample size
-// to be used when computing percentile intervals.  The replicate sample
-// size is set to boot_rep_prop * n, where n is the number of raw data points.
-//
-// e.g boot_rep_prop = 0.80;
-//
-boot_rep_prop = 1.0;
+////////////////////////////////////////////////////////////////////////////////
 
-//
-// Specify the number of times each set of matched pair data should be
-// resampled when computing bootstrap confidence intervals.  A value of
-// zero disables the computation of bootstrap condifence intervals.
-//
-// e.g. n_boot_rep = 1000;
-//
-n_boot_rep = 0;
+ci_alpha  = [ 0.10, 0.05 ];
 
-//
-// Specify the name of the random number generator to be used.  See the MET
-// Users Guide for a list of possible random number generators.
-//
-boot_rng = "mt19937";
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "1";
+};
 
-//
-// Specify the seed value to be used when computing bootstrap confidence
-// intervals.  If left unspecified, the seed will change for each run and
-// the computed bootstrap confidence intervals will not be reproducable.
-//
-boot_seed = "1";
+////////////////////////////////////////////////////////////////////////////////
 
-//
-// Specify a comma-separated list of interpolation method(s) to be used for
-// smoothing the data fields prior to comparing them.  The value at each grid
-// point is replaced by the measure computed over the neighborhood defined
-// around the grid point.  String values are interpreted as follows:
-//    MIN     = Minimum in the neighborhood
-//    MAX     = Maximum in the neighborhood
-//    MEDIAN  = Median in the neighborhood
-//    UW_MEAN = Unweighted mean in the neighborhood
-//
-//    NOTE: The distance-weighted mean (DW_MEAN), least-squares fit (LS_FIT),
-//          and bilinear interpolation (BILIN) are not options here.
-//
-// e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
-//
-interp_method[] = [ "UW_MEAN" ];
+interp = {
+   field      = FCST;
+   vld_thresh = 1.0;
+   type = [
+      {
+         method = UW_MEAN;
+         width  = 1;
+      }
+   ];
+};
 
-//
-// Specify a comma-separated list of box widths to be used by the interpolation
-// techniques listed above.  All values must be odd.  A value of 1 indicates
-// that no smoothing should be performed.  For values greater than 1, the n*n
-// grid points around each point will be used to smooth the data fields.
-//
-// e.g. interp_width = [ 1, 3, 5 ];
-//
-interp_width[] = [ 1 ];
+////////////////////////////////////////////////////////////////////////////////
 
-//
-// The interp_flag controls how the smoothing defined above should be applied:
-// (1) Smooth only the forecast field
-// (2) Smooth only the observation field
-// (3) Smooth both the forecast and observation fields
-//
-interp_flag = 1;
+nbrhd = {
+   vld_thresh = 1.0;
+   width      = [ 3, 5 ];
+   cov_thresh = [ >=0.5 ];
+}
 
-//
-// When smoothing, compute a ratio of the number of valid data points to
-// the total number of points in the neighborhood.  If that ratio is less
-// than this threshold, do not compute a smoothed forecast value.  This
-// threshold must be between 0 and 1.  Setting this threshold to 1 will
-// require that each observation be surrounded by n*n valid forecast
-// points.
-//
-// e.g. interp_thresh = 1.0;
-//
-interp_thresh = 1.0;
+////////////////////////////////////////////////////////////////////////////////
 
-//
-// Specify a comma-separated list of box widths to be used to define the
-// neighborhood size for the neighborhood verification methods. All values
-// must be odd.  For values greater than 1, the n*n grid points around each
-// point will be used to define the neighborhood.
-//
-// e.g. nbr_width = [ 3, 5 ];
-//
-nbr_width[] = [ 3, 5 ];
+output_flag = {
+   fho    = BOTH;
+   ctc    = BOTH;
+   cts    = BOTH;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = BOTH;
+   sl1l2  = BOTH;
+   vl1l2  = BOTH;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   nbrctc = BOTH;
+   nbrcts = BOTH;
+   nbrcnt = BOTH;
+};
 
-//
-// When applying the neighborhood verification methods, compute a ratio
-// of the number of valid data points to the total number of points in
-// the neighborhood.  If that ratio is less than this threshold, do not
-// include it in the computations.  This threshold must be between 0
-// and 1.  Setting this threshold to 1 will require that each point be
-// surrounded by n*n valid forecast points.
-//
-// e.g. nbr_thresh = 1.0;
-//
-nbr_thresh = 1.0;
+nc_pairs_flag = TRUE;
 
-//
-// When applying the neighborhood verification methods, apply a threshold
-// to the fractional coverage values to define contingency tables from
-// which to compute statistics.
-//
-// e.g. cov_thresh[] = [ "ge0.25", "ge0.50" ];
-//
-cov_thresh[] = [ "ge0.5" ];
+////////////////////////////////////////////////////////////////////////////////
 
-//
-// Specify flags to indicate the type of data to be output:
-//
-//    (1) STAT and FHO Text Files, Forecast, Hit, Observation Rates:
-//           Total (TOTAL),
-//           Forecast Rate (F_RATE),
-//           Hit Rate (H_RATE),
-//           Observation Rate (O_RATE)
-//
-//    (2) STAT and CTC Text Files, Contingency Table Counts:
-//           Total (TOTAL),
-//           Forecast Yes and Observation Yes Count (FY_OY),
-//           Forecast Yes and Observation No Count (FY_ON),
-//           Forecast No and Observation Yes Count (FN_OY),
-//           Forecast No and Observation No Count (FN_ON)
-//
-//    (3) STAT and CTS Text Files, Contingency Table Scores:
-//           Total (TOTAL),
-//           Base Rate (BASER),
-//           Forecast Mean (FMEAN),
-//           Accuracy (ACC),
-//           Frequency Bias (FBIAS),
-//           Probability of Detecting Yes (PODY),
-//           Probability of Detecting No (PODN),
-//           Probability of False Detection (POFD),
-//           False Alarm Ratio (FAR),
-//           Critical Success Index (CSI),
-//           Gilbert Skill Score (GSS),
-//           Hanssen and Kuipers Discriminant (HK),
-//           Heidke Skill Score (HSS),
-//           Odds Ratio (ODDS),
-//           NOTE: All statistics listed above contain parametric and/or
-//                 non-parametric confidence interval limits.
-//
-//    (4) STAT and MCTC Text Files, NxN Multi-Category Contingency Table Counts:
-//           Total (TOTAL),
-//           Number of Categories (N_CAT),
-//           Contingency Table Count columns repeated N_CAT*N_CAT times
-//
-//    (5) STAT and MCTS Text Files, NxN Multi-Category Contingency Table Scores:
-//           Total (TOTAL),
-//           Number of Categories (N_CAT),
-//           Accuracy (ACC),
-//           Hanssen and Kuipers Discriminant (HK),
-//           Heidke Skill Score (HSS),
-//           Gerrity Score (GER),
-//           NOTE: All statistics listed above contain parametric and/or
-//                 non-parametric confidence interval limits.
-//
-//    (6) STAT and CNT Text Files, Statistics of Continuous Variables:
-//           Total (TOTAL),
-//           Forecast Mean (FBAR),
-//           Forecast Standard Deviation (FSTDEV),
-//           Observation Mean (OBAR),
-//           Observation Standard Deviation (OSTDEV),
-//           Pearson's Correlation Coefficient (PR_CORR),
-//           Spearman's Rank Correlation Coefficient (SP_CORR),
-//           Kendall Tau Rank Correlation Coefficient (KT_CORR),
-//           Number of ranks compared (RANKS),
-//           Number of tied ranks in the forecast field (FRANK_TIES),
-//           Number of tied ranks in the observation field (ORANK_TIES),
-//           Mean Error (ME),
-//           Standard Deviation of the Error (ESTDEV),
-//           Multiplicative Bias (MBIAS = FBAR - OBAR),
-//           Mean Absolute Error (MAE),
-//           Mean Squared Error (MSE),
-//           Bias-Corrected Mean Squared Error (BCMSE),
-//           Root Mean Squared Error (RMSE),
-//           Percentiles of the Error (E10, E25, E50, E75, E90)
-//           NOTE: Most statistics listed above contain parametric and/or
-//                 non-parametric confidence interval limits.
-//
-//    (7) STAT and SL1L2 Text Files, Scalar Partial Sums:
-//           Total (TOTAL),
-//           Forecast Mean (FBAR),
-//              = mean(f)
-//           Observation Mean (OBAR),
-//              = mean(o)
-//           Forecast*Observation Product Mean (FOBAR),
-//              = mean(f*o)
-//           Forecast Squared Mean (FFBAR),
-//              = mean(f^2)
-//           Observation Squared Mean (OOBAR)
-//              = mean(o^2)
-//
-//    (8) STAT and VL1L2 Text Files, Vector Partial Sums:
-//           Total (TOTAL),
-//           U-Forecast Mean (UFBAR),
-//              = mean(uf)
-//           V-Forecast Mean (VFBAR),
-//              = mean(vf)
-//           U-Observation Mean (UOBAR),
-//              = mean(uo)
-//           V-Observation Mean (VOBAR),
-//              = mean(vo)
-//           U-Product Plus V-Product (UVFOBAR),
-//              = mean(uf*uo+vf*vo)
-//           U-Forecast Squared Plus V-Forecast Squared (UVFFBAR),
-//              = mean(uf^2+vf^2)
-//           U-Observation Squared Plus V-Observation Squared (UVOOBAR)
-//              = mean(uo^2+vo^2)
-//
-//    (9) STAT and PCT Text Files, Nx2 Probability Contingency Table Counts:
-//           Total (TOTAL),
-//           Number of Forecast Probability Thresholds (N_THRESH),
-//           Probability Threshold Value (THRESH_i),
-//           Row Observation Yes Count (OY_i),
-//           Row Observation No Count (ON_i),
-//           NOTE: Previous 3 columns repeated for each row in the table
-//           Last Probability Threshold Value (THRESH_n)
-//
-//   (10) STAT and PSTD Text Files, Nx2 Probability Contingency Table Scores:
-//           Total (TOTAL),
-//           Number of Forecast Probability Thresholds (N_THRESH),
-//           Base Rate (BASER) with confidence interval limits,
-//           Reliability (RELIABILITY),
-//           Resolution (RESOLUTION),
-//           Uncertainty (UNCERTAINTY),
-//           Area Under the ROC Curve (ROC_AUC),
-//           Brier Score (BRIER) with confidence interval limits,
-//           Probability Threshold Value (THRESH_i)
-//           NOTE: Previous column repeated for each probability threshold.
-//
-//   (11) STAT and PJC Text Files, Joint/Continuous Statistics of
-//                                 Probabilistic Variables:
-//           Total (TOTAL),
-//           Number of Forecast Probability Thresholds (N_THRESH),
-//           Probability Threshold Value (THRESH_i),
-//           Observation Yes Count Divided by Total (OY_TP_i),
-//           Observation No Count Divided by Total (ON_TP_i),
-//           Calibration (CALIBRATION_i),
-//           Refinement (REFINEMENT_i),
-//           Likelikhood (LIKELIHOOD_i),
-//           Base Rate (BASER_i),
-//           NOTE: Previous 7 columns repeated for each row in the table
-//           Last Probability Threshold Value (THRESH_n)
-//
-//   (12) STAT and PRC Text Files, ROC Curve Points for
-//                                 Probabilistic Variables:
-//           Total (TOTAL),
-//           Number of Forecast Probability Thresholds (N_THRESH),
-//           Probability Threshold Value (THRESH_i),
-//           Probability of Detecting Yes (PODY_i),
-//           Probability of False Detection (POFD_i),
-//           NOTE: Previous 3 columns repeated for each row in the table
-//           Last Probability Threshold Value (THRESH_n)
-//
-//   (13) STAT and NBRCTC Text Files, Neighborhood Methods Contingency Table Counts:
-//           Total (TOTAL),
-//           Forecast Yes and Observation Yes Count (FY_OY),
-//           Forecast Yes and Observation No Count (FY_ON),
-//           Forecast No and Observation Yes Count (FN_OY),
-//           Forecast No and Observation No Count (FN_ON),
-//           Fractional Threshold Value (FRAC_T)
-//
-//   (14) STAT and NBRCTS Text Files, Neighborhood Methods Contingency Table Scores:
-//           Total (TOTAL),
-//           Base Rate (BASER),
-//           Forecast Mean (FMEAN),
-//           Accuracy (ACC),
-//           Bias (BIAS),
-//           Probability of Detecting Yes (PODY),
-//           Probability of Detecting No (PODN),
-//           Probability of False Detection (POFD),
-//           False Alarm Ratio (FAR),
-//           Critical Success Index (CSI),
-//           Gilbert Skill Score (GSS),
-//           Hanssen and Kuipers Discriminant (HK),
-//           Heidke Skill Score (HSS),
-//           Odds Ratio (ODDS),
-//           NOTE: Most statistics listed above contain parametric and/or
-//                 non-parametric confidence interval limits.
-//
-//   (15) STAT and NBRCNT Text Files, Neighborhood Methods Continuous Scores:
-//           Total (TOTAL),
-//           Fractions Brier Score (FBS),
-//           Fractions Skill Score (FSS)
-//
-//   (16) NetCDF File containing difference fields for each grib
-//        code/mask combination.  A non-zero value indicates that
-//        this NetCDF file should be produced.  A value of 0
-//        indicates that it should not be produced.
-//
-// Values for flags (1) through (15) are interpreted as follows:
-//    (0) Do not generate output of this type
-//    (1) Write output to a STAT file
-//    (2) Write output to a STAT file and a text file
-//
-output_flag[] = [ 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 1 ];
+rank_corr_flag = FALSE;
+tmp_dir        = "/tmp";
+output_prefix  = "APCP_12";
+version        = "V3.1";
 
-//
-// Flag to indicate whether Kendall's Tau and Spearman's Rank Correlation
-// Coefficients should be computed.  Computing them over large datasets is
-// computationally intensive and slows down the runtime execution significantly.
-//    (0) Do not compute these correlation coefficients
-//    (1) Compute these correlation coefficients
-//
-rank_corr_flag = 0;
-
-//
-// Specify the GRIB Table 2 parameter table version number to be used
-// for interpreting GRIB codes.
-// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-//
-grib_ptv = 2;
-
-//
-// Directory where temporary files should be written.
-//
-tmp_dir = "/tmp";
-
-//
-// Prefix to be used for the output file names.
-//
-output_prefix = "APCP_12";
-
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//
-version = "V3.1";
+////////////////////////////////////////////////////////////////////////////////

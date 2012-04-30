@@ -16,15 +16,13 @@
 EXECUTABLES = grid_stat
 
 
-OBJECTS     = grid_stat_Conf.o \
-              grid_stat_conf_info.o
+OBJECTS     = grid_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = grid_stat_Conf.h \
-              grid_stat_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -54,12 +52,6 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-grid_stat_Conf.h grid_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/GridStatConfig_default
-	@ echo
-	@ rm -f grid_stat_Conf.h grid_stat_Conf.cc
-	$(ECONFIG_CODEGEN) -class grid_stat_Conf -outfile grid_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/GridStatConfig_default
-
-
 ########################################################################
 
 
@@ -68,14 +60,9 @@ grid_stat_Conf.h grid_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/GridStatConfig_defaul
    ##
 
 
-grid_stat_Conf.o: grid_stat_Conf.cc
-	@ echo
-	$(CXX) grid_stat_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
-
-
 grid_stat_conf_info.o: grid_stat_conf_info.cc
 	@ echo
-	$(CXX) grid_stat_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) grid_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -95,9 +82,8 @@ grid_stat_conf_info.o: grid_stat_conf_info.cc
 
 
 grid_stat: grid_stat.cc $(OBJECTS)
-	@ echo
 	$(CXX) -o $(EXECUTABLES) grid_stat.cc $(OBJECTS) \
-	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
+	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_stat_out \
@@ -106,17 +92,16 @@ grid_stat: grid_stat.cc $(OBJECTS)
 	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib $(OPT_LIBS) $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_config \
 	-lvx_cal \
-	-lvx_econfig \
-	-lvx_math \
+	-lvx_config \
 	-lvx_util \
+	-lvx_math \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
@@ -128,7 +113,7 @@ grid_stat: grid_stat.cc $(OBJECTS)
 
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES) $(GEN_SOURCES)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	rm -f $(MET_BIN_DIR)/grid_stat
 
 
