@@ -307,14 +307,14 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    ConcatString method;
    int i, j, k, width;
 
-   // Conf: interp.thresh
-   info.thresh = dict->lookup_double(conf_key_interp_thresh);
+   // Conf: interp.vld_thresh
+   info.vld_thresh = dict->lookup_double(conf_key_interp_vld_thresh);
 
    // Check that the interpolation threshold is between 0 and 1.
-   if(info.thresh < 0.0 || info.thresh > 1.0) {
+   if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "The \"" << conf_key_interp_thresh << "\" parameter ("
-           << info.thresh << ") must be set between 0 and 1.\n\n";
+           << "The \"" << conf_key_interp_vld_thresh << "\" parameter ("
+           << info.vld_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
    }   
 
