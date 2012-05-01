@@ -10,9 +10,11 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <vector>
 
 #include "table_lookup.h"
 #include "vx_util.h"
+#include "vx_math.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1152,29 +1154,70 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool TableFlatFile::lookup_grib2(const char * parm_name, Grib2TableEntry & e, int & n_matches)
+bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
+                                 Grib2TableEntry & e, int & n_matches)
 
 {
 
-e.clear();
+   //  clear the reference arguments
+   e.clear();
+   n_matches = 0;
 
-n_matches = 0;
+   //  build a list of matches
+   vector<Grib2TableEntry*> matches;
+   for(int j=0; j<N_grib2_elements; ++j){
 
-int j;
+      if( g2e[j]->parm_name != parm_name ||
+          (bad_data_int != a && g2e[j]->index_a != a) ||
+          (bad_data_int != b && g2e[j]->index_b != b) ||
+          (bad_data_int != c && g2e[j]->index_c != c) )
+         continue;
 
-for (j=0; j<N_grib2_elements; ++j)  {
+      if( n_matches++ == 0 ) e = *(g2e[j]);
+      matches.push_back( g2e[j] );
 
-   if ( g2e[j]->parm_name != parm_name )  continue;
+   }
 
-   if ( n_matches == 0 )  e = *(g2e[j]);
+   //  if there are multiple matches, print a descriptive warning
+   if( 1 < n_matches ){
 
-   ++n_matches;
+      ConcatString msg;
+      msg << "Multiple table entries match lookup criteria ("
+          << "parm_name = " << parm_name;
+      if( bad_data_int != a ) msg << ", index_a = " << a;
+      if( bad_data_int != b ) msg << ", index_b = " << b;
+      if( bad_data_int != c ) msg << ", index_c = " << c;
+      msg << "):\n";
+      mlog << Warning << "\n" << msg;
+
+      for(vector<Grib2TableEntry*>::iterator it = matches.begin();
+          it < matches.end(); it++)
+         mlog << Warning << "  parm_name: " << (*it)->parm_name
+                         << ", index_a = "  << (*it)->index_a
+                         << ", index_b = "  << (*it)->index_b
+                         << ", index_c = "  << (*it)->index_c << "\n";
+
+      mlog << Warning << "Using: "
+           << "  parm_name: " << e.parm_name
+           << ", index_a = "  << e.index_a
+           << ", index_b = "  << e.index_b
+           << ", index_c = "  << e.index_c << "\n\n";
+
+   }
+
+   return (n_matches > 0);
 
 }
 
 
+////////////////////////////////////////////////////////////////////////
 
-return ( (n_matches > 0) );
+
+bool TableFlatFile::lookup_grib2(const char * parm_name, Grib2TableEntry & e, int & n_matches)
+
+{
+
+   return lookup_grib2(parm_name, bad_data_int, bad_data_int, bad_data_int, e, n_matches);
 
 }
 

@@ -177,6 +177,7 @@ class TableFlatFile {
 
       bool lookup_grib2(int a, int b, int c, Grib2TableEntry &);
       bool lookup_grib2(const char * parm_name, Grib2TableEntry &, int & n_matches);
+      bool lookup_grib2(const char * parm_name, int a, int b, int c, Grib2TableEntry &, int & n_matches);
 
 };
 
