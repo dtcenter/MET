@@ -42,7 +42,7 @@ using namespace std;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo * VarInfoFactory::new_var_info(GrdFileType t) {
+VarInfo * VarInfoFactory::new_var_info(GrdFileType type) {
    VarInfo *vi = (VarInfo *) 0;
 
    //
@@ -50,7 +50,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType t) {
    // The VarInfo object is allocated and needs to be deleted by caller.
    //
 
-   switch(t) {
+   switch(type) {
 
       case FileType_Gb1:
          vi = new VarInfoGrib;
@@ -78,18 +78,23 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType t) {
       case FileType_HdfEos:
 
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
-              << "Support for GrdFileType = " << grdfiletype_to_string(t)
+              << "Support for GrdFileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";
          exit(1);
          break;
 
       default:
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
-              << "unsupported gridded data file type \"" << t
+              << "unsupported gridded data file type \"" << type
               << "\"\n\n";
          exit(1);
          break;
    } // end switch
+
+   mlog << Debug(4)
+        << "VarInfoFactory::new_var_info() -> "
+        << "created new VarInfo object of type \""
+        << grdfiletype_to_string(type) << "\".\n";
 
    return(vi);
 }
