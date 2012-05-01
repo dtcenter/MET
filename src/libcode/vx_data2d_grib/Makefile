@@ -115,21 +115,6 @@ libvx_data2d_grib.a: $(OBJECTS)
    ##  executables
    ##
 
-test_vx_data2d_grib: $(LIBRARIES) test_vx_data2d_grib.cc
-	$(CXX) -o test_vx_data2d_grib test_vx_data2d_grib.cc \
-	$(CXX_FLAGS) -I$(MET_INC_DIR) \
-	-I$(MET_INC_DIR) \
-	-L$(MET_LIB_DIR) \
-	-lvx_data2d_grib \
-	-lvx_data2d \
-	-lvx_grid \
-	-lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log
-
-
 test_read_grib1: test_read_grib1.cc $(LIBRARIES)
 	@ echo
 	$(CXX) test_read_grib1.cc $(CXX_FLAGS) -o test_read_grib1 -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
