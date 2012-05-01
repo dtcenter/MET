@@ -172,7 +172,6 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
       fcst_info[i] = info_factory.new_var_info(ftype);
 
       // Set the GRIB parameter table version number and pass the magic string
-      fcst_info[i]->set_pair(CONFIG_GRIB_PTV, grib_ptv_str);
       fcst_info[i]->set_magic(conf.fcst_field(i).sval());
 
       // Set the requested timing information
@@ -211,9 +210,6 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_
    for(i=0; i<n_vx; i++) {
 
       obs_info[i] = info_factory.new_var_info(otype);
-
-      // Set the GRIB parameter table version number
-      obs_info[i]->set_pair(CONFIG_GRIB_PTV, grib_ptv_str);
 
       // If obs_field is empty, use fcst_field
       if(conf.n_obs_field_elements() == 0) {

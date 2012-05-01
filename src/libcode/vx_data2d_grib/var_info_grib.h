@@ -83,7 +83,6 @@ class VarInfoGrib : public VarInfo
          // set stuff
          //
 
-      void set_pair(const ConcatString &key, const ConcatString &val);
       void set_magic(const ConcatString &);
       void set_dict(Dictionary &);
 

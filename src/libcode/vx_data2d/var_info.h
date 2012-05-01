@@ -93,7 +93,6 @@ class VarInfo
          // set stuff
          //
 
-      virtual void set_pair(const ConcatString &key, const ConcatString &val);
       virtual void set_magic(const ConcatString &);
       virtual void set_dict(Dictionary &);
 
@@ -117,7 +116,7 @@ class VarInfo
       void set_valid(unixtime);
       void set_lead(int);
 
-      void set_level_info_grib(char *);
+      void set_level_info_grib(Dictionary & dict);
 
 
          //

@@ -33,6 +33,7 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_util.h"
 #include "vx_log.h"
+#include "vx_data2d.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -155,22 +156,6 @@ void VarInfoGrib::set_lvl_type(int v) {
 
 void VarInfoGrib::set_p_code(int v) {
    PCode = v;
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void VarInfoGrib::set_pair(const ConcatString &key, const ConcatString &val) {
-
-   // First call the parent's set_pair function.
-   VarInfo::set_pair(key, val);
-
-   // Look for GRIB keywords.
-   if(strcasecmp(key, CONFIG_GRIB_PTV    ) == 0) { PTV     = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB_Code   ) == 0) { Code    = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB_LvlType) == 0) { LvlType = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB_PCode  ) == 0) { PCode   = atoi(val); }
-
    return;
 }
 
@@ -389,11 +374,76 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
 
 void VarInfoGrib::set_dict(Dictionary & dict) {
 
-   ConcatString mag;
-   mag.format("%s/%s", dict.lookup_string("name").text(),
-                       dict.lookup_string("level").text());
-   set_magic(mag);
-   set_req_name( dict.lookup_string("name") );
+   VarInfo::set_dict(dict);
+
+   int tab_match = -1;
+   Grib1TableEntry tab;
+   ConcatString field_name = dict.lookup_string(conf_key_name,      false);
+   int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv, false);
+   int field_rec           = dict.lookup_int   (conf_key_GRIB1_rec, false);
+
+   //  if the GRIB parameter table version is not specified, default to 2
+   if( bad_data_int == field_ptv ) field_ptv = 2;
+
+   //  if the name is specified, use it
+   if( !field_name.empty() ){
+
+      set_name( field_name );
+      set_req_name( field_name );
+
+      //  look up the name in the grib tables
+      if( !GribTable.lookup_grib1(field_name, field_ptv, field_rec, tab, tab_match) ){
+         mlog << Error << "\nVarInfoGrib::set_dict() - unrecognized GRIB1 field abbreviation '"
+              << field_name << "'\n\n";
+         exit(1);
+      }
+
+   }
+
+   //  if the field name is not specified, look for and use indexes
+   else {
+
+      //  if either the field name or the indices are specified, bail
+      if( bad_data_int == field_ptv || bad_data_int == field_rec ){
+         mlog << Error << "\nVarInfoGrib::set_dict() - either name or GRIB1_ptv "
+              << "and GRIB1_rec must be specified in field information\n\n";
+         exit(1);
+      }
+
+      //  use the specified indexes to look up the field name
+      if( !GribTable.lookup_grib1(field_ptv, field_rec, tab) ){
+         mlog << Error << "\nVarInfoGrib::set_dict() - no parameter found with matching "
+              << "GRIB1_ptv ("     << field_ptv     << ") "
+              << "GRIB1_rec ("     << field_rec     << ")\n\n";
+         exit(1);
+      }
+
+      //  use the lookup parameter name
+      field_name = tab.parm_name;
+   }
+
+   //  set the matched parameter lookup information
+   set_name      ( field_name       );
+   set_req_name  ( field_name       );
+   set_ptv       ( tab.table_number );
+   set_code      ( tab.code         );
+   set_units     ( tab.units        );
+   set_long_name ( tab.full_name    );
+
+   //  call the parent to set the level information
+   set_level_info_grib(dict);
+
+   //  if the field name is APCP, apply additional formatting
+   if( field_name == "APCP" ){
+      int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
+      if( 0 == accum % 10000 ) accum /= 10000;
+      set_name( str_format("%s_%02d", field_name.text(), accum) );
+   }
+
+   //  set the magic string
+   MagicStr = str_format("%s/%s", field_name.text(), Level.name().text());
+
+   return;
 
 }
 

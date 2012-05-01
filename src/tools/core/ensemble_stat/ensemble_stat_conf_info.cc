@@ -168,7 +168,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
       ens_info[i] = info_factory.new_var_info(etype);
 
       // Set the GRIB parameter table version number and pass the magic string
-      ens_info[i]->set_pair(CONFIG_GRIB_PTV, grib_ptv_str);
       ens_info[i]->set_magic(conf.ens_field(i).sval());
 
       // Set the requested timing information
@@ -252,7 +251,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
          vx_pd[i].fcst_info = info_factory.new_var_info(etype);
 
          // Set the GRIB parameter table version number and pass the magic string
-         vx_pd[i].fcst_info->set_pair(CONFIG_GRIB_PTV, grib_ptv_str);
          vx_pd[i].fcst_info->set_magic(conf.fcst_field(i).sval());
 
          // Set the requested timing information
@@ -291,9 +289,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
                  << "files have been specified.\n\n";
             exit(1);
          }
-
-         // Set the GRIB parameter table version number
-         vx_pd[i].obs_info->set_pair(CONFIG_GRIB_PTV, grib_ptv_str);
 
          // If obs_field is empty, use fcst_field
          if(conf.n_obs_field_elements() == 0) {
