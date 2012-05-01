@@ -135,19 +135,6 @@ void VarInfoNcMet::add_dimension(int dim) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcMet::set_pair(const ConcatString &key, const ConcatString &val) {
-
-   // First call the parent's set_pair function.
-   VarInfo::set_pair(key, val);
-
-   // Look for NetCDF keywords.
-   if(strcasecmp(key, CONFIG_NetCDF_Dimension) == 0) { Dimension.add(atoi(val)); }
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void VarInfoNcMet::set_magic(const ConcatString &s) {
    char tmp_str[max_str_len];
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;

@@ -275,13 +275,6 @@ void VarInfo::set_lead(int s) {
 
 ///////////////////////////////////////////////////////////////////////////////
  
-void VarInfo::set_pair(const ConcatString &key, const ConcatString &val) {
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void VarInfo::set_magic(const ConcatString &mag) {
 
    //  verify that there are no embedded spaces
@@ -313,6 +306,121 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(dict.last_lookup_status()) set_lead(timestring_to_sec(s));
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_level_info_grib(Dictionary & dict){
+
+   ConcatString field_level = dict.lookup_string(conf_key_level, false);
+   LevelType lt;
+   string lvl_type, lvl_val1, lvl_val2;
+   double lvl1 = -1, lvl2 = -1;
+
+
+   //  if the level string is specified, use it
+   if( ! field_level.empty() ){
+
+      //  parse the level string components
+      int num_mat = 0;
+      char** mat = NULL;
+      const char* pat_mag = "([ALPRZ])([0-9\\.]+)(\\-[0-9\\.]+)?";
+      if( 3 > (num_mat = regex_apply(pat_mag, 4, field_level.text(), mat)) ){
+         mlog << Error << "\nVarInfo::set_level_info_grib() - failed to parse level string '"
+              << field_level << "'\n\n";
+         exit(1);
+      }
+      lvl_type = mat[1];
+      lvl_val1 = mat[2];
+      lvl1 = atof(lvl_val1.data());
+      if( 4 == num_mat ){
+         lvl_val2 = mat[3];
+         lvl2 = atof( lvl_val2.substr(1, lvl_val2.length() - 1).data() );
+      }
+      regex_clean(mat);
+
+      //  set the level type based on the letter abbreviation
+      if      (lvl_type == "A") lt = LevelType_Accum;
+      else if (lvl_type == "Z") lt = LevelType_Vert;
+      else if (lvl_type == "P") lt = LevelType_Pres;
+      else if (lvl_type == "R") lt = LevelType_RecNumber;
+      else if (lvl_type == "L") lt = LevelType_None;
+      else                      lt = LevelType_None;
+
+   }
+
+   //  if the field level is not specified, look for an use indexes
+   else {
+
+      //  read the level index information
+      int    field_lvl_typ  = dict.lookup_int   (conf_key_GRIB_lvl_typ, false);
+      double field_lvl_val1 = dict.lookup_double(conf_key_GRIB_lvl_val1, false);
+      double field_lvl_val2 = dict.lookup_double(conf_key_GRIB_lvl_val2, false);
+
+      //  if the level index information is not specified, bail
+      if( bad_data_int    == field_lvl_typ ||
+          bad_data_double == field_lvl_val1 ){
+         mlog << Error << "\nVarInfo::set_level_info_grib() - either level or GRIB_lvl_typ, "
+              << "GRIB_lvl_val1 and GRIB2_lvl_val2 (if necessary) must be specified in field "
+              << "information\n\n";
+         exit(1);
+      }
+
+      //  set the level value strings
+      lvl_val1 = str_format("%f", field_lvl_val1);
+      lvl_val2 = str_format("%f", field_lvl_val2);
+
+      //  set the level type based on the indexes
+      //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
+      //        http://www.nco.ncep.noaa.gov/pmb/docs/on388/table3.html
+      switch( field_lvl_typ ){
+         case 1:
+            lt = LevelType_Accum; lvl_type = "A"; break;
+         case 100: case 108:
+            lt = LevelType_Pres;  lvl_type = "P"; break;
+         case 102: case 103:
+            lt = LevelType_Vert;  lvl_type = "Z"; break;
+         default:
+            lt = LevelType_None;  lvl_type = "L"; break;
+      }
+
+   }
+
+
+   //  arrange the level values appropriately
+   lvl2 = ( lvl2 != lvl1 ? lvl2 : -1 );
+   if( lt == LevelType_Pres && -1 != lvl2 && lvl2 < lvl1 ){
+      int lvl_tmp = lvl2;
+      lvl2 = lvl1;
+      lvl1 = lvl_tmp;
+   }
+
+   //  format the level name
+   ConcatString lvl_name;
+   if( lvl2 != -1 ) lvl_name.format("%s%d-%d", lvl_type.data(), (int)lvl2, (int)lvl1);
+   else             lvl_name.format("%s%d",    lvl_type.data(), (int)lvl1);
+
+   //  set the level information
+   Level.set_type(lt);
+   Level.set_req_name(lvl_name);
+   Level.set_name(lvl_name);
+
+   //  set the lower limit
+   if(lt == LevelType_Accum) Level.set_lower(timestring_to_sec( lvl_val1.data() ));
+   else                      Level.set_lower(lvl1);
+
+   //  if pressure ranges are not supported for the specified level type, bail
+   if( -1 != lvl2 && lt != LevelType_Pres && lt != LevelType_Vert && lt != LevelType_None ){
+      mlog << Error << "\nVarInfo::set_level_info_grib() - "
+           << "ranges of levels are only supported for pressure levels "
+           << "(P), vertical levels (Z), and generic levels (L)\n\n";
+      exit(1);
+   }
+
+   //  set the upper level value
+   if(lt == LevelType_Accum) Level.set_upper(timestring_to_sec( lvl_val1.data() ));
+   else                      Level.set_upper(-1 == lvl2 ? lvl1 : lvl2);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -454,7 +454,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_units     ( tab.units     );
    set_long_name ( tab.full_name );
 
-
+/*
    //
    //  field level information
    //
@@ -558,9 +558,13 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    //  set the upper level value
    if(lt == LevelType_Accum) Level.set_upper(timestring_to_sec( lvl_val1.data() ));
    else                      Level.set_upper(-1 == lvl2 ? lvl1 : lvl2);
+*/
+
+   //  call the parent to set the level information
+   set_level_info_grib(dict);
 
    //  if the level type is a record number, set the data member
-   set_record( lt == LevelType_RecNumber ? lvl1 : -1 );
+   set_record( Level.type() == LevelType_RecNumber ? Level.lower() : -1 );
 
    //  if the field name is APCP, apply additional formatting
    if( field_name == "APCP" ){

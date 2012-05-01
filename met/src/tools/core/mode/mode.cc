@@ -387,12 +387,10 @@ void process_command_line(int argc, char **argv)
    fcst_info = vfactory.new_var_info(ftype);
     obs_info = vfactory.new_var_info(otype);
 
-   fcst_info->set_pair(CONFIG_GRIB_PTV, grib_ptv_str);
    fcst_info->set_magic(engine.wconf.fcst_field().sval());
    if ( fcst_valid_ut != 0 )  fcst_info->set_valid(fcst_valid_ut);
    if ( !is_bad_data(fcst_lead_sec) ) fcst_info->set_lead(fcst_lead_sec);
 
-   obs_info->set_pair(CONFIG_GRIB_PTV, grib_ptv_str);
    obs_info->set_magic(engine.wconf.obs_field().sval());
    if ( obs_valid_ut != 0 )  obs_info->set_valid(obs_valid_ut);
    if ( !is_bad_data(obs_lead_sec) ) obs_info->set_lead(obs_lead_sec);

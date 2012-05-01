@@ -121,7 +121,7 @@ bool MetGrib2DataFile::open(const char * _filename) {
 
    bool status = ( 0 < RecList.size() );
    if( !status ){
-      mlog << Warning << "GRIB2 records not found in input file '" << Filename << "'\n";
+      mlog << Warning << "\nGRIB2 records not found in input file '" << Filename << "'\n\n";
    }
 
    return status;
@@ -933,7 +933,8 @@ long MetGrib2DataFile::read_grib2_record( long offset,
    cgrib  =  new unsigned char[lgrib];
    retval = fseek(FileGrib2, lskip, SEEK_SET);
    lengrib = fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
-   ierr = g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal);
+   if( g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal) )
+      return -1;
 
    //  read the specified field in the record
    ierr = g2_getfld(cgrib, ifld, unpack, 1, &gfld);

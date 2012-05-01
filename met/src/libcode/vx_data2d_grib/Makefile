@@ -13,8 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = test_read_grib1 \
-              test_vx_data2d_grib
+EXECUTABLES = test_read_grib1
 
 
 OBJECTS     = grib_classes.o \
