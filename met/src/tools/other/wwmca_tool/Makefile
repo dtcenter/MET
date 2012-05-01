@@ -89,62 +89,62 @@ wwmca_regrid_Conf.h wwmca_regrid_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WWMCARegridConf
 
 afwa_file.o: afwa_file.h afwa_file.cc
 	@ echo
-	$(CXX) afwa_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afwa_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 afwa_cp_file.o: afwa_cp_file.h afwa_cp_file.cc
 	@ echo
-	$(CXX) afwa_cp_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afwa_cp_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 afwa_pt_file.o: afwa_pt_file.h afwa_pt_file.cc
 	@ echo
-	$(CXX) afwa_pt_file.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afwa_pt_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 interp_base.o: interp_base.h interp_base.cc
 	@ echo
-	$(CXX) interp_base.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) interp_base.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 min_interp.o: min_interp.h min_interp.cc interp_base.o
 	@ echo
-	$(CXX) min_interp.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) min_interp.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 max_interp.o: max_interp.h max_interp.cc interp_base.o
 	@ echo
-	$(CXX) max_interp.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) max_interp.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ave_interp.o: ave_interp.h ave_interp.cc interp_base.o
 	@ echo
-	$(CXX) ave_interp.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) ave_interp.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 nearest_interp.o: nearest_interp.h nearest_interp.cc interp_base.o
 	@ echo
-	$(CXX) nearest_interp.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) nearest_interp.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 wwmca_regrid_Conf.o: wwmca_regrid_Conf.h wwmca_regrid_Conf.cc
 	@ echo
-	$(CXX) wwmca_regrid_Conf.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) wwmca_regrid_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 gridhemisphere_to_string.o: gridhemisphere_to_string.h gridhemisphere_to_string.cc
 	@ echo
-	$(CXX) gridhemisphere_to_string.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) gridhemisphere_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 wwmca_ref.o: wwmca_ref.h wwmca_ref.cc gridhemisphere_to_string.o wwmca_regrid_Conf.o
 	@ echo
-	$(CXX) wwmca_ref.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) wwmca_ref.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 nc_output.o: nc_output.cc wwmca_ref.o
 	@ echo
-	$(CXX) nc_output.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
+	$(CXX) nc_output.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
 
 
 ########################################################################
@@ -166,7 +166,7 @@ nc_output.o: nc_output.cc wwmca_ref.o
 wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o wwmca_regrid wwmca_regrid.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
+	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \
@@ -204,7 +204,7 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o wwmca_plot wwmca_plot.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map\" \
+	$(CXX_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_shapedata \

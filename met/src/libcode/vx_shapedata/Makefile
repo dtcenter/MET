@@ -104,7 +104,7 @@ mode_Conf.o: mode_Conf.h mode_Conf.cc
 	$(CXX) mode_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 engine.o: engine.h engine.cc
-	$(CXX) engine.cc $(CXX_FLAGS) $(OPT_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) engine.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 
 ########################################################################
