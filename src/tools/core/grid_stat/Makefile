@@ -62,7 +62,7 @@ gen_sources: $(GEN_SOURCES)
 
 grid_stat_conf_info.o: grid_stat_conf_info.cc
 	@ echo
-	$(CXX) grid_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) grid_stat_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -83,7 +83,7 @@ grid_stat_conf_info.o: grid_stat_conf_info.cc
 
 grid_stat: grid_stat.cc $(OBJECTS)
 	$(CXX) -o $(EXECUTABLES) grid_stat.cc $(OBJECTS) \
-	$(CXX_FLAGS) $(OPT_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
+	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_stat_out \
