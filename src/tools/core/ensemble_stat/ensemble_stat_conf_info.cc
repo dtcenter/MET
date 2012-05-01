@@ -282,15 +282,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
       for(i=0; i<n_vx; i++) {
      
          // Allocate a new VarInfoGrib object
-         vx_pd[i].obs_info = new VarInfoGrib;
-
-         // If obs_field is empty and the forecast file type is not GRIB1, error out
-         if(conf.n_obs_field_elements() == 0 && etype != FileType_Gb1) {
-            mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-                 << "When the forecast file is not GRIB1, \"obs_field\" cannot be blank.  "
-                 << "You must specify the verifying observations following the GRIB1 convention.\n\n";
-            exit(1);
-         }
+         vx_pd[i].obs_info = info_factory.new_var_info(otype);
 
          // Check that at least one observation file has been specified
          if(otype == FileType_None) {
