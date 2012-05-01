@@ -98,6 +98,11 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
 
    } // end switch
 
+   mlog << Debug(4)
+        << "Met2dDataFileFactory::new_met_2d_data_file() -> "
+        << "created new Met2dDataFile object of type \""
+        << grdfiletype_to_string(type) << "\".\n";
+
    return(mtddf);
 }
 
