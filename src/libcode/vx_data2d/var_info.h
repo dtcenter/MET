@@ -117,6 +117,9 @@ class VarInfo
       void set_valid(unixtime);
       void set_lead(int);
 
+      void set_level_info_grib(char *);
+
+
          //
          // do stuff
          //

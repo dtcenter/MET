@@ -26,12 +26,13 @@ using namespace std;
 #include <strings.h>
 #include <regex.h>
 
-#include "var_info.h"
 #include "var_info_grib2.h"
 
 #include "math_constants.h"
 #include "vx_log.h"
 #include "vx_util.h"
+#include "vx_data2d.h"
+#include "vx_config.h"
 
 
 map<string,string> map_id;
@@ -223,27 +224,6 @@ void VarInfoGrib2::set_der_type(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoGrib2::set_pair(const ConcatString &key, const ConcatString &val) {
-
-   // First call the parent's set_pair function.
-   VarInfo::set_pair(key, val);
-
-   // Look for GRIB2 keywords.
-   if(strcasecmp(key, CONFIG_GRIB2_Discipline) == 0) { Discipline = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_MTable    ) == 0) { MTable     = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_LTable    ) == 0) { LTable     = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_Tmpl      ) == 0) { Tmpl       = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_ParmCat   ) == 0) { ParmCat    = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_Parm      ) == 0) { Parm       = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_Process   ) == 0) { Process    = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_EnsType   ) == 0) { EnsType    = atoi(val); }
-   if(strcasecmp(key, CONFIG_GRIB2_DerType   ) == 0) { DerType    = atoi(val); }
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void VarInfoGrib2::set_magic(const ConcatString &s) {
 
    // Validate the magic_string
@@ -322,9 +302,9 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
       }
 
       //  if the parameter abbreviation maps to a single index, set the VarInfo data members
-      set_discipline( 1 == num_parm_idx ? atoi(mat[1]) : -1 );
-      set_parm_cat  ( 1 == num_parm_idx ? atoi(mat[2]) : -1 );
-      set_parm      ( 1 == num_parm_idx ? atoi(mat[3]) : -1 );
+      set_discipline( 0 < num_parm_idx ? atoi(mat[1]) : -1 );
+      set_parm_cat  ( 0 < num_parm_idx ? atoi(mat[2]) : -1 );
+      set_parm      ( 0 < num_parm_idx ? atoi(mat[3]) : -1 );
 
       regex_clean(mat);
 
@@ -410,11 +390,189 @@ void VarInfoGrib2::set_magic(const ConcatString &s) {
 
 void VarInfoGrib2::set_dict(Dictionary & dict) {
 
-   ConcatString mag;
-   mag.format("%s/%s", dict.lookup_string("name").text(),
-                       dict.lookup_string("level").text());
-   set_magic(mag);
-   set_req_name( dict.lookup_string("name") );
+   VarInfo::set_dict(dict);
+
+
+   //
+   //  field parameter name
+   //
+
+   int tab_match = -1;
+   Grib2TableEntry tab;
+   ConcatString field_name = dict.lookup_string(conf_key_name,           false);
+   int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,     false);
+   int field_parm_cat      = dict.lookup_int   (conf_key_GRIB2_parm_cat, false);
+   int field_parm          = dict.lookup_int   (conf_key_GRIB2_parm,     false);
+
+   //  if the name is specified, use it
+   if( !field_name.empty() ){
+
+      set_name( field_name );
+      set_req_name( field_name );
+
+      //  look up the name in the grib tables
+      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm,
+                                  tab, tab_match) ){
+         mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 field abbreviation '"
+              << field_name << "'\n\n";
+         exit(1);
+      }
+
+   }
+
+   //  if the field name is not specified, look for and use indexes
+   else {
+
+      //  if either the field name or the indices are specified, bail
+      if( bad_data_int == field_disc ||
+          bad_data_int == field_parm_cat ||
+          bad_data_int == field_parm ){
+         mlog << Error << "\nVarInfoGrib2::set_dict() - either name or GRIB2_disc, GRIB2_parm_cat "
+              << "and GRIB2_parm must be specified in field information\n\n";
+         exit(1);
+      }
+
+      //  use the specified indexes to look up the field name
+      if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, tab) ){
+         mlog << Error << "\nVarInfoGrib2::set_dict() - no parameter found with matching "
+              << "GRIB2_disc ("     << field_disc     << ") "
+              << "GRIB2_parm_cat (" << field_parm_cat << ") "
+              << "GRIB2_parm ("     << field_parm     << ")\n\n";
+         exit(1);
+      }
+
+      //  use the lookup parameter name
+      field_name = tab.parm_name;
+   }
+
+   //  set the matched parameter lookup information
+   set_name      ( field_name    );
+   set_req_name  ( field_name    );
+   set_discipline( tab.index_a   );
+   set_parm_cat  ( tab.index_b   );
+   set_parm      ( tab.index_c   );
+   set_units     ( tab.units     );
+   set_long_name ( tab.full_name );
+
+
+   //
+   //  field level information
+   //
+
+   ConcatString field_level = dict.lookup_string(conf_key_level, false);
+   LevelType lt;
+   string lvl_type, lvl_val1, lvl_val2;
+   double lvl1 = -1, lvl2 = -1;
+
+   //  if the level string is specified, use it
+   if( ! field_level.empty() ){
+
+      //  parse the level string components
+      int num_mat = 0;
+      char** mat = NULL;
+      const char* pat_mag = "([ALPRZ])([0-9\\.]+)(\\-[0-9\\.]+)?";
+      if( 3 > (num_mat = regex_apply(pat_mag, 4, field_level.text(), mat)) ){
+         mlog << Error << "\nVarInfoGrib2::set_dict() - failed to parse level string '"
+              << field_level << "'\n\n";
+         exit(1);
+      }
+      lvl_type = mat[1];
+      lvl_val1 = mat[2];
+      lvl1 = atof(lvl_val1.data());
+      if( 4 == num_mat ){
+         lvl_val2 = mat[3];
+         lvl2 = atof( lvl_val2.substr(1, lvl_val2.length() - 1).data() );
+      }
+      regex_clean(mat);
+
+      //  set the level type based on the letter abbreviation
+      if      (lvl_type == "A") lt = LevelType_Accum;
+      else if (lvl_type == "Z") lt = LevelType_Vert;
+      else if (lvl_type == "P") lt = LevelType_Pres;
+      else if (lvl_type == "R") lt = LevelType_RecNumber;
+      else if (lvl_type == "L") lt = LevelType_None;
+      else                      lt = LevelType_None;
+
+   }
+
+   //  if the field level is not specified, look for an use indexes
+   else {
+
+      //  read the level index information
+      int    g2_lvl_typ  = dict.lookup_int   (conf_key_GRIB2_lvl_typ, false);
+      double g2_lvl_val1 = dict.lookup_double(conf_key_GRIB2_lvl_val1, false);
+      double g2_lvl_val2 = dict.lookup_double(conf_key_GRIB2_lvl_val2, false);
+
+      //  if the level index information is not specified, bail
+      if( bad_data_int    == g2_lvl_typ ||
+          bad_data_double == g2_lvl_val1 ){
+         mlog << Error << "\nVarInfoGrib2::set_dict() - either level or GRIB2_lvl_typ, GRIB2_lvl_val1 "
+              << "and GRIB2_lvl_val2 (if necessary) must be specified in field information\n\n";
+         exit(1);
+      }
+
+      //  set the level value strings
+      lvl_val1 = str_format("%f", g2_lvl_val1);
+      lvl_val2 = str_format("%f", g2_lvl_val2);
+
+      //  set the level type based on the indexes
+      lt = g2_lty_to_level_type(g2_lvl_typ);
+      if      (lt == LevelType_Accum)     lvl_type = "A";
+      else if (lt == LevelType_Vert)      lvl_type = "Z";
+      else if (lt == LevelType_Pres)      lvl_type = "P";
+      else if (lt == LevelType_RecNumber) lvl_type = "R";
+      else if (lt == LevelType_None)      lvl_type = "L";
+
+   }
+
+   //  arrange the level values appropriately
+   lvl2 = ( lvl2 != lvl1 ? lvl2 : -1 );
+   if( lt == LevelType_Pres && -1 != lvl2 && lvl2 < lvl1 ){
+      int lvl_tmp = lvl2;
+      lvl2 = lvl1;
+      lvl1 = lvl_tmp;
+   }
+
+   //  format the level name
+   ConcatString lvl_name;
+   if( lvl2 != -1 ) lvl_name.format("%s%d-%d", lvl_type.data(), (int)lvl2, (int)lvl1);
+   else             lvl_name.format("%s%d",    lvl_type.data(), (int)lvl1);
+
+   //  set the level information
+   Level.set_type(lt);
+   Level.set_req_name(lvl_name);
+   Level.set_name(lvl_name);
+
+   //  set the lower limit
+   if(lt == LevelType_Accum) Level.set_lower(timestring_to_sec( lvl_val1.data() ));
+   else                      Level.set_lower(lvl1);
+
+   //  if pressure ranges are not supported for the specified level type, bail
+   if( -1 != lvl2 && lt != LevelType_Pres && lt != LevelType_Vert && lt != LevelType_None ){
+      mlog << Error << "\nVarInfoGrib2::set_dict() - "
+           << "ranges of levels are only supported for pressure levels "
+           << "(P), vertical levels (Z), and generic levels (L)\n\n";
+      exit(1);
+   }
+
+   //  set the upper level value
+   if(lt == LevelType_Accum) Level.set_upper(timestring_to_sec( lvl_val1.data() ));
+   else                      Level.set_upper(-1 == lvl2 ? lvl1 : lvl2);
+
+   //  if the level type is a record number, set the data member
+   set_record( lt == LevelType_RecNumber ? lvl1 : -1 );
+
+   //  if the field name is APCP, apply additional formatting
+   if( field_name == "APCP" ){
+      int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
+      if( 0 == accum % 10000 ) accum /= 10000;
+      set_name( str_format("%s_%02d", field_name.text(), accum) );
+   }
+
+   //  set the magic string
+   MagicStr = str_format("%s/%s", field_name.text(), Level.name().text());
+
+   return;
 
 }
 
@@ -462,43 +620,53 @@ string g2_id_parm(const char* id){
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_precipitation() const {
-
-   return(false);
+   return Discipline == 0 &&
+          ParmCat    == 1 &&
+          (
+             Parm == 8  ||       //  APCP
+             Parm == 9  ||       //  NCPCP
+             Parm == 10          //  ACPCP
+          );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_specific_humidity() const {
-
-   return(false);
+   return Discipline == 0 &&
+          ParmCat    == 1 &&
+          Parm       == 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_u_wind() const {
-
-   return(false);
+   return Discipline == 0 &&
+          ParmCat    == 2 &&
+          Parm       == 2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_v_wind() const {
-
-   return(false);
+   return Discipline == 0 &&
+          ParmCat    == 2 &&
+          Parm       == 3;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_wind_speed() const {
-
-   return(false);
+   return Discipline == 0 &&
+          ParmCat    == 2 &&
+          Parm       == 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_wind_direction() const {
-
-   return(false);
+   return Discipline == 0 &&
+          ParmCat    == 2 &&
+          Parm       == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -299,9 +299,6 @@ void VarInfo::set_magic(const ConcatString &mag) {
 
 void VarInfo::set_dict(Dictionary &dict) {
    ConcatString s;
-
-   // Set the name but error out if not present
-   set_name(dict.lookup_string(conf_key_name));
    
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
