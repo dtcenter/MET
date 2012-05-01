@@ -25,7 +25,7 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const int grid_debug_level = 3;
+static const int grid_debug_level = 4;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -322,9 +322,6 @@ void get_latlon_data_v3(NcFile * ncfile, LatLonData & data)
 
 NcAtt * att = (NcAtt *) 0;
 
-mlog << Debug(grid_debug_level)
-     << "It's a Lat/Lon (PlateCarree or Equidistant Cylindrical) grid...\n";
-
    // Store the grid name
 data.name = latlon_proj_type;
 
@@ -379,9 +376,6 @@ void get_lambert_data_v3(NcFile * ncfile, LambertData & data)
 {
 
 NcAtt * att = (NcAtt *) 0;
-
-mlog << Debug(grid_debug_level)
-     << "It's a Lambert Conformal grid...\n";
 
    // Store the grid name
 data.name = lambert_proj_type;
@@ -465,12 +459,8 @@ void get_stereographic_data_v3(NcFile * ncfile, StereographicData & data)
 NcAtt * att = (NcAtt *) 0;
 const char * c = (const char *) 0;
 
-mlog << Debug(grid_debug_level)
-     << "It's a Polar Stereographic grid...\n";
-
    // Store the grid name
 data.name = stereographic_proj_type;
-
 
    // Hemisphere
 get_att(ncfile, att, "hemisphere");
@@ -551,9 +541,6 @@ void get_mercator_data_v3(NcFile * ncfile, MercatorData & data)
 
 NcAtt * att = (NcAtt *) 0;
 
-mlog << Debug(grid_debug_level)
-     << "It's a Mercator grid...\n";
-
    // Store the grid name
 data.name = mercator_proj_type;
 
@@ -610,9 +597,6 @@ void get_latlon_data_v2(NcFile * ncfile, LatLonData & data)
 
 NcAtt * att = (NcAtt *) 0;
 
-mlog << Debug(grid_debug_level)
-     << "It's a Lat/Lon (PlateCarree or Equidistant Cylindrical) grid...\n";
-
    // Store the grid name
 data.name = latlon_proj_type;
 
@@ -667,9 +651,6 @@ void get_lambert_data_v2(NcFile * ncfile, LambertData & data)
 {
 
 NcAtt * att = (NcAtt *) 0;
-
-mlog << Debug(grid_debug_level)
-     << "It's a Lambert Conformal grid...\n";
 
    // Store the grid name
 data.name = lambert_proj_type;
@@ -750,9 +731,6 @@ void get_stereographic_data_v2(NcFile * ncfile, StereographicData & data)
 
 NcAtt * att = (NcAtt *) 0;
 
-mlog << Debug(grid_debug_level)
-     << "It's a Polar Stereographic grid...\n";
-
    // Store the grid name
 data.name = stereographic_proj_type;
 
@@ -830,9 +808,6 @@ void get_mercator_data_v2(NcFile * ncfile, MercatorData & data)
 {
 
 NcAtt * att = (NcAtt *) 0;
-
-mlog << Debug(grid_debug_level)
-     << "It's a Mercator grid...\n";
 
    // Store the grid name
 data.name = mercator_proj_type;
