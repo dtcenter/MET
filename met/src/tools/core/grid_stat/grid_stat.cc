@@ -160,43 +160,28 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
-   ConcatString fcst_grid_info, obs_grid_info;
 
    out_dir = ".";
 
-   //
-   // check for zero arguments
-   //
-   if (argc == 1)
-      usage();
+   // Check for zero arguments
+   if(argc == 1) usage();
 
-   //
-   // parse the command line into tokens
-   //
+   // Parse the command line into tokens
    cline.set(argc, argv);
 
-   //
-   // set the usage function
-   //
+   // Set the usage function
    cline.set_usage(usage);
 
-   //
-   // add the options function calls
-   //
+   // Add the options function calls
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
 
-   //
-   // parse the command line
-   //
+   // Parse the command line
    cline.parse();
 
-   //
-   // Check for error. There should be three arguments left; the
-   // forecast filename, the observation filename, and the config
-   // filename.
-   //
+   // Check for error. There should be three arguments left:
+   // forecast, observation, and config filenames
    if(cline.n() != 3) usage();
 
    // Store the input forecast and observation file names
@@ -204,42 +189,7 @@ void process_command_line(int argc, char **argv) {
    obs_file    = cline[1];
    config_file = cline[2];
 
-   // Read the input forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file))) {
-      mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Read the input observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file))) {
-      mlog << Error << "\nTrouble reading observation file \""
-           << obs_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Store the input data file types
-   ftype = fcst_mtddf->file_type();
-   otype = obs_mtddf->file_type();
-
-   // Check that the grids match
-   if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
-
-      fcst_grid_info = fcst_mtddf->grid().serialize();
-      obs_grid_info  = obs_mtddf->grid().serialize();
-      
-      mlog << Error << "\nprocess_scores() -> "
-           << "The forecast and observation grids do not match: "
-           << fcst_grid_info << " != " << obs_grid_info << "\n\n";
-      exit(1);
-   }
-   // If they do, store the grid
-   else {
-      grid = fcst_mtddf->grid();
-   }
-   
    // Create the default config file name
-
    default_config_file = replace_path(default_config_filename);
 
    // List the config files
@@ -262,18 +212,32 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Read observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, ftype))) {
+   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
-   }   
+   }
 
-   // Store the input file types
+   // Store the input data file types
    ftype = fcst_mtddf->file_type();
    otype = obs_mtddf->file_type();
 
    // Process the configuration
    conf_info.process_config(ftype, otype);
+
+   // Check that the grids match
+   if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
+      
+      mlog << Error << "\nprocess_scores() -> "
+           << "The forecast and observation grids do not match: "
+           << fcst_mtddf->grid().serialize() << " != "
+           << obs_mtddf->grid().serialize() << "\n\n";
+      exit(1);
+   }
+   // If they do, store the grid
+   else {
+      grid = fcst_mtddf->grid();
+   }
 
    // Set the model name
    shc.set_model(conf_info.model);
