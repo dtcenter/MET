@@ -436,12 +436,64 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    //  if the field name is APCP, apply additional formatting
    if( field_name == "APCP" ){
       int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
-      if( 0 == accum % 10000 ) accum /= 10000;
-      set_name( str_format("%s_%02d", field_name.text(), accum) );
+      if( 0 == accum % 10000 ) set_name( str_format("%s_%02d", field_name.text(), accum/1000) );
+      else                     set_name( str_format("%s_%06d", field_name.text(), accum)      );
    }
 
    //  set the magic string
    MagicStr = str_format("%s/%s", field_name.text(), Level.name().text());
+
+   //  check for a probability boolean setting
+   if( dict.lookup_bool(conf_key_prob, false) ){
+      set_p_flag( true );
+      return;
+   }
+
+   //  check for a probability dictionary setting
+   Dictionary* dict_prob;
+   if( NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false)) )
+      return;
+
+   //  prob can either be a dict or a bool
+   ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
+
+
+   field_ptv              = dict_prob->lookup_int   (conf_key_GRIB1_ptv, false);
+   field_rec              = dict_prob->lookup_int   (conf_key_GRIB1_rec, false);
+   SingleThresh thresh_lo = dict_prob->lookup_thresh(conf_key_thresh_lo, false);
+   SingleThresh thresh_hi = dict_prob->lookup_thresh(conf_key_thresh_hi, false);
+   delete dict_prob;
+
+   if( !GribTable.lookup_grib1(prob_name, field_ptv, field_rec, tab, tab_match) ){
+      mlog << Error << "\nVarInfoGrib::set_dict() - unrecognized GRIB1 probability field "
+           << "abbreviation '" << field_name << "'\n\n";
+      exit(1);
+   }
+
+   if( thresh_na == thresh_lo.get_type() && thresh_na == thresh_lo.get_type() ){
+      mlog << Error << "\nVarInfoGrib::set_dict() - at least one probability threshold "
+           << "(thresh_lo and/or thresh_hi) must be defined\n\n";
+      exit(1);
+   }
+
+   set_p_flag      ( true      );
+   set_p_code      ( tab.code  );
+   set_p_units     ( tab.units );
+   set_p_thresh_lo ( thresh_lo );
+   set_p_thresh_hi ( thresh_hi );
+
+   //  build the corresponding magic string
+   MagicStr = str_format("PROB(%s%s%s)/%s/PROB",
+                           (thresh_na == thresh_lo.get_type() ? "" :
+                                 str_format("%f%s", p_thresh_lo().get_thresh(),
+                                            thresh_type_str[p_thresh_lo().get_type()])),
+                           field_name.text(),
+                           (thresh_na == thresh_hi.get_type() ? "" :
+                                 str_format("%s%f", p_thresh_hi().get_thresh(),
+                                            thresh_type_str[p_thresh_hi().get_type()])),
+                           Level.name().text());
+
+
 
    return;
 
