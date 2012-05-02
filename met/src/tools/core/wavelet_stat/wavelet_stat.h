@@ -64,25 +64,10 @@ static const char * program_name = "wavelet_stat";
 static const char * default_config_filename =
    "MET_BASE/data/config/WaveletStatConfig_default";
 
-// static const char * default_out_dir = "MET_BASE/out/wavelet_stat";
 static const char * default_out_dir = ".";
 
 // Text file abbreviations
 static const char *isc_file_abbr = "isc";
-
-static const char * grid_decomp_str[] = {
-   "Auto", "User-Defined", "Padding"
-};
-
-static const char * mask_missing_str[] = {
-   "Off", "Fcst", "Obs", "Fcst/Obs"
-};
-
-static const char * wavelet_str[] = {
-   "Haar",       "Centered-Haar",
-   "Daubechies", "Centered-Daubechies",
-   "Bspline",    "Centered-Bspline"
-};
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -106,7 +91,6 @@ static int          obs_lead_sec  = bad_data_int;
 
 // Optional arguments
 static ConcatString out_dir;
-static ConcatString met_data_dir;
 
 ////////////////////////////////////////////////////////////////////////
 //

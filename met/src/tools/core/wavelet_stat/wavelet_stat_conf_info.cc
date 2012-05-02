@@ -46,12 +46,12 @@ WaveletStatConfInfo::~WaveletStatConfInfo() {
 void WaveletStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   wvlt_ptr      = (gsl_wavelet *) 0;
-   wvlt_work_ptr = (gsl_wavelet_workspace *) 0;
-   fcst_info     = (VarInfo **)     0;
-   obs_info      = (VarInfo **)     0;
+   fcst_info     = (VarInfo **)    0;
+   obs_info      = (VarInfo **)    0;
    fcst_ta       = (ThreshArray *) 0;
    obs_ta        = (ThreshArray *) 0;
+   wvlt_ptr      = (gsl_wavelet *) 0;
+   wvlt_work_ptr = (gsl_wavelet_workspace *) 0;
 
    clear();
 
@@ -61,19 +61,28 @@ void WaveletStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void WaveletStatConfInfo::clear() {
+   int i;
 
    // Set counts to zero
-   n_vx         = 0;
    max_n_thresh = 0;
    n_tile       = 0;
-   tile_dim     = 0;
    n_scale      = 0;
 
-   // Initialize the pad bounding box
-   pad_bb.set_llwh(0.0, 0.0, 0.0, 0.0);
-
+   model.clear();
+   mask_missing_flag = FieldType_None;
+   grid_decomp_flag = GridDecompType_None;
+   tile_dim = 0;
    tile_xll.clear();
    tile_yll.clear();
+   pad_bb.set_llwh(0.0, 0.0, 0.0, 0.0);
+   wvlt_type = WaveletType_None;
+   nc_pairs_flag = false;
+   ps_plot_flag = false;
+   met_data_dir.clear();
+   output_prefix.clear();
+   version.clear();
+   
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    // Deallocate memory
    if(wvlt_ptr)      { wavelet_free(wvlt_ptr);                }
@@ -81,13 +90,21 @@ void WaveletStatConfInfo::clear() {
    if(fcst_ta)       { delete [] fcst_ta;   fcst_ta   = (ThreshArray *) 0; }
    if(obs_ta)        { delete [] obs_ta;    obs_ta    = (ThreshArray *) 0; }
 
-   // Clear fcst_info and obs_info
-   for(int i=0; i<n_vx; i++) {
-      if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      if(obs_info[i])  { delete obs_info[i];  obs_info[i]  = (VarInfo *) 0; }
+   // Clear fcst_info
+   if(fcst_info) {
+      for(i=0; i<n_vx; i++)
+         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
+      delete fcst_info; fcst_info = (VarInfo **) 0;
    }
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo **) 0; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo **) 0; }
+
+   // Clear obs_info
+   if(obs_info) {
+      for(i=0; i<n_vx; i++)
+         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
+      delete obs_info; obs_info = (VarInfo **) 0;
+   }
+
+   // Reset count
    n_vx = 0;
 
    return;
@@ -96,9 +113,9 @@ void WaveletStatConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void WaveletStatConfInfo::read_config(const char *default_file_name,
-                                   const char *user_file_name,
-                                   GrdFileType ftype, unixtime fcst_valid_ut, int fcst_lead_sec,
-                                   GrdFileType otype, unixtime obs_valid_ut, int obs_lead_sec) {
+                                      const char *user_file_name) {
+   // Read the config file constants
+   conf.read(replace_path(config_const_filename));
 
    // Read the default config file
    conf.read(default_file_name);
@@ -106,370 +123,266 @@ void WaveletStatConfInfo::read_config(const char *default_file_name,
    // Read the user-specified config file
    conf.read(user_file_name);
 
-   // Process the configuration file
-   process_config(ftype, fcst_valid_ut, fcst_lead_sec,
-                  otype, obs_valid_ut, obs_lead_sec);
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void WaveletStatConfInfo::process_config(GrdFileType ftype, unixtime fcst_valid_ut, int fcst_lead_sec,
-                                         GrdFileType otype, unixtime obs_valid_ut, int obs_lead_sec) {
-   int i, k;
-   ConcatString grib_ptv_str;
-   gsl_wavelet_type wvlt_type;
+void WaveletStatConfInfo::process_config(GrdFileType ftype,
+                                         GrdFileType otype) {
+   int i, n;
    VarInfoFactory info_factory;
+   map<STATLineType,STATOutputType>output_map;
+   Dictionary *fcst_dict = (Dictionary *) 0;
+   Dictionary *obs_dict  = (Dictionary *) 0;
+   Dictionary *dict      = (Dictionary *) 0;
+   Dictionary i_fcst_dict, i_obs_dict;
+   gsl_wavelet_type type;
+   
+   // Dump the contents of the config file
+   if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
-   //
+   // Initialize
+   clear();
+
    // Conf: version
-   //
+   version = parse_conf_version(&conf);
 
-   check_met_version(conf.version().sval());
-
-   //
    // Conf: model
-   //
+   model = parse_conf_model(&conf);
 
-   if(strlen(conf.model().sval()) == 0 ||
-      check_reg_exp(ws_reg_exp, conf.model().sval()) == true) {
+   // Conf: output_flag
+   output_map = parse_conf_output_flag(&conf);
 
+   // Make sure the output_flag is the expected size
+   if((signed int) output_map.size() != n_txt) {
       mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "The model name (\"" << conf.model().sval()
-           << "\") must be non-empty and contain no embedded "
-           << "whitespace.\n\n";
+           << "Unexpected number of entries found in \""
+           << conf_key_output_flag << "\" ("
+           << (signed int) output_map.size()
+           << " != " << n_txt << ").\n\n";
       exit(1);
    }
 
-   //
-   // Conf: grib_ptv
-   //
+   // Populate the output_flag array with map values
+   for(i=0,n=0; i<n_txt; i++) {
+      output_flag[i] = output_map[txt_file_type[i]];
+      if(output_flag[i] != STATOutputType_None) n++;
+   }
 
-   // Store the grib_ptv as a string to be passed to the VarInfo objects
-   grib_ptv_str << conf.grib_ptv().ival();
-
-   //
-   // Conf: fcst_field
-   //
-
-   // Parse out the forecast fields to be verified
-   n_vx = conf.n_fcst_field_elements();
-
-   if(n_vx == 0) {
-
+   // Check for at least one output line type
+   if(n == 0) {
       mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "At least one value must be provided "
-           << "for fcst_field.\n\n";
+           << "At least one output STAT type must be requested.\n\n";
       exit(1);
    }
 
-   // Allocate space to store the forecast field information
-   fcst_info = new VarInfo * [n_vx];
+   // Conf: fcst.field and obs.field
+   fcst_dict = conf.lookup_array(conf_key_fcst_field);
+   obs_dict  = conf.lookup_array(conf_key_obs_field);
 
-   // Parse the fcst_field information
+   // Determine the number of fields (name/level) to be verified
+   n_vx = parse_conf_n_vx(fcst_dict);
+
+   // Check for a valid number of verification tasks
+   if(n_vx == 0 || parse_conf_n_vx(obs_dict) != n_vx) {
+      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
+           << "The number of verification tasks in \""
+           << conf_key_obs_field
+           << "\" must be non-zero and match the number in \""
+           << conf_key_fcst_field << "\".\n\n";
+      exit(1);
+   }
+
+   // Allocate space based on the number of verification tasks
+   fcst_info = new VarInfo *   [n_vx];
+   obs_info  = new VarInfo *   [n_vx];
+   fcst_ta   = new ThreshArray [n_vx];
+   obs_ta    = new ThreshArray [n_vx];
+   
+   // Parse the fcst and obs field information
+   max_n_thresh = 0;
    for(i=0; i<n_vx; i++) {
+
+      // Allocate new VarInfo objects
       fcst_info[i] = info_factory.new_var_info(ftype);
+      obs_info[i]  = info_factory.new_var_info(otype);
 
-      // Set the GRIB parameter table version number and pass the magic string
-      fcst_info[i]->set_magic(conf.fcst_field(i).sval());
+      // Get the current dictionaries
+      i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
+      i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
-      // Set the requested timing information
-      if(fcst_valid_ut > 0)           fcst_info[i]->set_valid(fcst_valid_ut);
-      if(!is_bad_data(fcst_lead_sec)) fcst_info[i]->set_lead(fcst_lead_sec);
+      // Set the current dictionaries
+      fcst_info[i]->set_dict(i_fcst_dict);
+      obs_info[i]->set_dict(i_obs_dict);
 
-      // No support for WDIR
-      if(fcst_info[i]->is_wind_direction()) {
+      // Dump the contents of the current VarInfo
+      if(mlog.verbosity_level() >= 5) {
+         mlog << Debug(5)
+              << "Parsed forecast field number " << i+1 << ":\n";
+         fcst_info[i]->dump(cout);
+         mlog << Debug(5)
+              << "Parsed observation field number " << i+1 << ":\n";
+         obs_info[i]->dump(cout);
+      }
 
+      // No support for wind direction
+      if(fcst_info[i]->is_wind_direction() ||
+         obs_info[i]->is_wind_direction()) {
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "the wind direction field may not be verified "
               << "using wavelet_stat.\n\n";
          exit(1);
       }
-   }
+      
+      // Conf: cat_thresh
+      fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_cat_thresh);
+      obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_cat_thresh);
 
-   //
-   // Conf: obs_field
-   //
-
-   // Check if the length of obs_field is non-zero and
-   // not equal to n_vx
-   if(conf.n_obs_field_elements() != 0 &&
-      conf.n_obs_field_elements() != n_vx) {
-
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "The length of obs_field must be the same as the "
-           << "length of fcst_field.\n\n";
-      exit(1);
-   }
-
-   // Allocate pointers for obs VarInfo objects
-   obs_info = new VarInfo * [n_vx];
-
-   // Parse the obs field information
-   for(i=0; i<n_vx; i++) {
-
-      obs_info[i] = info_factory.new_var_info(otype);
-
-      // If obs_field is empty, use fcst_field
-      if(conf.n_obs_field_elements() == 0) {
-         obs_info[i]->set_magic(conf.fcst_field(i).sval());
+      // Dump the contents of the current thresholds
+      if(mlog.verbosity_level() >= 5) {
+         mlog << Debug(5)
+              << "Parsed thresholds for forecast field number " << i+1 << ":\n";
+         fcst_ta[i].dump(cout);
+         mlog << Debug(5)
+              << "Parsed thresholds for observation field number " << i+1 << ":\n";
+         obs_ta[i].dump(cout);
       }
-      else {
-         obs_info[i]->set_magic(conf.obs_field(i).sval());
-      }
-
-      // Set the requested timing information
-      if(obs_valid_ut > 0)           obs_info[i]->set_valid(obs_valid_ut);
-      if(!is_bad_data(obs_lead_sec)) obs_info[i]->set_lead(obs_lead_sec);
-
-      // No support for wind direction
-      if(obs_info[i]->is_wind_direction()) {
-
-         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "the wind direction field may not be verified "
-              << "using grid_stat.\n\n";
-         exit(1);
-      }
-   }
-
-   //
-   // Conf: fcst_thresh
-   //
-
-   // Check that the number of forecast threshold levels matches n_vx
-   if(conf.n_fcst_thresh_elements() != n_vx) {
-
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "The number of fcst_thresh levels provided must match the "
-           << "number of fields provided in fcst_field.\n\n";
-      exit(1);
-   }
-
-   // Allocate space to store the forecast threshold information
-   fcst_ta = new ThreshArray [n_vx];
-
-   // Parse the fcst threshold information
-   for(i=0; i<n_vx; i++) {
-      fcst_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
-   }
-
-   //
-   // Conf: obs_thresh
-   //
-
-   // Check if the length of obs_thresh is non-zero and
-   // not equal to n_vx
-   if(conf.n_obs_thresh_elements() != 0 &&
-      conf.n_obs_thresh_elements() != n_vx) {
-
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "The number obs_thresh levels provided must match the "
-           << "number of fields provided in obs_field.\n\n";
-      exit(1);
-   }
-
-   // Allocate space to store the threshold information
-   obs_ta = new ThreshArray [n_vx];
-
-   // Parse the obs threshold information
-   for(i=0; i<n_vx; i++) {
-
-      // If obs_thresh is empty, use fcst_thresh
-      if(conf.n_obs_thresh_elements() == 0) {
-         obs_ta[i].parse_thresh_str(conf.fcst_thresh(i).sval());
-      }
-      else {
-         obs_ta[i].parse_thresh_str(conf.obs_thresh(i).sval());
-      }
-   }
-
-   //
-   // Compute max_n_thresh
-   //
-   for(i=0, max_n_thresh=0; i<n_vx; i++) {
 
       // Check for the same number of fcst and obs thresholds
       if(fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
-
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "The number of thresholds for each field in "
-              << "fcst_thresh must match the number of thresholds "
-              << "for each field in obs_thresh.\n\n";
+              << "The number of forecast and observation thresholds must match "
+              << "for each field.\n\n";
          exit(1);
       }
 
-      if(fcst_ta[i].n_elements() > max_n_thresh)
-         max_n_thresh = fcst_ta[i].n_elements();
-   }
+      // Keep track of the maximum number of thresholds
+      if(fcst_ta[i].n_elements() > max_n_thresh) max_n_thresh = fcst_ta[i].n_elements();
+      
+   } // end for i
 
-   //
    // Conf: mask_missing_flag
-   //
+   mask_missing_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_missing_flag));
 
-   i = conf.mask_missing_flag().ival();
-
-   if(i < 0 || i > 3) {
-
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "The mask_missing_flag must be set to an integer value "
-           << "between 0 and 3!\n\n";
-      exit(1);
-   }
-
-   //
    // Conf: grid_decomp_flag
-   //
+   grid_decomp_flag = parse_conf_grid_decomp_flag(&conf);
 
-   i = conf.grid_decomp_flag().ival();
+   // Only check tile definitions for GridDecompType_Tile
+   if(grid_decomp_flag == GridDecompType_Tile) {
+   
+      // Conf: tile.width
+      tile_dim = conf.lookup_int(conf_key_tile_width);
 
-   if(i < 0 || i > 2) {
-
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "The grid decomposition flag must be set "
-           << "between 0 and 2.\n\n";
-      exit(1);
-   }
-
-   //
-   // Only check the tile dimension parameters if the
-   // grid_decomp_flag = 1
-   //
-   if(conf.grid_decomp_flag().ival() == 1) {
-
-      //
-      // Conf: tile_xll and tile_yll
-      //
-      if(conf.n_tile_xll_elements() != conf.n_tile_yll_elements()) {
-
+      // Compute the number of scales
+      if((n_scale = get_pow2(tile_dim)) < 0) {
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "The number of entries in tile_xll must match "
-              << "the number of entries in tile_yll.\n\n";
+              << "The \"" << conf_key_tile_width
+              << "\" parameter must be set to an integer power of 2.\n\n";
          exit(1);
       }
+      
+      // Conf: tile.location
+      dict = conf.lookup_array(conf_key_tile_location);
 
-      //
-      // Conf: tile_dim and n_scale
-      //
-      if((n_scale = get_pow2(conf.tile_dim().ival())) < 0) {
+      // Loop over the array entries
+      for(i=0; i<dict->n_entries(); i++) {
 
-         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "The tile_dim parameter must be set to an integer "
-              << "power of 2 when requesting tiling.\n\n";
-         exit(1);
+         // Retrieve the x_ll and y_ll tile locations
+         tile_xll.add((*dict)[i]->dict_value()->lookup_int(conf_key_x_ll));
+         tile_yll.add((*dict)[i]->dict_value()->lookup_int(conf_key_y_ll));
       }
    }
 
-   //
-   // Conf: wavelet_flag
-   //
+   // Conf: wavelet.type
+   wvlt_type = parse_conf_wavelet_type(&conf);
 
-   i = conf.wavelet_flag().ival();
-
-   if(i < 0 || i > 6) {
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "The wavelet_flag must be set to an integer value "
-           << "between 0 and 6!\n\n";
-      exit(1);
-   }
-
-   // Get the requested wavelet type
-   switch(i) {
-
-      case(0):
-         wvlt_type = *(gsl_wavelet_haar);
-         break;
-
-      case(1):
-         wvlt_type = *(gsl_wavelet_haar_centered);
-         break;
-
-      case(2):
-         wvlt_type = *(gsl_wavelet_daubechies);
-         break;
-
-      case(3):
-         wvlt_type = *(gsl_wavelet_daubechies_centered);
-         break;
-
-      case(4):
-         wvlt_type = *(gsl_wavelet_bspline);
-         break;
-
-      case(5):
-         wvlt_type = *(gsl_wavelet_bspline_centered);
-         break;
-
+   // Process the wavelet type
+   switch(wvlt_type) {
+      case(WaveletType_Haar):         type = *(gsl_wavelet_haar); break;
+      case(WaveletType_Haar_Cntr):    type = *(gsl_wavelet_haar_centered); break;
+      case(WaveletType_Daub):         type = *(gsl_wavelet_daubechies); break;
+      case(WaveletType_Daub_Cntr):    type = *(gsl_wavelet_daubechies_centered); break;
+      case(WaveletType_BSpline):      type = *(gsl_wavelet_bspline); break;
+      case(WaveletType_BSpline_Cntr): type = *(gsl_wavelet_bspline_centered); break;
+      case(WaveletType_None):
       default:
-
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "Unexpected flag value of " << i << "!\n\n";
+              << "Unsupported wavelet type value of " << wvlt_type << ".\n\n";
          exit(1);
          break;
    }
 
-   //
-   // Conf: wavelet_k
-   //
+   // Conf: wavelet.member
+   wvlt_member = conf.lookup_int(conf_key_wavelet_member);
 
-   k = conf.wavelet_k().ival();
+   // Check for valid member number
+   switch(wvlt_type) {
+      case(WaveletType_Haar):
+      case(WaveletType_Haar_Cntr):
+         if(wvlt_member != 2) {
+            mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
+                 << "For Haar wavelets, \"" << conf_key_wavelet_member
+                 << "\" must be set to 2.\n\n";
+            exit(1);
+         }
+         break;
 
-   // Haar Wavelets: Check for valid k
-   if(i == 0 || i == 1) {
-      if(k != 2) {
+      case(WaveletType_Daub):
+      case(WaveletType_Daub_Cntr):
+         if(wvlt_member < 4 || wvlt_member > 20 || wvlt_member%2 == 1) {
+            mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
+                 << "For Daubechies wavelets, \"" << conf_key_wavelet_member
+                 << "\" must be set to an even integer between 4 and 20.\n\n";
+            exit(1);
+         }
+         break;
 
+      case(WaveletType_BSpline):
+      case(WaveletType_BSpline_Cntr):
+         if(wvlt_member != 103 && wvlt_member != 105 && wvlt_member != 202 &&
+            wvlt_member != 204 && wvlt_member != 206 && wvlt_member != 208 &&
+            wvlt_member != 301 && wvlt_member != 303 && wvlt_member != 305 &&
+            wvlt_member != 307 && wvlt_member != 309) {
+            mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
+                 << "For BSpline wavelets, \"" << conf_key_wavelet_member
+                 << "\" must be set to one of: 103, 105, 202, 204, 206, "
+                 << "208, 301, 303, 305, 307, 309.\n\n";
+            exit(1);
+         }
+         break;
+        
+      case(WaveletType_None):
+      default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "For Haar wavelets, wavelet_k must be set to 2.\n\n";
+              << "Unsupported wavelet type value of " << wvlt_type << ".\n\n";
          exit(1);
-      }
+         break;
    }
-   // Daubechies Wavelets: Check for valid k
-   else if(i == 2 || i == 3) {
-      if(k < 4 || k > 20 || k%2 == 1) {
+   
+   // Initialize the requested wavelet
+   wvlt_ptr = wavelet_set(&type, wvlt_member);
+   
+   // Conf: nc_pairs_flag
+   nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
 
-         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "For Daubechies wavelets, wavelet_k must be set to "
-              << "an even integer between 4 and 20.\n\n";
-         exit(1);
-      }
-   }
-   // Bspline Wavelets: Check for valid k
-   else if(i == 4 || i == 5) {
-      if(k != 103 && k != 105 && k != 202 && k != 204 && k != 206 &&
-         k != 208 && k != 301 && k != 303 && k != 305 && k != 307 &&
-         k != 309) {
+   // Conf: ps_plot_flag
+   ps_plot_flag = conf.lookup_bool(conf_key_ps_plot_flag);
 
-         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "For Daubechies wavelets, wavelet_k must be set to "
-              << "one of: 103, 105, 202, 204, 206, 208, 301, 303, 305, "
-              << "307, 309.\n\n";
-         exit(1);
-      }
-   }
+   // Conf: met_data_dir
+   met_data_dir = replace_path(conf.lookup_string(conf_key_met_data_dir));
 
-   // Set the wavelet pointer
-   wvlt_ptr = wavelet_set(&wvlt_type, k);
+   // Conf: fcst_raw_plot
+   fcst_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
 
-   //
-   // Conf: output_flag
-   //
+   // Conf: obs_raw_plot
+   obs_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
 
-   // Make sure the output_flag is the expected length
-   if(conf.n_output_flag_elements() != n_out) {
-
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "Unexpected number of elements in the output_flag "
-           << "parameter.\n\n";
-      exit(1);
-   }
-
-   // Check that at least one output STAT type is requested
-   if(conf.output_flag(0).ival() <= flag_no_out) {
-
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "At least one output STAT type must be requested.\n\n";
-      exit(1);
-   }
+   // Conf: wvlt_plot
+   wvlt_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_wvlt_plot));
+   
+   // Conf: output_prefix
+   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    return;
 }
@@ -481,12 +394,12 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
    ConcatString msg;
 
    // Handle the grid_decomp_flag by setting up the tiles to be used
-   switch(conf.grid_decomp_flag().ival()) {
+   switch(grid_decomp_flag) {
 
       // Tile the input data using tiles of dimension n by n where n
       // is the largest integer power of 2 less than the smallest
       // dimension of the input data and allowing no overlap.
-      case(0):
+      case(GridDecompType_Auto):
 
          center_tiles(grid.nx(), grid.ny());
 
@@ -503,17 +416,10 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
          break;
 
       // Apply the tiles specified in the configuration file
-      case(1):
+      case(GridDecompType_Tile):
 
-         // Store the tile_xll and tile_yll values
-         n_tile = conf.n_tile_xll_elements();
-         for(i=0; i<n_tile; i++) {
-            tile_xll.add(conf.tile_xll(i).ival());
-            tile_yll.add(conf.tile_yll(i).ival());
-         }
-
-         // Store the tile dimension specified
-         tile_dim = conf.tile_dim().ival();
+         // Number of tiles based on the user-specified locations
+         n_tile = tile_xll.n_elements();
 
          msg  << "\nTiling Method: Apply " << n_tile
               << " tile(s) specified in the configuration file "
@@ -529,14 +435,13 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
 
       // Setup tiles for padding the input fields out to the nearest
       // integer power of two
-      case(2):
+      case(GridDecompType_Pad):
 
          pad_tiles(grid.nx(), grid.ny());
 
          msg  << "\nTiling Method: Apply " << n_tile
-              << " tile padded out "
-              << "to dimension = " << tile_dim
-              << " and lower-left (x, y) = ";
+              << " tile padded out to dimension = "
+              << tile_dim << " and lower-left (x, y) = ";
 
          for(i=0; i<n_tile; i++)
             msg << "(" << tile_xll[i] << ", " << tile_yll[i] << ") ";
@@ -545,10 +450,11 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
 
          break;
 
+      case(GridDecompType_None):
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_tiles() -> "
-              << "unexpected value for grid_decomp_flag: "
-              << conf.grid_decomp_flag().ival() << "\n\n";
+              << "Unsupported grid decomposition type of "
+              << grid_decomp_flag << ".\n\n";
          exit(1);
          break;
    } // end switch

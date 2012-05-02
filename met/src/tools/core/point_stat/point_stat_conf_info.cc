@@ -327,7 +327,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
          i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
         
-         // Conf: thresh
+         // Conf: cat_thresh
          fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_cat_thresh);
          obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_cat_thresh);
          

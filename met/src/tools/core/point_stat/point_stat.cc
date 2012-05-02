@@ -483,7 +483,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
                         const char *suffix, ConcatString &str) {
    int mon, day, yr, hr, min, sec;
    int l_hr, l_min, l_sec;
-   char tmp_str[max_str_len];
+   ConcatString date_str;
 
    //
    // Create output file name
@@ -499,9 +499,9 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    // Append the timing information
    sec_to_hms(lead_sec, l_hr, l_min, l_sec);
    unix_to_mdyhms(valid_ut, mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV",
+   date_str.format("%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV",
            l_hr, l_min, l_sec, yr, mon, day, hr, min, sec);
-   str << "_" << tmp_str;
+   str << "_" << date_str;
 
    // Append the suffix
    str << suffix;

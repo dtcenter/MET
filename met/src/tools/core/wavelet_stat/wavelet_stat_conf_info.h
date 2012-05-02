@@ -15,7 +15,7 @@
 
 #include <iostream>
 
-#include "wavelet_stat_Conf.h"
+#include "vx_config.h"
 
 #include "vx_data2d.h"
 #include "vx_grid.h"
@@ -24,21 +24,17 @@
 #include "vx_math.h"
 #include "vx_gsl_prob.h"
 #include "vx_statistics.h"
-#include "result.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 // Indices for the output flag types in the configuration file
-static const int i_isc    = 0;
-static const int i_nc     = 1;
-static const int i_ps     = 2;
-static const int n_out    = 3;
+static const int i_isc = 0;
+static const int n_txt = 1;
 
-// Enumeration to store possible output flag values
-enum OutputFlag {
-   flag_no_out   = 0,
-   flag_stat_out = 1,
-   flag_txt_out  = 2
+// Text file type
+static const STATLineType txt_file_type[n_txt] = {
+   stat_isc
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,39 +49,46 @@ class WaveletStatConfInfo {
       int n_vx;              // Number of fields to be verified
       int max_n_thresh;      // Maximum number of thresholds
       int n_tile;            // Number of tiles to apply
-      int tile_dim;          // Tile dimension
       int n_scale;           // Number of scales based on tile_dim
 
    public:
 
       // Wavelet-Stat configuration object
-      wavelet_stat_Conf conf;
+      MetConfig conf;
 
-      // Pointer for the wavelet and wavelet workspace to be used
-      gsl_wavelet           *wvlt_ptr;
-      gsl_wavelet_workspace *wvlt_work_ptr;
-
-      // Various objects to store the data that's parsed from the
-      // Wavelet-Stat configuration object
-      VarInfo     **fcst_info;  // Array of pointers for fcst VarInfo [n_vx]
-      VarInfo     **obs_info;   // Array of pointers for obs VarInfo [n_vx]
-      ThreshArray *fcst_ta;     // Array for fcst thresholds [n_vx]
-      ThreshArray *obs_ta;      // Array for obs thresholds [n_vx]
-
-      NumArray     tile_xll;    // Array of lower-left x coordinates
-      NumArray     tile_yll;    // Array of lower-left y coordinates
-      Box          pad_bb;      // Pad bouding box
+      // Store data parsed from the Grid-Stat configuration object
+      ConcatString            model;              // Model name
+      VarInfo **              fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
+      VarInfo **              obs_info;           // Array of pointers for obs VarInfo [n_vx]
+      ThreshArray *           fcst_ta;            // Array for fcst thresholds [n_vx]
+      ThreshArray *           obs_ta;             // Array for obs thresholds [n_vx]
+      FieldType               mask_missing_flag;  // Mask missing data between fcst and obs
+      GridDecompType          grid_decomp_flag;   // Method for grid decomposition
+      int                     tile_dim;           // Tile dimension      
+      NumArray                tile_xll;           // Array of lower-left x coordinates
+      NumArray                tile_yll;           // Array of lower-left y coordinates
+      Box                     pad_bb;             // Pad bouding box
+      WaveletType             wvlt_type;          // Wavelet type
+      int                     wvlt_member;        // Wavelet member k-value
+      gsl_wavelet           * wvlt_ptr;           // GSL wavelet pointer
+      gsl_wavelet_workspace * wvlt_work_ptr;      // GSL wavelet workspace
+      STATOutputType          output_flag[n_txt]; // Flag for each output line type
+      bool                    nc_pairs_flag;      // Flag for the output NetCDF pairs file
+      bool                    ps_plot_flag;       // Flag for the output PostScript image file
+      ConcatString            met_data_dir;       // MET data directory
+      PlotInfo                fcst_raw_pi;        // Raw forecast plotting info
+      PlotInfo                obs_raw_pi;         // Raw observation plotting info
+      PlotInfo                wvlt_pi;            // Wavelet plotting
+      ConcatString            output_prefix;      // String to customize output file name
+      ConcatString            version;            // Config file version
 
       WaveletStatConfInfo();
      ~WaveletStatConfInfo();
 
       void clear();
 
-      void read_config   (const char *, const char *,
-                          GrdFileType, unixtime, int,
-                          GrdFileType, unixtime, int);
-      void process_config(GrdFileType, unixtime, int,
-                          GrdFileType, unixtime, int);
+      void read_config   (const char *, const char *);
+      void process_config(GrdFileType, GrdFileType);
       void process_tiles (const Grid &);
       void center_tiles  (int, int);
       void pad_tiles     (int, int);

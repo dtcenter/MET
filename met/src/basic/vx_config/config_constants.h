@@ -153,6 +153,18 @@ struct NbrhdInfo {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Struct to store plotting information
+//
+
+struct PlotInfo {
+   ConcatString color_table; // Color table file
+   double       plot_min;    // Minimum plot value
+   double       plot_max;    // Maximum plot value
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for duplicate_flag configuration parameter
 //
 
@@ -164,10 +176,43 @@ enum DuplicateType {
 
 ////////////////////////////////////////////////////////////////////////
 
+//
+// Enumeration for grid_decomp_flag configuration parameter
+//
+
+enum GridDecompType {
+   GridDecompType_None, // Default
+   GridDecompType_Auto, // Automatic tiling
+   GridDecompType_Tile, // User-specified tile definitions
+   GridDecompType_Pad   // Pad out to next largest tile
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for wavelet.type configuration parameter
+//
+
+enum WaveletType {
+   WaveletType_None,        // Default
+   WaveletType_Haar,        // Haar wavelet
+   WaveletType_Haar_Cntr,   // Centered Haar wavelet
+   WaveletType_Daub,        // Daubechies wavelet
+   WaveletType_Daub_Cntr,   // Centered Daubechies wavelet
+   WaveletType_BSpline,     // BSpline wavelet
+   WaveletType_BSpline_Cntr // Centered BSpline wavelet
+};
+
+////////////////////////////////////////////////////////////////////////
+//
+// Constants used in configuartion files
+//
+////////////////////////////////////////////////////////////////////////
+
 static const char config_const_filename[] = "MET_BASE/data/config/ConfigConstants";
 
 //
-// Constants for parameter names used in configuartion files
+// Parameter key names common to multiple tools
 //
 
 static const char conf_key_version[]           = "version";
@@ -220,9 +265,30 @@ static const char conf_key_duplicate_flag[]    = "duplicate_flag";
 static const char conf_key_rank_corr_flag[]    = "rank_corr_flag";
 static const char conf_key_tmp_dir[]           = "tmp_dir";
 static const char conf_key_output_prefix[]     = "output_prefix";
+static const char conf_key_met_data_dir[]      = "met_data_dir";
+static const char conf_key_color_table[]       = "color_table";
+static const char conf_key_plot_min[]          = "plot_min";
+static const char conf_key_plot_max[]          = "plot_max";
 
 //
-// Constants for parameter values used in configuartion files
+// Wavelet-Stat specific parameter key names
+//
+
+static const char conf_key_mask_missing_flag[] = "mask_missing_flag";
+static const char conf_key_grid_decomp_flag[]  = "grid_decomp_flag";
+static const char conf_key_tile_width[]        = "tile.width";
+static const char conf_key_tile_location[]     = "tile.location";
+static const char conf_key_x_ll[]              = "x_ll";
+static const char conf_key_y_ll[]              = "y_ll";
+static const char conf_key_wavelet_type[]      = "wavelet.type";
+static const char conf_key_wavelet_member[]    = "wavelet.member";
+static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
+static const char conf_key_fcst_raw_plot[]     = "fcst_raw_plot";
+static const char conf_key_obs_raw_plot[]      = "obs_raw_plot";
+static const char conf_key_wvlt_plot[]         = "wvlt_plot";
+
+//
+// Parameter value names common to multiple tools
 //
 
 // File types
@@ -247,6 +313,23 @@ static const char conf_val_bca[]    = "BCA";
 // Duplicate flag values
 static const char conf_val_unique[] = "UNIQUE";
 static const char conf_val_single[] = "SINGLE";
+
+//
+// Wavelet-Stat specific parameter value names
+//
+
+// Grid decomposition flag values
+static const char conf_val_auto[] = "AUTO";
+static const char conf_val_tile[] = "TILE";
+static const char conf_val_pad[]  = "PAD";
+
+// Supported wavelet types
+static const char conf_val_haar[]         = "HAAR";
+static const char conf_val_haar_cntr[]    = "HAAR_CNTR";
+static const char conf_val_daub[]         = "DAUB";
+static const char conf_val_daub_cntr[]    = "DAUB_CNTR";
+static const char conf_val_bspline[]      = "BSPLINE";
+static const char conf_val_bspline_cntr[] = "BSPLINE_CNTR";
 
 ////////////////////////////////////////////////////////////////////////
 
