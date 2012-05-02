@@ -43,3 +43,16 @@ BCA          = 2;
 // Duplicate flag settings
 UNIQUE       = 2;
 SINGLE       = 3;
+
+// Grid decomposition flag settings
+AUTO         = 2;
+TILE         = 3;
+PAD          = 4;
+
+// Wavelet types
+HAAR         = 2;
+HAAR_CNTR    = 3;
+DAUB         = 4;
+DAUB_CNTR    = 5;
+BSPLINE      = 6;
+BSPLINE_CNTR = 7;

@@ -161,7 +161,8 @@ void process_command_line(int argc, char **argv) {
    GrdFileType ftype, otype;
    ConcatString default_config_file;
 
-   out_dir = ".";
+   // Set the default output directory
+   out_dir = replace_path(default_out_dir);
 
    // Check for zero arguments
    if(argc == 1) usage();
@@ -184,7 +185,7 @@ void process_command_line(int argc, char **argv) {
    // forecast, observation, and config filenames
    if(cline.n() != 3) usage();
 
-   // Store the input forecast and observation file names
+   // Store the input file names
    fcst_file   = cline[0];
    obs_file    = cline[1];
    config_file = cline[2];
@@ -1061,7 +1062,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
                         const char *suffix, ConcatString &str) {
    int mon, day, yr, hr, min, sec;
    int l_hr, l_min, l_sec;
-   char tmp_str[max_str_len];
+   ConcatString date_str;
 
    //
    // Create output file name
@@ -1077,9 +1078,9 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    // Append the timing information
    sec_to_hms(lead_sec, l_hr, l_min, l_sec);
    unix_to_mdyhms(valid_ut, mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV",
+   date_str.format("%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV",
            l_hr, l_min, l_sec, yr, mon, day, hr, min, sec);
-   str << "_" << tmp_str;
+   str << "_" << date_str;
 
    // Append the suffix
    str << suffix;

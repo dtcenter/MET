@@ -16,15 +16,13 @@
 EXECUTABLES = wavelet_stat
 
 
-OBJECTS     = wavelet_stat_Conf.o \
-              wavelet_stat_conf_info.o
+OBJECTS     = wavelet_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = wavelet_stat_Conf.h \
-              wavelet_stat_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -54,23 +52,12 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-wavelet_stat_Conf.h wavelet_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/WaveletStatConfig_default
-	@ echo
-	@ rm -f wavelet_stat_Conf.h wavelet_stat_Conf.cc
-	$(ECONFIG_CODEGEN) -class wavelet_stat_Conf -outfile wavelet_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/WaveletStatConfig_default
-
-
 ########################################################################
 
 
    ##
    ##  objects
    ##
-
-
-wavelet_stat_Conf.o: wavelet_stat_Conf.cc
-	@ echo
-	$(CXX) wavelet_stat_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 wavelet_stat_conf_info.o: wavelet_stat_conf_info.cc
@@ -119,11 +106,11 @@ wavelet_stat: wavelet_stat.cc $(OBJECTS)
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_config \
 	-lvx_cal \
-	-lvx_econfig \
-	-lvx_math \
+	-lvx_config \
 	-lvx_util \
+	-lvx_math \
+	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)

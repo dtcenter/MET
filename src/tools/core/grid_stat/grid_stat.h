@@ -62,6 +62,9 @@ static const char * program_name = "grid_stat";
 static const char * default_config_filename =
    "MET_BASE/data/config/GridStatConfig_default";
 
+// Default output directory
+static const char * default_out_dir = ".";
+
 // Header columns
 static const char **txt_columns[n_txt] = {
    fho_columns,    ctc_columns,    cts_columns,

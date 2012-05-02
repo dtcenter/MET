@@ -23,9 +23,13 @@
 //   004    08/09/10  Halley Gotway   Add valid time variable attributes
 //                    to NetCDF output.
 //   005    10/20/11  Holmes          Added use of command line class to
-//                                    parse the command line arguments.
+//                    parse the command line arguments.
 //   006    11/14/11  Holmes          Added code to enable reading of
-//                                    multiple config files.
+//                    multiple config files.
+//   007    05/01/12  Halley Gotway   Switch to using vx_config library.
+//   008    05/01/12  Halley Gotway   Move -fcst_valid, -fcst_lead,
+//                    -obs_valid, and -obs_lead command line options
+//                    to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -110,10 +114,6 @@ static void render_image(PSfile *, const DataPlane &, Box &, int);
 static void render_tile(PSfile *, const double *, int, int, Box &);
 
 static void usage();
-static void set_fcst_valid_time(const StringArray &);
-static void set_fcst_lead_time(const StringArray &);
-static void set_obs_valid_time(const StringArray &);
-static void set_obs_lead_time(const StringArray &);
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_postscript(const StringArray &);
@@ -141,100 +141,41 @@ int main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv)
-
-{
-
+void process_command_line(int argc, char **argv) {
    CommandLine cline;
-   ConcatString path;
    GrdFileType ftype, otype;
-   ConcatString fcst_grid_info, obs_grid_info;
    ConcatString default_config_file;
 
    // Set the default output directory
    out_dir = replace_path(default_out_dir);
 
-   //
-   // check for zero arguments
-   //
-   if (argc == 1)
-      usage();
+   // Check for zero arguments
+   if(argc == 1) usage();
 
-   //
-   // parse the command line into tokens
-   //
+   // Parse the command line into tokens
    cline.set(argc, argv);
 
-   //
-   // set the usage function
-   //
+   // Set the usage function
    cline.set_usage(usage);
 
-   //
-   // add the options function calls
-   //
-   cline.add(set_fcst_valid_time, "-fcst_valid", 1);
-   cline.add(set_fcst_lead_time, "-fcst_lead", 1);
-   cline.add(set_obs_valid_time, "-obs_valid", 1);
-   cline.add(set_obs_lead_time, "-obs_lead", 1);
+   // Add the options function calls
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_postscript, "-ps", 0);
    cline.add(set_netcdf, "-nc", 0);
    cline.add(set_verbosity, "-v", 1);
 
-   //
-   // parse the command line
-   //
+   // Parse the command line
    cline.parse();
 
-   //
-   // Check for error. There should be three arguments left; the
-   // forecast filename, the observation filename, and the config
-   // filename.
-   //
-   if (cline.n() != 3) usage();
+   // Check for error. There should be three arguments left:
+   // forecast, observation, and config filenames
+   if(cline.n() != 3) usage();
 
-   //
-   // Store the input forecast and observation file names
-   //
+   // Store the input file names
    fcst_file   = cline[0];
    obs_file    = cline[1];
    config_file = cline[2];
-
-   // Read the input forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file))) {
-      mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Read the input observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file))) {
-      mlog << Error << "\nTrouble reading observation file \""
-           << obs_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Store the input data file types
-   ftype = fcst_mtddf->file_type();
-   otype = obs_mtddf->file_type();
-
-   // Check that the grids match
-   if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
-
-      fcst_grid_info = fcst_mtddf->grid().serialize();
-      obs_grid_info  = obs_mtddf->grid().serialize();
-
-      mlog << Error << "\nprocess_scores() -> "
-           << "The forecast and observation grids do not match: "
-           << fcst_grid_info << " != " << obs_grid_info << "\n\n";
-      exit(1);
-   }
-   // If they do, store the grid
-   else {
-      grid = fcst_mtddf->grid();
-   }
 
    // Create the default config file name
    default_config_file = replace_path(default_config_filename);
@@ -245,15 +186,49 @@ void process_command_line(int argc, char **argv)
         << "User Config File: "    << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file,
-                         ftype, fcst_valid_ut, fcst_lead_sec,
-                         otype, obs_valid_ut, obs_lead_sec);
+   conf_info.read_config(default_config_file, config_file);
 
-   // Set the MET data directory
-   met_data_dir = replace_path(conf_info.conf.met_data_dir().sval());
+   // Get the forecast and observation file types from config, if present
+   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst, false));
+   otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs,  false));
+
+   // Read forecast file
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+      mlog << Error << "\nTrouble reading forecast file \""
+           << fcst_file << "\"\n\n";
+      exit(1);
+   }
+
+   // Read observation file
+   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
+      mlog << Error << "\nTrouble reading observation file \""
+           << obs_file << "\"\n\n";
+      exit(1);
+   }
+
+   // Store the input data file types
+   ftype = fcst_mtddf->file_type();
+   otype = obs_mtddf->file_type();
+
+   // Process the configuration
+   conf_info.process_config(ftype, otype);
+
+   // Check that the grids match
+   if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
+
+      mlog << Error << "\nprocess_scores() -> "
+           << "The forecast and observation grids do not match: "
+           << fcst_mtddf->grid().serialize() << " != "
+           << obs_mtddf->grid().serialize() << "\n\n";
+      exit(1);
+   }
+   // If they do, store the grid
+   else {
+      grid = fcst_mtddf->grid();
+   }
 
    // Set the model name
-   shc.set_model(conf_info.conf.model().sval());
+   shc.set_model(conf_info.model);
 
    // List the input files
    mlog << Debug(1)
@@ -374,14 +349,14 @@ void process_scores() {
            << "Processing " << conf_info.fcst_info[i]->magic_str()
            << " versus " << conf_info.obs_info[i]->magic_str() << ".\n";
 
-      // Mask out the missing data in one field with the other
-      // if requested
-      if(conf_info.conf.mask_missing_flag().ival() == 1 ||
-         conf_info.conf.mask_missing_flag().ival() == 3)
+      // Mask out the missing data between fields
+      if(conf_info.mask_missing_flag == FieldType_Fcst ||
+         conf_info.mask_missing_flag == FieldType_Both)
          mask_bad_data(fcst_dp, obs_dp);
 
-      if(conf_info.conf.mask_missing_flag().ival() == 2 ||
-         conf_info.conf.mask_missing_flag().ival() == 3)
+      // Mask out the missing data between fields      
+      if(conf_info.mask_missing_flag == FieldType_Obs ||
+         conf_info.mask_missing_flag == FieldType_Both)
          mask_bad_data(obs_dp, fcst_dp);
 
       // Get the fill data value to be used for each field
@@ -400,10 +375,9 @@ void process_scores() {
       fill_bad_data(obs_dp_fill,  obs_fill);
 
       // Pad the fields out to the nearest power of two if requsted
-      if(conf_info.conf.grid_decomp_flag().ival() == 2) {
+      if(conf_info.grid_decomp_flag == GridDecompType_Pad) {
          mlog << Debug(2) << "Padding the fields out to the nearest integer "
               << "power of two.\n";
-
          pad_field(fcst_dp_fill, fcst_fill);
          pad_field(obs_dp_fill,  obs_fill);
       }
@@ -431,31 +405,27 @@ void process_scores() {
          get_tile(fcst_dp_fill, obs_dp_fill, i, j, f_na, o_na);
 
          // Compute Intensity-Scale scores
-         if(conf_info.conf.output_flag(i_isc).ival()) {
+         if(conf_info.output_flag[i_isc] != STATOutputType_None) {
 
             // Do the intensity-scale decomposition
             do_intensity_scale(f_na, o_na, isc_info[j], i, j);
 
             // Write out the ISC statistics
-            if(conf_info.conf.output_flag(i_isc).ival()) {
+            for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
+              
+               // Store the tile definition parameters
+               isc_info[j][k].tile_dim = conf_info.get_tile_dim();
+               isc_info[j][k].tile_xll = nint(conf_info.tile_xll[j]);
+               isc_info[j][k].tile_yll = nint(conf_info.tile_xll[j]);
 
-               for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
+               // Set the forecast and observation thresholds
+               shc.set_fcst_thresh(conf_info.fcst_ta[i][k]);
+               shc.set_obs_thresh(conf_info.obs_ta[i][k]);
 
-                  // Store the tile definition parameters
-                  isc_info[j][k].tile_dim = conf_info.get_tile_dim();
-                  isc_info[j][k].tile_xll = nint(conf_info.tile_xll[j]);
-                  isc_info[j][k].tile_yll = nint(conf_info.tile_xll[j]);
-
-                  // Set the forecast and observation thresholds
-                  shc.set_fcst_thresh(conf_info.fcst_ta[i][k]);
-                  shc.set_obs_thresh(conf_info.obs_ta[i][k]);
-
-                  write_isc_row(shc, isc_info[j][k],
-                     conf_info.conf.output_flag(i_isc).ival(),
-                     stat_at, i_stat_row,
-                     isc_at, i_isc_row);
-               }
-            } // end write ISC
+               write_isc_row(shc, isc_info[j][k],
+                  conf_info.output_flag[i_isc] == STATOutputType_Both,
+                  stat_at, i_stat_row, isc_at, i_isc_row);
+            } // end for k
          } // end if
       } // end for j
 
@@ -475,9 +445,8 @@ void process_scores() {
             aggregate_isc_info(isc_info, i, j, isc_aggr);
 
             write_isc_row(shc, isc_aggr,
-               conf_info.conf.output_flag(i_isc).ival(),
-               stat_at, i_stat_row,
-               isc_at, i_isc_row);
+               conf_info.output_flag[i_isc] == STATOutputType_Both,
+               stat_at, i_stat_row, isc_at, i_isc_row);
          }
       }
 
@@ -576,7 +545,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    //
    /////////////////////////////////////////////////////////////////////
 
-   if(conf_info.conf.output_flag(i_isc).ival() >= flag_txt_out) {
+   if(conf_info.output_flag[i_isc] != STATOutputType_None) {
 
 
       // Initialize file stream
@@ -726,25 +695,25 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
                         const char *suffix, ConcatString &str) {
    int mon, day, yr, hr, min, sec;
    int l_hr, l_min, l_sec;
-   ConcatString dateOut;
+   ConcatString date_str;
 
    //
    // Create output file name
    //
 
    // Append the output directory and program name
-   str << cs_erase << out_dir.text() << "/" << program_name;
+   str << cs_erase << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
-   if(strlen(conf_info.conf.output_prefix().sval()) > 0)
-      str << "_" << conf_info.conf.output_prefix().sval();
+   if(conf_info.output_prefix.nonempty())
+      str << "_" << conf_info.output_prefix;
 
    // Append the timing information
    sec_to_hms(lead_sec, l_hr, l_min, l_sec);
    unix_to_mdyhms(valid_ut, mon, day, yr, hr, min, sec);
-   dateOut.format("%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV",
+   date_str.format("%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV",
            l_hr, l_min, l_sec, yr, mon, day, hr, min, sec);
-   str << "_" << dateOut;
+   str << "_" << date_str;
 
    // Append the suffix
    str << suffix;
@@ -943,7 +912,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    int n, ns, n_isc;
    int bnd, row, col;
    int i, j, k;
-   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
+   ConcatString fcst_thresh_str, obs_thresh_str;
 
    // Check the NumArray lengths
    n = f_na.n_elements();
@@ -999,8 +968,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    // Apply each threshold
    for(i=0; i<conf_info.fcst_ta[i_gc].n_elements(); i++) {
 
-      isc_info[i].cts_fcst_thresh.get_abbr_str(fcst_thresh_str);
-      isc_info[i].cts_obs_thresh.get_abbr_str(obs_thresh_str);
+      fcst_thresh_str = isc_info[i].cts_fcst_thresh.get_abbr_str();
+      obs_thresh_str  = isc_info[i].cts_obs_thresh.get_abbr_str();
 
       mlog << Debug(2) << "Computing Intensity-Scale decomposition for "
            << conf_info.fcst_info[i_gc]->magic_str() << " "
@@ -1127,7 +1096,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       // Dump out the scores
       ConcatString msg;
       ConcatString thresh_str;
-      thresh_str.format("%s, %s", fcst_thresh_str, obs_thresh_str);
+      thresh_str << cs_erase << fcst_thresh_str << ", " << obs_thresh_str;
 
       msg << "FBIAS[" << thresh_str << "]\t\t= "
           << isc_info[i].fbias << "\n"
@@ -1182,14 +1151,14 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_gc, int i_thresh,
                         ISCInfo &isc_aggr) {
    int i, j;
    int fy_oy, fy_on, fn_oy, fn_on;
-   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
+   ConcatString fcst_thresh_str, obs_thresh_str;
 
    // Set up the aggregated ISCInfo object
    isc_aggr = isc_info[0][i_thresh];
    isc_aggr.zero_out();
 
-   isc_aggr.cts_fcst_thresh.get_abbr_str(fcst_thresh_str);
-   isc_aggr.cts_obs_thresh.get_abbr_str(obs_thresh_str);
+   fcst_thresh_str = isc_aggr.cts_fcst_thresh.get_abbr_str();
+   obs_thresh_str  = isc_aggr.cts_obs_thresh.get_abbr_str();
 
    mlog << Debug(2) << "Aggregating ISC for "
         << conf_info.fcst_info[i_gc]->magic_str() << " " << fcst_thresh_str
@@ -1532,38 +1501,36 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
-   ConcatString fcst_var_name;
-   ConcatString obs_var_name;
-   ConcatString diff_var_name;
-   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
+   ConcatString fcst_var_name, obs_var_name, diff_var_name;
+   ConcatString fcst_thresh_str, obs_thresh_str;
    ConcatString val;
 
    // Get the string for the threshold applied
-   fcst_st.get_abbr_str(fcst_thresh_str);
-   obs_st.get_abbr_str(obs_thresh_str);
+   fcst_thresh_str = fcst_st.get_abbr_str();
+   obs_thresh_str  = obs_st.get_abbr_str();
 
    // Build the variable names
    fcst_var_name.format("FCST_%s_%s_%s_%s_%s_%s",
            conf_info.fcst_info[i_gc]->name().text(),
            conf_info.fcst_info[i_gc]->level_name().text(),
-           fcst_thresh_str,
+           fcst_thresh_str.text(),
            conf_info.obs_info[i_gc]->name().text(),
            conf_info.obs_info[i_gc]->level_name().text(),
-           obs_thresh_str);
+           obs_thresh_str.text());
    obs_var_name.format("OBS_%s_%s_%s_%s_%s_%s",
            conf_info.fcst_info[i_gc]->name().text(),
            conf_info.fcst_info[i_gc]->level_name().text(),
-           fcst_thresh_str,
+           fcst_thresh_str.text(),
            conf_info.obs_info[i_gc]->name().text(),
            conf_info.obs_info[i_gc]->level_name().text(),
-           obs_thresh_str);
+           obs_thresh_str.text());
    diff_var_name.format("DIFF_%s_%s_%s_%s_%s_%s",
            conf_info.fcst_info[i_gc]->name().text(),
            conf_info.fcst_info[i_gc]->level_name().text(),
-           fcst_thresh_str,
+           fcst_thresh_str.text(),
            conf_info.obs_info[i_gc]->name().text(),
            conf_info.obs_info[i_gc]->level_name().text(),
-           obs_thresh_str);
+           obs_thresh_str.text());
 
    // If this is the binary field, define new variables
    if(i_tile == 0 && i_scale < 0) {
@@ -1629,7 +1596,8 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
               conf_info.obs_info[i_gc]->units().text());
       add_var_att(diff_var, "units", val);
       val.format("%s and %s",
-              fcst_thresh_str, obs_thresh_str);
+              fcst_thresh_str.text(),
+              obs_thresh_str.text());
       add_var_att(diff_var, "threshold", val);
       add_var_att(diff_var, "scale_0", "binary");
       add_var_att(diff_var, "scale_n", "scale 2^(n-1)");
@@ -1732,7 +1700,7 @@ void close_out_files() {
 
    // Write out the contents of the ISC AsciiTable and
    // close the ISC output files
-   if(conf_info.conf.output_flag(i_isc).ival() >= flag_txt_out) {
+   if(conf_info.output_flag[i_isc] == STATOutputType_Both) {
       if(isc_out) {
          *isc_out << isc_at;
          close_txt_file(isc_out, isc_file);
@@ -1797,8 +1765,8 @@ void plot_ps_raw(const DataPlane &fcst_dp,
                  int i_gc) {
    ConcatString label;
    ConcatString tmp_str;
-   char fcst_str[max_str_len], fcst_short_str[max_str_len];
-   char obs_str[max_str_len], obs_short_str[max_str_len];
+   ConcatString fcst_str, fcst_short_str;
+   ConcatString obs_str, obs_short_str;
    double v_tab, h_tab_a, h_tab_b;
    double data_min, data_max;
    int i, mon, day, yr, hr, minute, sec;
@@ -1827,21 +1795,21 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    // Load the raw forecast color table
    //
-   tmp_str = replace_path(conf_info.conf.fcst_raw_color_table().sval());
+   tmp_str = replace_path(conf_info.fcst_raw_pi.color_table);
    mlog << Debug(2) << "Loading forecast raw color table: " << tmp_str << "\n";
    fcst_ct.read(tmp_str);
 
    //
    // Load the raw observation color table
    //
-   tmp_str = replace_path(conf_info.conf.obs_raw_color_table().sval());
+   tmp_str = replace_path(conf_info.obs_raw_pi.color_table);
    mlog << Debug(2) << "Loading observation raw color table: " << tmp_str << "\n";
    obs_ct.read(tmp_str);
 
    //
    // Load the wavelet color table
    //
-   tmp_str = replace_path(conf_info.conf.wvlt_color_table().sval());
+   tmp_str = replace_path(conf_info.wvlt_pi.color_table);
    mlog << Debug(2) << "Loading wavelet color table: " << tmp_str << "\n";
    wvlt_ct.read(tmp_str);
 
@@ -1887,10 +1855,10 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    // If the fcst_raw_plot_min or fcst_raw_plot_max value is set in the
    // config file, rescale the forecast colortable to the requested range
    //
-   if(!is_eq(conf_info.conf.fcst_raw_plot_min().dval(), 0.0) ||
-      !is_eq(conf_info.conf.fcst_raw_plot_max().dval(), 0.0)) {
-      fcst_ct.rescale(conf_info.conf.fcst_raw_plot_min().dval(),
-                      conf_info.conf.fcst_raw_plot_max().dval(),
+   if(!is_eq(conf_info.fcst_raw_pi.plot_min, 0.0) ||
+      !is_eq(conf_info.fcst_raw_pi.plot_max, 0.0)) {
+      fcst_ct.rescale(conf_info.fcst_raw_pi.plot_min,
+                      conf_info.fcst_raw_pi.plot_max,
                       bad_data_double);
    }
 
@@ -1898,10 +1866,10 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    // If the obs_raw_plot_min or obs_raw_plot_max value is set in the
    // config file, rescale the observation colortable to the requested range
    //
-   if(!is_eq(conf_info.conf.obs_raw_plot_min().dval(), 0.0) ||
-      !is_eq(conf_info.conf.obs_raw_plot_max().dval(), 0.0)) {
-      obs_ct.rescale(conf_info.conf.obs_raw_plot_min().dval(),
-                     conf_info.conf.obs_raw_plot_max().dval(),
+   if(!is_eq(conf_info.obs_raw_pi.plot_min, 0.0) ||
+      !is_eq(conf_info.obs_raw_pi.plot_max, 0.0)) {
+      obs_ct.rescale(conf_info.obs_raw_pi.plot_min,
+                     conf_info.obs_raw_pi.plot_max,
                      bad_data_double);
    }
 
@@ -1930,10 +1898,10 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    ps_out->choose_font(31, 24.0);
    ps_out->write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5, label);
 
-   strcpy(fcst_str, "Forecast");
-   strcpy(fcst_short_str, "Fcst");
-   strcpy(obs_str, "Observation");
-   strcpy(obs_short_str, "Obs");
+   fcst_str       = "Forecast";
+   fcst_short_str = "Fcst";
+   obs_str        = "Observation";
+   obs_short_str  = "Obs";
 
    ps_out->choose_font(31, 18.0);
    ps_out->write_centered_text(1, 1, h_tab_1, 727.0, 0.5, 0.5,
@@ -2021,7 +1989,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Model Name:");
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5,
-                               conf_info.conf.model().sval());
+                               conf_info.model);
    v_tab -= plot_text_sep;
 
    //
@@ -2083,7 +2051,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Tile Method:");
-   label =  grid_decomp_str[conf_info.conf.grid_decomp_flag().ival()];
+   label = griddecomptype_to_string(conf_info.grid_decomp_flag);
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
    v_tab -= plot_text_sep;
 
@@ -2130,8 +2098,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Mask Missing:");
-   label.format("%s",
-           mask_missing_str[conf_info.conf.mask_missing_flag().ival()]);
+   label = fieldtype_to_string(conf_info.mask_missing_flag);
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
    v_tab -= plot_text_sep;
 
@@ -2140,9 +2107,8 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Wavelet(k):");
-   label.format("%s (%i)",
-           wavelet_str[conf_info.conf.wavelet_flag().ival()],
-           conf_info.conf.wavelet_k().ival());
+   label = wavelettype_to_string(conf_info.wvlt_type);
+   label << "(" << conf_info.wvlt_member << ")";
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
    v_tab -= plot_text_sep;
 
@@ -2158,7 +2124,7 @@ void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
                   ISCInfo &isc_info,
                   int i_scale, int n_scale) {
    ConcatString label;
-   char fcst_thresh_str[max_str_len], obs_thresh_str[max_str_len];
+   ConcatString fcst_thresh_str, obs_thresh_str;
    Box dim;
    double v_tab, h_tab_a, h_tab_b, h_tab_c, h_tab_d;
    double p;
@@ -2185,10 +2151,10 @@ void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
    // If the wvlt_plot_min or wvlt_plot_max value is set in the
    // config file, rescale the colortable to the requested range.
    //
-   if(!is_eq(conf_info.conf.wvlt_plot_min().dval(), 0.0) ||
-      !is_eq(conf_info.conf.wvlt_plot_max().dval(), 0.0)) {
-      wvlt_ct.rescale(conf_info.conf.wvlt_plot_min().dval(),
-                      conf_info.conf.wvlt_plot_max().dval(),
+   if(!is_eq(conf_info.wvlt_pi.plot_min, 0.0) ||
+      !is_eq(conf_info.wvlt_pi.plot_max, 0.0)) {
+      wvlt_ct.rescale(conf_info.wvlt_pi.plot_min,
+                      conf_info.wvlt_pi.plot_max,
                       bad_data_double);
    }
 
@@ -2207,12 +2173,14 @@ void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   isc_info.cts_fcst_thresh.get_str(fcst_thresh_str, 2);
-   isc_info.cts_obs_thresh.get_str(obs_thresh_str, 2);
+   fcst_thresh_str = isc_info.cts_fcst_thresh.get_str();
+   obs_thresh_str  = isc_info.cts_obs_thresh.get_str();
 
-   label.format("Wavelet-Stat: %s %s vs %s %s",
-                conf_info.fcst_info[i_gc]->magic_str().text(), fcst_thresh_str,
-                conf_info.obs_info[i_gc]->magic_str().text(), obs_thresh_str);
+   label.format("%s %s vs %s %s",
+                conf_info.fcst_info[i_gc]->magic_str().text(),
+                fcst_thresh_str.text(),
+                conf_info.obs_info[i_gc]->magic_str().text(),
+                obs_thresh_str.text());
 
    ps_out->choose_font(31, 24.0);
    v_tab -= 1.0*plot_text_sep;
@@ -2553,7 +2521,7 @@ void draw_map(PSfile *p, Box &dim) {
 
    p->gsave();
    p->setlinewidth(l_width);
-   draw_map(grid, xy_bb, *p, dim, c_map, met_data_dir);
+   draw_map(grid, xy_bb, *p, dim, c_map, conf_info.met_data_dir);
    p->grestore();
 
    return;
@@ -2575,7 +2543,7 @@ void draw_tiles(PSfile *p, Box &dim,
    for(i=tile_start; i<=tile_end; i++) {
 
       // If padding was performed, the tile is the size of the domain
-      if(conf_info.conf.grid_decomp_flag().ival() == 2) {
+      if(conf_info.grid_decomp_flag == GridDecompType_Pad) {
          tile_bb = dim;
       }
       // Find the lower-left and upper-right corners of the tile

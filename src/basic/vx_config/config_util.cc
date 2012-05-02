@@ -315,20 +315,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    v = interp_dict->lookup_int(conf_key_field, false);
 
    // If found, interpret value
-   if(interp_dict->last_lookup_status()) {
-
-      // Convert integer to enumerated FieldType   
-           if(v == conf_const.lookup_int(conf_val_none)) info.field = FieldType_None;
-      else if(v == conf_const.lookup_int(conf_val_both)) info.field = FieldType_Both;
-      else if(v == conf_const.lookup_int(conf_val_fcst)) info.field = FieldType_Fcst;
-      else if(v == conf_const.lookup_int(conf_val_obs))  info.field = FieldType_Obs;
-      else {
-         mlog << Error << "\nparse_conf_interp() -> "
-              << "Unexpected config file value of " << v << " for \""
-              << conf_key_interp << "." << conf_key_field << "\".\n\n";
-         exit(1);
-      }
-   }
+   if(interp_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
    
    // Conf: vld_thresh
    info.vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
@@ -525,6 +512,72 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
+   GridDecompType t;
+   int v;
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_grid_decomp_flag);
+
+   // Convert integer to enumerated GridDecompType
+        if(v == conf_const.lookup_int(conf_val_none)) t = GridDecompType_None;
+   else if(v == conf_const.lookup_int(conf_val_auto)) t = GridDecompType_Auto;
+   else if(v == conf_const.lookup_int(conf_val_tile)) t = GridDecompType_Tile;
+   else if(v == conf_const.lookup_int(conf_val_pad))  t = GridDecompType_Pad;
+   else {
+      mlog << Error << "\nparse_conf_grid_decomp_flag() -> "
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_grid_decomp_flag << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+WaveletType parse_conf_wavelet_type(Dictionary *dict) {
+   WaveletType t;
+   int v;
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_wavelet_type);
+
+   // Convert integer to enumerated WaveletType
+        if(v == conf_const.lookup_int(conf_val_none))         t = WaveletType_None;
+   else if(v == conf_const.lookup_int(conf_val_haar))         t = WaveletType_Haar;
+   else if(v == conf_const.lookup_int(conf_val_haar_cntr))    t = WaveletType_Haar_Cntr;
+   else if(v == conf_const.lookup_int(conf_val_daub))         t = WaveletType_Daub;
+   else if(v == conf_const.lookup_int(conf_val_daub_cntr))    t = WaveletType_Daub_Cntr;
+   else if(v == conf_const.lookup_int(conf_val_bspline))      t = WaveletType_BSpline;
+   else if(v == conf_const.lookup_int(conf_val_bspline_cntr)) t = WaveletType_BSpline_Cntr;
+   else {
+      mlog << Error << "\nparse_conf_wavelet_type() -> "
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_wavelet_type << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+PlotInfo parse_conf_plot_info(Dictionary *dict) {
+   PlotInfo info;
+
+   // Get the color table
+   info.color_table = dict->lookup_string(conf_key_color_table);
+
+   // Get the plotting range
+   info.plot_min = dict->lookup_double(conf_key_plot_min);
+   info.plot_max = dict->lookup_double(conf_key_plot_max);
+
+   return(info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void check_prob_thresh(const ThreshArray &ta) {
    int i, n;
 
@@ -641,6 +694,91 @@ STATLineType string_to_statlinetype(const char *s) {
    else                                         t = no_stat_line_type;
 
    return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+FieldType int_to_fieldtype(int v) {
+   FieldType t;
+
+   // Convert integer to enumerated FieldType
+        if(v == conf_const.lookup_int(conf_val_none)) t = FieldType_None;
+   else if(v == conf_const.lookup_int(conf_val_both)) t = FieldType_Both;
+   else if(v == conf_const.lookup_int(conf_val_fcst)) t = FieldType_Fcst;
+   else if(v == conf_const.lookup_int(conf_val_obs))  t = FieldType_Obs;
+   else {
+      mlog << Error << "\nint_to_fieldtype() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString fieldtype_to_string(FieldType type) {
+   ConcatString s;
+
+   // Convert enumerated FieldType to string
+   switch(type) {
+      case(FieldType_None): s = conf_val_none; break;
+      case(FieldType_Both): s = conf_val_both; break;
+      case(FieldType_Fcst): s = conf_val_fcst; break;
+      case(FieldType_Obs):  s = conf_val_obs; break;
+      default:
+         mlog << Error << "\nfieldtype_to_string() -> "
+              << "Unexpected FieldType value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString griddecomptype_to_string(GridDecompType type) {
+   ConcatString s;
+
+   // Convert enumerated GridDecompType to string
+   switch(type) {
+      case(GridDecompType_None): s = conf_val_none; break;
+      case(GridDecompType_Auto): s = conf_val_auto; break;
+      case(GridDecompType_Tile): s = conf_val_tile; break;
+      case(GridDecompType_Pad):  s = conf_val_pad; break;
+      default:
+         mlog << Error << "\ngriddecomptype_to_string() -> "
+              << "Unexpected GridDecompType value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+   
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString wavelettype_to_string(WaveletType type) {
+   ConcatString s;
+
+   // Convert enumerated WaveletType to string
+   switch(type) {
+      case(WaveletType_None):          s = conf_val_none; break;
+      case(WaveletType_Haar):          s = conf_val_haar; break;
+      case(WaveletType_Haar_Cntr):     s = conf_val_haar_cntr; break;
+      case(WaveletType_Daub):          s = conf_val_daub; break;
+      case(WaveletType_Daub_Cntr):     s = conf_val_daub_cntr; break;
+      case(WaveletType_BSpline):       s = conf_val_bspline; break;
+      case(WaveletType_BSpline_Cntr):  s = conf_val_bspline_cntr; break;
+      default:
+         mlog << Error << "\nwavlettype_to_string() -> "
+              << "Unexpected WaveletType value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+   
+   return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////

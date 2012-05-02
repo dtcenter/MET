@@ -16,8 +16,7 @@
 EXECUTABLES = wavelet_stat
 
 
-OBJECTS     = wavelet_stat_Conf.o \
-              wavelet_stat_conf_info.o
+OBJECTS     = wavelet_stat_conf_info.o
 
 
 LIBRARIES   =
@@ -44,11 +43,6 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  objects
    ##
-
-
-wavelet_stat_Conf.o: wavelet_stat_Conf.cc
-	@ echo
-	$(CXX) wavelet_stat_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 wavelet_stat_conf_info.o: wavelet_stat_conf_info.cc
@@ -97,13 +91,13 @@ wavelet_stat: wavelet_stat.cc $(OBJECTS)
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_config \
-	-lvx_math \
 	-lvx_cal \
-	-lvx_econfig \
+	-lvx_config \
 	-lvx_util \
+	-lvx_math \
+	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
 

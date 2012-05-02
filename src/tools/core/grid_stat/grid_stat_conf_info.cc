@@ -100,13 +100,21 @@ void GridStatConfInfo::clear() {
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)    0; }   
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)   0; }
 
-   // Clear fcst_info and obs_info
-   for(i=0; i<n_vx; i++) {
-      if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      if(obs_info[i])  { delete obs_info[i];  obs_info[i]  = (VarInfo *) 0; }
+   // Clear fcst_info
+   if(fcst_info) {
+      for(i=0; i<n_vx; i++)
+         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
+      delete fcst_info; fcst_info = (VarInfo **) 0;
    }
-   if(fcst_info) { delete [] fcst_info; fcst_info = (VarInfo **) 0; }
-   if(obs_info)  { delete [] obs_info;  obs_info  = (VarInfo **) 0; }
+
+   // Clear obs_info
+   if(obs_info) {
+      for(i=0; i<n_vx; i++)
+         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
+      delete obs_info; obs_info = (VarInfo **) 0;
+   }
+
+   // Reset count
    n_vx = 0;
 
    return;
@@ -300,7 +308,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
          i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
-         // Conf: thresh
+         // Conf: cat_thresh
          fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_cat_thresh);
          obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_cat_thresh);
 
@@ -458,7 +466,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
- return;
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
