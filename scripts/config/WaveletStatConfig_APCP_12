@@ -9,7 +9,7 @@ fcst = {
       {
         name       = "APCP";
         level      = [ "A12" ];
-        cat_thresh = [ >0.0, >=0.5 ];
+        cat_thresh = [ >0.0, >=5.0 ];
       }
    ];
 };
