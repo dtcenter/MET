@@ -458,8 +458,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    //  if the field name is APCP, apply additional formatting
    if( field_name == "APCP" ){
       int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
-      if( 0 == accum % 10000 ) set_name( str_format("%s_%02d", field_name.text(), accum/1000) );
-      else                     set_name( str_format("%s_%06d", field_name.text(), accum)      );
+      if( 0 == accum % 10000 ) set_name( str_format("%s_%02d", field_name.text(), accum/10000) );
+      else                     set_name( str_format("%s_%06d", field_name.text(), accum)       );
    }
 
    //  set the magic string
