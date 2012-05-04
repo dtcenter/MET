@@ -216,7 +216,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    // Parse the fcst and obs field information
    for(i=0; i<n_vx; i++) {
-     
+    
       // Allocate new VarInfo objects
       fcst_info[i] = info_factory.new_var_info(ftype);
       obs_info[i]  = info_factory.new_var_info(otype);

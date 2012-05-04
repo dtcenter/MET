@@ -205,18 +205,14 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    for(i=0,total=0; i<dict->n_entries(); i++) {
 
       // Increment count by the length of the level array
-      lvl     = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level);
-      total  += lvl.n_elements();
+      lvl    = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level);
+      total += lvl.n_elements();
 
       // Check if we're in the correct entry
       if(total > index) {
 
-         const DictionaryEntry *ee = dict->operator[](i);
-
-         i_dict = *(ee->dict_value());
-         
          // Copy the current entry's dictionary
-         //i_dict = *((*dict)[i]->dict_value());
+         i_dict = *((*dict)[i]->dict_value());
 
          // Set up the new entry, taking only a single level value
          entry.set_string(conf_key_level, lvl[index-(total-lvl.n_elements())]);
