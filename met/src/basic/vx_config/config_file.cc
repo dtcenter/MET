@@ -151,7 +151,7 @@ clear();
 
 Filename = c.Filename;
 
-Dictionary::assign(*this);
+Dictionary::assign(c);
 
 Debug = c.Debug;
 
