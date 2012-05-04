@@ -460,7 +460,6 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    field_rec              = dict_prob->lookup_int   (conf_key_GRIB1_rec, false);
    double thresh_lo       = dict_prob->lookup_double(conf_key_thresh_lo, false);
    double thresh_hi       = dict_prob->lookup_double(conf_key_thresh_hi, false);
-   delete dict_prob;
 
    //  if the GRIB parameter table version is not specified, default to 2
    if( bad_data_int == field_ptv ) field_ptv = 2;
