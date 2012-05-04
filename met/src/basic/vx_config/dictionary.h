@@ -17,6 +17,7 @@
 #include "num_array.h"
 #include "string_array.h"
 #include "thresh_array.h"
+#include "vx_cal.h"
 #include "pwl.h"
 
 
@@ -224,16 +225,20 @@ class Dictionary {
          //  convenience functions
          //
 
-      bool         lookup_bool         (const char * name, bool error_out = default_dictionary_error_out);
-      int          lookup_int          (const char * name, bool error_out = default_dictionary_error_out);
-      double       lookup_double       (const char * name, bool error_out = default_dictionary_error_out);
-      NumArray     lookup_num_array    (const char * name, bool error_out = default_dictionary_error_out);
-      ConcatString lookup_string       (const char * name, bool error_out = default_dictionary_error_out);
-      StringArray  lookup_string_array (const char * name, bool error_out = default_dictionary_error_out);
-      SingleThresh lookup_thresh       (const char * name, bool error_out = default_dictionary_error_out);
-      ThreshArray  lookup_thresh_array (const char * name, bool error_out = default_dictionary_error_out);
-      Dictionary * lookup_dictionary   (const char * name, bool error_out = default_dictionary_error_out);
-      Dictionary * lookup_array        (const char * name, bool error_out = default_dictionary_error_out);
+      bool         lookup_bool           (const char * name, bool error_out = default_dictionary_error_out);
+      int          lookup_int            (const char * name, bool error_out = default_dictionary_error_out);
+      double       lookup_double         (const char * name, bool error_out = default_dictionary_error_out);
+      NumArray     lookup_num_array      (const char * name, bool error_out = default_dictionary_error_out);
+      ConcatString lookup_string         (const char * name, bool error_out = default_dictionary_error_out);
+      StringArray  lookup_string_array   (const char * name, bool error_out = default_dictionary_error_out);
+      SingleThresh lookup_thresh         (const char * name, bool error_out = default_dictionary_error_out);
+      ThreshArray  lookup_thresh_array   (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary * lookup_dictionary     (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary * lookup_array          (const char * name, bool error_out = default_dictionary_error_out);
+      int          lookup_seconds        (const char * name, bool error_out = default_dictionary_error_out);
+      NumArray     lookup_seconds_array  (const char * name, bool error_out = default_dictionary_error_out);
+      unixtime     lookup_unixtime       (const char * name, bool error_out = default_dictionary_error_out);
+      TimeArray    lookup_unixtime_array (const char * name, bool error_out = default_dictionary_error_out);
 
 };
 

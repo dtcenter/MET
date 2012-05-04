@@ -17,6 +17,7 @@
 //   000    12/17/08  Halley Gotway   New
 //   001    08/16/11  Halley Gotway   Reimplementation of GO Index job
 //                    with addition of generalized Skill Score Index
+//   002    05/03/12  Halley Gotway  Switch to using vx_config library.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,12 +49,11 @@ static const char * go_index_config_file =
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void set_job_from_config(stat_analysis_Conf &,
-               STATAnalysisJob &);
+extern void set_job_from_config(MetConfig &, STATAnalysisJob &);
 
 extern void do_job(const ConcatString &, STATAnalysisJob &, int,
-                const ConcatString &, const ConcatString &,
-                ofstream *);
+               const ConcatString &, const ConcatString &,
+               ofstream *);
 
 extern void do_job_filter(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *);

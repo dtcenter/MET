@@ -288,6 +288,40 @@ static const char conf_key_obs_raw_plot[]      = "obs_raw_plot";
 static const char conf_key_wvlt_plot[]         = "wvlt_plot";
 
 //
+// STAT-Analysis specific parameter key names
+//
+
+static const char conf_key_fcst_lead[]         = "fcst_lead";
+static const char conf_key_obs_lead[]          = "obs_lead";
+static const char conf_key_fcst_valid_beg[]    = "fcst_valid_beg";
+static const char conf_key_fcst_valid_end[]    = "fcst_valid_end";
+static const char conf_key_obs_valid_beg[]     = "obs_valid_beg";
+static const char conf_key_obs_valid_end[]     = "obs_valid_end";
+static const char conf_key_fcst_init_beg[]     = "fcst_init_beg";
+static const char conf_key_fcst_init_end[]     = "fcst_init_end";
+static const char conf_key_obs_init_beg[]      = "obs_init_beg";
+static const char conf_key_obs_init_end[]      = "obs_init_end";
+static const char conf_key_fcst_init_hour[]    = "fcst_init_hour";
+static const char conf_key_obs_init_hour[]     = "obs_init_hour";
+static const char conf_key_fcst_var[]          = "fcst_var";
+static const char conf_key_obs_var[]           = "obs_var";
+static const char conf_key_fcst_lev[]          = "fcst_lev";
+static const char conf_key_obs_lev[]           = "obs_lev";
+static const char conf_key_obtype[]            = "obtype";
+static const char conf_key_vx_mask[]           = "vx_mask";
+static const char conf_key_interp_mthd[]       = "interp_mthd";
+static const char conf_key_interp_pnts[]       = "interp_pnts";
+static const char conf_key_fcst_thresh[]       = "fcst_thresh";
+static const char conf_key_obs_thresh[]        = "obs_thresh";
+static const char conf_key_alpha[]             = "alpha";
+static const char conf_key_line_type[]         = "line_type";
+static const char conf_key_column[]            = "column";
+static const char conf_key_weight[]            = "weight";
+static const char conf_key_out_alpha[]         = "out_alpha";
+static const char conf_key_vif_flag[]          = "vif_flag";
+static const char conf_key_jobs[]              = "jobs";
+   
+//
 // Parameter value names common to multiple tools
 //
 

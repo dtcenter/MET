@@ -33,6 +33,7 @@
 //                                    multiple config files.
 //   007    01/20/12  Halley Gotway   Modify logic so that command line
 //                    job options override config file job options.
+//   008    05/03/12  Halley Gotway   Switch to using vx_config library.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,9 +83,9 @@ static void set_verbosity(int);
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char * argv []) {
-   int i, n;
-   Result r;
-   ConcatString default_conf_file;
+   int i;
+   StringArray jobs_sa;
+   ConcatString default_config_file;
 
    //
    // Set handler to be called for memory allocation error
@@ -103,12 +104,23 @@ int main(int argc, char * argv []) {
    if(config_file.length() != 0) {
 
       //
-      // Read the default config file first and then read the user's
+      // Create the default config file name
       //
-      default_conf_file = replace_path(default_config_filename);
-      mlog << Debug(1) << "Reading Default Config: " << default_conf_file << "\n";
-      conf.read(default_conf_file);
-      mlog << Debug(1) << "Reading User Config: " << config_file << "\n";
+      default_config_file = replace_path(default_config_filename);
+
+      //
+      // List the config files
+      //
+      mlog << Debug(1)
+           << "Default Config File: " << default_config_file << "\n"
+           << "User Config File: "    << config_file << "\n";
+
+      //
+      // Read config file constants, the default config file,
+      // and then the user config file.
+      //
+      conf.read(replace_path(config_const_filename));
+      conf.read(default_config_file);
       conf.read(config_file);
 
       //
@@ -150,16 +162,14 @@ int main(int argc, char * argv []) {
       process_search_dirs();
 
       //
-      // If a config file was specified, process the jobs in the config
-      // file.
+      // If a config file was specified, process the jobs.
       //
       if(config_file.length() != 0) {
 
-         n = conf.n_jobs_elements();
+         jobs_sa = conf.lookup_string_array(conf_key_jobs);
 
-         for(i=0; i<n; i++) {
-            r = conf.jobs(i);
-            process_job(r.sval(), i+1);
+         for(i=0; i<jobs_sa.n_elements(); i++) {
+            process_job(jobs_sa[i], i+1);
          }
       }
       //
@@ -276,98 +286,65 @@ void sanity_check() {
    //
    // Conf: version
    //
-
-   check_met_version(conf.version().sval());
+   parse_conf_version(&conf);
 
    //
    // Check for fcst_valid_beg > fcst_valid_end
    //
-   ut_beg = timestring_to_unix(conf.fcst_valid_beg().sval());
-   ut_end = timestring_to_unix(conf.fcst_valid_end().sval());
+   ut_beg = conf.lookup_unixtime(conf_key_fcst_valid_beg, false);
+   ut_end = conf.lookup_unixtime(conf_key_fcst_valid_end, false);
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       mlog << Error << "\nsanity_check() -> "
-           << "fcst_valid_beg is after fcst_valid_end: "
-           << conf.fcst_valid_beg().sval() << " > "
-           << conf.fcst_valid_end().sval() << "!\n\n";
-
+           << "\"" << conf_key_fcst_valid_beg << "\" is after \""
+           << conf_key_fcst_valid_end << "\": "
+           << unix_to_yyyymmdd_hhmmss(ut_beg) << " > "
+           << unix_to_yyyymmdd_hhmmss(ut_end) << "!\n\n";
       exit(1);
    }
 
    //
    // Check for obs_valid_beg > obs_valid_end
    //
-   ut_beg = timestring_to_unix(conf.obs_valid_beg().sval());
-   ut_end = timestring_to_unix(conf.obs_valid_end().sval());
+   ut_beg = conf.lookup_unixtime(conf_key_obs_valid_beg, false);
+   ut_end = conf.lookup_unixtime(conf_key_obs_valid_end, false);
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       mlog << Error << "\nsanity_check() -> "
-           << "obs_valid_beg is after obs_valid_end: "
-           << conf.obs_valid_beg().sval() << " > "
-           << conf.obs_valid_end().sval() << "!\n\n";
-
+           << "\"" << conf_key_obs_valid_beg << "\" is after \""
+           << conf_key_obs_valid_end << "\": "
+           << unix_to_yyyymmdd_hhmmss(ut_beg) << " > "
+           << unix_to_yyyymmdd_hhmmss(ut_end) << "!\n\n";
       exit(1);
    }
 
    //
    // Check for fcst_init_beg > fcst_init_end
    //
-   ut_beg = timestring_to_unix(conf.fcst_init_beg().sval());
-   ut_end = timestring_to_unix(conf.fcst_init_end().sval());
+   ut_beg = conf.lookup_unixtime(conf_key_fcst_init_beg, false);
+   ut_end = conf.lookup_unixtime(conf_key_fcst_init_end, false);
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       mlog << Error << "\nsanity_check() -> "
-           << "fcst_init_beg is after fcst_init_end: "
-           << conf.fcst_init_beg().sval() << " > "
-           << conf.fcst_init_end().sval() << "!\n\n";
-
+           << "\"" << conf_key_fcst_init_beg << "\" is after \""
+           << conf_key_fcst_init_end << "\": "
+           << unix_to_yyyymmdd_hhmmss(ut_beg) << " > "
+           << unix_to_yyyymmdd_hhmmss(ut_end) << "!\n\n";
       exit(1);
    }
 
    //
    // Check for obs_init_beg > obs_init_end
    //
-   ut_beg = timestring_to_unix(conf.obs_init_beg().sval());
-   ut_end = timestring_to_unix(conf.obs_init_end().sval());
+   ut_beg = conf.lookup_unixtime(conf_key_obs_init_beg, false);
+   ut_end = conf.lookup_unixtime(conf_key_obs_init_end, false);
 
    if((ut_beg > 0) && (ut_end > 0) && (ut_beg > ut_end)) {
       mlog << Error << "\nsanity_check() -> "
-           << "obs_init_beg is after obs_init_end: "
-           << conf.obs_init_beg().sval() << " > "
-           << conf.obs_init_end().sval() << "!\n\n";
-
-      exit(1);
-   }
-
-   //
-   // Conf: rank_corr_flag
-   //
-   if(conf.rank_corr_flag().ival() != 0 &&
-      conf.rank_corr_flag().ival() != 1) {
-      mlog << Error << "\nsanity_check() -> "
-           << "The rank_corr_flag (" << conf.rank_corr_flag().ival()
-           << ") must be set to 0 or 1.\n\n";
-      exit(1);
-   }
-
-   //
-   // Conf: vif_flag
-   //
-   if(conf.vif_flag().ival() != 0 &&
-      conf.vif_flag().ival() != 1) {
-      mlog << Error << "\nsanity_check() -> "
-           << "The vif_flag (" << conf.vif_flag().ival()
-           << ") must be set to 0 or 1.\n\n";
-      exit(1);
-   }
-
-   //
-   // Conf: tmp_dir
-   //
-   if(opendir(conf.tmp_dir().sval()) == NULL ) {
-      mlog << Error << "\nsanity_check() -> "
-           << "Cannot access the tmp_dir temporary directory: "
-           << conf.tmp_dir().sval() << "\n\n";
+           << "\"" << conf_key_obs_init_beg << "\" is after \""
+           << conf_key_obs_init_end << "\": "
+           << unix_to_yyyymmdd_hhmmss(ut_beg) << " > "
+           << unix_to_yyyymmdd_hhmmss(ut_end) << "!\n\n";
       exit(1);
    }
 
@@ -430,7 +407,7 @@ void set_verbosity(int i) {
 
 void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
-   stat_analysis_Conf go_conf;
+   MetConfig go_conf;
    ConcatString go_conf_file;
 
    //
@@ -481,7 +458,7 @@ void process_search_dirs() {
    // use the config file setting or default setting.
    //
    if(tmp_dir.length() == 0) {
-      if(config_file.length() != 0) tmp_dir = conf.tmp_dir().sval();
+      if(config_file.length() != 0) tmp_dir = parse_conf_tmp_dir(&conf);
       else                          tmp_dir = default_tmp_dir;
    }
 

@@ -887,6 +887,8 @@ IsArray = false;
 
 Parent = (Dictionary *) 0;
 
+LastLookupStatus = false;
+
 return;
 
 }
@@ -1880,6 +1882,71 @@ if ( !Entry || !is_correct_type )  {
 }
 
 return ( Entry->array_value() );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+int Dictionary::lookup_seconds(const char * name, bool error_out)
+
+{
+
+ConcatString cs = lookup_string(name, error_out);
+
+if ( cs.empty() )  return ( bad_data_int );
+else               return ( timestring_to_sec( cs ) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+NumArray Dictionary::lookup_seconds_array(const char * name, bool error_out)
+
+{
+
+StringArray sa = lookup_string_array(name, error_out);
+NumArray na;
+
+int j;
+
+for (j=0; j<sa.n_elements(); ++j)  na.add( timestring_to_sec( sa[j] ));
+
+return ( na );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime Dictionary::lookup_unixtime(const char * name, bool error_out)
+
+{
+
+ConcatString cs = lookup_string(name, error_out);
+
+if ( cs.empty() )  return ( (unixtime) 0 );
+else               return ( timestring_to_unix( cs ) );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+TimeArray Dictionary::lookup_unixtime_array(const char * name, bool error_out)
+
+{
+
+StringArray sa = lookup_string_array(name, error_out);
+TimeArray ta;
+
+int j;
+
+for (j=0; j<sa.n_elements(); ++j)  ta.add( timestring_to_unix( sa[j] ));
+
+return ( ta );
 
 }
 
