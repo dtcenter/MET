@@ -16,8 +16,7 @@
 EXECUTABLES = stat_analysis
 
 
-OBJECTS     = stat_analysis_Conf.o \
-              aggr_stat_line.o \
+OBJECTS     = aggr_stat_line.o \
               parse_stat_line.o \
               stat_analysis_job.o
 
@@ -25,8 +24,7 @@ OBJECTS     = stat_analysis_Conf.o \
 LIBRARIES   =
 
 
-GEN_SOURCES = stat_analysis_Conf.h \
-              stat_analysis_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -56,23 +54,12 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-stat_analysis_Conf.h stat_analysis_Conf.cc: $(CONFIG_TEMPLATE_DIR)/STATAnalysisConfig_default
-	@ echo
-	@ rm -f stat_analysis_Conf.h stat_analysis_Conf.cc
-	$(ECONFIG_CODEGEN) -class stat_analysis_Conf -outfile stat_analysis_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/STATAnalysisConfig_default
-
-
 ########################################################################
 
 
    ##
    ##  objects
    ##
-
-
-stat_analysis_Conf.o: stat_analysis_Conf.cc
-	@ echo
-	$(CXX) stat_analysis_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 aggr_stat_line.o: aggr_stat_line.cc
@@ -107,7 +94,6 @@ stat_analysis_job.o: stat_analysis_job.cc
 
 
 stat_analysis: stat_analysis.cc $(OBJECTS)
-	@ echo
 	$(CXX) -o $(EXECUTABLES) stat_analysis.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
@@ -123,22 +109,12 @@ stat_analysis: stat_analysis.cc $(OBJECTS)
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d \
 	-lvx_nc_util \
-	-lvx_plot_util \
-	-lvx_render \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_gsl_prob \
 	-lvx_grid \
-	-lvx_config \
-	-lvx_econfig \
-	-lvx_math \
 	-lvx_cal \
+	-lvx_config \
 	-lvx_util \
+	-lvx_math \
+	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
@@ -149,7 +125,7 @@ stat_analysis: stat_analysis.cc $(OBJECTS)
 
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES) $(GEN_SOURCES)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	rm -f $(MET_BIN_DIR)/stat_analysis
 
 

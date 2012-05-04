@@ -22,6 +22,7 @@
 //   003    06/21/10  Halley Gotway   Add support for vif_flag.
 //   004    08/16/11  Halley Gotway   Reimplementation of GO Index job
 //                    with addition of generalized Skill Score Index
+//   005    05/03/12  Halley Gotway  Switch to using vx_config library.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,331 +39,65 @@ using namespace std;
 
 #include "vx_log.h"
 
-#include "stat_analysis_Conf.h"
-
 #include "stat_analysis_job.h"
 #include "parse_stat_line.h"
 #include "aggr_stat_line.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_job_from_config(stat_analysis_Conf &c, STATAnalysisJob &j) {
-   int i, n;
-   Result r;
+void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
+   BootInfo boot_info;
 
    //
-   // Get info from config file and store in the job
+   // Parse top-level configuration filtering options
    //
+   
+   j.model          = c.lookup_string_array(conf_key_model, false);
+   j.fcst_lead      = c.lookup_seconds_array(conf_key_fcst_lead, false);
+   j.obs_lead       = c.lookup_seconds_array(conf_key_obs_lead, false);
+   j.fcst_valid_beg = c.lookup_unixtime(conf_key_fcst_valid_beg, false);
+   j.fcst_valid_end = c.lookup_unixtime(conf_key_fcst_valid_end, false);
+   j.obs_valid_beg  = c.lookup_unixtime(conf_key_obs_valid_beg, false);
+   j.obs_valid_end  = c.lookup_unixtime(conf_key_obs_valid_end, false);
+   j.fcst_init_beg  = c.lookup_unixtime(conf_key_fcst_init_beg, false);
+   j.fcst_init_end  = c.lookup_unixtime(conf_key_fcst_init_end, false);
+   j.obs_init_beg   = c.lookup_unixtime(conf_key_obs_init_beg, false);
+   j.obs_init_end   = c.lookup_unixtime(conf_key_obs_init_end, false);
+   j.fcst_init_hour = c.lookup_seconds_array(conf_key_fcst_init_hour, false);
+   j.obs_init_hour  = c.lookup_seconds_array(conf_key_obs_init_hour, false);
+   j.fcst_var       = c.lookup_string_array(conf_key_fcst_var, false);
+   j.obs_var        = c.lookup_string_array(conf_key_obs_var, false);
+   j.fcst_lev       = c.lookup_string_array(conf_key_fcst_lev, false);
+   j.obs_lev        = c.lookup_string_array(conf_key_obs_lev, false);
+   j.obtype         = c.lookup_string_array(conf_key_obtype, false);
+   j.vx_mask        = c.lookup_string_array(conf_key_vx_mask, false);
+   j.interp_mthd    = c.lookup_string_array(conf_key_interp_mthd, false);
+   j.interp_pnts    = c.lookup_num_array(conf_key_interp_pnts, false);
+   j.fcst_thresh    = c.lookup_thresh_array(conf_key_fcst_thresh, false);
+   j.obs_thresh     = c.lookup_thresh_array(conf_key_obs_thresh, false);
+   j.cov_thresh     = c.lookup_thresh_array(conf_key_cov_thresh, false);
+   j.alpha          = c.lookup_num_array(conf_key_alpha, false);
+   j.line_type      = c.lookup_string_array(conf_key_line_type, false);
+   j.column         = c.lookup_string_array(conf_key_column, false);
+   j.weight         = c.lookup_num_array(conf_key_weight, false);
 
-   //
-   // model
-   //
-   n = c.n_model_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.model(i);
-      j.model.add(r.sval());
-   }
-
-   //
-   // fcst_lead
-   //
-   n = c.n_fcst_lead_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.fcst_lead(i);
-      j.fcst_lead.add(timestring_to_sec(r.sval()));
-   }
-
-   //
-   // obs_lead
-   //
-   n = c.n_obs_lead_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.obs_lead(i);
-      j.obs_lead.add(timestring_to_sec(r.sval()));
-   }
-
-   //
-   // fcst_valid_beg
-   //
-   r = c.fcst_valid_beg();
-
-   if(strlen(r.sval()) > 0)
-      j.fcst_valid_beg = timestring_to_unix(r.sval());
-
-   //
-   // fcst_valid_end
-   //
-   r = c.fcst_valid_end();
-
-   if(strlen(r.sval()) > 0)
-      j.fcst_valid_end = timestring_to_unix(r.sval());
-
-   //
-   // obs_valid_beg
-   //
-   r = c.obs_valid_beg();
-
-   if(strlen(r.sval()) > 0)
-      j.obs_valid_beg = timestring_to_unix(r.sval());
-
-   //
-   // obs_valid_end
-   //
-   r = c.obs_valid_end();
-
-   if(strlen(r.sval()) > 0)
-      j.obs_valid_end = timestring_to_unix(r.sval());
-
-   //
-   // fcst_init_beg
-   //
-   r = c.fcst_init_beg();
-
-   if(strlen(r.sval()) > 0)
-      j.fcst_init_beg = timestring_to_unix(r.sval());
-
-   //
-   // fcst_init_end
-   //
-   r = c.fcst_init_end();
-
-   if(strlen(r.sval()) > 0)
-      j.fcst_init_end = timestring_to_unix(r.sval());
-
-   //
-   // obs_init_beg
-   //
-   r = c.obs_init_beg();
-
-   if(strlen(r.sval()) > 0)
-      j.obs_init_beg = timestring_to_unix(r.sval());
-
-   //
-   // obs_init_end
-   //
-   r = c.obs_init_end();
-
-   if(strlen(r.sval()) > 0)
-      j.obs_init_end = timestring_to_unix(r.sval());
-
-   //
-   // fcst_init_hour
-   //
-   n = c.n_fcst_init_hour_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.fcst_init_hour(i);
-      j.fcst_init_hour.add(timestring_to_sec(r.sval()));
-   }
-
-   //
-   // obs_init_hour
-   //
-   n = c.n_obs_init_hour_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.obs_init_hour(i);
-      j.obs_init_hour.add(timestring_to_sec(r.sval()));
-   }
-
-   //
-   // fcst_var
-   //
-   n = c.n_fcst_var_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.fcst_var(i);
-      j.fcst_var.add(r.sval());
-   }
-
-   //
-   // obs_var
-   //
-   n = c.n_obs_var_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.obs_var(i);
-      j.obs_var.add(r.sval());
-   }
-
-   //
-   // fcst_lev
-   //
-   n = c.n_fcst_lev_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.fcst_lev(i);
-      j.fcst_lev.add(r.sval());
-   }
-
-   //
-   // obs_lev
-   //
-   n = c.n_obs_lev_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.obs_lev(i);
-      j.obs_lev.add(r.sval());
-   }
-
-   //
-   // obtype
-   //
-   n = c.n_obtype_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.obtype(i);
-      j.obtype.add(r.sval());
-   }
-
-   //
-   // vx_mask
-   //
-   n = c.n_vx_mask_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.vx_mask(i);
-      j.vx_mask.add(r.sval());
-   }
-
-   //
-   // interp_mthd
-   //
-   n = c.n_interp_mthd_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.interp_mthd(i);
-      j.interp_mthd.add(r.sval());
-   }
-
-   //
-   // interp_pnts
-   //
-   n = c.n_interp_pnts_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.interp_pnts(i);
-      j.interp_pnts.add(r.ival());
-   }
-
-   //
-   // fcst_thresh
-   //
-   n = c.n_fcst_thresh_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.fcst_thresh(i);
-      j.fcst_thresh.add(r.sval());
-   }
-
-   //
-   // obs_thresh
-   //
-   n = c.n_obs_thresh_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.obs_thresh(i);
-      j.obs_thresh.add(r.sval());
-   }
-
-   //
-   // cov_thresh
-   //
-   n = c.n_cov_thresh_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.cov_thresh(i);
-      j.cov_thresh.add(r.sval());
-   }
-
-   //
-   // alpha
-   //
-   n = c.n_alpha_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.alpha(i);
-      j.alpha.add(r.dval());
-   }
-
-   //
-   // line_type
-   //
-   n = c.n_line_type_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.line_type(i);
-      j.line_type.add(r.sval());
-   }
-
-   //
-   // column
-   //
-   n = c.n_column_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.column(i);
-      j.column.add(r.sval());
-   }
-
-   //
-   // weight
-   //
-   n = c.n_weight_elements();
-
-   for(i=0; i<n; i++) {
-      r = c.weight(i);
-      j.weight.add(r.dval());
-   }
-
+   j.out_alpha      = c.lookup_double(conf_key_out_alpha, false);
+   
+   boot_info        = parse_conf_boot(&c);
+   j.boot_interval  = boot_info.interval;
+   j.boot_rep_prop  = boot_info.rep_prop;
+   j.n_boot_rep     = boot_info.n_rep;
+   j.set_boot_rng(boot_info.rng);
+   j.set_boot_seed(boot_info.seed);
+   
+   j.rank_corr_flag = (int) c.lookup_bool(conf_key_rank_corr_flag);
+   j.vif_flag       = (int) c.lookup_bool(conf_key_vif_flag);
+   
    //
    // No settings in the default job for column_min_name,
    // column_min_value, column_max_name, and column_max_value since
    // those are strictly job command options.
    //
-
-   //
-   // out_out_alpha
-   //
-   j.out_alpha = c.out_alpha().dval();
-
-   //
-   // boot_interval
-   //
-   j.boot_interval = c.boot_interval().ival();
-
-   //
-   // boot_rep_prop
-   //
-   j.boot_rep_prop = c.boot_rep_prop().dval();
-
-   //
-   // n_boot_rep
-   //
-   j.n_boot_rep = c.n_boot_rep().ival();
-
-   //
-   // boot_rng
-   //
-   j.set_boot_rng(c.boot_rng().sval());
-
-   //
-   // boot_seed
-   //
-   j.set_boot_seed(c.boot_seed().sval());
-
-   //
-   // rank_corr_flag
-   //
-   j.rank_corr_flag = c.rank_corr_flag().ival();
-
-   //
-   // vif_flag
-   //
-   j.vif_flag = c.vif_flag().ival();
 
    return;
 }
@@ -2168,7 +1903,7 @@ void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
 void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
                      STATAnalysisJob &j, int &n_in, int &n_out,
                      ofstream *sa_out) {
-   stat_analysis_Conf go_conf;
+   MetConfig go_conf;
    double go_index;
    AsciiTable out_at;
    ConcatString config_file;

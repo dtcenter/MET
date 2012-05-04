@@ -23,9 +23,17 @@ using namespace std;
 ConcatString parse_conf_version(Dictionary *dict) {
    ConcatString s;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_version() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
    s = dict->lookup_string(conf_key_version);
 
-   check_met_version(s);
+   if(dict->last_lookup_status()) {
+      check_met_version(s);
+   }
 
    return(s);
 }
@@ -35,14 +43,23 @@ ConcatString parse_conf_version(Dictionary *dict) {
 ConcatString parse_conf_model(Dictionary *dict) {
    ConcatString s;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_model() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    s = dict->lookup_string(conf_key_model);
 
-   // Check that it's non-empty and contains no whitespace
-   if(s.empty() || check_reg_exp(ws_reg_exp, s) == true) {
-      mlog << Error << "\nparse_conf_model() -> "
-           << "The model name (\"" << s << "\") must be non-empty and "
-           << "contain no embedded whitespace.\n\n";
-      exit(1);
+   if(dict->last_lookup_status()) {
+   
+      // Check that it's non-empty and contains no whitespace
+      if(s.empty() || check_reg_exp(ws_reg_exp, s) == true) {
+         mlog << Error << "\nparse_conf_model() -> "
+              << "The model name (\"" << s << "\") must be non-empty and "
+              << "contain no embedded whitespace.\n\n";
+         exit(1);
+      }
    }
 
    return(s);
@@ -54,6 +71,12 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
    GrdFileType t = FileType_None;
    int v;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_file_type() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_file_type, false);
 
@@ -83,6 +106,12 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
    STATOutputType output_type;
    int i, v;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_output_flag() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Get the output flag dictionary
    out_dict = dict->lookup_dictionary(conf_key_output_flag);
    
@@ -124,6 +153,12 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
 int parse_conf_n_vx(Dictionary *dict) {
    int i, total;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_n_vx() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Check that this dictionary is an array
    if(!dict->is_array()) {
       mlog << Error << "\nparse_conf_n_vx() -> "
@@ -152,7 +187,13 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    DictionaryEntry entry;
    StringArray lvl;
    int i, total;
-  
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_i_vx_dict() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Check that this dictionary is an array
    if(!dict->is_array()) {
       mlog << Error << "\nparse_conf_i_vx_dict() -> "
@@ -170,8 +211,12 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
       // Check if we're in the correct entry
       if(total > index) {
 
+         const DictionaryEntry *ee = dict->operator[](i);
+
+         i_dict = *(ee->dict_value());
+         
          // Copy the current entry's dictionary
-         i_dict = (*(*dict)[i]->dict_value());
+         //i_dict = *((*dict)[i]->dict_value());
 
          // Set up the new entry, taking only a single level value
          entry.set_string(conf_key_level, lvl[index-(total-lvl.n_elements())]);
@@ -192,6 +237,12 @@ StringArray parse_conf_message_type(Dictionary *dict) {
    StringArray sa;
    int i;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_message_type() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    sa = dict->lookup_string_array(conf_key_message_type);
 
    // Check that at least one PrepBufr message type is provided
@@ -221,6 +272,12 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
    NumArray na;
    int i;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_ci_alpha() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    na = dict->lookup_num_array(conf_key_ci_alpha);
 
    // Check that at least one alpha value is provided
@@ -251,6 +308,12 @@ BootInfo parse_conf_boot(Dictionary *dict) {
    BootInfo info;
    int v;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_boot() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Conf: boot.interval
    v = dict->lookup_int(conf_key_boot_interval);
 
@@ -297,7 +360,6 @@ BootInfo parse_conf_boot(Dictionary *dict) {
    return(info);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 InterpInfo parse_conf_interp(Dictionary *dict) {
@@ -308,6 +370,12 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    ConcatString method;
    int i, j, k, v, width;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_interp() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Conf: interp
    interp_dict = dict->lookup_dictionary(conf_key_interp);
 
@@ -408,6 +476,12 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    NbrhdInfo info;
    int i;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_nbrhd() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Conf: nbrhd
    nbrhd_dict = dict->lookup_dictionary(conf_key_nbrhd);
 
@@ -473,7 +547,13 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    DuplicateType t;
    int v;
-   
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_duplicate_flag() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_duplicate_flag);
       
@@ -496,6 +576,12 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
 ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    ConcatString s;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_tmp_dir() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Read the temporary directory
    s = dict->lookup_string(conf_key_tmp_dir);
 
@@ -516,6 +602,12 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
    GridDecompType t;
    int v;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_grid_decomp_flag() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_grid_decomp_flag);
 
@@ -540,6 +632,12 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
    WaveletType t;
    int v;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_wavelet_type() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_wavelet_type);
 
@@ -566,6 +664,12 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
 PlotInfo parse_conf_plot_info(Dictionary *dict) {
    PlotInfo info;
 
+   if(!dict) {
+      mlog << Error << "\nparse_conf_plot_info() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
    // Get the color table
    info.color_table = dict->lookup_string(conf_key_color_table);
 

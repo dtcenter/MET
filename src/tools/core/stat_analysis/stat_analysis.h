@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
+//   001    05/03/12  Halley Gotway  Switch to using vx_config library.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -35,8 +36,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "stat_analysis_Conf.h"
-
+#include "vx_config.h"
 #include "vx_analysis_util.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
@@ -88,10 +88,10 @@ static ConcatString tmp_path;
 static ofstream tmp_out;
 
 // STAT-Analysis configuration object
-static stat_analysis_Conf conf;
+static MetConfig conf;
 
 // STAT-Analysis default job
-static STATAnalysisJob    default_job;
+static STATAnalysisJob default_job;
 
 ////////////////////////////////////////////////////////////////////////
 
