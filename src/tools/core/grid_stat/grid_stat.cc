@@ -202,8 +202,8 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file, config_file);
 
    // Get the forecast and observation file types from config, if present
-   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst, false));
-   otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs,  false));
+   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
+   otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
