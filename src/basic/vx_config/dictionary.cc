@@ -135,6 +135,8 @@ if ( Dict )  { delete Dict;  Dict = (Dictionary *) 0; }
 
 if ( Thresh )  { delete Thresh;  Thresh = (SingleThresh *) 0; }
 
+if ( PWL )  { delete PWL;  PWL = (PiecewiseLinear *) 0; }
+
    //
    //  done
    //
@@ -920,6 +922,8 @@ if ( d.Nentries > 0 )  {
 IsArray = d.IsArray;
 
 Parent = d.Parent;
+
+LastLookupStatus = d.LastLookupStatus;
 
 patch_parents();
 
