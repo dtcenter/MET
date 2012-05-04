@@ -302,6 +302,8 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    ConcatString abbr_str;
    bool match = false;
 
+   if(str.empty()) return(false);
+
    //
    // Use the default GRIB1 parameter table version number 2
    //
