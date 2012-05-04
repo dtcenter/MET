@@ -128,8 +128,8 @@ test_table_read: test_table_read.cc libvx_data2d.a
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) \
 	-L$(MET_LIB_DIR) \
-	-lvx_cal \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_log \
 	-lvx_data2d \
 	-lvx_util \
@@ -143,8 +143,8 @@ dump_default_table: dump_default_table.cc libvx_data2d.a
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) \
 	-L$(MET_LIB_DIR) \
-	-lvx_cal \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_log \
 	-lvx_data2d \
 	-lvx_util \
