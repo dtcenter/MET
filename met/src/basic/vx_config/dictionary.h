@@ -233,13 +233,17 @@ class Dictionary {
       StringArray  lookup_string_array   (const char * name, bool error_out = default_dictionary_error_out);
       SingleThresh lookup_thresh         (const char * name, bool error_out = default_dictionary_error_out);
       ThreshArray  lookup_thresh_array   (const char * name, bool error_out = default_dictionary_error_out);
-      Dictionary * lookup_dictionary     (const char * name, bool error_out = default_dictionary_error_out);
-      Dictionary * lookup_array          (const char * name, bool error_out = default_dictionary_error_out);
       int          lookup_seconds        (const char * name, bool error_out = default_dictionary_error_out);
       NumArray     lookup_seconds_array  (const char * name, bool error_out = default_dictionary_error_out);
       unixtime     lookup_unixtime       (const char * name, bool error_out = default_dictionary_error_out);
       TimeArray    lookup_unixtime_array (const char * name, bool error_out = default_dictionary_error_out);
 
+         //
+         //  return value not allocated
+         //
+
+      Dictionary * lookup_dictionary     (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary * lookup_array          (const char * name, bool error_out = default_dictionary_error_out);
 };
 
 
