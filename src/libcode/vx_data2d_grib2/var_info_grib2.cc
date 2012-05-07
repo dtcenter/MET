@@ -406,7 +406,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       set_req_name( field_name );
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm,
+      if( field_name != "PROB" &&
+          !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm,
                                   tab, tab_match) ){
          mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 field abbreviation '"
               << field_name << "'\n\n";
@@ -443,11 +444,13 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    //  set the matched parameter lookup information
    set_name      ( field_name    );
    set_req_name  ( field_name    );
-   set_discipline( tab.index_a   );
-   set_parm_cat  ( tab.index_b   );
-   set_parm      ( tab.index_c   );
-   set_units     ( tab.units     );
-   set_long_name ( tab.full_name );
+   if( field_name != "PROB" ){
+      set_discipline( tab.index_a   );
+      set_parm_cat  ( tab.index_b   );
+      set_parm      ( tab.index_c   );
+      set_units     ( tab.units     );
+      set_long_name ( tab.full_name );
+   }
 
    //  call the parent to set the level information
    set_level_info_grib(dict);
@@ -455,17 +458,40 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    //  if the level type is a record number, set the data member
    set_record( Level.type() == LevelType_RecNumber ? Level.lower() : -1 );
 
-   //  if the field name is APCP, apply additional formatting
-   if( field_name == "APCP" ){
-      int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
-      if( 0 == accum % 10000 ) set_name( str_format("%s_%02d", field_name.text(), accum/10000) );
-      else                     set_name( str_format("%s_%06d", field_name.text(), accum)       );
+   //  if the field is not probabilistic, work is done
+   if( field_name != "PROB" ) return;
+
+   //  check for a probability dictionary setting
+   Dictionary* dict_prob;
+   if( NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false)) ){
+      mlog << Error << "\nVarInfoGrib2::set_dict() - if the field name is set to "
+           << "\"PROB\", then a prob information section must be present\n\n";
+      exit(1);
    }
 
-   //  set the magic string
-   MagicStr = str_format("%s/%s", field_name.text(), Level.name().text());
+   //  gather information from the prob dictionary
+   ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
+   field_disc       = dict_prob->lookup_int   (conf_key_GRIB2_disc,     false);
+   field_parm_cat   = dict_prob->lookup_int   (conf_key_GRIB2_parm_cat, false);
+   field_parm       = dict_prob->lookup_int   (conf_key_GRIB2_parm,     false);
+   double thresh_lo = dict_prob->lookup_double(conf_key_thresh_lo,      false);
+   double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
-   return;
+   //  look up the probability field abbreviation
+   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat, field_parm,
+                               tab, tab_match) ){
+      mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 probability field "
+           << "abbreviation '" << prob_name << "'\n\n";
+      exit(1);
+   }
+
+   set_discipline ( tab.index_a );
+   set_parm_cat   ( tab.index_b );
+   set_parm       ( tab.index_c );
+   set_p_flag     ( true        );
+   set_p_units    ( tab.units   );
+
+   set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
 }
 

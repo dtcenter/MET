@@ -117,6 +117,8 @@ class VarInfo
       void set_lead(int);
 
       void set_level_info_grib(Dictionary & dict);
+      void set_prob_info_grib(ConcatString prob_name,
+                              double thresh_lo, double thresh_hi);
 
 
          //

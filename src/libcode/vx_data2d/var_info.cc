@@ -421,6 +421,63 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
    if(lt == LevelType_Accum) Level.set_upper(timestring_to_sec( lvl_val1.data() ));
    else                      Level.set_upper(-1 == lvl2 ? lvl1 : lvl2);
 
+   //  if the field name is APCP, apply additional formatting
+   ConcatString field_name = name();
+   if( field_name == "APCP" ){
+      int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
+      if( 0 == accum % 10000 ) set_name( str_format("%s_%02d", field_name.text(), accum/10000) );
+      else                     set_name( str_format("%s_%06d", field_name.text(), accum)       );
+   }
+
+   //  set the magic string
+   MagicStr = str_format("%s/%s", field_name.text(), Level.name().text());
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, double thresh_hi){
+
+   //  verify the probability thresholds
+   if( is_eq(bad_data_double, thresh_lo) && is_eq(bad_data_double, thresh_hi) ){
+      mlog << Error << "\nVarInfo::set_prob_info_grib() - at least one probability threshold "
+           << "(thresh_lo and/or thresh_hi) must be defined\n\n";
+      exit(1);
+   }
+
+   //  build and set threshold objects
+   SingleThresh thr_lo, thr_hi;
+   thr_lo.set(thresh_lo, is_bad_data(thresh_lo) ? thresh_na : thresh_gt);
+   set_p_thresh_lo(thr_lo);
+   thr_hi.set(thresh_hi, is_bad_data(thresh_hi) ? thresh_na : thresh_gt);
+   set_p_thresh_hi(thr_hi);
+
+   //  if the prob field name is APCP, apply additional formatting
+   if( prob_name == "APCP" ){
+      int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
+      if( 0 == accum % 10000 ) prob_name = str_format("%s_%02d", prob_name.text(), accum/10000);
+      else                     prob_name = str_format("%s_%06d", prob_name.text(), accum);
+   }
+
+   //  build the corresponding field name and magic string
+   ConcatString field_name;
+   if( thresh_na != thr_lo.get_type() && thresh_na != thr_hi.get_type() ){
+      field_name = str_format("PROB(%s%s%s)",
+                              str_format("%.3f%s", thr_lo.get_thresh(), thresh_type_str[thr_lo.get_type()]),
+                              prob_name.text(),
+                              str_format("%s%.3f", thresh_type_str[thr_hi.get_type()], thr_hi.get_thresh()));
+      MagicStr = str_format("%s/%s/PROB", field_name.text(), Level.name().text());
+   } else {
+      SingleThresh thr( thresh_na != thr_lo.get_type() ? thr_lo : thr_hi );
+      field_name = str_format("PROB(%s%s)",
+                            prob_name.text(),
+                            str_format("%s%.3f", thresh_type_str[thr.get_type()], thr.get_thresh()));
+      MagicStr = str_format("%s/%s/PROB", field_name.text(), Level.name().text());
+   }
+   set_name     ( field_name );
+   set_req_name ( field_name );
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
