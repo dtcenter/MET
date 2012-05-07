@@ -52,8 +52,10 @@ typedef struct {
    int RangeTyp;
    int RangeVal;
    int ResCompFlag;
+   bool ProbFlag;
    double ProbLower;
    double ProbUpper;
+   int ProbType;
    unixtime InitTime;
    unixtime ValidTime;
    int LeadTime;

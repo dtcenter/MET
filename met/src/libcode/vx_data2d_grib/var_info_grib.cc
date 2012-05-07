@@ -433,16 +433,6 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    //  call the parent to set the level information
    set_level_info_grib(dict);
 
-   //  if the field name is APCP, apply additional formatting
-   if( field_name == "APCP" ){
-      int accum = atoi( sec_to_hhmmss( (int)Level.lower() ).text() );
-      if( 0 == accum % 10000 ) set_name( str_format("%s_%02d", field_name.text(), accum/10000) );
-      else                     set_name( str_format("%s_%06d", field_name.text(), accum)       );
-   }
-
-   //  set the magic string
-   MagicStr = str_format("%s/%s", field_name.text(), Level.name().text());
-
    //  check for a probability boolean setting
    if( dict.lookup_bool(conf_key_prob, false) ){
       set_p_flag( true );
@@ -467,14 +457,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    //  look up the probability field abbreviation
    if( !GribTable.lookup_grib1(prob_name, field_ptv, field_rec, tab, tab_match) ){
       mlog << Error << "\nVarInfoGrib::set_dict() - unrecognized GRIB1 probability field "
-           << "abbreviation '" << field_name << "'\n\n";
-      exit(1);
-   }
-
-   //  verify the probability thresholds
-   if( is_eq(bad_data_double, thresh_lo) && is_eq(bad_data_double, thresh_hi) ){
-      mlog << Error << "\nVarInfoGrib::set_dict() - at least one probability threshold "
-           << "(thresh_lo and/or thresh_hi) must be defined\n\n";
+           << "abbreviation '" << prob_name << "'\n\n";
       exit(1);
    }
 
@@ -482,34 +465,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    set_p_code      ( tab.code  );
    set_p_units     ( tab.units );
 
-   //  build and set threshold objects
-   SingleThresh thr_lo, thr_hi;
-   if( !is_eq(bad_data_double, thresh_lo) ){
-      thr_lo.set(thresh_lo, thresh_gt);
-      set_p_thresh_lo(thr_lo);
-   }
-   if( !is_eq(bad_data_double, thresh_hi) ){
-      thr_hi.set(thresh_hi, thresh_gt);
-      set_p_thresh_hi(thr_hi);
-   }
-
-   //  build the corresponding magic string
-   if( thresh_na != thr_lo.get_type() && thresh_na != thr_hi.get_type() ){
-      MagicStr = str_format("PROB(%s%s%s)/%s/PROB",
-                            str_format("%f%s", thr_lo.get_thresh(), thresh_type_str[thr_lo.get_type()]),
-                            field_name.text(),
-                            str_format("%s%f", thresh_type_str[thr_hi.get_type()], thr_hi.get_thresh()),
-                            Level.name().text());
-   } else {
-      SingleThresh thr( thresh_na != thr_lo.get_type() ? thr_lo : thr_hi );
-      MagicStr = str_format("PROB(%s%s)/%s/PROB",
-                            field_name.text(),
-                            str_format("%s%f", thresh_type_str[thr.get_type()], thr.get_thresh()),
-                            Level.name().text());
-   }
-
-
-   return;
+   set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
 }
 

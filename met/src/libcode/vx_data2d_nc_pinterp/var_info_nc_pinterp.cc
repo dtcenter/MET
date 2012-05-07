@@ -243,6 +243,12 @@ void VarInfoNcPinterp::set_dict(Dictionary & dict) {
    set_magic(mag);
    set_req_name( dict.lookup_string("name") );
 
+   //  check for a probability boolean setting
+   if( dict.lookup_bool(conf_key_prob, false) ){
+      set_p_flag( true );
+      return;
+   }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////

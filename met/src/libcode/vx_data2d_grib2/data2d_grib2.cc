@@ -377,7 +377,45 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
             rec_match_ex = ( lvl1 == rec_lvl1 ) && ( lvl1 == lvl2 || lvl2 == rec_lvl2 );
             rec_match_rn = ( lvl1 != lvl2 && lvl1 <= rec_lvl1 && lvl2 >= rec_lvl2 );
 
+         }  //  END: if( level match )
+
+         //  if seeking a probabilistic field, check the prob info
+         if( (rec_match_ex || rec_match_rn) && vinfo->p_flag() ){
+
+            rec_match_ex = rec_match_rn = false;
+            if( (*it)->ProbFlag ){
+
+               SingleThresh v_thr_lo = vinfo->p_thresh_lo();
+               SingleThresh v_thr_hi = vinfo->p_thresh_hi();
+
+               //  if both thresholds are in effect, check both values
+               if( !is_bad_data(v_thr_lo.get_thresh()) &&
+                   !is_bad_data(v_thr_hi.get_thresh()) ){
+                  rec_match_ex = ( is_eq(v_thr_lo.get_thresh(), (*it)->ProbLower) &&
+                                   is_eq(v_thr_hi.get_thresh(), (*it)->ProbUpper) &&
+                                   2 == (*it)->ProbType
+                                 );
+               }
+
+               //  compare the single upper threshold case
+               else if( !is_bad_data(v_thr_hi.get_thresh()) ){
+                  rec_match_ex = ( 0 == (*it)->ProbType &&
+                                   is_eq(v_thr_hi.get_thresh(), (*it)->ProbLower) ) ||
+                                 ( 4 == (*it)->ProbType &&
+                                   is_eq(v_thr_hi.get_thresh(), (*it)->ProbUpper) );
+               }
+
+               //  compare the single lower threshold case
+               else if( !is_bad_data(v_thr_lo.get_thresh()) ){
+                  rec_match_ex = ( 1 == (*it)->ProbType &&
+                                   is_eq(v_thr_lo.get_thresh(), (*it)->ProbUpper) ) ||
+                                 ( 3 == (*it)->ProbType &&
+                                   is_eq(v_thr_lo.get_thresh(), (*it)->ProbLower) );
+               }
+
+            }
          }
+
 
       }  //  END: else if( parameter match )
 
@@ -579,14 +617,23 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  store the probability information, if appropriate
-         if( 9 == gfld->ipdtnum ){
+         if( 5 == gfld->ipdtnum || 9 == gfld->ipdtnum ){
+            rec->ProbFlag  = true;
+            rec->ProbType  = gfld->ipdtmpl[17];
             rec->ProbLower = (double)(gfld->ipdtmpl[19]) / pow( 10, (double)(gfld->ipdtmpl[18]) );
             rec->ProbUpper = (double)(gfld->ipdtmpl[21]) / pow( 10, (double)(gfld->ipdtmpl[20]) );
+         } else {
+            rec->ProbFlag  = false;
+            rec->ProbType  = -1;
+            rec->ProbLower = bad_data_double;
+            rec->ProbUpper = bad_data_double;
          }
 
          //  set the accumulation interval
-         g2int range_typ = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
-         g2int range_val = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
+         g2int range_typ = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] :
+                            9 == gfld->ipdtnum ? gfld->ipdtmpl[32] : 0);
+         g2int range_val = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] :
+                            9 == gfld->ipdtnum ? gfld->ipdtmpl[33] : 0);
          double sec_accum_unit = VarInfoGrib2::g2_time_range_unit_to_sec( range_typ );
          rec->Accum = range_val * (int)sec_accum_unit;
 
