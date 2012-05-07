@@ -75,6 +75,8 @@ static PiecewiseLinear pwl;
 
 static Dictionary DD;
 
+static SingleThresh ST;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -512,7 +514,15 @@ void do_assign_threshold(const char * name)
 
 {
 
-dict_stack->pop_element(name);
+DictionaryEntry e;
+
+e.set_threshold(name, ST);
+
+dict_stack->store(e);
+
+// dict_stack->pop_element(name);
+
+ST.clear();
 
 return;
 
@@ -700,7 +710,13 @@ void do_thresh(const ThreshType t, const Number & n)
 
 {
 
-if ( !dict_stack->top_is_array() )  return;
+if ( ! dict_stack->top_is_array() )  {
+
+   ST.set(as_double(n), t);
+
+   return;
+
+}
 
 DictionaryEntry e;
 SingleThresh T;
