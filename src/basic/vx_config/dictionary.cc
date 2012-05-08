@@ -351,7 +351,7 @@ switch ( Type )  {
       break;
 
    case FunctionType:
-      out << "[ ";
+      out << "( ";
       for (k=0; k<(PWL->n_points()); ++k)  {
 
          out << '(' << (PWL->x(k)) << ", " << (PWL->y(k)) << ')';
@@ -359,7 +359,7 @@ switch ( Type )  {
          if ( k < (PWL->n_points() - 1) )  out << ' ';
 
       }
-      out << " ]\n";
+      out << " );\n";
       break;
 
    default:
