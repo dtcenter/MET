@@ -5,7 +5,6 @@ model = "WRF";
 ////////////////////////////////////////////////////////////////////////////////
 
 fcst = {
-
    wind_thresh = [ NA ];
 
    field = [
@@ -56,6 +55,7 @@ boot = {
 interp = {
    field      = FCST;
    vld_thresh = 1.0;
+
    type = [
       {
          method = UW_MEAN;
