@@ -159,8 +159,6 @@ static void write_netcdf(unixtime, unixtime, int, const Grid &, const DataPlane 
 
 static bool is_timestring(const char *);
 
-static ConcatString make_magic(int gribcode, int ptv, int accum_interval);
-
 static void usage();
 static void set_sum(const StringArray &);
 static void set_add(const StringArray &);
@@ -707,31 +705,16 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
             return -1;
          }
 
-         //  initialize the VarInfo object and store the requested timing information
-         if( !user_dict.empty() ){
-
-            //  if the user-specified config string contains an '=', parse it as a config string
-            char** mat = NULL;
-            if( regex_apply(".+=.+", 0, user_dict, mat) ){
-               mlog << Debug(4) << "Retrieving field using config string'" << user_dict << "'\n";
-               MetConfig config;
-               config.read_string( user_dict );
-               var->set_dict( config );
-            }
-
-            //  otherwise, parse it as a magic string
-            else {
-               mlog << Debug(4) << "Retrieving field using magic string '" << user_dict << "'\n";
-               var->set_magic( user_dict );
-            }
-
-         } else {
-
-            //  build a magic string
-            mlog << Debug(4) << "Retrieving field using accumulation of " << in_accum << "\n";
-            var->set_magic( make_magic(grib_code, grib_ptv, in_accum) );
-
+         //  initialize the VarInfo object with a field dictionary and
+         //  the requested timing information
+         ConcatString accum_dict = user_dict;
+         if( user_dict.empty() ){
+            accum_dict.format("name=\"APCP\";level=\"A%s\";", sec_to_hhmmss(in_accum).text());
          }
+         MetConfig config;
+         config.read_string( accum_dict.text() );
+         var->set_dict( config );
+
          var->set_valid(cur_ut);
          var->set_init(init_time);
          var->set_lead(init_time ? cur_ut - init_time : 0);
@@ -1005,34 +988,16 @@ void get_field(const char * filename, const char * fld_accum_mag,
       exit (1);
    }
 
-   //  attempt to parse the input accum/magic string as an accum
-   ConcatString config_str = !user_dict.empty() ? user_dict : "";
-   int get_accum = 0;
-   if( is_timestring(fld_accum_mag) ) get_accum  = timestring_to_sec(fld_accum_mag);
-   else                               config_str = fld_accum_mag;
-
-   //  use the user-specified config string, if available, otherwise assume GRIB
-   if( !config_str.empty() ){
-
-      //  if the user-specified config string contains an '=', parse it as a config string
-      char** mat = NULL;
-      if( regex_apply(".+=.+", 0, config_str, mat) ){
-         mlog << Debug(4) << "Retrieving field using config string '" << config_str << "'\n";
-         MetConfig config;
-         config.read_string( config_str );
-         var->set_dict( config );
-      }
-
-      //  otherwise, parse it as a magic string
-      else {
-         mlog << Debug(4) << "Retrieving field using magic string '" << config_str << "'\n";
-         var->set_magic( config_str );
-      }
-
-   } else {
-      mlog << Debug(4) << "Retrieving field using accumulation of " << fld_accum_mag << "\n";
-      var->set_magic( make_magic(grib_code, grib_ptv, get_accum) );
+   //  build the field config string
+   ConcatString config_str = is_timestring(fld_accum_mag) ? user_dict.text() : fld_accum_mag;
+   if( config_str.empty() ){
+      config_str.format("name=\"APCP\";level=\"A%s\";", fld_accum_mag);
    }
+
+   //  initialize the VarInfo object with a field dictionary
+   MetConfig config;
+   config.read_string( config_str );
+   var->set_dict( config );
 
    //  set the VarInfo timing object
    var->set_valid(get_valid_ut);
@@ -1212,22 +1177,6 @@ return ( false );
 
 ////////////////////////////////////////////////////////////////////////
 
-
-ConcatString make_magic(int gribcode, int ptv, int accum_interval)
-
-{
-
-ConcatString s;
-
-s << get_grib_code_abbr(gribcode, ptv) << "/A" << sec_to_hhmmss(accum_interval);
-
-return ( s );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 void usage()
 
 {
@@ -1237,8 +1186,6 @@ void usage()
 
         << "Usage: " << program_name << "\n"
         << "\t[[-sum] sum_args] | [-add add_args] | [-subtract subtract_args]\n"
-        << "\t[-gc code]\n"
-        << "\t[-ptv number]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-config config_str]\n\n"
@@ -1254,13 +1201,6 @@ void usage()
         << "\t\t\"-subtract subtract_args\" indicates that "
         << "accumulations from two files should be subtracted using "
         << "the arguments provided.\n"
-
-        << "\t\t\"-gc code\" overrides the default GRIB code ("
-        << grib_code << ") to be used (optional).\n"
-
-        << "\t\t\"-ptv number\" overrides the default GRIB parameter "
-        << "table version number (" << grib_ptv
-        << ") to be used (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
