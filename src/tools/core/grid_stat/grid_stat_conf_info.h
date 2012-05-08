@@ -43,7 +43,6 @@ static const int i_prc    = 11;
 static const int i_nbrctc = 12;
 static const int i_nbrcts = 13;
 static const int i_nbrcnt = 14;
-
 static const int n_txt    = 15;
 
 // Text file type

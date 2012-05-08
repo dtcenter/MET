@@ -74,6 +74,7 @@ void GridStatConfInfo::clear() {
    max_n_prob_fcst_thresh = 0;
    max_n_prob_obs_thresh  = 0;
 
+   // Initialize values
    model.clear();
    fcst_wind_ta.clear();
    obs_wind_ta.clear();
@@ -84,6 +85,7 @@ void GridStatConfInfo::clear() {
    n_boot_rep = bad_data_int;
    boot_rng.clear();
    boot_seed.clear();
+   interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
    nc_pairs_flag = false;
