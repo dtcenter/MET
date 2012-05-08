@@ -127,8 +127,6 @@ static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
 static void set_obs_valid_end_time(const StringArray &);
-static void set_valid_beg_time(const StringArray &);
-static void set_valid_end_time(const StringArray &);
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
@@ -174,8 +172,7 @@ void process_command_line(int argc, char **argv) {
    //
    // check for zero arguments
    //
-   if (argc == 1)
-      usage();
+   if(argc == 1) usage();
 
    climo_file = "none";
 
@@ -197,8 +194,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_ncfile, "-ncfile", 1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
-   cline.add(set_valid_beg_time, "-valid_beg", 1);
-   cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
@@ -213,8 +208,7 @@ void process_command_line(int argc, char **argv) {
    // forecast filename, the observation filename, and the config
    // filename.
    //
-   if (cline.n() != 3)
-      usage();
+   if(cline.n() != 3) usage();
 
    // Check that the end_ut >= beg_ut
    if(obs_valid_beg_ut != (unixtime) 0 &&
@@ -1753,20 +1747,6 @@ void set_obs_valid_beg_time(const StringArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 void set_obs_valid_end_time(const StringArray & a)
-{
-   obs_valid_end_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_valid_beg_time(const StringArray & a)
-{
-   obs_valid_beg_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_valid_end_time(const StringArray & a)
 {
    obs_valid_end_ut = timestring_to_unix(a[0]);
 }

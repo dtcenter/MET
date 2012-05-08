@@ -155,8 +155,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    model = parse_conf_model(&conf);
 
    // Conf: beg_ds and end_ds
-   beg_ds = conf.lookup_int("obs_window.beg_ds");
-   end_ds = conf.lookup_int("obs_window.end_ds");
+   beg_ds = conf.lookup_int(conf_key_obs_window_beg_ds);
+   end_ds = conf.lookup_int(conf_key_obs_window_end_ds);
    if(beg_ds > end_ds) {
       mlog << Error << "\nPointStatConfInfo::process_config() -> "
            << "\"beg_ds\" cannot be greater than \"end_ds\": "

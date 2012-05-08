@@ -43,7 +43,6 @@ static const int i_pstd      = 11;
 static const int i_pjc       = 12;
 static const int i_prc       = 13;
 static const int i_mpr       = 14;
-
 static const int n_txt       = 15;
 
 // Text file type
@@ -92,8 +91,8 @@ class PointStatConfInfo {
       ThreshArray       obs_wind_ta;        // Wind speed obs thresholds
       StringArray *     msg_typ;            // Array of message types [n_vx]
       StringArray       mask_name;          // Masking region names [n_mask]
-      DataPlane *       mask_dp;            // Array for masking regions [n_mask]
-      StringArray       mask_sid;           // Masking station id's
+      DataPlane *       mask_dp;            // Array for masking regions [n_mask_area]
+      StringArray       mask_sid;           // Masking station id's [n_mask_sid]
       NumArray          ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType  boot_interval;      // Bootstrap CI type
       double            boot_rep_prop;      // Bootstrap replicate proportion
