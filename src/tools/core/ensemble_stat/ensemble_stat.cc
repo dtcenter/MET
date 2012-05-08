@@ -27,6 +27,9 @@
 //   005    12/09/11  Halley Gotway   When gridded observations are
 //          missing, print a warning and continue rather than exiting
 //          with error status.
+//   006    05/08/12  Halley Gotway   Switch to using vx_config library.
+//   007    05/08/12  Halley Gotway   Move -ens_valid, -ens_lead,
+//                    and -obs_lead command line options to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -99,11 +102,8 @@ static void usage();
 
 static void set_grid_obs(const StringArray &);
 static void set_point_obs(const StringArray &);
-static void set_ens_valid(const StringArray &);
-static void set_ens_lead(const StringArray &);
 static void set_obs_valid_beg(const StringArray &);
 static void set_obs_valid_end(const StringArray &);
-static void set_obs_lead(const StringArray &);
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
@@ -139,7 +139,6 @@ void process_command_line(int argc, char **argv)
    int i;
    struct stat results;
    GrdFileType etype, otype;
-   unixtime obs_valid_ut;
    CommandLine cline;
    ConcatString default_config_file;
 
@@ -168,11 +167,8 @@ void process_command_line(int argc, char **argv)
    //
    cline.add(set_grid_obs, "-grid_obs", 1);
    cline.add(set_point_obs, "-point_obs", 1);
-   cline.add(set_ens_valid, "-ens_valid", 1);
-   cline.add(set_ens_lead, "-ens_lead", 1);
    cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end, "-obs_valid_end", 1);
-   cline.add(set_obs_lead, "-obs_lead", 1);
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
@@ -186,51 +182,61 @@ void process_command_line(int argc, char **argv)
    // Check for error. There should be either a number followed by that
    // number of filenames or a single filename and a config filename.
    //
-   if (cline.n() < 2) usage();
+   if(cline.n() < 2) usage();
 
-   if (cline.n() == 2)
-   {
+   if(cline.n() == 2) {
+
       //
-      // it should be a filename and then a config filename
+      // It should be a filename and then a config filename
       //
-      if (is_integer(cline[0]) == 0)
+      if(is_integer(cline[0]) == 0)
          parse_ens_file_list(cline[0]);
       else
          usage();
 
    }
-   else
-   {
+   else {
+     
       //
       // More than two arguments. Check that the first is an integer
       // followed by that number of filenames and a config filename.
       //
-      if (is_integer(cline[0]) == 1)
-      {
+      if(is_integer(cline[0]) == 1) {
+        
          n_ens = atoi(cline[0]);
 
-         if (n_ens <= 0)
-         {
+         if(n_ens <= 0) {
             mlog << Error << "\nprocess_command_line() -> "
                  << "the number of ensemble member files must be >= 1 ("
                  << n_ens << ")\n\n";
             exit(1);
          }
 
-         if ((cline.n() - 2) == n_ens)
-         {
+         if((cline.n() - 2) == n_ens) {
+
             //
             // Add each of the ensemble members to the list of files.
             //
-            for(i = 1; i <= n_ens; i++)
-               ens_file_list.add(cline[i]);
-
+            for(i = 1; i <= n_ens; i++) ens_file_list.add(cline[i]);
          }
-         else
+         else {
             usage();
-
+         }
       }
+   }
 
+   // Check that the end_ut >= beg_ut
+   if(obs_valid_beg_ut != (unixtime) 0 &&
+      obs_valid_end_ut != (unixtime) 0 &&
+      obs_valid_beg_ut > obs_valid_end_ut) {
+
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the ending time ("
+           << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
+           << ") must be greater than the beginning time ("
+           << unix_to_yyyymmdd_hhmmss(obs_valid_beg_ut)
+           << ").\n\n";
+      exit(1);
    }
 
    //
@@ -238,8 +244,22 @@ void process_command_line(int argc, char **argv)
    //
    config_file = cline[cline.n() - 1];
 
+   // Create the default config file name
+   default_config_file = replace_path(default_config_filename);
+
+   // List the config files
+   mlog << Debug(1)
+        << "Default Config File: " << default_config_file << "\n"
+        << "User Config File: "    << config_file << "\n";
+
+   // Read the config files
+   conf_info.read_config(default_config_file, config_file);
+   
+   // Get the ensemble file type from config, if present
+   etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
+
    // Read the first input ensemble file
-   if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0]))) {
+   if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0], etype))) {
       mlog << Error << "\nprocess_command_line() -> "
            << "Trouble reading ensemble file \""
            << ens_file_list[0] << "\"\n\n";
@@ -253,6 +273,9 @@ void process_command_line(int argc, char **argv)
    if(point_obs_flag)      otype = FileType_Gb1;
    else if(!grid_obs_flag) otype = FileType_None;
    else {
+     
+      // Get the observation file type from config, if present
+      otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
       // Read the first gridded observation file
       if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0]))) {
@@ -265,46 +288,19 @@ void process_command_line(int argc, char **argv)
       // Store the gridded observation file type
       otype = obs_mtddf->file_type();
    }
-
-   // Check that the end_ut >= beg_ut
-   if(obs_valid_beg_ut != (unixtime) 0 &&
-      obs_valid_end_ut != (unixtime) 0 &&
-      obs_valid_beg_ut > obs_valid_end_ut) {
-
-      mlog << Error << "\nprocess_command_line() -> "
-           << "the ending time (" << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
-           << ") must be greater than the beginning time ("
-           << unix_to_yyyymmdd_hhmmss(obs_valid_beg_ut) << ").\n\n";
-      exit(1);
-   }
-
-   // Create the default config file name
-   default_config_file = replace_path(default_config_filename);
-
-   // List the config files
-   mlog << Debug(1)
-        << "Default Config File: " << default_config_file << "\n"
-        << "User Config File: "    << config_file << "\n";
-
-   // Get the user-specified observation valid time to be extracted
-   if(obs_valid_beg_ut == obs_valid_end_ut) obs_valid_ut = obs_valid_beg_ut;
-   else                                     obs_valid_ut = (unixtime) 0;
-        
-   // Read the config files
-   conf_info.read_config(default_config_file, config_file,
-                         etype, ens_valid_search_ut, ens_lead_search_sec,
-                         otype, obs_valid_ut, obs_lead_sec);
+   
+   // Process the configuration
+   conf_info.process_config(etype, otype);
 
    // Set the model name
-   shc.set_model(conf_info.conf.model().sval());
+   shc.set_model(conf_info.model);
 
    // Allocate arrays to store threshold counts
    thresh_count_na = new NumArray [conf_info.get_max_n_thresh()];
 
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
-   rng_set(rng_ptr, conf_info.conf.rng_type().sval(),
-           conf_info.conf.rng_seed().sval());
+   rng_set(rng_ptr, conf_info.rng_type, conf_info.rng_seed);
 
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
@@ -354,9 +350,9 @@ void process_command_line(int argc, char **argv)
    // Set flag to indicate whether verification is to be performed
    if((point_obs_flag || grid_obs_flag) &&
       (conf_info.get_n_vx() > 0) &&
-      (conf_info.conf.output_flag(i_orank).ival() > 0 ||
-       conf_info.conf.output_flag(i_rhist).ival() > 0)) vx_flag = 1;
-   else                                                 vx_flag = 0;
+      (conf_info.output_flag[i_orank] != STATOutputType_None ||
+       conf_info.output_flag[i_rhist] != STATOutputType_None)) vx_flag = 1;
+   else                                                        vx_flag = 0;
 
    return;
 }
@@ -442,7 +438,7 @@ void process_ensemble() {
          }
 
          // Check if the number of missing fields exceeds the threshold
-         t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
+         t = 1.0 - conf_info.vld_ens_thresh;
          if((double) n_miss/n_ens > t) {
             mlog << Error << "\nprocess_ensemble_files() -> "
                  << n_miss << " missing fields exceeds the maximum "
@@ -468,7 +464,7 @@ void process_ensemble() {
       } // end for j
 
       // Check if the number of missing fields exceeds the threshold
-      t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
+      t = 1.0 - conf_info.vld_ens_thresh;
       if((double) n_miss/n_ens > t) {
          mlog << Error << "\nprocess_ensemble_files() -> "
               << n_miss << " missing fields exceeds the maximum "
@@ -531,10 +527,10 @@ void process_point_vx() {
    // Set the matching time window.  If obs_valid_beg_ut and obs_valid_end_ut
    // were not set on the command line, use beg_ds and end_ds.
    if(obs_valid_beg_ut == (unixtime) 0) {
-      obs_valid_beg_ut = ens_valid_ut + conf_info.conf.beg_ds().ival();
+      obs_valid_beg_ut = ens_valid_ut + conf_info.beg_ds;
    }
    if(obs_valid_end_ut == (unixtime) 0) {
-      obs_valid_end_ut = ens_valid_ut + conf_info.conf.end_ds().ival();
+      obs_valid_end_ut = ens_valid_ut + conf_info.end_ds;
    }
 
    // Store the valid time window
@@ -565,7 +561,7 @@ void process_point_vx() {
       n_miss += miss_flag;
 
       // Check if the number of missing fields exceeds the threshold
-      t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
+      t = 1.0 - conf_info.vld_ens_thresh;
       if((double) n_miss/n_ens > t) {
          mlog << Error << "\nprocess_point_vx() -> "
               << n_miss << " missing fields exceeds the maximum "
@@ -836,10 +832,10 @@ void process_point_scores() {
       shc.set_obs_valid_end(conf_info.vx_pd[i].end_ut);
 
       // Loop through the message types
-      for(j=0; j<conf_info.get_n_msg_typ(); j++) {
+      for(j=0; j<conf_info.get_n_msg_typ(i); j++) {
 
          // Store the message type
-         shc.set_msg_typ(conf_info.msg_typ[j]);
+         shc.set_msg_typ(conf_info.msg_typ[i][j]);
 
          // Loop through the verification masking regions
          for(k=0; k<conf_info.get_n_mask(); k++) {
@@ -879,10 +875,10 @@ void process_point_scores() {
                pd_ptr->compute_stats(n_ens_vld);
 
                // Write out the ORANK lines
-               if(conf_info.conf.output_flag(i_orank).ival()) {
+               if(conf_info.output_flag[i_orank] != STATOutputType_None) {
 
                   write_orank_row(shc, pd_ptr,
-                     conf_info.conf.output_flag(i_orank).ival(),
+                     conf_info.output_flag[i_orank],
                      stat_at, i_stat_row,
                      txt_at[i_orank], i_txt_row[i_orank]);
 
@@ -892,10 +888,10 @@ void process_point_scores() {
                }
 
                // Compute RHIST scores
-               if(conf_info.conf.output_flag(i_rhist).ival()) {
+               if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
                   write_rhist_row(shc, pd_ptr,
-                     conf_info.conf.output_flag(i_rhist).ival(),
+                     conf_info.output_flag[i_rhist],
                      stat_at, i_stat_row,
                      txt_at[i_rhist], i_txt_row[i_rhist]);
                }
@@ -995,7 +991,7 @@ void process_grid_vx() {
          }
 
          // Check if the number of missing fields exceeds the threshold
-         t = 1.0 - conf_info.conf.vld_ens_thresh().dval();
+         t = 1.0 - conf_info.vld_ens_thresh;
          if((double) n_miss/n_ens > t) {
             mlog << Error << "\nprocess_grid_vx() -> "
                  << n_miss << " missing fields exceeds the maximum "
@@ -1006,7 +1002,7 @@ void process_grid_vx() {
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
-      if(conf_info.conf.output_flag(i_nc_orank).ival() &&
+      if(conf_info.ensemble_flag[i_nc_orank] &&
          nc_out == (NcFile *) 0)
          setup_nc_file(fcst_dp[j].valid(), fcst_dp[j].lead(),
                        "_orank.nc");
@@ -1075,12 +1071,13 @@ void process_grid_vx() {
 
          // If requested in the config file, smooth the forecast fields
          for(k=0; k<ens_file_list.n_elements(); k++) {
-            if(conf_info.conf.interp_flag().ival() == 1 ||
-               conf_info.conf.interp_flag().ival() == 3) {
+         
+            if(conf_info.interp_field == FieldType_Fcst ||
+               conf_info.interp_field == FieldType_Both) {
                smooth_field(fcst_dp[k], fcst_dp_smooth[k],
                             conf_info.interp_mthd[j],
                             conf_info.interp_wdth[j],
-                            conf_info.conf.interp_thresh().dval());
+                            conf_info.interp_thresh);
             }
             // Do not smooth the forecast field
             else {
@@ -1089,12 +1086,12 @@ void process_grid_vx() {
          } // end for k
 
          // If requested in the config file, smooth the observation field
-         if(conf_info.conf.interp_flag().ival() == 2 ||
-            conf_info.conf.interp_flag().ival() == 3) {
+         if(conf_info.interp_field == FieldType_Obs ||
+            conf_info.interp_field == FieldType_Both) {
             smooth_field(obs_dp, obs_dp_smooth,
                          conf_info.interp_mthd[j],
                          conf_info.interp_wdth[j],
-                         conf_info.conf.interp_thresh().dval());
+                         conf_info.interp_thresh);
          }
          // Do not smooth the observation field
          else {
@@ -1134,16 +1131,16 @@ void process_grid_vx() {
             pd.compute_stats(n_ens_vld);
 
             // Compute RHIST scores
-            if(conf_info.conf.output_flag(i_rhist).ival()) {
+            if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
                write_rhist_row(shc, &pd,
-                  conf_info.conf.output_flag(i_rhist).ival(),
+                  conf_info.output_flag[i_rhist],
                   stat_at, i_stat_row,
                   txt_at[i_rhist], i_txt_row[i_rhist]);
             }
 
             // Write out the smoothed forecast, observation, and difference
-            if(conf_info.conf.output_flag(i_nc_orank).ival())
+            if(conf_info.ensemble_flag[i_nc_orank])
                write_orank_nc(pd, obs_dp_smooth, i, j, k);
 
          } // end for k
@@ -1420,7 +1417,7 @@ void setup_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
-      if(conf_info.conf.output_flag(i).ival() >= flag_txt_out) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Only create ORANK file when using point observations
          if(i == i_orank && !point_obs_flag) continue;
@@ -1516,8 +1513,8 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
    str << cs_erase << out_dir.text() << "/" << program_name;
 
    // Append the output prefix, if defined
-   if(strlen(conf_info.conf.output_prefix().sval()) > 0)
-      str << "_" << conf_info.conf.output_prefix().sval();
+   if(conf_info.output_prefix.nonempty())
+      str << "_" << conf_info.output_prefix;
 
    // Append the timing information
    unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
@@ -1561,7 +1558,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
    ens_freq  = new float [grid.nx()*grid.ny()];
 
    // Store the threshold for the ratio of valid data points
-   t = conf_info.conf.vld_data_thresh().dval();
+   t = conf_info.vld_data_thresh;
 
    // Store the data
    for(i=0; i<count_na.n_elements(); i++) {
@@ -1594,63 +1591,63 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
    } // end for i
 
    // Add the ensemble mean if requested
-   if(conf_info.conf.output_flag(i_nc_mean).ival()) {
+   if(conf_info.ensemble_flag[i_nc_mean]) {
       write_ens_var_float(i_vx, ens_mean, dp,
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation if requested
-   if(conf_info.conf.output_flag(i_nc_stdev).ival()) {
+   if(conf_info.ensemble_flag[i_nc_stdev]) {
       write_ens_var_float(i_vx, ens_stdev, dp,
                           "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation if requested
-   if(conf_info.conf.output_flag(i_nc_minus).ival()) {
+   if(conf_info.ensemble_flag[i_nc_minus]) {
       write_ens_var_float(i_vx, ens_minus, dp,
                           "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation if requested
-   if(conf_info.conf.output_flag(i_nc_plus).ival()) {
+   if(conf_info.ensemble_flag[i_nc_plus]) {
       write_ens_var_float(i_vx, ens_plus, dp,
                           "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value if requested
-   if(conf_info.conf.output_flag(i_nc_min).ival()) {
+   if(conf_info.ensemble_flag[i_nc_min]) {
       write_ens_var_float(i_vx, ens_min, dp,
                           "ENS_MIN",
                           "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value if requested
-   if(conf_info.conf.output_flag(i_nc_max).ival()) {
+   if(conf_info.ensemble_flag[i_nc_max]) {
       write_ens_var_float(i_vx, ens_max, dp,
                           "ENS_MAX",
                           "Ensemble Maximum");
    }
 
    // Add the ensemble range if requested
-   if(conf_info.conf.output_flag(i_nc_range).ival()) {
+   if(conf_info.ensemble_flag[i_nc_range]) {
       write_ens_var_float(i_vx, ens_range, dp,
                           "ENS_RANGE",
                           "Ensemble Range");
    }
 
    // Add the ensemble valid data count if requested
-   if(conf_info.conf.output_flag(i_nc_vld).ival()) {
+   if(conf_info.ensemble_flag[i_nc_vld]) {
       write_ens_var_int(i_vx, ens_vld, dp,
                         "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
 
    // Add the ensemble relative frequencies if requested
-   if(conf_info.conf.output_flag(i_nc_freq).ival()) {
+   if(conf_info.ensemble_flag[i_nc_freq]) {
 
       // Loop through each threshold
       for(i=0; i<conf_info.ens_ta[i_vx].n_elements(); i++) {
@@ -1869,8 +1866,8 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 
    // Append smoothing information
    if((wdth > 1) &&
-      (conf_info.conf.interp_flag().ival() == 2 ||
-       conf_info.conf.interp_flag().ival() == 3)) {
+      (conf_info.interp_field == FieldType_Obs ||
+       conf_info.interp_field == FieldType_Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
@@ -1921,8 +1918,8 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
    // Append smoothing information
    if((wdth > 1) &&
-      (conf_info.conf.interp_flag().ival() == 2 ||
-       conf_info.conf.interp_flag().ival() == 3)) {
+      (conf_info.interp_field == FieldType_Obs ||
+       conf_info.interp_field == FieldType_Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
@@ -1987,7 +1984,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.conf.output_flag(i).ival() >= flag_txt_out) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {
@@ -2047,11 +2044,8 @@ void usage() {
         << "\tconfig_file\n"
         << "\t[-grid_obs file]\n"
         << "\t[-point_obs file]\n"
-        << "\t[-ens_valid time]\n"
-        << "\t[-ens_lead time]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
-        << "\t[-obs_lead time]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
@@ -2072,20 +2066,11 @@ void usage() {
         << "\t\t\"-point_obs file\" specifies a NetCDF point observation file. "
         << "May be used multiple times (optional).\n"
 
-        << "\t\t\"-ens_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the ensemble valid time to be used (optional).\n"
-
-        << "\t\t\"-ens_lead time\" in HH[MMSS] format sets "
-        << "the ensemble lead time to be used (optional).\n"
-
         << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "beginning of the matching time window (optional).\n"
 
         << "\t\t\"-obs_valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "end of the matching time window (optional).\n"
-
-        << "\t\t\"-obs_lead time\" in HH[MMSS] format sets "
-        << "the observation lead time to be used (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output directory "
         << "(" << out_dir << ") (optional).\n"
@@ -2120,20 +2105,6 @@ void set_point_obs(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_ens_valid(const StringArray & a)
-{
-   ens_valid_search_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_ens_lead(const StringArray & a)
-{
-   ens_lead_search_sec = timestring_to_sec(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void set_obs_valid_beg(const StringArray & a)
 {
    obs_valid_beg_ut = timestring_to_unix(a[0]);
@@ -2144,13 +2115,6 @@ void set_obs_valid_beg(const StringArray & a)
 void set_obs_valid_end(const StringArray & a)
 {
    obs_valid_end_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_lead(const StringArray & a)
-{
-   obs_lead_sec = timestring_to_sec(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

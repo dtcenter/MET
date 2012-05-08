@@ -50,11 +50,9 @@ void EnsembleStatConfInfo::init_from_scratch() {
    ens_info    = (VarInfo **)           0;
    ens_ta      = (ThreshArray *)        0;
    vx_pd       = (VxPairDataEnsemble *) 0;
-   msg_typ     = (ConcatString *)       0;
+   msg_typ     = (StringArray *)        0;
+   mask_dp     = (DataPlane *)          0;   
    interp_mthd = (InterpMthd *)         0;
-   interp_wdth = (int *)                0;
-   mask_dp     = (DataPlane *)          0;
-   mask_name   = (ConcatString *)       0;
 
    clear();
 
@@ -64,28 +62,50 @@ void EnsembleStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::clear() {
+   int i;
 
    // Set counts to zero
-   n_ens_var    = 0;
    max_n_thresh = 0;
    n_vx         = 0;
-   n_msg_typ    = 0;
    n_interp     = 0;
    n_mask       = 0;
    n_mask_area  = 0;
-   n_mask_sid   = 0;
+
+   // Initialize values
+   model.clear();
+   beg_ds = end_ds = bad_data_int;
+   vld_ens_thresh = vld_data_thresh = bad_data_double;
+   mask_name.clear();
+   mask_sid.clear();
+   interp_field = FieldType_None;
+   interp_thresh = bad_data_double;
+   interp_wdth.clear();
+   rng_type.clear();
+   rng_seed.clear();
+   duplicate_flag = DuplicateType_None;
+   output_prefix.clear();
+   version.clear();
+
+   for(i=0; i<n_txt; i++) output_flag[i]   = STATOutputType_None;
+   for(i=0; i<n_nc;  i++) ensemble_flag[i] = false;
 
    // Deallocate memory
    if(ens_info)    { delete [] ens_info;    ens_info    = (VarInfo **)           0; }
    if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)        0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataEnsemble *) 0; }
-   if(msg_typ)     { delete [] msg_typ;     msg_typ     = (ConcatString *)       0; }
+   if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
+   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }   
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)         0; }
-   if(interp_wdth) { delete [] interp_wdth; interp_wdth = (int *)                0; }
-   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }
-   if(mask_name)   { delete [] mask_name;   mask_name   = (ConcatString *   )    0; }
 
-   mask_sid.clear();
+   // Clear ens_info
+   if(ens_info) {
+      for(i=0; i<n_vx; i++)
+         if(ens_info[i]) { delete ens_info[i]; ens_info[i] = (VarInfo *) 0; }
+      delete ens_info; ens_info = (VarInfo **) 0;
+   }
+
+   // Reset count
+   n_ens_var = 0;
 
    return;
 }
@@ -93,9 +113,10 @@ void EnsembleStatConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::read_config(const char *default_file_name,
-                                       const char *user_file_name,
-                                       GrdFileType etype, unixtime ens_valid_ut, int ens_lead_sec,
-                                       GrdFileType otype, unixtime obs_valid_ut, int obs_lead_sec) {
+                                       const char *user_file_name) {
+
+   // Read the config file constants
+   conf.read(replace_path(config_const_filename));
 
    // Read the default config file
    conf.read(default_file_name);
@@ -103,211 +124,211 @@ void EnsembleStatConfInfo::read_config(const char *default_file_name,
    // Read the user-specified config file
    conf.read(user_file_name);
 
-   process_config(etype, ens_valid_ut, ens_lead_sec,
-                  otype, obs_valid_ut, obs_lead_sec);
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_ut, int ens_lead_sec,
-                                          GrdFileType otype, unixtime obs_valid_ut, int obs_lead_sec) {
-   int i, j, n, n_mthd, n_wdth, a, b;
-   ConcatString grib_ptv_str;
-   InterpMthd method;
+void EnsembleStatConfInfo::process_config(GrdFileType etype,
+                                          GrdFileType otype) {
+   int i;  
    VarInfoFactory info_factory;
+   map<STATLineType,STATOutputType>output_map;
+   Dictionary *ens_dict  = (Dictionary *) 0;
+   Dictionary *fcst_dict = (Dictionary *) 0;
+   Dictionary *obs_dict  = (Dictionary *) 0;
+   Dictionary i_ens_dict, i_fcst_dict, i_obs_dict;
+   InterpInfo interp_info;
 
-   //
+   // Dump the contents of the config file
+   if(mlog.verbosity_level() >= 5) conf.dump(cout);
+
+   // Initialize
+   clear();
+
    // Conf: version
-   //
+   version = parse_conf_version(&conf);
 
-   check_met_version(conf.version().sval());
-
-   //
    // Conf: model
-   //
+   model = parse_conf_model(&conf);
 
-   if(strlen(conf.model().sval()) == 0 ||
-      check_reg_exp(ws_reg_exp, conf.model().sval()) == true) {
-
+   // Conf: beg_ds and end_ds
+   beg_ds = conf.lookup_int(conf_key_obs_window_beg_ds);
+   end_ds = conf.lookup_int(conf_key_obs_window_end_ds);
+   if(beg_ds > end_ds) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "The model name (\"" << conf.model().sval() 
-           << "\") must be non-empty and contain no embedded "
-           << "whitespace.\n\n";
+           << "\"beg_ds\" cannot be greater than \"end_ds\": "
+           << beg_ds << " > " << end_ds << "\n\n";
+      exit(1);
+   }
+   
+   // Conf: output_flag
+   output_map = parse_conf_output_flag(&conf);
+
+   // Make sure the output_flag is the expected size
+   if((signed int) output_map.size() != n_txt) {
+      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+           << "Unexpected number of entries found in \""
+           << conf_key_output_flag << "\" ("
+           << (signed int) output_map.size()
+           << " != " << n_txt << ").\n\n";
       exit(1);
    }
 
-   //
-   // Conf: grib_ptv
-   //
+   // Populate the output_flag array with map values
+   for(i=0; i<n_txt; i++) {
+      output_flag[i] = output_map[txt_file_type[i]];
+   }
 
-   // Store the grib_ptv as a string to be passed to the VarInfo objects
-   grib_ptv_str << conf.grib_ptv().ival();
+   // Conf: ensemble_flag
+   ens_dict = conf.lookup_dictionary(conf_key_ensemble_flag);
 
-   //
-   // Conf: ens_field
-   //
+   // Populate the ensemble_flag array
+   for(i=0; i<n_nc; i++) {
+      ensemble_flag[i] = ens_dict->lookup_bool(conf_key_ensemble_flag_entries[i]);
+   }
 
-   // Parse out the GRIB codes to be verified
-   n_ens_var = conf.n_ens_field_elements();
+   // Conf: ens.field
+   ens_dict = conf.lookup_array(conf_key_ens_field);
 
+   // Determine the number of ensemble fields (name/level) to be processed
+   n_ens_var = parse_conf_n_vx(ens_dict);
+
+   // Check for a valid number of ensemble fields
    if(n_ens_var == 0) {
-
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "At least one value must be provided "
-           << "for ens_field.\n\n";
+           << "At least one field must be specified for \""
+           << conf_key_ens_field << "\".\n\n";
       exit(1);
    }
 
-   // Allocate space to store the GRIB code information
+   // Allocate space based on the number of ensemble fields
    ens_info = new VarInfo * [n_ens_var];
+   ens_ta   = new ThreshArray [n_ens_var];
 
-   // Parse the ensemble field information
-   for(i=0; i<n_ens_var; i++) {
+    // Parse the ensemble field information
+   for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
+
+      // Allocate new VarInfo object
       ens_info[i] = info_factory.new_var_info(etype);
 
-      // Set the GRIB parameter table version number and pass the magic string
-      ens_info[i]->set_magic(conf.ens_field(i).sval());
+      // Get the current dictionary
+      i_ens_dict = parse_conf_i_vx_dict(ens_dict, i);
 
-      // Set the requested timing information
-      if(ens_valid_ut > 0)           ens_info[i]->set_valid(ens_valid_ut);
-      if(!is_bad_data(ens_lead_sec)) ens_info[i]->set_lead(ens_lead_sec);
-   }
+      // Set the current dictionary
+      ens_info[i]->set_dict(i_ens_dict);
 
-   //
-   // Conf: ens_thresh
-   //
+      // Dump the contents of the current VarInfo
+      if(mlog.verbosity_level() >= 5) {
+         mlog << Debug(5)
+              << "Parsed ensemble field number " << i+1 << ":\n";
+         ens_info[i]->dump(cout);
+      }
 
-   // If the ensemble relative frequency is requested, check that the
-   // number of forecast threshold levels matches n_ens_var
-   if(conf.output_flag(i_nc_freq).ival() != 0 &&
-      conf.n_ens_thresh_elements()       != n_ens_var) {
+      // Only parse thresholds if relative frequencies are requested
+      if(ensemble_flag[i_nc_freq]) {
+        
+         // Conf: cat_thresh
+         ens_ta[i] = i_ens_dict.lookup_thresh_array(conf_key_cat_thresh);
 
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "When computing ensemble relative frequencies, "
-           << "the number of ens_thresh levels provided must match "
-           << "the number of fields provided in ens_field.\n\n";
-      exit(1);
-   }
+         // Dump the contents of the current thresholds
+         if(mlog.verbosity_level() >= 5) {
+            mlog << Debug(5)
+                 << "Parsed thresholds for ensemble field number " << i+1 << ":\n";
+            ens_ta[i].dump(cout);
+         }
 
-   // Allocate space to store the threshold information
-   ens_ta = new ThreshArray [n_ens_var];
-
-   // Parse the ensemble threshold information
-   for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
-      ens_ta[i].parse_thresh_str(conf.ens_thresh(i).sval());
-
-      // Keep track of the maximum number of thresholds
-      if(ens_ta[i].n_elements() > max_n_thresh) {
-         max_n_thresh = ens_ta[i].n_elements();
+         // Keep track of the maximum number of thresholds
+         if(ens_ta[i].n_elements() > max_n_thresh) {
+            max_n_thresh = ens_ta[i].n_elements();
+         }
       }
    }
 
-   //
-   // Conf: vld_ens_thresh
-   //
+   // Conf: ens.ens_thresh
+   vld_ens_thresh = conf.lookup_double(conf_key_ens_ens_thresh);
 
    // Check that the valid ensemble threshold is between 0 and 1.
-   if(conf.vld_ens_thresh().dval() <= 0.0 ||
-      conf.vld_ens_thresh().dval() >  1.0) {
-
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-              << "The valid ensemble threshold value must be set "
-              << "greater than 0 and less than or equal to 1.\n\n";
-         exit(1);
+   if(vld_ens_thresh <= 0.0 || vld_ens_thresh >  1.0) {
+      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+           << "The \"" << conf_key_ens_ens_thresh << "\" parameter ("
+           << vld_ens_thresh << ") must be set between 0 and 1.\n\n";
+      exit(1);
    }
 
-   //
-   // Conf: vld_data_thresh
-   //
-
+   // Conf: ens.vld_thresh
+   vld_data_thresh = conf.lookup_double(conf_key_ens_vld_thresh);
+   
    // Check that the valid ensemble threshold is between 0 and 1.
-   if(conf.vld_data_thresh().dval() <= 0.0 ||
-      conf.vld_data_thresh().dval() >  1.0) {
-
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-              << "The valid data threshold value must be set "
-              << "greater than 0 and less than or equal to 1.\n\n";
-         exit(1);
+   if(vld_data_thresh <= 0.0 || vld_data_thresh >  1.0) {
+      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+           << "The \"" << conf_key_ens_vld_thresh << "\" parameter ("
+           << vld_data_thresh << ") must be set between 0 and 1.\n\n";
+      exit(1);
    }
 
-   //
-   // Conf: fcst_field
-   //
+   // Conf: fcst.field and obs.field
+   fcst_dict = conf.lookup_array(conf_key_fcst_field);
+   obs_dict  = conf.lookup_array(conf_key_obs_field);
 
-   // Parse out the GRIB codes to be verified
-   n_vx = conf.n_fcst_field_elements();
+   // Determine the number of fields (name/level) to be verified
+   n_vx = parse_conf_n_vx(fcst_dict);
 
-   if(n_vx != 0) {
+   // Check for a valid number of verification tasks
+   if(parse_conf_n_vx(obs_dict) != n_vx) {
+      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+           << "The number of verification tasks in \""
+           << conf_key_obs_field
+           << "\" must match the number in \""
+           << conf_key_fcst_field << "\".\n\n";
+      exit(1);
+   }
 
-      // Allocate space to store the GRIB code information
-      vx_pd = new VxPairDataEnsemble [n_vx];
+   if(n_vx > 0) {
 
+      // Allocate space based on the number of verification tasks
+      vx_pd   = new VxPairDataEnsemble [n_vx];
+      msg_typ = new StringArray        [n_vx];
+   
       // Parse the fcst field information
       for(i=0; i<n_vx; i++) {
 
-         // Get new VarInfo object
+         // Allocate new VarInfo objects
          vx_pd[i].fcst_info = info_factory.new_var_info(etype);
+         vx_pd[i].obs_info  = info_factory.new_var_info(otype);
 
-         // Set the GRIB parameter table version number and pass the magic string
-         vx_pd[i].fcst_info->set_magic(conf.fcst_field(i).sval());
+         // Get the current dictionaries
+         i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
+         i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
-         // Set the requested timing information
-         if(ens_valid_ut > 0)           vx_pd[i].fcst_info->set_valid(ens_valid_ut);
-         if(!is_bad_data(ens_lead_sec)) vx_pd[i].fcst_info->set_lead(ens_lead_sec);
-      }
-   } // end if n_vx != 0
+         // Conf: msg_typ
+         msg_typ[i] = parse_conf_message_type(&i_fcst_dict);
 
-   //
-   // Conf: obs_field
-   //
+         // Set the current dictionaries
+         vx_pd[i].fcst_info->set_dict(i_fcst_dict);
+         vx_pd[i].obs_info->set_dict(i_obs_dict);
 
-   // Check if the length of obs_field is non-zero and
-   // not equal to n_vx
-   if(conf.n_obs_field_elements() != 0 &&
-      conf.n_obs_field_elements() != n_vx) {
-
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "The length of obs_field must be the same as the "
-           << "length of fcst_field.\n\n";
-      exit(1);
-   }
-
-   if(n_vx != 0) {
-
-      // Parse the obs field information
-      for(i=0; i<n_vx; i++) {
-     
-         // Allocate a new VarInfo object
-         vx_pd[i].obs_info = info_factory.new_var_info(otype);
-
-         // Check that at least one observation file has been specified
-         if(otype == FileType_None) {
-            mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-                 << "Verification has been requested but no observation "
-                 << "files have been specified.\n\n";
-            exit(1);
+         // Dump the contents of the current VarInfo
+         if(mlog.verbosity_level() >= 5) {
+            mlog << Debug(5)
+                 << "Parsed forecast field number " << i+1 << ":\n";
+            vx_pd[i].fcst_info->dump(cout);
+            mlog << Debug(5)
+                 << "Parsed observation field number " << i+1 << ":\n";
+            vx_pd[i].obs_info->dump(cout);
          }
 
-         // If obs_field is empty, use fcst_field
-         if(conf.n_obs_field_elements() == 0) {
-            vx_pd[i].obs_info->set_magic(conf.fcst_field(i).sval());
-         }
-         else {
-            vx_pd[i].obs_info->set_magic(conf.obs_field(i).sval());
-         }
-
-         // Check the levels for the fcst and obs fields.  If the
-         // fcst_field is a range of pressure levels, check to see if the
-         // range of obs_field pressure levels is wholly contained in the
+         // Check the levels for the forecast and observation fields.  If the
+         // forecast field is a range of pressure levels, check to see if the
+         // range of observation field pressure levels is wholly contained in the
          // fcst levels.  If not, print a warning message.
-         if(vx_pd[i].fcst_info->level().type()  == LevelType_Pres &&
+         if(vx_pd[i].fcst_info->level().type() == LevelType_Pres &&
             !is_eq(vx_pd[i].fcst_info->level().lower(), vx_pd[i].fcst_info->level().upper()) &&
-            (vx_pd[i].obs_info->level().lower() <  vx_pd[i].fcst_info->level().lower() ||
-             vx_pd[i].obs_info->level().upper() >  vx_pd[i].fcst_info->level().upper())) {
-
-            mlog << Warning << "\nEnsembleStatConfInfo::process_config() -> "
+            (vx_pd[i].obs_info->level().lower() < vx_pd[i].fcst_info->level().lower() ||
+             vx_pd[i].obs_info->level().upper() > vx_pd[i].fcst_info->level().upper())) {
+           
+            mlog << Warning
+                 << "\nEnsembleStatConfInfo::process_config() -> "
                  << "The range of requested observation pressure levels "
                  << "is not contained within the range of requested "
                  << "forecast pressure levels.  No vertical interpolation "
@@ -315,247 +336,79 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype, unixtime ens_valid_
                  << "the range of forecast levels.  Instead, they will be "
                  << "matched to the single nearest forecast level.\n\n";
          }
-      } // end for loop
-
-   } // end if n_vx != 0
-
-   //
-   // Conf: message_type
-   //
-
-   // Parse the number of message types to be used
-   n_msg_typ = conf.n_message_type_elements();
-
-   // Check that at least one PrepBufr message type is provided
-   if(n_vx > 0 && n_msg_typ == 0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "At least one PrepBufr message type must be provided.\n\n";
-      exit(1);
-   }
-
-   if(n_msg_typ > 0) {
-
-      // Store the message types
-      msg_typ = new ConcatString [n_msg_typ];
-      for(i=0; i<n_msg_typ; i++) msg_typ[i] = conf.message_type(i).sval();
-
-      // Check that each PrepBufr message type provided is valid
-      for(i=0; i<n_msg_typ; i++) {
-
-         if(strstr(vld_msg_typ_str, msg_typ[i]) == NULL) {
-            mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-                 << "Invalid message type string provided ("
-                 << conf.message_type(i).sval() << ").\n\n";
-            exit(1);
-         }
       }
-   }
+   } // end if n_vx > 0
 
-   //
+   // Conf: interp
+   interp_info   = parse_conf_interp(&conf);
+   interp_field  = interp_info.field;
+   interp_thresh = interp_info.vld_thresh;
+   n_interp      = interp_info.n_interp;
+   interp_wdth   = interp_info.width;
+
+   // Allocate memory to store the interpolation methods
+   interp_mthd = new InterpMthd [n_interp];
+   for(i=0; i<n_interp; i++)
+      interp_mthd[i] = string_to_interpmthd(interp_info.method[i]);
+
+   // Conf: rng_type and rng_seed
+   rng_type = conf.lookup_string(conf_key_rng_type);
+   rng_seed = conf.lookup_string(conf_key_rng_seed);
+
    // Conf: duplicate_flag
-   //
-   duplicate_flag = conf.duplicate_flag().ival();
-
-   // Check that duplicate_flag is valid
-   if( duplicate_flag < 0 || duplicate_flag > 2 ) {
-      mlog << Error << "\nPointStatConfInfo::process_config() -> "
-           << "The duplicate_flag setting must be either NONE, UNIQUE or "
-           << "SINGLE\n\n";
-      exit(1);
-   }
-
-   //
-   // Conf: interp_method
-   //
-
-   // Parse the number of interpolation methods to be used
-   n_mthd = conf.n_interp_method_elements();
-
-   // Check that at least one interpolation method is provided
-   if(n_vx > 0 && n_mthd == 0) {
-
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "At least one interpolation method must be provided.\n\n";
-      exit(1);
-   }
-
-   //
-   // Conf: interp_width
-   //
-
-   // Parse the number of interpolation widths to be used
-   n_wdth = conf.n_interp_width_elements();
-
-   // Check that at least one interpolation width is provided
-   if(n_vx > 0 && n_wdth == 0) {
-
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "At least one interpolation width must be provided.\n\n";
-      exit(1);
-   }
-
-   if(n_wdth > 0 && n_mthd > 0) {
-
-      // Compute the number of interpolation methods to be used
-      n_interp = 0;
-
-      // Check for nearest neighbor special case
-      for(i=0, a=n_wdth; i<n_wdth; i++) {
-
-         if(conf.interp_width(i).ival() == 1) {
-            a--;
-            n_interp++;
-         }
-
-         // Perform error checking on widths
-         if(conf.interp_width(i).ival() < 1) {
-            mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-                 << "The interpolation width values must be set "
-                 << "greater than or equal to 1 ("
-                 << conf.interp_width(i).ival() << ").\n\n";
-            exit(1);
-         }
-      }
-
-      // Check for bilinear interpolation special case
-      for(i=0, b=n_mthd; i<n_mthd; i++) {
-
-         method = string_to_interpmthd(conf.interp_method(i).sval());
-
-         if(method == InterpMthd_Bilin) {
-            b--;
-            n_interp++;
-         }
-      }
-
-      // Compute n_interp
-      n_interp += a*b;
-
-      // Allocate space for the interpolation methods and widths
-      interp_mthd = new InterpMthd [n_interp];
-      interp_wdth = new int        [n_interp];
-
-      // Initialize the interpolation method count
-      n = 0;
-
-      // Check for the nearest neighbor special case
-      for(i=0; i<n_wdth; i++) {
-         if(conf.interp_width(i).ival() == 1) {
-            interp_mthd[n] = InterpMthd_UW_Mean;
-            interp_wdth[n] = 1;
-            n++;
-         }
-      }
-
-      // Check for the bilinear interpolation special case
-      for(i=0; i<n_mthd; i++) {
-         method = string_to_interpmthd(conf.interp_method(i).sval());
-         if(method == InterpMthd_Bilin) {
-            interp_mthd[n] = method;
-            interp_wdth[n] = 2;
-            n++;
-         }
-      }
-
-      // Loop through the interpolation widths
-      for(i=0; i<n_wdth; i++) {
-
-         // Skip the nearest neighbor case
-         if(conf.interp_width(i).ival() == 1) continue;
-
-         // Loop through the interpolation methods
-         for(j=0; j<n_mthd; j++) {
-            method = string_to_interpmthd(conf.interp_method(j).sval());
-
-            // Skip the bilinear interpolation case
-            if(method == InterpMthd_Bilin) continue;
-
-            // Store the interpolation method and width
-            interp_mthd[n] = method;
-            interp_wdth[n] = conf.interp_width(i).ival();
-            n++;
-         }
-      }
-   }
-
-   //
-   // Conf: interp_thresh
-   //
-
-   // Check that the interpolation threshold is set between 0 and 1
-   if(conf.interp_thresh().dval() < 0.0 ||
-      conf.interp_thresh().dval() > 1.0) {
-
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-              << "The interpolation threshold value must be set "
-              << "between 0 and 1.\n\n";
-         exit(1);
-   }
-
-   //
-   // Conf: output_flag
-   //
-
-   // Make sure the output_flag is the expected length
-   if(conf.n_output_flag_elements() != n_out) {
-
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "Found " << conf.n_output_flag_elements()
-           << " elements in the output_flag but expected " << n_out
-           << ".\n\n";
-      exit(1);
-   }
+   duplicate_flag = parse_conf_duplicate_flag(&conf);
+   
+   // Conf: output_prefix
+   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_masks(const Grid &grid) {
-   int i, n_mask_grid, n_mask_poly;
-   StringArray mask_sid_sa;
+void EnsembleStatConfInfo::process_masks(const Grid &grid) {   
+   int i, j;
+   StringArray mask_grid, mask_poly;
+   ConcatString sid_file, s;
 
-   // Get the number of masking areas
-   n_mask_grid = conf.n_mask_grid_elements();
-   n_mask_poly = conf.n_mask_poly_elements();
-   n_mask_area = n_mask_grid + n_mask_poly;
+   // Retrieve the area masks
+   mask_grid = conf.lookup_string_array(conf_key_mask_grid);
+   mask_poly = conf.lookup_string_array(conf_key_mask_poly);
+   n_mask_area = mask_grid.n_elements() + mask_poly.n_elements();
 
-   // Get the number of masking station ID's
-   parse_sid_mask(conf.mask_sid().sval(), mask_sid_sa);
-   n_mask_sid = mask_sid_sa.n_elements();
+   // Retrieve the station masks
+   sid_file = conf.lookup_string(conf_key_mask_sid);
+   parse_sid_mask(sid_file, mask_sid);
 
    // Save the total number masks as a sum of the masking areas and
    // masking points
-   n_mask = n_mask_area + n_mask_sid;
+   n_mask = n_mask_area + mask_sid.n_elements();
 
    // Check that at least one verification masking region is provided
    if(n_mask == 0) {
-      mlog << Error << "\nEnsemblesStatConfInfo::process_masks() -> "
+      mlog << Error << "\nEnsembleStatConfInfo::process_masks() -> "
            << "At least one grid, polyline, or station ID "
            << "masking region must be provided.\n\n";
       exit(1);
    }
 
    // Allocate space to store the masking information
-   mask_dp   = new DataPlane [n_mask_area];
-   mask_name = new ConcatString [n_mask];
+   mask_dp = new DataPlane [n_mask_area];
 
    // Parse out the masking grid areas
-   for(i=0; i<n_mask_grid; i++) {
-      parse_grid_mask(conf.mask_grid(i).sval(), grid,
-                      mask_dp[i], mask_name[i]);
+   for(i=0; i<mask_grid.n_elements(); i++) {
+      parse_grid_mask(mask_grid[i], grid, mask_dp[i], s);
+      mask_name.add(s);
    }
 
    // Parse out the masking poly areas
-   for(i=0; i<n_mask_poly; i++) {
-      parse_poly_mask(conf.mask_poly(i).sval(), grid,
-                      mask_dp[i+n_mask_grid], mask_name[i+n_mask_grid]);
+   for(i=0,j=mask_grid.n_elements(); i<mask_poly.n_elements(); i++,j++) {
+      parse_poly_mask(mask_poly[i], grid, mask_dp[j], s);
+      mask_name.add(s);
    }
 
    // Store the masking station ID points
-   for(i=0; i<n_mask_sid; i++) {
-      mask_name[i+n_mask_area] = mask_sid_sa[i];
-   }
+   for(i=0; i<mask_sid.n_elements(); i++) mask_name.add(mask_sid[i]);
 
    return;
 }
@@ -563,18 +416,21 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::set_vx_pd() {
-   int i, j;
+   int i, j, n_msg_typ;
 
    // EnsPairData is stored in the vx_pd objects in the following order:
    // [n_msg_typ][n_mask][n_interp]
    for(i=0; i<n_vx; i++) {
+
+      // Get the message types for the current verification task
+      n_msg_typ = get_n_msg_typ(i);
 
       // Set up the dimensions for the vx_pd object
       vx_pd[i].set_pd_size(n_msg_typ, n_mask, n_interp);
 
       // Add the verifying message type to the vx_pd objects
       for(j=0; j<n_msg_typ; j++)
-         vx_pd[i].set_msg_typ(j, msg_typ[j]);
+         vx_pd[i].set_msg_typ(j, msg_typ[i][j]);
 
       // Add the masking information to the vx_pd objects
       for(j=0; j<n_mask; j++) {
@@ -600,17 +456,35 @@ void EnsembleStatConfInfo::set_vx_pd() {
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::n_txt_row(int i) {
-   int n;
+int EnsembleStatConfInfo::get_n_msg_typ(int i) const {
+
+   if(i < 0 || i >= n_vx) {
+      mlog << Error << "\nEnsembleStatConfInfo::get_n_msg_typ(int i) -> "
+           << "range check error for i = " << i << "\n\n";
+      exit(1);
+   }
+
+   return(msg_typ[i].n_elements());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
+   int i, n, max_n_msg_typ;
+
+   // Determine the maximum number of message types being used
+   for(i=0, max_n_msg_typ=0; i<n_vx; i++)
+      if(get_n_msg_typ(i) > max_n_msg_typ)
+         max_n_msg_typ = get_n_msg_typ(i);
 
    // Switch on the index of the line type
-   switch(i) {
+   switch(i_txt_row) {
 
       case(i_rhist):
          // Maximum number of Rank Histogram lines possible =
          //    Fields * Masks * Interpolations * Message Type [Point Obs]
          //    Fields * Masks * Interpolations [Grid Obs]
-         n =   n_vx * n_mask * n_interp * n_msg_typ
+         n =   n_vx * n_mask * n_interp * max_n_msg_typ
              + n_vx * n_mask * n_interp;
          break;
 
@@ -623,7 +497,10 @@ int EnsembleStatConfInfo::n_txt_row(int i) {
          break;
 
       default:
-         n = 0;
+         mlog << Error << "\nEnsembleStatConfInfo::n_txt_row(int) -> "
+              << "unexpected output type index value: " << i_txt_row
+              << "\n\n";
+         exit(1);
          break;
    }
 
@@ -639,7 +516,7 @@ int EnsembleStatConfInfo::n_stat_row() {
    // for the optional text files that have been requested
    for(i=0, n=0; i<n_txt; i++) {
 
-      if(conf.output_flag(i).ival() > 0) n += n_txt_row(i);
+      if(output_flag[i] != STATOutputType_None) n += n_txt_row(i);
    }
 
    return(n);

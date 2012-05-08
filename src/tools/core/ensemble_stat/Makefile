@@ -16,15 +16,13 @@
 EXECUTABLES = ensemble_stat
 
 
-OBJECTS     = ensemble_stat_Conf.o \
-              ensemble_stat_conf_info.o
+OBJECTS     = ensemble_stat_conf_info.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = ensemble_stat_Conf.h \
-              ensemble_stat_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -54,23 +52,12 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-ensemble_stat_Conf.h ensemble_stat_Conf.cc: $(CONFIG_TEMPLATE_DIR)/EnsembleStatConfig_default
-	@ echo
-	@ rm -f ensemble_stat_Conf.h ensemble_stat_Conf.cc
-	$(ECONFIG_CODEGEN) -class ensemble_stat_Conf -outfile ensemble_stat_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/EnsembleStatConfig_default
-
-
 ########################################################################
 
 
    ##
    ##  objects
    ##
-
-
-ensemble_stat_Conf.o: ensemble_stat_Conf.cc
-	@ echo
-	$(CXX) ensemble_stat_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
@@ -95,7 +82,6 @@ ensemble_stat_conf_info.o: ensemble_stat_conf_info.cc
 
 
 ensemble_stat: ensemble_stat.cc $(OBJECTS)
-	@ echo
 	$(CXX) -o $(EXECUTABLES) ensemble_stat.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
@@ -112,11 +98,10 @@ ensemble_stat: ensemble_stat.cc $(OBJECTS)
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_config \
 	-lvx_cal \
-	-lvx_econfig \
-	-lvx_math \
+	-lvx_config \
 	-lvx_util \
+	-lvx_math \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \

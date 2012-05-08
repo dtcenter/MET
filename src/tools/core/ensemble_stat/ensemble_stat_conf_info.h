@@ -15,8 +15,7 @@
 
 #include <iostream>
 
-#include "ensemble_stat_Conf.h"
-
+#include "vx_config.h"
 #include "vx_data2d.h"
 #include "vx_grid.h"
 #include "vx_util.h"
@@ -31,26 +30,25 @@
 // Indices for the output flag types in the configuration file
 static const int i_rhist    = 0;
 static const int i_orank    = 1;
-static const int i_nc_mean  = 2;
-static const int i_nc_stdev = 3;
-static const int i_nc_minus = 4;
-static const int i_nc_plus  = 5;
-static const int i_nc_min   = 6;
-static const int i_nc_max   = 7;
-static const int i_nc_range = 8;
-static const int i_nc_vld   = 9;
-static const int i_nc_freq  = 10;
-static const int i_nc_orank = 11;
-
 static const int n_txt      = 2;
-static const int n_out      = 12;
 
-// Enumeration to store possible output flag values
-enum OutputFlag {
-   flag_no_out   = 0,
-   flag_stat_out = 1,
-   flag_txt_out  = 2
+// Text file type
+static const STATLineType txt_file_type[n_txt] = {
+   stat_rhist, stat_orank
 };
+
+// Indices for the ensemble flag types in the configuration file
+static const int i_nc_mean  = 0;
+static const int i_nc_stdev = 1;
+static const int i_nc_minus = 2;
+static const int i_nc_plus  = 3;
+static const int i_nc_min   = 4;
+static const int i_nc_max   = 5;
+static const int i_nc_range = 6;
+static const int i_nc_vld   = 7;
+static const int i_nc_freq  = 8;
+static const int i_nc_orank = 9;
+static const int n_nc       = 10;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -66,57 +64,59 @@ class EnsembleStatConfInfo {
 
       // Ensemble verification
       int n_vx;         // Number of ensemble fields to be verified
-      int n_msg_typ;    // Number of verifying message types
       int n_interp;     // Number of interpolation methods
       int n_mask;       // Number of masking regions
       int n_mask_area;  // Number of masking areas
-      int n_mask_sid;   // Number of masking station id's
 
    public:
 
       // Ensemble-Stat configuration object
-      ensemble_stat_Conf conf;
+      MetConfig conf;
 
-      // Various objects to store the data that's parsed from the
-      // Ensemble-Stat configuration object
-      VarInfo     **ens_info;     // Array of pointers for ensemble [n_ens_var]
-      ThreshArray  *ens_ta;       // Array for ensemble thresholds [n_ens_var]
-
-      VxPairDataEnsemble *vx_pd;  // Array for ensemble pair data [n_vx]
-
-      ConcatString *msg_typ;      // Array of message types [n_msg_typ]
-
-      int          duplicate_flag; // Duplicate observation behavior
-
-      InterpMthd   *interp_mthd;  // Array for interpolation methods [n_interp]
-      int          *interp_wdth;  // Array for interpolation widths [n_interp]
-
-      DataPlane    *mask_dp;      // Array for masking regions [n_mask]
-      ConcatString *mask_name;    // Masking region names [n_mask]
-      StringArray   mask_sid;     // Masking station id's
+      // Store data parsed from the Grid-Stat configuration object
+      ConcatString         model;               // Model name
+      int                  beg_ds;              // Begin observation time window offset
+      int                  end_ds;              // End observation time window offset
+      VarInfo **           ens_info;            // Array of pointers for ensemble [n_ens_var]
+      ThreshArray *        ens_ta;              // Array for ensemble thresholds [n_ens_var]
+      double               vld_ens_thresh;      // Minimum valid input file ratio
+      double               vld_data_thresh;     // Minimum valid data ratio for each point
+      VxPairDataEnsemble * vx_pd;               // Array for ensemble pair data [n_vx]
+      StringArray *        msg_typ;             // Array of message types [n_vx]
+      StringArray          mask_name;           // Masking region names [n_mask]
+      DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
+      StringArray          mask_sid;            // Masking station id's [n_mask_sid]
+      FieldType            interp_field;        // How to apply interpolation options      
+      double               interp_thresh;       // Proportion of valid data values
+      InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]
+      IntArray             interp_wdth;         // Array for interpolation widths [n_interp]      
+      STATOutputType       output_flag[n_txt];  // Flag for each output line type
+      bool                 ensemble_flag[n_nc]; // Boolean for each ensemble field type
+      ConcatString         rng_type;            // GSL random number generator
+      ConcatString         rng_seed;            // GSL RNG seed value
+      DuplicateType        duplicate_flag;      // Duplicate observation behavior
+      ConcatString         output_prefix;       // String to customize output file names
+      ConcatString         version;             // Config file version
 
       EnsembleStatConfInfo();
      ~EnsembleStatConfInfo();
 
       void clear();
 
-      void read_config   (const char *, const char *,
-                          GrdFileType, unixtime, int,
-                          GrdFileType, unixtime, int);
-      void process_config(GrdFileType, unixtime, int,
-                          GrdFileType, unixtime, int);
+      void read_config   (const char *, const char *);
+      void process_config(GrdFileType, GrdFileType);
       void process_masks (const Grid &);
       void set_vx_pd     ();
 
       // Dump out the counts
-      int get_n_ens_var()     const;
-      int get_max_n_thresh()  const;
-      int get_n_vx()          const;
-      int get_n_msg_typ()     const;
-      int get_n_interp()      const;
-      int get_n_mask()        const;
-      int get_n_mask_area()   const;
-      int get_n_mask_sid()    const;
+      int get_n_ens_var()      const;
+      int get_max_n_thresh()   const;
+      int get_n_vx()           const;
+      int get_n_msg_typ(int i) const;
+      int get_n_interp()       const;
+      int get_n_mask()         const;
+      int get_n_mask_area()    const;
+      int get_n_mask_sid()     const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
@@ -126,14 +126,13 @@ class EnsembleStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()     const { return(n_ens_var);    }
-inline int EnsembleStatConfInfo::get_max_n_thresh()  const { return(max_n_thresh); }
-inline int EnsembleStatConfInfo::get_n_vx()          const { return(n_vx);         }
-inline int EnsembleStatConfInfo::get_n_msg_typ()     const { return(n_msg_typ);    }
-inline int EnsembleStatConfInfo::get_n_interp()      const { return(n_interp);     }
-inline int EnsembleStatConfInfo::get_n_mask()        const { return(n_mask);       }
-inline int EnsembleStatConfInfo::get_n_mask_area()   const { return(n_mask_area);  }
-inline int EnsembleStatConfInfo::get_n_mask_sid()    const { return(n_mask_sid);   }
+inline int EnsembleStatConfInfo::get_n_ens_var()      const { return(n_ens_var);             }
+inline int EnsembleStatConfInfo::get_max_n_thresh()   const { return(max_n_thresh);          }
+inline int EnsembleStatConfInfo::get_n_vx()           const { return(n_vx);                  }
+inline int EnsembleStatConfInfo::get_n_interp()       const { return(n_interp);              }
+inline int EnsembleStatConfInfo::get_n_mask()         const { return(n_mask);                }
+inline int EnsembleStatConfInfo::get_n_mask_area()    const { return(n_mask_area);           }
+inline int EnsembleStatConfInfo::get_n_mask_sid()     const { return(mask_sid.n_elements()); }
 
 ////////////////////////////////////////////////////////////////////////
 

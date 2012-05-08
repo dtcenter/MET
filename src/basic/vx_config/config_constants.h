@@ -218,6 +218,8 @@ static const char config_const_filename[] = "MET_BASE/data/config/ConfigConstant
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
 static const char conf_key_output_flag[]       = "output_flag";
+static const char conf_key_obs_window_beg_ds[] = "obs_window.beg_ds";
+static const char conf_key_obs_window_end_ds[] = "obs_window.end_ds";
 static const char conf_key_fcst[]              = "fcst";
 static const char conf_key_obs[]               = "obs";
 static const char conf_key_fcst_field[]        = "fcst.field";
@@ -286,6 +288,25 @@ static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
 static const char conf_key_fcst_raw_plot[]     = "fcst_raw_plot";
 static const char conf_key_obs_raw_plot[]      = "obs_raw_plot";
 static const char conf_key_wvlt_plot[]         = "wvlt_plot";
+
+//
+// Ensemble-Stat specific parameter key names
+//
+
+static const char conf_key_ens[]                     = "ens";
+static const char conf_key_ens_field[]               = "ens.field";
+static const char conf_key_ens_ens_thresh[]          = "ens.ens_thresh";
+static const char conf_key_ens_vld_thresh[]          = "ens.vld_thresh";
+static const char conf_key_rng_type[]                = "rng.type";
+static const char conf_key_rng_seed[]                = "rng.seed";
+static const char conf_key_ensemble_flag[]           = "ensemble_flag";
+static const char * conf_key_ensemble_flag_entries[] = {
+   "mean",  "stdev", "minus",     "plus",      "min",
+   "max",   "range", "vld_count", "frequency", "rank"
+};
+static const int n_conf_key_ensemble_flag_entries =
+                    sizeof(conf_key_ensemble_flag_entries)/
+                    sizeof(*conf_key_ensemble_flag_entries);
 
 //
 // STAT-Analysis specific parameter key names
