@@ -20,7 +20,7 @@ using namespace std;
 #include "empty_string.h"
 #include "math_constants.h"
 
-#include "threshold.h" //  must be included before config.tab.h
+#include "threshold.h"       //  must be included before config.tab.h
 
 #include "scanner_stuff.h"   //  must be included before config.tab.h
 
@@ -55,9 +55,13 @@ extern void finish_string_scan ();
 
 static bool reading_string = false;
 
-static YY_BUFFER_STATE file_buffer = (YY_BUFFER_STATE) 0;
+static bool reading_env    = false;
+
+static YY_BUFFER_STATE file_buffer   = (YY_BUFFER_STATE) 0;
 
 static YY_BUFFER_STATE string_buffer = 0;   //  used for string parsing
+
+static YY_BUFFER_STATE env_buffer = 0;   //  used for environment variables outside of strings
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,9 +72,9 @@ static void do_cpp_comment();
 
 static  int nextchar();
 
-static int  do_comp();
+static  int do_comp();
 
-static int  do_id();
+static  int do_id();
 
 static void do_int();
 static void do_float();
@@ -80,6 +84,10 @@ static void do_quoted_string();
 static void patch_env(char * text);
 
 static void get_env_text(const char * line, char * env_text, int len);
+
+static bool do_eof();
+
+static void do_env();
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,6 +147,8 @@ WS          [ \n\t]*
 
 "\""                                { do_quoted_string();  return ( QUOTED_STRING ); }
 
+"${"{IDENTIFIER}"}"                 { do_env(); }
+
 {IDENTIFIER}                        { return ( do_id() ); }
 
 
@@ -166,6 +176,7 @@ WS          [ \n\t]*
 
 "\n"                                { ++LineNumber;  Column = 1; }
 
+<<EOF>>                             { if ( do_eof() )  return ( 0 ); }
 
 .                                   { ++Column; }
 
@@ -669,6 +680,88 @@ void finish_string_scan()
 config_delete_buffer(string_buffer);
 
 string_buffer = 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool do_eof()
+
+{
+
+if ( ! reading_env )  return ( true );
+
+config_delete_buffer(YY_CURRENT_BUFFER);
+
+config_switch_to_buffer(file_buffer);
+
+reading_env = false;
+
+Column += 3;
+
+return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_env()
+
+{
+
+int n;
+char junk[512];
+char * value = (char *) 0;
+
+
+
+memset(junk, 0, sizeof(junk));
+
+n = strlen(yytext);
+
+if ( n >= (int) (sizeof(junk) - 1) )  {
+
+   cerr << "\n\n  do_env() -> environment variable name too long\n\n";
+
+   exit ( 1 );
+
+}
+
+strncpy(junk, yytext + 2, sizeof(junk) - 1);
+
+junk[n - 3] = (char) 0;
+
+// cout << "environment variable \"" << junk << "\"\n" << flush;
+
+value = getenv(junk);
+
+if ( !value )  {
+
+   cerr << "\n\n  do_env() -> can't get value of environment variable \"" << junk << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+file_buffer = YY_CURRENT_BUFFER;
+
+reading_env = true;
+
+env_buffer = config_scan_string(value);
+
+config_switch_to_buffer(env_buffer);
+
+
+
+   //
+   //  done
+   //
 
 return;
 
