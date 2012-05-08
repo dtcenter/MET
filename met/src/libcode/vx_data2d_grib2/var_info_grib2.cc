@@ -406,9 +406,9 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       set_req_name( field_name );
 
       //  look up the name in the grib tables
-      if( field_name != "PROB" &&
-          !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm,
-                                  tab, tab_match) ){
+      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm,
+                                  tab, tab_match) &&
+          field_name != "PROB" ){
          mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 field abbreviation '"
               << field_name << "'\n\n";
          exit(1);

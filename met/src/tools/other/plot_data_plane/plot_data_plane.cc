@@ -72,7 +72,7 @@ static const char *program_name = "plot_data_plane";
 
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
-static ConcatString MagicString;
+static ConcatString ConfigString;
 static ConcatString ColorTableName;
 static ConcatString TitleString;
 
@@ -141,7 +141,9 @@ int main(int argc, char * argv[])
       //
       // populate the var_info object from the magic string
       //
-   var_ptr->set_magic(MagicString);
+   MetConfig config;
+   config.read_string( ConfigString );
+   var_ptr->set_dict(config);
 
       //
       // open the file
@@ -158,8 +160,8 @@ int main(int argc, char * argv[])
       //
    if (!met_ptr->data_plane(*var_ptr, data_plane))
    {
-      mlog << Error << "\n" << program_name << " -> trouble getting \""
-           << MagicString << "\" from file \"" << InputFilename << "\"\n\n";
+      mlog << Error << "\n" << program_name << " -> trouble getting field \""
+           << ConfigString << "\" from file \"" << InputFilename << "\"\n\n";
       exit (1);
    }
 
@@ -258,7 +260,7 @@ void process_command_line(int argc, char **argv)
       //
    InputFilename = cline[0];
    OutputFilename = cline[1];
-   MagicString = cline[2];
+   ConfigString = cline[2];
 
 }
 
@@ -274,7 +276,7 @@ void usage()
         << "Usage: " << program_name << "\n"
         << "\tinput_filename\n"
         << "\toutput_filename\n"
-        << "\tmagic_string\n"
+        << "\tconfig_string\n"
         << "\t[-color_table color_table_name]\n"
         << "\t[-plot_range min max]\n"
         << "\t[-title title_string]\n"
@@ -287,7 +289,7 @@ void usage()
         << "\t\t\"output_filename\" is the name of the output "
         << "PostScript file to be written (required).\n"
 
-        << "\t\t\"magic_string\" defines the data to be plotted "
+        << "\t\t\"config_string\" defines the data to be plotted "
         << "from the input file (required).\n"
 
         << "\t\t\"-color_table color_table_name\" overrides the "
