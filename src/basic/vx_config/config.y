@@ -239,7 +239,7 @@ expression : number                                     { $$ = $1; }
            ;
 
 
-piecewise_linear : '[' point_list ']'   { }
+piecewise_linear : '(' point_list ')'   { }
                  ;
 
 
@@ -248,7 +248,7 @@ point_list : point              { }
            ;
 
 
-point : '(' number ',' number ')'   { add_point($2, $4); }
+point : '(' expression ',' expression ')'   { add_point($2, $4); }
 
 
 

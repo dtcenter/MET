@@ -288,6 +288,7 @@ void DictionaryEntry::dump_config_format(ostream & out, int depth) const
 
 {
 
+int k;
 const ConcatString s = config_prefix(depth);
 
 out << s;
@@ -349,8 +350,17 @@ switch ( Type )  {
       out << ";\n";
       break;
 
+   case FunctionType:
+      out << "[ ";
+      for (k=0; k<(PWL->n_points()); ++k)  {
 
+         out << '(' << (PWL->x(k)) << ", " << (PWL->y(k)) << ')';
 
+         if ( k < (PWL->n_points() - 1) )  out << ' ';
+
+      }
+      out << " ]\n";
+      break;
 
    default:
       mlog << Error
