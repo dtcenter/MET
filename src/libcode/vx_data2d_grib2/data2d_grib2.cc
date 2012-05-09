@@ -325,8 +325,8 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
    //  check each record for a match against the VarInfo
    for( vector<Grib2Record*>::iterator it = RecList.begin();
-       it < RecList.end();
-       it++ ) {
+        it < RecList.end();
+        it++ ) {
 
       bool rec_match_ex = false;
       bool rec_match_rn = false;
@@ -542,7 +542,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
       for(int i=1; i <= numfields; i++){
 
          //  validate the PDS template number
-         if( 0 != gfld->ipdtnum && 8 != gfld->ipdtnum && 9 != gfld->ipdtnum ){
+         if(  0 != gfld->ipdtnum &&     //  analysis or forecast
+              2 != gfld->ipdtnum &&     //  ensemble mean
+              5 != gfld->ipdtnum &&     //  probability forecast
+              8 != gfld->ipdtnum &&     //  accumulation forecast
+              9 != gfld->ipdtnum &&     //  probabilistic accumultion forecast
+             12 != gfld->ipdtnum ){     //  derived accumulation forecast (?)
             mlog << Error << "\nMetGrib2DataFile::data_plane() - unexpected PDS template number ("
                  << gfld->ipdtnum << ")\n\n";
             exit(1);
@@ -559,11 +564,11 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->PdsTmpl      = gfld->ipdtnum;
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
-         rec->LvlTyp       = (8 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
+         rec->LvlTyp       = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
          rec->LvlVal1      = gfld->ipdtmpl[11];
          rec->LvlVal2      = 255 != gfld->ipdtmpl[12] ? gfld->ipdtmpl[14] : rec->LvlVal1;
-         rec->RangeTyp     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
-         rec->RangeVal     = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
+         rec->RangeTyp     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
+         rec->RangeVal     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
          rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
 
          //  initialize the forecast time information
@@ -586,7 +591,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  depending on the template number, determine the reference times
-         if( 8 == gfld->ipdtnum ){
+         if( 8 == gfld->ipdtnum || 12 == gfld->ipdtnum ){
 
             if( -1 != rec->ValidTime ){
                mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - accum valid time "
@@ -595,8 +600,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
                exit(1);
             }
 
-            rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[16], gfld->ipdtmpl[17], gfld->ipdtmpl[15],
-                                            gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[20]);
+            if( 8 == gfld->ipdtnum ){
+               rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[16], gfld->ipdtmpl[17], gfld->ipdtmpl[15],
+                                               gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[20]);
+            } else if( 12 == gfld->ipdtnum ){
+               rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[17],
+                                               gfld->ipdtmpl[20], gfld->ipdtmpl[21], gfld->ipdtmpl[22]);
+            }
             rec->LeadTime = rec->ValidTime - rec->InitTime;
 
          } else {
@@ -630,10 +640,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  set the accumulation interval
-         g2int range_typ = (8 == gfld->ipdtnum ? gfld->ipdtmpl[25] :
-                            9 == gfld->ipdtnum ? gfld->ipdtmpl[32] : 0);
-         g2int range_val = (8 == gfld->ipdtnum ? gfld->ipdtmpl[26] :
-                            9 == gfld->ipdtnum ? gfld->ipdtmpl[33] : 0);
+         g2int range_typ = ( 8 == gfld->ipdtnum ? gfld->ipdtmpl[25] :
+                             9 == gfld->ipdtnum ? gfld->ipdtmpl[32] :
+                            12 == gfld->ipdtnum ? gfld->ipdtmpl[27] : 0);
+         g2int range_val = ( 8 == gfld->ipdtnum ? gfld->ipdtmpl[26] :
+                             9 == gfld->ipdtnum ? gfld->ipdtmpl[33] :
+                            12 == gfld->ipdtnum ? gfld->ipdtmpl[28] : 0);
          double sec_accum_unit = VarInfoGrib2::g2_time_range_unit_to_sec( range_typ );
          rec->Accum = range_val * (int)sec_accum_unit;
 
