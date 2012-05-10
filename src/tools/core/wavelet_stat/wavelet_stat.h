@@ -98,10 +98,6 @@ static ConcatString out_dir;
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Output file flags
-static int nc_flag = 1;
-static int ps_flag = 1;
-
 // Output NetCDF file
 static ConcatString out_nc_file;
 static NcFile       *nc_out    = (NcFile *) 0;
