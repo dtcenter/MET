@@ -110,10 +110,6 @@ static StringArray  obs_file;
 static ConcatString      config_file;
 static PointStatConfInfo conf_info;
 
-// Command line arguments used to store requested timing information
-static unixtime     fcst_valid_ut    = (unixtime) 0;
-static int          fcst_lead_sec    = bad_data_int;
-
 // Optional arguments
 static unixtime     obs_valid_beg_ut = (unixtime) 0;
 static unixtime     obs_valid_end_ut = (unixtime) 0;
@@ -125,6 +121,10 @@ static bool         climo_flag       = false;
 // Variables for Output Files
 //
 ////////////////////////////////////////////////////////////////////////
+
+// Timing information
+static unixtime fcst_valid_ut = (unixtime) 0;
+static int      fcst_lead_sec = bad_data_int;
 
 // Output STAT file
 static ConcatString stat_file;
