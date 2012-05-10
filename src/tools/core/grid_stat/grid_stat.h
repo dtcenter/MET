@@ -106,12 +106,6 @@ static ConcatString obs_file;
 static ConcatString     config_file;
 static GridStatConfInfo conf_info;
 
-// Command line arguments used to store requested timing information
-static unixtime     fcst_valid_ut = (unixtime) 0;
-static int          fcst_lead_sec = bad_data_int;
-static unixtime     obs_valid_ut  = (unixtime) 0;
-static int          obs_lead_sec  = bad_data_int;
-
 // Optional arguments
 static ConcatString out_dir;
 
