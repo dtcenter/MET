@@ -78,7 +78,7 @@ class WaveletStatConfInfo {
       ConcatString            met_data_dir;       // MET data directory
       PlotInfo                fcst_raw_pi;        // Raw forecast plotting info
       PlotInfo                obs_raw_pi;         // Raw observation plotting info
-      PlotInfo                wvlt_pi;            // Wavelet plotting
+      PlotInfo                wvlt_pi;            // Wavelet plotting info
       ConcatString            output_prefix;      // String to customize output file name
       ConcatString            version;            // Config file version
 

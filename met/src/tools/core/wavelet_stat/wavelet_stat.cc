@@ -28,8 +28,8 @@
 //                    multiple config files.
 //   007    05/01/12  Halley Gotway   Switch to using vx_config library.
 //   008    05/01/12  Halley Gotway   Move -fcst_valid, -fcst_lead,
-//                    -obs_valid, and -obs_lead command line options
-//                    to config file.
+//                    -obs_valid, -obs_lead, -ps, -nc command line
+//                    options to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,8 +116,6 @@ static void render_tile(PSfile *, const double *, int, int, Box &);
 static void usage();
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
-static void set_postscript(const StringArray &);
-static void set_netcdf(const StringArray &);
 static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -161,8 +159,6 @@ void process_command_line(int argc, char **argv) {
    // Add the options function calls
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
-   cline.add(set_postscript, "-ps", 0);
-   cline.add(set_netcdf, "-nc", 0);
    cline.add(set_verbosity, "-v", 1);
 
    // Parse the command line
@@ -383,7 +379,7 @@ void process_scores() {
       }
 
       // Write out the raw fields to PostScript
-      if(ps_flag) {
+      if(conf_info.ps_plot_flag) {
          plot_ps_raw(fcst_dp, obs_dp, fcst_dp_fill, obs_dp_fill, i);
       }
 
@@ -493,12 +489,12 @@ void setup_first_pass(const DataPlane &dp) {
    setup_txt_files(dp.valid(), dp.lead());
 
    // If requested, create a NetCDF file
-   if(nc_flag) {
+   if(conf_info.nc_pairs_flag) {
       setup_nc_file(dp.valid(), dp.lead());
    }
 
    // If requested, create a PostScript file
-   if(ps_flag) {
+   if(conf_info.ps_plot_flag) {
       setup_ps_file(dp.valid(), dp.lead());
    }
 
@@ -961,7 +957,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    } // end for j
 
    // Write out the raw fields to NetCDF
-   if(nc_flag) {
+   if(conf_info.nc_pairs_flag) {
       write_nc_raw(f_dat, o_dat, n, i_gc, i_tile);
    }
 
@@ -998,14 +994,14 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       isc_info[i].compute_isc(-1);
 
       // Write the thresholded binary fields to NetCDF
-      if(ps_flag) {
+      if(conf_info.ps_plot_flag) {
          write_nc_wav(f_dat, o_dat, n, i_gc, i_tile, -1,
                       isc_info[i].cts_fcst_thresh,
                       isc_info[i].cts_obs_thresh);
       }
 
       // Write the thresholded binary difference field to PostScript
-      if(nc_flag) {
+      if(conf_info.nc_pairs_flag) {
          plot_ps_wvlt(diff, n, i_gc, i_tile, isc_info[i], -1, ns);
       }
 
@@ -1077,7 +1073,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          isc_info[i].compute_isc(j);
 
          // Write the decomposed fields for this scale to NetCDF
-         if(nc_flag) {
+         if(conf_info.nc_pairs_flag) {
             write_nc_wav(f_scl, o_scl, n, i_gc, i_tile, j,
                          isc_info[i].cts_fcst_thresh,
                          isc_info[i].cts_obs_thresh);
@@ -1087,7 +1083,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          for(k=0; k<n; k++) diff[k] = f_scl[k] - o_scl[k];
 
          // Write the decomposed difference field for this scale to PostScript
-         if(ps_flag) {
+         if(conf_info.ps_plot_flag) {
             plot_ps_wvlt(diff, n, i_gc, i_tile, isc_info[i], j, ns);
          }
 
@@ -1708,7 +1704,7 @@ void close_out_files() {
    }
 
    // Close the output NetCDF file as long as it was opened
-   if(nc_out && nc_flag) {
+   if(nc_out && conf_info.nc_pairs_flag) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
@@ -1718,7 +1714,7 @@ void close_out_files() {
    }
 
    // Close the output PSfile as long as it was opened
-   if(ps_out && ps_flag) {
+   if(ps_out && conf_info.ps_plot_flag) {
 
       // List the PostScript file after it is finished
       mlog << Debug(1) << "Output file: " << out_ps_file << "\n";
@@ -2755,14 +2751,8 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
-        << "\t[-fcst_valid time]\n"
-        << "\t[-fcst_lead time]\n"
-        << "\t[-obs_valid time]\n"
-        << "\t[-obs_lead time]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
-        << "\t[-ps]\n"
-        << "\t[-nc]\n"
         << "\t[-v level]\n\n"
 
         << "\twhere\t\"fcst_file\" is a forecast file in either Grib "
@@ -2776,28 +2766,11 @@ void usage() {
         << "\t\t\"config_file\" is a WaveletStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
-        << "\t\t\"-fcst_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the forecast valid time to be verified (optional).\n"
-
-        << "\t\t\"-fcst_lead time\" in HH[MMSS] format sets "
-        << "the forecast lead time to be verified (optional).\n"
-
-        << "\t\t\"-obs_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the observation valid time to be used (optional).\n"
-
-        << "\t\t\"-obs_lead time\" in HH[MMSS] format sets "
-        << "the observation lead time to be used (optional).\n"
-
         << "\t\t\"-outdir path\" overrides the default output directory ("
         << default_out_dir << ") (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
-
-        << "\t\t\"-ps\" disables the PostScript output file (optional)."
-        << "\n"
-
-        << "\t\t\"-nc\" disables the NetCDF output file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
@@ -2806,34 +2779,6 @@ void usage() {
         << "on the same grid.\n\n" << flush;
 
    exit(1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_fcst_valid_time(const StringArray & a)
-{
-   fcst_valid_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_fcst_lead_time(const StringArray & a)
-{
-   fcst_lead_sec = timestring_to_sec(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_valid_time(const StringArray & a)
-{
-   obs_valid_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_lead_time(const StringArray & a)
-{
-   obs_lead_sec = timestring_to_sec(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2852,20 +2797,6 @@ void set_logfile(const StringArray & a)
    filename = a[0];
 
    mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_postscript(const StringArray &)
-{
-   ps_flag = 0;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_netcdf(const StringArray &)
-{
-   nc_flag = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
