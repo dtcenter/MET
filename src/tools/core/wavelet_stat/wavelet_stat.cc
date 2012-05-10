@@ -261,16 +261,12 @@ void process_scores() {
          continue;
       }
 
-      // Store the forecast lead and valid times
-      if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = fcst_dp.valid();
-      if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = fcst_dp.lead();
-
       // Set the forecast lead time
-      shc.set_fcst_lead_sec(fcst_lead_sec);
+      shc.set_fcst_lead_sec(fcst_dp.lead());
 
       // Set the forecast valid time
-      shc.set_fcst_valid_beg(fcst_valid_ut);
-      shc.set_fcst_valid_end(fcst_valid_ut);
+      shc.set_fcst_valid_beg(fcst_dp.valid());
+      shc.set_fcst_valid_end(fcst_dp.valid());
 
       // Read the gridded data from the input observation file
       status = obs_mtddf->data_plane(*conf_info.obs_info[i], obs_dp);
@@ -282,24 +278,20 @@ void process_scores() {
          continue;
       }
 
-      // Store the observation lead and valid times
-      if(obs_valid_ut == (unixtime) 0) obs_valid_ut = obs_dp.valid();
-      if(is_bad_data(obs_lead_sec))    obs_lead_sec = obs_dp.lead();
-
       // Set the observation lead time
-      shc.set_obs_lead_sec(obs_lead_sec);
+      shc.set_obs_lead_sec(obs_dp.lead());
 
       // Set the observation valid time
-      shc.set_obs_valid_beg(obs_valid_ut);
-      shc.set_obs_valid_end(obs_valid_ut);
+      shc.set_obs_valid_beg(obs_dp.valid());
+      shc.set_obs_valid_end(obs_dp.valid());
 
       // Check that the valid times match
-      if(fcst_valid_ut != obs_valid_ut) {
+      if(fcst_dp.valid() != obs_dp.valid()) {
 
          mlog << Warning << "\nprocess_scores() -> "
               << "Forecast and observation valid times do not match "
-              << unix_to_yyyymmdd_hhmmss(fcst_valid_ut) << " != " <<
-              unix_to_yyyymmdd_hhmmss(obs_valid_ut) << " for "
+              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != " <<
+              unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
               << conf_info.fcst_info[i]->magic_str() << " versus "
               << conf_info.obs_info[i]->magic_str() << ".\n";
       }
