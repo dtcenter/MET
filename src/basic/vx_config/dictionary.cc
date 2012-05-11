@@ -1968,6 +1968,41 @@ return ( ta );
 ////////////////////////////////////////////////////////////////////////
 
 
+PiecewiseLinear *Dictionary::lookup_pwl(const char * name, bool error_out)
+
+{
+
+const DictionaryEntry * Entry = lookup(name);
+bool is_correct_type = false;
+
+if ( Entry )  is_correct_type = (Entry->type() == FunctionType);
+
+LastLookupStatus = is_correct_type;
+
+if ( !Entry || !is_correct_type )  {
+
+   if ( error_out )  {
+
+      mlog << Error
+           << "\nDictionary::lookup_pwl() -> "
+           << "lookup failed for name \"" << name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   return ( (PiecewiseLinear *) 0 );
+
+}
+
+return ( Entry->pwl_value() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class DictionaryStack
    //

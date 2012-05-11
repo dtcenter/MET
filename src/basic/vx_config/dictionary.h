@@ -242,8 +242,9 @@ class Dictionary {
          //  return value not allocated
          //
 
-      Dictionary * lookup_dictionary     (const char * name, bool error_out = default_dictionary_error_out);
-      Dictionary * lookup_array          (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary *      lookup_dictionary (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary *      lookup_array      (const char * name, bool error_out = default_dictionary_error_out);
+      PiecewiseLinear * lookup_pwl        (const char * name, bool error_out = default_dictionary_error_out);
 };
 
 
