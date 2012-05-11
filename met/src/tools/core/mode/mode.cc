@@ -45,6 +45,10 @@
 //                                   multiple config files.
 //
 //   013    01/11/11  Bullock        Ported to new repository
+//   014    05/10/12  Halley Gotway  Switch to using vx_config library.
+//   015    05/10/12  Halley Gotway  Move -fcst_valid, -fcst_lead,
+//                    -obs_valid, and -obs_lead command line options
+//                    to config file.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -64,7 +68,6 @@ using namespace std;
 #include <unistd.h>
 
 #include "netcdf.hh"
-#include "grib_classes.h"
 
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
@@ -123,12 +126,9 @@ static ConcatString merge_config_file;
 // Input files
 static ConcatString fcst_file;
 static ConcatString obs_file;
-
-static unixtime     fcst_valid_ut = (unixtime) 0;
-static int          fcst_lead_sec = bad_data_int;
-static unixtime     obs_valid_ut  = (unixtime) 0;
-static int          obs_lead_sec  = bad_data_int;
-
+Met2dDataFile * fcst_mtddf = (Met2dDataFile *) 0;
+Met2dDataFile * obs_mtddf  = (Met2dDataFile *) 0;
+   
 static const int n_cts = 3;
 static const char *cts_str[n_cts] = {"RAW", "FILTER", "OBJECT"};
 static TTContingencyTable cts[n_cts];
@@ -137,11 +137,6 @@ static Engine engine;
 static Grid grid;
 static Box xy_bb;
 static ConcatString out_dir;
-static ConcatString met_data_dir;
-
-// Grib Codes to be verified for the forecast and observation fields
-static VarInfo * fcst_info = (VarInfo *) 0;
-static VarInfo *  obs_info = (VarInfo *) 0;
 static double data_min, data_max;
 
 ///////////////////////////////////////////////////////////////////////
@@ -152,10 +147,6 @@ static double data_min, data_max;
 
 static ColorTable fcst_ct, obs_ct;
 static int stride = 1;
-static int plot_flag = 1;
-static int obj_stat_flag = 1;
-static int obj_plot_flag = 1;
-static int ct_stat_flag = 1;
 static const Color c_map(25, 25, 25);
 static const Color c_hull(0, 0, 0);
 static const Color c_bndy(0, 0, 255);
@@ -193,10 +184,9 @@ static void process_fcst_obs_files();
 static void process_masks(ShapeData &, ShapeData &);
 static void process_output();
 
-static void check_engine_config();
 static void compute_ct_stats();
 
-static void set_plot_dims(int, int);
+static void set_postscript_dims(int, int);
 static void plot_engine();
 static void plot_engine(PSfile &, Engine &, EngineType, const char *);
 static void plot_threshold_merging(PSfile &, Engine &, const char *, int);
@@ -223,18 +213,9 @@ static void write_obs_bdy_netcdf(NcFile *);
 static void write_ct_stats();
 static void usage();
 static void set_config_merge_file(const StringArray &);
-static void set_fcst_valid_time(const StringArray &);
-static void set_fcst_lead_time(const StringArray &);
-static void set_obs_valid_time(const StringArray &);
-static void set_obs_lead_time(const StringArray &);
 static void set_outdir(const StringArray &);
-static void set_plot(const StringArray &);
-static void set_obj_plot(const StringArray &);
-static void set_obj_stat(const StringArray &);
-static void set_ct_stat(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
-
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -262,151 +243,95 @@ int main(int argc, char *argv[])
    //
    process_output();
 
-   if ( fcst_info )  { delete fcst_info;  fcst_info = (VarInfo *) 0; }
-   if (  obs_info )  { delete  obs_info;   obs_info = (VarInfo *) 0; }
+   //
+   // Clean up
+   //
+   if(fcst_mtddf) { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) 0; }
+   if(obs_mtddf)  { delete obs_mtddf;   obs_mtddf  = (Met2dDataFile *) 0; }
 
    return(0);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv)
-
-{
-
+void process_command_line(int argc, char **argv) {
    CommandLine cline;
-   ConcatString grib_ptv_str;
    ConcatString s;
-   GrdFileType ftype = FileType_None;
-   GrdFileType otype = FileType_None;
-   VarInfoFactory vfactory;
+   GrdFileType ftype, otype;
+   Met2dDataFileFactory mtddf_factory;   
 
    // Set the default output directory
    out_dir = replace_path(default_out_dir);
 
-   //
-   // check for zero arguments
-   //
-   if(argc == 1)
-      usage();
+   // Check for zero arguments
+   if(argc == 1) usage();
 
-   //
-   // parse the command line into tokens
-   //
+   // Parse the command line into tokens
    cline.set(argc, argv);
 
-   //
-   // set the usage function
-   //
+   // Set the usage function
    cline.set_usage(usage);
 
-   //
-   // add the options function calls
-   //
+   // Add the options function calls
    cline.add(set_config_merge_file, "-config_merge", 1);
-   cline.add(set_fcst_valid_time, "-fcst_valid", 1);
-   cline.add(set_fcst_lead_time, "-fcst_lead", 1);
-   cline.add(set_obs_valid_time, "-obs_valid", 1);
-   cline.add(set_obs_lead_time, "-obs_lead", 1);
    cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_plot, "-plot", 0);
-   cline.add(set_obj_plot, "-obj_plot", 0);
-   cline.add(set_obj_stat, "-obj_stat", 0);
-   cline.add(set_ct_stat, "-ct_stat", 0);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
 
-   //
-   // parse the command line
-   //
+   // Parse the command line
    cline.parse();
 
-   //
-   // Check for error. There should be three arguments left; the
-   // forecast filename, the observation filename, and the config
-   // filename.
-   //
-   if(cline.n() != 3)
-      usage();
+   // Check for error. There should be three arguments left:
+   // forecast, observation, and config filenames
+   if(cline.n() != 3) usage();
 
-   //
    // Store the input forecast and observation file names
-   //
    fcst_file         = cline[0];
    obs_file          = cline[1];
    match_config_file = cline[2];
 
-   // Determine the input file types
-   ftype = grd_file_type(fcst_file);
-   otype = grd_file_type(obs_file);
-
-   fcst_info = vfactory.new_var_info(ftype);
-    obs_info = vfactory.new_var_info(otype);
-
-   //
-   // If the merge config file was not set using the optional
-   // arguments, then set it to the match config file
-   //
-   if(merge_config_file.length() == 0)
-      merge_config_file = match_config_file;
-
-   //
-   // Read the default config file first and then read the user's match config file
-   //
+   // Create the default config file name
    default_config_file = replace_path(default_config_filename);
 
+   // If the merge config file was not set, use the match config file
+   if(merge_config_file.length() == 0)
+        merge_config_file = match_config_file;
+   
    // List the config files
    mlog << Debug(1)
         << "Default Config File: " << default_config_file << "\n"
         << "Match Config File: " << match_config_file << "\n"
         << "Merge Config File: " << merge_config_file << "\n";
 
-   //
-   // Read the default and match config files
-   //
-   engine.wconf.read(default_config_file);
-   engine.wconf.read(match_config_file);
+   // Read the config files
+   engine.conf_info.read_config(default_config_file, match_config_file);
 
-   //
-   // Process the engine configuration
-   //
-   engine.process_engine_config();
+   // Get the forecast and observation file types from config, if present
+   ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
+   otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
 
-   //
-   // Check the configuration of the engine
-   //
-   check_engine_config();
-
-   //
-   // Parse out the GRIB code and level information for the forecast
-   // and observation GRIB codes.
-   //
-
-   grib_ptv_str << cs_erase << (engine.wconf.grib_ptv().ival());
-
-   fcst_info = vfactory.new_var_info(ftype);
-    obs_info = vfactory.new_var_info(otype);
-
-   fcst_info->set_magic(engine.wconf.fcst_field().sval());
-   if ( fcst_valid_ut != 0 )  fcst_info->set_valid(fcst_valid_ut);
-   if ( !is_bad_data(fcst_lead_sec) ) fcst_info->set_lead(fcst_lead_sec);
-
-   obs_info->set_magic(engine.wconf.obs_field().sval());
-   if ( obs_valid_ut != 0 )  obs_info->set_valid(obs_valid_ut);
-   if ( !is_bad_data(obs_lead_sec) ) obs_info->set_lead(obs_lead_sec);
-
-   //
-   // Check to make sure that MODE can be run on the GRIB codes specified
-   //
-   if(fcst_info->is_wind_direction() || obs_info->is_wind_direction()) {
-      mlog << Error << "\nmain() -> "
-           << "mode may not be run on a wind direction field.\n\n";
+   // Read forecast file
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+      mlog << Error << "\nTrouble reading forecast file \""
+           << fcst_file << "\"\n\n";
       exit(1);
    }
 
-   //
+   // Read observation file
+   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
+      mlog << Error << "\nTrouble reading observation file \""
+           << obs_file << "\"\n\n";
+      exit(1);
+   }
+
+   // Store the input data file types
+   ftype = fcst_mtddf->file_type();
+   otype = obs_mtddf->file_type();
+
+   // Process the configuration
+   engine.conf_info.process_config(ftype, otype);
+
    // List the input files
-   //
    mlog << Debug(1)
         << "Forecast File: " << fcst_file << "\n"
         << "Observation File: " << obs_file << "\n";
@@ -416,221 +341,125 @@ void process_command_line(int argc, char **argv)
 
 ///////////////////////////////////////////////////////////////////////
 
-void process_fcst_obs_files()
-
-{
-
-   ShapeData fcst_wd, obs_wd;
-   char tmp_str[max_str_len], tmp2_str[max_str_len];
-   char merge_str[max_str_len];
+void process_fcst_obs_files() {
+   ShapeData fcst_sd, obs_sd;
    double fmin, omin, fmax, omax;
-   Met2dDataFileFactory factory;
-   Met2dDataFile * fcst_mtddf = (Met2dDataFile *) 0;
-   Met2dDataFile * obs_mtddf  = (Met2dDataFile *) 0;
-   
 
-   //
    // Read the gridded data from the input forecast file
-   //
-
-   fcst_mtddf = factory.new_met_2d_data_file(fcst_file);
-
-   if ( !fcst_mtddf )  {
-
-      mlog << Error << "\nprocess_fcst_obs_files() -> "
-           << "can't open data file \"" << fcst_file << "\"\n\n";
-
-      exit ( 1 );
-
-   }
-
-   if ( ! (fcst_mtddf->data_plane(*fcst_info, fcst_wd.data)) )  {
+   if(!(fcst_mtddf->data_plane(*(engine.conf_info.fcst_info), fcst_sd.data))) {
 
       mlog << Error << "\nprocess_fcst_obs_files() -> "
            << "can't get data from file \"" << fcst_file << "\"\n\n";
-
-      exit ( 1 );
-
+      exit(1);
    }
 
-   //
-   // Store the forecast lead and valid times
-   //
-   if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = fcst_wd.data.valid();
-   if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = fcst_wd.data.lead();
-
-   //
    // For probability fields, rescale from [0, 100] to [0, 1]
-   //
-   if(fcst_info->p_flag()) rescale_probability(fcst_wd.data);
-   
-   //
+   if(engine.conf_info.fcst_info->p_flag()) rescale_probability(fcst_sd.data);
+
    // Read the gridded data from the input observation file
-   //
-
-   obs_mtddf = factory.new_met_2d_data_file(obs_file);
-
-   if ( !obs_mtddf )  {
-
-      mlog << Error << "\nprocess_fcst_obs_files() -> "
-           << "can't open data file \"" << obs_file << "\"\n\n";
-
-      exit ( 1 );
-
-   }
-
-   if ( ! (obs_mtddf->data_plane(*obs_info, obs_wd.data)) )  {
+   if(!(obs_mtddf->data_plane(*(engine.conf_info.obs_info), obs_sd.data))) {
 
       mlog << Error << "\nprocess_fcst_obs_files() -> "
            << "can't get data from file \"" << obs_file << "\"\n\n";
-
-      exit ( 1 );
-
+      exit(1);
    }
 
-   //
-   // Store the observation lead and valid times
-   //
-   if(obs_valid_ut == (unixtime) 0) obs_valid_ut = obs_wd.data.valid();
-   if(is_bad_data(obs_lead_sec))    obs_lead_sec = obs_wd.data.lead();
-
-   //
    // For probability fields, rescale from [0, 100] to [0, 1]
-   //
-   if(obs_info->p_flag()) rescale_probability(obs_wd.data);
-   
-   //
+   if(engine.conf_info.obs_info->p_flag()) rescale_probability(obs_sd.data);
+
    // Check that the grids match
-   //
    if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
+
       mlog << Error << "\nprocess_fcst_obs_files() -> "
-           << "The forecast and observation grids do not match.\n\n";
+           << "The forecast and observation grids do not match: "
+           << fcst_mtddf->grid().serialize() << " != "
+           << obs_mtddf->grid().serialize() << "\n\n";
       exit(1);
    }
    grid = fcst_mtddf->grid();
 
-   //
-   // Deallocate gridded data files
-   //
-   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) 0; }
-   if ( obs_mtddf  )  { delete obs_mtddf;   obs_mtddf  = (Met2dDataFile *) 0; }
-
-   //
    // Print a warning if the valid times do not match
-   //
-   if(fcst_valid_ut != obs_valid_ut) {
+   if(fcst_sd.data.valid() != obs_sd.data.valid()) {
 
-      unix_to_yyyymmdd_hhmmss(fcst_valid_ut, tmp_str);
-      unix_to_yyyymmdd_hhmmss(obs_valid_ut, tmp2_str);
-
-      mlog << Warning << "\nprocess_fcst_obs_files() -> "
+      mlog << Warning << "\nnprocess_fcst_obs_files() -> "
            << "Forecast and observation valid times do not match "
-           << tmp_str << " != " << tmp2_str << ".\n\n";
+           << unix_to_yyyymmdd_hhmmss(fcst_sd.data.valid()) << " != "
+           << unix_to_yyyymmdd_hhmmss(obs_sd.data.valid()) << " for "
+           << engine.conf_info.fcst_info->magic_str() << " versus "
+           << engine.conf_info.obs_info->magic_str() << ".\n\n";
    }
 
-   //
    // Print a warning if the accumulation intervals do not match
-   //
-   if(fcst_info->level().type() == LevelType_Accum &&
-      obs_info->level().type()  == LevelType_Accum &&
-      fcst_wd.data.accum()     != obs_wd.data.accum()) {
-
-      sec_to_hhmmss(fcst_wd.data.accum(), tmp_str);
-      sec_to_hhmmss(obs_wd.data.accum(), tmp2_str);
+   if(engine.conf_info.fcst_info->level().type() == LevelType_Accum &&
+      engine.conf_info.obs_info->level().type()  == LevelType_Accum &&
+      fcst_sd.data.accum()                != obs_sd.data.accum()) {
 
       mlog << Warning << "\nprocess_fcst_obs_files() -> "
            << "Forecast and observation accumulation times do not match "
-           << tmp_str << " != " << tmp2_str << ".\n\n";
+           << sec_to_hhmmss(fcst_sd.data.valid()) << " != "
+           << sec_to_hhmmss(obs_sd.data.valid()) << " for "
+           << engine.conf_info.fcst_info->magic_str() << " versus "
+           << engine.conf_info.obs_info->magic_str() << ".\n\n";
    }
-
-   //
-   // Store the forecast and observation variable, level, and units.
-   //
-   engine.fcst_var_str  = (const char *) fcst_info->name();
-   engine.fcst_lvl_str  = (const char *) fcst_info->level_name();
-   engine.fcst_unit_str = (const char *) fcst_info->units();
-
-   engine.obs_var_str   = (const char *) obs_info->name();
-   engine.obs_lvl_str   = (const char *) obs_info->level_name();
-   engine.obs_unit_str  = (const char *) obs_info->units();
 
    mlog << Debug(1)
         << "Forecast Field: "
-        << engine.fcst_var_str << " at " << engine.fcst_lvl_str
+        << engine.conf_info.fcst_info->name() << " at "
+        << engine.conf_info.fcst_info->level_name()
         << "\n"
         << "Observation Field: "
-        << engine.obs_var_str << " at " << engine.obs_lvl_str
+        << engine.conf_info.obs_info->name() << " at "
+        << engine.conf_info.obs_info->level_name()
         << "\n";
 
-   //
-   // Mask out the missing data in one field with the other if requested
-   //
-   if(engine.wconf.mask_missing_flag().ival() == 1 ||
-      engine.wconf.mask_missing_flag().ival() == 3)   mask_bad_data(fcst_wd.data, obs_wd.data);
-   if(engine.wconf.mask_missing_flag().ival() == 2 ||
-      engine.wconf.mask_missing_flag().ival() == 3)   mask_bad_data(obs_wd.data, fcst_wd.data);
+   // Mask out the missing data between fields
+   if(engine.conf_info.mask_missing_flag == FieldType_Fcst ||
+      engine.conf_info.mask_missing_flag == FieldType_Both)
+      mask_bad_data(fcst_sd.data, obs_sd.data);
 
-   //
+   // Mask out the missing data between fields   
+   if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
+      engine.conf_info.mask_missing_flag == FieldType_Both)
+      mask_bad_data(obs_sd.data, fcst_sd.data);
+
    // Parse the grid and/or polyline masks from the configuration
-   //
-   process_masks(fcst_wd, obs_wd);
+   process_masks(fcst_sd, obs_sd);
 
-   //
-   // Compute the min and max data values across both raw fields for use
-   // in setting up the color table
-   //
-   fcst_wd.data.data_range(fmin, fmax);
-    obs_wd.data.data_range(omin, omax);
-
+   // Compute the min and max data values across both raw fields
+   fcst_sd.data.data_range(fmin, fmax);
+   obs_sd.data.data_range(omin, omax);
    data_min = min(fmin, omin);
    data_max = max(fmax, omax);
 
-   //
    // Set up the engine with these raw fields
-   //
    mlog << Debug(2)
         << "Identifying objects in the forecast and observation fields...\n";
+   engine.set(fcst_sd, obs_sd);
 
-   engine.set(fcst_wd, obs_wd);
-
-   //
    // Compute the contingency table statistics for the fields
-   //
-   if(ct_stat_flag) {
-      compute_ct_stats();
-   }
+   if(engine.conf_info.ct_stats_flag) compute_ct_stats();
 
-   if(plot_flag || obj_stat_flag || obj_plot_flag) {
+   // Do matching and merging
+   if(engine.conf_info.ps_plot_flag || engine.conf_info.nc_pairs_flag) {
+
       mlog << Debug(2)
            << "Identified: " << engine.n_fcst << " forecast objects "
            << "and " << engine.n_obs << " observation objects.\n";
 
-      if(engine.wconf.fcst_merge_flag().ival() == 1)
-         strcpy(merge_str, "threshold merging");
-      else if(engine.wconf.fcst_merge_flag().ival() == 2)
-         strcpy(merge_str, "engine merging");
-      else if(engine.wconf.fcst_merge_flag().ival() == 3)
-         strcpy(merge_str, "threshold merging and engine merging");
-      else
-         strcpy(merge_str, "no merging");
-
       mlog << Debug(2)
-           << "Performing merging (" << merge_str << ") in the forecast field.\n";
+           << "Performing merging ("
+           << mergetype_to_string(engine.conf_info.fcst_merge_flag)
+           << ") in the forecast field.\n";
 
+      // Do the forecast merging
       engine.do_fcst_merging(default_config_file, merge_config_file);
 
-      if(engine.wconf.obs_merge_flag().ival() == 1)
-         strcpy(merge_str, "threshold merging");
-      else if(engine.wconf.obs_merge_flag().ival() == 2)
-         strcpy(merge_str, "engine merging");
-      else if(engine.wconf.obs_merge_flag().ival() == 3)
-         strcpy(merge_str, "threshold merging and engine merging");
-      else
-         strcpy(merge_str, "no merging");
-
       mlog << Debug(2)
-           << "Performing merging (" << merge_str << ") in the observation field.\n";
+           << "Performing merging ("
+           << mergetype_to_string(engine.conf_info.obs_merge_flag)
+           << ") in the observation field.\n";
 
+      // Do the observation merging
       engine.do_obs_merging(default_config_file, merge_config_file);
 
       mlog << Debug(2)
@@ -638,11 +467,11 @@ void process_fcst_obs_files()
            << "and " << engine.n_obs << " observation objects.\n";
 
       mlog << Debug(2)
-           << "Performing matching between the forecast and observation fields.\n";
+           << "Performing matching ("
+           << matchtype_to_string(engine.conf_info.match_flag)
+           << ") between the forecast and observation fields.\n";
 
-      //
       // Do the matching of objects between fields
-      //
       engine.do_matching();
    }
 
@@ -651,58 +480,45 @@ void process_fcst_obs_files()
 
 ///////////////////////////////////////////////////////////////////////
 
-void process_masks(ShapeData &fcst_wd, ShapeData &obs_wd) {
-   ShapeData grid_mask, poly_mask;
-   ConcatString tmp_str;
+void process_masks(ShapeData &fcst_sd, ShapeData &obs_sd) {
+   ShapeData grid_mask_sd, poly_mask_sd;
+   ConcatString name;
 
-   //
    // Parse the grid mask into a ShapeData object
-   //
-   if(engine.wconf.mask_grid_flag().ival() != 0) {
-      parse_grid_mask(engine.wconf.mask_grid().sval(), grid,
-                      grid_mask.data, tmp_str);
+   if(engine.conf_info.mask_grid_flag != FieldType_None) {
+      parse_grid_mask(engine.conf_info.mask_grid_name, grid,
+                      grid_mask_sd.data, name);
    }
 
-   //
    // Parse the poly mask into a ShapeData object
-   //
-   if(engine.wconf.mask_poly_flag().ival() != 0) {
-      parse_poly_mask(engine.wconf.mask_poly().sval(), grid,
-                      poly_mask.data, tmp_str);
+   if(engine.conf_info.mask_poly_flag != FieldType_None) {
+      parse_poly_mask(engine.conf_info.mask_poly_name, grid,
+                      poly_mask_sd.data, name);
    }
 
-   //
    // Apply the grid mask to the forecast field if requested
-   //
-   if(engine.wconf.mask_grid_flag().ival() == 1 ||
-      engine.wconf.mask_grid_flag().ival() == 3) {
-      apply_mask(fcst_wd, grid_mask);
+   if(engine.conf_info.mask_grid_flag == FieldType_Fcst ||
+      engine.conf_info.mask_grid_flag == FieldType_Both) {
+      apply_mask(fcst_sd, grid_mask_sd);
    }
 
-   //
    // Apply the grid mask to the observation field if requested
-   //
-   if(engine.wconf.mask_grid_flag().ival() == 2 ||
-      engine.wconf.mask_grid_flag().ival() == 3) {
-      apply_mask(obs_wd, grid_mask);
+   if(engine.conf_info.mask_grid_flag == FieldType_Obs ||
+      engine.conf_info.mask_grid_flag == FieldType_Both) {
+      apply_mask(obs_sd, grid_mask_sd);
    }
 
-   //
-   // Apply the Lat/Lon polyline mask to the forecast field if requested
-   //
-   if(engine.wconf.mask_poly_flag().ival() == 1 ||
-      engine.wconf.mask_poly_flag().ival() == 3) {
-      apply_mask(fcst_wd, poly_mask);
+   // Apply the polyline mask to the forecast field if requested
+   if(engine.conf_info.mask_poly_flag == FieldType_Fcst ||
+      engine.conf_info.mask_poly_flag == FieldType_Both) {
+      apply_mask(fcst_sd, poly_mask_sd);
    }
 
-   //
-   // Apply the Lat/Lon polyline mask to the observation field if requested
-   //
-   if(engine.wconf.mask_poly_flag().ival() == 2 ||
-      engine.wconf.mask_poly_flag().ival() == 3) {
-      apply_mask(obs_wd, poly_mask);
+   // Apply the polyline mask to the observation field if requested
+   if(engine.conf_info.mask_poly_flag == FieldType_Obs ||
+      engine.conf_info.mask_poly_flag == FieldType_Both) {
+      apply_mask(obs_sd, poly_mask_sd);
    }
-
 
    return;
 }
@@ -711,265 +527,11 @@ void process_masks(ShapeData &fcst_wd, ShapeData &obs_wd) {
 
 void process_output() {
 
-   //
    // Create output stats files and plots
-   //
-   if(ct_stat_flag)  write_ct_stats();
-   if(obj_stat_flag) write_obj_stats();
-   if(obj_plot_flag) write_obj_netcdf();
-   if(plot_flag)     plot_engine();
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////
-
-void check_engine_config()
-
-{
-
-   ColorTable ct_test;
-   ConcatString s;
-
-   // Check that the model name is not empty
-   if(strlen(engine.wconf.model().sval()) == 0 ||
-      check_reg_exp(ws_reg_exp, engine.wconf.model().sval()) == true) {
-
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The model name (\"" << engine.wconf.model().sval()
-           << "\") must be non-empty and contain no embedded "
-           << "whitespace.\n\n";
-      exit(1);
-   }
-
-   // Check that grid_res is > 0
-   if(engine.wconf.grid_res().dval() <= 0) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "grid_res (" << engine.wconf.grid_res().dval()
-           << ") must be set > 0 in the configuration file\n\n";
-      exit(1);
-   }
-
-   // Check that mask_missing_flag is set between 0 and 3
-   if(engine.wconf.mask_missing_flag().ival() < 0 ||
-      engine.wconf.mask_missing_flag().ival() > 3) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The mask_missing_flag (" << engine.wconf.mask_missing_flag().ival()
-           << ") must be set between 0 and 3\n\n";
-      exit(1);
-   }
-
-   // Check that mask_grid_flag is set between 0 and 3
-   if(engine.wconf.mask_grid_flag().ival() < 0 ||
-      engine.wconf.mask_grid_flag().ival() > 3) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The mask_grid_flag (" << engine.wconf.mask_grid_flag().ival()
-           << ") must be set between 0 and 3\n\n";
-      exit(1);
-   }
-
-   // Check that mask_poly_flag is set between 0 and 3
-   if(engine.wconf.mask_poly_flag().ival() < 0 ||
-      engine.wconf.mask_poly_flag().ival() > 3) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The mask_poly_flag (" << engine.wconf.mask_poly_flag().ival()
-           << ") must be set between 0 and 3\n\n";
-      exit(1);
-   }
-
-   // Check that fcst_conv_radius and obs_conv_radius are non-negative
-   if(engine.wconf.fcst_conv_radius().ival() < 0 ||
-      engine.wconf.obs_conv_radius().ival() < 0) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "fcst_conv_radius (" << engine.wconf.fcst_conv_radius().ival()
-           << ") and obs_conv_radius (" << engine.wconf.obs_conv_radius().ival()
-           << ") must be non-negative\n\n";
-      exit(1);
-   }
-
-   // Check that fcst_area_thresh and obs_area_thresh are non-negative
-   if(engine.fcst_area_thresh.thresh < 0 ||
-      engine.obs_area_thresh.thresh  < 0) {
-      mlog << Warning << "\ncheck_engine_config() -> "
-           << "fcst_area_thresh (" << engine.wconf.fcst_area_thresh().ival()
-           << ") and obs_area_thresh (" << engine.wconf.obs_area_thresh().ival()
-           << ") should be non-negative\n\n";
-   }
-
-   // Check that fcst_merge_flag is set between 0 and 3
-   if(engine.wconf.fcst_merge_flag().ival() < 0 ||
-      engine.wconf.fcst_merge_flag().ival() > 3) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The fcst_merge_flag (" << engine.wconf.fcst_merge_flag().ival()
-           << ") must be set between 0 and 3\n\n";
-      exit(1);
-   }
-
-   // Check that obs_merge_flag is set between 0 and 3
-   if(engine.wconf.obs_merge_flag().ival() < 0 ||
-      engine.wconf.obs_merge_flag().ival() > 3) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The obs_merge_flag (" << engine.wconf.obs_merge_flag().ival()
-           << ") must be set between 0 and 3\n\n";
-      exit(1);
-   }
-
-   // Check that match_flag is set between 0 and 3
-   if(engine.wconf.match_flag().ival() < 0 ||
-      engine.wconf.match_flag().ival() > 3) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The match_flag (" << engine.wconf.match_flag().ival()
-           << ") must be set between 0 and 3\n\n";
-      exit(1);
-   }
-
-   // Check that match_flag is set between 0 and 3
-   if(engine.wconf.match_flag().ival() == 0 &&
-      (engine.wconf.fcst_merge_flag().ival() != 0 ||
-       engine.wconf.obs_merge_flag().ival() != 0) ) {
-      mlog << Warning << "\ncheck_engine_config() -> "
-           << "when matching is disabled (match_flag = " << engine.wconf.match_flag().ival()
-           << ") but merging is requested (fcst_merge_flag = " << engine.wconf.fcst_merge_flag().ival()
-           << ", obs_merge_flag = " << engine.wconf.obs_merge_flag().ival()
-           << ") any merging information will be discarded.\n\n";
-   }
-
-   // Check that max_centroid_dist is > 0
-   if(engine.wconf.max_centroid_dist().dval() <= 0) {
-      mlog << Warning << "\ncheck_engine_config() -> "
-           << "max_centroid_dist (" << engine.wconf.max_centroid_dist().dval()
-           << ") should be set > 0\n\n";
-   }
-
-   // Check that the fuzzy engine weights are non-negative
-   if(engine.wconf.centroid_dist_weight().dval() < 0 ||
-      engine.wconf.boundary_dist_weight().dval() < 0 ||
-      engine.wconf.convex_hull_dist_weight().dval() < 0 ||
-      engine.wconf.angle_diff_weight().dval() < 0 ||
-      engine.wconf.area_ratio_weight().dval() < 0 ||
-      engine.wconf.int_area_ratio_weight().dval() < 0 ||
-      engine.wconf.complexity_ratio_weight().dval() < 0 ||
-      engine.wconf.intensity_ratio_weight().dval() < 0) {
-
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "All of the fuzzy engine weights must be >= 0\n\n";
-      exit(1);
-   }
-
-   // Check that the sum of the weights is non-zero if matching is
-   // requested.
-   if(engine.wconf.match_flag().ival() != 0 &&
-      is_eq((engine.wconf.centroid_dist_weight().dval()
-       + engine.wconf.boundary_dist_weight().dval()
-       + engine.wconf.convex_hull_dist_weight().dval()
-       + engine.wconf.angle_diff_weight().dval()
-       + engine.wconf.area_ratio_weight().dval()
-       + engine.wconf.int_area_ratio_weight().dval()
-       + engine.wconf.complexity_ratio_weight().dval()
-       + engine.wconf.intensity_ratio_weight().dval()), 0.0)) {
-
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "When matching is requested, the sum of the fuzzy engine "
-           << "weights cannot be 0\n\n";
-      exit(1);
-   }
-
-   // Check that intensity_percentile >= 0 and <= 100
-   if(engine.wconf.intensity_percentile().ival() < 0 ||
-      engine.wconf.intensity_percentile().ival() > 100) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "intensity_percentile (" << engine.wconf.intensity_percentile().ival()
-           << ") must be >= 0 and <= 100\n\n";
-      exit(1);
-   }
-
-   // Check that total_interest_thresh >= 0 and <= 1
-   if(engine.wconf.total_interest_thresh().dval() < 0 ||
-      engine.wconf.total_interest_thresh().dval() > 1) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "total_interest_thresh (" << engine.wconf.total_interest_thresh().dval()
-           << ") must be >= 0 and <= 1\n\n";
-      exit(1);
-   }
-
-   // Check that print_interest_thresh >= 0 and <= 1
-   if(engine.wconf.print_interest_thresh().dval() < 0 ||
-      engine.wconf.print_interest_thresh().dval() > 1) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "print_interest_thresh (" << engine.wconf.print_interest_thresh().dval()
-           << ") must be >= 0 and <= 1\n\n";
-      exit(1);
-   }
-
-   // Check that zero_border_size >= 1
-   if(engine.wconf.zero_border_size().ival() < 1) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "zero_border_size (" << engine.wconf.zero_border_size().ival()
-           << ") must be >= 1\n\n";
-      exit(1);
-   }
-
-   // Get the MET Data directory from which to read the plotting data files
-   met_data_dir = replace_path(engine.wconf.met_data_dir().sval());
-
-   // Check that fcst_raw_color_table can be read
-   ct_test.clear();
-   s = replace_path(engine.wconf.fcst_raw_color_table().sval());
-   if(!ct_test.read(s)) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "cannot read fcst_raw_color_table file ("
-           << s
-           << ")\n\n";
-      exit(1);
-   }
-
-   // Check that obs_raw_color_table can be read
-   ct_test.clear();
-   s = replace_path(engine.wconf.obs_raw_color_table().sval());
-   if(!ct_test.read(s)) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "cannot read obs_raw_color_table file ("
-           << s
-           << ")\n\n";
-      exit(1);
-   }
-
-   // Check that the stride length is set >= 1
-   if((stride = engine.wconf.stride_length().ival()) < 1) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "stride_length must be set >= 1: " << stride
-           << "\n\n";
-      exit(1);
-   }
-
-   // Check that mode_color_table can be read
-   ct_test.clear();
-   s = replace_path(engine.wconf.mode_color_table().sval());
-   if(!ct_test.read(s)) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "cannot read mode_color_table file ("
-           << s
-           << ")\n\n";
-      exit(1);
-   }
-
-   // Check that plot_valid_flag is set between 0 and 1
-   if(engine.wconf.plot_valid_flag().ival() < 0 ||
-      engine.wconf.plot_valid_flag().ival() > 1) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The plot_valid_flag (" << engine.wconf.plot_valid_flag().ival()
-           << ") must be set to 0 or 1\n\n";
-      exit(1);
-   }
-
-   // Check that plot_gcarc_flag is set between 0 and 1
-   if(engine.wconf.plot_gcarc_flag().ival() < 0 ||
-      engine.wconf.plot_gcarc_flag().ival() > 1) {
-      mlog << Error << "\ncheck_engine_config() -> "
-           << "The plot_gcarc_flag (" << engine.wconf.plot_gcarc_flag().ival()
-           << ") must be set to 0 or 1\n\n";
-      exit(1);
-   }
+   write_obj_stats();   
+   if(engine.conf_info.ct_stats_flag) write_ct_stats();
+   if(engine.conf_info.nc_pairs_flag) write_obj_netcdf();
+   if(engine.conf_info.ps_plot_flag)  plot_engine();
 
    return;
 }
@@ -993,8 +555,8 @@ void compute_ct_stats() {
          obs_mask  = *engine.obs_raw;
 
          // Apply the thresholds specified in the config file
-         fcst_mask.threshold(engine.fcst_conv_thresh);
-         obs_mask.threshold(engine.obs_conv_thresh);
+         fcst_mask.threshold(engine.conf_info.fcst_conv_thresh);
+         obs_mask.threshold(engine.conf_info.obs_conv_thresh);
       }
       // Filtered fields
       else if(i == 1) {
@@ -1002,8 +564,8 @@ void compute_ct_stats() {
          obs_mask  = *engine.obs_filter;
 
          // Apply the thresholds specified in the config file
-         fcst_mask.threshold(engine.fcst_conv_thresh);
-         obs_mask.threshold(engine.obs_conv_thresh);
+         fcst_mask.threshold(engine.conf_info.fcst_conv_thresh);
+         obs_mask.threshold(engine.conf_info.obs_conv_thresh);
       }
       // Object fields
       else if(i == 2) {
@@ -1032,7 +594,7 @@ void compute_ct_stats() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void set_plot_dims(int nx, int ny) {
+void set_postscript_dims(int nx, int ny) {
    double grid_ar, sm_plot_ar, lg_plot_ar;
 
    grid_ar    = ((double) nx)/ny;
@@ -1074,7 +636,7 @@ void plot_engine() {
    //
    // Setup the plotting dimensions based on the x/y bounding box
    //
-   set_plot_dims(nint(xy_bb.width()), nint(xy_bb.height()));
+   set_postscript_dims(nint(xy_bb.width()), nint(xy_bb.height()));
 
    //
    // Create output PostScript file name
@@ -1084,14 +646,14 @@ void plot_engine() {
    //
    // Load the raw forecast color table
    //
-   s = replace_path(engine.wconf.fcst_raw_color_table().sval());
+   s = replace_path(engine.conf_info.fcst_raw_pi.color_table);
    mlog << Debug(1) << "Loading forecast raw color table: " << s << "\n";
    fcst_ct.read(s);
 
    //
    // Load the raw observation color table
    //
-   s = replace_path(engine.wconf.obs_raw_color_table().sval());
+   s = replace_path(engine.conf_info.obs_raw_pi.color_table);
    mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
    obs_ct.read(s);
 
@@ -1100,7 +662,7 @@ void plot_engine() {
    // of both colortables is [0, 1], rescale both colortables to the
    // data_min and data_max values
    //
-   if(fcst_info->name() == obs_info->name() &&
+   if(engine.conf_info.fcst_info->name() == engine.conf_info.obs_info->name() &&
       is_eq(fcst_ct.data_min(bad_data_double), 0.0) &&
       is_eq(fcst_ct.data_max(bad_data_double), 1.0) &&
       is_eq(obs_ct.data_min(bad_data_double),  0.0) &&
@@ -1134,10 +696,10 @@ void plot_engine() {
    // If the fcst_raw_plot_min or fcst_raw_plot_max value is set in the
    // config file, rescale the forecast colortable to the requested range
    //
-   if(!is_eq(engine.wconf.fcst_raw_plot_min().dval(), 0.0) ||
-      !is_eq(engine.wconf.fcst_raw_plot_max().dval(), 0.0)) {
-      fcst_ct.rescale(engine.wconf.fcst_raw_plot_min().dval(),
-                      engine.wconf.fcst_raw_plot_max().dval(),
+   if(!is_eq(engine.conf_info.fcst_raw_pi.plot_min, 0.0) ||
+      !is_eq(engine.conf_info.fcst_raw_pi.plot_max, 0.0)) {
+      fcst_ct.rescale(engine.conf_info.fcst_raw_pi.plot_min,
+                      engine.conf_info.fcst_raw_pi.plot_max,
                       bad_data_double);
    }
 
@@ -1145,10 +707,10 @@ void plot_engine() {
    // If the obs_raw_plot_min or obs_raw_plot_max value is set in the
    // config file, rescale the observation colortable to the requested range
    //
-   if(!is_eq(engine.wconf.obs_raw_plot_min().dval(), 0.0) ||
-      !is_eq(engine.wconf.obs_raw_plot_max().dval(), 0.0)) {
-      obs_ct.rescale(engine.wconf.obs_raw_plot_min().dval(),
-                     engine.wconf.obs_raw_plot_max().dval(),
+   if(!is_eq(engine.conf_info.obs_raw_pi.plot_min, 0.0) ||
+      !is_eq(engine.conf_info.obs_raw_pi.plot_max, 0.0)) {
+      obs_ct.rescale(engine.conf_info.obs_raw_pi.plot_min,
+                     engine.conf_info.obs_raw_pi.plot_max,
                      bad_data_double);
    }
 
@@ -1168,27 +730,29 @@ void plot_engine() {
    n_page = 1;
 
    s << cs_erase
-     << "MODE: " << engine.fcst_var_str << " at " << engine.fcst_lvl_str
-     << " vs "   << engine.obs_var_str  << " at " << engine.obs_lvl_str;
+     << "MODE: " << engine.conf_info.fcst_info->name() << " at "
+     << engine.conf_info.fcst_info->level_name() << " vs "
+     << engine.conf_info.obs_info->name() << " at "
+     << engine.conf_info.obs_info->level_name();
    plot_engine(plot, engine, FOEng, s);
 
-   if(engine.wconf.fcst_merge_flag().ival() == 1 ||
-      engine.wconf.fcst_merge_flag().ival() == 3 ) {
+   if(engine.conf_info.fcst_merge_flag == MergeType_Both ||
+      engine.conf_info.fcst_merge_flag == MergeType_Thresh) {
       plot_threshold_merging(plot, engine, "Forecast: Threshold Merging", 1);
    }
 
-   if(engine.wconf.fcst_merge_flag().ival() == 2 ||
-      engine.wconf.fcst_merge_flag().ival() == 3) {
+   if(engine.conf_info.fcst_merge_flag == MergeType_Both ||
+      engine.conf_info.fcst_merge_flag == MergeType_Engine) {
       plot_engine(plot, *engine.fcst_engine, FFEng, "Forecast: Engine Merging");
    }
 
-   if(engine.wconf.obs_merge_flag().ival() == 1 ||
-      engine.wconf.obs_merge_flag().ival() == 3) {
+   if(engine.conf_info.obs_merge_flag == MergeType_Both ||
+      engine.conf_info.obs_merge_flag == MergeType_Thresh) {
       plot_threshold_merging(plot, engine, "Observation: Threshold Merging", 0);
    }
 
-   if(engine.wconf.obs_merge_flag().ival() == 2 ||
-      engine.wconf.obs_merge_flag().ival() == 3) {
+   if(engine.conf_info.obs_merge_flag == MergeType_Both ||
+      engine.conf_info.obs_merge_flag == MergeType_Engine) {
       plot_engine(plot, *engine.obs_engine, OOEng, "Observation: Engine Merging");
    }
 
@@ -1203,16 +767,13 @@ void plot_engine() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
-
-{
-
+void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title) {
    Box dim;
-   ConcatString label;
+   ConcatString label, thresh_str;
+   ConcatString fcst_str, fcst_short_str;
+   ConcatString obs_str, obs_short_str;
+   
    char junk[1024];
-   char fcst_str[max_str_len], fcst_short_str[max_str_len];
-   char obs_str[max_str_len], obs_short_str[max_str_len];
-   char thresh_str[max_str_len];
    ConcatString tmp_str, tmp2_str, tmp3_str;
    double v_tab, h_tab, h_tab_a, h_tab_b, h_tab_c, v;
    bool draw_line;
@@ -1226,32 +787,32 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
 
    p.pagenumber(n_page);
 
-   p.choose_font(31, 24.0, met_data_dir);
+   p.choose_font(31, 24.0, engine.conf_info.met_data_dir);
    p.write_centered_text(1, 1, 306.0, 752.0, 0.5, 0.5, title);
 
    // Plot forecast versus observation
    if(eng_type == FOEng) {
-      strcpy(fcst_str, "Forecast");
-      strcpy(fcst_short_str, "Fcst");
-      strcpy(obs_str, "Observation");
-      strcpy(obs_short_str, "Obs");
+      fcst_str       = "Forecast";
+      fcst_short_str = "Fcst";
+      obs_str        = "Observation";
+      obs_short_str  = "Obs";
    }
    // Plot forecast versus forecast
    else if(eng_type == FFEng) {
-      strcpy(fcst_str, "Forecast");
-      strcpy(fcst_short_str, "Fcst");
-      strcpy(obs_str, "Forecast");
-      strcpy(obs_short_str, "Fcst");
+      fcst_str       = "Forecast";
+      fcst_short_str = "Fcst";
+      obs_str        = "Forecast";
+      obs_short_str  = "Fcst";
    }
    // Plot observation versus observation
    else if(eng_type == OOEng) {
-      strcpy(fcst_str, "Observation");
-      strcpy(fcst_short_str, "Obs");
-      strcpy(obs_str, "Observation");
-      strcpy(obs_short_str, "Obs");
+      fcst_str       = "Observation";
+      fcst_short_str = "Obs";
+      obs_str        = "Observation";
+      obs_short_str  = "Obs";
    }
 
-   p.choose_font(31, 18.0, met_data_dir);
+   p.choose_font(31, 18.0, engine.conf_info.met_data_dir);
    p.write_centered_text(1, 1, h_tab_1, 727.0, 0.5, 0.5, fcst_str);
    p.write_centered_text(1, 1, h_tab_2, 727.0, 0.5, 0.5, obs_str);
 
@@ -1329,7 +890,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    ////////////////////////////////////////////////////////////////////
 
-   p.choose_font(31, 11.0, met_data_dir);
+   p.choose_font(31, 11.0, engine.conf_info.met_data_dir);
 
    p.write_centered_text(1, 1, h_tab_3 + 1.5*plot_text_sep, 727.0, 0.5, 0.5, fcst_short_str);
    p.write_centered_text(1, 1, h_tab_3 + 4.5*plot_text_sep, 727.0, 0.5, 0.5, obs_short_str);
@@ -1340,7 +901,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
 
    for(i=0; i<(eng.n_fcst*eng.n_obs) && v_tab >= v_margin; i++) {
 
-      if(eng.info[i].interest_value < eng.wconf.total_interest_thresh().dval()
+      if(eng.info[i].interest_value < eng.conf_info.total_interest_thresh
       && draw_line == false) {
 
          p.write_centered_text(1, 1, h_tab_3 + 4.5*plot_text_sep,
@@ -1389,7 +950,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Model:");
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5,
-                         eng.wconf.model().sval());
+                         eng.conf_info.model);
    v_tab -= plot_text_sep;
 
    //
@@ -1397,9 +958,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Field:");
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5,
-                         eng.fcst_var_str);
+                         eng.conf_info.fcst_info->name());
    p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5,
-                         eng.obs_var_str);
+                         eng.conf_info.obs_info->name());
    v_tab -= plot_text_sep;
 
    //
@@ -1407,9 +968,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Level:");
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5,
-                         eng.fcst_lvl_str);
+                         eng.conf_info.fcst_info->level_name());
    p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5,
-                         eng.obs_lvl_str);
+                         eng.conf_info.obs_info->level_name());
    v_tab -= plot_text_sep;
 
    //
@@ -1417,9 +978,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Units:");
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5,
-                         eng.fcst_unit_str);
+                         eng.conf_info.fcst_info->units());
    p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5,
-                         eng.obs_unit_str);
+                         eng.conf_info.obs_info->units());
    v_tab -= plot_text_sep;
 
    //
@@ -1493,9 +1054,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Centroid/Boundary:");
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.centroid_dist_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.centroid_dist_wt);
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.boundary_dist_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.boundary_dist_wt);
    p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
@@ -1504,9 +1065,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Convex Hull/Angle:");
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.convex_hull_dist_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.convex_hull_dist_wt);
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.angle_diff_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.angle_diff_wt);
    p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
@@ -1515,9 +1076,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Area/Intersection Area:");
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.area_ratio_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.area_ratio_wt);
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.int_area_ratio_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.int_area_ratio_wt);
    p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
@@ -1526,9 +1087,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Complexity/Intensity:");
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.complexity_ratio_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.complexity_ratio_wt);
    p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.intensity_ratio_weight().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.inten_perc_ratio_wt);
    p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
    v_tab -= plot_text_sep;
 
@@ -1537,7 +1098,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
    //
    p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                          "Total Interest Thresh:");
-   snprintf(junk, sizeof(junk), "%.2f", eng.wconf.total_interest_thresh().dval());
+   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.total_interest_thresh);
    p.write_centered_text(1, 1, (h_tab_b+h_tab_c)/2.0, v_tab, 0.0, 0.5,
                          junk);
    v_tab -= plot_text_sep;
@@ -1566,27 +1127,27 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Mask missing, grid, and polyline Flags
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Mask M/G/P:");
-      if(eng.wconf.mask_missing_flag().ival() == 1 ||
-         eng.wconf.mask_missing_flag().ival() == 3) tmp_str = "on";
-      else                                          tmp_str = "off";
-      if(eng.wconf.mask_grid_flag().ival() == 1 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    tmp2_str = "on";
-      else                                          tmp2_str = "off";
-      if(eng.wconf.mask_grid_flag().ival() == 1 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    tmp3_str = "on";
-      else                                          tmp3_str = "off";
+      if(eng.conf_info.mask_missing_flag == FieldType_Both ||
+         eng.conf_info.mask_missing_flag == FieldType_Fcst) tmp_str = "on";
+      else                                                  tmp_str = "off";
+      if(eng.conf_info.mask_grid_flag == FieldType_Both ||
+         eng.conf_info.mask_grid_flag == FieldType_Fcst)    tmp2_str = "on";
+      else                                                  tmp2_str = "off";
+      if(eng.conf_info.mask_grid_flag == FieldType_Both ||
+         eng.conf_info.mask_grid_flag == FieldType_Fcst)    tmp3_str = "on";
+      else                                                  tmp3_str = "off";
       label << cs_erase << tmp_str << '/' << tmp2_str << '/' << tmp3_str;
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
 
-      if(eng.wconf.mask_missing_flag().ival() == 2 ||
-         eng.wconf.mask_missing_flag().ival() == 3) tmp_str = "on";
-      else                                          tmp_str = "off";
-      if(eng.wconf.mask_grid_flag().ival() == 2 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    tmp2_str = "on";
-      else                                          tmp2_str = "off";
-      if(eng.wconf.mask_grid_flag().ival() == 2 ||
-         eng.wconf.mask_grid_flag().ival() == 3)    tmp3_str = "on";
-      else                                          tmp3_str = "off";
+      if(eng.conf_info.mask_missing_flag == FieldType_Both ||
+         eng.conf_info.mask_missing_flag == FieldType_Obs)  tmp_str = "on";
+      else                                                  tmp_str = "off";
+      if(eng.conf_info.mask_grid_flag == FieldType_Both ||
+         eng.conf_info.mask_grid_flag == FieldType_Obs)     tmp2_str = "on";
+      else                                                  tmp2_str = "off";
+      if(eng.conf_info.mask_grid_flag == FieldType_Both ||
+         eng.conf_info.mask_grid_flag == FieldType_Obs)     tmp3_str = "on";
+      else                                                  tmp3_str = "off";
       label << cs_erase << tmp_str << '/' << tmp2_str << '/' << tmp3_str;
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
 
@@ -1596,9 +1157,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Raw threshold
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Raw Thresh:");
-      eng.fcst_raw_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.fcst_raw_thresh.get_str(2);
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, thresh_str);
-      eng.obs_raw_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.obs_raw_thresh.get_str(2);
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, thresh_str);
       v_tab -= plot_text_sep;
 
@@ -1606,9 +1167,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Convolution Radius
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Conv Radius:");
-      snprintf(junk, sizeof(junk), "%.0i gs", eng.wconf.fcst_conv_radius().ival());
+      snprintf(junk, sizeof(junk), "%.0i gs", eng.conf_info.fcst_conv_radius);
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
-      snprintf(junk, sizeof(junk), "%.0i gs", eng.wconf.obs_conv_radius().ival());
+      snprintf(junk, sizeof(junk), "%.0i gs", eng.conf_info.obs_conv_radius);
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
@@ -1616,9 +1177,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Convolution Threshold
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Conv Thresh:");
-      eng.fcst_conv_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.fcst_conv_thresh.get_str(2);
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, thresh_str);
-      eng.obs_conv_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.obs_conv_thresh.get_str(2);
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, thresh_str);
       v_tab -= plot_text_sep;
 
@@ -1626,11 +1187,11 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Area Threshold
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Area Thresh:");
-      eng.fcst_area_thresh.get_str(thresh_str, 0);
-      snprintf(junk, sizeof(junk), "%s gs", thresh_str);
+      thresh_str = eng.conf_info.fcst_area_thresh.get_str(0);
+      snprintf(junk, sizeof(junk), "%s gs", thresh_str.text());
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, junk);
-      eng.obs_area_thresh.get_str(thresh_str, 0);
-      snprintf(junk, sizeof(junk), "%s gs", thresh_str);
+      thresh_str = eng.conf_info.obs_area_thresh.get_str(0);
+      snprintf(junk, sizeof(junk), "%s gs", thresh_str.text());
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, junk);
       v_tab -= plot_text_sep;
 
@@ -1640,23 +1201,23 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       p.write_centered_text(1, 1, h_tab_a, v_tab,
                            0.0, 0.5, "Inten Thresh:");
 
-      if(     nint(eng.wconf.fcst_inten_perc().ival()) == 101) tmp_str = "mean";
-      else if(nint(eng.wconf.fcst_inten_perc().ival()) == 102) tmp_str = "sum";
+           if(nint(eng.conf_info.fcst_inten_perc_value) == 101) tmp_str = "mean";
+      else if(nint(eng.conf_info.fcst_inten_perc_value) == 102) tmp_str = "sum";
       else {
-         snprintf(junk, sizeof(junk), "p%.0i", eng.wconf.fcst_inten_perc().ival());
+         snprintf(junk, sizeof(junk), "p%.0i", eng.conf_info.fcst_inten_perc_value);
          tmp_str = junk;
       }
-      eng.fcst_inten_perc_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.fcst_inten_perc_thresh.get_str(2);
       label << cs_erase << tmp_str << thresh_str;
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
 
-      if(     nint(eng.wconf.obs_inten_perc().ival()) == 101) tmp_str = "mean";
-      else if(nint(eng.wconf.obs_inten_perc().ival()) == 102) tmp_str = "sum";
+           if(nint(eng.conf_info.obs_inten_perc_value) == 101) tmp_str = "mean";
+      else if(nint(eng.conf_info.obs_inten_perc_value) == 102) tmp_str = "sum";
       else {
-         snprintf(junk, sizeof(junk), "p%.0i", eng.wconf.obs_inten_perc().ival());
+         snprintf(junk, sizeof(junk), "p%.0i", eng.conf_info.obs_inten_perc_value);
          tmp_str = junk;
       }
-      eng.obs_inten_perc_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.obs_inten_perc_thresh.get_str(2);
       label << cs_erase << tmp_str << thresh_str;
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
       v_tab -= plot_text_sep;
@@ -1665,9 +1226,9 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Merge Threshold
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Merge Thresh:");
-      eng.fcst_merge_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.fcst_merge_thresh.get_str(2);
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, thresh_str);
-      eng.obs_merge_thresh.get_str(thresh_str, 2);
+      thresh_str = eng.conf_info.obs_merge_thresh.get_str(2);
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, thresh_str);
       v_tab -= plot_text_sep;
 
@@ -1681,16 +1242,16 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Merging flag
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Merging:");
-      if(eng.wconf.fcst_merge_flag().ival() == 0)       label = "none";
-      else if(eng.wconf.fcst_merge_flag().ival() == 1)  label = "thresh";
-      else if(eng.wconf.fcst_merge_flag().ival() == 2)  label = "engine";
-      else if(eng.wconf.fcst_merge_flag().ival() == 3)  label = "thresh/engine";
+           if(eng.conf_info.fcst_merge_flag == MergeType_Thresh) label = "thresh";
+      else if(eng.conf_info.fcst_merge_flag == MergeType_Engine) label = "engine";
+      else if(eng.conf_info.fcst_merge_flag == MergeType_Both)   label = "thresh/engine";
+      else                                                       label = "none";
       p.write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
 
-      if(eng.wconf.obs_merge_flag().ival() == 0)        label = "none";
-      else if(eng.wconf.obs_merge_flag().ival() == 1)   label = "thresh";
-      else if(eng.wconf.obs_merge_flag().ival() == 2)   label = "engine";
-      else if(eng.wconf.obs_merge_flag().ival() == 3)   label = "thresh/engine";
+           if(eng.conf_info.obs_merge_flag == MergeType_Thresh) label = "thresh";
+      else if(eng.conf_info.obs_merge_flag == MergeType_Engine) label = "engine";
+      else if(eng.conf_info.obs_merge_flag == MergeType_Both)   label = "thresh/engine";
+      else                                                      label = "none";
       p.write_centered_text(1, 1, h_tab_c, v_tab, 0.0, 0.5, label);
       v_tab -= plot_text_sep;
 
@@ -1698,10 +1259,10 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       // Matching scheme
       //
       p.write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5, "Matching:");
-      if(eng.wconf.match_flag().ival() == 0)      label = "none";
-      else if(eng.wconf.match_flag().ival() == 1) label = "match/merge";
-      else if(eng.wconf.match_flag().ival() == 2) label = "match/fcst merge";
-      else if(eng.wconf.match_flag().ival() == 3) label = "match/no merge";
+           if(eng.conf_info.match_flag == MatchType_MergeBoth) label = "match/merge";
+      else if(eng.conf_info.match_flag == MatchType_MergeFcst) label = "match/fcst merge";
+      else if(eng.conf_info.match_flag == MatchType_NoMerge)   label = "match/no merge";
+      else                                                     label = "none";
       p.write_centered_text(1, 1, (h_tab_b+h_tab_c)/2.0, v_tab, 0.0, 0.5, label);
       v_tab -= plot_text_sep;
 
@@ -1854,7 +1415,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
 
       p.pagenumber(n_page);
 
-      p.choose_font(31, 24.0, met_data_dir);
+      p.choose_font(31, 24.0, engine.conf_info.met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5, title);
       p.write_centered_text(1, 1, h_tab_cen, 722.0, 0.5, 0.5, fcst_str);
 
@@ -1904,7 +1465,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
 
       p.pagenumber(n_page);
 
-      p.choose_font(31, 24.0, met_data_dir);
+      p.choose_font(31, 24.0, engine.conf_info.met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5, title);
       p.write_centered_text(1, 1, h_tab_cen, 722.0, 0.5, 0.5, obs_str);
 
@@ -1965,7 +1526,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       set_dim(dim, v_tab - lg_plot_height, v_tab, h_tab_cen);
 
       tmp_str << cs_erase << fcst_str << " Objects with " << obs_str << " Outlines";
-      p.choose_font(31, 24.0, met_data_dir);
+      p.choose_font(31, 24.0, engine.conf_info.met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, dim.top() + plot_text_sep/2.0,
                             0.5, 0.5, tmp_str);
 
@@ -1984,7 +1545,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       set_dim(dim, v_tab - lg_plot_height, v_tab, h_tab_cen);
 
       tmp_str << cs_erase << obs_str << " Objects with " << fcst_str << " Outlines";
-      p.choose_font(31, 24.0, met_data_dir);
+      p.choose_font(31, 24.0, engine.conf_info.met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, dim.top() + plot_text_sep/2.0,
                             0.5, 0.5, tmp_str);
 
@@ -2016,11 +1577,11 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       v_tab = page_height - 2.0*v_margin;
       set_dim(dim, v_tab - lg_plot_height, v_tab, h_tab_cen);
 
-      p.choose_font(31, 24.0, met_data_dir);
+      p.choose_font(31, 24.0, engine.conf_info.met_data_dir);
       p.write_centered_text(1, 1, h_tab_cen, dim.top() + plot_text_sep/2.0,
                             0.5, 0.5, "Cluster Object Information");
 
-      p.choose_font(31, 18.0, met_data_dir);
+      p.choose_font(31, 18.0, engine.conf_info.met_data_dir);
       p.write_centered_text(1, 1, h_tab_a, 727.0, 0.5, 0.5, fcst_str);
       p.write_centered_text(1, 1, h_tab_b, 727.0, 0.5, 0.5, obs_str);
 
@@ -2076,7 +1637,7 @@ void plot_engine(PSfile &p, Engine &eng, EngineType eng_type, const char *title)
       //
       /////////////////////////////////////////////////////////////////
 
-      p.choose_font(31, 11.0, met_data_dir);
+      p.choose_font(31, 11.0, engine.conf_info.met_data_dir);
 
       v_tab = v_tab_2 - 1.0*plot_text_sep;
       h_tab = h_margin;
@@ -2224,17 +1785,17 @@ void plot_threshold_merging(PSfile &p, Engine &eng, const char *title, int fcst)
 
    if(fcst == 1) {
       merge_mask = *(eng.fcst_conv);
-      merge_mask.threshold(eng.fcst_merge_thresh);
+      merge_mask.threshold(eng.conf_info.fcst_merge_thresh);
    }
    else if(fcst == 0) {
       merge_mask = *(eng.obs_conv);
-      merge_mask.threshold(eng.obs_merge_thresh);
+      merge_mask.threshold(eng.conf_info.obs_merge_thresh);
    }
    merge_split = split(merge_mask, n_merge);
 
    p.pagenumber(n_page);
 
-   p.choose_font(31, 24.0, met_data_dir);
+   p.choose_font(31, 24.0, engine.conf_info.met_data_dir);
    p.write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5, title);
 
    ////////////////////////////////////////////////////////////////////
@@ -2301,7 +1862,7 @@ void draw_map(PSfile &p, Box &dim) {
 
    p.gsave();
    p.setlinewidth(l_thin);
-   draw_map(grid, xy_bb, p, dim, c_map, met_data_dir);
+   draw_map(grid, xy_bb, p, dim, c_map, engine.conf_info.met_data_dir);
    p.grestore();
 
    return;
@@ -2447,7 +2008,7 @@ void plot_simple_ids(PSfile &p, Engine &eng, Box &dim, int fcst) {
       else     c = eng.obs_color[i];
 
       p.setrgbcolor(c.red()/255.0, c.green()/255.0, c.blue()/255.0);
-      p.choose_font(28, 16.0, met_data_dir);
+      p.choose_font(28, 16.0, engine.conf_info.met_data_dir);
       snprintf(label, sizeof(label), "%i", i+1);
       p.write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
 
@@ -2506,7 +2067,7 @@ void draw_convex_hulls(PSfile &p, Engine &eng, const Box &dim,
          gridxy_to_pagexy(grid, xy_bb, grid_x, grid_y, page_x, page_y, dim);
 
          p.setrgbcolor(c.red()/255.0, c.green()/255.0, c.blue()/255.0);
-         p.choose_font(28, 16.0, met_data_dir);
+         p.choose_font(28, 16.0, engine.conf_info.met_data_dir);
          snprintf(label, sizeof(label), "%i", i+1);
          p.write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
 
@@ -2550,7 +2111,7 @@ void draw_boundaries(PSfile &p, Engine &eng, const Box &dim, int fcst) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void draw_boundaries(PSfile &p, ShapeData &split_wd, int n_shapes,
+void draw_boundaries(PSfile &p, ShapeData &split_dp, int n_shapes,
                      const Box &dim) {
    int i;
    Polyline poly;
@@ -2560,7 +2121,7 @@ void draw_boundaries(PSfile &p, ShapeData &split_wd, int n_shapes,
    // Draw boundary for each shape in the split field
    //
    for(i=0; i<n_shapes; i++) {
-      wd_shape = select(split_wd, i+1);
+      wd_shape = select(split_dp, i+1);
       poly = wd_shape.single_boundary();
       draw_polyline(p, poly, c_bndy, dim, false);
    }
@@ -2629,7 +2190,7 @@ void draw_polyline(PSfile &p, Polyline &poly, const Color &c,
       gridxy_to_pagexy(grid, xy_bb, grid_x_cur, grid_y_cur, page_x, page_y, dim);
 
       // Plot polylines as straight lines in the grid
-      if(engine.wconf.plot_gcarc_flag().ival() == 0) {
+      if(engine.conf_info.plot_gcarc_flag == 0) {
          p.lineto(page_x, page_y);
       }
       // Plot polylines using great circle arcs
@@ -2677,7 +2238,7 @@ void plot_colorbar(PSfile &p, Box &dim, int fcst) {
    //
    p.gsave();
    p.setlinewidth(l_thin);
-   p.choose_font(28, 8.0, met_data_dir);
+   p.choose_font(28, 8.0, engine.conf_info.met_data_dir);
 
    bar_width = h_margin/2.0;
    bar_height = (dim.top() - dim.bottom())/n_colors;
@@ -2757,8 +2318,8 @@ void build_outfile_name(const char *suffix, ConcatString &str) {
    str << cs_erase << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
-   if(strlen(engine.wconf.output_prefix().sval()) > 0)
-      str << "_" << engine.wconf.output_prefix().sval();
+   if(engine.conf_info.output_prefix.nonempty())
+      str << "_" << engine.conf_info.output_prefix;
 
    // Append the timing information
    sec_to_hms(engine.fcst_raw->data.lead(), l_hr, l_min, l_sec);
@@ -2820,8 +2381,8 @@ void write_obj_stats() {
 
    out.close();
 
-   if(engine.wconf.fcst_merge_flag().ival() == 2 ||
-      engine.wconf.fcst_merge_flag().ival() == 3) {
+   if(engine.conf_info.fcst_merge_flag == MergeType_Both ||
+      engine.conf_info.fcst_merge_flag == MergeType_Engine) {
 
       //
       // Create output stats file for forecast merging
@@ -2852,8 +2413,8 @@ void write_obj_stats() {
       out.close();
    }
 
-   if(engine.wconf.obs_merge_flag().ival() == 2 ||
-      engine.wconf.obs_merge_flag().ival() == 3) {
+   if(engine.conf_info.obs_merge_flag == MergeType_Both ||
+      engine.conf_info.obs_merge_flag == MergeType_Engine) {
 
       //
       // Create output stats file for obseravation merging
@@ -3605,7 +3166,7 @@ void set_xy_bb() {
    // Check the value of the plot_valid_flag in the config file.
    // If not set, reset the xy_bb to the entire grid.
    //
-   if(engine.wconf.plot_valid_flag().ival() == 0) {
+   if(engine.conf_info.plot_valid_flag == 0) {
 
      xy_bb.set_llwh(0.0, 0.0, grid.nx(), grid.ny());
    }
@@ -3687,58 +3248,28 @@ void usage() {
         << "\tobs_file\n"
         << "\tconfig_file\n"
         << "\t[-config_merge merge_config_file]\n"
-        << "\t[-fcst_valid time]\n"
-        << "\t[-fcst_lead time]\n"
-        << "\t[-obs_valid time]\n"
-        << "\t[-obs_lead time]\n"
         << "\t[-outdir path]\n"
-        << "\t[-plot]\n"
-        << "\t[-obj_plot]\n"
-        << "\t[-obj_stat]\n"
-        << "\t[-ct_stat]\n"
+        << "\t[-ps]\n"
+        << "\t[-nc]\n"
+        << "\t[-cts]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"fcst_file\" is a forecast file in either GRIB "
-        << "or netCDF format (output of pcp_combine) containing the "
-        << "field to be verified (required).\n"
+        << "\twhere\t\"fcst_file\" is a gridded forecast file "
+        << "containing the field to be verified (required).\n"
 
-        << "\t\t\"obs_file\" is an observation file in either GRIB "
-        << "or netCDF format (output of pcp_combine) containing the "
-        << "verifying field (required).\n"
+        << "\t\t\"obs_file\" is a gridded observation file "
+        << "containing the verifying field (required).\n"
 
-        << "\t\t\"config_file\" is a WrfModeConfig file containing "
-        << "the desired configuration settings (required).\n"
+        << "\t\t\"config_file\" is a MODEConfig file "
+        << "containing the desired configuration settings (required).\n"
 
         << "\t\t\"-config_merge merge_config_file\" overrides the default "
         << "fuzzy engine settings for merging within the fcst/obs fields "
         << "(optional).\n"
 
-        << "\t\t\"-fcst_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the forecast valid time to be verified (optional).\n"
-
-        << "\t\t\"-fcst_lead time\" in HH[MMSS] format sets "
-        << "the forecast lead time to be verified (optional).\n"
-
-        << "\t\t\"-obs_valid time\" in YYYYMMDD[_HH[MMSS]] format "
-        << "sets the observation valid time to be used (optional).\n"
-
-        << "\t\t\"-obs_lead time\" in HH[MMSS] format sets "
-        << "the observation lead time to be used (optional).\n"
-
         << "\t\t\"-outdir path\" overrides the default output directory ("
         << out_dir << ") (optional).\n"
-
-        << "\t\t\"-plot\" disables plotting (optional).\n"
-
-        << "\t\t\"-obj_plot\" disables the output of the object split "
-        << "and cluster fields to a NetCDF file (optional).\n"
-
-        << "\t\t\"-obj_stat\" disables the output of the object "
-        << "statistics file (optional).\n"
-
-        << "\t\t\"-ct_stat\" disables the output of the contingency "
-        << "table standard statistics file (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -3761,65 +3292,9 @@ void set_config_merge_file(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_fcst_valid_time(const StringArray & a)
-{
-   fcst_valid_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_fcst_lead_time(const StringArray & a)
-{
-   fcst_lead_sec = timestring_to_sec(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_valid_time(const StringArray & a)
-{
-   obs_valid_ut = timestring_to_unix(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_lead_time(const StringArray & a)
-{
-   obs_lead_sec = timestring_to_sec(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void set_outdir(const StringArray & a)
 {
    out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_plot(const StringArray &)
-{
-   plot_flag = 0;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obj_plot(const StringArray &)
-{
-   obj_plot_flag = 0;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obj_stat(const StringArray &)
-{
-   obj_stat_flag = 0;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_ct_stat(const StringArray &)
-{
-   ct_stat_flag = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

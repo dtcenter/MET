@@ -285,9 +285,7 @@ void Engine::clear_colors() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
-
-{
+void Engine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd) {
 
    ConcatString path;
 
@@ -298,7 +296,7 @@ void Engine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
    set_fcst(fcst_wd);
    set_obs(obs_wd);
 
-   path = replace_path(wconf.mode_color_table().sval());
+   path = replace_path(conf_info.object_pi.color_table);
 
    ctable.read(path);
 
@@ -319,7 +317,7 @@ void Engine::set_fcst(const ShapeData &fcst_wd) {
    need_fcst_clus_split = 1;
    need_match           = 1;
 
-   int k = wconf.zero_border_size().ival();
+   int k = conf_info.zero_border_size;
    fcst_raw->zero_border(k, bad_data_double);
 
    do_fcst_filter();
@@ -344,7 +342,7 @@ void Engine::set_obs(const ShapeData &obs_wd) {
    need_obs_clus_split = 1;
    need_match          = 1;
 
-   int k = wconf.zero_border_size().ival();
+   int k = conf_info.zero_border_size;
    obs_raw->zero_border(k, bad_data_double);
 
    do_obs_filter();
@@ -380,15 +378,13 @@ void Engine::do_fcst_filter() {
    //
    // Filter out the data which doesn't meet the fcst_raw_thresh
    //
-   st.thresh = fcst_raw_thresh.thresh;
-   st.type   = fcst_raw_thresh.type;
-   fcst_filter->filter(st);
+   fcst_filter->filter(conf_info.fcst_raw_thresh);
 
    //
    // Threshold the fcst_filter field applying the fcst_conv_thresh
    //
    *fcst_thresh = *fcst_filter;
-   fcst_thresh->threshold(fcst_conv_thresh);
+   fcst_thresh->threshold(conf_info.fcst_conv_thresh);
 
    need_fcst_filter     = 0;
    need_fcst_conv       = 1;
@@ -413,15 +409,13 @@ void Engine::do_obs_filter() {
    //
    // Filter out the data which doesn't meet the obs_raw_thresh
    //
-   st.thresh = obs_raw_thresh.thresh;
-   st.type   = obs_raw_thresh.type;
-   obs_filter->filter(st);
+   obs_filter->filter(conf_info.obs_raw_thresh);
 
    //
    // Threshold the obs_filter field applying the obs_conv_thresh
    //
    *obs_thresh = *obs_filter;
-   obs_thresh->threshold(obs_conv_thresh);
+   obs_thresh->threshold(conf_info.obs_conv_thresh);
 
    need_obs_filter     = 0;
    need_obs_conv       = 1;
@@ -443,16 +437,16 @@ void Engine::do_fcst_convolution() {
 
    if(!need_fcst_conv) return;
 
-   r = wconf.fcst_conv_radius().ival();
+   r = conf_info.fcst_conv_radius;
 
    *fcst_conv = *fcst_filter;
 
    //
    // Apply a circular convolution to the filtered field
    //
-   if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, wconf.bad_data_thresh().dval());
+   if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.fcst_vld_thresh);
 
-   fcst_conv->zero_border(wconf.zero_border_size().ival(), bad_data_double);
+   fcst_conv->zero_border(conf_info.zero_border_size, bad_data_double);
 
    need_fcst_conv       = 0;
    need_fcst_thresh     = 1;
@@ -473,16 +467,16 @@ void Engine::do_obs_convolution() {
 
    if(!need_obs_conv) return;
 
-   r = wconf.obs_conv_radius().ival();
+   r = conf_info.obs_conv_radius;
 
    *obs_conv = *obs_filter;
 
    //
    // Apply a circular convolution to the filtered field
    //
-   if(r > 0) obs_conv->conv_filter_circ(2*r + 1, wconf.bad_data_thresh().dval());
+   if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.obs_vld_thresh);
 
-   obs_conv->zero_border(wconf.zero_border_size().ival(), bad_data_double);
+   obs_conv->zero_border(conf_info.zero_border_size, bad_data_double);
 
    need_obs_conv       = 0;
    need_obs_thresh     = 1;
@@ -507,19 +501,19 @@ void Engine::do_fcst_thresholding() {
    //
    // Threshold the convolved field
    //
-   fcst_mask->threshold(fcst_conv_thresh);
+   fcst_mask->threshold(conf_info.fcst_conv_thresh);
 
    //
    // Apply the area threshold
    //
-   fcst_mask->threshold_area(fcst_area_thresh);
+   fcst_mask->threshold_area(conf_info.fcst_area_thresh);
 
    //
    // Apply the intensity threshold
    //
    fcst_mask->threshold_intensity(fcst_filter,
-                                  wconf.fcst_inten_perc().ival(),
-                                  fcst_inten_perc_thresh);
+                                  conf_info.fcst_inten_perc_value,
+                                  conf_info.fcst_inten_perc_thresh);
 
    need_fcst_thresh     = 0;
    need_fcst_split      = 1;
@@ -543,19 +537,19 @@ void Engine::do_obs_thresholding() {
    //
    // Threshold the convolved field
    //
-   obs_mask->threshold(obs_conv_thresh);
+   obs_mask->threshold(conf_info.obs_conv_thresh);
 
    //
    // Apply the area threshold
    //
-   obs_mask->threshold_area(obs_area_thresh);
+   obs_mask->threshold_area(conf_info.obs_area_thresh);
 
    //
    // Apply the intensity threshold
    //
    obs_mask->threshold_intensity(obs_filter,
-                                 wconf.obs_inten_perc().ival(),
-                                 obs_inten_perc_thresh);
+                                 conf_info.obs_inten_perc_value,
+                                 conf_info.obs_inten_perc_thresh);
 
    need_obs_thresh     = 0;
    need_obs_split      = 1;
@@ -629,12 +623,12 @@ void Engine::do_fcst_merging(const char *default_config,
 
    if(!need_fcst_merge) return;
 
-   if(wconf.fcst_merge_flag().ival() == 1 ||
-      wconf.fcst_merge_flag().ival() == 3)
+   if(conf_info.fcst_merge_flag == MergeType_Both ||
+      conf_info.fcst_merge_flag == MergeType_Thresh)
       do_fcst_merge_thresh();
 
-   if(wconf.fcst_merge_flag().ival() == 2 ||
-      wconf.fcst_merge_flag().ival() == 3)
+   if(conf_info.fcst_merge_flag == MergeType_Both ||
+      conf_info.fcst_merge_flag == MergeType_Engine)
       do_fcst_merge_engine(default_config, merge_config);
 
    //
@@ -657,12 +651,12 @@ void Engine::do_obs_merging(const char *default_config,
 
    if(!need_obs_merge) return;
 
-   if(wconf.obs_merge_flag().ival() == 1 ||
-      wconf.obs_merge_flag().ival() == 3)
+   if(conf_info.obs_merge_flag == MergeType_Both ||
+      conf_info.obs_merge_flag == MergeType_Thresh)
       do_obs_merge_thresh();
 
-   if(wconf.obs_merge_flag().ival() == 2 ||
-      wconf.obs_merge_flag().ival() == 3)
+   if(conf_info.obs_merge_flag == MergeType_Both ||
+      conf_info.obs_merge_flag == MergeType_Engine)
       do_obs_merge_engine(default_config, merge_config);
 
    //
@@ -682,18 +676,20 @@ void Engine::do_matching() {
 
    if(!need_match) return;
 
-   if(wconf.match_flag().ival() == 0) {
+   if(conf_info.match_flag == MatchType_None) {
       mlog << Warning << "\nEngine::do_matching() -> "
            << "no matching requested in configuration file\n";
-
-                                                    do_no_match();
+      do_no_match();
    }
-   else if(wconf.match_flag().ival() == 1)       do_match_merge();
-
-   else if(wconf.match_flag().ival() == 2)  do_match_fcst_merge();
-
-   else if(wconf.match_flag().ival() == 3)        do_match_only();
-
+   else if(conf_info.match_flag == MatchType_MergeBoth) {
+      do_match_merge();
+   }
+   else if(conf_info.match_flag == MatchType_MergeFcst) {
+      do_match_fcst_merge();
+   }
+   else if(conf_info.match_flag == MatchType_NoMerge) {
+      do_match_only();
+   }
    else {
       mlog << Error << "\nEngine::do_matching() -> "
            << "invalid match_flag value specified.  match_flag must be "
@@ -764,14 +760,14 @@ void Engine::do_no_match() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         wconf.intensity_percentile().ival());
+                         conf_info.inten_perc_value);
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        wconf.intensity_percentile().ival());
+                        conf_info.inten_perc_value);
       obs_single[j].object_number = j+1;
    }
 
@@ -827,14 +823,14 @@ void Engine::do_match_merge() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         wconf.intensity_percentile().ival());
+                         conf_info.inten_perc_value);
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        wconf.intensity_percentile().ival());
+                        conf_info.inten_perc_value);
       obs_single[j].object_number = j+1;
    }
 
@@ -847,7 +843,7 @@ void Engine::do_match_merge() {
          n = two_to_one(j, k);
 
          pair[n].set(fcst_single[j], obs_single[k],
-                     wconf.max_centroid_dist().ival());
+                     conf_info.max_centroid_dist);
          pair[n].pair_number = n;
       }
    }
@@ -863,7 +859,7 @@ void Engine::do_match_merge() {
          info[n].fcst_number    = (j+1);
          info[n].obs_number     = (k+1);
          info[n].pair_number    = n;
-         info[n].interest_value = total_interest(wconf, 1, pair[n]);
+         info[n].interest_value = total_interest(conf_info, 1, pair[n]);
       }
    }
 
@@ -891,7 +887,7 @@ void Engine::do_match_merge() {
 
    for(j=0; j<n; j++) {
 
-      if(info[j].interest_value < (wconf.total_interest_thresh().dval()))
+      if(info[j].interest_value < conf_info.total_interest_thresh)
          continue;
 
       collection.add_pair(info[j].fcst_number, info[j].obs_number);
@@ -982,7 +978,7 @@ void Engine::do_fcst_merge_thresh() {
    //
    // Threshold the forecast merge field
    //
-   fcst_merge_mask.threshold(fcst_merge_thresh);
+   fcst_merge_mask.threshold(conf_info.fcst_merge_thresh);
 
    //
    // Split up the forecast merge field
@@ -1111,7 +1107,7 @@ void Engine::do_obs_merge_thresh() {
    //
    // Threshold the forecast merge field
    //
-   obs_merge_mask.threshold(obs_merge_thresh);
+   obs_merge_mask.threshold(conf_info.obs_merge_thresh);
 
    //
    // Split up the forecast merge field
@@ -1243,40 +1239,30 @@ void Engine::do_fcst_merge_engine(const char *default_config,
    //
    fcst_engine->ctable = ctable;
    if(default_config && merge_config) {
-      fcst_engine->wconf.read(default_config);
-      fcst_engine->wconf.read(merge_config);
-      fcst_engine->process_engine_config();
-      path = replace_path(fcst_engine->wconf.mode_color_table().sval());
+      fcst_engine->conf_info.read_config(default_config, merge_config);
+      fcst_engine->conf_info.process_config(conf_info.fcst_info->file_type(),
+                                            conf_info.fcst_info->file_type());
+      path = replace_path(fcst_engine->conf_info.object_pi.color_table);
       fcst_engine->ctable.read(path);
    }
 
    //
    // Copy over the forecast threshold values
    //
-   fcst_engine->fcst_raw_thresh        = fcst_raw_thresh;
-   fcst_engine->obs_raw_thresh         = fcst_raw_thresh;
+   fcst_engine->conf_info.fcst_raw_thresh        = conf_info.fcst_raw_thresh;
+   fcst_engine->conf_info.obs_raw_thresh         = conf_info.fcst_raw_thresh;
 
-   fcst_engine->fcst_conv_thresh       = fcst_conv_thresh;
-   fcst_engine->obs_conv_thresh        = fcst_conv_thresh;
+   fcst_engine->conf_info.fcst_conv_thresh       = conf_info.fcst_conv_thresh;
+   fcst_engine->conf_info.obs_conv_thresh        = conf_info.fcst_conv_thresh;
 
-   fcst_engine->fcst_area_thresh       = fcst_area_thresh;
-   fcst_engine->obs_area_thresh        = fcst_area_thresh;
+   fcst_engine->conf_info.fcst_area_thresh       = conf_info.fcst_area_thresh;
+   fcst_engine->conf_info.obs_area_thresh        = conf_info.fcst_area_thresh;
 
-   fcst_engine->fcst_inten_perc_thresh = fcst_inten_perc_thresh;
-   fcst_engine->obs_inten_perc_thresh  = fcst_inten_perc_thresh;
+   fcst_engine->conf_info.fcst_inten_perc_thresh = conf_info.fcst_inten_perc_thresh;
+   fcst_engine->conf_info.obs_inten_perc_thresh  = conf_info.fcst_inten_perc_thresh;
 
-   fcst_engine->fcst_merge_thresh      = fcst_merge_thresh;
-   fcst_engine->obs_merge_thresh       = fcst_merge_thresh;
-
-   //
-   // Copy over the forecast variable, level, and unit strings
-   //
-   fcst_engine->fcst_var_str  = fcst_var_str;
-   fcst_engine->fcst_lvl_str  = fcst_lvl_str;
-   fcst_engine->fcst_unit_str = fcst_unit_str;
-   fcst_engine->obs_var_str   = fcst_var_str;
-   fcst_engine->obs_lvl_str   = fcst_lvl_str;
-   fcst_engine->obs_unit_str  = fcst_unit_str;
+   fcst_engine->conf_info.fcst_merge_thresh      = conf_info.fcst_merge_thresh;
+   fcst_engine->conf_info.obs_merge_thresh       = conf_info.fcst_merge_thresh;
 
    //
    // Copy the previously defined fuzzy engine fields
@@ -1423,40 +1409,30 @@ void Engine::do_obs_merge_engine(const char *default_config,
    //
    obs_engine->ctable = ctable;
    if(default_config && merge_config) {
-      obs_engine->wconf.read(default_config);
-      obs_engine->wconf.read(merge_config);
-      obs_engine->process_engine_config();
-      path = replace_path(obs_engine->wconf.mode_color_table().sval());
+      obs_engine->conf_info.read_config(default_config, merge_config);
+      obs_engine->conf_info.process_config(conf_info.obs_info->file_type(),
+                                           conf_info.obs_info->file_type());
+      path = replace_path(obs_engine->conf_info.object_pi.color_table);
       obs_engine->ctable.read(path);
    }
 
    //
    // Copy over the observation threshold values
    //
-   obs_engine->fcst_raw_thresh        = obs_raw_thresh;
-   obs_engine->obs_raw_thresh         = obs_raw_thresh;
+   obs_engine->conf_info.fcst_raw_thresh        = conf_info.obs_raw_thresh;
+   obs_engine->conf_info.obs_raw_thresh         = conf_info.obs_raw_thresh;
 
-   obs_engine->fcst_conv_thresh       = obs_conv_thresh;
-   obs_engine->obs_conv_thresh        = obs_conv_thresh;
+   obs_engine->conf_info.fcst_conv_thresh       = conf_info.obs_conv_thresh;
+   obs_engine->conf_info.obs_conv_thresh        = conf_info.obs_conv_thresh;
 
-   obs_engine->fcst_area_thresh       = obs_area_thresh;
-   obs_engine->obs_area_thresh        = obs_area_thresh;
+   obs_engine->conf_info.fcst_area_thresh       = conf_info.obs_area_thresh;
+   obs_engine->conf_info.obs_area_thresh        = conf_info.obs_area_thresh;
 
-   obs_engine->fcst_inten_perc_thresh = obs_inten_perc_thresh;
-   obs_engine->obs_inten_perc_thresh  = obs_inten_perc_thresh;
+   obs_engine->conf_info.fcst_inten_perc_thresh = conf_info.obs_inten_perc_thresh;
+   obs_engine->conf_info.obs_inten_perc_thresh  = conf_info.obs_inten_perc_thresh;
 
-   obs_engine->fcst_merge_thresh      = obs_merge_thresh;
-   obs_engine->obs_merge_thresh       = obs_merge_thresh;
-
-   //
-   // Copy over the forecast variable, level, and unit strings
-   //
-   obs_engine->fcst_var_str  = obs_var_str;
-   obs_engine->fcst_lvl_str  = obs_lvl_str;
-   obs_engine->fcst_unit_str = obs_unit_str;
-   obs_engine->obs_var_str   = obs_var_str;
-   obs_engine->obs_lvl_str   = obs_lvl_str;
-   obs_engine->obs_unit_str  = obs_unit_str;
+   obs_engine->conf_info.fcst_merge_thresh      = conf_info.obs_merge_thresh;
+   obs_engine->conf_info.obs_merge_thresh       = conf_info.obs_merge_thresh;
 
    //
    // Copy the previously defined fuzzy engine fields
@@ -1606,14 +1582,14 @@ void Engine::do_match_fcst_merge() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         wconf.intensity_percentile().ival());
+                         conf_info.inten_perc_value);
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        wconf.intensity_percentile().ival());
+                        conf_info.inten_perc_value);
       obs_single[j].object_number = j+1;
    }
 
@@ -1626,7 +1602,7 @@ void Engine::do_match_fcst_merge() {
          n = two_to_one(j, k);
 
          pair[n].set(fcst_single[j], obs_single[k],
-                     wconf.max_centroid_dist().ival());
+                     conf_info.max_centroid_dist);
          pair[n].pair_number = n;
       }
    }
@@ -1642,7 +1618,7 @@ void Engine::do_match_fcst_merge() {
          info[n].fcst_number    = (j+1);
          info[n].obs_number     = (k+1);
          info[n].pair_number    = n;
-         info[n].interest_value = total_interest(wconf, 1, pair[n]);
+         info[n].interest_value = total_interest(conf_info, 1, pair[n]);
       }
    }
 
@@ -1670,7 +1646,7 @@ void Engine::do_match_fcst_merge() {
 
    for(j=0; j<n; j++) {
 
-      if(info[j].interest_value < (wconf.total_interest_thresh().dval())) {
+      if(info[j].interest_value < conf_info.total_interest_thresh) {
          continue;
       }
 
@@ -1772,14 +1748,14 @@ void Engine::do_match_only() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         wconf.intensity_percentile().ival());
+                         conf_info.inten_perc_value);
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        wconf.intensity_percentile().ival());
+                        conf_info.inten_perc_value);
       obs_single[j].object_number = j+1;
    }
 
@@ -1792,7 +1768,7 @@ void Engine::do_match_only() {
          n = two_to_one(j, k);
 
          pair[n].set(fcst_single[j], obs_single[k],
-                     wconf.max_centroid_dist().ival());
+                     conf_info.max_centroid_dist);
          pair[n].pair_number = n;
       }
    }
@@ -1808,7 +1784,7 @@ void Engine::do_match_only() {
          info[n].fcst_number    = (j+1);
          info[n].obs_number     = (k+1);
          info[n].pair_number    = n;
-         info[n].interest_value = total_interest(wconf, 1, pair[n]);
+         info[n].interest_value = total_interest(conf_info, 1, pair[n]);
       }
    }
 
@@ -1834,7 +1810,7 @@ void Engine::do_match_only() {
    n = n_fcst*n_obs;
    for(j=0; j<n; j++) {
 
-      if(info[j].interest_value < (wconf.total_interest_thresh().dval()))
+      if(info[j].interest_value < conf_info.total_interest_thresh)
          continue;
 
       //
@@ -2006,12 +1982,12 @@ void Engine::do_cluster_features() {
    for(j=0; j<n_clus; j++) {
       fcst_clus_shape[j] = select(*fcst_clus_split, j+1);
       fcst_clus[j].set(*fcst_filter, *fcst_thresh, fcst_clus_shape[j],
-                       wconf.intensity_percentile().ival());
+                       conf_info.inten_perc_value);
       fcst_clus[j].object_number = j+1;
 
       obs_clus_shape[j] = select(*obs_clus_split, j+1);
       obs_clus[j].set(*obs_filter, *obs_thresh, obs_clus_shape[j],
-                      wconf.intensity_percentile().ival());
+                      conf_info.inten_perc_value);
       obs_clus[j].object_number = j+1;
    }
 
@@ -2020,7 +1996,7 @@ void Engine::do_cluster_features() {
    //
    for(j=0; j<n_clus; j++) {
       pair_clus[j].set(fcst_clus[j], obs_clus[j],
-                       wconf.max_centroid_dist().ival());
+                       conf_info.max_centroid_dist);
       pair_clus[j].pair_number = j+1;
    }
 
@@ -2031,7 +2007,7 @@ void Engine::do_cluster_features() {
       info_clus[j].fcst_number    = (j+1);
       info_clus[j].obs_number     = (j+1);
       info_clus[j].pair_number    = j;
-      info_clus[j].interest_value = total_interest(wconf, 0, pair_clus[j]);
+      info_clus[j].interest_value = total_interest(conf_info, 0, pair_clus[j]);
    }
 
    //
@@ -2040,35 +2016,6 @@ void Engine::do_cluster_features() {
 
    delete [] fcst_clus_shape; fcst_clus_shape = (ShapeData *) 0;
    delete [] obs_clus_shape;  obs_clus_shape  = (ShapeData *) 0;
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////
-
-
-void Engine::process_engine_config() {
-
-   //
-   // Check the version number of the config file
-   //
-
-   check_met_version(wconf.version().sval());
-
-   //
-   // For each of the threshold values specified in the config file
-   // parse out the threshold value and the threshold indicator
-   //
-   fcst_raw_thresh.set(wconf.fcst_raw_thresh().sval());
-   obs_raw_thresh.set(wconf.obs_raw_thresh().sval());
-   fcst_conv_thresh.set(wconf.fcst_conv_thresh().sval());
-   obs_conv_thresh.set(wconf.obs_conv_thresh().sval());
-   fcst_area_thresh.set(wconf.fcst_area_thresh().sval());
-   obs_area_thresh.set(wconf.obs_area_thresh().sval());
-   fcst_inten_perc_thresh.set(wconf.fcst_inten_perc_thresh().sval());
-   obs_inten_perc_thresh.set(wconf.obs_inten_perc_thresh().sval());
-   fcst_merge_thresh.set(wconf.fcst_merge_thresh().sval());
-   obs_merge_thresh.set(wconf.obs_merge_thresh().sval());
 
    return;
 }
@@ -2160,24 +2107,26 @@ int Engine::get_unmatched_obs(int area) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-double total_interest(mode_Conf &mc, int dist_flag,
+double total_interest(ModeConfInfo &mc, int dist_flag,
                       const PairFeature &p) {
    double t;
+   ostream *out = (ostream *) 0;
 
-   t = total_interest_print(mc, dist_flag, p, (ostream *) 0);
+   if(mlog.verbosity_level() >= 5) out = &cout;
+
+   t = total_interest_print(mc, dist_flag, p, out);
 
    return(t);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-double total_interest_print(mode_Conf &mc, int dist_flag,
+double total_interest_print(ModeConfInfo &mc, int dist_flag,
                             const PairFeature &p, ostream *out) {
    double attribute;
    double interest, weight;
    double confidence;
    double aspect_obs, aspect_fcst;
-   double complexity_obs, complexity_fcst;
    double conf_obs, conf_fcst;
    double term, sum, weight_sum;
    double total;
@@ -2189,14 +2138,14 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    //
    ////////////////////////////////////////////////////////////////////
 
-   if(dist_flag && p.centroid_dist > mc.max_centroid_dist().ival()) {
+   if(dist_flag && p.centroid_dist > mc.max_centroid_dist) {
       total = bad_data_double;
 
       if(out) {
          (*out) << "Total Interest = " << total << "\n"
                 << "Centroid Distance (" << p.centroid_dist
                 << ") > Max Centroid Distance ("
-                << mc.max_centroid_dist().ival() << ")\n";
+                << mc.max_centroid_dist << ")\n";
       }
       return(total);
    }
@@ -2211,9 +2160,9 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.centroid_dist;
-   interest    = mc.centroid_dist_if(attribute);
-   confidence  = mc.area_ratio_conf(p.area_ratio);
-   weight      = mc.centroid_dist_weight().dval();
+   interest    = (*mc.centroid_dist_if)(attribute);
+   confidence  = area_ratio_conf(p.area_ratio);
+   weight      = mc.centroid_dist_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2236,9 +2185,9 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.boundary_dist;
-   interest    = mc.boundary_dist_if(attribute);
+   interest    = (*mc.boundary_dist_if)(attribute);
    confidence  = 1.0;
-   weight      = mc.boundary_dist_weight().dval();
+   weight      = mc.boundary_dist_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2261,9 +2210,9 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.convex_hull_dist;
-   interest    = mc.convex_hull_dist_if(attribute);
+   interest    = (*mc.convex_hull_dist_if)(attribute);
    confidence  = 1.0;
-   weight      = mc.convex_hull_dist_weight().dval();
+   weight      = mc.convex_hull_dist_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2286,13 +2235,13 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.angle_diff;
-   interest    = mc.angle_diff_if(attribute);
+   interest    = (*mc.angle_diff_if)(attribute);
    aspect_obs  = p.Obs->aspect_ratio;
    aspect_fcst = p.Fcst->aspect_ratio;
-   conf_obs    = mc.aspect_ratio_conf(aspect_obs);
-   conf_fcst   = mc.aspect_ratio_conf(aspect_fcst);
+   conf_obs    = aspect_ratio_conf(aspect_obs);
+   conf_fcst   = aspect_ratio_conf(aspect_fcst);
    confidence  = sqrt(conf_obs*conf_fcst);
-   weight      = mc.angle_diff_weight().dval();
+   weight      = mc.angle_diff_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2315,9 +2264,9 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.area_ratio;
-   interest    = mc.area_ratio_if(attribute);
+   interest    = (*mc.area_ratio_if)(attribute);
    confidence  = 1.0;
-   weight      = mc.area_ratio_weight().dval();
+   weight      = mc.area_ratio_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2340,9 +2289,9 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = (p.intersection_area)/(min(p.Obs->area, p.Fcst->area));
-   interest    = mc.int_area_ratio_if(attribute);
+   interest    = (*mc.int_area_ratio_if)(attribute);
    confidence  = 1.0;
-   weight      = mc.int_area_ratio_weight().dval();
+   weight      = mc.int_area_ratio_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2364,19 +2313,10 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    //
    ////////////////////////////////////////////////////////////////////
 
-   attribute       = p.complexity_ratio;
-   complexity_obs  = p.Obs->complexity;
-   complexity_fcst = p.Fcst->complexity;
-   // Both complexities are non-zero
-   if(complexity_obs > 0 && complexity_fcst > 0) {
-      interest  = mc.complexity_ratio_if(attribute);
-   }
-   // At least one complexity is zero
-   else {
-      interest  = mc.ratio_if(attribute);
-   }
+   attribute   = p.complexity_ratio;
+   interest    = (*mc.complexity_ratio_if)(attribute);
    confidence  = 1.0;
-   weight      = mc.complexity_ratio_weight().dval();
+   weight      = mc.complexity_ratio_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
@@ -2399,15 +2339,16 @@ double total_interest_print(mode_Conf &mc, int dist_flag,
    ////////////////////////////////////////////////////////////////////
 
    attribute   = p.percentile_intensity_ratio;
-   interest    = mc.intensity_ratio_if(attribute);
+   interest    = (*mc.inten_perc_ratio_if)(attribute);
    confidence  = 1.0;
-   weight      = mc.intensity_ratio_weight().dval();
+   weight      = mc.inten_perc_ratio_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
 
    if(out) {
-      (*out) << "Percentile Intensity Ratio:\n"
+      (*out) << "Percentile (" << mc.inten_perc_value
+             << "th) Intensity Ratio:\n"
              << "-----------------------\n"
              << "   Value      = " << attribute  << "\n"
              << "   Interest   = " << interest   << "\n"
@@ -2442,7 +2383,7 @@ double interest_percentile(Engine &eng, const double p, const int flag) {
    double *v = (double *) 0;
    NumArray fcst_na, obs_na;
 
-   if(eng.wconf.match_flag().ival() == 0 ||
+   if(eng.conf_info.match_flag == 0 ||
       eng.n_fcst                    == 0 ||
       eng.n_obs                     == 0) return(0.0);
 
@@ -2565,7 +2506,7 @@ void write_engine_stats(Engine &eng, const Grid &grid, AsciiTable &at) {
    //
    // If no matching was requested, don't write any more
    //
-   if(eng.wconf.match_flag().ival() == 0) return;
+   if(eng.conf_info.match_flag == 0) return;
 
    //
    // Object pairs, increment the counter within the subroutine
@@ -2628,7 +2569,7 @@ void write_header(Engine &eng, AsciiTable &at, const int row) {
    // Over-ride the name of the INTENSITY_USER column
    //
    sprintf(tmp_str, "INTENSITY_%d",
-           nint(eng.wconf.intensity_percentile().ival()));
+           nint(eng.conf_info.inten_perc_value));
    at.set_entry(row, mode_intensity_user_offset, tmp_str);
 
    return;
@@ -2644,7 +2585,7 @@ void write_header_columns(Engine &eng, AsciiTable &at, const int row) {
    at.set_entry(row, mode_version_offset, met_version);
 
    // Model Name
-   at.set_entry(row, mode_model_offset, eng.wconf.model().sval());
+   at.set_entry(row, mode_model_offset, eng.conf_info.model);
 
    // Forecast lead time
    sec_to_hms(eng.fcst_raw->data.lead(), hr, min, sec);
@@ -2679,31 +2620,35 @@ void write_header_columns(Engine &eng, AsciiTable &at, const int row) {
 
    // Forecast convolution radius
    at.set_entry(row, mode_fcst_rad_offset,
-                eng.wconf.fcst_conv_radius().ival());
+                eng.conf_info.fcst_conv_radius);
 
    // Forecast convolution threshold
-   eng.fcst_conv_thresh.get_str(tmp_str);
-   at.set_entry(row, mode_fcst_thr_offset, tmp_str);
+   at.set_entry(row, mode_fcst_thr_offset,
+                eng.conf_info.fcst_conv_thresh.get_str());
 
    // Observation convolution radius
    at.set_entry(row, mode_obs_rad_offset,
-                eng.wconf.obs_conv_radius().ival());
+                eng.conf_info.obs_conv_radius);
 
    // Observation convolution threshold
-   eng.obs_conv_thresh.get_str(tmp_str);
-   at.set_entry(row, mode_obs_thr_offset, tmp_str);
+   at.set_entry(row, mode_obs_thr_offset,
+                eng.conf_info.obs_conv_thresh.get_str());
 
    // Forecast Variable Name
-   at.set_entry(row, mode_fcst_var_offset, eng.fcst_var_str);
+   at.set_entry(row, mode_fcst_var_offset,
+                eng.conf_info.fcst_info->name());
 
    // Forecast Variable Level
-   at.set_entry(row, mode_fcst_lev_offset, eng.fcst_lvl_str);
+   at.set_entry(row, mode_fcst_lev_offset,
+                eng.conf_info.fcst_info->level_name());
 
    // Observation Variable Name
-   at.set_entry(row, mode_obs_var_offset, eng.obs_var_str);
+   at.set_entry(row, mode_obs_var_offset,
+                eng.conf_info.obs_info->name());
 
    // Observation Variable Level
-   at.set_entry(row, mode_obs_lev_offset, eng.obs_lvl_str);
+   at.set_entry(row, mode_obs_lev_offset,
+                eng.conf_info.obs_info->level_name());
 
    return;
 }
@@ -2967,8 +2912,8 @@ void write_pair(Engine &eng, const int n_f, const int n_o,
    // Only dump out pair features if the total interest value for the pair
    // is greater than the print interest threshold
    //
-   if( eng.info[eng.get_info_index(n)].interest_value
-     < eng.wconf.print_interest_thresh().dval())  return;
+   if( eng.info[eng.get_info_index(n)].interest_value <
+       eng.conf_info.print_interest_thresh)  return;
 
    // Write out the common header columns
    write_header_columns(eng, at, row);
@@ -3520,6 +3465,18 @@ void calc_obs_cluster_mask(const Engine &eng, ShapeData &comp, const int n_set) 
    comp.calc_moments();
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+double area_ratio_conf(double t) {
+   return(t);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+double aspect_ratio_conf(double t) {
+   return(pow(pow(t-1, 2)/(pow(t, 2) + 1), 0.3));
 }
 
 ///////////////////////////////////////////////////////////////////////

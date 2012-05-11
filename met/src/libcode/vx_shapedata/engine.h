@@ -13,9 +13,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "mode_conf_info.h"
+
 #include "interest.h"
 #include "set.h"
-#include "mode_Conf.h"
 
 #include "vx_shapedata.h"
 #include "vx_math.h"
@@ -244,42 +245,14 @@ class Engine {
       void do_cluster_features();
 
       //
-      // Object holding default configuration values
+      // Configuration information
       //
 
-      mode_Conf wconf;
-
-      void process_engine_config();
-
-      //
-      // SingleThresh variables to store the thesholds
-      // specified in the config file
-      //
-      SingleThresh fcst_raw_thresh;
-      SingleThresh obs_raw_thresh;
-
-      SingleThresh fcst_conv_thresh;
-      SingleThresh obs_conv_thresh;
-
-      SingleThresh fcst_area_thresh;
-      SingleThresh obs_area_thresh;
-
-      SingleThresh fcst_inten_perc_thresh;
-      SingleThresh obs_inten_perc_thresh;
-
-      SingleThresh fcst_merge_thresh;
-      SingleThresh obs_merge_thresh;
+      ModeConfInfo conf_info;
 
       //
       // Data
       //
-
-      ConcatString fcst_var_str;
-      ConcatString obs_var_str;
-      ConcatString fcst_lvl_str;
-      ConcatString obs_lvl_str;
-      ConcatString fcst_unit_str;
-      ConcatString obs_unit_str;
 
       int need_fcst_filter;
       int need_obs_filter;
@@ -352,8 +325,8 @@ class Engine {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-extern double total_interest(mode_Conf &, int, const PairFeature &);
-extern double total_interest_print(mode_Conf &, int, const PairFeature &, ostream *);
+extern double total_interest(ModeConfInfo &, int, const PairFeature &);
+extern double total_interest_print(ModeConfInfo &, int, const PairFeature &, ostream *);
 extern double interest_percentile(Engine &, const double, const int);
 
 extern void write_engine_stats(Engine &, const Grid &, AsciiTable &);
@@ -373,6 +346,9 @@ extern void calc_fcst_cluster_mask(const Engine &, ShapeData &, const int);
 extern void calc_obs_cluster_mask(const Engine &, ShapeData &, const int);
 
 extern void parse_thresh_info(const char *, SingleThresh &);
+
+extern double area_ratio_conf(double);
+extern double aspect_ratio_conf(double);
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -157,9 +157,10 @@ struct NbrhdInfo {
 //
 
 struct PlotInfo {
-   ConcatString color_table; // Color table file
-   double       plot_min;    // Minimum plot value
-   double       plot_max;    // Maximum plot value
+   ConcatString color_table;      // Color table file
+   double       plot_min;         // Minimum plot value
+   double       plot_max;         // Maximum plot value
+   int          colorbar_spacing; // Spacing of colors in the colorbar
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -201,6 +202,32 @@ enum WaveletType {
    WaveletType_Daub_Cntr,   // Centered Daubechies wavelet
    WaveletType_BSpline,     // BSpline wavelet
    WaveletType_BSpline_Cntr // Centered BSpline wavelet
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for MODE merging options
+//
+
+enum MergeType {
+   MergeType_None,   // No additional merging
+   MergeType_Both,   // Double-threshold and fuzzy engine
+   MergeType_Thresh, // Double-threshold only
+   MergeType_Engine  // Fuzzy engine only
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for MODE matching options
+//
+
+enum MatchType {
+   MatchType_None,      // No matching
+   MatchType_MergeBoth, // Match with merging in both fcst and obs
+   MatchType_MergeFcst, // Match with merging in fcst only
+   MatchType_NoMerge    // Match with no additional merging
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -262,15 +289,19 @@ static const char conf_key_method[]            = "method";
 static const char conf_key_width[]             = "width";
 static const char conf_key_nbrhd[]             = "nbrhd";
 static const char conf_key_cov_thresh[]        = "cov_thresh";
+static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
 static const char conf_key_nc_pairs_flag[]     = "nc_pairs_flag";
 static const char conf_key_duplicate_flag[]    = "duplicate_flag";
 static const char conf_key_rank_corr_flag[]    = "rank_corr_flag";
 static const char conf_key_tmp_dir[]           = "tmp_dir";
 static const char conf_key_output_prefix[]     = "output_prefix";
 static const char conf_key_met_data_dir[]      = "met_data_dir";
+static const char conf_key_fcst_raw_plot[]     = "fcst_raw_plot";
+static const char conf_key_obs_raw_plot[]      = "obs_raw_plot";
 static const char conf_key_color_table[]       = "color_table";
 static const char conf_key_plot_min[]          = "plot_min";
 static const char conf_key_plot_max[]          = "plot_max";
+static const char conf_key_colorbar_spacing[]  = "colorbar_spacing";
 
 //
 // Wavelet-Stat specific parameter key names
@@ -284,9 +315,6 @@ static const char conf_key_x_ll[]              = "x_ll";
 static const char conf_key_y_ll[]              = "y_ll";
 static const char conf_key_wavelet_type[]      = "wavelet.type";
 static const char conf_key_wavelet_member[]    = "wavelet.member";
-static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
-static const char conf_key_fcst_raw_plot[]     = "fcst_raw_plot";
-static const char conf_key_obs_raw_plot[]      = "obs_raw_plot";
 static const char conf_key_wvlt_plot[]         = "wvlt_plot";
 
 //
@@ -337,11 +365,43 @@ static const char conf_key_obs_thresh[]        = "obs_thresh";
 static const char conf_key_alpha[]             = "alpha";
 static const char conf_key_line_type[]         = "line_type";
 static const char conf_key_column[]            = "column";
-static const char conf_key_weight[]            = "weight";
 static const char conf_key_out_alpha[]         = "out_alpha";
 static const char conf_key_vif_flag[]          = "vif_flag";
 static const char conf_key_jobs[]              = "jobs";
-   
+
+//
+// MODE specific parameter key names
+//
+
+static const char conf_key_raw_thresh[]            = "raw_thresh";
+static const char conf_key_conv_radius[]           = "conv_radius";
+static const char conf_key_conv_thresh[]           = "conv_thresh";
+static const char conf_key_area_thresh[]           = "area_thresh";
+static const char conf_key_inten_perc_value[]      = "inten_perc_value";
+static const char conf_key_inten_perc_thresh[]     = "inten_perc_thresh";
+static const char conf_key_merge_thresh[]          = "merge_thresh";
+static const char conf_key_merge_flag[]            = "merge_flag";
+static const char conf_key_match_flag[]            = "match_flag";
+static const char conf_key_max_centroid_dist[]     = "max_centroid_dist";
+static const char conf_key_weight[]                = "weight";
+static const char conf_key_interest_function[]     = "interest_function";
+static const char conf_key_centroid_dist[]         = "centroid_dist";
+static const char conf_key_boundary_dist[]         = "boundary_dist";
+static const char conf_key_convex_hull_dist[]      = "convex_hull_dist";
+static const char conf_key_angle_diff[]            = "angle_diff";
+static const char conf_key_area_ratio[]            = "area_ratio";
+static const char conf_key_int_area_ratio[]        = "int_area_ratio";
+static const char conf_key_complexity_ratio[]      = "complexity_ratio";
+static const char conf_key_inten_perc_ratio[]      = "inten_perc_ratio";
+static const char conf_key_object_plot[]           = "object_plot";
+static const char conf_key_intensity_percentile[]  = "intensity_percentile";
+static const char conf_key_total_interest_thresh[] = "total_interest_thresh";
+static const char conf_key_print_interest_thresh[] = "print_interest_thresh";
+static const char conf_key_zero_border_size[]      = "zero_border_size";
+static const char conf_key_plot_valid_flag[]       = "plot_valid_flag";
+static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
+static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
+
 //
 // Parameter value names common to multiple tools
 //
@@ -385,6 +445,19 @@ static const char conf_val_daub[]         = "DAUB";
 static const char conf_val_daub_cntr[]    = "DAUB_CNTR";
 static const char conf_val_bspline[]      = "BSPLINE";
 static const char conf_val_bspline_cntr[] = "BSPLINE_CNTR";
+
+//
+// MODE specific parameter value names
+//
+
+// Merging options
+static const char conf_val_thresh[] = "THRESH";
+static const char conf_val_engine[] = "ENGINE";
+
+// Matching options
+static const char conf_val_merge_both[] = "MERGE_BOTH";
+static const char conf_val_merge_fcst[] = "MERGE_FCST";
+static const char conf_val_no_merge[]   = "NO_MERGE";
 
 ////////////////////////////////////////////////////////////////////////
 

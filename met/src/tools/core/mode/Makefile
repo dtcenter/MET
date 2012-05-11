@@ -76,37 +76,33 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 mode: mode.cc $(OBJECTS)
-	@ echo
 	$(CXX) -o $(EXECUTABLES) mode.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-lvx_pxm \
+	-lvx_plot_util \
+	-lvx_nav \
+	-lvx_render \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_stat_out \
+	-lvx_statistics \
 	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	-lvx_nc_util \
 	-lvx_data2d \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
-	-lvx_econfig \
+	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)

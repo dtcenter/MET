@@ -16,20 +16,19 @@
 EXECUTABLES =
 
 
-OBJECTS     = moments.o   \
-              node.o      \
-              polyline.o  \
+OBJECTS     = moments.o \
+              node.o \
+              polyline.o \
               shapedata.o \
-              set.o       \
-              interest.o  \
-              mode_Conf.o \
-              engine.o    \
+              set.o \
+              interest.o \
+              mode_conf_info.o \
+              engine.o
 
 LIBRARIES   = libvx_shapedata.a
 
 
-GEN_SOURCES = mode_Conf.h \
-              mode_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -43,8 +42,8 @@ HEADERS     = moments.h \
               set.h \
               interest.h \
               mode_columns.h \
+              mode_conf_info.h \
               engine.h \
-              mode_Conf.h \
               vx_shapedata.h
 
 
@@ -67,11 +66,6 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 
 gen_sources: $(GEN_SOURCES)
 	@ echo
-
-mode_Conf.h mode_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
-	@ echo
-	@ rm -f mode_Conf.h mode_Conf.cc
-	$(ECONFIG_CODEGEN) -class mode_Conf -outfile mode_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/MODEConfig_default
 
 
 ########################################################################
@@ -97,11 +91,11 @@ shapedata.o: shapedata.h shapedata.cc
 set.o: set.h set.cc
 	$(CXX) set.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
+mode_conf_info.o: mode_conf_info.h mode_conf_info.cc
+	$(CXX) mode_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+
 interest.o: interest.h interest.cc shapedata.o
 	$(CXX) interest.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
-
-mode_Conf.o: mode_Conf.h mode_Conf.cc
-	$(CXX) mode_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 engine.o: engine.h engine.cc
 	$(CXX) engine.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
