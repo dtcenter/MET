@@ -29,6 +29,7 @@
 #include "set.h"
 #include "interest.h"
 #include "mode_columns.h"
+#include "mode_conf_info.h"
 #include "engine.h"
 
 

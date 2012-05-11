@@ -669,9 +669,25 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
    // Get the color table
    info.color_table = dict->lookup_string(conf_key_color_table);
 
-   // Get the plotting range
-   info.plot_min = dict->lookup_double(conf_key_plot_min);
-   info.plot_max = dict->lookup_double(conf_key_plot_max);
+   // Get the minimum plot value, 0 if not present
+   info.plot_min = dict->lookup_double(conf_key_plot_min, false);
+   if(is_bad_data(info.plot_min)) info.plot_min = 0.0;
+   
+   // Get the maximum plot value, 0 if not present
+   info.plot_max = dict->lookup_double(conf_key_plot_max, false);
+   if(is_bad_data(info.plot_max)) info.plot_max = 0.0;
+
+   // Get the colorbar spacing, 1 if not present
+   info.colorbar_spacing = dict->lookup_int(conf_key_colorbar_spacing, false);
+   if(is_bad_data(info.colorbar_spacing)) info.colorbar_spacing = 1;
+
+   // Check that the colorbar spacing is set >= 1
+   if(info.colorbar_spacing < 1) {
+      mlog << Error << "\nparse_conf_plot_info() -> "
+           << "the colorbar_spacing (" << info.colorbar_spacing
+           << ") must be set >= 1.\n\n";
+      exit(1);
+   }   
 
    return(info);
 }
@@ -829,6 +845,86 @@ ConcatString fieldtype_to_string(FieldType type) {
       default:
          mlog << Error << "\nfieldtype_to_string() -> "
               << "Unexpected FieldType value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MergeType int_to_mergetype(int v) {
+   MergeType t;
+
+   // Convert integer to enumerated MergeType
+        if(v == conf_const.lookup_int(conf_val_none))   t = MergeType_None;
+   else if(v == conf_const.lookup_int(conf_val_both))   t = MergeType_Both;
+   else if(v == conf_const.lookup_int(conf_val_thresh)) t = MergeType_Thresh;
+   else if(v == conf_const.lookup_int(conf_val_engine)) t = MergeType_Engine;
+   else {
+      mlog << Error << "\nint_to_mergetype() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString mergetype_to_string(MergeType type) {
+   ConcatString s;
+
+   // Convert enumerated MergeType to string
+   switch(type) {
+      case(MergeType_None):   s = conf_val_none;   break;
+      case(MergeType_Both):   s = conf_val_both;   break;
+      case(MergeType_Thresh): s = conf_val_thresh; break;
+      case(MergeType_Engine): s = conf_val_engine; break;
+      default:
+         mlog << Error << "\nmergetype_to_string() -> "
+              << "Unexpected MergeType value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MatchType int_to_matchtype(int v) {
+   MatchType t;
+
+   // Convert integer to enumerated MatchType
+        if(v == conf_const.lookup_int(conf_val_none))       t = MatchType_None;
+   else if(v == conf_const.lookup_int(conf_val_merge_both)) t = MatchType_MergeBoth;
+   else if(v == conf_const.lookup_int(conf_val_merge_fcst)) t = MatchType_MergeFcst;
+   else if(v == conf_const.lookup_int(conf_val_no_merge))   t = MatchType_NoMerge;
+   else {
+      mlog << Error << "\nint_to_matchtype() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString matchtype_to_string(MatchType type) {
+   ConcatString s;
+
+   // Convert enumerated MatchType to string
+   switch(type) {
+      case(MatchType_None):      s = conf_val_none;       break;
+      case(MatchType_MergeBoth): s = conf_val_merge_both; break;
+      case(MatchType_MergeFcst): s = conf_val_merge_fcst; break;
+      case(MatchType_NoMerge):   s = conf_val_no_merge;   break;
+      default:
+         mlog << Error << "\nmatchtype_to_string() -> "
+              << "Unexpected MatchType value of " << type << ".\n\n";
          exit(1);
          break;
    }

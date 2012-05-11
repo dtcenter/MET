@@ -22,7 +22,7 @@ OBJECTS     = moments.o \
               shapedata.o \
               set.o \
               interest.o \
-              mode_Conf.o \
+              mode_conf_info.o \
               engine.o
 
 
@@ -40,8 +40,8 @@ HEADERS     = moments.h \
               set.h \
               interest.h \
               mode_columns.h \
+              mode_conf_info.h \
               engine.h \
-              mode_Conf.h \
               vx_shapedata.h
 
 
@@ -77,11 +77,11 @@ shapedata.o: shapedata.h shapedata.cc
 set.o: set.h set.cc
 	$(CXX) set.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
+mode_conf_info.o: mode_conf_info.h mode_conf_info.cc
+	$(CXX) mode_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+
 interest.o: interest.h interest.cc shapedata.o
 	$(CXX) interest.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
-
-mode_Conf.o: mode_Conf.h mode_Conf.cc
-	$(CXX) mode_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 engine.o: engine.h engine.cc
 	$(CXX) engine.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)

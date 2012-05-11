@@ -375,7 +375,7 @@ double ShapeData::complexity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void ShapeData::conv_filter_circ(int diameter, double bd_thresh)
+void ShapeData::conv_filter_circ(int diameter, double vld_thresh)
 
 {
 
@@ -385,13 +385,13 @@ int vpr, upr;
 int count, bd_count;
 double center, cur, sum;
 double dx, dy, dist;
-double ratio;
+double vld_ratio;
 const int nx = data.nx();
 const int ny = data.ny();
 bool * f = (bool *) 0;
 bool center_bad = false;
 DataPlane in_data = data;
-const bool bd_thresh_zero = is_eq(bd_thresh, 0.0);
+const bool vld_thresh_one = is_eq(vld_thresh, 1.0);
 
 
 if ( (diameter%2 == 0) || (diameter < 3) )  {
@@ -455,7 +455,7 @@ for(y=0; y<ny; y++) {
 
       center_bad = ::is_bad_data(center);
 
-      if ( center_bad && bd_thresh_zero ) { out[dn] = bad_data_double;  continue; }
+      if ( center_bad && vld_thresh_one ) { out[dn] = bad_data_double;  continue; }
 
       sum      = 0.0;
       count    = 0;
@@ -498,16 +498,16 @@ for(y=0; y<ny; y++) {
          //
          //  If the center of the convolution contains bad data and the ratio
          //  of bad data in the convolution area is too high, set the convoled
-         //  value to the minimum value.
+         //  value to bad data.
          //
 
       if ( count == 0 )  sum = bad_data_double;
       else {
 
-         ratio = ((double) bd_count)/(bd_count + count);
+         vld_ratio = ((double) count)/(bd_count + count);
 
-         if ( center_bad && (ratio > bd_thresh) )  sum = bad_data_double;
-         else                                      sum /= count;
+         if ( center_bad && (vld_ratio < vld_thresh) )  sum = bad_data_double;
+         else                                           sum /= count;
 
       }
 

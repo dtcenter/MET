@@ -53,8 +53,14 @@ extern void         statlinetype_to_string(const STATLineType, char *);
 extern STATLineType string_to_statlinetype(const char *);
 
 extern FieldType    int_to_fieldtype(int);
-
 extern ConcatString fieldtype_to_string(FieldType);
+
+extern MergeType    int_to_mergetype(int);
+extern ConcatString mergetype_to_string(MergeType);
+
+extern MatchType    int_to_matchtype(int);
+extern ConcatString matchtype_to_string(MatchType);
+
 extern ConcatString griddecomptype_to_string(GridDecompType);
 extern ConcatString wavelettype_to_string(WaveletType);
 
