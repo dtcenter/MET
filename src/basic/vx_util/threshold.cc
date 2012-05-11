@@ -194,23 +194,14 @@ void SingleThresh::set(const char *str) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString SingleThresh::get_str() const {
+ConcatString SingleThresh::get_str(int precision) const {
    char tmp_str[max_str_len];
    ConcatString t;
   
-   get_str(tmp_str);
+   get_str(tmp_str, precision);
    t = tmp_str;
 
    return(t);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void SingleThresh::get_str(char *str) const {
-
-   get_str(str, 3);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -235,23 +226,14 @@ void SingleThresh::get_str(char *str, int precision) const {
 //
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString SingleThresh::get_abbr_str() const {
+ConcatString SingleThresh::get_abbr_str(int precision) const {
    char tmp_str[max_str_len];
    ConcatString t;
 
-   get_abbr_str(tmp_str, 3);
+   get_abbr_str(tmp_str, precision);
    t = tmp_str;
 
    return(t);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void SingleThresh::get_abbr_str(char *str) const {
-
-   get_abbr_str(str, 3);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -39,10 +39,11 @@ static const char * const thresh_abbr_str[n_thresh_type] = {
    "na", "lt", "le", "eq", "ne", "gt", "ge"
 };
 
+static const int thresh_default_precision = 3;
+
 ////////////////////////////////////////////////////////////////////////
 //
-// Class to store a threshold value and the corresponding threshold
-// type
+// Class to store a threshold value and type
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -63,24 +64,22 @@ class SingleThresh {
 
       bool operator==(const SingleThresh &);
 
-      double     thresh; // Threshold value
-      ThreshType type;   // Threshold type
+      double       thresh; // Threshold value
+      ThreshType   type;   // Threshold type
 
-      void       clear();
+      void         clear();
 
-      void       set(double, ThreshType);
-      void       set(const char *);
+      void         set(double, ThreshType);
+      void         set(const char *);
 
       double       get_thresh() const;
       ThreshType   get_type() const;
-      ConcatString get_str() const;
-      void         get_str(char *) const;
-      void         get_str(char *, int) const;
-      ConcatString get_abbr_str() const;
-      void         get_abbr_str(char *) const;
-      void         get_abbr_str(char *, int) const;
+      ConcatString get_str(int precision = thresh_default_precision) const;
+      void         get_str(char *, int precision = thresh_default_precision) const;
+      ConcatString get_abbr_str(int precision = thresh_default_precision) const;
+      void         get_abbr_str(char *, int precision = thresh_default_precision) const;
 
-      bool       check(double) const;
+      bool         check(double) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
