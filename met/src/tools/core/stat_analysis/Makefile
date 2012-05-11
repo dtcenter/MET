@@ -110,8 +110,8 @@ stat_analysis: stat_analysis.cc $(OBJECTS)
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_cal \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
