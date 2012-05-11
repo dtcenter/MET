@@ -7,52 +7,68 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Allow TRUE and FALSE to be either case
-TRUE         = true;
-FALSE        = false;
+TRUE          = true;
+FALSE         = false;
 
 // File types
-GRIB1        = 1;
-GRIB2        = 2;
-NETCDF_MET   = 3;
-NETCDF_PINT  = 4;
+GRIB1         = 1;
+GRIB2         = 2;
+NETCDF_MET    = 3;
+NETCDF_PINT   = 4;
 
 // Interpolation method
-MIN          = 1;
-MAX          = 2;
-MEDIAN       = 3;
-UW_MEAN      = 4;
-DW_MEAN      = 5;
-LS_FIT       = 6;
-BILIN        = 7;
+MIN           = 1;
+MAX           = 2;
+MEDIAN        = 3;
+UW_MEAN       = 4;
+DW_MEAN       = 5;
+LS_FIT        = 6;
+BILIN         = 7;
 
 // Interpolation types
-NONE         = 1;
-BOTH         = 2;
-FCST         = 3;
-OBS          = 4;
+NONE          = 1;
+BOTH          = 2;
+FCST          = 3;
+OBS           = 4;
 
 // Output flag values
-NONE         = 1;
-BOTH         = 2;
-STAT         = 3;
+NONE          = 1;
+BOTH          = 2;
+STAT          = 3;
 
 // Bootstrapping interval type
-PCTILE       = 1;
-BCA          = 2;
+PCTILE        = 1;
+BCA           = 2;
 
 // Duplicate flag settings
-UNIQUE       = 2;
-SINGLE       = 3;
+NONE          = 1;
+UNIQUE        = 2;
+SINGLE        = 3;
 
 // Grid decomposition flag settings
-AUTO         = 2;
-TILE         = 3;
-PAD          = 4;
+NONE          = 1;
+AUTO          = 2;
+TILE          = 3;
+PAD           = 4;
 
 // Wavelet types
-HAAR         = 2;
-HAAR_CNTR    = 3;
-DAUB         = 4;
-DAUB_CNTR    = 5;
-BSPLINE      = 6;
-BSPLINE_CNTR = 7;
+NONE          = 1;
+HAAR          = 2;
+HAAR_CNTR     = 3;
+DAUB          = 4;
+DAUB_CNTR     = 5;
+BSPLINE       = 6;
+BSPLINE_CNTR  = 7;
+
+// MODE merging types
+NONE          = 1;
+BOTH          = 2;
+THRESH        = 3;
+ENGINE        = 4;
+
+// MODE matching types
+NONE          = 1;
+MERGE_BOTH    = 2;
+MERGE_FCST    = 3;
+NO_MERGE      = 4;
+
