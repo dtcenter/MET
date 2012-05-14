@@ -45,6 +45,8 @@ extern ConcatString   parse_conf_tmp_dir(Dictionary *dict);
 extern GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict);
 extern WaveletType    parse_conf_wavelet_type(Dictionary *dict);
 extern PlotInfo       parse_conf_plot_info(Dictionary *dict);
+extern void           parse_conf_range_int(Dictionary *dict, int &beg, int &end);
+extern void           parse_conf_range_double(Dictionary *dict, double &beg, double &end);
 
 extern void check_prob_thresh(const ThreshArray &);
 

@@ -16,7 +16,7 @@
 EXECUTABLES = pb2nc
 
 
-OBJECTS     = pb2nc_Conf.o \
+OBJECTS     = pb2nc_conf_info.o \
               numpbmsg.o \
               openpb.o \
               closepb.o \
@@ -27,8 +27,7 @@ OBJECTS     = pb2nc_Conf.o \
 LIBRARIES   =
 
 
-GEN_SOURCES = pb2nc_Conf.h \
-              pb2nc_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -58,12 +57,6 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-pb2nc_Conf.h pb2nc_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
-	@ echo
-	@ rm -f pb2nc_Conf.h pb2nc_Conf.cc
-	$(ECONFIG_CODEGEN) -class pb2nc_Conf -outfile pb2nc_Conf -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
-
-
 ########################################################################
 
 
@@ -72,9 +65,9 @@ pb2nc_Conf.h pb2nc_Conf.cc: $(CONFIG_TEMPLATE_DIR)/PB2NCConfig_default
    ##
 
 
-pb2nc_Conf.o: pb2nc_Conf.cc
+pb2nc_conf_info.o: pb2nc_conf_info.cc
 	@ echo
-	$(CXX) pb2nc_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+	$(CXX) pb2nc_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 numpbmsg.o: numpbmsg.f
@@ -123,33 +116,24 @@ pb2nc: pb2nc.cc $(OBJECTS)
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(BUFR_INCS) $(F2C_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(BUFR_LIBS) $(F2C_LIBS) $(GRIB2C_LIBS) \
+	-lvx_stat_out \
+	-lvx_statistics \
 	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	-lvx_nc_util \
 	-lvx_data2d \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
-	-lvx_econfig \
-	-lvx_pb_util \
+	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_pb_util \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas -lbufr \
 	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)

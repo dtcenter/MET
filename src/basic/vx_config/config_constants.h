@@ -245,8 +245,9 @@ static const char config_const_filename[] = "MET_BASE/data/config/ConfigConstant
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
 static const char conf_key_output_flag[]       = "output_flag";
-static const char conf_key_obs_window_beg_ds[] = "obs_window.beg_ds";
-static const char conf_key_obs_window_end_ds[] = "obs_window.end_ds";
+static const char conf_key_obs_window[]        = "obs_window";
+static const char conf_key_beg[]               = "beg";
+static const char conf_key_end[]               = "end";
 static const char conf_key_fcst[]              = "fcst";
 static const char conf_key_obs[]               = "obs";
 static const char conf_key_fcst_field[]        = "fcst.field";
@@ -401,6 +402,22 @@ static const char conf_key_zero_border_size[]      = "zero_border_size";
 static const char conf_key_plot_valid_flag[]       = "plot_valid_flag";
 static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
+
+
+//
+// PB2NC specific parameter key names
+//
+
+static const char conf_key_station_id[]            = "station_id";
+static const char conf_key_elevation_range[]       = "elevation_range";
+static const char conf_key_pb_report_type[]        = "pb_report_type";
+static const char conf_key_in_report_type[]        = "in_report_type";
+static const char conf_key_instrument_type[]       = "instrument_type";
+static const char conf_key_level_range[]           = "level_range";
+static const char conf_key_level_category[]        = "level_category";
+static const char conf_key_obs_grib_code[]         = "obs_grib_code";
+static const char conf_key_quality_mark_thresh[]   = "quality_mark_thresh";
+static const char conf_key_event_stack_flag[]      = "event_stack_flag";
 
 //
 // Parameter value names common to multiple tools
