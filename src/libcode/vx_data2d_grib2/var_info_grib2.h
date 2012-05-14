@@ -47,34 +47,6 @@ static const char * const CONFIG_GRIB2_DerType    = "GRIB2_DerType";
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//
-//  Functionality and data members related to GRIB2 indexes and parameter
-//    names - intended to be later factored into a class that reads flat files
-//
-///////////////////////////////////////////////////////////////////////////////
-
-void init_var_maps();
-
-extern map<string,string> map_id;
-extern multimap<string,string> map_code;
-
-
-//
-// GRIB2 table lookups
-//
-
-string             g2_id_parm(const char* id);
-const char*        g2_id_lookup(const char* id);
-int                g2_id_count(const char* id);
-vector<string>     g2_code_lookup(const char* code);
-int                g2_code_count(const char* code);
-
-inline const char* g2_id_lookup (const char* id)    { return map_id[id].data();     }
-inline int         g2_id_count  (const char* id)    { return map_id.count(id);      }
-inline int         g2_code_count(const char* code)  { return map_code.count(code);  }
-
-
-///////////////////////////////////////////////////////////////////////////////
 
 class VarInfoGrib2 : public VarInfo
 {

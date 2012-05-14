@@ -88,8 +88,6 @@ void MetGrib2DataFile::grib2_init_from_scratch() {
 
    ScanMode = -1;
 
-   init_var_maps();
-
    PairMap["UGRD"] = "VGRD";
    PairMap["VGRD"] = "UGRD";
 
@@ -652,7 +650,18 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  build the parameter "name"
          ConcatString id;
          id << rec->Discipline << "_" << rec->ParmCat << "_" << rec->Parm;
-         rec->ParmName = g2_id_parm(id.text());
+
+         //  use the index to look up the parameter name
+         int tab_match = -1;
+         Grib2TableEntry tab;
+         ConcatString field_name;
+         if( !GribTable.lookup_grib2(field_name, rec->Discipline, rec->ParmCat, rec->Parm,
+                                     tab, tab_match) ){
+            mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
+                 << "field abbreviation '" << field_name << "'\n\n";
+            exit(1);
+         }
+         rec->ParmName = field_name.text();
 
          //  add the record to the list
          RecList.push_back(rec);
