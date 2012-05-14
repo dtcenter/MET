@@ -162,6 +162,19 @@ void VarInfoGrib::set_p_code(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoGrib::set_magic(const ConcatString & s) {
+
+   // Validate the magic string
+   VarInfo::set_magic(s);
+
+   // Store the magic string
+   MagicStr = s;
+
+   // Store the code value and parse any probability info
+   char *ptr = (char *) 0;
+   double prob_lo, prob_hi;
+   Code = str_to_grib_code(ptr, PCode, prob_lo, prob_hi);
+
+   /* PGO
    ConcatString tmp_str, tmp2_str, tmp3_str;
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *save_ptr = (char *) 0;
    double prob_lo, prob_hi, tmp_dbl;
@@ -368,6 +381,7 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
    }
 
    return;
+   */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
