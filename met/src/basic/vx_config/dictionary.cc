@@ -1458,8 +1458,10 @@ double Dictionary::lookup_double(const char * name, bool error_out)
 
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
+double v;
 
-if ( Entry )  is_correct_type = (Entry->type() == FloatType);
+if ( Entry )  is_correct_type = (Entry->type() == FloatType ||
+                                 Entry->type() == IntegerType);
 
 LastLookupStatus = is_correct_type;
 
@@ -1479,7 +1481,14 @@ if ( !Entry || !is_correct_type )  {
 
 }
 
-return ( Entry->d_value() );
+   //
+   //  Store the number as a double
+   //
+
+     if ( Entry->type() == FloatType   )  v = Entry->d_value();
+else if ( Entry->type() == IntegerType )  v = (double) Entry->i_value();
+
+return ( v );
 
 }
 

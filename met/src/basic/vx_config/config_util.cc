@@ -694,6 +694,56 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void parse_conf_range_int(Dictionary *dict, int &beg, int &end) {
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_range_int() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Lookup the integer values
+   beg = dict->lookup_int(conf_key_beg);
+   end = dict->lookup_int(conf_key_end);
+
+   // Check the range
+   if(beg > end) {
+      mlog << Error << "\nparse_conf_range_int() -> "
+           << "the ending value (" << end
+           << ") must be >= the beginning value (" << beg << ").\n\n";
+      exit(1);
+   }
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
+
+   if(!dict) {
+      mlog << Error << "\nnparse_conf_range_double -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Lookup the double values
+   beg = dict->lookup_double(conf_key_beg);
+   end = dict->lookup_double(conf_key_end);
+
+   // Check the range
+   if(beg > end) {
+      mlog << Error << "\nparse_conf_range_double() -> "
+           << "the ending value (" << end
+           << ") must be >= the beginning value (" << beg << ").\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void check_prob_thresh(const ThreshArray &ta) {
    int i, n;
 
