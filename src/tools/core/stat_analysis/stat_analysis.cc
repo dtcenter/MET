@@ -101,7 +101,7 @@ int main(int argc, char * argv []) {
    // If a config file was specified, set up the default job using the
    // config file.
    //
-   if(config_file.length() != 0) {
+   if(config_file.length() > 0) {
 
       //
       // Create the default config file name

@@ -34,803 +34,341 @@ using namespace std;
 
 
 #include "config_to_att.h"
+#include "is_bad_data.h"
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const bool error_out = false;
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void config_to_att(mode_analysis_Conf & config, ModeAttributes & atts)
+void config_to_att(MetConfig & config, ModeAttributes & atts)
 
 {
 
-int k, n, s;
-unixtime t;
-Result r;
+int      v_int;
+double   v_dbl;
+unixtime v_ut;
 
+   //
+   //  dump the contents of the config file
+   //
+if(mlog.verbosity_level() >= 5) config.dump(cout);
+
+   //
+   //  initialize
+   //
 
 atts.clear();
-
 
    //
    //  toggle members
    //
 
-if ( config.has_fcst() ) {
-   r = config.fcst();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_fcst();
-   }
-}
+if ( config.lookup_bool(conf_key_fcst, error_out) )
+   atts.set_fcst();
 
-if ( config.has_obs() ) {
-   r = config.obs();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_obs();
-   }
-}
+if ( config.lookup_bool(conf_key_obs, error_out) )
+   atts.set_obs();
 
-if ( config.has_single() ) {
-   r = config.single();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_single();
-   }
-}
+if ( config.lookup_bool(conf_key_single, error_out) )
+   atts.set_single();
 
-if ( config.has_pair() ) {
-   r = config.pair();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_pair();
-   }
-}
+if ( config.lookup_bool(conf_key_pair, error_out) )
+   atts.set_pair();
 
-if ( config.has_simple() ) {
-   r = config.simple();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_simple();
-   }
-}
+if ( config.lookup_bool(conf_key_simple, error_out) )
+   atts.set_simple();
 
-if ( config.has_cluster() ) {
-   r = config.cluster();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_cluster();
-   }
-}
+if ( config.lookup_bool(conf_key_cluster, error_out) )
+   atts.set_cluster();
 
-if ( config.has_matched() ) {
-   r = config.matched();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_matched();
-   }
-}
+if ( config.lookup_bool(conf_key_matched, error_out) )
+   atts.set_matched();
 
-if ( config.has_unmatched() ) {
-   r = config.unmatched();
-   if ( r.type() != no_result_type )  {
-      if ( r.ival() )  atts.set_unmatched();
-   }
-}
+if ( config.lookup_bool(conf_key_unmatched, error_out) )
+   atts.set_unmatched();
 
    //
    //  string array members
    //
 
-if ( config.has_model() ) {
-   n = config.n_model_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.model(k);
-         atts.model.add(r.sval());
-      }
-   }
-}
+atts.model.add( config.lookup_string_array(conf_key_model, error_out) );
 
-if ( config.has_fcst_thr() ) {
-   n = config.n_fcst_thr_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.fcst_thr(k);
-         atts.fcst_thr.add(r.sval());
-      }
-   }
-}
+atts.fcst_thr.add( config.lookup_string_array(conf_key_fcst_thr, error_out) );
 
-if ( config.has_obs_thr() ) {
-   n = config.n_obs_thr_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.obs_thr(k);
-         atts.obs_thr.add(r.sval());
-      }
-   }
-}
+atts.obs_thr.add( config.lookup_string_array(conf_key_obs_thr, error_out) );
 
-if ( config.has_fcst_var() ) {
-   n = config.n_fcst_var_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.fcst_var(k);
-         atts.fcst_var.add(r.sval());
-      }
-   }
-}
+atts.fcst_var.add( config.lookup_string_array(conf_key_fcst_var, error_out) );
 
-if ( config.has_fcst_lev() ) {
-   n = config.n_fcst_lev_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.fcst_lev(k);
-         atts.fcst_lev.add(r.sval());
-      }
-   }
-}
+atts.fcst_lev.add( config.lookup_string_array(conf_key_fcst_lev, error_out) );
 
-if ( config.has_obs_var() ) {
-   n = config.n_obs_var_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.obs_var(k);
-         atts.obs_var.add(r.sval());
-      }
-   }
-}
+atts.obs_var.add( config.lookup_string_array(conf_key_obs_var, error_out) );
 
-if ( config.has_obs_lev() ) {
-   n = config.n_obs_lev_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.obs_lev(k);
-         atts.obs_lev.add(r.sval());
-      }
-   }
-}
-
+atts.obs_lev.add( config.lookup_string_array(conf_key_obs_lev, error_out) );
 
    //
    //  int array members
    //
 
-if ( config.has_fcst_lead() ) {
-   n = config.n_fcst_lead_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.fcst_lead(k);
-         s = timestring_to_sec(r.sval());
-         atts.fcst_lead.add(s);
-      }
-   }
-}
+atts.fcst_lead.add( config.lookup_seconds_array(conf_key_fcst_lead, error_out) );
 
-if ( config.has_fcst_init_hour() ) {
-   n = config.n_fcst_init_hour_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.fcst_init_hour(k);
-         s = timestring_to_sec(r.sval());
-         atts.fcst_init_hour.add(s);
-      }
-   }
-}
+atts.fcst_init_hour.add( config.lookup_seconds_array(conf_key_fcst_init_hour, error_out) );
 
-if ( config.has_fcst_accum() ) {
-   n = config.n_fcst_accum_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.fcst_accum(k);
-         s = timestring_to_sec(r.sval());
-         atts.fcst_accum.add(s);
-      }
-   }
-}
+atts.fcst_accum.add( config.lookup_seconds_array(conf_key_fcst_accum, error_out) );
 
-if ( config.has_obs_lead() ) {
-   n = config.n_obs_lead_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.obs_lead(k);
-         s = timestring_to_sec(r.sval());
-         atts.obs_lead.add(s);
-      }
-   }
-}
+atts.obs_lead.add( config.lookup_seconds_array(conf_key_obs_lead, error_out) );
 
-if ( config.has_obs_init_hour() ) {
-   n = config.n_obs_init_hour_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.obs_init_hour(k);
-         s = timestring_to_sec(r.sval());
-         atts.obs_init_hour.add(s);
-      }
-   }
-}
+atts.obs_init_hour.add( config.lookup_seconds_array(conf_key_obs_init_hour, error_out) );
 
-if ( config.has_obs_accum() ) {
-   n = config.n_obs_accum_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.obs_accum(k);
-         s = timestring_to_sec(r.sval());
-         atts.obs_accum.add(s);
-      }
-   }
-}
+atts.obs_accum.add( config.lookup_seconds_array(conf_key_obs_accum, error_out) );
 
-if ( config.has_fcst_rad() ) {
-   n = config.n_fcst_rad_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.fcst_rad(k);
-         atts.fcst_rad.add(r.ival());
-      }
-   }
-}
+atts.fcst_rad.add( config.lookup_int_array(conf_key_fcst_rad, error_out) );
 
-if ( config.has_obs_rad() ) {
-   n = config.n_obs_rad_elements();
-   if ( n > 0 )  {
-      for (k=0; k<n; ++k)  {
-         r = config.obs_rad(k);
-         atts.obs_rad.add(r.ival());
-      }
-   }
-}
-
+atts.obs_rad.add( config.lookup_int_array(conf_key_obs_rad, error_out) );
 
    //
    //  int maxmin members
    //
 
-if ( config.has_area_min() ) {
-   r = config.area_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_min(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_min, error_out)) )
+   atts.set_area_min(v_int);
 
-if ( config.has_area_max() ) {
-   r = config.area_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_max(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_max, error_out)) )
+   atts.set_area_max(v_int);
 
-if ( config.has_area_filter_min() ) {
-   r = config.area_filter_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_filter_min(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_filter_min, error_out)) )
+   atts.set_area_filter_min(v_int);
 
-if ( config.has_area_filter_max() ) {
-   r = config.area_filter_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_filter_max(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_filter_max, error_out)) )
+   atts.set_area_filter_max(v_int);
 
-if ( config.has_area_thresh_min() ) {
-   r = config.area_thresh_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_thresh_min(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_thresh_min, error_out)) )
+   atts.set_area_thresh_min(v_int);
 
-if ( config.has_area_thresh_max() ) {
-   r = config.area_thresh_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_thresh_max(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_thresh_max, error_out)) )
+   atts.set_area_thresh_max(v_int);
 
-if ( config.has_intersection_area_min() ) {
-   r = config.intersection_area_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intersection_area_min(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_intersection_area_min, error_out)) )
+   atts.set_intersection_area_min(v_int);
 
-if ( config.has_intersection_area_max() ) {
-   r = config.intersection_area_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intersection_area_max(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_intersection_area_max, error_out)) )
+   atts.set_intersection_area_max(v_int);
 
-if ( config.has_union_area_min() ) {
-   r = config.union_area_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_union_area_min(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_union_area_min, error_out)) )
+   atts.set_union_area_min(v_int);
 
-if ( config.has_union_area_max() ) {
-   r = config.union_area_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_union_area_max(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_union_area_max, error_out)) )
+   atts.set_union_area_max(v_int);
 
-if ( config.has_symmetric_diff_min() ) {
-   r = config.symmetric_diff_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_symmetric_diff_min(r.ival());
-   }
-}
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_symmetric_diff_min, error_out)) )
+   atts.set_symmetric_diff_min(v_int);
 
-if ( config.has_symmetric_diff_max() ) {
-   r = config.symmetric_diff_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_symmetric_diff_max(r.ival());
-   }
-}
-
+if ( !is_bad_data(v_int = config.lookup_int(conf_key_symmetric_diff_max, error_out)) )
+   atts.set_symmetric_diff_max(v_int);
 
    //
    //  unixtime maxmin members
    //
 
-if ( config.has_fcst_valid_min() ) {
-   r = config.fcst_valid_min();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_fcst_valid_min(t);
-   }
-}
+if ( (v_ut = config.lookup_unixtime(conf_key_fcst_valid_min, error_out)) > 0 )
+   atts.set_fcst_valid_min(v_ut);
 
-if ( config.has_fcst_valid_max() ) {
-   r = config.fcst_valid_max();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_fcst_valid_max(t);
-   }
-}
+if ( (v_ut = config.lookup_unixtime(conf_key_fcst_valid_max, error_out)) > 0 )
+   atts.set_fcst_valid_max(v_ut);
 
-if ( config.has_obs_valid_min() ) {
-   r = config.obs_valid_min();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_obs_valid_min(t);
-   }
-}
+if ( (v_ut = config.lookup_unixtime(conf_key_obs_valid_min, error_out)) > 0 )
+   atts.set_obs_valid_min(v_ut);
 
-if ( config.has_obs_valid_max() ) {
-   r = config.obs_valid_max();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_obs_valid_max(t);
-   }
-}
+if ( (v_ut = config.lookup_unixtime(conf_key_obs_valid_max, error_out)) > 0 )
+   atts.set_obs_valid_max(v_ut);
 
-if ( config.has_fcst_init_min() ) {
-   r = config.fcst_init_min();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_fcst_init_min(t);
-   }
-}
+if ( (v_ut = config.lookup_unixtime(conf_key_fcst_init_min, error_out)) > 0 )
+   atts.set_fcst_init_min(v_ut);
 
-if ( config.has_fcst_init_max() ) {
-   r = config.fcst_init_max();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_fcst_init_max(t);
-   }
-}
+if ( (v_ut = config.lookup_unixtime(conf_key_fcst_init_max, error_out)) > 0 )
+   atts.set_fcst_init_max(v_ut);
 
-if ( config.has_obs_init_min() ) {
-   r = config.obs_init_min();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_obs_init_min(t);
-   }
-}
+if ( (v_ut = config.lookup_unixtime(conf_key_obs_init_min, error_out)) > 0 )
+   atts.set_obs_init_min(v_ut);
 
-if ( config.has_obs_init_max() ) {
-   r = config.obs_init_max();
-   if ( (r.type() != no_result_type) && (strlen(r.sval()) > 0 ) )  {
-      t = timestring_to_unix(r.sval());
-      atts.set_obs_init_max(t);
-   }
-}
-
+if ( (v_ut = config.lookup_unixtime(conf_key_obs_init_max, error_out)) > 0 )
+   atts.set_obs_init_max(v_ut);
 
    //
    //  double maxmin members
    //
 
-if ( config.has_centroid_x_min() ) {
-   r = config.centroid_x_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_x_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_x_min, error_out)) )
+   atts.set_centroid_x_min(v_dbl);
 
-if ( config.has_centroid_x_max() ) {
-   r = config.centroid_x_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_x_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_x_max, error_out)) )
+   atts.set_centroid_x_max(v_dbl);
 
-if ( config.has_centroid_y_min() ) {
-   r = config.centroid_y_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_y_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_y_min, error_out)) )
+   atts.set_centroid_y_min(v_dbl);
 
-if ( config.has_centroid_y_max() ) {
-   r = config.centroid_y_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_y_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_y_max, error_out)) )
+   atts.set_centroid_y_max(v_dbl);
 
-if ( config.has_centroid_lat_min() ) {
-   r = config.centroid_lat_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_lat_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_lat_min, error_out)) )
+   atts.set_centroid_lat_min(v_dbl);
 
-if ( config.has_centroid_lat_max() ) {
-   r = config.centroid_lat_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_lat_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_lat_max, error_out)) )
+   atts.set_centroid_lat_max(v_dbl);
 
-if ( config.has_centroid_lon_min() ) {
-   r = config.centroid_lon_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_lon_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_lon_min, error_out)) )
+   atts.set_centroid_lon_min(v_dbl);
 
-if ( config.has_centroid_lon_max() ) {
-   r = config.centroid_lon_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_lon_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_lon_max, error_out)) )
+   atts.set_centroid_lon_max(v_dbl);
 
-if ( config.has_axis_ang_min() ) {
-   r = config.axis_ang_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_axis_ang_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_axis_ang_min, error_out)) )
+   atts.set_axis_ang_min(v_dbl);
 
-if ( config.has_axis_ang_max() ) {
-   r = config.axis_ang_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_axis_ang_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_axis_ang_max, error_out)) )
+   atts.set_axis_ang_max(v_dbl);
 
-if ( config.has_length_min() ) {
-   r = config.length_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_length_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_length_min, error_out)) )
+   atts.set_length_min(v_dbl);
 
-if ( config.has_length_max() ) {
-   r = config.length_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_length_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_length_max, error_out)) )
+   atts.set_length_max(v_dbl);
 
-if ( config.has_width_min() ) {
-   r = config.width_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_width_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_width_min, error_out)) )
+   atts.set_width_min(v_dbl);
 
-if ( config.has_width_max() ) {
-   r = config.width_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_width_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_width_max, error_out)) )
+   atts.set_width_max(v_dbl);
 
-if ( config.has_aspect_ratio_min() ) {
-   r = config.aspect_ratio_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_aspect_ratio_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_aspect_ratio_min, error_out)) )
+   atts.set_aspect_ratio_min(v_dbl);
 
-if ( config.has_aspect_ratio_max() ) {
-   r = config.aspect_ratio_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_aspect_ratio_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_aspect_ratio_max, error_out)) )
+   atts.set_aspect_ratio_max(v_dbl);
 
-if ( config.has_curvature_min() ) {
-   r = config.curvature_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_curvature_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_min, error_out)) )
+   atts.set_curvature_min(v_dbl);
 
-if ( config.has_curvature_max() ) {
-   r = config.curvature_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_curvature_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_max, error_out)) )
+   atts.set_curvature_max(v_dbl);
 
-if ( config.has_curvature_x_min() ) {
-   r = config.curvature_x_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_curvature_x_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_x_min, error_out)) )
+   atts.set_curvature_x_min(v_dbl);
 
-if ( config.has_curvature_x_max() ) {
-   r = config.curvature_x_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_curvature_x_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_x_max, error_out)) )
+   atts.set_curvature_x_max(v_dbl);
 
-if ( config.has_curvature_y_min() ) {
-   r = config.curvature_y_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_curvature_y_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_y_min, error_out)) )
+   atts.set_curvature_y_min(v_dbl);
 
-if ( config.has_curvature_y_max() ) {
-   r = config.curvature_y_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_curvature_y_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_y_max, error_out)) )
+   atts.set_curvature_y_max(v_dbl);
 
-if ( config.has_complexity_min() ) {
-   r = config.complexity_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_complexity_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_complexity_min, error_out)) )
+   atts.set_complexity_min(v_dbl);
 
-if ( config.has_complexity_max() ) {
-   r = config.complexity_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_complexity_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_complexity_max, error_out)) )
+   atts.set_complexity_max(v_dbl);
 
-if ( config.has_intensity_10_min() ) {
-   r = config.intensity_10_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_10_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_10_min, error_out)) )
+   atts.set_intensity_10_min(v_dbl);
 
-if ( config.has_intensity_10_max() ) {
-   r = config.intensity_10_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_10_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_10_max, error_out)) )
+   atts.set_intensity_10_max(v_dbl);
 
-if ( config.has_intensity_25_min() ) {
-   r = config.intensity_25_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_25_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_25_min, error_out)) )
+   atts.set_intensity_25_min(v_dbl);
 
-if ( config.has_intensity_25_max() ) {
-   r = config.intensity_25_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_25_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_25_max, error_out)) )
+   atts.set_intensity_25_max(v_dbl);
 
-if ( config.has_intensity_50_min() ) {
-   r = config.intensity_50_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_50_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_50_min, error_out)) )
+   atts.set_intensity_50_min(v_dbl);
 
-if ( config.has_intensity_50_max() ) {
-   r = config.intensity_50_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_50_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_50_max, error_out)) )
+   atts.set_intensity_50_max(v_dbl);
 
-if ( config.has_intensity_75_min() ) {
-   r = config.intensity_75_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_75_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_75_min, error_out)) )
+   atts.set_intensity_75_min(v_dbl);
 
-if ( config.has_intensity_75_max() ) {
-   r = config.intensity_75_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_75_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_75_max, error_out)) )
+   atts.set_intensity_75_max(v_dbl);
 
-if ( config.has_intensity_90_min() ) {
-   r = config.intensity_90_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_90_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_90_min, error_out)) )
+   atts.set_intensity_90_min(v_dbl);
 
-if ( config.has_intensity_90_max() ) {
-   r = config.intensity_90_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_90_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_90_max, error_out)) )
+   atts.set_intensity_90_max(v_dbl);
 
-if ( config.has_intensity_user_min() ) {
-   r = config.intensity_user_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_user_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_user_min, error_out)) )
+   atts.set_intensity_user_min(v_dbl);
 
-if ( config.has_intensity_user_max() ) {
-   r = config.intensity_user_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_user_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_user_max, error_out)) )
+   atts.set_intensity_user_max(v_dbl);
 
-if ( config.has_intensity_sum_min() ) {
-   r = config.intensity_sum_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_sum_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_sum_min, error_out)) )
+   atts.set_intensity_sum_min(v_dbl);
 
-if ( config.has_intensity_sum_max() ) {
-   r = config.intensity_sum_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intensity_sum_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intensity_sum_max, error_out)) )
+   atts.set_intensity_sum_max(v_dbl);
 
-if ( config.has_centroid_dist_min() ) {
-   r = config.centroid_dist_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_dist_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_dist_min, error_out)) )
+   atts.set_centroid_dist_min(v_dbl);
 
-if ( config.has_centroid_dist_max() ) {
-   r = config.centroid_dist_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_centroid_dist_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_centroid_dist_max, error_out)) )
+   atts.set_centroid_dist_max(v_dbl);
 
-if ( config.has_boundary_dist_min() ) {
-   r = config.boundary_dist_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_boundary_dist_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_boundary_dist_min, error_out)) )
+   atts.set_boundary_dist_min(v_dbl);
 
-if ( config.has_boundary_dist_max() ) {
-   r = config.boundary_dist_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_boundary_dist_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_boundary_dist_max, error_out)) )
+   atts.set_boundary_dist_max(v_dbl);
 
-if ( config.has_convex_hull_dist_min() ) {
-   r = config.convex_hull_dist_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_convex_hull_dist_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_convex_hull_dist_min, error_out)) )
+   atts.set_convex_hull_dist_min(v_dbl);
 
-if ( config.has_convex_hull_dist_max() ) {
-   r = config.convex_hull_dist_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_convex_hull_dist_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_convex_hull_dist_max, error_out)) )
+   atts.set_convex_hull_dist_max(v_dbl);
 
-if ( config.has_angle_diff_min() ) {
-   r = config.angle_diff_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_angle_diff_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_angle_diff_min, error_out)) )
+   atts.set_angle_diff_min(v_dbl);
 
-if ( config.has_angle_diff_max() ) {
-   r = config.angle_diff_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_angle_diff_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_angle_diff_max, error_out)) )
+   atts.set_angle_diff_max(v_dbl);
 
-if ( config.has_area_ratio_min() ) {
-   r = config.area_ratio_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_ratio_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_area_ratio_min, error_out)) )
+   atts.set_area_ratio_min(v_dbl);
 
-if ( config.has_area_ratio_max() ) {
-   r = config.area_ratio_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_area_ratio_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_area_ratio_max, error_out)) )
+   atts.set_area_ratio_max(v_dbl);
 
-if ( config.has_intersection_over_area_min() ) {
-   r = config.intersection_over_area_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_intersection_over_area_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intersection_over_area_min, error_out)) )
+   atts.set_intersection_over_area_min(v_dbl);
 
-if ( config.has_intersection_over_area_max() ) {
-   r = config.intersection_over_area_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_intersection_over_area_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intersection_over_area_max, error_out)) )
+   atts.set_intersection_over_area_max(v_dbl);
 
-if ( config.has_complexity_ratio_min() ) {
-   r = config.complexity_ratio_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_complexity_ratio_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_complexity_ratio_min, error_out)) )
+   atts.set_complexity_ratio_min(v_dbl);
 
-if ( config.has_complexity_ratio_max() ) {
-   r = config.complexity_ratio_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_complexity_ratio_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_complexity_ratio_max, error_out)) )
+   atts.set_complexity_ratio_max(v_dbl);
 
-if ( config.has_percentile_intensity_ratio_min() ) {
-   r = config.percentile_intensity_ratio_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_percentile_intensity_ratio_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_percentile_intensity_ratio_min, error_out)) )
+   atts.set_percentile_intensity_ratio_min(v_dbl);
 
-if ( config.has_percentile_intensity_ratio_max() ) {
-   r = config.percentile_intensity_ratio_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_percentile_intensity_ratio_max(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_percentile_intensity_ratio_max, error_out)) )
+   atts.set_percentile_intensity_ratio_max(v_dbl);
 
-if ( config.has_interest_min() ) {
-   r = config.interest_min();
-   if ( r.type() != no_result_type )  {
-      atts.set_interest_min(r.dval());
-   }
-}
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_interest_min, error_out)) )
+   atts.set_interest_min(v_dbl);
 
-if ( config.has_interest_max() ) {
-   r = config.interest_max();
-   if ( r.type() != no_result_type )  {
-      atts.set_interest_max(r.dval());
-   }
-}
-
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_interest_max, error_out)) )
+   atts.set_interest_max(v_dbl);
 
    //
    //  done

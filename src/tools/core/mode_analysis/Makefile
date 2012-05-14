@@ -16,15 +16,13 @@
 EXECUTABLES = mode_analysis
 
 
-OBJECTS     = mode_analysis_Conf.o \
-              config_to_att.o
+OBJECTS     = config_to_att.o
 
 
 LIBRARIES   =
 
 
-GEN_SOURCES = mode_analysis_Conf.h \
-              mode_analysis_Conf.cc
+GEN_SOURCES =
 
 
 ########################################################################
@@ -54,12 +52,6 @@ gen_sources: $(GEN_SOURCES)
 	@ echo
 
 
-mode_analysis_Conf.h mode_analysis_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEAnalysisConfig_build
-	@ echo
-	@ rm -f mode_analysis_Conf.h mode_analysis_Conf.cc
-	$(ECONFIG_CODEGEN) -class mode_analysis_Conf -outfile mode_analysis_Conf -nopanic -allow_multiple_reads $(CONFIG_TEMPLATE_DIR)/MODEAnalysisConfig_build
-
-
 ########################################################################
 
 
@@ -68,13 +60,7 @@ mode_analysis_Conf.h mode_analysis_Conf.cc: $(CONFIG_TEMPLATE_DIR)/MODEAnalysisC
    ##
 
 
-mode_analysis_Conf.o: mode_analysis_Conf.cc
-	@ echo
-	$(CXX) mode_analysis_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
-
-
 config_to_att.o: config_to_att.cc
-	@ echo
 	$(CXX) config_to_att.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -95,37 +81,27 @@ config_to_att.o: config_to_att.cc
 
 
 mode_analysis: mode_analysis.cc $(OBJECTS)
-	@ echo
 	$(CXX) -o $(EXECUTABLES) mode_analysis.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-lvx_stat_out \
+	-lvx_statistics \
 	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	-lvx_nc_util \
 	-lvx_data2d \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
-	-lvx_econfig \
+	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)

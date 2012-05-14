@@ -12,6 +12,7 @@ using namespace std;
 
 #include "indent.h"
 #include "vx_log.h"
+#include "nint.h"
 #include "bool_to_string.h"
 #include "empty_string.h"
 #include "is_bad_data.h"
@@ -1598,6 +1599,23 @@ return ( array );
 ////////////////////////////////////////////////////////////////////////
 
 
+IntArray Dictionary::lookup_int_array(const char * name, bool error_out)
+
+{
+
+IntArray array;
+NumArray num_array = lookup_num_array(name, error_out);
+
+for (int i=0; i<num_array.n_elements(); i++)
+   array.add( nint(num_array[i]) );
+
+return ( array );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString Dictionary::lookup_string(const char * name, bool error_out)
 
 {
@@ -1926,18 +1944,18 @@ else               return ( timestring_to_sec( cs ) );
 ////////////////////////////////////////////////////////////////////////
 
 
-NumArray Dictionary::lookup_seconds_array(const char * name, bool error_out)
+IntArray Dictionary::lookup_seconds_array(const char * name, bool error_out)
 
 {
 
 StringArray sa = lookup_string_array(name, error_out);
-NumArray na;
+IntArray ia;
 
 int j;
 
-for (j=0; j<sa.n_elements(); ++j)  na.add( timestring_to_sec( sa[j] ));
+for (j=0; j<sa.n_elements(); ++j)  ia.add( timestring_to_sec( sa[j] ));
 
-return ( na );
+return ( ia );
 
 }
 

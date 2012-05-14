@@ -1,63 +1,50 @@
 ////////////////////////////////////////////////////////////////////////////////
-//
-// Default mode_analysis configuration file
-//
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// The parameters listed below are used to filter the MODE data down to the
-// desired subset of MODE lines with which the analysis job is to be performed.
-// Only those MODE lines which meet ALL of the parameters will be retained.
-//
-// The parameters set here either add to or override parameters set on the
-// command line.  For the set string and set integer type options below that are
-// enclosed in brackets, the values specified here are added to any values set
-// on the command line.  For the toggle and min/max type options below, the
-// values specified here override those set on the command line.
-//
-// Parameters for which you do not wish to set a value must be commented out
-// using two backslash characters.
-//
 
 //
 // MODE line type toggle options
 //
-fcst      = 0;
-obs       = 0;
+fcst      = FALSE;
+obs       = FALSE;
 
-single    = 0;
-pair      = 0;
+single    = FALSE;
+pair      = FALSE;
 
-simple    = 0;
-cluster   = 0;
+simple    = FALSE;
+cluster   = FALSE;
 
-matched   = 0;
-unmatched = 0;
+matched   = FALSE;
+unmatched = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Multiple set string options
 //
-//model    [] = [];
-//fcst_thr [] = [];
-//obs_thr  [] = [];
-//fcst_var [] = [];
-//fcst_lev [] = [];
-//obs_var  [] = [];
-//obs_lev  [] = [];
+//model    = [];
+//fcst_thr = [];
+//obs_thr  = [];
+//fcst_var = [];
+//fcst_lev = [];
+//obs_var  = [];
+//obs_lev  = [];
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Multiple set integer options
 //
 // Time stings of the form: HH or HHMMSS
 //
-//fcst_lead      [] = [];
-//fcst_init_hour [] = [];
-//fcst_accum     [] = [];
-//obs_lead       [] = [];
-//obs_init_hour  [] = [];
-//obs_accum      [] = [];
-//fcst_rad       [] = [];
-//obs_rad        [] = [];
+//fcst_lead      = [];
+//fcst_init_hour = [];
+//fcst_accum     = [];
+//obs_lead       = [];
+//obs_init_hour  = [];
+//obs_accum      = [];
+//fcst_rad       = [];
+//obs_rad        = [];
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Integer min/max options
@@ -80,6 +67,8 @@ unmatched = 0;
 //symmetric_diff_min    = 0;
 //symmetric_diff_max    = 0;
 
+////////////////////////////////////////////////////////////////////////////////
+
 //
 // Date/time min/max options
 //
@@ -96,6 +85,8 @@ unmatched = 0;
 
 //obs_init_min   = "";
 //obs_init_max   = "";
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Floating-point min/max options
@@ -184,8 +175,8 @@ unmatched = 0;
 //interest_min                   = 0.0;
 //interest_max                   = 0.0;
 
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//
+////////////////////////////////////////////////////////////////////////////////
+
 version = "V3.1";
+
+////////////////////////////////////////////////////////////////////////////////

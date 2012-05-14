@@ -420,6 +420,99 @@ static const char conf_key_quality_mark_thresh[]   = "quality_mark_thresh";
 static const char conf_key_event_stack_flag[]      = "event_stack_flag";
 
 //
+// MODE-Analysis specific parameter key names
+//
+
+static const char conf_key_single[]                         = "single";
+static const char conf_key_pair[]                           = "pair";
+static const char conf_key_simple[]                         = "simple";
+static const char conf_key_cluster[]                        = "cluster";
+static const char conf_key_matched[]                        = "matched";
+static const char conf_key_unmatched[]                      = "unmatched";
+static const char conf_key_fcst_thr[]                       = "fcst_thr";
+static const char conf_key_obs_thr[]                        = "obs_thr";
+static const char conf_key_fcst_accum[]                     = "fcst_accum";
+static const char conf_key_obs_accum[]                      = "obs_accum";
+static const char conf_key_fcst_rad[]                       = "fcst_rad";
+static const char conf_key_obs_rad[]                        = "obs_rad";
+static const char conf_key_area_min[]                       = "area_min";
+static const char conf_key_area_max[]                       = "area_max";
+static const char conf_key_area_filter_min[]                = "area_filter_min";
+static const char conf_key_area_filter_max[]                = "area_filter_max";
+static const char conf_key_area_thresh_min[]                = "area_thresh_min";
+static const char conf_key_area_thresh_max[]                = "area_thresh_max";
+static const char conf_key_intersection_area_min[]          = "intersection_area_min";
+static const char conf_key_intersection_area_max[]          = "intersection_area_max";
+static const char conf_key_union_area_min[]                 = "union_area_min";
+static const char conf_key_union_area_max[]                 = "union_area_max";
+static const char conf_key_symmetric_diff_min[]             = "symmetric_diff_min";
+static const char conf_key_symmetric_diff_max[]             = "symmetric_diff_max";
+static const char conf_key_fcst_valid_min[]                 = "fcst_valid_min";
+static const char conf_key_fcst_valid_max[]                 = "fcst_valid_max";
+static const char conf_key_obs_valid_min[]                  = "obs_valid_min";
+static const char conf_key_obs_valid_max[]                  = "obs_valid_max";
+static const char conf_key_fcst_init_min[]                  = "fcst_init_min";
+static const char conf_key_fcst_init_max[]                  = "fcst_init_max";
+static const char conf_key_obs_init_min[]                   = "obs_init_min";
+static const char conf_key_obs_init_max[]                   = "obs_init_max";
+static const char conf_key_centroid_x_min[]                 = "centroid_x_min";
+static const char conf_key_centroid_x_max[]                 = "centroid_x_max";
+static const char conf_key_centroid_y_min[]                 = "centroid_y_min";
+static const char conf_key_centroid_y_max[]                 = "centroid_y_max";
+static const char conf_key_centroid_lat_min[]               = "centroid_lat_min";
+static const char conf_key_centroid_lat_max[]               = "centroid_lat_max";
+static const char conf_key_centroid_lon_min[]               = "centroid_lon_min";
+static const char conf_key_centroid_lon_max[]               = "centroid_lon_max";
+static const char conf_key_axis_ang_min[]                   = "axis_ang_min";
+static const char conf_key_axis_ang_max[]                   = "axis_ang_max";
+static const char conf_key_length_min[]                     = "length_min";
+static const char conf_key_length_max[]                     = "length_max";
+static const char conf_key_width_min[]                      = "width_min";
+static const char conf_key_width_max[]                      = "width_max";
+static const char conf_key_aspect_ratio_min[]               = "aspect_ratio_min";
+static const char conf_key_aspect_ratio_max[]               = "aspect_ratio_max";
+static const char conf_key_curvature_min[]                  = "curvature_min";
+static const char conf_key_curvature_max[]                  = "curvature_max";
+static const char conf_key_curvature_x_min[]                = "curvature_x_min";
+static const char conf_key_curvature_x_max[]                = "curvature_x_max";
+static const char conf_key_curvature_y_min[]                = "curvature_y_min";
+static const char conf_key_curvature_y_max[]                = "curvature_y_max";
+static const char conf_key_complexity_min[]                 = "complexity_min";
+static const char conf_key_complexity_max[]                 = "complexity_max";
+static const char conf_key_intensity_10_min[]               = "intensity_10_min";
+static const char conf_key_intensity_10_max[]               = "intensity_10_max";
+static const char conf_key_intensity_25_min[]               = "intensity_25_min";
+static const char conf_key_intensity_25_max[]               = "intensity_25_max";
+static const char conf_key_intensity_50_min[]               = "intensity_50_min";
+static const char conf_key_intensity_50_max[]               = "intensity_50_max";
+static const char conf_key_intensity_75_min[]               = "intensity_75_min";
+static const char conf_key_intensity_75_max[]               = "intensity_75_max";
+static const char conf_key_intensity_90_min[]               = "intensity_90_min";
+static const char conf_key_intensity_90_max[]               = "intensity_90_max";
+static const char conf_key_intensity_user_min[]             = "intensity_user_min";
+static const char conf_key_intensity_user_max[]             = "intensity_user_max";
+static const char conf_key_intensity_sum_min[]              = "intensity_sum_min";
+static const char conf_key_intensity_sum_max[]              = "intensity_sum_max";
+static const char conf_key_centroid_dist_min[]              = "centroid_dist_min";
+static const char conf_key_centroid_dist_max[]              = "centroid_dist_max";
+static const char conf_key_boundary_dist_min[]              = "boundary_dist_min";
+static const char conf_key_boundary_dist_max[]              = "boundary_dist_max";
+static const char conf_key_convex_hull_dist_min[]           = "convex_hull_dist_min";
+static const char conf_key_convex_hull_dist_max[]           = "convex_hull_dist_max";
+static const char conf_key_angle_diff_min[]                 = "angle_diff_min";
+static const char conf_key_angle_diff_max[]                 = "angle_diff_max";
+static const char conf_key_area_ratio_min[]                 = "area_ratio_min";
+static const char conf_key_area_ratio_max[]                 = "area_ratio_max";
+static const char conf_key_intersection_over_area_min[]     = "intersection_over_area_min";
+static const char conf_key_intersection_over_area_max[]     = "intersection_over_area_max";
+static const char conf_key_complexity_ratio_min[]           = "complexity_ratio_min";
+static const char conf_key_complexity_ratio_max[]           = "complexity_ratio_max";
+static const char conf_key_percentile_intensity_ratio_min[] = "percentile_intensity_ratio_min";
+static const char conf_key_percentile_intensity_ratio_max[] = "percentile_intensity_ratio_max";
+static const char conf_key_interest_min[]                   = "interest_min";
+static const char conf_key_interest_max[]                   = "interest_max";
+
+//
 // Parameter value names common to multiple tools
 //
 
