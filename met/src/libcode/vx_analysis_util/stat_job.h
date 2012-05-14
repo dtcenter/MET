@@ -125,8 +125,8 @@ class STATAnalysisJob {
       //
       StringArray model;
 
-      NumArray    fcst_lead; // stored in seconds
-      NumArray    obs_lead;  // stored in seconds
+      IntArray    fcst_lead; // stored in seconds
+      IntArray    obs_lead;  // stored in seconds
 
       unixtime    fcst_valid_beg;
       unixtime    fcst_valid_end;
@@ -138,8 +138,8 @@ class STATAnalysisJob {
       unixtime    obs_init_beg;
       unixtime    obs_init_end;
 
-      NumArray    fcst_init_hour; // stored in seconds
-      NumArray    obs_init_hour;  // stored in seconds
+      IntArray    fcst_init_hour; // stored in seconds
+      IntArray    obs_init_hour;  // stored in seconds
 
       StringArray fcst_var;
       StringArray obs_var;

@@ -26,6 +26,7 @@
 //                                    parse the command line arguments.
 //   003    11/10/11  Holmes          Added code to enable reading of
 //                                    multiple config files.
+//   004    05/14/12  Halley Gotway   Switch to using vx_config library.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,7 +46,6 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_analysis_util.h"
 
-#include "mode_analysis_Conf.h"
 #include "config_to_att.h"
 
 
@@ -60,7 +60,7 @@ static BasicModeAnalysisJob * job = (BasicModeAnalysisJob *) 0;
 
 static ModeAttributes config_atts;
 
-static mode_analysis_Conf config;
+static MetConfig config;
 
 static const char * const program_name = "mode_analysis";
 
@@ -110,9 +110,12 @@ int main(int argc, char * argv [])
 
 {
 
-ConcatString default_conf_file;
+ConcatString default_config_file;
 
-// Set handler to be called for memory allocation error
+   //
+   //  set handler to be called for memory allocation error
+   //
+
 set_new_handler(oom);
 
 if ( argc == 1 )  { usage(); }
@@ -131,12 +134,26 @@ if ( 3 <= mlog.verbosity_level() )  {
 if ( config_filename.length() > 0 )  {
 
       //
-      // first read the default config file and then read the user's
+      //  create the default config file name
       //
-   default_conf_file = replace_path(default_config_filename);
-   mlog << Debug(1) << "Reading Default Config File: " << default_conf_file << "\n";
-   config.read(default_conf_file);
-   mlog << Debug(1) << "Reading User Config File: " << config_filename << "\n";
+
+   default_config_file = replace_path(default_config_filename);
+
+      //
+      //  list the config files
+      //
+
+   mlog << Debug(1)
+        << "Default Config File: " << default_config_file << "\n"
+        << "User Config File: "    << config_filename << "\n";
+
+      //
+      //  read config file constants, the default config file,
+      //  and then the user config file.
+      //
+
+   config.read(replace_path(config_const_filename));
+   config.read(default_config_file);
    config.read(config_filename);
 
    config_to_att(config, config_atts);
@@ -157,10 +174,6 @@ if ( dumpfile )  job->dumpfile = dumpfile;
 if ( outfile  )  job->outfile  = outfile;
 
 job->do_job(mode_files);
-
-
-
-
 
    //
    //  done
@@ -188,25 +201,29 @@ int j;
    //
    // parse the command line into tokens
    //
+
 cline.set(argc, argv);
 
    //
-   // Allow for unrecognized command line switches.
-   // This must be called after set above since set calls
-   // clear which would reset this to false.
-   // This allows us to be able to handle single jobs on
-   // the command line.
+   //  allow for unrecognized command line switches.
+   //  this must be called after set above since set calls
+   //  clear which would reset this to false.
+   //  this allows us to be able to handle single jobs on
+   //  the command line.
    //
+
 cline.allow_unrecognized_switches();
 
    //
-   // set the usage function
+   //  set the usage function
    //
+
 cline.set_usage(usage);
 
    //
-   // add the options function calls
+   //  add the options function calls
    //
+
 cline.add(set_lookin_path, "-lookin", 1);
 cline.add(set_summary_jobtype, "-summary", 0);
 cline.add(set_bycase_jobtype, "-bycase", 0);
@@ -218,8 +235,9 @@ cline.add(set_logfile, "-log", 1);
 cline.add(set_verbosity, "-v", 1);
 
    //
-   // parse the command line
+   //  parse the command line
    //
+
 cline.parse();
 
 
@@ -232,10 +250,10 @@ if ( !job )  {
 }
 
    //
-   // fill a StringArray with the rest of the command line arguments
-   // to parse as of old below. All that should remain are the
-   // MODE FILE LIST and the MODE LINE OPTIONS if there are any of
-   // either.
+   //  fill a StringArray with the rest of the command line arguments
+   //  to parse as of old below. all that should remain are the
+   //  MODE FILE LIST and the MODE LINE OPTIONS if there are any of
+   //  either.
    //
 
 cmd_line.clear();
