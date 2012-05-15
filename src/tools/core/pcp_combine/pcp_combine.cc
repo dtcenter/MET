@@ -1128,7 +1128,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    var_str = get_grib_code_unit(grib_code, grib_ptv);
    pcp_var->add_att("units",      (const char *) var_str);
-   pcp_var->add_att("grib_code",  grib_code);
    pcp_var->add_att("_FillValue", bad_data_float);
 
    //
