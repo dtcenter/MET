@@ -3249,9 +3249,6 @@ void usage() {
         << "\tconfig_file\n"
         << "\t[-config_merge merge_config_file]\n"
         << "\t[-outdir path]\n"
-        << "\t[-ps]\n"
-        << "\t[-nc]\n"
-        << "\t[-cts]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
