@@ -100,7 +100,6 @@ plot_point_obs: plot_point_obs.cc $(OBJECTS)
 	-lvx_gsl_prob \
 	-lvx_grid \
 	-lvx_config \
-	-lvx_econfig \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \

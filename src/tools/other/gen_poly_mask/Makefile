@@ -102,7 +102,6 @@ gen_poly_mask: gen_poly_mask.cc $(OBJECTS)
 	-lvx_stat_out \
 	-lvx_statistics \
 	-lvx_gsl_prob \
-	-lvx_econfig \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_util \

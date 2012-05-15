@@ -16,7 +16,6 @@ all:
 	@ cd enum_to_string ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_math        ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_util        ; $(MAKE) $(PRINT_OPTS)
-	@ cd vx_econfig     ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_config      ; $(MAKE) $(PRINT_OPTS)
 
 
@@ -30,7 +29,6 @@ clean:
 	@ cd enum_to_string ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_math        ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_util        ; $(MAKE) $(PRINT_OPTS) clean
-	@ cd vx_econfig     ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_config      ; $(MAKE) $(PRINT_OPTS) clean
 
 
@@ -44,7 +42,6 @@ gen_sources:
 	@ cd enum_to_string ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_math        ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_util        ; $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_econfig     ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_config      ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
