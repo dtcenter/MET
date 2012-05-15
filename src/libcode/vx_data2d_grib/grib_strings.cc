@@ -27,77 +27,7 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_util.h"
 #include "vx_log.h"
-
-///////////////////////////////////////////////////////////////////////////////
-
-void get_grib_code_list(int grib_code, int ptv,
-                        int &n, const GribCodeData *&ptr) {
-
-   //
-   // Search the base strings for codes less than 128
-   //
-   if(grib_code < 128) {
-      n   = n_grib_code_list_base;
-      ptr = grib_code_list_base;
-   }
-   //
-   // Search based on the paramter table version
-   //
-   else {
-      switch(ptv) {
-
-         case(2):
-            n   = n_grib_code_list_ptv2;
-            ptr = grib_code_list_ptv2;
-            break;
-
-         case(128):
-            n   = n_grib_code_list_ptv128;
-            ptr = grib_code_list_ptv128;
-            break;
-
-         case(129):
-            n   = n_grib_code_list_ptv129;
-            ptr = grib_code_list_ptv129;
-            break;
-
-         case(130):
-            n   = n_grib_code_list_ptv130;
-            ptr = grib_code_list_ptv130;
-            break;
-
-         case(131):
-            n   = n_grib_code_list_ptv131;
-            ptr = grib_code_list_ptv131;
-            break;
-
-         case(133):
-            n   = n_grib_code_list_ptv133;
-            ptr = grib_code_list_ptv133;
-            break;
-
-         case(140):
-            n   = n_grib_code_list_ptv140;
-            ptr = grib_code_list_ptv140;
-            break;
-
-         case(141):
-            n   = n_grib_code_list_ptv141;
-            ptr = grib_code_list_ptv141;
-            break;
-
-         default:
-            mlog << Error << "\nget_grib_code_list() -> "
-                 << "unsupported GRIB parameter table version number of "
-                 << ptv << ".  The supported version numbers are 2, 128, "
-                 << "129, 130, 131, 133, 140, 141.\n\n";
-            exit(1);
-            break;
-      }
-   }
-
-   return;
-}
+#include "vx_data2d.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -105,51 +35,25 @@ ConcatString get_grib_code_list_str(int k, int grib_code, int ptv)
 
 {
 
-   int i, match;
-   int n_grib_code_list;
-   const GribCodeData * grib_code_list = (const GribCodeData *) 0;
-   ConcatString str = missing_str;
-
-   //
-   // Retrieve the GRIB code table to be used
-   //
-   get_grib_code_list(grib_code, ptv, n_grib_code_list, grib_code_list);
-
-   for(i=0, match=-1; i<n_grib_code_list; i++) {
-
-      if(grib_code == grib_code_list[i].code) { match = i; break; }
-
-   } // end for i
-
-   //
-   // Check if we have a match
-   //
-   if(match >= 0) {
-
-      switch(k) {
-         case(0): // GRIB Code Name
-            str = grib_code_list[match].name;
-            break;
-
-         case(1): // GRIB Code Unit
-            str = grib_code_list[match].unit;
-            break;
-
-         case(2): // GRIB Code Abbreviation
-            str = grib_code_list[match].abbr;
-            break;
-
-         default:
-            mlog << Error << "\nget_grib_code_list_str() -> "
-                 << "unexpected value for k: " << k
-                 << "\n\n";
-            exit(1);
-            break;
-      }
-
+   //  look up the name in the grib tables
+   Grib1TableEntry tab;
+   if( !GribTable.lookup_grib1(grib_code, ptv, tab) ){
+      mlog << Error << "\nget_grib_code_list_str() - unrecognized GRIB1 code "
+           << grib_code << " and/or table version " << ptv << "\n\n";
+      exit(1);
    }
 
-   return ( str );
+   //  return the requested field
+   switch(k) {
+      case 0:  return tab.full_name;      // GRIB Code Name
+      case 1:  return tab.units;          // GRIB Code Unit
+      case 2:  return tab.parm_name;      // GRIB Code Abbreviation
+      default:
+         mlog << Error << "\nget_grib_code_list_str() - unexpected value for k: "
+              << k << "\n\n";
+         exit(1);
+   }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -317,67 +221,17 @@ int str_to_grib_code(const char *c, int ptv)
 
 {
 
-   int gc = bad_data_int;
-   int i, l, is_numeric, n_grib_code_list;
-   char c_upper[512];
-   const GribCodeData *grib_code_list = (const GribCodeData *) 0;
+   //  if the input string is numeric, interpret as a grib code
+   if( check_reg_exp("[0-9]+", c) ) return atoi(c);
 
-   // First check if this string contains a numeric grib code.
-   // Check if each character in the string is a digit.
-   is_numeric = 1;
-   l = strlen(c);
-   for(i=0; i<l; i++) {
-      if(!isdigit(c[i])) {
-         is_numeric = 0;
-         break;
-      }
-   }
+   //  look up the name in the grib tables
+   int n_matches;
+   Grib1TableEntry tab;
+   if( !GribTable.lookup_grib1(c, ptv, bad_data_int, tab, n_matches) )
+      return bad_data_int;
 
-   if(is_numeric) {
-      gc = atoi(c);
-   }
-   // If not numeric, search for a matching grib code abbreviation
-   else{
+   return tab.code;
 
-      // Convert the input string to all upper case ignoring anything
-      // after an underscore indicating an accumulation interval
-      strcpy(c_upper, c);
-      l = strlen(c_upper);
-      for(i=0; i<l; i++) {
-         if(c_upper[i] == '_') {
-            c_upper[i] = '\0';
-            break;
-         }
-         else {
-            c_upper[i] = toupper(c_upper[i]);
-         }
-      }
-
-      // Search for GRIB codes from 0 to 127
-      get_grib_code_list(0, ptv, n_grib_code_list, grib_code_list);
-
-      for(i=0; i<n_grib_code_list; i++) {
-         if(strcmp(c_upper, grib_code_list[i].abbr) == 0) {
-            gc = grib_code_list[i].code;
-            break;
-         }
-      }
-
-      if(is_bad_data(gc)) {
-
-         // Search for GRIB codes from 128 to 255
-         get_grib_code_list(128, ptv, n_grib_code_list, grib_code_list);
-
-         for(i=0; i<n_grib_code_list; i++) {
-            if(strcmp(c_upper, grib_code_list[i].abbr) == 0) {
-               gc = grib_code_list[i].code;
-               break;
-            }
-         }
-      }
-   }
-
-   return(gc);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

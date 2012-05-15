@@ -345,6 +345,8 @@ bool VarInfoGrib2::is_precipitation() const {
    return Discipline == 0 &&
           ParmCat    == 1 &&
           (
+             Parm == 3  ||       //  PWAT
+             Parm == 7  ||       //  PRATE
              Parm == 8  ||       //  APCP
              Parm == 9  ||       //  NCPCP
              Parm == 10          //  ACPCP

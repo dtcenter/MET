@@ -83,8 +83,8 @@ plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GRIB2C_LIBS) \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_nc_util \
 	-lvx_data2d \
