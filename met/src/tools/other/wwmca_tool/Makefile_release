@@ -25,7 +25,6 @@ OBJECTS     = afwa_file.o \
               max_interp.o \
               ave_interp.o \
               nearest_interp.o \
-              wwmca_regrid_Conf.o \
               gridhemisphere_to_string.o \
               wwmca_ref.o \
               nc_output.o
@@ -97,17 +96,12 @@ nearest_interp.o: nearest_interp.h nearest_interp.cc interp_base.o
 	$(CXX) nearest_interp.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
-wwmca_regrid_Conf.o: wwmca_regrid_Conf.h wwmca_regrid_Conf.cc
-	@ echo
-	$(CXX) wwmca_regrid_Conf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
-
-
 gridhemisphere_to_string.o: gridhemisphere_to_string.h gridhemisphere_to_string.cc
 	@ echo
 	$(CXX) gridhemisphere_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
-wwmca_ref.o: wwmca_ref.h wwmca_ref.cc gridhemisphere_to_string.o wwmca_regrid_Conf.o
+wwmca_ref.o: wwmca_ref.h wwmca_ref.cc gridhemisphere_to_string.o
 	@ echo
 	$(CXX) wwmca_ref.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
@@ -139,34 +133,31 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-lvx_pxm \
+	-lvx_plot_util \
+	-lvx_nav \
+	-lvx_render \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_stat_out \
+	-lvx_statistics \
 	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	-lvx_nc_util \
 	-lvx_data2d \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
-	-lvx_econfig \
+	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp wwmca_regrid $(MET_BIN_DIR)
 
@@ -177,34 +168,31 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	$(CXX_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
+	-lvx_pxm \
+	-lvx_plot_util \
+	-lvx_nav \
+	-lvx_render \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_stat_out \
+	-lvx_statistics \
 	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	-lvx_nc_util \
 	-lvx_data2d \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
-	-lvx_econfig \
+	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp wwmca_plot $(MET_BIN_DIR)
 

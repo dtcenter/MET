@@ -91,7 +91,7 @@ ToGrid = (const Grid *) 0;
 
 interp = (Interpolator *) 0;
 
-Config = (wwmca_regrid_Conf *) 0;
+Config = (MetConfig *) 0;
 
 
 
@@ -126,7 +126,7 @@ Hemi = no_hemisphere;
 
 grid_strings.clear();
 
-Config = (wwmca_regrid_Conf *) 0;
+Config = (MetConfig *) 0;
 
 ConfigFilename.clear();
 
@@ -310,7 +310,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void WwmcaRegridder::set_config(wwmca_regrid_Conf & wc, const char * config_filename)
+void WwmcaRegridder::set_config(MetConfig & wc, const char * config_filename)
 
 {
 
@@ -453,6 +453,7 @@ int sub_x, sub_y;
 int wm1o2;
 int xx, yy;
 double lat, lon, dx, dy, t;
+const double max_minutes = Config->lookup_double(conf_key_max_minutes);
 
 
 
@@ -474,7 +475,7 @@ from_y0 = nint(dy);
 if ( I.width() == 1 )  {
 
    if ( cloud.xy_is_ok(from_x0, from_y0) &&
-        ((pixel.pixel_age_sec(from_x0, from_y0) / 60) < (int) Config->max_minutes()))  {
+        ((pixel.pixel_age_sec(from_x0, from_y0) / 60) < max_minutes))  {
 
       iv.ok = true;
 
@@ -511,7 +512,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
       sub_y  = yy + wm1o2;
 
       if ( !(cloud.xy_is_ok(from_x, from_y) &&
-             ((pixel.pixel_age_sec(from_x0, from_y0) / 60) < (int) Config->max_minutes())) )  {
+             ((pixel.pixel_age_sec(from_x0, from_y0) / 60) < max_minutes)) )  {
 
          I.put_bad(sub_x, sub_y);
 
@@ -562,6 +563,7 @@ const AfwaPixelTimeFile  * pixel_this  = (const AfwaPixelTimeFile *) 0;
 const AfwaPixelTimeFile  * pixel_other = (const AfwaPixelTimeFile *) 0;
 const Grid * From_this  = (const Grid *) 0;
 const Grid * From_other = (const Grid *) 0;
+const double max_minutes = Config->lookup_double(conf_key_max_minutes);
 
 
 
@@ -608,7 +610,7 @@ from_y0 = nint(dy0);
 if ( I.width() == 1 )  {
 
    if ( cloud_this->xy_is_ok(from_x0, from_y0) &&
-        ((pixel_this->pixel_age_sec(from_x0, from_y0) / 60) < (int) Config->max_minutes()))  {
+        ((pixel_this->pixel_age_sec(from_x0, from_y0) / 60) < max_minutes))  {
 
       iv.ok = true;
 
@@ -648,7 +650,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
       if ( lat*lat0 >= 0 )  {   //  same hemisphere
 
-         if ((pixel_this->pixel_age_sec(from_x, from_y) / 60) < (int) Config->max_minutes())
+         if ((pixel_this->pixel_age_sec(from_x, from_y) / 60) < max_minutes)
             t = cloud_this->cloud_pct(from_x, from_y);
          else
             t = 0.0;
@@ -657,7 +659,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
          From_other->latlon_to_xy(lat, lon, dx, dy);
 
-         if ((pixel_other->pixel_age_sec(nint(dx), nint(dy)) / 60) < (int) Config->max_minutes())
+         if ((pixel_other->pixel_age_sec(nint(dx), nint(dy)) / 60) < max_minutes)
             t = cloud_other->cloud_pct(nint(dx), nint(dy));
          else
             t = 0.0;
@@ -695,11 +697,12 @@ void WwmcaRegridder::find_grid_hemisphere()
 
 int j, ix, iy;
 double x, y, lat, lon;
-bool nh_used    = false;
-bool sh_used    = false;
-const int Nx    = ToGrid->nx();
-const int Ny    = ToGrid->ny();
-const int Width = Config->interp_width();
+bool nh_used                 = false;
+bool sh_used                 = false;
+const int Nx                 = ToGrid->nx();
+const int Ny                 = ToGrid->ny();
+const InterpInfo interp_info = parse_conf_interp(Config);
+const int Width              = interp_info.width[0];
 
 
 Hemi = no_hemisphere;
@@ -808,32 +811,22 @@ void WwmcaRegridder::get_interpolator()
 
 {
 
-int width, good_percent;
-int n_good_needed;
-ConcatString method;
 Ave_Interp ave;
 Nearest_Interp nearest;
 Min_Interp mini;
 Max_Interp maxi;
-Result r;
+const InterpInfo interp_info = parse_conf_interp(Config);
+const int width              = interp_info.width[0];
+const InterpMthd method      = string_to_interpmthd(interp_info.method[0]);
 
-
-width = Config->interp_width();
-
-good_percent = Config->good_percent();
-
-n_good_needed = nint(ceil(0.01*good_percent*width));
-
-r = Config->interp_method();
-
-method = r.sval();
+int n_good_needed = nint(ceil(0.01*interp_info.vld_thresh*width));
 
 
    //
    //  get to work
    //
 
-if ( method == "average" )  {
+if ( method == InterpMthd_UW_Mean )  {
 
    ave.set_size(width);
 
@@ -846,7 +839,7 @@ if ( method == "average" )  {
 }
 
 
-if ( method == "nearest" )  {
+else if ( width == 1 )  {
 
    nearest.set_size(width);
 
@@ -858,7 +851,7 @@ if ( method == "nearest" )  {
 
 }
 
-if ( method == "min" )  {
+else if ( method == InterpMthd_Min )  {
 
    mini.set_size(width);
 
@@ -871,7 +864,7 @@ if ( method == "min" )  {
 }
 
 
-if ( method == "max" )  {
+else if ( method == InterpMthd_Max )  {
 
    maxi.set_size(width);
 
@@ -883,6 +876,15 @@ if ( method == "max" )  {
 
 }
 
+else  {
+
+   mlog << Error << "\nWwmcaRegridder::get_interpolator() -> "
+        << "unsupported interpolation option \""
+        << interpmthd_to_string(method) << "\".\n\n";
+
+   exit ( 1 );
+
+}
 
 
    //
@@ -908,16 +910,12 @@ char * p = (char *) 0;
 const char delim [] = " ";
 ConcatString s;
 ConcatString gridinfo_string;
-Result r;
 bool status = false;
 Grid * G = (Grid *) 0;
 
 
 
-
-r = Config->To_Grid();
-
-gridinfo_string = r.sval();
+gridinfo_string = Config->lookup_string(conf_key_to_grid);
 
 grid_strings.clear();
 

@@ -403,7 +403,6 @@ static const char conf_key_plot_valid_flag[]       = "plot_valid_flag";
 static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
 
-
 //
 // PB2NC specific parameter key names
 //
@@ -511,6 +510,16 @@ static const char conf_key_percentile_intensity_ratio_min[] = "percentile_intens
 static const char conf_key_percentile_intensity_ratio_max[] = "percentile_intensity_ratio_max";
 static const char conf_key_interest_min[]                   = "interest_min";
 static const char conf_key_interest_max[]                   = "interest_max";
+
+//
+// WWMCA specific parameter key names
+//
+
+static const char conf_key_to_grid[]       = "to_grid";
+static const char conf_key_max_minutes[]   = "max_minutes";
+static const char conf_key_variable_name[] = "variable_name";
+static const char conf_key_units[]         = "units";
+static const char conf_key_long_name[]     = "long_name";
 
 //
 // Parameter value names common to multiple tools

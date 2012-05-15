@@ -25,7 +25,6 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_util.h"
 
-#include "wwmca_regrid_Conf.h"
 #include "wwmca_ref.h"
 
 
@@ -64,7 +63,7 @@ static CommandLine cline;
 
 static WwmcaRegridder regridder;
 
-static wwmca_regrid_Conf config;
+static MetConfig config;
 
 static ConcatString config_filename;
 
@@ -91,7 +90,7 @@ int main(int argc, char * argv [])
 
 {
 
-ConcatString path;
+ConcatString default_config_file;
 
 
 program_name = get_short_name(argv[0]);
@@ -116,17 +115,26 @@ if ( cline.n() != 0 )  usage();
 sanity_check();
 
    //
-   // read the default config file first and then read the user's
+   //  create the default config file name
    //
 
-path = replace_path(default_config_filename);
+default_config_file = replace_path(default_config_filename);
 
-mlog << Debug(1) << "Reading Default Config File: " << path << "\n";
+   //
+   //  list the config files
+   //
 
-config.read(path);
+mlog << Debug(1)
+     << "Default Config File: " << default_config_file << "\n"
+     << "User Config File: "    << config_filename << "\n";
 
-mlog << Debug(1) << "Reading User Config File: " << config_filename << "\n";
+   //
+   //  read config file constants, the default config file,
+   //  and then the user config file.
+   //
 
+config.read(replace_path(config_const_filename));
+config.read(default_config_file);
 config.read(config_filename);
 
    //
@@ -144,16 +152,9 @@ regridder.set_config(config, config_filename);
    //  done
    //
 
-// regridder.dump(cout);
+if ( mlog.verbosity_level() >= 5 )  regridder.dump(cout);
 
 regridder.do_output(output_filename);
-
-
-
-
-
-
-
 
 
    //
