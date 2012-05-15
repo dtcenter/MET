@@ -29,8 +29,8 @@
 #include "afwa_cp_file.h"
 #include "afwa_pt_file.h"
 #include "interp_base.h"
-#include "wwmca_regrid_Conf.h"
 
+#include "vx_config.h"
 #include "vx_grid.h"
 
 
@@ -103,7 +103,7 @@ class WwmcaRegridder {
 
       Interpolator * interp;         //  allocated
 
-      wwmca_regrid_Conf * Config;          //  not allocated
+      MetConfig * Config;            //  not allocated
 
       ConcatString ConfigFilename;
 
@@ -123,7 +123,7 @@ class WwmcaRegridder {
       void set_pt_nh_file(const char *);
       void set_pt_sh_file(const char *);
 
-      void set_config(wwmca_regrid_Conf &, const char * filename);
+      void set_config(MetConfig &, const char * filename);
 
 
       GridHemisphere hemi() const;

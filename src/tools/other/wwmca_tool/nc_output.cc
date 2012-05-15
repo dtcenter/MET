@@ -32,7 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const double fill_value = -9999.0;
+static const float fill_value = bad_data_float;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,14 +51,12 @@ NcVar  * data_var = (NcVar *)  0;
 unixtime valid_time = 0LL;
 unixtime issue_time = 0LL;
 int month, day, year, hour, minute, second;
-int j, x, y;
+int x, y;
 float f[2];
 double lat, lon;
 InterpolationValue iv;
 char junk[256];
 ConcatString s;
-Result r;
-// const LambertData & ldata = *(ginfo.lc);
 const int Nx = ToGrid->nx();
 const int Ny = ToGrid->ny();
 
@@ -100,49 +98,39 @@ lon_dim = ncfile->get_dim("lon");
 ncfile->add_var("lat",  ncFloat, lat_dim, lon_dim);
 lat_var = ncfile->get_var("lat");
 
-
+   //
+   //  variable attributes
+   //
 
 lat_var->add_att("units",      "degrees_north");
 lat_var->add_att("long_name",  "Latitude");
-lat_var->add_att("_FillValue", -9999.f);   //  don't use NC_FILL_FLOAT, I guess ...
+lat_var->add_att("_FillValue", fill_value);   //  don't use NC_FILL_FLOAT, I guess ...
 
 ncfile->add_var("lon",  ncFloat, lat_dim, lon_dim);
 lon_var = ncfile->get_var("lon");
 
 lon_var->add_att("units",      "degrees_east");
 lon_var->add_att("long_name",  "Longitude");
-lon_var->add_att("_FillValue", -9999.f);
+lon_var->add_att("_FillValue", fill_value);
 
-r = Config->variable_name();
-
-s = r.sval();
+s = Config->lookup_string(conf_key_variable_name);
 
 ncfile->add_var((const char *) s, ncFloat, lat_dim, lon_dim);
 data_var = ncfile->get_var((const char *) s);
 
-j = Config->grib_code();
-
-data_var->add_att("grib_code",   j);
-
-r = Config->units();
-
-s = r.sval();
+s = Config->lookup_string(conf_key_units);
 
 data_var->add_att("units",      (const char *) s);
 
-r = Config->long_name();
-
-s = r.sval();
+s = Config->lookup_string(conf_key_long_name);
 
 data_var->add_att("long_name",  (const char *) s);
 
-r = Config->level();
-
-s = r.sval();
+s = Config->lookup_string(conf_key_level);
 
 data_var->add_att("level",      (const char *) s);
 
-data_var->add_att("_FillValue",  -9999.f);
+data_var->add_att("_FillValue",  fill_value);
 
 unix_to_mdyhms(issue_time, month, day, year, hour, minute, second);
 
@@ -210,7 +198,7 @@ for (x=0; x<Nx; ++x)  {
       iv = get_interpolated_value(x, y);
 
       if ( iv.ok )  f[0] = (float) (iv.value);
-      else          f[0] = (float) fill_value;
+      else          f[0] = fill_value;
 
       data_var->set_cur(y, x);
 
