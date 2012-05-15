@@ -229,6 +229,12 @@ void process_command_line(int argc, char **argv)
    cline.set(argc, argv);
 
       //
+      // allow for negative numbers on the command line
+      // which may be used for the -plot_range option.
+      //
+   cline.allow_numbers();
+
+      //
       // set the usage function
       //
    cline.set_usage(usage);
