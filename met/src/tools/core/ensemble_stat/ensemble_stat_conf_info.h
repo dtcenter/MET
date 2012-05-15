@@ -23,7 +23,6 @@
 #include "vx_math.h"
 #include "vx_gsl_prob.h"
 #include "vx_statistics.h"
-#include "result.h"
 
 ////////////////////////////////////////////////////////////////////////
 
