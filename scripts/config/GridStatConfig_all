@@ -105,6 +105,6 @@ nc_pairs_flag = TRUE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V3.1";
+version        = "V4.0";
 
 ////////////////////////////////////////////////////////////////////////////////
