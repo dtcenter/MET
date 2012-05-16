@@ -77,8 +77,8 @@ class WwmcaRegridder {
 
 
       InterpolationValue do_single_hemi(int to_x, int to_y, const Grid * From,
-                                        const AfwaCloudPctFile & cloud,
-                                        const AfwaPixelTimeFile & pixel) const;
+                                        const AfwaCloudPctFile * cloud,
+                                        const AfwaPixelTimeFile * pixel) const;
 
       InterpolationValue do_both_hemi(int to_x, int to_y) const;
 
