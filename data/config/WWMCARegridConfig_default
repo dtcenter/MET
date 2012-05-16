@@ -27,12 +27,10 @@ to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0";
 interp = {
    vld_thresh = 0;
 
-   type = [
-      {
-         method = UW_MEAN;
-         width  = 5;
-      }
-   ];
+   type = {
+      method = UW_MEAN;
+      width  = 5;
+   };
    
 };
 

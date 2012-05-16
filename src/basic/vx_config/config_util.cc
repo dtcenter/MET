@@ -355,7 +355,6 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 
    return(info);
 }
-
 ////////////////////////////////////////////////////////////////////////
 
 InterpInfo parse_conf_interp(Dictionary *dict) {
@@ -364,14 +363,15 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    InterpInfo info;
    NumArray mthd_na, wdth_na;
    ConcatString method;
-   int i, j, k, v, width;
+   int i, j, k, v, width, n_entries;
+   bool is_correct_type = false;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_interp() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Conf: interp
    interp_dict = dict->lookup_dictionary(conf_key_interp);
 
@@ -380,7 +380,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 
    // If found, interpret value
    if(interp_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
-   
+
    // Conf: vld_thresh
    info.vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
 
@@ -391,24 +391,42 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
-   }   
+   }
 
    // Conf: type
-   type_dict = interp_dict->lookup_array(conf_key_type);
+   const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
 
-   // Check for at least one interpolation type
-   if(type_dict->n_entries() == 0) {
+   if(type_entry) is_correct_type = (type_entry->type() == ArrayType ||
+                                     type_entry->type() == DictionaryType);
+
+   // Check that type is a dictionary or array of dictionaries
+   if(!type_entry || !is_correct_type) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "At least one interpolation type must be provided.\n\n";
+           << "Lookup failed for name \"" << conf_key_type << "\"\n\n";
       exit(1);
    }
-   
+
+   if(type_entry->type() == ArrayType) {
+      type_dict = type_entry->array_value();
+      n_entries = type_dict->n_entries();
+   }
+   else {
+      type_dict = type_entry->dict_value();
+      n_entries = 1;
+   }
+
    // Loop over the interpolation type dictionary entries
-   for(i=0, info.n_interp=0; i<type_dict->n_entries(); i++) {
+   for(i=0, info.n_interp=0; i<n_entries; i++) {
 
       // Get the methods and widths for the current entry
-      mthd_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_key_method);
-      wdth_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_key_width);
+      if(type_entry->type() == ArrayType) {
+         mthd_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_key_method);
+         wdth_na = (*type_dict)[i]->dict_value()->lookup_num_array(conf_key_width);
+      }
+      else {
+         mthd_na = type_dict->lookup_num_array(conf_key_method);
+         wdth_na = type_dict->lookup_num_array(conf_key_width);
+      }
 
       // Loop over the methods
       for(j=0; j<mthd_na.n_elements(); j++) {
@@ -434,7 +452,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 
             // Store the current width
             width = wdth_na[k];
-           
+
             // Check for the nearest neighbor special case
             if(width == 1 && strcmp(method, interpmthd_uw_mean_str) != 0) {
                mlog << Warning << "\nparse_conf_interp() -> "
