@@ -101,8 +101,8 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
-cline.add(set_nh_filename, "-nh",     2);
-cline.add(set_sh_filename, "-sh",     2);
+cline.add(set_nh_filename, "-nh",    -1);
+cline.add(set_sh_filename, "-sh",    -1);
 cline.add(set_outfile,     "-out",    1);
 cline.add(set_config,      "-config", 1);
 cline.add(set_logfile,     "-log",    1);
@@ -136,6 +136,12 @@ mlog << Debug(1)
 config.read(replace_path(config_const_filename));
 config.read(default_config_file);
 config.read(config_filename);
+
+   //
+   //  dump the contents of the config file
+   //
+
+if(mlog.verbosity_level() >= 5) config.dump(cout);
 
    //
    //  load up regridder
@@ -176,20 +182,20 @@ void usage()
 cout << "\nUsage: " << program_name << "\n"
      << "\t-out filename\n"
      << "\t-config filename\n"
-     << "\t[-nh cp_filename pt_filename]\n"
-     << "\t[-sh cp_filename pt_filename]\n"
+     << "\t-nh cp_filename [pt_filename]\n"
+     << "\t-sh cp_filename [pt_filename]\n"
      << "\t[-log file]\n"
-     << "\t[-v level]\n"
+     << "\t[-v level]\n\n"
      << "\twhere\t\"-out filename\" is the name of the output "
      << "file to create (required).\n"
      << "\t\t\"-config filename\" is a WWMCARegridConfig file "
      << "containing the desired configuration settings (required).\n"
-     << "\t\t\"-nh cp_filename pt_filename\" are the names of the "
-     << "cloud percent and pixel time files for the northern "
-     << "hemisphere to regrid.\n"
-     << "\t\t\"-sh cp_filename pt_filename\" are the names of the "
-     << "cloud percent and pixel time files for the southern "
-     << "hemisphere to regrid.\n"
+     << "\t\t\"-nh cp_filename [pt_filename]\" are the names of the "
+     << "cloud percent file and the optional pixel time file for the "
+     << "northern hemisphere to regrid.\n"
+     << "\t\t\"-sh cp_filename [pt_filename]\" are the names of the "
+     << "cloud percent file and the optional pixel time file for the "
+     << "southern hemisphere to regrid.\n"
      << "\t\t\"-log file\" outputs log messages to the specified "
      << "file (optional).\n"
      << "\t\t\"-v level\" overrides the default level of logging ("
@@ -210,8 +216,15 @@ void set_nh_filename(const StringArray & a)
 
 {
 
+if ( a.n_elements() != 1 && a.n_elements() != 2 )  {
+   mlog << Error << "\nset_nh_filename() -> "
+        << "unexpected number of arguments (" << a.n_elements()
+        << ").\n\n";
+   exit ( 1 );
+}
+  
 cp_nh_filename = a[0];
-pt_nh_filename = a[1];
+if ( a.n_elements() == 2)  pt_nh_filename = a[1];
 
 return;
 
@@ -225,8 +238,15 @@ void set_sh_filename(const StringArray & a)
 
 {
 
+if ( a.n_elements() != 1 && a.n_elements() != 2 )  {
+   mlog << Error << "\nset_nh_filename() -> "
+        << "unexpected number of arguments (" << a.n_elements()
+        << ").\n\n";
+   exit ( 1 );
+}
+ 
 cp_sh_filename = a[0];
-pt_sh_filename = a[1];
+if ( a.n_elements() == 2)  pt_sh_filename = a[1];
 
 return;
 
@@ -334,8 +354,7 @@ if ( output_filename.length() == 0 )  {
    //  check that at least one input file was given
    //
 
-if ( (cp_nh_filename.length() == 0) && (cp_sh_filename.length() == 0) &&
-     (pt_nh_filename.length() == 0) && (pt_sh_filename.length() == 0))  {
+if ( (cp_nh_filename.length() == 0) && (cp_sh_filename.length() == 0) )  {
 
    trouble = true;
 
@@ -343,32 +362,6 @@ if ( (cp_nh_filename.length() == 0) && (cp_sh_filename.length() == 0) &&
 
    // exit ( 1 );
 
-}
-
-if (cp_nh_filename.length() != 0)  {
-
-   if (pt_nh_filename.length() == 0)  {
-
-      trouble = true;
-
-      mlog << Error << "\n" << program_name << ": missing the pixel time file!\n\n";
-
-      // exit ( 1 );
-
-   }
-}
-
-if (cp_sh_filename.length() != 0)  {
-
-   if (pt_sh_filename.length() == 0)  {
-
-      trouble = true;
-
-      mlog << Error << "\n" << program_name << ": missing the pixel time file!\n\n";
-
-      // exit ( 1 );
-
-   }
 }
 
 
