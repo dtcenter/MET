@@ -65,6 +65,6 @@ boot = {
 rank_corr_flag = TRUE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V3.1";
+version        = "V4.0";
 
 ////////////////////////////////////////////////////////////////////////////////

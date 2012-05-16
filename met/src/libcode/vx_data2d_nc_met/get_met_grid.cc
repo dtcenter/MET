@@ -51,18 +51,10 @@ static void get_mercator_data_v2      (NcFile *, MercatorData &);
 
 
 void read_netcdf_grid(NcFile * f_in, Grid & gr) {
-   NcAtt * proj_att = (NcAtt *) 0;
    bool v3_flag = false;
 
    // Check for the MET version global attribute
-   if(has_att(f_in, "MET_version")) {
-
-      // Get the version number from the NetCDF file
-      get_att(f_in, proj_att, "MET_version");
-
-      // Check to see if it matches the current version
-      if(match_met_version(proj_att->as_string(0))) v3_flag = true;
-   }
+   if(has_att(f_in, "MET_version")) v3_flag = true;
 
    // Parse the projection information based on the version
    if(v3_flag) read_netcdf_grid_v3(f_in, gr);
