@@ -412,8 +412,8 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 
       // Loop over the methods
       for(j=0; j<mthd_na.n_elements(); j++) {
-      
-         // Convert integer to enumerated InterpMthd
+
+         // Store interpolation method as a string
               if(mthd_na[j] == conf_const.lookup_int(interpmthd_min_str))     method = interpmthd_min_str;
          else if(mthd_na[j] == conf_const.lookup_int(interpmthd_max_str))     method = interpmthd_max_str;
          else if(mthd_na[j] == conf_const.lookup_int(interpmthd_median_str))  method = interpmthd_median_str;
