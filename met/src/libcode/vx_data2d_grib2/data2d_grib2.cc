@@ -652,16 +652,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
          id << rec->Discipline << "_" << rec->ParmCat << "_" << rec->Parm;
 
          //  use the index to look up the parameter name
-         int tab_match = -1;
          Grib2TableEntry tab;
-         ConcatString field_name;
-         if( !GribTable.lookup_grib2(field_name, rec->Discipline, rec->ParmCat, rec->Parm,
-                                     tab, tab_match) ){
+         if( !GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm, tab) ){
             mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
-                 << "field abbreviation '" << field_name << "'\n\n";
+                 << "field indexes -  disc: " << rec->Discipline << "  parm_cat: " << rec->ParmCat
+                 << " parm: " << rec->Parm << "\n\n";
             exit(1);
          }
-         rec->ParmName = field_name.text();
+         rec->ParmName = tab.parm_name;
 
          //  add the record to the list
          RecList.push_back(rec);
