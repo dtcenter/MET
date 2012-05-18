@@ -93,9 +93,9 @@ static const int obs_arr_len = 5;
 ////////////////////////////////////////////////////////////////////////
 
 // Input Ensemble files
-static int          n_ens;
-static int          n_ens_vld;
-static int          n_rank;
+static int          n_ens;         // Number of input ensemble members
+static IntArray     n_ens_vld;     // Number of members with valid data for each field
+static int          n_rank;        // Number of ranks = max(n_ens_vld) + 1
 static StringArray  ens_file_list;
 static IntArray     ens_file_vld;
 

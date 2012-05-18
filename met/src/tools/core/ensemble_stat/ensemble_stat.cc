@@ -30,6 +30,8 @@
 //   006    05/08/12  Halley Gotway   Switch to using vx_config library.
 //   007    05/08/12  Halley Gotway   Move -ens_valid, -ens_lead,
 //                    and -obs_lead command line options to config file.
+//   008    05/18/12  Halley Gotway   Modify logic to better handle
+//                    missing files, fields, and data values.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -341,11 +343,8 @@ void process_command_line(int argc, char **argv)
       }
    }
 
-   // Count up the number of valid forecast files
-   n_ens_vld = ens_file_vld.sum();
-
    // Set n_rank as one more than the number of valid forecasts
-   n_rank = n_ens_vld + 1;
+   n_rank = ens_file_vld.sum() + 1;
 
    // Set flag to indicate whether verification is to be performed
    if((point_obs_flag || grid_obs_flag) &&
@@ -361,7 +360,7 @@ void process_command_line(int argc, char **argv)
 
 void process_ensemble() {
    int i, j, n_miss, n_vld;
-   bool status;
+   bool found = false;
    double t;
    DataPlane ens_dp;
 
@@ -390,10 +389,10 @@ void process_ensemble() {
             }
            
             // Read the gridded data from the current ensemble file
-            status = ens_mtddf->data_plane(*conf_info.ens_info[i], ens_dp);
+            found = ens_mtddf->data_plane(*conf_info.ens_info[i], ens_dp);
 
             // Track the missing and valid counts
-            if(!status) {
+            if(!found) {
                mlog << Warning << "\nprocess_ensemble() -> "
                     << conf_info.ens_info[i]->magic_str()
                     << " not found in file \"" << ens_file_list[j]
@@ -401,7 +400,7 @@ void process_ensemble() {
                n_miss++;
                continue;
             }
-            else {
+            else {              
                n_vld++;
             }
 
@@ -433,7 +432,7 @@ void process_ensemble() {
             mlog << Warning << "\nprocess_ensemble() -> "
                  << "Cannot read ensemble file \""
                  << ens_file_list[j] << "\"\n\n";
-
+            found = false;
             n_miss++;
          }
 
@@ -442,21 +441,20 @@ void process_ensemble() {
          if((double) n_miss/n_ens > t) {
             mlog << Error << "\nprocess_ensemble_files() -> "
                  << n_miss << " missing fields exceeds the maximum "
-                 << "allowable specified by \"vld_ens_thresh\" "
+                 << "allowable specified by \"ens.ens_thresh\" "
                  << "in the configuration file.\n\n";
             exit(1);
          }
 
          // Continue if the current field is missing
-         if(!status) continue;
+         if(!found) continue;
 
          // Create a NetCDF file to store the ensemble output
          if(nc_out == (NcFile *) 0)
-            setup_nc_file(ens_dp.valid(), ens_dp.lead(),
-                          "_ens.nc");
+            setup_nc_file(ens_dp.valid(), ens_dp.lead(), "_ens.nc");
 
          // Reset the running sums and counts
-         if(n_vld==1) clear_counts(ens_dp, i);
+         if(n_vld == 1) clear_counts(ens_dp, i);
 
          // Apply current data to the running sums and counts
          track_counts(ens_dp, i);
@@ -468,10 +466,13 @@ void process_ensemble() {
       if((double) n_miss/n_ens > t) {
          mlog << Error << "\nprocess_ensemble_files() -> "
               << n_miss << " missing fields exceeds the maximum "
-              << "allowable specified by \"vld_ens_thresh\" "
+              << "allowable specified by \"ens.ens_thresh\" "
               << "in the configuration file.\n\n";
          exit(1);
       }
+
+      // Store the number of valid members for the current field
+      n_ens_vld.add(n_vld);
 
       // Write out the ensemble information to a NetCDF file
       write_ens_nc(i, ens_dp);
@@ -519,9 +520,9 @@ void process_vx() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+      
 void process_point_vx() {
-   int i, j, n_miss, miss_flag;
+   int i, n_miss, miss_flag;
    double t;
 
    // Set the matching time window.  If obs_valid_beg_ut and obs_valid_end_ut
@@ -567,11 +568,6 @@ void process_point_vx() {
               << n_miss << " missing fields exceeds the maximum "
               << "allowable specified in the configuration file.\n\n";
          exit(1);
-      }
-
-      // If a file was missing, add bad data for that ensemble member
-      if(miss_flag) {
-         for(j=0; j<conf_info.get_n_vx(); j++) conf_info.vx_pd[j].add_miss();
       }
    } // end for i
 
@@ -852,8 +848,11 @@ void process_point_scores() {
 
                pd_ptr = &conf_info.vx_pd[i].pd[j][k][l];
 
+               // Determine the number of valid ensemble members
+               pd_ptr->set_n_ens();
+               
                // Compute the ranks for the observations
-               pd_ptr->compute_rank(n_ens_vld, rng_ptr);
+               pd_ptr->compute_rank(rng_ptr);
 
                mlog << Debug(2)
                     << "Processing point verification "
@@ -871,8 +870,8 @@ void process_point_scores() {
                if(pd_ptr->n_pair == 0) continue;
 
                // Compute ensemble statistics
-               pd_ptr->compute_rhist(n_ens_vld);
-               pd_ptr->compute_stats(n_ens_vld);
+               pd_ptr->compute_rhist();
+               pd_ptr->compute_stats();
 
                // Write out the ORANK lines
                if(conf_info.output_flag[i_orank] != STATOutputType_None) {
@@ -908,7 +907,7 @@ void process_point_scores() {
 
 void process_grid_vx() {
    int i, j, k, n_miss;
-   bool status;
+   bool found;
    double t;
    DataPlane *fcst_dp = (DataPlane *) 0, *fcst_dp_smooth = (DataPlane *) 0;
    DataPlane  obs_dp,   obs_dp_smooth;
@@ -975,10 +974,10 @@ void process_grid_vx() {
             }
 
             // Read the gridded data from the current ensemble file
-            status = ens_mtddf->data_plane(*conf_info.vx_pd[i].fcst_info, fcst_dp[j]);
+            found = ens_mtddf->data_plane(*conf_info.vx_pd[i].fcst_info, fcst_dp[j]);
 
             // Count the number of missing files
-            if(!status) {
+            if(!found) {
                n_miss++;
                continue;
             }
@@ -1022,10 +1021,10 @@ void process_grid_vx() {
          }
 
          // Read the gridded data from the current observation file
-         status = obs_mtddf->data_plane(*conf_info.vx_pd[i].obs_info, obs_dp);
+         found = obs_mtddf->data_plane(*conf_info.vx_pd[i].obs_info, obs_dp);
 
          // If found, break out of the loop
-         if(!status) n_miss++;
+         if(!found) n_miss++;
          else {
 
             // Set the grid
@@ -1127,8 +1126,8 @@ void process_grid_vx() {
             if(pd.n_pair == 0) continue;
 
             // Compute ensemble statistics
-            pd.compute_rhist(n_ens_vld);
-            pd.compute_stats(n_ens_vld);
+            pd.compute_rhist();
+            pd.compute_stats();
 
             // Compute RHIST scores
             if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
@@ -1194,9 +1193,9 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
       // Loop through each of the ensemble members
       for(j=0; j<n_ens; j++) {
 
-         // Look for missing data
+         // Skip missing data
          if(fcst_dp[j].nx() == 0 || fcst_dp[j].ny() == 0) {
-            v = bad_data_double;
+            continue;
          }
          // Get the ensemble value
          else {
@@ -1207,9 +1206,15 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
          pd.add_ens(i, v);
       } // end for j
    } // end for i
+   
+   if(pd.n_pair > 0) {
+     
+      // Determine the number of valid ensemble members
+      pd.set_n_ens();
 
-   // Compute the ranks and valid counts
-   if(pd.n_pair > 0) pd.compute_rank(n_ens_vld, rng_ptr);
+      // Compute the ranks for the observations
+      pd.compute_rank(rng_ptr);
+   }
 
    return;
 }
@@ -1567,7 +1572,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
       ens_vld[i] = nint(count_na[i]);
 
       // Check for too much missing data
-      if((double) (count_na[i]/n_ens) < t) {
+      if((double) (count_na[i]/n_ens_vld[i_vx]) < t) {
          ens_mean[i]  = bad_data_float;
          ens_stdev[i] = bad_data_float;
          ens_minus[i] = bad_data_float;
@@ -1577,6 +1582,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
          ens_range[i] = bad_data_float;
       }
       else {
+
          // Compute ensemble summary
          ens_mean[i]  = (float) (sum_na[i]/count_na[i]);
          ens_stdev[i] = (float) compute_stdev(sum_na[i], sum_sq_na[i], ens_vld[i]);
@@ -1659,7 +1665,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
          for(j=0; j<count_na.n_elements(); j++) {
 
             // Check for too much missing data
-            if((double) (count_na[j]/n_ens) < t) {
+            if((double) (count_na[j]/n_ens_vld[i_vx]) < t) {
                ens_freq[j] = bad_data_float;
             }
             else {
