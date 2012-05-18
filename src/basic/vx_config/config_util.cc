@@ -438,7 +438,6 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
          else if(mthd_na[j] == conf_const.lookup_int(interpmthd_uw_mean_str)) method = interpmthd_uw_mean_str;
          else if(mthd_na[j] == conf_const.lookup_int(interpmthd_dw_mean_str)) method = interpmthd_dw_mean_str;
          else if(mthd_na[j] == conf_const.lookup_int(interpmthd_ls_fit_str))  method = interpmthd_ls_fit_str;
-         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_nbrhd_str))   method = interpmthd_nbrhd_str;
          else if(mthd_na[j] == conf_const.lookup_int(interpmthd_bilin_str))   method = interpmthd_bilin_str;
          else {
             mlog << Error << "\nparse_conf_interval() -> "
