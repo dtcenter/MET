@@ -4,6 +4,47 @@ model = "WRF";
 
 ////////////////////////////////////////////////////////////////////////////////
 
+fcst = {
+   wind_thresh  = [ NA ];
+   message_type = [ "ADPUPA" ];
+
+   field = [
+      {
+        name       = "SPFH";
+        level      = [ "P500" ];
+        cat_thresh = [ >80.0 ];
+      },
+
+      {
+        name       = "TMP";
+        level      = [ "P500" ];
+        cat_thresh = [ >273.0 ];
+      },
+
+      {
+        name       = "HGT";
+        level      = [ "P500" ];
+        cat_thresh = [ >0.0 ];
+      },
+
+      {
+        name       = "UGRD";
+        level      = [ "P500" ];
+        cat_thresh = [ >5.0 ];
+      },
+
+      {
+        name       = "VGRD";
+        level      = [ "P500" ];
+        cat_thresh = [ >5.0 ];
+      }      
+   ];
+
+};
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
 obs_window = {
    beg = -5400;
    end =  5400;
