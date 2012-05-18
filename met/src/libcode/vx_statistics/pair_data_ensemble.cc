@@ -69,6 +69,7 @@ void PairDataEnsemble::init_from_scratch() {
 
    e_na   = (NumArray *) 0;
    n_pair = 0;
+   n_ens  = 0;
 
    clear();
 
@@ -93,6 +94,7 @@ void PairDataEnsemble::clear() {
    rhist_na.clear();
 
    n_pair = 0;
+   n_ens  = 0;
 
    return;
 }
@@ -119,7 +121,6 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    vld_ta   = pd.vld_ta;
    lvl_na   = pd.lvl_na;
    elv_na   = pd.elv_na;
-   n_pair   = pd.n_pair;
    o_na     = pd.o_na;
    v_na     = pd.v_na;
    r_na     = pd.r_na;
@@ -128,8 +129,9 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    pit_na   = pd.pit_na;
    rhist_na = pd.rhist_na;
 
-   n_obs  = pd.n_obs;
-   n_pair = pd.n_pair;
+   n_obs    = pd.n_obs;
+   n_pair   = pd.n_pair;
+   n_ens    = pd.n_ens;   
 
    set_size();
 
@@ -161,8 +163,34 @@ void PairDataEnsemble::set_size() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::compute_rank(int n_vld_ens, const gsl_rng *rng_ptr) {
-   int i, j, k, n_vld, n_bel, n_tie;
+void PairDataEnsemble::set_n_ens() {
+   int i;
+   
+   // Look at the number of ensemble values present for each pair
+   for(i=0, n_ens=bad_data_int; i<n_pair; i++) {
+
+      // Set the number of ensemble members
+      if(is_bad_data(n_ens)) n_ens = e_na[i].n_elements();
+      else {
+
+         // Make sure the number of ensemble members doesn't change
+         if(n_ens != e_na[i].n_elements()) {
+            mlog << Error << "\nPairDataEnsemble::set_n_ens() -> "
+                 << "the number of ensemble members changed from "
+                 << n_ens << " to " << e_na[i].n_elements()
+                 << ".\n\n";
+            exit(1);
+         }
+      }
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
+   int i, j, k, n_miss,n_vld, n_bel, n_tie;
    NumArray src_na, dest_na;
 
    // Compute the rank for each observation
@@ -186,9 +214,8 @@ void PairDataEnsemble::compute_rank(int n_vld_ens, const gsl_rng *rng_ptr) {
       // Store the number of valid ensemble values
       v_na.add(n_vld);
 
-      // Store the observation rank only when the number of valid
-      // values matches the number of valid ensembles
-      if(n_vld == n_vld_ens) {
+      // Compute rank only when all ensemble members are valid
+      if(n_vld == n_ens) {
 
          // With no ties, the rank is the number below plus 1
          if(n_tie == 0) {
@@ -223,14 +250,14 @@ void PairDataEnsemble::compute_rank(int n_vld_ens, const gsl_rng *rng_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::compute_rhist(int n_vld_ens) {
+void PairDataEnsemble::compute_rhist() {
    int i, rank;
 
    // Clear the ranked histogram
    rhist_na.clear();
 
    // Initialize the histogram counts to 0
-   for(i=0; i<=n_vld_ens; i++) rhist_na.add(0);
+   for(i=0; i<=n_ens; i++) rhist_na.add(0);
 
    // The compute_rank() routine should have already been called.
    // Loop through the ranks and populate the histogram.
@@ -249,7 +276,7 @@ void PairDataEnsemble::compute_rhist(int n_vld_ens) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::compute_stats(int n_vld_ens) {
+void PairDataEnsemble::compute_stats() {
    int i;
    double crps, ign, pit;
 
@@ -260,7 +287,7 @@ void PairDataEnsemble::compute_stats(int n_vld_ens) {
    for(i=0; i<n_pair; i++) {
 
       // Don't compute if any of the ensemble members are missing
-      if(nint(v_na[i]) != n_vld_ens) {
+      if(nint(v_na[i]) != n_ens) {
          crps_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
@@ -760,28 +787,6 @@ void VxPairDataEnsemble::add_ens() {
                pd[i][j][k].add_ens(l, fcst_v);
 
             }
-         } // end for k
-      } // end for j
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::add_miss() {
-   int i, j, k, l;
-
-   // Loop through all the PairDataEnsemble objects
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
-            for(l=0; l<pd[i][j][k].n_pair; l++) { 
-
-               // Add bad data as a placeholder for missing file
-               pd[i][j][k].add_ens(l, bad_data_double);
-
-            } // end for l
          } // end for k
       } // end for j
    } // end for i

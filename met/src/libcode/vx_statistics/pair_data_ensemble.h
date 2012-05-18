@@ -49,6 +49,7 @@ class PairDataEnsemble : public PairBase {
       NumArray  ign_na;   // Ignorance Score [n_pair]
       NumArray  pit_na;   // Probability Integral Transform [n_pair]
       int       n_pair;
+      int       n_ens;      
 
       NumArray  rhist_na; // Ranked Histogram [n_ens]
 
@@ -58,10 +59,11 @@ class PairDataEnsemble : public PairBase {
 
       void add_ens(int, double);
       void set_size();
+      void set_n_ens();
 
-      void compute_rank(int, const gsl_rng *);
-      void compute_rhist(int);
-      void compute_stats(int);
+      void compute_rank(const gsl_rng *);
+      void compute_rhist();
+      void compute_stats();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -155,7 +157,6 @@ class VxPairDataEnsemble {
       void add_obs(float *, const char *, const char *, unixtime,
                    float *, Grid &);
       void add_ens();
-      void add_miss();
 
       void find_vert_lvl(double, int &, int &);
 
