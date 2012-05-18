@@ -9,6 +9,11 @@ grid_res = 4;
 ////////////////////////////////////////////////////////////////////////////////
 
 fcst = {
+   field = {
+      name  = "APCP";
+      level = "A03";
+   };
+  
    raw_thresh        = >=0.0;
    conv_radius       = 60.0/grid_res;
    conv_thresh       = >=5.0;
