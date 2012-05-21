@@ -49,12 +49,6 @@ static const int n_suffixes = sizeof(suffix_list)/sizeof(*suffix_list);
 ////////////////////////////////////////////////////////////////////////
 
 
-extern int unix_to_sec_of_day(unixtime);
-
-  
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class STATLine
    //
@@ -1072,22 +1066,6 @@ switch(type) {
 };
 
 return(offset);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int unix_to_sec_of_day(unixtime t) {
-
-int s, mon, day, yr, hr, min, sec;
-
-unix_to_mdyhms(t, mon, day, yr, hr, min, sec);
-
-s = hms_to_sec(hr, min, sec);
-
-return ( s );
 
 }
 

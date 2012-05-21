@@ -78,3 +78,19 @@ return ( out_sec );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+int unix_to_sec_of_day(unixtime u) {
+
+int s, mon, day, yr, hr, min, sec;
+
+unix_to_mdyhms(u, mon, day, yr, hr, min, sec);
+
+s = hms_to_sec(hr, min, sec);
+
+return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////

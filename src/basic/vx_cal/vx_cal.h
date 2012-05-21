@@ -77,6 +77,8 @@ extern  void      sec_to_hms      (int in_sec, int & hour, int & min, int & sec)
 
 extern  int       hms_to_sec      (int hour, int min, int sec);
 
+extern  int       unix_to_sec_of_day (unixtime u);
+
 // Parse time strings
 
 extern  void     substring_vx_cal       (const char * text, char * out, int first, int last);
