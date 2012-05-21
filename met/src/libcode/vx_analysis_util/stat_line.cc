@@ -49,6 +49,12 @@ static const int n_suffixes = sizeof(suffix_list)/sizeof(*suffix_list);
 ////////////////////////////////////////////////////////////////////////
 
 
+extern int unix_to_sec_of_day(unixtime);
+
+  
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class STATLine
    //
@@ -378,6 +384,18 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+int STATLine::fcst_valid_hour() const
+
+{
+
+return ( unix_to_sec_of_day(fcst_valid_beg()) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int STATLine::obs_lead() const
 
 {
@@ -422,6 +440,18 @@ const char * c = get_item(obs_valid_end_offset);
 t = timestring_to_unix(c);
 
 return ( t );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int STATLine::obs_valid_hour() const
+
+{
+
+return ( unix_to_sec_of_day(obs_valid_beg()) );
 
 }
 
@@ -671,6 +701,18 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+int STATLine::fcst_init_hour() const
+
+{
+
+return ( unix_to_sec_of_day(fcst_init_beg()) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 unixtime STATLine::obs_init_beg() const
 
 {
@@ -713,41 +755,11 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-int STATLine::fcst_init_hour() const
-
-{
-
-int s, mon, day, yr, hr, min, sec;
-unixtime t;
-
-t = fcst_init_beg();
-
-unix_to_mdyhms(t, mon, day, yr, hr, min, sec);
-
-s = hms_to_sec(hr, min, sec);
-
-return ( s );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 int STATLine::obs_init_hour() const
 
 {
 
-int s, mon, day, yr, hr, min, sec;
-unixtime t;
-
-t = obs_init_beg();
-
-unix_to_mdyhms(t, mon, day, yr, hr, min, sec);
-
-s = hms_to_sec(hr, min, sec);
-
-return ( s );
+return ( unix_to_sec_of_day(obs_init_beg()) );
 
 }
 
@@ -1065,3 +1077,19 @@ return(offset);
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+int unix_to_sec_of_day(unixtime t) {
+
+int s, mon, day, yr, hr, min, sec;
+
+unix_to_mdyhms(t, mon, day, yr, hr, min, sec);
+
+s = hms_to_sec(hr, min, sec);
+
+return ( s );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+

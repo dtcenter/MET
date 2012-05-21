@@ -52,46 +52,48 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    // Parse top-level configuration filtering options
    //
    
-   j.model          = c.lookup_string_array(conf_key_model, false);
-   j.fcst_lead      = c.lookup_seconds_array(conf_key_fcst_lead, false);
-   j.obs_lead       = c.lookup_seconds_array(conf_key_obs_lead, false);
-   j.fcst_valid_beg = c.lookup_unixtime(conf_key_fcst_valid_beg, false);
-   j.fcst_valid_end = c.lookup_unixtime(conf_key_fcst_valid_end, false);
-   j.obs_valid_beg  = c.lookup_unixtime(conf_key_obs_valid_beg, false);
-   j.obs_valid_end  = c.lookup_unixtime(conf_key_obs_valid_end, false);
-   j.fcst_init_beg  = c.lookup_unixtime(conf_key_fcst_init_beg, false);
-   j.fcst_init_end  = c.lookup_unixtime(conf_key_fcst_init_end, false);
-   j.obs_init_beg   = c.lookup_unixtime(conf_key_obs_init_beg, false);
-   j.obs_init_end   = c.lookup_unixtime(conf_key_obs_init_end, false);
-   j.fcst_init_hour = c.lookup_seconds_array(conf_key_fcst_init_hour, false);
-   j.obs_init_hour  = c.lookup_seconds_array(conf_key_obs_init_hour, false);
-   j.fcst_var       = c.lookup_string_array(conf_key_fcst_var, false);
-   j.obs_var        = c.lookup_string_array(conf_key_obs_var, false);
-   j.fcst_lev       = c.lookup_string_array(conf_key_fcst_lev, false);
-   j.obs_lev        = c.lookup_string_array(conf_key_obs_lev, false);
-   j.obtype         = c.lookup_string_array(conf_key_obtype, false);
-   j.vx_mask        = c.lookup_string_array(conf_key_vx_mask, false);
-   j.interp_mthd    = c.lookup_string_array(conf_key_interp_mthd, false);
-   j.interp_pnts    = c.lookup_num_array(conf_key_interp_pnts, false);
-   j.fcst_thresh    = c.lookup_thresh_array(conf_key_fcst_thresh, false);
-   j.obs_thresh     = c.lookup_thresh_array(conf_key_obs_thresh, false);
-   j.cov_thresh     = c.lookup_thresh_array(conf_key_cov_thresh, false);
-   j.alpha          = c.lookup_num_array(conf_key_alpha, false);
-   j.line_type      = c.lookup_string_array(conf_key_line_type, false);
-   j.column         = c.lookup_string_array(conf_key_column, false);
-   j.weight         = c.lookup_num_array(conf_key_weight, false);
+   j.model           = c.lookup_string_array(conf_key_model, false);
+   j.fcst_lead       = c.lookup_seconds_array(conf_key_fcst_lead, false);
+   j.obs_lead        = c.lookup_seconds_array(conf_key_obs_lead, false);
+   j.fcst_valid_beg  = c.lookup_unixtime(conf_key_fcst_valid_beg, false);
+   j.fcst_valid_end  = c.lookup_unixtime(conf_key_fcst_valid_end, false);
+   j.fcst_valid_hour = c.lookup_seconds_array(conf_key_fcst_valid_hour, false);
+   j.obs_valid_beg   = c.lookup_unixtime(conf_key_obs_valid_beg, false);
+   j.obs_valid_end   = c.lookup_unixtime(conf_key_obs_valid_end, false);
+   j.obs_valid_hour  = c.lookup_seconds_array(conf_key_obs_valid_hour, false);
+   j.fcst_init_beg   = c.lookup_unixtime(conf_key_fcst_init_beg, false);
+   j.fcst_init_end   = c.lookup_unixtime(conf_key_fcst_init_end, false);
+   j.fcst_init_hour  = c.lookup_seconds_array(conf_key_fcst_init_hour, false);
+   j.obs_init_beg    = c.lookup_unixtime(conf_key_obs_init_beg, false);
+   j.obs_init_end    = c.lookup_unixtime(conf_key_obs_init_end, false);
+   j.obs_init_hour   = c.lookup_seconds_array(conf_key_obs_init_hour, false);
+   j.fcst_var        = c.lookup_string_array(conf_key_fcst_var, false);
+   j.obs_var         = c.lookup_string_array(conf_key_obs_var, false);
+   j.fcst_lev        = c.lookup_string_array(conf_key_fcst_lev, false);
+   j.obs_lev         = c.lookup_string_array(conf_key_obs_lev, false);
+   j.obtype          = c.lookup_string_array(conf_key_obtype, false);
+   j.vx_mask         = c.lookup_string_array(conf_key_vx_mask, false);
+   j.interp_mthd     = c.lookup_string_array(conf_key_interp_mthd, false);
+   j.interp_pnts     = c.lookup_num_array(conf_key_interp_pnts, false);
+   j.fcst_thresh     = c.lookup_thresh_array(conf_key_fcst_thresh, false);
+   j.obs_thresh      = c.lookup_thresh_array(conf_key_obs_thresh, false);
+   j.cov_thresh      = c.lookup_thresh_array(conf_key_cov_thresh, false);
+   j.alpha           = c.lookup_num_array(conf_key_alpha, false);
+   j.line_type       = c.lookup_string_array(conf_key_line_type, false);
+   j.column          = c.lookup_string_array(conf_key_column, false);
+   j.weight          = c.lookup_num_array(conf_key_weight, false);
 
-   j.out_alpha      = c.lookup_double(conf_key_out_alpha, false);
+   j.out_alpha       = c.lookup_double(conf_key_out_alpha, false);
    
-   boot_info        = parse_conf_boot(&c);
-   j.boot_interval  = boot_info.interval;
-   j.boot_rep_prop  = boot_info.rep_prop;
-   j.n_boot_rep     = boot_info.n_rep;
+   boot_info         = parse_conf_boot(&c);
+   j.boot_interval   = boot_info.interval;
+   j.boot_rep_prop   = boot_info.rep_prop;
+   j.n_boot_rep      = boot_info.n_rep;
    j.set_boot_rng(boot_info.rng);
    j.set_boot_seed(boot_info.seed);
    
-   j.rank_corr_flag = (int) c.lookup_bool(conf_key_rank_corr_flag);
-   j.vif_flag       = (int) c.lookup_bool(conf_key_vif_flag);
+   j.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
+   j.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
    
    //
    // No settings in the default job for column_min_name,

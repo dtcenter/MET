@@ -29,7 +29,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void timestring(const unixtime t, char * out);
+static ConcatString timestring(const unixtime t);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -113,11 +113,15 @@ void STATAnalysisJob::clear() {
    obs_lead.clear();
 
    fcst_valid_beg = fcst_valid_end = (unixtime) 0;
+   fcst_valid_hour.clear();
+   
    obs_valid_beg  = obs_valid_end  = (unixtime) 0;
+   obs_valid_hour.clear();
+   
    fcst_init_beg  = fcst_init_end  = (unixtime) 0;
-   obs_init_beg   = obs_init_end   = (unixtime) 0;
-
    fcst_init_hour.clear();
+   
+   obs_init_beg   = obs_init_end   = (unixtime) 0;
    obs_init_hour.clear();
 
    fcst_var.clear();
@@ -194,14 +198,18 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    fcst_valid_beg   = aj.fcst_valid_beg;
    fcst_valid_end   = aj.fcst_valid_end;
+   fcst_valid_hour  = aj.fcst_valid_hour;
+   
    obs_valid_beg    = aj.obs_valid_beg;
    obs_valid_end    = aj.obs_valid_end;
+   obs_valid_hour   = aj.obs_valid_hour;
+   
    fcst_init_beg    = aj.fcst_init_beg;
    fcst_init_end    = aj.fcst_init_end;
+   fcst_init_hour   = aj.fcst_init_hour;
+   
    obs_init_beg     = aj.obs_init_beg;
    obs_init_end     = aj.obs_init_end;
-
-   fcst_init_hour   = aj.fcst_init_hour;
    obs_init_hour    = aj.obs_init_hour;
 
    fcst_var         = aj.fcst_var;
@@ -262,10 +270,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
 void STATAnalysisJob::dump(ostream & out, int depth) const {
    Indent prefix(depth);
-   char junk[512];
 
-   statjobtype_to_string(job_type, junk);
-   out << prefix << "job type = " << junk << "\n";
+   out << prefix << "job type = " << statjobtype_to_string(job_type) << "\n";
 
    out << prefix << "model ...\n";
    model.dump(out, depth + 1);
@@ -276,40 +282,38 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "obs_lead ...\n";
    obs_lead.dump(out, depth + 1);
 
-   timestring(fcst_valid_beg, junk);
    out << prefix << "fcst_valid_beg = "
-       << prefix << junk << "\n";
+       << prefix << timestring(fcst_valid_beg) << "\n";
 
-   timestring(fcst_valid_end, junk);
    out << prefix << "fcst_valid_end = "
-       << prefix << junk << "\n";
+       << prefix << timestring(fcst_valid_end) << "\n";
 
-   timestring(obs_valid_beg, junk);
+   out << prefix << "fcst_valid_hour ...\n";
+   fcst_valid_hour.dump(out, depth + 1);
+
    out << prefix << "obs_valid_beg = "
-       << prefix << junk << "\n";
+       << prefix << timestring(obs_valid_beg) << "\n";
 
-   timestring(obs_valid_end, junk);
    out << prefix << "obs_valid_end = "
-       << prefix << junk << "\n";
+       << prefix << timestring(obs_valid_end) << "\n";
 
-   timestring(fcst_init_beg, junk);
+   out << prefix << "obs_valid_hour ...\n";
+   obs_valid_hour.dump(out, depth + 1);
+
    out << prefix << "fcst_init_beg = "
-       << prefix << junk << "\n";
+       << prefix << timestring(fcst_init_beg) << "\n";
 
-   timestring(fcst_init_end, junk);
    out << prefix << "fcst_init_end = "
-       << prefix << junk << "\n";
-
-   timestring(obs_init_beg, junk);
-   out << prefix << "obs_init_beg = "
-       << prefix << junk << "\n";
-
-   timestring(obs_init_end, junk);
-   out << prefix << "obs_init_end = "
-       << prefix << junk << "\n";
+       << prefix << timestring(fcst_init_end) << "\n";
 
    out << prefix << "fcst_init_hour ...\n";
    fcst_init_hour.dump(out, depth + 1);
+
+   out << prefix << "obs_init_beg = "
+       << prefix << timestring(obs_init_beg) << "\n";
+
+   out << prefix << "obs_init_end = "
+       << prefix << timestring(obs_init_end) << "\n";
 
    out << prefix << "obs_init_hour ...\n";
    obs_init_hour.dump(out, depth + 1);
@@ -386,9 +390,8 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "mask_poly = " << prefix
        << mask_poly << "\n";
 
-   statlinetype_to_string(out_line_type, junk);
    out << prefix << "out_line_type = " << prefix
-       << junk << "\n";
+       << statlinetype_to_string(out_line_type) << "\n";
 
    out << prefix << "out_fcst_thresh ...\n";
    out_fcst_thresh.dump(out, depth + 1);
@@ -428,9 +431,8 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 int STATAnalysisJob::is_keeper(const STATLine & L) const {
-   int j, h, found, n, c;
+   int j, n, c;
    double v;
-   SingleThresh t;
 
    //
    // model
@@ -443,18 +445,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    // fcst_lead (in seconds)
    //
    if(fcst_lead.n_elements() > 0) {
-
-      n = fcst_lead.n_elements();
-      h = L.fcst_lead();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(h == (int) fcst_lead[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+      if(!fcst_lead.has(L.fcst_lead())) return(0);
    }
 
    //
@@ -470,6 +461,18 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       return(0);
 
    //
+   // fcst_valid_hour: if specified for the job, the fcst_valid_beg and
+   //                  fcst_valid_end times must match
+   //
+   if(fcst_valid_hour.n_elements() > 0) {
+
+      // Check that fcst_valid_beg = fcst_valid_end
+      if(L.fcst_valid_beg() != L.fcst_valid_end()) return(0);
+      
+      if(!fcst_valid_hour.has(L.fcst_valid_hour())) return(0);
+   }
+   
+   //
    // fcst_init_beg
    //
    if((fcst_init_beg > 0) && (L.fcst_init_beg() < fcst_init_beg))
@@ -482,21 +485,22 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       return(0);
 
    //
+   // fcst_init_hour: if specified for the job, the fcst_init_beg and
+   //                 fcst_init_end times must match
+   //
+   if(fcst_init_hour.n_elements() > 0) {
+
+      // Check that fcst_init_beg = fcst_init_end
+      if(L.fcst_init_beg() != L.fcst_init_end()) return(0);
+
+      if(!fcst_init_hour.has(L.fcst_init_hour())) return(0);
+   }
+   
+   //
    // obs_lead (in seconds)
    //
    if(obs_lead.n_elements() > 0) {
-
-      n = obs_lead.n_elements();
-      h = L.obs_lead();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(h == (int) obs_lead[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+      if(!obs_lead.has(L.obs_lead())) return(0);
    }
 
    //
@@ -512,6 +516,18 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       return(0);
 
    //
+   // obs_valid_hour: if specified for the job, the obs_valid_beg and
+   //                 obs_valid_end times must match
+   //
+   if(obs_valid_hour.n_elements() > 0) {
+
+      // Check that obs_valid_beg = obs_valid_end
+      if(L.obs_valid_beg() != L.obs_valid_end()) return(0);
+
+      if(!obs_valid_hour.has(L.obs_valid_hour())) return(0);
+   }
+   
+   //
    // obs_init_beg
    //
    if((obs_init_beg > 0) && (L.obs_init_beg() < obs_init_beg))
@@ -524,47 +540,15 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       return(0);
 
    //
-   // fcst_init_hour: if specified for the job, the fcst_init_beg and
-   //                 fcst_init_end times must match
-   //
-   if(fcst_init_hour.n_elements() > 0) {
-
-      // Check that fcst_init_beg = fcst_init_end
-      if(L.fcst_init_beg() != L.fcst_init_end()) return(0);
-
-      n = fcst_init_hour.n_elements();
-      h = L.fcst_init_hour();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(h == (int) fcst_init_hour[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
-   }
-
-   //
    // obs_init_hour: if specified for the job, the obs_init_beg and
-   //                obs_init_end times must match
+   //                 obs_init_end times must match
    //
    if(obs_init_hour.n_elements() > 0) {
 
       // Check that obs_init_beg = obs_init_end
       if(L.obs_init_beg() != L.obs_init_end()) return(0);
 
-      n = obs_init_hour.n_elements();
-      h = L.obs_init_hour();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(h == (int) obs_init_hour[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+      if(!obs_init_hour.has(L.obs_init_hour())) return(0);
    }
 
    //
@@ -620,90 +604,35 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    // interp_pnts
    //
    if(interp_pnts.n_elements() > 0) {
-
-      n = interp_pnts.n_elements();
-      h = L.interp_pnts();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(h == (int) interp_pnts[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+      if(!interp_pnts.has(L.interp_pnts())) return(0);
    }
 
    //
    // fcst_thresh
    //
    if(fcst_thresh.n_elements() > 0) {
-
-      n = fcst_thresh.n_elements();
-      t = L.fcst_thresh();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(t == fcst_thresh[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+      if(!fcst_thresh.has(L.fcst_thresh())) return(0);
    }
 
    //
    // obs_thresh
    //
-   if(obs_thresh.n_elements() > 0) {
-
-      n = obs_thresh.n_elements();
-      t = L.obs_thresh();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(t == obs_thresh[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+   if(obs_thresh.n_elements() > 0) {     
+      if(!obs_thresh.has(L.obs_thresh())) return(0);
    }
 
    //
    // cov_thresh
    //
    if(cov_thresh.n_elements() > 0) {
-
-      n = cov_thresh.n_elements();
-      t = L.cov_thresh();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(t == cov_thresh[j]) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+      if(!cov_thresh.has(L.cov_thresh())) return(0);
    }
 
    //
    // alpha
    //
    if(alpha.n_elements() > 0) {
-
-      n = alpha.n_elements();
-      v = L.alpha();
-
-      found = 0;
-      for(j=0; j<n; ++j) {
-         if(is_eq(v, (double) alpha[j])) {
-            found = 1;
-            break;
-         }
-      }
-      if(!found) return(0);
+      if(!alpha.has(L.alpha())) return(0);
    }
 
    //
@@ -832,6 +761,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          fcst_lead.clear();
       else if(strcmp(jc_array[i], "-obs_lead"       ) == 0)
          obs_lead.clear();
+      else if(strcmp(jc_array[i], "-fcst_valid_hour" ) == 0)
+         fcst_valid_hour.clear();
+      else if(strcmp(jc_array[i], "-obs_valid_hour"  ) == 0)
+         obs_valid_hour.clear();
       else if(strcmp(jc_array[i], "-fcst_init_hour" ) == 0)
          fcst_init_hour.clear();
       else if(strcmp(jc_array[i], "-obs_init_hour"  ) == 0)
@@ -932,6 +865,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          fcst_valid_end = timestring_to_unix(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-fcst_valid_hour") == 0) {
+         k = timestring_to_sec(jc_array[i+1]);
+         fcst_valid_hour.add(k);
+         i++;
+      }      
       else if(strcmp(jc_array[i], "-obs_valid_beg") == 0) {
          obs_valid_beg = timestring_to_unix(jc_array[i+1]);
          i++;
@@ -940,6 +878,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          obs_valid_end = timestring_to_unix(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-obs_valid_hour") == 0) {
+         k = timestring_to_sec(jc_array[i+1]);
+         obs_valid_hour.add(k);
+         i++;
+      }      
       else if(strcmp(jc_array[i], "-fcst_init_beg") == 0) {
          fcst_init_beg = timestring_to_unix(jc_array[i+1]);
          i++;
@@ -948,17 +891,17 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          fcst_init_end = timestring_to_unix(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-fcst_init_hour") == 0) {
+         k = timestring_to_sec(jc_array[i+1]);
+         fcst_init_hour.add(k);
+         i++;
+      }      
       else if(strcmp(jc_array[i], "-obs_init_beg") == 0) {
          obs_init_beg = timestring_to_unix(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-obs_init_end") == 0) {
          obs_init_end = timestring_to_unix(jc_array[i+1]);
-         i++;
-      }
-      else if(strcmp(jc_array[i], "-fcst_init_hour") == 0) {
-         k = timestring_to_sec(jc_array[i+1]);
-         fcst_init_hour.add(k);
          i++;
       }
       else if(strcmp(jc_array[i], "-obs_init_hour") == 0) {
@@ -1254,7 +1197,6 @@ void STATAnalysisJob::close_dump_row_file() {
 
 ConcatString STATAnalysisJob::get_jobstring() const {
    int i;
-   char junk[512];
    STATLineType type;
    ConcatString js;
 
@@ -1262,8 +1204,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    js.clear();
 
    // job type
-   statjobtype_to_string(job_type, junk);
-   js << "-job " << junk << " ";
+   js << "-job " << statjobtype_to_string(job_type) << " ";
 
    // model
    if(model.n_elements() > 0) {
@@ -1274,72 +1215,74 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // fcst_lead
    if(fcst_lead.n_elements() > 0) {
       for(i=0; i<fcst_lead.n_elements(); i++) {
-         sec_to_hhmmss(nint(fcst_lead[i]), junk);
-         js << "-fcst_lead " << junk << " ";
+         js << "-fcst_lead " << sec_to_hhmmss(nint(fcst_lead[i])) << " ";
       }
    }
 
    // obs_lead
    if(obs_lead.n_elements() > 0) {
       for(i=0; i<obs_lead.n_elements(); i++) {
-         sec_to_hhmmss(nint(obs_lead[i]), junk);
-         js << "-obs_lead " << junk << " ";
+         js << "-obs_lead " << sec_to_hhmmss(nint(obs_lead[i])) << " ";
       }
    }
 
    // fcst_valid_beg and fcst_valid_end
    if(fcst_valid_beg > 0) {
-      unix_to_yyyymmdd_hhmmss(fcst_valid_beg, junk);
-      js << "-fcst_valid_beg " << junk << " ";
+      js << "-fcst_valid_beg " << unix_to_yyyymmdd_hhmmss(fcst_valid_beg) << " ";
    }
    if(fcst_valid_end > 0) {
-      unix_to_yyyymmdd_hhmmss(fcst_valid_end, junk);
-      js << "-fcst_valid_end " << junk << " ";
+      js << "-fcst_valid_end " << unix_to_yyyymmdd_hhmmss(fcst_valid_end) << " ";
+   }
+
+   // fcst_valid_hour
+   if(fcst_valid_hour.n_elements() > 0) {
+      for(i=0; i<fcst_valid_hour.n_elements(); i++) {
+         js << "-fcst_valid_hour " << sec_to_hhmmss(nint(fcst_valid_hour[i])) << " ";
+      }
    }
 
    // obs_valid_beg and obs_valid_end
    if(obs_valid_beg > 0) {
-      unix_to_yyyymmdd_hhmmss(obs_valid_beg, junk);
-      js << "-obs_valid_beg " << junk << " ";
+      js << "-obs_valid_beg " << unix_to_yyyymmdd_hhmmss(obs_valid_beg) << " ";
    }
    if(obs_valid_end > 0) {
-      unix_to_yyyymmdd_hhmmss(obs_valid_end, junk);
-      js << "-obs_valid_end " << junk << " ";
+      js << "-obs_valid_end " << unix_to_yyyymmdd_hhmmss(obs_valid_end) << " ";
+   }
+
+   // obs_valid_hour
+   if(obs_valid_hour.n_elements() > 0) {
+      for(i=0; i<obs_valid_hour.n_elements(); i++) {
+         js << "-obs_valid_hour " << sec_to_hhmmss(nint(obs_valid_hour[i])) << " ";
+      }
    }
 
    // fcst_init_beg and fcst_init_end
    if(fcst_init_beg > 0) {
-      unix_to_yyyymmdd_hhmmss(fcst_init_beg, junk);
-      js << "-fcst_init_beg " << junk << " ";
+      js << "-fcst_init_beg " << unix_to_yyyymmdd_hhmmss(fcst_init_beg) << " ";
    }
    if(fcst_init_end > 0) {
-      unix_to_yyyymmdd_hhmmss(fcst_init_end, junk);
-      js << "-fcst_init_end " << junk << " ";
-   }
-
-   // obs_init_beg and obs_init_end
-   if(obs_init_beg > 0) {
-      unix_to_yyyymmdd_hhmmss(obs_init_beg, junk);
-      js << "-obs_init_beg " << junk << " ";
-   }
-   if(obs_init_end > 0) {
-      unix_to_yyyymmdd_hhmmss(obs_init_end, junk);
-      js << "-obs_init_end " << junk << " ";
+      js << "-fcst_init_end " << unix_to_yyyymmdd_hhmmss(fcst_init_end) << " ";
    }
 
    // fcst_init_hour
    if(fcst_init_hour.n_elements() > 0) {
       for(i=0; i<fcst_init_hour.n_elements(); i++) {
-         sec_to_hhmmss(nint(fcst_init_hour[i]), junk);
-         js << "-fcst_init_hour " << junk << " ";
+         js << "-fcst_init_hour " << sec_to_hhmmss(nint(fcst_init_hour[i])) << " ";
       }
+   }
+
+   // obs_init_beg and obs_init_end
+   if(obs_init_beg > 0) {
+      js << "-obs_init_beg " << unix_to_yyyymmdd_hhmmss(obs_init_beg) << " ";
+   }
+   if(obs_init_end > 0) {
+      js << "-obs_init_end " << unix_to_yyyymmdd_hhmmss(obs_init_end) << " ";
    }
 
    // obs_init_hour
    if(obs_init_hour.n_elements() > 0) {
       for(i=0; i<obs_init_hour.n_elements(); i++) {
-         sec_to_hhmmss(nint(obs_init_hour[i]), junk);
-         js << "-obs_init_hour " << junk << " ";
+         js << "-obs_init_hour " << sec_to_hhmmss(nint(obs_init_hour[i])) << " ";
       }
    }
 
@@ -1394,24 +1337,21 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // fcst_thresh
    if(fcst_thresh.n_elements() > 0) {
       for(i=0; i<fcst_thresh.n_elements(); i++) {
-         fcst_thresh[i].get_str(junk);
-         js << "-fcst_thresh " << junk << " ";
+         js << "-fcst_thresh " << fcst_thresh[i].get_str() << " ";
       }
    }
 
    // obs_thresh
    if(obs_thresh.n_elements() > 0) {
       for(i=0; i<obs_thresh.n_elements(); i++) {
-         obs_thresh[i].get_str(junk);
-         js << "-obs_thresh " << junk << " ";
+         js << "-obs_thresh " << obs_thresh[i].get_str() << " ";
       }
    }
 
    // cov_thresh
    if(cov_thresh.n_elements() > 0) {
       for(i=0; i<cov_thresh.n_elements(); i++) {
-         cov_thresh[i].get_str(junk);
-         js << "-cov_thresh " << junk << " ";
+         js << "-cov_thresh " << cov_thresh[i].get_str() << " ";
       }
    }
 
@@ -1425,8 +1365,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    if(line_type.n_elements() > 0) {
       for(i=0; i<line_type.n_elements(); i++) {
          type = string_to_statlinetype(line_type[i]);
-         statlinetype_to_string(type, junk);
-         js << "-line_type " << junk << " ";
+         js << "-line_type " << statlinetype_to_string(type) << " ";
       }
    }
 
@@ -1476,23 +1415,20 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
    // out_line_type
    if(out_line_type != no_stat_line_type) {
-      statlinetype_to_string(out_line_type, junk);
-      js << "-out_line_type " << junk << " ";
+      js << "-out_line_type " << statlinetype_to_string(out_line_type) << " ";
    }
 
    // out_fcst_thresh
    if(out_fcst_thresh.n_elements() > 0) {
       for(i=0; i<out_fcst_thresh.n_elements(); i++) {
-         out_fcst_thresh[i].get_str(junk);
-         js << "-out_fcst_thresh " << junk << " ";
+         js << "-out_fcst_thresh " << out_fcst_thresh[i].get_str() << " ";
       }
    }
 
    // out_obs_thresh
    if(out_obs_thresh.n_elements() > 0) {
       for(i=0; i<out_obs_thresh.n_elements(); i++) {
-         out_obs_thresh[i].get_str(junk);
-         js << "-out_obs_thresh " << junk << " ";
+         js << "-out_obs_thresh " << out_obs_thresh[i].get_str() << " ";
       }
    }
 
@@ -1667,16 +1603,17 @@ STATJobType string_to_statjobtype(const char *str) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void timestring(const unixtime t, char * out) {
+ConcatString timestring(const unixtime t) {
+   ConcatString s;
    int month, day, year, hour, minute, second;
 
    unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
-   sprintf(out, "%s %d, %d   %02d:%02d:%02d",
-           short_month_name[month], day, year,
-           hour, minute, second);
+   s.format("%s %d, %d   %02d:%02d:%02d",
+            short_month_name[month], day, year,
+            hour, minute, second);
 
-   return;
+   return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
