@@ -108,9 +108,11 @@ class ModeAttributes {
          //
 
       IntArray fcst_lead;
-      IntArray fcst_init_hour;
+      IntArray fcst_valid_hour;
+      IntArray fcst_init_hour;      
       IntArray fcst_accum;
       IntArray obs_lead;
+      IntArray obs_valid_hour;
       IntArray obs_init_hour;
       IntArray obs_accum;
       IntArray fcst_rad;
@@ -401,21 +403,25 @@ class ModeAttributes {
          //  int array "add" functions
          //
 
-      void add_fcst_lead      (int);
+      void add_fcst_lead       (int);
 
-      void add_fcst_init_hour (int);
+      void add_fcst_valid_hour (int);
+      
+      void add_fcst_init_hour  (int);
 
-      void add_fcst_accum     (int);
+      void add_fcst_accum      (int);
 
-      void add_obs_lead       (int);
+      void add_obs_lead        (int);
 
-      void add_obs_init_hour  (int);
+      void add_obs_valid_hour  (int);
+      
+      void add_obs_init_hour   (int);
 
-      void add_obs_accum      (int);
+      void add_obs_accum       (int);
 
-      void add_fcst_rad       (int);
+      void add_fcst_rad        (int);
 
-      void add_obs_rad        (int);
+      void add_obs_rad         (int);
 
 
 

@@ -33,16 +33,18 @@ simple      = TRUE;
 //
 // Multiple set integer options
 //
-// Time stings of the form: HH or HHMMSS
+// Time strings of the form: HH or HHMMSS
 //
-//fcst_lead      = [];
-//fcst_init_hour = [];
-//fcst_accum     = [];
-//obs_lead       = [];
-//obs_init_hour  = [];
-//obs_accum      = [];
-//fcst_rad       = [];
-//obs_rad        = [];
+//fcst_lead       = [];
+//fcst_valid_hour = [];
+//fcst_init_hour  = [];
+//fcst_accum      = [];
+//obs_lead        = [];
+//obs_valid_hour  = [];
+//obs_init_hour   = [];
+//obs_accum       = [];
+//fcst_rad        = [];
+//obs_rad         = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
