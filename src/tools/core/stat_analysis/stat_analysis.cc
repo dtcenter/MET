@@ -34,6 +34,8 @@
 //   007    01/20/12  Halley Gotway   Modify logic so that command line
 //                    job options override config file job options.
 //   008    05/03/12  Halley Gotway   Switch to using vx_config library.
+//   009    05/21/12  Halley Gotway   Add support of -fcst_valid_hour
+//                    and -obs_valid_hour job command options.
 //
 ////////////////////////////////////////////////////////////////////////
 
