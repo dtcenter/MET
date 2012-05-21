@@ -20,6 +20,8 @@
 //                                    apect_ratio min/max options,
 //                                    fcst/obs init_time min/max options,
 //                                    fcst/obs init_hour options
+//   002    05/21/12  Halley Gotway   Add support for:
+//                                    fcst/obs valid_hour options
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,11 +118,15 @@ atts.obs_lev.add( config.lookup_string_array(conf_key_obs_lev, error_out) );
 
 atts.fcst_lead.add( config.lookup_seconds_array(conf_key_fcst_lead, error_out) );
 
+atts.fcst_valid_hour.add( config.lookup_seconds_array(conf_key_fcst_valid_hour, error_out) );
+
 atts.fcst_init_hour.add( config.lookup_seconds_array(conf_key_fcst_init_hour, error_out) );
 
 atts.fcst_accum.add( config.lookup_seconds_array(conf_key_fcst_accum, error_out) );
 
 atts.obs_lead.add( config.lookup_seconds_array(conf_key_obs_lead, error_out) );
+
+atts.obs_valid_hour.add( config.lookup_seconds_array(conf_key_obs_valid_hour, error_out) );
 
 atts.obs_init_hour.add( config.lookup_seconds_array(conf_key_obs_init_hour, error_out) );
 

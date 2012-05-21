@@ -146,14 +146,16 @@ fcst_lev.clear();
    // int array members
    //
 
-     fcst_lead.clear();
-fcst_init_hour.clear();
-    fcst_accum.clear();
-      obs_lead.clear();
- obs_init_hour.clear();
-     obs_accum.clear();
-      fcst_rad.clear();
-       obs_rad.clear();
+      fcst_lead.clear();
+fcst_valid_hour.clear();
+ fcst_init_hour.clear();
+     fcst_accum.clear();
+       obs_lead.clear();
+ obs_valid_hour.clear();
+  obs_init_hour.clear();
+      obs_accum.clear();
+       fcst_rad.clear();
+        obs_rad.clear();
 
    //
    // unixtime max/min members
@@ -446,14 +448,16 @@ obs_lev  = A.obs_lev;
    //  int array members
    //
 
-fcst_lead      = A.fcst_lead;
-fcst_init_hour = A.fcst_init_hour;
-fcst_accum     = A.fcst_accum;
-obs_lead       = A.obs_lead;
-obs_init_hour  = A.obs_init_hour;
-obs_accum      = A.obs_accum;
-fcst_rad       = A.fcst_rad;
-obs_rad        = A.obs_rad;
+fcst_lead       = A.fcst_lead;
+fcst_valid_hour = A.fcst_valid_hour;
+fcst_init_hour  = A.fcst_init_hour;
+fcst_accum      = A.fcst_accum;
+obs_lead        = A.obs_lead;
+obs_valid_hour  = A.obs_valid_hour;
+obs_init_hour   = A.obs_init_hour;
+obs_accum       = A.obs_accum;
+fcst_rad        = A.fcst_rad;
+obs_rad         = A.obs_rad;
 
    //
    //  unixtime max/min members
@@ -898,6 +902,22 @@ if ( fcst_lead.n_elements() > 0 )  {
 
 }
 
+if ( fcst_valid_hour.n_elements() > 0 )  {
+
+   out << prefix << "fcst_valid_hour = { ";
+
+   for (j=0; j<(fcst_valid_hour.n_elements()); ++j)  {
+
+      out << fcst_valid_hour[j];
+
+      if ( j < (fcst_valid_hour.n_elements() - 1) )  out << ", ";
+
+   }
+
+   out << " }\n";
+
+}
+
 if ( fcst_init_hour.n_elements() > 0 )  {
 
    out << prefix << "fcst_init_hour = { ";
@@ -939,6 +959,22 @@ if ( obs_lead.n_elements() > 0 )  {
       out << obs_lead[j];
 
       if ( j < (obs_lead.n_elements() - 1) )  out << ", ";
+
+   }
+
+   out << " }\n";
+
+}
+
+if ( obs_valid_hour.n_elements() > 0 )  {
+
+   out << prefix << "obs_valid_hour = { ";
+
+   for (j=0; j<(obs_valid_hour.n_elements()); ++j)  {
+
+      out << obs_valid_hour[j];
+
+      if ( j < (obs_valid_hour.n_elements() - 1) )  out << ", ";
 
    }
 
@@ -1335,6 +1371,10 @@ i = L.fcst_lead();
 
 if ( (fcst_lead.n_elements() > 0) && !(fcst_lead.has(i)) )  return ( 0 );
 
+i = L.fcst_valid_hour();
+
+if ( (fcst_valid_hour.n_elements() > 0) && !(fcst_valid_hour.has(i)) )  return ( 0 );
+
 i = L.fcst_init_hour();
 
 if ( (fcst_init_hour.n_elements() > 0) && !(fcst_init_hour.has(i)) )  return ( 0 );
@@ -1346,6 +1386,10 @@ if ( (fcst_accum.n_elements() > 0) && !(fcst_accum.has(i)) )  return ( 0 );
 i = L.obs_lead();
 
 if ( (obs_lead.n_elements() > 0) && !(obs_lead.has(i)) )  return ( 0 );
+
+i = L.obs_valid_hour();
+
+if ( (obs_valid_hour.n_elements() > 0) && !(obs_valid_hour.has(i)) )  return ( 0 );
 
 i = L.obs_init_hour();
 
@@ -1828,14 +1872,16 @@ while ( j < (a.n_elements()) )  {
       //  int array members
       //
 
-   else if ( strcmp(c, "-fcst_lead"      ) == 0 )  { add_fcst_lead      (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_init_hour" ) == 0 )  { add_fcst_init_hour (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_accum"     ) == 0 )  { add_fcst_accum     (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_lead"       ) == 0 )  { add_obs_lead       (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_init_hour"  ) == 0 )  { add_obs_init_hour  (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_accum"      ) == 0 )  { add_obs_accum      (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_rad"       ) == 0 )  { add_fcst_rad       (atoi(a[j + 1]));               a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_rad"        ) == 0 )  { add_obs_rad        (atoi(a[j + 1]));               a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_lead"       ) == 0 )  { add_fcst_lead       (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_valid_hour" ) == 0 )  { add_fcst_valid_hour (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_init_hour"  ) == 0 )  { add_fcst_init_hour  (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_accum"      ) == 0 )  { add_fcst_accum      (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_lead"        ) == 0 )  { add_obs_lead        (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_valid_hour"  ) == 0 )  { add_obs_valid_hour  (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_init_hour"   ) == 0 )  { add_obs_init_hour   (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_accum"       ) == 0 )  { add_obs_accum       (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_rad"        ) == 0 )  { add_fcst_rad        (atoi(a[j + 1]));               a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_rad"         ) == 0 )  { add_obs_rad         (atoi(a[j + 1]));               a.shift_down(j, 2); }
 
       //
       //  int max/min members
@@ -2050,6 +2096,12 @@ for (j=0; j<(m.fcst_lead.n_elements()); ++j)  {
 
 }
 
+for (j=0; j<(m.fcst_valid_hour.n_elements()); ++j)  {
+
+   add_fcst_valid_hour(m.fcst_valid_hour[j]);
+
+}
+
 for (j=0; j<(m.fcst_init_hour.n_elements()); ++j)  {
 
    add_fcst_init_hour(m.fcst_init_hour[j]);
@@ -2065,6 +2117,12 @@ for (j=0; j<(m.fcst_accum.n_elements()); ++j)  {
 for (j=0; j<(m.obs_lead.n_elements()); ++j)  {
 
    add_obs_lead(m.obs_lead[j]);
+
+}
+
+for (j=0; j<(m.obs_valid_hour.n_elements()); ++j)  {
+
+   add_obs_valid_hour(m.obs_valid_hour[j]);
 
 }
 
@@ -2489,6 +2547,20 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ModeAttributes::add_fcst_valid_hour(int i)
+
+{
+
+if ( !(fcst_valid_hour.has(i)) )   fcst_valid_hour.add(i);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ModeAttributes::add_fcst_init_hour(int i)
 
 {
@@ -2522,6 +2594,20 @@ void ModeAttributes::add_obs_lead(int i)
 {
 
 if ( !(obs_lead.has(i)) )   obs_lead.add(i);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeAttributes::add_obs_valid_hour(int i)
+
+{
+
+if ( !(obs_valid_hour.has(i)) )   obs_valid_hour.add(i);
 
 return;
 
@@ -3881,14 +3967,16 @@ s << "\n"
   << "multiple set integer options\n"
   << "============================\n"
   << "\n";
-s << "   -fcst_lead      hh[mmss]\n";
-s << "   -fcst_init_hour hh[mmss]\n";
-s << "   -fcst_accum     hh[mmss]\n";
-s << "   -obs_lead       hh[mmss]\n";
-s << "   -obs_init_hour  hh[mmss]\n";
-s << "   -obs_accum      hh[mmss]\n";
-s << "   -fcst_rad       value\n";
-s << "   -obs_rad        value\n";
+s << "   -fcst_lead       hh[mmss]\n";
+s << "   -fcst_valid_hour hh[mmss]\n";
+s << "   -fcst_init_hour  hh[mmss]\n";
+s << "   -fcst_accum      hh[mmss]\n";
+s << "   -obs_lead        hh[mmss]\n";
+s << "   -obs_valid_hour  hh[mmss]\n";
+s << "   -obs_init_hour   hh[mmss]\n";
+s << "   -obs_accum       hh[mmss]\n";
+s << "   -fcst_rad        value\n";
+s << "   -obs_rad         value\n";
 
 s << "\n"
   << "integer max/min options\n"

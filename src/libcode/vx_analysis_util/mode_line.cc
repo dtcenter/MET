@@ -243,6 +243,18 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+int ModeLine::fcst_valid_hour() const
+
+{
+
+return ( unix_to_sec_of_day(fcst_valid()) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 unixtime ModeLine::fcst_init() const
 
 {
@@ -270,16 +282,7 @@ int ModeLine::fcst_init_hour() const
 
 {
 
-unixtime i;
-int s, mon, day, yr, hr, min, sec;
-
-i = fcst_init();
-
-unix_to_mdyhms(i, mon, day, yr, hr, min, sec);
-
-s = hms_to_sec(hr, min, sec);
-
-return ( s );
+return ( unix_to_sec_of_day(fcst_init()) );
 
 }
 
@@ -344,6 +347,18 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+int ModeLine::obs_valid_hour() const
+
+{
+
+return ( unix_to_sec_of_day(obs_valid()) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 unixtime ModeLine::obs_init() const
 
 {
@@ -371,16 +386,7 @@ int ModeLine::obs_init_hour() const
 
 {
 
-unixtime i;
-int s, mon, day, yr, hr, min, sec;
-
-i = obs_init();
-
-unix_to_mdyhms(i, mon, day, yr, hr, min, sec);
-
-s = hms_to_sec(hr, min, sec);
-
-return ( s );
+return ( unix_to_sec_of_day(obs_init()) );
 
 }
 

@@ -56,12 +56,14 @@ class ModeLine : public DataLine {
 
       int          fcst_lead                  () const;   //  column  3
       unixtime     fcst_valid                 () const;   //  column  4
+      int          fcst_valid_hour            () const;   //  valid%sec_per_day
       unixtime     fcst_init                  () const;   //  Compute as valid - lead
       int          fcst_init_hour             () const;   //  HHMMSS portion of init time
       int          fcst_accum                 () const;   //  column  5
 
       int          obs_lead                   () const;   //  column  6
       unixtime     obs_valid                  () const;   //  column  7
+      int          obs_valid_hour             () const;   //  valid%sec_per_day
       unixtime     obs_init                   () const;   //  Compute as valid - lead
       int          obs_init_hour              () const;   //  HHMMSS portion of init time
       int          obs_accum                  () const;   //  column  8
