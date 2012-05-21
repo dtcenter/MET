@@ -190,7 +190,7 @@ void PairDataEnsemble::set_n_ens() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
-   int i, j, k, n_miss,n_vld, n_bel, n_tie;
+   int i, j, k, n_vld, n_bel, n_tie;
    NumArray src_na, dest_na;
 
    // Compute the rank for each observation
