@@ -83,13 +83,12 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
                      DataPlane &mask_dp, ConcatString &mask_name)
 
 {
-
-   ConcatString s;
-   char mask_poly_path[PATH_MAX];
-   char file_name[PATH_MAX];
-   char magic_str[PATH_MAX], thresh_str[PATH_MAX];
+   StringArray tokens;
+   ConcatString s, file_name, thresh_str;
    SingleThresh st;
-   char *ptr = (char *) 0;
+   MetConfig config;
+   const char *delim = "{}";
+   bool append_level, append_thresh;
 
    mlog << Debug(4) << "parse_poly_mask() -> "
         << " parsing poly mask \"" << mask_poly_str << "\"\n";
@@ -102,27 +101,12 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    VarInfoFactory info_factory;
    VarInfo *info = (VarInfo *) 0;
 
-   // Replace any instances of MET_BASE with it's expanded value
-   s = replace_path(mask_poly_str);
-   strncpy(mask_poly_path, s, sizeof(mask_poly_path) - 1);
+   // Split up the input string
+   tokens = mask_poly_str.split(delim);
 
-   // Store the masking file name
-   if((ptr = strtok(mask_poly_path, " ")) == NULL) {
-      mlog << Error << "\nparse_poly_mask() -> "
-           << "must supply a file name to be used.\n\n";
-      exit(1);
-   }
-   else {
-      strcpy(file_name, ptr);
-   }
-
-   // Store the magic string, if present, and NA otherwise.
-   if((ptr = strtok(NULL, " ")) != NULL) strcpy(magic_str, ptr);
-   else                                  strcpy(magic_str, na_str);
-
-   // Store the threshold string, if present, and default threshold otherwise.
-   if((ptr = strtok(NULL, " ")) != NULL) strcpy(thresh_str, ptr);
-   else                                  strcpy(thresh_str, default_mask_thresh);
+   // Store masking file name
+   file_name = replace_path(tokens[0]);
+   file_name.ws_strip();
 
    // Attempt to open the data file
    mtddf = mtddf_factory.new_met_2d_data_file(file_name);
@@ -140,13 +124,36 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
               << "the masking grid does not match the input grid.\n\n";
          exit(1);
       }
-
+      
       // Create a new VarInfo object
       info = info_factory.new_var_info(mtddf->file_type());
-      info->set_magic(magic_str);
+
+      // Parse the dictionary string
+      if(tokens.n_elements() > 1) {
+         append_level = true;
+         config.read_string(tokens[1]);
+      }
+      else {
+         append_level = false;
+         config.read_string(default_mask_dict);
+      }
+
+      // Set up the VarInfo object
+      info->set_dict(config);
 
       // Extract the data plane from the input file
       mtddf->data_plane(*info, mask_dp);
+
+      // Parse the threshold string
+      if(tokens.n_elements() > 2) {
+         append_thresh = true;
+         thresh_str = tokens[2];
+      }
+      else {
+         append_thresh = false;
+         thresh_str = default_mask_thresh;
+      }
+      thresh_str.ws_strip();
 
       // Parse the threshold information
       st.set(thresh_str);
@@ -156,6 +163,12 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
       // Store the mask name
       mask_name = info->name();
+
+      // Append level info
+      if(append_level) mask_name << "_" << info->level_name();
+
+      // Append threshold info
+      if(append_thresh) mask_name << st.get_str();
    }
 
    // Clean up
