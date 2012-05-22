@@ -22,6 +22,7 @@
 static const double mask_on_value         = 1.0;
 static const double mask_off_value        = 0.0;
 static const char   default_mask_thresh[] = "!=0.0";
+static const char   default_mask_dict[]   = "name=\"NA\"; level=\"NA\";";
 
 ////////////////////////////////////////////////////////////////////////
 
