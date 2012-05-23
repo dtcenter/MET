@@ -1,13 +1,28 @@
 ////////////////////////////////////////////////////////////////////////////////
+//
+// MODE configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
 
+//
+// Output model name to be written
+//
 model = "WRF";
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Approximate grid resolution (km)
+//
 grid_res = 40;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Forecast and observation fields to be verified
+//
 fcst = {
    field = {
       name  = "APCP";
@@ -32,23 +47,38 @@ obs = {
    }
 };
 
+//
+// Handle missing data
+//
 mask_missing_flag = BOTH;
 
+//
+// Match objects between the forecast and observation fields
+//
 match_flag = MERGE_BOTH;
 
+//
+// Maximum centroid distance for objects to be compared
+//
 max_centroid_dist = 800.0/grid_res;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Verification masking regions
+//
 mask = {
    grid      = "";
-   grid_flag = NONE;
+   grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
    poly      = "";
-   poly_flag = NONE;
+   poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Fuzzy engine weights
+//
 weight = {
    centroid_dist    = 2.0;
    boundary_dist    = 4.0;
@@ -63,6 +93,9 @@ weight = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Fuzzy engine interest functions
+//
 interest_function = {
 
    centroid_dist = (
@@ -110,12 +143,21 @@ interest_function = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Total interest threshold for determining matches
+//
 total_interest_thresh = 0.7;
 
+//
+// Interest threshold for printing output pair information
+//
 print_interest_thresh = 0.0;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Plotting information
+//
 met_data_dir = "MET_BASE/data";
 
 fcst_raw_plot = {
@@ -136,13 +178,27 @@ object_plot = {
    color_table      = "MET_BASE/data/colortables/mode_obj.ctable";
 };
 
+//
+// Number of grid boxes to fill with bad data values along the edge of the field
+// to avoid edge effects.
+//
 zero_border_size = 1;
 
+//
+// Boolean for plotting on the region of valid data within the domain
+//
 plot_valid_flag = FALSE;
+
+//
+// Plot polyline edges using great circle arcs instead of straight lines
+//
 plot_gcarc_flag = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// NetCDF matched pairs, PostScript, and contingency table output files
+//
 ps_plot_flag    = TRUE;
 nc_pairs_flag   = TRUE;
 ct_stats_flag   = TRUE;
@@ -150,7 +206,6 @@ ct_stats_flag   = TRUE;
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "";
-
 version        = "V4.0";
 
 ////////////////////////////////////////////////////////////////////////////////

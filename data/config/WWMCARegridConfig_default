@@ -1,29 +1,33 @@
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//
+// WWMCA-Regrid configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
 
-   //
-   //  Name
-   //
-   //       or
-   //
-   //  lambert  Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1 [ standard_parallel 2]
-   //
-   //       or
-   //
-   //  stereo   Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
-   //
-   //       or
-   //
-   //  latlon   Nx Ny lat_ll lon_ll delta_lat delta_lon
-   //
-   //       or
-   //
-   //  mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
-   //
-
+//
+// Specify the grid to which the data should be interpolated in one of the
+// following ways:
+//
+//    - Name ("GNNN" where NNN indicates the three digit NCEP grid number)
+//
+//    - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
+//      [standard_parallel_2]
+//
+//    - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
+//
+//    - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
+//
+//    - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+//
 to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0";
 
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
+//
+// Interpolation methods
+//
 interp = {
    vld_thresh = 0;
 
@@ -34,15 +38,21 @@ interp = {
    
 };
 
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
+//
+// NetCDF output information
+//
 variable_name = "Cloud_Pct";
 units         = "percent";
 long_name     = "cloud cover percent";
 level         = "SFC";
 
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
+//
+// Maximum pixel age in minutes
+//
 max_minutes   = 120;
 
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
