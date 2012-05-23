@@ -1,9 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Settings for filtering input STAT lines.
+// STAT-Analysis configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Filtering input STAT lines by the contents of each column
+//
 model = [];
 
 fcst_lead = [];
@@ -52,10 +57,10 @@ column = [];
 weight = [];
 
 ////////////////////////////////////////////////////////////////////////////////
+
 //
-// STAT-Analysis job definition.
+// Array of STAT-Analysis jobs to be performed on the filtered data
 //
-////////////////////////////////////////////////////////////////////////////////
 
 jobs = [
    "-job filter         -line_type SL1L2                                            -vx_mask DTC165                                     -dump_row ../out/stat_analysis/job_filter_SL1L2.stat",
@@ -74,6 +79,9 @@ jobs = [
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// Confidence interval settings
+//
 out_alpha = 0.05;
 
 boot = {
