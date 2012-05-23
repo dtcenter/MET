@@ -204,13 +204,12 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
       }
    }
 
-   // If the range flag was not found, return 0 matches
-   if(!found) {
-      mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
-           << "no range flag found in magic string \""
-           << vinfo.magic_str() << "\"\n\n";
-
-      return(0);
+   // If the range flag was not found, call data_plane() and return
+   if( !found ){
+      DataPlane plane;
+      if( !data_plane(vinfo, plane) ) return 0;
+      plane_array.add(plane, bad_data_float, bad_data_float);
+      return 1;
    }
 
    // Compute the number of levels
