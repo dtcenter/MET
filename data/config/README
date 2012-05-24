@@ -64,7 +64,7 @@ They are specified as ${ENV_VAR}, where ENV_VAR is the name of the environment
 variable.
 
 The MET_BASE variable is defined in the code at compilation time as the path
-to the top-level MET directory.  MET_BASE may be used in the ME configuration
+to the top-level MET directory.  MET_BASE may be used in the MET configuration
 files when specifying paths and the appropriate path will be substituted in.
 If MET_BASE is defined as an enviroment variable, it's value will be used
 instead of the one defined at compilation time.
