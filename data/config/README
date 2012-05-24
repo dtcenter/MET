@@ -28,6 +28,8 @@ The configuration file language supports the following data types:
       - A boolean value (TRUE or FALSE).
    - Threshold:
       - A threshold type (<, <=, ==, !-, >=, or >) followed by a numeric value.
+      - The threshold type may also be specified using two letter abbreviations
+        (lt, le, eq, ne, ge, gt).
    - Piecewise-Linear Function (currently used only by MODE):
       - A list of (x, y) points enclosed in parenthesis ().
       - The (x, y) points are *NOT* separated by commas.
