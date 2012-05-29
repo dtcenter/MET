@@ -315,6 +315,7 @@ void write_netcdf()
 
          // Lat/Lon values for each grid point
          grid.xy_to_latlon(x, y, lat, lon);
+         lon -= 360.0*floor((lon + 180.0)/360.0);
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
          // Grid masking
