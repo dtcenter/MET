@@ -44,7 +44,8 @@ OBJECTS     =  ascii_table.o \
                data_plane_util.o \
                interp_mthd.o \
                interp_util.o \
-               two_to_one.o
+               file_linecount.o \
+               two_to_one.o  \
 
 
 LIBRARIES   =  libvx_util.a
@@ -85,7 +86,8 @@ HEADERS     =  util_constants.h \
                interp_mthd.h \
                two_to_one.h \
                interp_util.h \
-               vx_util.h
+               file_linecount.h \
+               vx_util.h  \
 
 
 ########################################################################
@@ -191,6 +193,9 @@ filename_suffix.o: filename_suffix.cc filename_suffix.h
 
 two_to_one.o: two_to_one.cc two_to_one.h
 	$(CXX) two_to_one.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+
+file_linecount.o: file_linecount.cc file_linecount.h
+	$(CXX) file_linecount.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
 
 ########################################################################
 
