@@ -1206,7 +1206,7 @@ int N, D;
 double num, denom;
 
 N = fy_oy();
-D = (fy_oy() + fn_oy());
+D = n();
 
 if ( D == 0 )  return ( bad_data_double );
 
