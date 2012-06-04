@@ -54,7 +54,6 @@ HEADERS     = config_file.h \
               scanner_stuff.h \
               config_util.h \
               config_constants.h \
-              config.tab.h \
               vx_config.h  \
 
 
@@ -223,9 +222,7 @@ test_string: test_string.cc $(OBJECTS) $(LIBRARIES)
 clean:
 	@ echo
 	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	rm -f config.output config.tab.c config.tab.h lex.config.c
-	rm -f lex.econfig.cc
-	rm -f $(MET_BIN_DIR)/econfig_codegen
+	rm -f config.output
 	rm -f $(MET_LIB_DIR)/libvx_config.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 
