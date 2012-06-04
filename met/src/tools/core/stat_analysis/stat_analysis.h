@@ -53,6 +53,9 @@ static const char * program_name = "stat_analysis";
 static const char * default_config_filename =
    "MET_BASE/data/config/STATAnalysisConfig_default";
 
+static const char * go_index_config_file =
+   "MET_BASE/data/config/STATAnalysisConfig_GO_Index";
+   
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments

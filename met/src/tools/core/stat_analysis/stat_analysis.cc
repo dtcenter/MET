@@ -410,7 +410,7 @@ void set_verbosity(int i) {
 void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
    MetConfig go_conf;
-   ConcatString go_conf_file;
+   STATAnalysisJob go_job;
 
    //
    // Initialize
@@ -432,22 +432,27 @@ void process_search_dirs() {
    }
 
    //
-   // If this is a GO Index job use the GO Index filtering criteria.
+   // Apply the GO Index filtering criteria for a command line job.
    //
    if(default_job.job_type == stat_job_go_index) {
-
+      
       //
-      // Read in the STATAnalysis config file which defines
-      // the GO Index.
+      // Read config file constants followed by the config file which
+      // defines the GO Index.
       //
-      go_conf_file = replace_path(go_index_config_file);
-      go_conf.read(go_conf_file);
+      go_conf.read(replace_path(config_const_filename));      
+      go_conf.read(replace_path(go_index_config_file));
 
       //
       // Parse the contents of the GO Index config file into the
       // search job.
       //
-      set_job_from_config(go_conf, default_job);
+      set_job_from_config(go_conf, go_job);
+      
+      //
+      // Amend the default job with GO Index filtering criteria.
+      //
+      default_job.parse_job_command(go_job.get_jobstring());
 
    } // end if go_index
 
@@ -558,30 +563,62 @@ void process_stat_file(const char *filename, const STATAnalysisJob &j,
 ////////////////////////////////////////////////////////////////////////
 
 void process_job(const char * jobstring, int n_job) {
-   STATAnalysisJob job;
+   STATAnalysisJob job, go_job;
    ConcatString full_jobstring;
+   MetConfig go_conf;
 
    //
    // Initialize to the default job
    //
+   mlog << Debug(4)
+        << "\nInitializing Job " << n_job << " to default job: \""
+        << default_job.get_jobstring() << "\"\n";
    job = default_job;
 
    //
    // Parse the job command line options
    //
    mlog << Debug(4)
-        << "\nInitializing Job " << n_job << " with: \""
+        << "\nAmending Job " << n_job << " with options: \""
         << jobstring << "\"\n";
    job.parse_job_command(jobstring);
+
+   //
+   // Special processing for the GO Index job.
+   //
+   if(job.job_type == stat_job_go_index) {
+
+      //
+      // Read config file constants followed by the config file which
+      // defines the GO Index.
+      //
+      go_conf.read(replace_path(config_const_filename));
+      go_conf.read(replace_path(go_index_config_file));
+
+      //
+      // Parse the contents of the GO Index config file into the
+      // search job.
+      //
+      set_job_from_config(go_conf, go_job);
+
+      //
+      // Amend the current job with GO Index filtering criteria
+      //
+      mlog << Debug(4)
+           << "\nAmending Job " << n_job << " with GO Index configuration file: "
+           << replace_path(go_index_config_file) << "\n";
+      job.parse_job_command(go_job.get_jobstring());
+
+   } // end if go_index
    
    //
    // Amend the current job using any command line options
    //
    mlog << Debug(4)
-        << "Amending Job " << n_job << " with command line options: \""
+        << "\nAmending Job " << n_job << " with command line options: \""
         << command_line_job_options << "\"\n";
    job.parse_job_command(command_line_job_options);
-
+   
    //
    // Get the full jobstring
    //

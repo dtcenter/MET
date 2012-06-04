@@ -44,11 +44,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * go_index_config_file =
-   "MET_BASE/data/config/STATAnalysisConfig_GO_Index";
-
-////////////////////////////////////////////////////////////////////////
-
 extern void set_job_from_config(MetConfig &, STATAnalysisJob &);
 
 extern void do_job(const ConcatString &, STATAnalysisJob &, int,

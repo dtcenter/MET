@@ -1905,22 +1905,8 @@ void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
 void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
                      STATAnalysisJob &j, int &n_in, int &n_out,
                      ofstream *sa_out) {
-   MetConfig go_conf;
    double go_index;
    AsciiTable out_at;
-   ConcatString config_file;
-
-   //
-   // Read in the STATAnalysis config file which defines the GO Index.
-   //
-   config_file = replace_path(go_index_config_file);
-   mlog << Debug(3) << "Reading Config: " << config_file << "\n";
-   go_conf.read(config_file);
-
-   //
-   // Parse the contents of the GO Index config file into the job.
-   //
-   set_job_from_config(go_conf, j);
 
    //
    // Compute the GO Index as a special case of the Skill Score Index

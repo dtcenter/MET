@@ -1204,7 +1204,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    js.clear();
 
    // job type
-   js << "-job " << statjobtype_to_string(job_type) << " ";
+   if(job_type != no_stat_job_type) {
+      js << "-job " << statjobtype_to_string(job_type) << " ";
+   }
 
    // model
    if(model.n_elements() > 0) {
