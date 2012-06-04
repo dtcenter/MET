@@ -246,23 +246,27 @@ bool has_prefix(const char **prefix_list, int n_prefix,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Does replace(met_base_str, MET_BASE) on the output string, first
+// checking the MET_BASE environment variable.
+//
+////////////////////////////////////////////////////////////////////////   
 
-   //
-   //  Does replace(met_base_str, MET_BASE) on the output string
-   //
+ConcatString replace_path(const char * path) {
+   ConcatString s, met_base_val;
+   char *ptr;
 
-ConcatString replace_path(const char * path)
+   // Initialize
+   s = path;
 
-{
+   // Use the MET_BASE environment variable, if set.
+   // Otherwise, use the compile-time value.   
+   if((ptr = getenv(met_base_str)) != NULL) met_base_val = ptr;
+   else                                     met_base_val = MET_BASE;
 
-ConcatString s;
+   s.replace(met_base_str, met_base_val);
 
-s = path;
-
-s.replace(met_base_str, MET_BASE);
-
-return ( s );
-
+   return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -313,6 +317,8 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    regfree(re);
    return num_act;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 void regex_clean(char** &mat)
 {
