@@ -122,7 +122,6 @@ clean:
 	@ echo
 	rm -f *.a *.o temp junk core log a.out out out2 $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	rm -f config.output
-	rm -f lex.econfig.cc
 	rm -f $(MET_LIB_DIR)/libvx_config.a
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 
