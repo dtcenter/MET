@@ -271,6 +271,8 @@ int *ibuf = (int *)Buf;
 
 int minutes = ibuf[n];
 
+if ( native_endian != big_endian )  shuffle_4(&minutes);
+
 if (minutes == 0)  k = 0;
 else {
 
