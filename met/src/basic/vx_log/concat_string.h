@@ -21,6 +21,7 @@
 #include <stdarg.h>
 
 #include "string_array.h"
+#include "indent.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -214,6 +215,7 @@ extern ConcatString & operator << (ConcatString &, long long);
 extern ConcatString & operator << (ConcatString &, double);
 
 extern ConcatString & operator << (ConcatString &, CSInlineCommand);
+extern ConcatString & operator << (ConcatString &, const Indent &);
 
 
    //
