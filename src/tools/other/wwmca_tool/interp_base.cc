@@ -139,6 +139,38 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void InterpolationValue::set_good(double _value)
+
+{
+
+ok = true;
+
+value = _value;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void InterpolationValue::set_bad()
+
+{
+
+ok = false;
+
+value = 0.0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class Interpolator
    //
@@ -308,9 +340,7 @@ if ( !Data )  {
 
 int n = two_to_one(x, y);
 
-Data[n].ok = true;
-
-Data[n].value = value;
+Data[n].set_good(value);
 
 return;
 
@@ -334,9 +364,7 @@ if ( !Data )  {
 
 int n = two_to_one(x, y);
 
-Data[n].ok = false;
-
-Data[n].value = 0.0;
+Data[n].set_bad();
 
 return;
 

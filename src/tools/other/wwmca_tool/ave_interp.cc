@@ -202,8 +202,7 @@ for (j=0; j<n; ++j)  {
 
 }   // for j
 
-
-if ( good_count >= NgoodNeeded )  {
+if ( (good_count > 0) && (good_count >= NgoodNeeded) )  {
 
    I.ok = true;
 

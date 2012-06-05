@@ -47,6 +47,8 @@ class InterpolationValue {
 
       void clear();
 
+      void set_good (double);
+      void set_bad  ();
 
       double value;
 

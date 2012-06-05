@@ -481,21 +481,15 @@ from_y0 = nint(dy);
 
 if ( I.width() == 1 )  {
 
+   pixel_age_minutes = 0;
+
+   iv.set_bad();
+
    if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x0, from_y0) / 60;
-   else          pixel_age_minutes = 0;
   
-   if ( cloud->xy_is_ok(from_x0, from_y0) &&
-        pixel_age_minutes < max_minutes )  {
+   if ( cloud->xy_is_ok(from_x0, from_y0) && pixel_age_minutes < max_minutes )  {
 
-      iv.ok = true;
-
-      iv.value = (double) ((*cloud)(from_x0, from_y0));
-
-   } else {
-
-      iv.ok = false;
-
-      iv.value = 0.0;
+      iv.set_good( (double) ((*cloud)(from_x0, from_y0)) );
 
    }
 
@@ -570,8 +564,8 @@ double t;
 int from_x0, from_y0;
 int xx, yy, sub_x, sub_y, from_x, from_y, wm1o2;
 InterpolationValue iv;
-const AfwaCloudPctFile  * cloud_this  = (const AfwaCloudPctFile *) 0;
-const AfwaCloudPctFile  * cloud_other = (const AfwaCloudPctFile *) 0;
+const AfwaCloudPctFile   * cloud_this  = (const AfwaCloudPctFile *) 0;
+const AfwaCloudPctFile   * cloud_other = (const AfwaCloudPctFile *) 0;
 const AfwaPixelTimeFile  * pixel_this  = (const AfwaPixelTimeFile *) 0;
 const AfwaPixelTimeFile  * pixel_other = (const AfwaPixelTimeFile *) 0;
 const Grid * From_this  = (const Grid *) 0;
@@ -622,22 +616,16 @@ from_y0 = nint(dy0);
    //
 
 if ( I.width() == 1 )  {
+
+   pixel_age_minutes = 0;
+
+   iv.set_bad();
   
    if ( pixel_this )  pixel_age_minutes = pixel_this->pixel_age_sec(from_x0, from_y0) / 60;
-   else               pixel_age_minutes = 0;
 
-   if ( cloud_this->xy_is_ok(from_x0, from_y0) &&
-        pixel_age_minutes < max_minutes )  {
+   if ( cloud_this->xy_is_ok(from_x0, from_y0) && pixel_age_minutes < max_minutes )  {
 
-      iv.ok = true;
-
-      iv.value = (double) (cloud_this->cloud_pct(from_x0, from_y0));
-
-   } else {
-
-      iv.ok = false;
-
-      iv.value = 0.0;
+      iv.set_good( (double) (cloud_this->cloud_pct(from_x0, from_y0)) );
 
    }
 
@@ -667,13 +655,21 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
       if ( lat*lat0 >= 0 )  {   //  same hemisphere
 
-         if ( pixel_this )  pixel_age_minutes = pixel_this->pixel_age_sec(from_x, from_y) / 60;
-         else               pixel_age_minutes = 0;
+         pixel_age_minutes = 0;
 
-         if (pixel_age_minutes < max_minutes)
+         if ( pixel_this )  pixel_age_minutes = pixel_this->pixel_age_sec(from_x, from_y) / 60;
+
+         if (pixel_age_minutes < max_minutes)  {
+
             t = cloud_this->cloud_pct(from_x, from_y);
-         else
-            t = 0.0;
+
+            I.put_good(sub_x, sub_y, t);
+
+         } else {
+
+            I.put_bad(sub_x, sub_y);
+
+         }
 
       } else {
 
@@ -682,14 +678,19 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
          if ( pixel_other )  pixel_age_minutes = pixel_other->pixel_age_sec(nint(dx), nint(dy)) / 60;
          else                pixel_age_minutes = 0;
 
-         if (pixel_age_minutes < max_minutes)
+         if (pixel_age_minutes < max_minutes)  {
+
             t = cloud_other->cloud_pct(nint(dx), nint(dy));
-         else
-            t = 0.0;
+
+            I.put_good(sub_x, sub_y, t);
+
+         } else {
+
+            I.put_bad(sub_x, sub_y);
+
+         }
 
       }
-
-      I.put_good(sub_x, sub_y, t);
 
    }   //  for yy
 
