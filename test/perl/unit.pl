@@ -11,9 +11,6 @@ use XML::Parser;
 use Data::Dumper;
 use Time::HiRes qw( gettimeofday tv_interval );
 
-#my $mnc_dir = "/d3/projects/MET/MET_test/rMnc";
-#my ($mgnc, $mpnc) = ("$mnc_dir/mgnc.sh", "$mnc_dir/mpnc.sh");
-
 # these variables will be set by the xml parsing function build_tests()
 my ($mgnc, $mpnc);
 my $exit_on_fail = 1;
@@ -148,7 +145,8 @@ sub build_tests {
 
       # set the exec or parm string
       $test_child eq "exec" || $test_child eq "param"
-        and $test{$test_child} = $childs[0][2] and shift @childs and next;
+        and $test{$test_child} = repl_env($childs[0][2]) 
+        and shift @childs and next;
 
       # build the output file arrays
       if( $test_child eq "output" ){
@@ -159,10 +157,9 @@ sub build_tests {
         while( @_ ){
           my $out_child = shift;
           $out_child or shift and next;
-
-          "point_nc" eq $out_child and push @out_pncs,  $_[0][2];
-          "grid_nc"  eq $out_child and push @out_gncs,  $_[0][2];
-          "stat"     eq $out_child and push @out_stats, $_[0][2];
+          "point_nc" eq $out_child and push @out_pncs,  repl_env($_[0][2]);
+          "grid_nc"  eq $out_child and push @out_gncs,  repl_env($_[0][2]);
+          "stat"     eq $out_child and push @out_stats, repl_env($_[0][2]);   
           shift;
         }
 
@@ -213,4 +210,33 @@ sub build_tests {
   }  # END: while( @_ )
 
   return @tests;
+}
+
+#######################################################################
+# repl_env()
+#
+#   This function assumes that the inputs are strings containing one or
+#   more placeholders for environment variable values with syntax
+#   ${ENV_NAME}.  The entire placeholder is replaced with the value of
+#   the specified environment variable.  If no named variable exists,
+#   repl_env() dies with error message. 
+#
+#   Arguments:
+#     repl_list = array of strings containing environment value place-
+#                 holders to be replaced
+#
+#######################################################################
+
+sub repl_env {
+  @_ or return 0;
+  my @ret;
+  while( @_ ){
+    local $_ = shift;
+    while( /\${(\w+)}/ ){
+      my $val = $ENV{$1} or die "ERROR: environment variable $1 not found\n";
+      s/\${$1}/$val/g;
+    }
+    push @ret, $_;
+  }
+  return wantarray ? @ret : $ret[0];
 }
