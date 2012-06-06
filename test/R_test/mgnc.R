@@ -33,7 +33,7 @@ for(strVarName in names(ncfile$var)){
 	# get the variable values and return bad status if it's all zero or NA
 	var = get.var.ncdf(ncfile, strVarName);
 	if( verb ){ cat("Checking", strVarName, "... "); }
-	size = nrow(var) * ncol(var);
+	size = length(var);
 	if( size <= sum( 0 == var[!is.na(var)] ) ){
 		if( verb ){ cat("all zeroes\n"); }
 		q(status=1);
