@@ -7,9 +7,9 @@ export NETCDF_INCLUDE=/usr/local/netcdf/include
 export NETCDF_LIB=/usr/local/netcdf/lib
 
 # check for environment variables, use defaults if necessary
-TEST_BASE=${TEST_BASE:-/d3/projects/MET/MET_test/test}
-TEST_RSCRIPT=${TEST_RSCRIPT:-/usr/local/bin/Rscript}
+MET_TEST_BASE=${MET_TEST_BASE:-/d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/test}
+MET_TEST_RSCRIPT=${MET_TEST_RSCRIPT:-/usr/local/bin/Rscript}
 MGNC=$TEST_BASE/R_test/mgnc.R
 
-$TEST_RSCRIPT $MGNC $@ 2>&1
+$MET_TEST_RSCRIPT $MGNC $@ 2>&1
 
