@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test
+[
+  <!ENTITY MET_DIR        "/d3/projects/MET/MET_releases/${MET_VERSION}">
+  <!ENTITY TEST_DIR       "/d3/projects/MET/MET_test/test">
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR       "/d3/projects/MET/MET_test_data/unit_test">
+  
+  <!ENTITY DATA_DIR_MODEL "&DATA_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&DATA_DIR;/obs_data">
+  <!ENTITY DATA_DIR_OUT   "&DATA_DIR;/output/${MET_VERSION}">
+]>
+
+<met_test>
+
+  <!--                                                                  -->
+  <!-- gen_poly_mask:                                                   -->
+  <!-- run on global and regional grids for supported projection types  -->
+  <!--                                                                  -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+  
+  <!--                                                                  -->
+  <!-- global lat/lon grid                                              -->
+  <!--                                                                  -->
+  
+  <test name="gen_poly_mask_GFS_LATLON">
+    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &MET_DIR;/data/poly/CONUS.poly \
+      &DATA_DIR_OUT;/gen_poly_mask/GFS_LATLON_CONUS_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/gen_poly_mask/GFS_LATLON_CONUS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- global mercator grid                                             -->
+  <!--                                                                  -->
+  
+  <test name="gen_poly_mask_GFS_MERCATOR">
+    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &MET_DIR;/data/poly/CONUS.poly \
+      &DATA_DIR_OUT;/gen_poly_mask/GFS_MERCATOR_CONUS_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/gen_poly_mask/GFS_MERCATOR_CONUS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- regional lambert conformal grid                                  -->
+  <!--                                                                  -->
+
+  <test name="gen_poly_mask_NAM_LAMBERT">
+    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &MET_DIR;/data/poly/CONUS.poly \
+      &DATA_DIR_OUT;/gen_poly_mask/NAM_LAMBERT_CONUS_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/gen_poly_mask/NAM_LAMBERT_CONUS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- regional polar stereographic grid                                -->
+  <!--                                                                  -->
+  
+  <test name="gen_poly_mask_HMT_STEREO">
+    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
+      &MET_DIR;/data/poly/NWC.poly \
+      &DATA_DIR_OUT;/gen_poly_mask/HMT_STEREO_NWC_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/gen_poly_mask/HMT_STEREO_NWC_mask.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

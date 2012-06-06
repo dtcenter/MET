@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test
+[
+  <!ENTITY DATA_DIR      "/d1/pgoldenb/var/data">
+  <!ENTITY DATA_DIR_IN   "&DATA_DIR;/met_input">
+  <!ENTITY DATA_DIR_OUT  "&DATA_DIR;/met_output">
+
+  <!ENTITY MET_DIR       "/d1/pgoldenb/opt/MET_builds/svn-met-dev.cgd.ucar.edu/trunk/met">
+]>
+
+<met_test>
+
+
+  <!--                                    -->
+  <!--  pcp_combine -sum                  -->
+  <!--                                    -->
+
+  <test name="pcp_combine_sum_GRIB1">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      20050807_00 3 20050807_18 18 \
+      &DATA_DIR_OUT;/pcp_combine/grib1/wrfprs_ruc13_18.tm00_G212.APCP18.nc \
+      -pcpdir &DATA_DIR_IN;/grib1
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/grib1/wrfprs_ruc13_18.tm00_G212.APCP18.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_sum_GRIB2">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      20050807_00 3 20050807_18 18 \
+      &DATA_DIR_OUT;/pcp_combine/grib2/wrfprs_ruc13_18.tm00_G212.APCP18.nc \
+      -pcpdir &DATA_DIR_IN;/grib2/ruc
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/grib2/wrfprs_ruc13_18.tm00_G212.APCP18.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_sum_NC_MET_18">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      20050807_00 3 20050807_18 18 \
+      &DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP18.nc \
+      -pcpdir &DATA_DIR_IN;/met_nc \
+      -config 'name="APCP_03";level="(*,*)";'
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP18.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_sum_NC_MET_12">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      20050807_00 3 20050807_12 12 \
+      &DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP12.nc \
+      -pcpdir &DATA_DIR_IN;/met_nc \
+      -config 'name="APCP_03";level="(*,*)";'
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP12.nc</grid_nc>
+    </output>
+  </test>
+  
+
+
+  <!--                                    -->
+  <!--  pcp_combine -add                  -->
+  <!--                                    -->
+
+  <test name="pcp_combine_add_GRIB1">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -add \
+      &DATA_DIR_IN;/grib1/wrfprs_ruc13_09.tm00_G212.grb 3 \
+      &DATA_DIR_IN;/grib1/wrfprs_ruc13_12.tm00_G212.grb 3 \
+      &DATA_DIR_IN;/grib1/wrfprs_ruc13_15.tm00_G212.grb 3 \
+      &DATA_DIR_IN;/grib1/wrfprs_ruc13_18.tm00_G212.grb 3 \
+      &DATA_DIR_OUT;/pcp_combine/grib1/wrfprs_ruc13_18.tm00_G212.APCP12.nc
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/grib1/wrfprs_ruc13_18.tm00_G212.APCP12.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_add_GRIB2">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -add \
+      &DATA_DIR_IN;/grib2/ruc/wrfprs_ruc13_09.tm00_G212.grib2 3 \
+      &DATA_DIR_IN;/grib2/ruc/wrfprs_ruc13_12.tm00_G212.grib2 3 \
+      &DATA_DIR_IN;/grib2/ruc/wrfprs_ruc13_15.tm00_G212.grib2 3 \
+      &DATA_DIR_IN;/grib2/ruc/wrfprs_ruc13_18.tm00_G212.grib2 3 \
+      &DATA_DIR_OUT;/pcp_combine/grib2/wrfprs_ruc13_18.tm00_G212.APCP12.nc
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/grib2/wrfprs_ruc13_18.tm00_G212.APCP12.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_add_NC_MET">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -add \
+      &DATA_DIR_IN;/met_nc/wrfprs_ruc13_09.tm00_G212.nc 3 \
+      &DATA_DIR_IN;/met_nc/wrfprs_ruc13_12.tm00_G212.nc 3 \
+      &DATA_DIR_IN;/met_nc/wrfprs_ruc13_15.tm00_G212.nc 3 \
+      &DATA_DIR_IN;/met_nc/wrfprs_ruc13_18.tm00_G212.nc 3 \
+      &DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP12.nc \
+      -config 'name="APCP_03";level="(*,*)";'
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP12.nc</grid_nc>
+    </output>
+  </test>
+  
+  
+  <!--                                    -->
+  <!--  pcp_combine -subtract             -->
+  <!--                                    -->
+
+  <test name="pcp_combine_sub_GRIB1">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_IN;/grib1/wrfprs_ruc13_18.tm00_G212.grb 18 \
+      &DATA_DIR_IN;/grib1/wrfprs_ruc13_12.tm00_G212.grb 12 \
+      &DATA_DIR_OUT;/pcp_combine/grib1/wrfprs_ruc13_18.tm00_G212.APCP6.nc
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/grib1/wrfprs_ruc13_18.tm00_G212.APCP6.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_sub_GRIB2">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_IN;/grib2/ruc/wrfprs_ruc13_18.tm00_G212.grib2 18 \
+      &DATA_DIR_IN;/grib2/ruc/wrfprs_ruc13_12.tm00_G212.grib2 12 \
+      &DATA_DIR_OUT;/pcp_combine/grib2/wrfprs_ruc13_18.tm00_G212.APCP6.nc
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/grib2/wrfprs_ruc13_18.tm00_G212.APCP6.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_sub_NC_MET">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP18.nc \
+        'name="APCP_18";level="(*,*)";' \
+      &DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP12.nc \
+        'name="APCP_12";level="(*,*)";' \
+      &DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP6.nc
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/met_nc/wrfprs_ruc13_18.tm00_G212.APCP6.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="pcp_combine_sub_P_INTERP">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_IN;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
+        'name="RAINNC";level="(0,*,*)";' \
+      &DATA_DIR_IN;/p_interp/wrfout_d01_2008-08-08_06:00:00_PLEV \
+        'name="RAINNC";level="(0,*,*)";' \
+      &DATA_DIR_OUT;/pcp_combine/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV.APCP6.nc
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV.APCP6.nc</grid_nc>
+    </output>
+  </test>
+  
+</met_test>
