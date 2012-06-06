@@ -45,7 +45,7 @@
   <test name="gen_poly_mask_GFS_MERCATOR">
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
-      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_g008.grib \
       &MET_DIR;/data/poly/CONUS.poly \
       &DATA_DIR_OUT;/gen_poly_mask/GFS_MERCATOR_CONUS_mask.nc \
       -v 1
