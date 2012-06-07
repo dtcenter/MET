@@ -591,6 +591,12 @@ for (j=0; j<n; ++j)  {
 }   //  for j
 
    //
+   //  check for any more environment variables remaining in the string
+   //
+
+if ( strstr(text, "${") )  patch_env(text);
+
+   //
    //  done
    //
 
