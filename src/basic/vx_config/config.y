@@ -273,7 +273,7 @@ void yyerror(const char * s)
 int j, j1, j2;
 int line_len, text_len;
 int c;
-char line[512];
+char line[max_id_length + 1];
 ifstream in;
 ConcatString msg;
 

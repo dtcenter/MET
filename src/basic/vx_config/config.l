@@ -716,7 +716,7 @@ void do_env()
 {
 
 int n;
-char junk[512];
+char junk[max_id_length];
 char * value = (char *) 0;
 
 
