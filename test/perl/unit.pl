@@ -48,7 +48,7 @@ for my $test (@tests){
   printf "TEST: %-*s - ", $name_wid, $test->{"name"};
 
   # prepare the output space
-  my @outputs = ( @{$test->{"out_pnc"}}, @{$test->{"out_gnc"}}, @{$test->{"out_stat"}} );
+  my @outputs = ( @{$test->{"out_pnc"}}, @{$test->{"out_gnc"}}, @{$test->{"out_stat"}}, @{$test->{"out_ps"}}, @{$test->{"out_exist"}}, @{$test->{"out_not_exist"}} );
   for my $output ( @outputs ){
     -s $output and qx/rm -rf $output/;
     vx_file_mkdir($output);
@@ -74,9 +74,24 @@ for my $test (@tests){
     for my $output ( @{ $test->{"out_stat"} } ){
       -s $output or 
         push @cmd_outs, "ERROR: stat file missing \"$output\"\n" and $out_ok = 0 and next;
-      qx{cat $output 2>/dev/null | egrep -v '^VERSION' | wc -l} or 
+      qx{cat $output 2>/dev/null | egrep -v '^VERSION' | wc -l} or
         push @cmd_outs, "ERROR: stat data missing from file \"$output\"\n" and $out_ok = 0;
     }
+    for my $output ( @{ $test->{"out_ps"} } ){
+      -s $output or 
+        push @cmd_outs, "ERROR: postscript file missing \"$output\"\n" and $out_ok = 0 and next;
+      !(qx{gs -sDEVICE=nullpage -dQUIET -dNOPAUSE -dBATCH $output 2>/dev/null}) or
+        push @cmd_outs, "ERROR: ghostscript error for postscript file \"$output\"\n" and $out_ok = 0;
+    }
+    for my $output ( @{ $test->{"out_exist"} } ){
+      -s $output or 
+        push @cmd_outs, "ERROR: file missing when it should exist \"$output\"\n" and $out_ok = 0 and next;
+    }
+    for my $output ( @{ $test->{"out_not_exist"} } ){
+      !(-s $output) or 
+        push @cmd_outs, "ERROR: file exists when it should be missing \"$output\"\n" and $out_ok = 0 and next;
+    }
+    
   }
 
   # print the test result
@@ -153,18 +168,21 @@ sub build_tests {
         local @_ = @{ $childs[0] };
         shift and shift @childs;
 
-        my (@out_pncs, @out_gncs, @out_stats);
+        my (@out_pncs, @out_gncs, @out_stats, @out_pss, @out_exists, @out_not_exists);
         while( @_ ){
           my $out_child = shift;
           $out_child or shift and next;
-          "point_nc" eq $out_child and push @out_pncs,  repl_env($_[0][2]);
-          "grid_nc"  eq $out_child and push @out_gncs,  repl_env($_[0][2]);
-          "stat"     eq $out_child and push @out_stats, repl_env($_[0][2]);   
+          "point_nc"  eq $out_child and push @out_pncs,       repl_env($_[0][2]);
+          "grid_nc"   eq $out_child and push @out_gncs,       repl_env($_[0][2]);
+          "stat"      eq $out_child and push @out_stats,      repl_env($_[0][2]);   
+          "ps"        eq $out_child and push @out_pss,        repl_env($_[0][2]);
+          "exist"     eq $out_child and push @out_exists,     repl_env($_[0][2]);
+          "not_exist" eq $out_child and push @out_not_exists, repl_env($_[0][2]);          
           shift;
         }
 
-        @test{ ("out_pnc",  "out_gnc",   "out_stat") } = 
-               (\@out_pncs, \@out_gncs,  \@out_stats);
+        @test{ ("out_pnc",  "out_gnc",   "out_stat",  "out_ps",  "out_exist",  "out_not_exist") } = 
+               (\@out_pncs, \@out_gncs,  \@out_stats, \@out_pss, \@out_exists, \@out_not_exists);
       }
 
       # build the environment map
@@ -201,7 +219,7 @@ sub build_tests {
     # verify the structure of the test element
     $test{"exec"}   or die "ERROR: test " . $test{"name"} . " missing exec element\n";
     $test{"param"}  or die "ERROR: test " . $test{"name"} . " missing param element\n";
-    ( $test{"out_pnc"} && $test{"out_gnc"} && $test{"out_stat"} ) 
+    ( $test{"out_pnc"} && $test{"out_gnc"} && $test{"out_stat"} && $test{"out_ps"} && $test{"out_exist"} && $test{"out_not_exist"} ) 
                     or die "ERROR: test " . $test{"name"} . " missing output element\n";
 
     # add the test to the list of parsed tests
