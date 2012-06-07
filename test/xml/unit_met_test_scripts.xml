@@ -1,0 +1,500 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test
+[
+  <!--<!ENTITY MET_DIR        "/d3/projects/MET/MET_releases/${MET_VERSION}">-->
+  <!ENTITY MET_DIR        "/d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR       "/d3/projects/MET/MET_test_data/unit_test">
+  
+  <!ENTITY DATA_DIR_MODEL "&DATA_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&DATA_DIR;/obs_data">
+  <!ENTITY DATA_DIR_OUT   "&DATA_DIR;/output/${MET_VERSION}/test_all">
+]>
+
+<met_test>
+
+  <!--                                                                  -->
+  <!-- run all of the tests included in MET/scripts/test_all.sh         -->
+  <!--                                                                  -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!--                                                                  -->
+  <!-- gen_poly_mask                                                    -->
+  <!--                                                                  -->
+  
+  <test name="test_all_gen_poly_mask">
+    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DIR;/data/poly/CONUS.poly \
+      &DATA_DIR_OUT;/gen_poly_mask/CONUS_poly.nc \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/gen_poly_mask/CONUS_poly.nc</grid_nc>
+    </output>
+  </test>
+   
+  <!--                                                                  -->
+  <!-- pcp_combine                                                      -->
+  <!--                                                                  -->
+  
+  <test name="test_all_pcp_combine_1">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      20050807_000000 3 20050807_120000 12 \
+      &DATA_DIR_OUT;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
+      -pcpdir &MET_DIR;/data/sample_fcst/2005080700
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="test_all_pcp_combine_2">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      20050807_000000 3 20050808_000000 12 \
+      &DATA_DIR_OUT;/pcp_combine/sample_fcst_12L_2005080800V_12A.nc \
+      -pcpdir &MET_DIR;/data/sample_fcst/2005080700
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sample_fcst_12L_2005080800V_12A.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="test_all_pcp_combine_3">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      20050807_000000 3 20050807_240000 24 \
+      &DATA_DIR_OUT;/pcp_combine/sample_fcst_24L_2005080800V_24A.nc \
+      -pcpdir &MET_DIR;/data/sample_fcst/2005080700
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sample_fcst_24L_2005080800V_24A.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="test_all_pcp_combine_4">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      00000000_000000 1 20050807_120000 12 \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080712V_12A.nc \
+      -pcpdir &MET_DIR;/data/sample_obs/ST2ml
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sample_obs_2005080712V_12A.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="test_all_pcp_combine_5">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      00000000_000000 1 20050808_000000 12 \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_12A.nc \
+      -pcpdir &MET_DIR;/data/sample_obs/ST2ml
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_12A.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="test_all_pcp_combine_6">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      00000000_000000 1 20050808_000000 24 \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_24A.nc \
+      -pcpdir &MET_DIR;/data/sample_obs/ST2ml
+    </param>
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_24A.nc</grid_nc>
+    </output>
+  </test>
+   
+  <!--                                                                  -->
+  <!-- mode                                                             -->
+  <!--                                                                  -->
+  
+  <test name="test_all_mode_1">
+    <exec>&MET_DIR;/bin/mode</exec>
+    <param> \
+      &DATA_DIR_OUT;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080712V_12A.nc \
+      &MET_DIR;/scripts/config/MODEConfig_APCP_12 \
+      -outdir &DATA_DIR_OUT;/mode \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_120000A_cts.txt</stat>
+      <stat>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_120000A_obj.txt</stat>
+      <grid_nc>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_120000A_obj.nc</grid_nc>      
+      <ps>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_120000A.ps</ps>
+    </output>
+  </test>
+
+  <test name="test_all_mode_2">
+    <exec>&MET_DIR;/bin/mode</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_24A.nc \
+      &MET_DIR;/scripts/config/MODEConfig_APCP_24 \
+      -outdir &DATA_DIR_OUT;/mode \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/mode/mode_240000L_20050808_000000V_240000A_cts.txt</stat>
+      <stat>&DATA_DIR_OUT;/mode/mode_240000L_20050808_000000V_240000A_obj.txt</stat>
+      <grid_nc>&DATA_DIR_OUT;/mode/mode_240000L_20050808_000000V_240000A_obj.nc</grid_nc>
+      <ps>&DATA_DIR_OUT;/mode/mode_240000L_20050808_000000V_240000A.ps</ps>
+    </output>
+  </test>
+
+  <test name="test_all_mode_3">
+    <exec>&MET_DIR;/bin/mode</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+      &MET_DIR;/data/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212 \
+      &MET_DIR;/scripts/config/MODEConfig_RH \
+      -outdir &DATA_DIR_OUT;/mode \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_000000A_cts.txt</stat>
+      <stat>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_000000A_obj.txt</stat>
+      <grid_nc>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_000000A_obj.nc</grid_nc>
+      <ps>&DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_000000A.ps</ps>
+    </output>
+  </test>    
+
+  <!--                                                                  -->
+  <!-- grid_stat                                                        -->
+  <!--                                                                  -->
+  
+  <test name="test_all_grid_stat_1">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>TEST_OUT_DIR</name> <value>&DATA_DIR_OUT;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OUT;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080712V_12A.nc \
+      &MET_DIR;/scripts/config/GridStatConfig_APCP_12 \
+      -outdir &DATA_DIR_OUT;/grid_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_cnt.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_ctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_cts.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_fho.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_nbrcnt.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_nbrctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_nbrcts.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_sl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_vl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V.stat</stat>
+      <grid_nc>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="test_all_grid_stat_2">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080312/pop5km_2005080312F096.grib_G212 \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_12A.nc \
+      &MET_DIR;/scripts/config/GridStatConfig_POP_12 \
+      -outdir &DATA_DIR_OUT;/grid_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_POP_12_1080000L_20050808_000000V_pct.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_POP_12_1080000L_20050808_000000V_pjc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_POP_12_1080000L_20050808_000000V_prc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_POP_12_1080000L_20050808_000000V_pstd.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_POP_12_1080000L_20050808_000000V.stat</stat>
+      <grid_nc>&DATA_DIR_OUT;/grid_stat/grid_stat_POP_12_1080000L_20050808_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="test_all_grid_stat_3">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>TEST_OUT_DIR</name> <value>&DATA_DIR_OUT;</value></pair>
+    </env>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_24A.nc \
+      &MET_DIR;/scripts/config/GridStatConfig_APCP_24 \
+      -outdir &DATA_DIR_OUT;/grid_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_cnt.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_ctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_cts.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_fho.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_mctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_mcts.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_nbrcnt.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_nbrctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_nbrcts.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_sl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_vl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V.stat</stat>
+      <grid_nc>&DATA_DIR_OUT;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="test_all_grid_stat_4">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>TEST_OUT_DIR</name> <value>&DATA_DIR_OUT;</value></pair>
+    </env>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+      &MET_DIR;/data/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212 \
+      &MET_DIR;/scripts/config/GridStatConfig_all \
+      -outdir &DATA_DIR_OUT;/grid_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_cnt.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_ctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_cts.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_fho.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_nbrcnt.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_nbrctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_nbrcts.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_sl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_vl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V.stat</stat>
+      <grid_nc>&DATA_DIR_OUT;/grid_stat/grid_stat_120000L_20050807_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- pb2nc                                                            -->
+  <!--                                                                  -->
+  
+  <test name="test_all_pb2nc">
+    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <param> \
+      &MET_DIR;/data/sample_obs/prepbufr/ndas.t00z.prepbufr.tm12.20070401.nr \
+      &DATA_DIR_OUT;/pb2nc/sample_pb.nc \
+      &MET_DIR;/scripts/config/PB2NCConfig_G212 \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&DATA_DIR_OUT;/pb2nc/sample_pb.nc</point_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- ascii2nc                                                         -->
+  <!--                                                                  -->
+  
+  <test name="test_all_ascii2nc_1">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &MET_DIR;/data/sample_obs/ascii/sample_ascii_obs.txt \
+      &DATA_DIR_OUT;/ascii2nc/sample_ascii.nc \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&DATA_DIR_OUT;/ascii2nc/sample_ascii.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="test_all_ascii2nc_2">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &MET_DIR;/data/sample_obs/ascii/precip24_2010010112.ascii \
+      &DATA_DIR_OUT;/ascii2nc/precip24_2010010112.nc \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&DATA_DIR_OUT;/ascii2nc/precip24_2010010112.nc</point_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- point_stat                                                       -->
+  <!--                                                                  -->
+  
+  <test name="test_all_point_stat">
+    <exec>&MET_DIR;/bin/point_stat</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
+      &DATA_DIR_OUT;/pb2nc/sample_pb.nc \
+      &MET_DIR;/scripts/config/PointStatConfig \
+      -outdir &DATA_DIR_OUT;/point_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_cnt.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_ctc.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_cts.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_fho.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_mpr.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_sal1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_sl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_val1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V_vl1l2.txt</stat>
+      <stat>&DATA_DIR_OUT;/point_stat/point_stat_360000L_20070331_120000V.stat</stat>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- wavelet_stat                                                     -->
+  <!--                                                                  -->
+  
+  <test name="test_all_wavelet_stat_1">
+    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080712V_12A.nc \
+      &MET_DIR;/scripts/config/WaveletStatConfig_APCP_12 \
+      -outdir &DATA_DIR_OUT;/wavelet_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_120000L_20050807_120000V_isc.txt</stat>
+      <stat>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_120000L_20050807_120000V.stat</stat>
+      <grid_nc>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_120000L_20050807_120000V.nc</grid_nc>
+      <ps>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_120000L_20050807_120000V.ps</ps>
+    </output>
+  </test>
+  
+  <test name="test_all_wavelet_stat_2">
+    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <param> \
+      &DATA_DIR_OUT;/pcp_combine/sample_fcst_12L_2005080800V_12A.nc \
+      &DATA_DIR_OUT;/pcp_combine/sample_obs_2005080800V_12A.nc \
+      &MET_DIR;/scripts/config/WaveletStatConfig_APCP_12_NC \
+      -outdir &DATA_DIR_OUT;/wavelet_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_240000L_20050808_000000V_isc.txt</stat>
+      <stat>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_240000L_20050808_000000V.stat</stat>
+      <grid_nc>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_240000L_20050808_000000V.nc</grid_nc>
+      <ps>&DATA_DIR_OUT;/wavelet_stat/wavelet_stat_240000L_20050808_000000V.ps</ps>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- ensemble_stat                                                    -->
+  <!--                                                                  -->
+  
+  <test name="test_all_ensemble_stat">
+    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <param> \
+      6 \
+      &MET_DIR;/data/sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
+      &MET_DIR;/scripts/config/EnsembleStatConfig \
+      -grid_obs &MET_DIR;/data/sample_obs/ST4/ST4.2010010112.24h \
+      -point_obs &DATA_DIR_OUT;/ascii2nc/precip24_2010010112.nc \
+      -outdir &DATA_DIR_OUT;/ensemble_stat \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/ensemble_stat/ensemble_stat_20100101_120000V_orank.txt</stat>
+      <stat>&DATA_DIR_OUT;/ensemble_stat/ensemble_stat_20100101_120000V_rhist.txt</stat>
+      <stat>&DATA_DIR_OUT;/ensemble_stat/ensemble_stat_20100101_120000V.stat</stat>
+      <grid_nc>&DATA_DIR_OUT;/ensemble_stat/ensemble_stat_20100101_120000V_ens.nc</grid_nc>
+      <exist>&DATA_DIR_OUT;/ensemble_stat/ensemble_stat_20100101_120000V_orank.nc</exist>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- stat_analysis                                                    -->
+  <!--                                                                  -->
+  
+  <test name="test_all_stat_analysis">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <env>
+      <pair><name>TEST_OUT_DIR</name> <value>&DATA_DIR_OUT;</value></pair>
+    </env>
+    <param> \
+      -config &MET_DIR;/scripts/config/STATAnalysisConfig \
+      -lookin &DATA_DIR_OUT;/grid_stat \
+      -lookin &DATA_DIR_OUT;/wavelet_stat \
+      -lookin &DATA_DIR_OUT;/ensemble_stat \
+      -out &DATA_DIR_OUT;/stat_analysis/stat_analysis.out \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_FHO.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_ISC.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_PCT.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_RHIST.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_SL1L2.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_stat_FHO_CTS.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_stat_MCTC_MCTS.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_stat_ORANK_RHIST.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_stat_PCT_PSTD.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_aggregate_stat_SL1L2_CNT.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_filter_SL1L2.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/job_summary_ME.stat</stat>
+      <stat>&DATA_DIR_OUT;/stat_analysis/stat_analysis.out</stat>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- mode_analysis                                                    -->
+  <!--                                                                  -->
+
+  <test name="test_all_mode_analysis_1">
+    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <param> \
+      -lookin &DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
+      -summary \
+      -column AREA -column LENGTH -column WIDTH -column CURVATURE -column INTENSITY_50 -fcst \
+      -config &MET_DIR;/scripts/config/MODEAnalysisConfig \
+      -dump_row &DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_fcst.txt \
+      -out &DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_fcst.out \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_fcst.txt</stat>
+      <stat>&DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_fcst.out</stat>
+    </output>
+  </test>
+  
+  <test name="test_all_mode_analysis_2">
+    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <param> \
+      -lookin &DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
+      -summary \
+      -column AREA -column LENGTH -column WIDTH -column CURVATURE -column INTENSITY_50 -obs \
+      -config &MET_DIR;/scripts/config/MODEAnalysisConfig \
+      -dump_row &DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_obs.txt \
+      -out &DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_obs.out \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_obs.txt</stat>
+      <stat>&DATA_DIR_OUT;/mode_analysis/job_summary_APCP_12_simple_obs.out</stat>
+    </output>
+  </test>
+  
+  <test name="test_all_mode_analysis_3">
+    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <param> \
+      -lookin &DATA_DIR_OUT;/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
+      -lookin &DATA_DIR_OUT;/mode/mode_240000L_20050808_000000V_240000A_obj.txt \
+      -bycase -single -simple \
+      -dump_row &DATA_DIR_OUT;/mode_analysis/job_summary_bycase.txt \
+      -out &DATA_DIR_OUT;/mode_analysis/job_summary_bycase.out \
+      -v 2
+    </param>
+    <output>
+      <stat>&DATA_DIR_OUT;/mode_analysis/job_summary_bycase.txt</stat>
+      <stat>&DATA_DIR_OUT;/mode_analysis/job_summary_bycase.out</stat>
+    </output>
+  </test>
+
+</met_test>
