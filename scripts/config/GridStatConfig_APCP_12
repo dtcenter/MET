@@ -37,7 +37,7 @@ obs = fcst;
 //
 mask = {
    grid = [ "DTC165", "DTC166" ];
-   poly = [ "MET_BASE/out/gen_poly_mask/CONUS_poly.nc",
+   poly = [ "${TEST_OUT_DIR}/gen_poly_mask/CONUS_poly.nc",
             "MET_BASE/data/poly/LMV.poly" ];
 };
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export TEST_OUT_DIR="../out"
+
 echo
 echo "*** Testing the Model Evaluation Tools Project ***"
 echo

@@ -4,8 +4,8 @@ echo
 echo "*** Running STAT-Analysis ***"
 ../bin/stat_analysis \
    -config config/STATAnalysisConfig \
-   -lookin ../out/grid_stat \
-   -lookin ../out/wavelet_stat \
-   -lookin ../out/ensemble_stat \
-   -out ../out/stat_analysis/stat_analysis.out \
+   -lookin ${TEST_OUT_DIR}/grid_stat \
+   -lookin ${TEST_OUT_DIR}/wavelet_stat \
+   -lookin ${TEST_OUT_DIR}/ensemble_stat \
+   -out ${TEST_OUT_DIR}/stat_analysis/stat_analysis.out \
    -v 2
