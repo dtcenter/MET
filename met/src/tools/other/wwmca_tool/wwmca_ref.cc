@@ -843,7 +843,7 @@ const InterpInfo interp_info = parse_conf_interp(Config);
 const int width              = interp_info.width[0];
 const InterpMthd method      = string_to_interpmthd(interp_info.method[0]);
 
-int n_good_needed = nint(ceil(0.01*interp_info.vld_thresh*width));
+const int n_good_needed = nint(ceil((interp_info.vld_thresh)*width*width));
 
 
    //
