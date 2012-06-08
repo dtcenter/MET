@@ -401,7 +401,7 @@ void PSfile::choose_font(int n, double s)
 
 ConcatString data_dir;
 
-data_dir << MET_BASE << "/data";
+data_dir = replace_path(default_met_data_dir);
 
 choose_font(n, s, data_dir);
 
