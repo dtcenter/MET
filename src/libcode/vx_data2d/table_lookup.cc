@@ -30,11 +30,11 @@ TableFlatFile GribTable (0);
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char table_data_dir   [] = "data/table_files";      //  relative to MET_BASE_DIR
+static const char table_data_dir   [] = "MET_BASE/data/table_files"; //  relative to MET_BASE
 
-static const char grib1_table_file [] = "nceptab_flat.txt";      //  relative to table_data_dir
+static const char grib1_table_file [] = "nceptab_flat.txt";          //  relative to table_data_dir
 
-static const char grib2_table_file [] = "grib2_vars_flat.txt";   //  relative to table_data_dir
+static const char grib2_table_file [] = "grib2_vars_flat.txt";       //  relative to table_data_dir
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -519,10 +519,12 @@ init_from_scratch();
 ConcatString path;
 
    //
-   //  read the default grib1 table file
+   //  read the default grib1 table file, expanding MET_BASE
    //
 
-path << cs_erase << MET_BASE_DIR << '/' << table_data_dir << '/' << grib1_table_file;
+path << cs_erase << table_data_dir << '/' << grib1_table_file;
+
+path = replace_path(path);
 
 if ( ! read(path) )  {
 
@@ -534,10 +536,12 @@ if ( ! read(path) )  {
 }
 
    //
-   //  read the default grib2 table file
+   //  read the default grib2 table file, expanding MET_BASE
    //
 
-path << cs_erase << MET_BASE_DIR << '/' << table_data_dir << '/' << grib2_table_file;
+path << cs_erase << table_data_dir << '/' << grib2_table_file;
+
+path = replace_path(path);
 
 if ( ! read(path) )  {
 
