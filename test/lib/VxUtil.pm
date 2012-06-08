@@ -2,7 +2,7 @@
 
 #######################################################################
 #
-#   VxUtil.pm - v0.2.0 - 2012-05-31
+#   VxUtil.pm - v0.2.0 - 2012-06-08
 #
 #   Verification script utilities, including functionality for logging,
 #   parsing contants file, filename templates, GEMPAK file conversion,
