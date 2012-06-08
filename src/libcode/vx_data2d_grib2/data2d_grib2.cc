@@ -687,10 +687,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
 void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
 
-   //  grid_def info
-   int n_x = -1;
-   int n_y = -1;
-
    _Grid = new Grid();
 
    //  determine the radius of the earth
@@ -718,10 +714,6 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.Nlon         = gfld->igdtmpl[7];
       data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0) - (double)data.Nlat * data.delta_lat;
       data.lon_ll       = 360 - (double)gfld->igdtmpl[12] / 1000000.0;
-
-      //  set the data grid information
-      n_x = data.Nlon;
-      n_y = data.Nlat;
 
       //  store the grid information
       _Grid->set(data);
@@ -770,10 +762,6 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
 
-      //  set the data grid information
-      n_x = data.nx;
-      n_y = data.ny;
-
       //  store the grid information
       _Grid->set(data);
 
@@ -808,10 +796,6 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.lon_ur = (double)gfld->igdtmpl[13] / 1000000.0;
       data.ny     = gfld->igdtmpl[7];
       data.nx     = gfld->igdtmpl[8];
-
-      //  set the data grid information
-      n_x = data.nx;
-      n_y = data.ny;
 
       //  store the grid information
       _Grid->set(data);
@@ -848,10 +832,6 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.r_km         = 6371.20;  //PGO jimmied...  r_km;
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
-
-      //  set the data grid information
-      n_x = data.nx;
-      n_y = data.ny;
 
       //  store the grid information
       _Grid->set(data);
@@ -990,20 +970,18 @@ long MetGrib2DataFile::read_grib2_record( long offset,
 
    //  g2c fields
    g2int  listsec0[3], listsec1[13], numlocal, lskip, lgrib;
-   int    retval, ierr;
-   size_t  lengrib;
 
    //  find the next record and read the info, return -1 if fail
    seekgb(FileGrib2, offset, 32000, &lskip, &lgrib);
    if (lgrib == 0) return -1;
-   cgrib  =  new unsigned char[lgrib];
-   retval = fseek(FileGrib2, lskip, SEEK_SET);
-   lengrib = fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
+   cgrib   = new unsigned char[lgrib];
+   fseek(FileGrib2, lskip, SEEK_SET);
+   fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
    if( g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal) )
       return -1;
 
    //  read the specified field in the record
-   ierr = g2_getfld(cgrib, ifld, unpack, 1, &gfld);
+   g2_getfld(cgrib, ifld, unpack, 1, &gfld);
 
    //  return the offset of the next record
    return lskip + lgrib;
