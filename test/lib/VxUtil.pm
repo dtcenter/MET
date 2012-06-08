@@ -27,6 +27,7 @@ $VERSION     = 1.00;
                   vx_gem_conv vx_gem_print_parm_map
                   vx_date_to_array vx_date_parse_date vx_date_parse_lead vx_date_format_lead 
                     vx_date_calc_add vx_date_calc_sub vx_date_calc_init vx_date_calc_valid
+                    vx_date_build_list
                   vx_wgrib_extract
                   vx_met_config_var vx_met_ens_stat vx_met_grid_stat vx_met_point_stat
                     vx_met_mode
@@ -40,6 +41,7 @@ $VERSION     = 1.00;
                   vx_gem_conv vx_gem_print_parm_map
                   vx_date_to_array vx_date_parse_date vx_date_parse_lead vx_date_format_lead
                     vx_date_calc_add vx_date_calc_sub vx_date_calc_init vx_date_calc_valid
+                    vx_date_build_list
                   vx_wgrib_extract
                   vx_met_config_var vx_met_ens_stat vx_met_grid_stat vx_met_point_stat
                     vx_met_mode
@@ -54,6 +56,7 @@ $VERSION     = 1.00;
                   &vx_gem_conv &vx_gem_print_parm_map
                   &vx_date_to_array &vx_date_parse_date &vx_date_parse_lead &vx_date_format_lead 
                     &vx_date_calc_add &vx_date_calc_sub &vx_date_calc_init &vx_date_calc_valid
+                    &vx_date_build_list
                   &vx_wgrib_extract
                   &vx_met_config_var &vx_met_ens_stat &vx_met_grid_stat &vx_met_point_stat
                     &vx_met_mode
@@ -917,6 +920,32 @@ sub vx_date_calc_add {
 sub vx_date_calc_sub   { return vx_date_calc_add(shift, -1 * shift); }
 sub vx_date_calc_valid { return vx_date_calc_add(@_); }
 sub vx_date_calc_init  { return vx_date_calc_sub(@_); }
+
+
+#####################################################################
+# sub vx_date_calc_add()
+#
+#   This function calculates a valid time by combining the input
+#   init time with the input lead time.  The input init time must
+#   be in the format YYYYmmdd[_]HH[MMSS] and the lead time in the 
+#   format [H]HH[MMSS].  The date returned will have the same format 
+#   as the input date.
+#
+#   Arguments:
+#     init_time = init time from which valid time will be derived
+#     lead_time = lead time added to init time
+#
+######################################################################
+
+sub vx_date_build_list {
+  my ($beg, $end, $inc, @dates) = @_;
+  my ($cur, $end_date) = ($beg, vx_date_parse_date($end));
+  while( vx_date_parse_date($cur) <= $end_date ){
+    push @dates, $cur;
+    $cur = vx_date_calc_add($cur, $inc);
+  }
+  return @dates;
+}
 
 
 ######################################################################
