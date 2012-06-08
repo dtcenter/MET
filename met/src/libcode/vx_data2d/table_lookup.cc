@@ -191,7 +191,6 @@ clear();
 
 int j, n;
 int * i[3];
-ConcatString * s[3];
 const char i_delim [] = "{} \"";
 const char s_delim [] = "\"";
 const char * c = (const char *) 0;
@@ -212,10 +211,6 @@ clear();
 
 i[0] = &code;
 i[1] = &table_number;
-
-s[0] = &parm_name;
-s[1] = &full_name;
-s[2] = &units;
 
    //
    //  grab the first 2 ints
