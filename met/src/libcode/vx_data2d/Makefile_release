@@ -72,7 +72,7 @@ data2d_utils.o: data2d_utils.h data2d_utils.cc
 	$(CXX) data2d_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 table_lookup.o: table_lookup.h table_lookup.cc
-	$(CXX) table_lookup.cc $(CXX_FLAGS) -c -DMET_BASE_DIR=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) table_lookup.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
