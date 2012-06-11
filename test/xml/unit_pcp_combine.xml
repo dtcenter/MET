@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
-<!DOCTYPE met_test
-[
-  <!ENTITY MET_DIR        "/d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met">
-  <!ENTITY TEST_DIR       "/d3/projects/MET/MET_test/test">
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
-  <!ENTITY DATA_DIR       "/d3/projects/MET/MET_test_data/unit_test">
-  
-  <!ENTITY DATA_DIR_MODEL "&DATA_DIR;/model_data">
-  <!ENTITY DATA_DIR_OBS   "&DATA_DIR;/obs_data">
-  <!ENTITY DATA_DIR_OUT   "&DATA_DIR;/output">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
 <met_test>
@@ -25,11 +24,11 @@
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
       20120409_00 3 20120409_18 18 \
-      &DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP18.nc \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc \
       -pcpdir &DATA_DIR_MODEL;/grib1/nam
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP18.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc</grid_nc>
     </output>
   </test>
   
@@ -37,41 +36,14 @@
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
       20120408_21 3 20120409_18 18 \
-      &DATA_DIR_OUT;/pcp_combine/sref_mean_2012040821_F021_APCP18.nc \
+      &OUTPUT_DIR;/pcp_combine/sref_mean_2012040821_F021_APCP18.nc \
       -pcpdir &DATA_DIR_MODEL;/grib2/sref_mn
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sref_mean_2012040821_F021_APCP18.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/sref_mean_2012040821_F021_APCP18.nc</grid_nc>
     </output>
   </test>
   
-  <test name="pcp_combine_sum_NC_MET_06">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
-    <param> \
-      20120409_00 3 20120409_18 6 \
-      &DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP06.nc \
-      -pcpdir &DATA_DIR_MODEL;/met_nc/nam \
-      -config 'name="APCP_03";level="(*,*)";'
-    </param>
-    <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP06.nc</grid_nc>
-    </output>
-  </test>
-  
-  <test name="pcp_combine_sum_NC_MET_12">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
-    <param> \
-      20120409_00 3 20120409_12 12 \
-      &DATA_DIR_OUT;/pcp_combine/nam_2012040900_F012_APCP12.nc \
-      -pcpdir &DATA_DIR_MODEL;/met_nc/nam \
-      -config 'name="APCP_03";level="(*,*)";'
-    </param>
-    <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/nam_2012040900_F012_APCP12.nc</grid_nc>
-    </output>
-  </test>
-  
-
 
   <!--                                    -->
   <!--  pcp_combine -add                  -->
@@ -85,10 +57,10 @@
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib 3 \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F015.grib 3 \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F018.grib 3 \
-      &DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP12.nc
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP12.nc
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP12.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP12.nc</grid_nc>
     </output>
   </test>
   
@@ -100,29 +72,13 @@
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F012.grib2 3 \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 3 \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F018.grib2 3 \
-      &DATA_DIR_OUT;/pcp_combine/sref_mean_2012040821_F018_APCP12.nc
+      &OUTPUT_DIR;/pcp_combine/sref_mean_2012040821_F018_APCP12.nc
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sref_mean_2012040821_F018_APCP12.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/sref_mean_2012040821_F018_APCP12.nc</grid_nc>
     </output>
   </test>
-  
-  <test name="pcp_combine_add_NC_MET">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
-    <param> \
-      -add \
-      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F021_APCP03.nc 3 \
-      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F024_APCP03.nc 3 \
-      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F027_APCP03.nc 3 \
-      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F030_APCP03.nc 3 \
-      &DATA_DIR_OUT;/pcp_combine/nam_2012040900_F030_APCP12.nc \
-      -config 'name="APCP_03";level="(*,*)";'
-    </param>
-    <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/nam_2012040900_F030_APCP12.nc</grid_nc>
-    </output>
-  </test>
-  
+    
   
   <!--                                    -->
   <!--  pcp_combine -subtract             -->
@@ -134,10 +90,10 @@
       -subtract \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F018.grib 6 \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F015.grib 3 \
-      &DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP03.nc
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP03.nc
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/nam_2012040900_F018_APCP03.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP03.nc</grid_nc>
     </output>
   </test>
   
@@ -147,23 +103,23 @@
       -subtract \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F003.grib2 12 \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F009.grib2 6 \
-      &DATA_DIR_OUT;/pcp_combine/sref_mean_2012040812_F015_APCP06.nc
+      &OUTPUT_DIR;/pcp_combine/sref_mean_2012040812_F015_APCP06.nc
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/sref_mean_2012040812_F015_APCP06.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/sref_mean_2012040812_F015_APCP06.nc</grid_nc>
     </output>
   </test>
   
-  <test name="pcp_combine_sub_NC_MET">
+  <test name="pcp_combine_sub_NC_MET_06">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
       -subtract \
-      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F012_APCP12.nc 'name="APCP_12";level="(*,*)";' \
-      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F012_APCP03.nc 'name="APCP_03";level="(*,*)";' \
-      &DATA_DIR_OUT;/pcp_combine/nam_2012040900_F009_APCP09.nc
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc 'name="APCP_18";level="(*,*)";' \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP12.nc 'name="APCP_12";level="(*,*)";' \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F006_APCP06.nc
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/nam_2012040900_F009_APCP09.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F006_APCP06.nc</grid_nc>
     </output>
   </test>
   
@@ -173,10 +129,10 @@
       -subtract \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV 'name="RAINNC";level="(0,*,*)";' \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_06:00:00_PLEV 'name="RAINNC";level="(0,*,*)";' \
-      &DATA_DIR_OUT;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc
+      &OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc
     </param>
     <output>
-      <grid_nc>&DATA_DIR_OUT;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc</grid_nc>
     </output>
   </test>
   

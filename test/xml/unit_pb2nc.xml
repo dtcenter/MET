@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
-<!DOCTYPE met_test
-[
-  <!ENTITY MET_DIR        "/d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met">
-  <!ENTITY TEST_DIR       "/d3/projects/MET/MET_test/test">
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
-  <!ENTITY DATA_DIR       "/d3/projects/MET/MET_test_data/unit_test">
-  
-  <!ENTITY DATA_DIR_MODEL "&DATA_DIR;/model_data">
-  <!ENTITY DATA_DIR_OBS   "&DATA_DIR;/obs_data">
-  <!ENTITY DATA_DIR_OUT   "&DATA_DIR;/output">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
 <met_test>
@@ -26,12 +25,12 @@
 <!--    </env>-->
 <!--    <param> \-->
 <!--      &DATA_DIR_OBS;/prepbufr/gdas/gdas1.20120409.t12z.prepbufr.nr \-->
-<!--      &DATA_DIR_OUT;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \-->
+<!--      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \-->
 <!--      &CONFIG_DIR;/PB2NCConfig \-->
 <!--      -v 1-->
 <!--    </param>-->
 <!--    <output>-->
-<!--      <point_nc>&DATA_DIR_OUT;/pb2nc/gdas1.20120409.t12z.prepbufr.nc</point_nc>-->
+<!--      <point_nc>&OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc</point_nc>-->
 <!--    </output>-->
 <!--  </test>-->
   
@@ -46,12 +45,12 @@
     </env>
     <param> \
       &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &DATA_DIR_OUT;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr \
       &CONFIG_DIR;/PB2NCConfig \
       -v 1
     </param>
     <output>
-      <point_nc>&DATA_DIR_OUT;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr</point_nc>
+      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr</point_nc>
     </output>
   </test>
   

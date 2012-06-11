@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
-<!DOCTYPE met_test
-[
-  <!ENTITY MET_DIR        "/d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met">
-  <!ENTITY TEST_DIR       "/d3/projects/MET/MET_test/test">
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
-  <!ENTITY DATA_DIR       "/d3/projects/MET/MET_test_data/unit_test">
-  
-  <!ENTITY DATA_DIR_MODEL "&DATA_DIR;/model_data">
-  <!ENTITY DATA_DIR_OBS   "&DATA_DIR;/obs_data">
-  <!ENTITY DATA_DIR_OUT   "&DATA_DIR;/output">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
 <met_test>
@@ -31,22 +30,22 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
-      &DATA_DIR_OUT;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_PHYS \
       -climo &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>   
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_sal1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_vl1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_val1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
   
@@ -60,22 +59,22 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &DATA_DIR_OUT;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr \
       &CONFIG_DIR;/PointStatConfig_PHYS \
       -climo &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012_gNam.grib2 \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>   
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_sal1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_vl1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_val1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
   
@@ -89,19 +88,19 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 \
-      &DATA_DIR_OUT;/pb2nc/gdas/gdas1.20120409.t12z.prepbufr.nc \
+      &OUTPUT_DIR;/pb2nc/gdas/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_PHYS \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_vl1l2.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_NDAS_150000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
   
@@ -117,17 +116,17 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
-      &DATA_DIR_OUT;/ascii2nc/trmm_2012040912_3hr.nc \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
       &CONFIG_DIR;/PointStatConfig_APCP \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_sl1l2.txt</stat>
     </output>
   </test>
   
@@ -143,17 +142,17 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F012.grib2 \
-      &DATA_DIR_OUT;/ascii2nc/trmm_2012040912_3hr.nc \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
       &CONFIG_DIR;/PointStatConfig_APCP \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_TRMM_150000L_20120409_120000V_sl1l2.txt</stat>
     </output>
   </test>
 
@@ -175,17 +174,17 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F036_APCP24.nc \
-      &DATA_DIR_OUT;/ascii2nc/gauge_2012041012_24hr.nc \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
       &CONFIG_DIR;/PointStatConfig_APCP \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_HMTGAGE_360000L_20120410_120000V_sl1l2.txt</stat>
     </output>
   </test>
 
@@ -207,17 +206,17 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
-      &DATA_DIR_OUT;/ascii2nc/trmm_2012040912_3hr.nc \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
       &CONFIG_DIR;/PointStatConfig_APCP \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_TRMM_240000L_20080808_120000V_sl1l2.txt</stat>
     </output>
   </test>
 
@@ -230,17 +229,17 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
-      &DATA_DIR_OUT;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr \
       &CONFIG_DIR;/PointStatConfig_PHYS_pint \
-      -outdir &DATA_DIR_OUT;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V.stat</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_fho.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_ctc.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_cts.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_cnt.txt</stat>
-      <stat>&DATA_DIR_OUT;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_NCPINT_NDAS_240000L_20080808_120000V_sl1l2.txt</stat>
     </output>
   </test>
 
