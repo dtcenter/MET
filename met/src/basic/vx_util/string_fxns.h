@@ -47,13 +47,13 @@ extern int regex_apply(const char* pat, int num_mat, const char* str, char** &ma
 
 extern void regex_clean(char** &mat);
 
-extern const char* str_replace(const char* data, const char* old, const char* repl);
+extern ConcatString str_replace(const char* data, const char* old, const char* repl);
 
-extern const char* str_replace_all(const char* data, const char* old, const char* repl);
+extern ConcatString str_replace_all(const char* data, const char* old, const char* repl);
 
-extern const char* str_format(const char *fmt, ...);
+extern ConcatString str_format(const char *fmt, ...);
 
-extern const char* str_trim(const char *str);
+extern ConcatString str_trim(const char *str);
 
 
 ////////////////////////////////////////////////////////////////////////

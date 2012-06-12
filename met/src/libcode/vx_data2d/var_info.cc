@@ -463,15 +463,15 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
    ConcatString field_name;
    if( thresh_na != thr_lo.get_type() && thresh_na != thr_hi.get_type() ){
       field_name = str_format("PROB(%s%s%s)",
-                              str_format("%.3f%s", thr_lo.get_thresh(), thresh_type_str[thr_lo.get_type()]),
+                              str_format("%.3f%s", thr_lo.get_thresh(), thresh_type_str[thr_lo.get_type()]).text(),
                               prob_name.text(),
-                              str_format("%s%.3f", thresh_type_str[thr_hi.get_type()], thr_hi.get_thresh()));
+                              str_format("%s%.3f", thresh_type_str[thr_hi.get_type()], thr_hi.get_thresh()).text());
       MagicStr = str_format("%s/%s/PROB", field_name.text(), Level.name().text());
    } else {
       SingleThresh thr( thresh_na != thr_lo.get_type() ? thr_lo : thr_hi );
       field_name = str_format("PROB(%s%s)",
                             prob_name.text(),
-                            str_format("%s%.3f", thresh_type_str[thr.get_type()], thr.get_thresh()));
+                            str_format("%s%.3f", thresh_type_str[thr.get_type()], thr.get_thresh()).text());
       MagicStr = str_format("%s/%s/PROB", field_name.text(), Level.name().text());
    }
    set_name     ( field_name );
