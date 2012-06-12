@@ -26,7 +26,7 @@ OBJECTS     = configobjecttype_to_string.o \
               config.tab.o \
               lex.config.o \
               config_file.o \
-              config_util.o  \
+              config_util.o \
 
 
 LIBRARIES   = libvx_config.a
@@ -35,10 +35,10 @@ LIBRARIES   = libvx_config.a
 GEN_SOURCES = grdfiletype_to_string.cc \
               grdfiletype_to_string.h \
               configobjecttype_to_string.h \
-              configobjecttype_to_string.cc  \
-              lex.config.c  \
-              config.tab.h  \
-              config.tab.c  \
+              configobjecttype_to_string.cc \
+              lex.config.cc \
+              config.tab.h \
+              config.tab.cc \
 
 
 ########################################################################
@@ -54,7 +54,7 @@ HEADERS     = config_file.h \
               scanner_stuff.h \
               config_util.h \
               config_constants.h \
-              vx_config.h  \
+              vx_config.h \
 
 
 ########################################################################
@@ -92,18 +92,22 @@ configobjecttype_to_string.h configobjecttype_to_string.cc: object_types.h
 	@ rm -f configobjecttype_to_string.h configobjecttype_to_string.cc
 	@ $(ENUM_TO_STRING) -concat_string object_types.h
 
+
 grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
 	@ echo
 	@ rm -f grdfiletype_to_string.cc grdfiletype_to_string.h
 	$(ENUM_TO_STRING) -concat_string -reverse data_file_type.h
 
 
-lex.config.c: config.l config.tab.h scanner_stuff.h
+lex.config.cc: config.l config.tab.h scanner_stuff.h
 	$(LEX) config.l
+	@ mv lex.config.c lex.config.cc
 
 
-config.tab.c config.tab.h: config.y scanner_stuff.h dictionary.o
+config.tab.cc config.tab.h: config.y scanner_stuff.h dictionary.o
 	$(YACC) config.y
+	@ mv config.tab.c config.tab.cc
+
 
 ########################################################################
 
@@ -125,12 +129,12 @@ dictionary.o: dictionary.h dictionary.cc configobjecttype_to_string.o
 	$(CXX) dictionary.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 
-config.tab.o: config.tab.c
-	$(CXX) config.tab.c -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+config.tab.o: config.tab.cc
+	$(CXX) config.tab.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 
-lex.config.o: lex.config.c
-	$(CXX) lex.config.c -c -g -I$(MET_INC_DIR)
+lex.config.o: lex.config.cc
+	$(CXX) lex.config.cc -c -g -I$(MET_INC_DIR)
 
 
 config_file.o: config_file.h config_file.cc configobjecttype_to_string.o dictionary.o config.tab.o lex.config.o
