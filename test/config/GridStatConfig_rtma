@@ -1,0 +1,122 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Grid-Stat configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   wind_thresh = [ NA ];
+
+   field = [
+      { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ <300, >=300 ]; },
+      { name = "DPT";   level = [ "Z2" ];  cat_thresh = [ <260, >=260 ]; },
+      { name = "UGRD";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ]; },
+      { name = "VGRD";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ]; },
+      { name = "WIND";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ]; }
+   ];
+
+};
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid = [ "DTC165", "DTC166" ];
+   poly = [ ];  // [ "${TEST_OUT_DIR}/gen_poly_mask/CONUS_poly.nc",
+                //   "MET_BASE/data/poly/LMV.poly" ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.10, 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "1";
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = FCST;
+   vld_thresh = 1.0;
+
+   type = [
+      { method = UW_MEAN; width  = 1; },
+      { method = UW_MEAN; width  = 3; },
+      { method = MIN;     width  = 1; },
+      { method = MAX;     width  = 3; }
+   ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Neighborhood methods
+//
+nbrhd = {
+   vld_thresh = 1.0;
+   width      = [ 3, 5 ];
+   cov_thresh = [ >=0.5 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   fho    = BOTH;
+   ctc    = BOTH;
+   cts    = BOTH;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = BOTH;
+   sl1l2  = BOTH;
+   vl1l2  = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   nbrctc = BOTH;
+   nbrcts = BOTH;
+   nbrcnt = BOTH;
+};
+
+//
+// NetCDF matched pairs output file
+//
+nc_pairs_flag = TRUE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+rank_corr_flag = FALSE;
+tmp_dir        = "/tmp";
+output_prefix  = "${OUTPUT_PREFIX}";
+version        = "V4.0";
+
+////////////////////////////////////////////////////////////////////////////////
