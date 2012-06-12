@@ -189,9 +189,6 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    //  if the name is specified, use it
    if( !field_name.empty() ){
 
-      set_name( field_name );
-      set_req_name( field_name );
-
       //  look up the name in the grib tables
       if( !GribTable.lookup_grib1(field_name, field_ptv, field_rec, tab, tab_match) ){
          mlog << Error << "\nVarInfoGrib::set_dict() - unrecognized GRIB1 field abbreviation '"
