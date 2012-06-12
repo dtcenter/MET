@@ -206,12 +206,12 @@ bool PairBase::add_obs(const char *sid,
 
       //  build a uniqueness test key
       string unq_key = str_format("%.4f_%.4f_%d_%.2f_%.2f_%.4f",
-            lat,     //  lat
-            lon,     //  lon
-            ut,      //  valid time
-            lvl,     //  level
-            elv,     //  elevation
-            o);      //  obs value
+            lat,       //  lat
+            lon,       //  lon
+            ut,        //  valid time
+            lvl,       //  level
+            elv,       //  elevation
+            o).text(); //  obs value
 
       //  add the station id to the reporting map
       if( 3 <= mlog.verbosity_level() )
@@ -227,17 +227,17 @@ bool PairBase::add_obs(const char *sid,
 
       //  build a uniqueness test key
       string sng_key = str_format("%.3f_%.3f_%.2f_%.2f",
-            lat,     //  lat
-            lon,     //  lon
-            lvl,     //  level
-            elv);    //  elevation
+            lat,         //  lat
+            lon,         //  lon
+            lvl,         //  level
+            elv).text(); //  elevation
 
       //  add a single value reporting string to the reporting map
       if( 3 <= mlog.verbosity_level() ){
          string sng_val = str_format("%s_%d_%.4f",
-               sid,     //  station id
-               ut,      //  valid time
-               o);      //  obs value
+               sid,       //  station id
+               ut,        //  valid time
+               o).text(); //  obs value
          map_single_val.insert( pair<string,string>(sng_key, sng_val) );
       }
 
@@ -322,7 +322,7 @@ void PairBase::print_duplicate_report(){
          string msg_key = str_format(
                              "[lat: %s  lon: %s  valid: %s  lev: %s  elv: %s  ob_val: %s]",
                              mat[1], mat[2], unix_to_yyyymmdd_hhmmss( atoi(mat[3]) ).text(),
-                             mat[4], mat[5], mat[6]);
+                             mat[4], mat[5], mat[6]).text();
          regex_clean(mat);
 
          string msg = "    " + msg_key + " - Station IDs: ";
@@ -367,7 +367,7 @@ void PairBase::print_duplicate_report(){
             exit(1);
          }
          string msg_key = str_format("[lat: %s  lon: %s  lev: %s  elv: %s]",
-                                     mat[1], mat[2], mat[3], mat[4]);
+                                     mat[1], mat[2], mat[3], mat[4]).text();
          regex_clean(mat);
 
          //  parse the single key value
@@ -376,7 +376,7 @@ void PairBase::print_duplicate_report(){
                  << "to parse '" << (*it_single).second.c_str() << "'\n\n";
             exit(1);
          }
-         string msg_val = str_format("%s (HHMMSS)", sec_to_hhmmss( atoi(mat[2]) ).text());
+         string msg_val = str_format("%s (HHMMSS)", sec_to_hhmmss( atoi(mat[2]) ).text()).text();
          regex_clean(mat);
 
          string msg = "  " + msg_key + " - used point ob with valid time offset of " + msg_val;
@@ -393,7 +393,7 @@ void PairBase::print_duplicate_report(){
                exit(1);
             }
             string msg_ob = str_format("[sid: %6s  vld: %s  ob_val: %8s]",
-                                        mat[1], unix_to_yyyymmdd_hhmmss( atoi(mat[2]) ).text(), mat[3]);
+                                        mat[1], unix_to_yyyymmdd_hhmmss( atoi(mat[2]) ).text(), mat[3]).text();
             regex_clean(mat);
             msg += "\n    " + msg_ob;
 

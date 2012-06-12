@@ -330,28 +330,32 @@ void regex_clean(char** &mat)
 
 ////////////////////////////////////////////////////////////////////////
 
-const char* str_replace(const char* data, const char* old, const char* repl){
+ConcatString str_replace(const char* data, const char* old, const char* repl){
    string str = data;
    size_t pos = str.find( old );
    if( string::npos == pos ) return "";
    str.replace(pos, strlen(old), repl);
-   return str.data();
+
+   ConcatString ret = str.data();
+   return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const char* str_replace_all(const char* data, const char* old, const char* repl){
+ConcatString str_replace_all(const char* data, const char* old, const char* repl){
    string str = data;
    while( string::npos != str.find(old) ) str = str_replace(str.c_str(), old, repl);
-   return str.c_str();
+
+   ConcatString ret = str.c_str();
+   return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const char* str_format(const char *fmt, ...){
+ConcatString str_format(const char *fmt, ...){
    va_list vl;
    va_start(vl, fmt);
-   char *buf = new char[max_str_len];
+   char buf[max_str_len];
    int status = vsprintf(buf, fmt, vl);
    va_end(vl);
 
@@ -360,16 +364,17 @@ const char* str_format(const char *fmt, ...){
       exit(1);
    }
 
-   string ret = buf;
-   delete [] buf;
-   return ret.data();
+   ConcatString ret = buf;
+   return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const char* str_trim(const char *str){
+ConcatString str_trim(const char *str){
    string dat = str;
    while( ' ' == dat.at(0) )              dat.replace(0,              1, "");
    while( ' ' == dat.at(dat.size() - 1) ) dat.replace(dat.size() - 1, 1, "");
-   return dat.c_str();
+
+   ConcatString ret = dat.c_str();
+   return ret;
 }
