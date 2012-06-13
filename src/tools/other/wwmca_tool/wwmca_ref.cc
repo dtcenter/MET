@@ -1194,6 +1194,8 @@ if ( H == 'S' )  {
 
 sdata->name = "To (stereographic)";
 
+sdata->hemisphere = H;
+
 sdata->scale_lat = lat_scale;
 
 sdata->lat_pin = lat_ll;
