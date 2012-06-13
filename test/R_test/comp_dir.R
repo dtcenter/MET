@@ -1,15 +1,22 @@
 library(ncdf);
 
-source("/d3/projects/MET/MET_test/test/R_test/test_const.R");
-source("/d3/projects/MET/MET_test/test/R_test/test_util.R");
+# get the MET_TEST_BASE environment variable and include the support scripts
+met_test_base = system("echo $MET_TEST_BASE", intern=T);
+if( "" == met_test_base ){
+	cat("ERROR: environment variable MET_TEST_BASE not set\n\n"); q(status=1);
+}
+source(paste(met_test_base, "/R_test/test_const.R", sep=""));
+source(paste(met_test_base, "/R_test/test_util.R", sep=""));
 
-verb = 1;		# default verbosity level
+verb = 1;
+strict = F;
 hist = 0;		# default histogram plot production
 
 usage = function(){
-	cat("usage: Rscript comp_dir.R [-v {lev}] {dir_1} {dir_2}\n",
-			"  where -v    {lev} indicates verbosity level (0-3), default 1\n",
+	cat("usage: Rscript comp_dir.R [-v {lev}] [-hist {0|1}] [-strict] {dir_1} {dir_2}\n",
+			"  where -v {lev}    indicates verbosity level (0-3), default 1\n",
 			"        -hist {0|1} 1 to produce histogram error plots for each file, default 0\n",
+			"        -strict     applies strict equality when comparing numerical values, default false\n\n",
 			sep="");
 }
 
@@ -18,12 +25,16 @@ listArgs = commandArgs(TRUE);
 while( 2 < length(listArgs) ){
 	if( "-v" == listArgs[1] ){
 		verb = listArgs[2];
+		listArgs = listArgs[3:length(listArgs)];
 	} else if( "-hist" == listArgs[1] ){
 		hist = listArgs[2];
+		listArgs = listArgs[3:length(listArgs)];
+	} else if( "-strict" == listArgs[1] ){
+		strict = 1;
+		listArgs = listArgs[2:length(listArgs)];
 	} else {
 		cat("ERROR: unrecognized option:", listArgs[1], "\n\n"); usage(); q(status=1);
 	}
-	listArgs = listArgs[3:length(listArgs)];
 }
 if( 2 != length(listArgs) ){ 
 	cat("ERROR: invalid number of arguments\n\n"); usage(); q(status=1);
@@ -76,7 +87,7 @@ for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
 	# if the files are NetCDF, compare accordingly
 	if( TRUE == grepl("\\.nc$", strFile1, perl=T) ){
 		if( 1 <= verb ){ cat("stat1: ", strFile1, "\nstat2: ", strFile2, "\n", sep=""); }
-		compareNc(strFile1, strFile2, verb);
+		compareNc(strFile1, strFile2, verb, strict);
 	}
 	
 	# compare the stat files and print a report
@@ -87,7 +98,7 @@ for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
 			strHistFile = gsub("\\.txt$",  ".png", strHistFile);
 		}
 		if( 1 <= verb ){ cat("stat1: ", strFile1, "\nstat2: ", strFile2, "\n", sep=""); }
-		listTest = compareStat(strFile1, strFile2, verb);
+		listTest = compareStat(strFile1, strFile2, verb, strict);
 		printCompReport(listTest, verb, strHistFile);
 	}
 	

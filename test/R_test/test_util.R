@@ -3,7 +3,6 @@
 # Global Variables
 #
 
-
 # fileExists() tests whether or not the specified file exists and returns a boolean
 #   indicating the results of the test.
 #
@@ -311,7 +310,8 @@ getStatLty = function(stat){
 #    stat2: path and file name of second stat file to compare
 #      lty: line type whose data to compare, format {line_type}[#{length}], see getStatLty()
 #     verb: (optional) verbosity level, 0 for no output
-compareStatLty = function(stat1, stat2, lty, verb=0){
+#   strict: (optional) require strict numerical equality, default no
+compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	
 	# check for "empty" stat files
 	if( isStatEmpty(stat1) ){ cat("ERROR: stat file", stat1, "contains no data\n"); return (NA); }
@@ -374,11 +374,15 @@ compareStatLty = function(stat1, stat2, lty, verb=0){
 		# compare the columns in different ways, depending on bootstrapping
 		boolBc = ( 0 < length( grep("_BC[UL]$", strCol, perl=TRUE) ) );
 		boolNum = is.numeric( dfV1[[strCol]] );
-		if( TRUE == boolBc ){
+		if( TRUE == boolBc & FALSE == strict){
 			listDiff = signif(dfV1[[strCol]], intSigFig) - signif(dfV2[[strCol]], intSigFig);
 			if( 0 < intAbsDifBc ){ listDiff[ abs(listDiff) < intAbsDifBc ] = 0; }
-		} else if( boolNum ) {
-			listDiff = signif(dfV1[[strCol]], intSigFig) - signif(dfV2[[strCol]], intSigFig);
+		} else if( TRUE == boolNum ) {
+			if( TRUE == strict ){
+				listDiff = dfV1[[strCol]] - dfV2[[strCol]];
+			} else {
+				listDiff = signif(dfV1[[strCol]], intSigFig) - signif(dfV2[[strCol]], intSigFig);
+			}
 			listTotHist = append(listTotHist, listDiff[is.na(listDiff) != TRUE & abs(listDiff) > 0]);
 			intTotComp = intTotComp + length(listDiff);
 			intTotDiff = intTotDiff + length(listDiff[is.na(listDiff) != TRUE & abs(listDiff) > 0]);
@@ -436,7 +440,8 @@ compareStatLty = function(stat1, stat2, lty, verb=0){
 #    stat1: path and file name of first stat file to compare
 #    stat2: path and file name of second stat file to compare
 #     verb: (optional) verbosity level, 0 for no output
-compareStat = function(stat1, stat2, verb=0){
+#   strict: (optional) require strict numerical equality, default no
+compareStat = function(stat1, stat2, verb=0, strict=0){
 	listTest = list();
 
 	# verify that the files exist
@@ -476,7 +481,7 @@ compareStat = function(stat1, stat2, verb=0){
 	for(strLty in listLty){
 		
 		# perform the comparison for the current line type
-		listResults = compareStatLty(stat1, stat2, strLty, verb);
+		listResults = compareStatLty(stat1, stat2, strLty, verb, strict);
 
 		# store performance information, if present
 		if( is.null(listResults$tot_comp) == FALSE ){
@@ -562,7 +567,8 @@ printCompReport = function(listTest, verb=0, hist=""){
 #      nc1: path and file name of first NetCDF file to compare
 #      nc2: path and file name of second NetCDF file to compare
 #     verb: (optional) verbosity level, 0 for no output
-compareNc = function(nc1, nc2, verb){
+#   strict: (optional) require strict numerical equality, default no
+compareNc = function(nc1, nc2, verb, strict=0){
 
 	strNcFileD = paste(strDirTmp, "/", "diff_", as.numeric(Sys.time()), ".nc", sep="");
 	
@@ -617,6 +623,10 @@ compareNc = function(nc1, nc2, verb){
 	compListStr(listAtt2Nam, listAtt1Nam, paste("file", nc2, "missing global attributes:"), verb);
 	compMapStr (listAtt1, listAtt2, "value of global attribute differs for", verb);
 	
+	# establish the numerical difference threshold
+	dblDiffThresh = 10^(-1*intSigFig);
+	if( TRUE == strict ){ dblDiffThresh = 0; }	
+	
 	# for each variable present in the file, check for differences
 	for(strVar in names(ncFileD$var)){
 		
@@ -637,10 +647,9 @@ compareNc = function(nc1, nc2, verb){
 		strVarType = "";
 		if( is.numeric(dataNcVar[1]) ){
 			strVarType = "numerical";
-			intNumDiff = sum( 10^(-1*intSigFig) <= abs(dataNcVar), na.rm=T );
-			#valDiff = max(abs(dataNcVar), na.rm=T);
-      valDiff = max(c(0, abs(dataNcVar)), na.rm=T);
-			boolDiff = (10^(-1*intSigFig) <= valDiff);
+			intNumDiff = sum(dblDiffThresh <= abs(dataNcVar), na.rm=T );
+      		valDiff = max(c(0, abs(dataNcVar)), na.rm=T);
+			boolDiff = (dblDiffThresh <= valDiff);
 			if( TRUE == boolDiff & 1 <= verb ){
 				cat("WARNING: found", 
 					format(intNumDiff, width="5", justify="right"), "differences in var",
