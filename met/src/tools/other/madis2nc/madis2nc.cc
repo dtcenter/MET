@@ -1417,7 +1417,7 @@ void usage() {
         << program_name << "\n"
         << "\tmadis_file\n"
         << "\tout_file\n"
-        << "\t[-type str]\n"
+        << "\t-type str\n"
         << "\t[-qc_dd list]\n"
         << "\t[-lvl_dim list]\n"
         << "\t[-rec_beg n]\n"
@@ -1431,7 +1431,7 @@ void usage() {
         << "\t\t\"out_file\" is the output NetCDF file (required).\n"
 
         << "\t\t\"-type str\" specifies the type of MADIS observations "
-        << "(metar or raob).\n"
+        << "(metar or raob) (required).\n"
 
         << "\t\t\"-qc_dd list\" specifies a comma-separated list of "
         << "QC flag values to be accepted (Z,C,S,V,X,Q,K,G,B) "
