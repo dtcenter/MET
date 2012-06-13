@@ -574,7 +574,9 @@ if ( v->num_dims() != a.n_elements() )  {
         << "needed " << (v->num_dims()) << " arguments for variable "
         << (v->name()) << ", got " << (a.n_elements()) << "\n\n";
 
-   return ( false );
+   exit ( 1 );
+
+   // return ( false );
 
 }
 
@@ -618,6 +620,23 @@ if ( !found )  {
 
    mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << "variable " << (v->name()) << " not found!\n\n";
+
+   return ( false );
+
+}
+
+   //
+   //  check x_slot and y_slot
+   //
+
+if ( (var->x_slot < 0) || (var->y_slot < 0) )  {
+
+   mlog << Error
+        << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+        << "can't find needed dimensions(s) for variable \""
+        << var->name << "\" ... one of the dimensions may be staggered.\n\n";
+
+   // exit ( 1 );
 
    return ( false );
 
