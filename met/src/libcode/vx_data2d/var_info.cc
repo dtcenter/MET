@@ -358,8 +358,8 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
       double field_lvl_val2 = dict.lookup_double(conf_key_GRIB_lvl_val2, false);
 
       //  if the level index information is not specified, bail
-      if( bad_data_int    == field_lvl_typ ||
-          bad_data_double == field_lvl_val1 ){
+      if( is_bad_data(field_lvl_typ) ||
+          is_bad_data(field_lvl_val1) ){
          mlog << Error << "\nVarInfo::set_level_info_grib() - either level or GRIB_lvl_typ, "
               << "GRIB_lvl_val1 and GRIB2_lvl_val2 (if necessary) must be specified in field "
               << "information\n\n";
@@ -386,10 +386,9 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
    }
 
-
    //  arrange the level values appropriately
-   lvl2 = ( lvl2 != lvl1 ? lvl2 : -1 );
-   if( lt == LevelType_Pres && -1 != lvl2 && lvl2 < lvl1 ){
+   lvl2 = ( !is_eq(lvl2, lvl1) ? lvl2 : -1.0 );
+   if( lt == LevelType_Pres && !is_eq(lvl2, -1.0) && lvl2 < lvl1 ){
       int lvl_tmp = lvl2;
       lvl2 = lvl1;
       lvl1 = lvl_tmp;
@@ -397,8 +396,8 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
    //  format the level name
    ConcatString lvl_name;
-   if( lvl2 != -1 ) lvl_name.format("%s%d-%d", lvl_type.data(), (int)lvl2, (int)lvl1);
-   else             lvl_name.format("%s%d",    lvl_type.data(), (int)lvl1);
+   if( !is_eq(lvl2, -1.0) ) lvl_name.format("%s%d-%d", lvl_type.data(), (int)lvl2, (int)lvl1);
+   else                     lvl_name.format("%s%d",    lvl_type.data(), (int)lvl1);
 
    //  set the level information
    Level.set_type(lt);
@@ -410,7 +409,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
    else                      Level.set_lower(lvl1);
 
    //  if pressure ranges are not supported for the specified level type, bail
-   if( -1 != lvl2 && lt != LevelType_Pres && lt != LevelType_Vert && lt != LevelType_None ){
+   if( !is_eq(lvl2, -1.0) && lt != LevelType_Pres && lt != LevelType_Vert && lt != LevelType_None ){
       mlog << Error << "\nVarInfo::set_level_info_grib() - "
            << "ranges of levels are only supported for pressure levels "
            << "(P), vertical levels (Z), and generic levels (L)\n\n";
@@ -419,7 +418,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
    //  set the upper level value
    if(lt == LevelType_Accum) Level.set_upper(timestring_to_sec( lvl_val1.data() ));
-   else                      Level.set_upper(-1 == lvl2 ? lvl1 : lvl2);
+   else                      Level.set_upper(is_eq(lvl2, -1.0) ? lvl1 : lvl2);
 
    //  if the field name is APCP, apply additional formatting
    ConcatString field_name = name();

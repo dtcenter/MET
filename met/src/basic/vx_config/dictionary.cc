@@ -994,16 +994,12 @@ void Dictionary::dump_config_format(ostream & out, int depth) const
 {
 
 int j;
-const ConcatString s = config_prefix(depth);
 
 for (j=0; j<Nentries; ++j)  {
-
-   // out << s << "Entry " << j << "...\n\n";
 
    e[j]->dump_config_format(out, depth + 1);
 
 }
-
 
    //
    //  done
