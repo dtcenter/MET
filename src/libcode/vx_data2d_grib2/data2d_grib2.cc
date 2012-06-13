@@ -352,12 +352,12 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          //  accumulation level type
          if( LevelType_Accum == vinfo_lty ){
 
-            rec_match_ex = (lvl1 == (*it)->Accum);
+            rec_match_ex = ( is_eq(lvl1, (*it)->Accum) );
 
          }
 
          //  record number level type
-         else if( LevelType_RecNumber == vinfo_lty && lvl1 == (*it)->RecNum ){
+         else if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
 
             rec_match_ex = true;
 
@@ -372,8 +372,8 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                rec_lvl1 /= 100;
                rec_lvl2 /= 100;
             }
-            rec_match_ex = ( lvl1 == rec_lvl1 ) && ( lvl1 == lvl2 || lvl2 == rec_lvl2 );
-            rec_match_rn = ( lvl1 != lvl2 && lvl1 <= rec_lvl1 && lvl2 >= rec_lvl2 );
+            rec_match_ex = ( is_eq(lvl1, rec_lvl1) ) && ( is_eq(lvl1, lvl2) || is_eq(lvl2, rec_lvl2) );
+            rec_match_rn = ( !is_eq(lvl1, lvl2) && lvl1 <= rec_lvl1 && lvl2 >= rec_lvl2 );
 
          }  //  END: if( level match )
 
@@ -995,16 +995,16 @@ const char* MetGrib2DataFile::build_magic(Grib2Record *rec){
    ConcatString lvl = "";
    int lvl_val1 = (int)rec->LvlVal1, lvl_val2 = (int)rec->LvlVal2;
    switch( VarInfoGrib2::g2_lty_to_level_type(rec->LvlTyp) ){
-		case LevelType_Accum:
-		   lvl = "A";
-		   lvl_val1 = rec->RangeVal * (int)VarInfoGrib2::g2_time_range_unit_to_sec(rec->RangeTyp);
-		   lvl_val1 = atoi( sec_to_hhmmss( lvl_val1 ) );
-		   lvl_val1 = (0 == lvl_val1 % 10000 ? lvl_val1 / 10000 : lvl_val1);
-		   lvl_val2 = lvl_val1;
-		   break;
-		case LevelType_Vert:       lvl = "Z";     break;
-		case LevelType_RecNumber:  lvl = "R";     break;
-		case LevelType_None:       lvl = "L";     break;
+      case LevelType_Accum:
+         lvl = "A";
+         lvl_val1 = rec->RangeVal * (int)VarInfoGrib2::g2_time_range_unit_to_sec(rec->RangeTyp);
+         lvl_val1 = atoi( sec_to_hhmmss( lvl_val1 ) );
+         lvl_val1 = (0 == lvl_val1 % 10000 ? lvl_val1 / 10000 : lvl_val1);
+         lvl_val2 = lvl_val1;
+         break;
+      case LevelType_Vert:       lvl = "Z";     break;
+      case LevelType_RecNumber:  lvl = "R";     break;
+      case LevelType_None:       lvl = "L";     break;
       case LevelType_Pres:
          lvl = "P";
          lvl_val1 /= 100;
@@ -1014,7 +1014,7 @@ const char* MetGrib2DataFile::build_magic(Grib2Record *rec){
    }
 
    ConcatString ret;
-   if( rec->LvlVal1 == rec->LvlVal2 ){
+   if( is_eq(rec->LvlVal1, rec->LvlVal2) ){
       ret.format("%s/%s%d", rec->ParmName.c_str(), lvl.text(), lvl_val1);
    } else {
       ret.format("%s/%s%d-%d", rec->ParmName.c_str(), lvl.text(), lvl_val1, lvl_val2);

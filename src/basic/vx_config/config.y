@@ -22,6 +22,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "math_constants.h"
+#include "is_bad_data.h"
 #include "scanner_stuff.h"
 #include "dictionary.h"
 #include "threshold.h"
@@ -395,7 +396,7 @@ switch ( op )  {
    case '-':  C = A - B;  break;
    case '*':  C = A * B;  break;
    case '/':
-      if ( B == 0.0 )  {
+      if ( is_eq(B, 0.0) )  {
          mlog << Error
               << "\ndo_op() -> "
               << "division by zero!\n\n";
