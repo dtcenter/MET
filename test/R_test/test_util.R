@@ -647,9 +647,9 @@ compareNc = function(nc1, nc2, verb, strict=0){
 		strVarType = "";
 		if( is.numeric(dataNcVar[1]) ){
 			strVarType = "numerical";
-			intNumDiff = sum(dblDiffThresh <= abs(dataNcVar), na.rm=T );
+			intNumDiff = sum(dblDiffThresh < abs(dataNcVar), na.rm=T );
       		valDiff = max(c(0, abs(dataNcVar)), na.rm=T);
-			boolDiff = (dblDiffThresh <= valDiff);
+			boolDiff = (dblDiffThresh < valDiff);
 			if( TRUE == boolDiff & 1 <= verb ){
 				cat("WARNING: found", 
 					format(intNumDiff, width="5", justify="right"), "differences in var",
