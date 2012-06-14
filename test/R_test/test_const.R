@@ -1,8 +1,20 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Environment Variables
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+met_base = system("echo $MET_BASE", intern=T);
+if( "" == met_base ){
+   cat("ERROR: environment variable MET_BASE not set\n\n"); q(status=1);
+}
+met_test_base = system("echo $MET_TEST_BASE", intern=T);
+if( "" == met_test_base ){
+   cat("ERROR: environment variable MET_TEST_BASE not set\n\n"); q(status=1);
+}
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #  Testing Scripts Information
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-strDirTest  = "/d1/pgoldenb/opt/MET_builds/svn-met-dev.cgd.ucar.edu/trunk/test";
+strDirTest  = met_test_base;
 strDirHdr   = paste(strDirTest, "/hdr", sep="");
 strDirTmp   = paste(strDirTest, "/tmp", sep="");
 
@@ -25,7 +37,7 @@ strModeConv   = paste(strDirTest, "/perl/mode_conv.pl", sep="");
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #  MET constants
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-strDirMetBase	= "/d1/pgoldenb/opt/MET_builds/svn-met-dev.cgd.ucar.edu/trunk/met";
+strDirMetBase	= met_base;
 strSaExec		= paste(strDirMetBase, "/bin/stat_analysis", sep="");
 
 
