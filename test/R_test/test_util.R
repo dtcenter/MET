@@ -457,6 +457,9 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 		strTmp2 = paste(strDirTmp, "/", "tmp_mode2_", as.numeric(Sys.time()), ".stat", sep="");
 		system( paste(strModeConv, stat2, ">", strTmp2) );
 		stat2 = strTmp2;
+		rmStat = TRUE;
+	} else {
+		rmStat = FALSE;
 	}
 	
 	# compare the line types present in the two files
@@ -501,11 +504,17 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 			listTest[[strLty]] = NA;
 		}
 	}
-	
+
 	listTest$tot_hist	= listTotHist;
 	listTest$tot_comp	= intTotComp;
 	listTest$tot_diff	= intTotDiff;
 	
+	# remove the temporary mode files, if required
+	if( TRUE == rmStat ){
+		rmFile(stat1);
+		rmFile(stat2);
+	}
+
 	return( listTest );
 }
 
