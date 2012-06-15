@@ -210,7 +210,7 @@ att.put.ncdf(nc, var_pcp, "accum_time_sec", acc_sec)
 cur_time = Sys.time()
 att.put.ncdf(nc, 0, "FileOrigins", paste("File", nc_file, "generated", format(Sys.time(), "%Y%m%d_%H%M%S"),
                                          "on host", Sys.info()[4], "by the Rscript trmm2nc.R"))
-att.put.ncdf(nc, 0, "MET_version", "V3.0.1")
+att.put.ncdf(nc, 0, "MET_version", "V4.0")
 att.put.ncdf(nc, 0, "Projection", "LatLon", prec="text")
 att.put.ncdf(nc, 0, "lat_ll", paste(min(lat), "degrees_north"), prec="text")
 att.put.ncdf(nc, 0, "lon_ll", paste(min(lon), "degrees_east"), prec="text")
