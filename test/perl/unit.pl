@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use lib "/home/pgoldenb/src/plMetUtil/lib";
+use lib "$ENV{'MET_TEST_BASE'}/lib";
 
 use strict;
 use warnings;
