@@ -115,10 +115,6 @@ model = "WRF";
 //     pairs that meet this wind speed criteria will be included in the sums.
 //     Setting this threshold to NA will result in all U/V pairs being used.
 //
-//   - The "message_type" entry is an array of point observation message types
-//     to be used.  This may be specified once at the top-level "fcst"
-//     dictionary or separately for each "field" array element.
-//
 // File-format specific settings for the "field" entry:
 //
 //    - GRIB1 and GRIB2:
@@ -168,6 +164,11 @@ fcst = {
 // observation files of different format types, this entry will need to be set
 // in a non-trivial way.  The length of the "obs.field" array must match the
 // length of the "fcst.field" array.
+//
+//   - The "message_type" entry is an array of point observation message types
+//     to be used.  This may be specified once at the top-level "obs"
+//     dictionary or separately for each "field" array element.  In the example
+//     shown here, this is specified in the "fcst" dictionary and copied to "obs".
 //
 obs = fcst;
 
