@@ -406,7 +406,7 @@ void Interpolator::set_ngood_needed(int n)
 
 {
 
-if ( (n < 0) || (n >= (Width*Width)) )  {
+if ( (n < 0) || (n > (Width*Width)) )  {
 
    mlog << Error << "\nInterpolator::set_ngood_needed(int) -> bad value ... " << n << "\n\n";
 
