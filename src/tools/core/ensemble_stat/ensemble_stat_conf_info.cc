@@ -296,7 +296,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
          // Conf: msg_typ
-         msg_typ[i] = parse_conf_message_type(&i_fcst_dict);
+         msg_typ[i] = parse_conf_message_type(&i_obs_dict);
 
          // Set the current dictionaries
          vx_pd[i].fcst_info->set_dict(i_fcst_dict);
