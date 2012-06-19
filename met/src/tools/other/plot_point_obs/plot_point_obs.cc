@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
    if (data_plane_filename.length() > 0)
    {
      
-      mlog << Debug(1) << "Retrieving grid from file: "
+      mlog << Debug(2) << "Retrieving grid from file: "
            << data_plane_filename << "\n";
      
       //
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
       grid = met_ptr->grid();
 
    } else {
-      mlog << Debug(1) << "Using default global grid.\n";
+      mlog << Debug(2) << "Using default global grid.\n";
    }
 
    //
@@ -271,17 +271,17 @@ int main(int argc, char *argv[]) {
    hdr_arr = new float[hdr_arr_dim->size()];
    obs_arr = new float[obs_arr_dim->size()];
 
-   mlog << Debug(1) << "Processing " << nobs_dim->size() << " observations at "
+   mlog << Debug(2) << "Processing " << nobs_dim->size() << " observations at "
         << nhdr_dim->size() << " locations.\n";
 
-   mlog << Debug(1) << "Observation GRIB codes: ";
+   mlog << Debug(2) << "Observation GRIB codes: ";
    if(ivar.n_elements() == 0) mlog << "ALL\n";
    else {
       for(i=0; i<ivar.n_elements(); i++) mlog << ivar[i] << " ";
       mlog << "\n";
    }
 
-   mlog << Debug(1) << "Observation message types: ";
+   mlog << Debug(2) << "Observation message types: ";
    if(ityp.n_elements() == 0) mlog << "ALL\n";
    else {
       for(i=0; i<ityp.n_elements(); i++) mlog << ityp[i] << " ";
