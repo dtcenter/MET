@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!-- Depends on unit_pcp_combine.xml -->
+
+  <test name="plot_data_plane_GRIB1">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_APCP_12.ps \
+      'name = "APCP"; level = "A12";' \
+      -title "GRIB1 NAM 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_APCP_12.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB2_TMP_P500.ps \
+      'name = "TMP"; level = "P500";' \
+      -title "GRIB2 NAM Temperature at 500mb" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB2_TMP_P500.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NC_PINTERP">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
+      &OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12:00:00_PLEV_NC_PINTERP_PRES_SFC.ps \
+      'name = "PSFC"; level = "(0,*,*)";' \
+      -title "NC PINTERP Pressure at the Surface" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12:00:00_PLEV_NC_PINTERP_PRES_SFC.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NC_MET">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP12.nc \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F018_APCP12_NC_MET.ps \
+      'name = "APCP_12"; level = "(*,*)";' \
+      -title "NC MET 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F018_APCP12_NC_MET.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_PROB">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F012.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps \
+      'name = "PROB"; level = "A12"; prob = { name = "APCP"; thresh_lo = 2.54; };' \
+      -title "GRIB2 Probability of 12-hour APCP > 2.54mm)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps</ps>
+    </output>
+  </test>
+
+</met_test>
