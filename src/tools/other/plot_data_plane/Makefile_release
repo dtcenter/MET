@@ -64,7 +64,7 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	@ echo
 	$(CXX) plot_data_plane.cc -o plot_data_plane \
-	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" $(ARCH_FLAGS) \
+	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GRIB2C_LIBS) \
 	-lvx_data2d_factory \

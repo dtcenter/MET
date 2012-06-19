@@ -140,7 +140,7 @@ asciitablejust_to_string.o: asciitablejust_to_string.cc
 	$(CXX) asciitablejust_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 check_endian.o: check_endian.cc
-	$(CXX) check_endian.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) check_endian.cc $(CXX_FLAGS) -c
 
 comma_string.o: comma_string.cc
 	$(CXX) comma_string.cc $(CXX_FLAGS) -c
@@ -206,22 +206,22 @@ threshold.o: threshold.cc
 	$(CXX) threshold.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 fix_float.o: fix_float.cc fix_float.h
-	$(CXX) fix_float.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) fix_float.cc $(CXX_FLAGS) -c
 
 command_line.o: command_line.cc command_line.h
-	$(CXX) command_line.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) command_line.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 file_exists.o: file_exists.cc file_exists.h
-	$(CXX) file_exists.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) file_exists.cc $(CXX_FLAGS) -c
 
 file_linecount.o: file_linecount.cc file_linecount.h
-	$(CXX) file_linecount.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) file_linecount.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 filename_suffix.o: filename_suffix.cc filename_suffix.h
-	$(CXX) filename_suffix.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) filename_suffix.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 two_to_one.o: two_to_one.cc two_to_one.h
-	$(CXX) two_to_one.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) two_to_one.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 ########################################################################
 
@@ -249,14 +249,14 @@ libvx_util.a: $(OBJECTS)
 
 test_command_line: test_command_line.cc $(LIBRARIES)
 	@ echo
-	$(CXX) test_command_line.cc -o test_command_line $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	$(CXX) test_command_line.cc -o test_command_line $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_util \
 	-lvx_log
 
 
 test_data_plane: test_data_plane.cc $(LIBRARIES)
 	@ echo
-	$(CXX) test_data_plane.cc -o test_data_plane $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	$(CXX) test_data_plane.cc -o test_data_plane $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_log

@@ -59,7 +59,7 @@ indent.o: indent.cc
 	$(CXX) indent.cc $(CXX_FLAGS) -c
 
 logger.o: logger.cc logger.h
-	$(CXX) logger.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) logger.cc $(CXX_FLAGS) -c
 
 string_array.o: string_array.cc
 	$(CXX) string_array.cc $(CXX_FLAGS) -c

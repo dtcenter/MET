@@ -63,13 +63,13 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 map_region.o: map_region.cc
-	$(CXX) map_region.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) map_region.cc $(CXX_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 vx_plot_util.o: vx_plot_util.cc map_region.o
-	$(CXX) vx_plot_util.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) vx_plot_util.cc $(CXX_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 data_plane_plot.o: data_plane_plot.cc vx_plot_util.o map_region.o
-	$(CXX) data_plane_plot.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) data_plane_plot.cc $(CXX_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 
 ########################################################################
@@ -97,7 +97,7 @@ libvx_plot_util.a: $(OBJECTS)
    ##
 
 test_map_region: test_map_region.cc $(LIBRARIES)
-	$(CXX) test_map_region.cc $(CXX_FLAGS) $(ARCH_FLAGS) -o test_map_region -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	$(CXX) test_map_region.cc $(CXX_FLAGS) -o test_map_region -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_plot_util \
 	-lvx_util \
 	-lvx_log \

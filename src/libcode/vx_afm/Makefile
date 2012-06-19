@@ -72,22 +72,22 @@ gen_sources: $(GEN_SOURCES)
 
 
 afm.o: afm.cc
-	$(CXX) afm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 afm_keywords.o: afm_keywords.cc
-	$(CXX) afm_keywords.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afm_keywords.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 afm_line.o: afm_line.cc
-	$(CXX) afm_line.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afm_line.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 afm_token.o: afm_token.cc
-	$(CXX) afm_token.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afm_token.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 afmkeyword_to_string.o: afmkeyword_to_string.cc
-	$(CXX) afmkeyword_to_string.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afmkeyword_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 afmtokentype_to_string.o: afmtokentype_to_string.cc
-	$(CXX) afmtokentype_to_string.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) afmtokentype_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

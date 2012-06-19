@@ -77,7 +77,7 @@ readpb.o: ../other/pb2nc/readpb.f
 
 chk4copyright: chk4copyright.cc $(LIBRARIES)
 	@ echo
-	$(CXX) chk4copyright.cc -o chk4copyright $(CXX_FLAGS) $(ARCH_FLAGS) \
+	$(CXX) chk4copyright.cc -o chk4copyright $(CXX_FLAGS) \
 	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_util \
 	-lvx_log
@@ -86,7 +86,7 @@ chk4copyright: chk4copyright.cc $(LIBRARIES)
 
 reformat_map_data: reformat_map_data.cc $(LIBRARIES)
 	@ echo
-	$(CXX) reformat_map_data.cc -o reformat_map_data $(CXX_FLAGS) $(ARCH_FLAGS) \
+	$(CXX) reformat_map_data.cc -o reformat_map_data $(CXX_FLAGS) \
 	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_util \
 	-lvx_log
@@ -95,7 +95,7 @@ reformat_map_data: reformat_map_data.cc $(LIBRARIES)
 
 reformat_county_data: reformat_county_data.cc $(LIBRARIES)
 	@ echo
-	$(CXX) reformat_county_data.cc -o reformat_county_data $(CXX_FLAGS) $(ARCH_FLAGS) \
+	$(CXX) reformat_county_data.cc -o reformat_county_data $(CXX_FLAGS) \
 	-I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_util \
 	-lvx_log

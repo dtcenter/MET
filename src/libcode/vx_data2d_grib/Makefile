@@ -72,7 +72,7 @@ gen_sources: $(GEN_SOURCES)
 
 
 grib_classes.o: grib_classes.cc
-	$(CXX) grib_classes.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) grib_classes.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 grib_strings.o: grib_strings.cc
 	$(CXX) grib_strings.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)

@@ -61,7 +61,7 @@ gen_sources: $(GEN_SOURCES)
 
 
 gnomon.o: gnomon.cc
-	$(CXX) gnomon.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) gnomon.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

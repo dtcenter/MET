@@ -8,7 +8,6 @@
 ###############################################################################
 
 export MAKE
-export ARCH_FLAGS
 
 export CXX
 export CXX_FLAGS

@@ -72,22 +72,22 @@ gen_sources: $(GEN_SOURCES)
 
 
 pbm.o: pbm.cc
-	$(CXX) pbm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) pbm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 pcm.o: pcm.cc
-	$(CXX) pcm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) pcm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 pgm.o: pgm.cc
-	$(CXX) pgm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) pgm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 ppm.o: ppm.cc
-	$(CXX) ppm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) ppm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 pxm_base.o: pxm_base.cc
-	$(CXX) pxm_base.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) pxm_base.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 pxm_utils.o: pxm_utils.cc
-	$(CXX) pxm_utils.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) pxm_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

@@ -98,7 +98,7 @@ interest.o: interest.h interest.cc shapedata.o
 	$(CXX) interest.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 engine.o: engine.h engine.cc
-	$(CXX) engine.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) engine.cc $(CXX_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 
 ########################################################################

@@ -69,19 +69,19 @@ gen_sources: $(GEN_SOURCES)
 
 
 cfile.tab.o: cfile.tab.cc
-	$(CXX) cfile.tab.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
+	$(CXX) cfile.tab.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
 
 lex.color.o: lex.color.cc
-	$(CXX) lex.color.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
+	$(CXX) lex.color.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
 
 color.o: color.cc
-	$(CXX) color.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) color.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 color_list.o: color_list.cc
-	$(CXX) color_list.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) color_list.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 color_table.o: color_table.cc
-	$(CXX) color_table.cc $(CXX_FLAGS) $(ARCH_FLAGS)  -c -I$(MET_INC_DIR)
+	$(CXX) color_table.cc $(CXX_FLAGS)  -c -I$(MET_INC_DIR)
 
 
 ########################################################################

@@ -69,19 +69,19 @@ gen_sources: $(GEN_SOURCES)
 
 
 nc_var_info.o: nc_var_info.cc
-	$(CXX) nc_var_info.cc $(ARCH_FLAGS) $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) nc_var_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 nc_utils.o: nc_utils.cc
-	$(CXX) nc_utils.cc $(ARCH_FLAGS) $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) nc_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 grid_output.o: grid_output.h grid_output.cc
-	$(CXX) grid_output.cc $(ARCH_FLAGS) $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) grid_output.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 write_netcdf.o: write_netcdf.h write_netcdf.cc grid_output.o
-	$(CXX) write_netcdf.cc $(ARCH_FLAGS) $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) write_netcdf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################
