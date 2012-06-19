@@ -80,40 +80,40 @@ gen_sources: $(GEN_SOURCES)
 
 
 ascii85_filter.o: ascii85_filter.cc
-	$(CXX) ascii85_filter.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) ascii85_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 bit_filter.o: bit_filter.cc
-	$(CXX) bit_filter.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) bit_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 hex_filter.o: hex_filter.cc
-	$(CXX) hex_filter.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) hex_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 ps_filter.o: ps_filter.cc
-	$(CXX) ps_filter.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) ps_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 psout_filter.o: psout_filter.cc
-	$(CXX) psout_filter.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) psout_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 render_pbm.o: render_pbm.cc
-	$(CXX) render_pbm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_pbm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 render_pcm.o: render_pcm.cc
-	$(CXX) render_pcm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_pcm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 render_pgm.o: render_pgm.cc
-	$(CXX) render_pgm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_pgm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 render_ppm.o: render_ppm.cc
-	$(CXX) render_ppm.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_ppm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 renderinfo.o: renderinfo.cc
-	$(CXX) renderinfo.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) renderinfo.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 rle_filter.o: rle_filter.cc
-	$(CXX) rle_filter.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) rle_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 uc_queue.o: uc_queue.cc
-	$(CXX) uc_queue.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) uc_queue.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

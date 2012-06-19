@@ -75,7 +75,7 @@ indent.o: indent.cc
 	$(CXX) indent.cc $(CXX_FLAGS) -c
 
 logger.o: logger.cc logger.h
-	$(CXX) logger.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) logger.cc $(CXX_FLAGS) -c
 
 string_array.o: string_array.cc
 	$(CXX) string_array.cc $(CXX_FLAGS) -c
@@ -108,7 +108,7 @@ libvx_log.a: $(OBJECTS)
 
 test_logger: test_logger.cc $(LIBRARIES)
 	@ echo
-	$(CXX) test_logger.cc -o test_logger $(CXX_FLAGS) $(ARCH_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	$(CXX) test_logger.cc -o test_logger $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_log
 
 

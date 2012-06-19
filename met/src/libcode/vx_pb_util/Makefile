@@ -68,16 +68,16 @@ gen_sources: $(GEN_SOURCES)
 
 
 pblock.o: pblock.cc
-	$(CXX) pblock.cc $(ARCH_FLAGS) $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) pblock.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 do_blocking.o: do_blocking.cc
-	$(CXX) do_blocking.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) do_blocking.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 do_unblocking.o: do_unblocking.cc
-	$(CXX) do_unblocking.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) do_unblocking.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 copy_bytes.o: copy_bytes.cc
-	$(CXX) copy_bytes.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) copy_bytes.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

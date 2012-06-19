@@ -92,14 +92,14 @@ is_bufr_file.o: is_bufr_file.h is_bufr_file.cc
 	$(CXX) is_bufr_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 var_info_factory.o: var_info_factory.cc
-	$(CXX) var_info_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c \
+	$(CXX) var_info_factory.cc $(CXX_FLAGS) -c \
 		-I$(MET_INC_DIR) $(GRIB2C_INCS) $(GRIB2C_LIBS) $(G2SUP_LIBS)
 
 data2d_factory_utils.o: data2d_factory_utils.h data2d_factory_utils.cc
 	$(CXX) data2d_factory_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 data2d_factory.o: data2d_factory.cc
-	$(CXX) data2d_factory.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c \
+	$(CXX) data2d_factory.cc $(CXX_FLAGS) -c \
 		-I$(MET_INC_DIR) $(NETCDF_INCS) $(GRIB2C_INCS) $(GRIB2C_LIBS) $(G2SUP_LIBS)
 
 

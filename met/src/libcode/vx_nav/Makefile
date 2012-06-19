@@ -61,7 +61,7 @@ gen_sources: $(GEN_SOURCES)
 
 
 nav.o: nav.cc
-	$(CXX) nav.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) nav.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################

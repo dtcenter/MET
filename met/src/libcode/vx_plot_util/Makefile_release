@@ -48,13 +48,13 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
 
 map_region.o: map_region.cc
-	$(CXX) map_region.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) map_region.cc $(CXX_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 vx_plot_util.o: vx_plot_util.cc map_region.o
-	$(CXX) vx_plot_util.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) vx_plot_util.cc $(CXX_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 data_plane_plot.o: data_plane_plot.cc vx_plot_util.o map_region.o
-	$(CXX) data_plane_plot.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) data_plane_plot.cc $(CXX_FLAGS) -c -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
 
 
 ########################################################################

@@ -114,7 +114,7 @@ asciitablejust_to_string.o: asciitablejust_to_string.cc
 	$(CXX) asciitablejust_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 check_endian.o: check_endian.cc
-	$(CXX) check_endian.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) check_endian.cc $(CXX_FLAGS) -c
 
 comma_string.o: comma_string.cc
 	$(CXX) comma_string.cc $(CXX_FLAGS) -c
@@ -180,22 +180,22 @@ threshold.o: threshold.cc
 	$(CXX) threshold.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 fix_float.o: fix_float.cc fix_float.h
-	$(CXX) fix_float.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) fix_float.cc $(CXX_FLAGS) -c
 
 command_line.o: command_line.cc command_line.h
-	$(CXX) command_line.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) command_line.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 file_exists.o: file_exists.cc file_exists.h
-	$(CXX) file_exists.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c
+	$(CXX) file_exists.cc $(CXX_FLAGS) -c
 
 filename_suffix.o: filename_suffix.cc filename_suffix.h
-	$(CXX) filename_suffix.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) filename_suffix.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 two_to_one.o: two_to_one.cc two_to_one.h
-	$(CXX) two_to_one.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) two_to_one.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 file_linecount.o: file_linecount.cc file_linecount.h
-	$(CXX) file_linecount.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) file_linecount.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 ########################################################################
 
