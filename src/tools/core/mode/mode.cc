@@ -381,7 +381,7 @@ void process_fcst_obs_files() {
    // Print a warning if the valid times do not match
    if(fcst_sd.data.valid() != obs_sd.data.valid()) {
 
-      mlog << Warning << "\nnprocess_fcst_obs_files() -> "
+      mlog << Warning << "\nprocess_fcst_obs_files() -> "
            << "Forecast and observation valid times do not match "
            << unix_to_yyyymmdd_hhmmss(fcst_sd.data.valid()) << " != "
            << unix_to_yyyymmdd_hhmmss(obs_sd.data.valid()) << " for "
