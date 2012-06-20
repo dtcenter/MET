@@ -569,6 +569,14 @@ void process_fcst_climo_files() {
          n_climo = 0;
       }
 
+      // For probability fields, check to see if they need to be
+      // rescaled from [0, 100] to [0, 1]
+      if(conf_info.vx_pd[i].fcst_info->p_flag()) {
+         for(j=0; j<fcst_dpa.n_planes(); j++) {
+            rescale_probability(fcst_dpa[j]);
+         }
+      } // end for j
+
       // Store information for the raw forecast fields
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
 
@@ -594,14 +602,6 @@ void process_fcst_climo_files() {
       conf_info.vx_pd[i].set_fcst_ut(fcst_valid_ut);
       conf_info.vx_pd[i].set_beg_ut(beg_ut);
       conf_info.vx_pd[i].set_end_ut(end_ut);
-
-      // For probability fields, check to see if they need to be
-      // rescaled from [0, 100] to [0, 1]
-      if(conf_info.vx_pd[i].fcst_info->p_flag()) {
-         for(j=0; j<fcst_dpa.n_planes(); j++) {
-            rescale_probability(fcst_dpa[j]);
-         }
-      } // end for j
 
       // Dump out the number of levels found
       mlog << Debug(2)
