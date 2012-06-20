@@ -19,14 +19,23 @@ model = "WRF";
 fcst = {
    wind_thresh = [ NA ];
    field = [
-      { name = "APCP";  level = [ "A12" ]; cat_thresh = [ >1.000, >2.000, >5.000 ]; }
+      {
+         name = "APCP";
+         level = [ "A12" ];
+         cat_thresh = [ >1.000, >2.000, >5.000 ];
+      }
    ];
 
 };
+
 obs = {
    wind_thresh = [ NA ];
    field = [
-      { name = "APCP_12";  level = [ "(*,*)" ]; cat_thresh = [ >1.000, >2.000, >5.000 ]; }
+      {
+         name = "APCP_12";
+         level = [ "(*,*)" ];
+         cat_thresh = [ >1.000, >2.000, >5.000 ];
+      }
    ];
 
 };
