@@ -1241,7 +1241,7 @@ void Engine::do_fcst_merge_engine(const char *default_config,
    if(default_config && merge_config) {
       fcst_engine->conf_info.read_config(default_config, merge_config);
       fcst_engine->conf_info.process_config(conf_info.fcst_info->file_type(),
-                                            conf_info.fcst_info->file_type());
+                                            conf_info.obs_info->file_type());
       path = replace_path(fcst_engine->conf_info.object_pi.color_table);
       fcst_engine->ctable.read(path);
    }
@@ -1410,7 +1410,7 @@ void Engine::do_obs_merge_engine(const char *default_config,
    obs_engine->ctable = ctable;
    if(default_config && merge_config) {
       obs_engine->conf_info.read_config(default_config, merge_config);
-      obs_engine->conf_info.process_config(conf_info.obs_info->file_type(),
+      obs_engine->conf_info.process_config(conf_info.fcst_info->file_type(),
                                            conf_info.obs_info->file_type());
       path = replace_path(obs_engine->conf_info.object_pi.color_table);
       obs_engine->ctable.read(path);
