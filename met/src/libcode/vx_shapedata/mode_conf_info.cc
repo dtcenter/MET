@@ -196,8 +196,8 @@ void ModeConfInfo::process_config(GrdFileType ftype,
    obs_raw_thresh  = obs_dict->lookup_thresh(conf_key_raw_thresh);
 
    // Conf: fcst.conv_radius and obs.conv_radius
-   fcst_conv_radius = fcst_dict->lookup_int(conf_key_conv_radius);
-   obs_conv_radius  = obs_dict->lookup_int(conf_key_conv_radius);
+   fcst_conv_radius = nint(fcst_dict->lookup_double(conf_key_conv_radius));
+   obs_conv_radius  = nint(obs_dict->lookup_double(conf_key_conv_radius));
 
    // Check that fcst_conv_radius and obs_conv_radius are non-negative
    if(fcst_conv_radius < 0 || obs_conv_radius < 0) {
