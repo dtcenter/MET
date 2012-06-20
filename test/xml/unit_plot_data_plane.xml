@@ -80,6 +80,8 @@
       &OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps \
       'name = "PROB"; level = "A12"; prob = { name = "APCP"; thresh_lo = 2.54; };' \
       -title "GRIB2 Probability of 12-hour APCP > 2.54mm)" \
+      -color_table &MET_DIR;/data/colortables/NCL_colortables/WhBlGrYeRe.ctable \
+      -plot_range 0 100 \
       -v 1
     </param>
     <output>
