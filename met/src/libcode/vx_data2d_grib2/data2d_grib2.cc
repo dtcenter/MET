@@ -589,7 +589,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  depending on the template number, determine the reference times
-         if( 8 == gfld->ipdtnum || 12 == gfld->ipdtnum ){
+         if( 8  == gfld->ipdtnum || 9  == gfld->ipdtnum || 12 == gfld->ipdtnum ){
 
             if( -1 != rec->ValidTime ){
                mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - accum valid time "
@@ -598,12 +598,23 @@ void MetGrib2DataFile::read_grib2_record_list() {
                exit(1);
             }
 
-            if( 8 == gfld->ipdtnum ){
-               rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[16], gfld->ipdtmpl[17], gfld->ipdtmpl[15],
-                                               gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[20]);
-            } else if( 12 == gfld->ipdtnum ){
-               rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[17],
-                                               gfld->ipdtmpl[20], gfld->ipdtmpl[21], gfld->ipdtmpl[22]);
+            switch(gfld->ipdtnum){
+               case 8:
+                  rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[16], gfld->ipdtmpl[17], gfld->ipdtmpl[15],
+                                                  gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[20]);
+                  break;
+               case 9:
+                  rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[23], gfld->ipdtmpl[24], gfld->ipdtmpl[22],
+                                                  gfld->ipdtmpl[25], gfld->ipdtmpl[26], gfld->ipdtmpl[27]);
+                  break;
+               case 10:
+                  rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[17], gfld->ipdtmpl[18], gfld->ipdtmpl[16],
+                                                  gfld->ipdtmpl[19], gfld->ipdtmpl[20], gfld->ipdtmpl[21]);
+                  break;
+               case 12:
+                  rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[17],
+                                                  gfld->ipdtmpl[20], gfld->ipdtmpl[21], gfld->ipdtmpl[22]);
+                  break;
             }
             rec->LeadTime = rec->ValidTime - rec->InitTime;
 
