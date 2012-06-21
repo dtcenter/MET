@@ -41,6 +41,9 @@ my @tests = build_tests( @{ $tree->[1] } );
 my $name_wid = 12;
 $name_wid < length($_->{"name"}) and $name_wid = length($_->{"name"}) for @tests;
 
+# default return value
+my $ret_val = 0;
+
 # run each test
 for my $test (@tests){
 
@@ -99,11 +102,12 @@ for my $test (@tests){
 
   # on failure, print the problematic test and exit, if requested
   if( !($ret_ok && $out_ok) ){
+    $ret_val = 1;
     my @envs;
     push @envs, "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
     
     print "$_" for (@envs, @cmd_outs);
-    $exit_on_fail and exit 1;
+    $exit_on_fail and exit $ret_val;
     print "\n\n";
   }
 
@@ -112,6 +116,9 @@ for my $test (@tests){
 # close the log resource
 vx_log("\nunit complete at " . strftime("%Y-%m-%d %H:%M:%S", gmtime()) . "\n");
 vx_log_close();
+
+# return value
+exit $ret_val;
 
 
 #######################################################################
