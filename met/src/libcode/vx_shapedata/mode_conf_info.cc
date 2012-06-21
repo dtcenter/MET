@@ -266,6 +266,14 @@ void ModeConfInfo::process_config(GrdFileType ftype,
            << ") should be set > 0\n\n";
    }
 
+   // Conf: mask.grid
+   mask_grid_name = conf.lookup_string(conf_key_mask_grid);
+   mask_grid_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_grid_flag));
+
+   // Conf: mask.poly
+   mask_poly_name = conf.lookup_string(conf_key_mask_poly);
+   mask_poly_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_poly_flag));
+
    // Conf: weight
    dict = conf.lookup_dictionary(conf_key_weight);
 
