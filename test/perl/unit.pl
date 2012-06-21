@@ -103,7 +103,7 @@ for my $test (@tests){
     push @envs, "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
     
     print "$_" for (@envs, @cmd_outs);
-    $exit_on_fail and exit;
+    $exit_on_fail and exit 1;
     print "\n\n";
   }
 
