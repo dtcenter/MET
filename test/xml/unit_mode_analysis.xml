@@ -26,7 +26,7 @@
       -v 1
     </param>   
     <output>
-      <exists>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_simple.txt</exists>
+      <exist>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_simple.txt</exist>
     </output>
   </test>
 
@@ -39,7 +39,7 @@
       -v 1
     </param>
     <output>
-      <exists>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_cluster.txt</exists>
+      <exist>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_cluster.txt</exist>
     </output>
   </test>
 

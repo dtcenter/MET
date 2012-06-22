@@ -47,7 +47,7 @@
     <output>
       <stat>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A_cts.txt</stat>
       <stat>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <exists>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A_obj.nc</exists>
+      <exist>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A_obj.nc</exist>
       <ps>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A.ps</ps>
     </output>
   </test>
@@ -71,7 +71,7 @@
     <output>
       <stat>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_cts.txt</stat>
       <stat>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <exists>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.nc</exists>
+      <exist>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.nc</exist>
       <ps>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A.ps</ps>
     </output>
   </test>
@@ -95,7 +95,7 @@
     <output>
       <stat>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A_cts.txt</stat>
       <stat>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <exists>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A_obj.nc</exists>
+      <exist>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A_obj.nc</exist>
       <ps>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A.ps</ps>
     </output>
   </test>
