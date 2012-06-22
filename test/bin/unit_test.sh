@@ -34,6 +34,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_wavelet_stat.xml \
           unit_ensemble_stat.xml \
           unit_mode.xml \
+          unit_mode_analysis.xml \
           unit_plot_point_obs.xml \
           unit_plot_data_plane.xml \
           unit_wwmca_plot.xml \
