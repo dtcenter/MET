@@ -18,7 +18,7 @@
   <!--  depends on unit_mode.xml  -->
 
   <test name="mode_analysis_BYCASE_SIMPLE">
-    <exec>mkdir -p &OUTPUT_DIR;/mode_analysis; &MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_DIR;/bin/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt \
       -bycase -single -simple \
@@ -31,7 +31,7 @@
   </test>
 
   <test name="mode_analysis_BYCASE_CLUSTER">
-    <exec>mkdir -p &OUTPUT_DIR;/mode_analysis; &MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_DIR;/bin/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt \
       -bycase -single -cluster \
