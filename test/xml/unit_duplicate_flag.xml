@@ -29,7 +29,7 @@
     </param>   
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_NONE_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_NONE_120000L_20120409_120000V_mpr.txt_bad</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_NONE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -47,7 +47,7 @@
     </param>   
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_SINGLE_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_SINGLE_120000L_20120409_120000V_mpr.txt_bad</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_SINGLE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -65,7 +65,7 @@
     </param>   
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_UNIQUE_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_UNIQUE_120000L_20120409_120000V_mpr.txt_bad</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_UNIQUE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
