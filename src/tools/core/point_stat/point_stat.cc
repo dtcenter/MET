@@ -704,7 +704,7 @@ void process_obs_file(int i_nc) {
       || !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the record for observation "
-              << "number " << i_obs << "\n\n";
+              << "index " << i_obs << "\n\n";
          exit(1);
       }
 
@@ -725,10 +725,11 @@ void process_obs_file(int i_nc) {
             !is_eq(obs_arr[2], prev_obs_arr[2]) ||
             !is_eq(obs_arr[3], prev_obs_arr[3])) {
             mlog << Error << "\nprocess_obs_file() -> "
-                 << "when computing vector winds, each UGRD "
-                 << "observation must be followed by a VGRD "
-                 << "observation with the same header and at the "
-                 << "same level\n\n";
+                 << "for observation index " << i_obs
+                 << ", when computing VL1L2 and/or VAL1L2 vector winds "
+                 << "each UGRD observation must be followed by a VGRD "
+                 << "observation with the same header and at the same "
+                 << "level.\n\n";
             exit(1);
          }
       }
@@ -737,7 +738,8 @@ void process_obs_file(int i_nc) {
       if(!hdr_arr_var->set_cur((long) (obs_arr[0])) ||
          !hdr_arr_var->get(hdr_arr, 1, hdr_arr_len)) {
          mlog << Error << "\nprocess_obs_file() -> "
-              << "can't read the header array record for header "
+              << "for observation index " << i_obs
+              << ", can't read the header array record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
       }
@@ -746,7 +748,8 @@ void process_obs_file(int i_nc) {
       if(!hdr_typ_var->set_cur((long) (obs_arr[0])) ||
          !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
          mlog << Error << "\nprocess_obs_file() -> "
-              << "can't read the message type record for header "
+              << "for observation index " << i_obs
+              << ", can't read the message type record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
       }
@@ -755,7 +758,8 @@ void process_obs_file(int i_nc) {
       if(!hdr_sid_var->set_cur((long) (obs_arr[0])) ||
          !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
          mlog << Error << "\nprocess_obs_file() -> "
-              << "can't read the station ID record for header "
+              << "for observation index " << i_obs
+              << ", can't read the station ID record for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
       }
@@ -764,7 +768,8 @@ void process_obs_file(int i_nc) {
       if(!hdr_vld_var->set_cur((long) (obs_arr[0])) ||
          !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
          mlog << Error << "\nprocess_obs_file() -> "
-              << "can't read the valid time for header "
+              << "for observation index " << i_obs
+              << ", can't read the valid time for header "
               << "number " << obs_arr[0] << "\n\n";
          exit(1);
       }
