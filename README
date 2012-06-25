@@ -1,4 +1,4 @@
-Model Evaluation Tools METv3.1 (February 7, 2012)
+Model Evaluation Tools METv4.0 (June 25, 2012)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -113,6 +113,8 @@ Dependencies
       - http://www.unidata.ucar.edu/software/netcdf
    - GNU Scientific Library (GSL), developer's version
       - http://www.gnu.org/software/gsl
+   - NCEP's GRIB2 Library in C (g2clib), if wishing to compile GRIB2 support
+      - http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
    - The F2C (or G2C) library for interfacing between fortran and C code
       - Not needed for most compilers.
       - http://www.netlib.org/f2c
@@ -167,6 +169,10 @@ sub-directory, or the MET Online Tutorial:
      location of the F2C library.  Or leave empty for compilers which do not
      require it, such as GNU gfortran and PGI pgf77.
 
+   - If compiling support for GRIB2, set "WITH_GRIB2" to 1 and set
+     "GRIB2C_BASE", "GRIB2C_INCS", and "GRIB2C_LIBS" to point to the location
+     of the GRIB2C library.
+
    - Edit the "ENABLE_TOOL_NAME" settings if you would like to disable the
      compilation of any of the MET tools.
 
@@ -178,7 +184,8 @@ sub-directory, or the MET Online Tutorial:
 
 - When make is finished, type 'CNTRL-C' to quit the tail.
 
-- If sucessful, this will create 16 executables in the bin directory:
+- If all tools are enabled and the build is successful, the "bin" directory will
+  contain  16 executables:
    - ascii2nc
    - ensemble_stat
    - gen_poly_mask
@@ -217,6 +224,49 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 4.0 Release Notes:
+-------------------------
+
+- What's New:
+    - Users will notice two major upgrades for METv4.0:
+      support for GRIB2 and a restructuring of the MET configuration files.
+    
+- Major Upgrades:
+    - Added optional support for GRIB2.  This support depends on the external
+      NCEP GRIB2 C-library.  Support for GRIB2 is enabled by setting the
+      "WITH_GRIB2" flag in "user_defs.mk".
+    - Restructured the MET configuration files to make them more readable and
+      give the user finer control over the verification tasks to be performed.
+      See "data/config/README" for more detail on the changes.
+
+- Enhancements to Existing Tools:
+    - Distributed latest set of bug fixes for METv3.1.
+    - Enhanced Point-Stat and Ensemble-Stat to apply filtering logic when
+      encountering duplicate point observations at the same location.  See the
+      "duplicate_flag" section in "data/config/README" for more detail.
+    - Enhanced PCP-Combine to run on all supported gridded data file types,
+      rather than just GRIB1.  Added -config command line option to specify the
+      field to be processed.
+    - Enhanced STAT-Analysis and MODE-Analysis by adding support for the
+      -fcst_valid_hour and -obs_valid_hour filtering options.
+    - Enhanced STAT-Analysis to aggregate multiple NBRCNT lines together for the
+      "aggregate" job type.
+    - Enhanced handling of GRIB1 and GRIB2 table information by reading it from
+      data files at runtime rather than having it hard-coded in header files.
+    - For Point-Stat, Grid-Stat, Wavelet-Stat, Ensemble-Stat, and MODE, moved
+      support for the -fcst_valid, -fcst_lead, -obs_valid, and -obs_lead
+      filtering options from the command line to the configuration files.
+    - Updated the WWMCA tools to ensure that pixel age masking is optional.
+    - Fixed STAT-Analysis bug in the computation of the GO Index.
+    - Fixed Ensemble-Stat bug in the handling of missing data.
+    - Fixed library code bug when applying polyline masks to global datasets.
+
+- Enhancement to the Build Process:
+    - Defined unit tests for each of the MET tools and major library
+      functionality.  These tests are not distributed with the code but are
+      routinely run during development to ensure that new development does not
+      break existing functionality.
 
 Version 3.1 Release Notes:
 -------------------------
