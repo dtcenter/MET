@@ -51,4 +51,16 @@
     </output>
   </test>
 
+  <test name="ascii2nc_duplicates">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/dup_test.txt \
+      &OUTPUT_DIR;/ascii2nc/dup_test.nc \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/dup_test.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>

@@ -80,12 +80,12 @@ interp = {
 ////////////////////////////////////////////////////////////////////////////////
 
 output_flag = {
-   fho    = BOTH;
-   ctc    = BOTH;
-   cts    = BOTH;
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
+   cnt    = NONE;
    sl1l2  = NONE;
    sal1l2 = NONE;
    vl1l2  = NONE;

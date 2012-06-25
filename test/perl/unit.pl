@@ -10,18 +10,36 @@ use VxUtil;
 use XML::Parser;
 use Data::Dumper;
 use Time::HiRes qw( gettimeofday tv_interval );
+use Getopt::Long;
 
-# these variables will be set by the xml parsing function build_tests()
-my ($mgnc, $mpnc);
-my $exit_on_fail = 1;
+sub usage {
+  print "usage: $0 [-log {log_file}] [-cmd] [-noexit] {test_xml}
 
-# parse the input parameters
-my $test_xml = shift or die "usage: $0 {test_xml}\n";
+  where:
+        log: if present, write output from each test to the specified file
+        cmd: if present, print the test commands but do not run them, 
+               overrides -log
+     noexit: if present, the unit tester will continue executing subsequent
+               tests when a test fails
+   test_xml: file containing the unit test(s) to perform
 
-# start the logging mechanism
-my $log_file = "";
-vx_log_open($log_file, 1, 1, 0);
-vx_log("unit - running at " . strftime("%Y-%m-%d %H:%M:%S", gmtime()) . "\n");
+";
+}
+
+# parse the input options
+my ($mgnc, $mpnc, $file_log, $cmd_only, $noexit);
+GetOptions("log=s" => \$file_log, "cmd" => \$cmd_only, "noexit" => \$noexit)
+  or die "ERROR: parsing input options";
+
+# parse the input test xml file parameter
+my $test_xml = shift or usage() and exit;
+
+# if command  only mode is enabled, disable logging
+$cmd_only and $file_log = 0;
+
+# open the log file, if requested
+open(my $fh_log, ">", $file_log) or die "ERROR: unable to open log file $file_log\n"
+  if $file_log;
 
 # initialize parser object and parse the string
 my $parser = XML::Parser->new( Style => "Tree" );
@@ -48,7 +66,7 @@ my $ret_val = 0;
 for my $test (@tests){
 
   # print the test name
-  printf "TEST: %-*s - ", $name_wid, $test->{"name"};
+  $cmd_only or printf "TEST: %-*s - ", $name_wid, $test->{"name"};
 
   # prepare the output space
   my @outputs = ( @{$test->{"out_pnc"}}, @{$test->{"out_gnc"}}, @{$test->{"out_stat"}}, @{$test->{"out_ps"}}, @{$test->{"out_exist"}}, @{$test->{"out_not_exist"}} );
@@ -60,9 +78,18 @@ for my $test (@tests){
   # set the test environment variables
   $ENV{$_} = $test->{"env"}{$_} for keys %{ $test->{"env"} };
 
-  # build, run and time the test command
+  # build the text command
   my ($cmd, $ret_ok, $out_ok) = ($test->{"exec"} . $test->{"param"});
   $cmd =~ s/[ \n\t]+$//m;
+  
+  # if writing a command file, print the environment and command, then loop
+  if( $cmd_only ){
+    print "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
+    print "$cmd\n\n";
+    next;
+  }
+  
+  # run and time the test command
   my $t_start = [gettimeofday];
   my @cmd_outs = qx{$cmd 2>&1};
   my $t_elaps = tv_interval( $t_start );
@@ -77,7 +104,7 @@ for my $test (@tests){
     for my $output ( @{ $test->{"out_stat"} } ){
       -s $output or 
         push @cmd_outs, "ERROR: stat file missing \"$output\"\n" and $out_ok = 0 and next;
-      qx{cat $output 2>/dev/null | egrep -v '^VERSION' | wc -l} or
+      int(qx{cat $output 2>/dev/null | egrep -v '^VERSION' | wc -l}) or
         push @cmd_outs, "ERROR: stat data missing from file \"$output\"\n" and $out_ok = 0;
     }
     for my $output ( @{ $test->{"out_ps"} } ){
@@ -100,25 +127,26 @@ for my $test (@tests){
   # print the test result
   printf "%s - %7.3f sec\n", $ret_ok && $out_ok ? "pass" : "FAIL", sprintf("%7.3f", $t_elaps);
 
+  # build a list of environment variable exports for reporting
+  my @envs;
+  push @envs, "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
+
+  # if the log file is activated, print the test information
+  if( $file_log ){
+    print $fh_log "\n\n";
+    print $fh_log "$_" for (@envs, @cmd_outs);
+    print $fh_log "\n\n";
+  }
+
   # on failure, print the problematic test and exit, if requested
   if( !($ret_ok && $out_ok) ){
-    $ret_val = 1;
-    my @envs;
-    push @envs, "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
-    
     print "$_" for (@envs, @cmd_outs);
-    $exit_on_fail and exit $ret_val;
+    $noexit or exit 1;
     print "\n\n";
   }
 
 }
 
-# close the log resource
-vx_log("\nunit complete at " . strftime("%Y-%m-%d %H:%M:%S", gmtime()) . "\n");
-vx_log_close();
-
-# return value
-exit $ret_val;
 
 
 #######################################################################
@@ -145,7 +173,6 @@ sub build_tests {
 
     # examine the next element
     my $elm_test = shift;
-    $elm_test eq 'exit_on_fail' and $exit_on_fail = ${$_[0]}[2] =~ /true/i;
     $elm_test eq 'test_dir'
       and $mgnc = ${$_[0]}[2] . "/bin/mgnc.sh"
       and $mpnc = ${$_[0]}[2] . "/bin/mpnc.sh"; 
@@ -216,7 +243,7 @@ sub build_tests {
             }
             $pair_name or die "ERROR: env pair in test \"" . $test{"name"} . "\" " .
                               "missing name or value\n";            
-            $env{$pair_name} = $pair_value;
+            $env{$pair_name} = defined($pair_value) ? $pair_value : "";
           }
           $test{"env"} = \%env;
         }

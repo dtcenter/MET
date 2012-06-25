@@ -12,6 +12,8 @@
 
 <met_test>
 
+  <!--  Depends on unit_ascii2nc to generate dup_test.nc obs file -->
+
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>false</exit_on_fail>
   
@@ -23,7 +25,7 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &DATA_DIR_OBS;/ascii/dup_test.nc \
+      &OUTPUT_DIR;/ascii2nc/dup_test.nc \
       &CONFIG_DIR;/PointStatConfig_dup \
       -outdir &OUTPUT_DIR;/point_stat -v 3
     </param>   
@@ -41,7 +43,7 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &DATA_DIR_OBS;/ascii/dup_test.nc \
+      &OUTPUT_DIR;/ascii2nc/dup_test.nc \
       &CONFIG_DIR;/PointStatConfig_dup \
       -outdir &OUTPUT_DIR;/point_stat -v 3
     </param>   
@@ -59,7 +61,7 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &DATA_DIR_OBS;/ascii/dup_test.nc \
+      &OUTPUT_DIR;/ascii2nc/dup_test.nc \
       &CONFIG_DIR;/PointStatConfig_dup \
       -outdir &OUTPUT_DIR;/point_stat -v 3
     </param>   
