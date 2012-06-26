@@ -192,7 +192,6 @@
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_nbrctc.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_nbrcts.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_vl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_pairs.nc</grid_nc>
     </output>
@@ -240,7 +239,6 @@
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_nbrctc.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_nbrcts.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_vl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_24_240000L_20050808_000000V_pairs.nc</grid_nc>
     </output>
@@ -337,9 +335,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V_cts.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V_fho.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V_mpr.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V_val1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V_vl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_360000L_20070331_120000V.stat</stat>
     </output>
