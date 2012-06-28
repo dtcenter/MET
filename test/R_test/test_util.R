@@ -343,10 +343,24 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	}
 	boolTestHdr = ( (1 > length(listV1HdrExt)) & (1 > length(listV2HdrExt)) );
 	listHdr = listV1Hdr[listV1Hdr %in% listV2Hdr];
-
+	
 	# build the complete path and file names of the stat files and read them into data frames 
 	dfV1 = readStatData(stat1, strV1, lty);
 	dfV2 = readStatData(stat2, strV2, lty);
+
+	# compare the information in the first 20 header columns
+	for(intCol in 2:21){
+		listMatch = apply(data.frame(dfV1[,intCol], dfV2[,intCol]), 1, 
+				function(a){ a[1] == a[2] });
+		intNumDiff = sum( !listMatch[ !is.na(listMatch) ] );
+		if( 0 < intNumDiff ){
+			if( 1 <= verb ){
+				cat("WARNING: header information mismatch in column ", 
+						listHeaderCols[intCol], sep="");				
+			}
+			return (list("hdr" = FALSE));
+		}
+	}
 	
 	# check for a mis-match on number of rows, and report if any are found
 	listNrow = c(nrow(dfV1), nrow(dfV2));
@@ -691,3 +705,8 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	if( TRUE == boolRmTmp ){ rmFile(strNcFileD); }
 
 }
+
+
+listHeaderCols = c("VERSION", "MODEL", "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END", "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END", 
+                   "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV", "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS", "FCST_THRESH", 
+				   "OBS_THRESH", "COV_THRESH", "ALPHA", "LINE_TYPE");
