@@ -89,7 +89,7 @@ plot_point_obs: plot_point_obs.cc $(OBJECTS)
    	-lvx_util \
    	-lvx_math \
    	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
 
