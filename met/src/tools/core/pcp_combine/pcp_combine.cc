@@ -1213,7 +1213,7 @@ void usage()
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
         << "the default behavior.\n"
 
-        << "\t\tNote: For \"-add\" and \"-subtract\", the accumulation intervals"
+        << "\t\tNote: For \"-add\" and \"-subtract\", the accumulation intervals "
         << "may be substituted with config file strings.\n\n"
 
         << "\tSUM_ARGS:\n"
