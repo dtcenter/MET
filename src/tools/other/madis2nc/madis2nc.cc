@@ -21,6 +21,8 @@
 //   000    07-21-11  Halley Gotway  Adapted from contributed code.
 //   001    01-06-12  Holmes         Added use of command line class to
 //                                   parse the command line arguments.
+//   002    07-13-12  Oldenburg      Added support for profiler
+//                                   observation type
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -89,6 +91,7 @@ static void      convert_wind_wdir_to_u_v(float wind, float wdir,
 
 static void process_madis_metar(NcFile *&f_in);
 static void process_madis_raob(NcFile *&f_in);
+static void process_madis_profiler(NcFile *&f_in);
 
 static void usage();
 static void set_type(const StringArray &);
@@ -235,6 +238,9 @@ void process_madis_file(const char *madis_file) {
       case(madis_raob):
          process_madis_raob(f_in);
          break;
+      case (madis_profiler):
+         process_madis_profiler(f_in);
+         break;
 
       case(madis_coop):
       case(madis_HDW):
@@ -245,7 +251,6 @@ void process_madis_file(const char *madis_file) {
       case(madis_acarsProfiles):
       case(madis_maritime):
       case(madis_mesonet):
-      case(madis_profiler):
       case(madis_radiometer):
       case(madis_sao):
       case(madis_satrad):
@@ -1411,6 +1416,185 @@ void process_madis_raob(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_madis_profiler(NcFile *&f_in) {
+   int nhdr, nlvl, i_lvl, i_obs;
+   int n_rej_fill, n_rej_qc;
+   long i_hdr;
+   int hdr_sid_len;
+   double tmp_dbl;
+   char tmp_str[max_str_len];
+   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float pressure, pressure_fill_value;
+
+   //
+   // Input header variables:
+   // Note: hdr_typ is always set to ADPUPA
+   //
+   NcVar *in_hdr_sid_var = get_nc_var(f_in, "staName");
+   NcVar *in_hdr_vld_var = get_nc_var(f_in, "timeObs");
+   NcVar *in_hdr_lat_var = get_nc_var(f_in, "staLat");
+   NcVar *in_hdr_lon_var = get_nc_var(f_in, "staLon");
+   NcVar *in_hdr_elv_var = get_nc_var(f_in, "staElev");
+
+   //
+   // Variables for vertical level information
+   //
+   NcVar *in_pressure_var = get_nc_var(f_in, "pressure");
+
+   //
+   // Read the fill value for pressure
+   //
+   get_nc_var_att(in_pressure_var, "_FillValue", pressure_fill_value);
+
+   //
+   // Retrieve applicable dimensions
+   //
+   hdr_sid_len  = get_nc_dim(f_in, "staNamLen");
+   nhdr         = get_nc_dim(f_in, in_recNum_str);
+   if(rec_end == 0) rec_end = nhdr;
+
+   //
+   // Setup the output NetCDF file
+   //
+   setup_netcdf_out(nhdr);
+
+   mlog << Debug(2) << "Processing PROFILER recs\t= " << rec_end - rec_beg << "\n";
+
+   //
+   // Initialize variables for processing observations
+   //
+   conversion = 1.0;
+   i_obs = n_rej_fill = n_rej_qc = 0;
+
+   //
+   // Arrays of longs for indexing into NetCDF variables
+   //
+   long *cur = new long [3];
+   cur[0] = cur[1] = cur[2] = 0;
+   long *dim = new long [3];
+   dim[0] = dim[1] = dim[2] = 1;
+
+   //
+   // Loop through each record and get the header data.
+   //
+   for(i_hdr=rec_beg; i_hdr<rec_end; i_hdr++) {
+
+      //
+      // Mapping of NetCDF variable names from input to output:
+      // Output                    = Input
+      // hdr_typ                   = NA - always set to ADPUPA
+      // hdr_sid                   = staName (staNameLen = 50)
+      // hdr_vld (YYYYMMDD_HHMMSS) = synTime (unixtime) - synoptic time
+      // hdr_arr[0](Lat)           = staLat
+      // hdr_arr[1](Lon)           = staLon
+      // hdr_arr[2](Elv)           = staElev
+      //
+
+      mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+
+      //
+      // Use cur to index into the NetCDF variables.
+      //
+      cur[0] = i_hdr;
+      cur[1] = 0;
+
+      //
+      // Process the header type.
+      // For PROFILER, store as ADPUPA.
+      //
+      hdr_typ = "ADPUPA";
+      put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
+
+      //
+      // Process the station name.
+      //
+      get_nc_var_val(in_hdr_sid_var, cur, hdr_sid_len, hdr_sid);
+      put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
+
+      //
+      // Process the observation time.
+      //
+      get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
+      hdr_vld = tmp_str;
+      put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
+
+      //
+      // Process the latitude, longitude, and elevation.
+      //
+      get_nc_var_val(in_hdr_lat_var, cur, dim, hdr_arr[0]);
+      get_nc_var_val(in_hdr_lon_var, cur, dim, hdr_arr[1]);
+      get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
+
+      //
+      // Write the header array to the output file.
+      //
+      put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+
+      //
+      // Initialize the observation array: hdr_id
+      //
+      obs_arr[0] = (float) i_hdr;
+
+      //
+      // Get the pressure for the current level
+      //
+      get_nc_var_val(in_pressure_var, cur, dim, pressure);
+      if( is_eq(pressure, pressure_fill_value) ) pressure = bad_data_float;
+
+      //
+      // Loop through the mandatory levels
+      //
+      nlvl = get_nc_dim(f_in, "level");
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         mlog << Debug(3) << "  Level: " << i_lvl << "\n";
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+
+         //
+         // Set the pressure and height for this level
+         //
+         obs_arr[2] = pressure;
+         NcVar* var_levels = get_nc_var(f_in, "levels");
+         get_nc_var_val(var_levels, cur, dim, obs_arr[3]);
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         // Wind U
+         process_obs(f_in, "uComponent", cur, dim, 33, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+         // Wind V
+         process_obs(f_in, "vComponent", cur, dim, 34, conversion,
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      } // end for i_lvl
+
+   } // end for i_hdr
+
+   mlog << Debug(2) << "Rejected based on QC\t= " << n_rej_qc << "\n"
+        << "Rejected based on fill\t= " << n_rej_fill << "\n"
+        << "Retained or derived\t= " << i_obs << "\n";
+
+   //
+   // Cleanup
+   //
+   if(cur) { delete [] cur; cur = (long *) 0; }
+   if(dim) { delete [] dim; dim = (long *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void usage() {
 
    cout << "\nUsage: "
@@ -1469,6 +1653,9 @@ void set_type(const StringArray & a)
    }
    else if(strcasecmp(a[0], raob_str) == 0) {
       mtype = madis_raob;
+   }
+   else if(strcasecmp(a[0], profiler_str) == 0) {
+      mtype = madis_profiler;
    }
    else {
       mlog << Error << "\nprocess_command_line() -> "
