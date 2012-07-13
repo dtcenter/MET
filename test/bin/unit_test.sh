@@ -13,7 +13,7 @@ if [[ -z "${MET_BASE}"       ||
 else
   echo "export MET_BASE=${MET_BASE}"
   echo "export MET_TEST_BASE=${MET_TEST_BASE}"
-  echo "export MET_TEST_INPUT=${MET_TEST_OUTPUT}"
+  echo "export MET_TEST_INPUT=${MET_TEST_INPUT}"
   echo "export MET_TEST_OUTPUT=${MET_TEST_OUTPUT}"
 fi
 
