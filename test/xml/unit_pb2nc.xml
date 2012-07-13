@@ -44,12 +44,12 @@
     </env>
     <param> \
       &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr.nc \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &CONFIG_DIR;/PB2NCConfig \
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc</point_nc>
     </output>
   </test>
   

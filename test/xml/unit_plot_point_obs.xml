@@ -20,7 +20,7 @@
   <test name="plot_point_obs_G218">
     <exec>&MET_DIR;/bin/plot_point_obs</exec>
     <param> \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nr.nc \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &OUTPUT_DIR;/plot_point_obs/ndas.20120409.t12z.prepbufr.tm00.nr_G218.ps \
       -data_file &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
       -v 1
