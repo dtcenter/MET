@@ -73,8 +73,9 @@ static const int   obs_arr_len  = 5;  // Observation values length
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char *metar_str = "METAR";
-static const char *raob_str  = "RAOB";
+static const char *metar_str     = "METAR";
+static const char *raob_str      = "RAOB";
+static const char *profiler_str  = "PROFILER";
 
 ////////////////////////////////////////////////////////////////////////
 //
