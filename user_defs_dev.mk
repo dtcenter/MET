@@ -68,6 +68,14 @@ F2C_INCS     =
 F2C_LIBS     =
 F2C_LIBNAME  =
 
+# Top level directory for the GRIB2 C Library if it's not
+# installed in a standard location.
+# grib2c include directory specified as: -I/your/include/path
+# grib2c library directory specified as: -L/your/library/path
+GRIB2C_BASE  =
+GRIB2C_INCS  =
+GRIB2C_LIBS  =
+
 # Optional flags to disable the compilation of MET tools
 # Specify a non-zero value to enable the compilation of the tool
 ENABLE_ASCII2NC        = 1
