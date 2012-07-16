@@ -463,8 +463,7 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	if( ! fileExists(stat2) ){ cat("ERROR: stat file does not exist:", stat2, "\n"); return (NA); }	
 
 	# if the files are mode files, convert them to temporary stat files
-	if( TRUE == grepl("^.*/mode_[^/]+_obj.txt$", stat1, perl=T) |
-		  TRUE == grepl("^.*/mode_[^/]+_cts.txt$", stat1, perl=T) ){
+	if( TRUE == grepl("^.*[^a-z]mode[^a-z].*\\.txt$", stat1, perl=T) ){
 		strTmp1 = paste(strDirTmp, "/", "tmp_mode1_", as.numeric(Sys.time()), ".stat", sep="");
 		system( paste(strModeConv, stat1, ">", strTmp1) );
 		stat1 = strTmp1;
