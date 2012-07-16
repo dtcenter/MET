@@ -51,6 +51,7 @@ export ENABLE_POINT_STAT
 export ENABLE_STAT_ANALYSIS
 export ENABLE_WAVELET_STAT
 export ENABLE_WWMCA
+export ENABLE_TC_UTILS
 
 ###############################################################################
 
