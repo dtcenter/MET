@@ -18,6 +18,7 @@ static const char met_base_str[]         = "MET_BASE";
 static const char default_met_data_dir[] = "MET_BASE/data";
 static const char txt_file_ext[]         = ".txt";
 static const char stat_file_ext[]        = ".stat";
+static const char tc_stat_file_ext[]     = ".tcst";
 static const char full_domain_str[]      = "FULL";
 
 /*

@@ -14,6 +14,7 @@ all:
 	@ cd core       ; $(MAKE) $(PRINT_OPTS)
 	@ cd dev_utils  ; $(MAKE) $(PRINT_OPTS)
 	@ cd other      ; $(MAKE) $(PRINT_OPTS)
+	@ cd tc_utils   ; $(MAKE) $(PRINT_OPTS)
 
 
 ########################################################################
@@ -24,6 +25,7 @@ clean:
 	@ cd core       ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd dev_utils  ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd other      ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd tc_utils   ; $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
@@ -34,6 +36,7 @@ gen_sources:
 	@ cd core       ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd dev_utils  ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd other      ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd tc_utils   ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################

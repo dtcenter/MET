@@ -585,7 +585,8 @@ for(j=0; j<Nelements; j++) {
    count++;
 }
 
-mn  = s/count;
+if(count == 0) mn = bad_data_double; 
+else           mn = s/count;
 
 if(count > 1) {
 
@@ -743,6 +744,25 @@ for(j=0; j<Nelements; j++) {
 }
 
 return(max_v);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString NumArray::serialize() const
+
+{
+
+if(Nelements == 0) return("");
+
+ConcatString s = e[0];
+int j;
+
+for(j=1; j<Nelements; j++) s << " " << e[j];
+
+return(s);
 
 }
 

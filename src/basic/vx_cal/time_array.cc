@@ -26,6 +26,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static int compare_unixtime(const void *, const void *);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class TimeArray
    //
@@ -112,6 +118,8 @@ if ( e )  { delete [] e;  e = (unixtime *) 0; }
 
 Nelements = Nalloc = 0;
 
+Sorted = false;
+
 return;
 
 }
@@ -139,6 +147,8 @@ for (j=0; j<(a.Nelements); ++j)  {
 }
 
 Nelements = a.Nelements;
+
+Sorted = a.Sorted;
 
 
 return;
@@ -229,15 +239,27 @@ int TimeArray::has(unixtime u) const
 
 {
 
-int j;
-
-for (j=0; j<Nelements; ++j)  {
-
-   if ( e[j] == u )  return ( 1 );
+   return ( index ( u ) >= 0 );
 
 }
 
-return ( 0 );
+
+////////////////////////////////////////////////////////////////////////
+
+
+int TimeArray::index(unixtime u) const
+
+{
+
+int j, match = -1;
+
+for (j=0; j<Nelements; ++j)  {
+
+   if ( e[j] == u )  {  match = j;  break;  }
+
+}
+
+return ( match );
 
 }
 
@@ -252,6 +274,8 @@ void TimeArray::add(unixtime u)
 extend(Nelements + 1);
 
 e[Nelements++] = u;
+
+Sorted = false;
 
 return;
 
@@ -275,6 +299,7 @@ for (j=0; j<(a.Nelements); ++j)  {
 
 }
 
+Sorted = false;
 
 return;
 
@@ -297,6 +322,8 @@ if ( (n < 0) || (n >= Nelements) )  {
 }
 
 e[n] = u;
+
+Sorted = false;
 
 return;
 
@@ -337,6 +364,45 @@ for(j=0, u=e[0]; j<Nelements; j++) {
 }
 
 return(u);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void TimeArray::sort_array()
+
+{
+  
+if ( Nelements <= 1 )  return;
+
+qsort(e, Nelements, sizeof(unixtime), compare_unixtime);
+
+Sorted = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int compare_unixtime(const void *p1, const void *p2)
+
+{
+
+const unixtime *a = (const unixtime *) p1;
+const unixtime *b = (const unixtime *) p2;
+
+
+if ( (*a) < (*b) )  return ( -1 );
+
+if ( (*a) > (*b) )  return (  1 );
+
+
+return ( 0 );
 
 }
 

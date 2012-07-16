@@ -104,7 +104,8 @@ void MaskPoly::init_from_scratch()
 
 {
 
-Name = (char *) 0;
+Name     = (char *) 0;
+FileName = (char *) 0;
 
 Lat = (double *) 0;
 Lon = (double *) 0;
@@ -126,7 +127,8 @@ void MaskPoly::clear()
 
 {
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+if ( Name )      { delete [] Name;      Name     = (char *) 0; }
+if ( FileName )  { delete [] FileName;  FileName = (char *) 0; }
 
 if ( Lat )  { delete [] Lat;  Lat = (double *) 0; }
 
@@ -181,6 +183,18 @@ if ( m.Name )  {
 
 }
 
+if ( m.FileName )  {
+
+   int n = strlen(m.FileName);
+
+   FileName = new char [1 + n];
+
+   memset(FileName, 0, 1 + n);
+
+   strcpy(FileName, m.FileName);
+
+}
+
 return;
 
 }
@@ -203,8 +217,9 @@ Indent prefix(depth);
 Indent p2(depth + 1);
 
 
-out << prefix << "Name    = \"" << Name    << "\"\n";
-out << prefix << "Npoints = "   << Npoints << "\n";
+out << prefix << "Name     = \"" << Name     << "\"\n";
+out << prefix << "FileName = \"" << FileName << "\"\n";
+out << prefix << "Npoints  = "   << Npoints  << "\n";
 
 for (j=0; j<Npoints; ++j)  {
 
@@ -283,6 +298,14 @@ if ( !in )  {
    exit ( 1 );
 
 }
+
+   //
+   //  store file name
+   //
+
+FileName = new char [ strlen(filename) ];
+
+strcpy(FileName, filename);
 
    //
    //  get name
@@ -380,6 +403,22 @@ int status;
    //
 
 lon = -lon;
+
+status = latlon_is_inside_dege(lat, lon);
+
+return ( status != 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool MaskPoly::latlon_is_inside_dege(double lat, double lon) const
+
+{
+
+int status;
 
 status = is_inside(U, V, Npoints, lon, lat);
 

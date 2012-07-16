@@ -10,22 +10,18 @@
 
 
 all:
-	@ echo
-	@ cd core       ; $(MAKE) $(PRINT_OPTS)
-	@ cd other      ; $(MAKE) $(PRINT_OPTS)
-	@ cd tc_utils   ; $(MAKE) $(PRINT_OPTS)
+	cd tc_dland; $(MAKE) $(PRINT_OPTS)
+	cd tc_pairs; $(MAKE) $(PRINT_OPTS)
+	cd tc_stat;  $(MAKE) $(PRINT_OPTS)
 
 
 ########################################################################
 
 
 clean:
-	@ echo
-	@ cd core       ; $(MAKE) $(PRINT_OPTS) clean
-	@ cd other      ; $(MAKE) $(PRINT_OPTS) clean
-	@ cd tc_utils   ; $(MAKE) $(PRINT_OPTS) clean
+	cd tc_dland; $(MAKE) $(PRINT_OPTS) clean
+	cd tc_pairs; $(MAKE) $(PRINT_OPTS) clean
+	cd tc_stat;  $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
-
-

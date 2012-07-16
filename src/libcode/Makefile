@@ -34,6 +34,7 @@ endif
 	@ cd vx_statistics        ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_stat_out          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_analysis_util     ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_tc_util           ; $(MAKE) $(PRINT_OPTS)
 
 
 ########################################################################
@@ -64,6 +65,7 @@ endif
 	@ cd vx_statistics        ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_stat_out          ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_analysis_util     ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_tc_util           ; $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
@@ -94,6 +96,7 @@ endif
 	@ cd vx_statistics        ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_stat_out          ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_analysis_util     ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_tc_util           ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################

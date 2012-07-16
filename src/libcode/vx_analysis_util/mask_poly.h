@@ -38,6 +38,7 @@ class MaskPoly {
       void assign(const MaskPoly &);
 
       char * Name;
+      char * FileName;
 
       double * Lat;
       double * Lon;
@@ -66,9 +67,11 @@ class MaskPoly {
          //  get stuff
          //
 
-      const char * name()     const;
+      const char * name()      const;
 
-      int          n_points() const;
+      const char * file_name() const;
+
+      int          n_points()  const;
 
          //
          //  do stuff
@@ -76,7 +79,8 @@ class MaskPoly {
 
       void load(const char * filename);
 
-      bool latlon_is_inside (double lat, double lon) const;
+      bool latlon_is_inside      (double lat, double lon) const;
+      bool latlon_is_inside_dege (double lat, double lon) const;      
 
 };
 
@@ -84,8 +88,9 @@ class MaskPoly {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * MaskPoly::name()     const { return ( Name    ); }
-inline       int    MaskPoly::n_points() const { return ( Npoints ); }
+inline const char * MaskPoly::name()      const { return ( Name     ); }
+inline const char * MaskPoly::file_name() const { return ( FileName ); }
+inline       int    MaskPoly::n_points()  const { return ( Npoints  ); }
 
 
 ////////////////////////////////////////////////////////////////////////
