@@ -91,6 +91,7 @@ ENABLE_POINT_STAT      = 1
 ENABLE_STAT_ANALYSIS   = 1
 ENABLE_WAVELET_STAT    = 1
 ENABLE_WWMCA           = 1
+ENABLE_TC_UTILS        = 0
 
 # Flags to compile support for additional file formats
 WITH_GRIB2             = 0

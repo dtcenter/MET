@@ -14,7 +14,9 @@ all:
 	@ cd core       ; $(MAKE) $(PRINT_OPTS)
 	@ cd dev_utils  ; $(MAKE) $(PRINT_OPTS)
 	@ cd other      ; $(MAKE) $(PRINT_OPTS)
+ifeq ($(ENABLE_TC_UTILS), 1)
 	@ cd tc_utils   ; $(MAKE) $(PRINT_OPTS)
+endif
 
 
 ########################################################################
