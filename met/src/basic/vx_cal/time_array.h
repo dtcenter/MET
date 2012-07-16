@@ -46,6 +46,8 @@ class TimeArray {
 
       int Nalloc;
 
+      bool Sorted;      
+
    public:
 
       TimeArray();
@@ -58,10 +60,13 @@ class TimeArray {
       unixtime operator[](int) const;
 
       int  has(unixtime) const;
+      int  index(unixtime) const;
       void add(unixtime);
       void add(const TimeArray &);
 
       void set(int, unixtime);
+
+      void sort_array();
 
       unixtime min() const;
       unixtime max() const;

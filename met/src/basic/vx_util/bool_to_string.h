@@ -22,6 +22,7 @@
 
 
 inline const char * bool_to_string(bool _tf) { return ( _tf ? "true" : "false" ); }
+inline bool string_to_bool(const char *s) { return ( strcasecmp(s, "true") == 0 ? true : false ); }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -46,7 +46,8 @@ OBJECTS     =  ascii_table.o \
                data_plane_util.o \
                interp_mthd.o \
                interp_util.o \
-               two_to_one.o
+               two_to_one.o \
+               get_filenames.o
 
 
 LIBRARIES   =  libvx_util.a
@@ -92,8 +93,8 @@ HEADERS     =  util_constants.h \
                interp_util.h \
                bool_to_string.h \
                empty_string.h \
+               get_filenames.h \
                vx_util.h  \
-
 
 
 ########################################################################
@@ -222,6 +223,10 @@ filename_suffix.o: filename_suffix.cc filename_suffix.h
 
 two_to_one.o: two_to_one.cc two_to_one.h
 	$(CXX) two_to_one.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+
+get_filenames.o: get_filenames.cc get_filenames.h
+	$(CXX) get_filenames.cc $(CXX_FLAGS) $(ARCH_FLAGS) -c -I$(MET_INC_DIR)
+
 
 ########################################################################
 

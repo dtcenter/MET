@@ -20,6 +20,8 @@
 
 #include <iostream>
 
+#include "concat_string.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -83,6 +85,8 @@ class NumArray {
       double mode() const;
       double min() const;
       double max() const;
+
+      ConcatString serialize() const;
 
       int n_elements() const;
 

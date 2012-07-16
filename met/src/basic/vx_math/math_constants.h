@@ -54,6 +54,9 @@ static const double knots_per_mps         = 1.0/mps_per_knot;
 static const double km_per_nautical_mile  = (twopi*earth_radius_km)/(360.0*60.0);
 static const double nautical_miles_per_km = 1.0/km_per_nautical_mile;
 
+static const double tc_km_per_nautical_miles = 1.8520;
+static const double tc_nautical_miles_per_km = 1.0/tc_km_per_nautical_miles;
+
 static const double km_per_statute_mile   = 1.609344;
 static const double statute_miles_per_km  = 1.0/km_per_statute_mile;
 

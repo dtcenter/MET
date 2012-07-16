@@ -31,6 +31,7 @@
 #include "file_linecount.h"
 #include "filename_suffix.h"
 #include "fix_float.h"
+#include "get_filenames.h"
 #include "grib_constants.h"
 #include "int_array.h"
 #include "interp_mthd.h"
