@@ -685,7 +685,7 @@ sub vx_util_perm {
   my ($key) = keys %val_map;
   my @vals = @{ $val_map{$key} };
   delete $val_map{$key};
-  @perms = vx_perm( \%val_map );
+  @perms = vx_util_perm( \%val_map );
   
   # create an inner permutation copy for each key value
   my @perms_new;
