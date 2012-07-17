@@ -23,7 +23,7 @@ $VERSION     = 1.00;
 @EXPORT      = qw(vx_const_init vx_const_get vx_const_def
                   vx_log_open vx_log vx_log_set_email vx_log_close 
                   vx_file_status vx_file_mkdir vx_file_tmpl_gen 
-                  vx_util_unique vx_util_seq
+                  vx_util_unique vx_util_seq vx_util_perm
                   vx_gem_conv vx_gem_print_parm_map
                   vx_date_to_array vx_date_parse_date vx_date_parse_lead vx_date_format_lead 
                     vx_date_calc_add vx_date_calc_sub vx_date_calc_init vx_date_calc_valid
@@ -37,7 +37,7 @@ $VERSION     = 1.00;
 @EXPORT_OK   = qw(vx_const_init vx_const_get vx_const_def 
                   vx_log_open vx_log vx_log_set_email vx_log_close 
                   vx_file_status vx_file_mkdir vx_file_tmpl_gen 
-                  vx_util_unique vx_util_seq
+                  vx_util_unique vx_util_seq vx_util_perm
                   vx_gem_conv vx_gem_print_parm_map
                   vx_date_to_array vx_date_parse_date vx_date_parse_lead vx_date_format_lead
                     vx_date_calc_add vx_date_calc_sub vx_date_calc_init vx_date_calc_valid
@@ -52,7 +52,7 @@ $VERSION     = 1.00;
                qw(&vx_const_init &vx_const_get &vx_const_def 
                   &vx_log_open &vx_log &vx_log_set_email &vx_log_close 
                   &vx_file_status &vx_file_mkdir &vx_file_tmpl_gen 
-                  &vx_util_unique &vx_util_seq
+                  &vx_util_unique &vx_util_seq &vx_util_perm
                   &vx_gem_conv &vx_gem_print_parm_map
                   &vx_date_to_array &vx_date_parse_date &vx_date_parse_lead &vx_date_format_lead 
                     &vx_date_calc_add &vx_date_calc_sub &vx_date_calc_init &vx_date_calc_valid
@@ -655,6 +655,50 @@ sub vx_util_seq {
     do{ push(@ret, $beg); $beg += $inc; } while( $beg >= $end );
   }
   return @ret;
+}
+
+
+######################################################################
+# vx_util_perm()
+#
+#   This function assumes that the single input argument is a map ref
+#   in which keys are mapped to array references.  It builds an array
+#   of array refs, each of which contains a single permutation of the
+#   values of the input map.
+#
+#   Arguments:
+#      map = map whose lists of values will be permuted
+#
+#######################################################################
+sub vx_util_perm {
+
+  my (%val_map, @perms) = %{ $_[0] };
+  
+  # if the input val_map has only one key, build the start list and return
+  if( 1 == keys %val_map ){
+    my ($key) = keys %val_map;
+    push @perms, [$_] for @{ $val_map{$key} };
+    return @perms;
+  }
+  
+  # select a key over which to permute and build the inner permutation
+  my ($key) = keys %val_map;
+  my @vals = @{ $val_map{$key} };
+  delete $val_map{$key};
+  @perms = vx_perm( \%val_map );
+  
+  # create an inner permutation copy for each key value
+  my @perms_new;
+  for my $val (@vals) {
+    for (@perms){
+      my @copy = ( @{$_} );
+      unshift @copy, $val;
+      push @perms_new, \@copy;
+    }
+  }
+  
+  return @perms_new;
+  
 }
 
 
