@@ -242,9 +242,8 @@ void write_tc_mpr_header_row(int hdr_flag, AsciiTable &at,
    // Write the variable columns names specific to the TCMPR line type
    for(i=0; i<NWinds; i++) {
       for(j=0; j<n_tc_mpr_var; j++) {
-         s.erase();
-         s.format("%s%i");
-         s << tc_mpr_cols[n_tc_mpr_static + j] << WindIntensity[i];
+         s.format("%s%i", tc_mpr_cols[n_tc_mpr_static + j],
+                  WindIntensity[i]);
          at.set_entry(r, c++, s);
       }
    }
