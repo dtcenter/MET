@@ -663,8 +663,8 @@ sub vx_util_seq {
 #
 #   This function assumes that the single input argument is a map ref
 #   in which keys are mapped to array references.  It builds an array
-#   of array refs, each of which contains a single permutation of the
-#   values of the input map.
+#   of map refs, each of which contains a single permutation of the
+#   values of the input map, referenced by the same set of keys.
 #
 #   Arguments:
 #      map = map whose lists of values will be permuted
@@ -677,7 +677,7 @@ sub vx_util_perm {
   # if the input val_map has only one key, build the start list and return
   if( 1 == keys %val_map ){
     my ($key) = keys %val_map;
-    push @perms, [$_] for @{ $val_map{$key} };
+    push @perms, { $key => $_ } for @{ $val_map{$key} };
     return @perms;
   }
   
@@ -691,11 +691,13 @@ sub vx_util_perm {
   my @perms_new;
   for my $val (@vals) {
     for (@perms){
-      my @copy = ( @{$_} );
-      unshift @copy, $val;
-      push @perms_new, \@copy;
+      my %copy = ( %{$_} );
+      $copy{$key} = $val;
+      push @perms_new, \%copy;
     }
   }
+  
+  return @perms_new;
   
   return @perms_new;
   
