@@ -1,0 +1,128 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default TCPairs configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// ATCF file format reference:
+//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//
+
+//
+// Specify a comma-separated list of basins to be used.
+// An empty list indicates that all should be used.
+//   Valid basins: WP, IO, SH, CP, EP, AL, SL
+//
+// e.g. basin = [ "AL", "EP" ];
+//
+basin = [];
+
+//
+// Specify a comma-separated list of cyclone numbers (01-99) to be used.
+// An empty list indicates that all should be used.
+//
+// e.g. cyclone = [ "01", "02", "03" ];
+//
+cyclone = [];
+
+//
+// Specify a comma-separated list of models to be used.
+// An empty list indicates that all should be used.
+//
+// e.g. model = [ "AHW4", "AHWI" ];
+//
+model = [];
+
+//
+// Specify how consensus forecasts should be defined using three settings:
+//   consensus model name, membership, and minimum number of models required
+// All three settings must have the same length.
+//
+// e.g. con_model[] = [ "CON1", "CON2" ];
+//      con_members = [ "MOD1 MOD2 MOD3",
+//                      "MOD1 MOD3 MOD4 MOD5" ];
+//      con_min_req = [ 2, 3 ];
+//
+con_model   = [];
+con_members = [];
+con_min_req = [];
+
+//
+// Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format.
+// Tracks whose initial time falls within the time window will be used.
+// An empty string indicates that all times should be used.
+//
+// e.g. init_beg = "20100101";
+//      init_end = "20101231";
+//
+init_beg = "";
+init_end = "";
+
+//
+// Specify a comma-separated list of model initialization hours to be used
+// in HH[MMSS] format. An empty list indicates that all hours should be used.
+//
+// e.g. init_hh = [ "00", "06", "12", "18" ];
+//
+init_hh = [];
+
+//
+// Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
+// Tracks for which all valid times fall within the time window will be used.
+// An empty string indicates that all times should be used.
+//
+// e.g. valid_beg = "20100101";
+//      valid_end = "20101231";
+//
+valid_beg = "";
+valid_end = "";
+
+//
+// Specify lat/lon polylines defining masking regions to be applied.
+// Tracks whose initial location falls within init_mask will be used.
+// Tracks for which all locations fall within valid_mask will be used.
+//
+// e.g. init_mask  = "MET_BASE/data/poly/EAST.poly";
+//
+init_mask  = "";
+valid_mask = "";
+
+//
+// Specify the NetCDF output of the gen_dland tool containing a gridded
+// representation of the minimum distance to land.
+//
+dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
+
+//
+// Specify whether special processing should be performed for interpolated
+// models with 12-hour spacing.  For model with a name ending in 'I' (e.g. AHWI)
+// search for the corresponding track whose model name ends in '2' (e.g. AHW2)
+// and merge it's track points into the interpolated model's track.
+//
+// e.g. interp12 = true;
+//
+interp12 = true;
+
+//
+// Specify whether the code should check for duplicates ATCF lines when
+// building tracks.  Setting this to false makes the parsing of tracks quicker.
+//
+// e.g. check_dup = true;
+//
+check_dup = true;
+
+//
+// Specify whether only those track points common to both the ADECK and BDECK
+// tracks should be written out.
+//
+// e.g. match_points = false;
+//
+match_points = false;
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V4.0";
+
