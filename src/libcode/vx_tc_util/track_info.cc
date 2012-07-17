@@ -356,7 +356,7 @@ bool TrackInfo::add(const TrackLine &l) {
    }
 
    // Add TrackLine to an existing TrackPoint if possible
-   for(i=0; i<NPoints; i++) {
+   for(i=NPoints-1; i>=0; i--) {
       if(Point[i].is_match(l)) {
          found = true;
          status = Point[i].set(l);
@@ -386,7 +386,7 @@ bool TrackInfo::has(const TrackLine &l) const {
    int i;
 
    // Check if the TrackPoint data matches
-   for(i=0; i<NPoints; i++) {
+   for(i=NPoints-1; i>=0; i--) {
       if(Point[i].has(l)) {
          found = true;
          break;
@@ -746,7 +746,7 @@ bool TrackInfoArray::add(const TrackLine &l, bool check_has) {
    }
 
    // Add TrackLine to an existing track if possible
-   for(i=0; i<NTracks; i++) {
+   for(i=NTracks-1; i>=0; i--) {
       if(Track[i].is_match(l)) {
          found = true;
          status = Track[i].add(l);
@@ -770,7 +770,7 @@ bool TrackInfoArray::has(const TrackLine &l) const {
    int i;
 
    // Check if the TrackInfo data matches
-   for(i=0; i<NTracks; i++) {
+   for(i=NTracks-1; i>=0; i--) {
       if(Track[i].has(l)) {
          found = true;
          break;
