@@ -392,7 +392,8 @@ unixtime t;
 
 t = (unixtime) 0;
 
-     if ( strlen(text) == 0         )  t = (unixtime) 0;
+     if ( !text                     )  t = (unixtime) 0;
+else if ( strlen(text) == 0         )  t = (unixtime) 0;
 else if ( is_yyyymmdd_hhmmss (text) )  t = yyyymmdd_hhmmss_to_unix (text);
 else if ( is_yyyymmdd_hh     (text) )  t = yyyymmdd_hh_to_unix     (text);
 else if ( is_yyyymmddhh      (text) )  t = yyyymmddhh_to_unix      (text);
@@ -530,7 +531,8 @@ int t;
 
 t = 0;
 
-     if ( strlen(text) == 0 )  t = 0;
+     if ( !text             )  t = 0;
+else if ( strlen(text) == 0 )  t = 0;
 else if ( is_hhmmss (text)  )  t = hhmmss_to_sec(text);
 else if ( is_hh     (text)  )  t = hms_to_sec(atoi(text), 0, 0);
 else {

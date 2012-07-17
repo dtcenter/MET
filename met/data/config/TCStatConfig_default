@@ -1,0 +1,137 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default TCStat configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// The parameters listed below are used to filter the TC-STAT data down to the
+// desired subset of lines over which statistics are to be computed.  Only
+// those lines which meet ALL of the criteria specified will be retained.
+//
+// The settings that are common to all jobs may be specified once at the top
+// level.  If no selection is listed for a parameter, that parameter will not
+// be used for filtering.  If multiple selections are listed for a parameter,
+// the analyses will be performed on their union.
+//
+
+//
+// Stratify by the AMODEL or BMODEL columns.
+// Specify comma-separated lists of model names to be used for all analyses
+// performed.  May add to this list using the "-amodel" and "-bmodel"
+// job command options.
+// e.g. amodel = [ "AHW4" ];
+//      bmodel = [ "BEST" ];
+//
+amodel = [];
+bmodel = [];
+
+//
+// Stratify by the BASIN column.
+// May add using the "-basin" job command option.
+// e.g. basin = [ "AL" ];
+//
+basin = [];
+
+//
+// Stratify by the CYCLONE column.
+// May add using the "-cyclone" job command option.
+// e.g. cyclone= [ "03" ];
+//
+cyclone = [];
+
+//
+// Stratify by the INIT and VALID times.
+// Define time windows in YYYYMMDD[_HH[MMSS]].
+// May modify using the "-init_beg", "-init_end", "-valid_beg", and "-valid_end"
+// job command options.
+// e.g. init_beg = "20100101";
+//      init_end = "20101231_12";
+//
+init_beg  = "";
+init_end  = "";
+valid_beg = "";
+valid_end = "";
+
+//
+// Stratify by the initialization hour and LEAD time.
+// Specify a comma-separated list of initialization hours and lead times in
+// HH[MMSS] format.  May add using the "-init_hh" and "-lead"
+// job command options.
+// e.g. init_hh = [ "00" ];
+//      lead    = [ "24", "36" ];
+//
+init_hh = [];
+lead    = [];
+
+//
+// Stratify by the INIT_MASK and VALID_MASK columns.
+// May add using the "-init_mask" and "-valid_mask" job command options.
+//
+init_mask  = [];
+valid_mask = [];
+
+//
+// Stratify by the LINE_TYPE column.  May add using the "-line_type"
+// job command option.
+// e.g. line_type = [ "TCMPR" ];
+//
+line_type = [];
+
+//
+// Stratify by applying thresholds to numeric data columns.
+// Specify a comma-separated list of columns names and thresholds
+// to be applied.  May add using the "-col_num name thresh" job command options.
+// e.g. col_num_name   = [ "ADLAND", "BDLAND" ];
+//      col_num_thresh = [ >200,     >200     ];
+//
+col_num_name   = [];
+col_num_thresh = [];
+
+//
+// Stratify by performing string matching on non-numeric data columns.
+// Specify a comma-separated list of columns names and values
+// to be checked.  May add using the "-col_str name value" job command options.
+// e.g. col_str_name  = [ "LEVEL", "LEVEL" ];
+//      col_str_value = [ "HU",    "TS"    ];
+//
+col_str_name  = [];
+col_str_value = [];
+
+//
+// Specify whether only those track points common to both the ADECK and BDECK
+// tracks should be retained.
+// e.g. match_points = false;
+//
+match_points = false;
+
+//
+// Specify a list of analysis jobs to be performed, formatted as follows:
+//
+//    -job job_name
+//    OPTIONAL ARGS
+//
+//    Where "job_name" is one of the following:
+//
+//       "filter"
+//          To filter the TCMPR lines using the criteria specified above plus
+//          any job command options.  The output is written to the file
+//          specified using the "-dump_row" option.
+//          Required Args: -dump_row
+//
+//       "summary"
+//          To compute the mean, standard deviation, and percentiles
+//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the columns
+//          specified using the "-column" argument, which may be set to ALL,
+//          TRACK, WIND, or an explicit column name.
+//          Required Args: -column
+//          Optional Args: -by column_name to specify case information
+//                         -out_alpha to override default alpha value
+//
+jobs = [];
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V4.0";
