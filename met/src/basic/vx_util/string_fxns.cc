@@ -24,6 +24,7 @@ using namespace std;
 
 #include "util_constants.h"
 #include "string_fxns.h"
+#include "vx_cal.h"
 #include "vx_log.h"
 
 
@@ -138,35 +139,6 @@ void strip_char(char *str, const char c)
    }
 
    return;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool check_reg_exp(const char *reg_exp_str, const char *test_str)
-
-{
-   bool valid = false;
-   regex_t buffer;
-   regex_t *preg = &buffer;
-
-   if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
-      mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
-           << "regcomp error for \""
-           << reg_exp_str << "\" and \"" << test_str << "\"\n\n";
-
-      exit(1);
-   }
-
-   if( regexec(preg, test_str, 0, 0, 0) == 0 ) { valid = true; }
-
-   //
-   // Free allocated memory.
-   //
-   regfree( preg );
-
-   return(valid);
 }
 
 

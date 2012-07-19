@@ -115,17 +115,19 @@ extern  int      timestring_to_sec(const char *);
 ////////////////////////////////////////////////////////////////////////
 
 
-extern  int is_yyyymmdd(const char * text);
+extern bool check_reg_exp(const char *, const char *);
 
-extern  int is_yyyymmddhh(const char * text);
+extern  bool is_yyyymmdd(const char * text);
 
-extern  int is_yyyymmdd_hh(const char * text);
+extern  bool is_yyyymmddhh(const char * text);
 
-extern  int is_yyyymmdd_hhmmss(const char * text);
+extern  bool is_yyyymmdd_hh(const char * text);
 
-extern  int is_hhmmss(const char * text);
+extern  bool is_yyyymmdd_hhmmss(const char * text);
 
-extern  int is_hh(const char * text);
+extern  bool is_hhmmss(const char * text);
+
+extern  bool is_hh(const char * text);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <regex.h>
 
 #include "vx_cal.h"
 #include "vx_log.h"
@@ -415,22 +416,11 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_yyyymmdd(const char * text)
+bool is_yyyymmdd(const char * text)
 
 {
 
-if ( strlen(text) != 8 )  return ( 0 );
-
-int j;
-
-for (j=0; j<8; ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-
-return ( 1 );
+return ( check_reg_exp("^[0-9]\\{8\\}$", text) );
 
 }
 
@@ -438,22 +428,11 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_yyyymmddhh(const char * text)
+bool is_yyyymmddhh(const char * text)
 
 {
 
-if ( strlen(text) != 10 )  return ( 0 );
-
-int j;
-
-for (j=0; j<10; ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-
-return ( 1 );
+return ( check_reg_exp("^[0-9]\\{10\\}$", text) );
 
 }
 
@@ -461,30 +440,11 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_yyyymmdd_hh(const char * text)
+bool is_yyyymmdd_hh(const char * text)
 
 {
 
-if ( strlen(text) != 11 )  return ( 0 );
-
-int j;
-
-for (j=0; j<8; ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-if ( text[8] != '_' )  return ( 0 );
-
-for (j=9; j<11; ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-
-return ( 1 );
+return ( check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{2\\}$", text) );
 
 }
 
@@ -492,30 +452,11 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_yyyymmdd_hhmmss(const char * text)
+bool is_yyyymmdd_hhmmss(const char * text)
 
 {
 
-if ( strlen(text) != 15 )  return ( 0 );
-
-int j;
-
-for (j=0; j<8; ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-if ( text[8] != '_' )  return ( 0 );
-
-for (j=9; j<15; ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-
-return ( 1 );
+return ( check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{6\\}$", text) );
 
 }
 
@@ -552,23 +493,12 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_hhmmss(const char * text)
+bool is_hhmmss(const char * text)
 
 {
-
-// Allow 2 or 3 digits for the number of hours
-if ( strlen(text) != 6 && strlen(text) != 7)  return ( 0 );
-
-unsigned int j;
-
-for (j=0; j<strlen(text); ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-
-return ( 1 );
+  
+// Allow negative times and 2 or 3 digits for the number of hours
+return ( check_reg_exp("^-*[0-9]\\{6,7\\}$", text) );
 
 }
 
@@ -576,23 +506,12 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_hh(const char * text)
+bool is_hh(const char * text)
 
 {
 
-// Allow 1, 2, or 3 digits for the number of hours
-if ( strlen(text) < 1 || strlen(text) > 3 )  return ( 0 );
-
-unsigned int j;
-
-for (j=0; j<strlen(text); ++j)  {
-
-   if ( !(isdigit(text[j])) )  return ( 0 );
-
-}
-
-
-return ( 1 );
+// Allow negative times and 1, 2, or 3 digits for the number of hours
+return ( check_reg_exp("^-*[0-9]\\{1,3\\}$", text) );
 
 }
 
@@ -612,6 +531,35 @@ ConcatString str = junk;
 
 return ( str );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool check_reg_exp(const char *reg_exp_str, const char *test_str)
+
+{
+   bool valid = false;
+   regex_t buffer;
+   regex_t *preg = &buffer;
+
+   if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
+      mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
+           << "regcomp error for \""
+           << reg_exp_str << "\" and \"" << test_str << "\"\n\n";
+
+      exit ( 1 );
+   }
+
+   if( regexec(preg, test_str, 0, 0, 0) == 0 ) { valid = true; }
+
+   //
+   // Free allocated memory.
+   //
+   regfree( preg );
+
+   return( valid );
 }
 
 
