@@ -448,26 +448,26 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       if(c[0] != '-') continue;
 
       // Check job command options
-           if(strcmp(c, "-job"             ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcmp(c, "-amodel"          ) == 0) { AModel.add(a[i+1]);                               a.shift_down(i, 1); }
-      else if(strcmp(c, "-bmodel"          ) == 0) { BModel.add(a[i+1]);                               a.shift_down(i, 1); }
-      else if(strcmp(c, "-basin"           ) == 0) { Basin.add(a[i+1]);                                a.shift_down(i, 1); }
-      else if(strcmp(c, "-cyclone"         ) == 0) { Cyclone.add(a[i+1]);                              a.shift_down(i, 1); }
-      else if(strcmp(c, "-init_beg"        ) == 0) { InitBeg  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcmp(c, "-init_end"        ) == 0) { InitEnd  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcmp(c, "-valid_beg"       ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcmp(c, "-valid_end"       ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcmp(c, "-init_hh"         ) == 0) { InitHH.add(timestring_to_sec(a[i+1]));            a.shift_down(i, 1); }
-      else if(strcmp(c, "-lead"            ) == 0) { Lead.add(timestring_to_sec(a[i+1]));              a.shift_down(i, 1); }
-      else if(strcmp(c, "-init_mask"       ) == 0) { InitMask.add(a[i+1]);                             a.shift_down(i, 1); }
-      else if(strcmp(c, "-valid_mask"      ) == 0) { ValidMask.add(a[i+1]);                            a.shift_down(i, 1); }
-      else if(strcmp(c, "-line_type"       ) == 0) { LineType.add(a[i+1]);                             a.shift_down(i, 1); }
-      else if(strcmp(c, "-col_num"         ) == 0) { ColNumName.add(a[i+1]); ColNumThresh.add(a[i+2]); a.shift_down(i, 2); }
-      else if(strcmp(c, "-col_str"         ) == 0) { ColStrName.add(a[i+1]); ColStrValue.add(a[i+2]);  a.shift_down(i, 2); }
-      else if(strcmp(c, "-dump_row"        ) == 0) { DumpFile = a[i+1]; open_dump_file();              a.shift_down(i, 1); }
-      else if(strcmp(c, "-out_init_mask"   ) == 0) { set_mask(OutInitMask, a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcmp(c, "-out_valid_mask"  ) == 0) { set_mask(OutValidMask, a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcmp(c, "-match_points"    ) == 0) { MatchPoints = string_to_bool(a[i+1]);             a.shift_down(i, 1); }
+           if(strcasecmp(c, "-job"             ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-amodel"          ) == 0) { AModel.add(a[i+1]);                               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-bmodel"          ) == 0) { BModel.add(a[i+1]);                               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-basin"           ) == 0) { Basin.add(a[i+1]);                                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-cyclone"         ) == 0) { Cyclone.add(a[i+1]);                              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_beg"        ) == 0) { InitBeg  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_end"        ) == 0) { InitEnd  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_beg"       ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_end"       ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_hh"         ) == 0) { InitHH.add(timestring_to_sec(a[i+1]));            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead"            ) == 0) { Lead.add(timestring_to_sec(a[i+1]));              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_mask"       ) == 0) { InitMask.add(a[i+1]);                             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_mask"      ) == 0) { ValidMask.add(a[i+1]);                            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-line_type"       ) == 0) { LineType.add(a[i+1]);                             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-col_num"         ) == 0) { ColNumName.add(a[i+1]); ColNumThresh.add(a[i+2]); a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-col_str"         ) == 0) { ColStrName.add(a[i+1]); ColStrValue.add(a[i+2]);  a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-dump_row"        ) == 0) { DumpFile = a[i+1]; open_dump_file();              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_init_mask"   ) == 0) { set_mask(OutInitMask, a[i+1]);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_valid_mask"  ) == 0) { set_mask(OutValidMask, a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-match_points"    ) == 0) { MatchPoints = string_to_bool(a[i+1]);             a.shift_down(i, 1); }
    }
 
    return;
@@ -922,9 +922,9 @@ void TCStatJobSummary::parse_job_command(const char *jobstring) {
       if(c[0] != '-') continue;
 
       // Check job command options
-           if(strcmp(c, "-column"   ) == 0) { ReqColumn.add(a[i+1]); add_column(a[i+1]); a.shift_down(i, 1); }
-      else if(strcmp(c, "-by"       ) == 0) { Case.add(a[i+1]);                          a.shift_down(i, 1); }
-      else if(strcmp(c, "-out_alpha") == 0) { OutAlpha = atof(a[i+1]);                   a.shift_down(i, 1); }
+           if(strcasecmp(c, "-column"   ) == 0) { ReqColumn.add(a[i+1]); add_column(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-by"       ) == 0) { Case.add(a[i+1]);                          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha") == 0) { OutAlpha = atof(a[i+1]);                   a.shift_down(i, 1); }
    }
 
    return;
@@ -1020,7 +1020,7 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
    int skip, index, i, j;
    map<ConcatString,NumArray,cs_cmp> cur_map;
    map<ConcatString,NumArray,cs_cmp>::iterator it;
-   ConcatString key;
+   ConcatString key, cur;
    NumArray val_na;
    double val;
    
@@ -1075,7 +1075,14 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
 
             // Add case information to the key
             for(j=0; j<Case.n_elements(); j++) {
-               key << ':' << line.get_item(Case[j]);
+
+               cur = line.get_item(Case[j]);
+
+               // For lead time column, make sure hour is 3-digits
+               if(strcasecmp(Case[j], "LEAD") == 0 &&
+                  hhmmss_to_sec(cur) < 100*sec_per_hour)
+                    key << ":0" << cur;
+               else key << ":"  << cur;
             }
      
             // Key is not yet defined in the map
@@ -1135,11 +1142,23 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
 double TCStatJobSummary::get_column_double(const TCStatLine &line,
                                            const ConcatString &column) {
    StringArray sa;
+   ConcatString in;
    double v, v_cur;
+   bool abs_flag = false;
    int i;
 
+   // Check for absolute value
+   if(strncasecmp(column, "ABS", 3) == 0) {
+      abs_flag = true;
+      sa = column.split("()");
+      in = sa[1];
+   }
+   else {
+      in = column;
+   }
+
    // Split the input column name on hyphens for differences
-   sa = column.split("-");
+   sa = in.split("-");
 
    // Get the first value
    v = atof(line.get_item(sa[0]));
@@ -1158,6 +1177,9 @@ double TCStatJobSummary::get_column_double(const TCStatLine &line,
          else                                     v -= v_cur;
       }
    }
+
+   // Apply absolute value, if requested
+   if(abs_flag) v = abs(v);
 
    return(v);
 }
@@ -1205,7 +1227,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    StringArray sa;
    ConcatString case_info, line;
    AsciiTable out_at;
-   NumArray v, abs_v, index;
+   NumArray v, index;
    CIInfo mean_ci, stdev_ci;
    int i, r, c;
 
@@ -1240,8 +1262,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "P50");
    out_at.set_entry(r, c++, "P75");
    out_at.set_entry(r, c++, "P90");
-   out_at.set_entry(r, c++, "MAX");   
-   out_at.set_entry(r, c++, "MEAN_ABS");
+   out_at.set_entry(r, c++, "MAX");
    out_at.set_entry(r, c++, "SUM");
 
    // Loop over the map entries and popluate the output table
@@ -1264,12 +1285,8 @@ void TCStatJobSummary::do_output(ostream &out) {
 
       // Get the valid subset of data
       v.clear();
-      abs_v.clear();
       for(i=0; i<it->second.n_elements(); i++) {
-         if(!is_bad_data(it->second[i])) {
-            v.add(it->second[i]);
-            abs_v.add(abs(it->second[i]));
-         }
+         if(!is_bad_data(it->second[i])) v.add(it->second[i]);
       }
 
       // Build index array
@@ -1295,8 +1312,7 @@ void TCStatJobSummary::do_output(ostream &out) {
       out_at.set_entry(r, c++, v.percentile_array(0.50));
       out_at.set_entry(r, c++, v.percentile_array(0.75));
       out_at.set_entry(r, c++, v.percentile_array(0.90));
-      out_at.set_entry(r, c++, v.max());      
-      out_at.set_entry(r, c++, abs_v.mean());
+      out_at.set_entry(r, c++, v.max());
       out_at.set_entry(r, c++, v.sum());
 
       // Increment row count
@@ -1322,8 +1338,8 @@ void TCStatJobSummary::do_output(ostream &out) {
 TCStatJobType string_to_tcstatjobtype(const char *s) {
    TCStatJobType t;
 
-        if(strcmp(s, TCStatJobType_FilterStr) == 0)  t = TCStatJobType_Filter;
-   else if(strcmp(s, TCStatJobType_SummaryStr) == 0) t = TCStatJobType_Summary;
+        if(strcasecmp(s, TCStatJobType_FilterStr) == 0)  t = TCStatJobType_Filter;
+   else if(strcasecmp(s, TCStatJobType_SummaryStr) == 0) t = TCStatJobType_Summary;
    else                                              t = NoTCStatJobType;
 
    return(t);
