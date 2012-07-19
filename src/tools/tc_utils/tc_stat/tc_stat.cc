@@ -195,8 +195,6 @@ void process_jobs() {
          jobstring << conf_info.Jobs[i];
       }
 
-cout << "JOBSTRING = " << jobstring << "\n";
-   
       // Allocate a new job
       cur_job = factory.new_tc_stat_job(jobstring);
 
