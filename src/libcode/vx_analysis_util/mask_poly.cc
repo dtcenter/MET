@@ -30,9 +30,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static int line_count(const char * filename);
-
-static int is_inside(const double * x, const double * y, const int n, const double x_test, const double y_test);
+static int is_inside(const NumArray &x, const NumArray &y,
+                     const double x_test, const double y_test);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -104,15 +103,6 @@ void MaskPoly::init_from_scratch()
 
 {
 
-Name     = (char *) 0;
-FileName = (char *) 0;
-
-Lat = (double *) 0;
-Lon = (double *) 0;
-
-U = (double *) 0;
-V = (double *) 0;
-
 clear();
 
 return;
@@ -127,15 +117,14 @@ void MaskPoly::clear()
 
 {
 
-if ( Name )      { delete [] Name;      Name     = (char *) 0; }
-if ( FileName )  { delete [] FileName;  FileName = (char *) 0; }
+Name.clear();
+FileName.clear();
 
-if ( Lat )  { delete [] Lat;  Lat = (double *) 0; }
+Lat.clear();
+Lon.clear();
 
-if ( Lon )  { delete [] Lon;  Lon = (double *) 0; }
-
-if ( U )  { delete [] U;  U = (double *) 0; }
-if ( V )  { delete [] V;  V = (double *) 0; }
+U.clear();
+V.clear();
 
 Npoints = 0;
 
@@ -153,47 +142,18 @@ void MaskPoly::assign(const MaskPoly & m)
 
 clear();
 
+Name     = m.Name;
+FileName = m.FileName;
+
 if ( m.Npoints == 0 )  return;
 
 Npoints = m.Npoints;
 
-Lat = new double [Npoints];
-Lon = new double [Npoints];
+Lat = m.Lat;
+Lon = m.Lon;
 
-U = new double [Npoints];
-V = new double [Npoints];
-
-memcpy(Lat, m.Lat, Npoints*sizeof(double));
-
-memcpy(Lon, m.Lon, Npoints*sizeof(double));
-
-memcpy(U, m.U, Npoints*sizeof(double));
-
-memcpy(V, m.V, Npoints*sizeof(double));
-
-if ( m.Name )  {
-
-   int n = strlen(m.Name);
-
-   Name = new char [1 + n];
-
-   memset(Name, 0, 1 + n);
-
-   strcpy(Name, m.Name);
-
-}
-
-if ( m.FileName )  {
-
-   int n = strlen(m.FileName);
-
-   FileName = new char [1 + n];
-
-   memset(FileName, 0, 1 + n);
-
-   strcpy(FileName, m.FileName);
-
-}
+U = m.U;
+V = m.V;
 
 return;
 
@@ -253,39 +213,13 @@ void MaskPoly::load(const char * filename)
 
 {
 
-int j, k, n;
+int j;
 char line[512];
 double a, b;
 ifstream in;
 
 
 clear();
-
-Npoints = line_count(filename);
-
---Npoints;   //  first line in file is polyline name
-
-if ( Npoints < 0 )  {
-
-   mlog << Error << "\nMaskPoly::load() -> "
-        << "can't determine line count in file \""
-        << filename << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-Lat = new double [Npoints];
-Lon = new double [Npoints];
-
-U   = new double [Npoints];
-V   = new double [Npoints];
-
-memset(Lat, 0, Npoints*sizeof(double));
-memset(Lon, 0, Npoints*sizeof(double));
-
-memset(U, 0, Npoints*sizeof(double));
-memset(V, 0, Npoints*sizeof(double));
 
 in.open(filename);
 
@@ -303,9 +237,7 @@ if ( !in )  {
    //  store file name
    //
 
-FileName = new char [ strlen(filename) ];
-
-strcpy(FileName, filename);
+FileName = filename;
 
    //
    //  get name
@@ -313,35 +245,17 @@ strcpy(FileName, filename);
 
 in.getline(line, sizeof(line));
 
-n = strlen(line);
-
-Name = new char [1 + n];
-
-memset(Name, 0, 1 + n);
-
-strcpy(Name, line);
+Name = line;
 
    //
    //  get points
    //
 
-for (j=0; j<Npoints; ++j)  {
+while ( in.getline(line, sizeof(line)) ) {
 
-   in.getline(line, sizeof(line));
+   j = sscanf(line, "%lf%lf", &a, &b);
 
-   if ( !in )  {
-
-      mlog << Error << "\nMaskPoly::load() -> "
-           << "read error in mask poly file \""
-           << filename << "\"\n\n";
-
-      exit ( 1 );
-
-   }
-
-   k = sscanf(line, "%lf%lf", &a, &b);
-
-   if ( k != 2 )  {
+   if ( j != 2 )  {
 
       mlog << Error << "\nMaskPoly::load() -> "
            << "read error in mask poly file \""
@@ -351,13 +265,13 @@ for (j=0; j<Npoints; ++j)  {
 
    }
 
-   Lat[j] = a;
+   Lat.add ( a );
 
    //
    //  check that the point isn't too close to the poles
    //
 
-   if ( 90.0 - abs(Lat[j]) < 1.0 ) {
+   if ( 90.0 - abs(Lat[Npoints]) < 1.0 ) {
 
       mlog << Error << "\nMaskPoly::load() -> "
            << "encountered latitude value too close to a pole, (Lat, Lon) = ("
@@ -371,11 +285,12 @@ for (j=0; j<Npoints; ++j)  {
 
    b -= 360.0*floor((b + 180.0)/360.0);
 
-   Lon[j] = b;
+   Lon.add ( b );
 
-   U[j]   = Lon[j];  // U equals Lon for a Lat/Lon projection
-   V[j]   = Lat[j];  // V equals Lat for a Lat/Lon projection
+   U.add ( Lon[Npoints] );  // U equals Lon for a Lat/Lon projection
+   V.add ( Lat[Npoints] );  // V equals Lat for a Lat/Lon projection
 
+   Npoints++;               // Increment NPoints
 }
 
 in.close();
@@ -420,49 +335,9 @@ bool MaskPoly::latlon_is_inside_dege(double lat, double lon) const
 
 int status;
 
-status = is_inside(U, V, Npoints, lon, lat);
+status = is_inside(U, V, lon, lat);
 
 return ( status != 0 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for misc functions
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int line_count(const char * filename)
-
-{
-
-int count;
-char c;
-ifstream in;
-
-
-in.open(filename);
-
-if ( !in )  return ( -1 );
-
-count = 0;
-
-while ( in.get(c) )  {
-
-   if ( c == '\n' )  ++count;
-
-}
-
-in.close();
-
-
-return ( count );
 
 }
 
@@ -493,11 +368,12 @@ return ( count );
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_inside(const double * x, const double * y, const int n, const double x_test, const double y_test)
+int is_inside(const NumArray &x, const NumArray &y, const double x_test, const double y_test)
 
 {
 
 int j, k;
+int n = x.n_elements();
 double angle, angle0, a, b, c, d;
 
 

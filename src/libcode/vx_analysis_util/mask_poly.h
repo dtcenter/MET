@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include "vx_util.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -37,14 +39,14 @@ class MaskPoly {
 
       void assign(const MaskPoly &);
 
-      char * Name;
-      char * FileName;
+      ConcatString Name;
+      ConcatString FileName;
 
-      double * Lat;
-      double * Lon;
+      NumArray Lat;
+      NumArray Lon;
 
-      double * U;
-      double * V;
+      NumArray U;
+      NumArray V;
 
       int Npoints;
 
@@ -67,9 +69,9 @@ class MaskPoly {
          //  get stuff
          //
 
-      const char * name()      const;
+      ConcatString name()      const;
 
-      const char * file_name() const;
+      ConcatString file_name() const;
 
       int          n_points()  const;
 
@@ -88,8 +90,8 @@ class MaskPoly {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * MaskPoly::name()      const { return ( Name     ); }
-inline const char * MaskPoly::file_name() const { return ( FileName ); }
+inline ConcatString MaskPoly::name()      const { return ( Name     ); }
+inline ConcatString MaskPoly::file_name() const { return ( FileName ); }
 inline       int    MaskPoly::n_points()  const { return ( Npoints  ); }
 
 
