@@ -53,7 +53,6 @@ if ( argc != 2 )  {
 
 const char * const input_filename = argv[1];
 
-int count;
 char line[512];
 ifstream in;
 
@@ -67,13 +66,9 @@ if ( ! in )  {
 
 }
 
-count = 0;
-
 cout << "GRIB2\n";
 
 while ( in.getline(line, sizeof(line)) )  {
-
-   // cout << "\n count = " << (++count) << "\n" << flush;
 
    parse_line(line);
 
