@@ -154,7 +154,7 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       void dump(ostream &, int = 0) const;
 
-      static const char* build_magic(Grib2Record *rec);
+      static ConcatString build_magic(Grib2Record *rec);
 
 };
 
