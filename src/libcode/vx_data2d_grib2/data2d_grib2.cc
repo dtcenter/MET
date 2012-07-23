@@ -665,10 +665,9 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  use the index to look up the parameter name
          Grib2TableEntry tab;
          if( !GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm, tab) ){
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
+            mlog << Debug(3) << "\nMetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
                  << "field indexes -  disc: " << rec->Discipline << "  parm_cat: " << rec->ParmCat
                  << " parm: " << rec->Parm << "\n\n";
-            exit(1);
          }
          rec->ParmName = tab.parm_name;
 
