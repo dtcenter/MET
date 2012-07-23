@@ -229,7 +229,7 @@ void QuadInfo::set_value(int n, int v) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const int QuadInfo::operator[](int n) const {
+int QuadInfo::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= NQuadInfoValues)) {
