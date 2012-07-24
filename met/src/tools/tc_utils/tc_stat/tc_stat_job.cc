@@ -1179,7 +1179,7 @@ double TCStatJobSummary::get_column_double(const TCStatLine &line,
    }
 
    // Apply absolute value, if requested
-   if(abs_flag) v = abs(v);
+   if(abs_flag) v = fabs(v);
 
    return(v);
 }
