@@ -25,7 +25,7 @@
 
 static const char * tc_header_cols [] = {
    "VERSION",      "AMODEL",     "BMODEL",
-   "BASIN",        "CYCLONE",
+   "BASIN",        "CYCLONE",    "STORM_NAME",
    "INIT",         "LEAD",       "VALID",
    "INIT_MASK",    "VALID_MASK", "LINE_TYPE"
 };

@@ -154,6 +154,12 @@ const char * TCStatLine::cyclone() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+const char * TCStatLine::storm_name() const {
+   return(get_item("STORM_NAME"));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 unixtime TCStatLine::init() const {
    const char * c = get_item("INIT");
    unixtime ut;

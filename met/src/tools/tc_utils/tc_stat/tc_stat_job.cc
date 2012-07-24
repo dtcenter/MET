@@ -141,6 +141,7 @@ void TCStatJob::init_from_scratch() {
    BModel.set_ignore_case(1);
    Basin.set_ignore_case(1);
    Cyclone.set_ignore_case(1);
+   StormName.set_ignore_case(1);
    InitMask.set_ignore_case(1);
    ValidMask.set_ignore_case(1);
    LineType.set_ignore_case(1);
@@ -164,6 +165,7 @@ void TCStatJob::clear() {
    BModel.clear();
    Basin.clear();
    Cyclone.clear();
+   StormName.clear();
    InitBeg  = InitEnd  = (unixtime) 0;
    ValidBeg = ValidEnd = (unixtime) 0;
    InitHH.clear();
@@ -201,6 +203,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    BModel = j.BModel;
    Basin = j.Basin;
    Cyclone = j.Cyclone;
+   StormName = j.StormName;
    InitBeg  = j.InitBeg;
    InitEnd  = j.InitEnd;
    ValidBeg = j.ValidBeg;
@@ -246,6 +249,9 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "Cyclone ...\n";
    Cyclone.dump(out, depth + 1);
 
+   out << prefix << "StormName ...\n";
+   StormName.dump(out, depth + 1);
+   
    out << prefix << "InitBeg = " << unix_to_yyyymmdd_hhmmss(InitBeg) << "\n";
    out << prefix << "InitEnd = " << unix_to_yyyymmdd_hhmmss(InitEnd) << "\n";
    out << prefix << "ValidBeg = " << unix_to_yyyymmdd_hhmmss(ValidBeg) << "\n";
@@ -310,6 +316,8 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
      !Basin.has(line.basin()))          { keep = false; n.RejBasin++;     }
    else if(Cyclone.n_elements() > 0 &&
      !Cyclone.has(line.cyclone()))      { keep = false; n.RejCyclone++;   }
+   else if(StormName.n_elements() > 0 &&
+     !StormName.has(line.storm_name())) { keep = false; n.RejStormName++; }
    else if(InitBeg > 0 &&
       line.init() < InitBeg)            { keep = false; n.RejInit++;      }
    else if(InitEnd > 0 &&
@@ -453,6 +461,7 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-bmodel"          ) == 0) { BModel.add(a[i+1]);                               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-basin"           ) == 0) { Basin.add(a[i+1]);                                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-cyclone"         ) == 0) { Cyclone.add(a[i+1]);                              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_name"      ) == 0) { StormName.add(a[i+1]);                            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_beg"        ) == 0) { InitBeg  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_end"        ) == 0) { InitEnd  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_beg"       ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
@@ -595,6 +604,8 @@ ConcatString TCStatJob::serialize() const {
       s << "-basin " <<  Basin[i] << " ";
    for(i=0; i<Cyclone.n_elements(); i++)
       s << "-cyclone " <<  Cyclone[i] << " ";
+   for(i=0; i<StormName.n_elements(); i++)
+      s << "-storm_name " <<  StormName[i] << " ";
    if(InitBeg > 0)
       s << "-init_beg " << unix_to_yyyymmdd_hhmmss(InitBeg) << " ";
    if(InitEnd > 0)

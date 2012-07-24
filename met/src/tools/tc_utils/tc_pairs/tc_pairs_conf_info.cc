@@ -58,10 +58,11 @@ void TCPairsConfInfo::clear() {
 
    // Deallocate memory
    if(ConMembers) { delete [] ConMembers; ConMembers = (StringArray *) 0; }
-  
+
+   Model.clear();
    Basin.clear();
    Cyclone.clear();
-   Model.clear();
+   StormName.clear();
    NCon = 0;
    ConModel.clear();
    ConMinReq.clear();
@@ -103,6 +104,9 @@ void TCPairsConfInfo::process_config() {
    StringArray sa;
    ConcatString poly_file;
 
+   // Conf: Model
+   Model = Conf.lookup_string_array("model");
+   
    // Conf: Version
    Version = Conf.lookup_string("version");
    check_met_version(Version);
@@ -113,9 +117,9 @@ void TCPairsConfInfo::process_config() {
    // Conf: Cyclone
    Cyclone = Conf.lookup_string_array("cyclone");
 
-   // Conf: Model
-   Model = Conf.lookup_string_array("model");
-
+   // Conf: StormName
+   Cyclone = Conf.lookup_string_array("storm_name");
+   
    // Conf: ConModel
    ConModel = Conf.lookup_string_array("con_model");
 

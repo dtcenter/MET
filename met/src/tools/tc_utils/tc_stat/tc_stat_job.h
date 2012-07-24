@@ -64,6 +64,7 @@ struct TCLineCounts {
    int RejBModel;
    int RejBasin;
    int RejCyclone;
+   int RejStormName;
    int RejInit;
    int RejInitHH;
    int RejLead;   
@@ -138,6 +139,7 @@ class TCStatJob {
       StringArray BModel;
       StringArray Basin;
       StringArray Cyclone;
+      StringArray StormName;
 
       // Timing information
       unixtime  InitBeg, InitEnd;
