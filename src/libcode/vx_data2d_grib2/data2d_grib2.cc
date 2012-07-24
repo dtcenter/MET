@@ -436,7 +436,7 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
    //  build the magic string of the pair field, and make sure it's present
    ConcatString pair_mag = build_magic( rec );
    pair_mag.replace(parm_name.data(), PairMap[parm_name].data());
-   if( 0 == NameRecMap.count( pair_mag.text() ) ){
+   if( 0 == NameRecMap.count( string(pair_mag.text()) ) ){
       mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation - UV rotation pair "
            << "record not found: '" << pair_mag << "'";
       return plane;
@@ -665,18 +665,18 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  use the index to look up the parameter name
          Grib2TableEntry tab;
          if( !GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm, tab) ){
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
+            mlog << Debug(3) << "\nMetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
                  << "field indexes -  disc: " << rec->Discipline << "  parm_cat: " << rec->ParmCat
                  << " parm: " << rec->Parm << "\n\n";
-            exit(1);
          }
-         rec->ParmName = tab.parm_name;
+         rec->ParmName = tab.parm_name.text();
 
          //  add the record to the list
          RecList.push_back(rec);
 
          //  build data structure for U/V wind pairs
-         NameRecMap[build_magic(rec)] = rec;
+         string rec_mag = build_magic(rec).text();
+         NameRecMap[rec_mag] = rec;
 
          g2_free(gfld);
          delete [] cgrib;
@@ -1001,7 +1001,7 @@ long MetGrib2DataFile::read_grib2_record( long offset,
 
 ////////////////////////////////////////////////////////////////////////
 
-const char* MetGrib2DataFile::build_magic(Grib2Record *rec){
+ConcatString MetGrib2DataFile::build_magic(Grib2Record *rec){
 
    ConcatString lvl = "";
    int lvl_val1 = (int)rec->LvlVal1, lvl_val2 = (int)rec->LvlVal2;
@@ -1030,9 +1030,7 @@ const char* MetGrib2DataFile::build_magic(Grib2Record *rec){
    } else {
       ret.format("%s/%s%d-%d", rec->ParmName.c_str(), lvl.text(), lvl_val1, lvl_val2);
    }
-
-   string ret_str = ret.text();
-   return ret_str.c_str();
+   return ret;
 
 }
 
