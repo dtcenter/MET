@@ -65,6 +65,7 @@ class TCStatLine : public DataLine {
       const char * bmodel       () const;
       const char * basin        () const;
       const char * cyclone      () const;
+      const char * storm_name   () const;
       unixtime     init         () const;
       int          init_hh      () const; // init%sec_per_day
       int          lead         () const;

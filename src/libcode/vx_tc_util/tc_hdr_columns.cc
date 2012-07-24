@@ -50,6 +50,7 @@ void TcHdrColumns::clear() {
    BDeckModel.clear();
    Basin.clear();
    Cyclone.clear();
+   StormName.clear();
    InitTime = (unixtime) 0;
    LeadTime = 0;
    ValidTime = (unixtime) 0;

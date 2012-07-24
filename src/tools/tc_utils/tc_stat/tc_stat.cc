@@ -223,6 +223,7 @@ void process_jobs() {
            << "Rejected for bmodel            = " << n.RejBModel       << "\n"
            << "Rejected for basin             = " << n.RejBasin        << "\n"
            << "Rejected for cyclone           = " << n.RejCyclone      << "\n"
+           << "Rejected for storm name        = " << n.RejStormName    << "\n"
            << "Rejected for init time         = " << n.RejInit         << "\n"
            << "Rejected for init hour         = " << n.RejInitHH       << "\n"
            << "Rejected for lead time         = " << n.RejLead         << "\n"

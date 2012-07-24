@@ -36,9 +36,16 @@ basin = [];
 //
 // Stratify by the CYCLONE column.
 // May add using the "-cyclone" job command option.
-// e.g. cyclone= [ "03" ];
+// e.g. cyclone = [ "03" ];
 //
 cyclone = [];
+
+//
+// Stratify by the STORM_NAME column.
+// May add using the "-storm_name" job command option.
+// e.g. storm_name = [ "KATRINA" ];
+//
+storm_name = [];
 
 //
 // Stratify by the INIT and VALID times.

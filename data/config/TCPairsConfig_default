@@ -10,6 +10,14 @@
 //
 
 //
+// Specify a comma-separated list of models to be used.
+// An empty list indicates that all should be used.
+//
+// e.g. model = [ "AHW4", "AHWI" ];
+//
+model = [];
+
+//
 // Specify a comma-separated list of basins to be used.
 // An empty list indicates that all should be used.
 //   Valid basins: WP, IO, SH, CP, EP, AL, SL
@@ -27,12 +35,12 @@ basin = [];
 cyclone = [];
 
 //
-// Specify a comma-separated list of models to be used.
+// Specify a comma-separated list of storm names to be used.
 // An empty list indicates that all should be used.
 //
-// e.g. model = [ "AHW4", "AHWI" ];
+// e.g. storm_name = [ "KATRINA" ];
 //
-model = [];
+storm_name = [];
 
 //
 // Specify how consensus forecasts should be defined using three settings:

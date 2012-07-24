@@ -338,7 +338,7 @@ void process_track_files(const StringArray &files,
 void filter_tracks(TrackInfoArray &tracks) {
    int i, j;
    int m, d, y, h, mm, s;
-   int n_bas, n_cyc, n_mod, n_init, n_vld, n_hh, n_maski, n_maskv;
+   int n_mod, n_bas, n_cyc, n_name, n_init, n_vld, n_hh, n_maski, n_maskv;
    bool status;
    TrackInfoArray t = tracks;
    
@@ -350,6 +350,15 @@ void filter_tracks(TrackInfoArray &tracks) {
    // Loop through the tracks and determine which should be retained
    for(i=0; i<t.n_tracks(); i++) {
 
+      // Check model
+      if(conf_info.Model.n_elements() > 0 &&
+         !conf_info.Model.has(t[i].technique())) {
+         mlog << Debug(4)
+              << "Discarding track " << i+1 << " for model mismatch.\n";
+         n_mod++;
+         continue;
+      }
+     
       // Check basin
       if(conf_info.Basin.n_elements() > 0 &&
          !conf_info.Basin.has(t[i].basin())) {
@@ -368,12 +377,12 @@ void filter_tracks(TrackInfoArray &tracks) {
          continue;
       }
 
-      // Check model
-      if(conf_info.Model.n_elements() > 0 &&
-         !conf_info.Model.has(t[i].technique())) {
+      // Check storm name
+      if(conf_info.StormName.n_elements() > 0 &&
+         !conf_info.StormName.has(t[i].storm_name())) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for model mismatch.\n";
-         n_mod++;
+              << "Discarding track " << i+1 << " for storm name mismatch.\n";
+         n_name++;
          continue;
       }
 
@@ -454,9 +463,10 @@ void filter_tracks(TrackInfoArray &tracks) {
    mlog << Debug(3)
         << "Total tracks read       = " << t.n_tracks()      << "\n"
         << "Total tracks kept       = " << tracks.n_tracks() << "\n"
+        << "Rejected for model      = " << n_mod             << "\n"
         << "Rejected for basin      = " << n_bas             << "\n"
         << "Rejected for cyclone    = " << n_cyc             << "\n"
-        << "Rejected for model      = " << n_mod             << "\n"
+        << "Rejected for storm name = " << n_name             << "\n"
         << "Rejected for init time  = " << n_init            << "\n"
         << "Rejected for init hour  = " << n_hh              << "\n"
         << "Rejected for valid time = " << n_vld             << "\n"
@@ -925,6 +935,7 @@ void write_output(const TrackPairInfoArray &p) {
       tchc.set_bdeck_model(p[i].bdeck().technique());
       tchc.set_basin(p[i].bdeck().basin());
       tchc.set_cyclone(p[i].bdeck().cyclone());
+      tchc.set_storm_name(p[i].bdeck().storm_name());
      
      // Write the current TrackPairInfo object
      write_tc_mpr_row(tchc, p[i], out_at, i_row);

@@ -48,6 +48,7 @@ class TrackInfo {
       // Storm and model identification
       ConcatString Basin;
       ConcatString Cyclone;
+      ConcatString StormName;
       int          TechniqueNumber;
       ConcatString Technique;
 
@@ -83,6 +84,7 @@ class TrackInfo {
 
       void set_basin(const ConcatString &);
       void set_cyclone(const ConcatString &);
+      void set_storm_name(const ConcatString &);
       void set_technique_number(int);
       void set_technique(const ConcatString &);
       void set_init(const unixtime);
@@ -97,6 +99,7 @@ class TrackInfo {
       const TrackPoint & operator[](int)    const;
       ConcatString       basin()            const;
       ConcatString       cyclone()          const;
+      ConcatString       storm_name()       const;
       int                technique_number() const;
       ConcatString       technique()        const;
       unixtime           init()             const;
@@ -127,14 +130,16 @@ class TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void TrackInfo::set_basin(const ConcatString &s)     { Basin = s;           };
-inline void TrackInfo::set_cyclone(const ConcatString &s)   { Cyclone = s;         };
-inline void TrackInfo::set_technique_number(int i)          { TechniqueNumber = i; };
-inline void TrackInfo::set_technique(const ConcatString &s) { Technique = s;       };
-inline void TrackInfo::set_init(const unixtime u)           { InitTime = u;        };
+inline void TrackInfo::set_basin(const ConcatString &s)      { Basin = s;           };
+inline void TrackInfo::set_cyclone(const ConcatString &s)    { Cyclone = s;         };
+inline void TrackInfo::set_storm_name(const ConcatString &s) { StormName = s;       };
+inline void TrackInfo::set_technique_number(int i)           { TechniqueNumber = i; };
+inline void TrackInfo::set_technique(const ConcatString &s)  { Technique = s;       };
+inline void TrackInfo::set_init(const unixtime u)            { InitTime = u;        };
 
 inline ConcatString TrackInfo::basin()            const { return(Basin);                   }
 inline ConcatString TrackInfo::cyclone()          const { return(Cyclone);                 }
+inline ConcatString TrackInfo::storm_name()       const { return(StormName);               }
 inline int          TrackInfo::technique_number() const { return(TechniqueNumber);         }
 inline ConcatString TrackInfo::technique()        const { return(Technique);               }
 inline unixtime     TrackInfo::init()             const { return(InitTime);                }

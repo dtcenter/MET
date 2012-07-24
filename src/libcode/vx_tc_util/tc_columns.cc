@@ -294,7 +294,7 @@ void write_tc_header_cols(const TcHdrColumns &hdr,
 
    // Header columns:
    //    VERSION,      AMODEL,     BDECK_MODEL,
-   //    BASIN,        CYCLONE,
+   //    BASIN,        CYCLONE,    STORM_NAME,
    //    INIT,         LEAD,       VALID,
    //    INIT_MASK,    VALID_MASK, LINE_TYPE
 
@@ -302,7 +302,8 @@ void write_tc_header_cols(const TcHdrColumns &hdr,
    at.set_entry(r, c++, hdr.adeck_model());
    at.set_entry(r, c++, hdr.bdeck_model());
    at.set_entry(r, c++, hdr.basin());
-   at.set_entry(r, c++, hdr.cyclone());   
+   at.set_entry(r, c++, hdr.cyclone());
+   at.set_entry(r, c++, hdr.storm_name());
    if(hdr.init() > 0)           at.set_entry(r, c++, unix_to_yyyymmdd_hhmmss(hdr.init()));
    else                         at.set_entry(r, c++, na_str);
    if(!is_bad_data(hdr.lead())) at.set_entry(r, c++, sec_to_hhmmss(hdr.lead()));

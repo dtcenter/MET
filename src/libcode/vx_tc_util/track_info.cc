@@ -78,6 +78,7 @@ void TrackInfo::clear() {
 
    Basin.clear();
    Cyclone.clear();
+   StormName.clear();
    TechniqueNumber = bad_data_int;
    Technique.clear();
    InitTime        = (unixtime) 0;
@@ -107,6 +108,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
 
    out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
    out << prefix << "Cyclone         = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\"\n";
+   out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
    out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
    out << prefix << "InitTime        = " << unix_to_yyyymmdd_hhmmss(InitTime) << "\n";
@@ -134,6 +136,7 @@ ConcatString TrackInfo::serialize() const {
    s << "TrackInfo: "
      << "Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
      << ", Cyclone = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\""
+     << ", StormName = \"" << (StormName ? StormName.text() : "(nul)") << "\""
      << ", TechniqueNumber = " << TechniqueNumber
      << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
      << ", InitTime = " << unix_to_yyyymmdd_hhmmss(InitTime)
@@ -173,6 +176,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    
    Basin           = t.Basin;
    Cyclone         = t.Cyclone;
+   StormName       = t.StormName;
    TechniqueNumber = t.TechniqueNumber;
    Technique       = t.Technique;
    InitTime        = t.InitTime;
@@ -238,6 +242,7 @@ void TrackInfo::initialize(const TrackLine &l) {
 
    Basin           = l.basin();
    Cyclone         = l.cyclone_number();
+   StormName       = l.storm_name();
    TechniqueNumber = l.technique_number();
    Technique       = l.technique();
 
@@ -341,12 +346,22 @@ bool TrackInfo::add(const TrackLine &l) {
 
    // Check if TrackPoint doesn't match this TrackInfo
    if(!is_match(l)) return(false);
+   
+   // Check if the storm name needs to be set or has changed
+   if(!StormName) StormName = l.storm_name();
+   else if(StormName && l.storm_name() &&
+           StormName != l.storm_name()) {
+      mlog << Warning
+           << "\nTrackInfo::add(const TrackLine &) -> "
+           << "the storm name should remain the same \"" << StormName
+           << "\" != \"" << l.storm_name() << "\".\n\n";
+   }
 
    // Check that the TrackPoint valid time is increasing
    if(NPoints > 0) {
       if(l.valid() < Point[NPoints-1].valid()) {
          mlog << Warning
-              << "\nTrackInfo::add(const TrackPoint &) -> "
+              << "\nTrackInfo::add(const TrackLine &) -> "
               << "skipping TrackLine since the valid time is not increasing ("
               << unix_to_yyyymmdd_hhmmss(l.valid()) << " < "
               << unix_to_yyyymmdd_hhmmss(Point[NPoints-1].valid())
@@ -410,6 +425,7 @@ bool TrackInfo::is_match(const TrackLine &l) const {
    if(strcasecmp(Technique, BestTrackStr) == 0) {
 
       // Check basin, cyclone, and technique
+      // No need to check storm name
       if(Basin     != l.basin()          ||
          Cyclone   != l.cyclone_number() ||
          Technique != l.technique())
@@ -809,6 +825,7 @@ TrackInfo consensus(const TrackInfoArray &tarr,
    // Initialize average track to the first track
    tavg.set_basin(tarr.Track[0].basin());
    tavg.set_cyclone(tarr.Track[0].cyclone());
+   tavg.set_storm_name(tarr.Track[0].storm_name());
    tavg.set_technique_number(tarr.Track[0].technique_number());
    tavg.set_technique(model);
    tavg.set_init(tarr.Track[0].init());

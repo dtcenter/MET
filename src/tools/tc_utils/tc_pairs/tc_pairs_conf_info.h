@@ -34,9 +34,10 @@ class TCPairsConfInfo {
       MetConfig Conf;
 
       // Track filtering criteria
-      StringArray Basin;   // List of basin names
-      StringArray Cyclone; // List of cyclone numbers
-      StringArray Model;   // List of model names
+      StringArray Model;     // List of model names
+      StringArray Basin;     // List of basin names
+      StringArray Cyclone;   // List of cyclone numbers
+      StringArray StormName; // List of storm names
 
       // Consensus model definition
       int NCon;                // Number of consensus models
