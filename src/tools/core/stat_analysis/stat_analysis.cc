@@ -41,7 +41,6 @@
 
 using namespace std;
 
-#include <cmath>
 #include <cstdio>
 #include <dirent.h>
 #include <iostream>
@@ -49,6 +48,7 @@ using namespace std;
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cmath>
 
 #include "vx_log.h"
 

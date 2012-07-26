@@ -26,13 +26,13 @@
 
 using namespace std;
 
-#include <cmath>
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cmath>
 
 #include "vx_log.h"
 #include "vx_data2d_grib.h"
@@ -1699,7 +1699,7 @@ double compute_vif(NumArray &na) {
    corr = stats_lag1_autocorrelation(na);
 
    // Compute the variance inflation factor
-   vif = 1 + 2.0*abs(corr) - 2.0*abs(corr)/na.n_elements();
+   vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n_elements();
 
    return(vif);
 }

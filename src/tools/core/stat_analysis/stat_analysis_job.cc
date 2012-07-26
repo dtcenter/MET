@@ -28,7 +28,6 @@
 
 using namespace std;
 
-#include <cmath>
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -36,6 +35,7 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/param.h>
 #include <unistd.h>
+#include <cmath>
 
 #include "vx_log.h"
 
@@ -1440,7 +1440,7 @@ void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
       }
 
       me   += angle;
-      mae  += abs(angle);
+      mae  += fabs(angle);
    }
    if(!is_eq(me,  bad_data_double)) me  /= n_out;
    if(!is_eq(mae, bad_data_double)) mae /= n_out;
