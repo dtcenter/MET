@@ -969,17 +969,18 @@ sub vx_date_calc_init  { return vx_date_calc_sub(@_); }
 
 
 #####################################################################
-# sub vx_date_calc_add()
+# sub vx_date_build_list()
 #
-#   This function calculates a valid time by combining the input
-#   init time with the input lead time.  The input init time must
-#   be in the format YYYYmmdd[_]HH[MMSS] and the lead time in the 
-#   format [H]HH[MMSS].  The date returned will have the same format 
-#   as the input date.
+#   This function builds and returns a list of date strings in
+#   the format YYYYmmdd_HH[MMSS].  The begin time and end time must
+#   be specified in a format which will be the format used by the
+#   returned dates.  The increment must be specified in the format
+#   [H]HH[MMSS].
 #
 #   Arguments:
-#     init_time = init time from which valid time will be derived
-#     lead_time = lead time added to init time
+#     beg = beginning time of the list
+#     end = end time of the list
+#     inc = time increment between successive list times
 #
 ######################################################################
 

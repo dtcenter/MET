@@ -104,5 +104,9 @@ for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
 	
 }
 
-
+if( 1 <= verb ){
+  cat("\n# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #\n\n",
+      "comp_dir complete\n");
+}
+	
 
