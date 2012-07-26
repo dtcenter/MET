@@ -20,9 +20,11 @@
     <param> \
       &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
-      -type metar -v 1
+      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
+      -type metar -rec_beg 2000 -rec_end 6000 -v 2
     </param>   
     <output>
+      <exist>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log</exist>
       <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc</point_nc>
     </output>
   </test>
@@ -32,10 +34,34 @@
     <param> \
       &DATA_DIR_OBS;/madis/raob/raob_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/raob_2012040912_F000.nc \
-      -type raob -v 1
+      -type raob -v 2
     </param>   
     <output>
       <point_nc>&OUTPUT_DIR;/madis2nc/raob_2012040912_F000.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="madis2nc_PROFILER">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/profiler/profiler_20120409_1200.nc \
+      &OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc \
+      -type profiler -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="madis2nc_MARITIME">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/maritime/maritime_20120409_1200.nc \
+      &OUTPUT_DIR;/madis2nc/maritime_2012040912_F000.nc \
+      -type maritime -qc_dd V,Q -v 2
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/maritime_2012040912_F000.nc</point_nc>
     </output>
   </test>
   
