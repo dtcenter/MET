@@ -146,8 +146,8 @@ void TCStatJob::init_from_scratch() {
    InitMask.set_ignore_case(1);
    ValidMask.set_ignore_case(1);
    LineType.set_ignore_case(1);
-   ColNumName.set_ignore_case(1);
-   ColStrName.set_ignore_case(1);
+   ColumnThreshName.set_ignore_case(1);
+   ColumnStrName.set_ignore_case(1);
 
    clear();
 
@@ -175,10 +175,10 @@ void TCStatJob::clear() {
    InitMask.clear();
    ValidMask.clear();
    LineType.clear();
-   ColNumName.clear();
-   ColNumThresh.clear();
-   ColStrName.clear();
-   ColStrValue.clear();
+   ColumnThreshName.clear();
+   ColumnThreshVal.clear();
+   ColumnStrName.clear();
+   ColumnStrVal.clear();
    
    DumpFile.clear();
    close_dump_file();
@@ -216,10 +216,10 @@ void TCStatJob::assign(const TCStatJob & j) {
    InitMask = j.InitMask;
    ValidMask = j.ValidMask;
    LineType = j.LineType;
-   ColNumName = j.ColNumName;
-   ColNumThresh = j.ColNumThresh;
-   ColStrName = j.ColStrName;
-   ColStrValue = j.ColStrValue;
+   ColumnThreshName = j.ColumnThreshName;
+   ColumnThreshVal = j.ColumnThreshVal;
+   ColumnStrName = j.ColumnStrName;
+   ColumnStrVal = j.ColumnStrVal;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -278,17 +278,17 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "LineType ...\n";
    LineType.dump(out, depth + 1);
 
-   out << prefix << "ColNumName ...\n";
-   ColNumName.dump(out, depth + 1);
+   out << prefix << "ColumnThreshName ...\n";
+   ColumnThreshName.dump(out, depth + 1);
 
-   out << prefix << "ColNumThresh ...\n";
-   ColNumThresh.dump(out, depth + 1);
+   out << prefix << "ColumnThreshVal ...\n";
+   ColumnThreshVal.dump(out, depth + 1);
 
-   out << prefix << "ColStrName ...\n";
-   ColStrName.dump(out, depth + 1);
+   out << prefix << "ColumnStrName ...\n";
+   ColumnStrName.dump(out, depth + 1);
 
-   out << prefix << "ColStrValue ...\n";
-   ColStrValue.dump(out, depth + 1);
+   out << prefix << "ColumnStrVal ...\n";
+   ColumnStrVal.dump(out, depth + 1);
 
    out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
 
@@ -350,16 +350,15 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
    if(keep == true) {
 
       // Loop through the numeric column thresholds
-      for(i=0; i<ColNumName.n_elements(); i++) {
-        
-         // Determine the column offset and retrieve the value
-         offset = determine_column_offset(line.type(), ColNumName[i]);
-         v_dbl  = atof(line.get_item(offset));
+      for(i=0; i<ColumnThreshName.n_elements(); i++) {
+
+         // Get the numeric column value
+         v_dbl = get_column_double(line, ColumnThreshName[i]);
 
          // Check the column threshold
-         if(is_bad_data(v_dbl) || !ColNumThresh[i].check(v_dbl)) {
+         if(is_bad_data(v_dbl) || !ColumnThreshVal[i].check(v_dbl)) {
            keep = false;
-           n.RejColNum++;
+           n.RejColumnThresh++;
            break;
          }
       } // end for i
@@ -369,22 +368,22 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
    if(keep == true) {
 
       // Loop through the column string matching
-      for(i=0; i<ColStrName.n_elements(); i++) {
+      for(i=0; i<ColumnStrName.n_elements(); i++) {
 
          // Construct list of all entries for the current column name
          sa.clear();
-         for(j=0; j<ColStrName.n_elements(); j++)
-            if(strcasecmp(ColStrName[i], ColStrName[j]) == 0)
-               sa.add(ColStrValue[j]);
+         for(j=0; j<ColumnStrName.n_elements(); j++)
+            if(strcasecmp(ColumnStrName[i], ColumnStrName[j]) == 0)
+               sa.add(ColumnStrVal[j]);
         
          // Determine the column offset and retrieve the value
-         offset = determine_column_offset(line.type(), ColStrName[i]);
+         offset = determine_column_offset(line.type(), ColumnStrName[i]);
          v_str  = line.get_item(offset);
 
          // Check the string value
          if(!sa.has(v_str)) {
             keep = false;
-            n.RejColStr++;
+            n.RejColumnStr++;
             break;
          }
       } // end for i
@@ -448,6 +447,53 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
 
 ////////////////////////////////////////////////////////////////////////
 
+double TCStatJob::get_column_double(const TCStatLine &line,
+                                    const ConcatString &column) const {
+   StringArray sa;
+   ConcatString in;
+   double v, v_cur;
+   bool abs_flag = false;
+   int i;
+
+   // Check for absolute value
+   if(strncasecmp(column, "ABS", 3) == 0) {
+      abs_flag = true;
+      sa = column.split("()");
+      in = sa[1];
+   }
+   else {
+      in = column;
+   }
+
+   // Split the input column name on hyphens for differences
+   sa = in.split("-");
+
+   // Get the first value
+   v = atof(line.get_item(sa[0]));
+
+   // If multiple columns, compute the requested difference
+   if(sa.n_elements() > 1) {
+
+      // Loop through the column
+      for(i=1; i<sa.n_elements(); i++) {
+
+         // Get the current column value
+         v_cur = atof(line.get_item(sa[i]));
+
+         // Compute the difference, checking for bad data
+         if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
+         else                                     v -= v_cur;
+      }
+   }
+
+   // Apply absolute value, if requested
+   if(abs_flag) v = fabs(v);
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TCStatJob::parse_job_command(const char *jobstring) {
    StringArray a;
    const char * c = (const char *) 0;
@@ -481,8 +527,10 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-init_mask"       ) == 0) { InitMask.add(a[i+1]);                             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_mask"      ) == 0) { ValidMask.add(a[i+1]);                            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-line_type"       ) == 0) { LineType.add(a[i+1]);                             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-col_num"         ) == 0) { ColNumName.add(a[i+1]); ColNumThresh.add(a[i+2]); a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-col_str"         ) == 0) { ColStrName.add(a[i+1]); ColStrValue.add(a[i+2]);  a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-column_thresh"   ) == 0) { ColumnThreshName.add(a[i+1]);
+                                                         ColumnThreshVal.add(a[i+2]);                      a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-column_str"      ) == 0) { ColumnStrName.add(a[i+1]);
+                                                         ColumnStrVal.add(a[i+2]);                         a.shift_down(i, 2); }
       else if(strcasecmp(c, "-dump_row"        ) == 0) { DumpFile = a[i+1]; open_dump_file();              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_init_mask"   ) == 0) { set_mask(OutInitMask, a[i+1]);                    a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_valid_mask"  ) == 0) { set_mask(OutValidMask, a[i+1]);                   a.shift_down(i, 1); }
@@ -636,10 +684,12 @@ ConcatString TCStatJob::serialize() const {
       s << "-valid_mask " << ValidMask[i] << " ";
    for(i=0; i<LineType.n_elements(); i++)
       s << "-line_type " << LineType[i] << " ";
-   for(i=0; i<ColNumName.n_elements(); i++)
-      s << "-col_num " << ColNumName[i] << " " << ColNumThresh[i].get_str() << " ";
-   for(i=0; i<ColStrName.n_elements(); i++)
-      s << "-col_str " << ColStrName[i] << " " << ColStrValue[i] << " ";
+   for(i=0; i<ColumnThreshName.n_elements(); i++)
+      s << "-column_thresh " << ColumnThreshName[i] << " "
+                             << ColumnThreshVal[i].get_str() << " ";
+   for(i=0; i<ColumnStrName.n_elements(); i++)
+      s << "-column_str " << ColumnStrName[i] << " "
+                          << ColumnStrVal[i] << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
    if(OutInitMask.n_points() > 0)
@@ -1158,53 +1208,6 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
    }
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double TCStatJobSummary::get_column_double(const TCStatLine &line,
-                                           const ConcatString &column) {
-   StringArray sa;
-   ConcatString in;
-   double v, v_cur;
-   bool abs_flag = false;
-   int i;
-
-   // Check for absolute value
-   if(strncasecmp(column, "ABS", 3) == 0) {
-      abs_flag = true;
-      sa = column.split("()");
-      in = sa[1];
-   }
-   else {
-      in = column;
-   }
-
-   // Split the input column name on hyphens for differences
-   sa = in.split("-");
-
-   // Get the first value
-   v = atof(line.get_item(sa[0]));
-   
-   // If multiple columns, compute the requested difference
-   if(sa.n_elements() > 1) {
-
-      // Loop through the column
-      for(i=1; i<sa.n_elements(); i++) {
-
-         // Get the current column value
-         v_cur = atof(line.get_item(sa[i]));
-
-         // Compute the difference, checking for bad data
-         if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
-         else                                     v -= v_cur;
-      }
-   }
-
-   // Apply absolute value, if requested
-   if(abs_flag) v = fabs(v);
-
-   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
