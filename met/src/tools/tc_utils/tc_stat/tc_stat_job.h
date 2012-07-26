@@ -73,8 +73,8 @@ struct TCLineCounts {
    int RejInitMask;
    int RejValidMask;
    int RejLineType;
-   int RejColNum;
-   int RejColStr;
+   int RejColumnThresh;
+   int RejColumnStr;
    int RejOutInitMask;
    int RejOutValidMask;
    int RejMatchPoints;
@@ -114,6 +114,9 @@ class TCStatJob {
 
       bool is_keeper(const TCStatLine &, int &skip_lines,
                      TCLineCounts &) const;
+
+      double get_column_double(const TCStatLine &,
+                               const ConcatString &) const;
 
       virtual void parse_job_command(const char *);
       void set_mask(MaskPoly &, const char *);
@@ -155,12 +158,12 @@ class TCStatJob {
       StringArray LineType;
 
       // Numeric column thresholds
-      StringArray ColNumName;
-      ThreshArray ColNumThresh;
+      StringArray ColumnThreshName;
+      ThreshArray ColumnThreshVal;
 
       // ASCII column string matching
-      StringArray ColStrName;
-      StringArray ColStrValue;
+      StringArray ColumnStrName;
+      StringArray ColumnStrVal;
 
       // Variables to the store the analysis job specification
       
@@ -228,8 +231,6 @@ class TCStatJobSummary : public TCStatJob {
       void do_job(const StringArray &, TCLineCounts &); // virtual from base class
 
       void process_tc_stat_file(const char *, TCLineCounts &);
-
-      double get_column_double(const TCStatLine &, const ConcatString &);
       
       void add_map(map<ConcatString,NumArray,cs_cmp>&);
 

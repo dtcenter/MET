@@ -127,28 +127,30 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::ValidMask
    Filter.ValidMask = Conf.lookup_string_array("valid_mask");
 
-   // Conf: TCStatJob::ColNumName, TCStatJob::ColNumThresh
-   Filter.ColNumName   = Conf.lookup_string_array("col_num_name");
-   Filter.ColNumThresh = Conf.lookup_thresh_array("col_num_thresh");
+   // Conf: TCStatJob::ColumnThreshName, TCStatJob::ColumnThreshVal
+   Filter.ColumnThreshName = Conf.lookup_string_array("column_thresh_name");
+   Filter.ColumnThreshVal  = Conf.lookup_thresh_array("column_thresh_val");
 
    // Check that they are the same length
-   if(Filter.ColNumName.n_elements() != Filter.ColNumName.n_elements()) {
+   if(Filter.ColumnThreshName.n_elements() !=
+      Filter.ColumnThreshName.n_elements()) {
       mlog << Error
            << "\nTCStatConfInfo::process_config() -> "
-           << "the \"col_num_name\" and \"col_num_thresh\" entries "
-           << "must have the same length.\n\n";
+           << "the \"column_thresh_name\" and \"column_thresh_val\" "
+           << "entries must have the same length.\n\n";
       exit(1);
    }
 
-   // Conf: TCStatJob::ColStrName, TCStatJob::ColStrValue
-   Filter.ColStrName  = Conf.lookup_string_array("col_str_name");
-   Filter.ColStrValue = Conf.lookup_string_array("col_str_value");
+   // Conf: TCStatJob::ColumnStrName, TCStatJob::ColumnStrVal
+   Filter.ColumnStrName = Conf.lookup_string_array("column_str_name");
+   Filter.ColumnStrVal  = Conf.lookup_string_array("column_str_val");
 
    // Check that they are the same length
-   if(Filter.ColStrName.n_elements() != Filter.ColStrValue.n_elements()) {
+   if(Filter.ColumnStrName.n_elements() !=
+      Filter.ColumnStrVal.n_elements()) {
       mlog << Error
            << "\nTCStatConfInfo::process_config() -> "
-           << "the \"col_str_name\" and \"col_str_value\" entries "
+           << "the \"column_str_name\" and \"column_str_val\" entries "
            << "must have the same length.\n\n";
       exit(1);
    }

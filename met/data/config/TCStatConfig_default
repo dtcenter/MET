@@ -99,22 +99,22 @@ line_type = [];
 //
 // Stratify by applying thresholds to numeric data columns.
 // Specify a comma-separated list of columns names and thresholds
-// to be applied.  May add using the "-col_num name thresh" job command options.
-// e.g. col_num_name   = [ "ADLAND", "BDLAND" ];
-//      col_num_thresh = [ >200,     >200     ];
+// to be applied.  May add using the "-column_thresh name thresh" job command options.
+// e.g. column_thresh_name = [ "ADLAND", "BDLAND" ];
+//      column_thresh_val  = [ >200,     >200     ];
 //
-col_num_name   = [];
-col_num_thresh = [];
+column_thresh_name = [];
+column_thresh_val  = [];
 
 //
 // Stratify by performing string matching on non-numeric data columns.
 // Specify a comma-separated list of columns names and values
-// to be checked.  May add using the "-col_str name value" job command options.
-// e.g. col_str_name  = [ "LEVEL", "LEVEL" ];
-//      col_str_value = [ "HU",    "TS"    ];
+// to be checked.  May add using the "-column_str name string" job command options.
+// e.g. column_str_name = [ "LEVEL", "LEVEL" ];
+//      column_str_val  = [ "HU",    "TS"    ];
 //
-col_str_name  = [];
-col_str_value = [];
+column_str_name = [];
+column_str_val  = [];
 
 //
 // Specify whether only those track points common to both the ADECK and BDECK
