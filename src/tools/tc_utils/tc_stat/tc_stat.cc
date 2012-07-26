@@ -221,6 +221,7 @@ void process_jobs() {
            << "Total lines kept               = " << n.NKeep           << "\n"
            << "Rejected for amodel            = " << n.RejAModel       << "\n"
            << "Rejected for bmodel            = " << n.RejBModel       << "\n"
+           << "Rejected for storm id          = " << n.RejStormId      << "\n"
            << "Rejected for basin             = " << n.RejBasin        << "\n"
            << "Rejected for cyclone           = " << n.RejCyclone      << "\n"
            << "Rejected for storm name        = " << n.RejStormName    << "\n"

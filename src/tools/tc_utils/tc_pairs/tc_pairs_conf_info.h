@@ -35,6 +35,7 @@ class TCPairsConfInfo {
 
       // Track filtering criteria
       StringArray Model;     // List of model names
+      StringArray StormId;   // List of storm ids
       StringArray Basin;     // List of basin names
       StringArray Cyclone;   // List of cyclone numbers
       StringArray StormName; // List of storm names

@@ -82,11 +82,11 @@ class TrackInfo {
 
       void initialize(const TrackLine &);
 
-      void set_basin(const ConcatString &);
-      void set_cyclone(const ConcatString &);
-      void set_storm_name(const ConcatString &);
+      void set_basin(const char *);
+      void set_cyclone(const char *);
+      void set_storm_name(const char *);
       void set_technique_number(int);
-      void set_technique(const ConcatString &);
+      void set_technique(const char *);
       void set_init(const unixtime);
       
          //
@@ -97,11 +97,11 @@ class TrackInfo {
       int valid_index(unixtime) const;
 
       const TrackPoint & operator[](int)    const;
-      ConcatString       basin()            const;
-      ConcatString       cyclone()          const;
-      ConcatString       storm_name()       const;
+      const char *       basin()            const;
+      const char *       cyclone()          const;
+      const char *       storm_name()       const;
       int                technique_number() const;
-      ConcatString       technique()        const;
+      const char *       technique()        const;
       unixtime           init()             const;
       int                init_hh()          const;
       unixtime           valid_min()        const;
@@ -130,18 +130,18 @@ class TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void TrackInfo::set_basin(const ConcatString &s)      { Basin = s;           };
-inline void TrackInfo::set_cyclone(const ConcatString &s)    { Cyclone = s;         };
-inline void TrackInfo::set_storm_name(const ConcatString &s) { StormName = s;       };
-inline void TrackInfo::set_technique_number(int i)           { TechniqueNumber = i; };
-inline void TrackInfo::set_technique(const ConcatString &s)  { Technique = s;       };
-inline void TrackInfo::set_init(const unixtime u)            { InitTime = u;        };
+inline void TrackInfo::set_basin(const char *s)      { Basin = s;           };
+inline void TrackInfo::set_cyclone(const char *s)    { Cyclone = s;         };
+inline void TrackInfo::set_storm_name(const char *s) { StormName = s;       };
+inline void TrackInfo::set_technique_number(int i)   { TechniqueNumber = i; };
+inline void TrackInfo::set_technique(const char *s)  { Technique = s;       };
+inline void TrackInfo::set_init(const unixtime u)    { InitTime = u;        };
 
-inline ConcatString TrackInfo::basin()            const { return(Basin);                   }
-inline ConcatString TrackInfo::cyclone()          const { return(Cyclone);                 }
-inline ConcatString TrackInfo::storm_name()       const { return(StormName);               }
+inline const char * TrackInfo::basin()            const { return(Basin);                   }
+inline const char * TrackInfo::cyclone()          const { return(Cyclone);                 }
+inline const char * TrackInfo::storm_name()       const { return(StormName);               }
 inline int          TrackInfo::technique_number() const { return(TechniqueNumber);         }
-inline ConcatString TrackInfo::technique()        const { return(Technique);               }
+inline const char * TrackInfo::technique()        const { return(Technique);               }
 inline unixtime     TrackInfo::init()             const { return(InitTime);                }
 inline int          TrackInfo::init_hh()          const { return(InitTime % sec_per_hour); }
 inline unixtime     TrackInfo::valid_min()        const { return(MinValidTime);            }
@@ -210,6 +210,8 @@ inline int TrackInfoArray::n_tracks() const { return(NTracks); }
 ////////////////////////////////////////////////////////////////////////
 
 extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int);
+extern bool has_storm_id(const StringArray &, const ConcatString &basin,
+                         const ConcatString &cyclone, unixtime init);
 
 ////////////////////////////////////////////////////////////////////////
 

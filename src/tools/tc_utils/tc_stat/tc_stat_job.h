@@ -62,6 +62,7 @@ struct TCLineCounts {
    int NKeep;
    int RejAModel;
    int RejBModel;
+   int RejStormId;
    int RejBasin;
    int RejCyclone;
    int RejStormName;
@@ -137,6 +138,7 @@ class TCStatJob {
       // Header column entries
       StringArray AModel;
       StringArray BModel;
+      StringArray StormId;
       StringArray Basin;
       StringArray Cyclone;
       StringArray StormName;

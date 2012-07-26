@@ -139,6 +139,7 @@ void TCStatJob::init_from_scratch() {
    // Ignore case when performing comparisons
    AModel.set_ignore_case(1);
    BModel.set_ignore_case(1);
+   StormId.set_ignore_case(1);
    Basin.set_ignore_case(1);
    Cyclone.set_ignore_case(1);
    StormName.set_ignore_case(1);
@@ -163,6 +164,7 @@ void TCStatJob::clear() {
 
    AModel.clear();
    BModel.clear();
+   StormId.clear();
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
@@ -201,6 +203,7 @@ void TCStatJob::assign(const TCStatJob & j) {
 
    AModel = j.AModel;
    BModel = j.BModel;
+   StormId = j.StormId;
    Basin = j.Basin;
    Cyclone = j.Cyclone;
    StormName = j.StormName;
@@ -242,6 +245,9 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "BModel ...\n";
    BModel.dump(out, depth + 1);
+
+   out << prefix << "StormId ...\n";
+   StormId.dump(out, depth + 1);
 
    out << prefix << "Basin ...\n";
    Basin.dump(out, depth + 1);
@@ -312,6 +318,9 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
      !AModel.has(line.amodel()))        { keep = false; n.RejAModel++;    }
    else if(BModel.n_elements() > 0 &&
      !BModel.has(line.bmodel()))        { keep = false; n.RejBModel++;    }
+   else if(StormId.n_elements() > 0 &&
+     !has_storm_id(StormId, line.basin(), line.cyclone(), line.init()))
+                                        { keep = false; n.RejStormId++;   }
    else if(Basin.n_elements() > 0 &&
      !Basin.has(line.basin()))          { keep = false; n.RejBasin++;     }
    else if(Cyclone.n_elements() > 0 &&
@@ -459,6 +468,7 @@ void TCStatJob::parse_job_command(const char *jobstring) {
            if(strcasecmp(c, "-job"             ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);        a.shift_down(i, 1); }
       else if(strcasecmp(c, "-amodel"          ) == 0) { AModel.add(a[i+1]);                               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-bmodel"          ) == 0) { BModel.add(a[i+1]);                               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_id"        ) == 0) { StormId.add(a[i+1]);                              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-basin"           ) == 0) { Basin.add(a[i+1]);                                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-cyclone"         ) == 0) { Cyclone.add(a[i+1]);                              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-storm_name"      ) == 0) { StormName.add(a[i+1]);                            a.shift_down(i, 1); }
@@ -599,13 +609,15 @@ ConcatString TCStatJob::serialize() const {
    for(i=0; i<AModel.n_elements(); i++)
       s << "-amodel " << AModel[i] << " ";
    for(i=0; i<BModel.n_elements(); i++)
-      s << "-bmodel " <<  BModel[i] << " ";
+      s << "-bmodel " << BModel[i] << " ";
+   for(i=0; i<StormId.n_elements(); i++)
+      s << "-storm_id " << StormId[i] << " ";
    for(i=0; i<Basin.n_elements(); i++)
-      s << "-basin " <<  Basin[i] << " ";
+      s << "-basin " << Basin[i] << " ";
    for(i=0; i<Cyclone.n_elements(); i++)
-      s << "-cyclone " <<  Cyclone[i] << " ";
+      s << "-cyclone " << Cyclone[i] << " ";
    for(i=0; i<StormName.n_elements(); i++)
-      s << "-storm_name " <<  StormName[i] << " ";
+      s << "-storm_name " << StormName[i] << " ";
    if(InitBeg > 0)
       s << "-init_beg " << unix_to_yyyymmdd_hhmmss(InitBeg) << " ";
    if(InitEnd > 0)
@@ -619,15 +631,15 @@ ConcatString TCStatJob::serialize() const {
    for(i=0; i<Lead.n_elements(); i++)
       s << "-lead " << sec_to_hhmmss(Lead[i]) << " ";
    for(i=0; i<InitMask.n_elements(); i++)
-      s << "-init_mask " <<  InitMask[i] << " ";
+      s << "-init_mask " << InitMask[i] << " ";
    for(i=0; i<ValidMask.n_elements(); i++)
-      s << "-valid_mask " <<  ValidMask[i] << " ";
+      s << "-valid_mask " << ValidMask[i] << " ";
    for(i=0; i<LineType.n_elements(); i++)
-      s << "-line_type " <<  LineType[i] << " ";
+      s << "-line_type " << LineType[i] << " ";
    for(i=0; i<ColNumName.n_elements(); i++)
-      s << "-col_num " <<  ColNumName[i] << " " << ColNumThresh[i].get_str() << " ";
+      s << "-col_num " << ColNumName[i] << " " << ColNumThresh[i].get_str() << " ";
    for(i=0; i<ColStrName.n_elements(); i++)
-      s << "-col_str " <<  ColStrName[i] << " " << ColStrValue[i] << " ";
+      s << "-col_str " << ColStrName[i] << " " << ColStrValue[i] << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
    if(OutInitMask.n_points() > 0)

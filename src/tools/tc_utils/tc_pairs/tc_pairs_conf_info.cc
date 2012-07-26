@@ -60,6 +60,7 @@ void TCPairsConfInfo::clear() {
    if(ConMembers) { delete [] ConMembers; ConMembers = (StringArray *) 0; }
 
    Model.clear();
+   StormId.clear();
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
@@ -106,6 +107,9 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: Model
    Model = Conf.lookup_string_array("model");
+
+   // Conf: StormId
+   StormId = Conf.lookup_string_array("storm_id");
    
    // Conf: Version
    Version = Conf.lookup_string("version");
