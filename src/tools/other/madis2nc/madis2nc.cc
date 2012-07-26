@@ -92,6 +92,7 @@ static void      convert_wind_wdir_to_u_v(float wind, float wdir,
 static void process_madis_metar(NcFile *&f_in);
 static void process_madis_raob(NcFile *&f_in);
 static void process_madis_profiler(NcFile *&f_in);
+static void process_madis_maritime(NcFile *&f_in);
 
 static void usage();
 static void set_type(const StringArray &);
@@ -241,6 +242,9 @@ void process_madis_file(const char *madis_file) {
       case (madis_profiler):
          process_madis_profiler(f_in);
          break;
+      case(madis_maritime):
+         process_madis_maritime(f_in);
+         break;
 
       case(madis_coop):
       case(madis_HDW):
@@ -249,7 +253,6 @@ void process_madis_file(const char *madis_file) {
       case(madis_POES):
       case(madis_acars):
       case(madis_acarsProfiles):
-      case(madis_maritime):
       case(madis_mesonet):
       case(madis_radiometer):
       case(madis_sao):
@@ -1595,6 +1598,210 @@ void process_madis_profiler(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_madis_maritime(NcFile *&f_in) {
+   int nhdr, i_obs;
+   int n_rej_fill, n_rej_qc;
+   long i_hdr;
+   int hdr_sid_len;
+   double tmp_dbl;
+   char tmp_str[max_str_len];
+   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float pressure, pressure_fill_value;
+
+   //
+   // Input header variables:
+   // Note: hdr_typ is always set to ADPUPA
+   //
+   NcVar *in_hdr_sid_var = get_nc_var(f_in, "stationName");
+   NcVar *in_hdr_vld_var = get_nc_var(f_in, "timeObs");
+   NcVar *in_hdr_lat_var = get_nc_var(f_in, "latitude");
+   NcVar *in_hdr_lon_var = get_nc_var(f_in, "longitude");
+   NcVar *in_hdr_elv_var = get_nc_var(f_in, "elevation");
+
+   //
+   // Variables for vertical level information
+   //
+   NcVar *in_pressure_var = get_nc_var(f_in, "stationPress");
+
+   //
+   // Read the fill value for pressure
+   //
+   get_nc_var_att(in_pressure_var, "_FillValue", pressure_fill_value);
+
+   //
+   // Retrieve applicable dimensions
+   //
+   hdr_sid_len  = get_nc_dim(f_in, "maxStaNamLen");
+   nhdr         = get_nc_dim(f_in, in_recNum_str);
+   if(rec_end == 0) rec_end = nhdr;
+
+   //
+   // Setup the output NetCDF file
+   //
+   setup_netcdf_out(nhdr);
+
+   mlog << Debug(2) << "Processing MARITIME recs\t= " << rec_end - rec_beg << "\n";
+
+   //
+   // Initialize variables for processing observations
+   //
+   conversion = 1.0;
+   i_obs = n_rej_fill = n_rej_qc = 0;
+
+   //
+   // Arrays of longs for indexing into NetCDF variables
+   //
+   long *cur = new long [3];
+   cur[0] = cur[1] = cur[2] = 0;
+   long *dim = new long [3];
+   dim[0] = dim[1] = dim[2] = 1;
+
+   //
+   // Loop through each record and get the header data.
+   //
+   for(i_hdr=rec_beg; i_hdr<rec_end; i_hdr++) {
+
+      //
+      // Mapping of NetCDF variable names from input to output:
+      // Output                    = Input
+      // hdr_typ                   = NA - always set to ADPUPA
+      // hdr_sid                   = staName (staNameLen = 50)
+      // hdr_vld (YYYYMMDD_HHMMSS) = synTime (unixtime) - synoptic time
+      // hdr_arr[0](Lat)           = staLat
+      // hdr_arr[1](Lon)           = staLon
+      // hdr_arr[2](Elv)           = staElev
+      //
+
+      mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+
+      //
+      // Use cur to index into the NetCDF variables.
+      //
+      cur[0] = i_hdr;
+      cur[1] = 0;
+
+      //
+      // Process the header type.
+      // For maritime, store as SFCSHP.
+      //
+      hdr_typ = "SFCSHP";
+      put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
+
+      //
+      // Process the station name.
+      //
+      get_nc_var_val(in_hdr_sid_var, cur, hdr_sid_len, hdr_sid);
+      put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
+
+      //
+      // Process the observation time.
+      //
+      get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
+      hdr_vld = tmp_str;
+      put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
+
+      //
+      // Process the latitude, longitude, and elevation.
+      //
+      get_nc_var_val(in_hdr_lat_var, cur, dim, hdr_arr[0]);
+      get_nc_var_val(in_hdr_lon_var, cur, dim, hdr_arr[1]);
+      get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
+
+      //
+      // Write the header array to the output file.
+      //
+      put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+
+      //
+      // Initialize the observation array: hdr_id
+      //
+      obs_arr[0] = (float) i_hdr;
+
+      //
+      // Get the pressure for the current level
+      //
+      get_nc_var_val(in_pressure_var, cur, dim, pressure);
+      if( is_eq(pressure, pressure_fill_value) ) pressure = bad_data_float;
+
+      //
+      // Set the pressure and height for this level
+      //
+      obs_arr[2] = pressure;
+      obs_arr[3] = hdr_arr[2];
+
+      //
+      // Check for bad data
+      //
+      if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+      // Wind Direction
+      process_obs(f_in, "windDir", cur, dim, 31, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Wind Speed
+      process_obs(f_in, "windSpeed", cur, dim, 32, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Temperature
+      process_obs(f_in, "temperature", cur, dim, 11, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Dew Point temperature
+      process_obs(f_in, "dewpoint", cur, dim, 17, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Pressure reduced to MSL
+      process_obs(f_in, "seaLevelPress", cur, dim, 2, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // Surface wind gust
+      process_obs(f_in, "windGust", cur, dim, 180, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // APCP_01
+      obs_arr[2] = 3600;
+      process_obs(f_in, "precip1Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // APCP_06
+      obs_arr[2] = 21600;
+      process_obs(f_in, "precip6Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // APCP_12
+      obs_arr[2] = 43200;
+      process_obs(f_in, "precip12Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // APCP_18
+      obs_arr[2] = 64800;
+      process_obs(f_in, "precip18Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+      // APCP_24
+      obs_arr[2] = 86400;
+      process_obs(f_in, "precip24Hour", cur, dim, 61, conversion,
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+
+   } // end for i_hdr
+
+   mlog << Debug(2) << "Rejected based on QC\t= " << n_rej_qc << "\n"
+        << "Rejected based on fill\t= " << n_rej_fill << "\n"
+        << "Retained or derived\t= " << i_obs << "\n";
+
+   //
+   // Cleanup
+   //
+   if(cur) { delete [] cur; cur = (long *) 0; }
+   if(dim) { delete [] dim; dim = (long *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void usage() {
 
    cout << "\nUsage: "
@@ -1615,7 +1822,7 @@ void usage() {
         << "\t\t\"out_file\" is the output NetCDF file (required).\n"
 
         << "\t\t\"-type str\" specifies the type of MADIS observations "
-        << "(metar or raob) (required).\n"
+        << "(metar, raob, profiler or maritime) (required).\n"
 
         << "\t\t\"-qc_dd list\" specifies a comma-separated list of "
         << "QC flag values to be accepted (Z,C,S,V,X,Q,K,G,B) "
@@ -1656,6 +1863,9 @@ void set_type(const StringArray & a)
    }
    else if(strcasecmp(a[0], profiler_str) == 0) {
       mtype = madis_profiler;
+   }
+   else if(strcasecmp(a[0], maritime_str) == 0) {
+      mtype = madis_maritime;
    }
    else {
       mlog << Error << "\nprocess_command_line() -> "
