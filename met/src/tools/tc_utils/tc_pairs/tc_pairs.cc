@@ -338,14 +338,15 @@ void process_track_files(const StringArray &files,
 void filter_tracks(TrackInfoArray &tracks) {
    int i, j;
    int m, d, y, h, mm, s;
-   int n_mod, n_bas, n_cyc, n_name, n_init, n_vld, n_hh, n_maski, n_maskv;
+   int n_mod, n_sid, n_bas, n_cyc, n_name;
+   int n_init, n_init_hh, n_vld, n_maski, n_maskv;
    bool status;
    TrackInfoArray t = tracks;
    
    // Initialize
    tracks.clear();
-   n_bas = n_cyc = n_mod = n_init = n_vld = n_hh = 0;
-   n_maski = n_maskv = 0;
+   n_mod  = n_sid     = n_bas = n_cyc   = n_name  = 0;
+   n_init = n_init_hh = n_vld = n_maski = n_maskv = 0;
    
    // Loop through the tracks and determine which should be retained
    for(i=0; i<t.n_tracks(); i++) {
@@ -356,6 +357,16 @@ void filter_tracks(TrackInfoArray &tracks) {
          mlog << Debug(4)
               << "Discarding track " << i+1 << " for model mismatch.\n";
          n_mod++;
+         continue;
+      }
+
+      // Check model
+      if(conf_info.StormId.n_elements() > 0 &&
+         !has_storm_id(conf_info.StormId, t[i].basin(),
+                       t[i].cyclone(), t[i].init())) {
+         mlog << Debug(4)
+              << "Discarding track " << i+1 << " for storm id mismatch.\n";
+         n_sid++;
          continue;
       }
      
@@ -398,6 +409,17 @@ void filter_tracks(TrackInfoArray &tracks) {
          continue;
       }
 
+      // Initialization hour
+      unix_to_mdyhms(t[i].init(), m, d, y, h, mm, s);
+      if(conf_info.InitHH.n_elements() > 0 &&
+         !conf_info.InitHH.has(hms_to_sec(h, mm, s))) {
+         mlog << Debug(4)
+              << "Discarding track " << i+1 << " for initialization hour "
+              << "mismatch.\n";
+         n_init_hh++;
+         continue;
+      }
+
       // Valid time window
       if((conf_info.ValidBeg > 0 &&
           conf_info.ValidBeg > t[i].valid_min()) ||
@@ -407,17 +429,6 @@ void filter_tracks(TrackInfoArray &tracks) {
               << "Discarding track " << i+1 << " for falling outside of the "
               << "valid time window.\n";
          n_vld++;
-         continue;
-      }
-
-      // Initialization hour
-      unix_to_mdyhms(t[i].init(), m, d, y, h, mm, s);
-      if(conf_info.InitHH.n_elements() > 0 &&
-         !conf_info.InitHH.has(hms_to_sec(h, mm, s))) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for initialization hour "
-              << "mismatch.\n";
-         n_hh++;
          continue;
       }
 
@@ -464,15 +475,16 @@ void filter_tracks(TrackInfoArray &tracks) {
         << "Total tracks read       = " << t.n_tracks()      << "\n"
         << "Total tracks kept       = " << tracks.n_tracks() << "\n"
         << "Rejected for model      = " << n_mod             << "\n"
+        << "Rejected for storm id   = " << n_sid             << "\n"
         << "Rejected for basin      = " << n_bas             << "\n"
         << "Rejected for cyclone    = " << n_cyc             << "\n"
-        << "Rejected for storm name = " << n_name             << "\n"
+        << "Rejected for storm name = " << n_name            << "\n"
         << "Rejected for init time  = " << n_init            << "\n"
-        << "Rejected for init hour  = " << n_hh              << "\n"
+        << "Rejected for init hour  = " << n_init_hh         << "\n"
         << "Rejected for valid time = " << n_vld             << "\n"
         << "Rejected for init mask  = " << n_maski           << "\n"
         << "Rejected for valid mask = " << n_maskv           << "\n";
-   
+
    return;
 }
 

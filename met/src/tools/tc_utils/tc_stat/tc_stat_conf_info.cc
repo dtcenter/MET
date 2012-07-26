@@ -94,6 +94,9 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::BModel
    Filter.BModel = Conf.lookup_string_array("bmodel");
 
+   // Conf: TCStatJob::StormId
+   Filter.StormId = Conf.lookup_string_array("storm_id");
+   
    // Conf: TCStatJob::Basin
    Filter.Basin = Conf.lookup_string_array("basin");
 

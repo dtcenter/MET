@@ -303,7 +303,6 @@ const TrackPoint & TrackInfo::operator[](int n) const {
    return(Point[n]);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 int TrackInfo::valid_inc() const {
@@ -919,6 +918,68 @@ TrackInfo consensus(const TrackInfoArray &tarr,
 
    // Return the consensus track
    return(tavg);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Determine if the basin/cyclone/init of the storm match any of the
+// storm id's specified in the list.  The storm id consists of:
+//   2-character basin, 2-character cyclone, 4-character year
+//
+// To match all storms in a season, replace cyclone with "AL".
+// To match multiple years, replace year with the the last two digits
+// of the beginning and ending years.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool has_storm_id(const StringArray &storm_id,
+                  const ConcatString &basin,
+                  const ConcatString &cyclone,
+                  unixtime init) {
+   int i, year, year_beg, year_end;
+   unixtime init_beg, init_end;
+   bool match = false;
+
+   // Loop over the storm id entries
+   for(i=0; i<storm_id.n_elements(); i++) {
+
+      // Check that the basin matches
+      if(strncasecmp(storm_id[i], basin, 2) != 0) continue;
+
+      // Check that the cyclone number matches
+      if(strncasecmp(storm_id[i]+2, cyclone, 2) != 0 &&
+         strncasecmp(storm_id[i]+2,    "AL", 2) != 0) continue;
+
+      // Parse the year
+      year = atoi(storm_id[i]+4);
+
+      // Handle a single year
+      if(year >= 1900 && year < 2100) {
+         year_beg = year_end = year;
+      }
+      // Handle a range of years
+      else {
+         year_beg = year/100;
+         year_end = year%100;
+
+         // Add the appropriate century
+         if(year_beg > 50) year_beg += 1900;
+         else              year_beg += 2000;
+         if(year_end > 50) year_end += 1900;
+         else              year_end += 2000;
+      }
+
+      // Check that the init time falls in the specified time range
+      init_beg = mdyhms_to_unix(01, 01, year_beg,   0, 0, 0);
+      init_end = mdyhms_to_unix(01, 01, year_end+1, 0, 0, 0);
+      if(init < init_beg || init >= init_end) continue;
+
+      // Otherwise, it's a match
+      match = true;
+      break;
+   }
+
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////

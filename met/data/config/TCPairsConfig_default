@@ -18,6 +18,17 @@
 model = [];
 
 //
+// Specify a comma-separated list of storm id's to be used:
+//    2-letter basin, 2-digit cyclone number, 4-digit year
+// An empty list indicates that all should be used.
+//
+// e.g. storm_id = [ "AL092011" ];
+//
+// This may also be set using basin, cyclone, and timing information below.
+//
+storm_id = [];
+
+//
 // Specify a comma-separated list of basins to be used.
 // An empty list indicates that all should be used.
 //   Valid basins: WP, IO, SH, CP, EP, AL, SL
