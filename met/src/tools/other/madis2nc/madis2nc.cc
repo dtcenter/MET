@@ -78,6 +78,9 @@ static int    get_num_lvl(NcVar *&, const char *dim_str,
 static float  get_nc_obs(NcFile *&f_in, const char *in_str,
                          const long *cur, const long *dim,
                          int &n_rej_fill, int &n_rej_qc);
+static float  get_nc_obs(NcFile *&f_in, const char *in_str,
+                         const long *cur, const long *dim,
+                         int &n_rej_fill, int &n_rej_qc, char &qty);
 static void   process_obs(NcFile *&f_in, const char *in_str,
                           const long *cur, const long *dim,
                           const int gc, const float conversion,
@@ -331,6 +334,7 @@ void setup_netcdf_out(int nhdr) {
    hdr_sid_var = f_out->add_var("hdr_sid", ncChar,  hdr_dim, strl_dim);
    hdr_vld_var = f_out->add_var("hdr_vld", ncChar,  hdr_dim, strl_dim);
    hdr_arr_var = f_out->add_var("hdr_arr", ncFloat, hdr_dim, hdr_arr_dim);
+   obs_qty_var = f_out->add_var("obs_qty", ncChar,  obs_dim, strl_dim);
    obs_arr_var = f_out->add_var("obs_arr", ncFloat, obs_dim, obs_arr_dim);
 
    //
@@ -351,6 +355,8 @@ void setup_netcdf_out(int nhdr) {
    hdr_arr_var->add_att("lon_units", "degrees_east");
    hdr_arr_var->add_att("elv_long_name", "elevation");
    hdr_arr_var->add_att("elv_units", "meters above sea level (msl)");
+
+   obs_qty_var->add_att("long_name", "quality flag");
 
    obs_arr_var->add_att("long_name", "array of observation values");
    obs_arr_var->add_att("_fill_value", fill_value);
@@ -593,10 +599,9 @@ int get_num_lvl(NcVar *&var, const char *dim_str,
 
 float get_nc_obs(NcFile *&f_in, const char *in_str,
                  const long *cur, const long *dim,
-                 int &n_rej_fill, int &n_rej_qc) {
+                 int &n_rej_fill, int &n_rej_qc, char &qty) {
    float v, in_fill_value;
    ConcatString in_dd_str, dd_str;
-   char dd;
 
    //
    // Setup the QC search string.
@@ -619,8 +624,8 @@ float get_nc_obs(NcFile *&f_in, const char *in_str,
    // Retrieve the values
    //
    get_nc_var_val(in_var, cur, dim, v);
-   get_nc_var_val(in_var_dd, cur, dim, dd);
-   dd_str << dd;
+   get_nc_var_val(in_var_dd, cur, dim, qty);
+   dd_str << qty;
 
    //
    // Check for missing data
@@ -650,6 +655,15 @@ float get_nc_obs(NcFile *&f_in, const char *in_str,
 
 ////////////////////////////////////////////////////////////////////////
 
+float get_nc_obs(NcFile *&f_in, const char *in_str,
+                 const long *cur, const long *dim,
+                 int &n_rej_fill, int &n_rej_qc) {
+   char qty;
+   return get_nc_obs(f_in, in_str, cur, dim, n_rej_fill, n_rej_qc, qty);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void process_obs(NcFile *&f_in, const char *in_str,
                  const long *cur, const long *dim,
                  const int in_gc, const float conversion,
@@ -663,7 +677,8 @@ void process_obs(NcFile *&f_in, const char *in_str,
    //
    // Get the observation value and store it
    //
-   obs_arr[4] = get_nc_obs(f_in, in_str, cur, dim, n_rej_fill, n_rej_qc);
+   char qty;
+   obs_arr[4] = get_nc_obs(f_in, in_str, cur, dim, n_rej_fill, n_rej_qc, qty);
 
    //
    // Check for bad data and apply conversion factor
@@ -671,6 +686,12 @@ void process_obs(NcFile *&f_in, const char *in_str,
    if(!is_bad_data(obs_arr[4])) {
       obs_arr[4] *= conversion;
       put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+
+      //PGO -  Add the quality control value to the quality header array
+      ConcatString qty_str;
+      qty_str << qty;
+      put_nc_var_val(obs_qty_var, i_obs, qty_str);
+
       i_obs++;
    }
 

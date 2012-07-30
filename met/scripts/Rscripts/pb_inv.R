@@ -50,7 +50,8 @@ dfObs = data.frame(
 	gc     = get.var.ncdf(ncPb, ncPb$var[["obs_arr"]])[2,],
 	lvl    = get.var.ncdf(ncPb, ncPb$var[["obs_arr"]])[3,],
 	hgt    = get.var.ncdf(ncPb, ncPb$var[["obs_arr"]])[4,],
-	ob     = get.var.ncdf(ncPb, ncPb$var[["obs_arr"]])[5,]
+	qty    = get.var.ncdf(ncPb, ncPb$var[["obs_qty"]]),
+	ob     = signif(get.var.ncdf(ncPb, ncPb$var[["obs_arr"]])[5,], 5)
 );
 
 # apply the filtering criteria and merge the headers and obs
@@ -60,7 +61,7 @@ if( strGc  != "" ){ dfObs = dfObs[dfObs$gc  == strGc, ]; }
 dfSid = merge(dfHdr, dfObs);
 
 # print the formatted observations
-options(scipen=20);
+options(scipen=20, digits=6);
 apply(dfSid, 1, function(d){ cat(d,"\n") })
 
 # better formatting, but very slow...

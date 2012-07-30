@@ -65,8 +65,10 @@ enum ASCIIFormat {
 static ASCIIFormat ascii_format = met_point;
 
 // MET point observation format info
-static const char *met_fmt_str = "met_point";
-static const int   n_met_col   = 10;
+static const char *met_fmt_str   = "met_point";
+static const int   n_met_col     = 10;
+static const int   n_met_col_qty = 11;
+static       int   n_file_col    = -1;
 
 // Variables for command line arguments
 static ConcatString asfile;
@@ -219,19 +221,42 @@ void open_met_ascii(LineDataFile &f_in) {
    while(f_in >> dl) {
 
       //
-      // Check that the line contains the expected number of columns
+      // Store/check the number of columns in the current row
       //
-      if(dl.n_items() != n_met_col) {
+      if( -1 == n_file_col ){
+
+         // Make sure the number of columns conforms to an acceptible format
+         if(dl.n_items() != n_met_col && dl.n_items() != n_met_col_qty) {
+            mlog << Error << "\nopen_met_ascii() -> "
+                 << "line number " << nrow << " doesn't contain the "
+                 << "expected number of columns (" << n_met_col
+                 << " or " << n_met_col_qty << "):\n";
+
+            dl.dump(cout);
+
+            mlog << Error << "\n";
+            exit(1);
+         }
+
+         // Store the format
+         n_file_col = dl.n_items();
+         if( n_file_col == n_met_col ){
+            mlog << Debug(1) << "Found 10 column input file format deprecated "
+                 << "in METv4.1 - consider adding quality flag value\n";
+         }
+
+      // Verify format consistency
+      } else if( dl.n_items() != n_file_col ) {
          mlog << Error << "\nopen_met_ascii() -> "
-              << "line number " << nrow << " doesn't contain the "
-              << "expected number of columns (" << n_met_col
-              << "):\n";
+              << "line number " << nrow << " does not have the same number of "
+              << "columns as the first line (" << n_file_col << "):\n";
 
          dl.dump(cout);
 
          mlog << Error << "\n";
          exit(1);
       }
+
 
       //
       // Store the PrepBufr message type, station id, valid time,
@@ -300,7 +325,7 @@ void open_met_ascii(LineDataFile &f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
-   int i_obs, i_hdr;
+   int i_obs, i_hdr, obs_idx;
    DataLine dl;
 
    ConcatString hdr_typ, prev_hdr_typ;
@@ -325,6 +350,7 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
    NcVar *hdr_sid_var = f_out->add_var("hdr_sid", ncChar, hdr_dim, strl_dim);
    NcVar *hdr_vld_var = f_out->add_var("hdr_vld", ncChar, hdr_dim, strl_dim);
    NcVar *hdr_arr_var = f_out->add_var("hdr_arr", ncFloat, hdr_dim, hdr_arr_dim);
+   NcVar *obs_qty_var = f_out->add_var("obs_qty", ncChar, obs_dim, strl_dim);
    NcVar *obs_arr_var = f_out->add_var("obs_arr", ncFloat, obs_dim, obs_arr_dim);
 
    //
@@ -344,6 +370,8 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
    hdr_arr_var->add_att("lon_units", "degrees_east");
    hdr_arr_var->add_att("elv_long_name", "elevation ");
    hdr_arr_var->add_att("elv_units", "meters above sea level (msl)");
+
+   obs_qty_var->add_att("long_name", "quality flag");
 
    obs_arr_var->add_att("long_name", "array of observation values");
    obs_arr_var->add_att("_fill_value", fill_value);
@@ -370,10 +398,10 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       //
       // Check that the line contains the expected number of columns
       //
-      if(dl.n_items() != n_met_col) {
+      if(dl.n_items() != n_file_col) {
          mlog << Error << "\nwrite_met_obs() -> "
               << "line number " << i_obs+1 << " doesn't contain the "
-              << "expected number of columns (" << n_met_col
+              << "expected number of columns (" << n_file_col
               << "):\n";
 
          dl.dump(cout);
@@ -480,15 +508,16 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
       //
       // Store the observation array
       //
-      obs_arr[0] = i_hdr;       // Header ID
-      obs_arr[1] = atof(dl[6]); // Grib Code
+      obs_arr[0] = i_hdr;                            // Header ID
+      obs_arr[1] = atof(dl[6]);                      // Grib Code
+      obs_idx = (n_file_col == n_met_col ? 9 : 10);  // Index of observation
 
       // Level: pressure level (hPa) or accumulation interval (sec) for precip
       if(is_precip_grib_code(obs_arr[1])) obs_arr[2] = timestring_to_sec(dl[7]);
       else                                obs_arr[2] = atof(dl[7]);
 
-      obs_arr[3] = atof(dl[8]); // Meters above sea level
-      obs_arr[4] = atof(dl[9]); // Observation Value
+      obs_arr[3] = atof(dl[8]);       // Meters above sea level
+      obs_arr[4] = atof(dl[obs_idx]); // Observation Value
 
       if(!obs_arr_var->set_cur(i_obs, (long) 0) ||
          !obs_arr_var->put(obs_arr, (long) 1, (long) obs_arr_len) ) {
@@ -497,10 +526,20 @@ void write_met_obs(LineDataFile &f_in, NcFile *&f_out) {
          exit(1);
       }
 
+      // Write the observation flag value
+      ConcatString qty = (n_file_col == n_met_col ? "NA" : dl[9]);
+      if(!obs_qty_var->set_cur(i_obs, (long) 0) ||
+         !obs_qty_var->put(qty, (long) 1, (long) qty.length()) ) {
+         mlog << Error << "\nmain() -> "
+              << "error writing the quality flag to the netCDF file\n\n";
+         exit(1);
+      }
+
       //
       // Increment the observation count
       //
       i_obs++;
+
    } // end while
 
    mlog << Debug(2) << "Finished processing " << nrow << " observations.\n";
