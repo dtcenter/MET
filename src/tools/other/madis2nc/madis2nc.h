@@ -123,6 +123,7 @@ static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
 static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
 static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
 static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
+static NcVar *obs_qty_var = (NcVar *)  0; // Quality Flag
 static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
 
 ////////////////////////////////////////////////////////////////////////

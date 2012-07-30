@@ -57,6 +57,7 @@ using namespace std;
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -195,6 +196,7 @@ static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
 static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
 static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
 static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
+static NcVar *obs_qty_var = (NcVar *)  0; // Quality flag
 static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
 
 ////////////////////////////////////////////////////////////////////////
@@ -231,7 +233,8 @@ static bool   keep_instrument_type(int);
 static bool   keep_obs_grib_code(int);
 static bool   keep_level_category(int);
 
-static float  derive_grib_code(int, float *, double);
+static float  derive_grib_code(int, float *, float *, double,
+                               float&);
 
 static void   usage();
 static void   set_pbfile(const StringArray &);
@@ -380,6 +383,8 @@ void open_netcdf() {
    obs_dim     = f_out->add_dim("nobs"); // unlimited dimension
 
    // Define netCDF variables
+   obs_qty_var = f_out->add_var("obs_qty", ncChar, obs_dim,
+                                strl_dim);
    obs_arr_var = f_out->add_var("obs_arr", ncFloat, obs_dim,
                                 obs_arr_dim);
 
@@ -387,6 +392,7 @@ void open_netcdf() {
    write_netcdf_global(f_out, ncfile.text(), program_name);
 
    // Add variable attributes
+   obs_qty_var->add_att("long_name", "quality flag");
    obs_arr_var->add_att("long_name", "array of observation values");
    obs_arr_var->add_att("_fill_value", fill_value);
    obs_arr_var->add_att("columns", "hdr_id gc lvl hgt ob");
@@ -428,7 +434,7 @@ void process_pbfile(int i_pb) {
 
    float    quality_mark, dl_category;
    float    obs_arr[obs_arr_len];
-   float    pqtzuv[mxr8vt];
+   float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
 
    // List the PrepBufr file being processed
    mlog << Debug(1) << "Processing PrepBufr File:\t" << pbfile[i_pb]
@@ -739,7 +745,10 @@ void process_pbfile(int i_pb) {
          }
 
          // Initialize the P, Q, T, Z, U, V variables
-         for(i=0; i<mxr8vt; i++) pqtzuv[i] = fill_value;
+         for(i=0; i<mxr8vt; i++){
+            pqtzuv[i]     = fill_value;
+            pqtzuv_qty[i] = fill_value;
+         }
 
          // Index through the variable types 'P, Q, T, Z, U, V'
          for(kk=0; kk<mxr8vt; kk++) {
@@ -805,12 +814,25 @@ void process_pbfile(int i_pb) {
 
             // Store the observation values from which other
             // variables may be derived
-            pqtzuv[kk] = obs_arr[4];
+            pqtzuv[kk]     = obs_arr[4];
+            pqtzuv_qty[kk] = quality_mark;
 
             // If the grib code corrsponding to the observation
             // variable is not listed in the configuration file
             // continue to the next observation variable
             if(!keep_obs_grib_code(var_gc[kk])) continue;
+
+            // Write the quality flag to the netCDF file
+            ConcatString quality_mark_str;
+            quality_mark_str.format("%.1f", quality_mark);
+            if(!obs_qty_var->set_cur(n_total_obs, (long) 0) ||
+               !obs_qty_var->put(quality_mark_str, (long) 1,
+                                 (long) strl_len)) {
+               mlog << Error << "\nprocess_pbfile() -> "
+                    << "error writing the quality flag to the "
+                    << "netCDF file\n\n";
+               exit(1);
+            }
 
             // Write the observation array to the netCDF file
             if(!obs_arr_var->set_cur(n_total_obs, (long) 0) ||
@@ -851,9 +873,22 @@ void process_pbfile(int i_pb) {
 
                // Derive the value for the grib code
                obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
-                                             hdr_arr_lat);
+                                             pqtzuv_qty, hdr_arr_lat,
+                                             quality_mark);
 
                if(is_eq(obs_arr[4], fill_value)) continue;
+
+               // Write the quality flag to the netCDF file
+               ConcatString quality_mark_str;
+               quality_mark_str.format("%.1f", quality_mark);
+               if(!obs_qty_var->set_cur(n_total_obs, (long) 0) ||
+                  !obs_qty_var->put(quality_mark_str, (long) 1,
+                                    (long) strl_len)) {
+                  mlog << Error << "\nprocess_pbfile() -> "
+                       << "error writing the quality flag to the "
+                       << "netCDF file\n\n";
+                  exit(1);
+               }
 
                // Write the observation array to the netCDF file
                if(!obs_arr_var->set_cur(n_total_obs, (long) 0) ||
@@ -1185,7 +1220,8 @@ bool keep_level_category(int category) {
 
 ////////////////////////////////////////////////////////////////////////
 
-float derive_grib_code(int gc, float *pqtzuv, double lat) {
+float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
+                       double lat, float &qty) {
    float result;
    double p, q, t, z, u, v, w, vp;
 
@@ -1196,12 +1232,16 @@ float derive_grib_code(int gc, float *pqtzuv, double lat) {
          p      = (double) pqtzuv[0];
          t      = (double) pqtzuv[2];
          z      = (double) pqtzuv[3];
+         qty    = pqtzuv_qty[0];
+         qty    = pqtzuv_qty[2] > qty ? pqtzuv_qty[2] : qty;
+         qty    = pqtzuv_qty[3] > qty ? pqtzuv_qty[3] : qty;
          result = (float) convert_p_t_z_to_prmsl(p, t, z, lat);
          break;
 
       // Humidity mixing ratio
       case(mixr_grib_code):
          q      = (double) pqtzuv[1];
+         qty    = pqtzuv_qty[1];
          result = (float) convert_q_to_w(q);
          break;
 
@@ -1209,6 +1249,8 @@ float derive_grib_code(int gc, float *pqtzuv, double lat) {
       case(dpt_grib_code):
          p      = (double) pqtzuv[0];
          q      = (double) pqtzuv[1];
+         qty    = pqtzuv_qty[0];
+         qty    = pqtzuv_qty[1] > qty ? pqtzuv_qty[1] : qty;
          w      = convert_q_to_w(q);
          vp     = convert_p_w_to_vp(p, w);
          result = (float) convert_vp_to_dpt(vp);
@@ -1219,6 +1261,9 @@ float derive_grib_code(int gc, float *pqtzuv, double lat) {
          p      = (double) pqtzuv[0];
          q      = (double) pqtzuv[1];
          t      = (double) pqtzuv[2];
+         qty    = pqtzuv_qty[0];
+         qty    = pqtzuv_qty[1] > qty ? pqtzuv_qty[1] : qty;
+         qty    = pqtzuv_qty[2] > qty ? pqtzuv_qty[2] : qty;
          result = (float) convert_p_q_t_to_rh(p, q, t);
          break;
 
@@ -1226,6 +1271,8 @@ float derive_grib_code(int gc, float *pqtzuv, double lat) {
       case(wdir_grib_code):
          u      = (double) pqtzuv[4];
          v      = (double) pqtzuv[5];
+         qty    = pqtzuv_qty[4];
+         qty    = pqtzuv_qty[5] > qty ? pqtzuv_qty[5] : qty;
          result = (float) convert_u_v_to_wdir(u, v);
          break;
 
@@ -1233,6 +1280,8 @@ float derive_grib_code(int gc, float *pqtzuv, double lat) {
       case(wind_grib_code):
          u      = (double) pqtzuv[4];
          v      = (double) pqtzuv[5];
+         qty    = pqtzuv_qty[4];
+         qty    = pqtzuv_qty[5] > qty ? pqtzuv_qty[5] : qty;
          result = (float) convert_u_v_to_wind(u, v);
          break;
 
