@@ -38,7 +38,8 @@ for(strVarName in names(ncfile$var)){
 	# if the variable contains header information, make sure it's not empty
 	if( strVarName == "hdr_typ" | 
 	    strVarName == "hdr_sid" | 
-		strVarName == "hdr_vld" ){ 
+		strVarName == "hdr_vld" | 
+		strVarName == "obs_qty" ){ 
 	    
 		if( 1 > nrow(var) ){
 			if( verb ){ cat(strVarName, "empty\n"); }
@@ -64,7 +65,7 @@ for(strVarName in names(ncfile$var)){
 }
 
 # if one or more variables are missing, throw an error
-if( 3 != intNumHdrVar ){
+if( 3 != intNumHdrVar & 4 != intNumHdrVar ){
 	if( verb ){ cat("Unexpected number of header variables (", intNumHdrVar, ")\n"); }
 	q(status=1);
 }

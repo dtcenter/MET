@@ -18,7 +18,7 @@
   <test name="ascii2nc_TRMM_3hr">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/trmm/trmm_2012040912_3hr.mtxt \
+      &DATA_DIR_OBS;/trmm/trmm_2012040912_3hr_qty.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
       -v 1
     </param>   
@@ -30,7 +30,7 @@
   <test name="ascii2nc_TRMM_12hr">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/trmm/trmm_2008080812_12hr.mtxt \
+      &DATA_DIR_OBS;/trmm/trmm_2008080812_12hr_qty.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2008080812_12hr.nc \
       -v 1
     </param>   
@@ -42,7 +42,7 @@
   <test name="ascii2nc_GAGE_24hr">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/gauge/2012041012.precip24.ascii \
+      &DATA_DIR_OBS;/gauge/2012041012.precip24_qty.ascii \
       &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
       -v 1
     </param>   
@@ -54,7 +54,7 @@
   <test name="ascii2nc_duplicates">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/ascii/dup_test.txt \
+      &DATA_DIR_OBS;/ascii/dup_test_qty.txt \
       &OUTPUT_DIR;/ascii2nc/dup_test.nc \
       -v 1
     </param>   
