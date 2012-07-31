@@ -187,12 +187,14 @@ void TrackPairInfo::initialize(const TCStatLine &l) {
    // Initialize the ADECK TrackInfo
    ADeck.set_basin(l.basin());
    ADeck.set_cyclone(l.cyclone());
+   ADeck.set_storm_name(l.storm_name());
    ADeck.set_technique(l.amodel());
    ADeck.set_init(l.init());
 
    // Initialize the BDECK TrackInfo
    BDeck.set_basin(l.basin());
    BDeck.set_cyclone(l.cyclone());
+   BDeck.set_storm_name(l.storm_name());
    BDeck.set_technique(l.bmodel());
    BDeck.set_init((unixtime) 0);
 
@@ -258,6 +260,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
       cs << cs_erase << deck[i] << "MSLP";
       tp->set_mslp(atof(l.get_item(cs)));
       tp->set_level(string_to_cyclonelevel(l.get_item("LEVEL")));
+      tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 
       // Loop over the winds
       for(j=0; j<NWinds; j++) {

@@ -153,6 +153,7 @@ class TrackPoint {
       void set_v_max(const int);
       void set_mslp(const int);
       void set_level(CycloneLevel);
+      void set_watch_warn(WatchWarnType);
       void set_watch_warn(WatchWarnType, unixtime);
 
          //
@@ -182,13 +183,14 @@ class TrackPoint {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void TrackPoint::set_valid(const unixtime u) { ValidTime = u; }
-inline void TrackPoint::set_lead(const int s)       { LeadTime = s;  }
-inline void TrackPoint::set_lat(const double l)     { Lat = l;       }
-inline void TrackPoint::set_lon(const double l)     { Lon = l;       }
-inline void TrackPoint::set_v_max(const int v)      { Vmax = v;      }
-inline void TrackPoint::set_mslp(const int v)       { MSLP = v;      }
-inline void TrackPoint::set_level(CycloneLevel l)   { Level = l;     }
+inline void TrackPoint::set_valid(const unixtime u)    { ValidTime = u; }
+inline void TrackPoint::set_lead(const int s)          { LeadTime = s;  }
+inline void TrackPoint::set_lat(const double l)        { Lat = l;       }
+inline void TrackPoint::set_lon(const double l)        { Lon = l;       }
+inline void TrackPoint::set_v_max(const int v)         { Vmax = v;      }
+inline void TrackPoint::set_mslp(const int v)          { MSLP = v;      }
+inline void TrackPoint::set_level(CycloneLevel l)      { Level = l;     }
+inline void TrackPoint::set_watch_warn(WatchWarnType t){ WatchWarn = t; }
 
 inline unixtime      TrackPoint::valid()      const { return(ValidTime); }
 inline int           TrackPoint::lead()       const { return(LeadTime);  }

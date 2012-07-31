@@ -522,7 +522,7 @@ const QuadInfo & TrackPoint::operator[](int n) const {
 void TrackPoint::set_watch_warn(WatchWarnType ww_type, unixtime ww_ut) {
 
    // If the watch/warning time exceeds the TrackPoint time, set it
-   if(ValidTime >= ww_ut) WatchWarn = ww_type;
+   if(ValidTime >= ww_ut) set_watch_warn(ww_type);
    
    return;
 }
