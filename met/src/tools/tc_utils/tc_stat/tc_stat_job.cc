@@ -459,10 +459,22 @@ bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
 
    // Check TrackWatchWarn
    if(TrackWatchWarn.n_elements() > 0 &&
-      !TrackWatchWarn.has(watchwarntype_to_string(tpi.track_watch_warn()))) {
+      !TrackWatchWarn.has(watchwarntype_to_string(tpi.track_watch_warn())))
+      keep = false;
+  
+   // Check for the special string ALL:
+   //    HUWARN, TSWARN, HUWATCH, TSWATCH
+   if(TrackWatchWarn.has("ALL") &&
+      (tpi.track_watch_warn() == HurricaneWarn     ||
+       tpi.track_watch_warn() == TropicalStormWarn ||
+       tpi.track_watch_warn() == HurricaneWatch    ||
+       tpi.track_watch_warn() == TropicalStormWatch))
+       keep = true;
+
+   // Update counts
+   if(!keep) {
       n.RejTrackWatchWarn += tpi.n_points();
       n.NKeep             -= tpi.n_points();
-      keep                 = false;
    }
 
    return(keep);
