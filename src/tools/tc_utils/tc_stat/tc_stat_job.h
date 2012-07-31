@@ -78,6 +78,7 @@ struct TCLineCounts {
    int RejOutInitMask;
    int RejOutValidMask;
    int RejMatchPoints;
+   int RejTrackWatchWarn;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -113,6 +114,8 @@ class TCStatJob {
       void dump(ostream &, int depth = 0) const;
 
       bool is_keeper(const TCStatLine &, int &skip_lines,
+                     TCLineCounts &) const;
+      bool is_keeper(const TrackPairInfo &,
                      TCLineCounts &) const;
 
       double get_column_double(const TCStatLine &,
@@ -154,6 +157,9 @@ class TCStatJob {
       // Polyline masking regions
       StringArray InitMask, ValidMask;
 
+      // Track watch/warning status
+      StringArray TrackWatchWarn;
+      
       // Line type
       StringArray LineType;
 

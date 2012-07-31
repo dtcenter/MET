@@ -97,6 +97,15 @@ valid_mask = [];
 line_type = [];
 
 //
+// Stratify by selecting the most severe watch/warning over the entire track.
+// Individual watch/warning status by point may be specified using the
+// -column_str options below, but this option filters by the track maximum.
+// May add using the "-track_watch_warn" job command option.
+// e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
+//
+track_watch_warn = [];
+
+//
 // Stratify by applying thresholds to numeric data columns.
 // Specify a comma-separated list of columns names and thresholds
 // to be applied.  May add using the "-column_thresh name thresh" job command options.

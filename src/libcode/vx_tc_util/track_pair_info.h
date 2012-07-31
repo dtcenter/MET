@@ -90,6 +90,7 @@ class TrackPairInfo {
       double            track_err(int)       const;
       double            along_track_err(int) const;
       double            cross_track_err(int) const;
+      WatchWarnType     track_watch_warn()   const;
 
          //
          //  do stuff
