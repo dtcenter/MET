@@ -623,6 +623,7 @@ void TCStatJob::write_dump_file() {
       tchc.set_bdeck_model(PairArray[i].bdeck().technique());
       tchc.set_basin(PairArray[i].bdeck().basin());
       tchc.set_cyclone(PairArray[i].bdeck().cyclone());
+      tchc.set_storm_name(PairArray[i].bdeck().storm_name());
    
       if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
       else                            tchc.set_init_mask(na_str);
