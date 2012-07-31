@@ -444,6 +444,85 @@ ConcatString parse_str(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
+WatchWarnType ww_max(const WatchWarnType t1, const WatchWarnType t2) {
+   WatchWarnType t;
+
+   // Order of severity (most to least):
+   //   HurricaneWarn, HurricaneWatch,
+   //   TropicalStormWarn, TropicalStormWatch,
+   //   GaleWarn, StormWarn
+
+        if(t1 == HurricaneWarn      ||
+           t2 == HurricaneWarn       ) t = HurricaneWarn;
+   else if(t1 == HurricaneWatch     ||
+           t2 == HurricaneWatch      ) t = HurricaneWatch;
+   else if(t1 == TropicalStormWarn  ||
+           t2 == TropicalStormWarn   ) t = TropicalStormWarn;
+   else if(t1 == TropicalStormWatch ||
+           t2 == TropicalStormWatch  ) t = TropicalStormWatch;
+   else if(t1 == GaleWarn           ||
+           t2 == GaleWarn            ) t = GaleWarn;
+   else if(t1 == StormWarn          ||
+           t2 == StormWarn           ) t = StormWarn;
+   else                                t = NoWatchWarnType;
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+WatchWarnType int_to_watchwarntype(int i) {
+   WatchWarnType t;
+
+        if(i == 1) t = TropicalStormWatch;
+   else if(i == 2) t = TropicalStormWarn;
+   else if(i == 3) t = GaleWarn;
+   else if(i == 4) t = StormWarn;
+   else if(i == 5) t = HurricaneWatch;
+   else if(i == 6) t = HurricaneWarn;
+   else            t = NoWatchWarnType;
+
+   return(t);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+WatchWarnType string_to_watchwarntype(const char *s) {
+   WatchWarnType t;
+
+        if(strcasecmp(s, "TSWATCH") == 0) t = TropicalStormWatch;
+   else if(strcasecmp(s, "TSWARN")  == 0) t = TropicalStormWarn;
+   else if(strcasecmp(s, "GLWARN")  == 0) t = GaleWarn;
+   else if(strcasecmp(s, "STWARN")  == 0) t = StormWarn;
+   else if(strcasecmp(s, "HUWATCH") == 0) t = HurricaneWatch;
+   else if(strcasecmp(s, "HUWARN")  == 0) t = HurricaneWarn;
+   else                                   t = NoWatchWarnType;
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString watchwarntype_to_string(const WatchWarnType t) {
+   const char *s = (const char *) 0;
+
+   switch(t) {
+      case TropicalStormWatch: s = "TSWATCH"; break;
+      case TropicalStormWarn:  s = "TSWARN";  break;
+      case GaleWarn:           s = "GLWARN";  break;
+      case StormWarn:          s = "STWARN";  break;
+      case HurricaneWatch:     s = "HUWATCH"; break;
+      case HurricaneWarn:      s = "HUWARN";  break;
+      case NoWatchWarnType:    s = na_str;    break;
+      default:                 s = na_str;    break;
+   }
+
+   return(ConcatString(s));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 CycloneLevel string_to_cyclonelevel(const char *s) {
    CycloneLevel l;
 

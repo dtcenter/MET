@@ -296,6 +296,19 @@ void TrackPairInfo::add(const TCStatLine &l) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
+                                   WatchWarnType ww_type,
+                                   unixtime ww_ut) {
+
+   // Add watch/warning information to the ADECK and BDECK tracks
+   ADeck.add_watch_warn(storm_id, ww_type, ww_ut);
+   BDeck.add_watch_warn(storm_id, ww_type, ww_ut);
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class TrackPairInfoArray
 //
@@ -497,3 +510,16 @@ void TrackPairInfoArray::add(const TrackPairInfo &p) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfoArray::add_watch_warn(const ConcatString &ww_sid,
+                                        WatchWarnType ww_type,
+                                        unixtime ww_ut) {
+   int i;
+
+   // Loop through the track pairs
+   for(i=0; i<NPairs; i++) Pair[i].add_watch_warn(ww_sid, ww_type, ww_ut);
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////

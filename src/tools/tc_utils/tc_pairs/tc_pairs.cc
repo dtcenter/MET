@@ -66,6 +66,7 @@ static void   compute_acerr       (const TrackInfo &, const TrackInfo &,
                                    TimeArray &, NumArray &, NumArray &,
                                    NumArray &);
 static void   load_dland          ();
+static void   process_watch_warn  (TrackPairInfoArray &);
 static void   write_output        (const TrackPairInfoArray &);
 static void   setup_table         (AsciiTable &);
 static void   clean_up            ();
@@ -243,6 +244,9 @@ void process_tracks() {
               << n_match << " BDECK track(s).\n";
       }
    } // end for i
+
+   // Add the watch/warning information to the matched track pairs
+   process_watch_warn(pairs);
 
    // Dump out very verbose output
    if(mlog.verbosity_level() >= 5) {
@@ -867,7 +871,7 @@ void load_dland() {
    // Get the path for the distance to land file
    file_name = replace_path(conf_info.DLandFile);
    
-   mlog << Debug(3)
+   mlog << Debug(1)
         << "Distance to land file: " << file_name << "\n";
   
    // Open the NetCDF output of the tc_dland tool
@@ -910,6 +914,72 @@ void load_dland() {
            << file_name << "\"\n\n";
       exit(1);
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_watch_warn(TrackPairInfoArray &p) {
+   ConcatString file_name;
+   LineDataFile f_in;
+   DataLine dl;
+   ConcatString ww_sid;
+   unixtime ww_ut;
+   WatchWarnType ww_type;
+   int i, n_ww;
+
+   // Get the path for the watch/warning file
+   file_name = replace_path(conf_info.WatchWarnFile);
+
+   // Check for non-empty file name
+   if(file_name.empty()) {
+      mlog << Debug(1)
+           << "No watch/warning file specified.\n";
+      return;
+   }
+
+   mlog << Debug(1)
+        << "Watch/Warning file: " << file_name << "\n";
+
+   // Open the watch/warning ASCII file
+   if(!f_in.open(file_name)) {
+      mlog << Error << "\nprocess_watch_warn() -> "
+           << "can't open input watch/warning ASCII file \""
+           << file_name << "\" for reading\n\n";
+      exit(1);
+   }
+
+   // Read the file line by line
+   while(f_in >> dl) {
+
+      // Parse the watch/warning time
+      ww_ut = mdyhms_to_unix(atoi(dl[0]), atoi(dl[1]),
+                             atoi(dl[2]), atoi(dl[3]), 0, 0);
+
+      // Parse the number of watch/warning messages
+      n_ww = atoi(dl[5]);
+
+      // Parse the storm id
+      ww_sid = dl[6];
+      ww_sid.ws_strip();
+      
+      // Determine the maximum severity watch/warning in effect
+      for(i=0, ww_type=NoWatchWarnType; i<n_ww; i++) {
+
+         // Read the next line
+         f_in >> dl;
+
+         // Compute maximum severity watch/warning
+         ww_type = ww_max(ww_type, int_to_watchwarntype(atoi(dl[0])));
+      }
+
+      // Add the current watch/warning information to the tracks
+      p.add_watch_warn(ww_sid, ww_type, ww_ut);
+   }
+
+   // Close the input file
+   f_in.close();
 
    return;
 }

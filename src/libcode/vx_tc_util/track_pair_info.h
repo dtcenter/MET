@@ -98,7 +98,7 @@ class TrackPairInfo {
       void add(const TrackPoint &, const TrackPoint &,
                double, double, double, double, double);
       void add(const TCStatLine&);
-
+      void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ class TrackPairInfoArray {
          //
 
       void add(const TrackPairInfo &);
-
+      void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 };
 
 ////////////////////////////////////////////////////////////////////////
