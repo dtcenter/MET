@@ -101,6 +101,7 @@ line_type = [];
 // Individual watch/warning status by point may be specified using the
 // -column_str options below, but this option filters by the track maximum.
 // May add using the "-track_watch_warn" job command option.
+// The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
 // e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
 //
 track_watch_warn = [];
