@@ -33,7 +33,7 @@ static const char * tc_header_cols [] = {
 // The last 10 columns repeat for each wind intensity value
 static const char * tc_mpr_cols [] = {
    "TOTAL",       "INDEX",      "LEVEL",
-   "ALAT",        "ALON",
+   "WATCH_WARN",  "ALAT",       "ALON",
    "BLAT",        "BLON",
    "TK_ERR",      "ALTK_ERR",   "CRTK_ERR",
    "ADLAND",      "BDLAND",

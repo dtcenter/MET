@@ -30,6 +30,26 @@ static const char  BestTrackStr[]  = "BEST";
 
 ////////////////////////////////////////////////////////////////////////
 
+enum WatchWarnType {
+   TropicalStormWatch, // Tropical Storm Watch
+   TropicalStormWarn,  // Tropical Storm Warning
+   
+   GaleWarn,           // Gale Warning
+   StormWarn,          // Storm Warning
+   
+   HurricaneWatch,     // Hurricane Watch
+   HurricaneWarn,      // Hurricane Warning
+
+   NoWatchWarnType
+};
+
+extern WatchWarnType ww_max(const WatchWarnType, const WatchWarnType);
+extern WatchWarnType int_to_watchwarntype(int);
+extern WatchWarnType string_to_watchwarntype(const char *);
+extern ConcatString  watchwarntype_to_string(const WatchWarnType);
+
+////////////////////////////////////////////////////////////////////////
+
 enum CycloneLevel {
    Disturbance,            // DB
    TropicalDepression,     // TD

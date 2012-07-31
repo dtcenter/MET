@@ -393,6 +393,7 @@ void TrackPoint::clear() {
    Vmax      = bad_data_int;
    MSLP      = bad_data_int;
    Level     = NoCycloneLevel;
+   WatchWarn = NoWatchWarnType;
 
    // Call clear for each Wind object and then set intensity value
    for(i=0; i<NWinds; i++) {
@@ -416,6 +417,7 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "Vmax      = " << Vmax << "\n";
    out << prefix << "MSLP      = " << MSLP << "\n";
    out << prefix << "Level     = " << cyclonelevel_to_string(Level) << "\n";
+   out << prefix << "WatchWarn = " << watchwarntype_to_string(WatchWarn) << "\n";
 
    for(i=0; i<NWinds; i++) {
       out << prefix << "Wind[" << i+1 << "]:" << "\n";
@@ -439,7 +441,8 @@ ConcatString TrackPoint::serialize() const {
      << ", Lon = " << Lon
      << ", Vmax = " << Vmax
      << ", MSLP = " << MSLP
-     << ", Level = " << cyclonelevel_to_string(Level);
+     << ", Level = " << cyclonelevel_to_string(Level)
+     << ", WatchWarn = " << watchwarntype_to_string(WatchWarn);
 
    return(s);
 }
@@ -475,6 +478,7 @@ void TrackPoint::assign(const TrackPoint &t) {
    Vmax      = t.Vmax;
    MSLP      = t.MSLP;
    Level     = t.Level;
+   WatchWarn = t.WatchWarn;
    
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
    
@@ -511,6 +515,16 @@ const QuadInfo & TrackPoint::operator[](int n) const {
    }
 
    return(Wind[n]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPoint::set_watch_warn(WatchWarnType ww_type, unixtime ww_ut) {
+
+   // If the watch/warning time exceeds the TrackPoint time, set it
+   if(ValidTime >= ww_ut) WatchWarn = ww_type;
+   
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

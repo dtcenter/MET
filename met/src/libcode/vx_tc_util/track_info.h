@@ -46,6 +46,7 @@ class TrackInfo {
       bool         IsSet;
 
       // Storm and model identification
+      ConcatString StormId;
       ConcatString Basin;
       ConcatString Cyclone;
       ConcatString StormName;
@@ -97,6 +98,7 @@ class TrackInfo {
       int valid_index(unixtime) const;
 
       const TrackPoint & operator[](int)    const;
+      const char *       storm_id();
       const char *       basin()            const;
       const char *       cyclone()          const;
       const char *       storm_name()       const;
@@ -115,6 +117,7 @@ class TrackInfo {
 
       void add(const TrackPoint &);
       bool add(const TrackLine &);
+      void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
       
       bool has(const TrackLine &) const;
       

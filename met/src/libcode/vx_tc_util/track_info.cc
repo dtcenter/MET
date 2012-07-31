@@ -76,6 +76,7 @@ void TrackInfo::clear() {
 
    IsSet           = false;
 
+   StormId.clear();
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
@@ -106,6 +107,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
 
+   out << prefix << "StormId         = \"" << (StormId ? StormId.text() : "(nul)") << "\"\n";
    out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
    out << prefix << "Cyclone         = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\"\n";
    out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
@@ -134,7 +136,8 @@ ConcatString TrackInfo::serialize() const {
    ConcatString s;
 
    s << "TrackInfo: "
-     << "Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
+     << "StormId = \"" << (StormId ? StormId.text() : "(nul)") << "\""
+     << ", Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
      << ", Cyclone = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\""
      << ", StormName = \"" << (StormName ? StormName.text() : "(nul)") << "\""
      << ", TechniqueNumber = " << TechniqueNumber
@@ -173,7 +176,8 @@ void TrackInfo::assign(const TrackInfo &t) {
    clear();
 
    IsSet           = true;
-   
+
+   StormId         = t.StormId;
    Basin           = t.Basin;
    Cyclone         = t.Cyclone;
    StormName       = t.StormName;
@@ -305,6 +309,32 @@ const TrackPoint & TrackInfo::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+const char * TrackInfo::storm_id() {
+   int year, mon, day, hr, minute, sec;
+   unixtime ut;
+
+   // If already set, return it's value
+   if(!StormId.empty()) return(StormId);
+
+   // Use timing information to determine the year.
+        if(InitTime > 0)     ut = InitTime;
+   else if(MinValidTime > 0) ut = MinValidTime;
+   else                      ut = MaxValidTime;
+
+   // Ensure that the StormId components are valid
+   if(!Basin.empty() && !Cyclone.empty() && ut > 0) {
+
+      unix_to_mdyhms(ut, mon, day, year, hr, minute, sec);
+
+      // Set StormId
+      StormId << Basin << Cyclone << year;
+   }
+
+   return(StormId);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackInfo::valid_inc() const {
    int i;
    NumArray ut_inc;
@@ -391,6 +421,21 @@ bool TrackInfo::add(const TrackLine &l) {
       MaxValidTime = l.valid();
 
    return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
+                               WatchWarnType ww_type, unixtime ww_ut) {
+   int i;
+
+   // Check for a matching storm id
+   if(storm_id() != ww_sid) return;
+
+   // Loop over the TrackPoints
+   for(i=0; i<NPoints; i++) Point[i].set_watch_warn(ww_type, ww_ut);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -935,9 +980,9 @@ TrackInfo consensus(const TrackInfoArray &tarr,
 bool has_storm_id(const StringArray &storm_id,
                   const ConcatString &basin,
                   const ConcatString &cyclone,
-                  unixtime init) {
+                  unixtime ut) {
    int i, year, year_beg, year_end;
-   unixtime init_beg, init_end;
+   unixtime ut_beg, ut_end;
    bool match = false;
 
    // Loop over the storm id entries
@@ -969,10 +1014,10 @@ bool has_storm_id(const StringArray &storm_id,
          else              year_end += 2000;
       }
 
-      // Check that the init time falls in the specified time range
-      init_beg = mdyhms_to_unix(01, 01, year_beg,   0, 0, 0);
-      init_end = mdyhms_to_unix(01, 01, year_end+1, 0, 0, 0);
-      if(init < init_beg || init >= init_end) continue;
+      // Check that the ut time falls in the specified time range
+      ut_beg = mdyhms_to_unix(01, 01, year_beg,   0, 0, 0);
+      ut_end = mdyhms_to_unix(01, 01, year_end+1, 0, 0, 0);
+      if(ut < ut_beg || ut >= ut_end) continue;
 
       // Otherwise, it's a match
       match = true;

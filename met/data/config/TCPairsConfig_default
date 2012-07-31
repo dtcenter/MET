@@ -114,6 +114,13 @@ valid_mask = "";
 dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
 
 //
+// Specify an ASCII file containing watch/warning information to be used.
+// At each track point, the most severe watch/warning status in effect,
+// if any, will be written to the output.
+//
+watch_warn_file = "MET_BASE/data/tc_data/wwpts_us.txt";
+
+//
 // Specify whether special processing should be performed for interpolated
 // models with 12-hour spacing.  For model with a name ending in 'I' (e.g. AHWI)
 // search for the corresponding track whose model name ends in '2' (e.g. AHW2)

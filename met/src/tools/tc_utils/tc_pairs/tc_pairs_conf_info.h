@@ -58,6 +58,9 @@ class TCPairsConfInfo {
       // Gridded data file containing distances to land
       ConcatString DLandFile;
 
+      // ASCII watch/warnings file
+      ConcatString WatchWarnFile;
+      
       // Merge 6-hour TrackPoints into 12-hour interpolated tracks
       bool Interp12;
       

@@ -73,6 +73,7 @@ void TCPairsConfInfo::clear() {
    InitMask.clear();
    ValidMask.clear();
    DLandFile.clear();
+   WatchWarnFile.clear();
    Interp12 = true;
    CheckDup = true;
    MatchPoints = false;
@@ -181,6 +182,9 @@ void TCPairsConfInfo::process_config() {
    // Conf: DLandFile
    DLandFile = Conf.lookup_string("dland_file");
 
+   // Conf: WatchWarnFile
+   WatchWarnFile = Conf.lookup_string("watch_warn_file");
+   
    // Conf: Interp12
    Interp12 = Conf.lookup_bool("interp12");
 
