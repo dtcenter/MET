@@ -447,17 +447,20 @@ ConcatString parse_str(const char *s) {
 WatchWarnType ww_max(const WatchWarnType t1, const WatchWarnType t2) {
    WatchWarnType t;
 
-   // Order of severity (most to least):
-   //   HurricaneWarn, HurricaneWatch,
-   //   TropicalStormWarn, TropicalStormWatch,
-   //   GaleWarn, StormWarn
+   // Order of watch/warning interest:
+   //   HurricaneWarn,
+   //   TropicalStormWarn,
+   //   HurricaneWatch,
+   //   TropicalStormWatch,
+   //   GaleWarn,
+   //   StormWarn
 
         if(t1 == HurricaneWarn      ||
            t2 == HurricaneWarn       ) t = HurricaneWarn;
-   else if(t1 == HurricaneWatch     ||
-           t2 == HurricaneWatch      ) t = HurricaneWatch;
    else if(t1 == TropicalStormWarn  ||
            t2 == TropicalStormWarn   ) t = TropicalStormWarn;
+   else if(t1 == HurricaneWatch     ||
+           t2 == HurricaneWatch      ) t = HurricaneWatch;
    else if(t1 == TropicalStormWatch ||
            t2 == TropicalStormWatch  ) t = TropicalStormWatch;
    else if(t1 == GaleWarn           ||

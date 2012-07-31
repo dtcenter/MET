@@ -146,6 +146,7 @@ void TCStatJob::init_from_scratch() {
    InitMask.set_ignore_case(1);
    ValidMask.set_ignore_case(1);
    LineType.set_ignore_case(1);
+   TrackWatchWarn.set_ignore_case(1);
    ColumnThreshName.set_ignore_case(1);
    ColumnStrName.set_ignore_case(1);
 
@@ -175,6 +176,7 @@ void TCStatJob::clear() {
    InitMask.clear();
    ValidMask.clear();
    LineType.clear();
+   TrackWatchWarn.clear();
    ColumnThreshName.clear();
    ColumnThreshVal.clear();
    ColumnStrName.clear();
@@ -216,6 +218,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    InitMask = j.InitMask;
    ValidMask = j.ValidMask;
    LineType = j.LineType;
+   TrackWatchWarn = j.TrackWatchWarn;
    ColumnThreshName = j.ColumnThreshName;
    ColumnThreshVal = j.ColumnThreshVal;
    ColumnStrName = j.ColumnStrName;
@@ -278,6 +281,9 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "LineType ...\n";
    LineType.dump(out, depth + 1);
 
+   out << prefix << "TrackWatchWarn ...\n";
+   TrackWatchWarn.dump(out, depth + 1);
+   
    out << prefix << "ColumnThreshName ...\n";
    ColumnThreshName.dump(out, depth + 1);
 
@@ -447,6 +453,23 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
+                          TCLineCounts &n) const {
+   bool keep = true;
+
+   // Check TrackWatchWarn
+   if(TrackWatchWarn.n_elements() > 0 &&
+      !TrackWatchWarn.has(watchwarntype_to_string(tpi.track_watch_warn()))) {
+      n.RejTrackWatchWarn += tpi.n_points();
+      n.NKeep             -= tpi.n_points();
+      keep                 = false;
+   }
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double TCStatJob::get_column_double(const TCStatLine &line,
                                     const ConcatString &column) const {
    StringArray sa;
@@ -527,6 +550,7 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-init_mask"       ) == 0) { InitMask.add(a[i+1]);                             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_mask"      ) == 0) { ValidMask.add(a[i+1]);                            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-line_type"       ) == 0) { LineType.add(a[i+1]);                             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-track_watch_warn") == 0) { TrackWatchWarn.add(a[i+1]);                       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-column_thresh"   ) == 0) { ColumnThreshName.add(a[i+1]);
                                                          ColumnThreshVal.add(a[i+2]);                      a.shift_down(i, 2); }
       else if(strcasecmp(c, "-column_str"      ) == 0) { ColumnStrName.add(a[i+1]);
@@ -685,6 +709,8 @@ ConcatString TCStatJob::serialize() const {
       s << "-valid_mask " << ValidMask[i] << " ";
    for(i=0; i<LineType.n_elements(); i++)
       s << "-line_type " << LineType[i] << " ";
+   for(i=0; i<TrackWatchWarn.n_elements(); i++)
+      s << "-track_watch_warn " << TrackWatchWarn[i] << " ";
    for(i=0; i<ColumnThreshName.n_elements(); i++)
       s << "-column_thresh " << ColumnThreshName[i] << " "
                              << ColumnThreshVal[i].get_str() << " ";
@@ -749,9 +775,13 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
       // Check for the first point of a track
       if(index == 1) {
             
-         // Store the current pair, write it, and clear it
+         // Store the current pair and clear it
          if(tpi.n_points() > 0) {
-            PairArray.add(tpi);
+
+            // Store the current pair
+            if(is_keeper(tpi, n)) PairArray.add(tpi);
+
+            // Clear the current pair
             tpi.clear();
          }
       }
@@ -780,8 +810,8 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
       }
    }
 
-   // Store the current pair and write it
-   if(tpi.n_points() > 0) PairArray.add(tpi);
+   // Store the last pair
+   if(tpi.n_points() > 0 && is_keeper(tpi, n)) PairArray.add(tpi);
    
    return;
 }
@@ -1119,14 +1149,17 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
       // Check for the first point of a track
       if(index == 1) {
 
+         // Store the current map and pair and clear them
          if(tpi.n_points() > 0) {
 
-            // Store the current map and clear it
-            add_map(cur_map);
-            cur_map.clear();
+            // Store the current map and pair
+            if(is_keeper(tpi, n)) {
+               add_map(cur_map);
+               PairArray.add(tpi);
+            }
 
-            // Store the current pair and clear it
-            PairArray.add(tpi);
+            // Clear the current map and pair
+            cur_map.clear();
             tpi.clear();
          }
       }
@@ -1152,11 +1185,15 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
 
                cur = line.get_item(Case[j]);
 
+               // For bad data, use the NA string
+               if(is_bad_data(atoi(cur))) cur = na_str;
+
                // For lead time column, make sure hour is 3-digits
                if(strcasecmp(Case[j], "LEAD") == 0 &&
-                  hhmmss_to_sec(cur) < 100*sec_per_hour)
+                  cur != na_str &&
+                  hhmmss_to_sec(cur) < 100*sec_per_hour)                 
                     key << ":0" << cur;
-               else key << ":"  << cur;
+               else key << ":"  << cur;       
             }
      
             // Key is not yet defined in the map
@@ -1198,8 +1235,8 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
       }
    }
 
-   // Check if there's data to store before returning
-   if(tpi.n_points() > 0) {
+   // Store the last pair and map
+   if(tpi.n_points() > 0 && is_keeper(tpi, n)) {
 
       // Store the current map
       add_map(cur_map);

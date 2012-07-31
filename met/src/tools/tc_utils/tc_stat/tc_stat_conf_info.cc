@@ -127,6 +127,9 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::ValidMask
    Filter.ValidMask = Conf.lookup_string_array("valid_mask");
 
+   // Conf: TCStatJob::TrackWatchWarn
+   Filter.TrackWatchWarn = Conf.lookup_string_array("track_watch_warn");
+   
    // Conf: TCStatJob::ColumnThreshName, TCStatJob::ColumnThreshVal
    Filter.ColumnThreshName = Conf.lookup_string_array("column_thresh_name");
    Filter.ColumnThreshVal  = Conf.lookup_thresh_array("column_thresh_val");

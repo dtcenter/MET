@@ -300,6 +300,25 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
+WatchWarnType TrackPairInfo::track_watch_warn() const {
+   WatchWarnType ww_cur, ww_type;
+   int i;
+
+   // Initialize
+   ww_type = ww_cur = NoWatchWarnType;
+   
+   // Loop over the track points and pick the watch/warning type of
+   // most interest
+   for(i=0; i<NPoints; i++) {
+      ww_cur  = ww_max(ADeck[i].watch_warn(), BDeck[i].watch_warn());
+      ww_type = ww_max(ww_type, ww_cur);
+   }
+
+   return(ww_type);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
                                    WatchWarnType ww_type,
                                    unixtime ww_ut) {

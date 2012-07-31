@@ -217,26 +217,27 @@ void process_jobs() {
            << n.NRead << " lines read.\n";
 
       mlog << Debug(3)
-           << "Total lines read               = " << n.NRead           << "\n"
-           << "Total lines kept               = " << n.NKeep           << "\n"
-           << "Rejected for amodel            = " << n.RejAModel       << "\n"
-           << "Rejected for bmodel            = " << n.RejBModel       << "\n"
-           << "Rejected for storm id          = " << n.RejStormId      << "\n"
-           << "Rejected for basin             = " << n.RejBasin        << "\n"
-           << "Rejected for cyclone           = " << n.RejCyclone      << "\n"
-           << "Rejected for storm name        = " << n.RejStormName    << "\n"
-           << "Rejected for init time         = " << n.RejInit         << "\n"
-           << "Rejected for init hour         = " << n.RejInitHH       << "\n"
-           << "Rejected for lead time         = " << n.RejLead         << "\n"
-           << "Rejected for valid time        = " << n.RejValid        << "\n"
-           << "Rejected for init mask         = " << n.RejInitMask     << "\n"
-           << "Rejected for valid mask        = " << n.RejValidMask    << "\n"
-           << "Rejected for line type         = " << n.RejLineType     << "\n"
-           << "Rejected for numeric threshold = " << n.RejColumnThresh << "\n"
-           << "Rejected for string matching   = " << n.RejColumnStr    << "\n"
-           << "Rejected for out init mask     = " << n.RejOutInitMask  << "\n"
-           << "Rejected for out valid mask    = " << n.RejOutValidMask << "\n"
-           << "Rejected for match points      = " << n.RejMatchPoints  << "\n";
+           << "Total lines read               = " << n.NRead             << "\n"
+           << "Total lines kept               = " << n.NKeep             << "\n"
+           << "Rejected for amodel            = " << n.RejAModel         << "\n"
+           << "Rejected for bmodel            = " << n.RejBModel         << "\n"
+           << "Rejected for storm id          = " << n.RejStormId        << "\n"
+           << "Rejected for basin             = " << n.RejBasin          << "\n"
+           << "Rejected for cyclone           = " << n.RejCyclone        << "\n"
+           << "Rejected for storm name        = " << n.RejStormName      << "\n"
+           << "Rejected for init time         = " << n.RejInit           << "\n"
+           << "Rejected for init hour         = " << n.RejInitHH         << "\n"
+           << "Rejected for lead time         = " << n.RejLead           << "\n"
+           << "Rejected for valid time        = " << n.RejValid          << "\n"
+           << "Rejected for init mask         = " << n.RejInitMask       << "\n"
+           << "Rejected for valid mask        = " << n.RejValidMask      << "\n"
+           << "Rejected for line type         = " << n.RejLineType       << "\n"
+           << "Rejected for numeric threshold = " << n.RejColumnThresh   << "\n"
+           << "Rejected for string matching   = " << n.RejColumnStr      << "\n"
+           << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"
+           << "Rejected for out valid mask    = " << n.RejOutValidMask   << "\n"
+           << "Rejected for match points      = " << n.RejMatchPoints    << "\n"
+           << "Rejected for track watch/warn  = " << n.RejTrackWatchWarn << "\n";
            
       // Deallocate current job
       if(cur_job) { delete cur_job; cur_job = (TCStatJob *) 0; }
