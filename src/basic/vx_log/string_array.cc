@@ -299,6 +299,9 @@ void StringArray::add(const char * text)
 
 extend(Nelements + 1);
 
+// Add an empty string for a null pointer
+if ( !text ) text = "";
+
 int n = strlen(text);
 
 if ( n > MaxLength )  MaxLength = n;
