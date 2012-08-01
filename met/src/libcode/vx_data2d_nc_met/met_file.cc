@@ -140,7 +140,7 @@ bool MetNcFile::open(const char * filename)
 
 {
 
-int j, k;
+int j, k, init_int, valid_int;
 const char * c = (const char *) 0;
 NcVar * v   = (NcVar *) 0;
 
@@ -216,8 +216,11 @@ for (j=0; j<Nvars; ++j)  {
    get_att_str( Var[j], level_att_name,      Var[j].level_att     );
    get_att_str( Var[j], units_att_name,      Var[j].units_att     );
    get_att_int( Var[j], accum_time_att_name, Var[j].AccumTime     );
+   get_att_int( Var[j], init_time_att_name,  init_int             );
+   get_att_int( Var[j], valid_time_att_name, valid_int            );
 
-   get_times(Var[j].var);
+   InitTime  = (unixtime) init_int;
+   ValidTime = (unixtime) valid_int;
 
    for (k=0; k<(Var[j].Ndims); ++k)  {
 
@@ -639,53 +642,6 @@ NcVarInfo* MetNcFile::find_var_name(const char * var_name) const {
    for(int i=0; i < Nvars; i++) if( Var[i].name == var_name ) return &Var[i];
 
    return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void MetNcFile::get_times(const NcVar * var)
-
-{
-
-int j, n;
-NcAtt * att = (NcAtt *) 0;
-bool valid_time_found = false;
-bool  init_time_found = false;
-
-
-n = var->num_atts();
-
-for (j=0; j<n; ++j)  {
-
-   att = var->get_att(j);
-
-   if ( strcmp(att->name(), valid_time_att_name) == 0 )  {
-
-      valid_time_found = true;
-
-      ValidTime = att->as_int(0);
-
-   }
-
-   if ( strcmp(att->name(), init_time_att_name) == 0 )  {
-
-      init_time_found = true;
-
-      InitTime = att->as_int(0);
-
-   }
-
-   if ( valid_time_found && init_time_found )  break;
-
-}   //  for j
-
-
-   //
-   //  done
-   //
-
-return;
-
 }
 
 

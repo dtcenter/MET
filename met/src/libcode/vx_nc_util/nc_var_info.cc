@@ -280,6 +280,15 @@ for (j=0; j<n; ++j)  {
 
    if ( strcmp(att_name, att->name()) == 0 )  {
 
+      // Check for the correct type
+      if ( att->type() != ncChar ) {
+
+         mlog << Error << "\nget_att_str(const NcVarInfo &, const ConcatString &, ConcatString &) -> "
+              << "attribute \"" << att_name << "\" should be a string.\n\n";
+
+         exit ( 1 );
+      }
+     
       att_value = att->as_string(0);
       found = true;
 
@@ -318,6 +327,15 @@ for (j=0; j<n; ++j)  {
 
    if ( strcmp(att_name, att->name()) == 0 )  {
 
+      // Check for the correct type
+      if ( att->type() != ncInt ) {
+
+         mlog << Error << "\nget_att_int(const NcVarInfo &, const ConcatString &, int &) -> "
+              << "attribute \"" << att_name << "\" should be an integer.\n\n";
+
+         exit ( 1 );
+      }
+     
       att_value = att->as_int(0);
       found = true;
 

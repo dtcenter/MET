@@ -50,8 +50,6 @@ class MetNcFile {
       MetNcFile(const MetNcFile &);
       MetNcFile & operator=(const MetNcFile &);
 
-      void get_times(const NcVar *);
-
    public:
 
       MetNcFile();
