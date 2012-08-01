@@ -105,7 +105,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    tokens = mask_poly_str.split(delim);
 
    // Store masking file name
-   file_name = replace_path(tokens[0]);
+   if(tokens.n_elements() > 0) file_name = replace_path(tokens[0]);
    file_name.ws_strip();
 
    // Attempt to open the data file
