@@ -276,11 +276,11 @@ if ( native_endian != big_endian )  shuffle_4(&minutes);
 if (minutes == 0)  k = 0;
 else {
 
-   t = 60LL * minutes;  // convert minutes to long long in seconds
+   t = 60LL * minutes;      // convert minutes to long long in seconds
 
-   t += afwa_start;  // convert afwa time to unixtime
+   t += afwa_start;         // convert afwa time to unixtime
 
-   k = (int) (Valid - t);  // subtract from the filetime (Valid) to get pixel age in seconds
+   k = (int) (Valid - t);   // subtract from the filetime (Valid) to get pixel age in seconds
 
 }
 
