@@ -1069,6 +1069,18 @@ void TCStatJobSummary::add_column(const char *col) {
          }
       }
    }
+   // Track and Intensity (TI)
+   else if(strcasecmp(col, "TI") == 0) {
+      for(i=0; i<n_tc_cols_ti; i++) Column.add(tc_cols_ti[i]);
+   }
+   // Along and Cross Track (AC)
+   else if(strcasecmp(col, "AC") == 0) {
+      for(i=0; i<n_tc_cols_ac; i++) Column.add(tc_cols_ac[i]);
+   }
+   // Lat/Lon Difference (XY)
+   else if(strcasecmp(col, "XY") == 0) {
+      for(i=0; i<n_tc_cols_xy; i++) Column.add(tc_cols_xy[i]);
+   }
    // Otherwise, just add the column name
    else {
       Column.add(col);

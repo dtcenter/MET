@@ -68,6 +68,21 @@ static const char * tc_cols_wind [] = {
 };
 static const int n_tc_cols_wind = sizeof(tc_cols_wind)/sizeof(*tc_cols_wind);
 
+static const char * tc_cols_ti [] = {
+  "ABS(TK_ERR)", "ABS(AMAX_WIND-BMAX_WIND)"
+};
+static const int n_tc_cols_ti = sizeof(tc_cols_ti)/sizeof(*tc_cols_ti);
+
+static const char * tc_cols_ac [] = {
+  "ABS(ALTK_ERR)", "ABS(CRTK_ERR)"
+};
+static const int n_tc_cols_ac = sizeof(tc_cols_ac)/sizeof(*tc_cols_ac);
+
+static const char * tc_cols_xy [] = {
+  "ABS(ALAT-BLAT)", "ABS(ALON-BLON)"
+};
+static const int n_tc_cols_xy = sizeof(tc_cols_xy)/sizeof(*tc_cols_xy);
+
 ////////////////////////////////////////////////////////////////////////
 
 extern int get_tc_col_offset    (const char **, int, const char *);
