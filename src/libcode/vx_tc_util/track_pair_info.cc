@@ -78,6 +78,8 @@ void TrackPairInfo::clear() {
    ADeckDLand.clear();
    BDeckDLand.clear();
    TrackErr.clear();
+   XErr.clear();
+   YErr.clear();
    AlongTrackErr.clear();
    CrossTrackErr.clear();
 
@@ -100,6 +102,10 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    BDeckDLand.dump(out, indent_depth+1);
    out << prefix << "TrackErr:\n";
    TrackErr.dump(out, indent_depth+1);
+   out << prefix << "XErr:\n";
+   XErr.dump(out, indent_depth+1);
+   out << prefix << "YErr:\n";
+   YErr.dump(out, indent_depth+1);
    out << prefix << "AlongTrackErr:\n";
    AlongTrackErr.dump(out, indent_depth+1);
    out << prefix << "CrossTrackErr:\n";
@@ -140,6 +146,8 @@ ConcatString TrackPairInfo::serialize_r(int n, int indent_depth) const {
        << "ADeckDLand = " << ADeckDLand[i]
        << ", BDeckDLand = " << BDeckDLand[i]
        << ", TrackErr = " << TrackErr[i]
+       << ", XErr = " << XErr[i]
+       << ", YErr = " << YErr[i]
        << ", AlongTrackErr = " << AlongTrackErr[i]
        << ", CrossTrackErr = " << CrossTrackErr[i]
        << "\n";
@@ -160,6 +168,8 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
    ADeckDLand    = t.ADeckDLand;
    BDeckDLand    = t.BDeckDLand;
    TrackErr      = t.TrackErr;
+   XErr          = t.XErr;
+   YErr          = t.YErr;
    AlongTrackErr = t.AlongTrackErr;
    CrossTrackErr = t.CrossTrackErr;
 
@@ -205,7 +215,8 @@ void TrackPairInfo::initialize(const TCStatLine &l) {
 
 void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
                         double adland, double bdland,
-                        double tkerr, double altkerr, double crtkerr) {
+                        double tkerr, double xerr, double yerr,
+                        double altkerr, double crtkerr) {
 
    // Increment the count
    NPoints++;
@@ -216,6 +227,8 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
    ADeckDLand.add(adland);
    BDeckDLand.add(bdland);
    TrackErr.add(tkerr);
+   XErr.add(xerr);
+   YErr.add(yerr);
    AlongTrackErr.add(altkerr);
    CrossTrackErr.add(crtkerr);
 
@@ -292,6 +305,8 @@ void TrackPairInfo::add(const TCStatLine &l) {
    ADeckDLand.add(atof(l.get_item("ADLAND")));
    BDeckDLand.add(atof(l.get_item("BDLAND")));
    TrackErr.add(atof(l.get_item("TK_ERR")));
+   XErr.add(atof(l.get_item("X_ERR")));
+   YErr.add(atof(l.get_item("Y_ERR")));
    AlongTrackErr.add(atof(l.get_item("ALTK_ERR")));
    CrossTrackErr.add(atof(l.get_item("CRTK_ERR")));
 

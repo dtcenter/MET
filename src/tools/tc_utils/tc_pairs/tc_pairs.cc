@@ -62,9 +62,9 @@ static void   derive_consensus    (TrackInfoArray &);
 static void   process_match       (const TrackInfo &, const TrackInfo &,
                                    TrackPairInfoArray &);
 static double compute_dland       (double, double);
-static void   compute_acerr       (const TrackInfo &, const TrackInfo &,
+static void   compute_track_err   (const TrackInfo &, const TrackInfo &,
                                    TimeArray &, NumArray &, NumArray &,
-                                   NumArray &);
+                                   NumArray &, NumArray &, NumArray &);
 static void   load_dland          ();
 static void   process_watch_warn  (TrackPairInfoArray &);
 static void   write_output        (const TrackPairInfoArray &);
@@ -656,8 +656,8 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
                    TrackPairInfoArray &p) {
    int i, i_adeck, i_bdeck, i_err;
    TimeArray valid_list, valid_err;
-   NumArray tk_err, altk_err, crtk_err;
-   double adeck_dland, bdeck_dland, e_tk, e_altk, e_crtk;
+   NumArray tk_err, x_err, y_err, altk_err, crtk_err;
+   double adeck_dland, bdeck_dland, e_tk, e_x, e_y, e_altk, e_crtk;
 
    TrackPairInfo pair;
    const TrackPoint *adeck_point = (TrackPoint *) 0;
@@ -668,7 +668,8 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
    pair.initialize(adeck, bdeck);
    
    // Compute the track errors
-   compute_acerr(adeck, bdeck, valid_err, tk_err, altk_err, crtk_err);
+   compute_track_err(adeck, bdeck, valid_err, tk_err,
+                     x_err, y_err, altk_err, crtk_err);
 
    // Loop through the ADECK TrackPoints to build a list of valid times
    for(i=0; i<adeck.n_points(); i++) {
@@ -722,11 +723,13 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
       i_err = valid_err.index(valid_list[i]);
 
       // Initialize errors
-      e_tk = e_altk = e_crtk = bad_data_double;
+      e_tk = e_x = e_y = e_altk = e_crtk = bad_data_double;
       
       // Get the errors if ADECK and BDECK are both valid
       if(i_err >= 0 && i_adeck >= 0 && i_bdeck >= 0) {
          e_tk   = tk_err[i_err];
+         e_x    = x_err[i_err];
+         e_y    = y_err[i_err];
          e_altk = altk_err[i_err];
          e_crtk = crtk_err[i_err];
       }
@@ -736,11 +739,12 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
            << unix_to_yyyymmdd_hhmmss(valid_list[i])
            << ", ADECK: index = " << i_adeck << ", dland = " << adeck_dland
            << ", BDECK: index = " << i_bdeck << ", dland = " << bdeck_dland
-           << ", ERROR: track = " << e_tk << ", along = " << e_altk
-           << ", cross = " << e_crtk << "\n";
+           << ", ERROR: track = " << e_tk << ", x = " << e_x << ", y = " << e_y
+           << ", along = " << e_altk << ", cross = " << e_crtk << "\n";
 
       // Add this info to the TrackPairInfoArray
-      pair.add(*adeck_point, *bdeck_point, adeck_dland, bdeck_dland, e_tk, e_altk, e_crtk);
+      pair.add(*adeck_point, *bdeck_point, adeck_dland, bdeck_dland,
+               e_tk, e_x, e_y, e_altk, e_crtk);
       
    } // end for i
 
@@ -773,18 +777,22 @@ double compute_dland(double lat, double lon) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_acerr(const TrackInfo &adeck, const TrackInfo &bdeck,
-                   TimeArray &vld_err, NumArray &tk_err,
-                   NumArray &altk_err, NumArray &crtk_err) {
+void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
+                       TimeArray &vld_err, NumArray &tk_err,
+                       NumArray &x_err,    NumArray &y_err,
+                       NumArray &altk_err, NumArray &crtk_err) {
    int i, i_adeck, i_bdeck, status;
    unixtime ut, ut_min, ut_max;
    int ut_inc, n_ut;
    float alat[mxp], alon[mxp], blat[mxp], blon[mxp];
    float crtk[mxp], altk[mxp];
+   double lat_err, lon_err, lat_avg;
 
    // Initialize
    vld_err.clear();
    tk_err.clear();
+   x_err.clear();
+   y_err.clear();
    altk_err.clear();
    crtk_err.clear();
 
@@ -816,9 +824,11 @@ void compute_acerr(const TrackInfo &adeck, const TrackInfo &bdeck,
       vld_err.add(ut);
 
       // Initialize to bad data
+      tk_err.add(bad_data_double);
+      x_err.add(bad_data_double);
+      y_err.add(bad_data_double);
       altk_err.add(bad_data_double);
       crtk_err.add(bad_data_double);
-      tk_err.add(bad_data_double);
 
       // Get the indices for this time
       i_adeck = adeck.valid_index(ut);
@@ -833,28 +843,36 @@ void compute_acerr(const TrackInfo &adeck, const TrackInfo &bdeck,
       else             blat[i] = bad_data_float;
       if(i_bdeck >= 0) blon[i] = bdeck[i_bdeck].lon();
       else             blon[i] = bad_data_float;
+
+      // Check for good data
+      if(is_bad_data(alat[i]) || is_bad_data(blat[i]) ||
+         is_bad_data(alon[i]) || is_bad_data(blon[i])) continue;
+
+      // Compute lat/lon errors
+      lat_err = alat[i] - blat[i];
+      lon_err = rescale_lon(alon[i] - blon[i]);
+      lat_avg = 0.5*(alat[i] + blat[i]);
+
+      // Store the X/Y and track errors
+      x_err.set(i, nautical_miles_per_deg*lon_err*cosd(lat_avg));
+      y_err.set(i, nautical_miles_per_deg*lat_err);
+      tk_err.set(i, sqrt(x_err[i]*x_err[i] + y_err[i]*y_err[i]));
    }
 
-   // Call the ACERR subroutine
+   // Call the ACERR subroutine for along and cross track errors
    acerr_(blat, blon, alat, alon, &n_ut, crtk, altk, &status);
 
-   // Store the track errors, converting from km to nautical miles
+   // Store the along/cross track errors in nm
    if(status == 0) {
       for(i=0; i<n_ut; i++) {
 
          // Along-track error
          if(!is_bad_data(altk[i]))
-            altk_err.set(i, tc_nautical_miles_per_km * altk[i]);
+            altk_err.set(i, tc_nautical_miles_per_km*altk[i]);
 
          // Cross-track error
          if(!is_bad_data(crtk[i]))
-            crtk_err.set(i, tc_nautical_miles_per_km * crtk[i]);
-
-         // Track error
-         if(!is_bad_data(altk_err[i]) &&
-            !is_bad_data(crtk_err[i]))
-            tk_err.set(i, sqrt(altk_err[i]*altk_err[i] +
-                               crtk_err[i]*crtk_err[i]));
+            crtk_err.set(i, tc_nautical_miles_per_km*crtk[i]);
       }
    }
    

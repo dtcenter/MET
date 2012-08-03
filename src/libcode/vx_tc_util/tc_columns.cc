@@ -81,7 +81,8 @@ int get_tc_mpr_col_offset(const char *col_name) {
    //    TOTAL,       INDEX,      LEVEL,
    //    ALAT,        ALON,
    //    BLAT,        BLON,
-   //    TK_ERR,      ALTK_ERR,   CRTK_ERR,
+   //    TK_ERR,      X_ERR,      Y_ERR,
+   //    ALTK_ERR,    CRTK_ERR,
    //    ADLAND,      BDLAND,
    //    AMSLP,       BMSLP,
    //    AMAX_WIND,   BMAX_WIND,
@@ -337,6 +338,8 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, p.bdeck()[i].lat());
    at.set_entry(r, c++, p.bdeck()[i].lon());
    at.set_entry(r, c++, p.track_err(i));
+   at.set_entry(r, c++, p.x_err(i));
+   at.set_entry(r, c++, p.y_err(i));
    at.set_entry(r, c++, p.along_track_err(i));
    at.set_entry(r, c++, p.cross_track_err(i));
    at.set_entry(r, c++, p.adeck_dland(i));

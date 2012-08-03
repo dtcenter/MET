@@ -53,8 +53,10 @@ class TrackPairInfo {
       NumArray     ADeckDLand;
       NumArray     BDeckDLand;
       
-      // Along-Track, Cross-Track, and Track Errors
+      // Track Error, X/Y Errors, and Along/Cross Track Errors
       NumArray     TrackErr;
+      NumArray     XErr;
+      NumArray     YErr;
       NumArray     AlongTrackErr;
       NumArray     CrossTrackErr;
 
@@ -88,6 +90,8 @@ class TrackPairInfo {
       double            adeck_dland(int)     const;
       double            bdeck_dland(int)     const;
       double            track_err(int)       const;
+      double            x_err(int)           const;
+      double            y_err(int)           const;
       double            along_track_err(int) const;
       double            cross_track_err(int) const;
       WatchWarnType     track_watch_warn()   const;
@@ -97,7 +101,7 @@ class TrackPairInfo {
          //
 
       void add(const TrackPoint &, const TrackPoint &,
-               double, double, double, double, double);
+               double, double, double, double, double, double, double);
       void add(const TCStatLine&);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 };
@@ -110,6 +114,8 @@ inline const TrackInfo & TrackPairInfo::bdeck()                const { return(BD
 inline double            TrackPairInfo::adeck_dland(int i)     const { return(ADeckDLand[i]);    }
 inline double            TrackPairInfo::bdeck_dland(int i)     const { return(BDeckDLand[i]);    }
 inline double            TrackPairInfo::track_err(int i)       const { return(TrackErr[i]);      }
+inline double            TrackPairInfo::x_err(int i)           const { return(XErr[i]);          }
+inline double            TrackPairInfo::y_err(int i)           const { return(YErr[i]);          }
 inline double            TrackPairInfo::along_track_err(int i) const { return(AlongTrackErr[i]); }
 inline double            TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]); }
 
