@@ -46,9 +46,12 @@ class TCPairsConfInfo {
       StringArray *ConMembers; // Members for each consensus model
       NumArray     ConMinReq;  // Minimum required consensus members
 
+      // Time-lagged track definition
+      NumArray LagHour;
+
       // Timing information
       unixtime  InitBeg, InitEnd;
-      NumArray  InitHH;
+      NumArray  InitHour;
       unixtime  ValidBeg, ValidEnd;
 
       // Polyline masking regions

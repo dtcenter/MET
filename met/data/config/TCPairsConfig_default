@@ -58,7 +58,7 @@ storm_name = [];
 //   consensus model name, membership, and minimum number of models required
 // All three settings must have the same length.
 //
-// e.g. con_model[] = [ "CON1", "CON2" ];
+// e.g. con_model   = [ "CON1", "CON2" ];
 //      con_members = [ "MOD1 MOD2 MOD3",
 //                      "MOD1 MOD3 MOD4 MOD5" ];
 //      con_min_req = [ 2, 3 ];
@@ -66,6 +66,15 @@ storm_name = [];
 con_model   = [];
 con_members = [];
 con_min_req = [];
+
+//
+// Specify a comma-separated list of forecast lag times to be used in HH[MMSS]
+// format.  For each ADECK track identified, a lagged track will be derived
+// for each entry listed.
+//
+// e.g. lag_hour = [ "06", "12" ];
+//
+lag_hour = [];
 
 //
 // Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format.

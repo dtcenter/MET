@@ -264,6 +264,23 @@ void TrackInfo::initialize(const ATCFLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TrackInfo::set_point(int n, const TrackPoint &p) {
+
+   // Check range
+   if((n < 0) || (n >= NPoints)) {
+      mlog << Error
+           << "\nTrackInfo::set_point(int, const TrackPoint &) -> "
+           << "range check error for index value " << n << "\n\n";
+      exit(1);
+   }
+
+   Point[n] = p;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackInfo::lead_index(int l) const {
    int i;
 

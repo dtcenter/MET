@@ -59,6 +59,7 @@ static void   process_track_files (const StringArray &, TrackInfoArray &);
 static void   filter_tracks       (TrackInfoArray &);
 static void   merge_interp12      (TrackInfoArray &);
 static void   derive_consensus    (TrackInfoArray &);
+static void   derive_lag          (TrackInfoArray &);
 static void   process_match       (const TrackInfo &, const TrackInfo &,
                                    TrackPairInfoArray &);
 static double compute_dland       (double, double);
@@ -184,18 +185,21 @@ void process_tracks() {
 
    // Process the ADECK track files
    mlog << Debug(2)
-        << "Processing " << adeck_files.n_elements() << " ADECK file(s).\n";
+        << "Processing " << adeck_files.n_elements()
+        << " ADECK file(s).\n";
    process_track_files(adeck_files, adeck_tracks);
 
    // Process the BDECK track files
    mlog << Debug(2)
-        << "Processing " << bdeck_files.n_elements() << " BDECK file(s).\n";
+        << "Processing " << bdeck_files.n_elements()
+        << " BDECK file(s).\n";
    process_track_files(bdeck_files, bdeck_tracks);
 
    // Merge 6-hourly TrackPoints into 12-hourly interpolated Tracks
    if(conf_info.Interp12) {
       mlog << Debug(2)
-           << "Merging 6-hour TrackPoints into 12-hour interpolated tracks.\n";
+           << "Merging 6-hour TrackPoints into 12-hour "
+           << "interpolated tracks.\n";
       merge_interp12(adeck_tracks);
    }
 
@@ -206,9 +210,16 @@ void process_tracks() {
    
    // Derive consensus forecasts from the ADECK tracks
    mlog << Debug(2)
-        << "Deriving " << conf_info.NCon << " ADECK consensus tracks(s).\n";
+        << "Deriving " << conf_info.NCon
+        << " ADECK consensus tracks(s).\n";
    derive_consensus(adeck_tracks);
 
+   // Derive lag forecasts from the ADECK tracks
+   mlog << Debug(2)
+        << "Deriving " << conf_info.LagHour.n_elements()
+        << " ADECK lag tracks(s).\n";
+   derive_lag(adeck_tracks);
+   
    mlog << Debug(2)
         << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
         << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
@@ -415,8 +426,8 @@ void filter_tracks(TrackInfoArray &tracks) {
 
       // Initialization hour
       unix_to_mdyhms(t[i].init(), m, d, y, h, mm, s);
-      if(conf_info.InitHH.n_elements() > 0 &&
-         !conf_info.InitHH.has(hms_to_sec(h, mm, s))) {
+      if(conf_info.InitHour.n_elements() > 0 &&
+         !conf_info.InitHour.has(hms_to_sec(h, mm, s))) {
          mlog << Debug(4)
               << "Discarding track " << i+1 << " for initialization hour "
               << "mismatch.\n";
@@ -646,6 +657,74 @@ void derive_consensus(TrackInfoArray &tracks) {
 
    } // end for i
 
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void derive_lag(TrackInfoArray &tracks) {
+   int i, j, k, s, n_tracks;
+   TrackInfo lag_info;
+   TrackPoint lag_point;
+   ConcatString lag_model;
+   
+   // If no time lags are requested, nothing to do
+   if(conf_info.LagHour.n_elements() == 0) return;
+
+   mlog << Debug(3)
+        << "Buliding time-lagged track(s) for "
+        << conf_info.LagHour.n_elements() << " lags.\n";
+
+   // Store the input number of tracks to process
+   n_tracks = tracks.n_tracks();
+        
+   // Loop through the time lags to be applied
+   for(i=0; i<conf_info.LagHour.n_elements(); i++) {
+
+      // Store current lag time
+      s = conf_info.LagHour[i];
+  
+      // Loop through the tracks
+      for(j=0; j<n_tracks; j++) {
+
+         // Make a copy of the current track
+         lag_info = tracks[j];
+         
+         // Adjust the TrackInfo model name
+         lag_model << cs_erase << lag_info.technique()
+                   << "_LAG_" << sec_to_timestring(s);
+         lag_info.set_technique(lag_model);
+
+         // Adjust the TrackInfo times
+         lag_info.set_init(lag_info.init() + s);
+         lag_info.set_valid_min(lag_info.valid_min() + s);
+         lag_info.set_valid_max(lag_info.valid_max() + s);
+      
+         // Loop over the track points
+         for(k=0; k<lag_info.n_points(); k++) {
+
+            // Make a copy of the current track point
+            lag_point = lag_info[k];
+            
+            // Adjust the TrackPoint times
+            lag_point.set_valid(lag_point.valid() + s);
+
+            // Store the current time-lagged track point
+            lag_info.set_point(k, lag_point);
+            
+         } // end for k
+
+         mlog << Debug(5)
+              << "Adding time-lagged track:\n"
+              << lag_info.serialize_r(1) << "\n";
+
+         // Store the current time-lagged track
+         tracks.add(lag_info);
+
+      } // end for j
+
+   } // end for i
 
    return;
 }

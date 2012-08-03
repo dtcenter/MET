@@ -89,6 +89,9 @@ class TrackInfo {
       void set_technique_number(int);
       void set_technique(const char *);
       void set_init(const unixtime);
+      void set_valid_min(const unixtime);
+      void set_valid_max(const unixtime);
+      void set_point(int, const TrackPoint &);
       
          //
          //  get stuff
@@ -133,12 +136,14 @@ class TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void TrackInfo::set_basin(const char *s)      { Basin = s;           };
-inline void TrackInfo::set_cyclone(const char *s)    { Cyclone = s;         };
-inline void TrackInfo::set_storm_name(const char *s) { StormName = s;       };
-inline void TrackInfo::set_technique_number(int i)   { TechniqueNumber = i; };
-inline void TrackInfo::set_technique(const char *s)  { Technique = s;       };
-inline void TrackInfo::set_init(const unixtime u)    { InitTime = u;        };
+inline void TrackInfo::set_basin(const char *s)        { Basin = s;           };
+inline void TrackInfo::set_cyclone(const char *s)      { Cyclone = s;         };
+inline void TrackInfo::set_storm_name(const char *s)   { StormName = s;       };
+inline void TrackInfo::set_technique_number(int i)     { TechniqueNumber = i; };
+inline void TrackInfo::set_technique(const char *s)    { Technique = s;       };
+inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        };
+inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    };
+inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    };
 
 inline const char * TrackInfo::basin()            const { return(Basin);                   }
 inline const char * TrackInfo::cyclone()          const { return(Cyclone);                 }

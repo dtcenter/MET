@@ -70,7 +70,7 @@ class QuadInfo {
          //  get stuff
          //
 
-      int    operator[](int) const;
+      int    operator[](int)       const;
       int          intensity()     const;
       QuadrantType quadrant()      const;
 
