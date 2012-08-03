@@ -144,6 +144,9 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::TrackWatchWarn
    Filter.TrackWatchWarn = Conf.lookup_string_array("track_watch_warn");
+
+   // Conf: TCStatJob::WaterOnly
+   Filter.WaterOnly = Conf.lookup_bool("water_only");
    
    // Conf: TCStatJob::ColumnThreshName, TCStatJob::ColumnThreshVal
    Filter.ColumnThreshName = Conf.lookup_string_array("column_thresh_name");
