@@ -175,6 +175,34 @@ void TCStatConfInfo::process_config() {
            << "must have the same length.\n\n";
       exit(1);
    }
+
+   // Conf: TCStatJob::InitThreshName, TCStatJob::InitThreshVal
+   Filter.InitThreshName = Conf.lookup_string_array("init_thresh_name");
+   Filter.InitThreshVal  = Conf.lookup_thresh_array("init_thresh_val");
+
+   // Check that they are the same length
+   if(Filter.InitThreshName.n_elements() !=
+      Filter.InitThreshName.n_elements()) {
+      mlog << Error
+           << "\nTCStatConfInfo::process_config() -> "
+           << "the \"init_thresh_name\" and \"init_thresh_val\" "
+           << "entries must have the same length.\n\n";
+      exit(1);
+   }
+
+   // Conf: TCStatJob::InitStrName, TCStatJob::InitStrVal
+   Filter.InitStrName = Conf.lookup_string_array("init_str_name");
+   Filter.InitStrVal  = Conf.lookup_string_array("init_str_val");
+
+   // Check that they are the same length
+   if(Filter.InitStrName.n_elements() !=
+      Filter.InitStrVal.n_elements()) {
+      mlog << Error
+           << "\nTCStatConfInfo::process_config() -> "
+           << "the \"init_str_name\" and \"init_str_val\" entries "
+           << "must have the same length.\n\n";
+      exit(1);
+   }
    
    // Conf: TCStatJob::MatchPoints
    Filter.MatchPoints = Conf.lookup_bool("match_points");

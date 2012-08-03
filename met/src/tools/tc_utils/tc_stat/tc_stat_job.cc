@@ -149,6 +149,8 @@ void TCStatJob::init_from_scratch() {
    TrackWatchWarn.set_ignore_case(1);
    ColumnThreshName.set_ignore_case(1);
    ColumnStrName.set_ignore_case(1);
+   InitThreshName.set_ignore_case(1);
+   InitStrName.set_ignore_case(1);
 
    clear();
 
@@ -184,6 +186,10 @@ void TCStatJob::clear() {
    ColumnThreshVal.clear();
    ColumnStrName.clear();
    ColumnStrVal.clear();
+   InitThreshName.clear();
+   InitThreshVal.clear();
+   InitStrName.clear();
+   InitStrVal.clear();
    
    DumpFile.clear();
    close_dump_file();
@@ -231,6 +237,10 @@ void TCStatJob::assign(const TCStatJob & j) {
    ColumnThreshVal = j.ColumnThreshVal;
    ColumnStrName = j.ColumnStrName;
    ColumnStrVal = j.ColumnStrVal;
+   InitThreshName = j.InitThreshName;
+   InitThreshVal = j.InitThreshVal;
+   InitStrName = j.InitStrName;
+   InitStrVal = j.InitStrVal;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -316,6 +326,18 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "ColumnStrVal ...\n";
    ColumnStrVal.dump(out, depth + 1);
 
+   out << prefix << "InitThreshName ...\n";
+   InitThreshName.dump(out, depth + 1);
+
+   out << prefix << "InitThreshVal ...\n";
+   InitThreshVal.dump(out, depth + 1);
+
+   out << prefix << "InitStrName ...\n";
+   InitStrName.dump(out, depth + 1);
+
+   out << prefix << "InitStrVal ...\n";
+   InitStrVal.dump(out, depth + 1);
+   
    out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
 
    out << prefix << "OutInitMask = " << (OutInitMask.name() ? OutInitMask.name() : na_str) << "\n";
@@ -382,7 +404,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
    if(keep == true && WaterOnly == true) {
       adland = atof(line.get_item("ADLAND"));
       bdland = atof(line.get_item("BDLAND"));
-      
+
       if(is_bad_data(adland) || adland <= 0 ||
          is_bad_data(bdland) || bdland <= 0) {
          keep = false;
@@ -419,7 +441,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
          for(j=0; j<ColumnStrName.n_elements(); j++)
             if(strcasecmp(ColumnStrName[i], ColumnStrName[j]) == 0)
                sa.add(ColumnStrVal[j]);
-        
+
          // Determine the column offset and retrieve the value
          offset = determine_column_offset(line.type(), ColumnStrName[i]);
          v_str  = line.get_item(offset);
@@ -468,7 +490,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
       if(is_bad_data(alat) ||
          is_bad_data(alon) ||
          !OutValidMask.latlon_is_inside_dege(alat, alon)) {
-        
+
          keep = false;
          n.RejOutValidMask++;
       }
@@ -484,10 +506,11 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
          keep = false;
          n.RejMatchPoints++;
       }
-   }   
+   }
 
    return(keep);
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -609,6 +632,10 @@ void TCStatJob::parse_job_command(const char *jobstring) {
                                                          ColumnThreshVal.add(a[i+2]);                      a.shift_down(i, 2); }
       else if(strcasecmp(c, "-column_str"      ) == 0) { ColumnStrName.add(a[i+1]);
                                                          ColumnStrVal.add(a[i+2]);                         a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-init_thresh"     ) == 0) { InitThreshName.add(a[i+1]);
+                                                         InitThreshVal.add(a[i+2]);                        a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-init_str"        ) == 0) { InitStrName.add(a[i+1]);
+                                                         InitStrVal.add(a[i+2]);                           a.shift_down(i, 2); }
       else if(strcasecmp(c, "-dump_row"        ) == 0) { DumpFile = a[i+1]; open_dump_file();              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_init_mask"   ) == 0) { set_mask(OutInitMask, a[i+1]);                    a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_valid_mask"  ) == 0) { set_mask(OutValidMask, a[i+1]);                   a.shift_down(i, 1); }
@@ -779,6 +806,12 @@ ConcatString TCStatJob::serialize() const {
    for(i=0; i<ColumnStrName.n_elements(); i++)
       s << "-column_str " << ColumnStrName[i] << " "
                           << ColumnStrVal[i] << " ";
+   for(i=0; i<InitThreshName.n_elements(); i++)
+      s << "-init_thresh " << InitThreshName[i] << " "
+                           << InitThreshVal[i].get_str() << " ";
+   for(i=0; i<InitStrName.n_elements(); i++)
+      s << "-init_str " << InitStrName[i] << " "
+                        << InitStrVal[i] << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
    if(OutInitMask.n_points() > 0)
@@ -836,7 +869,7 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
 
       // Check for the first point of a track
       if(index == 1) {
-            
+
          // Store the current pair and clear it
          if(tpi.n_points() > 0) {
 
@@ -853,7 +886,6 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
 
          // Add line to the pair
          tpi.add(line);
-              
          n.NKeep++;
       }
       else {
@@ -863,7 +895,7 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
             tpi.clear();
             n.NKeep -= skip;
          }
-              
+
          // Skip lines if necessary
          for(i=0; i<skip; i++) {
             in >> line;
@@ -874,7 +906,7 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
 
    // Store the last pair
    if(tpi.n_points() > 0 && is_keeper(tpi, n)) PairArray.add(tpi);
-   
+
    return;
 }
 
