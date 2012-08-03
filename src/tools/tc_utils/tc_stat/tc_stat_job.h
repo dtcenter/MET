@@ -25,8 +25,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Defaults to be used if not specified by the user
+static const bool   default_water_only   = false;
 static const bool   default_match_points = false;
-static const double default_tc_alpha = 0.05;
+static const double default_tc_alpha     = 0.05;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -74,6 +75,7 @@ struct TCLineCounts {
    int RejInitMask;
    int RejValidMask;
    int RejLineType;
+   int RejWaterOnly;
    int RejColumnThresh;
    int RejColumnStr;
    int RejOutInitMask;
@@ -167,6 +169,9 @@ class TCStatJob {
       
       // Line type
       StringArray LineType;
+
+      // Only retain TrackPoints where ADLAND and BDLAND > 0
+      bool WaterOnly;
 
       // Numeric column thresholds
       StringArray ColumnThreshName;

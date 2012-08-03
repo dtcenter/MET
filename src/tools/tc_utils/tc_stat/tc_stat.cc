@@ -233,6 +233,7 @@ void process_jobs() {
            << "Rejected for init mask         = " << n.RejInitMask       << "\n"
            << "Rejected for valid mask        = " << n.RejValidMask      << "\n"
            << "Rejected for line type         = " << n.RejLineType       << "\n"
+           << "Rejected for water only        = " << n.RejWaterOnly      << "\n"
            << "Rejected for numeric threshold = " << n.RejColumnThresh   << "\n"
            << "Rejected for string matching   = " << n.RejColumnStr      << "\n"
            << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"

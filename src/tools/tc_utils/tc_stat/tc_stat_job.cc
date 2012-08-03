@@ -193,6 +193,7 @@ void TCStatJob::clear() {
    OutValidMask.clear();
 
    // Set to default values
+   WaterOnly   = default_water_only;
    MatchPoints = default_match_points;
 
    return;
@@ -223,6 +224,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    ValidHour = j.ValidHour;
    InitMask = j.InitMask;
    ValidMask = j.ValidMask;
+   WaterOnly = j.WaterOnly;
    LineType = j.LineType;
    TrackWatchWarn = j.TrackWatchWarn;
    ColumnThreshName = j.ColumnThreshName;
@@ -297,6 +299,8 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "LineType ...\n";
    LineType.dump(out, depth + 1);
 
+   out << prefix << "WaterOnly = " << bool_to_string(WaterOnly) << "\n";
+   
    out << prefix << "TrackWatchWarn ...\n";
    TrackWatchWarn.dump(out, depth + 1);
    
@@ -331,7 +335,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
                           TCLineCounts &n) const {
    bool keep = true;
    int i, j, offset;
-   double v_dbl, alat, alon, blat, blon;
+   double v_dbl, alat, alon, blat, blon, adland, bdland;
    ConcatString v_str;
    StringArray sa;
 
@@ -364,7 +368,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
    else if(ValidEnd > 0 &&
       line.valid() > ValidEnd)          { keep = false; n.RejValid++;     }
    else if(ValidExc.n_elements() > 0 &&
-     ValidExc.has(line.valid()))        { keep = false; n.RejValid++;      }
+     ValidExc.has(line.valid()))        { keep = false; n.RejValid++;     }
    else if(ValidHour.n_elements() > 0 &&
      !ValidHour.has(line.valid_hour())) { keep = false; n.RejValidHour++; }
    else if(InitMask.n_elements() > 0 &&
@@ -373,6 +377,18 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
      !ValidMask.has(line.valid_mask())) { keep = false; n.RejValidMask++; }
    else if(LineType.n_elements() > 0 &&
      !LineType.has(line.line_type()))   { keep = false; n.RejLineType++;  }
+
+   // Check water only
+   if(keep == true && WaterOnly == true) {
+      adland = atof(line.get_item("ADLAND"));
+      bdland = atof(line.get_item("BDLAND"));
+      
+      if(is_bad_data(adland) || adland <= 0 ||
+         is_bad_data(bdland) || bdland <= 0) {
+         keep = false;
+         n.RejWaterOnly++;
+      }
+   }
 
    // Check the numeric column thresholds
    if(keep == true) {
@@ -575,8 +591,8 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-basin"           ) == 0) { Basin.add(a[i+1]);                                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-cyclone"         ) == 0) { Cyclone.add(a[i+1]);                              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-storm_name"      ) == 0) { StormName.add(a[i+1]);                            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_beg"        ) == 0) { InitBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_end"        ) == 0) { InitEnd = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_beg"        ) == 0) { InitBeg = timestring_to_unix(a[i+1]);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_end"        ) == 0) { InitEnd = timestring_to_unix(a[i+1]);             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_exc"        ) == 0) { InitExc.add(timestring_to_unix(a[i+1]));          a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_hour"       ) == 0) { InitHour.add(timestring_to_sec(a[i+1]));          a.shift_down(i, 1); }
       else if(strcasecmp(c, "-lead"            ) == 0) { Lead.add(timestring_to_sec(a[i+1]));              a.shift_down(i, 1); }
@@ -587,6 +603,7 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-init_mask"       ) == 0) { InitMask.add(a[i+1]);                             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_mask"      ) == 0) { ValidMask.add(a[i+1]);                            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-line_type"       ) == 0) { LineType.add(a[i+1]);                             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-water_only"      ) == 0) { WaterOnly = string_to_bool(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-track_watch_warn") == 0) { TrackWatchWarn.add(a[i+1]);                       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-column_thresh"   ) == 0) { ColumnThreshName.add(a[i+1]);
                                                          ColumnThreshVal.add(a[i+2]);                      a.shift_down(i, 2); }
@@ -752,6 +769,8 @@ ConcatString TCStatJob::serialize() const {
       s << "-valid_mask " << ValidMask[i] << " ";
    for(i=0; i<LineType.n_elements(); i++)
       s << "-line_type " << LineType[i] << " ";
+   if(WaterOnly != default_water_only)
+      s << "-water_only " << bool_to_string(WaterOnly) << " ";
    for(i=0; i<TrackWatchWarn.n_elements(); i++)
       s << "-track_watch_warn " << TrackWatchWarn[i] << " ";
    for(i=0; i<ColumnThreshName.n_elements(); i++)
