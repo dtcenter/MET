@@ -73,8 +73,9 @@ class TcHdrColumns {
       ConcatString storm_name  () const;
       int          lead        () const;
       unixtime     init        () const;
-      int          init_hh     () const;
+      int          init_hour   () const;
       unixtime     valid       () const;
+      int          valid_hour  () const;
       ConcatString init_mask   () const;
       ConcatString valid_mask  () const;
 
@@ -95,18 +96,19 @@ inline void TcHdrColumns::set_init_mask   (const ConcatString &s) { InitMask = s
 inline void TcHdrColumns::set_valid_mask  (const ConcatString &s) { ValidMask = s;  }
 inline void TcHdrColumns::set_line_type   (const ConcatString &s) { LineType = s;   }
 
-inline ConcatString TcHdrColumns::adeck_model () const { return(ADeckModel);              }
-inline ConcatString TcHdrColumns::bdeck_model () const { return(BDeckModel);              }
-inline ConcatString TcHdrColumns::basin       () const { return(Basin);                   }
-inline ConcatString TcHdrColumns::cyclone     () const { return(Cyclone);                 }
-inline ConcatString TcHdrColumns::storm_name  () const { return(StormName);               }
-inline int          TcHdrColumns::lead        () const { return(LeadTime);                }
-inline unixtime     TcHdrColumns::init        () const { return(InitTime);                }
-inline int          TcHdrColumns::init_hh     () const { return(InitTime % sec_per_hour); }
-inline unixtime     TcHdrColumns::valid       () const { return(ValidTime);               }
-inline ConcatString TcHdrColumns::init_mask   () const { return(InitMask);                }
-inline ConcatString TcHdrColumns::valid_mask  () const { return(ValidMask);               }
-inline ConcatString TcHdrColumns::line_type   () const { return(LineType);                }
+inline ConcatString TcHdrColumns::adeck_model () const { return(ADeckModel);               }
+inline ConcatString TcHdrColumns::bdeck_model () const { return(BDeckModel);               }
+inline ConcatString TcHdrColumns::basin       () const { return(Basin);                    }
+inline ConcatString TcHdrColumns::cyclone     () const { return(Cyclone);                  }
+inline ConcatString TcHdrColumns::storm_name  () const { return(StormName);                }
+inline int          TcHdrColumns::lead        () const { return(LeadTime);                 }
+inline unixtime     TcHdrColumns::init        () const { return(InitTime);                 }
+inline int          TcHdrColumns::init_hour   () const { return(InitTime % sec_per_hour);  }
+inline unixtime     TcHdrColumns::valid       () const { return(ValidTime);                }
+inline int          TcHdrColumns::valid_hour  () const { return(ValidTime % sec_per_hour); }
+inline ConcatString TcHdrColumns::init_mask   () const { return(InitMask);                 }
+inline ConcatString TcHdrColumns::valid_mask  () const { return(ValidMask);                }
+inline ConcatString TcHdrColumns::line_type   () const { return(LineType);                 }
 
 ////////////////////////////////////////////////////////////////////////
 

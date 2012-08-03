@@ -67,9 +67,10 @@ class TCStatLine : public DataLine {
       const char * cyclone      () const;
       const char * storm_name   () const;
       unixtime     init         () const;
-      int          init_hh      () const; // init%sec_per_day
+      int          init_hour    () const; // init%sec_per_day
       int          lead         () const;
       unixtime     valid        () const;
+      int          valid_hour   () const; // valid%sec_per_day
       const char * init_mask    () const;
       const char * valid_mask   () const;
       const char * line_type    () const;

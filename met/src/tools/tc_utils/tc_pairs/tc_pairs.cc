@@ -343,14 +343,14 @@ void filter_tracks(TrackInfoArray &tracks) {
    int i, j;
    int m, d, y, h, mm, s;
    int n_mod, n_sid, n_bas, n_cyc, n_name;
-   int n_init, n_init_hh, n_vld, n_maski, n_maskv;
+   int n_init, n_init_hour, n_vld, n_maski, n_maskv;
    bool status;
    TrackInfoArray t = tracks;
    
    // Initialize
    tracks.clear();
-   n_mod  = n_sid     = n_bas = n_cyc   = n_name  = 0;
-   n_init = n_init_hh = n_vld = n_maski = n_maskv = 0;
+   n_mod  = n_sid       = n_bas = n_cyc   = n_name  = 0;
+   n_init = n_init_hour = n_vld = n_maski = n_maskv = 0;
    
    // Loop through the tracks and determine which should be retained
    for(i=0; i<t.n_tracks(); i++) {
@@ -420,7 +420,7 @@ void filter_tracks(TrackInfoArray &tracks) {
          mlog << Debug(4)
               << "Discarding track " << i+1 << " for initialization hour "
               << "mismatch.\n";
-         n_init_hh++;
+         n_init_hour++;
          continue;
       }
 
@@ -484,7 +484,7 @@ void filter_tracks(TrackInfoArray &tracks) {
         << "Rejected for cyclone    = " << n_cyc             << "\n"
         << "Rejected for storm name = " << n_name            << "\n"
         << "Rejected for init time  = " << n_init            << "\n"
-        << "Rejected for init hour  = " << n_init_hh         << "\n"
+        << "Rejected for init hour  = " << n_init_hour       << "\n"
         << "Rejected for valid time = " << n_vld             << "\n"
         << "Rejected for init mask  = " << n_maski           << "\n"
         << "Rejected for valid mask = " << n_maskv           << "\n";
