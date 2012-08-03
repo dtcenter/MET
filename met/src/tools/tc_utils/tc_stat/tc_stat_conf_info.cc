@@ -107,6 +107,11 @@ void TCStatConfInfo::process_config() {
    Filter.InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
    Filter.InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
 
+   // Conf: TCStatJob::InitExc
+   sa = Conf.lookup_string_array("init_exc");
+   for(i=0; i<sa.n_elements(); i++)
+      Filter.InitExc.add(timestring_to_unix(sa[i]));
+
    // Conf: TCStatJob::InitHour
    sa = Conf.lookup_string_array("init_hour");
    for(i=0; i<sa.n_elements(); i++)
@@ -120,6 +125,11 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::ValidBeg, TCStatJob::ValidEnd
    Filter.ValidBeg = timestring_to_unix(Conf.lookup_string("valid_beg"));
    Filter.ValidEnd = timestring_to_unix(Conf.lookup_string("valid_end"));
+
+   // Conf: TCStatJob::ValidExc
+   sa = Conf.lookup_string_array("valid_exc");
+   for(i=0; i<sa.n_elements(); i++)
+      Filter.ValidExc.add(timestring_to_unix(sa[i]));
 
    // Conf: TCStatJob::ValidHour
    sa = Conf.lookup_string_array("valid_hour");

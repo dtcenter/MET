@@ -152,9 +152,11 @@ class TCStatJob {
 
       // Timing information
       unixtime  InitBeg, InitEnd;
+      TimeArray InitExc;
       NumArray  InitHour;
       NumArray  Lead;
       unixtime  ValidBeg, ValidEnd;
+      TimeArray ValidExc;
       NumArray  ValidHour;
 
       // Polyline masking regions

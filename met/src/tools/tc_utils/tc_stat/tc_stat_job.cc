@@ -170,9 +170,11 @@ void TCStatJob::clear() {
    Cyclone.clear();
    StormName.clear();
    InitBeg  = InitEnd  = (unixtime) 0;
+   InitExc.clear();
    InitHour.clear();
    Lead.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
+   ValidExc.clear();
    ValidHour.clear();
    InitMask.clear();
    ValidMask.clear();
@@ -210,13 +212,15 @@ void TCStatJob::assign(const TCStatJob & j) {
    Basin = j.Basin;
    Cyclone = j.Cyclone;
    StormName = j.StormName;
-   InitBeg  = j.InitBeg;
-   InitEnd  = j.InitEnd;
+   InitBeg = j.InitBeg;
+   InitEnd = j.InitEnd;
+   InitExc = j.InitExc;
+   InitHour = j.InitHour;
+   Lead = j.Lead;
    ValidBeg = j.ValidBeg;
    ValidEnd = j.ValidEnd;
-   InitHour = j.InitHour;
+   ValidExc = j.ValidExc;
    ValidHour = j.ValidHour;
-   Lead = j.Lead;
    InitMask = j.InitMask;
    ValidMask = j.ValidMask;
    LineType = j.LineType;
@@ -265,18 +269,25 @@ void TCStatJob::dump(ostream & out, int depth) const {
    
    out << prefix << "InitBeg = " << unix_to_yyyymmdd_hhmmss(InitBeg) << "\n";
    out << prefix << "InitEnd = " << unix_to_yyyymmdd_hhmmss(InitEnd) << "\n";
+
+   out << prefix << "InitExc ...\n";
+   InitExc.dump(out, depth + 1);
+   
+   out << prefix << "InitHour ...\n";
+   InitHour.dump(out, depth + 1);
+   
+   out << prefix << "Lead ...\n";
+   Lead.dump(out, depth + 1);   
+   
    out << prefix << "ValidBeg = " << unix_to_yyyymmdd_hhmmss(ValidBeg) << "\n";
    out << prefix << "ValidEnd = " << unix_to_yyyymmdd_hhmmss(ValidEnd) << "\n";
 
-   out << prefix << "InitHour ...\n";
-   InitHour.dump(out, depth + 1);
-
+   out << prefix << "ValidExc ...\n";
+   ValidExc.dump(out, depth + 1);
+   
    out << prefix << "ValidHour ...\n";
    ValidHour.dump(out, depth + 1);
    
-   out << prefix << "Lead ...\n";
-   Lead.dump(out, depth + 1);
-
    out << prefix << "InitMask ...\n";
    InitMask.dump(out, depth + 1);
 
@@ -342,6 +353,8 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
       line.init() < InitBeg)            { keep = false; n.RejInit++;      }
    else if(InitEnd > 0 &&
       line.init() > InitEnd)            { keep = false; n.RejInit++;      }
+   else if(InitExc.n_elements() > 0 &&
+     InitExc.has(line.init()))          { keep = false; n.RejInit++;      }
    else if(InitHour.n_elements() > 0 &&
      !InitHour.has(line.init_hour()))   { keep = false; n.RejInitHour++;  }
    else if(Lead.n_elements() > 0 &&
@@ -350,6 +363,8 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
       line.valid() < ValidBeg)          { keep = false; n.RejValid++;     }
    else if(ValidEnd > 0 &&
       line.valid() > ValidEnd)          { keep = false; n.RejValid++;     }
+   else if(ValidExc.n_elements() > 0 &&
+     ValidExc.has(line.valid()))        { keep = false; n.RejValid++;      }
    else if(ValidHour.n_elements() > 0 &&
      !ValidHour.has(line.valid_hour())) { keep = false; n.RejValidHour++; }
    else if(InitMask.n_elements() > 0 &&
@@ -560,12 +575,14 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-basin"           ) == 0) { Basin.add(a[i+1]);                                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-cyclone"         ) == 0) { Cyclone.add(a[i+1]);                              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-storm_name"      ) == 0) { StormName.add(a[i+1]);                            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_beg"        ) == 0) { InitBeg  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_end"        ) == 0) { InitEnd  = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_beg"        ) == 0) { InitBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_end"        ) == 0) { InitEnd = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_exc"        ) == 0) { InitExc.add(timestring_to_unix(a[i+1]));          a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_hour"       ) == 0) { InitHour.add(timestring_to_sec(a[i+1]));          a.shift_down(i, 1); }
       else if(strcasecmp(c, "-lead"            ) == 0) { Lead.add(timestring_to_sec(a[i+1]));              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_beg"       ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_end"       ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_exc"       ) == 0) { ValidExc.add(timestring_to_unix(a[i+1]));         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_hour"      ) == 0) { ValidHour.add(timestring_to_sec(a[i+1]));         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_mask"       ) == 0) { InitMask.add(a[i+1]);                             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_mask"      ) == 0) { ValidMask.add(a[i+1]);                            a.shift_down(i, 1); }
@@ -715,6 +732,8 @@ ConcatString TCStatJob::serialize() const {
       s << "-init_beg " << unix_to_yyyymmdd_hhmmss(InitBeg) << " ";
    if(InitEnd > 0)
       s << "-init_end " << unix_to_yyyymmdd_hhmmss(InitEnd) << " ";
+   for(i=0; i<InitExc.n_elements(); i++)
+      s << "-init_exc " << unix_to_yyyymmdd_hhmmss(InitExc[i]) << " ";
    for(i=0; i<InitHour.n_elements(); i++)
       s << "-init_hour " << sec_to_hhmmss(InitHour[i]) << " ";
    for(i=0; i<Lead.n_elements(); i++)
@@ -723,6 +742,8 @@ ConcatString TCStatJob::serialize() const {
       s << "-valid_beg " << unix_to_yyyymmdd_hhmmss(ValidBeg) << " ";
    if(ValidEnd > 0)
       s << "-valid_end " << unix_to_yyyymmdd_hhmmss(ValidEnd) << " ";
+   for(i=0; i<ValidExc.n_elements(); i++)
+      s << "-valid_exc " << unix_to_yyyymmdd_hhmmss(ValidExc[i]) << " ";
    for(i=0; i<ValidHour.n_elements(); i++)
       s << "-valid_hour " << sec_to_hhmmss(ValidHour[i]) << " ";
    for(i=0; i<InitMask.n_elements(); i++)

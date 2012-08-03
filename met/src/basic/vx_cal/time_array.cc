@@ -214,6 +214,40 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void TimeArray::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+
+out << prefix << "Nelements = " << Nelements << "\n";
+out << prefix << "Nalloc    = " << Nalloc    << "\n";
+out << prefix << "Sorted    = " << (Sorted ? "true" : "false") << "\n";
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   out << prefix << "Element # " << j << " = "
+       << unix_to_yyyymmdd_hhmmss(e[j]) << "\n";
+
+}
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 unixtime TimeArray::operator[](int n) const
 
 {
