@@ -240,7 +240,7 @@ void TrackInfo::extend(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackInfo::initialize(const TrackLine &l) {
+void TrackInfo::initialize(const ATCFLine &l) {
 
    IsSet           = true;
 
@@ -365,12 +365,12 @@ void TrackInfo::add(const TrackPoint &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::add(const TrackLine &l) {
+bool TrackInfo::add(const ATCFLine &l) {
    bool found = false;
    bool status = false;
    int i;
 
-   // Initialize TrackInfo with TrackLine, if necessary
+   // Initialize TrackInfo with ATCFLine, if necessary
    if(!IsSet) initialize(l);
 
    // Check if TrackPoint doesn't match this TrackInfo
@@ -381,7 +381,7 @@ bool TrackInfo::add(const TrackLine &l) {
    else if(StormName && l.storm_name() &&
            StormName != l.storm_name()) {
       mlog << Warning
-           << "\nTrackInfo::add(const TrackLine &) -> "
+           << "\nTrackInfo::add(const ATCFLine &) -> "
            << "the storm name should remain the same \"" << StormName
            << "\" != \"" << l.storm_name() << "\".\n\n";
    }
@@ -390,8 +390,8 @@ bool TrackInfo::add(const TrackLine &l) {
    if(NPoints > 0) {
       if(l.valid() < Point[NPoints-1].valid()) {
          mlog << Warning
-              << "\nTrackInfo::add(const TrackLine &) -> "
-              << "skipping TrackLine since the valid time is not increasing ("
+              << "\nTrackInfo::add(const ATCFLine &) -> "
+              << "skipping ATCFLine since the valid time is not increasing ("
               << unix_to_yyyymmdd_hhmmss(l.valid()) << " < "
               << unix_to_yyyymmdd_hhmmss(Point[NPoints-1].valid())
               << "):\n" << l.line() << "\n\n";
@@ -399,7 +399,7 @@ bool TrackInfo::add(const TrackLine &l) {
       }
    }
 
-   // Add TrackLine to an existing TrackPoint if possible
+   // Add ATCFLine to an existing TrackPoint if possible
    for(i=NPoints-1; i>=0; i--) {
       if(Point[i].is_match(l)) {
          found = true;
@@ -440,7 +440,7 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::has(const TrackLine &l) const {
+bool TrackInfo::has(const ATCFLine &l) const {
    int found = false;
    int i;
 
@@ -458,7 +458,7 @@ bool TrackInfo::has(const TrackLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::is_match(const TrackLine &l) const {
+bool TrackInfo::is_match(const ATCFLine &l) const {
    bool match = true;
    int diff;
 
@@ -789,23 +789,23 @@ void TrackInfoArray::set(int n, const TrackInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfoArray::add(const TrackLine &l, bool check_has) {
+bool TrackInfoArray::add(const ATCFLine &l, bool check_has) {
    bool found  = false;
    bool status = false;
    int i;
 
-   // Check if this TrackLine already exists in the TrackInfoArray
+   // Check if this ATCFLine already exists in the TrackInfoArray
    if(check_has) {
       if(has(l)) {
          mlog << Warning
-              << "\nTrackInfoArray::add(const TrackLine &) -> "
-              << "skipping duplicate TrackLine:\n"
+              << "\nTrackInfoArray::add(const ATCFLine &) -> "
+              << "skipping duplicate ATCFLine:\n"
               << l.line() << "\n\n";
          return(false);
       }
    }
 
-   // Add TrackLine to an existing track if possible
+   // Add ATCFLine to an existing track if possible
    for(i=NTracks-1; i>=0; i--) {
       if(Track[i].is_match(l)) {
          found = true;
@@ -825,7 +825,7 @@ bool TrackInfoArray::add(const TrackLine &l, bool check_has) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfoArray::has(const TrackLine &l) const {
+bool TrackInfoArray::has(const ATCFLine &l) const {
    int found = false;
    int i;
 

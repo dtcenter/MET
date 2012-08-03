@@ -64,7 +64,7 @@ class TCPairsConfInfo {
       // Merge 6-hour TrackPoints into 12-hour interpolated tracks
       bool Interp12;
       
-      // Check for duplicate TrackLines
+      // Check for duplicate ATCFLines
       bool CheckDup;
 
       // Only retain TrackPoints in both the ADECK and BDECK tracks

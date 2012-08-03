@@ -169,7 +169,7 @@ void process_command_line(int argc, char **argv) {
 
 void process_tracks() {
    StringArray adeck_files, bdeck_files, suffix_list;
-   TrackLine line;
+   ATCFLine line;
    TrackInfoArray adeck_tracks, bdeck_tracks;
    TrackPairInfoArray pairs;
    ifstream in;
@@ -266,7 +266,7 @@ void process_track_files(const StringArray &files,
                          TrackInfoArray &tracks) {
    int i, cur_read, cur_add, tot_read, tot_add;
    ifstream in;
-   TrackLine line;
+   ATCFLine line;
 
    // Initialize
    tracks.clear();

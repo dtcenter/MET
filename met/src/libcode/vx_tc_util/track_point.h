@@ -18,7 +18,7 @@
 #include "vx_cal.h"
 #include "vx_util.h"
 
-#include "track_line.h"
+#include "atcf_line.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -59,8 +59,8 @@ class QuadInfo {
          //  set stuff
          //
 
-      void set_wind(const TrackLine &);
-      void set_seas(const TrackLine &);
+      void set_wind(const ATCFLine &);
+      void set_seas(const ATCFLine &);
 
       void set_intensity(int);
       void set_quadrant(QuadrantType);
@@ -78,11 +78,11 @@ class QuadInfo {
          //  do stuff
          //
 
-      bool has_wind(const TrackLine &)      const;
-      bool has_seas(const TrackLine &)      const;
+      bool has_wind(const ATCFLine &)      const;
+      bool has_seas(const ATCFLine &)      const;
 
-      bool is_match_wind(const TrackLine &) const;
-      bool is_match_seas(const TrackLine &) const;
+      bool is_match_wind(const ATCFLine &) const;
+      bool is_match_seas(const ATCFLine &) const;
 
 };
 
@@ -144,7 +144,7 @@ class TrackPoint {
          //  set stuff
          //
 
-      void initialize(const TrackLine &);
+      void initialize(const ATCFLine &);
 
       void set_valid(const unixtime);
       void set_lead(const int);
@@ -175,9 +175,9 @@ class TrackPoint {
          //
 
       void set_wind(int, const QuadInfo &);
-      bool set(const TrackLine &);
-      bool has(const TrackLine &)      const;
-      bool is_match(const TrackLine &) const;
+      bool set(const ATCFLine &);
+      bool has(const ATCFLine &)      const;
+      bool is_match(const ATCFLine &) const;
 
 };
 

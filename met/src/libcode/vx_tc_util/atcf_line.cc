@@ -19,7 +19,7 @@ using namespace std;
 
 #include "vx_math.h"
 
-#include "track_line.h"
+#include "atcf_line.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -31,23 +31,23 @@ extern ConcatString parse_str (const char *);
   
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class TrackLine
+//  Code for class ATCFLine
 //
 ////////////////////////////////////////////////////////////////////////
 
-TrackLine::TrackLine() {
+ATCFLine::ATCFLine() {
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-TrackLine::~TrackLine() {
+ATCFLine::~ATCFLine() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-TrackLine::TrackLine(const TrackLine &t) {
+ATCFLine::ATCFLine(const ATCFLine &t) {
    init_from_scratch();
 
    assign(t);
@@ -55,7 +55,7 @@ TrackLine::TrackLine(const TrackLine &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-TrackLine & TrackLine::operator=(const TrackLine &t) {
+ATCFLine & ATCFLine::operator=(const ATCFLine &t) {
 
    if(this == &t) return(*this);
 
@@ -66,7 +66,7 @@ TrackLine & TrackLine::operator=(const TrackLine &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackLine::operator==(const TrackLine &t) {
+bool ATCFLine::operator==(const ATCFLine &t) {
    bool match = false;
 
    if(this == &t) return(true);
@@ -79,7 +79,7 @@ bool TrackLine::operator==(const TrackLine &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackLine::init_from_scratch() {
+void ATCFLine::init_from_scratch() {
 
    clear();
 
@@ -88,7 +88,7 @@ void TrackLine::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackLine::clear() {
+void ATCFLine::clear() {
 
    Line.clear();
    Basin.clear();
@@ -132,7 +132,7 @@ void TrackLine::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackLine::dump(ostream &out, int indent_depth) const {
+void ATCFLine::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
    out << prefix << "Line            = " << Line << "\n";
@@ -179,7 +179,7 @@ void TrackLine::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackLine::assign(const TrackLine &t) {
+void ATCFLine::assign(const ATCFLine &t) {
   
    clear();
 
@@ -225,7 +225,7 @@ void TrackLine::assign(const TrackLine &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-unixtime TrackLine::valid() const {
+unixtime ATCFLine::valid() const {
    unixtime u = 0;
    
    // Compute the valid time if WarningTime and ForecastPeriod are valid
@@ -244,10 +244,10 @@ unixtime TrackLine::valid() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int TrackLine::lead() const {
+int ATCFLine::lead() const {
    int s = bad_data_int;
 
-   // Lead time for the BSET track is 0
+   // Lead time for the BEST track is 0
    if(strcasecmp(Technique, BestTrackStr) == 0) {
       s = 0;
    }
@@ -264,7 +264,7 @@ int TrackLine::lead() const {
 //
 ////////////////////////////////////////////////////////////////////////
 
-bool operator>>(istream &in, TrackLine &t) {
+bool operator>>(istream &in, ATCFLine &t) {
    ConcatString element;
    StringArray a;
    const char delim [] = ",";
@@ -286,7 +286,7 @@ bool operator>>(istream &in, TrackLine &t) {
    // Check for the minumum number of elements
    if(a.n_elements() < MinATCFElements) {
       mlog << Warning
-           << "\nbool operator>>(istream & in, TrackLine & t) -> "
+           << "\nbool operator>>(istream & in, ATCFLine & t) -> "
            << "found fewer than the expected number of elements ("
            << a.n_elements() << "<" << MinATCFElements << ") in ATCF line:\n"
            << t.Line << "\n\n";
@@ -309,7 +309,11 @@ bool operator>>(istream &in, TrackLine &t) {
         case (1): t.CycloneNumber   = parse_str(a[j]);               break;
         case (2): t.WarningTime     = parse_time(a[j]);              break;
         case (3): t.TechniqueNumber = parse_int(a[j]);               break;
-        case (4): t.Technique       = parse_str(a[j]);               break;
+
+        // Replace instances of AVN with GFS
+        case (4): t.Technique       = parse_str(a[j]);
+                  t.Technique.replace("AVN", "GFS");                 break;
+
         case (5): t.ForecastPeriod  = parse_int(a[j]);               break;
         case (6): t.LatTenths       = parse_lat(a[j]);               break;
         case (7): t.LonTenths       = parse_lon(a[j]);               break;
