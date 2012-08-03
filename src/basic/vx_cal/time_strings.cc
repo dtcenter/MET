@@ -23,6 +23,7 @@ using namespace std;
 
 #include "vx_cal.h"
 #include "vx_log.h"
+#include "vx_math.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -472,8 +473,11 @@ int t;
 
 t = 0;
 
-     if ( !text             )  t = 0;
-else if ( strlen(text) == 0 )  t = 0;
+     if ( !text             )  t = bad_data_int;
+else if ( strlen(text) == 0 )  t = bad_data_int;
+else if ( strcmp(text,       na_str) == 0 ||
+          strcmp(text, bad_data_str) == 0 )
+                               t = bad_data_int;
 else if ( is_hhmmss (text)  )  t = hhmmss_to_sec(text);
 else if ( is_hh     (text)  )  t = hms_to_sec(atoi(text), 0, 0);
 else {

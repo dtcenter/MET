@@ -157,6 +157,27 @@ column_str_name = [];
 column_str_val  = [];
 
 //
+// Just like the column_thresh options above, but apply the threshold only
+// when lead = 0.  If lead = 0 value does not meet the threshold, discard
+// the entire track.  May add using the "-init_thresh name thresh" job command
+// options.
+// e.g. init_thresh_name = [ "ADLAND" ];
+//      init_thresh_val  = [ >200     ];
+//
+init_thresh_name = [];
+init_thresh_val  = [];
+
+//
+// Just like the column_str options above, but apply the string matching only
+// when lead = 0.  If lead = 0 string does not match, discard the entire track.
+// May add using the "-init_str name thresh" job command options.
+// e.g. init_str_name = [ "LEVEL" ];
+//      init_str_val  = [ "HU"    ];
+//
+init_str_name = [];
+init_str_val  = [];
+
+//
 // Specify whether only those track points common to both the ADECK and BDECK
 // tracks should be retained.
 // e.g. match_points = false;

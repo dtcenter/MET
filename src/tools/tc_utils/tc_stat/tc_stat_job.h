@@ -78,6 +78,8 @@ struct TCLineCounts {
    int RejWaterOnly;
    int RejColumnThresh;
    int RejColumnStr;
+   int RejInitThresh;
+   int RejInitStr;
    int RejOutInitMask;
    int RejOutValidMask;
    int RejMatchPoints;
@@ -181,6 +183,14 @@ class TCStatJob {
       StringArray ColumnStrName;
       StringArray ColumnStrVal;
 
+      // Numeric column thresholds
+      StringArray InitThreshName;
+      ThreshArray InitThreshVal;
+
+      // ASCII column string matching
+      StringArray InitStrName;
+      StringArray InitStrVal;
+      
       // Variables to the store the analysis job specification
       
       ConcatString DumpFile;        // Dump TrackPairInfo used to a file
