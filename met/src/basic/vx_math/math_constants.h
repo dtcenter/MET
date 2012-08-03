@@ -57,6 +57,9 @@ static const double nautical_miles_per_km = 1.0/km_per_nautical_mile;
 static const double tc_km_per_nautical_miles = 1.8520;
 static const double tc_nautical_miles_per_km = 1.0/tc_km_per_nautical_miles;
 
+static const double nautical_miles_per_deg = 60.0;
+static const double deg_per_nautical_mile  = 1.0/nautical_miles_per_deg;
+
 static const double km_per_statute_mile   = 1.609344;
 static const double statute_miles_per_km  = 1.0/km_per_statute_mile;
 
