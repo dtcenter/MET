@@ -57,6 +57,8 @@ class TimeArray {
 
       void clear();
 
+      void dump(ostream &, int depth = 0) const;
+
       unixtime operator[](int) const;
 
       int  has(unixtime) const;
