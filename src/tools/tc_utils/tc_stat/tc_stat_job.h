@@ -67,9 +67,10 @@ struct TCLineCounts {
    int RejCyclone;
    int RejStormName;
    int RejInit;
-   int RejInitHH;
-   int RejLead;   
+   int RejInitHour;
+   int RejLead;
    int RejValid;
+   int RejValidHour;
    int RejInitMask;
    int RejValidMask;
    int RejLineType;
@@ -151,8 +152,10 @@ class TCStatJob {
 
       // Timing information
       unixtime  InitBeg, InitEnd;
+      NumArray  InitHour;
+      NumArray  Lead;
       unixtime  ValidBeg, ValidEnd;
-      NumArray  InitHH, Lead;
+      NumArray  ValidHour;
 
       // Polyline masking regions
       StringArray InitMask, ValidMask;

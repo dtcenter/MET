@@ -172,9 +172,8 @@ unixtime TCStatLine::init() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int TCStatLine::init_hh() const {
-   unixtime ut = init();
-   return(ut%sec_per_day);
+int TCStatLine::init_hour() const {
+   return(init()%sec_per_day);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -199,6 +198,12 @@ unixtime TCStatLine::valid() const {
    else                             ut = timestring_to_unix(c);
 
    return(ut);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int TCStatLine::valid_hour() const {
+   return(valid()%sec_per_day);
 }
 
 ////////////////////////////////////////////////////////////////////////

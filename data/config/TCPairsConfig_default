@@ -82,9 +82,9 @@ init_end = "";
 // Specify a comma-separated list of model initialization hours to be used
 // in HH[MMSS] format. An empty list indicates that all hours should be used.
 //
-// e.g. init_hh = [ "00", "06", "12", "18" ];
+// e.g. init_hour = [ "00", "06", "12", "18" ];
 //
-init_hh = [];
+init_hour = [];
 
 //
 // Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.

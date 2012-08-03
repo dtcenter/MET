@@ -155,7 +155,7 @@ void TCPairsConfInfo::process_config() {
    InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
 
    // Conf: InitHH
-   sa = Conf.lookup_string_array("init_hh");
+   sa = Conf.lookup_string_array("init_hour");
    for(i=0; i<sa.n_elements(); i++)
       InitHH.add(timestring_to_sec(sa[i]));
    

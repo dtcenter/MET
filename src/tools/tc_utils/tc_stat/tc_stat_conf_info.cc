@@ -107,19 +107,24 @@ void TCStatConfInfo::process_config() {
    Filter.InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
    Filter.InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
 
-   // Conf: TCStatJob::ValidBeg, TCStatJob::ValidEnd
-   Filter.ValidBeg = timestring_to_unix(Conf.lookup_string("valid_beg"));
-   Filter.ValidEnd = timestring_to_unix(Conf.lookup_string("valid_end"));
-
-   // Conf: TCStatJob::InitHH
-   sa = Conf.lookup_string_array("init_hh");
+   // Conf: TCStatJob::InitHour
+   sa = Conf.lookup_string_array("init_hour");
    for(i=0; i<sa.n_elements(); i++)
-      Filter.InitHH.add(timestring_to_sec(sa[i]));
+      Filter.InitHour.add(timestring_to_sec(sa[i]));
 
    // Conf: TCStatJob::Lead
    sa = Conf.lookup_string_array("lead");
    for(i=0; i<sa.n_elements(); i++)
       Filter.Lead.add(timestring_to_sec(sa[i]));
+   
+   // Conf: TCStatJob::ValidBeg, TCStatJob::ValidEnd
+   Filter.ValidBeg = timestring_to_unix(Conf.lookup_string("valid_beg"));
+   Filter.ValidEnd = timestring_to_unix(Conf.lookup_string("valid_end"));
+
+   // Conf: TCStatJob::ValidHour
+   sa = Conf.lookup_string_array("valid_hour");
+   for(i=0; i<sa.n_elements(); i++)
+      Filter.ValidHour.add(timestring_to_sec(sa[i]));
 
    // Conf: TCStatJob::InitMask
    Filter.InitMask = Conf.lookup_string_array("init_mask");

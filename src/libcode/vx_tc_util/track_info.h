@@ -105,7 +105,7 @@ class TrackInfo {
       int                technique_number() const;
       const char *       technique()        const;
       unixtime           init()             const;
-      int                init_hh()          const;
+      int                init_hour()        const;
       unixtime           valid_min()        const;
       unixtime           valid_max()        const;
       int                valid_inc()        const;
@@ -146,7 +146,7 @@ inline const char * TrackInfo::storm_name()       const { return(StormName);    
 inline int          TrackInfo::technique_number() const { return(TechniqueNumber);         }
 inline const char * TrackInfo::technique()        const { return(Technique);               }
 inline unixtime     TrackInfo::init()             const { return(InitTime);                }
-inline int          TrackInfo::init_hh()          const { return(InitTime % sec_per_hour); }
+inline int          TrackInfo::init_hour()        const { return(InitTime % sec_per_hour); }
 inline unixtime     TrackInfo::valid_min()        const { return(MinValidTime);            }
 inline unixtime     TrackInfo::valid_max()        const { return(MaxValidTime);            }
 inline int          TrackInfo::n_points()         const { return(NPoints);                 }
