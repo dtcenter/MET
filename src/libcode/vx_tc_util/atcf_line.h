@@ -8,8 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_TRACK_LINE_H__
-#define  __VX_TRACK_LINE_H__
+#ifndef  __VX_ATCF_LINE_H__
+#define  __VX_ATCF_LINE_H__
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -130,19 +130,19 @@ extern ConcatString systemsdepth_to_string(const SystemsDepth);
 
 ////////////////////////////////////////////////////////////////////////
 //
-// TrackLine class stores the data in a single ATCF line.
+// ATCFLine class stores the data in a single ATCF line.
 //
 ////////////////////////////////////////////////////////////////////////
 
-class TrackLine {
+class ATCFLine {
 
-      friend bool operator>>(istream &, TrackLine &);
+      friend bool operator>>(istream &, ATCFLine &);
 
    private:
 
       void init_from_scratch();
 
-      void assign(const TrackLine &);
+      void assign(const ATCFLine &);
 
       ConcatString Line;
       
@@ -212,11 +212,11 @@ class TrackLine {
 
    public:
 
-      TrackLine();
-     ~TrackLine();
-      TrackLine(const TrackLine &);
-      TrackLine & operator= (const TrackLine &);
-      bool        operator==(const TrackLine &);
+      ATCFLine();
+     ~ATCFLine();
+      ATCFLine(const ATCFLine &);
+      ATCFLine & operator= (const ATCFLine &);
+      bool        operator==(const ATCFLine &);
 
       void clear();
 
@@ -306,50 +306,50 @@ class TrackLine {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline ConcatString   TrackLine::line()             const { return(Line);            }
-inline ConcatString   TrackLine::basin()            const { return(Basin);           }
-inline ConcatString   TrackLine::cyclone_number()   const { return(CycloneNumber);   }
-inline unixtime       TrackLine::warning_time()     const { return(WarningTime);     }
-inline int            TrackLine::technique_number() const { return(TechniqueNumber); }
-inline int            TrackLine::forecast_period()  const { return(ForecastPeriod);  }
-inline ConcatString   TrackLine::technique()        const { return(Technique);       }
-inline double         TrackLine::lat()              const { return(0.1*LatTenths);   }
-inline double         TrackLine::lon()              const { return(0.1*LonTenths);   }
-inline int            TrackLine::v_max()            const { return(Vmax);            }
-inline int            TrackLine::mslp()             const { return(MSLP);            }
-inline CycloneLevel   TrackLine::level()            const { return(Level);           }
-inline int            TrackLine::wind_intensity()   const { return(WindIntensity);   }
-inline QuadrantType   TrackLine::quadrant()         const { return(Quadrant);        }
-inline int            TrackLine::radius1()          const { return(Radius1);         }
-inline int            TrackLine::radius2()          const { return(Radius2);         }
-inline int            TrackLine::radius3()          const { return(Radius3);         }
-inline int            TrackLine::radius4()          const { return(Radius4);         }
-inline int            TrackLine::isobar_pressure()  const { return(IsobarPressure);  }
-inline int            TrackLine::isobar_radius()    const { return(IsobarRadius);    }
-inline int            TrackLine::max_wind_radius()  const { return(MaxWindRadius);   }
-inline int            TrackLine::gusts()            const { return(Gusts);           }
-inline int            TrackLine::eye_diameter()     const { return(EyeDiameter);     }
-inline SubregionCode  TrackLine::subregion()        const { return(SubRegion);       }
-inline int            TrackLine::max_seas()         const { return(MaxSeas);         }
-inline int            TrackLine::storm_direction()  const { return(StormDirection);  }
-inline int            TrackLine::storm_speed()      const { return(StormSpeed);      }
-inline ConcatString   TrackLine::storm_name()       const { return(StormName);       }
-inline SystemsDepth   TrackLine::depth()            const { return(Depth);           }
-inline int            TrackLine::wave_height()      const { return(WaveHeight);      }
-inline QuadrantType   TrackLine::seas_code()        const { return(SeasCode);        }
-inline int            TrackLine::seas_radius1()     const { return(SeasRadius1);     }
-inline int            TrackLine::seas_radius2()     const { return(SeasRadius2);     }
-inline int            TrackLine::seas_radius3()     const { return(SeasRadius3);     }
-inline int            TrackLine::seas_radius4()     const { return(SeasRadius4);     }
+inline ConcatString   ATCFLine::line()             const { return(Line);            }
+inline ConcatString   ATCFLine::basin()            const { return(Basin);           }
+inline ConcatString   ATCFLine::cyclone_number()   const { return(CycloneNumber);   }
+inline unixtime       ATCFLine::warning_time()     const { return(WarningTime);     }
+inline int            ATCFLine::technique_number() const { return(TechniqueNumber); }
+inline int            ATCFLine::forecast_period()  const { return(ForecastPeriod);  }
+inline ConcatString   ATCFLine::technique()        const { return(Technique);       }
+inline double         ATCFLine::lat()              const { return(0.1*LatTenths);   }
+inline double         ATCFLine::lon()              const { return(0.1*LonTenths);   }
+inline int            ATCFLine::v_max()            const { return(Vmax);            }
+inline int            ATCFLine::mslp()             const { return(MSLP);            }
+inline CycloneLevel   ATCFLine::level()            const { return(Level);           }
+inline int            ATCFLine::wind_intensity()   const { return(WindIntensity);   }
+inline QuadrantType   ATCFLine::quadrant()         const { return(Quadrant);        }
+inline int            ATCFLine::radius1()          const { return(Radius1);         }
+inline int            ATCFLine::radius2()          const { return(Radius2);         }
+inline int            ATCFLine::radius3()          const { return(Radius3);         }
+inline int            ATCFLine::radius4()          const { return(Radius4);         }
+inline int            ATCFLine::isobar_pressure()  const { return(IsobarPressure);  }
+inline int            ATCFLine::isobar_radius()    const { return(IsobarRadius);    }
+inline int            ATCFLine::max_wind_radius()  const { return(MaxWindRadius);   }
+inline int            ATCFLine::gusts()            const { return(Gusts);           }
+inline int            ATCFLine::eye_diameter()     const { return(EyeDiameter);     }
+inline SubregionCode  ATCFLine::subregion()        const { return(SubRegion);       }
+inline int            ATCFLine::max_seas()         const { return(MaxSeas);         }
+inline int            ATCFLine::storm_direction()  const { return(StormDirection);  }
+inline int            ATCFLine::storm_speed()      const { return(StormSpeed);      }
+inline ConcatString   ATCFLine::storm_name()       const { return(StormName);       }
+inline SystemsDepth   ATCFLine::depth()            const { return(Depth);           }
+inline int            ATCFLine::wave_height()      const { return(WaveHeight);      }
+inline QuadrantType   ATCFLine::seas_code()        const { return(SeasCode);        }
+inline int            ATCFLine::seas_radius1()     const { return(SeasRadius1);     }
+inline int            ATCFLine::seas_radius2()     const { return(SeasRadius2);     }
+inline int            ATCFLine::seas_radius3()     const { return(SeasRadius3);     }
+inline int            ATCFLine::seas_radius4()     const { return(SeasRadius4);     }
 
 ////////////////////////////////////////////////////////////////////////
 
-extern bool operator>>(istream &, TrackLine &);
+extern bool operator>>(istream &, ATCFLine &);
 
 extern CycloneLevel   wind_speed_to_cyclone_level(int);
   
 ////////////////////////////////////////////////////////////////////////
 
-#endif   /*  __VX_TRACK_LINE_H__  */
+#endif   /*  __VX_ATCF_LINE_H__  */
 
 ////////////////////////////////////////////////////////////////////////

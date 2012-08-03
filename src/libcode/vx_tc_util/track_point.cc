@@ -174,9 +174,9 @@ void QuadInfo::assign(const QuadInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void QuadInfo::set_wind(const TrackLine &l) {
+void QuadInfo::set_wind(const ATCFLine &l) {
 
-   // Return if Intensity doesn't match TrackLine intensity
+   // Return if Intensity doesn't match ATCFLine intensity
    if(Intensity != l.wind_intensity()) return;
   
    clear();
@@ -192,9 +192,9 @@ void QuadInfo::set_wind(const TrackLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void QuadInfo::set_seas(const TrackLine &l) {
+void QuadInfo::set_seas(const ATCFLine &l) {
 
-   // Return if Intensity doesn't match TrackLine wave height
+   // Return if Intensity doesn't match ATCFLine wave height
    if(Intensity != l.wave_height()) return;;
   
    clear();
@@ -244,21 +244,21 @@ int QuadInfo::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool QuadInfo::has_wind(const TrackLine &l) const {
+bool QuadInfo::has_wind(const ATCFLine &l) const {
 
    return(is_match_wind(l));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool QuadInfo::has_seas(const TrackLine &l) const {
+bool QuadInfo::has_seas(const ATCFLine &l) const {
 
    return(is_match_seas(l));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool QuadInfo::is_match_wind(const TrackLine &l) const {
+bool QuadInfo::is_match_wind(const ATCFLine &l) const {
    bool match = true;
 
    // Check storm and model info
@@ -275,7 +275,7 @@ bool QuadInfo::is_match_wind(const TrackLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool QuadInfo::is_match_seas(const TrackLine &l) const {
+bool QuadInfo::is_match_seas(const ATCFLine &l) const {
    bool match = true;
 
    // Check storm and model info
@@ -487,7 +487,7 @@ void TrackPoint::assign(const TrackPoint &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackPoint::initialize(const TrackLine &l) {
+void TrackPoint::initialize(const ATCFLine &l) {
 
    IsSet     = true;
 
@@ -529,13 +529,13 @@ void TrackPoint::set_watch_warn(WatchWarnType ww_type, unixtime ww_ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackPoint::set(const TrackLine &l) {
+bool TrackPoint::set(const ATCFLine &l) {
    int i;
 
-   // Initialize TrackPoint with TrackLine, if necessary
+   // Initialize TrackPoint with ATCFLine, if necessary
    if(!IsSet) initialize(l);
 
-   // Attempt to set each WindInfo object with TrackLine
+   // Attempt to set each WindInfo object with ATCFLine
    for(i=0; i<NWinds; i++) Wind[i].set_wind(l);
 
    return(true);
@@ -561,7 +561,7 @@ void TrackPoint::set_wind(int n, const QuadInfo &w) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackPoint::has(const TrackLine &l) const {
+bool TrackPoint::has(const ATCFLine &l) const {
    int found = false;
    int i;
 
@@ -579,7 +579,7 @@ bool TrackPoint::has(const TrackLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackPoint::is_match(const TrackLine &l) const {
+bool TrackPoint::is_match(const ATCFLine &l) const {
    bool match = true;
 
    // Check storm and model info

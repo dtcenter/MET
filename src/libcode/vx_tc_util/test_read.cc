@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
    
    ConcatString input_filename = argv[1];
    ifstream in;
-   TrackLine t_line;
+   ATCFLine t_line;
    TrackInfoArray t_array;
    int count, i;
    in.open(input_filename);

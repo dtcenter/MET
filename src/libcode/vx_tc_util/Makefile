@@ -16,7 +16,7 @@
 EXECUTABLES = test_read
 
 
-OBJECTS     = track_line.o \
+OBJECTS     = atcf_line.o \
               track_point.o \
               track_info.o \
               track_pair_info.o \
@@ -34,7 +34,7 @@ GEN_SOURCES =
 ########################################################################
 
 
-HEADERS     = track_line.h \
+HEADERS     = atcf_line.h \
               track_point.h \
               track_info.h \
               track_pair_info.h \
@@ -73,8 +73,8 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 
-track_line.o: track_line.h track_line.cc
-	$(CXX) track_line.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+atcf_line.o: atcf_line.h atcf_line.cc
+	$(CXX) atcf_line.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 track_point.o: track_point.h track_point.cc
 	$(CXX) track_point.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)

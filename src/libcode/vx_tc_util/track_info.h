@@ -19,7 +19,7 @@
 #include "vx_math.h"
 #include "vx_util.h"
 
-#include "track_line.h"
+#include "atcf_line.h"
 #include "track_point.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ class TrackInfo {
          //  set stuff
          //
 
-      void initialize(const TrackLine &);
+      void initialize(const ATCFLine &);
 
       void set_basin(const char *);
       void set_cyclone(const char *);
@@ -116,12 +116,12 @@ class TrackInfo {
          //
 
       void add(const TrackPoint &);
-      bool add(const TrackLine &);
+      bool add(const ATCFLine &);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
       
-      bool has(const TrackLine &) const;
+      bool has(const ATCFLine &) const;
       
-      bool is_match(const TrackLine &) const;
+      bool is_match(const ATCFLine &) const;
       bool is_match(const TrackInfo &) const;
       
       bool is_interp() const;
@@ -201,8 +201,8 @@ class TrackInfoArray {
 
       void add(const TrackInfo &);
       void set(int, const TrackInfo &);
-      bool add(const TrackLine &, bool = true);
-      bool has(const TrackLine &) const;
+      bool add(const ATCFLine &, bool = true);
+      bool has(const ATCFLine &) const;
 
 };
 
