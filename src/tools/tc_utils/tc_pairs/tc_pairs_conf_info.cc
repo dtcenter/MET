@@ -67,8 +67,9 @@ void TCPairsConfInfo::clear() {
    NCon = 0;
    ConModel.clear();
    ConMinReq.clear();
+   LagHour.clear();
    InitBeg = InitEnd = (unixtime) 0;
-   InitHH.clear();   
+   InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    InitMask.clear();
    ValidMask.clear();
@@ -150,14 +151,19 @@ void TCPairsConfInfo::process_config() {
       exit(1);
    }   
 
+   // Conf: LagHour
+   sa = Conf.lookup_string_array("lag_hour");
+   for(i=0; i<sa.n_elements(); i++)
+      LagHour.add(timestring_to_sec(sa[i]));
+
    // Conf: InitBeg, InitEnd
    InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
    InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
 
-   // Conf: InitHH
+   // Conf: InitHour
    sa = Conf.lookup_string_array("init_hour");
    for(i=0; i<sa.n_elements(); i++)
-      InitHH.add(timestring_to_sec(sa[i]));
+      InitHour.add(timestring_to_sec(sa[i]));
    
    // Conf: ValidBeg, ValidEnd
    ValidBeg = timestring_to_unix(Conf.lookup_string("valid_beg"));

@@ -109,7 +109,8 @@ extern  unixtime timestring_to_unix(const char *);
 
 extern  ConcatString HH(int hours);
 
-extern  int      timestring_to_sec(const char *);
+extern  int          timestring_to_sec(const char *);
+extern  ConcatString sec_to_timestring(int);
 
 
 ////////////////////////////////////////////////////////////////////////

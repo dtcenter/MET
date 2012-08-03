@@ -493,6 +493,23 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString sec_to_timestring(int s)
+
+{
+
+ConcatString str;
+
+  if ( s % 3600 == 0 ) str = HH ( s / 3600 );
+else                   str = sec_to_hhmmss ( s );
+
+return ( str );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool is_hhmmss(const char * text)
 
 {
