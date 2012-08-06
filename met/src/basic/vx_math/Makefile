@@ -99,7 +99,7 @@ nti.o: nti.cc
 	$(CXX) nti.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 ptile.o: ptile.cc
-	$(CXX) ptile.cc $(CXX_FLAGS) -c
+	$(CXX) ptile.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 pwl.o: pwl.h pwl.cc
 	$(CXX) pwl.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
