@@ -82,6 +82,7 @@ void TrackPairInfo::clear() {
    YErr.clear();
    AlongTrackErr.clear();
    CrossTrackErr.clear();
+   InitLine.clear();
 
    return;
 }
@@ -110,7 +111,9 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    AlongTrackErr.dump(out, indent_depth+1);
    out << prefix << "CrossTrackErr:\n";
    CrossTrackErr.dump(out, indent_depth+1);
-
+   out << prefix << "InitLine:\n";
+   InitLine.dump(out, indent_depth+1);
+   
    out << flush;
 
    return;
@@ -172,6 +175,7 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
    YErr          = t.YErr;
    AlongTrackErr = t.AlongTrackErr;
    CrossTrackErr = t.CrossTrackErr;
+   InitLine      = t.InitLine;
 
    return;
 }
@@ -243,7 +247,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
    QuadInfo wind;
    ConcatString cs;
    int i, j, k;
-
+   
    // Check the line type
    if(l.type() != TCStatLineType_TCMPR) return;
 
@@ -309,6 +313,9 @@ void TrackPairInfo::add(const TCStatLine &l) {
    YErr.add(atof(l.get_item("Y_ERR")));
    AlongTrackErr.add(atof(l.get_item("ALTK_ERR")));
    CrossTrackErr.add(atof(l.get_item("CRTK_ERR")));
+
+   // Store the TCStatLine for ADECK initialization time (lead == 0)
+   if(apoint.lead() == 0) InitLine = l;
 
    return;
 }

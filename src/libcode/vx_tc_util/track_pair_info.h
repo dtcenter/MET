@@ -60,6 +60,9 @@ class TrackPairInfo {
       NumArray     AlongTrackErr;
       NumArray     CrossTrackErr;
 
+      // TCStatLine for ADECK initialization time
+      TCStatLine   InitLine;
+
    public:
 
       TrackPairInfo();
@@ -84,17 +87,18 @@ class TrackPairInfo {
          //  get stuff
          //
 
-      int               n_points()           const;
-      const TrackInfo & adeck()              const;
-      const TrackInfo & bdeck()              const;
-      double            adeck_dland(int)     const;
-      double            bdeck_dland(int)     const;
-      double            track_err(int)       const;
-      double            x_err(int)           const;
-      double            y_err(int)           const;
-      double            along_track_err(int) const;
-      double            cross_track_err(int) const;
-      WatchWarnType     track_watch_warn()   const;
+      int                n_points()           const;
+      const TrackInfo &  adeck()              const;
+      const TrackInfo &  bdeck()              const;
+      double             adeck_dland(int)     const;
+      double             bdeck_dland(int)     const;
+      double             track_err(int)       const;
+      double             x_err(int)           const;
+      double             y_err(int)           const;
+      double             along_track_err(int) const;
+      double             cross_track_err(int) const;
+      const TCStatLine & init_line()          const;
+      WatchWarnType      track_watch_warn()   const;
 
          //
          //  do stuff
@@ -108,16 +112,17 @@ class TrackPairInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int               TrackPairInfo::n_points()             const { return(NPoints);          }
-inline const TrackInfo & TrackPairInfo::adeck()                const { return(ADeck);            }
-inline const TrackInfo & TrackPairInfo::bdeck()                const { return(BDeck);            }
-inline double            TrackPairInfo::adeck_dland(int i)     const { return(ADeckDLand[i]);    }
-inline double            TrackPairInfo::bdeck_dland(int i)     const { return(BDeckDLand[i]);    }
-inline double            TrackPairInfo::track_err(int i)       const { return(TrackErr[i]);      }
-inline double            TrackPairInfo::x_err(int i)           const { return(XErr[i]);          }
-inline double            TrackPairInfo::y_err(int i)           const { return(YErr[i]);          }
-inline double            TrackPairInfo::along_track_err(int i) const { return(AlongTrackErr[i]); }
-inline double            TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]); }
+inline int                TrackPairInfo::n_points()             const { return(NPoints);          }
+inline const TrackInfo &  TrackPairInfo::adeck()                const { return(ADeck);            }
+inline const TrackInfo &  TrackPairInfo::bdeck()                const { return(BDeck);            }
+inline double             TrackPairInfo::adeck_dland(int i)     const { return(ADeckDLand[i]);    }
+inline double             TrackPairInfo::bdeck_dland(int i)     const { return(BDeckDLand[i]);    }
+inline double             TrackPairInfo::track_err(int i)       const { return(TrackErr[i]);      }
+inline double             TrackPairInfo::x_err(int i)           const { return(XErr[i]);          }
+inline double             TrackPairInfo::y_err(int i)           const { return(YErr[i]);          }
+inline double             TrackPairInfo::along_track_err(int i) const { return(AlongTrackErr[i]); }
+inline double             TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]); }
+inline const TCStatLine & TrackPairInfo::init_line()            const { return(InitLine);         }
 
 ////////////////////////////////////////////////////////////////////////
 //
