@@ -400,7 +400,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
    else if(LineType.n_elements() > 0 &&
      !LineType.has(line.line_type()))   { keep = false; n.RejLineType++;  }
 
-   // Check water only
+   // Check WaterOnly
    if(keep == true && WaterOnly == true) {
       adland = atof(line.get_item("ADLAND"));
       bdland = atof(line.get_item("BDLAND"));
@@ -412,7 +412,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
       }
    }
 
-   // Check the numeric column thresholds
+   // Check ColumnThresh
    if(keep == true) {
 
       // Loop through the numeric column thresholds
@@ -430,7 +430,7 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
       } // end for i
    }
 
-   // Check the column string matching
+   // Check ColumnStr
    if(keep == true) {
 
       // Loop through the column string matching
@@ -464,7 +464,8 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
    // Initialize skip lines to 0
    skip_lines = 0;
 
-   // Check OutInitMask.  Check the first valid ADECK lat/lon track point.
+   // Check OutInitMask.
+   // Check the first valid ADECK lat/lon track point.
    // If it falls outside the polyline region, skip the entire track.
    if(OutInitMask.n_points() > 0 &&
       !is_bad_data(alat) &&
@@ -517,6 +518,10 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
 bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
                           TCLineCounts &n) const {
    bool keep = true;
+   int i, j, offset;
+   double v_dbl;
+   ConcatString v_str;
+   StringArray sa;
 
    // Check TrackWatchWarn
    if(TrackWatchWarn.n_elements() > 0 &&
@@ -533,10 +538,59 @@ bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
        keep = true;
 
    // Update counts
-   if(!keep) {
-      n.RejTrackWatchWarn += tpi.n_points();
-      n.NKeep             -= tpi.n_points();
+   if(!keep) n.RejTrackWatchWarn += tpi.n_points();
+
+   // Check that the initialization line is set
+   if(tpi.init_line().n_items() == 0) {
+      keep = false;
+      n.RejInitThresh += tpi.n_points();
    }
+   
+   // Check InitThresh
+   if(keep == true) {
+
+      // Loop through the numeric init column thresholds
+      for(i=0; i<InitThreshName.n_elements(); i++) {
+
+         // Get the numeric init column value
+         v_dbl = get_column_double(tpi.init_line(), InitThreshName[i]);
+
+         // Check the column threshold
+         if(is_bad_data(v_dbl) || !InitThreshVal[i].check(v_dbl)) {
+           keep = false;
+           n.RejInitThresh += tpi.n_points();
+           break;
+         }
+      } // end for i
+   }
+
+   // Check InitStr
+   if(keep == true) {
+  
+      // Loop through the column string matching
+      for(i=0; i<InitStrName.n_elements(); i++) {
+
+         // Construct list of all entries for the current column name
+         sa.clear();
+         for(j=0; j<InitStrName.n_elements(); j++)
+            if(strcasecmp(InitStrName[i], InitStrName[j]) == 0)
+               sa.add(InitStrVal[j]);
+
+         // Determine the column offset and retrieve the value
+         offset = determine_column_offset(tpi.init_line().type(), InitStrName[i]);
+         v_str  = tpi.init_line().get_item(offset);
+
+         // Check the string value
+         if(!sa.has(v_str)) {
+            keep = false;
+            n.RejInitStr += tpi.n_points();
+            break;
+         }
+      } // end for i
+   }
+
+   // Update counts
+   if(!keep) n.NKeep -= tpi.n_points();
 
    return(keep);
 }
