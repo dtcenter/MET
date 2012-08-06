@@ -540,8 +540,10 @@ bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
    // Update counts
    if(!keep) n.RejTrackWatchWarn += tpi.n_points();
 
-   // Check that the initialization line is set
-   if(tpi.init_line().n_items() == 0) {
+   // Check that the initialization line is set for InitThresh or InitStr
+   if(tpi.init_line().n_items() == 0 &&
+      (InitThreshName.n_elements() > 0 ||
+       InitStrName.n_elements()    > 0)) {
       keep = false;
       n.RejInitThresh += tpi.n_points();
    }
