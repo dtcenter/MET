@@ -20,6 +20,7 @@
 
 #include <cmath>
 
+#include "vx_cal.h"
 #include "math_constants.h"
 
 

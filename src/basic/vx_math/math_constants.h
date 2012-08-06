@@ -83,16 +83,6 @@ static const double m_per_km              = 1000.0;
 static const double km_per_m              = 1.0/m_per_km;
 
    //
-   //  Bad Data Values
-   //
-
-static const int    bad_data_int          = -9999;
-static const float  bad_data_float        = -9999.f;
-static const double bad_data_double       = -9999.0;
-static const char   bad_data_str[]        = "-9999";
-static const char   na_str[]              = "NA";
-
-   //
    //  Default tolerance to determine if two number of close enough
    //  to be considered equal
    //
