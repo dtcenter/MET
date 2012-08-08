@@ -62,6 +62,9 @@ TrackPairInfo & TrackPairInfo::operator=(const TrackPairInfo & t) {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::init_from_scratch() {
+
+   // Initialize pointers
+   Line = (TCStatLine *) 0;
   
    clear();
 
@@ -82,7 +85,9 @@ void TrackPairInfo::clear() {
    YErr.clear();
    AlongTrackErr.clear();
    CrossTrackErr.clear();
-   InitLine.clear();
+
+   if(Line) { delete [] Line; Line = (TCStatLine *) 0; }
+   NLines = NAlloc = 0;
 
    return;
 }
@@ -111,9 +116,7 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    AlongTrackErr.dump(out, indent_depth+1);
    out << prefix << "CrossTrackErr:\n";
    CrossTrackErr.dump(out, indent_depth+1);
-   out << prefix << "InitLine:\n";
-   InitLine.dump(out, indent_depth+1);
-   
+   out << prefix << "NLines = " << NLines << "\n";
    out << flush;
 
    return;
@@ -162,6 +165,7 @@ ConcatString TrackPairInfo::serialize_r(int n, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::assign(const TrackPairInfo &t) {
+   int i;
 
    clear();
 
@@ -175,7 +179,52 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
    YErr          = t.YErr;
    AlongTrackErr = t.AlongTrackErr;
    CrossTrackErr = t.CrossTrackErr;
-   InitLine      = t.InitLine;
+
+   extend(t.NLines);
+
+   for(i=0; i<t.NLines; i++) Line[i] = t.Line[i];
+
+   NLines = t.NLines;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfo::extend(int n) {
+   int j, k;
+   TCStatLine *new_line = (TCStatLine *) 0;
+
+   // Check if enough memory is already allocated
+   if(NAlloc >= n) return;
+
+   // Check how many allocations are required
+   k = n/TrackPairLineAllocInc;
+   if(n%TrackPairLineAllocInc) k++;
+   n = k*TrackPairLineAllocInc;
+
+   // Allocate a new TCStatLine array of the required length
+   new_line = new TCStatLine [n];
+
+   if(!new_line) {
+      mlog << Error
+           << "\nvoid TrackPairInfo::extend(int) -> "
+           << "memory allocation error\n\n";
+      exit(1);
+   }
+
+   // Copy the array contents and delete the old one
+   if(Line) {
+      for(j=0; j<NLines; j++) new_line[j] = Line[j];
+      delete [] Line; Line = (TCStatLine *) 0;
+   }
+
+   // Point to the new array
+   Line     = new_line;
+   new_line = (TCStatLine *) 0;
+
+   // Store the allocated length
+   NAlloc = n;
 
    return;
 }
@@ -314,10 +363,25 @@ void TrackPairInfo::add(const TCStatLine &l) {
    AlongTrackErr.add(atof(l.get_item("ALTK_ERR")));
    CrossTrackErr.add(atof(l.get_item("CRTK_ERR")));
 
-   // Store the TCStatLine for ADECK initialization time (lead == 0)
-   if(apoint.lead() == 0) InitLine = l;
+   // Store the input line
+   extend(NLines + 1);
+   Line[NLines++] = l;
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const TCStatLine * TrackPairInfo::init_line() const {
+   int i;
+   TCStatLine *ptr = (TCStatLine *) 0;
+
+   // Find the point where ADeck has lead = 0
+   for(i=0; i<NPoints; i++) if(ADeck[i].lead() == 0) break;
+
+   if(i < NLines) ptr = &Line[i];
+
+   return(ptr);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -350,6 +414,67 @@ void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
    BDeck.add_watch_warn(storm_id, ww_type, ww_ut);
    
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Subset the track keeping only those points meeting the rapid
+// intensification criteria.  Return the number of points that were
+// discarded.
+//
+////////////////////////////////////////////////////////////////////////
+
+int TrackPairInfo::subset_rapid_inten(const SingleThresh &st) {
+   int i, j, n_points_in;
+   unixtime delta_ut;
+   TrackPairInfo tpi;
+   double cur_vmax, min_vmax;
+
+   // Check that the number of points equals the number of TCStatLines
+   if(NPoints != NLines) {
+      mlog << Error
+           << "\nTrackPairInfo::subset_rapid_inten(const SingleThresh &st) -> "
+           << "the number of track points \"" << NPoints
+           << "\" must equal the number of track lines \"" << NLines
+           << "\".\n\n";
+      exit(1);
+   }
+
+   // Store the original number of points
+   n_points_in = NPoints;
+
+   // Loop over the track points
+   for(i=0; i<NPoints; i++) {
+
+      // Store the current wind speed maximum
+      cur_vmax = BDeck[i].v_max();
+      min_vmax = bad_data_double;
+
+      // Search other track points for the minimum wind speed
+      // in the time window
+      for(j=0; j<NPoints; j++) {
+
+         // Check if this point falls in the time window
+         delta_ut = BDeck[i].valid() - BDeck[j].valid();
+         if(delta_ut >= 0 &&
+            delta_ut <= sec_per_hour*RapidIntenHourOffset) {
+
+            // Check for the minimum wind speed
+            if(is_bad_data(min_vmax) ||
+               (!is_bad_data(BDeck[j].v_max()) &&
+                BDeck[j].v_max() < min_vmax))
+               min_vmax = BDeck[j].v_max();
+         }
+      } // end for j
+
+      // Check if the vmax delta meets the threshold criteria
+      if(st.check(cur_vmax - min_vmax)) tpi.add(Line[i]);
+   }
+
+   // Reset the current object to the subset
+   *this = tpi;
+
+   return(n_points_in - NPoints);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -406,7 +531,7 @@ void TrackPairInfoArray::init_from_scratch() {
 void TrackPairInfoArray::clear() {
 
    if(Pair) { delete [] Pair; Pair = (TrackPairInfo *) 0; }
-   NPairs = NAlloc  = 0;
+   NPairs = NAlloc = 0;
 
    return;
 }

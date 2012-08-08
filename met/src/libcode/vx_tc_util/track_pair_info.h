@@ -25,7 +25,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+static const int TrackPairLineAllocInc = 10;
 static const int TrackPairInfoAllocInc = 10;
+static const int RapidIntenHourOffset  = 24;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -40,6 +42,7 @@ class TrackPairInfo {
 
       void init_from_scratch();
       void assign(const TrackPairInfo &);
+
       void extend(int);
 
       // Number of track points
@@ -60,8 +63,10 @@ class TrackPairInfo {
       NumArray     AlongTrackErr;
       NumArray     CrossTrackErr;
 
-      // TCStatLine for ADECK initialization time
-      TCStatLine   InitLine;
+      // TCStatLines used to construct this track
+      int          NLines;
+      int          NAlloc;
+      TCStatLine * Line;
 
    public:
 
@@ -97,7 +102,11 @@ class TrackPairInfo {
       double             y_err(int)           const;
       double             along_track_err(int) const;
       double             cross_track_err(int) const;
-      const TCStatLine & init_line()          const;
+
+      int                n_lines()            const;
+      const TCStatLine * line(int i)          const;
+      const TCStatLine * init_line()          const;
+
       WatchWarnType      track_watch_warn()   const;
 
          //
@@ -108,6 +117,8 @@ class TrackPairInfo {
                double, double, double, double, double, double, double);
       void add(const TCStatLine&);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
+
+      int  subset_rapid_inten(const SingleThresh &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -122,7 +133,8 @@ inline double             TrackPairInfo::x_err(int i)           const { return(X
 inline double             TrackPairInfo::y_err(int i)           const { return(YErr[i]);          }
 inline double             TrackPairInfo::along_track_err(int i) const { return(AlongTrackErr[i]); }
 inline double             TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]); }
-inline const TCStatLine & TrackPairInfo::init_line()            const { return(InitLine);         }
+inline int                TrackPairInfo::n_lines()              const { return(NLines);           }
+inline const TCStatLine * TrackPairInfo::line(int i)            const { return(&Line[i]);         }
 
 ////////////////////////////////////////////////////////////////////////
 //
