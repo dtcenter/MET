@@ -50,6 +50,15 @@ SingleThresh::SingleThresh(const SingleThresh &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
+SingleThresh::SingleThresh(const char *str) {
+
+   init_from_scratch();
+
+   set(str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 SingleThresh & SingleThresh::operator=(const SingleThresh &c) {
 
    if(this == &c) return(*this);
@@ -61,7 +70,7 @@ SingleThresh & SingleThresh::operator=(const SingleThresh &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool SingleThresh::operator==(const SingleThresh &st)
+bool SingleThresh::operator==(const SingleThresh &st) const
 
 {
 
