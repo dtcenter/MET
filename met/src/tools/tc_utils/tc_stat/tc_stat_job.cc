@@ -199,8 +199,10 @@ void TCStatJob::clear() {
    OutValidMask.clear();
 
    // Set to default values
-   WaterOnly   = default_water_only;
-   MatchPoints = default_match_points;
+   WaterOnly        = default_water_only;
+   MatchPoints      = default_match_points;
+   RapidInten       = default_rapid_inten;
+   RapidIntenThresh = default_rapid_inten_thresh;
 
    return;
 }
@@ -249,6 +251,9 @@ void TCStatJob::assign(const TCStatJob & j) {
    OutValidMask = j.OutValidMask;
 
    MatchPoints = j.MatchPoints;
+
+   RapidInten = j.RapidInten;
+   RapidIntenThresh = j.RapidIntenThresh;
 
    return;
 }
@@ -345,6 +350,10 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "OutValidMask = " << (OutValidMask.name() ? OutValidMask.name() : na_str) << "\n";
 
    out << prefix << "MatchPoints = " << bool_to_string(MatchPoints) << "\n";
+
+   out << prefix << "RapidInten = " << bool_to_string(RapidInten) << "\n";
+
+   out << prefix << "RapidIntenThresh = " << RapidIntenThresh.get_str() << "\n";
    
    out.flush();
 
@@ -353,8 +362,8 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
-                          TCLineCounts &n) const {
+bool TCStatJob::is_keeper_line(const TCStatLine &line, int &skip_lines,
+                               TCLineCounts &n) const {
    bool keep = true;
    int i, j, offset;
    double v_dbl, alat, alon, blat, blon, adland, bdland;
@@ -515,8 +524,8 @@ bool TCStatJob::is_keeper(const TCStatLine &line, int &skip_lines,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
-                          TCLineCounts &n) const {
+bool TCStatJob::is_keeper_track(TrackPairInfo &tpi,
+                                TCLineCounts &n) const {
    bool keep = true;
    int i, j, offset;
    double v_dbl;
@@ -541,7 +550,7 @@ bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
    if(!keep) n.RejTrackWatchWarn += tpi.n_points();
 
    // Check that the initialization line is set for InitThresh or InitStr
-   if(tpi.init_line().n_items() == 0 &&
+   if(tpi.init_line() != (TCStatLine *) 0 &&
       (InitThreshName.n_elements() > 0 ||
        InitStrName.n_elements()    > 0)) {
       keep = false;
@@ -555,7 +564,7 @@ bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
       for(i=0; i<InitThreshName.n_elements(); i++) {
 
          // Get the numeric init column value
-         v_dbl = get_column_double(tpi.init_line(), InitThreshName[i]);
+         v_dbl = get_column_double(*tpi.init_line(), InitThreshName[i]);
 
          // Check the column threshold
          if(is_bad_data(v_dbl) || !InitThreshVal[i].check(v_dbl)) {
@@ -579,8 +588,8 @@ bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
                sa.add(InitStrVal[j]);
 
          // Determine the column offset and retrieve the value
-         offset = determine_column_offset(tpi.init_line().type(), InitStrName[i]);
-         v_str  = tpi.init_line().get_item(offset);
+         offset = determine_column_offset(tpi.init_line()->type(), InitStrName[i]);
+         v_str  = tpi.init_line()->get_item(offset);
 
          // Check the string value
          if(!sa.has(v_str)) {
@@ -589,6 +598,17 @@ bool TCStatJob::is_keeper(const TrackPairInfo &tpi,
             break;
          }
       } // end for i
+   }
+
+   // Check RapidInten
+   if(keep == true && RapidInten == true) {
+
+      // Subset the track for rapid intensification
+      i = tpi.subset_rapid_inten(RapidIntenThresh);
+
+      // Update counts
+      n.RejRapidInten += i;
+      n.NKeep         -= i;
    }
 
    // Update counts
@@ -663,39 +683,41 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       if(c[0] != '-') continue;
 
       // Check job command options
-           if(strcasecmp(c, "-job"             ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-amodel"          ) == 0) { AModel.add(a[i+1]);                               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-bmodel"          ) == 0) { BModel.add(a[i+1]);                               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_id"        ) == 0) { StormId.add(a[i+1]);                              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-basin"           ) == 0) { Basin.add(a[i+1]);                                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-cyclone"         ) == 0) { Cyclone.add(a[i+1]);                              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_name"      ) == 0) { StormName.add(a[i+1]);                            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_beg"        ) == 0) { InitBeg = timestring_to_unix(a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_end"        ) == 0) { InitEnd = timestring_to_unix(a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_exc"        ) == 0) { InitExc.add(timestring_to_unix(a[i+1]));          a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_hour"       ) == 0) { InitHour.add(timestring_to_sec(a[i+1]));          a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead"            ) == 0) { Lead.add(timestring_to_sec(a[i+1]));              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_beg"       ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_end"       ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_exc"       ) == 0) { ValidExc.add(timestring_to_unix(a[i+1]));         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_hour"      ) == 0) { ValidHour.add(timestring_to_sec(a[i+1]));         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_mask"       ) == 0) { InitMask.add(a[i+1]);                             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_mask"      ) == 0) { ValidMask.add(a[i+1]);                            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-line_type"       ) == 0) { LineType.add(a[i+1]);                             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-water_only"      ) == 0) { WaterOnly = string_to_bool(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-track_watch_warn") == 0) { TrackWatchWarn.add(a[i+1]);                       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_thresh"   ) == 0) { ColumnThreshName.add(a[i+1]);
-                                                         ColumnThreshVal.add(a[i+2]);                      a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-column_str"      ) == 0) { ColumnStrName.add(a[i+1]);
-                                                         ColumnStrVal.add(a[i+2]);                         a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_thresh"     ) == 0) { InitThreshName.add(a[i+1]);
-                                                         InitThreshVal.add(a[i+2]);                        a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_str"        ) == 0) { InitStrName.add(a[i+1]);
-                                                         InitStrVal.add(a[i+2]);                           a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-dump_row"        ) == 0) { DumpFile = a[i+1]; open_dump_file();              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_init_mask"   ) == 0) { set_mask(OutInitMask, a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_valid_mask"  ) == 0) { set_mask(OutValidMask, a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-match_points"    ) == 0) { MatchPoints = string_to_bool(a[i+1]);             a.shift_down(i, 1); }
+           if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add(a[i+1]);                         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add(a[i+1]);                     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add(timestring_to_unix(a[i+1]));   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add(timestring_to_sec(a[i+1]));   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add(timestring_to_sec(a[i+1]));       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add(timestring_to_unix(a[i+1]));  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add(timestring_to_sec(a[i+1]));  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add(a[i+1]);                     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add(a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-column_thresh"     ) == 0) { ColumnThreshName.add(a[i+1]);
+                                                           ColumnThreshVal.add(a[i+2]);               a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-column_str"        ) == 0) { ColumnStrName.add(a[i+1]);
+                                                           ColumnStrVal.add(a[i+2]);                  a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_thresh"       ) == 0) { InitThreshName.add(a[i+1]);
+                                                           InitThreshVal.add(a[i+2]);                 a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-init_str"          ) == 0) { InitStrName.add(a[i+1]);
+                                                           InitStrVal.add(a[i+2]);                    a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-rapid_inten"       ) == 0) { RapidInten = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);              a.shift_down(i, 1); }
    }
 
    return;
@@ -778,6 +800,9 @@ void TCStatJob::write_dump_file() {
    // Loop over and write the pairs
    for(i=0, i_row=1; i<PairArray.n_pairs(); i++) {
 
+      // Check for no remaining points
+      if(PairArray[i].n_points() == 0) continue;
+     
       // Setup header columns
       tchc.clear();
       tchc.set_adeck_model(PairArray[i].adeck().technique());
@@ -862,12 +887,6 @@ ConcatString TCStatJob::serialize() const {
    for(i=0; i<ColumnStrName.n_elements(); i++)
       s << "-column_str " << ColumnStrName[i] << " "
                           << ColumnStrVal[i] << " ";
-   for(i=0; i<InitThreshName.n_elements(); i++)
-      s << "-init_thresh " << InitThreshName[i] << " "
-                           << InitThreshVal[i].get_str() << " ";
-   for(i=0; i<InitStrName.n_elements(); i++)
-      s << "-init_str " << InitStrName[i] << " "
-                        << InitStrVal[i] << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
    if(OutInitMask.n_points() > 0)
@@ -876,6 +895,16 @@ ConcatString TCStatJob::serialize() const {
       s << "-out_valid_mask " << OutValidMask.file_name() << " ";
    if(MatchPoints != default_match_points)
       s << "-match_points " << bool_to_string(MatchPoints) << " ";
+   for(i=0; i<InitThreshName.n_elements(); i++)
+      s << "-init_thresh " << InitThreshName[i] << " "
+                           << InitThreshVal[i].get_str() << " ";
+   for(i=0; i<InitStrName.n_elements(); i++)
+      s << "-init_str " << InitStrName[i] << " "
+                        << InitStrVal[i] << " ";   
+   if(RapidInten != default_rapid_inten)
+      s << "-rapid_inten " << bool_to_string(RapidInten) << " ";
+   if(!(RapidIntenThresh == default_rapid_inten_thresh))
+      s << "-rapid_inten_thresh " << RapidIntenThresh.get_str() << " ";
    
    return(s);
 }
@@ -930,7 +959,7 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
          if(tpi.n_points() > 0) {
 
             // Store the current pair
-            if(is_keeper(tpi, n)) PairArray.add(tpi);
+            if(is_keeper_track(tpi, n)) PairArray.add(tpi);
 
             // Clear the current pair
             tpi.clear();
@@ -938,7 +967,7 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
       }
 
       // Check if this line meets the job criteria
-      if(is_keeper(line, skip, n)) {
+      if(is_keeper_line(line, skip, n)) {
 
          // Add line to the pair
          tpi.add(line);
@@ -961,7 +990,8 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
    }
 
    // Store the last pair
-   if(tpi.n_points() > 0 && is_keeper(tpi, n)) PairArray.add(tpi);
+   if(tpi.n_points() > 0 && is_keeper_track(tpi, n))
+      PairArray.add(tpi);
 
    return;
 }
@@ -1280,6 +1310,80 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
 void TCStatJobSummary::process_tc_stat_file(const char *path,
                                             TCLineCounts &n) {
+   int i, j, k, l;
+   map<ConcatString,NumArray,cs_cmp> cur_map;
+   map<ConcatString,NumArray,cs_cmp>::iterator it;
+   ConcatString key, cur;
+   NumArray val_na;
+   double val;
+
+   // Call's parent's implementation
+   TCStatJob::process_tc_stat_file(path, n);
+
+   // Loop over the TrackPairInfoArray entries
+   for(i=0; i<PairArray.n_pairs(); i++) {
+
+      // Initialize the map
+      cur_map.clear();
+     
+      // Loop over TCStatLines for each TrackPairInfo entry
+      // and construct a map
+      for(j=0; j<PairArray[i].n_lines(); j++) {
+
+         // Add summary info to the current map
+         for(k=0; k<Column.n_elements(); k++) {
+
+            // Build the key and get the current column value
+            key = Column[k];
+            val = get_column_double(*PairArray[i].line(j), Column[k]);
+
+            // Add case information to the key
+            for(l=0; l<Case.n_elements(); l++) {
+
+               cur = PairArray[i].line(j)->get_item(Case[l]);
+
+               // For bad data, use the NA string
+               if(is_bad_data(atoi(cur))) cur = na_str;
+
+               // For lead time column, make sure hour is 3-digits
+               if(strcasecmp(Case[l], "LEAD") == 0 &&
+                  cur != na_str &&
+                  hhmmss_to_sec(cur) < 100*sec_per_hour)
+                    key << ":0" << cur;
+               else key << ":"  << cur;
+               
+            } // end for l
+
+            // Key is not yet defined in the map
+            if((it = cur_map.find(key)) == cur_map.end()) {
+
+               // Add the pair to the map
+               val_na.clear();
+               val_na.add(val);
+               cur_map[key] = val_na;
+            }
+            // Key is defined in the map
+            else {
+
+               // Add the value for the existing key
+               it->second.add(val);
+            }
+            
+         } // end for k
+      } // end for j
+
+      // Add the current map
+      add_map(cur_map);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+/*
+void TCStatJobSummary::process_tc_stat_file(const char *path,
+                                            TCLineCounts &n) {
    LineDataFile in;
    TCStatLine line;
    TrackPairInfo tpi;
@@ -1312,7 +1416,7 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
       if(index == 1) {
 
          // Store the current map and pair and clear them
-         if(tpi.n_points() > 0) {
+         if(tpi.n_points() > 0 && is_keeper(tpi, n)) {
 
             // Store the current map and pair
             if(is_keeper(tpi, n)) {
@@ -1397,18 +1501,22 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
       }
    }
 
-   // Store the last pair and map
+   // Store the last map and pair and clear them
    if(tpi.n_points() > 0 && is_keeper(tpi, n)) {
 
-      // Store the current map
-      add_map(cur_map);
+      // Store the last map and pair
+      if(is_keeper(tpi, n)) {
+         add_map(cur_map);
+         PairArray.add(tpi);
+      }
 
-      // Store the current pair
-      PairArray.add(tpi);
+      // Clear the last map and pair
+      cur_map.clear();
+      tpi.clear();
    }
 
    return;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////
 
