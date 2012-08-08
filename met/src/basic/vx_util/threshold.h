@@ -58,11 +58,12 @@ class SingleThresh {
       SingleThresh();
       ~SingleThresh();
       SingleThresh(const SingleThresh &);
+      SingleThresh(const char *);      
       SingleThresh & operator=(const SingleThresh &);
 
       void dump(ostream &, int = 0) const;
 
-      bool operator==(const SingleThresh &);
+      bool operator==(const SingleThresh &) const;
 
       double       thresh; // Threshold value
       ThreshType   type;   // Threshold type
