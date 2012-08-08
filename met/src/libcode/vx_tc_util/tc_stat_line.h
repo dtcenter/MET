@@ -38,6 +38,8 @@ class TCStatLine : public DataLine {
 
    private:
 
+      void assign(const TCStatLine &);
+
       void determine_line_type();
 
       TCStatLineType Type;

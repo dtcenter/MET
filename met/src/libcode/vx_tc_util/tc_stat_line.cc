@@ -69,6 +69,17 @@ TCStatLine & TCStatLine::operator=(const TCStatLine & L) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TCStatLine::assign(const TCStatLine & L) {
+
+   DataLine::assign(L);
+
+   Type = L.Type;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TCStatLine::read_line(LineDataFile * ldf) {
    int status;
 
