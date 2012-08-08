@@ -25,9 +25,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Defaults to be used if not specified by the user
-static const bool   default_water_only   = false;
-static const bool   default_match_points = false;
-static const double default_tc_alpha     = 0.05;
+static const bool         default_water_only         = false;
+static const bool         default_match_points       = false;
+static const bool         default_rapid_inten        = false;
+static const SingleThresh default_rapid_inten_thresh(">=30.0");
+static const double       default_tc_alpha           = 0.05;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -80,6 +82,7 @@ struct TCLineCounts {
    int RejColumnStr;
    int RejInitThresh;
    int RejInitStr;
+   int RejRapidInten;
    int RejOutInitMask;
    int RejOutValidMask;
    int RejMatchPoints;
@@ -118,10 +121,10 @@ class TCStatJob {
 
       void dump(ostream &, int depth = 0) const;
 
-      bool is_keeper(const TCStatLine &, int &skip_lines,
-                     TCLineCounts &) const;
-      bool is_keeper(const TrackPairInfo &,
-                     TCLineCounts &) const;
+      bool is_keeper_line(const TCStatLine &, int &skip_lines,
+                          TCLineCounts &) const;
+      bool is_keeper_track(TrackPairInfo &,
+                           TCLineCounts &) const;
 
       double get_column_double(const TCStatLine &,
                                const ConcatString &) const;
@@ -202,6 +205,10 @@ class TCStatJob {
 
       // Only retain TrackPoints in both the ADECK and BDECK tracks
       bool MatchPoints;
+
+      // Only retain TrackPoints with recent rapid intensification
+      bool RapidInten;
+      SingleThresh RapidIntenThresh;
 };
 
 ////////////////////////////////////////////////////////////////////////
