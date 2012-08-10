@@ -27,8 +27,16 @@
 // Defaults to be used if not specified by the user
 static const bool         default_water_only         = false;
 static const bool         default_match_points       = false;
+
+// Default rapid intensification is an increase of 30 kts
 static const bool         default_rapid_inten        = false;
 static const SingleThresh default_rapid_inten_thresh(">=30.0");
+
+// Default is 24 hours prior to landfall
+static const bool         default_landfall           = false;
+static const int          default_landfall_beg       = -86400;
+static const int          default_landfall_end       = 0;
+
 static const double       default_tc_alpha           = 0.05;
 
 ////////////////////////////////////////////////////////////////////////
@@ -61,8 +69,21 @@ extern ConcatString  tcstatjobtype_to_string(const TCStatJobType);
 
 // Struct for counts of lines read and rejected
 struct TCLineCounts {
+
+   // Read and keep counts
    int NRead;
    int NKeep;
+
+   // Checking entire track
+   int RejTrackWatchWarn;
+   int RejInitThresh;
+   int RejInitStr;
+
+   // Filtering on track attributes
+   int RejRapidInten;
+   int RejLandfall;
+
+   // Checking track point attributes
    int RejAModel;
    int RejBModel;
    int RejStormId;
@@ -80,13 +101,9 @@ struct TCLineCounts {
    int RejWaterOnly;
    int RejColumnThresh;
    int RejColumnStr;
-   int RejInitThresh;
-   int RejInitStr;
-   int RejRapidInten;
    int RejOutInitMask;
    int RejOutValidMask;
    int RejMatchPoints;
-   int RejTrackWatchWarn;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -121,10 +138,14 @@ class TCStatJob {
 
       void dump(ostream &, int depth = 0) const;
 
-      bool is_keeper_line(const TCStatLine &, int &skip_lines,
-                          TCLineCounts &) const;
-      bool is_keeper_track(TrackPairInfo &,
+      bool is_keeper_track(const TrackPairInfo &,
                            TCLineCounts &) const;
+
+      void filter_track(TrackPairInfo &,
+                        TCLineCounts &) const;
+
+      bool is_keeper_line(const TCStatLine &,
+                          TCLineCounts &) const;
 
       double get_column_double(const TCStatLine &,
                                const ConcatString &) const;
@@ -140,6 +161,8 @@ class TCStatJob {
       virtual void do_job(const StringArray &, TCLineCounts &);
 
       virtual void process_tc_stat_file(const char *, TCLineCounts &);
+
+      void process_track_pair(TrackPairInfo &, TCLineCounts &);
       
       // Job Type
       TCStatJobType JobType;
@@ -207,8 +230,13 @@ class TCStatJob {
       bool MatchPoints;
 
       // Only retain TrackPoints with recent rapid intensification
-      bool RapidInten;
+      bool         RapidInten;
       SingleThresh RapidIntenThresh;
+
+      // Only retain TrackPoints in a time window around landfall
+      bool Landfall;
+      int  LandfallBeg;
+      int  LandfallEnd;
 };
 
 ////////////////////////////////////////////////////////////////////////

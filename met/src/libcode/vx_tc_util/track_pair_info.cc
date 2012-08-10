@@ -85,6 +85,7 @@ void TrackPairInfo::clear() {
    YErr.clear();
    AlongTrackErr.clear();
    CrossTrackErr.clear();
+   Keep.clear();
 
    if(Line) { delete [] Line; Line = (TCStatLine *) 0; }
    NLines = NAlloc = 0;
@@ -116,6 +117,8 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    AlongTrackErr.dump(out, indent_depth+1);
    out << prefix << "CrossTrackErr:\n";
    CrossTrackErr.dump(out, indent_depth+1);
+   out << prefix << "Keep:\n";
+   Keep.dump(out, indent_depth+1);
    out << prefix << "NLines = " << NLines << "\n";
    out << flush;
 
@@ -243,6 +246,7 @@ void TrackPairInfo::initialize(const TrackInfo &a, const TrackInfo &b) {
 
    return;
 }
+
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::initialize(const TCStatLine &l) {
@@ -260,6 +264,15 @@ void TrackPairInfo::initialize(const TCStatLine &l) {
    BDeck.set_storm_name(l.storm_name());
    BDeck.set_technique(l.bmodel());
    BDeck.set_init((unixtime) 0);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfo::set_keep(int i, int val) {
+
+   Keep.set(i, val);
 
    return;
 }
@@ -284,6 +297,7 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
    YErr.add(yerr);
    AlongTrackErr.add(altkerr);
    CrossTrackErr.add(crtkerr);
+   Keep.add(1);
 
    return;
 }
@@ -362,6 +376,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
    YErr.add(atof(l.get_item("Y_ERR")));
    AlongTrackErr.add(atof(l.get_item("ALTK_ERR")));
    CrossTrackErr.add(atof(l.get_item("CRTK_ERR")));
+   Keep.add(1);
 
    // Store the input line
    extend(NLines + 1);
@@ -372,16 +387,16 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const TCStatLine * TrackPairInfo::init_line() const {
-   int i;
-   TCStatLine *ptr = (TCStatLine *) 0;
+int TrackPairInfo::i_init() const {
+   int i, i_match;
 
    // Find the point where ADeck has lead = 0
-   for(i=0; i<NPoints; i++) if(ADeck[i].lead() == 0) break;
+   for(i=0, i_match=bad_data_int; i<NPoints; i++)
+      if(ADeck[i].lead() == 0) break;
 
-   if(i < NLines) ptr = &Line[i];
+   if(i < NPoints) i_match = i;
 
-   return(ptr);
+   return(i_match);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -404,6 +419,36 @@ WatchWarnType TrackPairInfo::track_watch_warn() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Define landfall as the time of the last BEST track point before
+// its distance to land switches from positive to negative.
+//
+////////////////////////////////////////////////////////////////////////
+
+unixtime TrackPairInfo::landfall_time() const {
+   int i;
+   unixtime ut = (unixtime) 0;
+
+   // Loop over the track points looking for landfall.
+   for(i=0; i<NPoints; i++) {
+
+      // Skip bad data values
+      if(is_bad_data(BDeckDLand[i])) continue;
+
+      // Check for distance switching from positive to negative
+      if(i+1 < NPoints &&
+         !is_bad_data(BDeckDLand[i+1]) &&
+         BDeckDLand[i]   >= 0 &&
+         BDeckDLand[i+1] <= 0) break;
+   }
+
+   // Only store value if landfall was found
+   if(i < NPoints) ut = BDeck[i].valid();
+
+   return(ut);
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
                                    WatchWarnType ww_type,
@@ -418,33 +463,20 @@ void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Subset the track keeping only those points meeting the rapid
-// intensification criteria.  Return the number of points that were
-// discarded.
+// Apply the rapid intensification logic to the track to determine
+// which track points meet the criteria.  Set the keep status to false
+// for those track points not meeting the criteria and return the number
+// of points that were rejected.
 //
 ////////////////////////////////////////////////////////////////////////
 
-int TrackPairInfo::subset_rapid_inten(const SingleThresh &st) {
-   int i, j, n_points_in;
+int TrackPairInfo::check_rapid_inten(const SingleThresh &st) {
+   int i, j, n_rej;
    unixtime delta_ut;
-   TrackPairInfo tpi;
    double cur_vmax, min_vmax;
 
-   // Check that the number of points equals the number of TCStatLines
-   if(NPoints != NLines) {
-      mlog << Error
-           << "\nTrackPairInfo::subset_rapid_inten(const SingleThresh &st) -> "
-           << "the number of track points \"" << NPoints
-           << "\" must equal the number of track lines \"" << NLines
-           << "\".\n\n";
-      exit(1);
-   }
-
-   // Store the original number of points
-   n_points_in = NPoints;
-
    // Loop over the track points
-   for(i=0; i<NPoints; i++) {
+   for(i=0, n_rej=0; i<NPoints; i++) {
 
       // Store the current wind speed maximum
       cur_vmax = BDeck[i].v_max();
@@ -467,14 +499,86 @@ int TrackPairInfo::subset_rapid_inten(const SingleThresh &st) {
          }
       } // end for j
 
-      // Check if the vmax delta meets the threshold criteria
-      if(st.check(cur_vmax - min_vmax)) tpi.add(Line[i]);
+      // Check if the vmax delta does not meet the threshold criteria,
+      // set keep status to false
+      if(!st.check(cur_vmax - min_vmax) && Keep[i] != 0) {
+        Keep.set(i, 0);
+        n_rej++;
+      }
    }
 
-   // Reset the current object to the subset
-   *this = tpi;
+   return(n_rej);
+}
 
-   return(n_points_in - NPoints);
+////////////////////////////////////////////////////////////////////////
+//
+// Apply the landfall logic to the track to determine which track
+// points meet the criteria.  Set the keep status to false for those
+// track points not meeting the criteria and return the number of
+// points that were rejected.
+//
+////////////////////////////////////////////////////////////////////////
+
+int TrackPairInfo::check_landfall(const int landfall_beg,
+                                  const int landfall_end) {
+   int i, n_rej;
+   unixtime landfall_ut, beg_ut, end_ut, delta_ut;
+   
+   // Determine the time of landfall from the BEST track
+   landfall_ut = landfall_time();
+
+   // If no landfall, define trivial time window
+   if(landfall_ut == (unixtime) 0) {
+      beg_ut = end_ut = (unixtime) 0;
+   }
+   // Otherwise, define time window
+   else {
+      beg_ut = landfall_ut + landfall_beg;
+      end_ut = landfall_ut + landfall_end;
+   }
+
+   // Loop over the track points
+   for(i=0, n_rej=0; i<NPoints; i++) {
+
+      // Determine the time offset
+      delta_ut = landfall_ut - BDeck[i].valid();
+
+      // Check if this point is outside the landfall time window
+      if(delta_ut < beg_ut || delta_ut > end_ut) {
+
+         // Discard this point
+         if(Keep[i] != 0) {
+            Keep.set(i, 0);
+            n_rej++;
+         }
+      }
+   }
+
+   return(n_rej);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Return a subset of the current track containing only those points
+// marked for retention.
+//
+////////////////////////////////////////////////////////////////////////
+
+TrackPairInfo TrackPairInfo::keep_subset() const {
+   int i;
+   TrackPairInfo tpi;
+
+   // Loop over the points
+   for(i=0; i<NLines; i++) {
+
+      // Check the retention status
+      if(Keep[i] == 0) continue;
+
+      // Add the current track pair point
+      tpi.add(Line[i]);
+   }
+
+   return(tpi);
 }
 
 ////////////////////////////////////////////////////////////////////////

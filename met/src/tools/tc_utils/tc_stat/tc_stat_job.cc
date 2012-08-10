@@ -203,6 +203,9 @@ void TCStatJob::clear() {
    MatchPoints      = default_match_points;
    RapidInten       = default_rapid_inten;
    RapidIntenThresh = default_rapid_inten_thresh;
+   Landfall         = default_landfall;
+   LandfallBeg      = default_landfall_beg;
+   LandfallEnd      = default_landfall_end;
 
    return;
 }
@@ -254,6 +257,10 @@ void TCStatJob::assign(const TCStatJob & j) {
 
    RapidInten = j.RapidInten;
    RapidIntenThresh = j.RapidIntenThresh;
+
+   Landfall = j.Landfall;
+   LandfallBeg = j.LandfallBeg;
+   LandfallEnd = j.LandfallEnd;
 
    return;
 }
@@ -354,6 +361,12 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "RapidInten = " << bool_to_string(RapidInten) << "\n";
 
    out << prefix << "RapidIntenThresh = " << RapidIntenThresh.get_str() << "\n";
+
+   out << prefix << "Landfall = " << bool_to_string(Landfall) << "\n";
+
+   out << prefix << "LandfallBeg = " << LandfallBeg << "\n";
+
+   out << prefix << "LandfallEnd = " << LandfallEnd << "\n";
    
    out.flush();
 
@@ -362,7 +375,144 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCStatJob::is_keeper_line(const TCStatLine &line, int &skip_lines,
+bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
+                                TCLineCounts &n) const {
+   bool keep = true;
+   int i, j, i_init, offset;
+   double v_dbl;
+   ConcatString v_str;
+   StringArray sa;
+
+   // Check TrackWatchWarn
+   if(TrackWatchWarn.n_elements() > 0 &&
+      !TrackWatchWarn.has(watchwarntype_to_string(tpi.track_watch_warn())))
+      keep = false;
+  
+   // Check for the special string ALL:
+   //    HUWARN, TSWARN, HUWATCH, TSWATCH
+   if(TrackWatchWarn.has("ALL") &&
+      (tpi.track_watch_warn() == HurricaneWarn     ||
+       tpi.track_watch_warn() == TropicalStormWarn ||
+       tpi.track_watch_warn() == HurricaneWatch    ||
+       tpi.track_watch_warn() == TropicalStormWatch))
+       keep = true;
+
+   // Update counts
+   if(!keep) n.RejTrackWatchWarn += tpi.n_points();
+
+   // Get the index of the track initialization point
+   i_init = tpi.i_init();
+   
+   // If ADECK initialization filter is requested, check for a valid init time
+   if((InitThreshName.n_elements() > 0 ||
+       InitStrName.n_elements()    > 0 ||
+       OutInitMask.n_points()      > 0) &&
+       is_bad_data(i_init)) {
+      keep = false;
+      n.RejInitThresh += tpi.n_points();
+   }
+   
+   // Check InitThresh
+   if(keep == true) {
+     
+      // Loop through the numeric init column thresholds
+      for(i=0; i<InitThreshName.n_elements(); i++) {
+
+         // Get the numeric init column value
+         v_dbl = get_column_double(*tpi.line(i_init), InitThreshName[i]);
+
+         // Check the column threshold
+         if(is_bad_data(v_dbl) || !InitThreshVal[i].check(v_dbl)) {
+           keep = false;
+           n.RejInitThresh += tpi.n_points();
+           break;
+         }
+      } // end for i
+   }
+
+   // Check InitStr
+   if(keep == true) {
+  
+      // Loop through the column string matching
+      for(i=0; i<InitStrName.n_elements(); i++) {
+
+         // Construct list of all entries for the current column name
+         sa.clear();
+         for(j=0; j<InitStrName.n_elements(); j++)
+            if(strcasecmp(InitStrName[i], InitStrName[j]) == 0)
+               sa.add(InitStrVal[j]);
+
+         // Determine the column offset and retrieve the value
+         offset = determine_column_offset(tpi.line(i_init)->type(), InitStrName[i]);
+         v_str  = tpi.line(i_init)->get_item(offset);
+
+         // Check the string value
+         if(!sa.has(v_str)) {
+            keep = false;
+            n.RejInitStr += tpi.n_points();
+            break;
+         }
+      } // end for i
+   }
+
+   // Check OutInitMask
+   if(keep == true) {
+
+      // A mask has been specified
+      if(OutInitMask.n_points() > 0) {
+
+         // Check if ADECK init location falls inside the mask
+         if(is_bad_data(tpi.adeck()[i_init].lat()) ||
+            is_bad_data(tpi.adeck()[i_init].lon()) ||
+            !OutInitMask.latlon_is_inside_dege(
+               tpi.adeck()[i_init].lat(),
+               tpi.adeck()[i_init].lon())) {
+            keep = false;
+            n.RejOutInitMask++;
+         }
+      }
+   }
+
+   // Update counts
+   if(!keep) n.NKeep -= tpi.n_points();
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::filter_track(TrackPairInfo &tpi,
+                            TCLineCounts &n) const {
+   int n_rej;
+   
+   // Check RapidInten
+   if(RapidInten == true) {
+
+      // Determine the rapid intensification points
+      n_rej = tpi.check_rapid_inten(RapidIntenThresh);
+
+      // Update counts
+      n.RejRapidInten += n_rej;
+      n.NKeep         -= n_rej;
+   }
+
+   // Check Landfall
+   if(Landfall == true) {
+
+      // Determine the landfall points
+      n_rej = tpi.check_landfall(LandfallBeg, LandfallEnd);
+
+      // Update counts
+      n.RejLandfall += n_rej;
+      n.NKeep       -= n_rej;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCLineCounts &n) const {
    bool keep = true;
    int i, j, offset;
@@ -470,29 +620,6 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line, int &skip_lines,
    blat = atof(line.get_item("BLAT"));
    blon = atof(line.get_item("BLON"));
 
-   // Initialize skip lines to 0
-   skip_lines = 0;
-
-   // Check OutInitMask.
-   // Check the first valid ADECK lat/lon track point.
-   // If it falls outside the polyline region, skip the entire track.
-   if(OutInitMask.n_points() > 0 &&
-      !is_bad_data(alat) &&
-      !is_bad_data(alon)) {
-
-      // Check ADECK locations
-      if(is_bad_data(alat) || is_bad_data(alon) ||
-         !OutInitMask.latlon_is_inside_dege(alat, alon)) {
-
-         keep = false;
-         n.RejOutInitMask++;
-
-         // Skip the remainder of the track: TOTAL - INDEX
-         skip_lines = atoi(line.get_item("TOTAL")) -
-                      atoi(line.get_item("INDEX"));
-      }
-   }
-
    // Check OutValidMask
    if(keep == true && OutValidMask.n_points() > 0) {
 
@@ -500,7 +627,6 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line, int &skip_lines,
       if(is_bad_data(alat) ||
          is_bad_data(alon) ||
          !OutValidMask.latlon_is_inside_dege(alat, alon)) {
-
          keep = false;
          n.RejOutValidMask++;
       }
@@ -512,107 +638,10 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line, int &skip_lines,
       // Check that the ADECK and BDECK locations are both defined
       if(is_bad_data(alat) || is_bad_data(alon) ||
          is_bad_data(blat) || is_bad_data(blon)) {
-
          keep = false;
          n.RejMatchPoints++;
       }
    }
-
-   return(keep);
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-bool TCStatJob::is_keeper_track(TrackPairInfo &tpi,
-                                TCLineCounts &n) const {
-   bool keep = true;
-   int i, j, offset;
-   double v_dbl;
-   ConcatString v_str;
-   StringArray sa;
-
-   // Check TrackWatchWarn
-   if(TrackWatchWarn.n_elements() > 0 &&
-      !TrackWatchWarn.has(watchwarntype_to_string(tpi.track_watch_warn())))
-      keep = false;
-  
-   // Check for the special string ALL:
-   //    HUWARN, TSWARN, HUWATCH, TSWATCH
-   if(TrackWatchWarn.has("ALL") &&
-      (tpi.track_watch_warn() == HurricaneWarn     ||
-       tpi.track_watch_warn() == TropicalStormWarn ||
-       tpi.track_watch_warn() == HurricaneWatch    ||
-       tpi.track_watch_warn() == TropicalStormWatch))
-       keep = true;
-
-   // Update counts
-   if(!keep) n.RejTrackWatchWarn += tpi.n_points();
-
-   // Check that the initialization line is set for InitThresh or InitStr
-   if(tpi.init_line() != (TCStatLine *) 0 &&
-      (InitThreshName.n_elements() > 0 ||
-       InitStrName.n_elements()    > 0)) {
-      keep = false;
-      n.RejInitThresh += tpi.n_points();
-   }
-   
-   // Check InitThresh
-   if(keep == true) {
-
-      // Loop through the numeric init column thresholds
-      for(i=0; i<InitThreshName.n_elements(); i++) {
-
-         // Get the numeric init column value
-         v_dbl = get_column_double(*tpi.init_line(), InitThreshName[i]);
-
-         // Check the column threshold
-         if(is_bad_data(v_dbl) || !InitThreshVal[i].check(v_dbl)) {
-           keep = false;
-           n.RejInitThresh += tpi.n_points();
-           break;
-         }
-      } // end for i
-   }
-
-   // Check InitStr
-   if(keep == true) {
-  
-      // Loop through the column string matching
-      for(i=0; i<InitStrName.n_elements(); i++) {
-
-         // Construct list of all entries for the current column name
-         sa.clear();
-         for(j=0; j<InitStrName.n_elements(); j++)
-            if(strcasecmp(InitStrName[i], InitStrName[j]) == 0)
-               sa.add(InitStrVal[j]);
-
-         // Determine the column offset and retrieve the value
-         offset = determine_column_offset(tpi.init_line()->type(), InitStrName[i]);
-         v_str  = tpi.init_line()->get_item(offset);
-
-         // Check the string value
-         if(!sa.has(v_str)) {
-            keep = false;
-            n.RejInitStr += tpi.n_points();
-            break;
-         }
-      } // end for i
-   }
-
-   // Check RapidInten
-   if(keep == true && RapidInten == true) {
-
-      // Subset the track for rapid intensification
-      i = tpi.subset_rapid_inten(RapidIntenThresh);
-
-      // Update counts
-      n.RejRapidInten += i;
-      n.NKeep         -= i;
-   }
-
-   // Update counts
-   if(!keep) n.NKeep -= tpi.n_points();
 
    return(keep);
 }
@@ -718,6 +747,9 @@ void TCStatJob::parse_job_command(const char *jobstring) {
                                                            InitStrVal.add(a[i+2]);                    a.shift_down(i, 2); }
       else if(strcasecmp(c, "-rapid_inten"       ) == 0) { RapidInten = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                a.shift_down(i, 1); }
    }
 
    return;
@@ -905,6 +937,12 @@ ConcatString TCStatJob::serialize() const {
       s << "-rapid_inten " << bool_to_string(RapidInten) << " ";
    if(!(RapidIntenThresh == default_rapid_inten_thresh))
       s << "-rapid_inten_thresh " << RapidIntenThresh.get_str() << " ";
+   if(Landfall != default_landfall)
+      s << "-landfall " << bool_to_string(Landfall) << " ";
+   if(LandfallBeg != default_landfall_beg ||
+      LandfallEnd != default_landfall_end)
+      s << "-landfall_beg " << LandfallBeg << " "
+        << "-landfall_end " << LandfallEnd << " ";
    
    return(s);
 }
@@ -932,7 +970,7 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
    LineDataFile in;
    TCStatLine line;
    TrackPairInfo tpi;
-   int skip, index, i;
+   int index;
 
    // Open the data file
    if(!(in.open(path))) {
@@ -947,52 +985,60 @@ void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
    // Process each TC-STAT line
    while(in >> line) {
 
+      // Increment counts
       n.NRead++;
+      n.NKeep++;
 
       // Get the index value for the current line
       index = atoi(line.get_item("INDEX"));
 
-      // Check for the first point of a track
+      // Check for the first point of a track pair
       if(index == 1) {
-
-         // Store the current pair and clear it
-         if(tpi.n_points() > 0) {
-
-            // Store the current pair
-            if(is_keeper_track(tpi, n)) PairArray.add(tpi);
-
-            // Clear the current pair
-            tpi.clear();
-         }
+         process_track_pair(tpi, n);
+         tpi.clear();
       }
 
-      // Check if this line meets the job criteria
-      if(is_keeper_line(line, skip, n)) {
-
-         // Add line to the pair
-         tpi.add(line);
-         n.NKeep++;
-      }
-      else {
-
-         // If skip lines is non-zero, clear the track and decrement count
-         if(skip > 0) {
-            tpi.clear();
-            n.NKeep -= skip;
-         }
-
-         // Skip lines if necessary
-         for(i=0; i<skip; i++) {
-            in >> line;
-            n.NRead++;
-         }
-      }
+      // Add the current line to the track pair
+      tpi.add(line);
    }
 
-   // Store the last pair
-   if(tpi.n_points() > 0 && is_keeper_track(tpi, n))
-      PairArray.add(tpi);
+   // Store the last track pair
+   process_track_pair(tpi, n);
 
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::process_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
+   int i;
+   TrackPairInfo tpi_subset;
+
+   // Check for no points
+   if(tpi.n_points() == 0) return;
+
+   // Determine if the whole track can be discarded
+   if(!is_keeper_track(tpi, n)) return;
+
+   // Filter down the track if necessary
+   filter_track(tpi, n);
+
+   // Loop over the track points to check line by line
+   for(i=0; i<tpi.n_lines(); i++) {
+
+      // Continue is this line is not be kept
+      if(!tpi.keep(i)) continue;
+
+      // Check if this line is not to be kept
+      if(!is_keeper_line(*tpi.line(i), n)) tpi.set_keep(i, 0);
+   }
+
+   // Retrieve the subset of track pair points marked for retention
+   tpi_subset = tpi.keep_subset();
+   
+   // Add track pair to the PairArray
+   if(tpi_subset.n_points() > 0) PairArray.add(tpi_subset);
+   
    return;
 }
 
@@ -1379,144 +1425,6 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
 
    return;
 }
-
-////////////////////////////////////////////////////////////////////////
-/*
-void TCStatJobSummary::process_tc_stat_file(const char *path,
-                                            TCLineCounts &n) {
-   LineDataFile in;
-   TCStatLine line;
-   TrackPairInfo tpi;
-   int skip, index, i, j;
-   map<ConcatString,NumArray,cs_cmp> cur_map;
-   map<ConcatString,NumArray,cs_cmp>::iterator it;
-   ConcatString key, cur;
-   NumArray val_na;
-   double val;
-   
-   // Open the data file
-   if(!(in.open(path))) {
-      mlog << Error << "\nTCStatJobSummary::process_tc_stat_file(const char *path) -> "
-           << "can't open file \"" << path << "\" for reading\n\n";
-      exit(1);
-   }
-
-   mlog << Debug(3)
-        << "Reading file: " << path << "\n";
-
-   // Process each TC-STAT line
-   while(in >> line) {
-
-      n.NRead++;
-
-      // Get the index value for the current line
-      index = atoi(line.get_item("INDEX"));
-
-      // Check for the first point of a track
-      if(index == 1) {
-
-         // Store the current map and pair and clear them
-         if(tpi.n_points() > 0 && is_keeper(tpi, n)) {
-
-            // Store the current map and pair
-            if(is_keeper(tpi, n)) {
-               add_map(cur_map);
-               PairArray.add(tpi);
-            }
-
-            // Clear the current map and pair
-            cur_map.clear();
-            tpi.clear();
-         }
-      }
-
-      // Check if this line meets the job criteria
-      if(is_keeper(line, skip, n)) {
-
-         // Add line to the pair
-         tpi.add(line);
-
-         // Increment the count
-         n.NKeep++;
-
-         // Add summary info to the current map
-         for(i=0; i<Column.n_elements(); i++) {
-
-            // Build the key and get the current column value
-            key = Column[i];
-            val = get_column_double(line, Column[i]);
-
-            // Add case information to the key
-            for(j=0; j<Case.n_elements(); j++) {
-
-               cur = line.get_item(Case[j]);
-
-               // For bad data, use the NA string
-               if(is_bad_data(atoi(cur))) cur = na_str;
-
-               // For lead time column, make sure hour is 3-digits
-               if(strcasecmp(Case[j], "LEAD") == 0 &&
-                  cur != na_str &&
-                  hhmmss_to_sec(cur) < 100*sec_per_hour)                 
-                    key << ":0" << cur;
-               else key << ":"  << cur;       
-            }
-     
-            // Key is not yet defined in the map
-            if((it = cur_map.find(key)) == cur_map.end()) {
-              
-               // Add the pair to the map
-               val_na.clear();
-               val_na.add(val);
-               cur_map[key] = val_na;
-            }
-            // Key is defined in the map
-            else {
-              
-               // Add the value for the existing key
-               it->second.add(val);
-            }
-         }
-      }
-      else {
-
-         // Check for non-zero skip count
-         if(skip > 0) {
-
-            // Clear the current map
-            cur_map.clear();
-           
-            // Clear the current pair
-            tpi.clear();
-
-            // Decrement the count
-            n.NKeep -= skip;
-         }
-
-         // Skip lines if necessary
-         for(i=0; i<skip; i++) {
-            in >> line;
-            n.NRead++;
-         }
-      }
-   }
-
-   // Store the last map and pair and clear them
-   if(tpi.n_points() > 0 && is_keeper(tpi, n)) {
-
-      // Store the last map and pair
-      if(is_keeper(tpi, n)) {
-         add_map(cur_map);
-         PairArray.add(tpi);
-      }
-
-      // Clear the last map and pair
-      cur_map.clear();
-      tpi.clear();
-   }
-
-   return;
-}*/
 
 ////////////////////////////////////////////////////////////////////////
 
