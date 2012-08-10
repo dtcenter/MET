@@ -219,6 +219,12 @@ void process_jobs() {
       mlog << Debug(3)
            << "Total lines read               = " << n.NRead             << "\n"
            << "Total lines kept               = " << n.NKeep             << "\n"
+           << "Rejected for track watch/warn  = " << n.RejTrackWatchWarn << "\n"
+           << "Rejected for init threshold    = " << n.RejInitThresh     << "\n"
+           << "Rejected for init string       = " << n.RejInitStr        << "\n"
+           << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"
+           << "Rejected for rapid inten       = " << n.RejRapidInten     << "\n"
+           << "Rejected for landfall          = " << n.RejLandfall       << "\n"
            << "Rejected for amodel            = " << n.RejAModel         << "\n"
            << "Rejected for bmodel            = " << n.RejBModel         << "\n"
            << "Rejected for storm id          = " << n.RejStormId        << "\n"
@@ -238,11 +244,7 @@ void process_jobs() {
            << "Rejected for string matching   = " << n.RejColumnStr      << "\n"
            << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"
            << "Rejected for out valid mask    = " << n.RejOutValidMask   << "\n"
-           << "Rejected for match points      = " << n.RejMatchPoints    << "\n"
-           << "Rejected for track watch/warn  = " << n.RejTrackWatchWarn << "\n"
-           << "Rejected for init threshold    = " << n.RejInitThresh     << "\n"
-           << "Rejected for init string       = " << n.RejInitStr        << "\n"
-           << "Rejected for rapid inten       = " << n.RejRapidInten     << "\n";
+           << "Rejected for match points      = " << n.RejMatchPoints    << "\n";
            
       // Deallocate current job
       if(cur_job) { delete cur_job; cur_job = (TCStatJob *) 0; }

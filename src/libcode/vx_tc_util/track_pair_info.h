@@ -68,6 +68,9 @@ class TrackPairInfo {
       int          NAlloc;
       TCStatLine * Line;
 
+      // Status for whether this point should be used
+      NumArray     Keep;
+
    public:
 
       TrackPairInfo();
@@ -87,6 +90,7 @@ class TrackPairInfo {
 
       void initialize(const TrackInfo &, const TrackInfo &);
       void initialize(const TCStatLine &);
+      void set_keep(int, int);
       
          //
          //  get stuff
@@ -105,9 +109,11 @@ class TrackPairInfo {
 
       int                n_lines()            const;
       const TCStatLine * line(int i)          const;
-      const TCStatLine * init_line()          const;
+      int                i_init()             const;
 
+      bool               keep(int)            const;
       WatchWarnType      track_watch_warn()   const;
+      unixtime           landfall_time()      const;
 
          //
          //  do stuff
@@ -118,7 +124,10 @@ class TrackPairInfo {
       void add(const TCStatLine&);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
-      int  subset_rapid_inten(const SingleThresh &);
+      int check_rapid_inten(const SingleThresh &);
+      int check_landfall(const int, const int);
+
+      TrackPairInfo keep_subset() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -135,6 +144,7 @@ inline double             TrackPairInfo::along_track_err(int i) const { return(A
 inline double             TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]); }
 inline int                TrackPairInfo::n_lines()              const { return(NLines);           }
 inline const TCStatLine * TrackPairInfo::line(int i)            const { return(&Line[i]);         }
+inline bool               TrackPairInfo::keep(int i)            const { return(Keep[i] != 0);     }
 
 ////////////////////////////////////////////////////////////////////////
 //
