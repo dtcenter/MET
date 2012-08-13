@@ -117,6 +117,14 @@ valid_mask = [];
 line_type = [];
 
 //
+// Stratify by only using points where both the ADECK and BDECK tracks are
+// over water.
+//
+// e.g. water_only = false;
+//
+water_only = false;
+
+//
 // Stratify by selecting the most severe watch/warning over the entire track.
 // Individual watch/warning status by point may be specified using the
 // -column_str options below, but this option filters by the track maximum.
@@ -125,14 +133,6 @@ line_type = [];
 // e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
 //
 track_watch_warn = [];
-
-//
-// Stratify by only using points where both the ADECK and BDECK tracks are
-// over water.
-//
-// e.g. water_only = false;
-//
-water_only = false;
 
 //
 // Stratify by applying thresholds to numeric data columns.
@@ -178,11 +178,55 @@ init_str_name = [];
 init_str_val  = [];
 
 //
+// Specify whether only those track points for which rapid intensification
+// occurred in the BDECK track during the previous 24 hours should be retained.
+// Define rapid intensification by thresholding the change in maximum windspeed.
+// May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
+// options.
+// e.g. rapid_inten        = false;
+//      rapid_inten_thresh = >=30.0;
+//
+rapid_inten        = false;
+rapid_inten_thresh = >=30.0;
+
+//
+// Specify whether only those track points occurring near landfall should be
+// retained, and define the landfall retention window as a number of seconds
+// offset from the landfall time.  Landfall is defined as the last BDECK track
+// point before the distance to land switches from positive to 0 or negative.
+// May modify using the "-landfall", "-landfall_beg", and "-landfall_end" job
+// command options.
+// e.g. landfall     = false;
+//      landfall_beg = -86400; (24 hours prior to landfall)
+//      landfall_end = 0;
+//
+landfall     = false;
+landfall_beg = -86400;
+landfall_end = 0;
+
+//
 // Specify whether only those track points common to both the ADECK and BDECK
-// tracks should be retained.
+// tracks should be retained.  May modify using the "-match_points" job command
+// option.
 // e.g. match_points = false;
 //
 match_points = false;
+
+//
+// Apply polyline masking logic to the location of the ADECK track at the
+// initialization time.  If it falls outside the mask, discard the entire track.
+// May modify using the "-out_init_mask" job command option.
+// e.g. out_init_mask = "";
+//
+out_init_mask = "";
+
+//
+// Apply polyline masking logic to the location of the ADECK track at the
+// valid time.  If it falls outside the mask, discard only the current track
+// point.  May modify using the "-out_valid_mask" job command option.
+// e.g. out_valid_mask = "";
+//
+out_valid_mask = "";
 
 //
 // Specify a list of analysis jobs to be performed, formatted as follows:

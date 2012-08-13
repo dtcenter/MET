@@ -101,9 +101,9 @@ struct TCLineCounts {
    int RejWaterOnly;
    int RejColumnThresh;
    int RejColumnStr;
+   int RejMatchPoints;
    int RejOutInitMask;
    int RejOutValidMask;
-   int RejMatchPoints;
 };
 
 ////////////////////////////////////////////////////////////////////////
