@@ -1030,7 +1030,10 @@ void TCStatJob::process_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
       if(!tpi.keep(i)) continue;
 
       // Check if this line is not to be kept
-      if(!is_keeper_line(*tpi.line(i), n)) tpi.set_keep(i, 0);
+      if(!is_keeper_line(*tpi.line(i), n)) {
+         tpi.set_keep(i, 0);
+         n.NKeep -= 1;
+      }
    }
 
    // Retrieve the subset of track pair points marked for retention
