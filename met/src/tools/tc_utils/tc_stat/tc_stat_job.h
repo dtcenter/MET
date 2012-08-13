@@ -150,7 +150,7 @@ class TCStatJob {
       double get_column_double(const TCStatLine &,
                                const ConcatString &) const;
 
-      virtual void parse_job_command(const char *);
+      virtual StringArray parse_job_command(const char *);
       void set_mask(MaskPoly &, const char *);
       void open_dump_file();
       void close_dump_file();
@@ -283,7 +283,7 @@ class TCStatJobSummary : public TCStatJob {
 
       void clear();
 
-      void parse_job_command(const char *);
+      StringArray parse_job_command(const char *);
       
       void add_column(const char *);
 

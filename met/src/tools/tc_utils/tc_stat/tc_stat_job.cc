@@ -72,22 +72,37 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
 
 TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
    TCStatJob *job = (TCStatJob *) 0;
-   StringArray sa;
+   StringArray a;
    ConcatString type_str = na_str;
+   ConcatString err_str;
    int i;
 
    // Parse the jobstring into an array
-   sa.parse_wsss(jobstring);
+   a.parse_wsss(jobstring);
 
    // Check if the job type is specified
-   if(sa.has("-job", i)) type_str = sa[i+1];
+   if(a.has("-job", i)) type_str = a[i+1];
 
    // Allocate a new job of the requested type
    job = new_tc_stat_job_type(type_str);
 
    // Parse the jobstring into the new job
-   job->parse_job_command(jobstring);
+   a = job->parse_job_command(jobstring);
 
+   // Check for unused arguments
+   if(a.n_elements() > 0) {
+
+      // Build list of unknown args
+      for(i=0; i<a.n_elements()-1; i++) err_str << a[i] << " ";
+      err_str << a[a.n_elements()-1];
+     
+      mlog << Error
+           << "\nTCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) -> "
+           << "unsupported job command options \""
+           << err_str << "\".\n\n";
+      exit(1);
+   }
+   
    return(job);
 }
 
@@ -695,8 +710,8 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::parse_job_command(const char *jobstring) {
-   StringArray a;
+StringArray TCStatJob::parse_job_command(const char *jobstring) {
+   StringArray a, b;
    const char * c = (const char *) 0;
    int i;
 
@@ -709,7 +724,10 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       c = a[i];
 
       // Check for a job command option
-      if(c[0] != '-') continue;
+      if(c[0] != '-') {
+         b.add(a[i]);
+         continue;
+      }
 
       // Check job command options
            if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]); a.shift_down(i, 1); }
@@ -750,9 +768,10 @@ void TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                a.shift_down(i, 1); }
+      else                                               {                                            b.add(a[i]);        }
    }
 
-   return;
+   return(b);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -781,7 +800,6 @@ void TCStatJob::open_dump_file() {
       mlog << Error << "\nTCStatJob::open_dump_file()-> "
            << "can't open the output file \"" << DumpFile
            << "\" for writing!\n\n";
-
       exit(1);
    }
 
@@ -1235,32 +1253,34 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::parse_job_command(const char *jobstring) {
-   StringArray a;
+StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
+   StringArray a, b;
    const char * c = (const char *) 0;
    int i;
 
-   // Call the parent
-   TCStatJob::parse_job_command(jobstring);
-   
-   // Parse the jobstring into a StringArray
-   a.parse_wsss(jobstring);
+   // Call the parent and store any unused options
+   a = TCStatJob::parse_job_command(jobstring);
 
    // Loop over the StringArray elements
    for(i=0; i<a.n_elements(); i++) {
 
+      // Point at the current entry
       c = a[i];
 
       // Check for a job command option
-      if(c[0] != '-') continue;
+      if(c[0] != '-') {
+         b.add(a[i]);
+         continue;
+      }
 
       // Check job command options
            if(strcasecmp(c, "-column"   ) == 0) { ReqColumn.add(a[i+1]); add_column(a[i+1]); a.shift_down(i, 1); }
       else if(strcasecmp(c, "-by"       ) == 0) { Case.add(a[i+1]);                          a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_alpha") == 0) { OutAlpha = atof(a[i+1]);                   a.shift_down(i, 1); }
+      else                                      {                                            b.add(a[i]);        }
    }
 
-   return;
+   return(b);
 }
 
 ////////////////////////////////////////////////////////////////////////
