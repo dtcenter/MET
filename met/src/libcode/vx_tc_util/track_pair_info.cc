@@ -428,6 +428,7 @@ WatchWarnType TrackPairInfo::track_watch_warn() const {
 unixtime TrackPairInfo::landfall_time() const {
    int i;
    unixtime ut = (unixtime) 0;
+   bool landfall_flag = true;
 
    // Loop over the track points looking for landfall.
    for(i=0; i<NPoints; i++) {
@@ -435,8 +436,12 @@ unixtime TrackPairInfo::landfall_time() const {
       // Skip bad data values
       if(is_bad_data(BDeckDLand[i])) continue;
 
+      // If the distance to land is negative, landfall already occurred
+      if(BDeckDLand[i] < 0) landfall_flag = false;
+
       // Check for distance switching from positive to negative
-      if(i+1 < NPoints &&
+      if(landfall_flag &&
+         i+1 < NPoints &&
          !is_bad_data(BDeckDLand[i+1]) &&
          BDeckDLand[i]   >= 0 &&
          BDeckDLand[i+1] <= 0) break;
@@ -522,7 +527,7 @@ int TrackPairInfo::check_rapid_inten(const SingleThresh &st) {
 int TrackPairInfo::check_landfall(const int landfall_beg,
                                   const int landfall_end) {
    int i, n_rej;
-   unixtime landfall_ut, beg_ut, end_ut, delta_ut;
+   unixtime landfall_ut, beg_ut, end_ut;
    
    // Determine the time of landfall from the BEST track
    landfall_ut = landfall_time();
@@ -540,11 +545,8 @@ int TrackPairInfo::check_landfall(const int landfall_beg,
    // Loop over the track points
    for(i=0, n_rej=0; i<NPoints; i++) {
 
-      // Determine the time offset
-      delta_ut = landfall_ut - BDeck[i].valid();
-
       // Check if this point is outside the landfall time window
-      if(delta_ut < beg_ut || delta_ut > end_ut) {
+      if(BDeck[i].valid() < beg_ut || BDeck[i].valid() > end_ut) {
 
          // Discard this point
          if(Keep[i] != 0) {
