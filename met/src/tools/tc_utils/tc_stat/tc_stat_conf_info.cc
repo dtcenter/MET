@@ -103,6 +103,9 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::Cyclone
    Filter.Cyclone = Conf.lookup_string_array("cyclone");
 
+   // Conf: TCStatJob::StormName
+   Filter.StormName = Conf.lookup_string_array("storm_name");
+
    // Conf: TCStatJob::InitBeg, TCStatJob::InitEnd
    Filter.InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
    Filter.InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
@@ -112,16 +115,6 @@ void TCStatConfInfo::process_config() {
    for(i=0; i<sa.n_elements(); i++)
       Filter.InitExc.add(timestring_to_unix(sa[i]));
 
-   // Conf: TCStatJob::InitHour
-   sa = Conf.lookup_string_array("init_hour");
-   for(i=0; i<sa.n_elements(); i++)
-      Filter.InitHour.add(timestring_to_sec(sa[i]));
-
-   // Conf: TCStatJob::Lead
-   sa = Conf.lookup_string_array("lead");
-   for(i=0; i<sa.n_elements(); i++)
-      Filter.Lead.add(timestring_to_sec(sa[i]));
-   
    // Conf: TCStatJob::ValidBeg, TCStatJob::ValidEnd
    Filter.ValidBeg = timestring_to_unix(Conf.lookup_string("valid_beg"));
    Filter.ValidEnd = timestring_to_unix(Conf.lookup_string("valid_end"));
@@ -131,10 +124,20 @@ void TCStatConfInfo::process_config() {
    for(i=0; i<sa.n_elements(); i++)
       Filter.ValidExc.add(timestring_to_unix(sa[i]));
 
+   // Conf: TCStatJob::InitHour
+   sa = Conf.lookup_string_array("init_hour");
+   for(i=0; i<sa.n_elements(); i++)
+      Filter.InitHour.add(timestring_to_sec(sa[i]));
+
    // Conf: TCStatJob::ValidHour
    sa = Conf.lookup_string_array("valid_hour");
    for(i=0; i<sa.n_elements(); i++)
       Filter.ValidHour.add(timestring_to_sec(sa[i]));
+   
+   // Conf: TCStatJob::Lead
+   sa = Conf.lookup_string_array("lead");
+   for(i=0; i<sa.n_elements(); i++)
+      Filter.Lead.add(timestring_to_sec(sa[i]));
 
    // Conf: TCStatJob::InitMask
    Filter.InitMask = Conf.lookup_string_array("init_mask");
@@ -142,11 +145,14 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::ValidMask
    Filter.ValidMask = Conf.lookup_string_array("valid_mask");
 
-   // Conf: TCStatJob::TrackWatchWarn
-   Filter.TrackWatchWarn = Conf.lookup_string_array("track_watch_warn");
-
+   // Conf: TCStatJob::LineType
+   Filter.LineType = Conf.lookup_string_array("line_type");
+   
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool("water_only");
+
+   // Conf: TCStatJob::TrackWatchWarn
+   Filter.TrackWatchWarn = Conf.lookup_string_array("track_watch_warn");
    
    // Conf: TCStatJob::ColumnThreshName, TCStatJob::ColumnThreshVal
    Filter.ColumnThreshName = Conf.lookup_string_array("column_thresh_name");
@@ -203,9 +209,26 @@ void TCStatConfInfo::process_config() {
            << "must have the same length.\n\n";
       exit(1);
    }
-   
+
+   // Conf: TCStatJob::RapidInten, TCStatJob::RapidIntenThresh
+   Filter.RapidInten       = Conf.lookup_bool("rapid_inten");
+   Filter.RapidIntenThresh = Conf.lookup_thresh("rapid_inten_thresh");
+
+   // Conf: TCStatJob::Landfall, TCStatJob::LandfallBeg, TCStatJob::LandfallEnd
+   Filter.Landfall    = Conf.lookup_bool("landfall");
+   Filter.LandfallBeg = Conf.lookup_int("landfall_beg");
+   Filter.LandfallEnd = Conf.lookup_int("landfall_end");
+
    // Conf: TCStatJob::MatchPoints
    Filter.MatchPoints = Conf.lookup_bool("match_points");
+   
+   // Conf: TCStatJob::OutInitMask
+   poly_file = Conf.lookup_string("out_init_mask");
+   if(poly_file.nonempty()) Filter.set_mask(Filter.OutInitMask, poly_file);
+   
+   // Conf: TCStatJob::OutValidMask
+   poly_file = Conf.lookup_string("out_valid_mask");
+   if(poly_file.nonempty()) Filter.set_mask(Filter.OutValidMask, poly_file);
    
    // Conf: Jobs
    Jobs = Conf.lookup_string_array("jobs");

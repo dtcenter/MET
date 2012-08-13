@@ -210,18 +210,18 @@ void TCStatJob::clear() {
    close_dump_file();
    JobOut = (ofstream *) 0;
 
-   OutInitMask.clear();
-   OutValidMask.clear();
-
    // Set to default values
    WaterOnly        = default_water_only;
-   MatchPoints      = default_match_points;
    RapidInten       = default_rapid_inten;
    RapidIntenThresh = default_rapid_inten_thresh;
    Landfall         = default_landfall;
    LandfallBeg      = default_landfall_beg;
    LandfallEnd      = default_landfall_end;
+   MatchPoints      = default_match_points;
 
+   OutInitMask.clear();
+   OutValidMask.clear();
+   
    return;
 }
 
@@ -265,17 +265,17 @@ void TCStatJob::assign(const TCStatJob & j) {
    DumpFile = j.DumpFile;
    open_dump_file();
 
-   OutInitMask = j.OutInitMask;
-   OutValidMask = j.OutValidMask;
-
-   MatchPoints = j.MatchPoints;
-
    RapidInten = j.RapidInten;
    RapidIntenThresh = j.RapidIntenThresh;
 
    Landfall = j.Landfall;
    LandfallBeg = j.LandfallBeg;
    LandfallEnd = j.LandfallEnd;
+
+   MatchPoints = j.MatchPoints;
+   
+   OutInitMask = j.OutInitMask;
+   OutValidMask = j.OutValidMask;
 
    return;
 }
@@ -364,14 +364,6 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "InitStrVal ...\n";
    InitStrVal.dump(out, depth + 1);
-   
-   out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
-
-   out << prefix << "OutInitMask = " << (OutInitMask.name() ? OutInitMask.name() : na_str) << "\n";
-   
-   out << prefix << "OutValidMask = " << (OutValidMask.name() ? OutValidMask.name() : na_str) << "\n";
-
-   out << prefix << "MatchPoints = " << bool_to_string(MatchPoints) << "\n";
 
    out << prefix << "RapidInten = " << bool_to_string(RapidInten) << "\n";
 
@@ -382,6 +374,14 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "LandfallBeg = " << LandfallBeg << "\n";
 
    out << prefix << "LandfallEnd = " << LandfallEnd << "\n";
+
+   out << prefix << "MatchPoints = " << bool_to_string(MatchPoints) << "\n";
+   
+   out << prefix << "OutInitMask = " << (OutInitMask.name() ? OutInitMask.name() : na_str) << "\n";
+
+   out << prefix << "OutValidMask = " << (OutValidMask.name() ? OutValidMask.name() : na_str) << "\n";
+
+   out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
    
    out.flush();
 
@@ -635,6 +635,17 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    blat = atof(line.get_item("BLAT"));
    blon = atof(line.get_item("BLON"));
 
+   // Check MatchPoints
+   if(keep == true && MatchPoints == true) {
+
+      // Check that the ADECK and BDECK locations are both defined
+      if(is_bad_data(alat) || is_bad_data(alon) ||
+         is_bad_data(blat) || is_bad_data(blon)) {
+         keep = false;
+         n.RejMatchPoints++;
+      }
+   }
+   
    // Check OutValidMask
    if(keep == true && OutValidMask.n_points() > 0) {
 
@@ -644,17 +655,6 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
          !OutValidMask.latlon_is_inside_dege(alat, alon)) {
          keep = false;
          n.RejOutValidMask++;
-      }
-   }
-
-   // Check MatchPoints
-   if(keep == true && MatchPoints == true) {
-
-      // Check that the ADECK and BDECK locations are both defined
-      if(is_bad_data(alat) || is_bad_data(alon) ||
-         is_bad_data(blat) || is_bad_data(blon)) {
-         keep = false;
-         n.RejMatchPoints++;
       }
    }
 
@@ -755,10 +755,6 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
                                                            ColumnThreshVal.add(a[i+2]);               a.shift_down(i, 2); }
       else if(strcasecmp(c, "-column_str"        ) == 0) { ColumnStrName.add(a[i+1]);
                                                            ColumnStrVal.add(a[i+2]);                  a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_thresh"       ) == 0) { InitThreshName.add(a[i+1]);
                                                            InitThreshVal.add(a[i+2]);                 a.shift_down(i, 2); }
       else if(strcasecmp(c, "-init_str"          ) == 0) { InitStrName.add(a[i+1]);
@@ -768,6 +764,10 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
       else                                               {                                            b.add(a[i]);        }
    }
 
@@ -937,20 +937,12 @@ ConcatString TCStatJob::serialize() const {
    for(i=0; i<ColumnStrName.n_elements(); i++)
       s << "-column_str " << ColumnStrName[i] << " "
                           << ColumnStrVal[i] << " ";
-   if(DumpFile.length() > 0)
-      s << "-dump_row " << DumpFile << " ";
-   if(OutInitMask.n_points() > 0)
-      s << "-out_init_mask " << OutInitMask.file_name() << " ";
-   if(OutValidMask.n_points() > 0)
-      s << "-out_valid_mask " << OutValidMask.file_name() << " ";
-   if(MatchPoints != default_match_points)
-      s << "-match_points " << bool_to_string(MatchPoints) << " ";
    for(i=0; i<InitThreshName.n_elements(); i++)
       s << "-init_thresh " << InitThreshName[i] << " "
                            << InitThreshVal[i].get_str() << " ";
    for(i=0; i<InitStrName.n_elements(); i++)
       s << "-init_str " << InitStrName[i] << " "
-                        << InitStrVal[i] << " ";   
+                        << InitStrVal[i] << " ";
    if(RapidInten != default_rapid_inten)
       s << "-rapid_inten " << bool_to_string(RapidInten) << " ";
    if(!(RapidIntenThresh == default_rapid_inten_thresh))
@@ -961,6 +953,14 @@ ConcatString TCStatJob::serialize() const {
       LandfallEnd != default_landfall_end)
       s << "-landfall_beg " << LandfallBeg << " "
         << "-landfall_end " << LandfallEnd << " ";
+   if(MatchPoints != default_match_points)
+      s << "-match_points " << bool_to_string(MatchPoints) << " ";
+   if(OutInitMask.n_points() > 0)
+      s << "-out_init_mask " << OutInitMask.file_name() << " ";
+   if(OutValidMask.n_points() > 0)
+      s << "-out_valid_mask " << OutValidMask.file_name() << " ";
+   if(DumpFile.length() > 0)
+      s << "-dump_row " << DumpFile << " ";
    
    return(s);
 }

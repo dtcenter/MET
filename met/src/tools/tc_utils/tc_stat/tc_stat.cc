@@ -242,9 +242,9 @@ void process_jobs() {
            << "Rejected for water only        = " << n.RejWaterOnly      << "\n"
            << "Rejected for numeric threshold = " << n.RejColumnThresh   << "\n"
            << "Rejected for string matching   = " << n.RejColumnStr      << "\n"
+           << "Rejected for match points      = " << n.RejMatchPoints    << "\n"
            << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"
-           << "Rejected for out valid mask    = " << n.RejOutValidMask   << "\n"
-           << "Rejected for match points      = " << n.RejMatchPoints    << "\n";
+           << "Rejected for out valid mask    = " << n.RejOutValidMask   << "\n";
            
       // Deallocate current job
       if(cur_job) { delete cur_job; cur_job = (TCStatJob *) 0; }
