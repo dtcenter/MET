@@ -113,7 +113,6 @@ class TrackPairInfo {
 
       bool               keep(int)            const;
       WatchWarnType      track_watch_warn()   const;
-      unixtime           landfall_time()      const;
 
          //
          //  do stuff
@@ -124,8 +123,9 @@ class TrackPairInfo {
       void add(const TCStatLine&);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
-      int check_rapid_inten(const SingleThresh &);
-      int check_landfall(const int, const int);
+      int  check_rapid_inten(const SingleThresh &);
+      int  check_landfall(const int, const int);
+      bool landfall_window(unixtime, unixtime) const;
 
       TrackPairInfo keep_subset() const;
 };
