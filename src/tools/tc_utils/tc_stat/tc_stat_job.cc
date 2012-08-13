@@ -688,7 +688,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
    }
 
    // Apply absolute value, if requested
-   if(abs_flag) v = fabs(v);
+   if(abs_flag && !is_bad_data(v)) v = fabs(v);
 
    return(v);
 }
