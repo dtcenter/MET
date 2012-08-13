@@ -419,41 +419,6 @@ WatchWarnType TrackPairInfo::track_watch_warn() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Define landfall as the time of the last BEST track point before
-// its distance to land switches from positive to negative.
-//
-////////////////////////////////////////////////////////////////////////
-
-unixtime TrackPairInfo::landfall_time() const {
-   int i;
-   unixtime ut = (unixtime) 0;
-   bool landfall_flag = true;
-
-   // Loop over the track points looking for landfall.
-   for(i=0; i<NPoints; i++) {
-
-      // Skip bad data values
-      if(is_bad_data(BDeckDLand[i])) continue;
-
-      // If the distance to land is negative, landfall already occurred
-      if(BDeckDLand[i] < 0) landfall_flag = false;
-
-      // Check for distance switching from positive to negative
-      if(landfall_flag &&
-         i+1 < NPoints &&
-         !is_bad_data(BDeckDLand[i+1]) &&
-         BDeckDLand[i]   >= 0 &&
-         BDeckDLand[i+1] <= 0) break;
-   }
-
-   // Only store value if landfall was found
-   if(i < NPoints) ut = BDeck[i].valid();
-
-   return(ut);
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
                                    WatchWarnType ww_type,
@@ -527,26 +492,17 @@ int TrackPairInfo::check_rapid_inten(const SingleThresh &st) {
 int TrackPairInfo::check_landfall(const int landfall_beg,
                                   const int landfall_end) {
    int i, n_rej;
-   unixtime landfall_ut, beg_ut, end_ut;
-   
-   // Determine the time of landfall from the BEST track
-   landfall_ut = landfall_time();
-
-   // If no landfall, define trivial time window
-   if(landfall_ut == (unixtime) 0) {
-      beg_ut = end_ut = (unixtime) 0;
-   }
-   // Otherwise, define time window
-   else {
-      beg_ut = landfall_ut + landfall_beg;
-      end_ut = landfall_ut + landfall_end;
-   }
 
    // Loop over the track points
    for(i=0, n_rej=0; i<NPoints; i++) {
 
-      // Check if this point is outside the landfall time window
-      if(BDeck[i].valid() < beg_ut || BDeck[i].valid() > end_ut) {
+      // If the current point is over land or landfall did not occur
+      // in this time window, discard the point. Subtract and switch
+      // the time window bounds since they are defined relative to
+      // landfall, not the track point valid time.
+      if(BDeckDLand[i] <= 0 ||
+         !landfall_window(BDeck[i].valid() - landfall_end,
+                          BDeck[i].valid() - landfall_beg)) {
 
          // Discard this point
          if(Keep[i] != 0) {
@@ -557,6 +513,39 @@ int TrackPairInfo::check_landfall(const int landfall_beg,
    }
 
    return(n_rej);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check to see if a landfall event occurred during the time window.
+// Define landfall as the time of the last BEST track point before
+// its distance to land switches from positive to negative.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool TrackPairInfo::landfall_window(unixtime beg_ut, unixtime end_ut) const {
+   int i;
+   bool found = false;
+
+   // Loop over the track points looking for landfall.
+   for(i=0; i<NPoints; i++) {
+
+      // Skip bad data values or points outside of the time window
+      if(is_bad_data(BDeckDLand[i]) ||
+         BDeck[i].valid() < beg_ut ||
+         BDeck[i].valid() > end_ut) continue;
+
+      // Check for distance switching from positive to negative
+      if(i+1 < NPoints &&
+         !is_bad_data(BDeckDLand[i+1]) &&
+         BDeckDLand[i]   >= 0 &&
+         BDeckDLand[i+1] <= 0) {
+         found = true;
+         break;
+      }
+   }
+
+   return(found);
 }
 
 ////////////////////////////////////////////////////////////////////////
