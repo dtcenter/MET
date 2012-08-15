@@ -44,40 +44,49 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int mxp = 100;
+static const int mxp  = 100;
+static const int nvtx = 10;
 
 extern "C" {
    void acerr_(float [mxp], float [mxp], float [mxp], float [mxp], int *,
                float [mxp], float [mxp], int *);
+   void btclip_(char [2], int *, int *, int *, int *,
+                float [mxp],  float [mxp],  float [mxp],
+                float [mxp],  float [mxp],  float [mxp],
+                float [nvtx], float [nvtx], float [nvtx]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void   process_command_line(int, char **);
-static void   process_tracks      ();
-static void   process_track_files (const StringArray &, TrackInfoArray &);
-static void   filter_tracks       (TrackInfoArray &);
-static void   merge_interp12      (TrackInfoArray &);
-static void   derive_consensus    (TrackInfoArray &);
-static void   derive_lag          (TrackInfoArray &);
-static void   process_match       (const TrackInfo &, const TrackInfo &,
-                                   TrackPairInfoArray &);
-static double compute_dland       (double, double);
-static void   compute_track_err   (const TrackInfo &, const TrackInfo &,
-                                   TimeArray &, NumArray &, NumArray &,
-                                   NumArray &, NumArray &, NumArray &);
-static void   load_dland          ();
-static void   process_watch_warn  (TrackPairInfoArray &);
-static void   write_output        (const TrackPairInfoArray &);
-static void   setup_table         (AsciiTable &);
-static void   clean_up            ();
-static void   usage               ();
-static void   set_adeck           (const StringArray &);
-static void   set_bdeck           (const StringArray &);
-static void   set_config          (const StringArray &);
-static void   set_out             (const StringArray &);
-static void   set_logfile         (const StringArray &);
-static void   set_verbosity       (const StringArray &);
+static void   process_command_line (int, char **);
+static void   process_tracks       ();
+static void   process_track_files  (const StringArray &, TrackInfoArray &);
+static void   filter_tracks        (TrackInfoArray &);
+static void   merge_interp12       (TrackInfoArray &);
+static void   derive_consensus     (TrackInfoArray &);
+static void   derive_lag           (TrackInfoArray &);
+static void   derive_baseline      (TrackInfoArray &, TrackInfoArray &);
+static void   derive_baseline_model(const ConcatString &,
+                                    const TrackInfo &, int,
+                                    TrackInfoArray &);
+static void   process_match        (const TrackInfo &, const TrackInfo &,
+                                    TrackPairInfoArray &);
+static double compute_dland        (double, double);
+static void   compute_track_err    (const TrackInfo &, const TrackInfo &,
+                                    TimeArray &, NumArray &, NumArray &,
+                                    NumArray &, NumArray &, NumArray &);
+static void   load_dland           ();
+static void   process_watch_warn   (TrackPairInfoArray &);
+static void   write_output         (const TrackPairInfoArray &);
+static void   setup_table          (AsciiTable &);
+static void   clean_up             ();
+static void   usage                ();
+static void   set_adeck            (const StringArray &);
+static void   set_bdeck            (const StringArray &);
+static void   set_config           (const StringArray &);
+static void   set_out              (const StringArray &);
+static void   set_logfile          (const StringArray &);
+static void   set_verbosity        (const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -216,9 +225,15 @@ void process_tracks() {
 
    // Derive lag forecasts from the ADECK tracks
    mlog << Debug(2)
-        << "Deriving " << conf_info.LagHour.n_elements()
+        << "Deriving " << conf_info.LagTime.n_elements()
         << " ADECK lag tracks(s).\n";
    derive_lag(adeck_tracks);
+
+   // Derive CLIPER/SHIFOR forecasts from the ADECK tracks
+   mlog << Debug(2)
+        << "Deriving " << conf_info.BaseModel.n_elements()
+        << " CLIPER/SHIFOR baseline track(s).\n";
+   derive_baseline(adeck_tracks, bdeck_tracks);
    
    mlog << Debug(2)
         << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
@@ -595,10 +610,10 @@ void derive_consensus(TrackInfoArray &tracks) {
 
    // Loop through the cases and process each consensus model
    for(i=0; i<case_list.n_elements(); i++) {
-
+     
       // Break the case back out into Basin, Cyclone, InitTime
       cur_case = case_list[i];
-      case_cmp = cur_case.split(sep);
+      case_cmp = cur_case.split(sep);      
      
       // Loop through the consensus models
       for(j=0; j<conf_info.NCon; j++) {
@@ -615,13 +630,14 @@ void derive_consensus(TrackInfoArray &tracks) {
 
                // If the consenus member was found for this case,
                // add it to the TrackInfoArray object
-               if(case_cmp[0] == tracks[l].basin()                         &&
-                  case_cmp[1] == tracks[l].cyclone()                       &&
-                  case_cmp[2] == unix_to_yyyymmdd_hhmmss(tracks[l].init()) &&
-                  conf_info.ConMembers[j][k] == tracks[l].technique()) {
+               if(tracks[l].basin()     == case_cmp[0]                &&
+                  tracks[l].cyclone()   == case_cmp[1]                &&
+                  tracks[l].technique() == conf_info.ConMembers[j][k] &&
+                  tracks[l].init()      == yyyymmdd_hhmmss_to_unix(case_cmp[2])) {
                   con_tracks.add(tracks[l]);
                   break;
                }
+
             } // end for l
          } // end for k
 
@@ -670,20 +686,20 @@ void derive_lag(TrackInfoArray &tracks) {
    ConcatString lag_model;
    
    // If no time lags are requested, nothing to do
-   if(conf_info.LagHour.n_elements() == 0) return;
-
-   mlog << Debug(3)
-        << "Buliding time-lagged track(s) for "
-        << conf_info.LagHour.n_elements() << " lags.\n";
+   if(conf_info.LagTime.n_elements() == 0) return;
 
    // Store the input number of tracks to process
    n_tracks = tracks.n_tracks();
         
    // Loop through the time lags to be applied
-   for(i=0; i<conf_info.LagHour.n_elements(); i++) {
+   for(i=0; i<conf_info.LagTime.n_elements(); i++) {
+
+      mlog << Debug(3)
+           << "Buliding time-lagged track(s) for lag time \""
+           << sec_to_hhmmss(conf_info.LagTime[i]) << "\"\n";
 
       // Store current lag time
-      s = conf_info.LagHour[i];
+      s = conf_info.LagTime[i];
   
       // Loop through the tracks
       for(j=0; j<n_tracks; j++) {
@@ -725,6 +741,184 @@ void derive_lag(TrackInfoArray &tracks) {
       } // end for j
 
    } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
+   int i, j;
+   
+   // If no baseline models are requested, nothing to do
+   if(conf_info.BaseModel.n_elements() == 0) return;
+
+   mlog << Debug(3)
+        << "Buliding CLIPER/SHIFOR baseline track forecasts using "
+        << conf_info.BaseModel.n_elements() << " methods.\n";
+
+   // Loop over the ADECK tracks
+   for(i=0; i<atracks.n_tracks(); i++) {
+
+      // Only derive baselines from the CARQ model
+      if(strcmp(atracks[i].technique(), "CARQ") != 0) continue;
+
+      // Derive OCLIP
+      if(conf_info.BaseModel.has("OCLIP"))
+         derive_baseline_model("OCLIP", atracks[i], 0, atracks);
+
+      // Derive OCLIP5
+      if(conf_info.BaseModel.has("OCLIP5"))
+         derive_baseline_model("OCLIP5", atracks[i], 0, atracks);
+
+      // Derive OCLIPD5
+      if(conf_info.BaseModel.has("OCLIPD5"))
+         derive_baseline_model("OCLIPD5", atracks[i], 0, atracks);
+
+   } // end for i
+        
+   // Loop over the BDECK tracks
+   for(i=0; i<btracks.n_tracks(); i++) {
+
+      // Derive baseline model for each track point
+      for(j=0; j<btracks[i].n_points(); j++) {
+
+         // Check if the current time is a 6-hour interval
+         if((btracks[i][j].valid()%(6*sec_per_hour)) != 0) continue;
+        
+         // Derive BTCLIP
+         if(conf_info.BaseModel.has("BTCLIP"))
+            derive_baseline_model("BTCLIP", btracks[i], j, atracks);
+
+         // Derive BTCLIP5
+         if(conf_info.BaseModel.has("BTCLIP5"))
+            derive_baseline_model("BTCLIP5", btracks[i], j, atracks);
+
+         // Derive BTCLIPA
+         if(conf_info.BaseModel.has("BTCLIPA"))
+            derive_baseline_model("BTCLIPA", btracks[i], j, atracks);
+         
+      } // end for j
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void derive_baseline_model(const ConcatString &model,
+                           const TrackInfo &ti, int i_start,
+                           TrackInfoArray &atracks) {
+   int i, ntp;
+   int mon, day, yr, hr, minute, sec, lead_sec;
+   unixtime ut;
+   char basin[2];
+   float tp_mon[mxp], tp_day[mxp], tp_hr[mxp];
+   float tp_lat[mxp], tp_lon[mxp], tp_vmax[mxp];
+   float clip_lat[nvtx], clip_lon[nvtx], clip_vmax[nvtx];
+   TrackInfo  new_track;
+   TrackPoint new_point;
+
+   // Check bounds
+   if(i_start < 0 || i_start >= ti.n_points()) {
+       mlog << Error
+            << "\nderive_baseline_model() -> "
+            << "range check error for i_start = " << i_start << "\n\n";
+       exit(1);
+   }
+
+   // Store the basin name
+   strncpy(basin, ti.basin(), 2);
+
+   // Loop over the track points and populate date/location arrays
+   for(i=i_start, ntp=0; i<ti.n_points(); i++) {
+
+      // Check if the current time is a 6-hour interval
+      if((ti[i].valid()%(6*sec_per_hour)) != 0) continue;
+      
+      // Process the valid time
+      unix_to_mdyhms(ti[i].valid(),
+                     mon, day, yr, hr, minute, sec);
+
+      // Store the valid time, location, and max wind
+      tp_mon[ntp]  = (float) mon;
+      tp_day[ntp]  = (float) day;
+      tp_hr[ntp]   = (float) hr;
+      tp_lat[ntp]  = (float) ti[i].lat();
+      tp_lon[ntp]  = (float) ti[i].lon();
+      tp_vmax[ntp] = (float) ti[i].v_max();
+
+      // Increment the track point counter
+      ntp++;
+
+   } // end for i
+     
+   // Store the valid time of the starting point
+   unix_to_mdyhms(ti[i_start].valid(),
+                  mon, day, yr, hr, minute, sec);
+
+   // Call appropriate subroutine to derive baseline model
+   if(model == "BTCLIP") {
+
+      btclip_(basin, &mon, &day, &hr, &ntp,
+              tp_mon,   tp_day,   tp_hr,
+              tp_lat,   tp_lon,   tp_vmax,
+              clip_lat, clip_lon, clip_vmax);
+
+      // FUTURE WORK: add more case statements for other baseline model types
+   }
+   else {
+       mlog << Error
+            << "\nderive_baseline_model() -> "
+            << "unsupported baseline model type \"" << model
+            << "\".\n\n";
+       exit(1);
+
+   }
+
+   // Populate the CLIPER/SHIFOR track info
+   new_track.set_init(ti[i_start].valid());
+   new_track.set_basin(ti.basin());
+   new_track.set_cyclone(ti.cyclone());
+   new_track.set_storm_name(ti.storm_name());
+   new_track.set_technique(model);
+   new_track.set_technique_number(ti.technique_number());
+         
+   // Loop over the track points
+   for(i=0; i<nvtx; i++) {
+
+      // Check for bad data
+      if(is_bad_data(clip_lat[i]) || is_bad_data(clip_lon[i]) ||
+         clip_lat[i] < -90        || clip_lon[i] < -180       ||
+         clip_lat[i] >  90        || clip_lat[i] > 180) break;
+        
+         // Initialize
+         new_point.clear();
+
+         // Compute the lead time for the current point
+         lead_sec = 12*sec_per_hour*(i+1);
+        
+         // Compute the current valid time
+         ut = ti[i_start].valid() + lead_sec;
+           
+         // Setup the current track point
+         new_point.set_valid(ut);
+         new_point.set_lead(lead_sec);
+         new_point.set_lat(clip_lat[i]);
+         new_point.set_lon(clip_lon[i]);
+         if(!is_bad_data(clip_vmax[i])) new_point.set_v_max(clip_vmax[i]);
+
+         // Add the current CLIPER/SHIFOR track point
+         new_track.add(new_point);
+
+   } // end for j
+
+   mlog << Debug(5)
+        << "Adding CLIPER/SHIFOR track:\n"
+        << new_track.serialize_r(1) << "\n";
+
+   // Add the CLIPER/SHIFOR track to the ADECKS
+   atracks.add(new_track);
 
    return;
 }

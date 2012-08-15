@@ -326,7 +326,7 @@ const TrackPoint & TrackInfo::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const char * TrackInfo::storm_id() {
+const ConcatString & TrackInfo::storm_id() {
    int year, mon, day, hr, minute, sec;
    unixtime ut;
 
@@ -864,7 +864,7 @@ bool TrackInfoArray::has(const ATCFLine &l) const {
 //
 ////////////////////////////////////////////////////////////////////////
 
-TrackInfo consensus(const TrackInfoArray &tarr,
+TrackInfo consensus(const TrackInfoArray &tracks,
                     const ConcatString &model, int req) {
    int i, j, k, i_pnt;
    TrackInfo tavg;
@@ -876,7 +876,7 @@ TrackInfo consensus(const TrackInfoArray &tarr,
    QuadInfo   wavg;
 
    // Check for at least one track
-   if(tarr.n_tracks() == 0) {
+   if(tracks.n_tracks() == 0) {
       mlog << Error
            << "\nTrackInfoArray::consensus() -> "
            << "cannot compute a consensus for zero tracks!\n\n";
@@ -884,20 +884,20 @@ TrackInfo consensus(const TrackInfoArray &tarr,
    }
 
    // Initialize average track to the first track
-   tavg.set_basin(tarr.Track[0].basin());
-   tavg.set_cyclone(tarr.Track[0].cyclone());
-   tavg.set_storm_name(tarr.Track[0].storm_name());
-   tavg.set_technique_number(tarr.Track[0].technique_number());
+   tavg.set_basin(tracks[0].basin());
+   tavg.set_cyclone(tracks[0].cyclone());
+   tavg.set_storm_name(tracks[0].storm_name());
+   tavg.set_technique_number(tracks[0].technique_number());
    tavg.set_technique(model);
-   tavg.set_init(tarr.Track[0].init());
+   tavg.set_init(tracks[0].init());
 
    // Loop through the tracks and build a list of lead times
-   for(i=0; i<tarr.n_tracks(); i++) {
+   for(i=0; i<tracks.n_tracks(); i++) {
 
       // Error out if these elements change
-      if(tavg.basin()   != tarr.Track[i].basin()   ||
-         tavg.cyclone() != tarr.Track[i].cyclone() ||
-         tavg.init()    != tarr.Track[i].init()) {
+      if(tavg.basin()   != tracks[i].basin()   ||
+         tavg.cyclone() != tracks[i].cyclone() ||
+         tavg.init()    != tracks[i].init()) {
          mlog << Error
               << "\nTrackInfoArray::consensus() -> "
               << "the basin, cyclone number, and init time must "
@@ -906,21 +906,21 @@ TrackInfo consensus(const TrackInfoArray &tarr,
       }
 
       // Warning if the the technique number changes
-      if(tavg.technique_number() != tarr.Track[i].technique_number()) {
+      if(tavg.technique_number() != tracks[i].technique_number()) {
          mlog << Warning
               << "\nTrackInfoArray::consensus() -> "
               << "the technique number has changed ("
               << tavg.technique_number() << "!="
-              << tarr.Track[i].technique_number() << ").\n\n";
+              << tracks[i].technique_number() << ").\n\n";
       }
 
       // Loop through the points for the lead times
-      for(j=0; j<tarr.Track[i].n_points(); j++) {
+      for(j=0; j<tracks[i].n_points(); j++) {
 
          // Add the lead time to the list
-         if(!is_bad_data(tarr.Track[i][j].lead())) {
-            if(!lead_list.has(tarr.Track[i][j].lead()))
-               lead_list.add(tarr.Track[i][j].lead());
+         if(!is_bad_data(tracks[i][j].lead())) {
+            if(!lead_list.has(tracks[i][j].lead()))
+               lead_list.add(tracks[i][j].lead());
          }
       } // end for j
 
@@ -937,15 +937,15 @@ TrackInfo consensus(const TrackInfoArray &tarr,
       pcnt = 0;
 
       // Loop through the tracks and get an average TrackPoint
-      for(j=0; j<tarr.n_tracks(); j++) {
+      for(j=0; j<tracks.n_tracks(); j++) {
 
          // Get the index of the TrackPoint for this lead time
-         i_pnt = tarr.Track[j].lead_index(lead_list[i]);
+         i_pnt = tracks.Track[j].lead_index(lead_list[i]);
          if(i_pnt < 0) continue;
 
          // Keep track of the TrackPoint count and sums
          pcnt++;
-         psum += tarr.Track[j][i_pnt];
+         psum += tracks.Track[j][i_pnt];
       }
 
       // Check for the minimum number of points

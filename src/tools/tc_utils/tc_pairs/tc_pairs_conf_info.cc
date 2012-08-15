@@ -67,7 +67,8 @@ void TCPairsConfInfo::clear() {
    NCon = 0;
    ConModel.clear();
    ConMinReq.clear();
-   LagHour.clear();
+   LagTime.clear();
+   BaseModel.clear();
    InitBeg = InitEnd = (unixtime) 0;
    InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
@@ -149,13 +150,16 @@ void TCPairsConfInfo::process_config() {
            << "The \"ConModel\", \"ConMembers\", and \"ConMinReq\" "
            << "entries must all have the same length.\n\n";
       exit(1);
-   }   
+   }
 
-   // Conf: LagHour
-   sa = Conf.lookup_string_array("lag_hour");
+   // Conf: LagTime
+   sa = Conf.lookup_string_array("lag_time");
    for(i=0; i<sa.n_elements(); i++)
-      LagHour.add(timestring_to_sec(sa[i]));
+      LagTime.add(timestring_to_sec(sa[i]));
 
+   // Conf: BaseModel
+   BaseModel = Conf.lookup_string_array("base_model");
+   
    // Conf: InitBeg, InitEnd
    InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
    InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
