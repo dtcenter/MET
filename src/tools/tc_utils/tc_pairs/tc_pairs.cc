@@ -48,12 +48,24 @@ static const int mxp  = 100;
 static const int nvtx = 10;
 
 extern "C" {
-   void acerr_(float [mxp], float [mxp], float [mxp], float [mxp], int *,
-               float [mxp], float [mxp], int *);
+   void acerr_(float [mxp], float [mxp], float [mxp], float [mxp],
+           int *, float [mxp], float [mxp], int *);
    void btclip_(char [2], int *, int *, int *, int *,
-                float [mxp],  float [mxp],  float [mxp],
-                float [mxp],  float [mxp],  float [mxp],
-                float [nvtx], float [nvtx], float [nvtx]);
+           float [mxp],  float [mxp],  float [mxp],
+           float [mxp],  float [mxp],  float [mxp],
+           float [nvtx], float [nvtx], float [nvtx]);
+   void btclip5_(char [2], int *, int *, int *, int *, int *,
+           float [mxp],  float [mxp],  float [mxp],
+           float [mxp],  float [mxp],  float [mxp],
+           float [nvtx], float [nvtx], float [nvtx]);
+   void btclipd5_(char [2], int *, int *, int *, int *, int *,
+           float [mxp],  float [mxp],  float [mxp],
+           float [mxp],  float [mxp],  float [mxp],
+           float [nvtx], float [nvtx], float [nvtx]);
+   void btclipa_(char [2], int *, int *, int *, int *,
+           float [mxp],  float [mxp],  float [mxp],
+           float [mxp],  float [mxp],  float [mxp],
+           float [nvtx], float [nvtx], float [nvtx]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -231,7 +243,8 @@ void process_tracks() {
 
    // Derive CLIPER/SHIFOR forecasts from the ADECK tracks
    mlog << Debug(2)
-        << "Deriving " << conf_info.BaseModel.n_elements()
+        << "Deriving " << conf_info.OperBaseline.n_elements() +
+                          conf_info.BestBaseline.n_elements()
         << " CLIPER/SHIFOR baseline track(s).\n";
    derive_baseline(adeck_tracks, bdeck_tracks);
    
@@ -605,7 +618,7 @@ void derive_consensus(TrackInfoArray &tracks) {
    } // end for i
 
    mlog << Debug(3)
-        << "Buliding consensus track(s) for " << case_list.n_elements()
+        << "Building consensus track(s) for " << case_list.n_elements()
         << " cases.\n";
 
    // Loop through the cases and process each consensus model
@@ -695,7 +708,7 @@ void derive_lag(TrackInfoArray &tracks) {
    for(i=0; i<conf_info.LagTime.n_elements(); i++) {
 
       mlog << Debug(3)
-           << "Buliding time-lagged track(s) for lag time \""
+           << "Building time-lagged track(s) for lag time \""
            << sec_to_hhmmss(conf_info.LagTime[i]) << "\"\n";
 
       // Store current lag time
@@ -748,35 +761,35 @@ void derive_lag(TrackInfoArray &tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
-   int i, j;
+   int i, j, k;
    
    // If no baseline models are requested, nothing to do
-   if(conf_info.BaseModel.n_elements() == 0) return;
+   if(conf_info.OperBaseline.n_elements() == 0 &&
+      conf_info.BestBaseline.n_elements() == 0) return;
 
    mlog << Debug(3)
-        << "Buliding CLIPER/SHIFOR baseline track forecasts using "
-        << conf_info.BaseModel.n_elements() << " methods.\n";
-
+        << "Building CLIPER/SHIFOR operational baseline forecasts using "
+        << conf_info.OperBaseline.n_elements() << " methods.\n";
+   
    // Loop over the ADECK tracks
    for(i=0; i<atracks.n_tracks(); i++) {
 
       // Only derive baselines from the CARQ model
       if(strcmp(atracks[i].technique(), "CARQ") != 0) continue;
 
-      // Derive OCLIP
-      if(conf_info.BaseModel.has("OCLIP"))
-         derive_baseline_model("OCLIP", atracks[i], 0, atracks);
+      // Loop over the operational baseline methods
+      for(j=0; j<conf_info.OperBaseline.n_elements(); j++) {
 
-      // Derive OCLIP5
-      if(conf_info.BaseModel.has("OCLIP5"))
-         derive_baseline_model("OCLIP5", atracks[i], 0, atracks);
-
-      // Derive OCLIPD5
-      if(conf_info.BaseModel.has("OCLIPD5"))
-         derive_baseline_model("OCLIPD5", atracks[i], 0, atracks);
-
+         // Derive the baseline model
+         derive_baseline_model(conf_info.OperBaseline[j],
+                               atracks[i], 0, atracks);
+      } // end for j                     
    } // end for i
-        
+   
+   mlog << Debug(3)
+        << "Building CLIPER/SHIFOR BEST track baseline forecasts using "
+        << conf_info.BestBaseline.n_elements() << " methods.\n";
+
    // Loop over the BDECK tracks
    for(i=0; i<btracks.n_tracks(); i++) {
 
@@ -786,18 +799,13 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
          // Check if the current time is a 6-hour interval
          if((btracks[i][j].valid()%(6*sec_per_hour)) != 0) continue;
         
-         // Derive BTCLIP
-         if(conf_info.BaseModel.has("BTCLIP"))
-            derive_baseline_model("BTCLIP", btracks[i], j, atracks);
+         // Loop over the BEST track baseline methods
+         for(k=0; k<conf_info.BestBaseline.n_elements(); k++) {
 
-         // Derive BTCLIP5
-         if(conf_info.BaseModel.has("BTCLIP5"))
-            derive_baseline_model("BTCLIP5", btracks[i], j, atracks);
-
-         // Derive BTCLIPA
-         if(conf_info.BaseModel.has("BTCLIPA"))
-            derive_baseline_model("BTCLIPA", btracks[i], j, atracks);
-         
+            // Derive the baseline model
+            derive_baseline_model(conf_info.BestBaseline[k],
+                                  btracks[i], j, atracks);
+         } // end for k
       } // end for j
    } // end for i
 
@@ -856,16 +864,31 @@ void derive_baseline_model(const ConcatString &model,
    // Store the valid time of the starting point
    unix_to_mdyhms(ti[i_start].valid(),
                   mon, day, yr, hr, minute, sec);
-
+                  
    // Call appropriate subroutine to derive baseline model
-   if(model == "BTCLIP") {
-
+   if(model == "BCLP") {
       btclip_(basin, &mon, &day, &hr, &ntp,
               tp_mon,   tp_day,   tp_hr,
               tp_lat,   tp_lon,   tp_vmax,
               clip_lat, clip_lon, clip_vmax);
-
-      // FUTURE WORK: add more case statements for other baseline model types
+   }
+   else if(model == "BCS5") {
+      btclip5_(basin, &yr, &mon, &day, &hr, &ntp,
+               tp_mon,   tp_day,   tp_hr,
+               tp_lat,   tp_lon,   tp_vmax,
+               clip_lat, clip_lon, clip_vmax);
+   }
+   else if(model == "BCD5") {
+      btclipd5_(basin, &yr, &mon, &day, &hr, &ntp,
+                tp_mon,   tp_day,   tp_hr,
+                tp_lat,   tp_lon,   tp_vmax,
+                clip_lat, clip_lon, clip_vmax);
+   }
+   else if(model == "BCLA") {
+      btclipa_(basin, &mon, &day, &hr, &ntp,
+               tp_mon,   tp_day,   tp_hr,
+               tp_lat,   tp_lon,   tp_vmax,
+               clip_lat, clip_lon, clip_vmax);
    }
    else {
        mlog << Error
