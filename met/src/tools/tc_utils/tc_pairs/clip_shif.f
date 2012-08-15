@@ -2231,7 +2231,7 @@ C
 C
 C     Error on coefficient file
 C     -------------------------
-900   WRITE(1,'("FATAL ERROR READING CLIPER COEFFICIENTS.")')
+900   PRINT *, ' FATAL ERROR READING CLIPER COEFFICIENTS.'
       STOP
 C
       END
