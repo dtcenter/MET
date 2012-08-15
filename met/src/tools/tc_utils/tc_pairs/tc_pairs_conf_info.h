@@ -50,7 +50,8 @@ class TCPairsConfInfo {
       NumArray LagTime;
 
       // CLIPER/SHIFOR baseline model definition
-      StringArray BaseModel;
+      StringArray BestBaseline;
+      StringArray OperBaseline;
 
       // Timing information
       unixtime  InitBeg, InitEnd;

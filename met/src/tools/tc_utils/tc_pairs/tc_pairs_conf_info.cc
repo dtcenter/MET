@@ -68,7 +68,8 @@ void TCPairsConfInfo::clear() {
    ConModel.clear();
    ConMinReq.clear();
    LagTime.clear();
-   BaseModel.clear();
+   BestBaseline.clear();
+   OperBaseline.clear();
    InitBeg = InitEnd = (unixtime) 0;
    InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
@@ -157,8 +158,11 @@ void TCPairsConfInfo::process_config() {
    for(i=0; i<sa.n_elements(); i++)
       LagTime.add(timestring_to_sec(sa[i]));
 
-   // Conf: BaseModel
-   BaseModel = Conf.lookup_string_array("base_model");
+   // Conf: BestBaseline
+   BestBaseline = Conf.lookup_string_array("best_baseline");
+
+   // Conf: OperBaseline
+   OperBaseline = Conf.lookup_string_array("oper_baseline");
    
    // Conf: InitBeg, InitEnd
    InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));

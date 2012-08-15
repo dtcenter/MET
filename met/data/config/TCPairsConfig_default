@@ -77,15 +77,16 @@ con_min_req = [];
 lag_time = [];
 
 //
-// Specify a comma-separated list of CLIPER/SHIFOR baseline forecast tracks
-// to be derived.
-// Derived from BEST tracks: BTCLIP, BTCLIP5, BTCLIPA
-// Derived from CARQ tracks: OCLIP, OCLIP5, OCLIPD5
+// Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
+// derived from the BEST and operational (CARQ) tracks.
+// Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
+// Derived from CARQ tracks: OCLP, OCS5, OCD5, OCDT
 //
-// e.g. base_model = [ "BTCLIP", "BTCLIP5", "BTCLIPA",
-//                     "OCLIP",  "OCLIP5",  "OCLIPD5" ];
+// e.g. base_baseline = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
+//      oper_baseline = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
 //
-base_model = [];
+best_baseline = [];
+oper_baseline = [];
 
 //
 // Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format.
