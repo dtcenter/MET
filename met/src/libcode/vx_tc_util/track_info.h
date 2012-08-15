@@ -100,19 +100,19 @@ class TrackInfo {
       int lead_index(int)       const;
       int valid_index(unixtime) const;
 
-      const TrackPoint & operator[](int)    const;
-      const char *       storm_id();
-      const char *       basin()            const;
-      const char *       cyclone()          const;
-      const char *       storm_name()       const;
-      int                technique_number() const;
-      const char *       technique()        const;
-      unixtime           init()             const;
-      int                init_hour()        const;
-      unixtime           valid_min()        const;
-      unixtime           valid_max()        const;
-      int                valid_inc()        const;
-      int                n_points()         const;
+      const TrackPoint &   operator[](int)    const;
+      const ConcatString & storm_id();
+      const ConcatString & basin()            const;
+      const ConcatString & cyclone()          const;
+      const ConcatString & storm_name()       const;
+      int                  technique_number() const;
+      const ConcatString & technique()        const;
+      unixtime             init()             const;
+      int                  init_hour()        const;
+      unixtime             valid_min()        const;
+      unixtime             valid_max()        const;
+      int                  valid_inc()        const;
+      int                  n_points()         const;
 
          //
          //  do stuff
@@ -145,16 +145,16 @@ inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        };
 inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    };
 inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    };
 
-inline const char * TrackInfo::basin()            const { return(Basin);                   }
-inline const char * TrackInfo::cyclone()          const { return(Cyclone);                 }
-inline const char * TrackInfo::storm_name()       const { return(StormName);               }
-inline int          TrackInfo::technique_number() const { return(TechniqueNumber);         }
-inline const char * TrackInfo::technique()        const { return(Technique);               }
-inline unixtime     TrackInfo::init()             const { return(InitTime);                }
-inline int          TrackInfo::init_hour()        const { return(InitTime % sec_per_hour); }
-inline unixtime     TrackInfo::valid_min()        const { return(MinValidTime);            }
-inline unixtime     TrackInfo::valid_max()        const { return(MaxValidTime);            }
-inline int          TrackInfo::n_points()         const { return(NPoints);                 }
+inline const ConcatString & TrackInfo::basin()            const { return(Basin);                   }
+inline const ConcatString & TrackInfo::cyclone()          const { return(Cyclone);                 }
+inline const ConcatString & TrackInfo::storm_name()       const { return(StormName);               }
+inline int                  TrackInfo::technique_number() const { return(TechniqueNumber);         }
+inline const ConcatString & TrackInfo::technique()        const { return(Technique);               }
+inline unixtime             TrackInfo::init()             const { return(InitTime);                }
+inline int                  TrackInfo::init_hour()        const { return(InitTime % sec_per_hour); }
+inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);            }
+inline unixtime             TrackInfo::valid_max()        const { return(MaxValidTime);            }
+inline int                  TrackInfo::n_points()         const { return(NPoints);                 }
 
 ////////////////////////////////////////////////////////////////////////
 //

@@ -18,7 +18,7 @@ c                           =0 for normal return
 c                           >0 for error
 c
 c     Notes: The btlat, btlon, flat, and flon arrays can have missing
-c            values (use -999. for missing). The missing values
+c            values (use -9999. for missing). The missing values
 c            are replaced by linearly interpolated values. Valid
 c            lat/lons must be available for at least two time periods.
 c
@@ -60,7 +60,7 @@ c     Set debug flag (idbug=0 for no debug writes)
       lulog=6
 c
 c     Specify value for missing lat/lons
-      rmiss=-999.0
+      rmiss=-9999.0
 c
 c     Check working array size
       if (npts .gt. mxp) then
@@ -307,7 +307,7 @@ c
          call distk(rlon1,rlat1,rlon2,rlat2,dx,dy,rad)
 c
       if (rad .le. 0.0) then
-       head(n) = -999.
+       head(n) = -9999.
          else
        call ctor(dx,dy,rad,head(n))
          endif
@@ -318,7 +318,7 @@ c     Check to see how many headings are missing
       nmiss = 0
       ntot  = 1 + nlast-nfirst
       do n=nfirst,nlast
-      if (head(n) .le. -999.) nmiss=nmiss+1
+      if (head(n) .le. -9999.) nmiss=nmiss+1
       enddo
 c
       if (nmiss .eq. 0) then
@@ -333,10 +333,10 @@ c        The storm is stationary, set all headings to north
 c        Some heading missing, find nearest values
 c
          do n=nfirst+1,nlast
-       if (head(n) .le. -999.) then
+       if (head(n) .le. -9999.) then
 c              Search backwards for first available value
                do k=n-1,nfirst,-1
-                  if (head(k) .gt. -999.) then
+                  if (head(k) .gt. -9999.) then
            head(n) = head(k)
            go to 1000
                   endif
@@ -346,10 +346,10 @@ c              Search backwards for first available value
          enddo
 c
          do n=nfirst,nlast-1
-       if (head(n) .le. -999.) then
+       if (head(n) .le. -9999.) then
 c              Search forward for first available value
                do k=n+1,nlast
-                  if (head(k) .gt. -999.) then
+                  if (head(k) .gt. -9999.) then
            head(n) = head(k)
            go to 1001
                   endif

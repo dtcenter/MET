@@ -47,7 +47,10 @@ class TCPairsConfInfo {
       NumArray     ConMinReq;  // Minimum required consensus members
 
       // Time-lagged track definition
-      NumArray LagHour;
+      NumArray LagTime;
+
+      // CLIPER/SHIFOR baseline model definition
+      StringArray BaseModel;
 
       // Timing information
       unixtime  InitBeg, InitEnd;

@@ -17,6 +17,7 @@ EXECUTABLES = tc_pairs
 
 
 OBJECTS     = acerr.o \
+              clip_shif.o \
               tc_pairs_conf_info.o
 
 LIBRARIES   =
@@ -64,6 +65,11 @@ acerr.o: acerr.f
 	@ echo
 	$(FC) acerr.f $(FC_FLAGS) -c
 
+
+clip_shif.o: clip_shif.f
+	@ echo
+	$(FC) clip_shif.f $(FC_FLAGS) -c
+	
 
 tc_pairs_conf_info.o: tc_pairs_conf_info.cc
 	@ echo
