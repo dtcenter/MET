@@ -113,9 +113,9 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
    out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
-   out << prefix << "InitTime        = " << unix_to_yyyymmdd_hhmmss(InitTime) << "\n";
-   out << prefix << "MinValidTime    = " << unix_to_yyyymmdd_hhmmss(MinValidTime) << "\n";
-   out << prefix << "MaxValidTime    = " << unix_to_yyyymmdd_hhmmss(MaxValidTime) << "\n";
+   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : "(unset)") << "\"\n";
+   out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : "(unset)") << "\"\n";
+   out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : "(unset)") << "\"\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
       
@@ -142,9 +142,9 @@ ConcatString TrackInfo::serialize() const {
      << ", StormName = \"" << (StormName ? StormName.text() : "(nul)") << "\""
      << ", TechniqueNumber = " << TechniqueNumber
      << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
-     << ", InitTime = " << unix_to_yyyymmdd_hhmmss(InitTime)
-     << ", MinValidTime = " << unix_to_yyyymmdd_hhmmss(MinValidTime)
-     << ", MaxValidTime = " << unix_to_yyyymmdd_hhmmss(MaxValidTime)
+     << ", InitTime = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : "(unset)") << "\""
+     << ", MinValidTime = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : "(unset)") << "\""
+     << ", MaxValidTime = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : "(unset)") << "\""
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc;
 
@@ -258,6 +258,9 @@ void TrackInfo::initialize(const ATCFLine &l) {
 
    // Set the valid time range
    MinValidTime = MaxValidTime = l.valid();
+
+   // Create the storm id
+   set_storm_id();
    
    return;
 }
@@ -326,12 +329,9 @@ const TrackPoint & TrackInfo::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const ConcatString & TrackInfo::storm_id() {
+void TrackInfo::set_storm_id() {
    int year, mon, day, hr, minute, sec;
    unixtime ut;
-
-   // If already set, return it's value
-   if(!StormId.empty()) return(StormId);
 
    // Use timing information to determine the year.
         if(InitTime > 0)     ut = InitTime;
@@ -347,7 +347,7 @@ const ConcatString & TrackInfo::storm_id() {
       StormId << Basin << Cyclone << year;
    }
 
-   return(StormId);
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -890,6 +890,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    tavg.set_technique_number(tracks[0].technique_number());
    tavg.set_technique(model);
    tavg.set_init(tracks[0].init());
+   tavg.set_storm_id();
 
    // Loop through the tracks and build a list of lead times
    for(i=0; i<tracks.n_tracks(); i++) {

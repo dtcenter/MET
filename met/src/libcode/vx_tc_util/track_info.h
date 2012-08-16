@@ -83,6 +83,7 @@ class TrackInfo {
 
       void initialize(const ATCFLine &);
 
+      void set_storm_id();
       void set_basin(const char *);
       void set_cyclone(const char *);
       void set_storm_name(const char *);
@@ -101,7 +102,7 @@ class TrackInfo {
       int valid_index(unixtime) const;
 
       const TrackPoint &   operator[](int)    const;
-      const ConcatString & storm_id();
+      const ConcatString & storm_id()         const;
       const ConcatString & basin()            const;
       const ConcatString & cyclone()          const;
       const ConcatString & storm_name()       const;
@@ -145,6 +146,7 @@ inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        };
 inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    };
 inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    };
 
+inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                 }
 inline const ConcatString & TrackInfo::basin()            const { return(Basin);                   }
 inline const ConcatString & TrackInfo::cyclone()          const { return(Cyclone);                 }
 inline const ConcatString & TrackInfo::storm_name()       const { return(StormName);               }
