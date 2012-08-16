@@ -242,7 +242,8 @@ void process_tracks() {
 
    // Filter the ADECK tracks using the config file information
    mlog << Debug(2)
-        << "Filtering ADECK tracks based on config file settings.\n";
+        << "Filtering " << adeck_tracks.n_tracks()
+        << " ADECK tracks based on config file settings.\n";
    filter_tracks(adeck_tracks);
    
    // Derive consensus forecasts from the ADECK tracks
@@ -278,8 +279,7 @@ void process_tracks() {
             n_match++;
             mlog << Debug(4)
                  << "[Track " << i+1 << "] ADECK track " << i+1
-                 << " (" << adeck_tracks[i].technique()
-                 << ") matches BDECK track " << j+1 << ":\n"
+                 << " matches BDECK track " << j+1 << ":\n"
                  << "    ADECK: " << adeck_tracks[i].serialize() << "\n"
                  << "    BDECK: " << bdeck_tracks[j].serialize() << "\n";
 
@@ -288,17 +288,11 @@ void process_tracks() {
          }
       } // end for j
 
-      // Check for no matching BDECK track
-      if(n_match == 0) {
-         mlog << Warning
-              << "\nADECK track " << i+1 << " matches 0 BDECK tracks:\n"
-              << "   ADECK: " << adeck_tracks[i].serialize() << "\n\n";
-      }
-      else {
-         mlog << Debug(3)
-              << "[Track " << i+1 << "] ADECK track " << i+1 << " matches "
-              << n_match << " BDECK track(s).\n";
-      }
+      // Dump the number of matching tracks
+      mlog << Debug(3)
+           << "[Track " << i+1 << "] ADECK track " << i+1 << " matches "
+           << n_match << " BDECK track(s).\n";
+
    } // end for i
 
    // Add the watch/warning information to the matched track pairs
@@ -582,7 +576,7 @@ void merge_interp12(TrackInfoArray &tracks) {
 
       // Check for no match found
       if(j == tracks.n_tracks()) {
-         mlog << Warning
+         mlog << Debug(4)
               << "\n[Track " << i+1 << "] Found no 6-hour track to merge "
               << "into 12-hour interpolated track " << i+1 << ":\n"
               << "    12-hour: " << tracks[i].serialize() << "\n\n";
