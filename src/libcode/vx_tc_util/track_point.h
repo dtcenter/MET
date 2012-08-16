@@ -121,7 +121,13 @@ class TrackPoint {
       int           Vmax;       //  knots
       int           MSLP;       //  millibars
       CycloneLevel  Level;
-      WatchWarnType WatchWarn; // watch/warning status
+
+      // Speed and direction
+      double       Speed;
+      double       Direction;
+
+      // Watch/Warning status
+      WatchWarnType WatchWarn; 
 
       // Wind Radii
       QuadInfo      Wind[NWinds];
@@ -153,6 +159,8 @@ class TrackPoint {
       void set_v_max(const int);
       void set_mslp(const int);
       void set_level(CycloneLevel);
+      void set_speed(const double);
+      void set_direction(const double);
       void set_watch_warn(WatchWarnType);
       void set_watch_warn(WatchWarnType, unixtime);
 
@@ -168,6 +176,8 @@ class TrackPoint {
       int              v_max()         const;
       int              mslp()          const;
       CycloneLevel     level()         const;
+      double           speed()         const;
+      double           direction()     const;
       WatchWarnType    watch_warn()    const;
 
          //
@@ -176,7 +186,7 @@ class TrackPoint {
 
       void set_wind(int, const QuadInfo &);
       bool set(const ATCFLine &);
-      bool has(const ATCFLine &)      const;
+      bool has(const ATCFLine &) const;
       bool is_match(const ATCFLine &) const;
 
 };
@@ -190,6 +200,8 @@ inline void TrackPoint::set_lon(const double l)        { Lon = l;       }
 inline void TrackPoint::set_v_max(const int v)         { Vmax = v;      }
 inline void TrackPoint::set_mslp(const int v)          { MSLP = v;      }
 inline void TrackPoint::set_level(CycloneLevel l)      { Level = l;     }
+inline void TrackPoint::set_speed(const double s)      { Speed = s;     }
+inline void TrackPoint::set_direction(const double d)  { Direction = d; }
 inline void TrackPoint::set_watch_warn(WatchWarnType t){ WatchWarn = t; }
 
 inline unixtime      TrackPoint::valid()      const { return(ValidTime); }
@@ -199,6 +211,8 @@ inline double        TrackPoint::lon()        const { return(Lon);       }
 inline int           TrackPoint::v_max()      const { return(Vmax);      }
 inline int           TrackPoint::mslp()       const { return(MSLP);      }
 inline CycloneLevel  TrackPoint::level()      const { return(Level);     }
+inline double        TrackPoint::speed()      const { return(Speed);     }
+inline double        TrackPoint::direction()  const { return(Direction); }
 inline WatchWarnType TrackPoint::watch_warn() const { return(WatchWarn); }
 
 ////////////////////////////////////////////////////////////////////////
