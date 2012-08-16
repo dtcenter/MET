@@ -49,7 +49,23 @@ static const int nvtx = 10;
 
 extern "C" {
    void acerr_(float [mxp], float [mxp], float [mxp], float [mxp],
-           int *, float [mxp], float [mxp], int *);
+           int *, float [mxp], float [mxp], int *);           
+   void oclip_(char [2], int *, int *, int *, int *,
+           float *,  float *,  float *, float *, float *,
+           float *,  float *,  float *, float *, float *,
+           float [nvtx], float [nvtx], float [nvtx]);
+   void oclip5_(char [2], int *, int *, int *, int *,
+           float *,  float *,  float *, float *, float *,
+           float *,  float *,  float *, float *, float *,
+           float [nvtx], float [nvtx], float [nvtx]);
+   void oclipd5_(char [2], int *, int *, int *, int *,
+           float *,  float *,  float *, float *, float *,
+           float *,  float *,  float *, float *, float *,
+           float [nvtx], float [nvtx], float [nvtx]);
+   void oclipd5_test__(char [2], int *, int *, int *, int *,
+           float *,  float *,  float *, float *, float *,
+           float *,  float *,  float *, float *, float *,
+           float [nvtx], float [nvtx], float [nvtx]);
    void btclip_(char [2], int *, int *, int *, int *,
            float [mxp],  float [mxp],  float [mxp],
            float [mxp],  float [mxp],  float [mxp],
@@ -262,7 +278,8 @@ void process_tracks() {
             n_match++;
             mlog << Debug(4)
                  << "[Track " << i+1 << "] ADECK track " << i+1
-                 << " matches BDECK track " << j+1 << ":\n"
+                 << " (" << adeck_tracks[i].technique()
+                 << ") matches BDECK track " << j+1 << ":\n"
                  << "    ADECK: " << adeck_tracks[i].serialize() << "\n"
                  << "    BDECK: " << bdeck_tracks[j].serialize() << "\n";
 
@@ -769,7 +786,7 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
 
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
-        << conf_info.OperBaseline.n_elements() << " methods.\n";
+        << conf_info.OperBaseline.n_elements() << " method(s).\n";
    
    // Loop over the ADECK tracks
    for(i=0; i<atracks.n_tracks(); i++) {
@@ -788,7 +805,7 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
    
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR BEST track baseline forecasts using "
-        << conf_info.BestBaseline.n_elements() << " methods.\n";
+        << conf_info.BestBaseline.n_elements() << " method(s).\n";
 
    // Loop over the BDECK tracks
    for(i=0; i<btracks.n_tracks(); i++) {
@@ -823,7 +840,8 @@ void derive_baseline_model(const ConcatString &model,
    char basin[2];
    float tp_mon[mxp], tp_day[mxp], tp_hr[mxp];
    float tp_lat[mxp], tp_lon[mxp], tp_vmax[mxp];
-   float clip_lat[nvtx], clip_lon[nvtx], clip_vmax[nvtx];
+   float tp_dir[2], tp_spd[2];
+   float bl_lat[nvtx], bl_lon[nvtx], bl_vmax[nvtx];
    TrackInfo  new_track;
    TrackPoint new_point;
 
@@ -835,60 +853,115 @@ void derive_baseline_model(const ConcatString &model,
        exit(1);
    }
 
+   // Populate input variables for operational baselines
+   if(model[0] == 'O') {
+     
+      // Loop over the track points and populate date/location arrays
+      for(i=i_start, ntp=0; i<ti.n_points(); i++) {
+
+         // Store lead time = 0 in index 0
+         if(ti[i].lead() == 0) {
+            tp_lat[0]  = (float) ti[i].lat();
+            tp_lon[0]  = (float) ti[i].lon();
+            tp_vmax[0] = (float) ti[i].v_max();
+            tp_dir[0]  = (float) ti[i].direction();
+            tp_spd[0]  = (float) ti[i].speed();
+         }
+
+         // Store lead time = -12 in index 1
+         else if(ti[i].lead() == (-12*sec_per_hour)) {
+            tp_lat[1]  = (float) ti[i].lat();
+            tp_lon[1]  = (float) ti[i].lon();
+            tp_vmax[1] = (float) ti[i].v_max();
+            tp_dir[1]  = (float) ti[i].direction();
+            tp_spd[1]  = (float) ti[i].speed();
+         }
+
+      } // end for i
+   }
+
+   // Populate input variables for BEST track baselines
+   if(model[0] == 'B') {
+
+      // Loop over the track points and populate date/location arrays
+      for(i=i_start, ntp=0; i<ti.n_points(); i++) {
+
+         // Check if the current time is a 6-hour interval
+         if((ti[i].valid()%(6*sec_per_hour)) != 0) continue;
+      
+         // Process the valid time
+         unix_to_mdyhms(ti[i].valid(),
+                        mon, day, yr, hr, minute, sec);
+
+         // Store the valid time, location, and max wind
+         tp_mon[ntp]  = (float) mon;
+         tp_day[ntp]  = (float) day;
+         tp_hr[ntp]   = (float) hr;
+         tp_lat[ntp]  = (float) ti[i].lat();
+         tp_lon[ntp]  = (float) ti[i].lon();
+         tp_vmax[ntp] = (float) ti[i].v_max();
+
+         // Increment the track point counter
+         ntp++;
+
+      } // end for i
+   }
+
    // Store the basin name
    strncpy(basin, ti.basin(), 2);
-
-   // Loop over the track points and populate date/location arrays
-   for(i=i_start, ntp=0; i<ti.n_points(); i++) {
-
-      // Check if the current time is a 6-hour interval
-      if((ti[i].valid()%(6*sec_per_hour)) != 0) continue;
-      
-      // Process the valid time
-      unix_to_mdyhms(ti[i].valid(),
-                     mon, day, yr, hr, minute, sec);
-
-      // Store the valid time, location, and max wind
-      tp_mon[ntp]  = (float) mon;
-      tp_day[ntp]  = (float) day;
-      tp_hr[ntp]   = (float) hr;
-      tp_lat[ntp]  = (float) ti[i].lat();
-      tp_lon[ntp]  = (float) ti[i].lon();
-      tp_vmax[ntp] = (float) ti[i].v_max();
-
-      // Increment the track point counter
-      ntp++;
-
-   } // end for i
-     
+    
    // Store the valid time of the starting point
    unix_to_mdyhms(ti[i_start].valid(),
                   mon, day, yr, hr, minute, sec);
-                  
+
    // Call appropriate subroutine to derive baseline model
-   if(model == "BCLP") {
+   if(model == "OCLP") {
+      oclip_(basin, &yr, &mon, &day, &hr,
+         &tp_lat[0], &tp_lon[0], &tp_vmax[0], &tp_dir[0], &tp_spd[0],
+         &tp_lat[1], &tp_lon[1], &tp_vmax[1], &tp_dir[1], &tp_spd[1],
+         bl_lat,     bl_lon,     bl_vmax);
+   }
+   else if(model == "OCS5") {
+      oclip5_(basin, &yr, &mon, &day, &hr,
+         &tp_lat[0], &tp_lon[0], &tp_vmax[0], &tp_dir[0], &tp_spd[0],
+         &tp_lat[1], &tp_lon[1], &tp_vmax[1], &tp_dir[1], &tp_spd[1],
+         bl_lat,     bl_lon,     bl_vmax);
+   }
+   else if(model == "OCD5") {
+      oclipd5_(basin, &yr, &mon, &day, &hr,
+         &tp_lat[0], &tp_lon[0], &tp_vmax[0], &tp_dir[0], &tp_spd[0],
+         &tp_lat[1], &tp_lon[1], &tp_vmax[1], &tp_dir[1], &tp_spd[1],
+         bl_lat,     bl_lon,     bl_vmax);
+   }
+   else if(model == "OCDT") {
+      oclipd5_test__(basin, &yr, &mon, &day, &hr,
+         &tp_lat[0], &tp_lon[0], &tp_vmax[0], &tp_dir[0], &tp_spd[0],
+         &tp_lat[1], &tp_lon[1], &tp_vmax[1], &tp_dir[1], &tp_spd[1],
+         bl_lat,     bl_lon,     bl_vmax);
+   }
+   else if(model == "BCLP") {
       btclip_(basin, &mon, &day, &hr, &ntp,
-              tp_mon,   tp_day,   tp_hr,
-              tp_lat,   tp_lon,   tp_vmax,
-              clip_lat, clip_lon, clip_vmax);
+         tp_mon,   tp_day,   tp_hr,
+         tp_lat,   tp_lon,   tp_vmax,
+         bl_lat,   bl_lon,   bl_vmax);
    }
    else if(model == "BCS5") {
       btclip5_(basin, &yr, &mon, &day, &hr, &ntp,
-               tp_mon,   tp_day,   tp_hr,
-               tp_lat,   tp_lon,   tp_vmax,
-               clip_lat, clip_lon, clip_vmax);
+         tp_mon,   tp_day,   tp_hr,
+         tp_lat,   tp_lon,   tp_vmax,
+         bl_lat,   bl_lon,   bl_vmax);
    }
    else if(model == "BCD5") {
       btclipd5_(basin, &yr, &mon, &day, &hr, &ntp,
-                tp_mon,   tp_day,   tp_hr,
-                tp_lat,   tp_lon,   tp_vmax,
-                clip_lat, clip_lon, clip_vmax);
+         tp_mon,   tp_day,   tp_hr,
+         tp_lat,   tp_lon,   tp_vmax,
+         bl_lat,   bl_lon,   bl_vmax);
    }
    else if(model == "BCLA") {
       btclipa_(basin, &mon, &day, &hr, &ntp,
-               tp_mon,   tp_day,   tp_hr,
-               tp_lat,   tp_lon,   tp_vmax,
-               clip_lat, clip_lon, clip_vmax);
+         tp_mon,   tp_day,   tp_hr,
+         tp_lat,   tp_lon,   tp_vmax,
+         bl_lat,   bl_lon,   bl_vmax);
    }
    else {
        mlog << Error
@@ -896,7 +969,6 @@ void derive_baseline_model(const ConcatString &model,
             << "unsupported baseline model type \"" << model
             << "\".\n\n";
        exit(1);
-
    }
 
    // Populate the CLIPER/SHIFOR track info
@@ -906,14 +978,23 @@ void derive_baseline_model(const ConcatString &model,
    new_track.set_storm_name(ti.storm_name());
    new_track.set_technique(model);
    new_track.set_technique_number(ti.technique_number());
-         
-   // Loop over the track points
+   new_track.set_storm_id();
+
+   // Store the initial track point
+   new_point.set_valid(ti[i_start].valid());
+   new_point.set_lead(0);
+   new_point.set_lat(tp_lat[0]);
+   new_point.set_lon(tp_lon[0]);
+   if(!is_bad_data(tp_vmax[0])) new_point.set_v_max(tp_vmax[0]);
+   new_track.add(new_point);
+   
+   // Loop over the remaining track points
    for(i=0; i<nvtx; i++) {
 
       // Check for bad data
-      if(is_bad_data(clip_lat[i]) || is_bad_data(clip_lon[i]) ||
-         clip_lat[i] < -90        || clip_lon[i] < -180       ||
-         clip_lat[i] >  90        || clip_lat[i] > 180) break;
+      if(is_bad_data(bl_lat[i]) || is_bad_data(bl_lon[i]) ||
+         bl_lat[i] < -90        || bl_lon[i] < -180       ||
+         bl_lat[i] >  90        || bl_lat[i] >  180) break;
         
          // Initialize
          new_point.clear();
@@ -927,9 +1008,9 @@ void derive_baseline_model(const ConcatString &model,
          // Setup the current track point
          new_point.set_valid(ut);
          new_point.set_lead(lead_sec);
-         new_point.set_lat(clip_lat[i]);
-         new_point.set_lon(clip_lon[i]);
-         if(!is_bad_data(clip_vmax[i])) new_point.set_v_max(clip_vmax[i]);
+         new_point.set_lat(bl_lat[i]);
+         new_point.set_lon(bl_lon[i]);
+         if(!is_bad_data(bl_vmax[i])) new_point.set_v_max(bl_vmax[i]);
 
          // Add the current CLIPER/SHIFOR track point
          new_track.add(new_point);
