@@ -393,6 +393,8 @@ void TrackPoint::clear() {
    Vmax      = bad_data_int;
    MSLP      = bad_data_int;
    Level     = NoCycloneLevel;
+   Speed     = bad_data_double;
+   Direction = bad_data_double;
    WatchWarn = NoWatchWarnType;
 
    // Call clear for each Wind object and then set intensity value
@@ -417,6 +419,8 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "Vmax      = " << Vmax << "\n";
    out << prefix << "MSLP      = " << MSLP << "\n";
    out << prefix << "Level     = " << cyclonelevel_to_string(Level) << "\n";
+   out << prefix << "Speed     = " << Speed << "\n";
+   out << prefix << "Direction = " << Direction << "\n";
    out << prefix << "WatchWarn = " << watchwarntype_to_string(WatchWarn) << "\n";
 
    for(i=0; i<NWinds; i++) {
@@ -442,6 +446,8 @@ ConcatString TrackPoint::serialize() const {
      << ", Vmax = " << Vmax
      << ", MSLP = " << MSLP
      << ", Level = " << cyclonelevel_to_string(Level)
+     << ", Speed = " << Speed
+     << ", Direction = " << Direction
      << ", WatchWarn = " << watchwarntype_to_string(WatchWarn);
 
    return(s);
@@ -478,6 +484,8 @@ void TrackPoint::assign(const TrackPoint &t) {
    Vmax      = t.Vmax;
    MSLP      = t.MSLP;
    Level     = t.Level;
+   Speed     = t.Speed;
+   Direction = t.Direction;
    WatchWarn = t.WatchWarn;
    
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
@@ -498,6 +506,8 @@ void TrackPoint::initialize(const ATCFLine &l) {
    Vmax      = l.v_max();
    MSLP      = l.mslp();
    Level     = l.level();
+   Speed     = l.storm_speed();
+   Direction = l.storm_direction();
 
    return;
 }
