@@ -378,16 +378,17 @@ void process_track_files(const StringArray &files,
    mlog << Debug(3)
         << "Identified " << tracks.n_tracks() << " track(s).\n";
 
-   // Dump out the count of points for each track
-   for(i=0; i<tracks.n_tracks(); i++) {
-      mlog << Debug(4)
-           << "[Track " << i+1 << "] " << tracks[i].serialize() << "\n";
-   }
-
    // Dump out very verbose output
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << tracks.serialize_r() << "\n";
+   }
+   // Dump out track info
+   else {
+      for(i=0; i<tracks.n_tracks(); i++) {
+         mlog << Debug(4)
+              << "[Track " << i+1 << "] " << tracks[i].serialize() << "\n";
+      }
    }
 
    return;
@@ -614,7 +615,7 @@ void derive_consensus(TrackInfoArray &tracks) {
    ConcatString cur_case;
    StringArray case_list, case_cmp;
    TrackInfoArray con_tracks;
-   TrackInfo con;
+   TrackInfo new_track;
    const char *sep = " ";
 
    // If no consensus models are defined, nothing to do
@@ -650,7 +651,7 @@ void derive_consensus(TrackInfoArray &tracks) {
 
          // Initialize
          con_tracks.clear();
-         con.clear();
+         new_track.clear();
 
          // Loop through the consensus members
          for(k=0; k<conf_info.ConMembers[j].n_elements(); k++) {
@@ -683,21 +684,22 @@ void derive_consensus(TrackInfoArray &tracks) {
          }
 
          // Derive the consensus model from the TrackInfoArray
-         con = consensus(con_tracks, conf_info.ConModel[j], conf_info.ConMinReq[j]);
+         new_track = consensus(con_tracks, conf_info.ConModel[j],
+                               conf_info.ConMinReq[j]);
 
-         mlog << Debug(4)
-              << "[Case " << i+1 << "] For case \"" << case_list[i]
-              << "\" adding consensus model \"" << conf_info.ConModel[j]
-              << "\" since the minimum number of required members were found ("
-              << con_tracks.n_tracks() << " >= "
-              << conf_info.ConMinReq[j] << "):\n"
-              << "    " << con.serialize() << "\n";
-
-         mlog << Debug(5)
-              << "Adding consensus track:\n" << con.serialize_r(1) << "\n";
+         if(mlog.verbosity_level() >= 5) {
+            mlog << Debug(5)
+                 << "Adding consensus track:\n"
+                 << new_track.serialize_r(1) << "\n";
+         }
+         else {
+            mlog << Debug(4)
+                 << "Adding consensus track:\n"
+                 << new_track.serialize() << "\n";
+         }
          
          // Add the consensus model
-         tracks.add(con);
+         tracks.add(new_track);
 
       } // end for j
 
@@ -711,8 +713,8 @@ void derive_consensus(TrackInfoArray &tracks) {
 
 void derive_lag(TrackInfoArray &tracks) {
    int i, j, k, s, n_tracks;
-   TrackInfo lag_info;
-   TrackPoint lag_point;
+   TrackInfo new_track;
+   TrackPoint new_point;
    ConcatString lag_model;
    
    // If no time lags are requested, nothing to do
@@ -735,38 +737,45 @@ void derive_lag(TrackInfoArray &tracks) {
       for(j=0; j<n_tracks; j++) {
 
          // Make a copy of the current track
-         lag_info = tracks[j];
+         new_track = tracks[j];
          
          // Adjust the TrackInfo model name
-         lag_model << cs_erase << lag_info.technique()
+         lag_model << cs_erase << new_track.technique()
                    << "_LAG_" << sec_to_timestring(s);
-         lag_info.set_technique(lag_model);
+         new_track.set_technique(lag_model);
 
          // Adjust the TrackInfo times
-         lag_info.set_init(lag_info.init() + s);
-         lag_info.set_valid_min(lag_info.valid_min() + s);
-         lag_info.set_valid_max(lag_info.valid_max() + s);
+         new_track.set_init(new_track.init() + s);
+         new_track.set_valid_min(new_track.valid_min() + s);
+         new_track.set_valid_max(new_track.valid_max() + s);
       
          // Loop over the track points
-         for(k=0; k<lag_info.n_points(); k++) {
+         for(k=0; k<new_track.n_points(); k++) {
 
             // Make a copy of the current track point
-            lag_point = lag_info[k];
+            new_point = new_track[k];
             
             // Adjust the TrackPoint times
-            lag_point.set_valid(lag_point.valid() + s);
+            new_point.set_valid(new_point.valid() + s);
 
             // Store the current time-lagged track point
-            lag_info.set_point(k, lag_point);
+            new_track.set_point(k, new_point);
             
          } // end for k
 
-         mlog << Debug(5)
-              << "Adding time-lagged track:\n"
-              << lag_info.serialize_r(1) << "\n";
+         if(mlog.verbosity_level() >= 5) {
+            mlog << Debug(5)
+                 << "Adding time-lagged track:\n"
+                 << new_track.serialize_r(1) << "\n";
+         }
+         else {
+            mlog << Debug(4)
+                 << "Adding time-lagged track:\n"
+                 << new_track.serialize() << "\n";
+         }
 
          // Store the current time-lagged track
-         tracks.add(lag_info);
+         tracks.add(new_track);
 
       } // end for j
 
@@ -1017,9 +1026,16 @@ void derive_baseline_model(const ConcatString &model,
 
    } // end for j
 
-   mlog << Debug(5)
-        << "Adding CLIPER/SHIFOR track:\n"
-        << new_track.serialize_r(1) << "\n";
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << "Adding CLIPER/SHIFOR track:\n"
+           << new_track.serialize_r(1) << "\n";
+   }
+   else {
+      mlog << Debug(4)
+           << "Adding CLIPER/SHIFOR track:\n"
+           << new_track.serialize() << "\n";
+   }
 
    // Add the CLIPER/SHIFOR track to the ADECKS
    atracks.add(new_track);
