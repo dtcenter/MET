@@ -113,9 +113,9 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
    out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
-   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : "(unset)") << "\"\n";
-   out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : "(unset)") << "\"\n";
-   out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : "(unset)") << "\"\n";
+   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str) << "\n";
+   out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : na_str) << "\n";
+   out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str) << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
       
@@ -142,9 +142,9 @@ ConcatString TrackInfo::serialize() const {
      << ", StormName = \"" << (StormName ? StormName.text() : "(nul)") << "\""
      << ", TechniqueNumber = " << TechniqueNumber
      << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
-     << ", InitTime = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : "(unset)") << "\""
-     << ", MinValidTime = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : "(unset)") << "\""
-     << ", MaxValidTime = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : "(unset)") << "\""
+     << ", InitTime = " << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str)
+     << ", MinValidTime = " << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : na_str)
+     << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str)
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc;
 

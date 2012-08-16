@@ -411,9 +411,9 @@ void TrackPoint::clear() {
 void TrackPoint::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
-
-   out << prefix << "ValidTime = " << unix_to_yyyymmdd_hhmmss(ValidTime) << "\n";
-   out << prefix << "LeadTime  = " << sec_to_hhmmss(LeadTime) << "\n";
+   
+   out << prefix << "ValidTime = " << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime) : na_str) << "\n";
+   out << prefix << "LeadTime  = " << (!is_bad_data(LeadTime) ? sec_to_hhmmss(LeadTime) : na_str) << "\n";
    out << prefix << "Lat       = " << Lat << "\n";
    out << prefix << "Lon       = " << Lon << "\n";
    out << prefix << "Vmax      = " << Vmax << "\n";
@@ -439,8 +439,8 @@ ConcatString TrackPoint::serialize() const {
    ConcatString s;
 
    s << "TrackPoint: "
-     << "ValidTime = " << unix_to_yyyymmdd_hhmmss(ValidTime)
-     << ", LeadTime = " << sec_to_hhmmss(LeadTime)
+     << "ValidTime = " << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime) : na_str)
+     << ", LeadTime = " << (!is_bad_data(LeadTime) ? sec_to_hhmmss(LeadTime) : na_str)
      << ", Lat = " << Lat
      << ", Lon = " << Lon
      << ", Vmax = " << Vmax
