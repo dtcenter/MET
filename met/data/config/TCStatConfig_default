@@ -267,7 +267,7 @@ out_valid_mask = "";
 //             "AC" for along-track and cross-track errors.
 //             "XY" for x-track and y-track errors.
 //             "col" for a specific column name.
-//             "col1-col2" for a difference of two columns
+//             "col1-col2" for a difference of two columns.
 //             "ABS(col or col1-col2)" for the absolute value.
 //          Required Args: -column
 //          Optional Args: -by column_name to specify case information
