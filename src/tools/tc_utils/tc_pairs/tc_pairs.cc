@@ -225,12 +225,24 @@ void process_tracks() {
         << "Processing " << adeck_files.n_elements()
         << " ADECK file(s).\n";
    process_track_files(adeck_files, adeck_tracks);
+   mlog << Debug(2)
+        << "Found " << adeck_tracks.n_tracks()
+        << " ADECK track(s).\n";
 
+   // Filter the ADECK tracks using the config file information
+   mlog << Debug(2)
+        << "Filtering " << adeck_tracks.n_tracks()
+        << " ADECK tracks based on config file settings.\n";
+   filter_tracks(adeck_tracks);
+        
    // Process the BDECK track files
    mlog << Debug(2)
         << "Processing " << bdeck_files.n_elements()
         << " BDECK file(s).\n";
    process_track_files(bdeck_files, bdeck_tracks);
+   mlog << Debug(2)
+        << "Found " << bdeck_tracks.n_tracks()
+        << " BDECK track(s).\n";
 
    // Merge 6-hourly TrackPoints into 12-hourly interpolated Tracks
    if(conf_info.Interp12) {
@@ -239,12 +251,6 @@ void process_tracks() {
            << "interpolated tracks.\n";
       merge_interp12(adeck_tracks);
    }
-
-   // Filter the ADECK tracks using the config file information
-   mlog << Debug(2)
-        << "Filtering " << adeck_tracks.n_tracks()
-        << " ADECK tracks based on config file settings.\n";
-   filter_tracks(adeck_tracks);
    
    // Derive consensus forecasts from the ADECK tracks
    mlog << Debug(2)
@@ -264,6 +270,12 @@ void process_tracks() {
                           conf_info.BestBaseline.n_elements()
         << " CLIPER/SHIFOR baseline track(s).\n";
    derive_baseline(adeck_tracks, bdeck_tracks);
+
+   // Filter the ADECK tracks using the config file information
+   mlog << Debug(2)
+        << "Filtering " << adeck_tracks.n_tracks()
+        << " ADECK tracks based on config file settings.\n";
+   filter_tracks(adeck_tracks);
    
    mlog << Debug(2)
         << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
@@ -415,7 +427,7 @@ void filter_tracks(TrackInfoArray &tracks) {
          continue;
       }
 
-      // Check model
+      // Check storm id
       if(conf_info.StormId.n_elements() > 0 &&
          !has_storm_id(conf_info.StormId, t[i].basin(),
                        t[i].cyclone(), t[i].init())) {
@@ -454,12 +466,14 @@ void filter_tracks(TrackInfoArray &tracks) {
 
       // Initialization time window
       if((conf_info.InitBeg > 0 &&
-          conf_info.InitBeg > t[i].init()) ||
+          conf_info.InitBeg < t[i].init()) ||
          (conf_info.InitEnd > 0 &&
-          conf_info.InitEnd < t[i].init())) {
+          conf_info.InitEnd > t[i].init()) ||
+         (conf_info.InitExc.n_elements() > 0 &&
+          conf_info.InitExc.has(t[i].init()))) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for falling outside of the "
-              << "initialization time window.\n";
+              << "Discarding track " << i+1 << " for its "
+              << "initialization time.\n";
          n_init++;
          continue;
       }
