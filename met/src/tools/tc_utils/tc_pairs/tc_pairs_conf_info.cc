@@ -64,22 +64,22 @@ void TCPairsConfInfo::clear() {
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
+   InitBeg = InitEnd = (unixtime) 0;
+   InitHour.clear();
+   ValidBeg = ValidEnd = (unixtime) 0;
+   InitMask.clear();
+   ValidMask.clear();
+   CheckDup = true;
+   Interp12 = true;
    NCon = 0;
    ConModel.clear();
    ConMinReq.clear();
    LagTime.clear();
    BestBaseline.clear();
    OperBaseline.clear();
-   InitBeg = InitEnd = (unixtime) 0;
-   InitHour.clear();
-   ValidBeg = ValidEnd = (unixtime) 0;
-   InitMask.clear();
-   ValidMask.clear();
+   MatchPoints = false;
    DLandFile.clear();
    WatchWarnFile.clear();
-   Interp12 = true;
-   CheckDup = true;
-   MatchPoints = false;
    Version.clear();
 
    return;
@@ -109,15 +109,15 @@ void TCPairsConfInfo::process_config() {
    StringArray sa;
    ConcatString poly_file;
 
+   // Conf: Version
+   Version = Conf.lookup_string("version");
+   check_met_version(Version);
+   
    // Conf: Model
    Model = Conf.lookup_string_array("model");
 
    // Conf: StormId
    StormId = Conf.lookup_string_array("storm_id");
-   
-   // Conf: Version
-   Version = Conf.lookup_string("version");
-   check_met_version(Version);
 
    // Conf: Basin
    Basin = Conf.lookup_string_array("basin");
@@ -127,7 +127,47 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: StormName
    Cyclone = Conf.lookup_string_array("storm_name");
+
+   // Conf: InitBeg, InitEnd
+   InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
+   InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
    
+   // Conf: InitExc
+   sa = Conf.lookup_string_array("init_exc");
+   for(i=0; i<sa.n_elements(); i++)
+      InitExc.add(timestring_to_unix(sa[i]));
+   
+   // Conf: InitHour
+   sa = Conf.lookup_string_array("init_hour");
+   for(i=0; i<sa.n_elements(); i++)
+      InitHour.add(timestring_to_sec(sa[i]));
+
+   // Conf: ValidBeg, ValidEnd
+   ValidBeg = timestring_to_unix(Conf.lookup_string("valid_beg"));
+   ValidEnd = timestring_to_unix(Conf.lookup_string("valid_end"));
+
+   // Conf: InitMask
+   if(nonempty(Conf.lookup_string("init_mask"))) {
+      poly_file = replace_path(Conf.lookup_string("init_mask"));
+      mlog << Debug(2)
+           << "Initialization polyline: " << poly_file << "\n";
+      InitMask.load(poly_file);
+   }
+
+   // Conf: ValidMask
+   if(nonempty(Conf.lookup_string("valid_mask"))) {
+      poly_file = replace_path(Conf.lookup_string("valid_mask"));
+      mlog << Debug(2)
+           << "Valid polyline: " << poly_file << "\n";
+      ValidMask.load(poly_file);
+   }
+
+   // Conf: CheckDup
+   CheckDup = Conf.lookup_bool("check_dup");
+
+   // Conf: Interp12
+   Interp12 = Conf.lookup_bool("interp12");
+
    // Conf: ConModel
    ConModel = Conf.lookup_string_array("con_model");
 
@@ -163,50 +203,15 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: OperBaseline
    OperBaseline = Conf.lookup_string_array("oper_baseline");
-   
-   // Conf: InitBeg, InitEnd
-   InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
-   InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
 
-   // Conf: InitHour
-   sa = Conf.lookup_string_array("init_hour");
-   for(i=0; i<sa.n_elements(); i++)
-      InitHour.add(timestring_to_sec(sa[i]));
-   
-   // Conf: ValidBeg, ValidEnd
-   ValidBeg = timestring_to_unix(Conf.lookup_string("valid_beg"));
-   ValidEnd = timestring_to_unix(Conf.lookup_string("valid_end"));
-
-   // Conf: InitMask
-   if(nonempty(Conf.lookup_string("init_mask"))) {
-      poly_file = replace_path(Conf.lookup_string("init_mask"));
-      mlog << Debug(2)
-           << "Initialization polyline: " << poly_file << "\n";
-      InitMask.load(poly_file);
-   }
-
-   // Conf: ValidMask
-   if(nonempty(Conf.lookup_string("valid_mask"))) {
-      poly_file = replace_path(Conf.lookup_string("valid_mask"));
-      mlog << Debug(2)
-           << "Valid polyline: " << poly_file << "\n";
-      ValidMask.load(poly_file);
-   }
+   // Conf: MatchPoints
+   MatchPoints = Conf.lookup_bool("match_points");   
 
    // Conf: DLandFile
    DLandFile = Conf.lookup_string("dland_file");
 
    // Conf: WatchWarnFile
    WatchWarnFile = Conf.lookup_string("watch_warn_file");
-   
-   // Conf: Interp12
-   Interp12 = Conf.lookup_bool("interp12");
-
-   // Conf: CheckDup
-   CheckDup = Conf.lookup_bool("check_dup");
-
-   // Conf: MatchPoints
-   MatchPoints = Conf.lookup_bool("match_points");
    
    return;
 }
