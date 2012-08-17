@@ -40,11 +40,11 @@ static const char * tc_mpr_cols [] = {
    "ADLAND",      "BDLAND",
    "AMSLP",       "BMSLP",
    "AMAX_WIND",   "BMAX_WIND",
-   "AQUAD_WIND_", "BQUAD_WIND_",
-   "ARAD1_WIND_", "BRAD1_WIND_",
-   "ARAD2_WIND_", "BRAD2_WIND_",
-   "ARAD3_WIND_", "BRAD3_WIND_",
-   "ARAD4_WIND_", "BRAD4_WIND_"
+   "AAL_WIND_",   "BAL_WIND_",
+   "ANE_WIND_",   "BNE_WIND_",
+   "ASE_WIND_",   "BSE_WIND_",
+   "ASW_WIND_",   "BSW_WIND_",
+   "ANW_WIND_",   "BNW_WIND_"
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -62,10 +62,21 @@ static const char * tc_cols_track [] = {
 static const int n_tc_cols_track = sizeof(tc_cols_track)/sizeof(*tc_cols_track);
 
 static const char * tc_cols_wind [] = {
-   "ARAD1_WIND_", "BRAD1_WIND_",
-   "ARAD2_WIND_", "BRAD2_WIND_",
-   "ARAD3_WIND_", "BRAD3_WIND_",
-   "ARAD4_WIND_", "BRAD4_WIND_"
+   "ABS(AAL_WIND_34-BAL_WIND_34)",
+   "ABS(ANE_WIND_34-BNE_WIND_34)",
+   "ABS(ASE_WIND_34-BSE_WIND_34)",
+   "ABS(ASW_WIND_34-BSW_WIND_34)",
+   "ABS(ANW_WIND_34-BNW_WIND_34)",
+   "ABS(AAL_WIND_50-BAL_WIND_50)",
+   "ABS(ANE_WIND_50-BNE_WIND_50)",
+   "ABS(ASE_WIND_50-BSE_WIND_50)",
+   "ABS(ASW_WIND_50-BSW_WIND_50)",
+   "ABS(ANW_WIND_50-BNW_WIND_50)",
+   "ABS(AAL_WIND_64-BAL_WIND_64)",
+   "ABS(ANE_WIND_64-BNE_WIND_64)",
+   "ABS(ASE_WIND_64-BSE_WIND_64)",
+   "ABS(ASW_WIND_64-BSW_WIND_64)",
+   "ABS(ANW_WIND_64-BNW_WIND_64)"
 };
 static const int n_tc_cols_wind = sizeof(tc_cols_wind)/sizeof(*tc_cols_wind);
 
@@ -80,7 +91,7 @@ static const char * tc_cols_ac [] = {
 static const int n_tc_cols_ac = sizeof(tc_cols_ac)/sizeof(*tc_cols_ac);
 
 static const char * tc_cols_xy [] = {
-  "ABS(ALAT-BLAT)", "ABS(ALON-BLON)"
+  "ABS(X_ERR)", "ABS(Y_ERR)"
 };
 static const int n_tc_cols_xy = sizeof(tc_cols_xy)/sizeof(*tc_cols_xy);
 

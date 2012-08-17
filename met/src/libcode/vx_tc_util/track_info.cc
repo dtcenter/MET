@@ -866,7 +866,7 @@ bool TrackInfoArray::has(const ATCFLine &l) const {
 
 TrackInfo consensus(const TrackInfoArray &tracks,
                     const ConcatString &model, int req) {
-   int i, j, k, i_pnt;
+   int i, j, i_pnt;
    TrackInfo tavg;
    NumArray lead_list;
 
@@ -966,7 +966,11 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          wavg = pavg[j];
 
          // Compute the average wind
-         for(k=0; k<NQuadInfoValues; k++) wavg.set_value(k, nint(wavg[k]/pcnt));
+         wavg.set_al_val(wavg.al_val()/pcnt);
+         wavg.set_ne_val(wavg.ne_val()/pcnt);
+         wavg.set_se_val(wavg.se_val()/pcnt);
+         wavg.set_sw_val(wavg.sw_val()/pcnt);
+         wavg.set_nw_val(wavg.nw_val()/pcnt);
 
          // Store the average wind
          pavg.set_wind(j, wavg);

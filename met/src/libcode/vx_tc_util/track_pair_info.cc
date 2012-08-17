@@ -311,7 +311,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
    TrackPoint *tp = (TrackPoint *) 0;
    QuadInfo wind;
    ConcatString cs;
-   int i, j, k;
+   int i, j;
    
    // Check the line type
    if(l.type() != TCStatLineType_TCMPR) return;
@@ -352,15 +352,18 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
          // Set the wind intensity and quadrant
          wind.set_intensity(WindIntensity[j]);
-         cs << cs_erase << deck[i] << "QUAD_WIND_" << WindIntensity[j];
-         wind.set_quadrant(string_to_quadranttype(l.get_item(cs)));
 
          // Set the wind radius values
-         for(k=0; k<NQuadInfoValues; k++) {
-            cs << cs_erase << deck[i] << "RAD" << k+1
-               << "_WIND_" << WindIntensity[j];
-            wind.set_value(k, atof(l.get_item(cs)));
-         }
+         cs << cs_erase << deck[i] << "AL_WIND_" << WindIntensity[j];
+         wind.set_al_val(atof(l.get_item(cs)));
+         cs << cs_erase << deck[i] << "NE_WIND_" << WindIntensity[j];
+         wind.set_ne_val(atof(l.get_item(cs)));
+         cs << cs_erase << deck[i] << "SE_WIND_" << WindIntensity[j];
+         wind.set_se_val(atof(l.get_item(cs)));
+         cs << cs_erase << deck[i] << "SW_WIND_" << WindIntensity[j];
+         wind.set_sw_val(atof(l.get_item(cs)));
+         cs << cs_erase << deck[i] << "NW_WIND_" << WindIntensity[j];
+         wind.set_nw_val(atof(l.get_item(cs)));
 
          // Add wind to TrackInfo
          tp->set_wind(j, wind);
