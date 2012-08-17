@@ -62,7 +62,6 @@ QuadInfo & QuadInfo::operator=(const QuadInfo &t) {
 ////////////////////////////////////////////////////////////////////////
 
 QuadInfo & QuadInfo::operator+=(const QuadInfo &t) {
-   int i;
 
    // Check intensity
    if(is_bad_data(Intensity)) Intensity = t.intensity();
@@ -74,21 +73,26 @@ QuadInfo & QuadInfo::operator+=(const QuadInfo &t) {
       exit(1);
    }
 
-   // Check quadrant
-   if(Quadrant == NoQuadrantType) Quadrant = t.quadrant();
-   else if(Quadrant != t.quadrant()) {
-      mlog << Error
-           << "\nQuadInfo::operator+=(const QuadInfo &t) -> "
-           << "cannot call += for two different quadrants ("
-           << quadranttype_to_string(Quadrant) << " != "
-           << quadranttype_to_string(t.quadrant()) << ").\n\n";
-      exit(1);
-   }
-
    // Increment counts
-   for(i=0; i<NQuadInfoValues; i++) Value[i] += t[i];
+   ALVal += t.ALVal;
+   NEVal += t.NEVal;
+   SEVal += t.SEVal;
+   SWVal += t.SWVal;
+   NWVal += t.NWVal;
 
    return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool QuadInfo::operator==(const QuadInfo &t) const {
+
+   return(Intensity == t.Intensity &&
+          is_eq(ALVal, t.ALVal)    &&
+          is_eq(NEVal, t.NEVal)    &&
+          is_eq(SEVal, t.SEVal)    &&
+          is_eq(SWVal, t.SWVal)    &&
+          is_eq(NWVal, t.NWVal));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -106,12 +110,12 @@ void QuadInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void QuadInfo::clear() {
-   int i;
 
-   Quadrant  = NoQuadrantType;
-
-   // Initialize the values to 0 rather than bad data
-   for(i=0; i<NQuadInfoValues; i++) Value[i] = 0;
+   ALVal = bad_data_double;
+   NEVal = bad_data_double;
+   SEVal = bad_data_double;
+   SWVal = bad_data_double;
+   NWVal = bad_data_double;
 
    return;
 }
@@ -120,12 +124,13 @@ void QuadInfo::clear() {
 
 void QuadInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    out << prefix << "Intensity = " << Intensity << "\n";
-   out << prefix << "Quadrant  = " << quadranttype_to_string(Quadrant) << "\n";
-   for(i=0; i<NQuadInfoValues; i++)
-      out << prefix << "Value[" << i+1 << "]  = " << Value[i] << "\n";
+   out << prefix << "ALVal     = " << ALVal << "\n";
+   out << prefix << "NEVal     = " << NEVal << "\n";
+   out << prefix << "SEVal     = " << SEVal << "\n";
+   out << prefix << "SWVal     = " << SWVal << "\n";
+   out << prefix << "NWVal     = " << NWVal << "\n";
    out << flush;
 
    return;
@@ -135,16 +140,16 @@ void QuadInfo::dump(ostream &out, int indent_depth) const {
 
 ConcatString QuadInfo::serialize() const {
    ConcatString s;
-   int i;
 
    s << "QuadInfo: "
      << "Intensity = " << Intensity
-     << ", Quadrant = " << quadranttype_to_string(Quadrant);
-   for(i=0; i<NQuadInfoValues; i++)
-      s << ", Value[" << i+1 << "] = " << Value[i];
+     << ", ALVal = " << ALVal
+     << ", NEVal = " << NEVal
+     << ", SEVal = " << SEVal
+     << ", SWVal = " << SWVal
+     << ", NWVal = " << NWVal;
 
    return(s);
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -161,13 +166,15 @@ ConcatString QuadInfo::serialize_r(int n, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void QuadInfo::assign(const QuadInfo &t) {
-   int i;
 
    clear();
 
    Intensity = t.Intensity;
-   Quadrant  = t.Quadrant;
-   for(i=0; i<NQuadInfoValues; i++) Value[i] = t[i];
+   ALVal     = t.ALVal;
+   NEVal     = t.NEVal;
+   SEVal     = t.SEVal;
+   SWVal     = t.SWVal;
+   NWVal     = t.NWVal;
    
    return;
 }
@@ -176,16 +183,14 @@ void QuadInfo::assign(const QuadInfo &t) {
 
 void QuadInfo::set_wind(const ATCFLine &l) {
 
-   // Return if Intensity doesn't match ATCFLine intensity
+   // Return if intensity doesn't match ATCFLine intensity
    if(Intensity != l.wind_intensity()) return;
   
    clear();
 
-   Quadrant  = l.quadrant();
-   Value[0]  = l.radius1();
-   Value[1]  = l.radius2();
-   Value[2]  = l.radius3();
-   Value[3]  = l.radius4();
+   set_quad_vals(l.quadrant(),
+                 l.radius1(), l.radius2(),
+                 l.radius3(), l.radius4());
 
    return;
 }
@@ -196,50 +201,71 @@ void QuadInfo::set_seas(const ATCFLine &l) {
 
    // Return if Intensity doesn't match ATCFLine wave height
    if(Intensity != l.wave_height()) return;;
-  
+
    clear();
 
-   Intensity = l.wave_height();
-   Quadrant  = l.seas_code();
-   Value[0]  = l.seas_radius1();
-   Value[1]  = l.seas_radius2();
-   Value[2]  = l.seas_radius3();
-   Value[3]  = l.seas_radius4();
+   set_quad_vals(l.seas_code(),
+                 l.seas_radius1(), l.seas_radius2(),
+                 l.seas_radius3(), l.seas_radius4());
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void QuadInfo::set_value(int n, int v) {
+void QuadInfo::set_quad_vals(QuadrantType ref_quad,
+                             int rad1, int rad2, int rad3, int rad4) {
 
-   // Check the range
-   if((n < 0) || (n >= NQuadInfoValues)) {
-      mlog << Error
-           << "\nQuadInfo::set_value(int, int) -> "
-           << "range check error (" << n << ").\n\n";
-      exit(1);
+   // Switch logic based on the reference quadrant, couting clockwise.
+   switch(ref_quad) {
+
+     // Full circle radius is stored in the first radius
+     case(FullCircle):
+        ALVal = rad1;
+        break;
+        
+     case(NE_Quadrant):
+        NEVal = rad1;
+        SEVal = rad2;
+        SWVal = rad3;
+        NWVal = rad4;
+        break;
+        
+     case(SE_Quadrant):
+        NEVal = rad4;
+        SEVal = rad1;
+        SWVal = rad2;
+        NWVal = rad3;
+        break;
+        
+     case(SW_Quadrant):
+        NEVal = rad3;
+        SEVal = rad4;
+        SWVal = rad1;
+        NWVal = rad2;
+        break;
+        
+     case(NW_Quadrant):
+        NEVal = rad2;
+        SEVal = rad3;
+        SWVal = rad4;
+        NWVal = rad1;
+        break;
+
+     // Nothing to do
+     case(NoQuadrantType):
+        break;
+        
+     default:
+       mlog << Error
+            << "\nQuadInfo::set_quad_vals() -> "
+            << "unexpected quadrant type encountered \""
+            << quadranttype_to_string(ref_quad) << "\".\n\n";
+       exit(1);
+       break;
    }
-
-   // Set the value
-   Value[n] = v;
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int QuadInfo::operator[](int n) const {
-
-   // Check range
-   if((n < 0) || (n >= NQuadInfoValues)) {
-      mlog << Error
-           << "\nQuadInfo::operator[](int) -> "
-           << "range check error (" << n << ").\n\n";
-      exit(1);
-   }
-
-   return(Value[n]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -259,35 +285,23 @@ bool QuadInfo::has_seas(const ATCFLine &l) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool QuadInfo::is_match_wind(const ATCFLine &l) const {
-   bool match = true;
+   QuadInfo qi;
 
-   // Check storm and model info
-   if(Intensity != l.wind_intensity() ||
-      Quadrant  != l.quadrant()       ||
-      Value[0]  != l.radius1()        ||
-      Value[1]  != l.radius2()        ||
-      Value[2]  != l.radius3()        ||
-      Value[3]  != l.radius4())
-      match = false;
+   // Parse the line into a QuadInfo object
+   qi.set_wind(l);
 
-   return(match);
+   return(*this == qi);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool QuadInfo::is_match_seas(const ATCFLine &l) const {
-   bool match = true;
+   QuadInfo qi;
 
-   // Check storm and model info
-   if(Intensity != l.wind_intensity() ||
-      Quadrant  != l.seas_code()      ||
-      Value[0]  != l.seas_radius1()   ||
-      Value[1]  != l.seas_radius2()   ||
-      Value[2]  != l.seas_radius3()   ||
-      Value[3]  != l.seas_radius4())
-      match = false;
+   // Parse the line into a QuadInfo object
+   qi.set_seas(l);
 
-   return(match);
+   return(*this == qi);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -556,7 +570,7 @@ bool TrackPoint::set(const ATCFLine &l) {
 void TrackPoint::set_wind(int n, const QuadInfo &w) {
 
    // Check the range
-   if((n < 0) || (n >= NQuadInfoValues)) {
+   if((n < 0) || (n >= NWinds)) {
       mlog << Error
            << "\nQuadInfo::set_wind(int, const QuadInfo) -> "
            << "range check error (" << n << ").\n\n";

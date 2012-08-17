@@ -1286,7 +1286,7 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::add_column(const char *col) {
-   int i, i_wind;
+   int i;
    ConcatString s;
 
    //
@@ -1299,12 +1299,7 @@ void TCStatJobSummary::add_column(const char *col) {
    }
    // Wind errors
    else if(strcasecmp(col, "WIND") == 0) {
-      for(i_wind=0; i_wind<NWinds; i_wind++) {
-         for(i=0; i<n_tc_cols_wind; i++) {
-            s << cs_erase << tc_cols_wind[i] << WindIntensity[i_wind];
-            Column.add(s);
-         }
-      }
+      for(i=0; i<n_tc_cols_wind; i++) Column.add(tc_cols_wind[i]);
    }
    // Track and Intensity (TI)
    else if(strcasecmp(col, "TI") == 0) {

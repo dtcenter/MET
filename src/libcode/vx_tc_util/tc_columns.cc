@@ -86,11 +86,11 @@ int get_tc_mpr_col_offset(const char *col_name) {
    //    ADLAND,      BDLAND,
    //    AMSLP,       BMSLP,
    //    AMAX_WIND,   BMAX_WIND,
-   //   [AQUAD_WIND_, BQUAD_WIND_,
-   //    ARAD1_WIND_, BRAD1_WIND_,
-   //    ARAD2_WIND_, BRAD2_WIND_,
-   //    ARAD3_WIND_, BRAD3_WIND_,
-   //    ARAD4_WIND_, BRAD4_WIND_]
+   //   [AAL_WIND_,   BAL_WIND_,
+   //    ANE_WIND_,   BNE_WIND_,
+   //    ASE_WIND_,   BSE_WIND_,
+   //    ASW_WIND_,   BSW_WIND_,
+   //    ANW_WIND_,   BNW_WIND_]
    //    (for each wind intensity value)
 
    // Check the static columns
@@ -351,16 +351,16 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
 
    // Write variable columns
    for(j=0; j<NWinds; j++) {
-      at.set_entry(r, c++, quadranttype_to_string(p.adeck()[i][j].quadrant()));
-      at.set_entry(r, c++, quadranttype_to_string(p.bdeck()[i][j].quadrant()));
-      at.set_entry(r, c++, p.adeck()[i][j][0]);
-      at.set_entry(r, c++, p.bdeck()[i][j][0]);
-      at.set_entry(r, c++, p.adeck()[i][j][1]);
-      at.set_entry(r, c++, p.bdeck()[i][j][1]);
-      at.set_entry(r, c++, p.adeck()[i][j][2]);
-      at.set_entry(r, c++, p.bdeck()[i][j][2]);
-      at.set_entry(r, c++, p.adeck()[i][j][3]);
-      at.set_entry(r, c++, p.bdeck()[i][j][3]);
+      at.set_entry(r, c++, p.adeck()[i][j].al_val());
+      at.set_entry(r, c++, p.bdeck()[i][j].al_val());
+      at.set_entry(r, c++, p.adeck()[i][j].ne_val());
+      at.set_entry(r, c++, p.bdeck()[i][j].ne_val());
+      at.set_entry(r, c++, p.adeck()[i][j].se_val());
+      at.set_entry(r, c++, p.bdeck()[i][j].se_val());
+      at.set_entry(r, c++, p.adeck()[i][j].sw_val());
+      at.set_entry(r, c++, p.bdeck()[i][j].sw_val());
+      at.set_entry(r, c++, p.adeck()[i][j].nw_val());
+      at.set_entry(r, c++, p.bdeck()[i][j].nw_val());
    } // end for j
 
    return;

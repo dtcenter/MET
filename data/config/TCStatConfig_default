@@ -260,8 +260,15 @@ out_valid_mask = "";
 //       "summary"
 //          To compute the mean, standard deviation, and percentiles
 //          (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the columns
-//          specified using the "-column" argument, which may be set to ALL,
-//          TRACK, WIND, or an explicit column name.
+//          specified using the "-column" argument, which may be set to:
+//             "TRACK" for track, along-track, and cross-track errors.
+//             "WIND" for all wind radius errors.
+//             "TI" for track and maximum wind intensity errors.
+//             "AC" for along-track and cross-track errors.
+//             "XY" for x-track and y-track errors.
+//             "col" for a specific column name.
+//             "col1-col2" for a difference of two columns
+//             "ABS(col or col1-col2)" for the absolute value.
 //          Required Args: -column
 //          Optional Args: -by column_name to specify case information
 //                         -out_alpha to override default alpha value

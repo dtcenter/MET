@@ -22,8 +22,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int NQuadInfoValues = 4;
-
 // Define the wind intensity levels to be handled
 static const int WindIntensity[] = { 34, 50, 64 };
 static const int NWinds = sizeof(WindIntensity)/sizeof(*WindIntensity);
@@ -37,9 +35,12 @@ class QuadInfo {
 
       void assign(const QuadInfo &);
 
-      int          Intensity;
-      QuadrantType Quadrant;
-      int          Value[NQuadInfoValues];
+      int    Intensity;
+      double ALVal;
+      double NEVal;
+      double SEVal;
+      double SWVal;
+      double NWVal;
 
    public:
 
@@ -48,6 +49,7 @@ class QuadInfo {
       QuadInfo(const QuadInfo &);
       QuadInfo & operator=(const QuadInfo &);
       QuadInfo & operator+=(const QuadInfo &);
+      bool       operator==(const QuadInfo &) const;
 
       void clear();
 
@@ -61,18 +63,25 @@ class QuadInfo {
 
       void set_wind(const ATCFLine &);
       void set_seas(const ATCFLine &);
+      void set_quad_vals(QuadrantType, int, int, int, int);
 
       void set_intensity(int);
-      void set_quadrant(QuadrantType);
-      void set_value(int, int);
+      void set_al_val(double);
+      void set_ne_val(double);
+      void set_se_val(double);
+      void set_sw_val(double);
+      void set_nw_val(double);
 
          //
          //  get stuff
          //
 
-      int    operator[](int)       const;
-      int          intensity()     const;
-      QuadrantType quadrant()      const;
+      int    intensity() const;
+      double al_val()    const;
+      double ne_val()    const;
+      double se_val()    const;
+      double sw_val()    const;
+      double nw_val()    const;
 
          //
          //  do stuff
@@ -88,11 +97,19 @@ class QuadInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void QuadInfo::set_intensity(int i)         { Intensity = i; }
-inline void QuadInfo::set_quadrant(QuadrantType t) { Quadrant = t;  }
+inline void QuadInfo::set_intensity(int i) { Intensity = i; }
+inline void QuadInfo::set_al_val(double v) { ALVal = v;     }
+inline void QuadInfo::set_ne_val(double v) { NEVal = v;     }
+inline void QuadInfo::set_se_val(double v) { SEVal = v;     }
+inline void QuadInfo::set_sw_val(double v) { SWVal = v;     }
+inline void QuadInfo::set_nw_val(double v) { NWVal = v;     }
 
-inline int          QuadInfo::intensity() const { return(Intensity); }
-inline QuadrantType QuadInfo::quadrant()  const { return(Quadrant);  }
+inline int    QuadInfo::intensity() const { return(Intensity); }
+inline double QuadInfo::al_val()    const { return(ALVal);     }
+inline double QuadInfo::ne_val()    const { return(NEVal);     }
+inline double QuadInfo::se_val()    const { return(SEVal);     }
+inline double QuadInfo::sw_val()    const { return(SWVal);     }
+inline double QuadInfo::nw_val()    const { return(NWVal);     }
 
 ////////////////////////////////////////////////////////////////////////
 //
