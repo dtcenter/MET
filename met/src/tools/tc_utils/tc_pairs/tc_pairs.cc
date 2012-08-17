@@ -1161,6 +1161,10 @@ double compute_dland(double lat, double lon) {
    double x_dbl, y_dbl, dist;
    int x, y;
 
+   // Check for empty grid
+   if(dland_grid.nx() == 0 || dland_grid.ny() == 0)
+      return(bad_data_double);
+   
    // Convert lat,lon to x,y
    dland_grid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
 
@@ -1292,6 +1296,9 @@ void load_dland() {
    
    mlog << Debug(1)
         << "Distance to land file: " << file_name << "\n";
+
+   // Check for no file provided
+   if(file_name.empty()) return;
   
    // Open the NetCDF output of the tc_dland tool
    MetNcFile MetNc;
