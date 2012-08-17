@@ -40,6 +40,7 @@ storm_id = [];
 //
 // Stratify by the BASIN column.
 // May add using the "-basin" job command option.
+//
 // e.g. basin = [ "AL" ];
 //
 basin = [];
@@ -47,6 +48,7 @@ basin = [];
 //
 // Stratify by the CYCLONE column.
 // May add using the "-cyclone" job command option.
+//
 // e.g. cyclone = [ "03" ];
 //
 cyclone = [];
@@ -54,6 +56,7 @@ cyclone = [];
 //
 // Stratify by the STORM_NAME column.
 // May add using the "-storm_name" job command option.
+//
 // e.g. storm_name = [ "KATRINA" ];
 //
 storm_name = [];
@@ -94,6 +97,7 @@ valid_exc = [];
 // valid hours, and and lead times in HH[MMSS] format.
 // May add using the "-init_hour", "-valid_hour", and "-lead"
 // job command options.
+//
 // e.g. init_hour  = [ "00" ];
 //      valid_hour = [ "12" ];
 //      lead       = [ "24", "36" ];
@@ -112,6 +116,7 @@ valid_mask = [];
 //
 // Stratify by the LINE_TYPE column.  May add using the "-line_type"
 // job command option.
+//
 // e.g. line_type = [ "TCMPR" ];
 //
 line_type = [];
@@ -130,6 +135,7 @@ water_only = false;
 // -column_str options below, but this option filters by the track maximum.
 // May add using the "-track_watch_warn" job command option.
 // The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
+//
 // e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
 //
 track_watch_warn = [];
@@ -139,6 +145,7 @@ track_watch_warn = [];
 // Specify a comma-separated list of columns names and thresholds
 // to be applied.  May add using the "-column_thresh name thresh" job command
 // options.
+//
 // e.g. column_thresh_name = [ "ADLAND", "BDLAND" ];
 //      column_thresh_val  = [ >200,     >200     ];
 //
@@ -150,6 +157,7 @@ column_thresh_val  = [];
 // Specify a comma-separated list of columns names and values
 // to be checked.  May add using the "-column_str name string" job command
 // options.
+//
 // e.g. column_str_name = [ "LEVEL", "LEVEL" ];
 //      column_str_val  = [ "HU",    "TS"    ];
 //
@@ -161,6 +169,7 @@ column_str_val  = [];
 // when lead = 0.  If lead = 0 value does not meet the threshold, discard
 // the entire track.  May add using the "-init_thresh name thresh" job command
 // options.
+//
 // e.g. init_thresh_name = [ "ADLAND" ];
 //      init_thresh_val  = [ >200     ];
 //
@@ -171,6 +180,7 @@ init_thresh_val  = [];
 // Just like the column_str options above, but apply the string matching only
 // when lead = 0.  If lead = 0 string does not match, discard the entire track.
 // May add using the "-init_str name thresh" job command options.
+//
 // e.g. init_str_name = [ "LEVEL" ];
 //      init_str_val  = [ "HU"    ];
 //
@@ -183,6 +193,7 @@ init_str_val  = [];
 // Define rapid intensification by thresholding the change in maximum windspeed.
 // May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
 // options.
+//
 // e.g. rapid_inten        = false;
 //      rapid_inten_thresh = >=30.0;
 //
@@ -196,6 +207,7 @@ rapid_inten_thresh = >=30.0;
 // point before the distance to land switches from positive to 0 or negative.
 // May modify using the "-landfall", "-landfall_beg", and "-landfall_end" job
 // command options.
+//
 // e.g. landfall     = false;
 //      landfall_beg = -86400; (24 hours prior to landfall)
 //      landfall_end = 0;
@@ -208,6 +220,7 @@ landfall_end = 0;
 // Specify whether only those track points common to both the ADECK and BDECK
 // tracks should be retained.  May modify using the "-match_points" job command
 // option.
+//
 // e.g. match_points = false;
 //
 match_points = false;
@@ -216,6 +229,7 @@ match_points = false;
 // Apply polyline masking logic to the location of the ADECK track at the
 // initialization time.  If it falls outside the mask, discard the entire track.
 // May modify using the "-out_init_mask" job command option.
+//
 // e.g. out_init_mask = "";
 //
 out_init_mask = "";
@@ -224,6 +238,7 @@ out_init_mask = "";
 // Apply polyline masking logic to the location of the ADECK track at the
 // valid time.  If it falls outside the mask, discard only the current track
 // point.  May modify using the "-out_valid_mask" job command option.
+//
 // e.g. out_valid_mask = "";
 //
 out_valid_mask = "";
