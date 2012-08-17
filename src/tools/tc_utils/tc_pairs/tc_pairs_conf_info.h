@@ -40,6 +40,22 @@ class TCPairsConfInfo {
       StringArray Cyclone;   // List of cyclone numbers
       StringArray StormName; // List of storm names
 
+      // Timing information
+      unixtime  InitBeg, InitEnd;
+      TimeArray InitExc;
+      NumArray  InitHour;
+      unixtime  ValidBeg, ValidEnd;
+
+      // Polyline masking regions
+      MaskPoly  InitMask;
+      MaskPoly  ValidMask;
+
+      // Check for duplicate ATCFLines
+      bool CheckDup;
+      
+      // Merge 6-hour TrackPoints into 12-hour interpolated tracks
+      bool Interp12;
+      
       // Consensus model definition
       int NCon;                // Number of consensus models
       StringArray  ConModel;   // Consensus model names
@@ -53,29 +69,14 @@ class TCPairsConfInfo {
       StringArray BestBaseline;
       StringArray OperBaseline;
 
-      // Timing information
-      unixtime  InitBeg, InitEnd;
-      NumArray  InitHour;
-      unixtime  ValidBeg, ValidEnd;
-
-      // Polyline masking regions
-      MaskPoly  InitMask;
-      MaskPoly  ValidMask;
+      // Only retain TrackPoints in both the ADECK and BDECK tracks
+      bool MatchPoints;
 
       // Gridded data file containing distances to land
       ConcatString DLandFile;
 
       // ASCII watch/warnings file
       ConcatString WatchWarnFile;
-      
-      // Merge 6-hour TrackPoints into 12-hour interpolated tracks
-      bool Interp12;
-      
-      // Check for duplicate ATCFLines
-      bool CheckDup;
-
-      // Only retain TrackPoints in both the ADECK and BDECK tracks
-      bool MatchPoints;      
 
       // Config file version
       ConcatString Version;
