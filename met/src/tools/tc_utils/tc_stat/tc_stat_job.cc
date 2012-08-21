@@ -1231,7 +1231,8 @@ void TCStatJobSummary::clear() {
    SummaryMap.clear();
 
    // Set to default value
-   OutAlpha = default_tc_alpha;
+   OutAlpha  = default_tc_alpha;
+   FSPThresh = default_fsp_thresh;
    
    return;
 }
@@ -1247,6 +1248,7 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
    Case = j.Case;
    SummaryMap = j.SummaryMap;
    OutAlpha = j.OutAlpha;
+   FSPThresh = j.FSPThresh;
 
    return;
 }
@@ -1274,10 +1276,11 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-column"   ) == 0) { ReqColumn.add(a[i+1]); add_column(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"       ) == 0) { Case.add(a[i+1]);                          a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha") == 0) { OutAlpha = atof(a[i+1]);                   a.shift_down(i, 1); }
-      else                                      {                                            b.add(a[i]);        }
+           if(strcasecmp(c, "-column"    ) == 0) { ReqColumn.add(a[i+1]); add_column(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-by"        ) == 0) { Case.add(a[i+1]);                          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);                     a.shift_down(i, 1); }
+      else                                       {                                            b.add(a[i]);        }
    }
 
    return(b);
@@ -1336,6 +1339,7 @@ ConcatString TCStatJobSummary::serialize() const {
    for(i=0; i<Case.n_elements(); i++)
       s << "-by " << Case[i] << " ";
    s << "-out_alpha " << OutAlpha;
+   s << "-fsp_thresh " << FSPThresh.get_str();
 
    return(s);
 }
@@ -1343,7 +1347,7 @@ ConcatString TCStatJobSummary::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::do_job(const StringArray &file_list,
-                             TCLineCounts &n) {
+                              TCLineCounts &n) {
    int i;
 
    // Check that the -column option has been supplied
@@ -1360,6 +1364,9 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
       process_tc_stat_file(file_list[i], n);
    }
 
+   // Process the PairArray entries
+   process_pair_array();
+
    // Write the dump file
    if(DumpOut) write_dump_file();
 
@@ -1372,17 +1379,13 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::process_tc_stat_file(const char *path,
-                                            TCLineCounts &n) {
+void TCStatJobSummary::process_pair_array() {
    int i, j, k, l;
-   map<ConcatString,NumArray,cs_cmp> cur_map;
-   map<ConcatString,NumArray,cs_cmp>::iterator it;
+   map<ConcatString,MapData,cs_cmp> cur_map;
+   map<ConcatString,MapData,cs_cmp>::iterator it;
    ConcatString key, cur;
-   NumArray val_na;
+   MapData data;
    double val;
-
-   // Call's parent's implementation
-   TCStatJob::process_tc_stat_file(path, n);
 
    // Loop over the TrackPairInfoArray entries
    for(i=0; i<PairArray.n_pairs(); i++) {
@@ -1393,7 +1396,7 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
       // Loop over TCStatLines for each TrackPairInfo entry
       // and construct a map
       for(j=0; j<PairArray[i].n_lines(); j++) {
-
+        
          // Add summary info to the current map
          for(k=0; k<Column.n_elements(); k++) {
 
@@ -1421,16 +1424,26 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
             // Key is not yet defined in the map
             if((it = cur_map.find(key)) == cur_map.end()) {
 
-               // Add the pair to the map
-               val_na.clear();
-               val_na.add(val);
-               cur_map[key] = val_na;
+               // Add the MapData to the current map
+               clear_map_data(data);
+               data.Val.add(val);
+               data.Hdr.add(PairArray[i].line(j)->header());
+               data.AModel.add(PairArray[i].line(j)->amodel());
+               data.Init.add(PairArray[i].line(j)->init());
+               data.Lead.add(PairArray[i].line(j)->lead());
+               data.Valid.add(PairArray[i].line(j)->valid());
+               cur_map[key] = data;
             }
             // Key is defined in the map
             else {
 
                // Add the value for the existing key
-               it->second.add(val);
+               it->second.Val.add(val);
+               it->second.Hdr.add(PairArray[i].line(j)->header());
+               it->second.AModel.add(PairArray[i].line(j)->amodel());
+               it->second.Init.add(PairArray[i].line(j)->init());
+               it->second.Lead.add(PairArray[i].line(j)->lead());
+               it->second.Valid.add(PairArray[i].line(j)->valid());
             }
             
          } // end for k
@@ -1446,9 +1459,9 @@ void TCStatJobSummary::process_tc_stat_file(const char *path,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::add_map(map<ConcatString,NumArray,cs_cmp>&m) {
-   map<ConcatString,NumArray,cs_cmp>::iterator it_in;
-   map<ConcatString,NumArray,cs_cmp>::iterator it;
+void TCStatJobSummary::add_map(map<ConcatString,MapData,cs_cmp>&m) {
+   map<ConcatString,MapData,cs_cmp>::iterator it_in;
+   map<ConcatString,MapData,cs_cmp>::iterator it;
 
    // Loop over the input map entries
    for(it_in = m.begin(); it_in != m.end(); it_in++) {
@@ -1458,8 +1471,8 @@ void TCStatJobSummary::add_map(map<ConcatString,NumArray,cs_cmp>&m) {
 
          mlog << Debug(5)
               << "Summary Map Insert (" << it_in->first << ") "
-              << it_in->second.n_elements() << " values: "
-              << it_in->second.serialize() << "\n";
+              << it_in->second.Val.n_elements() << " values: "
+              << it_in->second.Val.serialize() << "\n";
 
          // Add the pair to the map
          SummaryMap[it_in->first] = it_in->second;
@@ -1469,11 +1482,16 @@ void TCStatJobSummary::add_map(map<ConcatString,NumArray,cs_cmp>&m) {
 
          mlog << Debug(5)
               << "Summary Map Add (" << it_in->first << ") "
-              << it_in->second.n_elements() << " values: "
-              << it_in->second.serialize() << "\n";
+              << it_in->second.Val.n_elements() << " values: "
+              << it_in->second.Val.serialize() << "\n";
 
          // Add the value for the existing key
-         it->second.add(it_in->second);
+         it->second.Val.add(it_in->second.Val);
+         it->second.Hdr.add(it_in->second.Hdr);
+         it->second.AModel.add(it_in->second.AModel);
+         it->second.Init.add(it_in->second.Init);
+         it->second.Lead.add(it_in->second.Lead);
+         it->second.Valid.add(it_in->second.Valid);
       }
    } // end for it_in
 
@@ -1483,13 +1501,16 @@ void TCStatJobSummary::add_map(map<ConcatString,NumArray,cs_cmp>&m) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::do_output(ostream &out) {
-   map<ConcatString,NumArray,cs_cmp>::iterator it;
+   map<ConcatString,MapData,cs_cmp>::iterator it;
    StringArray sa;
    ConcatString case_info, line;
    AsciiTable out_at;
    NumArray v, index;
    CIInfo mean_ci, stdev_ci;
    int i, r, c;
+
+   double fsp;
+   NumArray fsp_cnt, fsp_tot;
 
    // Setup the output table
    out_at.set_size((int) SummaryMap.size() + 1, 19);
@@ -1524,7 +1545,11 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "P90");
    out_at.set_entry(r, c++, "MAX");
    out_at.set_entry(r, c++, "SUM");
+   out_at.set_entry(r, c++, "FSP");
 
+   // Compute the frequency of superior performance
+   if(Case.has("AMODEL")) compute_fsp(fsp_cnt, fsp_tot);
+     
    // Loop over the map entries and popluate the output table
    for(it=SummaryMap.begin(),r=1; it != SummaryMap.end(); it++) {
 
@@ -1545,8 +1570,9 @@ void TCStatJobSummary::do_output(ostream &out) {
 
       // Get the valid subset of data
       v.clear();
-      for(i=0; i<it->second.n_elements(); i++) {
-         if(!is_bad_data(it->second[i])) v.add(it->second[i]);
+      for(i=0; i<it->second.Val.n_elements(); i++) {
+         if(!is_bad_data(it->second.Val[i]))
+            v.add(it->second.Val[i]);
       }
 
       // Build index array
@@ -1555,12 +1581,20 @@ void TCStatJobSummary::do_output(ostream &out) {
 
       // Compute mean and standard deviation
       compute_mean_stdev(v, index, 1, OutAlpha, mean_ci, stdev_ci);
+
+      // Compute the FSP value
+      if(fsp_cnt.n_elements() > 0 && fsp_tot[r-1] != 0) {
+         fsp = fsp_cnt[r-1]/fsp_tot[r-1];
+      }
+      else {
+         fsp = bad_data_double;
+      }
                                 
       // Write the table row
       out_at.set_entry(r, c++, "SUMMARY:");      
       out_at.set_entry(r, c++, sa[0]);
       out_at.set_entry(r, c++, case_info);
-      out_at.set_entry(r, c++, it->second.n_elements());
+      out_at.set_entry(r, c++, it->second.Val.n_elements());
       out_at.set_entry(r, c++, v.n_elements());
       out_at.set_entry(r, c++, mean_ci.v);
       out_at.set_entry(r, c++, mean_ci.v_ncl[0]);
@@ -1574,7 +1608,8 @@ void TCStatJobSummary::do_output(ostream &out) {
       out_at.set_entry(r, c++, v.percentile_array(0.90));
       out_at.set_entry(r, c++, v.max());
       out_at.set_entry(r, c++, v.sum());
-
+      out_at.set_entry(r, c++, fsp);      
+      
       // Increment row count
       r++;
    }
@@ -1585,6 +1620,127 @@ void TCStatJobSummary::do_output(ostream &out) {
 
    // Write the table
    out << out_at << "\n" << flush;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
+   map<ConcatString,MapData,cs_cmp>::iterator it;
+   StringArray case_list;
+   double v;
+   double best_val;
+   ConcatString best_mod;
+   int i, j, k, n;
+
+   // Initialize counts
+   cnt.clear();
+   tot.clear();
+   
+   // Loop over the SummaryMap
+   for(it=SummaryMap.begin(); it != SummaryMap.end(); it++) {
+
+      // Initialize counts to zero
+      cnt.add(0);
+      tot.add(0);
+
+      // Loop over the header entries to build a list of unique headers
+      for(i=0; i<it->second.Hdr.n_elements(); i++) {
+
+         // Store unique headers
+         if(!case_list.has(it->second.Hdr[i]))
+            case_list.add(it->second.Hdr[i]);
+
+      } // end for i
+   } // end it
+
+   mlog << Debug(5)
+        << "Computing frequency of superior performance for "
+        << Column.n_elements() << " columns and "
+        << case_list.n_elements() << " cases.\n";   
+
+   // Loop over the columns being summarized
+   for(i=0; i<Column.n_elements(); i++) {
+
+      // Check if FSP should be computed for this column
+      if(strstr(Column[i], "-")   == NULL &&
+         strstr(Column[i], "ERR") == NULL) {
+         mlog << Debug(5)
+              << "Skipping frequency of superior performance for "
+              << "column \"" << Column[i] << "\" since it is not an "
+              << "error or difference.\n";
+         continue;
+      }
+
+      // Loop over the cases
+      for(j=0; j<case_list.n_elements(); j++) {
+
+         // Initialize top performer
+         best_mod = na_str;
+         best_val = bad_data_double;
+
+         // Loop over the SummaryMap
+         for(it=SummaryMap.begin(); it != SummaryMap.end(); it++) {
+
+            // Loop over the values for this entry
+            for(k=0; k<it->second.Hdr.n_elements(); k++) {
+              
+               // Check if entry matches the current case
+               if(strncasecmp(Column[i], it->first,
+                              strlen(Column[i])) != 0 ||
+                  strcmp(case_list[j], it->second.Hdr[k]) != 0)
+                  continue;
+
+               // Store the value
+               v = it->second.Val[k];
+
+               // Check for bad data
+               if(is_bad_data(v)) continue;
+
+               // Check for an meaningful improvment
+               if(is_bad_data(best_val) ||
+                  FSPThresh.check(abs(best_val) - abs(v))) {
+                  best_val = v;
+                  best_mod = it->second.AModel[k];
+               }
+               // Check for ties
+               else if(abs(v) <= abs(best_val)) {
+                  best_val = v;
+                  best_mod = "TIE";
+               }
+
+            } // end for k
+         } // end it
+
+         mlog << Debug(5)
+              << "For case \"" << Column[i] << ":" << case_list[j]
+              << "\" superior performance of " << best_val
+              << " by \"" << best_mod << "\".\n";
+
+         // Loop over the SummaryMap to update counts
+         for(it=SummaryMap.begin(),n=-1; it != SummaryMap.end(); it++) {
+
+            // Increment counter
+            n++;
+           
+            // Check if entry has the current case
+            if(strncasecmp(Column[i], it->first,
+                           strlen(Column[i])) != 0 ||
+               !it->second.Hdr.has(case_list[j]))
+               continue;
+
+            // Update total
+            tot.set(n, tot[n]+1);
+
+            // See if this entry is the top performer
+            if(strcmp(best_mod, it->second.AModel[0]) == 0)
+               cnt.set(n, cnt[n]+1);
+
+         } // end it
+              
+      } // end for j
+   } // end for i
 
    return;
 }
@@ -1617,6 +1773,19 @@ ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
    }
 
    return(ConcatString(s));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void clear_map_data(MapData &d) {
+   d.Val.clear();
+   d.Hdr.clear();
+   d.AModel.clear();
+   d.Init.clear();
+   d.Lead.clear();
+   d.Valid.clear();
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -38,6 +38,21 @@ static const int          default_landfall_beg       = -86400;
 static const int          default_landfall_end       = 0;
 
 static const double       default_tc_alpha           = 0.05;
+static const SingleThresh default_fsp_thresh(">0");
+
+////////////////////////////////////////////////////////////////////////
+
+// Define struct to store the mapped StringArray and NumArray values
+struct MapData {
+   NumArray    Val;
+   StringArray Hdr;
+   StringArray AModel;
+   TimeArray   Init;
+   NumArray    Lead;
+   TimeArray   Valid;
+};
+
+void clear_map_data(MapData &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -291,11 +306,13 @@ class TCStatJobSummary : public TCStatJob {
       
       void do_job(const StringArray &, TCLineCounts &); // virtual from base class
 
-      void process_tc_stat_file(const char *, TCLineCounts &);
+      void process_pair_array();
       
-      void add_map(map<ConcatString,NumArray,cs_cmp>&);
+      void add_map(map<ConcatString,MapData,cs_cmp>&);
 
       void do_output(ostream &);
+
+      void compute_fsp(NumArray &, NumArray &);
       
       // Store the requested column names
       StringArray ReqColumn;
@@ -309,8 +326,11 @@ class TCStatJobSummary : public TCStatJob {
       // Confidence interval alpha value
       double OutAlpha;
 
+      // Threshold to determine meaningful improvements
+      SingleThresh FSPThresh;
+
       // Map column and case info to column values
-      map<ConcatString,NumArray,cs_cmp> SummaryMap;
+      map<ConcatString,MapData,cs_cmp> SummaryMap;
 
 };
 
