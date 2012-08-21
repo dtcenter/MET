@@ -1507,13 +1507,13 @@ void TCStatJobSummary::do_output(ostream &out) {
    AsciiTable out_at;
    NumArray v, index;
    CIInfo mean_ci, stdev_ci;
-   int i, r, c;
+   int i, r, c, dsec, tind;
 
    double fsp;
    NumArray fsp_total, fsp_best, fsp_ties;
 
    // Setup the output table
-   out_at.set_size((int) SummaryMap.size() + 1, 21);
+   out_at.set_size((int) SummaryMap.size() + 1, 23);
    out_at.set_table_just(LeftJust);
    out_at.set_precision(default_precision);
    out_at.set_bad_data_value(bad_data_double);
@@ -1545,14 +1545,16 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "P90");
    out_at.set_entry(r, c++, "MAX");
    out_at.set_entry(r, c++, "SUM");
+   out_at.set_entry(r, c++, "TS_INT");
+   out_at.set_entry(r, c++, "TS_IND");
    out_at.set_entry(r, c++, "FSP_TOTAL");
    out_at.set_entry(r, c++, "FSP_BEST");
    out_at.set_entry(r, c++, "FSP_TIES");
    out_at.set_entry(r, c++, "FSP");
 
-   // Compute the frequency of superior performance
-   compute_fsp(fsp_total, fsp_best, fsp_ties);
-     
+   // Only compute FSP when AMODEL is in the case information
+   if(Case.has("AMODEL")) compute_fsp(fsp_total, fsp_best, fsp_ties);
+   
    // Loop over the map entries and popluate the output table
    for(it=SummaryMap.begin(),r=1; it!=SummaryMap.end(); it++,r++) {
 
@@ -1586,8 +1588,19 @@ void TCStatJobSummary::do_output(ostream &out) {
       compute_mean_stdev(v, index, 1, OutAlpha, mean_ci, stdev_ci);
 
       // Compute the FSP value
-      if(fsp_total[r-1] != 0) fsp = fsp_best[r-1]/fsp_total[r-1];
-      else                    fsp = bad_data_double;
+      fsp = bad_data_double;
+      if(fsp_total.n_elements() > 0 && fsp_best.n_elements() > 0) {
+         if(fsp_total[r-1] != 0) fsp = fsp_best[r-1]/fsp_total[r-1];
+      }
+
+      // Compute time to independence for time-series data
+      if(is_time_series(it->second.Init, it->second.Lead,
+                        it->second.Valid, dsec)) {
+         tind = compute_time_to_indep(it->second.Val, dsec);
+      }
+      else {
+         tind = dsec = bad_data_double;
+      }
                                 
       // Write the table row
       out_at.set_entry(r, c++, "SUMMARY:");      
@@ -1607,9 +1620,26 @@ void TCStatJobSummary::do_output(ostream &out) {
       out_at.set_entry(r, c++, v.percentile_array(0.90));
       out_at.set_entry(r, c++, v.max());
       out_at.set_entry(r, c++, v.sum());
-      out_at.set_entry(r, c++, nint(fsp_total[r-1]));
-      out_at.set_entry(r, c++, nint(fsp_best[r-1]));
-      out_at.set_entry(r, c++, nint(fsp_ties[r-1]));
+      if(is_bad_data(dsec))
+         out_at.set_entry(r, c++, dsec);
+      else
+         out_at.set_entry(r, c++, sec_to_hhmmss(dsec));
+      if(is_bad_data(tind))
+         out_at.set_entry(r, c++, tind);
+      else
+         out_at.set_entry(r, c++, sec_to_hhmmss(tind));
+      if(fsp_total.n_elements() > 0)
+         out_at.set_entry(r, c++, nint(fsp_total[r-1]));
+      else
+         out_at.set_entry(r, c++, bad_data_int);
+      if(fsp_best.n_elements() > 0)
+         out_at.set_entry(r, c++, nint(fsp_best[r-1]));
+      else
+         out_at.set_entry(r, c++, bad_data_int);
+      if(fsp_ties.n_elements() > 0)
+         out_at.set_entry(r, c++, nint(fsp_ties[r-1]));
+      else
+         out_at.set_entry(r, c++, bad_data_int);
       out_at.set_entry(r, c++, fsp);
    }
 
@@ -1638,23 +1668,16 @@ void TCStatJobSummary::compute_fsp(NumArray &total,
    total.clear();
    best.clear();
    ties.clear();
-   
-   // Loop over the SummaryMap to initialize counts to zero
+
+   // Loop over the SummaryMap
    for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
 
       // Initialize counts to zero
       total.add(0);
       best.add(0);
       ties.add(0);
-   } // end for it
-
-   // Only compute FSP when AMODEL is in the case information
-   if(!Case.has("AMODEL")) return;
-
-   // Loop over the SummaryMap to build a list of unique headers
-   for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
-
-      // Loop over the header entries
+     
+      // Loop over the header entries to build a unique list
       for(i=0; i<it->second.Hdr.n_elements(); i++) {
 
          // Store unique headers
@@ -1796,6 +1819,115 @@ void clear_map_data(MapData &d) {
    d.Valid.clear();
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// A time-series exists if either the init, valid, or lead time are
+// fixed and the other two entries vary by a fixed amount.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool is_time_series(const TimeArray &init, const NumArray &lead,
+                    const TimeArray &valid, int &dsec) {
+   int i, dinit, dlead, dvalid;
+
+   // Initialize
+   dsec = bad_data_int;
+
+   // The arrays should all be of the same length > 1
+   if(init.n_elements() != lead.n_elements() ||
+      init.n_elements() != valid.n_elements() ||
+      init.n_elements() < 2) return(false);
+
+   // Initialize time spacing
+   dinit  = init[1]  - init[0];
+   dlead  = lead[1]  - lead[0];
+   dvalid = valid[1] - valid[0];
+   
+   // Loop over the entries to determine the time spacing
+   for(i=0; i<init.n_elements()-1; i++) {
+
+      // Make sure the time spacing remains fixed
+      if(dinit  != (init[i+1]  - init[i]) ||
+         dlead  != (lead[i+1]  - lead[i]) ||
+         dvalid != (valid[i+1] - valid[i])) return(false);
+   }
+    
+   // Check for one fixed and the others varying by a non-zero amount
+   if(dinit == 0 && dlead == dvalid && dlead > 0) {
+      dsec = dlead;
+      mlog << Debug(5)
+           << "Computing time-series for initialization time \""
+           << unix_to_yyyymmdd_hhmmss(init[0]) << "\" and spacing \""
+           << sec_to_hhmmss(dsec) << "\".\n";
+   }
+   else if(dlead == 0 && dvalid == dinit && dvalid > 0) {
+      dsec = dvalid;
+      mlog << Debug(5)
+           << "Computing time-series for valid time \""
+           << unix_to_yyyymmdd_hhmmss(valid[0]) << "\" and spacing \""
+           << sec_to_hhmmss(dsec) << "\".\n";
+   }
+   else if(dvalid == 0 && dinit == dlead && dinit > 0) {
+      dsec = dinit;
+      mlog << Debug(5)
+           << "Computing time-series for lead time \""
+           << sec_to_hhmmss(lead[0]) << "\" and spacing \""
+           << sec_to_hhmmss(dsec) << "\".\n";
+   }
+
+   return(!is_bad_data(dsec));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int compute_time_to_indep(const NumArray &val, int ds) {
+   double mean, exp_runs, eff_size, tind;
+   int i, n_abv, n_run_abv, n_bel, n_run_bel;
+   bool cur_abv, prv_abv;
+
+   // Compute the mean value of the time-series
+   mean = val.mean();
+
+   // Initialize
+   n_abv = n_run_abv = 0;
+   n_bel = n_run_bel = 0;
+   prv_abv = false;
+   
+   // Count the number of values above and belwo the mean
+   for(i=0; i<val.n_elements(); i++) {
+
+      // Store the current state
+      cur_abv = (val[i] >= mean);
+
+      // Increment counters
+      if(cur_abv) n_abv++;
+      else        n_bel++;
+
+      // Count runs above and below
+      if(i == 1) {
+         if(cur_abv) n_run_abv++;
+         else        n_run_bel++;
+      }
+      else {
+              if(cur_abv  && !prv_abv) n_run_abv++;
+         else if(!cur_abv &&  prv_abv) n_run_bel++;
+      }
+
+      // Store previous state
+      prv_abv = cur_abv;
+
+   } // end for i
+     
+   // Calculate expected number of runs
+   exp_runs = 1.0 + 2.0*(n_abv * n_bel)/(n_abv + n_bel);
+
+   // Calculate effective sample size, time to independence
+   eff_size = val.n_elements()*(n_run_abv + n_run_bel)/exp_runs;
+   tind     = ds*val.n_elements()/eff_size;
+   
+   return(nint(tind));
 }
 
 ////////////////////////////////////////////////////////////////////////
