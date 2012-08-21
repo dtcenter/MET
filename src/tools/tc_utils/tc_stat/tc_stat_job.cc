@@ -1552,8 +1552,8 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "FSP_TIES");
    out_at.set_entry(r, c++, "FSP");
 
-   // Only compute FSP when AMODEL is in the case information
-   if(Case.has("AMODEL")) compute_fsp(fsp_total, fsp_best, fsp_ties);
+   // Compute the frequency of superior performance
+   compute_fsp(fsp_total, fsp_best, fsp_ties);
    
    // Loop over the map entries and popluate the output table
    for(it=SummaryMap.begin(),r=1; it!=SummaryMap.end(); it++,r++) {
@@ -1588,10 +1588,8 @@ void TCStatJobSummary::do_output(ostream &out) {
       compute_mean_stdev(v, index, 1, OutAlpha, mean_ci, stdev_ci);
 
       // Compute the FSP value
-      fsp = bad_data_double;
-      if(fsp_total.n_elements() > 0 && fsp_best.n_elements() > 0) {
-         if(fsp_total[r-1] != 0) fsp = fsp_best[r-1]/fsp_total[r-1];
-      }
+      if(fsp_total[r-1] != 0) fsp = fsp_best[r-1]/fsp_total[r-1];
+      else                    fsp = bad_data_double;
 
       // Compute time to independence for time-series data
       if(is_time_series(it->second.Init, it->second.Lead,
@@ -1620,26 +1618,13 @@ void TCStatJobSummary::do_output(ostream &out) {
       out_at.set_entry(r, c++, v.percentile_array(0.90));
       out_at.set_entry(r, c++, v.max());
       out_at.set_entry(r, c++, v.sum());
-      if(is_bad_data(dsec))
-         out_at.set_entry(r, c++, dsec);
-      else
-         out_at.set_entry(r, c++, sec_to_hhmmss(dsec));
-      if(is_bad_data(tind))
-         out_at.set_entry(r, c++, tind);
-      else
-         out_at.set_entry(r, c++, sec_to_hhmmss(tind));
-      if(fsp_total.n_elements() > 0)
-         out_at.set_entry(r, c++, nint(fsp_total[r-1]));
-      else
-         out_at.set_entry(r, c++, bad_data_int);
-      if(fsp_best.n_elements() > 0)
-         out_at.set_entry(r, c++, nint(fsp_best[r-1]));
-      else
-         out_at.set_entry(r, c++, bad_data_int);
-      if(fsp_ties.n_elements() > 0)
-         out_at.set_entry(r, c++, nint(fsp_ties[r-1]));
-      else
-         out_at.set_entry(r, c++, bad_data_int);
+      if(is_bad_data(dsec)) out_at.set_entry(r, c++, dsec);
+      else                  out_at.set_entry(r, c++, sec_to_hhmmss(dsec));
+      if(is_bad_data(tind)) out_at.set_entry(r, c++, tind);
+      else                  out_at.set_entry(r, c++, sec_to_hhmmss(tind));
+      out_at.set_entry(r, c++, nint(fsp_total[r-1]));
+      out_at.set_entry(r, c++, nint(fsp_best[r-1]));
+      out_at.set_entry(r, c++, nint(fsp_ties[r-1]));
       out_at.set_entry(r, c++, fsp);
    }
 
@@ -1669,14 +1654,21 @@ void TCStatJobSummary::compute_fsp(NumArray &total,
    best.clear();
    ties.clear();
 
-   // Loop over the SummaryMap
+   // Loop over the SummaryMap and initialize counts
    for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
 
       // Initialize counts to zero
       total.add(0);
       best.add(0);
       ties.add(0);
+   } // end for it
      
+   // Only compute FSP when AMODEL is in the case information
+   if(!Case.has("AMODEL")) return;
+
+   // Loop over the SummaryMap
+   for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
+
       // Loop over the header entries to build a unique list
       for(i=0; i<it->second.Hdr.n_elements(); i++) {
 
