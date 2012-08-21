@@ -1415,7 +1415,8 @@ void TCStatJobSummary::process_pair_array() {
                // For lead time column, make sure hour is 3-digits
                if(strcasecmp(Case[l], "LEAD") == 0 &&
                   cur != na_str &&
-                  hhmmss_to_sec(cur) < 100*sec_per_hour)
+                  hhmmss_to_sec(cur) < 100*sec_per_hour &&
+                  hhmmss_to_sec(cur) > 0)
                     key << ":0" << cur;
                else key << ":"  << cur;
                
