@@ -757,9 +757,10 @@ ConcatString NumArray::serialize() const
 
 if(Nelements == 0) return("");
 
-ConcatString s = e[0];
+ConcatString s;
 int j;
 
+s << e[0];
 for(j=1; j<Nelements; j++) s << " " << e[j];
 
 return(s);
