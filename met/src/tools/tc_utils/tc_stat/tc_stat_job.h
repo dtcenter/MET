@@ -312,7 +312,7 @@ class TCStatJobSummary : public TCStatJob {
 
       void do_output(ostream &);
 
-      void compute_fsp(NumArray &, NumArray &);
+      void compute_fsp(NumArray &, NumArray &, NumArray &);
       
       // Store the requested column names
       StringArray ReqColumn;

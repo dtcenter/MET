@@ -1510,10 +1510,10 @@ void TCStatJobSummary::do_output(ostream &out) {
    int i, r, c;
 
    double fsp;
-   NumArray fsp_cnt, fsp_tot;
+   NumArray fsp_total, fsp_best, fsp_ties;
 
    // Setup the output table
-   out_at.set_size((int) SummaryMap.size() + 1, 19);
+   out_at.set_size((int) SummaryMap.size() + 1, 21);
    out_at.set_table_just(LeftJust);
    out_at.set_precision(default_precision);
    out_at.set_bad_data_value(bad_data_double);
@@ -1545,13 +1545,16 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "P90");
    out_at.set_entry(r, c++, "MAX");
    out_at.set_entry(r, c++, "SUM");
+   out_at.set_entry(r, c++, "FSP_TOTAL");
+   out_at.set_entry(r, c++, "FSP_BEST");
+   out_at.set_entry(r, c++, "FSP_TIES");
    out_at.set_entry(r, c++, "FSP");
 
    // Compute the frequency of superior performance
-   if(Case.has("AMODEL")) compute_fsp(fsp_cnt, fsp_tot);
+   compute_fsp(fsp_total, fsp_best, fsp_ties);
      
    // Loop over the map entries and popluate the output table
-   for(it=SummaryMap.begin(),r=1; it != SummaryMap.end(); it++) {
+   for(it=SummaryMap.begin(),r=1; it!=SummaryMap.end(); it++,r++) {
 
       // Initialize column index
       c = 0;
@@ -1583,12 +1586,8 @@ void TCStatJobSummary::do_output(ostream &out) {
       compute_mean_stdev(v, index, 1, OutAlpha, mean_ci, stdev_ci);
 
       // Compute the FSP value
-      if(fsp_cnt.n_elements() > 0 && fsp_tot[r-1] != 0) {
-         fsp = fsp_cnt[r-1]/fsp_tot[r-1];
-      }
-      else {
-         fsp = bad_data_double;
-      }
+      if(fsp_total[r-1] != 0) fsp = fsp_best[r-1]/fsp_total[r-1];
+      else                    fsp = bad_data_double;
                                 
       // Write the table row
       out_at.set_entry(r, c++, "SUMMARY:");      
@@ -1608,10 +1607,10 @@ void TCStatJobSummary::do_output(ostream &out) {
       out_at.set_entry(r, c++, v.percentile_array(0.90));
       out_at.set_entry(r, c++, v.max());
       out_at.set_entry(r, c++, v.sum());
-      out_at.set_entry(r, c++, fsp);      
-      
-      // Increment row count
-      r++;
+      out_at.set_entry(r, c++, nint(fsp_total[r-1]));
+      out_at.set_entry(r, c++, nint(fsp_best[r-1]));
+      out_at.set_entry(r, c++, nint(fsp_ties[r-1]));
+      out_at.set_entry(r, c++, fsp);
    }
 
    // Build a simple output line
@@ -1626,7 +1625,8 @@ void TCStatJobSummary::do_output(ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
+void TCStatJobSummary::compute_fsp(NumArray &total,
+                                   NumArray &best, NumArray &ties) {
    map<ConcatString,MapData,cs_cmp>::iterator it;
    StringArray case_list;
    double v;
@@ -1635,17 +1635,26 @@ void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
    int i, j, k, n;
 
    // Initialize counts
-   cnt.clear();
-   tot.clear();
+   total.clear();
+   best.clear();
+   ties.clear();
    
-   // Loop over the SummaryMap
-   for(it=SummaryMap.begin(); it != SummaryMap.end(); it++) {
+   // Loop over the SummaryMap to initialize counts to zero
+   for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
 
       // Initialize counts to zero
-      cnt.add(0);
-      tot.add(0);
+      total.add(0);
+      best.add(0);
+      ties.add(0);
+   } // end for it
 
-      // Loop over the header entries to build a list of unique headers
+   // Only compute FSP when AMODEL is in the case information
+   if(!Case.has("AMODEL")) return;
+
+   // Loop over the SummaryMap to build a list of unique headers
+   for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
+
+      // Loop over the header entries
       for(i=0; i<it->second.Hdr.n_elements(); i++) {
 
          // Store unique headers
@@ -1653,7 +1662,7 @@ void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
             case_list.add(it->second.Hdr[i]);
 
       } // end for i
-   } // end it
+   } // end for it
 
    mlog << Debug(5)
         << "Computing frequency of superior performance for "
@@ -1681,7 +1690,7 @@ void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
          best_val = bad_data_double;
 
          // Loop over the SummaryMap
-         for(it=SummaryMap.begin(); it != SummaryMap.end(); it++) {
+         for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
 
             // Loop over the values for this entry
             for(k=0; k<it->second.Hdr.n_elements(); k++) {
@@ -1711,7 +1720,7 @@ void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
                }
 
             } // end for k
-         } // end it
+         } // end for it
 
          mlog << Debug(5)
               << "For case \"" << Column[i] << ":" << case_list[j]
@@ -1719,10 +1728,7 @@ void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
               << " by \"" << best_mod << "\".\n";
 
          // Loop over the SummaryMap to update counts
-         for(it=SummaryMap.begin(),n=-1; it != SummaryMap.end(); it++) {
-
-            // Increment counter
-            n++;
+         for(it=SummaryMap.begin(),n=0; it!=SummaryMap.end(); it++,n++) {
            
             // Check if entry has the current case
             if(strncasecmp(Column[i], it->first,
@@ -1731,13 +1737,17 @@ void TCStatJobSummary::compute_fsp(NumArray &cnt, NumArray &tot) {
                continue;
 
             // Update total
-            tot.set(n, tot[n]+1);
+            total.set(n, total[n]+1);
 
             // See if this entry is the top performer
             if(strcmp(best_mod, it->second.AModel[0]) == 0)
-               cnt.set(n, cnt[n]+1);
+               best.set(n, best[n]+1);
+            
+            // See if there was a tie
+            if(strcmp(best_mod, "TIE") == 0)
+               ties.set(n, ties[n]+1);
 
-         } // end it
+         } // end for it
               
       } // end for j
    } // end for i
