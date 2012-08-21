@@ -240,6 +240,22 @@ const char * TCStatLine::line_type() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString TCStatLine::header() const {
+   ConcatString hdr;
+   const char *sep = ":";
+
+   hdr << bmodel()                         << sep
+       << basin()                          << sep
+       << cyclone()                        << sep
+       << unix_to_yyyymmdd_hhmmss(init())  << sep
+       << sec_to_hhmmss(lead())            << sep
+       << unix_to_yyyymmdd_hhmmss(valid());
+
+   return(hdr);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TCStatLine::determine_line_type() {
    const char *c = line_type();
 

@@ -76,6 +76,7 @@ class TCStatLine : public DataLine {
       const char * init_mask    () const;
       const char * valid_mask   () const;
       const char * line_type    () const;
+      ConcatString header       () const;
 
       TCStatLineType type       () const;
 };
