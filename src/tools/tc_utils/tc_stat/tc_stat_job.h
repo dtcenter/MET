@@ -52,8 +52,6 @@ struct MapData {
    TimeArray   Valid;
 };
 
-void clear_map_data(MapData &);
-
 ////////////////////////////////////////////////////////////////////////
 
 // Define struct used to perform comparisons on ConcatStrings
@@ -333,6 +331,13 @@ class TCStatJobSummary : public TCStatJob {
       map<ConcatString,MapData,cs_cmp> SummaryMap;
 
 };
+
+////////////////////////////////////////////////////////////////////////
+
+void clear_map_data(MapData &);
+bool is_time_series(const TimeArray &, const NumArray &,
+                    const TimeArray &, int &);
+int  compute_time_to_indep(const NumArray &, int);
 
 ////////////////////////////////////////////////////////////////////////
 
