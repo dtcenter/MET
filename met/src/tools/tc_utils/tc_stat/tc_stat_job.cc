@@ -1505,7 +1505,8 @@ void TCStatJobSummary::do_output(ostream &out) {
    StringArray sa;
    ConcatString case_info, line;
    AsciiTable out_at;
-   NumArray v, index;
+   NumArray v, lead, index;
+   TimeArray init, valid;
    CIInfo mean_ci, stdev_ci;
    int i, r, c, dsec, tind;
 
@@ -1576,8 +1577,12 @@ void TCStatJobSummary::do_output(ostream &out) {
       // Get the valid subset of data
       v.clear();
       for(i=0; i<it->second.Val.n_elements(); i++) {
-         if(!is_bad_data(it->second.Val[i]))
+         if(!is_bad_data(it->second.Val[i])) {
             v.add(it->second.Val[i]);
+            init.add(it->second.Init[i]);
+            lead.add(it->second.Lead[i]);
+            valid.add(it->second.Valid[i]);
+         }
       }
 
       // Build index array
@@ -1592,13 +1597,10 @@ void TCStatJobSummary::do_output(ostream &out) {
       else                    fsp = bad_data_double;
 
       // Compute time to independence for time-series data
-      if(is_time_series(it->second.Init, it->second.Lead,
-                        it->second.Valid, dsec)) {
-         tind = compute_time_to_indep(it->second.Val, dsec);
-      }
-      else {
+      if(is_time_series(init, lead, valid, dsec))
+         tind = compute_time_to_indep(v, dsec);
+      else
          tind = dsec = bad_data_double;
-      }
                                 
       // Write the table row
       out_at.set_entry(r, c++, "SUMMARY:");      
