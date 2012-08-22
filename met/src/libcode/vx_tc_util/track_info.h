@@ -53,15 +53,18 @@ class TrackInfo {
       int          TechniqueNumber;
       ConcatString Technique;
 
+      // Forecaster Initials
+      ConcatString Initials;
+
       // Timing information
-      unixtime       InitTime;
-      unixtime       MinValidTime;
-      unixtime       MaxValidTime;
+      unixtime     InitTime;
+      unixtime     MinValidTime;
+      unixtime     MaxValidTime;
 
       // TrackPoints                    
-      TrackPoint    *Point;
-      int            NPoints;
-      int            NAlloc;
+      TrackPoint  *Point;
+      int          NPoints;
+      int          NAlloc;
 
    public:
 
@@ -89,6 +92,7 @@ class TrackInfo {
       void set_storm_name(const char *);
       void set_technique_number(int);
       void set_technique(const char *);
+      void set_initials(const char *);
       void set_init(const unixtime);
       void set_valid_min(const unixtime);
       void set_valid_max(const unixtime);
@@ -108,6 +112,7 @@ class TrackInfo {
       const ConcatString & storm_name()       const;
       int                  technique_number() const;
       const ConcatString & technique()        const;
+      const ConcatString & initials()         const;
       unixtime             init()             const;
       int                  init_hour()        const;
       unixtime             valid_min()        const;
@@ -142,6 +147,7 @@ inline void TrackInfo::set_cyclone(const char *s)      { Cyclone = s;         };
 inline void TrackInfo::set_storm_name(const char *s)   { StormName = s;       };
 inline void TrackInfo::set_technique_number(int i)     { TechniqueNumber = i; };
 inline void TrackInfo::set_technique(const char *s)    { Technique = s;       };
+inline void TrackInfo::set_initials(const char *s)     { Initials = s;        };
 inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        };
 inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    };
 inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    };
@@ -152,6 +158,7 @@ inline const ConcatString & TrackInfo::cyclone()          const { return(Cyclone
 inline const ConcatString & TrackInfo::storm_name()       const { return(StormName);               }
 inline int                  TrackInfo::technique_number() const { return(TechniqueNumber);         }
 inline const ConcatString & TrackInfo::technique()        const { return(Technique);               }
+inline const ConcatString & TrackInfo::initials()         const { return(Initials);                }
 inline unixtime             TrackInfo::init()             const { return(InitTime);                }
 inline int                  TrackInfo::init_hour()        const { return(InitTime % sec_per_hour); }
 inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);            }

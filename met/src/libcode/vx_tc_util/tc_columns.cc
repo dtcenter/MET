@@ -78,19 +78,20 @@ int get_tc_mpr_col_offset(const char *col_name) {
    }
 
    // If not found, search the TC MPR columns:
-   //    TOTAL,       INDEX,      LEVEL,
-   //    ALAT,        ALON,
-   //    BLAT,        BLON,
-   //    TK_ERR,      X_ERR,      Y_ERR,
-   //    ALTK_ERR,    CRTK_ERR,
-   //    ADLAND,      BDLAND,
-   //    AMSLP,       BMSLP,
-   //    AMAX_WIND,   BMAX_WIND,
-   //   [AAL_WIND_,   BAL_WIND_,
-   //    ANE_WIND_,   BNE_WIND_,
-   //    ASE_WIND_,   BSE_WIND_,
-   //    ASW_WIND_,   BSW_WIND_,
-   //    ANW_WIND_,   BNW_WIND_]
+   //    TOTAL,     INDEX,
+   //    LEVEL,     WATCH_WARN, INITIALS,
+   //    ALAT,      ALON,
+   //    BLAT,      BLON,
+   //    TK_ERR,    X_ERR,      Y_ERR,
+   //    ALTK_ERR,  CRTK_ERR,
+   //    ADLAND,    BDLAND,
+   //    AMSLP,     BMSLP,
+   //    AMAX_WIND, BMAX_WIND,
+   //   [AAL_WIND_, BAL_WIND_,
+   //    ANE_WIND_, BNE_WIND_,
+   //    ASE_WIND_, BSE_WIND_,
+   //    ASW_WIND_, BSW_WIND_,
+   //    ANW_WIND_, BNW_WIND_]
    //    (for each wind intensity value)
 
    // Check the static columns
@@ -333,6 +334,8 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, i+1);
    at.set_entry(r, c++, cyclonelevel_to_string(p.bdeck()[i].level()));
    at.set_entry(r, c++, watchwarntype_to_string(p.bdeck()[i].watch_warn()));
+   if(p.adeck().initials().empty()) at.set_entry(r, c++, na_str);
+   else                             at.set_entry(r, c++, p.adeck().initials());
    at.set_entry(r, c++, p.adeck()[i].lat());
    at.set_entry(r, c++, p.adeck()[i].lon());
    at.set_entry(r, c++, p.bdeck()[i].lat());

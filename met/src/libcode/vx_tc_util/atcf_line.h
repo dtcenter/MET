@@ -191,7 +191,7 @@ class ATCFLine {
 
       int MaxSeas;   // feet
 
-      ConcatString Forecaster;   // forecaster's initials
+      ConcatString Initials;   // forecaster's initials
 
       int StormDirection;   // degrees
 
@@ -281,6 +281,8 @@ class ATCFLine {
 
       int max_seas() const;
 
+      ConcatString initials() const;
+
       int storm_direction() const;
 
       int storm_speed() const;
@@ -331,6 +333,7 @@ inline int            ATCFLine::gusts()            const { return(Gusts);       
 inline int            ATCFLine::eye_diameter()     const { return(EyeDiameter);     }
 inline SubregionCode  ATCFLine::subregion()        const { return(SubRegion);       }
 inline int            ATCFLine::max_seas()         const { return(MaxSeas);         }
+inline ConcatString   ATCFLine::initials()         const { return(Initials);        }
 inline int            ATCFLine::storm_direction()  const { return(StormDirection);  }
 inline int            ATCFLine::storm_speed()      const { return(StormSpeed);      }
 inline ConcatString   ATCFLine::storm_name()       const { return(StormName);       }
