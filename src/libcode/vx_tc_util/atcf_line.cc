@@ -34,7 +34,7 @@ extern ConcatString parse_str (const char *);
 //  Code for class ATCFLine
 //
 ////////////////////////////////////////////////////////////////////////
-
+  
 ATCFLine::ATCFLine() {
    init_from_scratch();
 }
@@ -115,7 +115,7 @@ void ATCFLine::clear() {
    EyeDiameter     = bad_data_int;
    SubRegion       = NoSubregionCode;
    MaxSeas         = bad_data_int;
-   Forecaster.clear();
+   Initials.clear();
    StormDirection  = bad_data_int;
    StormSpeed      = bad_data_int;
    StormName.clear();
@@ -161,7 +161,7 @@ void ATCFLine::dump(ostream &out, int indent_depth) const {
    out << prefix << "EyeDiameter     = " << EyeDiameter << "\n";
    out << prefix << "SubRegion       = " << subregioncode_to_string(SubRegion) << "\n";
    out << prefix << "MaxSeas         = " << MaxSeas << "\n";
-   out << prefix << "Forecaster      = \"" << (Forecaster ? Forecaster.text() : "(nul)") << "\"\n";
+   out << prefix << "Initials        = \"" << (Initials ? Initials.text() : "(nul)") << "\"\n";
    out << prefix << "StormDirection  = " << StormDirection << "\n";
    out << prefix << "StormSpeed      = " << StormSpeed << "\n";
    out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
@@ -208,7 +208,7 @@ void ATCFLine::assign(const ATCFLine &t) {
    EyeDiameter     = t.EyeDiameter;
    SubRegion       = t.SubRegion;
    MaxSeas         = t.MaxSeas;
-   Forecaster      = t.Forecaster;
+   Initials        = t.Initials;
    StormDirection  = t.StormDirection;
    StormSpeed      = t.StormSpeed;
    StormName       = t.StormName;
@@ -333,7 +333,7 @@ bool operator>>(istream &in, ATCFLine &t) {
         case(21): t.EyeDiameter     = parse_int(a[j]);               break;
         case(22): t.SubRegion       = string_to_subregioncode(a[j]); break;
         case(23): t.MaxSeas         = parse_int(a[j]);               break;
-        case(24): t.Forecaster      = parse_str(a[j]);               break;
+        case(24): t.Initials        = parse_str(a[j]);               break;
         case(25): t.StormDirection  = parse_int(a[j]);               break;
         case(26): t.StormSpeed      = parse_int(a[j]);               break;
         case(27): t.StormName       = parse_str(a[j]);               break;

@@ -32,19 +32,20 @@ static const char * tc_header_cols [] = {
 
 // The last 10 columns repeat for each wind intensity value
 static const char * tc_mpr_cols [] = {
-   "TOTAL",       "INDEX",      "LEVEL",
-   "WATCH_WARN",  "ALAT",       "ALON",
-   "BLAT",        "BLON",
-   "TK_ERR",      "X_ERR",      "Y_ERR",
-   "ALTK_ERR",    "CRTK_ERR",
-   "ADLAND",      "BDLAND",
-   "AMSLP",       "BMSLP",
-   "AMAX_WIND",   "BMAX_WIND",
-   "AAL_WIND_",   "BAL_WIND_",
-   "ANE_WIND_",   "BNE_WIND_",
-   "ASE_WIND_",   "BSE_WIND_",
-   "ASW_WIND_",   "BSW_WIND_",
-   "ANW_WIND_",   "BNW_WIND_"
+   "TOTAL",     "INDEX",
+   "LEVEL",     "WATCH_WARN", "INITIALS",
+   "ALAT",      "ALON",
+   "BLAT",      "BLON",
+   "TK_ERR",    "X_ERR",      "Y_ERR",
+   "ALTK_ERR",  "CRTK_ERR",
+   "ADLAND",    "BDLAND",
+   "AMSLP",     "BMSLP",
+   "AMAX_WIND", "BMAX_WIND",
+   "AAL_WIND_", "BAL_WIND_",
+   "ANE_WIND_", "BNE_WIND_",
+   "ASE_WIND_", "BSE_WIND_",
+   "ASW_WIND_", "BSW_WIND_",
+   "ANW_WIND_", "BNW_WIND_"
 };
 
 ////////////////////////////////////////////////////////////////////////

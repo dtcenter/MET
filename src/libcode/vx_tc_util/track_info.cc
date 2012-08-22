@@ -249,6 +249,7 @@ void TrackInfo::initialize(const ATCFLine &l) {
    StormName       = l.storm_name();
    TechniqueNumber = l.technique_number();
    Technique       = l.technique();
+   Initials        = l.initials();
 
    // For BEST tracks, keep InitTime unset
    if(Technique) {
@@ -486,7 +487,7 @@ bool TrackInfo::is_match(const ATCFLine &l) const {
    if(strcasecmp(Technique, BestTrackStr) == 0) {
 
       // Check basin, cyclone, and technique
-      // No need to check storm name
+      // No need to check storm name or initials
       if(Basin     != l.basin()          ||
          Cyclone   != l.cyclone_number() ||
          Technique != l.technique())
