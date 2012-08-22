@@ -277,6 +277,9 @@ bool operator>>(istream &in, ATCFLine &t) {
    if(!t.Line.read_line(in)) return(false);
    t.Line.chomp('\n');
 
+   // Append an extra space before splitting
+   t.Line << " ";
+   
    // Split the comma-delimited line
    a = t.Line.split(delim);
 
