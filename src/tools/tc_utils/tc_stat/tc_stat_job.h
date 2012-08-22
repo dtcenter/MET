@@ -334,10 +334,11 @@ class TCStatJobSummary : public TCStatJob {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clear_map_data(MapData &);
-bool is_time_series(const TimeArray &, const NumArray &,
-                    const TimeArray &, int &);
-int  compute_time_to_indep(const NumArray &, int);
+void        clear_map_data(MapData &);
+bool        is_time_series(const TimeArray &, const NumArray &,
+                           const TimeArray &, int &);
+int         compute_time_to_indep(const NumArray &, int);
+StringArray intersection(const StringArray &, const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
