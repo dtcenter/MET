@@ -1662,8 +1662,8 @@ void TCStatJobSummary::do_output(ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::compute_fsp(NumArray &total,
-                                   NumArray &best, NumArray &ties) {
+void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
+                                   NumArray &ties) {
    map<ConcatString,MapData,cs_cmp>::iterator it;
    StringArray case_list;
    double v;
@@ -1693,18 +1693,18 @@ void TCStatJobSummary::compute_fsp(NumArray &total,
       return;
    }
 
-   // Loop over the SummaryMap
+   // Compute FSP cases as the intersection of the cases for each entry
    for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
 
-      // Loop over the header entries to build a unique list
-      for(i=0; i<it->second.Hdr.n_elements(); i++) {
-
-         // Store unique headers
-         if(!case_list.has(it->second.Hdr[i]))
-            case_list.add(it->second.Hdr[i]);
-
-      } // end for i
-   } // end for it
+      // Initialize case list to the first entry
+      if(it==SummaryMap.begin()) {
+         case_list = it->second.Hdr;
+      }
+      // Take the intersection of the remaining entries
+      else {
+         case_list = intersection(case_list, it->second.Hdr);
+      }
+   } // end for it   
 
    mlog << Debug(5)
         << "Computing frequency of superior performance for "
@@ -1715,8 +1715,8 @@ void TCStatJobSummary::compute_fsp(NumArray &total,
    for(i=0; i<Column.n_elements(); i++) {
 
       // Check if FSP should be computed for this column
-      if(strstr(Column[i], "-")   == NULL &&
-         strstr(Column[i], "ERR") == NULL) {
+      if(strcasestr(Column[i], "-")   == NULL &&
+         strcasestr(Column[i], "ERR") == NULL) {
          mlog << Debug(5)
               << "Skipping frequency of superior performance for "
               << "column \"" << Column[i] << "\" since it is not an "
@@ -1970,6 +1970,20 @@ int compute_time_to_indep(const NumArray &val, int ds) {
    tind     = ds*val.n_elements()/eff_size;
    
    return(nint(tind));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray intersection(const StringArray &s1, const StringArray &s2) {
+   StringArray s;
+   int i;
+
+   // Add elements common to both list
+   for(i=0; i<s1.n_elements(); i++) {
+      if(s2.has(s1[i])) s.add(s1[i]);
+   }
+
+   return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
