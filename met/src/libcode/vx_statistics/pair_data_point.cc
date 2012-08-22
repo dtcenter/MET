@@ -221,7 +221,8 @@ void VxPairDataPoint::clear() {
 
    fcst_dpa.clear();
    climo_dpa.clear();
-   
+   obs_qty_filt.clear();
+
    fcst_ut       = (unixtime) 0;
    beg_ut        = (unixtime) 0;
    end_ut        = (unixtime) 0;
@@ -232,6 +233,7 @@ void VxPairDataPoint::clear() {
    rej_obs       = 0;
    rej_grd       = 0;
    rej_lvl       = 0;
+   rej_qty       = 0;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
@@ -260,6 +262,8 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    set_fcst_info(vx_pd.fcst_info);
    set_obs_info(vx_pd.obs_info);
+
+   obs_qty_filt = vx_pd.obs_qty_filt;
 
    fcst_ut  = vx_pd.fcst_ut;
    beg_ut   = vx_pd.beg_ut;
@@ -386,6 +390,15 @@ void VxPairDataPoint::set_end_ut(const unixtime ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::set_obs_qty_filt(const StringArray q) {
+
+   obs_qty_filt = q;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
    int i, j, k;
 
@@ -490,7 +503,8 @@ void VxPairDataPoint::set_interp(int i_interp, InterpMthd mthd,
 
 void VxPairDataPoint::add_obs(float *hdr_arr,     char *hdr_typ_str,
                               char  *hdr_sid_str, unixtime hdr_ut,
-                              float *obs_arr,     Grid &gr) {
+                              char  *obs_qty,     float *obs_arr,
+                              Grid &gr) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt;
@@ -506,6 +520,18 @@ void VxPairDataPoint::add_obs(float *hdr_arr,     char *hdr_typ_str,
    if(obs_info->code() != nint(obs_arr[1])) {
       rej_gc++;
       return;
+   }
+
+   // Check if the observation quality flag is included in the list
+   if( obs_qty_filt.n_elements() && strcmp(obs_qty, "") ) {
+      bool qty_match = false;
+      for(i=0; i < obs_qty_filt.n_elements() && !qty_match; i++)
+         if( 0 == strcmp(obs_qty, obs_qty_filt[i]) ) qty_match = true;
+
+      if( !qty_match ){
+         rej_qty++;
+         return;
+      }
    }
 
    // Check whether the observation time falls within the valid time

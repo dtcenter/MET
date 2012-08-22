@@ -109,6 +109,10 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray obs_qty_filt;  // Observation quality markers
+
+      //////////////////////////////////////////////////////////////////
+
       int      n_msg_typ;        // Number of verifying message types
 
       int      n_mask;           // Total number of masking regions
@@ -128,6 +132,7 @@ class VxPairDataPoint {
       int rej_obs;               // Reject observation bad data
       int rej_grd;               // Reject based on location
       int rej_lvl;               // Reject based on vertical level
+      int rej_qty;               // Reject based on obs quality
 
       //  3-Dim Arrays for observation rejection reason codes
       int ***rej_typ;            // Reject based on message type
@@ -149,6 +154,8 @@ class VxPairDataPoint {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
+      void set_obs_qty_filt(const StringArray);
+
       // Call set_pd_size before set_msg_typ, set_mask_dp, and set_interp
       void set_pd_size(int, int, int);
 
@@ -157,7 +164,7 @@ class VxPairDataPoint {
       void set_interp(int, const char *, int);
       void set_interp(int, InterpMthd, int);
 
-      void add_obs(float *, char *, char *, unixtime, float *, Grid &);
+      void add_obs(float *, char *, char *, unixtime, char *, float *, Grid &);
 
       void find_fcst_vert_lvl(double, int &, int &);
       void find_climo_vert_lvl(double, int &, int &);

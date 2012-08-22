@@ -768,6 +768,16 @@ vif_flag = FALSE;
 duplicate_flag = NONE;
 
 //
+// The "obs_quality" entry specifies the quality flag values that are to be
+// retained and used for verificaiton.  An empty list signifies that all
+// point observations should be used, regardless of their quality flag value.
+// The quality flag values will vary depending on the original source of the 
+// observations.  The quality flag values to retain should be specified as
+// an array of strings, even if the values themselves are numeric.
+//
+obs_quality = [];
+
+//
 // The "met_data_dir" entry specifies the location of the MET data
 // sub-directory which contains data files used when generating plots.
 //

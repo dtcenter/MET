@@ -93,6 +93,7 @@ class PointStatConfInfo {
       StringArray       mask_name;          // Masking region names [n_mask]
       DataPlane *       mask_dp;            // Array for masking regions [n_mask_area]
       StringArray       mask_sid;           // Masking station id's [n_mask_sid]
+      StringArray       obs_qty;            // Observation quality flags [obs_qty]
       NumArray          ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType  boot_interval;      // Bootstrap CI type
       double            boot_rep_prop;      // Bootstrap replicate proportion

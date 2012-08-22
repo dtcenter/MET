@@ -77,6 +77,7 @@ void EnsembleStatConfInfo::clear() {
    vld_ens_thresh = vld_data_thresh = bad_data_double;
    mask_name.clear();
    mask_sid.clear();
+   obs_qty.clear();
    interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
@@ -352,6 +353,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&conf);
    
+   // Conf: obs_qty
+   obs_qty = conf.lookup_string_array(conf_key_obs_qty);
+   for(i=0; i<n_vx; i++) { vx_pd[i].set_obs_qty_filt(obs_qty); }
+
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
