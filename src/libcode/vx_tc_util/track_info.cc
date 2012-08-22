@@ -82,6 +82,7 @@ void TrackInfo::clear() {
    StormName.clear();
    TechniqueNumber = bad_data_int;
    Technique.clear();
+   Initials.clear();
    InitTime        = (unixtime) 0;
    MinValidTime    = (unixtime) 0;
    MaxValidTime    = (unixtime) 0;
@@ -113,6 +114,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
    out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
+   out << prefix << "Initials        = \"" << (Initials ? Initials.text() : "(nul)") << "\"\n";
    out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str) << "\n";
    out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : na_str) << "\n";
    out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str) << "\n";
@@ -142,6 +144,7 @@ ConcatString TrackInfo::serialize() const {
      << ", StormName = \"" << (StormName ? StormName.text() : "(nul)") << "\""
      << ", TechniqueNumber = " << TechniqueNumber
      << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
+     << ", Initials = \"" << (Initials ? Initials.text() : "(nul)") << "\""
      << ", InitTime = " << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str)
      << ", MinValidTime = " << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : na_str)
      << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str)
@@ -183,6 +186,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    StormName       = t.StormName;
    TechniqueNumber = t.TechniqueNumber;
    Technique       = t.Technique;
+   Initials        = t.Initials;
    InitTime        = t.InitTime;
    MinValidTime    = t.MinValidTime;
    MaxValidTime    = t.MaxValidTime;
