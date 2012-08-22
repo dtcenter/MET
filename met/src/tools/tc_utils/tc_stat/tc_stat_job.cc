@@ -1687,7 +1687,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
      
    // Only compute FSP when AMODEL is in the case information
    if(!Case.has("AMODEL")) {
-      mlog << Debug(5)
+      mlog << Debug(4)
            << "Skipping frequency of superior performance since "
            << "the case information does not contain \"AMODEL\".\n";
       return;
@@ -1706,7 +1706,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
       }
    } // end for it   
 
-   mlog << Debug(5)
+   mlog << Debug(4)
         << "Computing frequency of superior performance for "
         << Column.n_elements() << " columns and "
         << case_list.n_elements() << " cases.\n";   
@@ -1717,7 +1717,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
       // Check if FSP should be computed for this column
       if(strcasestr(Column[i], "-")   == NULL &&
          strcasestr(Column[i], "ERR") == NULL) {
-         mlog << Debug(5)
+         mlog << Debug(4)
               << "Skipping frequency of superior performance for "
               << "column \"" << Column[i] << "\" since it is not an "
               << "error or difference.\n";
@@ -1764,7 +1764,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
             } // end for k
          } // end for it
 
-         mlog << Debug(5)
+         mlog << Debug(4)
               << "For case \"" << Column[i] << ":" << case_list[j]
               << "\" superior performance of " << best_val
               << " by \"" << best_mod << "\".\n";
@@ -1858,9 +1858,9 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    if(init.n_elements() != lead.n_elements() ||
       init.n_elements() != valid.n_elements() ||
       init.n_elements() < 2) {
-      mlog << Debug(5)
-           << "Skipping time-series computations since the array lengths "
-           << "differ.\n";
+      mlog << Debug(4)
+           << "Skipping time-series computations since the array "
+           << "length differ.\n";
       return(false);
    }
 
@@ -1874,21 +1874,21 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
 
       // Make sure the time spacing remains fixed
       if(dinit != (init[i+1] - init[i])) {
-         mlog << Debug(5)
+         mlog << Debug(4)
               << "Skipping time-series computations since the "
               << "initialization time spacing changed: " << dinit
               << " != " << (init[i+1] - init[i]) << "\n";
          return(false);
       }
       else if(dlead != (lead[i+1] - lead[i])) {
-         mlog << Debug(5)
+         mlog << Debug(4)
               << "Skipping time-series computations since the "
               << "lead time spacing changed: " << dlead
               << " != " << (lead[i+1] - lead[i]) << "\n";
          return(false);
       }
       else if(dvalid != (valid[i+1] - valid[i])) {
-         mlog << Debug(5)
+         mlog << Debug(4)
               << "Skipping time-series computations since the "
               << "valid time spacing changed: " << dvalid
               << " != " << (valid[i+1] - valid[i]) << "\n";
@@ -1899,21 +1899,21 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    // Check for one fixed and the others varying by a non-zero amount
    if(dinit == 0 && dlead == dvalid && dlead > 0) {
       dsec = dlead;
-      mlog << Debug(5)
+      mlog << Debug(4)
            << "Computing time-series for initialization time \""
            << unix_to_yyyymmdd_hhmmss(init[0]) << "\" and spacing \""
            << sec_to_hhmmss(dsec) << "\".\n";
    }
    else if(dlead == 0 && dvalid == dinit && dvalid > 0) {
       dsec = dvalid;
-      mlog << Debug(5)
+      mlog << Debug(4)
            << "Computing time-series for valid time \""
            << unix_to_yyyymmdd_hhmmss(valid[0]) << "\" and spacing \""
            << sec_to_hhmmss(dsec) << "\".\n";
    }
    else if(dvalid == 0 && dinit == dlead && dinit > 0) {
       dsec = dinit;
-      mlog << Debug(5)
+      mlog << Debug(4)
            << "Computing time-series for lead time \""
            << sec_to_hhmmss(lead[0]) << "\" and spacing \""
            << sec_to_hhmmss(dsec) << "\".\n";
