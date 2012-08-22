@@ -737,11 +737,15 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add(a[i+1]);                         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add(a[i+1]);                       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add(a[i+1]);                     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init"              ) == 0) { InitBeg = timestring_to_unix(a[i+1]);
+                                                           InitEnd = InitBeg;                         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add(timestring_to_unix(a[i+1]));   a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add(timestring_to_sec(a[i+1]));   a.shift_down(i, 1); }
       else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add(timestring_to_sec(a[i+1]));       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid"             ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);
+                                                           ValidEnd = ValidBeg;                       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add(timestring_to_unix(a[i+1]));  a.shift_down(i, 1); }
@@ -1211,7 +1215,12 @@ TCStatJobSummary & TCStatJobSummary::operator=(const TCStatJobSummary &j) {
 void TCStatJobSummary::init_from_scratch() {
 
    TCStatJob::init_from_scratch();
-
+   
+   // Ignore case when performing comparisons
+   ReqColumn.set_ignore_case(1);
+   Column.set_ignore_case(1);
+   Case.set_ignore_case(1);
+   
    clear();
 
    return;
@@ -1380,7 +1389,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::process_pair_array() {
-   int i, j, k, l;
+   int i, j, k, l, lead;
    map<ConcatString,MapData,cs_cmp> cur_map;
    map<ConcatString,MapData,cs_cmp>::iterator it;
    ConcatString key, cur;
@@ -1412,13 +1421,20 @@ void TCStatJobSummary::process_pair_array() {
                // For bad data, use the NA string
                if(is_bad_data(atoi(cur))) cur = na_str;
 
-               // For lead time column, make sure hour is 3-digits
-               if(strcasecmp(Case[l], "LEAD") == 0 &&
-                  cur != na_str &&
-                  hhmmss_to_sec(cur) < 100*sec_per_hour &&
-                  hhmmss_to_sec(cur) > 0)
-                    key << ":0" << cur;
-               else key << ":"  << cur;
+               // Special handling for lead time:
+               // Switch 2-digit hours to 3-digit hours so that the
+               // summary job output is sorted nicely.
+               if(strcasecmp(Case[l], "LEAD") == 0 && cur != na_str &&
+                  abs(lead = hhmmss_to_sec(cur)) < 100*sec_per_hour) {
+
+                  // Handle positive and negative lead times
+                  key << (lead < 0 ? ":-0" : ":0")
+                      << sec_to_hhmmss(abs(lead));
+               }
+               // Otherwise, just append the current case info
+               else {
+                  key << ":" << cur;
+               }
                
             } // end for l
 
@@ -1577,6 +1593,9 @@ void TCStatJobSummary::do_output(ostream &out) {
 
       // Get the valid subset of data
       v.clear();
+      init.clear();
+      lead.clear();
+      valid.clear();
       for(i=0; i<it->second.Val.n_elements(); i++) {
          if(!is_bad_data(it->second.Val[i])) {
             v.add(it->second.Val[i]);
@@ -1667,7 +1686,12 @@ void TCStatJobSummary::compute_fsp(NumArray &total,
    } // end for it
      
    // Only compute FSP when AMODEL is in the case information
-   if(!Case.has("AMODEL")) return;
+   if(!Case.has("AMODEL")) {
+      mlog << Debug(5)
+           << "Skipping frequency of superior performance since "
+           << "the case information does not contain \"AMODEL\".\n";
+      return;
+   }
 
    // Loop over the SummaryMap
    for(it=SummaryMap.begin(); it!=SummaryMap.end(); it++) {
@@ -1833,7 +1857,12 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    // The arrays should all be of the same length > 1
    if(init.n_elements() != lead.n_elements() ||
       init.n_elements() != valid.n_elements() ||
-      init.n_elements() < 2) return(false);
+      init.n_elements() < 2) {
+      mlog << Debug(5)
+           << "Skipping time-series computations since the array lengths "
+           << "differ.\n";
+      return(false);
+   }
 
    // Initialize time spacing
    dinit  = init[1]  - init[0];
@@ -1844,9 +1873,27 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    for(i=0; i<init.n_elements()-1; i++) {
 
       // Make sure the time spacing remains fixed
-      if(dinit  != (init[i+1]  - init[i]) ||
-         dlead  != (lead[i+1]  - lead[i]) ||
-         dvalid != (valid[i+1] - valid[i])) return(false);
+      if(dinit != (init[i+1] - init[i])) {
+         mlog << Debug(5)
+              << "Skipping time-series computations since the "
+              << "initialization time spacing changed: " << dinit
+              << " != " << (init[i+1] - init[i]) << "\n";
+         return(false);
+      }
+      else if(dlead != (lead[i+1] - lead[i])) {
+         mlog << Debug(5)
+              << "Skipping time-series computations since the "
+              << "lead time spacing changed: " << dlead
+              << " != " << (lead[i+1] - lead[i]) << "\n";
+         return(false);
+      }
+      else if(dvalid != (valid[i+1] - valid[i])) {
+         mlog << Debug(5)
+              << "Skipping time-series computations since the "
+              << "valid time spacing changed: " << dvalid
+              << " != " << (valid[i+1] - valid[i]) << "\n";
+         return(false);
+      }
    }
     
    // Check for one fixed and the others varying by a non-zero amount
