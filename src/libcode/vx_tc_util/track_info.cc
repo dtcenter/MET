@@ -398,10 +398,10 @@ bool TrackInfo::add(const ATCFLine &l) {
    if(!StormName) StormName = l.storm_name();
    else if(StormName && l.storm_name() &&
            StormName != l.storm_name()) {
-      mlog << Warning
-           << "\nTrackInfo::add(const ATCFLine &) -> "
-           << "the storm name should remain the same \"" << StormName
-           << "\" != \"" << l.storm_name() << "\".\n\n";
+      mlog << Debug(4)
+           << "Updating storm name from \"" << StormName << "\" to \""
+           << l.storm_name() << "\" for " << StormId << ".\n";
+      StormName = l.storm_name();
    }
 
    // Check that the TrackPoint valid time is increasing
