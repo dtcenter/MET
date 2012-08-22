@@ -512,7 +512,7 @@ bool TrackInfo::is_match(const ATCFLine &l) const {
          TechniqueNumber != l.technique_number() ||
          Technique       != l.technique()        ||
          InitTime        != l.warning_time())
-      match = false;
+         match = false;
    }
    
    return(match);
