@@ -585,6 +585,7 @@ void process_point_obs(int i_nc) {
    char hdr_typ_str[max_str_len];
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
+   char obs_qty_str[max_str_len];
    unixtime hdr_ut;
    NcFile *obs_in = (NcFile *) 0;
 
@@ -613,6 +614,7 @@ void process_point_obs(int i_nc) {
 
    // Define variables
    NcVar *obs_arr_var = (NcVar *) 0;
+   NcVar *obs_qty_var = (NcVar *) 0;
    NcVar *hdr_typ_var = (NcVar *) 0;
    NcVar *hdr_sid_var = (NcVar *) 0;
    NcVar *hdr_vld_var = (NcVar *) 0;
@@ -640,6 +642,8 @@ void process_point_obs(int i_nc) {
    hdr_vld_var = obs_in->get_var("hdr_vld");
    hdr_arr_var = obs_in->get_var("hdr_arr");
 
+   if( 6 == obs_in->num_vars() ) obs_qty_var = obs_in->get_var("obs_qty");
+
    if(!obs_arr_var || !obs_arr_var->is_valid() ||
       !hdr_typ_var || !hdr_typ_var->is_valid() ||
       !hdr_sid_var || !hdr_sid_var->is_valid() ||
@@ -651,6 +655,9 @@ void process_point_obs(int i_nc) {
            << point_obs_file_list[i_nc] << "\n\n";
       exit(1);
    }
+
+   if(!obs_qty_var || !obs_qty_var->is_valid())
+      mlog << Debug(3) << "Quality marker information not found input file\n";
 
    mlog << Debug(2) << "Searching " << obs_dim->size()
         << " observations from " << hdr_dim->size()
@@ -704,6 +711,18 @@ void process_point_obs(int i_nc) {
          exit(1);
       }
 
+      // Read the current observation quality flag
+      strcpy(obs_qty_str, "");
+      if( ( obs_qty_var && obs_qty_var->is_valid() ) &&
+          ( !obs_qty_var->set_cur((long) i_obs) ||
+            !obs_qty_var->get(obs_qty_str, 1, strl_dim->size()) )
+        ) {
+         mlog << Error << "\nprocess_obs_file() -> "
+              << "can't read the quality flag for observation "
+              << "index " << i_obs << "\n\n";
+         exit(1);
+      }
+
       // Convert string to a unixtime
       hdr_ut = timestring_to_unix(hdr_vld_str);
 
@@ -713,7 +732,7 @@ void process_point_obs(int i_nc) {
 
          // Attempt to add the observation to the conf_info.vx_pd object
          conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                    hdr_ut, obs_arr, grid);
+                                    hdr_ut, obs_qty_str, obs_arr, grid);
       }
    } // end for i_obs
 

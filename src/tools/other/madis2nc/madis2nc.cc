@@ -86,6 +86,12 @@ static void   process_obs(NcFile *&f_in, const char *in_str,
                           const int gc, const float conversion,
                           float *obs_arr, int &i_obs,
                           int &n_rej_fill, int &n_rej_qc);
+static void   process_obs(NcFile *&f_in, const char *in_str,
+                          const long *cur, const long *dim,
+                          const int gc, const float conversion,
+                          float *obs_arr, int &i_obs,
+                          int &n_rej_fill, int &n_rej_qc, char &qty);
+static void   write_qty(int &i_obs, char &qty);
 
 static MadisType get_madis_type(NcFile *&f_in);
 static void      parse_css(const char *, StringArray &);
@@ -669,6 +675,19 @@ void process_obs(NcFile *&f_in, const char *in_str,
                  const int in_gc, const float conversion,
                  float *obs_arr, int &i_obs,
                  int &n_rej_fill, int &n_rej_qc) {
+   char qty;
+   process_obs(f_in, in_str, cur, dim, in_gc, conversion, obs_arr, i_obs,
+               n_rej_fill, n_rej_qc, qty);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_obs(NcFile *&f_in, const char *in_str,
+                 const long *cur, const long *dim,
+                 const int in_gc, const float conversion,
+                 float *obs_arr, int &i_obs,
+                 int &n_rej_fill, int &n_rej_qc,
+                 char &qty) {
    //
    // Store the GRIB code
    //
@@ -677,7 +696,6 @@ void process_obs(NcFile *&f_in, const char *in_str,
    //
    // Get the observation value and store it
    //
-   char qty;
    obs_arr[4] = get_nc_obs(f_in, in_str, cur, dim, n_rej_fill, n_rej_qc, qty);
 
    //
@@ -686,16 +704,20 @@ void process_obs(NcFile *&f_in, const char *in_str,
    if(!is_bad_data(obs_arr[4])) {
       obs_arr[4] *= conversion;
       put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-
-      //PGO -  Add the quality control value to the quality header array
-      ConcatString qty_str;
-      qty_str << qty;
-      put_nc_var_val(obs_qty_var, i_obs, qty_str);
-
+      write_qty(i_obs, qty);
       i_obs++;
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_qty(int &i_obs, char &qty) {
+   ConcatString qty_str;
+   qty_str << qty;
+   qty_str.replace(" ", "_");
+   put_nc_var_val(obs_qty_var, i_obs, qty_str);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -891,8 +913,9 @@ void process_madis_metar(NcFile *&f_in) {
       wdir = obs_arr[4];
 
       // Wind Speed
+      char qty;
       process_obs(f_in, "windSpeed", cur, dim, 32, conversion,
-                  obs_arr, i_obs, n_rej_fill, n_rej_qc);
+                  obs_arr, i_obs, n_rej_fill, n_rej_qc, qty);
       wind = obs_arr[4];
 
       // Convert the wind direction and speed into U and V components
@@ -903,6 +926,7 @@ void process_madis_metar(NcFile *&f_in) {
       obs_arr[4] = ugrd;
       if(!is_bad_data(ugrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+         write_qty(i_obs, qty);
          i_obs++;
       }
 
@@ -911,6 +935,7 @@ void process_madis_metar(NcFile *&f_in) {
       obs_arr[4] = vgrd;
       if(!is_bad_data(vgrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+         write_qty(i_obs, qty);
          i_obs++;
       }
 
@@ -975,7 +1000,7 @@ void process_madis_raob(NcFile *&f_in) {
    long i_hdr;
    int hdr_sid_len;
    double tmp_dbl;
-   char tmp_str[max_str_len];
+   char tmp_str[max_str_len], qty;
    ConcatString hdr_typ, hdr_sid, hdr_vld;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
@@ -1137,7 +1162,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          // Wind Speed
          process_obs(f_in, "wsMan", cur, dim, 32, conversion,
-                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1148,6 +1173,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1156,6 +1182,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1226,7 +1253,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          // Wind Speed
          process_obs(f_in, "wsSigW", cur, dim, 32, conversion,
-                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1237,6 +1264,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1245,6 +1273,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1281,7 +1310,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          // Wind Speed
          process_obs(f_in, "wsSigPrW", cur, dim, 32, conversion,
-                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1292,6 +1321,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1300,6 +1330,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1344,7 +1375,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          // Wind Speed
          process_obs(f_in, "wsTrop", cur, dim, 32, conversion,
-                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1355,6 +1386,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1363,6 +1395,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1399,7 +1432,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          // Wind Speed
          process_obs(f_in, "wsMaxW", cur, dim, 32, conversion,
-                     obs_arr, i_obs, n_rej_fill, n_rej_qc);
+                     obs_arr, i_obs, n_rej_fill, n_rej_qc, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1410,6 +1443,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 
@@ -1418,6 +1452,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(i_obs, qty);
             i_obs++;
          }
 

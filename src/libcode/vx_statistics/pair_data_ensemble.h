@@ -117,6 +117,10 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray obs_qty_filt;  // Observation quality markers
+
+      //////////////////////////////////////////////////////////////////
+
       int      n_msg_typ;        // Number of verifying message types
 
       int      n_mask;           // Total number of masking regions
@@ -143,6 +147,8 @@ class VxPairDataEnsemble {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
+      void set_obs_qty_filt(const StringArray);
+
       // Call set_pd_size before set_msg_typ, set_mask_dp, and set_interp
       void set_pd_size(int, int, int);
 
@@ -155,7 +161,7 @@ class VxPairDataEnsemble {
       void set_ens_size();
 
       void add_obs(float *, const char *, const char *, unixtime,
-                   float *, Grid &);
+                   const char *, float *, Grid &);
       void add_ens();
 
       void find_vert_lvl(double, int &, int &);

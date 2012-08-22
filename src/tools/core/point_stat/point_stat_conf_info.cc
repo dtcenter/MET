@@ -84,6 +84,7 @@ void PointStatConfInfo::clear() {
    obs_wind_ta.clear();
    mask_name.clear();
    mask_sid.clear();
+   obs_qty.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
    boot_rep_prop = bad_data_double;
@@ -416,6 +417,10 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
            << "match the number of thresholds in \"obs_wind_thresh\".\n\n";
       exit(1);
    }
+
+   // Conf: obs_qty
+   obs_qty = conf.lookup_string_array(conf_key_obs_qty);
+   for(i=0; i<n_vx; i++) { vx_pd[i].set_obs_qty_filt(obs_qty); }
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);

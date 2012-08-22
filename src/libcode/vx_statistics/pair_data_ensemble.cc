@@ -371,6 +371,7 @@ void VxPairDataEnsemble::clear() {
    interp_thresh = 0;
 
    fcst_dpa.clear();
+   obs_qty_filt.clear();
    
    fcst_ut       = (unixtime) 0;
    beg_ut        = (unixtime) 0;
@@ -404,6 +405,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    fcst_ut = vx_pd.fcst_ut;
    beg_ut  = vx_pd.beg_ut;
    end_ut  = vx_pd.end_ut;
+   obs_qty_filt = vx_pd.obs_qty_filt;
 
    interp_thresh = vx_pd.interp_thresh;
 
@@ -503,6 +505,15 @@ void VxPairDataEnsemble::set_beg_ut(const unixtime ut) {
 void VxPairDataEnsemble::set_end_ut(const unixtime ut) {
 
    end_ut = ut;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_obs_qty_filt(const StringArray q) {
+
+   obs_qty_filt = q;
 
    return;
 }
@@ -613,8 +624,9 @@ void VxPairDataEnsemble::set_ens_size() {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
-                                 const char  *hdr_sid_str, unixtime hdr_ut,
-                                 float *obs_arr, Grid &gr) {
+                                 const char *hdr_sid_str, unixtime hdr_ut,
+                                 const char *obs_qty, float *obs_arr,
+                                 Grid &gr) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt;
@@ -634,6 +646,15 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check whether the GRIB code for the observation matches
    // the specified code
    if(obs_info_grib->code() != nint(obs_arr[1])) return;
+
+   // Check if the observation quality flag is included in the list
+   if( obs_qty_filt.n_elements() && strcmp(obs_qty, "") ) {
+      bool qty_match = false;
+      for(i=0; i < obs_qty_filt.n_elements() && !qty_match; i++)
+         if( 0 == strcmp(obs_qty, obs_qty_filt[i]) ) qty_match = true;
+
+      if( !qty_match ) return;
+   }
 
    // Check whether the observation time falls within the valid time
    // window
