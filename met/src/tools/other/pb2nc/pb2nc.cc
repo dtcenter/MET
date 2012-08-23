@@ -824,7 +824,7 @@ void process_pbfile(int i_pb) {
 
             // Write the quality flag to the netCDF file
             ConcatString quality_mark_str;
-            quality_mark_str.format("%.1f", quality_mark);
+            quality_mark_str.format("%d", nint(quality_mark));
             if(!obs_qty_var->set_cur(n_total_obs, (long) 0) ||
                !obs_qty_var->put(quality_mark_str, (long) 1,
                                  (long) strl_len)) {
@@ -880,7 +880,7 @@ void process_pbfile(int i_pb) {
 
                // Write the quality flag to the netCDF file
                ConcatString quality_mark_str;
-               quality_mark_str.format("%.1f", quality_mark);
+               quality_mark_str.format("%d", nint(quality_mark));
                if(!obs_qty_var->set_cur(n_total_obs, (long) 0) ||
                   !obs_qty_var->put(quality_mark_str, (long) 1,
                                     (long) strl_len)) {
