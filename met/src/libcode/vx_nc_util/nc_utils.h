@@ -33,6 +33,8 @@ extern bool args_ok(const LongArray &);
 
 extern int  get_int_var(NcFile *, const char * var_name, int index);
 
+extern int  has_var(NcFile *, const char * var_name);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __NC_UTILS_H__  */
