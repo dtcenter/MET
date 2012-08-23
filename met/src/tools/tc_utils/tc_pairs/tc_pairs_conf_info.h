@@ -42,6 +42,7 @@ class TCPairsConfInfo {
 
       // Timing information
       unixtime  InitBeg, InitEnd;
+      TimeArray InitInc;
       TimeArray InitExc;
       NumArray  InitHour;
       unixtime  ValidBeg, ValidEnd;
