@@ -59,6 +59,10 @@ static ConcatString program_name;
 static const LatLonData NWHemTenthData =
    { "NWHemTenthDegree", 0.0, -180.0, 0.1, 0.1, 601, 1801 };
 
+// Default location of data file
+static const char *default_aland_data_file =
+   "MET_BASE/data/tc_data/aland.dat";
+   
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for command line arguments
@@ -72,7 +76,7 @@ static bool latlon_flag = true;
 ////////////////////////////////////////////////////////////////////////
 
 extern "C" {
-   void aland_(float *, float *, float *);
+   void aland_(const char *, float *, float *, float *);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -156,6 +160,7 @@ void process_distances() {
    double latd, lond;
    float latf, lonf1, lonf2, d1, d2;
    float *dland = (float *) 0;
+   ConcatString data_file = replace_path(default_aland_data_file);
 
    // Instantiate the grid
    Grid grid(GridData);
@@ -228,8 +233,8 @@ void process_distances() {
          lonf2 = (float) rescale_deg(-1.0*lond,    0.0, 360.0);
 
          // Compute distance to land
-         aland_(&lonf1, &latf, &d1);
-         aland_(&lonf2, &latf, &d2);
+         aland_(data_file, &lonf1, &latf, &d1);
+         aland_(data_file, &lonf2, &latf, &d2);
 
          // Convert to nuatical miles and store the minimum
          d1 *= nautical_miles_per_km;
