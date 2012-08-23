@@ -63,7 +63,7 @@ gen_sources: $(GEN_SOURCES)
 
 acerr.o: acerr.f
 	@ echo
-	$(FC) acerr.f $(FC_FLAGS)
+	$(FC) acerr.f $(FC_FLAGS) -c
 
 
 clip_shif.o: clip_shif.f
