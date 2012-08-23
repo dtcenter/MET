@@ -798,18 +798,28 @@ void derive_lag(TrackInfoArray &tracks) {
 
 void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
    int i, j, k;
+   ConcatString cur_case;
+   StringArray case_list;
    
    // If no baseline models are requested, nothing to do
    if(conf_info.OperBaseline.n_elements() == 0 &&
       conf_info.BestBaseline.n_elements() == 0) return;
-
+     
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
         << conf_info.OperBaseline.n_elements() << " method(s).\n";
    
    // Loop over the ADECK tracks
    for(i=0; i<atracks.n_tracks(); i++) {
+     
+      // Define the current case as stormid and initialization time
+      cur_case << cs_erase
+               << atracks[i].storm_id() << ":"
+               << atracks[i].init();
 
+      // Build a unique list of cases
+      if(!case_list.has(cur_case)) case_list.add(cur_case);
+      
       // Only derive baselines from the CARQ model
       if(strcmp(atracks[i].technique(), "CARQ") != 0) continue;
 
@@ -824,7 +834,8 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
    
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR BEST track baseline forecasts using "
-        << conf_info.BestBaseline.n_elements() << " method(s).\n";
+        << conf_info.BestBaseline.n_elements() << " method(s) for "
+        << case_list.n_elements() << " cases.\n";
 
    // Loop over the BDECK tracks
    for(i=0; i<btracks.n_tracks(); i++) {
@@ -832,8 +843,13 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
       // Derive baseline model for each track point
       for(j=0; j<btracks[i].n_points(); j++) {
 
-         // Check if the current time is a 6-hour interval
-         if((btracks[i][j].valid()%(6*sec_per_hour)) != 0) continue;
+         // Define the current case as stormid and current valid time
+         cur_case << cs_erase
+                  << btracks[i].storm_id() << ":"
+                  << btracks[i][j].valid();
+
+         // Check if the current case is in the list
+         if(!case_list.has(cur_case)) continue;
         
          // Loop over the BEST track baseline methods
          for(k=0; k<conf_info.BestBaseline.n_elements(); k++) {
