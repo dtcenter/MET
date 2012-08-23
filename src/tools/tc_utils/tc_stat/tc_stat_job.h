@@ -194,12 +194,16 @@ class TCStatJob {
       StringArray Cyclone;
       StringArray StormName;
 
-      // Timing information
+      // Initialization Times
       unixtime  InitBeg, InitEnd;
+      TimeArray InitInc;
       TimeArray InitExc;
       NumArray  InitHour;
       NumArray  Lead;
+      
+      // Valid Times      
       unixtime  ValidBeg, ValidEnd;
+      TimeArray ValidInc;
       TimeArray ValidExc;
       NumArray  ValidHour;
 
@@ -299,7 +303,7 @@ class TCStatJobSummary : public TCStatJob {
 
       StringArray parse_job_command(const char *);
       
-      void add_column(const StringArray &);
+      void add_column(const char *);
 
       ConcatString serialize() const;
       

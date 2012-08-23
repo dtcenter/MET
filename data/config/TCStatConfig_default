@@ -64,31 +64,36 @@ storm_name = [];
 //
 // Stratify by the INIT times.
 // Define beginning and ending time windows in YYYYMMDD[_HH[MMSS]]
-// or provide a list of specific initialization times to exclude.
-// May modify using the "-init_beg", "-init_end", and "-init_exc"
-// job command options.
+// or provide a list of specific initialization times to include
+// or exclude.
+// May modify using the "-init_beg", "-init_end", "-init_inc",
+// and "-init_exc" job command options.
 // 
 // e.g. init_beg = "20100101";
 //      init_end = "20101231_12";
+//      init_inc = [ "20101231_06" ];
 //      init_exc = [ "20101231_00" ];
 //
 init_beg = "";
 init_end = "";
+init_inc = [];
 init_exc = [];
 
 //
 // Stratify by the VALID times.
 // Define beginning and ending time windows in YYYYMMDD[_HH[MMSS]]
-// or provide a list of specific valid times to exclude.
-// May modify using the "-valid_beg", "-valid_end", and "-valid_exc"
-// job command options.
+// or provide a list of specific valid times to include or exclude.
+// May modify using the "-valid_beg", "-valid_end", "-valid_inc",
+// and "-valid_exc" job command options.
 //
 // e.g. valid_beg = "20100101";
 //      valid_end = "20101231_12";
+//      valid_inc = [ "20101231_06" ];
 //      valid_exc = [ "20101231_00" ];
 //
 valid_beg = "";
 valid_end = "";
+valid_inc = [];
 valid_exc = [];
 
 //
