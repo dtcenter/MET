@@ -3,10 +3,11 @@ C     ALAND  A collection of routines for computing
 C               the distance to land.
 C     ----------------------------------------------
 
-      SUBROUTINE ALAND ( CLON, CLAT, DIST )
+      SUBROUTINE ALAND ( DATAFILE, CLON, CLAT, DIST )
 C
-c  Input: CLON - Longitude (deg W negative)
-c         CLAT - Latitude (deg N positive)
+c  Input: DATAFILE - Location of aland.dat data file.
+c         CLON     - Longitude (deg W negative)
+c         CLAT     - Latitude (deg N positive)
 c  
 c  Output: DIST - distance (km) to nearest coastline. DIST is positive if the 
 c                 point CLON,CLAT is over water and negative if it is over land.
@@ -46,6 +47,8 @@ C
       PARAMETER (NCOAST=30)
       PARAMETER (NCONOB=400)
       PARAMETER (NISLOB=100)
+
+      CHARACTER DATAFILE* ( 1024 )
 C
 C      REAL*8 CISL(NCOAST)
       REAL*4 XISL(NCOAST,NISLOB,2), DI(NCOAST), BI(NCOAST),
@@ -65,20 +68,12 @@ C
 C
 C     T H I S   I S   C O A S L I N E   I N P U T **********
 C
-C     ON VAX
-c     OPEN(LUIN,FILE='D11:[HRD.DEMARIA.ATLC]ALAND.DAT',
-c    +     FORM='FORMATTED',STATUS='OLD',READONLY)
-C
-C     ON HP WORKSTATION
-c     OPEN(LUIN,FILE='/home/demaria/land/aland.dat',
-c    +     FORM='FORMATTED',STATUS='OLD')
-C
 C     On Linux
-      OPEN(LUIN,FILE='aland.dat',
+      OPEN(LUIN,FILE=DATAFILE,
      +     FORM='FORMATTED',STATUS='OLD')
 c
 C     ON TYPE42
-C      OPEN(LUIN,FILE='ALAND.DAT',
+C      OPEN(LUIN,FILE=DATAFILE,
 C     +     FORM='FORMATTED',STATUS='OLD',READONLY)
 C
 C     READ CONTINENT COASTAL POINTS
