@@ -680,10 +680,7 @@ void process_obs_file(int i_nc) {
    hdr_sid_var = obs_in->get_var("hdr_sid");
    hdr_vld_var = obs_in->get_var("hdr_vld");
    hdr_arr_var = obs_in->get_var("hdr_arr");
-
-   // If the obs_qty variable is present, read it
-   if( -1 < has_var(obs_in, "obs_qty") )
-      obs_qty_var = obs_in->get_var("obs_qty");
+   obs_qty_var = has_var(obs_in, "obs_qty");
 
    if(!obs_arr_var || !obs_arr_var->is_valid() ||
       !hdr_typ_var || !hdr_typ_var->is_valid() ||

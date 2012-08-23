@@ -100,12 +100,12 @@ bool args_ok(const LongArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int has_var(NcFile *nc, const char * var_name) {
+NcVar* has_var(NcFile *nc, const char * var_name) {
    for(int i=0; i < nc->num_vars(); i++){
       NcVar* v = nc->get_var(i);
-      if( !strcmp(v->name(), var_name) ) return i;
+      if( !strcmp(v->name(), var_name) ) return v;
    }
-   return -1;
+   return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////
