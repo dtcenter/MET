@@ -63,12 +63,12 @@ gen_sources: $(GEN_SOURCES)
 
 acerr.o: acerr.f
 	@ echo
-	$(FC) acerr.f $(FC_FLAGS) -c
+	$(FC) acerr.f $(FC_FLAGS)
 
 
 clip_shif.o: clip_shif.f
 	@ echo
-	$(FC) clip_shif.f $(FC_FLAGS) -c
+	$(FC) clip_shif.f $(FC_FLAGS) -c > /dev/null 2>&1
 	
 
 tc_pairs_conf_info.o: tc_pairs_conf_info.cc
