@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/tc_data/adeck">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/tc_data/bdeck">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="tc_pairs_ALAL2010">
+    <exec>&MET_DIR;/bin/tc_pairs</exec>
+    <param> \
+      -adeck &DATA_DIR_MODEL; \
+      -bdeck &DATA_DIR_OBS; \
+      -config &CONFIG_DIR;/TCPairsConfig_ALAL2010 \
+      -out &OUTPUT_DIR;/tc_pairs/alal2010 \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_ALAL2010.log \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2010.tcst</stat>
+    </output>
+  </test>
+  
+</met_test>
