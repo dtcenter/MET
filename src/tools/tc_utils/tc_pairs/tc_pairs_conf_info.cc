@@ -131,6 +131,11 @@ void TCPairsConfInfo::process_config() {
    // Conf: InitBeg, InitEnd
    InitBeg = timestring_to_unix(Conf.lookup_string("init_beg"));
    InitEnd = timestring_to_unix(Conf.lookup_string("init_end"));
+
+   // Conf: InitInc
+   sa = Conf.lookup_string_array("init_inc");
+   for(i=0; i<sa.n_elements(); i++)
+      InitInc.add(timestring_to_unix(sa[i]));
    
    // Conf: InitExc
    sa = Conf.lookup_string_array("init_exc");

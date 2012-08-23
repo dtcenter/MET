@@ -55,17 +55,18 @@ storm_name = [];
 
 //
 // Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
-// or provide a list of specific initialization times to exclude.
-// Tracks whose initial time falls within the time window and not in the
-// exclusion list will be used.
+// or provide a list of specific initialization times to include or exclude.
+// Tracks whose initial time meets the specified criteria will be used.
 // An empty string indicates that all times should be used.
 //
 // e.g. init_beg = "20100101";
 //      init_end = "20101231";
+//      init_inc = [ "20101231_06" ];
 //      init_exc = [ "20101231_00" ];
 //
 init_beg = "";
 init_end = "";
+init_inc = [];
 init_exc = [];
 
 //

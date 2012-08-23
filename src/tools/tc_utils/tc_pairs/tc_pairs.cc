@@ -469,6 +469,8 @@ void filter_tracks(TrackInfoArray &tracks) {
           conf_info.InitBeg < t[i].init()) ||
          (conf_info.InitEnd > 0 &&
           conf_info.InitEnd > t[i].init()) ||
+         (conf_info.InitInc.n_elements() > 0 &&
+          !conf_info.InitInc.has(t[i].init())) ||
          (conf_info.InitExc.n_elements() > 0 &&
           conf_info.InitExc.has(t[i].init()))) {
          mlog << Debug(4)
