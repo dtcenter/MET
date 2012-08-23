@@ -37,6 +37,7 @@ static const bool         default_landfall           = false;
 static const int          default_landfall_beg       = -86400;
 static const int          default_landfall_end       = 0;
 
+// Default alpha value and FSP significance threshold
 static const double       default_tc_alpha           = 0.05;
 static const SingleThresh default_fsp_thresh(">0");
 
@@ -298,7 +299,7 @@ class TCStatJobSummary : public TCStatJob {
 
       StringArray parse_job_command(const char *);
       
-      void add_column(const char *);
+      void add_column(const StringArray &);
 
       ConcatString serialize() const;
       
