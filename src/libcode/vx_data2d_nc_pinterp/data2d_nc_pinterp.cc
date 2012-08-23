@@ -22,8 +22,8 @@ using namespace std;
 #include <cmath>
 
 #include "data2d_nc_pinterp.h"
-#include "data2d_nc_pinterp_utils.h"
 #include "get_pinterp_grid.h"
+#include "vx_nc_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
 

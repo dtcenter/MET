@@ -18,7 +18,6 @@ EXECUTABLES =
 OBJECTS     = get_pinterp_grid.o \
               pinterp_file.o \
               var_info_nc_pinterp.o \
-              data2d_nc_pinterp_utils.o \
               data2d_nc_pinterp.o
 
 
@@ -34,7 +33,6 @@ GEN_SOURCES =
 HEADERS     = get_pinterp_grid.h \
               pinterp_file.h \
               var_info_nc_pinterp.h \
-              data2d_nc_pinterp_utils.h \
               data2d_nc_pinterp.h \
               vx_data2d_nc_pinterp.h
 
@@ -76,9 +74,6 @@ pinterp_file.o: pinterp_file.cc
 
 var_info_nc_pinterp.o: var_info_nc_pinterp.cc
 	$(CXX) var_info_nc_pinterp.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
-
-data2d_nc_pinterp_utils.o: data2d_nc_pinterp_utils.cc
-	$(CXX) data2d_nc_pinterp_utils.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 data2d_nc_pinterp.o: data2d_nc_pinterp.cc
 	$(CXX) data2d_nc_pinterp.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
