@@ -32,6 +32,9 @@ using namespace std;
 static const char *TCStatJobType_FilterStr  = "filter";
 static const char *TCStatJobType_SummaryStr = "summary";
 
+// Delimiter for separating multiple command line options
+static const char *ArgsDelim                = ",";
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Code for class TCStatJobFactory
@@ -711,7 +714,8 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 ////////////////////////////////////////////////////////////////////////
 
 StringArray TCStatJob::parse_job_command(const char *jobstring) {
-   StringArray a, b;
+   StringArray a, b, op;
+   ConcatString s;
    const char * c = (const char *) 0;
    int i;
 
@@ -723,6 +727,12 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
 
       c = a[i];
 
+      // Parse next argument as a comma-separated list
+      if(i+1 < a.n_elements()) {
+         s  = a[i+1];
+         op = s.split(ArgsDelim);
+      }
+
       // Check for a job command option
       if(c[0] != '-') {
          b.add(a[i]);
@@ -731,12 +741,12 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
 
       // Check job command options
            if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add(a[i+1]);                        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add(a[i+1]);                        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add(a[i+1]);                       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add(a[i+1]);                         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add(a[i+1]);                       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add(a[i+1]);                     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add(op);                            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add(op);                            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add(op);                           a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add(op);                             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add(op);                           a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add(op);                         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init"              ) == 0) { InitBeg = timestring_to_unix(a[i+1]);
                                                            InitEnd = InitBeg;                         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
@@ -750,18 +760,18 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add(timestring_to_unix(a[i+1]));  a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add(timestring_to_sec(a[i+1]));  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add(a[i+1]);                     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add(op);                          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add(op);                         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add(op);                          a.shift_down(i, 1); }
       else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add(a[i+1]);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_thresh"     ) == 0) { ColumnThreshName.add(a[i+1]);
+      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add(op);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-column_thresh"     ) == 0) { ColumnThreshName.add(op);
                                                            ColumnThreshVal.add(a[i+2]);               a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-column_str"        ) == 0) { ColumnStrName.add(a[i+1]);
+      else if(strcasecmp(c, "-column_str"        ) == 0) { ColumnStrName.add(op);
                                                            ColumnStrVal.add(a[i+2]);                  a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_thresh"       ) == 0) { InitThreshName.add(a[i+1]);
+      else if(strcasecmp(c, "-init_thresh"       ) == 0) { InitThreshName.add(op);
                                                            InitThreshVal.add(a[i+2]);                 a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_str"          ) == 0) { InitStrName.add(a[i+1]);
+      else if(strcasecmp(c, "-init_str"          ) == 0) { InitStrName.add(op);
                                                            InitStrVal.add(a[i+2]);                    a.shift_down(i, 2); }
       else if(strcasecmp(c, "-rapid_inten"       ) == 0) { RapidInten = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);              a.shift_down(i, 1); }
@@ -1265,8 +1275,9 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
 ////////////////////////////////////////////////////////////////////////
 
 StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
-   StringArray a, b;
+   StringArray a, b, op;
    const char * c = (const char *) 0;
+   ConcatString s;
    int i;
 
    // Call the parent and store any unused options
@@ -1277,19 +1288,26 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
 
       // Point at the current entry
       c = a[i];
-
+      
       // Check for a job command option
       if(c[0] != '-') {
          b.add(a[i]);
          continue;
       }
 
+      // Parse next argument as a comma-separated list
+      if(i+1 < a.n_elements()) {
+         s  = a[i+1];
+         op = s.split(ArgsDelim);
+      }
+
       // Check job command options
-           if(strcasecmp(c, "-column"    ) == 0) { ReqColumn.add(a[i+1]); add_column(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"        ) == 0) { Case.add(a[i+1]);                          a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);                     a.shift_down(i, 1); }
-      else                                       {                                            b.add(a[i]);        }
+           if(strcasecmp(c, "-column"    ) == 0) { ReqColumn.add(op);
+                                                   add_column(op);          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-by"        ) == 0) { Case.add(op);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);   a.shift_down(i, 1); }
+      else                                       {                          b.add(a[i]);        }
    }
 
    return(b);
@@ -1297,38 +1315,38 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::add_column(const char *col) {
-   int i;
+void TCStatJobSummary::add_column(const StringArray &sa) {
+   int i, j;
    ConcatString s;
 
-   //
-   // Handle special column names
-   //
+   // Loop over the entries, handling special column names
+   for(i=0; i<sa.n_elements(); i++) {
 
-   // Track errors
-   if(strcasecmp(col, "TRACK") == 0) {
-      for(i=0; i<n_tc_cols_track; i++) Column.add(tc_cols_track[i]);
-   }
-   // Wind errors
-   else if(strcasecmp(col, "WIND") == 0) {
-      for(i=0; i<n_tc_cols_wind; i++) Column.add(tc_cols_wind[i]);
-   }
-   // Track and Intensity (TI)
-   else if(strcasecmp(col, "TI") == 0) {
-      for(i=0; i<n_tc_cols_ti; i++) Column.add(tc_cols_ti[i]);
-   }
-   // Along and Cross Track (AC)
-   else if(strcasecmp(col, "AC") == 0) {
-      for(i=0; i<n_tc_cols_ac; i++) Column.add(tc_cols_ac[i]);
-   }
-   // Lat/Lon Difference (XY)
-   else if(strcasecmp(col, "XY") == 0) {
-      for(i=0; i<n_tc_cols_xy; i++) Column.add(tc_cols_xy[i]);
-   }
-   // Otherwise, just add the column name
-   else {
-      Column.add(col);
-   }
+      // Track errors
+      if(strcasecmp(sa[i], "TRACK") == 0) {
+         for(j=0; j<n_tc_cols_track; j++) Column.add(tc_cols_track[j]);
+      }
+      // Wind errors
+      else if(strcasecmp(sa[i], "WIND") == 0) {
+         for(j=0; j<n_tc_cols_wind; j++) Column.add(tc_cols_wind[j]);
+      }
+      // Track and Intensity (TI)
+      else if(strcasecmp(sa[i], "TI") == 0) {
+         for(j=0; j<n_tc_cols_ti; j++) Column.add(tc_cols_ti[j]);
+      }
+      // Along and Cross Track (AC)
+      else if(strcasecmp(sa[i], "AC") == 0) {
+         for(j=0; j<n_tc_cols_ac; j++) Column.add(tc_cols_ac[j]);
+      }
+      // Lat/Lon Difference (XY)
+      else if(strcasecmp(sa[i], "XY") == 0) {
+         for(j=0; j<n_tc_cols_xy; j++) Column.add(tc_cols_xy[j]);
+      }
+      // Otherwise, just add the column name
+      else {
+         Column.add(sa[i]);
+      }
+   } // end for i
 
    return;
 }
