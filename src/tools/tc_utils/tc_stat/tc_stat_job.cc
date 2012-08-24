@@ -1796,6 +1796,14 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
             } // end for k
          } // end for it
 
+         // Check for no top performer found
+         if(is_bad_data(best_val)) {
+            mlog << Debug(4)
+                 << "For case \"" << Column[i] << ":" << case_list[j]
+                 << "\" no superior performance found.\n";
+            continue;
+         }
+
          mlog << Debug(4)
               << "For case \"" << Column[i] << ":" << case_list[j]
               << "\" superior performance of " << best_val
