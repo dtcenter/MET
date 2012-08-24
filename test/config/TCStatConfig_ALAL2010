@@ -1,0 +1,290 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default TCStat configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// The parameters listed below are used to filter the TC-STAT data down to the
+// desired subset of lines over which statistics are to be computed.  Only
+// those lines which meet ALL of the criteria specified will be retained.
+//
+// The settings that are common to all jobs may be specified once at the top
+// level.  If no selection is listed for a parameter, that parameter will not
+// be used for filtering.  If multiple selections are listed for a parameter,
+// the analyses will be performed on their union.
+//
+
+//
+// Stratify by the AMODEL or BMODEL columns.
+// Specify comma-separated lists of model names to be used for all analyses
+// performed.  May add to this list using the "-amodel" and "-bmodel"
+// job command options.
+// e.g. amodel = [ "AHW4" ];
+//      bmodel = [ "BEST" ];
+//
+amodel = [ "AHWI", "BCLP" ];
+bmodel = [];
+
+//
+// Specify a comma-separated list of storm id's to be used:
+//    2-letter basin, 2-digit cyclone number, 4-digit year
+// An empty list indicates that all should be used.
+//
+// e.g. storm_id = [ "AL092011" ];
+//
+// This may also be set using basin, cyclone, and timing information below.
+//
+storm_id = [ "ALAL2010" ];
+
+//
+// Stratify by the BASIN column.
+// May add using the "-basin" job command option.
+//
+// e.g. basin = [ "AL" ];
+//
+basin = [];
+
+//
+// Stratify by the CYCLONE column.
+// May add using the "-cyclone" job command option.
+//
+// e.g. cyclone = [ "03" ];
+//
+cyclone = [];
+
+//
+// Stratify by the STORM_NAME column.
+// May add using the "-storm_name" job command option.
+//
+// e.g. storm_name = [ "KATRINA" ];
+//
+storm_name = [];
+
+//
+// Stratify by the INIT times.
+// Define beginning and ending time windows in YYYYMMDD[_HH[MMSS]]
+// or provide a list of specific initialization times to include
+// or exclude.
+// May modify using the "-init_beg", "-init_end", "-init_inc",
+// and "-init_exc" job command options.
+// 
+// e.g. init_beg = "20100101";
+//      init_end = "20101231_12";
+//      init_inc = [ "20101231_06" ];
+//      init_exc = [ "20101231_00" ];
+//
+init_beg = "";
+init_end = "";
+init_inc = [];
+init_exc = [];
+
+//
+// Stratify by the VALID times.
+// Define beginning and ending time windows in YYYYMMDD[_HH[MMSS]]
+// or provide a list of specific valid times to include or exclude.
+// May modify using the "-valid_beg", "-valid_end", "-valid_inc",
+// and "-valid_exc" job command options.
+//
+// e.g. valid_beg = "20100101";
+//      valid_end = "20101231_12";
+//      valid_inc = [ "20101231_06" ];
+//      valid_exc = [ "20101231_00" ];
+//
+valid_beg = "";
+valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Stratify by the initialization and valid hours and lead time.
+// Specify a comma-separated list of initialization hours,
+// valid hours, and and lead times in HH[MMSS] format.
+// May add using the "-init_hour", "-valid_hour", and "-lead"
+// job command options.
+//
+// e.g. init_hour  = [ "00" ];
+//      valid_hour = [ "12" ];
+//      lead       = [ "24", "36" ];
+//
+init_hour  = [];
+valid_hour = [];
+lead       = [];
+
+//
+// Stratify by the INIT_MASK and VALID_MASK columns.
+// May add using the "-init_mask" and "-valid_mask" job command options.
+//
+init_mask  = [];
+valid_mask = [];
+
+//
+// Stratify by the LINE_TYPE column.  May add using the "-line_type"
+// job command option.
+//
+// e.g. line_type = [ "TCMPR" ];
+//
+line_type = [];
+
+//
+// Stratify by only using points where both the ADECK and BDECK tracks are
+// over water.
+//
+// e.g. water_only = false;
+//
+water_only = false;
+
+//
+// Stratify by selecting the most severe watch/warning over the entire track.
+// Individual watch/warning status by point may be specified using the
+// -column_str options below, but this option filters by the track maximum.
+// May add using the "-track_watch_warn" job command option.
+// The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
+//
+// e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
+//
+track_watch_warn = [];
+
+//
+// Stratify by applying thresholds to numeric data columns.
+// Specify a comma-separated list of columns names and thresholds
+// to be applied.  May add using the "-column_thresh name thresh" job command
+// options.
+//
+// e.g. column_thresh_name = [ "ADLAND", "BDLAND" ];
+//      column_thresh_val  = [ >200,     >200     ];
+//
+column_thresh_name = [];
+column_thresh_val  = [];
+
+//
+// Stratify by performing string matching on non-numeric data columns.
+// Specify a comma-separated list of columns names and values
+// to be checked.  May add using the "-column_str name string" job command
+// options.
+//
+// e.g. column_str_name = [ "LEVEL", "LEVEL" ];
+//      column_str_val  = [ "HU",    "TS"    ];
+//
+column_str_name = [];
+column_str_val  = [];
+
+//
+// Just like the column_thresh options above, but apply the threshold only
+// when lead = 0.  If lead = 0 value does not meet the threshold, discard
+// the entire track.  May add using the "-init_thresh name thresh" job command
+// options.
+//
+// e.g. init_thresh_name = [ "ADLAND" ];
+//      init_thresh_val  = [ >200     ];
+//
+init_thresh_name = [];
+init_thresh_val  = [];
+
+//
+// Just like the column_str options above, but apply the string matching only
+// when lead = 0.  If lead = 0 string does not match, discard the entire track.
+// May add using the "-init_str name thresh" job command options.
+//
+// e.g. init_str_name = [ "LEVEL" ];
+//      init_str_val  = [ "HU"    ];
+//
+init_str_name = [];
+init_str_val  = [];
+
+//
+// Specify whether only those track points for which rapid intensification
+// occurred in the BDECK track during the previous 24 hours should be retained.
+// Define rapid intensification by thresholding the change in maximum windspeed.
+// May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
+// options.
+//
+// e.g. rapid_inten        = false;
+//      rapid_inten_thresh = >=30.0;
+//
+rapid_inten        = false;
+rapid_inten_thresh = >=30.0;
+
+//
+// Specify whether only those track points occurring near landfall should be
+// retained, and define the landfall retention window as a number of seconds
+// offset from the landfall time.  Landfall is defined as the last BDECK track
+// point before the distance to land switches from positive to 0 or negative.
+// May modify using the "-landfall", "-landfall_beg", and "-landfall_end" job
+// command options.
+//
+// e.g. landfall     = false;
+//      landfall_beg = -86400; (24 hours prior to landfall)
+//      landfall_end = 0;
+//
+landfall     = false;
+landfall_beg = -86400;
+landfall_end = 0;
+
+//
+// Specify whether only those track points common to both the ADECK and BDECK
+// tracks should be retained.  May modify using the "-match_points" job command
+// option.
+//
+// e.g. match_points = false;
+//
+match_points = true;
+
+//
+// Apply polyline masking logic to the location of the ADECK track at the
+// initialization time.  If it falls outside the mask, discard the entire track.
+// May modify using the "-out_init_mask" job command option.
+//
+// e.g. out_init_mask = "";
+//
+out_init_mask = "";
+
+//
+// Apply polyline masking logic to the location of the ADECK track at the
+// valid time.  If it falls outside the mask, discard only the current track
+// point.  May modify using the "-out_valid_mask" job command option.
+//
+// e.g. out_valid_mask = "";
+//
+out_valid_mask = "";
+
+//
+// Specify a list of analysis jobs to be performed, formatted as follows:
+//
+//    -job job_name
+//    OPTIONAL ARGS
+//
+//    Where "job_name" is one of the following:
+//
+//       "filter"
+//          To filter the TCMPR lines using the criteria specified above plus
+//          any job command options.  The output is written to the file
+//          specified using the "-dump_row" option.
+//          Required Args: -dump_row
+//
+//       "summary"
+//          To compute the mean, standard deviation, and percentiles
+//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the columns
+//          specified using the "-column" argument, which may be set to:
+//             "TRACK" for track, along-track, and cross-track errors.
+//             "WIND" for all wind radius errors.
+//             "TI" for track and maximum wind intensity errors.
+//             "AC" for along-track and cross-track errors.
+//             "XY" for x-track and y-track errors.
+//             "col" for a specific column name.
+//             "col1-col2" for a difference of two columns.
+//             "ABS(col or col1-col2)" for the absolute value.
+//          Required Args: -column
+//          Optional Args: -by column_name to specify case information
+//                         -out_alpha to override default alpha value
+//
+jobs = [
+   "-job summary -column TRACK -by AMODEL -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP.tcst",
+   "-job summary -column TRACK -by AMODEL,INIT -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst"
+];
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V4.0";
