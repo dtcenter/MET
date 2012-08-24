@@ -42,6 +42,7 @@ fcst = {
       {
          name  = "TMP";
          level = [ "Z2" ];
+         obs_quality    = [ ${OBS_QUALITY} ];
       }
    ];
 }
@@ -126,7 +127,6 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 duplicate_flag = NONE;
-obs_quality    = [ ${OBS_QUALITY} ];
 output_prefix  = "${OUTPUT_PREFIX}";
 version        = "V4.0";
 
