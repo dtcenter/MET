@@ -244,12 +244,12 @@ ConcatString TCStatLine::header() const {
    ConcatString hdr;
    const char *sep = ":";
 
-   hdr << bmodel()                         << sep
-       << basin()                          << sep
-       << cyclone()                        << sep
-       << unix_to_yyyymmdd_hhmmss(init())  << sep
-       << sec_to_hhmmss(lead())            << sep
-       << unix_to_yyyymmdd_hhmmss(valid());
+   hdr << bmodel() << sep
+       << basin() << sep
+       << cyclone() << sep
+       << (init() > 0 ? unix_to_yyyymmdd_hhmmss(init()) : na_str) << sep
+       << (!is_bad_data(lead()) ? sec_to_hhmmss(lead()) : na_str) << sep
+       << (valid() > 0 ? unix_to_yyyymmdd_hhmmss(valid()) : na_str);
 
    return(hdr);
 }
