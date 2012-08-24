@@ -1377,8 +1377,10 @@ ConcatString TCStatJobSummary::serialize() const {
       s << "-column " << ReqColumn[i] << " ";
    for(i=0; i<Case.n_elements(); i++)
       s << "-by " << Case[i] << " ";
-   s << "-out_alpha " << OutAlpha << " ";
-   s << "-fsp_thresh " << FSPThresh.get_str();
+   if(OutAlpha != default_tc_alpha)
+      s << "-out_alpha " << OutAlpha << " ";
+   if(!(FSPThresh == default_fsp_thresh))
+      s << "-fsp_thresh " << FSPThresh.get_str();
 
    return(s);
 }
