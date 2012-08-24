@@ -18,13 +18,22 @@ model = "WRF";
 //
 fcst = {
    wind_thresh  = [ NA ];
-   message_type = [ "ADPSFC" ];
 
    field = [
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
+        message_type = [ "ADPSFC" ];
+        obs_quality    = [ ${OBS_QUALITY_SFC} ];
+      },
+      
+      {
+        name       = "TMP";
+        level      = [ "P500" ];
+        cat_thresh = [ <=273, >273 ];
+        message_type = [ "ADPUPA" ];
+        obs_quality    = [ ${OBS_QUALITY_UPA} ];
       }
    ];
 
@@ -109,7 +118,6 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 duplicate_flag = NONE;
-obs_quality    = [ ${OBS_QUALITY} ];
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
