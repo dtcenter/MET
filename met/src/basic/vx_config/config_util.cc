@@ -264,6 +264,22 @@ StringArray parse_conf_message_type(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+StringArray parse_conf_obs_qty(Dictionary *dict) {
+   StringArray sa;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_obs_qty() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   sa = dict->lookup_string_array(conf_key_obs_qty);
+
+   return(sa);
+}
+////////////////////////////////////////////////////////////////////////
+
 NumArray parse_conf_ci_alpha(Dictionary *dict) {
    NumArray na;
    int i;

@@ -51,6 +51,7 @@ void EnsembleStatConfInfo::init_from_scratch() {
    ens_ta      = (ThreshArray *)        0;
    vx_pd       = (VxPairDataEnsemble *) 0;
    msg_typ     = (StringArray *)        0;
+   obs_qty     = (StringArray *)        0;
    mask_dp     = (DataPlane *)          0;   
    interp_mthd = (InterpMthd *)         0;
 
@@ -77,7 +78,6 @@ void EnsembleStatConfInfo::clear() {
    vld_ens_thresh = vld_data_thresh = bad_data_double;
    mask_name.clear();
    mask_sid.clear();
-   obs_qty.clear();
    interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
@@ -95,6 +95,7 @@ void EnsembleStatConfInfo::clear() {
    if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)        0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataEnsemble *) 0; }
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
+   if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)      0; }
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }   
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)         0; }
 
@@ -284,7 +285,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       // Allocate space based on the number of verification tasks
       vx_pd   = new VxPairDataEnsemble [n_vx];
       msg_typ = new StringArray        [n_vx];
-   
+      obs_qty = new StringArray        [n_vx];
+
       // Parse the fcst field information
       for(i=0; i<n_vx; i++) {
 
@@ -298,6 +300,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
          // Conf: msg_typ
          msg_typ[i] = parse_conf_message_type(&i_obs_dict);
+
+         // Conf: obs_qty
+         obs_qty[i] = parse_conf_obs_qty(&i_obs_dict);
+         vx_pd[i].set_obs_qty_filt(obs_qty[i]);
 
          // Set the current dictionaries
          vx_pd[i].fcst_info->set_dict(i_fcst_dict);
@@ -353,10 +359,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&conf);
    
-   // Conf: obs_qty
-   obs_qty = conf.lookup_string_array(conf_key_obs_qty);
-   for(i=0; i<n_vx; i++) { vx_pd[i].set_obs_qty_filt(obs_qty); }
-
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 

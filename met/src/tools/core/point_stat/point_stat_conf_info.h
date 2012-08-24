@@ -87,13 +87,13 @@ class PointStatConfInfo {
       VxPairDataPoint * vx_pd;              // Array pair data [n_vx]
       ThreshArray *     fcst_ta;            // Array for fcst thresholds [n_vx]
       ThreshArray *     obs_ta;             // Array for obs thresholds [n_vx]      
+      StringArray *     obs_qty;            // Array for quality flags [n_vx]
       ThreshArray       fcst_wind_ta;       // Wind speed fcst thresholds
       ThreshArray       obs_wind_ta;        // Wind speed obs thresholds
       StringArray *     msg_typ;            // Array of message types [n_vx]
       StringArray       mask_name;          // Masking region names [n_mask]
       DataPlane *       mask_dp;            // Array for masking regions [n_mask_area]
       StringArray       mask_sid;           // Masking station id's [n_mask_sid]
-      StringArray       obs_qty;            // Observation quality flags [obs_qty]
       NumArray          ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType  boot_interval;      // Bootstrap CI type
       double            boot_rep_prop;      // Bootstrap replicate proportion
