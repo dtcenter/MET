@@ -36,6 +36,7 @@ extern map<STATLineType,STATOutputType>
 extern int            parse_conf_n_vx(Dictionary *dict);
 extern Dictionary     parse_conf_i_vx_dict(Dictionary *dict, int index);
 extern StringArray    parse_conf_message_type(Dictionary *dict);
+extern StringArray    parse_conf_obs_qty(Dictionary *dict);
 extern NumArray       parse_conf_ci_alpha(Dictionary *dict);
 extern BootInfo       parse_conf_boot(Dictionary *dict);
 extern InterpInfo     parse_conf_interp(Dictionary *dict);

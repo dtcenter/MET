@@ -49,6 +49,7 @@ void PointStatConfInfo::init_from_scratch() {
    // Initialize pointers
    fcst_ta     = (ThreshArray *)     0;
    obs_ta      = (ThreshArray *)     0;
+   obs_qty     = (StringArray *)     0;
    msg_typ     = (StringArray *)     0;
    mask_dp     = (DataPlane *)       0;
    interp_mthd = (InterpMthd *)      0;
@@ -84,7 +85,6 @@ void PointStatConfInfo::clear() {
    obs_wind_ta.clear();
    mask_name.clear();
    mask_sid.clear();
-   obs_qty.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
    boot_rep_prop = bad_data_double;
@@ -106,6 +106,7 @@ void PointStatConfInfo::clear() {
    if(obs_ta)      { delete [] obs_ta;      obs_ta      = (ThreshArray *)      0; }
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)       0; }
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)      0; }
+   if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)      0; }
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)        0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataPoint *)  0; }
 
@@ -207,6 +208,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    fcst_ta = new ThreshArray     [n_vx];
    obs_ta  = new ThreshArray     [n_vx];   
    msg_typ = new StringArray     [n_vx];
+   obs_qty = new StringArray     [n_vx];
    
    // Parse the fcst and obs field information
    for(i=0; i<n_vx; i++) {
@@ -222,6 +224,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       // Conf: msg_typ
       msg_typ[i] = parse_conf_message_type(&i_obs_dict);
       
+      // Conf: obs_qty
+      obs_qty[i] = parse_conf_obs_qty(&i_obs_dict);
+
       // Set the current dictionaries
       vx_pd[i].fcst_info->set_dict(i_fcst_dict);
       vx_pd[i].obs_info->set_dict(i_obs_dict);
@@ -419,8 +424,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    }
 
    // Conf: obs_qty
-   obs_qty = conf.lookup_string_array(conf_key_obs_qty);
-   for(i=0; i<n_vx; i++) { vx_pd[i].set_obs_qty_filt(obs_qty); }
+   for(i=0; i<n_vx; i++) vx_pd[i].set_obs_qty_filt(obs_qty[i]);
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);

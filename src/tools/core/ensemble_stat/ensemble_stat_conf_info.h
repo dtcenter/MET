@@ -82,10 +82,10 @@ class EnsembleStatConfInfo {
       double               vld_data_thresh;     // Minimum valid data ratio for each point
       VxPairDataEnsemble * vx_pd;               // Array for ensemble pair data [n_vx]
       StringArray *        msg_typ;             // Array of message types [n_vx]
+      StringArray *        obs_qty;             // Observation quality flags for filtering[n_vx]
       StringArray          mask_name;           // Masking region names [n_mask]
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
       StringArray          mask_sid;            // Masking station id's [n_mask_sid]
-      StringArray          obs_qty;             // Observation quality flags [obs_qty]
       FieldType            interp_field;        // How to apply interpolation options      
       double               interp_thresh;       // Proportion of valid data values
       InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]
