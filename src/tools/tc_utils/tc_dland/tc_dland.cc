@@ -38,7 +38,6 @@ using namespace std;
 
 #include "vx_log.h"
 #include "data2d_factory.h"
-#include "mask_poly.h"
 #include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_cal.h"
@@ -62,9 +61,11 @@ static const LatLonData NWHemTenthData =
 // Default location of data file
 static const char *default_land_data_file =
    "MET_BASE/data/tc_data/aland.dat";
+
+static const double km_per_deg = 111.12;
    
 ////////////////////////////////////////////////////////////////////////
-//
+//    
 // Variables for command line arguments
 //
 ////////////////////////////////////////////////////////////////////////
@@ -102,7 +103,7 @@ int main(int argc, char *argv[]) {
    
    // Process the command line arguments
    process_command_line(argc, argv);
-   
+
    // Process the MODE file
    process_distances();
    
@@ -188,11 +189,11 @@ void process_distances() {
    }
 
    // Add global attributes
-   mlog << Debug(3) << "Writing global attributes.\n";
+   mlog << Debug(3) << "Writing NetCDF global attributes.\n";
    write_netcdf_global(f_out, out_filename, program_name);
 
    // Add the projection information
-   mlog << Debug(3) << "Writing map projection.\n";
+   mlog << Debug(3) << "Writing NetCDF map projection.\n";
    write_netcdf_proj(f_out, grid);
 
    // Define Dimensions
@@ -201,7 +202,7 @@ void process_distances() {
    
    // Add the lat/lon variables
    if(latlon_flag) {
-      mlog << Debug(3) << "Writing lat/lon variables.\n";
+      mlog << Debug(3) << "Writing NetCDF lat/lon variables.\n";
       write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
    }
 
@@ -217,14 +218,14 @@ void process_distances() {
    mlog << Debug(2)
         << "Computing distances for " << grid.nx() * grid.ny()
         << " points in grid (" << grid.serialize() << ")\n";
-   
+        
    // Loop over the grid and compute the distance to land for each point
-   if(mlog.verbosity_level() >= 3) cout << "Processing" << flush;
+   if(mlog.verbosity_level() == 3) cout << "Processing" << flush;
    for(x=0,c=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
          if(++c % (int) (grid.nx()*grid.ny()/100) == 0 &&
-            mlog.verbosity_level() >= 3) cout << "." << flush;
+            mlog.verbosity_level() == 3) cout << "." << flush;
         
          // Call two_to_one
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
