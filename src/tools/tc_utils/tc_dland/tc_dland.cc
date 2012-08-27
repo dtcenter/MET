@@ -60,7 +60,7 @@ static const LatLonData NWHemTenthData =
    { "NWHemTenthDegree", 0.0, -180.0, 0.1, 0.1, 601, 1801 };
 
 // Default location of data file
-static const char *default_aland_data_file =
+static const char *default_land_data_file =
    "MET_BASE/data/tc_data/aland.dat";
    
 ////////////////////////////////////////////////////////////////////////
@@ -72,6 +72,7 @@ static const char *default_aland_data_file =
 static ConcatString out_filename;
 static LatLonData GridData = NWHemTenthData;
 static bool latlon_flag = true;
+static ConcatString land_data_file = default_land_data_file;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -86,6 +87,7 @@ static void process_distances();
 static void usage();
 static void set_grid(const StringArray &);
 static void set_noll(const StringArray &);
+static void set_land(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
@@ -100,7 +102,7 @@ int main(int argc, char *argv[]) {
    
    // Process the command line arguments
    process_command_line(argc, argv);
-
+   
    // Process the MODE file
    process_distances();
    
@@ -132,6 +134,7 @@ void process_command_line(int argc, char **argv) {
    //
    cline.add(set_grid,      "-grid", 6);
    cline.add(set_noll,      "-noll", 0);
+   cline.add(set_land,      "-land", 1);
    cline.add(set_logfile,   "-log",  1);
    cline.add(set_verbosity, "-v",    1);
    
@@ -160,7 +163,7 @@ void process_distances() {
    double latd, lond;
    float latf, lonf1, lonf2, d1, d2;
    float *dland = (float *) 0;
-   ConcatString data_file = replace_path(default_aland_data_file);
+   ConcatString data_file = replace_path(land_data_file);
 
    // Instantiate the grid
    Grid grid(GridData);
@@ -286,6 +289,7 @@ void usage() {
         << "\tout_file\n"
         << "\t[-grid spec]\n"
         << "\t[-noll]\n"
+        << "\t[-land file]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -295,6 +299,9 @@ void usage() {
         << "\t\t\"-grid spec\" overrides the default 1/10th degree "
         << "NW Hemisphere grid (optional).\n"
         << "\t\t   spec = lat_ll lon_ll delta_lat delta_lon n_lat n_lon\n"
+
+        << "\t\t\"-land file\" overwrites the default land data file (\""
+        << replace_path(default_land_data_file) << "\") (optional).\n"
 
         << "\t\t\"-noll\" skips writing the lat/lon variables in the "
         << "output NetCDF file to reduce the file size (optional).\n"
@@ -328,6 +335,12 @@ void set_grid(const StringArray & a) {
 
 void set_noll(const StringArray & a) {
    latlon_flag = false;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_land(const StringArray & a) {
+   land_data_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
