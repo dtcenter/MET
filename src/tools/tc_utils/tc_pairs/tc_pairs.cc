@@ -181,10 +181,12 @@ void process_command_line(int argc, char **argv) {
    // List the input track files
    for(i=0; i<adeck_source.n_elements(); i++)
       mlog << Debug(1)
-           << "[Source " << i+1 << "] ADECK Source: " << adeck_source[i] << "\n";
+           << "[Source " << i+1 << " of " << adeck_source.n_elements()
+           <<  "] ADECK Source: " << adeck_source[i] << "\n";
    for(i=0; i<bdeck_source.n_elements(); i++)
       mlog << Debug(1)
-           << "[Source " << i+1 << "] BDECK Source: " << bdeck_source[i] << "\n";
+           << "[Source " << i+1 << " of " << bdeck_source.n_elements()
+           << "] BDECK Source: " << bdeck_source[i] << "\n";
 
    // Create the default config file name
    default_config_file = replace_path(default_config_filename);
@@ -367,7 +369,8 @@ void process_track_files(const StringArray &files,
 
       // Dump out the current number of lines
       mlog << Debug(4)
-           << "[File " << i+1 << "] Used " << cur_add << " of " << cur_read
+           << "[File " << i+1 << " of " << files.n_elements()
+           << "] Used " << cur_add << " of " << cur_read
            << " lines read from file \"" << files[i] << "\"\n";
 
       // Close the current file
@@ -393,7 +396,8 @@ void process_track_files(const StringArray &files,
    else {
       for(i=0; i<tracks.n_tracks(); i++) {
          mlog << Debug(4)
-              << "[Track " << i+1 << "] " << tracks[i].serialize() << "\n";
+              << "[Track " << i+1 << " of " << tracks.n_tracks()
+              << "] " << tracks[i].serialize() << "\n";
       }
    }
 
