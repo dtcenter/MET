@@ -825,7 +825,7 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
       if(!case_list.has(cur_case)) case_list.add(cur_case);
       
       // Only derive baselines from the CARQ model
-      if(strcmp(atracks[i].technique(), "CARQ") != 0) continue;
+      if(strcmp(atracks[i].technique(), OperTrackStr) != 0) continue;
 
       // Loop over the operational baseline methods
       for(j=0; j<conf_info.OperBaseline.n_elements(); j++) {
@@ -843,6 +843,9 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
 
    // Loop over the BDECK tracks
    for(i=0; i<btracks.n_tracks(); i++) {
+
+      // Only derive baselines from the BEST tracks
+      if(strcmp(btracks[i].technique(), BestTrackStr) != 0) continue;
 
       // Derive baseline model for each track point
       for(j=0; j<btracks[i].n_points(); j++) {

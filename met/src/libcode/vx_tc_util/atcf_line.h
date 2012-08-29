@@ -27,6 +27,7 @@
 
 static const int   MinATCFElements = 18;
 static const char  BestTrackStr[]  = "BEST";
+static const char  OperTrackStr[]  = "CARQ";
 
 ////////////////////////////////////////////////////////////////////////
 
