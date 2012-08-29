@@ -183,6 +183,11 @@ void QuadInfo::assign(const QuadInfo &t) {
 
 void QuadInfo::set_wind(const ATCFLine &l) {
 
+   // If intensity is not yet set, retrieve it from the ATCFLine
+   if(is_bad_data(Intensity)) {
+      Intensity = l.wind_intensity();
+   }
+  
    // Return if intensity doesn't match ATCFLine intensity
    if(Intensity != l.wind_intensity()) return;
   
@@ -586,7 +591,7 @@ void TrackPoint::set_wind(int n, const QuadInfo &w) {
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackPoint::has(const ATCFLine &l) const {
-   int found = false;
+   bool found = false;
    int i;
 
    // Check if the QuadInfo data matches
