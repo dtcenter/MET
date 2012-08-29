@@ -463,7 +463,7 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfo::has(const ATCFLine &l) const {
-   int found = false;
+   bool found = false;
    int i;
 
    // Check if the TrackPoint data matches
@@ -848,7 +848,7 @@ bool TrackInfoArray::add(const ATCFLine &l, bool check_has) {
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfoArray::has(const ATCFLine &l) const {
-   int found = false;
+   bool found = false;
    int i;
 
    // Check if the TrackInfo data matches
