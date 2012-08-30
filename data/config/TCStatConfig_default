@@ -231,6 +231,14 @@ landfall_end = 0;
 match_points = false;
 
 //
+// Specify whether only those cases common to all models in the dataset should
+// be retained.  May modify using the "-event_equal" job command option.
+//
+// e.g. event_equal = false;
+//
+event_equal = false;
+
+//
 // Apply polyline masking logic to the location of the ADECK track at the
 // initialization time.  If it falls outside the mask, discard the entire track.
 // May modify using the "-out_init_mask" job command option.

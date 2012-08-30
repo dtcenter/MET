@@ -27,6 +27,7 @@
 // Defaults to be used if not specified by the user
 static const bool         default_water_only         = false;
 static const bool         default_match_points       = false;
+static const bool         default_event_equal        = false;
 
 // Default rapid intensification is an increase of 30 kts
 static const bool         default_rapid_inten        = false;
@@ -116,6 +117,7 @@ struct TCLineCounts {
    int RejColumnThresh;
    int RejColumnStr;
    int RejMatchPoints;
+   int RejEventEqual;
    int RejOutInitMask;
    int RejOutValidMask;
 };
@@ -177,6 +179,8 @@ class TCStatJob {
       virtual void process_tc_stat_file(const char *, TCLineCounts &);
 
       void process_track_pair(TrackPairInfo &, TCLineCounts &);
+
+      void process_event_equal(TCLineCounts &);
       
       // Job Type
       TCStatJobType JobType;
@@ -247,6 +251,9 @@ class TCStatJob {
       // Only retain TrackPoints in both the ADECK and BDECK tracks
       bool MatchPoints;
 
+      // Only retain cases present for all models
+      bool EventEqual;
+      
       // Only retain TrackPoints with recent rapid intensification
       bool         RapidInten;
       SingleThresh RapidIntenThresh;

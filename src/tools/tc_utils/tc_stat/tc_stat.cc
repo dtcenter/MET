@@ -243,6 +243,7 @@ void process_jobs() {
            << "Rejected for numeric threshold = " << n.RejColumnThresh   << "\n"
            << "Rejected for string matching   = " << n.RejColumnStr      << "\n"
            << "Rejected for match points      = " << n.RejMatchPoints    << "\n"
+           << "Rejected for event equal       = " << n.RejEventEqual     << "\n"
            << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"
            << "Rejected for out valid mask    = " << n.RejOutValidMask   << "\n";
            

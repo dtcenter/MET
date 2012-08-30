@@ -221,6 +221,9 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::MatchPoints
    Filter.MatchPoints = Conf.lookup_bool("match_points");
+
+   // Conf: TCStatJob::EventEqual
+   Filter.EventEqual = Conf.lookup_bool("event_equal");
    
    // Conf: TCStatJob::OutInitMask
    poly_file = Conf.lookup_string("out_init_mask");
