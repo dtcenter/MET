@@ -230,6 +230,7 @@ void TCStatJob::clear() {
    LandfallBeg      = default_landfall_beg;
    LandfallEnd      = default_landfall_end;
    MatchPoints      = default_match_points;
+   EventEqual       = default_event_equal;
 
    OutInitMask.clear();
    OutValidMask.clear();
@@ -287,6 +288,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    LandfallEnd = j.LandfallEnd;
 
    MatchPoints = j.MatchPoints;
+   EventEqual = j.EventEqual;
    
    OutInitMask = j.OutInitMask;
    OutValidMask = j.OutValidMask;
@@ -396,6 +398,8 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "LandfallEnd = " << LandfallEnd << "\n";
 
    out << prefix << "MatchPoints = " << bool_to_string(MatchPoints) << "\n";
+
+   out << prefix << "EventEqual = " << bool_to_string(EventEqual) << "\n";
    
    out << prefix << "OutInitMask = " << (OutInitMask.name() ? OutInitMask.name() : na_str) << "\n";
 
@@ -517,7 +521,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::filter_track(TrackPairInfo &tpi,
-                            TCLineCounts &n) const {
+                             TCLineCounts &n) const {
    int n_rej;
    
    // Check RapidInten
@@ -791,6 +795,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
@@ -985,6 +990,8 @@ ConcatString TCStatJob::serialize() const {
         << "-landfall_end " << LandfallEnd << " ";
    if(MatchPoints != default_match_points)
       s << "-match_points " << bool_to_string(MatchPoints) << " ";
+   if(EventEqual != default_match_points)
+      s << "-event_equal " << bool_to_string(EventEqual) << " ";
    if(OutInitMask.n_points() > 0)
       s << "-out_init_mask " << OutInitMask.file_name() << " ";
    if(OutValidMask.n_points() > 0)
@@ -1004,6 +1011,11 @@ void TCStatJob::do_job(const StringArray &file_list,
    // Loop through the input file list
    for(i=0; i<file_list.n_elements(); i++) {
       process_tc_stat_file(file_list[i], n);
+   }
+
+   // Apply event equalization logic
+   if(EventEqual == true) {
+      process_event_equal(n);
    }
 
    // Write the dump file
@@ -1074,7 +1086,7 @@ void TCStatJob::process_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    // Loop over the track points to check line by line
    for(i=0; i<tpi.n_lines(); i++) {
 
-      // Continue is this line is not be kept
+      // Continue if this line is not be kept
       if(!tpi.keep(i)) continue;
 
       // Check if this line is not to be kept
@@ -1088,8 +1100,99 @@ void TCStatJob::process_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    tpi_subset = tpi.keep_subset();
    
    // Add track pair to the PairArray
-   if(tpi_subset.n_points() > 0) PairArray.add(tpi_subset);
+   if(tpi_subset.n_points() > 0) {
+
+     mlog << Debug(4)
+          << "Adding track pair " << PairArray.n_pairs()+1 << ": "
+          << tpi_subset.serialize() << "\n";
+
+     PairArray.add(tpi_subset);
+   }
    
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::process_event_equal(TCLineCounts &n) {
+   int i, j;
+   StringArray case_list;
+   map<ConcatString,StringArray,cs_cmp> case_map;
+   map<ConcatString,StringArray,cs_cmp>::iterator it;
+   TrackPairInfo new_pair;
+   TrackPairInfoArray new_pair_array;
+
+   // Loop over the TrackPairInfoArray entries and map the ADECK model
+   // name to a list of cases
+   for(i=0; i<PairArray.n_pairs(); i++) {
+
+      // Loop over the TCStatLines for the current TrackPairInfo
+      for(j=0; j<PairArray[i].n_lines(); j++) {
+
+         // Attempt to locate the current ADECK model in the map
+         it = case_map.find(PairArray[i].line(j)->amodel());
+
+         // ADECK model is not yet defined in the map
+         if(it == case_map.end()) {
+
+            // Store the case info in a StringArray
+            case_list.clear();
+            case_list.add(PairArray[i].line(j)->header());
+           
+            // Add the pair to the map
+            case_map[PairArray[i].line(j)->amodel()] = case_list;
+         }
+         // ADECK model is already defined in the map
+         else {
+
+            // Add the case info to the map
+            it->second.add(PairArray[i].line(j)->header());
+         }
+
+      } // end for j
+   } // end for i
+
+   // Initialize to the first map entry
+   case_list = case_map.begin()->second;
+
+   // Loop over the map entries and build a list of unique cases
+   for(it = case_map.begin(); it != case_map.end(); it++) {
+      case_list = intersection(case_list, it->second);
+   } // end for it
+
+   mlog << Debug(4)
+        << "For event equalization, identified " << case_list.n_elements()
+        << " unique cases.\n";
+
+   // Build a new PairArray with only the common cases
+   for(i=0; i<PairArray.n_pairs(); i++) {
+
+      // Initialize
+      new_pair.clear();
+      
+      // Loop over the TCStatLines for the current TrackPairInfo
+      for(j=0; j<PairArray[i].n_lines(); j++) {
+
+         // Check if the current line belongs
+         if(case_list.has(PairArray[i].line(j)->header())) {
+            new_pair.add(*PairArray[i].line(j));
+         }
+         // Otherwise, adjust counts
+         else {
+            n.RejEventEqual++;
+            n.NKeep--;
+         }
+
+      } // end for j
+
+      // Add track pair to the PairArray
+      if(new_pair.n_points() > 0) new_pair_array.add(new_pair);
+
+   } // end for i
+
+   // Store the new array
+   PairArray = new_pair_array;
+
    return;
 }
 
@@ -1399,17 +1502,12 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
            << serialize() << "\n\n";
       exit(1);
    }
-
-   // Loop through the input file list
-   for(i=0; i<file_list.n_elements(); i++) {
-      process_tc_stat_file(file_list[i], n);
-   }
+   
+   // Call the parent's do_job() to filter the data
+   TCStatJob::do_job(file_list, n);
 
    // Process the PairArray entries
    process_pair_array();
-
-   // Write the dump file
-   if(DumpOut) write_dump_file();
 
    // Process the summary output
    if(JobOut) do_output(*JobOut);
