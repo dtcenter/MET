@@ -11,6 +11,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <string>
+#include <deque>
+#include <map>
+
 #include "pair_base.h"
 
 #include "vx_util.h"
@@ -18,6 +22,20 @@
 #include "vx_data2d.h"
 #include "vx_data2d_grib.h"
 #include "vx_gsl_prob.h"
+#include "vx_statistics.h"
+
+using namespace std;
+
+// Structures to store the spread/skill point information
+struct ens_ssvar_pt {
+   double var;
+   double f;
+   double o;
+};
+
+typedef deque<ens_ssvar_pt>       ssvar_pt_list;
+typedef map<string,ssvar_pt_list> ssvar_bin_map;  // Indexed by bin min
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -53,6 +71,11 @@ class PairDataEnsemble : public PairBase {
 
       NumArray  rhist_na; // Ranked Histogram [n_ens]
 
+      NumArray   var_na;          // Ensemble member value variance [n_pair]
+      NumArray   mn_na;           // Ensemble mean value [n_pair]
+      double     ssvar_bin_size;  // Variance bin size for spread/skill
+      SSVARInfo* ssvar_bins;      // Ensemble spread/skill bin information [n_bin]
+
       //////////////////////////////////////////////////////////////////
 
       void clear();
@@ -64,6 +87,8 @@ class PairDataEnsemble : public PairBase {
       void compute_rank(const gsl_rng *);
       void compute_rhist();
       void compute_stats();
+      void compute_ssvar();
+
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -121,6 +146,11 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
+      ConcatString ens_ssvar_mean;      // Name of ensemble spread/skill mean file
+      bool         ens_ssvar_flag;      // Flag to trigger spread/skill calculations
+
+      //////////////////////////////////////////////////////////////////
+
       int      n_msg_typ;        // Number of verifying message types
 
       int      n_mask;           // Total number of masking regions
@@ -160,9 +190,11 @@ class VxPairDataEnsemble {
       // Call set_ens_size before add_ens
       void set_ens_size();
 
+      void set_ssvar_bin_size(double);
+
       void add_obs(float *, const char *, const char *, unixtime,
                    const char *, float *, Grid &);
-      void add_ens();
+      void add_ens(bool mn);
 
       void find_vert_lvl(double, int &, int &);
 

@@ -32,6 +32,7 @@
 //                    and -obs_lead command line options to config file.
 //   008    05/18/12  Halley Gotway   Modify logic to better handle
 //                    missing files, fields, and data values.
+//   008    08/30/12  Oldenburg       Added spread/skill functionality
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +54,7 @@ using namespace std;
 #include "ensemble_stat.h"
 
 #include "vx_nc_util.h"
+#include "vx_data2d_nc_met.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,7 +83,6 @@ static void setup_table         (AsciiTable &);
 
 static void build_outfile_name(unixtime, const char *,
                                ConcatString &);
-
 static void write_ens_nc(int, DataPlane &);
 static void write_ens_var_float(int, float *, DataPlane &,
                                 const char *, const char *);
@@ -104,6 +105,7 @@ static void usage();
 
 static void set_grid_obs(const StringArray &);
 static void set_point_obs(const StringArray &);
+static void set_ssvar_mean(const StringArray & a);
 static void set_obs_valid_beg(const StringArray &);
 static void set_obs_valid_end(const StringArray &);
 static void set_outdir(const StringArray &);
@@ -169,6 +171,7 @@ void process_command_line(int argc, char **argv)
    //
    cline.add(set_grid_obs, "-grid_obs", 1);
    cline.add(set_point_obs, "-point_obs", 1);
+   cline.add(set_ssvar_mean, "-ssvar_mean", 1);
    cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end, "-obs_valid_end", 1);
    cline.add(set_outdir, "-outdir", 1);
@@ -353,6 +356,41 @@ void process_command_line(int argc, char **argv)
        conf_info.output_flag[i_rhist] != STATOutputType_None)) vx_flag = 1;
    else                                                        vx_flag = 0;
 
+   // Check the spread/skill configuration information
+   conf_info.ens_ssvar_flag = 0;
+   bool ssvar_out = (conf_info.output_flag[i_ssvar] != STATOutputType_None);
+   if( ens_ssvar_mean && strcmp(ens_ssvar_mean, "") ){
+
+      if( !ssvar_out ){
+         mlog << Warning << "\nprocess_command_line() -> "
+              << "ignoring input -ssvar_mean file because "
+              << "SSVAR line type is set to NONE\n\n";
+      } else if( stat(ens_ssvar_mean, &results) ) {
+         mlog << Warning << "\nprocess_command_line() -> "
+              << "can't open input spread/skill mean file: "
+              << ens_ssvar_mean << "\n\n";
+         ens_ssvar_mean = "";
+      } else if( !vx_flag ) {
+         mlog << Warning << "\nprocess_command_line() -> "
+              << "ignoring input -ssvar_mean file because "
+              << "no observations have been specified\n\n";
+      } else {
+         conf_info.ens_ssvar_flag = 1;
+      }
+
+   } else if( ssvar_out ){
+
+      if( !vx_flag ) {
+         mlog << Warning << "\nprocess_command_line() -> "
+              << "disabling ensemble spread/skill calculation "
+              << "because no observations have been specified\n\n";
+      } else {
+         conf_info.ens_ssvar_flag = 1;
+      }
+
+   }
+   conf_info.ens_ssvar_mean = ens_ssvar_mean;
+
    return;
 }
 
@@ -476,6 +514,9 @@ void process_ensemble() {
 
       // Write out the ensemble information to a NetCDF file
       write_ens_nc(i, ens_dp);
+
+      // Store the ensemble output file for spread/skill analysis
+      conf_info.ens_ssvar_file = out_nc_file_list[ out_nc_file_list.n_elements() - 1 ];
    }
 
    // Close the output NetCDF file
@@ -570,6 +611,9 @@ void process_point_vx() {
          exit(1);
       }
    } // end for i
+
+   // Process the ensemble mean, if spread/skill is activated
+   if( conf_info.ens_ssvar_flag ) process_point_ens(-1);
 
    // Compute the scores and write them out
    process_point_scores();
@@ -752,36 +796,55 @@ int process_point_ens(int i_ens) {
    int i, n_fcst;
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
+   VarInfo* info;
+
+   ConcatString ens_file;
+   bool ens_mn = (-1 == i_ens);
+   const char* file_type = ens_mn ? "mean" : "ensemble";
+
+   // Determine the correct file to process
+   if( !ens_mn )  ens_file = ConcatString(ens_file_list[i_ens]);
+   else           ens_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
+                                 ens_ssvar_mean : conf_info.ens_ssvar_file;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
-        << "Processing ensemble file: "
-        << ens_file_list[i_ens] << "\n";
+        << "Processing " << file_type << " file: " << ens_file << "\n";
 
    // Loop through each of the fields to be verified and extract
    // the forecast fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      // For spread/skill, use the calculated mean file if none was specified
+      if( ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) ){
+         fcst_dpa.clear();
+         ConcatString ens_magic;
+         ens_magic << conf_info.ens_ssvar_vars[i] << "(*,*)";
+         mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
+         info = new VarInfoNcMet();
+         info->set_magic(ens_magic);
+      } else {
+         info = conf_info.vx_pd[i].fcst_info;
+      }
+
       // Deallocate the data file pointer, if necessary
       if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
 
       // Read the current ensemble file
-      if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[i_ens]))) {
+      if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file))) {
          mlog << Error << "\nprocess_point_ens() -> "
-              << "Trouble reading ensemble file \""
-              << ens_file_list[i_ens] << "\"\n\n";
+              << "Trouble reading " << file_type << " file \""
+              << ens_file << "\"\n\n";
          exit(1);
       }
 
       // Read the gridded data from the input forecast file
-      n_fcst = ens_mtddf->data_plane_array(*conf_info.vx_pd[i].fcst_info, fcst_dpa);
+      n_fcst = ens_mtddf->data_plane_array(*info, fcst_dpa);
 
       // Check for zero fields
       if(n_fcst == 0) {
          mlog << Warning << "\nprocess_point_ens() -> "
-              << "no fields matching "
-              << conf_info.vx_pd[i].fcst_info->magic_str()
-              << " found in file: "
-              << ens_file_list[i_ens] << "\n";
+              << "no fields matching " << info->magic_str()
+              << " found in file: " << ens_file << "\n";
          return(1);
       }
 
@@ -789,15 +852,14 @@ int process_point_ens(int i_ens) {
       set_grid(ens_mtddf->grid());
 
       // Dump out the number of levels found
-      mlog << Debug(2) << "For "
-           << conf_info.vx_pd[i].fcst_info->magic_str()
+      mlog << Debug(2) << "For " << info->magic_str()
            << " found " << n_fcst<< " forecast levels.\n";
 
       // Store information for the raw forecast fields
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
 
       // Compute forecast values for this ensemble member
-      conf_info.vx_pd[i].add_ens();
+      conf_info.vx_pd[i].add_ens(ens_mn);
 
    } // end for i
 
@@ -911,6 +973,16 @@ void process_point_scores() {
                      conf_info.output_flag[i_rhist],
                      stat_at, i_stat_row,
                      txt_at[i_rhist], i_txt_row[i_rhist]);
+               }
+
+               // Compute SSVAR scores
+               if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
+                  pd_ptr->compute_ssvar();
+
+                  write_ssvar_row(shc, pd_ptr,
+                     conf_info.output_flag[i_ssvar],
+                     stat_at, i_stat_row,
+                     txt_at[i_ssvar], i_txt_row[i_ssvar]);
                }
 
             } // end for l
@@ -1466,6 +1538,10 @@ void setup_txt_files() {
                max_col = get_n_orank_columns(n_ens) + n_header_columns + 1;
                break;
 
+            case(i_ssvar):
+               max_col = n_ssvar_columns + n_header_columns + 1;
+               break;
+
             default:
                max_col = n_txt_columns[i]  + n_header_columns + 1;
                break;
@@ -1557,6 +1633,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
    int i, j;
    double t, v;
    char thresh_str[max_str_len], type_str[max_str_len];
+
 
    // Arrays for storing ensemble data
    float *ens_mean  = (float *) 0;
@@ -1728,6 +1805,7 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_vx]->level_name() << "_"
                 << type_str;
    ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
+   conf_info.ens_ssvar_vars.add(ens_var_name);
 
    //
    // Construct the variable name attribute
@@ -2068,6 +2146,7 @@ void usage() {
         << "\tconfig_file\n"
         << "\t[-grid_obs file]\n"
         << "\t[-point_obs file]\n"
+        << "\t[-ssvar_mean file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
         << "\t[-outdir path]\n"
@@ -2089,6 +2168,9 @@ void usage() {
 
         << "\t\t\"-point_obs file\" specifies a NetCDF point observation file. "
         << "May be used multiple times (optional).\n"
+
+        << "\t\t\"-ssvar_mean file\" specifies an ensemble mean model data file. "
+        << "Used in conjunction with the SSVAR output line type.\n"
 
         << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "beginning of the matching time window (optional).\n"
@@ -2125,6 +2207,13 @@ void set_point_obs(const StringArray & a)
 {
    point_obs_file_list.add(a[0]);
    point_obs_flag = 1;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_ssvar_mean(const StringArray & a)
+{
+   ens_ssvar_mean = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////

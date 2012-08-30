@@ -221,6 +221,13 @@ static const char * orank_columns [] = {
    "ENS_"
 };
 
+static const char * ssvar_columns [] = {
+   "N_BIN",       "BIN_i",       "BIN_N",
+   "VAR_MIN",     "VAR_MAX",     "VAR_MEAN",
+   "FBAR",        "OBAR",        "FOBAR",
+   "FFBAR",       "OOBAR"
+};
+
 static const char * job_sum_columns [] = {
    "TOTAL",
    "MEAN",        "MEAN_NCL",    "MEAN_NCU",     "MEAN_BCL",    "MEAN_BCU",
@@ -280,6 +287,7 @@ static const int n_job_wdir_columns = sizeof(job_wdir_columns)/sizeof(*job_wdir_
 
 static const int n_rhist_columns    = sizeof(rhist_columns)/sizeof(*rhist_columns);
 static const int n_orank_columns    = sizeof(orank_columns)/sizeof(*orank_columns);
+static const int n_ssvar_columns    = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -369,6 +377,8 @@ extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_orank_row (StatHdrColumns &, const PairDataEnsemble *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+extern void write_ssvar_row (StatHdrColumns &, const PairDataEnsemble *, bool,
+                             AsciiTable &, int &, AsciiTable &, int &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -399,6 +409,7 @@ extern void write_mpr_cols   (const PairDataPoint *,    int, AsciiTable &, int, 
 extern void write_isc_cols   (const ISCInfo &,     int, AsciiTable &, int, int);
 extern void write_rhist_cols (const PairDataEnsemble *,      AsciiTable &, int, int);
 extern void write_orank_cols (const PairDataEnsemble *, int, AsciiTable &, int, int);
+extern void write_ssvar_cols (const PairDataEnsemble *, int, AsciiTable &, int, int);
 
 ////////////////////////////////////////////////////////////////////////
 

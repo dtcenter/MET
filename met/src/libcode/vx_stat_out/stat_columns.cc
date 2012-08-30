@@ -1834,6 +1834,50 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
+                     bool txt_flag,
+                     AsciiTable &stat_at, int &stat_row,
+                     AsciiTable &txt_at, int &txt_row) {
+
+   // SSVAR line type
+   shc.set_line_type("SSVAR");
+
+   // Not Applicable
+   shc.clear_fcst_thresh();
+   shc.clear_obs_thresh();
+   shc.clear_cov_thresh();
+   shc.set_alpha(bad_data_double);
+
+   // Write a line for each ssvar bin
+   for(int i=0; i<pd_ptr->ssvar_bins[0].n_bin; i++) {
+
+      // Set the observation valid time
+      shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
+      shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data columns
+      write_ssvar_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(txt_flag) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_header_cols(const StatHdrColumns &shc,
                        AsciiTable &at, int r) {
 
@@ -3364,6 +3408,54 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
+                      AsciiTable &at, int r, int c) {
+
+   //
+   // Ensemble spread/skill variance bins
+   // Dump out the SSVAR line:
+   //    N_BIN,       BIN_i,       BIN_N,
+   //    VAR_MIN,     VAR_MAX,     VAR_MEAN,
+   //    FBAR,        OBAR,        FOBAR,
+   //    FFBAR,       OOBAR
+
+   at.set_entry(r, c+0,  // Total Number of Bins
+      pd_ptr->ssvar_bins[i].n_bin);
+
+   at.set_entry(r, c+1,  // Index of current bin
+      pd_ptr->ssvar_bins[i].bin_i);
+
+   at.set_entry(r, c+2,  // Number of points in bin i
+      pd_ptr->ssvar_bins[i].bin_n);
+
+   at.set_entry(r, c+3,  // Lower variance value for bin
+      pd_ptr->ssvar_bins[i].var_min);
+
+   at.set_entry(r, c+4,  // Upper variance value for bin
+      pd_ptr->ssvar_bins[i].var_max);
+
+   at.set_entry(r, c+5,  // Mean variance value for bin
+      pd_ptr->ssvar_bins[i].var_mean);
+
+   at.set_entry(r, c+6,  // Mean(f)
+      pd_ptr->ssvar_bins[i].fbar);
+
+   at.set_entry(r, c+7,  // Mean(o)
+      pd_ptr->ssvar_bins[i].obar);
+
+   at.set_entry(r, c+8,  // Mean(fo)
+      pd_ptr->ssvar_bins[i].fobar);
+
+   at.set_entry(r, c+9,  // Mean(ff)
+      pd_ptr->ssvar_bins[i].ffbar);
+
+   at.set_entry(r, c+10,  // Mean(oo)
+      pd_ptr->ssvar_bins[i].oobar);
+
 }
 
 ////////////////////////////////////////////////////////////////////////

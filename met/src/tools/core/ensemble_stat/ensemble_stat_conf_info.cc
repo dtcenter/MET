@@ -305,6 +305,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          obs_qty[i] = parse_conf_obs_qty(&i_obs_dict);
          vx_pd[i].set_obs_qty_filt(obs_qty[i]);
 
+         // Conf: ssvar_bin_size
+         ens_ssvar_bin_size.add( i_obs_dict.lookup_double(conf_key_ssvar_bin) );
+
          // Set the current dictionaries
          vx_pd[i].fcst_info->set_dict(i_fcst_dict);
          vx_pd[i].obs_info->set_dict(i_obs_dict);
@@ -429,6 +432,11 @@ void EnsembleStatConfInfo::set_vx_pd() {
       // Set up the dimensions for the vx_pd object
       vx_pd[i].set_pd_size(n_msg_typ, n_mask, n_interp);
 
+      // Set the ensemble spread/skill information
+      vx_pd[i].ens_ssvar_flag = ens_ssvar_flag;
+      vx_pd[i].ens_ssvar_mean = ens_ssvar_mean;
+      vx_pd[i].set_ssvar_bin_size(ens_ssvar_bin_size[i]);
+
       // Add the verifying message type to the vx_pd objects
       for(j=0; j<n_msg_typ; j++)
          vx_pd[i].set_msg_typ(j, msg_typ[i][j]);
@@ -490,12 +498,14 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       case(i_orank):
+      case(i_ssvar):
          // Compute the maximum number of matched pairs to be written
          // out by summing the number for each VxPairDataEnsemble object
          for(i=0, n=0; i<n_vx; i++) {
             n += vx_pd[i].get_n_pair();
          }
          break;
+
 
       default:
          mlog << Error << "\nEnsembleStatConfInfo::n_txt_row(int) -> "

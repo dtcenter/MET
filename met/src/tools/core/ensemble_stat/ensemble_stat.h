@@ -64,7 +64,7 @@ static const char * default_config_filename =
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "rhist", "orank"
+   "rhist", "orank", "ssvar"
 };
 
 // Header columns
@@ -98,7 +98,8 @@ static IntArray     n_ens_vld;     // Number of members with valid data for each
 static int          n_rank;        // Number of ranks = max(n_ens_vld) + 1
 static StringArray  ens_file_list;
 static IntArray     ens_file_vld;
-static ConcatString ens_ss_mean;   // Mean data file to use for spread/skill analysis
+
+static ConcatString ens_ssvar_mean;  // Mean data file to use for spread/skill analysis
 
 // Input Observation files
 static StringArray  grid_obs_file_list;
