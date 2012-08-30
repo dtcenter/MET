@@ -16,6 +16,8 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <set>
+#include <limits>
 
 #include "pair_data_ensemble.h"
 
@@ -26,6 +28,8 @@ using namespace std;
 #include "vx_grid.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -70,6 +74,7 @@ void PairDataEnsemble::init_from_scratch() {
    e_na   = (NumArray *) 0;
    n_pair = 0;
    n_ens  = 0;
+   ssvar_bins = 0;
 
    clear();
 
@@ -92,6 +97,11 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
    rhist_na.clear();
+   var_na.clear();
+   mn_na.clear();
+
+   if( ssvar_bins ) delete [] ssvar_bins;
+   ssvar_bins = 0;
 
    n_pair = 0;
    n_ens  = 0;
@@ -128,10 +138,19 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ign_na   = pd.ign_na;
    pit_na   = pd.pit_na;
    rhist_na = pd.rhist_na;
+   var_na   = pd.var_na;
+   mn_na    = pd.mn_na;
 
    n_obs    = pd.n_obs;
    n_pair   = pd.n_pair;
    n_ens    = pd.n_ens;   
+
+   if( pd.ssvar_bins ){
+      ssvar_bins = new SSVARInfo[ pd.ssvar_bins[0].n_bin ];
+      for(i=0; i < pd.ssvar_bins[0].n_bin; i++){
+         ssvar_bins[i] = pd.ssvar_bins[i];
+      }
+   } else ssvar_bins = 0;
 
    set_size();
 
@@ -303,6 +322,118 @@ void PairDataEnsemble::compute_stats() {
       pit_na.add(pit);
 
    } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Comparison method for ssvar bins
+struct ssvar_bin_comp {
+  bool operator() (const string& lhs, const string& rhs) const {
+     return atof(lhs.data()) < atof(rhs.data());
+  }
+};
+
+void PairDataEnsemble::compute_ssvar() {
+   int i, j, n_vld;
+   double var, dev;
+   ssvar_bin_map bins;
+
+   // Compute the variance of ensemble member values at each point
+   for(i=0; i<o_na.n_elements(); i++) {
+
+      // Add the deviation of each ensemble member
+      for(j=0, n_vld=0, var=0; j<e_na[i].n_elements(); j++) {
+
+         // Skip bad data
+         if(is_bad_data(e_na[i][j])) continue;
+         n_vld++;
+
+         // Add the squared deviation
+         dev = (e_na[i][j] - mn_na[i]);
+         var = var + dev*dev;
+
+      } // end for j
+
+      if( !n_vld ) continue;
+
+      //  Calculate the variance
+      var = (1.0 / ((double)n_vld - 1.0)) * var;
+
+      // Build a variance point
+      ens_ssvar_pt pt;
+      pt.var = var;
+      pt.f   = mn_na[i];
+      pt.o   = o_na[i];
+
+      // Determine the bin for the current point and add it to the list
+      string ssvar_min =
+            str_format("%.5e", var - fmod(var,ssvar_bin_size)).contents();
+      if( !bins.count(ssvar_min) ){
+         ssvar_pt_list pts;
+         pts.push_back(pt);
+         bins[ssvar_min] = pts;
+      } else {
+         bins[ssvar_min].push_back(pt);
+      }
+
+   } // end for i
+
+   // Sort the bins
+   set<string,ssvar_bin_comp> sorted_bins;
+   for( ssvar_bin_map::iterator map_it = bins.begin();
+        map_it != bins.end(); map_it++ ){
+      sorted_bins.insert( (*map_it).first );
+   }
+
+   // Report the number of bins built
+   int n_bin = sorted_bins.size();
+   mlog << Debug(4) << "PairDataEnsemble::compute_ssvar() - "
+        << "Built " << n_bin << " variance spread/skill bins from "
+        << o_na.n_elements() << " observations\n";
+
+   // Build a list of SSVARInfo objects
+   ssvar_bins = new SSVARInfo[n_bin];
+   i=0;
+   for( set<string>::iterator set_it = sorted_bins.begin();
+        set_it != sorted_bins.end(); set_it++, i++ ){
+
+      ssvar_pt_list* pts = &( bins[*set_it] );
+      var = 0;
+      double f = 0, o = 0, fo = 0, ff = 0, oo = 0;
+
+      for(j=0; j < (int)pts->size(); j++){
+         var = var +   (*pts)[j].var;
+         f   = f   +   (*pts)[j].f;
+         o   = o   +   (*pts)[j].o;
+         fo  = fo  + ( (*pts)[j].f * (*pts)[j].o );
+         ff  = ff  + ( (*pts)[j].f * (*pts)[j].f );
+         oo  = oo  + ( (*pts)[j].o * (*pts)[j].o );
+      }
+
+      ssvar_bins[i].n_bin    = n_bin;
+      ssvar_bins[i].bin_i    = i;
+      ssvar_bins[i].bin_n    = pts->size();
+
+      ssvar_bins[i].var_min  = atof( (*set_it).data() );
+      ssvar_bins[i].var_max  = ssvar_bins[i].var_min + ssvar_bin_size;
+      ssvar_bins[i].var_mean = var / (double)pts->size();
+
+      ssvar_bins[i].fbar     = f / (double)pts->size();
+      ssvar_bins[i].obar     = o / (double)pts->size();
+      ssvar_bins[i].fobar    = fo / (double)pts->size();
+      ssvar_bins[i].ffbar    = ff / (double)pts->size();
+      ssvar_bins[i].oobar    = oo / (double)pts->size();
+
+      mlog << Debug(4) << "  SSVAR[ "
+           << "bin_i: " << ssvar_bins[i].bin_i << "  "
+           << "bin_n: " << ssvar_bins[i].bin_n << "  "
+           << "var: (" << ssvar_bins[i].var_min << ", " << ssvar_bins[i].var_max << ")  "
+           << "fbar: " << ssvar_bins[i].fbar << "  "
+           << "obar: " << ssvar_bins[i].obar << " ]\n";
+
+   }
 
    return;
 }
@@ -621,6 +752,23 @@ void VxPairDataEnsemble::set_ens_size() {
    return;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_ssvar_bin_size(double ssvar_bin_size) {
+   int i, j, k;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_mask; j++) {
+         for(k=0; k<n_interp; k++) {
+            pd[i][j][k].ssvar_bin_size = ssvar_bin_size;
+         }
+      }
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
@@ -768,7 +916,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::add_ens() {
+void VxPairDataEnsemble::add_ens(bool mn) {
    int i, j, k, l;
    int fcst_lvl_below, fcst_lvl_above;
    double fcst_v;
@@ -780,6 +928,19 @@ void VxPairDataEnsemble::add_ens() {
 
             // Process each of the observations
             for(l=0; l<pd[i][j][k].n_pair; l++) { 
+
+               // PGO - ensemble mean calculation for interpolation-then-mean implementation
+               /*
+               // Calculate the ensemble mean in the absence of a mean file
+               if( mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean,"")) ){
+                  NumArray* e_pt = &(pd[i][j][k].e_na[l]);
+                  fcst_v = 0;
+                  for(int m=0; m < e_pt->n_elements(); m++)
+                     fcst_v = fcst_v + (*e_pt)[m];
+                  pd[i][j][k].mn_na.add(fcst_v / (double)e_pt->n_elements());
+                  continue;
+               }
+               */
 
                // For a single forecast field
                if(fcst_dpa.n_planes() == 1) {
@@ -805,7 +966,8 @@ void VxPairDataEnsemble::add_ens() {
                                        pd[i][j][k].lvl_na[l], fcst_lvl_below, fcst_lvl_above);
 
                // Add the ensemble value, even if it's bad data
-               pd[i][j][k].add_ens(l, fcst_v);
+               if( !mn ) pd[i][j][k].add_ens(l, fcst_v);
+               else      pd[i][j][k].mn_na.add(fcst_v);
 
             }
          } // end for k

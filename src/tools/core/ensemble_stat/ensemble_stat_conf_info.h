@@ -29,11 +29,12 @@
 // Indices for the output flag types in the configuration file
 static const int i_rhist    = 0;
 static const int i_orank    = 1;
-static const int n_txt      = 2;
+static const int i_ssvar    = 2;
+static const int n_txt      = 3;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_rhist, stat_orank
+   stat_rhist, stat_orank, stat_ssvar
 };
 
 // Indices for the ensemble flag types in the configuration file
@@ -84,6 +85,9 @@ class EnsembleStatConfInfo {
       StringArray *        msg_typ;             // Array of message types [n_vx]
       StringArray *        obs_qty;             // Observation quality flags for filtering[n_vx]
       StringArray          mask_name;           // Masking region names [n_mask]
+      NumArray             ens_ssvar_bin_size;  // Ensemble spread/skill variance bin size [n_vx]
+      ConcatString         ens_ssvar_file;      // Ensemble mean file name
+      StringArray          ens_ssvar_vars;      // Ensemble mean variable names [n_vx]
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
       StringArray          mask_sid;            // Masking station id's [n_mask_sid]
       FieldType            interp_field;        // How to apply interpolation options      
@@ -97,6 +101,10 @@ class EnsembleStatConfInfo {
       DuplicateType        duplicate_flag;      // Duplicate observation behavior
       ConcatString         output_prefix;       // String to customize output file names
       ConcatString         version;             // Config file version
+
+      bool                 ens_ssvar_flag;      // Indicator for calculation of ensemble spread/skill
+      ConcatString         ens_ssvar_mean;      // Ensemble mean for spread/skill calculations
+
 
       EnsembleStatConfInfo();
      ~EnsembleStatConfInfo();

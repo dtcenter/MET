@@ -431,6 +431,40 @@ class PCTInfo {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Class to store Ensemble Spread/Skill Information
+//
+////////////////////////////////////////////////////////////////////////
+
+class SSVARInfo {
+
+   private:
+      void init_from_scratch();
+      void assign(const SSVARInfo &);
+
+   public:
+
+      SSVARInfo();
+      ~SSVARInfo();
+      SSVARInfo(const SSVARInfo &);
+      SSVARInfo & operator=(const SSVARInfo &);
+
+      int n_bin;
+      int bin_i;
+      int bin_n;
+      double var_min;
+      double var_max;
+      double var_mean;
+      double fbar;
+      double obar;
+      double fobar;
+      double ffbar;
+      double oobar;
+
+      void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+//
 // Utility functions for parsing data from configuration files
 //
 ////////////////////////////////////////////////////////////////////////

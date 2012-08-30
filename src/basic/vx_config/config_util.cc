@@ -847,6 +847,7 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_wdir):         s = stat_wdir_str;    break;
       case(stat_rhist):        s = stat_rhist_str;   break;
       case(stat_orank):        s = stat_orank_str;   break;
+      case(stat_ssvar):        s = stat_ssvar_str;   break;
       case(no_stat_line_type): s = stat_na_str;      break;
       default:                 s = (const char *) 0; break;
    }
@@ -890,6 +891,7 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_wdir_str)   == 0) t = stat_wdir;
    else if(strcasecmp(s, stat_rhist_str)  == 0) t = stat_rhist;
    else if(strcasecmp(s, stat_orank_str)  == 0) t = stat_orank;
+   else if(strcasecmp(s, stat_ssvar_str)  == 0) t = stat_ssvar;
    else                                         t = no_stat_line_type;
 
    return(t);
