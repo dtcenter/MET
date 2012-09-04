@@ -69,12 +69,12 @@ static const char *txt_file_abbr[n_txt] = {
 
 // Header columns
 static const char **txt_columns[n_txt] = {
-   rhist_columns, orank_columns
+   rhist_columns, orank_columns, ssvar_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_rhist_columns, n_orank_columns
+   n_rhist_columns, n_orank_columns, n_ssvar_columns
 };
 
 // Maximum number of GRIB records
@@ -108,7 +108,8 @@ static int          grid_obs_flag = 0;
 static StringArray  point_obs_file_list;
 static int          point_obs_flag = 0;
 
-static int          vx_flag = 0;
+static int          vx_flag    = 0;
+static int          vx_num_mpr = 0;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;

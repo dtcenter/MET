@@ -62,6 +62,7 @@ using namespace std;
 static void process_command_line  (int, char **);
 static void process_ensemble      ();
 static void process_vx            ();
+static void process_vx_table_size ();
 
 static void process_point_vx      ();
 static void process_point_obs     (int);
@@ -70,7 +71,7 @@ static void process_point_scores  ();
 
 static void process_grid_vx       ();
 static void process_grid_scores   (DataPlane *&, DataPlane &, DataPlane &,
-                                   PairDataEnsemble &);
+                                   DataPlane &, PairDataEnsemble &);
 
 static void parse_ens_file_list(const char *);
 static void set_grid(const Grid &);
@@ -79,6 +80,7 @@ static void track_counts(const DataPlane &, int);
 
 static void setup_nc_file       (unixtime, int, const char *);
 static void setup_txt_files     ();
+static void setup_txt_files     (int);
 static void setup_table         (AsciiTable &);
 
 static void build_outfile_name(unixtime, const char *,
@@ -550,6 +552,9 @@ void process_vx() {
       // Setup the GCPairData objects
       conf_info.set_vx_pd();
 
+      //PGO - handle the ascii table size issue here
+      process_vx_table_size();
+
       // Process the point observations
       if(point_obs_flag) process_point_vx();
 
@@ -558,6 +563,75 @@ void process_vx() {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_vx_table_size() {
+
+   //PGO
+   // The conservative approach to calculating the number of stat file row:
+   //
+   //  ADD:
+   //    * grid dimensions of gridded obs files (number of gridded matched pairs)
+   //    * number of observations in obs files (number of point matched pairs)
+   //
+   //  Then,
+   //  MULTIPLY: by number of masks, message types and interpolation methods
+   //
+
+   // Store the number of grid points for each gridded obs file
+   vx_num_mpr = 0;
+   int n_grid = grid.nx() && grid.ny() ? grid.nx() * grid.ny() : 0;
+   for(int i=0; i < grid_obs_file_list.n_elements(); i++) vx_num_mpr += n_grid;
+
+   // Add the number of observations in each point observation NetCDF file
+   for(int i=0; i<point_obs_file_list.n_elements(); i++) {
+
+      mlog << Debug(3) << "process_vx_table_size() - Processing point observation "
+           << "file: " << point_obs_file_list[i] << "\n";
+
+      // Open and check the observation file
+      NcFile *obs_in = new NcFile(point_obs_file_list[i]);
+      if(!obs_in->is_valid()) {
+         obs_in->close();
+         delete obs_in;
+         mlog << Warning << "\nprocess_vx_table_size() -> can't open observation "
+              << "netCDF file: " << point_obs_file_list[i] << "\n\n";
+         continue;
+      }
+
+      // Read the number of observations
+      NcDim *obs_dim = obs_in->get_dim("nobs");
+      if(!obs_dim  || !obs_dim->is_valid()) {
+         mlog << Warning << "\nprocess_vx_table_size() -> can't read \"nobs\" dimension "
+              << "from netCDF file: " << point_obs_file_list[i] << "\n\n";
+         continue;
+      }
+
+      // Add the number of observations to the matched pair tally
+      vx_num_mpr += obs_dim->size();
+      obs_in->close();
+      delete obs_in;
+
+   }
+
+   // Determine the maximum number of message types being used
+   int max_n_msg_typ;
+   for(int i=0; i< conf_info.get_n_vx(); i++)
+      if(conf_info.get_n_msg_typ(i) > max_n_msg_typ)
+         max_n_msg_typ = conf_info.get_n_msg_typ(i);
+
+   // Calculate the maximum number of verification cases
+   int vx_mult = conf_info.get_n_vx()     * conf_info.get_n_mask() *
+                 conf_info.get_n_interp() * max_n_msg_typ
+                 +
+                 conf_info.get_n_vx()     * conf_info.get_n_mask() *
+                 conf_info.get_n_interp();
+
+   // Multiply the number of matched pairs by the verification cases
+   vx_num_mpr *= vx_mult;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -855,6 +929,10 @@ int process_point_ens(int i_ens) {
       mlog << Debug(2) << "For " << info->magic_str()
            << " found " << n_fcst<< " forecast levels.\n";
 
+      // Clean up the allocated VarInfo object, if necessary
+      if( ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) )
+         delete info;
+
       // Store information for the raw forecast fields
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
 
@@ -1000,13 +1078,13 @@ void process_grid_vx() {
    bool found;
    double t;
    DataPlane *fcst_dp = (DataPlane *) 0, *fcst_dp_smooth = (DataPlane *) 0;
-   DataPlane  obs_dp,   obs_dp_smooth;
+   DataPlane  obs_dp, obs_dp_smooth, mn_dp, mn_dp_smooth;
    PairDataEnsemble pd;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Create output text files as requested in the config file
-   setup_txt_files();
+   //PGO setup_txt_files();
 
    // Allocate space to store the forecast fields
    fcst_dp        = new DataPlane [n_ens];
@@ -1139,6 +1217,49 @@ void process_grid_vx() {
       shc.set_obs_valid_beg(obs_dp.valid());
       shc.set_obs_valid_end(obs_dp.valid());
 
+      // If spread/skill is activated, read the ensemble mean file
+      // PGO - read the correct file
+      if( conf_info.ens_ssvar_flag ){
+
+         VarInfo* info;
+         ConcatString mn_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
+                                       ens_ssvar_mean : conf_info.ens_ssvar_file;
+
+         mlog << Debug(2) << "\n" << sep_str << "\n\n"
+              << "Processing ensemble mean file: " << mn_file << "\n";
+
+         // For spread/skill, use the calculated mean file if none was specified
+         if( !ens_ssvar_mean || !strcmp(ens_ssvar_mean, "") ){
+            ConcatString ens_magic;
+            ens_magic << conf_info.ens_ssvar_vars[i] << "(*,*)";
+            mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
+            info = new VarInfoNcMet();
+            info->set_magic(ens_magic);
+         } else {
+            info = conf_info.vx_pd[i].fcst_info;
+         }
+
+         // Deallocate the data file pointer, if necessary
+         if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
+
+         // Read the current gridded observation file
+         if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(mn_file))) {
+            mlog << Error << "\nprocess_grid_vx() -> "
+                 << "Trouble reading gridded ensemble mean file \""
+                 << mn_file << "\"\n\n";
+            exit(1);
+         }
+
+         // Read the gridded data from the mean file
+         if( !ens_mtddf->data_plane(*info, mn_dp) ){
+            mlog << Error << "\nprocess_grid_vx() -> "
+                 << "Trouble reading field " << info->magic_str()
+                 << " from file " << mn_file << "\n\n";
+            exit(1);
+         }
+
+      }
+
       // Loop through and apply each of the smoothing operations
       for(j=0; j<conf_info.get_n_interp(); j++) {
 
@@ -1167,10 +1288,20 @@ void process_grid_vx() {
                             conf_info.interp_mthd[j],
                             conf_info.interp_wdth[j],
                             conf_info.interp_thresh);
+
+               if( conf_info.ens_ssvar_flag ){
+                  smooth_field(mn_dp, mn_dp_smooth,
+                               conf_info.interp_mthd[j],
+                               conf_info.interp_wdth[j],
+                               conf_info.interp_thresh);
+               }
+
+
             }
             // Do not smooth the forecast field
             else {
                fcst_dp_smooth[k] = fcst_dp[k];
+               if( conf_info.ens_ssvar_flag ) mn_dp_smooth = mn_dp;
             }
          } // end for k
 
@@ -1198,6 +1329,7 @@ void process_grid_vx() {
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
+                                mn_dp_smooth,
                                 conf_info.mask_dp[k], pd);
 
             mlog << Debug(2)
@@ -1219,6 +1351,9 @@ void process_grid_vx() {
             pd.compute_rhist();
             pd.compute_stats();
 
+            //PGO - moving this here
+            if( 0 == i ) setup_txt_files(pd.n_pair);
+
             // Compute RHIST scores
             if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
@@ -1231,6 +1366,17 @@ void process_grid_vx() {
             // Write out the smoothed forecast, observation, and difference
             if(conf_info.ensemble_flag[i_nc_orank])
                write_orank_nc(pd, obs_dp_smooth, i, j, k);
+
+            // Compute SSVAR scores
+            if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
+               pd.ssvar_bin_size = conf_info.ens_ssvar_bin_size[i];
+               pd.compute_ssvar();
+
+               write_ssvar_row(shc, &pd,
+                  conf_info.output_flag[i_ssvar],
+                  stat_at, i_stat_row,
+                  txt_at[i_ssvar], i_txt_row[i_ssvar]);
+            }
 
          } // end for k
       } // end for j
@@ -1253,6 +1399,7 @@ void process_grid_vx() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
+                         DataPlane &mn_dp,
                          DataPlane &mask_dp, PairDataEnsemble &pd) {
    int i, j, x, y;
    double v;
@@ -1270,6 +1417,11 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 
       } // end for y
    } // end for x
+
+   // Loop through the mean field, adding all the points
+   for(x=0; x<mn_dp.nx(); x++)
+      for(y=0; y<mn_dp.ny(); y++)
+         pd.mn_na.add(mn_dp.get(x, y));
 
    // Allocate space for the ensemble data
    pd.set_size();
@@ -1463,6 +1615,12 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
+   setup_txt_files(-1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_txt_files(int n_pair) {
    int  i, max_col;
    ConcatString tmp_str;
 
@@ -1493,7 +1651,8 @@ void setup_txt_files() {
    open_txt_file(stat_out, stat_file);
 
    // Setup the STAT AsciiTable
-   stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
+   //PGO stat_at.set_size(conf_info.n_stat_row(n_pair) + 1, max_col);
+   stat_at.set_size(vx_num_mpr + 1, max_col);
    setup_table(stat_at);
 
    // Write the text header row
@@ -1538,17 +1697,14 @@ void setup_txt_files() {
                max_col = get_n_orank_columns(n_ens) + n_header_columns + 1;
                break;
 
-            case(i_ssvar):
-               max_col = n_ssvar_columns + n_header_columns + 1;
-               break;
-
             default:
                max_col = n_txt_columns[i]  + n_header_columns + 1;
                break;
          } // end switch
 
          // Setup the text AsciiTable
-         txt_at[i].set_size(conf_info.n_txt_row(i) + 1, max_col);
+         //PGO txt_at[i].set_size(conf_info.n_stat_row(n_pair) + 1, max_col);
+         txt_at[i].set_size(vx_num_mpr + 1, max_col);
          setup_table(txt_at[i]);
 
          // Write the text header row
