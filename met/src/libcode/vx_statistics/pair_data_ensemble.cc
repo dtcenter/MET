@@ -352,7 +352,7 @@ void PairDataEnsemble::compute_ssvar() {
 
          // Add the squared deviation
          dev = (e_na[i][j] - mn_na[i]);
-         var = var + dev*dev;
+         var += dev*dev;
 
       } // end for j
 
@@ -404,12 +404,12 @@ void PairDataEnsemble::compute_ssvar() {
       double f = 0, o = 0, fo = 0, ff = 0, oo = 0;
 
       for(j=0; j < (int)pts->size(); j++){
-         var = var +   (*pts)[j].var;
-         f   = f   +   (*pts)[j].f;
-         o   = o   +   (*pts)[j].o;
-         fo  = fo  + ( (*pts)[j].f * (*pts)[j].o );
-         ff  = ff  + ( (*pts)[j].f * (*pts)[j].f );
-         oo  = oo  + ( (*pts)[j].o * (*pts)[j].o );
+         var +=   (*pts)[j].var;
+         f   +=   (*pts)[j].f;
+         o   +=   (*pts)[j].o;
+         fo  += ( (*pts)[j].f * (*pts)[j].o );
+         ff  += ( (*pts)[j].f * (*pts)[j].f );
+         oo  += ( (*pts)[j].o * (*pts)[j].o );
       }
 
       ssvar_bins[i].n_bin    = n_bin;
@@ -426,12 +426,18 @@ void PairDataEnsemble::compute_ssvar() {
       ssvar_bins[i].ffbar    = ff / (double)pts->size();
       ssvar_bins[i].oobar    = oo / (double)pts->size();
 
-      mlog << Debug(4) << "  SSVAR[ "
-           << "bin_i: " << ssvar_bins[i].bin_i << "  "
-           << "bin_n: " << ssvar_bins[i].bin_n << "  "
-           << "var: (" << ssvar_bins[i].var_min << ", " << ssvar_bins[i].var_max << ")  "
-           << "fbar: " << ssvar_bins[i].fbar << "  "
-           << "obar: " << ssvar_bins[i].obar << " ]\n";
+      if( i < 100 ){
+         mlog << Debug(4) << "  SSVAR[ "
+              << "bin_i: " << ssvar_bins[i].bin_i << "  "
+              << "bin_n: " << ssvar_bins[i].bin_n << "  "
+              << "var: (" << ssvar_bins[i].var_min << ", "
+                          << ssvar_bins[i].var_max << ")  "
+              << "fbar: " << ssvar_bins[i].fbar << "  "
+              << "obar: " << ssvar_bins[i].obar << " ]\n";
+      } else if( i == 100 ){
+         mlog << Debug(4) << "  SSVAR message 101 through "
+              << n_bin << " omitted\n";
+      }
 
    }
 
@@ -936,7 +942,7 @@ void VxPairDataEnsemble::add_ens(bool mn) {
                   NumArray* e_pt = &(pd[i][j][k].e_na[l]);
                   fcst_v = 0;
                   for(int m=0; m < e_pt->n_elements(); m++)
-                     fcst_v = fcst_v + (*e_pt)[m];
+                     fcst_v += (*e_pt)[m];
                   pd[i][j][k].mn_na.add(fcst_v / (double)e_pt->n_elements());
                   continue;
                }
@@ -970,9 +976,9 @@ void VxPairDataEnsemble::add_ens(bool mn) {
                else      pd[i][j][k].mn_na.add(fcst_v);
 
             }
-         } // end for k
-      } // end for j
-   } // end for i
+         } // end for k - n_interp
+      } // end for j - n_mask
+   } // end for i - n_msg_typ
 
    return;
 }
