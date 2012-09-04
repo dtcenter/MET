@@ -560,7 +560,7 @@ void process_vx() {
       // Setup the GCPairData objects
       conf_info.set_vx_pd();
 
-      //PGO - handle the ascii table size issue here
+      // Determine the number of ascii table rows needed
       process_vx_table_size();
 
       // Process the point observations
@@ -577,7 +577,6 @@ void process_vx() {
 
 void process_vx_table_size() {
 
-   //PGO
    // The conservative approach to calculating the number of stat file row:
    //
    //  ADD:
@@ -1091,9 +1090,6 @@ void process_grid_vx() {
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
-   // Create output text files as requested in the config file
-   //PGO setup_txt_files();
-
    // Allocate space to store the forecast fields
    fcst_dp        = new DataPlane [n_ens];
    fcst_dp_smooth = new DataPlane [n_ens];
@@ -1226,7 +1222,6 @@ void process_grid_vx() {
       shc.set_obs_valid_end(obs_dp.valid());
 
       // If spread/skill is activated, read the ensemble mean file
-      // PGO - read the correct file
       if( conf_info.ens_ssvar_flag ){
 
          VarInfo* info;
@@ -1659,7 +1654,6 @@ void setup_txt_files(int n_pair) {
    open_txt_file(stat_out, stat_file);
 
    // Setup the STAT AsciiTable
-   //PGO stat_at.set_size(conf_info.n_stat_row(n_pair) + 1, max_col);
    stat_at.set_size(vx_num_mpr + 1, max_col);
    setup_table(stat_at);
 
@@ -1711,7 +1705,6 @@ void setup_txt_files(int n_pair) {
          } // end switch
 
          // Setup the text AsciiTable
-         //PGO txt_at[i].set_size(conf_info.n_stat_row(n_pair) + 1, max_col);
          txt_at[i].set_size(vx_num_mpr + 1, max_col);
          setup_table(txt_at[i]);
 
