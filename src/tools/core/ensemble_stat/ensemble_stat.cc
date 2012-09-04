@@ -355,7 +355,8 @@ void process_command_line(int argc, char **argv)
    if((point_obs_flag || grid_obs_flag) &&
       (conf_info.get_n_vx() > 0) &&
       (conf_info.output_flag[i_orank] != STATOutputType_None ||
-       conf_info.output_flag[i_rhist] != STATOutputType_None)) vx_flag = 1;
+       conf_info.output_flag[i_rhist] != STATOutputType_None ||
+       conf_info.output_flag[i_ssvar] != STATOutputType_None)) vx_flag = 1;
    else                                                        vx_flag = 0;
 
    // Check the spread/skill configuration information
@@ -388,6 +389,13 @@ void process_command_line(int argc, char **argv)
               << "because no observations have been specified\n\n";
       } else {
          conf_info.ens_ssvar_flag = 1;
+
+         if( !conf_info.ensemble_flag[i_nc_mean] ){
+            mlog << Warning << "\nprocess_command_line() -> "
+                 << "enabling ensemble mean to facilitate calculation "
+                 << "of ensemble spread/skill\n\n";
+            conf_info.ensemble_flag[i_nc_mean] = true;
+         }
       }
 
    }
