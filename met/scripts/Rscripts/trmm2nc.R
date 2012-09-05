@@ -117,7 +117,7 @@ if(as.character(hdr[1,3]) == "TRMM") {
   acc_type = 3
 } else {
   cat("\n\nERROR: Can\'t figure out the accumulation interval!\n\n")
-  exit(1)
+  quit(1)
 }
 
 # Parse the init and valid times
