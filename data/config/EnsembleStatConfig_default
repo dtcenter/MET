@@ -36,12 +36,12 @@ ens = {
 //
 fcst = {
    message_type = [ "ADPUPA" ];
+   ens_ssvar_bin_size = 1;
 
    field = [
       {
          name               = "APCP";
          level              = [ "A03" ];
-         ens_ssvar_bin_size = 1;
       }
    ];
 }
