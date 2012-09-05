@@ -222,10 +222,10 @@ static const char * orank_columns [] = {
 };
 
 static const char * ssvar_columns [] = {
-   "N_BIN",       "BIN_i",       "BIN_N",
-   "VAR_MIN",     "VAR_MAX",     "VAR_MEAN",
-   "FBAR",        "OBAR",        "FOBAR",
-   "FFBAR",       "OOBAR"
+   "TOTAL",       "N_BIN",       "BIN_i",
+   "BIN_N",       "VAR_MIN",     "VAR_MAX",
+   "VAR_MEAN",    "FBAR",        "OBAR",
+   "FOBAR",       "FFBAR",       "OOBAR"
 };
 
 static const char * job_sum_columns [] = {

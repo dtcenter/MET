@@ -3418,42 +3418,46 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    //
    // Ensemble spread/skill variance bins
    // Dump out the SSVAR line:
-   //    N_BIN,       BIN_i,       BIN_N,
-   //    VAR_MIN,     VAR_MAX,     VAR_MEAN,
-   //    FBAR,        OBAR,        FOBAR,
-   //    FFBAR,       OOBAR
+   //    TOTAL,       N_BIN,       BIN_i,
+   //    BIN_N,       VAR_MIN,     VAR_MAX,
+   //    VAR_MEAN,    FBAR,        OBAR,
+   //    FOBAR,       FFBAR,       OOBAR
+   //
 
-   at.set_entry(r, c+0,  // Total Number of Bins
+   at.set_entry(r, c+0,  // Total Number of Pairs
+      pd_ptr->n_pair);
+
+   at.set_entry(r, c+1,  // Total Number of Bins
       pd_ptr->ssvar_bins[i].n_bin);
 
-   at.set_entry(r, c+1,  // Index of current bin
+   at.set_entry(r, c+2,  // Index of current bin
       pd_ptr->ssvar_bins[i].bin_i);
 
-   at.set_entry(r, c+2,  // Number of points in bin i
+   at.set_entry(r, c+3,  // Number of points in bin i
       pd_ptr->ssvar_bins[i].bin_n);
 
-   at.set_entry(r, c+3,  // Lower variance value for bin
+   at.set_entry(r, c+4,  // Lower variance value for bin
       pd_ptr->ssvar_bins[i].var_min);
 
-   at.set_entry(r, c+4,  // Upper variance value for bin
+   at.set_entry(r, c+5,  // Upper variance value for bin
       pd_ptr->ssvar_bins[i].var_max);
 
-   at.set_entry(r, c+5,  // Mean variance value for bin
+   at.set_entry(r, c+6,  // Mean variance value for bin
       pd_ptr->ssvar_bins[i].var_mean);
 
-   at.set_entry(r, c+6,  // Mean(f)
+   at.set_entry(r, c+7,  // Mean(f)
       pd_ptr->ssvar_bins[i].fbar);
 
-   at.set_entry(r, c+7,  // Mean(o)
+   at.set_entry(r, c+8,  // Mean(o)
       pd_ptr->ssvar_bins[i].obar);
 
-   at.set_entry(r, c+8,  // Mean(fo)
+   at.set_entry(r, c+9,  // Mean(fo)
       pd_ptr->ssvar_bins[i].fobar);
 
-   at.set_entry(r, c+9,  // Mean(ff)
+   at.set_entry(r, c+10,  // Mean(ff)
       pd_ptr->ssvar_bins[i].ffbar);
 
-   at.set_entry(r, c+10,  // Mean(oo)
+   at.set_entry(r, c+11,  // Mean(oo)
       pd_ptr->ssvar_bins[i].oobar);
 
 }
