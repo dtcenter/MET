@@ -64,6 +64,8 @@
 //   014    03/07/12  Halley Gotway  Bugfix in get_field() function and
 //                                   remove unnecessary time strings.
 //
+//   015    04/12/12  Oldenburg      Support for all gridded data types
+//
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -126,6 +128,8 @@ static int          out_accum;
 static StringArray  pcp_dir;
 static ConcatString pcp_reg_exp = default_reg_exp;
 static ConcatString user_dict = "";
+static ConcatString field_name = "";
+static VarInfo*     var_info = (VarInfo *) 0;
 
 // Variables for the add and subtract commands
 static ConcatString *in_file = (ConcatString *) 0;
@@ -170,6 +174,7 @@ static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_user_dict(const StringArray & a);
+static void set_var_name(const StringArray & a);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -243,6 +248,7 @@ void process_command_line(int argc, char **argv)
    cline.add(set_pcpdir,    "-pcpdir",   1);
    cline.add(set_pcprx,     "-pcprx",    1);
    cline.add(set_user_dict, "-config",   1);
+   cline.add(set_var_name,  "-varname",  1);
 
    //
    // parse the command line
@@ -389,8 +395,13 @@ void process_add_sub_args(const CommandLine & cline)
    //
    for(i=0; i<n_files; i++) {
       in_file[i] = cline[i*2];
-      //accum[i]   = timestring_to_sec(cline[i*2 + 1]);
       accum_mag.add( cline[i*2 + 1] );
+
+      /*PGO
+      accum_mag.add( "name=\"TMP\";level=\"Z2\";" );
+      accum[i] = is_hhmmss(accum_mag[i]) || is_hh(accum_mag[i]) ?
+                     timestring_to_sec(accum_mag[i]) : 0;
+      */
    }
 
    //
@@ -1003,6 +1014,19 @@ void get_field(const char * filename, const char * fld_accum_mag,
    var->set_valid(get_valid_ut);
    var->set_init(get_init_ut);
 
+   //PGO  build an output field name using the magic string
+   if( !var_info ){
+      var_info = var;
+      if( field_name.empty() ){
+         field_name = var->magic_str();
+         field_name = str_replace_all(field_name, "(", "");
+         field_name = str_replace_all(field_name, ")", "");
+         field_name = str_replace_all(field_name, "*", "");
+         field_name = str_replace_all(field_name, ",", "");
+         field_name = str_replace_all(field_name, "/", "_");
+      }
+   }
+
    //  read the record of interest into a DataPlane object
    if( ! datafile->data_plane(*var, plane) ){
       mlog << Error << "\nget_field() -> can't get data plane from file \"" << filename
@@ -1092,21 +1116,30 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Define a name for the variable
    // If the accumulation time is non-zero, append it to the variable name
-   tmp_str = get_grib_code_abbr(grib_code, grib_ptv);
+   //PGO tmp_str = get_grib_code_abbr(grib_code, grib_ptv);
+   tmp_str = field_name;
 
    // For no accumulation interval, append nothing
    if(nc_accum <= 0) {
       var_str = tmp_str;
    }
-   // For an hourly accumulation interval, append _HH
-   else if(nc_accum % sec_per_hour == 0) {
-      var_str.set_precision(2);
-      var_str << cs_erase << tmp_str << '_' << HH(nc_accum/sec_per_hour);
-   }
-   // For any other accumulation interval, append _HHMMSS
-   else {
-      tmp2_str = sec_to_hhmmss(nc_accum);
-      var_str << cs_erase << tmp_str << '_' << tmp2_str;
+
+   // Otherwise append the interval to the leading variable name
+   else{
+      StringArray l = tmp_str.split("_");
+      tmp_str = l[0];
+
+      // For an hourly accumulation interval, append _HH
+      if(nc_accum % sec_per_hour == 0) {
+         var_str.set_precision(2);
+         var_str << cs_erase << tmp_str << '_' << HH(nc_accum/sec_per_hour);
+      }
+
+      // For any other accumulation interval, append _HHMMSS
+      else {
+         tmp2_str = sec_to_hhmmss(nc_accum);
+         var_str << cs_erase << tmp_str << '_' << tmp2_str;
+      }
    }
 
    // Define Variable
@@ -1114,8 +1147,9 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Add variable attributes
    pcp_var->add_att("name",  (const char *) var_str);
-   var_str = get_grib_code_name(grib_code, grib_ptv);
-   pcp_var->add_att("long_name", (const char *) var_str);
+//PGO   var_str = get_grib_code_name(grib_code, grib_ptv);
+//   pcp_var->add_att("long_name", (const char *) var_str);
+   pcp_var->add_att("long_name", var_info->long_name());
 
    // Ouput level string
    if(nc_accum%sec_per_hour == 0) {
@@ -1126,8 +1160,9 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    pcp_var->add_att("level", (const char *) var_str);
 
-   var_str = get_grib_code_unit(grib_code, grib_ptv);
-   pcp_var->add_att("units",      (const char *) var_str);
+//PGO   var_str = get_grib_code_unit(grib_code, grib_ptv);
+//   pcp_var->add_att("units",      (const char *) var_str);
+   pcp_var->add_att("units",      var_info->units());
    pcp_var->add_att("_FillValue", bad_data_float);
 
    //
@@ -1188,6 +1223,7 @@ void usage()
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-config config_str]\n\n"
+        << "\t[-varname variable_name]\n\n"
 
         << "\twhere\t\"-sum sum_args\" indicates that accumulations "
         << "from multiple files should be summed up using the "
@@ -1209,6 +1245,9 @@ void usage()
 
         << "\t\t\"-config config_str\" configuration string to use when "
         << "searching for records in input files (optional).\n\n"
+
+        << "\t\t\"-varname variable_name\" name of combined variable in "
+        << "output NetCDF file (optional).\n\n"
 
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
         << "the default behavior.\n"
@@ -1378,3 +1417,9 @@ void set_user_dict(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_var_name(const StringArray & a)
+{
+   field_name = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////

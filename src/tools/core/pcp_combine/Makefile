@@ -84,8 +84,8 @@ pcp_combine: pcp_combine.cc $(OBJECTS)
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_data2d \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_data2d_nc_pinterp \
