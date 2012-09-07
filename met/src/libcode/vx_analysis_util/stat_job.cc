@@ -1462,10 +1462,13 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          js << "-boot_rep_prop " << boot_rep_prop << " ";
          js << "-n_boot_rep "    << n_boot_rep    << " ";
          js << "-boot_rng "      << boot_rng      << " ";
-         if(strlen(boot_seed) == 0) {
-            js << "-boot_seed '' ";
-         } else {
-            js << "-boot_seed "  << boot_seed     << " ";
+         if(boot_seed) {
+            if(strlen(boot_seed) == 0) {
+               js << "-boot_seed '' ";
+            }
+            else {
+               js << "-boot_seed "  << boot_seed     << " ";
+            }
          }
       }
    }
