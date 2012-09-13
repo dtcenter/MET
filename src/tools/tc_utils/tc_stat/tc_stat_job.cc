@@ -1492,7 +1492,6 @@ ConcatString TCStatJobSummary::serialize() const {
 
 void TCStatJobSummary::do_job(const StringArray &file_list,
                               TCLineCounts &n) {
-   int i;
 
    // Check that the -column option has been supplied
    if(Column.n_elements() == 0) {

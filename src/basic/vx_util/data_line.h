@@ -102,6 +102,8 @@ class DataLine {
 
       virtual int read_line(LineDataFile *);
 
+      virtual int read_fwf_line(LineDataFile *, const int *wdth, int n_wdth);
+
       virtual int is_ok() const;
 
 };
@@ -144,9 +146,13 @@ class LineDataFile {
 
       void close();
 
+      void rewind();
+
       int ok() const;
 
       int operator>>(DataLine &);
+
+      int read_fwf_line(DataLine &, const int *wdth, int n_wdth);
 
       const char * filename() const;
       const char * short_filename() const;
