@@ -485,6 +485,95 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
+int DataLine::read_fwf_line(LineDataFile * ldf, const int *wdth, int n_wdth)
+
+{
+
+clear();
+
+ifstream & f = *(ldf->in);
+
+if ( !f )  return ( 0 );
+
+int i, j;
+char buf[max_str_len];
+char c;
+int pos, count;
+
+   //
+   //  get a line from the file using the specified widths
+   //
+   
+pos = count = 0;
+
+for( i=0; i<n_wdth; i++ )  {
+
+   if ( !f )  { clear();  return ( 0 ); }
+
+   extend_char(pos + wdth[i] + 1);   //  better safe than sorry
+   extend_int(++count);
+   
+   //
+   //  get the next entry
+   //
+   f.read(buf, wdth[i]);             
+
+   //
+   //  store the offset to this entry
+   //
+   Offset[count - 1] = pos;
+   
+   //
+   //  store this entry
+   //
+   for( j=0; j<wdth[i]; j++ )  {
+
+     Line[pos++] = buf[j];
+     
+     //
+     //  check for embedded newline
+     //
+     if(buf[j] == '\n') {
+        mlog << Warning
+             << "\nDataLine::read_fwf_line() -> "
+             << "Encountered newline while parsing line "
+             << ldf->last_line_number() + 1 << ".\n\n";
+     }
+   }
+
+   //
+   //  null terminate the entry
+   //
+   Line[pos++] = '\0';
+}
+
+   //
+   //  advance to the end of the line
+   //
+   
+while ( f.get(c) )  {
+
+   if ( !f )  { clear();  return ( 0 ); }
+
+   if ( c == '\n' )  break;
+}
+
+
+if ( !f )  { clear();  return ( 0 ); }
+
+N_items = count;
+
+LineNumber = ldf->last_line_number() + 1;
+
+
+return ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int DataLine::is_ok() const
 
 {
@@ -677,6 +766,31 @@ return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFile::rewind()
+
+{
+  
+   //
+   //  clear any error status and rewind to beginning
+   //
+   
+if ( in )  {
+
+   in->clear();
+
+   in->seekg(0, ios::beg);
+
+   Last_Line_Number = 0;
+   
+}
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -707,6 +821,31 @@ int status;
 do { 
 
    status = a.read_line(this);
+
+   if ( !status ) return ( 0 );
+
+   ++Last_Line_Number;
+
+} while ( !(a.is_ok()) );
+
+
+return ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int LineDataFile::read_fwf_line(DataLine & a, const int *wdth, int n_wdth)
+
+{
+
+int status;
+
+do {
+
+   status = a.read_fwf_line(this, wdth, n_wdth);
 
    if ( !status ) return ( 0 );
 
