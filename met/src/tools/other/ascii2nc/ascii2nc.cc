@@ -173,8 +173,7 @@ int main(int argc, char *argv[]) {
    //
    // Check for zero arguments
    //
-   if (argc == 1)
-      usage();
+   if(argc == 1) usage();
 
    //
    // Parse the command line into tokens
@@ -301,7 +300,7 @@ void process_met_hdr(LineDataFile &f_in) {
    nhdr = 0;
 
    //
-   // Count the number of unique headers and determine the column format
+   // Process each line of the file
    //
    while(f_in >> dl) {
 
@@ -412,7 +411,7 @@ void process_met_obs(LineDataFile &f_in) {
    i_hdr = i_obs = -1;
         
    //
-   // Process the observations
+   // Process each line of the file
    //
    while(f_in >> dl) {
 
@@ -499,12 +498,12 @@ void process_little_r_hdr(LineDataFile &f_in) {
    f_in.rewind();
        
    //
-   // Initialize the nhdr count
+   // Initialize the number of headers
    //
    nhdr = 0;
 
    //
-   // Read the lines:
+   // Read the fixed-width lines:
    //   - one header report line
    //   - variable number of data lines
    //   - one end of report line
@@ -574,7 +573,7 @@ void process_little_r_obs(LineDataFile &f_in) {
    i_hdr = i_obs = -1;
    
    //
-   // Read the lines:
+   // Read the fixed-width lines:
    //   - one header report line
    //   - variable number of data lines
    //   - one end of report line
@@ -699,9 +698,12 @@ void process_little_r_obs(LineDataFile &f_in) {
 
                //
                // Observation value
-               // Convert pressure from hectopascals to pascals
                //
                obs_val = atof(dl[i]);
+
+               //
+               // Convert pressure from hectopascals to pascals
+               //
                if(lr_grib_codes[i/2] == 1) obs_val *= 10;
             
                //
