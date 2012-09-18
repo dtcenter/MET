@@ -256,7 +256,7 @@ void process_tracks() {
    
    // Derive consensus forecasts from the ADECK tracks
    mlog << Debug(2)
-        << "Deriving " << conf_info.NCon
+        << "Deriving " << conf_info.NConsensus
         << " ADECK consensus tracks(s).\n";
    derive_consensus(adeck_tracks);
 
@@ -630,10 +630,11 @@ void derive_consensus(TrackInfoArray &tracks) {
    StringArray case_list, case_cmp;
    TrackInfoArray con_tracks;
    TrackInfo new_track;
+   bool found, skip;
    const char *sep = " ";
 
    // If no consensus models are defined, nothing to do
-   if(conf_info.NCon == 0) return;
+   if(conf_info.NConsensus == 0) return;
 
    // Loop through the tracks to build a list of cases
    for(i=0; i<tracks.n_tracks(); i++) {
@@ -661,45 +662,62 @@ void derive_consensus(TrackInfoArray &tracks) {
       case_cmp = cur_case.split(sep);      
      
       // Loop through the consensus models
-      for(j=0; j<conf_info.NCon; j++) {
+      for(j=0; j<conf_info.NConsensus; j++) {
 
          // Initialize
          con_tracks.clear();
          new_track.clear();
 
          // Loop through the consensus members
-         for(k=0; k<conf_info.ConMembers[j].n_elements(); k++) {
+         for(k=0, skip=false;
+             k<conf_info.Consensus[j].Members.n_elements(); k++) {
 
             // Loop through the tracks looking for a match
-            for(l=0; l<tracks.n_tracks(); l++) {
+            for(l=0, found=false; l<tracks.n_tracks(); l++) {
 
                // If the consenus member was found for this case,
                // add it to the TrackInfoArray object
-               if(tracks[l].basin()     == case_cmp[0]                &&
-                  tracks[l].cyclone()   == case_cmp[1]                &&
-                  tracks[l].technique() == conf_info.ConMembers[j][k] &&
+               if(tracks[l].basin()     == case_cmp[0]                       &&
+                  tracks[l].cyclone()   == case_cmp[1]                       &&
+                  tracks[l].technique() == conf_info.Consensus[j].Members[k] &&
                   tracks[l].init()      == yyyymmdd_hhmmss_to_unix(case_cmp[2])) {
                   con_tracks.add(tracks[l]);
+                  found = true;
                   break;
                }
-
             } // end for l
+
+            // Check if a required model was not found
+            if(conf_info.Consensus[j].Required[k] && !found) {
+               mlog << Debug(4)
+                    << "[Case " << i+1 << "] For case \"" << case_list[i]
+                    << "\" skipping consensus model \""
+                    << conf_info.Consensus[j].Name
+                    << "\" since required member \""
+                    << conf_info.Consensus[j].Members[k]
+                    <<  "\" was not found.\n";
+               skip = true;
+               break;
+            } 
          } // end for k
 
+         // If a required member was missing, continue to the next case
+         if(skip) continue;
+
          // Check that the required number of tracks were found
-         if(con_tracks.n_tracks() < conf_info.ConMinReq[j]) {
+         if(con_tracks.n_tracks() < conf_info.Consensus[j].MinReq) {
             mlog << Debug(4)
                  << "[Case " << i+1 << "] For case \"" << case_list[i]
-                 << "\" skipping consensus model \"" << conf_info.ConModel[j]
+                 << "\" skipping consensus model \"" << conf_info.Consensus[j].Name
                  << "\" since the minimum number of required members were not found ("
                  << con_tracks.n_tracks() << " < "
-                 << conf_info.ConMinReq[j] << ").\n";
+                 << conf_info.Consensus[j].MinReq << ").\n";
             continue;
          }
 
          // Derive the consensus model from the TrackInfoArray
-         new_track = consensus(con_tracks, conf_info.ConModel[j],
-                               conf_info.ConMinReq[j]);
+         new_track = consensus(con_tracks, conf_info.Consensus[j].Name,
+                               conf_info.Consensus[j].MinReq);
 
          if(mlog.verbosity_level() >= 5) {
             mlog << Debug(5)
@@ -718,7 +736,6 @@ void derive_consensus(TrackInfoArray &tracks) {
       } // end for j
 
    } // end for i
-
 
    return;
 }
