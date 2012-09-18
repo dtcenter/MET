@@ -1516,7 +1516,8 @@ NumArray array;
 
 if ( Entry )  is_correct_type = (Entry->type() == ArrayType   ||
                                  Entry->type() == IntegerType ||
-                                 Entry->type() == FloatType);
+                                 Entry->type() == FloatType   ||
+                                 Entry->type() == BooleanType);
                                  
 LastLookupStatus = is_correct_type;
 
@@ -1561,6 +1562,18 @@ if ( Entry->type() == FloatType )  {
 }
 
    //
+   //  Store a single boolean and return
+   //
+
+if ( Entry->type() == BooleanType )  {
+
+   array.add( Entry->b_value() );
+
+   return ( array );
+
+}
+
+   //
    //  Retrieve the array dictionary
    //
 
@@ -1575,7 +1588,9 @@ if ( Dict->n_entries() > 0 )  {
 
    Type = (*Dict)[0]->type();
 
-   if( Type != IntegerType && Type != FloatType )  {
+   if( Type != IntegerType &&
+       Type != FloatType   &&
+       Type != BooleanType )  {
 
       mlog << Error
            << "\nDictionary::lookup_num_array() -> "
@@ -1593,8 +1608,9 @@ if ( Dict->n_entries() > 0 )  {
 
 for (int i=0; i<Dict->n_entries(); i++)  {
 
-   if( Type == IntegerType)  array.add((*Dict)[i]->i_value());
-   else                      array.add((*Dict)[i]->d_value());
+        if( Type == FloatType   )  array.add((*Dict)[i]->i_value());
+   else if( Type == IntegerType )  array.add((*Dict)[i]->d_value());
+   else if( Type == BooleanType )  array.add((*Dict)[i]->b_value());
 
 }
 
