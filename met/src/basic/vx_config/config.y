@@ -106,6 +106,8 @@ static void do_dict();
 
 static void do_string(const char *);
 
+static void do_boolean(const bool &);
+
 static void do_number(const Number &);
 
 // static void do_array(const char * LHS);
@@ -173,6 +175,7 @@ assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean   ($1
            | assign_prefix QUOTED_STRING    ';'        { do_assign_string    ($1, $2); }
            | assign_prefix dictionary                  { do_assign_dict      ($1); }
 
+           | array_prefix boolean_list    ']' ';'      { do_assign_dict($1); }
            | array_prefix number_list     ']' ';'      { do_assign_dict($1); }
            | array_prefix string_list     ']' ';'      { do_assign_dict($1); }
            | array_prefix threshold_list  ']' ';'      { do_assign_dict($1); }
@@ -217,6 +220,11 @@ threshold : COMPARISON number { do_thresh($1, $2); }
 number : INTEGER { }
        | FLOAT   { }
        ;
+    
+
+boolean_list : BOOLEAN                   { do_boolean($1); }
+            | boolean_list ',' BOOLEAN   { do_boolean($3); }
+            ;
 
 
 number_list : number                   { do_number($1); }
@@ -675,6 +683,25 @@ void do_string(const char * text)
 DictionaryEntry e;
 
 e.set_string(0, text);
+
+dict_stack->store(e);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_boolean(const bool & boolean)
+
+{
+
+DictionaryEntry e;
+
+e.set_boolean(0, boolean);
 
 dict_stack->store(e);
 
