@@ -100,11 +100,11 @@ valid_mask = "";
 
 //
 // Specify whether the code should check for duplicates ATCF lines when
-// building tracks.  Setting this to false makes the parsing of tracks quicker.
+// building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
 //
-// e.g. check_dup = true;
+// e.g. check_dup = TRUE;
 //
-check_dup = true;
+check_dup = TRUE;
 
 //
 // Specify whether special processing should be performed for interpolated
@@ -112,23 +112,29 @@ check_dup = true;
 // search for the corresponding track whose model name ends in '2' (e.g. AHW2)
 // and merge it's track points into the interpolated model's track.
 //
-// e.g. interp12 = true;
+// e.g. interp12 = TRUE;
 //
-interp12 = true;
+interp12 = TRUE;
 
 //
-// Specify how consensus forecasts should be defined using three settings:
-//   consensus model name, membership, and minimum number of models required
-// All three settings must have the same length.
+// Specify how consensus forecasts should be defined:
+//   name    = consensus model name
+//   members = array of consensus member model names
+//   requied = array of true/false for each member
+//             if empty, default is false
+//   min_req = minimum number of members required for the consensus
 //
-// e.g. con_model   = [ "CON1", "CON2" ];
-//      con_members = [ "MOD1 MOD2 MOD3",
-//                      "MOD1 MOD3 MOD4 MOD5" ];
-//      con_min_req = [ 2, 3 ];
+// e.g.
+//    consensus = [
+//       {
+//          name     = "CON1";
+//          members  = [ "MOD1", "MOD2", "MOD3" ];
+//          required = [ true, false, false ];
+//          min_req  = 2;
+//       }
+//    ];
 //
-con_model   = [];
-con_members = [];
-con_min_req = [];
+consensus = [];
 
 //
 // Specify a comma-separated list of forecast lag times to be used in HH[MMSS]
@@ -155,9 +161,9 @@ oper_baseline = [];
 // Specify whether only those track points common to both the ADECK and BDECK
 // tracks should be written out.
 //
-// e.g. match_points = false;
+// e.g. match_points = FALSE;
 //
-match_points = false;
+match_points = FALSE;
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded

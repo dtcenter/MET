@@ -18,7 +18,17 @@
 #include "config_file.h"
 #include "mask_poly.h"
 
+#include "vx_config.h"
 #include "vx_util.h"
+
+////////////////////////////////////////////////////////////////////////
+
+struct ConsensusInfo {
+   ConcatString Name;
+   StringArray  Members;
+   NumArray     Required;
+   int          MinReq;
+};
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -58,10 +68,8 @@ class TCPairsConfInfo {
       bool Interp12;
       
       // Consensus model definition
-      int NCon;                // Number of consensus models
-      StringArray  ConModel;   // Consensus model names
-      StringArray *ConMembers; // Members for each consensus model
-      NumArray     ConMinReq;  // Minimum required consensus members
+      int NConsensus;           // Number of consensus models
+      ConsensusInfo *Consensus; // Consensus model definition
 
       // Time-lagged track definition
       NumArray LagTime;

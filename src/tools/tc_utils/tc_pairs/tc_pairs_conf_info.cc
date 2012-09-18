@@ -45,7 +45,7 @@ TCPairsConfInfo::~TCPairsConfInfo() {
 void TCPairsConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   ConMembers = (StringArray *) 0;
+   Consensus = (ConsensusInfo *) 0;
   
    clear();
 
@@ -57,7 +57,7 @@ void TCPairsConfInfo::init_from_scratch() {
 void TCPairsConfInfo::clear() {
 
    // Deallocate memory
-   if(ConMembers) { delete [] ConMembers; ConMembers = (StringArray *) 0; }
+   if(Consensus) { delete [] Consensus; Consensus = (ConsensusInfo *) 0; }
 
    Model.clear();
    StormId.clear();
@@ -71,9 +71,7 @@ void TCPairsConfInfo::clear() {
    ValidMask.clear();
    CheckDup = true;
    Interp12 = true;
-   NCon = 0;
-   ConModel.clear();
-   ConMinReq.clear();
+   NConsensus = 0;
    LagTime.clear();
    BestBaseline.clear();
    OperBaseline.clear();
@@ -90,6 +88,9 @@ void TCPairsConfInfo::clear() {
 void TCPairsConfInfo::read_config(const char *default_file_name,
                                   const char *user_file_name) {
 
+   // Read the config file constants
+   Conf.read(replace_path(config_const_filename));
+  
    // Read the default config file
    Conf.read(default_file_name);
 
@@ -105,9 +106,10 @@ void TCPairsConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCPairsConfInfo::process_config() {
-   int i;
+   int i, j;
    StringArray sa;
    ConcatString poly_file;
+   Dictionary *con_dict = (Dictionary *) 0;
 
    // Conf: Version
    Version = Conf.lookup_string("version");
@@ -173,29 +175,36 @@ void TCPairsConfInfo::process_config() {
    // Conf: Interp12
    Interp12 = Conf.lookup_bool("interp12");
 
-   // Conf: ConModel
-   ConModel = Conf.lookup_string_array("con_model");
+   // Conf: Consensus
+   con_dict = Conf.lookup_array("consensus");
 
-   // Conf: ConMembers
-   sa = Conf.lookup_string_array("con_members");
-   ConMembers = new StringArray [sa.n_elements()];
-   for(i=0; i<sa.n_elements(); i++)
-      ConMembers[i].parse_wsss(sa[i]);
+   // Set the consensus count
+   NConsensus = con_dict->n_entries();
+   Consensus  = new ConsensusInfo [NConsensus];
 
-   // Conf: ConMinReq
-   ConMinReq = Conf.lookup_num_array("con_min_req");
-   
-   // Conf: NCon
-   NCon = sa.n_elements();
+   // Loop over the consensus entries
+   for(i=0; i<NConsensus; i++) {
 
-   // Check for consistent consensus parameters.
-   if(NCon != ConModel.n_elements() ||
-      NCon != ConMinReq.n_elements()) {
-      mlog << Error
-           << "\nTCPairsConfInfo::process_config() -> "
-           << "The \"ConModel\", \"ConMembers\", and \"ConMinReq\" "
-           << "entries must all have the same length.\n\n";
-      exit(1);
+      // Conf: Consensus: name, members, required, min_req
+      Consensus[i].Name     = (*con_dict)[i]->dict_value()->lookup_string("name");
+      Consensus[i].Members  = (*con_dict)[i]->dict_value()->lookup_string_array("members");
+      Consensus[i].Required = (*con_dict)[i]->dict_value()->lookup_num_array("required");
+      Consensus[i].MinReq   = (*con_dict)[i]->dict_value()->lookup_int("min_req");
+
+      // If required is empty, default to 0
+      if(Consensus[i].Required.n_elements() == 0) {
+         for(j=0; j<Consensus[i].Members.n_elements(); j++) {
+            Consensus[i].Required.add(0);
+         }
+      }
+      else if(Consensus[i].Required.n_elements() !=
+              Consensus[i].Members.n_elements()) {
+         mlog << Error
+              << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus.required\" must either be empty "
+              << "or the same length as \"consensus.members\".\n\n";
+         exit(1);
+      }
    }
 
    // Conf: LagTime
