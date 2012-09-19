@@ -426,7 +426,8 @@ void filter_tracks(TrackInfoArray &tracks) {
       if(conf_info.Model.n_elements() > 0 &&
          !conf_info.Model.has(t[i].technique())) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for model mismatch.\n";
+              << "Discarding track " << i+1 << " for model mismatch: "
+              << t[i].technique() << "\n";
          n_mod++;
          continue;
       }
@@ -436,7 +437,8 @@ void filter_tracks(TrackInfoArray &tracks) {
          !has_storm_id(conf_info.StormId, t[i].basin(),
                        t[i].cyclone(), t[i].init())) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for storm id mismatch.\n";
+              << "Discarding track " << i+1 << " for storm id mismatch: "
+              << t[i].storm_id() << "\n";
          n_sid++;
          continue;
       }
@@ -445,7 +447,8 @@ void filter_tracks(TrackInfoArray &tracks) {
       if(conf_info.Basin.n_elements() > 0 &&
          !conf_info.Basin.has(t[i].basin())) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for basin mismatch.\n";
+              << "Discarding track " << i+1 << " for basin mismatch: "
+              << t[i].basin() << "\n";
          n_bas++;
          continue;
       }
@@ -454,7 +457,8 @@ void filter_tracks(TrackInfoArray &tracks) {
       if(conf_info.Cyclone.n_elements() > 0 &&
          !conf_info.Cyclone.has(t[i].cyclone())) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for cyclone mismatch.\n";
+              << "Discarding track " << i+1 << " for cyclone mismatch: "
+              << t[i].cyclone() << "\n";
          n_cyc++;
          continue;
       }
@@ -463,7 +467,8 @@ void filter_tracks(TrackInfoArray &tracks) {
       if(conf_info.StormName.n_elements() > 0 &&
          !conf_info.StormName.has(t[i].storm_name())) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for storm name mismatch.\n";
+              << "Discarding track " << i+1 << " for storm name mismatch: "
+              << t[i].storm_name() << "\n";
          n_name++;
          continue;
       }
@@ -478,8 +483,9 @@ void filter_tracks(TrackInfoArray &tracks) {
          (conf_info.InitExc.n_elements() > 0 &&
           conf_info.InitExc.has(t[i].init()))) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for its "
-              << "initialization time.\n";
+              << "Discarding track " << i+1 << " for initialization "
+              << "time mismatch: "
+              << unix_to_yyyymmdd_hhmmss(t[i].init()) << "\n";
          n_init++;
          continue;
       }
@@ -489,8 +495,9 @@ void filter_tracks(TrackInfoArray &tracks) {
       if(conf_info.InitHour.n_elements() > 0 &&
          !conf_info.InitHour.has(hms_to_sec(h, mm, s))) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for initialization hour "
-              << "mismatch.\n";
+              << "Discarding track " << i+1 << " for initialization "
+              << "mismatch: " << sec_to_hhmmss(hms_to_sec(h, mm, s))
+              << "\n";
          n_init_hour++;
          continue;
       }
@@ -501,19 +508,22 @@ void filter_tracks(TrackInfoArray &tracks) {
          (conf_info.ValidEnd > 0 &&
           conf_info.ValidEnd < t[i].valid_max())) {
          mlog << Debug(4)
-              << "Discarding track " << i+1 << " for falling outside of the "
-              << "valid time window.\n";
+              << "Discarding track " << i+1 << " for falling outside the "
+              << "valid time window: "
+              <<  unix_to_yyyymmdd_hhmmss(t[i].valid_min()) << " to "
+              <<  unix_to_yyyymmdd_hhmmss(t[i].valid_max()) << "\n";
          n_vld++;
          continue;
       }
 
       // Initialization location mask
       if(conf_info.InitMask.n_points() > 0 &&
-         !conf_info.InitMask.latlon_is_inside_dege(t[i][0].lat(),
-                                                   t[i][0].lon())) {
+         !conf_info.InitMask.latlon_is_inside(t[i][0].lat(),
+                                              t[i][0].lon())) {
          mlog << Debug(4)
               << "Discarding track " << i+1 << " for falling outside the "
-              << "initialization polyline.\n";
+              << "initialization polyline: ("
+              << t[i][0].lat() << ", " << t[i][0].lon() << ")\n";
          n_maski++;
          continue;
       }
@@ -525,8 +535,8 @@ void filter_tracks(TrackInfoArray &tracks) {
          for(j=0,status=true; j<t[i].n_points(); j++) {
 
             // In the TrackPoint falls outside of the polyline break out
-            if(!conf_info.ValidMask.latlon_is_inside_dege(t[i][j].lat(),
-                                                          t[i][j].lon())) {
+            if(!conf_info.ValidMask.latlon_is_inside(t[i][j].lat(),
+                                                     t[i][j].lon())) {
                status = false;
                break;
             }
@@ -535,7 +545,8 @@ void filter_tracks(TrackInfoArray &tracks) {
          if(!status) {
             mlog << Debug(4)
                  << "Discarding track " << i+1 << " for falling outside the "
-                 << "valid polyline.\n";
+                 << "valid polyline: "
+                 << t[i][j].lat() << ", " << t[i][j].lon() << ")\n";
             n_maskv++;
             continue;
          }
