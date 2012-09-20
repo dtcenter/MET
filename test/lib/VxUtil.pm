@@ -645,7 +645,7 @@ sub vx_util_unique {
 #
 #######################################################################
 sub vx_util_seq {
-  return () if (2 > @_ || 3 < @_);
+  return @_ if (2 > @_);
   my ($beg, $inc, $end) = (shift, (2 == @_ ? shift : 1), shift);
   $inc = ($beg > $end && 0 < $inc ? -1 * $inc : $inc);
   my @ret = ();
@@ -1147,7 +1147,8 @@ sub vx_met_ens_stat {
   $strEnsCmd .= "  $strConfig";
 
   # add the options from the input options map to the command line
-  my @listOpt = qw(grid_obs point_obs ens_valid ens_lead obs_valid_beg obs_valid_end obs_lead outdir v);
+  my @listOpt = qw(grid_obs point_obs ens_valid ens_lead obs_valid_beg obs_valid_end 
+                   obs_lead outdir ssvar_mean v);
   foreach my $strOpt (@listOpt){
     next if( ! defined $mapOpt{$strOpt} );
     $strEnsCmd .= " \\\n  -$strOpt $mapOpt{$strOpt}";
