@@ -1159,7 +1159,7 @@ sub vx_met_ens_stat {
   vx_log("$strEnsCmd\n");
   unless( $boolNoRun ){
     my @listEnsOut = qx/$strEnsCmd 2>&1/;
-    do{ chomp(); vx_log("$_"); } foreach (@listEnsOut);
+    chomp() and vx_log($_) for (@listEnsOut);
   }
 
 }
