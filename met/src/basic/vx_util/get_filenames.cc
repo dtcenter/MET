@@ -49,10 +49,10 @@ for (j=0; j<N; ++j)  {
 
    if ( stat(search_dirs[j], &sbuf) < 0 )  {
 
-      mlog << Error << "\nget_filenames() -> "
+      mlog << Warning << "\nget_filenames() -> "
            << "can't stat \"" << search_dirs[j] << "\"\n\n";
 
-      exit ( 1 );
+      continue;
 
    }
 
