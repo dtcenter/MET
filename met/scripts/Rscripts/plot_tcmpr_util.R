@@ -95,9 +95,6 @@ get_series_sub = function(cur, cur_plot, diff) {
 ########################################################################
 
 set_range = function(sub, plot_type, yrange) {
-
-      d = aggregate(sub$PLOT, list(sub$LEAD_HR), mean, na.rm=TRUE)
-      d = aggregate(sub$PLOT, list(sub$LEAD_HR), median, na.rm=TRUE)
       
   # Get the data range based on plot type
   if(plot_type == mean_str) {
@@ -239,9 +236,12 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
     # Prepare the data
     if(plot_type == mean_str) {
       d = aggregate(sub$PLOT, list(sub$LEAD_HR), mean, na.rm=TRUE)
+      # JHG
+      #s = Compute_STDerr_from_mean(sub, "ML",  )
     }
     else if(plot_type == median_str) {
       d = aggregate(sub$PLOT, list(sub$LEAD_HR), median, na.rm=TRUE)
+      # JHG s = Compute_STDerr_from_median()
     }
 
     # Plot the data
@@ -306,8 +306,6 @@ plot_time_series = function(dep, plot_type,
 
   cat(paste("Range of ", dep, ":", sep=''),
       paste(yrange, collapse=", "), "\n")
-
-cat("Title =,", title_str, "\n")
 
   # Create an empty plot
   par(mfrow=c(1,1), mai=c(1.5, 1.5, 2.0, 0.5), cex=1.5)

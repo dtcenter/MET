@@ -67,9 +67,11 @@ column_info = read.table("plot_tcmpr_hdr.dat", header=TRUE, row.names=1)
 # move customizable settings into a "config" file sort of thing
 # add -v verbosity for logging
 # New plot types from Eric: windrose and minimum spanning tree
-# Do mean and median plots
+# Add CI's for mean and median plots, use "-no_ci" command line argument
 # Do skill plots
 # Do rank plots
+# Sort the data into chronological order so that the event equal output is in the same order?
+# Move legend below X-axis
 
 # JHG - DONE
 # add title, subtitle, ylab options to override defaults
@@ -91,9 +93,7 @@ column_info = read.table("plot_tcmpr_hdr.dat", header=TRUE, row.names=1)
   # Create time series of boxplots for the difference (mod1-mod2) of the absolute values.
   # Create time series of median and mean for the difference (mod1-mod2) of the absolute values without CIs.
   # Create time series of median and mean for the difference (mod1-mod2) of the absolute values with CIs.
-
   # Compute ranks
-
 
 ########################################################################
 #
@@ -323,34 +323,6 @@ tcst = read.table(tcst_tmp_file, header=TRUE)
 run_cmd = paste("rm -f", tcst_tmp_file)
 cat("CALLING: ", run_cmd, "\n")
 status = system(run_cmd)
-
-########################################################################
-#
-# Build strings based on the filtering options chosen.
-#
-########################################################################
-
-# JHG, these strings aren't used.  Do I really need them?
-
-# Land vs water
-if(length(grep("-water_only true", filter_opts, ignore.case=TRUE)) > 0) {
-  abbr_verification_type="WATERONLY"
-  title_verification_type="(Water Only)"
-} else {
-  abbr_verification_type="LANDANDWATER"
-  title_verification_type="(Land and Water)"
-}
-cat("Selected Land/Water:", abbr_verification_type, "\n")
-
-# Basin
-if(length(grep("-basin al", filter_opts, ignore.case=TRUE)) > 0) {
-  abbr_basin="ALbasin"
-} else if(length(grep("-basin ep", filter_opts, ignore.case=TRUE)) > 0) {
-  abbr_basin="EPbasin"
-} else {
-  abbr_basin="ALLbasins"
-}
-cat("Selected Basin:", abbr_basin, "\n")
 
 ########################################################################
 #
