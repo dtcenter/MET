@@ -227,6 +227,8 @@ class ATCFLine {
          // set stuff
          //
 
+      void set_technique(const ConcatString &);
+
          //
          // get stuff
          //
@@ -308,6 +310,8 @@ class ATCFLine {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+inline void           ATCFLine::set_technique(const ConcatString &s) { Technique = s; }
 
 inline ConcatString   ATCFLine::line()             const { return(Line);            }
 inline ConcatString   ATCFLine::basin()            const { return(Basin);           }
