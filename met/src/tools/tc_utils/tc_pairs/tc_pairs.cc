@@ -88,7 +88,9 @@ extern "C" {
 
 static void   process_command_line (int, char **);
 static void   process_tracks       ();
-static void   process_track_files  (const StringArray &, TrackInfoArray &);
+static void   process_track_files  (const StringArray &,
+                                    TrackInfoArray &, bool);
+static bool   is_keeper            (const ATCFLine &);
 static void   filter_tracks        (TrackInfoArray &);
 static void   merge_interp12       (TrackInfoArray &);
 static int    derive_consensus     (TrackInfoArray &);
@@ -226,7 +228,7 @@ void process_tracks() {
    mlog << Debug(2)
         << "Processing " << adeck_files.n_elements()
         << " ADECK file(s).\n";
-   process_track_files(adeck_files, adeck_tracks);
+   process_track_files(adeck_files, adeck_tracks, true);
    mlog << Debug(2)
         << "Found " << adeck_tracks.n_tracks()
         << " ADECK track(s).\n";
@@ -241,7 +243,7 @@ void process_tracks() {
    mlog << Debug(2)
         << "Processing " << bdeck_files.n_elements()
         << " BDECK file(s).\n";
-   process_track_files(bdeck_files, bdeck_tracks);
+   process_track_files(bdeck_files, bdeck_tracks, false);
    mlog << Debug(2)
         << "Found " << bdeck_tracks.n_tracks()
         << " BDECK track(s).\n";
@@ -327,7 +329,7 @@ void process_tracks() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_track_files(const StringArray &files,
-                         TrackInfoArray &tracks) {
+                         TrackInfoArray &tracks, bool check_keep) {
    int i, cur_read, cur_add, tot_read, tot_add;
    ifstream in;
    ATCFLine line;
@@ -359,8 +361,11 @@ void process_track_files(const StringArray &files,
          // Increment the line counts
          cur_read++;
          tot_read++;
+
+         // Check the keep status if requested
+         if(check_keep && !is_keeper(line)) continue;
          
-         // Add the current line to the TrackInfoArray
+         // Attempt to add the current line to the TrackInfoArray
          if(tracks.add(line, conf_info.CheckDup)) {
             cur_add++;
             tot_add++;
@@ -403,6 +408,63 @@ void process_track_files(const StringArray &files,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check if the ATCFLine should be kept.  Only check those columns that
+// remain constant across the entire track:
+//    model, storm id, basin, cyclone, and init time
+//
+////////////////////////////////////////////////////////////////////////
+
+bool is_keeper(const ATCFLine &line) {
+   bool keep = true;
+   int m, d, y, h, mm, s;
+
+   // Decompose warning time
+   unix_to_mdyhms(line.warning_time(), m, d, y, h, mm, s);
+   
+   // Check model
+   if(conf_info.Model.n_elements() > 0 &&
+      !conf_info.Model.has(line.technique()))
+      keep = false;
+
+   // Check storm id
+   else if(conf_info.StormId.n_elements() > 0 &&
+           !has_storm_id(conf_info.StormId, line.basin(),
+                         line.cyclone_number(), line.warning_time()))
+      keep = false;
+
+   // Check basin
+   else if(conf_info.Basin.n_elements() > 0 &&
+           !conf_info.Basin.has(line.basin()))
+      keep = false;
+
+   // Check cyclone
+   else if(conf_info.Cyclone.n_elements() > 0 &&
+           !conf_info.Cyclone.has(line.cyclone_number()))
+      keep = false;
+
+   // Initialization time window
+   else if((conf_info.InitBeg > 0 &&
+            conf_info.InitBeg < line.warning_time()) ||
+           (conf_info.InitEnd > 0 &&
+            conf_info.InitEnd > line.warning_time()) ||
+           (conf_info.InitInc.n_elements() > 0 &&
+            !conf_info.InitInc.has(line.warning_time())) ||
+           (conf_info.InitExc.n_elements() > 0 &&
+            conf_info.InitExc.has(line.warning_time())))
+      keep = false;
+
+   // Initialization hour
+   else if(conf_info.InitHour.n_elements() > 0 &&
+           !conf_info.InitHour.has(hms_to_sec(h, mm, s)))
+      keep = false;
+
+   // Return the keep status
+   return(keep);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
