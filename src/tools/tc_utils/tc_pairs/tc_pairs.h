@@ -67,8 +67,8 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray     adeck_source;
-static StringArray     bdeck_source;
+static StringArray     adeck_source, adeck_model_suffix;
+static StringArray     bdeck_source, bdeck_model_suffix;
 static ConcatString    config_file;
 static TCPairsConfInfo conf_info;
 

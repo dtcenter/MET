@@ -89,6 +89,7 @@ extern "C" {
 static void   process_command_line (int, char **);
 static void   process_tracks       ();
 static void   process_track_files  (const StringArray &,
+                                    const StringArray &,
                                     TrackInfoArray &, bool);
 static bool   is_keeper            (const ATCFLine &);
 static void   filter_tracks        (TrackInfoArray &);
@@ -113,6 +114,8 @@ static void   clean_up             ();
 static void   usage                ();
 static void   set_adeck            (const StringArray &);
 static void   set_bdeck            (const StringArray &);
+static void   set_atcf_source      (const StringArray &,
+                                    StringArray &, StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
 static void   set_logfile          (const StringArray &);
@@ -180,15 +183,21 @@ void process_command_line(int argc, char **argv) {
       usage();
    }
 
-   // List the input track files
-   for(i=0; i<adeck_source.n_elements(); i++)
+   // List the input ADECK track files
+   for(i=0; i<adeck_source.n_elements(); i++) {
       mlog << Debug(1)
            << "[Source " << i+1 << " of " << adeck_source.n_elements()
-           <<  "] ADECK Source: " << adeck_source[i] << "\n";
-   for(i=0; i<bdeck_source.n_elements(); i++)
+           << "] ADECK Source: " << adeck_source[i] << ", Model Suffix: "
+           << adeck_model_suffix[i] << "\n";
+   }
+   
+   // List the input BDECK track files
+   for(i=0; i<bdeck_source.n_elements(); i++) {
       mlog << Debug(1)
            << "[Source " << i+1 << " of " << bdeck_source.n_elements()
-           << "] BDECK Source: " << bdeck_source[i] << "\n";
+           << "] BDECK Source: " << bdeck_source[i] << ", Model Suffix: "
+           << bdeck_model_suffix[i] << "\n";
+   }
 
    // Create the default config file name
    default_config_file = replace_path(default_config_filename);
@@ -210,7 +219,9 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_tracks() {
-   StringArray adeck_files, bdeck_files, suffix_list;
+   StringArray suffix_list, source, file_list;
+   StringArray adeck_files, adeck_files_model_suffix;
+   StringArray bdeck_files, bdeck_files_model_suffix;
    ATCFLine line;
    TrackInfoArray adeck_tracks, bdeck_tracks;
    TrackPairInfoArray pairs;
@@ -220,15 +231,34 @@ void process_tracks() {
    // Search for files ending in .dat
    suffix_list.add(atcf_suffix);
 
-   // Retrieve the ADECK and BDECK file lists
-   adeck_files = get_filenames(adeck_source, suffix_list);
-   bdeck_files = get_filenames(bdeck_source, suffix_list);
+   // Build list of ADECK files and corresponding model suffix list
+   for(i=0; i<adeck_source.n_elements(); i++) {
+      source.clear();
+      source.add(adeck_source[i]);
+      file_list = get_filenames(source, suffix_list);
+      for(j=0; j<file_list.n_elements(); j++) {
+         adeck_files.add(file_list[j]);
+         adeck_files_model_suffix.add(adeck_model_suffix[i]);
+      }
+   }
+
+   // Build list of BDECK files and corresponding model suffix list
+   for(i=0; i<bdeck_source.n_elements(); i++) {
+      source.clear();
+      source.add(bdeck_source[i]);
+      file_list = get_filenames(source, suffix_list);
+      for(j=0; j<file_list.n_elements(); j++) {
+         bdeck_files.add(file_list[j]);
+         bdeck_files_model_suffix.add(bdeck_model_suffix[i]);
+      }
+   }
 
    // Process the ADECK track files
    mlog << Debug(2)
         << "Processing " << adeck_files.n_elements()
         << " ADECK file(s).\n";
-   process_track_files(adeck_files, adeck_tracks, true);
+   process_track_files(adeck_files, adeck_files_model_suffix,
+                       adeck_tracks, true);
    mlog << Debug(2)
         << "Found " << adeck_tracks.n_tracks()
         << " ADECK track(s).\n";
@@ -243,7 +273,8 @@ void process_tracks() {
    mlog << Debug(2)
         << "Processing " << bdeck_files.n_elements()
         << " BDECK file(s).\n";
-   process_track_files(bdeck_files, bdeck_tracks, false);
+   process_track_files(bdeck_files, bdeck_files_model_suffix,
+                       bdeck_tracks, false);
    mlog << Debug(2)
         << "Found " << bdeck_tracks.n_tracks()
         << " BDECK track(s).\n";
@@ -329,9 +360,11 @@ void process_tracks() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_track_files(const StringArray &files,
+                         const StringArray &model_suffix,
                          TrackInfoArray &tracks, bool check_keep) {
    int i, cur_read, cur_add, tot_read, tot_add;
    ifstream in;
+   ConcatString cs;
    ATCFLine line;
 
    // Initialize
@@ -362,6 +395,12 @@ void process_track_files(const StringArray &files,
          cur_read++;
          tot_read++;
 
+         // Add model suffix, if specified
+         if(strlen(model_suffix[i]) > 0) {
+            cs << cs_erase << line.technique() << model_suffix[i];
+            line.set_technique(cs);
+         }
+         
          // Check the keep status if requested
          if(check_keep && !is_keeper(line)) continue;
          
@@ -1667,7 +1706,11 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n";
+        << mlog.verbosity_level() << ") (optional).\n\n"
+
+        << "\tNote: The \"-adeck\" and \"-bdeck\" options may include "
+        << "\"suffix=string\" to modify the model names from that "
+        << "source.\n\n";
 
    exit(1);
 }
@@ -1675,13 +1718,49 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_adeck(const StringArray & a) {
-   for(int i=0; i<a.n_elements(); i++) adeck_source.add(a[i]);
+   set_atcf_source(a, adeck_source, adeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_bdeck(const StringArray & a) {
-   for(int i=0; i<a.n_elements(); i++) bdeck_source.add(a[i]);
+   set_atcf_source(a, bdeck_source, bdeck_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_atcf_source(const StringArray & a,
+                     StringArray &source, StringArray &model_suffix) {
+   int i;
+   StringArray sa;
+   ConcatString cs, suffix = "";
+
+   // Check for optional suffix sub-argument
+   for(i=0; i<a.n_elements(); i++) {
+      if(strncmp(a[i], "suffix", strlen("suffix")) == 0) {
+         cs = a[i];
+         sa = cs.split("=");
+         if(sa.n_elements() != 2) {
+            mlog << Error
+                 << "\nset_atcf_source() -> "
+                 << "the model suffix must be specified as "
+                 << "\"suffix=string\".\n\n";
+            usage();
+         }
+         else {
+            suffix = sa[1];
+         }
+      }
+   }
+
+   // Parse the remaining sources
+   for(i=0; i<a.n_elements(); i++) {
+     if(strncmp(a[i], "suffix", strlen("suffix")) == 0) continue;
+     source.add(a[i]);
+     model_suffix.add(suffix);
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
