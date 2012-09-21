@@ -441,7 +441,7 @@ int StringArray::has(const char * text, int & index) const
 
 index = -1;
 
-if ( Nelements == 0 )  return ( 0 );
+if ( Nelements == 0 || !text )  return ( 0 );
 
 int j;
 
