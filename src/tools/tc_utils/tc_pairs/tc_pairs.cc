@@ -91,9 +91,9 @@ static void   process_tracks       ();
 static void   process_track_files  (const StringArray &, TrackInfoArray &);
 static void   filter_tracks        (TrackInfoArray &);
 static void   merge_interp12       (TrackInfoArray &);
-static void   derive_consensus     (TrackInfoArray &);
-static void   derive_lag           (TrackInfoArray &);
-static void   derive_baseline      (TrackInfoArray &, TrackInfoArray &);
+static int    derive_consensus     (TrackInfoArray &);
+static int    derive_lag           (TrackInfoArray &);
+static int    derive_baseline      (TrackInfoArray &, TrackInfoArray &);
 static void   derive_baseline_model(const ConcatString &,
                                     const TrackInfo &, int,
                                     TrackInfoArray &);
@@ -257,28 +257,28 @@ void process_tracks() {
    // Derive consensus forecasts from the ADECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.NConsensus
-        << " ADECK consensus tracks(s).\n";
-   derive_consensus(adeck_tracks);
+        << " ADECK consensus model(s).\n";
+   i = derive_consensus(adeck_tracks);
+   mlog << Debug(2)
+        << "Added " << i << " ADECK consensus tracks(s).\n";
 
    // Derive lag forecasts from the ADECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.LagTime.n_elements()
-        << " ADECK lag tracks(s).\n";
-   derive_lag(adeck_tracks);
-
-   // Derive CLIPER/SHIFOR forecasts from the ADECK tracks
+        << " ADECK lag model(s).\n";
+   i = derive_lag(adeck_tracks);
+   mlog << Debug(2)
+        << "Added " << i << " ADECK lag tracks(s).\n";
+        
+   // Derive CLIPER/SHIFOR forecasts from the ADECK/BDECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.OperBaseline.n_elements() +
                           conf_info.BestBaseline.n_elements()
-        << " CLIPER/SHIFOR baseline track(s).\n";
-   derive_baseline(adeck_tracks, bdeck_tracks);
-
-   // Filter the ADECK tracks using the config file information
+        << " CLIPER/SHIFOR baseline model(s).\n";
+   i = derive_baseline(adeck_tracks, bdeck_tracks);
    mlog << Debug(2)
-        << "Filtering " << adeck_tracks.n_tracks()
-        << " ADECK tracks based on config file settings.\n";
-   filter_tracks(adeck_tracks);
-   
+        << "Added " << i << " CLIPER/SHIFOR baseline track(s).\n";
+
    mlog << Debug(2)
         << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
         << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
@@ -635,7 +635,7 @@ void merge_interp12(TrackInfoArray &tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void derive_consensus(TrackInfoArray &tracks) {
+int derive_consensus(TrackInfoArray &tracks) {
    int i, j, k, l;
    ConcatString cur_case;
    StringArray case_list, case_cmp;
@@ -643,9 +643,10 @@ void derive_consensus(TrackInfoArray &tracks) {
    TrackInfo new_track;
    bool found, skip;
    const char *sep = " ";
+   int n_add = 0;
 
    // If no consensus models are defined, nothing to do
-   if(conf_info.NConsensus == 0) return;
+   if(conf_info.NConsensus == 0) return(0);
 
    // Loop through the tracks to build a list of cases
    for(i=0; i<tracks.n_tracks(); i++) {
@@ -694,22 +695,36 @@ void derive_consensus(TrackInfoArray &tracks) {
                   tracks[l].init()      == yyyymmdd_hhmmss_to_unix(case_cmp[2])) {
                   con_tracks.add(tracks[l]);
                   found = true;
+                  mlog << Debug(5)
+                       << "[Case " << i+1 << "] For case \""
+                       << case_list[i] << "\" member \""
+                       << conf_info.Consensus[j].Members[k]
+                       <<  "\" was found.\n";
                   break;
                }
             } // end for l
-
-            // Check if a required model was not found
-            if(conf_info.Consensus[j].Required[k] && !found) {
-               mlog << Debug(4)
-                    << "[Case " << i+1 << "] For case \"" << case_list[i]
-                    << "\" skipping consensus model \""
-                    << conf_info.Consensus[j].Name
-                    << "\" since required member \""
+            
+            // Check if the model was not found
+            if(!found) {
+               mlog << Debug(5)
+                    << "[Case " << i+1 << "] For case \""
+                    << case_list[i] << "\" member \""
                     << conf_info.Consensus[j].Members[k]
                     <<  "\" was not found.\n";
-               skip = true;
-               break;
-            } 
+
+               // Check if it was a required model
+               if(conf_info.Consensus[j].Required[k]) {
+                  mlog << Debug(4)
+                       << "[Case " << i+1 << "] For case \"" << case_list[i]
+                       << "\" skipping consensus model \""
+                       << conf_info.Consensus[j].Name
+                       << "\" since required member \""
+                       << conf_info.Consensus[j].Members[k]
+                       <<  "\" was not found.\n";
+                     skip = true;
+                     break;
+               }
+            }
          } // end for k
 
          // If a required member was missing, continue to the next case
@@ -743,24 +758,26 @@ void derive_consensus(TrackInfoArray &tracks) {
          
          // Add the consensus model
          tracks.add(new_track);
+         n_add++;
 
       } // end for j
 
    } // end for i
 
-   return;
+   return(n_add);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void derive_lag(TrackInfoArray &tracks) {
+int derive_lag(TrackInfoArray &tracks) {
    int i, j, k, s, n_tracks;
    TrackInfo new_track;
    TrackPoint new_point;
    ConcatString lag_model;
+   int n_add = 0;
    
    // If no time lags are requested, nothing to do
-   if(conf_info.LagTime.n_elements() == 0) return;
+   if(conf_info.LagTime.n_elements() == 0) return(0);
 
    // Store the input number of tracks to process
    n_tracks = tracks.n_tracks();
@@ -818,25 +835,27 @@ void derive_lag(TrackInfoArray &tracks) {
 
          // Store the current time-lagged track
          tracks.add(new_track);
+         n_add++;
 
       } // end for j
 
    } // end for i
 
-   return;
+   return(n_add);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
+int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
    int i, j, k;
    ConcatString cur_case;
    StringArray case_list;
+   int n_add = 0;
    
    // If no baseline models are requested, nothing to do
    if(conf_info.OperBaseline.n_elements() == 0 &&
-      conf_info.BestBaseline.n_elements() == 0) return;
-     
+      conf_info.BestBaseline.n_elements() == 0) return(0);
+
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
         << conf_info.OperBaseline.n_elements() << " method(s).\n";
@@ -861,6 +880,7 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
          // Derive the baseline model
          derive_baseline_model(conf_info.OperBaseline[j],
                                atracks[i], 0, atracks);
+         n_add++;
       } // end for j                     
    } // end for i
    
@@ -892,11 +912,12 @@ void derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
             // Derive the baseline model
             derive_baseline_model(conf_info.BestBaseline[k],
                                   btracks[i], j, atracks);
+            n_add++;
          } // end for k
       } // end for j
    } // end for i
 
-   return;
+   return(n_add);
 }
 
 ////////////////////////////////////////////////////////////////////////
