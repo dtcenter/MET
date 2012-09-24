@@ -217,6 +217,9 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
                                         DataPlaneArray &plane_array
                                       ){
 
+   // Initialize
+   plane_array.clear();
+
    //  narrow the vinfo pointer
    VarInfoGrib2* vinfo_g2 = (VarInfoGrib2*)(&vinfo);
 
@@ -665,11 +668,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  use the index to look up the parameter name
          Grib2TableEntry tab;
          if( !GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm, tab) ){
-            mlog << Debug(3) << "\nMetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
+            mlog << Debug(4) << "MetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
                  << "field indexes -  disc: " << rec->Discipline << "  parm_cat: " << rec->ParmCat
-                 << " parm: " << rec->Parm << "\n\n";
+                 << " parm: " << rec->Parm << "\n";
+            rec->ParmName = str_format("DISC%d_CAT%d_PARM%d", rec->Discipline, rec->ParmCat, rec->Parm);
+         } else {
+            rec->ParmName = tab.parm_name.text();
          }
-         rec->ParmName = tab.parm_name.text();
 
          //  add the record to the list
          RecList.push_back(rec);
