@@ -1608,8 +1608,8 @@ if ( Dict->n_entries() > 0 )  {
 
 for (int i=0; i<Dict->n_entries(); i++)  {
 
-        if( Type == FloatType   )  array.add((*Dict)[i]->i_value());
-   else if( Type == IntegerType )  array.add((*Dict)[i]->d_value());
+        if( Type == FloatType   )  array.add((*Dict)[i]->d_value());
+   else if( Type == IntegerType )  array.add((*Dict)[i]->i_value());
    else if( Type == BooleanType )  array.add((*Dict)[i]->b_value());
 
 }
