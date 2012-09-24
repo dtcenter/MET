@@ -438,7 +438,7 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
    pair_mag.replace(parm_name.data(), PairMap[parm_name].data());
    if( 0 == NameRecMap.count( string(pair_mag.text()) ) ){
       mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation - UV rotation pair "
-           << "record not found: '" << pair_mag << "'";
+           << "record not found: '" << pair_mag << "'\n";
       return plane;
    }
 
