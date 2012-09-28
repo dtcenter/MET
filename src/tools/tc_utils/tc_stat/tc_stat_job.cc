@@ -1997,7 +1997,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
       init.n_elements() < 2) {
       mlog << Debug(4)
            << "Skipping time-series computations since the array "
-           << "length differ.\n";
+           << "lengths differ.\n";
       return(false);
    }
 
