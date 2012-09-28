@@ -209,8 +209,7 @@ if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
    mlog << Error << "\n"
         << "  AsciiTable::rc_to_n() -> range check error ... \n"
         << "                           (Nrows, Ncols) = (" << Nrows << ", " << Ncols << ")\n"
-        << "                           (r, c) = (" << r << ", " << c << ")\n"
-        << "\n\n";
+        << "                           (r, c) = (" << r << ", " << c << ")\n\n";
 
    exit ( 1 );
 
