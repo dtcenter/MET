@@ -1167,10 +1167,10 @@ void derive_baseline_model(const ConcatString &model,
    new_track.set_init(ti[i_start].valid());
    new_track.set_basin(ti.basin());
    new_track.set_cyclone(ti.cyclone());
+   new_track.set_storm_id();
    new_track.set_storm_name(ti.storm_name());
    new_track.set_technique(model);
    new_track.set_technique_number(ti.technique_number());
-   new_track.set_storm_id();
 
    // Store the initial track point
    new_point.set_valid(ti[i_start].valid());
@@ -1616,6 +1616,7 @@ void write_output(const TrackPairInfoArray &p) {
       // More header columns
       tchc.set_adeck_model(p[i].adeck().technique());
       tchc.set_bdeck_model(p[i].bdeck().technique());
+      tchc.set_storm_id(p[i].bdeck().storm_id());
       tchc.set_basin(p[i].bdeck().basin());
       tchc.set_cyclone(p[i].bdeck().cyclone());
       tchc.set_storm_name(p[i].bdeck().storm_name());

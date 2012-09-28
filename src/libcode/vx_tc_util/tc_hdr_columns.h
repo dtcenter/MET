@@ -33,7 +33,7 @@ class TcHdrColumns {
       ConcatString ADeckModel, BDeckModel;
 
       // Basin and cyclone names
-      ConcatString Basin, Cyclone, StormName;
+      ConcatString StormId, Basin, Cyclone, StormName;
 
       // Timing info
       unixtime     InitTime, ValidTime;
@@ -55,6 +55,7 @@ class TcHdrColumns {
       // Set functions
       void set_adeck_model (const ConcatString &);
       void set_bdeck_model (const ConcatString &);
+      void set_storm_id    (const ConcatString &);
       void set_basin       (const ConcatString &);
       void set_cyclone     (const ConcatString &);
       void set_storm_name  (const ConcatString &);
@@ -68,6 +69,7 @@ class TcHdrColumns {
       // Get functions
       ConcatString adeck_model () const;
       ConcatString bdeck_model () const;
+      ConcatString storm_id    () const;
       ConcatString basin       () const;
       ConcatString cyclone     () const;
       ConcatString storm_name  () const;
@@ -86,6 +88,7 @@ class TcHdrColumns {
 
 inline void TcHdrColumns::set_adeck_model (const ConcatString &s) { ADeckModel = s; }
 inline void TcHdrColumns::set_bdeck_model (const ConcatString &s) { BDeckModel = s; }
+inline void TcHdrColumns::set_storm_id    (const ConcatString &s) { StormId = s;    }
 inline void TcHdrColumns::set_basin       (const ConcatString &s) { Basin = s;      }
 inline void TcHdrColumns::set_cyclone     (const ConcatString &s) { Cyclone = s;    }
 inline void TcHdrColumns::set_storm_name  (const ConcatString &s) { StormName = s;  }
@@ -98,6 +101,7 @@ inline void TcHdrColumns::set_line_type   (const ConcatString &s) { LineType = s
 
 inline ConcatString TcHdrColumns::adeck_model () const { return(ADeckModel);               }
 inline ConcatString TcHdrColumns::bdeck_model () const { return(BDeckModel);               }
+inline ConcatString TcHdrColumns::storm_id    () const { return(StormId);                  }
 inline ConcatString TcHdrColumns::basin       () const { return(Basin);                    }
 inline ConcatString TcHdrColumns::cyclone     () const { return(Cyclone);                  }
 inline ConcatString TcHdrColumns::storm_name  () const { return(StormName);                }

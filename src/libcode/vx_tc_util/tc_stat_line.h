@@ -65,6 +65,7 @@ class TCStatLine : public DataLine {
       const char * version      () const;
       const char * amodel       () const;
       const char * bmodel       () const;
+      const char * storm_id     () const;
       const char * basin        () const;
       const char * cyclone      () const;
       const char * storm_name   () const;

@@ -25,9 +25,10 @@
 
 static const char * tc_header_cols [] = {
    "VERSION",      "AMODEL",     "BMODEL",
-   "BASIN",        "CYCLONE",    "STORM_NAME",
-   "INIT",         "LEAD",       "VALID",
-   "INIT_MASK",    "VALID_MASK", "LINE_TYPE"
+   "STORM_ID",     "BASIN",      "CYCLONE",
+   "STORM_NAME",   "INIT",       "LEAD",
+   "VALID",        "INIT_MASK",  "VALID_MASK",
+   "LINE_TYPE"
 };
 
 // The last 10 columns repeat for each wind intensity value
