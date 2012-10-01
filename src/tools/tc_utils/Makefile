@@ -10,18 +10,33 @@
 
 
 all:
-	cd tc_dland; $(MAKE) $(PRINT_OPTS)
-	cd tc_pairs; $(MAKE) $(PRINT_OPTS)
-	cd tc_stat;  $(MAKE) $(PRINT_OPTS)
+ifeq ($(ENABLE_TC_UTILS), 1)
+	@ cd tc_dland; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_TC_UTILS), 1)
+	@ cd tc_pairs; $(MAKE) $(PRINT_OPTS)
+endif
+ifeq ($(ENABLE_TC_UTILS), 1)
+	@ cd tc_stat;  $(MAKE) $(PRINT_OPTS)
+endif
 
 
 ########################################################################
 
 
 clean:
-	cd tc_dland; $(MAKE) $(PRINT_OPTS) clean
-	cd tc_pairs; $(MAKE) $(PRINT_OPTS) clean
-	cd tc_stat;  $(MAKE) $(PRINT_OPTS) clean
+	@ cd tc_dland; $(MAKE) $(PRINT_OPTS) clean
+	@ cd tc_pairs; $(MAKE) $(PRINT_OPTS) clean
+	@ cd tc_stat;  $(MAKE) $(PRINT_OPTS) clean
+
+
+########################################################################
+
+
+gen_sources:
+	@ cd tc_dland; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd tc_pairs; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd tc_stat;  $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################
