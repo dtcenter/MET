@@ -160,15 +160,18 @@ for(i in i_start:length(args)) {
       # Use only the simple pair lines.
       ind<-ind_simp_pair
 
-      # Find the maximum interest for each forecast object.
-      max_interest_fcst <-aggregate(mode$INTEREST[ind], by=list(fcst=substr(mode$OBJECT_ID[ind], 1, 4)), FUN=max)
+      if(sum(ind) > 0) {
+      
+         # Find the maximum interest for each forecast object.
+         max_interest_fcst <-aggregate(mode$INTEREST[ind], by=list(fcst=substr(mode$OBJECT_ID[ind], 1, 4)), FUN=max)
 
-      # Find the maximum interest for each observation object.
-      max_interest_obs <-aggregate(mode$INTEREST[ind], by=list(fcst=substr(mode$OBJECT_ID[ind], 6, 9)), FUN=max)
+         # Find the maximum interest for each observation object.
+         max_interest_obs <-aggregate(mode$INTEREST[ind], by=list(fcst=substr(mode$OBJECT_ID[ind], 6, 9)), FUN=max)
 
-      # Append this array to the previous ones
-      list_max_interest_fcst <-c(list_max_interest_fcst, max_interest_fcst$x)
-      list_max_interest_obs  <-c(list_max_interest_obs, max_interest_obs$x)
+         # Append this array to the previous ones
+         list_max_interest_fcst <-c(list_max_interest_fcst, max_interest_fcst$x)
+         list_max_interest_obs  <-c(list_max_interest_obs, max_interest_obs$x)
+      }
 
       ########################################################################
       #
