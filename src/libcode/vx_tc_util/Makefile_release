@@ -13,7 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = test_read
+EXECUTABLES =
 
 
 OBJECTS     = atcf_line.o \
@@ -26,9 +26,6 @@ OBJECTS     = atcf_line.o \
 
 
 LIBRARIES   = libvx_tc_util.a
-
-
-GEN_SOURCES =
 
 
 ########################################################################
@@ -47,22 +44,10 @@ HEADERS     = atcf_line.h \
 ########################################################################
 
 
-all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
 	@ echo "*** Finished Making the vx_tc_util Library ***"
 	@ echo
-
-
-########################################################################
-
-
-   ##
-   ##  generated sources
-   ##
-
-
-gen_sources: $(GEN_SOURCES)
-	@ $(MAKE) all
 
 
 ########################################################################
@@ -120,23 +105,11 @@ libvx_tc_util.a: $(OBJECTS)
    ##
 
 
-test_read: $(LIBRARIES) test_read.cc
-	$(CXX) -o test_read test_read.cc \
-	$(CXX_FLAGS) -I$(MET_INC_DIR) \
-	-I$(MET_INC_DIR) \
-	-L$(MET_LIB_DIR) \
-	-lvx_tc_util \
-	-lvx_cal \
-	-lvx_util \
-	-lvx_math \
-	-lvx_log
-
-
 ########################################################################
 
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
+	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_tc_util.a
 
@@ -144,7 +117,7 @@ clean:
 ########################################################################
 
 
-.PHONY: all clean gen_sources
+.PHONY: all clean
 
 
 ########################################################################
