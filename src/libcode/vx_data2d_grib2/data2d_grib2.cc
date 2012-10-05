@@ -39,7 +39,7 @@ extern "C" {
   #include "grib2.h"
 }
 
-static bool print_grid = false;
+static bool print_grid = true;
 
 using namespace std;
 
@@ -728,8 +728,11 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.delta_lon    = (double)gfld->igdtmpl[17] / 1000000.0;
       data.Nlat         = gfld->igdtmpl[8];
       data.Nlon         = gfld->igdtmpl[7];
-      data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0) - (double)data.Nlat * data.delta_lat;
-      data.lon_ll       = 360 - (double)gfld->igdtmpl[12] / 1000000.0;
+      data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0);
+      data.lon_ll       = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
+
+      //  if y scan order is -y, move lat_ll
+      if( ! ScanMode & 64 ) data.lat_ll -= (data.Nlat - 1) * data.delta_lat;
 
       //  store the grid information
       _Grid->set(data);
@@ -769,10 +772,10 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.hemisphere   = hem;
       data.scale_lat    = (double)gfld->igdtmpl[12] / 1000000.0;
       data.lat_pin      = (double)gfld->igdtmpl[9] / 1000000.0;
-      data.lon_pin      = 360 - (double)gfld->igdtmpl[10] / 1000000.0;
+      data.lon_pin      = -1.0*rescale_lon( (double)gfld->igdtmpl[10] / 1000000.0 );
       data.x_pin        = 0;     //PGO depends on ScanMode?
       data.y_pin        = 0;
-      data.lon_orient   = 360 - (double)gfld->igdtmpl[13] / 1000000.0;
+      data.lon_orient   = -1.0*rescale_lon( (double)gfld->igdtmpl[13] / 1000000.0 );
       data.d_km         = (double)gfld->igdtmpl[14] / 1000000.0;
       data.r_km         = r_km;
       data.nx           = gfld->igdtmpl[7];
@@ -807,9 +810,9 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       MercatorData data;
       data.name   = mercator_proj_type;
       data.lat_ll = (double)gfld->igdtmpl[8] / 1000000.0;   //PGO depends on ScanMode?
-      data.lon_ll = (double)gfld->igdtmpl[9] / 1000000.0;
+      data.lon_ll = -1.0*rescale_lon( (double)gfld->igdtmpl[9] / 1000000.0 );
       data.lat_ur = (double)gfld->igdtmpl[12] / 1000000.0;
-      data.lon_ur = (double)gfld->igdtmpl[13] / 1000000.0;
+      data.lon_ur = -1.0*rescale_lon( (double)gfld->igdtmpl[13] / 1000000.0 );
       data.ny     = gfld->igdtmpl[7];
       data.nx     = gfld->igdtmpl[8];
 
@@ -840,10 +843,10 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.scale_lat_1  = (double)gfld->igdtmpl[18] / 1000000.0;
       data.scale_lat_2  = (double)gfld->igdtmpl[19] / 1000000.0;
       data.lat_pin      = (double)gfld->igdtmpl[9]  / 1000000.0;
-      data.lon_pin      = 360 - (double)gfld->igdtmpl[10] / 1000000.0;
+      data.lon_pin      = -1.0*rescale_lon( (double)gfld->igdtmpl[10] / 1000000.0 );
       data.x_pin        = 0;     //PGO depends on ScanMode?
       data.y_pin        = 0;
-      data.lon_orient   = 360 - (double)gfld->igdtmpl[13] / 1000000.0;
+      data.lon_orient   = -1.0*rescale_lon( (double)gfld->igdtmpl[13] / 1000000.0 );
       data.d_km         = (double)gfld->igdtmpl[14] / 1000000.0;
       data.r_km         = 6371.20;  //PGO jimmied...  r_km;
       data.nx           = gfld->igdtmpl[7];
