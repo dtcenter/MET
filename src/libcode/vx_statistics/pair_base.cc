@@ -243,7 +243,7 @@ bool PairBase::add_obs(const char *sid,
 
       //  if the key is not present in the duplicate map, add it to the map
       if( 1 > map_single.count(sng_key) ){
-         map_single[sng_key] = str_format("%d_%d", n_obs, llabs(fcst_ut - ut));
+         map_single[sng_key] = str_format("%d_%d", n_obs, labs(fcst_ut - ut));
       }
 
       //  if the key is present, use the one with the closest valid time to the forecast
@@ -263,14 +263,14 @@ bool PairBase::add_obs(const char *sid,
          regex_clean(mat);
 
          //  if the current observation is closer to the forecast valid time, use it instead
-         if( ut_diff > llabs(fcst_ut - ut) ){
+         if( ut_diff > labs(fcst_ut - ut) ){
             sid_sa.set(obs_idx, sid);
             x_na  .set(obs_idx, x);
             y_na  .set(obs_idx, y);
             vld_ta.set(obs_idx, ut);
             o_na  .set(obs_idx, o);
 
-            map_single[sng_key] = str_format("%d_%d", obs_idx, llabs(fcst_ut - ut));
+            map_single[sng_key] = str_format("%d_%d", obs_idx, labs(fcst_ut - ut));
          }
 
          return false;
