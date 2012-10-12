@@ -724,8 +724,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       //  build a LatLonData struct with the projection information
       LatLonData data;
       data.name         = latlon_proj_type;
-      data.delta_lat    = (double)gfld->igdtmpl[16] / 1000000.0;
-      data.delta_lon    = (double)gfld->igdtmpl[17] / 1000000.0;
+      data.delta_lon    = (double)gfld->igdtmpl[16] / 1000000.0;
+      data.delta_lat    = (double)gfld->igdtmpl[17] / 1000000.0;
       data.Nlat         = gfld->igdtmpl[8];
       data.Nlon         = gfld->igdtmpl[7];
       data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0);
