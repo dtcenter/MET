@@ -776,7 +776,7 @@ void do_add_command()
       //
       mlog << Debug(1) << "Reading input file: " << in_file[i] << "\n";
 
-      get_field(in_file[i].text(), accum_mag[0], 0, 0, grid2, part);
+      get_field(in_file[i].text(), accum_mag[i], 0, 0, grid2, part);
 
       //
       // Check for the same grid dimensions
@@ -794,7 +794,7 @@ void do_add_command()
       if(nc_valid_time < part.valid()) nc_valid_time = part.valid();
 
       // Output accumulation time
-      nc_accum += total.accum();
+      nc_accum += part.accum();
 
       //
       // Increment sums for each grid point
