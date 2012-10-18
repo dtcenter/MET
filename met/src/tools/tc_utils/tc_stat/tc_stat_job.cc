@@ -888,6 +888,7 @@ void TCStatJob::write_dump_file() {
       tchc.clear();
       tchc.set_adeck_model(PairArray[i].adeck().technique());
       tchc.set_bdeck_model(PairArray[i].bdeck().technique());
+      tchc.set_storm_id(PairArray[i].adeck().storm_id());
       tchc.set_basin(PairArray[i].bdeck().basin());
       tchc.set_cyclone(PairArray[i].bdeck().cyclone());
       tchc.set_storm_name(PairArray[i].bdeck().storm_name());
