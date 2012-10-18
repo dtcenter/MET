@@ -26,7 +26,7 @@ CXX_LIBS     =
 # Fortran compiler flags
 # Any additional required libraries
 FC           = /set/this/path/to/pgf77
-FC_FLAGS     = -Bstatic # -g
+FC_FLAGS     = -Mnosecond_underscore -Bstatic # -g
 FC_LIBS      = -lpgftnrtl -lrt -lpthread
 
 # Make print options

@@ -62,7 +62,7 @@ extern "C" {
            float *,  float *,  float *, float *, float *,
            float *,  float *,  float *, float *, float *,
            float [nvtx], float [nvtx], float [nvtx]);
-   void oclipd5_test__(char [2], int *, int *, int *, int *,
+   void oclipd5_test_(char [2], int *, int *, int *, int *,
            float *,  float *,  float *, float *, float *,
            float *,  float *,  float *, float *, float *,
            float [nvtx], float [nvtx], float [nvtx]);
@@ -1126,7 +1126,7 @@ void derive_baseline_model(const ConcatString &model,
          bl_lat,     bl_lon,     bl_vmax);
    }
    else if(model == "OCDT") {
-      oclipd5_test__(basin, &yr, &mon, &day, &hr,
+      oclipd5_test_(basin, &yr, &mon, &day, &hr,
          &tp_lat[0], &tp_lon[0], &tp_vmax[0], &tp_dir[0], &tp_spd[0],
          &tp_lat[1], &tp_lon[1], &tp_vmax[1], &tp_dir[1], &tp_spd[1],
          bl_lat,     bl_lon,     bl_vmax);
