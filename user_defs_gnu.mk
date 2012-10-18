@@ -26,7 +26,7 @@ CXX_LIBS     =
 # Fortran compiler flags
 # Any additional required libraries
 FC           = /set/this/path/to/gfortran
-FC_FLAGS     = -Wall -Wshadow -static -ff2c # -g -m32
+FC_FLAGS     = -fno-second-underscore -Wall -Wshadow -static -ff2c # -g -m32
 FC_LIBS      = -lgfortran
 
 # Make print options
