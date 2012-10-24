@@ -111,13 +111,13 @@ sys_cmd = paste("rm -f", hdr_file)
 system(sys_cmd)
 
 # Determine the accumlation interval
-if(as.character(hdr[1,3]) == "TRMM") {
+if(as.character(hdr[1,3]) == "Daily") {
   acc_type = 24
 } else if(as.character(hdr[1,3]) == "3-hourly") {
   acc_type = 3
 } else {
   cat("\n\nERROR: Can\'t figure out the accumulation interval!\n\n")
-  exit(1)
+  quit(1)
 }
 
 # Parse the init and valid times
