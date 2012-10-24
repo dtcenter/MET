@@ -527,12 +527,12 @@ void process_fcst_climo_files() {
 
       // Check for zero fields
       if(n_fcst == 0) {
-         mlog << Error << "\nprocess_fcst_climo_files() -> "
+         mlog << Warning << "\nprocess_fcst_climo_files() -> "
               << "no fields matching "
               << conf_info.vx_pd[i].fcst_info->magic_str()
               << " found in file: "
               << fcst_file << "\n\n";
-         exit(1);
+         continue;
       }
 
       // Setup the first pass through the data
@@ -799,6 +799,9 @@ void process_obs_file(int i_nc) {
       // should be added
       for(j=0; j<conf_info.get_n_vx(); j++) {
 
+         // Check for no forecast fields
+         if(conf_info.vx_pd[j].fcst_dpa.n_planes() == 0) continue;
+      
          // Attempt to add the observation to the conf_info.vx_pd object
          conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
                                     hdr_ut, obs_qty_str, obs_arr, grid);
@@ -806,8 +809,10 @@ void process_obs_file(int i_nc) {
 
    } // end for i_obs
 
-   //  print the duplicate report
-   for(j=0; j < conf_info.get_n_vx(); j++) conf_info.vx_pd[j].print_duplicate_report();
+   // Print the duplicate report
+   for(j=0; j<conf_info.get_n_vx(); j++) {
+      conf_info.vx_pd[j].print_duplicate_report();
+   }
 
    // Deallocate and clean up
    obs_in->close();
@@ -850,6 +855,9 @@ void process_scores() {
    // Loop through the Pair Data objects, compute the scores requested,
    // and write the output.
    for(i=0; i<conf_info.get_n_vx(); i++) {
+
+      // Check for no forecast fields
+      if(conf_info.vx_pd[i].fcst_dpa.n_planes() == 0) continue;
 
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_pd[i].fcst_info->name());
