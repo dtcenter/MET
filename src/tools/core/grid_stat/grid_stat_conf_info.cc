@@ -365,7 +365,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
                   obs_ta[i][j].type    == thresh_eq              ||
                   obs_ta[i][j].type    == thresh_ne) {
 
-                  mlog << Error << "\nPointStatConfInfo::process_config() -> "
+                  mlog << Error << "\nGridStatConfInfo::process_config() -> "
                        << "when verifying using multi-category contingency "
                        << "tables, the thresholds must be monotonically "
                        << "increasing and be of the same inequality type "
@@ -400,7 +400,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    // Check that the number of wind speed thresholds match
    if(fcst_wind_ta.n_elements() != obs_wind_ta.n_elements()) {
-      mlog << Error << "\nPointStatConfInfo::process_config() -> "
+      mlog << Error << "\nGridStatConfInfo::process_config() -> "
            << "The number of thresholds in \"fcst_wind_thresh\" must "
            << "match the number of thresholds in \"obs_wind_thresh\".\n\n";
       exit(1);
