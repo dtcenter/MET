@@ -506,7 +506,7 @@ obs_grib_code = [ "SPFH", "TMP", "HGT", "UGRD", "VGRD" ];
 quality_mark_thresh = 2;
 
 //
-// The "event_stack_flag" entry specifies is set to "TOP" or "BOTTOM" to
+// The "event_stack_flag" entry is set to "TOP" or "BOTTOM" to
 // specify whether observations should be drawn from the top of the event
 // stack (most quality controlled) or the bottom of the event stack (most raw).
 //
