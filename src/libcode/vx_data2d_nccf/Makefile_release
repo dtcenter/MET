@@ -8,24 +8,31 @@
 
 ########################################################################
 #
-# Makefile for the gen_poly_mask tool
+# Makefile for the vx_data2d_nccf library
 #
 ########################################################################
 
 
-EXECUTABLES = gen_poly_mask
+EXECUTABLES =
 
 
-OBJECTS     =
+OBJECTS     = get_nccf_grid.o \
+              nccf_file.o \
+              var_info_nccf.o \
+              data2d_nccf.o
 
 
-LIBRARIES   =
+LIBRARIES   = libvx_data2d_nccf.a
 
 
 ########################################################################
 
 
-HEADERS     =
+HEADERS     = get_nccf_grid.h \
+              nccf_file.h \
+              var_info_nccf.h \
+              data2d_nccf.h \
+              vx_data2d_nccf.h
 
 
 ########################################################################
@@ -33,7 +40,7 @@ HEADERS     =
 
 all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making the gen_poly_mask Tool ***"
+	@ echo "*** Finished Making the vx_data2d_nccf Library ***"
 	@ echo
 
 
@@ -45,12 +52,34 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
 
 
+get_nccf_grid.o: get_nccf_grid.cc
+	$(CXX) get_nccf_grid.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+nccf_file.o: nccf_file.cc
+	$(CXX) nccf_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+var_info_nccf.o: var_info_nccf.cc
+	$(CXX) var_info_nccf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+
+data2d_nccf.o: data2d_nccf.cc
+	$(CXX) data2d_nccf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+
 ########################################################################
 
 
    ##
    ##  libraries
    ##
+
+
+libvx_data2d_nccf.a: $(OBJECTS)
+	ar -rs libvx_data2d_nccf.a $(OBJECTS) 2>&1
+	ranlib libvx_data2d_nccf.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_data2d_nccf.a
+	cp libvx_data2d_nccf.a $(MET_LIB_DIR)
 
 
 ########################################################################
@@ -61,50 +90,14 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
 
 
-gen_poly_mask: gen_poly_mask.cc $(OBJECTS)
-	@ echo
-	$(CXX) -o $(EXECUTABLES) gen_poly_mask.cc $(OBJECTS) \
-	$(CXX_FLAGS) \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
-	-lvx_shapedata \
-	-lvx_analysis_util \
-	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_met \
-	-lvx_data2d_nc_pinterp \
-	-lvx_data2d_nc_cf \
-	-lvx_nc_util \
-	-lvx_data2d \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
-	-lvx_grid \
-	-lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
-	$(CXX_LIBS)
-	cp $(EXECUTABLES) $(MET_BIN_DIR)
-
-
 ########################################################################
 
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-	rm -f $(MET_BIN_DIR)/gen_poly_mask
+	rm -f test_read_nccf
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_data2d_nccf.a
 
 
 ########################################################################
@@ -114,5 +107,4 @@ clean:
 
 
 ########################################################################
-
 

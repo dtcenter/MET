@@ -14,27 +14,23 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __DATA2D_FACTORY_H__
-#define  __DATA2D_FACTORY_H__
+#ifndef  __VX_DATA2D_NC_CF_H__
+#define  __VX_DATA2D_NC_CF_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "data2d_factory.h"
-#include "data2d_factory_utils.h"
-#include "is_grib_file.h"
-#include "is_met_nc_file.h"
-#include "is_nccf_file.h"
-#include "is_netcdf_file.h"
-#include "is_pinterp_file.h"
-#include "var_info_factory.h"
+#include "data2d_nccf.h"
+#include "var_info_nccf.h"
+#include "get_nccf_grid.h"
+#include "nccf_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __DATA2D_FACTORY_H__
+#endif   //  __VX_DATA2D_NC_CF_H__
 
 
 ////////////////////////////////////////////////////////////////////////

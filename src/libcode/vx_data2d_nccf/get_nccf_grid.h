@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2012
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -8,36 +6,25 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
 
-
+#ifndef  __GET_MET_GRID_H__
+#define  __GET_MET_GRID_H__
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <netcdf.hh>
 
-#ifndef  __DATA2D_FACTORY_H__
-#define  __DATA2D_FACTORY_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "data2d_factory.h"
-#include "data2d_factory_utils.h"
-#include "is_grib_file.h"
-#include "is_met_nc_file.h"
-#include "is_nccf_file.h"
-#include "is_netcdf_file.h"
-#include "is_pinterp_file.h"
-#include "var_info_factory.h"
-
+#include "vx_grid.h"
 
 ////////////////////////////////////////////////////////////////////////
 
+extern void read_netcdf_grid(NcFile *, Grid &);
 
-#endif   //  __DATA2D_FACTORY_H__
-
+extern int  has_variable(NcFile *, const char *);
 
 ////////////////////////////////////////////////////////////////////////
 
+#endif   //  __GET_MET_GRID_H__
 
-
+////////////////////////////////////////////////////////////////////////
