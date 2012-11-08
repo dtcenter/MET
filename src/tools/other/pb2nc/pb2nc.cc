@@ -68,11 +68,6 @@ using namespace std;
 
 #include "pb2nc_conf_info.h"
 #include "vx_log.h"
-#include "vx_data2d.h"
-#include "vx_data2d_factory.h"
-#include "vx_data2d_grib.h"
-#include "vx_data2d_nc_met.h"
-#include "vx_data2d_nc_pinterp.h"
 #include "vx_nc_util.h"
 #include "vx_grid.h"
 #include "vx_util.h"
