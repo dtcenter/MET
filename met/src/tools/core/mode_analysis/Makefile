@@ -61,6 +61,7 @@ gen_sources: $(GEN_SOURCES)
 
 
 config_to_att.o: config_to_att.cc
+	@ echo
 	$(CXX) config_to_att.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
@@ -94,6 +95,7 @@ mode_analysis: mode_analysis.cc $(OBJECTS)
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \

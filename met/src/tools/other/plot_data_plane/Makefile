@@ -86,6 +86,7 @@ plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_plot_util \
@@ -102,7 +103,8 @@ plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf
+	-lm -lnetcdf_c++ -lnetcdf \
+	$(CXX_LIBS)
 	cp plot_data_plane $(MET_BIN_DIR)
 
 

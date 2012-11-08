@@ -24,6 +24,7 @@ using namespace std;
 #include "data2d_factory_utils.h"
 #include "is_grib_file.h"
 #include "is_met_nc_file.h"
+#include "is_nccf_file.h"
 #include "is_pinterp_file.h"
 #include "is_netcdf_file.h"
 #include "is_bufr_file.h"
@@ -93,6 +94,7 @@ if ( type != FileType_None )  return ( type );
      if ( is_grib1_file   (filename) ) type = FileType_Gb1;
 else if ( is_grib2_file   (filename) ) type = FileType_Gb2;
 else if ( is_pinterp_file (filename) ) type = FileType_NcPinterp;
+else if ( is_nccf_file    (filename) ) type = FileType_NcCF;
 else if ( is_netcdf_file  (filename) ) type = FileType_NcMet;
 else if ( is_bufr_file    (filename) ) type = FileType_Bufr;
 else                                   type = FileType_None;

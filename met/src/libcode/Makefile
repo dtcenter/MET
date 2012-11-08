@@ -18,6 +18,7 @@ ifeq ($(WITH_GRIB2), 1)
 	@ cd vx_data2d_grib2      ; $(MAKE) $(PRINT_OPTS)
 endif
 	@ cd vx_data2d_nc_met     ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_data2d_nccf      ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_data2d_nc_pinterp ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_gsl_prob          ; $(MAKE) $(PRINT_OPTS)
@@ -49,6 +50,7 @@ ifeq ($(WITH_GRIB2), 1)
 	@ cd vx_data2d_grib2      ; $(MAKE) $(PRINT_OPTS) clean
 endif
 	@ cd vx_data2d_nc_met     ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_data2d_nccf      ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_data2d_nc_pinterp ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_gsl_prob          ; $(MAKE) $(PRINT_OPTS) clean
@@ -80,6 +82,7 @@ ifeq ($(WITH_GRIB2), 1)
 	@ cd vx_data2d_grib2      ; $(MAKE) $(PRINT_OPTS) gen_sources
 endif
 	@ cd vx_data2d_nc_met     ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_data2d_nccf      ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_data2d_nc_pinterp ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_gsl_prob          ; $(MAKE) $(PRINT_OPTS) gen_sources

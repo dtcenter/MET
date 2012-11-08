@@ -170,6 +170,7 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
@@ -205,6 +206,7 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \

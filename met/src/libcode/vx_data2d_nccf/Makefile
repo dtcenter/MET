@@ -8,23 +8,20 @@
 
 ########################################################################
 #
-# Makefile for the pb2nc tool
+# Makefile for the vx_data2d_nccf library
 #
 ########################################################################
 
 
-EXECUTABLES = pb2nc
+EXECUTABLES = test_read_nccf
+              
+OBJECTS     = get_nccf_grid.o \
+              nccf_file.o \
+              var_info_nccf.o \
+              data2d_nccf.o
 
 
-OBJECTS     = pb2nc_conf_info.o \
-              numpbmsg.o \
-              openpb.o \
-              closepb.o \
-              readpb.o \
-              dumppb.o
-
-
-LIBRARIES   =
+LIBRARIES   = libvx_data2d_nccf.a
 
 
 GEN_SOURCES =
@@ -33,7 +30,11 @@ GEN_SOURCES =
 ########################################################################
 
 
-HEADERS     =
+HEADERS     = get_nccf_grid.h \
+              nccf_file.h \
+              var_info_nccf.h \
+              data2d_nccf.h \
+              vx_data2d_nccf.h
 
 
 ########################################################################
@@ -41,7 +42,7 @@ HEADERS     =
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making the pb2nc Tool ***"
+	@ echo "*** Finished Making the vx_data2d_nccf Library ***"
 	@ echo
 
 
@@ -65,34 +66,17 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 
-pb2nc_conf_info.o: pb2nc_conf_info.cc
-	@ echo
-	$(CXX) pb2nc_conf_info.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+get_nccf_grid.o: get_nccf_grid.cc
+	$(CXX) get_nccf_grid.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
+nccf_file.o: nccf_file.cc
+	$(CXX) nccf_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
-numpbmsg.o: numpbmsg.f
-	@ echo
-	$(FC) numpbmsg.f $(FC_FLAGS) -c
+var_info_nccf.o: var_info_nccf.cc
+	$(CXX) var_info_nccf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
-
-openpb.o: openpb.f
-	@ echo
-	$(FC) openpb.f $(FC_FLAGS) -c
-
-
-closepb.o: closepb.f
-	@ echo
-	$(FC) closepb.f $(FC_FLAGS) -c
-
-
-readpb.o: readpb.f
-	@ echo
-	$(FC) readpb.f $(FC_FLAGS) -c
-
-
-dumppb.o: dumppb.f
-	@ echo
-	$(FC) dumppb.f $(FC_FLAGS) -c
+data2d_nccf.o: data2d_nccf.cc
+	$(CXX) data2d_nccf.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -103,6 +87,15 @@ dumppb.o: dumppb.f
    ##
 
 
+libvx_data2d_nccf.a: $(OBJECTS)
+	ar -rs libvx_data2d_nccf.a $(OBJECTS) 2>&1
+	ranlib libvx_data2d_nccf.a
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	cp $(HEADERS) $(MET_INC_DIR)
+	rm -f $(MET_LIB_DIR)/libvx_data2d_nccf.a
+	cp libvx_data2d_nccf.a $(MET_LIB_DIR)
+
+
 ########################################################################
 
 
@@ -110,35 +103,21 @@ dumppb.o: dumppb.f
    ##  executables
    ##
 
-
-pb2nc: pb2nc.cc $(OBJECTS)
-	$(CXX) -o $(EXECUTABLES) pb2nc.cc $(OBJECTS) \
-	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(BUFR_INCS) $(F2C_INCS) $(GRIB2C_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(BUFR_LIBS) $(F2C_LIBS) $(GRIB2C_LIBS) \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_shapedata \
-	-lvx_gsl_prob \
-	-lvx_analysis_util \
-	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_met \
-	-lvx_data2d_nc_pinterp \
+test_read_nccf: $(LIBRARIES) test_read_nccf.cc
+	$(CXX) -o test_read_nccf test_read_nccf.cc \
+	$(CXX_FLAGS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d \
 	-lvx_nc_util \
+	-lvx_data2d \
 	-lvx_grid \
 	-lvx_config \
-	-lvx_pb_util \
-	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_color \
+	-lvx_cal \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas -lbufr \
-	$(F2C_LIBNAME) $(CXX_LIBS) $(FC_LIBS)
-	cp $(EXECUTABLES) $(MET_BIN_DIR)
+	-lnetcdf_c++ -lnetcdf
 
 
 ########################################################################
@@ -146,7 +125,8 @@ pb2nc: pb2nc.cc $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
-	rm -f $(MET_BIN_DIR)/pb2nc
+	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
+	rm -f $(MET_LIB_DIR)/libvx_data2d_nccf.a
 
 
 ########################################################################
