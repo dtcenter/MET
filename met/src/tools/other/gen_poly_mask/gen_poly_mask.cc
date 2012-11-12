@@ -22,6 +22,7 @@
 //   003    10/13/11  Holmes          Added use of command line class to
 //                                    parse the command line arguments.
 //   004    12/20/11  Bullock         Ported to new repository
+//   005    11/12/12  Halley Gotway   Fix bug masking grids.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -234,19 +235,22 @@ if ( datafile )  {
    //  ok, assume it's an ascii polyline file
    //
 
+else {
+
    // Parse out the polyline from the file
+   poly_mask.clear();
 
-poly_mask.clear();
-
-poly_mask.load(mask_filename);
+   poly_mask.load(mask_filename);
 
    // If not already specified, retrieve the mask name
 
-if(mask_name.length() == 0) mask_name = poly_mask.name();
+   if(mask_name.length() == 0) mask_name = poly_mask.name();
 
-mlog << Debug(2)
-     << "Parsed Polyline:\t" << mask_name
-     << " containing " << poly_mask.n_points() << " points\n";
+   mlog << Debug(2)
+        << "Parsed Polyline:\t" << mask_name
+        << " containing " << poly_mask.n_points() << " points\n";
+
+}
 
    //
    //  done
@@ -300,6 +304,14 @@ void write_netcdf()
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
+   // Check that mask_name is set
+	if(!mask_name) {
+      mlog << Error << "\nwrite_netcdf() -> "
+           << "the masking variable name must be set using the "
+           << "\"-name\" command line argument.\n\n";
+      exit(1);
+	}
+	
    // Define Variables
    mask_var = f_out->add_var(mask_name, ncInt, lat_dim, lon_dim);
    sprintf(var_str, "%s polyline masking region", mask_name.text());

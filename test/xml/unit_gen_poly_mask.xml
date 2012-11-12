@@ -88,4 +88,22 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- masking grid rather than a polyline                              -->
+  <!--                                                                  -->
+
+  <test name="gen_poly_mask_GRID">
+    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
+      &OUTPUT_DIR;/gen_poly_mask/NAM_GRID_mask.nc \
+      -name hmt_domain \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_poly_mask/NAM_GRID_mask.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
