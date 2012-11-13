@@ -314,7 +314,7 @@ void write_netcdf()
 	
    // Define Variables
    mask_var = f_out->add_var(mask_name, ncInt, lat_dim, lon_dim);
-   sprintf(var_str, "%s polyline masking region", mask_name.text());
+   sprintf(var_str, "%s masking region", mask_name.text());
    mask_var->add_att("long_name", var_str);
 
    // Allocate memory to store the mask values for each grid point
