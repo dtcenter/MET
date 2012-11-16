@@ -597,18 +597,18 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	strNcDiff  = paste(strDirTmp, "/", "ncdiff_", as.numeric(Sys.time()), ".nc", sep="");
 	
    # build and run the ncdump command for the first file
-   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n > ", strNcDump1, sep="");
+   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
    # build and run the ncdump command for the second file
-   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n > ", strNcDump2, sep="");
+   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
    # build and run the diff command for the ncdump output
-   strCmd = paste(strDiffExec, " \\\n  ", strNcDump1, " \\\n ", strNcDump2,
-               " | egrep '<|>' | egrep -v 'FileOrigins|MET_version'", sep="");
+   strCmd = paste(strDiffExec, " \\\n  ", strNcDump1, " \\\n  ", strNcDump2,
+               " \\\n  | egrep '<|>' | egrep -v 'FileOrigins|MET_version|RunCommand'", sep="");
 	if( 2 <= verb ){ cat("DIFF:", strCmd, "\n"); }
 	str = system(paste(strCmd, "2>&1"), intern=T);
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
