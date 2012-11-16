@@ -30,7 +30,8 @@ listNcDiffAttrExcl = c("FileOrigins");
 #  Testing System Utilities
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 strNcDiffExec = "/usr/local/bin/ncdiff";
-strNcDumpExec	= "/usr/local/netcdf3/bin/ncdump";
+strNcDumpExec = "/usr/local/netcdf3/bin/ncdump";
+strDiffExec   = "/usr/bin/diff";
 strModeConv   = paste(strDirTest, "/perl/mode_conv.pl", sep="");
 
 

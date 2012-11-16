@@ -580,7 +580,7 @@ printCompReport = function(listTest, verb=0, hist=""){
 }
 
 # compareNc() assumes that the specified strings nc1 and nc2 contain the paths and
-#   file names of MET output NetCDF files.  The stat files are compared and, if the
+#   file names of MET output NetCDF files.  The netcdf files are compared and, if the
 #   specified verbosity level is greater than zero, warning messages are printed 
 #   describing the differences.  If the verbosity level is zero, the function exits
 #   R with non-zero status when the first difference is found, otherwise it returns.
@@ -592,20 +592,49 @@ printCompReport = function(listTest, verb=0, hist=""){
 #   strict: (optional) require strict numerical equality, default no
 compareNc = function(nc1, nc2, verb, strict=0){
 
-	strNcFileD = paste(strDirTmp, "/", "diff_", as.numeric(Sys.time()), ".nc", sep="");
+   strNcDump1 = paste(strDirTmp, "/", "ncdump_hdr1_", as.numeric(Sys.time()), ".txt", sep="");
+   strNcDump2 = paste(strDirTmp, "/", "ncdump_hdr2_", as.numeric(Sys.time()), ".txt", sep="");
+	strNcDiff  = paste(strDirTmp, "/", "ncdiff_", as.numeric(Sys.time()), ".nc", sep="");
 	
+   # build and run the ncdump command for the first file
+   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n > ", strNcDump1, sep="");
+	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
+
+   # build and run the ncdump command for the second file
+   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n > ", strNcDump2, sep="");
+	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
+
+   # build and run the diff command for the ncdump output
+   strCmd = paste(strDiffExec, " \\\n  ", strNcDump1, " \\\n ", strNcDump2,
+               " | egrep '<|>' | egrep -v 'FileOrigins|MET_version'", sep="");
+	if( 2 <= verb ){ cat("DIFF:", strCmd, "\n"); }
+	str = system(paste(strCmd, "2>&1"), intern=T);
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
+
+   # if there are differences in the header, warn and quit
+	if( 0 < length(strCmdOut) ){
+		if( 1 <= verb ){
+			cat("WARNING: NetCDF headers differ:\n", paste(strCmdOut, collapse='\n'), "\n", sep='');
+			return();
+		} else {
+			quit(status=1);
+		}
+	}
+
 	# build and run the ncdiff command
-	strCmd = paste(strNcDiffExec, " \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcFileD, sep="");
+	strCmd = paste(strNcDiffExec, " \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcDiff, sep="");
 	if( 2 <= verb ){ cat("NCDIFF:", strCmd, "\n"); }
-	strDiffOut = system(paste(strCmd, "2>&1"), intern=T);
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 	
 	# if the ncdiff file failed for some reason, warn and quit
-	if( 0 < length(strDiffOut) ){
+	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
-			cat("WARNING: ncdiff error ", strDiffOut, "\n");
+			cat("WARNING: ncdiff error ", strCmdOut, "\n");
 			
 			# if there is a variable mismatch, print a side-by-side table of variable names in the NetCDF files
-			if( TRUE == grepl("variable .* is in list one and not in list two", strDiffOut) ){
+			if( TRUE == grepl("variable .* is in list one and not in list two", strCmdOut) ){
 				strNcV = paste(strDirTmp, "/", "ncv_", as.numeric(Sys.time()), ".txt", sep="");	
 				strCmd = paste(strNcDumpExec, nc1, "| grep -P '^\\t\\w' >",  strNcV, "; echo >> ", strNcV, ";",
 							   strNcDumpExec, nc2, "| grep -P '^\\t\\w' >>", strNcV, "; cat", strNcV, "| perl -e'",
@@ -620,7 +649,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
 			quit(status=1);
 		}
 	}
-	if( ! fileExists(strNcFileD) ){
+	if( ! fileExists(strNcDiff) ){
 		if( 1 <= verb ){
 			cat("WARNING: ncdiff output file does not exist\n");
 			return();
@@ -632,7 +661,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	# open the NetCDF files for reading
 	ncFile1 = open.ncdf(c(nc1), write=F);
 	ncFile2 = open.ncdf(c(nc2), write=F);
-	ncFileD = open.ncdf(c(strNcFileD), write=F);
+	ncFileD = open.ncdf(c(strNcDiff), write=F);
 	
 	# read the global attributes from each file
 	listAtt1 = att.get.ncdf(ncFile1, varid=0);
@@ -699,10 +728,13 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	close.ncdf(ncFile1);
 	close.ncdf(ncFile2);
 	close.ncdf(ncFileD);
-	
-	# remove the temporary diff file, if required
-	if( TRUE == boolRmTmp ){ rmFile(strNcFileD); }
 
+	# remove the temporary diff files, if required
+	if( TRUE == boolRmTmp ){
+	   rmFile(strNcDump1);
+	   rmFile(strNcDump2);
+	   rmFile(strNcDiff);
+	}
 }
 
 
