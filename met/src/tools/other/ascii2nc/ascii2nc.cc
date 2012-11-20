@@ -734,7 +734,7 @@ void process_little_r_obs(LineDataFile &f_in) {
               << "the number of data lines specified in the header ("
               << n_data_hdr
               << ") does not match the number found in the data ("
-              << i_data << ").\n\n";
+              << i_data << ") on line number " << dl.line_number() << ".\n\n";
       }
 
       //
