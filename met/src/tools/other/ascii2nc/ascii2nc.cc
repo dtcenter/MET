@@ -624,7 +624,8 @@ void process_little_r_obs(LineDataFile &f_in) {
       //
       // Store the elevation
       //
-      hdr_elv = atof(dl[6]);
+      hdr_elv = (is_eq(atof(dl[6]), lr_missing_value) ?
+                 bad_data_float : atof(dl[6]));
 
       //
       // Write the header info
