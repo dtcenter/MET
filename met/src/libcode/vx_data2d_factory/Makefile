@@ -159,7 +159,7 @@ test_factory: $(LIBRARIES) test_factory.cc
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lgrib2c -ljasper -lpng -lz -lm -lnetcdf_c++ -lnetcdf
+	-lm -lnetcdf_c++ -lnetcdf
 
 
 ########################################################################
