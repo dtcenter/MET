@@ -7,6 +7,10 @@
 The configuration files that control many of the MET tools contain formatted
 ASCII text.  This format has been updated for METv4.0.
 
+In general, settings common to multiple tools are described in this README file
+while settings specific to individual tools are described in the comments of
+their configuration files.
+
 A configuration file entry is an entry name, followed by an equal sign =,
 followed by an entry value, and is terminated by a semicolon ;.  The
 configuration file itself is one large dictionary consisting of entries, some of
