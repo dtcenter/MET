@@ -592,28 +592,28 @@ printCompReport = function(listTest, verb=0, hist=""){
 #   strict: (optional) require strict numerical equality, default no
 compareNc = function(nc1, nc2, verb, strict=0){
 
-   strNcDump1 = paste(strDirTmp, "/", "ncdump_hdr1_", as.numeric(Sys.time()), ".txt", sep="");
-   strNcDump2 = paste(strDirTmp, "/", "ncdump_hdr2_", as.numeric(Sys.time()), ".txt", sep="");
+	strNcDump1 = paste(strDirTmp, "/", "ncdump_hdr1_", as.numeric(Sys.time()), ".txt", sep="");
+	strNcDump2 = paste(strDirTmp, "/", "ncdump_hdr2_", as.numeric(Sys.time()), ".txt", sep="");
 	strNcDiff  = paste(strDirTmp, "/", "ncdiff_", as.numeric(Sys.time()), ".nc", sep="");
-	
-   # build and run the ncdump command for the first file
-   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
+
+	# build and run the ncdump command for the first file
+	strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
-   # build and run the ncdump command for the second file
-   strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
+	# build and run the ncdump command for the second file
+	strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
-   # build and run the diff command for the ncdump output
-   strCmd = paste(strDiffExec, " \\\n  ", strNcDump1, " \\\n  ", strNcDump2,
-               " \\\n  | egrep '<|>' | egrep -v 'FileOrigins|MET_version|RunCommand'", sep="");
+	# build and run the diff command for the ncdump output
+	strCmd = paste(strDiffExec, " \\\n  ", strNcDump1, " \\\n  ", strNcDump2,
+		" \\\n -I 'FileOrigins' -I'MET_version' -I'RunCommand'", sep="");
 	if( 2 <= verb ){ cat("DIFF:", strCmd, "\n"); }
 	str = system(paste(strCmd, "2>&1"), intern=T);
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
-   # if there are differences in the header, warn and quit
+	# if there are differences in the header, warn and quit
 	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
 			cat("WARNING: NetCDF headers differ:\n", paste(strCmdOut, collapse='\n'), "\n", sep='');
