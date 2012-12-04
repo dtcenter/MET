@@ -186,6 +186,7 @@ class PSfile {
 
       virtual void setgray(double);
       virtual void setlinewidth(double);
+      virtual void setdash(const char *);
 
       virtual void box(double, double, double, double, double);
 
@@ -193,7 +194,6 @@ class PSfile {
 
       virtual void setrgbcolor(double, double, double);
       virtual void sethsbcolor(double, double, double);
-
 };
 
 

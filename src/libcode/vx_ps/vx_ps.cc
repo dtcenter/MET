@@ -118,6 +118,8 @@ static const char * const    translate_string = "tr";
 
 static const char * const setlinewidth_string = "w";
 
+static const char * const setdash_string      = "d";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -318,6 +320,7 @@ f << "%%EndComments\n";
 f << "%%BeginProlog\n"
 
   << '/' << setlinewidth_string << " {setlinewidth} def\n"
+  << '/' << setdash_string      << " {setdash} def\n"
   << '/' << lineto_string       << " {lineto} def\n"
   << '/' << newpath_string      << " {newpath} def\n"
   << '/' << moveto_string       << " {moveto} def\n"
@@ -840,6 +843,22 @@ void PSfile::setlinewidth(double w)
 File->precision(2);
 
 file() << ' ' << w << ' ' << setlinewidth_string << '\n';
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::setdash(const char *d)
+
+{
+
+File->precision(2);
+
+file() << ' ' << d << ' ' << setdash_string << '\n';
 
 return;
 
