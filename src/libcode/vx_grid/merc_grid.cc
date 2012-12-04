@@ -219,7 +219,8 @@ double u, v;
 lat_rad = lat/deg_per_rad;
 lon_rad = lon/deg_per_rad;
 
-lon_rad += twopi*floor((Lon_LL_radians - lon_rad)/twopi);
+// lon_rad += twopi*floor((Lon_LL_radians - lon_rad)/twopi);
+   lon_rad -= twopi*floor((lon_rad - Lon_LL_radians + pi)/twopi);
 
 u = merc_lon_to_u(lon_rad);
 
