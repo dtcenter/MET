@@ -109,15 +109,12 @@ int main(int argc, char *argv[]) {
    Box page, view, map_box;
    double lat, lon, grid_x, grid_y, page_x, page_y, mag;
    IntArray ihdr;
-   Color black;
 
    //
    // check for zero arguments
    //
    if (argc == 1)
       usage();
-
-   black.set_gray(0);
 
    //
    // Initialize the grid bounding box to the whole grid
@@ -328,10 +325,16 @@ int main(int argc, char *argv[]) {
                             get_short_name(nc_file));
 
    //
+   // read config file defaults
+   //
+   MetConfig config;
+   config.read(replace_path(config_const_filename));
+
+   //
    // draw the map first and then put a border around it
    //
    plot.setrgbcolor(0.0, 0.0, 0.0);
-   draw_map(grid, grid_bb, plot, map_box, black, met_data_dir);
+   draw_map(grid, grid_bb, plot, map_box, &config);
    draw_border(plot, map_box);
    
    //

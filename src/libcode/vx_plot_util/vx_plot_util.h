@@ -24,6 +24,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include "vx_config.h"
 #include "vx_color.h"
 #include "vx_ps.h"
 #include "vx_pxm.h"
@@ -36,33 +37,24 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const char world_data[]             = "map/world_data";
-static const char world_data_minus_usa[]   = "map/world_data_minus_usa";
-static const char country_data[]           = "map/country_data";
-static const char country_data_minus_usa[] = "map/country_data_minus_usa";
-static const char usa_state_data[]         = "map/usa_state_data";
-static const char usa_county_data[]        = "map/usa_county_data";
-
-////////////////////////////////////////////////////////////////////////////////
-
 typedef enum {satellite, lambert, mercator} Projection;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-extern void draw_map(const Grid &, const Box &, PSfile &,
-                     const Box &, Color, const char *);
+extern void draw_map(const Grid &, const Box &, PSfile &, const Box &,
+                     MetConfig *);
 
-extern void draw_map_data(const Grid &, const Box &, PSfile &,
-                          const Box &, Color, const char *);
+extern void draw_map_data(const Grid &, const Box &, PSfile &, const Box &,
+                          const char *);
 
-extern void draw_region(const Grid &, const Box &, PSfile &,
-                        const Box &, const MapRegion &);
+extern void draw_region(const Grid &, const Box &, PSfile &, const Box &,
+                        const MapRegion &);
 
 extern bool region_overlaps_grid(const Grid &, const Box &,
                                  const MapRegion &);
 
-extern void draw_grid(const Grid &, const Box &, int, PSfile &,
-                      const Box &, Color);
+extern void draw_grid(const Grid &, const Box &, int, PSfile &, const Box &,
+                      Color);
 
 extern void gc_arcto(const Grid &, const Box &, PSfile &, double, double,
                      double, double, double, const Box &);

@@ -147,7 +147,6 @@ static double data_min, data_max;
 
 static ColorTable fcst_ct, obs_ct;
 static int stride = 1;
-static const Color c_map(25, 25, 25);
 static const Color c_hull(0, 0, 0);
 static const Color c_bndy(0, 0, 255);
 static const double l_thin = 0.50;
@@ -1862,7 +1861,7 @@ void draw_map(PSfile &p, Box &dim) {
 
    p.gsave();
    p.setlinewidth(l_thin);
-   draw_map(grid, xy_bb, p, dim, c_map, engine.conf_info.met_data_dir);
+   draw_map(grid, xy_bb, p, dim, &engine.conf_info.conf);
    p.grestore();
 
    return;

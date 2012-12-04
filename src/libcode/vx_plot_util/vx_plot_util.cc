@@ -30,26 +30,55 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Draw a map in a PostScript file.  By default, draw the world outlines,
-// country boundaries, and USA states.
+// Draw a map in a PostScript file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p,
-              const Box &dim, Color c, const char *data_dir) {
-   char map_file_name[PATH_MAX];
+void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p, const Box &dim,
+              MetConfig *conf) {
+   int i;
+   Dictionary *map_dict = (Dictionary *) 0;
+   ConcatString file_name, line_dash;
+   NumArray line_color;
+   double line_width;
 
-   // Draw the world outlines minus the USA states
-   sprintf(map_file_name, "%s/%s", data_dir, world_data_minus_usa);
-   draw_map_data(gr, gr_bb, p, dim, c, map_file_name);
+   // Check for a valid dictionary
+   if(!conf) {
+      mlog << Error << "\ndraw_map() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
+   // Lookup the map_data.source dictionary
+   map_dict = conf->lookup_array(conf_key_map_data_source);
 
-   // Draw the country outlines minus the USA states
-   sprintf(map_file_name, "%s/%s", data_dir, country_data_minus_usa);
-   draw_map_data(gr, gr_bb, p, dim, c, map_file_name);
+   // Loop over the map data sources
+   for(i=0; i<map_dict->n_entries(); i++) {
 
-   // Draw the USA state outlines
-   sprintf(map_file_name, "%s/%s", data_dir, usa_state_data);
-   draw_map_data(gr, gr_bb, p, dim, c, map_file_name);
+      // Get the map data setting for the current entry
+      file_name  = replace_path((*map_dict)[i]->dict_value()->lookup_string(conf_key_file_name));
+      line_color = (*map_dict)[i]->dict_value()->lookup_num_array(conf_key_line_color);
+      line_width = (*map_dict)[i]->dict_value()->lookup_double(conf_key_line_width);
+      line_dash  = (*map_dict)[i]->dict_value()->lookup_string(conf_key_line_dash, false);
+
+      // Check for correctly formatted colors
+      if(line_color.n_elements() != 3) {
+         mlog << Error << "\ndraw_map() -> "
+              << "\"line_color\" must be specified as three RGB values.\n\n";
+         exit(1);
+      }
+
+      mlog << Debug(4) << "draw_map() -> "
+           << "Plotting map data file: " << file_name << "\n";
+
+      // Set the PostScript line options
+      p.gsave();
+      p.setlinewidth(line_width);
+      p.setrgbcolor(line_color[0]/255.0, line_color[1]/255.0, line_color[2]/255.0);
+      if(line_dash.length() > 0) p.setdash(line_dash);
+      draw_map_data(gr, gr_bb, p, dim, file_name);
+      p.grestore();
+   }
    
    return;
 }
@@ -59,12 +88,11 @@ void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p,
 // Draw map data file.
 //   The gr_bb argument specifies the subset of the grid to be plotted.
 //   The dim argument specifies the location on the PostScript page.
-//   The color (c) argument specifies the line color.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 void draw_map_data(const Grid &gr, const Box &gr_bb, PSfile &p,
-                   const Box &dim, Color c, const char *map_data_file) {
+                   const Box &dim, const char *map_data_file) {
    ifstream in;
    MapRegion r;
 
@@ -88,7 +116,6 @@ void draw_map_data(const Grid &gr, const Box &gr_bb, PSfile &p,
    p.clip();
 
    p.file() << "1 setlinejoin\n";
-   p.setrgbcolor(c.red()/255.0, c.green()/255.0, c.blue()/255.0);
 
    while(in >> r) draw_region(gr, gr_bb, p, dim, r);
 
@@ -130,6 +157,7 @@ void draw_region(const Grid &gr, const Box &gr_bb, PSfile &p,
       // Finish the previous path and begin a new one
       //
       if(abs(px2 - px1) > 0.90*abs(dim.x_ur() - dim.x_ll())) {
+
          p.stroke();
 
          p.newpath();

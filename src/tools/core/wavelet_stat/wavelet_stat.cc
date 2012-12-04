@@ -2509,7 +2509,7 @@ void draw_map(PSfile *p, Box &dim) {
 
    p->gsave();
    p->setlinewidth(l_width);
-   draw_map(grid, xy_bb, *p, dim, c_map, conf_info.met_data_dir);
+   draw_map(grid, xy_bb, *p, dim, &conf_info.conf);
    p->grestore();
 
    return;
