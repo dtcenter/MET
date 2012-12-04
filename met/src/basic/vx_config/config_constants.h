@@ -306,6 +306,11 @@ static const char conf_key_color_table[]       = "color_table";
 static const char conf_key_plot_min[]          = "plot_min";
 static const char conf_key_plot_max[]          = "plot_max";
 static const char conf_key_colorbar_spacing[]  = "colorbar_spacing";
+static const char conf_key_map_data_source[]   = "map_data.source";
+static const char conf_key_file_name[]         = "file_name";
+static const char conf_key_line_color[]        = "line_color";
+static const char conf_key_line_width[]        = "line_width";
+static const char conf_key_line_dash[]         = "line_dash";
 
 //
 // Wavelet-Stat specific parameter key names

@@ -165,28 +165,52 @@ int j;
 
 r.clear();
 
-   // read in the region number, the number of points for this region number,
-   // and the a, b, and c values
-   in >> r.number >> r.n_points;
+ConcatString line;
+StringArray a;
 
-   // check for end of file
-   if (!in) return (false);
+   // read the map region meta data
+   if(!line.read_line(in)) return (false);
 
-   // read in the minimum latitude, the maximum latitude, the minimum longitude,
-   // and the maximum longitude for this region number
-   in >> r.lat_min >> r.lat_max >> r.lon_min >> r.lon_max;
+   // split up the meta data line
+   a = line.split(" ");
+
+   // check for the minumum number of elements
+   if(a.n_elements() < min_region_header_elements) {
+      mlog << Warning
+           << "\nbool operator>>(istream & in, MapRegion & r) -> "
+           << "found fewer than the expected number of elements ("
+           << a.n_elements() << "<" << min_region_header_elements
+           << ") in map region line:\n" << line << "\n\n";
+      return(false);
+   }
+
+   // parse the region header line:
+   //  - region number
+   //  - the number of points for this region number
+   //  - min/max latitude
+   //  - min/max longitude
+   //  - optional region description
+   r.number   = atoi(a[0]);
+   r.n_points = atoi(a[1]);
+   r.lat_min  = atof(a[2]);
+   r.lat_max  = atof(a[3]);
+   r.lon_min  = atof(a[4]);
+   r.lon_max  = atof(a[5]);
 
    // check that the number of points to read in is not greater than the size
    // of the arrays to hold the lat/lon point values
    if(r.n_points > max_region_points) {
-      mlog << Error << "\noperator>>(ifstream &, MapRegion &) ->"
+      mlog << Error << "\noperator>>(ifstream &, MapRegion &) -> "
            << "map region has too many points\n\n";
       exit (1);
    }
 
-   // read in the lat/lon point values
+   // parse the lat/lon data lines
    for(j=0; j<r.n_points; j++) {
-      in >> r.lat[j] >> r.lon[j];
+      if(!line.read_line(in)) return (false);
+      a = line.split(" ");
+      r.lat[j] = atof(a[0]);
+      r.lon[j] = atof(a[1]);
    }
 
    //

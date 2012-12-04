@@ -142,6 +142,7 @@ int main(int argc, char * argv[])
       // populate the var_info object from the magic string
       //
    MetConfig config;
+   config.read(replace_path(config_const_filename));
    config.read_string( ConfigString );
    var_ptr->set_dict(config);
 
@@ -200,7 +201,8 @@ int main(int argc, char * argv[])
       // plot the image
       //
    mlog << Debug(1)  << "Creating postscript file: " << OutputFilename << "\n";
-   data_plane_plot(InputFilename, OutputFilename, grid, TitleString, color_table, data_plane);
+   data_plane_plot(InputFilename, OutputFilename, grid, TitleString,
+                   color_table, &config, data_plane);
 
       //
       // done

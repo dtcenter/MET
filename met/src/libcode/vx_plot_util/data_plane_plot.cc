@@ -60,29 +60,21 @@ static void fill_colorbar_image(Ppm &, const ColorTable &);
 
 void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
                      const Grid & grid, const ConcatString & title,
-                     const ColorTable & colortable, const DataPlane & data_plane)
+                     const ColorTable & colortable, MetConfig *conf,
+                     const DataPlane & data_plane)
 {
    PSfile plot;
    Ppm image, cbar_image;
    RenderInfo render_info, cbar_render_info;
    Box grid_bb, image_bb, cbar_bb;
    Box page, view, map_box;
-   Color black;
    ConcatString short_filename;
-   ConcatString data_dir;
    char junk[64];
    int i;
    double mag;
    double tick_m, val_m, tick_val, x1, x2, y1;
 
    short_filename = get_short_name(inname);
-
-   black.set_gray(0);
-
-      //
-      // By default, set the data_dir to MET_BASE/data
-      //
-   data_dir = replace_path(default_met_data_dir);
 
       //
       // open the PostScript file using the default media
@@ -158,7 +150,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       //
       // draw the map on top of the image and put a border around it
       //
-    draw_map(grid, grid_bb, plot, map_box, black, data_dir);
+    draw_map(grid, grid_bb, plot, map_box, conf);
     draw_border(plot, map_box, 2.0);
    
       //

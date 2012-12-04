@@ -278,6 +278,7 @@ StringArray parse_conf_obs_qty(Dictionary *dict) {
 
    return(sa);
 }
+
 ////////////////////////////////////////////////////////////////////////
 
 NumArray parse_conf_ci_alpha(Dictionary *dict) {

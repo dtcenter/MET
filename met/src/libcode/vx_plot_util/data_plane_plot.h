@@ -29,7 +29,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 extern void data_plane_plot(const ConcatString &, const ConcatString &, const Grid &,
-                            const ConcatString &, const ColorTable &, const DataPlane &);
+                            const ConcatString &, const ColorTable &, MetConfig *,
+                            const DataPlane &);
 
 ////////////////////////////////////////////////////////////////////////////////
 

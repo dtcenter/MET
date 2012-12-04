@@ -127,7 +127,6 @@ static int          i_isc_row;
 ////////////////////////////////////////////////////////////////////////
 
 static ColorTable fcst_ct, obs_ct, wvlt_ct;
-static const Color c_map(25, 25, 25);
 static const Color c_hull(0, 0, 0);
 static const Color c_bndy(0, 0, 255);
 static const int n_color_bars = 20;
