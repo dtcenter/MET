@@ -20,7 +20,7 @@ static const int gray_max         = 255;
 static const double h_margin      = 40.0;
 static const double v_margin      = 80.0;
 
-static const char map_filename [] = "world_data";   //  relative to MAP_DATA_DIR
+static const char map_filename [] = "MET_BASE/data/map/legacy/world_data";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -567,7 +567,7 @@ MapRegion r;
 ifstream in;
 ConcatString filename;
 
-filename << MAP_DATA_DIR << '/' << map_filename;
+filename = replace_path(map_filename);
 
 in.open(filename);
 
