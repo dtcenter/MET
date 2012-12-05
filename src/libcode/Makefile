@@ -23,6 +23,7 @@ endif
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_gsl_prob          ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_gnomon            ; $(MAKE) $(PRINT_OPTS)
+	@ cd vx_geodesy           ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_nav               ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_pb_util           ; $(MAKE) $(PRINT_OPTS)
 	@ cd vx_afm               ; $(MAKE) $(PRINT_OPTS)
@@ -55,6 +56,7 @@ endif
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_gsl_prob          ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_gnomon            ; $(MAKE) $(PRINT_OPTS) clean
+	@ cd vx_geodesy           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_nav               ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_pb_util           ; $(MAKE) $(PRINT_OPTS) clean
 	@ cd vx_afm               ; $(MAKE) $(PRINT_OPTS) clean
@@ -87,6 +89,7 @@ endif
 	@ cd vx_data2d_factory    ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_gsl_prob          ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_gnomon            ; $(MAKE) $(PRINT_OPTS) gen_sources
+	@ cd vx_geodesy           ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_nav               ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_pb_util           ; $(MAKE) $(PRINT_OPTS) gen_sources
 	@ cd vx_afm               ; $(MAKE) $(PRINT_OPTS) gen_sources
