@@ -166,7 +166,7 @@ wwmca_regrid: wwmca_regrid.cc $(OBJECTS)
 wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	@ echo
 	$(CXX) -o wwmca_plot wwmca_plot.cc $(OBJECTS) \
-	$(CXX_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map\" \
+	$(CXX_FLAGS) -DMAP_DATA_DIR=\"$(MET_BASE_DIR)/data/map/legacy\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
 	-lvx_pxm \
