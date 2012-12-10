@@ -143,23 +143,24 @@ typedef double (*ConfidenceFunc) (double);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class Engine {
+
+class ModeFuzzyEngine {
 
    private:
 
-      Engine(const Engine &);
-      Engine & operator=(const Engine &);
+      ModeFuzzyEngine(const ModeFuzzyEngine &);
+      ModeFuzzyEngine & operator=(const ModeFuzzyEngine &);
 
       void init_from_scratch();
 
    public:
 
-      Engine();
-     ~Engine();
+      ModeFuzzyEngine();
+     ~ModeFuzzyEngine();
 
-      //
-      // Non-const functions
-      //
+         //
+         // Non-const functions
+         //
 
       void clear_features();
       void clear_colors();
@@ -193,49 +194,47 @@ class Engine {
 
       void do_matching();
 
-      //
-      // Perform no matching, but still define the single features
-      // for each simple object
-      //
+         //
+         // Perform no matching, but still define the single features
+         // for each simple object
+         //
 
       void do_no_match();
 
-      //
-      // Perform merging and matching in one step based on the
-      // interest threshold
-      //
+         //
+         // Perform merging and matching in one step based on the
+         // interest threshold
+         //
 
       void do_match_merge();
 
-      //
-      // Perform merging of the forecast and observation fields
-      // based on a lower convolution threshold
-      //
+         //
+         // Perform merging of the forecast and observation fields
+         // based on a lower convolution threshold
+         //
 
       void do_fcst_merge_thresh();
       void do_obs_merge_thresh();
 
-      //
-      // Perform merging of the forecast and observation fields
-      // using a Fuzzy Engine
-      //
+         //
+         // Perform merging of the forecast and observation fields
+         // using a Fuzzy ModeFuzzyEngine
+         //
 
-      void do_fcst_merge_engine(const char *default_config,
-                                const char *merge_config);
-      void do_obs_merge_engine(const char *default_config,
-                               const char *merge_config);
+      void do_fcst_merge_engine (const char *default_config, const char *merge_config);
+      void do_obs_merge_engine  (const char *default_config, const char *merge_config);
 
-      //
-      // Perform match between the forecast and observation field
-      // allowing no merging in the observation field
-      //
+         //
+         // Perform match between the forecast and observation field
+         // allowing no merging in the observation field
+         //
 
       void do_match_fcst_merge();
 
-      //
-      // Perform match between the forecast and observation field
-      // allowing no merging in either field
-      //
+         //
+         // Perform match between the forecast and observation field
+         // allowing no merging in either field
+         //
 
       void do_match_only();
 
@@ -244,66 +243,66 @@ class Engine {
 
       void do_cluster_features();
 
-      //
-      // Configuration information
-      //
+         //
+         // Configuration information
+         //
 
       ModeConfInfo conf_info;
 
-      //
-      // Data
-      //
+         //
+         // Data
+         //
 
-      int need_fcst_filter;
-      int need_obs_filter;
+      bool need_fcst_filter;
+      bool need_obs_filter;
 
-      int need_fcst_conv;
-      int need_obs_conv;
+      bool need_fcst_conv;
+      bool need_obs_conv;
 
-      int need_fcst_thresh;
-      int need_obs_thresh;
+      bool need_fcst_thresh;
+      bool need_obs_thresh;
 
-      int need_fcst_split;
-      int need_obs_split;
+      bool need_fcst_split;
+      bool need_obs_split;
 
-      int need_fcst_merge;
-      int need_obs_merge;
+      bool need_fcst_merge;
+      bool need_obs_merge;
 
-      int need_match;
+      bool need_match;
 
-      int need_fcst_clus_split;
-      int need_obs_clus_split;
+      bool need_fcst_clus_split;
+      bool need_obs_clus_split;
 
-      ShapeData * fcst_raw;
-      ShapeData * fcst_filter;
-      ShapeData * fcst_thresh;
-      ShapeData * fcst_conv;
-      ShapeData * fcst_mask;
-      ShapeData * fcst_split;
-      ShapeData * fcst_clus_split;
+      ShapeData * fcst_raw;          //  allocated
+      ShapeData * fcst_filter;       //  allocated
+      ShapeData * fcst_thresh;       //  allocated
+      ShapeData * fcst_conv;         //  allocated
+      ShapeData * fcst_mask;         //  allocated
+      ShapeData * fcst_split;        //  allocated
+      ShapeData * fcst_clus_split;   //  allocated
 
-      ShapeData * obs_raw;
-      ShapeData * obs_filter;
-      ShapeData * obs_thresh;
-      ShapeData * obs_conv;
-      ShapeData * obs_mask;
-      ShapeData * obs_split;
-      ShapeData * obs_clus_split;
+      ShapeData * obs_raw;           //  allocated
+      ShapeData * obs_filter;        //  allocated
+      ShapeData * obs_thresh;        //  allocated
+      ShapeData * obs_conv;          //  allocated
+      ShapeData * obs_mask;          //  allocated
+      ShapeData * obs_split;         //  allocated
+      ShapeData * obs_clus_split;    //  allocated
 
-      Engine * fcst_engine;
-      Engine * obs_engine;
+      ModeFuzzyEngine * fcst_engine;   //  allocated
+      ModeFuzzyEngine * obs_engine;    //  allocated
 
       int n_fcst;
       int n_obs;
       int n_clus;
 
-      SingleFeature * fcst_single;
-      SingleFeature * obs_single;
-      PairFeature   * pair;
+      SingleFeature * fcst_single;  //  allocated
+      SingleFeature * obs_single;   //  allocated
+      PairFeature   * pair;         //  allocated
 
-      SingleFeature * fcst_clus;
-      SingleFeature * obs_clus;
-      PairFeature   * pair_clus;
+      SingleFeature * fcst_clus;    //  allocated
+      SingleFeature * obs_clus;     //  allocated
+      PairFeature   * pair_clus;    //  allocated
 
       Color fcst_color [max_singles];
       Color obs_color  [max_singles];
@@ -321,34 +320,36 @@ class Engine {
       int get_unmatched_obs(int)  const;
 
       SetCollection collection;
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 extern double total_interest(ModeConfInfo &, int, const PairFeature &);
 extern double total_interest_print(ModeConfInfo &, int, const PairFeature &, ostream *);
-extern double interest_percentile(Engine &, const double, const int);
+extern double interest_percentile(ModeFuzzyEngine &, const double, const int);
 
-extern void write_engine_stats(Engine &, const Grid &, AsciiTable &);
-extern void write_header(Engine &, AsciiTable &, const int);
-extern void write_header_columns(Engine &, AsciiTable & , const int);
-extern void write_fcst_single(Engine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_obs_single(Engine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_pair(Engine &, const int, const int, AsciiTable &, int &);
-extern void write_fcst_cluster(Engine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_obs_cluster(Engine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_cluster_pair(Engine &, const int, AsciiTable &, const int);
+extern void write_engine_stats(ModeFuzzyEngine &, const Grid &, AsciiTable &);
+extern void write_header(ModeFuzzyEngine &, AsciiTable &, const int);
+extern void write_header_columns(ModeFuzzyEngine &, AsciiTable & , const int);
+extern void write_fcst_single(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_obs_single(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_pair(ModeFuzzyEngine &, const int, const int, AsciiTable &, int &);
+extern void write_fcst_cluster(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_obs_cluster(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_cluster_pair(ModeFuzzyEngine &, const int, AsciiTable &, const int);
 
-extern void calc_fcst_clus_ch_mask(const Engine &, ShapeData &);
-extern void calc_obs_clus_ch_mask(const Engine &, ShapeData &);
+extern void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &, ShapeData &);
+extern void calc_obs_clus_ch_mask(const ModeFuzzyEngine &, ShapeData &);
 
-extern void calc_fcst_cluster_mask(const Engine &, ShapeData &, const int);
-extern void calc_obs_cluster_mask(const Engine &, ShapeData &, const int);
+extern void calc_fcst_cluster_mask(const ModeFuzzyEngine &, ShapeData &, const int);
+extern void calc_obs_cluster_mask(const ModeFuzzyEngine &, ShapeData &, const int);
 
 extern void parse_thresh_info(const char *, SingleThresh &);
 
-extern double area_ratio_conf(double);
+// extern double area_ratio_conf(double);
 extern double aspect_ratio_conf(double);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -69,9 +69,9 @@ class ShapeData {
 
    public:
 
-      //
-      //  canonical members
-      //
+         //
+         //  canonical members
+         //
 
       ShapeData();
       virtual ~ShapeData();
@@ -82,18 +82,18 @@ class ShapeData {
 
       DataPlane data;        // stores the data
 
-      //
-      //  get functions
-      //
+         //
+         //  get functions
+         //
 
       Moments moments()  const;
 
       bool is_zero    (int x, int y) const;
       bool is_nonzero (int x, int y) const;
 
-      //
-      //  check if a point or it's neighbors are non-zero
-      //
+         //
+         //  check if a point or it's neighbors are non-zero
+         //
 
       bool s_is_on(int, int) const;
       bool f_is_on(int, int) const;
@@ -101,9 +101,9 @@ class ShapeData {
       bool is_valid_xy (int x, int y) const;
       bool is_bad_data (int x, int y) const;
 
-      //
-      //  object attributes
-      //
+         //
+         //  object attributes
+         //
 
       void    calc_moments();
 
@@ -117,9 +117,9 @@ class ShapeData {
       int     s_area()                                const;
       double  complexity()                            const;
 
-      //
-      //  object polylines
-      //
+         //
+         //  object polylines
+         //
 
       Polyline convex_hull()                             const;
       Polyline single_boundary()                         const;
@@ -127,9 +127,9 @@ class ShapeData {
       Polyline single_boundary_offset(double)            const;
       Polyline single_boundary_offset(bool, int, double) const;
 
-      //
-      //  object operations
-      //
+         //
+         //  object operations
+         //
 
       void conv_filter_circ(int diameter, double bd_thresh);  // diameter must be an odd number
 

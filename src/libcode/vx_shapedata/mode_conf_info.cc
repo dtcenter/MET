@@ -52,66 +52,95 @@ void ModeConfInfo::init_from_scratch() {
    clear();
 
    return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeConfInfo::clear() {
+
+void ModeConfInfo::clear()
+
+{
 
    // Initialize values
+
    model.clear();
+
    mask_missing_flag = FieldType_None;
+
    fcst_raw_thresh.clear();
    obs_raw_thresh.clear();
+
    fcst_conv_radius = bad_data_int;
    obs_conv_radius = bad_data_int;
+
    fcst_conv_thresh.clear();
    obs_conv_thresh.clear();
+
    fcst_vld_thresh = bad_data_double;
    obs_vld_thresh = bad_data_double;
+
    fcst_area_thresh.clear();
    obs_area_thresh.clear();
+
    fcst_inten_perc_value = bad_data_int;
    obs_inten_perc_value = bad_data_int;
+
    fcst_inten_perc_thresh.clear();
    obs_inten_perc_thresh.clear();
+
    fcst_merge_thresh.clear();
    obs_merge_thresh.clear();
+
    fcst_merge_flag = MergeType_None;
    obs_merge_flag = MergeType_None;
+
    match_flag = MatchType_None;
+
    max_centroid_dist = bad_data_double;
+
    mask_grid_name.clear();
    mask_grid_flag = FieldType_None;
+
    mask_poly_name.clear();
    mask_poly_flag = FieldType_None;
-   centroid_dist_wt = bad_data_double;
-   boundary_dist_wt = bad_data_double;
+
+   centroid_dist_wt    = bad_data_double;
+   boundary_dist_wt    = bad_data_double;
    convex_hull_dist_wt = bad_data_double;
-   angle_diff_wt = bad_data_double;
-   area_ratio_wt = bad_data_double;
-   int_area_ratio_wt = bad_data_double;
+   angle_diff_wt       = bad_data_double;
+   area_ratio_wt       = bad_data_double;
+   int_area_ratio_wt   = bad_data_double;
    complexity_ratio_wt = bad_data_double;
    inten_perc_ratio_wt = bad_data_double;
+
    inten_perc_value = bad_data_int;
-   centroid_dist_if = (PiecewiseLinear *) 0;
-   boundary_dist_if = (PiecewiseLinear *) 0;
+
+   centroid_dist_if    = (PiecewiseLinear *) 0;
+   boundary_dist_if    = (PiecewiseLinear *) 0;
    convex_hull_dist_if = (PiecewiseLinear *) 0;
-   angle_diff_if = (PiecewiseLinear *) 0;
-   area_ratio_if = (PiecewiseLinear *) 0;
-   int_area_ratio_if = (PiecewiseLinear *) 0;
+   angle_diff_if       = (PiecewiseLinear *) 0;
+   area_ratio_if       = (PiecewiseLinear *) 0;
+   int_area_ratio_if   = (PiecewiseLinear *) 0;
    complexity_ratio_if = (PiecewiseLinear *) 0;
    inten_perc_ratio_if = (PiecewiseLinear *) 0;
+
    total_interest_thresh = bad_data_double;
+
    print_interest_thresh = bad_data_double;
+
    met_data_dir.clear();
+
    zero_border_size = bad_data_int;
+
    plot_valid_flag = false;
    plot_gcarc_flag = false;
-   ps_plot_flag = false;
-   nc_pairs_flag = false;
-   ct_stats_flag = false;
+   ps_plot_flag    = false;
+   nc_pairs_flag   = false;
+   ct_stats_flag   = false;
+
    output_prefix.clear();
+
    version.clear();
 
    // Deallocate memory
@@ -119,12 +148,14 @@ void ModeConfInfo::clear() {
    if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
    
    return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeConfInfo::read_config(const char *default_file_name,
-                               const char *user_file_name) {
+void ModeConfInfo::read_config(const char *default_file_name, const char *user_file_name)
+
+{
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename));
@@ -136,43 +167,54 @@ void ModeConfInfo::read_config(const char *default_file_name,
    conf.read(user_file_name);
 
    return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeConfInfo::process_config(GrdFileType ftype,
-                                  GrdFileType otype) {
+void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
+
+{
+
    VarInfoFactory info_factory;
    Dictionary *fcst_dict = (Dictionary *) 0;
    Dictionary *obs_dict  = (Dictionary *) 0;
    Dictionary *dict      = (Dictionary *) 0;
    PlotInfo plot_info;
    
-   // Dump the contents of the config file
+      // Dump the contents of the config file
+
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
-   // Initialize
+      // Initialize
+
    clear();
 
-   // Conf: version
+      // Conf: version
+
    version = parse_conf_version(&conf);
 
-   // Conf: model
+      // Conf: model
+
    model = parse_conf_model(&conf);
 
-   // Conf: fcst and obs
+      // Conf: fcst and obs
+
    fcst_dict = conf.lookup_dictionary(conf_key_fcst);
    obs_dict  = conf.lookup_dictionary(conf_key_obs);
     
-   // Allocate new VarInfo objects
+      // Allocate new VarInfo objects
+
    fcst_info = info_factory.new_var_info(ftype);
    obs_info  = info_factory.new_var_info(otype);
 
-   // Set the dictionaries
+      // Set the dictionaries
+
    fcst_info->set_dict(*(fcst_dict->lookup_dictionary(conf_key_field)));
    obs_info->set_dict(*(obs_dict->lookup_dictionary(conf_key_field)));
 
-   // Dump the contents of the VarInfo objects
+      // Dump the contents of the VarInfo objects
+
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed forecast field:\n";
@@ -182,24 +224,27 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       obs_info->dump(cout);
    }
    
-   // No support for wind direction
-   if(fcst_info->is_wind_direction() ||
-      obs_info->is_wind_direction()) {
+      // No support for wind direction
+
+   if(fcst_info->is_wind_direction() || obs_info->is_wind_direction()) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "the wind direction field may not be verified "
            << "using MODE.\n\n";
       exit(1);
    }
 
-   // Conf: fcst.raw_thresh and obs.raw_thresh
+      // Conf: fcst.raw_thresh and obs.raw_thresh
+
    fcst_raw_thresh = fcst_dict->lookup_thresh(conf_key_raw_thresh);
    obs_raw_thresh  = obs_dict->lookup_thresh(conf_key_raw_thresh);
 
-   // Conf: fcst.conv_radius and obs.conv_radius
+      // Conf: fcst.conv_radius and obs.conv_radius
+
    fcst_conv_radius = nint(fcst_dict->lookup_double(conf_key_conv_radius));
    obs_conv_radius  = nint(obs_dict->lookup_double(conf_key_conv_radius));
 
-   // Check that fcst_conv_radius and obs_conv_radius are non-negative
+      // Check that fcst_conv_radius and obs_conv_radius are non-negative
+
    if(fcst_conv_radius < 0 || obs_conv_radius < 0) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "fcst_conv_radius (" << fcst_conv_radius
@@ -208,44 +253,53 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
    
-   // Conf: fcst.conv_thresh and obs.conv_thresh
+      // Conf: fcst.conv_thresh and obs.conv_thresh
+
    fcst_conv_thresh = fcst_dict->lookup_thresh(conf_key_conv_thresh);
    obs_conv_thresh  = obs_dict->lookup_thresh(conf_key_conv_thresh);
 
-   // Conf: fcst.vld_thresh and obs.vld_thresh
+      // Conf: fcst.vld_thresh and obs.vld_thresh
+
    fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
    obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
 
-   // Conf: fcst.area_thresh and obs.area_thresh
+      // Conf: fcst.area_thresh and obs.area_thresh
+
    fcst_area_thresh = fcst_dict->lookup_thresh(conf_key_area_thresh);
    obs_area_thresh  = obs_dict->lookup_thresh(conf_key_area_thresh);
    
-   // Conf: fcst.inten_perc and obs.inten_perc
+      // Conf: fcst.inten_perc and obs.inten_perc
+
    fcst_inten_perc_value = fcst_dict->lookup_int(conf_key_inten_perc_value);
    obs_inten_perc_value  = obs_dict->lookup_int(conf_key_inten_perc_value);
 
-   // Conf: fcst.inten_perc_thresh and obs.inten_perc_thresh
+      // Conf: fcst.inten_perc_thresh and obs.inten_perc_thresh
+
    fcst_inten_perc_thresh = fcst_dict->lookup_thresh(conf_key_inten_perc_thresh);
    obs_inten_perc_thresh  = obs_dict->lookup_thresh(conf_key_inten_perc_thresh);
 
-   // Conf: fcst.merge_thresh and obs.merge_thresh
+      // Conf: fcst.merge_thresh and obs.merge_thresh
+
    fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
    obs_merge_thresh  = obs_dict->lookup_thresh(conf_key_merge_thresh);
 
-   // Conf: fcst.merge_flag and obs.merge_flag
+      // Conf: fcst.merge_flag and obs.merge_flag
+
    fcst_merge_flag = int_to_mergetype(fcst_dict->lookup_int(conf_key_merge_flag));
    obs_merge_flag  = int_to_mergetype(obs_dict->lookup_int(conf_key_merge_flag));
 
-   // Conf: mask_missing_flag
+      // Conf: mask_missing_flag
+
    mask_missing_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_missing_flag));
    
-   // Conf: match_flag
+      // Conf: match_flag
+
    match_flag = int_to_matchtype(conf.lookup_int(conf_key_match_flag));
 
-   // Check that match_flag is set between 0 and 3
+      // Check that match_flag is set between 0 and 3
+
    if(match_flag == MatchType_None &&
-      (fcst_merge_flag != MergeType_None ||
-       obs_merge_flag  != MergeType_None) ) {
+      (fcst_merge_flag != MergeType_None || obs_merge_flag  != MergeType_None) ) {
       mlog << Warning << "\nModeConfInfo::process_config() -> "
            << "When matching is disabled (match_flag = "
            << matchtype_to_string(match_flag)
@@ -256,28 +310,34 @@ void ModeConfInfo::process_config(GrdFileType ftype,
            << ") any merging information will be discarded.\n\n";
    }
    
-   // Conf: max_centroid_dist
+      // Conf: max_centroid_dist
+
    max_centroid_dist = conf.lookup_double(conf_key_max_centroid_dist);
 
-   // Check that max_centroid_dist is > 0
+      // Check that max_centroid_dist is > 0
+
    if(max_centroid_dist <= 0) {
       mlog << Warning << "\nModeConfInfo::process_config() -> "
            << "max_centroid_dist (" << max_centroid_dist
            << ") should be set > 0\n\n";
    }
 
-   // Conf: mask.grid
+      // Conf: mask.grid
+
    mask_grid_name = conf.lookup_string(conf_key_mask_grid);
    mask_grid_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_grid_flag));
 
-   // Conf: mask.poly
+      // Conf: mask.poly
+
    mask_poly_name = conf.lookup_string(conf_key_mask_poly);
    mask_poly_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_poly_flag));
 
-   // Conf: weight
+      // Conf: weight
+
    dict = conf.lookup_dictionary(conf_key_weight);
 
-   // Parse the weights
+      // Parse the weights
+
    centroid_dist_wt    = dict->lookup_double(conf_key_centroid_dist);
    boundary_dist_wt    = dict->lookup_double(conf_key_boundary_dist);
    convex_hull_dist_wt = dict->lookup_double(conf_key_convex_hull_dist);
@@ -289,7 +349,8 @@ void ModeConfInfo::process_config(GrdFileType ftype,
    inten_perc_ratio_wt = dict->lookup_double(conf_key_inten_perc_ratio);
    inten_perc_value    = dict->lookup_int(conf_key_inten_perc_value);
 
-   // Check that intensity_percentile >= 0 and <= 100
+      // Check that intensity_percentile >= 0 and <= 100
+
    if(inten_perc_value < 0 || inten_perc_value > 100) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "inten_perc_value (" << inten_perc_value
@@ -297,7 +358,8 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
    
-   // Check that the fuzzy engine weights are non-negative
+      // Check that the fuzzy engine weights are non-negative
+
    if(centroid_dist_wt    < 0 || boundary_dist_wt    < 0 ||
       convex_hull_dist_wt < 0 || angle_diff_wt       < 0 ||
       area_ratio_wt       < 0 || int_area_ratio_wt   < 0 ||
@@ -307,7 +369,8 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
    
-   // Check that the sum of the weights is non-zero for matching
+      // Check that the sum of the weights is non-zero for matching
+
    if(match_flag != MatchType_None &&
       is_eq(centroid_dist_wt    + boundary_dist_wt   +
             convex_hull_dist_wt + angle_diff_wt      +
@@ -319,10 +382,12 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
 
-   // Conf: interest_function
+      // Conf: interest_function
+
    dict = conf.lookup_dictionary(conf_key_interest_function);
 
-   // Parse the interest functions
+      // Parse the interest functions
+
    centroid_dist_if    = dict->lookup_pwl(conf_key_centroid_dist);
    boundary_dist_if    = dict->lookup_pwl(conf_key_boundary_dist);
    convex_hull_dist_if = dict->lookup_pwl(conf_key_convex_hull_dist);
@@ -333,10 +398,12 @@ void ModeConfInfo::process_config(GrdFileType ftype,
    int_area_ratio_if   = dict->lookup_pwl(conf_key_int_area_ratio);
    inten_perc_ratio_if = dict->lookup_pwl(conf_key_inten_perc_ratio);
 
-   // Conf: total_interest_thresh
+      // Conf: total_interest_thresh
+
    total_interest_thresh = conf.lookup_double(conf_key_total_interest_thresh);
 
-   // Check that total_interest_thresh is between 0 and 1.
+      // Check that total_interest_thresh is between 0 and 1.
+
    if(total_interest_thresh < 0 || total_interest_thresh > 1) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "total_interest_thresh (" << total_interest_thresh
@@ -344,10 +411,12 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
    
-   // Conf: print_interest_thresh
+      // Conf: print_interest_thresh
+
    print_interest_thresh = conf.lookup_double(conf_key_print_interest_thresh);
    
-   // Check that print_interest_thresh is between 0 and 1.
+      // Check that print_interest_thresh is between 0 and 1.
+
    if(print_interest_thresh < 0 || print_interest_thresh > 1) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "print_interest_thresh (" << print_interest_thresh
@@ -355,22 +424,28 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
 
-   // Conf: met_data_dir
+      // Conf: met_data_dir
+
    met_data_dir = replace_path(conf.lookup_string(conf_key_met_data_dir));
 
-   // Conf: fcst_raw_plot
+      // Conf: fcst_raw_plot
+
    fcst_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
 
-   // Conf: obs_raw_plot
+      // Conf: obs_raw_plot
+
    obs_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
 
-   // Conf: object_plot
+      // Conf: object_plot
+
    object_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_object_plot));
 
-   // Conf: zero_border_size
+      // Conf: zero_border_size
+
    zero_border_size = conf.lookup_int(conf_key_zero_border_size);
    
-   // Check that zero_border_size >= 1
+      // Check that zero_border_size >= 1
+
    if(zero_border_size < 1) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "zero_border_size (" << zero_border_size
@@ -378,25 +453,34 @@ void ModeConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
 
-   // Conf: plot_valid_flag
+      // Conf: plot_valid_flag
+
    plot_valid_flag = conf.lookup_bool(conf_key_plot_valid_flag);
 
-   // Conf: plot_gcarc_flag
+      // Conf: plot_gcarc_flag
+
    plot_gcarc_flag = conf.lookup_bool(conf_key_plot_gcarc_flag);
 
-   // Conf: ps_plot_flag
+      // Conf: ps_plot_flag
+
    ps_plot_flag = conf.lookup_bool(conf_key_ps_plot_flag);
    
-   // Conf: nc_pairs_flag
+      // Conf: nc_pairs_flag
+
    nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
 
-   // Conf: ct_stats_flag
+      // Conf: ct_stats_flag
+
    ct_stats_flag = conf.lookup_bool(conf_key_ct_stats_flag);
    
-   // Conf: output_prefix
+      // Conf: output_prefix
+
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
