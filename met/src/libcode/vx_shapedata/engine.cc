@@ -26,20 +26,22 @@ using namespace std;
 
 static inline int max(int a, int b) { return((a > b) ? a : b); }
 
+static inline double area_ratio_conf(double t) { return(t); }
+
 ///////////////////////////////////////////////////////////////////////
 //
-// Code for class Engine
+// Code for class ModeFuzzyEngine
 //
 ///////////////////////////////////////////////////////////////////////
 
-Engine::Engine() {
+ModeFuzzyEngine::ModeFuzzyEngine() {
 
    init_from_scratch();
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-Engine::~Engine() {
+ModeFuzzyEngine::~ModeFuzzyEngine() {
 
    clear_features();
 
@@ -144,54 +146,54 @@ Engine::~Engine() {
    //
    if(fcst_engine) {
       delete fcst_engine;
-      fcst_engine = (Engine *) 0;
+      fcst_engine = (ModeFuzzyEngine *) 0;
    }
    if(obs_engine) {
       delete obs_engine;
-      obs_engine = (Engine *) 0;
+      obs_engine = (ModeFuzzyEngine *) 0;
    }
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-Engine::Engine(const Engine &eng) {
+ModeFuzzyEngine::ModeFuzzyEngine(const ModeFuzzyEngine &eng) {
 
-   mlog << Error << "\nEngine::Engine(const Engine &) -> "
+   mlog << Error << "\nModeFuzzyEngine::ModeFuzzyEngine(const ModeFuzzyEngine &) -> "
         << "should never be called!\n\n";
    exit(1);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-Engine & Engine::operator=(const Engine & eng) {
+ModeFuzzyEngine & ModeFuzzyEngine::operator=(const ModeFuzzyEngine & eng) {
 
-   mlog << Error << "\nEngine::operator=(const Engine &) -> "
+   mlog << Error << "\nModeFuzzyEngine::operator=(const ModeFuzzyEngine &) -> "
         << "should never be called\n\n";
    exit(1);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::init_from_scratch() {
+void ModeFuzzyEngine::init_from_scratch() {
 
    //
    // Reset all fcst and obs processing flags to initial state
    //
-   need_fcst_filter     = 1;
-   need_fcst_conv       = 1;
-   need_fcst_thresh     = 1;
-   need_fcst_split      = 1;
-   need_fcst_merge      = 1;
-   need_fcst_clus_split = 1;
+   need_fcst_filter     = true;
+   need_fcst_conv       = true;
+   need_fcst_thresh     = true;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
 
-   need_obs_filter      = 1;
-   need_obs_conv        = 1;
-   need_obs_thresh      = 1;
-   need_obs_split       = 1;
-   need_obs_merge       = 1;
-   need_obs_clus_split  = 1;
+   need_obs_filter      = true;
+   need_obs_conv        = true;
+   need_obs_thresh      = true;
+   need_obs_split       = true;
+   need_obs_merge       = true;
+   need_obs_clus_split  = true;
 
-   need_match           = 1;
+   need_match           = true;
 
    fcst_raw         = new ShapeData;
    fcst_filter      = new ShapeData;
@@ -209,8 +211,8 @@ void Engine::init_from_scratch() {
    obs_split        = new ShapeData;
    obs_clus_split   = new ShapeData;
 
-   fcst_engine      = (Engine *) 0;
-   obs_engine       = (Engine *) 0;
+   fcst_engine      = (ModeFuzzyEngine *) 0;
+   obs_engine       = (ModeFuzzyEngine *) 0;
 
    n_fcst           = 0;
    n_obs            = 0;
@@ -234,7 +236,7 @@ void Engine::init_from_scratch() {
 
    if(!fcst_single || !obs_single || !pair ||
       !fcst_clus   || !obs_clus   || !pair_clus) {
-      mlog << Error << "\nEngine::init_from_scratch() -> "
+      mlog << Error << "\nModeFuzzyEngine::init_from_scratch() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -248,7 +250,7 @@ void Engine::init_from_scratch() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::clear_features() {
+void ModeFuzzyEngine::clear_features() {
    int j;
 
    for(j=0; j<max_singles; j++) {
@@ -272,7 +274,7 @@ void Engine::clear_features() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::clear_colors() {
+void ModeFuzzyEngine::clear_colors() {
    int j;
 
    for(j=0; j<max_singles; j++) {
@@ -285,7 +287,9 @@ void Engine::clear_colors() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd) {
+void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd) 
+
+{
 
    ConcatString path;
 
@@ -301,21 +305,22 @@ void Engine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd) {
    ctable.read(path);
 
    return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::set_fcst(const ShapeData &fcst_wd) {
+void ModeFuzzyEngine::set_fcst(const ShapeData &fcst_wd) {
 
    *fcst_raw = fcst_wd;
 
-   need_fcst_filter     = 1;
-   need_fcst_conv       = 1;
-   need_fcst_thresh     = 1;
-   need_fcst_split      = 1;
-   need_fcst_merge      = 1;
-   need_fcst_clus_split = 1;
-   need_match           = 1;
+   need_fcst_filter     = true;
+   need_fcst_conv       = true;
+   need_fcst_thresh     = true;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
 
    int k = conf_info.zero_border_size;
    fcst_raw->zero_border(k, bad_data_double);
@@ -330,17 +335,17 @@ void Engine::set_fcst(const ShapeData &fcst_wd) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::set_obs(const ShapeData &obs_wd) {
+void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
 
    *obs_raw = obs_wd;
 
-   need_obs_filter     = 1;
-   need_obs_conv       = 1;
-   need_obs_thresh     = 1;
-   need_obs_split      = 1;
-   need_obs_merge      = 1;
-   need_obs_clus_split = 1;
-   need_match          = 1;
+   need_obs_filter     = true;
+   need_obs_conv       = true;
+   need_obs_thresh     = true;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
 
    int k = conf_info.zero_border_size;
    obs_raw->zero_border(k, bad_data_double);
@@ -357,7 +362,7 @@ void Engine::set_obs(const ShapeData &obs_wd) {
 ///////////////////////////////////////////////////////////////////////
 
 
-int Engine::two_to_one(int n_f, int n_o) const {
+int ModeFuzzyEngine::two_to_one(int n_f, int n_o) const {
    int n;
 
    n = n_o*n_fcst + n_f;
@@ -368,7 +373,7 @@ int Engine::two_to_one(int n_f, int n_o) const {
 ///////////////////////////////////////////////////////////////////////
 
 
-void Engine::do_fcst_filter() {
+void ModeFuzzyEngine::do_fcst_filter() {
    SingleThresh st;
 
    if(!need_fcst_filter) return;
@@ -386,20 +391,20 @@ void Engine::do_fcst_filter() {
    *fcst_thresh = *fcst_filter;
    fcst_thresh->threshold(conf_info.fcst_conv_thresh);
 
-   need_fcst_filter     = 0;
-   need_fcst_conv       = 1;
-   need_fcst_thresh     = 1;
-   need_fcst_split      = 1;
-   need_fcst_merge      = 1;
-   need_fcst_clus_split = 1;
-   need_match           = 1;
+   need_fcst_filter     = false;
+   need_fcst_conv       = true;
+   need_fcst_thresh     = true;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_filter() {
+void ModeFuzzyEngine::do_obs_filter() {
    SingleThresh st;
 
    if(!need_obs_filter) return;
@@ -417,20 +422,20 @@ void Engine::do_obs_filter() {
    *obs_thresh = *obs_filter;
    obs_thresh->threshold(conf_info.obs_conv_thresh);
 
-   need_obs_filter     = 0;
-   need_obs_conv       = 1;
-   need_obs_thresh     = 1;
-   need_obs_split      = 1;
-   need_obs_merge      = 1;
-   need_obs_clus_split = 1;
-   need_match          = 1;
+   need_obs_filter     = false;
+   need_obs_conv       = true;
+   need_obs_thresh     = true;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_convolution() {
+void ModeFuzzyEngine::do_fcst_convolution() {
    int r;
 
    if(need_fcst_filter) do_fcst_filter();
@@ -448,19 +453,19 @@ void Engine::do_fcst_convolution() {
 
    fcst_conv->zero_border(conf_info.zero_border_size, bad_data_double);
 
-   need_fcst_conv       = 0;
-   need_fcst_thresh     = 1;
-   need_fcst_split      = 1;
-   need_fcst_merge      = 1;
-   need_fcst_clus_split = 1;
-   need_match           = 1;
+   need_fcst_conv       = false;
+   need_fcst_thresh     = true;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_convolution() {
+void ModeFuzzyEngine::do_obs_convolution() {
    int r;
 
    if(need_obs_filter) do_obs_filter();
@@ -478,19 +483,19 @@ void Engine::do_obs_convolution() {
 
    obs_conv->zero_border(conf_info.zero_border_size, bad_data_double);
 
-   need_obs_conv       = 0;
-   need_obs_thresh     = 1;
-   need_obs_split      = 1;
-   need_obs_merge      = 1;
-   need_obs_clus_split = 1;
-   need_match          = 1;
+   need_obs_conv       = false;
+   need_obs_thresh     = true;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_thresholding() {
+void ModeFuzzyEngine::do_fcst_thresholding() {
 
    if(need_fcst_conv) do_fcst_convolution();
 
@@ -515,18 +520,18 @@ void Engine::do_fcst_thresholding() {
                                   conf_info.fcst_inten_perc_value,
                                   conf_info.fcst_inten_perc_thresh);
 
-   need_fcst_thresh     = 0;
-   need_fcst_split      = 1;
-   need_fcst_merge      = 1;
-   need_fcst_clus_split = 1;
-   need_match           = 1;
+   need_fcst_thresh     = false;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_thresholding() {
+void ModeFuzzyEngine::do_obs_thresholding() {
 
    if(need_obs_conv) do_obs_convolution();
 
@@ -551,18 +556,18 @@ void Engine::do_obs_thresholding() {
                                  conf_info.obs_inten_perc_value,
                                  conf_info.obs_inten_perc_thresh);
 
-   need_obs_thresh     = 0;
-   need_obs_split      = 1;
-   need_obs_merge      = 1;
-   need_obs_clus_split = 1;
-   need_match          = 1;
+   need_obs_thresh     = false;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_splitting() {
+void ModeFuzzyEngine::do_fcst_splitting() {
 
    if(need_fcst_thresh) do_fcst_thresholding();
 
@@ -570,17 +575,17 @@ void Engine::do_fcst_splitting() {
 
    *fcst_split = split(*fcst_mask, n_fcst);
 
-   need_fcst_split      = 0;
-   need_fcst_merge      = 1;
-   need_fcst_clus_split = 1;
-   need_match           = 1;
+   need_fcst_split      = false;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_splitting() {
+void ModeFuzzyEngine::do_obs_splitting() {
 
    if(need_obs_thresh) do_obs_thresholding();
 
@@ -588,17 +593,17 @@ void Engine::do_obs_splitting() {
 
    *obs_split = split(*obs_mask, n_obs);
 
-   need_obs_split      = 0;
-   need_obs_merge      = 1;
-   need_obs_clus_split = 1;
-   need_match          = 1;
+   need_obs_split      = false;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_merging() {
+void ModeFuzzyEngine::do_fcst_merging() {
 
    do_fcst_merging("", "");
 
@@ -607,7 +612,7 @@ void Engine::do_fcst_merging() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_merging() {
+void ModeFuzzyEngine::do_obs_merging() {
 
    do_obs_merging("", "");
 
@@ -616,7 +621,7 @@ void Engine::do_obs_merging() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_merging(const char *default_config,
+void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
                              const char *merge_config) {
 
    if(need_fcst_thresh) do_fcst_thresholding();
@@ -635,16 +640,16 @@ void Engine::do_fcst_merging(const char *default_config,
    // Done
    //
 
-   need_fcst_merge      = 0;
-   need_fcst_clus_split = 1;
-   need_match           = 1;
+   need_fcst_merge      = false;
+   need_fcst_clus_split = true;
+   need_match           = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_merging(const char *default_config,
+void ModeFuzzyEngine::do_obs_merging(const char *default_config,
                             const char *merge_config) {
 
    if(need_obs_thresh) do_obs_thresholding();
@@ -663,21 +668,21 @@ void Engine::do_obs_merging(const char *default_config,
    // Done
    //
 
-   need_obs_merge      = 0;
-   need_obs_clus_split = 1;
-   need_match          = 1;
+   need_obs_merge      = false;
+   need_obs_clus_split = true;
+   need_match          = true;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_matching() {
+void ModeFuzzyEngine::do_matching() {
 
    if(!need_match) return;
 
    if(conf_info.match_flag == MatchType_None) {
-      mlog << Warning << "\nEngine::do_matching() -> "
+      mlog << Warning << "\nModeFuzzyEngine::do_matching() -> "
            << "no matching requested in configuration file\n";
       do_no_match();
    }
@@ -691,7 +696,7 @@ void Engine::do_matching() {
       do_match_only();
    }
    else {
-      mlog << Error << "\nEngine::do_matching() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_matching() -> "
            << "invalid match_flag value specified.  match_flag must be "
            << "between 0 and 3.\n\n";
       exit(1);
@@ -712,9 +717,9 @@ void Engine::do_matching() {
    // Done
    //
 
-   need_match           = 0;
-   need_fcst_clus_split = 0;
-   need_obs_clus_split  = 0;
+   need_match           = false;
+   need_fcst_clus_split = false;
+   need_obs_clus_split  = false;
 
    return;
 }
@@ -725,7 +730,7 @@ void Engine::do_matching() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_no_match() {
+void ModeFuzzyEngine::do_no_match() {
    int j;
    ShapeData * fcst_shape = (ShapeData *) 0;
    ShapeData * obs_shape = (ShapeData *) 0;
@@ -735,7 +740,7 @@ void Engine::do_no_match() {
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
 
-      mlog << Error << "\nEngine::do_no_match() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_no_match() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -748,7 +753,7 @@ void Engine::do_no_match() {
 
    if(!fcst_shape || !obs_shape) {
 
-      mlog << Error << "\nEngine::do_no_match() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_no_match() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -787,7 +792,7 @@ void Engine::do_no_match() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_match_merge() {
+void ModeFuzzyEngine::do_match_merge() {
    int j, k, n;
    InterestInfo junkinfo;
    ShapeData * fcst_shape = (ShapeData *) 0;
@@ -798,7 +803,7 @@ void Engine::do_match_merge() {
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
 
-      mlog << Error << "\nEngine::do_match_merge() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_merge() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -811,7 +816,7 @@ void Engine::do_match_merge() {
 
    if(!fcst_shape || !obs_shape) {
 
-      mlog << Error << "\nEngine::do_match_merge() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_merge() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -903,7 +908,7 @@ void Engine::do_match_merge() {
    //
    if(collection.n_sets > ctable.n_entries()) {
 
-      mlog << Error << "\nEngine::do_match_merge() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_merge() -> "
            << "not enough colors ... need at least " << (collection.n_sets)
            << "\n\n";
       exit(1);
@@ -951,7 +956,7 @@ void Engine::do_match_merge() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_merge_thresh() {
+void ModeFuzzyEngine::do_fcst_merge_thresh() {
    int j, k, x, y;
    int n_fcst_merge, intersection;
    int count, first_k;
@@ -963,7 +968,7 @@ void Engine::do_fcst_merge_thresh() {
 
    if(n_fcst >= max_singles) {
 
-      mlog << Error << "\nEngine::do_fcst_merge_thresh() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_thresh() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_fcst << "\n\n";
       exit(1);
@@ -994,7 +999,7 @@ void Engine::do_fcst_merge_thresh() {
 
    if(!fcst_shape || !fcst_merge_shape) {
 
-      mlog << Error << "\nEngine::do_fcst_merge_thresh() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_thresh() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1080,7 +1085,7 @@ void Engine::do_fcst_merge_thresh() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_merge_thresh() {
+void ModeFuzzyEngine::do_obs_merge_thresh() {
    int j, k, x, y;
    int n_obs_merge, intersection;
    int count, first_k;
@@ -1092,7 +1097,7 @@ void Engine::do_obs_merge_thresh() {
 
    if(n_obs >= max_singles) {
 
-      mlog << Error << "\nEngine::do_obs_merge_thresh() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_thresh() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_obs << "\n\n";
       exit(1);
@@ -1123,7 +1128,7 @@ void Engine::do_obs_merge_thresh() {
 
    if(!obs_shape || !obs_merge_shape) {
 
-      mlog << Error << "\nEngine::do_obs_merge_thresh() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_thresh() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1201,15 +1206,17 @@ void Engine::do_obs_merge_thresh() {
    return;
 }
 
-///////////////////////////////////////////////////////////////////////
-//
-// Perform merging of the forecast field using a fuzzy engine matching
-// approach
-//
-///////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////
+   //
+   // Perform merging of the forecast field using a fuzzy engine matching
+   // approach
+   //
+   ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_merge_engine(const char *default_config,
-                                  const char *merge_config) {
+void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const char *merge_config)
+
+{
+
    int i, j;
    ShapeData fcst_merge_split;
    ConcatString path;
@@ -1217,7 +1224,7 @@ void Engine::do_fcst_merge_engine(const char *default_config,
    do_fcst_splitting();
 
    if(n_fcst >= max_singles) {
-      mlog << Error << "\nEngine::do_fcst_merge_engine() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_engine() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_fcst << "\n\n";
       exit(1);
@@ -1226,10 +1233,10 @@ void Engine::do_fcst_merge_engine(const char *default_config,
    //
    // Will be deleted by destructor if allocated
    //
-   fcst_engine = new Engine;
+   fcst_engine = new ModeFuzzyEngine;
 
    if(!fcst_engine) {
-      mlog << Error << "\nEngine::do_fcst_merge_engine() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_engine() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1292,21 +1299,21 @@ void Engine::do_fcst_merge_engine(const char *default_config,
    fcst_engine->n_fcst = n_fcst;
    fcst_engine->n_obs  = n_fcst;
 
-   fcst_engine->need_fcst_filter     = 0;
-   fcst_engine->need_fcst_conv       = 0;
-   fcst_engine->need_fcst_thresh     = 0;
-   fcst_engine->need_fcst_split      = 0;
-   fcst_engine->need_fcst_merge      = 1;
-   fcst_engine->need_fcst_clus_split = 1;
+   fcst_engine->need_fcst_filter     = false;
+   fcst_engine->need_fcst_conv       = false;
+   fcst_engine->need_fcst_thresh     = false;
+   fcst_engine->need_fcst_split      = false;
+   fcst_engine->need_fcst_merge      = true;
+   fcst_engine->need_fcst_clus_split = true;
 
-   fcst_engine->need_obs_filter      = 0;
-   fcst_engine->need_obs_conv        = 0;
-   fcst_engine->need_obs_thresh      = 0;
-   fcst_engine->need_obs_split       = 0;
-   fcst_engine->need_obs_merge       = 1;
-   fcst_engine->need_obs_clus_split  = 1;
+   fcst_engine->need_obs_filter      = false;
+   fcst_engine->need_obs_conv        = false;
+   fcst_engine->need_obs_thresh      = false;
+   fcst_engine->need_obs_split       = false;
+   fcst_engine->need_obs_merge       = true;
+   fcst_engine->need_obs_clus_split  = true;
 
-   fcst_engine->need_match           = 1;
+   fcst_engine->need_match           = true;
 
    //
    // Copy the top level set collection down to the fcst engine
@@ -1377,7 +1384,7 @@ void Engine::do_fcst_merge_engine(const char *default_config,
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_merge_engine(const char *default_config,
+void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
                                  const char *merge_config) {
    int i, j;
    ShapeData obs_merge_split;
@@ -1387,7 +1394,7 @@ void Engine::do_obs_merge_engine(const char *default_config,
 
    if(n_obs >= max_singles) {
 
-      mlog << Error << "\nEngine::do_obs_merge_engine() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_engine() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << n_obs << "\n\n";
       exit(1);
@@ -1396,10 +1403,10 @@ void Engine::do_obs_merge_engine(const char *default_config,
    //
    // Will be deleted by destructor if allocated
    //
-   obs_engine = new Engine;
+   obs_engine = new ModeFuzzyEngine;
 
    if(!obs_engine) {
-      mlog << Error << "\nEngine::do_obs_merge_engine() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_engine() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1462,21 +1469,21 @@ void Engine::do_obs_merge_engine(const char *default_config,
    obs_engine->n_fcst = n_obs;
    obs_engine->n_obs  = n_obs;
 
-   obs_engine->need_fcst_filter     = 0;
-   obs_engine->need_fcst_conv       = 0;
-   obs_engine->need_fcst_thresh     = 0;
-   obs_engine->need_fcst_split      = 0;
-   obs_engine->need_fcst_merge      = 1;
-   obs_engine->need_fcst_clus_split = 1;
+   obs_engine->need_fcst_filter     = false;
+   obs_engine->need_fcst_conv       = false;
+   obs_engine->need_fcst_thresh     = false;
+   obs_engine->need_fcst_split      = false;
+   obs_engine->need_fcst_merge      = true;
+   obs_engine->need_fcst_clus_split = true;
 
-   obs_engine->need_obs_filter      = 0;
-   obs_engine->need_obs_conv        = 0;
-   obs_engine->need_obs_thresh      = 0;
-   obs_engine->need_obs_split       = 0;
-   obs_engine->need_obs_merge       = 1;
-   obs_engine->need_obs_clus_split  = 1;
+   obs_engine->need_obs_filter      = false;
+   obs_engine->need_obs_conv        = false;
+   obs_engine->need_obs_thresh      = false;
+   obs_engine->need_obs_split       = false;
+   obs_engine->need_obs_merge       = true;
+   obs_engine->need_obs_clus_split  = true;
 
-   obs_engine->need_match           = 1;
+   obs_engine->need_match           = true;
 
    //
    // Copy the top level set collection down to the obs engine
@@ -1549,7 +1556,7 @@ void Engine::do_obs_merge_engine(const char *default_config,
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_match_fcst_merge() {
+void ModeFuzzyEngine::do_match_fcst_merge() {
    int j, k, n;
    InterestInfo junkinfo;
    ShapeData * fcst_shape = (ShapeData *) 0;
@@ -1559,7 +1566,7 @@ void Engine::do_match_fcst_merge() {
    do_obs_splitting();
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-      mlog << Error << "\nEngine::do_match_fcst_merge() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_fcst_merge() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -1571,7 +1578,7 @@ void Engine::do_match_fcst_merge() {
    obs_shape = new ShapeData [n_obs];
 
    if(!fcst_shape || !obs_shape) {
-      mlog << Error << "\nEngine::do_match_fcst_merge() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_fcst_merge() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1667,7 +1674,7 @@ void Engine::do_match_fcst_merge() {
    // Assign the colors
    //
    if(collection.n_sets > ctable.n_entries()) {
-      mlog << Error << "\nEngine::do_match_fcst_merge() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_fcst_merge() -> "
            << "not enough colors ... need at least " << (collection.n_sets)
            << "\n\n";
       exit(1);
@@ -1715,7 +1722,7 @@ void Engine::do_match_fcst_merge() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_match_only() {
+void ModeFuzzyEngine::do_match_only() {
    int j, k, n;
    InterestInfo junkinfo;
    ShapeData * fcst_shape = (ShapeData *) 0;
@@ -1725,7 +1732,7 @@ void Engine::do_match_only() {
    do_obs_splitting();
 
    if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-      mlog << Error << "\nEngine::do_match_only() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_only() -> "
            << "too many shapes ... increase \"max_singles\" to at least "
            << max(n_fcst, n_obs) << "\n\n";
       exit(1);
@@ -1737,7 +1744,7 @@ void Engine::do_match_only() {
    obs_shape = new ShapeData [n_obs];
 
    if(!fcst_shape || !obs_shape) {
-      mlog << Error << "\nEngine::do_match_only() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_only() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -1832,7 +1839,7 @@ void Engine::do_match_only() {
    // Assign the colors
    //
    if(collection.n_sets > ctable.n_entries()) {
-      mlog << Error << "\nEngine::do_match_only() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_match_only() -> "
            << "not enough colors ... need at least " << (collection.n_sets)
            << "\n\n";
       exit(1);
@@ -1876,7 +1883,7 @@ void Engine::do_match_only() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_fcst_clus_splitting() {
+void ModeFuzzyEngine::do_fcst_clus_splitting() {
    int x, y, set_number;
    double v;
    ShapeData junk;
@@ -1905,7 +1912,7 @@ void Engine::do_fcst_clus_splitting() {
    // Done
    //
 
-   need_fcst_clus_split = 0;
+   need_fcst_clus_split = false;
 
    return;
 }
@@ -1917,7 +1924,7 @@ void Engine::do_fcst_clus_splitting() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_obs_clus_splitting() {
+void ModeFuzzyEngine::do_obs_clus_splitting() {
    int x, y, set_number;
    double v;
    ShapeData junk;
@@ -1946,14 +1953,14 @@ void Engine::do_obs_clus_splitting() {
    // Done
    //
 
-   need_obs_clus_split = 0;
+   need_obs_clus_split = false;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void Engine::do_cluster_features() {
+void ModeFuzzyEngine::do_cluster_features() {
    int j;
    ShapeData * fcst_clus_shape = (ShapeData *) 0;
    ShapeData * obs_clus_shape  = (ShapeData *) 0;
@@ -1971,7 +1978,7 @@ void Engine::do_cluster_features() {
 
    if(!fcst_clus_shape || !obs_clus_shape) {
 
-      mlog << Error << "\nEngine::do_cluster_features() -> "
+      mlog << Error << "\nModeFuzzyEngine::do_cluster_features() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -2022,7 +2029,7 @@ void Engine::do_cluster_features() {
 
 ///////////////////////////////////////////////////////////////////////
 
-int Engine::get_info_index(int pair_n) const {
+int ModeFuzzyEngine::get_info_index(int pair_n) const {
    int i;
 
    for(i=0; i<max_singles*max_singles; i++) {
@@ -2035,7 +2042,7 @@ int Engine::get_info_index(int pair_n) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-int Engine::get_matched_fcst(int area) const {
+int ModeFuzzyEngine::get_matched_fcst(int area) const {
    int i, count;
 
    count = 0;
@@ -2053,7 +2060,7 @@ int Engine::get_matched_fcst(int area) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-int Engine::get_unmatched_fcst(int area) const {
+int ModeFuzzyEngine::get_unmatched_fcst(int area) const {
    int i, count;
 
    count = 0;
@@ -2071,7 +2078,7 @@ int Engine::get_unmatched_fcst(int area) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-int Engine::get_matched_obs(int area) const {
+int ModeFuzzyEngine::get_matched_obs(int area) const {
    int i, count;
 
    count = 0;
@@ -2089,7 +2096,7 @@ int Engine::get_matched_obs(int area) const {
 
 ///////////////////////////////////////////////////////////////////////
 
-int Engine::get_unmatched_obs(int area) const {
+int ModeFuzzyEngine::get_unmatched_obs(int area) const {
    int i, count;
 
    count = 0;
@@ -2377,7 +2384,7 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
 
 ///////////////////////////////////////////////////////////////////////
 
-double interest_percentile(Engine &eng, const double p, const int flag) {
+double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag) {
    int i, fcst_i, obs_i, n_values;
    double interest, ptile;
    double *v = (double *) 0;
@@ -2455,7 +2462,7 @@ double interest_percentile(Engine &eng, const double p, const int flag) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_engine_stats(Engine &eng, const Grid &grid, AsciiTable &at) {
+void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) {
    int i, j, row;
 
    //
@@ -2547,7 +2554,7 @@ void write_engine_stats(Engine &eng, const Grid &grid, AsciiTable &at) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_header(Engine &eng, AsciiTable &at, const int row) {
+void write_header(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
    int i;
    char tmp_str[max_str_len];
 
@@ -2577,7 +2584,7 @@ void write_header(Engine &eng, AsciiTable &at, const int row) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_header_columns(Engine &eng, AsciiTable &at, const int row) {
+void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
    int mon, day, yr, hr, min, sec;
    char tmp_str[max_str_len];
 
@@ -2655,14 +2662,14 @@ void write_header_columns(Engine &eng, AsciiTable &at, const int row) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_fcst_single(Engine &eng, const int n, const Grid &grid,
+void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                        AsciiTable &at, const int row) {
    int i;
    double lat, lon;
    char tmp_str[max_str_len];
 
    if(n >= eng.n_fcst) {
-      mlog << Error << "\nwrite_fcst_single(const Engine &, int, "
+      mlog << Error << "\nwrite_fcst_single(const ModeFuzzyEngine &, int, "
            << "AsciiTable, int) -> "
            << n << " >= number of fcst, " << eng.n_fcst << "\n\n";
       exit(1);
@@ -2774,14 +2781,14 @@ void write_fcst_single(Engine &eng, const int n, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_obs_single(Engine &eng, const int n, const Grid &grid,
+void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                       AsciiTable &at, const int row) {
    int i;
    double lat, lon;
    char tmp_str[max_str_len];
 
    if(n >= eng.n_obs) {
-      mlog << Error << "\nwrite_obs_single(const Engine &, int, "
+      mlog << Error << "\nwrite_obs_single(const ModeFuzzyEngine &, int, "
            << "AsciiTable, int) -> "
            << n << " >= number of obs, " << eng.n_obs << "\n\n";
       exit(1);
@@ -2893,13 +2900,13 @@ void write_obs_single(Engine &eng, const int n, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_pair(Engine &eng, const int n_f, const int n_o,
+void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
                 AsciiTable &at, int &row) {
    int n, i, fcst_i, obs_i;
    char tmp_str[max_str_len];
 
    if(n_f >= eng.n_fcst || n_o >= eng.n_obs) {
-      mlog << Error << "\nwrite_pair(const Engine &, int, int, "
+      mlog << Error << "\nwrite_pair(const ModeFuzzyEngine &, int, int, "
            << "AsciiTable &, const int) -> "
            << n_f << " >= number of fcst, " << eng.n_fcst << " or "
            << n_o << " >= number of obs, " << eng.n_obs << "\n\n";
@@ -2989,7 +2996,7 @@ void write_pair(Engine &eng, const int n_f, const int n_o,
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_fcst_cluster(Engine &eng, const int n, const Grid &grid,
+void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                           AsciiTable &at, const int row) {
    int i;
    double lat, lon;
@@ -3099,7 +3106,7 @@ void write_fcst_cluster(Engine &eng, const int n, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_obs_cluster(Engine &eng, const int n, const Grid &grid,
+void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                          AsciiTable &at, const int row) {
    int i;
    double lat, lon;
@@ -3209,7 +3216,7 @@ void write_obs_cluster(Engine &eng, const int n, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_cluster_pair(Engine &eng, const int n,
+void write_cluster_pair(ModeFuzzyEngine &eng, const int n,
                           AsciiTable &at, const int row) {
    int i;
    char tmp_str[max_str_len];
@@ -3286,7 +3293,7 @@ void write_cluster_pair(Engine &eng, const int n,
 
 ///////////////////////////////////////////////////////////////////////
 
-void calc_fcst_clus_ch_mask(const Engine &eng, ShapeData &mask) {
+void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    int i, x, y;
    ShapeData comp;
    Polyline poly;
@@ -3349,7 +3356,7 @@ void calc_fcst_clus_ch_mask(const Engine &eng, ShapeData &mask) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void calc_obs_clus_ch_mask(const Engine &eng, ShapeData &mask) {
+void calc_obs_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    int i, x, y;
    ShapeData comp;
    Polyline poly;
@@ -3411,7 +3418,7 @@ void calc_obs_clus_ch_mask(const Engine &eng, ShapeData &mask) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void calc_fcst_cluster_mask(const Engine &eng, ShapeData &comp, const int n_set) {
+void calc_fcst_cluster_mask(const ModeFuzzyEngine &eng, ShapeData &comp, const int n_set) {
    int i, x, y;
    ShapeData junk;
 
@@ -3440,7 +3447,7 @@ void calc_fcst_cluster_mask(const Engine &eng, ShapeData &comp, const int n_set)
 
 ///////////////////////////////////////////////////////////////////////
 
-void calc_obs_cluster_mask(const Engine &eng, ShapeData &comp, const int n_set) {
+void calc_obs_cluster_mask(const ModeFuzzyEngine &eng, ShapeData &comp, const int n_set) {
    int i, x, y;
    ShapeData junk;
 
@@ -3469,14 +3476,17 @@ void calc_obs_cluster_mask(const Engine &eng, ShapeData &comp, const int n_set) 
 
 ///////////////////////////////////////////////////////////////////////
 
-double area_ratio_conf(double t) {
-   return(t);
+
+double aspect_ratio_conf(double t)
+
+{
+
+const double tm1   = t - 1.0;
+const double ratio = (tm1*tm1)/(t*t + 1.0);
+
+return( pow(ratio, 0.3) );
+
 }
 
-///////////////////////////////////////////////////////////////////////
-
-double aspect_ratio_conf(double t) {
-   return(pow(pow(t-1, 2)/(pow(t, 2) + 1), 0.3));
-}
 
 ///////////////////////////////////////////////////////////////////////

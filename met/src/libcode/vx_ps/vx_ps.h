@@ -145,6 +145,8 @@ class PSfile {
       bool is_portrait  () const;
       bool is_landscape () const;
 
+      int pagenumber() const;
+
          //
          //  do stuff
          //
@@ -161,6 +163,7 @@ class PSfile {
       virtual void showpage();
 
       virtual void pagenumber(int);
+      virtual void inc_pagenumber();   //  increment page number
 
       virtual void gsave();
       virtual void grestore();
@@ -194,6 +197,7 @@ class PSfile {
 
       virtual void setrgbcolor(double, double, double);
       virtual void sethsbcolor(double, double, double);
+
 };
 
 
@@ -212,6 +216,10 @@ inline double PSfile::page_height () const { return ( (Orientation == Orientatio
 
 inline bool PSfile::is_portrait  () const { return ( Orientation == OrientationPortrait  ); }
 inline bool PSfile::is_landscape () const { return ( Orientation == OrientationLandscape ); }
+
+inline int PSfile::pagenumber() const { return ( showpage_count + 1); }
+
+inline void PSfile::inc_pagenumber() { pagenumber(showpage_count + 1);  return; }
 
 
 //////////////////////////////////////////////////////////////

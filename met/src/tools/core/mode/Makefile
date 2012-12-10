@@ -16,7 +16,14 @@
 EXECUTABLES = mode
 
 
-OBJECTS     =
+OBJECTS     = mode_ps_file.o       \
+              plot_engine.o        \
+              page_1.o             \
+              fcst_enlarge_page.o  \
+               obs_enlarge_page.o  \
+              cluster_page.o       \
+              overlap_page.o       \
+              mode_exec.o          \
 
 
 LIBRARIES   =
@@ -59,6 +66,31 @@ gen_sources: $(GEN_SOURCES)
    ##  objects
    ##
 
+mode_ps_file.o: mode_ps_file.h mode_ps_file.cc
+	$(CXX) mode_ps_file.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
+plot_engine.o: mode_ps_file.h plot_engine.cc
+	$(CXX) plot_engine.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
+page_1.o: page_1.cc mode_ps_file.h
+	$(CXX) page_1.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
+fcst_enlarge_page.o: fcst_enlarge_page.cc mode_ps_file.h
+	$(CXX) fcst_enlarge_page.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
+obs_enlarge_page.o: obs_enlarge_page.cc mode_ps_file.h
+	$(CXX) obs_enlarge_page.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
+overlap_page.o: overlap_page.cc mode_ps_file.h
+	$(CXX) overlap_page.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
+cluster_page.o: cluster_page.cc mode_ps_file.h
+	$(CXX) cluster_page.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
+
+mode_exec.o: mode_exec.h mode_exec.cc
+	$(CXX) mode_exec.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+
 
 ########################################################################
 
@@ -76,7 +108,7 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 mode: mode.cc $(OBJECTS)
-	$(CXX) -o $(EXECUTABLES) mode.cc $(OBJECTS) \
+	$(CXX) -o mode mode.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
@@ -95,7 +127,6 @@ mode: mode.cc $(OBJECTS)
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
@@ -107,7 +138,7 @@ mode: mode.cc $(OBJECTS)
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
-	cp $(EXECUTABLES) $(MET_BIN_DIR)
+	cp mode $(MET_BIN_DIR)
 
 
 ########################################################################
