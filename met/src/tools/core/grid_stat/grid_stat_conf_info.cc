@@ -401,8 +401,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    // Check that the number of wind speed thresholds match
    if(fcst_wind_ta.n_elements() != obs_wind_ta.n_elements()) {
       mlog << Error << "\nGridStatConfInfo::process_config() -> "
-           << "The number of thresholds in \"fcst_wind_thresh\" must "
-           << "match the number of thresholds in \"obs_wind_thresh\".\n\n";
+           << "The number of thresholds in \"fcst.wind_thresh\" must "
+           << "match the number of thresholds in \"obs.wind_thresh\".\n\n";
       exit(1);
    }
    
