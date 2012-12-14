@@ -33,6 +33,8 @@ extern ConcatString   parse_conf_model(Dictionary *dict);
 extern GrdFileType    parse_conf_file_type(Dictionary *dict);
 extern map<STATLineType,STATOutputType>
                       parse_conf_output_flag(Dictionary *dict);
+extern map<STATLineType,StringArray>
+                      parse_conf_output_stats(Dictionary *dict);
 extern int            parse_conf_n_vx(Dictionary *dict);
 extern Dictionary     parse_conf_i_vx_dict(Dictionary *dict, int index);
 extern StringArray    parse_conf_message_type(Dictionary *dict);

@@ -274,6 +274,7 @@ static const char conf_key_cat_thresh[]        = "cat_thresh";
 static const char conf_key_prob[]              = "prob";
 static const char conf_key_thresh_lo[]         = "thresh_lo";
 static const char conf_key_thresh_hi[]         = "thresh_hi";
+static const char conf_key_wind_thresh[]       = "wind_thresh";
 static const char conf_key_fcst_wind_thresh[]  = "fcst.wind_thresh";
 static const char conf_key_obs_wind_thresh[]   = "obs.wind_thresh";
 static const char conf_key_mask_grid[]         = "mask.grid";
@@ -533,6 +534,13 @@ static const char conf_key_max_minutes[]   = "max_minutes";
 static const char conf_key_variable_name[] = "variable_name";
 static const char conf_key_units[]         = "units";
 static const char conf_key_long_name[]     = "long_name";
+
+//
+// Series-Analysis specific parameter key names
+//
+
+static const char conf_key_output_stats[] = "output_stats";
+static const char conf_key_block_thresh[] = "block_thresh";
 
 //
 // Parameter value names common to multiple tools

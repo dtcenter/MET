@@ -144,6 +144,40 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
+   Dictionary *out_dict = (Dictionary *) 0;
+   map<STATLineType,StringArray> output_map;
+   STATLineType line_type;
+   StringArray sa;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_output_stats() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the output flag dictionary
+   out_dict = dict->lookup_dictionary(conf_key_output_stats);
+
+   // Loop over the output flag dictionary entries
+   for(i=0; i<out_dict->n_entries(); i++) {
+
+      // Get the line type for the current entry
+      line_type = string_to_statlinetype((*out_dict)[i]->name());
+
+      // Get the StringArray value for the current entry
+      sa = out_dict->lookup_string_array((*out_dict)[i]->name());
+
+      // Store entry line type and corresponding list of statistics
+      output_map[line_type].add(sa);
+   }
+
+   return(output_map);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Compute the number of verification tasks specified in the current
 // dictionary array.

@@ -1,0 +1,94 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Series-Analysis configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   wind_thresh = [ NA ];
+   cat_thresh  = [ >0.0, >=5.0 ];
+
+   field = [
+      {
+        name  = "APCP";
+        level = [ "A03" ];
+      }
+   ];
+
+};
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "";
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid = "";
+   poly = "";
+};
+
+//
+// Ratio of the grid points to be processed concurrently.  Set to 1 for
+// all grid points.  Set smaller to use less memory.
+//
+block_thresh = 1.0;
+
+//
+// Ratio of valid matched pairs to compute statistics for a grid point
+//
+vld_thresh = 1.0;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_stats = {
+   fho    = [ "ALL" ];
+   ctc    = [ "ALL" ];
+   cts    = [ "ALL" ];
+   mctc   = [ "ALL" ];
+   mcts   = [ "ALL" ];
+   cnt    = [ "RMSE", "FBAR", "OBAR" ];
+   sl1l2  = [ "ALL" ];
+   pct    = [ "ALL" ];
+   pstd   = [ "ALL" ];
+   pjc    = [ "ALL" ];
+   prc    = [ "ALL" ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+rank_corr_flag = TRUE;
+tmp_dir        = "/tmp";
+version        = "V4.0";
+
+////////////////////////////////////////////////////////////////////////////////
