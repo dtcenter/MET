@@ -229,7 +229,7 @@ void process_command_line(int argc, char **argv) {
    // Check that the grids match
    if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
       
-      mlog << Error << "\nprocess_scores() -> "
+      mlog << Error << "\nprocess_command_line() -> "
            << "The forecast and observation grids do not match: "
            << fcst_mtddf->grid().serialize() << " != "
            << obs_mtddf->grid().serialize() << "\n\n";
