@@ -71,9 +71,11 @@ void SeriesAnalysisConfInfo::clear() {
    n_boot_rep = bad_data_int;
    boot_rng.clear();
    boot_seed.clear();
-   mask_grid_name.clear();
-   mask_poly_name.clear();
-   block_thresh = vld_data_thresh = bad_data_double;
+   mask_grid.clear();
+   mask_poly.clear();
+   mask_dp.clear();
+   block_size = bad_data_int;
+   vld_data_thresh = bad_data_double;
    rank_corr_flag = false;
    tmp_dir.clear();
    version.clear();
@@ -249,19 +251,13 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       }
    } // end for i
 
-   // Conf: mask.grid
-   mask_grid_name = conf.lookup_string(conf_key_mask_grid);
-
-   // Conf: mask.poly
-   mask_poly_name = conf.lookup_string(conf_key_mask_poly);
-
-   // Conf: block_thresh
-   block_thresh = conf.lookup_double(conf_key_block_thresh);
+   // Conf: block_size
+   block_size = conf.lookup_int(conf_key_block_size);
    
-   if(block_thresh <= 0.0 || block_thresh > 1.0) {
+   if(block_size <= 0.0) {
       mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
-           << "The \"" << conf_key_block_thresh << "\" parameter ("
-           << block_thresh << ") must be set between 0 and 1.\n\n";
+           << "The \"" << conf_key_block_size << "\" parameter ("
+           << block_size << ") must be greater than 0.\n\n";
       exit(1);
    }
 
@@ -375,6 +371,38 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
+   int i;
+   DataPlane mask_grid_dp, mask_poly_dp;
+   ConcatString name;
+
+   // Initialize the mask to all points on
+   mask_dp.set_size(grid.nx(), grid.ny());
+   mask_dp.set_constant(mask_on_value);
+   
+   // Conf: mask.grid
+   mask_grid = conf.lookup_string(conf_key_mask_grid);
+
+   // Conf: mask.poly
+   mask_poly = conf.lookup_string(conf_key_mask_poly);
+
+   // Parse out the masking grid
+   if(mask_grid.length() > 0) {
+      parse_grid_mask(mask_grid, grid, mask_grid_dp, name);
+      apply_mask(mask_dp, mask_grid_dp);
+   }
+
+   // Parse out the masking polyline
+   if(mask_poly.length() > 0) {
+      parse_poly_mask(mask_poly, grid, mask_poly_dp, name);
+      apply_mask(mask_dp, mask_poly_dp);
+   }
 
    return;
 }

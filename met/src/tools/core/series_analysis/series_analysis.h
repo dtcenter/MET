@@ -60,9 +60,6 @@ static const char * program_name = "series_analysis";
 static const char * default_config_filename =
    "MET_BASE/data/config/SeriesAnalysisConfig_default";
 
-// Default output directory
-static const char * default_out_dir = ".";
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -72,6 +69,8 @@ static const char * default_out_dir = ".";
 // Input files
 static StringArray fcst_files;
 static StringArray obs_files;
+static GrdFileType ftype = FileType_None;
+static GrdFileType otype = FileType_None;
 
 // Output file
 static ConcatString out_file;

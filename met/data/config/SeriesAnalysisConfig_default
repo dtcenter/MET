@@ -56,10 +56,10 @@ mask = {
 };
 
 //
-// Ratio of the grid points to be processed concurrently.  Set to 1 for
-// all grid points.  Set smaller to use less memory.
+// Number of grid points to be processed concurrently.  Set smaller to use
+// less memory but increase the number of passes through the data.
 //
-block_thresh = 1.0;
+block_size = 1024;
 
 //
 // Ratio of valid matched pairs to compute statistics for a grid point
