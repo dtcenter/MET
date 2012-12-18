@@ -59,6 +59,8 @@ class NumArray {
 
       void clear();
 
+      void empty();
+
       void dump(ostream &, int depth = 0) const;
 
       double operator[](int) const;
