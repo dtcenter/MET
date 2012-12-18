@@ -351,11 +351,35 @@ void apply_mask(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void mask_bad_data(DataPlane &dp, const DataPlane &dp_mask) {
+void apply_mask(DataPlane &dp, const DataPlane &mask_dp) {
    int x, y;
 
-   if(dp.nx() != dp_mask.nx() ||
-      dp.ny() != dp_mask.ny() ) {
+   if(dp.nx() != mask_dp.nx() ||
+      dp.ny() != mask_dp.ny() ) {
+
+      mlog << Error << "\napply_mask() -> "
+           << "grid dimensions do not match\n\n";
+      exit(1);
+   }
+
+   for(x=0; x<dp.nx(); x++) {
+      for(y=0; y<dp.ny(); y++) {
+
+         // Put bad data everywhere the mask is turned off
+         if(!mask_dp(x, y)) dp.set(bad_data_double, x, y);
+      }
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void mask_bad_data(DataPlane &dp, const DataPlane &mask_dp) {
+   int x, y;
+
+   if(dp.nx() != mask_dp.nx() ||
+      dp.ny() != mask_dp.ny() ) {
 
       mlog << Error << "\nmask_bad_data() -> "
            << "grid dimensions do not match\n\n";
@@ -365,7 +389,7 @@ void mask_bad_data(DataPlane &dp, const DataPlane &dp_mask) {
    for(x=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
 
-         if(is_bad_data(dp_mask.get(x, y)))
+         if(is_bad_data(mask_dp.get(x, y)))
             dp.set(bad_data_double, x, y);
       }
    }

@@ -56,6 +56,8 @@ extern void fractional_coverage(const DataPlane &, DataPlane &,
 extern void apply_mask(const DataPlane &, const DataPlane &, const DataPlane &,
                        NumArray &, NumArray &);
 
+extern void apply_mask(DataPlane &, const DataPlane &);
+                       
 extern void mask_bad_data(DataPlane &, const DataPlane &);
 
 ///////////////////////////////////////////////////////////////////////////////
