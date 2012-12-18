@@ -56,9 +56,10 @@ class SeriesAnalysisConfInfo {
       int              n_boot_rep;         // Number of bootstrap replicates
       ConcatString     boot_rng;           // GSL random number generator
       ConcatString     boot_seed;          // GSL RNG seed value
-      ConcatString     mask_grid_name;     // Path for masking grid area
-      ConcatString     mask_poly_name;     // Path for masking poly area
-      double           block_thresh;       // Ratio of grid points to be processed concurrently
+      ConcatString     mask_grid;          // Path for masking grid area
+      ConcatString     mask_poly;          // Path for masking poly area
+      DataPlane        mask_dp;
+      int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point
       bool             rank_corr_flag;     // Flag for computing rank correlations
       ConcatString     tmp_dir;            // Directory for temporary files
@@ -74,6 +75,7 @@ class SeriesAnalysisConfInfo {
 
       void read_config   (const char *, const char *);
       void process_config(GrdFileType, GrdFileType);
+      void process_masks (const Grid &);
 
       // Dump out the counts
       int get_n_fcst()        const;

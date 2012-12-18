@@ -42,7 +42,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-static void process_scores      ();
+static void process_scores();
+static void get_series_data(int, VarInfo *, VarInfo *,
+                            DataPlane &, DataPlane &);
+static void get_series_entry(int, VarInfo *, const ConcatString &,
+                             const GrdFileType, DataPlane &);
+static void get_series_entry(int, VarInfo *, const StringArray &,
+                             const GrdFileType, DataPlane &);
+
 
 // static void setup_first_pass(const DataPlane &);
 // static void setup_txt_files (unixtime, int);
@@ -110,7 +117,6 @@ int main(int argc, char *argv[]) {
 
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
-   GrdFileType ftype, otype;
    ConcatString default_config_file;
 
    // Check for zero arguments
@@ -211,6 +217,7 @@ void process_command_line(int argc, char **argv) {
    // If they do, store the grid
    else {
       grid = fcst_mtddf->grid();
+      conf_info.process_masks(grid);
    }
 
    // Set the random number generator and seed value to be used when
@@ -271,9 +278,222 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
+// JHG, should detect if this is a time series
 
-   cout << "JHG, work here!\n";
+void process_scores() {
+   int nxny, i, x, y, i_read, n_reads, i_series, i_point;
+   VarInfo *fcst_info = (VarInfo *) 0;
+   VarInfo *obs_info  = (VarInfo *) 0;
+   NumArray *f_na = (NumArray *) 0;
+   NumArray *o_na = (NumArray *) 0;
+   DataPlane fcst_dp, obs_dp;
+
+   // Determine the block size
+   nxny    = grid.nx() * grid.ny();
+   n_reads = ceil((double) nxny / conf_info.block_size);
+
+   // Allocate space to store the pairs for each grid point
+   f_na = new NumArray [conf_info.block_size];
+   o_na = new NumArray [conf_info.block_size];
+
+   mlog << Debug(2)
+        << "Computing statistics using a block size of "
+        << conf_info.block_size << ", requiring " << n_reads
+        << " passes through the " << grid.nx() << " x "
+        << grid.ny() << " grid.\n";
+
+   // Loop over the data reads
+   for(i_read=0; i_read<n_reads; i_read++) {
+     
+      // Starting grid point
+      i_point = i_read*conf_info.block_size;
+
+      mlog << Debug(3)
+           << "Processing data pass number " << i_read + 1 << " of "
+           << n_reads << " for grid points " << i_point + 1 << " to "
+           << i_point + conf_info.block_size << ".\n";
+      
+      // Loop over the series variable
+      for(i_series=0; i_series<n_series; i_series++) {
+
+         // Store the current VarInfo objects
+         fcst_info = (conf_info.get_n_fcst() > 1 ?
+                      conf_info.fcst_info[i_series] :
+                      conf_info.fcst_info[0]);
+         obs_info  = (conf_info.get_n_obs() > 1 ?
+                      conf_info.obs_info[i_series] :
+                      conf_info.obs_info[0]);
+
+         // Retrieve the data planes for the current series entry
+         get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
+         
+         // Store matched pairs for each grid point
+         for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
+
+            // Convert n to x, y
+            fcst_dp.one_to_two(i_point + i, x, y);
+
+            // Store valid fcst/obs pairs where the mask is on
+            if(!is_bad_data(fcst_dp(x,y)) &&
+               !is_bad_data(obs_dp(x,y)) &&
+               !is_bad_data(conf_info.mask_dp(x,y))) {
+               f_na[i].add(fcst_dp(x, y));
+               o_na[i].add(obs_dp(x, y));
+            }
+
+         } // end for i
+
+      } // end for i_series
+
+      // Compute statistics for each grid point in the block
+      for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
+
+         // JHG, work here!
+         fcst_dp.one_to_two(i_point + i, x, y);
+         mlog << Debug(1) << "[" << i+1 << " of "
+              << conf_info.block_size << " (" << x << "," << y
+              << ")] mean(f_na) = " << f_na[i].mean()
+              << ", mean(o_na) = " << o_na[i].mean() << "\n";
+      }
+
+      // Empty out the NumArray objects
+      for(i=0; i<conf_info.block_size; i++) {
+         f_na[i].empty();
+         o_na[i].empty();
+      }
+     
+   } // end for i_read
+
+   // Deallocate and clean up
+   if(f_na) { delete [] f_na; f_na = (NumArray *) 0; }
+   if(o_na) { delete [] o_na; o_na = (NumArray *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_series_data(int i_series,
+                     VarInfo *fcst_info, VarInfo *obs_info,
+                     DataPlane &fcst_dp, DataPlane &obs_dp) {
+  
+   mlog << Debug(3)
+        << "Processing series entry " << i_series + 1 << " of "
+        << n_series << ": " << fcst_info->magic_str()
+        << " versus " << obs_info->magic_str() << "\n";
+  
+   // Switch on the series type
+   switch(series_type) {
+
+      case SeriesType_Fcst_Conf:
+         get_series_entry(i_series, fcst_info, fcst_files, ftype, fcst_dp);
+         if(conf_info.get_n_obs() == 1) {
+            obs_info->set_valid(fcst_dp.valid());
+         }
+         get_series_entry(i_series, obs_info, obs_files, otype, obs_dp);
+         break;
+
+      case SeriesType_Obs_Conf:
+         get_series_entry(i_series, obs_info, obs_files, otype, obs_dp);
+         if(conf_info.get_n_fcst() == 1) {
+            fcst_info->set_valid(obs_dp.valid());
+         }
+         get_series_entry(i_series, fcst_info, fcst_files, ftype, fcst_dp);
+         break;
+         
+      case SeriesType_Fcst_Files:
+         get_series_entry(i_series, fcst_info, fcst_files[i_series], ftype, fcst_dp);
+         obs_info->set_valid(fcst_dp.valid());
+         get_series_entry(i_series, obs_info, obs_files, otype, obs_dp);
+         break;
+
+      case SeriesType_Obs_Files:
+         get_series_entry(i_series, obs_info, obs_files[i_series], otype, obs_dp);
+         fcst_info->set_valid(obs_dp.valid());
+         get_series_entry(i_series, fcst_info, fcst_files, ftype, fcst_dp);
+         break;
+
+      default:
+         mlog << Error << "\nget_series_data() -> "
+              << "unexpected SeriesType value: "
+              << series_type << "\n\n";
+         exit(1);
+         break;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_series_entry(int i_series, VarInfo *info,
+                      const ConcatString &file, const GrdFileType type,
+                      DataPlane &dp) {
+   StringArray sa;
+
+   sa.add(file);
+
+   get_series_entry(i_series, info, sa, type, dp);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// JHG, implement an optional quiet argument for data_plane() in
+// Met2dDataFile heirarchy
+
+void get_series_entry(int i_series, VarInfo *info,
+                      const StringArray &files, const GrdFileType type,
+                      DataPlane &dp) {
+   int i, j;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   bool found = false;
+
+   // Search for match in the file list
+   for(i=0; i<files.n_elements(); i++) {
+
+      // Start the search with the value of i_series
+      j = (i_series + i) % files.n_elements();
+     
+      // Open the data file
+      mtddf = mtddf_factory.new_met_2d_data_file(files[j], type);
+
+      // Check that the grid does not change
+      if(mtddf->grid() != grid) {
+         mlog << Error << "\nget_series_entry() -> "
+              << "the grid has changed in file \"" << files[j] << "\":\n"
+              << "Old: " << grid.serialize() << "\n"
+              << "New: " << mtddf->grid().serialize() << "\n\n";
+         exit(1);
+      }
+      
+      // Attempt to read the gridded data from the current file
+      found = mtddf->data_plane(*info, dp);
+      
+      // Close the data file
+      delete mtddf; mtddf = (Met2dDataFile *) 0;
+
+      // Break out of the loop if found
+      if(found) {
+         mlog << Debug(3)
+              << "Found data for " << info->magic_str()
+              << " in " << files[j] << "\n";
+         break;
+      }
+   }
+
+   // Check if the data plane was found
+   if(!found) {
+      mlog << Error << "\nget_series_entry() -> "
+           << "Could not find data for " << info->magic_str()
+           << " in file list:\n";
+      for(i=0; i<files.n_elements(); i++)
+         mlog << Error << "   " << files[i] << "\n";
+      mlog << Error << "\n";
+      exit(1);
+   }
+
    return;
 }
 

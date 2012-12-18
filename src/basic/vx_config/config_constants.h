@@ -540,7 +540,7 @@ static const char conf_key_long_name[]     = "long_name";
 //
 
 static const char conf_key_output_stats[] = "output_stats";
-static const char conf_key_block_thresh[] = "block_thresh";
+static const char conf_key_block_size[]   = "block_size";
 
 //
 // Parameter value names common to multiple tools
