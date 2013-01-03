@@ -127,7 +127,7 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 duplicate_flag = NONE;
-obs_quality    = [ ];
+obs_quality    = [];
 output_prefix  = "";
 version        = "V4.0";
 
