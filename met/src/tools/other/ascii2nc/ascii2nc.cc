@@ -639,15 +639,14 @@ void process_little_r_obs(LineDataFile &f_in) {
       n_data_hdr = atoi(dl[7]);
 
       //
-      // Observation of sea level pressure.
-      // Convert from hectopascals to pascals.
+      // Observation of sea level pressure in pascals.
       //
       if(!is_eq(atof(dl[18]), lr_missing_value)) {
          obs_qty = (is_eq(atof(dl[19]), lr_missing_value) ?
                     na_str : dl[19]);
          obs_qty.ws_strip();
          write_obs_info(i_obs, i_hdr, 2, bad_data_float, hdr_elv,
-                        atof(dl[18])*10, obs_qty);
+                        atof(dl[18]), obs_qty);
       }
 
       //
@@ -671,7 +670,8 @@ void process_little_r_obs(LineDataFile &f_in) {
                     bad_data_float : atof(dl[2]));
 
          //
-         // Convert pressure from hectopascals to millibars
+         // Pressure in Little_R is stored in pascals.  Convert to
+         // hectopascals for the header entry.
          //
          if(!is_bad_data(obs_prs)) obs_prs /= 100;
 
@@ -701,11 +701,6 @@ void process_little_r_obs(LineDataFile &f_in) {
                // Observation value
                //
                obs_val = atof(dl[i]);
-
-               //
-               // Convert pressure from hectopascals to pascals
-               //
-               if(lr_grib_codes[i/2] == 1) obs_val *= 10;
             
                //
                // Write the observation info
@@ -921,9 +916,9 @@ void write_obs_info(int &i_obs, int i_hdr,
    // Build the observation array
    //
    obs_arr[0] = i_hdr; // Index of header
-   obs_arr[1] = gc;    // GRIB code
-   obs_arr[2] = prs;   // Pressure level
-   obs_arr[3] = hgt;   // Height level = elevation of station
+   obs_arr[1] = gc;    // GRIB code corresponding to the observation type
+   obs_arr[2] = prs;   // Pressure level (hPa) or accumulation interval (sec)
+   obs_arr[3] = hgt;   // Height in meters above sea level or ground level (msl or agl)
    obs_arr[4] = obs;   // Observation value
 
    //
