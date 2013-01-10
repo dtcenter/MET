@@ -44,6 +44,7 @@ class Color {
    public:
 
       Color();
+      Color(unsigned char);
       Color(unsigned char, unsigned char, unsigned char);
      ~Color();
       Color(const Color &);

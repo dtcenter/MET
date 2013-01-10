@@ -48,6 +48,8 @@ enum ViewGravity {
    view_southwest_gravity,
    view_southeast_gravity,
 
+   fill_viewport, 
+
    no_view_gravity
 
 };
@@ -451,6 +453,8 @@ extern ConformalAffine operator*(const ConformalAffine &, const ConformalAffine 
 
 ////////////////////////////////////////////////////////////////////////
 
+
+extern void viewgravity_to_uv(const ViewGravity, double & u, double & v);
 
 extern double calc_aspect(double width, double height);
 

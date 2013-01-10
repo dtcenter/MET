@@ -51,6 +51,7 @@ class Ppm : public PxmBase {
 
       void clear();
 
+      int n_data_bytes() const;
 
       void set_size_rc(int NR, int NC);
       void set_size_xy(int NX, int NY);
@@ -83,6 +84,12 @@ class Ppm : public PxmBase {
       void make_gray();
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int Ppm::n_data_bytes() const { return ( Nalloc ); }
 
 
 ////////////////////////////////////////////////////////////////////////

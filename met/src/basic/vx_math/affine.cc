@@ -1280,6 +1280,42 @@ bool is_between(double a, double b, double x) {
 ////////////////////////////////////////////////////////////////////////
 
 
+void viewgravity_to_uv(const ViewGravity g, double & u, double & v)
+
+{
+
+switch ( g )  {
+
+   case view_center_gravity:      u = 0.5;   v = 0.5;   break;
+
+   case view_north_gravity:       u = 0.5;   v = 1.0;   break;
+   case view_south_gravity:       u = 0.5;   v = 0.0;   break;
+   case view_east_gravity:        u = 1.0;   v = 0.5;   break;
+   case view_west_gravity:        u = 0.0;   v = 0.5;   break;
+
+   case view_northwest_gravity:   u = 0.0;   v = 1.0;   break;
+   case view_northeast_gravity:   u = 1.0;   v = 1.0;   break;
+   case view_southwest_gravity:   u = 0.0;   v = 0.0;   break;
+   case view_southeast_gravity:   u = 1.0;   v = 0.0;   break;
+
+
+   default:
+      cerr << "\n\n  viewgravity_to_uv() -> bad gravity ... " 
+           << viewgravity_to_string(g) << "\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 
 

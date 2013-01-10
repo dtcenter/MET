@@ -54,6 +54,7 @@ class Pcm : public PxmBase {
 
       void clear();
 
+      int n_data_bytes() const;
 
       void set_size_rc(int NR, int NC);
       void set_size_xy(int NX, int NY);
@@ -101,6 +102,7 @@ class Pcm : public PxmBase {
 
 inline int Pcm::n_colors() const { return ( Ncolors ); }
 
+inline int Pcm::n_data_bytes() const { return ( Nalloc ); }
 
 ////////////////////////////////////////////////////////////////////////
 

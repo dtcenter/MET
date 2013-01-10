@@ -56,6 +56,8 @@ class Pbm : public PxmBase {
 
       void clear();
 
+      int n_data_bytes() const;
+
 
       void set_size_rc(int NR, int NC);
       void set_size_xy(int NX, int NY);
@@ -90,6 +92,8 @@ class Pbm : public PxmBase {
 inline int Pbm::bytes_per_row() const { return ( (Ncols + 7)/8 ); }
 
 inline int Pbm::total_data_bytes() const { return ( Nrows*bytes_per_row() ); }
+
+inline int Pbm::n_data_bytes() const { return ( Nalloc ); }
 
 
 ////////////////////////////////////////////////////////////////////////
