@@ -366,6 +366,63 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void PxmBase::copy_data(unsigned char * out) const
+
+{
+
+const int n = n_data_bytes();
+
+memcpy(out, data, n);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PxmBase::copy_data_32(unsigned char * out, const bool swap_endian) const
+
+{
+
+int j;
+const int nxy = Nrows*Ncols;
+unsigned char * u = out;
+unsigned int  * i = (unsigned int *) out;
+unsigned char * d = data;
+
+j = 0;
+
+while ( j < nxy )  {
+
+   *u++ = 0;
+
+   *u++ = *d++;
+   *u++ = *d++;
+   *u++ = *d++;
+
+   // *u++ = 0;
+
+   if ( swap_endian )  shuffle_4(i);
+
+   ++j;
+
+   ++i;
+
+}   //  while
+
+
+return;
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 
 

@@ -77,6 +77,7 @@ class PxmBase {
 
       virtual  void   clear () = 0;
 
+      virtual  int    n_data_bytes () const = 0;
 
       virtual  void   set_size_rc (int NR, int NC) = 0;
       virtual  void   set_size_xy (int NX, int NY) = 0;
@@ -126,6 +127,9 @@ class PxmBase {
       virtual void add_comment (const char *);
 
       virtual void clear_comments ();
+
+      virtual void copy_data    (unsigned char * out) const;
+      virtual void copy_data_32 (unsigned char * out, const bool swap_endian = false) const;
 
 };
 

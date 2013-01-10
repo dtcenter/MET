@@ -52,6 +52,7 @@ class Pgm : public PxmBase {
 
       void clear();
 
+      int n_data_bytes() const;
 
       void set_size_rc(int NR, int NC);
       void set_size_xy(int NX, int NY);
@@ -78,6 +79,12 @@ class Pgm : public PxmBase {
       void dump(ostream &, int depth = 0) const;
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int Pgm::n_data_bytes() const { return ( Nalloc ); }
 
 
 ////////////////////////////////////////////////////////////////////////
