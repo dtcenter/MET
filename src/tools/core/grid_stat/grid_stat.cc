@@ -1150,7 +1150,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
 
    //
-   // Compute the stats, normal confidence intervals, and bootstrap
+   // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
    if(conf_info.boot_interval == BootIntervalType_BCA) {
