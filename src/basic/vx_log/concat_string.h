@@ -165,6 +165,8 @@ class ConcatString {
       void replace(const char * target, const char * replacement);   //  replace all occurences of target with replacement
                                                                      //  if "replacement" is an environment variable, use 
                                                                      //  it's value
+      void set_upper();
+      void set_lower();
 
 };
 
