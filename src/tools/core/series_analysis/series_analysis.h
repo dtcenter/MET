@@ -90,10 +90,15 @@ static NcFile *nc_out  = (NcFile *) 0;
 static NcDim  *lat_dim = (NcDim *)  0;
 static NcDim  *lon_dim = (NcDim *)  0;
 
-// List of output NetCDF variable names
-static StringArray fcst_var_sa;
-static StringArray obs_var_sa;
-static StringArray diff_var_sa;
+// Structure to store computed statistics and corresponding metadata
+struct StatInfo {
+   float * data;
+   ConcatString name_att;      // Statistic name
+   ConcatString long_name_att; // Statistic long name
+};
+
+// Mapping of NetCDF variable name to computed statistic
+map<ConcatString, StatInfo> stat_data;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -128,6 +133,21 @@ static int n_series = 0;
 
 // Is this a time series
 static bool is_time_series = false;
+
+// Range of timing values encountered in the data
+static unixtime fcst_init_beg  = (unixtime) 0;
+static unixtime fcst_init_end  = (unixtime) 0;
+static unixtime fcst_valid_beg = (unixtime) 0;
+static unixtime fcst_valid_end = (unixtime) 0;
+static int      fcst_lead_beg  = bad_data_int;
+static int      fcst_lead_end  = bad_data_int;
+
+static unixtime obs_init_beg   = (unixtime) 0;
+static unixtime obs_init_end   = (unixtime) 0;
+static unixtime obs_valid_beg  = (unixtime) 0;
+static unixtime obs_valid_end  = (unixtime) 0;
+static int      obs_lead_beg   = bad_data_int;
+static int      obs_lead_end   = bad_data_int;
 
 ////////////////////////////////////////////////////////////////////////
 

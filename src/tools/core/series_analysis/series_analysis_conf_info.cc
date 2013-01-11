@@ -63,8 +63,6 @@ void SeriesAnalysisConfInfo::clear() {
    model.clear();
    fcst_cat_ta.clear();
    obs_cat_ta.clear();
-   fcst_wind_ta.clear();
-   obs_wind_ta.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
    boot_rep_prop = bad_data_double;
@@ -150,7 +148,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    output_stats = parse_conf_output_stats(&conf);
 
    // Count the number of statistics requested
-   for(i = 0,it = output_stats.begin(); it != output_stats.end(); it++) {
+   for(i = 0, it = output_stats.begin(); it != output_stats.end(); it++) {
       i += it->second.n_elements();
    } // end for it
 
@@ -340,20 +338,6 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
          }
       } // end for i
    }
-
-   // Conf: fcst.wind_thresh
-   fcst_wind_ta = fcst_dict->lookup_thresh_array(conf_key_wind_thresh);
-
-   // Conf: obs.wind_thresh
-   obs_wind_ta = obs_dict->lookup_thresh_array(conf_key_wind_thresh);
-
-   // Check that the number of wind speed thresholds match
-   if(fcst_wind_ta.n_elements() != obs_wind_ta.n_elements()) {
-      mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
-           << "The number of thresholds in \"fcst.wind_thresh\" must "
-           << "match the number of thresholds in \"obs.wind_thresh\".\n\n";
-      exit(1);
-   }
    
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);
@@ -378,7 +362,6 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
-   int i;
    DataPlane mask_grid_dp, mask_poly_dp;
    ConcatString name;
 

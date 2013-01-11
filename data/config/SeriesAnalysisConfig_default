@@ -17,7 +17,7 @@ model = "WRF";
 // Forecast and observation fields to be verified
 //
 fcst = {
-   wind_thresh = [ NA ];
+
    cat_thresh  = [ >0.0, >=5.0 ];
 
    field = [
@@ -72,17 +72,17 @@ vld_thresh = 1.0;
 // Statistical output types
 //
 output_stats = {
-   fho    = [ "ALL" ];
-   ctc    = [ "ALL" ];
-   cts    = [ "ALL" ];
-   mctc   = [ "ALL" ];
-   mcts   = [ "ALL" ];
+   fho    = [];
+   ctc    = [];
+   cts    = [];
+   mctc   = [];
+   mcts   = [];
    cnt    = [ "RMSE", "FBAR", "OBAR" ];
-   sl1l2  = [ "ALL" ];
-   pct    = [ "ALL" ];
-   pstd   = [ "ALL" ];
-   pjc    = [ "ALL" ];
-   prc    = [ "ALL" ];
+   sl1l2  = [];
+   pct    = [];
+   pstd   = [];
+   pjc    = [];
+   prc    = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
