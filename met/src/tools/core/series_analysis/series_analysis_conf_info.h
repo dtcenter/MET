@@ -48,8 +48,6 @@ class SeriesAnalysisConfInfo {
       VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
       ThreshArray      fcst_cat_ta;        // Categorical fcst thresholds
       ThreshArray      obs_cat_ta;         // Categorical obs thresholds
-      ThreshArray      fcst_wind_ta;       // Wind speed fcst thresholds
-      ThreshArray      obs_wind_ta;        // Wind speed obs thresholds
       NumArray         ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType boot_interval;      // Bootstrap CI type
       double           boot_rep_prop;      // Bootstrap replicate proportion
@@ -78,18 +76,14 @@ class SeriesAnalysisConfInfo {
       void process_masks (const Grid &);
 
       // Dump out the counts
-      int get_n_fcst()        const;
-      int get_n_obs()         const;
-      int get_n_wind_thresh() const;
-      int get_n_ci_alpha()    const;
+      int get_n_fcst() const;
+      int get_n_obs()  const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int SeriesAnalysisConfInfo::get_n_fcst()        const { return(n_fcst);                    }
-inline int SeriesAnalysisConfInfo::get_n_obs()         const { return(n_obs);                     }
-inline int SeriesAnalysisConfInfo::get_n_wind_thresh() const { return(fcst_wind_ta.n_elements()); }
-inline int SeriesAnalysisConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());     }
+inline int SeriesAnalysisConfInfo::get_n_fcst() const { return(n_fcst); }
+inline int SeriesAnalysisConfInfo::get_n_obs()  const { return(n_obs);  }
 
 ////////////////////////////////////////////////////////////////////////
 
