@@ -170,6 +170,9 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
       // Get the StringArray value for the current entry
       sa = out_dict->lookup_string_array((*out_dict)[i]->name());
 
+      // Set ignore case to true
+      sa.set_ignore_case(true);
+
       // Store entry line type and corresponding list of statistics
       output_map[line_type].add(sa);
    }
