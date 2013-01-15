@@ -69,8 +69,10 @@ void SeriesAnalysisConfInfo::clear() {
    n_boot_rep = bad_data_int;
    boot_rng.clear();
    boot_seed.clear();
-   mask_grid.clear();
-   mask_poly.clear();
+   mask_grid_file.clear();
+   mask_grid_name.clear();
+   mask_poly_file.clear();
+   mask_poly_name.clear();
    mask_dp.clear();
    block_size = bad_data_int;
    vld_data_thresh = bad_data_double;
@@ -370,20 +372,20 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    mask_dp.set_constant(mask_on_value);
    
    // Conf: mask.grid
-   mask_grid = conf.lookup_string(conf_key_mask_grid);
+   mask_grid_file = conf.lookup_string(conf_key_mask_grid);
 
    // Conf: mask.poly
-   mask_poly = conf.lookup_string(conf_key_mask_poly);
+   mask_poly_file = conf.lookup_string(conf_key_mask_poly);
 
    // Parse out the masking grid
-   if(mask_grid.length() > 0) {
-      parse_grid_mask(mask_grid, grid, mask_grid_dp, name);
+   if(mask_grid_file.length() > 0) {
+      parse_grid_mask(mask_grid_file, grid, mask_grid_dp, mask_grid_name);
       apply_mask(mask_dp, mask_grid_dp);
    }
 
    // Parse out the masking polyline
-   if(mask_poly.length() > 0) {
-      parse_poly_mask(mask_poly, grid, mask_poly_dp, name);
+   if(mask_poly_file.length() > 0) {
+      parse_poly_mask(mask_poly_file, grid, mask_poly_dp, mask_poly_name);
       apply_mask(mask_dp, mask_poly_dp);
    }
 

@@ -54,8 +54,10 @@ class SeriesAnalysisConfInfo {
       int              n_boot_rep;         // Number of bootstrap replicates
       ConcatString     boot_rng;           // GSL random number generator
       ConcatString     boot_seed;          // GSL RNG seed value
-      ConcatString     mask_grid;          // Path for masking grid area
-      ConcatString     mask_poly;          // Path for masking poly area
+      ConcatString     mask_grid_file;     // Path for masking grid area
+      ConcatString     mask_grid_name;     // Name of masking grid area
+      ConcatString     mask_poly_file;     // Path for masking poly area
+      ConcatString     mask_poly_name;     // Name of masking poly area
       DataPlane        mask_dp;
       int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point
