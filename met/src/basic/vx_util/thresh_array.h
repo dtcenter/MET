@@ -14,6 +14,7 @@
 
 #include <iostream>
 
+#include "concat_string.h"
 #include "threshold.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,9 +57,11 @@ class ThreshArray {
 
       int has(const SingleThresh &) const;
       int has(const SingleThresh &, int & index) const;
-
-      void get_str(const char *, char *) const;
-      void get_abbr_str(const char *, char *) const;
+      
+      ConcatString get_str(const char *, int precision = thresh_default_precision) const;
+      void         get_str(const char *, char *, int precision = thresh_default_precision) const;
+      ConcatString get_abbr_str(const char *, int precision = thresh_default_precision) const;
+      void         get_abbr_str(const char *, char *, int precision = thresh_default_precision) const;
 
       int  check(double) const;
 };

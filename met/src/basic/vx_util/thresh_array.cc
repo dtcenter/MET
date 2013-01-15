@@ -285,38 +285,52 @@ int ThreshArray::has(const SingleThresh &st, int & index) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ThreshArray::get_str(const char *sep, char *str) const {
+ConcatString ThreshArray::get_str(const char *sep, int precision) const {
    int i;
-   char junk[1024];
+   ConcatString cur_str;
    ConcatString tmp_str;
 
    for(i=0; i<Nelements; i++) {
-      t[i].get_str(junk);
+      cur_str = t[i].get_str(precision);
 
-      if(i==0) tmp_str << junk;
-      else     tmp_str << sep << junk;
+      if(i==0) tmp_str << cur_str;
+      else     tmp_str << sep << cur_str;
    }
 
-   strcpy(str, tmp_str.text());
+   return(tmp_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ThreshArray::get_str(const char *sep, char *str, int precision) const {
+   
+   strcpy(str, get_str(sep, precision));
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ThreshArray::get_abbr_str(const char *sep, char *str) const {
+ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
    int i;
-   char junk[1024];
+   ConcatString cur_str;
    ConcatString tmp_str;
 
    for(i=0; i<Nelements; i++) {
-      t[i].get_abbr_str(junk);
+      cur_str = t[i].get_abbr_str(precision);
 
-      if(i==0) tmp_str << junk;
-      else     tmp_str << sep << junk;
+      if(i==0) tmp_str << cur_str;
+      else     tmp_str << sep << cur_str;
    }
 
-   strcpy(str, tmp_str.text());
+   return(tmp_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ThreshArray::get_abbr_str(const char *sep, char *str, int precision) const {
+
+   strcpy(str, get_abbr_str(sep, precision));
 
    return;
 }
