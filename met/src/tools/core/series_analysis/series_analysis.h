@@ -92,9 +92,12 @@ static NcDim  *lon_dim = (NcDim *)  0;
 
 // Structure to store computed statistics and corresponding metadata
 struct StatInfo {
-   float * data;
-   ConcatString name_att;      // Statistic name
-   ConcatString long_name_att; // Statistic long name
+   ConcatString name_att;        // Name attribute
+   ConcatString long_name_att;   // Long name attribute
+   ConcatString fcst_thresh_att; // Forecast threshold attribute
+   ConcatString obs_thresh_att;  // Observation threshold attribute
+   double       alpha_att;       // Alpha value attribute
+   float * data;                 // Data values
 };
 
 // Mapping of NetCDF variable name to computed statistic
