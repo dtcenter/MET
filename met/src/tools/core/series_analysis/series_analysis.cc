@@ -71,15 +71,13 @@ static void store_stat_pct  (int, const ConcatString &, const PCTInfo &);
 static void store_stat_pstd (int, const ConcatString &, const PCTInfo &);
 static void store_stat_pjc  (int, const ConcatString &, const PCTInfo &);
 static void store_stat_prc  (int, const ConcatString &, const PCTInfo &);
-
-static void store_stat_info (const ConcatString &, const ConcatString &,
-                             const ConcatString &, const ConcatString &,
-                             const ConcatString &, double);
-static void store_stat_value(int, const ConcatString &, double);
   
-static void setup_first_pass(const VarInfo *, const VarInfo *);
-static void setup_nc_file();
-static void write_nc_file(int);
+static void setup_nc_file(const VarInfo *, const VarInfo *);
+static void add_nc_var(const ConcatString &, const ConcatString &,
+                       const ConcatString &, const ConcatString &,
+                       const ConcatString &, double);
+static void put_nc_val(int, const ConcatString &, float);
+
 static void set_range(const unixtime &, unixtime &, unixtime &);
 static void set_range(const int &, int &, int &);
          
@@ -282,9 +280,6 @@ void process_command_line(int argc, char **argv) {
       found_obs_files.add("");
    }
 
-   // Setup the output NetCDF file
-   setup_nc_file();
-
    return;
 }
 
@@ -299,7 +294,6 @@ void process_scores() {
    NumArray *f_na = (NumArray *) 0;
    NumArray *o_na = (NumArray *) 0;
    DataPlane fcst_dp, obs_dp;
-   map<ConcatString, StatInfo>::iterator it;
 
    // Determine the block size
    nxny    = grid.nx() * grid.ny();
@@ -326,11 +320,6 @@ void process_scores() {
            << n_reads << " for grid points " << i_point + 1 << " to "
            << min(i_point + conf_info.block_size, nxny) << ".\n";
 
-      // Initialize the statistics to bad data values
-      for(it = stat_data.begin(); it != stat_data.end(); it++) {
-         for(i=0; i<conf_info.block_size; i++) it->second.data[i] = bad_data_float;
-      }
-
       // Loop over the series variable
       for(i_series=0; i_series<n_series; i_series++) {
 
@@ -345,8 +334,8 @@ void process_scores() {
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
 
-         // Setup the first pass through the data
-         if(is_first_pass) setup_first_pass(fcst_info, obs_info);
+         // Setup the output NetCDF file on the first pass
+         if(nc_out == (NcFile *) 0) setup_nc_file(fcst_info, obs_info);
 
          // Update timing info
          set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
@@ -400,21 +389,21 @@ void process_scores() {
             (conf_info.output_stats[stat_fho].n_elements() +
              conf_info.output_stats[stat_ctc].n_elements() +
              conf_info.output_stats[stat_cts].n_elements()) > 0) {
-            do_cts(i, f_na[i], o_na[i]);
+            do_cts(i_point+i, f_na[i], o_na[i]);
          }
 
          // Compute multi-category contingency table counts and statistics
          if(!conf_info.fcst_info[0]->p_flag() &&
             (conf_info.output_stats[stat_mctc].n_elements() +
              conf_info.output_stats[stat_mcts].n_elements()) > 0) {
-            do_mcts(i, f_na[i], o_na[i]);
+            do_mcts(i_point+i, f_na[i], o_na[i]);
          }
 
          // Compute continuous statistics
          if(!conf_info.fcst_info[0]->p_flag() &&
             (conf_info.output_stats[stat_cnt].n_elements() +
              conf_info.output_stats[stat_sl1l2].n_elements()) > 0) {
-            do_cnt(i, f_na[i], o_na[i]);
+            do_cnt(i_point+i, f_na[i], o_na[i]);
          }
 
          // Compute probabilistics counts and statistics
@@ -423,12 +412,9 @@ void process_scores() {
              conf_info.output_stats[stat_pstd].n_elements() +
              conf_info.output_stats[stat_pjc].n_elements() +
              conf_info.output_stats[stat_prc].n_elements()) > 0) {
-            do_pct(i, f_na[i], o_na[i]);
+            do_pct(i_point+i, f_na[i], o_na[i]);
          }
       } // end for i
-
-      // Write out the statistics computed in this block
-      write_nc_file(i_point);
 
       // Empty out the NumArray objects
       for(i=0; i<conf_info.block_size; i++) {
@@ -455,12 +441,6 @@ void process_scores() {
    // Deallocate and clean up
    if(f_na) { delete [] f_na; f_na = (NumArray *) 0; }
    if(o_na) { delete [] o_na; o_na = (NumArray *) 0; }
-   for(it = stat_data.begin(); it != stat_data.end(); it++) {
-      if(it->second.data) {
-         delete [] it->second.data;
-         it->second.data = (float *) 0;
-      }
-   }
 
    return;
 }
@@ -616,7 +596,7 @@ void get_series_entry(int i_series, VarInfo *info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts (int i_point, const NumArray &f_na, const NumArray &o_na) {
+void do_cts(int n, const NumArray &f_na, const NumArray &o_na) {
    int i, j;
 
    mlog << Debug(4) << "Computing Categorical Statistics.\n";
@@ -656,19 +636,19 @@ void do_cts (int i_point, const NumArray &f_na, const NumArray &o_na) {
 
       // Add statistic value for each possible FHO column
       for(j=0; j<conf_info.output_stats[stat_fho].n_elements(); j++) {
-         store_stat_fho(i_point, conf_info.output_stats[stat_fho][j],
+         store_stat_fho(n, conf_info.output_stats[stat_fho][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTC column
       for(j=0; j<conf_info.output_stats[stat_ctc].n_elements(); j++) {
-         store_stat_ctc(i_point, conf_info.output_stats[stat_ctc][j],
+         store_stat_ctc(n, conf_info.output_stats[stat_ctc][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTS column
       for(j=0; j<conf_info.output_stats[stat_cts].n_elements(); j++) {
-         store_stat_cts(i_point, conf_info.output_stats[stat_cts][j],
+         store_stat_cts(n, conf_info.output_stats[stat_cts][j],
                         cts_info[i]);
       }
    } // end for i
@@ -681,7 +661,7 @@ void do_cts (int i_point, const NumArray &f_na, const NumArray &o_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_mcts(int i_point, const NumArray &f_na, const NumArray &o_na) {
+void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
    int i;
 
    mlog << Debug(4) << "Computing Multi-Category Statistics.\n";
@@ -716,13 +696,13 @@ void do_mcts(int i_point, const NumArray &f_na, const NumArray &o_na) {
    
    // Add statistic value for each possible MCTC column
    for(i=0; i<conf_info.output_stats[stat_mctc].n_elements(); i++) {
-      store_stat_mctc(i_point, conf_info.output_stats[stat_mctc][i],
+      store_stat_mctc(n, conf_info.output_stats[stat_mctc][i],
                       mcts_info);
    }
 
    // Add statistic value for each possible MCTS column
    for(i=0; i<conf_info.output_stats[stat_mcts].n_elements(); i++) {
-      store_stat_mcts(i_point, conf_info.output_stats[stat_mcts][i],
+      store_stat_mcts(n, conf_info.output_stats[stat_mcts][i],
                       mcts_info);
    }
 
@@ -731,7 +711,7 @@ void do_mcts(int i_point, const NumArray &f_na, const NumArray &o_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt(int i_point, const NumArray &f_na, const NumArray &o_na) {
+void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
    int i;
   
    mlog << Debug(4) << "Computing Continuous Statistics.\n";
@@ -764,13 +744,13 @@ void do_cnt(int i_point, const NumArray &f_na, const NumArray &o_na) {
 
    // Add statistic value for each possible CNT column
    for(i=0; i<conf_info.output_stats[stat_cnt].n_elements(); i++) {
-      store_stat_cnt(i_point, conf_info.output_stats[stat_cnt][i],
+      store_stat_cnt(n, conf_info.output_stats[stat_cnt][i],
                      cnt_info);
    }
 
    // Add statistic value for each possible SL1L2 column
    for(i=0; i<conf_info.output_stats[stat_sl1l2].n_elements(); i++) {
-      store_stat_sl1l2(i_point, conf_info.output_stats[stat_cnt][i],
+      store_stat_sl1l2(n, conf_info.output_stats[stat_cnt][i],
                        cnt_info);
    }
 
@@ -779,7 +759,7 @@ void do_cnt(int i_point, const NumArray &f_na, const NumArray &o_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(int i_point, const NumArray &f_na, const NumArray &o_na) {
+void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
    int i, j;
 
    mlog << Debug(4) << "Computing Probabilistic Statistics.\n";
@@ -806,25 +786,25 @@ void do_pct(int i_point, const NumArray &f_na, const NumArray &o_na) {
 
       // Add statistic value for each possible PCT column
       for(j=0; j<conf_info.output_stats[stat_pct].n_elements(); j++) {
-         store_stat_pct(i_point, conf_info.output_stats[stat_pct][j],
+         store_stat_pct(n, conf_info.output_stats[stat_pct][j],
                         pct_info);
       }
 
       // Add statistic value for each possible PSTD column
       for(j=0; j<conf_info.output_stats[stat_pstd].n_elements(); j++) {
-         store_stat_pstd(i_point, conf_info.output_stats[stat_pstd][j],
+         store_stat_pstd(n, conf_info.output_stats[stat_pstd][j],
                          pct_info);
       }
 
       // Add statistic value for each possible PJC column
       for(j=0; j<conf_info.output_stats[stat_pjc].n_elements(); j++) {
-         store_stat_pjc(i_point, conf_info.output_stats[stat_pjc][j],
+         store_stat_pjc(n, conf_info.output_stats[stat_pjc][j],
                         pct_info);
       }
 
       // Add statistic value for each possible PRC column
       for(j=0; j<conf_info.output_stats[stat_prc].n_elements(); j++) {
-         store_stat_prc(i_point, conf_info.output_stats[stat_prc][j],
+         store_stat_prc(n, conf_info.output_stats[stat_prc][j],
                         pct_info);
       }
    } // end for i
@@ -834,7 +814,7 @@ void do_pct(int i_point, const NumArray &f_na, const NumArray &o_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_fho(int i_point, const ConcatString &col,
+void store_stat_fho(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
    double v;
    ConcatString var_name;
@@ -871,21 +851,21 @@ void store_stat_fho(int i_point, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
 
       // Add new map entry
-      store_stat_info(var_name, c, c,
-                      cts_info.cts_fcst_thresh.get_str(),
-                      cts_info.cts_obs_thresh.get_str(),
-                      bad_data_double);
+      add_nc_var(var_name, c, c,
+                 cts_info.cts_fcst_thresh.get_str(),
+                 cts_info.cts_obs_thresh.get_str(),
+                 bad_data_double);
    }
 
    // Store the statistic value
-   store_stat_value(i_point, var_name, (double) v);
+   put_nc_val(n, var_name, (float) v);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_ctc(int i_point, const ConcatString &col,
+void store_stat_ctc(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
    int v;
    ConcatString var_name;
@@ -923,41 +903,36 @@ void store_stat_ctc(int i_point, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
 
       // Add new map entry
-      store_stat_info(var_name, c, c,
-                      cts_info.cts_fcst_thresh.get_str(),
-                      cts_info.cts_obs_thresh.get_str(),
-                      bad_data_double);
+      add_nc_var(var_name, c, c,
+                 cts_info.cts_fcst_thresh.get_str(),
+                 cts_info.cts_obs_thresh.get_str(),
+                 bad_data_double);
    }
    
    // Store the statistic value
-   store_stat_value(i_point, var_name, (double) v);
+   put_nc_val(n, var_name, (float) v);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_cts(int i_point, const ConcatString &col,
+void store_stat_cts(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
    int i;
    double v;
    ConcatString var_name;
-
-   bool ci = false;
-   int n = 1;
+   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) {
-      n  = cts_info.n_alpha;
-      ci = true;
-   }
+   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = cts_info.n_alpha;
 
    // Loop over the alpha values, if necessary
-   for(i=0; i<n; i++) {
+   for(i=0; i<n_ci; i++) {
 
       // Get the column value
            if(c == "TOTAL")     { v = (double) cts_info.cts.n(); }
@@ -1040,20 +1015,20 @@ void store_stat_cts(int i_point, const ConcatString &col,
       }
 
       // Append confidence interval alpha value
-      if(ci) var_name << "_a"  << cts_info.alpha[i];
+      if(n_ci > 1) var_name << "_a"  << cts_info.alpha[i];
       
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
         
          // Add new map entry
-         store_stat_info(var_name, c, c,
-                         cts_info.cts_fcst_thresh.get_str(),
-                         cts_info.cts_obs_thresh.get_str(),
-                         (ci ? cts_info.alpha[i] : bad_data_double));
+         add_nc_var(var_name, c, c,
+                    cts_info.cts_fcst_thresh.get_str(),
+                    cts_info.cts_obs_thresh.get_str(),
+                    (n_ci > 1 ? cts_info.alpha[i] : bad_data_double));
       }
    
       // Store the statistic value
-      store_stat_value(i_point, var_name, v);
+      put_nc_val(n, var_name, (float) v);
 
    } // end for i
 
@@ -1062,7 +1037,7 @@ void store_stat_cts(int i_point, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_mctc(int i_point, const ConcatString &col,
+void store_stat_mctc(int n, const ConcatString &col,
                      const MCTSInfo &mcts_info) {
    int i, j;
    double v;
@@ -1109,41 +1084,36 @@ void store_stat_mctc(int i_point, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
       
       // Add new map entry
-      store_stat_info(var_name, c, c,
-                      mcts_info.cts_fcst_ta.get_str(","),
-                      mcts_info.cts_obs_ta.get_str(","),
-                      bad_data_double);
+      add_nc_var(var_name, c, c,
+                 mcts_info.cts_fcst_ta.get_str(","),
+                 mcts_info.cts_obs_ta.get_str(","),
+                 bad_data_double);
    }
    
    // Store the statistic value
-   store_stat_value(i_point, var_name, v);
+   put_nc_val(n, var_name, (float) v);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_mcts(int i_point, const ConcatString &col,
+void store_stat_mcts(int n, const ConcatString &col,
                      const MCTSInfo &mcts_info) {
    int i;
    double v;
    ConcatString var_name;
-
-   bool ci = false;
-   int n = 1;
+   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) {
-      n  = mcts_info.n_alpha;
-      ci = true;
-   }
+   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = mcts_info.n_alpha;
 
    // Loop over the alpha values, if necessary
-   for(i=0; i<n; i++) {
+   for(i=0; i<n_ci; i++) {
 
       // Get the column value
            if(c == "TOTAL")   { v = (double) mcts_info.cts.total(); }
@@ -1173,20 +1143,20 @@ void store_stat_mcts(int i_point, const ConcatString &col,
       var_name << cs_erase << "series_mcts_" << c;
 
       // Append confidence interval alpha value
-      if(ci) var_name << "_a"  << mcts_info.alpha[i];
+      if(n_ci > 1) var_name << "_a"  << mcts_info.alpha[i];
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
          
          // Add new map entry
-         store_stat_info(var_name, c, c,
-                         mcts_info.cts_fcst_ta.get_str(","),
-                         mcts_info.cts_obs_ta.get_str(","),
-                         (ci ? mcts_info.alpha[i] : bad_data_double));
+         add_nc_var(var_name, c, c,
+                    mcts_info.cts_fcst_ta.get_str(","),
+                    mcts_info.cts_obs_ta.get_str(","),
+                    (n_ci > 1 ? mcts_info.alpha[i] : bad_data_double));
       }
 
       // Store the statistic value
-      store_stat_value(i_point, var_name, v);
+      put_nc_val(n, var_name, (float) v);
 
    } // end for i
 
@@ -1195,27 +1165,22 @@ void store_stat_mcts(int i_point, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_cnt(int i_point, const ConcatString &col,
+void store_stat_cnt(int n, const ConcatString &col,
                     const CNTInfo &cnt_info) {
    int i;
    double v;
    ConcatString var_name;
-
-   bool ci = false;
-   int n = 1;
+   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
    
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) {
-      n  = cnt_info.n_alpha;
-      ci = true;
-   }
+   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = cnt_info.n_alpha;
 
    // Loop over the alpha values, if necessary
-   for(i=0; i<n; i++) {
+   for(i=0; i<n_ci; i++) {
    
       // Get the column value
            if(c == "TOTAL")       { v = (double) cnt_info.n;       }
@@ -1298,19 +1263,19 @@ void store_stat_cnt(int i_point, const ConcatString &col,
 
       // Construct the NetCDF variable name
       var_name << cs_erase << "series_cnt_" << c;
-      if(ci) var_name << "_a"  << cnt_info.alpha[i];
+      if(n_ci > 1) var_name << "_a"  << cnt_info.alpha[i];
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
          
          // Add new map entry
-         store_stat_info(var_name, c, c,
-                         "", "",
-                         (ci ? cnt_info.alpha[i] : bad_data_double));
+         add_nc_var(var_name, c, c,
+                    "", "",
+                    (n_ci > 1 ? cnt_info.alpha[i] : bad_data_double));
       }
 
       // Store the statistic value
-      store_stat_value(i_point, var_name, v);
+      put_nc_val(n, var_name, (float) v);
 
    } // end for i
 
@@ -1319,7 +1284,7 @@ void store_stat_cnt(int i_point, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_sl1l2(int i_point, const ConcatString &col,
+void store_stat_sl1l2(int n, const ConcatString &col,
                       const CNTInfo &cnt_info) {
    double v;
    ConcatString var_name;
@@ -1349,20 +1314,20 @@ void store_stat_sl1l2(int i_point, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
 
       // Add new map entry
-      store_stat_info(var_name, c, c,
-                      "", "",
-                      bad_data_double);
+      add_nc_var(var_name, c, c,
+                 "", "",
+                 bad_data_double);
    }
    
    // Store the statistic value
-   store_stat_value(i_point, var_name, v);
+   put_nc_val(n, var_name, (float) v);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_pct(int i_point, const ConcatString &col,
+void store_stat_pct(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
    int i, v;
    ConcatString var_name;
@@ -1407,41 +1372,36 @@ void store_stat_pct(int i_point, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
 
       // Add new map entry
-      store_stat_info(var_name, c, c,
-                      pct_info.pct_fcst_thresh.get_str(","),
-                      pct_info.pct_obs_thresh.get_str(),
-                      bad_data_double);
+      add_nc_var(var_name, c, c,
+                 pct_info.pct_fcst_thresh.get_str(","),
+                 pct_info.pct_obs_thresh.get_str(),
+                 bad_data_double);
    }
             
    // Store the statistic value
-   store_stat_value(i_point, var_name, (double) v);
+   put_nc_val(n, var_name, (float) v);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_pstd(int i_point, const ConcatString &col,
+void store_stat_pstd(int n, const ConcatString &col,
                      const PCTInfo &pct_info) {
    int i;
    double v;
    ConcatString var_name;
-
-   bool ci = false;
-   int n = 1;
+   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) {
-      n  = pct_info.n_alpha;
-      ci = true;
-   }
+   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = pct_info.n_alpha;
 
    // Loop over the alpha values, if necessary
-   for(i=0; i<n; i++) {
+   for(i=0; i<n_ci; i++) {
 
       // Get the column value
            if(c == "TOTAL")       { v = (double) pct_info.pct.n();         }
@@ -1467,20 +1427,20 @@ void store_stat_pstd(int i_point, const ConcatString &col,
       var_name << cs_erase << "series_pstd_" << c;
 
       // Append confidence interval alpha value
-      if(ci) var_name << "_a"  << pct_info.alpha[i];
+      if(n_ci > 1) var_name << "_a"  << pct_info.alpha[i];
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Add new map entry
-         store_stat_info(var_name, c, c,
-                         pct_info.pct_fcst_thresh.get_str(","),
-                         pct_info.pct_obs_thresh.get_str(),
-                         (ci ? pct_info.alpha[i] : bad_data_double));
+         add_nc_var(var_name, c, c,
+                    pct_info.pct_fcst_thresh.get_str(","),
+                    pct_info.pct_obs_thresh.get_str(),
+                    (n_ci > 1 ? pct_info.alpha[i] : bad_data_double));
       }
 
       // Store the statistic value
-      store_stat_value(i_point, var_name, v);
+      put_nc_val(n, var_name, (float) v);
 
    } // end for i
 
@@ -1489,9 +1449,9 @@ void store_stat_pstd(int i_point, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_pjc(int i_point, const ConcatString &col,
+void store_stat_pjc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i, n;
+   int i, tot;
    double v;
    ConcatString var_name;
 
@@ -1515,18 +1475,18 @@ void store_stat_pjc(int i_point, const ConcatString &col,
    }  // end if
 
    // Store the total count
-   n = pct_info.pct.n();
+   tot = pct_info.pct.n();
 
    // Get the column value
-        if(c == "TOTAL")                           { v = (double) n;                                       }
-   else if(c == "N_THRESH")                        { v = (double) pct_info.pct.nrows() + 1;                }
-   else if(check_reg_exp("THRESH_[0-9]", c))      { v = pct_info.pct.threshold(i);                        }
-   else if(check_reg_exp("OY_TP_[0-9]", c))       { v = pct_info.pct.event_count_by_row(i)/(double) n;    }
-   else if(check_reg_exp("ON_TP_[0-9]", c))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) n; }
-   else if(check_reg_exp("CALIBRATION_[0-9]", c)) { v = pct_info.pct.row_calibration(i);                  }
-   else if(check_reg_exp("REFINEMENT_[0-9]", c))  { v = pct_info.pct.row_refinement(i);                   }
-   else if(check_reg_exp("LIKELIHOOD_[0-9]", c))  { v = pct_info.pct.row_event_likelihood(i);             }
-   else if(check_reg_exp("BASER_[0-9]", c))       { v = pct_info.pct.row_obar(i);                         }
+        if(c == "TOTAL")                           { v = (double) tot;                                      }
+   else if(c == "N_THRESH")                        { v = (double) pct_info.pct.nrows() + 1;                 }
+   else if(check_reg_exp("THRESH_[0-9]", c))      { v = pct_info.pct.threshold(i);                          }
+   else if(check_reg_exp("OY_TP_[0-9]", c))       { v = pct_info.pct.event_count_by_row(i)/(double) tot;    }
+   else if(check_reg_exp("ON_TP_[0-9]", c))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) tot; }
+   else if(check_reg_exp("CALIBRATION_[0-9]", c)) { v = pct_info.pct.row_calibration(i);                    }
+   else if(check_reg_exp("REFINEMENT_[0-9]", c))  { v = pct_info.pct.row_refinement(i);                     }
+   else if(check_reg_exp("LIKELIHOOD_[0-9]", c))  { v = pct_info.pct.row_event_likelihood(i);               }
+   else if(check_reg_exp("BASER_[0-9]", c))       { v = pct_info.pct.row_obar(i);                           }
    else {
      mlog << Error << "\nstore_stat_pjc() -> "
           << "unsupported column name requested \"" << c
@@ -1542,21 +1502,21 @@ void store_stat_pjc(int i_point, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
 
      // Add new map entry
-     store_stat_info(var_name, c, c,
-                     pct_info.pct_fcst_thresh.get_str(","),
-                     pct_info.pct_obs_thresh.get_str(),
-                     bad_data_double);
+     add_nc_var(var_name, c, c,
+                pct_info.pct_fcst_thresh.get_str(","),
+                pct_info.pct_obs_thresh.get_str(),
+                bad_data_double);
    }
             
    // Store the statistic value
-   store_stat_value(i_point, var_name, v);
+   put_nc_val(n, var_name, (float) v);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_prc(int i_point, const ConcatString &col,
+void store_stat_prc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
    int i;
    double v;
@@ -1603,94 +1563,21 @@ void store_stat_prc(int i_point, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
 
      // Add new map entry
-     store_stat_info(var_name, c, c,
-                     pct_info.pct_fcst_thresh.get_str(","),
-                     pct_info.pct_obs_thresh.get_str(),
-                     bad_data_double);
+     add_nc_var(var_name, c, c,
+                pct_info.pct_fcst_thresh.get_str(","),
+                pct_info.pct_obs_thresh.get_str(),
+                bad_data_double);
    }
             
    // Store the statistic value
-   store_stat_value(i_point, var_name, v);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-                             
-void store_stat_info(const ConcatString &var_name,   const ConcatString &name,
-                     const ConcatString &long_name,  const ConcatString &fcst_thresh,
-                     const ConcatString &obs_thresh, double alpha) {
-   int i;
-   StatInfo si;
-
-   // Allocate array of floats for the data
-   si.data = new float [conf_info.block_size];
-
-   // Initialize to bad data
-   for(i=0; i<conf_info.block_size; i++) si.data[i] = bad_data_float;
-
-   // Store variable attribute information
-   si.name_att        = name;
-   si.long_name_att   = long_name;
-   si.fcst_thresh_att = fcst_thresh;
-   si.obs_thresh_att  = obs_thresh;
-   si.alpha_att       = alpha;
-   
-   // Store the new StatInfo object in the map
-   stat_data[var_name] = si;
+   put_nc_val(n, var_name, (float) v);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_value(int i_point, const ConcatString &var_name, double v) {
-
-   // Check bounds
-   if(i_point > conf_info.block_size) {
-      mlog << Error << "\nstore_stat_value() -> "
-           << "array overflow: " << i_point << " exceeds the blocksize of "
-           << conf_info.block_size << "\n\n";
-      exit(1);
-   }
-
-   // Check for key in the map
-   if(stat_data.count(var_name) == 0) {
-      mlog << Error << "\nstore_stat_value() -> "
-           << "variable name \"" << var_name
-           << "\" does not exist in the map.\n\n";
-      exit(1);
-   }     
-
-   // Store the statistic value
-   stat_data[var_name].data[i_point] = (float) v;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void setup_first_pass(const VarInfo *fcst_info, const VarInfo *obs_info) {
-  
-   // Add global attributes to output NetCDF file
-   nc_out->add_att("model",      conf_info.model);
-   nc_out->add_att("mask_grid",  (conf_info.mask_grid_name ? conf_info.mask_grid_name : na_str));
-   nc_out->add_att("mask_poly",  (conf_info.mask_poly_name ? conf_info.mask_poly_name : na_str));
-   nc_out->add_att("fcst_var",   fcst_info->name());
-   nc_out->add_att("fcst_lev",   fcst_info->level_name());
-   nc_out->add_att("fcst_units", fcst_info->units());
-   nc_out->add_att("obs_var",    obs_info->name());
-   nc_out->add_att("obs_lev",    obs_info->level_name());
-   nc_out->add_att("obs_units",  obs_info->units());
-
-   is_first_pass = false;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void setup_nc_file() {
+void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
    // Create a new NetCDF file and open it
    nc_out = new NcFile(out_file, NcFile::Replace);
@@ -1704,6 +1591,17 @@ void setup_nc_file() {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_file, program_name);
+   nc_out->add_att("model",      conf_info.model);
+   nc_out->add_att("mask_grid",  (conf_info.mask_grid_name ?
+                                  conf_info.mask_grid_name : na_str));
+   nc_out->add_att("mask_poly",  (conf_info.mask_poly_name ?
+                                  conf_info.mask_poly_name : na_str));
+   nc_out->add_att("fcst_var",   fcst_info->name());
+   nc_out->add_att("fcst_lev",   fcst_info->level_name());
+   nc_out->add_att("fcst_units", fcst_info->units());
+   nc_out->add_att("obs_var",    obs_info->name());
+   nc_out->add_att("obs_lev",    obs_info->level_name());
+   nc_out->add_att("obs_units",  obs_info->units());
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
@@ -1729,56 +1627,58 @@ void setup_nc_file() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+                             
+void add_nc_var(const ConcatString &var_name,
+                const ConcatString &name,
+                const ConcatString &long_name,
+                const ConcatString &fcst_thresh,
+                const ConcatString &obs_thresh,
+                double alpha) {
+   NcVarData d;
 
-void write_nc_file(int i_point) {
-   map<ConcatString, StatInfo>::iterator it;
-   NcVar *var = (NcVar *) 0;
-   int i, x, y;
+   // Add a new variable to the NetCDF file
+   d.var = nc_out->add_var(var_name, ncFloat, lat_dim, lon_dim);
 
-   // Loop through the contents of the stat data map
-   for(it = stat_data.begin(); it != stat_data.end(); it++) {
+   // Add variable attributes
+   d.var->add_att("_FillValue", bad_data_float);
+   if(name.length() > 0)        d.var->add_att("name", name);
+   if(long_name.length() > 0)   d.var->add_att("long_name", long_name);
+   if(fcst_thresh.length() > 0) d.var->add_att("fcst_thresh", fcst_thresh);
+   if(obs_thresh.length() > 0)  d.var->add_att("obs_thresh", obs_thresh);
+   if(!is_bad_data(alpha))      d.var->add_att("alpha", alpha);
+   
+   // Store the new NcVarData object in the map
+   stat_data[var_name] = d;
 
-      // Attempt to access the current variable
-      var = has_var(nc_out, it->first);
+   return;
+}
 
-      // Check if the variable does not already exist
-      if(!var) {
+////////////////////////////////////////////////////////////////////////
 
-         // Add a new variable
-         var = nc_out->add_var(it->first, ncFloat, lat_dim, lon_dim);
+void put_nc_val(int n, const ConcatString &var_name, float v) {
+   int x, y;
 
-         // Add variable attributes
-         if(it->second.name_att.length() > 0)
-            var->add_att("name", it->second.name_att);
-         if(it->second.long_name_att.length() > 0)
-            var->add_att("long_name", it->second.long_name_att);
-         if(it->second.fcst_thresh_att.length() > 0)
-            var->add_att("fcst_thresh", it->second.fcst_thresh_att);
-         if(it->second.obs_thresh_att.length() > 0)
-            var->add_att("obs_thresh", it->second.obs_thresh_att);
-         if(!is_bad_data(it->second.alpha_att))
-            var->add_att("alpha", it->second.alpha_att);
-         var->add_att("_FillValue", bad_data_float);
-      }
+   // Determine x,y location
+   DefaultTO.one_to_two(grid.nx(), grid.ny(), n, x, y);
+   
+   // Check for key in the map
+   if(stat_data.count(var_name) == 0) {
+      mlog << Error << "\nput_nc_val() -> "
+           << "variable name \"" << var_name
+           << "\" does not exist in the map.\n\n";
+      exit(1);
+   }
+   
+   // Get the NetCDF variable to be written
+   NcVar *var = stat_data[var_name].var;
 
-// JHG, rather than writing values one-by-one, write them in a big block
-// if you can't do that, you don't need the whole StatInfo thing
-
-      // Write statistic for each grid point in the block
-      for(i=0; i<conf_info.block_size && (i_point+i)<grid.nx()*grid.ny(); i++) {
-        
-         // Determine x,y location
-         DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
-
-         if(!var->set_cur(y, x) || !var->put(&it->second.data[i], 1, 1)) {
-            mlog << Error << "\nwrite_nc_file() -> "
-                 << "error writing to variable " << it->first
-                 << " for point (" << x << ", " << y << ").\n\n";
-            exit(1);
-         }
-
-      } // end for i
-   } // end it
+   // Store the current value
+   if(!var->set_cur(y, x) || !var->put(&v, 1, 1)) {
+      mlog << Error << "\nput_nc_val() -> "
+           << "error writing to variable " << var_name
+           << " for point (" << x << ", " << y << ").\n\n";
+      exit(1);
+   }
 
    return;
 }

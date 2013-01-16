@@ -91,17 +91,12 @@ static NcDim  *lat_dim = (NcDim *)  0;
 static NcDim  *lon_dim = (NcDim *)  0;
 
 // Structure to store computed statistics and corresponding metadata
-struct StatInfo {
-   ConcatString name_att;        // Name attribute
-   ConcatString long_name_att;   // Long name attribute
-   ConcatString fcst_thresh_att; // Forecast threshold attribute
-   ConcatString obs_thresh_att;  // Observation threshold attribute
-   double       alpha_att;       // Alpha value attribute
-   float * data;                 // Data values
+struct NcVarData {
+   NcVar * var; // Pointer to NetCDF variable
 };
 
 // Mapping of NetCDF variable name to computed statistic
-map<ConcatString, StatInfo> stat_data;
+map<ConcatString, NcVarData> stat_data;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -111,7 +106,6 @@ map<ConcatString, StatInfo> stat_data;
 
 // Grid variables
 static Grid grid;
-static bool is_first_pass = true;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
@@ -133,9 +127,6 @@ static SeriesType series_type = SeriesType_None;
 
 // Series length
 static int n_series = 0;
-
-// Is this a time series
-static bool is_time_series = false;
 
 // Range of timing values encountered in the data
 static unixtime fcst_init_beg  = (unixtime) 0;
