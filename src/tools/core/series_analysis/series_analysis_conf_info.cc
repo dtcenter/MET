@@ -220,7 +220,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    for(i=0; i<n_obs; i++) {
 
       // Allocate new VarInfo objects
-      obs_info[i] = info_factory.new_var_info(ftype);
+      obs_info[i] = info_factory.new_var_info(otype);
 
       // Get the current dictionaries
       i_obs_dict = parse_conf_i_vx_dict(obs_dict, i);
