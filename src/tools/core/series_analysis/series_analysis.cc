@@ -48,10 +48,12 @@ static void process_scores();
 
 static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
-static void get_series_entry(int, VarInfo *, const ConcatString &,
-                             const GrdFileType, DataPlane &);
-static void get_series_entry(int, VarInfo *, const StringArray &,
-                             const GrdFileType, DataPlane &);
+static void get_series_entry(int, VarInfo *,
+                             const ConcatString &, const GrdFileType,
+                             StringArray &, DataPlane &);
+static void get_series_entry(int, VarInfo *,
+                             const StringArray &, const GrdFileType,
+                             StringArray &, DataPlane &);
 
 static void do_cts (int, const NumArray &, const NumArray &);
 static void do_mcts(int, const NumArray &, const NumArray &);
@@ -116,6 +118,7 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
+   int i;
    CommandLine cline;
    ConcatString default_config_file;
 
@@ -271,6 +274,12 @@ void process_command_line(int argc, char **argv) {
            << "\"obs.field\" configuration entries and the \"-fcst\" and "
            << "\"-obs\" command line options all have length one.\n\n";
       exit(1);
+   }
+
+   // Initialize the series file names
+   for(i=0; i<n_series; i++) {
+      found_fcst_files.add("");
+      found_obs_files.add("");
    }
 
    // Setup the output NetCDF file
@@ -471,31 +480,39 @@ void get_series_data(int i_series,
    switch(series_type) {
 
       case SeriesType_Fcst_Conf:
-         get_series_entry(i_series, fcst_info, fcst_files, ftype, fcst_dp);
+         get_series_entry(i_series, fcst_info, fcst_files,
+                          ftype, found_fcst_files, fcst_dp);
          if(conf_info.get_n_obs() == 1) {
             obs_info->set_valid(fcst_dp.valid());
          }
-         get_series_entry(i_series, obs_info, obs_files, otype, obs_dp);
+         get_series_entry(i_series, obs_info, obs_files,
+                          otype, found_obs_files, obs_dp);
          break;
 
       case SeriesType_Obs_Conf:
-         get_series_entry(i_series, obs_info, obs_files, otype, obs_dp);
+         get_series_entry(i_series, obs_info, obs_files,
+                          otype, found_obs_files, obs_dp);
          if(conf_info.get_n_fcst() == 1) {
             fcst_info->set_valid(obs_dp.valid());
          }
-         get_series_entry(i_series, fcst_info, fcst_files, ftype, fcst_dp);
+         get_series_entry(i_series, fcst_info, fcst_files,
+                          ftype, found_fcst_files, fcst_dp);
          break;
          
       case SeriesType_Fcst_Files:
-         get_series_entry(i_series, fcst_info, fcst_files[i_series], ftype, fcst_dp);
+         get_series_entry(i_series, fcst_info, fcst_files[i_series],
+                          ftype, found_fcst_files, fcst_dp);
          obs_info->set_valid(fcst_dp.valid());
-         get_series_entry(i_series, obs_info, obs_files, otype, obs_dp);
+         get_series_entry(i_series, obs_info, obs_files,
+                          otype, found_obs_files, obs_dp);
          break;
 
       case SeriesType_Obs_Files:
-         get_series_entry(i_series, obs_info, obs_files[i_series], otype, obs_dp);
+         get_series_entry(i_series, obs_info, obs_files[i_series],
+                          otype, found_obs_files, obs_dp);
          fcst_info->set_valid(obs_dp.valid());
-         get_series_entry(i_series, fcst_info, fcst_files, ftype, fcst_dp);
+         get_series_entry(i_series, fcst_info, fcst_files,
+                          ftype, found_fcst_files, fcst_dp);
          break;
 
       default:
@@ -516,42 +533,48 @@ void get_series_data(int i_series,
 ////////////////////////////////////////////////////////////////////////
 
 void get_series_entry(int i_series, VarInfo *info,
-                      const ConcatString &file, const GrdFileType type,
-                      DataPlane &dp) {
-   StringArray sa;
+                      const ConcatString &file,
+                      const GrdFileType type,
+                      StringArray &found_files, DataPlane &dp) {
+   StringArray search_files;
 
-   sa.add(file);
+   search_files.add(file);
 
-   get_series_entry(i_series, info, sa, type, dp);
+   get_series_entry(i_series, info, search_files, type, found_files, dp);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-// JHG, implement an optional quiet argument for data_plane() in
-// Met2dDataFile heirarchy
-
 void get_series_entry(int i_series, VarInfo *info,
-                      const StringArray &files, const GrdFileType type,
-                      DataPlane &dp) {
+                      const StringArray &search_files,
+                      const GrdFileType type,
+                      StringArray &found_files, DataPlane &dp) {
    int i, j;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   ConcatString cur_file;
    bool found = false;
 
    // Search for match in the file list
-   for(i=0; i<files.n_elements(); i++) {
+   for(i=0; i<search_files.n_elements(); i++) {
 
       // Start the search with the value of i_series
-      j = (i_series + i) % files.n_elements();
-     
+      j = (i_series + i) % search_files.n_elements();
+
+      // Check if the file for this series entry has already been found
+      if(strlen(found_files[i_series]) > 0)
+         cur_file = found_files[i_series];
+      else
+         cur_file = search_files[j];
+
       // Open the data file
-      mtddf = mtddf_factory.new_met_2d_data_file(files[j], type);
+      mtddf = mtddf_factory.new_met_2d_data_file(cur_file, type);
 
       // Check that the grid does not change
       if(mtddf->grid() != grid) {
          mlog << Error << "\nget_series_entry() -> "
-              << "the grid has changed in file \"" << files[j] << "\":\n"
+              << "the grid has changed in file \"" << cur_file << "\":\n"
               << "Old: " << grid.serialize() << "\n"
               << "New: " << mtddf->grid().serialize() << "\n\n";
          exit(1);
@@ -563,11 +586,16 @@ void get_series_entry(int i_series, VarInfo *info,
       // Close the data file
       delete mtddf; mtddf = (Met2dDataFile *) 0;
 
-      // Break out of the loop if found
+      // Check if the series entry was found
       if(found) {
          mlog << Debug(3)
               << "Found data for " << info->magic_str()
-              << " in " << files[j] << "\n";
+              << " in " << search_files[j] << "\n";
+
+         // Store the found file
+         found_files.set(i_series, cur_file);
+
+         // Break out of the loop
          break;
       }
    }
@@ -577,8 +605,8 @@ void get_series_entry(int i_series, VarInfo *info,
       mlog << Error << "\nget_series_entry() -> "
            << "Could not find data for " << info->magic_str()
            << " in file list:\n";
-      for(i=0; i<files.n_elements(); i++)
-         mlog << Error << "   " << files[i] << "\n";
+      for(i=0; i<search_files.n_elements(); i++)
+         mlog << Error << "   " << search_files[i] << "\n";
       mlog << Error << "\n";
       exit(1);
    }
@@ -1342,11 +1370,9 @@ void store_stat_pct(int i_point, const ConcatString &col,
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
-
-// JHG, need better reg exp to skip "N_THRESH" column!
    
    // Get index value for variable column numbers
-   if(check_reg_exp("*_[0-9]*", c)) {
+   if(check_reg_exp("_[0-9]", c)) {
 
       // Parse the index value from the column name
       i = atoi(strrchr(c, '_') + 1) - 1;
@@ -1363,9 +1389,9 @@ void store_stat_pct(int i_point, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL")                      { v = pct_info.pct.n();                      }
    else if(c == "N_THRESH")                   { v = pct_info.pct.nrows() + 1;              }
-   else if(check_reg_exp("THRESH_[0-9]*", c)) { v = pct_info.pct.threshold(i);             }
-   else if(check_reg_exp("OY_[0-9]*", c))     { v = pct_info.pct.event_count_by_row(i);    }
-   else if(check_reg_exp("ON_[0-9]*", c))     { v = pct_info.pct.nonevent_count_by_row(i); }
+   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);             }
+   else if(check_reg_exp("OY_[0-9]", c))     { v = pct_info.pct.event_count_by_row(i);    }
+   else if(check_reg_exp("ON_[0-9]", c))     { v = pct_info.pct.nonevent_count_by_row(i); }
    else {
      mlog << Error << "\nstore_stat_pct() -> "
           << "unsupported column name requested \"" << c
@@ -1473,10 +1499,8 @@ void store_stat_pjc(int i_point, const ConcatString &col,
    ConcatString c = col;
    c.set_upper();
 
-// JHG, need better reg exp to skip "N_THRESH" column!
-
    // Get index value for variable column numbers
-   if(check_reg_exp("*_[0-9]*", c)) {
+   if(check_reg_exp("_[0-9]", c)) {
 
       // Parse the index value from the column name
       i = atoi(strrchr(c, '_') + 1) - 1;
@@ -1496,13 +1520,13 @@ void store_stat_pjc(int i_point, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL")                           { v = (double) n;                                       }
    else if(c == "N_THRESH")                        { v = (double) pct_info.pct.nrows() + 1;                }
-   else if(check_reg_exp("THRESH_[0-9]*", c))      { v = pct_info.pct.threshold(i);                        }
-   else if(check_reg_exp("OY_TP_[0-9]*", c))       { v = pct_info.pct.event_count_by_row(i)/(double) n;    }
-   else if(check_reg_exp("ON_TP_[0-9]*", c))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) n; }
-   else if(check_reg_exp("CALIBRATION_[0-9]*", c)) { v = pct_info.pct.row_calibration(i);                  }
-   else if(check_reg_exp("REFINEMENT_[0-9]*", c))  { v = pct_info.pct.row_refinement(i);                   }
-   else if(check_reg_exp("LIKELIHOOD_[0-9]*", c))  { v = pct_info.pct.row_event_likelihood(i);             }
-   else if(check_reg_exp("BASER_[0-9]*", c))       { v = pct_info.pct.row_obar(i);                         }
+   else if(check_reg_exp("THRESH_[0-9]", c))      { v = pct_info.pct.threshold(i);                        }
+   else if(check_reg_exp("OY_TP_[0-9]", c))       { v = pct_info.pct.event_count_by_row(i)/(double) n;    }
+   else if(check_reg_exp("ON_TP_[0-9]", c))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) n; }
+   else if(check_reg_exp("CALIBRATION_[0-9]", c)) { v = pct_info.pct.row_calibration(i);                  }
+   else if(check_reg_exp("REFINEMENT_[0-9]", c))  { v = pct_info.pct.row_refinement(i);                   }
+   else if(check_reg_exp("LIKELIHOOD_[0-9]", c))  { v = pct_info.pct.row_event_likelihood(i);             }
+   else if(check_reg_exp("BASER_[0-9]", c))       { v = pct_info.pct.row_obar(i);                         }
    else {
      mlog << Error << "\nstore_stat_pjc() -> "
           << "unsupported column name requested \"" << c
@@ -1543,10 +1567,8 @@ void store_stat_prc(int i_point, const ConcatString &col,
    ConcatString c = col;
    c.set_upper();
 
-// JHG, need better reg exp to skip "N_THRESH" column!
-
    // Get index value for variable column numbers
-   if(check_reg_exp("*_[0-9]*", c)) {
+   if(check_reg_exp("_[0-9]", c)) {
 
       // Parse the index value from the column name
       i = atoi(strrchr(c, '_') + 1) - 1;
@@ -1567,9 +1589,9 @@ void store_stat_prc(int i_point, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL")                      { v = (double) pct_info.pct.n();         }
    else if(c == "N_THRESH")                   { v = (double) pct_info.pct.nrows() + 1; }
-   else if(check_reg_exp("THRESH_[0-9]*", c)) { v = pct_info.pct.threshold(i);         }
-   else if(check_reg_exp("PODY_[0-9]*", c))   { v = ct.pod_yes();                      }
-   else if(check_reg_exp("POFD_[0-9]*", c))   { v = ct.pofd();                         }
+   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);         }
+   else if(check_reg_exp("PODY_[0-9]", c))   { v = ct.pod_yes();                      }
+   else if(check_reg_exp("POFD_[0-9]", c))   { v = ct.pofd();                         }
    else {
      mlog << Error << "\nstore_stat_prc() -> "
           << "unsupported column name requested \"" << c
