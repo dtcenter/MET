@@ -143,6 +143,11 @@ static unixtime obs_valid_end  = (unixtime) 0;
 static int      obs_lead_beg   = bad_data_int;
 static int      obs_lead_end   = bad_data_int;
 
+// Mapping of statistic names to descriptions
+map<ConcatString, ConcatString> stat_long_name;
+static const char stat_long_name_file[] =
+   "MET_BASE/data/table_files/stat_column_description.txt";
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __SERIES_ANALYSIS_H__
