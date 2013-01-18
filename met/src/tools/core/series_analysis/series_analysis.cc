@@ -39,8 +39,6 @@ using namespace std;
 #include "vx_nc_util.h"
 #include "vx_log.h"
 
-// JHG, add long name
-
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
@@ -93,6 +91,7 @@ static void set_log_file(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void parse_file_list(const StringArray &, StringArray &);
 static void parse_ascii_file_list(const char *, StringArray &);
+static void parse_long_names();
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -284,8 +283,6 @@ void process_command_line(int argc, char **argv) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-  
-// JHG, should detect if this is a time series
 
 void process_scores() {
    int nxny, i, x, y, i_read, n_reads, i_series, i_point;
@@ -451,7 +448,7 @@ void get_series_data(int i_series,
                      VarInfo *fcst_info, VarInfo *obs_info,
                      DataPlane &fcst_dp, DataPlane &obs_dp) {
   
-   mlog << Debug(3)
+   mlog << Debug(2)
         << "Processing series entry " << i_series + 1 << " of "
         << n_series << ": " << fcst_info->magic_str()
         << " versus " << obs_info->magic_str() << "\n";
@@ -548,6 +545,9 @@ void get_series_entry(int i_series, VarInfo *info,
       else
          cur_file = search_files[j];
 
+      mlog << Debug(3)
+           << "Searching file " << cur_file << "\n";
+      
       // Open the data file
       mtddf = mtddf_factory.new_met_2d_data_file(cur_file, type);
 
@@ -559,7 +559,7 @@ void get_series_entry(int i_series, VarInfo *info,
               << "New: " << mtddf->grid().serialize() << "\n\n";
          exit(1);
       }
-      
+
       // Attempt to read the gridded data from the current file
       found = mtddf->data_plane(*info, dp);
       
@@ -568,7 +568,7 @@ void get_series_entry(int i_series, VarInfo *info,
 
       // Check if the series entry was found
       if(found) {
-         mlog << Debug(3)
+         mlog << Debug(2)
               << "Found data for " << info->magic_str()
               << " in " << search_files[j] << "\n";
 
@@ -817,7 +817,7 @@ void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
 void store_stat_fho(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = col;
@@ -850,8 +850,11 @@ void store_stat_fho(int n, const ConcatString &col,
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
+      // Build key
+      lty_stat << "FHO_" << c;
+     
       // Add new map entry
-      add_nc_var(var_name, c, c,
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
                  cts_info.cts_fcst_thresh.get_str(),
                  cts_info.cts_obs_thresh.get_str(),
                  bad_data_double);
@@ -868,7 +871,7 @@ void store_stat_fho(int n, const ConcatString &col,
 void store_stat_ctc(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
    int v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = col;
@@ -902,8 +905,11 @@ void store_stat_ctc(int n, const ConcatString &col,
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
+      // Build key
+      lty_stat << "CTC_" << c;
+
       // Add new map entry
-      add_nc_var(var_name, c, c,
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
                  cts_info.cts_fcst_thresh.get_str(),
                  cts_info.cts_obs_thresh.get_str(),
                  bad_data_double);
@@ -921,7 +927,7 @@ void store_stat_cts(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
    int i;
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
    int n_ci = 1;
 
    // Set the column name to all upper case
@@ -1019,9 +1025,12 @@ void store_stat_cts(int n, const ConcatString &col,
       
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
-        
+
+         // Build key
+         lty_stat << "CTS_" << c;
+
          // Add new map entry
-         add_nc_var(var_name, c, c,
+         add_nc_var(var_name, c, stat_long_name[lty_stat],
                     cts_info.cts_fcst_thresh.get_str(),
                     cts_info.cts_obs_thresh.get_str(),
                     (n_ci > 1 ? cts_info.alpha[i] : bad_data_double));
@@ -1041,17 +1050,20 @@ void store_stat_mctc(int n, const ConcatString &col,
                      const MCTSInfo &mcts_info) {
    int i, j;
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
    StringArray sa;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
+   ConcatString d = c;
 
    // Get the column value
         if(c == "TOTAL") { v = (double) mcts_info.cts.total(); }
    else if(c == "N_CAT") { v = (double) mcts_info.cts.nrows(); }
-   else if(check_reg_exp("F[0-9]*_O[0-9]*", c)) {
+   else if(check_reg_exp("F[0-9]*_O[0-9]*", c)) {               
+
+      d = "FI_OJ";
 
       // Parse column name to retrieve index values
       sa = c.split("_");
@@ -1082,9 +1094,12 @@ void store_stat_mctc(int n, const ConcatString &col,
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
-      
+
+      // Build key
+      lty_stat << "MCTC_" << d;
+
       // Add new map entry
-      add_nc_var(var_name, c, c,
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
                  mcts_info.cts_fcst_ta.get_str(","),
                  mcts_info.cts_obs_ta.get_str(","),
                  bad_data_double);
@@ -1102,7 +1117,7 @@ void store_stat_mcts(int n, const ConcatString &col,
                      const MCTSInfo &mcts_info) {
    int i;
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
    int n_ci = 1;
 
    // Set the column name to all upper case
@@ -1148,8 +1163,11 @@ void store_stat_mcts(int n, const ConcatString &col,
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
          
+         // Build key
+         lty_stat << "MCTS_" << c;
+
          // Add new map entry
-         add_nc_var(var_name, c, c,
+         add_nc_var(var_name, c, stat_long_name[lty_stat],
                     mcts_info.cts_fcst_ta.get_str(","),
                     mcts_info.cts_obs_ta.get_str(","),
                     (n_ci > 1 ? mcts_info.alpha[i] : bad_data_double));
@@ -1169,7 +1187,7 @@ void store_stat_cnt(int n, const ConcatString &col,
                     const CNTInfo &cnt_info) {
    int i;
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
    int n_ci = 1;
 
    // Set the column name to all upper case
@@ -1268,8 +1286,11 @@ void store_stat_cnt(int n, const ConcatString &col,
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
          
+         // Build key
+         lty_stat << "CNT_" << c;
+
          // Add new map entry
-         add_nc_var(var_name, c, c,
+         add_nc_var(var_name, c, stat_long_name[lty_stat],
                     "", "",
                     (n_ci > 1 ? cnt_info.alpha[i] : bad_data_double));
       }
@@ -1287,7 +1308,7 @@ void store_stat_cnt(int n, const ConcatString &col,
 void store_stat_sl1l2(int n, const ConcatString &col,
                       const CNTInfo &cnt_info) {
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = col;
@@ -1313,8 +1334,11 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
+      // Build key
+      lty_stat << "SL1L2_" << c;
+
       // Add new map entry
-      add_nc_var(var_name, c, c,
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
                  "", "",
                  bad_data_double);
    }
@@ -1330,12 +1354,13 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 void store_stat_pct(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
    int i, v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
-   
+   ConcatString d = c;
+
    // Get index value for variable column numbers
    if(check_reg_exp("_[0-9]", c)) {
 
@@ -1352,11 +1377,13 @@ void store_stat_pct(int n, const ConcatString &col,
    }  // end if
    
    // Get the column value
-        if(c == "TOTAL")                      { v = pct_info.pct.n();                      }
-   else if(c == "N_THRESH")                   { v = pct_info.pct.nrows() + 1;              }
+        if(c == "TOTAL")                     { v = pct_info.pct.n();                      }
+   else if(c == "N_THRESH")                  { v = pct_info.pct.nrows() + 1;              }
    else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);             }
-   else if(check_reg_exp("OY_[0-9]", c))     { v = pct_info.pct.event_count_by_row(i);    }
-   else if(check_reg_exp("ON_[0-9]", c))     { v = pct_info.pct.nonevent_count_by_row(i); }
+   else if(check_reg_exp("OY_[0-9]", c))     { v = pct_info.pct.event_count_by_row(i);
+                                               d = "OY_I";                                }
+   else if(check_reg_exp("ON_[0-9]", c))     { v = pct_info.pct.nonevent_count_by_row(i);
+                                               d = "ON_I";                                }
    else {
      mlog << Error << "\nstore_stat_pct() -> "
           << "unsupported column name requested \"" << c
@@ -1371,8 +1398,11 @@ void store_stat_pct(int n, const ConcatString &col,
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
+      // Build key
+      lty_stat << "PCT_" << d;
+
       // Add new map entry
-      add_nc_var(var_name, c, c,
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
                  pct_info.pct_fcst_thresh.get_str(","),
                  pct_info.pct_obs_thresh.get_str(),
                  bad_data_double);
@@ -1390,7 +1420,7 @@ void store_stat_pstd(int n, const ConcatString &col,
                      const PCTInfo &pct_info) {
    int i;
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
    int n_ci = 1;
 
    // Set the column name to all upper case
@@ -1432,8 +1462,11 @@ void store_stat_pstd(int n, const ConcatString &col,
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
+         // Build key
+         lty_stat << "PSTD_" << c;
+
          // Add new map entry
-         add_nc_var(var_name, c, c,
+         add_nc_var(var_name, c, stat_long_name[lty_stat],
                     pct_info.pct_fcst_thresh.get_str(","),
                     pct_info.pct_obs_thresh.get_str(),
                     (n_ci > 1 ? pct_info.alpha[i] : bad_data_double));
@@ -1453,12 +1486,13 @@ void store_stat_pjc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
    int i, tot;
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
-
+   ConcatString d = c;
+   
    // Get index value for variable column numbers
    if(check_reg_exp("_[0-9]", c)) {
 
@@ -1478,15 +1512,22 @@ void store_stat_pjc(int n, const ConcatString &col,
    tot = pct_info.pct.n();
 
    // Get the column value
-        if(c == "TOTAL")                           { v = (double) tot;                                      }
-   else if(c == "N_THRESH")                        { v = (double) pct_info.pct.nrows() + 1;                 }
-   else if(check_reg_exp("THRESH_[0-9]", c))      { v = pct_info.pct.threshold(i);                          }
-   else if(check_reg_exp("OY_TP_[0-9]", c))       { v = pct_info.pct.event_count_by_row(i)/(double) tot;    }
-   else if(check_reg_exp("ON_TP_[0-9]", c))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) tot; }
-   else if(check_reg_exp("CALIBRATION_[0-9]", c)) { v = pct_info.pct.row_calibration(i);                    }
-   else if(check_reg_exp("REFINEMENT_[0-9]", c))  { v = pct_info.pct.row_refinement(i);                     }
-   else if(check_reg_exp("LIKELIHOOD_[0-9]", c))  { v = pct_info.pct.row_event_likelihood(i);               }
-   else if(check_reg_exp("BASER_[0-9]", c))       { v = pct_info.pct.row_obar(i);                           }
+        if(c == "TOTAL")                          { v = (double) tot;                                       }
+   else if(c == "N_THRESH")                       { v = (double) pct_info.pct.nrows() + 1;                  }
+   else if(check_reg_exp("THRESH_[0-9]", c))      { v = pct_info.pct.threshold(i);
+                                                    d = "THRESH_I";                                         }
+   else if(check_reg_exp("OY_TP_[0-9]", c))       { v = pct_info.pct.event_count_by_row(i)/(double) tot;
+                                                    d = "OY_TP_I";                                          }
+   else if(check_reg_exp("ON_TP_[0-9]", c))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) tot;
+                                                    d = "ON_TP_I";                                          }
+   else if(check_reg_exp("CALIBRATION_[0-9]", c)) { v = pct_info.pct.row_calibration(i);
+                                                    d = "CALIBRATION_I";                                    }
+   else if(check_reg_exp("REFINEMENT_[0-9]", c))  { v = pct_info.pct.row_refinement(i);
+                                                    d = "REFINEMENT_I";                                     }
+   else if(check_reg_exp("LIKELIHOOD_[0-9]", c))  { v = pct_info.pct.row_event_likelihood(i);
+                                                    d = "LIKELIHOOD_I";                                     }
+   else if(check_reg_exp("BASER_[0-9]", c))       { v = pct_info.pct.row_obar(i);
+                                                    d = "BASER_I";                                          }
    else {
      mlog << Error << "\nstore_stat_pjc() -> "
           << "unsupported column name requested \"" << c
@@ -1501,11 +1542,14 @@ void store_stat_pjc(int n, const ConcatString &col,
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
-     // Add new map entry
-     add_nc_var(var_name, c, c,
-                pct_info.pct_fcst_thresh.get_str(","),
-                pct_info.pct_obs_thresh.get_str(),
-                bad_data_double);
+      // Build key
+      lty_stat << "PJC_" << d;
+
+      // Add new map entry
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
+                 pct_info.pct_fcst_thresh.get_str(","),
+                 pct_info.pct_obs_thresh.get_str(),
+                 bad_data_double);
    }
             
    // Store the statistic value
@@ -1520,12 +1564,13 @@ void store_stat_prc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
    int i;
    double v;
-   ConcatString var_name;
+   ConcatString lty_stat, var_name;
    TTContingencyTable ct;
 
    // Set the column name to all upper case
    ConcatString c = col;
    c.set_upper();
+   ConcatString d = c;
 
    // Get index value for variable column numbers
    if(check_reg_exp("_[0-9]", c)) {
@@ -1547,11 +1592,14 @@ void store_stat_prc(int n, const ConcatString &col,
    }  // end if
 
    // Get the column value
-        if(c == "TOTAL")                      { v = (double) pct_info.pct.n();         }
-   else if(c == "N_THRESH")                   { v = (double) pct_info.pct.nrows() + 1; }
-   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);         }
-   else if(check_reg_exp("PODY_[0-9]", c))   { v = ct.pod_yes();                      }
-   else if(check_reg_exp("POFD_[0-9]", c))   { v = ct.pofd();                         }
+        if(c == "TOTAL")                     { v = (double) pct_info.pct.n();         }
+   else if(c == "N_THRESH")                  { v = (double) pct_info.pct.nrows() + 1; }
+   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);
+                                               d = "THRESH_I";                        }
+   else if(check_reg_exp("PODY_[0-9]", c))   { v = ct.pod_yes();
+                                               d = "PODY_I";                          }
+   else if(check_reg_exp("POFD_[0-9]", c))   { v = ct.pofd();
+                                               d = "POFD_I";                          }
    else {
      mlog << Error << "\nstore_stat_prc() -> "
           << "unsupported column name requested \"" << c
@@ -1562,11 +1610,14 @@ void store_stat_prc(int n, const ConcatString &col,
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
-     // Add new map entry
-     add_nc_var(var_name, c, c,
-                pct_info.pct_fcst_thresh.get_str(","),
-                pct_info.pct_obs_thresh.get_str(),
-                bad_data_double);
+      // Build key
+      lty_stat << "PRC_" << d;
+
+      // Add new map entry
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
+                 pct_info.pct_fcst_thresh.get_str(","),
+                 pct_info.pct_obs_thresh.get_str(),
+                 bad_data_double);
    }
             
    // Store the statistic value
@@ -1622,6 +1673,9 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
            << "error writing the series length variable.\n\n";
             exit(1);
    }
+
+   // Load the long name descriptions for each column name
+   parse_long_names();
 
    return;
 }
@@ -1853,7 +1907,7 @@ void parse_ascii_file_list(const char *file_list, StringArray & list) {
    mlog << Debug(1)
         << "Reading ASCII file list: " << file_list << "\n";
    
-   // Open the ensemble file list
+   // Open the file list
    f_in.open(file_list);
    if(!f_in) {
       mlog << Error << "\nparse_ascii_file_list() -> "
@@ -1864,6 +1918,47 @@ void parse_ascii_file_list(const char *file_list, StringArray & list) {
 
    // Read and store the file names
    while(f_in >> file_name) list.add(file_name);
+
+   // Close the input file
+   f_in.close();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_long_names() {
+   ifstream f_in;
+   ConcatString line, key;
+   StringArray sa;
+   ConcatString file_name = replace_path(stat_long_name_file);
+
+   mlog << Debug(1)
+        << "Reading stat column descriptions: " << file_name << "\n";
+
+   // Open the data file
+   f_in.open(file_name);
+   if(!f_in) {
+      mlog << Error << "\nparse_long_names() -> "
+           << "can't open the ASCII file \"" << file_name
+           << "\" for reading\n\n";
+      exit(1);
+   }
+
+   // Read the lines in the file
+   while(line.read_line(f_in)) {
+
+      // Parse the line
+      sa = line.split("\"");
+
+      // Skip any lines without enough elements
+      if(sa.n_elements() < 2) continue;
+
+      // Store the description
+      key = sa[0];
+      key.ws_strip();
+      stat_long_name[key] = sa[1];
+   }
 
    // Close the input file
    f_in.close();
