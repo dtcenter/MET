@@ -1,4 +1,3 @@
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2012
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -12,14 +11,22 @@
 //   Filename:   pcp_combine.cc
 //
 //   Description:
-//      Based on user specified time periods, this tool combines
-//      one or more grib precipitation files into a single
-//      precipitation file and will dump out the output in NetCDF
-//      format.
+//      Based on the command line options, this tool combines one or
+//      more gridded data files into a single gridded data file and
+//      writes the output in NetCDF format.
 //
-//      The user must specify the following on the command line:
-//      init_time_time, in_accum_time, valid_time, out_accum_time,
-//      and out_filename
+//      The tool may be run three different modes: sum, add, subtract
+//
+//      The sum command requires the user to specify an initialization
+//      time, input accumulation interval, valid time, and output
+//      accumulation interval.
+//
+//      The add and subtract commands require the user to specify a
+//      list of input files, each followed by an accumulation interval.
+//      The subtract command requires exactly two input files while the
+//      add command supports one or more input files.
+//
+//      In all cases, the last argument is the output NetCDF file name.
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
@@ -65,6 +72,7 @@
 //                                   remove unnecessary time strings.
 //
 //   015    04/12/12  Oldenburg      Support for all gridded data types
+//   016    01/23/13  Oldenburg      Update usage statements
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -89,8 +97,6 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
-#include "vx_data2d_grib.h"
-#include "grib_classes.h"
 #include "vx_nc_util.h"
 #include "vx_grid.h"
 #include "vx_statistics.h"
@@ -111,14 +117,10 @@ enum RunCommand { sum = 0, add = 1, sub = 2 };
 
 // Variables for top-level command line arguments
 static RunCommand run_command = sum;
-static int grib_code = apcp_grib_code;
-static int grib_ptv  = 2;
-// static GCInfo gc_info;
 static int verbosity = 1;
 
 // Variables common to all commands
 static ConcatString out_filename;
-// static float       *pcp_data = (float *) 0;
 
 // Variables for the sum command
 static unixtime     init_time;
@@ -148,7 +150,7 @@ static void do_sum_command();
 static void do_add_command();
 static void do_sub_command();
 
-static void sum_grib_files(Grid &, DataPlane &);
+static void sum_data_files(Grid &, DataPlane &);
 static int  search_pcp_dir(const char *, const unixtime, ConcatString &);
 
 static void get_field(const char * filename, const int get_accum,
@@ -167,15 +169,12 @@ static void usage();
 static void set_sum(const StringArray &);
 static void set_add(const StringArray &);
 static void set_subtract(const StringArray &);
-static void set_grib_code(const StringArray &);
-static void set_ptv_num(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_user_dict(const StringArray & a);
 static void set_var_name(const StringArray & a);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -240,15 +239,12 @@ void process_command_line(int argc, char **argv)
    cline.add(set_sum,       "-sum",      0);
    cline.add(set_add,       "-add",      0);
    cline.add(set_subtract,  "-subtract", 0);
-
-   cline.add(set_grib_code, "-gc",       1);
-   cline.add(set_ptv_num,   "-ptv",      1);
-   cline.add(set_logfile,   "-log",      1);
-   cline.add(set_verbosity, "-v",        1);
    cline.add(set_pcpdir,    "-pcpdir",   1);
    cline.add(set_pcprx,     "-pcprx",    1);
    cline.add(set_user_dict, "-config",   1);
    cline.add(set_var_name,  "-varname",  1);
+   cline.add(set_logfile,   "-log",      1);
+   cline.add(set_verbosity, "-v",        1);   
 
    //
    // parse the command line
@@ -396,12 +392,6 @@ void process_add_sub_args(const CommandLine & cline)
    for(i=0; i<n_files; i++) {
       in_file[i] = cline[i*2];
       accum_mag.add( cline[i*2 + 1] );
-
-      /*PGO
-      accum_mag.add( "name=\"TMP\";level=\"Z2\";" );
-      accum[i] = is_hhmmss(accum_mag[i]) || is_hh(accum_mag[i]) ?
-                     timestring_to_sec(accum_mag[i]) : 0;
-      */
    }
 
    //
@@ -480,7 +470,7 @@ void do_sum_command()
    //
    // Find and sum up the matching precipitation files
    //
-   sum_grib_files(grid, plane);
+   sum_data_files(grid, plane);
 
    //
    // Write the combined precipitation field out in NetCDF format
@@ -495,7 +485,7 @@ void do_sum_command()
 
 ////////////////////////////////////////////////////////////////////////
 
-void sum_grib_files(Grid & grid, DataPlane & plane)
+void sum_data_files(Grid & grid, DataPlane & plane)
 
 {
 
@@ -560,7 +550,7 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
       //
       if(pcp_recs[i] == -1) {
 
-         mlog << Error << "\nsum_grib_files() -> "
+         mlog << Error << "\nsum_data_files() -> "
               << "Cannot find a file with a valid time of "
               << unix_to_yyyymmdd_hhmmss(pcp_times[i])
               << " and accumulation time of "
@@ -603,7 +593,7 @@ void sum_grib_files(Grid & grid, DataPlane & plane)
          // Check to make sure the grid stays the same
          //
          if(!(grid == gr)) {
-            mlog << Error << "\nsum_grib_files() -> "
+            mlog << Error << "\nsum_data_files() -> "
                  << "The grid must remain the same for all "
                  << "data files.\n\n";
             exit(1);
@@ -865,7 +855,7 @@ void do_sub_command()
    }
 
    //
-   // Read the two specified Grib files
+   // Read the two specified data files
    //
    mlog << Debug(1) 
         << "Reading input file: " << in_file[0] << "\n";
@@ -1014,7 +1004,7 @@ void get_field(const char * filename, const char * fld_accum_mag,
    var->set_valid(get_valid_ut);
    var->set_init(get_init_ut);
 
-   //PGO  build an output field name using the magic string
+   //  build an output field name using the magic string
    if( !var_info ){
       var_info = var;
       if( field_name.empty() ){
@@ -1116,7 +1106,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Define a name for the variable
    // If the accumulation time is non-zero, append it to the variable name
-   //PGO tmp_str = get_grib_code_abbr(grib_code, grib_ptv);
    tmp_str = field_name;
 
    // For no accumulation interval, append nothing
@@ -1147,8 +1136,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Add variable attributes
    pcp_var->add_att("name",  (const char *) var_str);
-//PGO   var_str = get_grib_code_name(grib_code, grib_ptv);
-//   pcp_var->add_att("long_name", (const char *) var_str);
    pcp_var->add_att("long_name", var_info->long_name());
 
    // Ouput level string
@@ -1159,9 +1146,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    }
 
    pcp_var->add_att("level", (const char *) var_str);
-
-//PGO   var_str = get_grib_code_unit(grib_code, grib_ptv);
-//   pcp_var->add_att("units",      (const char *) var_str);
    pcp_var->add_att("units",      var_info->units());
    pcp_var->add_att("_FillValue", bad_data_float);
 
@@ -1220,10 +1204,10 @@ void usage()
 
         << "Usage: " << program_name << "\n"
         << "\t[[-sum] sum_args] | [-add add_args] | [-subtract subtract_args]\n"
+        << "\t[-config config_str]\n"
+        << "\t[-varname variable_name]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n"
-        << "\t[-config config_str]\n\n"
-        << "\t[-varname variable_name]\n\n"
+        << "\t[-v level]\n\n"
 
         << "\twhere\t\"-sum sum_args\" indicates that accumulations "
         << "from multiple files should be summed up using the "
@@ -1237,17 +1221,17 @@ void usage()
         << "accumulations from two files should be subtracted using "
         << "the arguments provided.\n"
 
+        << "\t\t\"-config config_str\" configuration string to use when "
+        << "searching for records in input files (optional).\n"
+
+        << "\t\t\"-varname variable_name\" name of combined variable in "
+        << "output NetCDF file (optional).\n"
+
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << verbosity << ") (optional).\n"
-
-        << "\t\t\"-config config_str\" configuration string to use when "
-        << "searching for records in input files (optional).\n\n"
-
-        << "\t\t\"-varname variable_name\" name of combined variable in "
-        << "output NetCDF file (optional).\n\n"
+        << verbosity << ") (optional).\n\n"
 
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
         << "the default behavior.\n"
@@ -1265,11 +1249,11 @@ void usage()
         << "\t\t[-pcprx reg_exp]\n\n"
 
         << "\t\twhere\t\"init_time\" indicates the initialization "
-        << "time of the input GRIB files in YYYYMMDD[_HH[MMSS]] format "
+        << "time of the input data files in YYYYMMDD[_HH[MMSS]] format "
         << "(required).\n"
 
         << "\t\t\t\"in_accum\" indicates the accumulation interval "
-        << "of the input GRIB files in HH[MMSS] format (required).\n"
+        << "of the input data files in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"valid_time\" indicates the desired valid "
         << "time in YYYYMMDD[_HH[MMSS]] format (required).\n"
@@ -1299,13 +1283,13 @@ void usage()
         << "\t\taccumn\n"
         << "\t\tout_file\n\n"
 
-        << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
+        << "\t\twhere\t\"in_file1\" indicates the name of the first input data "
         << "file to be used (required).\n"
 
         << "\t\t\t\"accum1\" indicates the accumulation interval to be used "
         << "from in_file1 in HH[MMSS] format (required).\n"
 
-        << "\t\t\t\"in_filen\" indicates additional input GRIB files to be "
+        << "\t\t\t\"in_filen\" indicates additional input data files to be "
         << "added together (optional).\n"
 
         << "\t\t\t\"accumn\" indicates the accumulation interval to be used "
@@ -1321,13 +1305,13 @@ void usage()
         << "\t\taccum2\n"
         << "\t\tout_file\n\n"
 
-        << "\t\twhere\t\"in_file1\" indicates the name of the first input GRIB "
+        << "\t\twhere\t\"in_file1\" indicates the name of the first input data "
         << "file to be used (required).\n"
 
         << "\t\t\t\"accum1\" indicates the accumulation interval to be used "
         << "from in_file1 in HH[MMSS] format (required).\n"
 
-        << "\t\t\t\"in_file2\" indicates the name of the second input GRIB "
+        << "\t\t\t\"in_file2\" indicates the name of the second input data "
         << "file to be subtracted from in_file1 (required).\n"
 
         << "\t\t\t\"accum2\" indicates the accumulation interval to be used "
@@ -1360,20 +1344,6 @@ void set_add(const StringArray &)
 void set_subtract(const StringArray &)
 {
    run_command = sub;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_grib_code(const StringArray & a)
-{
-   grib_code = atoi(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_ptv_num(const StringArray & a)
-{
-   grib_ptv = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
