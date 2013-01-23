@@ -89,7 +89,7 @@ cluster_page.o: cluster_page.cc mode_ps_file.h
 
 
 mode_exec.o: mode_exec.h mode_exec.cc
-	$(CXX) mode_exec.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR)
+	$(CXX) mode_exec.cc -c $(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" -I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS)
 
 
 ########################################################################
