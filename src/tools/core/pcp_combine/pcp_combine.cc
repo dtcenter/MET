@@ -71,8 +71,9 @@
 //   014    03/07/12  Halley Gotway  Bugfix in get_field() function and
 //                                   remove unnecessary time strings.
 //
-//   015    04/12/12  Oldenburg      Support for all gridded data types
-//   016    01/23/13  Oldenburg      Update usage statements
+//   015    04/12/12  Oldenburg      Support for all gridded data types.
+//   016    01/23/13  Halley Gotway  Update usage statement and code
+//                                   cleanup.
 //
 ////////////////////////////////////////////////////////////////////////
 
