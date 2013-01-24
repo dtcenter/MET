@@ -23,6 +23,7 @@
 //   002    01/03/12  Holmes          Modified to get a grid definition
 //                                    from a data file to use for the
 //                                    plot.
+//   003    01/24/13  Halley Gotway   Add -dotsize command line argument.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -69,6 +70,7 @@ using namespace std;
 static const char  *program_name = "plot_point_obs";
 static const Color  c_map(25, 25, 25);
 static const double l_width = 0.5;
+static const double default_dotsize = 1.0;
 
 static const double margin_size = 36.0;
 
@@ -83,6 +85,7 @@ static Box          grid_bb;
 static StringArray  ityp;
 static IntArray     ivar;
 static ConcatString data_plane_filename;
+static double       dotsize = default_dotsize;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -91,6 +94,7 @@ static void usage();
 static void set_grib_code(const StringArray &);
 static void set_msg_type(const StringArray &);
 static void set_data_filename(const StringArray &);
+static void set_dotsize(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
@@ -142,6 +146,7 @@ int main(int argc, char *argv[]) {
    cline.add(set_grib_code, "-gc", 1);
    cline.add(set_msg_type, "-msg_typ", 1);
    cline.add(set_data_filename, "-data_file", 1);
+   cline.add(set_dotsize, "-dotsize", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
 
@@ -450,7 +455,7 @@ int main(int argc, char *argv[]) {
          //
          // Draw a circle at this point and increment the plot count
          //
-         plot.circle(page_x, page_y, 0.5, 0);
+         plot.circle(page_x, page_y, dotsize, 0);
          plot.fill();
 
          //
@@ -514,6 +519,7 @@ void usage() {
         << "\t[-gc code]\n"
         << "\t[-msg_typ name]\n"
         << "\t[-data_file name]\n"
+        << "\t[-dotsize val]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -527,6 +533,8 @@ void usage() {
         << "plotted (optional).\n"
         << "\t\t\"-data_file name\" specifies a data file whose grid "
         << "should be used for the plot (optional).\n"
+        << "\t\t\"-dotsize val\" overrides the default dot size value ("
+        << default_dotsize << ") (optional).\n"
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
         << "\t\t\"-v level\" overrides the default level of logging ("
@@ -555,6 +563,13 @@ void set_msg_type(const StringArray & a)
 void set_data_filename(const StringArray & a)
 {
    data_plane_filename = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_dotsize(const StringArray & a)
+{
+   dotsize = atof(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
