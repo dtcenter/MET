@@ -1851,10 +1851,6 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    // Write a line for each ssvar bin
    for(int i=0; i<pd_ptr->ssvar_bins[0].n_bin; i++) {
 
-      // Set the observation valid time
-      shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
-      shc.set_obs_valid_end(pd_ptr->vld_ta[i]);
-
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
 
