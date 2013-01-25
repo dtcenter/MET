@@ -935,19 +935,6 @@ void VxPairDataEnsemble::add_ens(bool mn) {
             // Process each of the observations
             for(l=0; l<pd[i][j][k].n_pair; l++) { 
 
-               // PGO - ensemble mean calculation for interpolation-then-mean implementation
-               /*
-               // Calculate the ensemble mean in the absence of a mean file
-               if( mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean,"")) ){
-                  NumArray* e_pt = &(pd[i][j][k].e_na[l]);
-                  fcst_v = 0;
-                  for(int m=0; m < e_pt->n_elements(); m++)
-                     fcst_v += (*e_pt)[m];
-                  pd[i][j][k].mn_na.add(fcst_v / (double)e_pt->n_elements());
-                  continue;
-               }
-               */
-
                // For a single forecast field
                if(fcst_dpa.n_planes() == 1) {
                   fcst_lvl_below = 0;
