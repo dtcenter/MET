@@ -1354,7 +1354,6 @@ void process_grid_vx() {
             pd.compute_rhist();
             pd.compute_stats();
 
-            //PGO - moving this here
             if( 0 == i ) setup_txt_files(pd.n_pair);
 
             // Compute RHIST scores
