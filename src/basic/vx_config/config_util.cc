@@ -303,7 +303,6 @@ StringArray parse_conf_message_type(Dictionary *dict) {
 
 StringArray parse_conf_obs_qty(Dictionary *dict) {
    StringArray sa;
-   int i;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_obs_qty() -> "
