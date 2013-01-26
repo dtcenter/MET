@@ -1798,7 +1798,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
    StringArray case_list;
    double v;
    double best_val;
-   ConcatString best_mod;
+   ConcatString best_mod, s;
    int i, j, k, n;
 
    // Initialize counts
@@ -1845,8 +1845,9 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
    for(i=0; i<Column.n_elements(); i++) {
 
       // Check if FSP should be computed for this column
-      if(strcasestr(Column[i], "-")   == NULL &&
-         strcasestr(Column[i], "ERR") == NULL) {
+      s = Column[i];
+      s.set_upper();
+      if(strstr(s, "-") == NULL && strstr(s, "ERR") == NULL) {
          mlog << Debug(4)
               << "Skipping frequency of superior performance for "
               << "column \"" << Column[i] << "\" since it is not an "

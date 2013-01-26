@@ -327,10 +327,6 @@ void write_tc_header_cols(const TcHdrColumns &hdr,
 void write_tc_mpr_cols(const TrackPairInfo &p, int i,
                        AsciiTable &at, int r, int c) {
    int j;
-   WatchWarnType ww_type;
-
-   // Get the most severe watch/warning type
-   ww_type = ww_max(p.adeck()[i].watch_warn(), p.bdeck()[i].watch_warn());
 
    // Write static columns
    at.set_entry(r, c++, p.n_points());

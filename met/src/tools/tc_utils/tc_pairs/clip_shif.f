@@ -1847,37 +1847,6 @@ c
 C
 C
 C
-      subroutine calendar_day(iyear,julday,imon,iday)
-c
-c     This routine calculates the calendar day (julday) from
-c     the Julian day and year. The
-c     appropriate correction is made for leap year.
-c
-      integer daytab(24)
-      data daytab/31,28,31,30,31,30,31,31,30,31,30,31,
-     *            31,29,31,30,31,30,31,31,30,31,30,31/
-c
-      if ((mod(iyear,4).eq.0.and.mod(iyear,100).ne.0) .or.
-     *   (mod(iyear,400).eq.0)) then
-         leap = 1
-         else
-         leap = 0
-         endif
-c
-      i=1
-      mday = julday
-      do while (mday>daytab(i+12*leap))
-         ii = i+12*leap
-         mday = mday-daytab(ii)
-         i=i+1
-         end do
-      imon=i
-      iday=mday
-      return
-      end
-C
-C
-C
 C     ------------------------------------------------------------
       SUBROUTINE BTCLIP(BASIN,IMO,IDY,IHR,NBT,BMO,BDY,BHR,
      *                  BLAT,BLON,BWS,CLAT,CLON,SWND)

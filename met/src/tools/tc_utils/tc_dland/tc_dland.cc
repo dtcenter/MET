@@ -62,8 +62,6 @@ static const LatLonData NWHemTenthData =
 static const char *default_land_data_file =
    "MET_BASE/data/tc_data/aland.dat";
 
-static const double km_per_deg = 111.12;
-   
 ////////////////////////////////////////////////////////////////////////
 //    
 // Variables for command line arguments
