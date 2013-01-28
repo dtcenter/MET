@@ -1796,8 +1796,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
                                    NumArray &ties) {
    map<ConcatString,MapData,cs_cmp>::iterator it;
    StringArray case_list;
-   double v;
-   double best_val;
+   double v, best_val;
    ConcatString best_mod, s;
    int i, j, k, n;
 
@@ -1882,12 +1881,12 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 
                // Check for an meaningful improvment
                if(is_bad_data(best_val) ||
-                  FSPThresh.check(abs(best_val) - abs(v))) {
+                  FSPThresh.check(fabs(best_val) - fabs(v))) {
                   best_val = v;
                   best_mod = it->second.AModel[k];
                }
                // Check for ties
-               else if(abs(v) <= abs(best_val)) {
+               else if(fabs(v) <= fabs(best_val)) {
                   best_val = v;
                   best_mod = "TIE";
                }
