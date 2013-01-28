@@ -389,7 +389,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
    //  arrange the level values appropriately
    lvl2 = ( !is_eq(lvl2, lvl1) ? lvl2 : -1.0 );
    if( lt == LevelType_Pres && !is_eq(lvl2, -1.0) && lvl2 < lvl1 ){
-      int lvl_tmp = lvl2;
+      double lvl_tmp = lvl2;
       lvl2 = lvl1;
       lvl1 = lvl_tmp;
    }

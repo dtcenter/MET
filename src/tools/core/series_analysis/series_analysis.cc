@@ -294,7 +294,7 @@ void process_scores() {
 
    // Determine the block size
    nxny    = grid.nx() * grid.ny();
-   n_reads = ceil((double) nxny / conf_info.block_size);
+   n_reads = nint(ceil((double) nxny / conf_info.block_size));
 
    // Allocate space to store the pairs for each grid point
    f_na = new NumArray [conf_info.block_size];
@@ -1353,7 +1353,8 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 
 void store_stat_pct(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i, v;
+   int i;
+   double v;
    ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
@@ -1377,13 +1378,13 @@ void store_stat_pct(int n, const ConcatString &col,
    }  // end if
    
    // Get the column value
-        if(c == "TOTAL")                     { v = pct_info.pct.n();                      }
-   else if(c == "N_THRESH")                  { v = pct_info.pct.nrows() + 1;              }
-   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);             }
-   else if(check_reg_exp("OY_[0-9]", c))     { v = pct_info.pct.event_count_by_row(i);
-                                               d = "OY_I";                                }
-   else if(check_reg_exp("ON_[0-9]", c))     { v = pct_info.pct.nonevent_count_by_row(i);
-                                               d = "ON_I";                                }
+        if(c == "TOTAL")                     { v = (double) pct_info.pct.n();                      }
+   else if(c == "N_THRESH")                  { v = (double) pct_info.pct.nrows() + 1;              }
+   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);                      }
+   else if(check_reg_exp("OY_[0-9]", c))     { v = (double) pct_info.pct.event_count_by_row(i);
+                                               d = "OY_I";                                         }
+   else if(check_reg_exp("ON_[0-9]", c))     { v = (double) pct_info.pct.nonevent_count_by_row(i);
+                                               d = "ON_I";                                         }
    else {
      mlog << Error << "\nstore_stat_pct() -> "
           << "unsupported column name requested \"" << c

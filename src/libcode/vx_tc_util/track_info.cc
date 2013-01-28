@@ -946,7 +946,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       for(j=0; j<tracks.n_tracks(); j++) {
 
          // Get the index of the TrackPoint for this lead time
-         i_pnt = tracks.Track[j].lead_index(lead_list[i]);
+         i_pnt = tracks.Track[j].lead_index(nint(lead_list[i]));
          if(i_pnt < 0) continue;
 
          // Keep track of the TrackPoint count and sums

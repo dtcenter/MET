@@ -888,10 +888,10 @@ int derive_lag(TrackInfoArray &tracks) {
 
       mlog << Debug(3)
            << "Building time-lagged track(s) for lag time \""
-           << sec_to_hhmmss(conf_info.LagTime[i]) << "\"\n";
+           << sec_to_hhmmss(nint(conf_info.LagTime[i])) << "\"\n";
 
       // Store current lag time
-      s = conf_info.LagTime[i];
+      s = nint(conf_info.LagTime[i]);
   
       // Loop through the tracks
       for(j=0; j<n_tracks; j++) {
@@ -1177,7 +1177,7 @@ void derive_baseline_model(const ConcatString &model,
    new_point.set_lead(0);
    new_point.set_lat(tp_lat[0]);
    new_point.set_lon(tp_lon[0]);
-   if(!is_bad_data(tp_vmax[0])) new_point.set_v_max(tp_vmax[0]);
+   if(!is_bad_data(tp_vmax[0])) new_point.set_v_max(nint(tp_vmax[0]));
    new_track.add(new_point);
    
    // Loop over the remaining track points
@@ -1202,7 +1202,7 @@ void derive_baseline_model(const ConcatString &model,
          new_point.set_lead(lead_sec);
          new_point.set_lat(bl_lat[i]);
          new_point.set_lon(bl_lon[i]);
-         if(!is_bad_data(bl_vmax[i])) new_point.set_v_max(bl_vmax[i]);
+         if(!is_bad_data(bl_vmax[i])) new_point.set_v_max(nint(bl_vmax[i]));
 
          // Add the current CLIPER/SHIFOR track point
          new_track.add(new_point);

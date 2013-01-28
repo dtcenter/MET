@@ -944,9 +944,9 @@ ConcatString TCStatJob::serialize() const {
    for(i=0; i<InitExc.n_elements(); i++)
       s << "-init_exc " << unix_to_yyyymmdd_hhmmss(InitExc[i]) << " ";
    for(i=0; i<InitHour.n_elements(); i++)
-      s << "-init_hour " << sec_to_hhmmss(InitHour[i]) << " ";
+      s << "-init_hour " << sec_to_hhmmss(nint(InitHour[i])) << " ";
    for(i=0; i<Lead.n_elements(); i++)
-      s << "-lead " << sec_to_hhmmss(Lead[i]) << " ";
+      s << "-lead " << sec_to_hhmmss(nint(Lead[i])) << " ";
    if(ValidBeg > 0)
       s << "-valid_beg " << unix_to_yyyymmdd_hhmmss(ValidBeg) << " ";
    if(ValidEnd > 0)
@@ -956,7 +956,7 @@ ConcatString TCStatJob::serialize() const {
    for(i=0; i<ValidExc.n_elements(); i++)
       s << "-valid_exc " << unix_to_yyyymmdd_hhmmss(ValidExc[i]) << " ";
    for(i=0; i<ValidHour.n_elements(); i++)
-      s << "-valid_hour " << sec_to_hhmmss(ValidHour[i]) << " ";
+      s << "-valid_hour " << sec_to_hhmmss(nint(ValidHour[i])) << " ";
    for(i=0; i<InitMask.n_elements(); i++)
       s << "-init_mask " << InitMask[i] << " ";
    for(i=0; i<ValidMask.n_elements(); i++)
@@ -1747,10 +1747,12 @@ void TCStatJobSummary::do_output(ostream &out) {
       else                    fsp = bad_data_double;
 
       // Compute time to independence for time-series data
-      if(is_time_series(init, lead, valid, dsec))
+      if(is_time_series(init, lead, valid, dsec)) {
          tind = compute_time_to_indep(v, dsec);
-      else
-         tind = dsec = bad_data_double;
+      }
+      else {
+         tind = dsec = bad_data_int;
+      }
                                 
       // Write the table row
       out_at.set_entry(r, c++, "SUMMARY:");      
@@ -2003,7 +2005,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    }
 
    // Initialize time spacing
-   dinit  = init[1]  - init[0];
+   dinit  = nint(init[1]  - init[0]);
    dlead  = lead[1]  - lead[0];
    dvalid = valid[1] - valid[0];
    
@@ -2053,7 +2055,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
       dsec = dinit;
       mlog << Debug(4)
            << "Computing time-series for lead time \""
-           << sec_to_hhmmss(lead[0]) << "\" and spacing \""
+           << sec_to_hhmmss(nint(lead[0])) << "\" and spacing \""
            << sec_to_hhmmss(dsec) << "\".\n";
    }
 

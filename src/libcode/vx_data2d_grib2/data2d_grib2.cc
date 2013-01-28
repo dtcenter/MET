@@ -630,7 +630,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
                     << "lead time unit of " << gfld->ipdtmpl[7] << "\n\n";
                exit(1);
             }
-            rec->LeadTime = sec_lead_unit * gfld->ipdtmpl[8];
+            rec->LeadTime = nint(sec_lead_unit * gfld->ipdtmpl[8]);
 
             //  set the forecast time information
             if     ( -1 == rec->ValidTime )   rec->ValidTime = rec->InitTime  + rec->LeadTime;

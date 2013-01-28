@@ -29,6 +29,7 @@ using namespace std;
 #include "var_info_grib2.h"
 
 #include "math_constants.h"
+#include "vx_math.h"
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_data2d.h"
@@ -300,7 +301,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_level_info_grib(dict);
 
    //  if the level type is a record number, set the data member
-   set_record( Level.type() == LevelType_RecNumber ? Level.lower() : -1 );
+   set_record( Level.type() == LevelType_RecNumber ? nint(Level.lower()) : -1 );
 
    //  if the field is not probabilistic, work is done
    if( field_name != "PROB" ) return;

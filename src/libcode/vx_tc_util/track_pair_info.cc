@@ -338,9 +338,9 @@ void TrackPairInfo::add(const TCStatLine &l) {
       cs << cs_erase << deck[i] << "LON";
       tp->set_lon(atof(l.get_item(cs)));
       cs << cs_erase << deck[i] << "MAX_WIND";
-      tp->set_v_max(atof(l.get_item(cs)));
+      tp->set_v_max(atoi(l.get_item(cs)));
       cs << cs_erase << deck[i] << "MSLP";
-      tp->set_mslp(atof(l.get_item(cs)));
+      tp->set_mslp(atoi(l.get_item(cs)));
       tp->set_level(string_to_cyclonelevel(l.get_item("LEVEL")));
       tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 

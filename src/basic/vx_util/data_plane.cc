@@ -162,7 +162,7 @@ void DataPlane::set_size(int x, int y) {
       exit(1);
    }
 
-   memset(Data, 0.0, Nxy*sizeof(double));
+   memset(Data, 0, Nxy*sizeof(double));
 
    return;
 }
