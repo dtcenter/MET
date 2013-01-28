@@ -503,7 +503,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
          for(k=0; k<wdth_na.n_elements(); k++) {
 
             // Store the current width
-            width = wdth_na[k];
+            width = nint(wdth_na[k]);
 
             // Check for the nearest neighbor special case
             if(width == 1 && strcmp(method, interpmthd_uw_mean_str) != 0) {
