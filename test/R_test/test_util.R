@@ -348,6 +348,17 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	# build the complete path and file names of the stat files and read them into data frames 
 	dfV1 = readStatData(stat1, strV1, lty);
 	dfV2 = readStatData(stat2, strV2, lty);
+	
+	# check for a mis-match on number of rows, and report if any are found
+	listNrow = c(nrow(dfV1), nrow(dfV2));
+	boolTestNrow = ( listNrow[1] == listNrow[2] );
+	if( FALSE == boolTestNrow ){
+		if( 1 <= verb ){
+			cat("WARNING: differing number of rows", listNrow[1], "vs.", listNrow[2], 
+				"for row type", lty, "between versions",	strV1, "vs.", strV2, "\n");
+		}
+		return (list("nrow" = FALSE));
+	}
 
 	# compare the information in the first 20 header columns
 	for(intCol in 2:21){
@@ -361,17 +372,6 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 			}
 			return (list("hdr" = FALSE));
 		}
-	}
-	
-	# check for a mis-match on number of rows, and report if any are found
-	listNrow = c(nrow(dfV1), nrow(dfV2));
-	boolTestNrow = ( listNrow[1] == listNrow[2] );
-	if( FALSE == boolTestNrow ){
-		if( 1 <= verb ){
-			cat("WARNING: differing number of rows", listNrow[1], "vs.", listNrow[2], 
-				"for row type", lty, "between versions",	strV1, "vs.", strV2, "\n");
-		}
-		return (list("nrow" = FALSE));
 	}
 
 	# performance storage
