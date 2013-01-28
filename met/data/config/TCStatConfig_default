@@ -292,4 +292,4 @@ jobs = [];
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V4.0";
+version = "V4.1b6";
