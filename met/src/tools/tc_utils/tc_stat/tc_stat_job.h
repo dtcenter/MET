@@ -146,7 +146,7 @@ class TCStatJob {
    public:
 
       TCStatJob();
-     ~TCStatJob();
+      virtual ~TCStatJob();
       TCStatJob(const TCStatJob &);
       TCStatJob & operator=(const TCStatJob &);
 
@@ -277,7 +277,7 @@ class TCStatJobFilter : public TCStatJob {
    public:
 
       TCStatJobFilter();
-     ~TCStatJobFilter();
+      virtual ~TCStatJobFilter();
       TCStatJobFilter(const TCStatJobFilter &);
       TCStatJobFilter & operator=(const TCStatJobFilter &);
 
@@ -302,7 +302,7 @@ class TCStatJobSummary : public TCStatJob {
    public:
 
       TCStatJobSummary();
-     ~TCStatJobSummary();
+      virtual ~TCStatJobSummary();
       TCStatJobSummary(const TCStatJobSummary &);
       TCStatJobSummary & operator=(const TCStatJobSummary &);
 
