@@ -2005,8 +2005,8 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    }
 
    // Initialize time spacing
-   dinit  = nint(init[1]  - init[0]);
-   dlead  = lead[1]  - lead[0];
+   dinit  = init[1] - init[0];
+   dlead  = nint(lead[1] - lead[0]);
    dvalid = valid[1] - valid[0];
    
    // Loop over the entries to determine the time spacing
