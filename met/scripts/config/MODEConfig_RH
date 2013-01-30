@@ -28,7 +28,7 @@ fcst = {
       name  = "RH";
       level = "P500";
    }
-  
+
    raw_thresh        = >=0.0;
    conv_radius       = 5;
    conv_thresh       = >=80.0;
