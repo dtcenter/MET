@@ -522,6 +522,11 @@ plot.set(engine, grid, data_min, data_max);
 
 build_outfile_name(".ps", ps_file);
 
+//
+// List the image file as it is being created
+//
+mlog << Debug(1) << "Creating postscript file: " << ps_file << "\n";
+
 plot.open(ps_file);
 
 plot.make_plot();
