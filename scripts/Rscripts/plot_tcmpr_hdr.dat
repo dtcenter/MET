@@ -1,0 +1,63 @@
+COLUMN      DESCRIPTION                                     UNITS
+VERSION     "MET Version"                                   NA
+AMODEL      "ADeck Model"                                   NA
+BMODEL      "BDeck Model"                                   NA
+BASIN       "Basin"                                         NA
+CYCLONE     "Cyclone Number"                                NA
+STORM_NAME  "Storm Name"                                    NA
+INIT        "Initialization Time"                           "YYYYMMDD_HHMMSS"
+LEAD        "Lead Time"                                     "HHMMSS"
+VALID       "Valid Time"                                    "YYYYMMDD_HHMMSS"
+INIT_MASK   "Initialization Masking Region"                 NA
+VALID_MASK  "Valid Masking Region"                          NA
+LINE_TYPE   "Line Type"                                     NA
+TOTAL       "Total Number"                                  NA
+INDEX       "Index of Total"                                NA
+LEVEL       "Storm Severity"                                NA
+WATCH_WARN  "Watch/Warning Status"                          NA
+INITIALS    "Forecaster Initials"                           NA
+ALAT        "ADeck Latitude"                                "deg"
+ALON        "ADeck Longitude"                               "deg"
+BLAT        "BDeck Latitude"                                "deg"
+BLON        "BDeck Longitude"                               "deg"
+TK_ERR      "Track Error"                                   "nm"
+X_ERR       "X Track Error"                                 "nm"
+Y_ERR       "Y Track Error"                                 "nm"
+ALTK_ERR    "Along-Track Error"                             "nm"
+CRTK_ERR    "Cross-Track Error"                             "nm"
+ADLAND      "ADeck Distance to Land"                        "nm"
+BDLAND      "BDeck Distance to Land"                        "nm"
+AMSLP       "ADeck Minimum Sea Level Pressure"              "mb"
+BMSLP       "BDeck Minimum Sea Level Pressure"              "mb"
+AMAX_WIND   "ADeck Maximum Wind Speed"                      "kt"
+BMAX_WIND   "BDeck Maximum Wind Speed"                      "kt"
+AAL_WIND_34 "ADeck All Quadarants Radius of 34kt Winds"     "nm"
+BAL_WIND_34 "BDeck All Quadrants Radius of 34kt Winds"      "nm"
+ANE_WIND_34 "ADeck Northeast Quadrant Radius of 34kt Winds" "nm"
+BNE_WIND_34 "BDeck Northeast Quadrant Radius of 34kt Winds" "nm"
+ASE_WIND_34 "ADeck Southeast Quadrant Radius of 34kt Winds" "nm"
+BSE_WIND_34 "BDeck Southeast Quadrant Radius of 34kt Winds" "nm"
+ASW_WIND_34 "ADeck Southwest Quadrant Radius of 34kt Winds" "nm"
+BSW_WIND_34 "BDeck Southwest Quadrant Radius of 34kt Winds" "nm"
+ANW_WIND_34 "ADeck Northwest Quadrant Radius of 34kt Winds" "nm"
+BNW_WIND_34 "BDeck Northwest Quadrant Radius of 34kt Winds" "nm"
+AAL_WIND_50 "ADeck All Quadarants Radius of 50kt Winds"     "nm"
+BAL_WIND_50 "BDeck All Quadrants Radius of 50kt Winds"      "nm"
+ANE_WIND_50 "ADeck Northeast Quadrant Radius of 50kt Winds" "nm"
+BNE_WIND_50 "BDeck Northeast Quadrant Radius of 50kt Winds" "nm"
+ASE_WIND_50 "ADeck Southeast Quadrant Radius of 50kt Winds" "nm"
+BSE_WIND_50 "BDeck Southeast Quadrant Radius of 50kt Winds" "nm"
+ASW_WIND_50 "ADeck Southwest Quadrant Radius of 50kt Winds" "nm"
+BSW_WIND_50 "BDeck Southwest Quadrant Radius of 50kt Winds" "nm"
+ANW_WIND_50 "ADeck Northwest Quadrant Radius of 50kt Winds" "nm"
+BNW_WIND_50 "BDeck Northwest Quadrant Radius of 50kt Winds" "nm"
+AAL_WIND_64 "ADeck All Quadarants Radius of 64kt Winds"     "nm"
+BAL_WIND_64 "BDeck All Quadrants Radius of 64kt Winds"      "nm"
+ANE_WIND_64 "ADeck Northeast Quadrant Radius of 64kt Winds" "nm"
+BNE_WIND_64 "BDeck Northeast Quadrant Radius of 64kt Winds" "nm"
+ASE_WIND_64 "ADeck Southeast Quadrant Radius of 64kt Winds" "nm"
+BSE_WIND_64 "BDeck Southeast Quadrant Radius of 64kt Winds" "nm"
+ASW_WIND_64 "ADeck Southwest Quadrant Radius of 64kt Winds" "nm"
+BSW_WIND_64 "BDeck Southwest Quadrant Radius of 64kt Winds" "nm"
+ANW_WIND_64 "ADeck Northwest Quadrant Radius of 64kt Winds" "nm"
+BNW_WIND_64 "BDeck Northwest Quadrant Radius of 64kt Winds" "nm"
