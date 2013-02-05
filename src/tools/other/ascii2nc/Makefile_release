@@ -16,7 +16,7 @@
 EXECUTABLES = ascii2nc
 
 
-OBJECTS     =
+OBJECTS     = ascii_file.o
 
 
 LIBRARIES   =
@@ -43,6 +43,11 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
    ##  objects
    ##
+
+
+ascii_file.o: ascii_file.h ascii_file.cc
+	@ echo
+	$(CXX) ascii_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
 ########################################################################
