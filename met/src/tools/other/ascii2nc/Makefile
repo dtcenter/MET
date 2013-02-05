@@ -16,7 +16,10 @@
 EXECUTABLES = ascii2nc
 
 
-OBJECTS     =
+OBJECTS     = file_handler.o \
+	little_r_handler.o \
+	met_handler.o \
+	surfrad_handler.o
 
 
 LIBRARIES   =
@@ -58,6 +61,23 @@ gen_sources: $(GEN_SOURCES)
    ##
    ##  objects
    ##
+
+
+file_handler.o: file_handler.h file_handler.cc
+	@ echo
+	$(CXX) file_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+little_r_handler.o: little_r_handler.h little_r_handler.cc
+	@ echo
+	$(CXX) little_r_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+met_handler.o: met_handler.h met_handler.cc
+	@ echo
+	$(CXX) met_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+surfrad_handler.o: surfrad_handler.h surfrad_handler.cc
+	@ echo
+	$(CXX) surfrad_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################
