@@ -18,6 +18,7 @@ using namespace std;
 
 
 #include <iostream>
+#include <map>
 
 #include "vx_log.h"
 #include "vx_math.h"
@@ -55,9 +56,8 @@ static const int lr_grib_codes[] = {
    1, 7, 11, 17, 32, 31, 33, 34, 52, bad_data_int
 };
 
+// Little-R regular expression used to determine file type
 static const char *lr_rpt_reg_exp = "FM-[0-9]";
-static const char *lr_rpt_sfc_str = "FM-12";
-static const char *lr_rpt_upa_str = "FM-35";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +73,19 @@ static const char *lr_rpt_upa_str = "FM-35";
 LittleRHandler::LittleRHandler(const string &program_name) :
   FileHandler(program_name)
 {
+
+   //
+   // Load mapping of report types to message types
+   //
+   MAP_MSG_TYP["FM-12 SYNOP" ] = "ADPSFC";
+   MAP_MSG_TYP["FM-13 SHIP"  ] = "SFCSHP";
+   MAP_MSG_TYP["FM-15 METAR" ] = "ADPSFC";
+   MAP_MSG_TYP["FM-18 BUOY"  ] = "SFCSHP";
+   MAP_MSG_TYP["FM-281 QSCAT"] = "ASCATW";
+   MAP_MSG_TYP["FM-32 PILOT" ] = "ADPUPA";
+   MAP_MSG_TYP["FM-35 TEMP"  ] = "ADPUPA";
+   MAP_MSG_TYP["FM-88 SATOB" ] = "SATWND";
+   MAP_MSG_TYP["FM-97 ACARS" ] = "AIRCFT";
 }
 
 
@@ -170,14 +183,14 @@ bool LittleRHandler::_prepareHeaders(LineDataFile &ascii_file) {
 ////////////////////////////////////////////////////////////////////////
 
 bool LittleRHandler::_processObs(LineDataFile &ascii_file,
-				 const string &nc_filename) {
+                                 const string &nc_filename) {
    DataLine dl;
    int i, i_data, n_data_hdr;
    ConcatString cs, hdr_typ, hdr_sid, hdr_vld, obs_qty;
    double hdr_elv, obs_prs, obs_hgt, obs_val;
 
    mlog << Debug(2) << "Processing " << _nhdr << " Little_r reports.\n";
-
+   
    //
    // Read the fixed-width lines:
    //   - one header report line
@@ -198,18 +211,20 @@ bool LittleRHandler::_processObs(LineDataFile &ascii_file,
       }
 
       //
-      // Store the message type, checking for special strings
+      // Store the message type
       //
-      if(strstr(dl[4], lr_rpt_sfc_str) != NULL) {
-         hdr_typ = "ADPSFC";
-      }
-      else if(strstr(dl[4], lr_rpt_upa_str) != NULL) {
-         hdr_typ = "ADPUPA";
+      cs = dl[4];
+      cs.ws_strip();
+      
+      if(MAP_MSG_TYP[cs]) {
+         hdr_typ = MAP_MSG_TYP[cs];
       }
       else {
-         hdr_typ = dl[4];
-         hdr_typ.ws_strip();
+         hdr_typ = cs;
          hdr_typ.replace(" ", "_");
+         mlog << Warning << "\nLittleRHandler::_processObs() -> "
+              << "Storing message type as \"" << hdr_typ
+              << "\" for unexpected report type \"" << cs << "\".\n\n";
       }
 
       //
@@ -237,8 +252,8 @@ bool LittleRHandler::_processObs(LineDataFile &ascii_file,
       // Write the header info
       //
       if (!_writeHdrInfo(hdr_typ, hdr_sid, hdr_vld,
-			 atof(dl[0]), atof(dl[1]), hdr_elv))
-	return false;
+                         atof(dl[0]), atof(dl[1]), hdr_elv))
+         return false;
       
       
       //
@@ -254,8 +269,8 @@ bool LittleRHandler::_processObs(LineDataFile &ascii_file,
                     na_str : dl[19]);
          obs_qty.ws_strip();
          if (!_writeObsInfo(2, bad_data_float, hdr_elv,
-			    atof(dl[18]), obs_qty))
-	   return false;
+                            atof(dl[18]), obs_qty))
+            return false;
       }
 
       //
@@ -315,8 +330,8 @@ bool LittleRHandler::_processObs(LineDataFile &ascii_file,
                // Write the observation info
                //
                if (!_writeObsInfo(lr_grib_codes[i/2],
-				  obs_prs, obs_hgt, obs_val, obs_qty))
-		 return false;
+                                  obs_prs, obs_hgt, obs_val, obs_qty))
+                  return false;
             }
 
             //

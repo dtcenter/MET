@@ -22,6 +22,7 @@
 
 
 #include <iostream>
+#include <map>
 
 #include "file_handler.h"
 
@@ -44,8 +45,8 @@ public:
     return "little_r";
   }
 
-protected:  
-
+protected:
+  
   // Process the header records in the file
 
   bool _prepareHeaders(LineDataFile &ascii_file);
@@ -53,9 +54,14 @@ protected:
   // Process the observations in the file
 
   bool _processObs(LineDataFile &ascii_file,
-		   const string &nc_filename);
-  
-//  int _nFileColumns;
+                   const string &nc_filename);
+
+  ///////////////////////
+  // Protected members //
+  ///////////////////////
+
+  map<ConcatString, ConcatString> MAP_MSG_TYP;
+
 };
 
 
