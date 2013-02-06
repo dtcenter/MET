@@ -75,4 +75,18 @@
     </output>
   </test>
 
+  <test name="ascii2nc_SURFRAD">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/surfrad_tbl12136.txt \
+      &DATA_DIR_OBS;/ascii/surfrad_tbl12137.txt \
+      &DATA_DIR_OBS;/ascii/surfrad_tbl12138.txt \
+      &OUTPUT_DIR;/ascii2nc/surfrad_tbl12.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_tbl12.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>
