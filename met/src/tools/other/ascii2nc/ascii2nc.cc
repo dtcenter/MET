@@ -25,6 +25,7 @@
 //   005    08-01-12  Oldenburg      Added support for obs quality flag.
 //   006    09-13-12  Halley Gotway  Added support for Little_r and
 //                    factored out common code.
+//   007    02-06-13  Rehak          Added support for surfrad data.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -75,20 +76,14 @@ static ASCIIFormat ascii_format = ASCIIFormat_None;
 
 ////////////////////////////////////////////////////////////////////////
 
-// SurfRad point observation format info
-static const int   n_surfrad_hdr_col     = 6;
-
-////////////////////////////////////////////////////////////////////////
-
 // Variables for command line arguments
-//static ConcatString asfile;
 static vector< ConcatString > asfile_list;
 static ConcatString ncfile;
 
 ////////////////////////////////////////////////////////////////////////
 
 static FileHandler *create_file_handler(const ASCIIFormat,
-					const ConcatString &);
+                                        const ConcatString &);
 static FileHandler *determine_ascii_format(const ConcatString &);
 
 static void usage();
@@ -134,20 +129,11 @@ int main(int argc, char *argv[]) {
    cline.parse();
 
    //
-   // Check for error. There should be two arguments left:
-   // ASCII input filename and the NetCDF output filename
-   //
-//   if(cline.n() != 2) usage();
-
-   //
    // Store the input ASCII file name and the output NetCDF file name
    //
    for (int i = 0; i < cline.n() - 1; ++i)
      asfile_list.push_back(cline[i]);
    ncfile = cline[cline.n() - 1];
-   
-//   asfile = cline[0];
-//   ncfile = cline[1];
 
    //
    // Create the file handler based on the ascii format specified on
@@ -155,9 +141,7 @@ int main(int argc, char *argv[]) {
    // first file to guess the format.
    //
    FileHandler *file_handler = create_file_handler(ascii_format,
-						   asfile_list[0]);
-//   FileHandler *file_handler = create_file_handler(ascii_format,
-//						   asfile);
+                                                   asfile_list[0]);
    
    if (file_handler == 0)
      return 0;
@@ -166,7 +150,6 @@ int main(int argc, char *argv[]) {
    // Process the file
    //
    file_handler->processFiles(asfile_list, ncfile.text());
-//   file_handler->processFiles(asfile, ncfile.text());
    
    delete file_handler;
    
@@ -176,7 +159,7 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 FileHandler *create_file_handler(const ASCIIFormat format,
-				 const ConcatString &ascii_filename) {
+                                 const ConcatString &ascii_filename) {
   //
   // If the ASCII format was specified, just create the appropriate
   // object and return it.  If it wasn't specified, look in the
@@ -210,6 +193,7 @@ FileHandler *create_file_handler(const ASCIIFormat format,
 ////////////////////////////////////////////////////////////////////////
 
 FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
+
   //
   // Use the contents of the file to try to guess its format.
   //
@@ -221,8 +205,8 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
   if(!f_in.open(ascii_filename)) {
     mlog << Error << "\ndetermine_ascii_format() -> "
-	 << "can't open input ASCII file \"" << ascii_filename
-	 << "\" for reading\n\n";
+         << "can't open input ASCII file \"" << ascii_filename
+         << "\" for reading\n\n";
     exit(1);
   }
    
@@ -299,8 +283,10 @@ void usage() {
         << "\t\t\"netcdf_file\" indicates the name of the output "
         << "NetCDF file to be written (required).\n"
 
-        << "\t\t\"-format ASCII_format\" may be set to \"" << MetHandler::getFormatString()
-        << "\", \"" << LittleRHandler::getFormatString() << "\" or \"" << SurfradHandler::getFormatString() << "\" (optional).\n"
+        << "\t\t\"-format ASCII_format\" may be set to \""
+        << MetHandler::getFormatString() << "\", \""
+        << LittleRHandler::getFormatString() << "\" or \""
+        << SurfradHandler::getFormatString() << "\" (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -342,8 +328,8 @@ void set_format(const StringArray & a) {
   }
   else {
     mlog << Error << "\nset_format() -> "
-	 << "unsupported ASCII observation format \""
-	 << a[0] << "\".\n\n";
+         << "unsupported ASCII observation format \""
+         << a[0] << "\".\n\n";
     exit(1);
   }
 }
