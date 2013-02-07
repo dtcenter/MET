@@ -716,7 +716,7 @@ void process_obs(NcFile *&f_in, const char *in_str,
 void write_qty(int &i_obs, char &qty) {
    ConcatString qty_str;
    qty_str << qty;
-   qty_str.replace(" ", "_");
+   qty_str.replace(" ", "_", false);
    put_nc_var_val(obs_qty_var, i_obs, qty_str);
 }
 
