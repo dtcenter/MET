@@ -162,9 +162,10 @@ class ConcatString {
 
       bool read_line(istream &);   //  read a line from the input stream
 
-      void replace(const char * target, const char * replacement);   //  replace all occurences of target with replacement
-                                                                     //  if "replacement" is an environment variable, use 
-                                                                     //  it's value
+      //  replace all occurences of target with replacement
+      //  if "replacement" is an environment variable, use it's value
+      void replace(const char * target, const char * replacement, bool check_env = true);
+      
       void set_upper();
       void set_lower();
 

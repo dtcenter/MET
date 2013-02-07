@@ -734,7 +734,8 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ConcatString::replace(const char * target, const char * replacement)
+void ConcatString::replace(const char * target, const char * replacement,
+                           bool check_env)
 
 {
 
@@ -743,7 +744,7 @@ if ( empty() )  return;
 
 if ( ::is_empty(target) || ::is_empty(replacement) )  {
 
-   mlog << Error << "\nConcatString::replace(const char * target, const char * replacement) -> target and/or replacement string is empty\n\n";
+   mlog << Error << "\nConcatString::replace(const char * target, const char * replacement, bool check_env) -> target and/or replacement string is empty\n\n";
 
    exit ( 1 );
 
@@ -751,7 +752,7 @@ if ( ::is_empty(target) || ::is_empty(replacement) )  {
 
 const char * c = (const char *) 0;
 
-if ( (c = getenv(replacement)) != NULL )  replacement = c;
+if ( check_env && (c = getenv(replacement)) != NULL )  replacement = c;
 
 
 const int target_len = strlen(target);

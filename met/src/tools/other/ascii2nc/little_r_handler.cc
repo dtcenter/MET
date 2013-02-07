@@ -221,7 +221,7 @@ bool LittleRHandler::_processObs(LineDataFile &ascii_file,
       }
       else {
          hdr_typ = cs;
-         hdr_typ.replace(" ", "_");
+         hdr_typ.replace(" ", "_", false);
          mlog << Warning << "\nLittleRHandler::_processObs() -> "
               << "Storing message type as \"" << hdr_typ
               << "\" for unexpected report type \"" << cs << "\".\n\n";
@@ -232,7 +232,7 @@ bool LittleRHandler::_processObs(LineDataFile &ascii_file,
       //
       hdr_sid = dl[2];
       hdr_sid.ws_strip();
-      hdr_sid.replace(" ", "_");
+      hdr_sid.replace(" ", "_", false);
 
       //
       // Store the valid time in YYYYMMDD_HHMMSS format
