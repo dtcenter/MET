@@ -44,8 +44,6 @@ public:
   
   bool processFiles(const vector< ConcatString > &ascii_filename_list,
 		    const string &nc_filename);
-//  bool processFiles(const ConcatString &ascii_filename,
-//		   const string &nc_filename);
   
 protected:
 
