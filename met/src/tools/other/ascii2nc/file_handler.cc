@@ -67,8 +67,6 @@ FileHandler::~FileHandler()
 
 bool FileHandler::processFiles(const vector< ConcatString > &ascii_filename_list,
 			      const string &nc_filename)
-//bool FileHandler::processFiles(const ConcatString &ascii_filename,
-//			      const string &nc_filename)
 {
   // Make a first pass through the ASCII files, preparing the header
   // records.  We have to do this pass separately because we need to know
@@ -83,7 +81,6 @@ bool FileHandler::processFiles(const vector< ConcatString > &ascii_filename_list
     // Set the ASCII filename so it can be used in debug messages
 
     _asciiFilename = ascii_filename->text();
-//    _asciiFilename = ascii_filename.text();
 
     // Open the input ASCII observation file
 
@@ -126,7 +123,6 @@ bool FileHandler::processFiles(const vector< ConcatString > &ascii_filename_list
     // Set the ASCII filename so it can be used in debug messages
 
     _asciiFilename = ascii_filename->text();
-//    _asciiFilename = ascii_filename.text();
 
     // Open the input ASCII observation file
 
