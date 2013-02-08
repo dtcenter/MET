@@ -1215,7 +1215,6 @@ void STATAnalysisJob::close_dump_row_file() {
 
 ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    int i;
-   STATLineType type;
    ConcatString key;
 
    //
