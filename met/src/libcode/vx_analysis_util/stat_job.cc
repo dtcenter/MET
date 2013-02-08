@@ -95,6 +95,7 @@ void STATAnalysisJob::init_from_scratch() {
    column_min_name.set_ignore_case(1);
    column_max_name.set_ignore_case(1);
    column_str_name.set_ignore_case(1);
+   column_case.set_ignore_case(1);
 
    clear();
 
@@ -155,6 +156,8 @@ void STATAnalysisJob::clear() {
 
    column_str_name.clear();
    column_str_value.clear();
+
+   column_case.clear();
 
    if(dump_row) { delete [] dump_row; dump_row = (char *)    0; }
 
@@ -243,6 +246,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    column_str_name  = aj.column_str_name;
    column_str_value = aj.column_str_value;
+
+   column_case      = aj.column_case;
 
    out_line_type    = aj.out_line_type;
 
@@ -380,6 +385,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "column_str_value ...\n";
    column_str_value.dump(out, depth + 1);
+
+   out << prefix << "column_case ...\n";
+   column_case.dump(out, depth + 1);
 
    out << prefix << "dump_row = " << prefix
        << dump_row << "\n";
@@ -722,6 +730,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    char *lp   = (char *) 0;
    const char delim [] = " ";
    int i, k, n;
+   ConcatString cs;
 
    // If jobstring is null, simply return;
    if(jobstring) n = strlen(jobstring);
@@ -816,6 +825,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-column_str"     ) == 0) {
          column_str_name.clear();
          column_str_value.clear();
+      }
+      else if(strcmp(jc_array[i], "-by"             ) == 0) {
+         column_case.clear();
       }
       else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0)
          out_fcst_thresh.clear();
@@ -991,6 +1003,12 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          column_str_name.add(jc_array[i+1]);
          column_str_value.add(jc_array[i+2]);
          i+=2;
+      }
+      else if(strcmp(jc_array[i], "-by") == 0) {
+         cs = jc_array[i+1];
+         cs.set_upper();
+         column_case.add(cs);
+         i+=1;
       }
       else if(strcmp(jc_array[i], "-dump_row") == 0) {
          set_dump_row(jc_array[i+1]);
@@ -1191,6 +1209,29 @@ void STATAnalysisJob::close_dump_row_file() {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
+   int i;
+   STATLineType type;
+   ConcatString key;
+
+   //
+   // Check for no case information
+   //
+   if(column_case.n_elements() == 0) return(na_str);
+
+   //
+   // Retrieve value for each column_case option
+   //
+   for(i=0; i<column_case.n_elements(); i++) {
+      key << L.get_item(determine_column_offset(L.type(), column_case[i]));
+      if(i+1 < column_case.n_elements()) key << ":";
+   }
+
+   return(key);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1404,6 +1445,12 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       for(i=0; i<column_str_name.n_elements(); i++)
          js << "-column_str " << column_str_name[i]
             << " " << column_str_value[i] << " ";
+   }
+
+   // column_case 
+   if(column_case.n_elements() > 0) {
+      for(i=0; i<column_case.n_elements(); i++)
+         js << "-by " << column_case[i] << " ";
    }
 
    // dump_row
