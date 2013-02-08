@@ -1215,19 +1215,13 @@ void STATAnalysisJob::close_dump_row_file() {
 
 ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    int i;
-   ConcatString key;
-
-   //
-   // Check for no case information
-   //
-   if(column_case.n_elements() == 0) return(na_str);
+   ConcatString key = "";
 
    //
    // Retrieve value for each column_case option
    //
    for(i=0; i<column_case.n_elements(); i++) {
-      key << L.get_item(determine_column_offset(L.type(), column_case[i]));
-      if(i+1 < column_case.n_elements()) key << ":";
+      key << ":" << L.get_item(determine_column_offset(L.type(), column_case[i]));
    }
 
    return(key);
