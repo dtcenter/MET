@@ -1349,7 +1349,7 @@ void TCStatJobSummary::init_from_scratch() {
    // Ignore case when performing comparisons
    ReqColumn.set_ignore_case(1);
    Column.set_ignore_case(1);
-   Case.set_ignore_case(1);
+   CaseColumn.set_ignore_case(1);
    
    clear();
 
@@ -1366,7 +1366,7 @@ void TCStatJobSummary::clear() {
 
    ReqColumn.clear();
    Column.clear();
-   Case.clear();
+   CaseColumn.clear();
    SummaryMap.clear();
 
    // Set to default value
@@ -1384,7 +1384,7 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
 
    ReqColumn = j.ReqColumn;
    Column = j.Column;
-   Case = j.Case;
+   CaseColumn = j.CaseColumn;
    SummaryMap = j.SummaryMap;
    OutAlpha = j.OutAlpha;
    FSPThresh = j.FSPThresh;
@@ -1416,11 +1416,11 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
 
       // Check job command options
            if(strcasecmp(c, "-column"    ) == 0) { add_string(a[i+1], ReqColumn);
-                                                   add_column(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"        ) == 0) { add_string(a[i+1], Case);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);         a.shift_down(i, 1); }
-      else                                       {                                b.add(a[i]);        }
+                                                   add_column(a[i+1]);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-by"        ) == 0) { add_string(a[i+1], CaseColumn); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);          a.shift_down(i, 1); }
+      else                                       {                                 b.add(a[i]);        }
    }
 
    return(b);
@@ -1479,8 +1479,8 @@ ConcatString TCStatJobSummary::serialize() const {
    // Add summary job-specific options
    for(i=0; i<ReqColumn.n_elements(); i++)
       s << "-column " << ReqColumn[i] << " ";
-   for(i=0; i<Case.n_elements(); i++)
-      s << "-by " << Case[i] << " ";
+   for(i=0; i<CaseColumn.n_elements(); i++)
+      s << "-by " << CaseColumn[i] << " ";
    if(OutAlpha != default_tc_alpha)
       s << "-out_alpha " << OutAlpha << " ";
    if(!(FSPThresh == default_fsp_thresh))
@@ -1544,9 +1544,9 @@ void TCStatJobSummary::process_pair_array() {
             val = get_column_double(*PairArray[i].line(j), Column[k]);
 
             // Add case information to the key
-            for(l=0; l<Case.n_elements(); l++) {
+            for(l=0; l<CaseColumn.n_elements(); l++) {
 
-               cur = PairArray[i].line(j)->get_item(Case[l]);
+               cur = PairArray[i].line(j)->get_item(CaseColumn[l]);
 
                // For bad data, use the NA string
                if(is_bad_data(atoi(cur))) cur = na_str;
@@ -1554,7 +1554,7 @@ void TCStatJobSummary::process_pair_array() {
                // Special handling for lead time:
                // Switch 2-digit hours to 3-digit hours so that the
                // summary job output is sorted nicely.
-               if(strcasecmp(Case[l], "LEAD") == 0 && cur != na_str &&
+               if(strcasecmp(CaseColumn[l], "LEAD") == 0 && cur != na_str &&
                   abs(lead = hhmmss_to_sec(cur)) < 100*sec_per_hour) {
 
                   // Handle positive and negative lead times
@@ -1650,7 +1650,7 @@ void TCStatJobSummary::add_map(map<ConcatString,MapData,cs_cmp>&m) {
 void TCStatJobSummary::do_output(ostream &out) {
    map<ConcatString,MapData,cs_cmp>::iterator it;
    StringArray sa;
-   ConcatString case_info, line;
+   ConcatString line;
    AsciiTable out_at;
    NumArray v, lead, index;
    TimeArray init, valid;
@@ -1661,7 +1661,8 @@ void TCStatJobSummary::do_output(ostream &out) {
    NumArray fsp_total, fsp_best, fsp_ties;
 
    // Setup the output table
-   out_at.set_size((int) SummaryMap.size() + 1, 23);
+   out_at.set_size((int) SummaryMap.size() + 1,
+                   CaseColumn.n_elements() + 22);
    out_at.set_table_just(LeftJust);
    out_at.set_precision(default_precision);
    out_at.set_bad_data_value(bad_data_double);
@@ -1678,7 +1679,12 @@ void TCStatJobSummary::do_output(ostream &out) {
    // Write the header row
    out_at.set_entry(r, c++, "COL_NAME:");
    out_at.set_entry(r, c++, "COLUMN");
-   out_at.set_entry(r, c++, "CASE");
+
+   // Write case column names
+   for(i=0; i<CaseColumn.n_elements(); i++) {
+      out_at.set_entry(r, c++, CaseColumn[i]);
+   }
+  
    out_at.set_entry(r, c++, "TOTAL");
    out_at.set_entry(r, c++, "VALID");
    out_at.set_entry(r, c++, "MEAN");
@@ -1711,15 +1717,6 @@ void TCStatJobSummary::do_output(ostream &out) {
 
       // Split the current map key
       sa = it->first.split(":");
-
-      // Rebuild the case info
-      if(sa.n_elements() == 1) {
-         case_info = "NA";
-      }
-      else {
-         case_info = sa[1];
-         for(i=2; i<sa.n_elements(); i++) case_info << ":" << sa[i];
-      }
 
       // Get the valid subset of data
       v.clear();
@@ -1757,7 +1754,11 @@ void TCStatJobSummary::do_output(ostream &out) {
       // Write the table row
       out_at.set_entry(r, c++, "SUMMARY:");      
       out_at.set_entry(r, c++, sa[0]);
-      out_at.set_entry(r, c++, case_info);
+      
+      // Write case column values
+      for(i=1; i<sa.n_elements(); i++)
+         out_at.set_entry(r, c++, sa[i]);
+      
       out_at.set_entry(r, c++, it->second.Val.n_elements());
       out_at.set_entry(r, c++, v.n_elements());
       out_at.set_entry(r, c++, mean_ci.v);
@@ -1817,7 +1818,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
    } // end for it
      
    // Only compute FSP when AMODEL is in the case information
-   if(!Case.has("AMODEL")) {
+   if(!CaseColumn.has("AMODEL")) {
       mlog << Debug(4)
            << "Skipping frequency of superior performance since "
            << "the case information does not contain \"AMODEL\".\n";

@@ -331,7 +331,7 @@ class TCStatJobSummary : public TCStatJob {
       StringArray Column;
 
       // Store the case information
-      StringArray Case;
+      StringArray CaseColumn;
 
       // Confidence interval alpha value
       double OutAlpha;
