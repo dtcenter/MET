@@ -113,6 +113,8 @@ class STATAnalysisJob {
       void open_dump_row_file ();
       void close_dump_row_file();
 
+      ConcatString get_case_info(const STATLine &) const;
+
       ConcatString get_jobstring() const;
 
       //
@@ -175,6 +177,12 @@ class STATAnalysisJob {
 
       StringArray column_str_name;
       StringArray column_str_value;
+
+      //
+      // Store the case information for the -by option
+      //
+
+      StringArray column_case;
 
       //
       // Variables used to the store the analysis job specification

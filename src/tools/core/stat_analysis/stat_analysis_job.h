@@ -17,7 +17,8 @@
 //   000    12/17/08  Halley Gotway   New
 //   001    08/16/11  Halley Gotway   Reimplementation of GO Index job
 //                    with addition of generalized Skill Score Index
-//   002    05/03/12  Halley Gotway  Switch to using vx_config library.
+//   002    05/03/12  Halley Gotway   Switch to using vx_config library.
+//   003    02/04/13  Halley Gotway   Add -by case option.
 //
 ////////////////////////////////////////////////////////////////////////
 

@@ -22,7 +22,8 @@
 //   003    06/21/10  Halley Gotway   Add support for vif_flag.
 //   004    08/16/11  Halley Gotway   Reimplementation of GO Index job
 //                    with addition of generalized Skill Score Index
-//   005    05/03/12  Halley Gotway  Switch to using vx_config library.
+//   005    05/03/12  Halley Gotway   Switch to using vx_config library.
+//   006    02/04/13  Halley Gotway   Add -by case option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,8 +98,8 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    
    //
    // No settings in the default job for column_min_name,
-   // column_min_value, column_max_name, and column_max_value since
-   // those are strictly job command options.
+   // column_min_value, column_max_name, column_max_value, and 
+   // column_case since those are strictly job command options.
    //
 
    return;
@@ -139,6 +140,17 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
       mlog << Debug(1) << "Creating STAT output file \"" << j.dump_row
            << "\"\n";
       j.open_dump_row_file();
+   }
+
+   //
+   // Print warning for column_case option
+   //
+   if(j.column_case.n_elements() > 0 &&
+      j.job_type != stat_job_summary &&
+      j.job_type != stat_job_aggr &&
+      j.job_type != stat_job_aggr_stat) {
+      mlog << "\nWARNING: The -by option is ignored for the \""
+           << statjobtype_to_string(j.job_type) << "\" job type.\n\n";
    }
 
    //
@@ -261,12 +273,16 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     ofstream *sa_out) {
    STATLine line;
    STATLineType lt;
-   NumArray v_array;
-   int offset;
+   int i, k, r, c;
    double v, min, v10, v25, v50, v75, v90, max;
    CIInfo mean_ci, stdev_ci;
    gsl_rng *rng_ptr = (gsl_rng *) 0;
    AsciiTable out_at;
+   ConcatString key;
+   NumArray value;
+   StringArray sa;
+   map<ConcatString, NumArray> summary_map;
+   map<ConcatString, NumArray>::iterator it;
 
    //
    // Check that the -line_type option has been supplied only once
@@ -283,12 +299,11 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check that the -column option has been supplied
    //
-   if(j.column.n_elements() != 1) {
+   if(j.column.n_elements() == 0) {
       mlog << Error << "\ndo_job_summary()-> "
            << "this function may only be called when the "
-           << "\"-column\" option has been used to specify a "
-           << "single column from which to select a statistic "
-           << "to summarize: " << jobstring << "\n\n";
+           << "\"-column\" option has been used to specify "
+           << "columns to summarize: " << jobstring << "\n\n";
       throw(1);
    }
 
@@ -296,13 +311,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Determine the line type
    //
    lt = string_to_statlinetype(j.line_type[0]);
-
-   //
-   // Based on the line type and the column name selected, determine
-   // the column offset to use.
-   //
-   offset = determine_column_offset(lt, j.column[0]);
-
+   
    //
    // Process the STAT lines
    //
@@ -317,18 +326,42 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
          //
          if(j.dr_out) *(j.dr_out) << line;
 
-         v = atof(line.get_item(offset));
+         //
+         // Loop through the columns to be summarized
+         //
+         for(i=0; i<j.column.n_elements(); i++) {
+        
+            //
+            // Build the key and get the current column value
+            //
+            key =j.column[i];
+            key << ":" << j.get_case_info(line);
+            v   = atof(line.get_item(determine_column_offset(lt, j.column[i])));
 
-         if(!is_bad_data(v)) v_array.add(v);
+            //
+            // Add value to existing map entry or add a new one
+            //         
+            if(!is_bad_data(v)) {
+               if(summary_map.count(key) > 0) {
+                  summary_map[key].add(v);
+               }
+               else {
+                  value.clear();
+                  value.add(v);
+                  summary_map[key] = value;
+               }
+            }
+         } // end for i
 
          n_out++;
-      }
+
+      } // end if
    } // end while
 
    //
    // Check for no matching STAT lines
    //
-   if(v_array.n_elements() == 0) {
+   if(summary_map.size() == 0) {
       mlog << Warning << "\ndo_job_summary() -> "
            << "no valid data found in the STAT lines for job: "
            << jobstring << "\n\n";
@@ -336,72 +369,104 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Compute the summary information for this collection of values:
-   // min, max, v10, v25, v50, 75, v90
+   // Setup the output object
    //
-   min = v_array.percentile_array(0.00);
-   v10 = v_array.percentile_array(0.10);
-   v25 = v_array.percentile_array(0.25);
-   v50 = v_array.percentile_array(0.50);
-   v75 = v_array.percentile_array(0.75);
-   v90 = v_array.percentile_array(0.90);
-   max = v_array.percentile_array(1.00);
+   r = c = 0;
+   out_at.set_size(summary_map.size() + 1,
+                   2 + j.column_case.n_elements() + n_job_sum_columns);
+   setup_table(out_at);
+
+   //
+   // Write header line
+   //
+   out_at.set_entry(r, c++, "COL_NAME:");
+   out_at.set_entry(r, c++, "COLUMN");
+
+   // Write case column names
+   for(k=0; k<j.column_case.n_elements(); k++)
+     out_at.set_entry(0, c++, j.column_case[k]);
+   
+   write_header_row(job_sum_columns, n_job_sum_columns,
+                    0, out_at, r, c);
 
    //
    // Set up CIInfo objects
    //
    mean_ci.allocate_n_alpha(1);
    stdev_ci.allocate_n_alpha(1);
+                    
+   //
+   // Loop over the summary table
+   //
+   for(it  = summary_map.begin(), r=1;
+       it != summary_map.end();
+       it++, r++) {
 
-   //
-   // Set up the random number generator and seed value
-   //
-   rng_set(rng_ptr, j.boot_rng, j.boot_seed);
+      //
+      // Compute the summary information for this collection of values:
+      // min, max, v10, v25, v50, 75, v90
+      //
+      min = it->second.percentile_array(0.00);
+      v10 = it->second.percentile_array(0.10);
+      v25 = it->second.percentile_array(0.25);
+      v50 = it->second.percentile_array(0.50);
+      v75 = it->second.percentile_array(0.75);
+      v90 = it->second.percentile_array(0.90);
+      max = it->second.percentile_array(1.00);
 
-   //
-   // Compute a bootstrap confidence interval for the mean of this
-   // array of values.
-   //
-   if(j.boot_interval == boot_bca_flag) {
-      compute_mean_stdev_ci_bca(rng_ptr, v_array,
-                                j.n_boot_rep,
-                                j.out_alpha, mean_ci, stdev_ci);
-   }
-   else {
-      compute_mean_stdev_ci_perc(rng_ptr, v_array,
-                                 j.n_boot_rep, j.boot_rep_prop,
-                                 j.out_alpha, mean_ci, stdev_ci);
-   }
+      //
+      // Set up the random number generator and seed value
+      //
+      rng_set(rng_ptr, j.boot_rng, j.boot_seed);
 
-   //
-   // Get the column names
-   //
-   out_at.set_size(2, n_job_sum_columns+1);
-   setup_table(out_at);
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(job_sum_columns, n_job_sum_columns,
-                    0, out_at, 0, 1);
+      //
+      // Compute a bootstrap confidence interval for the mean of this
+      // array of values.
+      //
+      if(j.boot_interval == boot_bca_flag) {
+         compute_mean_stdev_ci_bca(rng_ptr, it->second,
+                                   j.n_boot_rep,
+                                   j.out_alpha, mean_ci, stdev_ci);
+      }
+      else {
+         compute_mean_stdev_ci_perc(rng_ptr, it->second,
+                                    j.n_boot_rep, j.boot_rep_prop,
+                                    j.out_alpha, mean_ci, stdev_ci);
+      }
 
-   //
-   // Write the data row
-   //
-   out_at.set_entry(1, 0,  "SUMMARY:");
-   out_at.set_entry(1, 1,  v_array.n_elements());
-   out_at.set_entry(1, 2,  mean_ci.v);
-   out_at.set_entry(1, 3,  mean_ci.v_ncl[0]);
-   out_at.set_entry(1, 4,  mean_ci.v_ncu[0]);
-   out_at.set_entry(1, 5,  mean_ci.v_bcl[0]);
-   out_at.set_entry(1, 6,  mean_ci.v_bcu[0]);
-   out_at.set_entry(1, 7,  stdev_ci.v);
-   out_at.set_entry(1, 8,  stdev_ci.v_bcl[0]);
-   out_at.set_entry(1, 9,  stdev_ci.v_bcu[0]);
-   out_at.set_entry(1, 10, min);
-   out_at.set_entry(1, 11, v10);
-   out_at.set_entry(1, 12, v25);
-   out_at.set_entry(1, 13, v50);
-   out_at.set_entry(1, 14, v75);
-   out_at.set_entry(1, 15, v90);
-   out_at.set_entry(1, 16, max);
+      //
+      // Write the data row
+      //
+      c = 0;
+      
+      // Split the current map key
+      sa = it->first.split(":");
+
+      out_at.set_entry(r, c++, "SUMMARY:");
+      out_at.set_entry(r, c++, sa[0]);
+
+      // Write case column values
+      for(i=1; i<sa.n_elements(); i++)
+         out_at.set_entry(r, c++, sa[i]);
+
+      out_at.set_entry(r, c++, it->second.n_elements());
+      out_at.set_entry(r, c++, mean_ci.v);
+      out_at.set_entry(r, c++, mean_ci.v_ncl[0]);
+      out_at.set_entry(r, c++, mean_ci.v_ncu[0]);
+      out_at.set_entry(r, c++, mean_ci.v_bcl[0]);
+      out_at.set_entry(r, c++, mean_ci.v_bcu[0]);
+      out_at.set_entry(r, c++, stdev_ci.v);
+      out_at.set_entry(r, c++, stdev_ci.v_bcl[0]);
+      out_at.set_entry(r, c++, stdev_ci.v_bcu[0]);
+      out_at.set_entry(r, c++, min);
+      out_at.set_entry(r, c++, v10);
+      out_at.set_entry(r, c++, v25);
+      out_at.set_entry(r, c++, v50);
+      out_at.set_entry(r, c++, v75);
+      out_at.set_entry(r, c++, v90);
+      out_at.set_entry(r, c++, max);
+
+   } // end for it
 
    //
    // Write the Ascii Table and the job command line
