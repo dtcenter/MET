@@ -334,8 +334,8 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
             //
             // Build the key and get the current column value
             //
-            key =j.column[i];
-            key << ":" << j.get_case_info(line);
+            key = j.column[i];
+            key << j.get_case_info(line);
             v   = atof(line.get_item(determine_column_offset(lt, j.column[i])));
 
             //
