@@ -820,8 +820,7 @@ void store_stat_fho(int n, const ConcatString &col,
    ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
 
    // Get the column value
         if(c == "TOTAL")  { v = (double) cts_info.cts.n(); }
@@ -874,8 +873,7 @@ void store_stat_ctc(int n, const ConcatString &col,
    ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
 
    // Get the column value
         if(c == "TOTAL") { v = cts_info.cts.n();     }
@@ -931,8 +929,7 @@ void store_stat_cts(int n, const ConcatString &col,
    int n_ci = 1;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
    if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = cts_info.n_alpha;
@@ -1054,8 +1051,7 @@ void store_stat_mctc(int n, const ConcatString &col,
    StringArray sa;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
    ConcatString d = c;
 
    // Get the column value
@@ -1121,8 +1117,7 @@ void store_stat_mcts(int n, const ConcatString &col,
    int n_ci = 1;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
    if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = mcts_info.n_alpha;
@@ -1191,8 +1186,7 @@ void store_stat_cnt(int n, const ConcatString &col,
    int n_ci = 1;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
    
    // Check for columns with normal or bootstrap confidence limits
    if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = cnt_info.n_alpha;
@@ -1311,8 +1305,7 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
 
    // Get the column value
         if(c == "TOTAL") { v = (double) cnt_info.n; }
@@ -1358,8 +1351,7 @@ void store_stat_pct(int n, const ConcatString &col,
    ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
    ConcatString d = c;
 
    // Get index value for variable column numbers
@@ -1425,8 +1417,7 @@ void store_stat_pstd(int n, const ConcatString &col,
    int n_ci = 1;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
    if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = pct_info.n_alpha;
@@ -1490,8 +1481,7 @@ void store_stat_pjc(int n, const ConcatString &col,
    ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
    ConcatString d = c;
    
    // Get index value for variable column numbers
@@ -1569,8 +1559,7 @@ void store_stat_prc(int n, const ConcatString &col,
    TTContingencyTable ct;
 
    // Set the column name to all upper case
-   ConcatString c = col;
-   c.set_upper();
+   ConcatString c = to_upper(col);
    ConcatString d = c;
 
    // Get index value for variable column numbers

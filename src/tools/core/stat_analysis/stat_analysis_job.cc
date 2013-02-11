@@ -302,8 +302,9 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    if(j.column.n_elements() == 0) {
       mlog << Error << "\ndo_job_summary()-> "
            << "this function may only be called when the "
-           << "\"-column\" option has been used to specify "
-           << "columns to summarize: " << jobstring << "\n\n";
+           << "\"-column\" option has been used at least once to "
+           << "specify the column(s) to summarize: " << jobstring
+           << "\n\n";
       throw(1);
    }
 

@@ -871,6 +871,36 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString to_upper(const ConcatString &cs)
+
+{
+
+ConcatString uc = cs;
+
+uc.set_upper();
+
+return ( uc );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString to_lower(const ConcatString &cs)
+
+{
+
+ConcatString lc = cs;
+
+lc.set_lower();
+
+return ( lc );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString & operator<<(ConcatString & cs, const char c)
 
 {
