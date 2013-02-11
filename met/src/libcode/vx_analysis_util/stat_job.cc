@@ -730,7 +730,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    char *lp   = (char *) 0;
    const char delim [] = " ";
    int i, k, n;
-   ConcatString cs;
 
    // If jobstring is null, simply return;
    if(jobstring) n = strlen(jobstring);
@@ -974,7 +973,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-column") == 0) {
-         column.add(jc_array[i+1]);
+         column.add(to_upper(jc_array[i+1]));
          i++;
       }
       else if(strcmp(jc_array[i], "-weight") == 0) {
@@ -982,32 +981,30 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-column_min") == 0) {
-         column_min_name.add(jc_array[i+1]);
+         column_min_name.add(to_upper(jc_array[i+1]));
          column_min_value.add(atof(jc_array[i+2]));
          i+=2;
       }
       else if(strcmp(jc_array[i], "-column_max") == 0) {
-         column_max_name.add(jc_array[i+1]);
+         column_max_name.add(to_upper(jc_array[i+1]));
          column_max_value.add(atof(jc_array[i+2]));
          i+=2;
       }
       // For -column_eq, just add it to both column_min and column_max
       else if(strcmp(jc_array[i], "-column_eq") == 0) {
-         column_min_name.add(jc_array[i+1]);
+         column_min_name.add(to_upper(jc_array[i+1]));
+         column_max_name.add(to_upper(jc_array[i+1]));
          column_min_value.add(atof(jc_array[i+2]));
-         column_max_name.add(jc_array[i+1]);
          column_max_value.add(atof(jc_array[i+2]));
          i+=2;
       }
       else if(strcmp(jc_array[i], "-column_str") == 0) {
-         column_str_name.add(jc_array[i+1]);
+         column_str_name.add(to_upper(jc_array[i+1]));
          column_str_value.add(jc_array[i+2]);
          i+=2;
       }
       else if(strcmp(jc_array[i], "-by") == 0) {
-         cs = jc_array[i+1];
-         cs.set_upper();
-         column_case.add(cs);
+         column_case.add(to_upper(jc_array[i+1]));
          i+=1;
       }
       else if(strcmp(jc_array[i], "-dump_row") == 0) {

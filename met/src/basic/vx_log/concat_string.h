@@ -194,6 +194,11 @@ inline              ConcatString::operator const char * () const { return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
+extern ConcatString to_upper(const ConcatString &);
+
+extern ConcatString to_lower(const ConcatString &);
+
+
    //
    //  writing a ConcatString to an ostream
    //

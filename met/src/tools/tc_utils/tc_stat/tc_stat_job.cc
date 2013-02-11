@@ -1847,8 +1847,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
    for(i=0; i<Column.n_elements(); i++) {
 
       // Check if FSP should be computed for this column
-      s = Column[i];
-      s.set_upper();
+      s = to_upper(Column[i]);
       if(strstr(s, "-") == NULL && strstr(s, "ERR") == NULL) {
          mlog << Debug(4)
               << "Skipping frequency of superior performance for "
