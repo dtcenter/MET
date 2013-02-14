@@ -14,6 +14,7 @@ using namespace std;
 #include <cstdio>
 #include <ctime>
 #include <iostream>
+#include <limits.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>

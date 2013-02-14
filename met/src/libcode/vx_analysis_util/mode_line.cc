@@ -15,6 +15,7 @@ using namespace std;
 
 #include <iostream>
 #include <fstream>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
