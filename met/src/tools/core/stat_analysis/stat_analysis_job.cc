@@ -222,7 +222,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -dump_row option has been supplied
    //
    if(!j.dump_row) {
-      mlog << Error << "\ndo_job_filter()-> "
+      mlog << Error << "\ndo_job_filter() -> "
            << "this function may only be called when using the "
            << "-dump_row option in the job command line: "
            << jobstring << "\n\n";
@@ -288,7 +288,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -line_type option has been supplied only once
    //
    if(j.line_type.n_elements() != 1) {
-      mlog << Error << "\ndo_job_summary()-> "
+      mlog << Error << "\ndo_job_summary() -> "
            << "this function may only be called when the "
            << "\"-line_type\" option has been used exactly once to "
            << "specify a single line type from which to select a "
@@ -300,7 +300,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -column option has been supplied
    //
    if(j.column.n_elements() == 0) {
-      mlog << Error << "\ndo_job_summary()-> "
+      mlog << Error << "\ndo_job_summary() -> "
            << "this function may only be called when the "
            << "\"-column\" option has been used at least once to "
            << "specify the column(s) to summarize: " << jobstring
@@ -336,7 +336,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
             // Build the key and get the current column value
             //
             key = j.column[i];
-            key << j.get_case_info(line);
+            key << ":" << j.get_case_info(line);
             v   = atof(line.get_item(determine_column_offset(lt, j.column[i])));
 
             //
@@ -382,11 +382,8 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    //
    out_at.set_entry(r, c++, "COL_NAME:");
    out_at.set_entry(r, c++, "COLUMN");
-
-   // Write case column names
    for(k=0; k<j.column_case.n_elements(); k++)
      out_at.set_entry(0, c++, j.column_case[k]);
-   
    write_header_row(job_sum_columns, n_job_sum_columns,
                     0, out_at, r, c);
 
@@ -495,32 +492,23 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
                  ofstream *sa_out) {
    STATLine line;
    STATLineType lt;
-
-   CTSInfo          cts_info;
-   MCTSInfo         mcts_info;
-   CNTInfo          cnt_info;
-   SL1L2Info        sl1l2_info;
-   VL1L2Info        vl1l2_info;
-   PCTInfo          pct_info;
-   NBRCTSInfo       nbrcts_info;
-   NBRCNTInfo       nbrcnt_info;
-   ISCInfo          isc_info;
-   PairDataEnsemble ens_pd;
-
-   nbrcnt_info.allocate_n_alpha(1);
-
    AsciiTable out_at;
-   int i, n_thresh, n_cat;
+
+   map<ConcatString, AggrCTCInfo>   ctc_map;
+   map<ConcatString, AggrMCTCInfo>  mctc_map;
+   map<ConcatString, AggrPCTInfo>   pct_map;
+   map<ConcatString, AggrPSumInfo>  psum_map;
+   map<ConcatString, AggrISCInfo>   isc_map;
+   map<ConcatString, AggrRHISTInfo> rhist_map;
 
    //
-   // Check that the -line_type option has been supplied only once
+   // Check that the -line_type option has been supplied exactly once
    //
    if(j.line_type.n_elements() != 1) {
-      mlog << Error << "\ndo_job_aggr()-> "
-           << "this function may only be called when the "
-           << "\"-line_type\" option has been used exactly once to "
-           << "specify a single line type over which to perform the "
-           << "aggregation: " << jobstring << "\n\n";
+      mlog << Error << "\ndo_job_aggr() -> "
+           << "this function may only be called when the \"-line_type\" "
+           << "option has been used exactly once to specify the line "
+           << "type for aggregation: " << jobstring << "\n\n";
       throw(1);
    }
 
@@ -538,7 +526,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_val1l2 && lt != stat_pct    &&
       lt != stat_nbrctc && lt != stat_nbrcnt &&
       lt != stat_rhist  && lt != stat_isc) {
-      mlog << Error << "\ndo_job_aggr()-> "
+      mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
@@ -553,35 +541,22 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum up the contingency table type lines:
-   //    FHO, CTC
+   //    FHO, CTC, NBRCTC
    //
    if(lt == stat_fho ||
-      lt == stat_ctc) {
-      aggr_contable_lines(jobstring, f, j, cts_info,
-                          lt, n_in, n_out);
+      lt == stat_ctc ||
+      lt == stat_nbrctc) {
+      aggr_ctc_lines(f, j, ctc_map, n_in, n_out);
+      write_job_aggr_ctc(j, lt, ctc_map, out_at);
    }
 
    //
-   // Sum up the mulit-category contingency table type lines:
+   // Sum up the multi-category contingency table type lines:
    //    MCTC
    //
    else if(lt == stat_mctc) {
-      aggr_mctc_lines(jobstring, f, j, mcts_info,
-                      lt, n_in, n_out);
-   }
-
-   //
-   // Sum the partial sum line types:
-   //    SL1L2, SAL1L2, VL1L2, VAL1L2
-   //
-   else if(lt == stat_sl1l2  ||
-           lt == stat_sal1l2 ||
-           lt == stat_vl1l2  ||
-           lt == stat_val1l2 ||
-           lt == stat_nbrcnt) {
-      aggr_partial_sum_lines(jobstring, f, j,
-                             sl1l2_info, vl1l2_info, cnt_info,
-                             nbrcnt_info, lt, n_in, n_out);
+      aggr_mctc_lines(f, j, mctc_map, n_in, n_out);
+      write_job_aggr_mctc(j, lt, mctc_map, out_at);
    }
 
    //
@@ -589,44 +564,37 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //    PCT
    //
    else if(lt == stat_pct) {
-      aggr_nx2_contable_lines(jobstring, f, j, pct_info,
-                              lt, n_in, n_out);
+      aggr_pct_lines(f, j, pct_map, n_in, n_out);
+      write_job_aggr_pct(j, lt, pct_map, out_at);
    }
 
    //
-   // Sum up the neighborhood contingency table lines:
-   //    NBRCTC
+   // Sum the partial sum line types:
+   //    SL1L2, SAL1L2, VL1L2, VAL1L2, NBRCNT
    //
-   else if(lt == stat_nbrctc) {
-      aggr_contable_lines(jobstring, f, j, cts_info,
-                          lt, n_in, n_out);
-      nbrcts_info.cts_info = cts_info;
+   else if(lt == stat_sl1l2  ||
+           lt == stat_sal1l2 ||
+           lt == stat_vl1l2  ||
+           lt == stat_val1l2 ||
+           lt == stat_nbrcnt) {
+      aggr_psum_lines(f, j, psum_map, n_in, n_out);
+      write_job_aggr_psum(j, lt, psum_map, out_at);
    }
 
    //
    // Sum the ISC line types
    //
    else if(lt == stat_isc) {
-
-      //
-      // Check that the -line_type option has been supplied only once
-      //
-      if(j.vx_mask.n_elements() == 0) {
-         mlog << Error << "\ndo_job_aggr()-> "
-              << "when aggregating ISC lines you must select at least "
-              << "one tile name to be used with the \"-vx_mask\" "
-              << "option: " << jobstring << "\n\n";
-         throw(1);
-      }
-
-      aggr_isc_lines(jobstring, f, j, isc_info, n_in, n_out);
+      aggr_isc_lines(f, j, isc_map, n_in, n_out);
+      write_job_aggr_isc(j, lt, isc_map, out_at);
    }
 
    //
    // Sum the RHIST line types
    //
    else if(lt == stat_rhist) {
-      aggr_rhist_lines(jobstring, f, j, ens_pd, n_in, n_out);
+      aggr_rhist_lines(f, j, rhist_map, n_in, n_out);
+      write_job_aggr_rhist(j, lt, rhist_map, out_at);
    }
 
    //
@@ -640,259 +608,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Switch on the line type to determine the format of the output
-   // line
-   //
-   switch(lt) {
-
-      case(stat_fho):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_fho_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(fho_columns, n_fho_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the FHO row
-         //
-         out_at.set_entry(1, 0,  "FHO:");
-         write_fho_cols(cts_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_ctc):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_ctc_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(ctc_columns, n_ctc_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the CTC row
-         //
-         out_at.set_entry(1, 0,  "CTC:");
-         write_ctc_cols(cts_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_mctc):
-
-         //
-         // Get the column names
-         //
-         n_cat = mcts_info.cts.nrows();
-         out_at.set_size(2, get_n_mctc_columns(n_cat)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(mctc_columns, n_mctc_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the MCTC row
-         //
-         out_at.set_entry(1, 0,  "MCTC:");
-         write_mctc_cols(mcts_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_sl1l2):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_sl1l2_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(sl1l2_columns, n_sl1l2_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the SL1L2 row
-         //
-         out_at.set_entry(1, 0,  "SL1L2:");
-         write_sl1l2_cols(sl1l2_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_sal1l2):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_sal1l2_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(sal1l2_columns, n_sal1l2_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the SAL1L2 row
-         //
-         out_at.set_entry(1, 0,  "SAL1L2:");
-         write_sal1l2_cols(sl1l2_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_vl1l2):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_vl1l2_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(vl1l2_columns, n_vl1l2_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the VL1L2 row
-         //
-         out_at.set_entry(1, 0,  "VL1L2:");
-         write_vl1l2_cols(vl1l2_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_val1l2):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_val1l2_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(val1l2_columns, n_val1l2_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the VAL1L2 row
-         //
-         out_at.set_entry(1, 0,  "VAL1L2:");
-         write_val1l2_cols(vl1l2_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_pct):
-
-         //
-         // Get the column names
-         //
-         n_thresh = pct_info.pct.nrows()+1;
-         out_at.set_size(2, get_n_pct_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_pct_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PCT row
-         //
-         out_at.set_entry(1, 0,  "PCT:");
-         write_pct_cols(pct_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_nbrctc):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_nbrctc_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(nbrctc_columns, n_nbrctc_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the NBRCTC row
-         //
-         out_at.set_entry(1, 0,  "NBRCTC:");
-         write_nbrctc_cols(nbrcts_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_nbrcnt):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_nbrcnt_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(nbrcnt_columns, n_nbrcnt_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the NBRCTC row
-         //
-         out_at.set_entry(1, 0,  "NBRCNT:");
-         write_nbrcnt_cols(nbrcnt_info, 0, out_at, 1, 1);
-
-         break;
-
-      case(stat_isc):
-
-         //
-         // Allocate rows for the binary field, all scales, and the
-         // header row.
-         //
-         out_at.set_size(isc_info.n_scale+3, n_isc_columns+1);
-         setup_table(out_at);
-
-         //
-         // Get the column names
-         //
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(isc_columns, n_isc_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the ISC rows
-         //
-         out_at.set_entry(1, 0,  "ISC:");
-
-         for(i=-1; i<=isc_info.n_scale; i++) {
-            write_isc_cols(isc_info, i, out_at, i+2, 1);
-         }
-
-         break;
-
-      case(stat_rhist):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, get_n_rhist_columns(ens_pd.rhist_na.n_elements())+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_rhist_header_row(0, ens_pd.rhist_na.n_elements(), out_at, 0, 1);
-
-         //
-         // Write the RHIST row
-         //
-         out_at.set_entry(1, 0,  "RHIST:");
-         write_rhist_cols(&ens_pd, out_at, 1, 1);
-
-         break;
-
-      default:
-
-         mlog << Error << "\ndo_job_aggr() -> "
-              << "line type value of "
-               << statlinetype_to_string(line.type())
-              << " not currently supported for the aggregation "
-              << "job!\n\n";
-         throw(1);
-   } // end switch
-
-   //
-   // Write the Ascii Table and the job command line
+   // Write the ASCII Table and the job command line
    //
    write_jobstring(jobstring, sa_out);
    write_table(out_at, sa_out);
@@ -912,29 +628,22 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                       ofstream *sa_out, const ConcatString &tmp_dir) {
    STATLine line;
    STATLineType in_lt, out_lt;
-
-   CTSInfo          cts_info;
-   MCTSInfo         mcts_info;
-   CNTInfo          cnt_info;
-   SL1L2Info        sl1l2_info;
-   VL1L2Info        vl1l2_info;
-   PCTInfo          pct_info;
-   NBRCTSInfo       nbrcts_info;
-   NBRCNTInfo       nbrcnt_info;
-   ISCInfo          isc_info;
-   NumArray         f_na, o_na, c_na;
-   NumArray         uf_na, vf_na, uo_na, vo_na;
-   PairDataEnsemble ens_pd;
-
-   ConcatString fcst_var, obs_var;
    AsciiTable out_at;
    int i, n;
+
+   map<ConcatString, AggrCTCInfo>   ctc_map;
+   map<ConcatString, AggrMCTCInfo>  mctc_map;
+   map<ConcatString, AggrPCTInfo>   pct_map;
+   map<ConcatString, AggrPSumInfo>  psum_map;
+   map<ConcatString, AggrWindInfo>  wind_map;
+   map<ConcatString, AggrORANKInfo> orank_map;
+   map<ConcatString, AggrMPRInfo>   mpr_map;
 
    //
    // Check that the -line_type option has been supplied only once
    //
    if(j.line_type.n_elements() != 1) {
-      mlog << Error << "\ndo_job_aggr_stat()-> "
+      mlog << Error << "\ndo_job_aggr_stat() -> "
            << "this function may only be called when the "
            << "\"-line_type\" option has been used exactly once to "
            << "specify a single line type over which to perform the "
@@ -949,7 +658,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    out_lt = j.out_line_type;
 
    //
-   // Check for a valid combination of input and output line types
+   // Valid combinations of input and output line types:
    //    -line_type FHO,   CTC,    -out_line_type CTS
    //    -line_type MCTC,          -out_line_type MCTS
    //    -line_type SL1L2, SAL1L2, -out_line_type CNT
@@ -962,111 +671,88 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //                                             PCT, PSTD, PJC, PRC
    //    -line_type ORANK,         -out_line_type RHIST
    //
-   if     ( (in_lt  == stat_fho   || in_lt  == stat_ctc) &&
-            (out_lt == stat_cts)
-          ) i = 1;
-   else if( (in_lt  == stat_mctc) &&
-            (out_lt == stat_mcts)
-          ) i = 1;
-   else if( (in_lt  == stat_sl1l2 || in_lt  == stat_sal1l2) &&
-            (out_lt == stat_cnt)
-          )  i = 1;
-   else if( (in_lt  == stat_vl1l2 || in_lt  == stat_val1l2) &&
-            (out_lt == stat_wdir)
-          )  i = 1;
-   else if( (in_lt  == stat_pct) &&
-            (out_lt == stat_pstd  || out_lt == stat_pjc    ||
-             out_lt == stat_prc)
-          ) i = 1;
-   else if( (in_lt  == stat_nbrctc) &&
-            (out_lt == stat_nbrcts)
-          ) i = 1;
-   else if( (in_lt  == stat_mpr) &&
-            (out_lt == stat_fho   || out_lt == stat_ctc    ||
-             out_lt == stat_cts   || out_lt == stat_mctc   ||
-             out_lt == stat_mcts  || out_lt == stat_cnt    ||
-             out_lt == stat_sl1l2 || out_lt == stat_sal1l2 ||
-             out_lt == stat_pct   || out_lt == stat_pstd   ||
-             out_lt == stat_pjc   || out_lt == stat_prc)
-          )  i = 1;
-   else if( (in_lt  == stat_orank) &&
-            (out_lt == stat_rhist)
-          ) i = 1;
-   else {
-
-      mlog << Error << "\ndo_job_aggr_stat()-> "
-           << "invalid combination of \"-line_type "
-           << statlinetype_to_string(in_lt) << "\" and "
-           << "\"-out_line_type " << statlinetype_to_string(out_lt)
-           << "\"\n\n";
-      throw(1);
-   }
 
    //
    // Sum up the contingency table type lines:
-   //    FHO, CTC
+   //    FHO, CTC -> CTS
+   //    NBRCTC -> NBRCTS
    //
-   if(in_lt == stat_fho ||
-      in_lt == stat_ctc) {
-      aggr_contable_lines(jobstring, f, j, cts_info,
-                          in_lt, n_in, n_out);
+   if(((in_lt  == stat_fho ||
+        in_lt  == stat_ctc) &&
+        out_lt == stat_cts) ||
+      (in_lt   == stat_nbrctc &&
+       out_lt  == stat_nbrcts)) {
+      aggr_ctc_lines(f, j, ctc_map, n_in, n_out);
+      write_job_aggr_ctc(j, out_lt, ctc_map, out_at);
    }
 
    //
    // Sum up the multi-category contingency table type lines:
-   //    MCTC
+   //    MCTC -> MCTS
    //
-   else if(in_lt == stat_mctc) {
-      aggr_mctc_lines(jobstring, f, j, mcts_info,
-                      in_lt, n_in, n_out);
-   }
-
-   //
-   // Sum the scalar partial sum line types:
-   //    SL1L2, SAL1L2
-   //
-   else if(in_lt == stat_sl1l2  ||
-           in_lt == stat_sal1l2) {
-      aggr_partial_sum_lines(jobstring, f, j,
-                             sl1l2_info, vl1l2_info, cnt_info,
-                             nbrcnt_info, in_lt, n_in, n_out);
-   }
-
-   //
-   // Sum the vector partial sum line types:
-   //    VL1L2, VAL1L2
-   //
-   else if(in_lt == stat_vl1l2 ||
-           in_lt == stat_val1l2) {
-      aggr_vl1l2_wdir(jobstring, f, j, vl1l2_info,
-                      uf_na, vf_na, uo_na, vo_na,
-                      in_lt, n_in, n_out);
+   else if(in_lt  == stat_mctc &&
+           out_lt == stat_mcts) {
+      aggr_mctc_lines(f, j, mctc_map, n_in, n_out);
+      write_job_aggr_mctc(j, out_lt, mctc_map, out_at);
    }
 
    //
    // Sum up the Nx2 contingency table lines:
-   //    PCT
+   //    PCT -> PSTD, PJC, PRC
    //
-   else if(in_lt == stat_pct) {
-      aggr_nx2_contable_lines(jobstring, f, j, pct_info,
-                              in_lt, n_in, n_out);
+   else if(  in_lt == stat_pct &&
+           (out_lt == stat_pstd ||
+            out_lt == stat_pjc  ||
+            out_lt == stat_prc)) {
+      aggr_pct_lines(f, j, pct_map, n_in, n_out);
+      write_job_aggr_pct(j, out_lt, pct_map, out_at);
    }
 
    //
-   // Sum up the neighborhood contingency table lines:
-   //    NBRCTC
+   // Sum the scalar partial sum line types:
+   //    SL1L2, SAL1L2 -> CNT
+   //    NBRCTC -> NBRCNT
    //
-   else if(in_lt == stat_nbrctc) {
-      aggr_contable_lines(jobstring, f, j, cts_info,
-                          in_lt, n_in, n_out);
-      nbrcts_info.cts_info = cts_info;
+   else if((in_lt  == stat_sl1l2 ||
+            in_lt  == stat_sal1l2) &&
+            out_lt == stat_cnt) {
+      aggr_psum_lines(f, j, psum_map, n_in, n_out);
+      write_job_aggr_psum(j, out_lt, psum_map, out_at);
+   }
+
+   //
+   // Sum the vector partial sum line types:
+   //    VL1L2, VAL1L2 -> WDIR
+   //
+   else if((in_lt  == stat_vl1l2 ||
+            in_lt  == stat_val1l2) &&
+            out_lt == stat_wdir) {
+      aggr_wind_lines(f, j, wind_map, n_in, n_out);
+      write_job_aggr_wind(j, out_lt, wind_map, out_at);
+   }
+
+   //
+   // Sum the observation rank line types:
+   //    ORANK -> RHIST
+   //
+   else if(in_lt  == stat_orank &&
+           out_lt == stat_rhist) {
+      aggr_orank_lines(f, j, orank_map, n_in, n_out);
+      write_job_aggr_orank(j, out_lt, orank_map, out_at);
    }
 
    //
    // Read the matched pair lines:
-   //    MPR
+   //    MPR -> FHO, CTC, CTS, MCTC, MCTS, CNT,
+   //           SL1L2, SAL1L2, PCT, PSTD, PJC, PRC
    //
-   else if(in_lt == stat_mpr) {
+   else if(in_lt == stat_mpr &&
+           (out_lt == stat_fho   || out_lt == stat_ctc    ||
+            out_lt == stat_cts   || out_lt == stat_mctc   ||
+            out_lt == stat_mcts  || out_lt == stat_cnt    ||
+            out_lt == stat_sl1l2 || out_lt == stat_sal1l2 ||
+            out_lt == stat_pct   || out_lt == stat_pstd   ||
+            out_lt == stat_pjc   || out_lt == stat_prc)) {
 
       //
       // Check output threshold values for 2x2 contingency table
@@ -1077,7 +763,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
          if(j.out_fcst_thresh.n_elements() != 1 ||
             j.out_obs_thresh.n_elements()  != 1) {
-            mlog << Error << "\ndo_job_aggr_stat()-> "
+            mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to FHO, CTC, or "
                  << "CTS the \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must be specified "
@@ -1094,7 +780,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
          if(j.out_fcst_thresh.n_elements() <= 1 ||
             j.out_fcst_thresh.n_elements() != j.out_obs_thresh.n_elements()) {
-            mlog << Error << "\ndo_job_aggr_stat()-> "
+            mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to MCTC or MCTS "
                  << "the \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must be specified "
@@ -1131,8 +817,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          out_lt == stat_pjc  ||
          out_lt == stat_prc) {
 
-         if(j.out_obs_thresh.n_elements()  != 1) {
-            mlog << Error << "\ndo_job_aggr_stat()-> "
+         if(j.out_obs_thresh.n_elements() != 1) {
+            mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to PCT, PSTD, "
                  << "PJC, or PRC, the \"-out_obs_thresh\" option "
                  << "must be specified exactly once.\n\n";
@@ -1182,64 +868,20 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       //
       // Parse the input MPR lines
       //
-      read_mpr_lines(jobstring, f, j, fcst_var, obs_var,
-                     f_na, o_na, c_na,
-                     n_in, n_out);
-
-      //
-      // When -out_line_type FHO, CTC
-      //
-      if(out_lt == stat_fho ||
-         out_lt == stat_ctc) {
-         aggr_mpr_lines_ctc(j, f_na, o_na, cts_info);
-      }
-      //
-      // When -out_line_type CTS
-      //
-      else if(out_lt == stat_cts) {
-         aggr_mpr_lines_cts(j, f_na, o_na, cts_info, tmp_dir);
-      }
-      //
-      // When -out_line_type MCTC
-      //
-      else if(out_lt == stat_mctc) {
-         aggr_mpr_lines_mctc(j, f_na, o_na, mcts_info);
-      }
-      //
-      // When -out_line_type MCTS
-      //
-      else if(out_lt == stat_mcts) {
-         aggr_mpr_lines_mcts(j, f_na, o_na, mcts_info, tmp_dir);
-      }
-      //
-      // When -out_line_type CNT
-      //
-      else if(out_lt == stat_cnt) {
-         aggr_mpr_lines_cnt(j, fcst_var, obs_var, f_na, o_na, cnt_info, tmp_dir);
-      }
-      //
-      // When -out_line_type SL1L2, SAL1L2
-      //
-      else if(out_lt == stat_sl1l2 ||
-              out_lt == stat_sal1l2) {
-         aggr_mpr_lines_psums(j, f_na, o_na, c_na, sl1l2_info);
-      }
-      //
-      // When -out_line_type PCT, PSTD, PJC, PRC
-      //
-      else if(out_lt == stat_pct  ||
-              out_lt == stat_pstd ||
-              out_lt == stat_pjc  ||
-              out_lt == stat_prc) {
-         aggr_mpr_lines_pct(j, f_na, o_na, pct_info);
-      }
+      aggr_mpr_lines(f, j, mpr_map, n_in, n_out);
+      write_job_aggr_mpr(j, out_lt, mpr_map, out_at, tmp_dir);
    }
 
    //
-   // Compute a ranked histogram from the observation ranks lines.
+   // Invalid combination of input and output line types
    //
-   else if(in_lt == stat_orank) {
-      aggr_orank_lines(jobstring, f, j, ens_pd, n_in, n_out);
+   else {
+      mlog << Error << "\ndo_job_aggr_stat() -> "
+           << "invalid combination of \"-line_type "
+           << statlinetype_to_string(in_lt) << "\" and "
+           << "\"-out_line_type " << statlinetype_to_string(out_lt)
+           << "\"\n\n";
+      throw(1);
    }
 
    //
@@ -1253,52 +895,6 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Write output line for each supported job type
-   //
-   if(in_lt == stat_fho ||
-      in_lt == stat_ctc) {
-      write_job_cts(j, in_lt, cts_info, out_at);
-   }
-   else if(in_lt == stat_mctc) {
-      write_job_mcts(j, in_lt, mcts_info, out_at);
-   }
-   else if(in_lt == stat_sl1l2 ||
-           in_lt == stat_sal1l2) {
-      write_job_cnt(j, in_lt, sl1l2_info, cnt_info, out_at);
-   }
-   else if(in_lt == stat_vl1l2  ||
-           in_lt == stat_val1l2) {
-      write_job_wdir(j, in_lt, vl1l2_info,
-                     uf_na, vf_na, uo_na, vo_na, out_at);
-   }
-   else if(in_lt == stat_pct) {
-      write_job_pct(j, in_lt, pct_info, out_at);
-   }
-   else if(in_lt == stat_nbrctc) {
-      write_job_nbrcts(j, in_lt, nbrcts_info, out_at);
-   }
-   else if(in_lt == stat_mpr) {
-      write_job_mpr(j, in_lt, cts_info, mcts_info, cnt_info,
-                    sl1l2_info, pct_info, out_at);
-   }
-   else if(in_lt == stat_orank) {
-
-      //
-      // Get the column names
-      //
-      out_at.set_size(2, get_n_rhist_columns(ens_pd.rhist_na.n_elements())+1);
-      setup_table(out_at);
-      out_at.set_entry(0, 0,  "COL_NAME:");
-      write_rhist_header_row(0, ens_pd.rhist_na.n_elements(), out_at, 0, 1);
-
-      //
-      // Write the RHIST row
-      //
-      out_at.set_entry(1, 0,  "RHIST:");
-      write_rhist_cols(&ens_pd, out_at, 1, 1);
-   }
-
-   //
    // Write the Ascii Table and the job command line
    //
    write_jobstring(jobstring, sa_out);
@@ -1309,643 +905,917 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_job_cts(STATAnalysisJob &j, STATLineType in_lt,
-                   CTSInfo &cts_info, AsciiTable &out_at) {
+void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
+                        AsciiTable &at) {
+   int i, c;
 
    //
-   // Store the alpha information in the CTSInfo object
+   // Setup the output table
    //
-   cts_info.allocate_n_alpha(1);
-   cts_info.alpha[0] = j.out_alpha;
+   at.set_size(n_row, n_col);
+   setup_table(at);
 
    //
-   // Compute the stats and confidence intervals for this
-   // CTSInfo object
+   // Write the header information
    //
-   cts_info.compute_stats();
-   cts_info.compute_ci();
-
-   //
-   // Get the column names
-   //
-   out_at.set_size(2, n_cts_columns+1);
-   setup_table(out_at);
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(cts_columns, n_cts_columns, 0,
-                    out_at, 0, 1);
-
-   //
-   // Write the CTS row
-   //
-   out_at.set_entry(1, 0,  "CTS:");
-   write_cts_cols(cts_info, 0, out_at, 1, 1);
+   c = 0;
+   at.set_entry(0, c++, "COL_NAME:");
+   for(i=0; i<j.column_case.n_elements(); i++) {
+      at.set_entry(0, c++, j.column_case[i]);
+   } // end for i
 
    return;
-}
+}   
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_job_mcts(STATAnalysisJob &j, STATLineType in_lt,
-                    MCTSInfo &mcts_info, AsciiTable &out_at) {
+void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
+                        map<ConcatString, AggrCTCInfo> &m,
+                        AsciiTable &at) {
+   map<ConcatString, AggrCTCInfo>::iterator it;
+   int n_row, n_col, r, c;
+   NBRCTSInfo nbrcts_info;
 
    //
-   // Store the alpha information in the CTSInfo object
+   // Setup the output table
    //
-   mcts_info.allocate_n_alpha(1);
-   mcts_info.alpha[0] = j.out_alpha;
-
-   //
-   // Compute the stats and confidence intervals for this
-   // MCTSInfo object
-   //
-   mcts_info.compute_stats();
-   mcts_info.compute_ci();
-
-   //
-   // Get the column names
-   //
-   out_at.set_size(2, n_mcts_columns+1);
-   setup_table(out_at);
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(mcts_columns, n_mcts_columns, 0,
-                    out_at, 0, 1);
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements();
+        if(lt == stat_fho)    n_col += n_fho_columns;
+   else if(lt == stat_ctc)    n_col += n_ctc_columns;
+   else if(lt == stat_cts)    n_col += n_cts_columns;
+   else if(lt == stat_nbrctc) n_col += n_nbrctc_columns;
+   else if(lt == stat_nbrcts) n_col += n_nbrcts_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
-   // Write the MCTS row
+   // Write the rest of the header row
    //
-   out_at.set_entry(1, 0,  "MCTS:");
-   write_mcts_cols(mcts_info, 0, out_at, 1, 1);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_job_cnt(STATAnalysisJob &j, STATLineType in_lt,
-                   SL1L2Info &sl1l2_info, CNTInfo &cnt_info,
-                   AsciiTable &out_at) {
-
-   //
-   // Allocate space for confidence intervals
-   //
-   cnt_info.allocate_n_alpha(1);
-   cnt_info.alpha[0] = j.out_alpha;
-
-   //
-   // Compute CNTInfo statistics from the aggregated partial sums
-   //
-   switch(in_lt) {
-
-      case(stat_sl1l2):
-         compute_cntinfo(sl1l2_info, 0, cnt_info);
-         break;
-
-      case(stat_sal1l2):
-         compute_cntinfo(sl1l2_info, 1, cnt_info);
-         break;
-
-      default:
-         mlog << Error << "\nwrite_job_cnt() -> "
-              << "unexpected line type value of " << in_lt
-              << "\n\n";
-         throw(1);
-   } // end switch
-
-   //
-   // Get the column names
-   //
-   out_at.set_size(2, n_cnt_columns+1);
-   setup_table(out_at);
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(cnt_columns, n_cnt_columns, 0,
-                    out_at, 0, 1);
-
-   //
-   // Write the CNT row
-   //
-   out_at.set_entry(1, 0,  "CNT:");
-   write_cnt_cols(cnt_info, 0, out_at, 1, 1);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_job_wdir(STATAnalysisJob &j, STATLineType in_lt,
-                    VL1L2Info &vl1l2_info,
-                    NumArray &uf_na, NumArray &vf_na,
-                    NumArray &uo_na, NumArray &vo_na,
-                    AsciiTable &out_at) {
-   int i, n, n_out;
-   double uf, vf, uo, vo, angle;
-   double fbar, obar, me, mae;
-
-   if(uf_na.n_elements() != vf_na.n_elements() ||
-      uo_na.n_elements() != vo_na.n_elements() ||
-      uf_na.n_elements() != uo_na.n_elements()) {
-
-      mlog << Error << "\nwrite_job_wdir()-> "
-           << "the number of U and V forecast and observation points "
-           << "must be the same.\n\n";
-      throw(1);
-   }
-
-   n_out = uf_na.n_elements();
-
-   //
-   // Get the column names
-   //
-   out_at.set_size(3, n_job_wdir_columns+1);
-   setup_table(out_at);
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(job_wdir_columns, n_job_wdir_columns, 0,
-                    out_at, 0, 1);
-
-   //
-   // Compute the mean forecast and observation angles
-   // from the unit vectors
-   //
-   uf   = uf_na.sum()/uf_na.n_elements();
-   vf   = vf_na.sum()/vf_na.n_elements();
-   fbar = convert_u_v_to_wdir(uf, vf);
-   uo   = uo_na.sum()/uo_na.n_elements();
-   vo   = vo_na.sum()/vo_na.n_elements();
-   obar = convert_u_v_to_wdir(uo, vo);
-
-   mlog << Debug(4) << "write_job_wdir() -> "
-        << "ROW_MEAN_WDIR: average forecast direction (u, v) = ("
-        << uf << ", "  << vf << ") = " << fbar << " degrees\n";
-
-   mlog << Debug(4) << "write_job_wdir() -> "
-        << "ROW_MEAN_WDIR: average observed direction (u, v) = ("
-        << uo << ", "  << vo << ") = " << obar << " degrees\n";
+   c = 1 + j.column_case.n_elements();
+        if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
+   else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
+   else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
+   else if(lt == stat_nbrctc) write_header_row(nbrctc_columns, n_nbrctc_columns, 0, at, 0, c);
+   else if(lt == stat_nbrcts) write_header_row(nbrcts_columns, n_nbrcts_columns, 0, at, 0, c);
    
    //
-   // Compute the mean error and the mean absolute error
-   // from the unit vectors
+   // Loop through the map
    //
-   me = mae = 0.0;
-   for(i=0; i<n_out; i++) {
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
 
-      angle = angle_difference(uf_na[i], vf_na[i],
-                               uo_na[i], vo_na[i]);
+      //
+      // Initialize
+      //
+      c = 0;
 
-      if(mlog.verbosity_level() > 3) {
-         mlog << Debug(4) << "write_job_wdir() -> "
-              << "ROW_MEAN_WDIR: [" << i+1 << "] difference of forecast direction "
-              << convert_u_v_to_wdir(uf_na[i], vf_na[i]) << " - observed direction "
-              << convert_u_v_to_wdir(uo_na[i], vo_na[i]) << " = "
-              << angle << " degrees\n";
+      //
+      // FHO output line
+      //
+      if(lt == stat_fho) {
+         at.set_entry(r, c++, "FHO:");
+         write_case_cols(it->first, at, r, c);
+         write_fho_cols(it->second.cts_info, at, r, c);
       }
-                               
-      // Check for bad data
-      if(is_eq(angle, bad_data_double)) {
-         me  = bad_data_double;
-         mae = bad_data_double;
-         break;
+      //
+      // CTC output line
+      //
+      else if(lt == stat_ctc) {
+         at.set_entry(r, c++, "CTC:");
+         write_case_cols(it->first, at, r, c);
+         write_ctc_cols(it->second.cts_info, at, r, c);
       }
+      //
+      // CTS output line
+      //
+      else if(lt == stat_cts) {
 
-      me   += angle;
-      mae  += fabs(angle);
-   }
-   if(!is_eq(me,  bad_data_double)) me  /= n_out;
-   if(!is_eq(mae, bad_data_double)) mae /= n_out;
+         //
+         // Store the alpha information in the CTSInfo object
+         //
+         it->second.cts_info.allocate_n_alpha(1);
+         it->second.cts_info.alpha[0] = j.out_alpha;
 
-   //
-   // Write the mean wind direction statistics
-   //
-   out_at.set_entry(1, 0, "ROW_MEAN_WDIR:");
-   out_at.set_entry(1, 1, n_out);
-   out_at.set_entry(1, 2, fbar);
-   out_at.set_entry(1, 3, obar);
-   out_at.set_entry(1, 4, me);
-   out_at.set_entry(1, 5, mae);
+         //
+         // Compute the stats and confidence intervals for this
+         // CTSInfo object
+         //
+         it->second.cts_info.compute_stats();
+         it->second.cts_info.compute_ci();
 
-   switch(in_lt) {
+         //
+         // Write the data line
+         //
+         at.set_entry(r, c++, "CTS:");
+         write_case_cols(it->first, at, r, c);
+         write_cts_cols(it->second.cts_info, 0, at, r, c);
+      }
+      //
+      // NBRCTC output line
+      //
+      else if(lt == stat_nbrctc) {
 
-      case(stat_vl1l2):
-         uf = vl1l2_info.ufbar;
-         vf = vl1l2_info.vfbar;
-         uo = vl1l2_info.uobar;
-         vo = vl1l2_info.vobar;
-         n  = vl1l2_info.vcount;
-         break;
+         nbrcts_info.clear();
+         nbrcts_info.cts_info = it->second.cts_info;
+        
+         at.set_entry(r, c++, "NBRCTC:");
+         write_case_cols(it->first, at, r, c);
+         write_nbrctc_cols(nbrcts_info, at, r, c);
+      }
+      //
+      // NBRCTS output line
+      //
+      else if(lt == stat_nbrcts) {
 
-      case(stat_val1l2):
-         uf = vl1l2_info.ufabar;
-         vf = vl1l2_info.vfabar;
-         uo = vl1l2_info.uoabar;
-         vo = vl1l2_info.voabar;
-         n  = vl1l2_info.vacount;
-         break;
+         nbrcts_info.clear();
+         nbrcts_info.cts_info = it->second.cts_info;
 
-      default:
-         mlog << Error << "\nwrite_job_wdir() -> "
-              << "unexpected line type value of " << in_lt
-              << "\n\n";
-         throw(1);
-   } // end switch
+         //
+         // Store the alpha information in the NBRCTSInfo object
+         //
+         nbrcts_info.cts_info.allocate_n_alpha(1);
+         nbrcts_info.cts_info.alpha[0] = j.out_alpha;
 
-   //
-   // Compute the aggregated forecast and observation angles
-   //
-   fbar = convert_u_v_to_wdir(uf, vf);
-   obar = convert_u_v_to_wdir(uo, vo);
-   me   = angle_difference(uf, vf, uo, vo);
-   mae  = bad_data_double;
+         //
+         // Compute the stats and confidence intervals for this
+         // NBRCTSInfo object
+         //
+         nbrcts_info.cts_info.compute_stats();
+         nbrcts_info.cts_info.compute_ci();
 
-   mlog << Debug(4) << "write_job_wdir() -> "
-        << "AGGR_WDIR: aggregated forecast direction (u, v) = ("
-        << uf << ", "  << vf << ") = " << fbar << " degrees\n";
-
-   mlog << Debug(4) << "write_job_wdir() -> "
-        << "AGGR_WDIR: aggregated observed direction (u, v) = ("
-        << uo << ", "  << vo << ") = " << obar << " degrees\n";
-   
-   //
-   // Write the aggregated wind direction statistics
-   //
-   out_at.set_entry(2, 0, "AGGR_WDIR:");
-   out_at.set_entry(2, 1, n);
-   out_at.set_entry(2, 2, fbar);
-   out_at.set_entry(2, 3, obar);
-   out_at.set_entry(2, 4, me);
-   out_at.set_entry(2, 5, mae);
+         //
+         // Write the data line
+         //
+         at.set_entry(r, c++, "NBRCTS:");
+         write_case_cols(it->first, at, r, c);
+         write_nbrcts_cols(nbrcts_info, 0, at, r, c);
+      }
+   } // end for it
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_job_pct(STATAnalysisJob &j, STATLineType in_lt,
-                   PCTInfo &pct_info, AsciiTable &out_at) {
-   int n_thresh = pct_info.pct.nrows()+1;;
+void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
+                         map<ConcatString, AggrMCTCInfo> &m,
+                         AsciiTable &at) {
+   map<ConcatString, AggrMCTCInfo>::iterator it;
+   int n, n_row, n_col, r, c;
 
-   switch(j.out_line_type) {
+   //
+   // Determine the maximum MCTC dimension
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n = max(it->second.mcts_info.cts.nrows(), n);
+   }
 
-      case(stat_pstd):
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements();
+        if(lt == stat_mctc) n_col += get_n_mctc_columns(n);
+   else if(lt == stat_mcts) n_col += n_mcts_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+        if(lt == stat_mctc) write_header_row(mctc_columns, n_mctc_columns, 0, at, 0, c);
+   else if(lt == stat_mcts) write_header_row(mcts_columns, n_mcts_columns, 0, at, 0, c);
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // MCTC output line
+      //
+      if(lt == stat_mctc) {
+         at.set_entry(r, c++, "MCTC:");
+         write_case_cols(it->first, at, r, c);
+         write_mctc_cols(it->second.mcts_info, at, r, c);
+      }
+      //
+      // MCTS output line
+      //
+      else if(lt == stat_mcts) {
+
+         //
+         // Store the alpha information in the CTSInfo object
+         //
+         it->second.mcts_info.allocate_n_alpha(1);
+         it->second.mcts_info.alpha[0] = j.out_alpha;
+
+         //
+         // Compute the stats and confidence intervals for this
+         // MCTSInfo object
+         //
+         it->second.mcts_info.compute_stats();
+         it->second.mcts_info.compute_ci();
+
+         //
+         // Write the data line
+         //
+         at.set_entry(r, c++, "MCTS:");
+         write_case_cols(it->first, at, r, c);
+         write_mcts_cols(it->second.mcts_info, 0, at, r, c);
+      }
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
+                        map<ConcatString, AggrPCTInfo> &m,
+                        AsciiTable &at) {
+   map<ConcatString, AggrPCTInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+   
+   //
+   // Determine the maximum PCT dimension
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n = max(it->second.pct_info.pct.nrows() + 1, n);
+   }
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements();
+        if(lt == stat_pct)  n_col += get_n_pct_columns(n);
+   else if(lt == stat_pstd) n_col += get_n_pstd_columns(n);
+   else if(lt == stat_pjc)  n_col += get_n_pjc_columns(n);
+   else if(lt == stat_prc)  n_col += get_n_prc_columns(n);
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+        if(lt == stat_pct)  write_pct_header_row (0, n, at, 0, c);
+   else if(lt == stat_pstd) write_pstd_header_row(0, n, at, 0, c);
+   else if(lt == stat_pjc)  write_pjc_header_row (0, n, at, 0, c);
+   else if(lt == stat_prc)  write_prc_header_row (0, n, at, 0, c);
+   
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // PCT output line
+      //
+      if(lt == stat_pct) {
+         at.set_entry(r, c++, "PCT:");
+         write_case_cols(it->first, at, r, c);
+         write_pct_cols(it->second.pct_info, at, r, c);
+      }
+      //
+      // PSTD output line
+      //
+      else if(lt == stat_pstd) {
 
          //
          // Store the alpha information in the PCTInfo object
          //
-         pct_info.allocate_n_alpha(1);
-         pct_info.alpha[0] = j.out_alpha;
+         it->second.pct_info.allocate_n_alpha(1);
+         it->second.pct_info.alpha[0] = j.out_alpha;
 
          //
          // Compute the stats and confidence intervals for this
-         // PCTInfo object
+         // MCTSInfo object
          //
-         pct_info.compute_stats();
-         pct_info.compute_ci();
+         it->second.pct_info.compute_stats();
+         it->second.pct_info.compute_ci();
 
          //
-         // Get the column names
+         // Write the data line
          //
-         out_at.set_size(2, get_n_pstd_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_pstd_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PSTD row
-         //
-         out_at.set_entry(1, 0,  "PSTD:");
-         write_pstd_cols(pct_info, 0, out_at, 1, 1);
-
-         break;
-
-      case(stat_pjc):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, get_n_pjc_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_pjc_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PSTD row
-         //
-         out_at.set_entry(1, 0,  "PJC:");
-         write_pjc_cols(pct_info, out_at, 1, 1);
-
-         break;
-
-     case(stat_prc):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, get_n_prc_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_prc_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PRC row
-         //
-         out_at.set_entry(1, 0,  "PRC:");
-         write_prc_cols(pct_info, out_at, 1, 1);
-
-         break;
-
-      default:
-         mlog << Error << "\nwrite_job_pct() -> "
-              << "unexpected line type value of " << in_lt
-              << "\n\n";
-         throw(1);
-   } // end switch
+         at.set_entry(r, c++, "PSTD:");
+         write_case_cols(it->first, at, r, c);
+         write_pstd_cols(it->second.pct_info, 0, at, r, c);
+      }
+      //
+      // PJC output line
+      //
+      else if(lt == stat_pjc) {
+         at.set_entry(r, c++, "PJC:");
+         write_case_cols(it->first, at, r, c);
+         write_pjc_cols(it->second.pct_info, at, r, c);
+      }
+      //
+      // PRC output line
+      //
+      else if(lt == stat_prc) {
+         at.set_entry(r, c++, "PRC:");
+         write_case_cols(it->first, at, r, c);
+         write_prc_cols(it->second.pct_info, at, r, c);
+      }
+   } // end for it
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_job_nbrcts(STATAnalysisJob &j, STATLineType in_lt,
-                      NBRCTSInfo &nbrcts_info, AsciiTable &out_at) {
+void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
+                         map<ConcatString, AggrPSumInfo> &m,
+                         AsciiTable &at) {
+   map<ConcatString, AggrPSumInfo>::iterator it;
+   int n_row, n_col, r, c;
 
    //
-   // Store the alpha information in the NBRCTSInfo object
+   // Setup the output table
    //
-   nbrcts_info.cts_info.allocate_n_alpha(1);
-   nbrcts_info.cts_info.alpha[0] = j.out_alpha;
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements();
+        if(lt == stat_sl1l2)  n_col += n_sl1l2_columns;
+   else if(lt == stat_sal1l2) n_col += n_sal1l2_columns;
+   else if(lt == stat_vl1l2)  n_col += n_vl1l2_columns;
+   else if(lt == stat_val1l2) n_col += n_val1l2_columns;
+   else if(lt == stat_cnt)    n_col += n_cnt_columns;
+   else if(lt == stat_nbrcnt) n_col += n_nbrcnt_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
-   // Compute the stats and confidence intervals for this
-   // NBRCTSInfo object
+   // Write the rest of the header row
    //
-   nbrcts_info.cts_info.compute_stats();
-   nbrcts_info.cts_info.compute_ci();
+   c = 1 + j.column_case.n_elements();
+        if(lt == stat_sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
+   else if(lt == stat_sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
+   else if(lt == stat_vl1l2)  write_header_row(vl1l2_columns,  n_vl1l2_columns,  0, at, 0, c);
+   else if(lt == stat_val1l2) write_header_row(val1l2_columns, n_val1l2_columns, 0, at, 0, c);
+   else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
+   else if(lt == stat_nbrcnt) write_header_row(nbrcnt_columns, n_nbrcnt_columns, 0, at, 0, c);
 
    //
-   // Get the column names
+   // Loop through the map
    //
-   out_at.set_size(2, n_nbrcts_columns+1);
-   setup_table(out_at);
-   out_at.set_entry(0, 0,  "COL_NAME:");
-   write_header_row(nbrcts_columns, n_nbrcts_columns, 0,
-                    out_at, 0, 1);
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
 
-   //
-   // Write the NBRCTS row
-   //
-   out_at.set_entry(1, 0,  "NBRCTS:");
-   write_nbrcts_cols(nbrcts_info, 0, out_at, 1, 1);
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // SL1L2 output line
+      //
+      if(lt == stat_sl1l2) {
+         at.set_entry(r, c++, "SL1L2:");
+         write_case_cols(it->first, at, r, c);
+         write_sl1l2_cols(it->second.sl1l2_info, at, r, c);
+      }
+      //
+      // SAL1L2 output line
+      //
+      else if(lt == stat_sal1l2) {
+         at.set_entry(r, c++, "SAL1L2:");
+         write_case_cols(it->first, at, r, c);
+         write_sal1l2_cols(it->second.sl1l2_info, at, r, c);
+      }
+      //
+      // VL1L2 output line
+      //
+      else if(lt == stat_vl1l2) {
+         at.set_entry(r, c++, "VL1L2:");
+         write_case_cols(it->first, at, r, c);
+         write_vl1l2_cols(it->second.vl1l2_info, at, r, c);
+      }
+      //
+      // VAL1L2 output line
+      //
+      else if(lt == stat_val1l2) {
+         at.set_entry(r, c++, "VAL1L2:");
+         write_case_cols(it->first, at, r, c);
+         write_val1l2_cols(it->second.vl1l2_info, at, r, c);
+      }
+      //
+      // CNT output line
+      //
+      else if(lt == stat_cnt) {
+
+         it->second.cnt_info.clear();
+         
+         //
+         // Allocate space for confidence intervals
+         //
+         it->second.cnt_info.allocate_n_alpha(1);
+         it->second.cnt_info.alpha[0] = j.out_alpha;
+
+         //
+         // Compute CNTInfo statistics from the aggregated partial sums
+         //
+         if(it->second.sl1l2_info.scount > 0)
+            compute_cntinfo(it->second.sl1l2_info, 0, it->second.cnt_info);
+         else
+            compute_cntinfo(it->second.sl1l2_info, 1, it->second.cnt_info);
+         
+         at.set_entry(r, c++, "CNT:");
+         write_case_cols(it->first, at, r, c);
+         write_cnt_cols(it->second.cnt_info, 0, at, r, c);
+      }
+      //
+      // NBRCNT output line
+      //
+      else if(lt == stat_nbrcnt) {
+         at.set_entry(r, c++, "NBRCNT:");
+         write_case_cols(it->first, at, r, c);
+         write_nbrcnt_cols(it->second.nbrcnt_info, 0, at, r, c);
+      }
+   } // end for it
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_job_mpr(STATAnalysisJob &j, STATLineType in_lt,
-                   CTSInfo &cts_info, MCTSInfo &mcts_info,
-                   CNTInfo &cnt_info, SL1L2Info &sl1l2_info,
-                   PCTInfo &pct_info, AsciiTable &out_at) {
-   int n_thresh, n_cat;
+void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
+                         map<ConcatString, AggrWindInfo> &m,
+                         AsciiTable &at) {
+   map<ConcatString, AggrWindInfo>::iterator it;
+   int i, n, n_row, n_col, r, c, count;
+   double uf, vf, uo, vo, fbar, obar;
+   double angle, me, mae;
 
    //
-   // Construct the output line
+   // Setup the output table
    //
-   switch(j.out_line_type) {
+   n_row = 1 + (2 * m.size());
+   n_col = 1 + j.column_case.n_elements() + n_job_wdir_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
 
-      case(stat_fho):
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_header_row(job_wdir_columns, n_job_wdir_columns, 0, at, 0, c);
 
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_fho_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(fho_columns, n_fho_columns, 0,
-                          out_at, 0, 1);
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
 
-         //
-         // Write the FHO row
-         //
-         out_at.set_entry(1, 0,  "FHO:");
-         write_fho_cols(cts_info, out_at, 1, 1);
+      //
+      // Initialize
+      //
+      c = 0;
 
-         break;
-
-      case(stat_ctc):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_ctc_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(ctc_columns, n_ctc_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the CTC row
-         //
-         out_at.set_entry(1, 0,  "CTC:");
-         write_ctc_cols(cts_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_cts):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_cts_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(cts_columns, n_cts_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the CTS row
-         //
-         out_at.set_entry(1, 0,  "CTS:");
-         write_cts_cols(cts_info, 0, out_at, 1, 1);
-
-         break;
-
-      case(stat_mctc):
-
-         //
-         // Get the column names
-         //
-         n_cat = mcts_info.cts.nrows();
-         out_at.set_size(2, get_n_mctc_columns(n_cat)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(mctc_columns, n_mctc_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the MCTC row
-         //
-         out_at.set_entry(1, 0,  "MCTC:");
-         write_mctc_cols(mcts_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_mcts):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_mcts_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(mcts_columns, n_mcts_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the MCTS row
-         //
-         out_at.set_entry(1, 0,  "MCTS:");
-         write_mcts_cols(mcts_info, 0, out_at, 1, 1);
-
-         break;
-
-      case(stat_cnt):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_cnt_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(cnt_columns, n_cnt_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the CNT row
-         //
-         out_at.set_entry(1, 0,  "CNT:");
-         write_cnt_cols(cnt_info, 0, out_at, 1, 1);
-
-         break;
-
-      case(stat_sl1l2):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_sl1l2_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(sl1l2_columns, n_sl1l2_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the SL1L2 row
-         //
-         out_at.set_entry(1, 0,  "SL1L2:");
-         write_sl1l2_cols(sl1l2_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_sal1l2):
-
-         //
-         // Get the column names
-         //
-         out_at.set_size(2, n_sal1l2_columns+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_header_row(sal1l2_columns, n_sal1l2_columns, 0,
-                          out_at, 0, 1);
-
-         //
-         // Write the SAL1L2 row
-         //
-         out_at.set_entry(1, 0,  "SAL1L2:");
-         write_sal1l2_cols(sl1l2_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_pct):
-
-         //
-         // Get the column names
-         //
-         n_thresh = pct_info.pct.nrows()+1;
-         out_at.set_size(2, get_n_pct_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_pct_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PCT row
-         //
-         out_at.set_entry(1, 0,  "PCT:");
-         write_pct_cols(pct_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_pstd):
-
-         //
-         // Get the column names
-         //
-         n_thresh = pct_info.pct.nrows()+1;
-         out_at.set_size(2, get_n_pstd_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_pstd_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PSTD row
-         //
-         out_at.set_entry(1, 0,  "PSTD:");
-         write_pstd_cols(pct_info, 0, out_at, 1, 1);
-
-         break;
-
-      case(stat_pjc):
-
-         //
-         // Get the column names
-         //
-         n_thresh = pct_info.pct.nrows()+1;
-         out_at.set_size(2, get_n_pjc_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_pjc_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PJC row
-         //
-         out_at.set_entry(1, 0,  "PJC:");
-         write_pjc_cols(pct_info, out_at, 1, 1);
-
-         break;
-
-      case(stat_prc):
-
-         //
-         // Get the column names
-         //
-         n_thresh = pct_info.pct.nrows()+1;
-         out_at.set_size(2, get_n_prc_columns(n_thresh)+1);
-         setup_table(out_at);
-         out_at.set_entry(0, 0,  "COL_NAME:");
-         write_prc_header_row(0, n_thresh, out_at, 0, 1);
-
-         //
-         // Write the PRC row
-         //
-         out_at.set_entry(1, 0,  "PRC:");
-         write_prc_cols(pct_info, out_at, 1, 1);
-
-         break;
-
-      default:
-
-         mlog << Error << "\nwrite_job_mpr() -> "
-              << "line type value of " << j.out_line_type
-              << " not currently supported for the aggregation "
-              << "job!\n\n";
+      //
+      // Check for matching component lengths
+      //
+      if(it->second.uf_na.n_elements() != it->second.vf_na.n_elements() ||
+         it->second.uo_na.n_elements() != it->second.vo_na.n_elements() ||
+         it->second.uf_na.n_elements() != it->second.uo_na.n_elements()) {
+         mlog << Error << "\nwrite_job_aggr_wind() -> "
+              << "the number of U and V forecast and observation points "
+              << "must be the same.\n\n";
          throw(1);
-   } // end switch
+      }
+
+      //
+      // Store the number of vectors
+      //
+      n = it->second.uf_na.n_elements();
+
+      //
+      // Compute the mean forecast and observation angles
+      // from the unit vectors
+      //
+      uf   = it->second.uf_na.sum()/it->second.uf_na.n_elements();
+      vf   = it->second.vf_na.sum()/it->second.vf_na.n_elements();
+      fbar = convert_u_v_to_wdir(uf, vf);
+      uo   = it->second.uo_na.sum()/it->second.uo_na.n_elements();
+      vo   = it->second.vo_na.sum()/it->second.vo_na.n_elements();
+      obar = convert_u_v_to_wdir(uo, vo);
+
+      mlog << Debug(4) << "write_job_aggr_wind() -> "
+           << "ROW_MEAN_WDIR: average forecast direction (u, v) = ("
+           << uf << ", "  << vf << ") = " << fbar << " degrees\n";
+
+      mlog << Debug(4) << "write_job_aggr_wind() -> "
+           << "ROW_MEAN_WDIR: average observed direction (u, v) = ("
+           << uo << ", "  << vo << ") = " << obar << " degrees\n";
+
+      //
+      // Compute the mean error and the mean absolute error
+      // from the unit vectors
+      //
+      me = mae = 0.0;
+      for(i=0; i<n; i++) {
+
+         angle = angle_difference(it->second.uf_na[i], it->second.vf_na[i],
+                                  it->second.uo_na[i], it->second.vo_na[i]);
+
+         if(mlog.verbosity_level() > 3) {
+            mlog << Debug(4) << "write_job_aggr_wind() -> "
+                 << "ROW_MEAN_WDIR: [" << i+1 << "] difference of forecast direction "
+                 << convert_u_v_to_wdir(it->second.uf_na[i], it->second.vf_na[i])
+                 << " - observed direction "
+                 << convert_u_v_to_wdir(it->second.uo_na[i], it->second.vo_na[i])
+                 << " = " << angle << " degrees\n";
+         }
+
+         // Check for bad data
+         if(is_eq(angle, bad_data_double)) {
+            me  = bad_data_double;
+            mae = bad_data_double;
+            break;
+         }
+
+         me  += angle;
+         mae += fabs(angle);
+      } // end for i
+      if(!is_eq(me,  bad_data_double)) me  /= n;
+      if(!is_eq(mae, bad_data_double)) mae /= n;
+
+      //
+      // Write the mean wind direction statistics
+      //
+      at.set_entry(r, 0, "ROW_MEAN_WDIR:");
+      write_case_cols(it->first, at, r, c);      
+      at.set_entry(r, c++, n);
+      at.set_entry(r, c++, fbar);
+      at.set_entry(r, c++, obar);
+      at.set_entry(r, c++, me);
+      at.set_entry(r, c++, mae);
+
+      if(lt == stat_vl1l2) {
+         uf    = it->second.vl1l2_info.ufbar;
+         vf    = it->second.vl1l2_info.vfbar;
+         uo    = it->second.vl1l2_info.uobar;
+         vo    = it->second.vl1l2_info.vobar;
+         count = it->second.vl1l2_info.vcount;
+      }
+      else if(lt == stat_val1l2) {
+         uf    = it->second.vl1l2_info.ufabar;
+         vf    = it->second.vl1l2_info.vfabar;
+         uo    = it->second.vl1l2_info.uoabar;
+         vo    = it->second.vl1l2_info.voabar;
+         count = it->second.vl1l2_info.vacount;
+      }
+
+      //
+      // Compute the aggregated forecast and observation angles
+      //
+      fbar = convert_u_v_to_wdir(uf, vf);
+      obar = convert_u_v_to_wdir(uo, vo);
+      me   = angle_difference(uf, vf, uo, vo);
+      mae  = bad_data_double;
+
+      mlog << Debug(4) << "write_job_aggr_wind() -> "
+           << "AGGR_WDIR: aggregated forecast direction (u, v) = ("
+           << uf << ", "  << vf << ") = " << fbar << " degrees\n";
+
+      mlog << Debug(4) << "write_job_aggr_wind() -> "
+           << "AGGR_WDIR: aggregated observed direction (u, v) = ("
+           << uo << ", "  << vo << ") = " << obar << " degrees\n";
+
+      //
+      // Write the aggregated wind direction statistics
+      //
+      at.set_entry(r, 0, "AGGR_WDIR:");
+      write_case_cols(it->first, at, r, c);
+      at.set_entry(r, c++, count);
+      at.set_entry(r, c++, fbar);
+      at.set_entry(r, c++, obar);
+      at.set_entry(r, c++, me);
+      at.set_entry(r, c++, mae);
+
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
+                          map<ConcatString, AggrRHISTInfo> &m,
+                          AsciiTable &at) {
+   map<ConcatString, AggrRHISTInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+
+   //
+   // Determine the maximum number of ranks
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n = max(it->second.ens_pd.rhist_na.n_elements(), n);
+   }
+   
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements() + get_n_rhist_columns(n);
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_rhist_header_row(0, m.begin()->second.ens_pd.rhist_na.n_elements(), at, 0, c);
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // RHIST output line
+      //
+      at.set_entry(r, c++, "RHIST:");
+      write_case_cols(it->first, at, r, c);
+      write_rhist_cols(&(it->second.ens_pd), at, r, c);
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
+                          map<ConcatString, AggrORANKInfo> &m,
+                          AsciiTable &at) {
+   map<ConcatString, AggrORANKInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+
+   //
+   // Determine the maximum number of ranks
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n = max(it->second.ens_pd.rhist_na.n_elements(), n);
+   }
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements() + get_n_rhist_columns(n);
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_rhist_header_row(0, m.begin()->second.ens_pd.rhist_na.n_elements(), at, 0, c);
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // RHIST output line
+      //
+      at.set_entry(r, c++, "RHIST:");
+      write_case_cols(it->first, at, r, c);
+      write_rhist_cols(&(it->second.ens_pd), at, r, c);
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
+                        map<ConcatString, AggrISCInfo> &m,
+                        AsciiTable &at) {
+   map<ConcatString, AggrISCInfo>::iterator it;
+   int i, n, n_row, n_col, r, c;
+   
+   //
+   // Determine the maximum number of scales
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n = max(it->second.isc_info.n_scale + 2, n);
+   }
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + (n * m.size());
+   n_col = 1 + j.column_case.n_elements() + n_isc_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_header_row(isc_columns, n_isc_columns, 0, at, 0, c);
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++) {
+     
+      //
+      // ISC output line
+      //
+      for(i=-1, c=0; i<=it->second.isc_info.n_scale; i++, r++, c=0) {
+         at.set_entry(r, c++, "ISC:");
+         write_case_cols(it->first, at, r, c);
+         write_isc_cols(it->second.isc_info, i, at, r, c);
+      }
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
+                        map<ConcatString, AggrMPRInfo> &m,
+                        AsciiTable &at, const char *tmp_dir) {
+   map<ConcatString, AggrMPRInfo>::iterator it;
+   int n_row, n_col, r, c;
+
+   CTSInfo   cts_info;
+   MCTSInfo  mcts_info;
+   CNTInfo   cnt_info;
+   SL1L2Info sl1l2_info;
+   PCTInfo   pct_info;
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements();
+        if(lt == stat_fho)    n_col += n_fho_columns;
+   else if(lt == stat_ctc)    n_col += n_ctc_columns;
+   else if(lt == stat_cts)    n_col += n_cts_columns;
+   else if(lt == stat_mctc)   n_col += get_n_mctc_columns(j.out_fcst_thresh.n_elements()+1);
+   else if(lt == stat_mcts)   n_col += n_mcts_columns;
+   else if(lt == stat_cnt)    n_col += n_cnt_columns;
+   else if(lt == stat_sl1l2)  n_col += n_sl1l2_columns;
+   else if(lt == stat_sal1l2) n_col += n_sal1l2_columns;
+   else if(lt == stat_pct)    n_col += get_n_pct_columns(j.out_fcst_thresh.n_elements());
+   else if(lt == stat_pstd)   n_col += get_n_pstd_columns(j.out_fcst_thresh.n_elements());
+   else if(lt == stat_pjc)    n_col += get_n_pjc_columns(j.out_fcst_thresh.n_elements());
+   else if(lt == stat_prc)    n_col += get_n_prc_columns(j.out_fcst_thresh.n_elements());
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+        if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
+   else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
+   else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
+   else if(lt == stat_mctc)   write_header_row(mctc_columns,   n_mctc_columns,   0, at, 0, c);
+   else if(lt == stat_mcts)   write_header_row(mcts_columns,   n_mcts_columns,   0, at, 0, c);
+   else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
+   else if(lt == stat_sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
+   else if(lt == stat_sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
+   else if(lt == stat_pct)    write_pct_header_row (0, j.out_fcst_thresh.n_elements(), at, 0, c);
+   else if(lt == stat_pstd)   write_pstd_header_row(0, j.out_fcst_thresh.n_elements(), at, 0, c);
+   else if(lt == stat_pjc)    write_pjc_header_row (0, j.out_fcst_thresh.n_elements(), at, 0, c);
+   else if(lt == stat_prc)    write_prc_header_row (0, j.out_fcst_thresh.n_elements(), at, 0, c);
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // FHO output line
+      //
+      if(lt == stat_fho) {
+         mpr_to_ctc(j, it->second, cts_info);
+         at.set_entry(r, c++, "FHO:");
+         write_case_cols(it->first, at, r, c);
+         write_fho_cols(cts_info, at, r, c);
+      }
+      //
+      // CTC output line
+      //
+      else if(lt == stat_ctc) {
+         mpr_to_ctc(j, it->second, cts_info);
+         at.set_entry(r, c++, "CTC:");
+         write_case_cols(it->first, at, r, c);
+         write_ctc_cols(cts_info, at, r, c);
+      }
+      //
+      // CTS output line
+      //
+      else if(lt == stat_cts) {
+         mpr_to_cts(j, it->second, cts_info, tmp_dir);
+         at.set_entry(r, c++, "CTS:");
+         write_case_cols(it->first, at, r, c);
+         write_cts_cols(cts_info, 0, at, r, c);
+      }
+      //
+      // MCTC output line
+      //
+      else if(lt == stat_mctc) {
+         mpr_to_mctc(j, it->second, mcts_info);
+         at.set_entry(r, c++, "MCTC:");
+         write_case_cols(it->first, at, r, c);
+         write_mctc_cols(mcts_info, at, r, c);
+      }
+      //
+      // MCTS output line
+      //
+      else if(lt == stat_mcts) {
+         mpr_to_mcts(j, it->second, mcts_info, tmp_dir);
+         at.set_entry(r, c++, "MCTS:");
+         write_case_cols(it->first, at, r, c);
+         write_mcts_cols(mcts_info, 0, at, r, c);
+      }
+      //
+      // CNT output line
+      //
+      else if(lt == stat_cnt) {
+         mpr_to_cnt(j, it->second, cnt_info, tmp_dir);
+         at.set_entry(r, c++, "CNT:");
+         write_case_cols(it->first, at, r, c);
+         write_cnt_cols(cnt_info, 0, at, r, c);
+      }
+      //
+      // SL1L2 output line
+      //
+      else if(lt == stat_sl1l2) {
+         mpr_to_psum(j, it->second, sl1l2_info);
+         at.set_entry(r, c++, "SL1L2:");
+         write_case_cols(it->first, at, r, c);
+         write_sl1l2_cols(sl1l2_info, at, r, c);
+      }
+      //
+      // SAL1L2 output line
+      //
+      else if(lt == stat_sal1l2) {
+         mpr_to_psum(j, it->second, sl1l2_info);
+         at.set_entry(r, c++, "SAL1L2:");
+         write_case_cols(it->first, at, r, c);
+         write_sal1l2_cols(sl1l2_info, at, r, c);
+      }
+      //
+      // PCT output line
+      //
+      else if(lt == stat_pct) {
+         mpr_to_pct(j, it->second, pct_info);
+         at.set_entry(r, c++, "PCT:");
+         write_case_cols(it->first, at, r, c);
+         write_pct_cols(pct_info, at, r, c);
+      }
+      //
+      // PSTD output line
+      //
+      else if(lt == stat_pstd) {
+         mpr_to_pct(j, it->second, pct_info);
+         at.set_entry(r, c++, "PSTD:");
+         write_case_cols(it->first, at, r, c);
+         write_pstd_cols(pct_info, 0, at, r, c);
+      }
+      //
+      // PJC output line
+      //
+      else if(lt == stat_pjc) {
+         mpr_to_pct(j, it->second, pct_info);
+         at.set_entry(r, c++, "PJC:");
+         write_case_cols(it->first, at, r, c);
+         write_pjc_cols(pct_info, at, r, c);
+      }
+      //
+      // PRC output line
+      //
+      else if(lt == stat_prc) {
+         mpr_to_pct(j, it->second, pct_info);        
+         at.set_entry(r, c++, "PRC:");
+         write_case_cols(it->first, at, r, c);
+         write_prc_cols(pct_info, at, r, c);
+      }
+   } // end for it
 
    return;
 }
@@ -2076,7 +1946,7 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
 ////////////////////////////////////////////////////////////////////////
 
 void setup_table(AsciiTable &at) {
-
+  
    // Left-justify all columns
    at.set_table_just(LeftJust);
 
@@ -2148,7 +2018,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // The first is the forecast model and the second is the reference.
    //
    if(j.model.n_elements() != 2) {
-      mlog << Error << "\ncompute_ss_index()-> "
+      mlog << Error << "\ncompute_ss_index() -> "
            << "this job may only be called when the \"-model\" option "
            << "has been used exactly twice to specify the forecast "
            << "model followed by the reference model: "
@@ -2160,7 +2030,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Use the length of the fcst_var array to infer the number of terms.
    //
    if((n_terms = j.fcst_var.n_elements()) < 1) {
-      mlog << Error << "\ncompute_ss_index()-> "
+      mlog << Error << "\ncompute_ss_index() -> "
            << "you must define the Skill Score Index to be computed "
            << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
            << "\"-line_type\", \"-column\", and \"-weight\" options: "
@@ -2176,7 +2046,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       n_terms != j.line_type.n_elements() ||
       n_terms != j.column.n_elements()    ||
       n_terms != j.weight.n_elements()) {
-      mlog << Error << "\ncompute_ss_index()-> "
+      mlog << Error << "\ncompute_ss_index() -> "
            << "all filtering parameters for defining the Skill Score "
            << "Index must be of the same length.  Check \"-fcst_var\", "
            << "\"-fcst_lev\", \"-fcst_lead\", \"-line_type\", "
@@ -2667,3 +2537,13 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_case_cols(const ConcatString &cs, AsciiTable &at,
+                     int &r, int &c) {
+   StringArray sa = cs.split(":");
+
+   for(int i=0; i<sa.n_elements(); i++) at.set_entry(r, c++, sa[i]);
+
+   return;
+}
+           
+////////////////////////////////////////////////////////////////////////

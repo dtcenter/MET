@@ -142,7 +142,7 @@ clear();
 
 ContingencyTable::assign(t);
 
-set_thresholds(t.Thresholds);
+if(t.Thresholds) set_thresholds(t.Thresholds);
 
 return;
 
