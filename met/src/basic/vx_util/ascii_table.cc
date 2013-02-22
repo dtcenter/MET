@@ -792,6 +792,7 @@ void AsciiTable::set_entry(const int r, const int c, const char * text)
 
 
 int n, k;
+char junk[256];
 
 n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
@@ -803,6 +804,13 @@ n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
 if ( e[n] )  { delete [] e[n];  e[n] = (char *) 0; }
 
 if ( !text )  return;
+
+   //
+   //  check for bad data value
+   //
+
+sprintf(junk, "%.0f", BadDataValue);
+if ( strncmp(text, junk, strlen(junk)) == 0 ) text = BadDataStr;
 
 k = strlen(text);
 
