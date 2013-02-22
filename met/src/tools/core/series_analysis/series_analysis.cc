@@ -27,6 +27,7 @@ using namespace std;
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
+#include <limits.h>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
