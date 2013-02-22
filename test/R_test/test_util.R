@@ -212,7 +212,7 @@ readStatData = function(stat, ver, lty, rmTmp=TRUE){
 	# build the list of headers and the parsing string for the line type
 	intLtyIdx = isLtyVarLength(lty, ver);
 	listHdr = getStatHeaders(ver, lty);
-	strParse = paste("/ ", lty, " /", sep="");
+	strParse = paste("~/ LINE_TYPE / & / ", lty, " /", sep="");
 	if( 0 < intLtyIdx ){
 		if( intLtyLen <= intLtyIdx ){
 			cat("ERROR: line type", lty, "shorter than minimum length", intLtyIdx, "\n");
@@ -378,14 +378,13 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	listTotHist = c();
 	intTotComp = 0;
 	intTotDiff = 0;
-	
+
 	# check the numerical columns for differences
 	boolTestNum = TRUE;
 	boolTestNumBc = TRUE;
 	listHdrVx = names(dfV1);
-	#for(strCol in listHdrVx[ grep("^TOTAL$", listHdrVx):length(listHdrVx) ]){
 	for(strCol in listHdrVx[ 22:length(listHdrVx) ]){
-			
+
 		# compare the columns in different ways, depending on bootstrapping
 		boolBc = ( 0 < length( grep("_BC[UL]$", strCol, perl=TRUE) ) );
 		boolNum = is.numeric( dfV1[[strCol]] );
