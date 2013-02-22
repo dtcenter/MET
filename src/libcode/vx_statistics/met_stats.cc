@@ -1565,19 +1565,17 @@ void ISCInfo::assign(const ISCInfo &c) {
 void ISCInfo::allocate_n_scale(int i) {
    int j;
 
-   n_scale = i;
+   if((n_scale = i) == 0) return;
 
-   if(n_scale > 0) {
-      mse_scale = new double [n_scale+1];
-      isc_scale = new double [n_scale+1];
-      fen_scale = new double [n_scale+1];
-      oen_scale = new double [n_scale+1];
+   mse_scale = new double [n_scale+1];
+   isc_scale = new double [n_scale+1];
+   fen_scale = new double [n_scale+1];
+   oen_scale = new double [n_scale+1];
 
-      if(!mse_scale || !isc_scale || !fen_scale || !oen_scale) {
-         mlog << Error << "\nISCInfo::allocate_n_scale() -> "
-              << "Memory allocation error!\n\n";
-        exit(1);
-      }
+   if(!mse_scale || !isc_scale || !fen_scale || !oen_scale) {
+      mlog << Error << "\nISCInfo::allocate_n_scale() -> "
+           << "Memory allocation error!\n\n";
+      exit(1);
    }
 
    // Initialize the values

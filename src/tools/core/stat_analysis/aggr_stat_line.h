@@ -48,91 +48,137 @@ static const int min_time_series = 10;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void aggr_contable_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &, CTSInfo &,
-               STATLineType, int &, int &);
+struct AggrCTCInfo {
+   CTSInfo cts_info;
+   NumArray valid_ts, baser_ts, fmean_ts, acc_ts;
+   NumArray pody_ts, podn_ts, pofd_ts, far_ts, csi_ts, hk_ts;
+};
 
-extern void aggr_mctc_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &, MCTSInfo &,
-               STATLineType, int &, int &);
+struct AggrMCTCInfo {
+   MCTSInfo mcts_info;
+   NumArray valid_ts, acc_ts;
+};
 
-extern void aggr_nx2_contable_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &, PCTInfo &,
-               STATLineType, int &, int &);
+struct AggrPCTInfo {
+   PCTInfo pct_info;
+   NumArray valid_ts, baser_ts, brier_ts;
+};
 
-extern void aggr_partial_sum_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &, SL1L2Info &, VL1L2Info &, CNTInfo &,
-               NBRCNTInfo &, STATLineType, int &, int &);
+struct AggrPSumInfo {
+   SL1L2Info  sl1l2_info;
+   VL1L2Info  vl1l2_info;
+   CNTInfo    cnt_info;
+   NBRCNTInfo nbrcnt_info;
+   NumArray valid_ts, fbar_ts, obar_ts, me_ts;
+};
 
-extern void aggr_vl1l2_wdir(
-               const char *, LineDataFile &, STATAnalysisJob &,
-               VL1L2Info &,
-               NumArray &, NumArray &, NumArray &, NumArray &,
-               STATLineType, int &, int &);
+struct AggrWindInfo {
+   VL1L2Info vl1l2_info;
+   NumArray uf_na, vf_na, uo_na, vo_na;
+};
 
-extern void read_mpr_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &,
-               ConcatString &, ConcatString &,
-               NumArray &, NumArray &, NumArray &,
+struct AggrMPRInfo {
+   NumArray f_na, o_na, c_na;
+   ConcatString fcst_var, obs_var;
+};
+
+struct AggrISCInfo {
+   ISCInfo isc_info;
+   NumArray *total_na, *mse_na, *fen_na, *oen_na, *baser_na, *fbias_na;
+};
+
+struct AggrRHISTInfo {
+   PairDataEnsemble ens_pd;
+   double crps_num, crps_den, ign_num, ign_den;
+};
+
+struct AggrORANKInfo {
+   PairDataEnsemble ens_pd;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+extern void aggr_ctc_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrCTCInfo> &,
                int &, int &);
 
-extern void aggr_mpr_lines_ctc(
-               STATAnalysisJob &,
-               const NumArray &, const NumArray &,
-               CTSInfo &);
+extern void aggr_mctc_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrMCTCInfo> &,
+               int &, int &);
 
-extern void aggr_mpr_lines_cts(
-               STATAnalysisJob &,
-               const NumArray &, const NumArray &,
-               CTSInfo &, const char *);
+extern void aggr_pct_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrPCTInfo> &,
+               int &, int &);
 
-extern void aggr_mpr_lines_mctc(
-               STATAnalysisJob &,
-               const NumArray &, const NumArray &,
-               MCTSInfo &);
+extern void aggr_psum_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrPSumInfo> &,
+               int &, int &);
 
-extern void aggr_mpr_lines_mcts(
-               STATAnalysisJob &,
-               const NumArray &, const NumArray &,
-               MCTSInfo &, const char *);
+extern void aggr_wind_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrWindInfo> &,
+               int &, int &);
 
-extern void aggr_mpr_lines_cnt(
-               STATAnalysisJob &,
-               const ConcatString, const ConcatString,
-               const NumArray &, const NumArray &,
-               CNTInfo &, const char *);
-
-extern void aggr_mpr_lines_psums(
-               STATAnalysisJob &,
-               const NumArray &, const NumArray &, const NumArray &,
-               SL1L2Info &);
-
-extern void aggr_mpr_lines_pct(
-               STATAnalysisJob &,
-               const NumArray &, const NumArray &,
-               PCTInfo &);
-
+extern void aggr_mpr_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrMPRInfo> &,
+               int &, int &);
+               
 extern void aggr_isc_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &, ISCInfo &,
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrISCInfo> &,
                int &, int &);
 
 extern void aggr_rhist_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &, PairDataEnsemble &,
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrRHISTInfo> &,
                int &, int &);
 
 extern void aggr_orank_lines(
-               const char *, LineDataFile &,
-               STATAnalysisJob &, PairDataEnsemble &,
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrORANKInfo> &,
                int &, int &);
 
+////////////////////////////////////////////////////////////////////////
+
+extern void mpr_to_ctc(
+               STATAnalysisJob &, const AggrMPRInfo &,
+               CTSInfo &);
+
+extern void mpr_to_cts(
+               STATAnalysisJob &, const AggrMPRInfo &,
+               CTSInfo &, const char *);
+
+extern void mpr_to_mctc(
+               STATAnalysisJob &, const AggrMPRInfo &,
+               MCTSInfo &);
+
+extern void mpr_to_mcts(
+               STATAnalysisJob &, const AggrMPRInfo &,
+               MCTSInfo &, const char *);
+
+extern void mpr_to_cnt(
+               STATAnalysisJob &, const AggrMPRInfo &,
+               CNTInfo &, const char *);
+               
+
+extern void mpr_to_psum(STATAnalysisJob &, const AggrMPRInfo &,
+               SL1L2Info &);
+
+extern void mpr_to_pct(
+               STATAnalysisJob &, const AggrMPRInfo &,
+               PCTInfo &);
+
+////////////////////////////////////////////////////////////////////////
+               
 extern double compute_vif(NumArray &);
+
+extern void write_case_cols(const ConcatString &, AsciiTable &,
+                            int &, int &);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -42,6 +42,7 @@ using namespace std;
 #include "vx_analysis_util.h"
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
+#include "aggr_stat_line.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -72,29 +73,36 @@ extern void do_job_ss_index(const ConcatString &, LineDataFile &,
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void write_job_cts(STATAnalysisJob &, STATLineType,
-               CTSInfo &, AsciiTable &);
+extern void write_job_aggr_hdr(STATAnalysisJob &,
+               int, int, AsciiTable &);
 
-extern void write_job_mcts(STATAnalysisJob &, STATLineType,
-               MCTSInfo &, AsciiTable &);
+extern void write_job_aggr_ctc(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrCTCInfo> &, AsciiTable &);
+               
+extern void write_job_aggr_mctc(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrMCTCInfo> &, AsciiTable &);
 
-extern void write_job_cnt(STATAnalysisJob &, STATLineType,
-               SL1L2Info &, CNTInfo &, AsciiTable &);
+extern void write_job_aggr_pct(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrPCTInfo> &, AsciiTable &);
 
-extern void write_job_wdir(STATAnalysisJob &, STATLineType,
-               VL1L2Info &,
-               NumArray &, NumArray &, NumArray &, NumArray &,
-               AsciiTable &);
+extern void write_job_aggr_psum(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrPSumInfo> &, AsciiTable &);
 
-extern void write_job_pct(STATAnalysisJob &, STATLineType,
-               PCTInfo &, AsciiTable &);
+extern void write_job_aggr_wind(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrWindInfo> &, AsciiTable &);
 
-extern void write_job_nbrcts(STATAnalysisJob &, STATLineType,
-               NBRCTSInfo &, AsciiTable &);
+extern void write_job_aggr_rhist(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrRHISTInfo> &, AsciiTable &);
 
-extern void write_job_mpr(STATAnalysisJob &, STATLineType,
-               CTSInfo &, MCTSInfo &, CNTInfo &, SL1L2Info &, PCTInfo &,
-               AsciiTable &);
+extern void write_job_aggr_orank(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrORANKInfo> &, AsciiTable &);
+
+extern void write_job_aggr_isc(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrISCInfo> &, AsciiTable &);
+
+extern void write_job_aggr_mpr(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrMPRInfo> &, AsciiTable &,
+               const char *);
 
 ////////////////////////////////////////////////////////////////////////
 

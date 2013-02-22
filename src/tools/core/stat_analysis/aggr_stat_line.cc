@@ -47,30 +47,22 @@ extern bool is_precip_var_name(const ConcatString &s);
 
 ////////////////////////////////////////////////////////////////////////
 //
-// The aggr_contable_lines routine should only be called when the
+// The aggr_ctc_lines routine should only be called when the
 // -line_type option has been used exactly once.
 //
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_contable_lines(const char *jobstring, LineDataFile &f,
-                         STATAnalysisJob &j, CTSInfo &cts_info,
-                         STATLineType lt, int &n_in, int &n_out) {
+void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
+                    map<ConcatString, AggrCTCInfo> &m,
+                    int &n_in, int &n_out) {
    STATLine line;
-   TTContingencyTable ct;
-   CTSInfo cts_tmp;
-   int fy_oy, fy_on, fn_oy, fn_on, n, n_ties;
-
-   // Keep track of scores for each time for computing VIF
+   AggrCTCInfo aggr;
+   CTSInfo cur;
+   ConcatString key;
    unixtime ut;
-   NumArray valid_ts, baser_ts, fmean_ts, acc_ts;
-   NumArray pody_ts, podn_ts, pofd_ts, far_ts, csi_ts, hk_ts;
-
-   //
-   // Initialize the Contingency Table counts
-   //
-   fy_oy = fy_on = fn_oy = fn_on = 0;
-   cts_info.clear();
-
+   int n, n_ties;
+   map<ConcatString, AggrCTCInfo>::iterator it;
+   
    //
    // Process the STAT lines
    //
@@ -88,7 +80,7 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
          //
          // Zero out the contingecy table object
          //
-         ct.zero_out();
+         cur.cts.zero_out();
 
          //
          // Switch on the line type looking only for contingency
@@ -97,19 +89,19 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
          switch(line.type()) {
 
             case(stat_fho):
-               parse_fho_ctable(line, ct);
+               parse_fho_ctable(line, cur.cts);
                break;
 
             case(stat_ctc):
-               parse_ctc_ctable(line, ct);
+               parse_ctc_ctable(line, cur.cts);
                break;
 
             case(stat_nbrctc):
-               parse_nbrctc_ctable(line, ct);
+               parse_nbrctc_ctable(line, cur.cts);
                break;
 
             default:
-               mlog << Error << "\naggr_contable_lines() -> "
+               mlog << Error << "\naggr_ctc_lines() -> "
                     << "line type value of " << statlinetype_to_string(line.type())
                     << " not currently supported for the aggregation job!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -117,12 +109,40 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
          } // end switch
 
          //
-         // Increment the ctable counts
+         // Build the map key for the current line
          //
-         fy_oy += ct.fy_oy();
-         fy_on += ct.fy_on();
-         fn_oy += ct.fn_oy();
-         fn_on += ct.fn_on();
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.valid_ts.clear();
+            aggr.baser_ts.clear();
+            aggr.fmean_ts.clear();
+            aggr.acc_ts.clear();
+            aggr.pody_ts.clear();
+            aggr.podn_ts.clear();
+            aggr.pofd_ts.clear();
+            aggr.far_ts.clear();
+            aggr.csi_ts.clear();
+            aggr.hk_ts.clear();
+            aggr.cts_info = cur;
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+            m[key].cts_info.cts.set_fy_oy(m[key].cts_info.cts.fy_oy() +
+                                          cur.cts.fy_oy());
+            m[key].cts_info.cts.set_fy_on(m[key].cts_info.cts.fy_on() +
+                                          cur.cts.fy_on());
+            m[key].cts_info.cts.set_fn_oy(m[key].cts_info.cts.fn_oy() +
+                                          cur.cts.fn_oy());
+            m[key].cts_info.cts.set_fn_on(m[key].cts_info.cts.fn_on() +
+                                          cur.cts.fn_on());
+         }
 
          //
          // Keep track of scores for each time step for VIF
@@ -134,36 +154,34 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
             //
             ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
 
-            if(valid_ts.has((double) ut)) {
-               mlog << Warning << "\naggr_contable_lines() -> "
+            if(m[key].valid_ts.has((double) ut)) {
+               mlog << Warning << "\naggr_ctc_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
                     << "valid times.\n\n";
                j.vif_flag = 0;
             }
             else {
-               valid_ts.add((double) ut);
+               m[key].valid_ts.add((double) ut);
             }
 
             //
             // Compute the stats for the current time
             //
-            cts_tmp.clear();
-            cts_tmp.cts = ct;
-            cts_tmp.compute_stats();
+            cur.compute_stats();
 
             //
             // Append the stats
             //
-            baser_ts.add(cts_tmp.baser.v);
-            fmean_ts.add(cts_tmp.fmean.v);
-            acc_ts.add(cts_tmp.acc.v);
-            pody_ts.add(cts_tmp.pody.v);
-            podn_ts.add(cts_tmp.podn.v);
-            pofd_ts.add(cts_tmp.pofd.v);
-            far_ts.add(cts_tmp.far.v);
-            csi_ts.add(cts_tmp.csi.v);
-            hk_ts.add(cts_tmp.hk.v);
+            m[key].baser_ts.add(cur.baser.v);
+            m[key].fmean_ts.add(cur.fmean.v);
+            m[key].acc_ts.add(cur.acc.v);
+            m[key].pody_ts.add(cur.pody.v);
+            m[key].podn_ts.add(cur.podn.v);
+            m[key].pofd_ts.add(cur.pofd.v);
+            m[key].far_ts.add(cur.far.v);
+            m[key].csi_ts.add(cur.csi.v);
+            m[key].hk_ts.add(cur.hk.v);
          }
 
          n_out++;
@@ -171,88 +189,81 @@ void aggr_contable_lines(const char *jobstring, LineDataFile &f,
    } // end while
 
    //
-   // Store the ctable sums
+   // Loop over the map entries and adjust for VIF
    //
-   cts_info.cts.set_fy_oy(fy_oy);
-   cts_info.cts.set_fy_on(fy_on);
-   cts_info.cts.set_fn_oy(fn_oy);
-   cts_info.cts.set_fn_on(fn_on);
-
-   //
-   // Check for the minimum length of time series
-   //
-   if(j.vif_flag && valid_ts.n_elements() < min_time_series) {
-      mlog << Warning << "\naggr_contable_lines() -> "
-           << "the variance inflation factor adjustment can only "
-           << "be computed for at least " << min_time_series
-           << " unique valid times.\n\n";
-      j.vif_flag = 0;
-   }
-
-   //
-   // Compute the auto-correlations for VIF
-   //
-   if(j.vif_flag) {
+   for(it = m.begin(); it != m.end(); it++) {
 
       //
-      // Sort the valid times
+      // Check for the minimum length of time series
       //
-      n = valid_ts.rank_array(n_ties);
-
-      if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\naggr_contable_lines() -> "
-              << "should be no ties in the valid time array!\n\n";
-         throw(1);
+      if(j.vif_flag && it->second.valid_ts.n_elements() < min_time_series) {
+         mlog << Warning << "\naggr_ctc_lines() -> "
+              << "the variance inflation factor adjustment can only "
+              << "be computed for at least " << min_time_series
+              << " unique valid times.\n\n";
+         j.vif_flag = 0;
       }
 
       //
-      // Sort the stats into time order
+      // Compute the auto-correlations for VIF
       //
-      baser_ts.reorder(valid_ts);
-      fmean_ts.reorder(valid_ts);
-      acc_ts.reorder(valid_ts);
-      pody_ts.reorder(valid_ts);
-      podn_ts.reorder(valid_ts);
-      pofd_ts.reorder(valid_ts);
-      far_ts.reorder(valid_ts);
-      csi_ts.reorder(valid_ts);
-      hk_ts.reorder(valid_ts);
+      if(j.vif_flag) {
 
-      //
-      // Compute the lag 1 autocorrelation
-      //
-      cts_info.baser.vif = compute_vif(baser_ts);
-      cts_info.fmean.vif = compute_vif(fmean_ts);
-      cts_info.acc.vif   = compute_vif(acc_ts);
-      cts_info.pody.vif  = compute_vif(pody_ts);
-      cts_info.podn.vif  = compute_vif(podn_ts);
-      cts_info.pofd.vif  = compute_vif(pofd_ts);
-      cts_info.far.vif   = compute_vif(far_ts);
-      cts_info.csi.vif   = compute_vif(csi_ts);
-      cts_info.hk.vif    = compute_vif(hk_ts);
-   }
+         //
+         // Sort the valid times
+         //
+         n = it->second.valid_ts.rank_array(n_ties);
+
+         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+            mlog << Error << "\naggr_ctc_lines() -> "
+                 << "should be no ties in the valid time array!\n\n";
+            throw(1);
+         }
+
+         //
+         // Sort the stats into time order
+         //
+         it->second.baser_ts.reorder(it->second.valid_ts);
+         it->second.fmean_ts.reorder(it->second.valid_ts);
+         it->second.acc_ts.reorder(it->second.valid_ts);
+         it->second.pody_ts.reorder(it->second.valid_ts);
+         it->second.podn_ts.reorder(it->second.valid_ts);
+         it->second.pofd_ts.reorder(it->second.valid_ts);
+         it->second.far_ts.reorder(it->second.valid_ts);
+         it->second.csi_ts.reorder(it->second.valid_ts);
+         it->second.hk_ts.reorder(it->second.valid_ts);
+
+         //
+         // Compute the lag 1 autocorrelation
+         //
+         it->second.cts_info.baser.vif = compute_vif(it->second.baser_ts);
+         it->second.cts_info.fmean.vif = compute_vif(it->second.fmean_ts);
+         it->second.cts_info.acc.vif   = compute_vif(it->second.acc_ts);
+         it->second.cts_info.pody.vif  = compute_vif(it->second.pody_ts);
+         it->second.cts_info.podn.vif  = compute_vif(it->second.podn_ts);
+         it->second.cts_info.pofd.vif  = compute_vif(it->second.pofd_ts);
+         it->second.cts_info.far.vif   = compute_vif(it->second.far_ts);
+         it->second.cts_info.csi.vif   = compute_vif(it->second.csi_ts);
+         it->second.cts_info.hk.vif    = compute_vif(it->second.hk_ts);
+
+      } // end if vif
+   } // end for it
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
-                     STATAnalysisJob &j, MCTSInfo &mcts_info,
-                     STATLineType lt, int &n_in, int &n_out) {
+void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
+                     map<ConcatString, AggrMCTCInfo> &m,
+                     int &n_in, int &n_out) {
    STATLine line;
-   ContingencyTable mct;
-   MCTSInfo mcts_tmp;
-   int i, k, cur, n, n_ties;
-
-   // Keep track of scores for each time for computing VIF
+   AggrMCTCInfo aggr;
+   MCTSInfo cur;
+   ConcatString key;
    unixtime ut;
-   NumArray valid_ts, acc_ts;
-
-   //
-   // Initialize
-   //
-   mcts_info.clear();
+   int i, k, n, n_ties;
+   map<ConcatString, AggrMCTCInfo>::iterator it;
 
    //
    // Process the STAT lines
@@ -269,58 +280,61 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
          if(j.dr_out) *(j.dr_out) << line;
 
          //
-         // Initialize
+         // Check for expected line type
          //
-         mct.clear();
+         if(line.type() != stat_mctc) {
+            mlog << Error << "\naggr_mctc_lines() -> "
+                 << "should only encounter multi-category contingency table count "
+                 << "(MCTC) line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
 
          //
-         // Switch on the line type looking only for multi-category
-         // contingency table types of lines
+         // Parse the current MCTC line
          //
-         switch(line.type()) {
-
-            case(stat_mctc):
-               parse_mctc_ctable(line, mct);
-               break;
-
-            default:
-               mlog << Error << "\naggr_mctc_lines() -> "
-                    << "line type value of " << statlinetype_to_string(line.type())
-                    << " not currently supported for the aggregation job!\n"
-                    << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
-         } // end switch
+         parse_mctc_ctable(line, cur.cts);
 
          //
-         // Store the first mulit-category contingency table
+         // Build the map key for the current line
          //
-         if(mcts_info.cts.total() == 0) mcts_info.cts = mct;
+         key = j.get_case_info(line);
+
          //
-         // Increment the multi-category contingency table counts
+         // Add a new map entry, if necessary
          //
+         if(m.count(key) == 0) {
+            aggr.valid_ts.clear();
+            aggr.acc_ts.clear();
+            aggr.mcts_info = cur;
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //         
          else {
 
             //
             // The size of the contingency table must remain the same
             //
-            if(mcts_info.cts.nrows() != mct.nrows()) {
+            if(m[key].mcts_info.cts.nrows() != cur.cts.nrows()) {
                mlog << Error << "\naggr_mctc_lines() -> "
                     << "when aggregating MCTC lines the size of the "
                     << "contingency table must remain the same for all "
                     << "lines.  Try setting \"-column_eq N_CAT n\", "
-                    << mcts_info.cts.nrows() << " != "
-                    << mct.nrows() << "\n\n";
+                    << m[key].mcts_info.cts.nrows() << " != "
+                    << cur.cts.nrows() << "\n\n";
                throw(1);
             }
 
-            for(i=0; i<mcts_info.cts.nrows(); i++) {
-               for(k=0; k<mcts_info.cts.ncols(); k++) {
-
-                  //
-                  // Increment the counts
-                  //
-                  cur = mcts_info.cts.entry(i, k);
-                  mcts_info.cts.set_entry(i, k, cur + mct.entry(i, k));
+            //
+            // Increment the counts
+            //
+            for(i=0; i<m[key].mcts_info.cts.nrows(); i++) {
+               for(k=0; k<m[key].mcts_info.cts.ncols(); k++) {
+                  m[key].mcts_info.cts.set_entry(i, k,
+                                                 m[key].mcts_info.cts.entry(i, k) +
+                                                 cur.cts.entry(i, k));
                } //end for k
             } // end for i
          } // end else
@@ -335,7 +349,7 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
             //
             ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
 
-            if(valid_ts.has((double) ut)) {
+            if(m[key].valid_ts.has((double) ut)) {
                mlog << Warning << "\naggr_mctc_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
@@ -343,20 +357,18 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
                j.vif_flag = 0;
             }
             else {
-               valid_ts.add((double) ut);
+               m[key].valid_ts.add((double) ut);
             }
 
             //
             // Compute the stats for the current time
             //
-            mcts_tmp.clear();
-            mcts_tmp.cts = mct;
-            mcts_tmp.compute_stats();
+            cur.compute_stats();
 
             //
             // Append the stats
             //
-            acc_ts.add(mcts_tmp.acc.v);
+            m[key].acc_ts.add(cur.acc.v);
          }
 
          n_out++;
@@ -364,64 +376,257 @@ void aggr_mctc_lines(const char *jobstring, LineDataFile &f,
    } // end while
 
    //
-   // Check for the minimum length of time series
+   // Loop over the map entries and adjust for VIF
    //
-   if(j.vif_flag && valid_ts.n_elements() < min_time_series) {
-      mlog << Warning << "\naggr_mctc_lines() -> "
-           << "the variance inflation factor adjustment can only "
-           << "be computed for at least " << min_time_series
-           << " unique valid times.\n\n";
-      j.vif_flag = 0;
-   }
-
-   //
-   // Compute the auto-correlations for VIF
-   //
-   if(j.vif_flag) {
+   for(it = m.begin(); it != m.end(); it++) {
 
       //
-      // Sort the valid times
+      // Check for the minimum length of time series
       //
-      n = valid_ts.rank_array(n_ties);
-
-      if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\naggr_mctc_lines() -> "
-              << "should be no ties in the valid time array!\n\n";
-         throw(1);
+      if(j.vif_flag && it->second.valid_ts.n_elements() < min_time_series) {
+         mlog << Warning << "\naggr_mctc_lines() -> "
+              << "the variance inflation factor adjustment can only "
+              << "be computed for at least " << min_time_series
+              << " unique valid times.\n\n";
+         j.vif_flag = 0;
       }
 
       //
-      // Sort the stats into time order
+      // Compute the auto-correlations for VIF
       //
-      acc_ts.reorder(valid_ts);
+      if(j.vif_flag) {
+
+         //
+         // Sort the valid times
+         //
+         n = it->second.valid_ts.rank_array(n_ties);
+
+         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+            mlog << Error << "\naggr_mctc_lines() -> "
+                 << "should be no ties in the valid time array!\n\n";
+            throw(1);
+         }
+
+         //
+         // Sort the stats into time order
+         //
+         it->second.acc_ts.reorder(it->second.valid_ts);
+
+         //
+         // Compute the lag 1 autocorrelation
+         //
+         it->second.mcts_info.acc.vif = compute_vif(it->second.acc_ts);
+
+      } // end if vif
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+  
+void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
+                    map<ConcatString, AggrPCTInfo> &m,
+                    int &n_in, int &n_out) {
+   STATLine line;
+   AggrPCTInfo aggr;
+   PCTInfo cur;
+   ConcatString key;
+   unixtime ut;
+   int i, n, oy, on, n_ties;
+   map<ConcatString, AggrPCTInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
+         // Check for expected line type
+         //
+         if(line.type() != stat_pct) {
+            mlog << Error << "\naggr_pct_lines() -> "
+                 << "should only encounter probability contingency table (PCT) "
+                 << "line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current PCT line
+         //
+         parse_nx2_ctable(line, cur.pct);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.valid_ts.clear();
+            aggr.baser_ts.clear();
+            aggr.brier_ts.clear();
+            aggr.pct_info = cur;
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+
+            //
+            // The size of the contingency table must remain the same
+            //
+            if(m[key].pct_info.pct.nrows() != cur.pct.nrows()) {
+               mlog << Error << "\naggr_pct_lines() -> "
+                    << "when aggregating PCT lines the number of "
+                    << "thresholds must remain the same for all lines, "
+                    << m[key].pct_info.pct.nrows() << " != "
+                    << cur.pct.nrows() << "\n\n";
+               throw(1);
+            }
+
+            //
+            // Increment the counts
+            //
+            for(i=0; i<m[key].pct_info.pct.nrows(); i++) {
+
+               //
+               // The threshold values must remain the same
+               //
+               if(!is_eq(m[key].pct_info.pct.threshold(i), cur.pct.threshold(i))) {
+                  mlog << Error << "\naggr_pct_lines() -> "
+                       << "when aggregating PCT lines the threshold "
+                       << "values must remain the same for all lines, "
+                       << m[key].pct_info.pct.threshold(i) << " != "
+                       << cur.pct.threshold(i) << "\n\n";
+                  throw(1);
+               }
+
+               oy = m[key].pct_info.pct.event_count_by_row(i);
+               on = m[key].pct_info.pct.nonevent_count_by_row(i);
+
+               m[key].pct_info.pct.set_entry(i, nx2_event_column,
+                                             oy + cur.pct.event_count_by_row(i));
+               m[key].pct_info.pct.set_entry(i, nx2_nonevent_column,
+                                             on + cur.pct.nonevent_count_by_row(i));
+            } // end for i
+         } // end else
+
+         //
+         // Keep track of scores for each time step for VIF
+         //
+         if(j.vif_flag) {
+
+            //
+            // Cannot compute VIF when the times are not unique
+            //
+            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+
+            if(m[key].valid_ts.has((double) ut)) {
+               mlog << Warning << "\naggr_pct_lines() -> "
+                    << "the variance inflation factor adjustment can "
+                    << "only be computed for time series with unique "
+                    << "valid times.\n\n";
+               j.vif_flag = 0;
+            }
+            else {
+               m[key].valid_ts.add((double) ut);
+            }
+
+            //
+            // Compute the stats for the current time
+            //
+            cur.compute_stats();
+
+            //
+            // Append the stats
+            //
+            m[key].baser_ts.add(cur.baser.v);
+            m[key].brier_ts.add(cur.brier.v);
+         }
+
+         n_out++;
+      }
+   } // end while
+
+   //
+   // Loop over the map entries and adjust for VIF
+   //
+   for(it = m.begin(); it != m.end(); it++) {
 
       //
-      // Compute the lag 1 autocorrelation
+      // Check for the minimum length of time series
       //
-      mcts_info.acc.vif = compute_vif(acc_ts);
-   }
+      if(j.vif_flag && it->second.valid_ts.n_elements() < min_time_series) {
+         mlog << Warning << "\naggr_pct_lines() -> "
+              << "the variance inflation factor adjustment can only "
+              << "be computed for at least " << min_time_series
+              << " unique valid times.\n\n";
+         j.vif_flag = 0;
+      }
+
+      //
+      // Compute the auto-correlations for VIF
+      //
+      if(j.vif_flag) {
+
+         //
+         // Sort the valid times
+         //
+         n = it->second.valid_ts.rank_array(n_ties);
+
+         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+            mlog << Error << "\naggr_pct_lines() -> "
+                 << "should be no ties in the valid time array!\n\n";
+            throw(1);
+         }
+
+         //
+         // Sort the stats into time order
+         //
+         it->second.baser_ts.reorder(it->second.valid_ts);
+         it->second.brier_ts.reorder(it->second.valid_ts);
+
+         //
+         // Compute the lag 1 autocorrelation
+         //
+         it->second.pct_info.baser.vif = compute_vif(it->second.baser_ts);
+         it->second.pct_info.brier.vif = compute_vif(it->second.brier_ts);
+
+      } // end if vif
+   } // end for it
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
-                             STATAnalysisJob &j, PCTInfo &pct_info,
-                             STATLineType lt, int &n_in, int &n_out) {
+void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j, 
+                     map<ConcatString, AggrPSumInfo> &m,
+                     int &n_in, int &n_out) {
    STATLine line;
-   Nx2ContingencyTable pct;
-   PCTInfo pct_tmp;
-   int i, oy, on, n, n_ties;
-
-   // Keep track of scores for each time for computing VIF
+   AggrPSumInfo aggr;
+   SL1L2Info cur_sl1l2;
+   VL1L2Info cur_vl1l2;
+   NBRCNTInfo cur_nbrcnt;
+   CNTInfo cur_cnt;
+   ConcatString key;
    unixtime ut;
-   NumArray valid_ts, baser_ts, brier_ts;
-
-   //
-   // Initialize
-   //
-   pct_info.clear();
+   int n, n_ties;
+   map<ConcatString, AggrPSumInfo>::iterator it;
 
    //
    // Process the STAT lines
@@ -440,184 +645,9 @@ void aggr_nx2_contable_lines(const char *jobstring, LineDataFile &f,
          //
          // Initialize
          //
-         pct.clear();
-
-         //
-         // Switch on the line type looking only for probabilistic
-         // contingency table types of lines
-         //
-         switch(line.type()) {
-
-            case(stat_pct):
-               parse_nx2_ctable(line, pct);
-               break;
-
-            default:
-               mlog << Error << "\naggr_nx2_contable_lines() -> "
-                    << "line type value of " << statlinetype_to_string(line.type())
-                    << " not currently supported for the aggregation job!\n"
-                    << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
-         } // end switch
-
-         //
-         // Store the first Nx2 Contingency Table
-         //
-         if(pct_info.pct.n() == 0) pct_info.pct = pct;
-         //
-         // Increment the Nx2 Contingency Table counts
-         //
-         else {
-
-            //
-            // The number of thresholds must remain the same
-            //
-            if(pct_info.pct.nrows() != pct.nrows()) {
-               mlog << Error << "\naggr_nx2_contable_lines() -> "
-                    << "when aggregating PCT lines the number of "
-                    << "thresholds must remain the same for all lines, "
-                    << pct_info.pct.nrows() << " != " << pct.nrows()
-                    << "\n\n";
-               throw(1);
-            }
-
-            for(i=0; i<pct_info.pct.nrows(); i++) {
-
-               //
-               // The threshold values must remain the same
-               //
-               if(!is_eq(pct_info.pct.threshold(i), pct.threshold(i))) {
-                  mlog << Error << "\naggr_nx2_contable_lines() -> "
-                       << "when aggregating PCT lines the threshold "
-                       << "values must remain the same for all lines, "
-                       << pct_info.pct.threshold(i) << " != "
-                       << pct.threshold(i)
-                       << "\n\n";
-                  throw(1);
-               }
-
-               //
-               // Increment the counts
-               //
-               oy = pct_info.pct.event_count_by_row(i);
-               on = pct_info.pct.nonevent_count_by_row(i);
-
-               pct_info.pct.set_entry(i, nx2_event_column,
-                                      oy+pct.event_count_by_row(i));
-               pct_info.pct.set_entry(i, nx2_nonevent_column,
-                                      on+pct.nonevent_count_by_row(i));
-            } // end for i
-         } // end else
-
-         //
-         // Keep track of scores for each time step for VIF
-         //
-         if(j.vif_flag) {
-
-            //
-            // Cannot compute VIF when the times are not unique
-            //
-            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
-
-            if(valid_ts.has((double) ut)) {
-               mlog << Warning << "\naggr_nx2_contable_lines() -> "
-                    << "the variance inflation factor adjustment can "
-                    << "only be computed for time series with unique "
-                    << "valid times.\n\n";
-               j.vif_flag = 0;
-            }
-            else {
-               valid_ts.add((double) ut);
-            }
-
-            //
-            // Compute the stats for the current time
-            //
-            pct_tmp.clear();
-            pct_tmp.pct = pct;
-            pct_tmp.compute_stats();
-
-            //
-            // Append the stats
-            //
-            baser_ts.add(pct_tmp.baser.v);
-            brier_ts.add(pct_tmp.brier.v);
-         }
-
-         n_out++;
-      }
-   } // end while
-
-   //
-   // Compute the auto-correlations for VIF
-   //
-   if(j.vif_flag) {
-
-      //
-      // Sort the valid times
-      //
-      n = valid_ts.rank_array(n_ties);
-
-      if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\naggr_nx2_contable_lines() -> "
-              << "should be no ties in the valid time array!\n\n";
-         throw(1);
-      }
-
-      //
-      // Sort the stats into time order
-      //
-      baser_ts.reorder(valid_ts);
-      brier_ts.reorder(valid_ts);
-
-      //
-      // Compute the lag 1 autocorrelation
-      //
-      pct_info.baser.vif = compute_vif(baser_ts);
-      pct_info.brier.vif = compute_vif(brier_ts);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
-                            STATAnalysisJob &j, SL1L2Info &sl1l2_info,
-                            VL1L2Info &vl1l2_info, CNTInfo &cnt_info,
-                            NBRCNTInfo &nbrcnt_info, STATLineType lt,
-                            int &n_in, int &n_out) {
-   STATLine line;
-   SL1L2Info s;
-   VL1L2Info v;
-   NBRCNTInfo c;
-   int n, n_ties;
-
-   // Keep track of scores for each time for computing VIF
-   unixtime ut;
-   NumArray valid_ts, fbar_ts, obar_ts, me_ts;
-   CNTInfo cnt_tmp;
-
-   //
-   // Initialize the partial sums
-   //
-   sl1l2_info.clear();
-   vl1l2_info.clear();
-   nbrcnt_info.clear();
-
-   //
-   // Process the STAT lines
-   //
-   while(f >> line) {
-
-      n_in++;
-
-      if(j.is_keeper(line)) {
-
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         cur_sl1l2.clear();
+         cur_vl1l2.clear();
+         cur_nbrcnt.clear();
 
          //
          // Switch on the line type.
@@ -627,41 +657,58 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
          switch(line.type()) {
 
             case(stat_sl1l2):
-               s.clear();
-               parse_sl1l2_line(line, s);
-               sl1l2_info += s;
+               parse_sl1l2_line(line, cur_sl1l2);
                break;
 
             case(stat_sal1l2):
-               s.clear();
-               parse_sal1l2_line(line, s);
-               sl1l2_info += s;
+               parse_sal1l2_line(line, cur_sl1l2);
                break;
 
             case(stat_vl1l2):
-               v.clear();
-               parse_vl1l2_line(line, v);
-               vl1l2_info += v;
+               parse_vl1l2_line(line, cur_vl1l2);
                break;
 
             case(stat_val1l2):
-               v.clear();
-               parse_val1l2_line(line, v);
-               vl1l2_info += v;
+               parse_val1l2_line(line, cur_vl1l2);
                break;
 
             case(stat_nbrcnt):
-               c.clear();
-               parse_nbrcnt_line(line, c);
-               nbrcnt_info += c;
+               parse_nbrcnt_line(line, cur_nbrcnt);
                break;
 
             default:
-               mlog << Error << "\naggr_partial_sum_lines() -> "
+               mlog << Error << "\naggr_psum_lines() -> "
                     << "should only encounter partial sum line types!\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
          } // end switch
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.valid_ts.clear();
+            aggr.fbar_ts.clear();
+            aggr.obar_ts.clear();
+            aggr.me_ts.clear();
+            aggr.sl1l2_info  = cur_sl1l2;
+            aggr.vl1l2_info  = cur_vl1l2;
+            aggr.nbrcnt_info = cur_nbrcnt;
+            m[key] = aggr;
+         }
+         //
+         // Increment sums in the existing map entry
+         //
+         else {
+            m[key].sl1l2_info  += cur_sl1l2;
+            m[key].vl1l2_info  += cur_vl1l2;
+            m[key].nbrcnt_info += cur_nbrcnt;                                          
+         }
 
          //
          // Keep track of scores for each time step for VIF
@@ -673,277 +720,772 @@ void aggr_partial_sum_lines(const char *jobstring, LineDataFile &f,
             //
             ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
 
-            if(valid_ts.has((double) ut)) {
-               mlog << Warning << "\naggr_partial_sum_lines() -> "
+            if(m[key].valid_ts.has((double) ut)) {
+               mlog << Warning << "\naggr_psum_lines() -> "
                     << "the variance inflation factor adjustment can "
                     << "only be computed for time series with unique "
                     << "valid times.\n\n";
                j.vif_flag = 0;
             }
             else {
-               valid_ts.add((double) ut);
+               m[key].valid_ts.add((double) ut);
             }
 
             //
             // Compute the stats for the current time
             //
-            compute_cntinfo(s, 0, cnt_tmp);
+            compute_cntinfo(cur_sl1l2, 0, cur_cnt);
 
             //
             // Append the stats
             //
-            fbar_ts.add(cnt_tmp.fbar.v);
-            obar_ts.add(cnt_tmp.obar.v);
-            me_ts.add(cnt_tmp.me.v);
+            m[key].fbar_ts.add(cur_cnt.fbar.v);
+            m[key].obar_ts.add(cur_cnt.obar.v);
+            m[key].me_ts.add(cur_cnt.me.v);
+         }
+
+         n_out++;
+      }
+   } // end while
+   
+   //
+   // Loop over the map entries and adjust for VIF
+   //
+   for(it = m.begin(); it != m.end(); it++) {
+
+      //
+      // Check for the minimum length of time series
+      //
+      if(j.vif_flag && j.out_line_type == stat_cnt &&
+         it->second.valid_ts.n_elements() < min_time_series) {
+         mlog << Warning << "\naggr_psum_lines() -> "
+              << "the variance inflation factor adjustment can only "
+              << "be computed for at least " << min_time_series
+              << " unique valid times.\n\n";
+         j.vif_flag = 0;
+      }
+     
+      //
+      // Compute the auto-correlations for VIF
+      //
+      if(j.vif_flag && j.out_line_type == stat_cnt) {
+
+         //
+         // Sort the valid times
+         //
+         n = it->second.valid_ts.rank_array(n_ties);
+
+         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+            mlog << Error << "\naggr_psum_lines() -> "
+                 << "should be no ties in the valid time array!\n\n";
+            throw(1);
+         }
+
+         //
+         // Sort the stats into time order
+         //
+         it->second.fbar_ts.reorder(it->second.valid_ts);
+         it->second.obar_ts.reorder(it->second.valid_ts);
+         it->second.me_ts.reorder(it->second.valid_ts);
+
+         //
+         // Compute the lag 1 autocorrelation
+         //
+         it->second.cnt_info.fbar.vif = compute_vif(it->second.fbar_ts);
+         it->second.cnt_info.obar.vif = compute_vif(it->second.obar_ts);
+         it->second.cnt_info.me.vif   = compute_vif(it->second.me_ts);
+
+      } // end if vif
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
+                     map<ConcatString, AggrWindInfo> &m,
+                     int &n_in, int &n_out) {
+   STATLine line;
+   AggrWindInfo aggr;
+   VL1L2Info cur;
+   ConcatString key;
+   double uf, vf, uo, vo;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
+         // Initialize
+         //
+         cur.clear();
+
+         //
+         // Switch on the line type.
+         // For each partial sum line type, clear out the object,
+         // parse the new line and convert to unit vectors.
+         //
+         switch(line.type()) {
+
+            case(stat_vl1l2):
+               parse_vl1l2_line(line, cur);
+               convert_u_v_to_unit(cur.ufbar, cur.vfbar, uf, vf);
+               convert_u_v_to_unit(cur.uobar, cur.vobar, uo, vo);
+               break;
+
+            case(stat_val1l2):
+               parse_val1l2_line(line, cur);
+               convert_u_v_to_unit(cur.ufabar, cur.vfabar, uf, vf);
+               convert_u_v_to_unit(cur.uoabar, cur.voabar, uo, vo);
+               break;
+               
+            default:
+               mlog << Error << "\naggr_wind_lines() -> "
+                    << "should only encounter vector partial sum line types!\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n";
+               throw(1);
+         } // end switch
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.uf_na.clear();
+            aggr.vf_na.clear();
+            aggr.uo_na.clear();
+            aggr.vo_na.clear();
+            aggr.vl1l2_info = cur;
+            m[key] = aggr;
+         }
+         //
+         // Increment sums in the existing map entry
+         //
+         else {
+            m[key].vl1l2_info += cur;
+         } 
+
+         //
+         // Append the unit vectors
+         //
+         m[key].uf_na.add(uf);
+         m[key].vf_na.add(vf);
+         m[key].uo_na.add(uo);
+         m[key].vo_na.add(vo);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
+                    map<ConcatString, AggrMPRInfo> &m,
+                    int &n_in, int &n_out) {
+   STATLine line;
+   AggrMPRInfo aggr;
+   MPRData cur;
+   ConcatString key;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         //
+         // Check for expected line type
+         //
+         if(line.type() != stat_mpr) {
+            mlog << Error << "\naggr_mpr_lines() -> "
+                 << "should only encounter matched pair (MPR) line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current MPR line
+         //
+         parse_mpr_line(line, cur);
+
+         //
+         // Check the grid and poly masks if specified.
+         // Convert degrees_east to degrees_west.
+         //
+         if(!j.is_in_mask_grid(cur.obs_lat, (-1.0)*cur.obs_lon) ||
+            !j.is_in_mask_poly(cur.obs_lat, (-1.0)*cur.obs_lon))
+            continue;
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(cur.fcst) || is_bad_data(cur.obs)) continue;
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.f_na.clear();
+            aggr.o_na.clear();
+            aggr.c_na.clear();
+            aggr.f_na.add(cur.fcst);
+            aggr.o_na.add(cur.obs);
+            aggr.c_na.add(cur.climo);
+            aggr.fcst_var = cur.fcst_var;
+            aggr.obs_var = cur.obs_var;
+            m[key] = aggr;
+         }
+         //
+         // Increment sums in the existing map entry
+         //
+         else {
+            m[key].f_na.add(cur.fcst);
+            m[key].o_na.add(cur.obs);
+            m[key].c_na.add(cur.climo);
+
+            //
+            // Only aggregate consistent variable names
+            //
+            if(m[key].fcst_var != cur.fcst_var ||
+               m[key].obs_var  != cur.obs_var) {
+               mlog << Error << "\nread_mpr_lines() -> "
+                    << "both the forecast and observation variable types must "
+                    << "remain constant!  Try setting \"-fcst_var\" and/or "
+                    << "\"-obs_var\".\n"
+                    << "ERROR occurred on STAT line:\n" << line << "\n\n";
+               throw(1);
+            }
          }
 
          n_out++;
       }
    } // end while
 
+   return;
+}
 
-   //  initialize the aggregated nbrcnt CIs
-   nbrcnt_info.allocate_n_alpha(1);
+////////////////////////////////////////////////////////////////////////
+
+void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
+                    map<ConcatString, AggrISCInfo> &m,
+                    int &n_in, int &n_out) {
+   STATLine line;
+   AggrISCInfo aggr;
+   ISCInfo cur;
+   ConcatString key;
+   int i, k, iscale;
+   double total, w, den, baser_fbias_sum;
+   map<ConcatString, AggrISCInfo>::iterator it;
 
    //
-   // Compute the auto-correlations for VIF
+   // Process the STAT lines
    //
-   if(j.out_line_type == stat_cnt && j.vif_flag) {
+   while(ldf >> line) {
 
-      //
-      // Sort the valid times
-      //
-      n = valid_ts.rank_array(n_ties);
+      n_in++;
 
-      if(n_ties > 0 || n != valid_ts.n_elements()) {
-         mlog << Error << "\naggr_partial_sum_lines() -> "
-              << "should be no ties in the valid time array!\n\n";
-         throw(1);
+      if(j.is_keeper(line)) {
+
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         if(line.type() != stat_isc) {
+            mlog << Error << "\naggr_isc_lines() -> "
+                 << "should only encounter intensity-scale "
+                 << "(ISC) line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current ISC line
+         //
+         parse_isc_line(line, cur, iscale);
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(cur.total) || is_bad_data(cur.mse) ||
+            is_bad_data(cur.fen)   || is_bad_data(cur.oen) ||
+            is_bad_data(cur.baser) || is_bad_data(cur.fbias)) continue;
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.isc_info.clear();
+            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) 0;
+            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
+            m[key] = aggr;
+         }
+         
+         //
+         // After reading the first ISC line, setup the isc_info
+         // object to store the data.  Also, store the number
+         // of scales and make sure that it doesn't change.
+         //
+         if(m[key].isc_info.n_scale == 0) {
+
+            // Allocate room to store results for each scale
+            m[key].isc_info.allocate_n_scale(cur.n_scale);
+            m[key].isc_info.zero_out();
+
+            //
+            // Initialize tile_dim, tile_xll, and tile_yll.
+            // If they stay the same over all the lines, write them out.
+            // Otherwise, write out bad data.
+            //
+            m[key].isc_info.tile_dim = cur.tile_dim;
+            m[key].isc_info.tile_xll = cur.tile_xll;
+            m[key].isc_info.tile_yll = cur.tile_yll;
+
+            // Allocate room to store values for each scale
+            m[key].total_na = new NumArray [m[key].isc_info.n_scale + 2];
+            m[key].mse_na   = new NumArray [m[key].isc_info.n_scale + 2];
+            m[key].fen_na   = new NumArray [m[key].isc_info.n_scale + 2];
+            m[key].oen_na   = new NumArray [m[key].isc_info.n_scale + 2];
+            m[key].baser_na = new NumArray [m[key].isc_info.n_scale + 2];
+            m[key].fbias_na = new NumArray [m[key].isc_info.n_scale + 2];
+         }
+
+         //
+         // Check that the number of scales remains constant
+         //
+         if(m[key].isc_info.n_scale != cur.n_scale) {
+            mlog << Error << "\naggr_isc_lines() -> "
+                 << "the number of scales must remain constant "
+                 << "when aggregating ISC lines.  Use the "
+                 << "\"-column_min NSCALE n\" and "
+                 << "\"-column_max NSCALE n\" options to "
+                 << "filter out only those lines you'd like "
+                 << "to aggregate!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Check to see if tile_dim, tile_xll, or tile_yll has changed.
+         // If so, write out bad data.
+         //
+         if(m[key].isc_info.tile_dim != bad_data_int &&
+            m[key].isc_info.tile_dim != cur.tile_dim) {
+            m[key].isc_info.tile_dim = bad_data_int;
+         }
+         if( (m[key].isc_info.tile_xll != bad_data_int &&
+              m[key].isc_info.tile_xll != cur.tile_xll) ||
+             (m[key].isc_info.tile_yll != bad_data_int &&
+              m[key].isc_info.tile_yll != cur.tile_yll) ) {
+            m[key].isc_info.tile_xll = bad_data_int;
+            m[key].isc_info.tile_yll = bad_data_int;
+         }
+
+         //
+         // Store the data for this ISC line
+         //
+         m[key].total_na[iscale].add(cur.total);
+         m[key].mse_na[iscale].add(cur.mse);
+         m[key].fen_na[iscale].add(cur.fen);
+         m[key].oen_na[iscale].add(cur.oen);
+         m[key].baser_na[iscale].add(cur.baser);
+         m[key].fbias_na[iscale].add(cur.fbias);
+
+         n_out++;
       }
+   } // end while
+
+   //
+   // Return if no lines were read
+   //
+   if(n_out == 0) return;
+
+   //
+   // Loop over the map entries and compute weighted scores
+   //
+   for(it = m.begin(); it != m.end(); it++) {
 
       //
-      // Sort the stats into time order
+      // Get the sum of the totals, compute the weight, and sum the
+      // weighted scores
       //
-      fbar_ts.reorder(valid_ts);
-      obar_ts.reorder(valid_ts);
-      me_ts.reorder(valid_ts);
+      for(i=0; i<it->second.isc_info.n_scale+2; i++) {
+
+         // Total number of points for this scale
+         total = it->second.total_na[i].sum();
+
+         // Initialize
+         baser_fbias_sum = 0.0;
+
+         // Loop through all scores for this scale
+         for(k=0; k<it->second.total_na[i].n_elements(); k++) {
+
+            // Compute the weight for each score to be aggregated
+            // based on the number of points it represents
+            w = it->second.total_na[i][k]/total;
+
+            // Sum scores for the binary fields
+            if(i == 0) {
+               it->second.isc_info.mse    += w*it->second.mse_na[0][k];
+               it->second.isc_info.fen    += w*it->second.fen_na[0][k];
+               it->second.isc_info.oen    += w*it->second.oen_na[0][k];
+               it->second.isc_info.baser  += w*it->second.baser_na[0][k];
+               baser_fbias_sum += w*it->second.baser_na[0][k]*it->second.fbias_na[0][k];
+            }
+            // Weighted sum of scores for each scale
+            else {
+               it->second.isc_info.mse_scale[i-1] += w*it->second.mse_na[i][k];
+               it->second.isc_info.fen_scale[i-1] += w*it->second.fen_na[i][k];
+               it->second.isc_info.oen_scale[i-1] += w*it->second.oen_na[i][k];
+            }
+         }
+
+         //
+         // Compute the aggregated scores for the binary fields
+         //
+         if(i == 0) {
+
+            // Total
+            it->second.isc_info.total = nint(it->second.total_na[0].sum());
+
+            // Aggregated FBIAS
+            it->second.isc_info.fbias = baser_fbias_sum/it->second.isc_info.baser;
+
+            // Compute the aggregated ISC score.  For the binary fields
+            // do not divide by the number of scales.
+            den = (it->second.isc_info.fbias*
+                   it->second.isc_info.baser*
+                   (1.0 - it->second.isc_info.baser) +
+                   it->second.isc_info.baser*
+                   (1.0 - it->second.isc_info.fbias*
+                   it->second.isc_info.baser));
+
+            if(is_bad_data(it->second.isc_info.fbias) ||
+               is_bad_data(it->second.isc_info.baser) ||
+               is_eq(den, 0.0)) {
+               it->second.isc_info.isc = bad_data_double;
+            }
+            else {
+               it->second.isc_info.isc = 1.0 - it->second.isc_info.mse/den;
+            }
+         }
+         //
+         // Compute the aggregated scores for each scale
+         //
+         else {
+
+            // Compute the aggregated ISC score.  For each scale, divide
+            // by the number of scales.
+            den = (it->second.isc_info.fbias*
+                   it->second.isc_info.baser*
+                   (1.0 - it->second.isc_info.baser) +
+                   it->second.isc_info.baser*
+                   (1.0 - it->second.isc_info.fbias*
+                   it->second.isc_info.baser))
+                  /(it->second.isc_info.n_scale+1);
+
+            if(is_bad_data(it->second.isc_info.fbias) ||
+               is_bad_data(it->second.isc_info.baser) ||
+               is_eq(den, 0.0)) {
+               it->second.isc_info.isc_scale[i-1] = bad_data_double;
+            }
+            else {
+              it->second.isc_info.isc_scale[i-1] = 1.0 - it->second.isc_info.mse_scale[i-1]/den;
+            }
+         }
+      } // end for i
 
       //
-      // Compute the lag 1 autocorrelation
+      // Deallocate memory
       //
-      cnt_info.fbar.vif = compute_vif(fbar_ts);
-      cnt_info.obar.vif = compute_vif(obar_ts);
-      cnt_info.me.vif   = compute_vif(me_ts);
-   }
+      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) 0; }
+      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) 0; }
+      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) 0; }
+      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) 0; }
+      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) 0; }
+      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) 0; }
+
+   } // end for it
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_vl1l2_wdir(const char *jobstring, LineDataFile &f,
-                     STATAnalysisJob &j,
-                     VL1L2Info &vl1l2_info,
-                     NumArray &uf_na, NumArray &vf_na,
-                     NumArray &uo_na, NumArray &vo_na,
-                     STATLineType lt, int &n_in, int &n_out) {
+void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
+                      map<ConcatString, AggrRHISTInfo> &m,
+                      int &n_in, int &n_out) {
    STATLine line;
-   VL1L2Info v_info;
-   double u, v;
+   AggrRHISTInfo aggr;
+   RHISTData cur;
+   ConcatString key;
+   int i;
+   map<ConcatString, AggrRHISTInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         if(line.type() != stat_rhist) {
+            mlog << Error << "\naggr_rhist_lines() -> "
+                 << "should only encounter ranked histogram "
+                 << "(RHIST) line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current RHIST line
+         //
+         parse_rhist_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.crps_num = aggr.crps_den = 0.0;
+            aggr.ign_num  = aggr.ign_den  = 0.0;
+            aggr.ens_pd.rhist_na = cur.rank_na;
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+           
+            //
+            // Check for N_RANK remaining constant
+            //
+            if(m[key].ens_pd.rhist_na.n_elements() != cur.n_rank) {
+               mlog << Error << "\naggr_rhist_lines() -> "
+                    << "the \"N_RANK\" column must remain constant ("
+                    << m[key].ens_pd.rhist_na.n_elements() << " != " << cur.n_rank
+                    << ").  Try setting \"-column_eq N_RANK n\".\n\n";
+               throw(1);
+            }
+
+            //
+            // Aggregate the ranked histogram counts
+            //
+            for(i=0; i<m[key].ens_pd.rhist_na.n_elements(); i++) {
+               m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rank_na[i]);
+            }
+         } // end else
+
+         //
+         // Store running sums for CRPS
+         //
+         if(!is_bad_data(cur.crps)) {
+            m[key].crps_num += cur.total * cur.crps;
+            m[key].crps_den += cur.total;
+         }
+
+         //
+         // Store running sums for IGN
+         //
+         if(!is_bad_data(cur.ign)) {
+            m[key].ign_num += cur.total * cur.ign;
+            m[key].ign_den += cur.total;
+         }
+
+         n_out++;
+      }
+   } // end while
+
+   //
+   // Loop over the map entries and compute CRPS and IGN
+   //
+   for(it = m.begin(); it != m.end(); it++) {
+
+      // Compute weighted-mean for CRPS
+      if(it->second.crps_den > 0) {
+         it->second.ens_pd.crps_na.add(it->second.crps_num/it->second.crps_den);
+      }
+      else {
+         it->second.ens_pd.crps_na.add(bad_data_double);
+      }
+
+      // Compute weighted-mean for IGN
+      if(it->second.ign_den > 0) {
+         it->second.ens_pd.ign_na.add(it->second.ign_num/it->second.ign_den);
+      }
+      else {
+         it->second.ens_pd.ign_na.add(bad_data_double);
+      }
+
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
+                      map<ConcatString, AggrORANKInfo> &m,
+                      int &n_in, int &n_out) {
+   STATLine line;
+   AggrORANKInfo aggr;
+   ORANKData cur;
+   ConcatString key;
+   int i;
+   double crps, ign, pit;
+   map<ConcatString, AggrORANKInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         if(line.type() != stat_orank) {
+            mlog << Error << "\naggr_orank_lines() -> "
+                 << "should only encounter observation rank "
+                 << "(ORANK) line types!\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current RHIST line
+         //
+         parse_orank_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Skip missing data
+         //
+         if(is_bad_data(cur.rank)) continue;
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.ens_pd.clear();
+            for(i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
+            m[key] = aggr;
+         }
+
+         //
+         // Check for N_ENS remaining constant
+         //
+         if(m[key].ens_pd.rhist_na.n_elements() > 0 &&
+            m[key].ens_pd.rhist_na.n_elements() != cur.n_ens+1) {
+            mlog << Error << "\naggr_orank_lines() -> "
+                 << "the \"N_ENS\" column must remain constant.  "
+                 << "Try setting \"-column_eq N_ENS n\".\n\n";
+            throw(1);
+         }
+
+         //
+         // Aggregate the ranks
+         //
+         i = cur.rank - 1;
+         m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + 1);
+
+         //
+         // Store the CRPS and IGN values
+         //
+         compute_crps_ign_pit(cur.obs, cur.ens_na, crps, ign, pit);
+         m[key].ens_pd.crps_na.add(crps);
+         m[key].ens_pd.ign_na.add(ign);
+         m[key].ens_pd.pit_na.add(pit);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void mpr_to_ctc(STATAnalysisJob &j, const AggrMPRInfo &info,
+                CTSInfo &cts_info) {
+   int i;
+   int n = info.f_na.n_elements();
+   SingleThresh ft = j.out_fcst_thresh[0];
+   SingleThresh ot = j.out_obs_thresh[0];
 
    //
    // Initialize
    //
-   vl1l2_info.clear();
-   uf_na.clear();
-   vf_na.clear();
-   uo_na.clear();
-   vo_na.clear();
-
-   //
-   // Process the STAT lines
-   //
-   while(f >> line) {
-
-      n_in++;
-
-      if(j.is_keeper(line)) {
-
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
-
-         //
-         // Switch on the line type.
-         // For each partial sum line type, clear out the object,
-         // parse the new line, and add it to running sum.
-         //
-         switch(line.type()) {
-
-            case(stat_vl1l2):
-               v_info.clear();
-               parse_vl1l2_line(line, v_info);
-               vl1l2_info += v_info;
-
-               // Convert U and V component of winds to unit vectors,
-               // and store the values.
-               convert_u_v_to_unit(v_info.ufbar, v_info.vfbar, u, v);
-               uf_na.add(u);
-               vf_na.add(v);
-
-               convert_u_v_to_unit(v_info.uobar, v_info.vobar, u, v);
-               uo_na.add(u);
-               vo_na.add(v);
-               break;
-
-            case(stat_val1l2):
-               v_info.clear();
-               parse_val1l2_line(line, v_info);
-               vl1l2_info += v_info;
-
-               // Convert U and V component of winds to unit vectors,
-               // and store the values.
-               convert_u_v_to_unit(v_info.ufabar, v_info.vfabar, u, v);
-               uf_na.add(u);
-               vf_na.add(v);
-
-               convert_u_v_to_unit(v_info.uoabar, v_info.voabar, u, v);
-               uo_na.add(u);
-               vo_na.add(v);
-               break;
-
-            default:
-               mlog << Error << "\naggr_vl1l2_wdir() -> "
-                    << "should only encounter partial sum line types!\n"
-                    << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
-         } // end switch
-
-         n_out++;
-      }
-   } // end while
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void read_mpr_lines(const char *jobstring, LineDataFile &f,
-                    STATAnalysisJob &j,
-                    ConcatString &fcst_var, ConcatString &obs_var,
-                    NumArray &f_na, NumArray &o_na, NumArray &c_na,
-                    int &n_in, int &n_out) {
-   STATLine line;
-   MPRData m;
-
-   //
-   // Initialize the NumArray objects
-   //
-   f_na.clear();
-   o_na.clear();
-   c_na.clear();
-   fcst_var.clear();
-   obs_var.clear();
-
-   //
-   // Process the STAT lines
-   //
-   while(f >> line) {
-
-      n_in++;
-
-      if(j.is_keeper(line)) {
-
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
-
-         //
-         // Switch on the line type.
-         //
-         switch(line.type()) {
-
-            case(stat_mpr):
-
-               parse_mpr_line(line, m);
-
-               //
-               // Check the grid and poly masks if specified.
-               // Convert degrees_east to degrees_west.
-               //
-               if(!j.is_in_mask_grid(m.obs_lat, (-1.0)*m.obs_lon) ||
-                  !j.is_in_mask_poly(m.obs_lat, (-1.0)*m.obs_lon))
-                  continue;
-
-               //
-               // Check for bad data.
-               //
-               if(is_bad_data(m.fcst) || is_bad_data(m.obs)) continue;
-
-               //
-               // Store or check the variable names
-               //
-               if(fcst_var.empty() || obs_var.empty()) {
-                  fcst_var = m.fcst_var;
-                  obs_var  = m.obs_var;
-               }
-               else if(fcst_var != m.fcst_var || obs_var  != m.obs_var) {
-                  mlog << Error << "\nread_mpr_lines() -> "
-                       << "both the forecast variable type and observation "
-                       << "variable type must remain constant!  Try setting "
-                       << "\"-fcst_var\" and/or \"-obs_var\".\n"
-                       << "ERROR occurred on STAT line:\n" << line << "\n\n";
-                  throw(1);
-               }
-
-               //
-               // Store the values
-               //
-               f_na.add(m.fcst);
-               o_na.add(m.obs);
-               c_na.add(m.climo);
-
-               break;
-
-            default:
-               mlog << Error << "\nread_mpr_lines() -> "
-                    << "should only encounter MPR line types!\n"
-                    << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
-         } // end switch
-
-         n_out++;
-      }
-   } // end while
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void aggr_mpr_lines_ctc(STATAnalysisJob &j,
-                        const NumArray &f_na,
-                        const NumArray &o_na,
-                        CTSInfo &cts_info) {
-   int i;
-   int n = f_na.n_elements();
-   SingleThresh ft = j.out_fcst_thresh[0];
-   SingleThresh ot = j.out_obs_thresh[0];
-
+   cts_info.clear();
+   
    //
    // Update the contingency table counts
    //
    for(i=0; i<n; i++) {
 
-      if(      ft.check(f_na[i]) &&  ot.check(o_na[i]))
+      if(      ft.check(info.f_na[i]) &&  ot.check(info.o_na[i]))
          cts_info.cts.inc_fy_oy();
-      else if( ft.check(f_na[i]) && !ot.check(o_na[i]))
+      else if( ft.check(info.f_na[i]) && !ot.check(info.o_na[i]))
          cts_info.cts.inc_fy_on();
-      else if(!ft.check(f_na[i]) &&  ot.check(o_na[i]))
+      else if(!ft.check(info.f_na[i]) &&  ot.check(info.o_na[i]))
          cts_info.cts.inc_fn_oy();
-      else if(!ft.check(f_na[i]) && !ot.check(o_na[i]))
+      else if(!ft.check(info.f_na[i]) && !ot.check(info.o_na[i]))
          cts_info.cts.inc_fn_on();
    }
 
@@ -952,16 +1494,20 @@ void aggr_mpr_lines_ctc(STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines_cts(STATAnalysisJob &j,
-                        const NumArray &f_na, const NumArray &o_na,
-                        CTSInfo &cts_info, const char *tmp_dir) {
+void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
+                CTSInfo &cts_info, const char *tmp_dir) {
    CTSInfo *cts_info_ptr = (CTSInfo *) 0;
    gsl_rng *rng_ptr = (gsl_rng *) 0;
 
    //
+   // Initialize
+   //
+   cts_info.clear();
+   
+   //
    // If there are no matched pairs to process, return
    //
-   if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
+   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
 
    //
    // Store the out_alpha value
@@ -973,7 +1519,7 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
    // Store the thresholds to be applied.
    //
    if(j.out_fcst_thresh.n_elements() == 0) {
-      mlog << Error << "\naggr_mpr_lines_cts() -> "
+      mlog << Error << "\nmpr_to_cts() -> "
            << "when computing CTS lines, \"-out_fcst_thresh\" must be "
            << "used.\n\n";
       throw(1);
@@ -983,7 +1529,7 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
    }
 
    if(j.out_obs_thresh.n_elements() == 0) {
-      mlog << Error << "\naggr_mpr_lines_cts() -> "
+      mlog << Error << "\nmpr_to_cts() -> "
            << "when computing CTS lines, \"-out_obs_thresh\" must be "
            << "used.\n\n";
       throw(1);
@@ -1003,13 +1549,13 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
    //
    cts_info_ptr = &cts_info;
    if(j.boot_interval == boot_bca_flag) {
-      compute_cts_stats_ci_bca(rng_ptr, f_na, o_na,
+      compute_cts_stats_ci_bca(rng_ptr, info.f_na, info.o_na,
          j.n_boot_rep,
          cts_info_ptr, 1, 1,
          j.rank_corr_flag, tmp_dir);
    }
    else {
-      compute_cts_stats_ci_perc(rng_ptr, f_na, o_na,
+      compute_cts_stats_ci_perc(rng_ptr, info.f_na, info.o_na,
          j.n_boot_rep, j.boot_rep_prop,
          cts_info_ptr, 1, 1,
          j.rank_corr_flag, tmp_dir);
@@ -1025,15 +1571,18 @@ void aggr_mpr_lines_cts(STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines_mctc(STATAnalysisJob &j,
-                         const NumArray &f_na,
-                         const NumArray &o_na,
-                         MCTSInfo &mcts_info) {
+void mpr_to_mctc(STATAnalysisJob &j, const AggrMPRInfo &info,
+                 MCTSInfo &mcts_info) {
    int i;
-   int n = f_na.n_elements();
+   int n = info.f_na.n_elements();
 
    //
    // Initialize
+   //
+   mcts_info.clear();
+
+   //
+   // Setup
    //
    mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
    mcts_info.cts_fcst_ta = j.out_fcst_thresh;
@@ -1042,25 +1591,29 @@ void aggr_mpr_lines_mctc(STATAnalysisJob &j,
    //
    // Update the contingency table counts
    //
-   for(i=0; i<n; i++) mcts_info.add(f_na[i], o_na[i]);
+   for(i=0; i<n; i++) mcts_info.add(info.f_na[i], info.o_na[i]);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines_mcts(STATAnalysisJob &j,
-                         const NumArray &f_na, const NumArray &o_na,
-                         MCTSInfo &mcts_info, const char *tmp_dir) {
+void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
+                 MCTSInfo &mcts_info, const char *tmp_dir) {
    gsl_rng *rng_ptr = (gsl_rng *) 0;
 
    //
+   // Initialize
+   //
+   mcts_info.clear();
+   
+   //
    // If there are no matched pairs to process, return
    //
-   if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
+   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
 
    //
-   // Initialize
+   // Setup
    //
    mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
    mcts_info.cts_fcst_ta = j.out_fcst_thresh;
@@ -1082,13 +1635,13 @@ void aggr_mpr_lines_mcts(STATAnalysisJob &j,
    // bootstrap confidence intervals
    //
    if(j.boot_interval == boot_bca_flag) {
-      compute_mcts_stats_ci_bca(rng_ptr, f_na, o_na,
+      compute_mcts_stats_ci_bca(rng_ptr, info.f_na, info.o_na,
          j.n_boot_rep,
          mcts_info, 1,
          j.rank_corr_flag, tmp_dir);
    }
    else {
-      compute_mcts_stats_ci_perc(rng_ptr, f_na, o_na,
+      compute_mcts_stats_ci_perc(rng_ptr, info.f_na, info.o_na,
          j.n_boot_rep, j.boot_rep_prop,
          mcts_info, 1,
          j.rank_corr_flag, tmp_dir);
@@ -1104,22 +1657,25 @@ void aggr_mpr_lines_mcts(STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines_cnt(STATAnalysisJob &j,
-                        const ConcatString fcst_var, const ConcatString obs_var,
-                        const NumArray &f_na, const NumArray &o_na,
-                        CNTInfo &cnt_info, const char *tmp_dir) {
+void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
+                CNTInfo &cnt_info, const char *tmp_dir) {
    gsl_rng *rng_ptr = (gsl_rng *) 0;
    bool precip_flag = false;
 
    //
+   // Initialize
+   //
+   cnt_info.clear();
+   
+   //
    // If there are no matched pairs to process, return
    //
-   if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
+   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
 
    //
    // Set the precip flag based on fcst_var and obs_var
    //
-   if(is_precip_var_name(fcst_var) && is_precip_var_name(obs_var))
+   if(is_precip_var_name(info.fcst_var) && is_precip_var_name(info.obs_var))
       precip_flag = true;
 
    //
@@ -1139,13 +1695,13 @@ void aggr_mpr_lines_cnt(STATAnalysisJob &j,
    //
    if(j.boot_interval == boot_bca_flag) {
 
-      compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na,
+      compute_cnt_stats_ci_bca(rng_ptr, info.f_na, info.o_na,
          precip_flag, j.n_boot_rep,
          cnt_info, 1, j.rank_corr_flag, tmp_dir);
    }
    else {
 
-      compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na,
+      compute_cnt_stats_ci_perc(rng_ptr, info.f_na, info.o_na,
          precip_flag, j.n_boot_rep, j.boot_rep_prop,
          cnt_info, 1, j.rank_corr_flag, tmp_dir);
    }
@@ -1160,18 +1716,15 @@ void aggr_mpr_lines_cnt(STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines_psums(STATAnalysisJob &j,
-               const NumArray &f_na,
-               const NumArray &o_na,
-               const NumArray &c_na,
-               SL1L2Info &s_info) {
+void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
+                 SL1L2Info &s_info) {
    int i;
-   int n = f_na.n_elements();
+   int n = info.f_na.n_elements();
    int scount, sacount;
    double f, o, c;
    double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
    double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
-
+   
    //
    // Initialize the SL1L2Info object and counts
    //
@@ -1188,9 +1741,9 @@ void aggr_mpr_lines_psums(STATAnalysisJob &j,
       //
       // Update the counts for this matched pair
       //
-      f = f_na[i];
-      o = o_na[i];
-      c = c_na[i];
+      f = info.f_na[i];
+      o = info.o_na[i];
+      c = info.c_na[i];
 
       f_sum   += f;
       o_sum   += o;
@@ -1236,16 +1789,19 @@ void aggr_mpr_lines_psums(STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines_pct(STATAnalysisJob &j,
-                        const NumArray &f_na,
-                        const NumArray &o_na,
-                        PCTInfo &pct_info) {
+void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
+                PCTInfo &pct_info) {
    int pstd_flag;
+
+   //
+   // Initialize
+   //
+   pct_info.clear();
 
    //
    // If there are no matched pairs to process, return
    //
-   if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
+   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
 
    //
    // Set up the PCTInfo thresholds and alpha values
@@ -1261,431 +1817,7 @@ void aggr_mpr_lines_pct(STATAnalysisJob &j,
    //
    // Compute the probabilistic counts and statistics
    //
-   compute_pctinfo(f_na, o_na, pstd_flag, pct_info);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void aggr_isc_lines(const char *jobstring, LineDataFile &ldf,
-               STATAnalysisJob &j, ISCInfo &isc_aggr,
-               int &n_in, int &n_out) {
-   STATLine line;
-   ISCInfo isc_info;
-
-   int i, k, n_scale, iscale;
-   double total, w, den, baser_fbias_sum;
-   NumArray *total_na = (NumArray *) 0;
-   NumArray *mse_na   = (NumArray *) 0;
-   NumArray *fen_na   = (NumArray *) 0;
-   NumArray *oen_na   = (NumArray *) 0;
-   NumArray *baser_na = (NumArray *) 0;
-   NumArray *fbias_na = (NumArray *) 0;
-
-   //
-   // Initialize the ISCInfo objects
-   //
-   isc_aggr.clear();
-
-   //
-   // Process the STAT lines
-   //
-   while(ldf >> line) {
-
-      n_in++;
-
-      if(j.is_keeper(line)) {
-
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
-
-         //
-         // Switch on the line type.
-         //
-         switch(line.type()) {
-
-            case(stat_isc):
-
-               parse_isc_line(line, isc_info, iscale);
-
-               //
-               // Check for bad data
-               //
-               if(is_bad_data(isc_info.total) ||
-                  is_bad_data(isc_info.mse)   ||
-                  is_bad_data(isc_info.fen)   ||
-                  is_bad_data(isc_info.oen)   ||
-                  is_bad_data(isc_info.baser) ||
-                  is_bad_data(isc_info.fbias)) continue;
-
-               //
-               // After reading the first ISC line, setup the isc_info
-               // object to store the data.  Also, store the number
-               // of scales and make sure that it doesn't change.
-               //
-               if(isc_aggr.n_scale == 0) {
-
-                  n_scale = isc_info.n_scale;
-
-                  // Allocate room to store results for each scale
-                  isc_aggr.allocate_n_scale(n_scale);
-                  isc_aggr.zero_out();
-
-                  //
-                  // Initialize tile_dim, tile_xll, and tile_yll.
-                  // If they stay the same over all the lines, write them out.
-                  // Otherwise, write out bad data.
-                  //
-                  isc_aggr.tile_dim = isc_info.tile_dim;
-                  isc_aggr.tile_xll = isc_info.tile_xll;
-                  isc_aggr.tile_yll = isc_info.tile_yll;
-
-                  // Allocate room to store values for each scale
-                  total_na = new NumArray [n_scale + 2];
-                  mse_na   = new NumArray [n_scale + 2];
-                  fen_na   = new NumArray [n_scale + 2];
-                  oen_na   = new NumArray [n_scale + 2];
-                  baser_na = new NumArray [n_scale + 2];
-                  fbias_na = new NumArray [n_scale + 2];
-               }
-               else {
-
-                  if(isc_aggr.n_scale != isc_info.n_scale) {
-                     mlog << Error << "\naggr_isc_lines() -> "
-                          << "the number of scales must remain constant "
-                          << "when aggregating ISC lines.  Use the "
-                          << "\"-column_min NSCALE n\" and "
-                          << "\"-column_max NSCALE n\" options to "
-                          << "filter out only those lines you'd like "
-                          << "to aggregate!\n"
-                          << "ERROR occurred on STAT line:\n" << line << "\n\n";
-                     throw(1);
-                  }
-
-                  //
-                  // Check to see if tile_dim, tile_xll, or tile_yll has changed.
-                  // If so, write out bad data.
-                  //
-                  if(isc_aggr.tile_dim != bad_data_int &&
-                     isc_aggr.tile_dim != isc_info.tile_dim) {
-                     isc_aggr.tile_dim = bad_data_int;
-                  }
-
-                  if( (isc_aggr.tile_xll != bad_data_int &&
-                       isc_aggr.tile_xll != isc_info.tile_xll) ||
-                      (isc_aggr.tile_yll != bad_data_int &&
-                       isc_aggr.tile_yll != isc_info.tile_yll) ) {
-                     isc_aggr.tile_xll = bad_data_int;
-                     isc_aggr.tile_yll = bad_data_int;
-                  }
-               }
-
-               //
-               // Store the data for this ISC line
-               //
-               total_na[iscale].add(isc_info.total);
-               mse_na[iscale].add(isc_info.mse);
-               fen_na[iscale].add(isc_info.fen);
-               oen_na[iscale].add(isc_info.oen);
-               baser_na[iscale].add(isc_info.baser);
-               fbias_na[iscale].add(isc_info.fbias);
-
-               break;
-
-            default:
-               mlog << Error << "\naggr_isc_lines() -> "
-                    << "should only encounter ISC line types!\n"
-                    << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
-         } // end switch
-
-         n_out++;
-      }
-   } // end while
-
-   //
-   // Return if no lines were read
-   //
-   if(n_out == 0) return;
-
-   //
-   // Get the sum of the totals, compute the weight, and sum the
-   // weighted scores
-   //
-   for(i=0; i<n_scale+2; i++) {
-
-      // Total number of points for this scale
-      total = total_na[i].sum();
-
-      // Initialize
-      baser_fbias_sum = 0.0;
-
-      // Loop through all scores for this scale
-      for(k=0; k<total_na[i].n_elements(); k++) {
-
-         // Compute the weight for each score to be aggregated
-         // based on the number of points it represents
-         w = total_na[i][k]/total;
-
-         // Sum scores for the binary fields
-         if(i == 0) {
-            isc_aggr.mse    += w*mse_na[0][k];
-            isc_aggr.fen    += w*fen_na[0][k];
-            isc_aggr.oen    += w*oen_na[0][k];
-            isc_aggr.baser  += w*baser_na[0][k];
-            baser_fbias_sum += w*baser_na[0][k]*fbias_na[0][k];
-         }
-         // Weighted sum of scores for each scale
-         else {
-            isc_aggr.mse_scale[i-1] += w*mse_na[i][k];
-            isc_aggr.fen_scale[i-1] += w*fen_na[i][k];
-            isc_aggr.oen_scale[i-1] += w*oen_na[i][k];
-         }
-      }
-
-      //
-      // Compute the aggregated scores for the binary fields
-      //
-      if(i == 0) {
-
-         // Total
-         isc_aggr.total = nint(total_na[0].sum());
-
-         // Aggregated FBIAS
-         isc_aggr.fbias = baser_fbias_sum/isc_aggr.baser;
-
-         // Compute the aggregated ISC score.  For the binary fields
-         // do not divide by the number of scales.
-         den = (isc_aggr.fbias*isc_aggr.baser*(1.0 - isc_aggr.baser) +
-                isc_aggr.baser*(1.0 - isc_aggr.fbias*isc_aggr.baser));
-
-         if(is_bad_data(isc_aggr.fbias) ||
-            is_bad_data(isc_aggr.baser) ||
-            is_eq(den, 0.0)) {
-            isc_aggr.isc = bad_data_double;
-         }
-         else {
-            isc_aggr.isc = 1.0 - isc_aggr.mse/den;
-         }
-      }
-      //
-      // Compute the aggregated scores for each scale
-      //
-      else {
-
-         // Compute the aggregated ISC score.  For each scale, divide
-         // by the number of scales.
-         den = (isc_aggr.fbias*isc_aggr.baser*(1.0 - isc_aggr.baser) +
-                isc_aggr.baser*(1.0 - isc_aggr.fbias*isc_aggr.baser))
-               /(isc_aggr.n_scale+1);
-
-         if(is_bad_data(isc_aggr.fbias) ||
-            is_bad_data(isc_aggr.baser) ||
-            is_eq(den, 0.0)) {
-            isc_aggr.isc_scale[i-1] = bad_data_double;
-         }
-         else {
-            isc_aggr.isc_scale[i-1] = 1.0 - isc_aggr.mse_scale[i-1]/den;
-         }
-      }
-   } // end for i
-
-   //
-   // Deallocate memory
-   //
-   if(total_na) { delete [] total_na; total_na = (NumArray *) 0; }
-   if(mse_na  ) { delete [] mse_na;   mse_na   = (NumArray *) 0; }
-   if(fen_na  ) { delete [] fen_na;   fen_na   = (NumArray *) 0; }
-   if(oen_na  ) { delete [] oen_na;   oen_na   = (NumArray *) 0; }
-   if(baser_na) { delete [] baser_na; baser_na = (NumArray *) 0; }
-   if(fbias_na) { delete [] fbias_na; fbias_na = (NumArray *) 0; }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void aggr_rhist_lines(const char *jobstring, LineDataFile &f,
-                      STATAnalysisJob &j, PairDataEnsemble &ens_pd,
-                      int &n_in, int &n_out) {
-   STATLine line;
-   RHISTData r_data;
-   double crps_num, crps_den, ign_num, ign_den;
-   int i;
-
-   //
-   // Initialize
-   //
-   ens_pd.clear();
-   crps_num = crps_den = ign_num = ign_den = 0.0;
-
-   //
-   // Process the STAT lines
-   //
-   while(f >> line) {
-
-      n_in++;
-
-      if(j.is_keeper(line)) {
-
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
-
-         if(line.type() != stat_rhist) {
-            mlog << Error << "\naggr_rhist_lines() -> "
-                 << "should only encounter ranked histogram "
-                 << "(RHIST) line types!\n"
-                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
-         }
-
-         //
-         // Parse the current RHIST line
-         //
-         parse_rhist_line(line, r_data);
-
-         //
-         // Check for N_RANK remaining constant
-         //
-         if(ens_pd.rhist_na.n_elements() > 0 &&
-            ens_pd.rhist_na.n_elements() != r_data.n_rank) {
-            mlog << Error << "\naggr_rhist_lines() -> "
-                 << "the \"N_RANK\" column must remain constant ("
-                 << ens_pd.rhist_na.n_elements() << " != " << r_data.n_rank
-                 << ").  Try setting \"-column_eq N_RANK n\".\n\n";
-            throw(1);
-         }
-
-         //
-         // Aggregate the ranked histgram counts
-         //
-         if(ens_pd.rhist_na.n_elements() == 0) {
-            ens_pd.rhist_na = r_data.rank_na;
-         }
-         else {
-            for(i=0; i<ens_pd.rhist_na.n_elements(); i++) {
-               ens_pd.rhist_na.set(i, ens_pd.rhist_na[i] + r_data.rank_na[i]);
-            }
-         }
-
-         //
-         // Store running sums for CRPS
-         //
-         if(!is_bad_data(r_data.crps)) {
-            crps_num += r_data.total * r_data.crps;
-            crps_den += r_data.total;
-         }
-
-         //
-         // Store running sums for IGN
-         //
-         if(!is_bad_data(r_data.ign)) {
-            ign_num += r_data.total * r_data.ign;
-            ign_den += r_data.total;
-         }
-
-         n_out++;
-      }
-   } // end while
-
-   // Compute weighted-mean for CRPS
-   if(crps_den > 0) ens_pd.crps_na.add(crps_num/crps_den);
-   else             ens_pd.crps_na.add(bad_data_double);
-
-   // Compute weighted-mean for IGN
-   if(ign_den > 0) ens_pd.ign_na.add(ign_num/ign_den);
-   else            ens_pd.ign_na.add(bad_data_double);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void aggr_orank_lines(const char *jobstring, LineDataFile &f,
-                      STATAnalysisJob &j, PairDataEnsemble &ens_pd,
-                      int &n_in, int &n_out) {
-   STATLine line;
-   ORANKData o_data;
-   int i;
-   double crps, ign, pit;
-
-   //
-   // Initialize
-   //
-   ens_pd.clear();
-
-   //
-   // Process the STAT lines
-   //
-   while(f >> line) {
-
-      n_in++;
-
-      if(j.is_keeper(line)) {
-
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
-
-         if(line.type() != stat_orank) {
-            mlog << Error << "\naggr_orank_lines() -> "
-                 << "should only encounter observation rank "
-                 << "(ORANK) line types!\n"
-                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
-         }
-
-         //
-         // Parse the current RHIST line
-         //
-         parse_orank_line(line, o_data);
-
-         //
-         // Skip missing data
-         //
-         if(is_bad_data(o_data.rank)) continue;
-
-         //
-         // Check for N_ENS remaining constant
-         //
-         if(ens_pd.rhist_na.n_elements() > 0 &&
-            ens_pd.rhist_na.n_elements() != o_data.n_ens+1) {
-            mlog << Error << "\naggr_orank_lines() -> "
-                 << "the \"N_ENS\" column must remain constant.  "
-                 << "Try setting \"-column_eq N_ENS n\".\n\n";
-            throw(1);
-         }
-
-         //
-         // Initialize the ranked histogram counts
-         //
-         if(ens_pd.rhist_na.n_elements() == 0) {
-            for(i=0; i<o_data.n_ens+1; i++) ens_pd.rhist_na.add(0);
-         }
-
-         //
-         // Aggregate the ranks
-         //
-         i = o_data.rank - 1;
-         ens_pd.rhist_na.set(i, ens_pd.rhist_na[i] + 1);
-
-         //
-         // Store the CRPS and IGN values
-         //
-         compute_crps_ign_pit(o_data.obs, o_data.ens_na, crps, ign, pit);
-         ens_pd.crps_na.add(crps);
-         ens_pd.ign_na.add(ign);
-         ens_pd.pit_na.add(pit);
-
-         n_out++;
-      }
-   } // end while
+   compute_pctinfo(info.f_na, info.o_na, pstd_flag, pct_info);
 
    return;
 }
