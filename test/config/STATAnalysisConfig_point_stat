@@ -62,7 +62,9 @@ weight = [];
 // Array of STAT-Analysis jobs to be performed on the filtered data
 //
 jobs = [
-   "-job aggregate_stat -line_type MPR -out_line_type CNT -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr.stat"
+   "-job aggregate_stat -line_type MPR -out_line_type CNT -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr.stat",
+   "-job aggregate_stat -line_type MPR -out_line_type CNT -by VX_MASK -n_boot_rep 0",
+   "-job aggregate      -line_type CTC                    -by FCST_THRESH"
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
