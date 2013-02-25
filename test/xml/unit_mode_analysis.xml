@@ -22,11 +22,11 @@
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt \
       -bycase -single -simple \
-      -out &OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_simple.txt \
+      -out &OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_simple.out \
       -v 1
     </param>   
     <output>
-      <exist>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_simple.out</exist>
     </output>
   </test>
 
@@ -35,11 +35,11 @@
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt \
       -bycase -single -cluster \
-      -out &OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_cluster.txt \
+      -out &OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_cluster.out \
       -v 1
     </param>
     <output>
-      <exist>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_cluster.txt</exist>
+      <exist>&OUTPUT_DIR;/mode_analysis/MERGE_BOTH_bycase_cluster.out</exist>
     </output>
   </test>
 

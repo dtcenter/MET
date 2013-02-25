@@ -737,6 +737,54 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	}
 }
 
+# compareDiff() assumes that the specified strings file1 and file2 contain the paths and
+#   file names of files to be diffed.  First lines are stripped from the two files, and
+#   then they are compared using the diff command.
+#
+# INPUTS:
+#    file1: path and file name of first file to compare
+#    file2: path and file name of second file to compare
+#     verb: (optional) verbosity level, 0 for no output
+compareDiff = function(file1, file2, verb=0){
+	listTest = list();
+
+	strDiff1 = paste(strDirTmp, "/", "diff1_", as.numeric(Sys.time()), ".txt", sep="");
+	strDiff2 = paste(strDirTmp, "/", "diff2_", as.numeric(Sys.time()), ".txt", sep="");
+
+	# verify that the files exist
+	if( ! fileExists(file1) ){ cat("ERROR: file does not exist:", file1, "\n"); return (NA); }
+	if( ! fileExists(file2) ){ cat("ERROR: file does not exist:", file2, "\n"); return (NA); }
+
+	# strip out lines from the first file
+	strCmd = paste(strEgrepExec, " -v \"JOB_LIST:|FILTER:\" ", file1, " > ", strDiff1, sep="");
+	if( 2 <= verb ){ cat("EGREP:", strCmd, "\n"); }
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
+
+	# strip out lines from the second file
+	strCmd = paste(strEgrepExec, " -v \"JOB_LIST:|FILTER:\" ", file2, " > ", strDiff2, sep="");
+	if( 2 <= verb ){ cat("EGREP:", strCmd, "\n"); }
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
+
+	# build and run the diff command
+	strCmd = paste(strDiffExec, " \\\n  ", strDiff1, " \\\n  ", strDiff2, "\n", sep="");
+	if( 2 <= verb ){ cat("DIFF:", strCmd, "\n"); }
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
+
+	# if the diff failed, warn and quit
+	if( 0 < length(strCmdOut) ){
+		if( 1 <= verb ){
+		  cat("WARNING: diff error:", strCmdOut, sep="\n");
+		}
+		quit(status=1);
+	}
+	else if( 1 <= verb ){ cat("passed diff\n"); }
+
+	# remove the temporary diff files, if required
+	if( TRUE == boolRmTmp ){
+		rmFile(strDiff1);
+		rmFile(strDiff2);
+	}    
+}
 
 listHeaderCols = c("VERSION", "MODEL", "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END", "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END", 
                    "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV", "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS", "FCST_THRESH", 

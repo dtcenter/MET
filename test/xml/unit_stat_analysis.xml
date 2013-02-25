@@ -26,12 +26,12 @@
       -job aggregate -line_type RHIST \
       -fcst_var TMP -vx_mask NWC -vx_mask GRB \
       -dump_row &OUTPUT_DIR;/stat_analysis/AGG_RHIST_dump.stat \
-      -out &OUTPUT_DIR;/stat_analysis/AGG_RHIST_out.txt \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_RHIST.out \
       -v 1
     </param>   
     <output>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_RHIST_dump.stat</stat>
-      <exist>&OUTPUT_DIR;/stat_analysis/AGG_RHIST_out.txt</exist>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_RHIST.out</exist>
     </output>
   </test>
 
@@ -42,12 +42,12 @@
       -job aggregate_stat -line_type ORANK -out_line_type RHIST \
       -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB \
       -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_dump.stat \
-      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_out.txt \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK.out \
       -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_dump.stat</stat>
-      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_out.txt</exist>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK.out</exist>
     </output>
   </test>
 
@@ -60,12 +60,12 @@
       -job aggregate -line_type ISC \
       -fcst_var APCP_12 -fcst_thresh '>0.0' -vx_mask TILE1 -vx_mask TILE2 \
       -dump_row &OUTPUT_DIR;/stat_analysis/AGG_ISC_dump.stat \
-      -out &OUTPUT_DIR;/stat_analysis/AGG_ISC_out.txt \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_ISC.out \
       -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_ISC_dump.stat</stat>
-      <exist>&OUTPUT_DIR;/stat_analysis/AGG_ISC_out.txt</exist>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_ISC.out</exist>
     </output>
   </test>
 
@@ -79,11 +79,11 @@
     <param> \
       -lookin &OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_120000L_20120409_120000V.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_grid_stat \
-      -out &OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_out.txt \
+      -out &OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT.out \
       -v 1
     </param>
     <output>
-      <exist>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_out.txt</exist>
+      <exist>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT.out</exist>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_filter.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_sl1l2.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_ctc.stat</stat>
@@ -100,11 +100,11 @@
     <param> \
       -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_point_stat \
-      -out &OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_out.txt \
+      -out &OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT.out \
       -v 1
     </param>
     <output>
-      <exist>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_out.txt</exist>
+      <exist>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT.out</exist>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr.stat</stat>
     </output>
   </test>
