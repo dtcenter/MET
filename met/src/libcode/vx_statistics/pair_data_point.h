@@ -50,7 +50,7 @@ class PairDataPoint : public PairBase {
 
       void clear();
 
-      void add_pair(const char *, double, double, double, double,
+      bool add_pair(const char *, double, double, double, double,
                     unixtime, double, double, double, double, double);
 
       void set_pair(int, const char *, double, double, double, double,
@@ -138,6 +138,7 @@ class VxPairDataPoint {
       int ***rej_typ;            // Reject based on message type
       int ***rej_mask;           // Reject based on masking region
       int ***rej_fcst;           // Reject forecast bad data
+      int ***rej_dup;            // Reject based on duplicates logic
 
       //////////////////////////////////////////////////////////////////
 
