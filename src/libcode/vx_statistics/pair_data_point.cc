@@ -112,12 +112,12 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataPoint::add_pair(const char *sid, double lat, double lon,
+bool PairDataPoint::add_pair(const char *sid, double lat, double lon,
                              double x, double y, unixtime ut,
                              double lvl, double elv,
                              double f, double c, double o) {
 
-   if( ! PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv, o) ) return;
+   if( ! PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv, o) ) return(false);
 
    f_na.add(f);
    c_na.add(c);
@@ -125,7 +125,7 @@ void PairDataPoint::add_pair(const char *sid, double lat, double lon,
    // Increment the number of pairs
    n_pair += 1;
 
-   return;
+   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -199,6 +199,7 @@ void VxPairDataPoint::init_from_scratch() {
    rej_typ      = (int ***) 0;
    rej_mask     = (int ***) 0;
    rej_fcst     = (int ***) 0;
+   rej_dup      = (int ***) 0;
 
    n_msg_typ    = 0;
    n_mask       = 0;
@@ -242,6 +243,7 @@ void VxPairDataPoint::clear() {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
+            rej_dup[i][j][k]  = 0;
          }
       }
    }
@@ -273,6 +275,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    rej_typ  = vx_pd.rej_typ;
    rej_mask = vx_pd.rej_mask;
    rej_fcst = vx_pd.rej_fcst;
+   rej_dup  = vx_pd.rej_dup;
 
    interp_thresh = vx_pd.interp_thresh;
 
@@ -289,6 +292,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
             rej_typ[i][j][k]  = vx_pd.rej_typ[i][j][k];
             rej_mask[i][j][k] = vx_pd.rej_mask[i][j][k];
             rej_fcst[i][j][k] = vx_pd.rej_fcst[i][j][k];
+            rej_dup[i][j][k]  = vx_pd.rej_dup[i][j][k];
          }
       }
    }
@@ -412,23 +416,27 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
    rej_typ  = new int **           [n_msg_typ];
    rej_mask = new int **           [n_msg_typ];
    rej_fcst = new int **           [n_msg_typ];
+   rej_dup  = new int **           [n_msg_typ];
 
    for(i=0; i<n_msg_typ; i++) {
       pd[i]       = new PairDataPoint * [n_mask];
       rej_typ[i]  = new int *           [n_mask];
       rej_mask[i] = new int *           [n_mask];
       rej_fcst[i] = new int *           [n_mask];
+      rej_dup[i]  = new int *           [n_mask];
 
       for(j=0; j<n_mask; j++) {
          pd[i][j]       = new PairDataPoint [n_interp];
          rej_typ[i][j]  = new int           [n_interp];
          rej_mask[i][j] = new int           [n_interp];
          rej_fcst[i][j] = new int           [n_interp];
+         rej_dup[i][j] = new int           [n_interp];
 
          for(k=0; k<n_interp; k++) {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
+            rej_dup[i][j][k] = 0;
          } // end for k
       } // end for j
    } // end for i
@@ -740,9 +748,11 @@ void VxPairDataPoint::add_obs(float *hdr_arr,     char *hdr_typ_str,
             }
 
             // Add the forecast, climatological, and observation data
-            pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon,
-                                 obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
-                                 fcst_v, climo_v, obs_v);
+            if(!pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon,
+                  obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
+                  fcst_v, climo_v, obs_v)) {
+               inc_count(rej_dup, i, j, k);
+            }
 
          } // end for k
       } // end for j

@@ -70,6 +70,7 @@
 //   025    04/16/12  Halley Gotway  Switch to using vx_config library.
 //   026    04/27/12  Halley Gotway  Move -fcst_valid and -fcst_lead
 //                    command line options to config file.
+//   027    02/25/13  Halley Gotway  Add duplicates rejection counts.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -930,7 +931,8 @@ void process_scores() {
                     << "Rejected: quality marker = " << conf_info.vx_pd[i].rej_qty << "\n"
                     << "Rejected: message type   = " << conf_info.vx_pd[i].rej_typ[j][k][l] << "\n"
                     << "Rejected: masking region = " << conf_info.vx_pd[i].rej_mask[j][k][l] << "\n"
-                    << "Rejected: bad fcst value = " << conf_info.vx_pd[i].rej_fcst[j][k][l] << "\n";
+                    << "Rejected: bad fcst value = " << conf_info.vx_pd[i].rej_fcst[j][k][l] << "\n"
+                    << "Rejected: duplicates     = " << conf_info.vx_pd[i].rej_dup[j][k][l] << "\n";
 
 
                // Continue if the number of points is <= 1
