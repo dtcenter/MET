@@ -684,6 +684,37 @@ void write_header_row(const char **cols, int n_cols, int hdr_flag,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
+                           int r, int c) {
+   int i, j, col;
+   ConcatString cs;
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_header_columns; i++)
+         at.set_entry(r, i+c, hdr_columns[i]);
+
+      c += n_header_columns;
+   }
+
+   // Write the columns names specific to the MCTC line type
+   at.set_entry(r, c+0, mctc_columns[0]);
+   at.set_entry(r, c+1, mctc_columns[1]);
+
+   // Write Fi_Oj for each cell of the NxN table
+   for(i=0, col=c+2; i<n_cat; i++) {
+      for(j=0; j<n_cat; j++) {
+         cs.format("F%i_O%i", i+1, j+1);
+         at.set_entry(r, col, cs); // Fi_Oj
+         col++;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_pct_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
                           int r, int c) {
    int i, col;
