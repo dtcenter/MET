@@ -326,6 +326,7 @@ extern void close_txt_file(ofstream *&,  const char *);
 extern void write_header_row(const char **, int, int, AsciiTable &, int, int);
 
 // Write out the header row for variable length line types
+extern void write_mctc_header_row  (int, int, AsciiTable &, int, int);
 extern void write_pct_header_row   (int, int, AsciiTable &, int, int);
 extern void write_pstd_header_row  (int, int, AsciiTable &, int, int);
 extern void write_pjc_header_row   (int, int, AsciiTable &, int, int);

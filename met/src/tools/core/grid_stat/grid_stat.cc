@@ -962,6 +962,10 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
          // Write the text header row
          switch(i) {
 
+            case(i_mctc):
+               write_mctc_header_row(1, n_cat, txt_at[i], 0, 0);
+               break;
+
             case(i_pct):
                write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
