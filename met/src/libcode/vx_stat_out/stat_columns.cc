@@ -102,7 +102,7 @@ int get_mctc_column_offset(const char *col_name, int n_cat) {
    }
 
    //
-   // Check the variable colum
+   // Check the variable column
    //
    if(!found) {
 
