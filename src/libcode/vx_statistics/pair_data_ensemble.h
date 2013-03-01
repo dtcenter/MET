@@ -184,6 +184,7 @@ class VxPairDataEnsemble {
 
       void set_msg_typ(int, const char *);
       void set_mask_dp(int, const char *, DataPlane *);
+      void set_mask_sid(int, const char *, StringArray *);
       void set_interp(int, const char *, int);
       void set_interp(int, InterpMthd, int);
 

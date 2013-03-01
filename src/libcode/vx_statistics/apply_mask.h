@@ -30,7 +30,8 @@ extern void parse_grid_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
 extern void parse_poly_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
-extern void parse_sid_mask(const ConcatString &, StringArray &);
+extern void parse_sid_mask(const ConcatString &, StringArray &,
+                           ConcatString &);
 
 extern void apply_grid_mask(const Grid &, const Grid &,
                             DataPlane &);

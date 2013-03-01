@@ -461,13 +461,29 @@ void VxPairDataPoint::set_msg_typ(int i_msg_typ, const char *name) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::set_mask_dp(int i_mask, const char *name,
-                             DataPlane *dp_ptr) {
+                                  DataPlane *dp_ptr) {
    int i, j;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_interp; j++) {
          pd[i][i_mask][j].set_mask_name(name);
          pd[i][i_mask][j].set_mask_dp_ptr(dp_ptr);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_mask_sid(int i_mask, const char *name,
+                                   StringArray *sid_ptr) {
+   int i, j;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_interp; j++) {
+         pd[i][i_mask][j].set_mask_name(name);
+         pd[i][i_mask][j].set_mask_sid_ptr(sid_ptr);
       }
    }
 
@@ -708,10 +724,10 @@ void VxPairDataPoint::add_obs(float *hdr_arr,     char *hdr_typ_str,
                continue;
             }
          }
-         // Otherwise, check for the obs Station ID matching the
-         // masking SID
-         else {
-            if(strcmp(hdr_sid_str, pd[i][j][0].mask_name) != 0) {
+         // Otherwise, check for the obs Station ID's presence in the
+         // masking SID list
+         else if(pd[i][j][0].mask_sid_ptr != (StringArray *) 0) {
+            if(!pd[i][j][0].mask_sid_ptr->has(hdr_sid_str)) {
                inc_count(rej_mask, i, j);
                continue;
             }

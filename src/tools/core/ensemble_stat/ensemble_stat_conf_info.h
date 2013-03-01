@@ -67,6 +67,7 @@ class EnsembleStatConfInfo {
       int n_interp;     // Number of interpolation methods
       int n_mask;       // Number of masking regions
       int n_mask_area;  // Number of masking areas
+      int n_mask_sid;   // Number of masking station ID lists
 
    public:
 
@@ -89,7 +90,7 @@ class EnsembleStatConfInfo {
       ConcatString         ens_ssvar_file;      // Ensemble mean file name
       StringArray          ens_ssvar_vars;      // Ensemble mean variable names [n_vx]
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
-      StringArray          mask_sid;            // Masking station id's [n_mask_sid]
+      StringArray *        mask_sid;            // Masking station id's [n_mask_sid]
       FieldType            interp_field;        // How to apply interpolation options      
       double               interp_thresh;       // Proportion of valid data values
       InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]
@@ -136,13 +137,13 @@ class EnsembleStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()      const { return(n_ens_var);             }
-inline int EnsembleStatConfInfo::get_max_n_thresh()   const { return(max_n_thresh);          }
-inline int EnsembleStatConfInfo::get_n_vx()           const { return(n_vx);                  }
-inline int EnsembleStatConfInfo::get_n_interp()       const { return(n_interp);              }
-inline int EnsembleStatConfInfo::get_n_mask()         const { return(n_mask);                }
-inline int EnsembleStatConfInfo::get_n_mask_area()    const { return(n_mask_area);           }
-inline int EnsembleStatConfInfo::get_n_mask_sid()     const { return(mask_sid.n_elements()); }
+inline int EnsembleStatConfInfo::get_n_ens_var()      const { return(n_ens_var);    }
+inline int EnsembleStatConfInfo::get_max_n_thresh()   const { return(max_n_thresh); }
+inline int EnsembleStatConfInfo::get_n_vx()           const { return(n_vx);         }
+inline int EnsembleStatConfInfo::get_n_interp()       const { return(n_interp);     }
+inline int EnsembleStatConfInfo::get_n_mask()         const { return(n_mask);       }
+inline int EnsembleStatConfInfo::get_n_mask_area()    const { return(n_mask_area);  }
+inline int EnsembleStatConfInfo::get_n_mask_sid()     const { return(n_mask_sid);   }
 
 ////////////////////////////////////////////////////////////////////////
 
