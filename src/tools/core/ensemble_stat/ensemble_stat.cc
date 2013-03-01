@@ -1323,7 +1323,7 @@ void process_grid_vx() {
          }
 
          // Loop through the masks to be applied
-         for(k=0; k<conf_info.get_n_mask(); k++) {
+         for(k=0; k<conf_info.get_n_mask_area(); k++) {
 
             // Set the mask name
             shc.set_mask(conf_info.mask_name[k]);
