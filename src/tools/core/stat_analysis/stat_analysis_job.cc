@@ -149,7 +149,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
       j.job_type != stat_job_summary &&
       j.job_type != stat_job_aggr &&
       j.job_type != stat_job_aggr_stat) {
-      mlog << "\nWARNING: The -by option is ignored for the \""
+      mlog << Warning << "\nThe -by option is ignored for the \""
            << statjobtype_to_string(j.job_type) << "\" job type.\n\n";
    }
 
@@ -1529,7 +1529,7 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
    // Write the rest of the header row
    //
    c = 1 + j.column_case.n_elements();
-   write_rhist_header_row(0, m.begin()->second.ens_pd.rhist_na.n_elements(), at, 0, c);
+   write_rhist_header_row(0, n, at, 0, c);
 
    //
    // Loop through the map
@@ -1578,7 +1578,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    // Write the rest of the header row
    //
    c = 1 + j.column_case.n_elements();
-   write_rhist_header_row(0, m.begin()->second.ens_pd.rhist_na.n_elements(), at, 0, c);
+   write_rhist_header_row(0, n, at, 0, c);
 
    //
    // Loop through the map
