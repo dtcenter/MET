@@ -545,9 +545,10 @@ event_stack_flag = TOP;
 //         threshold to be applied.
 //         e.g. "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 //
-//       - The "sid" entry specifies an ASCII file containing a space-separated
-//         list of station ID's to be used for point verification.  Each
-//         station ID is treated as an individual masking region.
+//    - The "sid" entry is an array of station ID groups.  Each element is
+//      either the name of a single station ID or a station ID group file name.
+//      A station ID group file consists of a name for the group followed by a
+//      list of station ID's.
 //
 mask = {
    grid = [ "FULL" ];
@@ -556,7 +557,7 @@ mask = {
             "MET_BASE/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
             {name = \"TMP\"; level = \"Z2\";} >273"
           ];
-   sid  = "CONUS.stations";
+   sid  = [ "CONUS.stations" ];
 };
 
 //

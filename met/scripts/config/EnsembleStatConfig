@@ -91,7 +91,7 @@ mask = {
             "MET_BASE/data/poly/HMT_masks/huc4_1804_poly.nc",
             "MET_BASE/data/poly/HMT_masks/huc4_1805_poly.nc",
             "MET_BASE/data/poly/HMT_masks/huc4_1806_poly.nc" ];
-   sid  = "";
+   sid  = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////

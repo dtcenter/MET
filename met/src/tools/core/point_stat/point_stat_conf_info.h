@@ -69,6 +69,7 @@ class PointStatConfInfo {
       int n_vx_prob;     // Number of probability fields to be verified
       int n_mask;        // Total number of masking regions
       int n_mask_area;   // Number of masking areas
+      int n_mask_sid;    // Number of masking station ID lists
       int n_interp;      // Number of interpolation methods
 
       int max_n_scal_thresh;      // Maximum number of scalar thresholds
@@ -93,7 +94,7 @@ class PointStatConfInfo {
       StringArray *     msg_typ;            // Array of message types [n_vx]
       StringArray       mask_name;          // Masking region names [n_mask]
       DataPlane *       mask_dp;            // Array for masking regions [n_mask_area]
-      StringArray       mask_sid;           // Masking station id's [n_mask_sid]
+      StringArray *     mask_sid;           // Masking station id's [n_mask_sid]
       NumArray          ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType  boot_interval;      // Bootstrap CI type
       double            boot_rep_prop;      // Bootstrap replicate proportion
@@ -153,7 +154,7 @@ inline int PointStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);    
 inline int PointStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                 }
 inline int PointStatConfInfo::get_n_mask()        const { return(n_mask);                    }
 inline int PointStatConfInfo::get_n_mask_area()   const { return(n_mask_area);               }
-inline int PointStatConfInfo::get_n_mask_sid()    const { return(mask_sid.n_elements());     }
+inline int PointStatConfInfo::get_n_mask_sid()    const { return(n_mask_sid);                }
 inline int PointStatConfInfo::get_n_wind_thresh() const { return(fcst_wind_ta.n_elements()); }
 inline int PointStatConfInfo::get_n_interp()      const { return(n_interp);                  }
 inline int PointStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());     }

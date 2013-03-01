@@ -71,13 +71,13 @@ void EnsembleStatConfInfo::clear() {
    n_interp     = 0;
    n_mask       = 0;
    n_mask_area  = 0;
+   n_mask_sid   = 0;
 
    // Initialize values
    model.clear();
    beg_ds = end_ds = bad_data_int;
    vld_ens_thresh = vld_data_thresh = bad_data_double;
    mask_name.clear();
-   mask_sid.clear();
    interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
@@ -95,8 +95,9 @@ void EnsembleStatConfInfo::clear() {
    if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)        0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataEnsemble *) 0; }
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
-   if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)      0; }
-   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }   
+   if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)        0; }
+   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }
+   if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)        0; }
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)         0; }
 
    // Clear ens_info
@@ -372,8 +373,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {   
    int i, j;
-   StringArray mask_grid, mask_poly;
-   ConcatString sid_file, s;
+   StringArray mask_grid, mask_poly, sid_list;
+   ConcatString s;
 
    // Retrieve the area masks
    mask_grid = conf.lookup_string_array(conf_key_mask_grid);
@@ -381,12 +382,12 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    n_mask_area = mask_grid.n_elements() + mask_poly.n_elements();
 
    // Retrieve the station masks
-   sid_file = conf.lookup_string(conf_key_mask_sid);
-   parse_sid_mask(sid_file, mask_sid);
+   sid_list = conf.lookup_string_array(conf_key_mask_sid);
+   n_mask_sid = sid_list.n_elements();
 
    // Save the total number masks as a sum of the masking areas and
    // masking points
-   n_mask = n_mask_area + mask_sid.n_elements();
+   n_mask = n_mask_area + n_mask_sid;
 
    // Check that at least one verification masking region is provided
    if(n_mask == 0) {
@@ -411,8 +412,14 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       mask_name.add(s);
    }
 
-   // Store the masking station ID points
-   for(i=0; i<mask_sid.n_elements(); i++) mask_name.add(mask_sid[i]);
+   // Allocate space to store the station ID masks
+   mask_sid = new StringArray [n_mask_sid];
+
+   // Parse out the station ID masks
+   for(i=0; i<sid_list.n_elements(); i++) {
+      parse_sid_mask(sid_list[i], mask_sid[i], s);
+      mask_name.add(s);
+   }
 
    return;
 }
@@ -445,11 +452,13 @@ void EnsembleStatConfInfo::set_vx_pd() {
       for(j=0; j<n_mask; j++) {
 
          // If this is a masking area
-         if(j<n_mask_area)
+         if(j<n_mask_area) {
             vx_pd[i].set_mask_dp(j, mask_name[j], &mask_dp[j]);
+         }
          // Otherwise this is a masking StationID
-         else
-            vx_pd[i].set_mask_dp(j, mask_name[j], (DataPlane *) 0);
+         else {
+            vx_pd[i].set_mask_sid(j, mask_name[j], &mask_sid[j-n_mask_area]);
+         }
       }
 
       // Add the interpolation methods to the vx_pd objects
@@ -457,8 +466,8 @@ void EnsembleStatConfInfo::set_vx_pd() {
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
    } // end for i
 
-   //  set the duplicate flag for each pair data object
-   for(j=0; j < n_vx; j++) vx_pd[j].set_duplicate_flag((DuplicateType) duplicate_flag);
+   // Set the duplicate flag for each pair data object
+   for(i=0; i<n_vx; i++) vx_pd[i].set_duplicate_flag((DuplicateType) duplicate_flag);
 
    return;
 }

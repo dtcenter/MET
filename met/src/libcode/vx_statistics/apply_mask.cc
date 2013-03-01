@@ -38,7 +38,7 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
    Grid mask_grid;
 
    mlog << Debug(4) << "parse_grid_mask() -> "
-        << " parsing grid mask \"" << mask_grid_str << "\"\n";
+        << "parsing grid mask \"" << mask_grid_str << "\"\n";
 
    // Initialize the DataPlane masking object by turning all points on
    mask_dp.set_size(grid.nx(), grid.ny());
@@ -91,7 +91,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    bool append_level, append_thresh;
 
    mlog << Debug(4) << "parse_poly_mask() -> "
-        << " parsing poly mask \"" << mask_poly_str << "\"\n";
+        << "parsing poly mask \"" << mask_poly_str << "\"\n";
 
    // 2D Data file
    Met2dDataFileFactory mtddf_factory;
@@ -185,7 +185,7 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
    Polyline mask_poly;
 
    mlog << Debug(4) << "parse_poly_mask() -> "
-        << " parsing poly mask file \"" << file_name << "\"\n";
+        << "parsing poly mask file \"" << file_name << "\"\n";
 
    // Initialize the DataPlane masking object by turning all points on
    mask_dp.set_size(grid.nx(), grid.ny());
@@ -207,38 +207,81 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// This function is passed a string containing either a single station ID or
+// a file name containing a list of station ID's.  For a single station ID,
+// store it in the output StringArray, and store it's value as the mask name.
+// For a file name, parse the list of stations into the output StringArray,
+// and store the first entry in the file as the mask name.
+//
+///////////////////////////////////////////////////////////////////////////////
 
-void parse_sid_mask(const ConcatString &mask_sid_file,
-                    StringArray &mask_sid) {
+void parse_sid_mask(const ConcatString &mask_sid_str,
+                    StringArray &mask_sid, ConcatString &mask_name) {
    ifstream in;
    ConcatString tmp_file;
    char sid_str[PATH_MAX];
 
-   mlog << Debug(4) << "parse_sid_mask() -> "
-        << " parsing station ID mask file \"" << mask_sid_file << "\"\n";
+   // Initialize
+   mask_sid.clear();
+   mask_name = na_str;
 
    // Check for an empty length string
-   if(mask_sid_file.empty()) return;
-        
+   if(mask_sid_str.empty()) return;
+   
    // Replace any instances of MET_BASE with it's expanded value
-   tmp_file = replace_path(mask_sid_file);
+   tmp_file = replace_path(mask_sid_str);
 
-   // Open the mask station id file specified
-   in.open(tmp_file);
+   // Process string as a file name, if possible
+   if(file_exists(tmp_file)) {
 
-   if(!in) {
-      mlog << Error << "\nparse_sid_mask() -> "
-           << "Can't open the mask station ID file specified ("
-           << tmp_file << ").\n\n";
-      exit(1);
+      mlog << Debug(4) << "parse_sid_mask() -> "
+           << "parsing station ID masking file \"" << tmp_file << "\"\n";
+
+      // Open the mask station id file specified
+      in.open(tmp_file);
+
+      if(!in) {
+         mlog << Error << "\nparse_sid_mask() -> "
+              << "Can't open the station ID masking file \""
+              << tmp_file << "\".\n\n";
+         exit(1);
+      }
+
+      // Store the first entry as the name of the mask
+      in >> sid_str;
+      mask_name = sid_str;
+
+      // Store the rest of the entries as masking station ID's
+      while(in >> sid_str) mask_sid.add(sid_str);
+
+      // Close the input file
+      in.close();
+
+      mlog << Debug(4) << "parse_sid_mask() -> "
+           << "parsed " << mask_sid.n_elements() << " station ID's for the \""
+           << mask_name << "\" mask from file \"" << tmp_file << "\"\n";
    }
+   // Otherwise, process it as a single station ID
+   else {
 
-   // Read in and store the masking station ID names
-   while(in >> sid_str) mask_sid.add(sid_str);
+      mlog << Debug(4) << "parse_sid_mask() -> "
+           << "storing single station ID mask \"" << mask_sid_str << "\"\n";
 
-   // Close the input file
-   in.close();
+      // Check for embedded whitespace or slashes
+      if(check_reg_exp(ws_reg_exp, mask_sid_str) ||
+         check_reg_exp("[/]", mask_sid_str)) {
+         mlog << Error << "\nparse_sid_mask() -> "
+              << "masking station ID name can't contain whitespace or slashes \""
+              << mask_sid_str << "\".\n\n";
+         exit(1);
+      }
 
+      // Store the single station ID
+      mask_sid.add(mask_sid_str);
+      mask_name = mask_sid_str;
+   }
+   
    return;
 }
 

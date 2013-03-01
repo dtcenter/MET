@@ -711,8 +711,8 @@ void process_obs_file(int i_nc) {
    for(i_obs=0; i_obs<obs_dim->size(); i_obs++) {
 
       // Read the current observation message
-      if(!obs_arr_var->set_cur((long) i_obs)
-      || !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
+      if(!obs_arr_var->set_cur((long) i_obs) ||
+         !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the record for observation "
               << "index " << i_obs << "\n\n";

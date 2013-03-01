@@ -37,8 +37,10 @@ class PairBase {
 
       // Masking area applied to the forecast and climo fields
       ConcatString  mask_name;
-      DataPlane     *mask_dp_ptr; // Pointer to the masking field
-                                  // which is not allocated
+      DataPlane     *mask_dp_ptr;  // Pointer to the masking data plane
+                                   // which is not allocated
+      StringArray   *mask_sid_ptr; // Pointer to masking station ID list
+                                   // which is not allocated
 
       // The verifying message type
       ConcatString msg_typ;
@@ -75,6 +77,7 @@ class PairBase {
 
       void set_mask_name(const char *);
       void set_mask_dp_ptr(DataPlane *);
+      void set_mask_sid_ptr(StringArray *);
       void set_msg_typ(const char *);
 
       void set_interp_mthd(const char *);
@@ -101,8 +104,8 @@ class PairBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void   compute_crps_ign_pit(double, const NumArray &,
-                                   double &, double &, double &);
+extern void compute_crps_ign_pit(double, const NumArray &,
+                                 double &, double &, double &);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -625,8 +625,8 @@ void process_vx_table_size() {
    }
 
    // Determine the maximum number of message types being used
-   int max_n_msg_typ;
-   for(int i=0; i< conf_info.get_n_vx(); i++)
+   int max_n_msg_typ = 0;
+   for(int i=0; i<conf_info.get_n_vx(); i++)
       if(conf_info.get_n_msg_typ(i) > max_n_msg_typ)
          max_n_msg_typ = conf_info.get_n_msg_typ(i);
 
