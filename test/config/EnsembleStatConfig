@@ -74,7 +74,7 @@ mask = {
    grid = [ "FULL" ];
    poly = [ "MET_BASE/data/poly/NWC.poly",
             "MET_BASE/data/poly/GRB.poly" ];
-   sid  = "";
+   sid  = [ ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
