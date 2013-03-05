@@ -22,11 +22,6 @@ ens = {
 
    field = [
       {
-         name       = "TMP";
-         level      = "Z2";
-         cat_thresh = [ <=273.15, >273.15  ];
-      },
-      {
          name       = "APCP";
          level      = "A24";
          cat_thresh = [ >0.0  ];
@@ -43,10 +38,6 @@ fcst = {
    message_type = [ "ADPSFC" ];
   
    field = [
-      {
-         name  = "TMP";
-         level = "Z2";
-      },
       {
          name  = "APCP";
          level = "A24";
@@ -71,10 +62,9 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ "MET_BASE/data/poly/NWC.poly",
-            "MET_BASE/data/poly/GRB.poly" ];
-   sid  = [ ];
+   grid = [ ];
+   poly = [ ];
+   sid  = [ "${CONFIG_DIR}/SID_MESOWEST_OR.txt" ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,16 +101,16 @@ output_flag = {
 // Ensemble product output types
 //
 ensemble_flag = {
-   mean      = TRUE;
-   stdev     = TRUE; 
-   minus     = TRUE;
-   plus      = TRUE;
-   min       = TRUE;
-   max       = TRUE;
-   range     = TRUE;
-   vld_count = TRUE;
-   frequency = TRUE;
-   rank      = TRUE;
+   mean      = FALSE;
+   stdev     = FALSE;
+   minus     = FALSE;
+   plus      = FALSE;
+   min       = FALSE;
+   max       = FALSE;
+   range     = FALSE;
+   vld_count = FALSE;
+   frequency = FALSE;
+   rank      = FALSE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
