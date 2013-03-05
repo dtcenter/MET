@@ -396,6 +396,17 @@ void process_command_line(int argc, char **argv)
                  << "enabling ensemble mean to facilitate calculation "
                  << "of ensemble spread/skill\n\n";
             conf_info.ensemble_flag[i_nc_mean] = true;
+
+            // Check that the number of ensemble fields matches the
+            // number of verification fields
+            if( conf_info.get_n_ens_var() != conf_info.get_n_vx() ) {
+               mlog << Error << "\nprocess_command_line() -> "
+                    << "when calculating ensemble spread/skill against "
+                    << "the computed ensemble mean, the \"ens.field\" "
+                    << "and \"fcst.field\" configuration settings "
+                    << "must match.\n\n";
+               exit(1);
+            }
          }
       }
 
