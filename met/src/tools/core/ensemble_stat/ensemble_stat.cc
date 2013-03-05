@@ -396,17 +396,6 @@ void process_command_line(int argc, char **argv)
                  << "enabling ensemble mean to facilitate calculation "
                  << "of ensemble spread/skill\n\n";
             conf_info.ensemble_flag[i_nc_mean] = true;
-
-            // Check that the number of ensemble fields matches the
-            // number of verification fields
-            if( conf_info.get_n_ens_var() != conf_info.get_n_vx() ) {
-               mlog << Error << "\nprocess_command_line() -> "
-                    << "when calculating ensemble spread/skill against "
-                    << "the computed ensemble mean, the \"ens.field\" "
-                    << "and \"fcst.field\" configuration settings "
-                    << "must match.\n\n";
-               exit(1);
-            }
          }
       }
 
@@ -911,7 +900,9 @@ int process_point_ens(int i_ens) {
       if( ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) ){
          fcst_dpa.clear();
          ConcatString ens_magic;
-         ens_magic << conf_info.ens_ssvar_vars[i] << "(*,*)";
+         ens_magic << conf_info.vx_pd[i].fcst_info->name() << "_"
+                   << conf_info.vx_pd[i].fcst_info->level_name() << "_"
+                   << "ENS_MEAN(*,*)";
          mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
          info = new VarInfoNcMet();
          info->set_magic(ens_magic);
@@ -935,10 +926,10 @@ int process_point_ens(int i_ens) {
 
       // Check for zero fields
       if(n_fcst == 0) {
-         mlog << Warning << "\nprocess_point_ens() -> "
+         mlog << Error << "\nprocess_point_ens() -> "
               << "no fields matching " << info->magic_str()
-              << " found in file: " << ens_file << "\n";
-         return(1);
+              << " found in file: " << ens_file << "\n\n";
+         exit(1);
       }
 
       // Set the grid
@@ -1246,7 +1237,9 @@ void process_grid_vx() {
          // For spread/skill, use the calculated mean file if none was specified
          if( !ens_ssvar_mean || !strcmp(ens_ssvar_mean, "") ){
             ConcatString ens_magic;
-            ens_magic << conf_info.ens_ssvar_vars[i] << "(*,*)";
+            ens_magic << conf_info.ens_info[i]->name() << "_"
+                      << conf_info.ens_info[i]->level_name() << "_"
+                      << "ENS_MEAN(*,*)";
             mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
             info = new VarInfoNcMet();
             info->set_magic(ens_magic);
@@ -1973,7 +1966,6 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_vx]->level_name() << "_"
                 << type_str;
    ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
-   conf_info.ens_ssvar_vars.add(ens_var_name);
 
    //
    // Construct the variable name attribute

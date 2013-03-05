@@ -88,7 +88,6 @@ class EnsembleStatConfInfo {
       StringArray          mask_name;           // Masking region names [n_mask]
       NumArray             ens_ssvar_bin_size;  // Ensemble spread/skill variance bin size [n_vx]
       ConcatString         ens_ssvar_file;      // Ensemble mean file name
-      StringArray          ens_ssvar_vars;      // Ensemble mean variable names [n_vx]
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
       StringArray *        mask_sid;            // Masking station id's [n_mask_sid]
       FieldType            interp_field;        // How to apply interpolation options      
