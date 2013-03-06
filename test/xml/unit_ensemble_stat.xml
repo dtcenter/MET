@@ -27,7 +27,6 @@
     <exec>&MET_DIR;/bin/ensemble_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>CMD_LINE</value></pair>
-      <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
     </env>
     <param> \
       6 \
