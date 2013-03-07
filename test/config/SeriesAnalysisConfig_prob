@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "GFS";
+model = "SREF";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -18,17 +18,30 @@ model = "GFS";
 //
 fcst = {
 
-   cat_thresh  = [ >0.0, >5.0 ];
-
+   cat_thresh = [ >=0.00, >=0.25, >=0.50, >=0.75, >=1.00 ];
+  
    field = [
       {
-         name  = "APCP";
-         level = [ "A06" ];
+         name  = "PROB";
+         level = "A06";
+         prob  = { name = "APCP"; thresh_lo = 0.25; };
       }
    ];
 
 };
-obs = fcst;
+
+obs = {
+
+   cat_thresh = [ >0.25 ];
+  
+   field = [
+      {
+         name  = "APCP";
+         level = "A06";
+      }
+   ];
+
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -72,17 +85,17 @@ vld_thresh = 1.0;
 // Statistical output types
 //
 output_stats = {
-   fho    = [ "F_RATE",  "O_RATE"            ];
-   ctc    = [  "FY_OY",   "FN_ON"            ];
-   cts    = [    "CSI",     "GSS"            ];
-   mctc   = [  "F1_O1",   "F2_O2",   "F3_O3" ];
-   mcts   = [    "ACC", "ACC_NCL", "ACC_NCU" ];
-   cnt    = [     "ME",  "ME_NCL",  "ME_NCU" ];
-   sl1l2  = [   "FBAR",    "OBAR"            ];
-   pct    = [ ];
-   pstd   = [ ];
-   pjc    = [ ];
-   prc    = [ ];
+   fho    = [ ];
+   ctc    = [ ];
+   cts    = [ ];
+   mctc   = [ ];
+   mcts   = [ ];
+   cnt    = [ ];
+   sl1l2  = [ ];
+   pct    = [          "OY_1",         "ON_1"                           ];
+   pstd   = [       "ROC_AUC",        "BRIER", "BRIER_NCL", "BRIER_NCU" ];
+   pjc    = [ "CALIBRATION_1", "REFINEMENT_1"                           ];
+   prc    = [        "PODY_1",       "POFD_1"                           ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////

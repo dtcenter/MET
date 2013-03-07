@@ -14,7 +14,7 @@
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-  
+
   <test name="series_analysis_CMD_LINE">
     <exec>&MET_DIR;/bin/series_analysis</exec>
     <param> \
@@ -38,6 +38,36 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_CMD_LINE_APCP_06_2012040900_to_2012041100.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="series_analysis_FILE_LIST">
+    <exec>echo "&DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F009.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F015.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F021.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F027.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F033.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F039.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F045.grib" \
+                > &OUTPUT_DIR;/series_analysis/input_fcst_file_list; \
+          echo "&DATA_DIR_OBS;/stage4_hmt/stage4_2012040906_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040912_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040918_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041000_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib" \
+                > &OUTPUT_DIR;/series_analysis/input_obs_file_list; \
+          &MET_DIR;/bin/series_analysis</exec>
+    <param> \
+      -fcst   &OUTPUT_DIR;/series_analysis/input_fcst_file_list \
+      -obs    &OUTPUT_DIR;/series_analysis/input_obs_file_list \
+      -out    &OUTPUT_DIR;/series_analysis/series_analysis_FILE_LIST_PROB_APCP_06_2012040900_to_2012041100.nc \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_prob \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_FILE_LIST_PROB_APCP_06_2012040900_to_2012041100.nc</grid_nc>
     </output>
   </test>
 

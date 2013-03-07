@@ -61,7 +61,7 @@
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F024.grib" \
                 > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
-                &MET_DIR;/bin/ensemble_stat</exec>
+          &MET_DIR;/bin/ensemble_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>FILE_LIST</value></pair>
     </env>         
