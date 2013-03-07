@@ -39,6 +39,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_plot_point_obs.xml \
           unit_plot_data_plane.xml \
           unit_wwmca_plot.xml \
+          unit_series_analysis.xml \
           unit_tc_dland.xml \
           unit_tc_pairs.xml \
           unit_tc_stat.xml \
