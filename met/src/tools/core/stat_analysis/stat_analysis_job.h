@@ -19,6 +19,7 @@
 //                    with addition of generalized Skill Score Index
 //   002    05/03/12  Halley Gotway   Switch to using vx_config library.
 //   003    02/04/13  Halley Gotway   Add -by case option.
+//   004    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -93,6 +94,9 @@ extern void write_job_aggr_wind(STATAnalysisJob &, STATLineType,
 
 extern void write_job_aggr_rhist(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrRHISTInfo> &, AsciiTable &);
+
+extern void write_job_aggr_ssvar(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrSSVARInfo> &, AsciiTable &);
 
 extern void write_job_aggr_orank(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrORANKInfo> &, AsciiTable &);

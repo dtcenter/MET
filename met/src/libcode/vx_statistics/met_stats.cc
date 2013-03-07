@@ -1839,6 +1839,43 @@ SSVARInfo & SSVARInfo::operator=(const SSVARInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
+SSVARInfo & SSVARInfo::operator+=(const SSVARInfo &c) {
+   SSVARInfo s_info;
+
+   // Check for matching variance bounds
+   if(!is_eq(var_min, c.var_min) || !is_eq(var_max, c.var_max)) {
+      mlog << Error << "\nSSVARInfo::operator+=() -> "
+           << "the variance bounds don't match ("
+           << var_min << ", " << var_max << ") != ("
+           << c.var_min << ", " << c.var_max << ").\n\n";
+      exit(1);
+   }
+
+   // The bin index information is unknown when aggregating
+   s_info.n_bin = s_info.bin_i = bad_data_int;
+
+   // Increment the bin count
+   s_info.bin_n = bin_n + c.bin_n;
+
+   // Store the variance range
+   s_info.var_min  = var_min;
+   s_info.var_max  = var_max;
+
+   // Compute weighted averages
+   s_info.var_mean = (var_mean*bin_n + c.var_mean*c.bin_n)/s_info.bin_n;
+   s_info.fbar     = (fbar*bin_n     + c.fbar*c.bin_n)    /s_info.bin_n;
+   s_info.obar     = (obar*bin_n     + c.obar*c.bin_n)    /s_info.bin_n;
+   s_info.fobar    = (fobar*bin_n    + c.fobar*c.bin_n)   /s_info.bin_n;
+   s_info.ffbar    = (ffbar*bin_n    + c.ffbar*c.bin_n)   /s_info.bin_n;
+   s_info.oobar    = (oobar*bin_n    + c.oobar*c.bin_n)   /s_info.bin_n;
+
+   assign(s_info);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void SSVARInfo::init_from_scratch() {
 
    clear();

@@ -17,6 +17,8 @@
 //   000    12/17/08  Halley Gotway   New
 //   001    05/24/10  Halley Gotway   Add parse_rhist_line and
 //                    parse_orank_line.
+//   002    06/09/10  Halley Gotway   Add parse_mctc_ctable.
+//   003    03/07/13  Halley Gotway   Add parse_ssvar_line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -87,6 +89,7 @@ extern void parse_isc_line     (STATLine &, ISCInfo &, int &);
 extern void parse_nbrcnt_line  (STATLine &, NBRCNTInfo &);
 extern void parse_rhist_line   (STATLine &, RHISTData &);
 extern void parse_orank_line   (STATLine &, ORANKData &);
+extern void parse_ssvar_line   (STATLine &, SSVARInfo &);
 
 ////////////////////////////////////////////////////////////////////////
 

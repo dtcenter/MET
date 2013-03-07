@@ -24,6 +24,7 @@
 //                    with addition of generalized Skill Score Index
 //   005    05/03/12  Halley Gotway   Switch to using vx_config library.
 //   006    02/04/13  Halley Gotway   Add -by case option.
+//   007    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -500,6 +501,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrPSumInfo>  psum_map;
    map<ConcatString, AggrISCInfo>   isc_map;
    map<ConcatString, AggrRHISTInfo> rhist_map;
+   map<ConcatString, AggrSSVARInfo> ssvar_map;
 
    //
    // Check that the -line_type option has been supplied exactly once
@@ -525,12 +527,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_sal1l2 && lt != stat_vl1l2  &&
       lt != stat_val1l2 && lt != stat_pct    &&
       lt != stat_nbrctc && lt != stat_nbrcnt &&
-      lt != stat_rhist  && lt != stat_isc) {
+      lt != stat_rhist  && lt != stat_isc    &&
+      lt != stat_ssvar) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
-           << "\tPCT, NBRCTC, NBRCNT, ISC, RHIST\n\n";
+           << "\tPCT, NBRCTC, NBRCNT, ISC,\n"
+           << "\tRHIST, SSVAR\n\n";
       throw(1);
    }
 
@@ -595,6 +599,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    else if(lt == stat_rhist) {
       aggr_rhist_lines(f, j, rhist_map, n_in, n_out);
       write_job_aggr_rhist(j, lt, rhist_map, out_at);
+   }
+
+   //
+   // Sum the SSVAR line types
+   //
+   else if(lt == stat_ssvar) {
+      aggr_ssvar_lines(f, j, ssvar_map, n_in, n_out);
+      write_job_aggr_ssvar(j, lt, ssvar_map, out_at);
    }
 
    //
@@ -1548,6 +1560,85 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
       write_case_cols(it->first, at, r, c);
       write_rhist_cols(&(it->second.ens_pd), at, r, c);
    } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
+                          map<ConcatString, AggrSSVARInfo> &m,
+                          AsciiTable &at) {
+   map<ConcatString, AggrSSVARInfo>::iterator case_it;
+   map<ConcatString, SSVARInfo>::iterator bin_it;
+   int i, n, n_row, n_col, r, c;
+
+   //
+   // Determine the number of rows
+   //
+   for(case_it = m.begin(), n = 0; case_it != m.end(); case_it++) {
+      n += case_it->second.ssvar_bins.size();
+   } // end for case_it
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + n;
+   n_col = 1 + j.column_case.n_elements() + n_ssvar_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
+
+   //
+   // Loop through the case map
+   //
+   for(case_it = m.begin(), r=1; case_it != m.end(); case_it++) {
+
+      //
+      // Loop through the bin map to determine the total count
+      //
+      for(bin_it = case_it->second.ssvar_bins.begin(), n=0;
+          bin_it != case_it->second.ssvar_bins.end();
+          bin_it++) {
+         n += bin_it->second.bin_n;
+      }
+
+      //
+      // Loop through the bin map and write the output
+      //
+      for(bin_it = case_it->second.ssvar_bins.begin(), i=0;
+          bin_it != case_it->second.ssvar_bins.end();
+          bin_it++, r++, i++) {
+
+         //
+         // Initialize
+         //
+         c = 0;
+
+         //
+         // SSVAR output line
+         //
+         at.set_entry(r, c++, "SSVAR:");
+         write_case_cols(case_it->first, at, r, c);
+         at.set_entry(r, c++, n);
+         at.set_entry(r, c++, (int) case_it->second.ssvar_bins.size());
+         at.set_entry(r, c++, i);
+         at.set_entry(r, c++, bin_it->second.bin_n);
+         at.set_entry(r, c++, bin_it->second.var_min);
+         at.set_entry(r, c++, bin_it->second.var_max);
+         at.set_entry(r, c++, bin_it->second.var_mean);
+         at.set_entry(r, c++, bin_it->second.fbar);
+         at.set_entry(r, c++, bin_it->second.obar);
+         at.set_entry(r, c++, bin_it->second.fobar);
+         at.set_entry(r, c++, bin_it->second.ffbar);
+         at.set_entry(r, c++, bin_it->second.oobar);
+
+      } // end for bin_it
+   } // end for case_it
 
    return;
 }

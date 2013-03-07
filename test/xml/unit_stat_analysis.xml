@@ -51,6 +51,22 @@
     </output>
   </test>
 
+  <test name="stat_analysis_AGG_SSVAR">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate -line_type SSVAR \
+      -fcst_var APCP_24 -obtype MC_PCP -vx_mask NWC -vx_mask GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_SSVAR_dump.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_SSVAR.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_SSVAR_dump.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_SSVAR.out</exist>
+    </output>
+  </test>
+
   <!--  jobs for ensemble_stat output  -->
 
   <test name="stat_analysis_AGG_ISC">

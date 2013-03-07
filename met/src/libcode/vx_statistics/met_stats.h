@@ -447,6 +447,7 @@ class SSVARInfo {
       ~SSVARInfo();
       SSVARInfo(const SSVARInfo &);
       SSVARInfo & operator=(const SSVARInfo &);
+      SSVARInfo & operator+=(const SSVARInfo &);
 
       int n_bin;
       int bin_i;

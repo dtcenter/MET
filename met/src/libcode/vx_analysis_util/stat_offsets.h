@@ -467,6 +467,22 @@ static const int orank_n_ens_vld_offset  = nhc + 10;
 static const int orank_n_ens_offset      = nhc + 11;
 inline int orank_ens_offset(int i)       { return(nhc + 12 + i); }
 
+//
+// SSVAR Line Type offsets
+//
+static const int ssvar_total_offset      = nhc + 0;
+static const int ssvar_n_bin_offset      = nhc + 1;
+static const int ssvar_bin_i_offset      = nhc + 2;
+static const int ssvar_bin_n_offset      = nhc + 3;
+static const int ssvar_var_min_offset    = nhc + 4;
+static const int ssvar_var_max_offset    = nhc + 5;
+static const int ssvar_var_mean_offset   = nhc + 6;
+static const int ssvar_fbar_offset       = nhc + 7;
+static const int ssvar_obar_offset       = nhc + 8;
+static const int ssvar_fobar_offset      = nhc + 9;
+static const int ssvar_ffbar_offset      = nhc + 10;
+static const int ssvar_oobar_offset      = nhc + 11;
+
 ////////////////////////////////////////////////////////////////////////
 
 
