@@ -91,6 +91,26 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/stage4_2012040912_F012_APCP12.nc</grid_nc>
     </output>
   </test>
+
+
+  <!--                                        -->
+  <!--  add different accumulation intervals  -->
+  <!--                                        -->
+
+  
+  <test name="pcp_combine_add_ACCUMS">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -add \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib 12 \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F021.grib 9 \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F024.grib 3 \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F024_APCP24.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F024_APCP24.nc</grid_nc>
+    </output>
+  </test>
     
   
   <!--                                    -->
