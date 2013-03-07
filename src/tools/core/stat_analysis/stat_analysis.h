@@ -15,7 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
-//   001    05/03/12  Halley Gotway  Switch to using vx_config library.
+//   001    05/03/12  Halley Gotway   Switch to using vx_config library.
 //
 ////////////////////////////////////////////////////////////////////////
 

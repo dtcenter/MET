@@ -17,6 +17,7 @@
 //   000    12/17/08  Halley Gotway   New
 //   001    05/24/10  Halley Gotway   Add aggr_rhist_lines and
 //                    aggr_orank_lines.
+//   002    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -78,8 +79,8 @@ struct AggrWindInfo {
 };
 
 struct AggrMPRInfo {
-   NumArray f_na, o_na, c_na;
    ConcatString fcst_var, obs_var;
+   NumArray f_na, o_na, c_na;
 };
 
 struct AggrISCInfo {
@@ -94,6 +95,29 @@ struct AggrRHISTInfo {
 
 struct AggrORANKInfo {
    PairDataEnsemble ens_pd;
+};
+
+// Define struct used to perform comparisons for SSVAR bins
+struct ssvar_bin_cmp {
+  bool operator()(const ConcatString & cs1, const ConcatString & cs2) const {
+
+    // Check for string equality
+    if(strcmp(cs1, cs2) == 0) return(0);
+
+    // Otherwise, parse list of numbers and compare each element
+    StringArray sa1 = cs1.split(":");
+    StringArray sa2 = cs2.split(":");
+    for(int i=0; i<min(sa1.n_elements(), sa2.n_elements()); i++) {
+       if(!is_eq(atof(sa1[i]), atof(sa2[i]))) {
+          return(atof(sa1[i]) < atof(sa2[i]));
+       }
+    }
+    return(-1);
+  }
+};
+
+struct AggrSSVARInfo {
+   map<ConcatString, SSVARInfo, ssvar_bin_cmp> ssvar_bins;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -141,6 +165,11 @@ extern void aggr_rhist_lines(
 extern void aggr_orank_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrORANKInfo> &,
+               int &, int &);
+
+extern void aggr_ssvar_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrSSVARInfo> &,
                int &, int &);
 
 ////////////////////////////////////////////////////////////////////////

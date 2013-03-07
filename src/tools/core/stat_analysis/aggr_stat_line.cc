@@ -21,6 +21,7 @@
 //   003    06/21/10  Halley Gotway   Add support for vif_flag.
 //   004    07/28/10  Halley Gotway   Write out lines prior to error
 //                    checking and add input line to error messages.
+//   005    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -103,7 +104,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
             default:
                mlog << Error << "\naggr_ctc_lines() -> "
                     << "line type value of " << statlinetype_to_string(line.type())
-                    << " not currently supported for the aggregation job!\n"
+                    << " not currently supported for the aggregation job.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
          } // end switch
@@ -216,7 +217,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
 
          if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
             mlog << Error << "\naggr_ctc_lines() -> "
-                 << "should be no ties in the valid time array!\n\n";
+                 << "should be no ties in the valid time array.\n\n";
             throw(1);
          }
 
@@ -285,7 +286,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
          if(line.type() != stat_mctc) {
             mlog << Error << "\naggr_mctc_lines() -> "
                  << "should only encounter multi-category contingency table count "
-                 << "(MCTC) line types!\n"
+                 << "(MCTC) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
@@ -403,7 +404,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
 
          if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
             mlog << Error << "\naggr_mctc_lines() -> "
-                 << "should be no ties in the valid time array!\n\n";
+                 << "should be no ties in the valid time array.\n\n";
             throw(1);
          }
 
@@ -456,7 +457,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
          if(line.type() != stat_pct) {
             mlog << Error << "\naggr_pct_lines() -> "
                  << "should only encounter probability contingency table (PCT) "
-                 << "line types!\n"
+                 << "line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
@@ -590,7 +591,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
 
          if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
             mlog << Error << "\naggr_pct_lines() -> "
-                 << "should be no ties in the valid time array!\n\n";
+                 << "should be no ties in the valid time array.\n\n";
             throw(1);
          }
 
@@ -678,7 +679,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
 
             default:
                mlog << Error << "\naggr_psum_lines() -> "
-                    << "should only encounter partial sum line types!\n"
+                    << "should only encounter partial sum line types.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
          } // end switch
@@ -777,7 +778,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
 
          if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
             mlog << Error << "\naggr_psum_lines() -> "
-                 << "should be no ties in the valid time array!\n\n";
+                 << "should be no ties in the valid time array.\n\n";
             throw(1);
          }
 
@@ -852,7 +853,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                
             default:
                mlog << Error << "\naggr_wind_lines() -> "
-                    << "should only encounter vector partial sum line types!\n"
+                    << "should only encounter vector partial sum line types.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
          } // end switch
@@ -924,7 +925,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(line.type() != stat_mpr) {
             mlog << Error << "\naggr_mpr_lines() -> "
-                 << "should only encounter matched pair (MPR) line types!\n"
+                 << "should only encounter matched pair (MPR) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
@@ -981,7 +982,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
                m[key].obs_var  != cur.obs_var) {
                mlog << Error << "\nread_mpr_lines() -> "
                     << "both the forecast and observation variable types must "
-                    << "remain constant!  Try setting \"-fcst_var\" and/or "
+                    << "remain constant.  Try setting \"-fcst_var\" and/or "
                     << "\"-obs_var\".\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
                throw(1);
@@ -1025,7 +1026,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
          if(line.type() != stat_isc) {
             mlog << Error << "\naggr_isc_lines() -> "
                  << "should only encounter intensity-scale "
-                 << "(ISC) line types!\n"
+                 << "(ISC) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
@@ -1096,7 +1097,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
                  << "\"-column_min NSCALE n\" and "
                  << "\"-column_max NSCALE n\" options to "
                  << "filter out only those lines you'd like "
-                 << "to aggregate!\n"
+                 << "to aggregate.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
@@ -1275,7 +1276,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          if(line.type() != stat_rhist) {
             mlog << Error << "\naggr_rhist_lines() -> "
                  << "should only encounter ranked histogram "
-                 << "(RHIST) line types!\n"
+                 << "(RHIST) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
@@ -1399,13 +1400,13 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          if(line.type() != stat_orank) {
             mlog << Error << "\naggr_orank_lines() -> "
                  << "should only encounter observation rank "
-                 << "(ORANK) line types!\n"
+                 << "(ORANK) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
 
          //
-         // Parse the current RHIST line
+         // Parse the current ORANK line
          //
          parse_orank_line(line, cur);
 
@@ -1452,6 +1453,94 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].ens_pd.crps_na.add(crps);
          m[key].ens_pd.ign_na.add(ign);
          m[key].ens_pd.pit_na.add(pit);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
+                      map<ConcatString, AggrSSVARInfo> &m,
+                      int &n_in, int &n_out) {
+   STATLine line;
+   AggrSSVARInfo aggr;
+   SSVARInfo cur;
+   ConcatString case_key, bin_key;
+   ConcatString fcst_var, obs_var;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Write line to dump file
+         //
+         if(j.dr_out) *(j.dr_out) << line;
+
+         if(line.type() != stat_ssvar) {
+            mlog << Error << "\naggr_ssvar_lines() -> "
+                 << "should only encounter spread-skill variance "
+                 << "(SSVAR) line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Only aggregate consistent variable names
+         //
+         if(fcst_var.empty()) fcst_var = line.get_item(fcst_var_offset);
+         if(obs_var.empty())  obs_var  = line.get_item(obs_var_offset);
+         
+         if(fcst_var != line.get_item(fcst_var_offset) ||
+            obs_var  != line.get_item(obs_var_offset)) {
+            mlog << Error << "\nread_ssvar_lines() -> "
+                 << "both the forecast and observation variable types must "
+                 << "remain constant.  Try setting \"-fcst_var\" and/or "
+                 << "\"-obs_var\".\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current SSVAR line
+         //
+         parse_ssvar_line(line, cur);
+
+         //
+         // Build the case map and bin map keys for the current line
+         //
+         case_key = j.get_case_info(line);
+         bin_key << cs_erase << cur.var_min << ":" << cur.var_max;
+
+         //
+         // Add a new case map entry, if necessary
+         //
+         if(m.count(case_key) == 0) {
+            aggr.ssvar_bins.clear();
+            m[case_key] = aggr;
+         }
+
+         //
+         // Add a new bin map entry, if necessary
+         //
+         if(m[case_key].ssvar_bins.count(bin_key) == 0) {
+            m[case_key].ssvar_bins[bin_key] = cur;
+         }
+         //
+         // Otherwise, aggregate with the existing bin entry
+         //
+         else {
+            m[case_key].ssvar_bins[bin_key] += cur;
+         }
 
          n_out++;
       }

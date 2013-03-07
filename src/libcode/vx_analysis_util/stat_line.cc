@@ -1058,6 +1058,10 @@ switch(type) {
       offset = get_orank_column_offset(c);
       break;
 
+   case stat_ssvar:
+      offset = get_column_offset(ssvar_columns, n_ssvar_columns, c);
+      break;
+
    default:
       mlog << Error << "\ndetermine_column_offset() -> "
            << "unexpected line type value of " << type << "\n\n";

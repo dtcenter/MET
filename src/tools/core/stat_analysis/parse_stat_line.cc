@@ -18,6 +18,7 @@
 //   001    05/24/10  Halley Gotway   Add parse_rhist_line and
 //                    parse_orank_line.
 //   002    06/09/10  Halley Gotway   Add parse_mctc_ctable.
+//   003    03/07/13  Halley Gotway   Add parse_ssvar_line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -327,6 +328,27 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    for(i=0; i<o_data.n_ens; i++) {
       o_data.ens_na.add(atof(l.get_item(orank_ens_offset(i))));
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_ssvar_line(STATLine &l, SSVARInfo &s_info) {
+
+   s_info.n_bin    = atoi(l.get_item(ssvar_n_bin_offset));
+   s_info.bin_i    = atoi(l.get_item(ssvar_bin_i_offset));
+   s_info.bin_n    = atoi(l.get_item(ssvar_bin_n_offset));
+
+   s_info.var_min  = atof(l.get_item(ssvar_var_min_offset));
+   s_info.var_max  = atof(l.get_item(ssvar_var_max_offset));
+   s_info.var_mean = atof(l.get_item(ssvar_var_mean_offset));
+
+   s_info.fbar     = atof(l.get_item(ssvar_fbar_offset));
+   s_info.obar     = atof(l.get_item(ssvar_obar_offset));
+   s_info.fobar    = atof(l.get_item(ssvar_fobar_offset));
+   s_info.ffbar    = atof(l.get_item(ssvar_ffbar_offset));
+   s_info.oobar    = atof(l.get_item(ssvar_oobar_offset));
 
    return;
 }
