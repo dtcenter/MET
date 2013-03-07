@@ -751,7 +751,7 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
 
    // Add statistic value for each possible SL1L2 column
    for(i=0; i<conf_info.output_stats[stat_sl1l2].n_elements(); i++) {
-      store_stat_sl1l2(n, conf_info.output_stats[stat_cnt][i],
+      store_stat_sl1l2(n, conf_info.output_stats[stat_sl1l2][i],
                        cnt_info);
    }
 
