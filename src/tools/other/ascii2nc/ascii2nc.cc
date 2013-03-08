@@ -188,6 +188,8 @@ FileHandler *create_file_handler(const ASCIIFormat format,
   }
   
   }
+
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
