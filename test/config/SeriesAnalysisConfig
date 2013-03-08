@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "GFS";
+model = "${MODEL}";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -17,18 +17,14 @@ model = "GFS";
 // Forecast and observation fields to be verified
 //
 fcst = {
-
-   cat_thresh  = [ >0.0, >5.0 ];
-
-   field = [
-      {
-         name  = "APCP";
-         level = [ "A06" ];
-      }
-   ];
-
+   cat_thresh = [ ${FCST_CAT_THRESH} ];
+   field      = [ ${FCST_FIELD}      ];
 };
-obs = fcst;
+
+obs = {
+   cat_thresh = [ ${OBS_CAT_THRESH} ];
+   field      = [ ${OBS_FIELD}      ];
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +48,7 @@ boot = {
 //
 mask = {
    grid = "";
-   poly = "";
+   poly = "${MASK_POLY}";
 };
 
 //
@@ -72,17 +68,17 @@ vld_thresh = 1.0;
 // Statistical output types
 //
 output_stats = {
-   fho    = [ "F_RATE",  "O_RATE"            ];
-   ctc    = [  "FY_OY",   "FN_ON"            ];
-   cts    = [    "CSI",     "GSS"            ];
-   mctc   = [  "F1_O1",   "F2_O2",   "F3_O3" ];
-   mcts   = [    "ACC", "ACC_NCL", "ACC_NCU" ];
-   cnt    = [     "ME",  "ME_NCL",  "ME_NCU" ];
-   sl1l2  = [   "FBAR",    "OBAR"            ];
-   pct    = [ ];
-   pstd   = [ ];
-   pjc    = [ ];
-   prc    = [ ];
+   fho    = [ ${FHO_STATS}   ];
+   ctc    = [ ${CTC_STATS}   ];
+   cts    = [ ${CTS_STATS}   ];
+   mctc   = [ ${MCTC_STATS}  ];
+   mcts   = [ ${MCTS_STATS}  ];
+   cnt    = [ ${CNT_STATS}   ];
+   sl1l2  = [ ${SL1L2_STATS} ];
+   pct    = [ ${PCT_STATS}   ];
+   pstd   = [ ${PSTD_STATS}  ];
+   pjc    = [ ${PJC_STATS}   ];
+   prc    = [ ${PRC_STATS}   ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
