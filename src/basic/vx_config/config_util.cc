@@ -278,22 +278,11 @@ StringArray parse_conf_message_type(Dictionary *dict) {
    
    sa = dict->lookup_string_array(conf_key_message_type);
 
-   // Check that at least one PrepBufr message type is provided
+   // Check that at least one message type is provided
    if(sa.n_elements() == 0) {
       mlog << Error << "\nparse_conf_message_type() -> "
-           << "At least one PrepBufr message type must be provided.\n\n";
+           << "At least one message type must be provided.\n\n";
       exit(1);
-   }
-
-   // Check that each PrepBufr message type provided is valid
-   for(i=0; i<sa.n_elements(); i++) {
-
-      if(strstr(vld_msg_typ_str, sa[i]) == NULL) {
-         mlog << Error << "\nparse_conf_message_type() -> "
-              << "Invalid message type string provided ("
-              << sa[i] << ").\n\n";
-         exit(1);
-      }
    }
 
    return(sa);
