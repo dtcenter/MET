@@ -368,8 +368,10 @@ void PairDataEnsemble::compute_ssvar() {
       pt.o   = o_na[i];
 
       // Determine the bin for the current point and add it to the list
-      string ssvar_min =
-            str_format("%.5e", var - fmod(var,ssvar_bin_size)).contents();
+      // Bins are defined starting at 0 and are left-closed, right-open
+      j=0;
+      while(var > (j+1)*ssvar_bin_size || is_eq(var, (j+1)*ssvar_bin_size)) j++;
+      string ssvar_min = str_format("%.5e", j*ssvar_bin_size).contents();
       if( !bins.count(ssvar_min) ){
          ssvar_pt_list pts;
          pts.push_back(pt);
