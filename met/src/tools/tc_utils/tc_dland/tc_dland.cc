@@ -160,7 +160,7 @@ void process_command_line(int argc, char **argv) {
 void process_distances() {
    int n, x, y, c;
    double latd, lond;
-   float latf, lonf1, lonf2, d1, d2;
+   float latf, lonf;
    float *dland = (float *) 0;
    ConcatString data_file = replace_path(land_data_file);
 
@@ -230,24 +230,18 @@ void process_distances() {
         
          // Convert x,y to lat,lon
          grid.xy_to_latlon(x, y, latd, lond);
-         latf  = (float) latd;
-         lonf1 = (float) rescale_deg(-1.0*lond, -360.0,   0.0);
-         lonf2 = (float) rescale_deg(-1.0*lond,    0.0, 360.0);
+         latf = (float) latd;
+         lonf = (float) rescale_deg(-1.0*lond, -180.0, 180.0);
 
          // Compute distance to land
-         aland_(data_file, &lonf1, &latf, &d1);
-         aland_(data_file, &lonf2, &latf, &d2);
+         aland_(data_file, &lonf, &latf, &dland[n]);
 
-         // Convert to nuatical miles and store the minimum
-         d1 *= nautical_miles_per_km;
-         d2 *= nautical_miles_per_km;
-         dland[n] = min(d1, d2);
+         // Convert to nuatical miles
+         dland[n] *= nautical_miles_per_km;
 
          mlog << Debug(4)
-              << "Lat = "  << latf     << ", "
-              << "Lon1 = " << lonf1    << ", Dist1 = " << d1 << " nm, "
-              << "Lon2 = " << lonf2    << ", Dist2 = " << d2 << " nm, "
-              << "Dist = " << dland[n] << " nm\n";
+              << "Lat = " << latf << ", Lon = " << lonf
+              << ", Dist = " << dland[n] << " nm\n";
 
       } // end for y
    } // end for x
