@@ -216,7 +216,7 @@ if ( !Thresholds )  {
 
 }
 
-if ( t < Thresholds[0] && !is_eq(t, Thresholds[0]) )          return ( -1 );
+if ( t < Thresholds[0]     && !is_eq(t, Thresholds[0]) )      return ( -1 );
 
 if ( t > Thresholds[Nrows] && !is_eq(t, Thresholds[Nrows]) )  return ( -1 );
                                                //  Thresholds array is of size Nrows + 1, so
@@ -226,7 +226,8 @@ int j;
 
 for (j=0; j<Nrows; ++j)  {
 
-   if ( ( (t > Thresholds[j]) || is_eq(t, Thresholds[j] ) ) && (t < Thresholds[j + 1]) )  return ( j );
+   if ( ( t > Thresholds[j    ] ||  is_eq(t, Thresholds[j    ]) ) &&
+        ( t < Thresholds[j + 1] && !is_eq(t, Thresholds[j + 1]) ) )  return ( j );
 
 }
 
