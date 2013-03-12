@@ -32,9 +32,19 @@ echo
 ./test_pb2nc.sh
 
 echo
+echo "*** Testing PLOT_POINT_OBS application ***"
+echo
+./test_plot_point_obs.sh
+
+echo
 echo "*** Testing ASCII2NC application ***"
 echo
 ./test_ascii2nc.sh
+
+echo
+echo "*** Testing MADIS2NC application ***"
+echo
+./test_madis2nc.sh
 
 echo
 echo "*** Testing Point-Stat application ***"
@@ -60,6 +70,11 @@ echo
 echo "*** Testing MODE-Analysis application ***"
 echo
 ./test_mode_analysis.sh
+
+echo
+echo "*** Testing PLOT_DATA_PLANE application ***"
+echo
+./test_plot_data_plane.sh
 
 echo
 echo "*** Finished Testing the Model Evaluation Tools Project ***"
