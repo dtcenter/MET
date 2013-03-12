@@ -3,12 +3,11 @@
 echo
 echo "*** Running PLOT_DATA_PLANE on a sample GRIB1 gridded file  ***"
 ../bin/plot_data_plane \
-   ../data/sample_fcst/2012040900/nam/nam_2012040900_F012.grib \
-   ${TEST_OUT_DIR}/plot_data_plane/nam_2012040900_F012_GRIB1_APCP_12.ps \
-   'name = "APCP"; level = "A12";' \
-    -title "GRIB1 NAM 12-hour APCP" \
-    -v 1
-
+  ../data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
+  ${TEST_OUT_DIR}/plot_data_plane/nam.t00z.awip1236.tm00.20070330_TMPZ2.ps \
+  'name="TMP"; level="Z2";' \
+   -title "GRIB1 NAM Z2 TMP" \
+   -v 1
 
 echo
 echo "*** Running PLOT_DATA_PLANE on a sample netCDF file  ***"
