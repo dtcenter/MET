@@ -45,11 +45,11 @@ rmFile = function(file, warn=FALSE){
 # dirLookin: string containing folder pattern to specify for lookin option
 #      show: specifies whether to show stat_analysis command and output, default TRUE
 runStatAnalysis = function(crit, job, fileDump, fileOut, dirLookin, show=TRUE){
-		
+
 	# remove the stat_analysis output, if it exists
 	rmFile(fileDump);
 	rmFile(fileOut);
-	
+
 	# build and run the stat_analysis command
 	strCmdSa = paste(strSaExec, " \\", "\n", "  -lookin ", dirLookin, " -v 2 \\", "\n", sep="");
 	for( strCrit in names(crit) ){
@@ -70,9 +70,9 @@ runStatAnalysis = function(crit, job, fileDump, fileOut, dirLookin, show=TRUE){
 #   fileOut: string(s) containing path and filename of existing stat_analysis output file
 #  fileStat: string containing path and filename of stat file to write
 readStatAnalysisOutput = function(fileOut, fileStat){
-	
+
 	# append the contents of the stat_analysis output file to the specified stat file 
-	rmFile(fileStat);	
+	rmFile(fileStat);
 	for(strFile in fileOut){
 		strCmdFmtStat = paste("cat", strFile, 
 				"| perl -e\'while(<>){",
@@ -81,7 +81,7 @@ readStatAnalysisOutput = function(fileOut, fileStat){
 					"print \"$_\";",
 				"}\'", 
 				">>", fileStat);
-		system(strCmdFmtStat);		
+		system(strCmdFmtStat);
 	}
 
 	# read the formatted stat file into a dataframe and return it
@@ -114,7 +114,7 @@ compListStr = function(l1, l2, warn, verb){
 	listMiss = l2[ !(l2 %in% l1) ];
 	if( 0 < length(listMiss) ){
 		if( 1 <= verb ){ 
-			cat("WARNING:", warn, length(listMiss), "\n");	
+			cat("WARNING:", warn, length(listMiss), "\n");
 			if( 2 <= verb ){ for(strMiss in listMiss){ cat("   ", strMiss, "\n");	} }
 		} else {
 			quit(status=1);
@@ -140,7 +140,7 @@ compMapStr = function(m1, m2, warn, verb){
 		if( strAttr == "RunCommand" ){ next; }
 		if( m1[[strAttr]] != m2[[strAttr]] ){
 			if( 1 <= verb ){ 
-				cat("WARNING:", warn, strAttr, "\n");	
+				cat("WARNING:", warn, strAttr, "\n");
 			} else {
 				quit(status=1);
 			}
@@ -206,9 +206,9 @@ readStatData = function(stat, ver, lty, rmTmp=TRUE){
 	strLtyPar = sub("\\w+#(\\d+)", "\\1", lty, perl=T);
 	if( lty != strLtyPar ){
 		intLtyLen = as.numeric(strLtyPar);
-		lty = sub("(\\w+)#\\d+", "\\1", lty, perl=T);		
+		lty = sub("(\\w+)#\\d+", "\\1", lty, perl=T);
 	}
-	
+
 	# build the list of headers and the parsing string for the line type
 	intLtyIdx = isLtyVarLength(lty, ver);
 	listHdr = getStatHeaders(ver, lty);
@@ -222,17 +222,17 @@ readStatData = function(stat, ver, lty, rmTmp=TRUE){
 		for(intIdx in seq(intLtyIdx, intLtyLen)){ listHdr = append(listHdr, paste("COL", intIdx, sep="_")); }
 		strParse = paste(strParse, " and (", intLtyLen, " == @l)", sep="");
 	}
-	
+
 	# write the headers to a temp file
 	strTmp = paste(strDirTmp, "/", "tmp_", lty, "_", as.numeric(Sys.time()), ".stat", sep="");
 	cat( paste(listHdr, collapse=" "), "\n", file=strTmp );
-	
+
 	# write the rows corresponding to the input line type to the temp file
 	strCmdTmp = paste("cat ", stat, " | ",
 					  "perl -e'while(<>){@l=split(); next unless ", strParse, "; print $_;}' ",
 					  " >> ", strTmp, sep="");
 	system( strCmdTmp );
-	
+
 	# read the temp file into a data frame and return it
 	dfStat = read.table(strTmp, header=T);
 	if( TRUE == rmTmp ){ rmFile(strTmp) }
@@ -264,21 +264,21 @@ getStatMetVer = function(stat){
 #      stat: path and filename of a MET stat file to read line types from
 getStatLty = function(stat){
 	strVer = getStatMetVer(stat);
-	
+
 	# parse out the distinct line types present in the input file
 	strCmdLty = paste("cat ", stat, " 2>/dev/null | egrep '^V[0-9]' | awk '{print $21}' | sort -u", sep="");
 	listLty = system(strCmdLty, intern=T);
-	
+
 	# modify the list to include the length of variable length lines
 	listLtyRet = c();
 	for(strLty in listLty){
-		
+
 		# for lines of fixed length, add them and continue
 		if( 0 == isLtyVarLength(strLty, strVer) ){
 			listLtyRet = append(listLtyRet, strLty);
 			next;
 		}
-		
+
 		# for lines of variable length, add an entry for each distinct length
 		strCmdLtyLin = paste(
 				"LT=$(cat ", stat, " | egrep ' ", strLty, " ' | wc -l); ", 
@@ -313,15 +313,15 @@ getStatLty = function(stat){
 #     verb: (optional) verbosity level, 0 for no output
 #   strict: (optional) require strict numerical equality, default no
 compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
-	
+
 	# check for "empty" stat files
 	if( isStatEmpty(stat1) ){ cat("ERROR: stat file", stat1, "contains no data\n"); return (NA); }
 	if( isStatEmpty(stat2) ){ cat("ERROR: stat file", stat2, "contains no data\n"); return (NA); }
-	
+
 	# determine the version of the two stat files
 	strV1 = getStatMetVer(stat1);
 	strV2 = getStatMetVer(stat2);
-		
+
 	# get the headers and determine and determine if there are differences therein
 	strLtyPar = sub("(\\w+)(#\\d+)?", "\\1", lty, perl=T)
 	listV1Hdr = getStatHeaders(strV1, strLtyPar);
@@ -344,11 +344,11 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	}
 	boolTestHdr = ( (1 > length(listV1HdrExt)) & (1 > length(listV2HdrExt)) );
 	listHdr = listV1Hdr[listV1Hdr %in% listV2Hdr];
-	
+
 	# build the complete path and file names of the stat files and read them into data frames 
 	dfV1 = readStatData(stat1, strV1, lty);
 	dfV2 = readStatData(stat2, strV2, lty);
-	
+
 	# check for a mis-match on number of rows, and report if any are found
 	listNrow = c(nrow(dfV1), nrow(dfV2));
 	boolTestNrow = ( listNrow[1] == listNrow[2] );
@@ -368,7 +368,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 		if( 0 < intNumDiff ){
 			if( 1 <= verb ){
 				cat("WARNING: header information mismatch in column ", 
-						listHeaderCols[intCol], sep="");				
+						listHeaderCols[intCol], sep="");
 			}
 			return (list("hdr" = FALSE));
 		}
@@ -404,7 +404,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 			listDiff = as.numeric(as.character(dfV1[[strCol]]) != as.character(dfV2[[strCol]]));
 		}
 		listDiff[ is.na(listDiff) ] = 0;
-		
+
 		# report any differences found
 		intNumDiff = sum(listDiff != 0);
 		if( 0 < intNumDiff ){
@@ -424,13 +424,13 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 			if( 3 <= verb ){
 				cat(paste(dfV1[listDiff != 0,][[strCol]], "vs.", dfV2[listDiff != 0,][[strCol]], "\n"), sep="");
 			}
-			
+
 			if( TRUE  == boolBc ){ boolTestNumBc	= FALSE; } 
 			if( FALSE == boolBc ){ boolTestNum		= FALSE; }
-			
+
 		}
 	}
-	
+
 	listRet = list(
 		"num"		= boolTestNum, 
 		"num_bc"	= boolTestNumBc,
@@ -459,10 +459,10 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	listTest = list();
 
 	# verify that the files exist
-	if( ! fileExists(stat1) ){ cat("ERROR: stat file does not exist:", stat1, "\n"); return (NA); }	
-	if( ! fileExists(stat2) ){ cat("ERROR: stat file does not exist:", stat2, "\n"); return (NA); }	
+	if( ! fileExists(stat1) ){ cat("ERROR: stat file does not exist:", stat1, "\n"); return (NA); }
+	if( ! fileExists(stat2) ){ cat("ERROR: stat file does not exist:", stat2, "\n"); return (NA); }
 
-	# if the files are mode files, convert them to temporary stat files
+	# if the files are MODE files, convert them to temporary stat files
 	if( TRUE == grepl("^.*[^a-z]mode[^a-z].*\\.txt$", stat1, perl=T) ){
 		strTmp1 = paste(strDirTmp, "/", "tmp_mode1_", as.numeric(Sys.time()), ".stat", sep="");
 		system( paste(strModeConv, stat1, ">", strTmp1) );
@@ -474,7 +474,20 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	} else {
 		rmStat = FALSE;
 	}
-	
+
+	# if the files are .tcst files, convert them to temporary stat files
+	if( TRUE == grepl("^.*\\.tcst$", stat1, perl=T) ){
+		strTmp1 = paste(strDirTmp, "/", "tmp_tcst1_", as.numeric(Sys.time()), ".stat", sep="");
+		system( paste(strTcstConv, stat1, ">", strTmp1) );
+		stat1 = strTmp1;
+		strTmp2 = paste(strDirTmp, "/", "tmp_tcst2_", as.numeric(Sys.time()), ".stat", sep="");
+		system( paste(strTcstConv, stat2, ">", strTmp2) );
+		stat2 = strTmp2;
+		rmStat = TRUE;
+	} else {
+		rmStat = FALSE;
+	}
+
 	# compare the line types present in the two files
 	listV1Lty = getStatLty(stat1);
 	listV2Lty = getStatLty(stat2);
@@ -491,18 +504,18 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	listTotHist = c();
 	intTotComp = 0;
 	intTotDiff = 0;
-	
+
 	# for common line types, perform a line type comparison
 	listLty = listV1Lty[ listV1Lty %in% listV2Lty ];
 	for(strLty in listLty){
-		
+
 		# perform the comparison for the current line type
 		listResults = compareStatLty(stat1, stat2, strLty, verb, strict);
 
 		# store performance information, if present
 		if( is.null(listResults$tot_comp) == FALSE ){
 			listTotHist = append(listTotHist, listResults$tot_hist);
-			listResults$tot_hist = NULL;			
+			listResults$tot_hist = NULL;
 			intTotComp = intTotComp + listResults$tot_comp;
 			listResults$tot_comp = NULL;
 			intTotDiff = intTotDiff + listResults$tot_diff;
@@ -521,7 +534,7 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	listTest$tot_hist	= listTotHist;
 	listTest$tot_comp	= intTotComp;
 	listTest$tot_diff	= intTotDiff;
-	
+
 	# remove the temporary mode files, if required
 	if( TRUE == rmStat ){
 		rmFile(stat1);
@@ -541,7 +554,7 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 #      verb: (optional) verbosity level, 0 for no output
 #      hist: (optional) path and filename to write error histogram to
 printCompReport = function(listTest, verb=0, hist=""){
-	
+
 	# print the performance information
 	if( 1 <= verb ){
 		cat("\nSUMMARY for non-bootstrap numerical values\n",
@@ -551,7 +564,7 @@ printCompReport = function(listTest, verb=0, hist=""){
 			sum = summary(listTest$tot_hist);
 			for(stat in names(sum)){
 				cat(format( paste(stat, ":", sep=""), justify="right", width=12 ), sum[[stat]], "\n");
-			}	
+			}
 			if( hist != "" ){
 				bitmap(hist);
 				hist(listTest$tot_hist, xlab="Error Size", ylab="Frequency", main=hist);
@@ -564,7 +577,7 @@ printCompReport = function(listTest, verb=0, hist=""){
 	listTest$tot_comp = NULL;
 	listTest$tot_diff = NULL;
 	listTest$tot_hist = NULL;
-	
+
 	# print the results of the individual stat file tests
 	for(strLty in names( listTest )){
 		if( is.na( listTest[[strLty]] ) ){
@@ -627,15 +640,15 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	strCmd = paste(strNcDiffExec, " \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcDiff, sep="");
 	if( 2 <= verb ){ cat("NCDIFF:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
-	
+
 	# if the ncdiff file failed for some reason, warn and quit
 	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
 			cat("WARNING: ncdiff error ", strCmdOut, "\n");
-			
+
 			# if there is a variable mismatch, print a side-by-side table of variable names in the NetCDF files
 			if( TRUE == grepl("variable .* is in list one and not in list two", strCmdOut) ){
-				strNcV = paste(strDirTmp, "/", "ncv_", as.numeric(Sys.time()), ".txt", sep="");	
+				strNcV = paste(strDirTmp, "/", "ncv_", as.numeric(Sys.time()), ".txt", sep="");
 				strCmd = paste(strNcDumpExec, nc1, "| grep -P '^\\t\\w' >",  strNcV, "; echo >> ", strNcV, ";",
 							   strNcDumpExec, nc2, "| grep -P '^\\t\\w' >>", strNcV, "; cat", strNcV, "| perl -e'",
 							   "while(<>){if(/^\\s*$/){$s++;next;}chomp();if(!$s){push @l1,$_}else{push @l2,$_}}",
@@ -657,41 +670,41 @@ compareNc = function(nc1, nc2, verb, strict=0){
 			quit(status=1);
 		}
 	}
-	
+
 	# open the NetCDF files for reading
 	ncFile1 = open.ncdf(c(nc1), write=F);
 	ncFile2 = open.ncdf(c(nc2), write=F);
 	ncFileD = open.ncdf(c(strNcDiff), write=F);
-	
+
 	# read the global attributes from each file
 	listAtt1 = att.get.ncdf(ncFile1, varid=0);
 	listAtt1Nam = names(listAtt1);
 	listAtt2 = att.get.ncdf(ncFile2, varid=0);
 	listAtt2Nam = names(listAtt2);
-	
+
 	# compare the global attributes
 	compListStr(listAtt1Nam, listAtt2Nam, paste("file", nc1, "missing global attributes:"), verb);
 	compListStr(listAtt2Nam, listAtt1Nam, paste("file", nc2, "missing global attributes:"), verb);
 	compMapStr (listAtt1, listAtt2, "value of global attribute differs for", verb);
-	
+
 	# establish the numerical difference threshold
 	dblDiffThresh = 10^(-1*intSigFig);
-	if( TRUE == strict ){ dblDiffThresh = 0; }	
-	
+	if( TRUE == strict ){ dblDiffThresh = 0; }
+
 	# for each variable present in the file, check for differences
 	for(strVar in names(ncFileD$var)){
-		
+
 		# check the variable attributes for differences
 		listAtt1 = att.get.ncdf(ncFile1, varid=strVar);
 		listAtt1Nam = names(listAtt1);
 		listAtt2 = att.get.ncdf(ncFile2, varid=strVar);
 		listAtt2Nam = names(listAtt2);
-		
+
 		# compare the field attributes
 		compListStr(listAtt1Nam, listAtt2Nam, paste("file", nc1, "missing field", strVar, "attributes:"), verb);
 		compListStr(listAtt2Nam, listAtt1Nam, paste("file", nc2, "missing field", strVar, "attributes:"), verb);
-		compMapStr (listAtt1, listAtt2, paste("value of field", strVar, "attribute differs for"), verb);	
-		
+		compMapStr (listAtt1, listAtt2, paste("value of field", strVar, "attribute differs for"), verb);
+
 		# check the numerical data for differences
 		dataNcVar = get.var.ncdf(ncFileD, ncFileD$var[[ strVar ]]);
 		boolDiff = FALSE;
@@ -715,15 +728,15 @@ compareNc = function(nc1, nc2, verb, strict=0){
 			boolDiff = (0 < sum(listDiff));
 			if( TRUE == boolDiff & 1 <= verb ){ cat("WARNING:", sum(listDiff), "string difference(s) found in var", strVar, "\n"); }
 		}
-		
+
 		# quit or print a message depending on the presence of a difference and verbosity
 		if( boolDiff ){
 			if( 0 == verb ){ quit(status=1); }
 		}
 		else if( 1 <= verb ){ cat("passed", strVarType, "var", strVar, "\n"); }
-		
+
 	}
-	
+
 	# close the diff file
 	close.ncdf(ncFile1);
 	close.ncdf(ncFile2);

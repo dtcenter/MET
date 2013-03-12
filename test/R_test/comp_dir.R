@@ -45,16 +45,16 @@ strDir2 = gsub("/$", "", listArgs[2]);
 if( 1 <= verb ){ cat("dir1:", strDir1, "\ndir2:", strDir2, "\n\n"); }
 
 # build a list of files in each stat folder
-listTest1 = system(paste("find", strDir1, "| egrep '\\.stat$|\\.txt$|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
+listTest1 = system(paste("find", strDir1, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
 listTest1Files = gsub(paste(strDir1, "/", sep=""), "", listTest1);
-listTest2 = system(paste("find", strDir2, "| egrep '\\.stat$|\\.txt$|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
+listTest2 = system(paste("find", strDir2, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
 listTest2Files = gsub(paste(strDir2, "/", sep=""), "", listTest2);
 
 # report files missing from stat folder 1
 listMiss = listTest2Files[ !(listTest2Files %in% listTest1Files) ];
 if( 0 < length(listMiss) ){
 	if( 1 <= verb ){ 
-		cat("WARNING: folder", strDir1, "missing", length(listMiss), "files\n");	
+		cat("WARNING: folder", strDir1, "missing", length(listMiss), "files\n");
 		if( 2 <= verb ){ for(strMiss in listMiss){ cat("   ", strMiss, "\n");	} }
 	} else {
 		quit(status=1);
@@ -74,45 +74,46 @@ if( 0 < length(listMiss) ){
 
 # compare the files that are common to both stat folders
 for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
-	
+
   if( 1 <= verb ){
       cat("\n# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #\n\n",
           "COMPARING ", strFile, "\n", sep="");
   }
-	
+
 	# build the two stat file names
 	strFile1 = paste(strDir1, "/", strFile, sep="");
 	strFile2 = paste(strDir2, "/", strFile, sep="");
-	
+
 	# if the files are NetCDF, compare accordingly
 	if( TRUE == grepl("\\.nc$", strFile1, perl=T) ){
 		if( 1 <= verb ){ cat("file1: ", strFile1, "\nfile2: ", strFile2, "\n", sep=""); }
 		compareNc(strFile1, strFile2, verb, strict);
 	}
-	
+
 	# if the files are PostScript or end in .out, compare accordingly
 	else if( TRUE == grepl("\\.out$", strFile1, perl=T) || TRUE == grepl("\\.ps$",  strFile1, perl=T) ){
 		if( 1 <= verb ){ cat("file1: ", strFile1, "\nfile2: ", strFile2, "\n", sep=""); }
 		compareDiff(strFile1, strFile2, verb);
 	}
-	
+
 	# compare the stat files and print a report
 	else {
 		strHistFile = "";
 		if( 1 == hist ){
 			strHistFile = gsub("\\.stat$", ".png", strFile);
+			strHistFile = gsub("\\.tcst$", ".png", strHistFile);
 			strHistFile = gsub("\\.txt$",  ".png", strHistFile);
 		}
 		if( 1 <= verb ){ cat("file1: ", strFile1, "\nfile2: ", strFile2, "\n", sep=""); }
 		listTest = compareStat(strFile1, strFile2, verb, strict);
 		printCompReport(listTest, verb, strHistFile);
 	}
-	
+
 }
 
 if( 1 <= verb ){
   cat("\n# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #\n\n",
       "comp_dir complete\n");
 }
-	
+
 

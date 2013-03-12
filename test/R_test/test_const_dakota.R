@@ -19,6 +19,7 @@ listNcDiffAttrExcl = c("FileOrigins");
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 strNcDiffExec = "/usr/local/bin/ncdiff";
 strModeConv   = paste(strDirTest, "/bin/mode_conv.pl", sep="");
+strTcstConv   = paste(strDirTest, "/bin/tcst_conv.pl", sep="");
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 

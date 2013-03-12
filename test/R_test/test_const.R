@@ -34,6 +34,7 @@ strNcDumpExec = "/usr/local/netcdf3/bin/ncdump";
 strDiffExec   = "/usr/bin/diff";
 strEgrepExec  = "/bin/egrep";
 strModeConv   = paste(strDirTest, "/perl/mode_conv.pl", sep="");
+strTcstConv   = paste(strDirTest, "/perl/tcst_conv.pl", sep="");
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
