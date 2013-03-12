@@ -773,9 +773,12 @@ compareDiff = function(file1, file2, verb=0){
 	# if the diff failed, warn and quit
 	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
-		  cat("WARNING: diff error:", strCmdOut, sep="\n");
+			cat("WARNING: diff error:", strCmdOut, sep="\n");
+			return();  
+		} else {
+			quit(status=1);
 		}
-		quit(status=1);
+
 	}
 	else if( 1 <= verb ){ cat("passed diff\n"); }
 
