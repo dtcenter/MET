@@ -807,7 +807,7 @@ void ModeExecutive::write_obj_netcdf()
          // Get raw values and object ID's for each grid box
          //
          if(engine.fcst_split->is_nonzero(x, y) ) {
-            fcst_obj_raw_data[n] = engine.fcst_obj_raw->data(x, y);
+            fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
             fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
          }
          else {
@@ -816,7 +816,7 @@ void ModeExecutive::write_obj_netcdf()
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-            obs_obj_raw_data[n] = engine.obs_obj_raw->data(x, y);
+            obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
             obs_obj_data[n] = nint(engine.obs_split->data(x, y));
          }
          else {
