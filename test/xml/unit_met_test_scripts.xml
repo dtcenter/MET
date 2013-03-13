@@ -289,6 +289,21 @@
   </test>
 
   <!--                                                                  -->
+  <!-- plot_point_obs                                                   -->
+  <!--                                                                  -->
+  
+  <test name="test_all_plot_point_obs">
+    <exec>&MET_DIR;/bin/plot_point_obs</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/sample_pb.nc \
+      &OUTPUT_DIR;/plot_point_obs/sample_pb.ps 
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_point_obs/sample_pb.ps</ps>
+    </output>
+  </test>
+
+  <!--                                                                  -->
   <!-- ascii2nc                                                         -->
   <!--                                                                  -->
   
@@ -313,6 +328,23 @@
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/precip24_2010010112.nc</point_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- madis2nc                                                         -->
+  <!--                                                                  -->
+  
+  <test name="test_all_madis2nc">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &MET_DIR;/data/sample_obs/madis/metar/metar_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
+      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
+      -type metar -rec_beg 2000 -rec_end 6000 -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc</point_nc>
     </output>
   </test>
 
@@ -488,6 +520,38 @@
     <output>
       <stat>&OUTPUT_DIR;/mode_analysis/job_summary_bycase.txt</stat>
       <stat>&OUTPUT_DIR;/mode_analysis/job_summary_bycase.out</stat>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- plot_data_plane                                                  -->
+  <!--                                                                  -->
+
+  <test name="test_all_plot_data_plane_1">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
+      &OUTPUT_DIR;/plot_data_plane/nam.t00z.awip1236.tm00.20070330_TMPZ2.ps \
+      'name="TMP"; level="Z2";' \
+      -title "GRIB1 NAM Z2 TMP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam.t00z.awip1236.tm00.20070330_TMPZ2.ps</ps>
+    </output>
+  </test>
+
+  <test name="test_all_plot_data_plane_2">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
+      &OUTPUT_DIR;/plot_data_plane/sample_fcst_12L_2005080712V_12A_APCP12_NC_MET.ps \
+      'name = "APCP_12"; level = "(*,*)";' \
+      -title "NC MET 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/sample_fcst_12L_2005080712V_12A_APCP12_NC_MET.ps</ps>
     </output>
   </test>
 
