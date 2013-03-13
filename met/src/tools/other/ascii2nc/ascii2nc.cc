@@ -26,6 +26,7 @@
 //   006    09-13-12  Halley Gotway  Added support for Little_r and
 //                    factored out common code.
 //   007    02-06-13  Rehak          Added support for surfrad data.
+//   008    03-13-13  Rehak          Added optional summarization of obs.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +54,7 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_log.h"
 
+#include "ascii2nc_conf_info.h"
 #include "file_handler.h"
 #include "little_r_handler.h"
 #include "met_handler.h"
@@ -80,6 +82,11 @@ static ASCIIFormat ascii_format = ASCIIFormat_None;
 static vector< ConcatString > asfile_list;
 static ConcatString ncfile;
 
+static bool summarize = false;
+static time_t start_time = 0;
+static time_t end_time = 0;
+static int interval_secs = 1;
+
 ////////////////////////////////////////////////////////////////////////
 
 static FileHandler *create_file_handler(const ASCIIFormat,
@@ -89,6 +96,7 @@ static FileHandler *determine_ascii_format(const ConcatString &);
 static void usage();
 static void set_format(const StringArray &);
 static void set_logfile(const StringArray &);
+static void set_config(const StringArray &);
 static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -122,7 +130,8 @@ int main(int argc, char *argv[]) {
    cline.add(set_format, "-format", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
-
+   cline.add(set_config, "-config", 1);
+   
    //
    // Parse the command line
    //
@@ -147,10 +156,15 @@ int main(int argc, char *argv[]) {
      return 0;
    
    //
-   // Process the file
+   // Process the files
    //
-   file_handler->processFiles(asfile_list, ncfile.text());
+   file_handler->readAsciiFiles(asfile_list);
+
+   if (summarize)
+     file_handler->summarizeObs(start_time, end_time, interval_secs);
    
+   file_handler->writeNetcdfFile(ncfile.text());
+
    delete file_handler;
    
    return(0);
@@ -275,6 +289,7 @@ void usage() {
         << "\tascii_file1 [ascii_file2 ascii_file3 ... ascii_filen]\n"
         << "\tnetcdf_file\n"
         << "\t[-format ASCII_format]\n"
+        << "\t[-config file]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -289,6 +304,9 @@ void usage() {
         << MetHandler::getFormatString() << "\", \""
         << LittleRHandler::getFormatString() << "\" or \""
         << SurfradHandler::getFormatString() << "\" (optional).\n"
+
+        << "\t\t\"-config file\" uses the specified configuration file"
+	<< "to generate summaries of the fields in the ASCII files (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -344,6 +362,28 @@ void set_logfile(const StringArray & a) {
    filename = a[0];
 
    mlog.open_log_file(filename);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_config(const StringArray & a)
+{
+  summarize = true;
+  
+  ConcatString config_filename = a[0];
+
+  // List the config file
+  mlog << Debug(1)
+       << "Summarize Config File: " << config_filename << "\n";
+
+  // Read the config files
+
+  Ascii2NcConfInfo conf_info;
+  conf_info.read_config(config_filename.text());
+
+  start_time = conf_info.getSummarizeBeginTime();
+  end_time = conf_info.getSummarizeEndTime();
+  interval_secs = conf_info.getSummarizeIntervalSecs();
 }
 
 ////////////////////////////////////////////////////////////////////////

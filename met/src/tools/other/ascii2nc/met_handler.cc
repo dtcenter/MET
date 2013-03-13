@@ -83,176 +83,84 @@ bool MetHandler::isFileType(LineDataFile &ascii_file) const
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetHandler::_prepareHeaders(LineDataFile &ascii_file) {
-   DataLine dl;
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
-   double hdr_lat, hdr_lon, hdr_elv;
+bool MetHandler::_readObservations(LineDataFile &ascii_file)
+{
+  // Process each line of the file
 
-   mlog << Debug(1) << "Reading MET ASCII Observation file: "
-        << _asciiFilename << "\n";
+  DataLine data_line;
 
-   //
-   // Process each line of the file
-   //
-   while(ascii_file >> dl) {
+  while (ascii_file >> data_line)
+  {
+    ConcatString hdr_typ;
+    ConcatString hdr_sid;
+    ConcatString hdr_vld_str;
+    double hdr_lat = 0.0;
+    double hdr_lon = 0.0;
+    double hdr_elv = 0.0;
+    
+    time_t hdr_vld = 0;
+    
+    // Check for the first line of the file or the header changing
 
-      //
-      // Store/check the number of columns in the first line
-      //
-      if(dl.line_number() == 1) {
+    if (data_line.line_number()  == 1       ||
+	hdr_typ           != data_line[0]   ||
+	hdr_sid           != data_line[1]   ||
+	hdr_vld_str       != data_line[2]   ||
+	!is_eq(hdr_lat, atof(data_line[3])) ||
+	!is_eq(hdr_lon, atof(data_line[4])) ||
+	!is_eq(hdr_elv, atof(data_line[5])))
+    {
+      // Store the column format
 
-         //
-         // Make sure the number of columns is an acceptible format
-         //
-         if(dl.n_items() != n_met_col && dl.n_items() != n_met_col_qty) {
-            mlog << Error << "\nMetHandler::_prepareHeaders() -> "
-                 << "line number " << dl.line_number()
-                 << " does not contain the expected number of columns ("
-                 << n_met_col << " or " << n_met_col_qty << ").\n\n";
-            return false;
-         }
-
-         //
-         // Store the column format
-         //
-         _nFileColumns = dl.n_items();
-         if(_nFileColumns == n_met_col) {
-            mlog << Debug(1) << "Found 10 column input file format deprecated "
-                 << "in METv4.1 - consider adding quality flag value\n";
-         }
-
-         //
-         // Increment the header count and store the first line
-         //
-         _nhdr++;
-         hdr_typ =      dl[0];
-         hdr_sid =      dl[1];
-         hdr_vld =      dl[2];
-         hdr_lat = atof(dl[3]);
-         hdr_lon = atof(dl[4]);
-         hdr_elv = atof(dl[5]);
-
-      }
-      //
-      // Check all following lines
-      //
-      else {
-
-         //
-         // Verify format consistency
-         //
-         if(dl.n_items() != _nFileColumns) {
-            mlog << Error << "\nMetHandler::_prepareHeaders() -> "
-                 << "line number " << dl.line_number()
-                 << " does not have the same number of columns as the "
-                 << "first line (" << _nFileColumns << ").\n\n";
-            return false;
-         }
-
-         //
-         // Check to see if the header info has changed
-         //
-         if(hdr_typ           != dl[0]   ||
-            hdr_sid           != dl[1]   ||
-            hdr_vld           != dl[2]   ||
-            !is_eq(hdr_lat, atof(dl[3])) ||
-            !is_eq(hdr_lon, atof(dl[4])) ||
-            !is_eq(hdr_elv, atof(dl[5]))) {
-
-            //
-            // Increment the header count and store the current values
-            //
-            _nhdr++;
-            hdr_typ =      dl[0];
-            hdr_sid =      dl[1];
-            hdr_vld =      dl[2];
-            hdr_lat = atof(dl[3]);
-            hdr_lon = atof(dl[4]);
-            hdr_elv = atof(dl[5]);
-         }
-      }
-   } // end while
-
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool MetHandler::_processObs(LineDataFile &ascii_file,
-			     const string &nc_filename) {
-   DataLine dl;
-   int obs_idx;
-   ConcatString hdr_typ, hdr_sid, hdr_vld, obs_qty;
-   double hdr_lat, hdr_lon, hdr_elv, obs_prs, obs_hgt, obs_val;
-
-   mlog << Debug(2) << "Processing observations for " << _nhdr
-        << " headers.\n";
-
-   //
-   // Process each line of the file
-   //
-   while(ascii_file >> dl) {
-
-      //
-      // Check for the first line of the file or the header changing
-      //
-      if(dl.line_number()  == 1       ||
-         hdr_typ           != dl[0]   ||
-         hdr_sid           != dl[1]   ||
-         hdr_vld           != dl[2]   ||
-         !is_eq(hdr_lat, atof(dl[3])) ||
-         !is_eq(hdr_lon, atof(dl[4])) ||
-         !is_eq(hdr_elv, atof(dl[5]))) {
-
-         //
-         // Store the header info
-         //
-         hdr_typ =      dl[0];
-         hdr_sid =      dl[1];
-         hdr_vld =      dl[2];
-         hdr_lat = atof(dl[3]);
-         hdr_lon = atof(dl[4]);
-         hdr_elv = atof(dl[5]);
-
-         //
-         // Write the header info
-         //
-         if (!_writeHdrInfo(hdr_typ, hdr_sid, hdr_vld,
-			    hdr_lat, hdr_lon, hdr_elv))
-	   return false;
+      _nFileColumns = data_line.n_items();
+      if (_nFileColumns == n_met_col)
+      {
+	mlog << Debug(1) << "Found 10 column input file format deprecated "
+	     << "in METv4.1 - consider adding quality flag value\n";
       }
 
-      //
-      // Pressure level (hPa) or precip accumulation interval (sec)
-      //
-      obs_prs = (is_precip_grib_code(atoi(dl[6])) ?
-                 timestring_to_sec(dl[7]) : atof(dl[7]));
+      // Store the header info
 
-      //
-      // Observation height (meters above sea level)
-      //
-      obs_hgt = atof(dl[8]);
+      hdr_typ =      data_line[0];
+      hdr_sid =      data_line[1];
+      hdr_vld_str =  data_line[2];
+      hdr_lat = atof(data_line[3]);
+      hdr_lon = atof(data_line[4]);
+      hdr_elv = atof(data_line[5]);
 
-      //
-      // Observation quality
-      //
-      obs_qty = (_nFileColumns == n_met_col ? "NA" : dl[9]);
+      hdr_vld = _getValidTime(hdr_vld_str.text());
+      
+    }
 
-      //
-      // Observation value
-      //
-      obs_idx = (_nFileColumns == n_met_col ? 9 : 10);
-      obs_val = atof(dl[obs_idx]);
+    // Pressure level (hPa) or precip accumulation interval (sec)
+
+    double obs_prs = (is_precip_grib_code(atoi(data_line[6])) ?
+		      timestring_to_sec(data_line[7]) : atof(data_line[7]));
+
+    // Observation height (meters above sea level)
+
+    double obs_hgt = atof(data_line[8]);
+
+    // Observation quality
+
+    ConcatString obs_qty = (_nFileColumns == n_met_col ? "NA" : data_line[9]);
+
+    // Observation value
+
+    int obs_idx = (_nFileColumns == n_met_col ? 9 : 10);
+    double obs_val = atof(data_line[obs_idx]);
              
-      //
-      // Write the observation info
-      //
-      if (!_writeObsInfo(atoi(dl[6]),
-			 obs_prs, obs_hgt, obs_val, obs_qty))
-	return false;
-                        
-   } // end while
+    // Save the observation info
 
-   return true;
+    _observations.push_back(Observation(hdr_typ.text(),
+					hdr_sid.text(),
+					hdr_vld,
+					hdr_lat, hdr_lon, hdr_elv,
+					obs_qty.text(),
+					atoi(data_line[6]),
+					obs_prs, obs_hgt, obs_val));
+  } // end while
+
+  return true;
 }
-
+  

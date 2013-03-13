@@ -14,53 +14,38 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __METHANDLER_H__
-#define  __METHANDLER_H__
+using namespace std;
+
+
+#include "summary_key.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include <iostream>
-
-#include "file_handler.h"
+   //
+   //  Code for class SummaryKey
+   //
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-class MetHandler : public FileHandler
+SummaryKey::SummaryKey(const string &header_type,
+		       const string &station_id,
+		       const double lat, const double lon, const double elev,
+		       const int grib_code) :
+  _headerType(header_type),
+  _stationId(station_id),
+  _latitude(lat),
+  _longitude(lon),
+  _elevation(elev),
+  _gribCode(grib_code)
 {
-
-public:
-
-  MetHandler(const string &program_name);
-  virtual ~MetHandler();
-
-  virtual bool isFileType(LineDataFile &ascii_file) const;
-  
-  static string getFormatString()
-  {
-    return "met_point";
-  }
-
-protected:  
-
-  // Read the observations from the given file and add them to the
-  // _observations vector.
-
-  virtual bool _readObservations(LineDataFile &ascii_file);
-  
-  int _nFileColumns;
-};
-
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#endif   /*  __METHANDLER_H__  */
-
-
-////////////////////////////////////////////////////////////////////////
-
-
+SummaryKey::~SummaryKey()
+{
+  // Do nothing
+}

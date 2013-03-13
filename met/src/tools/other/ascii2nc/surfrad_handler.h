@@ -22,6 +22,7 @@
 
 
 #include <iostream>
+#include <time.h>
 
 #include "file_handler.h"
 
@@ -60,6 +61,10 @@ protected:
 
   static const int NUM_OBS_COLS;
 
+  // The header type for these observations
+
+  static const string HEADER_TYPE;
+
   // Grib codes for the different fields
 
   static const int DW_PSP_GRIB_CODE;
@@ -85,6 +90,18 @@ protected:
 
 
   ///////////////////////
+  // Protected members //
+  ///////////////////////
+
+  // Unchanging header information
+
+  string _stationId;
+  double _stationLat;
+  double _stationLon;
+  double _stationAlt;
+  
+  
+  ///////////////////////
   // Protected methods //
   ///////////////////////
 
@@ -102,42 +119,20 @@ protected:
     return k_value - 273.15;
   }
   
-  // Get the station id from the given header line.  This should be the first
-  // line in the file which contains the station name.
+  // Read and save the header information from the given file,  The file pointer
+  // is assumed to be at the beginning of the file.  Sets the _stationId,
+  // _stationLat, _stationLon and _stationAlt values.
 
-  int _getStationId(const DataLine &data_line);
-
-  // Get the station location (lat, lon, alt) from the given header line.
-  // This should be the second line ion the file.
-
-  int _getLocation(const DataLine &data_line);
+  bool _readHeaderInfo(LineDataFile &ascii_file);
   
   // Get the observation valid time from the given observation line
 
-  string _getValidTime(const DataLine &data_line) const;
+  time_t _getValidTime(const DataLine &data_line) const;
   
-  // Get the number of header records that will be needed for the netCDF
-  // file.  This must be done before calling _processObs().
+  // Read the observations from the given file and add them to the
+  // _observations vector.
 
-  bool _prepareHeaders(LineDataFile &ascii_file);
-
-  // Process the observations in the file.  Assumes that _nhdrs contains the
-  // number of header records for this file.
-
-  bool _processObs(LineDataFile &ascii_file,
-		   const string &nc_filename);
-  
-
-  ///////////////////////
-  // Protected members //
-  ///////////////////////
-
-  // Unchanging header information
-
-  string _stationId;
-  double _stationLat;
-  double _stationLon;
-  double _stationAlt;
+  virtual bool _readObservations(LineDataFile &ascii_file);
   
 };
 
