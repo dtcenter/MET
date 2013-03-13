@@ -696,25 +696,25 @@ void ModeExecutive::write_obj_netcdf()
    int n, x, y;
    ConcatString out_file;
 
-   float *fcst_raw_data  = (float *) 0;
-   int   *fcst_obj_data  = (int *)   0;
-   int   *fcst_clus_data = (int *)   0;
-   float *obs_raw_data   = (float *) 0;
-   int   *obs_obj_data   = (int *)   0;
-   int   *obs_clus_data  = (int *)   0;
+   float *fcst_obj_raw_data  = (float *) 0;
+   int   *fcst_obj_data      = (int *)   0;
+   int   *fcst_clus_data     = (int *)   0;
+   float *obs_obj_raw_data   = (float *) 0;
+   int   *obs_obj_data       = (int *)   0;
+   int   *obs_clus_data      = (int *)   0;
 
-   NcFile *f_out         = (NcFile *) 0;
+   NcFile *f_out             = (NcFile *) 0;
 
-   NcDim  *lat_dim       = (NcDim *)  0;
-   NcDim  *lon_dim       = (NcDim *)  0;
+   NcDim  *lat_dim           = (NcDim *)  0;
+   NcDim  *lon_dim           = (NcDim *)  0;
 
-   NcVar  *fcst_raw_var  = (NcVar *)  0;
-   NcVar  *fcst_obj_var  = (NcVar *)  0;
-   NcVar  *fcst_clus_var = (NcVar *)  0;
+   NcVar  *fcst_obj_raw_var  = (NcVar *)  0;
+   NcVar  *fcst_obj_var      = (NcVar *)  0;
+   NcVar  *fcst_clus_var     = (NcVar *)  0;
 
-   NcVar  *obs_raw_var   = (NcVar *)  0;
-   NcVar  *obs_obj_var   = (NcVar *)  0;
-   NcVar  *obs_clus_var  = (NcVar *)  0;
+   NcVar  *obs_obj_raw_var   = (NcVar *)  0;
+   NcVar  *obs_obj_var       = (NcVar *)  0;
+   NcVar  *obs_clus_var      = (NcVar *)  0;
 
    //
    // Create output NetCDF file name
@@ -754,18 +754,18 @@ void ModeExecutive::write_obj_netcdf()
    write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
    // Define Variables
-   fcst_raw_var = f_out->add_var("fcst_obj_raw", ncFloat, lat_dim, lon_dim);
-   fcst_obj_var = f_out->add_var("fcst_obj_id", ncInt, lat_dim, lon_dim);
-   fcst_clus_var = f_out->add_var("fcst_clus_id", ncInt, lat_dim, lon_dim);
+   fcst_obj_raw_var = f_out->add_var("fcst_obj_raw", ncFloat, lat_dim, lon_dim);
+   fcst_obj_var     = f_out->add_var("fcst_obj_id",  ncInt,   lat_dim, lon_dim);
+   fcst_clus_var    = f_out->add_var("fcst_clus_id", ncInt,   lat_dim, lon_dim);
 
-   obs_raw_var = f_out->add_var("obs_obj_raw", ncFloat, lat_dim, lon_dim);
-   obs_obj_var = f_out->add_var("obs_obj_id", ncInt, lat_dim, lon_dim);
-   obs_clus_var = f_out->add_var("obs_clus_id", ncInt, lat_dim, lon_dim);
+   obs_obj_raw_var  = f_out->add_var("obs_obj_raw", ncFloat, lat_dim, lon_dim);
+   obs_obj_var      = f_out->add_var("obs_obj_id",  ncInt,   lat_dim, lon_dim);
+   obs_clus_var     = f_out->add_var("obs_clus_id", ncInt,   lat_dim, lon_dim);
    
    // Add forecast variable attributes
-   fcst_raw_var->add_att("long_name", "Forecast Object Raw Values");
-   write_netcdf_var_times(fcst_raw_var, engine.fcst_raw->data);
-   fcst_raw_var->add_att("_FillValue", bad_data_float);
+   fcst_obj_raw_var->add_att("long_name", "Forecast Object Raw Values");
+   write_netcdf_var_times(fcst_obj_raw_var, engine.fcst_raw->data);
+   fcst_obj_raw_var->add_att("_FillValue", bad_data_float);
 
    fcst_obj_var->add_att("long_name", "Forecast Object ID");
    write_netcdf_var_times(fcst_obj_var, engine.fcst_raw->data);
@@ -776,9 +776,9 @@ void ModeExecutive::write_obj_netcdf()
    fcst_clus_var->add_att("_FillValue", bad_data_int);
 
    // Add observation variable attributes
-   obs_raw_var->add_att("long_name", "Observation Object Raw Values");
-   write_netcdf_var_times(obs_raw_var, engine.obs_raw->data);
-   obs_raw_var->add_att("_FillValue", bad_data_float);
+   obs_obj_raw_var->add_att("long_name", "Observation Object Raw Values");
+   write_netcdf_var_times(obs_obj_raw_var, engine.obs_raw->data);
+   obs_obj_raw_var->add_att("_FillValue", bad_data_float);
 
    obs_obj_var->add_att("long_name", "Observation Object ID");
    write_netcdf_var_times(obs_obj_var, engine.obs_raw->data);
@@ -791,12 +791,12 @@ void ModeExecutive::write_obj_netcdf()
    //
    // Allocate memory for the raw values and object ID's for each grid box
    //
-   fcst_raw_data  = new float [grid.nx()*grid.ny()];
-   fcst_obj_data  = new int   [grid.nx()*grid.ny()];
-   fcst_clus_data = new int   [grid.nx()*grid.ny()];
-   obs_raw_data   = new float [grid.nx()*grid.ny()];
-   obs_obj_data   = new int   [grid.nx()*grid.ny()];
-   obs_clus_data  = new int   [grid.nx()*grid.ny()];
+   fcst_obj_raw_data  = new float [grid.nx()*grid.ny()];
+   fcst_obj_data      = new int   [grid.nx()*grid.ny()];
+   fcst_clus_data     = new int   [grid.nx()*grid.ny()];
+   obs_obj_raw_data   = new float [grid.nx()*grid.ny()];
+   obs_obj_data       = new int   [grid.nx()*grid.ny()];
+   obs_clus_data      = new int   [grid.nx()*grid.ny()];
 
    for(x=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
@@ -807,20 +807,20 @@ void ModeExecutive::write_obj_netcdf()
          // Get raw values and object ID's for each grid box
          //
          if(engine.fcst_split->is_nonzero(x, y) ) {
-            fcst_raw_data[n] = engine.fcst_raw->data(x, y);
+            fcst_obj_raw_data[n] = engine.fcst_obj_raw->data(x, y);
             fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
          }
          else {
-            fcst_raw_data[n] = bad_data_float;
+            fcst_obj_raw_data[n] = bad_data_float;
             fcst_obj_data[n] = bad_data_int;
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-            obs_raw_data[n] = engine.obs_raw->data(x, y);
+            obs_obj_raw_data[n] = engine.obs_obj_raw->data(x, y);
             obs_obj_data[n] = nint(engine.obs_split->data(x, y));
          }
          else {
-            obs_raw_data[n] = bad_data_float;
+            obs_obj_raw_data[n] = bad_data_float;
             obs_obj_data[n] = bad_data_int;
          }
 
@@ -859,11 +859,11 @@ void ModeExecutive::write_obj_netcdf()
    //
    // Write the forecast and observation raw value variables
    //
-   if( !fcst_raw_var->put(&fcst_raw_data[0], grid.ny(), grid.nx()) ||
-       !obs_raw_var->put(&obs_raw_data[0], grid.ny(), grid.nx()) ) {
+   if( !fcst_obj_raw_var->put(&fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
+       !obs_obj_raw_var->put(&obs_obj_raw_data[0], grid.ny(), grid.nx()) ) {
 
       mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
+           << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
       exit(1);
    }
 
@@ -892,12 +892,12 @@ void ModeExecutive::write_obj_netcdf()
    //
    // Delete allocated memory
    //
-   if(fcst_raw_data)  { delete fcst_raw_data;  fcst_raw_data = (float *) 0; }
-   if(fcst_obj_data)  { delete fcst_obj_data;  fcst_obj_data = (int *) 0; }
-   if(fcst_clus_data) { delete fcst_clus_data; fcst_clus_data = (int *) 0; }
-   if(obs_raw_data)   { delete obs_raw_data;   obs_raw_data = (float *) 0; }
-   if(obs_obj_data)   { delete obs_obj_data;   obs_obj_data = (int *) 0; }
-   if(obs_clus_data)  { delete obs_clus_data;  obs_clus_data = (int *) 0; }
+   if(fcst_obj_raw_data)  { delete fcst_obj_raw_data;  fcst_obj_raw_data = (float *) 0; }
+   if(fcst_obj_data)      { delete fcst_obj_data;      fcst_obj_data     = (int *) 0; }
+   if(fcst_clus_data)     { delete fcst_clus_data;     fcst_clus_data    = (int *) 0; }
+   if(obs_obj_raw_data)   { delete obs_obj_raw_data;   obs_obj_raw_data  = (float *) 0; }
+   if(obs_obj_data)       { delete obs_obj_data;       obs_obj_data      = (int *) 0; }
+   if(obs_clus_data)      { delete obs_clus_data;      obs_clus_data     = (int *) 0; }
 
    //
    // Write out the values of the vertices of the boundary polylines for
