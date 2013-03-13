@@ -22,12 +22,16 @@
 
 
 #include <iostream>
+#include <map>
+#include <time.h>
 #include <vector>
 
 #include "netcdf.hh"
 
 #include "vx_util.h"
 
+#include "observation.h"
+#include "summary_key.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,40 +46,30 @@ public:
 
   virtual bool isFileType(LineDataFile &ascii_file) const = 0;
   
-  bool processFiles(const vector< ConcatString > &ascii_filename_list,
-		    const string &nc_filename);
+  bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
+  bool writeNetcdfFile(const string &nc_filename);
   
+  bool summarizeObs(const time_t start_time, const time_t end_time,
+		    const int interval_secs);
+  
+
 protected:
 
-  static const int   HDR_ARRAY_LEN;
-  static const int   OBS_ARRAY_LEN;
+  /////////////////////////
+  // Protected constants //
+  /////////////////////////
+
+  static const int HDR_ARRAY_LEN;
+  static const int OBS_ARRAY_LEN;
+
   static const float FILL_VALUE;
   
 
-  // Prepare the headers for adding to the netCDF file.  Update _nhdr to
-  // contain the number of header records the file will contain.
-
-  virtual bool _prepareHeaders(LineDataFile &ascii_file) = 0;
-
-  // Process the observations in the file.  Assumes that _nhdr contains the
-  // number of header records for this file.
-
-  virtual bool _processObs(LineDataFile &ascii_file,
-			   const string &nc_filename) = 0;
-  
-
-  void _closeNetcdf();
-  bool _openNetcdf(const string &nc_filename);
-  bool _writeHdrInfo(const ConcatString &hdr_typ,
-		     const ConcatString &hdr_sid,
-		     const ConcatString &hdr_vld,
-		     double lat, double lon, double elv);
-  bool _writeObsInfo(int gc, float prs, float hgt, float obs,
-		     const ConcatString &qty);
-  
+  ///////////////////////
+  // Protected members //
+  ///////////////////////
 
   string _programName;
-  string _asciiFilename;
   
   // Variables for writing output NetCDF file
 
@@ -91,6 +85,44 @@ protected:
 
   int _hdrNum;
   int _obsNum;
+
+  // List of observations read from the ascii files
+
+  vector< Observation > _observations;
+  
+
+  ///////////////////////
+  // Protected methods //
+  ///////////////////////
+
+  // Count the number of headers needed for the netCDF file.  All of the
+  // observations must be loaded into the _observations vector before calling
+  // this method.
+
+  void _countHeaders();
+  
+  time_t _getValidTime(const string &time_string) const;
+  
+  // Read the observations from the given file and add them to the
+  // _observations vector.
+
+  virtual bool _readObservations(LineDataFile &ascii_file) = 0;
+ 
+  // Write the observations in the _observations vector into the current
+  // netCDF file.
+
+  bool _writeObservations();
+  
+  void _closeNetcdf();
+  bool _openNetcdf(const string &nc_filename);
+  bool _writeHdrInfo(const ConcatString &hdr_typ,
+		     const ConcatString &hdr_sid,
+		     const ConcatString &hdr_vld,
+		     double lat, double lon, double elv);
+  bool _writeObsInfo(int gc, float prs, float hgt, float obs,
+		     const ConcatString &qty);
+  
+
 };
 
 

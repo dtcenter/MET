@@ -128,243 +128,186 @@ bool LittleRHandler::isFileType(LineDataFile &ascii_file) const
   
 
 ////////////////////////////////////////////////////////////////////////
-
-bool LittleRHandler::_prepareHeaders(LineDataFile &ascii_file) {
-   DataLine dl;
-
-   mlog << Debug(1) << "Reading little_r ASCII Observation file: "
-       << _asciiFilename << "\n";
-
-   //
-   // Read the fixed-width lines:
-   //   - one header report line
-   //   - variable number of data lines
-   //   - one end of report line
-   //
-   while(ascii_file.read_fwf_line(dl, lr_rpt_wdth, n_lr_rpt_wdth)) {
-
-      //
-      // Check for expected header line
-      //
-      if(!check_reg_exp(lr_rpt_reg_exp, dl[4])) {
-         mlog << Error << "\nLittleRHandler::_prepareHeaders() -> "
-              << "the fifth entry of the little_r report on line "
-              << dl.line_number() << " does not match \""
-              << lr_rpt_reg_exp << "\":\n\"" << dl[4] << "\"\n\n";
-         return false;
-      }
-
-      //
-      // Increment the header count
-      //
-      _nhdr++;
-
-      //
-      // Read the data lines
-      //
-      while(ascii_file.read_fwf_line(dl, lr_meas_wdth, n_lr_meas_wdth)) {
-
-         //
-         // Check for the end of report
-         //
-         if(is_eq(atof(dl[0]), lr_end_value) &&
-            is_eq(atof(dl[2]), lr_end_value)) break;
-      }
-
-      //
-      // Read the end of report line
-      //
-      ascii_file.read_fwf_line(dl, lr_end_wdth, n_lr_end_wdth);
-   }
-
-   return true;
-}
-
+// Protected/Private Methods
 ////////////////////////////////////////////////////////////////////////
 
-bool LittleRHandler::_processObs(LineDataFile &ascii_file,
-                                 const string &nc_filename) {
-   DataLine dl;
-   int i, i_data, n_data_hdr;
-   ConcatString cs, hdr_typ, hdr_sid, hdr_vld, obs_qty;
-   double hdr_elv, obs_prs, obs_hgt, obs_val;
+bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
+{
+  // Read the fixed-width lines:
+  //   - one header report line
+  //   - variable number of data lines
+  //   - one end of report line
 
-   mlog << Debug(2) << "Processing " << _nhdr << " Little_r reports.\n";
-   
-   //
-   // Read the fixed-width lines:
-   //   - one header report line
-   //   - variable number of data lines
-   //   - one end of report line
-   //
-   while(ascii_file.read_fwf_line(dl, lr_rpt_wdth, n_lr_rpt_wdth)) {
+  DataLine data_line;
+  int n_data_hdr;
+  
+  while (ascii_file.read_fwf_line(data_line, lr_rpt_wdth, n_lr_rpt_wdth))
+  {
+    // Check for expected header line
 
-      //
-      // Check for expected header line
-      //
-      if(!check_reg_exp(lr_rpt_reg_exp, dl[4])) {
-         mlog << Error << "\nLittleRHandler::_processObs() -> "
-              << "the fifth entry of the little_r report on line "
-              << dl.line_number() << " does not match \""
-              << lr_rpt_reg_exp << "\":\n\"" << dl[4] << "\"\n\n";
-         return false;
-      }
+    if (!check_reg_exp(lr_rpt_reg_exp, data_line[4]))
+    {
+      mlog << Error << "\nLittleRHandler::_readObservations() -> "
+	   << "the fifth entry of the little_r report on line "
+	   << data_line.line_number() << " does not match \""
+	   << lr_rpt_reg_exp << "\":\n\"" << data_line[4] << "\"\n\n";
+      return false;
+    }
 
-      //
-      // Store the message type
-      //
-      cs = dl[4];
-      cs.ws_strip();
-      
-      if(MAP_MSG_TYP[cs]) {
-         hdr_typ = MAP_MSG_TYP[cs];
-      }
-      else {
-         hdr_typ = cs;
-         hdr_typ.replace(" ", "_", false);
-         mlog << Warning << "\nLittleRHandler::_processObs() -> "
-              << "Storing message type as \"" << hdr_typ
-              << "\" for unexpected report type \"" << cs << "\".\n\n";
-      }
+    // Store the message type
 
-      //
-      // Store the station id
-      //
-      hdr_sid = dl[2];
-      hdr_sid.ws_strip();
-      hdr_sid.replace(" ", "_", false);
+    ConcatString concat_string = data_line[4];
+    concat_string.ws_strip();
+    ConcatString hdr_typ;
+    
+    if (MAP_MSG_TYP[concat_string])
+    {
+      hdr_typ = MAP_MSG_TYP[concat_string];
+    }
+    else
+    {
+      hdr_typ = concat_string;
+      hdr_typ.replace(" ", "_", false);
+      mlog << Warning << "\nLittleRHandler::_processObs() -> "
+	   << "Storing message type as \"" << hdr_typ
+	   << "\" for unexpected report type \"" << concat_string << "\".\n\n";
+    }
 
-      //
-      // Store the valid time in YYYYMMDD_HHMMSS format
-      //
-      cs = dl[17];      
-      cs.ws_strip();
-      hdr_vld << cs_erase;
-      hdr_vld.format("%.8s_%.6s", cs.text(), cs.text()+8);
+    // Store the station id
 
-      //
-      // Store the elevation
-      //
-      hdr_elv = (is_eq(atof(dl[6]), lr_missing_value) ?
-                 bad_data_float : atof(dl[6]));
+    ConcatString hdr_sid = data_line[2];
+    hdr_sid.ws_strip();
+    hdr_sid.replace(" ", "_", false);
 
-      //
-      // Write the header info
-      //
-      if (!_writeHdrInfo(hdr_typ, hdr_sid, hdr_vld,
-                         atof(dl[0]), atof(dl[1]), hdr_elv))
-         return false;
-      
-      
-      //
-      // Store the number of data lines specified in the header
-      //
-      n_data_hdr = atoi(dl[7]);
+    // Store the valid time in YYYYMMDD_HHMMSS format
 
-      //
-      // Observation of sea level pressure in pascals.
-      //
-      if(!is_eq(atof(dl[18]), lr_missing_value)) {
-         obs_qty = (is_eq(atof(dl[19]), lr_missing_value) ?
-                    na_str : dl[19]);
-         obs_qty.ws_strip();
-         if (!_writeObsInfo(2, bad_data_float, hdr_elv,
-                            atof(dl[18]), obs_qty))
-            return false;
-      }
+    ConcatString hdr_vld_str;
+    
+    concat_string = data_line[17];      
+    concat_string.ws_strip();
+    hdr_vld_str << cs_erase;
+    hdr_vld_str.format("%.8s_%.6s",
+		       concat_string.text(), concat_string.text()+8);
 
-      //
-      // Read the data lines
-      //
-      i_data = 0;
-      while(ascii_file.read_fwf_line(dl, lr_meas_wdth, n_lr_meas_wdth)) {
+    time_t hdr_vld = _getValidTime(hdr_vld_str.text());
+    
+    // Store the station location
 
-         //
-         // Check for the end of report
-         //
-         if(is_eq(atof(dl[0]), lr_end_value) &&
-            is_eq(atof(dl[2]), lr_end_value)) break;
+    double hdr_lat = atof(data_line[0]);
+    double hdr_lon = atof(data_line[1]);
+    double hdr_elv = (is_eq(atof(data_line[6]), lr_missing_value) ?
+		      bad_data_float : atof(data_line[6]));
 
-         //
-         // Retrieve pressure and height
-         //
-         obs_prs = (is_eq(atof(dl[0]), lr_missing_value) ?
-                    bad_data_float : atof(dl[0]));
-         obs_hgt = (is_eq(atof(dl[2]), lr_missing_value) ?
-                    bad_data_float : atof(dl[2]));
+    // Store the number of data lines specified in the header
 
-         //
-         // Pressure in Little_R is stored in pascals.  Convert to
-         // hectopascals for the header entry.
-         //
-         if(!is_bad_data(obs_prs)) obs_prs /= 100;
+    n_data_hdr = atoi(data_line[7]);
 
-         //
-         // Store observations of:
-         //    pressure, height, temperature, dew point,
-         //    wind speed, wind direction, u-wind, v-wind,
-         //    relative humidity
-         //
-         for(i=0; i<dl.n_items(); i++) {
+    // Observation of sea level pressure in pascals.
 
-            //
-            // Only store valid observation values with a
-            // valid corresponding GRIB code
-            //
-            if(!is_eq(atof(dl[i]), lr_missing_value) &&
-               !is_bad_data(lr_grib_codes[i/2])) {
+    if (!is_eq(atof(data_line[18]), lr_missing_value))
+    {
+      ConcatString obs_qty = (is_eq(atof(data_line[19]), lr_missing_value) ?
+			      na_str : data_line[19]);
+      obs_qty.ws_strip();
 
-               //
-               // Observation quality
-               //
-               obs_qty = (is_eq(atof(dl[i+1]), lr_missing_value) ?
-                          na_str : dl[i+1]);
-               obs_qty.ws_strip();
+      _observations.push_back(Observation(hdr_typ.text(),
+					  hdr_sid.text(),
+					  hdr_vld,
+					  hdr_lat,
+					  hdr_lon,
+					  hdr_elv,
+					  obs_qty.text(),
+					  2,
+					  bad_data_float,
+					  hdr_elv,
+					  atof(data_line[18])));
+    }
 
-               //
-               // Observation value
-               //
-               obs_val = atof(dl[i]);
+    // Read the data lines
+
+    int i_data = 0;
+    while (ascii_file.read_fwf_line(data_line, lr_meas_wdth, n_lr_meas_wdth))
+    {
+      // Check for the end of report
+
+      if (is_eq(atof(data_line[0]), lr_end_value) &&
+	  is_eq(atof(data_line[2]), lr_end_value))
+	break;
+
+      // Retrieve pressure and height
+
+      double obs_prs = (is_eq(atof(data_line[0]), lr_missing_value) ?
+			bad_data_float : atof(data_line[0]));
+      double obs_hgt = (is_eq(atof(data_line[2]), lr_missing_value) ?
+			bad_data_float : atof(data_line[2]));
+
+      // Pressure in Little_R is stored in pascals.  Convert to
+      // hectopascals for the header entry.
+
+      if (!is_bad_data(obs_prs)) obs_prs /= 100;
+
+      // Store observations of:
+      //    pressure, height, temperature, dew point,
+      //    wind speed, wind direction, u-wind, v-wind,
+      //    relative humidity
+
+      for (int i = 0; i < data_line.n_items(); ++i)
+      {
+	// Only store valid observation values with a
+	// valid corresponding GRIB code
+
+	if (!is_eq(atof(data_line[i]), lr_missing_value) &&
+	    !is_bad_data(lr_grib_codes[i/2]))
+	{
+	  // Observation quality
+
+	  ConcatString obs_qty =
+	    (is_eq(atof(data_line[i+1]), lr_missing_value) ?
+	     na_str : data_line[i+1]);
+	  obs_qty.ws_strip();
+
+	  // Observation value
+
+	  double obs_val = atof(data_line[i]);
             
-               //
-               // Write the observation info
-               //
-               if (!_writeObsInfo(lr_grib_codes[i/2],
-                                  obs_prs, obs_hgt, obs_val, obs_qty))
-                  return false;
-            }
+	  // Write the observation info
 
-            //
-            // Increment i to skip over the QC entry
-            //
-            i++;
-         }
+	  _observations.push_back(Observation(hdr_typ.text(), hdr_sid.text(),
+					      hdr_vld,
+					      hdr_lat, hdr_lon, hdr_elv,
+					      obs_qty.text(),
+					      lr_grib_codes[i/2],
+					      obs_prs, obs_hgt, obs_val));
+	}
 
-         //
-         // Increment the data line count
-         //
-         i_data++;
+	// Increment i to skip over the QC entry
+
+	i++;
       }
 
-      //
-      // Check that the number of data lines specified in the header
-      // matches the number found
-      //
-      if(n_data_hdr != i_data) {
-         mlog << Warning << "\nprocess_little_r_obs() -> "
-              << "the number of data lines specified in the header ("
-              << n_data_hdr
-              << ") does not match the number found in the data ("
-              << i_data << ") on line number " << dl.line_number() << ".\n\n";
-      }
+      // Increment the data line count
 
-      //
+      i_data++;
+    }
+
+    // Check that the number of data lines specified in the header
+    // matches the number found
+
+    if (n_data_hdr != i_data)
+    {
+      mlog << Warning << "\nprocess_little_r_obs() -> "
+	   << "the number of data lines specified in the header ("
+	   << n_data_hdr
+	   << ") does not match the number found in the data ("
+	   << i_data << ") on line number " << data_line.line_number() << ".\n\n";
+    }
+
       // Read the end of report line
-      //
-      ascii_file.read_fwf_line(dl, lr_end_wdth, n_lr_end_wdth);
 
-   } // end while
+    ascii_file.read_fwf_line(data_line, lr_end_wdth, n_lr_end_wdth);
 
-   return true;
+  } // end while
+
+  return true;
 }
-
+  

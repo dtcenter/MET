@@ -47,21 +47,22 @@ public:
 
 protected:
   
-  // Process the header records in the file
-
-  bool _prepareHeaders(LineDataFile &ascii_file);
-
-  // Process the observations in the file
-
-  bool _processObs(LineDataFile &ascii_file,
-                   const string &nc_filename);
-
   ///////////////////////
   // Protected members //
   ///////////////////////
 
   map<ConcatString, ConcatString> MAP_MSG_TYP;
 
+
+  ///////////////////////
+  // Protected methods //
+  ///////////////////////
+
+  // Read the observations from the given file and add them to the
+  // _observations vector.
+
+  virtual bool _readObservations(LineDataFile &ascii_file);
+  
 };
 
 

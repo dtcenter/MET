@@ -16,9 +16,12 @@
 EXECUTABLES = ascii2nc
 
 
-OBJECTS     = file_handler.o \
+OBJECTS     = ascii2nc_conf_info.o \
+	file_handler.o \
 	little_r_handler.o \
 	met_handler.o \
+	observation.o \
+	summary_key.o \
 	surfrad_handler.o
 
 
@@ -63,21 +66,33 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 
+ascii2nc_conf_info.o: ascii2nc_conf_info.h ascii2nc_conf_info.cc
+	@ echo
+	$(CXX) ascii2nc_conf_info.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
 file_handler.o: file_handler.h file_handler.cc
 	@ echo
-	$(CXX) file_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) file_handler.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 little_r_handler.o: little_r_handler.h little_r_handler.cc
 	@ echo
-	$(CXX) little_r_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) little_r_handler.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 met_handler.o: met_handler.h met_handler.cc
 	@ echo
-	$(CXX) met_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) met_handler.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+observation.o: observation.h observation.cc
+	@ echo
+	$(CXX) observation.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_key.o: summary_key.h summary_key.cc
+	@ echo
+	$(CXX) summary_key.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 surfrad_handler.o: surfrad_handler.h surfrad_handler.cc
 	@ echo
-	$(CXX) surfrad_handler.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+	$(CXX) surfrad_handler.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################
@@ -98,16 +113,16 @@ surfrad_handler.o: surfrad_handler.h surfrad_handler.cc
 
 ascii2nc: ascii2nc.cc $(OBJECTS)
 	@ echo
-	$(CXX) -o $(EXECUTABLES) ascii2nc.cc $(OBJECTS) \
+	$(CXX) -g -o $(EXECUTABLES) ascii2nc.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) \
+	-lvx_config \
 	-lvx_nc_util \
 	-lvx_grid \
-	-lvx_config \
+	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
-	-lvx_util \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf \
 	$(CXX_LIBS)
