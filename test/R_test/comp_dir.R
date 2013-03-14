@@ -56,7 +56,7 @@ listMiss = listTest2Files[ !(listTest2Files %in% listTest1Files) ];
 if( 0 < length(listMiss) ){
 	if( 1 <= verb ){ 
 		cat("WARNING: folder", strDir1, "missing", length(listMiss), "files\n");
-		for(strMiss in listMiss){ cat("   ", strMiss, "\n");	}
+		for(strMiss in listMiss){ cat("   ", strMiss, "\n"); }
 	} else {
 		quit(status=1);
 	}
