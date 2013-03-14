@@ -42,20 +42,21 @@ if( 2 != length(listArgs) ){
 strDir1 = gsub("/$", "", listArgs[1]);
 strDir2 = gsub("/$", "", listArgs[2]);
 
-if( 1 <= verb ){ cat("dir1:", strDir1, "\ndir2:", strDir2, "\n\n"); }
-
 # build a list of files in each stat folder
 listTest1 = system(paste("find", strDir1, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
 listTest1Files = gsub(paste(strDir1, "/", sep=""), "", listTest1);
 listTest2 = system(paste("find", strDir2, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
 listTest2Files = gsub(paste(strDir2, "/", sep=""), "", listTest2);
 
+if( 1 <= verb ){ cat("dir1:", strDir1, "contains", length(listTest1Files), "files\n");
+                 cat("dir2:", strDir2, "contains", length(listTest2Files), "files\n\n"); }
+
 # report files missing from stat folder 1
 listMiss = listTest2Files[ !(listTest2Files %in% listTest1Files) ];
 if( 0 < length(listMiss) ){
 	if( 1 <= verb ){ 
 		cat("WARNING: folder", strDir1, "missing", length(listMiss), "files\n");
-		if( 2 <= verb ){ for(strMiss in listMiss){ cat("   ", strMiss, "\n");	} }
+		for(strMiss in listMiss){ cat("   ", strMiss, "\n");	}
 	} else {
 		quit(status=1);
 	}
@@ -66,7 +67,7 @@ listMiss = listTest1Files[ !(listTest1Files %in% listTest2Files) ];
 if( 0 < length(listMiss) ){
 	if( 1 <= verb ){ 
 		cat("WARNING: folder", strDir2, "missing", length(listMiss), "files\n");
-		if( 2 <= verb ){ for(strMiss in listMiss){ cat("   ", strMiss, "\n"); } }
+		for(strMiss in listMiss){ cat("   ", strMiss, "\n"); }
 	} else {
 		quit(status=1);
 	}
