@@ -66,7 +66,7 @@ var_info_grib2.o: var_info_grib2.cc
 	$(CXX) var_info_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 data2d_grib2.o: data2d_grib2.cc
-	$(CXX) data2d_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GRIB2_LIBS) -lm
+	$(CXX) data2d_grib2.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(GRIB2C_INCS)
 
 
 ########################################################################
