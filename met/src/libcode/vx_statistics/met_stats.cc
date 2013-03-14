@@ -2943,7 +2943,7 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
       //
       // Check for the degenerate case
       //
-      if(n <= 1) {
+      if(n <= 1 || is_bad_data(stdev_ci.v)) {
          mean_ci.v_ncl[0]  = mean_ci.v_ncu[0]   = bad_data_double;
       }
       else {
