@@ -340,7 +340,6 @@
     <param> \
       &MET_DIR;/data/sample_obs/madis/metar/metar_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
-      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
       -type metar -rec_beg 2000 -rec_end 6000 -v 2
     </param>
     <output>
