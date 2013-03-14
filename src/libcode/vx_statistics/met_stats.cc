@@ -2930,8 +2930,9 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
 
       v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
 
-      if(v < 0) stdev_ci.v = bad_data_double;
-      else      stdev_ci.v = sqrt(v);
+      if(is_eq(v, 0.0)) stdev_ci.v = 0.0;
+      else if(v < 0)    stdev_ci.v = bad_data_double;
+      else              stdev_ci.v = sqrt(v);
    }
 
    //
@@ -2944,7 +2945,7 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
       // Check for the degenerate case
       //
       if(n <= 1 || is_bad_data(stdev_ci.v)) {
-         mean_ci.v_ncl[0]  = mean_ci.v_ncu[0]   = bad_data_double;
+         mean_ci.v_ncl[0] = mean_ci.v_ncu[0] = bad_data_double;
       }
       else {
 
