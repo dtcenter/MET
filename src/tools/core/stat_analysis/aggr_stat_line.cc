@@ -1584,9 +1584,9 @@ void mpr_to_ctc(STATAnalysisJob &j, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
-                CTSInfo &cts_info, const char *tmp_dir) {
+                CTSInfo &cts_info, const char *tmp_dir,
+                gsl_rng *rng_ptr) {
    CTSInfo *cts_info_ptr = (CTSInfo *) 0;
-   gsl_rng *rng_ptr = (gsl_rng *) 0;
 
    //
    // Initialize
@@ -1628,11 +1628,6 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
    }
 
    //
-   // Set up the random number generator and seed value
-   //
-   rng_set(rng_ptr, j.boot_rng, j.boot_seed);
-
-   //
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
@@ -1649,11 +1644,6 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
          cts_info_ptr, 1, 1,
          j.rank_corr_flag, tmp_dir);
    }
-
-   //
-   // Deallocate memory for the random number generator
-   //
-   rng_free(rng_ptr);
 
    return;
 }
@@ -1688,8 +1678,8 @@ void mpr_to_mctc(STATAnalysisJob &j, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
-                 MCTSInfo &mcts_info, const char *tmp_dir) {
-   gsl_rng *rng_ptr = (gsl_rng *) 0;
+                 MCTSInfo &mcts_info, const char *tmp_dir,
+                 gsl_rng *rng_ptr) {
 
    //
    // Initialize
@@ -1715,11 +1705,6 @@ void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
    mcts_info.alpha[0] = j.out_alpha;
 
    //
-   // Set up the random number generator and seed value
-   //
-   rng_set(rng_ptr, j.boot_rng, j.boot_seed);
-
-   //
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
@@ -1736,19 +1721,14 @@ void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
          j.rank_corr_flag, tmp_dir);
    }
 
-   //
-   // Deallocate memory for the random number generator
-   //
-   rng_free(rng_ptr);
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
-                CNTInfo &cnt_info, const char *tmp_dir) {
-   gsl_rng *rng_ptr = (gsl_rng *) 0;
+                CNTInfo &cnt_info, const char *tmp_dir,
+                gsl_rng *rng_ptr) {
    bool precip_flag = false;
 
    //
@@ -1774,11 +1754,6 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
    cnt_info.alpha[0] = j.out_alpha;
 
    //
-   // Set up the random number generator and seed value
-   //
-   rng_set(rng_ptr, j.boot_rng, j.boot_seed);
-
-   //
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
@@ -1794,11 +1769,6 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
          precip_flag, j.n_boot_rep, j.boot_rep_prop,
          cnt_info, 1, j.rank_corr_flag, tmp_dir);
    }
-
-   //
-   // Deallocate memory for the random number generator
-   //
-   rng_free(rng_ptr);
 
    return;
 }
