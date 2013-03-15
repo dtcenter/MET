@@ -113,6 +113,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
             const ConcatString &tmp_path, ofstream *sa_out) {
    LineDataFile f;
    int n_in, n_out;
+   gsl_rng *rng_ptr = (gsl_rng *) 0;
 
    //
    // Open up the temp file for reading the intermediate STAT line data
@@ -155,6 +156,15 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    }
 
    //
+   // Set up the random number generator and seed value
+   // for the summary and aggregate stat jobs.
+   //
+   if(j.job_type == stat_job_summary ||
+      j.job_type == stat_job_aggr_stat) {
+      rng_set(rng_ptr, j.boot_rng, j.boot_seed);
+   }
+
+   //
    // Switch on the job type
    //
    switch(j.job_type) {
@@ -164,7 +174,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
          break;
 
       case(stat_job_summary):
-         do_job_summary(jobstring, f, j, n_in, n_out, sa_out);
+         do_job_summary(jobstring, f, j, n_in, n_out, sa_out, rng_ptr);
          break;
 
       case(stat_job_aggr):
@@ -172,7 +182,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
          break;
 
       case(stat_job_aggr_stat):
-         do_job_aggr_stat(jobstring, f, j, n_in, n_out, sa_out, tmp_dir);
+         do_job_aggr_stat(jobstring, f, j, n_in, n_out, sa_out, tmp_dir, rng_ptr);
          break;
 
       case(stat_job_go_index):
@@ -202,6 +212,11 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    // Close the input file stream
    //
    f.close();
+
+   //
+   // Deallocate memory for the random number generator
+   //
+   if(rng_ptr) rng_free(rng_ptr);
 
    return;
 }
@@ -271,13 +286,12 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
 
 void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     STATAnalysisJob &j, int &n_in, int &n_out,
-                    ofstream *sa_out) {
+                    ofstream *sa_out, gsl_rng *rng_ptr) {
    STATLine line;
    STATLineType lt;
    int i, k, r, c;
    double v, min, v10, v25, v50, v75, v90, max;
    CIInfo mean_ci, stdev_ci;
-   gsl_rng *rng_ptr = (gsl_rng *) 0;
    AsciiTable out_at;
    ConcatString key;
    NumArray value;
@@ -414,11 +428,6 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
       max = it->second.percentile_array(1.00);
 
       //
-      // Set up the random number generator and seed value
-      //
-      rng_set(rng_ptr, j.boot_rng, j.boot_seed);
-
-      //
       // Compute a bootstrap confidence interval for the mean of this
       // array of values.
       //
@@ -472,11 +481,6 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    //
    write_jobstring(jobstring, sa_out);
    write_table(out_at, sa_out);
-
-   //
-   // Deallocate memory for the random number generator
-   //
-   rng_free(rng_ptr);
 
    return;
 }
@@ -637,7 +641,8 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
 
 void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                       STATAnalysisJob &j, int &n_in, int &n_out,
-                      ofstream *sa_out, const ConcatString &tmp_dir) {
+                      ofstream *sa_out, const ConcatString &tmp_dir,
+                      gsl_rng *rng_ptr) {
    STATLine line;
    STATLineType in_lt, out_lt;
    AsciiTable out_at;
@@ -881,7 +886,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       // Parse the input MPR lines
       //
       aggr_mpr_lines(f, j, mpr_map, n_in, n_out);
-      write_job_aggr_mpr(j, out_lt, mpr_map, out_at, tmp_dir);
+      write_job_aggr_mpr(j, out_lt, mpr_map, out_at, tmp_dir, rng_ptr);
    }
 
    //
@@ -1742,7 +1747,8 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
 
 void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
                         map<ConcatString, AggrMPRInfo> &m,
-                        AsciiTable &at, const char *tmp_dir) {
+                        AsciiTable &at, const char *tmp_dir,
+                        gsl_rng *rng_ptr) {
    map<ConcatString, AggrMPRInfo>::iterator it;
    int n_row, n_col, r, c;
 
@@ -1820,7 +1826,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       // CTS output line
       //
       else if(lt == stat_cts) {
-         mpr_to_cts(j, it->second, cts_info, tmp_dir);
+         mpr_to_cts(j, it->second, cts_info, tmp_dir, rng_ptr);
          at.set_entry(r, c++, "CTS:");
          write_case_cols(it->first, at, r, c);
          write_cts_cols(cts_info, 0, at, r, c);
@@ -1838,7 +1844,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       // MCTS output line
       //
       else if(lt == stat_mcts) {
-         mpr_to_mcts(j, it->second, mcts_info, tmp_dir);
+         mpr_to_mcts(j, it->second, mcts_info, tmp_dir, rng_ptr);
          at.set_entry(r, c++, "MCTS:");
          write_case_cols(it->first, at, r, c);
          write_mcts_cols(mcts_info, 0, at, r, c);
@@ -1847,7 +1853,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       // CNT output line
       //
       else if(lt == stat_cnt) {
-         mpr_to_cnt(j, it->second, cnt_info, tmp_dir);
+         mpr_to_cnt(j, it->second, cnt_info, tmp_dir, rng_ptr);
          at.set_entry(r, c++, "CNT:");
          write_case_cols(it->first, at, r, c);
          write_cnt_cols(cnt_info, 0, at, r, c);

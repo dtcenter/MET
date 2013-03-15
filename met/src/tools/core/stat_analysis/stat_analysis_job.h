@@ -57,14 +57,14 @@ extern void do_job_filter(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *);
 
 extern void do_job_summary(const ConcatString &, LineDataFile &,
-               STATAnalysisJob &, int &, int &, ofstream *);
+               STATAnalysisJob &, int &, int &, ofstream *, gsl_rng *);
 
 extern void do_job_aggr(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *);
 
 extern void do_job_aggr_stat(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *,
-               const ConcatString &);
+               const ConcatString &, gsl_rng *);
 
 extern void do_job_go_index(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *);
@@ -106,7 +106,7 @@ extern void write_job_aggr_isc(STATAnalysisJob &, STATLineType,
 
 extern void write_job_aggr_mpr(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrMPRInfo> &, AsciiTable &,
-               const char *);
+               const char *, gsl_rng *);
 
 ////////////////////////////////////////////////////////////////////////
 

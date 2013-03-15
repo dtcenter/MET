@@ -180,7 +180,7 @@ extern void mpr_to_ctc(
 
 extern void mpr_to_cts(
                STATAnalysisJob &, const AggrMPRInfo &,
-               CTSInfo &, const char *);
+               CTSInfo &, const char *, gsl_rng *);
 
 extern void mpr_to_mctc(
                STATAnalysisJob &, const AggrMPRInfo &,
@@ -188,11 +188,11 @@ extern void mpr_to_mctc(
 
 extern void mpr_to_mcts(
                STATAnalysisJob &, const AggrMPRInfo &,
-               MCTSInfo &, const char *);
+               MCTSInfo &, const char *, gsl_rng *);
 
 extern void mpr_to_cnt(
                STATAnalysisJob &, const AggrMPRInfo &,
-               CNTInfo &, const char *);
+               CNTInfo &, const char *, gsl_rng *);
                
 
 extern void mpr_to_psum(STATAnalysisJob &, const AggrMPRInfo &,
