@@ -27,7 +27,7 @@
 ##         [-save]
 ##
 ##   Arguments:
-##      "-lookin"   is a comma-separated list of files with TCMPR lines to be used.
+##      "-lookin"   is a list of files with TCMPR lines to be used.
 ##      "-outdir"   is the output directory.
 ##      "-prefix"   is the output file name prefix.
 ##      "-title"    overrides the default plot title.
@@ -58,10 +58,19 @@
 
 library(boot)
 
-source("plot_tcmpr_util.R");
+# Check that the MET_BASE environment variable is set
+MET_BASE = Sys.getenv("MET_BASE", unset=NA);
+if(is.na(MET_BASE)) {
+  cat("ERROR: The \"MET_BASE\" environment variable must be set.\n")
+  quit(status=1)
+}
+
+source(paste(MET_BASE, "/scripts/Rscripts/plot_tcmpr_util.R", sep=''))
 
 # Read the TCMPR column information from a data file.
-column_info = read.table("plot_tcmpr_hdr.dat", header=TRUE, row.names=1)
+column_info = read.table(
+  paste(MET_BASE, "/scripts/Rscripts/plot_tcmpr_hdr.dat", sep=''),
+  header=TRUE, row.names=1)
 
 # JHG - TO DO LIST:
 # move customizable settings into a "config" file sort of thing
@@ -102,7 +111,7 @@ column_info = read.table("plot_tcmpr_hdr.dat", header=TRUE, row.names=1)
 ########################################################################
 
 usage = function() {
-  cat("\nUsage: plot_tc_mpr.R\n")
+  cat("\nUsage: plot_tcmpr.R\n")
   cat("        -lookin tcst_file_list\n")
   cat("        [-outdir path]\n")
   cat("        [-prefix string]\n")
@@ -118,7 +127,7 @@ usage = function() {
   cat("        [-ylim min,max]\n")
   cat("        [-no_ee]\n")
   cat("        [-save]\n")
-  cat("        where \"-lookin\"   is a comma-separated list of files with TCMPR lines to be used.\n")
+  cat("        where \"-lookin\"   is a list of files with TCMPR lines to be used.\n")
   cat("              \"-outdir\"   is the output directory.\n")
   cat("              \"-prefix\"   is the output file name prefix.\n")
   cat("              \"-title\"    overrides the default plot title.\n")
@@ -223,8 +232,10 @@ i=1
 while(i <= length(args)) {
 
   if(args[i] == "-lookin") {
-    file_list = unlist(strsplit(args[i+1], ','))
-    i=i+1
+    while(i+1 <= length(args) & substring(args[i+1], 1, 1) != '-') {
+       file_list = c(file_list, args[i+1])
+       i=i+1
+    }
   } else if(args[i] == "-outdir") {
     outdir = args[i+1]
     i=i+1
@@ -290,12 +301,6 @@ while(i <= length(args)) {
 # Run a tc_stat filter job to subset the data.
 #
 ########################################################################
-
-# Check that the MET_BASE environment variable is set
-if(is.na(Sys.getenv("MET_BASE", unset=NA))) {
-  cat("ERROR: The \"MET_BASE\" environment variable must be set.\n")
-  quit(status=1)
-}
 
 # Add the event equalization option
 if(event_equal) {
