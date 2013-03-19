@@ -407,7 +407,10 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    //
    mean_ci.allocate_n_alpha(1);
    stdev_ci.allocate_n_alpha(1);
-                    
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) summary_map.size() << " case(s).\n";
+
    //
    // Loop over the summary table
    //
@@ -974,7 +977,10 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
    else if(lt == stat_nbrctc) write_header_row(nbrctc_columns, n_nbrctc_columns, 0, at, 0, c);
    else if(lt == stat_nbrcts) write_header_row(nbrcts_columns, n_nbrcts_columns, 0, at, 0, c);
-   
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
    //
    // Loop through the map
    //
@@ -1102,6 +1108,9 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_mctc) write_mctc_header_row(0, n, at, 0, c);
    else if(lt == stat_mcts) write_header_row(mcts_columns, n_mcts_columns, 0, at, 0, c);
 
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
    //
    // Loop through the map
    //
@@ -1184,7 +1193,10 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_pstd) write_pstd_header_row(0, n, at, 0, c);
    else if(lt == stat_pjc)  write_pjc_header_row (0, n, at, 0, c);
    else if(lt == stat_prc)  write_prc_header_row (0, n, at, 0, c);
-   
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
    //
    // Loop through the map
    //
@@ -1280,6 +1292,9 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_val1l2) write_header_row(val1l2_columns, n_val1l2_columns, 0, at, 0, c);
    else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
    else if(lt == stat_nbrcnt) write_header_row(nbrcnt_columns, n_nbrcnt_columns, 0, at, 0, c);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
 
    //
    // Loop through the map
@@ -1383,6 +1398,9 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
    //
    c = 1 + j.column_case.n_elements();
    write_header_row(job_wdir_columns, n_job_wdir_columns, 0, at, 0, c);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
 
    //
    // Loop through the map
@@ -1548,6 +1566,9 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
    c = 1 + j.column_case.n_elements();
    write_rhist_header_row(0, n, at, 0, c);
 
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
    //
    // Loop through the map
    //
@@ -1597,6 +1618,9 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
    //
    c = 1 + j.column_case.n_elements();
    write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
 
    //
    // Loop through the case map
@@ -1676,6 +1700,9 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    c = 1 + j.column_case.n_elements();
    write_rhist_header_row(0, n, at, 0, c);
 
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
    //
    // Loop through the map
    //
@@ -1724,6 +1751,9 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
    //
    c = 1 + j.column_case.n_elements();
    write_header_row(isc_columns, n_isc_columns, 0, at, 0, c);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
 
    //
    // Loop through the map
@@ -1793,6 +1823,9 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_pstd)   write_pstd_header_row(0, j.out_fcst_thresh.n_elements(), at, 0, c);
    else if(lt == stat_pjc)    write_pjc_header_row (0, j.out_fcst_thresh.n_elements(), at, 0, c);
    else if(lt == stat_prc)    write_prc_header_row (0, j.out_fcst_thresh.n_elements(), at, 0, c);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
 
    //
    // Loop through the map
