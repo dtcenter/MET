@@ -672,6 +672,12 @@ void VxPairDataPoint::add_obs(float *hdr_arr,     char *hdr_typ_str,
       }
    }
 
+   // When verifying a vertical level forecast against a surface message type,
+   // set the observation level value to bad data so that it's not used in the
+   // duplicate logic.
+   if(obs_info->level().type() == LevelType_Vert ||
+      strstr(onlysf_msg_typ_str, hdr_typ_str) != NULL) obs_lvl = bad_data_double;
+
    // Look through all of the PairDataPoint objects to see if the observation
    // should be added.
 
