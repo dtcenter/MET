@@ -188,8 +188,6 @@ void TCStatJob::clear() {
 
    JobType = NoTCStatJobType;
 
-   PairArray.clear();
-
    AModel.clear();
    BModel.clear();
    StormId.clear();
@@ -217,6 +215,7 @@ void TCStatJob::clear() {
    InitThreshVal.clear();
    InitStrName.clear();
    InitStrVal.clear();
+   EventEqualCases.clear();
    
    DumpFile.clear();
    close_dump_file();
@@ -289,6 +288,7 @@ void TCStatJob::assign(const TCStatJob & j) {
 
    MatchPoints = j.MatchPoints;
    EventEqual = j.EventEqual;
+   EventEqualCases = j.EventEqualCases;
    
    OutInitMask = j.OutInitMask;
    OutValidMask = j.OutValidMask;
@@ -520,37 +520,6 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::filter_track(TrackPairInfo &tpi,
-                             TCLineCounts &n) const {
-   int n_rej;
-   
-   // Check RapidInten
-   if(RapidInten == true) {
-
-      // Determine the rapid intensification points
-      n_rej = tpi.check_rapid_inten(RapidIntenThresh);
-
-      // Update counts
-      n.RejRapidInten += n_rej;
-      n.NKeep         -= n_rej;
-   }
-
-   // Check Landfall
-   if(Landfall == true) {
-
-      // Determine the landfall points
-      n_rej = tpi.check_landfall(LandfallBeg, LandfallEnd);
-
-      // Update counts
-      n.RejLandfall += n_rej;
-      n.NKeep       -= n_rej;
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCLineCounts &n) const {
    bool keep = true;
@@ -558,7 +527,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    double v_dbl, alat, alon, blat, blon, adland, bdland;
    ConcatString v_str;
    StringArray sa;
-
+   
    // Check TC-STAT header columns
    if(AModel.n_elements() > 0 &&
      !AModel.has(line.amodel()))        { keep = false; n.RejAModel++;    }
@@ -672,6 +641,13 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
          keep = false;
          n.RejMatchPoints++;
       }
+   }
+
+   // Check the event equalization cases
+   if(keep == true && EventEqualCases.n_elements() > 0 &&
+     !EventEqualCases.has(line.header())) {
+      keep = false;
+      n.RejEventEqual++;
    }
    
    // Check OutValidMask
@@ -856,57 +832,52 @@ void TCStatJob::close_dump_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::write_dump_file() {
-  
-   if(!DumpOut) return;
-   
-   int i, i_row;
+void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
+
+   if(!DumpOut || tpi.n_points() == 0) return;
+
    TcHdrColumns tchc;
    AsciiTable out_at;
-        
+   int i_row, hdr_row;
+
+   // Determine if we need to write a header row
+   if(DumpOut->tellp() == 0) hdr_row = 1;
+   else                      hdr_row = 0;
+   
    // Initialize the output AsciiTable
-   out_at.set_size(PairArray.n_points() + 1,
+   out_at.set_size(tpi.n_points() + hdr_row,
                    n_tc_header_cols + n_tc_mpr_cols);
 
+   // Write the TCMPR header row
+   write_tc_mpr_header_row(1, out_at, 0, 0);
+   
    // Setup the output AsciiTable
    out_at.set_table_just(LeftJust);
    out_at.set_precision(default_precision);
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
    out_at.set_delete_trailing_blank_rows(1);
-
-   // Write the TCMPR header row
-   write_tc_mpr_header_row(1, out_at, 0, 0);
-   
-   // Loop over and write the pairs
-   for(i=0, i_row=1; i<PairArray.n_pairs(); i++) {
-
-      // Check for no remaining points
-      if(PairArray[i].n_points() == 0) continue;
      
-      // Setup header columns
-      tchc.clear();
-      tchc.set_adeck_model(PairArray[i].adeck().technique());
-      tchc.set_bdeck_model(PairArray[i].bdeck().technique());
-      tchc.set_storm_id(PairArray[i].adeck().storm_id());
-      tchc.set_basin(PairArray[i].bdeck().basin());
-      tchc.set_cyclone(PairArray[i].bdeck().cyclone());
-      tchc.set_storm_name(PairArray[i].bdeck().storm_name());
+   // Setup header columns
+   tchc.clear();
+   tchc.set_adeck_model(tpi.adeck().technique());
+   tchc.set_bdeck_model(tpi.bdeck().technique());
+   tchc.set_storm_id(tpi.adeck().storm_id());
+   tchc.set_basin(tpi.bdeck().basin());
+   tchc.set_cyclone(tpi.bdeck().cyclone());
+   tchc.set_storm_name(tpi.bdeck().storm_name());
    
-      if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
-      else                            tchc.set_init_mask(na_str);
-      if(OutValidMask.n_points() > 0) tchc.set_valid_mask(OutValidMask.name());
-      else                            tchc.set_valid_mask(na_str);
+   if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
+   else                            tchc.set_init_mask(na_str);
+   if(OutValidMask.n_points() > 0) tchc.set_valid_mask(OutValidMask.name());
+   else                            tchc.set_valid_mask(na_str);
 
-      // Write the TrackPairInfo object
-      write_tc_mpr_row(tchc, PairArray[i], out_at, i_row);
-   }
+   // Write the TrackPairInfo object
+   i_row = hdr_row;
+   write_tc_mpr_row(tchc, tpi, out_at, i_row);
 
    // Write the AsciiTable to the file
    *DumpOut << out_at;
-
-   // Close the dump file
-   close_dump_file();
    
    return;
 }
@@ -1005,195 +976,142 @@ ConcatString TCStatJob::serialize() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::do_job(const StringArray &file_list,
-                       TCLineCounts &n) {
-   int i;
-   
-   // Loop through the input file list
-   for(i=0; i<file_list.n_elements(); i++) {
-      process_tc_stat_file(file_list[i], n);
-   }
+void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
 
-   // Apply event equalization logic
-   if(EventEqual == true) {
-      process_event_equal(n);
-   }
-
-   // Write the dump file
-   if(DumpOut) write_dump_file();
+   // Add the input file list
+   TCSTFiles.add_files(file_list);
+  
+   // Apply the event equalization logic to build a list of common cases
+   if(EventEqual == true) process_event_equal();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Apply event equalization logic to build list of common cases.
+//
+////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::process_tc_stat_file(const char *path, TCLineCounts &n) {
-   LineDataFile in;
-   TCStatLine line;
+void TCStatJob::process_event_equal() {
    TrackPairInfo tpi;
-   int index;
+   TCLineCounts n;
+   ConcatString key, val;
+   StringArray case_list;
+   ConcatString models;
+   int i;
 
-   // Open the data file
-   if(!(in.open(path))) {
-      mlog << Error << "\nTCStatJob::process_tc_stat_file(const char *path) -> "
-           << "can't open file \"" << path << "\" for reading\n\n";
-      exit(1);
-   }
+   // Event equalization case map
+   map<ConcatString,StringArray,cs_cmp> case_map;
+   map<ConcatString,StringArray,cs_cmp>::iterator it;
+   
+   mlog << Debug(3)
+        << "Applying event equalization logic.\n";
+
+   // Rewind to the beginning of the track pair input
+   TCSTFiles.rewind();
+
+   // Process each of the track pairs
+   while(TCSTFiles >> tpi) {
+
+      // Process the track pair down to points to be used
+      subset_track_pair(tpi, n);
+
+      // Add event equalization information for each track point
+      for(i=0; i<tpi.n_lines(); i++) {
+
+         // Store the current map key and value
+         key = tpi.adeck().technique(); // ADECK model name
+         val = tpi.line(i)->header();   // Track line header
+
+         // Add a new map entry, if necessary
+         if(case_map.count(key) == 0) {
+            case_list.clear();
+            case_map[key] = case_list;
+         }
+
+         // Add the current header to the case map
+         if(!case_map[key].has(val)) case_map[key].add(val);
+
+      } // end for i
+   } // end while
+
+   // Initialize to the first map entry
+   EventEqualCases = case_map.begin()->second;
+
+   // Loop over the map entries and build a list of common cases
+   for(it = case_map.begin(); it != case_map.end(); it++) {
+      EventEqualCases = intersection(EventEqualCases, it->second);
+      models << it->first << " ";
+   } // end for it
 
    mlog << Debug(3)
-        << "Reading file: " << path << "\n";
+        << "For event equalization, identified "
+        << EventEqualCases.n_elements() << " common cases for "
+        << (int) case_map.size() << " models: " << models << "\n";
 
-   // Process each TC-STAT line
-   while(in >> line) {
-
-      // Increment counts
-      n.NRead++;
-      n.NKeep++;
-
-      // Get the index value for the current line
-      index = atoi(line.get_item("INDEX"));
-
-      // Check for the first point of a track pair
-      if(index == 1) {
-         process_track_pair(tpi, n);
-         tpi.clear();
-      }
-
-      // Add the current line to the track pair
-      tpi.add(line);
+   for(i=0; i<EventEqualCases.n_elements(); i++) {
+      mlog << Debug(4)
+           << "[Case " << i+1 << " of " << EventEqualCases.n_elements()
+           << "] " << EventEqualCases[i] << "\n";
    }
-
-   // Store the last track pair
-   process_track_pair(tpi, n);
-
+        
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::process_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
-   int i;
-   TrackPairInfo tpi_subset;
-
+void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
+   int i, n_rej;
+  
    // Check for no points
    if(tpi.n_points() == 0) return;
 
-   // Determine if the whole track can be discarded
-   if(!is_keeper_track(tpi, n)) return;
+   // Increment the read and keep counts
+   n.NRead += tpi.n_points();
+   n.NKeep += tpi.n_points();
 
-   // Filter down the track if necessary
-   filter_track(tpi, n);
+   // Determine if the whole track can be discarded
+   if(!is_keeper_track(tpi, n)) {
+      tpi.clear();
+      return;
+   }
+
+   // Check RapidInten
+   if(RapidInten == true) {
+
+      // Determine the rapid intensification points
+      n_rej = tpi.check_rapid_inten(RapidIntenThresh);
+
+      // Update counts
+      n.RejRapidInten += n_rej;
+      n.NKeep         -= n_rej;
+   }
+
+   // Check Landfall
+   if(Landfall == true) {
+
+      // Determine the landfall points
+      n_rej = tpi.check_landfall(LandfallBeg, LandfallEnd);
+
+      // Update counts
+      n.RejLandfall += n_rej;
+      n.NKeep       -= n_rej;
+   }
 
    // Loop over the track points to check line by line
    for(i=0; i<tpi.n_lines(); i++) {
 
-      // Continue if this line is not be kept
+      // Skip marked lines
       if(!tpi.keep(i)) continue;
 
-      // Check if this line is not to be kept
-      if(!is_keeper_line(*tpi.line(i), n)) {
-         tpi.set_keep(i, 0);
-         n.NKeep -= 1;
-      }
+      // Check if this line should be discarded
+      if(!is_keeper_line(*tpi.line(i), n)) tpi.set_keep(i, 0);
    }
 
-   // Retrieve the subset of track pair points marked for retention
-   tpi_subset = tpi.keep_subset();
+   // Subset the points marked for retention
+   tpi = tpi.keep_subset();
    
-   // Add track pair to the PairArray
-   if(tpi_subset.n_points() > 0) {
-
-     mlog << Debug(4)
-          << "Adding track pair " << PairArray.n_pairs()+1 << ": "
-          << tpi_subset.serialize() << "\n";
-
-     PairArray.add(tpi_subset);
-   }
-   
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCStatJob::process_event_equal(TCLineCounts &n) {
-   int i, j;
-   StringArray case_list;
-   map<ConcatString,StringArray,cs_cmp> case_map;
-   map<ConcatString,StringArray,cs_cmp>::iterator it;
-   TrackPairInfo new_pair;
-   TrackPairInfoArray new_pair_array;
-
-   // Loop over the TrackPairInfoArray entries and map the ADECK model
-   // name to a list of cases
-   for(i=0; i<PairArray.n_pairs(); i++) {
-
-      // Loop over the TCStatLines for the current TrackPairInfo
-      for(j=0; j<PairArray[i].n_lines(); j++) {
-
-         // Attempt to locate the current ADECK model in the map
-         it = case_map.find(PairArray[i].line(j)->amodel());
-
-         // ADECK model is not yet defined in the map
-         if(it == case_map.end()) {
-
-            // Store the case info in a StringArray
-            case_list.clear();
-            case_list.add(PairArray[i].line(j)->header());
-           
-            // Add the pair to the map
-            case_map[PairArray[i].line(j)->amodel()] = case_list;
-         }
-         // ADECK model is already defined in the map
-         else {
-
-            // Add the case info to the map
-            it->second.add(PairArray[i].line(j)->header());
-         }
-
-      } // end for j
-   } // end for i
-
-   // Initialize to the first map entry
-   case_list = case_map.begin()->second;
-
-   // Loop over the map entries and build a list of unique cases
-   for(it = case_map.begin(); it != case_map.end(); it++) {
-      case_list = intersection(case_list, it->second);
-   } // end for it
-
-   mlog << Debug(4)
-        << "For event equalization, identified " << case_list.n_elements()
-        << " unique cases.\n";
-
-   // Build a new PairArray with only the common cases
-   for(i=0; i<PairArray.n_pairs(); i++) {
-
-      // Initialize
-      new_pair.clear();
-      
-      // Loop over the TCStatLines for the current TrackPairInfo
-      for(j=0; j<PairArray[i].n_lines(); j++) {
-
-         // Check if the current line belongs
-         if(case_list.has(PairArray[i].line(j)->header())) {
-            new_pair.add(*PairArray[i].line(j));
-         }
-         // Otherwise, adjust counts
-         else {
-            n.RejEventEqual++;
-            n.NKeep--;
-         }
-
-      } // end for j
-
-      // Add track pair to the PairArray
-      if(new_pair.n_points() > 0) new_pair_array.add(new_pair);
-
-   } // end for i
-
-   // Store the new array
-   PairArray = new_pair_array;
-
    return;
 }
 
@@ -1270,6 +1188,7 @@ void TCStatJobFilter::assign(const TCStatJobFilter & j) {
 
 void TCStatJobFilter::do_job(const StringArray &file_list,
                              TCLineCounts &n) {
+   TrackPairInfo tpi;
 
    // Check that the -dump_row option has been supplied
    if(!DumpOut) {
@@ -1280,8 +1199,30 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
       exit(1);
    }
 
-   // Call the parent's do_job() to filter the data
+   // Call the parent's do_job() to do event equalization
    TCStatJob::do_job(file_list, n);
+
+   // Rewind to the beginning of the track pair input
+   TCSTFiles.rewind();
+
+   // Process each of the track pairs
+   while(TCSTFiles >> tpi) {
+
+      // Process the track pair down to points to be used
+      subset_track_pair(tpi, n);
+
+      // Write out the retained lines
+      if(tpi.n_points() > 0) {
+
+         mlog << Debug(4)
+              << "Processing track pair: " << tpi.serialize() << "\n";
+
+         if(DumpOut) dump_track_pair(tpi);
+      }
+   } // end while
+
+   // Close the dump file
+   if(DumpOut) close_dump_file();
    
    // Process the filter output
    if(JobOut) do_output(*JobOut);
@@ -1493,6 +1434,7 @@ ConcatString TCStatJobSummary::serialize() const {
 
 void TCStatJobSummary::do_job(const StringArray &file_list,
                               TCLineCounts &n) {
+   TrackPairInfo tpi;
 
    // Check that the -column option has been supplied
    if(Column.n_elements() == 0) {
@@ -1503,11 +1445,33 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
       exit(1);
    }
    
-   // Call the parent's do_job() to filter the data
+   // Call the parent's do_job() to do event equalization
    TCStatJob::do_job(file_list, n);
 
-   // Process the PairArray entries
-   process_pair_array();
+   // Rewind to the beginning of the track pair input
+   TCSTFiles.rewind();
+
+   // Process each of the track pairs
+   while(TCSTFiles >> tpi) {
+
+      // Process the track pair down to points to be used
+      subset_track_pair(tpi, n);
+      
+      // Write out the retained lines
+      if(tpi.n_points() > 0) {
+        
+         mlog << Debug(4)
+              << "Processing track pair: " << tpi.serialize() << "\n";
+
+         // Process the track pair info for the summary job
+         process_track_pair(tpi);
+              
+         if(DumpOut) dump_track_pair(tpi);
+      }
+   } // end while
+
+   // Close the dump file
+   if(DumpOut) close_dump_file();
 
    // Process the summary output
    if(JobOut) do_output(*JobOut);
@@ -1518,88 +1482,69 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::process_pair_array() {
-   int i, j, k, l, lead;
+void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
+   int i, j, k, lead;
    map<ConcatString,MapData,cs_cmp> cur_map;
    map<ConcatString,MapData,cs_cmp>::iterator it;
    ConcatString key, cur;
    MapData data;
    double val;
 
-   // Loop over the TrackPairInfoArray entries
-   for(i=0; i<PairArray.n_pairs(); i++) {
-
-      // Initialize the map
-      cur_map.clear();
+   // Initialize the map
+   cur_map.clear();
      
-      // Loop over TCStatLines for each TrackPairInfo entry
-      // and construct a map
-      for(j=0; j<PairArray[i].n_lines(); j++) {
+   // Loop over TCStatLines and construct a summary map
+   for(i=0; i<tpi.n_lines(); i++) {
         
-         // Add summary info to the current map
-         for(k=0; k<Column.n_elements(); k++) {
+      // Add summary info to the current map
+      for(j=0; j<Column.n_elements(); j++) {
 
-            // Build the key and get the current column value
-            key = Column[k];
-            val = get_column_double(*PairArray[i].line(j), Column[k]);
+         // Build the key and get the current column value
+         key = Column[j];
+         val = get_column_double(*tpi.line(i), Column[j]);
 
-            // Add case information to the key
-            for(l=0; l<CaseColumn.n_elements(); l++) {
+         // Add case information to the key
+         for(k=0; k<CaseColumn.n_elements(); k++) {
 
-               cur = PairArray[i].line(j)->get_item(CaseColumn[l]);
+            cur = tpi.line(i)->get_item(CaseColumn[k]);
 
-               // For bad data, use the NA string
-               if(is_bad_data(atoi(cur))) cur = na_str;
+            // For bad data, use the NA string
+            if(is_bad_data(atoi(cur))) cur = na_str;
 
-               // Special handling for lead time:
-               // Switch 2-digit hours to 3-digit hours so that the
-               // summary job output is sorted nicely.
-               if(strcasecmp(CaseColumn[l], "LEAD") == 0 && cur != na_str &&
-                  abs(lead = hhmmss_to_sec(cur)) < 100*sec_per_hour) {
+            // Special handling for lead time:
+            // Switch 2-digit hours to 3-digit hours so that the
+            // summary job output is sorted nicely.
+            if(strcasecmp(CaseColumn[k], "LEAD") == 0 &&
+               cur != na_str &&
+               abs(lead = hhmmss_to_sec(cur)) < 100*sec_per_hour) {
 
-                  // Handle positive and negative lead times
-                  key << (lead < 0 ? ":-0" : ":0")
-                      << sec_to_hhmmss(abs(lead));
-               }
-               // Otherwise, just append the current case info
-               else {
-                  key << ":" << cur;
-               }
-               
-            } // end for l
-
-            // Key is not yet defined in the map
-            if((it = cur_map.find(key)) == cur_map.end()) {
-
-               // Add the MapData to the current map
-               clear_map_data(data);
-               data.Val.add(val);
-               data.Hdr.add(PairArray[i].line(j)->header());
-               data.AModel.add(PairArray[i].line(j)->amodel());
-               data.Init.add(PairArray[i].line(j)->init());
-               data.Lead.add(PairArray[i].line(j)->lead());
-               data.Valid.add(PairArray[i].line(j)->valid());
-               cur_map[key] = data;
+               // Handle positive and negative lead times
+               key << (lead < 0 ? ":-0" : ":0")
+                   << sec_to_hhmmss(abs(lead));
             }
-            // Key is defined in the map
+            // Otherwise, just append the current case info
             else {
-
-               // Add the value for the existing key
-               it->second.Val.add(val);
-               it->second.Hdr.add(PairArray[i].line(j)->header());
-               it->second.AModel.add(PairArray[i].line(j)->amodel());
-               it->second.Init.add(PairArray[i].line(j)->init());
-               it->second.Lead.add(PairArray[i].line(j)->lead());
-               it->second.Valid.add(PairArray[i].line(j)->valid());
+               key << ":" << cur;
             }
             
          } // end for k
+
+         // Add map entry for this key, if necessary
+         if(cur_map.count(key) == 0) cur_map[key] = data;
+
+         // Add values for this key
+         cur_map[key].Val.add(val);
+         cur_map[key].Hdr.add(tpi.line(i)->header());
+         cur_map[key].AModel.add(tpi.line(i)->amodel());
+         cur_map[key].Init.add(tpi.line(i)->init());
+         cur_map[key].Lead.add(tpi.line(i)->lead());
+         cur_map[key].Valid.add(tpi.line(i)->valid());
+
       } // end for j
-
-      // Add the current map
-      add_map(cur_map);
-
    } // end for i
+
+   // Add the current map
+   add_map(cur_map);
 
    return;
 }
@@ -1607,40 +1552,39 @@ void TCStatJobSummary::process_pair_array() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::add_map(map<ConcatString,MapData,cs_cmp>&m) {
-   map<ConcatString,MapData,cs_cmp>::iterator it_in;
    map<ConcatString,MapData,cs_cmp>::iterator it;
 
    // Loop over the input map entries
-   for(it_in = m.begin(); it_in != m.end(); it_in++) {
+   for(it = m.begin(); it != m.end(); it++) {
 
       // Current map key is not yet defined in SummaryMap
-      if((it = SummaryMap.find(it_in->first)) == SummaryMap.end()) {
+      if(SummaryMap.count(it->first) == 0) {
 
          mlog << Debug(5)
-              << "Summary Map Insert (" << it_in->first << ") "
-              << it_in->second.Val.n_elements() << " values: "
-              << it_in->second.Val.serialize() << "\n";
+              << "Summary Map Insert (" << it->first << ") "
+              << it->second.Val.n_elements() << " values: "
+              << it->second.Val.serialize() << "\n";
 
          // Add the pair to the map
-         SummaryMap[it_in->first] = it_in->second;
+         SummaryMap[it->first] = it->second;
       }
       // Current map key is defined in SummaryMap
       else {
 
          mlog << Debug(5)
-              << "Summary Map Add (" << it_in->first << ") "
-              << it_in->second.Val.n_elements() << " values: "
-              << it_in->second.Val.serialize() << "\n";
+              << "Summary Map Add (" << it->first << ") "
+              << it->second.Val.n_elements() << " values: "
+              << it->second.Val.serialize() << "\n";
 
          // Add the value for the existing key
-         it->second.Val.add(it_in->second.Val);
-         it->second.Hdr.add(it_in->second.Hdr);
-         it->second.AModel.add(it_in->second.AModel);
-         it->second.Init.add(it_in->second.Init);
-         it->second.Lead.add(it_in->second.Lead);
-         it->second.Valid.add(it_in->second.Valid);
+         SummaryMap[it->first].Val.add(it->second.Val);
+         SummaryMap[it->first].Hdr.add(it->second.Hdr);
+         SummaryMap[it->first].AModel.add(it->second.AModel);
+         SummaryMap[it->first].Init.add(it->second.Init);
+         SummaryMap[it->first].Lead.add(it->second.Lead);
+         SummaryMap[it->first].Valid.add(it->second.Valid);
       }
-   } // end for it_in
+   } // end for it
 
    return;
 }
@@ -1965,19 +1909,6 @@ ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
    }
 
    return(ConcatString(s));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void clear_map_data(MapData &d) {
-   d.Val.clear();
-   d.Hdr.clear();
-   d.AModel.clear();
-   d.Init.clear();
-   d.Lead.clear();
-   d.Valid.clear();
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

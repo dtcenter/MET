@@ -16,6 +16,8 @@
 #include <iostream>
 #include <map>
 
+#include "tc_stat_files.h"
+
 #include "mask_poly.h"
 #include "vx_tc_util.h"
 #include "vx_util.h"
@@ -154,39 +156,43 @@ class TCStatJob {
 
       void dump(ostream &, int depth = 0) const;
 
-      bool is_keeper_track(const TrackPairInfo &,
-                           TCLineCounts &) const;
+      //////////////////////////////////////////////////////////////////
+      
+      bool is_keeper_track(const TrackPairInfo &, TCLineCounts &) const;
 
-      void filter_track(TrackPairInfo &,
-                        TCLineCounts &) const;
+      bool is_keeper_line(const TCStatLine &, TCLineCounts &) const;
 
-      bool is_keeper_line(const TCStatLine &,
-                          TCLineCounts &) const;
+      double get_column_double(const TCStatLine &, const ConcatString &) const;
 
-      double get_column_double(const TCStatLine &,
-                               const ConcatString &) const;
-
+      //////////////////////////////////////////////////////////////////
+                               
       virtual StringArray parse_job_command(const char *);
+
       void set_mask(MaskPoly &, const char *);
+
       void open_dump_file();
+
+      void dump_track_pair(const TrackPairInfo &);
+
       void close_dump_file();
-      void write_dump_file();      
 
       virtual ConcatString serialize() const;
 
+      //////////////////////////////////////////////////////////////////
+      
       virtual void do_job(const StringArray &, TCLineCounts &);
 
-      virtual void process_tc_stat_file(const char *, TCLineCounts &);
-
-      void process_track_pair(TrackPairInfo &, TCLineCounts &);
-
-      void process_event_equal(TCLineCounts &);
+      void process_event_equal();
       
+      void subset_track_pair(TrackPairInfo &, TCLineCounts &);
+
+      //////////////////////////////////////////////////////////////////
+      
+      // Interface with the input data files for this job
+      TCStatFiles TCSTFiles;
+
       // Job Type
       TCStatJobType JobType;
-
-      // Array to store the filtered TrackPairInfo
-      TrackPairInfoArray PairArray;
 
       // Variables to stratify the input TC-STAT lines
 
@@ -252,8 +258,9 @@ class TCStatJob {
       bool MatchPoints;
 
       // Only retain cases present for all models
-      bool EventEqual;
-      
+      bool        EventEqual;
+      StringArray EventEqualCases;
+
       // Only retain TrackPoints with recent rapid intensification
       bool         RapidInten;
       SingleThresh RapidIntenThresh;
@@ -316,7 +323,7 @@ class TCStatJobSummary : public TCStatJob {
       
       void do_job(const StringArray &, TCLineCounts &); // virtual from base class
 
-      void process_pair_array();
+      void process_track_pair(TrackPairInfo &);
       
       void add_map(map<ConcatString,MapData,cs_cmp>&);
 
@@ -346,7 +353,6 @@ class TCStatJobSummary : public TCStatJob {
 
 ////////////////////////////////////////////////////////////////////////
 
-void        clear_map_data(MapData &);
 bool        is_time_series(const TimeArray &, const NumArray &,
                            const TimeArray &, int &);
 int         compute_time_to_indep(const NumArray &, int);
