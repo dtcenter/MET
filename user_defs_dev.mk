@@ -94,6 +94,7 @@ ENABLE_STAT_ANALYSIS   = 1
 ENABLE_WAVELET_STAT    = 1
 ENABLE_SERIES_ANALYSIS = 1
 ENABLE_WWMCA           = 1
+ENABLE_MODIS           = 1
 ENABLE_TC_UTILS        = 1
 
 # Flags to compile support for additional file formats
