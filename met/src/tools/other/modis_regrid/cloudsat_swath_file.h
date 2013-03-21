@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-// #include "vx_log.h"
+#include "vx_log.h"
 
 #include "hdf.h"
 #include "mfhdf.h"
