@@ -167,6 +167,7 @@ modis_file.o: modis_file.h modis_file.cc
 modis_regrid: modis_regrid.cc $(OBJECTS)
 	@ echo
 	$(CXX) modis_regrid.cc modis_file.o cloudsat_swath_file.o sat_utils.o data_averager.o data_plane_to_netcdf.o -o modis_regrid $(FLAGS) -I$(MET_INC_DIR) -I$(HDF_INC_DIR) -I$(HDF_EOS_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) -L$(MET_LIB_DIR) -L$(HDF_EOS_LIB_DIR) -L$(HDF_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(MET_LITTLE_Ls) -lhdfeos -lmfhdf -ldf -ljpeg -lz -lm
+	cp modis_regrid $(MET_BIN_DIR)
 
 ########################################################################
 
