@@ -52,6 +52,7 @@ export ENABLE_STAT_ANALYSIS
 export ENABLE_WAVELET_STAT
 export ENABLE_SERIES_ANALYSIS
 export ENABLE_WWMCA
+export ENABLE_MODIS
 export ENABLE_TC_UTILS
 
 ###############################################################################

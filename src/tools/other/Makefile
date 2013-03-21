@@ -32,7 +32,7 @@ ifeq ($(ENABLE_WWMCA), 1)
 	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS)
 endif
 ifeq ($(ENABLE_MODIS), 1)
-	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS)
+	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS)
 endif
 
 
@@ -47,7 +47,7 @@ clean:
 	cd madis2nc         ; $(MAKE) $(PRINT_OPTS) clean
 	cd pb2nc            ; $(MAKE) $(PRINT_OPTS) clean
 	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS) clean
-	cd modis            ; $(MAKE) $(PRINT_OPTS) clean
+	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
@@ -61,7 +61,7 @@ gen_sources:
 	cd madis2nc         ; $(MAKE) $(PRINT_OPTS) gen_sources
 	cd pb2nc            ; $(MAKE) $(PRINT_OPTS) gen_sources
 	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS) gen_sources
-	cd modis            ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################
