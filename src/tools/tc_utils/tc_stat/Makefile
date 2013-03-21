@@ -17,6 +17,7 @@ EXECUTABLES = tc_stat
 
 
 OBJECTS     = tc_stat_conf_info.o \
+              tc_stat_files.o \
               tc_stat_job.o
 
 LIBRARIES   =
@@ -29,6 +30,7 @@ GEN_SOURCES =
 
 
 HEADERS     = tc_stat_conf_info.h \
+              tc_stat_files.h \
               tc_stat_job.h
 
 
@@ -64,6 +66,11 @@ gen_sources: $(GEN_SOURCES)
 tc_stat_conf_info.o: tc_stat_conf_info.cc
 	@ echo
 	$(CXX) tc_stat_conf_info.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
+
+
+tc_stat_files.o: tc_stat_files.cc
+	@ echo
+	$(CXX) tc_stat_files.cc $(CXX_FLAGS) $(OPT_FLAGS) -c -I$(MET_INC_DIR) $(GSL_INCS) $(NETCDF_INCS)
 
 
 tc_stat_job.o: tc_stat_job.cc
