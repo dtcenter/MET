@@ -488,12 +488,6 @@ int EnsembleStatConfInfo::get_n_msg_typ(int i) const {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
-   return n_txt_row(i_txt_row, -1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsembleStatConfInfo::n_txt_row(int i_txt_row, int n_pair) {
    int i, n, max_n_msg_typ;
 
    // Determine the maximum number of message types being used
@@ -513,14 +507,20 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row, int n_pair) {
          break;
 
       case(i_orank):
-      case(i_ssvar):
+
          // Compute the maximum number of matched pairs to be written
          // out by summing the number for each VxPairDataEnsemble object
          for(i=0, n=0; i<n_vx; i++) {
-            n += (-1 == n_pair ? vx_pd[i].get_n_pair() : n_pair);
+            n += vx_pd[i].get_n_pair();
          }
          break;
 
+      case(i_ssvar):
+
+         // Just return zero since we'll resize the output AsciiTables
+         // to accomodate the SSVAR output
+         n = 0;
+         break;
 
       default:
          mlog << Error << "\nEnsembleStatConfInfo::n_txt_row(int) -> "
@@ -536,19 +536,13 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row, int n_pair) {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatConfInfo::n_stat_row() {
-   return n_stat_row(-1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int EnsembleStatConfInfo::n_stat_row(int n_pair) {
    int i, n;
 
    // Set the maximum number of STAT output lines by summing the counts
    // for the optional text files that have been requested
    for(i=0, n=0; i<n_txt; i++) {
 
-      if(output_flag[i] != STATOutputType_None) n += n_txt_row(i, n_pair);
+      if(output_flag[i] != STATOutputType_None) n += n_txt_row(i);
    }
 
    return(n);

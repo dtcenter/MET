@@ -63,7 +63,6 @@ using namespace std;
 static void process_command_line  (int, char **);
 static void process_ensemble      ();
 static void process_vx            ();
-static void process_vx_table_size ();
 
 static void process_point_vx      ();
 static void process_point_obs     (int);
@@ -79,10 +78,9 @@ static void set_grid(const Grid &);
 static void clear_counts(const DataPlane &, int);
 static void track_counts(const DataPlane &, int);
 
-static void setup_nc_file       (unixtime, int, const char *);
-static void setup_txt_files     ();
-static void setup_txt_files     (int);
-static void setup_table         (AsciiTable &);
+static void setup_nc_file   (unixtime, int, const char *);
+static void setup_txt_files ();
+static void setup_table     (AsciiTable &);
 
 static void build_outfile_name(unixtime, const char *,
                                ConcatString &);
@@ -363,42 +361,46 @@ void process_command_line(int argc, char **argv)
    // Check the spread/skill configuration information
    conf_info.ens_ssvar_flag = 0;
    bool ssvar_out = (conf_info.output_flag[i_ssvar] != STATOutputType_None);
-   if( ens_ssvar_mean && strcmp(ens_ssvar_mean, "") ){
+   if(ens_ssvar_mean && strcmp(ens_ssvar_mean, "")) {
 
-      if( !ssvar_out ){
+      if(!ssvar_out) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "ignoring input -ssvar_mean file because "
               << "SSVAR line type is set to NONE\n\n";
-      } else if( stat(ens_ssvar_mean, &results) ) {
+      }
+      else if(stat(ens_ssvar_mean, &results)) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input spread/skill mean file: "
               << ens_ssvar_mean << "\n\n";
          ens_ssvar_mean = "";
-      } else if( !vx_flag ) {
+      }
+      else if(!vx_flag) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "ignoring input -ssvar_mean file because "
               << "no observations have been specified\n\n";
-      } else {
+      }
+      else {
          conf_info.ens_ssvar_flag = 1;
       }
 
-   } else if( ssvar_out ){
+   }
+   else if(ssvar_out) {
 
-      if( !vx_flag ) {
+      if(!vx_flag) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "disabling ensemble spread/skill calculation "
               << "because no observations have been specified\n\n";
-      } else {
+      }
+      else {
          conf_info.ens_ssvar_flag = 1;
 
-         if( !conf_info.ensemble_flag[i_nc_mean] ){
+         if(!conf_info.ensemble_flag[i_nc_mean]) {
             mlog << Warning << "\nprocess_command_line() -> "
                  << "enabling ensemble mean to facilitate calculation "
                  << "of ensemble spread/skill\n\n";
             conf_info.ensemble_flag[i_nc_mean] = true;
          }
       }
-
    }
    conf_info.ens_ssvar_mean = ens_ssvar_mean;
 
@@ -531,11 +533,7 @@ void process_ensemble() {
    }
 
    // Close the output NetCDF file
-   if(nc_out) {
-      nc_out->close();
-      delete nc_out;
-      nc_out = (NcFile *) 0;
-   }
+   if(nc_out) { nc_out->close(); delete nc_out; nc_out = (NcFile *) 0; }
 
    return;
 }
@@ -561,9 +559,6 @@ void process_vx() {
       // Setup the GCPairData objects
       conf_info.set_vx_pd();
 
-      // Determine the number of ascii table rows needed
-      process_vx_table_size();
-
       // Process the point observations
       if(point_obs_flag) process_point_vx();
 
@@ -572,74 +567,6 @@ void process_vx() {
    }
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_vx_table_size() {
-
-   // The conservative approach to calculating the number of stat file row:
-   //
-   //  ADD:
-   //    * grid dimensions of gridded obs files (number of gridded matched pairs)
-   //    * number of observations in obs files (number of point matched pairs)
-   //
-   //  Then,
-   //  MULTIPLY: by number of masks, message types and interpolation methods
-   //
-
-   // Store the number of grid points for each gridded obs file
-   vx_num_mpr = 0;
-   int n_grid = grid.nx() && grid.ny() ? grid.nx() * grid.ny() : 0;
-   for(int i=0; i < grid_obs_file_list.n_elements(); i++) vx_num_mpr += n_grid;
-
-   // Add the number of observations in each point observation NetCDF file
-   for(int i=0; i<point_obs_file_list.n_elements(); i++) {
-
-      mlog << Debug(3) << "process_vx_table_size() - Processing point observation "
-           << "file: " << point_obs_file_list[i] << "\n";
-
-      // Open and check the observation file
-      NcFile *obs_in = new NcFile(point_obs_file_list[i]);
-      if(!obs_in->is_valid()) {
-         obs_in->close();
-         delete obs_in;
-         mlog << Warning << "\nprocess_vx_table_size() -> can't open observation "
-              << "netCDF file: " << point_obs_file_list[i] << "\n\n";
-         continue;
-      }
-
-      // Read the number of observations
-      NcDim *obs_dim = obs_in->get_dim("nobs");
-      if(!obs_dim  || !obs_dim->is_valid()) {
-         mlog << Warning << "\nprocess_vx_table_size() -> can't read \"nobs\" dimension "
-              << "from netCDF file: " << point_obs_file_list[i] << "\n\n";
-         continue;
-      }
-
-      // Add the number of observations to the matched pair tally
-      vx_num_mpr += obs_dim->size();
-      obs_in->close();
-      delete obs_in;
-
-   }
-
-   // Determine the maximum number of message types being used
-   int max_n_msg_typ = 0;
-   for(int i=0; i<conf_info.get_n_vx(); i++)
-      if(conf_info.get_n_msg_typ(i) > max_n_msg_typ)
-         max_n_msg_typ = conf_info.get_n_msg_typ(i);
-
-   // Calculate the maximum number of verification cases
-   int vx_mult = conf_info.get_n_vx()     * conf_info.get_n_mask() *
-                 conf_info.get_n_interp() * max_n_msg_typ
-                 +
-                 conf_info.get_n_vx()     * conf_info.get_n_mask() *
-                 conf_info.get_n_interp();
-
-   // Multiply the number of matched pairs by the verification cases
-   vx_num_mpr *= vx_mult;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -695,7 +622,7 @@ void process_point_vx() {
    } // end for i
 
    // Process the ensemble mean, if spread/skill is activated
-   if( conf_info.ens_ssvar_flag ) process_point_ens(-1);
+   if(conf_info.ens_ssvar_flag) process_point_ens(-1);
 
    // Compute the scores and write them out
    process_point_scores();
@@ -782,7 +709,7 @@ void process_point_obs(int i_nc) {
    }
 
    if(!obs_qty_var || !obs_qty_var->is_valid())
-      mlog << Debug(3) << "Quality marker information not found input file\n";
+      mlog << Debug(3) << "Quality marker information not found input file.\n";
 
    mlog << Debug(2) << "Searching " << obs_dim->size()
         << " observations from " << hdr_dim->size()
@@ -792,8 +719,8 @@ void process_point_obs(int i_nc) {
    for(i_obs=0; i_obs<obs_dim->size(); i_obs++) {
 
       // Read the current observation message
-      if(!obs_arr_var->set_cur((long) i_obs)
-      || !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
+      if(!obs_arr_var->set_cur((long) i_obs) ||
+         !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
          mlog << Error << "\nprocess_point_obs() -> "
               << "can't read the record for observation "
               << "number " << i_obs << "\n\n";
@@ -838,11 +765,10 @@ void process_point_obs(int i_nc) {
 
       // Read the current observation quality flag
       strcpy(obs_qty_str, "");
-      if( ( obs_qty_var && obs_qty_var->is_valid() ) &&
-          ( !obs_qty_var->set_cur((long) i_obs) ||
-            !obs_qty_var->get(obs_qty_str, 1, strl_dim->size()) )
-        ) {
-         mlog << Error << "\nprocess_obs_file() -> "
+      if((obs_qty_var && obs_qty_var->is_valid()) &&
+         (!obs_qty_var->set_cur((long) i_obs) ||
+          !obs_qty_var->get(obs_qty_str, 1, strl_dim->size()))) {
+         mlog << Error << "\nprocess_point_obs() -> "
               << "can't read the quality flag for observation "
               << "index " << i_obs << "\n\n";
          exit(1);
@@ -861,13 +787,11 @@ void process_point_obs(int i_nc) {
       }
    } // end for i_obs
 
-   //  print the duplicate report
+   // Print the duplicate report
    for(j=0; j < conf_info.get_n_vx(); j++) conf_info.vx_pd[j].print_duplicate_report();
 
    // Deallocate and clean up
-   obs_in->close();
-   delete obs_in;
-   obs_in = (NcFile *) 0;
+   if(obs_in) { obs_in->close(); delete obs_in; obs_in = (NcFile *) 0; }
 
    return;
 }
@@ -878,16 +802,16 @@ int process_point_ens(int i_ens) {
    int i, n_fcst;
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
-   VarInfo* info;
+   VarInfo *info = (VarInfo *) 0;
 
    ConcatString ens_file;
    bool ens_mn = (-1 == i_ens);
-   const char* file_type = ens_mn ? "mean" : "ensemble";
+   const char *file_type = ens_mn ? "mean" : "ensemble";
 
    // Determine the correct file to process
-   if( !ens_mn )  ens_file = ConcatString(ens_file_list[i_ens]);
-   else           ens_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
-                                 ens_ssvar_mean : conf_info.ens_ssvar_file;
+   if(!ens_mn) ens_file = ConcatString(ens_file_list[i_ens]);
+   else        ens_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
+                           ens_ssvar_mean : conf_info.ens_ssvar_file;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing " << file_type << " file: " << ens_file << "\n";
@@ -897,7 +821,7 @@ int process_point_ens(int i_ens) {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // For spread/skill, use the calculated mean file if none was specified
-      if( ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) ){
+      if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) {
          fcst_dpa.clear();
          ConcatString ens_magic;
          ens_magic << conf_info.vx_pd[i].fcst_info->name() << "_"
@@ -906,7 +830,8 @@ int process_point_ens(int i_ens) {
          mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
          info = new VarInfoNcMet();
          info->set_magic(ens_magic);
-      } else {
+      }
+      else {
          info = conf_info.vx_pd[i].fcst_info;
       }
 
@@ -940,8 +865,7 @@ int process_point_ens(int i_ens) {
            << " found " << n_fcst<< " forecast levels.\n";
 
       // Clean up the allocated VarInfo object, if necessary
-      if( ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) )
-         delete info;
+      if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) delete info;
 
       // Store information for the raw forecast fields
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
@@ -1067,6 +991,17 @@ void process_point_scores() {
                if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
                   pd_ptr->compute_ssvar();
 
+                  // Add rows to the output AsciiTables for SSVAR
+                  // and reapply the formatting
+                  stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin);
+                  setup_table(stat_at);
+
+                  if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
+                     txt_at[i_ssvar].add_rows(pd_ptr->ssvar_bins[0].n_bin);
+                     setup_table(txt_at[i_ssvar]);
+                  }
+
+                  // Write the SSVAR data
                   write_ssvar_row(shc, pd_ptr,
                      conf_info.output_flag[i_ssvar],
                      stat_at, i_stat_row,
@@ -1087,8 +1022,10 @@ void process_grid_vx() {
    int i, j, k, n_miss;
    bool found;
    double t;
-   DataPlane *fcst_dp = (DataPlane *) 0, *fcst_dp_smooth = (DataPlane *) 0;
-   DataPlane  obs_dp, obs_dp_smooth, mn_dp, mn_dp_smooth;
+   DataPlane *fcst_dp = (DataPlane *) 0;
+   DataPlane *fcst_dp_smooth = (DataPlane *) 0;
+   DataPlane  obs_dp, obs_dp_smooth;
+   DataPlane  mn_dp, mn_dp_smooth;
    PairDataEnsemble pd;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1225,17 +1162,17 @@ void process_grid_vx() {
       shc.set_obs_valid_end(obs_dp.valid());
 
       // If spread/skill is activated, read the ensemble mean file
-      if( conf_info.ens_ssvar_flag ){
+      if(conf_info.ens_ssvar_flag) {
 
-         VarInfo* info;
+         VarInfo *info = (VarInfo *) 0;
          ConcatString mn_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
-                                       ens_ssvar_mean : conf_info.ens_ssvar_file;
+                                 ens_ssvar_mean : conf_info.ens_ssvar_file;
 
          mlog << Debug(2) << "\n" << sep_str << "\n\n"
               << "Processing ensemble mean file: " << mn_file << "\n";
 
          // For spread/skill, use the calculated mean file if none was specified
-         if( !ens_ssvar_mean || !strcmp(ens_ssvar_mean, "") ){
+         if(!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) {
             ConcatString ens_magic;
             ens_magic << conf_info.ens_info[i]->name() << "_"
                       << conf_info.ens_info[i]->level_name() << "_"
@@ -1243,7 +1180,8 @@ void process_grid_vx() {
             mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
             info = new VarInfoNcMet();
             info->set_magic(ens_magic);
-         } else {
+         }
+         else {
             info = conf_info.vx_pd[i].fcst_info;
          }
 
@@ -1259,13 +1197,12 @@ void process_grid_vx() {
          }
 
          // Read the gridded data from the mean file
-         if( !ens_mtddf->data_plane(*info, mn_dp) ){
+         if(!ens_mtddf->data_plane(*info, mn_dp)) {
             mlog << Error << "\nprocess_grid_vx() -> "
                  << "Trouble reading field " << info->magic_str()
                  << " from file " << mn_file << "\n\n";
             exit(1);
          }
-
       }
 
       // Loop through and apply each of the smoothing operations
@@ -1297,7 +1234,7 @@ void process_grid_vx() {
                             conf_info.interp_wdth[j],
                             conf_info.interp_thresh);
 
-               if( conf_info.ens_ssvar_flag ){
+               if(conf_info.ens_ssvar_flag) {
                   smooth_field(mn_dp, mn_dp_smooth,
                                conf_info.interp_mthd[j],
                                conf_info.interp_wdth[j],
@@ -1309,7 +1246,7 @@ void process_grid_vx() {
             // Do not smooth the forecast field
             else {
                fcst_dp_smooth[k] = fcst_dp[k];
-               if( conf_info.ens_ssvar_flag ) mn_dp_smooth = mn_dp;
+               if(conf_info.ens_ssvar_flag) mn_dp_smooth = mn_dp;
             }
          } // end for k
 
@@ -1359,7 +1296,7 @@ void process_grid_vx() {
             pd.compute_rhist();
             pd.compute_stats();
 
-            if( 0 == i ) setup_txt_files(pd.n_pair);
+            if(i == 0) setup_txt_files();
 
             // Compute RHIST scores
             if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
@@ -1379,6 +1316,17 @@ void process_grid_vx() {
                pd.ssvar_bin_size = conf_info.ens_ssvar_bin_size[i];
                pd.compute_ssvar();
 
+               // Add rows to the output AsciiTables for SSVAR
+               // and reapply the formatting
+               stat_at.add_rows(pd.ssvar_bins[0].n_bin);
+               setup_table(stat_at);
+
+               if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
+                  txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin);
+                  setup_table(txt_at[i_ssvar]);
+               }
+
+               // Write the SSVAR data
                write_ssvar_row(shc, &pd,
                   conf_info.output_flag[i_ssvar],
                   stat_at, i_stat_row,
@@ -1394,11 +1342,7 @@ void process_grid_vx() {
    if(fcst_dp_smooth) { delete [] fcst_dp_smooth; fcst_dp_smooth = (DataPlane *) 0; }
 
    // Close the output NetCDF file
-   if(nc_out) {
-      nc_out->close();
-      delete nc_out;
-      nc_out = (NcFile *) 0;
-   }
+   if(nc_out) { nc_out->close(); delete nc_out; nc_out = (NcFile *) 0; }
 
    return;
 }
@@ -1622,12 +1566,6 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   setup_txt_files(-1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void setup_txt_files(int n_pair) {
    int  i, max_col;
    ConcatString tmp_str;
 
@@ -1656,9 +1594,9 @@ void setup_txt_files(int n_pair) {
 
    // Create the output STAT file
    open_txt_file(stat_out, stat_file);
-
+   
    // Setup the STAT AsciiTable
-   stat_at.set_size(vx_num_mpr + 1, max_col);
+   stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
    setup_table(stat_at);
 
    // Write the text header row
@@ -1709,7 +1647,7 @@ void setup_txt_files(int n_pair) {
          } // end switch
 
          // Setup the text AsciiTable
-         txt_at[i].set_size(vx_num_mpr + 1, max_col);
+         txt_at[i].set_size(conf_info.n_txt_row(i) + 1, max_col);
          setup_table(txt_at[i]);
 
          // Write the text header row
@@ -2280,8 +2218,7 @@ void clean_up() {
       for(i=0; i<conf_info.get_max_n_thresh(); i++) {
          thresh_count_na[i].clear();
       }
-      delete [] thresh_count_na;
-      thresh_count_na = (NumArray *) 0;
+      delete [] thresh_count_na; thresh_count_na = (NumArray *) 0;
    }
 
    // Deallocate memory for data files

@@ -129,9 +129,7 @@ class EnsembleStatConfInfo {
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
       int n_txt_row(int i);
-      int n_txt_row(int i, int n_pair);
       int n_stat_row();
-      int n_stat_row(int n_pair);
 };
 
 ////////////////////////////////////////////////////////////////////////
