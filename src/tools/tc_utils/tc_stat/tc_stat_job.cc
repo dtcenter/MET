@@ -194,7 +194,7 @@ void TCStatJob::clear() {
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
-   InitBeg  = InitEnd  = (unixtime) 0;
+   InitBeg = InitEnd = (unixtime) 0;
    InitInc.clear();
    InitExc.clear();
    InitHour.clear();
