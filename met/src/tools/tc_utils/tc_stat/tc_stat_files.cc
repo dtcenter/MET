@@ -143,7 +143,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &tpi) {
          // Open the next file for reading
          CurLDF.close();
          if(!(CurLDF.open(FileList[CurFile]))) {
-            mlog << Error << "\TCStatFiles::operator>>(TrackPairInfo &) -> "
+            mlog << Error << "\nTCStatFiles::operator>>(TrackPairInfo &) -> "
                  << "can't open file \"" << FileList[CurFile]
                  << "\" for reading\n\n";
             exit(1);
