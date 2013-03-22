@@ -369,6 +369,53 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  note that this function does not copy the table formatting
+   //
+
+
+void AsciiTable::add_rows(const int NR)
+
+{
+
+if ( NR < 0 )  {
+
+   mlog << Error << "\nAsciiTable::add_rows() -> bad size\n\n";
+
+   exit ( 1 );
+
+}
+
+AsciiTable a;
+
+a.set_size(Nrows + NR, Ncols);
+
+int r, c;
+
+for (r=0; r<Nrows; ++r) {
+
+   for (c=0; c<Ncols; ++c) {
+
+      a.set_entry(r, c, e[rc_to_n(r,c)]);
+
+   }
+
+}
+
+*this = a;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void AsciiTable::set_ics(int value)
 
 {

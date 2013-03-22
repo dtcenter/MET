@@ -186,6 +186,7 @@ class AsciiTable {
 
 
       virtual void set_size(const int NR, const int NC);
+      virtual void add_rows(const int NR);
 
       virtual void set_entry(const int r, const int c, const char * text);
       virtual void set_entry(const int r, const int c, int);
