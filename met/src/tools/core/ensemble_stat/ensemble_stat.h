@@ -109,7 +109,6 @@ static StringArray  point_obs_file_list;
 static int          point_obs_flag = 0;
 
 static int          vx_flag    = 0;
-static int          vx_num_mpr = 0;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;
