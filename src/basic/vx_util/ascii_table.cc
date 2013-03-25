@@ -367,7 +367,7 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
+/*
 
    //
    //  note that this function does not copy the table formatting
@@ -403,6 +403,101 @@ for (r=0; r<Nrows; ++r) {
 }
 
 *this = a;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+*/
+////////////////////////////////////////////////////////////////////////
+
+
+void AsciiTable::add_rows(const int NR)
+
+{
+
+   //
+   //  sanity check the input value
+   //
+
+if ( NR <= 0 )  {
+
+   mlog << Error
+        << "AsciiTable::add_rows(const int) -> bad number of rows ... " << NR << "\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  allocate some new memory
+   //
+
+int jr, jc;
+const int n_rows_new = Nrows + NR;
+const int n_rows_old = Nrows;
+const int nrc_new = n_rows_new*Ncols;
+char ** c = (char **) 0;
+AsciiTableJust * atj = (AsciiTableJust *) 0;
+int * irs = (int *) 0;
+
+c = new char * [nrc_new];
+
+atj = new AsciiTableJust [nrc_new];
+
+irs = new int [n_rows_new];
+
+memset(c, 0, nrc_new*sizeof(char *));
+
+memset(irs, 0, n_rows_new*sizeof(int));
+
+   //
+   //  copy the old values into the new memory
+   //
+
+memcpy(c, e, Nrows*Ncols*sizeof(char *));
+
+memcpy(atj, Just, Nrows*Ncols*sizeof(AsciiTableJust));
+
+memcpy(irs, InterRowSpace, Nrows*sizeof(int));
+
+   //
+   //  deallocate the old memory
+   //
+
+delete [] e;  e = (char **) 0;
+
+e = c;   c = (char **) 0;
+
+delete [] Just;  Just = (AsciiTableJust *) 0;
+
+Just = atj;   atj = (AsciiTableJust *) 0;
+
+delete [] InterRowSpace;  InterRowSpace = (int *) 0;
+
+InterRowSpace = irs;  irs = (int *) 0;
+
+Nrows = n_rows_new;
+
+   //
+   //  copy the justification information from the old last
+   //
+   //    row into all of the new rows
+   //
+
+for (jr=0; jr<NR; ++jr)  {
+
+   for (jc=0; jc<Ncols; ++jc)  {
+
+     Just[rc_to_n(jr + n_rows_old, jc)] = Just[rc_to_n(n_rows_old - 1, jc)];
+
+   }
+
+}
 
    //
    //  done
