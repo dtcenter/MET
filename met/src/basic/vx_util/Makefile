@@ -14,7 +14,8 @@
 
 
 EXECUTABLES =  test_command_line \
-               test_data_plane
+               test_data_plane   \
+               test_add_rows     \
 
 
 OBJECTS     =  ascii_table.o \
@@ -262,6 +263,14 @@ test_command_line: test_command_line.cc $(LIBRARIES)
 test_data_plane: test_data_plane.cc $(LIBRARIES)
 	@ echo
 	$(CXX) test_data_plane.cc -o test_data_plane $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	-lvx_util \
+	-lvx_cal \
+	-lvx_log
+
+
+test_add_rows: test_add_rows.cc $(LIBRARIES)
+	@ echo
+	$(CXX) test_add_rows.cc -o test_add_rows $(CXX_FLAGS) -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_log
