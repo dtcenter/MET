@@ -463,7 +463,7 @@ memcpy(c, e, Nrows*Ncols*sizeof(char *));
 
 memcpy(atj, Just, Nrows*Ncols*sizeof(AsciiTableJust));
 
-memcpy(irs, InterRowSpace, Nrows*sizeof(int));
+if ( Nrows > 1 )  memcpy(irs, InterRowSpace, Nrows*sizeof(int));
 
    //
    //  deallocate the old memory
