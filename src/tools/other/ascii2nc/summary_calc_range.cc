@@ -16,38 +16,32 @@
 
 using namespace std;
 
+#include <iostream>
 
-#include "summary_key.h"
-
+#include "summary_calc_range.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  Code for class SummaryKey
+   //  Code for class SummaryCalcRange
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _latitude(lat),
-  _longitude(lon),
-  _elevation(elev),
-  _gribCode(grib_code),
-  _height(height)
+
+SummaryCalcRange::SummaryCalcRange() :
+  SummaryCalc()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
+SummaryCalcRange::~SummaryCalcRange()
 {
-  // Do nothing
 }
+
+////////////////////////////////////////////////////////////////////////
+// Protected/Private Methods
+////////////////////////////////////////////////////////////////////////

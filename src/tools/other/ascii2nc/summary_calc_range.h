@@ -14,40 +14,47 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
-#include "summary_key.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for class SummaryKey
-   //
+#ifndef  __SUMMARYCALCRANGE_H__
+#define  __SUMMARYCALCRANGE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _latitude(lat),
-  _longitude(lon),
-  _elevation(elev),
-  _gribCode(grib_code),
-  _height(height)
+
+#include <iostream>
+
+#include "summary_calc.h"
+
+////////////////////////////////////////////////////////////////////////
+
+
+class SummaryCalcRange : public SummaryCalc
 {
-}
+
+public:
+
+  SummaryCalcRange();
+  virtual ~SummaryCalcRange();
+
+  virtual string getType() const
+  {
+    return "RANGE";
+  }
+  
+  virtual double calcSummary(const NumArray &num_array) const
+  {
+    return num_array.max() - num_array.min();
+  }
+  
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
-{
-  // Do nothing
-}
+
+#endif   /*  __SUMMARYCALCRANGE_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
+
+

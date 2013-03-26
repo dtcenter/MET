@@ -14,40 +14,39 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
-#include "summary_key.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for class SummaryKey
-   //
+#ifndef  __SUMMARYCALCMEDIAN_H__
+#define  __SUMMARYCALCMEDIAN_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _latitude(lat),
-  _longitude(lon),
-  _elevation(elev),
-  _gribCode(grib_code),
-  _height(height)
+
+#include <iostream>
+
+#include "summary_calc_percentile.h"
+
+////////////////////////////////////////////////////////////////////////
+
+
+class SummaryCalcMedian : public SummaryCalcPercentile
 {
-}
+
+public:
+
+  SummaryCalcMedian();
+  virtual ~SummaryCalcMedian();
+
+protected:
+
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
-{
-  // Do nothing
-}
+
+#endif   /*  __SUMMARYCALCMEDIAN_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
+
+

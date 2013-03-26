@@ -14,40 +14,47 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
-#include "summary_key.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for class SummaryKey
-   //
+#ifndef  __SUMMARYCALCMAX_H__
+#define  __SUMMARYCALCMAX_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _latitude(lat),
-  _longitude(lon),
-  _elevation(elev),
-  _gribCode(grib_code),
-  _height(height)
+
+#include <iostream>
+
+#include "summary_calc.h"
+
+////////////////////////////////////////////////////////////////////////
+
+
+class SummaryCalcMax : public SummaryCalc
 {
-}
+
+public:
+
+  SummaryCalcMax();
+  virtual ~SummaryCalcMax();
+
+  virtual string getType() const
+  {
+    return "MAX";
+  }
+  
+  virtual double calcSummary(const NumArray &num_array) const
+  {
+    return num_array.max();
+  }
+  
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
-{
-  // Do nothing
-}
+
+#endif   /*  __SUMMARYCALCMAX_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
+
+
