@@ -1471,6 +1471,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
    SSVARInfo cur;
    ConcatString case_key, bin_key;
    ConcatString fcst_var, obs_var;
+	double bin_width = bad_data_double;
 
    //
    // Process the STAT lines
@@ -1502,7 +1503,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          
          if(fcst_var != line.get_item(fcst_var_offset) ||
             obs_var  != line.get_item(obs_var_offset)) {
-            mlog << Error << "\nread_ssvar_lines() -> "
+            mlog << Error << "\naggr_ssvar_lines() -> "
                  << "both the forecast and observation variable types must "
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
                  << "\"-obs_var\".\n"
@@ -1514,6 +1515,19 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          // Parse the current SSVAR line
          //
          parse_ssvar_line(line, cur);
+
+         //
+         // Check for consistent bin width
+         //
+         if(is_bad_data(bin_width)) bin_width = cur.var_max - cur.var_min;
+
+         if(!is_eq(bin_width, cur.var_max - cur.var_min)) {
+            mlog << Warning << "\naggr_ssvar_lines() -> "
+                 << "the SSVAR bin width changed from " << bin_width << " to "
+                 << cur.var_max - cur.var_min << " on STAT line:\n" << line
+                 << "\n\n";
+            bin_width = cur.var_max - cur.var_min;
+         }
 
          //
          // Build the case map and bin map keys for the current line
