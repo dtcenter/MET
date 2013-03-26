@@ -1,0 +1,34 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default ascii2nc configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// The parameters listed below are used to summarize the ASCII data read in
+//
+
+//
+// Specify the time period for the summarization.
+// Define beginning and ending time window in YYYYMMDD[_HH[MMSS]].
+// Time interval is given in seconds.
+// 
+// e.g. summarize_beg = "20100101";
+//      summarize_end = "20101231_12";
+//
+
+time_summary = {
+  flag = FALSE;
+  beg = "000000";
+  end = "235959";
+  step = 1800;     // Time between summaries
+  width = 1800;    // Time width of summary, summary centered on "start" time
+  grib_code = [ 11, 204, 211 ];
+  type = [ "MIN", "max", "range", "MEAN", "stdev", "median", "p80" ];
+}
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V4.1b6";
