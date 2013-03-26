@@ -21,7 +21,8 @@ int main(int argc, char * argv [])
 
 {
 
-const int nr = 4;
+// const int nr = 4;
+const int nr = 1;
 const int nc = 3;
 int r, c;
 int n;
