@@ -342,6 +342,56 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
+  if (!dict)
+  {
+    mlog << Error << "\nparse_conf_time_summary() -> "
+	 << "empty dictionary!\n\n";
+    exit(1);
+  }
+   
+  TimeSummaryInfo info;
+
+  // Conf: time_summary.flag
+  info.flag = dict->lookup_bool(conf_key_time_summary_flag);
+
+  // Conf: time_summary.beg
+  info.beg = timestring_to_sec(dict->lookup_string(conf_key_time_summary_beg));
+
+  // Conf: time_summary.end
+  info.end = timestring_to_sec(dict->lookup_string(conf_key_time_summary_end));
+
+  // Conf: time_summary.step
+  info.step = dict->lookup_int(conf_key_time_summary_step);
+  if (info.step <= 0) {
+    mlog << Error << "\nparse_conf_time_summary() -> "
+	 << "The \"" << conf_key_time_summary_step
+	 << "\" parameter (" << info.step
+	 << ") must be greater than 0!\n\n";
+    exit(1);
+  }
+  
+  // Conf: time_summary.width
+  info.width = dict->lookup_int(conf_key_time_summary_width);
+  if (info.width <= 0) {
+    mlog << Error << "\nparse_conf_time_summary() -> "
+	 << "The \"" << conf_key_time_summary_width
+	 << "\" parameter (" << info.width
+	 << ") must be greater than 0!\n\n";
+    exit(1);
+  }
+  
+  // Conf: time_summary.grib_code
+  info.grib_code = dict->lookup_int_array(conf_key_time_summary_grib_code);
+  
+  // Conf: time_summary.type
+  info.type = dict->lookup_string_array(conf_key_time_summary_type);
+
+  return(info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 BootInfo parse_conf_boot(Dictionary *dict) {
    BootInfo info;
    int v;
@@ -397,6 +447,7 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 
    return(info);
 }
+
 ////////////////////////////////////////////////////////////////////////
 
 InterpInfo parse_conf_interp(Dictionary *dict) {
