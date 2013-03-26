@@ -168,6 +168,11 @@ set_xy_box();
 
 set_postscript_dims();
 
+   //
+   //  set MetDataDir with the config file value
+   //
+
+MetDataDir = ConfInfo->met_data_dir;
 
    //
    //  load the forecast and obs raw colortables
