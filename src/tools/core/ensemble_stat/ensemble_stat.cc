@@ -992,13 +992,10 @@ void process_point_scores() {
                   pd_ptr->compute_ssvar();
 
                   // Add rows to the output AsciiTables for SSVAR
-                  // and reapply the formatting
                   stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin);
-                  setup_table(stat_at);
 
                   if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
                      txt_at[i_ssvar].add_rows(pd_ptr->ssvar_bins[0].n_bin);
-                     setup_table(txt_at[i_ssvar]);
                   }
 
                   // Write the SSVAR data
@@ -1317,13 +1314,10 @@ void process_grid_vx() {
                pd.compute_ssvar();
 
                // Add rows to the output AsciiTables for SSVAR
-               // and reapply the formatting
                stat_at.add_rows(pd.ssvar_bins[0].n_bin);
-               setup_table(stat_at);
 
                if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
                   txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin);
-                  setup_table(txt_at[i_ssvar]);
                }
 
                // Write the SSVAR data
