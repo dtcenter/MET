@@ -104,6 +104,28 @@ static const char stat_na_str[]     = "NA";
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Struct to store time summary information for ascii2nc
+//
+
+struct TimeSummaryInfo {
+  bool        flag;        // Flag indicating whether to perform the
+                           //   time summary
+  int         beg;         // Time (specified as "HHMMSS" in config file) to
+                           //   start summaries for each day of data
+                           //         timestring_to_sec()
+  int         end;         // Time (specified as "HHMMSS" in config file) to
+                           //   end summaries for each day of data.
+  int         step;        // Number of seconds between summaries
+  int         width;       // Width of summary time window in seconds
+  IntArray    grib_code;   // List of grib codes to do summaries for
+  StringArray type;        // List of types of summaries to perform
+                           //   Valid summaries are "min", "max", "range",
+                           //   "mean", "stdev", "median" and "p##".
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for bootstrapping interval configuration parameter
 //
 
@@ -281,6 +303,15 @@ static const char conf_key_mask_grid[]         = "mask.grid";
 static const char conf_key_mask_poly[]         = "mask.poly";
 static const char conf_key_mask_sid[]          = "mask.sid";
 static const char conf_key_ci_alpha[]          = "ci_alpha";
+static const char conf_key_time_summary_flag[] = "time_summary.flag";
+static const char conf_key_time_summary_beg[]  = "time_summary.beg";
+static const char conf_key_time_summary_end[]  = "time_summary.end";
+static const char conf_key_time_summary_step[] = "time_summary.step";
+static const char conf_key_time_summary_width[] =
+                                                 "time_summary.width";
+static const char conf_key_time_summary_grib_code[] =
+                                                 "time_summary.grib_code";
+static const char conf_key_time_summary_type[] = "time_summary.type";
 static const char conf_key_boot_interval[]     = "boot.interval";
 static const char conf_key_boot_rep_prop[]     = "boot.rep_prop";
 static const char conf_key_boot_n_rep[]        = "boot.n_rep";
