@@ -168,6 +168,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     {
       hdr_typ = concat_string;
       hdr_typ.replace(" ", "_", false);
+      
       mlog << Warning << "\nLittleRHandler::_processObs() -> "
 	   << "Storing message type as \"" << hdr_typ
 	   << "\" for unexpected report type \"" << concat_string << "\".\n\n";

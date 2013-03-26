@@ -34,7 +34,8 @@ public:
   SummaryKey(const string &header_type,
 	     const string &station_id,
 	     const double lat, const double lon, const double elev,
-	     const int grib_code);
+	     const int grib_code,
+	     const double height_m);
   
   virtual ~SummaryKey();
 
@@ -73,6 +74,11 @@ public:
     return _gribCode;
   }
   
+  double getHeight() const
+  {
+    return _height;
+  }
+  
 
   ///////////////
   // Operators //
@@ -80,19 +86,23 @@ public:
 
   bool operator< (const SummaryKey &other) const
   {
-    // First sort on header type
+    // We need to use all of the fields for sorting so handle each one
+    // in turn.
+
+    // Header type
 
     if (_headerType != other._headerType)
       return _headerType < other._headerType;
     
-    // Second sort on station id
+    // Station id
 
     if (_stationId != other._stationId)
       return _stationId < other._stationId;
     
-    // Third sort on location.  This should be taken care of by the station
-    // id, but is in here just in case we somehow have 2 stations with the
-    // same ID but different locations.
+    // Location.
+    // This should be taken care of by the station id, but is in here just
+    // in case we somehow have 2 stations with the same ID but different
+    // locations.
 
     if (_latitude != other._latitude)
       return _latitude < other._latitude;
@@ -103,7 +113,12 @@ public:
     if (_elevation != other._elevation)
       return _elevation < other._elevation;
     
-    // Finally sort on grib code
+    // Height
+
+    if (_height != other._height)
+      return _height < other._height;
+    
+    // Grib code
 
     return _gribCode < other._gribCode;
   }
@@ -120,7 +135,7 @@ protected:
   double _longitude;
   double _elevation;
   int _gribCode;
-  
+  double _height;
 
 };
 

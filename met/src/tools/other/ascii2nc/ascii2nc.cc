@@ -27,7 +27,11 @@
 //                    factored out common code.
 //   007    02-06-13  Rehak          Added support for surfrad data.
 //   008    03-13-13  Rehak          Added optional summarization of obs.
-//
+//   009    03-26-13  Rehak          Updated configuration file
+//                                     specification, changed how the
+//                                     summary width is specified in the
+//                                     netCDF file and added summary info
+//                                     to the netCDF global attributes.
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -65,6 +69,9 @@ using namespace std;
 // Constants
 static const char *program_name = "ascii2nc";
 
+static const string DEFAULT_CONFIG_FILENAME =
+  "MET_BASE/data/config/Ascii2NcConfig_default";
+
 ////////////////////////////////////////////////////////////////////////
 
 // Supported input ASCII formats
@@ -82,10 +89,8 @@ static ASCIIFormat ascii_format = ASCIIFormat_None;
 static vector< ConcatString > asfile_list;
 static ConcatString ncfile;
 
-static bool summarize = false;
-static time_t start_time = 0;
-static time_t end_time = 0;
-static int interval_secs = 1;
+static bool config_file_used = false;
+static Ascii2NcConfInfo config_info;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -156,15 +161,25 @@ int main(int argc, char *argv[]) {
      return 0;
    
    //
-   // Process the files
+   // Process the files.  If a configuration file was specified, do any
+   // extra processing specified.
    //
    file_handler->readAsciiFiles(asfile_list);
 
-   if (summarize)
-     file_handler->summarizeObs(start_time, end_time, interval_secs);
-   
-   file_handler->writeNetcdfFile(ncfile.text());
+   if (config_file_used)
+   {
+     // Summarize the observations, if directed.  We need to use a different
+     // call to writeNetcdfFile in this case so that we can include the
+     // summarization details.
 
+     if (config_info.getSummaryInfo().flag)
+     {
+       file_handler->summarizeObs(config_info.getSummaryInfo());
+     }
+   }
+
+   file_handler->writeNetcdfFile(ncfile.text());
+   
    delete file_handler;
    
    return(0);
@@ -368,22 +383,17 @@ void set_logfile(const StringArray & a) {
 
 void set_config(const StringArray & a)
 {
-  summarize = true;
+  config_file_used = true;
   
   ConcatString config_filename = a[0];
 
   // List the config file
   mlog << Debug(1)
-       << "Summarize Config File: " << config_filename << "\n";
+       << "Config File: " << config_filename << "\n";
 
   // Read the config files
 
-  Ascii2NcConfInfo conf_info;
-  conf_info.read_config(config_filename.text());
-
-  start_time = conf_info.getSummarizeBeginTime();
-  end_time = conf_info.getSummarizeEndTime();
-  interval_secs = conf_info.getSummarizeIntervalSecs();
+  config_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
 }
 
 ////////////////////////////////////////////////////////////////////////

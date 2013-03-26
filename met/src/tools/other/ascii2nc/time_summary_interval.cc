@@ -17,37 +17,31 @@
 using namespace std;
 
 
-#include "summary_key.h"
+#include "time_summary_interval.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  Code for class SummaryKey
+   //  Code for class TimeSummaryInterval
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _latitude(lat),
-  _longitude(lon),
-  _elevation(elev),
-  _gribCode(grib_code),
-  _height(height)
+TimeSummaryInterval::TimeSummaryInterval(const time_t base_time,
+					 const int width_secs) :
+  _baseTime(base_time),
+  _width(width_secs)
 {
+  _startTime = _baseTime - (_width / 2);
+  _endTime = _startTime + _width - 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
+TimeSummaryInterval::~TimeSummaryInterval()
 {
   // Do nothing
 }

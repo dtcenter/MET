@@ -40,31 +40,7 @@ Observation::Observation(const string &header_type, const string &station_id,
 			 const double height_m, const double value) :
   _headerType(header_type),
   _stationId(station_id),
-  _startTime(valid_time),
-  _endTime(valid_time),
-  _latitude(latitude),
-  _longitude(longitude),
-  _elevation(elevation),
-  _qualityFlag(quality_flag),
-  _gribCode(grib_code),
-  _pressureLevel(pressure_level_hpa),
-  _height(height_m),
-  _value(value)
-{
-}
-
-  
-Observation::Observation(const string &header_type, const string &station_id,
-			 const time_t start_time, const time_t end_time,
-			 const double latitude, const double longitude,
-			 const double elevation,
-			 const string &quality_flag,
-			 const int grib_code, const double pressure_level_hpa,
-			 const double height_m, const double value) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _startTime(start_time),
-  _endTime(end_time),
+  _validTime(valid_time),
   _latitude(latitude),
   _longitude(longitude),
   _elevation(elevation),

@@ -16,38 +16,32 @@
 
 using namespace std;
 
+#include <iostream>
 
-#include "summary_key.h"
-
+#include "summary_calc_max.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  Code for class SummaryKey
+   //  Code for class SummaryCalcMax
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _latitude(lat),
-  _longitude(lon),
-  _elevation(elev),
-  _gribCode(grib_code),
-  _height(height)
+
+SummaryCalcMax::SummaryCalcMax() :
+  SummaryCalc()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
+SummaryCalcMax::~SummaryCalcMax()
 {
-  // Do nothing
 }
+
+////////////////////////////////////////////////////////////////////////
+// Protected/Private Methods
+////////////////////////////////////////////////////////////////////////

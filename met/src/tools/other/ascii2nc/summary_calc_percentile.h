@@ -14,55 +14,46 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __LITTLERHANDLER_H__
-#define  __LITTLERHANDLER_H__
+#ifndef  __SUMMARYCALCPERCENTILE_H__
+#define  __SUMMARYCALCPERCENTILE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 #include <iostream>
-#include <map>
-#include <string>
 
-#include "file_handler.h"
-
+#include "summary_calc.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class LittleRHandler : public FileHandler
+class SummaryCalcPercentile : public SummaryCalc
 {
 
 public:
 
-  LittleRHandler(const string &program_name);
-  virtual ~LittleRHandler();
+  SummaryCalcPercentile(const string &type_string);
+  virtual ~SummaryCalcPercentile();
 
-  virtual bool isFileType(LineDataFile &ascii_file) const;
-  
-  static string getFormatString()
+  virtual string getType() const
   {
-    return "little_r";
+    return _type;
+  }
+  
+  virtual double calcSummary(const NumArray &num_array) const
+  {
+    // Make a copy of the num_array so we don't change the original
+
+    NumArray num_array_copy = num_array;
+    
+    return num_array_copy.percentile_array(_percentile);
   }
 
 protected:
-  
-  ///////////////////////
-  // Protected members //
-  ///////////////////////
 
-  map<ConcatString, ConcatString> MAP_MSG_TYP;
-
-
-  ///////////////////////
-  // Protected methods //
-  ///////////////////////
-
-  // Read the observations from the given file and add them to the
-  // _observations vector.
-
-  virtual bool _readObservations(LineDataFile &ascii_file);
+  double _percentile;
+  string _type;
   
 };
 
@@ -70,7 +61,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __LITTLERHANDLER_H__  */
+#endif   /*  __SUMMARYCALCPERCENTILE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

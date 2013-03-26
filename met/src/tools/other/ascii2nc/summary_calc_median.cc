@@ -16,38 +16,34 @@
 
 using namespace std;
 
+#include <ctype.h>
+#include <iostream>
 
-#include "summary_key.h"
-
+#include "summary_calc_median.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  Code for class SummaryKey
+   //  Code for class SummaryCalcMedian
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height) :
-  _headerType(header_type),
-  _stationId(station_id),
-  _latitude(lat),
-  _longitude(lon),
-  _elevation(elev),
-  _gribCode(grib_code),
-  _height(height)
+
+SummaryCalcMedian::SummaryCalcMedian() :
+  SummaryCalcPercentile("p50")
 {
+  _type = "MEDIAN";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SummaryKey::~SummaryKey()
+SummaryCalcMedian::~SummaryCalcMedian()
 {
-  // Do nothing
 }
+
+////////////////////////////////////////////////////////////////////////
+// Protected/Private Methods
+////////////////////////////////////////////////////////////////////////

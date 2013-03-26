@@ -67,15 +67,12 @@ public:
   
   time_t getValidTime() const
   {
-    return _startTime;
+    return _validTime;
   }
   
   string getValidTimeString() const
   {
-    if (_startTime == _endTime)
-      return _getTimeString(_startTime);
-    
-    return _getTimeString(_startTime, _endTime);
+    return _getTimeString(_validTime);
   }
   
   double getLatitude() const
@@ -124,10 +121,10 @@ public:
 
   bool operator< (const Observation &other) const
   {
-    // First sort on start time
+    // First sort on valid time
 
-    if (_startTime != other._startTime)
-      return _startTime < other._startTime;
+    if (_validTime != other._validTime)
+      return _validTime < other._validTime;
     
     // Second sort on header type
 
@@ -152,8 +149,7 @@ protected:
 
   string _headerType;
   string _stationId;
-  time_t _startTime;
-  time_t _endTime;
+  time_t _validTime;
   double _latitude;
   double _longitude;
   double _elevation;

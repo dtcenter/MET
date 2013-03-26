@@ -15,11 +15,7 @@
 
 #include <iostream>
 
-//#include "tc_stat_job.h"
-
-//#include "mask_poly.h"
-
-#include "config_file.h"
+#include "vx_config.h"
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -28,46 +24,37 @@ class Ascii2NcConfInfo {
 
 public:
      
-  // TCStatJob to store filtering info
-//      TCStatJob Filter;
-      
-  // Jobs array
-//      StringArray Jobs;
-      
   Ascii2NcConfInfo();
   ~Ascii2NcConfInfo();
 
-  void read_config(const string &filename);
+  void read_config(const string &default_filename,
+		   const string &user_filename);
 
-  time_t getSummarizeBeginTime() const
+  TimeSummaryInfo getSummaryInfo() const
   {
-    return _summarizeBegin;
-  }
-  
-  time_t getSummarizeEndTime() const
-  {
-    return _summarizeEnd;
-  }
-  
-  int getSummarizeIntervalSecs() const
-  {
-    return _summarizeInterval;
+    return _timeSummaryInfo;
   }
   
 protected:
 
+  ///////////////////////
+  // Protected members //
+  ///////////////////////
+
   // TCPairs configuration object
 
-  MetConfig Conf;
+  MetConfig _conf;
 
   // Config file version
 
   ConcatString _version;
-      
-  time_t _summarizeBegin;
-  time_t _summarizeEnd;
-  time_t _summarizeInterval;
+  TimeSummaryInfo _timeSummaryInfo;
   
+
+  ///////////////////////
+  // Protected methods //
+  ///////////////////////
+
   void clear();
   void init_from_scratch();
   void process_config();
