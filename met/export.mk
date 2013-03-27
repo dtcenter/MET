@@ -33,6 +33,9 @@ export F2C_LIBNAME
 export GRIB2C_INCS
 export GRIB2C_LIBS
 
+export HDF_BASE_DIR
+export HDF_EOS_BASE_DIR
+
 ###############################################################################
 
 export ENABLE_ASCII2NC
