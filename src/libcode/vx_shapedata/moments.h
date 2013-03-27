@@ -39,7 +39,9 @@ class Moments {
 
    public:
 
-      double area;
+      // Areas based on s_is_on and f_is_on logic
+      double s_area;
+      double f_area;
 
       // First order moments
       double sx;

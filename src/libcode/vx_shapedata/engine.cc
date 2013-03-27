@@ -1033,8 +1033,8 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
          for(x=0; x<fcst_merge_mask.data.nx(); x++) {
             for(y=0; y<fcst_merge_mask.data.ny(); y++) {
 
-               if(fcst_merge_shape[j].f_is_on(x, y) &&
-                  fcst_shape[k].f_is_on(x, y)) intersection++;
+               if(fcst_merge_shape[j].s_is_on(x, y) &&
+                  fcst_shape[k].s_is_on(x, y)) intersection++;
             }
          }
 
@@ -1162,8 +1162,8 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
          for(x=0; x<obs_merge_mask.data.nx(); x++) {
             for(y=0; y<obs_merge_mask.data.ny(); y++) {
 
-               if(obs_merge_shape[j].f_is_on(x, y) &&
-                  obs_shape[k].f_is_on(x, y)) intersection++;
+               if(obs_merge_shape[j].s_is_on(x, y) &&
+                  obs_shape[k].s_is_on(x, y)) intersection++;
             }
          }
 

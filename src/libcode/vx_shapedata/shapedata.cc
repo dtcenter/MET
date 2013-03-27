@@ -182,7 +182,7 @@ void ShapeData::calc_moments()
 
 {
 
-   int x, y, k;
+   int x, y;
    double xx, yy;
 
    mom.clear();
@@ -195,22 +195,24 @@ void ShapeData::calc_moments()
 
          yy =((double) y);
 
-         k = f_is_on(x, y);
+         // Object area based on s_is_on() logic
+         if(s_is_on(x, y)) mom.s_area += 1;
 
-         if(k) {
-            mom.area += 1;
+         if(f_is_on(x, y)) {
 
-            mom.sx    += xx;
-            mom.sy    += yy;
+            mom.f_area += 1;
 
-            mom.sxx   += xx*xx;
-            mom.sxy   += xx*yy;
-            mom.syy   += yy*yy;
+            mom.sx     += xx;
+            mom.sy     += yy;
 
-            mom.sxxx  += xx*xx*xx;
-            mom.sxxy  += xx*xx*yy;
-            mom.sxyy  += xx*yy*yy;
-            mom.syyy  += yy*yy*yy;
+            mom.sxx    += xx*xx;
+            mom.sxy    += xx*yy;
+            mom.syy    += yy*yy;
+
+            mom.sxxx   += xx*xx*xx;
+            mom.sxxy   += xx*xx*yy;
+            mom.sxyy   += xx*yy*yy;
+            mom.syyy   += yy*yy*yy;
          }
       } // for y
    } // for x
@@ -245,7 +247,7 @@ double ShapeData::curvature(double &xcurv, double &ycurv) const {
 
 double ShapeData::area() const {
 
-   double x = (double) (mom.area);
+   double x = (double) (mom.s_area);
 
    return(x);
 }
@@ -253,7 +255,7 @@ double ShapeData::area() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::calc_length_width(double &l, double &w) const {
-   int x, y, k;
+   int x, y;
    double xx, yy;
    double u, v, u_max, u_min, v_max, v_min;
    double u_extent, v_extent;
@@ -275,9 +277,7 @@ void ShapeData::calc_length_width(double &l, double &w) const {
    for (x=0; x<data.nx(); ++x) {
       for (y=0; y<data.ny(); ++y) {
 
-         k = f_is_on(x, y);
-
-         if(!k) continue;
+         if(!f_is_on(x, y)) continue;
 
          xx = (double) x;
          yy = (double) y;
@@ -324,24 +324,6 @@ double ShapeData::width() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ShapeData::s_area() const {
-   int x, y;
-   int count;
-
-   count = 0;
-
-   for(x=0; x<data.nx(); x++) {
-      for(y=0; y<data.ny(); y++) {
-
-         if(s_is_on(x, y)) count++;
-      }
-   }
-
-   return(count);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 double ShapeData::complexity() const {
    int count;
    double shape;
@@ -349,7 +331,7 @@ double ShapeData::complexity() const {
    double u;
    Polyline poly;
 
-   count = s_area();
+   count = nint(mom.s_area);
 
    if(count == 0) {
       mlog << Error << "\nShapeData::complexity() const -> "
@@ -1776,7 +1758,7 @@ int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
    for(x=0; x<f1.data.nx(); x++) {
       for(y=0; y<f1.data.ny(); y++) {
 
-         if(f1.f_is_on(x, y) && f2.f_is_on(x, y)) intersection++;
+         if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;
       } // end for y
    } // end for x
 
