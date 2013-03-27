@@ -3,12 +3,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char output_field_name [] = "MODIS";
-
-static const char var_long_name     [] = "MODIS Cloud Fraction";
-static const char units             [] = "none";
-
-static const char algorithm_name    [] = "modis";
+static const char default_units [] = "none";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -27,6 +22,7 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_math.h"
 #include "vx_grid.h"
+#include "vx_data2d_factory.h"
 
 #include "data_plane_to_netcdf.h"
 
@@ -36,27 +32,32 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const LambertData rapice_grid_data = { 
-
-    "G236", 25.0, 25.0, 16.281,  126.138, 
-     0.0, 0.0,  95.0, 40.635,   
-     ncep_earth_radius_km,  151,  113 };
-
 static ConcatString program_name;
 
-static const Grid grid (rapice_grid_data);
+static Grid grid;
 
-static ConcatString output_directory = ".";
+static ConcatString grid_data_file;
+
+static ConcatString output_filename;
+
+static ConcatString modis_filename;
+
+static ConcatString modis_field;
+
+static ConcatString units = default_units;
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static void set_outdir(const StringArray &);
+static void set_out_file  (const StringArray &);
+static void set_grid_file (const StringArray &);
+static void set_field     (const StringArray &);
+static void set_units     (const StringArray &);
 
 static void usage();
 
-static ConcatString make_output_filename(const ModisFile &, int percent);
+static void get_grid();
 
 static void process(const char * input_filename);
 
@@ -76,27 +77,49 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
-cline.add(set_outdir, "-outdir", 1);
+cline.add(set_out_file,  "-out",       1);
+cline.add(set_grid_file, "-data_file", 1);
+cline.add(set_field,     "-field",     1);
+cline.add(set_units,     "-units",     1);
 
 cline.parse();
 
-if ( cline.n() == 0 )  usage();
+if ( cline.n() != 1 )  usage();
 
-int j;
+if ( grid_data_file.empty() )  {
 
-cout << "\n\n";
+   mlog << Error
+        << program_name << ": must specify a data file\n";
 
-for (j=0; j<(cline.n()); ++j)  {
-
-   if ( (j%5) == 0 )  cout << '\n';
-
-   cout << "Processing " << cline[j] << " ... " << (j + 1) << " of " << cline.n() << "\n" << flush;
-
-   process(cline[j]);
+   exit ( 1 );
 
 }
 
-cout << "\n\n";
+if ( output_filename.empty() )  {
+
+   mlog << Error
+        << program_name << ": must specify an output filename\n";
+
+   exit ( 1 );
+
+}
+
+if ( modis_field.empty() )  {
+
+   mlog << Error
+        << program_name << ": must specify a modis data field\n";
+
+   exit ( 1 );
+
+}
+
+modis_filename = cline[0];
+
+get_grid();
+
+cout << "Processing " << modis_filename << "\n" << flush;
+
+process(modis_filename);
 
 
 
@@ -113,11 +136,11 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_outdir(const StringArray & a)
+void set_out_file(const StringArray & a)
 
 {
 
-output_directory = a[0];
+output_filename = a[0];
 
 return;
 
@@ -127,11 +150,53 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void set_grid_file(const StringArray & a)
+
+{
+
+grid_data_file = a[0];
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_field(const StringArray & a)
+
+{
+
+modis_field = a[0];
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void set_units(const StringArray & a)
+
+{
+
+units = a[0];
+
+return;
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " modis_file\n\n";
+cerr << "\n\n   usage:  " << program_name << " -data_file path  modis_file\n\n";
 
 exit ( 1 );
 
@@ -143,31 +208,34 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString make_output_filename(const ModisFile & in, int percent)
+void get_grid()
 
 {
 
-ConcatString s;
-char junk[256];
-int month, day, year, hour, minute, second;
+   //
+   //  stole this code from plot_data_plane.cc
+   //
 
-unix_to_mdyhms(in.scan_start_time(), month, day, year, hour, minute, second);
+Met2dDataFile * met_ptr = (Met2dDataFile * ) 0;
+Met2dDataFileFactory m_factory;
 
-sprintf(junk, "%04d%02d%02d_%02d%02d%02d",
-               year, month, day, hour, minute, second);
+mlog << Debug(1)  << "Opening data file: " << grid_data_file << "\n";
+met_ptr = m_factory.new_met_2d_data_file(grid_data_file);
 
-s << cs_erase
-  << output_directory << '/'
-  << algorithm_name << '_'
-  << junk << 'V';
+if ( !met_ptr ) {
 
-sprintf(junk, "%02d", percent);
+      mlog << Error << "\n" << program_name << " -> file \""
+           << grid_data_file << "\" not a valid data file\n\n";
+      exit (1);
+}
 
-s << '_' << junk << "P";
+grid = met_ptr->grid();
 
-s << ".nc";
+   //
+   //  done
+   //
 
-return ( s );
+return;
 
 }
 
@@ -191,7 +259,6 @@ ModisFile in;
 DataPlane plane;
 DataAverager a;
 double data_min, data_max;
-ConcatString output_filename;
 
 
 if ( ! in.open(input_filename) )  {
@@ -275,10 +342,9 @@ cout << "Nonzero count is " << nonzero_count << "\n" << flush;
 
 percent = nint( (100.0*nonzero_count)/(nx*ny) );
 
-output_filename = make_output_filename(in, percent);
+ConcatString output_field_name = modis_field;
 
-
-write_grid_to_netcdf(plane, grid, output_filename, output_field_name, var_long_name, units);
+write_grid_to_netcdf(plane, grid, output_filename, output_field_name, modis_field, units);
 
 
 
