@@ -114,7 +114,6 @@ class ShapeData {
       void    calc_length_width(double &l, double &w) const;
       double  length()                                const;
       double  width()                                 const;
-      int     s_area()                                const;
       double  complexity()                            const;
 
          //

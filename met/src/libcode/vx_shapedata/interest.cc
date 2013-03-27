@@ -463,8 +463,8 @@ void PairFeature::set(const SingleFeature &fcst,
    for(x=0; x<(Fcst->Mask->data.nx()); ++x) {
       for(y=0; y<(Fcst->Mask->data.ny()); ++y) {
 
-         fcst_on = Fcst->Mask->f_is_on(x, y);
-         obs_on  =  Obs->Mask->f_is_on(x, y);
+         fcst_on = Fcst->Mask->s_is_on(x, y);
+         obs_on  =  Obs->Mask->s_is_on(x, y);
 
          if(fcst_on && obs_on) intersection_area++;
          if(fcst_on || obs_on) union_area++;
@@ -599,7 +599,7 @@ void get_percentiles(DistributionPercentiles &ptile,
    n_values = 0;
    for(x=0; x<nx; ++x) {
       for(y=0; y<ny; ++y) {
-         if((mask.f_is_on(x, y)) &&
+         if((mask.s_is_on(x, y)) &&
             (raw.is_valid_xy(x, y)) &&
             (raw.data(x, y) > 0))  ++n_values;
       }
@@ -623,7 +623,7 @@ void get_percentiles(DistributionPercentiles &ptile,
    for(x=0; x<nx; ++x) {
       for(y=0; y<ny; ++y) {
 
-         if((mask.f_is_on(x, y)) &&
+         if((mask.s_is_on(x, y)) &&
             (raw.is_valid_xy(x, y)) &&
             (raw.data(x, y) > 0)) {
 
