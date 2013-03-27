@@ -23,6 +23,9 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 #include "grib_strings.h"
 #include "two_to_one.h"
@@ -32,10 +35,10 @@ using namespace std;
 
 
 #ifdef IBM
-   typedef int uint4; 
+   typedef int uint4;
 #else
 //    typedef unsigned long uint4; 
-   typedef unsigned int uint4; 
+   typedef unsigned int uint4;
 #endif
 
 
@@ -308,17 +311,17 @@ class GribRecord  {
       Section3_Header *     bms;   //  allocated
       Section4_Header *     bds;   //  allocated
 
-      int Sec0_offset_in_record;
-      int Sec1_offset_in_record;
-      int Sec2_offset_in_record;
-      int Sec3_offset_in_record;
-      int Sec4_offset_in_record;
+      off_t Sec0_offset_in_record;
+      off_t Sec1_offset_in_record;
+      off_t Sec2_offset_in_record;
+      off_t Sec3_offset_in_record;
+      off_t Sec4_offset_in_record;
 
-      int Sec0_offset_in_file;
-      int Sec1_offset_in_file;
-      int Sec2_offset_in_file;
-      int Sec3_offset_in_file;
-      int Sec4_offset_in_file;
+      off_t Sec0_offset_in_file;
+      off_t Sec1_offset_in_file;
+      off_t Sec2_offset_in_file;
+      off_t Sec3_offset_in_file;
+      off_t Sec4_offset_in_file;
 
       int               rec_num;
       int               pds_len;
@@ -341,8 +344,8 @@ class GribRecord  {
 
       int             word_size;     //   bits
 
-      long  record_lseek_offset;     //   bytes from beginning of file
-      long    data_lseek_offset;     //   bytes from beginning of file
+      off_t record_lseek_offset;     //   bytes from beginning of file
+      off_t   data_lseek_offset;     //   bytes from beginning of file
 
       int             data_size;
       int            data_alloc;
@@ -398,9 +401,9 @@ class GribFile;   //  forward reference
 
 struct RecordInfo {
 
-   int lseek_offset;
+   off_t lseek_offset;
 
-   int gribcode;
+   int   gribcode;
 
 };
 
@@ -490,9 +493,9 @@ class GribFile {
 
       virtual void seek_record(int);
 
-      virtual int n_records();
-      virtual int record_offset(int);
-      virtual int gribcode(int);
+      virtual int   n_records();
+      virtual off_t record_offset(int);
+      virtual int   gribcode(int);
 
       virtual int issue();
       virtual int lead();

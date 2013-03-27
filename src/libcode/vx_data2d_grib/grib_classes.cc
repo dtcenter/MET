@@ -100,7 +100,7 @@ lead = 0;
 
 word_size = 0;
 
-data_lseek_offset = record_lseek_offset = 0L;
+data_lseek_offset = record_lseek_offset = (off_t) 0;
 
 data   = (unsigned char *) 0;
 bitmap = (unsigned char *) 0;
@@ -494,7 +494,7 @@ rec_num = pds_len = gds_flag = bms_flag = d_value = e_value = issue = lead = wor
 
 m_value = b_value = r_value = 0.0;
 
-record_lseek_offset = data_lseek_offset = (long) 0;
+record_lseek_offset = data_lseek_offset = (off_t) 0;
 
 mask = (uint4) 0;
 
@@ -884,8 +884,8 @@ int GribFile::read_record(GribRecord & g)
 int j, s, bytes, n_read, len;
 int m, d, y, hh, mm;
 int D, E;
-int file_pos;
-int bytes_processed;
+off_t file_pos;
+off_t bytes_processed;
 unsigned char *c = (unsigned char *) 0, c3[3];
 double t;
 float r[4];
@@ -936,7 +936,7 @@ if ( (n_read < 0) || (n_read != bytes) )  {
 
 if ( strncmp(g.is->grib_name, "GRIB", 4) != 0 )  {
 
-   int pos2 = lseek(rep->fd, 0L, SEEK_END);
+   off_t pos2 = lseek(rep->fd, 0L, SEEK_END);
 
    mlog << Error << "\nGribFile::read_record(GribRecord &) -> \"GRIB\" magic cookie not found in grib record\n\n"
         << "     reading record number " << (rep->n_records) << ", bytes left in file = "
@@ -1447,7 +1447,7 @@ return ( rep ? (rep->n_records) : 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int GribFile::record_offset(int n)
+off_t GribFile::record_offset(int n)
 
 {
 
