@@ -76,6 +76,13 @@ GRIB2C_BASE  =
 GRIB2C_INCS  =
 GRIB2C_LIBS  =
 
+
+# Top level directory for the HDF and HDF-EOS Libraries if they're not
+# installed in a standard location.  These need not be specified if
+# you're not building the modis reformatting tool.
+HDF_BASE_DIR      =
+HDF_EOS_BASE_DIR  =
+
 # Optional flags to disable the compilation of MET tools
 # Specify a non-zero value to enable the compilation of the tool
 ENABLE_ASCII2NC        = 1
