@@ -139,7 +139,7 @@ plot_valid_counts = function(sub, color, vert) {
 
   # Plot valid counts on the top axis
   axis(3, at=lead_list, tick=FALSE, labels=n,
-         padj=vert, cex.axis=0.75, col.axis=color)
+       padj=vert, cex.axis=0.75, col.axis=color)
 }
 
 ########################################################################
@@ -148,7 +148,7 @@ plot_valid_counts = function(sub, color, vert) {
 #
 ########################################################################
 
-plot_box_scatter = function(dep, plot_type, horz, vert) {
+plot_box_scatter = function(dep, plot_type, horz, vert, ee) {
 
   # Loop over the series list entries
   for(i in 1:n_series) {
@@ -196,7 +196,8 @@ plot_box_scatter = function(dep, plot_type, horz, vert) {
     } # end for lead
 
     # Plot the valid data counts
-    plot_valid_counts(sub, color, vert[i])
+    if(ee == TRUE)            color = "black";
+    if(ee == FALSE || i == 1) plot_valid_counts(sub, color, vert[i])
 
   } # end for i
 
@@ -216,7 +217,7 @@ plot_box_scatter = function(dep, plot_type, horz, vert) {
 #
 ########################################################################
 
-plot_mean_median = function(dep, plot_type, horz, vert) {
+plot_mean_median = function(dep, plot_type, horz, vert, ee) {
 
   # Loop over the series list entries
   for(i in 1:n_series) {
@@ -236,8 +237,8 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
     # Prepare the data
     if(plot_type == mean_str) {
       d = aggregate(sub$PLOT, list(sub$LEAD_HR), mean, na.rm=TRUE)
-      # JHG
-      #s = Compute_STDerr_from_mean(sub, "ML",  )
+      # JHG, what about VIF?
+      # JHG s = Compute_STDerr_from_mean(sub, "ML",  )
     }
     else if(plot_type == median_str) {
       d = aggregate(sub$PLOT, list(sub$LEAD_HR), median, na.rm=TRUE)
@@ -248,7 +249,8 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
     points(d$Group.1, d$x, type='b', col=color)
 
     # Plot the valid data counts
-    plot_valid_counts(sub, color, vert[i])
+    if(ee == TRUE)            color = "black";
+    if(ee == FALSE || i == 1) plot_valid_counts(sub, color, vert[i])
 
   } # end for i
 
@@ -268,7 +270,7 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
 ########################################################################
 
 plot_time_series = function(dep, plot_type,
-                            title_str, subtitle_str, ylab_str) {
+                            title_str, subtitle_str, ylab_str, ee) {
 
   cat("Plotting", plot_type, "time series by", series, "\n")
 
@@ -331,10 +333,10 @@ plot_time_series = function(dep, plot_type,
 
   # Populate the plot based on plot type
   if(plot_type == boxplot_str || plot_type == scatter_str) {
-    plot_box_scatter(dep, plot_type, horz, vert)
+    plot_box_scatter(dep, plot_type, horz, vert, ee)
   }
   else if(plot_type == mean_str || plot_type == median_str) {
-    plot_mean_median(dep, plot_type, horz, vert)
+    plot_mean_median(dep, plot_type, horz, vert, ee)
   }
 
   # Close the output device
