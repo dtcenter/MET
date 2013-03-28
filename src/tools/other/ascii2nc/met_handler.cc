@@ -116,9 +116,9 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
       if (data_line.line_number() == 1 &&
           _nFileColumns == n_met_col)
       {
-	mlog << Debug(1) << "Found deprecated 10 column input file format, "
+	mlog << Warning << "\nFound deprecated 10 column input file format, "
 	     << "consider adding quality flag values to file: "
-	     << ascii_file.filename() << "\n";
+	     << ascii_file.filename() << "\n\n";
       }
 
       // Store the header info
