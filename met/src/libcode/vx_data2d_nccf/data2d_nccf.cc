@@ -199,6 +199,9 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    int n_rec = 0;
    DataPlane plane;
 
+   // Initialize
+   plane_array.clear();
+   
    // Can only read a single 2D data plane from a MET NetCDF file
    status = data_plane(vinfo, plane);
 
