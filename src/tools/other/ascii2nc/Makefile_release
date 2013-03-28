@@ -21,8 +21,17 @@ OBJECTS     = ascii2nc_conf_info.o \
 	little_r_handler.o \
 	met_handler.o \
 	observation.o \
+	summary_calc.o \
+	summary_calc_max.o \
+	summary_calc_mean.o \
+	summary_calc_median.o \
+	summary_calc_min.o \
+	summary_calc_percentile.o \
+	summary_calc_range.o \
+	summary_calc_stdev.o \
 	summary_key.o \
-	surfrad_handler.o
+	surfrad_handler.o \
+	time_summary_interval.o
 
 
 LIBRARIES   =
@@ -71,6 +80,38 @@ observation.o: observation.h observation.cc
 	@ echo
 	$(CXX) observation.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
+summary_calc.o: summary_calc.h summary_calc.cc
+	@ echo
+	$(CXX) summary_calc.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_calc_max.o: summary_calc_max.h summary_calc_max.cc
+	@ echo
+	$(CXX) summary_calc_max.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_calc_mean.o: summary_calc_mean.h summary_calc_mean.cc
+	@ echo
+	$(CXX) summary_calc_mean.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_calc_median.o: summary_calc_median.h summary_calc_median.cc
+	@ echo
+	$(CXX) summary_calc_median.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_calc_min.o: summary_calc_min.h summary_calc_min.cc
+	@ echo
+	$(CXX) summary_calc_min.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_calc_percentile.o: summary_calc_percentile.h summary_calc_percentile.cc
+	@ echo
+	$(CXX) summary_calc_percentile.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_calc_range.o: summary_calc_range.h summary_calc_range.cc
+	@ echo
+	$(CXX) summary_calc_range.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+summary_calc_stdev.o: summary_calc_stdev.h summary_calc_stdev.cc
+	@ echo
+	$(CXX) summary_calc_stdev.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
 summary_key.o: summary_key.h summary_key.cc
 	@ echo
 	$(CXX) summary_key.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
@@ -78,6 +119,10 @@ summary_key.o: summary_key.h summary_key.cc
 surfrad_handler.o: surfrad_handler.h surfrad_handler.cc
 	@ echo
 	$(CXX) surfrad_handler.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+time_summary_interval.o: time_summary_interval.h time_summary_interval.cc
+	@ echo
+	$(CXX) time_summary_interval.cc -g $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 ########################################################################
