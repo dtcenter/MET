@@ -24,27 +24,29 @@
 ##         [-baseline model]
 ##         [-ylim min,max]
 ##         [-no_ee]
+##         [-save_data path]
 ##         [-save]
 ##
 ##   Arguments:
-##      "-lookin"   is a list of files with TCMPR lines to be used.
-##      "-outdir"   is the output directory.
-##      "-prefix"   is the output file name prefix.
-##      "-title"    overrides the default plot title.
-##      "-subtitle" overrides the default plot subtitle.
-##      "-ylab"     overrides the default plot y-axis label.
-##      "-filter"   is a list of filtering options for tc_stat.
-##      "-dep"      is a comma-separated list of dependent variable columns to plot.
-##      "-series"   is the column whose unique values define the series on the plot,
-##                  optionally followed by a comma-separated list of values including
-##                  ALL, OTHER, and colon-separated groups.
-##      "-lead"     is a list of lead times (h) to be plotted.
-##      "-plot"     is a comma-separated list of plot types to create, including
-##                  BOXPLOT, SCATTER, MEAN, MEDIAN, SKILL, RANK
-##      "-baseline" is the baseline model for skill scores.
-##      "-ylim"     is the bounds for plotting the Y-axis.
-##      "-no_ee"    to disable event equalization.
-##      "-save"     to call save.image().
+##      "-lookin"    is a list of files with TCMPR lines to be used.
+##      "-outdir"    is the output directory.
+##      "-prefix"    is the output file name prefix.
+##      "-title"     overrides the default plot title.
+##      "-subtitle"  overrides the default plot subtitle.
+##      "-ylab"      overrides the default plot y-axis label.
+##      "-filter"    is a list of filtering options for tc_stat.
+##      "-dep"       is a comma-separated list of dependent variable columns to plot.
+##      "-series"    is the column whose unique values define the series on the plot,
+##                   optionally followed by a comma-separated list of values including
+##                   ALL, OTHER, and colon-separated groups.
+##      "-lead"      is a list of lead times (h) to be plotted.
+##      "-plot"      is a comma-separated list of plot types to create, including
+##                   BOXPLOT, SCATTER, MEAN, MEDIAN, SKILL, RANK
+##      "-baseline"  is the baseline model for skill scores.
+##      "-ylim"      is the bounds for plotting the Y-axis.
+##      "-no_ee"     to disable event equalization.
+##      "-save_data" to save the filter track data to a file instead of deleting it.
+##      "-save"      to call save.image().
 ##
 ##   Details:
 ##
@@ -225,6 +227,7 @@ plot_list    = c(boxplot_str)
 baseline     = NA
 ymin = ymax  = NA
 event_equal  = TRUE
+save_data    = ""
 save         = FALSE
 
 # Parse optional arguments
@@ -283,6 +286,9 @@ while(i <= length(args)) {
     i=i+1
   } else if(args[i] == "-no_ee") {
     event_equal = FALSE
+  } else if(args[i] == "-save_data") {
+    save_data = args[i+1]
+    i=i+1
   } else if(args[i] == "-save") {
     save = TRUE
   } else {
@@ -324,8 +330,12 @@ if(status != 0) {
 # Read the data
 tcst = read.table(tcst_tmp_file, header=TRUE)
 
-# Delete the temporary file
-run_cmd = paste("rm -f", tcst_tmp_file)
+# Dispose of the temporary file by either saving or deleting it
+if(nchar(save_data) > 0) {
+   run_cmd = paste("mv -f", tcst_tmp_file, save_data)
+} else {
+   run_cmd = paste("rm -f", tcst_tmp_file)
+}
 cat("CALLING: ", run_cmd, "\n")
 status = system(run_cmd)
 
@@ -347,7 +357,8 @@ tcst$LEAD_HR    = tcst$LEAD/10000
 #
 ########################################################################
 
-info_list = c("AMODEL", "BMODEL", "BASIN", "CYCLONE", "STORM_NAME", "LEAD", "LEVEL", "WATCH_WARN")
+info_list = c("AMODEL",     "BMODEL", "BASIN", "CYCLONE",
+              "STORM_NAME", "LEAD",   "LEVEL", "WATCH_WARN")
 
 for(i in 1:length(info_list)) {
 
@@ -473,7 +484,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the boxplot
     plot_time_series(dep_list[i], boxplot_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab, event_equal)
   }
   
   # PLOT: Create time series of scatter plots.
@@ -494,7 +505,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the scatter plot
     plot_time_series(dep_list[i], scatter_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab, event_equal)
   }
 
   # PLOT: Create time series of means.
@@ -515,7 +526,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the mean plot
     plot_time_series(dep_list[i], mean_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab, event_equal)
   }
 
   # PLOT: Create time series of medians.
@@ -536,7 +547,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the median plot
     plot_time_series(dep_list[i], median_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab, event_equal)
   }
   
 } # end for i
