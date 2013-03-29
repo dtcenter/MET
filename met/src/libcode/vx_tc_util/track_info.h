@@ -134,9 +134,6 @@ class TrackInfo {
       bool is_match(const TrackInfo &) const;
       
       bool is_interp() const;
-      bool is_6hour() const;
-
-      void merge_points(const TrackInfo &);
 
 };
 
