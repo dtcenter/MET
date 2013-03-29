@@ -681,19 +681,18 @@ void filter_tracks(TrackInfoArray &tracks) {
 //
 // - Loop through the track array to construct a mapping of cases to
 //   track initialization times.
-//   - Only process the track if the ADECK model ends with an 'I'
-//   - The map key consists of the ADECK model name and the STORMID.
+//   - Only process the track if the model name ends with an 'I'.
+//   - The map key consists of the model name and the STORMID.
 //   - The map value is a list of track initialization times.
 //
 // - Loop through and process each of the map entries.
 //   - Sort the track initialization time array.
 //   - Loop through the times and compute the time step.
-//   - If the current time step or previous time step was 12-hours,
-//     search for the following track:
-//     - AMODEL is the input AMODEL, but ending in '2' instead of 'I'.
-//     - STORMID remains the same.
+//   - If the time step is 12-hours, search for the following track:
+//     - Model name is the same, but ending in '2' instead of 'I'.
+//     - STORMID is the same.
 //     - INIT is the previous track initialization time plus 6 hours.
-//   - If found, create a copy of that track but rename the AMODEL to end
+//   - If found, create a copy of that track but rename the model to end
 //     in 'I' rather than '2'.
 //
 ////////////////////////////////////////////////////////////////////////
