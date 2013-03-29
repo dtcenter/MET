@@ -904,7 +904,7 @@ void process_madis_metar(NcFile *&f_in) {
                   obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
       // Dewpoint
-      process_obs(f_in, "dewpoint", cur, dim, 7, conversion,
+      process_obs(f_in, "dewpoint", cur, dim, 17, conversion,
                   obs_arr, i_obs, n_rej_fill, n_rej_qc);
 
       // Wind Direction
