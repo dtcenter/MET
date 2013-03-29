@@ -559,49 +559,6 @@ bool TrackInfo::is_interp() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-bool TrackInfo::is_6hour() const {
-   const char *s = Technique;
-
-   s += (strlen(Technique) - 1);
-
-   // Return true if the last character of the model name is '2'
-   return(*s == '2');
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TrackInfo::merge_points(const TrackInfo &t) {
-   TrackInfo new_t;
-   int i, j;
-   
-   // Initialize to the current TrackInfo
-   new_t = *this;
-
-   // Delete the TrackPoints
-   new_t.clear_points();
-
-   // Loop through the TrackPoints,
-   // assuming they are in chronological order
-   i = j = 0;
-   while(i<NPoints || j<t.n_points()) {
-
-      // Check range
-      if(i >= NPoints)      { new_t.add(t[j]);     j++; continue; }
-      if(j >= t.n_points()) { new_t.add(Point[i]); i++; continue; }
-      
-      // Add the TrackPoint, who's valid time is less
-           if(Point[i].valid() <= t[j].valid()) { new_t.add(Point[i]); i++; }
-      else if(Point[i].valid() >  t[j].valid())  { new_t.add(t[j]);    j++; }
-
-   } // end while
-
-   *this = new_t;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 //  Code for class TrackInfoArray
 //

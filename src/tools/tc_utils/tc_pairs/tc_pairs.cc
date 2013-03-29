@@ -27,6 +27,7 @@ using namespace std;
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -93,7 +94,7 @@ static void   process_track_files  (const StringArray &,
                                     TrackInfoArray &, bool);
 static bool   is_keeper            (const ATCFLine &);
 static void   filter_tracks        (TrackInfoArray &);
-static void   merge_interp12       (TrackInfoArray &);
+static void   derive_interp12      (TrackInfoArray &);
 static int    derive_consensus     (TrackInfoArray &);
 static int    derive_lag           (TrackInfoArray &);
 static int    derive_baseline      (TrackInfoArray &, TrackInfoArray &);
@@ -279,12 +280,11 @@ void process_tracks() {
         << "Found " << bdeck_tracks.n_tracks()
         << " BDECK track(s).\n";
 
-   // Merge 6-hourly TrackPoints into 12-hourly interpolated Tracks
+   // Handle 12-hourly interpolated models
    if(conf_info.Interp12) {
       mlog << Debug(2)
-           << "Merging 6-hour TrackPoints into 12-hour "
-           << "interpolated tracks.\n";
-      merge_interp12(adeck_tracks);
+           << "Deriving 12-hour interpolated tracks.\n";
+      derive_interp12(adeck_tracks);
    }
    
    // Derive consensus forecasts from the ADECK tracks
@@ -676,60 +676,135 @@ void filter_tracks(TrackInfoArray &tracks) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Apply the following logic to derive 12-hour interpolated tracks:
+//
+// - Loop through the track array to construct a mapping of cases to
+//   track initialization times.
+//   - Only process the track if the ADECK model ends with an 'I'
+//   - The map key consists of the ADECK model name and the STORMID.
+//   - The map value is a list of track initialization times.
+//
+// - Loop through and process each of the map entries.
+//   - Sort the track initialization time array.
+//   - Loop through the times and compute the time step.
+//   - If the current time step or previous time step was 12-hours,
+//     search for the following track:
+//     - AMODEL is the input AMODEL, but ending in '2' instead of 'I'.
+//     - STORMID remains the same.
+//     - INIT is the previous track initialization time plus 6 hours.
+//   - If found, create a copy of that track but rename the AMODEL to end
+//     in 'I' rather than '2'.
+//
+////////////////////////////////////////////////////////////////////////
 
-void merge_interp12(TrackInfoArray &tracks) {
-   int i, j;
-   ConcatString model;
-   TrackInfo merge_track;
+void derive_interp12(TrackInfoArray &tracks) {
+   int i, j, ds;
+   ConcatString key, technique;
+   TimeArray val;
+   StringArray sa;
+   TrackInfo interp_track;
+   const char *sep = ":";
 
-   // Loop through the tracks looking for 12-hour interpolated models
+   // Interp12 case map
+   map<ConcatString,TimeArray> interp_map;
+   map<ConcatString,TimeArray>::iterator it;
+
+   // Track inititalization map
+   map<ConcatString,int> track_map;
+   
+   // Loop through the track array to construct maps
    for(i=0; i<tracks.n_tracks(); i++) {
 
-      // Continue if this is not an interpolated model
-      if(!tracks[i].is_interp()) continue;
+      // Build track map entry
+      key << cs_erase
+          << tracks[i].technique() << sep
+          << tracks[i].storm_id() << sep
+          << (tracks[i].init() > 0 ?
+              unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
 
-      // Continue if the valid increment is not 12-hours
-      if(tracks[i].valid_inc() != 12 * sec_per_hour) continue;
+      // Add track map entry
+      track_map[key] = i;
 
-      // Build the model name to be found
-      model = tracks[i].technique();
-      model.chomp('I');
-      model << '2';
+      // Skip AMODEL names not ending in 'I'
+      if(*(tracks[i].technique() +
+           strlen(tracks[i].technique()) - 1) != 'I') continue;
 
-      // Loop through the tracks looking for a matching 6-hour model
-      for(j=0; j<tracks.n_tracks(); j++) {
+      // Build interp map key
+      key << cs_erase
+          << tracks[i].technique() << sep
+          << tracks[i].storm_id();
 
-         // Match the model name, basin, cyclone, and init time
-         if(tracks[j].technique() == model &&
-            tracks[j].basin()     == tracks[i].basin() &&
-            tracks[j].cyclone()   == tracks[i].cyclone() &&
-            tracks[j].init()      == tracks[i].init()) break;
+      // Add a new interpolation map entry, if necessary
+      if(interp_map.count(key) == 0) {
+         val.clear();
+         interp_map[key] = val;
       }
 
-      // Check for no match found
-      if(j == tracks.n_tracks()) {
-         mlog << Debug(4)
-              << "\n[Track " << i+1 << "] Found no 6-hour track to merge "
-              << "into 12-hour interpolated track " << i+1 << ":\n"
-              << "    12-hour: " << tracks[i].serialize() << "\n\n";
-         continue;
-      }
-
-      // Merge the 6-hour TrackPoints into the interpolated track
-      merge_track = tracks[i];
-      merge_track.merge_points(tracks[j]);
-
-      mlog << Debug(4)
-           << "[Track " << i+1 << "] Merging 6-hour track " << j+1
-           << " into 12-hour interpolated track " << i+1 << ":\n"
-           << "     6-hour: " << tracks[j].serialize() << "\n"
-           << "    12-hour: " << tracks[i].serialize() << "\n"
-           << "     Merged: " << merge_track.serialize() << "\n";
-        
-      // Store the merged track
-      tracks.set(i, merge_track);
+      // Add the current time to the interpolation map entry
+      if(!interp_map[key].has(tracks[i].init()))
+         interp_map[key].add(tracks[i].init());
 
    } // end for i
+
+   // Loop through and process each of the interpolation map entries
+   for(it = interp_map.begin(); it != interp_map.end(); it++) {
+     
+      mlog << Debug(3)
+           << "Processing 12-hour interpolated tracks for case: "
+           << it->first << "\n";
+
+      // Split the current map key
+      sa = it->first.split(sep);
+
+      // Sort the current map key value
+      it->second.sort_array();
+
+      // Loop through the initialization times and process the time step
+      for(i=0; i<it->second.n_elements(); i++) {
+
+         // Compute the time step
+         if(i == it->second.n_elements() - 1)
+            ds = it->second[i]   - it->second[i-1];
+         else
+            ds = it->second[i+1] - it->second[i];
+
+         // Check for a 12-hour time step
+         if(ds != 12*sec_per_hour) continue;
+
+         // Swap the trailing 'I' for a '2'
+         technique = sa[0];
+         technique.chomp('I');
+         technique << '2';
+
+         // Build search key
+         key << cs_erase
+             << technique << sep
+             << sa[1] << sep
+             << unix_to_yyyymmdd_hhmmss(it->second[i] + 6*sec_per_hour);
+
+         // Retrieve the index for this track
+         j = (track_map.count(key) == 1 ?
+              track_map[key] : bad_data_int);
+
+         // Process interpolated track
+         if(j) {
+            mlog << Debug(3)
+                 << "Found 12-hour interpolated track for case: "
+                 << key << "\n";
+
+            // Copy, rename, and add the interpolated track
+            interp_track = tracks[j];
+            interp_track.set_technique(sa[0]);
+            tracks.add(interp_track);
+         }
+         else {
+            mlog << Debug(3)
+                 << "Could not find 12-hour interpolated track for case: "
+                 << key << "\n";
+         }
+      } //end for i
+   } // end for it
 
    return;
 }
