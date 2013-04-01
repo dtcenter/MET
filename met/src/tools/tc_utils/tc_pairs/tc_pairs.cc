@@ -698,32 +698,27 @@ void filter_tracks(TrackInfoArray &tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 void derive_interp12(TrackInfoArray &tracks) {
-   int i, j, ds;
+   int i, j, ds, n;
    ConcatString key, technique;
    TimeArray val;
-   StringArray sa;
+   StringArray sa, track_cases;
    TrackInfo interp_track;
    const char *sep = ":";
 
    // Interp12 case map
    map<ConcatString,TimeArray> interp_map;
    map<ConcatString,TimeArray>::iterator it;
-
-   // Track inititalization map
-   map<ConcatString,int> track_map;
    
    // Loop through the track array to construct maps
    for(i=0; i<tracks.n_tracks(); i++) {
 
-      // Build track map entry
+      // Build track case key
       key << cs_erase
           << tracks[i].technique() << sep
           << tracks[i].storm_id() << sep
           << (tracks[i].init() > 0 ?
               unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
-
-      // Add track map entry
-      track_map[key] = i;
+      track_cases.add(key);
 
       // Skip AMODEL names not ending in 'I'
       if(*(tracks[i].technique() +
@@ -747,7 +742,7 @@ void derive_interp12(TrackInfoArray &tracks) {
    } // end for i
 
    // Loop through and process each of the interpolation map entries
-   for(it = interp_map.begin(); it != interp_map.end(); it++) {
+   for(it = interp_map.begin(), n=0; it != interp_map.end(); it++) {
      
       mlog << Debug(3)
            << "Processing 12-hour interpolated tracks for case: "
@@ -782,28 +777,30 @@ void derive_interp12(TrackInfoArray &tracks) {
              << sa[1] << sep
              << unix_to_yyyymmdd_hhmmss(it->second[i] + 6*sec_per_hour);
 
-         // Retrieve the index for this track
-         j = (track_map.count(key) == 1 ?
-              track_map[key] : bad_data_int);
+         // Search for this track description
+         if(track_cases.has(key, j)) {
 
-         // Process interpolated track
-         if(j) {
+            // Process interpolated track
             mlog << Debug(3)
-                 << "Found 12-hour interpolated track for case: "
+                 << "Found 12-hour interpolated track: "
                  << key << "\n";
 
             // Copy, rename, and add the interpolated track
             interp_track = tracks[j];
             interp_track.set_technique(sa[0]);
             tracks.add(interp_track);
+            n++;
          }
          else {
             mlog << Debug(3)
-                 << "Could not find 12-hour interpolated track for case: "
+                 << "Could not find 12-hour interpolated track: "
                  << key << "\n";
          }
       } //end for i
    } // end for it
+
+   mlog << Debug(2)
+        << "Finished deriving " << n << " 12-hour interpolated tracks.\n";
 
    return;
 }
