@@ -698,7 +698,7 @@ void filter_tracks(TrackInfoArray &tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 void derive_interp12(TrackInfoArray &tracks) {
-   int i, j, ds, n;
+   int i, j, ds, n_add, n;
    ConcatString key, technique;
    TimeArray val;
    StringArray sa, track_cases;
@@ -742,10 +742,11 @@ void derive_interp12(TrackInfoArray &tracks) {
    } // end for i
 
    // Loop through and process each of the interpolation map entries
-   for(it = interp_map.begin(), n=0; it != interp_map.end(); it++) {
-     
+   for(it = interp_map.begin(), n=0, n_add=0; it != interp_map.end(); it++) {
+
       mlog << Debug(3)
-           << "Processing 12-hour interpolated tracks for case: "
+           << "[Case " << ++n << "] Processing " << it->second.n_elements()
+           << " initialization times to compute 12-hour interpolated tracks for "
            << it->first << "\n";
 
       // Split the current map key
@@ -764,7 +765,13 @@ void derive_interp12(TrackInfoArray &tracks) {
             ds = it->second[i+1] - it->second[i];
 
          // Check for a 12-hour time step
-         if(ds != 12*sec_per_hour) continue;
+         if(ds != 12*sec_per_hour) {
+            mlog << Debug(3)
+                 << "For initialization time "
+                 << unix_to_yyyymmdd_hhmmss(it->second[i]) << ", skipping "
+                 << sec_to_hhmmss(ds) << " timestep.\n";
+            continue;
+         }
 
          // Swap the trailing 'I' for a '2'
          technique = sa[0];
@@ -782,18 +789,22 @@ void derive_interp12(TrackInfoArray &tracks) {
 
             // Process interpolated track
             mlog << Debug(3)
-                 << "Found 12-hour interpolated track: "
+                 << "For initialization time "
+                 << unix_to_yyyymmdd_hhmmss(it->second[i])
+                 << ", found 12-hour interpolated track: "
                  << key << "\n";
 
             // Copy, rename, and add the interpolated track
             interp_track = tracks[j];
             interp_track.set_technique(sa[0]);
             tracks.add(interp_track);
-            n++;
+            n_add++;
          }
          else {
             mlog << Debug(3)
-                 << "Could not find 12-hour interpolated track: "
+                 << "For initialization time "
+                 << unix_to_yyyymmdd_hhmmss(it->second[i])
+                 << ", could not find 12-hour interpolated track: "
                  << key << "\n";
          }
       } //end for i
