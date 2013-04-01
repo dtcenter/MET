@@ -799,6 +799,17 @@ void derive_interp12(TrackInfoArray &tracks) {
             interp_track.set_technique(sa[0]);
             tracks.add(interp_track);
             n_add++;
+
+            if(mlog.verbosity_level() >= 5) {
+               mlog << Debug(5)
+                    << "Adding 12-hour interpolated track:\n"
+                    << interp_track.serialize_r(1) << "\n";
+            }
+            else {
+               mlog << Debug(4)
+                    << "Adding 12-hour interpolated track:\n"
+                    << interp_track.serialize() << "\n";
+            }
          }
          else {
             mlog << Debug(3)
@@ -811,7 +822,8 @@ void derive_interp12(TrackInfoArray &tracks) {
    } // end for it
 
    mlog << Debug(2)
-        << "Finished deriving " << n << " 12-hour interpolated tracks.\n";
+        << "Finished deriving " << n_add
+        << " 12-hour interpolated tracks.\n";
 
    return;
 }
