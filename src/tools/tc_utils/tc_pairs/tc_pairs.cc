@@ -747,7 +747,7 @@ void derive_interp12(TrackInfoArray &tracks) {
       mlog << Debug(3)
            << "[Case " << ++n << "] Processing " << it->second.n_elements()
            << " initialization times to compute 12-hour interpolated tracks for "
-           << it->first << "\n";
+           << it->first << ".\n";
 
       // Split the current map key
       sa = it->first.split(sep);
