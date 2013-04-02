@@ -67,14 +67,17 @@ if(is.na(MET_BASE)) {
   quit(status=1)
 }
 
-source(paste(MET_BASE, "/scripts/Rscripts/plot_tcmpr_util.R", sep=''))
+source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_util.R", sep=''))
+source(paste(MET_BASE, "/scripts/Rscripts/include/Compute_STDerr.R", sep=''))
 
 # Read the TCMPR column information from a data file.
 column_info = read.table(
-  paste(MET_BASE, "/scripts/Rscripts/plot_tcmpr_hdr.dat", sep=''),
+  paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
   header=TRUE, row.names=1)
 
 # JHG - TO DO LIST:
+# Ask Tressa - in what cases should we be using the Compute_STDerr functions - does it have to be a time series?
+# should I print a warning when the values being plotted for a lead time contain bad data?
 # move customizable settings into a "config" file sort of thing
 # add -v verbosity for logging
 # New plot types from Eric: windrose and minimum spanning tree
@@ -169,7 +172,7 @@ img_wdth = 11.0
 img_res  = 300
 
 # Colors
-color_list = c("red", "green", "blue", "purple", "orange")
+color_list = c("black", "red", "green", "blue", "purple", "orange")
 
 # Strings used to select the plots to be created
 boxplot_str = "BOXPLOT"
@@ -276,6 +279,7 @@ while(i <= length(args)) {
     i=i+1
   } else if(args[i] == "-plot") {
     plot_list = unlist(strsplit(args[i+1], ','))
+    plot_list = toupper(plot_list)
     i=i+1
   } else if(args[i] == "-baseline") {
     baseline = args[i+1]
@@ -484,7 +488,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the boxplot
     plot_time_series(dep_list[i], boxplot_str,
-                     plot_title, plot_sub, plot_ylab, event_equal)
+                     plot_title, plot_sub, plot_ylab)
   }
   
   # PLOT: Create time series of scatter plots.
@@ -505,7 +509,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the scatter plot
     plot_time_series(dep_list[i], scatter_str,
-                     plot_title, plot_sub, plot_ylab, event_equal)
+                     plot_title, plot_sub, plot_ylab)
   }
 
   # PLOT: Create time series of means.
@@ -526,7 +530,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the mean plot
     plot_time_series(dep_list[i], mean_str,
-                     plot_title, plot_sub, plot_ylab, event_equal)
+                     plot_title, plot_sub, plot_ylab)
   }
 
   # PLOT: Create time series of medians.
@@ -547,7 +551,7 @@ for(i in 1:length(dep_list)) {
 
     # Do the median plot
     plot_time_series(dep_list[i], median_str,
-                     plot_title, plot_sub, plot_ylab, event_equal)
+                     plot_title, plot_sub, plot_ylab)
   }
   
 } # end for i
