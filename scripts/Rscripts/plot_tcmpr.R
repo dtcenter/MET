@@ -17,12 +17,12 @@
 ##         [-title string]
 ##         [-subtitle string]
 ##         [-ylab string]
+##         [-ylim min,max]
 ##         [-dep list]
 ##         [-series string [list]]
 ##         [-lead list]
 ##         [-plot list]
-##         [-baseline model]
-##         [-ylim min,max]
+##         [-rp_thresh string]
 ##         [-no_ee]
 ##         [-save_data path]
 ##         [-save]
@@ -34,18 +34,22 @@
 ##      "-title"     overrides the default plot title.
 ##      "-subtitle"  overrides the default plot subtitle.
 ##      "-ylab"      overrides the default plot y-axis label.
+##      "-ylim"      is the bounds for plotting the Y-axis.
 ##      "-filter"    is a list of filtering options for tc_stat.
-##      "-dep"       is a comma-separated list of dependent variable columns to plot.
-##      "-series"    is the column whose unique values define the series on the plot,
-##                   optionally followed by a comma-separated list of values including
+##      "-dep"       is a comma-separated list of dependent variable
+##                   columns to plot.
+##      "-series"    is the column whose unique values define the
+##                   series on the plot, optionally followed by a
+##                   comma-separated list of values including:
 ##                   ALL, OTHER, and colon-separated groups.
 ##      "-lead"      is a list of lead times (h) to be plotted.
-##      "-plot"      is a comma-separated list of plot types to create, including
-##                   BOXPLOT, SCATTER, MEAN, MEDIAN, SKILL, RANK
-##      "-baseline"  is the baseline model for skill scores.
-##      "-ylim"      is the bounds for plotting the Y-axis.
+##      "-plot"      is a comma-separated list of plot types to create:
+##                   BOXPLOT, SCATTER, MEAN, MEDIAN, RELPERF, RANK
+##      "-rp_thresh" to specify a meaningful difference for the
+##                   relative performance plot.
 ##      "-no_ee"     to disable event equalization.
-##      "-save_data" to save the filter track data to a file instead of deleting it.
+##      "-save_data" to save the filter track data to a file instead
+##                   of deleting it.
 ##      "-save"      to call save.image().
 ##
 ##   Details:
@@ -77,37 +81,14 @@ column_info = read.table(
 
 # JHG - TO DO LIST:
 # Ask Tressa - in what cases should we be using the Compute_STDerr functions - does it have to be a time series?
-# should I print a warning when the values being plotted for a lead time contain bad data?
-# move customizable settings into a "config" file sort of thing
-# add -v verbosity for logging
+# What about percentiles for the rp_thresh argument?
+# When computing a difference, should we make sure that all of the lines being differenced have exactly the same header data?
+# Figure out what information should be written to a log file.
+# Should I print a warning when the values being plotted for a lead time contain bad data?
+# Move customizable settings into a "config" file sort of thing?
+# Add -v verbosity for logging?
+# Move legend below X-axis?
 # New plot types from Eric: windrose and minimum spanning tree
-# Add CI's for mean and median plots, use "-no_ci" command line argument
-# Do skill plots
-# Do rank plots
-# Sort the data into chronological order so that the event equal output is in the same order?
-# Move legend below X-axis
-
-# JHG - DONE
-# add title, subtitle, ylab options to override defaults
-# why does -series level not work?
-# check that MET_BASE is set
-# Write out ylim plotting values that were used
-# plot pairwise difference of series entries (e.g. -series AMODEL "GFSI-BCLP,GFSI-OFCL")
-#    if differene, make sure that event_equal is true, otherwise error.
-# Do boxplots
-# Do scatter plots
-
-  # Create time series of median and mean for raw values w/o CIs.
-  # Create time series of median and mean for raw values w CIs.
-  # Create time series of boxplots for absolute values.
-  # Create time series of median and mean for absolute values w/o CIs.
-  # Create time series of median and mean for absolute values w CIs.
-  # Create time series of median and mean skill scores for abs values.
-  # Create time series of percent cases over set threshold.
-  # Create time series of boxplots for the difference (mod1-mod2) of the absolute values.
-  # Create time series of median and mean for the difference (mod1-mod2) of the absolute values without CIs.
-  # Create time series of median and mean for the difference (mod1-mod2) of the absolute values with CIs.
-  # Compute ranks
 
 ########################################################################
 #
@@ -123,33 +104,33 @@ usage = function() {
   cat("        [-title string]\n")
   cat("        [-subtitle string]\n")
   cat("        [-ylab string]\n")
+  cat("        [-ylim min,max]\n")
   cat("        [-filter options]\n")
   cat("        [-dep list]\n")
   cat("        [-series string [list]]\n")
   cat("        [-lead list]\n")
   cat("        [-plot list]\n")
-  cat("        [-baseline model]\n")
-  cat("        [-ylim min,max]\n")
+  cat("        [-rp_thresh string]\n")
   cat("        [-no_ee]\n")
   cat("        [-save]\n")
-  cat("        where \"-lookin\"   is a list of files with TCMPR lines to be used.\n")
-  cat("              \"-outdir\"   is the output directory.\n")
-  cat("              \"-prefix\"   is the output file name prefix.\n")
-  cat("              \"-title\"    overrides the default plot title.\n")
-  cat("              \"-subtitle\" overrides the default plot subtitle.\n")
-  cat("              \"-ylab\"     overrides the default plot y-axis label.\n")
-  cat("              \"-filter\"   is a list of filtering options for the tc_stat tool.\n")
-  cat("              \"-dep\"      is a comma-separated list of dependent variable columns to plot.\n")
-  cat("              \"-series\"   is the column whose unique values define the series on the plot,\n")
-  cat("                          optionally followed by a comma-separated list of values including\n")
-  cat("                          ALL, OTHER, and colon-separated groups.\n")
-  cat("              \"-lead\"     is a comma-separted list of lead times (h) to be plotted.\n")
-  cat("              \"-plot\"     is a comma-separated list of plot types to create, including\n")
-  cat("                          BOXPLOT, SCATTER, MEAN, MEDIAN, SKILL, RANK\n")
-  cat("              \"-baseline\" is the baseline model for skill scores.\n")
-  cat("              \"-ylim\"     is the min,max bounds for plotting the Y-axis.\n")
-  cat("              \"-no_ee\"    to disable event equalization.\n")
-  cat("              \"-save\"     to call save.image().\n\n")
+  cat("        where \"-lookin\"    is a list of files with TCMPR lines to be used.\n")
+  cat("              \"-outdir\"    is the output directory.\n")
+  cat("              \"-prefix\"    is the output file name prefix.\n")
+  cat("              \"-title\"     overrides the default plot title.\n")
+  cat("              \"-subtitle\"  overrides the default plot subtitle.\n")
+  cat("              \"-ylab\"      overrides the default plot y-axis label.\n")
+  cat("              \"-ylim\"      is the min,max bounds for plotting the Y-axis.\n")
+  cat("              \"-filter\"    is a list of filtering options for the tc_stat tool.\n")
+  cat("              \"-dep\"       is a comma-separated list of dependent variable columns to plot.\n")
+  cat("              \"-series\"    is the column whose unique values define the series on the plot,\n")
+  cat("                           optionally followed by a comma-separated list of values, including:\n")
+  cat("                           ALL, OTHER, and colon-separated groups.\n")
+  cat("              \"-lead\"      is a comma-separted list of lead times (h) to be plotted.\n")
+  cat("              \"-plot\"      is a comma-separated list of plot types to create:\n")
+  cat("                           BOXPLOT, SCATTER, MEAN, MEDIAN, RELPERF, RANK\n")
+  cat("              \"-rp_thresh\" to specify a meaningful difference for the relative performance plot.\n")
+  cat("              \"-no_ee\"     to disable event equalization.\n")
+  cat("              \"-save\"      to call save.image().\n\n")
 }
 
 ########################################################################
@@ -179,7 +160,7 @@ boxplot_str = "BOXPLOT"
 scatter_str = "SCATTER"
 mean_str    = "MEAN"
 median_str  = "MEDIAN"
-skill_str   = "SKILL"
+relperf_str = "RELPERF"
 rank_str    = "RANK"
 
 # Minimum number of values for boxplots.  Otherwise, do a scatter plot.
@@ -188,7 +169,8 @@ n_min=11
 # Plotting offset value
 horz_offset = 2.00
 vert_offset = 1.25
-ci_offset   = 0.10
+
+relperf_horz_offset = 0.50
 
 # Alpha and z-value
 alpha           = 0.05
@@ -220,6 +202,7 @@ prefix       = ""
 title_str    = c()
 subtitle_str = c()
 ylab_str     = c()
+ymin = ymax  = NA
 filter_opts  = ""
 dep_list     = c("TK_ERR")
 series       = "AMODEL"
@@ -227,8 +210,7 @@ series_list  = c()
 lead_list    = c( 0,  6, 12, 18, 24, 30, 36, 42, 48, 54, 60,
                  66, 72, 78, 84, 90, 96, 102, 108, 114, 120)
 plot_list    = c(boxplot_str)
-baseline     = NA
-ymin = ymax  = NA
+rp_thresh    = ">=100"
 event_equal  = TRUE
 save_data    = ""
 save         = FALSE
@@ -257,6 +239,10 @@ while(i <= length(args)) {
   } else if(args[i] == "-ylab") {
     ylab_str = args[i+1]
     i=i+1
+  } else if(args[i] == "-ylim") {
+    ymin = as.numeric(unlist(strsplit(args[i+1], ','))[1])
+    ymax = as.numeric(unlist(strsplit(args[i+1], ','))[2])
+    i=i+1
   } else if(args[i] == "-filter") {
     filter_opts = args[i+1]
     i=i+1
@@ -281,12 +267,8 @@ while(i <= length(args)) {
     plot_list = unlist(strsplit(args[i+1], ','))
     plot_list = toupper(plot_list)
     i=i+1
-  } else if(args[i] == "-baseline") {
-    baseline = args[i+1]
-    i=i+1
-  } else if(args[i] == "-ylim") {
-    ymin = as.numeric(unlist(strsplit(args[i+1], ','))[1])
-    ymax = as.numeric(unlist(strsplit(args[i+1], ','))[2])
+  } else if(args[i] == "-rp_thresh") {
+    rp_thresh = args[i+1]
     i=i+1
   } else if(args[i] == "-no_ee") {
     event_equal = FALSE
@@ -334,6 +316,9 @@ if(status != 0) {
 # Read the data
 tcst = read.table(tcst_tmp_file, header=TRUE)
 
+# Sort the data by INIT and VALID columns
+tcst = tcst[with(tcst, order(INIT,VALID)),]
+  
 # Dispose of the temporary file by either saving or deleting it
 if(nchar(save_data) > 0) {
    run_cmd = paste("mv -f", tcst_tmp_file, save_data)
@@ -456,34 +441,29 @@ for(i in 1:length(dep_list)) {
   # Get the data to be plotted
   col       = get_dep_column(dep_list[i])
   tcst$PLOT = col$val
-  
-  # Initialize plotting strings
-  plot_title = title_str
-  plot_sub   = subtitle_str
-  plot_ylab  = ylab_str
+
+  # Remove special characters from output file name
+  out_file_dep = sub('[)]', '', sub('[(]', '_', dep_list[i]))
 
   # Set plotting strings
-  if(length(subtitle_str) == 0) {
-    plot_sub = paste("FILTER:" , filter_opts)
-  }
-  if(length(ylab_str) == 0) {
-    plot_ylab = paste(dep_list[i], " (", col$units,")", sep='')
-  }
+  plot_sub  = ifelse(length(subtitle_str) == 0,
+                     paste("FILTER:" , filter_opts),
+                     subtitle_str);
+  plot_ylab = ifelse(length(ylab_str) == 0,
+                     paste(dep_list[i], " (", col$units,")", sep=''),
+                     ylab_str);
 
   # PLOT: Create time series of boxplots.
   if(boxplot_str%in%plot_list == TRUE) {
 
     # Set plotting strings
-    if(length(title_str) == 0) {
-      plot_title = paste("Boxplots of", col$desc, "by",
-                         column_info[series, "DESCRIPTION"])
-    }
-    else {
-      plot_title = title_str
-    }
+    plot_title = ifelse(length(title_str) == 0,
+                        paste("Boxplots of", col$desc, "by",
+                              column_info[series, "DESCRIPTION"]),
+                        title_str);
   
     # Build output file name
-    out_file = paste(outdir, "/", prefix, dep_list[i],
+    out_file = paste(outdir, "/", prefix, out_file_dep,
                      "_bplot.", img_ext, sep="")
 
     # Do the boxplot
@@ -495,16 +475,13 @@ for(i in 1:length(dep_list)) {
   if(scatter_str%in%plot_list == TRUE) {
 
     # Set plotting strings
-    if(length(title_str) == 0) {
-      plot_title = paste("Scatter plots of", col$desc, "by",
-                         column_info[series, "DESCRIPTION"])
-    }
-    else {
-      plot_title = title_str
-    }
+    plot_title = ifelse(length(title_str) == 0,
+                        paste("Scatter Plots of", col$desc, "by",
+                              column_info[series, "DESCRIPTION"]),
+                        title_str);
 
     # Build output file name
-    out_file = paste(outdir, "/", prefix, dep_list[i],
+    out_file = paste(outdir, "/", prefix, out_file_dep,
                      "_scatter.", img_ext, sep="")
 
     # Do the scatter plot
@@ -516,16 +493,13 @@ for(i in 1:length(dep_list)) {
   if(mean_str%in%plot_list == TRUE) {
 
     # Set plotting strings
-    if(length(title_str) == 0) {
-      plot_title = paste("Mean of", col$desc, "by",
-                         column_info[series, "DESCRIPTION"])
-    }
-    else {
-      plot_title = title_str
-    }
+    plot_title = ifelse(length(title_str) == 0,
+                        paste("Mean of", col$desc, "by",
+                              column_info[series, "DESCRIPTION"]),
+                        title_str);
 
     # Build output file name
-    out_file = paste(outdir, "/", prefix, dep_list[i],
+    out_file = paste(outdir, "/", prefix, out_file_dep,
                      "_mean.", img_ext, sep="")
 
     # Do the mean plot
@@ -537,20 +511,61 @@ for(i in 1:length(dep_list)) {
   if(median_str%in%plot_list == TRUE) {
 
     # Set plotting strings
-    if(length(title_str) == 0) {
-      plot_title = paste("Median of", col$desc, "by",
-                         column_info[series, "DESCRIPTION"])
-    }
-    else {
-      plot_title = title_str
-    }
+    plot_title = ifelse(length(title_str) == 0,
+                        paste("Median of", col$desc, "by",
+                              column_info[series, "DESCRIPTION"]),
+                        title_str);
 
     # Build output file name
-    out_file = paste(outdir, "/", prefix, dep_list[i],
+    out_file = paste(outdir, "/", prefix, out_file_dep,
                      "_median.", img_ext, sep="")
 
     # Do the median plot
     plot_time_series(dep_list[i], median_str,
+                     plot_title, plot_sub, plot_ylab)
+  }
+
+  # PLOT: Create time series of relative performance.
+  if(relperf_str%in%plot_list == TRUE) {
+
+    # Set plotting strings
+    plot_title = ifelse(length(title_str) == 0,
+                        paste("Relative Performance of", col$desc,
+                               "Difference", rp_thresh, "by",
+                                column_info[series, "DESCRIPTION"]),
+                        title_str);
+    plot_ylab  = ifelse(length(ylab_str) == 0,
+                        "Percent of Cases",
+                        ylab_str);
+
+    # Build output file name
+    out_file = paste(outdir, "/", prefix, out_file_dep,
+                     "_rel_perf.", img_ext, sep="")
+
+    # Do the relative performance plot
+    plot_time_series(dep_list[i], relperf_str,
+                     plot_title, plot_sub, plot_ylab)
+  }
+
+  # PLOT: Create time series of ranks for the first model.
+  if(rank_str%in%plot_list == TRUE) {
+
+    # Set plotting strings
+    plot_title = ifelse(length(title_str) == 0,
+                        paste(series_list[1],
+                              column_info[series, "DESCRIPTION"],
+                              col$desc, "Rank Frequency"),
+                        title_str);
+    plot_ylab  = ifelse(length(ylab_str) == 0,
+                        "Percent of Cases",
+                        ylab_str);
+
+    # Build output file name
+    out_file = paste(outdir, "/", prefix, out_file_dep,
+                     "_rank.", img_ext, sep="")
+
+    # Do the relative performance plot
+    plot_time_series(dep_list[i], rank_str,
                      plot_title, plot_sub, plot_ylab)
   }
   

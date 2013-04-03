@@ -84,102 +84,223 @@ get_series_data = function(cur, cur_plot, diff) {
 
   # Subset based on requested lead times
   series_data = series_data[series_data$LEAD_HR%in%lead_list,]
-
-  # Sort the data subset by INIT and VALID columns
-  series_data = series_data[with(series_data, order(INIT,VALID)),]
   
   return(series_data)
 }
 
 ########################################################################
 #
-# Compute a confidence interval about the mean.
+# Build a table with summary information for each case.
 #
 ########################################################################
 
-get_mean_ci = function(d) {
+get_case_data = function() {
+
+  # Initialize
+  series_data = c();
+
+  # Get the data for all series to be used in order
+  for(i in 1:length(series_list)) {
+    series_data =
+      rbind(series_data,
+            get_series_data(series_list[i], series_list[i], FALSE));
+  } # end for i
+
+  # Define a case column
+  series_data$CASE = paste(series_data$BMODEL,
+                           series_data$STORM_ID,
+                           series_data$INIT,
+                           series_data$LEAD_HR,
+                           series_data$VALID,
+                           sep=':');
+
+  # Build a set of unique cases
+  case_data = unique(data.frame(CASE=series_data$CASE,
+                                LEAD_HR=series_data$LEAD_HR,
+                                MIN=NA, MAX=NA, DIFF=NA, WIN=NA, TEST=NA,
+                                RES=NA, PLOT=NA, RANK=NA));
+
+  # Check for equal numbers of entries for each case
+  if(sum(aggregate(series_data$PLOT, by=list(series_data$CASE), length)$x != n_series)) {
+      cat(paste("ERROR: Must have the same number of entries for each case.\n"));
+      quit(status=1);
+  }
+
+  # Loop through the cases
+  for(i in 1:dim(case_data)[1]) {
+
+    # Build indicator for the current case
+    ind = (series_data$CASE == case_data$CASE[i]);
+
+    # Check for the expected number of entries
+    if(sum(ind) != n_series) {
+      cat(paste("ERROR: Unexpected number of entries for case",
+                case_data$CASE[i], ".\n"));
+      cat(series_data[ind,]);
+      quit(status=1);
+    }
+
+    # Compute the winner for each case
+    case_data$MIN[i]  = min(series_data[ind,]$PLOT);
+    case_data$MAX[i]  = max(series_data[ind,]$PLOT);
+    case_data$DIFF[i] = case_data$MAX[i] - case_data$MIN[i];
+    case_data$WIN[i]  = as.character(series_data[ind,series][which.min(series_data[ind,]$PLOT)]);
+    case_data$TEST[i] = paste(case_data$DIFF[i], rp_thresh, sep='');
+    case_data$RES[i]  = eval(parse(text=case_data$TEST[i]));
+    case_data$PLOT[i] = ifelse(case_data$RES[i], case_data$WIN[i], "TIE");
+    case_data$RANK[i] = rank(series_data[ind,]$PLOT, na.last="keep", ties.method="random")[1];
+  }
+
+  return(case_data);
+}
+
+########################################################################
+#
+# Compute a confidence interval for a proportion.
+#
+########################################################################
+
+get_prop_ci <- function(x, n) {
+
+  # Compute the standard proportion error
+  zval   = abs(qnorm(alpha/2));
+  phat   = x/n;
+  bound  = (zval * ((phat * (1 - phat) + (zval^2)/(4 * n))/n)^(1/2))/(1 + (zval^2)/n);
+  midpnt = (phat + (zval^2)/(2 * n))/(1 + (zval^2)/n);
+
+  # Return the statistic and confidence interval
+  return(100*c(round(midpnt - bound, 4),
+               round(phat,           4),
+               round(midpnt + bound, 4)));
+}
+
+########################################################################
+#
+# Compute a confidence interval about the mean.
+# When diff is false, use the bonferroni correction.
+#
+########################################################################
+
+get_mean_ci = function(d, diff) {
 
   # Compute the standard error
   s = Compute_STDerr_from_mean(d, "ML");
-  if(length(s) > 1 && s[2] == 0) { stderr = round(zval_bonferroni*s[1], 1); }
-  else                           { stderr = 0;                              }
+  if(length(s) > 1 && s[2] == 0) {
+    stderr = ifelse(diff, round(zval*s[1], 1),
+                          round(zval_bonferroni*s[1], 1));
+  }
+  else {
+    stderr = 0;
+  }
 
   # Compute the statistic
   stat = mean(d, na.rm=TRUE);
 
   # Return the statistic and confidence interval
-  return(data.frame(val=stat,
-                    ncl=round(stat + stderr, 1),
-                    ncu=round(stat - stderr, 1)));
+  return(c(round(stat - stderr, 1), stat, round(stat + stderr, 1)));
 }
 
 ########################################################################
 #
 # Compute a confidence interval about the median.
+# When diff is false, use the bonferroni correction.
 #
 ########################################################################
 
-get_median_ci = function(d) {
+get_median_ci = function(d, diff) {
 
   # Compute the standard error
   s = Compute_STDerr_from_median(d, "ML");
-  if(length(s) > 1 && s[2] == 0) { stderr = round(zval_bonferroni*s[1], 1); }
-  else                           { stderr = 0;                              }
+  if(length(s) > 1 && s[2] == 0) {
+    stderr = ifelse(diff, round(zval*s[1], 1),
+                          round(zval_bonferroni*s[1], 1));
+  }
+  else {
+    stderr = 0;
+  }
 
   # Compute the statistic
   stat = median(d, na.rm=TRUE);
 
   # Return the statistic and confidence interval
-  return(data.frame(val=stat,
-                    ncl=round(stat + stderr, 1),
-                    ncu=round(stat - stderr, 1)));
-
-  return(stat);
+  return(c(round(stat - stderr, 1), stat, round(stat + stderr, 1)));
 }
 
 ########################################################################
 #
-# Update the range of the data based on the plot type.
+# Get the range of the data based on the plot type.
 #
 ########################################################################
 
-set_range = function(series_data, plot_type, yrange) {
+get_yrange = function(plot_type) {
 
-  # Get the data range based on plot type
-  if(plot_type == mean_str || plot_type == median_str) {
+  # Initialize
+  ylim = c(NA,NA)
+
+  # Loop over the series list entries
+  for(i in 1:n_series) {
+
+    # Get current subset of data
+    series_data = get_series_data(series_list[i], series_plot[[i]],
+                                  diff_flag[i])
 
     # Initialize
-    d = c();
+    cur = c();
 
-    for(i in 1:length(lead_list)) {
+    # Get the data range based on plot type
+    if(plot_type == mean_str || plot_type == median_str) {
 
-      # Get data for the current lead time
-      data = subset(series_data, series_data$LEAD_HR == lead_list[i] &
-                    !is.na(series_data$PLOT));
+      for(j in 1:length(lead_list)) {
 
-      # Skip lead times for which no data is found
-      if(dim(data)[1] == 0) next;
+        # Get data for the current lead time
+        data = subset(series_data, series_data$LEAD_HR == lead_list[j] &
+                      !is.na(series_data$PLOT));
 
-      # Append the plotting limits for each lead time
-      if(plot_type == mean_str) { d = c(d, get_mean_ci(data$PLOT));   }
-      else                      { d = c(d, get_median_ci(data$PLOT)); }
-    } # end for i
-  
-    sub_yrange = range(d, na.rm=TRUE);
-  }
-  else {
-    sub_yrange = range(series_data$PLOT, na.rm=TRUE)
-  }
+        # Skip lead times for which no data is found
+        if(dim(data)[1] == 0) next;
 
-  # Update the plotting limits
-  if(is.na(yrange[1]) || sub_yrange[1] < yrange[1]) {
-    yrange[1] = sub_yrange[1]
-  }
-  if(is.na(yrange[2]) || sub_yrange[2] > yrange[2]) {
-    yrange[2] = sub_yrange[2]
-  }
-      
-  return(yrange)
+        # Append the plotting limits for each lead time
+        if(plot_type == mean_str) { cur = c(cur,   get_mean_ci(data$PLOT, diff_flag[i])); }
+        else                      { cur = c(cur, get_median_ci(data$PLOT, diff_flag[i])); }
+
+      } # end for j
+    }
+    else if(plot_type == relperf_str || plot_type == rank_str) {
+
+      # Get the case data
+      case_data = get_case_data();
+
+      for(j in 1:length(lead_list)) {
+
+        ind = (case_data$LEAD_HR == lead_list[j]);
+
+        # Append the plotting limits for each lead time
+        if(plot_type == relperf_str) {
+          cur = c(cur, round(100*sum(case_data$PLOT[ind] ==
+                                     series_list[i])/sum(ind), 0));
+        }
+        else {
+
+          # Get counts
+          n_cur = sum(case_data$RANK[ind] == i);
+          n_tot = sum(ind);
+
+          # Compute the current rank value's frequency and CI
+          cur = c(cur, get_prop_ci(n_cur, n_tot));
+        }
+
+      } # end for j
+    }
+    else {
+      cur = range(series_data$PLOT, na.rm=TRUE)
+    }
+
+    # Update the plotting limits
+    ylim = range(c(ylim, cur), na.rm=TRUE);
+
+  } # end for i
+
+  return(ylim);
 }
 
 ########################################################################
@@ -199,49 +320,36 @@ plot_time_series = function(dep, plot_type,
          height=img_hgt, width=img_wdth, res=img_res)
 
   # Compute the series offsets
-  horz = (seq(1, n_series) - n_series/2 - 0.5)*horz_offset
+  hoff = ifelse(plot_type == relperf_str ||
+                plot_type == rank_str, relperf_horz_offset, horz_offset);
+  horz = (seq(1, n_series) - n_series/2 - 0.5)*hoff;
   vert = seq(2.0, 2.0-(n_series*vert_offset), by=-1.0*vert_offset)
 
   # Set the range for the Y-axis
-  if(!is.na(ymin) & !is.na(ymax)) {
-    yrange = c(ymin, ymax)
-  }
-  # Determine the plotting range for the data
-  else {
-
-    # Initialize
-    yrange = c(NA,NA)
-
-    # Loop over the series list entries
-    for(i in 1:n_series) {
-
-      # Get current subset of data
-      series_data = get_series_data(series_list[i], series_plot[[i]],
-                                    diff_flag[i])
-
-      # Update the plotting range
-      yrange = set_range(series_data, plot_type, yrange)
-
-    } # end for i
-  } # end else
+  if(!is.na(ymin) & !is.na(ymax)) { yrange = c(ymin, ymax);         }
+  else                            { yrange = get_yrange(plot_type); }
 
   cat(paste("Range of ", dep, ":", sep=''),
       paste(yrange, collapse=", "), "\n")
-
+  
   # Create an empty plot
-  par(mfrow=c(1,1), mai=c(1.5, 1.5, 2.0, 0.5), cex=1.5)
+  top_mar = ifelse(event_equal, 4, 4+floor(n_series/2))
+  par(mfrow=c(1,1), mar=c(5, 4, top_mar, 2), cex=1.5)
   plot(x=seq(0, max(lead_list), 6), type="n",
        xlab="Lead Time (h)",
        ylab=ylab_str,
-       main=title_str,
-       sub=subtitle_str,
+       main=NA, sub=subtitle_str,
        xlim=c(0+min(horz), max(lead_list)+max(horz)),
        ylim=yrange,
        xaxt='n', col=0, col.axis="black")
+  title(main=title_str, line=top_mar-2)
 
   # Draw the X-axis
   axis(1, at=lead_list, tick=TRUE, labels=lead_list)
-  abline(h=0, lty=3, lwd=2.0)
+
+  # Draw a reference line
+  if(plot_type == rank_str) { abline(h=100/n_series, lwd=2.0, col="gray"); }
+  else                      { abline(h=0, lty=3, lwd=2.0);                 }
 
   # Check for too few colors
   if(n_series > length(color_list)) {
@@ -251,11 +359,17 @@ plot_time_series = function(dep, plot_type,
   }
 
   # Populate the plot based on plot type
-  if(plot_type == boxplot_str || plot_type == scatter_str) {
+  if(plot_type == boxplot_str ||
+     plot_type == scatter_str) {
     plot_box_scatter(dep, plot_type, horz, vert)
   }
-  else if(plot_type == mean_str || plot_type == median_str) {
+  else if(plot_type == mean_str ||
+          plot_type == median_str) {
     plot_mean_median(dep, plot_type, horz, vert)
+  }
+  else if(plot_type == relperf_str ||
+          plot_type == rank_str) {
+    plot_relperf_rank(dep, plot_type, horz, vert)
   }
 
   # Close the output device
@@ -303,6 +417,7 @@ plot_box_scatter = function(dep, plot_type, horz, vert) {
        else if(plot_type == boxplot_str) {
 
          # Set the boxplot color
+         bxp_col = ifelse(color == "black", "white", color);
          if(color == "black") { bxp_col = "white"; }
          else                 { bxp_col = color;   }
 
@@ -319,14 +434,10 @@ plot_box_scatter = function(dep, plot_type, horz, vert) {
               pch=8);
 
     } # end for lead
-
-    # Set the valid data counts color
-    if(event_equal == TRUE) { vld_col = "black"; }
-    else                    { vld_col = color;   }
     
     # Plot the valid data counts    
     if(event_equal == FALSE || i == 1)
-      plot_valid_counts(series_data, vld_col, vert[i]);
+      plot_valid_counts(series_data, color, vert[i]);
 
   } # end for i
 
@@ -378,13 +489,14 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
       if(dim(data)[1] == 0) next;
 
       # Handle the mean and median
-      if(plot_type == mean_str) { s = get_mean_ci(data$PLOT);   }
-      else                      { s = get_median_ci(data$PLOT); }
+      if(plot_type == mean_str) { s =   get_mean_ci(data$PLOT, diff_flag[i]); }
+      else                      { s = get_median_ci(data$PLOT, diff_flag[i]); }
 
       # Store stats for this lead time
-      stat_val[j] = s$val;
-      stat_ncl[j] = s$ncl;
-      stat_ncu[j] = s$ncu;
+      stat_ncl[j] = s[1];
+      stat_val[j] = s[2];
+      stat_ncu[j] = s[3];
+
     } # end for j
 
     # Plot the statistics
@@ -397,13 +509,9 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
            lead_list[ind]+horz[i], stat_ncu[ind],
            col=color, length=0.02, angle=90, code=3, lwd=2.0)
 
-    # Set the valid data counts color
-    if(event_equal == TRUE) { vld_col = "black"; }
-    else                    { vld_col = color;   }
-
     # Plot the valid data counts
     if(event_equal == FALSE || i == 1)
-      plot_valid_counts(series_data, vld_col, vert[i]);
+      plot_valid_counts(series_data, color, vert[i]);
 
   } # end for i
 
@@ -413,7 +521,118 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
          col=rep(color_list, n_series)[1:n_series],
          lty=rep(1, n_series),
          lwd=rep(2, n_series),
-         bty="n")
+         pch=8, bty="n")
+}
+
+########################################################################
+#
+# Create time series of relative performance or rank frequency.
+#
+########################################################################
+
+plot_relperf_rank = function(dep, plot_type, horz, vert) {
+
+  # Check that event equalization has been applied
+  if(event_equal == FALSE) {
+    cat(paste("ERROR: Cannot plot relative performance or rank",
+              "frequency when event equalization is disabled.\n"));
+    quit(status=1);
+  }
+
+  # Check that series_list equals series_plot
+  for(i in 1:n_series) {
+    if(series_list[i] != series_plot[[i]]) {
+      cat(paste("ERROR: Cannot plot relative performance or rank",
+                "frequencey when using series aggregations.\n"));
+      quit(status=1);
+    }
+  } # end for i
+  
+  # Get the case data
+  case_data = get_case_data();
+  
+  # Loop over the series list entries
+  for(i in 1:n_series) {
+
+    # Get the color index
+    i_col = i%%length(color_list)
+    color = ifelse(i_col == 0, color_list[length(color_list)],
+                               color_list[i_col]);
+
+    # Compute statistic for each lead time
+    stat_val = stat_ncl = stat_ncu = rep(NA, length(lead_list));
+
+    # Prepare the data for each lead time
+    for(j in 1:length(lead_list)) {
+
+      ind = (case_data$LEAD_HR == lead_list[j]);
+      
+      # Handle the relative performance
+      if(plot_type == relperf_str) {
+
+        # Compute the current model's winning frequency
+        stat_val[j] = round(100*sum(case_data$PLOT[ind] ==
+                                    series_list[i])/sum(ind), 0);
+      }
+      # Handle the rank frequency
+      else {
+
+        # Get counts
+        n_cur = sum(case_data$RANK[ind] == i);
+        n_tot = sum(ind);
+
+        # Compute the current rank value's frequency and CI
+        s = get_prop_ci(n_cur, n_tot);
+
+        # Store stats for this lead time
+        stat_ncl[j] = s[1];
+        stat_val[j] = s[2];
+        stat_ncu[j] = s[3];
+      }
+    } # end for j
+
+    # Plot the statistics
+    ind = !is.na(stat_val);
+    pch = ifelse(plot_type == relperf_str, 8, as.character(i));
+    points(lead_list[ind]+horz[i], stat_val[ind],
+           pch=pch, type='b', col=color);
+
+    # Plot rank confidence intervals
+    if(plot_type == rank_str) {
+      points(lead_list[ind]+horz[i], stat_ncl[ind],
+             type='l', lty=3, col=color);
+      points(lead_list[ind]+horz[i], stat_ncu[ind],
+             type='l', lty=3, col=color);
+    }
+
+    # Plot the valid data counts
+    if(event_equal == FALSE || i == 1)
+      plot_valid_counts(case_data, color, vert[i]);
+
+  } # end for i
+
+  # Legend for relative performance
+  if(plot_type == relperf_str) {
+    legend(x="topleft",
+           legend=paste(series_list, "Better"),
+           col=rep(color_list, n_series)[1:n_series],
+           lty=rep(1, n_series),
+           lwd=rep(2, n_series),
+           pch=8, bty="n");
+  }
+  # Legend for rank frequency
+  else {
+    rank_str   = c("Best", "2nd", "3rd", "Worst");
+    legend_str = c(rank_str[1:min(3, n_series-1)]);
+    if(n_series >= 5) legend_str = c(legend_str, paste(4:(n_series-1), "th", sep=''));
+    legend_str = c(legend_str, rank_str[4], paste(100*(1-alpha), "% CI", sep=''));
+    legend(x="topleft",
+           legend=legend_str,
+           col=c(rep(color_list, n_series)[1:n_series], "gray"),
+           lty=c(rep(1, n_series), 3),
+           lwd=rep(2, n_series),
+           pch=c(as.character(1:n_series), NA), bty="n");
+  }
 }
 
 ########################################################################
@@ -423,6 +642,9 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
 ########################################################################
 
 plot_valid_counts = function(data, color, vert) {
+
+  # Reset the color to black for event equalized data
+  color = ifelse(event_equal, "black", color);
 
   # Aggregate the values to be plotted by lead hour
   d = aggregate(!is.na(data$PLOT), list(data$LEAD_HR), sum)
