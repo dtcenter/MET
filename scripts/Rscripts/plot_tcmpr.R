@@ -11,6 +11,7 @@
 ##   Usage:
 ##      Rscript plot_tcmpr.R
 ##         -lookin tcst_file_list
+##         [-config path]
 ##         [-outdir path]
 ##         [-prefix string]
 ##         [-filter options]
@@ -29,6 +30,7 @@
 ##
 ##   Arguments:
 ##      "-lookin"    is a list of files with TCMPR lines to be used.
+##      "-config"    is a plotting configuration file.
 ##      "-outdir"    is the output directory.
 ##      "-prefix"    is the output file name prefix.
 ##      "-title"     overrides the default plot title.
@@ -45,10 +47,12 @@
 ##      "-lead"      is a list of lead times (h) to be plotted.
 ##      "-plot"      is a comma-separated list of plot types to create:
 ##                   BOXPLOT, SCATTER, MEAN, MEDIAN, RELPERF, RANK
-##      "-rp_thresh" to specify a meaningful difference for the
-##                   relative performance plot.
+##      "-rp_thresh" is a comma-separated list of thresholds to specify
+##                   meaningful differences for the relative performance
+##                   plot.
 ##      "-no_ee"     to disable event equalization.
-##      "-save_data" to save the filter track data to a file instead
+##      "-no_ci"     to disable confidence intervals.
+##      "-save_data" to save the filtered track data to a file instead
 ##                   of deleting it.
 ##      "-save"      to call save.image().
 ##
@@ -73,6 +77,7 @@ if(is.na(MET_BASE)) {
 
 source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_util.R", sep=''))
 source(paste(MET_BASE, "/scripts/Rscripts/include/Compute_STDerr.R", sep=''))
+source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_config_default.R", sep=''));
 
 # Read the TCMPR column information from a data file.
 column_info = read.table(
@@ -82,10 +87,9 @@ column_info = read.table(
 # JHG - TO DO LIST:
 # Ask Tressa - in what cases should we be using the Compute_STDerr functions - does it have to be a time series?
 # What about percentiles for the rp_thresh argument?
+# The random assignment of ranks could lead to bad plotting limits from get_yrange for the rank plot.
 # When computing a difference, should we make sure that all of the lines being differenced have exactly the same header data?
 # Figure out what information should be written to a log file.
-# Should I print a warning when the values being plotted for a lead time contain bad data?
-# Move customizable settings into a "config" file sort of thing?
 # Add -v verbosity for logging?
 # Move legend below X-axis?
 # New plot types from Eric: windrose and minimum spanning tree
@@ -99,6 +103,7 @@ column_info = read.table(
 usage = function() {
   cat("\nUsage: plot_tcmpr.R\n")
   cat("        -lookin tcst_file_list\n")
+  cat("        [-config path]\n")
   cat("        [-outdir path]\n")
   cat("        [-prefix string]\n")
   cat("        [-title string]\n")
@@ -112,8 +117,11 @@ usage = function() {
   cat("        [-plot list]\n")
   cat("        [-rp_thresh string]\n")
   cat("        [-no_ee]\n")
+  cat("        [-no_ci]\n")
+  cat("        [-save_data]\n")
   cat("        [-save]\n")
   cat("        where \"-lookin\"    is a list of files with TCMPR lines to be used.\n")
+  cat("              \"-config\"    is a plotting configuration file.\n")
   cat("              \"-outdir\"    is the output directory.\n")
   cat("              \"-prefix\"    is the output file name prefix.\n")
   cat("              \"-title\"     overrides the default plot title.\n")
@@ -128,8 +136,11 @@ usage = function() {
   cat("              \"-lead\"      is a comma-separted list of lead times (h) to be plotted.\n")
   cat("              \"-plot\"      is a comma-separated list of plot types to create:\n")
   cat("                           BOXPLOT, SCATTER, MEAN, MEDIAN, RELPERF, RANK\n")
-  cat("              \"-rp_thresh\" to specify a meaningful difference for the relative performance plot.\n")
+  cat("              \"-rp_thresh\" is a comma-separated list of thresholds to specify\n")
+  cat("                           meaningful differences for the relative performance plot.\n")
   cat("              \"-no_ee\"     to disable event equalization.\n")
+  cat("              \"-no_ci\"     to disable confidence intervals.\n")
+  cat("              \"-save_data\" to save the filtered track data to a file instead of deleting it.\n")
   cat("              \"-save\"      to call save.image().\n\n")
 }
 
@@ -141,19 +152,6 @@ usage = function() {
 
 # Path to the tc_stat tool
 tc_stat = "${MET_BASE}/bin/tc_stat"
-  
-# Build unique tc_stat output file name
-tcst_tmp_file = paste("/tmp/plot_tcmpr_", Sys.getpid(), ".tcst", sep='')
-
-# Output image file format
-img_fmt  = "png256"
-img_ext  = "png"
-img_hgt  = 8.5
-img_wdth = 11.0
-img_res  = 300
-
-# Colors
-color_list = c("black", "red", "green", "blue", "purple", "orange")
 
 # Strings used to select the plots to be created
 boxplot_str = "BOXPLOT"
@@ -162,23 +160,6 @@ mean_str    = "MEAN"
 median_str  = "MEDIAN"
 relperf_str = "RELPERF"
 rank_str    = "RANK"
-
-# Minimum number of values for boxplots.  Otherwise, do a scatter plot.
-n_min=11
-
-# Plotting offset value
-horz_offset = 2.00
-vert_offset = 1.25
-
-relperf_horz_offset = 0.50
-
-# Alpha and z-value
-alpha           = 0.05
-zval            = qnorm(1 - (alpha/2));
-zval_bonferroni = (zval + zval/sqrt(2))/2;
-
-# Number of boostrap replicates to use
-n_boot_rep = 500
 
 ########################################################################
 #
@@ -195,25 +176,13 @@ if(length(args) < 2) {
   quit()
 }
 
-# Initialize options for command-line arguments
-file_list    = ""
-outdir       = "."
-prefix       = ""
-title_str    = c()
-subtitle_str = c()
-ylab_str     = c()
-ymin = ymax  = NA
-filter_opts  = ""
-dep_list     = c("TK_ERR")
-series       = "AMODEL"
-series_list  = c()
-lead_list    = c( 0,  6, 12, 18, 24, 30, 36, 42, 48, 54, 60,
-                 66, 72, 78, 84, 90, 96, 102, 108, 114, 120)
-plot_list    = c(boxplot_str)
-rp_thresh    = ">=100"
-event_equal  = TRUE
-save_data    = ""
-save         = FALSE
+# Process the -config option first
+for(i in 1:length(args)) {
+  if(args[i] == "-config") {
+    cat("Reading plot configuration file:", args[i+1], "\n");
+    source(args[i+1]);
+  }
+} # end for i
 
 # Parse optional arguments
 i=1
@@ -224,6 +193,8 @@ while(i <= length(args)) {
        file_list = c(file_list, args[i+1])
        i=i+1
     }
+  } else if(args[i] == "-config") {
+    i=i+1
   } else if(args[i] == "-outdir") {
     outdir = args[i+1]
     i=i+1
@@ -268,10 +239,12 @@ while(i <= length(args)) {
     plot_list = toupper(plot_list)
     i=i+1
   } else if(args[i] == "-rp_thresh") {
-    rp_thresh = args[i+1]
+    rp_list = unlist(strsplit(args[i+1], ','))
     i=i+1
   } else if(args[i] == "-no_ee") {
     event_equal = FALSE
+  } else if(args[i] == "-no_ci") {
+    ci_flag = FALSE
   } else if(args[i] == "-save_data") {
     save_data = args[i+1]
     i=i+1
@@ -287,6 +260,14 @@ while(i <= length(args)) {
   i=i+1
 
 } # end while
+
+# Check the relative performance threshold setting
+if(length(rp_list) == 1) rp_list = rep(rp_list, length(lead_list));
+if(length(rp_list) != length(lead_list)) {
+  cat("ERROR: The number of relative performance thresholds specified",
+      "must either be 1 or match the number of lead times.\n");
+  quit(status=1);
+}
 
 ########################################################################
 #
@@ -458,7 +439,7 @@ for(i in 1:length(dep_list)) {
 
     # Set plotting strings
     plot_title = ifelse(length(title_str) == 0,
-                        paste("Boxplots of", col$desc, "by",
+                        paste("Boxplots of\n", col$desc, "\nby",
                               column_info[series, "DESCRIPTION"]),
                         title_str);
   
@@ -476,7 +457,7 @@ for(i in 1:length(dep_list)) {
 
     # Set plotting strings
     plot_title = ifelse(length(title_str) == 0,
-                        paste("Scatter Plots of", col$desc, "by",
+                        paste("Scatter Plots of\n", col$desc, "\nby",
                               column_info[series, "DESCRIPTION"]),
                         title_str);
 
@@ -494,7 +475,7 @@ for(i in 1:length(dep_list)) {
 
     # Set plotting strings
     plot_title = ifelse(length(title_str) == 0,
-                        paste("Mean of", col$desc, "by",
+                        paste("Mean of\n", col$desc, "\nby",
                               column_info[series, "DESCRIPTION"]),
                         title_str);
 
@@ -512,7 +493,7 @@ for(i in 1:length(dep_list)) {
 
     # Set plotting strings
     plot_title = ifelse(length(title_str) == 0,
-                        paste("Median of", col$desc, "by",
+                        paste("Median of\n", col$desc, "\nby",
                               column_info[series, "DESCRIPTION"]),
                         title_str);
 
@@ -529,11 +510,20 @@ for(i in 1:length(dep_list)) {
   if(relperf_str%in%plot_list == TRUE) {
 
     # Set plotting strings
-    plot_title = ifelse(length(title_str) == 0,
-                        paste("Relative Performance of", col$desc,
-                               "Difference", rp_thresh, "by",
-                                column_info[series, "DESCRIPTION"]),
-                        title_str);
+    if(length(title_str) > 0) {
+      plot_title = title_str;
+    }
+    else if(length(unique(rp_list)) == 1) {
+      plot_title = paste("Relative Performance of\n", col$desc,
+                         "\nDifference", rp_list[1], col$units, "by",
+                         column_info[series, "DESCRIPTION"]);
+    }
+    else {
+      plot_title = paste("Relative Performance of\n", col$desc,
+                         "\nDifference by",
+                         column_info[series, "DESCRIPTION"]);
+    }
+
     plot_ylab  = ifelse(length(ylab_str) == 0,
                         "Percent of Cases",
                         ylab_str);
@@ -553,8 +543,8 @@ for(i in 1:length(dep_list)) {
     # Set plotting strings
     plot_title = ifelse(length(title_str) == 0,
                         paste(series_list[1],
-                              column_info[series, "DESCRIPTION"],
-                              col$desc, "Rank Frequency"),
+                              column_info[series, "DESCRIPTION"], "\n",
+                              col$desc, "\nRank Frequency"),
                         title_str);
     plot_ylab  = ifelse(length(ylab_str) == 0,
                         "Percent of Cases",

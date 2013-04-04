@@ -30,8 +30,11 @@ get_dep_column = function(dep) {
     col$val   = col$val - tcst[,diff_list[i]]
     col$desc  = paste(col$desc, "-",
                       column_info[diff_list[i], "DESCRIPTION"])
-    col$units = paste(col$units, "-",
-                      column_info[diff_list[i], "UNITS"])
+    # Only append units that differ
+    if(col$units != column_info[diff_list[i], "UNITS"]) {
+      col$units = paste(col$units, "-",
+                        column_info[diff_list[i], "UNITS"])
+    }
     i = i+1
   }
 
@@ -145,7 +148,7 @@ get_case_data = function() {
     case_data$MAX[i]  = max(series_data[ind,]$PLOT);
     case_data$DIFF[i] = case_data$MAX[i] - case_data$MIN[i];
     case_data$WIN[i]  = as.character(series_data[ind,series][which.min(series_data[ind,]$PLOT)]);
-    case_data$TEST[i] = paste(case_data$DIFF[i], rp_thresh, sep='');
+    case_data$TEST[i] = paste(case_data$DIFF[i], rp_list[which(case_data$LEAD_HR[i] == lead_list)], sep='');
     case_data$RES[i]  = eval(parse(text=case_data$TEST[i]));
     case_data$PLOT[i] = ifelse(case_data$RES[i], case_data$WIN[i], "TIE");
     case_data$RANK[i] = rank(series_data[ind,]$PLOT, na.last="keep", ties.method="random")[1];
@@ -245,7 +248,7 @@ get_yrange = function(plot_type) {
                                   diff_flag[i])
 
     # Initialize
-    cur = c();
+    yvals = c();
 
     # Get the data range based on plot type
     if(plot_type == mean_str || plot_type == median_str) {
@@ -259,9 +262,13 @@ get_yrange = function(plot_type) {
         # Skip lead times for which no data is found
         if(dim(data)[1] == 0) next;
 
-        # Append the plotting limits for each lead time
-        if(plot_type == mean_str) { cur = c(cur,   get_mean_ci(data$PLOT, diff_flag[i])); }
-        else                      { cur = c(cur, get_median_ci(data$PLOT, diff_flag[i])); }
+        # Get the values to be plotted for this lead time
+        if(plot_type == mean_str) { cur =   get_mean_ci(data$PLOT, diff_flag[i]); }
+        else                      { cur = get_median_ci(data$PLOT, diff_flag[i]); }
+
+        # Append the current values to the list
+        if(ci_flag) { yvals = c(yvals, cur);    }
+        else        { yvals = c(yvals, cur[2]); }
 
       } # end for j
     }
@@ -276,27 +283,37 @@ get_yrange = function(plot_type) {
 
         # Append the plotting limits for each lead time
         if(plot_type == relperf_str) {
-          cur = c(cur, round(100*sum(case_data$PLOT[ind] ==
-                                     series_list[i])/sum(ind), 0));
+
+          # Get counts
+          n_cur = sum(case_data$PLOT[ind] == series_list[i], na.rm=TRUE);
+          n_tot = sum(!is.na(case_data$PLOT[ind]));
+
+          # Compute the current model's winning frequency
+          yvals = c(yvals, round(100*n_cur/n_tot, 0));
         }
+        # Handle the rank frequency
         else {
 
           # Get counts
-          n_cur = sum(case_data$RANK[ind] == i);
-          n_tot = sum(ind);
+          n_cur = sum(case_data$RANK[ind] == i, na.rm=TRUE);
+          n_tot = sum(!is.na(case_data$RANK[ind]));
 
           # Compute the current rank value's frequency and CI
-          cur = c(cur, get_prop_ci(n_cur, n_tot));
+          cur = get_prop_ci(n_cur, n_tot);
+
+          # Append the current values to the list
+          if(ci_flag) { yvals = c(yvals, cur);    }
+          else        { yvals = c(yvals, cur[2]); }
         }
 
       } # end for j
     }
     else {
-      cur = range(series_data$PLOT, na.rm=TRUE)
+      yvals = range(series_data$PLOT, na.rm=TRUE);
     }
 
     # Update the plotting limits
-    ylim = range(c(ylim, cur), na.rm=TRUE);
+    ylim = range(c(ylim, yvals), na.rm=TRUE);
 
   } # end for i
 
@@ -320,8 +337,8 @@ plot_time_series = function(dep, plot_type,
          height=img_hgt, width=img_wdth, res=img_res)
 
   # Compute the series offsets
-  hoff = ifelse(plot_type == relperf_str ||
-                plot_type == rank_str, relperf_horz_offset, horz_offset);
+  hoff = ifelse(plot_type == relperf_str || plot_type == rank_str,
+                relperf_rank_horz_offset, horz_offset);
   horz = (seq(1, n_series) - n_series/2 - 0.5)*hoff;
   vert = seq(2.0, 2.0-(n_series*vert_offset), by=-1.0*vert_offset)
 
@@ -333,8 +350,8 @@ plot_time_series = function(dep, plot_type,
       paste(yrange, collapse=", "), "\n")
   
   # Create an empty plot
-  top_mar = ifelse(event_equal, 4, 4+floor(n_series/2))
-  par(mfrow=c(1,1), mar=c(5, 4, top_mar, 2), cex=1.5)
+  top_mar = ifelse(event_equal, 2, 2+floor(n_series/2))
+  par(mfrow=c(1,1), mar=c(5,4,top_mar,2), oma=c(0,0,4,0), cex=1.5)
   plot(x=seq(0, max(lead_list), 6), type="n",
        xlab="Lead Time (h)",
        ylab=ylab_str,
@@ -342,11 +359,18 @@ plot_time_series = function(dep, plot_type,
        xlim=c(0+min(horz), max(lead_list)+max(horz)),
        ylim=yrange,
        xaxt='n', col=0, col.axis="black")
-  title(main=title_str, line=top_mar-2)
+  title(main=title_str, outer=TRUE)
+
+  if(plot_type == relperf_str && length(unique(rp_list)) > 1) {
+    xlab = paste(lead_list, rp_list, " ", col$units, sep='');
+  }
+  else {
+    xlab = lead_list;
+  }
 
   # Draw the X-axis
-  axis(1, at=lead_list, tick=TRUE, labels=lead_list)
-
+  axis(1, at=lead_list, tick=TRUE, labels=xlab);
+  
   # Draw a reference line
   if(plot_type == rank_str) { abline(h=100/n_series, lwd=2.0, col="gray"); }
   else                      { abline(h=0, lty=3, lwd=2.0);                 }
@@ -505,9 +529,11 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
            pch=8, type='b', col=color)
 
     # Plot the confidence intervals
-    arrows(lead_list[ind]+horz[i], stat_ncl[ind],
-           lead_list[ind]+horz[i], stat_ncu[ind],
-           col=color, length=0.02, angle=90, code=3, lwd=2.0)
+    if(ci_flag) {
+      arrows(lead_list[ind]+horz[i], stat_ncl[ind],
+             lead_list[ind]+horz[i], stat_ncu[ind],
+             col=color, length=0.02, angle=90, code=3, lwd=2.0)
+    }
 
     # Plot the valid data counts
     if(event_equal == FALSE || i == 1)
@@ -550,7 +576,7 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
   
   # Get the case data
   case_data = get_case_data();
-  
+
   # Loop over the series list entries
   for(i in 1:n_series) {
 
@@ -570,16 +596,19 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
       # Handle the relative performance
       if(plot_type == relperf_str) {
 
+        # Get counts
+        n_cur = sum(case_data$PLOT[ind] == series_list[i], na.rm=TRUE);
+        n_tot = sum(!is.na(case_data$PLOT[ind]));
+
         # Compute the current model's winning frequency
-        stat_val[j] = round(100*sum(case_data$PLOT[ind] ==
-                                    series_list[i])/sum(ind), 0);
+        stat_val[j] = round(100*n_cur/n_tot, 0);
       }
       # Handle the rank frequency
       else {
 
         # Get counts
-        n_cur = sum(case_data$RANK[ind] == i);
-        n_tot = sum(ind);
+        n_cur = sum(case_data$RANK[ind] == i, na.rm=TRUE);
+        n_tot = sum(!is.na(case_data$RANK[ind]));
 
         # Compute the current rank value's frequency and CI
         s = get_prop_ci(n_cur, n_tot);
@@ -598,7 +627,7 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
            pch=pch, type='b', col=color);
 
     # Plot rank confidence intervals
-    if(plot_type == rank_str) {
+    if(plot_type == rank_str && ci_flag) {
       points(lead_list[ind]+horz[i], stat_ncl[ind],
              type='l', lty=3, col=color);
       points(lead_list[ind]+horz[i], stat_ncu[ind],
@@ -625,7 +654,8 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
     rank_str   = c("Best", "2nd", "3rd", "Worst");
     legend_str = c(rank_str[1:min(3, n_series-1)]);
     if(n_series >= 5) legend_str = c(legend_str, paste(4:(n_series-1), "th", sep=''));
-    legend_str = c(legend_str, rank_str[4], paste(100*(1-alpha), "% CI", sep=''));
+    legend_str = c(legend_str, rank_str[4]);
+    if(ci_flag) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
     legend(x="topleft",
            legend=legend_str,
            col=c(rep(color_list, n_series)[1:n_series], "gray"),
