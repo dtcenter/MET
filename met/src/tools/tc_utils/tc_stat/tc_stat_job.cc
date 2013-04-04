@@ -38,6 +38,7 @@ static const char *TCStatJobType_SummaryStr = "summary";
 extern void add_string(const char *, StringArray &);
 extern void add_unixtime(const char *, TimeArray &);
 extern void add_seconds(const char *, NumArray &);
+extern void add_thresh(const char *, ThreshArray &);
 
 // Delimiter for separating multiple command line options
 static const char *ArgsDelim = ",";
@@ -758,13 +759,13 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);        a.shift_down(i, 1); }
       else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { add_string(a[i+1], TrackWatchWarn);        a.shift_down(i, 1); }
       else if(strcasecmp(c, "-column_thresh"     ) == 0) { ColumnThreshName.add(a[i+1]);
-                                                           ColumnThreshVal.add(a[i+2]);               a.shift_down(i, 2); }
+                                                           add_thresh(a[i+2], ColumnThreshVal);       a.shift_down(i, 2); }
       else if(strcasecmp(c, "-column_str"        ) == 0) { ColumnStrName.add(a[i+1]);
-                                                           ColumnStrVal.add(a[i+2]);                  a.shift_down(i, 2); }
+                                                           add_string(a[i+2], ColumnStrVal);          a.shift_down(i, 2); }
       else if(strcasecmp(c, "-init_thresh"       ) == 0) { InitThreshName.add(a[i+1]);
-                                                           InitThreshVal.add(a[i+2]);                 a.shift_down(i, 2); }
+                                                           add_thresh(a[i+2], InitThreshVal);         a.shift_down(i, 2); }
       else if(strcasecmp(c, "-init_str"          ) == 0) { InitStrName.add(a[i+1]);
-                                                           InitStrVal.add(a[i+2]);                    a.shift_down(i, 2); }
+                                                           add_string(a[i+2], InitStrVal);            a.shift_down(i, 2); }
       else if(strcasecmp(c, "-rapid_inten"       ) == 0) { RapidInten = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
@@ -2095,6 +2096,21 @@ void add_seconds(const char *c, NumArray &na) {
    cs = c;
    sa = cs.split(ArgsDelim);
    for(i=0; i<sa.n_elements(); i++) na.add(timestring_to_sec(sa[i]));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void add_thresh(const char *c, ThreshArray &ta) {
+   ConcatString cs;
+   StringArray sa;
+   int i;
+
+   // Parse input list of thresholds into a ThreshArray
+   cs = c;
+   sa = cs.split(ArgsDelim);
+   for(i=0; i<sa.n_elements(); i++) ta.add(sa[i]);
 
    return;
 }
