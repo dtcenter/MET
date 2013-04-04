@@ -38,7 +38,8 @@ static const char *TCStatJobType_SummaryStr = "summary";
 extern void add_string(const char *, StringArray &);
 extern void add_unixtime(const char *, TimeArray &);
 extern void add_seconds(const char *, NumArray &);
-extern void add_thresh(const char *, ThreshArray &);
+extern void parse_thresh_option(const char *, const char *, StringArray &, ThreshArray &);
+extern void parse_string_option(const char *, const char *, StringArray &, StringArray &);
 
 // Delimiter for separating multiple command line options
 static const char *ArgsDelim = ",";
@@ -663,6 +664,9 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       }
    }
 
+   // Update counts
+   if(!keep) n.NKeep -= 1;
+
    return(keep);
 }
 
@@ -758,14 +762,14 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-line_type"         ) == 0) { add_string(a[i+1], LineType);              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);        a.shift_down(i, 1); }
       else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { add_string(a[i+1], TrackWatchWarn);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_thresh"     ) == 0) { ColumnThreshName.add(a[i+1]);
-                                                           add_thresh(a[i+2], ColumnThreshVal);       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-column_str"        ) == 0) { ColumnStrName.add(a[i+1]);
-                                                           add_string(a[i+2], ColumnStrVal);          a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_thresh"       ) == 0) { InitThreshName.add(a[i+1]);
-                                                           add_thresh(a[i+2], InitThreshVal);         a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_str"          ) == 0) { InitStrName.add(a[i+1]);
-                                                           add_string(a[i+2], InitStrVal);            a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshName, ColumnThreshVal);
+                                                                                                      a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrName, ColumnStrVal);
+                                                                                                      a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1], a[i+2], InitThreshName, InitThreshVal);
+                                                                                                      a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1], a[i+2], InitStrName, InitStrVal);
+                                                                                                      a.shift_down(i, 2); }
       else if(strcasecmp(c, "-rapid_inten"       ) == 0) { RapidInten = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
@@ -2102,15 +2106,38 @@ void add_seconds(const char *c, NumArray &na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_thresh(const char *c, ThreshArray &ta) {
+void parse_thresh_option(const char *col_name, const char *col_val,
+                         StringArray &name, ThreshArray &val) {
    ConcatString cs;
    StringArray sa;
    int i;
 
-   // Parse input list of thresholds into a ThreshArray
-   cs = c;
+   // Parse input list of strings into a ThreshArray
+   cs = col_val;
    sa = cs.split(ArgsDelim);
-   for(i=0; i<sa.n_elements(); i++) ta.add(sa[i]);
+   for(i=0; i<sa.n_elements(); i++) {
+      name.add(col_name);
+      val.add(sa[i]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_string_option(const char *col_name, const char *col_val,
+                         StringArray &name, StringArray &val) {
+   ConcatString cs;
+   StringArray sa;
+   int i;
+
+   // Parse input list of strings into a StringArray
+   cs = col_val;
+   sa = cs.split(ArgsDelim);
+   for(i=0; i<sa.n_elements(); i++) {
+      name.add(col_name);
+      val.add(sa[i]);
+   }
 
    return;
 }
