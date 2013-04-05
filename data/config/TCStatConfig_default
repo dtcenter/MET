@@ -127,14 +127,6 @@ valid_mask = [];
 line_type = [];
 
 //
-// Stratify by only using points where both the ADECK and BDECK tracks are
-// over water.
-//
-// e.g. water_only = false;
-//
-water_only = false;
-
-//
 // Stratify by selecting the most severe watch/warning over the entire track.
 // Individual watch/warning status by point may be specified using the
 // -column_str options below, but this option filters by the track maximum.
@@ -191,6 +183,14 @@ init_thresh_val  = [];
 //
 init_str_name = [];
 init_str_val  = [];
+
+//
+// Stratify by the ADECK and BDECK distances to land.  Once either the ADECK or
+// BDECK track encounters land, discard the remainder of the track.
+//
+// e.g. water_only = false;
+//
+water_only = false;
 
 //
 // Specify whether only those track points for which rapid intensification

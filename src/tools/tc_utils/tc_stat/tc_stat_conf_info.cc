@@ -147,9 +147,6 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::LineType
    Filter.LineType = Conf.lookup_string_array("line_type");
-   
-   // Conf: TCStatJob::WaterOnly
-   Filter.WaterOnly = Conf.lookup_bool("water_only");
 
    // Conf: TCStatJob::TrackWatchWarn
    Filter.TrackWatchWarn = Conf.lookup_string_array("track_watch_warn");
@@ -209,6 +206,9 @@ void TCStatConfInfo::process_config() {
            << "must have the same length.\n\n";
       exit(1);
    }
+
+   // Conf: TCStatJob::WaterOnly
+   Filter.WaterOnly = Conf.lookup_bool("water_only");
 
    // Conf: TCStatJob::RapidInten, TCStatJob::RapidIntenThresh
    Filter.RapidInten       = Conf.lookup_bool("rapid_inten");

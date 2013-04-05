@@ -123,6 +123,7 @@ class TrackPairInfo {
       void add(const TCStatLine&);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
+      int  check_water_only();
       int  check_rapid_inten(const SingleThresh &);
       int  check_landfall(const int, const int);
       bool landfall_window(unixtime, unixtime) const;

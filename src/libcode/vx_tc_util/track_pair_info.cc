@@ -438,6 +438,38 @@ void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Apply the water only logic to the track to determine which track
+// points should be kept.  Once either the ADECK or BDECK track
+// encounters land, discard the remainder of the track.
+//
+////////////////////////////////////////////////////////////////////////
+
+int TrackPairInfo::check_water_only() {
+   int i, n_rej;
+   bool hit_land = false;
+
+   // Loop over the track points
+   for(i=0, n_rej=0; i<NPoints; i++) {
+
+      // Check if the current track point is over land
+      if((!is_bad_data(ADeckDLand[i]) && ADeckDLand[i] <= 0) ||
+         (!is_bad_data(BDeckDLand[i]) && BDeckDLand[i] <= 0)) {
+         hit_land = true;
+      }
+
+      // If the track has encountered land previously,
+      // set keep status to false
+      if(hit_land && Keep[i] != 0) {
+         Keep.set(i, 0);
+         n_rej++;
+      }
+   } // end for i
+
+   return(n_rej);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Apply the rapid intensification logic to the track to determine
 // which track points meet the criteria.  Set the keep status to false
 // for those track points not meeting the criteria and return the number
@@ -474,7 +506,7 @@ int TrackPairInfo::check_rapid_inten(const SingleThresh &st) {
          }
       } // end for j
 
-      // Check if the vmax delta does not meet the threshold criteria,
+      // If the vmax delta does not meet the threshold criteria,
       // set keep status to false
       if(!st.check(cur_vmax - min_vmax) && Keep[i] != 0) {
         Keep.set(i, 0);
