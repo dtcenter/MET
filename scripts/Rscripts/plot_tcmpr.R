@@ -84,15 +84,19 @@ column_info = read.table(
   paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
   header=TRUE, row.names=1)
 
-# JHG - TO DO LIST:
-# Ask Tressa - in what cases should we be using the Compute_STDerr functions - does it have to be a time series?
-# What about percentiles for the rp_thresh argument?
-# The random assignment of ranks could lead to bad plotting limits from get_yrange for the rank plot.
-# When computing a difference, should we make sure that all of the lines being differenced have exactly the same header data?
-# Figure out what information should be written to a log file.
-# Add -v verbosity for logging?
-# Move legend below X-axis?
-# New plot types from Eric: windrose and minimum spanning tree
+# TO DO LIST:
+# - In what cases should we be using the Compute_STDerr functions -
+#   does it have to be a time series (Tressa)?
+# - Need to clarify the zval bonferroni adjusement for multiple models.
+# - What about percentiles for the rp_thresh argument?
+# - The random assignment of ranks could lead to bad plotting limits
+#   from get_yrange for the rank plot.
+# - When computing a difference, should we make sure that all of the
+#   lines being differenced have exactly the same header data?
+# - Figure out what information should be written to a log file.
+# - Add -v verbosity for logging?
+# - Move legend below X-axis?
+# - New plot types from Eric: windrose and minimum spanning tree
 
 ########################################################################
 #
