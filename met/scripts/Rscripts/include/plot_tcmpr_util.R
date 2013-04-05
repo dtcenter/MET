@@ -121,7 +121,7 @@ get_case_data = function() {
   case_data = unique(data.frame(CASE=series_data$CASE,
                                 LEAD_HR=series_data$LEAD_HR,
                                 MIN=NA, MAX=NA, DIFF=NA, WIN=NA, TEST=NA,
-                                RES=NA, PLOT=NA, RANK=NA));
+                                RES=NA, PLOT=NA, RANK_RANDOM=NA, RANK_MIN=NA));
 
   # Check for equal numbers of entries for each case
   if(sum(aggregate(series_data$PLOT, by=list(series_data$CASE), length)$x != n_series)) {
@@ -144,14 +144,15 @@ get_case_data = function() {
     }
 
     # Compute the winner for each case
-    case_data$MIN[i]  = min(series_data[ind,]$PLOT);
-    case_data$MAX[i]  = max(series_data[ind,]$PLOT);
-    case_data$DIFF[i] = case_data$MAX[i] - case_data$MIN[i];
-    case_data$WIN[i]  = as.character(series_data[ind,series][which.min(series_data[ind,]$PLOT)]);
-    case_data$TEST[i] = paste(case_data$DIFF[i], rp_list[which(case_data$LEAD_HR[i] == lead_list)], sep='');
-    case_data$RES[i]  = eval(parse(text=case_data$TEST[i]));
-    case_data$PLOT[i] = ifelse(case_data$RES[i], case_data$WIN[i], "TIE");
-    case_data$RANK[i] = rank(series_data[ind,]$PLOT, na.last="keep", ties.method="random")[1];
+    case_data$MIN[i]         = min(series_data[ind,]$PLOT);
+    case_data$MAX[i]         = max(series_data[ind,]$PLOT);
+    case_data$DIFF[i]        = case_data$MAX[i] - case_data$MIN[i];
+    case_data$WIN[i]         = as.character(series_data[ind,series][which.min(series_data[ind,]$PLOT)]);
+    case_data$TEST[i]        = paste(case_data$DIFF[i], rp_list[which(case_data$LEAD_HR[i] == lead_list)], sep='');
+    case_data$RES[i]         = eval(parse(text=case_data$TEST[i]));
+    case_data$PLOT[i]        = ifelse(case_data$RES[i], case_data$WIN[i], "TIE");
+    case_data$RANK_RANDOM[i] = rank(series_data[ind,]$PLOT, na.last="keep", ties.method="random")[1];
+    case_data$RANK_MIN[i]    = rank(series_data[ind,]$PLOT, na.last="keep", ties.method="min")[1];
   }
 
   return(case_data);
@@ -295,8 +296,8 @@ get_yrange = function(plot_type) {
         else {
 
           # Get counts
-          n_cur = sum(case_data$RANK[ind] == i, na.rm=TRUE);
-          n_tot = sum(!is.na(case_data$RANK[ind]));
+          n_cur = sum(case_data$RANK_RANDOM[ind] == i, na.rm=TRUE);
+          n_tot = sum(!is.na(case_data$RANK_RANDOM[ind]));
 
           # Compute the current rank value's frequency and CI
           cur = get_prop_ci(n_cur, n_tot);
@@ -375,25 +376,28 @@ plot_time_series = function(dep, plot_type,
   if(plot_type == rank_str) { abline(h=100/n_series, lwd=2.0, col="gray"); }
   else                      { abline(h=0, lty=3, lwd=2.0);                 }
 
+  # Get the list of colors to be used
+  color_list = eval(parse(text=paste(tolower(plot_type), "_color_list", sep='')));
+
   # Check for too few colors
   if(n_series > length(color_list)) {
     cat("WARNING: The number of series (", n_series,
         ") exceeds the number of colors (", length(color_list),
-        ").\n", sep='')
+        ").\n", sep='');
   }
 
   # Populate the plot based on plot type
   if(plot_type == boxplot_str ||
      plot_type == scatter_str) {
-    plot_box_scatter(dep, plot_type, horz, vert)
+    plot_box_scatter(dep, plot_type, horz, vert, color_list)
   }
   else if(plot_type == mean_str ||
           plot_type == median_str) {
-    plot_mean_median(dep, plot_type, horz, vert)
+    plot_mean_median(dep, plot_type, horz, vert, color_list)
   }
   else if(plot_type == relperf_str ||
           plot_type == rank_str) {
-    plot_relperf_rank(dep, plot_type, horz, vert)
+    plot_relperf_rank(dep, plot_type, horz, vert, color_list)
   }
 
   # Close the output device
@@ -406,7 +410,7 @@ plot_time_series = function(dep, plot_type,
 #
 ########################################################################
 
-plot_box_scatter = function(dep, plot_type, horz, vert) {
+plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
 
   # Loop over the series list entries
   for(i in 1:n_series) {
@@ -481,7 +485,7 @@ plot_box_scatter = function(dep, plot_type, horz, vert) {
 #
 ########################################################################
 
-plot_mean_median = function(dep, plot_type, horz, vert) {
+plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
 
   # Loop over the series list entries
   for(i in 1:n_series) {
@@ -556,7 +560,7 @@ plot_mean_median = function(dep, plot_type, horz, vert) {
 #
 ########################################################################
 
-plot_relperf_rank = function(dep, plot_type, horz, vert) {
+plot_relperf_rank = function(dep, plot_type, horz, vert, color_list) {
 
   # Check that event equalization has been applied
   if(event_equal == FALSE) {
@@ -587,6 +591,7 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
 
     # Compute statistic for each lead time
     stat_val = stat_ncl = stat_ncu = rep(NA, length(lead_list));
+    rank_min_val = rep(NA, length(lead_list));
 
     # Prepare the data for each lead time
     for(j in 1:length(lead_list)) {
@@ -607,8 +612,8 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
       else {
 
         # Get counts
-        n_cur = sum(case_data$RANK[ind] == i, na.rm=TRUE);
-        n_tot = sum(!is.na(case_data$RANK[ind]));
+        n_cur = sum(case_data$RANK_RANDOM[ind] == i, na.rm=TRUE);
+        n_tot = sum(!is.na(case_data$RANK_RANDOM[ind]));
 
         # Compute the current rank value's frequency and CI
         s = get_prop_ci(n_cur, n_tot);
@@ -617,6 +622,13 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
         stat_ncl[j] = s[1];
         stat_val[j] = s[2];
         stat_ncu[j] = s[3];
+
+        # Compute the RANK_MIN value for the first and last series
+        if(i == 1 || i == n_series) {
+          rank_min_val[j] = 100*
+            sum(case_data$RANK_MIN[ind] == i, na.rm=TRUE)/
+            sum(!is.na(case_data$RANK_MIN[ind]));
+        }
       }
     } # end for j
 
@@ -632,6 +644,12 @@ plot_relperf_rank = function(dep, plot_type, horz, vert) {
              type='l', lty=3, col=color);
       points(lead_list[ind]+horz[i], stat_ncu[ind],
              type='l', lty=3, col=color);
+    }
+
+    # For the BEST and WORST series, plot the RANK_MIN values
+    if(i == 1 || i == n_series) {
+       points(lead_list[ind]+horz[i], rank_min_val[ind],
+              pch=pch, type='p', col="black");
     }
 
     # Plot the valid data counts
@@ -688,75 +706,4 @@ plot_valid_counts = function(data, color, vert) {
   # Plot valid counts on the top axis
   axis(3, at=lead_list, tick=FALSE, labels=n,
        padj=vert, cex.axis=0.75, col.axis=color)
-}
-
-########################################################################
-#
-# Function used for outputting outlier case info for each lead time.
-#
-########################################################################
-
-boxplot_outlier = function(a, b, c, d, e, f) {
-
-   a_tmp  = unique(a)
-   a_stuq = sort(a_tmp, decreasing = TRUE)
-
-   lines_onePlus = -1
-   len_b_out = length(a_stuq)
-   for(p in 1:length(a_stuq)) {
-      row_ind_mNUM_StormList <- which(b[,j+2]==a_stuq[p])
-      len_ind_mNUM_StormList = length(row_ind_mNUM_StormList)
-      lines_onePlus = lines_onePlus + len_ind_mNUM_StormList
-   }
-   lines = lines_onePlus + len_b_out*2
-   cat(paste(lines, c, d,e[j],f,"(outlier values and case info)"))
-   cat(paste("\n"))
-   for(p in 1:length(a_stuq)) {
-      row_ind_mNUM_StormList <- which(b[,j+2]==a_stuq[p])
-      print(b[row_ind_mNUM_StormList,c(1,2,j+2)])
-      cat(paste("\n"))
-   }
-
-}
-
-boxplot_outlier_mdiff = function(a, b, c, d, e, f, g, h, i, k) {
-
-   a_tmp  = unique(a)
-   a_stuq = sort(a_tmp, decreasing = TRUE)
-
-   lines_onePlus = -1
-   lines_mNUM1 = -1
-   lines_mNUM2 = -1
-   len_b_out = length(a_stuq)
-   for(p in 1:length(a_stuq)) {
-#       row_ind_mNUM1_StormList <- which(g[,j+2]==a[p])
-#       len_ind_mNUM1_StormList = length(row_ind_mNUM1_StormList)
-#       row_ind_mNUM2_StormList <- which(i[,j+2]==a[p])
-#       len_ind_mNUM2_StormList = length(row_ind_mNUM2_StormList)
-#       lines_onePlus = lines_onePlus + len_ind_mNUM1_StormList + len_ind_mNUM2_StormList
-#       lines_mNUM1= lines_mNUM1 + len_ind_mNUM1_StormList
-#       lines_mNUM2= lines_mNUM2 + len_ind_mNUM2_StormList
-      row_ind_StormList <- which(b[,j]==a_stuq[p])
-      len_ind_StormList = length(row_ind_StormList)
-      lines_onePlus = lines_onePlus + len_ind_StormList*2
-   }
-   lines = lines_onePlus + len_b_out*5
-   cat(paste(lines, h,"-",k,"= mdiff", d,e[j],f,"(outlier values and case info)"))
-   cat(paste("\n"))
-   for(p in 1:length(a_stuq)) {
-      lines_onePlus = -1
-      row_ind_StormList <- which(b[,j]==a_stuq[p])
-      len_ind_StormList = length(row_ind_StormList)
-      lines_onePlus = lines_onePlus + len_ind_StormList*2
-      lines_indv = lines_onePlus + 4
-
-      row_ind_StormList <- which(b[,j]==a_stuq[p])
-      cat(paste(lines_indv,"!",p, "Individual Outlier Line Count"))
-      cat(paste("\n"))
-      print(g[row_ind_StormList,c(1,2,j+2)])
-      print(i[row_ind_StormList,c(1,2,j+2)])
-      print(b[row_ind_StormList,c(j)])
-      cat(paste("\n"))
-   }
-
 }

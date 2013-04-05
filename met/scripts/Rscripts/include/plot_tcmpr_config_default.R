@@ -40,8 +40,14 @@ img_hgt  = 8.5
 img_wdth = 11.0
 img_res  = 300
 
-# Colors
-color_list = c("black", "red", "green", "blue", "purple", "orange")
+# List of colors to be used for each plot type
+default_color_list = c("black", "red", "green", "blue", "purple", "orange")
+boxplot_color_list = default_color_list
+scatter_color_list = default_color_list
+mean_color_list    = default_color_list
+median_color_list  = default_color_list
+relperf_color_list = default_color_list
+rank_color_list    = c("green", "blue", "orange", "red", "magenta")
 
 # Minimum number of values for boxplots.  Otherwise, do a scatter plot.
 n_min=11
