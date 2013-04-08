@@ -414,8 +414,16 @@ WatchWarnType TrackPairInfo::track_watch_warn() const {
    ww_type = ww_cur = NoWatchWarnType;
    
    // Loop over the track points and pick the watch/warning type of
-   // most interest
+   // most interest from the track points common to both the ADECK and
+   // BDECK tracks
    for(i=0; i<NPoints; i++) {
+
+      // Skip points not common to the ADECK and BDECK tracks
+      if(is_bad_data(ADeck[i].lat()) ||
+         is_bad_data(ADeck[i].lon()) ||
+         is_bad_data(BDeck[i].lat()) ||
+         is_bad_data(BDeck[i].lon())) continue;
+
       ww_cur  = ww_max(ADeck[i].watch_warn(), BDeck[i].watch_warn());
       ww_type = ww_max(ww_type, ww_cur);
    }
