@@ -8,43 +8,43 @@
 get_dep_column = function(dep) {
 
   # Check for aboslute value
-  abs_flag = (substring(dep, 1, 3) == "ABS")
+  abs_flag = (substring(dep, 1, 3) == "ABS");
 
   # Strip off the absolute value
   if(abs_flag) {
-    dep = unlist(strsplit(dep, "[(|)]"))[2]
+    dep = unlist(strsplit(dep, "[(|)]"))[2];
   }
 
   # Split based on differences
-  diff_list = unlist(strsplit(dep, "[-]"))
+  diff_list = unlist(strsplit(dep, "[-]"));
 
   # Initialize output
-  col       = c()
-  col$val   = tcst[,diff_list[1]]
-  col$desc  = column_info[diff_list[1], "DESCRIPTION"]
-  col$units = column_info[diff_list[1], "UNITS"]
+  col       = c();
+  col$val   = tcst[,diff_list[1]];
+  col$desc  = column_info[diff_list[1], "DESCRIPTION"];
+  col$units = column_info[diff_list[1], "UNITS"];
 
   # Loop over any remaining entries
   i = 2
   while(i <= length(diff_list)) {
-    col$val   = col$val - tcst[,diff_list[i]]
+    col$val   = col$val - tcst[,diff_list[i]];
     col$desc  = paste(col$desc, "-",
-                      column_info[diff_list[i], "DESCRIPTION"])
+                      column_info[diff_list[i], "DESCRIPTION"]);
     # Only append units that differ
     if(col$units != column_info[diff_list[i], "UNITS"]) {
       col$units = paste(col$units, "-",
-                        column_info[diff_list[i], "UNITS"])
+                        column_info[diff_list[i], "UNITS"]);
     }
     i = i+1
   }
 
   # Apply absolute value
   if(abs_flag) {
-    col$val  = abs(col$val)
-    col$desc = paste("Absolute Value of", col$desc)
+    col$val  = abs(col$val);
+    col$desc = paste("Absolute Value of", col$desc);
   }
 
-  return(col)
+  return(col);
 }
 
 ########################################################################
@@ -59,12 +59,12 @@ get_series_data = function(cur, cur_plot, diff) {
   if(diff == TRUE) {
 
     # Initialize to the first entry
-    series_data = tcst[tcst[,series] == cur_plot[1],]
+    series_data = tcst[tcst[,series] == cur_plot[1],];
 
     # Loop over the remaining series entries
-    i = 2
+    i = 2;
     while(i <= length(cur_plot)) {
-      series_diff = tcst[tcst[,series] == cur_plot[i],]
+      series_diff = tcst[tcst[,series] == cur_plot[i],];
 
       # Check that the CASE column lines up exactly
       if(sum(series_data$CASE != series_diff$CASE) > 0) {
@@ -77,18 +77,18 @@ get_series_data = function(cur, cur_plot, diff) {
       # Compute series difference
       series_data$PLOT = series_data$PLOT - series_diff$PLOT
 
-      i = i+1
+      i = i+1;
     } # end while
   }
   # Otherwise, just subset based on a single series entry
   else {
-    series_data = tcst[tcst[,series]%in%cur_plot,]
+    series_data = tcst[tcst[,series]%in%cur_plot,];
   }
 
   # Subset based on requested lead times
-  series_data = series_data[series_data$LEAD_HR%in%lead_list,]
+  series_data = series_data[series_data$LEAD_HR%in%lead_list,];
   
-  return(series_data)
+  return(series_data);
 }
 
 ########################################################################
@@ -173,13 +173,16 @@ get_prop_ci <- function(x, n) {
   # Compute the standard proportion error
   zval   = abs(qnorm(alpha/2));
   phat   = x/n;
-  bound  = (zval * ((phat * (1 - phat) + (zval^2)/(4 * n))/n)^(1/2))/(1 + (zval^2)/n);
+  bound  = (zval * ((phat * (1 - phat) + (zval^2)/(4 * n))/n)^(1/2))/
+           (1 + (zval^2)/n);
   midpnt = (phat + (zval^2)/(2 * n))/(1 + (zval^2)/n);
 
-  # Return the statistic and confidence interval
-  return(100*c(round(midpnt - bound, 4),
-               round(phat,           4),
-               round(midpnt + bound, 4)));
+  # Compute the statistic and confidence interval
+  val = 100*round(phat, 4);
+  ncl = ifelse(n < n_min, NA, 100*round(midpnt - bound, 4));
+  ncu = ifelse(n < n_min, NA, 100*round(midpnt + bound, 4));
+
+  return(c(ncl, val, ncu));
 }
 
 ########################################################################
@@ -195,11 +198,12 @@ get_mean_ci = function(d) {
   if(length(s) > 1 && s[2] == 0) { stderr = round(zval*s[1], 1); }
   else                           { stderr = 0;                   }
 
-  # Compute the statistic
-  stat = mean(d, na.rm=TRUE);
+  # Compute the statistic and confidence interval
+  val = mean(d, na.rm=TRUE);
+  ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
+  ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
 
-  # Return the statistic and confidence interval
-  return(c(round(stat - stderr, 1), stat, round(stat + stderr, 1)));
+  return(c(ncl, val, ncu));
 }
 
 ########################################################################
@@ -215,11 +219,12 @@ get_median_ci = function(d) {
   if(length(s) > 1 && s[2] == 0) { stderr = round(zval*s[1], 1); }
   else                           { stderr = 0;                   }
 
-  # Compute the statistic
-  stat = median(d, na.rm=TRUE);
+  # Compute the statistic and confidence interval
+  val = median(d, na.rm=TRUE);
+  ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
+  ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
 
-  # Return the statistic and confidence interval
-  return(c(round(stat - stderr, 1), stat, round(stat + stderr, 1)));
+  return(c(ncl, val, ncu));
 }
 
 ########################################################################
@@ -231,14 +236,14 @@ get_median_ci = function(d) {
 get_yrange = function(plot_type) {
 
   # Initialize
-  ylim = c(NA,NA)
+  ylim = c(NA,NA);
 
   # Loop over the series list entries
   for(i in 1:n_series) {
 
     # Get current subset of data
     series_data = get_series_data(series_list[i], series_plot[[i]],
-                                  diff_flag[i])
+                                  diff_flag[i]);
 
     # Initialize
     yvals = c();
@@ -337,37 +342,37 @@ get_yrange = function(plot_type) {
 plot_time_series = function(dep, plot_type,
                             title_str, subtitle_str, ylab_str) {
 
-  cat("Plotting", plot_type, "time series by", series, "\n")
+  cat("Plotting", plot_type, "time series by", series, "\n");
 
   # Open the output device
-  cat(paste("Creating file:", out_file, "\n"))
+  cat(paste("Creating file:", out_file, "\n"));
   bitmap(out_file, type=img_fmt,
-         height=img_hgt, width=img_wdth, res=img_res)
+         height=img_hgt, width=img_wdth, res=img_res);
 
   # Compute the series offsets
   hoff = ifelse(plot_type == relperf_str || plot_type == rank_str,
                 relperf_rank_horz_offset, horz_offset);
   horz = (seq(1, n_series) - n_series/2 - 0.5)*hoff;
-  vert = seq(2.0, 2.0-(n_series*vert_offset), by=-1.0*vert_offset)
+  vert = seq(2.0, 2.0-(n_series*vert_offset), by=-1.0*vert_offset);
 
   # Set the range for the Y-axis
   if(!is.na(ymin) & !is.na(ymax)) { yrange = c(ymin, ymax);         }
   else                            { yrange = get_yrange(plot_type); }
 
   cat(paste("Range of ", dep, ":", sep=''),
-      paste(yrange, collapse=", "), "\n")
+      paste(yrange, collapse=", "), "\n");
   
   # Create an empty plot
-  top_mar = ifelse(event_equal, 2, 2+floor(n_series/2))
-  par(mfrow=c(1,1), mar=c(5,4,top_mar,2), oma=c(0,0,4,0), cex=1.5)
+  top_mar = ifelse(event_equal, 2, 2+floor(n_series/2));
+  par(mfrow=c(1,1), mar=c(5,4,top_mar,2), oma=c(0,0,4,0), cex=1.5);
   plot(x=seq(0, max(lead_list), 6), type="n",
        xlab="Lead Time (h)",
        ylab=ylab_str,
        main=NA, sub=subtitle_str,
        xlim=c(0+min(horz), max(lead_list)+max(horz)),
        ylim=yrange,
-       xaxt='n', col=0, col.axis="black")
-  title(main=title_str, outer=TRUE)
+       xaxt='n', col=0, col.axis="black");
+  title(main=title_str, outer=TRUE);
 
   if(plot_type == relperf_str && length(unique(rp_list)) > 1) {
     xlab = paste(lead_list, rp_list, " ", col$units, sep='');
@@ -392,21 +397,21 @@ plot_time_series = function(dep, plot_type,
   # Populate the plot based on plot type
   if(plot_type == boxplot_str ||
      plot_type == scatter_str) {
-    plot_box_scatter(dep, plot_type, horz, vert, color_list)
+    plot_box_scatter(dep, plot_type, horz, vert, color_list);
   }
   else if(plot_type == mean_str ||
           plot_type == median_str) {
-    plot_mean_median(dep, plot_type, horz, vert, color_list)
+    plot_mean_median(dep, plot_type, horz, vert, color_list);
   }
   else if(plot_type == relperf_str) {
-    plot_relperf(dep, horz, vert, color_list)
+    plot_relperf(dep, horz, vert, color_list);
   }
   else if(plot_type == rank_str) {
-    plot_rank(dep, horz, vert, color_list)
+    plot_rank(dep, horz, vert, color_list);
   }
 
   # Close the output device
-  dev.off()
+  dev.off();
 }
 
 ########################################################################
@@ -472,8 +477,9 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
     } # end for lead
     
     # Plot the valid data counts    
-    if(event_equal == FALSE || i == 1)
+    if(event_equal == FALSE || i == 1) {
       plot_valid_counts(series_data, color, vert[i]);
+    }
 
   } # end for i
 
@@ -502,12 +508,12 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
   for(i in 1:n_series) {
 
     # Get the color index
-    i_col = i%%length(color_list)
+    i_col = i%%length(color_list);
     if(i_col == 0) {
-      color = color_list[length(color_list)]
+      color = color_list[length(color_list)];
     }
     else {
-      color = color_list[i_col]
+      color = color_list[i_col];
     }
 
     # Get current subset of data
@@ -539,20 +545,21 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
     } # end for j
 
     # Plot the statistics
-    ind = !is.na(stat_val)
+    ind = !is.na(stat_val);
     points(lead_list[ind]+horz[i], stat_val[ind],
-           pch=8, type='b', col=color)
+           pch=8, type='b', col=color);
 
     # Plot the confidence intervals
     if(ci_flag) {
       arrows(lead_list[ind]+horz[i], stat_ncl[ind],
              lead_list[ind]+horz[i], stat_ncu[ind],
-             col=color, length=0.02, angle=90, code=3, lwd=2.0)
+             col=color, length=0.02, angle=90, code=3, lwd=2.0);
     }
 
     # Plot the valid data counts
-    if(event_equal == FALSE || i == 1)
+    if(event_equal == FALSE || i == 1) {
       plot_valid_counts(series_data, color, vert[i]);
+    }
 
   } # end for i
 
@@ -562,7 +569,7 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
          col=rep(color_list, n_series)[1:n_series],
          lty=rep(1, n_series),
          lwd=rep(2, n_series),
-         pch=8, bty="n")
+         pch=8, bty="n");
 }
 
 ########################################################################
@@ -606,7 +613,7 @@ plot_relperf = function(dep, horz, vert, color_list) {
       h_off      = 0;
     }
     else {
-      i_col      = i%%length(color_list)
+      i_col      = i%%length(color_list);
       color      = ifelse(i_col == 0, color_list[length(color_list)],
                                       color_list[i_col]);
       series_val = series_list[i];
@@ -697,7 +704,7 @@ plot_rank = function(dep, horz, vert, color_list) {
   for(i in 1:n_series) {
 
     # Get the color index
-    i_col = i%%length(color_list)
+    i_col = i%%length(color_list);
     color = ifelse(i_col == 0, color_list[length(color_list)],
                                color_list[i_col]);
 
@@ -780,15 +787,15 @@ plot_valid_counts = function(data, color, vert) {
   color = ifelse(event_equal, "black", color);
 
   # Aggregate the values to be plotted by lead hour
-  d = aggregate(!is.na(data$PLOT), list(data$LEAD_HR), sum)
+  d = aggregate(!is.na(data$PLOT), list(data$LEAD_HR), sum);
 
   # Initialize valid counts
-  n = rep(0, length(lead_list))
+  n = rep(0, length(lead_list));
 
   # Store valid counts for the correct lead hour
   n[which(lead_list%in%d$Group.1)] = d$x
 
   # Plot valid counts on the top axis
   axis(3, at=lead_list, tick=FALSE, labels=n,
-       padj=vert, cex.axis=0.75, col.axis=color)
+       padj=vert, cex.axis=0.75, col.axis=color);
 }
