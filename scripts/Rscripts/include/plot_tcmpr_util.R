@@ -66,12 +66,12 @@ get_series_data = function(cur, cur_plot, diff) {
     while(i <= length(cur_plot)) {
       series_diff = tcst[tcst[,series] == cur_plot[i],]
 
-      # Sanity check the dimensions
-      if(dim(series_data)[1] != dim(series_diff)[1]) {
+      # Check that the CASE column lines up exactly
+      if(sum(series_data$CASE != series_diff$CASE) > 0) {
         cat("ERROR: When computing series differences for",
-            cur, "the dimensions do not match:",
-            dim(series_data), "!=", dim(series_diff))
-        quit(1)
+            cur, "the case data does not match:",
+            series_data$CASE, "!=", series_diff$CASE);
+        quit(1);
       }
 
       # Compute series difference
@@ -99,6 +99,15 @@ get_series_data = function(cur, cur_plot, diff) {
 
 get_case_data = function() {
 
+  # Check that series_list equals series_plot
+  for(i in 1:length(series_list)) {
+    if(series_list[i] != series_plot[[i]]) {
+      cat(paste("ERROR: Cannot compute case data when plotting series",
+                "aggregations.\n"));
+      quit(status=1);
+    }
+  } # end for i
+
   # Initialize
   series_data = c();
 
@@ -108,14 +117,6 @@ get_case_data = function() {
       rbind(series_data,
             get_series_data(series_list[i], series_list[i], FALSE));
   } # end for i
-
-  # Define a case column
-  series_data$CASE = paste(series_data$BMODEL,
-                           series_data$STORM_ID,
-                           series_data$INIT,
-                           series_data$LEAD_HR,
-                           series_data$VALID,
-                           sep=':');
 
   # Build a set of unique cases
   case_data = unique(data.frame(CASE=series_data$CASE,
@@ -147,7 +148,10 @@ get_case_data = function() {
     case_data$MIN[i]         = min(series_data[ind,]$PLOT);
     case_data$MAX[i]         = max(series_data[ind,]$PLOT);
     case_data$DIFF[i]        = case_data$MAX[i] - case_data$MIN[i];
-    case_data$WIN[i]         = as.character(series_data[ind,series][which.min(series_data[ind,]$PLOT)]);
+    i_min                    = which.min(series_data[ind,]$PLOT);
+    if(length(i_min) > 0) {
+      case_data$WIN[i]       = as.character(series_data[ind,series][i_min]);
+    }
     case_data$TEST[i]        = paste(case_data$DIFF[i], rp_list[which(case_data$LEAD_HR[i] == lead_list)], sep='');
     case_data$RES[i]         = eval(parse(text=case_data$TEST[i]));
     case_data$PLOT[i]        = ifelse(case_data$RES[i], case_data$WIN[i], "TIE");
@@ -181,21 +185,15 @@ get_prop_ci <- function(x, n) {
 ########################################################################
 #
 # Compute a confidence interval about the mean.
-# When diff is false, use the bonferroni correction.
 #
 ########################################################################
 
-get_mean_ci = function(d, diff) {
+get_mean_ci = function(d) {
 
   # Compute the standard error
   s = Compute_STDerr_from_mean(d, "ML");
-  if(length(s) > 1 && s[2] == 0) {
-    stderr = ifelse(diff, round(zval*s[1], 1),
-                          round(zval_bonferroni*s[1], 1));
-  }
-  else {
-    stderr = 0;
-  }
+  if(length(s) > 1 && s[2] == 0) { stderr = round(zval*s[1], 1); }
+  else                           { stderr = 0;                   }
 
   # Compute the statistic
   stat = mean(d, na.rm=TRUE);
@@ -207,21 +205,15 @@ get_mean_ci = function(d, diff) {
 ########################################################################
 #
 # Compute a confidence interval about the median.
-# When diff is false, use the bonferroni correction.
 #
 ########################################################################
 
-get_median_ci = function(d, diff) {
+get_median_ci = function(d) {
 
   # Compute the standard error
   s = Compute_STDerr_from_median(d, "ML");
-  if(length(s) > 1 && s[2] == 0) {
-    stderr = ifelse(diff, round(zval*s[1], 1),
-                          round(zval_bonferroni*s[1], 1));
-  }
-  else {
-    stderr = 0;
-  }
+  if(length(s) > 1 && s[2] == 0) { stderr = round(zval*s[1], 1); }
+  else                           { stderr = 0;                   }
 
   # Compute the statistic
   stat = median(d, na.rm=TRUE);
@@ -264,8 +256,8 @@ get_yrange = function(plot_type) {
         if(dim(data)[1] == 0) next;
 
         # Get the values to be plotted for this lead time
-        if(plot_type == mean_str) { cur =   get_mean_ci(data$PLOT, diff_flag[i]); }
-        else                      { cur = get_median_ci(data$PLOT, diff_flag[i]); }
+        if(plot_type == mean_str) { cur =   get_mean_ci(data$PLOT); }
+        else                      { cur = get_median_ci(data$PLOT); }
 
         # Append the current values to the list
         if(ci_flag) { yvals = c(yvals, cur);    }
@@ -289,8 +281,23 @@ get_yrange = function(plot_type) {
           n_cur = sum(case_data$PLOT[ind] == series_list[i], na.rm=TRUE);
           n_tot = sum(!is.na(case_data$PLOT[ind]));
 
-          # Compute the current model's winning frequency
-          yvals = c(yvals, round(100*n_cur/n_tot, 0));
+          # Compute the current relative performance and CI
+          cur = get_prop_ci(n_cur, n_tot);
+
+          # Append the current values to the list
+          if(ci_flag) { yvals = c(yvals, cur);    }
+          else        { yvals = c(yvals, cur[2]); }
+
+          # Handle the ties
+          n_cur = sum(case_data$PLOT[ind] == "TIE", na.rm=TRUE);
+          n_tot = sum(!is.na(case_data$PLOT[ind]));
+
+          # Compute the current relative performance and CI
+          cur = get_prop_ci(n_cur, n_tot);
+
+          # Append the current values to the list
+          if(ci_flag) { yvals = c(yvals, cur);    }
+          else        { yvals = c(yvals, cur[2]); }
         }
         # Handle the rank frequency
         else {
@@ -371,10 +378,6 @@ plot_time_series = function(dep, plot_type,
 
   # Draw the X-axis
   axis(1, at=lead_list, tick=TRUE, labels=xlab);
-  
-  # Draw a reference line
-  if(plot_type == rank_str) { abline(h=100/n_series, lwd=2.0, col="gray"); }
-  else                      { abline(h=0, lty=3, lwd=2.0);                 }
 
   # Get the list of colors to be used
   color_list = eval(parse(text=paste(tolower(plot_type), "_color_list", sep='')));
@@ -395,9 +398,11 @@ plot_time_series = function(dep, plot_type,
           plot_type == median_str) {
     plot_mean_median(dep, plot_type, horz, vert, color_list)
   }
-  else if(plot_type == relperf_str ||
-          plot_type == rank_str) {
-    plot_relperf_rank(dep, plot_type, horz, vert, color_list)
+  else if(plot_type == relperf_str) {
+    plot_relperf(dep, horz, vert, color_list)
+  }
+  else if(plot_type == rank_str) {
+    plot_rank(dep, horz, vert, color_list)
   }
 
   # Close the output device
@@ -411,6 +416,9 @@ plot_time_series = function(dep, plot_type,
 ########################################################################
 
 plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
+
+  # Draw a reference line at 0
+  abline(h=0, lty=3, lwd=2.0);
 
   # Loop over the series list entries
   for(i in 1:n_series) {
@@ -487,6 +495,9 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
 
 plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
 
+  # Draw a reference line at 0
+  abline(h=0, lty=3, lwd=2.0);
+
   # Loop over the series list entries
   for(i in 1:n_series) {
 
@@ -517,8 +528,8 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
       if(dim(data)[1] == 0) next;
 
       # Handle the mean and median
-      if(plot_type == mean_str) { s =   get_mean_ci(data$PLOT, diff_flag[i]); }
-      else                      { s = get_median_ci(data$PLOT, diff_flag[i]); }
+      if(plot_type == mean_str) { s =   get_mean_ci(data$PLOT); }
+      else                      { s = get_median_ci(data$PLOT); }
 
       # Store stats for this lead time
       stat_ncl[j] = s[1];
@@ -556,28 +567,129 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
 
 ########################################################################
 #
-# Create time series of relative performance or rank frequency.
+# Create time series of relative performance.
 #
 ########################################################################
 
-plot_relperf_rank = function(dep, plot_type, horz, vert, color_list) {
+plot_relperf = function(dep, horz, vert, color_list) {
 
   # Check that event equalization has been applied
   if(event_equal == FALSE) {
-    cat(paste("ERROR: Cannot plot relative performance or rank",
-              "frequency when event equalization is disabled.\n"));
+    cat(paste("ERROR: Cannot plot relative performance when event",
+              "equalization is disabled.\n"));
     quit(status=1);
   }
 
   # Check that series_list equals series_plot
   for(i in 1:n_series) {
     if(series_list[i] != series_plot[[i]]) {
-      cat(paste("ERROR: Cannot plot relative performance or rank",
-                "frequencey when using series aggregations.\n"));
+      cat(paste("ERROR: Cannot plot relative performance when using",
+                "series aggregations.\n"));
       quit(status=1);
     }
   } # end for i
+
+  # Draw a reference line at 0 and 100
+  abline(h=c(0, 100), lwd=2.0, col="gray");
   
+  # Get the case data
+  case_data = get_case_data();
+
+  # Loop over the ties followed by the the series list entries
+  for(i in 0:n_series) {
+
+    # Set variables for plotting the ties:
+    #   color, series value, and horizontal offset
+    if(i == 0) {
+      color      = "gray";
+      series_val = "TIE";
+      h_off      = 0;
+    }
+    else {
+      i_col      = i%%length(color_list)
+      color      = ifelse(i_col == 0, color_list[length(color_list)],
+                                      color_list[i_col]);
+      series_val = series_list[i];
+      h_off      = horz[i];
+    }
+
+    # Compute statistic for each lead time
+    stat_val = stat_ncl = stat_ncu = rep(NA, length(lead_list));
+
+    # Prepare the data for each lead time
+    for(j in 1:length(lead_list)) {
+
+      ind = (case_data$LEAD_HR == lead_list[j]);
+
+      # Get counts
+      n_cur = sum(case_data$PLOT[ind] == series_val, na.rm=TRUE);
+      n_tot = sum(!is.na(case_data$PLOT[ind]));
+
+      # Compute the current relative performance and CI
+      s = get_prop_ci(n_cur, n_tot);
+
+      # Store stats for this lead time
+      stat_ncl[j] = s[1];
+      stat_val[j] = s[2];
+      stat_ncu[j] = s[3];
+
+    } # end for j
+
+    # Plot the relative performance
+    ind = !is.na(stat_val);
+    points(lead_list[ind]+h_off, stat_val[ind],
+           pch=8, type='b', col=color);
+
+    # Plot relative performance confidence intervals
+    if(ci_flag) {
+      points(lead_list[ind]+h_off, stat_ncl[ind],
+             type='l', lty=3, col=color);
+      points(lead_list[ind]+h_off, stat_ncu[ind],
+             type='l', lty=3, col=color);
+    }
+
+    # Plot the valid data counts
+    if(i == 1) { plot_valid_counts(case_data, color, vert[i]); }
+
+  } # end for i
+
+  # Legend for relative performance
+  legend_str = c(paste(series_list, "Better"), "TIE");
+  if(ci_flag) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
+  legend(x="topleft",
+         legend=legend_str,
+         col=c(rep(color_list, n_series)[1:n_series], "gray", "gray"),
+         lty=c(rep(1, n_series+1), 3),
+         lwd=2, pch=c(rep(8, n_series+1), NA), bty="n");
+}
+
+########################################################################
+#
+# Create time series of rank frequency.
+#
+########################################################################
+
+plot_rank = function(dep, horz, vert, color_list) {
+
+  # Check that event equalization has been applied
+  if(event_equal == FALSE) {
+    cat(paste("ERROR: Cannot plot relative rank frequency when event",
+              "equalization is disabled.\n"));
+    quit(status=1);
+  }
+
+  # Check that series_list equals series_plot
+  for(i in 1:n_series) {
+    if(series_list[i] != series_plot[[i]]) {
+      cat(paste("ERROR: Cannot plot rank frequencey when using series",
+                "aggregations.\n"));
+      quit(status=1);
+    }
+  } # end for i
+
+  # Draw a reference line at 100/n_series
+  abline(h=100/n_series, lwd=2.0, col="gray");
+
   # Get the case data
   case_data = get_case_data();
 
@@ -597,49 +709,34 @@ plot_relperf_rank = function(dep, plot_type, horz, vert, color_list) {
     for(j in 1:length(lead_list)) {
 
       ind = (case_data$LEAD_HR == lead_list[j]);
-      
-      # Handle the relative performance
-      if(plot_type == relperf_str) {
 
-        # Get counts
-        n_cur = sum(case_data$PLOT[ind] == series_list[i], na.rm=TRUE);
-        n_tot = sum(!is.na(case_data$PLOT[ind]));
+      # Get counts
+      n_cur = sum(case_data$RANK_RANDOM[ind] == i, na.rm=TRUE);
+      n_tot = sum(!is.na(case_data$RANK_RANDOM[ind]));
 
-        # Compute the current model's winning frequency
-        stat_val[j] = round(100*n_cur/n_tot, 0);
-      }
-      # Handle the rank frequency
-      else {
+      # Compute the current rank value's frequency and CI
+      s = get_prop_ci(n_cur, n_tot);
 
-        # Get counts
-        n_cur = sum(case_data$RANK_RANDOM[ind] == i, na.rm=TRUE);
-        n_tot = sum(!is.na(case_data$RANK_RANDOM[ind]));
+      # Store stats for this lead time
+      stat_ncl[j] = s[1];
+      stat_val[j] = s[2];
+      stat_ncu[j] = s[3];
 
-        # Compute the current rank value's frequency and CI
-        s = get_prop_ci(n_cur, n_tot);
-
-        # Store stats for this lead time
-        stat_ncl[j] = s[1];
-        stat_val[j] = s[2];
-        stat_ncu[j] = s[3];
-
-        # Compute the RANK_MIN value for the first and last series
-        if(i == 1 || i == n_series) {
-          rank_min_val[j] = 100*
-            sum(case_data$RANK_MIN[ind] == i, na.rm=TRUE)/
-            sum(!is.na(case_data$RANK_MIN[ind]));
-        }
+      # Compute the RANK_MIN value for the first and last series
+      if(i == 1 || i == n_series) {
+        rank_min_val[j] = 100*
+          sum(case_data$RANK_MIN[ind] == i, na.rm=TRUE)/
+          sum(!is.na(case_data$RANK_MIN[ind]));
       }
     } # end for j
 
     # Plot the statistics
     ind = !is.na(stat_val);
-    pch = ifelse(plot_type == relperf_str, 8, as.character(i));
     points(lead_list[ind]+horz[i], stat_val[ind],
-           pch=pch, type='b', col=color);
+           pch=as.character(i), type='b', col=color);
 
     # Plot rank confidence intervals
-    if(plot_type == rank_str && ci_flag) {
+    if(ci_flag) {
       points(lead_list[ind]+horz[i], stat_ncl[ind],
              type='l', lty=3, col=color);
       points(lead_list[ind]+horz[i], stat_ncu[ind],
@@ -649,38 +746,26 @@ plot_relperf_rank = function(dep, plot_type, horz, vert, color_list) {
     # For the BEST and WORST series, plot the RANK_MIN values
     if(i == 1 || i == n_series) {
        points(lead_list[ind]+horz[i], rank_min_val[ind],
-              pch=pch, type='p', col="black");
+              pch=as.character(i), type='p', col="black");
     }
 
     # Plot the valid data counts
-    if(event_equal == FALSE || i == 1)
-      plot_valid_counts(case_data, color, vert[i]);
+    if(i == 1) { plot_valid_counts(case_data, color, vert[i]); }
 
   } # end for i
 
-  # Legend for relative performance
-  if(plot_type == relperf_str) {
-    legend(x="topleft",
-           legend=paste(series_list, "Better"),
-           col=rep(color_list, n_series)[1:n_series],
-           lty=rep(1, n_series),
-           lwd=rep(2, n_series),
-           pch=8, bty="n");
-  }
   # Legend for rank frequency
-  else {
-    rank_str   = c("Best", "2nd", "3rd", "Worst");
-    legend_str = c(rank_str[1:min(3, n_series-1)]);
-    if(n_series >= 5) legend_str = c(legend_str, paste(4:(n_series-1), "th", sep=''));
-    legend_str = c(legend_str, rank_str[4]);
-    if(ci_flag) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
-    legend(x="topleft",
-           legend=legend_str,
-           col=c(rep(color_list, n_series)[1:n_series], "gray"),
-           lty=c(rep(1, n_series), 3),
-           lwd=rep(2, n_series),
-           pch=c(as.character(1:n_series), NA), bty="n");
-  }
+  rank_str   = c("Best", "2nd", "3rd", "Worst");
+  legend_str = c(rank_str[1:min(3, n_series-1)]);
+  if(n_series >= 5) legend_str = c(legend_str, paste(4:(n_series-1), "th", sep=''));
+  legend_str = c(legend_str, rank_str[4]);
+  if(ci_flag) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
+  legend(x="topleft",
+         legend=legend_str,
+         col=c(rep(color_list, n_series)[1:n_series], "gray"),
+         lty=c(rep(1, n_series), 3),
+         lwd=rep(2, n_series),
+         pch=c(as.character(1:n_series), NA), bty="n");
 }
 
 ########################################################################
