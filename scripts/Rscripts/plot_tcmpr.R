@@ -66,23 +66,23 @@
 ##
 ########################################################################
 
-library(boot)
+library(boot);
 
 # Check that the MET_BASE environment variable is set
 MET_BASE = Sys.getenv("MET_BASE", unset=NA);
 if(is.na(MET_BASE)) {
-  cat("ERROR: The \"MET_BASE\" environment variable must be set.\n")
-  quit(status=1)
+  cat("ERROR: The \"MET_BASE\" environment variable must be set.\n");
+  quit(status=1);
 }
 
-source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_util.R", sep=''))
-source(paste(MET_BASE, "/scripts/Rscripts/include/Compute_STDerr.R", sep=''))
+source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_util.R", sep=''));
+source(paste(MET_BASE, "/scripts/Rscripts/include/Compute_STDerr.R", sep=''));
 source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_config_default.R", sep=''));
 
 # Read the TCMPR column information from a data file.
 column_info = read.table(
   paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
-  header=TRUE, row.names=1)
+  header=TRUE, row.names=1);
 
 ########################################################################
 #
@@ -91,47 +91,47 @@ column_info = read.table(
 ########################################################################
 
 usage = function() {
-  cat("\nUsage: plot_tcmpr.R\n")
-  cat("        -lookin tcst_file_list\n")
-  cat("        [-config path]\n")
-  cat("        [-outdir path]\n")
-  cat("        [-prefix string]\n")
-  cat("        [-title string]\n")
-  cat("        [-subtitle string]\n")
-  cat("        [-ylab string]\n")
-  cat("        [-ylim min,max]\n")
-  cat("        [-filter options]\n")
-  cat("        [-dep list]\n")
-  cat("        [-series string [list]]\n")
-  cat("        [-lead list]\n")
-  cat("        [-plot list]\n")
-  cat("        [-rp_thresh string]\n")
-  cat("        [-no_ee]\n")
-  cat("        [-no_ci]\n")
-  cat("        [-save_data]\n")
-  cat("        [-save]\n")
-  cat("        where \"-lookin\"    is a list of files with TCMPR lines to be used.\n")
-  cat("              \"-config\"    is a plotting configuration file.\n")
-  cat("              \"-outdir\"    is the output directory.\n")
-  cat("              \"-prefix\"    is the output file name prefix.\n")
-  cat("              \"-title\"     overrides the default plot title.\n")
-  cat("              \"-subtitle\"  overrides the default plot subtitle.\n")
-  cat("              \"-ylab\"      overrides the default plot y-axis label.\n")
-  cat("              \"-ylim\"      is the min,max bounds for plotting the Y-axis.\n")
-  cat("              \"-filter\"    is a list of filtering options for the tc_stat tool.\n")
-  cat("              \"-dep\"       is a comma-separated list of dependent variable columns to plot.\n")
-  cat("              \"-series\"    is the column whose unique values define the series on the plot,\n")
-  cat("                           optionally followed by a comma-separated list of values, including:\n")
-  cat("                           ALL, OTHER, and colon-separated groups.\n")
-  cat("              \"-lead\"      is a comma-separted list of lead times (h) to be plotted.\n")
-  cat("              \"-plot\"      is a comma-separated list of plot types to create:\n")
-  cat("                           BOXPLOT, SCATTER, MEAN, MEDIAN, RELPERF, RANK\n")
-  cat("              \"-rp_thresh\" is a comma-separated list of thresholds to specify\n")
-  cat("                           meaningful differences for the relative performance plot.\n")
-  cat("              \"-no_ee\"     to disable event equalization.\n")
-  cat("              \"-no_ci\"     to disable confidence intervals.\n")
-  cat("              \"-save_data\" to save the filtered track data to a file instead of deleting it.\n")
-  cat("              \"-save\"      to call save.image().\n\n")
+  cat("\nUsage: plot_tcmpr.R\n");
+  cat("        -lookin tcst_file_list\n");
+  cat("        [-config path]\n");
+  cat("        [-outdir path]\n");
+  cat("        [-prefix string]\n");
+  cat("        [-title string]\n");
+  cat("        [-subtitle string]\n");
+  cat("        [-ylab string]\n");
+  cat("        [-ylim min,max]\n");
+  cat("        [-filter options]\n");
+  cat("        [-dep list]\n");
+  cat("        [-series string [list]]\n");
+  cat("        [-lead list]\n");
+  cat("        [-plot list]\n");
+  cat("        [-rp_thresh string]\n");
+  cat("        [-no_ee]\n");
+  cat("        [-no_ci]\n");
+  cat("        [-save_data]\n");
+  cat("        [-save]\n");
+  cat("        where \"-lookin\"    is a list of files with TCMPR lines to be used.\n");
+  cat("              \"-config\"    is a plotting configuration file.\n");
+  cat("              \"-outdir\"    is the output directory.\n");
+  cat("              \"-prefix\"    is the output file name prefix.\n");
+  cat("              \"-title\"     overrides the default plot title.\n");
+  cat("              \"-subtitle\"  overrides the default plot subtitle.\n");
+  cat("              \"-ylab\"      overrides the default plot y-axis label.\n");
+  cat("              \"-ylim\"      is the min,max bounds for plotting the Y-axis.\n");
+  cat("              \"-filter\"    is a list of filtering options for the tc_stat tool.\n");
+  cat("              \"-dep\"       is a comma-separated list of dependent variable columns to plot.\n");
+  cat("              \"-series\"    is the column whose unique values define the series on the plot,\n");
+  cat("                           optionally followed by a comma-separated list of values, including:\n");
+  cat("                           ALL, OTHER, and colon-separated groups.\n");
+  cat("              \"-lead\"      is a comma-separted list of lead times (h) to be plotted.\n");
+  cat("              \"-plot\"      is a comma-separated list of plot types to create:\n");
+  cat("                           BOXPLOT, SCATTER, MEAN, MEDIAN, RELPERF, RANK\n");
+  cat("              \"-rp_thresh\" is a comma-separated list of thresholds to specify\n");
+  cat("                           meaningful differences for the relative performance plot.\n");
+  cat("              \"-no_ee\"     to disable event equalization.\n");
+  cat("              \"-no_ci\"     to disable confidence intervals.\n");
+  cat("              \"-save_data\" to save the filtered track data to a file instead of deleting it.\n");
+  cat("              \"-save\"      to call save.image().\n\n");
 }
 
 ########################################################################
@@ -141,15 +141,15 @@ usage = function() {
 ########################################################################
 
 # Path to the tc_stat tool
-tc_stat = "${MET_BASE}/bin/tc_stat"
+tc_stat = "${MET_BASE}/bin/tc_stat";
 
 # Strings used to select the plots to be created
-boxplot_str = "BOXPLOT"
-scatter_str = "SCATTER"
-mean_str    = "MEAN"
-median_str  = "MEDIAN"
-relperf_str = "RELPERF"
-rank_str    = "RANK"
+boxplot_str = "BOXPLOT";
+scatter_str = "SCATTER";
+mean_str    = "MEAN";
+median_str  = "MEDIAN";
+relperf_str = "RELPERF";
+rank_str    = "RANK";
 
 ########################################################################
 #
@@ -158,12 +158,12 @@ rank_str    = "RANK"
 ########################################################################
 
 # Retreive the arguments
-args = commandArgs(TRUE)
+args = commandArgs(TRUE);
 
 # Check the number of arguments
 if(length(args) < 2) {
-  usage()
-  quit()
+  usage();
+  quit();
 }
 
 # Process the -config option first
@@ -175,79 +175,79 @@ for(i in 1:length(args)) {
 } # end for i
 
 # Parse optional arguments
-i=1
+i=1;
 while(i <= length(args)) {
 
   if(args[i] == "-lookin") {
     while(i+1 <= length(args) & substring(args[i+1], 1, 1) != '-') {
-       file_list = c(file_list, args[i+1])
-       i=i+1
+       file_list = c(file_list, args[i+1]);
+       i=i+1;
     }
   } else if(args[i] == "-config") {
-    i=i+1
+    i=i+1;
   } else if(args[i] == "-outdir") {
-    outdir = args[i+1]
-    i=i+1
+    outdir = args[i+1];
+    i=i+1;
   } else if(args[i] == "-prefix") {
-    prefix = args[i+1]
-    i=i+1
+    prefix = args[i+1];
+    i=i+1;
   } else if(args[i] == "-title") {
-    title_str = args[i+1]
-    i=i+1
+    title_str = args[i+1];
+    i=i+1;
   } else if(args[i] == "-subtitle") {
-    subtitle_str = args[i+1]
-    i=i+1
+    subtitle_str = args[i+1];
+    i=i+1;
   } else if(args[i] == "-ylab") {
-    ylab_str = args[i+1]
-    i=i+1
+    ylab_str = args[i+1];
+    i=i+1;
   } else if(args[i] == "-ylim") {
-    ymin = as.numeric(unlist(strsplit(args[i+1], ','))[1])
-    ymax = as.numeric(unlist(strsplit(args[i+1], ','))[2])
-    i=i+1
+    ymin = as.numeric(unlist(strsplit(args[i+1], ','))[1]);
+    ymax = as.numeric(unlist(strsplit(args[i+1], ','))[2]);
+    i=i+1;
   } else if(args[i] == "-filter") {
-    filter_opts = args[i+1]
-    i=i+1
+    filter_opts = args[i+1];
+    i=i+1;
   } else if(args[i] == "-dep") {
-    dep_list = unlist(strsplit(args[i+1], ','))
-    i=i+1
+    dep_list = unlist(strsplit(args[i+1], ','));
+    i=i+1;
   } else if(args[i] == "-series") {
-    series = args[i+1]
-    i=i+1
+    series = args[i+1];
+    i=i+1;
     
     # Check for optional list of series values
     if(i+1 <= length(args) &
        substring(args[i+1], 1, 1) != '-') {
-      series_list = unlist(strsplit(args[i+1], ','))
-      i=i+1
+      series_list = unlist(strsplit(args[i+1], ','));
+      i=i+1;
     }
 
   } else if(args[i] == "-lead") {
-    lead_list = as.numeric(unlist(strsplit(args[i+1], ',')))
-    i=i+1
+    lead_list = as.numeric(unlist(strsplit(args[i+1], ',')));
+    i=i+1;
   } else if(args[i] == "-plot") {
-    plot_list = unlist(strsplit(args[i+1], ','))
-    plot_list = toupper(plot_list)
-    i=i+1
+    plot_list = unlist(strsplit(args[i+1], ','));
+    plot_list = toupper(plot_list);
+    i=i+1;
   } else if(args[i] == "-rp_thresh") {
-    rp_list = unlist(strsplit(args[i+1], ','))
-    i=i+1
+    rp_list = unlist(strsplit(args[i+1], ','));
+    i=i+1;
   } else if(args[i] == "-no_ee") {
-    event_equal = FALSE
+    event_equal = FALSE;
   } else if(args[i] == "-no_ci") {
-    ci_flag = FALSE
+    ci_flag = FALSE;
   } else if(args[i] == "-save_data") {
-    save_data = args[i+1]
-    i=i+1
+    save_data = args[i+1];
+    i=i+1;
   } else if(args[i] == "-save") {
-    save = TRUE
+    save = TRUE;
   } else {
-    cat("ERROR: Unrecognized command line argument:", args[i], "\n")
-    usage()
-    quit()
+    cat("ERROR: Unrecognized command line argument:", args[i], "\n");
+    usage();
+    quit();
   }
 
   # Increment count
-  i=i+1
+  i=i+1;
 
 } # end while
 
@@ -267,21 +267,21 @@ if(length(rp_list) != length(lead_list)) {
 
 # Add the event equalization option
 if(event_equal) {
-  filter_opts = paste(filter_opts, "-event_equal true")
+  filter_opts = paste(filter_opts, "-event_equal true");
 }
 
 # Build tc_stat command
 run_cmd = paste(tc_stat,
                 paste("-lookin", unlist(strsplit(file_list, ',')), collapse=" "),
                 "-job filter -dump_row", tcst_tmp_file, filter_opts,
-                "-v 3")
+                "-v 3");
 
 # Run the tc_stat command and check the return status
-cat("CALLING: ", run_cmd, "\n")
-status = system(run_cmd)
+cat("CALLING: ", run_cmd, "\n");
+status = system(run_cmd);
 if(status != 0) {
-  cat("ERROR: Bad return value ", status , "\n")
-  quit(status=status)
+  cat("ERROR: Bad return value ", status , "\n");
+  quit(status=status);
 }
 
 # Read the data
@@ -296,12 +296,12 @@ tcst = tcst[with(tcst, order(CASE)),];
   
 # Dispose of the temporary file by either saving or deleting it
 if(nchar(save_data) > 0) {
-   run_cmd = paste("mv -f", tcst_tmp_file, save_data)
+   run_cmd = paste("mv -f", tcst_tmp_file, save_data);
 } else {
-   run_cmd = paste("rm -f", tcst_tmp_file)
+   run_cmd = paste("rm -f", tcst_tmp_file);
 }
-cat("CALLING: ", run_cmd, "\n")
-status = system(run_cmd)
+cat("CALLING: ", run_cmd, "\n");
+status = system(run_cmd);
 
 ########################################################################
 #
@@ -310,10 +310,10 @@ status = system(run_cmd)
 ########################################################################
 
 tcst$INIT_TIME  = as.POSIXct(strptime(tcst$INIT,
-                                      format="%Y%m%d_%H%M%s"))
+                                      format="%Y%m%d_%H%M%s"));
 tcst$VALID_TIME = as.POSIXct(strptime(tcst$VALID,
-                                      format="%Y%m%d_%H%M%s"))
-tcst$LEAD_HR    = tcst$LEAD/10000
+                                      format="%Y%m%d_%H%M%s"));
+tcst$LEAD_HR    = tcst$LEAD/10000;
 
 ########################################################################
 #
@@ -322,20 +322,20 @@ tcst$LEAD_HR    = tcst$LEAD/10000
 ########################################################################
 
 info_list = c("AMODEL",     "BMODEL", "BASIN", "CYCLONE",
-              "STORM_NAME", "LEAD",   "LEVEL", "WATCH_WARN")
+              "STORM_NAME", "LEAD",   "LEVEL", "WATCH_WARN");
 
 for(i in 1:length(info_list)) {
 
-  uniq_list = unique(tcst[,info_list[i]])
+  uniq_list = unique(tcst[,info_list[i]]);
 
   cat("Found ", length(uniq_list), " unique entries for ", info_list[i], ": ",
-      paste(uniq_list, collapse=", "), "\n", sep='')
+      paste(uniq_list, collapse=", "), "\n", sep='');
 
   # Check for a single BDECK model
   if(info_list[i] == "BMODEL" & length(uniq_list) != 1) {
     cat("ERROR: Must have exactly 1 BDECK model name.  ",
-        "Try setting \"-bmodel name\" in the \"-filter\" option.\n")
-    quit(status=1)
+        "Try setting \"-bmodel name\" in the \"-filter\" option.\n");
+    quit(status=1);
   }
 }
 
@@ -346,11 +346,11 @@ for(i in 1:length(info_list)) {
 ########################################################################
 
 # Get the unique series entries from the data
-series_uniq = unique(as.character(tcst[,series]))
+series_uniq = unique(as.character(tcst[,series]));
 
 # List unique series entries
 cat("Found", length(series_uniq), "unique value(s) for the", series,
-    "series:", paste(series_uniq, collapse=", "), "\n")
+    "series:", paste(series_uniq, collapse=", "), "\n");
 
 # Store the series list if not specified on the command line
 if(length(series_list) == 0) {
@@ -358,12 +358,12 @@ if(length(series_list) == 0) {
 }
 
 # Store the number of series to be plotted
-n_series = length(series_list)
+n_series = length(series_list);
 
 # Check for special series values "ALL" and "OTHER" and construct a
 # list of values that correspond to each series entry
-series_plot = list()
-diff_flag = rep(FALSE, n_series)
+series_plot = list();
+diff_flag = rep(FALSE, n_series);
 for(i in 1:n_series) {
 
   # Handle NA
@@ -383,25 +383,25 @@ for(i in 1:n_series) {
 
     # Check that event equalization is turned on
     if(!event_equal) {
-      cat("ERROR: Event equalization must be on for differences.\n")
-      quit(status=1)
+      cat("ERROR: Event equalization must be on for differences.\n");
+      quit(status=1);
     }
 
     # Store the entries for the difference
-    series_plot[[i]] = unlist(strsplit(series_list[i], "-"))
+    series_plot[[i]] = unlist(strsplit(series_list[i], "-"));
 
     # Enable the difference flag
     diff_flag[i] = TRUE;
   }
   # Handle the rest, assuming it's a colon separated list
   else {
-     series_plot[[i]] = unlist(strsplit(series_list[i], ':'))
+     series_plot[[i]] = unlist(strsplit(series_list[i], ':'));
   }
 }
 
 # Store the number of series to plot
 cat("Plotting", n_series, "value(s) for the", series, "series:",
-    paste(series_plot, collapse=", "), "\n")
+    paste(series_plot, collapse=", "), "\n");
 
 ########################################################################
 #
@@ -411,14 +411,14 @@ cat("Plotting", n_series, "value(s) for the", series, "series:",
 
 for(i in 1:length(dep_list)) {
 
-  cat("Processing column:", dep_list[i], "\n")
+  cat("Processing column:", dep_list[i], "\n");
 
   # Get the data to be plotted
-  col       = get_dep_column(dep_list[i])
+  col       = get_dep_column(dep_list[i]);
   tcst$PLOT = col$val
 
   # Remove special characters from output file name
-  out_file_dep = sub('[)]', '', sub('[(]', '_', dep_list[i]))
+  out_file_dep = sub('[)]', '', sub('[(]', '_', dep_list[i]));
 
   # Set plotting strings
   plot_sub  = ifelse(length(subtitle_str) == 0,
@@ -439,11 +439,11 @@ for(i in 1:length(dep_list)) {
   
     # Build output file name
     out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_bplot.", img_ext, sep="")
+                     "_bplot.", img_ext, sep="");
 
     # Do the boxplot
     plot_time_series(dep_list[i], boxplot_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab);
   }
   
   # PLOT: Create time series of scatter plots.
@@ -457,11 +457,11 @@ for(i in 1:length(dep_list)) {
 
     # Build output file name
     out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_scatter.", img_ext, sep="")
+                     "_scatter.", img_ext, sep="");
 
     # Do the scatter plot
     plot_time_series(dep_list[i], scatter_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab);
   }
 
   # PLOT: Create time series of means.
@@ -475,11 +475,11 @@ for(i in 1:length(dep_list)) {
 
     # Build output file name
     out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_mean.", img_ext, sep="")
+                     "_mean.", img_ext, sep="");
 
     # Do the mean plot
     plot_time_series(dep_list[i], mean_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab);
   }
 
   # PLOT: Create time series of medians.
@@ -493,11 +493,11 @@ for(i in 1:length(dep_list)) {
 
     # Build output file name
     out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_median.", img_ext, sep="")
+                     "_median.", img_ext, sep="");
 
     # Do the median plot
     plot_time_series(dep_list[i], median_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab);
   }
 
   # PLOT: Create time series of relative performance.
@@ -524,11 +524,11 @@ for(i in 1:length(dep_list)) {
 
     # Build output file name
     out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_rel_perf.", img_ext, sep="")
+                     "_rel_perf.", img_ext, sep="");
 
     # Do the relative performance plot
     plot_time_series(dep_list[i], relperf_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab);
   }
 
   # PLOT: Create time series of ranks for the first model.
@@ -546,11 +546,11 @@ for(i in 1:length(dep_list)) {
 
     # Build output file name
     out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_rank.", img_ext, sep="")
+                     "_rank.", img_ext, sep="");
 
     # Do the relative performance plot
     plot_time_series(dep_list[i], rank_str,
-                     plot_title, plot_sub, plot_ylab)
+                     plot_title, plot_sub, plot_ylab);
   }
   
 } # end for i
@@ -562,4 +562,4 @@ for(i in 1:length(dep_list)) {
 ########################################################################
 
 # Optionally, save all of the data to an .RData file
-if(save == TRUE) save.image()
+if(save == TRUE) save.image();
