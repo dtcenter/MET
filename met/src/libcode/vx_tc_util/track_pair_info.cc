@@ -451,9 +451,10 @@ int TrackPairInfo::check_water_only() {
    // Loop over the track points
    for(i=0, n_rej=0; i<NPoints; i++) {
 
-      // Check if the current track point is over land
-      if((!is_bad_data(ADeckDLand[i]) && ADeckDLand[i] <= 0) ||
-         (!is_bad_data(BDeckDLand[i]) && BDeckDLand[i] <= 0)) {
+      // Check if the current track point is over land.  Require that
+      // both ADECK and BDECK values are present.
+      if(!is_bad_data(ADeckDLand[i]) && !is_bad_data(BDeckDLand[i]) &&
+         (ADeckDLand[i] <= 0 || BDeckDLand[i] <= 0)) {
          hit_land = true;
       }
 
