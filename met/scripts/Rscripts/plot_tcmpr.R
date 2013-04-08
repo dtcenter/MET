@@ -84,20 +84,6 @@ column_info = read.table(
   paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
   header=TRUE, row.names=1)
 
-# TO DO LIST:
-# - In what cases should we be using the Compute_STDerr functions -
-#   does it have to be a time series (Tressa)?
-# - Need to clarify the zval bonferroni adjusement for multiple models.
-# - What about percentiles for the rp_thresh argument?
-# - The random assignment of ranks could lead to bad plotting limits
-#   from get_yrange for the rank plot.
-# - When computing a difference, should we make sure that all of the
-#   lines being differenced have exactly the same header data?
-# - Figure out what information should be written to a log file.
-# - Add -v verbosity for logging?
-# - Move legend below X-axis?
-# - New plot types from Eric: windrose and minimum spanning tree
-
 ########################################################################
 #
 # Usage statement.
@@ -299,10 +285,14 @@ if(status != 0) {
 }
 
 # Read the data
-tcst = read.table(tcst_tmp_file, header=TRUE)
+tcst = read.table(tcst_tmp_file, header=TRUE);
 
-# Sort the data by INIT and VALID columns
-tcst = tcst[with(tcst, order(INIT,VALID)),]
+# Define a case column
+tcst$CASE = paste(tcst$BMODEL,  tcst$STORM_ID, tcst$INIT,
+                  tcst$LEAD_HR, tcst$VALID, sep=':');
+
+# Sort the data by the CASE column
+tcst = tcst[with(tcst, order(CASE)),];
   
 # Dispose of the temporary file by either saving or deleting it
 if(nchar(save_data) > 0) {

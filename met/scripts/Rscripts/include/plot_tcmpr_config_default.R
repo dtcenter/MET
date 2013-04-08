@@ -47,7 +47,7 @@ scatter_color_list = default_color_list
 mean_color_list    = default_color_list
 median_color_list  = default_color_list
 relperf_color_list = default_color_list
-rank_color_list    = c("green", "blue", "orange", "red", "magenta")
+rank_color_list    = c("green", "blue", "orange", "red", "purple")
 
 # Minimum number of values for boxplots.  Otherwise, do a scatter plot.
 n_min=11
@@ -60,6 +60,5 @@ vert_offset  = 1.25
 relperf_rank_horz_offset = 0.50
 
 # Alpha and z-value
-alpha           = 0.05
-zval            = qnorm(1 - (alpha/2));
-zval_bonferroni = (zval + zval/sqrt(2))/2;
+alpha = 0.05
+zval  = qnorm(1 - (alpha/2));
