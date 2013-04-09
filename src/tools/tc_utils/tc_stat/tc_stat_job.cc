@@ -635,7 +635,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    }
 
    // Check the event equalization cases
-   if(keep == true && EventEqualCases.n_elements() > 0 &&
+   if(keep == true && EventEqual == true &&
      !EventEqualCases.has(line.header())) {
       keep = false;
       n.RejEventEqual++;
