@@ -1030,12 +1030,18 @@ void TCStatJob::process_event_equal() {
       } // end for i
    } // end while
 
-   // Initialize to the first map entry
-   EventEqualCases = case_map.begin()->second;
-
    // Loop over the map entries and build a list of common cases
    for(it = case_map.begin(); it != case_map.end(); it++) {
-      EventEqualCases = intersection(EventEqualCases, it->second);
+     
+      // Initialize to the first map entry
+      if(it == case_map.begin()) {
+         EventEqualCases = it->second;
+      }
+      // Otherwise, compute the intersection of cases
+      else {
+         EventEqualCases = intersection(EventEqualCases, it->second);
+      }
+
       models << it->first << " ";
    } // end for it
 
@@ -1206,6 +1212,13 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
 
    // Call the parent's do_job() to do event equalization
    TCStatJob::do_job(file_list, n);
+
+   // Check for no common cases
+   if(EventEqual == true && EventEqualCases.n_elements() == 0) {
+      mlog << Debug(1)
+           << "Event equalization found no common cases.\n";
+      return;
+   }
 
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
@@ -1453,6 +1466,13 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    // Call the parent's do_job() to do event equalization
    TCStatJob::do_job(file_list, n);
 
+   // Check for no common cases
+   if(EventEqual == true && EventEqualCases.n_elements() == 0) {
+      mlog << Debug(1)
+           << "Event equalization found no common cases.\n";
+      return;
+   }
+   
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
 
