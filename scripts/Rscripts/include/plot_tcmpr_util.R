@@ -61,6 +61,9 @@ get_series_data = function(cur, cur_plot, diff) {
     # Initialize to the first entry
     series_data = tcst[tcst[,series] == cur_plot[1],];
 
+    # Store the first PLOT value as the percent improvement reference
+    series_data$REF = series_data$PLOT;
+
     # Loop over the remaining series entries
     i = 2;
     while(i <= length(cur_plot)) {
@@ -178,11 +181,12 @@ get_prop_ci <- function(x, n) {
   midpnt = (phat + (zval^2)/(2 * n))/(1 + (zval^2)/n);
 
   # Compute the statistic and confidence interval
-  val = 100*round(phat, 4);
-  ncl = ifelse(n < n_min, NA, 100*round(midpnt - bound, 4));
-  ncu = ifelse(n < n_min, NA, 100*round(midpnt + bound, 4));
+  stat     = c();
+  stat$val = 100*round(phat, 4);
+  stat$ncl = ifelse(n < n_min, NA, 100*round(midpnt - bound, 4));
+  stat$ncu = ifelse(n < n_min, NA, 100*round(midpnt + bound, 4));
 
-  return(c(ncl, val, ncu));
+  return(stat);
 }
 
 ########################################################################
@@ -195,21 +199,25 @@ get_mean_ci = function(d) {
 
   # Compute the standard error
   s = Compute_STDerr_from_mean(d, "ML");
-  if(length(s) > 1 && s[2] == 0) { stderr = round(zval*s[1], 1); }
-  else                           { stderr = 0;                   }
+  if(length(s) > 1 && s[2] == 0 && sum(d != 0) >= n_min) {
+    stderr = round(zval*s[1], 1); }
+  else {
+    stderr = 0;
+  }
 
   # Compute the statistic and confidence interval
-  val  = mean(d, na.rm=TRUE);
-  ncl  = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
-  ncu  = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
+  stat     = c();
+  stat$val = mean(d, na.rm=TRUE);
+  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val - stderr, 1));
+  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val + stderr, 1));
 
   # Compute the p-value
-  count    = sum(!is.na(d));
-  df       = count - 1;
-  ss_pval  = 0.0 - abs(val/s[1]);
-  pval     = round(1 - 2*pt(ss_pval, df), 3);
+  count     = sum(!is.na(d));
+  df        = count - 1;
+  ss_pval   = 0.0 - abs(stat$val/s[1]);
+  stat$pval = round(1 - 2*pt(ss_pval, df), 3);
 
-  return(c(ncl, val, ncu, pval));
+  return(stat);
 }
 
 ########################################################################
@@ -222,21 +230,25 @@ get_median_ci = function(d) {
 
   # Compute the standard error
   s = Compute_STDerr_from_median(d, "ML");
-  if(length(s) > 1 && s[2] == 0) { stderr = round(zval*s[1], 1); }
-  else                           { stderr = 0;                   }
+  if(length(s) > 1 && s[2] == 0 && sum(d != 0) >= n_min) {
+    stderr = round(zval*s[1], 1); }
+  else {
+    stderr = 0;
+  }
 
   # Compute the statistic and confidence interval
-  val  = median(d, na.rm=TRUE);
-  ncl  = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
-  ncu  = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
+  stat     = c();
+  stat$val = median(d, na.rm=TRUE);
+  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val - stderr, 1));
+  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val + stderr, 1));
 
   # Compute the p-value
-  count    = sum(!is.na(d));
-  df       = count - 1;
-  ss_pval  = 0.0 - abs(val/s[1]);
-  pval     = round(1 - 2*pt(ss_pval, df), 3);
+  count     = sum(!is.na(d));
+  df        = count - 1;
+  ss_pval   = 0.0 - abs(stat$val/s[1]);
+  stat$pval = round(1 - 2*pt(ss_pval, df), 3);
 
-  return(c(ncl, val, ncu, pval));
+  return(stat);
 }
 
 ########################################################################
@@ -357,7 +369,7 @@ plot_time_series = function(dep, plot_type,
   cat("Plotting", plot_type, "time series by", series, "\n");
 
   # Open the output device
-  cat(paste("Creating file:", out_file, "\n"));
+  cat(paste("Creating image file:", out_file, "\n"));
   bitmap(out_file, type=img_fmt,
          height=img_hgt, width=img_wdth, res=img_res);
 
@@ -433,6 +445,9 @@ plot_time_series = function(dep, plot_type,
 
 plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
 
+  # Only generate a log file for boxplots
+  do_log = (log_flag == TRUE && plot_type == boxplot_str);
+
   # Draw a reference line at 0
   abline(h=0, lty=3, lwd=2.0);
 
@@ -455,35 +470,63 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
     # Add boxplots or scatter plots for each lead time
     for(lead in lead_list) {
 
+      # Get data for the current lead time
+      data = subset(series_data, series_data$LEAD_HR == lead &
+                    !is.na(series_data$PLOT));
+
       # Scatter plot
-      if(plot_type == scatter_str ||
-         sum(!is.na(series_data$PLOT[series_data$LEAD_HR==lead])) < n_min) {
+      if(plot_type == scatter_str || sum(!is.na(data$PLOT)) < n_min) {
 
-         # Create a scatter plot
-         points(rep(lead+horz[i],
-                length(series_data$PLOT[series_data$LEAD_HR==lead])),
-                series_data$PLOT[series_data$LEAD_HR==lead],
-                pch=1, col=color);
-       }
-       # Boxplot
-       else if(plot_type == boxplot_str) {
+        # Create a scatter plot
+        points(rep(lead+horz[i], length(data$PLOT)), data$PLOT,
+               pch=1, col=color);
+      }
+      # Boxplot
+      else if(plot_type == boxplot_str) {
 
-         # Set the boxplot color
-         bxp_col = ifelse(color == "black", "white", color);
-         if(color == "black") { bxp_col = "white"; }
-         else                 { bxp_col = color;   }
+        # Set the boxplot color
+        bxp_col = ifelse(color == "black", "white", color);
+        if(color == "black") { bxp_col = "white"; }
+        else                 { bxp_col = color;   }
 
-         # Create a boxplot
-         b = boxplot(series_data$PLOT[series_data$LEAD_HR==lead],
-                     add=TRUE, notch=TRUE, boxwex=1.5, outpch=1, outcex=1.0,
-                     at=lead+horz[i], xaxt="n", yaxt="n", col=bxp_col,
-                     varwidth=TRUE);
-       }
+        # Create a boxplot
+        b = boxplot(data$PLOT,
+                    add=TRUE, notch=TRUE, boxwex=1.5,
+                    outpch=1, outcex=1.0,
+                    at=lead+horz[i], xaxt="n", yaxt="n", col=bxp_col,
+                    varwidth=TRUE);
 
-       # Plot the mean value
-       points(lead+horz[i],
-              mean(series_data$PLOT[series_data$LEAD_HR==lead], na.rm=TRUE),
-              pch=8);
+        # Store logging information
+        if(do_log) {
+
+          if(!exists("log_data")) log_data = c();
+
+          # Sort the unique outlier values
+          for(outlier in sort(unique(b$out), decreasing=TRUE)) {
+
+            # Get the row(s) where this value appears
+            for(row in which(data$PLOT == outlier)) {
+
+              # Log boxplot outlier information:
+              #   lead hour, model name, storm ID, initialization time,
+              #   dependent variable, outlier value
+              outlier_info = c(lead,
+                               series_list[i],
+                               as.character(data$STORM_ID)[row],
+                               as.character(data$INIT)[row],
+                               out_file_dep,
+                               data$PLOT[row]);
+
+              # Store the log data
+              log_data = rbind(log_data, outlier_info);
+
+            } # end for row
+          } # end for outlier
+        } # end if do_log
+      }
+
+      # Plot the mean value
+      points(lead+horz[i], mean(data$PLOT, na.rm=TRUE), pch=8);
 
     } # end for lead
     
@@ -502,6 +545,15 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
          lwd=c(rep(2, n_series),NA),
          pch=c(rep(NA,n_series),8),
          bty="n");
+
+  # Write the log data out to the log file
+  if(do_log) {
+    cat(paste("Writing log file:", log_file, "\n"));
+    write.table(log_data, file=log_file, sep=',',
+                row.names=FALSE, quote=FALSE,
+                col.names=c("LEAD_HR", "AMODEL", "STORM_ID", "INIT",
+                            "VARIABLE", "OUTLIER"));
+  }
 }
 
 ########################################################################
@@ -537,10 +589,6 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
     # Compute statistics plus CI's for each lead time
     stat_val = stat_ncl = stat_ncu = rep(NA, length(lead_list));
 
-    # Construct a table of logging information
-    if(do_log) log_data = data.frame(row.names=c("LEAD_HR", "DIFF",
-                                                 "PERCENT", "P_VALUE"));
-
     # Prepare the data for each lead time
     for(j in 1:length(lead_list)) {
 
@@ -556,14 +604,35 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
       else                      { s = get_median_ci(data$PLOT); }
 
       # Store stats for this lead time
-      stat_ncl[j] = s[1];
-      stat_val[j] = s[2];
-      stat_ncu[j] = s[3];
+      stat_ncl[j] = s$ncl;
+      stat_val[j] = s$val;
+      stat_ncu[j] = s$ncu;
 
       # Store logging information
-      if(do_log && !is.na(s[2])) {
-        # JHG, need to compute percent
-        log_data = cbind(log_data, c(lead_list[j], s[2], NA, s[4]));
+      if(do_log && !is.na(stat_val[j])) {
+
+        # Construct a table of logging information
+        if(!exists("log_data")) {
+          log_data = data.frame(row.names=c("LEAD_HR", "COUNT", "NONZERO",
+                                            "STAT", "PC", "PVAL"));
+        }
+
+        # Get the reference statistic
+        if(plot_type == mean_str) {
+          stat_ref = mean(data$REF, na.rm=TRUE);
+        }
+        else {
+          stat_ref = median(data$REF, na.rm=TRUE);
+        }
+
+        # Log the lead time, statistic, percent change, and p-value
+        log_data = cbind(log_data, c(
+                     lead_list[j],
+                     sum(!is.na(data$PLOT)),
+                     sum(!is.na(data$PLOT) & data$PLOT != 0),
+                     round(stat_val[j], 3),
+                     paste(round(100*stat_val[j]/stat_ref, 0), "%", sep=''),
+                     s$pval));
       }
 
     } # end for j
@@ -595,7 +664,12 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
          lwd=rep(2, n_series),
          pch=8, bty="n");
 
-  # JHG: Write the log file
+  # Write the log data out to the log file
+  if(do_log) {
+    cat(paste("Writing log file:", log_file, "\n"));
+    write.table(log_data, file=log_file, sep=',',
+                row.names=FALSE, col.names=FALSE, quote=FALSE);
+  }
 }
 
 ########################################################################
@@ -662,9 +736,9 @@ plot_relperf = function(dep, horz, vert, color_list) {
       s = get_prop_ci(n_cur, n_tot);
 
       # Store stats for this lead time
-      stat_ncl[j] = s[1];
-      stat_val[j] = s[2];
-      stat_ncu[j] = s[3];
+      stat_ncl[j] = s$ncl;
+      stat_val[j] = s$val;
+      stat_ncu[j] = s$ncu;
 
     } # end for j
 
@@ -751,9 +825,9 @@ plot_rank = function(dep, horz, vert, color_list) {
       s = get_prop_ci(n_cur, n_tot);
 
       # Store stats for this lead time
-      stat_ncl[j] = s[1];
-      stat_val[j] = s[2];
-      stat_ncu[j] = s[3];
+      stat_ncl[j] = s$ncl;
+      stat_val[j] = s$val;
+      stat_ncu[j] = s$ncu;
 
       # Compute the RANK_MIN value for the first and last series
       if(i == 1 || i == n_series) {
@@ -824,75 +898,4 @@ plot_valid_counts = function(data, color, vert) {
   # Plot valid counts on the top axis
   axis(3, at=lead_list, tick=FALSE, labels=n,
        padj=vert, cex.axis=0.75, col.axis=color);
-}
-
-########################################################################
-#
-# Compute outlier case info for each lead time.
-#
-########################################################################
-
-boxplot_outlier = function(a, b, c, d, e, f) {
-
-   a_tmp  = unique(a)
-   a_stuq = sort(a_tmp, decreasing = TRUE)
-
-   lines_onePlus = -1
-   len_b_out = length(a_stuq)
-   for(p in 1:length(a_stuq)) {
-      row_ind_mNUM_StormList <- which(b[,j+2]==a_stuq[p])
-      len_ind_mNUM_StormList = length(row_ind_mNUM_StormList)
-      lines_onePlus = lines_onePlus + len_ind_mNUM_StormList
-   }
-   lines = lines_onePlus + len_b_out*2
-   cat(paste(lines, c, d,e[j],f,"(outlier values and case info)"))
-   cat(paste("\n"))
-   for(p in 1:length(a_stuq)) {
-      row_ind_mNUM_StormList <- which(b[,j+2]==a_stuq[p])
-      print(b[row_ind_mNUM_StormList,c(1,2,j+2)])
-      cat(paste("\n"))
-   }
-
-}
-
-boxplot_outlier_mdiff = function(a, b, c, d, e, f, g, h, i, k) {
-
-   a_tmp  = unique(a)
-   a_stuq = sort(a_tmp, decreasing = TRUE)
-
-   lines_onePlus = -1
-   lines_mNUM1 = -1
-   lines_mNUM2 = -1
-   len_b_out = length(a_stuq)
-   for(p in 1:length(a_stuq)) {
-#       row_ind_mNUM1_StormList <- which(g[,j+2]==a[p])
-#       len_ind_mNUM1_StormList = length(row_ind_mNUM1_StormList)
-#       row_ind_mNUM2_StormList <- which(i[,j+2]==a[p])
-#       len_ind_mNUM2_StormList = length(row_ind_mNUM2_StormList)
-#       lines_onePlus = lines_onePlus + len_ind_mNUM1_StormList + len_ind_mNUM2_StormList
-#       lines_mNUM1= lines_mNUM1 + len_ind_mNUM1_StormList
-#       lines_mNUM2= lines_mNUM2 + len_ind_mNUM2_StormList
-      row_ind_StormList <- which(b[,j]==a_stuq[p])
-      len_ind_StormList = length(row_ind_StormList)
-      lines_onePlus = lines_onePlus + len_ind_StormList*2
-   }
-   lines = lines_onePlus + len_b_out*5
-   cat(paste(lines, h,"-",k,"= mdiff", d,e[j],f,"(outlier values and case info)"))
-   cat(paste("\n"))
-   for(p in 1:length(a_stuq)) {
-      lines_onePlus = -1
-      row_ind_StormList <- which(b[,j]==a_stuq[p])
-      len_ind_StormList = length(row_ind_StormList)
-      lines_onePlus = lines_onePlus + len_ind_StormList*2
-      lines_indv = lines_onePlus + 4
-
-      row_ind_StormList <- which(b[,j]==a_stuq[p])
-      cat(paste(lines_indv,"!",p, "Individual Outlier Line Count"))
-      cat(paste("\n"))
-      print(g[row_ind_StormList,c(1,2,j+2)])
-      print(i[row_ind_StormList,c(1,2,j+2)])
-      print(b[row_ind_StormList,c(j)])
-      cat(paste("\n"))
-   }
-
 }

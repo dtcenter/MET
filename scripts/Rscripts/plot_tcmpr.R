@@ -422,7 +422,7 @@ for(i in 1:length(dep_list)) {
 
   # Get the data to be plotted
   col       = get_dep_column(dep_list[i]);
-  tcst$PLOT = col$val
+  tcst$PLOT = col$val;
 
   # Remove special characters from output file name
   out_file_dep = sub('[)]', '', sub('[(]', '_', dep_list[i]));
