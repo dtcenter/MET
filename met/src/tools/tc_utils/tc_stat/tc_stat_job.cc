@@ -53,7 +53,7 @@ static const char *ArgsDelim = ",";
 TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    TCStatJob *job = (TCStatJob *) 0;
    TCStatJobType type = NoTCStatJobType;
-   
+
    // Determine the TCStatJobType
    type = string_to_tcstatjobtype(type_str);
 
@@ -67,7 +67,7 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
 
       case TCStatJobType_Summary:
          job = new TCStatJobSummary;
-         break;         
+         break;
 
       case NoTCStatJobType:
       default:
@@ -107,14 +107,14 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
       // Build list of unknown args
       for(i=0; i<a.n_elements()-1; i++) err_str << a[i] << " ";
       err_str << a[a.n_elements()-1];
-     
+
       mlog << Error
            << "\nTCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) -> "
            << "unsupported job command options \""
            << err_str << "\".\n\n";
       exit(1);
    }
-   
+
    return(job);
 }
 
@@ -159,7 +159,7 @@ TCStatJob & TCStatJob::operator=(const TCStatJob &j) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::init_from_scratch() {
-   
+
    DumpOut = (ofstream *) 0;
    JobOut  = (ofstream *) 0;
 
@@ -218,7 +218,7 @@ void TCStatJob::clear() {
    InitStrName.clear();
    InitStrVal.clear();
    EventEqualCases.clear();
-   
+
    DumpFile.clear();
    close_dump_file();
    JobOut = (ofstream *) 0;
@@ -235,7 +235,7 @@ void TCStatJob::clear() {
 
    OutInitMask.clear();
    OutValidMask.clear();
-   
+
    return;
 }
 
@@ -244,7 +244,7 @@ void TCStatJob::clear() {
 void TCStatJob::assign(const TCStatJob & j) {
 
    clear();
-   
+
    JobType = j.JobType;
 
    AModel = j.AModel;
@@ -292,7 +292,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    MatchPoints = j.MatchPoints;
    EventEqual = j.EventEqual;
    EventEqualCases = j.EventEqualCases;
-   
+
    OutInitMask = j.OutInitMask;
    OutValidMask = j.OutValidMask;
 
@@ -324,34 +324,34 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "StormName ...\n";
    StormName.dump(out, depth + 1);
-   
+
    out << prefix << "InitBeg = " << unix_to_yyyymmdd_hhmmss(InitBeg) << "\n";
    out << prefix << "InitEnd = " << unix_to_yyyymmdd_hhmmss(InitEnd) << "\n";
 
    out << prefix << "InitInc ...\n";
    InitInc.dump(out, depth + 1);
-   
+
    out << prefix << "InitExc ...\n";
    InitExc.dump(out, depth + 1);
-   
+
    out << prefix << "InitHour ...\n";
    InitHour.dump(out, depth + 1);
-   
+
    out << prefix << "Lead ...\n";
-   Lead.dump(out, depth + 1);   
-   
+   Lead.dump(out, depth + 1);
+
    out << prefix << "ValidBeg = " << unix_to_yyyymmdd_hhmmss(ValidBeg) << "\n";
    out << prefix << "ValidEnd = " << unix_to_yyyymmdd_hhmmss(ValidEnd) << "\n";
 
    out << prefix << "ValidInc ...\n";
    ValidInc.dump(out, depth + 1);
-   
+
    out << prefix << "ValidExc ...\n";
    ValidExc.dump(out, depth + 1);
-   
+
    out << prefix << "ValidHour ...\n";
    ValidHour.dump(out, depth + 1);
-   
+
    out << prefix << "InitMask ...\n";
    InitMask.dump(out, depth + 1);
 
@@ -363,7 +363,7 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "TrackWatchWarn ...\n";
    TrackWatchWarn.dump(out, depth + 1);
-   
+
    out << prefix << "ColumnThreshName ...\n";
    ColumnThreshName.dump(out, depth + 1);
 
@@ -429,7 +429,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
    if(TrackWatchWarn.n_elements() > 0 &&
       !TrackWatchWarn.has(watchwarntype_to_string(tpi.track_watch_warn())))
       keep = false;
-  
+
    // Check for the special string ALL:
    //    HUWARN, TSWARN, HUWATCH, TSWATCH
    if(TrackWatchWarn.has("ALL") &&
@@ -444,7 +444,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
 
    // Get the index of the track initialization point
    i_init = tpi.i_init();
-   
+
    // If ADECK initialization filter is requested, check for a valid init time
    if((InitThreshName.n_elements() > 0 ||
        InitStrName.n_elements()    > 0 ||
@@ -453,10 +453,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
       keep = false;
       n.RejInitThresh += tpi.n_points();
    }
-   
+
    // Check InitThresh
    if(keep == true) {
-     
+
       // Loop through the numeric init column thresholds
       for(i=0; i<InitThreshName.n_elements(); i++) {
 
@@ -474,7 +474,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
 
    // Check InitStr
    if(keep == true) {
-  
+
       // Loop through the column string matching
       for(i=0; i<InitStrName.n_elements(); i++) {
 
@@ -530,7 +530,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    double v_dbl, alat, alon, blat, blon;
    ConcatString v_str;
    StringArray sa;
-   
+
    // Check TC-STAT header columns
    if(AModel.n_elements() > 0 &&
      !AModel.has(line.amodel()))        { keep = false; n.RejAModel++;    }
@@ -640,7 +640,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       keep = false;
       n.RejEventEqual++;
    }
-   
+
    // Check OutValidMask
    if(keep == true && OutValidMask.n_points() > 0) {
 
@@ -778,7 +778,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::set_mask(MaskPoly &p, const char *file) {
-  
+
    ConcatString poly_file = replace_path(file);
    p.clear();
    p.load(poly_file);
@@ -837,21 +837,21 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
    // Determine if we need to write a header row
    if(DumpOut->tellp() == 0) hdr_row = 1;
    else                      hdr_row = 0;
-   
+
    // Initialize the output AsciiTable
    out_at.set_size(tpi.n_points() + hdr_row,
                    n_tc_header_cols + n_tc_mpr_cols);
 
    // Write the TCMPR header row
    write_tc_mpr_header_row(1, out_at, 0, 0);
-   
+
    // Setup the output AsciiTable
    out_at.set_table_just(LeftJust);
    out_at.set_precision(default_precision);
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
    out_at.set_delete_trailing_blank_rows(1);
-     
+
    // Setup header columns
    tchc.clear();
    tchc.set_adeck_model(tpi.adeck().technique());
@@ -860,7 +860,7 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
    tchc.set_basin(tpi.bdeck().basin());
    tchc.set_cyclone(tpi.bdeck().cyclone());
    tchc.set_storm_name(tpi.bdeck().storm_name());
-   
+
    if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
    else                            tchc.set_init_mask(na_str);
    if(OutValidMask.n_points() > 0) tchc.set_valid_mask(OutValidMask.name());
@@ -872,7 +872,7 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
 
    // Write the AsciiTable to the file
    *DumpOut << out_at;
-   
+
    return;
 }
 
@@ -964,7 +964,7 @@ ConcatString TCStatJob::serialize() const {
       s << "-out_valid_mask " << OutValidMask.file_name() << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
-   
+
    return(s);
 }
 
@@ -974,7 +974,7 @@ void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
 
    // Add the input file list
    TCSTFiles.add_files(file_list);
-  
+
    // Apply the event equalization logic to build a list of common cases
    if(EventEqual == true) process_event_equal();
 
@@ -998,7 +998,7 @@ void TCStatJob::process_event_equal() {
    // Event equalization case map
    map<ConcatString,StringArray,cs_cmp> case_map;
    map<ConcatString,StringArray,cs_cmp>::iterator it;
-   
+
    mlog << Debug(3)
         << "Applying event equalization logic.\n";
 
@@ -1032,7 +1032,7 @@ void TCStatJob::process_event_equal() {
 
    // Loop over the map entries and build a list of common cases
    for(it = case_map.begin(); it != case_map.end(); it++) {
-     
+
       // Initialize to the first map entry
       if(it == case_map.begin()) {
          EventEqualCases = it->second;
@@ -1055,7 +1055,7 @@ void TCStatJob::process_event_equal() {
            << "[Case " << i+1 << " of " << EventEqualCases.n_elements()
            << "] " << EventEqualCases[i] << "\n";
    }
-        
+
    return;
 }
 
@@ -1063,7 +1063,7 @@ void TCStatJob::process_event_equal() {
 
 void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    int i, n_rej;
-  
+
    // Check for no points
    if(tpi.n_points() == 0) return;
 
@@ -1122,7 +1122,7 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
 
    // Subset the points marked for retention
    tpi = tpi.keep_subset();
-   
+
    return;
 }
 
@@ -1169,7 +1169,7 @@ TCStatJobFilter & TCStatJobFilter::operator=(const TCStatJobFilter &j) {
 void TCStatJobFilter::init_from_scratch() {
 
    TCStatJob::init_from_scratch();
-  
+
    clear();
 
    return;
@@ -1180,7 +1180,7 @@ void TCStatJobFilter::init_from_scratch() {
 void TCStatJobFilter::clear() {
 
    TCStatJob::clear();
-   
+
    JobType = TCStatJobType_Filter;
 
    return;
@@ -1217,31 +1217,33 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    if(EventEqual == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
            << "Event equalization found no common cases.\n";
-      return;
    }
+   // Otherwise, process the track data
+   else {
 
-   // Rewind to the beginning of the track pair input
-   TCSTFiles.rewind();
+      // Rewind to the beginning of the track pair input
+      TCSTFiles.rewind();
 
-   // Process each of the track pairs
-   while(TCSTFiles >> tpi) {
+      // Process each of the track pairs
+      while(TCSTFiles >> tpi) {
 
-      // Process the track pair down to points to be used
-      subset_track_pair(tpi, n);
+         // Process the track pair down to points to be used
+         subset_track_pair(tpi, n);
 
-      // Write out the retained lines
-      if(tpi.n_points() > 0) {
+         // Write out the retained lines
+         if(tpi.n_points() > 0) {
 
-         mlog << Debug(4)
-              << "Processing track pair: " << tpi.serialize() << "\n";
+            mlog << Debug(4)
+                 << "Processing track pair: " << tpi.serialize() << "\n";
 
-         if(DumpOut) dump_track_pair(tpi);
-      }
-   } // end while
+            if(DumpOut) dump_track_pair(tpi);
+         }
+      } // end while
+   } // end else
 
    // Close the dump file
    if(DumpOut) close_dump_file();
-   
+
    // Process the filter output
    if(JobOut) do_output(*JobOut);
    else       do_output(cout);
@@ -1304,12 +1306,12 @@ TCStatJobSummary & TCStatJobSummary::operator=(const TCStatJobSummary &j) {
 void TCStatJobSummary::init_from_scratch() {
 
    TCStatJob::init_from_scratch();
-   
+
    // Ignore case when performing comparisons
    ReqColumn.set_ignore_case(1);
    Column.set_ignore_case(1);
    CaseColumn.set_ignore_case(1);
-   
+
    clear();
 
    return;
@@ -1331,7 +1333,7 @@ void TCStatJobSummary::clear() {
    // Set to default value
    OutAlpha  = default_tc_alpha;
    FSPThresh = default_fsp_thresh;
-   
+
    return;
 }
 
@@ -1366,7 +1368,7 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
 
       // Point at the current entry
       c = a[i];
-      
+
       // Check for a job command option
       if(c[0] != '-') {
          b.add(a[i]);
@@ -1462,7 +1464,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
            << serialize() << "\n\n";
       exit(1);
    }
-   
+
    // Call the parent's do_job() to do event equalization
    TCStatJob::do_job(file_list, n);
 
@@ -1470,30 +1472,32 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    if(EventEqual == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
            << "Event equalization found no common cases.\n";
-      return;
    }
-   
-   // Rewind to the beginning of the track pair input
-   TCSTFiles.rewind();
+   // Otherwise, process the track data
+   else {
 
-   // Process each of the track pairs
-   while(TCSTFiles >> tpi) {
+      // Rewind to the beginning of the track pair input
+      TCSTFiles.rewind();
 
-      // Process the track pair down to points to be used
-      subset_track_pair(tpi, n);
-      
-      // Write out the retained lines
-      if(tpi.n_points() > 0) {
-        
-         mlog << Debug(4)
-              << "Processing track pair: " << tpi.serialize() << "\n";
+      // Process each of the track pairs
+      while(TCSTFiles >> tpi) {
 
-         // Process the track pair info for the summary job
-         process_track_pair(tpi);
-              
-         if(DumpOut) dump_track_pair(tpi);
-      }
-   } // end while
+         // Process the track pair down to points to be used
+         subset_track_pair(tpi, n);
+
+         // Write out the retained lines
+         if(tpi.n_points() > 0) {
+
+            mlog << Debug(4)
+                 << "Processing track pair: " << tpi.serialize() << "\n";
+
+            // Process the track pair info for the summary job
+            process_track_pair(tpi);
+
+            if(DumpOut) dump_track_pair(tpi);
+         }
+      } // end while
+   } // end else
 
    // Close the dump file
    if(DumpOut) close_dump_file();
@@ -1517,10 +1521,10 @@ void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
 
    // Initialize the map
    cur_map.clear();
-     
+
    // Loop over TCStatLines and construct a summary map
    for(i=0; i<tpi.n_lines(); i++) {
-        
+
       // Add summary info to the current map
       for(j=0; j<Column.n_elements(); j++) {
 
@@ -1551,7 +1555,7 @@ void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
             else {
                key << ":" << cur;
             }
-            
+
          } // end for k
 
          // Add map entry for this key, if necessary
@@ -1641,7 +1645,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    // Set up CIInfo objects
    mean_ci.allocate_n_alpha(1);
    stdev_ci.allocate_n_alpha(1);
-   
+
    // Initialize row and column indices
    r = c = 0;
 
@@ -1653,14 +1657,14 @@ void TCStatJobSummary::do_output(ostream &out) {
    for(i=0; i<CaseColumn.n_elements(); i++) {
       out_at.set_entry(r, c++, CaseColumn[i]);
    }
-  
+
    out_at.set_entry(r, c++, "TOTAL");
    out_at.set_entry(r, c++, "VALID");
    out_at.set_entry(r, c++, "MEAN");
    out_at.set_entry(r, c++, "MEAN_NCL");
    out_at.set_entry(r, c++, "MEAN_NCU");
    out_at.set_entry(r, c++, "STDEV");
-   out_at.set_entry(r, c++, "MIN");   
+   out_at.set_entry(r, c++, "MIN");
    out_at.set_entry(r, c++, "P10");
    out_at.set_entry(r, c++, "P25");
    out_at.set_entry(r, c++, "P50");
@@ -1677,7 +1681,7 @@ void TCStatJobSummary::do_output(ostream &out) {
 
    // Compute the frequency of superior performance
    compute_fsp(fsp_total, fsp_best, fsp_ties);
-   
+
    // Loop over the map entries and popluate the output table
    for(it=SummaryMap.begin(),r=1; it!=SummaryMap.end(); it++,r++) {
 
@@ -1719,22 +1723,22 @@ void TCStatJobSummary::do_output(ostream &out) {
       else {
          tind = dsec = bad_data_int;
       }
-                                
+
       // Write the table row
-      out_at.set_entry(r, c++, "SUMMARY:");      
+      out_at.set_entry(r, c++, "SUMMARY:");
       out_at.set_entry(r, c++, sa[0]);
-      
+
       // Write case column values
       for(i=1; i<sa.n_elements(); i++)
          out_at.set_entry(r, c++, sa[i]);
-      
+
       out_at.set_entry(r, c++, it->second.Val.n_elements());
       out_at.set_entry(r, c++, v.n_elements());
       out_at.set_entry(r, c++, mean_ci.v);
       out_at.set_entry(r, c++, mean_ci.v_ncl[0]);
       out_at.set_entry(r, c++, mean_ci.v_ncu[0]);
       out_at.set_entry(r, c++, stdev_ci.v);
-      out_at.set_entry(r, c++, v.min());      
+      out_at.set_entry(r, c++, v.min());
       out_at.set_entry(r, c++, v.percentile_array(0.10));
       out_at.set_entry(r, c++, v.percentile_array(0.25));
       out_at.set_entry(r, c++, v.percentile_array(0.50));
@@ -1785,7 +1789,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
       best.add(0);
       ties.add(0);
    } // end for it
-     
+
    // Only compute FSP when AMODEL is in the case information
    if(!CaseColumn.has("AMODEL")) {
       mlog << Debug(4)
@@ -1805,12 +1809,12 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
       else {
          case_list = intersection(case_list, it->second.Hdr);
       }
-   } // end for it   
+   } // end for it
 
    mlog << Debug(4)
         << "Computing frequency of superior performance for "
         << Column.n_elements() << " columns and "
-        << case_list.n_elements() << " cases.\n";   
+        << case_list.n_elements() << " cases.\n";
 
    // Loop over the columns being summarized
    for(i=0; i<Column.n_elements(); i++) {
@@ -1837,7 +1841,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 
             // Loop over the values for this entry
             for(k=0; k<it->second.Hdr.n_elements(); k++) {
-              
+
                // Check if entry matches the current case
                if(strncasecmp(Column[i], it->first,
                               strlen(Column[i])) != 0 ||
@@ -1880,7 +1884,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 
          // Loop over the SummaryMap to update counts
          for(it=SummaryMap.begin(),n=0; it!=SummaryMap.end(); it++,n++) {
-           
+
             // Check if entry has the current case
             if(strncasecmp(Column[i], it->first,
                            strlen(Column[i])) != 0 ||
@@ -1893,13 +1897,13 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
             // See if this entry is the top performer
             if(strcmp(best_mod, it->second.AModel[0]) == 0)
                best.set(n, best[n]+1);
-            
+
             // See if there was a tie
             if(strcmp(best_mod, "TIE") == 0)
                ties.set(n, ties[n]+1);
 
          } // end for it
-              
+
       } // end for j
    } // end for i
 
@@ -1964,7 +1968,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    dinit  = init[1] - init[0];
    dlead  = nint(lead[1] - lead[0]);
    dvalid = valid[1] - valid[0];
-   
+
    // Loop over the entries to determine the time spacing
    for(i=0; i<init.n_elements()-1; i++) {
 
@@ -1991,7 +1995,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
          return(false);
       }
    }
-    
+
    // Check for one fixed and the others varying by a non-zero amount
    if(dinit == 0 && dlead == dvalid && dlead > 0) {
       dsec = dlead;
@@ -2032,7 +2036,7 @@ int compute_time_to_indep(const NumArray &val, int ds) {
    n_abv = n_run_abv = 0;
    n_bel = n_run_bel = 0;
    prv_abv = false;
-   
+
    // Count the number of values above and belwo the mean
    for(i=0; i<val.n_elements(); i++) {
 
@@ -2057,14 +2061,14 @@ int compute_time_to_indep(const NumArray &val, int ds) {
       prv_abv = cur_abv;
 
    } // end for i
-     
+
    // Calculate expected number of runs
    exp_runs = 1.0 + 2.0*(n_abv * n_bel)/(n_abv + n_bel);
 
    // Calculate effective sample size, time to independence
    eff_size = val.n_elements()*(n_run_abv + n_run_bel)/exp_runs;
    tind     = ds*val.n_elements()/eff_size;
-   
+
    return(nint(tind));
 }
 
@@ -2090,7 +2094,7 @@ void add_string(const char *c, StringArray &sa) {
    // Parse input list into StringArray
    cs = c;
    sa.add(cs.split(ArgsDelim));
-   
+
    return;
 }
 

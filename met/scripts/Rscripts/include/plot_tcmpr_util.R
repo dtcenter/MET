@@ -199,11 +199,17 @@ get_mean_ci = function(d) {
   else                           { stderr = 0;                   }
 
   # Compute the statistic and confidence interval
-  val = mean(d, na.rm=TRUE);
-  ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
-  ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
+  val  = mean(d, na.rm=TRUE);
+  ncl  = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
+  ncu  = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
 
-  return(c(ncl, val, ncu));
+  # Compute the p-value
+  count    = sum(!is.na(d));
+  df       = count - 1;
+  ss_pval  = 0.0 - abs(val/s[1]);
+  pval     = round(1 - 2*pt(ss_pval, df), 3);
+
+  return(c(ncl, val, ncu, pval));
 }
 
 ########################################################################
@@ -220,11 +226,17 @@ get_median_ci = function(d) {
   else                           { stderr = 0;                   }
 
   # Compute the statistic and confidence interval
-  val = median(d, na.rm=TRUE);
-  ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
-  ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
+  val  = median(d, na.rm=TRUE);
+  ncl  = ifelse(sum(!is.na(d)) < n_min, NA, round(val - stderr, 1));
+  ncu  = ifelse(sum(!is.na(d)) < n_min, NA, round(val + stderr, 1));
 
-  return(c(ncl, val, ncu));
+  # Compute the p-value
+  count    = sum(!is.na(d));
+  df       = count - 1;
+  ss_pval  = 0.0 - abs(val/s[1]);
+  pval     = round(1 - 2*pt(ss_p_val, df), 3);
+
+  return(c(ncl, val, ncu, pval));
 }
 
 ########################################################################
@@ -265,7 +277,7 @@ get_yrange = function(plot_type) {
         else                      { cur = get_median_ci(data$PLOT); }
 
         # Append the current values to the list
-        if(ci_flag) { yvals = c(yvals, cur);    }
+        if(ci_flag) { yvals = c(yvals, cur[1:3]);    }
         else        { yvals = c(yvals, cur[2]); }
 
       } # end for j
@@ -385,7 +397,8 @@ plot_time_series = function(dep, plot_type,
   axis(1, at=lead_list, tick=TRUE, labels=xlab);
 
   # Get the list of colors to be used
-  color_list = eval(parse(text=paste(tolower(plot_type), "_color_list", sep='')));
+  color_list = eval(parse(text=paste(tolower(plot_type),
+                                     "_color_list", sep='')));
 
   # Check for too few colors
   if(n_series > length(color_list)) {
@@ -395,12 +408,10 @@ plot_time_series = function(dep, plot_type,
   }
 
   # Populate the plot based on plot type
-  if(plot_type == boxplot_str ||
-     plot_type == scatter_str) {
+  if(plot_type == boxplot_str || plot_type == scatter_str) {
     plot_box_scatter(dep, plot_type, horz, vert, color_list);
   }
-  else if(plot_type == mean_str ||
-          plot_type == median_str) {
+  else if(plot_type == mean_str || plot_type == median_str) {
     plot_mean_median(dep, plot_type, horz, vert, color_list);
   }
   else if(plot_type == relperf_str) {
@@ -501,6 +512,9 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
 
 plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
 
+  # Only generate a log file for a single series of differences
+  do_log = (log_flag == TRUE && n_series == 1 && diff_flag[1] == TRUE);
+
   # Draw a reference line at 0
   abline(h=0, lty=3, lwd=2.0);
 
@@ -523,6 +537,10 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
     # Compute statistics plus CI's for each lead time
     stat_val = stat_ncl = stat_ncu = rep(NA, length(lead_list));
 
+    # Construct a table of logging information
+    if(do_log) log_data = data.frame(row.names=c("LEAD_HR", "DIFF",
+                                                 "PERCENT", "P_VALUE"));
+
     # Prepare the data for each lead time
     for(j in 1:length(lead_list)) {
 
@@ -541,6 +559,12 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
       stat_ncl[j] = s[1];
       stat_val[j] = s[2];
       stat_ncu[j] = s[3];
+
+      # Store logging information
+      if(do_log && !is.na(s[2])) {
+        # JHG, need to compute percent
+        log_data = cbind(log_data, c(lead_list[j], s[2], NA, s[4]));
+      }
 
     } # end for j
 
@@ -570,6 +594,8 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
          lty=rep(1, n_series),
          lwd=rep(2, n_series),
          pch=8, bty="n");
+
+  # JHG: Write the log file
 }
 
 ########################################################################
@@ -798,4 +824,75 @@ plot_valid_counts = function(data, color, vert) {
   # Plot valid counts on the top axis
   axis(3, at=lead_list, tick=FALSE, labels=n,
        padj=vert, cex.axis=0.75, col.axis=color);
+}
+
+########################################################################
+#
+# Compute outlier case info for each lead time.
+#
+########################################################################
+
+boxplot_outlier = function(a, b, c, d, e, f) {
+
+   a_tmp  = unique(a)
+   a_stuq = sort(a_tmp, decreasing = TRUE)
+
+   lines_onePlus = -1
+   len_b_out = length(a_stuq)
+   for(p in 1:length(a_stuq)) {
+      row_ind_mNUM_StormList <- which(b[,j+2]==a_stuq[p])
+      len_ind_mNUM_StormList = length(row_ind_mNUM_StormList)
+      lines_onePlus = lines_onePlus + len_ind_mNUM_StormList
+   }
+   lines = lines_onePlus + len_b_out*2
+   cat(paste(lines, c, d,e[j],f,"(outlier values and case info)"))
+   cat(paste("\n"))
+   for(p in 1:length(a_stuq)) {
+      row_ind_mNUM_StormList <- which(b[,j+2]==a_stuq[p])
+      print(b[row_ind_mNUM_StormList,c(1,2,j+2)])
+      cat(paste("\n"))
+   }
+
+}
+
+boxplot_outlier_mdiff = function(a, b, c, d, e, f, g, h, i, k) {
+
+   a_tmp  = unique(a)
+   a_stuq = sort(a_tmp, decreasing = TRUE)
+
+   lines_onePlus = -1
+   lines_mNUM1 = -1
+   lines_mNUM2 = -1
+   len_b_out = length(a_stuq)
+   for(p in 1:length(a_stuq)) {
+#       row_ind_mNUM1_StormList <- which(g[,j+2]==a[p])
+#       len_ind_mNUM1_StormList = length(row_ind_mNUM1_StormList)
+#       row_ind_mNUM2_StormList <- which(i[,j+2]==a[p])
+#       len_ind_mNUM2_StormList = length(row_ind_mNUM2_StormList)
+#       lines_onePlus = lines_onePlus + len_ind_mNUM1_StormList + len_ind_mNUM2_StormList
+#       lines_mNUM1= lines_mNUM1 + len_ind_mNUM1_StormList
+#       lines_mNUM2= lines_mNUM2 + len_ind_mNUM2_StormList
+      row_ind_StormList <- which(b[,j]==a_stuq[p])
+      len_ind_StormList = length(row_ind_StormList)
+      lines_onePlus = lines_onePlus + len_ind_StormList*2
+   }
+   lines = lines_onePlus + len_b_out*5
+   cat(paste(lines, h,"-",k,"= mdiff", d,e[j],f,"(outlier values and case info)"))
+   cat(paste("\n"))
+   for(p in 1:length(a_stuq)) {
+      lines_onePlus = -1
+      row_ind_StormList <- which(b[,j]==a_stuq[p])
+      len_ind_StormList = length(row_ind_StormList)
+      lines_onePlus = lines_onePlus + len_ind_StormList*2
+      lines_indv = lines_onePlus + 4
+
+      row_ind_StormList <- which(b[,j]==a_stuq[p])
+      cat(paste(lines_indv,"!",p, "Individual Outlier Line Count"))
+      cat(paste("\n"))
+      print(g[row_ind_StormList,c(1,2,j+2)])
+      print(i[row_ind_StormList,c(1,2,j+2)])
+      print(b[row_ind_StormList,c(j)])
+      cat(paste("\n"))
+   }
+
 }

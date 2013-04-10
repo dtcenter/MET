@@ -25,6 +25,8 @@
 ##         [-plot list]
 ##         [-rp_thresh string]
 ##         [-no_ee]
+##         [-no_ci]
+##         [-no_log]
 ##         [-save_data path]
 ##         [-save]
 ##
@@ -52,6 +54,7 @@
 ##                   plot.
 ##      "-no_ee"     to disable event equalization.
 ##      "-no_ci"     to disable confidence intervals.
+##      "-no_log"    to disable log file generation.
 ##      "-save_data" to save the filtered track data to a file instead
 ##                   of deleting it.
 ##      "-save"      to call save.image().
@@ -108,6 +111,7 @@ usage = function() {
   cat("        [-rp_thresh string]\n");
   cat("        [-no_ee]\n");
   cat("        [-no_ci]\n");
+  cat("        [-no_log]\n");
   cat("        [-save_data]\n");
   cat("        [-save]\n");
   cat("        where \"-lookin\"    is a list of files with TCMPR lines to be used.\n");
@@ -130,6 +134,7 @@ usage = function() {
   cat("                           meaningful differences for the relative performance plot.\n");
   cat("              \"-no_ee\"     to disable event equalization.\n");
   cat("              \"-no_ci\"     to disable confidence intervals.\n");
+  cat("              \"-no_log\"    to disable log file generation.\n");
   cat("              \"-save_data\" to save the filtered track data to a file instead of deleting it.\n");
   cat("              \"-save\"      to call save.image().\n\n");
 }
@@ -235,6 +240,8 @@ while(i <= length(args)) {
     event_equal = FALSE;
   } else if(args[i] == "-no_ci") {
     ci_flag = FALSE;
+  } else if(args[i] == "-no_log") {
+    log_flag = FALSE;
   } else if(args[i] == "-save_data") {
     save_data = args[i+1];
     i=i+1;
@@ -428,131 +435,123 @@ for(i in 1:length(dep_list)) {
                      paste(dep_list[i], " (", col$units,")", sep=''),
                      ylab_str);
 
-  # PLOT: Create time series of boxplots.
-  if(boxplot_str%in%plot_list == TRUE) {
-
-    # Set plotting strings
-    plot_title = ifelse(length(title_str) == 0,
-                        paste("Boxplots of\n", col$desc, "\nby",
-                              column_info[series, "DESCRIPTION"]),
-                        title_str);
+  # Loop over the list of plots
+  for(j in 1:length(plot_list)) {
   
-    # Build output file name
+    # Build output image and log file names
     out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_bplot.", img_ext, sep="");
+                     "_", tolower(plot_list[j]), ".", img_ext, sep="");
+    log_file = paste(outdir, "/", prefix, out_file_dep,
+                     "_", tolower(plot_list[j]), ".log", sep="");
 
-    # Do the boxplot
-    plot_time_series(dep_list[i], boxplot_str,
-                     plot_title, plot_sub, plot_ylab);
-  }
+    # PLOT: Create time series of boxplots.
+    if(plot_list[j] == boxplot_str) {
+
+      # Set plotting strings
+      plot_title = ifelse(length(title_str) == 0,
+                          paste("Boxplots of\n", col$desc, "\nby",
+                                column_info[series, "DESCRIPTION"]),
+                          title_str);
+
+      # Do the boxplot
+      plot_time_series(dep_list[i], plot_list[j],
+                       plot_title, plot_sub, plot_ylab);
+    }
   
-  # PLOT: Create time series of scatter plots.
-  if(scatter_str%in%plot_list == TRUE) {
+    # PLOT: Create time series of scatter plots.
+    else if(dep_list[j] == scatter_str) {
 
-    # Set plotting strings
-    plot_title = ifelse(length(title_str) == 0,
-                        paste("Scatter Plots of\n", col$desc, "\nby",
-                              column_info[series, "DESCRIPTION"]),
-                        title_str);
+      # Set plotting strings
+      plot_title = ifelse(length(title_str) == 0,
+                          paste("Scatter Plots of\n", col$desc, "\nby",
+                                column_info[series, "DESCRIPTION"]),
+                          title_str);
 
-    # Build output file name
-    out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_scatter.", img_ext, sep="");
-
-    # Do the scatter plot
-    plot_time_series(dep_list[i], scatter_str,
-                     plot_title, plot_sub, plot_ylab);
-  }
-
-  # PLOT: Create time series of means.
-  if(mean_str%in%plot_list == TRUE) {
-
-    # Set plotting strings
-    plot_title = ifelse(length(title_str) == 0,
-                        paste("Mean of\n", col$desc, "\nby",
-                              column_info[series, "DESCRIPTION"]),
-                        title_str);
-
-    # Build output file name
-    out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_mean.", img_ext, sep="");
-
-    # Do the mean plot
-    plot_time_series(dep_list[i], mean_str,
-                     plot_title, plot_sub, plot_ylab);
-  }
-
-  # PLOT: Create time series of medians.
-  if(median_str%in%plot_list == TRUE) {
-
-    # Set plotting strings
-    plot_title = ifelse(length(title_str) == 0,
-                        paste("Median of\n", col$desc, "\nby",
-                              column_info[series, "DESCRIPTION"]),
-                        title_str);
-
-    # Build output file name
-    out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_median.", img_ext, sep="");
-
-    # Do the median plot
-    plot_time_series(dep_list[i], median_str,
-                     plot_title, plot_sub, plot_ylab);
-  }
-
-  # PLOT: Create time series of relative performance.
-  if(relperf_str%in%plot_list == TRUE) {
-
-    # Set plotting strings
-    if(length(title_str) > 0) {
-      plot_title = title_str;
+      # Do the scatter plot
+      plot_time_series(dep_list[i], plot_list[j],
+                       plot_title, plot_sub, plot_ylab);
     }
-    else if(length(unique(rp_list)) == 1) {
-      plot_title = paste("Relative Performance of\n", col$desc,
-                         "\nDifference", rp_list[1], col$units, "by",
-                         column_info[series, "DESCRIPTION"]);
+
+    # PLOT: Create time series of means.
+    else if(plot_list[j] == mean_str) {
+
+      # Set plotting strings
+      plot_title = ifelse(length(title_str) == 0,
+                          paste("Mean of\n", col$desc, "\nby",
+                                column_info[series, "DESCRIPTION"]),
+                          title_str);
+
+      # Do the mean plot
+      plot_time_series(dep_list[i], plot_list[j],
+                       plot_title, plot_sub, plot_ylab);
     }
+
+    # PLOT: Create time series of medians.
+    else if(plot_list[j] == median_str) {
+
+      # Set plotting strings
+      plot_title = ifelse(length(title_str) == 0,
+                          paste("Median of\n", col$desc, "\nby",
+                                column_info[series, "DESCRIPTION"]),
+                          title_str);
+
+      # Do the median plot
+      plot_time_series(dep_list[i], plot_list[j],
+                       plot_title, plot_sub, plot_ylab);
+    }
+
+    # PLOT: Create time series of relative performance.
+    else if(plot_list[j] == relperf_str) {
+
+      # Set plotting strings
+      if(length(title_str) > 0) {
+        plot_title = title_str;
+      }
+      else if(length(unique(rp_list)) == 1) {
+        plot_title = paste("Relative Performance of\n", col$desc,
+                           "\nDifference", rp_list[1], col$units, "by",
+                           column_info[series, "DESCRIPTION"]);
+      }
+      else {
+        plot_title = paste("Relative Performance of\n", col$desc,
+                           "\nDifference by",
+                           column_info[series, "DESCRIPTION"]);
+      }
+
+      plot_ylab  = ifelse(length(ylab_str) == 0,
+                          "Percent of Cases",
+                          ylab_str);
+
+      # Do the relative performance plot
+      plot_time_series(dep_list[i], plot_list[j],
+                       plot_title, plot_sub, plot_ylab);
+    }
+
+    # PLOT: Create time series of ranks for the first model.
+    else if(plot_list[j] == rank_str) {
+
+      # Set plotting strings
+      plot_title = ifelse(length(title_str) == 0,
+                          paste(series_list[1],
+                                column_info[series, "DESCRIPTION"], "\n",
+                                col$desc, "\nRank Frequency"),
+                          title_str);
+      plot_ylab  = ifelse(length(ylab_str) == 0,
+                          "Percent of Cases",
+                          ylab_str);
+
+      # Do the relative performance plot
+      plot_time_series(dep_list[i], plot_list[j],
+                       plot_title, plot_sub, plot_ylab);
+    }
+
+    # Unsupported plot type
     else {
-      plot_title = paste("Relative Performance of\n", col$desc,
-                         "\nDifference by",
-                         column_info[series, "DESCRIPTION"]);
+      cat("ERROR: Unsupported plot type:", plot_list[j], "\n");
+      quit(status=1);
     }
-
-    plot_ylab  = ifelse(length(ylab_str) == 0,
-                        "Percent of Cases",
-                        ylab_str);
-
-    # Build output file name
-    out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_rel_perf.", img_ext, sep="");
-
-    # Do the relative performance plot
-    plot_time_series(dep_list[i], relperf_str,
-                     plot_title, plot_sub, plot_ylab);
-  }
-
-  # PLOT: Create time series of ranks for the first model.
-  if(rank_str%in%plot_list == TRUE) {
-
-    # Set plotting strings
-    plot_title = ifelse(length(title_str) == 0,
-                        paste(series_list[1],
-                              column_info[series, "DESCRIPTION"], "\n",
-                              col$desc, "\nRank Frequency"),
-                        title_str);
-    plot_ylab  = ifelse(length(ylab_str) == 0,
-                        "Percent of Cases",
-                        ylab_str);
-
-    # Build output file name
-    out_file = paste(outdir, "/", prefix, out_file_dep,
-                     "_rank.", img_ext, sep="");
-
-    # Do the relative performance plot
-    plot_time_series(dep_list[i], rank_str,
-                     plot_title, plot_sub, plot_ylab);
-  }
-  
+    
+  } # end for j
 } # end for i
 
 ########################################################################
