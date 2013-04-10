@@ -41,7 +41,7 @@ Compute_STDerr_from_median <- function ( data, method )
       ## If the AR1 coefficient is out-of-bounds, try a different ARIMA method.
       ## What about higher-order coefficients?  Should we fit a higher-order function
       ## if those coefficients are large?
-      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] > 1.0 ) { 
+      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] >= 0.99 ) { 
          if ( method == 'ML' ) { method = "CSS"; } else { method = "ML"; }
          data.arima <- arima( data_excursions, order=c(1,0,0), method=method )
       }
@@ -61,7 +61,7 @@ Compute_STDerr_from_median <- function ( data, method )
       variance_inflation_factor = sqrt( RATIO );
 
       ## If the AR1 coefficient is less than 0.3, then don't even use a vif!  Set vif = 1.0
-      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] > 1.0  ) { variance_inflation_factor = 1.0; }
+      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] >= 0.99  ) { variance_inflation_factor = 1.0; }
 
       ## Compute the Standard Error using the variance inflation factor.
       STDerr_data <- variance_inflation_factor * ( IQR(data) * sqrt(pi/2.) ) / ( 1.349 * sqrt( length(data) ) )
@@ -95,7 +95,7 @@ Compute_STDerr_from_mean <- function ( data, method )
       ## If the AR1 coefficient is out-of-bounds, try a different ARIMA method.
       ## What about higher-order coefficients?  Should we fit a higher-order function
       ## if those coefficients are large?
-      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] > 1.0 ) { 
+      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] >= 0.99 ) { 
          if ( method == 'ML' ) { method = "CSS"; } else { method = "ML"; }
          data.arima <- arima( data, order=c(1,0,0), method=method )
       }
@@ -115,7 +115,7 @@ Compute_STDerr_from_mean <- function ( data, method )
       variance_inflation_factor = sqrt( RATIO );
 
       ## If the AR1 coefficient is less than 0.3, then don't even use a vif!  Set vif = 1.0
-      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] > 1.0  ) { variance_inflation_factor = 1.0; }
+      if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] >= 0.99  ) { variance_inflation_factor = 1.0; }
 
       ## Compute the Standard Error using the variance inflation factor.
       STDerr_data <- variance_inflation_factor * sqrt( var(data) ) / sqrt( length(data) );
