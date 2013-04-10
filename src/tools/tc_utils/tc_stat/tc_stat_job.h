@@ -259,6 +259,7 @@ class TCStatJob {
 
       // Only retain cases present for all models
       bool        EventEqual;
+      bool        EventEqualSet;
       StringArray EventEqualCases;
 
       // Only retain TrackPoints with recent rapid intensification

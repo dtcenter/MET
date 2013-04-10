@@ -232,6 +232,7 @@ void TCStatJob::clear() {
    LandfallEnd      = default_landfall_end;
    MatchPoints      = default_match_points;
    EventEqual       = default_event_equal;
+   EventEqualSet    = false;
 
    OutInitMask.clear();
    OutValidMask.clear();
@@ -291,6 +292,7 @@ void TCStatJob::assign(const TCStatJob & j) {
 
    MatchPoints = j.MatchPoints;
    EventEqual = j.EventEqual;
+   EventEqualSet = j.EventEqualSet;
    EventEqualCases = j.EventEqualCases;
 
    OutInitMask = j.OutInitMask;
@@ -635,7 +637,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    }
 
    // Check the event equalization cases
-   if(keep == true && EventEqual == true &&
+   if(keep == true && EventEqualSet == true &&
      !EventEqualCases.has(line.header())) {
       keep = false;
       n.RejEventEqual++;
@@ -1030,18 +1032,13 @@ void TCStatJob::process_event_equal() {
       } // end for i
    } // end while
 
+   // Initialize to the first map entry
+   EventEqualCases.clear();
+   if(case_map.size() > 0) EventEqualCases = case_map.begin()->second;
+
    // Loop over the map entries and build a list of common cases
    for(it = case_map.begin(); it != case_map.end(); it++) {
-
-      // Initialize to the first map entry
-      if(it == case_map.begin()) {
-         EventEqualCases = it->second;
-      }
-      // Otherwise, compute the intersection of cases
-      else {
-         EventEqualCases = intersection(EventEqualCases, it->second);
-      }
-
+      EventEqualCases = intersection(EventEqualCases, it->second);
       models << it->first << " ";
    } // end for it
 
@@ -1055,6 +1052,9 @@ void TCStatJob::process_event_equal() {
            << "[Case " << i+1 << " of " << EventEqualCases.n_elements()
            << "] " << EventEqualCases[i] << "\n";
    }
+
+   // Set flag to indicate that event equalization has been applied.
+   EventEqualSet = true;
 
    return;
 }
@@ -1214,7 +1214,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    TCStatJob::do_job(file_list, n);
 
    // Check for no common cases
-   if(EventEqual == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
            << "Event equalization found no common cases.\n";
    }
@@ -1469,7 +1469,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    TCStatJob::do_job(file_list, n);
 
    // Check for no common cases
-   if(EventEqual == true && EventEqualCases.n_elements() == 0) {
+   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
            << "Event equalization found no common cases.\n";
    }
