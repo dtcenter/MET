@@ -21,6 +21,7 @@ plot_list    = c("BOXPLOT");
 rp_list      = c(">=100");
 event_equal  = TRUE;
 ci_flag      = TRUE;
+log_flag     = TRUE;
 save_data    = "";
 save         = FALSE;
 
