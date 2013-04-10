@@ -80,8 +80,8 @@ GRIB2C_LIBS  =
 # Top level directory for the HDF and HDF-EOS Libraries if they're not
 # installed in a standard location.  These need not be specified if
 # you're not building the modis reformatting tool.
-HDF_BASE_DIR      = $(OTHERLIBS_DIR)/hdf/HDF4.2r3
-HDF_EOS_BASE_DIR  = $(OTHERLIBS_DIR)/hdf_eos/hdfeos
+HDF_BASE_DIR      = /d3/projects/MET/MET_releases/external_libs/hdf/HDF4.2r3
+HDF_EOS_BASE_DIR  = /d3/projects/MET/MET_releases/external_libs/hdf_eos/hdfeos
 
 # Optional flags to disable the compilation of MET tools
 # Specify a non-zero value to enable the compilation of the tool
