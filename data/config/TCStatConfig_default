@@ -195,8 +195,9 @@ water_only = false;
 
 //
 // Specify whether only those track points for which rapid intensification
-// occurred in the BDECK track during the previous 24 hours should be retained.
-// Define rapid intensification by thresholding the change in maximum windspeed.
+// occurred in the BDECK track between the current time and 24-hours prior
+// should be retained. Define rapid intensification by thresholding the change
+// in maximum windspeed.
 // May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
 // options.
 //

@@ -489,35 +489,30 @@ int TrackPairInfo::check_water_only() {
 int TrackPairInfo::check_rapid_inten(const SingleThresh &st) {
    int i, j, n_rej;
    unixtime delta_ut;
-   double cur_vmax, min_vmax;
+   double cur_vmax, prv_vmax;
 
    // Loop over the track points
    for(i=0, n_rej=0; i<NPoints; i++) {
 
       // Store the current wind speed maximum
       cur_vmax = BDeck[i].v_max();
-      min_vmax = bad_data_double;
+      prv_vmax = bad_data_double;
 
-      // Search other track points for the minimum wind speed
-      // in the time window
+      // Search other track points for the previous time
       for(j=0; j<NPoints; j++) {
-
-         // Check if this point falls in the time window
          delta_ut = BDeck[i].valid() - BDeck[j].valid();
          if(delta_ut >= 0 &&
-            delta_ut <= sec_per_hour*RapidIntenHourOffset) {
-
-            // Check for the minimum wind speed
-            if(is_bad_data(min_vmax) ||
-               (!is_bad_data(BDeck[j].v_max()) &&
-                BDeck[j].v_max() < min_vmax))
-               min_vmax = BDeck[j].v_max();
+            delta_ut == sec_per_hour*RapidIntenHourOffset) {
+            prv_vmax = BDeck[j].v_max();
+            break;
          }
       } // end for j
 
       // If the vmax delta does not meet the threshold criteria,
       // set keep status to false
-      if(!st.check(cur_vmax - min_vmax) && Keep[i] != 0) {
+      if(!is_bad_data(prv_vmax) &&
+         !st.check(cur_vmax - prv_vmax) &&
+         Keep[i] != 0) {
         Keep.set(i, 0);
         n_rej++;
       }
