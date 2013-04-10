@@ -459,7 +459,7 @@ for(i in 1:length(dep_list)) {
     }
   
     # PLOT: Create time series of scatter plots.
-    else if(dep_list[j] == scatter_str) {
+    else if(plot_list[j] == scatter_str) {
 
       # Set plotting strings
       plot_title = ifelse(length(title_str) == 0,

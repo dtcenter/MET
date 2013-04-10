@@ -234,7 +234,7 @@ get_median_ci = function(d) {
   count    = sum(!is.na(d));
   df       = count - 1;
   ss_pval  = 0.0 - abs(val/s[1]);
-  pval     = round(1 - 2*pt(ss_p_val, df), 3);
+  pval     = round(1 - 2*pt(ss_pval, df), 3);
 
   return(c(ncl, val, ncu, pval));
 }
