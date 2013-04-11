@@ -758,6 +758,9 @@ void derive_interp12(TrackInfoArray &tracks) {
       // Loop through the initialization times and process the time step
       for(i=0; i<it->second.n_elements(); i++) {
 
+         // Can't compute timestep for a single time
+         if(it->second.n_elements() == 1) break;
+
          // Compute the time step
          if(i == it->second.n_elements() - 1)
             ds = it->second[i]   - it->second[i-1];
