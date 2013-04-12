@@ -275,20 +275,6 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool QuadInfo::has_wind(const ATCFLine &l) const {
-
-   return(is_match_wind(l));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool QuadInfo::has_seas(const ATCFLine &l) const {
-
-   return(is_match_seas(l));
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool QuadInfo::is_match_wind(const ATCFLine &l) const {
    QuadInfo qi;
 
@@ -586,24 +572,6 @@ void TrackPoint::set_wind(int n, const QuadInfo &w) {
    Wind[n] = w;
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool TrackPoint::has(const ATCFLine &l) const {
-   bool found = false;
-   int i;
-
-   // Check if the QuadInfo data matches
-   for(i=0; i<NWinds; i++) {
-      if(Wind[i].has_wind(l)) {
-         found = true;
-         break;
-      }
-   }
-
-   // Return whether the QuadInfo matches and the TrackPoint matches
-   return(found && is_match(l));
 }
 
 ////////////////////////////////////////////////////////////////////////

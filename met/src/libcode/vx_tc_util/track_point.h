@@ -87,9 +87,6 @@ class QuadInfo {
          //  do stuff
          //
 
-      bool has_wind(const ATCFLine &)      const;
-      bool has_seas(const ATCFLine &)      const;
-
       bool is_match_wind(const ATCFLine &) const;
       bool is_match_seas(const ATCFLine &) const;
 
@@ -203,7 +200,6 @@ class TrackPoint {
 
       void set_wind(int, const QuadInfo &);
       bool set(const ATCFLine &);
-      bool has(const ATCFLine &) const;
       bool is_match(const ATCFLine &) const;
 
 };
