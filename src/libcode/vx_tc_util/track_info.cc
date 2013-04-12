@@ -86,6 +86,7 @@ void TrackInfo::clear() {
    InitTime        = (unixtime) 0;
    MinValidTime    = (unixtime) 0;
    MaxValidTime    = (unixtime) 0;
+   TrackLines.clear();
 
    clear_points();
 
@@ -120,6 +121,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str) << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
+   out << prefix << "NTrackLines     = " << TrackLines.n_elements() << "\n";
       
    for(i=0; i<NPoints; i++) {
       out << prefix << "TrackPoint[" << i+1 << "]:" << "\n";
@@ -149,7 +151,8 @@ ConcatString TrackInfo::serialize() const {
      << ", MinValidTime = " << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : na_str)
      << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str)
      << ", NPoints = " << NPoints
-     << ", NAlloc = " << NAlloc;
+     << ", NAlloc = " << NAlloc
+     << ", NTrackLines = " << TrackLines.n_elements();
 
    return(s);
 
@@ -190,6 +193,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    InitTime        = t.InitTime;
    MinValidTime    = t.MinValidTime;
    MaxValidTime    = t.MaxValidTime;
+   TrackLines      = t.TrackLines;
 
    if(t.NPoints == 0) return;
 
@@ -387,7 +391,7 @@ void TrackInfo::add(const TrackPoint &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::add(const ATCFLine &l) {
+bool TrackInfo::add(const ATCFLine &l, bool check_dup) {
    bool found = false;
    bool status = false;
    int i;
@@ -442,6 +446,9 @@ bool TrackInfo::add(const ATCFLine &l) {
    if(MaxValidTime == (unixtime) 0 || l.valid() > MaxValidTime)
       MaxValidTime = l.valid();
 
+   // Store the ATCFLine that was just added
+   if(check_dup) TrackLines.add(l.line());
+
    return(status);
 }
 
@@ -463,19 +470,7 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfo::has(const ATCFLine &l) const {
-   bool found = false;
-   int i;
-
-   // Check if the TrackPoint data matches
-   for(i=NPoints-1; i>=0; i--) {
-      if(Point[i].has(l)) {
-         found = true;
-         break;
-      }
-   }
-
-   // Return whether the TrackPoint matches and the TrackInfo matches
-   return(found && is_match(l));
+   return(TrackLines.has(l.line()));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -768,13 +763,13 @@ void TrackInfoArray::set(int n, const TrackInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfoArray::add(const ATCFLine &l, bool check_has) {
+bool TrackInfoArray::add(const ATCFLine &l, bool check_dup) {
    bool found  = false;
    bool status = false;
    int i;
 
    // Check if this ATCFLine already exists in the TrackInfoArray
-   if(check_has) {
+   if(check_dup) {
       if(has(l)) {
          mlog << Warning
               << "\nTrackInfoArray::add(const ATCFLine &) -> "
@@ -788,7 +783,7 @@ bool TrackInfoArray::add(const ATCFLine &l, bool check_has) {
    for(i=NTracks-1; i>=0; i--) {
       if(Track[i].is_match(l)) {
          found = true;
-         status = Track[i].add(l);
+         status = Track[i].add(l, check_dup);
          break;
       }
    }
@@ -796,7 +791,7 @@ bool TrackInfoArray::add(const ATCFLine &l, bool check_has) {
    // Otherwise, create a new track
    if(!found) {
       extend(NTracks + 1);
-      status = Track[NTracks++].add(l);
+      status = Track[NTracks++].add(l, check_dup);
    }
 
    return(status);

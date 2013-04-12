@@ -66,6 +66,9 @@ class TrackInfo {
       int          NPoints;
       int          NAlloc;
 
+      // Input ATCF Track Lines
+      StringArray  TrackLines;
+
    public:
 
       TrackInfo();
@@ -125,7 +128,7 @@ class TrackInfo {
          //
 
       void add(const TrackPoint &);
-      bool add(const ATCFLine &);
+      bool add(const ATCFLine &, bool check_dup);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
       
       bool has(const ATCFLine &) const;
