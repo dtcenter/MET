@@ -22,7 +22,8 @@ using namespace std;
 
 static const bool do_shuffle = false;
 
-static const int buf_size = 4096;
+static const int buf_size = 65536;
+// static const int buf_size = 15000000;
 
 static unsigned char buf[buf_size];
 
@@ -33,6 +34,7 @@ static const int max_dims = 100;
 
 
 static void clear_buf();
+static void clear_buf(void *, int nbytes);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -389,7 +391,8 @@ for (j=0; j<Nvalues; ++j)  {
          break;
 
       default:
-         cerr << "\n\n  SatAttribute::dump() -> bad number type ... "
+         mlog << Error
+              << "\n\n  SatAttribute::dump() -> bad number type ... "
               << numbertype_to_string(Numbertype) << "\n\n";
          exit ( 1 );
          break;
@@ -497,7 +500,8 @@ switch ( Numbertype )  {
    case nt_int_8:
       bytes_per_sample = 1;
       // if ( Bytes%bytes_per_sample )  {
-      //    cerr << "\n\n  SatAttribute::set_value() -> bad short size ... " << Bytes << "\n\n";
+      //    mlog << Error
+      //         << "\n\n  SatAttribute::set_value() -> bad short size ... " << Bytes << "\n\n";
       //    exit ( 1 ); 
       // }
       Nvalues = Bytes/bytes_per_sample;
@@ -514,7 +518,8 @@ switch ( Numbertype )  {
    case nt_int_16:
       bytes_per_sample = 2;
       if ( Bytes%bytes_per_sample )  {
-         cerr << "\n\n  SatAttribute::set_value() -> bad short size ... " << Bytes << "\n\n";
+         mlog << Error
+              << "\n\n  SatAttribute::set_value() -> bad short size ... " << Bytes << "\n\n";
          exit ( 1 ); 
       }
       Nvalues = Bytes/bytes_per_sample;
@@ -531,7 +536,8 @@ switch ( Numbertype )  {
    case nt_float_32:
       bytes_per_sample = 4;
       if ( Bytes%bytes_per_sample )  {
-         cerr << "\n\n  SatAttribute::set_value() -> bad float size ... " << Bytes << "\n\n";
+         mlog << Error
+              << "\n\n  SatAttribute::set_value() -> bad float size ... " << Bytes << "\n\n";
          exit ( 1 ); 
       }
       Nvalues = Bytes/bytes_per_sample;
@@ -548,7 +554,8 @@ switch ( Numbertype )  {
    case nt_float_64:
       bytes_per_sample = 8;
       if ( Bytes%bytes_per_sample )  {
-         cerr << "\n\n  SatAttribute::set_value() -> bad double size ... " << Bytes << "\n\n";
+         mlog << Error
+              << "\n\n  SatAttribute::set_value() -> bad double size ... " << Bytes << "\n\n";
          exit ( 1 ); 
       }
       Nvalues = Bytes/bytes_per_sample;
@@ -563,7 +570,8 @@ switch ( Numbertype )  {
    /////////////////////////////////////////////////////////////////////
 
    default:
-      cerr << "\n\n  SatAttribute::set_value() -> bad numbertype ... "
+      mlog << Error
+           << "\n\n  SatAttribute::set_value() -> bad numbertype ... "
            << numbertype_to_string(Numbertype) << "\n\n";
       exit ( 1 );
       break;
@@ -819,7 +827,8 @@ void SwathDataField::set_n_dimensions(int k)
 
 if ( k <= 0 )  {
 
-   cerr << "\n\n  SwathDataField::set_n_dimensions(int) -> bad value ... " << k << "\n\n";
+   mlog << Error
+        << "\n\n  SwathDataField::set_n_dimensions(int) -> bad value ... " << k << "\n\n";
 
    exit ( 1 );
 
@@ -853,7 +862,8 @@ void SwathDataField::set_dimension(int k, SatDimension * d)
 
 if ( (k < 0) || (k >= Ndimensions) )  {
 
-   cerr << "\n\n  SwathDataField::set_dimensions(int, SatDimension *) -> range check error\n\n";
+   mlog << Error
+        << "\n\n  SwathDataField::set_dimensions(int, SatDimension *) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -875,7 +885,8 @@ int SwathDataField::dimension_size(int k) const
 
 if ( (k < 0) || (k >= Ndimensions) )  {
 
-   cerr << "\n\n  SwathDataField::dimensions_size(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  SwathDataField::dimensions_size(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1024,7 +1035,8 @@ Name = s.Name;
 
 SwathId = s.SwathId;
 
-cerr << "\n\n  CloudsatSwath::assign(const CloudsatSwath &) -> not finished yet!\n\n";
+mlog << Error
+     << "\n\n  CloudsatSwath::assign(const CloudsatSwath &) -> not finished yet!\n\n";
 
 exit ( 1 );
 
@@ -1174,7 +1186,8 @@ clear_buf();
 
 if ( SWinqdatafields(SwathId, (char *) buf, 0, 0) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_data_fields() -> error (1)\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_data_fields() -> error (1)\n\n";
 
    exit ( 1 );
 
@@ -1199,7 +1212,8 @@ clear_buf();
 
 if ( SWinqdatafields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_data_fields() -> error (2)\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_data_fields() -> error (2)\n\n";
 
    exit ( 1 );
 
@@ -1224,7 +1238,8 @@ for (j=0; j<Ndatafields; ++j)  {
 
    if ( SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf) < 0 )  {
 
-      cerr << "\n\n  CloudsatSwath::get_data_fields() -> error (3)\n\n";
+      mlog << Error
+           << "\n\n  CloudsatSwath::get_data_fields() -> error (3)\n\n";
 
       exit ( 1 );
 
@@ -1242,7 +1257,8 @@ for (j=0; j<Ndatafields; ++j)  {
 
       if ( !d )  {
 
-         cerr << "\n\n  CloudsatSwath::get_data_fields() -> error (4)\n\n";
+         mlog << Error
+              << "\n\n  CloudsatSwath::get_data_fields() -> error (4)\n\n";
 
          exit ( 1 );
 
@@ -1276,21 +1292,37 @@ void CloudsatSwath::get_attributes()
 {
 
 int j;
-int32 nt, size;
+int32 nt, att_buf_size, att_size, retval;
 StringArray a;
 
 
-clear_buf();
+Nattributes = 0;
 
-if ( SWinqattrs(SwathId, (char *) buf, &size) < 0 )  {
+if ( (retval = SWinqattrs(SwathId, NULL, &att_buf_size)) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute names\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute buffer size\n\n";
 
    exit ( 1 );
 
 }
 
-parse_csl(buf, a);
+if ( retval == 0 )  return;
+
+char * att_buf = new char [att_buf_size];
+
+if ( (retval = SWinqattrs(SwathId, att_buf, &att_buf_size)) < 0 )  {
+
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute names\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( retval == 0 )  return;
+
+parse_csl(att_buf, a);
 
 Nattributes = a.n_elements();
 
@@ -1300,37 +1332,30 @@ for (j=0; j<Nattributes; ++j)  {
 
    Attribute[j].set_name(a[j]);
 
-   if ( SWattrinfo(SwathId, (char *) (a[j]), &nt, &size) < 0 )  {
+   if ( SWattrinfo(SwathId, (char *) (a[j]), &nt, &att_size) < 0 )  {
 
-      cerr << "\n\n  CloudsatSwath::get_attributes() -> can't get info on attribute \"" << (a[j]) << "\"\n\n";
+      mlog << Error
+           << "\n\n  CloudsatSwath::get_attributes() -> can't get info on attribute \"" << (a[j]) << "\"\n\n";
 
       exit ( 1 );
 
    }
 
    // Attribute[j].set_number_type ((int) nt);
-   // Attribute[j].set_bytes       ((int) size);
+   // Attribute[j].set_bytes       ((int) att_size);
 
-   if ( size >= buf_size )  {
+   clear_buf(att_buf, att_buf_size);
 
-      cerr << "\n\n  CloudsatSwath::get_attributes() -> buffer too small for attribute \"" << (a[j]) << "\"\n\n";
+   if ( SWreadattr(SwathId, (char *) (a[j]), att_buf) < 0 )  {
 
-      exit ( 1 );
-
-   }
-
-   clear_buf();
-
-   if ( SWreadattr(SwathId, (char *) (a[j]), buf) < 0 )  {
-
-      cerr << "\n\n  CloudsatSwath::get_attributes() -> can't get value for attribute \"" << (a[j]) << "\"\n\n";
+      mlog << Error
+           << "\n\n  CloudsatSwath::get_attributes() -> can't get value for attribute \"" << (a[j]) << "\"\n\n";
 
       exit ( 1 );
 
    }
 
-   Attribute[j].set_value((int) nt, buf, (int) size);
-
+   Attribute[j].set_value((int) nt, (unsigned char *) att_buf, (int) att_size);
 
 }   //  for j
 
@@ -1339,6 +1364,8 @@ for (j=0; j<Nattributes; ++j)  {
    //
    //  done
    //
+
+if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
 
 return;
 
@@ -1368,7 +1395,8 @@ clear_buf();
 
 if ( SWinqgeofields(SwathId, (char *) buf, 0, 0) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_geo_fields() -> error (1)\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_geo_fields() -> error (1)\n\n";
 
    exit ( 1 );
 
@@ -1393,7 +1421,8 @@ clear_buf();
 
 if ( SWinqgeofields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_geo_fields() -> error (2)\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_geo_fields() -> error (2)\n\n";
 
    exit ( 1 );
 
@@ -1419,7 +1448,8 @@ for (j=0; j<Ngeofields; ++j)  {
 
    if ( SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf) < 0 )  {
 
-      cerr << "\n\n  CloudsatSwath::get_geo_fields() -> error (3)\n\n";
+      mlog << Error
+           << "\n\n  CloudsatSwath::get_geo_fields() -> error (3)\n\n";
 
       exit ( 1 );
 
@@ -1437,7 +1467,8 @@ for (j=0; j<Ngeofields; ++j)  {
 
       if ( !d )  {
 
-         cerr << "\n\n  CloudsatSwath::get_data_fields() -> error (4)\n\n";
+         mlog << Error
+              << "\n\n  CloudsatSwath::get_data_fields() -> error (4)\n\n";
 
          exit ( 1 );
 
@@ -1477,7 +1508,8 @@ clear_buf();
 
 if ( SWinqdims(SwathId, (char *) buf, 0) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_dimensions() -> error (1)\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_dimensions() -> error (1)\n\n";
 
    exit ( 1 );
 
@@ -1495,7 +1527,8 @@ for (j=0; j<Ndimensions; ++j)  {
 
    if ( (k = SWdiminfo(SwathId, (char *) (a[j]))) < 0 )  {
 
-      cerr << "\n\n  CloudsatSwath::get_dimensions() ->can't get size for dimension \"" << a[j] << "\"\n\n";
+      mlog << Error
+           << "\n\n  CloudsatSwath::get_dimensions() ->can't get size for dimension \"" << a[j] << "\"\n\n";
 
       exit ( 1 );
 
@@ -1544,7 +1577,8 @@ SwathDataField * CloudsatSwath::get_field(int k) const
 
 if ( (k < 0) || (k >= Ndatafields) )  {
 
-   cerr << "\n\n  CloudsatSwath::get_field(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_field(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1586,7 +1620,8 @@ SwathDataField * CloudsatSwath::get_geo_field(int k) const
 
 if ( (k < 0) || (k >= Ngeofields) )  {
 
-   cerr << "\n\n  CloudsatSwath::get_geo_field(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_geo_field(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1628,7 +1663,8 @@ SwathDataField * CloudsatSwath::get_data_field(int k) const
 
 if ( (k < 0) || (k >= Ndatafields) )  {
 
-   cerr << "\n\n  CloudsatSwath::get_data_field(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_data_field(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1649,7 +1685,8 @@ SatDimension * CloudsatSwath::dimension(int k) const
 
 if ( (k < 0) || (k >= Ndimensions) )  {
 
-   cerr << "\n\n  CloudsatSwath::dimension(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::dimension(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1699,7 +1736,8 @@ Reflectivity = get_data_field("Radar_Reflectivity");
 
 if ( !Latitude || !Longitude || !Height || !Reflectivity )  {
 
-   cerr << "\n\n  CloudsatSwath::setup_geo_pointers() -> some geofields not found!\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::setup_geo_pointers() -> some geofields not found!\n\n";
 
    exit ( 1 );
 
@@ -1730,7 +1768,8 @@ n = Latitude->dimension_size(0);
 
 if ( (k < 0) || (k >= n) )  {
 
-   cerr << "\n\n  CloudsatSwath::lat(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::lat(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1740,7 +1779,8 @@ start = (int32) k;
 
 if ( SWreadfield(SwathId, (char *) "Latitude", &start, 0, &edge, buf) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::lat(int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::lat(int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -1772,7 +1812,8 @@ n = Longitude->dimension_size(0);
 
 if ( (k < 0) || (k >= n) )  {
 
-   cerr << "\n\n  CloudsatSwath::lon(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::lon(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1782,7 +1823,8 @@ start = (int32) k;
 
 if ( SWreadfield(SwathId, (char *) "Longitude", &start, 0, &edge, buf) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::lon(int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::lon(int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -1817,7 +1859,8 @@ n2 = Height->dimension_size(1);
 
 if ( (ray < 0) || (ray >= n1) || (bin < 0) || (bin >= n2) )  {
 
-   cerr << "\n\n  CloudsatSwath::height_m(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::height_m(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1830,7 +1873,8 @@ edge[0] = edge[1] = 1;
 
 if ( SWreadfield(SwathId, (char *) "Height", start, 0, edge, buf) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::height_m(int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::height_m(int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -1864,7 +1908,8 @@ n2 = Reflectivity->dimension_size(1);
 
 if ( (ray < 0) || (ray >= n1) || (bin < 0) || (bin >= n2) )  {
 
-   cerr << "\n\n  CloudsatSwath::reflectivity(int, int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::reflectivity(int, int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1877,7 +1922,8 @@ edge[0] = edge[1] = 1;
 
 if ( SWreadfield(SwathId, (char *) "Radar_Reflectivity", start, 0, edge, buf) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::reflectivity(int, int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::reflectivity(int, int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -1935,7 +1981,8 @@ CloudsatSwathFile::CloudsatSwathFile(const CloudsatSwathFile &)
 // 
 // assign(f);
 
-cerr << "\n\n  CloudsatSwathFile::CloudsatSwathFile(const CloudsatSwathFile &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  CloudsatSwathFile::CloudsatSwathFile(const CloudsatSwathFile &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -1954,7 +2001,8 @@ CloudsatSwathFile & CloudsatSwathFile::operator=(const CloudsatSwathFile &)
 // assign(f);
 
 
-cerr << "\n\n  CloudsatSwathFile::operator=(const CloudsatSwathFile &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  CloudsatSwathFile::operator=(const CloudsatSwathFile &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -2046,7 +2094,8 @@ Filename = _filename;
 
 if ( (FileId = SWopen((char *) _filename, DFACC_READ)) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwathFile::open(const char *) -> unable to open input file \"" << _filename << "\"\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwathFile::open(const char *) -> unable to open input file \"" << _filename << "\"\n\n";
 
    close();
 
@@ -2062,7 +2111,8 @@ clear_buf();
 
 if ( SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
 
-   cerr << "\n\n  CloudsatSwathFile::open(const char *) -> unable to get number of swaths from file \"" << _filename << "\"\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwathFile::open(const char *) -> unable to get number of swaths from file \"" << _filename << "\"\n\n";
 
    close();
 
@@ -2082,7 +2132,8 @@ for (j=0; j<Nswaths; ++j)  {
 
    if ( (k = SWattach(FileId, (char *) (a[j]))) < 0 )  {
 
-      cerr << "\n\n  CloudsatSwathFile::open(const char *) -> to attach swath # " << j << " in file \"" << _filename << "\"\n\n";
+      mlog << Error
+           << "\n\n  CloudsatSwathFile::open(const char *) -> to attach swath # " << j << " in file \"" << _filename << "\"\n\n";
 
       close();
 
@@ -2123,7 +2174,8 @@ void CloudsatSwathFile::close()
 
 if ( (FileId >= 0) && (SWclose(FileId) < 0) )  {
 
-   cerr << "\n\n  CloudsatSwathFile::close() -> trouble closing file\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwathFile::close() -> trouble closing file\n\n";
 
    exit ( 1 );
 
@@ -2171,7 +2223,8 @@ CloudsatSwath * CloudsatSwathFile::swath(int k) const
 
 if ( (k < 0) || (k >= Nswaths) )  {
 
-   cerr << "\n\n  CloudsatSwathFile::swath(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwathFile::swath(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -2202,6 +2255,20 @@ memset(buf, 0, buf_size);
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void clear_buf(void * p, int nbytes)
+
+{
+
+memset(p, 0, nbytes);
 
 return;
 

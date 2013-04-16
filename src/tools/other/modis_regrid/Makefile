@@ -124,27 +124,27 @@ gen_sources: $(GEN_SOURCES)
 
 data_plane_to_netcdf.o: data_plane_to_netcdf.h data_plane_to_netcdf.cc
 	@ echo
-	$(CXX) data_plane_to_netcdf.cc $(FLAGS)   -c -I$(MET_INC_DIR)
+	$(CXX) data_plane_to_netcdf.cc $(CXX_FLAGS)   -c -I$(MET_INC_DIR)
 
 
 data_averager.o: data_averager.h data_averager.cc
 	@ echo
-	$(CXX) data_averager.cc $(FLAGS)          -c -I$(MET_INC_DIR)
+	$(CXX) data_averager.cc $(CXX_FLAGS)          -c -I$(MET_INC_DIR)
 
 
 sat_utils.o: sat_utils.h sat_utils.cc
 	@ echo
-	$(CXX) sat_utils.cc $(FLAGS)              -c -I$(MET_INC_DIR) $(HDF_INCS)
+	$(CXX) sat_utils.cc $(CXX_FLAGS)              -c -I$(MET_INC_DIR) $(HDF_INCS)
 
 
 cloudsat_swath_file.o: cloudsat_swath_file.h cloudsat_swath_file.cc
 	@ echo
-	$(CXX) cloudsat_swath_file.cc $(FLAGS)    -c -I$(MET_INC_DIR) $(HDF_INCS)
+	$(CXX) cloudsat_swath_file.cc $(CXX_FLAGS)    -c -I$(MET_INC_DIR) $(HDF_INCS)
 
 
 modis_file.o: modis_file.h modis_file.cc
 	@ echo
-	$(CXX) modis_file.cc $(FLAGS)             -c -I$(MET_INC_DIR) -I$(HDF_INC_DIR) -I$(HDF_EOS_INC_DIR)
+	$(CXX) modis_file.cc $(CXX_FLAGS)             -c -I$(MET_INC_DIR) -I$(HDF_INC_DIR) -I$(HDF_EOS_INC_DIR)
 
 
 ########################################################################
@@ -167,7 +167,7 @@ modis_regrid: modis_regrid.cc $(OBJECTS)
 	@ echo
 	$(CXX) modis_regrid.cc modis_file.o cloudsat_swath_file.o sat_utils.o data_averager.o data_plane_to_netcdf.o \
         -o modis_regrid \
-        $(FLAGS) \
+        $(CXX_FLAGS) \
         -I$(MET_INC_DIR) \
         -I$(HDF_INC_DIR) \
         -I$(HDF_EOS_INC_DIR) \
