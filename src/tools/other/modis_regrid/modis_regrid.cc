@@ -304,9 +304,9 @@ for (n0=0; n0<(in.dim0()); ++n0)  {
 
       if ( (x < 0) || (x >= nx) || (y < 0) || (y >= ny) )  continue;
 
-      status = in.cloud_fraction(x, y, v);
+      status = in.surface_temperature(n0, n1, v);
 
-      if ( ! status )  v = 0.0;
+      if ( ! status )  v = bad_data_float;
 
       a.put(v, x, y);
 
@@ -325,10 +325,14 @@ for (x=0; x<nx; ++x)  {
 
       v = a.ave(x, y);
 
-      if ( v < data_min )  data_min = v;
-      if ( v > data_max )  data_max = v;
+      if ( ! is_bad_data(v) )  {
 
-      if ( v > 0.0 )  ++nonzero_count;
+         if ( v < data_min )  data_min = v;
+         if ( v > data_max )  data_max = v;
+
+         if ( v > 0.0 )  ++nonzero_count;
+
+      }
 
       plane.set(v, x, y);
 

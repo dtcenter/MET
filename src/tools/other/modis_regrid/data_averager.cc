@@ -13,6 +13,7 @@ using namespace std;
 #include "data_averager.h"
 
 #include "vx_math.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -60,6 +61,8 @@ Counts = 0;
 
 Sum = 0;
 
+DataOk = (bool *) 0;
+
 clear();
 
 return;
@@ -79,6 +82,8 @@ grid = 0;
 if ( Sum )  { delete [] Sum;   Sum = 0; }
 
 if ( Counts )  { delete [] Counts;   Counts = 0; }
+
+if ( DataOk )  { delete [] DataOk;   DataOk = 0; }
 
 Nx = Ny = 0;
 
@@ -110,11 +115,15 @@ Sum = new double [nxy];
 
 Counts = new int [nxy];
 
+DataOk = new bool [nxy];
+
 for (j=0; j<nxy; ++j)  {
 
    Counts[j] = 0;
 
    Sum[j] = 0.0;
+
+   DataOk[j] = false;
 
 }
 
@@ -138,9 +147,13 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  return;
 
 const int n = two_to_one(x, y);
 
+if ( is_bad_data(value) )  DataOk[n] = false;
+
 Sum[n] += value;
 
 Counts[n] += 1;
+
+DataOk[n] = true;
 
 return;
 
@@ -178,6 +191,8 @@ double DataAverager::ave(int x, int y) const
 {
 
 const int n = two_to_one(x, y);
+
+if ( ! DataOk[n] )  return ( bad_data_float );
 
 const int c = Counts[n];
 
