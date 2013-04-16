@@ -196,7 +196,7 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " -data_file path  modis_file\n\n";
+cerr << "\n\n   usage:  " << program_name << " -data_file path -units text -field name -out path modis_file\n\n";
 
 exit ( 1 );
 
