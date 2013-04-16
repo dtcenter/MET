@@ -196,7 +196,8 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " -data_file path -units text -field name -out path modis_file\n\n";
+mlog << Error
+     << "\n\n   usage:  " << program_name << " -data_file path -units text -field name -out path modis_file\n\n";
 
 exit ( 1 );
 
@@ -263,13 +264,24 @@ double data_min, data_max;
 
 if ( ! in.open(input_filename) )  {
 
-   cerr << "\n\n  " << program_name << ": unable to open input file \""
+   mlog << Error
+        << "\n\n  " << program_name << ": unable to open input file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
+// in.dump(cout);
+
+in.select_data_field(modis_field);
+
+mlog << Warning
+     << "Need to fix scale/offset values!\n\n";
+
+in.set_data_scale  (0.01);
+in.set_data_offset (-15000.0);
+in.set_data_fill   (-32768.0);
 
 in.latlon_range(lat_min, lat_max, lon_min, lon_max);
 
@@ -304,7 +316,7 @@ for (n0=0; n0<(in.dim0()); ++n0)  {
 
       if ( (x < 0) || (x >= nx) || (y < 0) || (y >= ny) )  continue;
 
-      status = in.surface_temperature(n0, n1, v);
+      status = in.data(n0, n1, v);
 
       if ( ! status )  v = bad_data_float;
 

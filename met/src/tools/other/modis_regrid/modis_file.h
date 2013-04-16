@@ -33,13 +33,15 @@ class ModisFile {
       void init_from_scratch();
 
 
-      void get_geo_field  (SwathDataField * &, const char * name);
-      void get_data_field (SwathDataField * &, const char * name);
+      void get_geo_field   (SwathDataField * &, const char * name);
+      void get_data_field  (SwathDataField * &, const char * name);
 
-      double get_double_data (SwathDataField *, int, int) const;
-      float  get_float_data  (SwathDataField *, int, int) const;
-      short  get_int16_data  (SwathDataField *, int, int) const;
-      char   get_int8_data   (SwathDataField *, int, int) const;
+      bool get_double_data (SwathDataField *, int, int, double &) const;
+      bool get_float_data  (SwathDataField *, int, int, float  &) const;
+      bool get_int16_data  (SwathDataField *, int, int, short  &) const;
+      bool get_int8_data   (SwathDataField *, int, int, char   &) const;
+
+      // void get_scale_offset();
 
 
       ConcatString Filename;
@@ -61,11 +63,17 @@ class ModisFile {
       SwathDataField * Longitude;   //  not allocated
 
          //
-         //  data fields
+         //  data field
          //
 
-      SwathDataField * SurfaceTemperature;   //  not allocated
-      SwathDataField * CloudFraction;        //  not allocated
+      SwathDataField * Field;   //  not allocated
+
+      int NumberType;
+
+      double DataScale;
+      double DataOffset;
+
+      double DataFillValue;
 
    public:
 
@@ -81,6 +89,10 @@ class ModisFile {
          //
          //  set stuff
          //
+
+     void set_data_scale  (double);
+     void set_data_offset (double);
+     void set_data_fill   (double);
 
          //
          //  get stuff
@@ -104,14 +116,13 @@ class ModisFile {
 
       void latlon_range(double & lat_min, double & lat_max, double & lon_min, double & lon_max) const;
 
-      bool surface_temperature (int, int, double &) const;
-
-      bool cloud_fraction      (int, int, double &) const;
+      bool data (int, int, double &) const;
 
          //
          //  do stuff
          //
 
+      void select_data_field (const char * name);
 
 };
 

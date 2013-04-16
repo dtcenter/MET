@@ -16,6 +16,7 @@ using namespace std;
 
 #include "modis_file.h"
 #include "sat_utils.h"
+#include "cloudsat_swath_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -35,6 +36,13 @@ static unsigned char buf[buf_size];
 static const int max_dims = 100;
 
 static const unixtime ut_modis_start = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
+
+static const int default_numbertype = nt_none_query;
+
+static const double default_data_scale  = 1.0;
+static const double default_data_offset = 0.0;
+
+static const double default_fill_value  = -9999.0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,7 +94,8 @@ ModisFile::ModisFile(const ModisFile &)
 // 
 // assign(f);
 
-cerr << "\n\n  ModisFile::ModisFile(const ModisFile &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  ModisFile::ModisFile(const ModisFile &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -105,7 +114,8 @@ ModisFile & ModisFile::operator=(const ModisFile &)
 // assign(f);
 
 
-cerr << "\n\n  ModisFile::operator=(const ModisFile &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  ModisFile::operator=(const ModisFile &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -129,9 +139,8 @@ Latitude = 0;
 
 Longitude = 0;
 
-SurfaceTemperature = 0;
+Field = 0;
 
-CloudFraction = 0;
 
 
 close();
@@ -181,6 +190,48 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ModisFile::set_data_scale(double s)
+
+{
+
+DataScale = s;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModisFile::set_data_offset(double off)
+
+{
+
+DataOffset = off;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModisFile::set_data_fill(double f)
+
+{
+
+DataFillValue = f;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool ModisFile::open(const char * _filename)
 
 {
@@ -192,6 +243,7 @@ int n0, n1;
 double dt;
 StringArray a;
 SwathDataField * sst = 0;   //  scan start time
+bool status = false;
 
 
 close();
@@ -204,7 +256,8 @@ Filename = _filename;
 
 if ( (FileId = SWopen((char *) _filename, DFACC_READ)) < 0 )  {
 
-   cerr << "\n\n  ModisFile::open(const char *) -> unable to open input file \"" << _filename << "\"\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::open(const char *) -> unable to open input file \"" << _filename << "\"\n\n";
 
    close();
 
@@ -220,7 +273,8 @@ clear_buf();
 
 if ( SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
 
-   cerr << "\n\n  ModisFile::open(const char *) -> unable to get number of swaths from file \"" << _filename << "\"\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::open(const char *) -> unable to get number of swaths from file \"" << _filename << "\"\n\n";
 
    close();
 
@@ -234,7 +288,8 @@ n_swaths = a.n_elements();
 
 if ( n_swaths > 1 )  {
 
-   cerr << "\n\n  ModisFile::open(const char *) -> too many swaths ("
+   mlog << Error
+        << "\n\n  ModisFile::open(const char *) -> too many swaths ("
         << n_swaths << ") in file \"" << _filename << "\"\n\n";
 
    close();
@@ -249,7 +304,8 @@ Swath->set_name(a[0]);
 
 if ( (k = SWattach(FileId, (char *) (a[0]))) < 0 )  {
 
-   cerr << "\n\n  ModisFile::open(const char *) -> unable to attach swath in file \"" << _filename << "\"\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::open(const char *) -> unable to attach swath in file \"" << _filename << "\"\n\n";
 
    close();
 
@@ -273,7 +329,8 @@ dim = Swath->dimension(dim0_name);
 
 if ( ! dim )  {
 
-   cerr << "\n\n  ModisFile::open(const char *) -> can't get dimension \"" << dim0_name << "\"\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::open(const char *) -> can't get dimension \"" << dim0_name << "\"\n\n";
 
    close();
 
@@ -287,7 +344,8 @@ dim = Swath->dimension(dim1_name);
 
 if ( ! dim )  {
 
-   cerr << "\n\n  ModisFile::open(const char *) -> can't get dimension \"" << dim1_name << "\"\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::open(const char *) -> can't get dimension \"" << dim1_name << "\"\n\n";
 
    close();
 
@@ -308,8 +366,8 @@ get_geo_field(Longitude, "Longitude");
    //  get the data fields
    //
 
-get_data_field(SurfaceTemperature, "Surface_Temperature");
-get_data_field(CloudFraction,      "Cloud_Fraction");
+// get_data_field(SurfaceTemperature, "Surface_Temperature");
+// get_data_field(CloudFraction,      "Cloud_Fraction");
 
    //
    //  get the scan start time
@@ -320,11 +378,12 @@ get_data_field(sst, "Scan_Start_Time");
 n0 = 0;
 n1 = 0;
 
-dt = get_double_data(sst, n0, n1);
+status = get_double_data(sst, n0, n1, dt);
 
-if ( dt < 0.0 )  {
+if ( !status || (dt < 0.0) )  {
 
-   cerr << "\n\n  ModisFile::open(const char *) -> bad scan start time ("
+   mlog << Error
+        << "\n\n  ModisFile::open(const char *) -> bad scan start time ("
         << dt << ") in file \"" << _filename << "\"\n\n";
 
    close();
@@ -357,7 +416,8 @@ field = Swath->get_geo_field(name);
 
 if ( !field )  {
 
-   cerr << "\n\n  ModisFile::get_geo_field() -> unable to find geolocation field \"" << name << "\"\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::get_geo_field() -> unable to find geolocation field \"" << name << "\"\n\n";
 
    exit ( 1 );
 
@@ -365,7 +425,8 @@ if ( !field )  {
 
 if ( field->rank() != 2 )  {
 
-   cerr << "\n\n  ModisFile::get_geo_field() -> bad rank ("
+   mlog << Error
+        << "\n\n  ModisFile::get_geo_field() -> bad rank ("
         << (field->rank()) << ") for geolocation field \"" << name << "\"\n\n";
 
    exit ( 1 );
@@ -378,7 +439,8 @@ k = field->dimension_size(0);
 
 if ( k != Dim0 )  {
 
-   cerr << "\n\n  ModisFile::get_geo_field() -> bad dimension 0 ("
+   mlog << Error
+        << "\n\n  ModisFile::get_geo_field() -> bad dimension 0 ("
         << k << ") for geolocation field \"" << name << "\"\n\n";
 
    exit ( 1 );
@@ -389,7 +451,8 @@ k = field->dimension_size(1);
 
 if ( k != Dim1 )  {
 
-   cerr << "\n\n  ModisFile::get_geo_field() -> bad dimension 1 ("
+   mlog << Error
+        << "\n\n  ModisFile::get_geo_field() -> bad dimension 1 ("
         << k << ") for geolocation field \"" << name << "\"\n\n";
 
    exit ( 1 );
@@ -417,7 +480,8 @@ field = Swath->get_data_field(name);
 
 if ( !field )  {
 
-   cerr << "\n\n  ModisFile::get_data_field() -> unable to find data field \"" << name << "\"\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::get_data_field() -> unable to find data field \"" << name << "\"\n\n";
 
    exit ( 1 );
 
@@ -425,7 +489,8 @@ if ( !field )  {
 
 if ( field->rank() != 2 )  {
 
-   cerr << "\n\n  ModisFile::get_data_field() -> bad rank ("
+   mlog << Error
+        << "\n\n  ModisFile::get_data_field() -> bad rank ("
         << (field->rank()) << ") for data field \"" << name << "\"\n\n";
 
    exit ( 1 );
@@ -438,7 +503,8 @@ k = field->dimension_size(0);
 
 if ( k != Dim0 )  {
 
-   cerr << "\n\n  ModisFile::get_data_field() -> bad dimension 0 ("
+   mlog << Error
+        << "\n\n  ModisFile::get_data_field() -> bad dimension 0 ("
         << k << ") for data field \"" << name << "\"\n\n";
 
    exit ( 1 );
@@ -449,7 +515,8 @@ k = field->dimension_size(1);
 
 if ( k != Dim1 )  {
 
-   cerr << "\n\n  ModisFile::get_data_field() -> bad dimension 1 ("
+   mlog << Error
+        << "\n\n  ModisFile::get_data_field() -> bad dimension 1 ("
         << k << ") for data field \"" << name << "\"\n\n";
 
    exit ( 1 );
@@ -460,6 +527,26 @@ if ( k != Dim1 )  {
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModisFile::select_data_field(const char * name)
+
+{
+
+get_data_field(Field, name);
+
+NumberType = Field->numbertype();
+
+// get_scale_offset();
+
+Field->dump(cout);
 
 return;
 
@@ -475,7 +562,8 @@ void ModisFile::close()
 
 if ( (FileId >= 0) && (SWclose(FileId) < 0) )  {
 
-   cerr << "\n\n  ModisFile::close() -> trouble closing file\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::close() -> trouble closing file\n\n";
 
    exit ( 1 );
 
@@ -491,9 +579,14 @@ Latitude = 0;
 
 Longitude = 0;
 
-SurfaceTemperature = 0;
+Field = 0;
 
-CloudFraction = 0;
+NumberType = default_numbertype;
+
+DataScale  = default_data_scale;
+DataOffset = default_data_offset;
+
+DataFillValue = default_fill_value;
 
    //
    //  done
@@ -507,7 +600,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double ModisFile::get_double_data(SwathDataField * field, int n0, int n1) const
+bool ModisFile::get_double_data(SwathDataField * field, int n0, int n1, double & value) const
 
 {
 
@@ -517,9 +610,12 @@ double * d = (double *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
 
-   cerr << "\n\n  ModisFile::get_float_data() -> range check error ... " << n0 << ", " << n1 << "\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::get_float_data() -> range check error ... " << n0 << ", " << n1 << "\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -536,17 +632,22 @@ status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
+
+value = d[0];
 
    //
    //  done
    //
 
-return ( d[0] );
+return ( true );
 
 }
 
@@ -554,7 +655,7 @@ return ( d[0] );
 ////////////////////////////////////////////////////////////////////////
 
 
-float ModisFile::get_float_data(SwathDataField * field, int n0, int n1) const
+bool ModisFile::get_float_data(SwathDataField * field, int n0, int n1, float & value) const
 
 {
 
@@ -564,9 +665,12 @@ float * f = (float *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
 
-   cerr << "\n\n  ModisFile::get_float_data() -> range check error ... " << n0 << ", " << n1 << "\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::get_float_data() -> range check error ... " << n0 << ", " << n1 << "\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -583,9 +687,12 @@ status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -593,7 +700,9 @@ if ( status < 0 )  {
    //  done
    //
 
-return ( f[0] );
+value = f[0];
+
+return ( true );
 
 }
 
@@ -601,7 +710,7 @@ return ( f[0] );
 ////////////////////////////////////////////////////////////////////////
 
 
-short ModisFile::get_int16_data(SwathDataField * field, int n0, int n1) const
+bool ModisFile::get_int16_data(SwathDataField * field, int n0, int n1, short & value) const
 
 {
 
@@ -611,9 +720,12 @@ short * s = (short *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
 
-   cerr << "\n\n  ModisFile::get_int16_data() -> range check error\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::get_int16_data() -> range check error\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -630,9 +742,12 @@ status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -640,7 +755,9 @@ if ( status < 0 )  {
    //  done
    //
 
-return ( s[0] );
+value = s[0];
+
+return ( true );
 
 }
 
@@ -648,7 +765,7 @@ return ( s[0] );
 ////////////////////////////////////////////////////////////////////////
 
 
-char ModisFile::get_int8_data(SwathDataField * field, int n0, int n1) const
+bool ModisFile::get_int8_data(SwathDataField * field, int n0, int n1, char & value) const
 
 {
 
@@ -658,9 +775,12 @@ char * c = (char *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
 
-   cerr << "\n\n  ModisFile::get_int16_data() -> range check error\n\n";
+   mlog << Error
+        << "\n\n  ModisFile::get_int16_data() -> range check error\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -677,9 +797,12 @@ status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
-   cerr << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
+   mlog << Error
+        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -687,7 +810,9 @@ if ( status < 0 )  {
    //  done
    //
 
-return ( c[0] );
+value = c[0];
+
+return ( true );
 
 }
 
@@ -700,8 +825,11 @@ double ModisFile::lat(int n0, int n1) const
 {
 
 double v;
+float f[2];
 
-v = get_float_data(Latitude, n0, n1);
+(void) get_float_data(Latitude, n0, n1, f[0]);
+
+v = f[0];
 
 return ( v );
 
@@ -716,8 +844,11 @@ double ModisFile::lon(int n0, int n1) const
 {
 
 double v;
+float f[2];
 
-v = get_float_data(Longitude, n0, n1);
+(void) get_float_data(Longitude, n0, n1, f[0]);
+
+v = f[0];
 
 v = -v;   //  west longitude positive
 
@@ -765,52 +896,56 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool ModisFile::surface_temperature(int n0, int n1, double & value) const
+bool ModisFile::data(int n0, int n1, double & value) const
 
 {
 
 value = 0.0;
+bool status = false;
+short s;
+double d;
+char c;
+float f;
 
-const short s = get_int16_data(SurfaceTemperature, n0, n1);
+switch ( NumberType )  {
 
-if ( s == -32768 )  return ( false );
+    case nt_int_8:
+       status = get_int8_data   (Field, n0, n1, c);
+       value = (double) c;
+       break;
 
-// value = 0.01*s - 15000.0;
+    case nt_int_16:       
+       status = get_int16_data  (Field, n0, n1, s);
+       value = (double) s;
+       break;
 
-// value = 0.01*(s - 15000);
+    case nt_float_32:
+       status = get_float_data (Field, n0, n1, f);
+       value = (double) f;
+       break;
 
-// value = 0.01*s + 15000.0;
-
-value = 0.01*(s + 15000.0);
-
-
-   //
-   //   done
-   //
-
-return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
+    case nt_float_64:
+       status = get_double_data (Field, n0, n1, d);
+       value = d;
+       break;
 
 
-bool ModisFile::cloud_fraction(int n0, int n1, double & value) const
+    default:
+      mlog << Error
+           << "\n\nModisFile::data(int n0, int n1, double & value) const -> unsupported data type "
+           << numbertype_to_string(NumberType)
+           << "\n\n";
 
-{
+      exit ( 1 );
+      break;
 
-value = 0.0;
-int k;
+}   //  switch
 
-const char c = get_int8_data(CloudFraction, n0, n1);
+if ( !status )  return ( false );
 
-if ( c < 0 )  return ( false );
+if ( value == DataFillValue )  return ( false );
 
-k = (int) c;
-
-value = 0.01*k;
-
+value = DataScale*(value - DataOffset);
 
    //
    //   done
@@ -860,6 +995,24 @@ return ( ScanStartTime );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+/*
+void ModisFile::get_scale_offset()
+
+{
+
+mlog << Warning
+     << "\n\n  ModisFile::get_scale_offset() -<> not yet implemented!\n\n";
+
+// exit ( 1 );
+
+
+return;
+
+}
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
