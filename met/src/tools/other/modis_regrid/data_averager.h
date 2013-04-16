@@ -38,6 +38,8 @@ class DataAverager {
 
       int * Counts;   //  allocated
 
+      bool * DataOk;   //  allocated
+
       const Grid * grid;   //  not allocated
 
    public:
@@ -49,8 +51,7 @@ class DataAverager {
 
       void put(double value, int x, int y);
 
-      void put(double value, double lat, double lon);
-
+      void put          (double value, double lat, double lon);
 
       int count(int x, int y) const;
 
@@ -58,8 +59,7 @@ class DataAverager {
 
       double ave(int x, int y) const;
 
-
-
+      bool ok(int x, int y) const;
 
 };
 
@@ -71,6 +71,7 @@ inline int DataAverager::two_to_one (int x, int y) const { return ( y*Nx + x ); 
 
 inline int    DataAverager::count(int x, int y) const { return ( Counts[two_to_one(x, y)] ); }
 inline double DataAverager::sum  (int x, int y) const { return (    Sum[two_to_one(x, y)] ); }
+inline bool   DataAverager::ok   (int x, int y) const { return ( DataOk[two_to_one(x, y)] ); }
 
 
 ////////////////////////////////////////////////////////////////////////
