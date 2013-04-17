@@ -46,6 +46,11 @@ static ConcatString modis_field;
 
 static ConcatString units = default_units;
 
+static double data_fill_value = -9999.0;
+
+static double data_scale      = 1.0;
+static double data_offset     = 0.0;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +59,9 @@ static void set_out_file  (const StringArray &);
 static void set_grid_file (const StringArray &);
 static void set_field     (const StringArray &);
 static void set_units     (const StringArray &);
+static void set_scale     (const StringArray &);
+static void set_offset    (const StringArray &);
+static void set_fillvalue (const StringArray &);
 
 static void usage();
 
@@ -77,10 +85,15 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
+cline.allow_numbers();
+
 cline.add(set_out_file,  "-out",       1);
 cline.add(set_grid_file, "-data_file", 1);
 cline.add(set_field,     "-field",     1);
 cline.add(set_units,     "-units",     1);
+cline.add(set_scale,     "-scale",     1);
+cline.add(set_offset,    "-offset",    1);
+cline.add(set_fillvalue, "-fill",      1);
 
 cline.parse();
 
@@ -196,8 +209,31 @@ void usage()
 
 {
 
-mlog << Error
-     << "\n\n   usage:  " << program_name << " -data_file path -units text -field name -out path modis_file\n\n";
+ConcatString tab;
+
+tab.set_repeat(' ', 13);
+
+cerr << "\n\n"
+     << "   Usage:  " << program_name << '\n'
+     << tab << "-data_file path\n"
+     << tab << "-field name\n"
+     << tab << "-out path\n"
+     << tab << "-scale value\n"
+     << tab << "-offset value\n"
+     << tab << "-fill value\n"
+     << tab << "[ -units text ]\n"
+     << tab << "      modis_file\n\n"
+
+     << "  where  \"-data_file path\" specifies the data files used to get the grid information\n"
+     << "         \"-field name\" specifies the name of the field to use in the modis data file\n"
+     << "         \"-out path\" specifies the name of the output netcdf file\n"
+     << "         \"-scale value\" specifies the scale factor to be used on the raw modis values\n"
+     << "         \"-offset value\" specifies the offset value to be used on the raw modis values\n"
+     << "         \"-fill value\" specifies the bad data value in the modis data\n"
+     << "         \"[ -units text ]\" specifies units string in the global attributes section of the output file (optional)\n"
+     << "         \"modis file\" is the name of the modis input file\n"
+
+     << "\n\n";
 
 exit ( 1 );
 
@@ -244,6 +280,48 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void set_scale(const StringArray & a)
+
+{
+
+data_scale = atof(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_offset(const StringArray & a)
+
+{
+
+data_offset = atof(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_fillvalue(const StringArray & a)
+
+{
+
+data_fill_value = atof(a[0]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void process(const char * input_filename)
 
 {
@@ -276,17 +354,17 @@ if ( ! in.open(input_filename) )  {
 
 in.select_data_field(modis_field);
 
-mlog << Warning
-     << "Need to fix scale/offset values!\n\n";
+in.set_data_scale(data_scale);
+in.set_data_offset(data_offset);
+in.set_data_fill_value(data_fill_value);
 
-in.set_data_scale  (0.01);
-in.set_data_offset (-15000.0);
-in.set_data_fill   (-32768.0);
+// mlog << Warning
+//      << "Need to fix scale/offset values!\n\n";
 
 in.latlon_range(lat_min, lat_max, lon_min, lon_max);
 
-cout << "\n  Lat range is " << lat_min << " to " << lat_max << "\n";
-cout << "\n  Lon range is " << lon_min << " to " << lon_max << "\n";
+cout << "Lat range is " << lat_min << " to " << lat_max << "\n";
+cout << "Lon range is " << lon_min << " to " << lon_max << "\n";
 
 plane.set_size(grid.nx(), grid.ny());
 

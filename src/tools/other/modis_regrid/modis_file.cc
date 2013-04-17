@@ -218,7 +218,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModisFile::set_data_fill(double f)
+void ModisFile::set_data_fill_value(double f)
 
 {
 
@@ -546,7 +546,7 @@ NumberType = Field->numbertype();
 
 // get_scale_offset();
 
-Field->dump(cout);
+// Field->dump(cout);
 
 return;
 
