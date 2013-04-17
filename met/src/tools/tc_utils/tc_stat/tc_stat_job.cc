@@ -427,19 +427,32 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
    ConcatString v_str;
    StringArray sa;
 
-   // Check TrackWatchWarn
-   if(TrackWatchWarn.n_elements() > 0 &&
-      !TrackWatchWarn.has(watchwarntype_to_string(tpi.track_watch_warn())))
+   // Check TrackWatchWarn for each TrackPoint
+   if(TrackWatchWarn.n_elements() > 0) {
+
+      // Assume track will not be kept
       keep = false;
 
-   // Check for the special string ALL:
-   //    HUWARN, TSWARN, HUWATCH, TSWATCH
-   if(TrackWatchWarn.has("ALL") &&
-      (tpi.track_watch_warn() == HurricaneWarn     ||
-       tpi.track_watch_warn() == TropicalStormWarn ||
-       tpi.track_watch_warn() == HurricaneWatch    ||
-       tpi.track_watch_warn() == TropicalStormWatch))
-       keep = true;
+      // Loop through the points to see if any are to be kept
+      for(i=0; i<tpi.n_points(); i++) {
+
+         // Get the current watch/warning type
+         WatchWarnType ww_type = tpi.watch_warn(i);
+         
+         // Check for the current watch/warn status in the list and the
+         // special string ALL:
+         //    HUWARN, TSWARN, HUWATCH, TSWATCH
+         if(TrackWatchWarn.has(watchwarntype_to_string(ww_type)) ||
+            (TrackWatchWarn.has("ALL") &&
+             (ww_type == HurricaneWarn     ||
+              ww_type == TropicalStormWarn ||
+              ww_type == HurricaneWatch    ||
+              ww_type == TropicalStormWatch))) {
+            keep = true;
+            break;
+         }
+      } // end for i
+   } // end if
 
    // Update counts
    if(!keep) n.RejTrackWatchWarn += tpi.n_points();
@@ -482,9 +495,12 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
 
          // Construct list of all entries for the current column name
          sa.clear();
-         for(j=0; j<InitStrName.n_elements(); j++)
-            if(strcasecmp(InitStrName[i], InitStrName[j]) == 0)
-               sa.add(InitStrVal[j]);
+         for(j=0; j<InitStrName.n_elements(); j++) {
+            if(strcasecmp(InitStrName[i], InitStrName[j]) == 0) {
+               if(strcmp(InitStrVal[j], na_str) == 0) sa.add(bad_data_str);
+               else                                   sa.add(InitStrVal[j]);
+            }
+         }
 
          // Determine the column offset and retrieve the value
          offset = determine_column_offset(tpi.line(i_init)->type(), InitStrName[i]);
@@ -602,9 +618,12 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
 
          // Construct list of all entries for the current column name
          sa.clear();
-         for(j=0; j<ColumnStrName.n_elements(); j++)
-            if(strcasecmp(ColumnStrName[i], ColumnStrName[j]) == 0)
-               sa.add(ColumnStrVal[j]);
+         for(j=0; j<ColumnStrName.n_elements(); j++) {
+            if(strcasecmp(ColumnStrName[i], ColumnStrName[j]) == 0) {
+               if(strcmp(ColumnStrVal[j], na_str) == 0) sa.add(bad_data_str);
+               else                                     sa.add(ColumnStrVal[j]);
+            }
+         }
 
          // Determine the column offset and retrieve the value
          offset = determine_column_offset(line.type(), ColumnStrName[i]);

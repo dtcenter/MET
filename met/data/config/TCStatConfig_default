@@ -127,8 +127,9 @@ valid_mask = [];
 line_type = [];
 
 //
-// Stratify by selecting the most severe watch/warning status from the track
-// points which are common to both the ADECK and BDECK tracks.
+// Stratify by checking the watch/warning status for each track point
+// common to both the ADECK and BDECK tracks.  If the watch/warning status
+// of any of the track points appears in the list, retain the entire track.
 // Individual watch/warning status by point may be specified using the
 // -column_str options below, but this option filters by the track maximum.
 // May add using the "-track_watch_warn" job command option.

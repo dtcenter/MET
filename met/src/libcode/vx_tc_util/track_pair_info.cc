@@ -406,26 +406,13 @@ int TrackPairInfo::i_init() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-WatchWarnType TrackPairInfo::track_watch_warn() const {
-   WatchWarnType ww_cur, ww_type;
-   int i;
+WatchWarnType TrackPairInfo::watch_warn(int i) const {
+   WatchWarnType ww_type = NoWatchWarnType;
 
-   // Initialize
-   ww_type = ww_cur = NoWatchWarnType;
-   
-   // Loop over the track points and pick the watch/warning type of
-   // most interest from the track points common to both the ADECK and
-   // BDECK tracks
-   for(i=0; i<NPoints; i++) {
-
-      // Skip points not common to the ADECK and BDECK tracks
-      if(is_bad_data(ADeck[i].lat()) ||
-         is_bad_data(ADeck[i].lon()) ||
-         is_bad_data(BDeck[i].lat()) ||
-         is_bad_data(BDeck[i].lon())) continue;
-
-      ww_cur  = ww_max(ADeck[i].watch_warn(), BDeck[i].watch_warn());
-      ww_type = ww_max(ww_type, ww_cur);
+   // Only check points common to both the ADECK and BDECK tracks
+   if(!is_bad_data(ADeck[i].lat()) && !is_bad_data(ADeck[i].lon()) &&
+      !is_bad_data(BDeck[i].lat()) && !is_bad_data(BDeck[i].lon())) {
+      ww_type = ww_max(ADeck[i].watch_warn(), BDeck[i].watch_warn());
    }
 
    return(ww_type);
