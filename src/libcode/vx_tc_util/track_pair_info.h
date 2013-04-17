@@ -112,7 +112,7 @@ class TrackPairInfo {
       int                i_init()             const;
 
       bool               keep(int)            const;
-      WatchWarnType      track_watch_warn()   const;
+      WatchWarnType      watch_warn(int)      const;
 
          //
          //  do stuff
