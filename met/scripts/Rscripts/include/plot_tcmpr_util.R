@@ -124,8 +124,9 @@ get_case_data = function() {
   # Build a set of unique cases
   case_data = unique(data.frame(CASE=series_data$CASE,
                                 LEAD_HR=series_data$LEAD_HR,
-                                MIN=NA, MAX=NA, DIFF=NA, WIN=NA, TEST=NA,
-                                RES=NA, PLOT=NA, RANK_RANDOM=NA, RANK_MIN=NA));
+                                MIN=NA, MAX=NA, WIN=NA,
+                                DIFF=NA, DIFF_TEST=NA, PERC=NA, PERC_TEST=NA,
+                                RESULT=NA, PLOT=NA, RANK_RANDOM=NA, RANK_MIN=NA));
 
   # Check for equal numbers of entries for each case
   if(sum(aggregate(series_data$PLOT, by=list(series_data$CASE), length)$x != n_series)) {
@@ -147,19 +148,40 @@ get_case_data = function() {
       quit(status=1);
     }
 
-    # Compute the winner for each case
+    # Store the threshold for the current lead time
+    rp_diff_thresh = rp_diff_list[which(case_data$LEAD_HR[i] == lead_list)];
+    rp_perc_thresh = rp_perc_list[which(case_data$LEAD_HR[i] == lead_list)];
+
+    # Compute the minimum, maximum, and winner
     case_data$MIN[i]         = min(series_data[ind,]$PLOT);
     case_data$MAX[i]         = max(series_data[ind,]$PLOT);
-    case_data$DIFF[i]        = case_data$MAX[i] - case_data$MIN[i];
     i_min                    = which.min(series_data[ind,]$PLOT);
     if(length(i_min) > 0) {
       case_data$WIN[i]       = as.character(series_data[ind,series][i_min]);
     }
-    case_data$TEST[i]        = paste(case_data$DIFF[i], rp_list[which(case_data$LEAD_HR[i] == lead_list)], sep='');
-    case_data$RES[i]         = eval(parse(text=case_data$TEST[i]));
-    case_data$PLOT[i]        = ifelse(case_data$RES[i], case_data$WIN[i], "TIE");
-    case_data$RANK_RANDOM[i] = rank(series_data[ind,]$PLOT, na.last="keep", ties.method="random")[1];
-    case_data$RANK_MIN[i]    = rank(series_data[ind,]$PLOT, na.last="keep", ties.method="min")[1];
+
+    # Compute the difference and test it
+    case_data$DIFF[i]        = case_data$MAX[i] - case_data$MIN[i];
+    case_data$DIFF_TEST[i]   = paste(case_data$DIFF[i], rp_diff_thresh, sep='');
+    
+    # Compute the absolute percent change and test it
+    # Percent change from the first model to the last model
+    case_data$PERC[i]        = 100*abs(series_data[ind,]$PLOT[1] -
+                               series_data[ind,]$PLOT[n_series]) /
+                               series_data[ind,]$PLOT[n_series];
+    case_data$PERC_TEST[i]   = paste(case_data$PERC[i], rp_perc_thresh, sep='');
+
+    # Evaluate the tests constructed above
+    case_data$RESULT[i]      = eval(parse(text=case_data$DIFF_TEST[i])) &&
+                               eval(parse(text=case_data$PERC_TEST[i]));
+    case_data$PLOT[i]        = ifelse(case_data$RESULT[i],
+                                      case_data$WIN[i], "TIE");
+
+    # Compute the rank for the first model
+    case_data$RANK_RANDOM[i] = rank(series_data[ind,]$PLOT, na.last="keep",
+                                    ties.method="random")[1];
+    case_data$RANK_MIN[i]    = rank(series_data[ind,]$PLOT, na.last="keep",
+                                    ties.method="min")[1];
   }
 
   return(case_data);
@@ -269,6 +291,9 @@ get_yrange = function(plot_type) {
     series_data = get_series_data(series_list[i], series_plot[[i]],
                                   diff_flag[i]);
 
+    # Skip this iteration if there's no valid data
+    if(sum(!is.na(series_data$PLOT)) == 0) next;
+
     # Initialize
     yvals = c();
 
@@ -289,8 +314,8 @@ get_yrange = function(plot_type) {
         else                      { cur = get_median_ci(data$PLOT); }
 
         # Append the current values to the list
-        if(ci_flag) { yvals = c(yvals, cur[1:3]);    }
-        else        { yvals = c(yvals, cur[2]); }
+        if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
+        else        { yvals = c(yvals, cur$val);                   }
 
       } # end for j
     }
@@ -314,8 +339,8 @@ get_yrange = function(plot_type) {
           cur = get_prop_ci(n_cur, n_tot);
 
           # Append the current values to the list
-          if(ci_flag) { yvals = c(yvals, cur);    }
-          else        { yvals = c(yvals, cur[2]); }
+          if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
+          else        { yvals = c(yvals, cur$val);                   }
 
           # Handle the ties
           n_cur = sum(case_data$PLOT[ind] == "TIE", na.rm=TRUE);
@@ -325,8 +350,8 @@ get_yrange = function(plot_type) {
           cur = get_prop_ci(n_cur, n_tot);
 
           # Append the current values to the list
-          if(ci_flag) { yvals = c(yvals, cur);    }
-          else        { yvals = c(yvals, cur[2]); }
+          if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
+          else        { yvals = c(yvals, cur$val);                   }
         }
         # Handle the rank frequency
         else {
@@ -339,8 +364,8 @@ get_yrange = function(plot_type) {
           cur = get_prop_ci(n_cur, n_tot);
 
           # Append the current values to the list
-          if(ci_flag) { yvals = c(yvals, cur);    }
-          else        { yvals = c(yvals, cur[2]); }
+          if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
+          else        { yvals = c(yvals, cur$val);                   }
         }
 
       } # end for j
@@ -398,15 +423,8 @@ plot_time_series = function(dep, plot_type,
        xaxt='n', col=0, col.axis="black");
   title(main=title_str, outer=TRUE);
 
-  if(plot_type == relperf_str && length(unique(rp_list)) > 1) {
-    xlab = paste(lead_list, rp_list, " ", col$units, sep='');
-  }
-  else {
-    xlab = lead_list;
-  }
-
   # Draw the X-axis
-  axis(1, at=lead_list, tick=TRUE, labels=xlab);
+  axis(1, at=lead_list, tick=TRUE, labels=lead_list);
 
   # Get the list of colors to be used
   color_list = eval(parse(text=paste(tolower(plot_type),
@@ -759,6 +777,15 @@ plot_relperf = function(dep, horz, vert, color_list) {
     if(i == 1) { plot_valid_counts(case_data, color, vert[i]); }
 
   } # end for i
+
+  # Plot threshold information across the top
+  if(length(unique(rp_perc_list)) > 1 ||
+     length(unique(rp_diff_list)) > 1) {
+     axis(3, at=lead_list, tick=FALSE, padj=vert[2], cex.axis=0.75,
+          labels=paste(rp_perc_list, "%", sep=''));
+     axis(3, at=lead_list, tick=FALSE, padj=vert[3], cex.axis=0.75,
+          labels=paste(rp_diff_list, col$units, sep=''));
+  }
 
   # Legend for relative performance
   legend_str = c(paste(series_list, "Better"), "TIE");
