@@ -90,9 +90,9 @@ class ModisFile {
          //  set stuff
          //
 
-     void set_data_scale  (double);
-     void set_data_offset (double);
-     void set_data_fill   (double);
+     void set_data_scale      (double);
+     void set_data_offset     (double);
+     void set_data_fill_value (double);
 
          //
          //  get stuff
