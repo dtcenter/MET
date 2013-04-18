@@ -1840,7 +1840,7 @@ SSVARInfo & SSVARInfo::operator=(const SSVARInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 SSVARInfo & SSVARInfo::operator+=(const SSVARInfo &c) {
-   SSVARInfo s_info;
+   SSVARInfo ssvar_info;
 
    // Check for matching variance bounds
    if(!is_eq(var_min, c.var_min) || !is_eq(var_max, c.var_max)) {
@@ -1852,24 +1852,21 @@ SSVARInfo & SSVARInfo::operator+=(const SSVARInfo &c) {
    }
 
    // The bin index information is unknown when aggregating
-   s_info.n_bin = s_info.bin_i = bad_data_int;
+   ssvar_info.n_bin = ssvar_info.bin_i = bad_data_int;
 
    // Increment the bin count
-   s_info.bin_n = bin_n + c.bin_n;
+   ssvar_info.bin_n = bin_n + c.bin_n;
 
    // Store the variance range
-   s_info.var_min  = var_min;
-   s_info.var_max  = var_max;
+   ssvar_info.var_min  = var_min;
+   ssvar_info.var_max  = var_max;
 
    // Compute weighted averages
-   s_info.var_mean = (var_mean*bin_n + c.var_mean*c.bin_n)/s_info.bin_n;
-   s_info.fbar     = (fbar*bin_n     + c.fbar*c.bin_n)    /s_info.bin_n;
-   s_info.obar     = (obar*bin_n     + c.obar*c.bin_n)    /s_info.bin_n;
-   s_info.fobar    = (fobar*bin_n    + c.fobar*c.bin_n)   /s_info.bin_n;
-   s_info.ffbar    = (ffbar*bin_n    + c.ffbar*c.bin_n)   /s_info.bin_n;
-   s_info.oobar    = (oobar*bin_n    + c.oobar*c.bin_n)   /s_info.bin_n;
+   ssvar_info.var_mean = (var_mean*bin_n + c.var_mean*c.bin_n)/ssvar_info.bin_n;
+   ssvar_info.sl1l2_info  = sl1l2_info;
+   ssvar_info.sl1l2_info += c.sl1l2_info;
 
-   assign(s_info);
+   assign(ssvar_info);
 
    return(*this);
 }
@@ -1888,7 +1885,8 @@ void SSVARInfo::init_from_scratch() {
 void SSVARInfo::clear() {
 
    n_bin = bin_i = bin_n = 0;
-   var_min = var_max = var_mean = fbar = obar = fobar = ffbar = oobar = 0;
+   var_min = var_max = var_mean = 0;
+   sl1l2_info.clear();
 
    return;
 }
@@ -1897,17 +1895,13 @@ void SSVARInfo::clear() {
 
 void SSVARInfo::assign(const SSVARInfo &c) {
 
-   n_bin    = c.n_bin;
-   bin_i    = c.bin_i;
-   bin_n    = c.bin_n;
-   var_min  = c.var_min;
-   var_max  = c.var_max;
-   var_mean = c.var_mean;
-   fbar     = c.fbar;
-   obar     = c.obar;
-   fobar    = c.fobar;
-   ffbar    = c.ffbar;
-   oobar    = c.oobar;
+   n_bin      = c.n_bin;
+   bin_i      = c.bin_i;
+   bin_n      = c.bin_n;
+   var_min    = c.var_min;
+   var_max    = c.var_max;
+   var_mean   = c.var_mean;
+   sl1l2_info = c.sl1l2_info;
 
    return;
 }

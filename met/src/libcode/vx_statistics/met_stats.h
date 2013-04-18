@@ -452,14 +452,12 @@ class SSVARInfo {
       int n_bin;
       int bin_i;
       int bin_n;
+      
       double var_min;
       double var_max;
       double var_mean;
-      double fbar;
-      double obar;
-      double fobar;
-      double ffbar;
-      double oobar;
+
+      SL1L2Info sl1l2_info;
 
       void clear();
 };

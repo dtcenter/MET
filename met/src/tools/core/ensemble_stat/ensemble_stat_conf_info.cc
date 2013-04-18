@@ -78,6 +78,7 @@ void EnsembleStatConfInfo::clear() {
    beg_ds = end_ds = bad_data_int;
    vld_ens_thresh = vld_data_thresh = bad_data_double;
    mask_name.clear();
+   ci_alpha.clear();
    interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
@@ -343,6 +344,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          }
       }
    } // end if n_vx > 0
+
+   // Conf: ci_alpha
+   ci_alpha = parse_conf_ci_alpha(&conf);
 
    // Conf: interp
    interp_info   = parse_conf_interp(&conf);

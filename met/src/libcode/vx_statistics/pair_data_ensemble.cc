@@ -422,11 +422,12 @@ void PairDataEnsemble::compute_ssvar() {
       ssvar_bins[i].var_max  = ssvar_bins[i].var_min + ssvar_bin_size;
       ssvar_bins[i].var_mean = var / (double)pts->size();
 
-      ssvar_bins[i].fbar     = f / (double)pts->size();
-      ssvar_bins[i].obar     = o / (double)pts->size();
-      ssvar_bins[i].fobar    = fo / (double)pts->size();
-      ssvar_bins[i].ffbar    = ff / (double)pts->size();
-      ssvar_bins[i].oobar    = oo / (double)pts->size();
+      ssvar_bins[i].sl1l2_info.scount = pts->size();
+      ssvar_bins[i].sl1l2_info.fbar   = f  / (double)pts->size();
+      ssvar_bins[i].sl1l2_info.obar   = o  / (double)pts->size();
+      ssvar_bins[i].sl1l2_info.fobar  = fo / (double)pts->size();
+      ssvar_bins[i].sl1l2_info.ffbar  = ff / (double)pts->size();
+      ssvar_bins[i].sl1l2_info.oobar  = oo / (double)pts->size();
 
       if( i < 100 ){
          mlog << Debug(4) << "  SSVAR[ "
@@ -434,8 +435,8 @@ void PairDataEnsemble::compute_ssvar() {
               << "bin_n: " << ssvar_bins[i].bin_n << "  "
               << "var: (" << ssvar_bins[i].var_min << ", "
                           << ssvar_bins[i].var_max << ")  "
-              << "fbar: " << ssvar_bins[i].fbar << "  "
-              << "obar: " << ssvar_bins[i].obar << " ]\n";
+              << "fbar: " << ssvar_bins[i].sl1l2_info.fbar << "  "
+              << "obar: " << ssvar_bins[i].sl1l2_info.obar << " ]\n";
       } else if( i == 100 ){
          mlog << Debug(4) << "  SSVAR message 101 through "
               << n_bin << " omitted\n";

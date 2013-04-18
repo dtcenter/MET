@@ -1866,9 +1866,10 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     bool txt_flag,
+                     double alpha, bool txt_flag,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
+   int i;
 
    // SSVAR line type
    shc.set_line_type("SSVAR");
@@ -1877,16 +1878,19 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    shc.clear_fcst_thresh();
    shc.clear_obs_thresh();
    shc.clear_cov_thresh();
-   shc.set_alpha(bad_data_double);
 
+   // Alpha value
+   shc.set_alpha(alpha);
+     
    // Write a line for each ssvar bin
-   for(int i=0; i<pd_ptr->ssvar_bins[0].n_bin; i++) {
+   for(i=0; i<pd_ptr->ssvar_bins[0].n_bin; i++) {
 
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
 
       // Write the data columns
-      write_ssvar_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
+      write_ssvar_cols(pd_ptr, i, alpha,
+                       stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(txt_flag) {
@@ -1898,7 +1902,8 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
       // Increment the STAT row counter
       stat_row++;
-   }
+
+   } // end for i
 
    return;
 }
@@ -3440,15 +3445,33 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
-                      AsciiTable &at, int r, int c) {
+                      double alpha, AsciiTable &at, int r, int c) {
+   CNTInfo cnt_info;
 
+   //
+   // Allocate space for confidence intervals and derive continuous
+   // statistics
+   //
+   cnt_info.allocate_n_alpha(1);
+   cnt_info.alpha[0] = alpha;
+   compute_cntinfo(pd_ptr->ssvar_bins[i].sl1l2_info, 0, cnt_info);
+   
    //
    // Ensemble spread/skill variance bins
    // Dump out the SSVAR line:
    //    TOTAL,       N_BIN,       BIN_i,
    //    BIN_N,       VAR_MIN,     VAR_MAX,
    //    VAR_MEAN,    FBAR,        OBAR,
-   //    FOBAR,       FFBAR,       OOBAR
+   //    FOBAR,       FFBAR,       OOBAR,
+   //    FBAR_NCL,    FBAR_NCU,
+   //    FSTDEV,      FSTDEV_NCL,  FSTDEV_NCU,
+   //    OBAR_NCL,    OBAR_NCU,
+   //    OSTDEV,      OSTDEV_NCL,  OSTDEV_NCU,
+   //    PR_CORR,     PR_CORR_NCL, PR_CORR_NCU,
+   //    ME,          ME_NCL,      ME_NCU,
+   //    ESTDEV,      ESTDEV_NCL,  ESTDEV_NCU,
+   //    MBIAS,       MSE,         BCMSE,
+   //    RMSE
    //
 
    at.set_entry(r, c+0,  // Total Number of Pairs
@@ -3472,20 +3495,89 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+6,  // Mean variance value for bin
       pd_ptr->ssvar_bins[i].var_mean);
 
-   at.set_entry(r, c+7,  // Mean(f)
-      pd_ptr->ssvar_bins[i].fbar);
+   at.set_entry(r, c+7,  // Forecast Mean
+      pd_ptr->ssvar_bins[i].sl1l2_info.fbar);
 
-   at.set_entry(r, c+8,  // Mean(o)
-      pd_ptr->ssvar_bins[i].obar);
+   at.set_entry(r, c+8,  // Observation Mean
+      pd_ptr->ssvar_bins[i].sl1l2_info.obar);
 
-   at.set_entry(r, c+9,  // Mean(fo)
-      pd_ptr->ssvar_bins[i].fobar);
+   at.set_entry(r, c+9,  // Forecast times Observation Mean
+      pd_ptr->ssvar_bins[i].sl1l2_info.fobar);
 
-   at.set_entry(r, c+10,  // Mean(ff)
-      pd_ptr->ssvar_bins[i].ffbar);
+   at.set_entry(r, c+10, // Forecast Squared Mean
+      pd_ptr->ssvar_bins[i].sl1l2_info.ffbar);
 
-   at.set_entry(r, c+11,  // Mean(oo)
-      pd_ptr->ssvar_bins[i].oobar);
+   at.set_entry(r, c+11, // Observation Squared Mean
+      pd_ptr->ssvar_bins[i].sl1l2_info.oobar);
+
+   at.set_entry(r, c+12, // Forecast Mean NCL
+      cnt_info.fbar.v_ncl[0]);
+
+   at.set_entry(r, c+13, // Forecast Mean NCU
+      cnt_info.fbar.v_ncu[0]);
+
+   at.set_entry(r, c+14, // Forecast Standard Deviation
+      cnt_info.fstdev.v);
+
+   at.set_entry(r, c+15, // Forecast Standard Deviation NCL
+      cnt_info.fstdev.v_ncl[0]);
+
+   at.set_entry(r, c+16, // Forecast Standard Deviation NCU
+      cnt_info.fstdev.v_ncu[0]);
+
+   at.set_entry(r, c+17, // Observation Mean NCL
+      cnt_info.obar.v_ncl[0]);
+
+   at.set_entry(r, c+18, // Observation Mean NCU
+      cnt_info.obar.v_ncu[0]);
+
+   at.set_entry(r, c+19, // Obsevation Standard Deviation
+      cnt_info.ostdev.v);
+
+   at.set_entry(r, c+20, // Obsevation Standard Deviation NCL
+      cnt_info.ostdev.v_ncl[0]);
+
+   at.set_entry(r, c+21, // Obsevation Standard Deviation NCU
+      cnt_info.ostdev.v_ncu[0]);
+
+   at.set_entry(r, c+22, // Pearson's Correlation Coefficient
+      cnt_info.pr_corr.v);
+
+   at.set_entry(r, c+23, // Pearson's Correlation Coefficient NCL
+      cnt_info.pr_corr.v_ncl[0]);
+
+   at.set_entry(r, c+24, // Pearson's Correlation Coefficient NCU
+      cnt_info.pr_corr.v_ncu[0]);
+
+   at.set_entry(r, c+25, // Mean Error
+      cnt_info.me.v);
+
+   at.set_entry(r, c+26, // Mean Error NCL
+      cnt_info.me.v_ncl[0]);
+
+   at.set_entry(r, c+27, // Mean Error NCU
+      cnt_info.me.v_ncu[0]);
+
+   at.set_entry(r, c+28, // Error Standard Deviation
+      cnt_info.estdev.v);
+
+   at.set_entry(r, c+29, // Error Standard Deviation NCL
+      cnt_info.estdev.v_ncl[0]);
+
+   at.set_entry(r, c+30, // Error Standard Deviation NCU
+      cnt_info.estdev.v_ncu[0]);
+
+   at.set_entry(r, c+31, // Multiplicative Bias
+      cnt_info.mbias.v);
+
+   at.set_entry(r, c+32, // Mean Squared Error
+      cnt_info.mse.v);
+
+   at.set_entry(r, c+33, // Bias-Corrected Mean Squared Error
+      cnt_info.bcmse.v);
+
+   at.set_entry(r, c+34, // Root Mean Squared Error
+      cnt_info.rmse.v);
 
 }
 

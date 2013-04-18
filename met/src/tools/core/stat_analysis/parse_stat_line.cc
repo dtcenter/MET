@@ -334,21 +334,22 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_ssvar_line(STATLine &l, SSVARInfo &s_info) {
+void parse_ssvar_line(STATLine &l, SSVARInfo &ssvar_info) {
 
-   s_info.n_bin    = atoi(l.get_item(ssvar_n_bin_offset));
-   s_info.bin_i    = atoi(l.get_item(ssvar_bin_i_offset));
-   s_info.bin_n    = atoi(l.get_item(ssvar_bin_n_offset));
+   ssvar_info.n_bin    = atoi(l.get_item(ssvar_n_bin_offset));
+   ssvar_info.bin_i    = atoi(l.get_item(ssvar_bin_i_offset));
+   ssvar_info.bin_n    = atoi(l.get_item(ssvar_bin_n_offset));
 
-   s_info.var_min  = atof(l.get_item(ssvar_var_min_offset));
-   s_info.var_max  = atof(l.get_item(ssvar_var_max_offset));
-   s_info.var_mean = atof(l.get_item(ssvar_var_mean_offset));
+   ssvar_info.var_min  = atof(l.get_item(ssvar_var_min_offset));
+   ssvar_info.var_max  = atof(l.get_item(ssvar_var_max_offset));
+   ssvar_info.var_mean = atof(l.get_item(ssvar_var_mean_offset));
 
-   s_info.fbar     = atof(l.get_item(ssvar_fbar_offset));
-   s_info.obar     = atof(l.get_item(ssvar_obar_offset));
-   s_info.fobar    = atof(l.get_item(ssvar_fobar_offset));
-   s_info.ffbar    = atof(l.get_item(ssvar_ffbar_offset));
-   s_info.oobar    = atof(l.get_item(ssvar_oobar_offset));
+   ssvar_info.sl1l2_info.scount = ssvar_info.bin_n;
+   ssvar_info.sl1l2_info.fbar   = atof(l.get_item(ssvar_fbar_offset));
+   ssvar_info.sl1l2_info.obar   = atof(l.get_item(ssvar_obar_offset));
+   ssvar_info.sl1l2_info.fobar  = atof(l.get_item(ssvar_fobar_offset));
+   ssvar_info.sl1l2_info.ffbar  = atof(l.get_item(ssvar_ffbar_offset));
+   ssvar_info.sl1l2_info.oobar  = atof(l.get_item(ssvar_oobar_offset));
 
    return;
 }

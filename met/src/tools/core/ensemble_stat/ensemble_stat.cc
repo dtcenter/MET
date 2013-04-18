@@ -882,7 +882,7 @@ int process_point_ens(int i_ens) {
 
 void process_point_scores() {
    PairDataEnsemble *pd_ptr = (PairDataEnsemble *) 0;
-   int i, j, k, l;
+   int i, j, k, l, m;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -992,17 +992,21 @@ void process_point_scores() {
                   pd_ptr->compute_ssvar();
 
                   // Add rows to the output AsciiTables for SSVAR
-                  stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin);
+                  stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin *
+                                   conf_info.ci_alpha.n_elements());
 
                   if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
-                     txt_at[i_ssvar].add_rows(pd_ptr->ssvar_bins[0].n_bin);
+                     txt_at[i_ssvar].add_rows(pd_ptr->ssvar_bins[0].n_bin *
+                                              conf_info.ci_alpha.n_elements());
                   }
 
-                  // Write the SSVAR data
-                  write_ssvar_row(shc, pd_ptr,
-                     conf_info.output_flag[i_ssvar],
-                     stat_at, i_stat_row,
-                     txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                  // Write the SSVAR data for each alpha value
+                  for(m=0; m<conf_info.ci_alpha.n_elements(); m++) {
+                     write_ssvar_row(shc, pd_ptr, conf_info.ci_alpha[m],
+                        conf_info.output_flag[i_ssvar],
+                        stat_at, i_stat_row,
+                        txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                  }
                }
 
             } // end for l
@@ -1016,7 +1020,7 @@ void process_point_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_vx() {
-   int i, j, k, n_miss;
+   int i, j, k, l, n_miss;
    bool found;
    double t;
    DataPlane *fcst_dp = (DataPlane *) 0;
@@ -1314,17 +1318,21 @@ void process_grid_vx() {
                pd.compute_ssvar();
 
                // Add rows to the output AsciiTables for SSVAR
-               stat_at.add_rows(pd.ssvar_bins[0].n_bin);
+               stat_at.add_rows(pd.ssvar_bins[0].n_bin *
+                                conf_info.ci_alpha.n_elements());
 
                if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
-                  txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin);
+                  txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
+                                           conf_info.ci_alpha.n_elements());
                }
 
-               // Write the SSVAR data
-               write_ssvar_row(shc, &pd,
-                  conf_info.output_flag[i_ssvar],
-                  stat_at, i_stat_row,
-                  txt_at[i_ssvar], i_txt_row[i_ssvar]);
+               // Write the SSVAR data for each alpha value
+               for(l=0; l<conf_info.ci_alpha.n_elements(); l++) {
+                  write_ssvar_row(shc, &pd, conf_info.ci_alpha[l],
+                     conf_info.output_flag[i_ssvar],
+                     stat_at, i_stat_row,
+                     txt_at[i_ssvar], i_txt_row[i_ssvar]);
+               }
             }
 
          } // end for k
@@ -1576,9 +1584,10 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   max_col = max(get_n_orank_columns(n_ens+1),
-                 get_n_rhist_columns(n_ens))
-             + n_header_columns;
+   max_col =  max(get_n_orank_columns(n_ens+1),
+                  get_n_rhist_columns(n_ens));
+   max_col =  max(max_col, n_ssvar_columns);
+   max_col += n_header_columns;
 
    // Initialize file stream
    stat_out = (ofstream *) 0;
@@ -1605,7 +1614,7 @@ void setup_txt_files() {
    //
    /////////////////////////////////////////////////////////////////////
 
-   // Loop through output file type
+   // Loop through output line type
    for(i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
