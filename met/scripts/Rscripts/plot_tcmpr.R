@@ -24,7 +24,6 @@
 ##         [-lead list]
 ##         [-plot list]
 ##         [-rp_diff string]
-##         [-rp_perc string]
 ##         [-no_ee]
 ##         [-no_ci]
 ##         [-no_log]
@@ -53,9 +52,6 @@
 ##      "-rp_diff"   is a comma-separated list of thresholds to specify
 ##                   meaningful differences for the relative performance
 ##                   plot.
-##      "-rp_perc"   is a comma-separated list of thresholds to specify
-##                   meaningful percentage changes for the relative
-##                   performance plot.
 ##      "-no_ee"     to disable event equalization.
 ##      "-no_ci"     to disable confidence intervals.
 ##      "-no_log"    to disable log file generation.
@@ -113,7 +109,6 @@ usage = function() {
   cat("        [-lead list]\n");
   cat("        [-plot list]\n");
   cat("        [-rp_diff string]\n");
-  cat("        [-rp_perc string]\n");
   cat("        [-no_ee]\n");
   cat("        [-no_ci]\n");
   cat("        [-no_log]\n");
@@ -137,8 +132,6 @@ usage = function() {
   cat("                           BOXPLOT, SCATTER, MEAN, MEDIAN, RELPERF, RANK\n");
   cat("              \"-rp_diff\"   is a comma-separated list of thresholds to specify\n");
   cat("                           meaningful differences for the relative performance plot.\n");
-  cat("              \"-rp_perc\"   is a comma-separated list of thresholds to specify\n");
-  cat("                           meaningful percent changes for the relative performance plot.\n");
   cat("              \"-no_ee\"     to disable event equalization.\n");
   cat("              \"-no_ci\"     to disable confidence intervals.\n");
   cat("              \"-no_log\"    to disable log file generation.\n");
@@ -243,9 +236,6 @@ while(i <= length(args)) {
   } else if(args[i] == "-rp_diff") {
     rp_diff_list = unlist(strsplit(args[i+1], ','));
     i=i+1;
-  } else if(args[i] == "-rp_perc") {
-    rp_perc_list = unlist(strsplit(args[i+1], ','));
-    i=i+1;
   } else if(args[i] == "-no_ee") {
     event_equal = FALSE;
   } else if(args[i] == "-no_ci") {
@@ -270,9 +260,7 @@ while(i <= length(args)) {
 
 # Check the relative performance threshold settings
 if(length(rp_diff_list) == 1) rp_diff_list = rep(rp_diff_list, length(lead_list));
-if(length(rp_perc_list) == 1) rp_perc_list = rep(rp_perc_list, length(lead_list));
-if(length(rp_diff_list) != length(lead_list) ||
-   length(rp_perc_list) != length(lead_list)) {
+if(length(rp_diff_list) != length(lead_list)) {
   cat("ERROR: The number of relative performance thresholds specified",
       "must either be 1 or match the number of lead times.\n");
   quit(status=1);
@@ -529,9 +517,6 @@ for(i in 1:length(dep_list)) {
         plot_title = paste("Relative Performance of \n", col$desc, "\n", sep='');
         if(length(unique(rp_diff_list)) == 1) {
           plot_title = paste(plot_title, "Difference", rp_diff_list[1], col$units, sep='');
-        }
-        if(length(unique(rp_perc_list)) == 1) {
-          plot_title = paste(plot_title, ", Change", rp_perc_list[1], "%", sep='');
         }
         plot_title = paste(plot_title, " by ", column_info[series, "DESCRIPTION"], sep='');
       }

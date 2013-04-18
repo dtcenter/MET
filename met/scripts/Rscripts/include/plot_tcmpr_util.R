@@ -124,8 +124,7 @@ get_case_data = function() {
   # Build a set of unique cases
   case_data = unique(data.frame(CASE=series_data$CASE,
                                 LEAD_HR=series_data$LEAD_HR,
-                                MIN=NA, MAX=NA, WIN=NA,
-                                DIFF=NA, DIFF_TEST=NA, PERC=NA, PERC_TEST=NA,
+                                MIN=NA, MAX=NA, WIN=NA, DIFF=NA, DIFF_TEST=NA,
                                 RESULT=NA, PLOT=NA, RANK_RANDOM=NA, RANK_MIN=NA));
 
   # Check for equal numbers of entries for each case
@@ -150,7 +149,6 @@ get_case_data = function() {
 
     # Store the threshold for the current lead time
     rp_diff_thresh = rp_diff_list[which(case_data$LEAD_HR[i] == lead_list)];
-    rp_perc_thresh = rp_perc_list[which(case_data$LEAD_HR[i] == lead_list)];
 
     # Compute the minimum, maximum, and winner
     case_data$MIN[i]         = min(series_data[ind,]$PLOT);
@@ -163,17 +161,9 @@ get_case_data = function() {
     # Compute the difference and test it
     case_data$DIFF[i]        = case_data$MAX[i] - case_data$MIN[i];
     case_data$DIFF_TEST[i]   = paste(case_data$DIFF[i], rp_diff_thresh, sep='');
-    
-    # Compute the absolute percent change and test it
-    # Percent change from the first model to the last model
-    case_data$PERC[i]        = 100*abs(series_data[ind,]$PLOT[1] -
-                               series_data[ind,]$PLOT[n_series]) /
-                               series_data[ind,]$PLOT[n_series];
-    case_data$PERC_TEST[i]   = paste(case_data$PERC[i], rp_perc_thresh, sep='');
 
-    # Evaluate the tests constructed above
-    case_data$RESULT[i]      = eval(parse(text=case_data$DIFF_TEST[i])) &&
-                               eval(parse(text=case_data$PERC_TEST[i]));
+    # Evaluate the test constructed above
+    case_data$RESULT[i]      = eval(parse(text=case_data$DIFF_TEST[i]));
     case_data$PLOT[i]        = ifelse(case_data$RESULT[i],
                                       case_data$WIN[i], "TIE");
 
@@ -779,11 +769,8 @@ plot_relperf = function(dep, horz, vert, color_list) {
   } # end for i
 
   # Plot threshold information across the top
-  if(length(unique(rp_perc_list)) > 1 ||
-     length(unique(rp_diff_list)) > 1) {
+  if(length(unique(rp_diff_list)) > 1) {
      axis(3, at=lead_list, tick=FALSE, padj=vert[2], cex.axis=0.75,
-          labels=paste(rp_perc_list, "%", sep=''));
-     axis(3, at=lead_list, tick=FALSE, padj=vert[3], cex.axis=0.75,
           labels=paste(rp_diff_list, col$units, sep=''));
   }
 
