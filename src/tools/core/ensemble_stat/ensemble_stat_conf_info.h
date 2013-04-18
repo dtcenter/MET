@@ -90,6 +90,7 @@ class EnsembleStatConfInfo {
       ConcatString         ens_ssvar_file;      // Ensemble mean file name
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
       StringArray *        mask_sid;            // Masking station id's [n_mask_sid]
+      NumArray             ci_alpha;            // Alpha value for confidence intervals
       FieldType            interp_field;        // How to apply interpolation options      
       double               interp_thresh;       // Proportion of valid data values
       InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]

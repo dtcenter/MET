@@ -470,18 +470,41 @@ inline int orank_ens_offset(int i)       { return(nhc + 12 + i); }
 //
 // SSVAR Line Type offsets
 //
-static const int ssvar_total_offset      = nhc + 0;
-static const int ssvar_n_bin_offset      = nhc + 1;
-static const int ssvar_bin_i_offset      = nhc + 2;
-static const int ssvar_bin_n_offset      = nhc + 3;
-static const int ssvar_var_min_offset    = nhc + 4;
-static const int ssvar_var_max_offset    = nhc + 5;
-static const int ssvar_var_mean_offset   = nhc + 6;
-static const int ssvar_fbar_offset       = nhc + 7;
-static const int ssvar_obar_offset       = nhc + 8;
-static const int ssvar_fobar_offset      = nhc + 9;
-static const int ssvar_ffbar_offset      = nhc + 10;
-static const int ssvar_oobar_offset      = nhc + 11;
+static const int ssvar_total_offset       = nhc + 0;
+static const int ssvar_n_bin_offset       = nhc + 1;
+static const int ssvar_bin_i_offset       = nhc + 2;
+static const int ssvar_bin_n_offset       = nhc + 3;
+static const int ssvar_var_min_offset     = nhc + 4;
+static const int ssvar_var_max_offset     = nhc + 5;
+static const int ssvar_var_mean_offset    = nhc + 6;
+static const int ssvar_fbar_offset        = nhc + 7;
+static const int ssvar_obar_offset        = nhc + 8;
+static const int ssvar_fobar_offset       = nhc + 9;
+static const int ssvar_ffbar_offset       = nhc + 10;
+static const int ssvar_oobar_offset       = nhc + 11;
+static const int ssvar_fbar_ncl_offset    = nhc + 12;
+static const int ssvar_fbar_ncu_offset    = nhc + 13;
+static const int ssvar_fstdev_offset      = nhc + 14;
+static const int ssvar_fstdev_ncl_offset  = nhc + 15;
+static const int ssvar_fstdev_ncu_offset  = nhc + 16;
+static const int ssvar_obar_ncl_offset    = nhc + 17;
+static const int ssvar_obar_ncu_offset    = nhc + 18;
+static const int ssvar_ostdev_offset      = nhc + 19;
+static const int ssvar_ostdev_ncl_offset  = nhc + 20;
+static const int ssvar_ostdev_ncu_offset  = nhc + 21;
+static const int ssvar_pr_corr_offset     = nhc + 22;
+static const int ssvar_pr_corr_ncl_offset = nhc + 23;
+static const int ssvar_pr_corr_ncu_offset = nhc + 24;
+static const int ssvar_me_offset          = nhc + 25;
+static const int ssvar_me_ncl_offset      = nhc + 26;
+static const int ssvar_me_ncu_offset      = nhc + 27;
+static const int ssvar_estdev_offset      = nhc + 28;
+static const int ssvar_estdev_ncl_offset  = nhc + 29;
+static const int ssvar_estdev_ncu_offset  = nhc + 30;
+static const int ssvar_mbias_offset       = nhc + 31;
+static const int ssvar_mse_offset         = nhc + 32;
+static const int ssvar_bcmse_offset       = nhc + 33;
+static const int ssvar_rmse_offset        = nhc + 34;
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1598,7 +1598,15 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
    map<ConcatString, AggrSSVARInfo>::iterator case_it;
    map<ConcatString, SSVARInfo>::iterator bin_it;
    int i, n, n_row, n_col, r, c;
+   CNTInfo cnt_info;
 
+   //
+   // Allocate space for confidence intervals and derive continuous
+   // statistics
+   //
+   cnt_info.allocate_n_alpha(1);
+   cnt_info.alpha[0] = j.out_alpha;
+   
    //
    // Determine the number of rows
    //
@@ -1649,6 +1657,11 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
          c = 0;
 
          //
+         // Compute CNTInfo statistics from the aggregated partial sums
+         //
+         compute_cntinfo(bin_it->second.sl1l2_info, 0, cnt_info);
+      
+         //
          // SSVAR output line
          //
          at.set_entry(r, c++, "SSVAR:");
@@ -1660,11 +1673,34 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, bin_it->second.var_min);
          at.set_entry(r, c++, bin_it->second.var_max);
          at.set_entry(r, c++, bin_it->second.var_mean);
-         at.set_entry(r, c++, bin_it->second.fbar);
-         at.set_entry(r, c++, bin_it->second.obar);
-         at.set_entry(r, c++, bin_it->second.fobar);
-         at.set_entry(r, c++, bin_it->second.ffbar);
-         at.set_entry(r, c++, bin_it->second.oobar);
+         at.set_entry(r, c++, bin_it->second.sl1l2_info.fbar);
+         at.set_entry(r, c++, bin_it->second.sl1l2_info.obar);
+         at.set_entry(r, c++, bin_it->second.sl1l2_info.fobar);
+         at.set_entry(r, c++, bin_it->second.sl1l2_info.ffbar);
+         at.set_entry(r, c++, bin_it->second.sl1l2_info.oobar);
+         at.set_entry(r, c++, cnt_info.fbar.v_ncl[0]);
+         at.set_entry(r, c++, cnt_info.fbar.v_ncu[0]);
+         at.set_entry(r, c++, cnt_info.fstdev.v);
+         at.set_entry(r, c++, cnt_info.fstdev.v_ncl[0]);
+         at.set_entry(r, c++, cnt_info.fstdev.v_ncu[0]);
+         at.set_entry(r, c++, cnt_info.obar.v_ncl[0]);
+         at.set_entry(r, c++, cnt_info.obar.v_ncu[0]);
+         at.set_entry(r, c++, cnt_info.ostdev.v);
+         at.set_entry(r, c++, cnt_info.ostdev.v_ncl[0]);
+         at.set_entry(r, c++, cnt_info.ostdev.v_ncu[0]);
+         at.set_entry(r, c++, cnt_info.pr_corr.v);
+         at.set_entry(r, c++, cnt_info.pr_corr.v_ncl[0]);
+         at.set_entry(r, c++, cnt_info.pr_corr.v_ncu[0]);
+         at.set_entry(r, c++, cnt_info.me.v);
+         at.set_entry(r, c++, cnt_info.me.v_ncl[0]);
+         at.set_entry(r, c++, cnt_info.me.v_ncu[0]);
+         at.set_entry(r, c++, cnt_info.estdev.v);
+         at.set_entry(r, c++, cnt_info.estdev.v_ncl[0]);
+         at.set_entry(r, c++, cnt_info.estdev.v_ncu[0]);
+         at.set_entry(r, c++, cnt_info.mbias.v);
+         at.set_entry(r, c++, cnt_info.mse.v);
+         at.set_entry(r, c++, cnt_info.bcmse.v);
+         at.set_entry(r, c++, cnt_info.rmse.v);
 
       } // end for bin_it
    } // end for case_it
