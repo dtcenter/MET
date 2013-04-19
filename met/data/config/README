@@ -1626,9 +1626,9 @@ vif_flag = FALSE;
 // Specify whether the code should check for duplicate ATCF lines when
 // building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
 //
-// e.g. check_dup = TRUE;
+// e.g. check_dup = FALSE;
 //
-check_dup = TRUE;
+check_dup = FALSE;
 
 //
 // Specify whether special processing should be performed for interpolated
@@ -1760,8 +1760,9 @@ lead       = [];
 line_type = [];
 
 //
-// Stratify by selecting the most severe watch/warning status from the track
-// points which are common to both the ADECK and BDECK tracks.
+// Stratify by checking the watch/warning status for each track point
+// common to both the ADECK and BDECK tracks. If the watch/warning status
+// of any of the track points appears in the list, retain the entire track.
 // Individual watch/warning status by point may be specified using the
 // -column_str options below, but this option filters by the track maximum.
 // May add using the "-track_watch_warn" job command option.
@@ -1828,8 +1829,9 @@ water_only = false;
 
 //
 // Specify whether only those track points for which rapid intensification
-// occurred in the BDECK track during the previous 24 hours should be retained.
-// Define rapid intensification by thresholding the change in maximum wind speed.
+// occurred in the BDECK track between the current time and 24-hours prior
+// should be retained. Define rapid intensification by thresholding the change
+// in maximum windspeed.
 // May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
 // options.
 //
