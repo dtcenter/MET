@@ -455,7 +455,8 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
 
   # Only generate a log file for boxplots
   do_log = (log_flag == TRUE && plot_type == boxplot_str);
-
+  if(do_log) log_data = c();
+  
   # Draw a reference line at 0
   abline(h=0, lty=3, lwd=2.0);
 
@@ -494,20 +495,18 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
 
         # Set the boxplot color
         bxp_col = ifelse(color == "black", "white", color);
-        if(color == "black") { bxp_col = "white"; }
-        else                 { bxp_col = color;   }
 
         # Create a boxplot
         b = boxplot(data$PLOT,
                     add=TRUE, notch=TRUE, boxwex=1.5,
                     outpch=1, outcex=1.0,
-                    at=lead+horz[i], xaxt="n", yaxt="n", col=bxp_col,
+                    at=lead+horz[i], xaxt="n", yaxt="n",
+                    col=bxp_col, outcol=color,
+                    whiskcol=color, staplecol=color,
                     varwidth=TRUE);
 
         # Store logging information
         if(do_log) {
-
-          if(!exists("log_data")) log_data = c();
 
           # Sort the unique outlier values
           for(outlier in sort(unique(b$out), decreasing=TRUE)) {
@@ -557,10 +556,19 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
   # Write the log data out to the log file
   if(do_log) {
     cat(paste("Writing log file:", log_file, "\n"));
-    write.table(log_data, file=log_file, sep=',',
-                row.names=FALSE, quote=FALSE,
-                col.names=c("LEAD_HR", "AMODEL", "STORM_ID", "INIT",
-                            "VARIABLE", "OUTLIER"));
+
+    # Check for no outliers
+    if(is.null(log_data)) {
+      write("LEAD_HR,AMODEL,STORM_ID,INIT,VARIABLEOUTLIER",
+            file=log_file);
+    }
+    # Otherwise, write the data
+    else {
+      write.table(log_data, file=log_file, sep=',',
+                  row.names=FALSE, quote=FALSE,
+                  col.names=c("LEAD_HR", "AMODEL", "STORM_ID",
+                              "INIT", "VARIABLE", "OUTLIER"));
+    }
   }
 }
 
