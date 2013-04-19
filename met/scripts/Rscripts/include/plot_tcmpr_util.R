@@ -100,7 +100,7 @@ get_series_data = function(cur, cur_plot, diff) {
 #
 ########################################################################
 
-get_case_data = function() {
+get_case_data = function() 
 
   # Check that series_list equals series_plot
   for(i in 1:length(series_list)) {
@@ -367,6 +367,9 @@ get_yrange = function(plot_type) {
     # Update the plotting limits
     ylim = range(c(ylim, yvals), na.rm=TRUE);
 
+    # Only need to check one series entry for relperf and rank
+    if(plot_type == relperf_str || plot_type == rank_str) break;
+
   } # end for i
 
   return(ylim);
@@ -402,8 +405,8 @@ plot_time_series = function(dep, plot_type,
       paste(yrange, collapse=", "), "\n");
   
   # Create an empty plot
-  top_mar = ifelse(event_equal, 2, 2+floor(n_series/2));
-  par(mfrow=c(1,1), mar=c(5,4,top_mar,2), oma=c(0,0,4,0), cex=1.5);
+  top_mar = ifelse(event_equal, 6, 6+floor(n_series/2));
+  par(mfrow=c(1,1), mar=c(5,4,top_mar,2), cex=1.5);
   plot(x=seq(0, max(lead_list), 6), type="n",
        xlab="Lead Time (h)",
        ylab=ylab_str,
@@ -411,7 +414,7 @@ plot_time_series = function(dep, plot_type,
        xlim=c(0+min(horz), max(lead_list)+max(horz)),
        ylim=yrange,
        xaxt='n', col=0, col.axis="black");
-  title(main=title_str, outer=TRUE);
+  title(main=title_str, line=top_mar-3.5);
 
   # Draw the X-axis
   axis(1, at=lead_list, tick=TRUE, labels=lead_list);

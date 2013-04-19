@@ -266,6 +266,17 @@ if(length(rp_diff_list) != length(lead_list)) {
   quit(status=1);
 }
 
+# Check for empty input file list
+if(length(file_list) == 0) {
+  cat("ERROR: Must specify input track data files using the",
+      "-lookin option.\n");
+  quit(status=1);
+}
+
+# Expand any wildcards in the input file list
+file_list = system(paste("ls -1", paste(file_list, collapse=" ")),
+                   intern=TRUE);
+
 ########################################################################
 #
 # Run a tc_stat filter job to subset the data.
@@ -279,7 +290,7 @@ if(event_equal) {
 
 # Build tc_stat command
 run_cmd = paste(tc_stat,
-                paste("-lookin", unlist(strsplit(file_list, ',')), collapse=" "),
+                paste("-lookin", file_list, collapse=' '),
                 "-job filter -dump_row", tcst_tmp_file, filter_opts,
                 "-v 3");
 
