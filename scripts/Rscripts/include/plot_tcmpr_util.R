@@ -100,7 +100,7 @@ get_series_data = function(cur, cur_plot, diff) {
 #
 ########################################################################
 
-get_case_data = function() 
+get_case_data = function() {
 
   # Check that series_list equals series_plot
   for(i in 1:length(series_list)) {
