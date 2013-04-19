@@ -197,13 +197,13 @@ while(i <= length(args)) {
     prefix = args[i+1];
     i=i+1;
   } else if(args[i] == "-title") {
-    title_str = args[i+1];
+    title_str = eval(parse(text=paste("'", args[i+1], "'", sep='')));
     i=i+1;
   } else if(args[i] == "-subtitle") {
-    subtitle_str = args[i+1];
+    subtitle_str = eval(parse(text=paste("'", args[i+1], "'", sep='')));
     i=i+1;
   } else if(args[i] == "-ylab") {
-    ylab_str = args[i+1];
+    ylab_str = eval(parse(text=paste("'", args[i+1], "'", sep='')));
     i=i+1;
   } else if(args[i] == "-ylim") {
     ymin = as.numeric(unlist(strsplit(args[i+1], ','))[1]);
