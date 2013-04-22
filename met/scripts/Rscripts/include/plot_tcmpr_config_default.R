@@ -13,6 +13,7 @@ ylab_str     = c();
 ymin         = NA;
 ymax         = NA;
 filter_opts  = "";
+tcst_file    = "";
 dep_list     = c("TK_ERR");
 series       = "AMODEL";
 series_list  = c();
