@@ -15,6 +15,7 @@
 ##         [-outdir path]
 ##         [-prefix string]
 ##         [-filter options]
+##         [-tcst path]
 ##         [-title string]
 ##         [-subtitle string]
 ##         [-ylab string]
@@ -40,6 +41,8 @@
 ##      "-ylab"      overrides the default plot y-axis label.
 ##      "-ylim"      is the bounds for plotting the Y-axis.
 ##      "-filter"    is a list of filtering options for tc_stat.
+##      "-tcst"      is a tcst data file to be used instead of running
+##                   the tc_stat tool.
 ##      "-dep"       is a comma-separated list of dependent variable
 ##                   columns to plot.
 ##      "-series"    is the column whose unique values define the
@@ -104,6 +107,7 @@ usage = function() {
   cat("        [-ylab string]\n");
   cat("        [-ylim min,max]\n");
   cat("        [-filter options]\n");
+  cat("        [-tcst path]\n");
   cat("        [-dep list]\n");
   cat("        [-series string [list]]\n");
   cat("        [-lead list]\n");
@@ -123,6 +127,7 @@ usage = function() {
   cat("              \"-ylab\"      overrides the default plot y-axis label.\n");
   cat("              \"-ylim\"      is the min,max bounds for plotting the Y-axis.\n");
   cat("              \"-filter\"    is a list of filtering options for the tc_stat tool.\n");
+  cat("              \"-tcst\"      is a tcst data file to be used instead of running the tc_stat tool.\n");
   cat("              \"-dep\"       is a comma-separated list of dependent variable columns to plot.\n");
   cat("              \"-series\"    is the column whose unique values define the series on the plot,\n");
   cat("                           optionally followed by a comma-separated list of values, including:\n");
@@ -212,6 +217,9 @@ while(i <= length(args)) {
   } else if(args[i] == "-filter") {
     filter_opts = args[i+1];
     i=i+1;
+  } else if(args[i] == "-tcst") {
+    tcst_file = args[i+1];
+    i=i+1;
   } else if(args[i] == "-dep") {
     dep_list = unlist(strsplit(args[i+1], ','));
     i=i+1;
@@ -283,27 +291,52 @@ file_list = system(paste("ls -1", paste(file_list, collapse=" ")),
 #
 ########################################################################
 
-# Add the event equalization option
-if(event_equal) {
-  filter_opts = paste(filter_opts, "-event_equal true");
+# Only run tc_stat is a tcst data has not been specified
+if(nchar(tcst_file) == 0) {
+
+  # Add the event equalization option
+  if(event_equal) {
+    filter_opts = paste(filter_opts, "-event_equal true");
+  }
+
+  # Build tc_stat command
+  run_cmd = paste(tc_stat,
+                  paste("-lookin", file_list, collapse=' '),
+                  "-job filter -dump_row", tcst_tmp_file, filter_opts,
+                  "-v 3");
+
+  # Run the tc_stat command and check the return status
+  cat("CALLING: ", run_cmd, "\n");
+  status = system(run_cmd);
+  if(status != 0) {
+    cat("ERROR: Bad return value ", status , "\n");
+    quit(status=status);
+  }
+
+  # Read the data
+  cat("Reading track data:", tcst_tmp_file, "\n");
+  tcst = read.table(tcst_tmp_file, header=TRUE);
+
+  # Dispose of the temporary file by either saving or deleting it
+  if(nchar(save_data) > 0) {
+     run_cmd = paste("mv -f", tcst_tmp_file, save_data);
+  } else {
+     run_cmd = paste("rm -f", tcst_tmp_file);
+  }
+  cat("CALLING: ", run_cmd, "\n");
+  status = system(run_cmd);
+
+# Otherwise, read the tcst data file directly
+} else {
+  cat("Reading track data:", tcst_file, "\n");
+  tcst = read.table(tcst_file, header=TRUE);
 }
-
-# Build tc_stat command
-run_cmd = paste(tc_stat,
-                paste("-lookin", file_list, collapse=' '),
-                "-job filter -dump_row", tcst_tmp_file, filter_opts,
-                "-v 3");
-
-# Run the tc_stat command and check the return status
-cat("CALLING: ", run_cmd, "\n");
-status = system(run_cmd);
-if(status != 0) {
-  cat("ERROR: Bad return value ", status , "\n");
-  quit(status=status);
-}
-
-# Read the data
-tcst = read.table(tcst_tmp_file, header=TRUE);
+  
+########################################################################
+#
+# Preprocess the tcst data
+#
+########################################################################
 
 # Define a case column
 tcst$CASE = paste(tcst$BMODEL,  tcst$STORM_ID, tcst$INIT,
@@ -311,22 +344,8 @@ tcst$CASE = paste(tcst$BMODEL,  tcst$STORM_ID, tcst$INIT,
 
 # Sort the data by the CASE column
 tcst = tcst[with(tcst, order(CASE)),];
-  
-# Dispose of the temporary file by either saving or deleting it
-if(nchar(save_data) > 0) {
-   run_cmd = paste("mv -f", tcst_tmp_file, save_data);
-} else {
-   run_cmd = paste("rm -f", tcst_tmp_file);
-}
-cat("CALLING: ", run_cmd, "\n");
-status = system(run_cmd);
 
-########################################################################
-#
-# Convert times in the data.
-#
-########################################################################
-
+# Format time strings
 tcst$INIT_TIME  = as.POSIXct(strptime(tcst$INIT,
                                       format="%Y%m%d_%H%M%s"));
 tcst$VALID_TIME = as.POSIXct(strptime(tcst$VALID,
