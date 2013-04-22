@@ -96,6 +96,20 @@ get_series_data = function(cur, cur_plot, diff) {
 
 ########################################################################
 #
+# Aggregation functions for case data.
+#
+########################################################################
+
+find_winner = function(x) { if(sum(is.na(x)) > 0)  { return(NA); }
+                            else                   { return(series_list[which.min(x)]); }
+}
+find_thresh = function(x) { return(rp_diff_list[which(lead_list == x)]); }
+eval_exp    = function(x) { return(eval(parse(text=x))); }
+rank_random = function(x) { return(rank(x, na.last="keep", ties.method="random")[1]); }
+rank_min    = function(x) { return(rank(x, na.last="keep", ties.method="min")[1]); }
+
+########################################################################
+#
 # Build a table with summary information for each case.
 #
 ########################################################################
@@ -124,8 +138,9 @@ get_case_data = function() {
   # Build a set of unique cases
   case_data = unique(data.frame(CASE=series_data$CASE,
                                 LEAD_HR=series_data$LEAD_HR,
-                                MIN=NA, MAX=NA, WIN=NA, DIFF=NA, DIFF_TEST=NA,
-                                RESULT=NA, PLOT=NA, RANK_RANDOM=NA, RANK_MIN=NA));
+                                MIN=NA, MAX=NA, WIN=NA,
+                                DIFF=NA, RP_THRESH=NA, DIFF_TEST=NA, RESULT=NA,
+                                PLOT=NA, RANK_RANDOM=NA, RANK_MIN=NA));
 
   # Check for equal numbers of entries for each case
   if(sum(aggregate(series_data$PLOT, by=list(series_data$CASE), length)$x != n_series)) {
@@ -133,46 +148,17 @@ get_case_data = function() {
       quit(status=1);
   }
 
-  # Loop through the cases
-  for(i in 1:dim(case_data)[1]) {
-
-    # Build indicator for the current case
-    ind = (series_data$CASE == case_data$CASE[i]);
-
-    # Check for the expected number of entries
-    if(sum(ind) != n_series) {
-      cat(paste("ERROR: Unexpected number of entries for case",
-                case_data$CASE[i], ".\n"));
-      cat(series_data[ind,]);
-      quit(status=1);
-    }
-
-    # Store the threshold for the current lead time
-    rp_diff_thresh = rp_diff_list[which(case_data$LEAD_HR[i] == lead_list)];
-
-    # Compute the minimum, maximum, and winner
-    case_data$MIN[i]         = min(series_data[ind,]$PLOT);
-    case_data$MAX[i]         = max(series_data[ind,]$PLOT);
-    i_min                    = which.min(series_data[ind,]$PLOT);
-    if(length(i_min) > 0) {
-      case_data$WIN[i]       = as.character(series_data[ind,series][i_min]);
-    }
-
-    # Compute the difference and test it
-    case_data$DIFF[i]        = case_data$MAX[i] - case_data$MIN[i];
-    case_data$DIFF_TEST[i]   = paste(case_data$DIFF[i], rp_diff_thresh, sep='');
-
-    # Evaluate the test constructed above
-    case_data$RESULT[i]      = eval(parse(text=case_data$DIFF_TEST[i]));
-    case_data$PLOT[i]        = ifelse(case_data$RESULT[i],
-                                      case_data$WIN[i], "TIE");
-
-    # Compute the rank for the first model
-    case_data$RANK_RANDOM[i] = rank(series_data[ind,]$PLOT, na.last="keep",
-                                    ties.method="random")[1];
-    case_data$RANK_MIN[i]    = rank(series_data[ind,]$PLOT, na.last="keep",
-                                    ties.method="min")[1];
-  }
+  # Compute summary info for each case
+  case_data$MIN         = aggregate(series_data$PLOT, by=list(series_data$CASE), FUN=min)$x;
+  case_data$MAX         = aggregate(series_data$PLOT, by=list(series_data$CASE), FUN=max)$x;
+  case_data$WIN         = aggregate(series_data$PLOT, by=list(series_data$CASE), FUN=find_winner)$x;
+  case_data$DIFF        = case_data$MAX - case_data$MIN;
+  case_data$RP_THRESH   = lapply(case_data$LEAD_HR, FUN=find_thresh);
+  case_data$DIFF_TEST   = paste(case_data$DIFF, case_data$RP_THRESH, sep='');
+  case_data$RESULT      = lapply(case_data$DIFF_TEST, FUN=eval_exp);
+  case_data$PLOT        = ifelse(case_data$RESULT, case_data$WIN, "TIE");
+  case_data$RANK_RANDOM = aggregate(series_data$PLOT, by=list(series_data$CASE), FUN=rank_random)$x;
+  case_data$RANK_MIN    = aggregate(series_data$PLOT, by=list(series_data$CASE), FUN=rank_min)$x;
 
   return(case_data);
 }
@@ -274,6 +260,11 @@ get_yrange = function(plot_type) {
   # Initialize
   ylim = c(NA,NA);
 
+  # Get the case data when necessary
+  if(plot_type == relperf_str || plot_type == rank_str) {
+    case_data = get_case_data();
+  }
+
   # Loop over the series list entries
   for(i in 1:n_series) {
 
@@ -310,9 +301,6 @@ get_yrange = function(plot_type) {
       } # end for j
     }
     else if(plot_type == relperf_str || plot_type == rank_str) {
-
-      # Get the case data
-      case_data = get_case_data();
 
       for(j in 1:length(lead_list)) {
 
@@ -366,9 +354,6 @@ get_yrange = function(plot_type) {
 
     # Update the plotting limits
     ylim = range(c(ylim, yvals), na.rm=TRUE);
-
-    # Only need to check one series entry for relperf and rank
-    if(plot_type == relperf_str || plot_type == rank_str) break;
 
   } # end for i
 
