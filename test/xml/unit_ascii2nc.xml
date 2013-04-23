@@ -89,4 +89,63 @@
     </output>
   </test>
 
+  <test name="ascii2nc_SURFRAD1">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/surfrad/tbl12001.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12002.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12003.dat \
+      &OUTPUT_DIR;/ascii2nc/surfrad.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_SURFRAD_summary1">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/surfrad/tbl12001.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12002.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12003.dat \
+      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad1 \
+      &OUTPUT_DIR;/ascii2nc/surfrad_summary1.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary1.nc </point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_SURFRAD_summary2">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/surfrad/tbl12001.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12002.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12003.dat \
+      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad2 \
+      &OUTPUT_DIR;/ascii2nc/surfrad_summary2.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary2.nc </point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_SURFRAD_summary3">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/surfrad/tbl12001.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12002.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12003.dat \
+      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad3 \
+      &OUTPUT_DIR;/ascii2nc/surfrad_summary3.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary3.nc </point_nc>
+    </output>
+  </test>
+
 </met_test>
