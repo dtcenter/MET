@@ -138,10 +138,15 @@ model = "WRF";
 //     included in the "field" entry if the user would like to use different 
 //     valid times for different fields.
 //
-//   - The "lead_time" entry specifies the lead time in YYYYMMDD[_HH[MMSS]] 
+//   - The "lead_time" entry specifies the lead time in HH[MMSS]
 //     format.  This entry can be included in the "fcst" entry as shown below or
 //     included in the "field" entry if the user would like to use different 
 //     lead times for different fields.
+//
+// It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
+// settings when verifying a file containing data for multiple output times.
+// For example, to verify a GRIB file containing data for many lead times, you
+// could use "lead_time" specify the record to be verified.
 //
 // File-format specific settings for the "field" entry:
 //
@@ -174,18 +179,19 @@ model = "WRF";
 //            gridded field.
 //       e.g. 
 //           field = [
-//              {
+//             {
 //               name       = "QVAPOR";
-//               level      = (0,5,*,*);
-//              }
-
+//               level      = "(0,5,*,*)";
+//             }
+//           ];
+//
 //
 fcst = {
    wind_thresh  = [ NA ];
    message_type = [ "ADPSFC" ];
-   init_time = [20120619_12];
-   valid_time = [20120620_00];
-   lead_time = [12];
+   init_time    = "20120619_12";
+   valid_time   = "20120620_00";
+   lead_time    = "12";
 
    field = [
       {
@@ -205,7 +211,8 @@ fcst = {
 // length of the "fcst.field" array.
 //
 //   - The "message_type" entry is an array of point observation message types
-//     to be used.  This may be specified once at the top-level "obs"
+//     to be used.  This only applies to the tools that verify against point
+//     observations.  This may be specified once at the top-level "obs"
 //     dictionary or separately for each "field" array element.  In the example
 //     shown here, this is specified in the "fcst" dictionary and copied to "obs".
 //
