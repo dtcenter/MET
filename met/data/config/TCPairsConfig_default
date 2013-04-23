@@ -108,5 +108,5 @@ watch_warn_file = "MET_BASE/data/tc_data/wwpts_us.txt";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V4.1b6";
+version = "V4.1";
 
