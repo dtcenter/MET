@@ -322,7 +322,7 @@ void PairBase::print_duplicate_report(){
 
          //  parse and format the unique key string
          char** mat = NULL;
-         const char* pat = "^([^_]+):([^_]+):([^_]+):([^_]+):([^_]+):([^_]+)$";
+         const char* pat = "^([^:]+):([^:]+):([^:]+):([^:]+):([^:]+):([^:]+)$";
          string key_unique_sid = (*it_unique).first;
          if( 7 != regex_apply(pat, 7, key_unique_sid.c_str(), mat) ){
             mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
@@ -371,7 +371,7 @@ void PairBase::print_duplicate_report(){
 
          //  parse the single key string
          char** mat = NULL;
-         if( 5 != regex_apply("^([^_]+):([^_]+):([^_]+):([^_]+)$", 5, key_single_val.c_str(), mat) ){
+         if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5, key_single_val.c_str(), mat) ){
             mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
                  << "to parse '" << key_single_val.c_str() << "'\n\n";
             exit(1);
@@ -381,7 +381,7 @@ void PairBase::print_duplicate_report(){
          regex_clean(mat);
 
          //  parse the single key value
-         if( 3 != regex_apply("^([^_]+):([^_]+)$", 3, (*it_single).second.c_str(), mat) ){
+         if( 3 != regex_apply("^([^:]+):([^:]+)$", 3, (*it_single).second.c_str(), mat) ){
             mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
                  << "to parse '" << (*it_single).second.c_str() << "'\n\n";
             exit(1);
@@ -397,7 +397,7 @@ void PairBase::print_duplicate_report(){
          for( multimap<string,string>::iterator it_val = single_val.first;
               it_val != single_val.second; ++it_val, num_val++){
 
-            if( 4 != regex_apply("^([^_]+):([^_]+):([^_]+)$", 4, (*it_val).second.c_str(), mat) ){
+            if( 4 != regex_apply("^([^:]+):([^:]+):([^:]+)$", 4, (*it_val).second.c_str(), mat) ){
                mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
                     << "to parse '" << (*it_single).second.c_str() << "'\n\n";
                exit(1);
