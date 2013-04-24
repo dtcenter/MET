@@ -124,7 +124,7 @@ gen_sources: $(GEN_SOURCES)
 
 data_plane_to_netcdf.o: data_plane_to_netcdf.h data_plane_to_netcdf.cc
 	@ echo
-	$(CXX) data_plane_to_netcdf.cc $(CXX_FLAGS)   -c -I$(MET_INC_DIR)
+	$(CXX) data_plane_to_netcdf.cc $(CXX_FLAGS)   -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 
 data_averager.o: data_averager.h data_averager.cc
