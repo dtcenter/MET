@@ -215,7 +215,7 @@ bool PairBase::add_obs(const char *sid,
    if( check_unique ){
 
       //  build a uniqueness test key
-      string unq_key = str_format("%.4f_%.4f_%d_%.2f_%.2f_%.4f",
+      string unq_key = str_format("%.4f:%.4f:%d:%.2f:%.2f:%.4f",
             lat,       //  lat
             lon,       //  lon
             ut,        //  valid time
@@ -236,7 +236,7 @@ bool PairBase::add_obs(const char *sid,
    } else if( check_single ){
 
       //  build a uniqueness test key
-      string sng_key = str_format("%.3f_%.3f_%.2f_%.2f",
+      string sng_key = str_format("%.3f:%.3f:%.2f:%.2f",
             lat,         //  lat
             lon,         //  lon
             lvl,         //  level
@@ -244,7 +244,7 @@ bool PairBase::add_obs(const char *sid,
 
       //  add a single value reporting string to the reporting map
       if( 3 <= mlog.verbosity_level() ){
-         string sng_val = str_format("%s_%d_%.4f",
+         string sng_val = str_format("%s:%d:%.4f",
                sid,       //  station id
                ut,        //  valid time
                o).text(); //  obs value
@@ -253,7 +253,7 @@ bool PairBase::add_obs(const char *sid,
 
       //  if the key is not present in the duplicate map, add it to the map
       if( 1 > map_single.count(sng_key) ){
-         map_single[sng_key] = str_format("%d_%d", n_obs, labs(fcst_ut - ut));
+         map_single[sng_key] = str_format("%d:%d", n_obs, labs(fcst_ut - ut));
       }
 
       //  if the key is present, use the one with the closest valid time to the forecast
@@ -262,7 +262,7 @@ bool PairBase::add_obs(const char *sid,
          //  parse the single duplicate value string
          char** mat = NULL;
          string sng_val = map_single[sng_key];
-         if( 3 != regex_apply("^([0-9]+)_([0-9]+)$", 3, sng_val.c_str(), mat) ){
+         if( 3 != regex_apply("^([0-9]+):([0-9]+)$", 3, sng_val.c_str(), mat) ){
             mlog << Error << "\nPairBase::add_obs() - regex_apply failed to parse '"
                  << map_single[sng_key].c_str() << "'\n\n";
             exit(1);
@@ -280,7 +280,7 @@ bool PairBase::add_obs(const char *sid,
             vld_ta.set(obs_idx, ut);
             o_na  .set(obs_idx, o);
 
-            map_single[sng_key] = str_format("%d_%d", obs_idx, labs(fcst_ut - ut));
+            map_single[sng_key] = str_format("%d:%d", obs_idx, labs(fcst_ut - ut));
          }
 
          return false;
@@ -322,7 +322,7 @@ void PairBase::print_duplicate_report(){
 
          //  parse and format the unique key string
          char** mat = NULL;
-         const char* pat = "^([^_]+)_([^_]+)_([^_]+)_([^_]+)_([^_]+)_([^_]+)$";
+         const char* pat = "^([^_]+):([^_]+):([^_]+):([^_]+):([^_]+):([^_]+)$";
          string key_unique_sid = (*it_unique).first;
          if( 7 != regex_apply(pat, 7, key_unique_sid.c_str(), mat) ){
             mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
@@ -371,7 +371,7 @@ void PairBase::print_duplicate_report(){
 
          //  parse the single key string
          char** mat = NULL;
-         if( 5 != regex_apply("^([^_]+)_([^_]+)_([^_]+)_([^_]+)$", 5, key_single_val.c_str(), mat) ){
+         if( 5 != regex_apply("^([^_]+):([^_]+):([^_]+):([^_]+)$", 5, key_single_val.c_str(), mat) ){
             mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
                  << "to parse '" << key_single_val.c_str() << "'\n\n";
             exit(1);
@@ -381,7 +381,7 @@ void PairBase::print_duplicate_report(){
          regex_clean(mat);
 
          //  parse the single key value
-         if( 3 != regex_apply("^([^_]+)_([^_]+)$", 3, (*it_single).second.c_str(), mat) ){
+         if( 3 != regex_apply("^([^_]+):([^_]+)$", 3, (*it_single).second.c_str(), mat) ){
             mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
                  << "to parse '" << (*it_single).second.c_str() << "'\n\n";
             exit(1);
@@ -397,7 +397,7 @@ void PairBase::print_duplicate_report(){
          for( multimap<string,string>::iterator it_val = single_val.first;
               it_val != single_val.second; ++it_val, num_val++){
 
-            if( 4 != regex_apply("^([^_]+)_([^_]+)_([^_]+)$", 4, (*it_val).second.c_str(), mat) ){
+            if( 4 != regex_apply("^([^_]+):([^_]+):([^_]+)$", 4, (*it_val).second.c_str(), mat) ){
                mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
                     << "to parse '" << (*it_single).second.c_str() << "'\n\n";
                exit(1);
