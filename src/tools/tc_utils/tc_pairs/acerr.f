@@ -51,7 +51,7 @@ c     Passed variables
       dimension alonge(npts),crosse(npts)
 c
 c     Local variables
-      parameter (mxp=100)
+      parameter (mxp=1000)
       dimension blat(mxp),blon(mxp),plat(mxp),plon(mxp)
       dimension head(mxp)
 c
