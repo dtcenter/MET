@@ -1717,11 +1717,17 @@ match_points = FALSE;
 dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
 
 //
-// Specify an ASCII file containing watch/warning information to be used.
-// At each track point, the most severe watch/warning status in effect,
-// if any, will be written to the output.
+// Specify watch/warning information.  Specify an ASCII file containing
+// watch/warning information to be used.  At each track point, the most severe
+// watch/warning status in effect, if any, will be written to the output.
+// Also specify a time offset in seconds to be added to each watch/warning
+// time processed.  NHC applies watch/warning information to all track points
+// occurring 4 hours (-14400 second) prior to the watch/warning time.
 //
-watch_warn_file = "MET_BASE/data/tc_data/wwpts_us.txt";
+watch_warn = {
+   file_name   = "MET_BASE/data/tc_data/wwpts_us.txt";
+   time_offset = -14400;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 //

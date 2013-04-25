@@ -1681,8 +1681,8 @@ void process_watch_warn(TrackPairInfoArray &p) {
          ww_type = ww_max(ww_type, int_to_watchwarntype(atoi(dl[0])));
       }
 
-      // Add the current watch/warning information to the tracks
-      p.add_watch_warn(ww_sid, ww_type, ww_ut);
+      // Add the current watch/warning information to the tracks.
+      p.add_watch_warn(ww_sid, ww_type, ww_ut + conf_info.WatchWarnOffset);
    }
 
    // Close the input file

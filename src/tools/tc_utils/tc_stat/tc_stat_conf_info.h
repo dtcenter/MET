@@ -19,7 +19,7 @@
 
 #include "mask_poly.h"
 
-#include "config_file.h"
+#include "vx_config.h"
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////

@@ -15,7 +15,6 @@
 
 #include <iostream>
 
-#include "config_file.h"
 #include "mask_poly.h"
 
 #include "vx_config.h"
@@ -86,6 +85,9 @@ class TCPairsConfInfo {
 
       // ASCII watch/warnings file
       ConcatString WatchWarnFile;
+
+      // Watch/warnings time offset
+      int WatchWarnOffset;
 
       // Config file version
       ConcatString Version;
