@@ -1492,7 +1492,16 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
         << unix_to_yyyymmdd_hhmmss(ut_min)
         << " to " << unix_to_yyyymmdd_hhmmss(ut_max)
         << " by " << sec_to_hhmmss(ut_inc) << " increment.\n";
-   
+
+   // Check for too many track points
+   if(n_ut > mxp) {
+      mlog << Error
+           << "\ncompute_track_err() -> "
+           << "exceeded the maximum number of allowable track points ("
+           << n_ut << " > " << mxp << ")\n\n";
+      exit(1);
+   }
+
    // Loop through the valid times
    for(i=0; i<n_ut; i++) {
      
