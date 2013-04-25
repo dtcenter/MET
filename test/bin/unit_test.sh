@@ -43,7 +43,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_tc_dland.xml \
           unit_tc_pairs.xml \
           unit_tc_stat.xml \
-          unit_met_test_scripts.xml"
+          unit_met_test_scripts.xml  \
+          unit_modis.xml"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
