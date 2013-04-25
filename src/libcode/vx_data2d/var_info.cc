@@ -394,10 +394,13 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
       lvl1 = lvl_tmp;
    }
 
-   //  format the level name
+   //  format the level name:
+   //  for accumulation intervals, use the full time string
+   //  otherwise, just the numeric value
    ConcatString lvl_name;
-   if( !is_eq(lvl2, -1.0) ) lvl_name.format("%s%d-%d", lvl_type.data(), (int)lvl2, (int)lvl1);
-   else                     lvl_name.format("%s%d",    lvl_type.data(), (int)lvl1);
+   if( lt == LevelType_Accum )   lvl_name.format("%s%s",    lvl_type.data(), lvl_val1.data());
+   else if( !is_eq(lvl2, -1.0) ) lvl_name.format("%s%d-%d", lvl_type.data(), (int)lvl2, (int)lvl1);
+   else                          lvl_name.format("%s%d",    lvl_type.data(), (int)lvl1);
 
    //  set the level information
    Level.set_type(lt);
