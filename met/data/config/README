@@ -1665,8 +1665,8 @@ interp12 = TRUE;
 // Specify how consensus forecasts should be defined:
 //   name    = consensus model name
 //   members = array of consensus member model names
-//   required = array of true/false for each member
-//             if empty, default is false
+//   required = array of TRUE/FALSE for each member
+//             if empty, default is FALSE
 //   min_req = minimum number of members required for the consensus
 //
 // e.g.
@@ -1674,7 +1674,7 @@ interp12 = TRUE;
 //       {
 //          name     = "CON1";
 //          members  = [ "MOD1", "MOD2", "MOD3" ];
-//          required = [ true, false, false ];
+//          required = [ TRUE, FALSE, FALSE ];
 //          min_req  = 2;
 //       }
 //    ];
@@ -1850,9 +1850,9 @@ init_str_val  = [];
 // Stratify by the ADECK and BDECK distances to land.  Once either the ADECK or
 // BDECK track encounters land, discard the remainder of the track.
 //
-// e.g. water_only = false;
+// e.g. water_only = FALSE;
 //
-water_only = false;
+water_only = FALSE;
 
 //
 // Specify whether only those track points for which rapid intensification
@@ -1862,10 +1862,10 @@ water_only = false;
 // May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
 // options.
 //
-// e.g. rapid_inten        = false;
+// e.g. rapid_inten        = FALSE;
 //      rapid_inten_thresh = >=30.0;
 //
-rapid_inten        = false;
+rapid_inten        = FALSE;
 rapid_inten_thresh = >=30.0;
 
 //
@@ -1876,11 +1876,11 @@ rapid_inten_thresh = >=30.0;
 // May modify using the "-landfall", "-landfall_beg", and "-landfall_end" job
 // command options.
 //
-// e.g. landfall     = false;
+// e.g. landfall     = FALSE;
 //      landfall_beg = -86400; (24 hours prior to landfall)
 //      landfall_end = 0;
 //
-landfall     = false;
+landfall     = FALSE;
 landfall_beg = -86400;
 landfall_end = 0;
 
@@ -1888,9 +1888,9 @@ landfall_end = 0;
 // Specify whether only those cases common to all models in the dataset should
 // be retained.  May modify using the "-event_equal" job command option.
 //
-// e.g. event_equal = false;
+// e.g. event_equal = FALSE;
 //
-event_equal = false;
+event_equal = FALSE;
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the

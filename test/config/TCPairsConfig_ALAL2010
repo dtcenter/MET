@@ -10,59 +10,32 @@
 //
 
 //
-// Specify a comma-separated list of models to be used.
-// An empty list indicates that all should be used.
-//
-// e.g. model = [ "AHW4", "AHWI" ];
+// Models
 //
 model = [];
 
 //
-// Specify a comma-separated list of storm id's to be used:
-//    2-letter basin, 2-digit cyclone number, 4-digit year
-// An empty list indicates that all should be used.
-//
-// e.g. storm_id = [ "AL092011" ];
-//
-// This may also be set using basin, cyclone, and timing information below.
-//
+// Storm identifiers
+//    
 storm_id = [ "ALAL2010" ];
 
 //
-// Specify a comma-separated list of basins to be used.
-// An empty list indicates that all should be used.
-//   Valid basins: WP, IO, SH, CP, EP, AL, SL
-//
-// e.g. basin = [ "AL", "EP" ];
+// Basins
 //
 basin = [];
 
 //
-// Specify a comma-separated list of cyclone numbers (01-99) to be used.
-// An empty list indicates that all should be used.
-//
-// e.g. cyclone = [ "01", "02", "03" ];
+// Cyclone numbers
 //
 cyclone = [];
 
 //
-// Specify a comma-separated list of storm names to be used.
-// An empty list indicates that all should be used.
-//
-// e.g. storm_name = [ "KATRINA" ];
+// Storm names
 //
 storm_name = [];
 
 //
-// Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
-// or provide a list of specific initialization times to include or exclude.
-// Tracks whose initial time meets the specified criteria will be used.
-// An empty string indicates that all times should be used.
-//
-// e.g. init_beg = "20100101";
-//      init_end = "20101231";
-//      init_inc = [ "20101231_06" ];
-//      init_exc = [ "20101231_00" ];
+// Model initialization time windows to include or exclude
 //
 init_beg = "";
 init_end = "";
@@ -70,98 +43,53 @@ init_inc = [];
 init_exc = [];
 
 //
-// Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
-// Tracks for which all valid times fall within the time window will be used.
-// An empty string indicates that all times should be used.
-//
-// e.g. valid_beg = "20100101";
-//      valid_end = "20101231";
+// Valid model time window
 //
 valid_beg = "";
 valid_end = "";
 
 //
-// Specify a comma-separated list of model initialization hours to be used
-// in HH[MMSS] format. An empty list indicates that all hours should be used.
-//
-// e.g. init_hour = [ "00", "06", "12", "18" ];
+// Model initialization hours 
 //
 init_hour = [];
 
 //
-// Specify lat/lon polylines defining masking regions to be applied.
-// Tracks whose initial location falls within init_mask will be used.
-// Tracks for which all locations fall within valid_mask will be used.
-//
-// e.g. init_mask  = "MET_BASE/data/poly/EAST.poly";
+// lat/lon polylines defining masking regions
 //
 init_mask  = "";
 valid_mask = "";
 
 //
-// Specify whether the code should check for duplicates ATCF lines when
-// building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
+// Specify if the code should check for duplicate ATCF lines 
 //
-// e.g. check_dup = TRUE;
-//
-check_dup = true;
+check_dup = TRUE;
 
 //
-// Specify whether special processing should be performed for interpolated
-// models with 12-hour spacing.  For model with a name ending in 'I' (e.g. AHWI)
-// search for the corresponding track whose model name ends in '2' (e.g. AHW2)
-// and merge it's track points into the interpolated model's track.
-//
-// e.g. interp12 = TRUE;
+// Specify if special processing should be performed for interpolated models with 
+// 12-hour spacing.  
 //
 interp12 = TRUE;
 
 //
-// Specify how consensus forecasts should be defined:
-//   name    = consensus model name
-//   members = array of consensus member model names
-//   requied = array of true/false for each member
-//             if empty, default is false
-//   min_req = minimum number of members required for the consensus
-//
-// e.g.
-//    consensus = [
-//       {
-//          name     = "CON1";
-//          members  = [ "MOD1", "MOD2", "MOD3" ];
-//          required = [ true, false, false ];
-//          min_req  = 2;
-//       }
-//    ];
+// Specify how consensus forecasts should be defined
 //
 consensus = [];
 
 //
-// Specify a comma-separated list of forecast lag times to be used in HH[MMSS]
-// format.  For each ADECK track identified, a lagged track will be derived
-// for each entry listed.
-//
-// e.g. lag_time = [ "06", "12" ];
+// Forecast lag times
 //
 lag_time = [];
 
 //
-// Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
-// derived from the BEST and operational (CARQ) tracks.
-// Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
-// Derived from CARQ tracks: OCLP, OCS5, OCD5, OCDT
-//
-// e.g. base_baseline = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
-//      oper_baseline = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
+// CLIPER/SHIFOR baseline forecasts to be derived from the BEST
+// and operational (CARQ) tracks.
 //
 best_baseline = [ "BCLP" ];
 oper_baseline = [ "OCLP" ];
 
 //
-// Specify whether only those track points common to both the ADECK and BDECK
-// tracks should be written out.
-//
-// e.g. match_points = FALSE;
+// Specify if only those track points common to both the ADECK and BDECK
+// tracks be written out.
 //
 match_points = FALSE;
 
@@ -169,18 +97,21 @@ match_points = FALSE;
 // Specify the NetCDF output of the gen_dland tool containing a gridded
 // representation of the minimum distance to land.
 //
-dland_file = "${MET_TEST_OUTPUT}/tc_dland/tc_dland_half_deg.nc";
+dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
 
 //
-// Specify an ASCII file containing watch/warning information to be used.
-// At each track point, the most severe watch/warning status in effect,
-// if any, will be written to the output.
+// Specify watch/warning information:
+//   - Input watch/warning filename
+//   - Watch/warning time offset in seconds
 //
-watch_warn_file = "MET_BASE/data/tc_data/wwpts_us.txt";
+watch_warn = {
+   file_name   = "MET_BASE/data/tc_data/wwpts_us.txt";
+   time_offset = -14400;
+};
 
 //
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V4.0";
+version = "V4.1";
 

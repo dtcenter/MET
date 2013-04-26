@@ -115,14 +115,14 @@ init_str_val  = [];
 //
 // Stratify by the ADECK and BDECK distances to land. 
 //
-water_only = false;
+water_only = FALSE;
 
 //
 // Specify whether only those track points for which rapid intensification
 // occurred in the BDECK track between the current time and 24-hours prior
 // should be retained. 
 //
-rapid_inten        = false;
+rapid_inten        = FALSE;
 rapid_inten_thresh = >=30.0;
 
 //
@@ -130,7 +130,7 @@ rapid_inten_thresh = >=30.0;
 // retained, and define the landfall retention window as a number of seconds
 // offset from the landfall time.  
 //
-landfall     = false;
+landfall     = FALSE;
 landfall_beg = -86400;
 landfall_end = 0;
 
@@ -139,13 +139,13 @@ landfall_end = 0;
 // tracks should be retained.  May modify using the "-match_points" job command
 // option.
 //
-match_points = false;
+match_points = FALSE;
 
 //
 // Specify whether only those cases common to all models in the dataset should
 // be retained.  
 //
-event_equal = false;
+event_equal = FALSE;
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the
