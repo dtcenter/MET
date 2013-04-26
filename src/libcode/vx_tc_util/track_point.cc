@@ -74,11 +74,14 @@ QuadInfo & QuadInfo::operator+=(const QuadInfo &t) {
    }
 
    // Increment counts
-   ALVal += t.ALVal;
-   NEVal += t.NEVal;
-   SEVal += t.SEVal;
-   SWVal += t.SWVal;
-   NWVal += t.NWVal;
+   if(is_bad_data(ALVal) || is_bad_data(t.ALVal)) ALVal  = bad_data_double;
+   else                                           ALVal += t.ALVal;
+   if(is_bad_data(NEVal) || is_bad_data(t.NEVal)) NEVal  = bad_data_double;
+   else                                           NEVal += t.NEVal;
+   if(is_bad_data(SEVal) || is_bad_data(t.SEVal)) SEVal  = bad_data_double;
+   else                                           SEVal += t.SEVal;
+   if(is_bad_data(NWVal) || is_bad_data(t.NWVal)) NWVal  = bad_data_double;
+   else                                           NWVal += t.NWVal;
 
    return(*this);
 }
@@ -361,14 +364,14 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    }
    
    // Increment counts
-   if(is_bad_data(Lat))  Lat   = p.lat();
-   else                  Lat  += p.lat();
-   if(is_bad_data(Lon))  Lon   = p.lon();
-   else                  Lon  += p.lon();
-   if(is_bad_data(Vmax)) Vmax  = p.v_max();
-   else                  Vmax += p.v_max();
-   if(is_bad_data(MSLP)) MSLP  = p.mslp();
-   else                  MSLP += p.mslp();
+   if(is_bad_data(Lat)  || is_bad_data(p.lat()))   Lat   = bad_data_double;
+   else                                            Lat  += p.lat();
+   if(is_bad_data(Lon)  || is_bad_data(p.lon()))   Lon   = bad_data_double;
+   else                                            Lon  += p.lon();
+   if(is_bad_data(Vmax) || is_bad_data(p.v_max())) Vmax  = bad_data_double;
+   else                                            Vmax += p.v_max();
+   if(is_bad_data(MSLP) || is_bad_data(p.mslp()))  MSLP  = bad_data_double;
+   else                                            MSLP += p.mslp();
 
    for(i=0; i<NWinds; i++) Wind[i] += p[i];
 

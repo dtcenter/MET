@@ -903,7 +903,8 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
          // Keep track of the TrackPoint count and sums
          pcnt++;
-         psum += tracks.Track[j][i_pnt];
+         if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
+         else          psum += tracks.Track[j][i_pnt];
       }
 
       // Check for the minimum number of points
@@ -911,30 +912,30 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
       // Compute the average point
       pavg = psum;
-      pavg.set_lat(psum.lat()/pcnt);
-      pavg.set_lon(psum.lon()/pcnt);
-      pavg.set_v_max(nint(psum.v_max()/pcnt));
-      pavg.set_mslp(nint(psum.mslp()/pcnt));
+      if(!is_bad_data(pavg.lat()))   pavg.set_lat(psum.lat()/pcnt);
+      if(!is_bad_data(pavg.lon()))   pavg.set_lon(psum.lon()/pcnt);
+      if(!is_bad_data(pavg.v_max())) pavg.set_v_max(nint(psum.v_max()/pcnt));
+      if(!is_bad_data(pavg.mslp()))  pavg.set_mslp(nint(psum.mslp()/pcnt));
 
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
 
          // Initialize the wind QuadInfo sum
-         wavg = pavg[j];
+         wavg = psum[j];
 
          // Compute the average wind
-         wavg.set_al_val(wavg.al_val()/pcnt);
-         wavg.set_ne_val(wavg.ne_val()/pcnt);
-         wavg.set_se_val(wavg.se_val()/pcnt);
-         wavg.set_sw_val(wavg.sw_val()/pcnt);
-         wavg.set_nw_val(wavg.nw_val()/pcnt);
+         if(!is_bad_data(wavg.al_val())) wavg.set_al_val(wavg.al_val()/pcnt);
+         if(!is_bad_data(wavg.ne_val())) wavg.set_ne_val(wavg.ne_val()/pcnt);
+         if(!is_bad_data(wavg.se_val())) wavg.set_se_val(wavg.se_val()/pcnt);
+         if(!is_bad_data(wavg.sw_val())) wavg.set_sw_val(wavg.sw_val()/pcnt);
+         if(!is_bad_data(wavg.nw_val())) wavg.set_nw_val(wavg.nw_val()/pcnt);
 
          // Store the average wind
          pavg.set_wind(j, wavg);
       }
 
       // Compute consensus CycloneLevel
-      pavg.set_level(wind_speed_to_cyclone_level(pavg.v_max()));
+      if(!is_bad_data(pavg.v_max())) pavg.set_level(wind_speed_to_cyclone_level(pavg.v_max()));
 
       // Add the current track point
       tavg.add(pavg);
