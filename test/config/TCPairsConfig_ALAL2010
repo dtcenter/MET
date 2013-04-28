@@ -97,7 +97,7 @@ match_points = FALSE;
 // Specify the NetCDF output of the gen_dland tool containing a gridded
 // representation of the minimum distance to land.
 //
-dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
+dland_file = "${MET_TEST_OUTPUT}/tc_dland/tc_dland_half_deg.nc";
 
 //
 // Specify watch/warning information:
