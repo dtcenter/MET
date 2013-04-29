@@ -65,6 +65,9 @@ void TCStatConfInfo::clear() {
 void TCStatConfInfo::read_config(const char *default_file_name,
                                   const char *user_file_name) {
 
+   // Read the config file constants
+   Conf.read(replace_path(config_const_filename));
+
    // Read the default config file
    Conf.read(default_file_name);
 
