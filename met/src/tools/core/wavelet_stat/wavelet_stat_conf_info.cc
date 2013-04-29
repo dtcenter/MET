@@ -116,6 +116,7 @@ void WaveletStatConfInfo::read_config(const char *default_file_name,
                                       const char *user_file_name) {
    // Read the config file constants
    conf.read(replace_path(config_const_filename));
+   conf.read(replace_path(config_map_data_filename));
 
    // Read the default config file
    conf.read(default_file_name);
