@@ -105,11 +105,17 @@
 
   <test name="ascii2nc_SURFRAD_summary1">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>BEG_TS</name>         <value>000000</value></pair>
+      <pair><name>END_TS</name>         <value>235959</value></pair>
+      <pair><name>STEP_TS</name>         <value>300</value></pair>
+      <pair><name>WIDTH_TS</name>         <value>300</value></pair>
+    </env>
     <param> \
       &DATA_DIR_OBS;/surfrad/tbl12001.dat \
       &DATA_DIR_OBS;/surfrad/tbl12002.dat \
       &DATA_DIR_OBS;/surfrad/tbl12003.dat \
-      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad1 \
+      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad \
       &OUTPUT_DIR;/ascii2nc/surfrad_summary1.nc \
       -v 1
     </param>
@@ -120,11 +126,17 @@
 
   <test name="ascii2nc_SURFRAD_summary2">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>BEG_TS</name>         <value>03</value></pair>
+      <pair><name>END_TS</name>         <value>20</value></pair>
+      <pair><name>STEP_TS</name>         <value>300</value></pair>
+      <pair><name>WIDTH_TS</name>         <value>600</value></pair>
+    </env>
     <param> \
       &DATA_DIR_OBS;/surfrad/tbl12001.dat \
       &DATA_DIR_OBS;/surfrad/tbl12002.dat \
       &DATA_DIR_OBS;/surfrad/tbl12003.dat \
-      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad2 \
+      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad \
       &OUTPUT_DIR;/ascii2nc/surfrad_summary2.nc \
       -v 1
     </param>
@@ -135,11 +147,17 @@
 
   <test name="ascii2nc_SURFRAD_summary3">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>BEG_TS</name>         <value>17</value></pair>
+      <pair><name>END_TS</name>         <value>03</value></pair>
+      <pair><name>STEP_TS</name>         <value>420</value></pair>
+      <pair><name>WIDTH_TS</name>         <value>420</value></pair>
+    </env>
     <param> \
       &DATA_DIR_OBS;/surfrad/tbl12001.dat \
       &DATA_DIR_OBS;/surfrad/tbl12002.dat \
       &DATA_DIR_OBS;/surfrad/tbl12003.dat \
-      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad3 \
+      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad \
       &OUTPUT_DIR;/ascii2nc/surfrad_summary3.nc \
       -v 1
     </param>
