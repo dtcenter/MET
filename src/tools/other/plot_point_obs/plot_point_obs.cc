@@ -334,6 +334,7 @@ int main(int argc, char *argv[]) {
    //
    MetConfig config;
    config.read(replace_path(config_const_filename));
+   config.read(replace_path(config_map_data_filename));
 
    //
    // draw the map first and then put a border around it

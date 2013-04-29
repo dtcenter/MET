@@ -1,0 +1,25 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default map data plotting information.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+map_data = {
+
+   line_color = [ 25, 25, 25 ]; // rgb triple values, 0-255
+   line_width = 0.5;
+   line_dash  = "";
+
+   source = [
+      {
+        file_name = "MET_BASE/data/map/legacy/world_data_minus_usa";
+      },
+      {
+        file_name = "MET_BASE/data/map/legacy/country_data_minus_usa";
+      },
+      {
+        file_name = "MET_BASE/data/map/legacy/usa_state_data";
+      }
+
+   ];
+};
