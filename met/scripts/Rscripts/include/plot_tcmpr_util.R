@@ -180,9 +180,9 @@ get_prop_ci <- function(x, n) {
 
   # Compute the statistic and confidence interval
   stat     = c();
-  stat$val = 100*round(phat, 4);
-  stat$ncl = ifelse(n < n_min, NA, 100*round(midpnt - bound, 4));
-  stat$ncu = ifelse(n < n_min, NA, 100*round(midpnt + bound, 4));
+  stat$val = 100*phat;
+  stat$ncl = ifelse(n < n_min, NA, 100*(midpnt - bound));
+  stat$ncu = ifelse(n < n_min, NA, 100*(midpnt + bound));
 
   return(stat);
 }
@@ -198,7 +198,8 @@ get_mean_ci = function(d) {
   # Compute the standard error
   s = Compute_STDerr_from_mean(d, "ML");
   if(length(s) > 1 && s[2] == 0 && sum(d != 0) >= n_min) {
-    stderr = round(zval*s[1], 1); }
+    stderr = zval*s[1];
+  }
   else {
     stderr = 0;
   }
@@ -206,14 +207,14 @@ get_mean_ci = function(d) {
   # Compute the statistic and confidence interval
   stat     = c();
   stat$val = mean(d, na.rm=TRUE);
-  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val - stderr, 1));
-  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val + stderr, 1));
+  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, stat$val - stderr);
+  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, stat$val + stderr);
 
   # Compute the p-value
   count     = sum(!is.na(d));
   df        = count - 1;
   ss_pval   = 0.0 - abs(stat$val/s[1]);
-  stat$pval = round(1 - 2*pt(ss_pval, df), 3);
+  stat$pval = 1 - 2*pt(ss_pval, df);
 
   return(stat);
 }
@@ -229,7 +230,8 @@ get_median_ci = function(d) {
   # Compute the standard error
   s = Compute_STDerr_from_median(d, "ML");
   if(length(s) > 1 && s[2] == 0 && sum(d != 0) >= n_min) {
-    stderr = round(zval*s[1], 1); }
+    stderr = zval*s[1];
+  }
   else {
     stderr = 0;
   }
@@ -237,14 +239,14 @@ get_median_ci = function(d) {
   # Compute the statistic and confidence interval
   stat     = c();
   stat$val = median(d, na.rm=TRUE);
-  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val - stderr, 1));
-  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, round(stat$val + stderr, 1));
+  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, stat$val - stderr);
+  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, stat$val + stderr);
 
   # Compute the p-value
   count     = sum(!is.na(d));
   df        = count - 1;
   ss_pval   = 0.0 - abs(stat$val/s[1]);
-  stat$pval = round(1 - 2*pt(ss_pval, df), 3);
+  stat$pval = 1 - 2*pt(ss_pval, df);
 
   return(stat);
 }
@@ -634,8 +636,8 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
                      lead_list[j],
                      sum(!is.na(data$PLOT)),
                      sum(!is.na(data$PLOT) & data$PLOT != 0),
-                     round(stat_val[j], 3),
-                     paste(round(100*stat_val[j]/stat_ref, 0), "%", sep=''),
+                     stat_val[j],
+                     paste(100*stat_val[j]/stat_ref, "%", sep=''),
                      s$pval));
       }
 
