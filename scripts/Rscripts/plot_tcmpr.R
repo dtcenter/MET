@@ -116,7 +116,7 @@ usage = function() {
   cat("        [-no_ee]\n");
   cat("        [-no_ci]\n");
   cat("        [-no_log]\n");
-  cat("        [-save_data]\n");
+  cat("        [-save_data path]\n");
   cat("        [-save]\n");
   cat("        where \"-lookin\"    is a list of files with TCMPR lines to be used.\n");
   cat("              \"-config\"    is a plotting configuration file.\n");
