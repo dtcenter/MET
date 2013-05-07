@@ -1,0 +1,121 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Grid-Stat configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "${MODEL}";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   wind_thresh = [ NA ];
+
+   field = [
+      {
+        name       = "APCP_03";
+        level      = [ "(*,*)" ];
+        cat_thresh = [ >0.0, >0.254, >0.508, >1.270, >2.540, >3.810, >6.350, >8.890, >12.700, >25.400 ];
+      }
+   ];
+
+};
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid = [ "FULL" ];
+   poly = [ "${MASK_POLY_FILE}" ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.01 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "";
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = UW_MEAN;
+         width  = 1;
+      }
+   ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Neighborhood methods
+//
+nbrhd = {
+   vld_thresh = 1.0;  
+   width      = [ 1 ];
+   cov_thresh = [ >=0.5 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   fho    = STAT;
+   ctc    = STAT;
+   cts    = STAT;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   vl1l2  = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   nbrctc = NONE;
+   nbrcts = NONE;
+   nbrcnt = NONE;
+};
+
+//
+// NetCDF matched pairs output file
+//
+nc_pairs_flag = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+rank_corr_flag = FALSE;
+tmp_dir        = "/tmp";
+output_prefix  = "${MODEL}_F${FCST_TIME}_03h";
+version        = "V4.0";
+
+////////////////////////////////////////////////////////////////////////////////
