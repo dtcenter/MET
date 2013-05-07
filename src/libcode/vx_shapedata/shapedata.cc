@@ -1726,7 +1726,7 @@ void ShapeData::filter(SingleThresh t) {
 
          v = data(x, y);
 
-         if(!t.check(v)) {
+         if(!t.check(v) && ! ::is_bad_data(v)) {
             data.set(0.0, x, y);
          }
 
