@@ -13,10 +13,6 @@
 ########################################################################
 
 
-#HDF_BASE_DIR     = $(OTHERLIBS_DIR)/hdf/HDF4.2r3
-#HDF_EOS_BASE_DIR = $(OTHERLIBS_DIR)/hdf_eos/hdfeos
-
-
 EXECUTABLES = modis_regrid \
 
 
