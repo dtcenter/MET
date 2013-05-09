@@ -846,7 +846,7 @@
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name>         <value>&OUTPUT_DIR;/ref_config/gen_poly_mask/CONUS.nc</value></pair>
-      <pair><name>MODEL</name>         <value>wrfprs</value></pair>
+      <pair><name>MODEL</name>         <value>AFWAv3.4_Noahv3.3</value></pair>
       <pair><name>FCST_TIME</name>         <value>12</value></pair>
     </env>
     <param> \
@@ -856,7 +856,7 @@
       -outdir &OUTPUT_DIR;/ref_config/grid_stat -v 1
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_wrfprs_F12_03h_120000L_20110902_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_AFWAv3.4_Noahv3.3_F12_03h_120000L_20110902_120000V.stat</stat>
     </output>
   </test>
 
@@ -864,7 +864,7 @@
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name>         <value>&OUTPUT_DIR;/ref_config/gen_poly_mask/CONUS.nc</value></pair>
-      <pair><name>MODEL</name>         <value>wrfprs</value></pair>
+      <pair><name>MODEL</name>         <value>AFWAv3.4_Noahv3.3</value></pair>
       <pair><name>FCST_TIME</name>         <value>24</value></pair>
     </env>
     <param> \
@@ -874,7 +874,7 @@
       -outdir &OUTPUT_DIR;/ref_config/grid_stat -v 1
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_wrfprs_F24_03h_240000L_20110903_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_AFWAv3.4_Noahv3.3_F24_03h_240000L_20110903_000000V.stat</stat>
     </output>
   </test>
 
@@ -882,7 +882,7 @@
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name>         <value>&OUTPUT_DIR;/ref_config/gen_poly_mask/CONUS.nc</value></pair>
-      <pair><name>MODEL</name>         <value>wrfprs</value></pair>
+      <pair><name>MODEL</name>         <value>AFWAv3.4_Noahv3.3</value></pair>
       <pair><name>FCST_TIME</name>         <value>36</value></pair>
     </env>
     <param> \
@@ -892,7 +892,7 @@
       -outdir &OUTPUT_DIR;/ref_config/grid_stat -v 1
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_wrfprs_F36_03h_360000L_20110903_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_AFWAv3.4_Noahv3.3_F36_03h_360000L_20110903_120000V.stat</stat>
     </output>
   </test>
 
@@ -900,7 +900,7 @@
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name>         <value>&OUTPUT_DIR;/ref_config/gen_poly_mask/CONUS.nc</value></pair>
-      <pair><name>MODEL</name>         <value>wrfprs</value></pair>
+      <pair><name>MODEL</name>         <value>AFWAv3.4_Noahv3.3</value></pair>
       <pair><name>FCST_TIME</name>         <value>48</value></pair>
     </env>
     <param> \
@@ -910,7 +910,7 @@
       -outdir &OUTPUT_DIR;/ref_config/grid_stat -v 1
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_wrfprs_F48_03h_480000L_20110904_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_AFWAv3.4_Noahv3.3_F48_03h_480000L_20110904_000000V.stat</stat>
     </output>
   </test>
 
@@ -918,7 +918,7 @@
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name>         <value>&OUTPUT_DIR;/ref_config/gen_poly_mask/CONUS.nc</value></pair>
-      <pair><name>MODEL</name>         <value>wrfprs</value></pair>
+      <pair><name>MODEL</name>         <value>AFWAv3.4_Noahv3.3</value></pair>
       <pair><name>FCST_TIME</name>         <value>36</value></pair>
     </env>
     <param> \
@@ -928,7 +928,7 @@
       -outdir &OUTPUT_DIR;/ref_config/grid_stat -v 1
     </param>   
     <output>
-      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_wrfprs_F36_24h_360000L_20110903_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ref_config/grid_stat/grid_stat_AFWAv3.4_Noahv3.3_F36_24h_360000L_20110903_120000V.stat</stat>
     </output>
   </test>
 
