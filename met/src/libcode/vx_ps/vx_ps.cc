@@ -406,7 +406,7 @@ ConcatString data_dir;
 
 data_dir = replace_path(default_met_data_dir);
 
-choose_font(n, s, data_dir);
+choose_font_with_dir(n, s, data_dir);
 
 return;
 
@@ -416,7 +416,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void PSfile::choose_font(int n, double s, const char * data_dir)
+void PSfile::choose_font_with_dir(int n, double s, const char * data_dir)
 
 {
 
@@ -426,7 +426,7 @@ void PSfile::choose_font(int n, double s, const char * data_dir)
 
 if ( (n < 0) || (n >= total_vx_ps_fonts) )  {
 
-   mlog << Error << "\nPSfile::choose_font() -> "
+   mlog << Error << "\nPSfile::choose_font_with_dir() -> "
         << "bad font number -> " << n << "\n\n";
 
    exit ( 1 );
@@ -435,7 +435,7 @@ if ( (n < 0) || (n >= total_vx_ps_fonts) )  {
 
 if ( s <= 0.0 )  {
 
-   mlog << Error << "\nPSfile::choose_font() -> "
+   mlog << Error << "\nPSfile::choose_font_with_dir() -> "
         << "bad font size -> " << s << "\n\n";
 
    exit ( 1 );
@@ -455,7 +455,7 @@ path << data_dir << '/' << afm_directory << '/' << junk << ".afm";
 
 if ( !(afm->read(path)) )  {
 
-   mlog << Error << "\nPSfile::choose_font() -> "
+   mlog << Error << "\nPSfile::choose_font_with_dir() -> "
         << "unable to read afm file \"" << path << "\"\n\n";
 
    exit ( 1 );
