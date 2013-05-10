@@ -856,8 +856,8 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
    int i_row, hdr_row;
 
    // Determine if we need to write a header row
-   if(DumpOut->tellp() == 0) hdr_row = 1;
-   else                      hdr_row = 0;
+   if((int) DumpOut->tellp() == 0) hdr_row = 1;
+   else                            hdr_row = 0;
 
    // Initialize the output AsciiTable
    out_at.set_size(tpi.n_points() + hdr_row,
