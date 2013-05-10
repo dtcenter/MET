@@ -27,13 +27,9 @@ static const char dim1_name [] = "Cell_Across_Swath_5km";
 
 static int32 edge_2[2] = { 1, 1 };   //  can't declare this "const" or SWreadfield will complain
 
-static const bool do_shuffle = false;
-
 static const int buf_size = 4096;
 
 static unsigned char buf[buf_size];
-
-static const int max_dims = 100;
 
 static const unixtime ut_modis_start = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
 

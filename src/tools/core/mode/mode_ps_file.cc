@@ -340,7 +340,7 @@ void ModePsFile::choose_font(int _font_number, double _font_size)
 
 {
 
-PSfile::choose_font(_font_number, _font_size, MetDataDir);
+PSfile::choose_font_with_dir(_font_number, _font_size, MetDataDir);
 
 return;
 

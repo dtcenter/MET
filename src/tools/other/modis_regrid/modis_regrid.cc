@@ -328,7 +328,7 @@ void process(const char * input_filename)
 
 int x, y;
 int n0, n1;
-int nonzero_count, percent;
+int nonzero_count;
 double v;
 double lat, lon;
 double lat_min, lat_max, lon_min, lon_max;
@@ -433,8 +433,6 @@ for (x=0; x<nx; ++x)  {
 cout << "Data range is " << data_min << " to " << data_max << "\n" << flush;
 
 cout << "Nonzero count is " << nonzero_count << "\n" << flush;
-
-percent = nint( (100.0*nonzero_count)/(nx*ny) );
 
 ConcatString output_field_name = modis_field;
 

@@ -126,7 +126,7 @@ class PSfile {
          //  set stuff
          //
 
-      virtual void choose_font(int, double, const char *);
+      virtual void choose_font_with_dir(int, double, const char *);
 
          //
          //  get stuff

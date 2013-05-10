@@ -268,7 +268,6 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
 
 StringArray parse_conf_message_type(Dictionary *dict) {
    StringArray sa;
-   int i;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_message_type() -> "
