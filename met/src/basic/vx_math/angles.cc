@@ -78,7 +78,7 @@ double new_deg;
 
 if ( is_bad_data(deg) )  return ( bad_data_double );
 
-if ( ! is_eq(abs(upper - lower), 360.0) || lower > upper )  {
+if ( ! is_eq(fabs(upper - lower), 360.0) || lower > upper )  {
 
    mlog << Error << "\nrescale_deg() -> invalid upper and lower limits supplied.\n\n";
 

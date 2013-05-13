@@ -301,8 +301,8 @@ int NumArray::is_bad_data(int n) const
 
 int r;
 
-if(abs(e[n] - bad_data_double) < 0.01) r = 1;
-else                                   r = 0;
+if(fabs(e[n] - bad_data_double) < 0.01) r = 1;
+else                                    r = 0;
 
 return ( r );
 

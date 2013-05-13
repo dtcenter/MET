@@ -581,8 +581,8 @@ int get_pow2(double n) {
    a = log(n)/log(2.0);
 
    // Check whether or not the log base 2 is an integer
-   if(abs((long double) (nint(a) - a)) > 10E-5) p = -1;
-   else                                         p = nint(a);
+   if(fabs(nint(a) - a) > 10E-5) p = -1;
+   else                          p = nint(a);
 
    return(p);
 }

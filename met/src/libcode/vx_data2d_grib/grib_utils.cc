@@ -207,7 +207,7 @@ data.Nlon = char2_to_int(gds.nx);
    // Latitudinal increment.  If not given, compute from lat1 and lat2
 if ( all_bits_set(gds.grid_type.latlon_grid.dj, 2) )  {
 
-   d = abs( (long double) decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3)
+   d = fabs(decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3)
           - decode_lat_lon(gds.grid_type.latlon_grid.lat2, 3));
 
    data.delta_lat = d/(data.Nlat);
@@ -221,7 +221,7 @@ if ( all_bits_set(gds.grid_type.latlon_grid.dj, 2) )  {
    // Longitudinal increment.  If not given, compute from lon1 and lon2
 if ( all_bits_set ( gds.grid_type.latlon_grid.di, 2) )  {
 
-   d = abs( (long double) decode_lat_lon(gds.grid_type.latlon_grid.lon1, 3)
+   d = fabs(decode_lat_lon(gds.grid_type.latlon_grid.lon1, 3)
           - decode_lat_lon(gds.grid_type.latlon_grid.lon2, 3));
 
    data.delta_lon = d/(data.Nlon);

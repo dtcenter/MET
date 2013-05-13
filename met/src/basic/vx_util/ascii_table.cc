@@ -943,7 +943,7 @@ void AsciiTable::set_entry(const int r, const int c, int a)
 
 char junk[256];
 
-if ( abs(a - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
+if ( fabs(a - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
 else if ( DoCommaString )              ::comma_string(a, junk);
 else                                   sprintf(junk, "%d", a);
 
@@ -963,7 +963,7 @@ void AsciiTable::set_entry(const int r, const int c, double x)
 
 char junk[256];
 
-if ( abs(x - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
+if ( fabs(x - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
 else                                   sprintf(junk, FloatFormat, x);
 
 if ( DoCommaString )  {
