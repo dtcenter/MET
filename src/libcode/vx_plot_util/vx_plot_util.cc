@@ -156,7 +156,7 @@ void draw_region(const Grid &gr, const Box &gr_bb, PSfile &p,
       // Check for regions which overlap the edge of the grid
       // Finish the previous path and begin a new one
       //
-      if(abs(px2 - px1) > 0.90*abs(dim.x_ur() - dim.x_ll())) {
+      if(fabs(px2 - px1) > 0.90*fabs(dim.x_ur() - dim.x_ll())) {
 
          p.stroke();
 

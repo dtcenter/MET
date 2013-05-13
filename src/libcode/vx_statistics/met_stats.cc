@@ -2181,7 +2181,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       oo_sum      += o*o;
       fo_sum      += f*o;
       err_sum     += err;
-      abs_err_sum += abs((long double) err);
+      abs_err_sum += fabs(err);
       err_sq_sum  += err*err;
    } // end for i
 

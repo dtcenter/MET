@@ -271,7 +271,7 @@ while ( in.getline(line, sizeof(line)) ) {
    //  check that the point isn't too close to the poles
    //
 
-   if ( 90.0 - abs(Lat[Npoints]) < 1.0 ) {
+   if ( 90.0 - fabs(Lat[Npoints]) < 1.0 ) {
 
       mlog << Error << "\nMaskPoly::load() -> "
            << "encountered latitude value too close to a pole, (Lat, Lon) = ("

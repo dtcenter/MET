@@ -1014,15 +1014,15 @@ void VxPairDataEnsemble::find_vert_lvl(double obs_lvl,
 
       // Check for the closest level below.
       // Levels below contain higher values of pressure.
-      if(dist <= 0 && abs((long double) dist) < dist_below) {
-         dist_below = abs((long double) dist);
+      if(dist <= 0 && fabs(dist) < dist_below) {
+         dist_below = fabs(dist);
          i_below = i;
       }
 
       // Check for the closest level above.
       // Levels above contain lower values of pressure.
-      if(dist >= 0 && abs((long double) dist) < dist_above) {
-         dist_above = abs((long double) dist);
+      if(dist >= 0 && fabs(dist) < dist_above) {
+         dist_above = fabs(dist);
          i_above = i;
       }
    }
