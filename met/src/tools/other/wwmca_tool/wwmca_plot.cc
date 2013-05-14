@@ -35,6 +35,7 @@ using namespace std;
 #include <cstdio>
 #include <string.h>
 #include <cmath>
+#include <ctype.h>
 
 #include "vx_log.h"
 #include "vx_util.h"
