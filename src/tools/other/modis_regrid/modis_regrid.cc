@@ -15,6 +15,7 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
+#include <ctype.h>
 
 #include "modis_file.h"
 
