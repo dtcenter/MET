@@ -21,6 +21,7 @@ using namespace std;
 #include <stdlib.h>
 #include <dirent.h>
 #include <cmath>
+#include <ctype.h>
 
 #include "vx_log.h"
 #include "vx_util.h"
