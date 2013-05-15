@@ -13,6 +13,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////
 
 
+#include <stdlib.h>
 #include <cmath>
 
 #include "vx_math.h"
