@@ -1,0 +1,555 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Configuration file overview.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+The configuration files that control many of the MET tools contain formatted
+ASCII text.  This format has been updated for METv4.0.
+
+Settings common to multiple tools are described in the top part of this README
+file and settings specific to individual tools are described beneath the common
+settings.  Please refer to the MET User's Guide in the "doc" directory for more
+details about the settings if necessary.
+
+A configuration file entry is an entry name, followed by an equal sign =,
+followed by an entry value, and is terminated by a semicolon ;.  The
+configuration file itself is one large dictionary consisting of entries, some of
+which are dictionaries themselves.
+
+The configuration file language supports the following data types:
+   - Dictionary:
+      - Grouping of one or more entries enclosed by curly braces {}.
+   - Array:
+      - List of one or more entries enclosed by square braces [].
+      - Array elements are separated by commas.
+   - String:
+      - A character string enclosed by double quotation marks "".
+   - Integer:
+      - A numeric integer value.
+   - Float:
+      - A numeric float value.
+   - Boolean:
+      - A boolean value (TRUE or FALSE).
+   - Threshold:
+      - A threshold type (<, <=, ==, !-, >=, or >) followed by a numeric value.
+      - The threshold type may also be specified using two letter abbreviations
+        (lt, le, eq, ne, ge, gt).
+   - Piecewise-Linear Function (currently used only by MODE):
+      - A list of (x, y) points enclosed in parenthesis ().
+      - The (x, y) points are *NOT* separated by commas.
+
+The context of a configuration entry matters.  If an entry cannot be found in
+the expected dictionary, the MET tools recursively search for that entry in the
+parent dictionaries, all the way up to the top-level configuration file
+dictionary.  If you'd like to apply the same setting across all cases, you can
+simply specify it once at the top-level.  Alternatively, you can specify a
+setting at the appropriate dictionary level to have finer control over the
+behavior.
+
+In order to make the configuration files more readable, several descriptive
+integer types have been defined in the ConfigConstants file.  These integer
+names may be used on the right-hand side for many configuration file entries.
+
+Each of the configurable MET tools expects a certain set of configuration
+entries.  Examples of the MET configuration files can be found in data/config
+and scripts/config.
+
+When you pass a configuration file to a MET tool, the tool actually parses three
+different configuration files in the following order:
+   (1) Reads data/config/ConfigConstants to define constants.
+   (2) Reads the default configuration file for the tool from data/config.
+   (3) Reads the user-specified configuration file from the command line.
+
+Many of the entries from step (2) are overwritten by the user-specified entries
+from step (3).  Therefore, the configuration file you pass in on the command
+line really only needs to contain entries that differ from the defaults.
+
+The configuration file language supports the use of environment variables. When
+scripting up many calls to the MET tools, you may find it convenient to use them.
+They are specified as ${ENV_VAR}, where ENV_VAR is the name of the environment
+variable.
+
+The MET_BASE variable is defined in the code at compilation time as the path
+to the top-level MET directory.  MET_BASE may be used in the MET configuration
+files when specifying paths and the appropriate path will be substituted in.
+If MET_BASE is defined as an environment variable, its value will be used
+instead of the one defined at compilation time.
+
+An error in the syntax of a configuration file will result in an error from the
+MET tool stating the location of the parsing error.
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Configuration settings common to multiple tools
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// The "model" entry specifies and array of model names to be verified. If  
+// verifying multiple models, choose descriptive model names (no whitespace)
+// to distinguish between their output.
+// e.g. model = [ "AHW4", "AHWI" ];
+//
+model = [];
+amodel = [];
+bmodel = [];
+
+//
+// Specify a comma-separated list of storm id's to be used:
+//    2-letter basin, 2-digit cyclone number, 4-digit year
+// An empty list indicates that all should be used.
+//
+// e.g. storm_id = [ "AL092011" ];
+//
+// This may also be set using basin, cyclone, and timing information below.
+//
+storm_id = [];
+
+//
+// Specify a comma-separated list of basins to be used.
+// An empty list indicates that all should be used.
+//   Valid basins: WP, IO, SH, CP, EP, AL, SL
+//
+// e.g. basin = [ "AL", "EP" ];
+//
+basin = [];
+
+//
+// Specify a comma-separated list of cyclone numbers (01-99) to be used.
+// An empty list indicates that all should be used.
+//
+// e.g. cyclone = [ "01", "02", "03" ];
+//
+cyclone = [];
+
+
+//
+// Specify a comma-separated list of storm names to be used.
+// An empty list indicates that all should be used.
+//
+// e.g. storm_name = [ "KATRINA" ];
+//
+storm_name = [];
+
+//
+// Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
+// or provide a list of specific initialization times to include or exclude.
+// Tracks whose initial time meets the specified criteria will be used.
+// An empty string indicates that all times should be used.
+//
+// e.g. init_beg = "20100101";
+//      init_end = "20101231";
+//      init_inc = [ "20101231_06" ];
+//      init_exc = [ "20101231_00" ];
+//
+init_beg = "";
+init_end = "";
+init_inc = [];
+init_exc = [];
+
+//
+// Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
+// Tracks for which all valid times fall within the time window will be used.
+// An empty string indicates that all times should be used.
+//
+// e.g. valid_beg = "20100101";
+//      valid_end = "20101231";
+//
+valid_beg = "";
+valid_end = "";
+
+//
+// Specify a comma-separated list of model initialization hours to be used
+// in HH[MMSS] format. An empty list indicates that all hours should be used.
+//
+// e.g. init_hour = [ "00", "06", "12", "18" ];
+//
+init_hour = [];
+
+//
+// Specify lat/lon polylines defining masking regions to be applied.
+// Tracks whose initial location falls within init_mask will be used.
+// Tracks for which all locations fall within valid_mask will be used.
+//
+// e.g. init_mask  = "MET_BASE/data/poly/EAST.poly";
+//
+init_mask  = "";
+valid_mask = "";
+
+//
+// Indicate the version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V4.1";
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Settings specific to individual tools
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// TCPairsConfig_default
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Specify whether the code should check for duplicate ATCF lines when
+// building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
+//
+// e.g. check_dup = FALSE;
+//
+check_dup = FALSE;
+
+//
+// Specify whether special processing should be performed for interpolated
+// models with 12-hour spacing.  For model with a name ending in 'I' (e.g. AHWI)
+// search for the corresponding track whose model name ends in '2' (e.g. AHW2)
+// and merge its track points into the interpolated model's track.
+//
+// e.g. interp12 = TRUE;
+//
+interp12 = TRUE;
+
+//
+// Specify how consensus forecasts should be defined:
+//   name    = consensus model name
+//   members = array of consensus member model names
+//   required = array of TRUE/FALSE for each member
+//             if empty, default is FALSE
+//   min_req = minimum number of members required for the consensus
+//
+// e.g.
+//    consensus = [
+//       {
+//          name     = "CON1";
+//          members  = [ "MOD1", "MOD2", "MOD3" ];
+//          required = [ TRUE, FALSE, FALSE ];
+//          min_req  = 2;
+//       }
+//    ];
+//
+consensus = [];
+
+//
+// Specify a comma-separated list of forecast lag times to be used in HH[MMSS]
+// format.  For each ADECK track identified, a lagged track will be derived
+// for each entry listed.
+//
+// e.g. lag_time = [ "06", "12" ];
+//
+lag_time = [];
+
+//
+// Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
+// derived from the BEST and operational (CARQ) tracks.
+// Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
+// Derived from CARQ tracks: OCLP, OCS5, OCD5, OCDT
+//
+// e.g. base_baseline = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
+//      oper_baseline = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
+//
+best_baseline = [];
+oper_baseline = [];
+
+//
+// Specify whether only those track points common to both the ADECK and BDECK
+// tracks should be written out.
+//
+// e.g. match_points = FALSE;
+//
+match_points = FALSE;
+
+//
+// Specify the NetCDF output of the gen_dland tool containing a gridded
+// representation of the minimum distance to land.
+//
+dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
+
+//
+// Specify watch/warning information.  Specify an ASCII file containing
+// watch/warning information to be used.  At each track point, the most severe
+// watch/warning status in effect, if any, will be written to the output.
+// Also specify a time offset in seconds to be added to each watch/warning
+// time processed.  NHC applies watch/warning information to all track points
+// occurring 4 hours (-14400 second) prior to the watch/warning time.
+//
+watch_warn = {
+   file_name   = "MET_BASE/data/tc_data/wwpts_us.txt";
+   time_offset = -14400;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// TCStatConfig_default
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Stratify by the AMODEL or BMODEL columns.
+// Specify comma-separated lists of model names to be used for all analyses
+// performed.  May add to this list using the "-amodel" and "-bmodel"
+// job command options.
+// e.g. amodel = [ "AHW4" ];
+//      bmodel = [ "BEST" ];
+//
+amodel = [];
+bmodel = [];
+
+//
+// Stratify by the VALID times.
+// Define beginning and ending time windows in YYYYMMDD[_HH[MMSS]]
+// or provide a list of specific valid times to include or exclude.
+// May modify using the "-valid_beg", "-valid_end", "-valid_inc",
+// and "-valid_exc" job command options.
+//
+// e.g. valid_beg = "20100101";
+//      valid_end = "20101231_12";
+//      valid_inc = [ "20101231_06" ];
+//      valid_exc = [ "20101231_00" ];
+//
+valid_beg = "";
+valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Stratify by the initialization and valid hours and lead time.
+// Specify a comma-separated list of initialization hours,
+// valid hours, and lead times in HH[MMSS] format.
+// May add using the "-init_hour", "-valid_hour", and "-lead"
+// job command options.
+//
+// e.g. init_hour  = [ "00" ];
+//      valid_hour = [ "12" ];
+//      lead       = [ "24", "36" ];
+//
+init_hour  = [];
+valid_hour = [];
+lead       = [];
+
+//
+// Stratify by the LINE_TYPE column.  May add using the "-line_type"
+// job command option.
+//
+// e.g. line_type = [ "TCMPR" ];
+//
+line_type = [];
+
+//
+// Stratify by checking the watch/warning status for each track point
+// common to both the ADECK and BDECK tracks. If the watch/warning status
+// of any of the track points appears in the list, retain the entire track.
+// Individual watch/warning status by point may be specified using the
+// -column_str options below, but this option filters by the track maximum.
+// May add using the "-track_watch_warn" job command option.
+// The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
+//
+// e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
+//
+track_watch_warn = [];
+
+//
+// Stratify by applying thresholds to numeric data columns.
+// Specify a comma-separated list of columns names and thresholds
+// to be applied.  May add using the "-column_thresh name thresh" job command
+// options.
+//
+// e.g. column_thresh_name = [ "ADLAND", "BDLAND" ];
+//      column_thresh_val  = [ >200,     >200     ];
+//
+column_thresh_name = [];
+column_thresh_val  = [];
+
+//
+// Stratify by performing string matching on non-numeric data columns.
+// Specify a comma-separated list of columns names and values
+// to be checked.  May add using the "-column_str name string" job command
+// options.
+//
+// e.g. column_str_name = [ "LEVEL", "LEVEL" ];
+//      column_str_val  = [ "HU",    "TS"    ];
+//
+column_str_name = [];
+column_str_val  = [];
+
+//
+// Just like the column_thresh options above, but apply the threshold only
+// when lead = 0.  If lead = 0 value does not meet the threshold, discard
+// the entire track.  May add using the "-init_thresh name thresh" job command
+// options.
+//
+// e.g. init_thresh_name = [ "ADLAND" ];
+//      init_thresh_val  = [ >200     ];
+//
+init_thresh_name = [];
+init_thresh_val  = [];
+
+//
+// Just like the column_str options above, but apply the string matching only
+// when lead = 0.  If lead = 0 string does not match, discard the entire track.
+// May add using the "-init_str name thresh" job command options.
+//
+// e.g. init_str_name = [ "LEVEL" ];
+//      init_str_val  = [ "HU"    ];
+//
+init_str_name = [];
+init_str_val  = [];
+
+//
+// Stratify by the ADECK and BDECK distances to land.  Once either the ADECK or
+// BDECK track encounters land, discard the remainder of the track.
+//
+// e.g. water_only = FALSE;
+//
+water_only = FALSE;
+
+//
+// Specify whether only those track points for which rapid intensification
+// occurred in the BDECK track between the current time and 24-hours prior
+// should be retained. Define rapid intensification by thresholding the change
+// in maximum windspeed.
+// May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
+// options.
+//
+// e.g. rapid_inten        = FALSE;
+//      rapid_inten_thresh = >=30.0;
+//
+rapid_inten        = FALSE;
+rapid_inten_thresh = >=30.0;
+
+//
+// Specify whether only those track points occurring near landfall should be
+// retained, and define the landfall retention window as a number of seconds
+// offset from the landfall time.  Landfall is defined as the last BDECK track
+// point before the distance to land switches from positive to 0 or negative.
+// May modify using the "-landfall", "-landfall_beg", and "-landfall_end" job
+// command options.
+//
+// e.g. landfall     = FALSE;
+//      landfall_beg = -86400; (24 hours prior to landfall)
+//      landfall_end = 0;
+//
+landfall     = FALSE;
+landfall_beg = -86400;
+landfall_end = 0;
+
+//
+// Specify whether only those cases common to all models in the dataset should
+// be retained.  May modify using the "-event_equal" job command option.
+//
+// e.g. event_equal = FALSE;
+//
+event_equal = FALSE;
+
+//
+// Apply polyline masking logic to the location of the ADECK track at the
+// initialization time.  If it falls outside the mask, discard the entire track.
+// May modify using the "-out_init_mask" job command option.
+//
+// e.g. out_init_mask = "";
+//
+out_init_mask = "";
+
+//
+// Apply polyline masking logic to the location of the ADECK track at the
+// valid time.  If it falls outside the mask, discard only the current track
+// point.  May modify using the "-out_valid_mask" job command option.
+//
+// e.g. out_valid_mask = "";
+//
+out_valid_mask = "";
+
+//
+// The "jobs" entry is an array of TCStat jobs to be performed.
+// Each element in the array contains the specifications for a single analysis
+// job to be performed.  The format for an analysis job is as follows:
+//
+//    -job job_name
+//    OPTIONAL ARGS
+//
+//    Where "job_name" is set to one of the following:
+//
+//       "filter"
+//          To filter out the STAT or TCMPR lines matching the job filtering criteria 
+//          specified above and using the optional arguments below.  The 
+//          output STAT lines are written to the file specified using the 
+//          "-dump_row" argument.
+//          Required Args: -dump_row
+//
+//          To further refine the STAT data: Each optional argument may be used
+//          in the job specification multiple times unless otherwise indicated.
+//          When multiple optional arguments of the same type are indicated, the 
+//          analysis will be performed over their union
+//
+//          "-model            name"
+//          "-lead        HHMMSS"
+//          "-valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-valid_inc   YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-valid_exc   YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-init_end    YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-init_inc    YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-init_exc    YYYYMMDD[_HH[MMSS]]" (use once)
+//          "-init_hour   HH[MMSS]"
+//          "-valid_hour  HH[MMSS]
+//          "-init_mask          name"
+//          "-valid_mask         name"
+//          "-line_type          name"
+//          "-track_watch_warn   name"
+//          "-column_thresh_name name"
+//          "-column_val         name"
+//          "-column_str_name    name"
+//          "-column_str_val     name"
+//          "-init_thresh_name   name"
+//          "-init_val           name"
+//          "-init_str_name      name"
+//          "-init_str_val       name"
+//
+//          Additional filtering options that may be used only when -line_type 
+//          has been listed only once. These options take two arguments: the name 
+//          of the data column to be used and the min, max, or exact value for that 
+//          column. If multiple column eq/min/max/str options are listed, the job 
+//          will be performed on their intersection:
+//
+//          "-column_min col_name value"  e.g. -column_min TK_ERR 100.00 
+//          "-column_max col_name value"
+//          "-column_eq  col_name value"
+//          "-column_str col_name string" separate multiple filtering strings
+//                                        with commas
+//
+//          Required Args: -dump_row
+//      
+//
+//
+//       "summary"
+//          To compute the mean, standard deviation, and percentiles
+//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
+//          specified using the "-line_type" and "-column" arguments.
+//          For TCStat, the "-column" argument may be set to:
+//
+//             "TRACK" for track, along-track, and cross-track errors.
+//             "WIND" for all wind radius errors.
+//             "TI" for track and maximum wind intensity errors.
+//             "AC" for along-track and cross-track errors.
+//             "XY" for x-track and y-track errors.
+//             "col" for a specific column name.
+//             "col1-col2" for a difference of two columns.
+//             "ABS(col or col1-col2)" for the absolute value.
+//
+//          Required Args: -line_type, -column
+//          Optional Args (TCStat): -by column_name to specify case information
+//                                  -out_alpha to override default alpha value
+//
+//       e.g.
+//       jobs = ["-job filter -model AHW4 -dumprow ./tc_filter_job.tcst",
+//               "-job filter -column_min TK_ERR 100.000 -dumprow ./tc_filter_job.tcst",
+//               "-job summary -line_type TCMPR -column AC -dumprow ./tc_summary_job.tcst"]
+//
+jobs =[];
