@@ -171,7 +171,7 @@ model = "WRF";
 //       - The "GRIB2_parm_cat" entry specifies the parameter category code.
 //       - The "GRIB2_parm" entry specifies the parameter code.
 //
-//    - NetCDF (from MET and Pinterp):
+//    - NetCDF (from MET tools and Pinterp):
 //       - The "name" entry specifies the NetCDF variable name.
 //       - The "level" entry specifies the dimensions to be used:
 //          - (i,...,j,*,*) for a single field, where i,...,j specifies fixed
@@ -182,7 +182,12 @@ model = "WRF";
 //             {
 //               name       = "QVAPOR";
 //               level      = "(0,5,*,*)";
+//             },
+//             {
+//               name       = "TMP_P850_ENS_MEAN";
+//               level      = [ "(*,*)" ];
 //             }
+//
 //           ];
 //
 //
@@ -202,6 +207,7 @@ fcst = {
    ];
 };
 
+
 //
 // The "obs" entry specifies the same type of information as "fcst", but for
 // the observation data.  It will often be set to the same things as "fcst",
@@ -209,12 +215,64 @@ fcst = {
 // observation files of different format types, this entry will need to be set
 // in a non-trivial way.  The length of the "obs.field" array must match the
 // length of the "fcst.field" array.
+//     e.g. 
+//         obs = fcst;
+//
+//     or
+//
+//         fcst = {
+//           wind_thresh = [ NA ];
+//       
+//           field = [
+//              { 
+//                 name       = "PWAT";
+//                 level      = [ "L0" ];
+//                 cat_thresh = [ >2.5 ];
+//              }
+//            ];
+//         }
+//
+//
+//         obs = {
+//           wind_thresh = [ NA ];
+//       
+//           field = [
+//              { 
+//                 name       = "IWV";
+//                 level      = [ "L0" ];
+//                 cat_thresh = [ >25.0 ];
+//              }
+//            ];
+//         }
+//
 //
 //   - The "message_type" entry is an array of point observation message types
 //     to be used.  This only applies to the tools that verify against point
 //     observations.  This may be specified once at the top-level "obs"
 //     dictionary or separately for each "field" array element.  In the example
-//     shown here, this is specified in the "fcst" dictionary and copied to "obs".
+//     shown above, this is specified in the "fcst" dictionary and copied to "obs".
+//   - The "message_type" would be placed in the "field" array element if more
+//     than one "message_type" entry is desired within the config file.  
+//     e.g.
+//     fcst = {
+//       wind_thresh  = [ NA ];
+//
+//       field = [
+//          {
+//            message_type = [ "ADPUPA" ];
+//            name       = "TMP";
+//            level      = [ "P250", "P500", "P700", "P850", "P1000" ];
+//            cat_thresh = [ <=273.0 ];
+//          },
+//          {
+//            message_type = [ "ADPSFC" ];
+//            name       = "TMP";
+//            level      = [ "Z2" ];
+//            cat_thresh = [ <=273.0 ];
+//          }
+//       ];
+//     }
+//
 //
 obs = fcst;
 
@@ -230,7 +288,8 @@ mask_missing_flag = BOTH;
 
 //
 // The "obs_window" entry is a dictionary specifying a beginning ("beg"
-// entry) and ending ("end" entry) time offset values in seconds.  These time
+// entry) and ending ("end" entry) time offset values in seconds.  It defines
+// the time window over which observations are retained for scoring. These time
 // offsets are defined relative to a reference time t, as [t+beg, t+end].
 // In PB2NC, the reference time is the PrepBufr files center time.  In
 // Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
@@ -480,7 +539,7 @@ duplicate_flag = NONE;
 obs_quality = [ "1", "2", "3", "9" ];
 
 //
-// The "met_data_dir" entry specifies the location of the MET data
+// The "met_data_dir" entry specifies the location of the internal MET data
 // sub-directory which contains data files used when generating plots.
 //
 met_data_dir = "MET_BASE/data";
@@ -531,234 +590,7 @@ output_prefix  = "";
 //
 version = "V4.0";
 
-//
-// The "jobs" entry is an array of STAT-Analysis or TCStat jobs to be performed.
-// Each element in the array contains the specifications for a single analysis
-// job to be performed.  The format for an analysis job is as follows:
-//
-//    -job job_name
-//    OPTIONAL ARGS
-//
-//    Where "job_name" is set to one of the following:
-//
-//       "filter"
-//          To filter out the STAT or TCMPR lines matching the job filtering criteria 
-//          specified above and using the optional arguments below.  The 
-//          output STAT lines are written to the file specified using the 
-//          "-dump_row" argument.
-//          Required Args: -dump_row
-//
-//       "summary"
-//          To compute the mean, standard deviation, and percentiles
-//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
-//          specified using the "-line_type" and "-column" arguments.
-//          For TCStat, the "-column" argument may be set to:
-//             "TRACK" for track, along-track, and cross-track errors.
-//             "WIND" for all wind radius errors.
-//             "TI" for track and maximum wind intensity errors.
-//             "AC" for along-track and cross-track errors.
-//             "XY" for x-track and y-track errors.
-//             "col" for a specific column name.
-//             "col1-col2" for a difference of two columns.
-//             "ABS(col or col1-col2)" for the absolute value.
-//          Required Args: -line_type, -column
-//          Optional Args (TCStat): -by column_name to specify case information
-//                                  -out_alpha to override default alpha value
-//
-//       "aggregate"
-//          To aggregate the STAT data for the STAT line type specified using
-//          the "-line_type" argument.  The output of the job will be in the
-//          same format as the input line type specified.  The following line
-//          types may be aggregated:
-//          -line_type FHO, CTC, MCTC,
-//                     SL1L2, SAL1L2, VL1L2, VAL1L2,
-//                     PCT, NBRCNT, NBRCTC, ISC, RHIST
-//          Required Args: -line_type
-//
-//       "aggregate_stat"
-//          To aggregate the STAT data for the STAT line type specified using
-//          the "-line_type" argument.  The output of the job will be the line
-//          type specified using the "-out_line_type" argument.  The valid
-//          combinations of "-line_type" and "-out_line_type" are listed below.
-//          -line_type FHO,   CTC,    -out_line_type CTS
-//          -line_type MCTC           -out_line_type MCTS
-//          -line_type SL1L2, SAL1L2, -out_line_type CNT
-//          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
-//          -line_type PCT,           -out_line_type PSTD, PJC, PRC
-//          -line_type NBRCTC,        -out_line_type NBRCTS
-//          -line_type MPR,           -out_line_type FHO, CTC, CTS,
-//                                                   MCTC, MCTS, CNT,
-//                                                   SL1L2, SAL1L2,
-//                                                   PCT, PSTD, PJC, PRC
-//          Required Args:
-//             -line_type, -out_line_type
-//          Additional Required Args for -line_type MPR:
-//             -out_fcst_thresh, -out_obs_thresh
-//             When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
-//                                 PCT, PSTD, PJC, PRC
-//          Additional Optional Args for -line_type MPR:
-//             -mask_grid, -mask_poly
-//
-//       "ss_index"
-//          The skill score index job can be configured to compute a weighted
-//          average of skill scores derived from a configurable set of
-//          variables, levels, lead times, and statistics.  The skill score
-//          index is computed using two models, a forecast model and a
-//          reference model.  For each statistic in the index, a skill score
-//          is computed as:
-//             SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
-//          Where S is the statistic.
-//          Next, a weighted average is computed over all the skill scores.
-//          Lastly, an index value is computed as:
-//             Index = sqrt(1/(1-SS[avg]))
-//          Where SS[avg] is the weighted average of skill scores.
-//          Required Args:
-//             Exactly 2 entries for -model, the forecast model and reference
-//             For each term of the index:
-//             -fcst_var, -fcst_lev, -fcst_lead, -line_type, -column, -weight
-//             Where -line_type is CNT or CTS and -column is the statistic.
-//             Optionally, specify other filters for each term, -fcst_thresh.
-//
-//       "go_index"
-//          The GO Index is a special case of the skill score index consisting
-//          of a predefined set of variables, levels, lead times, statistics,
-//          and weights.
-//          For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
-//          - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
-//          - Dew point Temperature at the surface(b), 850(b), 700(b), 400(b) mB
-//          - Temperature at the surface(b), 400(a) mB
-//          - Height at 400(a) mB
-//          - Sea Level Pressure(b)
-//          Where (a) means weights of 4, 3, 2, 1 for the lead times, and
-//          (b) means weights of 8, 6, 4, 2 for the lead times.
-//          Required Args: None
-//
-//    Job command FILTERING options to further refine the STAT data:
-//       Each optional argument may be used in the job specification multiple
-//       times unless otherwise indicated. When multiple optional arguments of
-//       the same type are indicated, the analysis will be performed over their
-//       union:
-//
-//       "-model            name"
-//       "-fcst_lead        HHMMSS"
-//       "-obs_lead         HHMMSS"
-//       "-fcst_valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-fcst_valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-obs_valid_beg    YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-obs_valid_end    YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-fcst_init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-fcst_init_end    YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-obs_init_beg     YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-obs_init_end     YYYYMMDD[_HH[MMSS]]" (use once)
-//       "-fcst_init_hour   HH[MMSS]"
-//       "-obs_init_hour    HH[MMSS]"
-//       "-fcst_valid_hour" HH[MMSS]
-//       "-obs_valid_hour"  HH[MMSS]
-//       "-fcst_var         name"
-//       "-obs_var          name"
-//       "-fcst_lev         name"
-//       "-obs_lev          name"
-//       "-obtype           name"
-//       "-vx_mask          name"
-//       "-interp_mthd      name"
-//       "-interp_pnts      n"
-//       "-fcst_thresh      t"
-//       "-obs_thresh       t"
-//       "-cov_thresh       t"
-//       "-alpha            a"
-//       "-line_type        type"
-//       "-column           name"
-//       "-weight           value"
-//
-//   Job command FILTERING options used when the -line_type has been set to a
-//   single value.  These options take two arguments, the name of the data
-//   column to be used and the min, max, or exact value for that column.
-//   If multiple column eq/min/max/str options are listed, the job will be
-//   performed on their intersection:
-//
-//       "-column_min col_name value"
-//       "-column_max col_name value"
-//       "-column_eq  col_name value"
-//       "-column_str col_name string" separate multiple filtering strings
-//                                     with commas
-//
-//   Job command options to DEFINE the analysis job.  Unless otherwise noted,
-//   these options may only be used ONCE per analysis job:
-//
-//       "-dump_row        path"
-//
-//       "-mask_grid       name"
-//       "-mask_poly       file"
-//
-//       "-out_line_type   name"
-//       "-out_fcst_thresh value" multiple for multi-category contingency tables
-//                                and probabilistic forecasts
-//       "-out_obs_thresh  value" multiple for multi-category contingency tables
-//       "-out_alpha       value"
-//
-//       "-boot_interval   value"
-//       "-boot_rep_prop   value"
-//       "-n_boot_rep      value"
-//       "-boot_rng        value"
-//       "-boot_seed       value"
-//
-//       "-rank_corr_flag  value"
-//       "-vif_flag        value"
-//
-jobs = [
-   "-job filter         -line_type SL1L2                                            -vx_mask DTC165                                     -dump_row job_filter_SL1L2.stat",
-   "-job summary        -line_type CNT   -alpha 0.050                                                                 -fcst_var TMP     -dump_row job_summary_ME.stat -column ME",
-   "-job aggregate      -line_type SL1L2                                            -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_SL1L2.stat",
-   "-job aggregate_stat -line_type SL1L2 -out_line_type CNT                         -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_stat_SL1L2_CNT.stat",
-   "-job aggregate_stat -line_type MPR   -out_line_type CNT                         -vx_mask DTC165   -vx_mask DTC166 -fcat_var TMP     -dump_row job_aggregate_stat_MPR_CNT.stat",
-   "-job aggregate      -line_type CTC                        -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_CTC.stat",
-   "-job aggregate_stat -line_type CTC   -out_line_type CTS   -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_stat_CTC_CTS.stat",
-   "-job aggregate      -line_type MCTC                       -column_eq N_CAT 4    -vx_mask DTC165   -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_MCTC.stat",
-   "-job aggregate_stat -line_type MCTC  -out_line_type MCTS  -column_eq N_CAT 4    -vx_mask DTC165   -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_stat_MCTC_MCTS.stat",
-   "-job aggregate      -line_type PCT                                              -vx_mask DTC165   -vx_mask DTC166                   -dump_row job_aggregate_PCT.stat",
-   "-job aggregate_stat -line_type PCT   -out_line_type PSTD                        -vx_mask DTC165   -vx_mask DTC166                   -dump_row job_aggregate_stat_PCT_PSTD.stat",
-   "-job aggregate      -line_type ISC                        -fcst_thresh >0.000   -vx_mask TILE_TOT                 -fcst_var APCP_12 -dump_row job_aggregate_ISC.stat",
-   "-job aggregate      -line_type RHIST                      -obtype MC_PCP        -vx_mask HUC4_1605 -vx_mask HUC4_1803               -dump_row job_aggregate_RHIST.stat",
-   "-job aggregate      -line_type SSVAR                      -obtype MC_PCP        -vx_mask HUC4_1605 -vx_mask HUC4_1803               -dump_row job_aggregate_SSVAR.stat",
-   "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC        -vx_mask HUC4_1605 -vx_mask HUC4_1803               -dump_row job_aggregate_stat_ORANK_RHIST.stat"
-];
 
-//
-// Specify a comma-separated list of storm id's to be used:
-//    2-letter basin, 2-digit cyclone number, 4-digit year
-// An empty list indicates that all should be used.
-//
-// e.g. storm_id = [ "AL092011" ];
-//
-// This may also be set using basin, cyclone, and timing information below.
-//
-storm_id = [];
-
-//
-// Specify a comma-separated list of basins to be used.
-// An empty list indicates that all should be used.
-//   Valid basins: WP, IO, SH, CP, EP, AL, SL
-//
-// e.g. basin = [ "AL", "EP" ];
-//
-basin = [];
-
-//
-// Specify a comma-separated list of cyclone numbers (01-99) to be used.
-// An empty list indicates that all should be used.
-//
-// e.g. cyclone = [ "01", "02", "03" ];
-//
-cyclone = [];
-
-
-//
-// Specify a comma-separated list of storm names to be used.
-// An empty list indicates that all should be used.
-//
-// e.g. storm_name = [ "KATRINA" ];
-//
-storm_name = [];
 
 //
 // Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
@@ -819,11 +651,12 @@ valid_mask = "";
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Specify the time periods for the summarization.  Summarizations are
-// centered on the defined times.
-// Define beginning and ending time window in HH[MMSS].
-// Step (the time between intervals) in seconds.
-// Width of the time intervals in seconds.
+// This feature was implemented to allow additional processing of observations
+// with high temporal resolution. The "flag" entry toggles the "time_summary"
+// on (TRUE) and off (FALSE).  Obs may be summarized across the user specified
+// time period defined by the "beg" and "end" entries.  The "step" entry defines 
+// the time between intervals in seconds.  The "width" entry specifies the width of 
+// the summary interval in seconds. 
 // 
 // e.g. beg = "00";
 //      end = "235959";
@@ -833,7 +666,7 @@ valid_mask = "";
 // This example does a 10-minute time summary every 5 minutes throughout the
 // day.  The first interval will be from 23:55:00 the previous day through
 // 00:04:59 of the current day.  The second interval will be from 0:00:00
-// through 00:09:59. And so on.
+// through 00:09:59. And so on.  
 //
 // The summaries will only be calculated for the specified grib codes.
 // The supported summaries are "min" (minimum), "max" (maximum), "range",
@@ -872,7 +705,12 @@ time_summary = {
 //      ensemble products, if the ratio of valid data values is too lower, the
 //      ensemble product will be set to bad data for that point.
 //
-//    - The "field" entry is as described above.
+//    - The "field" entry is as described above.  However, in this case, the
+//      cat_thresh entry is used for calculating probabilities of exceeding 
+//      the given threshold.  In the default shown below, the probability of 
+//      accumulated precipitation > 0.0 mm and > 5.0 mm will be calculated 
+//      from the member accumulated precipitation fields and stored as an
+//      ensemble field.
 //
 ens = {
    ens_thresh = 1.0;
@@ -883,6 +721,25 @@ ens = {
          name       = "APCP";
          level      = "A03";
          cat_thresh = [ >0.0, >=5.0 ];
+      }
+   ];
+}
+
+//
+// The fcst and obs entries is as described above and used by Ensemble Stat to
+// compute rank histograms, spread-skill variance, and a other statistics. In
+// this application the cat_thresh is not needed but "ens_ssvar_bin_size" may be. 
+// The "ens_ssvar_bin_size" entry sets the width of the variance bins.  Smaller values
+// provide the user with more flexibility in how data are binned during analysis.
+//
+fcst = {
+   message_type = [ "ADPUPA" ];
+   ens_ssvar_bin_size = 1;
+
+   field = [
+      {
+         name               = "APCP";
+         level              = [ "A03" ];
       }
    ];
 }
@@ -932,12 +789,12 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// MODE line options are used to create filters that determine which of the MODE output
-// lines that are read in, are kept.  The MODE line options are numerous.  They fall into
+// MODE line options are used to create filters that determine which MODE output lines
+// lines are read in and processed.  The MODE line options are numerous.  They fall into
 // seven categories: toggles, multiple set string options, multiple set integer options,
 // integer max/min options, date/time max/min options, floating-point max/min options, and
-// miscellaneous options.  In order to be applied, the options must be uncommented (remove
-// the "//" marks) before running.  These options are described in subsequent sections.
+// miscellaneous options.  In order to be applied, the options must be uncommented (i.e. 
+// remove  the "//" marks) before running. These options are described in subsequent sections.
 //
 
 //
@@ -1238,7 +1095,8 @@ unmatched = FALSE;
 //      discarded.
 //
 //    - The "inten_perc_value" entry specifies the intensity percentile value
-//      of interest between 0 and 100.
+//      of interest between 0 and 100.  The percentile set by this entry will 
+//      be output in addition to the standard intensity percentiles.
 //
 //    - The "inten_perc_thresh" entry specifies a threshold for the percentile
 //      intensity of each MODE object.  Any objects not meeting this threshold
@@ -1498,18 +1356,30 @@ elevation_range = {
 
 //
 // The "pb_report_type" entry is an array of PrepBufr report types to be
-// retained.  An empty list indicates that all should be retained.
+// retained.  The numeric "pb_report_type" entry allows for further stratification
+// within message types.  An empty list indicates that all should be retained.
 //
 // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
+// 
+// e.g.
+//   Report Type 120 is for message type ADPUPA but is only RAWINSONDE
+//   Report Type 132 is for message type ADPUPA but is only FLIGHT-LEVEL RECON
+//     and PROFILE DROPSONDE
 //
 pb_report_type  = [];
 
 //
 // The "in_report_type" entry is an array of input report type values to be
-// retained.  An empty list indicates that all should be retained.
+// retained.  The numeric "in_report_type" entry provides additional 
+// stratification of observations. An empty list indicates that all should
+// be retained.
 //
 // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm
 //
+// e.g.
+// Input Report Type 11 Fixed land RAOB and PIBAL by block and station number 
+// Input Report Type 12 Fixed land RAOB and PIBAL by call letters 
+
 in_report_type = [];
 
 //
@@ -1596,18 +1466,27 @@ event_stack_flag = TOP;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Number of grid points to be processed concurrently.  Set smaller to use
-// less memory but increase the number of passes through the data.
+// Computation may be memory intensive, especially for large grids.
+// The "block_size" entry sets the number of grid points to be processed
+// concurrently (i.e. in one pass through a time series). Smaller values
+// require less memory but increase the number of passes through the data. 
 //
 block_size = 1024;
 
 //
-// Ratio of valid matched pairs to compute statistics for a grid point
+// Ratio of valid matched pairs to total length of series for a grid
+// point.  If valid threshold is exceeded at that grid point the statistics
+// are computed and stored.  If not, a bad data flag is stored. The default 
+// setting requires all data in the series to be valid.
+//  
 //
 vld_thresh = 1.0;
 
 //
-// Statistical output types
+// Statistical output types need to be specified explicitly.  Refer to User's
+// Guide for available output types.  To keep output file size reasonable,
+// it is recommended to process a few output types at a time, especially if the
+// grid is large.
 //
 output_stats = {
    fho    = [];
@@ -1630,285 +1509,205 @@ output_stats = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// The "jobs" entry is an array of STAT-Analysis jobs to be performed.
+// Each element in the array contains the specifications for a single analysis
+// job to be performed.  The format for an analysis job is as follows:
+//
+//    -job job_name
+//    OPTIONAL ARGS
+//
+//    Where "job_name" is set to one of the following:
+//
+//       "filter"
+//          To filter out the STAT or TCMPR lines matching the job filtering criteria 
+//          specified below and using the optional arguments below.  The 
+//          output STAT lines are written to the file specified using the 
+//          "-dump_row" argument.
+//          Required Args: -dump_row
+//
+//       "summary"
+//          To compute the mean, standard deviation, and percentiles
+//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
+//          specified using the "-line_type" and "-column" arguments.
+//          For TCStat, the "-column" argument may be set to:
+//             "TRACK" for track, along-track, and cross-track errors.
+//             "WIND" for all wind radius errors.
+//             "TI" for track and maximum wind intensity errors.
+//             "AC" for along-track and cross-track errors.
+//             "XY" for x-track and y-track errors.
+//             "col" for a specific column name.
+//             "col1-col2" for a difference of two columns.
+//             "ABS(col or col1-col2)" for the absolute value.
+//          Required Args: -line_type, -column
+//          Optional Args (TCStat): -by column_name to specify case information
+//                                  -out_alpha to override default alpha value
+//
+//       "aggregate"
+//          To aggregate the STAT data for the STAT line type specified using
+//          the "-line_type" argument.  The output of the job will be in the
+//          same format as the input line type specified.  The following line
+//          types may be aggregated:
+//          -line_type FHO, CTC, MCTC,
+//                     SL1L2, SAL1L2, VL1L2, VAL1L2,
+//                     PCT, NBRCNT, NBRCTC, ISC, RHIST
+//          Required Args: -line_type
+//
+//       "aggregate_stat"
+//          To aggregate the STAT data for the STAT line type specified using
+//          the "-line_type" argument.  The output of the job will be the line
+//          type specified using the "-out_line_type" argument.  The valid
+//          combinations of "-line_type" and "-out_line_type" are listed below.
+//          -line_type FHO,   CTC,    -out_line_type CTS
+//          -line_type MCTC           -out_line_type MCTS
+//          -line_type SL1L2, SAL1L2, -out_line_type CNT
+//          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
+//          -line_type PCT,           -out_line_type PSTD, PJC, PRC
+//          -line_type NBRCTC,        -out_line_type NBRCTS
+//          -line_type MPR,           -out_line_type FHO, CTC, CTS,
+//                                                   MCTC, MCTS, CNT,
+//                                                   SL1L2, SAL1L2,
+//                                                   PCT, PSTD, PJC, PRC
+//          Required Args:
+//             -line_type, -out_line_type
+//          Additional Required Args for -line_type MPR:
+//             -out_fcst_thresh, -out_obs_thresh
+//             When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+//                                 PCT, PSTD, PJC, PRC
+//          Additional Optional Args for -line_type MPR:
+//             -mask_grid, -mask_poly
+//
+//       "ss_index"
+//          The skill score index job can be configured to compute a weighted
+//          average of skill scores derived from a configurable set of
+//          variables, levels, lead times, and statistics.  The skill score
+//          index is computed using two models, a forecast model and a
+//          reference model.  For each statistic in the index, a skill score
+//          is computed as:
+//             SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
+//          Where S is the statistic.
+//          Next, a weighted average is computed over all the skill scores.
+//          Lastly, an index value is computed as:
+//             Index = sqrt(1/(1-SS[avg]))
+//          Where SS[avg] is the weighted average of skill scores.
+//          Required Args:
+//             Exactly 2 entries for -model, the forecast model and reference
+//             For each term of the index:
+//             -fcst_var, -fcst_lev, -fcst_lead, -line_type, -column, -weight
+//             Where -line_type is CNT or CTS and -column is the statistic.
+//             Optionally, specify other filters for each term, -fcst_thresh.
+//
+//       "go_index"
+//          The GO Index is a special case of the skill score index consisting
+//          of a predefined set of variables, levels, lead times, statistics,
+//          and weights.
+//          For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
+//          - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
+//          - Dew point Temperature at the surface(b), 850(b), 700(b), 400(b) mB
+//          - Temperature at the surface(b), 400(a) mB
+//          - Height at 400(a) mB
+//          - Sea Level Pressure(b)
+//          Where (a) means weights of 4, 3, 2, 1 for the lead times, and
+//          (b) means weights of 8, 6, 4, 2 for the lead times.
+//
+//          Required Args: None
+//
+//    Job command FILTERING options to further refine the STAT data:
+//       Each optional argument may be used in the job specification multiple
+//       times unless otherwise indicated. When multiple optional arguments of
+//       the same type are indicated, the analysis will be performed over their
+//       union:
+//
+//       "-model            name"
+//       "-fcst_lead        HHMMSS"
+//       "-obs_lead         HHMMSS"
+//       "-fcst_valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-fcst_valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-obs_valid_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-obs_valid_end    YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-fcst_init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-fcst_init_end    YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-obs_init_beg     YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-obs_init_end     YYYYMMDD[_HH[MMSS]]" (use once)
+//       "-fcst_init_hour   HH[MMSS]"
+//       "-obs_init_hour    HH[MMSS]"
+//       "-fcst_valid_hour" HH[MMSS]
+//       "-obs_valid_hour"  HH[MMSS]
+//       "-fcst_var         name"
+//       "-obs_var          name"
+//       "-fcst_lev         name"
+//       "-obs_lev          name"
+//       "-obtype           name"
+//       "-vx_mask          name"
+//       "-interp_mthd      name"
+//       "-interp_pnts      n"
+//       "-fcst_thresh      t"
+//       "-obs_thresh       t"
+//       "-cov_thresh       t"
+//       "-alpha            a"
+//       "-line_type        type"
+//       "-column           name"
+//       "-weight           value"
+//
+//   Job command FILTERING options that may be used only when -line_type  
+//   has been listed once. These options take two arguments: the name of the 
+//   data column to be used and the min, max, or exact value for that column.
+//   If multiple column eq/min/max/str options are listed, the job will be
+//   performed on their intersection:
+//
+//       "-column_min col_name value"  e.g. -column_min BASER 0.02
+//       "-column_max col_name value"
+//       "-column_eq  col_name value"
+//       "-column_str col_name string" separate multiple filtering strings
+//                                     with commas
+//
+//   Job command options to DEFINE the analysis job.  Unless otherwise noted,
+//   these options may only be used ONCE per analysis job:
+//
+//       "-dump_row        path"
+//
+//       "-mask_grid       name"
+//       "-mask_poly       file"
+//
+//       "-out_line_type   name"
+//       "-out_fcst_thresh value" multiple for multi-category contingency tables
+//                                and probabilistic forecasts
+//       "-out_obs_thresh  value" multiple for multi-category contingency tables
+//       "-out_alpha       value"
+//
+//       "-boot_interval   value"
+//       "-boot_rep_prop   value"
+//       "-n_boot_rep      value"
+//       "-boot_rng        value"
+//       "-boot_seed       value"
+//
+//       "-rank_corr_flag  value"
+//       "-vif_flag        value"
+//
+jobs = [
+   "-job filter         -line_type SL1L2   -vx_mask DTC165 -dump_row job_filter_SL1L2.stat",
+   "-job summary        -line_type CNT   -alpha 0.050                                                                 -fcst_var TMP     -dump_row job_summary_ME.stat -column ME",
+   "-job aggregate      -line_type SL1L2  -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_SL1L2.stat",
+   "-job aggregate_stat -line_type SL1L2 -out_line_type CNT  -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_stat_SL1L2_CNT.stat",
+   "-job aggregate_stat -line_type MPR   -out_line_type CNT  -vx_mask DTC165   -vx_mask DTC166 -fcat_var TMP     -dump_row job_aggregate_stat_MPR_CNT.stat",
+   "-job aggregate      -line_type CTC   -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_CTC.stat",
+   "-job aggregate_stat -line_type CTC   -out_line_type CTS   -fcst_thresh <300.000 -vx_mask DTC165   -vx_mask DTC166 -fcst_var TMP     -dump_row job_aggregate_stat_CTC_CTS.stat",
+   "-job aggregate      -line_type MCTC  -column_eq N_CAT 4    -vx_mask DTC165   -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_MCTC.stat",
+   "-job aggregate_stat -line_type MCTC  -out_line_type MCTS  -column_eq N_CAT 4    -vx_mask DTC165   -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_stat_MCTC_MCTS.stat",
+   "-job aggregate      -line_type PCT   -vx_mask DTC165   -vx_mask DTC166                   -dump_row job_aggregate_PCT.stat",
+   "-job aggregate_stat -line_type PCT   -out_line_type PSTD                        -vx_mask DTC165   -vx_mask DTC166                   -dump_row job_aggregate_stat_PCT_PSTD.stat",
+   "-job aggregate      -line_type ISC   -fcst_thresh >0.000   -vx_mask TILE_TOT                 -fcst_var APCP_12 -dump_row job_aggregate_ISC.stat",
+   "-job aggregate      -line_type RHIST -obtype MC_PCP        -vx_mask HUC4_1605 -vx_mask HUC4_1803               -dump_row job_aggregate_RHIST.stat",
+   "-job aggregate      -line_type SSVAR -obtype MC_PCP        -vx_mask HUC4_1605 -vx_mask HUC4_1803               -dump_row job_aggregate_SSVAR.stat",
+   "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC        -vx_mask HUC4_1605 -vx_mask HUC4_1803               -dump_row job_aggregate_stat_ORANK_RHIST.stat"
+];
+
+//
 // The "vif_flag" entry is a boolean to indicate whether a variance inflation
 // factor should be computed when aggregating a time series of contingency
 // table counts or partial sums.  The VIF is used to adjust the normal
 // confidence intervals computed for the aggregated statistics.
 //
 vif_flag = FALSE;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-// TCPairsConfig_default
-//
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Specify whether the code should check for duplicate ATCF lines when
-// building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
-//
-// e.g. check_dup = FALSE;
-//
-check_dup = FALSE;
-
-//
-// Specify whether special processing should be performed for interpolated
-// models with 12-hour spacing.  For model with a name ending in 'I' (e.g. AHWI)
-// search for the corresponding track whose model name ends in '2' (e.g. AHW2)
-// and merge its track points into the interpolated model's track.
-//
-// e.g. interp12 = TRUE;
-//
-interp12 = TRUE;
-
-//
-// Specify how consensus forecasts should be defined:
-//   name    = consensus model name
-//   members = array of consensus member model names
-//   required = array of TRUE/FALSE for each member
-//             if empty, default is FALSE
-//   min_req = minimum number of members required for the consensus
-//
-// e.g.
-//    consensus = [
-//       {
-//          name     = "CON1";
-//          members  = [ "MOD1", "MOD2", "MOD3" ];
-//          required = [ TRUE, FALSE, FALSE ];
-//          min_req  = 2;
-//       }
-//    ];
-//
-consensus = [];
-
-//
-// Specify a comma-separated list of forecast lag times to be used in HH[MMSS]
-// format.  For each ADECK track identified, a lagged track will be derived
-// for each entry listed.
-//
-// e.g. lag_time = [ "06", "12" ];
-//
-lag_time = [];
-
-//
-// Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
-// derived from the BEST and operational (CARQ) tracks.
-// Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
-// Derived from CARQ tracks: OCLP, OCS5, OCD5, OCDT
-//
-// e.g. base_baseline = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
-//      oper_baseline = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
-//
-best_baseline = [];
-oper_baseline = [];
-
-//
-// Specify whether only those track points common to both the ADECK and BDECK
-// tracks should be written out.
-//
-// e.g. match_points = FALSE;
-//
-match_points = FALSE;
-
-//
-// Specify the NetCDF output of the gen_dland tool containing a gridded
-// representation of the minimum distance to land.
-//
-dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
-
-//
-// Specify watch/warning information.  Specify an ASCII file containing
-// watch/warning information to be used.  At each track point, the most severe
-// watch/warning status in effect, if any, will be written to the output.
-// Also specify a time offset in seconds to be added to each watch/warning
-// time processed.  NHC applies watch/warning information to all track points
-// occurring 4 hours (-14400 second) prior to the watch/warning time.
-//
-watch_warn = {
-   file_name   = "MET_BASE/data/tc_data/wwpts_us.txt";
-   time_offset = -14400;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-//
-// TCStatConfig_default
-//
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Stratify by the AMODEL or BMODEL columns.
-// Specify comma-separated lists of model names to be used for all analyses
-// performed.  May add to this list using the "-amodel" and "-bmodel"
-// job command options.
-// e.g. amodel = [ "AHW4" ];
-//      bmodel = [ "BEST" ];
-//
-amodel = [];
-bmodel = [];
-
-//
-// Stratify by the VALID times.
-// Define beginning and ending time windows in YYYYMMDD[_HH[MMSS]]
-// or provide a list of specific valid times to include or exclude.
-// May modify using the "-valid_beg", "-valid_end", "-valid_inc",
-// and "-valid_exc" job command options.
-//
-// e.g. valid_beg = "20100101";
-//      valid_end = "20101231_12";
-//      valid_inc = [ "20101231_06" ];
-//      valid_exc = [ "20101231_00" ];
-//
-valid_beg = "";
-valid_end = "";
-valid_inc = [];
-valid_exc = [];
-
-//
-// Stratify by the initialization and valid hours and lead time.
-// Specify a comma-separated list of initialization hours,
-// valid hours, and lead times in HH[MMSS] format.
-// May add using the "-init_hour", "-valid_hour", and "-lead"
-// job command options.
-//
-// e.g. init_hour  = [ "00" ];
-//      valid_hour = [ "12" ];
-//      lead       = [ "24", "36" ];
-//
-init_hour  = [];
-valid_hour = [];
-lead       = [];
-
-//
-// Stratify by the LINE_TYPE column.  May add using the "-line_type"
-// job command option.
-//
-// e.g. line_type = [ "TCMPR" ];
-//
-line_type = [];
-
-//
-// Stratify by checking the watch/warning status for each track point
-// common to both the ADECK and BDECK tracks. If the watch/warning status
-// of any of the track points appears in the list, retain the entire track.
-// Individual watch/warning status by point may be specified using the
-// -column_str options below, but this option filters by the track maximum.
-// May add using the "-track_watch_warn" job command option.
-// The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
-//
-// e.g. track_watch_warn = [ "HUWATCH", "HUWARN" ];
-//
-track_watch_warn = [];
-
-//
-// Stratify by applying thresholds to numeric data columns.
-// Specify a comma-separated list of columns names and thresholds
-// to be applied.  May add using the "-column_thresh name thresh" job command
-// options.
-//
-// e.g. column_thresh_name = [ "ADLAND", "BDLAND" ];
-//      column_thresh_val  = [ >200,     >200     ];
-//
-column_thresh_name = [];
-column_thresh_val  = [];
-
-//
-// Stratify by performing string matching on non-numeric data columns.
-// Specify a comma-separated list of columns names and values
-// to be checked.  May add using the "-column_str name string" job command
-// options.
-//
-// e.g. column_str_name = [ "LEVEL", "LEVEL" ];
-//      column_str_val  = [ "HU",    "TS"    ];
-//
-column_str_name = [];
-column_str_val  = [];
-
-//
-// Just like the column_thresh options above, but apply the threshold only
-// when lead = 0.  If lead = 0 value does not meet the threshold, discard
-// the entire track.  May add using the "-init_thresh name thresh" job command
-// options.
-//
-// e.g. init_thresh_name = [ "ADLAND" ];
-//      init_thresh_val  = [ >200     ];
-//
-init_thresh_name = [];
-init_thresh_val  = [];
-
-//
-// Just like the column_str options above, but apply the string matching only
-// when lead = 0.  If lead = 0 string does not match, discard the entire track.
-// May add using the "-init_str name thresh" job command options.
-//
-// e.g. init_str_name = [ "LEVEL" ];
-//      init_str_val  = [ "HU"    ];
-//
-init_str_name = [];
-init_str_val  = [];
-
-//
-// Stratify by the ADECK and BDECK distances to land.  Once either the ADECK or
-// BDECK track encounters land, discard the remainder of the track.
-//
-// e.g. water_only = FALSE;
-//
-water_only = FALSE;
-
-//
-// Specify whether only those track points for which rapid intensification
-// occurred in the BDECK track between the current time and 24-hours prior
-// should be retained. Define rapid intensification by thresholding the change
-// in maximum windspeed.
-// May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
-// options.
-//
-// e.g. rapid_inten        = FALSE;
-//      rapid_inten_thresh = >=30.0;
-//
-rapid_inten        = FALSE;
-rapid_inten_thresh = >=30.0;
-
-//
-// Specify whether only those track points occurring near landfall should be
-// retained, and define the landfall retention window as a number of seconds
-// offset from the landfall time.  Landfall is defined as the last BDECK track
-// point before the distance to land switches from positive to 0 or negative.
-// May modify using the "-landfall", "-landfall_beg", and "-landfall_end" job
-// command options.
-//
-// e.g. landfall     = FALSE;
-//      landfall_beg = -86400; (24 hours prior to landfall)
-//      landfall_end = 0;
-//
-landfall     = FALSE;
-landfall_beg = -86400;
-landfall_end = 0;
-
-//
-// Specify whether only those cases common to all models in the dataset should
-// be retained.  May modify using the "-event_equal" job command option.
-//
-// e.g. event_equal = FALSE;
-//
-event_equal = FALSE;
-
-//
-// Apply polyline masking logic to the location of the ADECK track at the
-// initialization time.  If it falls outside the mask, discard the entire track.
-// May modify using the "-out_init_mask" job command option.
-//
-// e.g. out_init_mask = "";
-//
-out_init_mask = "";
-
-//
-// Apply polyline masking logic to the location of the ADECK track at the
-// valid time.  If it falls outside the mask, discard only the current track
-// point.  May modify using the "-out_valid_mask" job command option.
-//
-// e.g. out_valid_mask = "";
-//
-out_valid_mask = "";
 
 
 ////////////////////////////////////////////////////////////////////////////////
