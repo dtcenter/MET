@@ -513,7 +513,10 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Polyline ShapeData::convex_hull() const {
+Polyline ShapeData::convex_hull() const
+
+{
+
    int j, k, n, y;
    int done;
    int *Index = (int *) 0;
@@ -549,33 +552,33 @@ Polyline ShapeData::convex_hull() const {
 
    for (y=0; y<data.ny(); ++y)  {
 
-   j = x_left(y);
+      j = x_left(y);
 
-   if ( j < 0 )  continue;
+      if ( j < 0 )  continue;
 
-   outline.u[n] = (double) j;
-   outline.v[n] = (double) y;
+      outline.u[n] = (double) j;
+      outline.v[n] = (double) y;
 
-   ++n;
+      ++n;
 
-   k = x_right(y);
+      k = x_right(y);
 
-   if ( k < 0 )  continue;
+      if ( k < 0 )  continue;
 
-   if ( j == k )  continue;
+      if ( j == k )  continue;
 
-   outline.u[n] = (double) k;
-   outline.v[n] = (double) y;
+      outline.u[n] = (double) k;
+      outline.v[n] = (double) y;
 
-   ++n;
+      ++n;
 
-   }
+   }   //  for y
 
    outline.n_points = n;
 
-   //
-   //  find "lowest" point in outline
-   //
+      //
+      //  find "lowest" point in outline
+      //
 
    v_low = 1.0e10;
 
@@ -583,7 +586,7 @@ Polyline ShapeData::convex_hull() const {
 
    for (k=0; k<(outline.n_points); ++k)  {
 
-   if ( outline.v[k] < v_low )  { v_low = outline.v[k];  j = k; }
+      if ( outline.v[k] < v_low )  { v_low = outline.v[k];  j = k; }
 
    }
 
@@ -592,15 +595,16 @@ Polyline ShapeData::convex_hull() const {
       mlog << Error << "\nconvex_hull(Polyline &) -> "
            << "can't find lowest point\n\n";
       exit(1);
+
    }
 
    n = 1;
 
    Index[0] = j;
 
-   //
-   //  find hull
-   //
+      //
+      //  find hull
+      //
 
    e1u = 1.0;
    e1v = 0.0;
@@ -609,67 +613,67 @@ Polyline ShapeData::convex_hull() const {
 
    while ( !done  )  {
 
-   e2u = -e1v;
-   e2v =  e1u;
+      e2u = -e1v;
+      e2v =  e1u;
 
-   angle_low = 1.0e10;
+      angle_low = 1.0e10;
 
-   p1u = outline.u[Index[n - 1]];
-   p1v = outline.v[Index[n - 1]];
+      p1u = outline.u[Index[n - 1]];
+      p1v = outline.v[Index[n - 1]];
 
-   j = -1;
+      j = -1;
 
-   for (k=0; k<(outline.n_points); ++k)  {
+      for (k=0; k<(outline.n_points); ++k)  {
 
-   if ( k == Index[n - 1] )  continue;
+         if ( k == Index[n - 1] )  continue;
 
-   p2u = outline.u[k];
-   p2v = outline.v[k];
+         p2u = outline.u[k];
+         p2v = outline.v[k];
 
-   alpha = (p2u - p1u)*e1u + (p2v - p1v)*e1v;
-   beta  = (p2u - p1u)*e2u + (p2v - p1v)*e2v;
+         alpha = (p2u - p1u)*e1u + (p2v - p1v)*e1v;
+         beta  = (p2u - p1u)*e2u + (p2v - p1v)*e2v;
 
-   angle = deg_per_rad*atan2(beta, alpha);
+         angle = deg_per_rad*atan2(beta, alpha);
 
-   angle -= 360.0*floor(angle/360.0);
+         angle -= 360.0*floor(angle/360.0);
 
-   //
-   //  reset angle very close to 360 to be 0
-   //
+            //
+            //  reset angle very close to 360 to be 0
+            //
 
-   if ( angle > 359.9999 )   { angle = 0.0; }
+         if ( angle > 359.9999 )   { angle = 0.0; }
 
-   if ( angle < angle_low )  { angle_low = angle;  j = k; }
+         if ( angle < angle_low )  { angle_low = angle;  j = k; }
 
-   }   //  for k
+      }   //  for k
 
-   if ( j < 0 )  {
+      if ( j < 0 )  {
 
-      mlog << Error << "\nconvex_hull(Polyline &) -> "
-           << "can't find next hull point\n\n";
-      exit(1);
-   }
+         mlog << Error << "\nconvex_hull(Polyline &) -> "
+              << "can't find next hull point\n\n";
+         exit(1);
+      }
 
-   p2u = outline.u[j];
-   p2v = outline.v[j];
+      p2u = outline.u[j];
+      p2v = outline.v[j];
 
-   e1u = p2u - p1u;
-   e1v = p2v - p1v;
+      e1u = p2u - p1u;
+      e1v = p2v - p1v;
 
-   t = sqrt( e1u*e1u + e1v*e1v );
+      t = sqrt( e1u*e1u + e1v*e1v );
 
-   e1u /= t;
-   e1v /= t;
+      e1u /= t;
+      e1v /= t;
 
-   Index[n++] = j;
+      Index[n++] = j;
 
-   if ( (n >= 3) && (Index[n - 1] == Index[0]) ) done = 1;
+      if ( (n >= 3) && (Index[n - 1] == Index[0]) ) done = 1;
 
    }   //  while
 
-   //
-   //  load up hull
-   //
+      //
+      //  load up hull
+      //
 
    --n;
 
@@ -682,13 +686,14 @@ Polyline ShapeData::convex_hull() const {
 
    }
 
-   //
-   //  done
-   //
+      //
+      //  done
+      //
 
    delete [] Index;   Index = (int *) 0;
 
    return(hull);
+
 }
 
 
