@@ -96,6 +96,7 @@ void VarInfoGrib2::assign(const VarInfoGrib2 &v) {
    VarInfo::assign(v);
 
    // Copy
+   Record     = v.record();
    Discipline = v.discipline();
    MTable     = v.m_table();
    LTable     = v.l_table();
@@ -117,6 +118,7 @@ void VarInfoGrib2::clear() {
    VarInfo::clear();
 
    // Initialize
+   Record     = bad_data_int;
    Discipline = bad_data_int;
    MTable     = bad_data_int;
    LTable     = bad_data_int;
@@ -136,6 +138,7 @@ void VarInfoGrib2::dump(ostream &out) const {
 
    // Dump out the contents
    out << "VarInfoGrib2::dump():\n"
+       << "  Record     = " << Record     << "\n"
        << "  Discipline = " << Discipline << "\n"
        << "  MTable     = " << MTable     << "\n"
        << "  LTable     = " << LTable     << "\n"

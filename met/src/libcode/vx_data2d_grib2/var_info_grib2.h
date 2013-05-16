@@ -141,7 +141,7 @@ class VarInfoGrib2 : public VarInfo
 ///////////////////////////////////////////////////////////////////////////////
 
 inline GrdFileType VarInfoGrib2::file_type()  const { return(FileType_Gb2); }
-inline int         VarInfoGrib2::record()     const { return(Record);   }
+inline int         VarInfoGrib2::record()     const { return(Record);       }
 inline int         VarInfoGrib2::discipline() const { return(Discipline);   }
 inline int         VarInfoGrib2::m_table()    const { return(MTable);       }
 inline int         VarInfoGrib2::l_table()    const { return(LTable);       }
