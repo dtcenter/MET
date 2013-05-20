@@ -86,16 +86,6 @@ MET tool stating the location of the parsing error.
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// The "model" entry specifies and array of model names to be verified. If  
-// verifying multiple models, choose descriptive model names (no whitespace)
-// to distinguish between their output.
-// e.g. model = [ "AHW4", "AHWI" ];
-//
-model = [];
-amodel = [];
-bmodel = [];
-
-//
 // Specify a comma-separated list of storm id's to be used:
 //    2-letter basin, 2-digit cyclone number, 4-digit year
 // An empty list indicates that all should be used.
@@ -183,20 +173,25 @@ valid_mask = "";
 //
 version = "V4.1";
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Settings specific to individual tools
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 // TCPairsConfig_default
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+//
+// The "model" entry specifies an array of model names to be verified. If
+// verifying multiple models, choose descriptive model names (no whitespace)
+// to distinguish between their output.
+// e.g. model = [ "AHW4", "AHWI" ];
+//
+model  = [];
 
 //
 // Specify whether the code should check for duplicate ATCF lines when
