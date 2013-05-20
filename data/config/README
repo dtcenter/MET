@@ -96,7 +96,7 @@ MET tool stating the location of the parsing error.
 // is written to the second column of the ASCII output generated.  If you're
 // verifying multiple models, you should choose descriptive model names (no 
 // whitespace) to distinguish between their output.
-// e.g. model = [ "AHW4", "AHWI" ];
+// e.g. model = "GFS";
 //
 model = "WRF";
 
@@ -146,7 +146,7 @@ model = "WRF";
 // It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
 // settings when verifying a file containing data for multiple output times.
 // For example, to verify a GRIB file containing data for many lead times, you
-// could use "lead_time" specify the record to be verified.
+// could use "lead_time" to specify the record to be verified.
 //
 // File-format specific settings for the "field" entry:
 //
@@ -346,7 +346,7 @@ mask = {
 //
 // The "ci_alpha" entry is an array of floats specifying the values for alpha
 // to be used when computing confidence intervals.  Values of alpha must be
-// between 0 and 1.
+// between 0 and 1.  A value of 0.05 corresponds to a 95% confidence interval.
 //
 ci_alpha = [ 0.05, 0.10 ];
 
@@ -488,9 +488,9 @@ output_flag = {
 };
 
 //
-// The "nc_pairs_flag" entry is a boolean value for Grid-Stat indicating
-// whether a NetCDF file containing the gridded forecast, observation, and
-// difference fields for all verification tasks should be created.
+// The "nc_pairs_flag" entry is a boolean value for Grid-Stat and MODE indicating
+// whether a NetCDF file containing the gridded forecast and observation fields
+// for all verification tasks should be created.
 //
 nc_pairs_flag = TRUE;
 
@@ -588,55 +588,7 @@ output_prefix  = "";
 // The configuration file version number should match the version number of
 // the MET code being run.  This value should generally not be modified.
 //
-version = "V4.0";
-
-
-
-//
-// Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
-// or provide a list of specific initialization times to include or exclude.
-// Tracks whose initial time meets the specified criteria will be used.
-// An empty string indicates that all times should be used.
-//
-// e.g. init_beg = "20100101";
-//      init_end = "20101231";
-//      init_inc = [ "20101231_06" ];
-//      init_exc = [ "20101231_00" ];
-//
-init_beg = "";
-init_end = "";
-init_inc = [];
-init_exc = [];
-
-//
-// Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
-// Tracks for which all valid times fall within the time window will be used.
-// An empty string indicates that all times should be used.
-//
-// e.g. valid_beg = "20100101";
-//      valid_end = "20101231";
-//
-valid_beg = "";
-valid_end = "";
-
-//
-// Specify a comma-separated list of model initialization hours to be used
-// in HH[MMSS] format. An empty list indicates that all hours should be used.
-//
-// e.g. init_hour = [ "00", "06", "12", "18" ];
-//
-init_hour = [];
-
-//
-// Specify lat/lon polylines defining masking regions to be applied.
-// Tracks whose initial location falls within init_mask will be used.
-// Tracks for which all locations fall within valid_mask will be used.
-//
-// e.g. init_mask  = "MET_BASE/data/poly/EAST.poly";
-//
-init_mask  = "";
-valid_mask = "";
-
+version = "V4.1";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -780,7 +732,6 @@ rng = {
    type = "mt19937";
    seed = "";
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1708,7 +1659,6 @@ jobs = [
 // confidence intervals computed for the aggregated statistics.
 //
 vif_flag = FALSE;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
