@@ -350,7 +350,7 @@ void apply_poly_mask_latlon(const Polyline &poly, const Grid &grid, DataPlane &d
 
          grid.xy_to_latlon(x, y, lat, lon);
 
-         if(!(poly.is_inside(lon, lat))) {
+         if(!(poly.is_inside(rescale_lon(lon), lat))) {
             out_count++;
             dp.set(mask_off_value, x, y);
          }
