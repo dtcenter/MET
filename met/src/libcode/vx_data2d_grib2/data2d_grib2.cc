@@ -732,7 +732,12 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.lon_ll       = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
 
       //  if y scan order is -y, move lat_ll
-      if( ! ScanMode & 64 ) data.lat_ll -= (data.Nlat - 1) * data.delta_lat;
+      if( !(ScanMode & 64) )
+         data.lat_ll -= (data.Nlat - 1) * data.delta_lat;
+
+      //  if x scan order is -x, move lon_ll
+      if( ScanMode & 128 )
+         data.lon_ll = rescale_lon(data.lon_ll - (data.Nlon - 1) * data.delta_lon);
 
       //  store the grid information
       _Grid->set(data);
