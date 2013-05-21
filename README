@@ -1,4 +1,4 @@
-Model Evaluation Tools METv4.0 (June 25, 2012)
+Model Evaluation Tools METv4.1 (May 22, 2013)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -118,6 +118,9 @@ Dependencies
    - The F2C (or G2C) library for interfacing between fortran and C code
       - Not needed for most compilers.
       - http://www.netlib.org/f2c
+   - HDF4 and HDF-EOS2 libraries, if wishing to compile MODIS-Regrid.
+      - http://www.hdfgroup.org/products/hdf4
+      - http://www.hdfgroup.org/hdfeos.html
 
 - It is suggested that the following tools be used in conjunction with MET:
    - Unified Post-Processor
@@ -173,6 +176,9 @@ sub-directory, or the MET Online Tutorial:
      "GRIB2C_BASE", "GRIB2C_INCS", and "GRIB2C_LIBS" to point to the location
      of the GRIB2C library.
 
+   - If compiling MODIS-Regrid, set "HDF_BASE_DIR" and "HDF_EOS_BASE_DIR" to the
+     top-level library directories containing include and lib subdirectories.
+
    - Edit the "ENABLE_TOOL_NAME" settings if you would like to disable the
      compilation of any of the MET tools.
 
@@ -185,7 +191,7 @@ sub-directory, or the MET Online Tutorial:
 - When make is finished, type 'CNTRL-C' to quit the tail.
 
 - If all tools are enabled and the build is successful, the "bin" directory will
-  contain  16 executables:
+  contain 21 executables:
    - ascii2nc
    - ensemble_stat
    - gen_poly_mask
@@ -193,17 +199,22 @@ sub-directory, or the MET Online Tutorial:
    - madis2nc
    - mode
    - mode_analysis
+   - modis_regrid
    - pb2nc
    - pcp_combine
    - plot_data_plane
    - plot_point_obs
    - point_stat
+   - series_analysis
    - stat_analysis
+   - tc_dland
+   - tc_pairs
+   - tc_stat
    - wavelet_stat
    - wwmca_plot
    - wwmca_regrid
 
-- Type 'ls bin' to check for the presence of the 16 executables.
+- Type 'ls bin' to check for the presence of the executables.
 
 - Type 'cd scripts' to enter the scripts directory
 
@@ -224,6 +235,70 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 4.1 Release Notes:
+-------------------------
+
+- What's New:
+    - METv4.1 includes several new tools and enhancements:
+      - New Tools: MODIS-Regrid, Series-Analysis, and MET-Tropical Cyclone
+      - Major Enhancments: Spread-Skill Variance (SSVAR) for Ensemble-Stat
+
+- New Tools:
+    - The new MODIS-Regrid tool reformats gridded MODIS data for use by other
+      MET tools.  Building MODIS-Regrid requires the HDF and HDF-EOS libraries.
+    - The new Series-Analysis tool performs a grid-to-grid comparison over a
+      series of fields, most commonly a time-series.  A user-specified set of
+      statistics are computed over that series for each grid point and are
+      written to a gridded NetCDF output file.  This tool may be used to analyze
+      how model performance varies spatially.
+    - The new set of MET-Tropical Cyclone (MET-TC) tools performs verification
+      on ATCF (Automated Tropical Cyclone Forecasting) files.  The tools compare
+      forecast ATCF files to the National Hurricane Center's (NHC) BEST track
+      data.  MET-TC implements and extends the verification logic used by the
+      NHC. See the MET-TC user's guide in the doc sub-directory for more detail.
+      MET-TC consists of 3 tools:
+      - TC-DLand precomputes distances to land and writes a gridded NetCDF file.
+      - TC-Pairs matches the forecast and observation tracks and writes a
+        Tropical Cyclone Statistics (.tcst) file.
+      - TC-Stat reads .tcst files and computes summary statistics.
+      - R-script (scripts/Rscripts/plot_tcmpr.R) for filtering and plotting
+        the .tcst files.
+
+- Enhancements to Existing Tools:
+    - Distributed latest set of bug fixes for METv4.0.
+    - Fixed two major bugs in MODE:
+      - The object areas being reported were artificially inflated.
+        See explanation:
+          http://www.dtcenter.org/met/users/docs/write_ups/mode_areas.pdf
+      - Areas of bad data were being treated as zero's in the convolution step.
+    - Restructured the MODE code to make it more extensible.
+    - Enhanced Point-Stat and Ensemble-Stat rejection reason counts to include
+      the duplicate flag logic.
+    - Enhanced ASCII2NC by adding support for the little_R point observation
+      format.
+    - Enhanced ASCII2NC by adding support for the SURFRAD point observation
+      format, including time-averaging logic.
+    - Enhanced MADIS2NC to support PROFILER and MARITIME data file types.
+    - Enhanced Plot-Point-Obs by adding the -dot_size option.
+    - Enhanced PB2NC, MADIS2NC, and ASCII2NC to pass through the point
+      observation quality control flags and enhanced Point-Stat and
+      Ensemble-Stat to filter the observations by those quality control values.
+    - Enhanced Point-Stat and Ensemble-Stat by modifying the logic for the
+      "mask_sid" entry in the configuration file.  It now contains a list of
+      station ID's to be treated as a group.
+    - Enhanced the duplicate flag logic in Point-Stat and Ensemble-Stat when
+      verifying vertical level fields (e.g. 2-m temperature) against surface
+      message type (e.g. ADPSFC or SFCSHP).  Set the observation level value to
+      bad data so that different level values will not be treated as unique
+      observations.
+    - Enhanced Ensemble-Stat by adding the new SSVAR (spread-skill variance)
+      output line type for creating ensemble spread-skill plots.
+    - Enhanced STAT-Analysis to aggregate multiple SSVAR lines.
+    - Enhanced STAT-Analysis by adding the "-by case" option for running jobs
+      once for each unique case entry.
+    - Factored map plotting information into data/config/ConfigMapData.  Users
+      may specify which maps should be used when the MET tools create plots.
 
 Version 4.0 Release Notes:
 -------------------------
