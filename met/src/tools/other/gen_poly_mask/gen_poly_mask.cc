@@ -305,13 +305,13 @@ void write_netcdf()
    write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
    // Check that mask_name is set
-	if(!mask_name) {
+   if(!mask_name) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "the masking variable name must be set using the "
            << "\"-name\" command line argument.\n\n";
       exit(1);
-	}
-	
+   }
+
    // Define Variables
    mask_var = f_out->add_var(mask_name, ncInt, lat_dim, lon_dim);
    sprintf(var_str, "%s masking region", mask_name.text());
