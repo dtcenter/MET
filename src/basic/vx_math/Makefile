@@ -101,7 +101,7 @@ nti.o: nti.cc
 ptile.o: ptile.cc
 	$(CXX) ptile.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
-pwl.o: pwl.h pwl.cc
+pwl.o: pwl.cc
 	$(CXX) pwl.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 viewgravity_to_string.o: viewgravity_to_string.h viewgravity_to_string.cc
