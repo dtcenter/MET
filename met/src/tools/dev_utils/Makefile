@@ -174,6 +174,7 @@ clean:
 	rm -f $(MET_BIN_DIR)/reformat_county_data
 	rm -f $(MET_BIN_DIR)/pbtime
 	rm -f $(MET_BIN_DIR)/gribtab.dat_to_flat
+	rm -f $(MET_BIN_DIR)/nceptab_to_flat
 
 
 ########################################################################

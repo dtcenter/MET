@@ -25,6 +25,7 @@ OBJECTS     = moments.o \
               mode_conf_info.o \
               engine.o
 
+
 LIBRARIES   = libvx_shapedata.a
 
 
