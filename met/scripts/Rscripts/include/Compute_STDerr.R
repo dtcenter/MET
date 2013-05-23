@@ -13,7 +13,7 @@ Compute_STDerr_from_median <- function ( data, method )
 
    if ( IQR(data) > 0.0 & length(data) > 2 ) {
 
-      ## Compute the Standard Error using the variance inflation factor.
+      ## Compute the Standard Error.
       STDerr_data <- ( IQR(data) * sqrt(pi/2.) ) / ( 1.349 * sqrt( length(data) ) )
 
    } else {
