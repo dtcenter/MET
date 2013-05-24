@@ -49,7 +49,7 @@ static const char second_var_name      [] = "second";
 
 static const char pressure_var_name    [] = "pressure";
 
-static const char init_time_att_name   [] = "SIMULATION_START_DATE";
+static const char init_time_att_name   [] = "START_DATE";
 
 static const char description_att_name [] = "description";
 static const char units_att_name       [] = "units";
