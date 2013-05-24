@@ -233,7 +233,7 @@ libvx_util.a: $(OBJECTS)
 
 clean:
 	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
-	rm -f test_command_line test_data_plane
+	rm -f test_command_line test_data_plane test_add_rows
 	cd $(MET_INC_DIR) ; rm -f $(HEADERS)
 	rm -f $(MET_LIB_DIR)/libvx_util.a
 
