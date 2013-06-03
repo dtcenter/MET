@@ -1,7 +1,7 @@
 
 
    // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-   // ** Copyright UCAR (c) 1992 - 2012
+   // ** Copyright UCAR (c) 1992 - 2013
    // ** University Corporation for Atmospheric Research (UCAR)
    // ** National Center for Atmospheric Research (NCAR)
    // ** Research Applications Lab (RAL)
@@ -630,7 +630,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
                     << "lead time unit of " << gfld->ipdtmpl[7] << "\n\n";
                exit(1);
             }
-            rec->LeadTime = sec_lead_unit * gfld->ipdtmpl[8];
+            rec->LeadTime = nint(sec_lead_unit * gfld->ipdtmpl[8]);
 
             //  set the forecast time information
             if     ( -1 == rec->ValidTime )   rec->ValidTime = rec->InitTime  + rec->LeadTime;
@@ -778,7 +778,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.scale_lat    = (double)gfld->igdtmpl[12] / 1000000.0;
       data.lat_pin      = (double)gfld->igdtmpl[9] / 1000000.0;
       data.lon_pin      = -1.0*rescale_lon( (double)gfld->igdtmpl[10] / 1000000.0 );
-      data.x_pin        = 0;     //PGO depends on ScanMode?
+      data.x_pin        = 0;
       data.y_pin        = 0;
       data.lon_orient   = -1.0*rescale_lon( (double)gfld->igdtmpl[13] / 1000000.0 );
       data.d_km         = (double)gfld->igdtmpl[14] / 1000000.0;
@@ -810,16 +810,16 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
    //  mercator
    else if( 10 == gfld->igdtnum ){
 
-      ScanMode = gfld->igdtmpl[14];
+      ScanMode = gfld->igdtmpl[15];
 
       MercatorData data;
       data.name   = mercator_proj_type;
-      data.lat_ll = (double)gfld->igdtmpl[8] / 1000000.0;   //PGO depends on ScanMode?
-      data.lon_ll = -1.0*rescale_lon( (double)gfld->igdtmpl[9] / 1000000.0 );
-      data.lat_ur = (double)gfld->igdtmpl[12] / 1000000.0;
-      data.lon_ur = -1.0*rescale_lon( (double)gfld->igdtmpl[13] / 1000000.0 );
-      data.ny     = gfld->igdtmpl[7];
-      data.nx     = gfld->igdtmpl[8];
+      data.lat_ll = (double)gfld->igdtmpl[9] / 1000000.0;
+      data.lon_ll = -1.0*rescale_lon( (double)gfld->igdtmpl[10] / 1000000.0 );
+      data.lat_ur = (double)gfld->igdtmpl[13] / 1000000.0;
+      data.lon_ur = -1.0*rescale_lon( (double)gfld->igdtmpl[14] / 1000000.0 );
+      data.nx     = gfld->igdtmpl[7];
+      data.ny     = gfld->igdtmpl[8];
 
       //  store the grid information
       _Grid->set(data);
@@ -849,11 +849,11 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.scale_lat_2  = (double)gfld->igdtmpl[19] / 1000000.0;
       data.lat_pin      = (double)gfld->igdtmpl[9]  / 1000000.0;
       data.lon_pin      = -1.0*rescale_lon( (double)gfld->igdtmpl[10] / 1000000.0 );
-      data.x_pin        = 0;     //PGO depends on ScanMode?
+      data.x_pin        = 0;
       data.y_pin        = 0;
       data.lon_orient   = -1.0*rescale_lon( (double)gfld->igdtmpl[13] / 1000000.0 );
       data.d_km         = (double)gfld->igdtmpl[14] / 1000000.0;
-      data.r_km         = 6371.20;  //PGO jimmied...  r_km;
+      data.r_km         = 6371.20;
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
 
