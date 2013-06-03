@@ -810,16 +810,16 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
    //  mercator
    else if( 10 == gfld->igdtnum ){
 
-      ScanMode = gfld->igdtmpl[14];
+      ScanMode = gfld->igdtmpl[15];
 
       MercatorData data;
       data.name   = mercator_proj_type;
-      data.lat_ll = (double)gfld->igdtmpl[8] / 1000000.0;
-      data.lon_ll = -1.0*rescale_lon( (double)gfld->igdtmpl[9] / 1000000.0 );
-      data.lat_ur = (double)gfld->igdtmpl[12] / 1000000.0;
-      data.lon_ur = -1.0*rescale_lon( (double)gfld->igdtmpl[13] / 1000000.0 );
-      data.ny     = gfld->igdtmpl[7];
-      data.nx     = gfld->igdtmpl[8];
+      data.lat_ll = (double)gfld->igdtmpl[9] / 1000000.0;
+      data.lon_ll = -1.0*rescale_lon( (double)gfld->igdtmpl[10] / 1000000.0 );
+      data.lat_ur = (double)gfld->igdtmpl[13] / 1000000.0;
+      data.lon_ur = -1.0*rescale_lon( (double)gfld->igdtmpl[14] / 1000000.0 );
+      data.nx     = gfld->igdtmpl[7];
+      data.ny     = gfld->igdtmpl[8];
 
       //  store the grid information
       _Grid->set(data);
