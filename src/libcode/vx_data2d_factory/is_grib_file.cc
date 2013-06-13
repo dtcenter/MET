@@ -36,7 +36,7 @@ static const char grib_magic [] = "GRIB";
 
 static const int grib_magic_len = strlen(grib_magic);
 
-static const int buf_size = 8;
+static const int buf_size = 256;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ return ( version == 2 );
 
 
    //
-   //  assumes that the "GRIB" magic cookie is at offset zero
+   //  searches the buffer for the "GRIB" magic cookie
    //
 
 bool check_grib(const char * filename, int & version)
@@ -100,6 +100,8 @@ bool check_grib(const char * filename, int & version)
 
 int fd = -1;
 char buf[buf_size];
+bool found = false;
+int i;
 
    //
    //  open file
@@ -111,12 +113,10 @@ if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
    exit ( 1 );
 
-   // return ( false );
-
 }
 
    //
-   //  read first few bytes
+   //  read into the buffer
    //
 
 if ( read(fd, buf, buf_size) != buf_size )  {
@@ -124,8 +124,6 @@ if ( read(fd, buf, buf_size) != buf_size )  {
    mlog << Error << "\ncheck_grib() -> unable to read header from input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
-
-   // return ( false );
 
 }
 
@@ -136,16 +134,24 @@ if ( read(fd, buf, buf_size) != buf_size )  {
 close(fd);  fd = -1;
 
    //
-   //  check for grib magic cookie
+   //  search buffer for grib magic cookie
    //
 
-if ( strncmp(buf, grib_magic, grib_magic_len) != 0 )  return ( false );
+for ( i=0; i<(buf_size - grib_magic_len); ++i)  {
+  
+   if ( strncmp(&buf[i], grib_magic, grib_magic_len) == 0 )  {
+      found = true;
+      break;
+   }
+}
+
+if( !found ) return ( false );
 
    //
    //  grab version number
    //
 
-version = (int) (buf[7]);
+version = (int) (buf[i+7]);
 
    //
    //  done
