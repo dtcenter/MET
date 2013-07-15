@@ -72,7 +72,7 @@ MET_LITTLE_Ls    = -lvx_pxm \
                    -lvx_analysis_util \
                    -lvx_data2d_factory \
                    -lvx_data2d_nc_met \
-                   -lvx_data2d_grib -lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz \
+                   -lvx_data2d_grib $(GRIB2_LIBS) \
                    -lvx_data2d_nc_pinterp \
                    -lvx_data2d \
                    -lvx_nc_util \
@@ -154,11 +154,13 @@ modis_regrid: modis_regrid.cc $(OBJECTS)
         -I$(HDF_EOS_INC_DIR) \
         $(NETCDF_INCS) \
         $(GSL_INCS) \
+        $(GRIB2C_INCS) \
         -L$(MET_LIB_DIR) \
         -L$(HDF_EOS_LIB_DIR) \
         -L$(HDF_LIB_DIR) \
         $(NETCDF_LIBS) \
         $(GSL_LIBS) \
+        $(GRIB2C_LIBS) \
         $(MET_LITTLE_Ls) \
         -lhdfeos \
         -lmfhdf \
