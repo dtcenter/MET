@@ -683,7 +683,7 @@ void ModeFuzzyEngine::do_matching() {
 
    if(conf_info.match_flag == MatchType_None) {
       mlog << Warning << "\nModeFuzzyEngine::do_matching() -> "
-           << "no matching requested in configuration file\n";
+           << "no matching requested in configuration file\n\n";
       do_no_match();
    }
    else if(conf_info.match_flag == MatchType_MergeBoth) {
