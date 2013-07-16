@@ -425,10 +425,15 @@ bool SurfradHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
     return false;
   }
-  
+
+  //
+  // Replace spaces in the station name with underscores to prevent
+  // embedded whitespace.
+  //
+
   _stationId = data_line[0];
   for (int i = 1; i < data_line.n_items(); ++i)
-    _stationId += string(" ") + data_line[i];
+    _stationId += string("_") + data_line[i];
 
   // The second line of the file has the lat/lon/alt information
 
