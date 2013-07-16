@@ -45,6 +45,8 @@
 //   011    11/14/11  Holmes         Added code to enable reading of
 //                    multiple config files.
 //   012    05/11/12  Halley Gotway  Switch to using vx_config library.
+//   013    07/12/13  Halley Gotway  Use observations of sensible
+//                    temperature instead of virtual temperature.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -133,6 +135,9 @@ static const int derive_gc[n_derive_gc] = {
    wind_grib_code, rh_grib_code,
    mixr_grib_code, prmsl_grib_code
 };
+
+// PREPBUFR VIRTMP program code
+static const double virtmp_prog_code = 8.0;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -751,8 +756,10 @@ void process_pbfile(int i_pb) {
 
             // Get the event index to be used based on the contents of
             // the event stack flag
-            ev = get_event_index(conf_info.event_stack_flag,
-                                 kk, lv);
+            ev = get_event_index(conf_info.event_stack_flag, kk, lv);
+
+            // Check for a valid event index
+            if(ev < 0 || ev >= mxr8vn) continue;
 
             // If the observation value or the quality mark is not
             // valid, continue to the next variable type
@@ -1059,7 +1066,7 @@ void clean_up() {
 ////////////////////////////////////////////////////////////////////////
 
 int get_event_index(int flag, int i_var, int i_lvl) {
-   int ev, i;
+   int ev, ev_tmp, i;
 
    // Check the event_stack_flag to determine if the top or bottom
    // of the event stack is to be used
@@ -1082,6 +1089,53 @@ int get_event_index(int flag, int i_var, int i_lvl) {
          }
       } // end for i
       if(ev < 0) ev = 0;
+   }
+
+   //
+   // Do not use virtual temperatures observations for verification.
+   // PREPBUFR Table 14 describes the VIRTMP processing step:
+   //    http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_14.htm
+   //
+   // For VIRTMP program code 8 with reason code 3, do not use this
+   // this observation of virtual temperature.
+   // For VIRTMP program code 8 with any other reason code, step up the
+   // event index to find sensible temperature.
+   //
+
+   if(i_var == 2 &&
+      is_eq(evns[i_var][ev][i_lvl][2], virtmp_prog_code)) {
+
+      // Skip VIRTMP program code with reason code 3
+      if(is_eq(evns[i_var][ev][i_lvl][3], 3.0)) {
+
+         mlog << Debug(4)
+              << "Skipping virtual temperature observation ("
+              << evns[i_var][ev][i_lvl][0]
+              << " C) with program code " << evns[i_var][ev][i_lvl][2]
+              << ", reason code " << evns[i_var][ev][i_lvl][3] << ".\n";
+         ev = bad_data_int;
+      }
+      // Otherwise, modify the event stack to find sensible temperature
+      else {
+
+         ev_tmp = ev;
+         while(is_eq(evns[i_var][ev_tmp][i_lvl][2], virtmp_prog_code)) {
+            if(conf_info.event_stack_flag) ev_tmp++;
+            else                           ev_tmp--;
+         }
+
+         // Warn the user about virtual temperature
+         mlog << Debug(4)
+              << "Selected sensible temperature ("
+              << evns[i_var][ev_tmp][i_lvl][0]
+              << " C) from event index " << ev_tmp
+              << " instead of virtual temperature ("
+              << evns[i_var][ev][i_lvl][0]
+              << " C) from event index " << ev << ".\n";
+
+         // Reset the event index
+         ev = ev_tmp;
+      }
    }
 
    return(ev);
