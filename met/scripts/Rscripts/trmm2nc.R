@@ -197,14 +197,14 @@ nc = create.ncdf(nc_file, var_pcp)
 # Add variable attributes
 att.put.ncdf(nc, var_pcp, "name", "APCP")
 att.put.ncdf(nc, var_pcp, "level", paste("A", acc_hr, sep=''))
-att.put.ncdf(nc, var_pcp, "grib_code", 61)
+att.put.ncdf(nc, var_pcp, "grib_code", 61, prec="int")
 att.put.ncdf(nc, var_pcp, "_FillValue", missing, prec="single")
 att.put.ncdf(nc, var_pcp, "init_time", format(init, "%Y%m%d_%H%M%S", tz="GMT"), prec="text")
-att.put.ncdf(nc, var_pcp, "init_time_ut", as.numeric(init), prec="double")
+att.put.ncdf(nc, var_pcp, "init_time_ut", as.numeric(init), prec="int")
 att.put.ncdf(nc, var_pcp, "valid_time", format(valid, "%Y%m%d_%H%M%S", tz="GMT"), prec="text")
-att.put.ncdf(nc, var_pcp, "valid_time_ut", as.numeric(valid), prec="double")
+att.put.ncdf(nc, var_pcp, "valid_time_ut", as.numeric(valid), prec="int")
 att.put.ncdf(nc, var_pcp, "accum_time", paste(acc_str, "0000", sep=''))
-att.put.ncdf(nc, var_pcp, "accum_time_sec", acc_sec)
+att.put.ncdf(nc, var_pcp, "accum_time_sec", acc_sec, prec="int")
 
 # Add global attributes
 cur_time = Sys.time()
