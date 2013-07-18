@@ -26,6 +26,7 @@ using namespace std;
 #include <cmath>
 
 #include "is_grib_file.h"
+#include "vx_util.h"
 #include "vx_log.h"
 
 
@@ -101,7 +102,7 @@ bool check_grib(const char * filename, int & version)
 int fd = -1;
 char buf[buf_size];
 bool found = false;
-int i;
+int i, read_size;
 
    //
    //  open file
@@ -116,10 +117,16 @@ if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 }
 
    //
+   //  determine the number of bytes to read
+   //
+
+read_size = min( buf_size, file_size(filename) );
+
+   //
    //  read into the buffer
    //
 
-if ( read(fd, buf, buf_size) != buf_size )  {
+if ( read(fd, buf, read_size) != read_size )  {
 
    mlog << Error << "\ncheck_grib() -> unable to read header from input file \"" << filename << "\"\n\n";
 
@@ -137,7 +144,7 @@ close(fd);  fd = -1;
    //  search buffer for grib magic cookie
    //
 
-for ( i=0; i<(buf_size - grib_magic_len); ++i)  {
+for ( i=0; i<(read_size - grib_magic_len); ++i)  {
   
    if ( strncmp(&buf[i], grib_magic, grib_magic_len) == 0 )  {
       found = true;

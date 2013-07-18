@@ -28,6 +28,7 @@
 #include "data_plane.h"
 #include "data_plane_util.h"
 #include "file_exists.h"
+#include "file_size.h"
 #include "file_linecount.h"
 #include "filename_suffix.h"
 #include "fix_float.h"
