@@ -47,6 +47,8 @@
 //   012    05/11/12  Halley Gotway  Switch to using vx_config library.
 //   013    07/12/13  Halley Gotway  Use observations of sensible
 //                    temperature instead of virtual temperature.
+//   014    07/23/13  Halley Gotway  Update sensible temperature fix
+//                    to handle older GDAS PREPBUFR files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1092,37 +1094,44 @@ int get_event_index(int flag, int i_var, int i_lvl) {
    }
 
    //
+   // Special processing for observations of temperature.
    // Do not use virtual temperatures observations for verification.
    // PREPBUFR Table 14 describes the VIRTMP processing step:
    //    http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_14.htm
    //
    // For VIRTMP program code 8 with reason code 3, do not use this
-   // this observation of virtual temperature.
-   // For VIRTMP program code 8 with any other reason code, step up the
-   // event index to find sensible temperature.
+   // this observation since all versions are virtual temperature.
+   //
+   // For VIRTMP program code 8 with any other reason code, step down
+   // the event stack to find sensible temperature.
    //
 
-   if(i_var == 2 &&
-      is_eq(evns[i_var][ev][i_lvl][2], virtmp_prog_code)) {
+   // Only check temperature observations
+   if(i_var == 2) {
 
-      // Skip VIRTMP program code with reason code 3
-      if(is_eq(evns[i_var][ev][i_lvl][3], 3.0)) {
+      // Loop through the event stack
+      ev_tmp = ev;
+      for(i=0; i<mxr8vn && evns[i_var][i][i_lvl][0]<r8bfms; i++) {
 
-         mlog << Debug(4)
-              << "Skipping virtual temperature observation ("
-              << evns[i_var][ev][i_lvl][0]
-              << " C) with program code " << evns[i_var][ev][i_lvl][2]
-              << ", reason code " << evns[i_var][ev][i_lvl][3] << ".\n";
-         ev = bad_data_int;
-      }
-      // Otherwise, modify the event stack to find sensible temperature
-      else {
+         // Check for the VIRTMP program code
+         if(is_eq(evns[i_var][i][i_lvl][2], virtmp_prog_code)) {
 
-         ev_tmp = ev;
-         while(is_eq(evns[i_var][ev_tmp][i_lvl][2], virtmp_prog_code)) {
-            if(conf_info.event_stack_flag) ev_tmp++;
-            else                           ev_tmp--;
+            // Check for reason code 3 for which no observation should be used
+            if(is_eq(evns[i_var][i][i_lvl][3], 3.0)) {
+               mlog << Debug(4)
+                    << "Skipping virtual temperature observation ("
+                    << evns[i_var][i][i_lvl][0]
+                    << " C) with program code " << evns[i_var][i][i_lvl][2]
+                    << ", reason code " << evns[i_var][ev_tmp][i][3] << ".\n";
+               return(bad_data_int);
+            }
+
+            // Use the next entry in the event stack, but continue searching
+            ev_tmp = i+1;
          }
+      }
+
+      if(ev != ev_tmp) {
 
          // Warn the user about virtual temperature
          mlog << Debug(4)
