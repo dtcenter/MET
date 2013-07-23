@@ -223,6 +223,7 @@ static void   write_netcdf_hdr_data();
 static void   clean_up();
 
 static int    get_event_index(int, int, int);
+static int    get_event_index_temp(int, int, int);
 static void   dbl2str(double *, char *);
 
 static bool   keep_message_type(const char *);
@@ -418,7 +419,7 @@ void process_pbfile(int i_pb) {
    int i, i_msg, i_read, n_file_obs, i_ret, i_date, n_hdr_obs;
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_pb_rpt, rej_in_rpt, rej_itp, rej_nobs;
-   int lv, ev, kk, len1, len2;
+   int lv, ev, ev_temp, kk, len1, len2;
 
    double   x, y;
 
@@ -764,8 +765,38 @@ void process_pbfile(int i_pb) {
             // the event stack flag
             ev = get_event_index(conf_info.event_stack_flag, kk, lv);
 
-            // Check for a valid event index
-            if(ev < 0 || ev >= mxr8vn) continue;
+            // Apply special logic to avoid virtual temperature observations
+            if(kk == 2) {
+
+               ev_temp = get_event_index_temp(conf_info.event_stack_flag, kk, lv);
+
+               // Check for bad data
+               if(is_bad_data(ev_temp)) {
+
+                  mlog << Debug(4)
+                       << "For " << hdr_typ << ", station id " << hdr_sid
+                       << ", pressure " << obs_arr[2] << " mb, and height "
+                       << obs_arr[3] << " msl, skipping virtual temperature observation ("
+                       << evns[kk][ev][lv][0] << " C) with program code "
+                       << evns[kk][ev][lv][2] << " and reason code "
+                       << evns[kk][ev][lv][3] << ".\n";
+                  continue;
+               }
+
+               // Check for the event index changing
+               else if(ev != ev_temp) {
+                  mlog << Debug(4)
+                       << "For " << hdr_typ << ", station id " << hdr_sid
+                       << ", pressure " << obs_arr[2] << " mb, and height "
+                       << obs_arr[3] << " msl, selected sensible temperature ("
+                       << evns[kk][ev_temp][lv][0]
+                       << " C) from event index " << ev_temp
+                       << " instead of virtual temperature ("
+                       << evns[kk][ev][lv][0]
+                       << " C) from event index " << ev << ".\n";
+                  ev = ev_temp;
+               }
+            }
 
             // If the observation value or the quality mark is not
             // valid, continue to the next variable type
@@ -1098,7 +1129,7 @@ void clean_up() {
 ////////////////////////////////////////////////////////////////////////
 
 int get_event_index(int flag, int i_var, int i_lvl) {
-   int ev, ev_tmp, i;
+   int ev, i;
 
    // Check the event_stack_flag to determine if the top or bottom
    // of the event stack is to be used
@@ -1123,58 +1154,60 @@ int get_event_index(int flag, int i_var, int i_lvl) {
       if(ev < 0) ev = 0;
    }
 
-   //
-   // Special processing for observations of temperature.
-   // Do not use virtual temperatures observations for verification.
-   // PREPBUFR Table 14 describes the VIRTMP processing step:
-   //    http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_14.htm
-   //
-   // For VIRTMP program code 8 with reason code 3, do not use this
-   // this observation since all versions are virtual temperature.
-   //
-   // For VIRTMP program code 8 with any other reason code, step down
-   // the event stack to find sensible temperature.
-   //
+   return(ev);
+}
 
-   // Only check temperature observations
-   if(i_var == 2) {
+////////////////////////////////////////////////////////////////////////
+//
+// Special processing for observations of temperature.
+// Do not use virtual temperatures observations for verification.
+// PREPBUFR Table 14 describes the VIRTMP processing step:
+//    http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_14.htm
+//
+// For the bottom of the event stack, skip the observation if it has
+// the VIRTMP program code of 8.
+//
+// For the top of the event stack, search the entire stack looking
+// for the VIRTMP program code.  For VIRTMP program code with reason
+// code 3, do not use this this observation since all versions are
+// virtual temperature.  For VIRTMP program code with any other
+// reason code, step down the event stack to find sensible temperature.
+//
+////////////////////////////////////////////////////////////////////////
 
+int get_event_index_temp(int flag, int i_var, int i_lvl) {
+   int ev, i;
+
+   // For the top of the event stack, search the entire stack looking
+   // for the VIRTMP program code.  If found, use the next entry.
+   if(conf_info.event_stack_flag) {
+
+      // Initialize to the top of the event stack
+      ev = 0;
+     
       // Loop through the event stack
-      ev_tmp = ev;
       for(i=0; i<mxr8vn && evns[i_var][i][i_lvl][0]<r8bfms; i++) {
 
          // Check for the VIRTMP program code
          if(is_eq(evns[i_var][i][i_lvl][2], virtmp_prog_code)) {
 
-            // Check for reason code 3 for which no observation should be used
-            if(is_eq(evns[i_var][i][i_lvl][3], 3.0)) {
-               mlog << Debug(4)
-                    << "Skipping virtual temperature observation ("
-                    << evns[i_var][i][i_lvl][0]
-                    << " C) with program code " << evns[i_var][i][i_lvl][2]
-                    << ", reason code " << evns[i_var][ev_tmp][i][3] << ".\n";
-               return(bad_data_int);
-            }
+            // Skip this observation if the reason code is 3
+            if(is_eq(evns[i_var][i][i_lvl][3], 3.0)) return(bad_data_int);
 
-            // Use the next entry in the event stack, but continue searching
-            ev_tmp = i+1;
+            // Use the next entry in the event stack but keep searching
+            ev = i+1;
          }
       }
+   }
 
-      if(ev != ev_tmp) {
+   // For the bottom of the event stack, skip the VIRTMP program code
+   else {
 
-         // Warn the user about virtual temperature
-         mlog << Debug(4)
-              << "Selected sensible temperature ("
-              << evns[i_var][ev_tmp][i_lvl][0]
-              << " C) from event index " << ev_tmp
-              << " instead of virtual temperature ("
-              << evns[i_var][ev][i_lvl][0]
-              << " C) from event index " << ev << ".\n";
+      // Retrieve the bottom of the event stack like normal
+      ev = get_event_index(flag, i_var, i_lvl);
 
-         // Reset the event index
-         ev = ev_tmp;
-      }
+      // Check for the VIRTMP program code
+      if(is_eq(evns[i_var][ev][i_lvl][2], virtmp_prog_code)) return(bad_data_int);
    }
 
    return(ev);
