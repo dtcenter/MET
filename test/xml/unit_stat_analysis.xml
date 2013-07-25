@@ -114,7 +114,7 @@
     </env>
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_NDAS_120000L_20120409_120000V.stat \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_point_stat \
       -out &OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT.out \
       -v 1
