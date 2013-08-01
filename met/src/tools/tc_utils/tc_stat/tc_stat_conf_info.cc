@@ -248,7 +248,13 @@ void TCStatConfInfo::process_config() {
    
    // Conf: Jobs
    Jobs = Conf.lookup_string_array(conf_key_jobs);
-   
+   if(Jobs.n_elements() == 0) {
+      mlog << Error
+           << "\nTCStatConfInfo::process_config() -> "
+           << "must specify at least one entry in \"jobs\".\n\n";
+      exit(1);
+   }
+
    return;
 }
 
