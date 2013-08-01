@@ -129,7 +129,7 @@ void TCPairsConfInfo::process_config() {
    Cyclone = Conf.lookup_string_array(conf_key_cyclone);
 
    // Conf: StormName
-   Cyclone = Conf.lookup_string_array(conf_key_storm_name);
+   StormName = Conf.lookup_string_array(conf_key_storm_name);
 
    // Conf: InitBeg, InitEnd
    InitBeg = timestring_to_unix(Conf.lookup_string(conf_key_init_beg));
