@@ -748,7 +748,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             in_lt  == stat_val1l2) &&
             out_lt == stat_wdir) {
       aggr_wind_lines(f, j, wind_map, n_in, n_out);
-      write_job_aggr_wind(j, out_lt, wind_map, out_at);
+      write_job_aggr_wind(j, in_lt, wind_map, out_at);
    }
 
    //
@@ -1408,11 +1408,6 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
    for(it = m.begin(), r=1; it != m.end(); it++, r++) {
 
       //
-      // Initialize
-      //
-      c = 0;
-
-      //
       // Check for matching component lengths
       //
       if(it->second.uf_na.n_elements() != it->second.vf_na.n_elements() ||
@@ -1483,13 +1478,19 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the mean wind direction statistics
       //
-      at.set_entry(r, 0, "ROW_MEAN_WDIR:");
-      write_case_cols(it->first, at, r, c);      
+      c = 0;
+      at.set_entry(r, c++, "ROW_MEAN_WDIR:");
+      write_case_cols(it->first, at, r, c);
       at.set_entry(r, c++, n);
       at.set_entry(r, c++, fbar);
       at.set_entry(r, c++, obar);
       at.set_entry(r, c++, me);
       at.set_entry(r, c++, mae);
+
+      //
+      // Increment row counter
+      //
+      r++;
 
       if(lt == stat_vl1l2) {
          uf    = it->second.vl1l2_info.ufbar;
@@ -1525,7 +1526,8 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the aggregated wind direction statistics
       //
-      at.set_entry(r, 0, "AGGR_WDIR:");
+      c = 0;
+      at.set_entry(r, c++, "AGGR_WDIR:");
       write_case_cols(it->first, at, r, c);
       at.set_entry(r, c++, count);
       at.set_entry(r, c++, fbar);
