@@ -25,6 +25,7 @@
 //   005    05/03/12  Halley Gotway   Switch to using vx_config library.
 //   006    02/04/13  Halley Gotway   Add -by case option.
 //   007    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
+//   008    05/08/13  Halley Gotway   Fix bug in write_job_aggr_wind().
 //
 ////////////////////////////////////////////////////////////////////////
 
