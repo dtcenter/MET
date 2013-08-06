@@ -702,6 +702,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
+   double d;
+   int ResCompFlag;
 
    _Grid = new Grid();
 
@@ -719,17 +721,36 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
    //  lat/long
    if( 0 == gfld->igdtnum ){
 
-      ScanMode = gfld->igdtmpl[18];
+      ScanMode    = gfld->igdtmpl[18];
+      ResCompFlag = gfld->igdtmpl[13];
 
       //  build a LatLonData struct with the projection information
       LatLonData data;
       data.name         = latlon_proj_type;
-      data.delta_lon    = (double)gfld->igdtmpl[16] / 1000000.0;
-      data.delta_lat    = (double)gfld->igdtmpl[17] / 1000000.0;
       data.Nlat         = gfld->igdtmpl[8];
       data.Nlon         = gfld->igdtmpl[7];
       data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0);
       data.lon_ll       = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
+
+      //  latitudinal increment.  If not given, compute from lat1 and lat2
+      if( ResCompFlag & 16 ) {
+         data.delta_lat = (double)gfld->igdtmpl[17] / 1000000.0;
+      }
+      else {
+         d = fabs(((double)gfld->igdtmpl[11] / 1000000.0)
+                - ((double)gfld->igdtmpl[14] / 1000000.0));
+         data.delta_lat = d/(data.Nlat);
+      }
+      
+      //  longitudinal increment.  If not given, compute from lon1 and lon2
+      if( ResCompFlag & 32 ) {
+         data.delta_lon = (double)gfld->igdtmpl[16] / 1000000.0;
+      }
+      else {
+         d = fabs(((double)gfld->igdtmpl[12] / 1000000.0)
+                - ((double)gfld->igdtmpl[15] / 1000000.0));
+         data.delta_lon = d/(data.Nlon);
+      }
 
       //  if y scan order is -y, move lat_ll
       if( !(ScanMode & 64) )
@@ -1056,3 +1077,5 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
    return 1 > listMatchExact.size() ? -1 : listMatchExact[0]->Index;
 
 }
+
+////////////////////////////////////////////////////////////////////////
