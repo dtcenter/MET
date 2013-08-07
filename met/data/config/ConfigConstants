@@ -76,5 +76,3 @@ NO_MERGE       = 4;
 TOP            = true;
 BOTTOM         = false;
 
-//  Lon Range Parameter
-LON_RANGE_MIN  = -180.0;
