@@ -667,6 +667,26 @@ return ( rep->rot_grid_to_earth(x, y) );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool Grid::is_global() const
+
+{
+
+if ( !rep )  {
+
+   mlog << Error << "\nGrid::is_global() const -> empty grid!\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( rep->is_global() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

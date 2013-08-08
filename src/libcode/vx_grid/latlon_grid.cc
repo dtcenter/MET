@@ -283,6 +283,21 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool LatLonGrid::is_global() const
+
+{
+
+const bool full_range_lat = (fabs(Ny*delta_lat) >= 180.0);
+const bool full_range_lon = (fabs(Nx*delta_lon) >= 360.0);
+
+return ( full_range_lat && full_range_lon );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
