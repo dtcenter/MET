@@ -46,12 +46,30 @@ class MetNcCFDataFile : public Met2dDataFile {
          //  NetCDF file
          //
       
-      MetNcFile * MetNc;    //  allocated
+      NcCfFile * _file;    //  allocated
 
    public:
 
       MetNcCFDataFile();
      ~MetNcCFDataFile();
+
+      virtual int nx() const
+      {
+	if (_file == 0)
+	  return 0;
+	
+	return _file->nx();
+      }
+      
+
+      virtual int ny() const
+      {
+	if (_file == 0)
+	  return 0;
+	
+	return _file->ny();
+      }
+      
 
          //
          //  set stuff

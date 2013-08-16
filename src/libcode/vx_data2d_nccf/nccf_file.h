@@ -14,8 +14,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MET_FILE_H__
-#define  __MET_FILE_H__
+#ifndef  __NCCF_FILE_H__
+#define  __NCCF_FILE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -41,19 +41,12 @@ static const char nccf_lon_var_name [] = "lon";
 ////////////////////////////////////////////////////////////////////////
 
 
-class MetNcFile {
-
-   private:
-
-      void init_from_scratch();
-
-      MetNcFile(const MetNcFile &);
-      MetNcFile & operator=(const MetNcFile &);
+class NcCfFile {
 
    public:
 
-      MetNcFile();
-     ~MetNcFile();
+      NcCfFile();
+     ~NcCfFile();
 
       bool open(const char * filename);
 
@@ -62,8 +55,22 @@ class MetNcFile {
       void dump(ostream &, int = 0) const;
 
 
-      NcFile * Nc;      //  allocated
-
+      int nx() const
+      {
+	if (_xDim == 0)
+	  return 0;
+	
+	return _xDim->size();
+      }
+      
+      int ny() const
+      {
+	if (_yDim == 0)
+	  return 0;
+	
+	return _yDim->size();
+      }
+      
          //
          //  time
          //
@@ -74,19 +81,6 @@ class MetNcFile {
 
       int      lead_time () const;   //  seconds
 
-
-         //
-         //  dimensions
-         //
-
-      int Ndims;
-
-      NcDim ** Dim;   //  allocated
-
-      StringArray DimNames;
-
-      NcDim * Xdim;   //  not allocated
-      NcDim * Ydim;   //  not allocated
 
          //
          //  variables
@@ -114,13 +108,64 @@ class MetNcFile {
 
       NcVarInfo* find_var_name(const char * var_name) const;
 
+   private:
+
+      static const double DELTA_TOLERANCE;
+      
+      NcFile * _ncFile;      //  allocated
+
+         //
+         //  dimensions
+         //
+
+      int _numDims;
+
+      NcDim ** _dims;   //  allocated
+
+      StringArray _dimNames;
+
+      // Pointers to the X/Y dimensions and the associated coordinate
+      // variables.  Note that these are pointers into the _dims and Var
+      // arrays so should not be deleted.
+
+      NcDim *_xDim;
+      NcDim *_yDim;
+
+      NcVar *_xCoordVar;
+      NcVar *_yCoordVar;
+      
+      void init_from_scratch();
+
+      NcCfFile(const NcCfFile &);
+      NcCfFile & operator=(const NcCfFile &);
+
+      // Read the grid information from the netCDF file and fill in the
+      // grid member with that information.
+
+      void read_netcdf_grid();
+      void get_grid_from_grid_mapping(const NcAtt *grid_mapping_att);
+      
+      void get_grid_mapping_albers_conical_equal_area(const NcVar *grid_mapping_var);
+      void get_grid_mapping_azimuthal_equidistant(const NcVar *grid_mapping_var);
+      void get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_mapping_var);
+      void get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mapping_var);
+      void get_grid_mapping_lambert_cylindrical_equal_area(const NcVar *grid_mapping_var);
+      void get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var);
+      void get_grid_mapping_mercator(const NcVar *grid_mapping_var);
+      void get_grid_mapping_orthographic(const NcVar *grid_mapping_var);
+      void get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_var);
+      void get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_mapping_var);
+      void get_grid_mapping_stereographic(const NcVar *grid_mapping_var);
+      void get_grid_mapping_transverse_mercator(const NcVar *grid_mapping_var);
+      void get_grid_mapping_vertical_perspective(const NcVar *grid_mapping_var);
+      
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MET_FILE_H__  */
+#endif   /*  __NCCF_FILE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
