@@ -23,7 +23,6 @@
 
 #include "data2d_nccf.h"
 #include "var_info_nccf.h"
-#include "get_nccf_grid.h"
 #include "nccf_file.h"
 
 

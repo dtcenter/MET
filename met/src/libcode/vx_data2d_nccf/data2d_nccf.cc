@@ -69,7 +69,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
   
-   MetNc  = (MetNcFile *) 0;
+   _file  = (NcCfFile *) 0;
 
    close();
 
@@ -80,7 +80,7 @@ void MetNcCFDataFile::nccf_init_from_scratch() {
 
 void MetNcCFDataFile::close() {
 
-   if(MetNc) { delete MetNc; MetNc = (MetNcFile *) 0; }
+   if(_file) { delete _file; _file = (NcCfFile *) 0; }
 
    return;
 }
@@ -91,9 +91,9 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    close();
 
-   MetNc = new MetNcFile;
+   _file = new NcCfFile;
    
-   if(!MetNc->open(_filename)) {
+   if(!_file->open(_filename)) {
       mlog << Error << "\nMetNcCFDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
@@ -105,7 +105,7 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    _Grid = new Grid;
 
-   *(_Grid) = MetNc->grid;
+   *(_Grid) = _file->grid;
 
    return(true);
 }
@@ -114,81 +114,102 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
 void MetNcCFDataFile::dump(ostream & out, int depth) const {
 
-   if(MetNc) MetNc->dump(out, depth);
+   if(_file) _file->dump(out, depth);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
-   bool status = false;
-   ConcatString req_time_str, data_time_str;
-   VarInfoNcCF * vinfo_nc = (VarInfoNcCF *) &vinfo;
-   NcVarInfo *info = (NcVarInfo *) 0;
-   int i;
+bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
+{
+  // Not sure why we do this
 
-   // Initialize the data plane
-   plane.clear();
+  VarInfoNcCF *vinfo_nc = (VarInfoNcCF *)&vinfo;
 
-   // Check for NA in the requested name
-   if(strcmp(vinfo_nc->req_name(), na_str) == 0) {
+  // Initialize the data plane
 
-      // Store the name of the first data variable
-      for(i=0; i<MetNc->Nvars; i++) {
-         if(strcmp(MetNc->Var[i].name, nccf_lat_var_name) != 0 &&
-            strcmp(MetNc->Var[i].name, nccf_lon_var_name) != 0) {
-            vinfo_nc->set_req_name(MetNc->Var[i].name);
-            break;
-         }
+  plane.clear();
+
+  // Check for NA in the requested name
+
+  if (strcmp(vinfo_nc->req_name(), na_str) == 0)
+  {
+    // Store the name of the first data variable
+    
+    for (int i = 0; i < _file->Nvars; ++i)
+    {
+      if (strcmp(_file->Var[i].name, nccf_lat_var_name) != 0 &&
+	  strcmp(_file->Var[i].name, nccf_lon_var_name) != 0)
+      {
+	vinfo_nc->set_req_name(_file->Var[i].name);
+	break;
       }
-   }
+    }
+  }
    
-   // Read the data
-   status = MetNc->data(vinfo_nc->req_name(),
-                        vinfo_nc->dimension(),
-                        plane, info);
+  // Read the data
 
-   // Check that the times match those requested
-   if(status) {
+  NcVarInfo *info = (NcVarInfo *) 0;
 
-      // Check that the valid time matches the request
-      if(vinfo.valid() > 0 && vinfo.valid() != plane.valid()) {
+  bool status = _file->data(vinfo_nc->req_name(),
+			    vinfo_nc->dimension(),
+			    plane, info);
 
-         // Compute time strings
-         req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
-         data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
+  // Check that the times match those requested
 
-         mlog << Warning << "\nMetNcCFDataFile::data_plane() -> "
-              << "for \"" << vinfo.req_name() << "\" variable, the valid "
-              << "time does not match the requested valid time: ("
-              << data_time_str << " != " << req_time_str << ")\n\n";
-         status = false;
-      }
+  if (status)
+  {
+    // Check that the valid time matches the request
 
-      // Check that the lead time matches the request
-      if(vinfo.lead() > 0 && vinfo.lead() != plane.lead()) {
+    if (vinfo.valid() > 0 && vinfo.valid() != plane.valid())
+    {
+      // Compute time strings
 
-         // Compute time strings
-         req_time_str  = sec_to_hhmmss(vinfo.lead());
-         data_time_str = sec_to_hhmmss(plane.lead());
+      ConcatString req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
+      ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
 
-         mlog << Warning << "\nMetNcCFDataFile::data_plane() -> "
-              << "for \"" << vinfo.req_name() << "\" variable, the lead "
-              << "time does not match the requested lead time: ("
-              << data_time_str << " != " << req_time_str << ")\n\n";
-         status = false;
-      }
+      mlog << Warning << "\nMetNcCFDataFile::data_plane() -> "
+	   << "for \"" << vinfo.req_name() << "\" variable, the valid "
+	   << "time does not match the requested valid time: ("
+	   << data_time_str << " != " << req_time_str << ")\n\n";
+      status = false;
+    }
 
-      // Set the VarInfo object's name, long_name, level, and units strings
-      if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
-      else                                 vinfo.set_name(info->name);
-      if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att);
-      if(info->level_att.length()     > 0) vinfo.set_level_name(info->level_att);
-      if(info->units_att.length()     > 0) vinfo.set_units(info->units_att);
-   }
+    // Check that the lead time matches the request
 
-   return(status);
+    if (vinfo.lead() > 0 && vinfo.lead() != plane.lead())
+    {
+      // Compute time strings
+
+      ConcatString req_time_str  = sec_to_hhmmss(vinfo.lead());
+      ConcatString data_time_str = sec_to_hhmmss(plane.lead());
+
+      mlog << Warning << "\nMetNcCFDataFile::data_plane() -> "
+	   << "for \"" << vinfo.req_name() << "\" variable, the lead "
+	   << "time does not match the requested lead time: ("
+	   << data_time_str << " != " << req_time_str << ")\n\n";
+      status = false;
+    }
+    
+    // Set the VarInfo object's name, long_name, level, and units strings
+
+    if (info->name_att.length() > 0)
+      vinfo.set_name(info->name_att);
+    else
+      vinfo.set_name(info->name);
+
+    if (info->long_name_att.length() > 0)
+      vinfo.set_long_name(info->long_name_att);
+
+    if (info->level_att.length() > 0)
+      vinfo.set_level_name(info->level_att);
+
+    if (info->units_att.length() > 0)
+      vinfo.set_units(info->units_att);
+  }
+
+  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -218,11 +239,11 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
 
 int MetNcCFDataFile::index(VarInfo &vinfo){
 
-   if( NULL == MetNc->find_var_name( vinfo.name() ) ) return -1;
+   if( NULL == _file->find_var_name( vinfo.name() ) ) return -1;
 
-   if( ( vinfo.valid() && MetNc->ValidTime   != vinfo.valid() ) ||
-       ( vinfo.init()  && MetNc->InitTime    != vinfo.init()  ) ||
-       ( vinfo.lead()  && MetNc->lead_time() != vinfo.lead()  ) )
+   if( ( vinfo.valid() && _file->ValidTime   != vinfo.valid() ) ||
+       ( vinfo.init()  && _file->InitTime    != vinfo.init()  ) ||
+       ( vinfo.lead()  && _file->lead_time() != vinfo.lead()  ) )
       return -1;
 
    return 0;

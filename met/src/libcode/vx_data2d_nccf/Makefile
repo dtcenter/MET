@@ -15,8 +15,7 @@
 
 EXECUTABLES = test_read_nccf
               
-OBJECTS     = get_nccf_grid.o \
-              nccf_file.o \
+OBJECTS     = nccf_file.o \
               var_info_nccf.o \
               data2d_nccf.o
 
@@ -30,8 +29,7 @@ GEN_SOURCES =
 ########################################################################
 
 
-HEADERS     = get_nccf_grid.h \
-              nccf_file.h \
+HEADERS     = nccf_file.h \
               var_info_nccf.h \
               data2d_nccf.h \
               vx_data2d_nccf.h
@@ -65,9 +63,6 @@ gen_sources: $(GEN_SOURCES)
    ##  objects
    ##
 
-
-get_nccf_grid.o: get_nccf_grid.cc
-	$(CXX) get_nccf_grid.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
 
 nccf_file.o: nccf_file.cc
 	$(CXX) nccf_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)

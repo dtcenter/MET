@@ -135,105 +135,136 @@ void VarInfoNcCF::add_dimension(int dim) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcCF::set_magic(const ConcatString &s) {
-   char tmp_str[max_str_len];
-   char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
+void VarInfoNcCF::set_magic(const ConcatString &magic_string)
+{
+  char tmp_str[max_str_len];
+  char *ptr = 0;
+  char *ptr2 = 0;
+  char *ptr3 = 0;
+  char *save_ptr = 0;
 
-   // Validate the magic string
-   VarInfo::set_magic(s);
+  // Validate the magic string
 
-   // Store the magic string
-   MagicStr = s;
+  VarInfo::set_magic(magic_string);
 
-   // Initialize the temp string
-   strcpy(tmp_str, s);
+  // Store the magic string
 
-   // Retreive the NetCDF variable name
-   if((ptr = strtok_r(tmp_str, "()/", &save_ptr)) == NULL) {
-      mlog << Error << "\nVarInfoNcCF::set_magic() -> "
-           << "bad NetCDF variable name specified \""
-           << s << "\".\n\n";
-      exit(1);
-   }
+  MagicStr = magic_string;
 
-   // Set the requested name and default output name
-   set_req_name(ptr);
-   set_name(ptr);
+  // Initialize the temp string
 
-   // If there's no level specification, assume (*, *)
-   if(strchr(s, '(') == NULL) {
-      Level.set_req_name("*,*");
-      Level.set_name("*,*");
+  strcpy(tmp_str, magic_string);
+
+  // Retreive the NetCDF variable name
+
+  if ((ptr = strtok_r(tmp_str, "()/", &save_ptr)) == NULL)
+  {
+    mlog << Error << "\nVarInfoNcCF::set_magic() -> "
+	 << "bad NetCDF variable name specified \""
+	 << magic_string << "\".\n\n";
+    exit(1);
+  }
+
+  // Set the requested name and default output name
+
+  set_req_name(ptr);
+  set_name(ptr);
+
+  // If there's no level specification, assume (*, *)
+
+  if (strchr(magic_string, '(') == NULL)
+  {
+    Level.set_req_name("*,*");
+    Level.set_name("*,*");
+    Dimension.clear();
+    Dimension.add(vx_data2d_star);
+    Dimension.add(vx_data2d_star);
+  }
+  else
+  {
+    // Parse the level specification
+
+    // Retreive the NetCDF level specification
+
+    ptr = strtok_r(NULL, "()", &save_ptr);
+
+    // Set the level name
+
+    Level.set_req_name(ptr);
+    Level.set_name(ptr);
+
+    // If dimensions are specified, clear the default value
+
+    if (strchr(ptr, ',') != NULL)
       Dimension.clear();
-      Dimension.add(vx_data2d_star);
-      Dimension.add(vx_data2d_star);
-   }
-   // Parse the level specification
-   else {
 
-      // Retreive the NetCDF level specification
-      ptr = strtok_r(NULL, "()", &save_ptr);
+    // Parse the dimensions
 
-      // Set the level name
-      Level.set_req_name(ptr);
-      Level.set_name(ptr);
+    while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL)
+    {
+      // Check for wildcards
 
-      // If dimensions are specified, clear the default value
-      if(strchr(ptr, ',') != NULL) Dimension.clear();
+      if (strchr(ptr2, '*') != NULL)
+	Dimension.add(vx_data2d_star);
+      else
+      {
+	// Check for a range of levels
 
-      // Parse the dimensions
-      while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
+	if ((ptr3 = strchr(ptr2, '-')) != NULL)
+	{
+	  // Check if a range has already been supplied
 
-         // Check for wildcards
-         if(strchr(ptr2, '*') != NULL) Dimension.add(vx_data2d_star);
-         else {
+	  if (Dimension.has(range_flag))
+	  {
+	    mlog << Error << "\nVarInfoNcCF::set_magic() -> "
+		 << "only one dimension can have a range for NetCDF variable \""
+		 << magic_string << "\".\n\n";
+	    exit(1);
+	  }
+	  else
+	  {
+	    // Store the dimension of the range and limits
 
-            // Check for a range of levels
-            if((ptr3 = strchr(ptr2, '-')) != NULL) {
+	    Dimension.add(range_flag);
+	    Level.set_lower(atoi(ptr2));
+	    Level.set_upper(atoi(++ptr3));
+	  }
+	}
+	else
+	{
+	  // Single level
 
-               // Check if a range has already been supplied
-               if(Dimension.has(range_flag)) {
-                  mlog << Error << "\nVarInfoNcCF::set_magic() -> "
-                       << "only one dimension can have a range for NetCDF variable \""
-                       << s << "\".\n\n";
-                  exit(1);
-               }
-               // Store the dimension of the range and limits
-               else {
-                  Dimension.add(range_flag);
-                  Level.set_lower(atoi(ptr2));
-                  Level.set_upper(atoi(++ptr3));
-               }
-            }
-            // Single level
-            else {
-               Dimension.add(atoi(ptr2));
-            }
-         }
+	  Dimension.add(atoi(ptr2));
+	}
+      }
 
-         // Set ptr to NULL for next call to strtok
-         ptr = NULL;
-      } // end while
+      // Set ptr to NULL for next call to strtok
 
-   } // end else
+      ptr = NULL;
+    } // end while
 
-   // Check for "/PROB" to indicate a probability forecast
-   if(strstr(s, "/PROB") != NULL) PFlag = 1;
+  } // end else
 
-   // Set the long name
-   sprintf(tmp_str, "%s(%s)", req_name().text(), Level.req_name().text());
-   set_long_name(tmp_str);
+  // Check for "/PROB" to indicate a probability forecast
 
-   // Set the units
-   set_units(na_str);
+  if (strstr(magic_string, "/PROB") != NULL)
+    PFlag = 1;
 
-   return;
+  // Set the long name
+
+  sprintf(tmp_str, "%s(%s)", req_name().text(), Level.req_name().text());
+  set_long_name(tmp_str);
+
+  // Set the units
+
+  set_units(na_str);
+
+  return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcCF::set_dict(Dictionary &dict){
-
    ConcatString mag;
    mag.format("%s%s", dict.lookup_string("name").text(),
                       dict.lookup_string("level").text());
@@ -245,7 +276,6 @@ void VarInfoNcCF::set_dict(Dictionary &dict){
       set_p_flag( true );
       return;
    }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
