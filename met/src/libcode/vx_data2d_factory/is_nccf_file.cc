@@ -35,53 +35,45 @@ using namespace std;
 
 
 static const char nccf_att_name[]  = "Conventions";
-static const char nccf_att_value[] = "CF-1.0";
+static const char nccf_att_value[] = "CF-";
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 bool is_nccf_file(const char * filename)
-
 {
+  // Check that it's a netcdf file
+  //
+  // This also checks that the filename string is non-null and nonempty
 
-   //
-   //  check that it's a netcdf file
-   //
-   //  this also checks that the filename string is non-null and nonempty
-   //
+  if (!is_netcdf_file(filename))
+    return false;
+  
+  // Look for the global attribute name
 
-if ( ! is_netcdf_file(filename) )  return ( false );
+  NcFile nc_file(filename);
 
-int j, n;
-NcFile f (filename);
-NcAtt * att = (NcAtt *) 0;
+  if (!nc_file.is_valid())
+    return false;
+  
+  int num_atts = nc_file.num_atts();
+  
+  for (int j = 0; j < num_atts; ++j)
+  {
+    NcAtt *att = nc_file.get_att(j);
 
-   //
-   //  look for the global attribute name
-   //
+    if (strcmp(att->name(), nccf_att_name) == 0)
+    {
+      if (strncmp(att->as_string(0), nccf_att_value,
+		  strlen(nccf_att_value)) == 0)
+	return true;
+    }
+  }
 
-if ( ! f.is_valid() )  return ( false );
+  //  If we get here, this is not a CF-compliant netCDF file
 
-n = f.num_atts();
-
-for (j=0; j<n; ++j)  {
-
-   att = f.get_att(j);
-
-   if ( strcmp(att->name(), nccf_att_name) == 0 )  {
-	  
-	   if ( strcmp(att->as_string(0), nccf_att_value) == 0 )  return ( true );
-
-	}
-}
-
-   //
-   //  done
-   //
-
-return ( false );
-
+  return false;
 }
 
 

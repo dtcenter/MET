@@ -22,6 +22,7 @@ using namespace std;
 #include "data2d_grib.h"
 #include "data2d_nc_met.h"
 #include "data2d_nc_pinterp.h"
+#include "data2d_nccf.h"
 
 #ifdef WITH_GRIB2
    #include "data2d_grib2.h"
@@ -68,6 +69,9 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
          break;
 
       case FileType_NcCF:
+	mtddf = new MetNcCFDataFile;
+	break;
+	
       case FileType_HdfEos:
 
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "

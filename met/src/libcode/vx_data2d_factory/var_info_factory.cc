@@ -26,6 +26,7 @@ using namespace std;
 #include "var_info_factory.h"
 #include "grdfiletype_to_string.h"
 #include "var_info_grib.h"
+#include "var_info_nccf.h"
 #include "var_info_nc_met.h"
 #include "var_info_nc_pinterp.h"
 
@@ -75,6 +76,9 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type) {
          break;
 
       case FileType_NcCF:
+	vi = new VarInfoNcCF;
+	break;
+	
       case FileType_HdfEos:
 
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
