@@ -75,6 +75,7 @@ MET_LITTLE_Ls    = -lvx_pxm \
                    -lvx_analysis_util \
                    -lvx_data2d_factory \
                    -lvx_data2d_nc_met \
+                   -lvx_data2d_nccf \
                    -lvx_data2d_grib $(GRIB2_LIBS) \
                    -lvx_data2d_nc_pinterp \
                    -lvx_data2d \
