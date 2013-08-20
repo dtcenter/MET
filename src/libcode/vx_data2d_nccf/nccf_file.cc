@@ -1015,7 +1015,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   double x_pin = -(x_values[0] / dx_m);
   double y_pin = -(y_values[0] / dy_m);
   
-  // Fill in the data structure
+  // Fill in the data structure.  Remember to negate the longitude
+  // values since MET uses the mathematical coordinate system centered on
+  // the center of the earth rather than the regular map coordinate system.
 
   LambertData data;
   data.name = lambert_proj_type;
@@ -1025,11 +1027,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   else
     data.scale_lat_2 = std_parallel_att->as_double(1);
   data.lat_pin = proj_origin_lat_att->as_double(0);
-//  data.lon_pin = central_lon_att->as_double(0);
   data.lon_pin = -central_lon_att->as_double(0);
   data.x_pin = x_pin;
   data.y_pin = y_pin;
-//  data.lon_orient = central_lon_att->as_double(0);
   data.lon_orient = -central_lon_att->as_double(0);
   data.d_km = dx_m / 1000.0;
   data.r_km = 6371.20;
@@ -1059,9 +1059,173 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
 {
   static const string method_name = "NcCfFile::get_grid_mapping_latitude_longitude()";
   
-  mlog << Error << "\n" << method_name << " -> "
-       << "Latitude longitude grid not handled in MET.\n\n";
-  exit(1);
+  // Look for the lat/lon dimensions
+
+  for (int dim_num = 0; dim_num < _numDims; ++dim_num)
+  {
+    // The lat/lon dimensions are identified by their units
+
+    const NcVar *coord_var = _ncFile->get_var(_dims[dim_num]->name());
+    if (coord_var == 0)
+      continue;
+    
+    const NcAtt *units_att = coord_var->get_att("units");
+    if (units_att == 0)
+      continue;
+    
+    const char *dim_units = units_att->as_string(0);
+    if (dim_units == 0)
+      continue;
+
+    // See if this is a lat or lon dimension
+
+    if (strcmp(dim_units, "degrees_north") == 0 ||
+	strcmp(dim_units, "degree_north") == 0 ||
+	strcmp(dim_units, "degree_N") == 0 ||
+	strcmp(dim_units, "degrees_N") == 0 ||
+	strcmp(dim_units, "degreeN") == 0 ||
+	strcmp(dim_units, "degreesN") == 0)
+    {
+      _yDim = _dims[dim_num];
+
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+	if (strcmp(Var[var_num].name, _yDim->name()) == 0)
+	{
+	  _yCoordVar = Var[var_num].var;
+	  break;
+	}
+      }
+    }
+    
+    if (strcmp(dim_units, "degrees_east") == 0 ||
+	strcmp(dim_units, "degree_east") == 0 ||
+	strcmp(dim_units, "degree_E") == 0 ||
+	strcmp(dim_units, "degrees_E") == 0 ||
+	strcmp(dim_units, "degreeE") == 0 ||
+	strcmp(dim_units, "degreesE") == 0)
+    {
+      _xDim = _dims[dim_num];
+
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+	if (strcmp(Var[var_num].name, _xDim->name()) == 0)
+	{
+	  _xCoordVar = Var[var_num].var;
+	  break;
+	}
+      }
+    }
+    
+  }
+
+  if (_xDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Didn't find X dimension (degrees_east) in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  if (_yDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Didn't find Y dimension (degrees_north) in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  if (_xCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Didn't find X coord variable (" << _xDim->name()
+	 << ") in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  if (_yCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Didn't find Y coord variable (" << _yDim->name()
+	 << ") in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  if (_xCoordVar->num_vals() != _xDim->size() ||
+      _yCoordVar->num_vals() != _yDim->size())
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  // Figure out the dlat/dlon values from the dimension variables
+
+  double lat_values[_yDim->size()];
+  long lat_counts = _yDim->size();
+  
+  _yCoordVar->get(lat_values, &lat_counts);
+  
+  double lon_values[_xDim->size()];
+  long lon_counts = _xDim->size();
+  
+  _xCoordVar->get(lon_values, &lon_counts);
+  
+  // Calculate dlat and dlon assuming they are constant.  MET requires that
+  // dlat be equal to dlon
+
+  double dlat = (lat_values[_yDim->size()-1] - lat_values[0]) /
+    (_yDim->size() - 1);
+  double dlon = (lon_values[_xDim->size()-1] - lon_values[0]) /
+    (_xDim->size() - 1);
+  
+  if (fabs(dlat - dlon) > DELTA_TOLERANCE)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "MET can only process Latitude/Longitude files where the delta lat and delta lon are the same\n\n";
+    exit(1);
+  }
+  
+  // As a sanity check, make sure that the deltas are constant through the
+  // entire grid.  CF compliancy doesn't require this, but MET does.
+
+  for (int i = 1; i < _yDim->size(); ++i)
+  {
+    double curr_delta = lat_values[i] - lat_values[i-1];
+    if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+	   << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
+      exit(1);
+    }
+  }
+  
+  for (int i = 1; i < _xDim->size(); ++i)
+  {
+    double curr_delta = lon_values[i] - lon_values[i-1];
+    if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+	   << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
+      exit(1);
+    }
+  }
+  
+  // Fill in the data structure.  Remember to negate the longitude
+  // values since MET uses the mathematical coordinate system centered on
+  // the center of the earth rather than the regular map coordinate system.
+
+  LatLonData data;
+  
+  data.name = latlon_proj_type;
+  data.lat_ll = lat_values[0];
+  data.lon_ll = -lon_values[0];
+  data.delta_lat = dlat;
+  data.delta_lon = dlon;
+  data.Nlat = _yDim->size();
+  data.Nlon = _xDim->size();
+
+  grid.set(data);
+  
+//  grid.dump(cerr);
 }
 
 ////////////////////////////////////////////////////////////////////////
