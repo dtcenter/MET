@@ -33,9 +33,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char x_dim_name          [] = "lon";
-static const char y_dim_name          [] = "lat";
-
 static const char valid_time_att_name [] = "valid_time_ut";
 static const char  init_time_att_name [] = "init_time_ut";
 static const char accum_time_att_name [] = "accum_time_sec";
@@ -959,6 +956,58 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     exit(1);
   }
   
+  // Make sure that the coordinate variables are given in meters.  If we get
+  // files that are in other units, we'll have to update the code to do the
+  // units conversions.
+
+  const NcAtt *x_coord_units_att = _xCoordVar->get_att("units");
+  if (x_coord_units_att == 0)
+  {
+    mlog << Warning << "\n" << method_name << " -> "
+	 << "Units not given for X coordinate variable -- assuming meters.\n\n";
+  }
+  else
+  {
+    const char *x_coord_units_name = x_coord_units_att->as_string(0);
+    if (x_coord_units_name == 0)
+    {
+      mlog << Warning << "\n" << method_name << " -> "
+	   << "Cannot extract X coordinate units from netCDF file -- "
+	   << "assuming meters.\n\n";
+    }
+    else if (strcmp(x_coord_units_name, "m") != 0)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+	   << "X coordinates for lambert conformal data not given in meters.\n"
+	   << "The coordinates must be in meters for MET.\n\n";
+      exit(1);
+    }
+  }
+  
+  const NcAtt *y_coord_units_att = _yCoordVar->get_att("units");
+  if (y_coord_units_att == 0)
+  {
+    mlog << Warning << "\n" << method_name << " -> "
+	 << "Units not given for Y coordinate variable -- assuming meters.\n\n";
+  }
+  else
+  {
+    const char *y_coord_units_name = y_coord_units_att->as_string(0);
+    if (y_coord_units_name == 0)
+    {
+      mlog << Warning << "\n" << method_name << " -> "
+	   << "Cannot extract Y coordinate units from netCDF file -- "
+	   << "assuming meters.\n\n";
+    }
+    else if (strcmp(y_coord_units_name, "m") != 0)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+	   << "Y coordinates for lambert conformal data not given in meters.\n"
+	   << "The coordinates must be in meters for MET.\n\n";
+      exit(1);
+    }
+  }
+  
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   double x_values[_xDim->size()];
@@ -1037,9 +1086,6 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.ny = _yDim->size();
   
   grid.set(data);
-  
-//  grid.dump(cerr);
-  
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1213,6 +1259,11 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   // values since MET uses the mathematical coordinate system centered on
   // the center of the earth rather than the regular map coordinate system.
 
+  // Note that I am assuming that the data is ordered from the lower-left
+  // corner.  I think this will generally be the case, but it is not
+  // guaranteed anywhere that I see.  But if this is not the case, then we
+  // will probably also need to reorder the data itself.
+
   LatLonData data;
   
   data.name = latlon_proj_type;
@@ -1224,8 +1275,6 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   data.Nlon = _xDim->size();
 
   grid.set(data);
-  
-//  grid.dump(cerr);
 }
 
 ////////////////////////////////////////////////////////////////////////
