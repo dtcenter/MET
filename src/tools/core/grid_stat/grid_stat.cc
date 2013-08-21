@@ -69,6 +69,8 @@
 //   027    04/30/12  Halley Gotway  Move -fcst_valid, -fcst_lead,
 //                    -obs_valid, and -obs_lead command line options
 //                    to config file.
+//   028    08/21/13  Halley Gotway  Fix sizing of output tables for 12
+//                    or more probabilstic thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -875,16 +877,12 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    max_prob_col = get_n_pjc_columns(n_prob);
    max_mctc_col = get_n_mctc_columns(n_cat);
 
-   // Maximum number of standard STAT columns
-   max_col = max_stat_col + n_header_columns + 1;
-
-   // Maximum number of probabilistic columns
-   if(max_prob_col > max_col)
-      max_col = max_prob_col + n_header_columns + 1;
-
-   // Maximum number of multi-category contingency table columns
-   if(max_mctc_col > max_stat_col)
-      max_col = max_mctc_col + n_header_columns + 1;
+   // Determine the maximum number of data columns 
+   max_col = ( max_prob_col > max_stat_col ? max_prob_col : max_stat_col );
+   max_col = ( max_mctc_col > max_col      ? max_mctc_col : max_col );
+   
+   // Add the header columns
+   max_col += n_header_columns + 1;
 
    // Initialize file stream
    stat_out   = (ofstream *) 0;
