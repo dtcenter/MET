@@ -73,6 +73,90 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_lc_0">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_0.ps \
+      'name = "GTG"; level = "(0,0,*,*)";' \
+      -title "NCCF Lambert Conformal Level 0" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_0.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_lc_25">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_25.ps \
+      'name = "GTG"; level = "(0,25,*,*)";' \
+      -title "NCCF Lambert Conformal Level 25" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_25.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_lc_50">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_50.ps \
+      'name = "GTG"; level = "(0,50,*,*)";' \
+      -title "NCCF Lambert Conformal Level 50" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_50.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_latlon_0">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_0.ps \
+      'name = "GTG"; level = "(0,0,*,*)";' \
+      -title "NCCF Latitude/Longitude Level 0" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_0.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_latlon_12">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_12.ps \
+      'name = "GTG"; level = "(0,12,*,*)";' \
+      -title "NCCF Latitude/Longitude Level 12" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_12.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_latlon_25">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_25.ps \
+      'name = "GTG"; level = "(0,25,*,*)";' \
+      -title "NCCF Latitude/Longitude Level 25" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_25.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_GRIB2_PROB">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
