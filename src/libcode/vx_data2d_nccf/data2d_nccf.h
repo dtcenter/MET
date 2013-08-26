@@ -58,7 +58,7 @@ class MetNcCFDataFile : public Met2dDataFile {
 	if (_file == 0)
 	  return 0;
 	
-	return _file->nx();
+	return _file->getNx();
       }
       
 
@@ -67,7 +67,7 @@ class MetNcCFDataFile : public Met2dDataFile {
 	if (_file == 0)
 	  return 0;
 	
-	return _file->ny();
+	return _file->getNy();
       }
       
 

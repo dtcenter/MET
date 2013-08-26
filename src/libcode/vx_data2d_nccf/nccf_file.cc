@@ -362,7 +362,7 @@ int NcCfFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
-double NcCfFile::data(NcVar * var, const LongArray & a) const
+double NcCfFile::getData(NcVar * var, const LongArray & a) const
 {
   if (!args_ok(a))
   {
@@ -459,7 +459,7 @@ double NcCfFile::data(NcVar * var, const LongArray & a) const
 ////////////////////////////////////////////////////////////////////////
 
 
-bool NcCfFile::data(NcVar * v, const LongArray & a, DataPlane & plane) const
+bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 {
   if (!args_ok(a))
   {
@@ -572,7 +572,7 @@ bool NcCfFile::data(NcVar * v, const LongArray & a, DataPlane & plane) const
     {
       b[y_slot] = y;
 
-      double value = data(v, b);
+      double value = getData(v, b);
 
       plane.set(value, x, y);
 
@@ -588,15 +588,15 @@ bool NcCfFile::data(NcVar * v, const LongArray & a, DataPlane & plane) const
 ////////////////////////////////////////////////////////////////////////
 
 
-bool NcCfFile::data(const char *var_name,
-		    const LongArray &a, DataPlane &plane,
-		    NcVarInfo *&info) const
+bool NcCfFile::getData(const char *var_name,
+		       const LongArray &a, DataPlane &plane,
+		       NcVarInfo *&info) const
 {
   info = find_var_name(var_name);
   if (info == 0)
     return false;
   
-  bool found = data(info->var, a, plane);
+  bool found = getData(info->var, a, plane);
 
   //  store the times
 

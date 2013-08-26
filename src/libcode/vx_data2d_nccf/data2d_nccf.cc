@@ -152,9 +152,9 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
   NcVarInfo *info = (NcVarInfo *) 0;
 
-  bool status = _file->data(vinfo_nc->req_name(),
-			    vinfo_nc->dimension(),
-			    plane, info);
+  bool status = _file->getData(vinfo_nc->req_name(),
+			       vinfo_nc->dimension(),
+			       plane, info);
 
   // Check that the times match those requested
 
