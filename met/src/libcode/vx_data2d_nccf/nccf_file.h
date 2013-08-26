@@ -55,7 +55,7 @@ class NcCfFile {
       void dump(ostream &, int = 0) const;
 
 
-      int nx() const
+      int getNx() const
       {
 	if (_xDim == 0)
 	  return 0;
@@ -63,7 +63,7 @@ class NcCfFile {
 	return _xDim->size();
       }
       
-      int ny() const
+      int getNy() const
       {
 	if (_yDim == 0)
 	  return 0;
@@ -100,11 +100,11 @@ class NcCfFile {
          //  data
          //
 
-      double data(NcVar *, const LongArray &) const;
+      double getData(NcVar *, const LongArray &) const;
 
-      bool data(NcVar *, const LongArray &, DataPlane &) const;
+      bool getData(NcVar *, const LongArray &, DataPlane &) const;
 
-      bool data(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
+      bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
       NcVarInfo* find_var_name(const char * var_name) const;
 
