@@ -78,7 +78,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
       &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_0.ps \
-      'name = "GTG"; level = "(0,0,*,*)";' \
+      'name = "edr"; level = "(0,0,*,*)";' \
       -title "NCCF Lambert Conformal Level 0" \
       -v 1
     </param>
@@ -92,7 +92,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
       &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_25.ps \
-      'name = "GTG"; level = "(0,25,*,*)";' \
+      'name = "edr"; level = "(0,25,*,*)";' \
       -title "NCCF Lambert Conformal Level 25" \
       -v 1
     </param>
@@ -106,7 +106,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
       &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_50.ps \
-      'name = "GTG"; level = "(0,50,*,*)";' \
+      'name = "edr"; level = "(0,50,*,*)";' \
       -title "NCCF Lambert Conformal Level 50" \
       -v 1
     </param>
@@ -120,7 +120,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
       &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_0.ps \
-      'name = "GTG"; level = "(0,0,*,*)";' \
+      'name = "edr"; level = "(0,0,*,*)";' \
       -title "NCCF Latitude/Longitude Level 0" \
       -v 1
     </param>
@@ -134,7 +134,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
       &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_12.ps \
-      'name = "GTG"; level = "(0,12,*,*)";' \
+      'name = "edr"; level = "(0,12,*,*)";' \
       -title "NCCF Latitude/Longitude Level 12" \
       -v 1
     </param>
@@ -148,7 +148,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
       &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_25.ps \
-      'name = "GTG"; level = "(0,25,*,*)";' \
+      'name = "edr"; level = "(0,25,*,*)";' \
       -title "NCCF Latitude/Longitude Level 25" \
       -v 1
     </param>
