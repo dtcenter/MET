@@ -78,15 +78,15 @@ config.tab.o: config.tab.cc
 
 
 lex.config.o: lex.config.cc
-	$(CXX) lex.config.cc -c -g -I$(MET_INC_DIR)
+	$(CXX) lex.config.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 
 config_file.o: config_file.h config_file.cc configobjecttype_to_string.o dictionary.o config.tab.o lex.config.o
-	$(CXX) config_file.cc -c -g -I$(MET_INC_DIR)
+	$(CXX) config_file.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 
 config_util.o: config_util.h config_util.cc
-	$(CXX) config_util.cc -c -g -I$(MET_INC_DIR)
+	$(CXX) config_util.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
 
 
 ########################################################################
