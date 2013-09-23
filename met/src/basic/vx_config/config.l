@@ -53,7 +53,7 @@ extern void finish_string_scan ();
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool reading_string = false;
+// static bool reading_string = false;
 
 static bool reading_env    = false;
 

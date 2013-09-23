@@ -108,13 +108,13 @@ assign(c);
 ////////////////////////////////////////////////////////////////////////
 
 
-MetConfig::MetConfig(const char *filename)
+MetConfig::MetConfig(const char * _filename)
 
 {
 
 init_from_scratch();
 
-read(filename);
+read( _filename );
 
 }
 
@@ -425,13 +425,13 @@ const DictionaryEntry * MetConfig::lookup(const char * name)
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * _e = (const DictionaryEntry *) 0;
 
-e = Dictionary::lookup(name);
+_e = Dictionary::lookup(name);
 
-LastLookupStatus = (e != 0);
+LastLookupStatus = (_e != 0);
 
-return ( e );
+return ( _e );
 
 }
 
