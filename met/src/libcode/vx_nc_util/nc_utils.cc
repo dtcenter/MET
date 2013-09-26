@@ -85,6 +85,21 @@ int get_int_var(NcFile * nc, const char * var_name, int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
+double get_double_var(NcFile * nc, const char * var_name, int index) {
+   double k;
+   NcVar * var = (NcVar *) 0;
+
+   var = nc->get_var(var_name);
+
+   var->set_cur(index);
+
+   var->get(&k, 1);
+
+   return(k);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool args_ok(const LongArray & a) {
    int j, k;
 
