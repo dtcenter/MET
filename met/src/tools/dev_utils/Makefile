@@ -19,10 +19,18 @@ EXECUTABLES = chk4copyright \
               pbtime  \
               gribtab.dat_to_flat  \
               nceptab_to_flat  \
+              insitu_nc_to_ascii  \
 
 
-OBJECTS     = openpb.o \
+PB_OBJECTS  = openpb.o \
               readpb.o
+
+
+INSITU_OBJECTS = insitu_nc_file.o
+
+
+OBJECTS     = $(PB_OBJECTS) \
+              $(INSITU_OBJECTS)
 
 
 LIBRARIES   =
@@ -76,6 +84,10 @@ readpb.o: ../other/pb2nc/readpb.f
 	$(FC) ../other/pb2nc/readpb.f $(FC_FLAGS) -c
 
 
+insitu_nc_file.o: insitu_nc_file.cc
+	$(CXX) insitu_nc_file.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) $(NETCDF_INCS)
+
+
 ########################################################################
 
 
@@ -119,9 +131,9 @@ reformat_county_data: reformat_county_data.cc $(LIBRARIES)
 	cp reformat_county_data $(MET_BIN_DIR)
 
 
-pbtime: pbtime.cc $(OBJECTS)
+pbtime: pbtime.cc $(PB_OBJECTS)
 	@ echo
-	$(CXX) -o pbtime pbtime.cc $(OBJECTS) \
+	$(CXX) -o pbtime pbtime.cc $(PB_OBJECTS) \
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) $(BUFR_INCS) $(F2C_INCS) \
 	-L$(MET_LIB_DIR) $(BUFR_LIBS) $(F2C_LIBS) \
@@ -134,9 +146,9 @@ pbtime: pbtime.cc $(OBJECTS)
 	cp pbtime $(MET_BIN_DIR)
 
 
-gribtab.dat_to_flat: gribtab.dat_to_flat.cc $(OBJECTS)
+gribtab.dat_to_flat: gribtab.dat_to_flat.cc $(PB_OBJECTS)
 	@ echo
-	$(CXX) -o gribtab.dat_to_flat gribtab.dat_to_flat.cc $(OBJECTS) \
+	$(CXX) -o gribtab.dat_to_flat gribtab.dat_to_flat.cc $(PB_OBJECTS) \
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) $(BUFR_INCS) $(F2C_INCS) \
 	-L$(MET_LIB_DIR) $(BUFR_LIBS) $(F2C_LIBS) \
@@ -149,9 +161,9 @@ gribtab.dat_to_flat: gribtab.dat_to_flat.cc $(OBJECTS)
 	cp gribtab.dat_to_flat $(MET_BIN_DIR)
 
 
-nceptab_to_flat: nceptab_to_flat.cc $(OBJECTS)
+nceptab_to_flat: nceptab_to_flat.cc $(PB_OBJECTS)
 	@ echo
-	$(CXX) -o nceptab_to_flat nceptab_to_flat.cc $(OBJECTS) \
+	$(CXX) -o nceptab_to_flat nceptab_to_flat.cc $(PB_OBJECTS) \
 	$(CXX_FLAGS) \
 	-I$(MET_INC_DIR) $(BUFR_INCS) $(F2C_INCS) \
 	-L$(MET_LIB_DIR) $(BUFR_LIBS) $(F2C_LIBS) \
@@ -164,17 +176,30 @@ nceptab_to_flat: nceptab_to_flat.cc $(OBJECTS)
 	cp nceptab_to_flat $(MET_BIN_DIR)
 
 
+insitu_nc_to_ascii: insitu_nc_to_ascii.cc $(INSITU_OBJECTS) $(LIBRARIES)
+	@ echo
+	$(CXX) -o insitu_nc_to_ascii insitu_nc_to_ascii.cc $(INSITU_OBJECTS) \
+	$(CXX_FLAGS) \
+	-I$(MET_INC_DIR) $(NETCDF_INCS) \
+	-L$(MET_LIB_DIR) $(NETCDF_LIBS) \
+	-lvx_util \
+	-lvx_log \
+	-lm -lnetcdf_c++ -lnetcdf
+	cp insitu_nc_to_ascii $(MET_BIN_DIR)
+
+
 ########################################################################
 
 
 clean:
-	rm -f *.a *.o *.ps temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
+	rm -f *.a *.o *.ps temp junk core a.out $(PB_OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	rm -f $(MET_BIN_DIR)/chk4copyright
 	rm -f $(MET_BIN_DIR)/reformat_map_data
 	rm -f $(MET_BIN_DIR)/reformat_county_data
 	rm -f $(MET_BIN_DIR)/pbtime
 	rm -f $(MET_BIN_DIR)/gribtab.dat_to_flat
 	rm -f $(MET_BIN_DIR)/nceptab_to_flat
+	rm -f $(MET_BIN_DIR)/insitu_nc_to_ascii
 
 
 ########################################################################
