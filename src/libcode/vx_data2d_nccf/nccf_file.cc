@@ -33,17 +33,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char valid_time_att_name [] = "valid_time_ut";
-static const char  init_time_att_name [] = "init_time_ut";
-static const char accum_time_att_name [] = "accum_time_sec";
-
-static const char name_att_name       [] = "name";
-static const char long_name_att_name  [] = "long_name";
-static const char level_att_name      [] = "level";
-static const char units_att_name      [] = "units";
-
 static const int  max_met_args           = 30;
-
 
 const double NcCfFile::DELTA_TOLERANCE = 15.0;
 
@@ -185,6 +175,11 @@ bool NcCfFile::open(const char * filename)
     _dimNames.add(_dims[j]->name());
   }
 
+  // Pull out the init and valid times
+
+  InitTime = (unixtime)get_double_var(_ncFile, "forecast_reference_time");
+  ValidTime = (unixtime)get_double_var(_ncFile, "time");
+  
   // Pull out the variables
 
   Nvars = _ncFile->num_vars();
@@ -205,20 +200,8 @@ bool NcCfFile::open(const char * filename)
 
     //  parse the variable attributes
    
-    int init_int;
-    int valid_int;
-    
-    get_att_str( Var[j], name_att_name,       Var[j].name_att      );
-    get_att_str( Var[j], long_name_att_name,  Var[j].long_name_att );
-    get_att_str( Var[j], level_att_name,      Var[j].level_att     );
-    get_att_str( Var[j], units_att_name,      Var[j].units_att     );
-    get_att_int( Var[j], accum_time_att_name, Var[j].AccumTime     );
-    get_att_int( Var[j], init_time_att_name,  init_int             );
-    get_att_int( Var[j], valid_time_att_name, valid_int            );
-
-    InitTime  = (unixtime)init_int;
-    ValidTime = (unixtime)valid_int;
-
+    get_att_str( Var[j], "long_name",  Var[j].long_name_att );
+    get_att_str( Var[j], "units",      Var[j].units_att     );
   }   //  for j
 
   // Pull out the grid.  This must be done after pulling out the dimension
