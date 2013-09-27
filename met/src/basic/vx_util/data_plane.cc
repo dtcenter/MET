@@ -350,6 +350,78 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
    return;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+
+void DataPlane::shift_right(int N)
+
+{
+
+   //
+   //  check some stuff
+   //
+
+
+if ( !Data )  {
+
+   mlog << Error 
+        << "\n\n  DataPlane::shift_right(int) -> data plane is empty!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+if ( N < 0 )  {
+
+   mlog << Error 
+        << "\n\n  DataPlane::shift_right(int) -> shift amount can't be negative\n\n";
+
+   exit ( 1 );
+
+}
+
+
+if ( N == 0 )  return;   //  no shift, so do nothing
+
+   //
+   //  ok, get to work
+   //
+
+int x, y, x_new;
+int index_old, index_new;
+double * new_data;
+
+new_data = new double [Nxy];
+
+for (x=0; x<Nx; ++x)  {
+
+   x_new = (x + N)%Nx;
+
+   for (y=0; y<Ny; ++y)  {
+
+      index_old = two_to_one(x,     y);
+      index_new = two_to_one(x_new, y);
+
+      new_data[index_new] = Data[index_old];
+
+   }
+
+}
+
+delete [] Data;
+
+Data = new_data;  new_data = (double *) 0;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //

@@ -52,9 +52,9 @@ class DataPlane {
 
       void dump(ostream &, int = 0) const;
 
-      //
-      // Set functions
-      //
+         //
+         // Set functions
+         //
 
       void set_size(int Nx, int Ny);
       void set(double, int, int);
@@ -65,9 +65,9 @@ class DataPlane {
       void set_lead(int);
       void set_accum(int);
 
-      //
-      // Get functions
-      //
+         //
+         // Get functions
+         //
 
       int      nx() const;
       int      ny() const; 
@@ -80,9 +80,9 @@ class DataPlane {
 
       const double * data () const;
 
-      //
-      // Do stuff
-      //
+         //
+         // Do stuff
+         //
 
       void threshold(const SingleThresh &);
       
@@ -93,6 +93,8 @@ class DataPlane {
       bool f_is_on(int x, int y) const;
 
       void data_range(double & data_min, double & data_max) const;
+
+      void shift_right  (int n);
 };
 
 ////////////////////////////////////////////////////////////////////////
