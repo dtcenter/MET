@@ -35,7 +35,7 @@ using namespace std;
 
 const long FileHandler::HDR_ARRAY_LEN  = 3;  // Observation header length
 const long FileHandler::OBS_ARRAY_LEN  = 5;  // Observation values length
-const long FileHandler::MAX_STRING_LEN  = 30;  // Maximum length for strings
+const long FileHandler::MAX_STRING_LEN  = 40; // Maximum length for strings
                                               //   in the netCDF file
 
 const float FileHandler::FILL_VALUE = -9999.f;
@@ -623,6 +623,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
 				const ConcatString &hdr_vld,
 				double lat, double lon, double elv) {
   float hdr_arr[HDR_ARRAY_LEN];
+  int hdr_sid_len;
 
    //
    // Increment header count before writing
@@ -649,8 +650,19 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    //
    // Store the station id
    //
+
+   if(hdr_sid.length() > MAX_STRING_LEN) {
+      mlog << Warning << "\nFileHandler::_writeHdrInfo() -> "
+           << "only writing the first " << MAX_STRING_LEN
+           << " of station id: " << hdr_sid << "\n\n";
+      hdr_sid_len = MAX_STRING_LEN;
+   }
+   else {
+      hdr_sid_len = hdr_sid.length();
+   }
+
    if(!_hdrStationIdVar->set_cur(_hdrNum, (long) 0) ||
-      !_hdrStationIdVar->put(hdr_sid, (long) 1, (long) hdr_sid.length())) {
+      !_hdrStationIdVar->put(hdr_sid, (long) 1, (long) hdr_sid_len)) {
       mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
            << "error writing the station id to the NetCDF file\n\n";
       return false;
