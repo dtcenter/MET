@@ -246,6 +246,33 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void Met2dDataFile::copy_raw_grid_to_dest()
+
+{
+
+if ( ! Raw_Grid )  {
+
+   mlog << Error
+        << "Met2dDataFile::copy_raw_grid_to_dest() -> no raw grid set!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = 0; }
+
+Dest_Grid = new Grid;
+
+(*Dest_Grid) = (*Raw_Grid);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 
 

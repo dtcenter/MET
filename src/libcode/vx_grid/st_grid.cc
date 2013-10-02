@@ -454,9 +454,11 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-void StereographicGrid::shift_right(int)
+void StereographicGrid::shift_right(int N)
 
 {
+
+if ( N == 0 )  return;
 
 mlog << Error
      << "\n\n  StereographicGrid::shift_right(int) -> "

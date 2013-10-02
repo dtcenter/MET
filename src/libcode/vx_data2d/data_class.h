@@ -96,6 +96,8 @@ class Met2dDataFile : public Met2dData {
       Grid * Raw_Grid;       //  Grid for raw data ... allocated
       Grid * Dest_Grid;      //  Grid for destination data ... allocated
 
+      void copy_raw_grid_to_dest();
+
       ConcatString Filename;
 
       int ShiftRight;

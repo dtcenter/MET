@@ -458,9 +458,11 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-void MercatorGrid::shift_right(int)
+void MercatorGrid::shift_right(int N)
 
 {
+
+if ( N == 0 )  return;
 
 mlog << Error
      << "\n\n  MercatorGrid::shift_right(int) -> "
