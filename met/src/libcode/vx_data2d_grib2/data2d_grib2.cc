@@ -135,9 +135,9 @@ void MetGrib2DataFile::dump(ostream & out, int depth) const {
    if ( Filename.empty() )  out << "(nul)\n";
    else                     out << '\"' << Filename << "\"\n";
 
-   if ( _Grid )  {
+   if ( Raw_Grid )  {
       out << prefix << "Grid:\n";
-      _Grid->dump(out, depth + 1);
+      Raw_Grid->dump(out, depth + 1);
    } else {
       out << prefix << "No Grid!\n";
    }
@@ -458,7 +458,7 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
    DataPlane u2d, v2d, u2d_rot, v2d_rot;
    if( 'U' == parm_name.at(0) ){ u2d = plane;  v2d = plane_pair; }
    else                        { v2d = plane;  u2d = plane_pair; }
-   rotate_uv_grid_to_earth(u2d, v2d, *_Grid, u2d_rot, v2d_rot);
+   rotate_uv_grid_to_earth(u2d, v2d, *Raw_Grid, u2d_rot, v2d_rot);
    if( 'U' == parm_name.at(0) ){ plane = u2d_rot; }
    else                        { plane = v2d_rot; }
 
@@ -537,7 +537,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
    while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, cgrib, numfields)) ){
 
       //  read the grid information, if necessary
-      if( !_Grid || 1 > _Grid->nx() || 1 > _Grid->ny() ) read_grib2_grid(gfld);
+      if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) read_grib2_grid(gfld);
 
       //  treat each field of the record as a separate record
       for(int i=1; i <= numfields; i++){
@@ -705,7 +705,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
    double d;
    int ResCompFlag;
 
-   _Grid = new Grid();
+   Raw_Grid = new Grid();
 
    //  determine the radius of the earth
    double r_km = -1;
@@ -761,7 +761,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
          data.lon_ll = rescale_lon(data.lon_ll - (data.Nlon - 1) * data.delta_lon);
 
       //  store the grid information
-      _Grid->set(data);
+      Raw_Grid->set(data);
 
       if( print_grid ){
          mlog << Debug(4) << "\n"
@@ -808,7 +808,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.ny           = gfld->igdtmpl[8];
 
       //  store the grid information
-      _Grid->set(data);
+      Raw_Grid->set(data);
 
       if( print_grid ){
          mlog << Debug(4) << "\n"
@@ -843,7 +843,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.ny     = gfld->igdtmpl[8];
 
       //  store the grid information
-      _Grid->set(data);
+      Raw_Grid->set(data);
 
       if( print_grid ){
          mlog << Debug(4) << "\n"
@@ -879,7 +879,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       data.ny           = gfld->igdtmpl[8];
 
       //  store the grid information
-      _Grid->set(data);
+      Raw_Grid->set(data);
 
       if( print_grid ){
          mlog << Debug(4) << "\n"
@@ -927,9 +927,9 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
    }
 
    //  ensure the grid has been read, and initialize the grid size
-   if( !_Grid || 1 > _Grid->nx() || 1 > _Grid->ny() ) read_grib2_grid(gfld);
-   int n_x = _Grid->nx();
-   int n_y = _Grid->ny();
+   if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) read_grib2_grid(gfld);
+   int n_x = Raw_Grid->nx();
+   int n_y = Raw_Grid->ny();
 
    //  determine whether or not the data bitmap applies
    bool apply_bmap = ( 0 == gfld->ibmap || 254 == gfld->ibmap );

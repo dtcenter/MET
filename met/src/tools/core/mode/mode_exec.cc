@@ -153,6 +153,7 @@ Met2dDataFileFactory mtddf_factory;
    // Read the config files
    engine.conf_info.read_config(default_config_file, match_config_file);
 
+
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
@@ -164,6 +165,7 @@ Met2dDataFileFactory mtddf_factory;
       exit(1);
    }
 
+
    // Read observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
       mlog << Error << "\nTrouble reading observation file \""
@@ -171,12 +173,18 @@ Met2dDataFileFactory mtddf_factory;
       exit(1);
    }
 
+
    // Store the input data file types
    ftype = fcst_mtddf->file_type();
    otype = obs_mtddf->file_type();
 
    // Process the configuration
    engine.conf_info.process_config(ftype, otype);
+
+   const int shift = engine.conf_info.shift_right;
+
+   fcst_mtddf->set_shift_right(shift);
+    obs_mtddf->set_shift_right(shift);
 
    // List the input files
    mlog << Debug(1)
@@ -239,6 +247,8 @@ void ModeExecutive::setup_fcst_obs_data()
    }
 
    grid = fcst_mtddf->grid();
+
+   grid.dump(cout);
 
       // Print a warning if the valid times do not match
 

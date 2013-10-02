@@ -480,6 +480,38 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
+void LambertGrid::shift_right(int N)
+
+{
+
+mlog << Error 
+     << "\n\n  LambertGrid::shift_right(int) -> "
+     << "shifting is not allowed for non-global grids\n\n";
+
+exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridRep * LambertGrid::copy() const
+
+{
+
+LambertGrid * p = new LambertGrid (Data);
+
+return ( p );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -582,8 +614,6 @@ if ( !rep )  {
    exit ( 1 );
 
 }
-
-rep->refCount = 1;
 
 }
 

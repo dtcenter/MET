@@ -185,9 +185,13 @@ GF->seek_record(0);
 
 (*GF) >> CurrentRecord;
 
-_Grid = new Grid;
+Raw_Grid = new Grid;
 
-gds_to_grid(*(CurrentRecord.gds), *(_Grid));
+gds_to_grid(*(CurrentRecord.gds), *(Raw_Grid));
+
+Dest_Grid = new Grid;
+
+(*Dest_Grid) = (*Raw_Grid);
 
 get_data_plane(CurrentRecord, Plane);
 
@@ -215,11 +219,11 @@ out << prefix << "File = ";
 if ( Filename.empty() )  out << "(nul)\n";
 else                     out << '\"' << Filename << "\"\n";
 
-if ( _Grid )  {
+if ( Raw_Grid )  {
 
    out << prefix << "Grid:\n";
 
-   _Grid->dump(out, depth + 1);
+   Raw_Grid->dump(out, depth + 1);
 
 } else {
 

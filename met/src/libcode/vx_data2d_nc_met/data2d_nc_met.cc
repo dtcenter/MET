@@ -103,9 +103,13 @@ bool MetNcMetDataFile::open(const char * _filename) {
 
    Filename = _filename;
 
-   _Grid = new Grid;
+   Raw_Grid = new Grid;
 
-   *(_Grid) = MetNc->grid;
+   *(Raw_Grid) = MetNc->grid;
+
+   Dest_Grid = new Grid;
+
+   (*Dest_Grid) = (*Raw_Grid);
 
    return(true);
 }
@@ -121,7 +125,10 @@ void MetNcMetDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
+
+{
+
    bool status = false;
    ConcatString req_time_str, data_time_str;
    VarInfoNcMet * vinfo_nc = (VarInfoNcMet *) &vinfo;
@@ -148,6 +155,8 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    status = MetNc->data(vinfo_nc->req_name(),
                         vinfo_nc->dimension(),
                         plane, info);
+
+   if ( ShiftRight != 0 )  plane.shift_right(ShiftRight);
 
    // Check that the times match those requested
    if(status) {

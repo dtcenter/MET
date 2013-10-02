@@ -93,9 +93,12 @@ class Met2dDataFile : public Met2dData {
 
    protected:
 
-      Grid * _Grid;        //  allocated
+      Grid * Raw_Grid;       //  Grid for raw data ... allocated
+      Grid * Dest_Grid;      //  Grid for destination data ... allocated
 
       ConcatString Filename;
+
+      int ShiftRight;
 
    public:
 
@@ -110,6 +113,7 @@ class Met2dDataFile : public Met2dData {
          //  set stuff
          //
 
+      void set_shift_right(int);
 
          //
          //  get stuff
@@ -117,13 +121,18 @@ class Met2dDataFile : public Met2dData {
 
       virtual const char * filename() const;
 
-      virtual const Grid & grid() const;
+      virtual const Grid & grid     () const;
+      virtual const Grid & raw_grid () const;
 
       virtual int nx() const;
-
       virtual int ny() const;
 
+      virtual int raw_nx() const;
+      virtual int raw_ny() const;
+
       virtual GrdFileType file_type() const = 0;
+
+      int shift_right() const;
 
          //
          //  do stuff
@@ -151,10 +160,15 @@ class Met2dDataFile : public Met2dData {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Met2dDataFile::nx() const { return ( _Grid ? (_Grid->nx()) : 0 ); }
-inline int Met2dDataFile::ny() const { return ( _Grid ? (_Grid->ny()) : 0 ); }
+inline int Met2dDataFile::nx() const { return ( Dest_Grid ? (Dest_Grid->nx()) : 0 ); }
+inline int Met2dDataFile::ny() const { return ( Dest_Grid ? (Dest_Grid->ny()) : 0 ); }
+
+inline int Met2dDataFile::raw_nx() const { return ( Raw_Grid ? (Raw_Grid->nx()) : 0 ); }
+inline int Met2dDataFile::raw_ny() const { return ( Raw_Grid ? (Raw_Grid->ny()) : 0 ); }
 
 inline const char * Met2dDataFile::filename() const { return ( Filename ); }
+
+inline int Met2dDataFile::shift_right() const { return ( ShiftRight ); }
 
 
 ////////////////////////////////////////////////////////////////////////

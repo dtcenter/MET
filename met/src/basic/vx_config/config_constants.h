@@ -448,6 +448,7 @@ static const char conf_key_zero_border_size[]      = "zero_border_size";
 static const char conf_key_plot_valid_flag[]       = "plot_valid_flag";
 static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
+static const char conf_key_shift_right_value[]     = "shift_right";
 
 //
 // PB2NC specific parameter key names
