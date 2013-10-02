@@ -195,6 +195,8 @@ Dest_Grid = new Grid;
 
 get_data_plane(CurrentRecord, Plane);
 
+if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
+
 
    //
    //  done
@@ -324,6 +326,8 @@ return (false);
    // put the current record into the plane
    //
 if( read_plane ) get_data_plane(CurrentRecord, Plane);
+
+if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
 
 return (true);
 
@@ -534,6 +538,8 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
             continue;
          }
 
+         if ( status && (ShiftRight != 0) )  cur_plane.shift_right(ShiftRight);
+
          // Add current record to the data plane array
          plane_array.add(cur_plane, (double) lower, (double) upper);
 
@@ -697,6 +703,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
 
          // Read current record
          status = get_data_plane(r, plane);
+         if ( status && (ShiftRight != 0) )  plane.shift_right(ShiftRight);
          break;
       }
    } // end for loop
