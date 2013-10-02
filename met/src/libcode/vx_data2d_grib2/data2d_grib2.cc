@@ -136,10 +136,17 @@ void MetGrib2DataFile::dump(ostream & out, int depth) const {
    else                     out << '\"' << Filename << "\"\n";
 
    if ( Raw_Grid )  {
-      out << prefix << "Grid:\n";
+      out << prefix << "Raw Grid:\n";
       Raw_Grid->dump(out, depth + 1);
    } else {
-      out << prefix << "No Grid!\n";
+      out << prefix << "No raw Grid!\n";
+   }
+
+   if ( Dest_Grid )  {
+      out << prefix << "Dest Grid:\n";
+      Dest_Grid->dump(out, depth + 1);
+   } else {
+      out << prefix << "No dest Grid!\n";
    }
 
    out.flush();
@@ -701,7 +708,10 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
+void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
+
+{
+
    double d;
    int ResCompFlag;
 
@@ -763,6 +773,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       //  store the grid information
       Raw_Grid->set(data);
 
+      copy_raw_grid_to_dest();
+
       if( print_grid ){
          mlog << Debug(4) << "\n"
               << "Latitude/Longitude Grid Data:\n"
@@ -810,6 +822,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
       //  store the grid information
       Raw_Grid->set(data);
 
+      copy_raw_grid_to_dest();
+
       if( print_grid ){
          mlog << Debug(4) << "\n"
               << "Stereographic Grid Data:\n"
@@ -844,6 +858,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
 
       //  store the grid information
       Raw_Grid->set(data);
+
+      copy_raw_grid_to_dest();
 
       if( print_grid ){
          mlog << Debug(4) << "\n"
@@ -880,6 +896,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
 
       //  store the grid information
       Raw_Grid->set(data);
+
+      copy_raw_grid_to_dest();
 
       if( print_grid ){
          mlog << Debug(4) << "\n"

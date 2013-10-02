@@ -484,6 +484,8 @@ void LambertGrid::shift_right(int N)
 
 {
 
+if ( N == 0 )  return;
+
 mlog << Error 
      << "\n\n  LambertGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";

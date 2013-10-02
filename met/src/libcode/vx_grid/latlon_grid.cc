@@ -302,6 +302,8 @@ void LatLonGrid::shift_right(int N)
 
 {
 
+if ( N == 0 )  return;
+
 if ( ! is_global() ) {
 
    mlog << Error 

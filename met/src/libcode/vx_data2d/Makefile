@@ -132,6 +132,7 @@ test_table_read: test_table_read.cc libvx_data2d.a
 	-lvx_cal \
 	-lvx_log \
 	-lvx_data2d \
+     -lvx_grid  \
 	-lvx_util \
 	-lvx_math \
 	$(CXX_LIBS)
@@ -147,6 +148,7 @@ dump_default_table: dump_default_table.cc libvx_data2d.a
 	-lvx_cal \
 	-lvx_log \
 	-lvx_data2d \
+     -lvx_grid  \
 	-lvx_util \
 	-lvx_math \
 	$(CXX_LIBS)
