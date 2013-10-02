@@ -127,6 +127,8 @@ class ModeConfInfo {
       bool             nc_pairs_flag;          // Flag for the output NetCDF pairs file
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
 
+      int              shift_right;            //  shift amount for global grids
+
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version
 

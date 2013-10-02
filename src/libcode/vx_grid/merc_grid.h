@@ -92,6 +92,10 @@ class MercatorGrid : public GridRep {
 
       bool is_global() const;
 
+      void shift_right(int);
+
+      GridRep * copy() const;
+
 };
 
 

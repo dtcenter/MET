@@ -29,21 +29,28 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-ModeConfInfo::ModeConfInfo() {
+ModeConfInfo::ModeConfInfo()
+
+{
 
    init_from_scratch();
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ModeConfInfo::~ModeConfInfo() {
+ModeConfInfo::~ModeConfInfo()
+
+{
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeConfInfo::init_from_scratch() {
+void ModeConfInfo::init_from_scratch()
+
+{
 
    // Initialize pointers
    fcst_info = (VarInfo *) 0;
@@ -138,6 +145,8 @@ void ModeConfInfo::clear()
    ps_plot_flag    = false;
    nc_pairs_flag   = false;
    ct_stats_flag   = false;
+
+   shift_right = 0;
 
    output_prefix.clear();
 
@@ -477,6 +486,10 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: output_prefix
 
    output_prefix = conf.lookup_string(conf_key_output_prefix);
+
+      // Conf: shift_right
+
+   shift_right = fcst_dict->lookup_int(conf_key_shift_right_value);
 
    return;
 

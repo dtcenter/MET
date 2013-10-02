@@ -458,6 +458,38 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
+void MercatorGrid::shift_right(int)
+
+{
+
+mlog << Error
+     << "\n\n  MercatorGrid::shift_right(int) -> "
+     << "shifting is not allowed for non-global grids\n\n";
+
+exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridRep * MercatorGrid::copy() const
+
+{
+
+MercatorGrid * p = new MercatorGrid (Data);
+
+return ( p );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -575,8 +607,6 @@ if ( !rep )  {
    exit ( 1 );
 
 }
-
-rep->refCount = 1;
 
 return;
 

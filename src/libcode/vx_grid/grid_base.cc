@@ -319,8 +319,6 @@ GridRep::GridRep()
 
 {
 
-refCount = 0;
-
 }
 
 
@@ -357,7 +355,7 @@ Grid::~Grid()
 
 {
 
-detach();
+clear();
 
 }
 
@@ -373,9 +371,8 @@ init_from_scratch();
 
 assign(g);
 
-// attach(g.rep);
-
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -386,8 +383,6 @@ Grid & Grid::operator=(const Grid & g)
 {
 
 if ( this == &g )  return ( * this );
-
-// attach(g.rep);
 
 assign(g);
 
@@ -431,7 +426,7 @@ void Grid::clear()
 
 {
 
-detach();
+if ( rep )  { delete rep;  rep = (GridRep *) 0; }
 
 return;
 
@@ -447,7 +442,9 @@ void Grid::assign(const Grid & g)
 
 clear();
 
-attach(g.rep);
+if ( ! (g.rep) )  return;
+
+rep = g.rep->copy();
 
 return;
 
@@ -491,42 +488,6 @@ Indent prefix(depth);
 out << prefix << "Grid Base ...\n";
 
 if ( rep )  rep->dump(out, depth + 1);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Grid::detach()
-
-{
-
-if ( !rep )  return;
-
-if ( --(rep->refCount) <= 0 )  { delete rep;  }
-
-rep = (GridRep *) 0;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Grid::attach(GridRep * r)
-
-{
-
-detach();
-
-rep = r;
-
-if ( rep )  ++(rep->refCount);
 
 return;
 
@@ -680,6 +641,26 @@ if ( !rep )  {
 }
 
 return ( rep->is_global() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::shift_right(int N)
+
+{
+
+if ( !rep )  {
+
+   mlog << Error << "\nGrid::shift_right() -> empty grid!\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( rep->shift_right(N) );
 
 }
 

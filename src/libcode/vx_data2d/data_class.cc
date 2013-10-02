@@ -108,7 +108,10 @@ void Met2dDataFile::mtddf_init_from_scratch()
 
 {
 
-_Grid = (Grid *) 0;
+Raw_Grid  = (Grid *) 0;
+Dest_Grid = (Grid *) 0;
+
+ShiftRight = 0;
 
 return;
 
@@ -124,9 +127,12 @@ void Met2dDataFile::mtddf_clear()
 
 // mttd_clear();
 
-if ( _Grid )  { delete _Grid;  _Grid = (Grid *) 0; }
+if ( Raw_Grid  )  { delete Raw_Grid;   Raw_Grid  = (Grid *) 0; }
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) 0; }
 
 Filename.clear();
+
+ShiftRight = 0;
 
 return;
 
@@ -147,15 +153,28 @@ out << prefix << "File = ";
 if ( Filename.empty() )  out << "(nul)\n";
 else                     out << '\"' << Filename << "\"\n";
 
-out << prefix << "Grid = ";
+out << prefix << "Raw Grid = ";
 
-if ( _Grid )  {
+if ( Raw_Grid )  {
 
    out << '\n';
 
-   _Grid->dump(out, depth + 1);
+   Raw_Grid->dump(out, depth + 1);
 
 } else out << "(nul)\n";
+
+
+out << prefix << "Dest Grid = ";
+
+if ( Dest_Grid )  {
+
+   out << '\n';
+
+   Dest_Grid->dump(out, depth + 1);
+
+} else out << "(nul)\n";
+
+out << prefix << "ShiftRight = " << ShiftRight << '\n';
    
    //
    //  done
@@ -175,7 +194,7 @@ const Grid & Met2dDataFile::grid() const
 
 {
 
-if ( ! _Grid )  {
+if ( ! Dest_Grid )  {
 
    mlog << Error << "\nMet2dDataFile::grid() -> no grid defined!\n\n";
 
@@ -183,12 +202,49 @@ if ( ! _Grid )  {
 
 }
 
-return ( *_Grid );
+return ( *Dest_Grid );
 
 }
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+const Grid & Met2dDataFile::raw_grid() const
+
+{
+
+if ( ! Raw_Grid )  {
+
+   mlog << Error << "\nMet2dDataFile::raw_grid() -> no raw grid defined!\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( *Raw_Grid );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Met2dDataFile::set_shift_right(int N)
+
+{
+
+ShiftRight = N;
+
+Dest_Grid->shift_right(ShiftRight);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 
 

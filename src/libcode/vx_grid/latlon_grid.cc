@@ -298,6 +298,59 @@ return ( full_range_lat && full_range_lon );
 ////////////////////////////////////////////////////////////////////////
 
 
+void LatLonGrid::shift_right(int N)
+
+{
+
+if ( ! is_global() ) {
+
+   mlog << Error 
+        << "\n\n  LatLonGrid::shift_right(int) -> "
+        << "shifting is not allowed for non-global grids\n\n";
+
+   exit ( 1 );
+
+}
+
+
+N %= Nx;
+
+if ( N < 0 )  N += Nx;
+
+if ( N == 0 )  return;
+
+
+double new_lat_ll, new_lon_ll;
+
+// xy_to_latlon( N, 0.0, new_lat_ll, new_lon_ll);
+   xy_to_latlon(-N, 0.0, new_lat_ll, new_lon_ll);
+
+lon_ll = new_lon_ll;
+
+Data.lon_ll = new_lon_ll;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridRep * LatLonGrid::copy() const
+
+{
+
+LatLonGrid * p = new LatLonGrid (Data);
+
+return ( p );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -335,8 +388,6 @@ if ( !rep )  {
    exit ( 1 );
 
 }
-
-rep->refCount = 1;
 
 return;
 

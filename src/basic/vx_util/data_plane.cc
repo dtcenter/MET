@@ -371,16 +371,9 @@ if ( !Data )  {
 
 }
 
+N %= Nx;
 
-if ( N < 0 )  {
-
-   mlog << Error 
-        << "\n\n  DataPlane::shift_right(int) -> shift amount can't be negative\n\n";
-
-   exit ( 1 );
-
-}
-
+if ( N < 0 )  N += Nx;
 
 if ( N == 0 )  return;   //  no shift, so do nothing
 
@@ -390,7 +383,7 @@ if ( N == 0 )  return;   //  no shift, so do nothing
 
 int x, y, x_new;
 int index_old, index_new;
-double * new_data;
+double * new_data = (double *) 0;
 
 new_data = new double [Nxy];
 

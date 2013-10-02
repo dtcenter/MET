@@ -122,6 +122,8 @@ class GridInterface {   //  pure abstract class for grid public interface
 
       virtual bool is_global() const = 0;
 
+      virtual void shift_right(int) = 0;
+
 };
 
 
@@ -133,8 +135,6 @@ class GridRep : public GridInterface {
       friend class Grid;
 
    private:
-
-      int refCount;
 
       GridRep(const GridRep &);
       GridRep & operator=(const GridRep &);
@@ -154,6 +154,10 @@ class GridRep : public GridInterface {
 
       virtual bool is_global() const = 0;
 
+      virtual void shift_right(int) = 0;
+
+      virtual GridRep * copy() const = 0;
+
 };
 
 
@@ -171,10 +175,6 @@ class Grid : public GridInterface {
       void assign(const Grid &);
 
       GridRep * rep;
-
-      void detach();
-
-      void attach(GridRep *);
 
    public:
 
@@ -214,6 +214,8 @@ class Grid : public GridInterface {
       double rot_grid_to_earth(int x, int y) const;
 
       bool is_global() const;
+
+      void shift_right(int);
 
 };
 
