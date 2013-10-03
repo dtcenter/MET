@@ -287,10 +287,15 @@ bool LatLonGrid::is_global() const
 
 {
 
-const bool full_range_lat = (fabs(Ny*delta_lat) >= 180.0);
-const bool full_range_lon = (fabs(Nx*delta_lon) >= 360.0);
+const double lon_range = fabs((Nx + 1)*delta_lon);
+const double lat_range = fabs((Ny + 1)*delta_lat);
 
-return ( full_range_lat && full_range_lon );
+const bool full_range_lat = (lat_range >= 180.0);
+const bool full_range_lon = (lon_range >= 360.0);
+
+const bool answer = full_range_lat && full_range_lon;
+
+return ( answer );
 
 }
 
