@@ -248,7 +248,7 @@ void ModeExecutive::setup_fcst_obs_data()
 
    grid = fcst_mtddf->grid();
 
-   grid.dump(cout);
+   // grid.dump(cout);
 
       // Print a warning if the valid times do not match
 
