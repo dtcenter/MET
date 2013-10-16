@@ -87,13 +87,13 @@ assign(b);
 ////////////////////////////////////////////////////////////////////////
 
 
-Box::Box(double _L, double _R, double _B, double _T)
+Box::Box(double _Left, double _Right, double _Bottom, double _Top)
 
 {
 
 init_from_scratch();
 
-set_lrbt (_L, _R, _B, _T);
+set_lrbt (_Left, _Right, _Bottom, _Top);
 
 }
 
@@ -165,15 +165,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Box::set_lrbt(double _L, double _R, double _B, double _T)
+void Box::set_lrbt(double _Left, double _Right, double _Bottom, double _Top)
 
 {
 
-Left  = _L;
-Right = _R;
+Left  = _Left;
+Right = _Right;
 
-Bottom = _B;
-Top    = _T;
+Bottom = _Bottom;
+Top    = _Top;
 
 if ( (width() < 0.0) || (height() < 0.0) )  {
 

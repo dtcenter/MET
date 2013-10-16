@@ -76,7 +76,7 @@ class Box {
       Box();
      ~Box();
       Box(const Box &);
-      Box(double _L, double _R, double _B, double _T);
+      Box(double _Left, double _Right, double _Bottom, double _Top);
       Box & operator=(const Box &);
 
       void clear();
@@ -85,7 +85,7 @@ class Box {
          //  set stuff
          //
 
-      void set_lrbt (double _L, double _R, double _B, double _T);
+      void set_lrbt (double _Left, double _Right, double _Bottom, double _Top);
       void set_llwh (double _xLL, double _yLL, double _Width, double _Height);
 
          //
