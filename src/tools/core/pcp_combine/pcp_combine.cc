@@ -63,6 +63,8 @@
 //
 //   014    03/07/12  Halley Gotway  Bugfix in get_field() function and
 //                                   remove unnecessary time strings.
+//   015    10/17/13  Halley Gotway  Bugfix for closing file handles during
+//                                   pcpdir search.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -720,7 +722,16 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
          var->set_lead(init_time ? cur_ut - init_time : 0);
 
          //  look for a VarInfo record match in the data file
-         if( -1 != (i_rec = datafile->index(*var)) ) break;
+         i_rec = datafile->index(*var);
+
+         //  delete allocated data file
+         if( datafile ) {
+            delete datafile;
+            datafile = (Met2dDataFile *) 0;
+         }
+
+         //  check for a valid match
+         if( -1 != i_rec ) break;
 
       } // end if
 
