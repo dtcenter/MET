@@ -267,11 +267,12 @@ void process_command_line(int argc, char **argv) {
            << n_series << ".\n";
    }
    else {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "cannot define series when the \"fcst.field\" and "
-           << "\"obs.field\" configuration entries and the \"-fcst\" and "
-           << "\"-obs\" command line options all have length one.\n\n";
-      exit(1);
+      series_type = SeriesType_Fcst_Conf;
+      n_series = 1;
+      mlog << Debug(1)
+           << "The \"fcst.field\" and \"obs.field\" configuration entries "
+           << "and the \"-fcst\" and \"-obs\" command line options "
+           << "all have length one.\n";
    }
 
    // Initialize the series file names
