@@ -463,6 +463,10 @@ void get_series_data(int i_series,
                           ftype, found_fcst_files, fcst_dp);
          if(conf_info.get_n_obs() == 1) {
             obs_info->set_valid(fcst_dp.valid());
+            mlog << Debug(3)
+                 << "Setting the observation valid time search criteria "
+                 << "using the forecast valid time of "
+                 << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp);
@@ -473,6 +477,10 @@ void get_series_data(int i_series,
                           otype, found_obs_files, obs_dp);
          if(conf_info.get_n_fcst() == 1) {
             fcst_info->set_valid(obs_dp.valid());
+            mlog << Debug(3)
+                 << "Setting the forecast valid time search criteria "
+                 << "using the observation valid time of "
+                 << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp);
@@ -482,6 +490,10 @@ void get_series_data(int i_series,
          get_series_entry(i_series, fcst_info, fcst_files[i_series],
                           ftype, found_fcst_files, fcst_dp);
          obs_info->set_valid(fcst_dp.valid());
+         mlog << Debug(3)
+              << "Setting the observation valid time search criteria "
+              << "using the forecast valid time of "
+              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
          get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp);
          break;
@@ -490,6 +502,10 @@ void get_series_data(int i_series,
          get_series_entry(i_series, obs_info, obs_files[i_series],
                           otype, found_obs_files, obs_dp);
          fcst_info->set_valid(obs_dp.valid());
+         mlog << Debug(3)
+              << "Setting the forecast valid time search criteria "
+              << "using the observation valid time of "
+              << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp);
          break;
