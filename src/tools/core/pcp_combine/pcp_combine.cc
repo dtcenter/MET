@@ -698,15 +698,15 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
          //  create a data file object
          datafile = factory.new_met_2d_data_file(cur_file);
          if( !datafile ){
-            mlog << Debug(4) << "search_pcp_dir() - can't open data file \"" << cur_file << "\"\n";
-            return -1;
+            mlog << Warning << "search_pcp_dir() - can't open data file \"" << cur_file << "\"\n";
+            continue;
          }
 
          //  create a VarInfo object from the data file
          var = var_fac.new_var_info(datafile->file_type());
          if( !var ){
-            mlog << Debug(4) << "search_pcp_dir() -> unable to determine filetype of \"" << cur_file << "\"\n";
-            return -1;
+            mlog << Warning << "search_pcp_dir() -> unable to determine filetype of \"" << cur_file << "\"\n";
+            continue;
          }
 
          //  initialize the VarInfo object with a field dictionary and
@@ -721,7 +721,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
 
          var->set_valid(cur_ut);
          var->set_init(init_time);
-         var->set_lead(init_time ? cur_ut - init_time : 0);
+         var->set_lead(init_time ? cur_ut - init_time : bad_data_int);
 
          //  look for a VarInfo record match in the data file
          i_rec = datafile->index(*var);
