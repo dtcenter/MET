@@ -805,9 +805,9 @@ int MetGrib1DataFile::index(VarInfo &vinfo){
    int lead = valid_ut - init_ut;
 
    //  check the record time information
-   if( ( vinfo.valid() && valid_ut != vinfo.valid() ) ||
-       ( vinfo.init()  && init_ut  != vinfo.init()  ) ||
-       ( vinfo.lead()  && lead     != vinfo.lead()  ) )
+   if( ( vinfo.valid()              && valid_ut != vinfo.valid() ) ||
+       ( vinfo.init()               && init_ut  != vinfo.init()  ) ||
+       ( !is_bad_data(vinfo.lead()) && lead     != vinfo.lead()  ) )
       return -1;
 
    return rec;

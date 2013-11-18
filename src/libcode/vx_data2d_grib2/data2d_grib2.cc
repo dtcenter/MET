@@ -710,8 +710,10 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld ){
    //  determine the radius of the earth
    double r_km = -1;
    switch( gfld->igdtmpl[0] ){
-      case 0:     r_km = 6367.470;  break;
-      case 6:     r_km = 6371.229;  break;
+      case 0:     r_km = 6367.470;                  break;
+      //  parse earth radius from header
+      case 1:     r_km = gfld->igdtmpl[2] / 1000.0; break;
+      case 6:     r_km = 6371.229;                  break;
       default:
          mlog << Error << "\nMetGrib2DataFile::data_plane() - unexpected earth shape ("
               << gfld->igdtmpl[0] << ")\n\n";
