@@ -47,6 +47,9 @@ dfHdr = data.frame(
 );
 dfHdr$hdr_id = seq(0,nrow(dfHdr)-1);
 
+# replace empty SID strings with NA                                                                                                                                                                                                     
+dfHdr$sid[dfHdr$sid == ""] = NA;
+
 # check for the obs_qty variable
 if( 0 < length(ncPnt$var[["obs_qty"]]) ) {
 	ObsQty = get.var.ncdf(ncPnt, ncPnt$var[["obs_qty"]]);
