@@ -633,6 +633,8 @@ Polyline ShapeData::convex_hull() const
          alpha = (p2u - p1u)*e1u + (p2v - p1v)*e1v;
          beta  = (p2u - p1u)*e2u + (p2v - p1v)*e2v;
 
+         if ( alpha == 0 && beta == 0 )  continue;
+
          angle = deg_per_rad*atan2(beta, alpha);
 
          angle -= 360.0*floor(angle/360.0);
