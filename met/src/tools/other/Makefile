@@ -34,6 +34,9 @@ endif
 ifeq ($(ENABLE_MODIS), 1)
 	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS)
 endif
+ifeq ($(ENABLE_MODE_GRAPHICS), 1)
+	cd mode_graphics    ; $(MAKE) $(PRINT_OPTS)
+endif
 
 
 ########################################################################
@@ -48,6 +51,7 @@ clean:
 	cd pb2nc            ; $(MAKE) $(PRINT_OPTS) clean
 	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS) clean
 	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS) clean
+	cd mode_graphics    ; $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
@@ -62,6 +66,7 @@ gen_sources:
 	cd pb2nc            ; $(MAKE) $(PRINT_OPTS) gen_sources
 	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS) gen_sources
 	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd mode_graphics    ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################
