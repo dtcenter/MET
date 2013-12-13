@@ -1,0 +1,52 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#ifndef  __MET_FO_PAIR_H__
+#define  __MET_FO_PAIR_H__
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include <iostream>
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+class FO_Pair {
+
+      void init_from_scratch();
+
+      void assign(const FO_Pair &);
+
+   public:
+
+      FO_Pair();
+     ~FO_Pair();
+      FO_Pair(const FO_Pair & );
+      FO_Pair & operator=(const FO_Pair & );
+
+      void clear();
+
+      void dump(ostream &, int = 0) const;
+
+      int nf;  //  fcst number
+      int no;  //  obs  number
+
+      int index;
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif  /*  __MET_FO_PAIR_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
+
+
