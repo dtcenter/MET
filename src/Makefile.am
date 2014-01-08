@@ -16,6 +16,9 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
+G2SUP_LIBS = -lgrib2c -ljasper -lpng -lz
+GRIB2_LIBS = -lvx_data2d_grib2 $(G2SUP_LIBS)
+
 ACLOCAL_AMFLAGS		= -I m4
 
 EXTRA_DIST		= bootstrap
