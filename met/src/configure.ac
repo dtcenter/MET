@@ -181,5 +181,13 @@ AC_CONFIG_FILES([Makefile
                  libcode/vx_tc_util/Makefile
                  tools/Makefile
                  tools/core/Makefile
-                 tools/core/ensemble_stat/Makefile])
+                 tools/core/ensemble_stat/Makefile
+                 tools/core/grid_stat/Makefile
+                 tools/core/mode/Makefile
+                 tools/core/mode_analysis/Makefile
+                 tools/core/pcp_combine/Makefile
+                 tools/core/point_stat/Makefile
+                 tools/core/stat_analysis/Makefile
+                 tools/core/series_analysis/Makefile
+                 tools/core/wavelet_stat/Makefile])
 AC_OUTPUT
