@@ -1767,8 +1767,14 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    double fcst_min, fcst_max, obs_min, obs_max;
    fcst_dp.data_range(fcst_min, fcst_max);
    obs_dp.data_range(obs_min, obs_max);
-   raw_plot_min = min(fcst_min, obs_min);
-   raw_plot_max = max(fcst_max, obs_max);
+   
+   if     (!is_bad_data(fcst_min) && !is_bad_data(obs_min)) raw_plot_min = min(fcst_min, obs_min);
+   else if(!is_bad_data(fcst_min) &&  is_bad_data(obs_min)) raw_plot_min = fcst_min;
+   else if( is_bad_data(fcst_min) && !is_bad_data(obs_min)) raw_plot_min = obs_min;
+
+   if     (!is_bad_data(fcst_max) && !is_bad_data(obs_max)) raw_plot_max = max(fcst_max, obs_max);
+   else if(!is_bad_data(fcst_max) &&  is_bad_data(obs_max)) raw_plot_max = fcst_max;
+   else if( is_bad_data(fcst_max) && !is_bad_data(obs_max)) raw_plot_max = obs_max;
 
    //
    // Setup the x/y bounding box for the data to be plotted.
