@@ -306,8 +306,13 @@ void ModeExecutive::setup_fcst_obs_data()
 
    Fcst_sd.data.data_range(fmin, fmax);
    Obs_sd.data.data_range(omin, omax);
-   data_min = min(fmin, omin);
-   data_max = max(fmax, omax);
+   if     (!is_bad_data(fmin) && !is_bad_data(omin)) data_min = min(fmin, omin);
+   else if(!is_bad_data(fmin) &&  is_bad_data(omin)) data_min = fmin;
+   else if( is_bad_data(fmin) && !is_bad_data(omin)) data_min = omin;
+
+   if     (!is_bad_data(fmax) && !is_bad_data(omax)) data_max = max(fmax, omax);
+   else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
+   else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
 
    //
    //  done
