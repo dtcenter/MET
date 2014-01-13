@@ -104,22 +104,6 @@ if test ! "x$HDFEOSDIR" = x; then
    CPPFLAGS="${CPPFLAGS} -I${HDFEOSDIR}/include"
 fi    
 
-# Did the user specify a location for the SZIP library?
-AC_MSG_CHECKING([whether a location for the SZIP library was specified])
-AC_ARG_WITH([szip],
-              [AS_HELP_STRING([--with-szip=<directory>],
-                              [Specify location of SZIP library. Configure will \
-                              expect to find subdirs include and lib.])],
-            [HDFEOSDIR=$with_szip])
-AC_MSG_RESULT([$SZIPDIR])
-AC_SUBST(HDFDIR, [$SZIPDIR])
-
-# Add the SZIP directory to includes and link flags
-if test ! "x$SZIPDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${SZIPDIR}/lib"
-   CPPFLAGS="${CPPFLAGS} -I${SZIPDIR}/include"
-fi    
-
 # Checks for programs.
 AC_PROG_YACC
 AC_PROG_CXX
