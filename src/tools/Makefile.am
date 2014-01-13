@@ -16,11 +16,10 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-#SUBDIRS	= core \
-#	dev_utils \
-#	other \
-#	tc_utils
+SUBDIRS	= core \
+	dev_utils \
+	other \
+	tc_utils
 
-SUBDIRS	= core
 
 MAINTAINERCLEANFILES 	= Makefile.in
