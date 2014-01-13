@@ -4,6 +4,24 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Test programs
+
+noinst_PROGRAMS = test_read_grib1
+
+test_read_grib1_SOURCES = test_read_grib1.cc
+test_read_grib1_CPPFLAGS = -I${includedir}
+test_read_grib1_LDFLAGS = -L${libdir}
+test_read_grib1_LDADD = -lvx_data2d_grib \
+	-lvx_data2d \
+	-lvx_grid \
+	-lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log
+
+# The library itself
+
 lib_LIBRARIES = libvx_data2d_grib.a
 libvx_data2d_grib_a_SOURCES = grib_classes.cc \
               grib_strings.cc \
