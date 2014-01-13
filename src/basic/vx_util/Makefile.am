@@ -4,6 +4,34 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Test programs
+
+noinst_PROGRAMS = test_command_line \
+	test_data_plane \
+	test_add_rows
+
+test_command_line_SOURCES = test_command_line.cc
+test_command_line_CPPFLAGS = -I${includedir}
+test_command_line_LDFLAGS = -L${libdir}
+test_command_line_LDADD = -lvx_util \
+	-lvx_log
+
+test_data_plane_SOURCES = test_data_plane.cc
+test_data_plane_CPPFLAGS = -I${includedir}
+test_data_plane_LDFLAGS = -L${libdir}
+test_data_plane_LDADD = -lvx_util \
+	-lvx_cal \
+	-lvx_log
+
+test_add_rows_SOURCES = test_add_rows.cc
+test_add_rows_CPPFLAGS = -I${includedir}
+test_add_rows_LDFLAGS = -L${libdir}
+test_add_rows_LDADD = -lvx_util \
+	-lvx_cal \
+	-lvx_log
+
+# The library itself
+
 lib_LIBRARIES = libvx_util.a
 libvx_util_a_SOURCES = ascii_table.cc \
                asciitablejust_to_string.cc \
