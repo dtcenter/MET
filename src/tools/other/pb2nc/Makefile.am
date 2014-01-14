@@ -12,8 +12,7 @@ pb2nc_SOURCES = pb2nc.cc \
 	closepb.f \
 	readpb.f \
 	dumppb.f
-pb2nc_CPPFLAGS = -DMET_BASE_DIR=\"$(abs_top_builddir)/..\" \
-	-I${includedir}
+pb2nc_CPPFLAGS = -I${includedir}
 pb2nc_LDFLAGS = -L${libdir}
 pb2nc_LDADD = -lvx_stat_out \
 	-lvx_statistics \
