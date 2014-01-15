@@ -25,6 +25,7 @@ using namespace std;
 #include <cmath>
 
 #include "mode_exec.h"
+#include "nc_utils.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -153,7 +154,6 @@ Met2dDataFileFactory mtddf_factory;
    // Read the config files
    engine.conf_info.read_config(default_config_file, match_config_file);
 
-
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
@@ -165,14 +165,12 @@ Met2dDataFileFactory mtddf_factory;
       exit(1);
    }
 
-
    // Read observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
    }
-
 
    // Store the input data file types
    ftype = fcst_mtddf->file_type();
@@ -247,8 +245,6 @@ void ModeExecutive::setup_fcst_obs_data()
    }
 
    grid = fcst_mtddf->grid();
-
-   // grid.dump(cout);
 
       // Print a warning if the valid times do not match
 
@@ -953,10 +949,9 @@ void ModeExecutive::write_obj_netcdf()
    if (obs_clus_data)      { delete obs_clus_data;      obs_clus_data     = (int *) 0; }
 
    //
-   // Write out the values of the vertices of the boundary polylines for
-   // the simple objects.
+   // Write out the values of the vertices of the polylines.
    //
-   write_bdy_netcdf(f_out);
+   write_poly_netcdf(f_out);
 
    //
    // Close the NetCDF file
@@ -968,321 +963,328 @@ void ModeExecutive::write_obj_netcdf()
    return;
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::write_bdy_netcdf(NcFile * f_out)
+void ModeExecutive::write_poly_netcdf(NcFile * f_out)
 
 {
 
    //
-   // Write out the number of forecast and observation objects
+   // Write out the number of forecast, observation, and cluster objects
    //
-   NcVar *n_fcst_obj_var = (NcVar *)  0;
-   NcVar *n_obs_obj_var  = (NcVar *)  0;
+   NcVar *n_fcst_simp_var = (NcVar *)  0;
+   NcVar *n_obs_simp_var  = (NcVar *)  0;
+   NcVar *n_clus_var      = (NcVar *)  0;
 
    // Define scalar variables
-   n_fcst_obj_var = f_out->add_var("n_fcst_obj", ncInt);
-   n_obs_obj_var  = f_out->add_var("n_obs_obj",  ncInt);
-
+   n_fcst_simp_var = f_out->add_var("n_fcst_simp", ncInt);
+   n_obs_simp_var  = f_out->add_var("n_obs_simp",  ncInt);
+   n_clus_var      = f_out->add_var("n_clus", ncInt);
+   
    //
    // Write the number of forecast and observation objects
    //
-   if( !n_fcst_obj_var->put(&engine.n_fcst) ||
-       !n_obs_obj_var->put(&engine.n_obs) ) {
+   if( !n_fcst_simp_var->put(&engine.n_fcst) ||
+       !n_obs_simp_var->put(&engine.n_obs)   ||
+       !n_clus_var->put(&engine.n_clus) ) {
 
       mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the n_fcst_obj_var-> or "
-           << "n_obs_obj_var->put\n\n";
+           << "error with the n_fcst_simp_var->put, "
+           << "n_obs_simp_var->put, or n_clus_var->put\n\n";
       exit(1);
    }
 
    //
-   // Only write out the boundary polyline points if there are objects
+   // Only write out the polyline points if there are objects
    // present.
    //
-   if(engine.n_fcst > 0) write_fcst_bdy_netcdf(f_out);
-   if(engine.n_obs  > 0) write_obs_bdy_netcdf(f_out);
-
+   if(engine.n_fcst > 0) {
+      write_poly_netcdf(f_out, FcstSimpBdyPoly);
+      write_poly_netcdf(f_out, FcstSimpHullPoly);
+   }
+   if(engine.n_obs > 0) {
+      write_poly_netcdf(f_out, ObsSimpBdyPoly);
+      write_poly_netcdf(f_out, ObsSimpHullPoly);
+   }
+   if(engine.n_clus > 0) {
+      write_poly_netcdf(f_out, FcstClusHullPoly);
+      write_poly_netcdf(f_out, ObsClusHullPoly);
+   }
+   
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::write_fcst_bdy_netcdf(NcFile *f_out)
+void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
 
 {
 
-   int i, j, x, y, n_pts;
+   int i, j, x, y, n_pts, n_poly;
    double lat, lon;
 
-   int   *bdy_start          = (int   *) 0;
-   int   *bdy_npts           = (int   *) 0;
-   float *bdy_lat            = (float *) 0;
-   float *bdy_lon            = (float *) 0;
-   int   *bdy_x              = (int   *) 0;
-   int   *bdy_y              = (int   *) 0;
+   Polyline **poly            = (Polyline **) 0;
+
+   int   *poly_start          = (int       *) 0;
+   int   *poly_npts           = (int       *) 0;
+   float *poly_lat            = (float     *) 0;
+   float *poly_lon            = (float     *) 0;
+   int   *poly_x              = (int       *) 0;
+   int   *poly_y              = (int       *) 0;
 
    // Dimensions and variables for each object
-   NcDim  *obj_dim           = (NcDim *)  0;
-   NcVar  *obj_bdy_start_var = (NcVar *)  0;
-   NcVar  *obj_bdy_npts_var  = (NcVar *)  0;
+   NcDim  *obj_dim            = (NcDim     *)  0;
+   NcVar  *obj_poly_start_var = (NcVar     *)  0;
+   NcVar  *obj_poly_npts_var  = (NcVar     *)  0;
 
    // Dimensions and variables for each boundary point
-   NcDim  *bdy_dim           = (NcDim *)  0;
-   NcVar  *bdy_lat_var       = (NcVar *)  0;
-   NcVar  *bdy_lon_var       = (NcVar *)  0;
-   NcVar  *bdy_x_var         = (NcVar *)  0;
-   NcVar  *bdy_y_var         = (NcVar *)  0;
+   NcDim  *poly_dim           = (NcDim     *)  0;
+   NcVar  *poly_lat_var       = (NcVar     *)  0;
+   NcVar  *poly_lon_var       = (NcVar     *)  0;
+   NcVar  *poly_x_var         = (NcVar     *)  0;
+   NcVar  *poly_y_var         = (NcVar     *)  0;
+   
+   // Dimension names
+   ConcatString obj_dim_name,   poly_dim_name;
+   
+   // Variable names
+   ConcatString start_var_name, start_long_name;
+   ConcatString npts_var_name,  npts_long_name;
+   ConcatString lat_var_name,   lat_long_name;
+   ConcatString lon_var_name,   lon_long_name;
+   ConcatString x_var_name,     x_long_name;
+   ConcatString y_var_name,     y_long_name;
+   ConcatString field_name,     field_long;
+   ConcatString poly_name,      poly_long;
 
-   // Get the number of forecast boundary polyline points
-   for(i=0, n_pts=0; i<engine.n_fcst; i++)
-      n_pts += engine.fcst_single[i].boundary[0].n_points;
+   // Determine the number of polylines to be written
+   // and set up strings
+   switch(poly_type) {
+
+      case FcstSimpBdyPoly:
+         n_poly     = engine.n_fcst;
+         field_name = "fcst";
+         field_long = "Forecast";
+         poly_name  = "simp_bdy";
+         poly_long  = "Simple Boundary";
+         break;
+
+      case ObsSimpBdyPoly:
+         n_poly     = engine.n_obs;
+         field_name = "obs";
+         field_long = "Observation";
+         poly_name  = "simp_bdy";
+         poly_long  = "Simple Boundary";
+         break;
+         
+      case FcstSimpHullPoly:
+         n_poly     = engine.n_fcst;
+         field_name = "fcst";
+         field_long = "Forecast";
+         poly_name  = "simp_hull";
+         poly_long  = "Simple Convex Hull";
+         break;
+
+      case ObsSimpHullPoly:
+         n_poly     = engine.n_obs;
+         field_name = "obs";
+         field_long = "Observation";
+         poly_name  = "simp_hull";
+         poly_long  = "Simple Convex Hull";
+         break;
+
+      case FcstClusHullPoly:
+         n_poly     = engine.n_clus;
+         field_name = "fcst";
+         field_long = "Forecast";
+         poly_name  = "clus_hull";
+         poly_long  = "Cluster Convex Hull";
+         break;
+
+      case ObsClusHullPoly:
+         n_poly     = engine.n_clus;
+         field_name = "obs";
+         field_long = "Observation";
+         poly_name  = "clus_hull";
+         poly_long  = "Cluster Convex Hull";
+         break;
+         
+      default:
+         return;
+         break;
+   }
+
+   // Setup dimension name strings
+   if(poly_type == FcstClusHullPoly ||
+      poly_type == ObsClusHullPoly) {
+      obj_dim_name << cs_erase << field_name << "_clus";
+   }
+   else {
+      obj_dim_name << cs_erase << field_name << "_simp";
+   }
+   poly_dim_name   << cs_erase << field_name << "_" << poly_name;
+   
+   // Setup variable name strings   
+   start_var_name  << cs_erase << field_name << "_" << poly_name << "_start";
+   start_long_name << cs_erase << field_long << " " << poly_long << " Starting Index";
+   npts_var_name   << cs_erase << field_name << "_" << poly_name << "_npts";
+   npts_long_name  << cs_erase << "Number of " << field_long << " " << poly_long << " Points";
+   lat_var_name    << cs_erase << field_name << "_" << poly_name << "_lat";
+   lat_long_name   << cs_erase << field_long << " " << poly_long << " Point Latitude";
+   lon_var_name    << cs_erase << field_name << "_" << poly_name << "_lon";
+   lon_long_name   << cs_erase << field_long << " " << poly_long << " Point Longitude";
+   x_var_name      << cs_erase << field_name << "_" << poly_name << "_x";
+   x_long_name     << cs_erase << field_long << " " << poly_long << " Point X-Coordinate";
+   y_var_name      << cs_erase << field_name << "_" << poly_name << "_y";
+   y_long_name     << cs_erase << field_long << " " << poly_long << " Point Y-Coordinate";
+   
+   // Allocate pointers for the polylines to be written
+   poly = new Polyline * [n_poly];
+
+   // Point at the polyline to be written
+   for(i=0; i<n_poly; i++) {
+
+      switch(poly_type) {
+
+         case FcstSimpBdyPoly:
+            poly[i] = &engine.fcst_single[i].boundary[0];
+            break;
+
+         case ObsSimpBdyPoly:
+            poly[i] = &engine.obs_single[i].boundary[0];
+            break;
+         
+         case FcstSimpHullPoly:
+            poly[i] = &engine.fcst_single[i].convex_hull;
+            break;
+
+         case ObsSimpHullPoly:
+            poly[i] = &engine.obs_single[i].convex_hull;
+            break;
+
+         case FcstClusHullPoly:
+            poly[i] = &engine.fcst_clus[i].convex_hull;
+            break;
+
+         case ObsClusHullPoly:
+            poly[i] = &engine.obs_clus[i].convex_hull;
+            break;
+         
+         default:
+            break;
+      }
+   }
+
+   // Get the number of polyline points
+   for(i=0, n_pts=0; i<n_poly; i++) n_pts += poly[i]->n_points;
 
    // Define dimensions
-   obj_dim = f_out->add_dim("fcst_obj", (long) engine.n_fcst);
-   bdy_dim = f_out->add_dim("fcst_bdy", (long) n_pts);
+   obj_dim = has_dim(f_out, obj_dim_name);
+   if(!obj_dim || !obj_dim->is_valid()) {
+      obj_dim = f_out->add_dim(obj_dim_name, (long) n_poly);
+   }
+   poly_dim = f_out->add_dim(poly_dim_name, (long) n_pts);
 
    // Define variables
-   obj_bdy_start_var = f_out->add_var("fcst_obj_bdy_start", ncInt, obj_dim);
-   obj_bdy_npts_var  = f_out->add_var("fcst_obj_bdy_npts", ncInt, obj_dim);
-   bdy_lat_var       = f_out->add_var("fcst_bdy_lat", ncFloat, bdy_dim);
-   bdy_lon_var       = f_out->add_var("fcst_bdy_lon", ncFloat, bdy_dim);
-   bdy_x_var         = f_out->add_var("fcst_bdy_x", ncInt, bdy_dim);
-   bdy_y_var         = f_out->add_var("fcst_bdy_y", ncInt, bdy_dim);
+   obj_poly_start_var = f_out->add_var(start_var_name, ncInt,   obj_dim);
+   obj_poly_npts_var  = f_out->add_var(npts_var_name,  ncInt,   obj_dim);
+   poly_lat_var       = f_out->add_var(lat_var_name,   ncFloat, poly_dim);
+   poly_lon_var       = f_out->add_var(lon_var_name,   ncFloat, poly_dim);
+   poly_x_var         = f_out->add_var(x_var_name,     ncInt,   poly_dim);
+   poly_y_var         = f_out->add_var(y_var_name,     ncInt,   poly_dim);
 
    // Add variable attributes
-   obj_bdy_start_var->add_att("long_name", "Forecast Boundary Starting Index");
-   obj_bdy_npts_var->add_att("long_name", "Number of Forecast Boundary Points");
-   bdy_lat_var->add_att("long_name", "Forecast Boundary Point Latitude");
-   bdy_lat_var->add_att("units", "degrees_north");
-   bdy_lon_var->add_att("long_name", "Forecast Boundary Point Longitude");
-   bdy_lon_var->add_att("units", "degrees_east");
-   bdy_x_var->add_att("long_name", "Forecast Boundary Point X-Coordinate");
-   bdy_y_var->add_att("long_name", "Forecast Boundary Point Y-Coordinate");
+   obj_poly_start_var->add_att("long_name", start_long_name);
+   obj_poly_npts_var->add_att("long_name", npts_long_name);
+   poly_lat_var->add_att("long_name", lat_long_name);
+   poly_lat_var->add_att("units", "degrees_north");
+   poly_lon_var->add_att("long_name", lon_long_name);
+   poly_lon_var->add_att("units", "degrees_east");
+   poly_x_var->add_att("long_name", x_long_name);
+   poly_y_var->add_att("long_name", y_long_name);
 
    //
-   // Allocate memory for the forecast boundary points
+   // Allocate memory for the polyline points
    //
-   bdy_start = new int   [engine.n_fcst];
-   bdy_npts  = new int   [engine.n_fcst];
-   bdy_lat   = new float [n_pts];
-   bdy_lon   = new float [n_pts];
-   bdy_x     = new int   [n_pts];
-   bdy_y     = new int   [n_pts];
+   poly_start = new int   [n_poly];
+   poly_npts  = new int   [n_poly];
+   poly_lat   = new float [n_pts];
+   poly_lon   = new float [n_pts];
+   poly_x     = new int   [n_pts];
+   poly_y     = new int   [n_pts];
 
    //
-   // Process each forecast object and store the boundary
-   // polyline points.
+   // Store the points for each polyline
    //
-   for(i=0, n_pts=0; i<engine.n_fcst; i++) {
+   for(i=0, n_pts=0; i<n_poly; i++) {
 
       // Store the starting point for this object.
-      bdy_start[i] = n_pts;
+      poly_start[i] = n_pts;
 
       // Store the number of points in this polyline.
-      bdy_npts[i] = engine.fcst_single[i].boundary[0].n_points;
+      poly_npts[i] = poly[i]->n_points;
 
-      for(j=0; j<bdy_npts[i]; j++, n_pts++) {
+      for(j=0; j<poly_npts[i]; j++, n_pts++) {
 
          // Get the boundary point (x,y) coordinates and store them
-         x = nint(engine.fcst_single[i].boundary[0].u[j]);
-         y = nint(engine.fcst_single[i].boundary[0].v[j]);
-         bdy_x[n_pts] = x;
-         bdy_y[n_pts] = y;
+         x = nint(poly[i]->u[j]);
+         y = nint(poly[i]->v[j]);
+         poly_x[n_pts] = x;
+         poly_y[n_pts] = y;
 
          // Convert to lat/lon and store them
          grid.xy_to_latlon(x, y, lat, lon);
-         bdy_lat[n_pts] = lat;
-         bdy_lon[n_pts] = -1.0*lon;
+         poly_lat[n_pts] = lat;
+         poly_lon[n_pts] = -1.0*lon;
       }
    }
 
    //
-   // Write the forecast boundary polyline information
+   // Write the polyline information
    //
-   if( !obj_bdy_start_var->put(&bdy_start[0], engine.n_fcst) ||
-       !obj_bdy_npts_var->put(&bdy_npts[0], engine.n_fcst) ) {
+   if( !obj_poly_start_var->put(&poly_start[0], n_poly) ||
+       !obj_poly_npts_var->put(&poly_npts[0], n_poly) ) {
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the obj_bdy_start_var->put or "
-           << "obj_bdy_npts_var->put\n\n";
+      mlog << Error << "\nwrite_poly_netcdf() -> "
+           << "error with " << start_var_name << "->put or "
+           << npts_var_name << "->put\n\n";
       exit(1);
    }
 
    //
    // Write the forecast boundary lat/lon points
    //
-   if( !bdy_lat_var->put(&bdy_lat[0], n_pts) ||
-       !bdy_lon_var->put(&bdy_lon[0], n_pts) ) {
+   if( !poly_lat_var->put(&poly_lat[0], n_pts) ||
+       !poly_lon_var->put(&poly_lon[0], n_pts) ) {
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with bdy_lat_var->put "
-           << "or bdy_lon_var->put\n\n";
+      mlog << Error << "\nwrite_poly_netcdf() -> "
+           << "error with " << lat_var_name << "->put or "
+           << lon_var_name << "->put\n\n";
       exit(1);
    }
 
    //
    // Write the forecast boundary (x,y) points
    //
-   if( !bdy_x_var->put(&bdy_x[0], n_pts) ||
-       !bdy_y_var->put(&bdy_y[0], n_pts) ) {
+   if( !poly_x_var->put(&poly_x[0], n_pts) ||
+       !poly_y_var->put(&poly_y[0], n_pts) ) {
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with bdy_x_var->put "
-           << "or bdy_y_var->put\n\n";
+      mlog << Error << "\nwrite_poly_netcdf() -> "
+           << "error with " << x_var_name << "->put or"
+           << y_var_name << "->put\n\n";
       exit(1);
    }
 
    //
    // Delete allocated memory
    //
-   if(bdy_start) { delete bdy_start; bdy_start = (int   *) 0; }
-   if(bdy_npts)  { delete bdy_npts;  bdy_npts  = (int   *) 0; }
-   if(bdy_lat)   { delete bdy_lat;   bdy_lat   = (float *) 0; }
-   if(bdy_lon)   { delete bdy_lon;   bdy_lon   = (float *) 0; }
-   if(bdy_x)     { delete bdy_x;     bdy_x     = (int   *) 0; }
-   if(bdy_y)     { delete bdy_y;     bdy_y     = (int   *) 0; }
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////
-
-void ModeExecutive::write_obs_bdy_netcdf(NcFile *f_out)
-
-{
-
-   int i, j, x, y, n_pts;
-   double lat, lon;
-
-   int   *bdy_start          = (int   *) 0;
-   int   *bdy_npts           = (int   *) 0;
-   float *bdy_lat            = (float *) 0;
-   float *bdy_lon            = (float *) 0;
-   int   *bdy_x              = (int   *) 0;
-   int   *bdy_y              = (int   *) 0;
-
-   // Dimensions and variables for each object
-   NcDim  *obj_dim           = (NcDim *)  0;
-   NcVar  *obj_bdy_start_var = (NcVar *)  0;
-   NcVar  *obj_bdy_npts_var  = (NcVar *)  0;
-
-   // Dimensions and variables for each boundary point
-   NcDim  *bdy_dim           = (NcDim *)  0;
-   NcVar  *bdy_lat_var       = (NcVar *)  0;
-   NcVar  *bdy_lon_var       = (NcVar *)  0;
-   NcVar  *bdy_x_var         = (NcVar *)  0;
-   NcVar  *bdy_y_var         = (NcVar *)  0;
-
-   // Get the number of observation boundary polyline points
-   for(i=0, n_pts=0; i<engine.n_obs; i++)
-      n_pts += engine.obs_single[i].boundary[0].n_points;
-
-   // Define dimensions
-   obj_dim = f_out->add_dim("obs_obj", (long) engine.n_obs);
-   bdy_dim = f_out->add_dim("obs_bdy", (long) n_pts);
-
-   // Define variables
-   obj_bdy_start_var = f_out->add_var("obs_obj_bdy_start", ncInt, obj_dim);
-   obj_bdy_npts_var  = f_out->add_var("obs_obj_bdy_npts", ncInt, obj_dim);
-   bdy_lat_var       = f_out->add_var("obs_bdy_lat", ncFloat, bdy_dim);
-   bdy_lon_var       = f_out->add_var("obs_bdy_lon", ncFloat, bdy_dim);
-   bdy_x_var         = f_out->add_var("obs_bdy_x", ncInt, bdy_dim);
-   bdy_y_var         = f_out->add_var("obs_bdy_y", ncInt, bdy_dim);
-
-   // Add variable attributes
-   obj_bdy_start_var->add_att("long_name", "Observation Boundary Starting Index");
-   obj_bdy_npts_var->add_att("long_name", "Number of Observation Boundary Points");
-   bdy_lat_var->add_att("long_name", "Observation Boundary Point Latitude");
-   bdy_lat_var->add_att("units", "degrees_north");
-   bdy_lon_var->add_att("long_name", "Observation Boundary Point Longitude");
-   bdy_lon_var->add_att("units", "degrees_east");
-   bdy_x_var->add_att("long_name", "Observation Boundary Point X-Coordinate");
-   bdy_y_var->add_att("long_name", "Observation Boundary Point Y-Coordinate");
-
-   //
-   // Allocate memory for the observation boundary points
-   //
-   bdy_start = new int   [engine.n_obs];
-   bdy_npts  = new int   [engine.n_obs];
-   bdy_lat   = new float [n_pts];
-   bdy_lon   = new float [n_pts];
-   bdy_x     = new int   [n_pts];
-   bdy_y     = new int   [n_pts];
-
-   //
-   // Process each observation object and store the boundary
-   // polyline points.
-   //
-   for(i=0, n_pts=0; i<engine.n_obs; i++) {
-
-      // Store the starting point for this object.
-      bdy_start[i] = n_pts;
-
-      // Store the number of points in this polyline.
-      bdy_npts[i] = engine.obs_single[i].boundary[0].n_points;
-
-      for(j=0; j<bdy_npts[i]; j++, n_pts++) {
-
-         // Get the boundary point (x,y) coordinates and store them
-         x = nint(engine.obs_single[i].boundary[0].u[j]);
-         y = nint(engine.obs_single[i].boundary[0].v[j]);
-         bdy_x[n_pts] = x;
-         bdy_y[n_pts] = y;
-
-         // Convert to lat/lon and store them
-         grid.xy_to_latlon(x, y, lat, lon);
-         bdy_lat[n_pts] = lat;
-         bdy_lon[n_pts] = -1.0*lon;
-      }
-   }
-
-   //
-   // Write the observation boundary polyline information
-   //
-   if( !obj_bdy_start_var->put(&bdy_start[0], engine.n_obs) ||
-       !obj_bdy_npts_var->put(&bdy_npts[0], engine.n_obs) ) {
-
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the obj_bdy_start_var->put or "
-           << "obj_bdy_npts_var->put\n\n";
-      exit(1);
-   }
-
-   //
-   // Write the observation boundary lat/lon points
-   //
-   if( !bdy_lat_var->put(&bdy_lat[0], n_pts) ||
-       !bdy_lon_var->put(&bdy_lon[0], n_pts) ) {
-
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with bdy_lat_var->put "
-           << "or bdy_lon_var->put\n\n";
-      exit(1);
-   }
-
-   //
-   // Write the observation boundary (x,y) points
-   //
-   if( !bdy_x_var->put(&bdy_x[0], n_pts) ||
-       !bdy_y_var->put(&bdy_y[0], n_pts) ) {
-
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with bdy_x_var->put "
-           << "or bdy_y_var->put\n\n";
-      exit(1);
-   }
-
-   //
-   // Delete allocated memory
-   //
-   if(bdy_start) { delete bdy_start; bdy_start = (int   *) 0; }
-   if(bdy_npts)  { delete bdy_npts;  bdy_npts  = (int   *) 0; }
-   if(bdy_lat)   { delete bdy_lat;   bdy_lat   = (float *) 0; }
-   if(bdy_lon)   { delete bdy_lon;   bdy_lon   = (float *) 0; }
-   if(bdy_x)     { delete bdy_x;     bdy_x     = (int   *) 0; }
-   if(bdy_y)     { delete bdy_y;     bdy_y     = (int   *) 0; }
+   if(poly)       { delete poly;       poly       = (Polyline **) 0; }
+   if(poly_start) { delete poly_start; poly_start = (int       *) 0; }
+   if(poly_npts)  { delete poly_npts;  poly_npts  = (int       *) 0; }
+   if(poly_lat)   { delete poly_lat;   poly_lat   = (float     *) 0; }
+   if(poly_lon)   { delete poly_lon;   poly_lon   = (float     *) 0; }
+   if(poly_x)     { delete poly_x;     poly_x     = (int       *) 0; }
+   if(poly_y)     { delete poly_y;     poly_y     = (int       *) 0; }
 
    return;
 }
