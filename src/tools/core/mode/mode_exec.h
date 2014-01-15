@@ -53,6 +53,19 @@ static const int n_cts = 3;
 ////////////////////////////////////////////////////////////////////////
 
 
+enum ObjPolyType {
+   FcstSimpBdyPoly  = 0,
+   ObsSimpBdyPoly   = 1,
+   FcstSimpHullPoly = 2,
+   ObsSimpHullPoly  = 3,
+   FcstClusHullPoly = 4,
+   ObsClusHullPoly  = 5
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class ModeExecutive {
 
    private:
@@ -112,9 +125,8 @@ class ModeExecutive {
       void build_outfile_name(const char *, ConcatString &);
       void write_obj_stats();
       void write_obj_netcdf();
-      void write_bdy_netcdf(NcFile *);
-      void write_fcst_bdy_netcdf(NcFile *);
-      void write_obs_bdy_netcdf(NcFile *);
+      void write_poly_netcdf(NcFile *);
+      void write_poly_netcdf(NcFile *, const ObjPolyType);
       void write_ct_stats();
 
 };
