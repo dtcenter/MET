@@ -124,3 +124,13 @@ NcVar* has_var(NcFile *nc, const char * var_name) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+NcDim* has_dim(NcFile *nc, const char * dim_name) {
+   for(int i=0; i < nc->num_dims(); i++){
+      NcDim* d = nc->get_dim(i);
+      if( !strcmp(d->name(), dim_name) ) return d;
+   }
+   return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////

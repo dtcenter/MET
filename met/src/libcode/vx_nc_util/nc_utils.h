@@ -37,6 +37,8 @@ extern double  get_double_var(NcFile *, const char * var_name, int index = 0);
 
 extern NcVar* has_var(NcFile *, const char * var_name);
 
+extern NcDim* has_dim(NcFile *, const char * dim_name);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __NC_UTILS_H__  */
