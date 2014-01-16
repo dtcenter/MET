@@ -104,10 +104,6 @@ if test ! "x$HDFEOSDIR" = x; then
    CPPFLAGS="${CPPFLAGS} -I${HDFEOSDIR}/include"
 fi    
 
-# Add MET_BASE to the CPPFLAGS so it is available to everyone
-
-#CPPFLAGS="${CPPFLAGS} -DMET_BASE=${prefix}"
-
 # Checks for programs.
 AC_PROG_YACC
 AC_PROG_CXX
