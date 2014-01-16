@@ -4,33 +4,7 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-# Test programs
-
-noinst_PROGRAMS = test_command_line \
-	test_data_plane \
-	test_add_rows
-
-test_command_line_SOURCES = test_command_line.cc
-test_command_line_CPPFLAGS = -I${includedir}
-test_command_line_LDFLAGS = -L${libdir}
-test_command_line_LDADD = -lvx_util \
-	-lvx_log
-
-test_data_plane_SOURCES = test_data_plane.cc
-test_data_plane_CPPFLAGS = -I${includedir}
-test_data_plane_LDFLAGS = -L${libdir}
-test_data_plane_LDADD = -lvx_util \
-	-lvx_cal \
-	-lvx_log
-
-test_add_rows_SOURCES = test_add_rows.cc
-test_add_rows_CPPFLAGS = -I${includedir}
-test_add_rows_LDFLAGS = -L${libdir}
-test_add_rows_LDADD = -lvx_util \
-	-lvx_cal \
-	-lvx_log
-
-# The library itself
+# The library
 
 lib_LIBRARIES = libvx_util.a
 libvx_util_a_SOURCES = ascii_table.cc \
@@ -65,7 +39,7 @@ libvx_util_a_SOURCES = ascii_table.cc \
                interp_util.cc \
                two_to_one.cc \
                get_filenames.cc
-libvx_util_a_CPPFLAGS = -DMET_BASE=\"$(abs_top_builddir)/..\" \
+libvx_util_a_CPPFLAGS = -DMET_BASE=\"$(pkgdatadir)\" \
 	-I${includedir}
 
 include_HEADERS = util_constants.h \
@@ -105,11 +79,39 @@ include_HEADERS = util_constants.h \
                get_filenames.h \
                vx_util.h
 
-# Build rule for viewgravity_to_string.cc
+# Generated source files
+
 asciitablejust_to_string.h asciitablejust_to_string.cc: ascii_table.h
 	${bindir}/enum_to_string -concat_string ascii_table.h
 
+# Test programs
+
+noinst_PROGRAMS = test_command_line \
+	test_data_plane \
+	test_add_rows
+
+test_command_line_SOURCES = test_command_line.cc
+test_command_line_CPPFLAGS = -I${includedir}
+test_command_line_LDFLAGS = -L${libdir} -L.
+test_command_line_LDADD = -lvx_util \
+	-lvx_log
+
+test_data_plane_SOURCES = test_data_plane.cc
+test_data_plane_CPPFLAGS = -I${includedir}
+test_data_plane_LDFLAGS = -L${libdir} -L.
+test_data_plane_LDADD = -lvx_util \
+	-lvx_cal \
+	-lvx_log
+
+test_add_rows_SOURCES = test_add_rows.cc
+test_add_rows_CPPFLAGS = -I${includedir}
+test_add_rows_LDFLAGS = -L${libdir} -L.
+test_add_rows_LDADD = -lvx_util \
+	-lvx_cal \
+	-lvx_log
+
 # Clean up extra local files
+
 clean-local:
 	-rm -f asciitablejust_to_string.h
 	-rm -f asciitablejust_to_string.cc
