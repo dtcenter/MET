@@ -6,7 +6,7 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 bin_PROGRAMS    = plot_data_plane
 plot_data_plane_SOURCES = plot_data_plane.cc
-plot_data_plane_CPPFLAGS = -DMET_BASE=\"$(abs_top_builddir)/..\" \
+plot_data_plane_CPPFLAGS = -DMET_BASE=\"$(pkgdatadir)\" \
 	-I${includedir}
 plot_data_plane_LDFLAGS = -L${libdir}
 plot_data_plane_LDADD = -lvx_data2d_factory \
