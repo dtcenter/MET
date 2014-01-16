@@ -149,6 +149,7 @@ AC_CONFIG_FILES([Makefile
                  data/map/update_2012/Makefile
                  data/map/update_2012/admin_by_country/Makefile
                  data/poly/Makefile
+                 data/poly/HMT_masks/Makefile
                  data/ps/Makefile
                  data/table_files/Makefile
                  data/tc_data/Makefile

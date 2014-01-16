@@ -16,6 +16,8 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
+SUBDIRS = HMT_masks
+
 polydir = $(pkgdatadir)/poly
 
 poly_DATA = \
@@ -29,7 +31,6 @@ poly_DATA = \
 	GLF.poly \
 	GMC.poly \
 	GRB.poly \
-	HMT_masks \
 	HWI.poly \
 	LMV.poly \
 	Makefile.am \
@@ -67,7 +68,6 @@ EXTRA_DIST = \
 	GLF.poly \
 	GMC.poly \
 	GRB.poly \
-	HMT_masks \
 	HWI.poly \
 	LMV.poly \
 	Makefile.am \
