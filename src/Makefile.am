@@ -27,9 +27,6 @@ CXX_FLAGS = $(CXX_FLAGS) $(ARCH_FLAGS)
 
 ACLOCAL_AMFLAGS		= -I m4
 
-EXTRA_DIST		= bootstrap
-
 SUBDIRS 		= basic libcode tools
 
-MAINTAINERCLEANFILES 	= Makefile.in aclocal.m4 configure \
-			  config-h.in sic/stamp-h.in
+MAINTAINERCLEANFILES 	= Makefile.in 
