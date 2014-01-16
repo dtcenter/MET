@@ -25,4 +25,6 @@ SUBDIRS = \
 	table_files \
 	tc_data
 
+pkgdata_DATA = copyright_notice.txt
+
 MAINTAINERCLEANFILES 	= Makefile.in 
