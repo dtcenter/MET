@@ -14,7 +14,7 @@ mode_SOURCES = mode.cc \
 	cluster_page.cc \
 	overlap_page.cc \
 	mode_exec.cc
-mode_CPPFLAGS = -DMET_BASE=\"$(abs_top_builddir)/..\" \
+mode_CPPFLAGS = -DMET_BASE=\"$(pkgdatadir)\" \
 	-I${includedir}
 mode_LDFLAGS = -L${libdir}
 mode_LDADD = -lvx_pxm \
