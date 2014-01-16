@@ -4,20 +4,7 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-# Test programs
-
-noinst_PROGRAMS = test_read
-
-test_read_SOURCES = test_read.cc
-test_read_CPPFLAGS = -I${includedir}
-test_read_LDFLAGS = -L${libdir}
-test_read_LDADD = -lvx_tc_util \
-	-lvx_cal \
-	-lvx_util \
-	-lvx_math \
-	-lvx_log
-
-# The library itself
+# The library
 
 lib_LIBRARIES = libvx_tc_util.a
 libvx_tc_util_a_SOURCES = atcf_line.cc \
@@ -37,3 +24,17 @@ include_HEADERS = atcf_line.h \
               tc_columns.h \
               tc_stat_line.h \
               vx_tc_util.h
+
+# Test programs
+
+noinst_PROGRAMS = test_read
+
+test_read_SOURCES = test_read.cc
+test_read_CPPFLAGS = -I${includedir}
+test_read_LDFLAGS = -L${libdir} -L.
+test_read_LDADD = -lvx_tc_util \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_math \
+	-lvx_log
+
