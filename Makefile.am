@@ -20,7 +20,7 @@ ACLOCAL_AMFLAGS		= -I m4
 
 EXTRA_DIST		= bootstrap
 
-SUBDIRS 		= src data
+SUBDIRS 		= data src
 
 MAINTAINERCLEANFILES 	= Makefile.in aclocal.m4 configure \
 			  config.h.in
