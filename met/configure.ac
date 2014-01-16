@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([MET], [4.1], [met_help@ucar.edu], [], [http://www.dtcenter.org/met/users])
-AC_CONFIG_SRCDIR([tools/tc_utils/tc_dland/tc_dland.cc])
+AC_CONFIG_SRCDIR([src/tools/tc_utils/tc_dland/tc_dland.cc])
 AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.9 foreign])
@@ -104,6 +104,10 @@ if test ! "x$HDFEOSDIR" = x; then
    CPPFLAGS="${CPPFLAGS} -I${HDFEOSDIR}/include"
 fi    
 
+# Add MET_BASE to the CPPFLAGS so it is available to everyone
+
+#CPPFLAGS="${CPPFLAGS} -DMET_BASE=${prefix}"
+
 # Checks for programs.
 AC_PROG_YACC
 AC_PROG_CXX
@@ -136,62 +140,75 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([dup2 floor gethostname memset mkdir pow regcomp select setenv sqrt strcasecmp strchr strcspn strerror strncasecmp strrchr strstr])
 
 AC_CONFIG_FILES([Makefile
-                 basic/Makefile
-                 basic/enum_to_string/Makefile
-                 basic/vx_cal/Makefile
-                 basic/vx_config/Makefile
-                 basic/vx_log/Makefile
-                 basic/vx_math/Makefile
-                 basic/vx_util/Makefile
-                 libcode/Makefile
-                 libcode/vx_afm/Makefile
-                 libcode/vx_analysis_util/Makefile
-                 libcode/vx_color/Makefile
-                 libcode/vx_data2d/Makefile
-                 libcode/vx_data2d_factory/Makefile
-                 libcode/vx_data2d_grib/Makefile
-                 libcode/vx_data2d_grib2/Makefile
-                 libcode/vx_data2d_nc_met/Makefile
-                 libcode/vx_data2d_nc_pinterp/Makefile
-                 libcode/vx_data2d_nccf/Makefile
-                 libcode/vx_geodesy/Makefile
-                 libcode/vx_gnomon/Makefile
-                 libcode/vx_grid/Makefile
-                 libcode/vx_gsl_prob/Makefile
-                 libcode/vx_nav/Makefile
-                 libcode/vx_nc_util/Makefile
-                 libcode/vx_pb_util/Makefile
-                 libcode/vx_plot_util/Makefile
-                 libcode/vx_ps/Makefile
-                 libcode/vx_pxm/Makefile
-                 libcode/vx_render/Makefile
-                 libcode/vx_shapedata/Makefile
-                 libcode/vx_stat_out/Makefile
-                 libcode/vx_statistics/Makefile
-                 libcode/vx_tc_util/Makefile
-                 tools/Makefile
-                 tools/core/Makefile
-                 tools/core/ensemble_stat/Makefile
-                 tools/core/grid_stat/Makefile
-                 tools/core/mode/Makefile
-                 tools/core/mode_analysis/Makefile
-                 tools/core/pcp_combine/Makefile
-                 tools/core/point_stat/Makefile
-                 tools/core/series_analysis/Makefile
-                 tools/core/stat_analysis/Makefile
-                 tools/core/wavelet_stat/Makefile
-                 tools/dev_utils/Makefile
-                 tools/other/Makefile
-                 tools/other/ascii2nc/Makefile
-                 tools/other/gen_poly_mask/Makefile
-                 tools/other/madis2nc/Makefile
-                 tools/other/modis_regrid/Makefile
-                 tools/other/pb2nc/Makefile 
-                 tools/other/plot_data_plane/Makefile
-                 tools/other/plot_point_obs/Makefile
-                 tools/other/wwmca_tool/Makefile
-                 tools/tc_utils/Makefile
-                 tools/tc_utils/tc_dland/Makefile
-                 tools/tc_utils/tc_pairs/Makefile
-                 tools/tc_utils/tc_stat/Makefile])
+                 data/Makefile
+                 data/colortables/Makefile
+                 data/colortables/NCL_colortables/Makefile
+                 data/config/Makefile
+                 data/map/Makefile
+                 data/map/legacy/Makefile
+                 data/map/update_2012/Makefile
+                 data/map/update_2012/admin_by_country/Makefile
+                 data/poly/Makefile
+                 data/ps/Makefile
+                 data/table_files/Makefile
+                 data/tc_data/Makefile
+                 src/Makefile
+                 src/basic/Makefile
+                 src/basic/enum_to_string/Makefile
+                 src/basic/vx_cal/Makefile
+                 src/basic/vx_config/Makefile
+                 src/basic/vx_log/Makefile
+                 src/basic/vx_math/Makefile
+                 src/basic/vx_util/Makefile
+                 src/libcode/Makefile
+                 src/libcode/vx_afm/Makefile
+                 src/libcode/vx_analysis_util/Makefile
+                 src/libcode/vx_color/Makefile
+                 src/libcode/vx_data2d/Makefile
+                 src/libcode/vx_data2d_factory/Makefile
+                 src/libcode/vx_data2d_grib/Makefile
+                 src/libcode/vx_data2d_grib2/Makefile
+                 src/libcode/vx_data2d_nc_met/Makefile
+                 src/libcode/vx_data2d_nc_pinterp/Makefile
+                 src/libcode/vx_data2d_nccf/Makefile
+                 src/libcode/vx_geodesy/Makefile
+                 src/libcode/vx_gnomon/Makefile
+                 src/libcode/vx_grid/Makefile
+                 src/libcode/vx_gsl_prob/Makefile
+                 src/libcode/vx_nav/Makefile
+                 src/libcode/vx_nc_util/Makefile
+                 src/libcode/vx_pb_util/Makefile
+                 src/libcode/vx_plot_util/Makefile
+                 src/libcode/vx_ps/Makefile
+                 src/libcode/vx_pxm/Makefile
+                 src/libcode/vx_render/Makefile
+                 src/libcode/vx_shapedata/Makefile
+                 src/libcode/vx_stat_out/Makefile
+                 src/libcode/vx_statistics/Makefile
+                 src/libcode/vx_tc_util/Makefile
+                 src/tools/Makefile
+                 src/tools/core/Makefile
+                 src/tools/core/ensemble_stat/Makefile
+                 src/tools/core/grid_stat/Makefile
+                 src/tools/core/mode/Makefile
+                 src/tools/core/mode_analysis/Makefile
+                 src/tools/core/pcp_combine/Makefile
+                 src/tools/core/point_stat/Makefile
+                 src/tools/core/series_analysis/Makefile
+                 src/tools/core/stat_analysis/Makefile
+                 src/tools/core/wavelet_stat/Makefile
+                 src/tools/dev_utils/Makefile
+                 src/tools/other/Makefile
+                 src/tools/other/ascii2nc/Makefile
+                 src/tools/other/gen_poly_mask/Makefile
+                 src/tools/other/madis2nc/Makefile
+                 src/tools/other/modis_regrid/Makefile
+                 src/tools/other/pb2nc/Makefile 
+                 src/tools/other/plot_data_plane/Makefile
+                 src/tools/other/plot_point_obs/Makefile
+                 src/tools/other/wwmca_tool/Makefile
+                 src/tools/tc_utils/Makefile
+                 src/tools/tc_utils/tc_dland/Makefile
+                 src/tools/tc_utils/tc_pairs/Makefile
+                 src/tools/tc_utils/tc_stat/Makefile])
 AC_OUTPUT
