@@ -18,8 +18,10 @@
 
 SUBDIRS	= core \
 	dev_utils \
-	other \
-	tc_utils
+	other
 
+if ENABLE_TC_UTILS
+  SUBDIRS += tc_utils
+endif
 
 MAINTAINERCLEANFILES 	= Makefile.in

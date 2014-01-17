@@ -16,14 +16,42 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS	= ensemble_stat \
-	grid_stat \
-	mode \
-	mode_analysis \
-	pcp_combine \
-	point_stat \
-	stat_analysis \
-	wavelet_stat \
-	series_analysis
+SUBDIRS	= 
+
+if ENABLE_ENSEMBLE_STAT
+  SUBDIRS += ensemble_stat
+endif
+
+if ENABLE_GRID_STAT
+  SUBDIRS += grid_stat
+endif
+
+if ENABLE_MODE
+  SUBDIRS += mode
+endif
+
+if ENABLE_MODE_ANALYSIS
+  SUBDIRS += mode_analysis
+endif
+
+if ENABLE_PCP_COMBINE
+  SUBDIRS += pcp_combine
+endif
+
+if ENABLE_POINT_STAT
+  SUBDIRS += point_stat
+endif
+
+if ENABLE_STAT_ANALYSIS
+  SUBDIRS += stat_analysis
+endif
+
+if ENABLE_WAVELET_STAT
+  SUBDIRS += wavelet_stat
+endif
+
+if ENABLE_SERIES_ANALYSIS
+  SUBDIRS += series_analysis
+endif
 
 MAINTAINERCLEANFILES 	= Makefile.in
