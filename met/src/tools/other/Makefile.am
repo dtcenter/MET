@@ -16,13 +16,47 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS	= gen_poly_mask \
-	plot_data_plane \
-	plot_point_obs \
-	ascii2nc \
-	madis2nc \
-	pb2nc \
-	wwmca_tool \
-	modis_regrid
+#SUBDIRS	= gen_poly_mask \
+#	plot_data_plane \
+#	plot_point_obs \
+#	ascii2nc \
+#	madis2nc \
+#	pb2nc \
+#	wwmca_tool \
+#	modis_regrid
+
+SUBDIRS	= 
+
+if ENABLE_GEN_POLY_MASK
+  SUBDIRS += gen_poly_mask
+endif
+
+if ENABLE_PLOT_DATA_PLANE
+  SUBDIRS += plot_data_plane
+endif
+
+if ENABLE_PLOT_POINT_OBS
+  SUBDIRS += plot_point_obs
+endif
+
+if ENABLE_ASCII2NC
+  SUBDIRS += ascii2nc
+endif
+
+if ENABLE_MADIS2NC
+  SUBDIRS += madis2nc
+endif
+
+if ENABLE_PB2NC
+  SUBDIRS += pb2nc
+endif
+
+if ENABLE_WWMCA
+  SUBDIRS += wwmca_tool
+endif
+
+if ENABLE_MODIS
+  SUBDIRS += modis_regrid
+endif
 
 MAINTAINERCLEANFILES 	= Makefile.in
