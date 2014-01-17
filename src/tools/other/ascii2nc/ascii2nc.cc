@@ -320,7 +320,7 @@ void usage() {
         << LittleRHandler::getFormatString() << "\" or \""
         << SurfradHandler::getFormatString() << "\" (optional).\n"
 
-        << "\t\t\"-config file\" uses the specified configuration file"
+        << "\t\t\"-config file\" uses the specified configuration file "
 	<< "to generate summaries of the fields in the ASCII files (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
