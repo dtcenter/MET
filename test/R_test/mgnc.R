@@ -30,14 +30,11 @@ ncfile = open.ncdf(listArgs[1]);
 intNumVar = 0;
 for(strVarName in names(ncfile$var)){
 	
-	# get the variable values and return bad status if it's all zero or NA
+	# get the variable values and return bad status if it's all NA
 	var = get.var.ncdf(ncfile, strVarName);
 	if( verb ){ cat("Checking", strVarName, "... "); }
 	size = length(var);
-	if( size <= sum( 0 == var[!is.na(var)] ) ){
-		if( verb ){ cat("all zeroes\n"); }
-		q(status=1);
-	} else if( size <= sum( is.na(var) ) ){
+	if( size <= sum( is.na(var) ) ){
 		if( verb ){ cat("all NAs\n"); }
 		q(status=1);
 	} else if( verb ){ cat("OK\n"); }
