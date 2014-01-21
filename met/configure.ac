@@ -466,6 +466,11 @@ else
     AC_MSG_NOTICE([tc_utils will not be compiled])
 fi
 
+# Add MET_BASE to the CPPFLAGS
+
+CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
+#CPPFLAGS="${CPPFLAGS} -DMET_BASE=\"${pkgdatadir}\""
+
 # Checks for programs.
 
 AC_PROG_YACC
