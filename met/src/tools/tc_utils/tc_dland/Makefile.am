@@ -19,4 +19,4 @@ tc_dland_LDADD = -lvx_tc_util \
 	-lvx_log \
 	-lm \
 	-lnetcdf_c++ -lnetcdf \
-	-lgfortran
+	$(FLIBS)

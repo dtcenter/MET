@@ -24,4 +24,4 @@ tc_pairs_LDADD = -lvx_config \
 	-lvx_log \
 	-lm \
 	-lnetcdf_c++ -lnetcdf \
-	-lgfortran
+	$(FLIBS)

@@ -469,7 +469,10 @@ fi
 # Add MET_BASE to the CPPFLAGS
 
 CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
-#CPPFLAGS="${CPPFLAGS} -DMET_BASE=\"${pkgdatadir}\""
+
+# Define other variables for the makefiles
+
+AC_SUBST(FC_LIBS, [-lgfortran])
 
 # Checks for programs.
 
@@ -481,6 +484,8 @@ AC_PROG_LEX
 AC_PROG_RANLIB
 
 # Checks for libraries.
+
+AC_F77_LIBRARY_LDFLAGS
 
 # Checks for header files.
 

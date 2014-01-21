@@ -40,7 +40,7 @@ pbtime_LDADD = -lvx_pb_util \
 	-lvx_util \
 	-lvx_log \
 	-lbufr \
-	-lgfortran
+	$(FLIBS)
 
 gribtab_dat_to_flat_SOURCES = gribtab.dat_to_flat.cc \
 	../other/pb2nc/openpb.f \
@@ -52,7 +52,7 @@ gribtab_dat_to_flat_LDADD = -lvx_pb_util \
 	-lvx_util \
 	-lvx_log \
 	-lbufr \
-	-lgfortran
+	$(FLIBS)
 
 nceptab_to_flat_SOURCES = nceptab_to_flat.cc \
 	../other/pb2nc/openpb.f \
@@ -64,7 +64,7 @@ nceptab_to_flat_LDADD = -lvx_pb_util \
 	-lvx_util \
 	-lvx_log \
 	-lbufr \
-	-lgfortran
+	$(FLIBS)
 
 insitu_nc_to_ascii_SOURCES = insitu_nc_to_ascii.cc \
 	insitu_nc_file.cc
