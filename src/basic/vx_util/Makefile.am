@@ -39,8 +39,7 @@ libvx_util_a_SOURCES = ascii_table.cc \
                interp_util.cc \
                two_to_one.cc \
                get_filenames.cc
-libvx_util_a_CPPFLAGS = -DMET_BASE=\"$(pkgdatadir)\" \
-	-I${includedir}
+libvx_util_a_CPPFLAGS = -I${includedir}
 
 include_HEADERS = util_constants.h \
                ascii_table.h \

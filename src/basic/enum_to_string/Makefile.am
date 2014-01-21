@@ -12,7 +12,6 @@ enum_to_string_SOURCES = enum_scanner.ll enum_parser.yy \
               code.cc code.h \
               scope.cc scope.h \
               enum_to_string.cc
-enum_to_string_CPPFLAGS = -DMET_BASE=\"$(pkgdatadir)\"
 enum_to_string_LDFLAGS = -L$(libdir)
 enum_to_string_LDADD = -lvx_cal
 
