@@ -19,6 +19,7 @@ using namespace std;
 #include "vx_log.h"
 #include "empty_string.h"
 #include "math_constants.h"
+#include "util_constants.h"
 
 #include "threshold.h"       //  must be included before config.tab.h
 
