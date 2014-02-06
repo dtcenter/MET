@@ -168,6 +168,8 @@ class PSfile {
       virtual void gsave();
       virtual void grestore();
 
+      virtual void comment(const char * text);
+
          //
          //  graphics
          //

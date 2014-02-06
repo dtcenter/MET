@@ -112,8 +112,7 @@ plot.file() << "/DeviceGray setcolorspace\n\n";
 
 // if ( !(info.encoding) )  plot.file << "/pix " << (image.width) << " string def\n\n";
 
-plot.file() << "\n"
-            << (info.x_ll()) << ' ' << (info.y_ll()) << " translate\n"
+plot.file() << (info.x_ll()) << ' ' << (info.y_ll()) << " translate\n"
             << w << ' ' << h << " scale\n\n";
 
 plot.file() << "<<\n"

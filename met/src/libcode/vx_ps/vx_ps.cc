@@ -34,6 +34,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+// static const int ml_prec = 1;   //  moveto/lineto precision
+static const int ml_prec = 5;   //  moveto/lineto precision
 
 static const DocumentOrientation default_orientation = OrientationPortrait;
 
@@ -682,7 +684,8 @@ void PSfile::moveto(double x, double y)
 
 {
 
-File->precision(5);
+// File->precision(5);
+File->precision(ml_prec);
 
 file() << ' ' << x << ' ' << y << ' ' << moveto_string << '\n';
 
@@ -744,7 +747,8 @@ void PSfile::lineto(double x, double y)
 
 {
 
-File->precision(5);
+// File->precision(5);
+File->precision(ml_prec);
 
 file() << ' ' << x << ' ' << y << ' ' << lineto_string << '\n';
 
@@ -1004,6 +1008,30 @@ void PSfile::grestore()
 {
 
 file() << ' ' << grestore_string << '\n';
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::comment(const char * text)
+
+{
+
+if ( empty(text) )  {
+
+   cerr << "\n\n  PSfile::comment(const char *) -> empty string!\n\n";
+
+   exit ( 1 );
+
+}
+
+file() << "   %\n"
+       << "   %  comment, page " << (showpage_count + 1) << ": " << text << "\n"
+       << "   %\n";
 
 return;
 

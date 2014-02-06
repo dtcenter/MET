@@ -43,7 +43,8 @@ write_centered_text(1, 1, Htab_cen, 722.0, 0.5, 0.5, FcstString);
 
 Vtab = PageHeight - 4.0*Vmargin;
 set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
-render_image(eng, eng_type, *(eng.fcst_raw), 1, 0);
+comment("fcst enlarge page: fcst raw");
+render_ppm(eng, eng_type, *(eng.fcst_raw), 1, 0);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 draw_colorbar(true);
@@ -56,7 +57,8 @@ draw_colorbar(true);
 
 Vtab -= LargePlotHeight;
 set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
-render_image(eng, eng_type, *(eng.fcst_split), 1, 1);
+comment("fcst enlarge page: fcst split");
+render_ppm(eng, eng_type, *(eng.fcst_split), 1, 1);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 draw_convex_hulls(eng, 1, 0);

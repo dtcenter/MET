@@ -46,7 +46,8 @@ choose_font(31, 24.0);
 write_centered_text(1, 1, Htab_cen, View_box.top() + TextSep/2.0,
                       0.5, 0.5, tmp_str);
 
-render_image(eng, eng_type, *(eng.fcst_split), 1, 1);
+comment("overlap page: fcst objects with obs boundaries");
+render_ppm(eng, eng_type, *(eng.fcst_split), 1, 1);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 draw_boundaries(eng, 0);
@@ -65,7 +66,8 @@ choose_font(31, 24.0);
 write_centered_text(1, 1, Htab_cen, View_box.top() + TextSep/2.0,
                       0.5, 0.5, tmp_str);
 
-render_image(eng, eng_type, *(eng.obs_split), 0, 1);
+comment("overlap page: obs objects with fcst boundaries");
+render_ppm(eng, eng_type, *(eng.obs_split), 0, 1);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 draw_boundaries(eng, 1);

@@ -13,9 +13,10 @@
 ########################################################################
 
 
-EXECUTABLES        = test_ft  \
+EXECUTABLES        = plot_mode_field  \
 
-#plot_mode_field  \
+#test_ft  \
+
 
 
 CGRAPH_OBJECTS     = color_stack.o                      \
@@ -79,8 +80,6 @@ FREETYPE_LIB_DIR        = /usr/lib
 
 ########################################################################
 
-
-ENUM_TO_STRING = $(MET_BIN_DIR)/enum_to_string
 
 ARCHIVE        = ar -rs
 
@@ -164,7 +163,7 @@ fo_pair_array.o: fo_pair_array.h fo_pair_array.cc
 
 mode_nc_file.o: mode_nc_file.h mode_nc_file.cc
 	@ echo
-	$(CXX) mode_nc_file.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+	$(CXX) mode_nc_file.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR) -I$(NETCDF_INCS)
 
 
 met_int_array.o: met_int_array.h met_int_array.cc
@@ -222,35 +221,33 @@ test_ft: test_ft.cc
             -lfontconfig  \
 
 
+
 plot_mode_field: $(OBJECTS) $(LIBRARIES) plot_mode_field.cc
 	@ echo
 	$(CXX) plot_mode_field.cc mode_nc_file.o $(CXX_FLAGS) -o plot_mode_field \
-       -I$(MET_INC_DIR) \
-       -I$(NETCDF_INCS) \
-       -I$(CAIRO_INC_DIR) \
-       -I$(FREETYPE_INC_DIR) \
-       -L$(MET_LIB_DIR) \
-       -L. \
-       -L$(NETCDF_LIBS) \
-       -L$(CAIRO_LIB_DIR) \
-       -L$(FREETYPE_LIB_DIR) \
-       -lvx_cgraph \
-       -lvx_data2d_nc_met \
-       -lnetcdf_c++ -lnetcdf  \
-       -lvx_grid \
-       -lvx_ps \
-       -lvx_afm \
-       -lvx_pxm \
-       -lvx_color \
-       -lvx_util \
-       -lvx_cal \
-       -lvx_log \
-       -lvx_math \
-       -lnetcdf_c++ -lnetcdf  \
-       -lm \
-       -lcairo -lfreetype \
-       -lz  \
-       -lpthread  \
+        -I$(MET_INC_DIR) \
+        -I$(NETCDF_INCS) \
+        -I$(CAIRO_INC_DIR) \
+        -I$(FREETYPE_INC_DIR) \
+        -L$(MET_LIB_DIR) \
+        -L. \
+        -L$(NETCDF_LIBS) \
+        -L$(CAIRO_LIB_DIR) \
+        -L$(FREETYPE_LIB_DIR) \
+        -lvx_cgraph \
+        -lvx_data2d_nc_met \
+        -lvx_grid \
+        -lvx_ps \
+        -lvx_afm \
+        -lvx_pxm \
+        -lvx_color \
+        -lvx_util \
+        -lvx_cal \
+        -lvx_log \
+        -lvx_math \
+        -lnetcdf_c++ -lnetcdf \
+        -lcairo -lfreetype \
+        -lm  \
 
 
 ########################################################################

@@ -79,7 +79,7 @@ class ModePsFile : public PSfile {
 
       void plot_simple_ids(ModeFuzzyEngine &, bool fcst);
 
-      void render_image(ModeFuzzyEngine &, EngineType, const ShapeData &, bool fcst, int split);
+      void render_ppm(ModeFuzzyEngine &, EngineType, const ShapeData &, bool fcst, int split);
 
       void draw_colorbar(bool);
 

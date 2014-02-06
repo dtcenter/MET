@@ -33,9 +33,10 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "cgraph.h"
 
 #include "mode_nc_file.h"
+
+#include "cgraph.h"
 
 
 ////////////////////////////////////////////////////////////////////////
