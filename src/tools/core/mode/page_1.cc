@@ -56,7 +56,8 @@ write_centered_text(1, 1, Htab_2, 727.0, 0.5, 0.5, ObsString);
    ////////////////////////////////////////////////////////////////////
 
 set_view(Vtab_1, Vtab_1 + SmallPlotHeight, Htab_1);
-render_image( eng, eng_type, *(eng.fcst_raw), 1, 0);
+comment("fcst raw");
+render_ppm( eng, eng_type, *(eng.fcst_raw), 1, 0);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 
@@ -67,7 +68,8 @@ draw_map( &(eng.conf_info.conf) );
    ////////////////////////////////////////////////////////////////////
 
 set_view(Vtab_1, Vtab_1 + SmallPlotHeight, Htab_2);
-render_image(eng, eng_type, *(eng.obs_raw), 0, 0);
+comment("obs raw");
+render_ppm(eng, eng_type, *(eng.obs_raw), 0, 0);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 
@@ -78,7 +80,8 @@ draw_map( &(eng.conf_info.conf) );
    ////////////////////////////////////////////////////////////////////
 
 set_view(Vtab_2, Vtab_2 + SmallPlotHeight, Htab_1);
-render_image(eng, eng_type, *(eng.fcst_split), 1, 1);
+comment("fcst split");
+render_ppm(eng, eng_type, *(eng.fcst_split), 1, 1);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 draw_convex_hulls(eng, 1, 0);
@@ -90,7 +93,8 @@ draw_convex_hulls(eng, 1, 0);
    ////////////////////////////////////////////////////////////////////
 
 set_view(Vtab_2, Vtab_2 + SmallPlotHeight, Htab_2);
-render_image(eng, eng_type, *eng.obs_split, 0, 1);
+comment("obs split");
+render_ppm(eng, eng_type, *eng.obs_split, 0, 1);
 outline_view();
 draw_map( &(eng.conf_info.conf) );
 draw_convex_hulls(eng, 0, 0);

@@ -619,8 +619,17 @@ v_tab = PageHeight - 3.0*Vmargin;
 
 set_view(v_tab - LargePlotHeight, v_tab, h_tab_cen);
 
-if ( fcst )  render_image(eng, FOEng, *(eng.fcst_raw), fcst, 0);
-else         render_image(eng, FOEng, *(eng.obs_raw),  fcst, 0);
+if ( fcst )  {
+
+   comment("threshold merging page: fcst raw");
+   render_ppm(eng, FOEng, *(eng.fcst_raw), fcst, 0);
+
+} else {
+
+   comment("threshold merging page: obs raw");
+   render_ppm(eng, FOEng, *(eng.obs_raw),  fcst, 0);
+
+}
 
 outline_box(View_box, L_thin);
 
@@ -638,8 +647,17 @@ v_tab -= LargePlotHeight;
 
 set_view(v_tab - LargePlotHeight, v_tab, h_tab_cen);
 
-if ( fcst )  render_image(eng, FOEng, *(eng.fcst_split), fcst, 2);
-else         render_image(eng, FOEng, *(eng.obs_split),  fcst, 2);
+if ( fcst )  {
+
+   comment("threshold merging page: fcst raw");
+   render_ppm(eng, FOEng, *(eng.fcst_split), fcst, 2);
+
+} else {
+
+   comment("threshold merging page: obs split");
+   render_ppm(eng, FOEng, *(eng.obs_split),  fcst, 2);
+
+}
 
 outline_box(View_box, L_thin);
 
@@ -970,7 +988,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModePsFile::render_image(ModeFuzzyEngine & eng, EngineType eng_type, const ShapeData &wd, bool fcst, int split)
+void ModePsFile::render_ppm(ModeFuzzyEngine & eng, EngineType eng_type, const ShapeData &wd, bool fcst, int split)
 
 {
 
