@@ -1491,7 +1491,7 @@ output_stats = {
 //             "ABS(col or col1-col2)" for the absolute value.
 //          Required Args: -line_type, -column
 //          Optional Args (TCStat): -by column_name to specify case information
-//                                  -out_alpha to override default alpha value
+//                                  -out_alpha to override default alpha value of 0.05
 //
 //       "aggregate"
 //          To aggregate the STAT data for the STAT line type specified using

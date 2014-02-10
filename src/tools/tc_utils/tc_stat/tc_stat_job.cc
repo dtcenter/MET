@@ -1461,10 +1461,11 @@ ConcatString TCStatJobSummary::serialize() const {
       s << "-column " << ReqColumn[i] << " ";
    for(i=0; i<CaseColumn.n_elements(); i++)
       s << "-by " << CaseColumn[i] << " ";
-   if(OutAlpha != default_tc_alpha)
-      s << "-out_alpha " << OutAlpha << " ";
    if(!(FSPThresh == default_fsp_thresh))
       s << "-fsp_thresh " << FSPThresh.get_str();
+
+   // Always list the output alpha value used
+   s << "-out_alpha " << OutAlpha << " ";
 
    return(s);
 }
