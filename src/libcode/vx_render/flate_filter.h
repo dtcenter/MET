@@ -7,46 +7,54 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VX_RENDER_H__
-#define __VX_RENDER_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "vx_ps.h"
-
-#include "vx_pxm.h"
-
-#include "renderinfo.h"
-#include "ascii85_filter.h"
-#include "bit_filter.h"
-#include "hex_filter.h"
-#include "psout_filter.h"
-#include "rle_filter.h"
-#include "flate_filter.h"
+#ifndef  __FLATE_FILTER_1_H__
+#define  __FLATE_FILTER_1_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void render(PSfile &, const Pbm &, const RenderInfo &);
+#include <zlib.h>
 
-extern void render(PSfile &, const Pgm &, const RenderInfo &);
-
-extern void render(PSfile &, const Ppm &, const RenderInfo &);
-
-extern void render(PSfile &, const Pcm &, const RenderInfo &);
+#include "ps_filter.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __VX_RENDER_H__
+class FlateEncodeFilter : public PSFilter {
+
+   public:
+
+      FlateEncodeFilter();
+     ~FlateEncodeFilter();
+
+      int flush_mode;
+
+      z_stream * s;   //  allocated
+
+      int inbytes;   //  # of bytes stored in the input buffer
+
+      unsigned char *  inbuf;   //  allocated
+
+      unsigned char * outbuf;   //  allocated
+
+      virtual void eat(unsigned char);
+
+      virtual void eod();
+
+      void do_output();
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   /*  __FLATE_FILTER_1_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

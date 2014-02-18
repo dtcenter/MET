@@ -25,6 +25,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const bool default_ignore_columns = false;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class PSOutputFilter
    //
@@ -40,6 +46,8 @@ PSOutputFilter::PSOutputFilter()
 file = (ofstream *) 0;
 
 column = 0;
+
+ignore_columns = default_ignore_columns;
 
 }
 
@@ -67,6 +75,8 @@ file = &s;
 
 column = 0;
 
+ignore_columns = default_ignore_columns;
+
 }
 
 
@@ -81,7 +91,7 @@ file->put(c);
 
 ++column;
 
-if ( (column >= 70) && (c != '~') && (c != '>') )  { file->put('\n');  column = 0; }
+if ( !ignore_columns && (column >= 70) && (c != '~') && (c != '>') )  { file->put('\n');  column = 0; }
 
 return;
 
@@ -96,6 +106,40 @@ void PSOutputFilter::eod()
 {
 
 file = (ofstream *) 0;   //  don't delete it
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSOutputFilter::attach(ofstream * ofs)
+
+{
+
+detach();
+
+file = ofs;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSOutputFilter::detach()
+
+{
+
+if ( file )  eod();
+
+file = 0;
+
+column = 0;
 
 return;
 

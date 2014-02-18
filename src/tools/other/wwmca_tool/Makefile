@@ -197,6 +197,7 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	-lvx_render \
 	-lvx_ps \
 	-lvx_afm \
+	-lvx_render \
 	-lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
@@ -216,7 +217,7 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
+	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp wwmca_plot $(MET_BIN_DIR)
 

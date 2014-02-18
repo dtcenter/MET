@@ -71,8 +71,13 @@ for (j=0; j<(info.n_filters()); ++j)  {
          v = &((*v)->next);
          break;
 
+      case FlateEncode:
+         *v = new FlateEncodeFilter();
+         v = &((*v)->next);
+         break;
+
       default:
-         mlog << Error << "\nrender() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
+         mlog << Error << "\nrender()(ppm) -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
          break;
 
@@ -84,7 +89,11 @@ for (j=0; j<(info.n_filters()); ++j)  {
    //  put an output filter on the back end
    //
 
-*v = new PSOutputFilter(plot.file());
+PSOutputFilter * psout = new PSOutputFilter(plot.psout);
+
+psout->ignore_columns = false;
+
+*v = psout;
 
 v = (PSFilter **) 0;
 
@@ -124,6 +133,10 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
 
       case RunLengthEncode:
          plot.file() << "/RunLengthDecode filter ";
+         break;
+
+      case FlateEncode:
+         plot.file() << "/FlateDecode filter ";
          break;
 
       default:

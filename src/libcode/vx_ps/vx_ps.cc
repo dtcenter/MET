@@ -31,11 +31,15 @@ using namespace std;
 #include "documentmedia_to_string.h"
 #include "documentorientation_to_string.h"
 
+#include "flate_filter.h"
+#include "ascii85_filter.h"
+#include "psout_filter.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
-// static const int ml_prec = 1;   //  moveto/lineto precision
-static const int ml_prec = 5;   //  moveto/lineto precision
+static const int ml_prec = 1;   //  moveto/lineto precision
+// static const int ml_prec = 5;   //  moveto/lineto precision
 
 static const DocumentOrientation default_orientation = OrientationPortrait;
 
@@ -166,6 +170,10 @@ void PSfile::init_from_scratch()
 
 File = (ofstream *) 0;
 
+psout.ignore_columns = true;
+
+Head = &psout;
+
 afm = new Afm;
 
 showpage_count = 0;
@@ -201,6 +209,12 @@ if ( !(*File) )  {
 }
 
 OutputFilename = filename;
+
+psout.attach(File);
+
+psout.set_decimal_places(ml_prec);
+
+Head = &psout;
 
    //
    //  set media first, then orientation
@@ -260,7 +274,8 @@ void PSfile::do_prolog()
 
 ConcatString orientation_string;
 ConcatString media_string;
-ofstream & f = *File;
+// ofstream & f = *File;
+PSFilter & f = *Head;
 
 
 switch ( Orientation )  {
@@ -367,6 +382,11 @@ void PSfile::close()
 current_font = -1;
 font_size    = -1.0;
 
+Head->eod();
+
+Head = &psout;
+
+psout.detach();
 
 if ( File )  {
 
@@ -472,7 +492,8 @@ font_size    = s;
    //  write font selection/size commands into ps file
    //
 
-(*File) << "/" << (afm->FontName) << " findfont " << font_size << " scalefont setfont\n";
+// (*File) << "/" << (afm->FontName) << " findfont " << font_size << " scalefont setfont\n";
+(*Head) << "/" << (afm->FontName) << " findfont " << font_size << " scalefont setfont\n";
 
    //
    //  done
@@ -620,6 +641,7 @@ int j;
 char junk[32];
 const char * t = n->text();
 // const double scale = 0.001*(n->font_size());
+PSFilter & f = *Head;
 
 
 file() << x_cur << " " << y_cur << " moveto ";
@@ -631,21 +653,21 @@ for (j=0; j<(n->nchars()); ++j)  {
 
    if ( needs_escape(t[j]) )  {
 
-      File->put('\\');
+      f << '\\';
 
-      File->put(t[j]);
+      f << t[j];
 
    } else if ( nonprintable(t[j]) )  {
 
       base_8_string(t[j], junk);
 
-      File->put('\\');
+      f << '\\';
 
-      file() << junk;
+      f << junk;
 
    } else {
 
-      File->put(t[j]);
+      f << t[j];
 
    }
 
@@ -666,7 +688,7 @@ switch ( fill_flag )  {
 
 }   //  switch
 
-File->put('\n');
+f << '\n';
 
    //
    //  done
@@ -685,7 +707,7 @@ void PSfile::moveto(double x, double y)
 {
 
 // File->precision(5);
-File->precision(ml_prec);
+// File->precision(ml_prec);
 
 file() << ' ' << x << ' ' << y << ' ' << moveto_string << '\n';
 
@@ -701,7 +723,7 @@ void PSfile::translate(double dx, double dy)
 
 {
 
-File->precision(5);
+// File->precision(5);
 
 file() << ' ' << dx << ' ' << dy << ' ' << translate_string << '\n';
 
@@ -717,7 +739,7 @@ void PSfile::rotate(double angle)
 
 {
 
-File->precision(5);
+// File->precision(5);
 
 file() << ' ' << angle << ' ' << rotate_string << '\n';
 
@@ -748,7 +770,7 @@ void PSfile::lineto(double x, double y)
 {
 
 // File->precision(5);
-File->precision(ml_prec);
+// File->precision(ml_prec);
 
 file() << ' ' << x << ' ' << y << ' ' << lineto_string << '\n';
 
@@ -808,7 +830,7 @@ void PSfile::line(double x1, double y1, double x2, double y2, bool do_newpath)
 
 if ( do_newpath )  newpath();
 
-File->precision(5);
+// File->precision(5);
 
 file() << ' ' << x1 << ' ' << y1 << ' ' << moveto_string
        << ' ' << x2 << " " << y2 << ' ' << lineto_string
@@ -828,7 +850,7 @@ void PSfile::setgray(double g)
 
 {
 
-File->precision(2);
+// File->precision(2);
 
 file() << ' ' << g << ' ' << setgray_string << '\n';
 
@@ -844,7 +866,7 @@ void PSfile::setlinewidth(double w)
 
 {
 
-File->precision(2);
+// File->precision(2);
 
 file() << ' ' << w << ' ' << setlinewidth_string << '\n';
 
@@ -860,7 +882,7 @@ void PSfile::setdash(const char *d)
 
 {
 
-File->precision(2);
+// File->precision(2);
 
 file() << ' ' << d << ' ' << setdash_string << '\n';
 
@@ -903,7 +925,8 @@ file() << "%%Page: " << page << ' ' << page << '\n';
 
 if ( is_landscape() )  {
 
-   (*File) << " 90 " << rotate_string << " 0 " << (-MediaWidth) << ' ' << translate_string << '\n';
+   // (*File) << " 90 " << rotate_string << " 0 " << (-MediaWidth) << ' ' << translate_string << '\n';
+   (*Head) << " 90 " << rotate_string << " 0 " << (-MediaWidth) << ' ' << translate_string << '\n';
 
 }
 
@@ -961,7 +984,7 @@ void PSfile::setrgbcolor(double r, double g, double b)
 
 {
 
-File->precision(5);
+// File->precision(5);
 
 file() << ' ' << r << ' ' << g << ' ' << b << ' ' << setrgbcolor_string << '\n';
 
@@ -977,7 +1000,7 @@ void PSfile::sethsbcolor(double h, double s, double b)
 
 {
 
-File->precision(5);
+// File->precision(5);
 
 file() << ' ' << h << ' ' << s << ' ' << b << ' ' << sethsbcolor_string << '\n';
 
@@ -1045,7 +1068,7 @@ void PSfile::circle(double cx, double cy, double radius, bool stroke_flag)
 
 {
 
-File->precision(5);
+// File->precision(5);
 
 newpath();
 
@@ -1118,6 +1141,78 @@ void PSfile::set_orientation(DocumentOrientation DO)
 {
 
 Orientation = DO;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::begin_flate()
+
+{
+
+PSFilter **v = &fa_bank;
+PSOutputFilter * pso = 0;
+
+   //
+   //  add a flate encode filter
+   //
+
+*v = new FlateEncodeFilter();
+ v = &((*v)->next);
+
+   //
+   //  add a ascii85 encode filter
+   //
+
+*v = new ASCII85EncodeFilter();
+ v = &((*v)->next);
+
+   //
+   //  add a ps output filter
+   //
+
+pso = new PSOutputFilter();
+pso->ignore_columns = false;
+pso->file = File;
+
+*v = pso;
+ v = &((*v)->next);
+
+   //
+   //
+   //
+
+(*File) << "currentfile\n"
+           "/ASCII85Decode filter /FlateDecode filter\n"
+           "cvx exec\n";
+
+Head = fa_bank;
+
+Head->set_decimal_places(ml_prec);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::end_flate()
+
+{
+
+fa_bank->eod();
+
+delete fa_bank;  fa_bank = 0;
+
+Head = &psout;
+
+psout.file = File;
 
 return;
 

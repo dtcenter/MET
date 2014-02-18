@@ -95,6 +95,7 @@ plot_point_obs: plot_point_obs.cc $(OBJECTS)
 	-lvx_color \
 	-lvx_ps \
 	-lvx_afm \
+	-lvx_render \
 	-lvx_pb_util \
 	-lvx_nav \
 	-lvx_gnomon \
@@ -105,7 +106,7 @@ plot_point_obs: plot_point_obs.cc $(OBJECTS)
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
+	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
 

@@ -23,6 +23,9 @@ static const double L_thin  = 0.50;
 static const double L_thick = 1.00;
 
 
+static const bool use_zlib = true;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 

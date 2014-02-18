@@ -24,6 +24,8 @@
 #include "afm.h"
 #include "ps_text.h"
 
+#include "psout_filter.h"
+
 
 //////////////////////////////////////////////////////////////
 
@@ -111,6 +113,8 @@ class PSfile {
 
       int showpage_count;
 
+      
+
          //
          //  These do NOT account for document orientation
          //
@@ -122,6 +126,10 @@ class PSfile {
       PSfile();
       virtual ~PSfile();
 
+      PSOutputFilter psout;
+
+      PSFilter * Head;
+
          //
          //  set stuff
          //
@@ -132,7 +140,8 @@ class PSfile {
          //  get stuff
          //
 
-      ofstream & file() const;
+      // ofstream & file() const;
+      PSFilter & file() const;
 
       DocumentOrientation orientation () const;
       DocumentMedia       media       () const;
@@ -200,13 +209,22 @@ class PSfile {
       virtual void setrgbcolor(double, double, double);
       virtual void sethsbcolor(double, double, double);
 
+         //
+         //  zlib compression stuff
+         //
+
+      PSFilter * fa_bank;   //  allocated
+
+      virtual void begin_flate();
+      virtual void end_flate();
+
 };
 
 
 //////////////////////////////////////////////////////////////
 
 
-inline ofstream & PSfile::file() const { return ( *File ); }
+inline PSFilter & PSfile::file() const { return ( *Head ); }
 
 inline DocumentOrientation PSfile::orientation () const { return ( Orientation ); }
 inline DocumentMedia       PSfile::media       () const { return ( Media ); }
