@@ -27,6 +27,7 @@ OBJECTS     = ascii85_filter.o \
               render_ppm.o \
               renderinfo.o \
               rle_filter.o \
+              flate_filter.o \
               uc_queue.o
 
 
@@ -47,6 +48,7 @@ HEADERS     = ascii85_filter.h \
               vx_render.h \
               renderinfo.h \
               rle_filter.h \
+              flate_filter.h \
               uc_queue.h
 
 
@@ -95,22 +97,25 @@ psout_filter.o: psout_filter.cc
 	$(CXX) psout_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 render_pbm.o: render_pbm.cc
-	$(CXX) render_pbm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_pbm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
 render_pcm.o: render_pcm.cc
-	$(CXX) render_pcm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_pcm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
 render_pgm.o: render_pgm.cc
-	$(CXX) render_pgm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_pgm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
 render_ppm.o: render_ppm.cc
-	$(CXX) render_ppm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+	$(CXX) render_ppm.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
 renderinfo.o: renderinfo.cc
 	$(CXX) renderinfo.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 rle_filter.o: rle_filter.cc
 	$(CXX) rle_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
+
+flate_filter.o: flate_filter.cc
+	$(CXX) flate_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 uc_queue.o: uc_queue.cc
 	$(CXX) uc_queue.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)

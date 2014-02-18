@@ -103,7 +103,7 @@ plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf \
+	-lm -lz -lnetcdf_c++ -lnetcdf \
 	$(CXX_LIBS)
 	cp plot_data_plane $(MET_BIN_DIR)
 

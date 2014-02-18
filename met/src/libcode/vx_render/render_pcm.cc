@@ -32,7 +32,7 @@ static const int table_size = 1537;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void set_up_colortable(ofstream &out, const Pcm &pcm, const RenderInfo &info);
+static void set_up_colortable(PSFilter & out, const Pcm & pcm, const RenderInfo & info);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,11 @@ for (j=0; j<(info.n_filters()); ++j)  {
    //  put an output filter on the back end
    //
 
-*v = new PSOutputFilter(plot.file());
+PSOutputFilter * psout = new PSOutputFilter(plot.psout);
+
+psout->ignore_columns = false;
+
+*v = psout;
 
 v = (PSFilter **) 0;
 
@@ -189,7 +193,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_up_colortable(ofstream &out, const Pcm &pcm, const RenderInfo &info)
+void set_up_colortable(PSFilter & out, const Pcm & pcm, const RenderInfo & info)
 
 {
 

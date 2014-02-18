@@ -18,6 +18,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "concat_string.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  filter types
    //
@@ -30,6 +36,8 @@ static const int ASCII85Encode    =  1;
 static const int HexEncode        =  2;
 
 static const int RunLengthEncode  =  3;
+
+static const int FlateEncode      =  4;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,11 +58,37 @@ class PSFilter {
 
       PSFilter *next;
 
+      int DecimalPlaces;
+
+      char double_format[32];
+
       virtual void eat(unsigned char);
 
       virtual void eod();
 
+      virtual void set_decimal_places(int);
+
+      virtual PSFilter & operator<<(const char);
+      virtual PSFilter & operator<<(const int);
+      virtual PSFilter & operator<<(const double);
+      virtual PSFilter & operator<<(const char *);
+      virtual PSFilter & operator<<(const ConcatString &);
+
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline PSFilter & PSFilter::operator<<(char c)
+
+{
+
+eat( (unsigned char) c );
+
+return ( *this );
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////

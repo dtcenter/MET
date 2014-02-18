@@ -31,6 +31,8 @@ static const Color MapColor      ( 25,  25,  25);
 static const Color HullColor     (  0,   0,   0);
 static const Color BoundaryColor (  0,   0, 255);
 
+static const Color white(255, 255, 255);
+
 static const int stride = 1;
 
 
@@ -877,6 +879,8 @@ void ModePsFile::draw_map(MetConfig * config)
 
 {
 
+if ( use_zlib )  begin_flate();
+
 gsave();
 
    setlinewidth(L_thin);
@@ -885,6 +889,8 @@ gsave();
    ::draw_map(*grid, XY_box, *this, View_box, config);
 
 grestore();
+
+if ( use_zlib )  end_flate();
 
 return;
 
@@ -999,7 +1005,6 @@ double mag, v;
 Color c;
 Color fill_color;
 ColorTable *ct = (ColorTable *) 0;
-const Color white(255, 255, 255);
 const int L = nint(XY_box.left());
 const int B = nint(XY_box.bottom());
 
@@ -1089,7 +1094,8 @@ mag = View_box.width()/XY_box.width();
 render_info.set_ll(View_box.left(), View_box.bottom());
 render_info.set_mag(mag);
 render_info.set_color();
-render_info.add_filter(RunLengthEncode);
+// render_info.add_filter(RunLengthEncode);
+render_info.add_filter(FlateEncode);
 render_info.add_filter(ASCII85Encode);
 
 render(*this, image, render_info);

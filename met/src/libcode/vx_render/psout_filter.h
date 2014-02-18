@@ -35,11 +35,17 @@ class PSOutputFilter : public PSFilter {
 
       ofstream *file;
 
+      bool ignore_columns;   //  default: false
+
       int column;
 
       virtual void eat(unsigned char);
 
       virtual void eod();
+
+
+      void attach(ofstream *);
+      void detach();
 
 };
 

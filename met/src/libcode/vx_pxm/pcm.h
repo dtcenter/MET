@@ -79,6 +79,9 @@ class Pcm : public PxmBase {
 
       void dump(ostream &, int depth = 0) const;
 
+      void all_black();   //  does nothing
+      void all_white();   //  does nothing
+
          //
          //  not from base class
          //

@@ -13,7 +13,9 @@
 ########################################################################
 
 
-EXECUTABLES = test_ps
+EXECUTABLES = 
+
+#test_ps
 
 
 OBJECTS     = documentmedia_to_string.o \
@@ -75,15 +77,15 @@ $(GEN_SOURCES): vx_ps.h
 
 
 documentmedia_to_string.o: documentmedia_to_string.h documentmedia_to_string.cc
-	$(CXX) documentmedia_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\"
+	$(CXX) documentmedia_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I../vx_render -DMET_BASE=\"$(MET_BASE_DIR)\"
 
 
 documentorientation_to_string.o: documentorientation_to_string.h documentorientation_to_string.cc
-	$(CXX) documentorientation_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\"
+	$(CXX) documentorientation_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I../vx_render -DMET_BASE=\"$(MET_BASE_DIR)\"
 
 
 vx_ps.o: vx_ps.cc $(GEN_SOURCES)
-	$(CXX) vx_ps.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -DMET_BASE=\"$(MET_BASE_DIR)\"
+	$(CXX) vx_ps.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I../vx_render -DMET_BASE=\"$(MET_BASE_DIR)\"
 
 
 ps_text.o: ps_text.cc
@@ -116,7 +118,7 @@ libvx_ps.a: $(OBJECTS)
 
 
 test_ps: test_ps.cc $(LIBRARIES)
-	$(CXX) test_ps.cc $(CXX_FLAGS) -o test_ps -I$(MET_INC_DIR) -L$(MET_LIB_DIR) \
+	$(CXX) test_ps.cc $(CXX_FLAGS) -o test_ps -I$(MET_INC_DIR) -I../vx_render -L$(MET_LIB_DIR) \
 	-lvx_ps \
 	-lvx_afm \
 	-lvx_util \

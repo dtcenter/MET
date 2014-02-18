@@ -100,7 +100,7 @@ for (j=0; j<(info.n_filters()); ++j)  {
          break;
 
       default:
-         mlog << Error << "\nrender_color_24() -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
+         mlog << Error << "\nrender()(pbm) -> bad filter: \"" << (info.filter(j)) << "\"\n\n";
          exit ( 1 );
          break;
 
@@ -112,7 +112,11 @@ for (j=0; j<(info.n_filters()); ++j)  {
    //  put an output filter on the back end
    //
 
-*v = new PSOutputFilter(plot.file());
+PSOutputFilter * psout = new PSOutputFilter(plot.psout);
+
+psout->ignore_columns = false;
+
+*v = psout;
 
 v = (PSFilter **) 0;
 
