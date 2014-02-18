@@ -23,11 +23,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern unixtime     parse_time(const char *);
-extern int          parse_lat (const char *);
-extern int          parse_lon (const char *);
-extern int          parse_int (const char *);
-extern ConcatString parse_str (const char *);
+extern unixtime     parse_time           (const char *);
+extern int          parse_lat            (const char *);
+extern int          parse_lon            (const char *);
+extern int          parse_int            (const char *);
+extern int          parse_int_check_zero (const char *);
+extern ConcatString parse_str            (const char *);
   
 ////////////////////////////////////////////////////////////////////////
 //
@@ -305,6 +306,7 @@ bool operator>>(istream &in, ATCFLine &t) {
    }
 
    // Loop through and parse each element
+   // For many numeric columns, replaces instances of 0 with NA
    for(j=0; j<a.n_elements(); j++) {
 
       switch(j) {
@@ -320,40 +322,36 @@ bool operator>>(istream &in, ATCFLine &t) {
         case (5): t.ForecastPeriod  = parse_int(a[j]);               break;
         case (6): t.LatTenths       = parse_lat(a[j]);               break;
         case (7): t.LonTenths       = parse_lon(a[j]);               break;
-        case (8): t.Vmax            = parse_int(a[j]);               break;
-        case (9): t.MSLP            = parse_int(a[j]);               break;
+        case (8): t.Vmax            = parse_int_check_zero(a[j]);    break;
+        case (9): t.MSLP            = parse_int_check_zero(a[j]);    break;
         case(10): t.Level           = string_to_cyclonelevel(a[j]);  break;
-        case(11): t.WindIntensity   = parse_int(a[j]);               break;
+        case(11): t.WindIntensity   = parse_int_check_zero(a[j]);    break;
         case(12): t.Quadrant        = string_to_quadranttype(a[j]);  break;
-        case(13): t.Radius1         = parse_int(a[j]);               break;
-        case(14): t.Radius2         = parse_int(a[j]);               break;
-        case(15): t.Radius3         = parse_int(a[j]);               break;
-        case(16): t.Radius4         = parse_int(a[j]);               break;
-        case(17): t.IsobarPressure  = parse_int(a[j]);               break;
-        case(18): t.IsobarRadius    = parse_int(a[j]);               break;
-        case(19): t.MaxWindRadius   = parse_int(a[j]);               break;
-        case(20): t.Gusts           = parse_int(a[j]);               break;
-        case(21): t.EyeDiameter     = parse_int(a[j]);               break;
+        case(13): t.Radius1         = parse_int_check_zero(a[j]);    break;
+        case(14): t.Radius2         = parse_int_check_zero(a[j]);    break;
+        case(15): t.Radius3         = parse_int_check_zero(a[j]);    break;
+        case(16): t.Radius4         = parse_int_check_zero(a[j]);    break;
+        case(17): t.IsobarPressure  = parse_int_check_zero(a[j]);    break;
+        case(18): t.IsobarRadius    = parse_int_check_zero(a[j]);    break;
+        case(19): t.MaxWindRadius   = parse_int_check_zero(a[j]);    break;
+        case(20): t.Gusts           = parse_int_check_zero(a[j]);    break;
+        case(21): t.EyeDiameter     = parse_int_check_zero(a[j]);    break;
         case(22): t.SubRegion       = string_to_subregioncode(a[j]); break;
-        case(23): t.MaxSeas         = parse_int(a[j]);               break;
+        case(23): t.MaxSeas         = parse_int_check_zero(a[j]);    break;
         case(24): t.Initials        = parse_str(a[j]);               break;
         case(25): t.StormDirection  = parse_int(a[j]);               break;
         case(26): t.StormSpeed      = parse_int(a[j]);               break;
         case(27): t.StormName       = parse_str(a[j]);               break;
         case(28): t.Depth           = string_to_systemsdepth(a[j]);  break;
-        case(29): t.WaveHeight      = parse_int(a[j]);               break;
+        case(29): t.WaveHeight      = parse_int_check_zero(a[j]);    break;
         case(30): t.SeasCode        = string_to_quadranttype(a[j]);  break;
-        case(31): t.SeasRadius1     = parse_int(a[j]);               break;
-        case(32): t.SeasRadius2     = parse_int(a[j]);               break;
-        case(33): t.SeasRadius3     = parse_int(a[j]);               break;
-        case(34): t.SeasRadius4     = parse_int(a[j]);               break;
+        case(31): t.SeasRadius1     = parse_int_check_zero(a[j]);    break;
+        case(32): t.SeasRadius2     = parse_int_check_zero(a[j]);    break;
+        case(33): t.SeasRadius3     = parse_int_check_zero(a[j]);    break;
+        case(34): t.SeasRadius4     = parse_int_check_zero(a[j]);    break;
         default:                                                     break;
       } // end switch
    } // end for
-
-   // Quality control checks
-   if(t.Vmax <= 0) t.Vmax = bad_data_int;
-   if(t.MSLP <= 0) t.MSLP = bad_data_int;
 
    return (true);
 }
@@ -435,6 +433,18 @@ int parse_int(const char *s) {
    
    if(strlen(s) > 0) v = atoi(s);
    else              v = bad_data_int;
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int parse_int_check_zero(const char *s) {
+
+   int v = parse_int(s);
+
+   // Interpret values of 0 as bad data
+   if(v == 0) v = bad_data_int;
 
    return(v);
 }
