@@ -644,7 +644,7 @@ const char * t = n->text();
 PSFilter & f = *Head;
 
 
-file() << x_cur << " " << y_cur << " moveto ";
+file() << x_cur << ' ' << y_cur << ' ' << moveto_string << ' ';
 
 file() << "(";
 
@@ -1157,6 +1157,8 @@ void PSfile::begin_flate()
 PSFilter **v = &fa_bank;
 PSOutputFilter * pso = 0;
 
+comment("begin flate compression");
+
    //
    //  add a flate encode filter
    //
@@ -1206,6 +1208,7 @@ void PSfile::end_flate()
 
 {
 
+
 fa_bank->eod();
 
 delete fa_bank;  fa_bank = 0;
@@ -1213,6 +1216,10 @@ delete fa_bank;  fa_bank = 0;
 Head = &psout;
 
 psout.file = File;
+
+file() << '\n';
+
+comment("end flate compression");
 
 return;
 

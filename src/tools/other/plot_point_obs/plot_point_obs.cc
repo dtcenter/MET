@@ -74,6 +74,8 @@ static const double default_dotsize = 1.0;
 
 static const double margin_size = 36.0;
 
+static const bool use_flate = true;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -340,9 +342,12 @@ int main(int argc, char *argv[]) {
    // draw the map first and then put a border around it
    //
    plot.setrgbcolor(0.0, 0.0, 0.0);
+
+   if ( use_flate )  plot.begin_flate();
    draw_map(grid, grid_bb, plot, map_box, &config);
+
    draw_border(plot, map_box);
-   
+
    //
    // set up clipping path so that the circles will not be made
    // outside the map box
@@ -473,6 +478,8 @@ int main(int argc, char *argv[]) {
       }
    } // end for i
    plot.grestore();
+
+   if ( use_flate )  plot.end_flate();
 
    mlog << Debug(2)
         << "Finished plotting " << plot_count << " locations.\n"
