@@ -57,6 +57,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static const bool use_flate = true;
+
+
+////////////////////////////////////////////////////////////////////////
+
 static void process_command_line(int, char **);
 static void process_scores();
 static void clean_up();
@@ -2433,6 +2439,9 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    //
    // Draw colorbar in the bottom-right corner of the Bounding Box
    //
+
+   if ( use_flate )  p->begin_flate();
+
    p->gsave();
    p->setlinewidth(l_width);
    p->choose_font(28, 8.0);
@@ -2488,6 +2497,8 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
 
    p->grestore();
 
+   if ( use_flate )  p->end_flate();
+
   return;
 }
 
@@ -2513,10 +2524,14 @@ void draw_border(PSfile *p, Box &dim) {
 
 void draw_map(PSfile *p, Box &dim) {
 
+   if ( use_flate )  p->begin_flate();
+
    p->gsave();
    p->setlinewidth(l_width);
    draw_map(grid, xy_bb, *p, dim, &conf_info.conf);
    p->grestore();
+
+   if ( use_flate )  p->end_flate();
 
    return;
 }
@@ -2682,7 +2697,10 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    render_info.set_ll(dim.x_ll(), dim.y_ll());
    render_info.set_mag(mag);
    render_info.set_color();
-   render_info.add_filter(RunLengthEncode);
+
+   if ( use_flate )  render_info.add_filter(FlateEncode);
+   else              render_info.add_filter(RunLengthEncode);
+
    render_info.add_filter(ASCII85Encode);
    render(*p, ppm_image, render_info);
 
@@ -2731,7 +2749,10 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
    render_info.set_ll(dim.x_ll(), dim.y_ll());
    render_info.set_mag(mag);
    render_info.set_color();
-   render_info.add_filter(RunLengthEncode);
+
+   if ( use_flate )  render_info.add_filter(FlateEncode);
+   else              render_info.add_filter(RunLengthEncode);
+
    render_info.add_filter(ASCII85Encode);
    render(*p, ppm_image, render_info);
 

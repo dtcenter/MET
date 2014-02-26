@@ -15,6 +15,8 @@ static const double one_inch = 72.0;
 
 static const int num_ticks = 9;
 
+static const bool use_flate = true;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -140,6 +142,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
 
    render_info.set_ll(map_box.left(), map_box.bottom());
 
+   if ( use_flate )  render_info.add_filter(FlateEncode);
    render_info.add_filter(ASCII85Encode);
 
       //
@@ -150,7 +153,10 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       //
       // draw the map on top of the image and put a border around it
       //
+    if ( use_flate )  plot.begin_flate();
     draw_map(grid, grid_bb, plot, map_box, conf);
+    if ( use_flate )  plot.end_flate();
+
     draw_border(plot, map_box, 2.0);
    
       //

@@ -261,7 +261,7 @@ void gc_arcto(const Grid &gr, const Box &gr_bb, PSfile &p,
    gr.xy_to_latlon(grid_x_start, grid_y_start, lat_start, lon_start);
    gr.xy_to_latlon(grid_x_end, grid_y_end, lat_end, lon_end);
 
-   // Calculate the total distance between the points
+   // Calclate the total distance between the points
    total_dist = gc_dist(lat_start, lon_start, lat_end, lon_end);
 
    // Calculate the number of legs required

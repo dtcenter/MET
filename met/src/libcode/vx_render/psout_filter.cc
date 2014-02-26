@@ -107,6 +107,8 @@ void PSOutputFilter::eod()
 
 file = (ofstream *) 0;   //  don't delete it
 
+column = 0;
+
 return;
 
 }
