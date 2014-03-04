@@ -338,19 +338,19 @@ if(nchar(tcst_file) == 0) {
 #
 ########################################################################
 
-# Define a case column
-tcst$CASE = paste(tcst$BMODEL,  tcst$STORM_ID, tcst$INIT,
-                  tcst$LEAD_HR, tcst$VALID, sep=':');
-
-# Sort the data by the CASE column
-tcst = tcst[with(tcst, order(CASE)),];
-
 # Format time strings
 tcst$INIT_TIME  = as.POSIXct(strptime(tcst$INIT,
                                       format="%Y%m%d_%H%M%s"));
 tcst$VALID_TIME = as.POSIXct(strptime(tcst$VALID,
                                       format="%Y%m%d_%H%M%s"));
 tcst$LEAD_HR    = tcst$LEAD/10000;
+
+# Define a case column
+tcst$CASE = paste(tcst$BMODEL,  tcst$STORM_ID, tcst$INIT,
+                  tcst$LEAD_HR, tcst$VALID, sep=':');
+
+# Sort the data by the CASE column
+tcst = tcst[with(tcst, order(CASE)),];
 
 ########################################################################
 #
