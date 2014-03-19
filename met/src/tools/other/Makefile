@@ -41,6 +41,7 @@ ifeq ($(ENABLE_GEN_CIRCLE_MASK), 1)
 	cd gen_circle_mask  ; $(MAKE) $(PRINT_OPTS)
 endif
 
+
 ########################################################################
 
 

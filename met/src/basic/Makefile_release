@@ -31,16 +31,3 @@ clean:
 
 
 ########################################################################
-
-
-gen_sources:
-	@ echo
-	@ cd vx_log         && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_cal         && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_math        && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_util        && $(MAKE) $(PRINT_OPTS) gen_sources
-	@ cd vx_config      && $(MAKE) $(PRINT_OPTS) gen_sources
-
-
-########################################################################
-
