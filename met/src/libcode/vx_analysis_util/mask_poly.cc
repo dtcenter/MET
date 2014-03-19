@@ -209,6 +209,52 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double MaskPoly::lat(int i) const {
+
+if ( i < 0 || i >= Npoints ) {
+      
+   mlog << Error << "\nMaskPoly::lat(int i) const -> "
+        << "range check error \"" << i << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //   done
+   //
+   
+return ( Lat[i] );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double MaskPoly::lon(int i) const {
+
+if ( i < 0 || i >= Npoints ) {
+      
+   mlog << Error << "\nMaskPoly::lon(int i) const -> "
+        << "range check error \"" << i << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //   done
+   //
+   
+return ( Lon[i] );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void MaskPoly::load(const char * filename)
 
 {
@@ -307,7 +353,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MaskPoly::latlon_is_inside(double lat, double lon) const
+bool MaskPoly::latlon_is_inside(double cur_lat, double cur_lon) const
 
 {
 
@@ -317,9 +363,9 @@ int status;
    //  toggle from degrees_west to degrees_east
    //
 
-lon = -lon;
+cur_lon = -cur_lon;
 
-status = latlon_is_inside_dege(lat, lon);
+status = latlon_is_inside_dege(cur_lat, cur_lon);
 
 return ( status != 0 );
 
@@ -329,13 +375,13 @@ return ( status != 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MaskPoly::latlon_is_inside_dege(double lat, double lon) const
+bool MaskPoly::latlon_is_inside_dege(double cur_lat, double cur_lon) const
 
 {
 
 int status;
 
-status = is_inside(U, V, lon, lat);
+status = is_inside(U, V, cur_lon, cur_lat);
 
 return ( status != 0 );
 

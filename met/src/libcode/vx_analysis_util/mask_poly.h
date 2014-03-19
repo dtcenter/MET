@@ -75,6 +75,9 @@ class MaskPoly {
 
       int          n_points()  const;
 
+      double       lat(int i)  const;
+      double       lon(int i)  const;
+
          //
          //  do stuff
          //
