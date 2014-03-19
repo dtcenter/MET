@@ -37,7 +37,9 @@ endif
 ifeq ($(ENABLE_MODE_GRAPHICS), 1)
 	cd mode_graphics    ; $(MAKE) $(PRINT_OPTS)
 endif
-
+ifeq ($(ENABLE_GEN_CIRCLE_MASK), 1)
+	cd gen_circle_mask  ; $(MAKE) $(PRINT_OPTS)
+endif
 
 ########################################################################
 
@@ -52,6 +54,7 @@ clean:
 	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS) clean
 	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS) clean
 	cd mode_graphics    ; $(MAKE) $(PRINT_OPTS) clean
+	cd gen_circle_mask  ; $(MAKE) $(PRINT_OPTS) clean
 
 
 ########################################################################
@@ -67,6 +70,7 @@ gen_sources:
 	cd wwmca_tool       ; $(MAKE) $(PRINT_OPTS) gen_sources
 	cd modis_regrid     ; $(MAKE) $(PRINT_OPTS) gen_sources
 	cd mode_graphics    ; $(MAKE) $(PRINT_OPTS) gen_sources
+	cd gen_circle_mask  ; $(MAKE) $(PRINT_OPTS) gen_sources
 
 
 ########################################################################
