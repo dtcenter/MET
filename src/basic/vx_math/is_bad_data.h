@@ -28,18 +28,18 @@
 
 
 inline int is_bad_data(int a)  {
-   if(a == bad_data_int) return(1);
-   else                  return(0);
+   if(a == bad_data_int || isnan(a)) return(1);
+   else                              return(0);
 }
 
 inline int is_bad_data(double a) {
-   if(abs((long double) (a - bad_data_double)) < default_tol) return(1);
-   else                                                       return(0);
+   if(abs((long double) (a - bad_data_double)) < default_tol || isnan(a)) return(1);
+   else                                                                   return(0);
 }
 
 inline int is_bad_data(float a) {
-   if(abs((long double) (a - bad_data_float)) < default_tol) return(1);
-   else                                                      return(0);
+   if(abs((long double) (a - bad_data_float)) < default_tol || isnan(a)) return(1);
+   else                                                                  return(0);
 }
 
 inline int is_eq(double a, double b, double tol) {
