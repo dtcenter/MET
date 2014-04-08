@@ -173,6 +173,11 @@ void parse_sl1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.ffbar  = atof(l.get_item(sl1l2_ffbar_offset));
    s_info.oobar  = atof(l.get_item(sl1l2_oobar_offset));
 
+   // Parse mae, if present
+   s_info.mae = (l.n_items() > sl1l2_mae_offset ?
+                 atof(l.get_item(sl1l2_mae_offset)) :
+                 bad_data_double);
+
    return;
 }
 
@@ -188,6 +193,11 @@ void parse_sal1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.foabar  = atof(l.get_item(sal1l2_foabar_offset));
    s_info.ffabar  = atof(l.get_item(sal1l2_ffabar_offset));
    s_info.ooabar  = atof(l.get_item(sal1l2_ooabar_offset));
+
+   // Parse mae, if present
+   s_info.mae = (l.n_items() > sal1l2_mae_offset ?
+                 atof(l.get_item(sal1l2_mae_offset)) :
+                 bad_data_double);
 
    return;
 }

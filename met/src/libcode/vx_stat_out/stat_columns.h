@@ -121,12 +121,14 @@ static const char * cnt_columns [] = {
 
 static const char * sl1l2_columns [] = {
    "TOTAL",       "FBAR",        "OBAR",
-   "FOBAR",       "FFBAR",       "OOBAR"
+   "FOBAR",       "FFBAR",       "OOBAR",
+   "MAE"
 };
 
 static const char * sal1l2_columns [] = {
    "TOTAL",       "FABAR",       "OABAR",
-   "FOABAR",      "FFABAR",      "OOABAR"
+   "FOABAR",      "FFABAR",      "OOABAR",
+   "MAE"
 };
 
 static const char * vl1l2_columns [] = {

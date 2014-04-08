@@ -1797,6 +1797,7 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
    double f, o, c;
    double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
    double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
+   double abs_err_sum;
    
    //
    // Initialize the SL1L2Info object and counts
@@ -1805,6 +1806,7 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
    scount = sacount = 0;
    f_sum  = o_sum  =  ff_sum  = oo_sum  = fo_sum  = 0.0;
    fa_sum = oa_sum =  ffa_sum = ooa_sum = foa_sum = 0.0;
+   abs_err_sum = 0.0;
 
    //
    // Update the partial sums
@@ -1818,43 +1820,45 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
       o = info.o_na[i];
       c = info.c_na[i];
 
-      f_sum   += f;
-      o_sum   += o;
-      ff_sum  += f*f;
-      oo_sum  += o*o;
-      fo_sum  += f*o;
-      scount  += 1;
+      f_sum       += f;
+      o_sum       += o;
+      ff_sum      += f*f;
+      oo_sum      += o*o;
+      fo_sum      += f*o;
+      abs_err_sum += abs(f-o);
+      scount   += 1;
 
       //
       // Check c for valid data
       //
       if(!is_bad_data(c)) {
 
-         fa_sum  += f-c;
-         oa_sum  += o-c;
-         ffa_sum += (f-c)*(f-c);
-         ooa_sum += (o-c)*(o-c);
-         foa_sum += (f-c)*(o-c);
-         sacount += 1;
+         fa_sum    += f-c;
+         oa_sum    += o-c;
+         ffa_sum   += (f-c)*(f-c);
+         ooa_sum   += (o-c)*(o-c);
+         foa_sum   += (f-c)*(o-c);
+         sacount   += 1;
       }
    } // end for
 
    if(scount != 0) {
-      s_info.scount  = scount;
-      s_info.fbar    = f_sum/scount;
-      s_info.obar    = o_sum/scount;
-      s_info.fobar   = fo_sum/scount;
-      s_info.ffbar   = ff_sum/scount;
-      s_info.oobar   = oo_sum/scount;
+      s_info.scount = scount;
+      s_info.fbar   = f_sum/scount;
+      s_info.obar   = o_sum/scount;
+      s_info.fobar  = fo_sum/scount;
+      s_info.ffbar  = ff_sum/scount;
+      s_info.oobar  = oo_sum/scount;
+      s_info.mae    = abs_err_sum/scount;
    }
 
    if(sacount != 0) {
-      s_info.sacount = sacount;
-      s_info.fabar   = fa_sum/sacount;
-      s_info.oabar   = oa_sum/sacount;
-      s_info.foabar  = foa_sum/sacount;
-      s_info.ffabar  = ffa_sum/sacount;
-      s_info.ooabar  = ooa_sum/sacount;
+      s_info.sacount  = sacount;
+      s_info.fabar    = fa_sum/sacount;
+      s_info.oabar    = oa_sum/sacount;
+      s_info.foabar   = foa_sum/sacount;
+      s_info.ffabar   = ffa_sum/sacount;
+      s_info.ooabar   = ooa_sum/sacount;
    }
 
    return;

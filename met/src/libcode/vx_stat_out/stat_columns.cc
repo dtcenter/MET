@@ -2470,7 +2470,8 @@ void write_sl1l2_cols(const CNTInfo &cnt_info,
    // Scalar L1L2 Line Type (SL1L2)
    // Dump out the SL1L2 line:
    //    TOTAL,       FBAR,        OBAR,
-   //    FOBAR,       FFBAR,       OOBAR
+   //    FOBAR,       FFBAR,       OOBAR,
+   //    MAE 
    //
    at.set_entry(r, c+0,  // Total Count
       cnt_info.n);
@@ -2489,6 +2490,9 @@ void write_sl1l2_cols(const CNTInfo &cnt_info,
 
    at.set_entry(r, c+5,  // OOBAR
       cnt_info.oobar);
+
+   at.set_entry(r, c+6,  // MAE
+      cnt_info.mae.v);
 
    return;
 }
@@ -2619,6 +2623,9 @@ void write_sl1l2_cols(const SL1L2Info &sl1l2_info,
    at.set_entry(r, c+5,  // OOBAR
       sl1l2_info.oobar);
 
+   at.set_entry(r, c+6,  // MAE
+      sl1l2_info.mae);
+
    return;
 }
 
@@ -2631,7 +2638,8 @@ void write_sal1l2_cols(const SL1L2Info &sl1l2_info,
    // Scalar Anomaly L1L2 Line Type (SAL1L2)
    // Dump out the SAL1L2 line:
    //    TOTAL,       FABAR,       OABAR,
-   //    FOABAR,      FFABAR,      OOABAR
+   //    FOABAR,      FFABAR,      OOABAR,
+   //    MAE 
    //
    at.set_entry(r, c+0,  // Total Anomaly Count
       sl1l2_info.sacount);
@@ -2650,6 +2658,9 @@ void write_sal1l2_cols(const SL1L2Info &sl1l2_info,
 
    at.set_entry(r, c+5,  // OOABAR
       sl1l2_info.ooabar);
+
+   at.set_entry(r, c+6,  // MAE 
+      sl1l2_info.mae);
 
    return;
 }

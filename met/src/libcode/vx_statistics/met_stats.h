@@ -208,6 +208,9 @@ class SL1L2Info {
       double ffabar, ooabar;
       int    sacount;
 
+      // Mean absolute error
+      double mae;
+
       void zero_out();
       void clear();
 };
