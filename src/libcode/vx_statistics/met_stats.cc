@@ -623,6 +623,8 @@ void CNTInfo::clear() {
 
    n_ranks = frank_ties = orank_ties = 0;
 
+   fobar = ffbar = oobar = bad_data_double;
+
    return;
 }
 
@@ -659,6 +661,9 @@ void CNTInfo::assign(const CNTInfo &c) {
    n_ranks     = c.n_ranks;
    frank_ties  = c.frank_ties;
    orank_ties  = c.orank_ties;
+   fobar       = c.fobar;
+   ffbar       = c.ffbar;
+   oobar       = c.oobar;
 
    return;
 }
@@ -884,6 +889,13 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
       s_info.fobar = (fobar*scount + c.fobar*c.scount)/s_info.scount;
       s_info.ffbar = (ffbar*scount + c.ffbar*c.scount)/s_info.scount;
       s_info.oobar = (oobar*scount + c.oobar*c.scount)/s_info.scount;
+      
+      if(is_bad_data(mae) || is_bad_data(c.mae)) {
+         s_info.mae = bad_data_double;
+      }
+      else {
+         s_info.mae = (mae*scount + c.mae*c.scount)/s_info.scount;
+      }
    }
 
    s_info.sacount  = sacount + c.sacount;
@@ -894,6 +906,13 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
       s_info.foabar = (foabar*sacount + c.foabar*c.sacount)/s_info.sacount;
       s_info.ffabar = (ffabar*sacount + c.ffabar*c.sacount)/s_info.sacount;
       s_info.ooabar = (ooabar*sacount + c.ooabar*c.sacount)/s_info.sacount;
+
+      if(is_bad_data(mae) || is_bad_data(c.mae)) {
+         s_info.mae = bad_data_double;
+      }
+      else {
+         s_info.mae = (mae*sacount + c.mae*c.sacount)/s_info.sacount;
+      }
    }
 
    assign(s_info);
@@ -915,14 +934,16 @@ void SL1L2Info::init_from_scratch() {
 void SL1L2Info::zero_out() {
 
    // SL1L2 Quantities
-   fbar   = obar   = 0.0;
-   fobar  = ffbar  = oobar  = 0.0;
-   scount = 0;
+   fbar    = obar   = 0.0;
+   fobar   = ffbar  = oobar  = 0.0;
+   scount  = 0;
 
    // SAL1L2 Quantities
-   fabar  = oabar  = 0.0;
-   foabar = ffabar = ooabar = 0.0;
+   fabar   = oabar  = 0.0;
+   foabar  = ffabar = ooabar = 0.0;
    sacount = 0;
+
+   mae     = 0.0;
 
    return;
 }
@@ -958,6 +979,8 @@ void SL1L2Info::assign(const SL1L2Info &c) {
    ooabar  = c.ooabar;
    sacount = c.sacount;
 
+   mae     = c.mae;
+
    return;
 }
 
@@ -973,7 +996,6 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    // Set the quantities that can't be derived from SL1L2Info to bad data
    cnt_info.sp_corr.set_bad_data();
    cnt_info.kt_corr.set_bad_data();
-   cnt_info.mae.set_bad_data();
    cnt_info.e10.set_bad_data();
    cnt_info.e25.set_bad_data();
    cnt_info.e50.set_bad_data();
@@ -1045,6 +1067,9 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
 
    // Compute mean error
    cnt_info.me.v = cnt_info.fbar.v - cnt_info.obar.v;
+
+   // Compute mean absolute error
+   cnt_info.mae.v = s.mae;
 
    // Compute mean squared error
    cnt_info.mse.v = cnt_info.ffbar + cnt_info.oobar - 2.0*cnt_info.fobar;

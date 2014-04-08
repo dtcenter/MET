@@ -1332,6 +1332,7 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    else if(c == "FOBAR") { v = cnt_info.fobar;      }
    else if(c == "FFBAR") { v = cnt_info.ffbar;      }
    else if(c == "OOBAR") { v = cnt_info.oobar;      }
+   else if(c == "MAE")   { v = cnt_info.mae.v;      }
    else {
      mlog << Error << "\nstore_stat_sl1l2() -> "
           << "unsupported column name requested \"" << c

@@ -61,6 +61,7 @@ static const int sl1l2_obar_offset       = nhc + 2;
 static const int sl1l2_fobar_offset      = nhc + 3;
 static const int sl1l2_ffbar_offset      = nhc + 4;
 static const int sl1l2_oobar_offset      = nhc + 5;
+static const int sl1l2_mae_offset        = nhc + 6;
 
 //
 // SAL1L2 Line Type offsets
@@ -71,6 +72,7 @@ static const int sal1l2_oabar_offset     = nhc + 2;
 static const int sal1l2_foabar_offset    = nhc + 3;
 static const int sal1l2_ffabar_offset    = nhc + 4;
 static const int sal1l2_ooabar_offset    = nhc + 5;
+static const int sal1l2_mae_offset       = nhc + 6;
 
 //
 // VL1L2 Line Type offsets

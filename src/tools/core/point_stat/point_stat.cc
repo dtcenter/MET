@@ -1382,14 +1382,16 @@ void do_sl1l2(SL1L2Info &s_info, int i_vx, PairDataPoint *pd_ptr) {
    double f, o, c;
    double f_sum, o_sum, fo_sum, ff_sum, oo_sum;
    double fa_sum, oa_sum, foa_sum, ffa_sum, ooa_sum;
+   double abs_err_sum;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums.\n";
 
    // Initialize the counts and sums
    s_info.zero_out();
-   f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0;
-   fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0;
+   f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
+   fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0.0;
+   abs_err_sum = 0.0;
 
    // Loop through the pair data and compute sums
    for(i=0; i<pd_ptr->n_pair; i++) {
@@ -1402,11 +1404,12 @@ void do_sl1l2(SL1L2Info &s_info, int i_vx, PairDataPoint *pd_ptr) {
       if(is_bad_data(f) || is_bad_data(o)) continue;
 
       // SL1L2 sums
-      f_sum  += f;
-      o_sum  += o;
-      fo_sum += f*o;
-      ff_sum += f*f;
-      oo_sum += o*o;
+      f_sum       += f;
+      o_sum       += o;
+      fo_sum      += f*o;
+      ff_sum      += f*f;
+      oo_sum      += o*o;
+      abs_err_sum += abs(f-o);
 
       s_info.scount++;
 
@@ -1435,6 +1438,7 @@ void do_sl1l2(SL1L2Info &s_info, int i_vx, PairDataPoint *pd_ptr) {
    s_info.fobar = fo_sum/s_info.scount;
    s_info.ffbar = ff_sum/s_info.scount;
    s_info.oobar = oo_sum/s_info.scount;
+   s_info.mae   = abs_err_sum/s_info.scount;
 
    // Compute the mean SAL1L2 values
    if(s_info.sacount > 0) {
