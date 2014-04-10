@@ -34,7 +34,13 @@ Compute_STDerr_from_mean <- function ( data, method )
    if ( var(data) > 0.0 & length(data) > 2 ) {
 
       ## Compute the first order auto-correlation coefficient.
-      data.arima <- arima( data, order=c(1,0,0), method=method )
+      data.arima <- try(arima( data, order=c(1,0,0), method=method ))
+
+      ## Catch errors from arima
+      if(class(data.arima) == "try-error") {
+         print(paste("WARNING: arima failed for dataset of length", length(data)));
+         return(c(NA, NA, NA, length(data)));
+      }
 
       ## If the AR1 coefficient is out-of-bounds, try a different ARIMA method.
       ## What about higher-order coefficients?  Should we fit a higher-order function
