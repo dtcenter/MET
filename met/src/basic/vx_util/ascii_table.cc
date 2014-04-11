@@ -192,6 +192,26 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void AsciiTable::empty()
+
+{
+
+int j;
+
+const int NRC = Nrows*Ncols;
+
+for (j=0; j<NRC; ++j)  {
+   if ( e[j] )  { delete [] e[j];  e[j] = (char *) 0; }
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int AsciiTable::rc_to_n(int r, int c) const
 
 {

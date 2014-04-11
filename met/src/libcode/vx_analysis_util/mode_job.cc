@@ -315,7 +315,7 @@ void BasicModeAnalysisJob::dump_mode_line(const ModeLine &L)
 
 {
 
-int i, j;
+int j;
 
 // Nothing to do with no dump file
 if ( !dumpfile )  return;
@@ -333,34 +333,28 @@ if ( n_dump == 0 )  {
    dump_at.set_delete_trailing_blank_rows(1);
 
    // Write out the MODE header columns
-   for ( i=0; i<n_mode_hdr_columns; i++ )  {
-      dump_at.set_entry(0, i, mode_hdr_columns[i]);
+   for (j=0; j<n_mode_hdr_columns; ++j)  {
+      dump_at.set_entry(0, j, mode_hdr_columns[j]);
    }
 
    // Write out the MODE objects columns
-   for ( i=0; i<n_mode_obj_columns; i++ )  {
-      dump_at.set_entry(0, i + n_mode_hdr_columns, mode_obj_columns[i]);
+   for (j=0; j<n_mode_obj_columns; ++j)  {
+      dump_at.set_entry(0, j + n_mode_hdr_columns, mode_obj_columns[j]);
    }
 
    n_dump++;
 }
 
 // Store the current data line
-for ( i=0; i<L.n_items(); i++ )  {
-   dump_at.set_entry(n_dump%dump_at.nrows(), i, L.get_item(i));
+for (j=0; j<L.n_items(); ++j)  {
+   dump_at.set_entry(n_dump%dump_at.nrows(), j, L.get_item(j));
 }
 n_dump++;
 
 // Write the buffer, if full
 if ( n_dump%dump_at.nrows() == 0 ) {
    *(dumpfile) << dump_at;
-
-   // Empty out the contents, keeping the formatting
-   for ( i=0; i<dump_at.nrows(); i++ )  {
-      for ( j=0; j<dump_at.ncols(); j++ )  {
-         dump_at.set_entry(i, j, "");
-      }
-   }
+   dump_at.empty();
 }
 
    //
