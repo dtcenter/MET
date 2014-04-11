@@ -39,6 +39,9 @@ static const int    default_rank_corr_flag = 1;
 static const int    default_vif_flag       = 0;
 static const char   default_tmp_dir[]      = "/tmp";
 
+static const int    dump_buffer_rows       = 512;
+static const int    dump_buffer_cols       = 512;
+
 ////////////////////////////////////////////////////////////////////////
 
 //
@@ -112,6 +115,7 @@ class STATAnalysisJob {
 
       void open_dump_row_file ();
       void close_dump_row_file();
+      void dump_stat_line     (const STATLine &);
 
       ConcatString get_case_info(const STATLine &) const;
 
@@ -190,6 +194,8 @@ class STATAnalysisJob {
 
       char        *dump_row; // dump rows used to a file
       ofstream    *dr_out;   // output file stream for dump row
+      int         n_dump;    // number of lines written to dump row
+      AsciiTable  dump_at;   // AsciiTable for buffering dump row data
 
       STATLineType out_line_type;   // output line type
       ThreshArray  out_fcst_thresh; // output forecast threshold(s)

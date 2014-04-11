@@ -77,6 +77,7 @@ void STATAnalysisJob::init_from_scratch() {
 
    dump_row  = (char *)     0;
    dr_out    = (ofstream *) 0;
+   n_dump    =              0;
    mask_grid = (char *)     0;
    mask_poly = (char *)     0;
    boot_rng  = (char *)     0;
@@ -1183,6 +1184,7 @@ void STATAnalysisJob::open_dump_row_file() {
 
    dr_out = new ofstream;
    dr_out->open(dump_row);
+   n_dump = 0;
 
    if(!(*dr_out)) {
       mlog << Error << "\nSTATAnalysisJob::open_dump_row_file()-> "
@@ -1200,9 +1202,159 @@ void STATAnalysisJob::open_dump_row_file() {
 void STATAnalysisJob::close_dump_row_file() {
 
    if(dr_out) {
+      
+      //
+      // Write any remaining lines
+      //
+      *(dr_out) << dump_at;
+
       dr_out->close();
       delete dr_out;
       dr_out = (ofstream *) 0;
+      n_dump = 0;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::dump_stat_line(const STATLine &line) {
+   int i, j;
+
+   //
+   // Nothing to do with no dump file
+   //
+   if(!dr_out) return;
+   
+   //
+   // Write a header before the first line
+   //
+   if(n_dump == 0) {
+
+      //
+      // Format the dump row AsciiTable
+      //
+      dump_at.set_size(dump_buffer_rows, dump_buffer_cols);
+      dump_at.set_table_just(LeftJust);
+      dump_at.set_precision(default_precision);
+      dump_at.set_bad_data_value(bad_data_double);
+      dump_at.set_bad_data_str(na_str);
+      dump_at.set_delete_trailing_blank_rows(1);
+
+      //
+      // If the line_type is set to a single value
+      // write a full header line
+      //
+      if(line_type.n_elements() == 1) {
+
+         switch(string_to_statlinetype(line_type[0])) {
+            case(stat_fho):
+               write_header_row(fho_columns, n_fho_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_ctc):
+               write_header_row(ctc_columns, n_ctc_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_cts):
+               write_header_row(cts_columns, n_cts_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_cnt):
+               write_header_row(cnt_columns, n_cnt_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_sl1l2):
+               write_header_row(sl1l2_columns, n_sl1l2_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_sal1l2):
+               write_header_row(sal1l2_columns, n_sal1l2_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_vl1l2):
+               write_header_row(vl1l2_columns, n_vl1l2_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_val1l2):
+               write_header_row(val1l2_columns, n_val1l2_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_mpr):
+               write_header_row(mpr_columns, n_mpr_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_nbrctc):
+               write_header_row(nbrctc_columns, n_nbrctc_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_nbrcts):
+               write_header_row(nbrcts_columns, n_nbrcts_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_nbrcnt):
+               write_header_row(nbrcnt_columns, n_nbrcnt_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_isc):
+               write_header_row(isc_columns, n_isc_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_ssvar):
+               write_header_row(ssvar_columns, n_ssvar_columns, 1, dump_at, 0, 0);
+               break;
+               
+            // Just write a STAT header line for indeterminant line types
+            case(stat_mctc):
+            case(stat_mcts):
+            case(stat_pct):
+            case(stat_pstd):
+            case(stat_pjc):
+            case(stat_prc):
+            case(stat_rhist):
+            case(stat_orank):
+               write_header_row((const char **) 0, 0, 1, dump_at, 0, 0);
+               break;
+
+            default:
+               mlog << Error << "\ndump_stat_line() -> "
+                    << "unexpected line type value " << line_type[0] << "\n\n";
+               throw(1);
+         } // end switch
+      }      
+      //
+      // Otherwise, just write a STAT header line
+      //
+      else {
+         write_header_row((const char **) 0, 0, 1, dump_at, 0, 0);
+      }
+
+      n_dump++;
+   }
+
+   //
+   // Store the data line
+   //
+   for(i=0; i<line.n_items(); i++) {
+     dump_at.set_entry(n_dump%dump_buffer_rows, i, line.get_item(i));
+   }
+   n_dump++;
+   
+   //
+   // Write the buffer, if full
+   //
+   if(n_dump%dump_buffer_rows == 0) {
+      *(dr_out) << dump_at;
+
+      //
+      // Empty out the contents, keeping the formatting
+      //
+      for(i=0; i<dump_buffer_rows; i++) {
+         for(j=0; j<dump_buffer_cols; j++) {
+            dump_at.set_entry(i, j, "");
+         }
+      }
    }
 
    return;
