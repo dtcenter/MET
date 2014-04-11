@@ -1220,7 +1220,7 @@ void STATAnalysisJob::close_dump_row_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void STATAnalysisJob::dump_stat_line(const STATLine &line) {
-   int i, j;
+   int i;
 
    //
    // Nothing to do with no dump file
@@ -1346,15 +1346,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
    //
    if(n_dump%dump_at.nrows() == 0) {
       *(dr_out) << dump_at;
-
-      //
-      // Empty out the contents, keeping the formatting
-      //
-      for(i=0; i<dump_at.nrows(); i++) {
-         for(j=0; j<dump_at.ncols(); j++) {
-            dump_at.set_entry(i, j, "");
-         }
-      }
+      dump_at.empty();
    }
 
    return;
