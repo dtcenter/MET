@@ -73,10 +73,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          //
          // Zero out the contingecy table object
@@ -275,10 +272,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          //
          // Check for expected line type
@@ -446,10 +440,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          //
          // Check for expected line type
@@ -638,10 +629,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          //
          // Initialize
@@ -822,10 +810,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          //
          // Initialize
@@ -915,10 +900,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          //
          // Check for expected line type
@@ -1018,10 +1000,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          if(line.type() != stat_isc) {
             mlog << Error << "\naggr_isc_lines() -> "
@@ -1268,10 +1247,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          if(line.type() != stat_rhist) {
             mlog << Error << "\naggr_rhist_lines() -> "
@@ -1392,10 +1368,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          if(line.type() != stat_orank) {
             mlog << Error << "\naggr_orank_lines() -> "
@@ -1471,7 +1444,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
    SSVARInfo cur;
    ConcatString case_key, bin_key;
    ConcatString fcst_var, obs_var;
-	double bin_width = bad_data_double;
+   double bin_width = bad_data_double;
 
    //
    // Process the STAT lines
@@ -1482,10 +1455,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          if(line.type() != stat_ssvar) {
             mlog << Error << "\naggr_ssvar_lines() -> "

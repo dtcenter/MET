@@ -255,10 +255,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          n_out++;
       }
@@ -338,10 +335,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
 
       if(j.is_keeper(line)) {
 
-         //
-         // Write line to dump file
-         //
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
 
          //
          // Loop through the columns to be summarized
@@ -2505,7 +2499,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       // Write line to dump file
       //
       if(keep) {
-         if(j.dr_out) *(j.dr_out) << line;
+         j.dump_stat_line(line);
          n_out++;
       }
 
