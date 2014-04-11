@@ -24,6 +24,7 @@ using namespace std;
 #include "analysis_utils.h"
 #include "mode_job.h"
 #include "mode_analysis_columns.h"
+#include "mode_columns.h"
 #include "by_case_info.h"
 
 #include "vx_math.h"
@@ -130,9 +131,16 @@ if ( accums )  { delete [] accums;  accums = (NumArray *) 0; }
 
 n_lines_read = n_lines_kept = 0;
 
+// Write any remaning lines to the dump file
+if ( dumpfile )  *(dumpfile) << dump_at;
+
 dumpfile = (ostream *) 0;   //  don't delete
 
 outfile  = (ostream *) 0;   //  don't delete
+
+n_dump = 0;
+
+dump_at.clear();
 
 return;
 
@@ -172,6 +180,10 @@ n_lines_kept = a.n_lines_kept;
 dumpfile = a.dumpfile;
 
 outfile = a.outfile;
+
+n_dump = a.n_dump;
+
+dump_at = a.dump_at;
 
 return;
 
@@ -291,6 +303,70 @@ if ( (k < 0) || (k >= n_mode_columns) )  {
 
 columns.add(k);
 
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void BasicModeAnalysisJob::dump_mode_line(const ModeLine &L)
+
+{
+
+int i, j;
+
+// Nothing to do with no dump file
+if ( !dumpfile )  return;
+   
+// Write header before the first line
+if ( n_dump == 0 )  {
+
+   // Format the dump row AsciiTable
+   dump_at.set_size(dump_mode_buffer_rows,
+                    n_mode_hdr_columns + n_mode_obj_columns);
+   dump_at.set_table_just(LeftJust);
+   dump_at.set_precision(default_precision);
+   dump_at.set_bad_data_value(bad_data_double);
+   dump_at.set_bad_data_str(na_str);
+   dump_at.set_delete_trailing_blank_rows(1);
+
+   // Write out the MODE header columns
+   for ( i=0; i<n_mode_hdr_columns; i++ )  {
+      dump_at.set_entry(0, i, mode_hdr_columns[i]);
+   }
+
+   // Write out the MODE objects columns
+   for ( i=0; i<n_mode_obj_columns; i++ )  {
+      dump_at.set_entry(0, i + n_mode_hdr_columns, mode_obj_columns[i]);
+   }
+
+   n_dump++;
+}
+
+// Store the current data line
+for ( i=0; i<L.n_items(); i++ )  {
+   dump_at.set_entry(n_dump%dump_at.nrows(), i, L.get_item(i));
+}
+n_dump++;
+
+// Write the buffer, if full
+if ( n_dump%dump_at.nrows() == 0 ) {
+   *(dumpfile) << dump_at;
+
+   // Empty out the contents, keeping the formatting
+   for ( i=0; i<dump_at.nrows(); i++ )  {
+      for ( j=0; j<dump_at.ncols(); j++ )  {
+         dump_at.set_entry(i, j, "");
+      }
+   }
+}
+
+   //
+   // done
+   //
+   
 return;
 
 }
@@ -606,7 +682,7 @@ while ( in >> L )  {
 
    ++n_lines_kept;
 
-   if ( dumpfile )  (*dumpfile) << L;
+   dump_mode_line( L );
 
       //
       //  accumulate the data
@@ -1018,7 +1094,7 @@ while ( in >> L )  {
 
    ++n_lines_kept;
 
-   if ( dumpfile )  (*dumpfile) << L;
+   dump_mode_line( L );
 
    c = L.get_item(column_index);
 

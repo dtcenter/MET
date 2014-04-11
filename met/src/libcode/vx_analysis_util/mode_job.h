@@ -33,6 +33,8 @@
 
 static const char underline_char = '-';
 
+static const int  dump_mode_buffer_rows = 512;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -78,6 +80,11 @@ class BasicModeAnalysisJob {
 
       ostream * dumpfile;   //  NOT allocated, so don't delete
       ostream * outfile;    //  NOT allocated, so don't delete
+      
+      int        n_dump;    //  number of lines written to dump file
+      AsciiTable dump_at;   //  AsciiTable object to buffer dump data
+
+      virtual void dump_mode_line(const ModeLine &);
 
 };
 
