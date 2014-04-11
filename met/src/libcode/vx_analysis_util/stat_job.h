@@ -39,8 +39,11 @@ static const int    default_rank_corr_flag = 1;
 static const int    default_vif_flag       = 0;
 static const char   default_tmp_dir[]      = "/tmp";
 
-static const int    dump_buffer_rows       = 512;
-static const int    dump_buffer_cols       = 512;
+//
+// Dump buffer size
+//
+static const int    dump_stat_buffer_rows  = 512;
+static const int    dump_stat_buffer_cols  = 512;
 
 ////////////////////////////////////////////////////////////////////////
 

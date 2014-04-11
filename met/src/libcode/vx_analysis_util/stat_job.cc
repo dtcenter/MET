@@ -1235,7 +1235,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
       //
       // Format the dump row AsciiTable
       //
-      dump_at.set_size(dump_buffer_rows, dump_buffer_cols);
+      dump_at.set_size(dump_stat_buffer_rows, dump_stat_buffer_cols);
       dump_at.set_table_just(LeftJust);
       dump_at.set_precision(default_precision);
       dump_at.set_bad_data_value(bad_data_double);
@@ -1337,21 +1337,21 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
    // Store the data line
    //
    for(i=0; i<line.n_items(); i++) {
-     dump_at.set_entry(n_dump%dump_buffer_rows, i, line.get_item(i));
+     dump_at.set_entry(n_dump%dump_at.nrows(), i, line.get_item(i));
    }
    n_dump++;
    
    //
    // Write the buffer, if full
    //
-   if(n_dump%dump_buffer_rows == 0) {
+   if(n_dump%dump_at.nrows() == 0) {
       *(dr_out) << dump_at;
 
       //
       // Empty out the contents, keeping the formatting
       //
-      for(i=0; i<dump_buffer_rows; i++) {
-         for(j=0; j<dump_buffer_cols; j++) {
+      for(i=0; i<dump_at.nrows(); i++) {
+         for(j=0; j<dump_at.ncols(); j++) {
             dump_at.set_entry(i, j, "");
          }
       }
