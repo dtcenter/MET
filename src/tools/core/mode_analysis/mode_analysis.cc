@@ -176,6 +176,12 @@ if ( outfile  )  job->outfile  = outfile;
 job->do_job(mode_files);
 
    //
+   //  clear the job to write the dump_row buffer
+   //
+
+job->clear();
+
+   //
    //  done
    //
 
