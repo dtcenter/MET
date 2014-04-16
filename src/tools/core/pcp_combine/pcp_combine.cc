@@ -76,6 +76,7 @@
 //                                   cleanup.
 //   017    10/17/13  Halley Gotway  Bugfix for closing file handles during
 //                                   pcpdir search.
+//   018    04/16/14  Halley Gotway  Bugfix for the -varname option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -134,6 +135,7 @@ static StringArray  pcp_dir;
 static ConcatString pcp_reg_exp = default_reg_exp;
 static ConcatString user_dict = "";
 static ConcatString field_name = "";
+static bool         varname_flag = false;
 static VarInfo*     var_info = (VarInfo *) 0;
 
 // Variables for the add and subtract commands
@@ -177,7 +179,7 @@ static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_user_dict(const StringArray & a);
-static void set_var_name(const StringArray & a);
+static void set_varname(const StringArray & a);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -245,7 +247,7 @@ void process_command_line(int argc, char **argv)
    cline.add(set_pcpdir,    "-pcpdir",   1);
    cline.add(set_pcprx,     "-pcprx",    1);
    cline.add(set_user_dict, "-config",   1);
-   cline.add(set_var_name,  "-varname",  1);
+   cline.add(set_varname,   "-varname",  1);
    cline.add(set_logfile,   "-log",      1);
    cline.add(set_verbosity, "-v",        1);   
 
@@ -1116,19 +1118,18 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
-   // Define a name for the variable
-   // If the accumulation time is non-zero, append it to the variable name
-   tmp_str = field_name;
-
-   // For no accumulation interval, append nothing
-   if(nc_accum <= 0) {
-      var_str = tmp_str;
+   // If the -varname command line option was used or the accumulation
+   // interval is zero, just use the field_name
+   if(varname_flag || nc_accum <= 0) {
+      var_str = field_name;
    }
+   // Otherwise, append the acculuation interval to the variable name
+   else {
 
-   // Otherwise append the interval to the leading variable name
-   else{
+      // Store up to the first underscore
+      tmp_str       = field_name;
       StringArray l = tmp_str.split("_");
-      tmp_str = l[0];
+      tmp_str       = l[0];
 
       // For an hourly accumulation interval, append _HH
       if(nc_accum % sec_per_hour == 0) {
@@ -1399,9 +1400,10 @@ void set_user_dict(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_var_name(const StringArray & a)
+void set_varname(const StringArray & a)
 {
-   field_name = a[0];
+   field_name   = a[0];
+   varname_flag = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
