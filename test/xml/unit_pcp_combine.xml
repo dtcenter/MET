@@ -111,7 +111,7 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F024_APCP24.nc</grid_nc>
     </output>
   </test>
-    
+
   
   <!--                                    -->
   <!--  pcp_combine -subtract             -->
@@ -166,6 +166,24 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc</grid_nc>
+    </output>
+  </test>
+  
+
+  <!--                                    -->
+  <!--  pcp_combine -add a single file    -->
+  <!--  using -varname option             -->
+
+  <test name="pcp_combine_add_VARNAME">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -add \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib 12 \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F012_VARNAME.nc \
+      -varname twelve_hour_precip
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F012_VARNAME.nc</grid_nc>
     </output>
   </test>
   
