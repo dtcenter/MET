@@ -13,8 +13,7 @@
 ########################################################################
 
 
-EXECUTABLES = series_analysis \
-              series_analysis_cnt
+EXECUTABLES = series_analysis
 
 
 OBJECTS     = series_analysis_conf_info.o
@@ -83,7 +82,7 @@ series_analysis_conf_info.o: series_analysis_conf_info.cc
 
 
 series_analysis: series_analysis.cc $(OBJECTS)
-	$(CXX) -o series_analysis series_analysis.cc $(OBJECTS) \
+	$(CXX) -o $(EXECUTABLES) series_analysis.cc $(OBJECTS) \
 	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
 	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
 	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
@@ -108,37 +107,8 @@ series_analysis: series_analysis.cc $(OBJECTS)
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	$(CXX_LIBS)
-
-
-series_analysis_cnt: series_analysis_cnt.cc $(OBJECTS)
-	$(CXX) -o series_analysis_cnt series_analysis_cnt.cc $(OBJECTS) \
-	$(CXX_FLAGS) -DMET_BASE=\"$(MET_BASE_DIR)\" \
-	-I$(MET_INC_DIR) $(NETCDF_INCS) $(GSL_INCS) $(GRIB2C_INCS) \
-	-L$(MET_LIB_DIR) $(NETCDF_LIBS) $(GSL_LIBS) $(GRIB2C_LIBS) \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_shapedata \
-	-lvx_gsl_prob \
-	-lvx_analysis_util \
-	-lvx_data2d_factory \
-	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_pinterp \
-	-lvx_data2d_nccf \
-	-lvx_data2d \
-	-lvx_nc_util \
-	-lvx_grid \
-	-lvx_config \
-	-lvx_cal \
-	-lvx_util \
-	-lvx_math \
-	-lvx_color \
-	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
-	$(CXX_LIBS)
-
-
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
+
 
 ########################################################################
 
