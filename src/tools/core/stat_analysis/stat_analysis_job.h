@@ -110,7 +110,7 @@ extern void write_job_aggr_mpr(STATAnalysisJob &, STATLineType,
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void setup_table    (AsciiTable &);
+extern void setup_table    (AsciiTable &, int);
 extern void write_table    (AsciiTable &,  ofstream *);
 extern void write_jobstring(const ConcatString &, ofstream *);
 extern void write_line     (const ConcatString &, ofstream *);

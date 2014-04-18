@@ -3593,3 +3593,37 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void justify_stat_cols(AsciiTable &at) {
+   int i;
+   
+   // Check for minimum number of columns
+   if(at.ncols() < n_header_columns) {
+      mlog << Error << "\njustify_stat_cols() -> "
+           << "AsciiTable object has fewer columns ("
+           << at.ncols() << ") than the number of STAT header columns ("
+           << n_header_columns << ").\n\n";
+      throw(1);
+   }
+   
+   // Left-justify all the columns
+   at.set_table_just(LeftJust);
+   
+   // Loop through and right-justify some columns
+   for(i=0; i<at.ncols(); i++) {
+      
+      // Right-justify data columns and a handful of header columns
+      if(i >= n_header_columns                      ||
+         strcmp(hdr_columns[i], "INTERP_PNTS") == 0 ||
+         strcmp(hdr_columns[i], "FCST_THRESH") == 0 ||
+         strcmp(hdr_columns[i], "OBS_THRESH" ) == 0 ||
+         strcmp(hdr_columns[i], "COV_THRESH" ) == 0 ||
+         strcmp(hdr_columns[i], "ALPHA"      ) == 0) {
+         at.set_column_just(i, RightJust);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////

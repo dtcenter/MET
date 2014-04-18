@@ -1236,7 +1236,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
       // Format the dump row AsciiTable
       //
       dump_at.set_size(dump_stat_buffer_rows, dump_stat_buffer_cols);
-      dump_at.set_table_just(LeftJust);
+      justify_stat_cols(dump_at);
       dump_at.set_precision(default_precision);
       dump_at.set_bad_data_value(bad_data_double);
       dump_at.set_bad_data_str(na_str);

@@ -339,6 +339,9 @@ extern void write_fcst_cluster(ModeFuzzyEngine &, const int, const Grid &, Ascii
 extern void write_obs_cluster(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
 extern void write_cluster_pair(ModeFuzzyEngine &, const int, AsciiTable &, const int);
 
+// Setup column justification for MODE AsciiTable objects
+extern void justify_mode_cols(AsciiTable &);
+
 extern void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &, ShapeData &);
 extern void calc_obs_clus_ch_mask(const ModeFuzzyEngine &, ShapeData &);
 
