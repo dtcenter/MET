@@ -867,7 +867,7 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
    write_tc_mpr_header_row(1, out_at, 0, 0);
 
    // Setup the output AsciiTable
-   out_at.set_table_just(LeftJust);
+   justify_tc_stat_cols(out_at);
    out_at.set_precision(default_precision);
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
@@ -1656,7 +1656,12 @@ void TCStatJobSummary::do_output(ostream &out) {
    // Setup the output table
    out_at.set_size((int) SummaryMap.size() + 1,
                    CaseColumn.n_elements() + 22);
-   out_at.set_table_just(LeftJust);
+   
+   // Left-justify case info and right-justify summary output
+   for(i=0; i<out_at.ncols(); i++) {
+      if(i < CaseColumn.n_elements()) out_at.set_column_just(i, LeftJust);
+      else                            out_at.set_column_just(i, RightJust);
+   }
    out_at.set_precision(default_precision);
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);

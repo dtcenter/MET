@@ -25,6 +25,7 @@ using namespace std;
 #include "mode_job.h"
 #include "mode_analysis_columns.h"
 #include "mode_columns.h"
+#include "engine.h"
 #include "by_case_info.h"
 
 #include "vx_math.h"
@@ -326,7 +327,7 @@ if ( n_dump == 0 )  {
    // Format the dump row AsciiTable
    dump_at.set_size(dump_mode_buffer_rows,
                     n_mode_hdr_columns + n_mode_obj_columns);
-   dump_at.set_table_just(LeftJust);
+   justify_mode_cols(dump_at);
    dump_at.set_precision(default_precision);
    dump_at.set_bad_data_value(bad_data_double);
    dump_at.set_bad_data_str(na_str);

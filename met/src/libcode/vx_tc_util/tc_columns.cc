@@ -369,3 +369,33 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void justify_tc_stat_cols(AsciiTable &at) {
+   int i;
+   
+   // Check for minimum number of columns
+   if(at.ncols() < n_tc_header_cols) {
+      mlog << Error << "\njustify_tc_stat_cols() -> "
+           << "AsciiTable object has fewer columns ("
+           << at.ncols() << ") than the number of TC-STAT header columns ("
+           << n_tc_header_cols << ").\n\n";
+      throw(1);
+   }
+   
+   // Left-justify all the columns
+   at.set_table_just(LeftJust);
+   
+   // Loop through and right-justify some columns
+   for(i=0; i<at.ncols(); i++) {
+      
+      // Right-justify data columns and a handful of header columns
+      if(i >= n_tc_header_cols ||
+         strcmp(tc_header_cols[i], "CYCLONE") == 0) {
+         at.set_column_just(i, RightJust);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////

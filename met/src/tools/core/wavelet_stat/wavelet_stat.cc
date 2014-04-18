@@ -572,8 +572,8 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 void setup_table(AsciiTable &at) {
 
-   // Left-justify all columns
-   at.set_table_just(LeftJust);
+   // Justify the STAT AsciiTable objects
+   justify_stat_cols(at);
 
    // Set the precision
    at.set_precision(default_precision);

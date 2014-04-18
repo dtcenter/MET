@@ -423,6 +423,9 @@ extern void write_rhist_cols (const PairDataEnsemble *,      AsciiTable &, int, 
 extern void write_orank_cols (const PairDataEnsemble *, int, AsciiTable &, int, int);
 extern void write_ssvar_cols (const PairDataEnsemble *, int, double, AsciiTable &, int, int);
 
+// Setup column justification for STAT AsciiTable objects
+extern void justify_stat_cols(AsciiTable &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __STAT_COLUMNS_H__  */

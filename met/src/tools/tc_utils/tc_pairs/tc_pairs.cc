@@ -1738,8 +1738,8 @@ void write_output(const TrackPairInfoArray &p) {
 
 void setup_table(AsciiTable &at) {
 
-   // Left-justify all columns
-   at.set_table_just(LeftJust);
+   // Justify the TC-STAT AsciiTable objects
+   justify_tc_stat_cols(at);
 
    // Set the precision
    at.set_precision(default_precision);

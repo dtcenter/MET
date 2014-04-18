@@ -385,7 +385,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    r = c = 0;
    out_at.set_size(summary_map.size() + 1,
                    2 + j.column_case.n_elements() + n_job_sum_columns);
-   setup_table(out_at);
+   setup_table(out_at, 2 + j.column_case.n_elements());
 
    //
    // Write header line
@@ -928,7 +928,7 @@ void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
    // Setup the output table
    //
    at.set_size(n_row, n_col);
-   setup_table(at);
+   setup_table(at, 1 + j.column_case.n_elements());
 
    //
    // Write the header information
@@ -2025,8 +2025,8 @@ void do_job_go_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Get the column names
    //
-   out_at.set_size(2, n_job_sum_columns+1);
-   setup_table(out_at);
+   out_at.set_size(2, 2);
+   setup_table(out_at, 1);
    out_at.set_entry(0, 0,  "COL_NAME:");
    write_header_row(job_go_columns, n_job_go_columns, 0, out_at, 0, 1);
 
@@ -2086,8 +2086,8 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Get the column names
    //
-   out_at.set_size(2, n_job_sum_columns+1);
-   setup_table(out_at);
+   out_at.set_size(2, 2);
+   setup_table(out_at, 1);
    out_at.set_entry(0, 0,  "COL_NAME:");
    write_header_row(job_ss_columns, n_job_ss_columns, 0, out_at, 0, 1);
 
@@ -2108,10 +2108,12 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_table(AsciiTable &at) {
-  
-   // Left-justify all columns
-   at.set_table_just(LeftJust);
+void setup_table(AsciiTable &at, int n_hdr_cols) {
+   int i;
+   
+   // Left-justify header columns and right-justify data columns
+   for(i=0;          i<n_hdr_cols; i++) at.set_column_just(i, LeftJust);
+   for(i=n_hdr_cols; i<at.ncols(); i++) at.set_column_just(i, RightJust);
 
    // Right-justify the first column
    at.set_column_just(0, RightJust);

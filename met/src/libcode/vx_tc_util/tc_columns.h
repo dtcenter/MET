@@ -127,6 +127,9 @@ extern void write_tc_header_cols(const TcHdrColumns &, AsciiTable &, int);
 // Write out the TCMPR entries
 extern void write_tc_mpr_cols(const TrackPairInfo &, int, AsciiTable &, int, int);
 
+// Setup column justification for TC-STAT AsciiTable objects
+extern void justify_tc_stat_cols(AsciiTable &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __TC_COLUMNS_H__  */
