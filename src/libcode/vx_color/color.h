@@ -69,7 +69,19 @@ class Color {
 
       void dump(ostream &, int depth = 0) const;
 
+      bool is_gray () const;
+
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline unsigned char Color::red   () const { return ( R ); }
+inline unsigned char Color::green () const { return ( G ); }
+inline unsigned char Color::blue  () const { return ( B ); }
+
+inline bool Color::is_gray() const { return ( (R == G) && (G == B) ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -113,14 +125,6 @@ extern void dhsv_to_drgb(double h, double s, double v, double & r, double & g, d
    //
 
 extern Color blend_colors(const Color & color0, const Color & color1, double t);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-inline unsigned char Color::red()   const { return ( R ); }
-inline unsigned char Color::green() const { return ( G ); }
-inline unsigned char Color::blue()  const { return ( B ); }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -26,6 +26,10 @@
 
 #include "psout_filter.h"
 
+#include "vx_color.h"
+
+#include "affine.h"
+
 
 //////////////////////////////////////////////////////////////
 
@@ -82,6 +86,23 @@ enum DocumentOrientation {
 //////////////////////////////////////////////////////////////
 
 
+enum FontFamily {
+
+   ff_Helvetica,
+   ff_NewCentury,
+   ff_Palatino,
+   ff_Times,
+   ff_Courier,
+   ff_Bookman,
+
+   no_font_family
+
+};
+
+
+//////////////////////////////////////////////////////////////
+
+
 class PSfile {
 
    protected:
@@ -110,6 +131,8 @@ class PSfile {
       ConcatString OutputFilename;
 
       Afm * afm;   //  allocated
+
+      FontFamily Family;   //  defaults to ff_Times
 
       int showpage_count;
 
@@ -156,6 +179,8 @@ class PSfile {
 
       int pagenumber() const;
 
+      FontFamily family () const;
+
          //
          //  do stuff
          //
@@ -165,7 +190,6 @@ class PSfile {
       virtual void open(const char *, DocumentMedia, DocumentOrientation);
       virtual void close();
 
-      virtual void choose_font(int, double);
 
       virtual void write_centered_text(int, int, double, double, double, double, const char *);
 
@@ -178,6 +202,33 @@ class PSfile {
       virtual void grestore();
 
       virtual void comment(const char * text);
+
+         //
+         //  fonts
+         //
+
+      virtual void choose_font(int, double);
+
+      virtual void  set_family     (FontFamily);
+      virtual void  set_font_size  (double);
+
+      virtual void  roman      (double size);
+      virtual void  italic     (double size);
+      virtual void  bold       (double size);
+      virtual void  bolditalic (double size);
+
+      virtual void  dingbats   (double size);   //  ZapfDingbats font (# 33)
+      virtual void  symbol     (double size);   //  Symbol font       (# 27)
+
+      virtual void  roman      ();
+      virtual void  italic     ();
+      virtual void  bold       ();
+      virtual void  bolditalic ();
+
+      virtual int roman_font      () const;
+      virtual int italic_font     () const;
+      virtual int bold_font       () const;
+      virtual int bolditalic_font () const;
 
          //
          //  graphics
@@ -208,6 +259,24 @@ class PSfile {
 
       virtual void setrgbcolor(double, double, double);
       virtual void sethsbcolor(double, double, double);
+
+      virtual void set_color(const Color &);
+
+      virtual void outline_box (const Box &);
+      virtual void outline_box (const Box &, const double linewidth);
+      virtual void outline_box (const Box &, const Color &, double linewidth);
+
+      virtual void fill_box (const Box &, const Color &);
+
+      virtual void setlinecap  (int);
+      virtual void setlinecap_butt();              // 0)
+      virtual void setlinecap_round();             // 1)
+      virtual void setlinecap_projecting_square(); // 2)
+
+      virtual void setlinejoin (int);
+      virtual void setlinejoin_miter();   //  0
+      virtual void setlinejoin_round();   //  1
+      virtual void setlinejoin_bevel();   //  2
 
          //
          //  zlib compression stuff
@@ -241,12 +310,28 @@ inline int PSfile::pagenumber() const { return ( showpage_count + 1); }
 
 inline void PSfile::inc_pagenumber() { pagenumber(showpage_count + 1);  return; }
 
+inline void PSfile::setlinecap_butt()              { setlinecap(0);  return; };
+inline void PSfile::setlinecap_round()             { setlinecap(1);  return; };
+inline void PSfile::setlinecap_projecting_square() { setlinecap(2);  return; };
+
+inline void PSfile::setlinejoin_miter() { setlinejoin(0);  return; };
+inline void PSfile::setlinejoin_round() { setlinejoin(1);  return; };
+inline void PSfile::setlinejoin_bevel() { setlinejoin(2);  return; };
+
+inline FontFamily PSfile::family () const { return ( Family ); }
+
 
 //////////////////////////////////////////////////////////////
 
 
 extern void make_list(const int font_number, const double font_size, const Afm & afm,
                       VxpsTextNode & node, const char * s);
+
+
+extern int ff_to_roman      (const FontFamily);
+extern int ff_to_italic     (const FontFamily);
+extern int ff_to_bold       (const FontFamily);
+extern int ff_to_bolditalic (const FontFamily);
 
 
 //////////////////////////////////////////////////////////////
