@@ -322,7 +322,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	strV1 = getStatMetVer(stat1);
 	strV2 = getStatMetVer(stat2);
 
-	# get the headers and determine and determine if there are differences therein
+	# get the headers and determine if there are differences therein
 	strLtyPar = sub("(\\w+)(#\\d+)?", "\\1", lty, perl=T)
 	listV1Hdr = getStatHeaders(strV1, strLtyPar);
 	listV2Hdr = getStatHeaders(strV2, strLtyPar);
@@ -751,8 +751,8 @@ compareNc = function(nc1, nc2, verb, strict=0){
 }
 
 # compareDiff() assumes that the specified strings file1 and file2 contain the paths and
-#   file names of files to be diffed.  First lines are stripped from the two files, and
-#   then they are compared using the diff command.
+#   file names of files to be diffed.  They are compared using the diff command
+#   ignoring whitespace and header lines.
 #
 # INPUTS:
 #    file1: path and file name of first file to compare
@@ -761,25 +761,12 @@ compareNc = function(nc1, nc2, verb, strict=0){
 compareDiff = function(file1, file2, verb=0){
 	listTest = list();
 
-	strDiff1 = paste(strDirTmp, "/", "diff1_", as.numeric(Sys.time()), ".txt", sep="");
-	strDiff2 = paste(strDirTmp, "/", "diff2_", as.numeric(Sys.time()), ".txt", sep="");
-
 	# verify that the files exist
 	if( ! fileExists(file1) ){ cat("ERROR: file does not exist:", file1, "\n"); return (NA); }
 	if( ! fileExists(file2) ){ cat("ERROR: file does not exist:", file2, "\n"); return (NA); }
 
-	# strip out lines from the first file
-	strCmd = paste(strEgrepExec, " -v \"JOB_LIST:|FILTER:\" ", file1, " > ", strDiff1, sep="");
-	if( 2 <= verb ){ cat("EGREP:", strCmd, "\n"); }
-	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
-
-	# strip out lines from the second file
-	strCmd = paste(strEgrepExec, " -v \"JOB_LIST:|FILTER:\" ", file2, " > ", strDiff2, sep="");
-	if( 2 <= verb ){ cat("EGREP:", strCmd, "\n"); }
-	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
-
-	# build and run the diff command
-	strCmd = paste(strDiffExec, " \\\n  ", strDiff1, " \\\n  ", strDiff2, "\n", sep="");
+	# build and run the diff command, use -w to ignore white space
+	strCmd = paste(strDiffExec, " -w -I 'JOB_LIST:' -I 'FILTER:' \\\n  ", file1, " \\\n  ", file2, "\n", sep="");
 	if( 2 <= verb ){ cat("DIFF:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
@@ -791,15 +778,8 @@ compareDiff = function(file1, file2, verb=0){
 		} else {
 			quit(status=1);
 		}
-
 	}
 	else if( 1 <= verb ){ cat("passed diff\n"); }
-
-	# remove the temporary diff files, if required
-	if( TRUE == boolRmTmp ){
-		rmFile(strDiff1);
-		rmFile(strDiff2);
-	}    
 }
 
 listHeaderCols = c("VERSION", "MODEL", "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END", "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END", 
