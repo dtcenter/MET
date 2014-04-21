@@ -869,9 +869,13 @@ void PSfile::setgray(double g)
 
 {
 
-// File->precision(2);
+const int d = Head->DecimalPlaces;
+
+Head->set_decimal_places(3);
 
 file() << ' ' << g << ' ' << setgray_string << '\n';
+
+Head->set_decimal_places(d);
 
 return;
 
@@ -1003,9 +1007,15 @@ void PSfile::setrgbcolor(double r, double g, double b)
 
 {
 
+const int d = Head->DecimalPlaces;
+
+Head->set_decimal_places(4);
+
 // File->precision(5);
 
 file() << ' ' << r << ' ' << g << ' ' << b << ' ' << setrgbcolor_string << '\n';
+
+Head->set_decimal_places(d);
 
 return;
 

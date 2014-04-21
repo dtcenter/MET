@@ -11,6 +11,7 @@ using namespace std;
 #include <cmath>
 
 #include "mode_ps_file.h"
+#include "mode_ps_table_defs.h"
 #include "table_helper.h"
 
 
@@ -25,19 +26,6 @@ static const double dy = 2.0;
 
 // static const int max_interest_rows = 45;
 static const int max_interest_rows = 29;
-
-static const Color black (  0,   0,   0);
-static const Color white (255, 255, 255);
-static const Color green (  0, 255,   0);
-static const Color blue  (  0,   0, 255);
-
-static Color light_green;
-static Color blue1;
-
-static Color blue2;
-static Color light_gray;
-
-static Color dark_gray;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -55,13 +43,6 @@ ConcatString tmp1_str, tmp2_str, tmp3_str;
 int i, mon, day, yr, hr, minute, sec;
 unixtime t;
 
-light_green = blend_colors(green, white, 0.95);
-blue1       = blend_colors(blue,  white, 0.95);
-
-blue2       = blend_colors(blue,  white, 0.80);
-light_gray  = blend_colors(white, black, 0.10);
-
-dark_gray   = blend_colors(black, white, 0.5);
 
    ////////////////////////////////////////////////////////////////////
    //
@@ -176,7 +157,7 @@ setlinewidth(0.2);
 text_y = 727.0 - 1.5*TextSep;
 
 TableHelper t0;
-double x, y;
+double x;
 int r, c, n;
 int bad_count;
 double table_width = 130.0;
