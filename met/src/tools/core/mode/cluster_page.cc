@@ -11,6 +11,20 @@ using namespace std;
 #include <cmath>
 
 #include "mode_ps_file.h"
+#include "mode_ps_table_defs.h"
+#include "table_helper.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const int max_table_rows = 20;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void write_header_cell(TableHelper & , int col, const char * s1, const char * s2);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -104,6 +118,34 @@ draw_convex_hulls(eng, 0, 1);
    //
    /////////////////////////////////////////////////////////////////
 
+int j, r, c;
+TableHelper t;
+
+j = eng.n_clus;
+
+if ( j > max_table_rows )  j = max_table_rows;
+
+t.set(*this, j + 1, 13);
+
+
+for (j=0; j<(t.ncols()); ++j)  t.set_col_width(j, 45.0);
+
+t.set_row_height(0, 25.0);
+
+for (j=1; j<(t.nrows()); ++j)  t.set_row_height(j, 15.0);
+
+
+t.set_pin(306.0, Vtab_2 - TextSep, 0.5, 1.0);
+
+t.fill_row(0, light_green);
+
+for (j=2; j<(t.nrows()); j+=2)  t.fill_row(j, light_gray);
+
+t.draw_skeleton(0.2);
+t.outline_table(0.2, black);
+
+
+
 choose_font(31, 11.0);
 
 Vtab = Vtab_2 - 1.0*TextSep;
@@ -116,6 +158,27 @@ dy = 10.0;
    // Plot the column headers
    //
 
+c = 0;
+
+bold();
+
+write_header_cell(t, c++,  "CLUS", "PAIR");
+write_header_cell(t, c++,   "CEN", "DIST");
+write_header_cell(t, c++,   "ANG", "DIFF");
+write_header_cell(t, c++,  "FCST", "AREA");
+write_header_cell(t, c++,   "OBS", "AREA");
+write_header_cell(t, c++, "INTER", "AREA");
+write_header_cell(t, c++, "UNION", "AREA");
+write_header_cell(t, c++,  "SYMM", "DIFF");
+write_header_cell(t, c++,  "FCST", "INT 50");
+write_header_cell(t, c++,   "OBS", "INT 50");
+write_header_cell(t, c++,  "FCST", "INT 90");
+write_header_cell(t, c++,   "OBS", "INT 90");
+write_header_cell(t, c++,   "TOT", "INTR");
+
+roman();
+
+/*
 write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "CLUS");
 write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "PAIR");
 Htab += dx;
@@ -167,7 +230,7 @@ Htab += dx;
 write_centered_text(1, 1, Htab, Vtab,      0.0, 0.5, "TOT");
 write_centered_text(1, 1, Htab, Vtab - dy, 0.0, 0.5, "INTR");
 Htab += dx;
-
+*/
 Vtab -= (TextSep + 10.0);
 
    //
@@ -176,68 +239,86 @@ Vtab -= (TextSep + 10.0);
 
 dx = 3.0*TextSep;
 
+dy = 2.0;
+
 for(i=0; i<eng.n_clus && Vtab >= Vmargin; i++) {
+
+   r = i + 1;
+
+   c = 0;
 
    Htab = Hmargin;
 
    // Cluster ID
-   snprintf(junk, sizeof(junk), "%i", i+1);
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   snprintf(junk, sizeof(junk), "%d", i+1);
+   t.write_xy1_to_cell(r, c++, 10.0, dy, 0.5, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Centroid Distance
    snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].centroid_dist);
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Angle Difference
    snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].angle_diff);
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Forecast Area
    snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].Fcst[0].area));
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Observation Area
    snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].Obs[0].area));
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Intersection Area
    snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].intersection_area));
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Union Area
    snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].union_area));
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Symmetric Difference
    snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].symmetric_diff));
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Forecast median intensity
    snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p50);
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Observation median intensity
    snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p50);
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Forecast 90th percentile of intensity
    snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p90);
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Observation median intensity
    snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p90);
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Total Interest
@@ -246,7 +327,8 @@ for(i=0; i<eng.n_clus && Vtab >= Vmargin; i++) {
       snprintf(junk, sizeof(junk), "%.4f", eng.info_clus[i].interest_value);
       label = junk;
    }
-   write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, label);
+   t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+   // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, label);
    Htab += dx;
 
    Vtab -= TextSep;
@@ -260,6 +342,33 @@ for(i=0; i<eng.n_clus && Vtab >= Vmargin; i++) {
    /////////////////////////////////////////////////////////////////
 
 showpage();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void write_header_cell(TableHelper & t, int col, const char * s1, const char * s2)
+
+{
+
+double v1 = 15.0;
+double v2 =  3.0;
+const double x = 0.5*(t.col_width(col));
+
+t.write_xy1_to_cell(0, col, x, v1, 0.5, 0.0, s1);
+t.write_xy1_to_cell(0, col, x, v2, 0.5, 0.0, s2);
 
 return;
 
