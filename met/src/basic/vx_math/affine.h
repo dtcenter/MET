@@ -111,6 +111,18 @@ class Box {
          //  do stuff
          //
 
+      void pad (double);
+      void pad (double px, double py);
+
+      void shrink (double);
+      void shrink (double px, double py);
+
+      double x_to_u (double x) const;
+      double y_to_v (double y) const;
+
+      double u_to_x (double u) const;
+      double v_to_y (double v) const;
+
 };
 
 

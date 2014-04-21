@@ -118,6 +118,8 @@ class ModePsFile : public PSfile {
 
       double TextSep;
 
+      double text_y;
+
       double DataMin;
       double DataMax;
 
@@ -172,8 +174,16 @@ class ModePsFile : public PSfile {
 
       void choose_font(int, double);   //  uses MetDataDir
 
+      void nextline();
+
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline void ModePsFile::nextline() { text_y -= TextSep;  return; }
 
 
 ////////////////////////////////////////////////////////////////////////

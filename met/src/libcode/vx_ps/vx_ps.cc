@@ -30,6 +30,7 @@ using namespace std;
 #include "vx_ps.h"
 #include "documentmedia_to_string.h"
 #include "documentorientation_to_string.h"
+#include "fontfamily_to_string.h"
 
 #include "flate_filter.h"
 #include "ascii85_filter.h"
@@ -42,6 +43,8 @@ static const int ml_prec = 1;   //  moveto/lineto precision
 // static const int ml_prec = 5;   //  moveto/lineto precision
 
 static const DocumentOrientation default_orientation = OrientationPortrait;
+
+static const FontFamily default_font_family    = ff_Times;
 
    //
    //  paper sizes
@@ -406,11 +409,27 @@ afm->clear();
 
 Orientation = default_orientation;
 
+Family = default_font_family;
+
 Media = default_media();
 
 OutputFilename.clear();
 
 showpage_count = 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::set_font_size(double s)
+
+{
+
+choose_font(current_font, s);
 
 return;
 
@@ -1229,6 +1248,428 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void PSfile::outline_box(const Box & b)
+
+{
+
+newpath();
+
+moveto(b.left() , b.bottom());
+lineto(b.right(), b.bottom());
+lineto(b.right(), b.top());
+lineto(b.left(),  b.top());
+
+closepath();
+
+stroke();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::outline_box(const Box & b, double linewidth)
+
+{
+
+gsave();
+
+   setlinewidth(linewidth);
+
+   newpath();
+
+   moveto(b.left() , b.bottom());
+   lineto(b.right(), b.bottom());
+   lineto(b.right(), b.top());
+   lineto(b.left(),  b.top());
+
+   closepath();
+
+   stroke();
+
+grestore();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::outline_box(const Box & b, const Color & c, double linewidth)
+
+{
+
+gsave();
+
+   set_color(c);
+
+   setlinewidth(linewidth);
+
+   outline_box(b);
+
+grestore();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::fill_box(const Box & b, const Color & c)
+
+{
+
+gsave();
+
+   set_color(c);
+
+   newpath();
+
+   moveto(b.left() , b.bottom());
+   lineto(b.right(), b.bottom());
+   lineto(b.right(), b.top());
+   lineto(b.left(),  b.top());
+
+   closepath();
+
+   fill();
+
+grestore();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::set_color(const Color & c)
+
+{
+
+double r, g, b;
+
+
+if ( c.is_gray() )  {
+
+   g = (c.green())/255.0;
+
+   setgray(g);
+
+} else {
+
+   r = (c.red())/255.0;
+   g = (c.green())/255.0;
+   b = (c.blue())/255.0;
+
+   setrgbcolor(r, g, b);
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::setlinejoin(int k)
+
+{
+
+   //
+   //  valid values are 0, 1, 2
+   //
+
+if ( (k < 0) || (k > 2) )  {
+
+   cerr << "\n\n  PSfile::setlinejoin(int) -> invalid value for line join\n\n";
+
+   exit ( 1 );
+
+}
+
+(*Head) << ' ' << k << ' ' << setlinejoin_string << '\n';
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::setlinecap(int k)
+
+{
+
+   //
+   //  valid values are 0, 1, 2
+   //
+
+if ( (k < 0) || (k > 2) )  {
+
+   cerr << "\n\n  PSfile::setlinecap(int) -> invalid value for line cap\n\n";
+
+   exit ( 1 );
+
+}
+
+(*Head) << ' ' << k << ' ' << setlinecap_string << '\n';
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::set_family(FontFamily f)
+
+{
+
+
+switch ( f )  {
+
+   case ff_Helvetica:    //  fall through
+   case ff_NewCentury:   //  fall through
+   case ff_Palatino:     //  fall through
+   case ff_Times:        //  fall through
+   case ff_Courier:      //  fall through
+   case ff_Bookman:      //  fall through
+      Family = f;
+      break;
+
+   default:
+      cerr << "\n\n  PSfile::set_family(FontFamily) -> bad font family ... "
+           << fontfamily_to_string(f) << "\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::roman()
+
+{
+
+roman(font_size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::bold()
+
+{
+
+bold(font_size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::italic()
+
+{
+
+italic(font_size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::bolditalic()
+
+{
+
+bolditalic(font_size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::roman(double size)
+
+{
+
+int n;
+
+n = ff_to_roman(Family);
+
+choose_font(n, size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::italic(double size)
+
+{
+
+int n;
+
+n = ff_to_italic(Family);
+
+choose_font(n, size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::bold(double size)
+
+{
+
+int n;
+
+n = ff_to_bold(Family);
+
+choose_font(n, size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::bolditalic(double size)
+
+{
+
+int n;
+
+n = ff_to_bolditalic(Family);
+
+choose_font(n, size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::dingbats(double size)
+
+{
+
+choose_font(33, size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PSfile::symbol(double size)
+
+{
+
+choose_font(27, size);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int PSfile::roman_font() const
+
+{
+
+return ( ff_to_roman (Family) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int PSfile::italic_font() const
+
+{
+
+return ( ff_to_italic(Family) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int PSfile::bold_font() const
+
+{
+
+return ( ff_to_bold(Family) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int PSfile::bolditalic_font() const
+
+{
+
+return ( ff_to_bolditalic (Family) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -1487,6 +1928,142 @@ mlog << Error << "\ndefault_media() -> "
 exit ( 1 );
 
 return ( no_document_media );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ff_to_roman(const FontFamily f)
+
+{
+
+int n;
+
+
+switch ( f )  {
+
+   case ff_Helvetica:    n = 11;  break;
+   case ff_NewCentury:   n = 22;  break;
+   case ff_Palatino:     n = 26;  break;
+
+   case ff_Times:        n = 31;  break;
+   case ff_Courier:      n =  7;  break;
+   case ff_Bookman:      n =  5;  break;
+
+   default:
+      cerr << "\n\n  ff_to_roman() -> bad font family ... "
+           << fontfamily_to_string(f) << "\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ff_to_italic(const FontFamily f)
+
+{
+
+int n;
+
+
+switch ( f )  {
+
+   case ff_Helvetica:    n = 18;  break;
+   case ff_NewCentury:   n = 21;  break;
+   case ff_Palatino:     n = 25;  break;
+
+   case ff_Times:        n = 30;  break;
+   case ff_Courier:      n = 10;  break;
+   case ff_Bookman:      n =  6;  break;
+
+   default:
+      cerr << "\n\n  ff_to_italic() -> bad font family ... "
+           << fontfamily_to_string(f) << "\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ff_to_bold(const FontFamily f)
+
+{
+
+int n;
+
+
+switch ( f )  {
+
+   case ff_Helvetica:    n = 12;  break;
+   case ff_NewCentury:   n = 19;  break;
+   case ff_Palatino:     n = 23;  break;
+
+   case ff_Times:        n = 28;  break;
+   case ff_Courier:      n =  8;  break;
+   case ff_Bookman:      n =  3;  break;
+
+   default:
+      cerr << "\n\n  ff_to_bold() -> bad font family ... "
+           << fontfamily_to_string(f) << "\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ff_to_bolditalic(const FontFamily f)
+
+{
+
+int n;
+
+
+switch ( f )  {
+
+   case ff_Helvetica:    n = 13;  break;
+   case ff_NewCentury:   n = 20;  break;
+   case ff_Palatino:     n = 24;  break;
+
+   case ff_Times:        n = 29;  break;
+   case ff_Courier:      n =  9;  break;
+   case ff_Bookman:      n =  4;  break;
+
+   default:
+      cerr << "\n\n  ff_to_bolditalic() -> bad font family ... "
+           << fontfamily_to_string(f) << "\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+
+return ( n );
 
 }
 

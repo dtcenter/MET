@@ -11,12 +11,33 @@ using namespace std;
 #include <cmath>
 
 #include "mode_ps_file.h"
+#include "table_helper.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static double Vtab, Htab_a, Htab_b, Htab_c;
+static double Htab_a, Htab_b, Htab_c;
+
+static const double dx = 2.0;
+static const double dy = 2.0;
+
+
+// static const int max_interest_rows = 45;
+static const int max_interest_rows = 29;
+
+static const Color black (  0,   0,   0);
+static const Color white (255, 255, 255);
+static const Color green (  0, 255,   0);
+static const Color blue  (  0,   0, 255);
+
+static Color light_green;
+static Color blue1;
+
+static Color blue2;
+static Color light_gray;
+
+static Color dark_gray;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -26,11 +47,21 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 
 {
 
+int j;
 char junk[1024];
-bool draw_line;
+// bool drew_line;
 ConcatString label, thresh_str;
 ConcatString tmp1_str, tmp2_str, tmp3_str;
 int i, mon, day, yr, hr, minute, sec;
+unixtime t;
+
+light_green = blend_colors(green, white, 0.95);
+blue1       = blend_colors(blue,  white, 0.95);
+
+blue2       = blend_colors(blue,  white, 0.80);
+light_gray  = blend_colors(white, black, 0.10);
+
+dark_gray   = blend_colors(black, white, 0.5);
 
    ////////////////////////////////////////////////////////////////////
    //
@@ -39,6 +70,13 @@ int i, mon, day, yr, hr, minute, sec;
    ////////////////////////////////////////////////////////////////////
 
 inc_pagenumber();
+
+// set_family(ff_Helvetica);
+set_family(ff_Palatino);
+// set_family(ff_NewCentury);
+
+setlinecap(1);
+setlinejoin(1);
 
 choose_font(31, 24.0);
 
@@ -129,42 +167,119 @@ plot_simple_ids(eng, 0);
 
 choose_font(31, 11.0);
 
-write_centered_text(1, 1, Htab_3 + 1.5*TextSep, 727.0, 0.5, 0.5, FcstShortString);
-write_centered_text(1, 1, Htab_3 + 4.5*TextSep, 727.0, 0.5, 0.5, ObsShortString);
-write_centered_text(1, 1, Htab_3 + 7.5*TextSep, 727.0, 0.5, 0.5, "Interest");
+setlinewidth(0.2);
 
-Vtab = 727.0 - 1.5*TextSep;
+// write_centered_text(1, 1, Htab_3 + 1.5*TextSep, 727.0, 0.5, 0.5, FcstShortString);
+// write_centered_text(1, 1, Htab_3 + 4.5*TextSep, 727.0, 0.5, 0.5, ObsShortString);
+// write_centered_text(1, 1, Htab_3 + 7.5*TextSep, 727.0, 0.5, 0.5, "Interest");
 
-draw_line = false;
+text_y = 727.0 - 1.5*TextSep;
 
-for(i=0; i<(eng.n_fcst*eng.n_obs) && Vtab >= Vmargin; i++) {
+TableHelper t0;
+double x, y;
+int r, c, n;
+int bad_count;
+double table_width = 130.0;
 
-   if ( (eng.info[i].interest_value < eng.conf_info.total_interest_thresh) && !draw_line )  {
+n = (eng.n_fcst)*(eng.n_obs);
 
-      write_centered_text(1, 1, Htab_3 + 4.5*TextSep, Vtab, 0.5, 0.5, "----------------------------------");
+if ( n > max_interest_rows )  n = max_interest_rows;
 
-      draw_line = true;
+t0.set(*this, n + 1, 3);
 
-      Vtab -= TextSep;
+for (j=0; j<(t0.nrows()); ++j)  t0.set_row_height(j, 15.0);
 
-   }
+t0.set_col_width(2, 50.0);
+t0.set_col_width(0, 0.5*(table_width - t0.col_width(2)));
+t0.set_col_width(1, t0.col_width(0));
 
-   label << cs_erase << eng.info[i].fcst_number;
-   write_centered_text(1, 1, Htab_3 + 1.5*TextSep, Vtab, 0.5, 0.5, label);
+// t0.set_row_height(9, 10.0);
 
-   label << cs_erase << eng.info[i].obs_number;
-   write_centered_text(1, 1, Htab_3 + 4.5*TextSep, Vtab, 0.5, 0.5, label);
+t0.set_pin(Htab_3, Vtab_1 + SmallPlotHeight + TextSep, 0.0, 1.0);
+
+t0.fill_row(0, light_green);
+
+
+bad_count = 0;
+
+for(i=0; i<n; i++) {
+
+   if ( eng.info[i].interest_value < eng.conf_info.total_interest_thresh )  ++bad_count;
+
+}
+
+for (j=0; j<bad_count; ++j)  {
+
+   t0.fill_row(t0.nrows() - 1 - j, light_gray);
+
+}
+
+t0.draw_skeleton(0.2);
+t0.outline_table(0.2, black);
+
+bold();
+
+t0.write_xy1_to_cell(0, 0, dx, dy, 0.0, 0.0, FcstShortString);
+t0.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0,  ObsShortString);
+t0.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  "Interest");
+
+roman();
+
+x = 0.5*(t0.col_width(0));
+
+for(i=0; i<n; i++) {
+
+   snprintf(junk, sizeof(junk), "%d", eng.info[i].fcst_number);
+
+   t0.write_xy1_to_cell(i + 1, 0, x, dy, 0.5, 0.0, junk);
+
+   snprintf(junk, sizeof(junk), "%d", eng.info[i].obs_number);
+
+   t0.write_xy1_to_cell(i + 1, 1, x, dy, 0.5, 0.0, junk);
 
    if ( eng.info[i].interest_value < 0 ) label = na_str;
    else {
       label.set_precision(4);
       label << cs_erase << eng.info[i].interest_value;
    }
-   write_centered_text(1, 1, Htab_3 + 7.5*TextSep, Vtab, 0.5, 0.5, label);
 
-   Vtab -= TextSep;
+   t0.write_xy1_to_cell(i + 1, 2, dx, dy, 0.0, 0.0, label);
+
+}
+
+
+/*
+drew_line = false;
+
+for(i=0; i<(eng.n_fcst*eng.n_obs) && text_y >= Vmargin; i++) {
+
+   if ( (eng.info[i].interest_value < eng.conf_info.total_interest_thresh) && !drew_line )  {
+
+      write_centered_text(1, 1, Htab_3 + 4.5*TextSep, text_y, 0.5, 0.5, "----------------------------------");
+
+      drew_line = true;
+
+      nextline();
+
+   }
+
+   label << cs_erase << eng.info[i].fcst_number;
+   write_centered_text(1, 1, Htab_3 + 1.5*TextSep, text_y, 0.5, 0.5, label);
+
+   label << cs_erase << eng.info[i].obs_number;
+   write_centered_text(1, 1, Htab_3 + 4.5*TextSep, text_y, 0.5, 0.5, label);
+
+   if ( eng.info[i].interest_value < 0 ) label = na_str;
+   else {
+      label.set_precision(4);
+      label << cs_erase << eng.info[i].interest_value;
+   }
+   write_centered_text(1, 1, Htab_3 + 7.5*TextSep, text_y, 0.5, 0.5, label);
+
+   nextline();
 
 }   //  for i
+*/
 
    ////////////////////////////////////////////////////////////////////
    //
@@ -172,102 +287,219 @@ for(i=0; i<(eng.n_fcst*eng.n_obs) && Vtab >= Vmargin; i++) {
    //
    ////////////////////////////////////////////////////////////////////
 
-Vtab   = Vtab_3 - 1.0*TextSep;
+set_font_size(11.0);
+
+text_y   = Vtab_3 - 1.0*TextSep;
 Htab_a = Htab_1 - 0.5*View_box.width();
 Htab_b = Htab_a + 4.0*TextSep;
 Htab_c = Htab_a + 9.0*TextSep;
 
+TableHelper t1;
+
+
+t1.set(*this, 10, 3);
+
+for (j=0; j<(t1.nrows()); ++j)  t1.set_row_height(j, 15.0);
+
+t1.set_col_width(0, Htab_b - Htab_a);
+t1.set_col_width(1, Htab_c - Htab_b);
+t1.set_col_width(2, Htab_c - Htab_b);
+
+// t1.set_row_height(9, 10.0);
+
+t1.set_pin(Htab_a, Vtab_3 - 2.0, 0.0, 1.0);
+
+t1.fill_cell(0, 1, light_green);
+t1.fill_cell(0, 2, light_green);
+
+t1.fill_cell(1, 0, blue1);
+t1.fill_cell(3, 0, blue1);
+t1.fill_cell(5, 0, blue1);
+t1.fill_cell(6, 0, blue1);
+t1.fill_cell(9, 0, blue1);
+
+t1.fill_cell(2, 0, blue2);
+t1.fill_cell(4, 0, blue2);
+t1.fill_cell(7, 0, blue2);
+t1.fill_cell(8, 0, blue2);
+
+t1.fill_cell(0, 0, dark_gray);
+// t1.fill_cell(1, 2, dark_gray);
+
+r = 2; t1.fill_cell(r, 1, light_gray); t1.fill_cell(r, 2, light_gray);
+r = 4; t1.fill_cell(r, 1, light_gray); t1.fill_cell(r, 2, light_gray);
+r = 7; t1.fill_cell(r, 1, light_gray); t1.fill_cell(r, 2, light_gray);
+r = 8; t1.fill_cell(r, 1, light_gray); t1.fill_cell(r, 2, light_gray);
+
+r = 0; line(t1.left(), t1.row_bottom(r), t1.right(), t1.row_bottom(r));
+r = 1; line(t1.left(), t1.row_bottom(r), t1.right(), t1.row_bottom(r));
+r = 2; line(t1.left(), t1.row_bottom(r), t1.right(), t1.row_bottom(r));
+r = 3; line(t1.left(), t1.row_bottom(r), t1.right(), t1.row_bottom(r));
+r = 4; line(t1.left(), t1.row_bottom(r), t1.right(), t1.row_bottom(r));
+r = 6; line(t1.left(), t1.row_bottom(r), t1.right(), t1.row_bottom(r));
+r = 8; line(t1.left(), t1.row_bottom(r), t1.right(), t1.row_bottom(r));
+
+c = 0; line(t1.col_right(c), t1.top(), t1.col_right(c), t1.bottom());
+c = 1; line(t1.col_right(c), t1.top(), t1.col_right(c), t1.row_bottom(0));
+       line(t1.col_right(c), t1.row_bottom(1), t1.col_right(c), t1.bottom());
+
+// t1.draw_skeleton(0.2);
+t1.outline_table(0.2, black);
+
    //
    // Field name
    //
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, FcstString);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, ObsString);
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, FcstString);
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, ObsString);
+nextline();
+
+bold();
+
+t1.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0, FcstString);
+t1.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  ObsString);
+
+r = 1;
+
+c = 0;
+
+t1.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0,  "Model");
+t1.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0,  "Field");
+t1.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0,  "Level");
+t1.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0,  "Units");
+t1.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0,  "Initial");
+++r;
+t1.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0,  "Valid");
+++r;
+t1.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0,  "Accum");
+
+roman();
 
    //
    // Model Name
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Model:");
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, eng.conf_info.model);
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Model:");
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, eng.conf_info.model);
+nextline();
+
+// t1.write_xy1_to_cell(1, 1, dx, dy, 0.0, 0.0, eng.conf_info.model);
+t1.write_xy1_to_cell(1, 2, 0.0, dy, 0.5, 0.0, eng.conf_info.model);
 
    //
    // Variable Name
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Field:");
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, eng.conf_info.fcst_info->name());
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, eng.conf_info.obs_info->name());
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Field:");
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, eng.conf_info.fcst_info->name());
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, eng.conf_info.obs_info->name());
+nextline();
+
+t1.write_xy1_to_cell(2, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->name());
+t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name());
 
    //
    // Level Name
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Level:");
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, eng.conf_info.fcst_info->level_name());
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, eng.conf_info.obs_info->level_name());
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Level:");
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, eng.conf_info.fcst_info->level_name());
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, eng.conf_info.obs_info->level_name());
+nextline();
+
+t1.write_xy1_to_cell(3, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->level_name());
+t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name());
 
    //
    // Units
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Units:");
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, eng.conf_info.fcst_info->units());
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, eng.conf_info.obs_info->units());
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Units:");
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, eng.conf_info.fcst_info->units());
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, eng.conf_info.obs_info->units());
+nextline();
+
+t1.write_xy1_to_cell(4, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->units());
+t1.write_xy1_to_cell(4, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->units());
 
    //
    // Initialization Time
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Initial:");
-unix_to_mdyhms(eng.fcst_raw->data.valid() -
-               eng.fcst_raw->data.lead(),
-               mon, day, yr, hr, minute, sec);
-snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
-snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
-write_centered_text(1, 1, Htab_b, Vtab-TextSep,
-                      0.0, 0.5, junk);
-unix_to_mdyhms(eng.obs_raw->data.valid() -
-               eng.obs_raw->data.lead(),
-               mon, day, yr, hr, minute, sec);
-snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
-write_centered_text(1, 1, Htab_c, Vtab-TextSep,
-                      0.0, 0.5, junk);
-Vtab -= 2.0*TextSep;
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Initial:");
+
+t = eng.fcst_raw->data.valid() - eng.fcst_raw->data.lead();
+
+unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
+
+// snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
+snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
+
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+t1.write_xy1_to_cell(5, 1, dx, dy, 0.0, 0.0, junk);
+
+snprintf(junk, sizeof(junk), "%02d:%.02d:%02d", hr, minute, sec);
+
+// write_centered_text(1, 1, Htab_b, text_y - TextSep, 0.0, 0.5, junk);
+
+t1.write_xy1_to_cell(6, 1, dx, dy, 0.0, 0.0, junk);
+
+t = eng.obs_raw->data.valid() - eng.obs_raw->data.lead();
+
+unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
+
+snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+t1.write_xy1_to_cell(5, 2, dx, dy, 0.0, 0.0, junk);
+snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+// write_centered_text(1, 1, Htab_c, text_y-TextSep, 0.0, 0.5, junk);
+t1.write_xy1_to_cell(6, 2, dx, dy, 0.0, 0.0, junk);
+text_y -= 2.0*TextSep;
 
    //
    // Valid time
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Valid:");
-unix_to_mdyhms(eng.fcst_raw->data.valid(),
-               mon, day, yr, hr, minute, sec);
-snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
-snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
-write_centered_text(1, 1, Htab_b, Vtab-TextSep,
-                      0.0, 0.5, junk);
-unix_to_mdyhms(eng.obs_raw->data.valid(),
-               mon, day, yr, hr, minute, sec);
-snprintf(junk, sizeof(junk), "%.4i%.2i%.2i", yr, mon, day);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
-write_centered_text(1, 1, Htab_c, Vtab-TextSep,
-                      0.0, 0.5, junk);
-Vtab -= 2.0*TextSep;
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Valid:");
+
+t = eng.fcst_raw->data.valid();
+
+unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
+
+snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
+
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+
+t1.write_xy1_to_cell(7, 1, dx, dy, 0.0, 0.0, junk);
+
+snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+// write_centered_text(1, 1, Htab_b, text_y-TextSep, 0.0, 0.5, junk);
+
+t1.write_xy1_to_cell(8, 1, dx, dy, 0.0, 0.0, junk);
+
+t = eng.obs_raw->data.valid();
+
+unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
+
+snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+
+
+t1.write_xy1_to_cell(7, 2, dx, dy, 0.0, 0.0, junk);
+
+snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+// write_centered_text(1, 1, Htab_c, text_y-TextSep, 0.0, 0.5, junk);
+
+t1.write_xy1_to_cell(8, 2, dx, dy, 0.0, 0.0, junk);
+
+text_y -= 2.0*TextSep;
 
    //
    // Accumulation time
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Accum:");
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Accum:");
 sec_to_hms(eng.fcst_raw->data.accum(), hr, minute, sec);
-snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+t1.write_xy1_to_cell(9, 1, dx, dy, 0.0, 0.0, junk);
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
 sec_to_hms(eng.obs_raw->data.accum(), hr, minute, sec);
-snprintf(junk, sizeof(junk), "%.2i:%.2i:%.2i", hr, minute, sec);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-Vtab -= TextSep;
+snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+t1.write_xy1_to_cell(9, 2, dx, dy, 0.0, 0.0, junk);
+nextline();
 
    ////////////////////////////////////////////////////////////////////
    //
@@ -275,65 +507,141 @@ Vtab -= TextSep;
    //
    ////////////////////////////////////////////////////////////////////
 
-Vtab -= TextSep;
+choose_font(31, 11.0);
+
+nextline();
 
 Htab_a = Htab_1 - 0.5*View_box.width();
 Htab_b = Htab_a + 8.0*TextSep;
 Htab_c = Htab_a + 11.0*TextSep;
 
+TableHelper t2;
+
+t2.set(*this, 5, 3);
+
+for (j=0; j<(t2.nrows()); ++j)  t2.set_row_height(j, 15.0);
+
+t2.set_col_width(0, 135.0);
+t2.set_col_width(1, 0.5*(t1.width() - t2.col_width(0)));
+t2.set_col_width(2, t2.col_width(1));
+
+// t2.set_row_height(9, 10.0);
+
+t2.set_pin(t1.left(), t1.bottom() - 15.0, 0.0, 1.0);
+
+// t2.fill_col(0, blue1);
+
+r = 1;
+
+for (j=0; j<(t2.nrows()); ++j)  {
+
+   if ( j%2 )  t2.fill_cell(j, 0, blue2);
+   else        t2.fill_cell(j, 0, blue1);
+
+}
+
+t2.fill_cell(r, 1, light_gray);  t2.fill_cell(r, 2, light_gray);  r+=2;
+t2.fill_cell(r, 1, light_gray);  t2.fill_cell(r, 2, light_gray);  r+=2;
+
+r = 0;
+
+line(t2.left(), t2.row_bottom(r), t2.right(), t2.row_bottom(r));  ++r;
+line(t2.left(), t2.row_bottom(r), t2.right(), t2.row_bottom(r));  ++r;
+line(t2.left(), t2.row_bottom(r), t2.right(), t2.row_bottom(r));  ++r;
+line(t2.left(), t2.row_bottom(r), t2.right(), t2.row_bottom(r));  ++r;
+
+c = 0;
+
+line(t2.col_right(c), t2.top(), t2.col_right(c), t2.bottom());  ++c;
+
+line(t2.col_right(c), t2.top(), t2.col_right(c), t2.row_top(t2.nrows() - 1));  ++c;
+
+// t2.draw_skeleton(0.2);
+t2.outline_table(0.2, black);
+
+bold();
+
+r = 0;
+
+c = 0;
+
+t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Centroid/Boundary");
+t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Convex Hull/Angle");
+t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Area/Intersection Area");
+t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Complexity/Intensity");
+t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Total Interest Thresh");
+
    //
    // Centroid and Boundary Distance Weights
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5,
-                      "Centroid/Boundary:");
+
+roman();
+
+r = 0;
+
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Centroid/Boundary:");
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.centroid_dist_wt);
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.boundary_dist_wt);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+++r;
+nextline();
 
    //
    // Convex Hull Distance and Angle Difference Weights
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5,
-                      "Convex Hull/Angle:");
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Convex Hull/Angle:");
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.convex_hull_dist_wt);
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.angle_diff_wt);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+++r;
+nextline();
 
    //
    // Area Ratio and Intesection Over Minimum Area Weights
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5,
-                      "Area/Intersection Area:");
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Area/Intersection Area:");
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.area_ratio_wt);
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.int_area_ratio_wt);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+++r;
+nextline();
 
    //
    // Complexity Ratio and Intensity Ratio Weights
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5,
-                      "Complexity/Intensity:");
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Complexity/Intensity:");
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.complexity_ratio_wt);
-write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.inten_perc_ratio_wt);
-write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-Vtab -= TextSep;
+// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+++r;
+nextline();
 
    //
    // Total Interest Threshold
    //
-write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5,
-                      "Total Interest Thresh:");
+// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Total Interest Thresh:");
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.total_interest_thresh);
-write_centered_text(1, 1, (Htab_b+Htab_c)/2.0, Vtab, 0.0, 0.5,
-                      junk);
-Vtab -= TextSep;
+// write_centered_text(1, 1, (Htab_b+Htab_c)/2.0, text_y, 0.0, 0.5, junk);
+
+t2.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, junk);
+
+nextline();
 
    ////////////////////////////////////////////////////////////////////
    //
@@ -341,7 +649,9 @@ Vtab -= TextSep;
    //
    ////////////////////////////////////////////////////////////////////
 
-Vtab   = Vtab_3 - 1.0*TextSep;
+choose_font(31, 11.0);
+
+text_y   = Vtab_3 - 1.0*TextSep;
 Htab_a = Htab_2 - 0.5*View_box.width();
 Htab_b = Htab_a + 5.0*TextSep;
 Htab_c = Htab_a + 10.0*TextSep;
@@ -358,26 +668,114 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+
 void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, const char * title)
 
 {
 
+int j, r;
 char junk[1024];
 ConcatString label, thresh_str;
 ConcatString tmp1_str, tmp2_str, tmp3_str;
 double v;
+double x, y;
+TableHelper t;
+const double w = 240.0;
+
+t.set(*this, 16, 3);
+
+for (j=0; j<(t.nrows()); ++j)  t.set_row_height(j, 15.0);
+
+t.set_col_width(0, 100.0);
+t.set_col_width(1, 0.5*(w - t.col_width(0)));
+t.set_col_width(2, t.col_width(1));
+
+// t.set_row_height(9, 10.0);
+
+t.set_pin(Htab_a, Vtab_3 - 2.0, 0.0, 1.0);
+
+for (j=1; j<(t.nrows()); ++j)  {
+
+   if ( j%2 )  t.fill_cell(j, 0, blue1);
+   else        t.fill_cell(j, 0, blue2);
+
+}
+
+// t.fill_col(0, blue1);
+
+t.fill_cell(0, 1, light_green);
+t.fill_cell(0, 2, light_green);
+
+t.fill_cell(0, 0, dark_gray);
+
+for (j=2; j<(t.nrows()); j+=2)  {
+
+   t.fill_cell(j, 1, light_gray);
+   t.fill_cell(j, 2, light_gray);
+
+}
+
+
+for (j=0; j<(t.nrows() - 1); ++j)  {
+
+   y = t.row_bottom(j);
+
+   line(t.left(), y, t.right(), y);
+
+}
+
+x = t.col_right(0);
+
+line(x, t.top(), x, t.bottom());
+
+x = t.col_right(1);
+
+line(x, t.top(), x, t.row_bottom(8));
+
+line(x, t.row_bottom(9), x, t.row_bottom(14));
+
+
+// t.draw_skeleton(0.2);
+t.outline_table(0.2, black);
+
+bold();
+
+t.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0, FcstString);
+t.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  ObsString);
+
+j = 1;
+
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Mask M/G/P");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Raw Thresh");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Conv Radius");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Conv Thresh");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Area Thresh");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Inten Thresh");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Merge Thresh");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Merging");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Matching");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Simple/M/U");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Area");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Area M/U");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Cluster");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "MMI");
+t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "MMI (F+O)");
 
       //
       // Field name
       //
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, FcstString);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, ObsString);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, FcstString);
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, ObsString);
+      nextline();
+
+r = 1;
+
+roman();
 
       //
       // Mask missing, grid, and polyline Flags
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Mask M/G/P:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Mask M/G/P:");
       if(eng.conf_info.mask_missing_flag == FieldType_Both ||
          eng.conf_info.mask_missing_flag == FieldType_Fcst) tmp1_str = "on";
       else                                                  tmp1_str = "off";
@@ -388,7 +786,8 @@ double v;
          eng.conf_info.mask_grid_flag == FieldType_Fcst)    tmp3_str = "on";
       else                                                  tmp3_str = "off";
       label << cs_erase << tmp1_str << '/' << tmp2_str << '/' << tmp3_str;
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, label);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, label);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label);
 
       if(eng.conf_info.mask_missing_flag == FieldType_Both ||
          eng.conf_info.mask_missing_flag == FieldType_Obs)  tmp1_str = "on";
@@ -400,67 +799,93 @@ double v;
          eng.conf_info.mask_grid_flag == FieldType_Obs)     tmp3_str = "on";
       else                                                  tmp3_str = "off";
       label << cs_erase << tmp1_str << '/' << tmp2_str << '/' << tmp3_str;
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, label);
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, label);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label);
 
-      Vtab -= TextSep;
+      ++r;
+      nextline();
 
       //
       // Raw threshold
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Raw Thresh:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Raw Thresh:");
       thresh_str = eng.conf_info.fcst_raw_thresh.get_str(2);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, thresh_str);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, thresh_str);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str);
+
       thresh_str = eng.conf_info.obs_raw_thresh.get_str(2);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, thresh_str);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, thresh_str);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str);
+
+      ++r;
+      nextline();
 
       //
       // Convolution Radius
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Conv Radius:");
-      snprintf(junk, sizeof(junk), "%.0i gs", eng.conf_info.fcst_conv_radius);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
-      snprintf(junk, sizeof(junk), "%.0i gs", eng.conf_info.obs_conv_radius);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Conv Radius:");
+      // snprintf(junk, sizeof(junk), "%d gs", eng.conf_info.fcst_conv_radius);
+      snprintf(junk, sizeof(junk), "%d", eng.conf_info.fcst_conv_radius);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
+      // snprintf(junk, sizeof(junk), "%d gs", eng.conf_info.obs_conv_radius);
+      snprintf(junk, sizeof(junk), "%d", eng.conf_info.obs_conv_radius);
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+
+      ++r;
+      nextline();
 
       //
       // Convolution Threshold
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Conv Thresh:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Conv Thresh:");
       thresh_str = eng.conf_info.fcst_conv_thresh.get_str(2);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, thresh_str);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, thresh_str);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str);
+
       thresh_str = eng.conf_info.obs_conv_thresh.get_str(2);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, thresh_str);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, thresh_str);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str);
+
+      ++r;
+      nextline();
 
       //
       // Area Threshold
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Area Thresh:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Area Thresh:");
       thresh_str = eng.conf_info.fcst_area_thresh.get_str(0);
-      snprintf(junk, sizeof(junk), "%s gs", thresh_str.text());
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      // snprintf(junk, sizeof(junk), "%s gs", thresh_str.text());
+      snprintf(junk, sizeof(junk), "%s", thresh_str.text());
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
       thresh_str = eng.conf_info.obs_area_thresh.get_str(0);
-      snprintf(junk, sizeof(junk), "%s gs", thresh_str.text());
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // snprintf(junk, sizeof(junk), "%s gs", thresh_str.text());
+      snprintf(junk, sizeof(junk), "%s", thresh_str.text());
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+
+      ++r;
+      nextline();
 
       //
       // Intensity Percentile and Threshold
       //
-      write_centered_text(1, 1, Htab_a, Vtab,
-                           0.0, 0.5, "Inten Thresh:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Inten Thresh:");
 
            if(nint(eng.conf_info.fcst_inten_perc_value) == 101) tmp1_str = "mean";
       else if(nint(eng.conf_info.fcst_inten_perc_value) == 102) tmp1_str = "sum";
       else {
-         snprintf(junk, sizeof(junk), "p%.0i", eng.conf_info.fcst_inten_perc_value);
+         snprintf(junk, sizeof(junk), "p%d", eng.conf_info.fcst_inten_perc_value);
          tmp1_str = junk;
       }
       thresh_str = eng.conf_info.fcst_inten_perc_thresh.get_str(2);
       label << cs_erase << tmp1_str << thresh_str;
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, label);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, label);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label);
 
            if(nint(eng.conf_info.obs_inten_perc_value) == 101) tmp1_str = "mean";
       else if(nint(eng.conf_info.obs_inten_perc_value) == 102) tmp1_str = "sum";
@@ -470,18 +895,26 @@ double v;
       }
       thresh_str = eng.conf_info.obs_inten_perc_thresh.get_str(2);
       label << cs_erase << tmp1_str << thresh_str;
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, label);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, label);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label);
+
+      ++r;
+      nextline();
 
       //
       // Merge Threshold
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Merge Thresh:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Merge Thresh:");
       thresh_str = eng.conf_info.fcst_merge_thresh.get_str(2);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, thresh_str);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, thresh_str);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str);
+
       thresh_str = eng.conf_info.obs_merge_thresh.get_str(2);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, thresh_str);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, thresh_str);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str);
+
+      ++r;
+      nextline();
 
       /////////////////////////////////////////////////////////////////
       //
@@ -492,30 +925,37 @@ double v;
       //
       // Merging flag
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Merging:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Merging:");
            if(eng.conf_info.fcst_merge_flag == MergeType_Thresh) label = "thresh";
       else if(eng.conf_info.fcst_merge_flag == MergeType_Engine) label = "engine";
       else if(eng.conf_info.fcst_merge_flag == MergeType_Both)   label = "thresh/engine";
       else                                                       label = "none";
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, label);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, label);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label);
 
            if(eng.conf_info.obs_merge_flag == MergeType_Thresh) label = "thresh";
       else if(eng.conf_info.obs_merge_flag == MergeType_Engine) label = "engine";
       else if(eng.conf_info.obs_merge_flag == MergeType_Both)   label = "thresh/engine";
       else                                                      label = "none";
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, label);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, label);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label);
+
+      ++r;
+      nextline();
 
       //
       // Matching scheme
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Matching:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Matching:");
            if(eng.conf_info.match_flag == MatchType_MergeBoth) label = "match/merge";
       else if(eng.conf_info.match_flag == MatchType_MergeFcst) label = "match/fcst merge";
       else if(eng.conf_info.match_flag == MatchType_NoMerge)   label = "match/no merge";
       else                                                     label = "none";
-      write_centered_text(1, 1, (Htab_b+Htab_c)/2.0, Vtab, 0.0, 0.5, label);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, (Htab_b + Htab_c)/2.0, text_y, 0.0, 0.5, label);
+      t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, label);
+
+      ++r;
+      nextline();
 
       /////////////////////////////////////////////////////////////////
       //
@@ -526,48 +966,68 @@ double v;
       //
       // Simple objects counts (Matched Simples/Unmatched Simples)
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Simple/M/U:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Simple/M/U:");
       snprintf(junk, sizeof(junk), "%i/%i/%i", eng.n_fcst,
               eng.get_matched_fcst(0), eng.get_unmatched_fcst(0));
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
       snprintf(junk, sizeof(junk), "%i/%i/%i", eng.n_obs,
               eng.get_matched_obs(0), eng.get_unmatched_obs(0));
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+
+      ++r;
+      nextline();
 
       //
       // Area counts
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Area:");
-      snprintf(junk, sizeof(junk), "%i gs",
-              eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
-      snprintf(junk, sizeof(junk), "%i gs",
-              eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Area:");
+      // snprintf(junk, sizeof(junk), "%i gs", eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
+      snprintf(junk, sizeof(junk), "%d", eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
+      // snprintf(junk, sizeof(junk), "%i gs", eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
+      snprintf(junk, sizeof(junk), "%d", eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+
+      ++r;
+      nextline();
 
       //
       // Area counts (Matched Simple/Unmatched Simples)
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Area M/U:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Area M/U:");
       snprintf(junk, sizeof(junk), "%i/%i",
               eng.get_matched_fcst(1),  eng.get_unmatched_fcst(1));
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
       snprintf(junk, sizeof(junk), "%i/%i",
               eng.get_matched_obs(1),  eng.get_unmatched_obs(1));
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+
+      ++r;
+      nextline();
 
       //
       // Cluster object counts
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Cluster:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Cluster:");
       snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
       snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+
+      ++r;
+      nextline();
 
       /////////////////////////////////////////////////////////////////
       //
@@ -578,23 +1038,31 @@ double v;
       //
       // Median of Maximum Interest Values
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "MMI:");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "MMI:");
       v = interest_percentile(eng, 50.0, 1);
       snprintf(junk, sizeof(junk), "%.4f", v);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+
       v = interest_percentile(eng, 50.0, 2);
       snprintf(junk, sizeof(junk), "%.4f", v);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+
+      ++r;
+      nextline();
 
       //
       // Median of Maximum Interest Values
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "MMI (F+O):");
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "MMI (F+O):");
       v = interest_percentile(eng, 50.0, 3);
       snprintf(junk, sizeof(junk), "%.4f", v);
-      write_centered_text(1, 1, (Htab_b+Htab_c)/2.0, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      // write_centered_text(1, 1, (Htab_b+Htab_c)/2.0, text_y, 0.0, 0.5, junk);
+      t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, junk);
+
+      ++r;
+      nextline();
 
    //
    //  done
@@ -612,14 +1080,14 @@ void ModePsFile::do_page_1_other(ModeFuzzyEngine & eng, EngineType eng_type, con
 
 char junk[1024];
 
-      Vtab -= 12.0*TextSep;
+      text_y -= 12.0*TextSep;
 
       //
       // Field name
       //
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, FcstString);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, ObsString);
-      Vtab -= TextSep;
+      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, FcstString);
+      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, ObsString);
+      nextline();
 
       /////////////////////////////////////////////////////////////////
       //
@@ -630,34 +1098,34 @@ char junk[1024];
       //
       // Simple objects counts
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Simple:");
+      write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Simple:");
       snprintf(junk, sizeof(junk), "%i", eng.n_fcst);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
       snprintf(junk, sizeof(junk), "%i", eng.n_obs);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      nextline();
 
       //
       // Area counts
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Area:");
+      write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Area:");
       snprintf(junk, sizeof(junk), "%i gs",
               eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
       snprintf(junk, sizeof(junk), "%i gs",
               eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      nextline();
 
       //
       // Cluster object counts
       //
-      write_centered_text(1, 1, Htab_a, Vtab, 0.0, 0.5, "Cluster:");
+      write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Cluster:");
       snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-      write_centered_text(1, 1, Htab_b, Vtab, 0.0, 0.5, junk);
+      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
       snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-      write_centered_text(1, 1, Htab_c, Vtab, 0.0, 0.5, junk);
-      Vtab -= TextSep;
+      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      nextline();
 
    //
    // done

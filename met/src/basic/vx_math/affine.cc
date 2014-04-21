@@ -205,6 +205,123 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double Box::x_to_u(double x) const 
+
+{ 
+
+return ( (x - Left)/(Right - Left) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Box::y_to_v(double y) const 
+
+{
+
+return ( (y - Bottom)/(Top - Bottom) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Box::u_to_x(double u) const
+
+{
+
+return ( Left + u*(Right - Left) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Box::v_to_y(double v) const
+
+{
+
+return ( Bottom + v*(Top - Bottom) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Box::shrink(double delta)
+
+{
+
+pad(-delta);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Box::shrink(double x_delta, double y_delta)
+
+{
+
+pad(-x_delta, -y_delta);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Box::pad(double p)
+
+{
+
+pad(p, p);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Box::pad(double px, double py)
+
+{
+
+Left   -= px;
+Right  += px;
+
+Top    += py;
+Bottom -= py;
+
+if ( (width() <= 0.0) || (height() <= 0.0) )  {
+
+   mlog << Error
+        << "\n\n  Box::pad(double, double) -> width and/or height is negative!\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class GeneralAffine
    //
@@ -1300,7 +1417,8 @@ switch ( g )  {
 
 
    default:
-      cerr << "\n\n  viewgravity_to_uv() -> bad gravity ... " 
+      mlog << Error
+           << "\n\n  viewgravity_to_uv() -> bad gravity ... " 
            << viewgravity_to_string(g) << "\n\n";
       exit ( 1 );
       break;

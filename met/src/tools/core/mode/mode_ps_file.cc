@@ -132,6 +132,8 @@ Vmargin = default_Vmargin;
 
 TextSep = default_TextSep;
 
+text_y = 0.0;
+
 FcstFillColor = default_fcst_fill;
 ObsFillColor  = default_obs_fill;
 
