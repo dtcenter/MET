@@ -36,15 +36,16 @@ LIBRARIES   = libvx_render.a
 ########################################################################
 
 
-HEADERS     = ascii85_filter.h \
-              bit_filter.h \
-              hex_filter.h \
-              ps_filter.h \
-              psout_filter.h \
-              vx_render.h \
-              renderinfo.h \
-              rle_filter.h \
-              uc_queue.h
+HEADERS     = ascii85_filter.h  \
+              bit_filter.h  \
+              flate_filter.h  \
+              hex_filter.h  \
+              ps_filter.h  \
+              psout_filter.h  \
+              renderinfo.h  \
+              rle_filter.h  \
+              uc_queue.h  \
+              vx_render.h  \
 
 
 ########################################################################
