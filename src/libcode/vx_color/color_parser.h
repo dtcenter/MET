@@ -1,23 +1,25 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2013
-// ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
-// ** Research Applications Lab (RAL)
-// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
 
 
 ///////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __PARSER_STUFF_H__
-#define  __PARSER_STUFF_H__
+#ifndef  __VX_COLOR_PARSER_STUFF_H__
+#define  __VX_COLOR_PARSER_STUFF_H__
 
 
 ///////////////////////////////////////////////////////////////////////
 
-#include "vx_util.h"
+
+struct ColorNumber {
+
+   int is_int;
+
+   int i;
+
+   double d;
+
+};
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -40,7 +42,7 @@ struct Dcolor {
 ///////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __PARSER_STUFF_H__
+#endif   /*  __VX_COLOR_PARSER_STUFF_H__  */
 
 
 ///////////////////////////////////////////////////////////////////////

@@ -16,7 +16,7 @@
 EXECUTABLES =
 
 
-OBJECTS     = cfile.tab.o \
+OBJECTS     = color.tab.o \
               lex.color.o \
               color.o \
               color_list.o \
@@ -29,7 +29,7 @@ LIBRARIES   = libvx_color.a
 ########################################################################
 
 
-HEADERS     = cfile.tab.h \
+HEADERS     = color.tab.h \
               color.h \
               color_list.h \
               color_parser.h \
@@ -53,8 +53,8 @@ all: $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
    ##
 
 
-cfile.tab.o: cfile.tab.cc
-	$(CXX) cfile.tab.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
+color.tab.o: color.tab.cc
+	$(CXX) color.tab.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
 
 lex.color.o: lex.color.cc
 	$(CXX) lex.color.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
