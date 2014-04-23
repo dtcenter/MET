@@ -137,7 +137,7 @@ for (j=1; j<(t.nrows()); ++j)  t.set_row_height(j, 15.0);
 
 t.set_pin(306.0, Vtab_2 - TextSep, 0.5, 1.0);
 
-t.fill_row(0, light_green);
+t.fill_row(0, blue1);
 
 for (j=2; j<(t.nrows()); j+=2)  t.fill_row(j, light_gray);
 

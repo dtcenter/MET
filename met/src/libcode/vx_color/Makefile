@@ -16,7 +16,7 @@
 EXECUTABLES =
 
 
-OBJECTS     = cfile.tab.o \
+OBJECTS     = color.tab.o \
               lex.color.o \
               color.o \
               color_list.o \
@@ -26,17 +26,29 @@ OBJECTS     = cfile.tab.o \
 LIBRARIES   = libvx_color.a
 
 
-GEN_SOURCES =
+GEN_SOURCES = lex.color.cc  \
+              color.tab.h   \
+              color.tab.cc  \
 
 
 ########################################################################
 
 
-HEADERS     = cfile.tab.h \
+HEADERS     = color.tab.h \
               color.h \
               color_list.h \
               color_parser.h \
-              vx_color.h
+              vx_color.h  \
+
+
+########################################################################
+
+
+LEX_PREFIX = color
+
+YACC       = bison -d -t -v -p $(LEX_PREFIX)
+
+LEX        = flex --prefix=$(LEX_PREFIX)
 
 
 ########################################################################
@@ -59,6 +71,15 @@ all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 gen_sources: $(GEN_SOURCES)
 	@ echo
 
+lex.color.cc: color.l color.tab.h
+	$(LEX) color.l
+	@ mv lex.color.c lex.color.cc
+
+
+color.tab.cc color.tab.h: color.y
+	$(YACC) color.y
+	@ mv color.tab.c color.tab.cc
+
 
 ########################################################################
 
@@ -68,8 +89,8 @@ gen_sources: $(GEN_SOURCES)
    ##
 
 
-cfile.tab.o: cfile.tab.cc
-	$(CXX) cfile.tab.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
+color.tab.o: color.tab.cc
+	$(CXX) color.tab.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
 
 lex.color.o: lex.color.cc
 	$(CXX) lex.color.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) > /dev/null 2>&1
