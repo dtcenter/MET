@@ -99,6 +99,9 @@ renderinfo.o: renderinfo.cc
 rle_filter.o: rle_filter.cc
 	$(CXX) rle_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
+flate_filter.o: flate_filter.cc
+	$(CXX) flate_filter.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
+
 uc_queue.o: uc_queue.cc
 	$(CXX) uc_queue.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I.
 
