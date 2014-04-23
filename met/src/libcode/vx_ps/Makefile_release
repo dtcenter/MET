@@ -28,10 +28,12 @@ LIBRARIES   = libvx_ps.a
 ########################################################################
 
 
-HEADERS     = documentmedia_to_string.h \
-              documentorientation_to_string.h \
-              vx_ps.h \
+HEADERS     = documentmedia_to_string.h  \
+              documentorientation_to_string.h  \
+              fontfamily_to_string.h  \
               ps_text.h  \
+              table_helper.h  \
+              vx_ps.h  \
 
 
 ########################################################################
