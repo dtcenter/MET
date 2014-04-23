@@ -79,6 +79,7 @@ plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	-lvx_pxm \
 	-lvx_color \
 	-lvx_ps \
+	-lvx_render \
 	-lvx_afm \
 	-lvx_nav \
 	-lvx_gnomon \
@@ -88,7 +89,7 @@ plot_data_plane: plot_data_plane.cc $(LIBRARIES) $(OBJECTS)
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf \
+	-lm -lnetcdf_c++ -lnetcdf -lz \
 	$(CXX_LIBS)
 	cp plot_data_plane $(MET_BIN_DIR)
 

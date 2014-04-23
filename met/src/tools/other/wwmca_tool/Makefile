@@ -196,6 +196,7 @@ wwmca_plot: wwmca_plot.cc $(OBJECTS)
 	-lvx_nav \
 	-lvx_render \
 	-lvx_ps \
+	-lvx_render \
 	-lvx_afm \
 	-lvx_render \
 	-lvx_stat_out \
