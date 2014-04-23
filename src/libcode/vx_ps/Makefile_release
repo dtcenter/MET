@@ -71,6 +71,14 @@ ps_text.o: ps_text.cc
 	$(CXX) ps_text.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR)
 
 
+fontfamily_to_string.o: fontfamily_to_string.h fontfamily_to_string.cc
+	$(CXX) fontfamily_to_string.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I../vx_render -I../vx_color -DMET_BASE=\"$(MET_BASE_DIR)\"
+
+
+table_helper.o: table_helper.cc
+	$(CXX) table_helper.cc $(CXX_FLAGS) -c -I$(MET_INC_DIR) -I../vx_render -I../vx_color
+
+
 ########################################################################
 
 
