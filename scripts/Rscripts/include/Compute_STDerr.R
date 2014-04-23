@@ -47,7 +47,13 @@ Compute_STDerr_from_mean <- function ( data, method )
       ## if those coefficients are large?
       if ( coef(data.arima)[1] < 0.3 | coef(data.arima)[1] >= 0.99 ) { 
          if ( method == 'ML' ) { method = "CSS"; } else { method = "ML"; }
-         data.arima <- arima( data, order=c(1,0,0), method=method )
+         data.arima <- try(arima( data, order=c(1,0,0), method=method ))
+         
+         ## Catch errors from arima
+         if(class(data.arima) == "try-error") {
+            print(paste("WARNING: different arima method failed for dataset of length", length(data)));
+            return(c(NA, NA, NA, length(data)));
+         }
       }
 
       ## Compute a variance inflation factor (having removed that portion of the time series that was correlated).
