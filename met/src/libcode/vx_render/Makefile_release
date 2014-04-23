@@ -16,18 +16,19 @@
 EXECUTABLES =
 
 
-OBJECTS     = ascii85_filter.o \
-              bit_filter.o \
-              hex_filter.o \
-              ps_filter.o \
-              psout_filter.o \
-              render_pbm.o \
-              render_pcm.o \
-              render_pgm.o \
-              render_ppm.o \
-              renderinfo.o \
-              rle_filter.o \
-              uc_queue.o
+OBJECTS     = ascii85_filter.o  \
+              bit_filter.o  \
+              flate_filter.o  \
+              hex_filter.o  \
+              ps_filter.o  \
+              psout_filter.o  \
+              renderinfo.o  \
+              render_pbm.o  \
+              render_pcm.o  \
+              render_pgm.o  \
+              render_ppm.o  \
+              rle_filter.o  \
+              uc_queue.o  \
 
 
 LIBRARIES   = libvx_render.a
