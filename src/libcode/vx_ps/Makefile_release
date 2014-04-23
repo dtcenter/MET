@@ -19,7 +19,7 @@ EXECUTABLES =
 OBJECTS     = documentmedia_to_string.o \
               documentorientation_to_string.o \
               vx_ps.o \
-              ps_text.o
+              ps_text.o  \
 
 
 LIBRARIES   = libvx_ps.a
@@ -31,7 +31,7 @@ LIBRARIES   = libvx_ps.a
 HEADERS     = documentmedia_to_string.h \
               documentorientation_to_string.h \
               vx_ps.h \
-              ps_text.h
+              ps_text.h  \
 
 
 ########################################################################
