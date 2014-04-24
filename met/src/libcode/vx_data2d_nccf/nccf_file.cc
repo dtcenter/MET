@@ -135,7 +135,7 @@ void NcCfFile::close()
 ////////////////////////////////////////////////////////////////////////
 
 
-bool NcCfFile::open(const char * filename)
+bool NcCfFile::open(const char * filepath)
 {
   // Close any open files and clear out the associated members
 
@@ -152,7 +152,7 @@ bool NcCfFile::open(const char * filename)
 
   // Open the file
 
-  _ncFile = new NcFile(filename);
+  _ncFile = new NcFile(filepath);
 
   if (!(_ncFile->is_valid()))
   {
@@ -175,10 +175,47 @@ bool NcCfFile::open(const char * filename)
     _dimNames.add(_dims[j]->name());
   }
 
-  // Pull out the init and valid times
+  // Pull out the valid and init times
 
-  InitTime = (unixtime)get_double_var(_ncFile, "forecast_reference_time");
-  ValidTime = (unixtime)get_double_var(_ncFile, "time");
+  NcVar *valid_time_var = _ncFile->get_var("time");
+  if (valid_time_var == 0)
+  {
+    // Time not in file, get from file name
+
+    if ((ValidTime = get_valid_time_from_file_path(filepath)) == 0)
+    {
+      mlog << Warning << "\nNcCfFile::open() -> "
+	   << "could not extract valid time from file name\n"
+	   << "Using valid time of 0\n\n";
+    }
+  }
+  else
+  {
+    double time_value;
+    valid_time_var->set_cur((long int)0);
+    valid_time_var->get(&time_value, 1);
+    ValidTime = (unixtime)time_value;
+  }
+  
+  NcVar *init_time_var = _ncFile->get_var("forecast_reference_time");
+  if (init_time_var == 0)
+  {
+    // Time not in file, get from file name
+
+    if ((InitTime = get_init_time_from_file_path(filepath)) == 0)
+    {
+      mlog << Warning << "\nNcCfFile::open() -> "
+	   << "could not extract init time from file name\n"
+	   << "Using init time of 0\n\n";
+    }
+  }
+  else
+  {
+    double time_value;
+    init_time_var->set_cur((long int)0);
+    init_time_var->get(&time_value, 1);
+    InitTime = (unixtime)time_value;
+  }
   
   // Pull out the variables
 
@@ -232,6 +269,227 @@ bool NcCfFile::open(const char * filename)
   //  done
   
   return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_valid_time_from_file_path(const string &filepath) const
+{
+  // Extract the file name from the path
+
+  string filename;
+  size_t slash_pos = filepath.rfind('/');
+  
+  if (slash_pos == string::npos)
+    filename = filepath;
+  else
+    filename = filepath.substr(slash_pos+1);
+  
+  // See if this is a TRMM 3hourly precip file
+
+  unixtime file_time;
+  
+  if ((file_time = get_time_from_TRMM_3B42_3hourly_filename(filename)) != 0)
+    return file_time + (int)(1.5 * 3600.0);
+  
+  // See if this is a TRMM daily precip file
+
+  if ((file_time = get_time_from_TRMM_3B42_daily_filename(filename)) != 0)
+    return file_time + (int)(22.5 * 3600.0);
+  
+  // If we get here, we couldn't get the time from the filename
+
+  return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_init_time_from_file_path(const string &filepath) const
+{
+  // Extract the file name from the path
+
+  string filename;
+  size_t slash_pos = filepath.rfind('/');
+  
+  if (slash_pos == string::npos)
+    filename = filepath;
+  else
+    filename = filepath.substr(slash_pos+1);
+  
+  // See if this is a TRMM 3hourly precip file
+
+  unixtime file_time;
+  
+  if ((file_time = get_time_from_TRMM_3B42_3hourly_filename(filename)) != 0)
+    return file_time - (int)(1.5 * 3600.0);
+  
+  // See if this is a TRMM daily precip file
+
+  if ((file_time = get_time_from_TRMM_3B42_daily_filename(filename)) != 0)
+    return file_time - (int)(1.5 * 3600.0);
+  
+  // If we get here, we couldn't get the time from the filename
+
+  return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_time_from_TRMM_3B42_3hourly_filename(const string &filename) const
+{
+  // The format of the TRMM 3hourly files is:
+  //      3B42.<yyyymmdd>.<hh>.7.G3.nc
+  // See if the tokens in this filename seem to match
+
+  ConcatString fn_string(filename.c_str());
+  StringArray tokens = fn_string.split(".");
+  
+  if (tokens.n_elements() != 6)
+    return 0;
+  
+  // 3B42
+
+  if (strcmp(tokens[0], "3B42") != 0)
+    return 0;
+  
+  // <yyyymmdd>
+
+  if (strlen(tokens[1]) != 8)
+    return 0;
+    
+  for (int i = 0; i < 8; ++i)
+  {
+    if (!isdigit(tokens[1][i]))
+      return 0;
+  }
+  
+  // <hh>
+
+  if (strlen(tokens[2]) != 2)
+    return 0;
+    
+  for (int i = 0; i < 2; ++i)
+  {
+    if (!isdigit(tokens[2][i]))
+      return 0;
+  }
+  
+  // 7
+
+  if (strcmp(tokens[3], "7") != 0)
+    return 0;
+  
+  // G3
+
+  if (strcmp(tokens[4], "G3") != 0)
+    return 0;
+  
+  // nc
+
+  if (strcmp(tokens[5], "nc") != 0)
+    return 0;
+  
+  // If we get here, this is a TRMM 3B42 3hourly file.  Extract the file time.
+
+  string date_string = tokens[1];
+  string hour_string = tokens[2];
+  
+  struct tm time_struct;
+  memset(&time_struct, 0, sizeof(time_struct));
+  
+  time_struct.tm_year = atoi(date_string.substr(0, 4).c_str()) - 1900;
+  time_struct.tm_mon = atoi(date_string.substr(4, 2).c_str()) - 1;
+  time_struct.tm_mday = atoi(date_string.substr(6, 2).c_str());
+  time_struct.tm_hour = atoi(hour_string.c_str());
+  
+  return (unixtime)timegm(&time_struct);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_time_from_TRMM_3B42_daily_filename(const string &filename) const
+{
+  // The format of the TRMM 3hourly files is:
+  //      3B42_daily.<yyyy>.<mm>.<dd>.7.G3.nc
+  // See if the tokens in this filename seem to match
+
+  ConcatString fn_string(filename.c_str());
+  StringArray tokens = fn_string.split(".");
+  
+  if (tokens.n_elements() != 7)
+    return 0;
+  
+  // 3B42_daily
+
+  if (strcmp(tokens[0], "3B42_daily") != 0)
+    return 0;
+  
+  // <yyyy>
+
+  if (strlen(tokens[1]) != 4)
+    return 0;
+    
+  for (int i = 0; i < 4; ++i)
+  {
+    if (!isdigit(tokens[1][i]))
+      return 0;
+  }
+  
+  // <mm>
+
+  if (strlen(tokens[2]) != 2)
+    return 0;
+    
+  for (int i = 0; i < 2; ++i)
+  {
+    if (!isdigit(tokens[2][i]))
+      return 0;
+  }
+  
+  // <dd>
+
+  if (strlen(tokens[3]) != 2)
+    return 0;
+    
+  for (int i = 0; i < 2; ++i)
+  {
+    if (!isdigit(tokens[3][i]))
+      return 0;
+  }
+  
+  // 7
+
+  if (strcmp(tokens[4], "7") != 0)
+    return 0;
+  
+  // G3
+
+  if (strcmp(tokens[5], "G3") != 0)
+    return 0;
+  
+  // nc
+
+  if (strcmp(tokens[6], "nc") != 0)
+    return 0;
+  
+  // If we get here, this is a TRMM 3B42 daily file.  Extract the file time.
+
+  struct tm time_struct;
+  memset(&time_struct, 0, sizeof(time_struct));
+  
+  time_struct.tm_year = atoi(tokens[1]) - 1900;
+  time_struct.tm_mon = atoi(tokens[2]) - 1;
+  time_struct.tm_mday = atoi(tokens[3]);
+  
+  return (unixtime)timegm(&time_struct);
 }
 
 
@@ -662,6 +920,18 @@ void NcCfFile::read_netcdf_grid()
     get_grid_from_grid_mapping(grid_mapping_att);
     return;
   }
+  
+  // If the grid mapping isn't provided, see if we can intuit a projection
+  // from the given dimensions
+
+  if (get_grid_from_dimensions())
+    return;
+  
+  // If we get here, we couldn't get the grid projection from the file
+
+  mlog << Error << "\nNcCfFile::read_netcdf_grid()" << " -> "
+       << "Couldn't figure out projection from information in netCDF file.\n\n";
+  exit(1);
   
 }
 
@@ -1335,6 +1605,174 @@ void NcCfFile::get_grid_mapping_vertical_perspective(const NcVar *grid_mapping_v
   mlog << Error << "\n" << method_name << " -> "
        << "Vertical perspective grid not handled in MET.\n\n";
   exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool NcCfFile::get_grid_from_dimensions()
+{
+  static const string method_name = "NcCfFile::get_grid_from_dimensions()";
+  
+  // Currently, we can only intuit a lat/lon grid from the dimensions.
+  // Start by looking for the lat/lon dimensions in the file
+
+  for (int dim_num = 0; dim_num < _numDims; ++dim_num)
+  {
+    // The lat/lon dimensions are identified by their units
+
+    const NcVar *coord_var = _ncFile->get_var(_dims[dim_num]->name());
+    if (coord_var == 0)
+      continue;
+    
+    const NcAtt *units_att = coord_var->get_att("units");
+    if (units_att == 0)
+      continue;
+    
+    const char *dim_units = units_att->as_string(0);
+    if (dim_units == 0)
+      continue;
+
+    // See if this is a lat or lon dimension
+
+    if (strcmp(dim_units, "degrees_north") == 0 ||
+	strcmp(dim_units, "degree_north") == 0 ||
+	strcmp(dim_units, "degree_N") == 0 ||
+	strcmp(dim_units, "degrees_N") == 0 ||
+	strcmp(dim_units, "degreeN") == 0 ||
+	strcmp(dim_units, "degreesN") == 0)
+    {
+      _yDim = _dims[dim_num];
+
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+	if (strcmp(Var[var_num].name, _yDim->name()) == 0)
+	{
+	  _yCoordVar = Var[var_num].var;
+	  break;
+	}
+      }
+    }
+    
+    if (strcmp(dim_units, "degrees_east") == 0 ||
+	strcmp(dim_units, "degree_east") == 0 ||
+	strcmp(dim_units, "degree_E") == 0 ||
+	strcmp(dim_units, "degrees_E") == 0 ||
+	strcmp(dim_units, "degreeE") == 0 ||
+	strcmp(dim_units, "degreesE") == 0)
+    {
+      _xDim = _dims[dim_num];
+
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+	if (strcmp(Var[var_num].name, _xDim->name()) == 0)
+	{
+	  _xCoordVar = Var[var_num].var;
+	  break;
+	}
+      }
+    }
+    
+  }
+
+  if (_xDim == 0 || _yDim == 0)
+    return false;
+  
+  if (_xCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Didn't find X coord variable (" << _xDim->name()
+	 << ") in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  if (_yCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Didn't find Y coord variable (" << _yDim->name()
+	 << ") in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  if (_xCoordVar->num_vals() != _xDim->size() ||
+      _yCoordVar->num_vals() != _yDim->size())
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
+    exit(1);
+  }
+  
+  // Figure out the dlat/dlon values from the dimension variables
+
+  double lat_values[_yDim->size()];
+  long lat_counts = _yDim->size();
+  
+  _yCoordVar->get(lat_values, &lat_counts);
+  
+  double lon_values[_xDim->size()];
+  long lon_counts = _xDim->size();
+  
+  _xCoordVar->get(lon_values, &lon_counts);
+  
+  // Calculate dlat and dlon assuming they are constant.  MET requires that
+  // dlat be equal to dlon
+
+  double dlat = (lat_values[_yDim->size()-1] - lat_values[0]) /
+    (_yDim->size() - 1);
+  double dlon = (lon_values[_xDim->size()-1] - lon_values[0]) /
+    (_xDim->size() - 1);
+  
+  if (fabs(dlat - dlon) > DELTA_TOLERANCE)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+	 << "MET can only process Latitude/Longitude files where the delta lat and delta lon are the same\n\n";
+    exit(1);
+  }
+  
+  // As a sanity check, make sure that the deltas are constant through the
+  // entire grid.  CF compliancy doesn't require this, but MET does.
+
+  for (int i = 1; i < _yDim->size(); ++i)
+  {
+    double curr_delta = lat_values[i] - lat_values[i-1];
+    if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+	   << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
+      exit(1);
+    }
+  }
+  
+  for (int i = 1; i < _xDim->size(); ++i)
+  {
+    double curr_delta = lon_values[i] - lon_values[i-1];
+    if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+	   << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
+      exit(1);
+    }
+  }
+  
+  // Fill in the data structure.  Remember to negate the longitude
+  // values since MET uses the mathematical coordinate system centered on
+  // the center of the earth rather than the regular map coordinate system.
+
+  // Note that I am assuming that the data is ordered from the lower-left
+  // corner.  I think this will generally be the case, but it is not
+  // guaranteed anywhere that I see.  But if this is not the case, then we
+  // will probably also need to reorder the data itself.
+
+  LatLonData data;
+  
+  data.name = latlon_proj_type;
+  data.lat_ll = lat_values[0];
+  data.lon_ll = -lon_values[0];
+  data.delta_lat = dlat;
+  data.delta_lon = dlon;
+  data.Nlat = _yDim->size();
+  data.Nlon = _xDim->size();
+
+  grid.set(data);
 }
 
 ////////////////////////////////////////////////////////////////////////
