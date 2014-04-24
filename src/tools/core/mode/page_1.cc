@@ -23,6 +23,7 @@ static double Htab_a, Htab_b, Htab_c;
 static const double dx = 2.0;
 static const double dy = 2.0;
 
+static double table_bottom = 10.0;
 
 // static const int max_interest_rows = 45;
 static const int max_interest_rows = 29;
@@ -289,6 +290,8 @@ t1.set_col_width(2, Htab_c - Htab_b);
 // t1.set_row_height(9, 10.0);
 
 t1.set_pin(Htab_a, Vtab_3 - 2.0, 0.0, 1.0);
+
+table_bottom = t1.bottom();
 
 t1.fill_cell(0, 1, light_green);
 t1.fill_cell(0, 2, light_green);
@@ -1059,15 +1062,43 @@ void ModePsFile::do_page_1_other(ModeFuzzyEngine & eng, EngineType eng_type, con
 
 {
 
+int j, c;
 char junk[1024];
+TableHelper t;
+const int simple_row  = 1;
+const int cluster_row = 2;
+const int area_row    = 3;
+const int fcst_col    = 1;
+const int  obs_col    = 2;
+
+t.set(*this, 4, 3);
+
+for (j=0; j<(t.nrows()); ++j)  t.set_row_height(j, 15.0);
+
+t.set_col_width(0, 50.0);
+t.set_col_width(1, 60.0);
+t.set_col_width(2, 60.0);
+
+t.set_pin(Htab_a, table_bottom, 0.0, 0.0);
+
+t.fill_row(0, light_green);
+t.fill_col(0, blue1);
+t.fill_cell(0, 0, dark_gray);
+
+t.draw_skeleton(0.2);
+t.outline_table(0.2, black);
+
+
 
       text_y -= 12.0*TextSep;
 
       //
       // Field name
       //
-      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, FcstString);
-      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, ObsString);
+      t.write_xy1_to_cell(0, fcst_col, 0.5*(t.col_width(fcst_col)), dy, 0.5, 0.0, FcstString);
+      t.write_xy1_to_cell(0,  obs_col, 0.5*(t.col_width(fcst_col)), dy, 0.5, 0.0,  ObsString);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, FcstString);
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, ObsString);
       nextline();
 
       /////////////////////////////////////////////////////////////////
@@ -1079,33 +1110,54 @@ char junk[1024];
       //
       // Simple objects counts
       //
-      write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Simple:");
-      snprintf(junk, sizeof(junk), "%i", eng.n_fcst);
-      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
-      snprintf(junk, sizeof(junk), "%i", eng.n_obs);
-      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      bold();
+      t.write_xy1_to_cell(simple_row,  0, dx, dy, 0.0, 0.0, "Simple");
+      t.write_xy1_to_cell(cluster_row, 0, dx, dy, 0.0, 0.0, "Cluster");
+      t.write_xy1_to_cell(area_row,    0, dx, dy, 0.0, 0.0, "Area");
+      roman();
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Simple:");
+      snprintf(junk, sizeof(junk), "%d", eng.n_fcst);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      c = fcst_col;
+      t.write_xy1_to_cell(simple_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+
+      snprintf(junk, sizeof(junk), "%d", eng.n_obs);
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      c = obs_col;
+      t.write_xy1_to_cell(simple_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+
       nextline();
 
       //
       // Area counts
       //
-      write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Area:");
-      snprintf(junk, sizeof(junk), "%i gs",
-              eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
-      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
-      snprintf(junk, sizeof(junk), "%i gs",
-              eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
-      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Area:");
+      snprintf(junk, sizeof(junk), "%d", eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      c = fcst_col;
+      t.write_xy1_to_cell(area_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+
+      snprintf(junk, sizeof(junk), "%d", eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      c = obs_col;
+      t.write_xy1_to_cell(area_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+
       nextline();
 
       //
       // Cluster object counts
       //
-      write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Cluster:");
-      snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-      write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
-      snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-      write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Cluster:");
+      snprintf(junk, sizeof(junk), "%d", eng.collection.n_sets);
+      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
+      c = fcst_col;
+      t.write_xy1_to_cell(cluster_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+
+      snprintf(junk, sizeof(junk), "%d", eng.collection.n_sets);
+      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+      c = obs_col;
+      t.write_xy1_to_cell(cluster_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+
       nextline();
 
    //
