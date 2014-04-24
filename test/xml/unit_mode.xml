@@ -100,4 +100,24 @@
     </output>
   </test>
 
+
+ <test name="mode_CUT_LINE">
+    <exec>&MET_DIR;/bin/mode</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>CUT_LINE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_FCST;/mode_cut_line/latlon_test.nc \
+      &DATA_DIR_FCST;/mode_cut_line/latlon_test.nc \
+      &CONFIG_DIR;/MODEConfig_cut_line \
+      -outdir &OUTPUT_DIR;/mode -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj.txt</stat>
+      <exist>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A.ps</ps>
+    </output>
+  </test>
+
 </met_test>
