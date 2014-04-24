@@ -139,6 +139,14 @@ class NcCfFile {
       NcCfFile(const NcCfFile &);
       NcCfFile & operator=(const NcCfFile &);
 
+      // Determine the file times from the filename
+
+      unixtime get_valid_time_from_file_path(const string &filepath) const;
+      unixtime get_init_time_from_file_path(const string &filepath) const;
+      unixtime get_time_from_TRMM_3B42_3hourly_filename(const string &filename) const;
+      unixtime get_time_from_TRMM_3B42_daily_filename(const string &filename) const;
+
+
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
@@ -159,6 +167,8 @@ class NcCfFile {
       void get_grid_mapping_transverse_mercator(const NcVar *grid_mapping_var);
       void get_grid_mapping_vertical_perspective(const NcVar *grid_mapping_var);
       
+      bool get_grid_from_dimensions();
+
 };
 
 

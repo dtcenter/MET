@@ -43,13 +43,6 @@ static const char nccf_att_value[] = "CF-";
 
 bool is_nccf_file(const char * filename)
 {
-  // Check that it's a netcdf file
-  //
-  // This also checks that the filename string is non-null and nonempty
-
-  if (!is_netcdf_file(filename))
-    return false;
-  
   // Look for the global attribute name
 
   NcFile nc_file(filename);
