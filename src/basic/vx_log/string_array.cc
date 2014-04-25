@@ -349,6 +349,24 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void StringArray::add_css(const char *text)
+
+{
+
+StringArray sa;
+
+sa.parse_css(text);
+
+add(sa);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void StringArray::set(int i, const char * text)
 
 {
@@ -476,10 +494,37 @@ void StringArray::parse_wsss(const char * text)
 
 {
 
+parse_delim(text, " ");
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void StringArray::parse_css(const char * text)
+
+{
+
+parse_delim(text, ",");
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void StringArray::parse_delim(const char * text, const char *delim)
+
+{
+
 char * line = (char *) 0;
 char * c    = (char *) 0;
 char * lp   = (char *) 0;
-const char delim [] = " ";
 const int n = strlen(text);
 
 

@@ -343,6 +343,34 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void TimeArray::add_css(const char *text)
+
+{
+
+StringArray sa;
+
+sa.parse_css(text);
+   
+extend(Nelements + sa.n_elements());
+
+int j;
+
+for (j=0; j<sa.n_elements(); j++)  {
+   
+   add(timestring_to_unix(sa[j]));
+
+}
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void TimeArray::set(int n, unixtime u)
 
 {

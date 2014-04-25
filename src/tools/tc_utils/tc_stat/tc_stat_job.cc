@@ -35,9 +35,6 @@ static const char *TCStatJobType_SummaryStr = "summary";
 ////////////////////////////////////////////////////////////////////////
 
 // Functions for parsing command line options
-extern void add_string(const char *, StringArray &);
-extern void add_unixtime(const char *, TimeArray &);
-extern void add_seconds(const char *, NumArray &);
 extern void parse_thresh_option(const char *, const char *, StringArray &, ThreshArray &);
 extern void parse_string_option(const char *, const char *, StringArray &, StringArray &);
 
@@ -750,27 +747,27 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
 
       // Check job command options
            if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-amodel"            ) == 0) { add_string(a[i+1], AModel);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-bmodel"            ) == 0) { add_string(a[i+1], BModel);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_id"          ) == 0) { add_string(a[i+1], StormId);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-basin"             ) == 0) { add_string(a[i+1], Basin);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-cyclone"           ) == 0) { add_string(a[i+1], Cyclone);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_name"        ) == 0) { add_string(a[i+1], StormName);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add_css(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add_css(a[i+1]);                     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add_css(a[i+1]);                 a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_inc"          ) == 0) { add_unixtime(a[i+1], InitInc);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_exc"          ) == 0) { add_unixtime(a[i+1], InitExc);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_hour"         ) == 0) { add_seconds(a[i+1], InitHour);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead"              ) == 0) { add_seconds(a[i+1], Lead);                 a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_inc"          ) == 0) { InitInc.add_css(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1]);              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1]);                  a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_inc"         ) == 0) { add_unixtime(a[i+1], ValidInc);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_exc"         ) == 0) { add_unixtime(a[i+1], ValidExc);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_hour"        ) == 0) { add_seconds(a[i+1], ValidHour);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_mask"         ) == 0) { add_string(a[i+1], InitMask);              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_mask"        ) == 0) { add_string(a[i+1], ValidMask);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-line_type"         ) == 0) { add_string(a[i+1], LineType);              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { add_string(a[i+1], TrackWatchWarn);        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1]);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add_css(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1]);                 a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1]);            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshName, ColumnThreshVal);
                                                                                                       a.shift_down(i, 2); }
       else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrName, ColumnStrVal);
@@ -1395,12 +1392,12 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-column"    ) == 0) { add_string(a[i+1], ReqColumn);
-                                                   add_column(a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"        ) == 0) { add_string(a[i+1], CaseColumn); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);          a.shift_down(i, 1); }
-      else                                       {                                 b.add(a[i]);        }
+           if(strcasecmp(c, "-column"    ) == 0) { ReqColumn.add_css(a[i+1]);
+                                                   add_column(a[i+1]);         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-by"        ) == 0) { CaseColumn.add_css(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);      a.shift_down(i, 1); }
+      else                                       {                             b.add(a[i]);        }
    }
 
    return(b);
@@ -1413,7 +1410,7 @@ void TCStatJobSummary::add_column(const char *c) {
    StringArray sa;
 
    // Parse entries into a StringArray
-   add_string(c, sa);
+   sa.add_css(c);
 
    // Loop over the entries, handling special column names
    for(i=0; i<sa.n_elements(); i++) {
@@ -2109,48 +2106,6 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
    }
 
    return(s);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void add_string(const char *c, StringArray &sa) {
-   ConcatString cs;
-
-   // Parse input list into StringArray
-   cs = c;
-   sa.add(cs.split(ArgsDelim));
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void add_unixtime(const char *c, TimeArray &ta) {
-   ConcatString cs;
-   StringArray sa;
-   int i;
-
-   // Parse input list of timestrings into TimeArray
-   cs = c;
-   sa = cs.split(ArgsDelim);
-   for(i=0; i<sa.n_elements(); i++) ta.add(timestring_to_unix(sa[i]));
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void add_seconds(const char *c, NumArray &na) {
-   ConcatString cs;
-   StringArray sa;
-   int i;
-
-   // Parse input list of timestrings into NumArray of seconds
-   cs = c;
-   sa = cs.split(ArgsDelim);
-   for(i=0; i<sa.n_elements(); i++) na.add(timestring_to_sec(sa[i]));
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

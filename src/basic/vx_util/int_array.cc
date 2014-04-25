@@ -21,6 +21,7 @@ using namespace std;
 
 #include "int_array.h"
 #include "nint.h"
+#include "vx_cal.h"
 #include "vx_log.h"
 
 
@@ -355,6 +356,32 @@ for (j=0; j<(a.Nelements); ++j)  {
 
 }
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void IntArray::add_css_sec(const char *text)
+
+{
+
+StringArray sa;
+
+sa.parse_css(text);
+
+extend(Nelements + sa.n_elements());
+
+int j;
+
+for (j=0; j<sa.n_elements(); j++)  {
+   
+   add(timestring_to_sec(sa[j]));
+
+}
 
 return;
 

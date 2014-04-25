@@ -73,6 +73,8 @@ class NumArray {
       void add(int);
       void add(double);
       void add(const NumArray &);
+      void add_css(const char *);
+      void add_css_sec(const char *);
 
       void set(int, int);
       void set(int, double);

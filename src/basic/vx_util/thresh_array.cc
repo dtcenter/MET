@@ -226,6 +226,21 @@ void ThreshArray::add(const ThreshArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void ThreshArray::add_css(const char *text) {
+   int j;
+   StringArray sa;
+
+   sa.parse_css(text);
+
+   extend(Nelements + sa.n_elements());
+
+   for(j=0; j<sa.n_elements(); j++) add(sa[j]);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void ThreshArray::parse_thresh_str(const char *thresh_str) {
    char *line = (char *) 0;
    char *c    = (char *) 0;
