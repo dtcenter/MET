@@ -1773,6 +1773,8 @@ bool NcCfFile::get_grid_from_dimensions()
   data.Nlon = _xDim->size();
 
   grid.set(data);
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
