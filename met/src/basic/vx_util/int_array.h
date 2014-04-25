@@ -68,6 +68,7 @@ class IntArray {
 
       void add(int);
       void add(const IntArray &);
+      void add_css_sec(const char *);
 
       int n_elements() const;
 

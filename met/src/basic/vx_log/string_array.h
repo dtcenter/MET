@@ -66,6 +66,8 @@ class StringArray {
 
       void add(const StringArray &);
 
+      void add_css(const char *);
+
       void set(int i, const char *);
 
       void insert(int i, const char *);
@@ -81,10 +83,14 @@ class StringArray {
       int has(const char *, int & index) const;
 
          //
-         //  parse a white-space separated string
+         //  parse delimited strings
          //
 
       void parse_wsss(const char *);
+
+      void parse_css(const char *);
+
+      void parse_delim(const char *, const char *delim);
 
          //
          //  for use when parsing command-line switches

@@ -50,6 +50,7 @@ class ThreshArray {
       void add(const double, const ThreshType);
       void add(const char *);
       void add(const ThreshArray &);
+      void add_css(const char *);
 
       void parse_thresh_str(const char *);
 
