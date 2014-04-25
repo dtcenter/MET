@@ -107,8 +107,8 @@
       <pair><name>OUTPUT_PREFIX</name>  <value>CUT_LINE</value></pair>
     </env>
     <param> \
-      &DATA_DIR_FCST;/mode_cut_line/latlon_test.nc \
-      &DATA_DIR_FCST;/mode_cut_line/latlon_test.nc \
+      &DATA_DIR_MODEL;/mode_cut_line/latlon_test.nc \
+      &DATA_DIR_MODEL;/mode_cut_line/latlon_test.nc \
       &CONFIG_DIR;/MODEConfig_cut_line \
       -outdir &OUTPUT_DIR;/mode -v 3
     </param>
