@@ -148,10 +148,10 @@ match_points = FALSE;
 event_equal = FALSE;
 
 //
-// Specify a lead time that must be present for a track to be included in the
+// Specify lead times that must be present for a track to be included in the
 // event equalization logic.
 //
-event_equal_lead = NA;
+event_equal_lead = [];
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the
