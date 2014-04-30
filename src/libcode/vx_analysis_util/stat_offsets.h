@@ -294,6 +294,7 @@ static const int mpr_obs_elv_offset      = nhc + 6;
 static const int mpr_fcst_offset         = nhc + 7;
 static const int mpr_obs_offset          = nhc + 8;
 static const int mpr_climo_offset        = nhc + 9;
+static const int mpr_obs_qc_offset       = nhc + 10;
 
 //
 // NBRCTC Line Type offsets

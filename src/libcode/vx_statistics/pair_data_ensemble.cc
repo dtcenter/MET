@@ -936,7 +936,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // Add the observation value
             pd[i][j][k].add_obs(hdr_sid_str, hdr_lat, hdr_lon,
                                 obs_x, obs_y, hdr_ut, obs_lvl,
-                                obs_hgt, obs_v);
+                                obs_hgt, obs_v, obs_qty);
          } // end for k
       } // end for j
    } // end for i

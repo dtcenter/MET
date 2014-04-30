@@ -271,6 +271,14 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
    m_data.obs      = atof(l.get_item(mpr_obs_offset));
    m_data.climo    = atof(l.get_item(mpr_climo_offset));
 
+   // Parse obs_qc, if present
+   if(l.n_items() > mpr_obs_qc_offset) {
+      m_data.obs_qc = l.get_item(mpr_obs_qc_offset);
+   }
+   else {
+      m_data.obs_qc.clear();
+   }
+
    return;
 }
 
