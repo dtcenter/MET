@@ -51,10 +51,12 @@ class PairDataPoint : public PairBase {
       void clear();
 
       bool add_pair(const char *, double, double, double, double,
-                    unixtime, double, double, double, double, double);
+                    unixtime, double, double, double, double, double,
+                    const char *);
 
       void set_pair(int, const char *, double, double, double, double,
-                    unixtime, double, double, double, double, double);
+                    unixtime, double, double, double, double, double,
+                    const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////

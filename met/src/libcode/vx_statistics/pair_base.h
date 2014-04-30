@@ -59,6 +59,7 @@ class PairBase {
       NumArray    lvl_na;  // Level [n_obs]
       NumArray    elv_na;  // Elevation [n_obs]
       NumArray    o_na;    // Observation value [n_obs]
+      StringArray o_qc_sa; // Observation quality control [n_obs]
       int         n_obs;   // Number of observations
 
       unixtime   fcst_ut;  // Forecast valid time
@@ -92,11 +93,11 @@ class PairBase {
                        double, double, int &);
 
       bool add_obs(const char *, double, double, double, double,
-                   unixtime, double, double, double);
+                   unixtime, double, double, double, const char *);
       void add_obs(double, double, double);
 
       void set_obs(int, const char *, double, double, double, double,
-                   unixtime, double, double, double);
+                   unixtime, double, double, double, const char *);
       void set_obs(int, double, double, double);
 
       void print_duplicate_report();

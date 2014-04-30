@@ -104,7 +104,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
       add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
                pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                pd.lvl_na[i], pd.elv_na[i],
-               pd.f_na[i], pd.c_na[i], pd.o_na[i]);
+               pd.f_na[i], pd.c_na[i], pd.o_na[i], pd.o_qc_sa[i]);
    }
 
    return;
@@ -115,9 +115,9 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
 bool PairDataPoint::add_pair(const char *sid, double lat, double lon,
                              double x, double y, unixtime ut,
                              double lvl, double elv,
-                             double f, double c, double o) {
+                             double f, double c, double o, const char *qc) {
 
-   if( ! PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv, o) ) return(false);
+   if( ! PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv, o, qc) ) return(false);
 
    f_na.add(f);
    c_na.add(c);
@@ -134,7 +134,7 @@ void PairDataPoint::set_pair(int i_pair, const char *sid,
                              double lat, double lon,
                              double x, double y, unixtime ut,
                              double lvl, double elv,
-                             double f, double c, double o) {
+                             double f, double c, double o, const char *qc) {
 
    if(i_pair < 0 || i_pair >= n_pair) {
       mlog << Error << "\nPairDataPoint::set_pair() -> "
@@ -144,7 +144,7 @@ void PairDataPoint::set_pair(int i_pair, const char *sid,
       exit(1);
    }
 
-   PairBase::set_obs(i_pair, sid, lat, lon, x, y, ut, lvl, elv, o);
+   PairBase::set_obs(i_pair, sid, lat, lon, x, y, ut, lvl, elv, o, qc);
 
    f_na.set(i_pair, f);
    c_na.set(i_pair, c);
@@ -772,7 +772,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr,     char *hdr_typ_str,
             // Add the forecast, climatological, and observation data
             if(!pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon,
                   obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
-                  fcst_v, climo_v, obs_v)) {
+                  fcst_v, climo_v, obs_v, obs_qty)) {
                inc_count(rej_dup, i, j, k);
             }
 

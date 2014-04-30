@@ -171,7 +171,7 @@ static const char * mpr_columns [] = {
    "TOTAL",       "INDEX",       "OBS_SID",
    "OBS_LAT",     "OBS_LON",     "OBS_LVL",
    "OBS_ELV",     "FCST",        "OBS",
-   "CLIMO"
+   "CLIMO",       "OBS_QC"
 };
 
 static const char * nbrctc_columns [] = {
