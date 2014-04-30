@@ -30,7 +30,6 @@
 static const bool         default_water_only         = false;
 static const bool         default_match_points       = false;
 static const bool         default_event_equal        = false;
-static const int          default_event_equal_lead   = bad_data_int;
 
 // Default rapid intensification is an increase of 30 kts
 static const bool         default_rapid_inten        = false;
@@ -261,7 +260,7 @@ class TCStatJob {
       // Only retain cases present for all models
       bool        EventEqual;
       bool        EventEqualSet;
-      int         EventEqualLead;
+      NumArray    EventEqualLead;
       StringArray EventEqualCases;
 
       // Only retain TrackPoints with recent rapid intensification
