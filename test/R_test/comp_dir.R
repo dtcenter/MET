@@ -8,6 +8,8 @@ if( "" == met_test_base ){
 source(paste(met_test_base, "/R_test/test_const.R", sep=""));
 source(paste(met_test_base, "/R_test/test_util.R", sep=""));
 
+cat(paste("JHG: MET_TEST_BASE = ", met_test_base, "\n"));
+
 verb = 1;
 strict = F;
 hist = 0;		# default histogram plot production
@@ -106,8 +108,12 @@ for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
 			strHistFile = gsub("\\.txt$",  ".png", strHistFile);
 		}
 		if( 1 <= verb ){ cat("file1: ", strFile1, "\nfile2: ", strFile2, "\n", sep=""); }
-		listTest = compareStat(strFile1, strFile2, verb, strict);
-		printCompReport(listTest, verb, strHistFile);
+		status = try(listTest <- compareStat(strFile1, strFile2, verb, strict));
+		if(class(status) == "try-error") {
+			cat("ERROR: compareStat() failed\n\n");
+		} else {
+			printCompReport(listTest, verb, strHistFile);
+		}
 	}
 
 }
