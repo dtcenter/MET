@@ -8,8 +8,6 @@ if( "" == met_test_base ){
 source(paste(met_test_base, "/R_test/test_const.R", sep=""));
 source(paste(met_test_base, "/R_test/test_util.R", sep=""));
 
-cat(paste("JHG: MET_TEST_BASE = ", met_test_base, "\n"));
-
 verb = 1;
 strict = F;
 hist = 0;		# default histogram plot production
