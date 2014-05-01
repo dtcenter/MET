@@ -43,5 +43,9 @@ strStat2 = listArgs[2];
 
 # compare the stat files and print a report
 if( 1 <= verb ){ cat("stat1: ", strStat1, "\nstat2: ", strStat2, "\n", sep=""); }
-listTest = compareStat(strStat1, strStat2, verb, strict);
-printCompReport(listTest, verb, hist);
+status = try(listTest <- compareStat(strStat1, strStat2, verb, strict));
+if(class(status) == "try-error") {
+	cat("ERROR: compareStat() failed\n\n");
+} else {
+	printCompReport(listTest, verb, hist);
+}
