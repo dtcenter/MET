@@ -99,8 +99,8 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    j.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
    
    //
-   // No settings in the default job for column_min_name,
-   // column_min_value, column_max_name, column_max_value, and 
+   // No settings in the default job for column_min_name/value,
+   // column_max_name/value, column_str_name/value, and 
    // column_case since those are strictly job command options.
    //
 
