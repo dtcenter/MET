@@ -295,8 +295,9 @@ void ConcatString::add(const char * a)
 
 {
 
-int n = strlen(a);
+if(!a) return;            // nothing to do for null string
 
+int n = strlen(a);
 
 extend(Length + n + 5);   //  just to make sure
 
