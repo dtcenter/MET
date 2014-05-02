@@ -95,7 +95,6 @@ void STATAnalysisJob::init_from_scratch() {
    column.set_ignore_case(1);
    column_min_name.set_ignore_case(1);
    column_max_name.set_ignore_case(1);
-   column_str_name.set_ignore_case(1);
    column_case.set_ignore_case(1);
 
    clear();
@@ -155,8 +154,7 @@ void STATAnalysisJob::clear() {
    column_max_name.clear();
    column_max_value.clear();
 
-   column_str_name.clear();
-   column_str_value.clear();
+   column_str_map.clear();
 
    column_case.clear();
 
@@ -245,8 +243,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    column_max_name  = aj.column_max_name;
    column_max_value = aj.column_max_value;
 
-   column_str_name  = aj.column_str_name;
-   column_str_value = aj.column_str_value;
+   column_str_map   = aj.column_str_map;
 
    column_case      = aj.column_case;
 
@@ -381,25 +378,26 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "column_max_value ...\n";
    column_max_value.dump(out, depth + 1);
 
-   out << prefix << "column_str_name ...\n";
-   column_str_name.dump(out, depth + 1);
-
-   out << prefix << "column_str_value ...\n";
-   column_str_value.dump(out, depth + 1);
+   out << prefix << "column_str_map ...\n";
+   for(map<ConcatString,StringArray>::const_iterator it = column_str_map.begin();
+       it != column_str_map.end(); it++) {
+      out << prefix << it->first << ": \n";
+      it->second.dump(out, depth + 1);
+   }
 
    out << prefix << "column_case ...\n";
    column_case.dump(out, depth + 1);
 
-   out << prefix << "dump_row = " << prefix
+   out << prefix << "dump_row = "
        << dump_row << "\n";
 
-   out << prefix << "mask_grid = " << prefix
-       << mask_grid << "\n";
+   out << prefix << "mask_grid = "
+       << (mask_grid ? mask_grid : na_str) << "\n";
 
-   out << prefix << "mask_poly = " << prefix
-       << mask_poly << "\n";
+   out << prefix << "mask_poly = "
+       << (mask_poly ? mask_poly : na_str) << "\n";
 
-   out << prefix << "out_line_type = " << prefix
+   out << prefix << "out_line_type = "
        << statlinetype_to_string(out_line_type) << "\n";
 
    out << prefix << "out_fcst_thresh ...\n";
@@ -408,28 +406,28 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "out_obs_thresh ...\n";
    out_obs_thresh.dump(out, depth + 1);
 
-   out << prefix << "out_alpha = " << prefix
+   out << prefix << "out_alpha = "
        << out_alpha << "\n";
 
-   out << prefix << "boot_interval = " << prefix
+   out << prefix << "boot_interval = "
        << boot_interval << "\n";
 
-   out << prefix << "boot_rep_prop = " << prefix
+   out << prefix << "boot_rep_prop = "
        << boot_rep_prop << "\n";
 
-   out << prefix << "n_boot_rep = " << prefix
+   out << prefix << "n_boot_rep = "
        << n_boot_rep << "\n";
 
-   out << prefix << "boot_rng = " << prefix
+   out << prefix << "boot_rng = "
        << boot_rng << "\n";
 
-   out << prefix << "boot_seed = " << prefix
+   out << prefix << "boot_seed = "
        << boot_seed << "\n";
 
-   out << prefix << "rank_corr_flag = " << prefix
+   out << prefix << "rank_corr_flag = "
        << rank_corr_flag << "\n";
 
-   out << prefix << "vif_flag = " << prefix
+   out << prefix << "vif_flag = "
        << vif_flag << "\n";
 
    out.flush();
@@ -702,22 +700,18 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    // column_str
    //
-   if(column_str_name.n_elements() > 0) {
-
-      n = column_str_name.n_elements();
-
-      for(j=0; j<n; ++j) {
-
-         //
-         // Determine the column offset
-         //
-         c = determine_column_offset(L.type(), column_str_name[j]);
-
-         //
-         // Perform the string comparison
-         //
-         if(strstr(column_str_value[j], L.get_item(c)) == NULL) return(0);
-      }
+   for(map<ConcatString,StringArray>::const_iterator it = column_str_map.begin();
+       it != column_str_map.end(); it++) {
+      
+      //
+      // Determine the column offset
+      //
+      c = determine_column_offset(L.type(), it->first);
+   
+      //
+      // Check if the current value is in the list for the column
+      //
+      if(!it->second.has(L.get_item(c))) return(0);
    }
 
    return(1);
@@ -730,6 +724,8 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    char *c    = (char *) 0;
    char *lp   = (char *) 0;
    const char delim [] = " ";
+   ConcatString col_name;
+   StringArray col_value;
    int i, n;
 
    // If jobstring is null, simply return;
@@ -823,8 +819,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          column_max_value.clear();
       }
       else if(strcmp(jc_array[i], "-column_str"     ) == 0) {
-         column_str_name.clear();
-         column_str_value.clear();
+         column_str_map.clear();
       }
       else if(strcmp(jc_array[i], "-by"             ) == 0) {
          column_case.clear();
@@ -994,8 +989,21 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i+=2;
       }
       else if(strcmp(jc_array[i], "-column_str") == 0) {
-         column_str_name.add_css(to_upper(jc_array[i+1]));
-         column_str_value.add_css(jc_array[i+2]);
+         
+         // Parse the column name and value
+         col_name = to_upper(jc_array[i+1]);
+         col_value.clear();
+         col_value.set_ignore_case(1);
+         col_value.add_css(jc_array[i+2]);
+
+         // If the column name is already present in the map, add to it
+         if(column_str_map.count(col_name) > 0) {
+            column_str_map[col_name].add(col_value);
+         }
+         // Otherwise, add a new map entry
+         else {
+            column_str_map.insert(pair<ConcatString, StringArray>(col_name, col_value));
+         }
          i+=2;
       }
       else if(strcmp(jc_array[i], "-by") == 0) {
@@ -1569,12 +1577,14 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // column_str
-   if(column_str_name.n_elements() > 0) {
-      for(i=0; i<column_str_name.n_elements(); i++)
-         js << "-column_str " << column_str_name[i]
-            << " " << column_str_value[i] << " ";
+   for(map<ConcatString,StringArray>::const_iterator it = column_str_map.begin();
+       it != column_str_map.end(); it++) {
+      
+      for(i=0; i<it->second.n_elements(); i++) {
+         js << "-column_str " << it->first << " " << it->second[i] << " ";
+      }
    }
-
+  
    // column_case 
    if(column_case.n_elements() > 0) {
       for(i=0; i<column_case.n_elements(); i++)

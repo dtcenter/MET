@@ -16,6 +16,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 
 #include "stat_line.h"
 #include "mask_poly.h"
@@ -182,8 +183,7 @@ class STATAnalysisJob {
       StringArray column_max_name;
       NumArray    column_max_value;
 
-      StringArray column_str_name;
-      StringArray column_str_value;
+      map<ConcatString,StringArray> column_str_map;
 
       //
       // Store the case information for the -by option
