@@ -571,6 +571,13 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       } // end for j
    } // end for i
 
+   // Check for at least one interpolation method
+   if(info.n_interp == 0) {
+      mlog << Error << "\nparse_conf_interp() -> "
+           << "Must define at least one interpolation method in the config file.\n\n";
+      exit(1);
+   }
+
    return(info);
 }
 
