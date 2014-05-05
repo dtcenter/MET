@@ -64,7 +64,9 @@ class ThreshArray {
       ConcatString get_abbr_str(const char *, int precision = thresh_default_precision) const;
       void         get_abbr_str(const char *, char *, int precision = thresh_default_precision) const;
 
-      int  check(double) const;
+      int check(double) const;
+      
+      bool check_dbl(double) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
