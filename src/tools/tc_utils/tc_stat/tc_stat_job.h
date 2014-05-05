@@ -230,20 +230,16 @@ class TCStatJob {
       bool WaterOnly;
 
       // Numeric column thresholds
-      StringArray ColumnThreshName;
-      ThreshArray ColumnThreshVal;
+      map<ConcatString,ThreshArray> ColumnThreshMap;
 
       // ASCII column string matching
-      StringArray ColumnStrName;
-      StringArray ColumnStrVal;
+      map<ConcatString,StringArray> ColumnStrMap;
 
       // Numeric column thresholds
-      StringArray InitThreshName;
-      ThreshArray InitThreshVal;
+      map<ConcatString,ThreshArray> InitThreshMap;
 
       // ASCII column string matching
-      StringArray InitStrName;
-      StringArray InitStrVal;
+      map<ConcatString,StringArray> InitStrMap;
       
       // Variables to the store the analysis job specification
       

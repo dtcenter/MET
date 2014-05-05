@@ -35,11 +35,8 @@ static const char *TCStatJobType_SummaryStr = "summary";
 ////////////////////////////////////////////////////////////////////////
 
 // Functions for parsing command line options
-extern void parse_thresh_option(const char *, const char *, StringArray &, ThreshArray &);
-extern void parse_string_option(const char *, const char *, StringArray &, StringArray &);
-
-// Delimiter for separating multiple command line options
-static const char *ArgsDelim = ",";
+extern void parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
+extern void parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -171,10 +168,6 @@ void TCStatJob::init_from_scratch() {
    ValidMask.set_ignore_case(1);
    LineType.set_ignore_case(1);
    TrackWatchWarn.set_ignore_case(1);
-   ColumnThreshName.set_ignore_case(1);
-   ColumnStrName.set_ignore_case(1);
-   InitThreshName.set_ignore_case(1);
-   InitStrName.set_ignore_case(1);
 
    clear();
 
@@ -206,14 +199,10 @@ void TCStatJob::clear() {
    ValidMask.clear();
    LineType.clear();
    TrackWatchWarn.clear();
-   ColumnThreshName.clear();
-   ColumnThreshVal.clear();
-   ColumnStrName.clear();
-   ColumnStrVal.clear();
-   InitThreshName.clear();
-   InitThreshVal.clear();
-   InitStrName.clear();
-   InitStrVal.clear();
+   ColumnThreshMap.clear();
+   ColumnStrMap.clear();
+   InitThreshMap.clear();
+   InitStrMap.clear();
    EventEqualLead.clear();
    EventEqualCases.clear();
 
@@ -267,14 +256,10 @@ void TCStatJob::assign(const TCStatJob & j) {
    ValidMask = j.ValidMask;
    LineType = j.LineType;
    TrackWatchWarn = j.TrackWatchWarn;
-   ColumnThreshName = j.ColumnThreshName;
-   ColumnThreshVal = j.ColumnThreshVal;
-   ColumnStrName = j.ColumnStrName;
-   ColumnStrVal = j.ColumnStrVal;
-   InitThreshName = j.InitThreshName;
-   InitThreshVal = j.InitThreshVal;
-   InitStrName = j.InitStrName;
-   InitStrVal = j.InitStrVal;
+   ColumnThreshMap = j.ColumnThreshMap;
+   ColumnStrMap = j.ColumnStrMap;
+   InitThreshMap = j.InitThreshMap;
+   InitStrMap = j.InitStrMap;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -304,6 +289,8 @@ void TCStatJob::assign(const TCStatJob & j) {
 
 void TCStatJob::dump(ostream & out, int depth) const {
    Indent prefix(depth);
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    out << prefix << "JobType = " << tcstatjobtype_to_string(JobType)
        << "\n";
@@ -365,29 +352,29 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "TrackWatchWarn ...\n";
    TrackWatchWarn.dump(out, depth + 1);
 
-   out << prefix << "ColumnThreshName ...\n";
-   ColumnThreshName.dump(out, depth + 1);
+   out << prefix << "ColumnThreshMap ...\n";
+   for(thr_it = ColumnThreshMap.begin(); thr_it != ColumnThreshMap.end(); thr_it++) {
+      out << prefix << thr_it->first << ": \n";
+      thr_it->second.dump(out, depth + 1);
+   }
 
-   out << prefix << "ColumnThreshVal ...\n";
-   ColumnThreshVal.dump(out, depth + 1);
+   out << prefix << "ColumnStrMap ...\n";
+   for(str_it = ColumnStrMap.begin(); str_it != ColumnStrMap.end(); str_it++) {
+      out << prefix << str_it->first << ": \n";
+      str_it->second.dump(out, depth + 1);
+   }
 
-   out << prefix << "ColumnStrName ...\n";
-   ColumnStrName.dump(out, depth + 1);
+   out << prefix << "InitThreshMap ...\n";
+   for(thr_it = InitThreshMap.begin(); thr_it != InitThreshMap.end(); thr_it++) {
+      out << prefix << thr_it->first << ": \n";
+      thr_it->second.dump(out, depth + 1);
+   }
 
-   out << prefix << "ColumnStrVal ...\n";
-   ColumnStrVal.dump(out, depth + 1);
-
-   out << prefix << "InitThreshName ...\n";
-   InitThreshName.dump(out, depth + 1);
-
-   out << prefix << "InitThreshVal ...\n";
-   InitThreshVal.dump(out, depth + 1);
-
-   out << prefix << "InitStrName ...\n";
-   InitStrName.dump(out, depth + 1);
-
-   out << prefix << "InitStrVal ...\n";
-   InitStrVal.dump(out, depth + 1);
+   out << prefix << "InitStrMap ...\n";
+   for(str_it = InitStrMap.begin(); str_it != InitStrMap.end(); str_it++) {
+      out << prefix << str_it->first << ": \n";
+      str_it->second.dump(out, depth + 1);
+   }
 
    out << prefix << "WaterOnly = " << bool_to_string(WaterOnly) << "\n";
 
@@ -424,10 +411,11 @@ void TCStatJob::dump(ostream & out, int depth) const {
 bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
                                 TCLineCounts &n) const {
    bool keep = true;
-   int i, j, i_init, offset;
+   int i, i_init, offset;
    double v_dbl;
    ConcatString v_str;
-   StringArray sa;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    // Check TrackWatchWarn for each TrackPoint
    if(TrackWatchWarn.n_elements() > 0) {
@@ -463,58 +451,46 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
    i_init = tpi.i_init();
 
    // If ADECK initialization filter is requested, check for a valid init time
-   if((InitThreshName.n_elements() > 0 ||
-       InitStrName.n_elements()    > 0 ||
-       OutInitMask.n_points()      > 0) &&
+   if((InitThreshMap.size() > 0 || OutInitMask.n_points() > 0) &&
        is_bad_data(i_init)) {
       keep = false;
       n.RejInitThresh += tpi.n_points();
    }
 
-   // Check InitThresh
+   // Check InitThreshMap
    if(keep == true) {
 
-      // Loop through the numeric init column thresholds
-      for(i=0; i<InitThreshName.n_elements(); i++) {
-
+      // Loop through the numeric column thresholds
+      for(thr_it = InitThreshMap.begin(); thr_it != InitThreshMap.end(); thr_it++) {
+         
          // Get the numeric init column value
-         v_dbl = get_column_double(*tpi.line(i_init), InitThreshName[i]);
+         v_dbl = get_column_double(*tpi.line(i_init), thr_it->first);
 
          // Check the column threshold
-         if(is_bad_data(v_dbl) || !InitThreshVal[i].check(v_dbl)) {
+         if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) {
            keep = false;
-           n.RejInitThresh += tpi.n_points();
+           n.RejInitThresh++;
            break;
          }
-      } // end for i
-   }
+      }
+   } 
 
    // Check InitStr
    if(keep == true) {
 
-      // Loop through the column string matching
-      for(i=0; i<InitStrName.n_elements(); i++) {
-
-         // Construct list of all entries for the current column name
-         sa.clear();
-         for(j=0; j<InitStrName.n_elements(); j++) {
-            if(strcasecmp(InitStrName[i], InitStrName[j]) == 0) {
-               if(strcmp(InitStrVal[j], na_str) == 0) sa.add(bad_data_str);
-               else                                   sa.add(InitStrVal[j]);
-            }
-         }
+      for(str_it = InitStrMap.begin(); str_it != InitStrMap.end(); str_it++) {
 
          // Determine the column offset and retrieve the value
-         offset = determine_column_offset(tpi.line(i_init)->type(), InitStrName[i]);
+         offset = determine_column_offset(tpi.line(i_init)->type(), str_it->first);
          v_str  = tpi.line(i_init)->get_item(offset);
 
          // Check the string value
-         if(!sa.has(v_str)) {
+         if(!str_it->second.has(v_str)) {
             keep = false;
             n.RejInitStr += tpi.n_points();
             break;
          }
-      } // end for i
+      }
    }
 
    // Check OutInitMask
@@ -546,10 +522,12 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
 bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCLineCounts &n) const {
    bool keep = true;
-   int i, j, offset;
+   int offset;
    double v_dbl, alat, alon, blat, blon;
    ConcatString v_str;
    StringArray sa;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    // Check TC-STAT header columns
    if(AModel.n_elements() > 0 &&
@@ -594,50 +572,41 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    else if(LineType.n_elements() > 0 &&
      !LineType.has(line.line_type()))   { keep = false; n.RejLineType++;  }
 
-   // Check ColumnThresh
+   // Check ColumnThreshMap
    if(keep == true) {
 
       // Loop through the numeric column thresholds
-      for(i=0; i<ColumnThreshName.n_elements(); i++) {
-
+      for(thr_it = ColumnThreshMap.begin(); thr_it != ColumnThreshMap.end(); thr_it++) {
+         
          // Get the numeric column value
-         v_dbl = get_column_double(line, ColumnThreshName[i]);
+         v_dbl = get_column_double(line, thr_it->first);
 
          // Check the column threshold
-         if(is_bad_data(v_dbl) || !ColumnThreshVal[i].check(v_dbl)) {
+         if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) {
            keep = false;
            n.RejColumnThresh++;
            break;
          }
-      } // end for i
+      }
    }
-
-   // Check ColumnStr
+   
+   // Check ColumnStrMap
    if(keep == true) {
 
       // Loop through the column string matching
-      for(i=0; i<ColumnStrName.n_elements(); i++) {
-
-         // Construct list of all entries for the current column name
-         sa.clear();
-         for(j=0; j<ColumnStrName.n_elements(); j++) {
-            if(strcasecmp(ColumnStrName[i], ColumnStrName[j]) == 0) {
-               if(strcmp(ColumnStrVal[j], na_str) == 0) sa.add(bad_data_str);
-               else                                     sa.add(ColumnStrVal[j]);
-            }
-         }
-
+      for(str_it = ColumnStrMap.begin(); str_it != ColumnStrMap.end(); str_it++) {
+         
          // Determine the column offset and retrieve the value
-         offset = determine_column_offset(line.type(), ColumnStrName[i]);
+         offset = determine_column_offset(line.type(), str_it->first);
          v_str  = line.get_item(offset);
 
          // Check the string value
-         if(!sa.has(v_str)) {
-            keep = false;
-            n.RejColumnStr++;
-            break;
+         if(!str_it->second.has(v_str)) {
+           keep = false;
+           n.RejColumnStr++;
+           break;
          }
-      } // end for i
+      }
    }
 
    // Retrieve the ADECK and BDECK lat/lon values
@@ -773,13 +742,13 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1]);                 a.shift_down(i, 1); }
       else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1]);                  a.shift_down(i, 1); }
       else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshName, ColumnThreshVal);
+      else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshMap);
                                                                                                       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrName, ColumnStrVal);
+      else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrMap);
                                                                                                       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1], a[i+2], InitThreshName, InitThreshVal);
+      else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1], a[i+2], InitThreshMap);
                                                                                                       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1], a[i+2], InitStrName, InitStrVal);
+      else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1], a[i+2], InitStrMap);
                                                                                                       a.shift_down(i, 2); }
       else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);        a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rapid_inten"       ) == 0) { RapidInten = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
@@ -905,6 +874,8 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
 ConcatString TCStatJob::serialize() const {
    ConcatString s;
    int i;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+   map<ConcatString,StringArray>::const_iterator str_it;
 
    // Initialize the jobstring
    s.clear();
@@ -954,18 +925,30 @@ ConcatString TCStatJob::serialize() const {
       s << "-line_type " << LineType[i] << " ";
    for(i=0; i<TrackWatchWarn.n_elements(); i++)
       s << "-track_watch_warn " << TrackWatchWarn[i] << " ";
-   for(i=0; i<ColumnThreshName.n_elements(); i++)
-      s << "-column_thresh " << ColumnThreshName[i] << " "
-                             << ColumnThreshVal[i].get_str() << " ";
-   for(i=0; i<ColumnStrName.n_elements(); i++)
-      s << "-column_str " << ColumnStrName[i] << " "
-                          << ColumnStrVal[i] << " ";
-   for(i=0; i<InitThreshName.n_elements(); i++)
-      s << "-init_thresh " << InitThreshName[i] << " "
-                           << InitThreshVal[i].get_str() << " ";
-   for(i=0; i<InitStrName.n_elements(); i++)
-      s << "-init_str " << InitStrName[i] << " "
-                        << InitStrVal[i] << " ";
+   for(thr_it = ColumnThreshMap.begin(); thr_it != ColumnThreshMap.end(); thr_it++) {
+      for(i=0; i<thr_it->second.n_elements(); i++) {
+         s << "-column_thresh " << thr_it->first << " "
+           << thr_it->second[i].get_str() << " ";
+      }
+   }
+   for(str_it = ColumnStrMap.begin(); str_it != ColumnStrMap.end(); str_it++) {
+      for(i=0; i<str_it->second.n_elements(); i++) {
+         s << "-column_str " << str_it->first << " "
+           << str_it->second[i] << " ";
+      }
+   }
+   for(thr_it = InitThreshMap.begin(); thr_it != InitThreshMap.end(); thr_it++) {
+      for(i=0; i<thr_it->second.n_elements(); i++) {
+         s << "-init_thresh " << thr_it->first << " "
+           << thr_it->second[i].get_str() << " ";
+      }
+   }
+   for(str_it = InitStrMap.begin(); str_it != InitStrMap.end(); str_it++) {
+      for(i=0; i<str_it->second.n_elements(); i++) {
+         s << "-init_str " << str_it->first << " "
+           << str_it->second[i] << " ";
+      }
+   }
    if(WaterOnly != default_water_only)
       s << "-water_only " << bool_to_string(WaterOnly) << " ";
    if(RapidInten != default_rapid_inten)
@@ -2129,18 +2112,14 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_thresh_option(const char *col_name, const char *col_val,
-                         StringArray &name, ThreshArray &val) {
-   ConcatString cs;
-   StringArray sa;
-   int i;
-
-   // Parse input list of strings into a ThreshArray
-   cs = col_val;
-   sa = cs.split(ArgsDelim);
-   for(i=0; i<sa.n_elements(); i++) {
-      name.add(col_name);
-      val.add(sa[i]);
-   }
+                         map<ConcatString,ThreshArray> &m) {
+   ConcatString cs = to_upper(col_name);
+   ThreshArray ta;
+   ta.add_css(col_val);
+   
+   // Add data to the map
+   if(m.count(cs) > 0) m[col_name].add(ta);
+   else                m.insert(pair<ConcatString, ThreshArray>(cs, ta));
 
    return;
 }
@@ -2148,18 +2127,15 @@ void parse_thresh_option(const char *col_name, const char *col_val,
 ////////////////////////////////////////////////////////////////////////
 
 void parse_string_option(const char *col_name, const char *col_val,
-                         StringArray &name, StringArray &val) {
-   ConcatString cs;
+                         map<ConcatString,StringArray> &m) {
+   ConcatString cs = to_upper(col_name);
    StringArray sa;
-   int i;
-
-   // Parse input list of strings into a StringArray
-   cs = col_val;
-   sa = cs.split(ArgsDelim);
-   for(i=0; i<sa.n_elements(); i++) {
-      name.add(col_name);
-      val.add(sa[i]);
-   }
+   sa.set_ignore_case(1);
+   sa.add_css(col_val);
+   
+   // Add data to the map
+   if(m.count(cs) > 0) m[col_name].add(sa);
+   else                m.insert(pair<ConcatString, StringArray>(cs, sa));
 
    return;
 }
