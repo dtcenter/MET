@@ -692,8 +692,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
          // Check if the column's value is bad data or is not in the
          // acceptable range
          //
-         if(is_bad_data(v) ||
-            v > column_max_value[j]) return(0);
+         if(is_bad_data(v) || v > column_max_value[j]) return(0);
       }
    }
 
