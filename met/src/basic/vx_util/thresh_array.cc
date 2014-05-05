@@ -402,3 +402,16 @@ int ThreshArray::check(double v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool ThreshArray::check_dbl(double v) const {
+   int i;
+   
+   //
+   // Check if the value satisifes all the thresholds in the array
+   //
+   for(i=0; i<Nelements; i++) if(!t[i].check(v)) return(false);
+   
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
