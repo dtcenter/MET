@@ -73,6 +73,10 @@ if( strMsg != "" ){ dfHdr = dfHdr[dfHdr$typ == strMsg,]; }
 if( strGc  != "" ){ dfObs = dfObs[dfObs$gc  == strGc, ]; } 
 dfSid = merge(dfHdr, dfObs);
 
+# format level column to HHMMSS for accumulation intervals
+ind_accum = ( dfSid$gc == 61 | dfSid$gc == 62 | dfSid$gc == 63 );
+dfSid$lvl[ind_accum] = format(.POSIXct(dfSid$lvl[ind_accum], tz="GMT"), "%H%M%S");
+
 # print the formatted observations
 options(scipen=20, digits=6);
 apply(dfSid[,2:12], 1, function(d){ cat(d,"\n") })
