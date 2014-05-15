@@ -42,6 +42,7 @@
 ##      001    2011-12-02  Halley Gotway  Fix parsing of the init and
 ##                         valid times from the header rather than
 ##                         assuming accumulations of 03 or 24-hours.
+##      002    2014-05-15  Halley Gotway  Update parsing of header info.
 ##
 ########################################################################
 
@@ -59,7 +60,7 @@ library(ncdf)
 #
 ########################################################################
 
-hdr_len    = 5           # Each pcp file begins with 5 header lines.
+hdr_len    = 9           # Each pcp file begins with 9 header lines.
 hdr_file   = "trmm.hdr"  # Temporary header file.
 missing    = -9999       # Missing pcp value to be used in MET.
 save       = FALSE       # If set to TRUE, call save.image()
@@ -111,40 +112,34 @@ sys_cmd = paste("rm -f", hdr_file)
 system(sys_cmd)
 
 # Determine the accumlation interval
-if(as.character(hdr[1,3]) == "Daily") {
+if(grepl("daily", hdr[1,2], ignore.case=TRUE)) {
   acc_type = 24
-} else if(as.character(hdr[1,3]) == "3-hourly") {
+} else if(grepl("3-hour", hdr[1,2], ignore.case=TRUE)) {
   acc_type = 3
 } else {
   cat("\n\nERROR: Can\'t figure out the accumulation interval!\n\n")
-  quit(1)
+  quit()
 }
 
 # Parse the init and valid times
 #   http://disc.sci.gsfc.nasa.gov/additional/faq/precipitation_faq.shtml#convert
 if(acc_type == 03) {
 
-  # For 03-hour accumulations, the time stamp gives the middle of the
-  # accumulation interval.
-  # Subtract 1.5 hours from the begin timestamp to get the init time.
-  # Add 1.5 hours to the end timestamp to get the valid time.
-
-  init  = as.POSIXct(strptime(unlist(strsplit(as.character(hdr[3,4]), '-'))[1],
-                              format="(%HZ%d%b%Y", tz="GMT") - 1.5*sec_per_hr)
-  valid = as.POSIXct(strptime(unlist(strsplit(as.character(hdr[3,4]), '-'))[2],
-                              format="%HZ%d%b%Y)", tz="GMT") + 1.5*sec_per_hr)
-
+  # For 03-hour accumulations, the time stamp gives the beginning of the
+  # accumulation interval. Add 3 hours to get the valid time.
+  init  = as.POSIXct(strptime(as.character(hdr[4,4]),
+                     format="%H:%MZ%d%b%Y", tz="GMT"))
+  valid = as.POSIXct(init + 3.0*sec_per_hr)
 } else {
 
   # The 24-hour accumulations are actually a sum of 03-hour accumulations:
   #   00Z, 03Z, 06Z, 12Z, 15Z, 18Z, and 21Z
   # Subtract 1.5 hours from the begin date to get the init time.
   # Add 22.5 hours to the end date to get the valid time.
-
-  init  = as.POSIXct(strptime(unlist(strsplit(as.character(hdr[3,4]), '-'))[1],
-                              format="(%d%b%Y", tz="GMT") - 1.5*sec_per_hr)
-  valid = as.POSIXct(strptime(unlist(strsplit(as.character(hdr[3,4]), '-'))[2],
-                              format="%d%b%Y)", tz="GMT") + 22.5*sec_per_hr)
+  init  = as.POSIXct(strptime(as.character(hdr[4,4]),
+                     format="%d%b%Y", tz="GMT") - 1.5*sec_per_hr)
+  valid = as.POSIXct(strptime(as.character(hdr[4,4]),
+                     format="%d%b%Y", tz="GMT") + 22.5*sec_per_hr)
 }
 
 # Compute the accumulation interval
@@ -162,16 +157,18 @@ acc_str = sprintf("%.2i", acc_hr)
 cat(paste("Reading:", trmm_file, "\n"))
 trmm = read.table(trmm_file, header=TRUE, skip=hdr_len)
 
+names(trmm) = c("latitude", "longitude", "precipitation")
+
 # Determine lat/lon dimensions
-lat  = unique(trmm$Latitude)
-lon  = unique(trmm$Longitude)
+lat  = unique(trmm$latitude)
+lon  = unique(trmm$longitude)
 dlat = lat[2]-lat[1]
 dlon = lon[2]-lon[1]
 nlat = length(lat)
 nlon = length(lon)
 
 # Slice the 1D array into a 2D array
-pcp = array(trmm$AccRain, dim=c(nlon, nlat), dimnames=c("lon", "lat"))
+pcp = array(trmm$precipitation, dim=c(nlon, nlat), dimnames=c("lon", "lat"))
 pcp[pcp < missing] = missing
 
 ########################################################################
@@ -181,10 +178,8 @@ pcp[pcp < missing] = missing
 ########################################################################
 
 # Define dimensions
-dim_lat = dim.def.ncdf("lat", "degrees_north", lat,
-                       create_dimvar=TRUE)
-dim_lon = dim.def.ncdf("lon", "degrees_east",  lon,
-                       create_dimvar=TRUE)
+dim_lat = dim.def.ncdf("lat", "degrees_north", lat, create_dimvar=TRUE)
+dim_lon = dim.def.ncdf("lon", "degrees_east",  lon, create_dimvar=TRUE)
 
 # Define variables
 var_pcp = var.def.ncdf(paste("APCP_", acc_str, sep=''), "kg/m^2",
@@ -210,7 +205,7 @@ att.put.ncdf(nc, var_pcp, "accum_time_sec", acc_sec, prec="int")
 cur_time = Sys.time()
 att.put.ncdf(nc, 0, "FileOrigins", paste("File", nc_file, "generated", format(Sys.time(), "%Y%m%d_%H%M%S"),
                                          "on host", Sys.info()[4], "by the Rscript trmm2nc.R"))
-att.put.ncdf(nc, 0, "MET_version", "V3.0.1")
+att.put.ncdf(nc, 0, "MET_version", "V4.1")
 att.put.ncdf(nc, 0, "Projection", "LatLon", prec="text")
 att.put.ncdf(nc, 0, "lat_ll", paste(min(lat), "degrees_north"), prec="text")
 att.put.ncdf(nc, 0, "lon_ll", paste(min(lon), "degrees_east"), prec="text")
