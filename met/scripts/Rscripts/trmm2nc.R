@@ -42,7 +42,8 @@
 ##      001    2011-12-02  Halley Gotway  Fix parsing of the init and
 ##                         valid times from the header rather than
 ##                         assuming accumulations of 03 or 24-hours.
-##      002    2014-05-15  Halley Gotway  Update parsing of header info.
+##      002    2014-05-15  Halley Gotway  Update parsing of header info
+##                         for 3B42 version 7.
 ##
 ########################################################################
 
@@ -107,15 +108,19 @@ for(i in 1:length(args)) {
 # Read the header pcp
 sys_cmd = paste("head -", hdr_len, " ", trmm_file, " > ", hdr_file, sep="")
 system(sys_cmd)
-hdr = read.table(hdr_file, fill=TRUE)
+hdr = readLines(hdr_file)
 sys_cmd = paste("rm -f", hdr_file)
 system(sys_cmd)
 
-# Determine the accumlation interval
-if(grepl("daily", hdr[1,2], ignore.case=TRUE)) {
-  acc_type = 24
-} else if(grepl("3-hour", hdr[1,2], ignore.case=TRUE)) {
-  acc_type = 3
+# Determine if it's a daily or 3-hourly file
+if(grepl("daily", hdr[1], ignore.case=TRUE)) {
+  acc_type  = 24
+  init_fmt  = "Selected time period: %d%b%Y"
+  valid_fmt = "%d%b%Y"
+} else if(grepl("3-hour", hdr[1], ignore.case=TRUE)) {
+  acc_type  = 3
+  init_fmt  = "Selected time period: %H:%MZ%d%b%Y"
+  valid_fmt = "%H:%MZ%d%b%Y"
 } else {
   cat("\n\nERROR: Can\'t figure out the accumulation interval!\n\n")
   quit()
@@ -123,23 +128,18 @@ if(grepl("daily", hdr[1,2], ignore.case=TRUE)) {
 
 # Parse the init and valid times
 #   http://disc.sci.gsfc.nasa.gov/additional/faq/precipitation_faq.shtml#convert
-if(acc_type == 03) {
-
-  # For 03-hour accumulations, the time stamp gives the beginning of the
-  # accumulation interval. Add 3 hours to get the valid time.
-  init  = as.POSIXct(strptime(as.character(hdr[4,4]),
-                     format="%H:%MZ%d%b%Y", tz="GMT"))
-  valid = as.POSIXct(init + 3.0*sec_per_hr)
+toks = unlist(strsplit(hdr[4], "-"))
+init = as.POSIXct(strptime(toks[1], format=init_fmt, tz="GMT"))
+if(length(toks) == 2) {
+   valid = as.POSIXct(strptime(toks[2], format=valid_fmt, tz="GMT"))
 } else {
+   valid = as.POSIXct(init + acc_type * sec_per_hr)
+}
 
-  # The 24-hour accumulations are actually a sum of 03-hour accumulations:
-  #   00Z, 03Z, 06Z, 12Z, 15Z, 18Z, and 21Z
-  # Subtract 1.5 hours from the begin date to get the init time.
-  # Add 22.5 hours to the end date to get the valid time.
-  init  = as.POSIXct(strptime(as.character(hdr[4,4]),
-                     format="%d%b%Y", tz="GMT") - 1.5*sec_per_hr)
-  valid = as.POSIXct(strptime(as.character(hdr[4,4]),
-                     format="%d%b%Y", tz="GMT") + 22.5*sec_per_hr)
+# Shift the valid times by 1.5 hours
+if(acc_type == 24) {
+   init  = as.POSIXct(init - 1.5 * sec_per_hr)
+   valid = as.POSIXct(valid - 1.5 * sec_per_hr)
 }
 
 # Compute the accumulation interval
