@@ -18,7 +18,7 @@
   <test name="ascii2nc_TRMM_3hr">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/trmm/trmm_2012040912_3hr_qty.mtxt \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
       -v 1
     </param>   
@@ -30,7 +30,7 @@
   <test name="ascii2nc_TRMM_12hr">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
-      &DATA_DIR_OBS;/trmm/trmm_2008080812_12hr_qty.mtxt \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.22:30Z07Aug2012-10:30Z08Aug2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2008080812_12hr.nc \
       -v 1
     </param>   

@@ -18,7 +18,7 @@
   <test name="trmm2nc_3hr">
     <exec>Rscript &MET_DIR;/scripts/Rscripts/trmm2nc.R</exec>
     <param> \
-      &DATA_DIR_OBS;/trmm/trmm_2012040912_3hr_full.txt \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.txt \
       &OUTPUT_DIR;/trmm2nc/trmm_2012040912_3hr_grid.nc
     </param>   
     <output>
@@ -29,7 +29,7 @@
   <test name="trmm2nc_12hr">
     <exec>Rscript &MET_DIR;/scripts/Rscripts/trmm2nc.R</exec>
     <param> \
-      &DATA_DIR_OBS;/trmm/trmm_2008080812_12hr_full.txt \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.22:30Z07Aug2012-10:30Z08Aug2012.G3.output.txt \
       &OUTPUT_DIR;/trmm2nc/trmm_2008080812_12hr_grid.nc
     </param>   
     <output>
