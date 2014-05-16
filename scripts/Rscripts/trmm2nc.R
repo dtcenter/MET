@@ -4,12 +4,12 @@
 ##
 ##   Description:
 ##      This script should be called via an Rscript command to reformat
-##      ASCII TRMM precipitation pcp into a NetCDF format that MET
+##      3B42 V7 ASCII TRMM precipitation pcp into a NetCDF format that MET
 ##      can read.  The input pcp for this script can be attained via:
 ##      24-hour accumulations:
-##        http://disc2.nascom.nasa.gov/Giovanni/tovas/realtime.3B42RT_daily.shtml
+##        http://gdata1.sci.gsfc.nasa.gov/daac-bin/G3/gui.cgi?instance_id=TRMM_3B42_Daily
 ##      03-hour accumulations:
-##        http://disc2.nascom.nasa.gov/Giovanni/tovas/realtime.3B42RT.shtml
+##        http://gdata1.sci.gsfc.nasa.gov/daac-bin/G3/gui.cgi?instance_id=TRMM_3-Hourly
 ##      GES DISC FAQ:
 ##        http://disc.sci.gsfc.nasa.gov/additional/faq/precipitation_faq.shtml
 ##
@@ -42,8 +42,8 @@
 ##      001    2011-12-02  Halley Gotway  Fix parsing of the init and
 ##                         valid times from the header rather than
 ##                         assuming accumulations of 03 or 24-hours.
-##      002    2014-05-15  Halley Gotway  Update parsing of header info
-##                         for 3B42 version 7.
+##      002    2014-05-15  Halley Gotway  Update parsing of header for
+##                         3B42 version 7.
 ##
 ########################################################################
 
