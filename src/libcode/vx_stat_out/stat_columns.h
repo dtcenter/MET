@@ -220,7 +220,7 @@ static const char * orank_columns [] = {
    "OBS_LAT",     "OBS_LON",     "OBS_LVL",
    "OBS_ELV",     "OBS",         "PIT",
    "RANK",        "N_ENS_VLD",   "N_ENS",
-   "ENS_"
+   "ENS_",        "OBS_QC"
 };
 
 static const char * ssvar_columns [] = {
@@ -308,18 +308,7 @@ inline int get_n_pstd_columns  (int n) { return(12 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_rhist_columns (int n) { return(4  + n);               } // n = N_RANK
-inline int get_n_orank_columns (int n) { return(12 + n);               } // n = N_ENS
-
-////////////////////////////////////////////////////////////////////////
-
-extern int get_column_offset      (const char **, int, const char *);
-extern int get_mctc_column_offset (const char *, int);
-extern int get_pct_column_offset  (const char *);
-extern int get_pstd_column_offset (const char *);
-extern int get_pjc_column_offset  (const char *);
-extern int get_prc_column_offset  (const char *);
-extern int get_rhist_column_offset(const char *);
-extern int get_orank_column_offset(const char *);
+inline int get_n_orank_columns (int n) { return(13 + n);               } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 

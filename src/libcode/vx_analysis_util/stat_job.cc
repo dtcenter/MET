@@ -661,7 +661,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
          //
          // Determine the column offset and retrieve the value
          //
-         c = determine_column_offset(L.type(), column_min_name[j]);
+         c = determine_column_offset(L, column_min_name[j]);
          v = atof(L.get_item(c));
 
          //
@@ -685,7 +685,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
          //
          // Determine the column offset and retrieve the value
          //
-         c = determine_column_offset(L.type(), column_max_name[j]);
+         c = determine_column_offset(L, column_max_name[j]);
          v = atof(L.get_item(c));
 
          //
@@ -705,7 +705,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Determine the column offset
       //
-      c = determine_column_offset(L.type(), it->first);
+      c = determine_column_offset(L, it->first);
    
       //
       // Check if the current value is in the list for the column
@@ -1363,7 +1363,7 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    // Retrieve value for each column_case option
    //
    for(i=0; i<column_case.n_elements(); i++) {
-      key << ":" << L.get_item(determine_column_offset(L.type(), column_case[i]));
+      key << ":" << L.get_item(determine_column_offset(L, column_case[i]));
    }
 
    return(key);

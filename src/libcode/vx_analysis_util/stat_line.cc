@@ -966,13 +966,13 @@ return ( 1 );
 
 ////////////////////////////////////////////////////////////////////////
 
-int determine_column_offset(STATLineType type, const char *c)
+int determine_column_offset(const STATLine &L, const char *c)
 
 {
 
 int offset;
 
-switch(type) {
+switch(L.type()) {
 
    case stat_sl1l2:
       offset = get_column_offset(sl1l2_columns, n_sl1l2_columns, c);
@@ -1055,7 +1055,7 @@ switch(type) {
       break;
 
    case stat_orank:
-      offset = get_orank_column_offset(c);
+      offset = get_orank_column_offset(c, L);
       break;
 
    case stat_ssvar:
@@ -1064,7 +1064,7 @@ switch(type) {
 
    default:
       mlog << Error << "\ndetermine_column_offset() -> "
-           << "unexpected line type value of " << type << "\n\n";
+           << "unexpected line type value of " << L.type() << "\n\n";
 
       exit ( 1 );
       break;
@@ -1076,3 +1076,580 @@ return(offset);
 
 ////////////////////////////////////////////////////////////////////////
 
+int get_column_offset(const char **arr, int n_cols, const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the columns provided
+   //
+   if(!found) {
+      for(i=0; i<n_cols; i++) {
+
+         if(strcasecmp(arr[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_column_offset() -> "
+           << "no match found in the indicated array for the column name "
+           << "specified: \"" << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_mctc_column_offset(const char *col_name, int n_cat) {
+   int i, j, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the PCT columns:
+   //    TOTAL,       N_CAT,
+   //    [Fi_Oj] (for of the NxN contingency table cells)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<2; i++) {
+
+         if(strcasecmp(mctc_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable column
+   //
+   if(!found) {
+
+      // Fi_Oj: Parse out i and j
+      parse_row_col(col_name, i, j);
+      offset = n_header_columns + 2 + (i-1)*n_cat + (j-1);
+      found  = 1;
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_mctc_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_pct_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the PCT columns:
+   //    TOTAL,       N_THRESH,
+   //   [THRESH,      OY,          ON,] (for each row of Nx2 Table)
+   //    THRESH                         (last threshold)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<2; i++) {
+
+         if(strcasecmp(pct_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable columns
+   //
+   if(!found) {
+
+      // THRESH_i
+      if(strncasecmp(pct_columns[2], col_name,
+                     strlen(pct_columns[2])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 3*(i-1) + 0;
+      }
+      // OY_i
+      else if(strncasecmp(pct_columns[3], col_name,
+                          strlen(pct_columns[3])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 3*(i-1) + 1;
+      }
+      // ON_i
+      else if(strncasecmp(pct_columns[4], col_name,
+                          strlen(pct_columns[4])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 3*(i-1) + 2;
+      }
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_pct_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_pstd_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the PSTD columns:
+   //    TOTAL,       N_THRESH,    BASER,
+   //    BASER_NCL,   BASER_NCU,   RELIABILTY,
+   //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
+   //    BRIER,       BRIER_NCL,   BRIER_NCU,
+   //    [THRESH] (for each threshold)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<12; i++) {
+
+         if(strcasecmp(pstd_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable columns
+   //
+   if(!found) {
+
+      // THRESH_i
+      if(strncasecmp(pstd_columns[12], col_name,
+                     strlen(pstd_columns[12])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 12 + (i-1);
+      }
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_pstd_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_pjc_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the PJC columns:
+   //    TOTAL,       N_THRESH,
+   //   [THRESH,
+   //    OY_TP,       ON_TP,      CALIBRATION,
+   //    REFINEMENT,  LIKELIHOOD, BASER] (for each row of Nx2 Table)
+   //    THRESH
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<2; i++) {
+
+         if(strcasecmp(pjc_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable columns
+   //
+   if(!found) {
+
+      // THRESH_i
+      if(strncasecmp(pjc_columns[2], col_name,
+                     strlen(pjc_columns[2])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 7*(i-1) + 0;
+      }
+      // OY_TP_i
+      else if(strncasecmp(pjc_columns[3], col_name,
+                          strlen(pjc_columns[3])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 7*(i-1) + 1;
+      }
+      // ON_TP_i
+      else if(strncasecmp(pjc_columns[4], col_name,
+                          strlen(pjc_columns[4])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 7*(i-1) + 2;
+      }
+      // CALIBRATION_i
+      else if(strncasecmp(pjc_columns[5], col_name,
+                          strlen(pjc_columns[5])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 7*(i-1) + 3;
+      }
+      // REFINEMENT_i
+      else if(strncasecmp(pjc_columns[6], col_name,
+                          strlen(pjc_columns[6])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 7*(i-1) + 4;
+      }
+      // LIKELIHOOD_i
+      else if(strncasecmp(pjc_columns[7], col_name,
+                          strlen(pjc_columns[7])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 7*(i-1) + 5;
+      }
+      // BASER_i
+      else if(strncasecmp(pjc_columns[8], col_name,
+                          strlen(pjc_columns[8])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 7*(i-1) + 6;
+      }
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_pjc_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_prc_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the prc columns:
+   //    TOTAL,       N_THRESH,
+   //   [THRESH,      PODY,        POFD,] (for each row of Nx2 Table)
+   //    THRESH                           (last threshold)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<2; i++) {
+
+         if(strcasecmp(prc_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable columns
+   //
+   if(!found) {
+
+      // THRESH_i
+      if(strncasecmp(prc_columns[2], col_name,
+                     strlen(prc_columns[2])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 3*(i-1) + 0;
+      }
+      // PODY_i
+      else if(strncasecmp(prc_columns[3], col_name,
+                          strlen(prc_columns[3])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 3*(i-1) + 1;
+      }
+      // POFD_i
+      else if(strncasecmp(prc_columns[4], col_name,
+                          strlen(prc_columns[4])) == 0) {
+
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 2 + 3*(i-1) + 2;
+      }
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_prc_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_rhist_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the rhist columns:
+   //    TOTAL,  CRPS,  IGN,
+   //    N_RANK, [RANK_] (for possible ranks, n_ens+1)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<4; i++) {
+
+         if(strcasecmp(rhist_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable column
+   //
+   if(!found) {
+
+      // RANK_i
+      if(strncasecmp(rhist_columns[4], col_name,
+                     strlen(rhist_columns[4])) == 0) {
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 4 + (i-1);
+      }
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_rhist_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_orank_column_offset(const char *col_name, const STATLine &L) {
+   int i, offset, found, n_ens;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the orank columns:
+   //    TOTAL,       INDEX,       OBS_SID,
+   //    OBS_LAT,     OBS_LON,     OBS_LVL,
+   //    OBS_ELV,     OBS,         PIT,
+   //    RANK,        N_ENS_VLD,   N_ENS,
+   //    [ENS_] (for each ensemble member)
+   //    OBS_QC
+   //
+   
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<12; i++) {
+
+         if(strcasecmp(orank_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable column
+   //
+   if(!found) {
+
+      // ENS_i
+      if(strncasecmp(orank_columns[12], col_name,
+                     strlen(orank_columns[12])) == 0) {
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 12 + (i-1);
+      }
+   }
+
+   //
+   // Check for the OBS_QC special case after the variable columns
+   //
+   if(strcasecmp(col_name, "OBS_QC") == 0) {
+      n_ens  = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
+      found  = 1;
+      offset = n_header_columns + 12 + n_ens;
+   }
+   
+   if(!found) {
+      mlog << Error << "\nget_orank_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////

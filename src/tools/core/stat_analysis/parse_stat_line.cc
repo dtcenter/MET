@@ -19,6 +19,7 @@
 //                    parse_orank_line.
 //   002    06/09/10  Halley Gotway   Add parse_mctc_ctable.
 //   003    03/07/13  Halley Gotway   Add parse_ssvar_line.
+//   004    05/19/14  Halley Gotway   Add OBS_QC to MPR and ORANK lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -271,7 +272,7 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
    m_data.obs      = atof(l.get_item(mpr_obs_offset));
    m_data.climo    = atof(l.get_item(mpr_climo_offset));
 
-   // Parse obs_qc, if present
+   // Parse OBS_QC, if present
    if(l.n_items() > mpr_obs_qc_offset) {
       m_data.obs_qc = l.get_item(mpr_obs_qc_offset);
    }
@@ -335,6 +336,7 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    o_data.obs_lvl   = atof(l.get_item(orank_obs_lvl_offset));
    o_data.obs_elv   = atof(l.get_item(orank_obs_elv_offset));
    o_data.obs       = atof(l.get_item(orank_obs_offset));
+
    o_data.pit       = atof(l.get_item(orank_pit_offset));
 
    o_data.rank      = atoi(l.get_item(orank_rank_offset));
@@ -345,6 +347,14 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    o_data.ens_na.clear();
    for(i=0; i<o_data.n_ens; i++) {
       o_data.ens_na.add(atof(l.get_item(orank_ens_offset(i))));
+   }
+   
+   // Parse OBS_QC, if present
+   if(l.n_items() > orank_obs_qc_offset(o_data.n_ens)) {
+      o_data.obs_qc = l.get_item(orank_obs_qc_offset(o_data.n_ens));
+   }
+   else {
+      o_data.obs_qc.clear();
    }
 
    return;

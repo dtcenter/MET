@@ -286,7 +286,6 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     STATAnalysisJob &j, int &n_in, int &n_out,
                     ofstream *sa_out, gsl_rng *rng_ptr) {
    STATLine line;
-   STATLineType lt;
    int i, k, r, c;
    double v, min, v10, v25, v50, v75, v90, max;
    CIInfo mean_ci, stdev_ci;
@@ -322,11 +321,6 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Determine the line type
-   //
-   lt = string_to_statlinetype(j.line_type[0]);
-   
-   //
    // Process the STAT lines
    //
    while(f >> line) {
@@ -347,7 +341,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
             //
             key = j.column[i];
             key << ":" << j.get_case_info(line);
-            v   = atof(line.get_item(determine_column_offset(lt, j.column[i])));
+            v   = atof(line.get_item(determine_column_offset(line, j.column[i])));
 
             //
             // Add value to existing map entry or add a new one
