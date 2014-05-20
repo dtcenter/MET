@@ -19,6 +19,7 @@
 //                    parse_orank_line.
 //   002    06/09/10  Halley Gotway   Add parse_mctc_ctable.
 //   003    03/07/13  Halley Gotway   Add parse_ssvar_line.
+//   004    05/19/14  Halley Gotway   Add OBS_QC to MPR and ORANK lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -65,7 +66,7 @@ struct RHISTData {
 // Observation Rank (ORANK) data structure
 struct ORANKData {
    int total, index;
-   ConcatString obs_sid;
+   ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, obs_lvl, obs_elv, obs, pit;
    int rank, n_ens_vld, n_ens;
    NumArray ens_na;
