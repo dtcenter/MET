@@ -651,7 +651,7 @@ s = s_sq = 0.0;
 count = 0;
 
 for(j=0; j<Nelements; j++) {
-   if(is_bad_data(j)) continue;
+   if(is_bad_data(e[j])) continue;
    s    += e[j];
    s_sq += e[j]*e[j];
    count++;
@@ -688,7 +688,7 @@ int j, count;
 double s, mn;
 
 for(j=0, count=0, s=0.0; j<Nelements; j++) {
-   if(is_bad_data(j)) continue;
+   if(is_bad_data(e[j])) continue;
    s += e[j];
    count++;
 }
@@ -712,7 +712,7 @@ int j, count;
 double s;
 
 for(j=0, count=0, s=0.0; j<Nelements; j++) {
-   if(is_bad_data(j)) continue;
+   if(is_bad_data(e[j])) continue;
    s += e[j];
    count++;
 }
@@ -788,7 +788,7 @@ int j;
 double min_v = e[0];
 
 for(j=0; j<Nelements; j++) {
-   if(is_bad_data(j)) continue;
+   if(is_bad_data(e[j])) continue;
    if(e[j] < min_v) min_v = e[j];
 }
 
@@ -811,7 +811,7 @@ int j;
 double max_v = e[0];
 
 for(j=0; j<Nelements; j++) {
-   if(is_bad_data(j)) continue;
+   if(is_bad_data(e[j])) continue;
    if(e[j] > max_v) max_v = e[j];
 }
 
