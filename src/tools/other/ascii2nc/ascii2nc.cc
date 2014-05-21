@@ -32,6 +32,9 @@
 //                                     summary width is specified in the
 //                                     netCDF file and added summary info
 //                                     to the netCDF global attributes.
+//   010    05-21-14  Halley Gotway  Print usage for fewer than 2 files
+//                                     on the command line.
+//                                    
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -141,6 +144,12 @@ int main(int argc, char *argv[]) {
    // Parse the command line
    //
    cline.parse();
+
+   //
+   // Check for error. There should be at least two arguments left:
+   // the ascii input filenames and the netCDF output filename
+   //
+   if(cline.n() < 2) usage();
 
    //
    // Store the input ASCII file name and the output NetCDF file name
