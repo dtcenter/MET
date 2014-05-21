@@ -1568,9 +1568,12 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, max_col;
+   int  i, max_col, max_n_ens_vld;
    ConcatString tmp_str;
 
+   // Get the maximum number of valid ensemble members
+   max_n_ens_vld = n_ens_vld.max();
+   
    // Check to see if the text files have already been set up
    if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
 
@@ -1584,8 +1587,8 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   max_col =  max(get_n_orank_columns(n_ens+1),
-                  get_n_rhist_columns(n_ens));
+   max_col =  max(get_n_orank_columns(max_n_ens_vld+1),
+                  get_n_rhist_columns(max_n_ens_vld));
    max_col =  max(max_col, n_ssvar_columns);
    max_col += n_header_columns;
 
@@ -1641,7 +1644,7 @@ void setup_txt_files() {
                break;
 
             case(i_orank):
-               max_col = get_n_orank_columns(n_ens) + n_header_columns + 1;
+               max_col = get_n_orank_columns(max_n_ens_vld) + n_header_columns + 1;
                break;
 
             default:
@@ -1661,7 +1664,7 @@ void setup_txt_files() {
                break;
 
             case(i_orank):
-               write_orank_header_row(1, n_ens, txt_at[i], 0, 0);
+               write_orank_header_row(1, max_n_ens_vld, txt_at[i], 0, 0);
                break;
 
             default:
