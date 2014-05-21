@@ -822,8 +822,10 @@ bool TrackInfoArray::has(const ATCFLine &l) const {
 ////////////////////////////////////////////////////////////////////////
 
 TrackInfo consensus(const TrackInfoArray &tracks,
-                    const ConcatString &model, int req) {
+                    const ConcatString &model, int req,
+                    const StringArray &req_list) {
    int i, j, i_pnt;
+   bool skip;
    TrackInfo tavg;
    NumArray lead_list;
 
@@ -887,7 +889,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    }
 
    // Loop through the lead times and construct a TrackPoint for each
-   for(i=0; i<lead_list.n_elements(); i++) {
+   for(i=0, skip=false; i<lead_list.n_elements(); i++) {
 
       // Initialize TrackPoint
       pavg.clear();
@@ -899,16 +901,24 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
          // Get the index of the TrackPoint for this lead time
          i_pnt = tracks.Track[j].lead_index(nint(lead_list[i]));
-         if(i_pnt < 0) continue;
+         
+         // Check for missing TrackPoint in a required member
+         if(i_pnt < 0) {
+            if(req_list.has(tracks.Track[j].technique())) {
+               skip = true;
+               break;
+            }
+            continue;
+         }        
 
-         // Keep track of the TrackPoint count and sums
+         // Increment the TrackPoint count and sums
          pcnt++;
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
       }
 
-      // Check for the minimum number of points
-      if(pcnt < req) continue;
+      // Check for missing required member and the minimum number of points
+      if(skip == true || pcnt < req) continue;
 
       // Compute the average point
       pavg = psum;

@@ -836,7 +836,7 @@ void derive_interp12(TrackInfoArray &tracks) {
 int derive_consensus(TrackInfoArray &tracks) {
    int i, j, k, l;
    ConcatString cur_case;
-   StringArray case_list, case_cmp;
+   StringArray case_list, case_cmp, req_list;
    TrackInfoArray con_tracks;
    TrackInfo new_track;
    bool found, skip;
@@ -877,10 +877,16 @@ int derive_consensus(TrackInfoArray &tracks) {
          // Initialize
          con_tracks.clear();
          new_track.clear();
+         req_list.clear();
 
          // Loop through the consensus members
          for(k=0, skip=false;
              k<conf_info.Consensus[j].Members.n_elements(); k++) {
+            
+            // Add required members to the list
+            if(conf_info.Consensus[j].Required[k]) {
+               req_list.add(conf_info.Consensus[j].Members[k]);
+            }
 
             // Loop through the tracks looking for a match
             for(l=0, found=false; l<tracks.n_tracks(); l++) {
@@ -941,7 +947,7 @@ int derive_consensus(TrackInfoArray &tracks) {
 
          // Derive the consensus model from the TrackInfoArray
          new_track = consensus(con_tracks, conf_info.Consensus[j].Name,
-                               conf_info.Consensus[j].MinReq);
+                               conf_info.Consensus[j].MinReq, req_list);
 
          if(mlog.verbosity_level() >= 5) {
             mlog << Debug(5)
