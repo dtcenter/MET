@@ -20,6 +20,7 @@ using namespace std;
 #include <cmath>
 
 #include "int_array.h"
+#include "is_bad_data.h"
 #include "nint.h"
 #include "vx_cal.h"
 #include "vx_log.h"
@@ -411,11 +412,63 @@ int IntArray::sum() const
 
 {
 
-int i, s;
+int j, count, s;
 
-for (i=0, s=0; i<Nelements; i++) s += e[i];
+for(j=0, count=0, s=0; j<Nelements; j++) {
+   if(is_bad_data(e[j])) continue;
+   s += e[j];
+   count++;
+}
+
+if(count == 0) s = bad_data_double;
 
 return(s);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int IntArray::min() const
+
+{
+
+if(Nelements == 0) return(bad_data_int);
+
+int j;
+
+int min_v = e[0];
+
+for(j=0; j<Nelements; j++) {
+   if(is_bad_data(e[j])) continue;
+   if(e[j] < min_v) min_v = e[j];
+}
+
+return(min_v);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int IntArray::max() const
+
+{
+
+if(Nelements == 0) return(bad_data_int);
+
+int j;
+
+int max_v = e[0];
+
+for(j=0; j<Nelements; j++) {
+   if(is_bad_data(e[j])) continue;
+   if(e[j] > max_v) max_v = e[j];
+}
+
+return(max_v);
 
 }
 
