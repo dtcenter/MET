@@ -173,7 +173,8 @@ inline int                  TrackInfo::n_points()         const { return(NPoints
 
 class TrackInfoArray {
 
-   friend TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int);
+   friend TrackInfo consensus(const TrackInfoArray &, const ConcatString &,
+                              int, const StringArray &);
 
    private:
 
@@ -226,7 +227,7 @@ inline int TrackInfoArray::n_tracks() const { return(NTracks); }
 
 ////////////////////////////////////////////////////////////////////////
 
-extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int);
+extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int, const StringArray &);
 extern bool has_storm_id(const StringArray &, const ConcatString &basin,
                          const ConcatString &cyclone, unixtime init);
 
