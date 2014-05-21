@@ -65,8 +65,6 @@ class NumArray {
 
       double operator[](int) const;
 
-      int is_bad_data(int) const;
-
       int has(int)    const;
       int has(double) const;
 

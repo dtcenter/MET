@@ -295,23 +295,6 @@ return(has((double) k));
 ////////////////////////////////////////////////////////////////////////
 
 
-int NumArray::is_bad_data(int n) const
-
-{
-
-int r;
-
-if(fabs(e[n] - bad_data_double) < 0.01) r = 1;
-else                                    r = 0;
-
-return ( r );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 int NumArray::has(double d) const
 
 {
@@ -577,7 +560,7 @@ if ( !data || !data_loc || !data_rank )  {
 n = 0;
 for(i=0; i<Nelements; i++) {
 
-   if(!is_bad_data(i)) {
+   if(!is_bad_data(e[i])) {
       data[n]     = e[i];
       data_loc[n] = i;
       n++;
