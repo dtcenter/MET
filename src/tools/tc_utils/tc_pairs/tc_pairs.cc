@@ -15,6 +15,9 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    03/14/12  Halley Gotway   New
+//   001    05/20/14  Halley Gotway   Refine consensus to ensure the
+//                                      presence of required members at
+//                                      each lead time.
 //
 ////////////////////////////////////////////////////////////////////////
 
