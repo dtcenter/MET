@@ -403,7 +403,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
       col++;
    }
 
-   at.set_entry(r, c+13+n_ens, orank_columns[13]);
+   at.set_entry(r, c+12+n_ens, orank_columns[13]);
    
    return;
 }
