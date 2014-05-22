@@ -1356,6 +1356,12 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       // NBRCNT output line
       //
       else if(lt == stat_nbrcnt) {
+
+         //
+         // Allocate space for confidence intervals
+         //
+         it->second.nbrcnt_info.allocate_n_alpha(1);
+
          at.set_entry(r, c++, "NBRCNT:");
          write_case_cols(it->first, at, r, c);
          write_nbrcnt_cols(it->second.nbrcnt_info, 0, at, r, c);
