@@ -320,11 +320,12 @@ class NBRCNTInfo {
       SingleThresh raw_fcst_thresh;
       SingleThresh raw_obs_thresh;
 
-      // Fractions Brier Score
-      CIInfo fbs;
-
-      // Fractions Skill Score
-      CIInfo fss;
+      // Fractions Brier Score,
+      // Fractions Skill Score, 
+      // Asymptotic Fractions Skill Score,
+      // Uniform Fractions Skill Score,
+      // Forecast Rate, and Observation Rate
+      CIInfo fbs, fss, afss, ufss, f_rate, o_rate;
 
       void clear();
       void allocate_n_alpha(int);
@@ -483,6 +484,10 @@ extern void   dbl_to_str(double, char *, int);
 
 extern double compute_stdev(double, double, int);
 
+extern double compute_afss(double, double);
+
+extern double compute_ufss(double);
+
 extern int    compute_rank(const DataPlane &, DataPlane &, double *, int &);
 
 extern void   compute_cntinfo(const SL1L2Info &, int, CNTInfo &);
@@ -509,9 +514,11 @@ extern void   compute_pctinfo(const NumArray &, const NumArray &,
                               int, PCTInfo &);
 
 extern void   compute_nbrcntinfo(const NumArray &, const NumArray &,
+                                 const NumArray &, const NumArray &,
                                  const NumArray &,
                                  NBRCNTInfo &, int);
 extern void   compute_i_nbrcntinfo(const NumArray &, const NumArray &,
+                                   const NumArray &, const NumArray &,
                                    int, NBRCNTInfo &);
 
 extern void   compute_mean_stdev(const NumArray &, const NumArray &,

@@ -1355,11 +1355,42 @@ NBRCNTInfo & NBRCNTInfo::operator=(const NBRCNTInfo &c) {
 NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
 
    NBRCNTInfo n_info;
+   double den;
 
    n_info.cnt_info.n = cnt_info.n + c.cnt_info.n;
-   if( n_info.cnt_info.n ){
-      n_info.fbs.v = (cnt_info.n*fbs.v + c.cnt_info.n*c.fbs.v) / n_info.cnt_info.n;
-      n_info.fss.v = (cnt_info.n*fss.v + c.cnt_info.n*c.fss.v) / n_info.cnt_info.n;
+
+   if(n_info.cnt_info.n) {
+      
+      //
+      // Aggregate FBS as a weighted average
+      //
+      n_info.fbs.v = (cnt_info.n*fbs.v + c.cnt_info.n*c.fbs.v) /
+                      n_info.cnt_info.n;
+
+      //
+      // Aggregate the denominator for FSS as a weighted average and then
+      // recompute FSS using the aggregated FBS and denominator
+      //
+      den = (  cnt_info.n *  fbs.v / (1.0 - fss.v  ) +
+             c.cnt_info.n *c.fbs.v / (1.0 - c.fss.v)) /
+             n_info.cnt_info.n;
+
+      if(is_eq(den, 0.0)) n_info.fss.v = bad_data_double;
+      else                n_info.fss.v = 1.0 - n_info.fbs.v / den;
+
+      //
+      // Aggregate F_RATE and O_RATE as weighted averages
+      //
+      n_info.f_rate.v = (cnt_info.n*f_rate.v + c.cnt_info.n*c.f_rate.v) /
+                         n_info.cnt_info.n;
+      n_info.o_rate.v = (cnt_info.n*o_rate.v + c.cnt_info.n*c.o_rate.v) /
+                         n_info.cnt_info.n;
+      
+      //
+      // Recompute AFSS and UFSS using the aggregated rates
+      //
+      n_info.afss.v = compute_afss(n_info.f_rate.v, n_info.o_rate.v);
+      n_info.ufss.v = compute_ufss(n_info.o_rate.v);
    }
 
    assign(n_info);
@@ -1382,6 +1413,10 @@ void NBRCNTInfo::clear() {
 
    fbs.clear();
    fss.clear();
+   afss.clear();
+   ufss.clear();
+   f_rate.clear();
+   o_rate.clear();
    cnt_info.clear();
    nbr_wdth = bad_data_int;
    raw_fcst_thresh.clear();
@@ -1398,6 +1433,10 @@ void NBRCNTInfo::assign(const NBRCNTInfo &c) {
 
    fbs             = c.fbs;
    fss             = c.fss;
+   afss            = c.afss;
+   ufss            = c.ufss;
+   f_rate          = c.f_rate;
+   o_rate          = c.o_rate;
    cnt_info        = c.cnt_info;
    nbr_wdth        = c.nbr_wdth;
    raw_fcst_thresh = c.raw_fcst_thresh;
@@ -1414,6 +1453,10 @@ void NBRCNTInfo::allocate_n_alpha(int i) {
 
    fbs.allocate_n_alpha(i);
    fss.allocate_n_alpha(i);
+   afss.allocate_n_alpha(i);
+   ufss.allocate_n_alpha(i);
+   f_rate.allocate_n_alpha(i);
+   o_rate.allocate_n_alpha(i);
 
    return;
 }
@@ -1441,6 +1484,12 @@ void NBRCNTInfo::compute_stats() {
 
    if(is_eq(den, 0.0)) fss.v = bad_data_double;
    else                fss.v = 1.0 - (num/den);
+
+   //
+   // Compute F_RATE and O_RATE
+   //
+   afss.v = compute_afss(f_rate.v, o_rate.v);
+   ufss.v = compute_ufss(o_rate.v);
 
    return;
 }
@@ -2092,6 +2141,41 @@ double compute_stdev(double sum, double sum_sq, int n) {
    }
 
    return(sigma);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double compute_afss(double f_rate, double o_rate) {
+   double num, den, afss;
+
+   //
+   // Compute Asymptotic Fractions Skill Score
+   //
+   num = 2.0*f_rate*o_rate;
+   den = f_rate*f_rate + o_rate*o_rate;
+
+   if(is_bad_data(f_rate) || is_bad_data(o_rate) || is_eq(den, 0.0)) {
+      afss = bad_data_double;
+   }
+   else {
+      afss = num/den;
+   }
+   
+   return(afss);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double compute_ufss(double o_rate) {
+   double ufss;
+
+   //
+   // Compute Uniform Fractions Skill Score
+   //
+   if(is_bad_data(o_rate)) ufss = bad_data_double;
+   else                    ufss = 0.5 + o_rate/2.0;
+
+   return(ufss);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2788,22 +2872,25 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Compute the following partial sums info for use in computing
-// FBS and FSS:
-//    n, ffbar, oobar, fobar
+// Compute partial sums info (n, ffbar, oobar, fobar) for FBS and FSS.
+// Compute F_RATE and O_RATE for AFSS and UFSS.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
+                        const NumArray &f_thr_na, const NumArray &o_thr_na,
                         const NumArray &i_na,
                         NBRCNTInfo &nbrcnt_info, int nbrcnt_flag) {
    int i, j, n;
    double f, o, ff_sum, oo_sum, fo_sum;
+   double f_thr_sum, o_thr_sum;
 
    //
-   // Check that the forecast and observation arrays of the same length
+   // Check that the input arrays have the same length
    //
    if(f_na.n_elements() != o_na.n_elements() ||
+      f_na.n_elements() != f_thr_na.n_elements() ||
+      f_na.n_elements() != o_thr_na.n_elements() ||
       f_na.n_elements() == 0) {
       mlog << Error << "\ncompute_nbrcntinfo() -> "
            << "the forecast and observation arrays must have the same "
@@ -2820,6 +2907,7 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    // Compute the continuous statistics from the fcst and obs arrays
    //
    ff_sum = oo_sum = fo_sum = 0.0;
+   f_thr_sum = o_thr_sum = 0.0;
    for(i=0; i<n; i++) {
 
       //
@@ -2833,6 +2921,9 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
       ff_sum += f*f;
       oo_sum += o*o;
       fo_sum += f*o;
+      
+      f_thr_sum += f_thr_na[j];
+      o_thr_sum += o_thr_na[j];
    } // end for i
 
    //
@@ -2848,7 +2939,13 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    nbrcnt_info.cnt_info.oobar = oo_sum/n;
 
    //
-   // Only compute FBS and FSS if requested
+   // Compute f_rate and o_rate
+   //
+   nbrcnt_info.f_rate.v = f_thr_sum/n;
+   nbrcnt_info.o_rate.v = o_thr_sum/n;
+   
+   //
+   // Only compute stats if requested
    //
    if(nbrcnt_flag) {
       nbrcnt_info.compute_stats();
@@ -2860,10 +2957,11 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
+                          const NumArray &f_thr_na, const NumArray &o_thr_na,
                           int skip,
                           NBRCNTInfo &nbrcnt_info) {
    int i, n, count;
-   NumArray f_na_i, o_na_i, i_na_i;
+   NumArray f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, i_na_i;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2893,11 +2991,14 @@ void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
       if(i == skip) continue;
       f_na_i.add(f_na[i]);
       o_na_i.add(o_na[i]);
+      f_thr_na_i.add(f_thr_na[i]);
+      o_thr_na_i.add(o_thr_na[i]);      
       i_na_i.add(count);
       count++;
    }
 
-   compute_nbrcntinfo(f_na_i, o_na_i, i_na_i, nbrcnt_info, 1);
+   compute_nbrcntinfo(f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, i_na_i,
+                      nbrcnt_info, 1);
 
    return;
 }
