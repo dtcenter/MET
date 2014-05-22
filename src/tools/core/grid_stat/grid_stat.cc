@@ -71,6 +71,8 @@
 //                    to config file.
 //   028    08/21/13  Halley Gotway  Fix sizing of output tables for 12
 //                    or more probabilstic thresholds.
+//   029    05/20/14  Halley Gotway  Add AFSS, UFSS, F_RATE, and O_RATE
+//                    to the NBRCNT line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -122,6 +124,7 @@ static void do_pct   (PCTInfo   *&, int,
 static void do_nbrcts(NBRCTSInfo *&, int, int, int,
                       const NumArray &, const NumArray &);
 static void do_nbrcnt(NBRCNTInfo &, int, int, int,
+                      const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
 
 static void write_nc(const DataPlane &, const DataPlane &,
@@ -266,8 +269,9 @@ void process_scores() {
 
    DataPlane fcst_dp,        obs_dp;
    DataPlane fcst_dp_smooth, obs_dp_smooth;
+   DataPlane fcst_dp_thresh, obs_dp_thresh;
 
-   NumArray f_na, o_na;
+   NumArray f_na, o_na, f_thr_na, o_thr_na;
 
    // Objects to handle vector winds
    DataPlane fcst_u_wind_dp,        obs_u_wind_dp;
@@ -722,6 +726,13 @@ void process_scores() {
             // Loop through and apply each of the raw threshold values
             for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
 
+               // Compute the binary thresholded fields
+               fcst_dp_thresh = fcst_dp;
+               fcst_dp_thresh.threshold(conf_info.fcst_ta[i][k]);
+
+               obs_dp_thresh = obs_dp;
+               obs_dp_thresh.threshold(conf_info.obs_ta[i][k]);
+
                // Compute the thresholded fractional coverage field
                fractional_coverage(fcst_dp, fcst_dp_smooth,
                                    conf_info.nbrhd_wdth[j],
@@ -736,10 +747,12 @@ void process_scores() {
                // Loop through the masks to be applied
                for(m=0; m<conf_info.get_n_mask(); m++) {
 
-                  // Apply the current mask to the fields
+                  // Apply the current mask to the fractional coverage
+                  // and thresholded fields
                   apply_mask(fcst_dp_smooth, obs_dp_smooth,
+                             fcst_dp_thresh, obs_dp_thresh,
                              conf_info.mask_dp[m],
-                             f_na, o_na);
+                             f_na, o_na, f_thr_na, o_thr_na);
 
                   mlog << Debug(2) << "Processing "
                        << conf_info.fcst_info[i]->magic_str()
@@ -806,7 +819,8 @@ void process_scores() {
                      // Initialize
                      nbrcnt_info.clear();
 
-                     do_nbrcnt(nbrcnt_info, i, j, k, f_na, o_na);
+                     do_nbrcnt(nbrcnt_info, i, j, k, f_na, o_na,
+                               f_thr_na, o_thr_na);
 
                      // Write out NBRCNT
                      if(nbrcnt_info.cnt_info.n > 0 &&
@@ -1437,7 +1451,8 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
 
 void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
                int i_vx, int i_wdth, int i_thresh,
-               const NumArray &f_na, const NumArray &o_na) {
+               const NumArray &f_na, const NumArray &o_na,
+               const NumArray &f_thr_na, const NumArray &o_thr_na) {
    int i;
 
    //
@@ -1466,6 +1481,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    //
    if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_nbrcnt_stats_ci_bca(rng_ptr, f_na, o_na,
+         f_thr_na, o_thr_na,
          conf_info.n_boot_rep,
          nbrcnt_info,
          conf_info.output_flag[i_nbrcnt] != STATOutputType_None,
@@ -1473,6 +1489,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    }
    else {
       compute_nbrcnt_stats_ci_perc(rng_ptr, f_na, o_na,
+         f_thr_na, o_thr_na,
          conf_info.n_boot_rep, conf_info.boot_rep_prop,
          nbrcnt_info,
          conf_info.output_flag[i_nbrcnt] != STATOutputType_None,

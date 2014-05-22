@@ -2649,6 +2649,10 @@ void write_nbrcnt_cols(const NBRCNTInfo &nbrcnt_info, int i,
    //    TOTAL,
    //    FBS,         FBS_BCL,     FBS_BCU,
    //    FSS,         FSS_BCL,     FSS_BCU,
+   //    AFSS,        AFSS_BCL,    AFSS_BCU,
+   //    UFSS,        UFSS_BCL,    UFSS_BCU,
+   //    F_RATE,      F_RATE_BCL,  F_RATE_BCU,
+   //    O_RATE,      O_RATE_BCL,  O_RATE_BCU
    //
    at.set_entry(r, c+0,  // Total Count
       nbrcnt_info.cnt_info.n);
@@ -2662,15 +2666,51 @@ void write_nbrcnt_cols(const NBRCNTInfo &nbrcnt_info, int i,
    at.set_entry(r, c+3,  // Fractions Brier Score BCU
       nbrcnt_info.fbs.v_bcu[i]);
 
-   at.set_entry(r, c+4,  // Fractions Skill score
+   at.set_entry(r, c+4,  // Fractions Skill Score
       nbrcnt_info.fss.v);
 
-   at.set_entry(r, c+5,  // Fractions Skill score BCL
+   at.set_entry(r, c+5,  // Fractions Skill Score BCL
       nbrcnt_info.fss.v_bcl[i]);
 
-   at.set_entry(r, c+6,  // Fractions Skill score BCU
+   at.set_entry(r, c+6,  // Fractions Skill Score BCU
       nbrcnt_info.fss.v_bcu[i]);
 
+   at.set_entry(r, c+7,  // Asymptotic Fractions Skill Score
+      nbrcnt_info.afss.v);
+
+   at.set_entry(r, c+8,  // Asymptotic Fractions Skill Score BCL
+      nbrcnt_info.afss.v_bcl[i]);
+
+   at.set_entry(r, c+9,  // Asymptotic Fractions Skill Score BCU
+      nbrcnt_info.afss.v_bcu[i]);
+
+   at.set_entry(r, c+10, // Uniform Fractions Skill Score
+      nbrcnt_info.ufss.v);
+
+   at.set_entry(r, c+11, // Uniform Fractions Skill Score BCL
+      nbrcnt_info.ufss.v_bcl[i]);
+
+   at.set_entry(r, c+12, // Uniform Fractions Skill Score BCU
+      nbrcnt_info.ufss.v_bcu[i]);
+
+   at.set_entry(r, c+13, // Forecast Rate
+      nbrcnt_info.f_rate.v);
+
+   at.set_entry(r, c+14, // Forecast Rate BCL
+      nbrcnt_info.f_rate.v_bcl[i]);
+
+   at.set_entry(r, c+15, // Forecast Rate BCU
+      nbrcnt_info.f_rate.v_bcu[i]);
+   
+   at.set_entry(r, c+16, // Observation Rate
+      nbrcnt_info.o_rate.v);
+
+   at.set_entry(r, c+17, // Observation Rate BCL
+      nbrcnt_info.o_rate.v_bcl[i]);
+
+   at.set_entry(r, c+18, // Observation Rate BCU
+      nbrcnt_info.o_rate.v_bcu[i]);
+   
    return;
 }
 

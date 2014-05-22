@@ -20,6 +20,8 @@
 //   002    06/09/10  Halley Gotway   Add parse_mctc_ctable.
 //   003    03/07/13  Halley Gotway   Add parse_ssvar_line.
 //   004    05/19/14  Halley Gotway   Add OBS_QC to MPR and ORANK lines.
+//   005    05/20/14  Halley Gotway   Add AFSS, UFSS, F_RATE, and O_RATE
+//                                      to the NBRCNT line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -195,7 +197,7 @@ void parse_sal1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.ffabar  = atof(l.get_item(sal1l2_ffabar_offset));
    s_info.ooabar  = atof(l.get_item(sal1l2_ooabar_offset));
 
-   // Parse mae, if present
+   // Parse MAE, if present
    s_info.mae = (l.n_items() > sal1l2_mae_offset ?
                  atof(l.get_item(sal1l2_mae_offset)) :
                  bad_data_double);
@@ -251,6 +253,20 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &v_info) {
    v_info.cnt_info.n = atoi(l.get_item(nbrcnt_total_offset));
    v_info.fbs.v      = atof(l.get_item(nbrcnt_fbs_offset));
    v_info.fss.v      = atof(l.get_item(nbrcnt_fss_offset));
+   
+   // Parse AFSS, UFSS, F_RATE, and O_RATE, if present
+   v_info.afss.v     = (l.n_items() > nbrcnt_afss_offset ?
+                        atof(l.get_item(nbrcnt_afss_offset)) : 
+                        bad_data_double);
+   v_info.ufss.v     = (l.n_items() > nbrcnt_ufss_offset ?
+                        atof(l.get_item(nbrcnt_ufss_offset)) : 
+                        bad_data_double);
+   v_info.f_rate.v   = (l.n_items() > nbrcnt_f_rate_offset ?
+                        atof(l.get_item(nbrcnt_f_rate_offset)) : 
+                        bad_data_double);
+   v_info.o_rate.v   = (l.n_items() > nbrcnt_o_rate_offset ?
+                        atof(l.get_item(nbrcnt_o_rate_offset)) : 
+                        bad_data_double);
 
    return;
 }

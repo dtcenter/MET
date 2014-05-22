@@ -199,7 +199,11 @@ static const char * nbrcts_columns [] = {
 static const char * nbrcnt_columns [] = {
    "TOTAL",
    "FBS",         "FBS_BCL",     "FBS_BCU",
-   "FSS",         "FSS_BCL",     "FSS_BCU"
+   "FSS",         "FSS_BCL",     "FSS_BCU",
+   "AFSS",        "AFSS_BCL",    "AFSS_BCU",
+   "UFSS",        "UFSS_BCL",    "UFSS_BCU",
+   "F_RATE",      "F_RATE_BCL",  "F_RATE_BCU",
+   "O_RATE",      "O_RATE_BCL",  "O_RATE_BCU"
 };
 
 static const char * isc_columns [] = {

@@ -372,13 +372,25 @@ static const int nbrcts_odds_bcu_offset  = nhc + 59;
 //
 // NBRCNT Line Type offsets
 //
-static const int nbrcnt_total_offset     = nhc + 0;
-static const int nbrcnt_fbs_offset       = nhc + 1;
-static const int nbrcnt_fbs_bcl_offset   = nhc + 2;
-static const int nbrcnt_fbs_bcu_offset   = nhc + 3;
-static const int nbrcnt_fss_offset       = nhc + 4;
-static const int nbrcnt_fss_bcl_offset   = nhc + 5;
-static const int nbrcnt_fss_bcu_offset   = nhc + 6;
+static const int nbrcnt_total_offset      = nhc + 0;
+static const int nbrcnt_fbs_offset        = nhc + 1;
+static const int nbrcnt_fbs_bcl_offset    = nhc + 2;
+static const int nbrcnt_fbs_bcu_offset    = nhc + 3;
+static const int nbrcnt_fss_offset        = nhc + 4;
+static const int nbrcnt_fss_bcl_offset    = nhc + 5;
+static const int nbrcnt_fss_bcu_offset    = nhc + 6;
+static const int nbrcnt_afss_offset       = nhc + 7;
+static const int nbrcnt_afss_bcl_offset   = nhc + 8;
+static const int nbrcnt_afss_bcu_offset   = nhc + 9;
+static const int nbrcnt_ufss_offset       = nhc + 10;
+static const int nbrcnt_ufss_bcl_offset   = nhc + 11;
+static const int nbrcnt_ufss_bcu_offset   = nhc + 12;
+static const int nbrcnt_f_rate_offset     = nhc + 13;
+static const int nbrcnt_f_rate_bcl_offset = nhc + 14;
+static const int nbrcnt_f_rate_bcu_offset = nhc + 15;
+static const int nbrcnt_o_rate_offset     = nhc + 16;
+static const int nbrcnt_o_rate_bcl_offset = nhc + 17;
+static const int nbrcnt_o_rate_bcu_offset = nhc + 18;
 
 //
 // ISC Line Type offsets
