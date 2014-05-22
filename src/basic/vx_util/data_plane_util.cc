@@ -349,6 +349,63 @@ void apply_mask(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void apply_mask(const DataPlane &fcst_dp, const DataPlane &obs_dp,
+                const DataPlane &fcst_thr_dp, const DataPlane &obs_thr_dp,
+                const DataPlane &mask_dp,
+                NumArray &f_na, NumArray &o_na,
+                NumArray &f_thr_na, NumArray &o_thr_na) {
+   int x, y;
+
+   mlog << Debug(3)
+        << "Extracting a list of valid forecast/observation matched "
+        << "pairs from the input DataPlane objects.\n";
+   
+   // Initialize the NumArray objects
+   f_na.clear();
+   o_na.clear();
+   f_thr_na.clear();
+   o_thr_na.clear();
+
+   if(fcst_dp.nx() != obs_dp.nx()      ||
+      fcst_dp.ny() != obs_dp.ny()      ||
+      fcst_dp.nx() != mask_dp.nx()     ||
+      fcst_dp.ny() != mask_dp.ny()     ||
+      fcst_dp.nx() != fcst_thr_dp.nx() ||
+      fcst_dp.ny() != fcst_thr_dp.ny() ||
+      fcst_dp.nx() != obs_thr_dp.nx()  ||
+      fcst_dp.ny() != obs_thr_dp.ny()) {
+
+      mlog << Error << "\napply_mask() -> "
+           << "data dimensions do not match\n\n";
+      exit(1);
+   }
+
+   // Store the pairs in NumArray objects
+   for(x=0; x<fcst_dp.nx(); x++) {
+      for(y=0; y<fcst_dp.ny(); y++) {
+
+         // Skip any grid points containing bad data values for
+         // either of the raw fields or where the verification
+         // masking region is turned off
+         if(is_bad_data(fcst_dp.get(x, y))     ||
+            is_bad_data(obs_dp.get(x, y))      ||
+            is_bad_data(fcst_thr_dp.get(x, y)) ||
+            is_bad_data(obs_thr_dp.get(x, y))  ||
+            !mask_dp.s_is_on(x, y)) continue;
+
+         f_na.add(fcst_dp.get(x, y));
+         o_na.add(obs_dp.get(x, y));
+         f_thr_na.add(fcst_thr_dp.get(x,y));
+         o_thr_na.add(obs_thr_dp.get(x,y));
+      } // end for y
+   } // end for x
+
+   return;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void apply_mask(DataPlane &dp, const DataPlane &mask_dp) {
