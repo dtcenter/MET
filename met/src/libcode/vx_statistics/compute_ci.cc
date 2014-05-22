@@ -2309,15 +2309,15 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
-                                 const NumArray &f_na,
-                                 const NumArray &o_na,
+                                 const NumArray &f_na, const NumArray &o_na,
+                                 const NumArray &f_thr_na, const NumArray &o_thr_na,
                                  int b, NBRCNTInfo &nbrcnt_info,
                                  int nbrcnt_flag,
                                  const char *tmp_dir) {
    int n, i;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   NBRCNTInfo  nbrcnt_tmp;
+   NBRCNTInfo nbrcnt_tmp;
 
    //
    // Temp file streams for continuous statistics
@@ -2346,7 +2346,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Compute continuous stats from the raw data
    //
-   compute_nbrcntinfo(f_na, o_na, i_na, nbrcnt_info, nbrcnt_flag);
+   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, i_na,
+                      nbrcnt_info, nbrcnt_flag);
 
    //
    // Do not compute bootstrap CI's if n<=1, the number of replicates
@@ -2387,7 +2388,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_nbrcntinfo(f_na, o_na, i, nbrcnt_tmp);
+         compute_i_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na,
+                              i, nbrcnt_tmp);
          write_nbrcntinfo(nbrcnt_i_out, nbrcnt_tmp);
       }
 
@@ -2401,7 +2403,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
          //
          // Compute continuous stats for each replicate
          //
-         compute_nbrcntinfo(f_na, o_na, ir_na, nbrcnt_tmp, 1);
+         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, ir_na,
+                            nbrcnt_tmp, 1);
          write_nbrcntinfo(nbrcnt_r_out, nbrcnt_tmp);
       }
 
@@ -2434,6 +2437,54 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               nbrcnt_info.cnt_info.alpha[i],
                               nbrcnt_info.fss.v_bcl[i],
                               nbrcnt_info.fss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for AFSS
+      //
+      s = nbrcnt_info.afss.v;
+      read_ldf(nbrcnt_i_file, 3, si_na);
+      read_ldf(nbrcnt_r_file, 3, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.afss.v_bcl[i],
+                              nbrcnt_info.afss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for UFSS
+      //
+      s = nbrcnt_info.ufss.v;
+      read_ldf(nbrcnt_i_file, 4, si_na);
+      read_ldf(nbrcnt_r_file, 4, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.ufss.v_bcl[i],
+                              nbrcnt_info.ufss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for F_RATE
+      //
+      s = nbrcnt_info.f_rate.v;
+      read_ldf(nbrcnt_i_file, 5, si_na);
+      read_ldf(nbrcnt_r_file, 5, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.f_rate.v_bcl[i],
+                              nbrcnt_info.f_rate.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for O_RATE
+      //
+      s = nbrcnt_info.o_rate.v;
+      read_ldf(nbrcnt_i_file, 6, si_na);
+      read_ldf(nbrcnt_r_file, 6, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.o_rate.v_bcl[i],
+                              nbrcnt_info.o_rate.v_bcu[i]);
 
    } // end try block
 
@@ -2772,8 +2823,8 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
-                                  const NumArray &f_na,
-                                  const NumArray &o_na,
+                                  const NumArray &f_na, const NumArray &o_na,
+                                  const NumArray &f_thr_na, const NumArray &o_thr_na,
                                   int b, double m_prop,
                                   NBRCNTInfo &nbrcnt_info,
                                   int nbrcnt_flag,
@@ -2781,7 +2832,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    int n, i;
    double s;
    NumArray i_na, ir_na, sr_na;
-   NBRCNTInfo  nbrcnt_tmp;
+   NBRCNTInfo nbrcnt_tmp;
 
    //
    // Temp file streams for continuous statistics
@@ -2810,7 +2861,8 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Compute continuous stats from the raw data
    //
-   compute_nbrcntinfo(f_na, o_na, i_na, nbrcnt_info, nbrcnt_flag);
+   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, i_na,
+                      nbrcnt_info, nbrcnt_flag);
 
    //
    // Do not compute bootstrap CI's if n<=1, the number of replicates
@@ -2851,7 +2903,8 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
          //
          // Compute continuous stats for each replicate
          //
-         compute_nbrcntinfo(f_na, o_na, ir_na, nbrcnt_tmp, 1);
+         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, ir_na,
+                            nbrcnt_tmp, 1);
          write_nbrcntinfo(nbrcnt_r_out, nbrcnt_tmp);
       }
 
@@ -2881,6 +2934,50 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
                               nbrcnt_info.cnt_info.alpha[i],
                               nbrcnt_info.fss.v_bcl[i],
                               nbrcnt_info.fss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for AFSS
+      //
+      s = nbrcnt_info.afss.v;
+      read_ldf(nbrcnt_r_file, 3, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.afss.v_bcl[i],
+                              nbrcnt_info.afss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for UFSS
+      //
+      s = nbrcnt_info.ufss.v;
+      read_ldf(nbrcnt_r_file, 4, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.ufss.v_bcl[i],
+                              nbrcnt_info.ufss.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for F_RATE
+      //
+      s = nbrcnt_info.f_rate.v;
+      read_ldf(nbrcnt_r_file, 5, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.f_rate.v_bcl[i],
+                              nbrcnt_info.f_rate.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for O_RATE
+      //
+      s = nbrcnt_info.o_rate.v;
+      read_ldf(nbrcnt_r_file, 6, sr_na);
+      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.o_rate.v_bcl[i],
+                              nbrcnt_info.o_rate.v_bcu[i]);
 
    } // end try block
 
@@ -3229,8 +3326,8 @@ void write_nbrcntinfo(ofstream &tmp_out, const NBRCNTInfo &c) {
    char line[max_line_len];
 
    sprintf(line,
-           "%f %f",
-           c.fbs.v,     c.fss.v);
+           "%f %f %f %f %f %f",
+           c.fbs.v, c.fss.v, c.afss.v, c.ufss.v, c.f_rate.v, c.o_rate.v);
 
    tmp_out << line << "\n";
 

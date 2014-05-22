@@ -71,6 +71,7 @@ extern void compute_nbrcts_stats_ci_bca(const gsl_rng *,
 
 extern void compute_nbrcnt_stats_ci_bca(const gsl_rng *,
    const NumArray &, const NumArray &,
+   const NumArray &, const NumArray &,   
    int, NBRCNTInfo &, int, const char *);
 
 extern void compute_nbrcts_stats_ci_perc(const gsl_rng *,
@@ -78,6 +79,7 @@ extern void compute_nbrcts_stats_ci_perc(const gsl_rng *,
    int, double, NBRCTSInfo *&, int, int, const char *);
 
 extern void compute_nbrcnt_stats_ci_perc(const gsl_rng *,
+   const NumArray &, const NumArray &,
    const NumArray &, const NumArray &,
    int, double, NBRCNTInfo &, int, const char *);
 
