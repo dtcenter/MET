@@ -26,6 +26,7 @@
 //   006    02/04/13  Halley Gotway   Add -by case option.
 //   007    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   008    05/08/13  Halley Gotway   Fix bug in write_job_aggr_wind().
+//   009    05/27/14  Halley Gotway   Range check the columns being read.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -286,7 +287,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     STATAnalysisJob &j, int &n_in, int &n_out,
                     ofstream *sa_out, gsl_rng *rng_ptr) {
    STATLine line;
-   int i, k, r, c;
+   int i, k, r, c, offset;
    double v, min, v10, v25, v50, v75, v90, max;
    CIInfo mean_ci, stdev_ci;
    AsciiTable out_at;
@@ -341,7 +342,23 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
             //
             key = j.column[i];
             key << ":" << j.get_case_info(line);
-            v   = atof(line.get_item(determine_column_offset(line, j.column[i])));
+            offset = determine_column_offset(line, j.column[i]);
+
+            //
+            // Range check the column to be read
+            //
+            if(offset >= line.n_items()) {
+               mlog << Error << "\ndo_job_summary() -> "
+                    << "can't retrieve column \"" << j.column[i]
+                    << "\" from the \"" << j.line_type[0]
+                    << "\" line type.\n\n";
+               throw(1); 
+            }
+            
+            //
+            // Retrieve the value
+            //
+            v = atof(line.get_item(offset));
 
             //
             // Add value to existing map entry or add a new one
