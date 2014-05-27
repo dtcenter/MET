@@ -166,6 +166,7 @@ class CNTInfo {
 
       CIInfo me, estdev, mbias, mae, mse, bcmse, rmse;
       CIInfo e10, e25, e50, e75, e90;
+      CIInfo mad;
 
       int n_ranks, frank_ties, orank_ties;
 

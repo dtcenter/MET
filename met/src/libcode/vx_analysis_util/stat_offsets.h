@@ -280,6 +280,9 @@ static const int cnt_e75_bcu_offset      = nhc + 67;
 static const int cnt_e90_offset          = nhc + 68;
 static const int cnt_e90_bcl_offset      = nhc + 69;
 static const int cnt_e90_bcu_offset      = nhc + 70;
+static const int cnt_mad_offset          = nhc + 71;
+static const int cnt_mad_bcl_offset      = nhc + 72;
+static const int cnt_mad_bcu_offset      = nhc + 73;
 
 //
 // MPR Line Type offsets
