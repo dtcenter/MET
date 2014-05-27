@@ -1661,11 +1661,7 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    OBAR,        OBAR_NCL,    OBAR_NCU,    OBAR_BCL,    OBAR_BCU,
    //    OSTDEV,      OSTDEV_NCL,  OSTDEV_NCU,  OSTDEV_BCL,  OSTDEV_BCU,
    //    PR_CORR,     PR_CORR_NCL, PR_CORR_NCU, PR_CORR_BCL, PR_CORR_BCU,
-   //    SP_CORR,
-   //    KT_CORR,
-   //    RANKS,
-   //    FRANK_TIES,
-   //    ORANK_TIES,
+   //    SP_CORR,     KT_CORR,     RANKS,       FRANK_TIES,  ORANK_TIES,
    //    ME,          ME_NCL,      ME_NCU,      ME_BCL,      ME_BCU,
    //    ESTDEV,      ESTDEV_NCL,  ESTDEV_NCU,  ESTDEV_BCL,  ESTDEV_BCU,
    //    MBIAS,       MBIAS_BCL,   MBIAS_BCU,
@@ -1678,6 +1674,7 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    E50,         E50_BCL,     E50_BCU,
    //    E75,         E75_BCL,     E75_BCU,
    //    E90,         E90_BCL,     E90_BCU
+   //    MAD,         MAD_BCL,     MAD_BCU
    //
    at.set_entry(r, c+0,  // Total Number of Grid Points
       cnt_info.n);
@@ -1891,6 +1888,15 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
 
    at.set_entry(r, c+70, // 90th Percentile of the Error BCU
       cnt_info.e90.v_bcu[i]);
+
+   at.set_entry(r, c+71, // Median Absolute Deviation
+      cnt_info.mad.v);
+
+   at.set_entry(r, c+72, // Median Absolute Deviation BCL
+      cnt_info.mad.v_bcl[i]);
+
+   at.set_entry(r, c+73, // Median Absolute Deviation BCU
+      cnt_info.mad.v_bcu[i]);
 
    return;
 }

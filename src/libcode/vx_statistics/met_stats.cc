@@ -620,6 +620,7 @@ void CNTInfo::clear() {
    e50.clear();
    e75.clear();
    e90.clear();
+   mad.clear();
 
    n_ranks = frank_ties = orank_ties = 0;
 
@@ -658,6 +659,7 @@ void CNTInfo::assign(const CNTInfo &c) {
    e50         = c.e50;
    e75         = c.e75;
    e90         = c.e90;
+   mad         = c.mad;
    n_ranks     = c.n_ranks;
    frank_ties  = c.frank_ties;
    orank_ties  = c.orank_ties;
@@ -703,6 +705,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       e50.allocate_n_alpha(n_alpha);
       e75.allocate_n_alpha(n_alpha);
       e90.allocate_n_alpha(n_alpha);
+      mad.allocate_n_alpha(n_alpha);
    }
 
    return;
@@ -1001,6 +1004,7 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    cnt_info.e50.set_bad_data();
    cnt_info.e75.set_bad_data();
    cnt_info.e90.set_bad_data();
+   cnt_info.mad.set_bad_data();
    cnt_info.n_ranks    = 0;
    cnt_info.frank_ties = 0;
    cnt_info.orank_ties = 0;
@@ -2245,7 +2249,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    int i, j, n;
    double f, o, v, f_sum, o_sum, ff_sum, oo_sum, fo_sum;
    double err, err_sum, abs_err_sum, err_sq_sum, den;
-   NumArray err_na;
+   NumArray err_na, dev_na;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2351,6 +2355,14 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    cnt_info.e50.v = err_na.percentile_array(0.50);
    cnt_info.e75.v = err_na.percentile_array(0.75);
    cnt_info.e90.v = err_na.percentile_array(0.90);
+   
+   //
+   // Compute the median absolute deviation
+   //
+   for(i=0; i<err_na.n_elements(); i++) {
+      dev_na.add(abs(err_na[i] - cnt_info.e50.v));
+   }
+   cnt_info.mad.v = dev_na.percentile_array(0.50);
 
    //
    // Compute mean error and standard deviation of the mean error

@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/10/12  Halley Gotway   New
+//   001    05/27/14  Halley Gotway   Add MAD to CNT line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1284,6 +1285,9 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "E90")         { v = cnt_info.e90.v;            }
       else if(c == "E90_BCL")     { v = cnt_info.e90.v_bcl[i];     }
       else if(c == "E90_BCU")     { v = cnt_info.e90.v_bcu[i];     }
+      else if(c == "MAD")         { v = cnt_info.mad.v;            }
+      else if(c == "MAD_BCL")     { v = cnt_info.mad.v_bcl[i];     }
+      else if(c == "MAD_BCU")     { v = cnt_info.mad.v_bcu[i];     }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c

@@ -100,11 +100,7 @@ static const char * cnt_columns [] = {
    "OBAR",        "OBAR_NCL",    "OBAR_NCU",    "OBAR_BCL",    "OBAR_BCU",
    "OSTDEV",      "OSTDEV_NCL",  "OSTDEV_NCU",  "OSTDEV_BCL",  "OSTDEV_BCU",
    "PR_CORR",     "PR_CORR_NCL", "PR_CORR_NCU", "PR_CORR_BCL", "PR_CORR_BCU",
-   "SP_CORR",
-   "KT_CORR",
-   "RANKS",
-   "FRANK_TIES",
-   "ORANK_TIES",
+   "SP_CORR",     "KT_CORR",     "RANKS",       "FRANK_TIES",  "ORANK_TIES",
    "ME",          "ME_NCL",      "ME_NCU",      "ME_BCL",      "ME_BCU",
    "ESTDEV",      "ESTDEV_NCL",  "ESTDEV_NCU",  "ESTDEV_BCL",  "ESTDEV_BCU",
    "MBIAS",       "MBIAS_BCL",   "MBIAS_BCU",
@@ -116,7 +112,8 @@ static const char * cnt_columns [] = {
    "E25",         "E25_BCL",     "E25_BCU",
    "E50",         "E50_BCL",     "E50_BCU",
    "E75",         "E75_BCL",     "E75_BCU",
-   "E90",         "E90_BCL",     "E90_BCU"
+   "E90",         "E90_BCL",     "E90_BCU",
+   "MAD",         "MAD_BCL",     "MAD_BCU"
 };
 
 static const char * sl1l2_columns [] = {
