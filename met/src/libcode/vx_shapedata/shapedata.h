@@ -132,6 +132,8 @@ class ShapeData {
 
       void conv_filter_circ(int diameter, double bd_thresh);  // diameter must be an odd number
 
+      int  n_objects();
+
       void threshold(double t);
       void threshold(SingleThresh);
       void threshold_area(SingleThresh);
