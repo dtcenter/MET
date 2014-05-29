@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2013
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -18,6 +16,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-05-31  Halley Gotway  Adapated from wrfdata.cc.
+//   001    14-05-29  Halley Gotway  Add ShapeData::n_objects()
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1319,6 +1318,18 @@ void apply_mask(ShapeData &f, ShapeData &mask)
    }
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int ShapeData::n_objects() {
+   int n;
+   ShapeData sd;
+
+   // Split the field to number the shapes
+   sd = split(*this, n);
+   
+   return(n);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

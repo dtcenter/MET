@@ -322,6 +322,10 @@ void ModeFuzzyEngine::set_fcst(const ShapeData &fcst_wd) {
    need_fcst_clus_split = true;
    need_match           = true;
 
+   mlog << Debug(3) << "Applying zero border of width "
+        << conf_info.zero_border_size
+        << " to the forecast field.\n";
+
    int k = conf_info.zero_border_size;
    fcst_raw->zero_border(k, bad_data_double);
 
@@ -346,6 +350,10 @@ void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
    need_obs_merge      = true;
    need_obs_clus_split = true;
    need_match          = true;
+
+   mlog << Debug(3) << "Applying zero border of width "
+        << conf_info.zero_border_size
+        << " to the observation field.\n";
 
    int k = conf_info.zero_border_size;
    obs_raw->zero_border(k, bad_data_double);
@@ -380,6 +388,10 @@ void ModeFuzzyEngine::do_fcst_filter() {
 
    *fcst_filter = *fcst_raw;
 
+   mlog << Debug(3) << "Applying raw filter threshold "
+        << conf_info.fcst_raw_thresh.get_str()
+        << " to the forecast field.\n";
+   
    //
    // Filter out the data which doesn't meet the fcst_raw_thresh
    //
@@ -411,6 +423,10 @@ void ModeFuzzyEngine::do_obs_filter() {
 
    *obs_filter = *obs_raw;
 
+   mlog << Debug(3) << "Applying raw filter threshold "
+        << conf_info.obs_raw_thresh.get_str()
+        << " to the observation field.\n";
+   
    //
    // Filter out the data which doesn't meet the obs_raw_thresh
    //
@@ -446,6 +462,9 @@ void ModeFuzzyEngine::do_fcst_convolution() {
 
    *fcst_conv = *fcst_filter;
 
+   mlog << Debug(3) << "Applying circular convolution of radius "
+        << r << " to the forecast field.\n";
+   
    //
    // Apply a circular convolution to the filtered field
    //
@@ -475,6 +494,9 @@ void ModeFuzzyEngine::do_obs_convolution() {
    r = conf_info.obs_conv_radius;
 
    *obs_conv = *obs_filter;
+
+   mlog << Debug(3) << "Applying circular convolution of radius "
+        << r << " to the observation field.\n";
 
    //
    // Apply a circular convolution to the filtered field
@@ -508,17 +530,47 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
    //
    fcst_mask->threshold(conf_info.fcst_conv_thresh);
 
+   mlog << Debug(3) << "Applying convolution threshold "
+        << conf_info.fcst_conv_thresh.get_str()
+        << " resulted in " << fcst_mask->n_objects()
+        << " simple forecast objects.\n";
+
    //
    // Apply the area threshold
    //
-   fcst_mask->threshold_area(conf_info.fcst_area_thresh);
+   if(conf_info.fcst_area_thresh.type != thresh_na) {
+
+      fcst_mask->threshold_area(conf_info.fcst_area_thresh);
+
+      mlog << Debug(3) << "Applying area threshold "
+           << conf_info.fcst_area_thresh.get_str()
+           << " resulted in " <<  fcst_mask->n_objects()
+           << " simple forecast objects.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "Skipping forecast object area threshold.\n";
+   }
 
    //
    // Apply the intensity threshold
    //
-   fcst_mask->threshold_intensity(fcst_filter,
-                                  conf_info.fcst_inten_perc_value,
-                                  conf_info.fcst_inten_perc_thresh);
+   if(conf_info.fcst_inten_perc_thresh.type != thresh_na) {
+      
+      fcst_mask->threshold_intensity(fcst_filter,
+                                     conf_info.fcst_inten_perc_value,
+                                     conf_info.fcst_inten_perc_thresh);
+
+      mlog << Debug(3) << "Applying intensity percentile threshold P"
+           << conf_info.fcst_inten_perc_value << " "
+           << conf_info.fcst_inten_perc_thresh.get_str()
+           << " resulted in " << fcst_mask->n_objects()
+           << " simple forecast objects.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "Skipping forecast object intensity percentile threshold.\n";
+   }
 
    need_fcst_thresh     = false;
    need_fcst_split      = true;
@@ -544,17 +596,45 @@ void ModeFuzzyEngine::do_obs_thresholding() {
    //
    obs_mask->threshold(conf_info.obs_conv_thresh);
 
+   mlog << Debug(3) << "Applying convolution threshold "
+        << conf_info.obs_conv_thresh.get_str()
+        << " resulted in " << obs_mask->n_objects()
+        << " simple observation objects.\n";
+
    //
    // Apply the area threshold
    //
-   obs_mask->threshold_area(conf_info.obs_area_thresh);
+   if(conf_info.obs_area_thresh.type != thresh_na) {
+      obs_mask->threshold_area(conf_info.obs_area_thresh);
+
+      mlog << Debug(3) << "Applying area threshold "
+           << conf_info.obs_area_thresh.get_str()
+           << " resulted in " <<  obs_mask->n_objects()
+           << " simple observation objects.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "Skipping observation object area threshold.\n";
+   }
 
    //
    // Apply the intensity threshold
    //
-   obs_mask->threshold_intensity(obs_filter,
-                                 conf_info.obs_inten_perc_value,
-                                 conf_info.obs_inten_perc_thresh);
+   if(conf_info.obs_inten_perc_thresh.type != thresh_na) {
+      obs_mask->threshold_intensity(obs_filter,
+                                    conf_info.obs_inten_perc_value,
+                                    conf_info.obs_inten_perc_thresh);
+
+      mlog << Debug(3) << "Applying intensity percentile threshold P"
+           << conf_info.obs_inten_perc_value << " "
+           << conf_info.obs_inten_perc_thresh.get_str()
+           << " resulted in " << obs_mask->n_objects()
+           << " simple observation objects.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "Skipping observation object intensity percentile threshold.\n";
+   }
 
    need_obs_thresh     = false;
    need_obs_split      = true;
@@ -697,8 +777,8 @@ void ModeFuzzyEngine::do_matching() {
    }
    else {
       mlog << Error << "\nModeFuzzyEngine::do_matching() -> "
-           << "invalid match_flag value specified.  match_flag must be "
-           << "between 0 and 3.\n\n";
+           << "invalid match_flag value of " << conf_info.match_flag
+           << " specified.\n\n";
       exit(1);
    }
 
@@ -707,11 +787,14 @@ void ModeFuzzyEngine::do_matching() {
    //
    do_fcst_clus_splitting();
    do_obs_clus_splitting();
-
+   
    //
    // Compute the cluster single and pair features
    //
    do_cluster_features();
+
+   mlog << Debug(3) << "Applying matching logic resulted in "
+        << n_clus << " matched cluster objects.\n";
 
    //
    // Done
@@ -950,7 +1033,7 @@ void ModeFuzzyEngine::do_match_merge() {
 
 ///////////////////////////////////////////////////////////////////////
 //
-// perform merging of the forecast field based on a different convolution
+// Perform merging of the forecast field based on a different convolution
 // threshold.  It is the user's responsibility to choose a threshold type and
 // value to define objects which are suitable for merging.
 //
@@ -1079,7 +1162,7 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
 
 ///////////////////////////////////////////////////////////////////////
 //
-// perform merging of the observation field based on a different convolution
+// Perform merging of the observation field based on a different convolution
 // threshold.  It is the user's responsibility to choose a threshold type and
 // value to define objects which are suitable for merging.
 //
@@ -1206,12 +1289,12 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
    return;
 }
 
-   ///////////////////////////////////////////////////////////////////////
-   //
-   // Perform merging of the forecast field using a fuzzy engine matching
-   // approach
-   //
-   ///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+//
+// Perform merging of the forecast field using a fuzzy engine matching
+// approach
+//
+///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const char *merge_config)
 
