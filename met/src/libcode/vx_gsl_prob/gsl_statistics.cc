@@ -20,6 +20,7 @@ using namespace std;
 #include <cmath>
 
 #include "gsl_statistics.h"
+#include "gsl/gsl_errno.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +39,25 @@ double stats_lag1_autocorrelation(const NumArray &na) {
    if(src) { delete [] src; src = (double *) 0; }
 
    return(corr);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double sf_lambert_W0(const double x) {
+   gsl_sf_result lw;
+   double w;
+
+   if(gsl_sf_lambert_W0_e(x, &lw) != GSL_SUCCESS) {
+      mlog << Warning << "\nsf_lambert_W0() -> "
+           << "call to gsl_sf_lambert_W0_e() for x = " << x 
+           << " returned bad status!\n\n";
+      w = bad_data_double;
+   }
+   else {
+      w = lw.val;
+   }
+
+   return(w);
 }
 
 ////////////////////////////////////////////////////////////////////////
