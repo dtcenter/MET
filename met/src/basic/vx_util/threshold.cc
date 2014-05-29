@@ -273,6 +273,9 @@ bool SingleThresh::check(double v) const {
    // Type of thresholding
    switch(type) { 
 
+      case thresh_na: // no threshold 
+         status = true;
+         break;
       case thresh_lt: // less than
          if(!is_eq(v, thresh) && v < thresh) status = true;
          break;
