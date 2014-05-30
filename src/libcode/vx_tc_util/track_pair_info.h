@@ -99,6 +99,7 @@ class TrackPairInfo {
       int                n_points()           const;
       const TrackInfo &  adeck()              const;
       const TrackInfo &  bdeck()              const;
+      unixtime           valid(int)           const;
       double             adeck_dland(int)     const;
       double             bdeck_dland(int)     const;
       double             track_err(int)       const;
