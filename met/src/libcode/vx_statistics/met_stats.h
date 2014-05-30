@@ -86,7 +86,8 @@ class CTSInfo {
 
       CIInfo baser, fmean, acc, fbias;
       CIInfo pody, podn, pofd;
-      CIInfo far, csi, gss, hk, hss, odds;
+      CIInfo far, csi, gss, bcgss, hk, hss, odds;
+      CIInfo lodds, orss, eds, seds, edi, sedi;
 
       void clear();
       void allocate_n_alpha(int);
@@ -165,7 +166,7 @@ class CNTInfo {
       CIInfo pr_corr, sp_corr, kt_corr;
 
       CIInfo me, estdev, mbias, mae, mse, bcmse, rmse;
-      CIInfo e10, e25, e50, e75, e90;
+      CIInfo e10, e25, e50, e75, e90, eiqr;
       CIInfo mad;
 
       int n_ranks, frank_ties, orank_ties;

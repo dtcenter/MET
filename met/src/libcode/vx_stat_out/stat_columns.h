@@ -78,7 +78,14 @@ static const char * cts_columns [] = {
    "GSS",         "GSS_BCL",     "GSS_BCU",
    "HK",          "HK_NCL",      "HK_NCU",      "HK_BCL",      "HK_BCU",
    "HSS",         "HSS_BCL",     "HSS_BCU",
-   "ODDS",        "ODDS_NCL",    "ODDS_NCU",    "ODDS_BCL",    "ODDS_BCU"
+   "ODDS",        "ODDS_NCL",    "ODDS_NCU",    "ODDS_BCL",    "ODDS_BCU",
+   "LODDS",       "LODDS_NCL",   "LODDS_NCU",   "LODDS_BCL",   "LODDS_BCU",
+   "ORSS",        "ORSS_NCL",    "ORSS_NCU",    "ORSS_BCL",    "ORSS_BCU",
+   "EDS",         "EDS_NCL",     "EDS_NCU",     "EDS_BCL",     "EDS_BCU",
+   "SEDS",        "SEDS_NCL",    "SEDS_NCU",    "SEDS_BCL",    "SEDS_BCU",
+   "EDI",         "EDI_NCL",     "EDI_NCU",     "EDI_BCL",     "EDI_BCU",
+   "SEDI",        "SEDI_NCL",    "SEDI_NCU",    "SEDI_BCL",    "SEDI_BCU",
+   "BCGSS",       "BCGSS_BCL",   "BCGSS_BCU"
 };
 
 static const char * mctc_columns [] = {
@@ -113,6 +120,7 @@ static const char * cnt_columns [] = {
    "E50",         "E50_BCL",     "E50_BCU",
    "E75",         "E75_BCL",     "E75_BCU",
    "E90",         "E90_BCL",     "E90_BCU",
+   "EIQR",        "EIQR_BCL",    "EIQR_BCU",
    "MAD",         "MAD_BCL",     "MAD_BCU"
 };
 
@@ -190,7 +198,14 @@ static const char * nbrcts_columns [] = {
    "GSS",         "GSS_BCL",     "GSS_BCU",
    "HK",          "HK_NCL",      "HK_NCU",      "HK_BCL",      "HK_BCU",
    "HSS",         "HSS_BCL",     "HSS_BCU",
-   "ODDS",        "ODDS_NCL",    "ODDS_NCU",    "ODDS_BCL",    "ODDS_BCU"
+   "ODDS",        "ODDS_NCL",    "ODDS_NCU",    "ODDS_BCL",    "ODDS_BCU",
+   "LODDS",       "LODDS_NCL",   "LODDS_NCU",   "LODDS_BCL",   "LODDS_BCU",
+   "ORSS",        "ORSS_NCL",    "ORSS_NCU",    "ORSS_BCL",    "ORSS_BCU",
+   "EDS",         "EDS_NCL",     "EDS_NCU",     "EDS_BCL",     "EDS_BCU",
+   "SEDS",        "SEDS_NCL",    "SEDS_NCU",    "SEDS_BCL",    "SEDS_BCU",
+   "EDI",         "EDI_NCL",     "EDI_NCU",     "EDI_BCL",     "EDI_BCU",
+   "SEDI",        "SEDI_NCL",    "SEDI_NCU",    "SEDI_BCL",    "SEDI_BCU",
+   "BCGSS",       "BCGSS_BCL",   "BCGSS_BCU"
 };
 
 static const char * nbrcnt_columns [] = {
@@ -264,8 +279,7 @@ static const char * job_wdir_columns [] = {
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int max_stat_col       = 73;
-static const int stat_col_len       = 32;
+static const int max_stat_col       = 94;
 
 static const int n_header_columns   = sizeof(hdr_columns)/sizeof(*hdr_columns);
 static const int n_fho_columns      = sizeof(fho_columns)/sizeof(*fho_columns);
