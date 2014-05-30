@@ -466,6 +466,26 @@ else
     AC_MSG_NOTICE([tc_utils will not be compiled])
 fi
 
+# GRIB2
+
+AC_ARG_ENABLE(grib2,
+	  [AS_HELP_STRING([--enable-grib2], [Enable compilation of utilities using GRIB2])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_GRIB2="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-grib2) ;;
+   esac],
+  [ENABLE_GRIB2="no"]
+)
+
+AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes"])
+
+if test "x$ENABLE_GRIB2" = "xyes"; then
+    AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
+    AC_MSG_NOTICE([GRIB2 utilites will be compiled])
+else
+    AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
+fi
+
 # Add MET_BASE to the CPPFLAGS
 
 CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
