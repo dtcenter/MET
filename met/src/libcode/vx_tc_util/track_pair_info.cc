@@ -392,12 +392,25 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
+unixtime TrackPairInfo::valid(int i) const {
+   unixtime t;
+
+   // Use the ADeck valid time, if defined.
+   t = (ADeck[i].valid() > 0 ? ADeck[i].valid() : BDeck[i].valid());
+   
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackPairInfo::i_init() const {
    int i, i_match;
 
-   // Find the point where ADeck has lead = 0
-   for(i=0, i_match=bad_data_int; i<NPoints; i++)
-      if(ADeck[i].lead() == 0) break;
+   // Find the point where the valid time matches the ADECK
+   // initialization time
+   for(i=0, i_match=bad_data_int; i<NPoints; i++) {
+      if(ADeck.init() == valid(i)) break;
+   }
 
    if(i < NPoints) i_match = i;
 

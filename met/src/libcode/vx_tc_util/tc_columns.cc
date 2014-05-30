@@ -272,8 +272,7 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
       hdr.set_lead(p.adeck()[i].lead());
 
       // Valid time for the ADECK and/or BDECK
-      if(p.adeck()[i].valid() > 0) hdr.set_valid(p.adeck()[i].valid());
-      else                         hdr.set_valid(p.bdeck()[i].valid());
+      hdr.set_valid(p.valid(i));
      
       // Write the header columns
       write_tc_header_cols(hdr, at, i_row);
