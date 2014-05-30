@@ -15,7 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/10/12  Halley Gotway   New
-//   001    05/27/14  Halley Gotway   Add MAD to CNT line type.
+//   001    05/27/14  Halley Gotway   Add EIQR and MAD to CNT line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1004,6 +1004,9 @@ void store_stat_cts(int n, const ConcatString &col,
       else if(c == "GSS")       { v = cts_info.gss.v;            }
       else if(c == "GSS_BCL")   { v = cts_info.gss.v_bcl[i];     }
       else if(c == "GSS_BCU")   { v = cts_info.gss.v_bcu[i];     }
+      else if(c == "BCGSS")     { v = cts_info.bcgss.v;          }
+      else if(c == "BCGSS_BCL") { v = cts_info.bcgss.v_bcl[i];   }
+      else if(c == "BCGSS_BCU") { v = cts_info.bcgss.v_bcu[i];   }
       else if(c == "HK")        { v = cts_info.hk.v;             }
       else if(c == "HK_NCL")    { v = cts_info.hk.v_ncl[i];      }
       else if(c == "HK_NCU")    { v = cts_info.hk.v_ncu[i];      }
@@ -1017,6 +1020,36 @@ void store_stat_cts(int n, const ConcatString &col,
       else if(c == "ODDS_NCU")  { v = cts_info.odds.v_ncu[i];    }
       else if(c == "ODDS_BCL")  { v = cts_info.odds.v_bcl[i];    }
       else if(c == "ODDS_BCU")  { v = cts_info.odds.v_bcu[i];    }
+      else if(c == "LODDS")     { v = cts_info.lodds.v;          }
+      else if(c == "LODDS_NCL") { v = cts_info.lodds.v_ncl[i];   }
+      else if(c == "LODDS_NCU") { v = cts_info.lodds.v_ncu[i];   }
+      else if(c == "LODDS_BCL") { v = cts_info.lodds.v_bcl[i];   }
+      else if(c == "LODDS_BCU") { v = cts_info.lodds.v_bcu[i];   }
+      else if(c == "ORSS")      { v = cts_info.orss.v;           }
+      else if(c == "ORSS_NCL")  { v = cts_info.orss.v_ncl[i];    }
+      else if(c == "ORSS_NCU")  { v = cts_info.orss.v_ncu[i];    }
+      else if(c == "ORSS_BCL")  { v = cts_info.orss.v_bcl[i];    }
+      else if(c == "ORSS_BCU")  { v = cts_info.orss.v_bcu[i];    }
+      else if(c == "EDS")       { v = cts_info.eds.v;            }
+      else if(c == "EDS_NCL")   { v = cts_info.eds.v_ncl[i];     }
+      else if(c == "EDS_NCU")   { v = cts_info.eds.v_ncu[i];     }
+      else if(c == "EDS_BCL")   { v = cts_info.eds.v_bcl[i];     }
+      else if(c == "EDS_BCU")   { v = cts_info.eds.v_bcu[i];     }
+      else if(c == "SEDS")      { v = cts_info.seds.v;           }
+      else if(c == "SEDS_NCL")  { v = cts_info.seds.v_ncl[i];    }
+      else if(c == "SEDS_NCU")  { v = cts_info.seds.v_ncu[i];    }
+      else if(c == "SEDS_BCL")  { v = cts_info.seds.v_bcl[i];    }
+      else if(c == "SEDS_BCU")  { v = cts_info.seds.v_bcu[i];    }
+      else if(c == "EDI")       { v = cts_info.edi.v;            }
+      else if(c == "EDI_NCL")   { v = cts_info.edi.v_ncl[i];     }
+      else if(c == "EDI_NCU")   { v = cts_info.edi.v_ncu[i];     }
+      else if(c == "EDI_BCL")   { v = cts_info.edi.v_bcl[i];     }
+      else if(c == "EDI_BCU")   { v = cts_info.edi.v_bcu[i];     }
+      else if(c == "SEDI")      { v = cts_info.sedi.v;           }
+      else if(c == "SEDI_NCL")  { v = cts_info.sedi.v_ncl[i];    }
+      else if(c == "SEDI_NCU")  { v = cts_info.sedi.v_ncu[i];    }
+      else if(c == "SEDI_BCL")  { v = cts_info.sedi.v_bcl[i];    }
+      else if(c == "SEDI_BCU")  { v = cts_info.sedi.v_bcu[i];    }
       else {
         mlog << Error << "\nstore_stat_cts() -> "
              << "unsupported column name requested \"" << c
@@ -1285,6 +1318,9 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "E90")         { v = cnt_info.e90.v;            }
       else if(c == "E90_BCL")     { v = cnt_info.e90.v_bcl[i];     }
       else if(c == "E90_BCU")     { v = cnt_info.e90.v_bcu[i];     }
+      else if(c == "EIQR")        { v = cnt_info.eiqr.v;           }
+      else if(c == "EIQR_BCL")    { v = cnt_info.eiqr.v_bcl[i];    }
+      else if(c == "EIQR_BCU")    { v = cnt_info.eiqr.v_bcu[i];    }
       else if(c == "MAD")         { v = cnt_info.mad.v;            }
       else if(c == "MAD_BCL")     { v = cnt_info.mad.v_bcl[i];     }
       else if(c == "MAD_BCU")     { v = cnt_info.mad.v_bcu[i];     }

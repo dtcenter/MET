@@ -24,6 +24,9 @@ static const int wald_sample_threshold  = 100;
 
 ////////////////////////////////////////////////////////////////////////
 
+extern void compute_normal_ci(double x, double alpha, double se,
+   double &cl, double &cu);
+
 extern void compute_proportion_ci(double p, int n, double alpha,
    double vif, double &p_cl, double &p_cu);
 

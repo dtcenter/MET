@@ -228,9 +228,16 @@ void CTSInfo::clear() {
    far.clear();
    csi.clear();
    gss.clear();
+   bcgss.clear();
    hk.clear();
    hss.clear();
    odds.clear();
+   lodds.clear();
+   orss.clear();
+   eds.clear();
+   seds.clear();
+   edi.clear();
+   sedi.clear();
 
    return;
 }
@@ -259,9 +266,16 @@ void CTSInfo::assign(const CTSInfo &c) {
    far = c.far;
    csi = c.csi;
    gss = c.gss;
+   bcgss = c.bcgss;
    hk = c.hk;
    hss = c.hss;
    odds = c.odds;
+   lodds = c.lodds;
+   orss = c.orss;
+   eds = c.eds;
+   seds = c.seds;
+   edi = c.edi;
+   sedi = c.sedi;
 
    return;
 }
@@ -292,9 +306,16 @@ void CTSInfo::allocate_n_alpha(int i) {
       far.allocate_n_alpha(n_alpha);
       csi.allocate_n_alpha(n_alpha);
       gss.allocate_n_alpha(n_alpha);
+      bcgss.allocate_n_alpha(n_alpha);
       hk.allocate_n_alpha(n_alpha);
       hss.allocate_n_alpha(n_alpha);
       odds.allocate_n_alpha(n_alpha);
+      lodds.allocate_n_alpha(n_alpha);
+      orss.allocate_n_alpha(n_alpha);
+      eds.allocate_n_alpha(n_alpha);
+      seds.allocate_n_alpha(n_alpha);
+      edi.allocate_n_alpha(n_alpha);
+      sedi.allocate_n_alpha(n_alpha);
    }
 
    return;
@@ -328,9 +349,16 @@ void CTSInfo::compute_stats() {
    far.v   = cts.far();
    csi.v   = cts.csi();
    gss.v   = cts.gss();
+   bcgss.v = cts.bcgss();
    hk.v    = cts.hk();
    hss.v   = cts.hss();
    odds.v  = cts.odds();
+   lodds.v = cts.lodds();
+   orss.v  = cts.orss();
+   eds.v   = cts.eds();
+   seds.v  = cts.seds();
+   edi.v   = cts.edi();
+   sedi.v  = cts.sedi();
 
    return;
 }
@@ -379,6 +407,14 @@ void CTSInfo::compute_ci() {
       compute_woolf_ci(odds.v, alpha[i],
                        cts.fy_oy(), cts.fy_on(), cts.fn_oy(), cts.fn_on(),
                        odds.v_ncl[i], odds.v_ncu[i]);
+
+      cts.lodds_ci(alpha[i], lodds.v_ncl[i], lodds.v_ncu[i]);
+      cts.orss_ci (alpha[i], orss.v_ncl[i],  orss.v_ncu[i]);
+      cts.eds_ci  (alpha[i], eds.v_ncl[i],   eds.v_ncu[i]);
+      cts.seds_ci (alpha[i], seds.v_ncl[i],  seds.v_ncu[i]);
+      cts.edi_ci  (alpha[i], edi.v_ncl[i],   edi.v_ncu[i]);
+      cts.sedi_ci (alpha[i], sedi.v_ncl[i],  sedi.v_ncu[i]);
+
    } // end for i
 
    return;
@@ -620,6 +656,7 @@ void CNTInfo::clear() {
    e50.clear();
    e75.clear();
    e90.clear();
+   eiqr.clear();
    mad.clear();
 
    n_ranks = frank_ties = orank_ties = 0;
@@ -659,6 +696,7 @@ void CNTInfo::assign(const CNTInfo &c) {
    e50         = c.e50;
    e75         = c.e75;
    e90         = c.e90;
+   eiqr        = c.eiqr;
    mad         = c.mad;
    n_ranks     = c.n_ranks;
    frank_ties  = c.frank_ties;
@@ -705,6 +743,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       e50.allocate_n_alpha(n_alpha);
       e75.allocate_n_alpha(n_alpha);
       e90.allocate_n_alpha(n_alpha);
+      eiqr.allocate_n_alpha(n_alpha);
       mad.allocate_n_alpha(n_alpha);
    }
 
@@ -1004,6 +1043,7 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    cnt_info.e50.set_bad_data();
    cnt_info.e75.set_bad_data();
    cnt_info.e90.set_bad_data();
+   cnt_info.eiqr.set_bad_data();   
    cnt_info.mad.set_bad_data();
    cnt_info.n_ranks    = 0;
    cnt_info.frank_ties = 0;
@@ -2350,11 +2390,12 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute percentiles of the error
    //
-   cnt_info.e10.v = err_na.percentile_array(0.10);
-   cnt_info.e25.v = err_na.percentile_array(0.25);
-   cnt_info.e50.v = err_na.percentile_array(0.50);
-   cnt_info.e75.v = err_na.percentile_array(0.75);
-   cnt_info.e90.v = err_na.percentile_array(0.90);
+   cnt_info.e10.v  = err_na.percentile_array(0.10);
+   cnt_info.e25.v  = err_na.percentile_array(0.25);
+   cnt_info.e50.v  = err_na.percentile_array(0.50);
+   cnt_info.e75.v  = err_na.percentile_array(0.75);
+   cnt_info.e90.v  = err_na.percentile_array(0.90);
+   cnt_info.eiqr.v = cnt_info.e75.v - cnt_info.e25.v;
    
    //
    // Compute the median absolute deviation

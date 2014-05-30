@@ -1040,9 +1040,9 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
-                   bool txt_flag,
-                   AsciiTable &stat_at, int &stat_row,
-                   AsciiTable &txt_at, int &txt_row) {
+                      bool txt_flag,
+                      AsciiTable &stat_at, int &stat_row,
+                      AsciiTable &txt_at, int &txt_row) {
    int i;
 
    // NBRCTS line type
@@ -1462,7 +1462,14 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
    //    GSS,         GSS_BCL,     GSS_BCU,
    //    HK,          HK_NCL,      HK_NCU,      HK_BCL,      HK_BCU,
    //    HSS,         HSS_BCL,     HSS_BCU,
-   //    ODDS,        ODDS_NCL,    ODDS_NCU,    ODDS_BCL,    ODDS_BCU
+   //    ODDS,        ODDS_NCL,    ODDS_NCU,    ODDS_BCL,    ODDS_BCU,
+   //    LOR,         LOR_NCL,     LOR_NCU,     LOR_BCL,     LOR_BCU,
+   //    ORSS,        ORSS_NCL,    ORSS_NCU,    ORSS_BCL,    ORSS_BCU,
+   //    EDS,         EDS_NCL,     EDS_NCU,     EDS_BCL,     EDS_BCU,
+   //    SEDS,        SEDS_NCL,    SEDS_NCU,    SEDS_BCL,    SEDS_BCU,
+   //    EDI,         EDI_NCL,     EDI_NCU,     EDI_BCL,     EDI_BCU,
+   //    SEDI,        SEDI_NCL,    SEDI_NCU,    SEDI_BCL,    SEDI_BCU,
+   //    BCGSS,       BCGSS_BCL,   BCGSS_BCU
    //
    at.set_entry(r, c+0,  // Total count
       cts_info.cts.n());
@@ -1644,6 +1651,105 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
    at.set_entry(r, c+59, // Odds Ratio BCU
       cts_info.odds.v_bcu[i]);
 
+   at.set_entry(r, c+60, // Log Odds Ratio
+      cts_info.lodds.v);
+
+   at.set_entry(r, c+61, // Log Odds Ratio NCL
+      cts_info.lodds.v_ncl[i]);
+
+   at.set_entry(r, c+62, // Log Odds Ratio NCU
+      cts_info.lodds.v_ncu[i]);
+
+   at.set_entry(r, c+63, // Log Odds Ratio BCL
+      cts_info.lodds.v_bcl[i]);
+
+   at.set_entry(r, c+64, // Log Odds Ratio BCU
+      cts_info.lodds.v_bcu[i]);
+
+   at.set_entry(r, c+65, // Odds Ratio Skill Score
+      cts_info.orss.v);
+
+   at.set_entry(r, c+66, // Odds Ratio Skill Score NCL
+      cts_info.orss.v_ncl[i]);
+
+   at.set_entry(r, c+67, // Odds Ratio Skill Score NCU
+      cts_info.orss.v_ncu[i]);
+
+   at.set_entry(r, c+68, // Odds Ratio Skill Score BCL
+      cts_info.orss.v_bcl[i]);
+
+   at.set_entry(r, c+69, // Odds Ratio Skill Score BCU
+      cts_info.orss.v_bcu[i]);
+   
+   at.set_entry(r, c+70, // Extreme Dependency Score
+      cts_info.eds.v);
+
+   at.set_entry(r, c+71, // Extreme Dependency Score NCL
+      cts_info.eds.v_ncl[i]);
+
+   at.set_entry(r, c+72, // Extreme Dependency Score NCU
+      cts_info.eds.v_ncu[i]);
+
+   at.set_entry(r, c+73, // Extreme Dependency Score BCL
+      cts_info.eds.v_bcl[i]);
+
+   at.set_entry(r, c+74, // Extreme Dependency Score BCU
+      cts_info.eds.v_bcu[i]);
+   
+   at.set_entry(r, c+75, // Symmetric Extreme Dependency Score
+      cts_info.seds.v);
+
+   at.set_entry(r, c+76, // Symmetric Extreme Dependency Score NCL
+      cts_info.seds.v_ncl[i]);
+
+   at.set_entry(r, c+77, // Symmetric Extreme Dependency Score NCU
+      cts_info.seds.v_ncu[i]);
+
+   at.set_entry(r, c+78, // Symmetric Extreme Dependency Score BCL
+      cts_info.seds.v_bcl[i]);
+
+   at.set_entry(r, c+79, // Symmetric Extreme Dependency Score BCU
+      cts_info.seds.v_bcu[i]);
+
+   at.set_entry(r, c+80, // Extreme Dependency Index
+      cts_info.edi.v);
+
+   at.set_entry(r, c+81, // Extreme Dependency Index NCL
+      cts_info.edi.v_ncl[i]);
+
+   at.set_entry(r, c+82, // Extreme Dependency Index NCU
+      cts_info.edi.v_ncu[i]);
+
+   at.set_entry(r, c+83, // Extreme Dependency Index BCL
+      cts_info.edi.v_bcl[i]);
+
+   at.set_entry(r, c+84, // Extreme Dependency Index BCU
+      cts_info.edi.v_bcu[i]);
+   
+   at.set_entry(r, c+85, // Symmetric Extreme Dependency Index
+      cts_info.sedi.v);
+
+   at.set_entry(r, c+86, // Symmetric Extreme Dependency Index NCL
+      cts_info.sedi.v_ncl[i]);
+
+   at.set_entry(r, c+87, // Symmetric Extreme Dependency Index NCU
+      cts_info.sedi.v_ncu[i]);
+
+   at.set_entry(r, c+88, // Symmetric Extreme Dependency Index BCL
+      cts_info.sedi.v_bcl[i]);
+
+   at.set_entry(r, c+89, // Symmetric Extreme Dependency Index BCU
+      cts_info.sedi.v_bcu[i]);
+
+   at.set_entry(r, c+90, // Bias-Corrected Gilbert Skill Score
+      cts_info.bcgss.v);
+
+   at.set_entry(r, c+91, // Bias-Corrected Gilbert Skill Score BCL
+      cts_info.bcgss.v_bcl[i]);
+
+   at.set_entry(r, c+92, // Bias-Corrected Gilbert Skill Score BCU
+      cts_info.bcgss.v_bcu[i]);
+
    return;
 }
 
@@ -1673,7 +1779,8 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    E25,         E25_BCL,     E25_BCU,
    //    E50,         E50_BCL,     E50_BCU,
    //    E75,         E75_BCL,     E75_BCU,
-   //    E90,         E90_BCL,     E90_BCU
+   //    E90,         E90_BCL,     E90_BCU,
+   //    EIQR,        EIQR_BCL,    EIQR_BCU,
    //    MAD,         MAD_BCL,     MAD_BCU
    //
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -1889,13 +1996,22 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    at.set_entry(r, c+70, // 90th Percentile of the Error BCU
       cnt_info.e90.v_bcu[i]);
 
-   at.set_entry(r, c+71, // Median Absolute Deviation
+   at.set_entry(r, c+71, // Interquartile Range of the Error
+      cnt_info.eiqr.v);
+
+   at.set_entry(r, c+72, // Interquartile Range of the Error BCL
+      cnt_info.eiqr.v_bcl[i]);
+
+   at.set_entry(r, c+73, // Interquartile Range of the Error BCU
+      cnt_info.eiqr.v_bcu[i]);
+   
+   at.set_entry(r, c+74, // Median Absolute Deviation
       cnt_info.mad.v);
 
-   at.set_entry(r, c+72, // Median Absolute Deviation BCL
+   at.set_entry(r, c+75, // Median Absolute Deviation BCL
       cnt_info.mad.v_bcl[i]);
 
-   at.set_entry(r, c+73, // Median Absolute Deviation BCU
+   at.set_entry(r, c+76, // Median Absolute Deviation BCU
       cnt_info.mad.v_bcu[i]);
 
    return;
@@ -2416,24 +2532,8 @@ void write_nbrctc_cols(const NBRCTSInfo &nbrcts_info,
 
    //
    // Neighborhood Method Contingency Table Counts Line Type (NBRCTC)
-   // Dump out the NBRCTC line:
-   //    TOTAL,       FY_OY,       FY_ON,
-   //    FN_OY,       FN_ON
    //
-   at.set_entry(r, c+0,  // Total Count
-      nbrcts_info.cts_info.cts.n());
-
-   at.set_entry(r, c+1,  // FY_OY
-      nbrcts_info.cts_info.cts.fy_oy());
-
-   at.set_entry(r, c+2,  // FY_ON
-      nbrcts_info.cts_info.cts.fy_on());
-
-   at.set_entry(r, c+3,  // FN_OY
-      nbrcts_info.cts_info.cts.fn_oy());
-
-   at.set_entry(r, c+4,  // FN_ON
-      nbrcts_info.cts_info.cts.fn_on());
+   write_ctc_cols(nbrcts_info.cts_info, at, r, c);
 
    return;
 }
@@ -2445,202 +2545,9 @@ void write_nbrcts_cols(const NBRCTSInfo &nbrcts_info, int i,
 
    //
    // Neighborhood Method Contingency Table Statistics Line Type (NBRCTS)
-   // Dump out the NBRCTS line:
-   //    TOTAL,
-   //    BASER,       BASER_NCL,   BASER_NCU,   BASER_BCL,   BASER_BCU,
-   //    FMEAN,       FMEAN_NCL,   FMEAN_NCU,   FMEAN_BCL,   FMEAN_BCU,
-   //    ACC,         ACC_NCL,     ACC_NCU,     ACC_BCL,     ACC_BCU,
-   //    FBIAS,       FBIAS_BCL,   FBIAS_BCU,
-   //    PODY,        PODY_NCL,    PODY_NCU,    PODY_BCL,    PODY_BCU,
-   //    PODN,        PODN_NCL,    PODN_NCU,    PODN_BCL,    PODN_BCU,
-   //    POFD,        POFD_NCL,    POFD_NCU,    POFD_BCL,    POFD_BCU,
-   //    FAR,         FAR_NCL,     FAR_NCU,     FAR_BCL,     FAR_BCU,
-   //    CSI,         CSI_NCL,     CSI_NCU,     CSI_BCL,     CSI_BCU,
-   //    GSS,         GSS_BCL,     GSS_BCU,
-   //    HK,          HK_NCL,      HK_NCU,      HK_BCL,      HK_BCU,
-   //    HSS,         HSS_BCL,     HSS_BCU,
-   //    ODDS,        ODDS_NCL,    ODDS_NCU,    ODDS_BCL,    ODDS_BCU
    //
-   at.set_entry(r, c+0,  // Total count
-      nbrcts_info.cts_info.cts.n());
-
-   at.set_entry(r, c+1,  // Base Rate (oy_tp)
-      nbrcts_info.cts_info.baser.v);
-
-   at.set_entry(r, c+2,  // Base Rate (oy_tp) NCL
-      nbrcts_info.cts_info.baser.v_ncl[i]);
-
-   at.set_entry(r, c+3,  // Base Rate (oy_tp) NCU
-      nbrcts_info.cts_info.baser.v_ncu[i]);
-
-   at.set_entry(r, c+4,  // Base Rate (oy_tp) BCL
-      nbrcts_info.cts_info.baser.v_bcl[i]);
-
-   at.set_entry(r, c+5,  // Base Rate (oy_tp) BCU
-      nbrcts_info.cts_info.baser.v_bcu[i]);
-
-   at.set_entry(r, c+6,  // Forecast Mean (fy_tp)
-      nbrcts_info.cts_info.fmean.v);
-
-   at.set_entry(r, c+7,  // Forecast Mean (fy_tp) NCL
-      nbrcts_info.cts_info.fmean.v_ncl[i]);
-
-   at.set_entry(r, c+8,  // Forecast Mean (fy_tp) NCU
-      nbrcts_info.cts_info.fmean.v_ncu[i]);
-
-   at.set_entry(r, c+9,  // Forecast Mean (fy_tp) BCL
-      nbrcts_info.cts_info.fmean.v_bcl[i]);
-
-   at.set_entry(r, c+10, // Forecast Mean (fy_tp) BCU
-      nbrcts_info.cts_info.fmean.v_bcu[i]);
-
-   at.set_entry(r, c+11, // Accuracy
-      nbrcts_info.cts_info.acc.v);
-
-   at.set_entry(r, c+12, // Accuracy NCL
-      nbrcts_info.cts_info.acc.v_ncl[i]);
-
-   at.set_entry(r, c+13, // Accuracy NCU
-      nbrcts_info.cts_info.acc.v_ncu[i]);
-
-   at.set_entry(r, c+14, // Accuracy BCL
-      nbrcts_info.cts_info.acc.v_bcl[i]);
-
-   at.set_entry(r, c+15, // Accuracy BCU
-      nbrcts_info.cts_info.acc.v_bcu[i]);
-
-   at.set_entry(r, c+16, // Frequency Bias
-      nbrcts_info.cts_info.fbias.v);
-
-   at.set_entry(r, c+17, // Frequency Bias BCL
-      nbrcts_info.cts_info.fbias.v_bcl[i]);
-
-   at.set_entry(r, c+18, // Frequency Bias BCU
-      nbrcts_info.cts_info.fbias.v_bcu[i]);
-
-   at.set_entry(r, c+19, // POD Yes
-      nbrcts_info.cts_info.pody.v);
-
-   at.set_entry(r, c+20, // POD Yes NCL
-      nbrcts_info.cts_info.pody.v_ncl[i]);
-
-   at.set_entry(r, c+21, // POD Yes NCU
-      nbrcts_info.cts_info.pody.v_ncu[i]);
-
-   at.set_entry(r, c+22, // POD Yes BCL
-      nbrcts_info.cts_info.pody.v_bcl[i]);
-
-   at.set_entry(r, c+23, // POD Yes BCU
-      nbrcts_info.cts_info.pody.v_bcu[i]);
-
-   at.set_entry(r, c+24, // POD No
-      nbrcts_info.cts_info.podn.v);
-
-   at.set_entry(r, c+25, // POD No NCL
-      nbrcts_info.cts_info.podn.v_ncl[i]);
-
-   at.set_entry(r, c+26, // POD No NCU
-      nbrcts_info.cts_info.podn.v_ncu[i]);
-
-   at.set_entry(r, c+27, // POD No BCL
-      nbrcts_info.cts_info.podn.v_bcl[i]);
-
-   at.set_entry(r, c+28, // POD No BCU
-      nbrcts_info.cts_info.podn.v_bcu[i]);
-
-   at.set_entry(r, c+29, // POFD
-      nbrcts_info.cts_info.pofd.v);
-
-   at.set_entry(r, c+30, // POFD NCL
-      nbrcts_info.cts_info.pofd.v_ncl[i]);
-
-   at.set_entry(r, c+31, // POFD NCU
-      nbrcts_info.cts_info.pofd.v_ncu[i]);
-
-   at.set_entry(r, c+32, // POFD BCL
-      nbrcts_info.cts_info.pofd.v_bcl[i]);
-
-   at.set_entry(r, c+33, // POFD BCU
-      nbrcts_info.cts_info.pofd.v_bcu[i]);
-
-   at.set_entry(r, c+34, // FAR
-      nbrcts_info.cts_info.far.v);
-
-   at.set_entry(r, c+35, // FAR NCL
-      nbrcts_info.cts_info.far.v_ncl[i]);
-
-   at.set_entry(r, c+36, // FAR NCU
-      nbrcts_info.cts_info.far.v_ncu[i]);
-
-   at.set_entry(r, c+37, // FAR BCL
-      nbrcts_info.cts_info.far.v_bcl[i]);
-
-   at.set_entry(r, c+38, // FAR BCU
-      nbrcts_info.cts_info.far.v_bcu[i]);
-
-   at.set_entry(r, c+39, // CSI (Threat Score)
-      nbrcts_info.cts_info.csi.v);
-
-   at.set_entry(r, c+40, // CSI (Threat Score) NCL
-      nbrcts_info.cts_info.csi.v_ncl[i]);
-
-   at.set_entry(r, c+41, // CSI (Threat Score) NCU
-      nbrcts_info.cts_info.csi.v_ncu[i]);
-
-   at.set_entry(r, c+42, // CSI (Threat Score) BCL
-      nbrcts_info.cts_info.csi.v_bcl[i]);
-
-   at.set_entry(r, c+43, // CSI (Threat Score) BCU
-      nbrcts_info.cts_info.csi.v_bcu[i]);
-
-   at.set_entry(r, c+44, // Gilbert Skill Score (ETS)
-      nbrcts_info.cts_info.gss.v);
-
-   at.set_entry(r, c+45, // Gilbert Skill Score (ETS) BCL
-      nbrcts_info.cts_info.gss.v_bcl[i]);
-
-   at.set_entry(r, c+46, // Gilbert Skill Score (ETS) BCU
-      nbrcts_info.cts_info.gss.v_bcu[i]);
-
-   at.set_entry(r, c+47, // Hanssen-Kuipers Discriminant (TSS)
-      nbrcts_info.cts_info.hk.v);
-
-   at.set_entry(r, c+48, // Hanssen-Kuipers Discriminant (TSS) NCL
-      nbrcts_info.cts_info.hk.v_ncl[i]);
-
-   at.set_entry(r, c+49, // Hanssen-Kuipers Discriminant (TSS) NCU
-      nbrcts_info.cts_info.hk.v_ncu[i]);
-
-   at.set_entry(r, c+50, // Hanssen-Kuipers Discriminant (TSS) BCL
-      nbrcts_info.cts_info.hk.v_bcl[i]);
-
-   at.set_entry(r, c+51, // Hanssen-Kuipers Discriminant (TSS) BCU
-      nbrcts_info.cts_info.hk.v_bcu[i]);
-
-   at.set_entry(r, c+52, // Heidke Skill Score
-      nbrcts_info.cts_info.hss.v);
-
-   at.set_entry(r, c+53, // Heidke Skill Score BCL
-      nbrcts_info.cts_info.hss.v_bcl[i]);
-
-   at.set_entry(r, c+54, // Heidke Skill Score BCU
-      nbrcts_info.cts_info.hss.v_bcu[i]);
-
-   at.set_entry(r, c+55, // Odds Ratio
-      nbrcts_info.cts_info.odds.v);
-
-   at.set_entry(r, c+56, // Odds Ratio NCL
-      nbrcts_info.cts_info.odds.v_ncl[i]);
-
-   at.set_entry(r, c+57, // Odds Ratio NCU
-      nbrcts_info.cts_info.odds.v_ncu[i]);
-
-   at.set_entry(r, c+58, // Odds Ratio BCL
-      nbrcts_info.cts_info.odds.v_bcl[i]);
-
-   at.set_entry(r, c+59, // Odds Ratio BCU
-      nbrcts_info.cts_info.odds.v_bcu[i]);
-
+   write_cts_cols(nbrcts_info.cts_info, i, at, r, c);
+   
    return;
 }
 

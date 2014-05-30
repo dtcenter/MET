@@ -379,11 +379,25 @@ class TTContingencyTable : public ContingencyTable {
       double csi        () const;
       double csi_ci     (double alpha, double &cl, double &cu) const;
       double gss        () const;
+      double bcgss      () const;
       double hk         () const;
       double hk_ci      (double alpha, double &cl, double &cu) const;
       double hss        () const;
       double odds       () const;
       double odds_ci    (double alpha, double &cl, double &cu) const;
+      double lodds      () const;
+      double slor2      () const;
+      double lodds_ci   (double alpha, double &cl, double &cu) const;
+      double orss       () const;
+      double orss_ci    (double alpha, double &cl, double &cu) const;
+      double eds        () const;
+      double eds_ci     (double alpha, double &cl, double &cu) const;
+      double seds       () const;
+      double seds_ci    (double alpha, double &cl, double &cu) const;
+      double edi        () const;
+      double edi_ci     (double alpha, double &cl, double &cu) const;
+      double sedi       () const;
+      double sedi_ci    (double alpha, double &cl, double &cu) const;      
 };
 
 

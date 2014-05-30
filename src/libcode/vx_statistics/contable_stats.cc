@@ -20,6 +20,7 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_math.h"
+#include "vx_gsl_prob.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,6 +286,40 @@ double TTContingencyTable::gss() const {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// BCGSS Reference:
+//    Bias Adjusted Precipitation Threat Scores
+//    F. Mesinger, Adv. Geosci., 16, 137-142, 2008
+//
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::bcgss() const {
+   double lf, lw, ha, num, den, v;
+
+   if(n() == 0 || oy() == 0 || fn_oy() == 0 || fy_on() == 0) {
+      return(bad_data_double);
+   }
+
+   lf = log((double) oy() / fn_oy());
+   lw = sf_lambert_W0((double) oy() / fy_on() * lf);
+   
+   if(is_bad_data(lw) || is_bad_data(lf) || is_eq(lf, 0.0)) {
+      return(bad_data_double);
+   }
+   else {
+      ha = (double) oy() - (fy_on() / lf) * lw;
+   }
+   
+   num = ha - (oy() * oy() / n());
+   den = 2.0*oy() - ha - (oy() * oy() / n());
+   
+   if(is_eq(den, 0.0)) v = bad_data_double;
+   else                v = num/den;
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Taken from eq. 7.12, page 249 in Wilks
 //
 ////////////////////////////////////////////////////////////////////////
@@ -382,6 +417,304 @@ double TTContingencyTable::odds_ci(double alpha,
 
    compute_woolf_ci(v, alpha, fy_oy(), fy_on(), fn_oy(), fn_on(),
                     cl, cu);
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::lodds() const {
+   double v;
+
+   if(fy_oy() == 0 || fy_on() == 0 || fn_oy() == 0 || fn_on() == 0) {
+      v = bad_data_double;
+   }
+   else {
+      v = log(fy_oy()) + log(fn_on()) - log(fy_on()) - log(fn_oy());
+   }
+   
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::slor2() const {
+   double v, df;
+
+   if(fy_oy() == 0 || fy_on() == 0 || fn_oy() == 0 || fn_on() == 0) {
+      v = bad_data_double;
+   }
+   else {
+      df = 1.0/(1.0/fy_oy() + 1.0/fy_on() + 1.0/fn_oy() + 1.0/fn_on());
+      v  = 1.0/df;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::lodds_ci(double alpha,
+                                    double &cl, double &cu) const {
+   double v, s, se;
+
+   v = lodds();
+   s = slor2();
+   
+   if(is_bad_data(v) || is_bad_data(s)) {
+      cl = cu = bad_data_double;
+      return(v);
+   }
+
+   //
+   // Compute the standard error
+   //
+   se = sqrt(s);
+   
+   compute_normal_ci(v, alpha, se, cl, cu);
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::orss() const {
+   double v, num, den;
+
+   num = fy_oy() * fn_on() - fy_on() * fn_oy();
+   den = fy_oy() * fn_on() + fy_on() * fn_oy();
+   
+   if(den == 0) v = bad_data_double;
+   else         v = (double) num / den;
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::orss_ci(double alpha,
+                                   double &cl, double &cu) const {
+   double v, r, s, se;
+
+   v = orss();
+   r = odds();
+   s = slor2();
+
+   if(is_bad_data(v) || is_bad_data(r) || is_bad_data(s)) {
+      cl = cu = bad_data_double;
+      return(v);
+   }
+   
+   //
+   // Compute the standard error
+   //
+   se = sqrt(s * 4.0 * pow(r, 2.0) / pow(r + 1, 4.0));
+
+   compute_normal_ci(v, alpha, se, cl, cu);
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::eds() const {
+   double v, num, den;
+   
+   if(fy_oy() == 0 || fy_oy() + fn_oy() == 0 || n() == 0) {
+      v = bad_data_double;  
+   }
+   else {
+      num = log((double) (fy_oy() + fn_oy()) / n());
+      den = log((double) fy_oy() / n());
+
+      if(is_eq(den, 0.0)) v = bad_data_double;
+      else                v = 2.0 * num / den - 1.0;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::eds_ci(double alpha,
+                                  double &cl, double &cu) const {
+   double v, b, h, se;
+
+   v = eds();
+   b = baser();
+   h = pod_yes();
+
+   if(is_bad_data(v) || is_bad_data(b) || is_bad_data(h) ||
+      is_eq(b, 0.0)  || is_eq(h, 0.0)) {
+      cl = cu = bad_data_double;
+      return(v);
+   }
+   
+   //
+   // Compute the standard error
+   //
+   se = 2.0 *
+        abs(log(b)) / (h * pow(log(b) + log(h), 2.0)) *
+        sqrt(h * (1 - h) / (b * n()));
+
+   compute_normal_ci(v, alpha, se, cl, cu);
+   
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::seds() const {
+   double v, num, den;
+   
+   if(fy_oy()           == 0           || n()     == 0 ||
+      fy_oy() + fn_oy() == 0 || fy_oy() + fy_on() == 0) {
+      v = bad_data_double;  
+   }
+   else {
+      num = log((double) (fy_oy() + fy_on()) / n()) +
+            log((double) (fy_oy() + fn_oy()) / n());
+      den = log((double) fy_oy() / n());
+      
+      if(is_eq(den, 0.0)) v = bad_data_double;
+      else                v = num / den - 1.0;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::seds_ci(double alpha,
+                                   double &cl, double &cu) const {
+   double v, b, h, se;
+
+   v = seds();
+   b = baser();
+   h = pod_yes();
+
+   if(is_bad_data(v) || is_bad_data(b) || is_bad_data(h) ||
+      is_eq(b, 0.0)  || is_eq(h, 0.0)) {
+      cl = cu = bad_data_double;
+      return(v);
+   }
+
+   //
+   // Compute the standard error
+   //
+   se = sqrt(h * (1.0 - h) / (n() * b)) *
+        (-1.0 * log(fbias() * pow(b, 2.0)) /
+        (h * pow(log(h * b), 2.0)));
+
+   compute_normal_ci(v, alpha, se, cl, cu);
+   
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::edi() const {
+   double v, h, f, num, den;
+
+   f = (double) fy_on() / (fy_on() + fn_on());
+   h = pod_yes();
+
+   if(is_bad_data(f) || is_bad_data(h) || is_eq(f, 0.0) || is_eq(h, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      num = log(f) - log(h);
+      den = log(f) + log(h);
+      if(is_eq(den, 0.0)) v = bad_data_double;
+      else                v = num/den;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::edi_ci(double alpha,
+                                  double &cl, double &cu) const {
+   double v, h, f, b, se;
+
+   v = edi();
+   f = (double) fy_on() / (fy_on() + fn_on());
+   h = pod_yes();
+   b = baser();
+
+   if(is_bad_data(f) || is_bad_data(h) || is_bad_data(b) ||
+      is_eq(f, 0.0)  || is_eq(h, 0.0)  || is_eq(h, 1.0)) {
+      cl = cu = bad_data_double;
+      return(v);
+   }
+   
+   //
+   // Compute the standard error
+   //
+   se = 2.0 * abs(log(f) + h / (1.0 - h) * log(h)) /
+        (h * pow(log(f) + log(h), 2.0)) *
+        sqrt(h * (1.0 - h) / (b * n()));
+
+   compute_normal_ci(v, alpha, se, cl, cu);
+   
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::sedi() const {
+   double v, h, f, num, den;
+
+   f = (double) fy_on() / (fy_on() + fn_on());
+   h = pod_yes();
+
+   if(is_bad_data(f) || is_bad_data(h) ||
+      is_eq(f, 0.0)  || is_eq(h, 0.0)  ||
+      is_eq(f, 1.0)  || is_eq(h, 1.0)) {
+      v = bad_data_double;
+   }
+   else {
+      num = (log(f) - log(h) - log(1 - f) + log(1 - h));
+      den = (log(f) + log(h) + log(1 - f) + log(1 - h));
+      if(is_eq(den, 0.0)) v = bad_data_double;
+      else                v = num/den;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::sedi_ci(double alpha,
+                                   double &cl, double &cu) const {
+   double v, h, f, b, se, mf, mh;
+
+   v = edi();
+   f = (double) fy_on() / (fy_on() + fn_on());
+   h = pod_yes();
+   b = baser();
+
+   if(is_bad_data(f) || is_bad_data(h) || is_bad_data(b) ||
+      is_eq(f, 0.0)  || is_eq(h, 0.0)  ||
+      is_eq(f, 1.0)  || is_eq(h, 1.0)) {
+      cl = cu = bad_data_double;
+      return(v);
+   }
+   
+   //
+   // Compute the standard error
+   //
+   mf = 1.0 - f;
+   mh = 1.0 - h;
+
+   se = 2.0 *
+        abs( (mh * mf + h * f) / (mh * 1.0 - f) *
+             log(f * mh) + 2.0 * h / mh * log(h * mf)) /
+        (h * pow(log(f * mh) + log(h * mf), 2.0)) *
+        sqrt(h * mh / (b * n()));
+
+   compute_normal_ci(v, alpha, se, cl, cu);
 
    return(v);
 }
