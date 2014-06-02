@@ -516,6 +516,13 @@ double TTContingencyTable::orss_ci(double alpha,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Reference for EDS, SEDS, EDI, SEDI and standard errors:
+//    Ferro, C. A. T., 2011: Extremal Dependence Indices: Improved
+//       Verification Measures for Deterministic Forecasts of Rare
+//       Binary Events, Wea. Forecasting, 26, 699-713.
+//
+////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::eds() const {
    double v, num, den;
@@ -709,8 +716,8 @@ double TTContingencyTable::sedi_ci(double alpha,
    mh = 1.0 - h;
 
    se = 2.0 *
-        abs( (mh * mf + h * f) / (mh * 1.0 - f) *
-             log(f * mh) + 2.0 * h / mh * log(h * mf)) /
+        abs( (mh * mf + h * f) / (mh * mf) *
+             log(f * mh) + 2.0 * h / mh * log(h * mf) ) /
         (h * pow(log(f * mh) + log(h * mf), 2.0)) *
         sqrt(h * mh / (b * n()));
 
