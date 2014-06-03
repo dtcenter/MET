@@ -71,10 +71,10 @@ PairDataEnsemble & PairDataEnsemble::operator=(const PairDataEnsemble &pd) {
 
 void PairDataEnsemble::init_from_scratch() {
 
-   e_na   = (NumArray *) 0;
-   n_pair = 0;
-   n_ens  = 0;
-   ssvar_bins = 0;
+   e_na       = (NumArray *) 0;
+   n_pair     = 0;
+   n_ens      = 0;
+   ssvar_bins = (SSVARInfo *) 0;
 
    clear();
 
@@ -97,11 +97,15 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
    rhist_na.clear();
+   phist_na.clear();
    var_na.clear();
    mn_na.clear();
 
    if( ssvar_bins ) delete [] ssvar_bins;
    ssvar_bins = 0;
+   
+   ssvar_bin_size = bad_data_double;
+   phist_bin_size = bad_data_double;
 
    n_pair = 0;
    n_ens  = 0;
@@ -138,6 +142,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ign_na   = pd.ign_na;
    pit_na   = pd.pit_na;
    rhist_na = pd.rhist_na;
+   phist_na = pd.phist_na;
    var_na   = pd.var_na;
    mn_na    = pd.mn_na;
 
@@ -151,6 +156,9 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
          ssvar_bins[i] = pd.ssvar_bins[i];
       }
    } else ssvar_bins = 0;
+   
+   ssvar_bin_size = pd.ssvar_bin_size;
+   phist_bin_size = pd.phist_bin_size;
 
    set_size();
 
@@ -287,6 +295,43 @@ void PairDataEnsemble::compute_rhist() {
 
       // Increment the histogram counts
       if(!is_bad_data(rank)) rhist_na.set(rank-1, rhist_na[rank-1]+1);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::compute_phist() {
+   int i, bin;
+
+   // Clear the PIT histogram
+   phist_na.clear();
+
+   // Initialize the histogram counts to 0
+   for(i=0; i<ceil(1.0/phist_bin_size); i++) phist_na.add(0);
+
+   // The compute_stats() routine should have already been called.
+   // Loop through the PIT values and populate the histogram.
+   for(i=0; i<pit_na.n_elements(); i++) {
+
+      if(is_bad_data(pit_na[i])) continue;
+
+      if(pit_na[i] < 0.0 || pit_na[i] > 1.0) {
+         mlog << Warning << "PairDataEnsemble::compute_phist() -> "
+              << "probability integral transform value ("
+              << pit_na[i] << ") is outside of valid range [0, 1].\n\n";
+         continue;
+      }
+
+      // Determine the bin
+      bin = (is_eq(pit_na[i], 1.0) ? 
+             phist_na.n_elements() - 1 :
+             floor(pit_na[i]/phist_bin_size));
+ 
+      // Increment the histogram counts
+      phist_na.set(bin, phist_na[bin]+1);
 
    } // end for i
 
@@ -787,6 +832,22 @@ void VxPairDataEnsemble::set_ssvar_bin_size(double ssvar_bin_size) {
       for(j=0; j<n_mask; j++) {
          for(k=0; k<n_interp; k++) {
             pd[i][j][k].ssvar_bin_size = ssvar_bin_size;
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
+   int i, j, k;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_mask; j++) {
+         for(k=0; k<n_interp; k++) {
+            pd[i][j][k].phist_bin_size = phist_bin_size;
          }
       }
    }

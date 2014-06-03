@@ -308,7 +308,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          vx_pd[i].set_obs_qty_filt(obs_qty[i]);
 
          // Conf: ssvar_bin_size
-         ens_ssvar_bin_size.add( i_obs_dict.lookup_double(conf_key_ssvar_bin) );
+         ens_ssvar_bin_size.add(i_obs_dict.lookup_double(conf_key_ssvar_bin));
+
+         // Conf: phist_bin_size
+         ens_phist_bin_size.add(i_obs_dict.lookup_double(conf_key_phist_bin));
 
          // Set the current dictionaries
          vx_pd[i].fcst_info->set_dict(i_fcst_dict);
@@ -448,6 +451,9 @@ void EnsembleStatConfInfo::set_vx_pd() {
       vx_pd[i].ens_ssvar_mean = ens_ssvar_mean;
       vx_pd[i].set_ssvar_bin_size(ens_ssvar_bin_size[i]);
 
+      // Set the PIT histogram bin size
+      vx_pd[i].set_phist_bin_size(ens_phist_bin_size[i]);
+
       // Add the verifying message type to the vx_pd objects
       for(j=0; j<n_msg_typ; j++)
          vx_pd[i].set_msg_typ(j, msg_typ[i][j]);
@@ -503,7 +509,8 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
    switch(i_txt_row) {
 
       case(i_rhist):
-         // Maximum number of Rank Histogram lines possible =
+      case(i_phist):
+         // Maximum number of Rank and PIT Histogram lines possible =
          //    Fields * Masks * Interpolations * Message Type [Point Obs]
          //    Fields * Masks * Interpolations [Grid Obs]
          n =   n_vx * n_mask * n_interp * max_n_msg_typ

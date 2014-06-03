@@ -32,7 +32,8 @@
 //                    and -obs_lead command line options to config file.
 //   008    05/18/12  Halley Gotway   Modify logic to better handle
 //                    missing files, fields, and data values.
-//   008    08/30/12  Oldenburg       Added spread/skill functionality
+//   009    08/30/12  Oldenburg       Add spread/skill functionality
+//   010    06/03/14  Halley Gotway   Add PHIST line type
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -355,6 +356,7 @@ void process_command_line(int argc, char **argv)
       (conf_info.get_n_vx() > 0) &&
       (conf_info.output_flag[i_orank] != STATOutputType_None ||
        conf_info.output_flag[i_rhist] != STATOutputType_None ||
+       conf_info.output_flag[i_phist] != STATOutputType_None ||
        conf_info.output_flag[i_ssvar] != STATOutputType_None)) vx_flag = 1;
    else                                                        vx_flag = 0;
 
@@ -964,6 +966,7 @@ void process_point_scores() {
                // Compute ensemble statistics
                pd_ptr->compute_rhist();
                pd_ptr->compute_stats();
+               pd_ptr->compute_phist();
 
                // Write out the ORANK lines
                if(conf_info.output_flag[i_orank] != STATOutputType_None) {
@@ -978,7 +981,7 @@ void process_point_scores() {
                   shc.set_obs_valid_end(conf_info.vx_pd[i].end_ut);
                }
 
-               // Compute RHIST scores
+               // Write RHIST scores
                if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
                   write_rhist_row(shc, pd_ptr,
@@ -987,7 +990,16 @@ void process_point_scores() {
                      txt_at[i_rhist], i_txt_row[i_rhist]);
                }
 
-               // Compute SSVAR scores
+               // Write PHIST scores
+               if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+
+                  write_phist_row(shc, pd_ptr,
+                     conf_info.output_flag[i_phist],
+                     stat_at, i_stat_row,
+                     txt_at[i_phist], i_txt_row[i_phist]);
+               }
+
+               // Write SSVAR scores
                if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
                   pd_ptr->compute_ssvar();
 
@@ -1293,13 +1305,17 @@ void process_grid_vx() {
             // Continue if there are no points
             if(pd.n_pair == 0) continue;
 
+            // Set the PHIST bin size
+            pd.phist_bin_size = conf_info.ens_phist_bin_size[i];
+
             // Compute ensemble statistics
             pd.compute_rhist();
             pd.compute_stats();
+            pd.compute_phist();
 
             if(i == 0) setup_txt_files();
 
-            // Compute RHIST scores
+            // Write RHIST scores
             if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
                write_rhist_row(shc, &pd,
@@ -1308,11 +1324,20 @@ void process_grid_vx() {
                   txt_at[i_rhist], i_txt_row[i_rhist]);
             }
 
+            // Write PHIST scores
+            if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+
+               write_phist_row(shc, &pd,
+                  conf_info.output_flag[i_phist],
+                  stat_at, i_stat_row,
+                  txt_at[i_phist], i_txt_row[i_phist]);
+            }
+
             // Write out the smoothed forecast, observation, and difference
             if(conf_info.ensemble_flag[i_nc_orank])
                write_orank_nc(pd, obs_dp_smooth, i, j, k);
 
-            // Compute SSVAR scores
+            // Write SSVAR scores
             if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
                pd.ssvar_bin_size = conf_info.ens_ssvar_bin_size[i];
                pd.compute_ssvar();
@@ -1568,7 +1593,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, max_col, max_n_ens_vld;
+   int  i, n_bin, max_col, max_n_ens_vld;
    ConcatString tmp_str;
 
    // Get the maximum number of valid ensemble members
@@ -1586,9 +1611,13 @@ void setup_txt_files() {
    //
    /////////////////////////////////////////////////////////////////////
 
+   // Compute the number of PHIST bins
+   n_bin  = ceil(1.0 / conf_info.ens_phist_bin_size.min());
+   
    // Get the maximum number of data columns
    max_col =  max(get_n_orank_columns(max_n_ens_vld+1),
                   get_n_rhist_columns(max_n_ens_vld));
+   max_col =  max(max_col, get_n_phist_columns(n_bin));
    max_col =  max(max_col, n_ssvar_columns);
    max_col += n_header_columns;
 
@@ -1643,6 +1672,10 @@ void setup_txt_files() {
                max_col = get_n_rhist_columns(n_rank) + n_header_columns + 1;
                break;
 
+            case(i_phist):
+               max_col = get_n_phist_columns(n_bin) + n_header_columns + 1;
+               break;
+
             case(i_orank):
                max_col = get_n_orank_columns(max_n_ens_vld) + n_header_columns + 1;
                break;
@@ -1661,6 +1694,10 @@ void setup_txt_files() {
 
             case(i_rhist):
                write_rhist_header_row(1, n_rank, txt_at[i], 0, 0);
+               break;
+
+            case(i_phist):
+               write_phist_header_row(1, n_bin, txt_at[i], 0, 0);
                break;
 
             case(i_orank):

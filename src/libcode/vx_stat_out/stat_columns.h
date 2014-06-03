@@ -231,6 +231,11 @@ static const char * rhist_columns [] = {
    "N_RANK",      "RANK_"
 };
 
+static const char * phist_columns [] = {
+   "TOTAL",       "BIN_SIZE",    "N_BIN",
+   "BIN_"
+};
+
 static const char * orank_columns [] = {
    "TOTAL",       "INDEX",       "OBS_SID",
    "OBS_LAT",     "OBS_LON",     "OBS_LVL",
@@ -312,6 +317,7 @@ static const int n_job_ss_columns   = sizeof(job_ss_columns)/sizeof(*job_ss_colu
 static const int n_job_wdir_columns = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
 
 static const int n_rhist_columns    = sizeof(rhist_columns)/sizeof(*rhist_columns);
+static const int n_phist_columns    = sizeof(phist_columns)/sizeof(*phist_columns);
 static const int n_orank_columns    = sizeof(orank_columns)/sizeof(*orank_columns);
 static const int n_ssvar_columns    = sizeof(ssvar_columns)/sizeof(*ssvar_columns);
 
@@ -323,6 +329,7 @@ inline int get_n_pstd_columns  (int n) { return(12 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_rhist_columns (int n) { return(4  + n);               } // n = N_RANK
+inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS
 inline int get_n_orank_columns (int n) { return(13 + n);               } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
@@ -347,6 +354,7 @@ extern void write_pstd_header_row  (int, int, AsciiTable &, int, int);
 extern void write_pjc_header_row   (int, int, AsciiTable &, int, int);
 extern void write_prc_header_row   (int, int, AsciiTable &, int, int);
 extern void write_rhist_header_row (int, int, AsciiTable &, int, int);
+extern void write_phist_header_row (int, int, AsciiTable &, int, int);
 extern void write_orank_header_row (int, int, AsciiTable &, int, int);
 
 extern void write_fho_row   (StatHdrColumns &, const CTSInfo &, bool,
@@ -391,6 +399,8 @@ extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+extern void write_phist_row (StatHdrColumns &, const PairDataEnsemble *, bool,
+                             AsciiTable &, int &, AsciiTable &, int &);
 extern void write_orank_row (StatHdrColumns &, const PairDataEnsemble *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ssvar_row (StatHdrColumns &, const PairDataEnsemble *, double, bool,
@@ -424,6 +434,7 @@ extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
 extern void write_mpr_cols   (const PairDataPoint *,    int, AsciiTable &, int, int);
 extern void write_isc_cols   (const ISCInfo &,     int, AsciiTable &, int, int);
 extern void write_rhist_cols (const PairDataEnsemble *,      AsciiTable &, int, int);
+extern void write_phist_cols (const PairDataEnsemble *,      AsciiTable &, int, int);
 extern void write_orank_cols (const PairDataEnsemble *, int, AsciiTable &, int, int);
 extern void write_ssvar_cols (const PairDataEnsemble *, int, double, AsciiTable &, int, int);
 
