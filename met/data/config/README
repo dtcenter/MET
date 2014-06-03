@@ -483,6 +483,7 @@ output_flag = {
    nbrcnt = BOTH;  // Neighborhood Continuous Statistics
    isc    = BOTH;  // Intensity-Scale
    rhist  = BOTH;  // Rank Histogram
+   phist  = BOTH;  // Probability Integral Transform Histogram
    orank  = BOTH;  // Observation Rank
    ssvar  = BOTH;  // Spread Skill Variance
 };
@@ -679,19 +680,24 @@ ens = {
 
 //
 // The fcst and obs entries is as described above and used by Ensemble Stat to
-// compute rank histograms, spread-skill variance, and a other statistics. In
-// this application the cat_thresh is not needed but "ens_ssvar_bin_size" may be. 
+// compute rank histograms, probability integral transform histograms, spread-skill
+// variance, and a other statistics. In this application the cat_thresh is not
+// needed but "ens_ssvar_bin_size" and "ens_phist_bin_size" may be. 
 // The "ens_ssvar_bin_size" entry sets the width of the variance bins.  Smaller values
 // provide the user with more flexibility in how data are binned during analysis.
+// The "ens_phist_bin_size" is set to a value between 0 and 1.  The number of bins
+// for the probability integral transform histogram in the PHIST line type is
+// defined as the ceiling of 1.0 / ens_phist_bin_size.
 //
 fcst = {
    message_type = [ "ADPUPA" ];
    ens_ssvar_bin_size = 1;
+   ens_phist_bin_size = 0.05;
 
    field = [
       {
-         name               = "APCP";
-         level              = [ "A03" ];
+         name  = "APCP";
+         level = [ "A03" ];
       }
    ];
 }
@@ -1500,7 +1506,7 @@ output_stats = {
 //          types may be aggregated:
 //          -line_type FHO, CTC, MCTC,
 //                     SL1L2, SAL1L2, VL1L2, VAL1L2,
-//                     PCT, NBRCNT, NBRCTC, ISC, RHIST
+//                     PCT, NBRCNT, NBRCTC, ISC, RHIST, PHIST
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
@@ -1514,6 +1520,7 @@ output_stats = {
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
 //          -line_type PCT,           -out_line_type PSTD, PJC, PRC
 //          -line_type NBRCTC,        -out_line_type NBRCTS
+//          -line_type ORANK,         -out_line_type RHIST, PHIST
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
