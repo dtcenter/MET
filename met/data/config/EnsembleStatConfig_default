@@ -36,12 +36,13 @@ ens = {
 //
 fcst = {
    message_type = [ "ADPUPA" ];
-   ens_ssvar_bin_size = 1;
+   ens_ssvar_bin_size = 1.0;
+   ens_phist_bin_size = 0.05;
 
    field = [
       {
-         name               = "APCP";
-         level              = [ "A03" ];
+         name  = "APCP";
+         level = [ "A03" ];
       }
    ];
 }
@@ -99,6 +100,7 @@ interp = {
 //
 output_flag = {
    rhist = BOTH;
+   phist = BOTH;
    orank = BOTH;
    ssvar = BOTH;
 };

@@ -355,11 +355,42 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
    at.set_entry(r, c+2, rhist_columns[2]);
    at.set_entry(r, c+3, rhist_columns[3]);
 
-   // Write N_i for each ensemble member
+   // Write RANK_i for each rank
    for(i=0, col=c+4; i<n_rank; i++) {
 
       sprintf(tmp_str, "%s%i", rhist_columns[4], i+1);
       at.set_entry(r, col, tmp_str); // Counts for each rank
+      col++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_phist_header_row(int hdr_flag, int n_bin, AsciiTable &at,
+                            int r, int c) {
+   int i, col;
+   char tmp_str[max_str_len];
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_header_columns; i++)
+         at.set_entry(r, i+c, hdr_columns[i]);
+
+      c += n_header_columns;
+   }
+
+   // Write the columns names specific to the PHIST line type
+   at.set_entry(r, c+0, phist_columns[0]);
+   at.set_entry(r, c+1, phist_columns[1]);
+   at.set_entry(r, c+2, phist_columns[2]);
+
+   // Write BIN_i for each bin
+   for(i=0, col=c+3; i<n_bin; i++) {
+
+      sprintf(tmp_str, "%s%i", phist_columns[3], i+1);
+      at.set_entry(r, col, tmp_str); // Counts for each bin
       col++;
    }
 
@@ -1237,6 +1268,42 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Write the data columns
    write_rhist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(txt_flag) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
+                     bool txt_flag,
+                     AsciiTable &stat_at, int &stat_row,
+                     AsciiTable &txt_at, int &txt_row) {
+
+   // PHIST line type
+   shc.set_line_type("PHIST");
+
+   // Not Applicable
+   shc.clear_fcst_thresh();
+   shc.clear_obs_thresh();
+   shc.clear_cov_thresh();
+   shc.set_alpha(bad_data_double);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_phist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
    if(txt_flag) {
@@ -2773,6 +2840,39 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
 
       at.set_entry(r, col, // RANK_i
          nint(pd_ptr->rhist_na[i]));
+      col++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_phist_cols(const PairDataEnsemble *pd_ptr,
+                      AsciiTable &at, int r, int c) {
+   int i, col;
+
+   //
+   // Probability Integral Transform Histogram
+   // Dump out the PHIST line:
+   //    TOTAL, BIN_SIZE, N_BIN, [BIN_] (for each bin)
+   //
+   at.set_entry(r, c+0,  // Total Number of PIT values
+      nint(pd_ptr->phist_na.sum()));
+
+   at.set_entry(r, c+1,  // Bin size
+      pd_ptr->phist_bin_size);
+
+   at.set_entry(r, c+2,  // Number of bins
+      pd_ptr->phist_na.n_elements());
+
+   //
+   // Write BIN_i count for each bin
+   //
+   for(i=0, col=c+3; i<pd_ptr->phist_na.n_elements(); i++) {
+
+      at.set_entry(r, col, // BIN_i
+         nint(pd_ptr->phist_na[i]));
       col++;
    }
 

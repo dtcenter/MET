@@ -65,6 +65,7 @@ enum STATLineType {
    stat_isc,
    stat_wdir,
    stat_rhist,
+   stat_phist,
    stat_orank,
    stat_ssvar,
    no_stat_line_type
@@ -97,6 +98,7 @@ static const char stat_nbrcnt_str[] = "NBRCNT";
 static const char stat_isc_str[]    = "ISC";
 static const char stat_wdir_str[]   = "WDIR";
 static const char stat_rhist_str[]  = "RHIST";
+static const char stat_phist_str[]  = "PHIST";
 static const char stat_orank_str[]  = "ORANK";
 static const char stat_ssvar_str[]  = "SSVAR";
 static const char stat_na_str[]     = "NA";
@@ -371,6 +373,7 @@ static const char conf_key_rng_type[]                = "rng.type";
 static const char conf_key_rng_seed[]                = "rng.seed";
 static const char conf_key_ensemble_flag[]           = "ensemble_flag";
 static const char conf_key_ssvar_bin[]               = "ens_ssvar_bin_size";
+static const char conf_key_phist_bin[]               = "ens_phist_bin_size";
 static const char * conf_key_ensemble_flag_entries[] = {
    "mean",  "stdev", "minus",     "plus",      "min",
    "max",   "range", "vld_count", "frequency", "rank"

@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
+//   001    06/03/14  Halley Gotway   Add PHIST line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -64,17 +65,17 @@ static const char * default_config_filename =
 
 // Text file abbreviations
 static const char *txt_file_abbr[n_txt] = {
-   "rhist", "orank", "ssvar"
+   "rhist", "phist", "orank", "ssvar"
 };
 
 // Header columns
 static const char **txt_columns[n_txt] = {
-   rhist_columns, orank_columns, ssvar_columns
+   rhist_columns, phist_columns, orank_columns, ssvar_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_rhist_columns, n_orank_columns, n_ssvar_columns
+   n_rhist_columns, n_phist_columns, n_orank_columns, n_ssvar_columns
 };
 
 // Maximum number of GRIB records

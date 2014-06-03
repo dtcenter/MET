@@ -28,13 +28,14 @@
 
 // Indices for the output flag types in the configuration file
 static const int i_rhist    = 0;
-static const int i_orank    = 1;
-static const int i_ssvar    = 2;
-static const int n_txt      = 3;
+static const int i_phist    = 1;
+static const int i_orank    = 2;
+static const int i_ssvar    = 3;
+static const int n_txt      = 4;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_rhist, stat_orank, stat_ssvar
+   stat_rhist, stat_phist, stat_orank, stat_ssvar
 };
 
 // Indices for the ensemble flag types in the configuration file
@@ -88,6 +89,7 @@ class EnsembleStatConfInfo {
       StringArray          mask_name;           // Masking region names [n_mask]
       NumArray             ens_ssvar_bin_size;  // Ensemble spread/skill variance bin size [n_vx]
       ConcatString         ens_ssvar_file;      // Ensemble mean file name
+      NumArray             ens_phist_bin_size;  // Ensemble PIT histogram bin size
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
       StringArray *        mask_sid;            // Masking station id's [n_mask_sid]
       NumArray             ci_alpha;            // Alpha value for confidence intervals
