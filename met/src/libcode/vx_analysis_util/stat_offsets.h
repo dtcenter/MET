@@ -538,6 +538,14 @@ static const int rhist_n_rank_offset     = nhc + 3;
 inline int rhist_rank_offset(int i)      { return(nhc + 4 + i); }
 
 //
+// PHIST Line Type offsets
+//
+static const int phist_total_offset      = nhc + 0;
+static const int phist_bin_size_offset   = nhc + 1;
+static const int phist_n_bin_offset      = nhc + 2;
+inline int phist_bin_offset(int i)       { return(nhc + 3 + i); }
+
+//
 // ORANK Line Type offsets
 //
 static const int orank_total_offset      = nhc + 0;

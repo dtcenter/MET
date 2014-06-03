@@ -1054,6 +1054,10 @@ switch(L.type()) {
       offset = get_rhist_column_offset(c);
       break;
 
+   case stat_phist:
+      offset = get_phist_column_offset(c);
+      break;
+
    case stat_orank:
       offset = get_orank_column_offset(c, L);
       break;
@@ -1569,6 +1573,67 @@ int get_rhist_column_offset(const char *col_name) {
 
    if(!found) {
       mlog << Error << "\nget_rhist_column_offset() -> "
+           << "no match found for the column name specified: \""
+           << col_name << "\"\n\n";
+      throw(1);
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_phist_column_offset(const char *col_name) {
+   int i, offset, found;
+
+   found = 0;
+
+   //
+   // Search the STAT header columns first
+   //
+   for(i=0; i<n_header_columns; i++) {
+      if(strcasecmp(hdr_columns[i], col_name) == 0) {
+         found  = 1;
+         offset = i;
+         break;
+      }
+   }
+
+   //
+   // If not found, search the phist columns:
+   //    TOTAL,  BIN_SIZE, N_BIN, [BIN_] (for possible bins)
+   //
+
+   //
+   // Check the static columns
+   //
+   if(!found) {
+      for(i=0; i<3; i++) {
+
+         if(strcasecmp(phist_columns[i], col_name) == 0) {
+            found  = 1;
+            offset = i+n_header_columns;
+            break;
+         }
+      }
+   }
+
+   //
+   // Check the variable column
+   //
+   if(!found) {
+
+      // BIN_i
+      if(strncasecmp(phist_columns[3], col_name,
+                     strlen(phist_columns[3])) == 0) {
+         found  = 1;
+         i      = parse_thresh_index(col_name);
+         offset = n_header_columns + 3 + (i-1);
+      }
+   }
+
+   if(!found) {
+      mlog << Error << "\nget_phist_column_offset() -> "
            << "no match found for the column name specified: \""
            << col_name << "\"\n\n";
       throw(1);

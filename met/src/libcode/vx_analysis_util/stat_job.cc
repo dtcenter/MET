@@ -172,6 +172,7 @@ void STATAnalysisJob::clear() {
 
    // Set to default values
    out_alpha      = default_alpha;
+   out_bin_size   = default_bin_size;
    boot_interval  = default_boot_interval;
    boot_rep_prop  = default_boot_rep_prop;
    n_boot_rep     = default_n_boot_rep;
@@ -252,6 +253,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    out_fcst_thresh  = aj.out_fcst_thresh;
    out_obs_thresh   = aj.out_obs_thresh;
    out_alpha        = aj.out_alpha;
+   out_bin_size     = aj.out_bin_size;
 
    boot_interval    = aj.boot_interval;
    boot_rep_prop    = aj.boot_rep_prop;
@@ -408,6 +410,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "out_alpha = "
        << out_alpha << "\n";
+
+   out << prefix << "out_bin_size = "
+       << out_bin_size << "\n";
 
    out << prefix << "boot_interval = "
        << boot_interval << "\n";
@@ -1037,6 +1042,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          out_alpha = atof(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-out_bin_size") == 0) {
+         out_bin_size = atof(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-boot_interval") == 0) {
          boot_interval = atoi(jc_array[i+1]);
          i++;
@@ -1314,6 +1323,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
             case(stat_pjc):
             case(stat_prc):
             case(stat_rhist):
+            case(stat_phist):
             case(stat_orank):
                write_header_row((const char **) 0, 0, 1, dump_at, 0, 0);
                break;
@@ -1631,6 +1641,16 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       js << "-out_alpha " << out_alpha << " ";
    }
 
+   // Jobs which use out_bin_size
+   if(line_type.n_elements() > 0) {
+      if(string_to_statlinetype(line_type[0]) == stat_orank &&
+         out_line_type == stat_phist) {
+
+         // out_bin_size
+        js << "-out_bin_size " << out_bin_size << " ";
+      }
+   }
+   
    // Jobs which perform bootstrapping
    if(line_type.n_elements() > 0) {
       type = string_to_statlinetype(line_type[0]);

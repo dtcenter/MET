@@ -18,6 +18,7 @@
 //   001    05/24/10  Halley Gotway   Add aggr_rhist_lines and
 //                    aggr_orank_lines.
 //   002    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
+//   003    06/03/14  Halley Gotway   Add aggregate PHIST lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -93,6 +94,10 @@ struct AggrRHISTInfo {
    double crps_num, crps_den, ign_num, ign_den;
 };
 
+struct AggrPHISTInfo {
+   PairDataEnsemble ens_pd;
+};
+
 struct AggrORANKInfo {
    PairDataEnsemble ens_pd;
 };
@@ -160,6 +165,11 @@ extern void aggr_isc_lines(
 extern void aggr_rhist_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrRHISTInfo> &,
+               int &, int &);
+
+extern void aggr_phist_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrPHISTInfo> &,
                int &, int &);
 
 extern void aggr_orank_lines(
