@@ -72,7 +72,7 @@
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type PHIST \
-      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB \
+      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB -out_bin_size 0.10 \
       -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat \
       -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out \
       -v 1
