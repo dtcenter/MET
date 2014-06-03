@@ -44,6 +44,7 @@
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_ssvar.txt</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_ens.nc</grid_nc>
@@ -75,6 +76,7 @@
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_ssvar.txt</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_ens.nc</grid_nc>
@@ -105,6 +107,7 @@
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_ssvar.txt</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_ens.nc</grid_nc>

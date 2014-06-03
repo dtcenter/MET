@@ -91,6 +91,7 @@ interp = {
 //
 output_flag = {
    rhist = BOTH;
+   phist = BOTH;
    orank = BOTH;
    ssvar = BOTH;
 };

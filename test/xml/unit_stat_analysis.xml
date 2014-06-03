@@ -35,19 +35,51 @@
     </output>
   </test>
 
-  <test name="stat_analysis_AGG_STAT_ORANK">
+  <test name="stat_analysis_AGG_PHIST">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate -line_type PHIST \
+      -fcst_var TMP -vx_mask NWC -vx_mask GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_PHIST_dump.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_PHIST.out \
+      -v 1
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_PHIST_dump.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_PHIST.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_RHIST">
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type RHIST \
       -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB \
-      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_dump.stat \
-      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK.out \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_dump.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST.out \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_dump.stat</stat>
-      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_dump.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_PHIST">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type PHIST \
+      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out</exist>
     </output>
   </test>
 
