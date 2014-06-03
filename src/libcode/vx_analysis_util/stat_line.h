@@ -126,6 +126,7 @@ extern int get_pstd_column_offset (const char *);
 extern int get_pjc_column_offset  (const char *);
 extern int get_prc_column_offset  (const char *);
 extern int get_rhist_column_offset(const char *);
+extern int get_phist_column_offset(const char *);
 extern int get_orank_column_offset(const char *, const STATLine &);
 
 

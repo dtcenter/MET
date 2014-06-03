@@ -27,6 +27,7 @@
 //   007    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   008    05/08/13  Halley Gotway   Fix bug in write_job_aggr_wind().
 //   009    05/27/14  Halley Gotway   Range check the columns being read.
+//   010    06/03/14  Halley Gotway   Add aggregate PHIST lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -514,6 +515,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrPSumInfo>  psum_map;
    map<ConcatString, AggrISCInfo>   isc_map;
    map<ConcatString, AggrRHISTInfo> rhist_map;
+   map<ConcatString, AggrPHISTInfo> phist_map;
    map<ConcatString, AggrSSVARInfo> ssvar_map;
 
    //
@@ -540,14 +542,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_sal1l2 && lt != stat_vl1l2  &&
       lt != stat_val1l2 && lt != stat_pct    &&
       lt != stat_nbrctc && lt != stat_nbrcnt &&
-      lt != stat_rhist  && lt != stat_isc    &&
-      lt != stat_ssvar) {
+      lt != stat_rhist  && lt != stat_phist  &&
+      lt != stat_isc    && lt != stat_ssvar) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, NBRCNT, ISC,\n"
-           << "\tRHIST, SSVAR\n\n";
+           << "\tRHIST, PHIST, SSVAR\n\n";
       throw(1);
    }
 
@@ -612,6 +614,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    else if(lt == stat_rhist) {
       aggr_rhist_lines(f, j, rhist_map, n_in, n_out);
       write_job_aggr_rhist(j, lt, rhist_map, out_at);
+   }
+   
+   //
+   // Sum the PHIST line types
+   //
+   else if(lt == stat_phist) {
+      aggr_phist_lines(f, j, phist_map, n_in, n_out);
+      write_job_aggr_phist(j, lt, phist_map, out_at);
    }
 
    //
@@ -695,7 +705,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //                                             MCTC, MCTS, CNT,
    //                                             SL1L2, SAL1L2,
    //                                             PCT, PSTD, PJC, PRC
-   //    -line_type ORANK,         -out_line_type RHIST
+   //    -line_type ORANK,         -out_line_type RHIST, PHIST
    //
 
    //
@@ -759,10 +769,10 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the observation rank line types:
-   //    ORANK -> RHIST
+   //    ORANK -> RHIST, PHIST
    //
    else if(in_lt  == stat_orank &&
-           out_lt == stat_rhist) {
+           (out_lt == stat_rhist || out_lt == stat_phist)) {
       aggr_orank_lines(f, j, orank_map, n_in, n_out);
       write_job_aggr_orank(j, out_lt, orank_map, out_at);
    }
@@ -1606,6 +1616,58 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
+                          map<ConcatString, AggrPHISTInfo> &m,
+                          AsciiTable &at) {
+   map<ConcatString, AggrPHISTInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+
+   //
+   // Determine the maximum number of bins
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n = max(it->second.ens_pd.phist_na.n_elements(), n);
+   }
+   
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements() + get_n_phist_columns(n);
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_phist_header_row(0, n, at, 0, c);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // PHIST output line
+      //
+      at.set_entry(r, c++, "PHIST:");
+      write_case_cols(it->first, at, r, c);
+      write_phist_cols(&(it->second.ens_pd), at, r, c);
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
                           map<ConcatString, AggrSSVARInfo> &m,
                           AsciiTable &at) {
@@ -1728,27 +1790,31 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
                           map<ConcatString, AggrORANKInfo> &m,
                           AsciiTable &at) {
    map<ConcatString, AggrORANKInfo>::iterator it;
-   int n, n_row, n_col, r, c;
+   int n_rhist, n_phist, n_row, n_col, r, c;
 
    //
    // Determine the maximum number of ranks
    //
-   for(it = m.begin(), n = 0; it != m.end(); it++) {
-      n = max(it->second.ens_pd.rhist_na.n_elements(), n);
+   for(it = m.begin(), n_rhist = 0, n_phist = 0; it != m.end(); it++) {
+      n_rhist = max(it->second.ens_pd.rhist_na.n_elements(), n_rhist);
+      n_phist = max(it->second.ens_pd.phist_na.n_elements(), n_phist);
    }
 
    //
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements() + get_n_rhist_columns(n);
+   n_col = 1 + j.column_case.n_elements();   
+        if(lt == stat_rhist) n_col += get_n_rhist_columns(n_rhist);
+   else if(lt == stat_phist) n_col += get_n_phist_columns(n_phist);   
    write_job_aggr_hdr(j, n_row, n_col, at);
 
-   //
+      //
    // Write the rest of the header row
    //
    c = 1 + j.column_case.n_elements();
-   write_rhist_header_row(0, n, at, 0, c);
+        if(lt == stat_rhist) write_rhist_header_row(0, n_rhist, at, 0, c);
+   else if(lt == stat_phist) write_phist_header_row(0, n_phist, at, 0, c);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1766,9 +1832,20 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       //
       // RHIST output line
       //
-      at.set_entry(r, c++, "RHIST:");
-      write_case_cols(it->first, at, r, c);
-      write_rhist_cols(&(it->second.ens_pd), at, r, c);
+      if(lt == stat_rhist) {
+         at.set_entry(r, c++, "RHIST:");
+         write_case_cols(it->first, at, r, c);
+         write_rhist_cols(&(it->second.ens_pd), at, r, c);
+      }
+
+      //
+      // PHIST output line
+      //
+      else if(lt == stat_phist) {
+         at.set_entry(r, c++, "PHIST:");
+         write_case_cols(it->first, at, r, c);
+         write_phist_cols(&(it->second.ens_pd), at, r, c);
+      }
    } // end for it
 
    return;

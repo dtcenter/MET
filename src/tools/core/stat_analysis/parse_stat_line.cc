@@ -22,6 +22,7 @@
 //   004    05/19/14  Halley Gotway   Add OBS_QC to MPR and ORANK lines.
 //   005    05/20/14  Halley Gotway   Add AFSS, UFSS, F_RATE, and O_RATE
 //                                      to the NBRCNT line.
+//   006    06/03/14  Halley Gotway   Add PHIST line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -329,11 +330,30 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    r_data.ign    = atof(l.get_item(rhist_ign_offset));
    r_data.n_rank = atoi(l.get_item(rhist_n_rank_offset));
 
-   r_data.rank_na.clear();
+   r_data.rhist_na.clear();
 
    // Parse out RANK_i
    for(i=0; i<r_data.n_rank; i++) {
-      r_data.rank_na.add(atoi(l.get_item(rhist_rank_offset(i))));
+      r_data.rhist_na.add(atoi(l.get_item(rhist_rank_offset(i))));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_phist_line(STATLine &l, PHISTData &p_data) {
+   int i;
+
+   p_data.total    = atoi(l.get_item(phist_total_offset));
+   p_data.bin_size = atof(l.get_item(phist_bin_size_offset));
+   p_data.n_bin    = atoi(l.get_item(phist_n_bin_offset));
+
+   p_data.phist_na.clear();
+
+   // Parse out BIN_i
+   for(i=0; i<p_data.n_bin; i++) {
+      p_data.phist_na.add(atoi(l.get_item(phist_bin_offset(i))));
    }
 
    return;

@@ -1533,6 +1533,8 @@ output_stats = {
 //                                 PCT, PSTD, PJC, PRC
 //          Additional Optional Args for -line_type MPR:
 //             -mask_grid, -mask_poly
+//          Additional Optional Args for -line_type ORANK -out_line_type PHIST:
+//             -out_bin_size
 //
 //       "ss_index"
 //          The skill score index job can be configured to compute a weighted
@@ -1631,6 +1633,7 @@ output_stats = {
 //                                and probabilistic forecasts
 //       "-out_obs_thresh  value" multiple for multi-category contingency tables
 //       "-out_alpha       value"
+//       "-out_bin_size    value"
 //
 //       "-boot_interval   value"
 //       "-boot_rep_prop   value"

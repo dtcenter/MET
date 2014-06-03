@@ -31,6 +31,7 @@
 // Defaults to be used if not specified by the user
 //
 static const double default_alpha          = 0.05;
+static const double default_bin_size       = 0.05;
 static const int    default_boot_interval  = 1;
 static const double default_boot_rep_prop  = 1.0;
 static const int    default_n_boot_rep     = 1000;
@@ -204,6 +205,7 @@ class STATAnalysisJob {
       ThreshArray  out_fcst_thresh; // output forecast threshold(s)
       ThreshArray  out_obs_thresh;  // output observation threshold
       double       out_alpha;       // output alpha value
+      double       out_bin_size;    // output PHIST bin size
 
       //
       // Variables used for the stat_job_aggr_mpr job type

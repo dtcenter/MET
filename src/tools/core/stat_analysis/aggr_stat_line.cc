@@ -22,6 +22,7 @@
 //   004    07/28/10  Halley Gotway   Write out lines prior to error
 //                    checking and add input line to error messages.
 //   005    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
+//   006    06/03/14  Halley Gotway   Add aggregate PHIST lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1273,7 +1274,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          if(m.count(key) == 0) {
             aggr.crps_num = aggr.crps_den = 0.0;
             aggr.ign_num  = aggr.ign_den  = 0.0;
-            aggr.ens_pd.rhist_na = cur.rank_na;
+            aggr.ens_pd.rhist_na = cur.rhist_na;
             m[key] = aggr;
          }
          //
@@ -1296,7 +1297,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
             // Aggregate the ranked histogram counts
             //
             for(i=0; i<m[key].ens_pd.rhist_na.n_elements(); i++) {
-               m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rank_na[i]);
+               m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rhist_na[i]);
             }
          } // end else
 
@@ -1348,6 +1349,86 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
+void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
+                      map<ConcatString, AggrPHISTInfo> &m,
+                      int &n_in, int &n_out) {
+   STATLine line;
+   AggrPHISTInfo aggr;
+   PHISTData cur;
+   ConcatString key;
+   int i;
+   map<ConcatString, AggrPHISTInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         j.dump_stat_line(line);
+
+         if(line.type() != stat_phist) {
+            mlog << Error << "\naggr_phist_lines() -> "
+                 << "should only encounter probability integral "
+                 << "transform histogram (PHIST) line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current PHIST line
+         //
+         parse_phist_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.ens_pd.phist_bin_size = cur.bin_size;
+            aggr.ens_pd.phist_na = cur.phist_na;
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+           
+            //
+            // Check for BIN_SIZE remaining constant
+            //
+            if(m[key].ens_pd.phist_bin_size != cur.bin_size) {
+               mlog << Error << "\naggr_phist_lines() -> "
+                    << "the \"BIN_SIZE\" column must remain constant ("
+                    << m[key].ens_pd.phist_bin_size << " != " << cur.bin_size
+                    << ").  Try setting \"-column_eq BIN_SIZE n\".\n\n";
+               throw(1);
+            }
+
+            //
+            // Aggregate the probability integral transform histogram counts
+            //
+            for(i=0; i<m[key].ens_pd.phist_na.n_elements(); i++) {
+               m[key].ens_pd.phist_na.set(i, m[key].ens_pd.phist_na[i] + cur.phist_na[i]);
+            }
+         } // end else
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
                       map<ConcatString, AggrORANKInfo> &m,
                       int &n_in, int &n_out) {
@@ -1355,7 +1436,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
    AggrORANKInfo aggr;
    ORANKData cur;
    ConcatString key;
-   int i;
+   int i, n_bin;
    double crps, ign, pit;
    map<ConcatString, AggrORANKInfo>::iterator it;
 
@@ -1399,6 +1480,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          if(m.count(key) == 0) {
             aggr.ens_pd.clear();
             for(i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
+            aggr.ens_pd.phist_bin_size = j.out_bin_size;
+            n_bin = ceil(1.0 / aggr.ens_pd.phist_bin_size);
+            for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             m[key] = aggr;
          }
 
@@ -1414,10 +1498,20 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          }
 
          //
-         // Aggregate the ranks
+         // Increment the RHIST counts
          //
          i = cur.rank - 1;
          m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + 1);
+         
+         //
+         // Increment the PHIST counts
+         //
+         if(!is_bad_data(cur.pit)) {
+            i = (is_eq(cur.pit, 1.0) ?
+                 m[key].ens_pd.phist_na.n_elements() - 1:
+                 floor(cur.pit / m[key].ens_pd.phist_bin_size));
+            m[key].ens_pd.phist_na.set(i, m[key].ens_pd.phist_na[i] + 1);
+         }
 
          //
          // Store the CRPS and IGN values

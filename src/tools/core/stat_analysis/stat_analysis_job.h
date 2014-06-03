@@ -95,6 +95,9 @@ extern void write_job_aggr_wind(STATAnalysisJob &, STATLineType,
 extern void write_job_aggr_rhist(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrRHISTInfo> &, AsciiTable &);
 
+extern void write_job_aggr_phist(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrPHISTInfo> &, AsciiTable &);
+
 extern void write_job_aggr_ssvar(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrSSVARInfo> &, AsciiTable &);
 

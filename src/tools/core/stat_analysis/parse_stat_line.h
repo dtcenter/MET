@@ -20,6 +20,7 @@
 //   002    06/09/10  Halley Gotway   Add parse_mctc_ctable.
 //   003    03/07/13  Halley Gotway   Add parse_ssvar_line.
 //   004    05/19/14  Halley Gotway   Add OBS_QC to MPR and ORANK lines.
+//   005    06/03/14  Halley Gotway   Add PHIST line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -60,7 +61,14 @@ struct MPRData {
 struct RHISTData {
    int total, n_rank;
    double crps, ign;
-   NumArray rank_na;
+   NumArray rhist_na;
+};
+
+// Probability Integral Transform Histogram (PHIST) data structure
+struct PHISTData {
+   int total, n_bin;
+   double bin_size;
+   NumArray phist_na;
 };
 
 // Observation Rank (ORANK) data structure
@@ -89,6 +97,7 @@ extern void parse_mpr_line     (STATLine &, MPRData &);
 extern void parse_isc_line     (STATLine &, ISCInfo &, int &);
 extern void parse_nbrcnt_line  (STATLine &, NBRCNTInfo &);
 extern void parse_rhist_line   (STATLine &, RHISTData &);
+extern void parse_phist_line   (STATLine &, PHISTData &);
 extern void parse_orank_line   (STATLine &, ORANKData &);
 extern void parse_ssvar_line   (STATLine &, SSVARInfo &);
 

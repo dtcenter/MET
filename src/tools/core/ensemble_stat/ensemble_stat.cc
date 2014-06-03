@@ -981,7 +981,7 @@ void process_point_scores() {
                   shc.set_obs_valid_end(conf_info.vx_pd[i].end_ut);
                }
 
-               // Write RHIST scores
+               // Write RHIST counts
                if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
                   write_rhist_row(shc, pd_ptr,
@@ -990,8 +990,9 @@ void process_point_scores() {
                      txt_at[i_rhist], i_txt_row[i_rhist]);
                }
 
-               // Write PHIST scores
-               if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+               // Write PHIST counts if greater than 0
+               if(conf_info.output_flag[i_phist] != STATOutputType_None &&
+                  pd_ptr->phist_na.sum() > 0) {
 
                   write_phist_row(shc, pd_ptr,
                      conf_info.output_flag[i_phist],
@@ -1315,7 +1316,7 @@ void process_grid_vx() {
 
             if(i == 0) setup_txt_files();
 
-            // Write RHIST scores
+            // Write RHIST counts
             if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
                write_rhist_row(shc, &pd,
@@ -1324,8 +1325,9 @@ void process_grid_vx() {
                   txt_at[i_rhist], i_txt_row[i_rhist]);
             }
 
-            // Write PHIST scores
-            if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+            // Write PHIST counts if greater than 0
+            if(conf_info.output_flag[i_phist] != STATOutputType_None &&
+               pd.phist_na.sum() > 0) {
 
                write_phist_row(shc, &pd,
                   conf_info.output_flag[i_phist],
