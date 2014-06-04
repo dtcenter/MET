@@ -32,7 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-int file_size(const char * path)
+long long file_size(const char * path)
 
 {
 
@@ -53,7 +53,7 @@ if ( status < 0 )  {
    //  return the file size in bytes
    //
 
-return( (int) sbuf.st_size );
+return( (long long) sbuf.st_size );
 
 }
 
