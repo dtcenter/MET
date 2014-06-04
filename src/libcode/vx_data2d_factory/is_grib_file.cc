@@ -102,7 +102,8 @@ bool check_grib(const char * filename, int & version)
 int fd = -1;
 char buf[buf_size];
 bool found = false;
-int i, read_size;
+int i;
+long long size, read_size;
 
    //
    //  open file
@@ -119,8 +120,8 @@ if ( (fd = open(filename, O_RDONLY)) < 0 )  {
    //
    //  determine the number of bytes to read
    //
-
-read_size = min( buf_size, file_size(filename) );
+size      = file_size(filename);
+read_size = ( buf_size < size ? buf_size : size );
 
    //
    //  read into the buffer
