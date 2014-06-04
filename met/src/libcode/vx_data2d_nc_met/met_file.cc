@@ -565,6 +565,12 @@ if ( (x_slot < 0) || (y_slot < 0) )  {
 
 }
 
+   //
+   //  get the bad data value
+   //
+
+double missing_value = get_var_missing_value(v);
+double fill_value    = get_var_fill_value(v);
 
    //
    //  set up the DataPlane object
@@ -586,6 +592,10 @@ for (x=0; x<Nx; ++x)  {
       b[y_slot] = y;
 
       value = data(v, b);
+
+      if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
+         value = bad_data_double;
+      }
 
       plane.set(value, x, y);
 
