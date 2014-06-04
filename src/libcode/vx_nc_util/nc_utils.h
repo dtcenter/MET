@@ -25,15 +25,21 @@
 
 extern bool get_var_att(const NcVar *, const ConcatString &, ConcatString &);
 
+extern bool get_var_att_double(const NcVar *, const ConcatString &, double &);
+   
 extern bool get_var_units(const NcVar *, ConcatString &);
 
 extern bool get_var_level(const NcVar *, ConcatString &);
 
+extern double get_var_missing_value(const NcVar *);
+
+extern double get_var_fill_value(const NcVar *);
+
 extern bool args_ok(const LongArray &);
 
-extern int  get_int_var(NcFile *, const char * var_name, int index);
+extern int get_int_var(NcFile *, const char * var_name, int index);
 
-extern double  get_double_var(NcFile *, const char * var_name, int index = 0);
+extern double get_double_var(NcFile *, const char * var_name, int index = 0);
 
 extern NcVar* has_var(NcFile *, const char * var_name);
 

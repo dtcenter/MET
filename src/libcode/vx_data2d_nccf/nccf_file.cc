@@ -793,6 +793,13 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     exit(1);
   }
 
+  //
+  //  get the bad data values
+  //
+   
+  double missing_value = get_var_missing_value(v);
+  double fill_value    = get_var_fill_value(v);
+  
   //  set up the DataPlane object
 
   const int nx = grid.nx();
@@ -814,6 +821,10 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
       b[y_slot] = y;
 
       double value = getData(v, b);
+
+      if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
+         value = bad_data_double;
+      }
 
       plane.set(value, x, y);
 

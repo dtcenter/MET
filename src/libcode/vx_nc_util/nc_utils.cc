@@ -19,11 +19,14 @@ using namespace std;
 
 #include "nc_utils.h"
 #include "util_constants.h"
+#include "vx_cal.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char  level_att_name     [] = "level";
-static const char  units_att_name     [] = "units";
+static const char  level_att_name         [] = "level";
+static const char  units_att_name         [] = "units";
+static const char  missing_value_att_name [] = "missing_value";
+static const char  fill_value_att_name    [] = "_FillValue";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,6 +59,35 @@ bool get_var_att(const NcVar *var, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_var_att_double(const NcVar *var, const ConcatString &att_name,
+                        double &att_val) {
+   int i, n;
+   NcAtt *att = (NcAtt *) 0;
+   bool status = false;
+   
+   // Initialize
+   att_val = bad_data_double;
+
+   n = var->num_atts();
+
+   // Loop through the attributes looking for a match
+   for(i=0; i<n; i++) {
+
+      att = var->get_att(i);
+
+      // Look for a match
+      if(strcmp(att_name, att->name()) == 0) {
+         att_val = att->as_double(0);
+         status = true;
+         break;
+      }
+   }
+   
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_var_units(const NcVar *var, ConcatString &att_val) {
   
    return(get_var_att(var, units_att_name, att_val));
@@ -66,6 +98,30 @@ bool get_var_units(const NcVar *var, ConcatString &att_val) {
 bool get_var_level(const NcVar *var, ConcatString &att_val) {
 
    return(get_var_att(var, level_att_name, att_val));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double get_var_missing_value(const NcVar *var) {
+   double v;
+   
+   if(!get_var_att_double(var, missing_value_att_name, v)) {
+      v = bad_data_double;
+   }
+   
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double get_var_fill_value(const NcVar *var) {
+   double v;
+   
+   if(!get_var_att_double(var, fill_value_att_name, v)) {
+      v = bad_data_double;
+   }
+   
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
