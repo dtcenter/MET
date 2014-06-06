@@ -42,6 +42,7 @@ static const bool default_dictionary_error_out = true;
 
 ////////////////////////////////////////////////////////////////////////
 
+
 class Dictionary;        //  forward reference
 
 
