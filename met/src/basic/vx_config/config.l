@@ -457,6 +457,9 @@ Column += strlen(configtext);
 if ( strcmp(configtext, "true"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
 if ( strcmp(configtext, "false" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
 
+if ( strcmp(configtext, "TRUE"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
+if ( strcmp(configtext, "FALSE" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
+
    //
    //  comparison?
    //
