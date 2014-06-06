@@ -6,10 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-// Allow TRUE and FALSE to be either case
-TRUE           = true;
-FALSE          = false;
-
 // File types
 GRIB1          = 1;
 GRIB2          = 2;
