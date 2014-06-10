@@ -161,7 +161,7 @@ void VarInfoNcPinterp::set_magic(const ConcatString &s) {
    // Set the requested name and default output name
    set_req_name(ptr);
    set_name(ptr);
-
+   
    // If there's no level specification, assume (0,*, *)
    if(strchr(s, '(') == NULL) {
       Level.set_req_name("0,*,*");
@@ -206,6 +206,9 @@ void VarInfoNcPinterp::set_magic(const ConcatString &s) {
                   Dimension.add(range_flag);
                   Level.set_lower(atoi(ptr2));
                   Level.set_upper(atoi(++ptr3));
+
+                  // Assume pressure level type for a range of levels
+                  Level.set_type(LevelType_Pres);
                }
             }
             // Single level
@@ -237,6 +240,8 @@ void VarInfoNcPinterp::set_magic(const ConcatString &s) {
 
 void VarInfoNcPinterp::set_dict(Dictionary & dict) {
 
+   VarInfo::set_dict(dict);
+   
    ConcatString mag;
    mag.format("%s%s", dict.lookup_string("name").text(),
                       dict.lookup_string("level").text());
