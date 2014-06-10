@@ -228,6 +228,9 @@ void VarInfoNcCF::set_magic(const ConcatString &magic_string)
 	    Dimension.add(range_flag);
 	    Level.set_lower(atoi(ptr2));
 	    Level.set_upper(atoi(++ptr3));
+       
+       // Assume pressure level type for a range of levels
+       Level.set_type(LevelType_Pres);
 	  }
 	}
 	else
@@ -265,6 +268,9 @@ void VarInfoNcCF::set_magic(const ConcatString &magic_string)
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcCF::set_dict(Dictionary &dict){
+   
+   VarInfo::set_dict(dict);
+   
    ConcatString mag;
    mag.format("%s%s", dict.lookup_string("name").text(),
                       dict.lookup_string("level").text());
