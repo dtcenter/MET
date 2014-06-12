@@ -1004,9 +1004,9 @@ void store_stat_cts(int n, const ConcatString &col,
       else if(c == "GSS")       { v = cts_info.gss.v;            }
       else if(c == "GSS_BCL")   { v = cts_info.gss.v_bcl[i];     }
       else if(c == "GSS_BCU")   { v = cts_info.gss.v_bcu[i];     }
-      else if(c == "BCGSS")     { v = cts_info.bcgss.v;          }
-      else if(c == "BCGSS_BCL") { v = cts_info.bcgss.v_bcl[i];   }
-      else if(c == "BCGSS_BCU") { v = cts_info.bcgss.v_bcu[i];   }
+      else if(c == "BAGSS")     { v = cts_info.bagss.v;          }
+      else if(c == "BAGSS_BCL") { v = cts_info.bagss.v_bcl[i];   }
+      else if(c == "BAGSS_BCU") { v = cts_info.bagss.v_bcu[i];   }
       else if(c == "HK")        { v = cts_info.hk.v;             }
       else if(c == "HK_NCL")    { v = cts_info.hk.v_ncl[i];      }
       else if(c == "HK_NCU")    { v = cts_info.hk.v_ncu[i];      }
