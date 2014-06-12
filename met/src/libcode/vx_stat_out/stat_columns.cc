@@ -1536,7 +1536,7 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
    //    SEDS,        SEDS_NCL,    SEDS_NCU,    SEDS_BCL,    SEDS_BCU,
    //    EDI,         EDI_NCL,     EDI_NCU,     EDI_BCL,     EDI_BCU,
    //    SEDI,        SEDI_NCL,    SEDI_NCU,    SEDI_BCL,    SEDI_BCU,
-   //    BCGSS,       BCGSS_BCL,   BCGSS_BCU
+   //    BAGSS,       BAGSS_BCL,   BAGSS_BCU
    //
    at.set_entry(r, c+0,  // Total count
       cts_info.cts.n());
@@ -1809,13 +1809,13 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
       cts_info.sedi.v_bcu[i]);
 
    at.set_entry(r, c+90, // Bias-Corrected Gilbert Skill Score
-      cts_info.bcgss.v);
+      cts_info.bagss.v);
 
    at.set_entry(r, c+91, // Bias-Corrected Gilbert Skill Score BCL
-      cts_info.bcgss.v_bcl[i]);
+      cts_info.bagss.v_bcl[i]);
 
    at.set_entry(r, c+92, // Bias-Corrected Gilbert Skill Score BCU
-      cts_info.bcgss.v_bcu[i]);
+      cts_info.bagss.v_bcu[i]);
 
    return;
 }

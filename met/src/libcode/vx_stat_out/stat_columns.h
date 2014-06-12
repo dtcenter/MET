@@ -85,7 +85,7 @@ static const char * cts_columns [] = {
    "SEDS",        "SEDS_NCL",    "SEDS_NCU",    "SEDS_BCL",    "SEDS_BCU",
    "EDI",         "EDI_NCL",     "EDI_NCU",     "EDI_BCL",     "EDI_BCU",
    "SEDI",        "SEDI_NCL",    "SEDI_NCU",    "SEDI_BCL",    "SEDI_BCU",
-   "BCGSS",       "BCGSS_BCL",   "BCGSS_BCU"
+   "BAGSS",       "BAGSS_BCL",   "BAGSS_BCU"
 };
 
 static const char * mctc_columns [] = {
@@ -205,7 +205,7 @@ static const char * nbrcts_columns [] = {
    "SEDS",        "SEDS_NCL",    "SEDS_NCU",    "SEDS_BCL",    "SEDS_BCU",
    "EDI",         "EDI_NCL",     "EDI_NCU",     "EDI_BCL",     "EDI_BCU",
    "SEDI",        "SEDI_NCL",    "SEDI_NCU",    "SEDI_BCL",    "SEDI_BCU",
-   "BCGSS",       "BCGSS_BCL",   "BCGSS_BCU"
+   "BAGSS",       "BAGSS_BCL",   "BAGSS_BCU"
 };
 
 static const char * nbrcnt_columns [] = {

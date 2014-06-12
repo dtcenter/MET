@@ -86,7 +86,7 @@ class CTSInfo {
 
       CIInfo baser, fmean, acc, fbias;
       CIInfo pody, podn, pofd;
-      CIInfo far, csi, gss, bcgss, hk, hss, odds;
+      CIInfo far, csi, gss, bagss, hk, hss, odds;
       CIInfo lodds, orss, eds, seds, edi, sedi;
 
       void clear();

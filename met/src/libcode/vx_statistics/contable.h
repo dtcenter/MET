@@ -379,7 +379,7 @@ class TTContingencyTable : public ContingencyTable {
       double csi        () const;
       double csi_ci     (double alpha, double &cl, double &cu) const;
       double gss        () const;
-      double bcgss      () const;
+      double bagss      () const;
       double hk         () const;
       double hk_ci      (double alpha, double &cl, double &cu) const;
       double hss        () const;

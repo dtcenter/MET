@@ -208,9 +208,9 @@ static const int cts_sedi_ncl_offset     = nhc + 86;
 static const int cts_sedi_ncu_offset     = nhc + 87;
 static const int cts_sedi_bcl_offset     = nhc + 88;
 static const int cts_sedi_bcu_offset     = nhc + 89;
-static const int cts_bcgss_offset        = nhc + 90;
-static const int cts_bcgss_bcl_offset    = nhc + 91;
-static const int cts_bcgss_bcu_offset    = nhc + 92;
+static const int cts_bagss_offset        = nhc + 90;
+static const int cts_bagss_bcl_offset    = nhc + 91;
+static const int cts_bagss_bcu_offset    = nhc + 92;
 
 //
 // MCTC Line Type offsets
@@ -437,9 +437,9 @@ static const int nbrcts_sedi_ncl_offset     = nhc + 86;
 static const int nbrcts_sedi_ncu_offset     = nhc + 87;
 static const int nbrcts_sedi_bcl_offset     = nhc + 88;
 static const int nbrcts_sedi_bcu_offset     = nhc + 89;
-static const int nbrcts_bcgss_offset        = nhc + 90;
-static const int nbrcts_bcgss_bcl_offset    = nhc + 91;
-static const int nbrcts_bcgss_bcu_offset    = nhc + 92;
+static const int nbrcts_bagss_offset        = nhc + 90;
+static const int nbrcts_bagss_bcl_offset    = nhc + 91;
+static const int nbrcts_bagss_bcu_offset    = nhc + 92;
 
 //
 // NBRCNT Line Type offsets
