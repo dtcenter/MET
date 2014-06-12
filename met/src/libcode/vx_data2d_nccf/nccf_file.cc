@@ -627,7 +627,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   if (var->num_dims() >= max_met_args)
   {
     mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
-	 << " too may arguments for variable \"" << (var->name()) << "\"\n\n";
+	 << "too may arguments for variable \"" << (var->name()) << "\"\n\n";
 
     exit(1);
   }
@@ -640,7 +640,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   if (!(var->set_cur((long *)a)))
   {
     mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
-	 << " can't set corner for variable \"" << (var->name()) << "\"\n\n";
+	 << "can't set corner for variable \"" << (var->name()) << "\"\n\n";
 
     exit(1);
   }
@@ -677,7 +677,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   default:
   {
     mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
-	 << " bad type for variable \"" << (var->name()) << "\"\n\n";
+	 << "bad type for variable \"" << (var->name()) << "\"\n\n";
     exit(1);
     break;
   }
@@ -686,7 +686,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   if (!status)
   {
     mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
-	 << " bad status for var->get()\n\n";
+	 << "bad status for var->get()\n\n";
 
     exit(1);
   }
@@ -724,7 +724,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (v->num_dims() >= max_met_args)
   {
     mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) -> "
-	 << " too may arguments for variable \"" << (v->name()) << "\"\n\n";
+	 << "too may arguments for variable \"" << (v->name()) << "\"\n\n";
 
     exit(1);
   }
@@ -765,7 +765,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
       if ((j != var->x_slot) && (j != var->y_slot))
       {
 	mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
-	     << " star found in bad slot\n\n";
+	     << "star found in bad slot\n\n";
 
 	exit(1);
       }
@@ -775,7 +775,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (count != 2)
   {
     mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
-	 << " bad star count ... " << count << "\n\n";
+	 << "bad star count ... " << count << "\n\n";
 
     exit(1);
   }
@@ -788,7 +788,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (x_slot < 0 || y_slot < 0)
   {
     mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
-	 << " bad x|y|z slot\n\n";
+	 << "bad x|y|z slot\n\n";
 
     exit(1);
   }
@@ -940,7 +940,7 @@ void NcCfFile::read_netcdf_grid()
   
   // If we get here, we couldn't get the grid projection from the file
 
-  mlog << Error << "\nNcCfFile::read_netcdf_grid()" << " -> "
+  mlog << Error << "\nNcCfFile::read_netcdf_grid() -> "
        << "Couldn't figure out projection from information in netCDF file.\n\n";
   exit(1);
   
@@ -977,8 +977,8 @@ void NcCfFile::get_grid_from_grid_mapping(const NcAtt *grid_mapping_att)
   if (grid_mapping_var == 0)
   {
     mlog << Error << "\n" << method_name << " -> "
-	 << "Cannot extract grid mapping variable(" << mapping_name
-	 << " from netCDF file.\n\n";
+	 << "Cannot extract grid mapping variable (" << mapping_name
+	 << ") from netCDF file.\n\n";
     exit(1);
   }
   
@@ -1053,7 +1053,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcAtt *grid_mapping_att)
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "Unknown grid mapping name (" << grid_mapping_name
-	 << " found in netCDF file.\n\n";
+	 << ") found in netCDF file.\n\n";
     exit(1);
   }
   
