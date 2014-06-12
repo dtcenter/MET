@@ -286,13 +286,13 @@ double TTContingencyTable::gss() const {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// BCGSS Reference:
+// BAGSS Reference:
 //    Bias Adjusted Precipitation Threat Scores
 //    F. Mesinger, Adv. Geosci., 16, 137-142, 2008
 //
 ////////////////////////////////////////////////////////////////////////
 
-double TTContingencyTable::bcgss() const {
+double TTContingencyTable::bagss() const {
    double lf, lw, ha, num, den, v;
 
    if(n() == 0 || oy() == 0 || fn_oy() == 0 || fy_on() == 0) {

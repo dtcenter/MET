@@ -228,7 +228,7 @@ void CTSInfo::clear() {
    far.clear();
    csi.clear();
    gss.clear();
-   bcgss.clear();
+   bagss.clear();
    hk.clear();
    hss.clear();
    odds.clear();
@@ -266,7 +266,7 @@ void CTSInfo::assign(const CTSInfo &c) {
    far = c.far;
    csi = c.csi;
    gss = c.gss;
-   bcgss = c.bcgss;
+   bagss = c.bagss;
    hk = c.hk;
    hss = c.hss;
    odds = c.odds;
@@ -306,7 +306,7 @@ void CTSInfo::allocate_n_alpha(int i) {
       far.allocate_n_alpha(n_alpha);
       csi.allocate_n_alpha(n_alpha);
       gss.allocate_n_alpha(n_alpha);
-      bcgss.allocate_n_alpha(n_alpha);
+      bagss.allocate_n_alpha(n_alpha);
       hk.allocate_n_alpha(n_alpha);
       hss.allocate_n_alpha(n_alpha);
       odds.allocate_n_alpha(n_alpha);
@@ -349,7 +349,7 @@ void CTSInfo::compute_stats() {
    far.v   = cts.far();
    csi.v   = cts.csi();
    gss.v   = cts.gss();
-   bcgss.v = cts.bcgss();
+   bagss.v = cts.bagss();
    hk.v    = cts.hk();
    hss.v   = cts.hss();
    odds.v  = cts.odds();

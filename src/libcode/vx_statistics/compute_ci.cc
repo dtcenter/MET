@@ -640,16 +640,16 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
                                  cts_info[i].sedi.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for bcgss
+         // Compute bootstrap interval for bagss
          //
-         s = cts_info[i].bcgss.v;
+         s = cts_info[i].bagss.v;
          read_ldf(cts_i_file[i], 20, si_na);
          read_ldf(cts_r_file[i], 20, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
-                                 cts_info[i].bcgss.v_bcl[j],
-                                 cts_info[i].bcgss.v_bcu[j]);
+                                 cts_info[i].bagss.v_bcl[j],
+                                 cts_info[i].bagss.v_bcu[j]);
       } // end for i
 
    } // end try block
@@ -1616,15 +1616,15 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
                                  cts_info[i].sedi.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for bcgss
+         // Compute bootstrap interval for bagss
          //
-         s = cts_info[i].bcgss.v;
+         s = cts_info[i].bagss.v;
          read_ldf(cts_r_file[i], 20, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
-                                 cts_info[i].bcgss.v_bcl[j],
-                                 cts_info[i].bcgss.v_bcu[j]);
+                                 cts_info[i].bagss.v_bcl[j],
+                                 cts_info[i].bagss.v_bcu[j]);
       } // end for i
 
    } // end try block
@@ -2559,16 +2559,16 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
                                  nbrcts_info[i].cts_info.sedi.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for bcgss
+         // Compute bootstrap interval for bagss
          //
-         s = nbrcts_info[i].cts_info.bcgss.v;
+         s = nbrcts_info[i].cts_info.bagss.v;
          read_ldf(nbrcts_i_file[i], 20, si_na);
          read_ldf(nbrcts_r_file[i], 20, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
-                                 nbrcts_info[i].cts_info.bcgss.v_bcl[j],
-                                 nbrcts_info[i].cts_info.bcgss.v_bcu[j]);
+                                 nbrcts_info[i].cts_info.bagss.v_bcl[j],
+                                 nbrcts_info[i].cts_info.bagss.v_bcu[j]);
       } // end for i
 
    } // end try block
@@ -3157,15 +3157,15 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                  nbrcts_info[i].cts_info.sedi.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for bcgss
+         // Compute bootstrap interval for bagss
          //
-         s = nbrcts_info[i].cts_info.bcgss.v;
+         s = nbrcts_info[i].cts_info.bagss.v;
          read_ldf(nbrcts_r_file[i], 20, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
-                                 nbrcts_info[i].cts_info.bcgss.v_bcl[j],
-                                 nbrcts_info[i].cts_info.bcgss.v_bcu[j]);
+                                 nbrcts_info[i].cts_info.bagss.v_bcl[j],
+                                 nbrcts_info[i].cts_info.bagss.v_bcu[j]);
       } // end for i
 
    } // end try block
@@ -3687,7 +3687,7 @@ void write_ctsinfo(ofstream &tmp_out, const CTSInfo &c) {
            c.pody.v,    c.podn.v,    c.pofd.v,    c.far.v,
            c.csi.v,     c.gss.v,     c.hk.v,      c.hss.v,
            c.odds.v,    c.lodds.v,   c.orss.v,    c.eds.v,
-           c.seds.v,    c.edi.v,     c.sedi.v,    c.bcgss.v
+           c.seds.v,    c.edi.v,     c.sedi.v,    c.bagss.v
           );
 
    tmp_out << line << "\n";
