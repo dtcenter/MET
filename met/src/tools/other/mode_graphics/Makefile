@@ -13,9 +13,8 @@
 ########################################################################
 
 
-EXECUTABLES        = plot_mode_field  \
-
-#test_ft  \
+EXECUTABLES        = test_png         \
+                     plot_mode_field  \
 
 
 
@@ -208,84 +207,67 @@ libvx_cgraph.a: $(CGRAPH_OBJECTS)
    ##
 
 
-test_ft: test_ft.cc
+test_png: $(OBJECTS) $(LIBRARIES) test_png.cc
 	@ echo
-	$(CXX) test_ft.cc $(CXX_FLAGS) -o test_ft -I$(MET_INC_DIR) -I$(CAIRO_INC_DIR) -I$(FREETYPE_INC_DIR) -L$(MET_LIB_DIR) -L. -L$(CAIRO_LIB_DIR) -L$(FREETYPE_LIB_DIR) -lvx_cgraph -lvx_ps -lvx_afm -lvx_color -lvx_math -lvx_util -lvx_log -lm \
-            -lcairo -lfreetype  \
-            -lpixman-1  \
-            -lcairo -lfreetype  \
-            -lpthread  \
-            -lpng  \
-            -lz  \
-            -lcairo -lfreetype  \
-            -lfontconfig  \
+	$(CXX) test_png.cc -g -Wall -Wshadow -o test_png \
+        -I$(MET_INC_DIR) \
+        -I$(CAIRO_INC_DIR) \
+        -I$(FREETYPE_INC_DIR) \
+        -L$(MET_LIB_DIR) \
+        -L. \
+        -L$(CAIRO_LIB_DIR) \
+        -L$(FREETYPE_LIB_DIR) \
+        -lvx_cgraph \
+        -lvx_ps \
+        -lvx_afm \
+        -lvx_pxm \
+        -lvx_render \
+        -lvx_color \
+        -lvx_util \
+        -lvx_cal \
+        -lvx_log \
+        -lvx_math \
+        -lcairo \
+        -lfreetype \
+        -lm \
+        -lz \
 
 
 
 plot_mode_field: $(OBJECTS) $(LIBRARIES) plot_mode_field.cc
 	@ echo
-	$(CXX) plot_mode_field.cc mode_nc_file.o $(CXX_FLAGS) -o plot_mode_field \
-        -I$(MET_INC_DIR) \
-        $(NETCDF_INCS) \
-        -I/usr/include/cairo \
-        -I/usr/include/freetype2  \
-        $(NETCDF_LIBS) \
-        -L/usr/lib/x86_64-linux-gnu \
-        -L/usr/lib \
-        -L. \
-        -L$(MET_LIB_DIR) \
-        -L$(CAIRO_LIB_DIR)  \
-        -L$(FREETYPE_LIB_DIR)  \
-        -lvx_config \
-        -lvx_plot_util \
-        -lvx_data2d_nc_met \
-        -lvx_grid \
-        -lvx_ps \
-        -lvx_afm \
-        -lvx_pxm \
-        -lvx_color \
-        -lvx_render \
-        -lvx_math \
-        -lvx_cgraph \
-        -lvx_util \
-        -lvx_cal \
-        -lvx_log \
-        -lcairo \
-        -lfreetype \
-        -lnetcdf_c++ \
-        -lnetcdf \
-        -lpthread  \
-        -lpixman-1  \
-        -lpng  \
-        -lm  \
+	$(CXX) plot_mode_field.cc mode_nc_file.o $(FLAGS) -o plot_mode_field   \
+        -I$(CAIRO_INC_DIR) \
+        -I$(FREETYPE_INC_DIR) \
+        -I$(MET_INC_DIR)   \
+        -I$(NETCDF_INC_DIR)   \
+        -I$(CAIRO_INC_DIR)   \
+        -I$(FREETYPE_INC_DIR)   \
+        -L$(MET_LIB_DIR)   \
+        -L.   \
+        -L$(NETCDF_LIB_DIR)   \
+        -L$(CAIRO_LIB_DIR)   \
+        -L$(FREETYPE_LIB_DIR)   \
+        -lvx_cgraph   \
+        -lvx_config   \
+        -lvx_plot_util   \
+        -lvx_data2d_nc_met   \
+        -lvx_grid   \
+        -lvx_ps   \
+        -lvx_afm   \
+        -lvx_pxm   \
+        -lvx_render  \
+        -lvx_color   \
+        -lvx_util   \
+        -lvx_cal   \
+        -lvx_log   \
+        -lvx_math   \
+        -lnetcdf_c++   \
+        -lnetcdf   \
+        -lcairo   \
+        -lfreetype   \
+        -lm   \
         -lz  \
-
-
-#       -lfontconfig  \
-
-
-#       -I$(NETCDF_INCS) \
-#       -I$(CAIRO_INC_DIR) \
-#       -I$(FREETYPE_INC_DIR) \
-#       -L$(MET_LIB_DIR) \
-#       -L. \
-#       -L$(NETCDF_LIBS) \
-#       -L$(CAIRO_LIB_DIR) \
-#       -L$(FREETYPE_LIB_DIR) \
-#       -lvx_cgraph \
-#       -lvx_data2d_nc_met \
-#       -lvx_grid \
-#       -lvx_ps \
-#       -lvx_afm \
-#       -lvx_pxm \
-#       -lvx_color \
-#       -lvx_util \
-#       -lvx_cal \
-#       -lvx_log \
-#       -lvx_math \
-#       -lnetcdf_c++ -lnetcdf \
-#       -lcairo -lfreetype \
-#       -lm  \
 
 
 ########################################################################
