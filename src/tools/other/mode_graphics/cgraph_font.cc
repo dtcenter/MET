@@ -114,7 +114,7 @@ face = 0;
 // 
 // }
 
-gs_font_dir = GS_FONT_DIR ;
+gs_font_dir = CGRAPH_FONT_DIR ;
 
 clear();
 
