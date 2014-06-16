@@ -13,6 +13,18 @@
 ########################################################################
 
 
+
+########################################################################
+#
+#
+#  Tarball of ghostscript fonts available at 
+#
+#       http://sourceforge.net/projects/gs-fonts/
+#
+#
+########################################################################
+
+
 EXECUTABLES        = test_png         \
                      plot_mode_field  \
 
@@ -135,7 +147,7 @@ cgraphbase_fontfamily_to_string.o: cgraphbase_fontfamily_to_string.h cgraphbase_
 
 cgraph_font.o: cgraph_font.h cgraph_font.cc
 	@ echo
-	$(CXX) cgraph_font.cc -c $(CXX_FLAGS) -DGS_FONT_DIR=\"$(GS_FONT_DIR)\" -I$(MET_INC_DIR) -I$(CAIRO_INC_DIR) -I$(FREETYPE_INC_DIR)
+	$(CXX) cgraph_font.cc -c $(CXX_FLAGS) -DCGRAPH_FONT_DIR=\"$(CGRAPH_FONT_DIR)\" -I$(MET_INC_DIR) -I$(CAIRO_INC_DIR) -I$(FREETYPE_INC_DIR)
 
 
 cgraph_main.o: cgraph_main.h cgraph_main.cc cgraphbase_plottype_to_string.o color_stack.o cgraph_font.o

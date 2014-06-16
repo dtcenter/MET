@@ -565,14 +565,12 @@ void CgraphBase::load_ps_font(int ps_font_number)
 CgFont f;
 
 f.full_pfb_name << f.gs_font_dir << '/'
-                << "gs_8.11" << '/'                
                 << gs_ps_map_info[ps_font_number].gs_pfb_name
                 << ".pfb";
 
 f.short_pfb_name = get_short_name(f.full_pfb_name);
 
 f.full_afm_name << f.gs_font_dir << '/'
-                << "gs_8.11" << '/'                
                 << gs_ps_map_info[ps_font_number].gs_pfb_name
                 << ".afm";
 
