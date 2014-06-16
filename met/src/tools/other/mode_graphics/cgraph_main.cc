@@ -138,7 +138,7 @@ CgraphBase::CgraphBase(const CgraphBase &)
 
 {
 
-cerr << "\n\n  CgraphBase::CgraphBase(const CgraphBase &) -> should never be called!\n\n";
+mlog << Error << "\n\n  CgraphBase::CgraphBase(const CgraphBase &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -156,7 +156,7 @@ CgraphBase & CgraphBase::operator=(const CgraphBase &)
 
 {
 
-cerr << "\n\n  operator=CgraphBase(const CgraphBase &) -> should never be called!\n\n";
+mlog << Error << "\n\n  operator=CgraphBase(const CgraphBase &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -250,7 +250,7 @@ void CgraphBase::write()
 
 if ( Filename.empty() )  {
 
-   cerr << "\n\n  CgraphBase::write() -> no filename given!\n\n";
+   mlog << Error << "\n\n  CgraphBase::write() -> no filename given!\n\n";
 
    exit ( 1 );
 
@@ -264,7 +264,7 @@ switch ( Ptype )  {
    case png_type:
       cstatus = cairo_surface_write_to_png (Surface, Filename);
       if ( cstatus != CAIRO_STATUS_SUCCESS )  {
-         cerr << "\n\n  CgraphBase::write() -> trouble writing png file \""
+         mlog << Error << "\n\n  CgraphBase::write() -> trouble writing png file \""
               << Filename << "\" ... " << cairo_status_to_string(cstatus)
               << "\n\n";
          exit ( 1 );
@@ -283,7 +283,7 @@ switch ( Ptype )  {
       break;
 
    default:
-      cerr << "\n\n  CgraphBase::close() -> plot type "
+      mlog << Error << "\n\n  CgraphBase::close() -> plot type "
            << cgraphbase_plottype_to_string(Ptype) 
            << " is not yet supported.\n\n";
       exit ( 1 );
@@ -307,7 +307,7 @@ close();
 
 if ( empty (filename) )  {
 
-   cerr << "\n\n  CgraphBase::open() -> empty filename!\n\n";
+   mlog << Error << "\n\n  CgraphBase::open() -> empty filename!\n\n";
 
    // exit ( 1 );
 
@@ -343,7 +343,7 @@ switch ( Ptype )  {
       break;
 
    default:
-      cerr << "\n\n  CgraphBase::open() -> plot type "
+      mlog << Error << "\n\n  CgraphBase::open() -> plot type "
            << cgraphbase_plottype_to_string(Ptype) 
            << " is not yet supported\n\n";
       break;
@@ -375,7 +375,7 @@ int error = FT_Init_FreeType(&Library);
 
 if ( error )   {
 
-   cerr << "\n\n  CgraphBase::cgraph_init_from_scratch() -> error initializing freetype library\n\n";
+   mlog << Error << "\n\n  CgraphBase::cgraph_init_from_scratch() -> error initializing freetype library\n\n";
 
    exit ( 1 );
 
@@ -509,7 +509,7 @@ void CgraphBase::choose_font(int ps_font_number, double size)
 
 if ( (ps_font_number < 0) || (ps_font_number >= total_vx_ps_fonts) )  {
 
-   cerr << "\n\n  CgraphBase::choose_font(int font_number, double size) -> bad font number ... "
+   mlog << Error << "\n\n  CgraphBase::choose_font(int font_number, double size) -> bad font number ... "
         << ps_font_number << "\n\n";
 
    exit ( 1 );
@@ -519,7 +519,7 @@ if ( (ps_font_number < 0) || (ps_font_number >= total_vx_ps_fonts) )  {
 
 if ( size <= 0.0 )  {
 
-   cerr << "\n\n  CgraphBase::choose_font(int font_number, double size) -> bad font size ... "
+   mlog << Error << "\n\n  CgraphBase::choose_font(int font_number, double size) -> bad font size ... "
         << size << "\n\n";
 
    exit ( 1 );
@@ -587,7 +587,7 @@ f.afm = new Afm;
 
 if ( ! (f.afm->read(f.full_afm_name)) )  {
 
-   cerr << "\n\n  CgraphBase::load_ps_font(int) -> unable to load afm file \""
+   mlog << Error << "\n\n  CgraphBase::load_ps_font(int) -> unable to load afm file \""
         << f.full_afm_name << "\"\n\n";
 
    exit ( 1 );
@@ -620,7 +620,7 @@ int error, char_size;
 
 if ( !CurrentFont )  {
 
-   cerr << "\n\n  CgraphBase::set_current_font_size(double) -> no current font!\n\n";
+   mlog << Error << "\n\n  CgraphBase::set_current_font_size(double) -> no current font!\n\n";
 
    exit ( 1 );
 
@@ -632,9 +632,9 @@ error = FT_Set_Char_Size(CurrentFont->face, char_size, char_size, dpi, dpi);
 
 if ( error )  {
 
-   cerr << "\n\n  CgraphBase::set_current_font_size(double) -> error setting font size\n\n";
+   mlog << Error << "\n\n  CgraphBase::set_current_font_size(double) -> error setting font size\n\n";
 
-   cerr << "\n\n  Error = " << error << "\n\n";
+   mlog << Error << "\n\n  Error = " << error << "\n\n";
 
    exit ( 1 );
 
@@ -666,13 +666,13 @@ error = FT_New_Face(Library, pfb_path, 0, &face);
 
 if ( error == FT_Err_Unknown_File_Format )  {
 
-   cerr << "\n\n  CgraphBase::ft_load() -> unknown file format\n\n";
+   mlog << Error << "\n\n  CgraphBase::ft_load() -> unknown file format\n\n";
 
    exit ( 1 );
 
 } else if ( error )  {
 
-   cerr << "\n\n  CgraphBase::ft_load() -> error reading font file \""
+   mlog << Error << "\n\n  CgraphBase::ft_load() -> error reading font file \""
         << pfb_path << "\" ... " << error << "\n\n";
 
    exit ( 1 );
@@ -687,7 +687,7 @@ error = FT_Attach_File(face, afm_path);
 
 if ( error )  {
 
-   cerr << "\n\n  CgraphBase::ft_load() -> can't load afm file \"" << afm_path << "\"\n\n";
+   mlog << Error << "\n\n  CgraphBase::ft_load() -> can't load afm file \"" << afm_path << "\"\n\n";
 
    exit ( 1 );
 
@@ -705,7 +705,7 @@ if ( error )  {
 
    if ( error )  {
 
-      cerr << "\n\n  CgraphBase::ft_load() -> can't select adobe encoding\n\n";
+      mlog << Error << "\n\n  CgraphBase::ft_load() -> can't select adobe encoding\n\n";
 
       exit ( 1 );
 
@@ -753,7 +753,7 @@ switch ( fw ) {
    case CgraphBase::bold:   cfw = CAIRO_FONT_WEIGHT_BOLD;     break;
 
    default:
-      cerr << "\n\n  choose_font() -> font weight "
+      mlog << Error << "\n\n  choose_font() -> font weight "
            << cgraphbase_fontweight_to_string(fw)
            << " is not supported.\n\n";
       exit ( 1 );
@@ -769,7 +769,7 @@ switch ( fs ) {
    case oblique:  cfs = CAIRO_FONT_SLANT_OBLIQUE;  break;
 
    default:
-      cerr << "\n\n  choose_font() -> font slant "
+      mlog << Error << "\n\n  choose_font() -> font slant "
            << cgraphbase_fontslant_to_string(fs)
            << " is not supported.\n\n";
       exit ( 1 );
@@ -824,7 +824,7 @@ void CgraphBase::write_centered_text(int center, int fill_flag, double x_pin, do
 
 if ( empty(s) )  {
 
-   cerr << "\n\n  CgraphBase::write_centered_text() -> empty string! (2)\n\n";
+   mlog << Error << "\n\n  CgraphBase::write_centered_text() -> empty string! (2)\n\n";
 
    exit ( 1 );
 
@@ -832,7 +832,7 @@ if ( empty(s) )  {
 
 if ( CurrentFont == 0 )  {
 
-   cerr << "\n\n  CgraphBase::write_centered_text() -> no current font!\n\n";
+   mlog << Error << "\n\n  CgraphBase::write_centered_text() -> no current font!\n\n";
 
    exit ( 1 );
 
@@ -870,7 +870,7 @@ const int N = strlen(new_string);
 
 if ( N >= max_wct_infos )  {
 
-   cerr << "\n\n  CgraphBase::write_centered_text() -> "
+   mlog << Error << "\n\n  CgraphBase::write_centered_text() -> "
         << "increase parameter \"max_wct_infos\" to at least "
         << N << "\n\n";
 
@@ -914,7 +914,7 @@ for (j=0; j<N; ++j)  {
 
    if ( info->glyph_index == 0 )  {
 
-      cerr << "\n\n  CgraphBase::write_centered_text() -> glyph index not found!\n\n";
+      mlog << Error << "\n\n  CgraphBase::write_centered_text() -> glyph index not found!\n\n";
 
       exit ( 1 );
 
@@ -928,7 +928,7 @@ for (j=0; j<N; ++j)  {
 
    if ( error )  {
 
-      cerr << "\n\n  CgraphBase::write_centered_text() -> error loading glyph\n\n";
+      mlog << Error << "\n\n  CgraphBase::write_centered_text() -> error loading glyph\n\n";
 
       exit ( 1 );
 
@@ -1053,7 +1053,7 @@ for (j=0; j<N; ++j)  {
 
    if ( error )  {
 
-      cerr << "\n\n  CgraphBase::write_centered_text() -> error loading glyph\n\n";
+      mlog << Error << "\n\n  CgraphBase::write_centered_text() -> error loading glyph\n\n";
 
       exit ( 1 );
 
@@ -1073,7 +1073,7 @@ for (j=0; j<N; ++j)  {
 
 
       default:
-         cerr << "\n\n  CgraphBase::write_centered_text() -> fill_flag "
+         mlog << Error << "\n\n  CgraphBase::write_centered_text() -> fill_flag "
               << fill_flag << " is not supported\n\n";
          exit ( 1 );
          break;
@@ -1242,7 +1242,7 @@ error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
 
 if ( error )  {
 
-   cerr << "\n\n  CgraphBase::draw_bitmap_ft_char() -> error rendering glyph\n\n";
+   mlog << Error << "\n\n  CgraphBase::draw_bitmap_ft_char() -> error rendering glyph\n\n";
 
    exit ( 1 );
 
@@ -1340,7 +1340,7 @@ void CgraphBase::draw_outline_ft_char(double x_ll, double y_ll, const FT_GlyphSl
 
 if ( slot->format != FT_GLYPH_FORMAT_OUTLINE )  {
 
-   cerr << "\n\n  CgraphBase::draw_outline_ft_char() -> not an outline!\n\n";
+   mlog << Error << "\n\n  CgraphBase::draw_outline_ft_char() -> not an outline!\n\n";
 
    exit ( 1 );
 
@@ -1373,7 +1373,7 @@ error = FT_Outline_Decompose(a, &funcs, &user);
 
 if ( error )  {
 
-   cerr << "\n\n  CgraphBase::draw_outline_ft_char() -> error deomposing glyph!\n\n";
+   mlog << Error << "\n\n  CgraphBase::draw_outline_ft_char() -> error deomposing glyph!\n\n";
 
    exit ( 1 );
 
@@ -1505,7 +1505,7 @@ switch ( k )  {
       break;
 
    default:
-      cerr << "\n\n  CgraphBase::setlinecap(int) -> bad value ... " << k << "\n\n";
+      mlog << Error << "\n\n  CgraphBase::setlinecap(int) -> bad value ... " << k << "\n\n";
       exit ( 1 );
       break;
 
@@ -1539,7 +1539,7 @@ switch ( k )  {
       break;
 
    default:
-      cerr << "\n\n  CgraphBase::setlinejoin(int) -> bad value ... " << k << "\n\n";
+      mlog << Error << "\n\n  CgraphBase::setlinejoin(int) -> bad value ... " << k << "\n\n";
       exit ( 1 );
       break;
 
@@ -1626,7 +1626,7 @@ void CgraphBase::roman(double size)
 
 if ( Family == CgraphBase::none )  {
 
-   cerr << "\n\n  CgraphBase::roman(double) -> no font family selected!\n\n";
+   mlog << Error << "\n\n  CgraphBase::roman(double) -> no font family selected!\n\n";
 
    exit ( 1 );
 
@@ -1652,7 +1652,7 @@ void CgraphBase::italic(double size)
 
 if ( Family == CgraphBase::none )  {
 
-   cerr << "\n\n  CgraphBase::italic(double) -> no font family selected!\n\n";
+   mlog << Error << "\n\n  CgraphBase::italic(double) -> no font family selected!\n\n";
 
    exit ( 1 );
 
@@ -1678,7 +1678,7 @@ void CgraphBase::bold(double size)
 
 if ( Family == CgraphBase::none )  {
 
-   cerr << "\n\n  CgraphBase::bold(double) -> no font family selected!\n\n";
+   mlog << Error << "\n\n  CgraphBase::bold(double) -> no font family selected!\n\n";
 
    exit ( 1 );
 
@@ -1704,7 +1704,7 @@ void CgraphBase::bolditalic(double size)
 
 if ( Family == CgraphBase::none )  {
 
-   cerr << "\n\n  CgraphBase::bolditalic(double) -> no font family selected!\n\n";
+   mlog << Error << "\n\n  CgraphBase::bolditalic(double) -> no font family selected!\n\n";
 
    exit ( 1 );
 
@@ -1853,7 +1853,7 @@ Cgraph::Cgraph(const Cgraph &)
 
 {
 
-cerr << "\n\n  Cgraph::Cgraph(const Cgraph &) -> should never be called!\n\n";
+mlog << Error << "\n\n  Cgraph::Cgraph(const Cgraph &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -1871,7 +1871,7 @@ Cgraph & Cgraph::operator=(const Cgraph &)
 
 {
 
-cerr << "\n\n  operator=Cgraph(const Cgraph &) -> should never be called!\n\n";
+mlog << Error << "\n\n  operator=Cgraph(const Cgraph &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -1908,7 +1908,7 @@ void Cgraph::wct(double x, double y, double u, double v, const char * text)
 
 if ( empty(text) )  {
 
-   cerr << "\n\n  Cgraph::wct() -> empty string!\n\n";
+   mlog << Error << "\n\n  Cgraph::wct() -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -2350,7 +2350,7 @@ void remap_string(FT_Face face, const char * in, const char * & out)
 
 if ( empty(in) )  {
 
-   cerr << "\n\n  remap_string(FT_Face, const char * in, const char * & out) -> empty string!\n\n";
+   mlog << Error << "\n\n  remap_string(FT_Face, const char * in, const char * & out) -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -2437,7 +2437,7 @@ switch ( f )  {
    case CgraphBase::Bookman:      n =  5;  break;
 
    default:
-      cerr << "\n\n  ff_to_roman() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_roman() -> bad font family ... "
            << cgraphbase_fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -2471,7 +2471,7 @@ switch ( f )  {
    case CgraphBase::Bookman:      n =  6;  break;
 
    default:
-      cerr << "\n\n  ff_to_italic() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_italic() -> bad font family ... "
            << cgraphbase_fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -2505,7 +2505,7 @@ switch ( f )  {
    case CgraphBase::Bookman:      n =  3;  break;
 
    default:
-      cerr << "\n\n  ff_to_bold() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_bold() -> bad font family ... "
            << cgraphbase_fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -2539,7 +2539,7 @@ switch ( f )  {
    case CgraphBase::Bookman:      n =  4;  break;
 
    default:
-      cerr << "\n\n  ff_to_bolditalic() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_bolditalic() -> bad font family ... "
            << cgraphbase_fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -2609,7 +2609,7 @@ int my_conic (const FT_Vector * control, const FT_Vector * to, void * u)
 
 ft_user_info * info = (ft_user_info *) u;
 
-cerr << "\n\n  my_conic() -> should never be called!\n\n";
+mlog << Error << "\n\n  my_conic() -> should never be called!\n\n";
 
 exit ( 1 );
 

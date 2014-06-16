@@ -107,7 +107,7 @@ face = 0;
 // 
 // if ( ! c )  {
 // 
-//    cerr << "\n\n  CgFont::init_from_scratch() -> unable to get environment variable \""
+//    mlog << Error << "\n\n  CgFont::init_from_scratch() -> unable to get environment variable \""
 //         << cgraph_font_dir_env << "\"\n\n";
 // 
 //    exit ( 1 );
@@ -137,7 +137,7 @@ if ( face )  {
 
    if ( error )  {
 
-      cerr << "\n\n  CgFont::clear() -> trouble closing typeface \"" << short_pfb_name << "\"\n\n";
+      mlog << Error << "\n\n  CgFont::clear() -> trouble closing typeface \"" << short_pfb_name << "\"\n\n";
 
       exit ( 1 );
 
@@ -269,7 +269,7 @@ clear();
 
 if ( (n < 0) || (n >= total_predef_fonts) )  {
 
-   cerr << "\n\n  CgFont::set_by_number(int) -> range check error\n\n";
+   mlog << Error << "\n\n  CgFont::set_by_number(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -285,7 +285,7 @@ full_afm_name << gs_font_dir << '/' << gs_font_dir << '/' << short_afm_name;
 
 if ( !file_exists(full_afm_name) )  {
 
-   cerr << "\n\n  CgFont::set_by_number(int) -> can't find afm file \"" << full_afm_name << "\"\n\n";
+   mlog << Error << "\n\n  CgFont::set_by_number(int) -> can't find afm file \"" << full_afm_name << "\"\n\n";
 
    exit ( 1 );
 
@@ -295,7 +295,7 @@ afm = new Afm;
 
 if ( !(afm->read(full_afm_name)) )  {
 
-   cerr << "\n\n  CgFont::set_by_number(int) -> trouble reading afm file \"" << full_afm_name << "\"\n\n";
+   mlog << Error << "\n\n  CgFont::set_by_number(int) -> trouble reading afm file \"" << full_afm_name << "\"\n\n";
 
    exit ( 1 );
 
@@ -413,7 +413,7 @@ if ( e )  {
 
       if ( error )  {
 
-         cerr << "\n\n  CgFontCollection::clear() -> trouble closing typeface \"" << e[j]->short_pfb_name << "\"\n\n";
+         mlog << Error << "\n\n  CgFontCollection::clear() -> trouble closing typeface \"" << e[j]->short_pfb_name << "\"\n\n";
 
          exit ( 1 );
 
@@ -495,7 +495,7 @@ u = new CgFont * [n];
 
 if ( !u )  {
 
-   cerr << "\n\n  CgFontCollection::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\n\n  CgFontCollection::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -679,7 +679,7 @@ CgFont * CgFontCollection::operator[](int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   cerr << "\n\n  CgFont * CgFontCollection::operator[](int) const -> range check error\n\n";
+   mlog << Error << "\n\n  CgFont * CgFontCollection::operator[](int) const -> range check error\n\n";
 
    exit ( 1 );
 

@@ -175,7 +175,7 @@ Color ** u = new Color * [n];
 
 if ( !u )  {
 
-   cerr << "ColorStack::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "ColorStack::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -241,7 +241,7 @@ void ColorStack::set_alloc_inc(int n)
 
 if ( n < 0 )  {
 
-   cerr << "ColorStack::set_alloc_int(int) -> bad value ... " << n << "\n\n";
+   mlog << Error << "ColorStack::set_alloc_int(int) -> bad value ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -268,7 +268,7 @@ e[Nelements] = new Color;
 
 if ( !(e[Nelements]) )  {
 
-   cerr << "ColorStack::add(const Color &) -> memory allocation error\n\n";
+   mlog << Error << "ColorStack::add(const Color &) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -290,7 +290,7 @@ Color ColorStack::pop()
 
 if ( Nelements <= 0 )  {
 
-   cerr << "ColorStack::pop() -> stack empty!\n\n";
+   mlog << Error << "ColorStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 
@@ -314,7 +314,7 @@ Color ColorStack::peek() const
 
 if ( Nelements <= 0 )  {
 
-   cerr << "ColorStack::pop() -> stack empty!\n\n";
+   mlog << Error << "ColorStack::pop() -> stack empty!\n\n";
 
    exit ( 1 );
 

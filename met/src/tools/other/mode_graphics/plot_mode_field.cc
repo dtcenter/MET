@@ -361,7 +361,7 @@ for (j=0; j<(a.n_entries()); ++j)  {
            << "\n\n  " << program_name << ": read_config() -> entry " << j << " of \"" 
            << name << "\" is not a string!\n\n";
 
-      // cerr << "\n\n  " << configobjecttype_to_string(e->type()) << "\n\n";
+      // mlog << Error << "\n\n  " << configobjecttype_to_string(e->type()) << "\n\n";
 
       exit ( 1 );
 
@@ -418,7 +418,7 @@ switch ( plot_field )  {
       break;
 
       default:
-      cerr << "\n\n  " << program_name << ": do_plot() -> bad field selected\n\n";
+      mlog << Error << "\n\n  " << program_name << ": do_plot() -> bad field selected\n\n";
       exit ( 1 );
       break;
 
