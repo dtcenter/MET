@@ -25,13 +25,7 @@ CGRAPH_OBJECTS     = color_stack.o                      \
                      cgraphbase_fontfamily_to_string.o  \
 
 
-OTHER_OBJECTS      = mode_nc_file.o      \
-                     fo_pair.o           \
-                     fo_pair_array.o     \
-                     met_int_array.o     \
-                     met_double_array.o  \
-                     mode_line_array.o   \
-                     mode_run.o          \
+OTHER_OBJECTS      = mode_nc_output_file.o      \
 
 
 
@@ -51,27 +45,27 @@ GEN_SOURCES        = cgraphbase_plottype_to_string.h     \
 ########################################################################
 
 
-HEADERS            = cgraph_font.h       \
-                     cgraph.h            \
-                     cgraph_main.h       \
-                     color_stack.h       \
-                     fo_pair_array.h     \
-                     fo_pair.h           \
-                     gs_ps_map.h         \
-                     met_double_array.h  \
-                     met_int_array.h     \
-                     mode_line_array.h   \
-                     mode_nc_file.h      \
-                     mode_run.h          \
-                     sincosd.h           \
+HEADERS            = cgraph_font.h          \
+                     cgraph.h               \
+                     cgraph_main.h          \
+                     color_stack.h          \
+                     fo_pair_array.h        \
+                     fo_pair.h              \
+                     gs_ps_map.h            \
+                     met_double_array.h     \
+                     met_int_array.h        \
+                     mode_line_array.h      \
+                     mode_nc_output_file.h  \
+                     mode_run.h             \
+                     sincosd.h              \
 
 
 ########################################################################
 
 
 CAIRO_INC_DIR           = /usr/include/cairo
-// CAIRO_LIB_DIR           = /usr/lib
-CAIRO_LIB_DIR           = /usr/lib/x86_64-linux-gnu
+CAIRO_LIB_DIR           = /usr/lib
+// CAIRO_LIB_DIR           = /usr/lib/x86_64-linux-gnu
 
 FREETYPE_INC_DIR        = /usr/include/freetype2
 FREETYPE_LIB_DIR        = /usr/lib
@@ -149,40 +143,9 @@ cgraph_main.o: cgraph_main.h cgraph_main.cc cgraphbase_plottype_to_string.o colo
 	$(CXX) cgraph_main.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR) -I$(CAIRO_INC_DIR) -I$(FREETYPE_INC_DIR)
 
 
-
-fo_pair.o: fo_pair.h fo_pair.cc
+mode_nc_output_file.o: mode_nc_output_file.h mode_nc_output_file.cc
 	@ echo
-	$(CXX) fo_pair.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
-
-fo_pair_array.o: fo_pair_array.h fo_pair_array.cc
-	@ echo
-	$(CXX) fo_pair_array.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
-
-mode_nc_file.o: mode_nc_file.h mode_nc_file.cc
-	@ echo
-	$(CXX) mode_nc_file.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR) -I$(NETCDF_INCS)
-
-
-met_int_array.o: met_int_array.h met_int_array.cc
-	@ echo
-	$(CXX) met_int_array.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
-
-met_double_array.o: met_double_array.h met_double_array.cc
-	@ echo
-	$(CXX) met_double_array.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
-
-mode_line_array.o: mode_line_array.h mode_line_array.cc
-	@ echo
-	$(CXX) mode_line_array.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
-
-
-mode_run.o: mode_run.h mode_run.cc
-	@ echo
-	$(CXX) mode_run.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR)
+	$(CXX) mode_nc_output_file.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR) -I$(NETCDF_INCS)
 
 
 ########################################################################
@@ -236,7 +199,7 @@ test_png: $(OBJECTS) $(LIBRARIES) test_png.cc
 
 plot_mode_field: $(OBJECTS) $(LIBRARIES) plot_mode_field.cc
 	@ echo
-	$(CXX) plot_mode_field.cc mode_nc_file.o $(FLAGS) -o plot_mode_field   \
+	$(CXX) plot_mode_field.cc mode_nc_output_file.o $(FLAGS) -o plot_mode_field   \
         -I$(CAIRO_INC_DIR) \
         -I$(FREETYPE_INC_DIR) \
         -I$(MET_INC_DIR)   \
@@ -274,7 +237,7 @@ plot_mode_field: $(OBJECTS) $(LIBRARIES) plot_mode_field.cc
 
 
 clean:
-	rm -f *.a *.o temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
+	rm -f *.a *.o *.png temp junk core a.out $(OBJECTS) $(LIBRARIES) $(EXECUTABLES) $(GEN_SOURCES)
 	rm -f $(MET_BIN_DIR)/modis_regrid
 
 
