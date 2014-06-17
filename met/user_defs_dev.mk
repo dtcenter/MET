@@ -102,7 +102,7 @@ ENABLE_SERIES_ANALYSIS = 1
 ENABLE_WWMCA           = 1
 ENABLE_MODIS           = 1
 ENABLE_TC_UTILS        = 1
-ENABLE_MODE_GRAPHICS   = 0
+ENABLE_MODE_GRAPHICS   = 1
 ENABLE_GEN_CIRCLE_MASK = 1
 
 # Flags to compile support for additional file formats

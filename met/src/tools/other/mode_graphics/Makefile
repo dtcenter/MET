@@ -13,7 +13,6 @@
 ########################################################################
 
 
-
 ########################################################################
 #
 #
@@ -74,18 +73,17 @@ HEADERS            = cgraph_font.h          \
 ########################################################################
 
 
-CAIRO_INC_DIR           = /usr/include/cairo
-CAIRO_LIB_DIR           = /usr/lib
-// CAIRO_LIB_DIR           = /usr/lib/x86_64-linux-gnu
+CAIRO_INC_DIR     = /usr/include/cairo
+CAIRO_LIB_DIR     = /usr/lib
 
-FREETYPE_INC_DIR        = /usr/include/freetype2
-FREETYPE_LIB_DIR        = /usr/lib
+FREETYPE_INC_DIR  = /usr/include/freetype2
+FREETYPE_LIB_DIR  = /usr/lib
 
 
 ########################################################################
 
 
-ARCHIVE        = ar -rs
+ARCHIVE           = ar -rs
 
 
 ########################################################################
@@ -93,7 +91,7 @@ ARCHIVE        = ar -rs
 
 all: $(GEN_SOURCES) $(OBJECTS) $(LIBRARIES) $(EXECUTABLES)
 	@ echo
-	@ echo "*** Finished Making the Mode Graiphcs Tools ***"
+	@ echo "*** Finished Making the Mode Graphics Tools ***"
 	@ echo
 
 

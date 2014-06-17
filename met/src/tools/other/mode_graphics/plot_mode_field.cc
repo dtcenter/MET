@@ -44,20 +44,28 @@ static ColorTable ctable;
 
 static MetConfig config;
 
+static Dictionary * sources;
+
+static int n_sources = 0;
+
+static const char        filename_name [] = "file_name";
 static const char      fontfamily_name [] = "font_family";
 static const char          outdir_name [] = "output_directory";
 static const char        plotinfo_name [] = "plot_info";
 static const char        plotsize_name [] = "size";
 static const char     borderwidth_name [] = "border_width";
 static const char         mapinfo_name [] = "map_info";
-static const char        mapcolor_name [] = "line_color";
+static const char       linecolor_name [] = "line_color";
 static const char       linewidth_name [] = "line_width";
-static const char        mapfiles_name [] = "map_files";
+// static const char        linedash_name [] = "line_dash";
+static const char          source_name [] = "source";
 static const char       rawctable_name [] = "raw_ctable_filename";
 static const char       objctable_name [] = "obj_ctable_filename";
 static const char          doanno_name [] = "do_annotation";
 static const char     annobgcolor_name [] = "anno_background_color";
 static const char   annotextcolor_name [] = "anno_text_color";
+static const char    annofontsize_name [] = "anno_font_size";
+static const char   titlefontsize_name [] = "title_font_size";
 
 enum PlotField {
 
@@ -95,22 +103,20 @@ static ConcatString output_directory = ".";
    //  default plot info
    //
 
-static double map_linewidth = 1.0;
-
 static int plot_size = 4;
 
 static int border_width = 10;
 
-static Color map_color        = black;
 static Color anno_bg_color    = white;
 static Color anno_text_color  = black;
-
-static StringArray map_files;
 
 static ConcatString raw_ctable_filename;
 static ConcatString obj_ctable_filename;
 
 static CgraphBase::FontFamily family = CgraphBase::Helvetica;
+
+static double title_font_size = 30.0;
+static double anno_font_size  = 20.0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -152,12 +158,13 @@ static void clip_box (const Box &, Cgraph &);
 
 static void draw_map (Cgraph &, const double x_ll, const double y_ll, const Grid &);
 
-static void draw_mapfile (Cgraph &, const double x_ll, const double y_ll, const Grid &, const char *);
+static void draw_mapfile (Cgraph &, const double x_ll, const double y_ll, const Grid &, Dictionary *);
 
 static void draw_region  (Cgraph &, const Grid &, const double x_ll, const double y_ll, const MapRegion &);
 
 static Color        get_dict_color  (Dictionary *, const char * id);
 static int          get_dict_int    (Dictionary *, const char * id);
+static double       get_dict_double (Dictionary *, const char * id);
 static ConcatString get_dict_string (Dictionary *, const char * id);
 static bool         get_dict_bool   (Dictionary *, const char * id);
 
@@ -242,7 +249,7 @@ if ( ! config.read(config_filename) )  {
 
 // config.dump(cout);
 
-int j;
+// int j;
 const DictionaryEntry * e = 0;
 const char * name = 0;
 Dictionary * map_info = 0;
@@ -269,7 +276,7 @@ if ( !e )   {
 
 plot_info = e->dict_value();
 
-s                   = get_dict_string(plot_info, fontfamily_name);
+s = get_dict_string(plot_info, fontfamily_name);
 
      if ( s == "Helvetica")   family = CgraphBase::Helvetica;
 else if ( s == "NewCentury")  family = CgraphBase::NewCentury;
@@ -292,6 +299,9 @@ output_directory    = replace_path(s);
 anno_bg_color       = get_dict_color(plot_info, annobgcolor_name);
 anno_text_color     = get_dict_color(plot_info, annotextcolor_name);
 
+anno_font_size      = get_dict_double(plot_info, annofontsize_name);
+title_font_size     = get_dict_double(plot_info, titlefontsize_name);
+
 plot_size           = get_dict_int(plot_info, plotsize_name);
 border_width        = get_dict_int(plot_info, borderwidth_name);
 
@@ -302,6 +312,7 @@ s                   = get_dict_string(plot_info, objctable_name);
 obj_ctable_filename = replace_path(s);
 
 do_anno             = get_dict_bool(plot_info, doanno_name);
+
 
    //
    //  map info
@@ -322,7 +333,7 @@ if ( !e )   {
 }
 
 map_info = e->dict_value();
-
+/*
 map_color = get_dict_color(map_info, mapcolor_name);
 
    //
@@ -334,12 +345,12 @@ name = linewidth_name;
 e = map_info->lookup(name);
 
 map_linewidth = e->d_value();
-
+*/
    //
-   //  data files
+   //  map data
    //
 
-name = mapfiles_name;
+name = source_name;
 
 e = map_info->lookup(name);
 
@@ -363,6 +374,10 @@ if ( ! (e->is_array()) )  {
 
 }
 
+sources = e->array_value();
+
+n_sources = sources->n_entries();
+/*
 Dictionary & a = *(e->array_value());
 
 for (j=0; j<(a.n_entries()); ++j)  {
@@ -384,7 +399,7 @@ for (j=0; j<(a.n_entries()); ++j)  {
    map_files.add(replace_path(s));
 
 }
-
+*/
 // map_files.dump(cout);
 
 
@@ -848,11 +863,28 @@ void draw_map(Cgraph & plot, const double x_ll, const double y_ll, const Grid & 
 {
 
 int j;
+Dictionary & s = *(sources);
+const DictionaryEntry * e = 0;
+Dictionary * dict = 0;
 
 
-for (j=0; j<(map_files.n_elements()); ++j)  {
+for (j=0; j<n_sources; ++j)  {
 
-   draw_mapfile(plot, x_ll, y_ll, grid, map_files[j]);
+   e = s[j];
+
+   if ( ! (e->is_dictionary()) )  {
+
+      mlog << Error
+           << "\n\n  " << program_name << ": draw_map() -> non-dictionary found "
+           << "in the source array in the config file!\n\n";
+
+      exit ( 1 );
+
+   }
+
+   dict = e->dict_value();
+
+   draw_mapfile(plot, x_ll, y_ll, grid, dict);
 
 }
 
@@ -869,13 +901,28 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_mapfile(Cgraph & plot, const double x_ll, const double y_ll, const Grid & grid, const char * map_filename)
+void draw_mapfile(Cgraph & plot, const double x_ll, const double y_ll, const Grid & grid, Dictionary * dict)
 
 {
 
 ifstream in;
 MapRegion r;
+double map_linewidth = 1.0;
+ConcatString s;
+// ConcatString map_dash;
+ConcatString map_filename;
+Color map_color;
 
+
+s = get_dict_string (dict, filename_name);
+
+map_filename  = replace_path(s);
+
+// map_dash      = get_dict_string (dict, linedash_name);
+
+map_linewidth = get_dict_double (dict, linewidth_name);
+
+map_color     = get_dict_color  (dict, linecolor_name);
 
 in.open(map_filename);
 
@@ -890,6 +937,8 @@ if ( !in )  {
 }
 
 plot.gsave();
+
+   // if ( map_dash.nonempty() )  plot.set_dash(map_dash);
 
    plot.setlinewidth(map_linewidth);
 
@@ -1054,6 +1103,48 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
+double get_dict_double(Dictionary * dict, const char * id)
+
+{
+
+double t = 0.0;
+const DictionaryEntry * e = 0;
+
+
+e = dict->lookup(id);
+
+if ( !e )  {
+
+   mlog << Error
+        << "\n\n  " << program_name << ": get_dict_double() -> lookup failed for \""
+        << id << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+     if ( e->type() == IntegerType )  t = (double) (e->i_value());
+else if ( e->type() == FloatType   )  t = (double) (e->d_value());
+else{
+
+   mlog << Error 
+        << "\n\n  " << program_name << ": get_dict_double() -> bad type for id \""
+        << id << "\" ... expecting number\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( t );
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 Color get_dict_color(Dictionary * dict, const char * id)
 
 {
@@ -1125,19 +1216,17 @@ void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_
 ConcatString title;
 ConcatString fcst_obs, raw_obj;
 ConcatString s;
-const double title_font_size = 30.0;
 char junk[256], ts[256];
 int month, day, year, hour, minute, second;
 int lead_seconds;
-double y;
+double delta;
 double htab1, htab2;
+double vtab1, vtab2;
 
 
 // mode_in.dump(cout);
 
 htab1 = border_width + 10.0;
-
-htab2 = htab1 + 60.0;
 
    //
    //  title
@@ -1171,41 +1260,50 @@ plot.bold(title_font_size);
 plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - title_font_size - 10.0, 0.5, 0.0, title);
 
 
-plot.roman(20.0);
+plot.roman(anno_font_size);
 
 plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, mode_in.short_filename());
+
+
+vtab1 = anno_height + 1.5*anno_font_size;
+vtab2 = vtab1 + 1.5*anno_font_size;
+
+delta = 0.0;
+
+
+plot.bold(anno_font_size);
+plot.set_color(black);
+plot.write_centered_text(1, 1, htab1, vtab1, 0.0, 0.0, "Lead");
+
+if ( plot.LastTextWidth > delta )  delta = plot.LastTextWidth;
+
+plot.bold(anno_font_size);
+plot.set_color(black);
+plot.write_centered_text(1, 1, htab1, vtab2, 0.0, 0.0, "Valid");
+
+if ( plot.LastTextWidth > delta )  delta = plot.LastTextWidth;
+
+htab2 = htab1 + delta + 20.0;
 
 
    //
    // lead time
    //
 
-y = anno_height + 20.0;
-
-plot.bold(20.0);
-plot.set_color(black);
-plot.write_centered_text(1, 1, htab1, y, 0.0, 0.0, "Lead");
-
-plot.roman(20.0);
+plot.roman(anno_font_size);
 plot.set_color(anno_text_color);
 
 lead_seconds = (int) (mode_in.valid_time() - mode_in.init_time());
 
 time_string(lead_seconds, ts, sizeof(ts));
 
-plot.write_centered_text(1, 1, htab2, y, 0.0, 0.0, ts);
+plot.write_centered_text(1, 1, htab2, vtab1, 0.0, 0.0, ts);
 
    //
    //  valid time
    //
 
-y += 30.0;
-
-plot.bold(20.0);
-plot.set_color(black);
-plot.write_centered_text(1, 1, htab1, y, 0.0, 0.0, "Valid");
-
-plot.roman(20.0);
+plot.roman(anno_font_size);
 plot.set_color(anno_text_color);
 
 unix_to_mdyhms(mode_in.valid_time(), month, day, year, hour, minute, second);
@@ -1214,7 +1312,7 @@ time_string((int) (mode_in.valid_time()%86400), ts, sizeof(ts));
 
 snprintf(junk, sizeof(junk), "%s %d, %d  %s", short_month_name[month], day, year, ts);
 
-plot.write_centered_text(1, 1, htab2, y, 0.0, 0.0, junk);
+plot.write_centered_text(1, 1, htab2, vtab2, 0.0, 0.0, junk);
 
 
    //

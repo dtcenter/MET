@@ -194,6 +194,8 @@ DoLigatures = true;
 
 Family = default_font_family;
 
+LastTextWidth = 0.0;
+
 
 
 
@@ -231,6 +233,8 @@ Fonts.clear();
 if ( Library )  { FT_Done_FreeType(Library);  Library = (FT_Library) 0; }
 
 Family = default_font_family;
+
+LastTextWidth = 0.0;
 
    //
    //  done
@@ -1007,6 +1011,8 @@ for (j=0; j<N; ++j)  {
    ++info;
 
 }   //  for j
+
+LastTextWidth = R - L;
 
    //
    //  calculate the starting position on the page
