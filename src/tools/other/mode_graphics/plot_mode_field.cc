@@ -3,10 +3,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int anno_height             =  100;
-
-static const int anno_roman_font = 11;
-static const int anno_bold_font  = 12;
+static const int anno_height     =  100;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -47,13 +44,13 @@ static ColorTable ctable;
 
 static MetConfig config;
 
+static const char      fontfamily_name [] = "font_family";
 static const char          outdir_name [] = "output_directory";
 static const char        plotinfo_name [] = "plot_info";
 static const char        plotsize_name [] = "size";
 static const char     borderwidth_name [] = "border_width";
 static const char         mapinfo_name [] = "map_info";
 static const char        mapcolor_name [] = "line_color";
-static const char backgroundcolor_name [] = "background_color";
 static const char       linewidth_name [] = "line_width";
 static const char        mapfiles_name [] = "map_files";
 static const char       rawctable_name [] = "raw_ctable_filename";
@@ -104,7 +101,6 @@ static int plot_size = 4;
 
 static int border_width = 10;
 
-static Color background_color = white;
 static Color map_color        = black;
 static Color anno_bg_color    = white;
 static Color anno_text_color  = black;
@@ -113,6 +109,8 @@ static StringArray map_files;
 
 static ConcatString raw_ctable_filename;
 static ConcatString obj_ctable_filename;
+
+static CgraphBase::FontFamily family = CgraphBase::Helvetica;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -156,7 +154,7 @@ static void draw_map (Cgraph &, const double x_ll, const double y_ll, const Grid
 
 static void draw_mapfile (Cgraph &, const double x_ll, const double y_ll, const Grid &, const char *);
 
-static void draw_region (Cgraph &, const Grid &, const double x_ll, const double y_ll, const MapRegion &);
+static void draw_region  (Cgraph &, const Grid &, const double x_ll, const double y_ll, const MapRegion &);
 
 static Color        get_dict_color  (Dictionary *, const char * id);
 static int          get_dict_int    (Dictionary *, const char * id);
@@ -271,10 +269,26 @@ if ( !e )   {
 
 plot_info = e->dict_value();
 
+s                   = get_dict_string(plot_info, fontfamily_name);
+
+     if ( s == "Helvetica")   family = CgraphBase::Helvetica;
+else if ( s == "NewCentury")  family = CgraphBase::NewCentury;
+else if ( s == "Palatino")    family = CgraphBase::Palatino;
+else if ( s == "Times")       family = CgraphBase::Times;
+else if ( s == "Courier")     family = CgraphBase::Courier;
+else {
+
+   mlog << Error 
+        << "\n\n  " << program_name << ": bad font family \"" 
+        << s << "\" in config file\n\n";
+
+   exit ( 1 );
+
+}
+
 s                   = get_dict_string(plot_info, outdir_name);
 output_directory    = replace_path(s);
 
-background_color    = get_dict_color(plot_info, backgroundcolor_name);
 anno_bg_color       = get_dict_color(plot_info, annobgcolor_name);
 anno_text_color     = get_dict_color(plot_info, annotextcolor_name);
 
@@ -360,8 +374,6 @@ for (j=0; j<(a.n_entries()); ++j)  {
       mlog << Error
            << "\n\n  " << program_name << ": read_config() -> entry " << j << " of \"" 
            << name << "\" is not a string!\n\n";
-
-      // mlog << Error << "\n\n  " << configobjecttype_to_string(e->type()) << "\n\n";
 
       exit ( 1 );
 
@@ -484,6 +496,8 @@ if ( do_anno )  {
 
 plot.open(output_filename, whole_box.width(), whole_box.height());
 
+plot.set_family(family);
+
 if ( do_anno )   fill_box(whole_box, anno_bg_color, plot);
 
    //
@@ -536,7 +550,7 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << ": -simple|-composite|-raw  -obs|-fcst -config path mode_nc_file_list\n\n";
+mlog << Error << "\n\n   usage:  " << program_name << ": -simple|-composite|-raw  -obs|-fcst -config path mode_nc_file_list\n\n";
 
 exit ( 1 );
 
@@ -727,8 +741,6 @@ for (x=0; x<(image.nx()); ++x)  {
 
       my = y/plot_size;
 
-      // image.putxy(background_color, x, y);
-
       if ( plot_field == raw_field )  {
 
          if ( do_obs )  value = mode_in.obs_raw  (mx, my);
@@ -754,12 +766,11 @@ for (x=0; x<(image.nx()); ++x)  {
 
          value = (double) k;
 
-         if ( k == -1 )  color = unmatched_color;
-         else            color = ctable.nearest(value);
+              if ( k ==    -1 )  color = unmatched_color;
+         else if ( k == -9999 )  color = white;
+         else                    color = ctable.nearest(value);
 
       }
-
-      if ( color == white )  color = background_color;
 
       image.putxy(color, x, y);
 
@@ -1155,12 +1166,12 @@ title << cs_erase
       << raw_obj  << ' '
       << "Field";
 
-plot.choose_font(anno_bold_font, title_font_size);
+plot.bold(title_font_size);
 
 plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - title_font_size - 10.0, 0.5, 0.0, title);
 
 
-plot.choose_font(anno_roman_font, 20.0);
+plot.roman(20.0);
 
 plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, mode_in.short_filename());
 
@@ -1171,11 +1182,11 @@ plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, mode_in.
 
 y = anno_height + 20.0;
 
-plot.choose_font(anno_bold_font, 20.0);
+plot.bold(20.0);
 plot.set_color(black);
 plot.write_centered_text(1, 1, htab1, y, 0.0, 0.0, "Lead");
 
-plot.choose_font(anno_roman_font, 20.0);
+plot.roman(20.0);
 plot.set_color(anno_text_color);
 
 lead_seconds = (int) (mode_in.valid_time() - mode_in.init_time());
@@ -1190,11 +1201,11 @@ plot.write_centered_text(1, 1, htab2, y, 0.0, 0.0, ts);
 
 y += 30.0;
 
-plot.choose_font(anno_bold_font, 20.0);
+plot.bold(20.0);
 plot.set_color(black);
 plot.write_centered_text(1, 1, htab1, y, 0.0, 0.0, "Valid");
 
-plot.choose_font(anno_roman_font, 20.0);
+plot.roman(20.0);
 plot.set_color(anno_text_color);
 
 unix_to_mdyhms(mode_in.valid_time(), month, day, year, hour, minute, second);
