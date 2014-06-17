@@ -17,15 +17,13 @@
 #include "color_stack.h"
 #include "cgraph_font.h"
 
+#include "cairo.h"
+#include "cairo-svg.h"
 
 #include "ft2build.h"
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
 #include FT_ERRORS_H
-
-
-#include "cairo.h"
-#include "cairo-svg.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -126,6 +124,8 @@ class CgraphBase : public PSfile {
       CgFont * CurrentFont;   //  not allocated
 
       FontFamily Family;
+
+      double LastTextWidth;
 
 
    public:
