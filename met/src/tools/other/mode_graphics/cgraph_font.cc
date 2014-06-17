@@ -23,6 +23,8 @@ static const int alloc_inc = 30;
 
 static const int total_predef_fonts = 34;
 
+static const char cg_font_env [] = "CGRAPH_FONT_DIR";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,7 +116,19 @@ face = 0;
 // 
 // }
 
-gs_font_dir = CGRAPH_FONT_DIR ;
+const char * c = getenv (cg_font_env);
+
+if ( !c )  {
+
+   mlog << Error
+        << "\n\n  CgFont::init_from_scratch() -> unable to get environment variable \""
+        << cg_font_env << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+gs_font_dir = c;
 
 clear();
 

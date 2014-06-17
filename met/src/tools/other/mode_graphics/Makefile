@@ -25,8 +25,7 @@
 ########################################################################
 
 
-EXECUTABLES        = test_png         \
-                     plot_mode_field  \
+EXECUTABLES        = plot_mode_field  \
 
 
 
@@ -147,7 +146,7 @@ cgraphbase_fontfamily_to_string.o: cgraphbase_fontfamily_to_string.h cgraphbase_
 
 cgraph_font.o: cgraph_font.h cgraph_font.cc
 	@ echo
-	$(CXX) cgraph_font.cc -c $(CXX_FLAGS) -DCGRAPH_FONT_DIR=\"$(CGRAPH_FONT_DIR)\" -I$(MET_INC_DIR) -I$(CAIRO_INC_DIR) -I$(FREETYPE_INC_DIR)
+	$(CXX) cgraph_font.cc -c $(CXX_FLAGS) -I$(MET_INC_DIR) -I$(CAIRO_INC_DIR) -I$(FREETYPE_INC_DIR)
 
 
 cgraph_main.o: cgraph_main.h cgraph_main.cc cgraphbase_plottype_to_string.o color_stack.o cgraph_font.o
@@ -180,33 +179,6 @@ libvx_cgraph.a: $(CGRAPH_OBJECTS)
    ##
    ##  executables
    ##
-
-
-test_png: $(OBJECTS) $(LIBRARIES) test_png.cc
-	@ echo
-	$(CXX) test_png.cc -g -Wall -Wshadow -o test_png \
-        -I$(MET_INC_DIR) \
-        -I$(CAIRO_INC_DIR) \
-        -I$(FREETYPE_INC_DIR) \
-        -L$(MET_LIB_DIR) \
-        -L. \
-        -L$(CAIRO_LIB_DIR) \
-        -L$(FREETYPE_LIB_DIR) \
-        -lvx_cgraph \
-        -lvx_ps \
-        -lvx_afm \
-        -lvx_pxm \
-        -lvx_render \
-        -lvx_color \
-        -lvx_util \
-        -lvx_cal \
-        -lvx_log \
-        -lvx_math \
-        -lcairo \
-        -lfreetype \
-        -lm \
-        -lz \
-
 
 
 plot_mode_field: $(OBJECTS) $(LIBRARIES) plot_mode_field.cc
