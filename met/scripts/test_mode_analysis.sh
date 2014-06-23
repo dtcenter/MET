@@ -3,7 +3,7 @@
 echo
 echo "*** Running MODE-Analysis to compute column summaries for simple forecast objects ***"
 
-../bin/mode_analysis \
+mode_analysis \
    -lookin ${TEST_OUT_DIR}/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
    -summary \
    -column AREA -column LENGTH -column WIDTH -column CURVATURE -column INTENSITY_50 \
@@ -15,7 +15,7 @@ echo "*** Running MODE-Analysis to compute column summaries for simple forecast 
 echo
 echo "*** Running MODE-Analysis to compute column summaries for simple observation objects ***"
 
-../bin/mode_analysis \
+mode_analysis \
    -lookin ${TEST_OUT_DIR}/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
    -summary \
    -column AREA -column LENGTH -column WIDTH -column CURVATURE -column INTENSITY_50 \
@@ -27,7 +27,7 @@ echo "*** Running MODE-Analysis to compute column summaries for simple observati
 echo
 echo "*** Running MODE-Analysis to summarize by case ***"
 
-../bin/mode_analysis \
+mode_analysis \
    -lookin ${TEST_OUT_DIR}/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
    -lookin ${TEST_OUT_DIR}/mode/mode_240000L_20050808_000000V_240000A_obj.txt \
    -bycase -single -simple \

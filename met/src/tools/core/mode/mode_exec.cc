@@ -37,7 +37,7 @@ static const char * cts_str[n_cts] = {"RAW", "FILTER", "OBJECT"};
 
 static const char program_name [] = "mode";
 
-static const char * default_config_filename = "MET_BASE/data/config/MODEConfig_default";
+static const char * default_config_filename = "MET_BASE/config/MODEConfig_default";
 
 
 ///////////////////////////////////////////////////////////////////////

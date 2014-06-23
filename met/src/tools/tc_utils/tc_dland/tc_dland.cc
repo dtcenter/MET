@@ -60,7 +60,7 @@ static const LatLonData NWHemTenthData =
 
 // Default location of data file
 static const char *default_land_data_file =
-   "MET_BASE/data/tc_data/aland.dat";
+   "MET_BASE/tc_data/aland.dat";
 
 ////////////////////////////////////////////////////////////////////////
 //    

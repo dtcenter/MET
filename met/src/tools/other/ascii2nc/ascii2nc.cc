@@ -73,7 +73,7 @@ using namespace std;
 static const char *program_name = "ascii2nc";
 
 static const string DEFAULT_CONFIG_FILENAME =
-  "MET_BASE/data/config/Ascii2NcConfig_default";
+  "MET_BASE/config/Ascii2NcConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
 

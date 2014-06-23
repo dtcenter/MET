@@ -32,7 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char * default_config_filename = "MET_BASE/data/config/WWMCARegridConfig_default";
+static const char * default_config_filename = "MET_BASE/config/WWMCARegridConfig_default";
 
 
 ////////////////////////////////////////////////////////////////////////

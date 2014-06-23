@@ -60,7 +60,7 @@ static const char * program_name = "grid_stat";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/data/config/GridStatConfig_default";
+   "MET_BASE/config/GridStatConfig_default";
 
 // Default output directory
 static const char * default_out_dir = ".";

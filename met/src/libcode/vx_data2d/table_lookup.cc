@@ -41,7 +41,7 @@ TableFlatFile GribTable (0);
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char table_data_dir   [] = "MET_BASE/data/table_files"; //  relative to MET_BASE
+static const char table_data_dir   [] = "MET_BASE/table_files";      //  relative to MET_BASE
 
 static const char grib1_table_file [] = "nceptab_flat.txt";          //  relative to table_data_dir
 

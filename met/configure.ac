@@ -10,101 +10,235 @@ AM_INIT_AUTOMAKE([1.9 foreign])
 
 # Process netCDF library specified by user
 
-AC_MSG_CHECKING([whether a location for the NETCDF library was specified])
-AC_ARG_WITH([netcdf],
-              [AS_HELP_STRING([--with-netcdf=<directory>],
-                              [Specify location of NETCDF library. Configure will \
-                              expect to find subdirs include and lib.])],
-            [NETCDFDIR=$with_netcdf])
-AC_MSG_RESULT([$NETCDFDIR])
-AC_SUBST(NETCDFDIR, [$NETCDFDIR])
+AC_MSG_CHECKING([whether a location for the NETCDF include files was specified])
+AC_ARG_WITH([netcdf_inc],
+              [AS_HELP_STRING([--with-netcdf_inc=<directory>],
+                              [Specify location of NETCDF include files..])],
+            [NETCDFINCDIR=$with_netcdf_inc])
+AC_MSG_RESULT([$NETCDFINDIR])
+AC_SUBST(NETCDFINCDIR, [$NETCDFINCDIR])
 
-if test ! "x$NETCDFDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${NETCDFDIR}/lib"
-   CPPFLAGS="${CPPFLAGS} -I${NETCDFDIR}/include"
+if test ! "x$NETCDFINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${NETCDFINCDIR}"
+fi    
+
+AC_MSG_CHECKING([whether a location for the NETCDF library files was specified])
+AC_ARG_WITH([netcdf_lib],
+              [AS_HELP_STRING([--with-netcdf_lib=<directory>],
+                              [Specify location of NETCDF library files..])],
+            [NETCDFLIBDIR=$with_netcdf_lib])
+AC_MSG_RESULT([$NETCDFLIBDIR])
+AC_SUBST(NETCDFLIBDIR, [$NETCDFLIBDIR])
+
+if test ! "x$NETCDFLIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${NETCDFLIBDIR}"
 fi    
 
 # Process GRIB2C library specified by user
 
-AC_MSG_CHECKING([whether a location for the GRIB2C library was specified])
-AC_ARG_WITH([grib2c],
-              [AS_HELP_STRING([--with-grib2c=<directory>],
-                              [Specify location of GRIB2C library. Configure will \
-                              expect to find subdirs include and lib.])],
-            [GRIB2CDIR=$with_grib2c])
-AC_MSG_RESULT([$GRIB2CDIR])
-AC_SUBST(GRIB2CDIR, [$GRIB2CDIR])
+AC_MSG_CHECKING([whether a location for the GRIB2C include files was specified])
+AC_ARG_WITH([grib2c_inc],
+              [AS_HELP_STRING([--with-grib2c_inc=<directory>],
+                              [Specify location of GRIB2C include files.])],
+            [GRIB2CINCDIR=$with_grib2c_inc])
+AC_MSG_RESULT([$GRIB2CINCDIR])
+AC_SUBST(GRIB2CINCDIR, [$GRIB2CINCDIR])
 
-if test ! "x$GRIB2CDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${GRIB2CDIR}/lib"
-   CPPFLAGS="${CPPFLAGS} -I${GRIB2CDIR}/include"
+if test ! "x$GRIB2CINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${GRIB2CINCDIR}"
+fi    
+
+AC_MSG_CHECKING([whether a location for the GRIB2C library files was specified])
+AC_ARG_WITH([grib2c_lib],
+              [AS_HELP_STRING([--with-grib2c_lib=<directory>],
+                              [Specify location of GRIB2C library files.])],
+            [GRIB2CLIBDIR=$with_grib2c_lib])
+AC_MSG_RESULT([$GRIB2CLIBDIR])
+AC_SUBST(GRIB2CLIBDIR, [$GRIB2CLIBDIR])
+
+if test ! "x$GRIB2CLIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${GRIB2CLIBDIR}"
 fi    
 
 # Process GSL library specified by user
 
-AC_MSG_CHECKING([whether a location for the GSL library was specified])
-AC_ARG_WITH([gsl],
-              [AS_HELP_STRING([--with-gsl=<directory>],
-                              [Specify location of GSL library. Configure will \
-                              expect to find subdirs include and lib.])],
-            [GSLDIR=$with_gsl])
-AC_MSG_RESULT([$GSLDIR])
-AC_SUBST(GSLDIR, [$GSLDIR])
+AC_MSG_CHECKING([whether a location for the GSL include files was specified])
+AC_ARG_WITH([gsl_inc],
+              [AS_HELP_STRING([--with-gsl_inc=<directory>],
+                              [Specify location of GSL include files.])],
+            [GSLINCDIR=$with_gsl_inc])
+AC_MSG_RESULT([$GSLINCDIR])
+AC_SUBST(GSLINCDIR, [$GSLINCDIR])
 
-if test ! "x$GSLDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${GSLDIR}/lib"
-   CPPFLAGS="${CPPFLAGS} -I${GSLDIR}/include"
+if test ! "x$GSLINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${GSLINCDIR}"
+fi    
+
+AC_MSG_CHECKING([whether a location for the GSL library files was specified])
+AC_ARG_WITH([gsl_lib],
+              [AS_HELP_STRING([--with-gsl_lib=<directory>],
+                              [Specify location of GSL library files.])],
+            [GSLLIBDIR=$with_gsl_lib])
+AC_MSG_RESULT([$GSLLIBDIR])
+AC_SUBST(GSLLIBDIR, [$GSLLIBDIR])
+
+if test ! "x$GSLLIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${GSLLIBDIR}"
 fi    
 
 # Process BUFR library specified by user
 
-AC_MSG_CHECKING([whether a location for the BUFR library was specified])
-AC_ARG_WITH([bufr],
-              [AS_HELP_STRING([--with-bufr=<directory>],
-                              [Specify location of BUFR library. Configure will \
-                              expect to find lib and include in this dir.])],
-            [BUFRDIR=$with_bufr])
-AC_MSG_RESULT([$BUFRDIR])
-AC_SUBST(BUFRDIR, [$BUFRDIR])
+AC_MSG_CHECKING([whether a location for the BUFR include files was specified])
+AC_ARG_WITH([bufr_inc],
+              [AS_HELP_STRING([--with-bufr_inc=<directory>],
+                              [Specify location of BUFR include files.])],
+            [BUFRINCDIR=$with_bufr_inc])
+AC_MSG_RESULT([$BUFRINCDIR])
+AC_SUBST(BUFRINCDIR, [$BUFRINCDIR])
 
-if test ! "x$BUFRDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${BUFRDIR}"
-   CPPFLAGS="${CPPFLAGS} -I${BUFRDIR}"
+if test ! "x$BUFRINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${BUFRINCDIR}"
+fi    
+
+AC_MSG_CHECKING([whether a location for the BUFR library files was specified])
+AC_ARG_WITH([bufr_lib],
+              [AS_HELP_STRING([--with-bufr_lib=<directory>],
+                              [Specify location of BUFR library files.])],
+            [BUFRLIBDIR=$with_bufr_lib])
+AC_MSG_RESULT([$BUFRLIBDIR])
+AC_SUBST(BUFRLIBDIR, [$BUFRLIBDIR])
+
+if test ! "x$BUFRLIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${BUFRLIBDIR}"
 fi    
 
 # Process HDF library specified by user
 
-AC_MSG_CHECKING([whether a location for the HDF library was specified])
-AC_ARG_WITH([hdf],
-              [AS_HELP_STRING([--with-hdf=<directory>],
-                              [Specify location of HDF library. Configure will \
-                              expect to find subdirs include and lib.])],
-            [HDFDIR=$with_hdf])
-AC_MSG_RESULT([$HDFDIR])
-AC_SUBST(HDFDIR, [$HDFDIR])
+AC_MSG_CHECKING([whether a location for the HDF include files was specified])
+AC_ARG_WITH([hdf_inc],
+              [AS_HELP_STRING([--with-hdf_inc=<directory>],
+                              [Specify location of HDF include files.])],
+            [HDFINCDIR=$with_hdf_inc])
+AC_MSG_RESULT([$HDFINCDIR])
+AC_SUBST(HDFINCDIR, [$HDFINCDIR])
 
-if test ! "x$HDFDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${HDFDIR}/lib"
-   CPPFLAGS="${CPPFLAGS} -I${HDFDIR}/include"
+if test ! "x$HDFINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${HDFINCDIR}"
+fi    
+
+AC_MSG_CHECKING([whether a location for the HDF library files was specified])
+AC_ARG_WITH([hdf_lib],
+              [AS_HELP_STRING([--with-hdf_lib=<directory>],
+                              [Specify location of HDF library files.])],
+            [HDFLIBDIR=$with_hdf_lib])
+AC_MSG_RESULT([$HDFLIBDIR])
+AC_SUBST(HDFLIBDIR, [$HDFLIBDIR])
+
+if test ! "x$HDFLIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${HDFLIBDIR}"
 fi    
 
 # Process HDF EOS library specified by user
 
-AC_MSG_CHECKING([whether a location for the HDF EOS library was specified])
-AC_ARG_WITH([hdfeos],
-              [AS_HELP_STRING([--with-hdfeos=<directory>],
-                              [Specify location of HDF EOS library. Configure will \
-                              expect to find subdirs include and lib.])],
-            [HDFEOSDIR=$with_hdfeos])
-AC_MSG_RESULT([$HDFEOSDIR])
-AC_SUBST(HDFDIR, [$HDFEOSDIR])
+AC_MSG_CHECKING([whether a location for the HDF EOS include files was specified])
+AC_ARG_WITH([hdfeos_inc],
+              [AS_HELP_STRING([--with-hdfeos_inc=<directory>],
+                              [Specify location of HDF EOS include files.])],
+            [HDFEOSINCDIR=$with_hdfeos_inc])
+AC_MSG_RESULT([$HDFEOSINCDIR])
+AC_SUBST(HDFEOSINCDIR, [$HDFEOSINCDIR])
 
-if test ! "x$HDFEOSDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${HDFEOSDIR}/lib"
-   CPPFLAGS="${CPPFLAGS} -I${HDFEOSDIR}/include"
+if test ! "x$HDFEOSINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${HDFEOSINCDIR}"
 fi    
 
+AC_MSG_CHECKING([whether a location for the HDF EOS library files was specified])
+AC_ARG_WITH([hdfeos_lib],
+              [AS_HELP_STRING([--with-hdfeos_lib=<directory>],
+                              [Specify location of HDF EOS library files.])],
+            [HDFEOSLIBDIR=$with_hdfeos_lib])
+AC_MSG_RESULT([$HDFEOSLIBDIR])
+AC_SUBST(HDFEOSLIBDIR, [$HDFEOSLIBDIR])
+
+if test ! "x$HDFEOSLIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${HDFEOSLIBDIR}"
+fi    
+
+# Process CAIRO include and library directories specified by user
+
+AC_MSG_CHECKING([whether a location for the CAIRO include files was specified])
+AC_ARG_WITH([cairo_inc],
+              [AS_HELP_STRING([--with-cairo_inc=<directory>],
+                              [Specify location of CAIRO includes directory. This must be supplied if you are compiling mode_graphics.])],
+            [CAIROINCDIR=$with_cairo_inc])
+AC_MSG_RESULT([$CAIROINCDIR])
+AC_SUBST(CAIROINCDIR, [$CAIROINCDIR])
+
+if test ! "x$CAIROINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${CAIROINCDIR}"
+fi    
+
+AC_MSG_CHECKING([whether a location for the CAIRO library files was specified])
+AC_ARG_WITH([cairo_lib],
+              [AS_HELP_STRING([--with-cairo_lib=<directory>],
+                              [Specify location of CAIRO library directory. This must be supplied if you are compiling mode_graphics.])],
+            [CAIROLIBDIR=$with_cairo_lib])
+AC_MSG_RESULT([$CAIROLIBDIR])
+AC_SUBST(CAIROLIBDIR, [$CAIROLIBDIR])
+
+if test ! "x$CAIROLIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${CAIROLIBDIR}"
+fi    
+
+# Process FREETYPE include and library directories specified by user
+
+AC_MSG_CHECKING([whether a location for the FREETYPE include files was specified])
+AC_ARG_WITH([freetype_inc],
+              [AS_HELP_STRING([--with-freetype_inc=<directory>],
+                              [Specify location of FREETYPE includes directory. This must be supplied if you are compiling mode_graphics.])],
+            [FREETYPEINCDIR=$with_freetype_inc])
+AC_MSG_RESULT([$FREETYPEINCDIR])
+AC_SUBST(FREETYPEINCDIR, [$FREETYPEINCDIR])
+
+if test ! "x$FREETYPEINCDIR" = x; then
+   CPPFLAGS="${CPPFLAGS} -I${FREETYPEINCDIR}"
+fi    
+
+AC_MSG_CHECKING([whether a location for the FREETYPE library files was specified])
+AC_ARG_WITH([freetype_lib],
+              [AS_HELP_STRING([--with-freetype_lib=<directory>],
+                              [Specify location of FREETYPE library directory. This must be supplied if you are compiling mode_graphics.])],
+            [FREETYPELIBDIR=$with_freetype_lib])
+AC_MSG_RESULT([$FREETYPELIBDIR])
+AC_SUBST(FREETYPELIBDIR, [$FREETYPELIBDIR])
+
+if test ! "x$FREETYPELIBDIR" = x; then
+   LDFLAGS="${LDFLAGS} -L${FREETYPELIBDIR}"
+fi    
+
+#
 # Process any enable flags specified by the user
+#
+
+# BLOCK4
+
+AC_ARG_ENABLE(block4,
+	  [AS_HELP_STRING([--disable-block4], [Disable use of BLOCK4 in the compilation. Use this if you have trouble using PrepBufr files.])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_BLOCK4="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-block4) ;;
+   esac],
+  [ENABLE_BLOCK4="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_BLOCK4], [test "x$ENABLE_BLOCK4" = "xyes"])
+
+if test "x$ENABLE_BLOCK4" = "xyes"; then
+    CPPFLAGS="${CPPFLAGS} -DBLOCK4"
+    AC_MSG_NOTICE([-DBLOCK4 will be used in the compiles])
+else
+    AC_MSG_NOTICE([-DBLOCK4 will not be used in the compiles])
+fi
 
 # ascii2nc
 
@@ -446,6 +580,46 @@ else
     AC_MSG_NOTICE([modis will not be compiled])
 fi
 
+# mode_graphics
+
+AC_ARG_ENABLE(mode_graphics,
+	  [AS_HELP_STRING([--enable-mode_graphics], [Enable compilation of mode_graphics])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_MODE_GRAPHICS="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-mode_graphics) ;;
+   esac],
+  [ENABLE_MODE_GRAPHICS="no"]
+)
+
+AM_CONDITIONAL([ENABLE_MODE_GRAPHICS], [test "x$ENABLE_MODE_GRAPHICS" = "xyes"])
+
+if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+    AC_DEFINE([ENABLE_MODE_GRAPHICS], [], ["build mode_graphics"])
+    AC_MSG_NOTICE([mode_graphics will be compiled])
+else
+    AC_MSG_NOTICE([mode_graphics will not be compiled])
+fi
+
+# gen_circle_mask
+
+AC_ARG_ENABLE(gen_circle_mask,
+	  [AS_HELP_STRING([--disable-gen_circle_mask], [Disable compilation of gen_circle_mask])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_GEN_CIRCLE_MASK="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gen_circle_mask) ;;
+   esac],
+  [ENABLE_GEN_CIRCLE_MASK="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_GEN_CIRCLE_MASK], [test "x$ENABLE_GEN_CIRCLE_MASK" = "xyes"])
+
+if test "x$ENABLE_GEN_CIRCLE_MASK" = "xyes"; then
+    AC_DEFINE([ENABLE_GEN_CIRCLE_MASK], [], ["build gen_circle_mask"])
+    AC_MSG_NOTICE([gen_circle_mask will be compiled])
+else
+    AC_MSG_NOTICE([gen_circle_mask will not be compiled])
+fi
+
 # tc_utils
 
 AC_ARG_ENABLE(tc_utils,
@@ -485,6 +659,10 @@ if test "x$ENABLE_GRIB2" = "xyes"; then
 else
     AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
 fi
+
+# Temporarily define GS_FRONT_DIR here.  Not sure how we should do this operationally.
+
+AC_SUBST([GS_FONT_DIR], [/usr/share/groff/1.21.font])
 
 # Add MET_BASE to the CPPFLAGS
 
@@ -593,8 +771,10 @@ AC_CONFIG_FILES([Makefile
                  src/tools/dev_utils/Makefile
                  src/tools/other/Makefile
                  src/tools/other/ascii2nc/Makefile
+                 src/tools/other/gen_circle_mask/Makefile
                  src/tools/other/gen_poly_mask/Makefile
                  src/tools/other/madis2nc/Makefile
+                 src/tools/other/mode_graphics/Makefile
                  src/tools/other/modis_regrid/Makefile
                  src/tools/other/pb2nc/Makefile 
                  src/tools/other/plot_data_plane/Makefile

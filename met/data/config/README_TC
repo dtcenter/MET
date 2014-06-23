@@ -162,7 +162,7 @@ init_hour = [];
 // Tracks whose initial location falls within init_mask will be used.
 // Tracks for which all locations fall within valid_mask will be used.
 //
-// e.g. init_mask  = "MET_BASE/data/poly/EAST.poly";
+// e.g. init_mask  = "MET_BASE/poly/EAST.poly";
 //
 init_mask  = "";
 valid_mask = "";
@@ -264,7 +264,7 @@ match_points = FALSE;
 // Specify the NetCDF output of the gen_dland tool containing a gridded
 // representation of the minimum distance to land.
 //
-dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
+dland_file = "MET_BASE/tc_data/dland_nw_hem_tenth_degree.nc";
 
 //
 // Specify watch/warning information.  Specify an ASCII file containing
@@ -275,7 +275,7 @@ dland_file = "MET_BASE/data/tc_data/dland_nw_hem_tenth_degree.nc";
 // occurring 4 hours (-14400 second) prior to the watch/warning time.
 //
 watch_warn = {
-   file_name   = "MET_BASE/data/tc_data/wwpts_us.txt";
+   file_name   = "MET_BASE/tc_data/wwpts_us.txt";
    time_offset = -14400;
 };
 

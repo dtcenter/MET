@@ -318,7 +318,7 @@ obs_window = {
 //       - An ASCII file containing a lat/lon polygon.
 //         Latitude in degrees north and longitude in degrees east.
 //         By default, the first and last polygon points are connected.
-//         e.g. "MET_BASE/data/poly/EAST.poly" which consists of n points:
+//         e.g. "MET_BASE/poly/EAST.poly" which consists of n points:
 //              "poly_name lat1 lon1 lat2 lon2... latn lonn"
 //
 //       - The NetCDF output of the gen_poly_mask tool.
@@ -335,9 +335,9 @@ obs_window = {
 //
 mask = {
    grid = [ "FULL" ];
-   poly = [ "MET_BASE/data/poly/LMV.poly",
+   poly = [ "MET_BASE/poly/LMV.poly",
             "MET_BASE/out/gen_poly_mask/CONUS_poly.nc",
-            "MET_BASE/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+            "MET_BASE/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
             {name = \"TMP\"; level = \"Z2\";} >273"
           ];
    sid  = [ "CONUS.stations" ];
@@ -543,7 +543,7 @@ obs_quality = [ "1", "2", "3", "9" ];
 // The "met_data_dir" entry specifies the location of the internal MET data
 // sub-directory which contains data files used when generating plots.
 //
-met_data_dir = "MET_BASE/data";
+met_data_dir = "MET_BASE";
 
 //
 // The "fcst_raw_plot" entry is a dictionary used by Wavelet-Stat and MODE
@@ -559,7 +559,7 @@ met_data_dir = "MET_BASE/data";
 //      their values.
 //
 fcst_raw_plot = {
-   color_table = "MET_BASE/data/colortables/met_default.ctable";
+   color_table = "MET_BASE/colortables/met_default.ctable";
    plot_min = 0.0;
    plot_max = 0.0;
 };

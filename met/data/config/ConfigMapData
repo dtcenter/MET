@@ -12,13 +12,13 @@ map_data = {
 
    source = [
       {
-        file_name = "MET_BASE/data/map/legacy/world_data_minus_usa";
+        file_name = "MET_BASE/map/legacy/world_data_minus_usa";
       },
       {
-        file_name = "MET_BASE/data/map/legacy/country_data_minus_usa";
+        file_name = "MET_BASE/map/legacy/country_data_minus_usa";
       },
       {
-        file_name = "MET_BASE/data/map/legacy/usa_state_data";
+        file_name = "MET_BASE/map/legacy/usa_state_data";
       }
 
    ];

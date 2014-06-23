@@ -62,7 +62,7 @@ static const char * program_name = "wavelet_stat";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/data/config/WaveletStatConfig_default";
+   "MET_BASE/config/WaveletStatConfig_default";
 
 static const char * default_out_dir = ".";
 

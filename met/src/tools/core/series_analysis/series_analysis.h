@@ -58,7 +58,7 @@ static const char * program_name = "series_analysis";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/data/config/SeriesAnalysisConfig_default";
+   "MET_BASE/config/SeriesAnalysisConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -146,7 +146,7 @@ static int      obs_lead_end   = bad_data_int;
 // Mapping of statistic names to descriptions
 map<ConcatString, ConcatString> stat_long_name;
 static const char stat_long_name_file[] =
-   "MET_BASE/data/table_files/stat_column_description.txt";
+   "MET_BASE/table_files/stat_column_description.txt";
 
 ////////////////////////////////////////////////////////////////////////
 

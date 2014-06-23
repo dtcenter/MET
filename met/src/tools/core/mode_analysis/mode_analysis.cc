@@ -52,7 +52,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char * default_config_filename = "MET_BASE/data/config/MODEAnalysisConfig_default";
+static const char * default_config_filename = "MET_BASE/config/MODEAnalysisConfig_default";
 
 static ConcatString config_filename;
 

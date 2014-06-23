@@ -46,7 +46,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
 
 wwmca_plot_SOURCES = wwmca_plot.cc \
 	afwa_file.cc \
@@ -65,9 +65,9 @@ wwmca_plot_LDFLAGS = -L${libdir}
 wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
-	-lvx_render \
 	-lvx_ps \
 	-lvx_afm \
+	-lvx_render \
 	-lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
@@ -87,7 +87,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
 
 # Create generated files
 gridhemisphere_to_string.h gridhemisphere_to_string.cc: wwmca_ref.h

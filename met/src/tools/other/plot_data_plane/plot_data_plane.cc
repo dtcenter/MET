@@ -108,7 +108,7 @@ int main(int argc, char * argv[])
       //
       // set the default color table
       //
-   ColorTableName << MET_BASE << "/data/colortables/met_default.ctable";
+   ColorTableName << MET_BASE << "/colortables/met_default.ctable";
 
       //
       // process the command line arguments
@@ -303,7 +303,7 @@ void usage()
 
         << "\t\t\"-color_table color_table_name\" overrides the "
         << "default color table "
-        << "(\"$(MET_BASE_DIR)/data/colortables/met_default.ctable\") "
+        << "(\"$(MET_BASE_DIR)/colortables/met_default.ctable\") "
         << "(optional).\n"
 
         << "\t\t\"-plot_range min max\" defines the range of the "
