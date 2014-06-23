@@ -16,10 +16,10 @@ using namespace std;
 
 #include <iostream>
 
-#include "color_parser.h"   //  this must be included before color.tab.h
+#include "color_parser.h"   //  this must be included before color_parser_yacc.h
 #include "color.h"
 
-#include "color.tab.h"
+#include "color_parser_yacc.h"
 
 
 ////////////////////////////////////////////////////////////////////////
