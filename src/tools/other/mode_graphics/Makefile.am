@@ -7,11 +7,11 @@ MAINTAINERCLEANFILES	= Makefile.in
 # The vx_cgraph library
 
 lib_LIBRARIES = libvx_cgraph.a
-libvx_cgraph_a_SOURCES = color_stack.cc \
+libvx_cgraph_a_SOURCES = cgraphbase_plottype_to_string.cc \
+	cgraphbase_fontfamily_to_string.cc \
+	color_stack.cc \
 	cgraph_font.cc \
-	cgraph_main.cc \
-	cgraphbase_plottype_to_string.cc \
-	cgraphbase_fontfamily_to_string.cc
+	cgraph_main.cc
 libvx_cgraph_a_CPPFLAGS = -I${includedir}
 
 # The plot_mode_field tool
