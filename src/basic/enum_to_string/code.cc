@@ -18,7 +18,7 @@ static const bool do_name_len_decl              = true;
 
 static const bool echo_pound_define_after_endif = true;
 
-static const char copyright_filename         [] = "src/tools/dev_utils/copyright_notice.txt";   //  relative to MET_BASE_DIR
+static const char copyright_filename         [] = "copyright_notice.txt";   //  relative to MET_BASE_DIR
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1238,7 +1238,7 @@ ifstream in;
 char c;
 char path[1024];
 
-snprintf(path, sizeof(path), "%s/%s", MET_BASE_DIR, copyright_filename);
+snprintf(path, sizeof(path), "%s/%s", MET_BASE, copyright_filename);
 
 in.open(path);
 

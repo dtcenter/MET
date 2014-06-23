@@ -2,7 +2,7 @@
 
 echo
 echo "*** Running STAT-Analysis ***"
-../bin/stat_analysis \
+stat_analysis \
    -config config/STATAnalysisConfig \
    -lookin ${TEST_OUT_DIR}/grid_stat \
    -lookin ${TEST_OUT_DIR}/wavelet_stat \

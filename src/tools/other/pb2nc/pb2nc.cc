@@ -86,7 +86,7 @@ using namespace std;
 // Constants
 //
 
-static const char * default_config_filename = "MET_BASE/data/config/PB2NCConfig_default";
+static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_default";
 
 static const char *program_name = "pb2nc";
 

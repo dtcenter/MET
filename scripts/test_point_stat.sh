@@ -2,7 +2,7 @@
 
 echo
 echo "*** Running Point-Stat on sample NAM data ***"
-../bin/point_stat \
+point_stat \
    ../data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
    ${TEST_OUT_DIR}/pb2nc/sample_pb.nc \
    config/PointStatConfig \

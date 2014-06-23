@@ -58,7 +58,7 @@ static const char * atcf_suffix = ".dat";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/data/config/TCPairsConfig_default";
+   "MET_BASE/config/TCPairsConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
 //

@@ -262,8 +262,8 @@ enum MatchType {
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char config_const_filename[]    = "MET_BASE/data/config/ConfigConstants";
-static const char config_map_data_filename[] = "MET_BASE/data/config/ConfigMapData";
+static const char config_const_filename[]    = "MET_BASE/config/ConfigConstants";
+static const char config_map_data_filename[] = "MET_BASE/config/ConfigMapData";
 
 //
 // Parameter key names common to multiple tools

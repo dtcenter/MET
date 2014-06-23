@@ -16,8 +16,9 @@ libvx_render_a_SOURCES = ascii85_filter.cc \
               render_ppm.cc \
               renderinfo.cc \
               rle_filter.cc \
+              flate_filter.cc \
               uc_queue.cc
-libvx_render_a_CPPFLAGS = -I${includedir}
+libvx_render_a_CPPFLAGS = -I${includedir} -I../vx_ps
 
 include_HEADERS = ascii85_filter.h \
               bit_filter.h \
@@ -27,4 +28,5 @@ include_HEADERS = ascii85_filter.h \
               vx_render.h \
               renderinfo.h \
               rle_filter.h \
+              flate_filter.h \
               uc_queue.h

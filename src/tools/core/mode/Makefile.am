@@ -41,4 +41,4 @@ mode_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas -lz

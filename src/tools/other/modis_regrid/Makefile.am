@@ -42,7 +42,6 @@ modis_regrid_LDADD = -lvx_pxm \
 	-lhdfeos \
 	-lmfhdf \
 	-ldf \
-	-lsz \
 	-lGctp \
 	-ljpeg \
 	-lz \

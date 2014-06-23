@@ -16,15 +16,6 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-#SUBDIRS	= gen_poly_mask \
-#	plot_data_plane \
-#	plot_point_obs \
-#	ascii2nc \
-#	madis2nc \
-#	pb2nc \
-#	wwmca_tool \
-#	modis_regrid
-
 SUBDIRS	= 
 
 if ENABLE_GEN_POLY_MASK
@@ -57,6 +48,14 @@ endif
 
 if ENABLE_MODIS
   SUBDIRS += modis_regrid
+endif
+
+if ENABLE_MODE_GRAPHICS
+  SUBDIRS += mode_graphics
+endif
+
+if ENABLE_GEN_CIRCLE_MASK
+  SUBDIRS += gen_circle_mask
 endif
 
 MAINTAINERCLEANFILES 	= Makefile.in

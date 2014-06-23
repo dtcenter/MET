@@ -16,11 +16,11 @@ plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_plot_util \
-	-lvx_render \
 	-lvx_pxm \
 	-lvx_color \
 	-lvx_ps \
 	-lvx_afm \
+	-lvx_render \
 	-lvx_pb_util \
 	-lvx_nav \
 	-lvx_gnomon \
@@ -31,4 +31,4 @@ plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas

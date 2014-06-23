@@ -55,7 +55,7 @@ static const char * program_name = "tc_stat";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/data/config/TCStatConfig_default";
+   "MET_BASE/config/TCStatConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
 //

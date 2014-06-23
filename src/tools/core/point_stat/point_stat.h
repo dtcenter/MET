@@ -60,7 +60,7 @@ static const char * program_name = "point_stat";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/data/config/PointStatConfig_default";
+   "MET_BASE/config/PointStatConfig_default";
 
 // Observation header length
 static const int hdr_arr_len = 3;

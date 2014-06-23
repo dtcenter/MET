@@ -5,14 +5,22 @@
 MAINTAINERCLEANFILES	= Makefile.in
 
 lib_LIBRARIES = libvx_math.a
-libvx_math_a_SOURCES = angles.cc \
+#libvx_math_a_SOURCES = angles.cc \
+#               hist.cc \
+#               nint.cc \
+#               nti.cc \
+#               ptile.cc \
+#               pwl.cc \
+#               affine.cc
+#nodist_libvx_math_a_SOURCES = viewgravity_to_string.cc
+libvx_math_a_SOURCES = viewgravity_to_string.cc \
+               angles.cc \
                hist.cc \
                nint.cc \
                nti.cc \
                ptile.cc \
                pwl.cc \
                affine.cc
-nodist_libvx_math_a_SOURCES = viewgravity_to_string.cc
 libvx_math_a_CPPFLAGS = -I${includedir}
 
 include_HEADERS = math_constants.h \
