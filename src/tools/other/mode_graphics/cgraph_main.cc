@@ -1027,8 +1027,8 @@ else                y_page = y_pin + (B + v*(T - B));
    //  adjust the character coordinates
    //
 
-// delta_x = x_page - L;
-delta_x = x_page;
+delta_x = x_page - L;
+// delta_x = x_page;
 delta_y = y_page;
 
 info = wct_info;
