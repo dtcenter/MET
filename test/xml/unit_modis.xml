@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test
 [
-  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
+  <!ENTITY MET_BASE       "${MET_BASE}">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">

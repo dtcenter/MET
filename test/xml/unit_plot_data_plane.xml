@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
+  <!ENTITY MET_BASE       "${MET_BASE}">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -164,7 +165,7 @@
       &OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps \
       'name = "PROB"; level = "A12"; prob = { name = "APCP"; thresh_lo = 2.54; };' \
       -title "GRIB2 Probability of 12-hour APCP > 2.54mm)" \
-      -color_table &MET_DIR;/data/colortables/NCL_colortables/WhBlGrYeRe.ctable \
+      -color_table &MET_BASE;/data/colortables/NCL_colortables/WhBlGrYeRe.ctable \
       -plot_range 0 100 \
       -v 1
     </param>

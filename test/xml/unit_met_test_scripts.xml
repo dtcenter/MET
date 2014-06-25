@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
+  <!ENTITY MET_BASE       "${MET_BASE}">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}/met_test_scripts">
@@ -27,7 +28,7 @@
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
-      &MET_DIR;/data/poly/CONUS.poly \
+      &MET_BASE;/data/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_poly_mask/CONUS_poly.nc \
       -v 2
     </param>
