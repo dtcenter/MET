@@ -30,6 +30,11 @@ documentorientation_to_string.h \
 documentorientation_to_string.cc : vx_ps.h
 	${bindir}/enum_to_string -concat_string vx_ps.h
 
+# Extra files to be included in the distribution
+
+EXTRA_DIST = fontfamily_to_string.h \
+	documentorientation_to_string.h \
+	documentmedia_to_string.h
 # Test programs
 
 noinst_PROGRAMS = test_ps

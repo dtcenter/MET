@@ -27,4 +27,6 @@ SUBDIRS = \
 
 pkgdata_DATA = copyright_notice.txt
 
+EXTRA_DIST = copyright_notice.txt
+
 MAINTAINERCLEANFILES 	= Makefile.in 

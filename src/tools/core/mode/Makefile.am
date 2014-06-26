@@ -42,3 +42,7 @@ mode_LDADD = -lvx_pxm \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas -lz
+
+EXTRA_DIST = mode_exec.h \
+	mode_ps_file.h \
+	mode_ps_table_defs.h

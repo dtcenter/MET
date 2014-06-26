@@ -26,3 +26,8 @@ tc_stat_LDADD = -lvx_config \
 	-lvx_log \
 	-lm \
 	-lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+
+EXTRA_DIST = tc_stat_conf_info.h \
+	tc_stat_files.h \
+	tc_stat.h \
+	tc_stat_job.h

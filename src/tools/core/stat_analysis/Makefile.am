@@ -31,3 +31,8 @@ stat_analysis_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+
+EXTRA_DIST = stat_analysis.h \
+	parse_stat_line.h \
+	aggr_stat_line.h \
+	stat_analysis_job.h

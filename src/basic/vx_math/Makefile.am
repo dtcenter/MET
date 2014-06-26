@@ -5,14 +5,6 @@
 MAINTAINERCLEANFILES	= Makefile.in
 
 lib_LIBRARIES = libvx_math.a
-#libvx_math_a_SOURCES = angles.cc \
-#               hist.cc \
-#               nint.cc \
-#               nti.cc \
-#               ptile.cc \
-#               pwl.cc \
-#               affine.cc
-#nodist_libvx_math_a_SOURCES = viewgravity_to_string.cc
 libvx_math_a_SOURCES = viewgravity_to_string.cc \
                angles.cc \
                hist.cc \
@@ -39,6 +31,9 @@ include_HEADERS = math_constants.h \
 # Build rule for viewgravity_to_string.cc
 affine.cc viewgravity_to_string.cc viewgravity_to_string.h: affine.h
 	${bindir}/enum_to_string -concat_string affine.h
+
+# Extra files to be included in the distribution
+EXTRA_DIST = viewgravity_to_string.h
 
 # Clean up extra local files
 clean-local:

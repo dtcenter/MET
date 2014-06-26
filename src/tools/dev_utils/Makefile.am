@@ -73,3 +73,5 @@ insitu_nc_to_ascii_LDFLAGS = -L${libdir}
 insitu_nc_to_ascii_LDADD = -lvx_util \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf
+
+EXTRA_DIST = insitu_nc_file.h

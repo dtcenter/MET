@@ -32,3 +32,20 @@ ascii2nc_LDADD = -lvx_config \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf
+
+EXTRA_DIST = ascii2nc_conf_info.h \
+	file_handler.h \
+	little_r_handler.h \
+	met_handler.h \
+	observation.h \
+	summary_calc.h \
+	summary_calc_max.h \
+	summary_calc_mean.h \
+	summary_calc_median.h \
+	summary_calc_min.h \
+	summary_calc_percentile.h \
+	summary_calc_range.h \
+	summary_calc_stdev.h \
+	summary_key.h \
+	surfrad_handler.h \
+	time_summary_interval.h

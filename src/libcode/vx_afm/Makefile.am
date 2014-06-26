@@ -20,3 +20,6 @@ include_HEADERS = afm.h \
               afm_token.h \
               afm_token_types.h \
               afmtokentype_to_string.h
+
+EXTRA_DIST = afmkeyword_to_string.h \
+	afmtokentype_to_string.h

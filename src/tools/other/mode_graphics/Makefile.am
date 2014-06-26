@@ -49,6 +49,10 @@ cgraphbase_plottype_to_string.h cgraphbase_plottype_to_string.cc \
 cgraphbase_fontfamily_to_string.h cgraphbase_fontfamily_to_string.cc: cgraph_main.h
 	${bindir}/enum_to_string -prefix -concat_string cgraph_main.h
 
+# Other files to be incoluded in the distribution
+EXTRA_DIST = cgraphbase_fontfamily_to_string.h \
+	cgraphbase_plottype_to_string.h
+
 # Clean up extra local files
 clean-local:
 	-rm -f cgraphbase_plottype_to_string.h
