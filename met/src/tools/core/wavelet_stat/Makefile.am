@@ -35,3 +35,7 @@ wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_color \
 	-lvx_log \
 	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+
+EXTRA_DIST = wavelet_stat.h \
+	wavelet_stat_conf_info.h
+

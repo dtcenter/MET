@@ -17,6 +17,8 @@ include_HEADERS = nccf_file.h \
               data2d_nccf.h \
               vx_data2d_nccf.h
 
+EXTRA_DIST = get_nccf_grid.h
+
 # Test programs
 
 noinst_PROGRAMS = test_read_nccf

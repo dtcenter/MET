@@ -16,3 +16,5 @@ madis2nc_LDADD = -lvx_nc_util \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+
+EXTRA_DIST = madis2nc.h

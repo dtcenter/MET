@@ -38,6 +38,11 @@ configobjecttype_to_string.h configobjecttype_to_string.cc: object_types.h
 grdfiletype_to_string.h grdfiletype_to_string.cc: data_file_type.h
 	${bindir}/enum_to_string -concat_string -reverse data_file_type.h
 
+# Extra files to be included in the distribution
+
+EXTRA_DIST = grdfiletype_to_string.h \
+	configobjecttype_to_string.h
+
 # Test programs
 
 noinst_PROGRAMS = test_config \

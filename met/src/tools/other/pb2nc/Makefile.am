@@ -32,3 +32,6 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas -lbufr \
 	$(FLIBS)
+
+EXTRA_DIST = readpb.prm \
+	pb2nc_conf_info.h

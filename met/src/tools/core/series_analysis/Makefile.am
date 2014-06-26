@@ -29,3 +29,6 @@ series_analysis_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+
+EXTRA_DIST = series_analysis.h \
+	series_analysis_conf_info.h

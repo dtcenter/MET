@@ -83,6 +83,11 @@ include_HEADERS = util_constants.h \
 asciitablejust_to_string.h asciitablejust_to_string.cc: ascii_table.h
 	${bindir}/enum_to_string -concat_string ascii_table.h
 
+# Extra files to be included in the distribution
+
+EXTRA_DIST = bool_to_string.h \
+	asciitablejust_to_string.h
+
 # Test programs
 
 noinst_PROGRAMS = test_command_line \
