@@ -22,8 +22,13 @@ SUBDIRS	= vx_grid \
 	vx_data2d_grib \
 	vx_data2d_nc_met \
 	vx_data2d_nccf \
-	vx_data2d_nc_pinterp \
-	vx_data2d_factory \
+	vx_data2d_nc_pinterp
+
+if ENABLE_GRIB2
+  SUBDIRS += vx_data2d_grib2
+endif
+
+SUBDIRS += vx_data2d_factory \
 	vx_gsl_prob \
 	vx_gnomon \
 	vx_geodesy \
@@ -40,9 +45,5 @@ SUBDIRS	= vx_grid \
 	vx_stat_out \
 	vx_analysis_util \
 	vx_tc_util
-
-if ENABLE_GRIB2
-  SUBDIRS += vx_data2d_grib2
-endif
 
 MAINTAINERCLEANFILES 	= Makefile.in

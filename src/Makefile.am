@@ -16,10 +16,6 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-ARCH_FLAGS = $(ARCH_FLAGS) -DWITH_GRIB2
-G2SUP_LIBS = -lgrib2c -ljasper -lpng -lz
-GRIB2_LIBS = -lvx_data2d_grib2 $(G2SUP_LIBS)
-
 F2C_LIBNAME =
 
 CXX_FLAGS = $(CXX_FLAGS) $(ARCH_FLAGS)

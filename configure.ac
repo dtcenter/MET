@@ -657,13 +657,12 @@ if test "x$ENABLE_GRIB2" = "xyes"; then
     AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
     AC_MSG_NOTICE([GRIB2 utilites will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
+    GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
 else
     AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
+    GRIB2_LIBS=
 fi
-
-# Temporarily define GS_FRONT_DIR here.  Not sure how we should do this operationally.
-
-AC_SUBST([GS_FONT_DIR], [/usr/share/groff/1.21.font])
+AC_SUBST([GRIB2_LIBS])
 
 # Add MET_BASE to the CPPFLAGS
 
