@@ -2,7 +2,7 @@
 //
 // Wavelet-Stat configuration file.
 //
-// For additional information, see the MET_BASE/data/config/README file.
+// For additional information, see the MET_BASE/config/README file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -89,22 +89,22 @@ ps_plot_flag  = TRUE;
 //
 // Plotting information
 //
-met_data_dir = "MET_BASE/data";
+met_data_dir = "MET_BASE";
 
 fcst_raw_plot = {
-   color_table = "MET_BASE/data/colortables/met_default.ctable";
+   color_table = "MET_BASE/colortables/met_default.ctable";
    plot_min = 0.0;
    plot_max = 0.0;
 };
 
 obs_raw_plot = {
-   color_table = "MET_BASE/data/colortables/met_default.ctable";
+   color_table = "MET_BASE/colortables/met_default.ctable";
    plot_min = 0.0;
    plot_max = 0.0;
 };
 
 wvlt_plot = {
-   color_table = "MET_BASE/data/colortables/NCL_colortables/BlWhRe.ctable";
+   color_table = "MET_BASE/colortables/NCL_colortables/BlWhRe.ctable";
    plot_min = -1.0;
    plot_max =  1.0;
 };

@@ -33,7 +33,7 @@ obs = {
 
 mask = {
    grid = [ "DTC165", "DTC166" ];
-   poly = [ "MET_BASE/data/poly/LMV.poly" ];
+   poly = [ "MET_BASE/poly/LMV.poly" ];
    sid  = [ ];
 };
 

@@ -2,7 +2,7 @@
 //
 // Grid-Stat configuration file.
 //
-// For additional information, see the MET_BASE/data/config/README file.
+// For additional information, see the MET_BASE/config/README file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +47,7 @@ obs = {
 //
 mask = {
    grid = [ ];
-   poly = [ "MET_BASE/data/poly/LMV.poly" ];
+   poly = [ "MET_BASE/poly/LMV.poly" ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////

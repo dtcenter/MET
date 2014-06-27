@@ -105,7 +105,7 @@ dland_file = "${MET_TEST_OUTPUT}/tc_dland/tc_dland_half_deg.nc";
 //   - Watch/warning time offset in seconds
 //
 watch_warn = {
-   file_name   = "MET_BASE/data/tc_data/wwpts_us.txt";
+   file_name   = "MET_BASE/tc_data/wwpts_us.txt";
    time_offset = -14400;
 };
 

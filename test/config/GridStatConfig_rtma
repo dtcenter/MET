@@ -2,7 +2,7 @@
 //
 // Grid-Stat configuration file.
 //
-// For additional information, see the MET_BASE/data/config/README file.
+// For additional information, see the MET_BASE/config/README file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +38,7 @@ obs = fcst;
 mask = {
    grid = [ "DTC165", "DTC166" ];
    poly = [ ];  // [ "${TEST_OUT_DIR}/gen_poly_mask/CONUS_poly.nc",
-                //   "MET_BASE/data/poly/LMV.poly" ];
+                //   "MET_BASE/poly/LMV.poly" ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
