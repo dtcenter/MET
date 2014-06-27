@@ -656,6 +656,7 @@ AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes"])
 if test "x$ENABLE_GRIB2" = "xyes"; then
     AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
     AC_MSG_NOTICE([GRIB2 utilites will be compiled])
+    CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
 else
     AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
 fi
