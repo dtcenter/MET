@@ -28,7 +28,7 @@
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
-      &MET_BASE;/data/poly/CONUS.poly \
+      &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_poly_mask/CONUS_poly.nc \
       -v 2
     </param>

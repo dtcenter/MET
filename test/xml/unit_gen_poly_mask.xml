@@ -29,7 +29,7 @@
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
-      &MET_BASE;/data/poly/CONUS.poly \
+      &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_poly_mask/GFS_LATLON_CONUS_mask.nc \
       -v 1
     </param>
@@ -46,7 +46,7 @@
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_g008.grib \
-      &MET_BASE;/data/poly/CONUS.poly \
+      &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_poly_mask/GFS_MERCATOR_CONUS_mask.nc \
       -v 1
     </param>
@@ -63,7 +63,7 @@
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
-      &MET_BASE;/data/poly/CONUS.poly \
+      &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_poly_mask/NAM_LAMBERT_CONUS_mask.nc \
       -v 1
     </param>
@@ -80,7 +80,7 @@
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
-      &MET_BASE;/data/poly/NWC.poly \
+      &MET_BASE;/poly/NWC.poly \
       &OUTPUT_DIR;/gen_poly_mask/HMT_STEREO_NWC_mask.nc \
       -v 1
     </param>

@@ -24,7 +24,7 @@
     <exec>&MET_DIR;/bin/gen_poly_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 \
-      &MET_BASE;/data/poly/CONUS.poly \
+      &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/ref_config/gen_poly_mask/CONUS.nc \
       -v 2
     </param>

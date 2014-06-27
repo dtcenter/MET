@@ -118,7 +118,7 @@
       <pair><name>FCST_FIELD</name>      <value>{ name = "TMP"; level = [ "P1000", "P925", "P850", "P700", "P500", "P400", "P300", "P250", "P200", "P150", "P100" ]; }</value></pair>
       <pair><name>OBS_CAT_THRESH</name>  <value></value></pair>
       <pair><name>OBS_FIELD</name>       <value>{ name = "TMP"; level = [ "P1000", "P925", "P850", "P700", "P500", "P400", "P300", "P250", "P200", "P150", "P100" ]; }</value></pair>
-      <pair><name>MASK_POLY</name>       <value>MET_BASE/data/poly/WEST.poly</value></pair>
+      <pair><name>MASK_POLY</name>       <value>MET_BASE/poly/WEST.poly</value></pair>
       <pair><name>FHO_STATS</name>       <value></value></pair>
       <pair><name>CTC_STATS</name>       <value></value></pair>
       <pair><name>CTS_STATS</name>       <value></value></pair>
