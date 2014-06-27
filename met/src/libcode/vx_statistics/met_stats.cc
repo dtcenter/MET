@@ -1408,19 +1408,36 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
       //
       // Aggregate FBS as a weighted average
       //
-      n_info.fbs.v = (cnt_info.n*fbs.v + c.cnt_info.n*c.fbs.v) /
-                      n_info.cnt_info.n;
+      if(is_bad_data(cnt_info.n*fbs.v) ||
+         is_bad_data(c.cnt_info.n*c.fbs.v)) {
+         n_info.fbs.v = bad_data_double;
+      }
+      else {
+         n_info.fbs.v = (cnt_info.n*fbs.v + c.cnt_info.n*c.fbs.v) /
+                         n_info.cnt_info.n;
+      }
 
       //
       // Aggregate the denominator for FSS as a weighted average and then
       // recompute FSS using the aggregated FBS and denominator
       //
-      den = (  cnt_info.n *  fbs.v / (1.0 - fss.v  ) +
-             c.cnt_info.n *c.fbs.v / (1.0 - c.fss.v)) /
-             n_info.cnt_info.n;
+      if(is_bad_data(fbs.v) || is_bad_data(c.fbs.v) ||
+         is_bad_data(fss.v) || is_bad_data(c.fss.v) ||
+         is_eq(fss.v, 1.0)  || is_eq(c.fss.v, 1.0)) {
+         den = bad_data_double;
+      }
+      else {
+         den = (  cnt_info.n *  fbs.v / (1.0 - fss.v  ) +
+                c.cnt_info.n *c.fbs.v / (1.0 - c.fss.v)) /
+                n_info.cnt_info.n;
+      }
 
-      if(is_eq(den, 0.0)) n_info.fss.v = bad_data_double;
-      else                n_info.fss.v = 1.0 - n_info.fbs.v / den;
+      if(is_bad_data(den) || is_eq(den, 0.0)) {
+         n_info.fss.v = bad_data_double;
+      }
+      else {
+         n_info.fss.v = 1.0 - n_info.fbs.v / den;
+      }
 
       //
       // Aggregate F_RATE and O_RATE as weighted averages
