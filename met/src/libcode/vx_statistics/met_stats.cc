@@ -1432,8 +1432,11 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
                 n_info.cnt_info.n;
       }
 
+      //
+      // If FSS cannot be aggregated numerically, just keep its current value
+      //
       if(is_bad_data(den) || is_eq(den, 0.0)) {
-         n_info.fss.v = bad_data_double;
+         n_info.fss.v = fss.v;
       }
       else {
          n_info.fss.v = 1.0 - n_info.fbs.v / den;
@@ -1543,7 +1546,11 @@ void NBRCNTInfo::compute_stats() {
    num = fbs.v;
    den = cnt_info.ffbar + cnt_info.oobar;
 
-   if(is_eq(den, 0.0)) fss.v = bad_data_double;
+   //
+   // When the base rate is zero, FSS is zero.  When the forecast
+   // rate is also zero, store FSS as zero rather than bad data.
+   //
+   if(is_eq(den, 0.0)) fss.v = 0.0;
    else                fss.v = 1.0 - (num/den);
 
    //
