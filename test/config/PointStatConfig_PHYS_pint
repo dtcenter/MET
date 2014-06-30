@@ -89,6 +89,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V4.0";
+version        = "V5.0";
 
 ////////////////////////////////////////////////////////////////////////////////

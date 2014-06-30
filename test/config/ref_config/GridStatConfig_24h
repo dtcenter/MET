@@ -116,6 +116,6 @@ nc_pairs_flag = FALSE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${MODEL}_F${FCST_TIME}_24h";
-version        = "V4.0";
+version        = "V5.0";
 
 ////////////////////////////////////////////////////////////////////////////////

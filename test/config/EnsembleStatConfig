@@ -138,6 +138,6 @@ rng = {
 
 duplicate_flag = NONE;
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V4.0";
+version        = "V5.0";
 
 ////////////////////////////////////////////////////////////////////////////////
