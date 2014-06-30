@@ -132,6 +132,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V4.2";
+version        = "V5.0";
 
 ////////////////////////////////////////////////////////////////////////////////

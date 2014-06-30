@@ -117,6 +117,6 @@ nc_pairs_flag = TRUE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "APCP_12";
-version        = "V4.2";
+version        = "V5.0";
 
 ////////////////////////////////////////////////////////////////////////////////
