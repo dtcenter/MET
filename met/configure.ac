@@ -240,6 +240,26 @@ else
     AC_MSG_NOTICE([-DBLOCK4 will not be used in the compiles])
 fi
 
+# static linking
+
+AC_ARG_ENABLE(static_linking,
+	  [AS_HELP_STRING([--enable-static_linking], [Enable static linking of the applications])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_STATIC_LINKING="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-static_linking) ;;
+   esac],
+  [ENABLE_STATIC_LINKING="no"]
+)
+
+AM_CONDITIONAL([ENABLE_STATIC_LINKING], [test "x$ENABLE_STATIC_LINKING" = "xyes"])
+
+if test "x$ENABLE_STATIC_LINKING" = "xyes"; then
+    LDFLAGS="${LDFLAGS} -static"
+    AC_MSG_NOTICE([Static linking will be used in the compiles])
+else
+    AC_MSG_NOTICE([Dynamic linking will not be used in the compiles])
+fi
+
 # ascii2nc
 
 AC_ARG_ENABLE(ascii2nc,
