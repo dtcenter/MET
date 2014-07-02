@@ -2,6 +2,7 @@
 
 # Check that required unit test environment variables are set
 if [[ -z "${MET_BASE}"       ||
+      -z "${MET_BUILD_BASE}" ||
       -z "${MET_TEST_BASE}"  ||
       -z "${MET_TEST_INPUT}" ||
       -z "${MET_TEST_OUTPUT}" ]]; then
