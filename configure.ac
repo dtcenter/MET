@@ -692,6 +692,12 @@ CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
 
 AC_SUBST(FC_LIBS, [-lgfortran])
 
+# The CXXFLAGS default to "-O2 -g".  The optimization is causing
+# problems so just set it to "-g" if the user hasn't overridden it
+# themselves.
+
+: ${CXXFLAGS="-g"}
+
 # Checks for programs.
 
 AC_PROG_YACC
