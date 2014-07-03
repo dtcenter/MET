@@ -703,7 +703,7 @@ AC_SUBST(FC_LIBS, [-lgfortran])
 AC_PROG_YACC
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_F77(gfortran g77 xlf f77 frt pgf77 cf77 fort77 fl32 af77 xlf90 f90 pgf90 pghpf epcf90)
 AC_PROG_LEX
 AC_PROG_RANLIB
 
