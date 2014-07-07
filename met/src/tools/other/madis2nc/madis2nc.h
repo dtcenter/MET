@@ -32,6 +32,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 #include "vx_log.h"
+#include "mask_poly.h"
+#include "vx_grid.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -102,6 +104,15 @@ static StringArray  lvl_dim_sa;
 static int          rec_beg = 0;
 static int          rec_end = 0;
 static ConcatString argv_str;
+static Grid         grid_mask;
+static MaskPoly     poly_mask;
+
+// Counters
+static int          i_obs    = 0;
+static int          rej_fill = 0;
+static int          rej_qc   = 0;
+static int          rej_grid = 0;
+static int          rej_poly = 0;
 
 ////////////////////////////////////////////////////////////////////////
 //

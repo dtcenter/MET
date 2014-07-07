@@ -8,7 +8,27 @@ bin_PROGRAMS    = madis2nc
 madis2nc_SOURCES = madis2nc.cc
 madis2nc_CPPFLAGS = -I${includedir}
 madis2nc_LDFLAGS = -L${libdir}
-madis2nc_LDADD = -lvx_nc_util \
+madis2nc_LDADD = -lvx_shapedata \
+	-lvx_analysis_util \
+	-lvx_data2d_factory \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_render \
+	-lvx_plot_util \
+	-lvx_pxm \
+	-lvx_color \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_pb_util \
+	-lvx_nav \
+	-lvx_gnomon \
+	-lvx_stat_out \
+	-lvx_statistics \
+	-lvx_gsl_prob \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_util \

@@ -42,12 +42,12 @@
     </output>
   </test>
   
-  <test name="madis2nc_PROFILER">
+  <test name="madis2nc_PROFILER_MASK_POLY">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/profiler/profiler_20120409_1200.nc \
       &OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc \
-      -type profiler -v 1
+      -type profiler -mask_poly &MET_BASE;/poly/CONUS.poly -v 2
     </param>   
     <output>
       <point_nc>&OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc</point_nc>
@@ -66,4 +66,16 @@
     </output>
   </test>
   
+  <test name="madis2nc_MESONET_MASK_GRID">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/mesonet/mesonet_20140704_1200.nc \
+      &OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc \
+      -type mesonet -mask_grid G207 -v 2
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>
