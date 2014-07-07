@@ -28,6 +28,8 @@
 
 #include "netcdf.hh"
 
+#include "mask_poly.h"
+#include "vx_grid.h"
 #include "vx_config.h"
 #include "vx_util.h"
 
@@ -48,6 +50,9 @@ public:
   virtual ~FileHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const = 0;
+  
+  void setGridMask(Grid     &g);
+  void setPolyMask(MaskPoly &p);
   
   bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
   bool writeNetcdfFile(const string &nc_filename);
@@ -88,7 +93,13 @@ protected:
 
   int _hdrNum;
   int _obsNum;
+  
+  int _gridMaskNum;
+  int _polyMaskNum;
 
+  Grid     *_gridMask;
+  MaskPoly *_polyMask;
+  
   bool _dataSummarized;
   TimeSummaryInfo _summaryInfo;
   
@@ -109,10 +120,14 @@ protected:
   
   time_t _getValidTime(const string &time_string) const;
   
-  // Read the observations from the given file and add them to the
-  // _observations vector.
+  // Read the observations from the given file.
 
   virtual bool _readObservations(LineDataFile &ascii_file) = 0;
+  
+  // Apply filtering logic to the observations and add them to the
+  // _observations vector.
+  
+  bool _addObservations(const Observation &obs);
  
   // Write the observations in the _observations vector into the current
   // netCDF file.
@@ -278,6 +293,8 @@ protected:
 
 };
 
+inline void FileHandler::setGridMask(Grid     &g) { _gridMask = &g; }
+inline void FileHandler::setPolyMask(MaskPoly &p) { _polyMask = &p; }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -211,7 +211,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 			      na_str : data_line[19]);
       obs_qty.ws_strip();
 
-      _observations.push_back(Observation(hdr_typ.text(),
+      _addObservations(Observation(hdr_typ.text(),
 					  hdr_sid.text(),
 					  hdr_vld,
 					  hdr_lat,
@@ -273,7 +273,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
             
 	  // Write the observation info
 
-	  _observations.push_back(Observation(hdr_typ.text(), hdr_sid.text(),
+	  _addObservations(Observation(hdr_typ.text(), hdr_sid.text(),
 					      hdr_vld,
 					      hdr_lat, hdr_lon, hdr_elv,
 					      obs_qty.text(),

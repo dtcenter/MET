@@ -168,7 +168,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // downwelling global solar (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -179,7 +179,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // upwelling global solar (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -190,7 +190,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // direct solar (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -201,7 +201,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // downwelling diffuse solar (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -212,7 +212,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // downwelling thermal infrared (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -223,7 +223,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // downwelling PIR case temp (K)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -234,7 +234,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // downwelling PIR dome temp (K)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -245,7 +245,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // upwelling thermal infrared (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -256,7 +256,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // upwelling PIR case temp (K)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -267,7 +267,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // upwelling PIR dome temp (K)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -278,7 +278,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // global UVB (milliWatts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -289,7 +289,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // photosynthetically active radiation (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -300,7 +300,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // net solar (dw_psp - uw_psp) (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -311,7 +311,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // net infrared (dw_pir - uw_pir) (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -322,7 +322,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // net radiation (netsolar + netir) (Watts m^-2)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -333,7 +333,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // 10-meter air temperature (C)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -344,7 +344,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // relative humidity (%)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -355,7 +355,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // wind speed (ms^-1)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -366,7 +366,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // wind direction (degrees, clockwise from north)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
@@ -377,7 +377,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      
      // station pressure (mb)
 
-     _observations.push_back(Observation(HEADER_TYPE, _stationId,
+     _addObservations(Observation(HEADER_TYPE, _stationId,
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,

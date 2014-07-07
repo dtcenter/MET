@@ -186,4 +186,30 @@
     </output>
   </test>
 
+  <test name="ascii2nc_MASK_GRID">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_grid_dtc165.nc \
+      -mask_grid DTC165 \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_grid_dtc165.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_MASK_POLY">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_poly_lmv.nc \
+      -mask_poly &MET_BASE;/poly/LMV.poly \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_poly_lmv.nc</point_nc>
+    </output>
+  </test>
+  
 </met_test>

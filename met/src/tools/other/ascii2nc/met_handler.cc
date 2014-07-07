@@ -154,7 +154,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
              
     // Save the observation info
 
-    _observations.push_back(Observation(hdr_typ.text(),
+    _addObservations(Observation(hdr_typ.text(),
 					hdr_sid.text(),
 					hdr_vld,
 					hdr_lat, hdr_lon, hdr_elv,

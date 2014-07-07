@@ -34,6 +34,8 @@
 //                                     to the netCDF global attributes.
 //   010    05-21-14  Halley Gotway  Print usage for fewer than 2 files
 //                                     on the command line.
+//   011    05-21-14  Halley Gotway  Added the mask_grid and mask_poly
+//                                     options to filter spatially.
 //                                    
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,6 +58,9 @@ using namespace std;
 
 #include "netcdf.hh"
 
+#include "data2d_factory.h"
+#include "mask_poly.h"
+#include "vx_grid.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
 #include "vx_math.h"
@@ -95,6 +100,9 @@ static ConcatString ncfile;
 static bool config_file_used = false;
 static Ascii2NcConfInfo config_info;
 
+static Grid grid_mask;
+static MaskPoly poly_mask;
+
 ////////////////////////////////////////////////////////////////////////
 
 static FileHandler *create_file_handler(const ASCIIFormat,
@@ -105,6 +113,8 @@ static void usage();
 static void set_format(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_config(const StringArray &);
+static void set_mask_grid(const StringArray &);
+static void set_mask_poly(const StringArray &);
 static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,6 +149,8 @@ int main(int argc, char *argv[]) {
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_config, "-config", 1);
+   cline.add(set_mask_grid, "-mask_grid", 1);
+   cline.add(set_mask_poly, "-mask_poly", 1);
    
    //
    // Parse the command line
@@ -170,6 +182,12 @@ int main(int argc, char *argv[]) {
      return 0;
    
    //
+   // Set the masking grid and polyline, if specified.
+   //
+   if(grid_mask.nx() > 0 || grid_mask.ny() > 0) file_handler->setGridMask(grid_mask);
+   if(poly_mask.n_points() > 0)                 file_handler->setPolyMask(poly_mask);
+
+   //
    // Process the files.  If a configuration file was specified, do any
    // extra processing specified.
    //
@@ -187,9 +205,12 @@ int main(int argc, char *argv[]) {
      }
    }
 
-   file_handler->writeNetcdfFile(ncfile.text());
+   int status = file_handler->writeNetcdfFile(ncfile.text());
    
    delete file_handler;
+   
+   if (!status)
+     return(1);
    
    return(0);
 }
@@ -314,6 +335,8 @@ void usage() {
         << "\tnetcdf_file\n"
         << "\t[-format ASCII_format]\n"
         << "\t[-config file]\n"
+        << "\t[-mask_grid string]\n"
+        << "\t[-mask_poly file]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -330,7 +353,13 @@ void usage() {
         << SurfradHandler::getFormatString() << "\" (optional).\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
-	<< "to generate summaries of the fields in the ASCII files (optional).\n"
+        << "to generate summaries of the fields in the ASCII files (optional).\n"
+
+        << "\t\t\"-mask_grid string\" is a named grid or a gridded data "
+        << "file for filtering the point observations spatially (optional).\n"
+
+        << "\t\t\"-mask_poly file\" is a polyline masking file for filtering "
+        << "the point observations spatially (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -401,8 +430,58 @@ void set_config(const StringArray & a)
        << "Config File: " << config_filename << "\n";
 
   // Read the config files
-
   config_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_mask_grid(const StringArray & a) {
+  Met2dDataFileFactory factory;
+  Met2dDataFile * datafile = (Met2dDataFile *) 0;
+
+  // List the grid masking file
+  mlog << Debug(1)
+       << "Grid Masking File: " << a[0] << "\n";
+  
+  // First, try to find the grid by name.
+  if(!find_grid_by_name(a[0], grid_mask)) {
+
+    // If that doesn't work, try to open a data file.
+    datafile = factory.new_met_2d_data_file(replace_path(a[0]));
+
+    if(!datafile) {
+      mlog << Error << "\nset_mask_grid() -> "
+           << "can't open data file \"" << a[0] << "\"\n\n";
+      exit(1);
+    }
+
+    // Store the data file's grid
+    grid_mask = datafile->grid();
+
+    delete datafile; datafile = (Met2dDataFile *) 0;
+  }
+  
+  // List the grid mask
+  mlog << Debug(2)
+       << "Parsed Masking Grid: " << grid_mask.name() << " ("
+       << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_mask_poly(const StringArray & a) {
+
+  // List the polyline masking file
+  mlog << Debug(1)
+       << "Polyline Masking File: " << a[0] << "\n";
+
+  // Parse the polyline file.
+  poly_mask.load(replace_path(a[0]));
+  
+  // List the polyline mask
+  mlog << Debug(2)
+       << "Parsed Masking Polyline: " << poly_mask.name()
+       << " containing " <<  poly_mask.n_points() << " points\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
