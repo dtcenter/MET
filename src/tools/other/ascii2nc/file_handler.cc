@@ -63,6 +63,10 @@ FileHandler::FileHandler(const string &program_name) :
   _nhdr(0),
   _hdrNum(0),
   _obsNum(0),
+  _gridMaskNum(0),
+  _polyMaskNum(0),
+  _gridMask(0),
+  _polyMask(0),
   _dataSummarized(false)
 {
 }
@@ -114,12 +118,31 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
 
 bool FileHandler::writeNetcdfFile(const string &nc_filename)
 {
+
+  // List the number of rejected observations.
+
+  mlog << Debug(2)
+       << "Rejected " << _gridMaskNum
+       << " observations off the masking grid.\n"
+       << "Rejected " << _polyMaskNum
+       << " observations outside the masking polyline.\n";
+
   // Loop through the observations, counting the number of headers needed in
   // the netCDF file.  We need to count the headers before opening the netCDF
   // file because we can't have two "unlimited" dimensions in a netCDF file.
 
   _countHeaders();
 
+  // Check for no data
+  if (_nhdr == 0)
+  {
+    mlog << Error << "\nZero observations retained.\n"
+         << "Cannot create NetCDF Observation file: "
+         << nc_filename << "\n\n";
+
+    return false;
+  }
+  
   mlog << Debug(2) << "Processing observations for " << _nhdr
        << " headers.\n";
 
@@ -747,6 +770,44 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
    }
 
    return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool FileHandler::_addObservations(const Observation &obs)
+{
+   double grid_x, grid_y;
+
+   //
+   // Apply the grid mask
+   //
+   if(_gridMask)
+   {
+     _gridMask->latlon_to_xy(obs.getLatitude(), -1.0*obs.getLongitude(),
+                             grid_x, grid_y);
+
+     if(grid_x < 0 || grid_x >= _gridMask->nx() ||
+        grid_y < 0 || grid_y >= _gridMask->ny()) {
+        _gridMaskNum++;
+        return false;
+     }
+   }
+   
+   //
+   // Apply the polyline mask
+   //
+   if(_polyMask)
+   {
+     if(!_polyMask->latlon_is_inside(obs.getLatitude(), obs.getLongitude()))
+     {
+       _polyMaskNum++;
+       return false;
+     }
+   }
+
+   _observations.push_back(obs);
+  
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
