@@ -441,7 +441,7 @@ void set_mask_grid(const StringArray & a) {
 
   // List the grid masking file
   mlog << Debug(1)
-       << "Grid Masking File: " << a[0] << "\n";
+       << "Grid Masking: " << a[0] << "\n";
   
   // First, try to find the grid by name.
   if(!find_grid_by_name(a[0], grid_mask)) {
