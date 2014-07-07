@@ -34,7 +34,7 @@
 //                                     to the netCDF global attributes.
 //   010    05-21-14  Halley Gotway  Print usage for fewer than 2 files
 //                                     on the command line.
-//   011    05-21-14  Halley Gotway  Added the mask_grid and mask_poly
+//   011    07-07-14  Halley Gotway  Added the mask_grid and mask_poly
 //                                     options to filter spatially.
 //                                    
 ////////////////////////////////////////////////////////////////////////
