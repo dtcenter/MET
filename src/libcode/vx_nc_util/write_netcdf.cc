@@ -28,7 +28,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 void write_netcdf_global(NcFile * f_out, const char *file_name,
-                         const char *program_name)
+                         const char *program_name, const char *model_name)
 
 {
 
@@ -47,6 +47,7 @@ sprintf(attribute_str,
 f_out->add_att("FileOrigins", attribute_str);
 f_out->add_att("MET_version", met_version);
 f_out->add_att("MET_tool", program_name);
+if(model_name) f_out->add_att("Model", model_name);
 
 return;
 

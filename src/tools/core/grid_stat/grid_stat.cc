@@ -1048,7 +1048,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file, program_name);
+   write_netcdf_global(nc_out, out_nc_file, program_name, conf_info.model);
    nc_out->add_att("Difference", "Forecast Value - Observation Value");
 
    // Add the projection information

@@ -757,7 +757,7 @@ void ModeExecutive::write_obj_netcdf()
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, out_file.text(), program_name);
+   write_netcdf_global(f_out, out_file.text(), program_name, engine.conf_info.model);
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);
