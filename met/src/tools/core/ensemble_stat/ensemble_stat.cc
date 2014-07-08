@@ -1574,7 +1574,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.text(), program_name);
+   write_netcdf_global(nc_out, out_nc_file.text(), program_name, conf_info.model);
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);

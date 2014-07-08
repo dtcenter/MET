@@ -1690,8 +1690,7 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file, program_name);
-   nc_out->add_att("model",      conf_info.model);
+   write_netcdf_global(nc_out, out_file, program_name, conf_info.model);
    nc_out->add_att("mask_grid",  (conf_info.mask_grid_name ?
                                   conf_info.mask_grid_name : na_str));
    nc_out->add_att("mask_poly",  (conf_info.mask_poly_name ?
