@@ -3,7 +3,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int anno_height     =  100;
+static const int anno_height       = 100;
+
+static const int ctable_width      =  15;
+
+static const int ctable_text_width =  30;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -48,6 +52,9 @@ static Dictionary * sources;
 
 static int n_sources = 0;
 
+static double M = 1.0;
+static double B = 1.0;
+
 static const char        filename_name [] = "file_name";
 static const char      fontfamily_name [] = "font_family";
 static const char          outdir_name [] = "output_directory";
@@ -66,6 +73,7 @@ static const char     annobgcolor_name [] = "anno_background_color";
 static const char   annotextcolor_name [] = "anno_text_color";
 static const char    annofontsize_name [] = "anno_font_size";
 static const char   titlefontsize_name [] = "title_font_size";
+static const char  ctablefontsize_name [] = "colortable_font_size";
 
 enum PlotField {
 
@@ -107,6 +115,8 @@ static int plot_size = 4;
 
 static int border_width = 10;
 
+static int colortable_font_size = 10.0;
+
 static Color anno_bg_color    = white;
 static Color anno_text_color  = black;
 
@@ -117,6 +127,8 @@ static CgraphBase::FontFamily family = CgraphBase::Helvetica;
 
 static double title_font_size = 30.0;
 static double anno_font_size  = 20.0;
+
+static double map_width = 0.0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -151,7 +163,7 @@ static void read_config();
 
 static void do_plot (const char * mode_nc_filename);
 
-static void get_data_ppm (const ModeNcOutputFile &, Ppm &);
+static void get_data_ppm (ModeNcOutputFile &, Ppm &);
 
 static void fill_box (const Box &, const Color &, Cgraph &);
 static void clip_box (const Box &, Cgraph &);
@@ -170,7 +182,12 @@ static bool         get_dict_bool   (Dictionary *, const char * id);
 
 static void time_string(int seconds, char * out, const int len);
 
-static void annotate(const ModeNcOutputFile &, Cgraph &, const Box &);
+static void annotate(const ModeNcOutputFile &, Cgraph &, const Box &, const Box &);
+
+static double calc_text_scale(Cgraph &, const double target_width, const char *);
+
+static void draw_obj_colortable(Cgraph &, const Box & map_box, const int Nobjs);
+static void draw_raw_colortable(Cgraph &, const Box & map_box);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -293,25 +310,26 @@ else {
 
 }
 
-s                   = get_dict_string(plot_info, outdir_name);
-output_directory    = replace_path(s);
+s                     = get_dict_string(plot_info, outdir_name);
+output_directory      = replace_path(s);
 
-anno_bg_color       = get_dict_color(plot_info, annobgcolor_name);
-anno_text_color     = get_dict_color(plot_info, annotextcolor_name);
+anno_bg_color         = get_dict_color(plot_info, annobgcolor_name);
+anno_text_color       = get_dict_color(plot_info, annotextcolor_name);
 
-anno_font_size      = get_dict_double(plot_info, annofontsize_name);
-title_font_size     = get_dict_double(plot_info, titlefontsize_name);
+anno_font_size        = get_dict_double(plot_info, annofontsize_name);
+title_font_size       = get_dict_double(plot_info, titlefontsize_name);
+colortable_font_size  = get_dict_double(plot_info, ctablefontsize_name);
 
-plot_size           = get_dict_int(plot_info, plotsize_name);
-border_width        = get_dict_int(plot_info, borderwidth_name);
+plot_size             = get_dict_int(plot_info, plotsize_name);
+border_width          = get_dict_int(plot_info, borderwidth_name);
 
-s                   = get_dict_string(plot_info, rawctable_name);
-raw_ctable_filename = replace_path(s);
+s                     = get_dict_string(plot_info, rawctable_name);
+raw_ctable_filename   = replace_path(s);
 
-s                   = get_dict_string(plot_info, objctable_name);
-obj_ctable_filename = replace_path(s);
+s                     = get_dict_string(plot_info, objctable_name);
+obj_ctable_filename   = replace_path(s);
 
-do_anno             = get_dict_bool(plot_info, doanno_name);
+do_anno               = get_dict_bool(plot_info, doanno_name);
 
 
    //
@@ -377,30 +395,6 @@ if ( ! (e->is_array()) )  {
 sources = e->array_value();
 
 n_sources = sources->n_entries();
-/*
-Dictionary & a = *(e->array_value());
-
-for (j=0; j<(a.n_entries()); ++j)  {
-
-   e = a[j];
-
-   if ( e->type() != StringType )  {
-
-      mlog << Error
-           << "\n\n  " << program_name << ": read_config() -> entry " << j << " of \"" 
-           << name << "\" is not a string!\n\n";
-
-      exit ( 1 );
-
-   }
-
-   s = *(e->string_value());
-
-   map_files.add(replace_path(s));
-
-}
-*/
-// map_files.dump(cout);
 
 
    //
@@ -424,32 +418,9 @@ ConcatString output_filename;
 Cgraph plot;
 Ppm image;
 Box whole_box, map_box, anno_box;
+bool is_object_field = false;
+int n_fcst, n_obs, n;
 
-
-output_filename << output_directory << '/' << get_short_name(mode_nc_filename);
-
-output_filename.chomp(".nc");
-
-switch ( plot_field )  {
-
-   case raw_field:
-      output_filename << "_raw.png";
-      break;
-
-   case simple_obj_field:
-      output_filename << "_simple.png";
-      break;
-
-   case composite_obj_field:
-      output_filename << "_comp.png";
-      break;
-
-      default:
-      mlog << Error << "\n\n  " << program_name << ": do_plot() -> bad field selected\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
 
 
    //
@@ -467,6 +438,41 @@ if ( ! mode_in.open(mode_nc_filename) )  {
 }
 
 // mode_in.dump(cout);
+
+
+output_filename << output_directory << '/' << get_short_name(mode_nc_filename);
+
+output_filename.chomp(".nc");
+
+switch ( plot_field )  {
+
+   case raw_field:
+      output_filename << "_raw.png";
+      is_object_field = false;
+      break;
+
+   case simple_obj_field:
+      output_filename << "_simple.png";
+      is_object_field = true;
+      n_fcst = mode_in.n_fcst_simple_objs();
+      n_obs  = mode_in.n_fcst_simple_objs();
+      break;
+
+   case composite_obj_field:
+      output_filename << "_comp.png";
+      is_object_field = true;
+      n_fcst = mode_in.n_fcst_comp_objs();
+      n_obs  = mode_in.n_fcst_comp_objs();
+      break;
+
+      default:
+      mlog << Error << "\n\n  " << program_name << ": do_plot() -> bad field selected\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+
 
    //
    //  read the colortable
@@ -489,9 +495,11 @@ if ( ! ctable.read(ctable_filename) )  {
 Nx = plot_size*(mode_in.nx());
 Ny = plot_size*(mode_in.ny());
 
+map_width = Nx;
+
 if ( do_anno )  {
 
-   whole_box.set_llwh(0.0, 0.0, Nx + 2*border_width, Ny + anno_height + border_width);
+   whole_box.set_llwh(0.0, 0.0, Nx + 2*border_width + ctable_width + ctable_text_width, Ny + anno_height + border_width);
 
    map_box.set_llwh(border_width, anno_height, Nx, Ny);
 
@@ -543,7 +551,27 @@ if ( do_anno )  plot.grestore();
    //  do the annotation, if needed
    //
 
-if ( do_anno )  annotate(mode_in, plot, anno_box);
+if ( do_anno )  annotate(mode_in, plot, anno_box, map_box);
+
+   //
+   //  colortable
+   //
+
+if ( do_anno )  {
+
+   if ( is_object_field )  {
+
+      n = (n_fcst > n_obs) ? n_fcst : n_obs;
+
+      draw_obj_colortable(plot, map_box, n);
+
+   } else {
+
+      draw_raw_colortable(plot, map_box);
+
+   }
+
+}
 
    //
    //  done
@@ -724,13 +752,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_data_ppm(const ModeNcOutputFile & mode_in, Ppm & image)
+void get_data_ppm(ModeNcOutputFile & mode_in, Ppm & image)
 
 {
 
 int k;
 int x, y, mx, my;
-double value, M, B;
+double value;
 double min_value, max_value;
 Color color;
 
@@ -1198,7 +1226,7 @@ m = (seconds%3600)/60;
 s = seconds%60;
 
      if ( (m == 0) && (s == 0) )  snprintf(out, len, "%02dh",          h);
-else if ( m == 0 )                snprintf(out, len, "%02d:%02d",      h, m);
+else if ( s == 0 )                snprintf(out, len, "%02d:%02d",      h, m);
 else                              snprintf(out, len, "%02d:%02d:%02d", h, m, s);
 
 return;
@@ -1209,7 +1237,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box)
+void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box, const Box & map_box)
 
 {
 
@@ -1219,9 +1247,10 @@ ConcatString s;
 char junk[256], ts[256];
 int month, day, year, hour, minute, second;
 int lead_seconds;
-double delta;
+double scale, delta;
 double htab1, htab2;
 double vtab1, vtab2;
+const double scale_tol = 0.05;
 
 
 // mode_in.dump(cout);
@@ -1237,9 +1266,17 @@ else           fcst_obs = "Forecast";
 
 switch ( plot_field )  {
 
-   case raw_field:            raw_obj = "Raw";               break;
-   case simple_obj_field:     raw_obj = "Simple Object";     break;
-   case composite_obj_field:  raw_obj = "Composite Object";  break;
+   case raw_field:
+      raw_obj = "Raw";
+      break;
+
+   case simple_obj_field:
+      raw_obj = "Simple Object";
+      break;
+
+   case composite_obj_field:
+      raw_obj = "Composite Object";
+      break;
 
    default:
       mlog << Error << "\n\n  " << program_name << ": annotate() -> bad plot field\n\n";
@@ -1257,15 +1294,25 @@ title << cs_erase
 
 plot.bold(title_font_size);
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - title_font_size - 10.0, 0.5, 0.0, title);
+scale = calc_text_scale(plot, map_width - 10.0, title);
+
+if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*title_font_size);
+
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - plot.current_font_size() - 10.0, 0.5, 0.0, title);
 
 
 plot.roman(anno_font_size);
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, mode_in.short_filename());
+s = mode_in.short_filename();
+
+scale = calc_text_scale(plot, map_width - 10.0, s);
+
+if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*anno_font_size);
+
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, s);
 
 
-vtab1 = anno_height + 1.5*anno_font_size;
+vtab1 = anno_height + 0.5*anno_font_size;
 vtab2 = vtab1 + 1.5*anno_font_size;
 
 delta = 0.0;
@@ -1313,6 +1360,169 @@ time_string((int) (mode_in.valid_time()%86400), ts, sizeof(ts));
 snprintf(junk, sizeof(junk), "%s %d, %d  %s", short_month_name[month], day, year, ts);
 
 plot.write_centered_text(1, 1, htab2, vtab2, 0.0, 0.0, junk);
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double calc_text_scale(Cgraph & plot, const double target_width, const char * text)
+
+{
+
+if ( empty(text) )  {
+
+   mlog << Error
+        << "\n\n  " << program_name << ": calc_text_scale() -> empty text!\n\n";
+
+   exit ( 1 );
+
+}
+
+double s;
+
+plot.write_centered_text(1, 1, 0.0, 0.0, 0.0, 0.0, text, false);
+
+s = target_width/(plot.LastTextWidth);
+
+if ( s > 1.0 )  s = 1.0;
+
+return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void draw_obj_colortable(Cgraph & plot, const Box & map_box, const int Nobjs)
+
+{
+
+int j, k;
+CtableEntry e;
+double x, y;
+const double dy = (map_box.height())/Nobjs;
+Box b;
+char junk[256];
+
+
+x = map_box.right();
+
+y = map_box.bottom();
+
+plot.roman(colortable_font_size);
+
+for (j=0; j<Nobjs; ++j)  {
+
+   b.set_llwh(x, y, ctable_width, dy);
+
+   e = ctable[j];
+
+   fill_box(b, e.color(), plot);
+
+   k = nint(e.value_low());
+
+   snprintf(junk, sizeof(junk), "%d", k);
+
+   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
+
+   y += dy;
+
+}
+
+
+
+plot.setgray(0.0);
+
+plot.setlinewidth(0.2);
+
+y = map_box.bottom();
+
+for (j=0; j<=Nobjs; ++j)  {
+
+   plot.line(x, y, x + ctable_width, y);
+
+   y += dy;
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void draw_raw_colortable(Cgraph & plot, const Box & map_box)
+
+{
+
+int j;
+CtableEntry e;
+double x, y;
+const double dy = (map_box.height())/(ctable.n_entries());
+Box b;
+char junk[256];
+double t;
+const int N = ctable.n_entries();
+
+
+
+x = map_box.right();
+
+y = map_box.bottom();
+
+plot.roman(colortable_font_size);
+
+for (j=0; j<N; ++j)  {
+
+   b.set_llwh(x, y, ctable_width, dy);
+
+   e = ctable[j];
+
+   fill_box(b, e.color(), plot);
+
+   t = 0.5*(e.value_low() + e.value_high());
+
+   t = (t - B)/M;
+
+   snprintf(junk, sizeof(junk), "%.2f", t);
+
+   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
+
+   y += dy;
+
+}
+
+
+plot.setgray(0.0);
+
+plot.setlinewidth(0.2);
+
+y = map_box.bottom();
+
+for (j=0; j<=N; ++j)  {
+
+   plot.line(x, y, x + ctable_width, y);
+
+   y += dy;
+
+}
+
 
 
    //
