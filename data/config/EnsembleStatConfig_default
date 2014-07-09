@@ -36,6 +36,7 @@ ens = {
 //
 fcst = {
    message_type = [ "ADPUPA" ];
+   sid_exc      = [];
    ens_ssvar_bin_size = 1.0;
    ens_phist_bin_size = 0.05;
 
@@ -64,9 +65,9 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [];
-   sid  = [];
+   grid    = [ "FULL" ];
+   poly    = [];
+   sid     = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////

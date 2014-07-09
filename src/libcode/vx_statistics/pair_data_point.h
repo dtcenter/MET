@@ -111,6 +111,7 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray sid_exc_filt;  // Station ID exclusion list
       StringArray obs_qty_filt;  // Observation quality markers
 
       //////////////////////////////////////////////////////////////////
@@ -129,6 +130,7 @@ class VxPairDataPoint {
 
       //  Counts for observation rejection reason codes
       int n_try;                 // Number of observations processed
+      int rej_sid_exc;           // Reject based on SID exclusion list
       int rej_gc;                // Reject based on GRIB code
       int rej_vld;               // Reject based on valid time
       int rej_obs;               // Reject observation bad data
@@ -157,6 +159,7 @@ class VxPairDataPoint {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
+      void set_sid_exc_filt(const StringArray);
       void set_obs_qty_filt(const StringArray);
 
       // Call set_pd_size before set_msg_typ, set_mask_dp, and set_interp

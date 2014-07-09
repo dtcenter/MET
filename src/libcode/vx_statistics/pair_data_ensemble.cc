@@ -556,6 +556,7 @@ void VxPairDataEnsemble::clear() {
    interp_thresh = 0;
 
    fcst_dpa.clear();
+   sid_exc_filt.clear();
    obs_qty_filt.clear();
    
    fcst_ut       = (unixtime) 0;
@@ -587,9 +588,10 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    set_fcst_info(vx_pd.fcst_info);
    set_obs_info(vx_pd.obs_info);
 
-   fcst_ut = vx_pd.fcst_ut;
-   beg_ut  = vx_pd.beg_ut;
-   end_ut  = vx_pd.end_ut;
+   fcst_ut      = vx_pd.fcst_ut;
+   beg_ut       = vx_pd.beg_ut;
+   end_ut       = vx_pd.end_ut;
+   sid_exc_filt = vx_pd.sid_exc_filt;
    obs_qty_filt = vx_pd.obs_qty_filt;
 
    interp_thresh = vx_pd.interp_thresh;
@@ -690,6 +692,15 @@ void VxPairDataEnsemble::set_beg_ut(const unixtime ut) {
 void VxPairDataEnsemble::set_end_ut(const unixtime ut) {
 
    end_ut = ut;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_sid_exc_filt(const StringArray se) {
+
+   sid_exc_filt = se;
 
    return;
 }
@@ -877,6 +888,9 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Create VarInfoGrib pointer
    VarInfoGrib *obs_info_grib = (VarInfoGrib *) obs_info;
 
+   // Check the station ID exclusion list
+   if(sid_exc_filt.n_elements() && sid_exc_filt.has(hdr_sid_str)) return;
+   
    // Check whether the GRIB code for the observation matches
    // the specified code
    if(obs_info_grib->code() != nint(obs_arr[1])) return;

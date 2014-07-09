@@ -28,29 +28,31 @@ static MetConfig conf_const(replace_path(config_const_filename));
 
 ////////////////////////////////////////////////////////////////////////
 
-extern ConcatString   parse_conf_version(Dictionary *dict);
-extern ConcatString   parse_conf_model(Dictionary *dict);
-extern GrdFileType    parse_conf_file_type(Dictionary *dict);
+extern ConcatString    parse_conf_version(Dictionary *dict);
+extern ConcatString    parse_conf_model(Dictionary *dict);
+extern GrdFileType     parse_conf_file_type(Dictionary *dict);
 extern map<STATLineType,STATOutputType>
-                      parse_conf_output_flag(Dictionary *dict);
+                       parse_conf_output_flag(Dictionary *dict);
 extern map<STATLineType,StringArray>
-                      parse_conf_output_stats(Dictionary *dict);
-extern int            parse_conf_n_vx(Dictionary *dict);
-extern Dictionary     parse_conf_i_vx_dict(Dictionary *dict, int index);
-extern StringArray    parse_conf_message_type(Dictionary *dict);
-extern StringArray    parse_conf_obs_qty(Dictionary *dict);
-extern NumArray       parse_conf_ci_alpha(Dictionary *dict);
+                       parse_conf_output_stats(Dictionary *dict);
+extern int             parse_conf_n_vx(Dictionary *dict);
+extern Dictionary      parse_conf_i_vx_dict(Dictionary *dict, int index);
+extern StringArray     parse_conf_message_type(Dictionary *dict);
+extern StringArray     parse_conf_sid_exc(Dictionary *dict);
+extern void            parse_sid_mask(const ConcatString &, StringArray &, ConcatString &);
+extern StringArray     parse_conf_obs_qty(Dictionary *dict);
+extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
-extern BootInfo       parse_conf_boot(Dictionary *dict);
-extern InterpInfo     parse_conf_interp(Dictionary *dict);
-extern NbrhdInfo      parse_conf_nbrhd(Dictionary *dict);
-extern DuplicateType  parse_conf_duplicate_flag(Dictionary *dict);
-extern ConcatString   parse_conf_tmp_dir(Dictionary *dict);
-extern GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict);
-extern WaveletType    parse_conf_wavelet_type(Dictionary *dict);
-extern PlotInfo       parse_conf_plot_info(Dictionary *dict);
-extern void           parse_conf_range_int(Dictionary *dict, int &beg, int &end);
-extern void           parse_conf_range_double(Dictionary *dict, double &beg, double &end);
+extern BootInfo        parse_conf_boot(Dictionary *dict);
+extern InterpInfo      parse_conf_interp(Dictionary *dict);
+extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict);
+extern DuplicateType   parse_conf_duplicate_flag(Dictionary *dict);
+extern ConcatString    parse_conf_tmp_dir(Dictionary *dict);
+extern GridDecompType  parse_conf_grid_decomp_flag(Dictionary *dict);
+extern WaveletType     parse_conf_wavelet_type(Dictionary *dict);
+extern PlotInfo        parse_conf_plot_info(Dictionary *dict);
+extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end);
+extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
 
 extern void check_prob_thresh(const ThreshArray &);
 

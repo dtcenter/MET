@@ -51,6 +51,7 @@ void EnsembleStatConfInfo::init_from_scratch() {
    ens_ta      = (ThreshArray *)        0;
    vx_pd       = (VxPairDataEnsemble *) 0;
    msg_typ     = (StringArray *)        0;
+   sid_exc     = (StringArray *)        0;
    obs_qty     = (StringArray *)        0;
    mask_dp     = (DataPlane *)          0;   
    interp_mthd = (InterpMthd *)         0;
@@ -96,6 +97,7 @@ void EnsembleStatConfInfo::clear() {
    if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)        0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataEnsemble *) 0; }
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
+   if(sid_exc)     { delete [] sid_exc;     sid_exc     = (StringArray *)        0; }
    if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)        0; }
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }
    if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)        0; }
@@ -287,6 +289,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       // Allocate space based on the number of verification tasks
       vx_pd   = new VxPairDataEnsemble [n_vx];
       msg_typ = new StringArray        [n_vx];
+      sid_exc = new StringArray        [n_vx];
       obs_qty = new StringArray        [n_vx];
 
       // Parse the fcst field information
@@ -300,8 +303,12 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
-         // Conf: msg_typ
+         // Conf: message_type
          msg_typ[i] = parse_conf_message_type(&i_obs_dict);
+
+         // Conf: sid_exc
+         sid_exc[i] = parse_conf_sid_exc(&i_obs_dict);
+         vx_pd[i].set_sid_exc_filt(sid_exc[i]);
 
          // Conf: obs_qty
          obs_qty[i] = parse_conf_obs_qty(&i_obs_dict);

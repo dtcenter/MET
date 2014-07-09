@@ -56,8 +56,8 @@ ens = {
 // Forecast and observation fields to be verified
 //
 fcst = {
-
    message_type = [ "ADPSFC" ];
+   sid_exc      = [];
   
    field = [
       {

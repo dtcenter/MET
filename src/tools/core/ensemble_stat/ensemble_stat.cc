@@ -34,6 +34,7 @@
 //                    missing files, fields, and data values.
 //   009    08/30/12  Oldenburg       Add spread/skill functionality
 //   010    06/03/14  Halley Gotway   Add PHIST line type
+//   011    07/09/14  Halley Gotway   Add station id exclusion option. 
 //
 ////////////////////////////////////////////////////////////////////////
 
