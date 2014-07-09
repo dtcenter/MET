@@ -94,6 +94,8 @@ class CgraphBase : public PSfile {
 
       void set_current_font_size(double);
 
+      double current_font_size() const;
+
       ConcatString Filename;
 
 
@@ -180,8 +182,8 @@ class CgraphBase : public PSfile {
       void choose_font(int, double);                     //  from ps base class
 
 
-      virtual void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char);
-      virtual void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char *);
+      virtual void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char,   const bool render_flag = true);
+      virtual void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char *, const bool render_flag = true);
 
          //
          //  text rendering, with the cairo "toy" interface
@@ -338,8 +340,8 @@ class Cgraph : public CgraphBase {
          //  text rendering
          //
 
-      void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char);
-      void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char *);
+      void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char,   const bool render_flag = true);
+      void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char *, const bool render_flag = true);
 
       // void wct(double x, double y, double u, double v, const char *);
 

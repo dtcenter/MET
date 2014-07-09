@@ -19,9 +19,9 @@ libvx_cgraph_a_CPPFLAGS = -I${includedir}
 bin_PROGRAMS    = plot_mode_field
 #plot_mode_field_SOURCES = plot_mode_field.cc \
 #	mode_nc_output_file.cc
-plot_mode_field_SOURCES = plot_mode_field.cc
+plot_mode_field_SOURCES = plot_mode_field.cc mode_nc_output_file.cc
 plot_mode_field_CPPFLAGS = -I${includedir}
-plot_mode_field_LDFLAGS = -L${libdir}
+plot_mode_field_LDFLAGS = -L${libdir} -L.
 plot_mode_field_LDADD = -lvx_cgraph \
         -lvx_config \
         -lvx_plot_util \

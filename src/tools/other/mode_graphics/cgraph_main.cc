@@ -655,6 +655,28 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double CgraphBase::current_font_size() const
+
+{
+
+if ( !CurrentFont )  {
+
+   mlog << Error 
+        << "\n\n  CgraphBase::current_font_size() const -> no current font!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( CurrentFont->scaled_ps_size );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 FT_Face CgraphBase::ft_load(const char * pfb_path, const char * afm_path)
 
 {
@@ -799,7 +821,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CgraphBase::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char c)
+void CgraphBase::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char c, const bool render_flag)
 
 {
 
@@ -808,7 +830,7 @@ char junk[2];
 junk[0] = c;
 junk[1] = (char) 0;
 
-write_centered_text(center, fill_flag, x_pin, y_pin, u, v, junk);
+write_centered_text(center, fill_flag, x_pin, y_pin, u, v, junk, render_flag);
 
 return;
 
@@ -818,7 +840,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CgraphBase::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char * s)
+void CgraphBase::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char * s, const bool render_flag)
 
 {
 
@@ -1051,45 +1073,49 @@ for (j=0; j<N; ++j)  {
    //  render the text
    //
 
-info = wct_info;
+if ( render_flag )  {
 
-for (j=0; j<N; ++j)  {
+   info = wct_info;
 
-   error = FT_Load_Glyph(face, info->glyph_index, FT_LOAD_DEFAULT);
+   for (j=0; j<N; ++j)  {
 
-   if ( error )  {
+      error = FT_Load_Glyph(face, info->glyph_index, FT_LOAD_DEFAULT);
 
-      mlog << Error << "\n\n  CgraphBase::write_centered_text() -> error loading glyph\n\n";
+      if ( error )  {
 
-      exit ( 1 );
+         mlog << Error << "\n\n  CgraphBase::write_centered_text() -> error loading glyph\n\n";
 
-   }
-
-   switch ( fill_flag )  {
-
-
-      case 0:
-         draw_outline_ft_char (info->x_outline_origin, info->y_outline_origin, face->glyph);
-         break;
-
-
-      case 1:
-         draw_bitmap_ft_char  (info->x_bitmap_origin, info->y_bitmap_origin, face->glyph);
-         break;
-
-
-      default:
-         mlog << Error << "\n\n  CgraphBase::write_centered_text() -> fill_flag "
-              << fill_flag << " is not supported\n\n";
          exit ( 1 );
-         break;
+
+      }
+
+      switch ( fill_flag )  {
 
 
-   }   //  switch
+         case 0:
+            draw_outline_ft_char (info->x_outline_origin, info->y_outline_origin, face->glyph);
+            break;
 
-   ++info;
 
-}   //  for j
+         case 1:
+            draw_bitmap_ft_char  (info->x_bitmap_origin, info->y_bitmap_origin, face->glyph);
+            break;
+
+
+         default:
+            mlog << Error << "\n\n  CgraphBase::write_centered_text() -> fill_flag "
+                 << fill_flag << " is not supported\n\n";
+            exit ( 1 );
+            break;
+
+
+      }   //  switch
+
+      ++info;
+
+   }   //  for j
+
+}   //  if render_flag
 
    //
    //  done
@@ -1947,7 +1973,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Cgraph::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char c)
+void Cgraph::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char c, const bool render_flag)
 
 {
 
@@ -1956,7 +1982,7 @@ char junk[2];
 junk[0] = c;
 junk[1] = (char) 0;
 
-CgraphBase::write_centered_text(center, fill_flag, x_pin, MediaHeight - y_pin, u, v, junk);
+CgraphBase::write_centered_text(center, fill_flag, x_pin, MediaHeight - y_pin, u, v, junk, render_flag);
 
 return;
 
@@ -1966,11 +1992,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Cgraph::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char * text)
+void Cgraph::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char * text, const bool render_flag)
 
 {
 
-CgraphBase::write_centered_text(center, fill_flag, x_pin, MediaHeight - y_pin, u, v, text);
+CgraphBase::write_centered_text(center, fill_flag, x_pin, MediaHeight - y_pin, u, v, text, render_flag);
 
 return;
 
