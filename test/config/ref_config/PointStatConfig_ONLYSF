@@ -19,6 +19,7 @@ model = "${MODEL}";
 fcst = {
    wind_thresh  = [ NA ];
    message_type = [ "ONLYSF" ];
+   sid_exc      = [];
 
    field = [
       {
