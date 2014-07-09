@@ -19,6 +19,7 @@ model = "WRF";
 fcst = {
    wind_thresh  = [ NA ];
    message_type = [ "ADPSFC" ];
+   sid_exc      = [];
 
    field = [
       {

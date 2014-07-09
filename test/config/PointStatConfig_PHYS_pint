@@ -23,6 +23,9 @@ fcst = {
 
 };
 obs = {
+
+   sid_exc = [];
+   
    field = [
       { name = "TMP";  level = "Z2";           cat_thresh = [ <=273, >273 ]; message_type = "ADPSFC"; },
       { name = "TMP";  level = "P850-700";     cat_thresh = [ <=273, >273 ]; message_type = "ADPUPA"; }

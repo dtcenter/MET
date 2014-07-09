@@ -37,6 +37,7 @@ ens = {
 fcst = {
 
    message_type = [ "ADPSFC" ];
+   sid_exc      = [];
   
    field = [
       {

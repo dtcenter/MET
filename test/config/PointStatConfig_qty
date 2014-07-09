@@ -18,6 +18,7 @@ model = "WRF";
 //
 fcst = {
    wind_thresh  = [ NA ];
+   sid_exc      = [];
 
    field = [
       {

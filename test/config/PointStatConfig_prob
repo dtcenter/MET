@@ -29,6 +29,7 @@ fcst = {
 obs = {
 
    wind_thresh = [ NA ];
+   sid_exc     = [];
    
    field = [
       {
