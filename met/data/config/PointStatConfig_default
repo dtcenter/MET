@@ -19,6 +19,7 @@ model = "WRF";
 fcst = {
    wind_thresh  = [ NA ];
    message_type = [ "ADPUPA" ];
+   sid_exc      = [];
 
    field = [
       {
@@ -71,9 +72,9 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [];
-   sid  = [];
+   grid    = [ "FULL" ];
+   poly    = [];
+   sid     = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////

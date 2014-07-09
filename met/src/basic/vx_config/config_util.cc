@@ -289,6 +289,113 @@ StringArray parse_conf_message_type(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+StringArray parse_conf_sid_exc(Dictionary *dict) {
+   StringArray sa, cur, sid_exc_sa;
+   ConcatString mask_name;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_sid_exc() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
+   sa = dict->lookup_string_array(conf_key_sid_exc);
+
+   // Parse station ID's to exclude from each entry
+   for(i=0; i<sa.n_elements(); i++) {
+      parse_sid_mask(sa[i], cur, mask_name);
+      sid_exc_sa.add(cur);
+   }
+   
+   mlog << Debug(4) << "parse_conf_sid_exc() -> "
+        << "Station ID exclusion list contains "
+        << sid_exc_sa.n_elements() << " entries.\n";
+
+   return(sid_exc_sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// This function is passed a string containing either a single station ID or
+// a file name containing a list of station ID's.  For a single station ID,
+// store it in the output StringArray, and store it's value as the mask name.
+// For a file name, parse the list of stations into the output StringArray,
+// and store the first entry in the file as the mask name.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void parse_sid_mask(const ConcatString &mask_sid_str,
+                    StringArray &mask_sid, ConcatString &mask_name) {
+   ifstream in;
+   ConcatString tmp_file;
+   char sid_str[PATH_MAX];
+
+   // Initialize
+   mask_sid.clear();
+   mask_name = na_str;
+
+   // Check for an empty length string
+   if(mask_sid_str.empty()) return;
+   
+   // Replace any instances of MET_BASE with it's expanded value
+   tmp_file = replace_path(mask_sid_str);
+
+   // Process string as a file name, if possible
+   if(file_exists(tmp_file)) {
+
+      mlog << Debug(4) << "parse_sid_mask() -> "
+           << "parsing station ID masking file \"" << tmp_file << "\"\n";
+
+      // Open the mask station id file specified
+      in.open(tmp_file);
+
+      if(!in) {
+         mlog << Error << "\nparse_sid_mask() -> "
+              << "Can't open the station ID masking file \""
+              << tmp_file << "\".\n\n";
+         exit(1);
+      }
+
+      // Store the first entry as the name of the mask
+      in >> sid_str;
+      mask_name = sid_str;
+
+      // Store the rest of the entries as masking station ID's
+      while(in >> sid_str) mask_sid.add(sid_str);
+
+      // Close the input file
+      in.close();
+
+      mlog << Debug(4) << "parse_sid_mask() -> "
+           << "parsed " << mask_sid.n_elements() << " station ID's for the \""
+           << mask_name << "\" mask from file \"" << tmp_file << "\"\n";
+   }
+   // Otherwise, process it as a single station ID
+   else {
+
+      mlog << Debug(4) << "parse_sid_mask() -> "
+           << "storing single station ID mask \"" << mask_sid_str << "\"\n";
+
+      // Check for embedded whitespace or slashes
+      if(check_reg_exp(ws_reg_exp, mask_sid_str) ||
+         check_reg_exp("[/]", mask_sid_str)) {
+         mlog << Error << "\nparse_sid_mask() -> "
+              << "masking station ID name can't contain whitespace or slashes \""
+              << mask_sid_str << "\".\n\n";
+         exit(1);
+      }
+
+      // Store the single station ID
+      mask_sid.add(mask_sid_str);
+      mask_name = mask_sid_str;
+   }
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 StringArray parse_conf_obs_qty(Dictionary *dict) {
    StringArray sa;
 

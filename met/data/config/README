@@ -261,19 +261,30 @@ fcst = {
 //       field = [
 //          {
 //            message_type = [ "ADPUPA" ];
+//            sid_exc      = [];
 //            name       = "TMP";
 //            level      = [ "P250", "P500", "P700", "P850", "P1000" ];
 //            cat_thresh = [ <=273.0 ];
 //          },
 //          {
 //            message_type = [ "ADPSFC" ];
+//            sid_exc      = [ "KDEN", "KDET" ];
 //            name       = "TMP";
 //            level      = [ "Z2" ];
 //            cat_thresh = [ <=273.0 ];
 //          }
 //       ];
 //     }
-//
+
+//    - The "sid_exc" entry is an array of station ID groups indicating which
+//      station ID's should be excluded from the verification tasks.  Each element
+//      is either the name of a single station ID or a station ID group file name.
+//      A station ID group file consists of a name for the group followed by a
+//      list of station ID's.  All of the station ID's indicated will be placed
+//      into one long list of station ID's to be excluded.
+//    - As with "message_type" above, the "sid_exc" setting can be placed in the
+//      in the "field" array element to control which station ID's are excluded
+//      for each verification task.
 //
 obs = fcst;
 
@@ -335,13 +346,13 @@ obs_window = {
 //      list of station ID's.
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ "MET_BASE/poly/LMV.poly",
-            "MET_BASE/out/gen_poly_mask/CONUS_poly.nc",
-            "MET_BASE/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
-            {name = \"TMP\"; level = \"Z2\";} >273"
-          ];
-   sid  = [ "CONUS.stations" ];
+   grid    = [ "FULL" ];
+   poly    = [ "MET_BASE/poly/LMV.poly",
+               "MET_BASE/out/gen_poly_mask/CONUS_poly.nc",
+               "MET_BASE/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+               {name = \"TMP\"; level = \"Z2\";} >273"
+             ];
+   sid     = [ "CONUS.stations" ];
 };
 
 //

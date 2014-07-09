@@ -73,6 +73,7 @@
 //   027    02/25/13  Halley Gotway  Add duplicates rejection counts.
 //   028    08/21/13  Halley Gotway  Fix sizing of output tables for 12
 //                    or more probabilstic thresholds.
+//   029    07/09/14  Halley Gotway  Add station id exclusion option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -925,6 +926,7 @@ void process_scores() {
                mlog << Debug(3)
                     << "Number of matched pairs  = " << pd_ptr->n_pair << "\n"
                     << "Observations processed   = " << conf_info.vx_pd[i].n_try << "\n"
+                    << "Rejected: SID exclusion  = " << conf_info.vx_pd[i].rej_sid_exc << "\n"
                     << "Rejected: GRIB code      = " << conf_info.vx_pd[i].rej_gc << "\n"
                     << "Rejected: valid time     = " << conf_info.vx_pd[i].rej_vld << "\n"
                     << "Rejected: bad obs value  = " << conf_info.vx_pd[i].rej_obs << "\n"

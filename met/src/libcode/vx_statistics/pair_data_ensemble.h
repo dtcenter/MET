@@ -146,6 +146,7 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray sid_exc_filt;  // Station ID exclusion list
       StringArray obs_qty_filt;  // Observation quality markers
 
       //////////////////////////////////////////////////////////////////
@@ -181,6 +182,7 @@ class VxPairDataEnsemble {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
+      void set_sid_exc_filt(const StringArray);
       void set_obs_qty_filt(const StringArray);
 
       // Call set_pd_size before set_msg_typ, set_mask_dp, and set_interp

@@ -85,6 +85,7 @@ class EnsembleStatConfInfo {
       double               vld_data_thresh;     // Minimum valid data ratio for each point
       VxPairDataEnsemble * vx_pd;               // Array for ensemble pair data [n_vx]
       StringArray *        msg_typ;             // Array of message types [n_vx]
+      StringArray *        sid_exc;             // Array of station ID's to exclude [n_vx]
       StringArray *        obs_qty;             // Observation quality flags for filtering[n_vx]
       StringArray          mask_name;           // Masking region names [n_mask]
       NumArray             ens_ssvar_bin_size;  // Ensemble spread/skill variance bin size [n_vx]

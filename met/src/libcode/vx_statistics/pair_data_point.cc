@@ -222,6 +222,7 @@ void VxPairDataPoint::clear() {
 
    fcst_dpa.clear();
    climo_dpa.clear();
+   sid_exc_filt.clear();
    obs_qty_filt.clear();
 
    fcst_ut       = (unixtime) 0;
@@ -229,6 +230,7 @@ void VxPairDataPoint::clear() {
    end_ut        = (unixtime) 0;
 
    n_try         = 0;
+   rej_sid_exc   = 0;
    rej_gc        = 0;
    rej_vld       = 0;
    rej_obs       = 0;
@@ -265,17 +267,18 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    set_fcst_info(vx_pd.fcst_info);
    set_obs_info(vx_pd.obs_info);
 
+   sid_exc_filt = vx_pd.sid_exc_filt;
    obs_qty_filt = vx_pd.obs_qty_filt;
 
    fcst_ut  = vx_pd.fcst_ut;
    beg_ut   = vx_pd.beg_ut;
    end_ut   = vx_pd.end_ut;
 
-   n_try    = vx_pd.n_try;
-   rej_typ  = vx_pd.rej_typ;
-   rej_mask = vx_pd.rej_mask;
-   rej_fcst = vx_pd.rej_fcst;
-   rej_dup  = vx_pd.rej_dup;
+   n_try       = vx_pd.n_try;
+   rej_typ     = vx_pd.rej_typ;
+   rej_mask    = vx_pd.rej_mask;
+   rej_fcst    = vx_pd.rej_fcst;
+   rej_dup     = vx_pd.rej_dup;
 
    interp_thresh = vx_pd.interp_thresh;
 
@@ -394,6 +397,15 @@ void VxPairDataPoint::set_end_ut(const unixtime ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::set_sid_exc_filt(const StringArray se) {
+
+   sid_exc_filt = se;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::set_obs_qty_filt(const StringArray q) {
 
    obs_qty_filt = q;
@@ -430,13 +442,13 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
          rej_typ[i][j]  = new int           [n_interp];
          rej_mask[i][j] = new int           [n_interp];
          rej_fcst[i][j] = new int           [n_interp];
-         rej_dup[i][j] = new int           [n_interp];
+         rej_dup[i][j]  = new int           [n_interp];
 
          for(k=0; k<n_interp; k++) {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
-            rej_dup[i][j][k] = 0;
+            rej_dup[i][j][k]  = 0;
          } // end for k
       } // end for j
    } // end for i
@@ -539,6 +551,12 @@ void VxPairDataPoint::add_obs(float *hdr_arr,     char *hdr_typ_str,
    // Increment the number of tries count
    n_try++;
    
+   // Check the station ID exclusion list
+   if(sid_exc_filt.n_elements() && sid_exc_filt.has(hdr_sid_str)) {
+      rej_sid_exc++;
+      return;
+   }
+
    // Check whether the GRIB code for the observation matches
    // the specified code
    if(obs_info->code() != nint(obs_arr[1])) {
