@@ -41,9 +41,9 @@ fcst = {
   
    field = [
       {
-         name  = "TMP";
-         level = [ "Z2" ];
-         obs_quality    = [ ${OBS_QUALITY} ];
+         name        = "TMP";
+         level       = [ "Z2" ];
+         obs_quality = [ ${OBS_QUALITY} ];
       }
    ];
 }

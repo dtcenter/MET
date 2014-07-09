@@ -1,41 +1,25 @@
 ////////////////////////////////////////////////////////////////////////////////
-//
-// Point-Stat configuration file.
-//
-// For additional information, see the MET_BASE/config/README file.
-//
-////////////////////////////////////////////////////////////////////////////////
 
-//
-// Output model name to be written
-//
 model = "WRF";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//
-// Forecast and observation fields to be verified
-//
-fcst = {
-   wind_thresh  = [ NA ];
-   sid_exc      = [];
+obs_window = {
+   beg = ${BEG_DS};
+   end = ${END_DS};
+}
 
+////////////////////////////////////////////////////////////////////////////////
+
+fcst = {
+
+   wind_thresh = [ NA ];
+   sid_exc     = [ ];
+   
    field = [
-      {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        cat_thresh   = [ <=273, >273 ];
-        message_type = [ "ADPSFC" ];
-        obs_quality  = [ ${OBS_QUALITY_SFC} ];
-      },
-      
-      {
-        name         = "TMP";
-        level        = [ "P500" ];
-        cat_thresh   = [ <=273, >273 ];
-        message_type = [ "ADPUPA" ];
-        obs_quality  = [ ${OBS_QUALITY_UPA} ];
-      }
+      { name = "UGRD"; level = "Z10"; message_type = "ADPSFC"; },
+      { name = "VGRD"; level = "Z10"; message_type = "ADPSFC";
+        sid_exc = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ]; }
    ];
 
 };
@@ -43,46 +27,28 @@ obs = fcst;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//
-// Point observation time window
-//
-obs_window = {
-   beg = -5400;
-   end =  5400;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Verification masking regions
-//
 mask = {
-   grid = [ "FULL" ];
+   grid = [ "DTC165" ];
    poly = [ ];
    sid  = [ ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//
-// Confidence interval settings
-//
 ci_alpha  = [ 0.05 ];
 
 boot = {
    interval = PCTILE;
    rep_prop = 1.0;
-   n_rep    = 0;
+   n_rep    = 200;
    rng      = "mt19937";
    seed     = "1";
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//
-// Interpolation methods
-//
 interp = {
+  
    vld_thresh = 1.0;
 
    type = [
@@ -95,17 +61,14 @@ interp = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//
-// Statistical output types
-//
 output_flag = {
-   fho    = BOTH;
-   ctc    = BOTH;
-   cts    = BOTH;
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
-   sl1l2  = BOTH;
+   cnt    = NONE;
+   sl1l2  = NONE;
    sal1l2 = NONE;
    vl1l2  = NONE;
    val1l2 = NONE;
@@ -118,7 +81,7 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-duplicate_flag = NONE;
+duplicate_flag = SINGLE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
