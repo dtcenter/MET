@@ -145,7 +145,7 @@ void ModeConfInfo::clear()
    plot_gcarc_flag = false;
    ps_plot_flag    = false;
 
-   nc_info.set_all_false();
+   nc_info.set_all_true();
 
    ct_stats_flag   = false;
 
@@ -639,6 +639,25 @@ do_object_raw = false;
 do_object_id  = false;
 do_cluster_id = false;
 do_polylines  = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeNcOutInfo::set_all_true()
+
+{
+
+do_latlon     = true;
+do_raw        = true;
+do_object_raw = true;
+do_object_id  = true;
+do_cluster_id = true;
+do_polylines  = true;
 
 return;
 

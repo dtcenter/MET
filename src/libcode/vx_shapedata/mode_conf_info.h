@@ -48,6 +48,7 @@ struct ModeNcOutInfo {
    bool all_false() const;
 
    void set_all_false();
+   void set_all_true();
 
 };
 
