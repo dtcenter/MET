@@ -50,7 +50,8 @@ class SingleFeature {
       void clear();
 
       void set(const ShapeData &raw,  const ShapeData &thresh,
-               const ShapeData &mask, const double p);
+               const ShapeData &mask, const double p,
+               const bool precip_flag);
 
       const ShapeData * Raw;    //  NOT allocated, so DON'T delete!
       const ShapeData * Thresh; //  NOT allocated, so DON'T delete!

@@ -848,14 +848,16 @@ void ModeFuzzyEngine::do_no_match() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         conf_info.inten_perc_value);
+                         conf_info.inten_perc_value,
+                         conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        conf_info.inten_perc_value);
+                        conf_info.inten_perc_value,
+                        conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -911,14 +913,16 @@ void ModeFuzzyEngine::do_match_merge() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         conf_info.inten_perc_value);
+                         conf_info.inten_perc_value,
+                         conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        conf_info.inten_perc_value);
+                        conf_info.inten_perc_value,
+                        conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -1672,14 +1676,16 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         conf_info.inten_perc_value);
+                         conf_info.inten_perc_value,
+                         conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        conf_info.inten_perc_value);
+                        conf_info.inten_perc_value,
+                        conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -1838,14 +1844,16 @@ void ModeFuzzyEngine::do_match_only() {
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
-                         conf_info.inten_perc_value);
+                         conf_info.inten_perc_value,
+                         conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
-                        conf_info.inten_perc_value);
+                        conf_info.inten_perc_value,
+                        conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -2072,12 +2080,14 @@ void ModeFuzzyEngine::do_cluster_features() {
    for(j=0; j<n_clus; j++) {
       fcst_clus_shape[j] = select(*fcst_clus_split, j+1);
       fcst_clus[j].set(*fcst_filter, *fcst_thresh, fcst_clus_shape[j],
-                       conf_info.inten_perc_value);
+                       conf_info.inten_perc_value,
+                       conf_info.fcst_info->is_precipitation());
       fcst_clus[j].object_number = j+1;
 
       obs_clus_shape[j] = select(*obs_clus_split, j+1);
       obs_clus[j].set(*obs_filter, *obs_thresh, obs_clus_shape[j],
-                      conf_info.inten_perc_value);
+                      conf_info.inten_perc_value,
+                      conf_info.obs_info->is_precipitation());
       obs_clus[j].object_number = j+1;
    }
 
