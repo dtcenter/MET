@@ -24,6 +24,35 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+
+struct ModeNcOutInfo {
+
+   bool do_latlon;
+
+   bool do_raw;
+
+   bool do_object_raw;
+
+   bool do_object_id;
+
+   bool do_cluster_id;
+
+      ///////////////
+
+   ModeNcOutInfo();
+
+   void clear();   //  sets everything to "true"
+
+   bool all_false() const;
+
+   void set_all_false();
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class ModeConfInfo {
 
    private:
@@ -40,6 +69,8 @@ class ModeConfInfo {
       void read_config    (const char * default_filename, const char * user_filename);
 
       void process_config (GrdFileType ftype, GrdFileType otype);
+
+      void parse_nc_info  ();
 
          // Store data parsed from the MODE configuration object
 
@@ -124,7 +155,8 @@ class ModeConfInfo {
       bool             plot_valid_flag;        // Zoom up plot to the sub-region of valid data
       bool             plot_gcarc_flag;        // Plot lines as great-circle arcs
       bool             ps_plot_flag;           // Flag for the output PostScript image file      
-      bool             nc_pairs_flag;          // Flag for the output NetCDF pairs file
+      // bool             nc_pairs_flag;          // output NetCDF file
+      ModeNcOutInfo    nc_info; 
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
 
       int              shift_right;            //  shift amount for global grids

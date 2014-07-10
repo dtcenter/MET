@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 #include "mode_conf_info.h"
+#include "configobjecttype_to_string.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
@@ -143,7 +144,9 @@ void ModeConfInfo::clear()
    plot_valid_flag = false;
    plot_gcarc_flag = false;
    ps_plot_flag    = false;
-   nc_pairs_flag   = false;
+
+   nc_info.set_all_false();
+
    ct_stats_flag   = false;
 
    shift_right = 0;
@@ -181,6 +184,7 @@ void ModeConfInfo::read_config(const char *default_file_name, const char *user_f
 }
 
 ////////////////////////////////////////////////////////////////////////
+
 
 void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
@@ -477,7 +481,9 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
    
       // Conf: nc_pairs_flag
 
-   nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
+   parse_nc_info();
+
+   // nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
 
       // Conf: ct_stats_flag
 
@@ -495,6 +501,148 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::parse_nc_info()
+
+{
+
+const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+e = conf.lookup(conf_key_nc_pairs_flag);
+
+if ( !e )  {
+
+   mlog << Error 
+        << "\n\n  ModeConfInfo::parse_nc_info() -> lookup failed for key \"" 
+        << conf_key_nc_pairs_flag << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+const ConfigObjectType type = e->type();
+
+if ( type == BooleanType )  {
+
+   bool value = e->b_value();
+
+   if ( ! value )  nc_info.set_all_false();
+
+   return;
+
+} 
+
+   //
+   //  it should be a dictionary
+   //
+
+if ( type != DictionaryType )  {
+
+   mlog << Error 
+        << "\n\n  ModeConfInfo::parse_nc_info() -> bad type ("
+        << configobjecttype_to_string(type)
+        << ") for key \""
+        << conf_key_nc_pairs_flag << "\"\n\n";
+
+   exit ( 1 );
+
+} 
+
+   //
+   //  parse the various entries
+   //
+
+Dictionary * d = e->dict_value();
+
+nc_info.do_latlon     = d->lookup_bool(conf_key_latlon_flag);
+nc_info.do_raw        = d->lookup_bool(conf_key_raw_flag);
+nc_info.do_object_raw = d->lookup_bool(conf_key_object_raw_flag);
+nc_info.do_object_id  = d->lookup_bool(conf_key_object_id_flag);
+nc_info.do_cluster_id = d->lookup_bool(conf_key_cluster_id_flag);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for struct ModeNcOutInfo
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ModeNcOutInfo::ModeNcOutInfo()
+
+{
+
+clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeNcOutInfo::clear()
+
+{
+
+do_latlon     = true;
+do_raw        = true;
+do_object_raw = true;
+do_object_id  = true;
+do_cluster_id = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool ModeNcOutInfo::all_false() const
+
+{
+
+bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id;
+
+return ( !status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeNcOutInfo::set_all_false()
+
+{
+
+do_latlon     = false;
+do_raw        = false;
+do_object_raw = false;
+do_object_id  = false;
+do_cluster_id = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 

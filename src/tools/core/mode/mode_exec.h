@@ -124,7 +124,7 @@ class ModeExecutive {
 
       void build_outfile_name(const char *, ConcatString &);
       void write_obj_stats();
-      void write_obj_netcdf();
+      void write_obj_netcdf(const ModeNcOutInfo &);
       void write_poly_netcdf(NcFile *);
       void write_poly_netcdf(NcFile *, const ObjPolyType);
       void write_ct_stats();

@@ -350,7 +350,7 @@ void ModeExecutive::do_match_merge()
 
       // Do matching and merging
 
-   if ( engine.conf_info.ps_plot_flag || engine.conf_info.nc_pairs_flag )  {
+   if ( engine.conf_info.ps_plot_flag || !(engine.conf_info.nc_info.all_false()) )  {
 
       mlog << Debug(2)
            << "Identified: " << engine.n_fcst << " forecast objects "
@@ -453,7 +453,7 @@ write_obj_stats();
 
 if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
 
-if ( engine.conf_info.nc_pairs_flag )  write_obj_netcdf();
+write_obj_netcdf(engine.conf_info.nc_info);
 
 if ( engine.conf_info.ps_plot_flag )   plot_engine();
 
@@ -700,9 +700,11 @@ void ModeExecutive::write_obj_stats()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::write_obj_netcdf()
+void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
 {
+
+if ( info.all_false() )  return;
 
    int n, x, y;
    ConcatString out_file;
@@ -767,130 +769,191 @@ void ModeExecutive::write_obj_netcdf()
    lon_dim = f_out->add_dim("lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
+   if ( info.do_latlon )  write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
    // Define Variables
-   fcst_raw_var     = f_out->add_var("fcst_raw",     ncFloat, lat_dim, lon_dim);
-   fcst_obj_raw_var = f_out->add_var("fcst_obj_raw", ncFloat, lat_dim, lon_dim);
-   fcst_obj_var     = f_out->add_var("fcst_obj_id",  ncInt,   lat_dim, lon_dim);
-   fcst_clus_var    = f_out->add_var("fcst_clus_id", ncInt,   lat_dim, lon_dim);
+   if ( info.do_raw )         fcst_raw_var     = f_out->add_var("fcst_raw",     ncFloat, lat_dim, lon_dim);
+   if ( info.do_object_raw )  fcst_obj_raw_var = f_out->add_var("fcst_obj_raw", ncFloat, lat_dim, lon_dim);
+   if ( info.do_object_id )   fcst_obj_var     = f_out->add_var("fcst_obj_id",  ncInt,   lat_dim, lon_dim);
+   if ( info.do_cluster_id )  fcst_clus_var    = f_out->add_var("fcst_clus_id", ncInt,   lat_dim, lon_dim);
 
-   obs_raw_var      = f_out->add_var("obs_raw",     ncFloat, lat_dim, lon_dim);
-   obs_obj_raw_var  = f_out->add_var("obs_obj_raw", ncFloat, lat_dim, lon_dim);
-   obs_obj_var      = f_out->add_var("obs_obj_id",  ncInt,   lat_dim, lon_dim);
-   obs_clus_var     = f_out->add_var("obs_clus_id", ncInt,   lat_dim, lon_dim);
+   if ( info.do_raw )         obs_raw_var      = f_out->add_var("obs_raw",     ncFloat, lat_dim, lon_dim);
+   if ( info.do_object_raw )  obs_obj_raw_var  = f_out->add_var("obs_obj_raw", ncFloat, lat_dim, lon_dim);
+   if ( info.do_object_id )   obs_obj_var      = f_out->add_var("obs_obj_id",  ncInt,   lat_dim, lon_dim);
+   if ( info.do_cluster_id )  obs_clus_var     = f_out->add_var("obs_clus_id", ncInt,   lat_dim, lon_dim);
    
    // Add forecast variable attributes
 
-   fcst_raw_var->add_att("long_name", "Forecast Raw Values");
-   write_netcdf_var_times(fcst_raw_var, engine.fcst_raw->data);
-   fcst_raw_var->add_att("_FillValue", bad_data_float);
+   if ( info.do_raw )  {
 
-   fcst_obj_raw_var->add_att("long_name", "Forecast Object Raw Values");
-   write_netcdf_var_times(fcst_obj_raw_var, engine.fcst_raw->data);
-   fcst_obj_raw_var->add_att("_FillValue", bad_data_float);
+      fcst_raw_var->add_att("long_name", "Forecast Raw Values");
+      write_netcdf_var_times(fcst_raw_var, engine.fcst_raw->data);
+      fcst_raw_var->add_att("_FillValue", bad_data_float);
 
-   fcst_obj_var->add_att("long_name", "Forecast Object ID");
-   write_netcdf_var_times(fcst_obj_var, engine.fcst_raw->data);
-   fcst_obj_var->add_att("_FillValue", bad_data_int);
+   }
 
-   fcst_clus_var->add_att("long_name", "Forecast Cluster Object ID");
-   write_netcdf_var_times(fcst_clus_var, engine.fcst_raw->data);
-   fcst_clus_var->add_att("_FillValue", bad_data_int);
+   if ( info.do_object_raw )  {
+
+      fcst_obj_raw_var->add_att("long_name", "Forecast Object Raw Values");
+      write_netcdf_var_times(fcst_obj_raw_var, engine.fcst_raw->data);
+      fcst_obj_raw_var->add_att("_FillValue", bad_data_float);
+
+   }
+
+   if ( info.do_object_id )  {
+
+      fcst_obj_var->add_att("long_name", "Forecast Object ID");
+      write_netcdf_var_times(fcst_obj_var, engine.fcst_raw->data);
+      fcst_obj_var->add_att("_FillValue", bad_data_int);
+
+   }
+
+   if ( info.do_cluster_id )  {
+
+      fcst_clus_var->add_att("long_name", "Forecast Cluster Object ID");
+      write_netcdf_var_times(fcst_clus_var, engine.fcst_raw->data);
+      fcst_clus_var->add_att("_FillValue", bad_data_int);
+
+   }
 
    // Add observation variable attributes
 
-   obs_raw_var->add_att("long_name", "Observation Raw Values");
-   write_netcdf_var_times(obs_raw_var, engine.obs_raw->data);
-   obs_raw_var->add_att("_FillValue", bad_data_float);
+   if ( info.do_raw )  {
 
-   obs_obj_raw_var->add_att("long_name", "Observation Object Raw Values");
-   write_netcdf_var_times(obs_obj_raw_var, engine.obs_raw->data);
-   obs_obj_raw_var->add_att("_FillValue", bad_data_float);
+      obs_raw_var->add_att("long_name", "Observation Raw Values");
+      write_netcdf_var_times(obs_raw_var, engine.obs_raw->data);
+      obs_raw_var->add_att("_FillValue", bad_data_float);
 
-   obs_obj_var->add_att("long_name", "Observation Object ID");
-   write_netcdf_var_times(obs_obj_var, engine.obs_raw->data);
-   obs_obj_var->add_att("_FillValue", bad_data_int);
+   }
 
-   obs_clus_var->add_att("long_name", "Observation Cluster Object ID");
-   write_netcdf_var_times(obs_clus_var, engine.obs_raw->data);
-   obs_clus_var->add_att("_FillValue", bad_data_int);
+   if ( info.do_object_raw )  {
+
+      obs_obj_raw_var->add_att("long_name", "Observation Object Raw Values");
+      write_netcdf_var_times(obs_obj_raw_var, engine.obs_raw->data);
+      obs_obj_raw_var->add_att("_FillValue", bad_data_float);
+
+   }
+
+   if ( info.do_object_id )  {
+
+      obs_obj_var->add_att("long_name", "Observation Object ID");
+      write_netcdf_var_times(obs_obj_var, engine.obs_raw->data);
+      obs_obj_var->add_att("_FillValue", bad_data_int);
+
+   }
+
+   if ( info.do_cluster_id )  {
+
+      obs_clus_var->add_att("long_name", "Observation Cluster Object ID");
+      write_netcdf_var_times(obs_clus_var, engine.obs_raw->data);
+      obs_clus_var->add_att("_FillValue", bad_data_int);
+
+   }
 
    //
    // Allocate memory for the raw values and object ID's for each grid box
    //
 
-   fcst_raw_data      = new float [grid.nx()*grid.ny()];
-   fcst_obj_raw_data  = new float [grid.nx()*grid.ny()];
-   fcst_obj_data      = new int   [grid.nx()*grid.ny()];
-   fcst_clus_data     = new int   [grid.nx()*grid.ny()];
+   if ( info.do_raw )  {
 
-   obs_raw_data       = new float [grid.nx()*grid.ny()];
-   obs_obj_raw_data   = new float [grid.nx()*grid.ny()];
-   obs_obj_data       = new int   [grid.nx()*grid.ny()];
-   obs_clus_data      = new int   [grid.nx()*grid.ny()];
+      fcst_raw_data      = new float [grid.nx()*grid.ny()];
+      obs_raw_data       = new float [grid.nx()*grid.ny()];
+
+   }
+
+   if ( info.do_object_raw )  {
+
+      fcst_obj_raw_data  = new float [grid.nx()*grid.ny()];
+      obs_obj_raw_data   = new float [grid.nx()*grid.ny()];
+
+   }
+
+   if ( info.do_object_id )  {
+
+      fcst_obj_data      = new int   [grid.nx()*grid.ny()];
+      obs_obj_data       = new int   [grid.nx()*grid.ny()];
+
+   }
+
+   if ( info.do_cluster_id )  {
+
+      fcst_clus_data     = new int   [grid.nx()*grid.ny()];
+      obs_clus_data      = new int   [grid.nx()*grid.ny()];
+
+   }
 
    for(x=0; x<grid.nx(); x++) {
+
       for(y=0; y<grid.ny(); y++) {
 
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
-         //
-         // Get raw values and object ID's for each grid box
-         //
+            //
+            // Get raw values and object ID's for each grid box
+            //
 
-         fcst_raw_data[n] = engine.fcst_raw->data (x, y);
-          obs_raw_data[n] = engine.obs_raw->data  (x, y);
+         if ( info.do_raw )  {
+
+            fcst_raw_data[n] = engine.fcst_raw->data (x, y);
+             obs_raw_data[n] = engine.obs_raw->data  (x, y);
+
+         }
 
          if(engine.fcst_split->is_nonzero(x, y) ) {
-            fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
-            fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+            if ( info.do_object_raw )  fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
+            if ( info.do_object_id  )  fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
          }
          else {
-            fcst_obj_raw_data[n] = bad_data_float;
-            fcst_obj_data[n] = bad_data_int;
+            if ( info.do_object_raw )  fcst_obj_raw_data[n] = bad_data_float;
+            if ( info.do_object_id  )  fcst_obj_data[n] = bad_data_int;
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-            obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
-            obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+            if ( info.do_object_raw )  obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
+            if ( info.do_object_id  )  obs_obj_data[n] = nint(engine.obs_split->data(x, y));
          }
          else {
-            obs_obj_raw_data[n] = bad_data_float;
-            obs_obj_data[n] = bad_data_int;
+            if ( info.do_object_raw )  obs_obj_raw_data[n] = bad_data_float;
+            if ( info.do_object_id  )  obs_obj_data[n] = bad_data_int;
          }
 
-         //
-         // Get cluster object ID's for each grid box
-         //
+            //
+            // Get cluster object ID's for each grid box
+            //
 
-         // Write the index of the cluster object
-         if(engine.fcst_clus_split->data(x, y) > 0) {
-            fcst_clus_data[n] = nint(engine.fcst_clus_split->data(x, y));
-         }
-         // Write a value of 0 for unmatched simple objects
-         else if(engine.fcst_split->data(x, y) > 0) {
-            fcst_clus_data[n] = unmatched_id;
-         }
-         // Otherwise, write bad data
-         else {
-            fcst_clus_data[n] = bad_data_int;
-         }
+         if ( info.do_cluster_id )  {
 
-         // Write the index of the cluster object
-         if(engine.obs_clus_split->data(x, y) > 0) {
-            obs_clus_data[n] = nint(engine.obs_clus_split->data(x, y));
-         }
-         // Write a value of 0 for unmatched simple objects
-         else if(engine.obs_split->data(x, y) > 0) {
-            obs_clus_data[n] = unmatched_id;
-         }
-         // Otherwise, write bad data
-         else {
-            obs_clus_data[n] = bad_data_int;
-         }
-      }
-   }
+               // Write the index of the cluster object
+            if ( engine.fcst_clus_split->data(x, y) > 0 ) {
+               fcst_clus_data[n] = nint(engine.fcst_clus_split->data(x, y));
+            }
+               // Write a value of 0 for unmatched simple objects
+            else if(engine.fcst_split->data(x, y) > 0) {
+               fcst_clus_data[n] = unmatched_id;
+            }
+               // Otherwise, write bad data
+            else {
+               fcst_clus_data[n] = bad_data_int;
+            }
+
+               // Write the index of the cluster object
+            if(engine.obs_clus_split->data(x, y) > 0) {
+               obs_clus_data[n] = nint(engine.obs_clus_split->data(x, y));
+            }
+               // Write a value of 0 for unmatched simple objects
+            else if(engine.obs_split->data(x, y) > 0) {
+               obs_clus_data[n] = unmatched_id;
+            }
+               // Otherwise, write bad data
+            else {
+               obs_clus_data[n] = bad_data_int;
+            }
+
+         }    //  if info.do_cluster_id
+
+      }   //  for y
+
+   }   //  for x
 
    //
    // Write the forecast and observation raw value variables

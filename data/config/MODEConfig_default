@@ -196,7 +196,17 @@ plot_gcarc_flag = FALSE;
 // NetCDF matched pairs, PostScript, and contingency table output files
 //
 ps_plot_flag    = TRUE;
-nc_pairs_flag   = TRUE;
+
+nc_pairs_flag   = {
+
+   latlon       = TRUE;
+   raw          = TRUE;
+   object_raw   = TRUE;
+   object_id    = TRUE;
+   cluster_id   = TRUE;
+
+};
+
 ct_stats_flag   = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
