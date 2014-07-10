@@ -36,7 +36,7 @@ using namespace std;
 
 static void get_percentiles(DistributionPercentiles &,
                             const ShapeData &, const ShapeData &,
-                            const double);
+                            const double, bool precip_flag);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -193,7 +193,8 @@ void SingleFeature::assign(const SingleFeature & s)
 ////////////////////////////////////////////////////////////////////////
 
 void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
-                        const ShapeData &mask, const double p)
+                        const ShapeData &mask, const double p,
+                        bool precip_flag)
 
 {
 
@@ -256,7 +257,7 @@ void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
    //
    // Compute the Intensity Percentiles
    //
-   get_percentiles(intensity_ptile, raw, mask, p);
+   get_percentiles(intensity_ptile, raw, mask, p, precip_flag);
 
    //
    // User Percentile
@@ -583,7 +584,7 @@ ostream & operator<<(ostream & out, const PairFeature & p)
 
 void get_percentiles(DistributionPercentiles &ptile,
                      const ShapeData &raw, const ShapeData &mask,
-                     const double p)
+                     const double p, const bool precip_flag)
 
 {
    int i, x, y, count, n_values;
@@ -594,14 +595,15 @@ void get_percentiles(DistributionPercentiles &ptile,
    ny = raw.data.ny();
 
    //
-   // Count values
+   // Count values.
+   // Only check precipitation for values greater than zero.
    //
    n_values = 0;
    for(x=0; x<nx; ++x) {
       for(y=0; y<ny; ++y) {
          if((mask.s_is_on(x, y)) &&
             (raw.is_valid_xy(x, y)) &&
-            (raw.data(x, y) > 0))  ++n_values;
+            (!precip_flag || (precip_flag && raw.data(x, y) > 0))) ++n_values;
       }
    }
 
@@ -622,10 +624,9 @@ void get_percentiles(DistributionPercentiles &ptile,
    count = 0;
    for(x=0; x<nx; ++x) {
       for(y=0; y<ny; ++y) {
-
          if((mask.s_is_on(x, y)) &&
             (raw.is_valid_xy(x, y)) &&
-            (raw.data(x, y) > 0)) {
+            (!precip_flag || (precip_flag && raw.data(x, y) > 0))) {
 
             v[count++] = (double) (raw.data(x, y));
          }
