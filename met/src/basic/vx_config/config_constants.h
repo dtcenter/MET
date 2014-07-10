@@ -311,10 +311,8 @@ static const char conf_key_time_summary_flag[] = "time_summary.flag";
 static const char conf_key_time_summary_beg[]  = "time_summary.beg";
 static const char conf_key_time_summary_end[]  = "time_summary.end";
 static const char conf_key_time_summary_step[] = "time_summary.step";
-static const char conf_key_time_summary_width[] =
-                                                 "time_summary.width";
-static const char conf_key_time_summary_grib_code[] =
-                                                 "time_summary.grib_code";
+static const char conf_key_time_summary_width[] = "time_summary.width";
+static const char conf_key_time_summary_grib_code[] = "time_summary.grib_code";
 static const char conf_key_time_summary_type[] = "time_summary.type";
 static const char conf_key_boot_interval[]     = "boot.interval";
 static const char conf_key_boot_rep_prop[]     = "boot.rep_prop";
@@ -347,6 +345,12 @@ static const char conf_key_file_name[]         = "file_name";
 static const char conf_key_line_color[]        = "line_color";
 static const char conf_key_line_width[]        = "line_width";
 static const char conf_key_line_dash[]         = "line_dash";
+
+static const char conf_key_latlon_flag       [] = "latlon";
+static const char conf_key_raw_flag          [] = "raw";
+static const char conf_key_object_raw_flag   [] = "object_raw";
+static const char conf_key_object_id_flag    [] = "object_id";
+static const char conf_key_cluster_id_flag   [] = "cluster_id";
 
 //
 // Wavelet-Stat specific parameter key names
