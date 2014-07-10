@@ -698,7 +698,9 @@ void ModeExecutive::write_obj_stats()
    return;
 }
 
+
 ///////////////////////////////////////////////////////////////////////
+
 
 void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
@@ -959,42 +961,60 @@ if ( info.all_false() )  return;
    // Write the forecast and observation raw value variables
    //
 
-   if( !fcst_raw_var->put(&fcst_raw_data[0], grid.ny(), grid.nx()) ||
-       !obs_raw_var->put(&obs_raw_data[0], grid.ny(), grid.nx()) ) {
+   if ( info.do_raw )  {
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
-      exit(1);
+      if( !fcst_raw_var->put(&fcst_raw_data[0], grid.ny(), grid.nx()) ||
+          !obs_raw_var->put(&obs_raw_data[0], grid.ny(), grid.nx()) ) {
+
+         mlog << Error << "\nwrite_obj_netcdf() -> "
+              << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
+         exit(1);
+      }
+
    }
 
-   if( !fcst_obj_raw_var->put(&fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
-       !obs_obj_raw_var->put(&obs_obj_raw_data[0], grid.ny(), grid.nx()) ) {
+   if ( info.do_object_raw )  {
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
-      exit(1);
+      if( !fcst_obj_raw_var->put(&fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
+          !obs_obj_raw_var->put(&obs_obj_raw_data[0], grid.ny(), grid.nx()) ) {
+
+         mlog << Error << "\nwrite_obj_netcdf() -> "
+              << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
+         exit(1);
+      }
+
    }
 
-   //
-   // Write the forecast and observation object ID variables
-   //
-   if( !fcst_obj_var->put(&fcst_obj_data[0], grid.ny(), grid.nx()) ||
-       !obs_obj_var->put(&obs_obj_data[0], grid.ny(), grid.nx()) ) {
+      //
+      // Write the forecast and observation object ID variables
+      //
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
-      exit(1);
+   if ( info.do_object_id )  {
+
+      if( !fcst_obj_var->put(&fcst_obj_data[0], grid.ny(), grid.nx()) ||
+          !obs_obj_var->put(&obs_obj_data[0], grid.ny(), grid.nx()) ) {
+
+         mlog << Error << "\nwrite_obj_netcdf() -> "
+              << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
+         exit(1);
+      }
+
    }
 
-   //
-   // Write the forecast and observation cluster object ID variables
-   //
-   if( !fcst_clus_var->put(&fcst_clus_data[0], grid.ny(), grid.nx()) ||
-       !obs_clus_var->put(&obs_clus_data[0], grid.ny(), grid.nx()) ) {
+      //
+      // Write the forecast and observation cluster object ID variables
+      //
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
-           << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
-      exit(1);
+   if ( info.do_cluster_id )  {
+
+      if( !fcst_clus_var->put(&fcst_clus_data[0], grid.ny(), grid.nx()) ||
+          !obs_clus_var->put(&obs_clus_data[0], grid.ny(), grid.nx()) ) {
+
+         mlog << Error << "\nwrite_obj_netcdf() -> "
+              << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
+         exit(1);
+      }
+
    }
 
    //
@@ -1011,10 +1031,11 @@ if ( info.all_false() )  return;
    if (obs_obj_data)       { delete obs_obj_data;       obs_obj_data      = (int *) 0; }
    if (obs_clus_data)      { delete obs_clus_data;      obs_clus_data     = (int *) 0; }
 
-   //
-   // Write out the values of the vertices of the polylines.
-   //
-   write_poly_netcdf(f_out);
+      //
+      // Write out the values of the vertices of the polylines.
+      //
+
+   if ( info.do_polylines ) write_poly_netcdf(f_out);
 
    //
    // Close the NetCDF file

@@ -37,6 +37,8 @@ struct ModeNcOutInfo {
 
    bool do_cluster_id;
 
+   bool do_polylines;
+
       ///////////////
 
    ModeNcOutInfo();
