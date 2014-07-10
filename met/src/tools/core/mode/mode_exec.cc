@@ -710,6 +710,8 @@ if ( info.all_false() )  return;
 
    int n, x, y;
    ConcatString out_file;
+   const ConcatString fcst_thresh = engine.conf_info.fcst_conv_thresh.get_str(5);
+   const ConcatString  obs_thresh = engine.conf_info.obs_conv_thresh.get_str(5);
 
    float *fcst_raw_data      = (float *) 0;
    float *fcst_obj_raw_data  = (float *) 0;
@@ -726,6 +728,9 @@ if ( info.all_false() )  return;
    NcDim  *lat_dim           = (NcDim *)  0;
    NcDim  *lon_dim           = (NcDim *)  0;
 
+   NcDim  *fcst_thresh_dim   = (NcDim *)  0;
+   NcDim  * obs_thresh_dim   = (NcDim *)  0;
+
    NcVar  *fcst_raw_var      = (NcVar *)  0;
    NcVar  *fcst_obj_raw_var  = (NcVar *)  0;
    NcVar  *fcst_obj_var      = (NcVar *)  0;
@@ -735,6 +740,12 @@ if ( info.all_false() )  return;
    NcVar  *obs_obj_raw_var   = (NcVar *)  0;
    NcVar  *obs_obj_var       = (NcVar *)  0;
    NcVar  *obs_clus_var      = (NcVar *)  0;
+
+   NcVar  *fcst_radius_var   = (NcVar *)  0;
+   NcVar  * obs_radius_var   = (NcVar *)  0;
+
+   NcVar  *fcst_thresh_var   = (NcVar *)  0;
+   NcVar  * obs_thresh_var   = (NcVar *)  0;
 
    //
    // Create output NetCDF file name
@@ -770,6 +781,9 @@ if ( info.all_false() )  return;
    lat_dim = f_out->add_dim("lat", (long) grid.ny());
    lon_dim = f_out->add_dim("lon", (long) grid.nx());
 
+   fcst_thresh_dim = f_out->add_dim("fcst_thresh_length", fcst_thresh.length());
+    obs_thresh_dim = f_out->add_dim( "obs_thresh_length",  obs_thresh.length());
+
    // Add the lat/lon variables
    if ( info.do_latlon )  write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
 
@@ -783,7 +797,38 @@ if ( info.all_false() )  return;
    if ( info.do_object_raw )  obs_obj_raw_var  = f_out->add_var("obs_obj_raw", ncFloat, lat_dim, lon_dim);
    if ( info.do_object_id )   obs_obj_var      = f_out->add_var("obs_obj_id",  ncInt,   lat_dim, lon_dim);
    if ( info.do_cluster_id )  obs_clus_var     = f_out->add_var("obs_clus_id", ncInt,   lat_dim, lon_dim);
+
+   fcst_radius_var = f_out->add_var("fcst_conv_radius", ncInt);
+    obs_radius_var = f_out->add_var( "obs_conv_radius", ncInt);
+
+   fcst_thresh_var = f_out->add_var("fcst_conv_threshold", ncChar, fcst_thresh_dim);
+    obs_thresh_var = f_out->add_var( "obs_conv_threshold", ncChar,  obs_thresh_dim);
+
+      //
+      //  write the radius and threshold values
+      //
+
+   if ( !fcst_radius_var->put(&engine.conf_info.fcst_conv_radius) || !obs_radius_var->put(&engine.conf_info.obs_conv_radius) )  {
    
+         mlog << Error 
+              << "write_obj_netcdf() -> "
+              << "error writing fcst/obs convolution radii\n\n";
+
+         exit(1);
+
+   }
+
+   if (    ! fcst_thresh_var->put((const char *) fcst_thresh, fcst_thresh.length())
+        || !  obs_thresh_var->put((const char *)  obs_thresh,  obs_thresh.length()) )  {
+
+         mlog << Error 
+              << "write_obj_netcdf() -> "
+              << "error writing fcst/obs thresholds\n\n";
+
+         exit(1);
+
+   }
+  
    // Add forecast variable attributes
 
    if ( info.do_raw )  {
