@@ -351,6 +351,7 @@ static const char conf_key_raw_flag          [] = "raw";
 static const char conf_key_object_raw_flag   [] = "object_raw";
 static const char conf_key_object_id_flag    [] = "object_id";
 static const char conf_key_cluster_id_flag   [] = "cluster_id";
+static const char conf_key_polylines_flag    [] = "polylines";
 
 //
 // Wavelet-Stat specific parameter key names
