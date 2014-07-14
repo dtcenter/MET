@@ -27,7 +27,9 @@
     <output>
       <exists>&OUTPUT_DIR;/tc_stat/ALAL2010_stat.out</exists>
       <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_vs_BCLP.tcst</stat>
-      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst</stat>      
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_ri.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_rw.tcst</stat>
     </output>
   </test>
   
