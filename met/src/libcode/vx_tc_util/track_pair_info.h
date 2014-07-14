@@ -22,12 +22,12 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_util.h"
+#include "vx_config.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 static const int TrackPairLineAllocInc = 10;
 static const int TrackPairInfoAllocInc = 10;
-static const int RapidIntenHourOffset  = 24;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -81,6 +81,7 @@ class TrackPairInfo {
       void clear();
 
       void         dump(ostream &, int = 0)  const;
+      ConcatString case_info()               const;
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
 
@@ -125,7 +126,8 @@ class TrackPairInfo {
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
       int  check_water_only();
-      int  check_rapid_inten(const SingleThresh &);
+      int  check_rapid_inten(const TrackType, const int, const bool,
+                             const SingleThresh &);
       int  check_landfall(const int, const int);
       bool landfall_window(unixtime, unixtime) const;
 

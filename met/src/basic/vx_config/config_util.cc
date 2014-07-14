@@ -1131,6 +1131,65 @@ ConcatString fieldtype_to_string(FieldType type) {
 
 ////////////////////////////////////////////////////////////////////////
 
+TrackType int_to_tracktype(int v) {
+   TrackType t;
+
+   // Convert integer to enumerated TrackType
+        if(v == conf_const.lookup_int(conf_val_none))  t = TrackType_None;
+   else if(v == conf_const.lookup_int(conf_val_both))  t = TrackType_Both;
+   else if(v == conf_const.lookup_int(conf_val_adeck)) t = TrackType_ADeck;
+   else if(v == conf_const.lookup_int(conf_val_bdeck)) t = TrackType_BDeck;
+   else {
+      mlog << Error << "\nint_to_tracktype() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TrackType string_to_tracktype(const char *s) {
+   TrackType t;
+
+   // Convert string to enumerated TrackType
+        if(strcasecmp(s, conf_val_none)  == 0) t = TrackType_None;
+   else if(strcasecmp(s, conf_val_both)  == 0) t = TrackType_Both;
+   else if(strcasecmp(s, conf_val_adeck) == 0) t = TrackType_ADeck;
+   else if(strcasecmp(s, conf_val_bdeck) == 0) t = TrackType_BDeck;
+   else {
+      mlog << Error << "\nstring_to_tracktype() -> "
+           << "Unexpected TrackType string \"" << s << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString tracktype_to_string(TrackType type) {
+   ConcatString s;
+
+   // Convert enumerated TrackType to string
+   switch(type) {
+      case(TrackType_None):  s = conf_val_none; break;
+      case(TrackType_Both):  s = conf_val_both; break;
+      case(TrackType_ADeck): s = conf_val_adeck; break;
+      case(TrackType_BDeck): s = conf_val_bdeck; break;
+      default:
+         mlog << Error << "\ntracktype_to_string() -> "
+              << "Unexpected TrackType value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 MergeType int_to_mergetype(int v) {
    MergeType t;
 
