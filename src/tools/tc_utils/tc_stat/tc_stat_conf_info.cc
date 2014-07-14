@@ -270,8 +270,11 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool(conf_key_water_only);
 
-   // Conf: TCStatJob::RapidInten, TCStatJob::RapidIntenThresh
-   Filter.RapidInten       = Conf.lookup_bool(conf_key_rapid_inten);
+   // Conf: TCStatJob::RapidIntenTrack, TCStatJob::RapidIntenTime
+   //       TCStatJob::RapidIntenExact, TCStatJob::RapidIntenThresh
+   Filter.RapidIntenTrack  = int_to_tracktype(Conf.lookup_int(conf_key_rapid_inten_track));
+   Filter.RapidIntenTime   = timestring_to_sec(Conf.lookup_string(conf_key_rapid_inten_time));
+   Filter.RapidIntenExact  = Conf.lookup_bool(conf_key_rapid_inten_exact);
    Filter.RapidIntenThresh = Conf.lookup_thresh(conf_key_rapid_inten_thresh);
 
    // Conf: TCStatJob::Landfall, TCStatJob::LandfallBeg, TCStatJob::LandfallEnd

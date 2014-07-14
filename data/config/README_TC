@@ -406,17 +406,19 @@ water_only = FALSE;
 
 //
 // Specify whether only those track points for which rapid intensification
-// occurred in the BDECK track between the current time and 24-hours prior
-// should be retained. Define rapid intensification by thresholding the change
-// in maximum windspeed.
-// May modify using the "-rapid_inten" and "-rapid_inten_thresh" job command
-// options.
+// or weakening of the maximum wind speed occurred in the previous time
+// step should be retained.
+// The NHC considers a 24-hour change >=30 kts to constitute rapid
+// intensification or weakening.
+// May modify using the "-rapid_inten_track", "-rapid_inten_time",
+// "-rapid_inten_exact", and "rapid_inten_thresh" job command options.
 //
-// e.g. rapid_inten        = FALSE;
-//      rapid_inten_thresh = >=30.0;
-//
-rapid_inten        = FALSE;
-rapid_inten_thresh = >=30.0;
+rapid_inten = {
+   track  = NONE;   // Specify which track types to search (NONE, ADECK, BDECK, or BOTH)
+   time   = 24;     // Rapid intensification/weakening time period in HHMMSS format.
+   exact  = TRUE;   // Use the exact or maximum intensity difference over the time period.
+   thresh = >=30.0; // Threshold for the intensity change.
+}
 
 //
 // Specify whether only those track points occurring near landfall should be

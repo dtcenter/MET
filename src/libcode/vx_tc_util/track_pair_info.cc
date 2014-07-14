@@ -128,6 +128,20 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString TrackPairInfo::case_info() const {
+   ConcatString s;
+
+   s << "TrackPairInfo: STORMID = " << ADeck.storm_id()
+     << ", ADECK = " << ADeck.technique()
+     << ", BDECK = " << BDeck.technique()
+     << ", INIT = " << unix_to_yyyymmdd_hhmmss(ADeck.init())
+     << ", NPoints = " << NPoints;
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString TrackPairInfo::serialize() const {
    ConcatString s;
 
@@ -486,35 +500,122 @@ int TrackPairInfo::check_water_only() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-int TrackPairInfo::check_rapid_inten(const SingleThresh &st) {
+int TrackPairInfo::check_rapid_inten(const TrackType track_type, const int ri_sec,
+                                     const bool exact_flag, const SingleThresh &st) {
    int i, j, n_rej;
    unixtime delta_ut;
-   double cur_vmax, prv_vmax;
-
+   double cur_avmax, cur_bvmax;
+   double prv_avmax, prv_bvmax;
+   bool adeck_ri, bdeck_ri;
+   
+   // Check threshold type for non-exact intensity differences.
+   if(!exact_flag &&
+      st.get_type() != thresh_lt && st.get_type() != thresh_le &&
+      st.get_type() != thresh_gt && st.get_type() != thresh_ge) {
+      mlog << Error << "\ncheck_rapid_inten() -> "
+           << "for non-exact intensity differeces the RI/RW threshold ("
+           << st.get_str() << ") must be of type <, <=, >, or >=.\n\n";
+      exit(1);
+   }
+   
    // Loop over the track points
    for(i=0, n_rej=0; i<NPoints; i++) {
 
-      // Store the current wind speed maximum
-      cur_vmax = BDeck[i].v_max();
-      prv_vmax = bad_data_double;
+      // Skip over track points we're not already keeping
+      if(!Keep[i]) continue;
 
-      // Search other track points for the previous time
+      // Initialize
+      adeck_ri = bdeck_ri = false;
+      
+      // Store the current wind speed maximum
+      cur_avmax = ADeck[i].v_max();
+      cur_bvmax = BDeck[i].v_max();
+      prv_avmax = bad_data_double;
+      prv_bvmax = bad_data_double;
+
+      // Search other track points for previous times
       for(j=0; j<NPoints; j++) {
-         delta_ut = BDeck[i].valid() - BDeck[j].valid();
-         if(delta_ut >= 0 &&
-            delta_ut == sec_per_hour*RapidIntenHourOffset) {
-            prv_vmax = BDeck[j].v_max();
+
+         // Compute time offset
+         delta_ut = valid(i) - valid(j);
+
+         // Skip over future track points.
+         if(delta_ut < 0) continue;
+
+         // Only check the end point of the time window
+         if(exact_flag && delta_ut == ri_sec) {
+            prv_avmax = ADeck[j].v_max();
+            prv_bvmax = BDeck[j].v_max();
             break;
+         }
+
+         // Check all points in the time window
+         if(!exact_flag && delta_ut <= ri_sec) {
+
+            // Initialize the previous intensities.
+            if(is_bad_data(prv_avmax)) prv_avmax = ADeck[j].v_max();
+            if(is_bad_data(prv_bvmax)) prv_bvmax = BDeck[j].v_max();
+
+            // Update the previous ADeck intensity.
+            if(!is_bad_data(prv_avmax) && !is_bad_data(ADeck[j].v_max())) {
+
+               // For greater-than type thresholds, find the minimum value in the window.
+               if((st.get_type() == thresh_gt || st.get_type() == thresh_ge) &&
+                  ADeck[j].v_max() < prv_avmax) prv_avmax = ADeck[j].v_max();
+
+               // For less-than type thresholds, find the maximum value in the window.
+               if((st.get_type() == thresh_lt || st.get_type() == thresh_le) &&
+                  ADeck[j].v_max() > prv_avmax) prv_avmax = ADeck[j].v_max();
+            }
+
+            // Update the previous BDeck intensity
+            if(!is_bad_data(prv_bvmax) && !is_bad_data(BDeck[j].v_max())) {
+
+               // For greater-than type thresholds, find the minimum value in the window.
+               if((st.get_type() == thresh_gt || st.get_type() == thresh_ge) &&
+                  BDeck[j].v_max() < prv_bvmax) prv_bvmax = BDeck[j].v_max();
+
+               // For less-than type thresholds, find the maximum value in the window.
+               if((st.get_type() == thresh_lt || st.get_type() == thresh_le) &&
+                  BDeck[j].v_max() > prv_bvmax) prv_bvmax = BDeck[j].v_max();
+            }
          }
       } // end for j
 
-      // If the vmax delta does not meet the threshold criteria,
-      // set keep status to false
-      if(!is_bad_data(prv_vmax) &&
-         !st.check(cur_vmax - prv_vmax) &&
-         Keep[i] != 0) {
-        Keep.set(i, 0);
-        n_rej++;
+      // Apply ADeck logic
+      if(!is_bad_data(cur_avmax) && !is_bad_data(prv_avmax) &&
+         st.check(cur_avmax - prv_avmax)) adeck_ri = true;
+
+      // Apply BDeck logic
+      if(!is_bad_data(cur_bvmax) && !is_bad_data(prv_bvmax) &&
+         st.check(cur_bvmax - prv_bvmax)) bdeck_ri = true;
+
+      // Print debug message when rapid intensification is found
+      if(adeck_ri && (track_type == TrackType_ADeck ||
+                      track_type == TrackType_Both)) {
+         mlog << Debug(4) << "Found ADECK RI/RW for valid time "
+              << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << " with "
+              << sec_to_hhmmss(ri_sec) << (exact_flag ? " exact " : " maximum " )
+              << "change of " << prv_avmax << " kt to " << cur_avmax << " kt, "
+              << cur_avmax - prv_avmax << st.get_str()
+              << " kt for " << case_info() << "\n";
+      }
+      if(bdeck_ri && (track_type == TrackType_BDeck ||
+                      track_type == TrackType_Both)) {
+         mlog << Debug(4) << "Found BDECK RI/RW for valid time "
+              << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << " with "
+              << sec_to_hhmmss(ri_sec) << (exact_flag ? " exact " : " maximum " )
+              << "change of " << prv_bvmax << " kt to " << cur_bvmax << " kt, "
+              << cur_bvmax - prv_bvmax << st.get_str()
+              << " kt for " << case_info() << "\n";
+      }
+
+      // Update the keep status
+      if((track_type == TrackType_ADeck && !adeck_ri) ||
+         (track_type == TrackType_BDeck && !bdeck_ri) ||
+         (track_type == TrackType_Both  && !adeck_ri && !bdeck_ri)) {
+         Keep.set(i, 0);
+         n_rej++;
       }
    }
 

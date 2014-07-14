@@ -27,6 +27,12 @@ BOTH           = 2;
 FCST           = 3;
 OBS            = 4;
 
+// Track types
+NONE           = 1;
+BOTH           = 2;
+ADECK          = 3;
+BDECK          = 4;
+
 // Output flag values
 NONE           = 1;
 BOTH           = 2;

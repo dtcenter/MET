@@ -26,6 +26,7 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
+#include "vx_config.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -212,7 +213,9 @@ void TCStatJob::clear() {
 
    // Set to default values
    WaterOnly        = default_water_only;
-   RapidInten       = default_rapid_inten;
+   RapidIntenTrack  = default_rapid_inten_track;
+   RapidIntenTime   = default_rapid_inten_time;
+   RapidIntenExact  = default_rapid_inten_exact;
    RapidIntenThresh = default_rapid_inten_thresh;
    Landfall         = default_landfall;
    LandfallBeg      = default_landfall_beg;
@@ -266,7 +269,9 @@ void TCStatJob::assign(const TCStatJob & j) {
 
    WaterOnly = j.WaterOnly;
 
-   RapidInten = j.RapidInten;
+   RapidIntenTrack = j.RapidIntenTrack;
+   RapidIntenTime = j.RapidIntenTime;
+   RapidIntenExact = j.RapidIntenExact;
    RapidIntenThresh = j.RapidIntenThresh;
 
    Landfall = j.Landfall;
@@ -378,7 +383,11 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "WaterOnly = " << bool_to_string(WaterOnly) << "\n";
 
-   out << prefix << "RapidInten = " << bool_to_string(RapidInten) << "\n";
+   out << prefix << "RapidIntenTrack = " << tracktype_to_string(RapidIntenTrack) << "\n";
+
+   out << prefix << "RapidIntenTime = " << sec_to_hhmmss(RapidIntenTime) << "\n";
+
+   out << prefix << "RapidIntenExact = " << bool_to_string(RapidIntenExact) << "\n";
 
    out << prefix << "RapidIntenThresh = " << RapidIntenThresh.get_str() << "\n";
 
@@ -720,49 +729,51 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add_css(a[i+1]);                     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add_css(a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_inc"          ) == 0) { InitInc.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1]);              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1]);            a.shift_down(i, 1); }
+           if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add_css(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add_css(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add_css(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add_css(a[i+1]);                         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add_css(a[i+1]);                     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1]);          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_inc"          ) == 0) { InitInc.add_css(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1]);                 a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add_css(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1]);                     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshMap);
-                                                                                                      a.shift_down(i, 2); }
+                                                                                                          a.shift_down(i, 2); }
       else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrMap);
-                                                                                                      a.shift_down(i, 2); }
+                                                                                                          a.shift_down(i, 2); }
       else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1], a[i+2], InitThreshMap);
-                                                                                                      a.shift_down(i, 2); }
+                                                                                                          a.shift_down(i, 2); }
       else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1], a[i+2], InitStrMap);
-                                                                                                      a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rapid_inten"       ) == 0) { RapidInten = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
-      else                                               {                                            b.add(a[i]);        }
+                                                                                                          a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_track" ) == 0) { RapidIntenTrack = string_to_tracktype(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_time"  ) == 0) { RapidIntenTime = timestring_to_sec(a[i+1]);    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_exact" ) == 0) { RapidIntenExact = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1]);           a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);                 a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();           a.shift_down(i, 1); }
+      else                                               {                                                b.add(a[i]);        }
    }
 
    return(b);
@@ -951,8 +962,12 @@ ConcatString TCStatJob::serialize() const {
    }
    if(WaterOnly != default_water_only)
       s << "-water_only " << bool_to_string(WaterOnly) << " ";
-   if(RapidInten != default_rapid_inten)
-      s << "-rapid_inten " << bool_to_string(RapidInten) << " ";
+   if(RapidIntenTrack != default_rapid_inten_track)
+      s << "-rapid_inten_track " << tracktype_to_string(RapidIntenTrack) << " ";
+   if(RapidIntenTime != default_rapid_inten_time)
+      s << "-rapid_inten_time " << sec_to_hhmmss(RapidIntenTime) << " ";
+   if(RapidIntenExact != default_rapid_inten_exact)
+      s << "-rapid_inten_exact " << bool_to_string(RapidIntenExact) << " ";
    if(!(RapidIntenThresh == default_rapid_inten_thresh))
       s << "-rapid_inten_thresh " << RapidIntenThresh.get_str() << " ";
    if(Landfall != default_landfall)
@@ -1106,10 +1121,11 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    }
 
    // Check RapidInten
-   if(RapidInten == true) {
+   if(RapidIntenTrack != TrackType_None) {
 
       // Determine the rapid intensification points
-      n_rej = tpi.check_rapid_inten(RapidIntenThresh);
+      n_rej = tpi.check_rapid_inten(RapidIntenTrack, RapidIntenTime, 
+                                    RapidIntenExact, RapidIntenThresh);
 
       // Update counts
       n.RejRapidInten += n_rej;
@@ -1251,7 +1267,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
          if(tpi.n_points() > 0) {
 
             mlog << Debug(4)
-                 << "Processing track pair: " << tpi.serialize() << "\n";
+                 << "Processing track pair: " << tpi.case_info() << "\n";
 
             if(DumpOut) dump_track_pair(tpi);
          }
@@ -1507,7 +1523,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
          if(tpi.n_points() > 0) {
 
             mlog << Debug(4)
-                 << "Processing track pair: " << tpi.serialize() << "\n";
+                 << "Processing track pair: " << tpi.case_info() << "\n";
 
             // Process the track pair info for the summary job
             process_track_pair(tpi);

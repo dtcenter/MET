@@ -18,6 +18,7 @@
 
 #include "tc_stat_files.h"
 
+#include "config_constants.h"
 #include "mask_poly.h"
 #include "vx_tc_util.h"
 #include "vx_util.h"
@@ -31,8 +32,10 @@ static const bool         default_water_only         = false;
 static const bool         default_match_points       = false;
 static const bool         default_event_equal        = false;
 
-// Default rapid intensification is an increase of 30 kts
-static const bool         default_rapid_inten        = false;
+// Default rapid intensification is an increase of 30 kts over 24 hours
+static const TrackType    default_rapid_inten_track  = TrackType_None;
+static const int          default_rapid_inten_time   = 86400;
+static const bool         default_rapid_inten_exact  = true;
 static const SingleThresh default_rapid_inten_thresh(">=30.0");
 
 // Default is 24 hours prior to landfall
@@ -260,7 +263,9 @@ class TCStatJob {
       StringArray EventEqualCases;
 
       // Only retain TrackPoints with recent rapid intensification
-      bool         RapidInten;
+      TrackType    RapidIntenTrack;
+      int          RapidIntenTime;
+      bool         RapidIntenExact;
       SingleThresh RapidIntenThresh;
 
       // Only retain TrackPoints in a time window around landfall

@@ -33,8 +33,8 @@ test_read_SOURCES = test_read.cc
 test_read_CPPFLAGS = -I${includedir}
 test_read_LDFLAGS = -L${libdir} -L.
 test_read_LDADD = -lvx_tc_util \
-	-lvx_cal \
+	-lvx_config \
 	-lvx_util \
 	-lvx_math \
+        -lvx_cal \
 	-lvx_log
-
