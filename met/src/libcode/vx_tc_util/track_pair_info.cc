@@ -596,7 +596,7 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type, const int ri_se
          mlog << Debug(4) << "Found ADECK RI/RW for valid time "
               << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << " with "
               << sec_to_hhmmss(ri_sec) << (exact_flag ? " exact " : " maximum " )
-              << "change of " << prv_avmax << " kt to " << cur_avmax << " kt, "
+              << "change of " << prv_avmax << " to " << cur_avmax << " kt, "
               << cur_avmax - prv_avmax << st.get_str()
               << " kt for " << case_info() << "\n";
       }
@@ -605,7 +605,7 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type, const int ri_se
          mlog << Debug(4) << "Found BDECK RI/RW for valid time "
               << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << " with "
               << sec_to_hhmmss(ri_sec) << (exact_flag ? " exact " : " maximum " )
-              << "change of " << prv_bvmax << " kt to " << cur_bvmax << " kt, "
+              << "change of " << prv_bvmax << " to " << cur_bvmax << " kt, "
               << cur_bvmax - prv_bvmax << st.get_str()
               << " kt for " << case_info() << "\n";
       }
