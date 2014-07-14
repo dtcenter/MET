@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    04/03/12  Halley Gotway   New
+//   001    07/14/14  Halley Gotway   Generalize rapid intensification.
 //
 ////////////////////////////////////////////////////////////////////////
 
