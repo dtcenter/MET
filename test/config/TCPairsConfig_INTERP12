@@ -17,7 +17,7 @@ model = [];
 //
 // Storm identifiers
 //    
-storm_id = [ "ALAL2010" ];
+storm_id = [];
 
 //
 // Basins
@@ -68,7 +68,7 @@ check_dup = TRUE;
 // Specify special processing to be performed for interpolated models.
 // Set to NONE, FILL, or REPLACE.
 //
-interp12 = NONE;
+interp12 = ${INTERP12};
 
 //
 // Specify how consensus forecasts should be defined
