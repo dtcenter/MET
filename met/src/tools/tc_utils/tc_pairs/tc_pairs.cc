@@ -744,7 +744,7 @@ void derive_interp12(TrackInfoArray &tracks) {
 
          mlog << Debug(3)
               << "Adding new track for Interp12 case \"" << track_case
-              << "\" by renaming the " << tracks[i].technique() << " track\n";
+              << "\" by renaming the " << tracks[i].technique() << " track.\n";
 
          tracks.add(interp_track);
          n_add++;
