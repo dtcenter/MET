@@ -4,13 +4,19 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = tc_stat
 tc_stat_SOURCES = tc_stat.cc \
 	tc_stat_conf_info.cc \
 	tc_stat_files.cc \
 	tc_stat_job.cc
-tc_stat_CPPFLAGS = -I${includedir}
-tc_stat_LDFLAGS = -L${libdir}
+tc_stat_CPPFLAGS = ${MET_CPPFLAGS}
+tc_stat_LDFLAGS = ${MET_LDFLAGS}
 tc_stat_LDADD = -lvx_config \
 	-lvx_data2d_nc_met \
 	-lvx_analysis_util \

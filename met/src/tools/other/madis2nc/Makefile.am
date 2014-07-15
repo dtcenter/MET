@@ -4,10 +4,16 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = madis2nc
 madis2nc_SOURCES = madis2nc.cc
-madis2nc_CPPFLAGS = -I${includedir}
-madis2nc_LDFLAGS = -L${libdir}
+madis2nc_CPPFLAGS = ${MET_CPPFLAGS}
+madis2nc_LDFLAGS = ${MET_LDFLAGS}
 madis2nc_LDADD = -lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \

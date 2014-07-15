@@ -4,6 +4,12 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = ascii2nc
 ascii2nc_SOURCES = ascii2nc.cc \
 	ascii2nc_conf_info.cc \
@@ -22,8 +28,8 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	summary_key.cc \
 	surfrad_handler.cc \
 	time_summary_interval.cc
-ascii2nc_CPPFLAGS = -I${includedir}
-ascii2nc_LDFLAGS = -L${libdir}
+ascii2nc_CPPFLAGS = ${MET_CPPFLAGS}
+ascii2nc_LDFLAGS = ${MET_LDFLAGS}
 ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \

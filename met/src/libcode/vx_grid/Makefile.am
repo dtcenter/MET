@@ -4,23 +4,23 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_grid.a
-libvx_grid_a_SOURCES = find_grid_by_name.cc \
-              grid_base.cc \
-              latlon_grid.cc \
-              lc_grid.cc \
-              merc_grid.cc \
-              st_grid.cc
-libvx_grid_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = find_grid_by_name.h \
-              grid_base.h \
-              vx_grid.h \
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_grid.a
+libvx_grid_a_SOURCES = \
+              find_grid_by_name.cc  find_grid_by_name.h \
+              grid_base.cc grid_base.h \
               latlon_grid_defs.h \
-              latlon_grid.h \
+              latlon_grid.cc latlon_grid.h \
               lc_grid_defs.h \
-              lc_grid.h \
+              lc_grid.cc lc_grid.h \
               merc_grid_defs.h \
-              merc_grid.h \
+              merc_grid.cc merc_grid.h \
               st_grid_defs.h \
-              st_grid.h
+              st_grid.cc st_grid.h \
+              vx_grid.h
+libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}

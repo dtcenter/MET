@@ -4,23 +4,22 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_statistics.a
-libvx_statistics_a_SOURCES = apply_mask.cc \
-               compute_ci.cc \
-               contable.cc \
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_statistics.a
+libvx_statistics_a_SOURCES = \
+               apply_mask.cc apply_mask.h \
+               compute_ci.cc compute_ci.h \
+               contable.cc contable.h \
                contable_stats.cc \
                contable_nx2.cc \
-               met_stats.cc \
-               pair_base.cc \
-               pair_data_point.cc \
-               pair_data_ensemble.cc
-libvx_statistics_a_CPPFLAGS = -I${includedir}
-
-include_HEADERS = apply_mask.h \
-               compute_ci.h \
-               contable.h \
-               met_stats.h \
-               pair_base.h \
-               pair_data_point.h \
-               pair_data_ensemble.h \
+               met_stats.cc met_stats.h \
+               pair_base.cc pair_base.h \
+               pair_data_point.cc pair_data_point.h \
+               pair_data_ensemble.cc pair_data_ensemble.h \
                vx_statistics.h
+libvx_statistics_a_CPPFLAGS = ${MET_CPPFLAGS}

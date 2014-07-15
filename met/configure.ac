@@ -2,219 +2,302 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([MET], [4.1], [met_help@ucar.edu], [], [http://www.dtcenter.org/met/users])
+AC_INIT([MET], [5.0], [met_help@ucar.edu], [], [http://www.dtcenter.org/met/users])
 AC_CONFIG_SRCDIR([src/tools/tc_utils/tc_dland/tc_dland.cc])
 AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.9 foreign])
 
-# Process netCDF library specified by user
+#
+# Look for the NetCDF library
+#
 
-AC_MSG_CHECKING([whether a location for the NETCDF include files was specified])
-AC_ARG_WITH([netcdf_inc],
-              [AS_HELP_STRING([--with-netcdf_inc=<directory>],
-                              [Specify location of NETCDF include files..])],
-            [NETCDFINCDIR=$with_netcdf_inc])
-AC_MSG_RESULT([$NETCDFINDIR])
-AC_SUBST(NETCDFINCDIR, [$NETCDFINCDIR])
+# Configure the variables.  The help text will appear if the user uses "configure --help".
 
-if test ! "x$NETCDFINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${NETCDFINCDIR}"
-fi    
+AC_ARG_VAR([NETCDF], [Where netcdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([NETCDFINC], [Where netcdf include files are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, NETCDFLIB must also be defined and NETCDF will be ignored.])
+AC_ARG_VAR([NETCDFLIB], [Where netcdf libraries are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, NETCDFINC must also be defined and NETCDF will be ignored.])
 
-AC_MSG_CHECKING([whether a location for the NETCDF library files was specified])
-AC_ARG_WITH([netcdf_lib],
-              [AS_HELP_STRING([--with-netcdf_lib=<directory>],
-                              [Specify location of NETCDF library files..])],
-            [NETCDFLIBDIR=$with_netcdf_lib])
-AC_MSG_RESULT([$NETCDFLIBDIR])
-AC_SUBST(NETCDFLIBDIR, [$NETCDFLIBDIR])
+# Ensure that both or neither are specified.
 
-if test ! "x$NETCDFLIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${NETCDFLIBDIR}"
-fi    
+if (test -n "$NETCDFLIB" && test -z "$NETCDFINC") || \
+   (test -n "$NETCDFINC" && test -z "$NETCDFLIB"); then
+  AC_MSG_ERROR([both or neither NETCDF variables])
+fi 
 
-# Process GRIB2C library specified by user
+# If the individual locations weren't specified, then the main NetCDF directory
+# must be specified.  If it isn't, let the user know they need to supply one.
 
-AC_MSG_CHECKING([whether a location for the GRIB2C include files was specified])
-AC_ARG_WITH([grib2c_inc],
-              [AS_HELP_STRING([--with-grib2c_inc=<directory>],
-                              [Specify location of GRIB2C include files.])],
-            [GRIB2CINCDIR=$with_grib2c_inc])
-AC_MSG_RESULT([$GRIB2CINCDIR])
-AC_SUBST(GRIB2CINCDIR, [$GRIB2CINCDIR])
+if test -z "$NETCDFLIB" && test -n "$NETCDF"; then
+   NETCDFINC='${NETCDF}/include'
+   NETCDFLIB='${NETCDF}/lib'
+fi
 
-if test ! "x$GRIB2CINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${GRIB2CINCDIR}"
-fi    
+# We don't currently look for the NetCDF libraries in "known"
+# locations.  If we want to, this example code might be
+# helpful.
+## Not specified? Check for FTK in standard places.
+#if test -z "$FTKLIB"; then
+#  # Check for flaim tool kit as a sub-project.
+#  if test -d "$srcdir/ftk"; then
+#    AC_CONFIG_SUBDIRS([ftk])
+#    FTKINC='$(top_srcdir)/ftk/src'
+#    FTKLIB='$(top_builddir)/ftk/src'
+#  else
+#    # Check for flaim tool kit as a super-project.
+#    if test -d "$srcdir/../ftk"; then
+#      FTKINC='$(top_srcdir)/../ftk/src'
+#      FTKLIB='$(top_builddir)/../ftk/src'
+#    fi
+#  fi
+#fi
+#
+## Still empty? Check for installed flaim tool kit.
+#if test -z "$FTKLIB"; then
+#  AC_CHECK_LIB([flaimtk], [ftkFastChecksum], 
+#    [AC_CHECK_HEADERS([flaimtk.h])
+#     LIBS="-lflaimtk $LIBS"],
+#    [AC_MSG_ERROR([No FLAIM Took Kit found.])])
+#fi
 
-AC_MSG_CHECKING([whether a location for the GRIB2C library files was specified])
-AC_ARG_WITH([grib2c_lib],
-              [AS_HELP_STRING([--with-grib2c_lib=<directory>],
-                              [Specify location of GRIB2C library files.])],
-            [GRIB2CLIBDIR=$with_grib2c_lib])
-AC_MSG_RESULT([$GRIB2CLIBDIR])
-AC_SUBST(GRIB2CLIBDIR, [$GRIB2CLIBDIR])
+# AC_SUBST command line variables.  If we get here, the NetCDF
+# libraries were found so no need to check
 
-if test ! "x$GRIB2CLIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${GRIB2CLIBDIR}"
-fi    
+if test -n "$NETCDFLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${NETCDFINC}"
+   LDFLAGS="${LDFLAGS} -L${NETCDFLIB}"
+fi
 
-# Process GSL library specified by user
+#
+# Look for the GRIB2C library
+#
 
-AC_MSG_CHECKING([whether a location for the GSL include files was specified])
-AC_ARG_WITH([gsl_inc],
-              [AS_HELP_STRING([--with-gsl_inc=<directory>],
-                              [Specify location of GSL include files.])],
-            [GSLINCDIR=$with_gsl_inc])
-AC_MSG_RESULT([$GSLINCDIR])
-AC_SUBST(GSLINCDIR, [$GSLINCDIR])
+# Configure the variables.  The help text will appear if the user uses "configure --help".
 
-if test ! "x$GSLINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${GSLINCDIR}"
-fi    
+AC_ARG_VAR([GRIB2C], [Where grib2c lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([GRIB2CINC], [Where grib2c include files are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, GRIB2CLIB must also be defined and GRIB2C will be ignored.])
+AC_ARG_VAR([GRIB2CLIB], [Where grib2c libraries are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, GRIB2CINC must also be defined and GRIB2C will be ignored.])
 
-AC_MSG_CHECKING([whether a location for the GSL library files was specified])
-AC_ARG_WITH([gsl_lib],
-              [AS_HELP_STRING([--with-gsl_lib=<directory>],
-                              [Specify location of GSL library files.])],
-            [GSLLIBDIR=$with_gsl_lib])
-AC_MSG_RESULT([$GSLLIBDIR])
-AC_SUBST(GSLLIBDIR, [$GSLLIBDIR])
+# Ensure that both or neither are specified.
 
-if test ! "x$GSLLIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${GSLLIBDIR}"
-fi    
+if (test -n "$GRIB2CLIB" && test -z "$GRIB2CINC") || \
+   (test -n "$GRIB2CINC" && test -z "$GRIB2CLIB"); then
+  AC_MSG_ERROR([both or neither GRIB2C variables])
+fi 
 
-# Process BUFR library specified by user
+# If the individual locations weren't specified, then the main Grib2c directory
+# must be specified.  If it isn't, let the user know they need to supply one.
 
-AC_MSG_CHECKING([whether a location for the BUFR include files was specified])
-AC_ARG_WITH([bufr_inc],
-              [AS_HELP_STRING([--with-bufr_inc=<directory>],
-                              [Specify location of BUFR include files.])],
-            [BUFRINCDIR=$with_bufr_inc])
-AC_MSG_RESULT([$BUFRINCDIR])
-AC_SUBST(BUFRINCDIR, [$BUFRINCDIR])
+if test -z "$GRIB2CLIB" && test -n "$GRIB2C"; then
+   GRIB2CINC='${GRIB2C}/include'
+   GRIB2CLIB='${GRIB2C}/lib'
+fi
 
-if test ! "x$BUFRINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${BUFRINCDIR}"
-fi    
+# AC_SUBST command line variables.  If we get here, the Grib2c
+# libraries were found so no need to check
 
-AC_MSG_CHECKING([whether a location for the BUFR library files was specified])
-AC_ARG_WITH([bufr_lib],
-              [AS_HELP_STRING([--with-bufr_lib=<directory>],
-                              [Specify location of BUFR library files.])],
-            [BUFRLIBDIR=$with_bufr_lib])
-AC_MSG_RESULT([$BUFRLIBDIR])
-AC_SUBST(BUFRLIBDIR, [$BUFRLIBDIR])
+if test -n "$GRIB2CLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${GRIB2CINC}"
+   LDFLAGS="${LDFLAGS} -L${GRIB2CLIB}"
+fi
 
-if test ! "x$BUFRLIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${BUFRLIBDIR}"
-fi    
+#
+# Look for the GSL library
+#
 
-# Process HDF library specified by user
+# Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_MSG_CHECKING([whether a location for the HDF include files was specified])
-AC_ARG_WITH([hdf_inc],
-              [AS_HELP_STRING([--with-hdf_inc=<directory>],
-                              [Specify location of HDF include files.])],
-            [HDFINCDIR=$with_hdf_inc])
-AC_MSG_RESULT([$HDFINCDIR])
-AC_SUBST(HDFINCDIR, [$HDFINCDIR])
+AC_ARG_VAR([GSL], [Where gsl lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([GSLINC], [Where gsl include files are located. Use if the libraries and include files are not under the same main gsl directory.  If used, GSLLIB must also be defined and GSL will be ignored.])
+AC_ARG_VAR([GSLLIB], [Where gsl libraries are located. Use if the libraries and include files are not under the same main gsl directory.  If used, GSLINC must also be defined and GSL will be ignored.])
 
-if test ! "x$HDFINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${HDFINCDIR}"
-fi    
+# Ensure that both or neither are specified.
 
-AC_MSG_CHECKING([whether a location for the HDF library files was specified])
-AC_ARG_WITH([hdf_lib],
-              [AS_HELP_STRING([--with-hdf_lib=<directory>],
-                              [Specify location of HDF library files.])],
-            [HDFLIBDIR=$with_hdf_lib])
-AC_MSG_RESULT([$HDFLIBDIR])
-AC_SUBST(HDFLIBDIR, [$HDFLIBDIR])
+if (test -n "$GSLLIB" && test -z "$GSLINC") || \
+   (test -n "$GSLINC" && test -z "$GSLLIB"); then
+  AC_MSG_ERROR([both or neither GSL variables])
+fi 
 
-if test ! "x$HDFLIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${HDFLIBDIR}"
-fi    
+# If the individual locations weren't specified, then the main Gsl directory
+# must be specified.  If it isn't, let the user know they need to supply one.
 
-# Process HDF EOS library specified by user
+if test -z "$GSLLIB" && test -n "$GSL"; then
+   GSLINC='${GSL}/include'
+   GSLLIB='${GSL}/lib'
+fi
 
-AC_MSG_CHECKING([whether a location for the HDF EOS include files was specified])
-AC_ARG_WITH([hdfeos_inc],
-              [AS_HELP_STRING([--with-hdfeos_inc=<directory>],
-                              [Specify location of HDF EOS include files.])],
-            [HDFEOSINCDIR=$with_hdfeos_inc])
-AC_MSG_RESULT([$HDFEOSINCDIR])
-AC_SUBST(HDFEOSINCDIR, [$HDFEOSINCDIR])
+# AC_SUBST command line variables.  If we get here, the Gsl
+# libraries were found so no need to check
 
-if test ! "x$HDFEOSINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${HDFEOSINCDIR}"
-fi    
+if test -n "$GSLLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${GSLINC}"
+   LDFLAGS="${LDFLAGS} -L${GSLLIB}"
+fi
 
-AC_MSG_CHECKING([whether a location for the HDF EOS library files was specified])
-AC_ARG_WITH([hdfeos_lib],
-              [AS_HELP_STRING([--with-hdfeos_lib=<directory>],
-                              [Specify location of HDF EOS library files.])],
-            [HDFEOSLIBDIR=$with_hdfeos_lib])
-AC_MSG_RESULT([$HDFEOSLIBDIR])
-AC_SUBST(HDFEOSLIBDIR, [$HDFEOSLIBDIR])
+#
+# Look for the BUFR library
+#
 
-if test ! "x$HDFEOSLIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${HDFEOSLIBDIR}"
-fi    
+# Configure the variables.  The help text will appear if the user uses "configure --help".
 
-# Process CAIRO include and library directories specified by user
+AC_ARG_VAR([BUFR], [Where bufr lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([BUFRINC], [Where bufr include files are located. Use if the libraries and include files are not under the same main bufr directory.  If used, BUFRLIB must also be defined and BUFR will be ignored.])
+AC_ARG_VAR([BUFRLIB], [Where bufr libraries are located. Use if the libraries and include files are not under the same main bufr directory.  If used, BUFRINC must also be defined and BUFR will be ignored.])
 
-AC_MSG_CHECKING([whether a location for the CAIRO include files was specified])
-AC_ARG_WITH([cairo_inc],
-              [AS_HELP_STRING([--with-cairo_inc=<directory>],
-                              [Specify location of CAIRO includes directory. This must be supplied if you are compiling mode_graphics.])],
-            [CAIROINCDIR=$with_cairo_inc])
-AC_MSG_RESULT([$CAIROINCDIR])
-AC_SUBST(CAIROINCDIR, [$CAIROINCDIR])
+# Ensure that both or neither are specified.
 
-if test ! "x$CAIROINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${CAIROINCDIR}"
-fi    
+if (test -n "$BUFRLIB" && test -z "$BUFRINC") || \
+   (test -n "$BUFRINC" && test -z "$BUFRLIB"); then
+  AC_MSG_ERROR([both or neither BUFR variables])
+fi 
 
-AC_MSG_CHECKING([whether a location for the CAIRO library files was specified])
-AC_ARG_WITH([cairo_lib],
-              [AS_HELP_STRING([--with-cairo_lib=<directory>],
-                              [Specify location of CAIRO library directory. This must be supplied if you are compiling mode_graphics.])],
-            [CAIROLIBDIR=$with_cairo_lib])
-AC_MSG_RESULT([$CAIROLIBDIR])
-AC_SUBST(CAIROLIBDIR, [$CAIROLIBDIR])
+# If the individual locations weren't specified, then the main Bufr directory
+# must be specified.  If it isn't, let the user know they need to supply one.
 
-if test ! "x$CAIROLIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${CAIROLIBDIR}"
-fi    
+if test -z "$BUFRLIB" && test -n "$BUFR"; then
+   BUFRINC='${BUFR}/include'
+   BUFRLIB='${BUFR}/lib'
+fi
 
-# Process FREETYPE include and library directories specified by user
+# AC_SUBST command line variables.  If we get here, the Bufr
+# libraries were found so no need to check
 
-AC_MSG_CHECKING([whether a location for the FREETYPE include files was specified])
-AC_ARG_WITH([freetype_inc],
-              [AS_HELP_STRING([--with-freetype_inc=<directory>],
-                              [Specify location of FREETYPE includes directory. This must be supplied if you are compiling mode_graphics.])],
-            [FREETYPEINCDIR=$with_freetype_inc])
-AC_MSG_RESULT([$FREETYPEINCDIR])
-AC_SUBST(FREETYPEINCDIR, [$FREETYPEINCDIR])
+if test -n "$BUFRLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${BUFRINC}"
+   LDFLAGS="${LDFLAGS} -L${BUFRLIB}"
+fi
 
-if test ! "x$FREETYPEINCDIR" = x; then
-   CPPFLAGS="${CPPFLAGS} -I${FREETYPEINCDIR}"
-fi    
+#
+# Look for the HDF library
+#
 
-AC_MSG_CHECKING([whether a location for the FREETYPE library files was specified])
-AC_ARG_WITH([freetype_lib],
-              [AS_HELP_STRING([--with-freetype_lib=<directory>],
-                              [Specify location of FREETYPE library directory. This must be supplied if you are compiling mode_graphics.])],
-            [FREETYPELIBDIR=$with_freetype_lib])
-AC_MSG_RESULT([$FREETYPELIBDIR])
-AC_SUBST(FREETYPELIBDIR, [$FREETYPELIBDIR])
+# Configure the variables.  The help text will appear if the user uses "configure --help".
 
-if test ! "x$FREETYPELIBDIR" = x; then
-   LDFLAGS="${LDFLAGS} -L${FREETYPELIBDIR}"
-fi    
+AC_ARG_VAR([HDF], [Where hdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([HDFINC], [Where hdf include files are located. Use if the libraries and include files are not under the same main hdf directory.  If used, HDFLIB must also be defined and HDF will be ignored.])
+AC_ARG_VAR([HDFLIB], [Where hdf libraries are located. Use if the libraries and include files are not under the same main hdf directory.  If used, HDFINC must also be defined and HDF will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$HDFLIB" && test -z "$HDFINC") || \
+   (test -n "$HDFINC" && test -z "$HDFLIB"); then
+  AC_MSG_ERROR([both or neither HDF variables])
+fi 
+
+# If the individual locations weren't specified, then the main Hdf directory
+# must be specified.  If it isn't, let the user know they need to supply one.
+
+if test -z "$HDFLIB" && test -n "$HDF"; then
+   HDFINC='${HDF}/include'
+   HDFLIB='${HDF}/lib'
+fi
+
+# AC_SUBST command line variables.  If we get here, the Hdf
+# libraries were found so no need to check
+
+if test -n "$HDFLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${HDFINC}"
+   LDFLAGS="${LDFLAGS} -L${HDFLIB}"
+fi
+
+#
+# Look for the Hdfeos library
+#
+
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([HDFEOS], [Where hdfeos lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([HDFEOSINC], [Where hdfeos include files are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, HDFEOSLIB must also be defined and HDFEOS will be ignored.])
+AC_ARG_VAR([HDFEOSLIB], [Where hdfeos libraries are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, HDFEOSINC must also be defined and HDFEOS will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$HDFEOSLIB" && test -z "$HDFEOSINC") || \
+   (test -n "$HDFEOSINC" && test -z "$HDFEOSLIB"); then
+  AC_MSG_ERROR([both or neither HDFEOS variables])
+fi 
+
+# If the individual locations weren't specified, then the main Hdfeos directory
+# must be specified.  If it isn't, let the user know they need to supply one.
+
+if test -z "$HDFEOSLIB" && test -n "$HDFEOS"; then
+   HDFEOSINC='${HDFEOS}/include'
+   HDFEOSLIB='${HDFEOS}/lib'
+fi
+
+# AC_SUBST command line variables.  If we get here, the Hdfeos
+# libraries were found so no need to check
+
+if test -n "$HDFEOSLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${HDFEOSINC}"
+   LDFLAGS="${LDFLAGS} -L${HDFEOSLIB}"
+fi
+
+#
+# Look for the Cairo library
+#
+
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([CAIRO], [Where cairo lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Cairo is only needed if you are building the mode_graphics utility.])
+AC_ARG_VAR([CAIROINC], [Where cairo include files are located. Use if the libraries and include files are not under the same main cairo directory.  If used, CAIROLIB must also be defined and CAIRO will be ignored.])
+AC_ARG_VAR([CAIROLIB], [Where cairo libraries are located. Use if the libraries and include files are not under the same main cairo directory.  If used, CAIROINC must also be defined and CAIRO will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$CAIROLIB" && test -z "$CAIROINC") || \
+   (test -n "$CAIROINC" && test -z "$CAIROLIB"); then
+  AC_MSG_ERROR([both or neither CAIRO variables])
+fi 
+
+# If the individual locations weren't specified, then the main Cairo directory
+# must be specified.  If it isn't, let the user know they need to supply one.
+
+if test -z "$CAIROLIB" && test -n "$CAIRO"; then
+   CAIROINC='${CAIRO}/include'
+   CAIROLIB='${CAIRO}/lib'
+fi
+
+# AC_SUBST command line variables.  If we get here, the Cairo
+# libraries were found so no need to check
+
+if test -n "$CAIROLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${CAIROINC}"
+   LDFLAGS="${LDFLAGS} -L${CAIROLIB}"
+fi
+
+#
+# Look for the Freetype library
+#
+
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([FREETYPE], [Where freetype lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Freetype is only needed if you are building the mode_graphics utility.])
+AC_ARG_VAR([FREETYPEINC], [Where freetype include files are located. Use if the libraries and include files are not under the same main freetype directory.  If used, FREETYPELIB must also be defined and FREETYPE will be ignored.])
+AC_ARG_VAR([FREETYPELIB], [Where freetype libraries are located. Use if the libraries and include files are not under the same main freetype directory.  If used, FREETYPEINC must also be defined and FREETYPE will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$FREETYPELIB" && test -z "$FREETYPEINC") || \
+   (test -n "$FREETYPEINC" && test -z "$FREETYPELIB"); then
+  AC_MSG_ERROR([both or neither FREETYPE variables])
+fi 
+
+# If the individual locations weren't specified, then the main Freetype directory
+# must be specified.  If it isn't, let the user know they need to supply one.
+
+if test -z "$FREETYPELIB" && test -n "$FREETYPE"; then
+   FREETYPEINC='${FREETYPE}/include'
+   FREETYPELIB='${FREETYPE}/lib'
+fi
+
+# AC_SUBST command line variables.  If we get here, the Freetype
+# libraries were found so no need to check
+
+if test -n "$FREETYPELIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${FREETYPEINC}"
+   LDFLAGS="${LDFLAGS} -L${FREETYPELIB}"
+fi
 
 #
 # Process any enable flags specified by the user
@@ -735,20 +818,86 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([dup2 floor gethostname memset mkdir pow regcomp select setenv sqrt strcasecmp strchr strcspn strerror strncasecmp strrchr strstr])
 
+#AC_CONFIG_FILES([Makefile
+#                 data/Makefile
+#                 internal_tests/Makefile
+#                 internal_tests/basic/Makefile
+#                 internal_tests/basic/vx_config/Makefile
+#                 internal_tests/basic/vx_log/Makefile
+#                 internal_tests/basic/vx_util/Makefile
+#                 internal_tests/libcode/Makefile
+#                 internal_tests/libcode/vx_data2d/Makefile
+#                 internal_tests/libcode/vx_data2d_factory/Makefile
+#                 internal_tests/libcode/vx_data2d_grib/Makefile
+#                 internal_tests/libcode/vx_data2d_nc_met/Makefile
+#                 internal_tests/libcode/vx_data2d_nccf/Makefile
+#                 internal_tests/libcode/vx_geodesy/Makefile
+#                 internal_tests/libcode/vx_plot_util/Makefile
+#                 internal_tests/libcode/vx_ps/Makefile
+#                 internal_tests/libcode/vx_tc_util/Makefile
+#                 src/Makefile
+#                 src/basic/Makefile
+#                 src/basic/enum_to_string/Makefile
+#                 src/basic/vx_cal/Makefile
+#                 src/basic/vx_config/Makefile
+#                 src/basic/vx_log/Makefile
+#                 src/basic/vx_math/Makefile
+#                 src/basic/vx_util/Makefile
+#                 src/libcode/Makefile
+#                 src/libcode/vx_afm/Makefile
+#                 src/libcode/vx_analysis_util/Makefile
+#                 src/libcode/vx_color/Makefile
+#                 src/libcode/vx_data2d/Makefile
+#                 src/libcode/vx_data2d_factory/Makefile
+#                 src/libcode/vx_data2d_grib/Makefile
+#                 src/libcode/vx_data2d_grib2/Makefile
+#                 src/libcode/vx_data2d_nc_met/Makefile
+#                 src/libcode/vx_data2d_nc_pinterp/Makefile
+#                 src/libcode/vx_data2d_nccf/Makefile
+#                 src/libcode/vx_geodesy/Makefile
+#                 src/libcode/vx_gnomon/Makefile
+#                 src/libcode/vx_grid/Makefile
+#                 src/libcode/vx_gsl_prob/Makefile
+#                 src/libcode/vx_nav/Makefile
+#                 src/libcode/vx_nc_util/Makefile
+#                 src/libcode/vx_pb_util/Makefile
+#                 src/libcode/vx_plot_util/Makefile
+#                 src/libcode/vx_ps/Makefile
+#                 src/libcode/vx_pxm/Makefile
+#                 src/libcode/vx_render/Makefile
+#                 src/libcode/vx_shapedata/Makefile
+#                 src/libcode/vx_stat_out/Makefile
+#                 src/libcode/vx_statistics/Makefile
+#                 src/libcode/vx_tc_util/Makefile
+#                 src/tools/Makefile
+#                 src/tools/core/Makefile
+#                 src/tools/core/ensemble_stat/Makefile
+#                 src/tools/core/grid_stat/Makefile
+#                 src/tools/core/mode/Makefile
+#                 src/tools/core/mode_analysis/Makefile
+#                 src/tools/core/pcp_combine/Makefile
+#                 src/tools/core/point_stat/Makefile
+#                 src/tools/core/series_analysis/Makefile
+#                 src/tools/core/stat_analysis/Makefile
+#                 src/tools/core/wavelet_stat/Makefile
+#                 src/tools/dev_utils/Makefile
+#                 src/tools/other/Makefile
+#                 src/tools/other/ascii2nc/Makefile
+#                 src/tools/other/gen_circle_mask/Makefile
+#                 src/tools/other/gen_poly_mask/Makefile
+#                 src/tools/other/madis2nc/Makefile
+#                 src/tools/other/mode_graphics/Makefile
+#                 src/tools/other/modis_regrid/Makefile
+#                 src/tools/other/pb2nc/Makefile 
+#                 src/tools/other/plot_data_plane/Makefile
+#                 src/tools/other/plot_point_obs/Makefile
+#                 src/tools/other/wwmca_tool/Makefile
+#                 src/tools/tc_utils/Makefile
+#                 src/tools/tc_utils/tc_dland/Makefile
+#                 src/tools/tc_utils/tc_pairs/Makefile
+#                 src/tools/tc_utils/tc_stat/Makefile])
 AC_CONFIG_FILES([Makefile
                  data/Makefile
-                 data/colortables/Makefile
-                 data/colortables/NCL_colortables/Makefile
-                 data/config/Makefile
-                 data/map/Makefile
-                 data/map/legacy/Makefile
-                 data/map/update_2012/Makefile
-                 data/map/update_2012/admin_by_country/Makefile
-                 data/poly/Makefile
-                 data/poly/HMT_masks/Makefile
-                 data/ps/Makefile
-                 data/table_files/Makefile
-                 data/tc_data/Makefile
                  src/Makefile
                  src/basic/Makefile
                  src/basic/enum_to_string/Makefile
@@ -810,4 +959,21 @@ AC_CONFIG_FILES([Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
                  src/tools/tc_utils/tc_stat/Makefile])
+#if test -n "$MET_DEVELOPMENT"; then
+   AC_CONFIG_FILES([internal_tests/Makefile
+                    internal_tests/basic/Makefile
+                    internal_tests/basic/vx_config/Makefile
+                    internal_tests/basic/vx_log/Makefile
+                    internal_tests/basic/vx_util/Makefile
+                    internal_tests/libcode/Makefile
+                    internal_tests/libcode/vx_data2d/Makefile
+                    internal_tests/libcode/vx_data2d_factory/Makefile
+                    internal_tests/libcode/vx_data2d_grib/Makefile
+                    internal_tests/libcode/vx_data2d_nc_met/Makefile
+                    internal_tests/libcode/vx_data2d_nccf/Makefile
+                    internal_tests/libcode/vx_geodesy/Makefile
+                    internal_tests/libcode/vx_plot_util/Makefile
+                    internal_tests/libcode/vx_ps/Makefile
+                    internal_tests/libcode/vx_tc_util/Makefile])
+#fi
 AC_OUTPUT

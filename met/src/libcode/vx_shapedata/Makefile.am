@@ -4,25 +4,23 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_shapedata.a
-libvx_shapedata_a_SOURCES = moments.cc \
-              node.cc \
-              polyline.cc \
-              shapedata.cc \
-              set.cc \
-              interest.cc \
-              mode_conf_info.cc \
-              engine.cc
-libvx_shapedata_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = moments.h \
-              node.h \
-              polyline.h \
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_shapedata.a
+libvx_shapedata_a_SOURCES = \
+              moments.cc moments.h \
+              node.cc node.h \
+              polyline.cc polyline.h \
               shape.h \
-              shapedata.h \
-              set.h \
-              interest.h \
+              shapedata.cc shapedata.h \
+              set.cc set.h \
+              interest.cc interest.h \
               mode_columns.h \
-              mode_conf_info.h \
-              engine.h \
+              mode_conf_info.cc mode_conf_info.h \
+              engine.cc engine.h \
               vx_shapedata.h
+libvx_shapedata_a_CPPFLAGS = ${MET_CPPFLAGS}

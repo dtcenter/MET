@@ -4,8 +4,12 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_nav.a
-libvx_nav_a_SOURCES = nav.cc
-libvx_nav_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = nav.h
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_nav.a
+libvx_nav_a_SOURCES = nav.cc nav.h
+libvx_nav_a_CPPFLAGS = ${MET_CPPFLAGS}

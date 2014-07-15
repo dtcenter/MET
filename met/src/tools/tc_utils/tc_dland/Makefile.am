@@ -4,11 +4,17 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = tc_dland
 tc_dland_SOURCES = tc_dland.cc \
 	aland.f
-tc_dland_CPPFLAGS = -I${includedir}
-tc_dland_LDFLAGS = -L${libdir}
+tc_dland_CPPFLAGS = ${MET_CPPFLAGS}
+tc_dland_LDFLAGS = ${MET_LDFLAGS}
 tc_dland_LDADD = -lvx_tc_util \
 	-lvx_nc_util \
 	-lvx_grid \

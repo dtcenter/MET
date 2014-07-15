@@ -4,19 +4,19 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_pxm.a
-libvx_pxm_a_SOURCES = pbm.cc \
-              pcm.cc \
-              pgm.cc \
-              ppm.cc \
-              pxm_base.cc \
-              pxm_utils.cc
-libvx_pxm_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = pbm.h \
-              pcm.h \
-              pgm.h \
-              ppm.h \
-              pxm_base.h \
-              pxm_utils.h \
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_pxm.a
+libvx_pxm_a_SOURCES = \
+              pbm.cc pbm.h \
+              pcm.cc pcm.h \
+              pgm.cc pgm.h \
+              ppm.cc ppm.h \
+              pxm_base.cc pxm_base.h \
+              pxm_utils.cc pxm_utils.h \
               vx_pxm.h
+libvx_pxm_a_CPPFLAGS = ${MET_CPPFLAGS}

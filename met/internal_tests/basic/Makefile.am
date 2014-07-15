@@ -16,16 +16,8 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-tcdatadir = $(pkgdatadir)/tc_data
+SUBDIRS = vx_log \
+	vx_util \
+	vx_config
 
-tcdata_DATA = \
-	aland.dat \
-	dland_nw_hem_tenth_degree.nc \
-	wwpts_us.txt
-
-EXTRA_DIST = \
-	aland.dat \
-	dland_nw_hem_tenth_degree.nc \
-	wwpts_us.txt
-
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in

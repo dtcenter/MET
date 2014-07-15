@@ -4,8 +4,12 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_gnomon.a
-libvx_gnomon_a_SOURCES = gnomon.cc
-libvx_gnomon_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = gnomon.h
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_gnomon.a
+libvx_gnomon_a_SOURCES = gnomon.cc gnomon.h
+libvx_gnomon_a_CPPFLAGS = ${MET_CPPFLAGS}

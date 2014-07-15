@@ -4,27 +4,15 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
 # The library
 
-lib_LIBRARIES = libvx_plot_util.a
-libvx_plot_util_a_SOURCES = map_region.cc \
-              vx_plot_util.cc \
-              data_plane_plot.cc
-libvx_plot_util_a_CPPFLAGS = -I${includedir}
-
-include_HEADERS = map_region.h \
-              vx_plot_util.h \
-              data_plane_plot.h
-
-# Test programs
-
-noinst_PROGRAMS = test_map_region
-
-test_map_region_SOURCES = test_map_region.cc
-test_map_region_CPPFLAGS = -I${includedir}
-test_map_region_LDFLAGS = -L${libdir} -L.
-test_map_region_LDADD = -lvx_plot_util \
-	-lvx_util \
-	-lvx_log \
-	-lm
-
+noinst_LIBRARIES = libvx_plot_util.a
+libvx_plot_util_a_SOURCES = \
+              map_region.cc map_region.h \
+              vx_plot_util.cc vx_plot_util.h \
+              data_plane_plot.cc data_plane_plot.h
+libvx_plot_util_a_CPPFLAGS = ${MET_CPPFLAGS}

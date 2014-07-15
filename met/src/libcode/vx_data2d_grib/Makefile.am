@@ -4,45 +4,27 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
 # The library
 
-lib_LIBRARIES = libvx_data2d_grib.a
-libvx_data2d_grib_a_SOURCES = grib_classes.cc \
-              grib_strings.cc \
-              grib_utils.cc \
-              var_info_grib.cc \
-              data2d_grib_utils.cc \
-              data2d_grib.cc
-libvx_data2d_grib_a_CPPFLAGS = -I${includedir}
-
-include_HEADERS = grib_classes.h \
-              grib_strings.h \
-              grib_utils.h \
-              var_info_grib.h \
-              data2d_grib_utils.h \
-              data2d_grib.h \
+noinst_LIBRARIES = libvx_data2d_grib.a
+libvx_data2d_grib_a_SOURCES = \
+              grib_classes.cc grib_classes.h \
+              grib_strings.cc grib_strings.h \
+              grib_utils.cc grib_utils.h \
+              var_info_grib.cc var_info_grib.h \
+              data2d_grib_utils.cc data2d_grib_utils.h \
+              data2d_grib.cc data2d_grib.h \
               vx_data2d_grib.h
+libvx_data2d_grib_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 # Generated source files
 
 leveltype_to_string.h leveltype_to_string.cc: level_info.h
-	${bindir}/enum_to_string -concat_string level_info.h
-
-# Test programs
-
-noinst_PROGRAMS = test_read_grib1
-
-test_read_grib1_SOURCES = test_read_grib1.cc
-test_read_grib1_CPPFLAGS = -I${includedir}
-test_read_grib1_LDFLAGS = -L${libdir} -L.
-test_read_grib1_LDADD = -lvx_data2d_grib \
-	-lvx_data2d \
-	-lvx_grid \
-	-lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log
+	${ENUM_TO_STRING} -concat_string level_info.h
 
 # Clean up extra local files
 

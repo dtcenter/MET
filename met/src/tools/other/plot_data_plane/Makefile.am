@@ -4,10 +4,16 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = plot_data_plane
 plot_data_plane_SOURCES = plot_data_plane.cc
-plot_data_plane_CPPFLAGS = -I${includedir}
-plot_data_plane_LDFLAGS = -L${libdir}
+plot_data_plane_CPPFLAGS = ${MET_CPPFLAGS}
+plot_data_plane_LDFLAGS = ${MET_LDFLAGS}
 plot_data_plane_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \

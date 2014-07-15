@@ -4,10 +4,16 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = gen_poly_mask
 gen_poly_mask_SOURCES = gen_poly_mask.cc
-gen_poly_mask_CPPFLAGS = -I${includedir}
-gen_poly_mask_LDFLAGS = -L${libdir}
+gen_poly_mask_CPPFLAGS = ${MET_CPPFLAGS}
+gen_poly_mask_LDFLAGS = ${MET_LDFLAGS}
 gen_poly_mask_LDADD = -lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \

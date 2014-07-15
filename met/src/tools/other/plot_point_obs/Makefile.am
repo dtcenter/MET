@@ -4,10 +4,16 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = plot_point_obs
 plot_point_obs_SOURCES = plot_point_obs.cc
-plot_point_obs_CPPFLAGS = -I${includedir}
-plot_point_obs_LDFLAGS = -L${libdir}
+plot_point_obs_CPPFLAGS = ${MET_CPPFLAGS}
+plot_point_obs_LDFLAGS = ${MET_LDFLAGS}
 plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \

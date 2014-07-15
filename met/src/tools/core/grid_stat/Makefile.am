@@ -4,11 +4,17 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = grid_stat
 grid_stat_SOURCES = grid_stat.cc \
 	grid_stat_conf_info.cc
-grid_stat_CPPFLAGS = -I${includedir}
-grid_stat_LDFLAGS = -L${libdir}
+grid_stat_CPPFLAGS = ${MET_CPPFLAGS}
+grid_stat_LDFLAGS = ${MET_LDFLAGS}
 grid_stat_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \

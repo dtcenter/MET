@@ -4,102 +4,46 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-# The library
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# Yacc/lex flags
 
 AM_YFLAGS	= -d -p config
 AM_LFLAGS	= --prefix=config --outfile=lex.yy.c
 
-lib_LIBRARIES = libvx_config.a
-libvx_config_a_SOURCES = config.tab.yy config_scanner.ll \
-              configobjecttype_to_string.cc \
-              grdfiletype_to_string.cc \
-              dictionary.cc \
-              config_file.cc \
-              config_util.cc
-libvx_config_a_CPPFLAGS = -I${includedir}
+# The library
 
-include_HEADERS = config_file.h \
-              configobjecttype_to_string.h \
-              grdfiletype_to_string.h \
+noinst_LIBRARIES = libvx_config.a
+libvx_config_a_SOURCES = config.tab.yy config_scanner.ll \
+              configobjecttype_to_string.cc configobjecttype_to_string.h \
+              grdfiletype_to_string.cc grdfiletype_to_string.h \
+              dictionary.cc dictionary.h \
+              config_file.cc config_file.h \
+              config_util.cc config_util.h \
               data_file_type.h \
-              config.tab.h \
-              dictionary.h \
               object_types.h \
               scanner_stuff.h \
-              config_util.h \
               config_constants.h \
               vx_config.h
+libvx_config_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 # Generated source files
 
 configobjecttype_to_string.h configobjecttype_to_string.cc: object_types.h
-	${bindir}/enum_to_string -concat_string object_types.h
+	${ENUM_TO_STRING} -concat_string object_types.h
 
 grdfiletype_to_string.h grdfiletype_to_string.cc: data_file_type.h
-	${bindir}/enum_to_string -concat_string -reverse data_file_type.h
+	${ENUM_TO_STRING} -concat_string -reverse data_file_type.h
 
-# Extra files to be included in the distribution
+# Extra distribution files
 
-EXTRA_DIST = grdfiletype_to_string.h \
+EXTRA_DIST = config.tab.cc \
+	config.tab.h \
+	config_scanner.cc \
+	grdfiletype_to_string.h \
 	configobjecttype_to_string.h
-
-# Test programs
-
-noinst_PROGRAMS = test_config \
-              test_lookup \
-              test_lookup2 \
-              test_lookup3 \
-              test_string
-
-test_config_SOURCES = test_config.cc
-test_config_CPPFLAGS = -I${includedir}
-test_config_LDFLAGS = -L${libdir} -L.
-test_config_LDADD = -lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lm
-
-test_lookup_SOURCES = test_lookup.cc
-test_lookup_CPPFLAGS = -I${includedir}
-test_lookup_LDFLAGS = -L${libdir} -L.
-test_lookup_LDADD = -lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lm
-
-test_lookup2_SOURCES = test_lookup2.cc
-test_lookup2_CPPFLAGS = -I${includedir}
-test_lookup2_LDFLAGS = -L${libdir} -L.
-test_lookup2_LDADD = -lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lm
-
-test_lookup3_SOURCES = test_lookup3.cc
-test_lookup3_CPPFLAGS = -I${includedir}
-test_lookup3_LDFLAGS = -L${libdir} -L.
-test_lookup3_LDADD = -lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lm
-
-test_string_SOURCES = test_string.cc
-test_string_CPPFLAGS = -I${includedir}
-test_string_LDFLAGS = -L${libdir} -L.
-test_string_LDADD = -lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lm
 
 # Clean up extra local files
 

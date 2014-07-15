@@ -4,7 +4,11 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-INCLUDES        = -I$(includedir)
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
 
 bin_PROGRAMS = enum_to_string
 enum_to_string_SOURCES = enum_scanner.ll enum_parser.yy \
@@ -12,13 +16,21 @@ enum_to_string_SOURCES = enum_scanner.ll enum_parser.yy \
               code.cc code.h \
               scope.cc scope.h \
               enum_to_string.cc
-enum_to_string_LDFLAGS = -L$(libdir)
+enum_to_string_CPPFLAGS = -DCOPYRIGHT_DIR="\"${abs_top_srcdir}/data\"" ${MET_CPPFLAGS}
+enum_to_string_LDFLAGS = ${MET_LDFLAGS}
 enum_to_string_LDADD = -lvx_cal
+
+# Build enum_to_string when making a distribution so that we can
+#  create all of the generated sources.
+
+dist-hook: $(bin_PROGRAMS)
+
+# Extra stuff needed for the distribution
 
 EXTRA_DIST = enum.tab.h
 
 # Clean up extra local files
-clean-local:
-	-rm -f enum_scanner.cc
-	-rm -f enum_parser.cc
-	-rm -f lex.yy.c
+
+CLEANFILES = enum_scanner.cc \
+	enum_parser.cc \
+	lex.yy.c

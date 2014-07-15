@@ -4,11 +4,17 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = ensemble_stat
 ensemble_stat_SOURCES = ensemble_stat.cc \
 	ensemble_stat_conf_info.cc
-ensemble_stat_CPPFLAGS = -I${includedir}
-ensemble_stat_LDFLAGS = -L${libdir}
+ensemble_stat_CPPFLAGS = ${MET_CPPFLAGS}
+ensemble_stat_LDFLAGS = ${MET_LDFLAGS}
 ensemble_stat_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
