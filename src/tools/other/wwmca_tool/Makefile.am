@@ -4,6 +4,12 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The programs
+
 bin_PROGRAMS    = wwmca_regrid \
 	wwmca_plot
 
@@ -19,8 +25,8 @@ wwmca_regrid_SOURCES = gridhemisphere_to_string.cc \
 	nearest_interp.cc \
 	wwmca_ref.cc \
 	nc_output.cc
-wwmca_regrid_CPPFLAGS = -I${includedir}
-wwmca_regrid_LDFLAGS = -L${libdir}
+wwmca_regrid_CPPFLAGS = ${MET_CPPFLAGS}
+wwmca_regrid_LDFLAGS = ${MET_LDFLAGS}
 wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
@@ -60,8 +66,8 @@ wwmca_plot_SOURCES = gridhemisphere_to_string.cc \
 	nearest_interp.cc \
 	wwmca_ref.cc \
 	nc_output.cc
-wwmca_plot_CPPFLAGS = -I${includedir}
-wwmca_plot_LDFLAGS = -L${libdir}
+wwmca_plot_CPPFLAGS = ${MET_CPPFLAGS}
+wwmca_plot_LDFLAGS = ${MET_LDFLAGS}
 wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
@@ -91,7 +97,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 
 # Create generated files
 gridhemisphere_to_string.h gridhemisphere_to_string.cc: wwmca_ref.h
-	${bindir}/enum_to_string wwmca_ref.h
+	${ENUM_TO_STRING} wwmca_ref.h
 
 # Specify other files to be included in the distribution
 EXTRA_DIST = afwa_cp_file.h \

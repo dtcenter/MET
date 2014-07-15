@@ -4,22 +4,18 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_afm.a
-libvx_afm_a_SOURCES = afm.cc \
-              afm_keywords.cc \
-              afm_line.cc \
-              afm_token.cc \
-              afmkeyword_to_string.cc \
-              afmtokentype_to_string.cc
-libvx_afm_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = afm.h \
-              afm_keywords.h \
-              afmkeyword_to_string.h \
-              afm_line.h \
-              afm_token.h \
-              afm_token_types.h \
-              afmtokentype_to_string.h
+include ${top_srcdir}/Make-include
 
-EXTRA_DIST = afmkeyword_to_string.h \
-	afmtokentype_to_string.h
+# The library
+
+noinst_LIBRARIES = libvx_afm.a
+libvx_afm_a_SOURCES = afm.cc afm.h \
+              afm_keywords.cc afm_keywords.h \
+              afm_line.cc afm_line.h \
+              afm_token.cc afm_token.h \
+              afmkeyword_to_string.cc afmkeyword_to_string.h \
+              afmtokentype_to_string.cc afmtokentype_to_string.h \
+              afm_token_types.h
+libvx_afm_a_CPPFLAGS = ${MET_CPPFLAGS}

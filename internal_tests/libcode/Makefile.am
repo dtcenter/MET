@@ -16,18 +16,14 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS 		= admin_by_country
+SUBDIRS	= vx_data2d \
+	vx_data2d_grib \
+	vx_data2d_nc_met \
+	vx_data2d_nccf \
+	vx_data2d_factory \
+	vx_geodesy \
+	vx_ps \
+	vx_plot_util \
+	vx_tc_util
 
-map2012dir = $(pkgdatadir)/map/update_2012
-
-map2012_DATA = \
-	admin_detail_data \
-	country_data \
-	country_detail_data
-
-EXTRA_DIST = \
-	admin_detail_data \
-	country_data \
-	country_detail_data
-
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in

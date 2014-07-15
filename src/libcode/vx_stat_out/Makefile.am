@@ -4,11 +4,15 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_stat_out.a
-libvx_stat_out_a_SOURCES = stat_columns.cc \
-              stat_hdr_columns.cc
-libvx_stat_out_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = stat_columns.h \
-              stat_hdr_columns.h \
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_stat_out.a
+libvx_stat_out_a_SOURCES = \
+              stat_columns.cc stat_columns.h \
+              stat_hdr_columns.cc stat_hdr_columns.h \
               vx_stat_out.h
+libvx_stat_out_a_CPPFLAGS = ${MET_CPPFLAGS}

@@ -4,11 +4,17 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = wavelet_stat
 wavelet_stat_SOURCES = wavelet_stat.cc \
 	wavelet_stat_conf_info.cc
-wavelet_stat_CPPFLAGS = -I${includedir}
-wavelet_stat_LDFLAGS = -L${libdir}
+wavelet_stat_CPPFLAGS = ${MET_CPPFLAGS}
+wavelet_stat_LDFLAGS = ${MET_LDFLAGS}
 wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \

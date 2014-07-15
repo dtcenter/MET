@@ -4,36 +4,18 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
 # The library
 
-lib_LIBRARIES = libvx_data2d_nccf.a
-libvx_data2d_nccf_a_SOURCES = nccf_file.cc \
-              var_info_nccf.cc \
-              data2d_nccf.cc
-libvx_data2d_nccf_a_CPPFLAGS = -I${includedir}
-
-include_HEADERS = nccf_file.h \
-              var_info_nccf.h \
-              data2d_nccf.h \
+noinst_LIBRARIES = libvx_data2d_nccf.a
+libvx_data2d_nccf_a_SOURCES = \
+              nccf_file.cc nccf_file.h \
+              var_info_nccf.cc var_info_nccf.h \
+              data2d_nccf.cc data2d_nccf.h \
               vx_data2d_nccf.h
+libvx_data2d_nccf_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 EXTRA_DIST = get_nccf_grid.h
-
-# Test programs
-
-noinst_PROGRAMS = test_read_nccf
-
-test_read_nccf_SOURCES = test_read_nccf.cc
-test_read_nccf_CPPFLAGS = -I${includedir}
-test_read_nccf_LDFLAGS = -L${libdir} -L.
-test_read_nccf_LDADD = -lvx_data2d_nccf \
-	-lvx_nc_util \
-	-lvx_data2d \
-	-lvx_grid \
-	-lvx_config \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lnetcdf_c++ -lnetcdf
-

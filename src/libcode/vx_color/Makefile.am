@@ -4,25 +4,30 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# YACC/LEX flags
+
 AM_YFLAGS	= -d -p color
 AM_LFLAGS	= --prefix=color --outfile=lex.yy.c
 
-lib_LIBRARIES = libvx_color.a
-libvx_color_a_SOURCES = color_parser_yacc.yy color_scanner.ll \
-              color.cc \
-              color_list.cc \
-              color_table.cc
-libvx_color_a_CPPFLAGS = -I${includedir}
+# The library
 
-include_HEADERS = color_parser_yacc.h \
-              color.h \
-              color_list.h \
+noinst_LIBRARIES = libvx_color.a
+libvx_color_a_SOURCES = \
+              color_parser_yacc.yy color_scanner.ll \
+              color.cc color.h \
+              color_list.cc color_list.h \
+              color_table.cc \
               color_parser.h \
               vx_color.h
+libvx_color_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 # Clean up extra local files
-clean-local:
-	-rm -f color_scanner.cc
-	-rm -f color_parser_yacc.cc
-	-rm -f color_parser_yacc.h
-	-rm -f lex.color.cc
+
+CLEANFILES = color_scanner.cc \
+	color_parser_yacc.cc \
+	color_parser_yacc.h \
+	lex.color.cc

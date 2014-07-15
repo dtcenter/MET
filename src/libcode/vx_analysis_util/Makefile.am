@@ -4,27 +4,24 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_analysis_util.a
-libvx_analysis_util_a_SOURCES = analysis_utils.cc \
-              by_case_info.cc \
-              mask_poly.cc \
-              mode_atts.cc \
-              mode_job.cc \
-              mode_line.cc \
-              stat_job.cc \
-              stat_line.cc \
-              time_series.cc
-libvx_analysis_util_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = analysis_utils.h \
-              by_case_info.h \
-              mask_poly.h \
-              mode_atts.h \
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_analysis_util.a
+libvx_analysis_util_a_SOURCES = \
+              analysis_utils.cc analysis_utils.h \
+              by_case_info.cc by_case_info.h \
+              mask_poly.cc mask_poly.h \
+              mode_atts.cc mode_atts.h \
+              mode_job.cc mode_job.h \
+              mode_line.cc mode_line.h \
+              stat_job.cc stat_job.h \
+              stat_line.cc stat_line.h \
+              time_series.cc time_series.h \
               mode_analysis_columns.h \
-              mode_job.h \
-              mode_line.h \
-              stat_job.h \
-              stat_line.h \
               stat_offsets.h \
-              time_series.h \
               vx_analysis_util.h
+libvx_analysis_util_a_CPPFLAGS = ${MET_CPPFLAGS}

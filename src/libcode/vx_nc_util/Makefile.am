@@ -4,16 +4,18 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_nc_util.a
-libvx_nc_util_a_SOURCES = nc_var_info.cc \
-              nc_utils.cc \
-              write_netcdf.cc \
-              grid_output.cc
-libvx_nc_util_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = nc_constants.h \
-              nc_var_info.h \
-              nc_utils.h \
-              write_netcdf.h \
-              grid_output.h \
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_nc_util.a
+libvx_nc_util_a_SOURCES = \
+              nc_var_info.cc nc_var_info.h \
+              nc_utils.cc nc_utils.h \
+              write_netcdf.cc write_netcdf.h \
+              grid_output.cc grid_output.h \
+              nc_constants.h \
               vx_nc_util.h
+libvx_nc_util_a_CPPFLAGS = ${MET_CPPFLAGS}

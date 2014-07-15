@@ -4,14 +4,21 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_log.a
-libvx_log_a_SOURCES = concat_string.cc \
-               indent.cc \
-               logger.cc \
-               string_array.cc
+# Include the project definitions
 
-include_HEADERS = concat_string.h \
-               indent.h \
-               logger.h \
-               string_array.h \
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_log.a
+libvx_log_a_SOURCES = concat_string.cc concat_string.h \
+               indent.cc indent.h \
+               logger.cc logger.h \
+               string_array.cc string_array.h \
                vx_log.h
+
+# Build the library when making a distribution so that
+# we can make enum_to_string and create all of the generated
+# sources.
+
+dist-hook: $(noinst_LIBRARIES)

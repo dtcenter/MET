@@ -16,17 +16,12 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
+EXTRA_DIST = colortables \
 	config \
 	map \
 	poly \
 	ps \
 	table_files \
 	tc_data
-
-pkgdata_DATA = copyright_notice.txt
-
-EXTRA_DIST = copyright_notice.txt
 
 MAINTAINERCLEANFILES 	= Makefile.in 

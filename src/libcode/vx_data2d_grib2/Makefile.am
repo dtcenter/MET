@@ -4,10 +4,14 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_data2d_grib2.a
-libvx_data2d_grib2_a_SOURCES =var_info_grib2.cc \
-              data2d_grib2.cc
-libvx_data2d_grib2_a_CPPFLAGS = -I${includedir}
+# Include the project definitions
 
-include_HEADERS = var_info_grib2.h \
-              data2d_grib2.h
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_data2d_grib2.a
+libvx_data2d_grib2_a_SOURCES = \
+              var_info_grib2.cc var_info_grib2.h \
+              data2d_grib2.cc data2d_grib2.h
+libvx_data2d_grib2_a_CPPFLAGS = ${MET_CPPFLAGS}

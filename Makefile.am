@@ -18,9 +18,13 @@
 
 ACLOCAL_AMFLAGS		= -I m4
 
-EXTRA_DIST		= bootstrap
+EXTRA_DIST		= out scripts Make-include
 
-SUBDIRS 		= data src
+SUBDIRS 		= data src internal_tests
+DIST_SUBDIRS 		= data src
 
 MAINTAINERCLEANFILES 	= Makefile.in aclocal.m4 configure \
 			  config.h.in
+
+dist-hook:
+	-rm -rf `find $(distdir) -name .svn`

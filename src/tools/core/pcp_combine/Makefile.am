@@ -4,10 +4,16 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = pcp_combine
 pcp_combine_SOURCES = pcp_combine.cc
-pcp_combine_CPPFLAGS = -I${includedir}
-pcp_combine_LDFLAGS = -L${libdir}
+pcp_combine_CPPFLAGS = ${MET_CPPFLAGS}
+pcp_combine_LDFLAGS = ${MET_LDFLAGS}
 pcp_combine_LDADD = -lvx_data2d \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \

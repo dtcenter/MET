@@ -4,13 +4,19 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = tc_pairs
 tc_pairs_SOURCES = tc_pairs.cc \
 	acerr.f \
 	clip_shif.f \
 	tc_pairs_conf_info.cc
-tc_pairs_CPPFLAGS = -I${includedir}
-tc_pairs_LDFLAGS = -L${libdir}
+tc_pairs_CPPFLAGS = ${MET_CPPFLAGS}
+tc_pairs_LDFLAGS = ${MET_LDFLAGS}
 tc_pairs_LDADD = -lvx_config \
 	-lvx_data2d_nc_met \
 	-lvx_analysis_util \

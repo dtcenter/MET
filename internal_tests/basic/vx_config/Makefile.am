@@ -1,0 +1,62 @@
+## @start 1
+## Makefile.am -- Process this file with automake to produce Makefile.in
+## @end 1
+
+MAINTAINERCLEANFILES	= Makefile.in
+
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# Build flags applicable for the entire Makefile
+
+AM_CPPFLAGS = ${MET_CPPFLAGS}
+AM_LDFLAGS = -L. ${MET_LDFLAGS}
+
+# Test programs
+
+noinst_PROGRAMS = test_config \
+              test_lookup \
+              test_lookup2 \
+              test_lookup3 \
+              test_string
+
+nodist_test_config_SOURCES = test_config.cc
+test_config_LDADD = -lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm
+
+nodist_test_lookup_SOURCES = test_lookup.cc
+test_lookup_LDADD = -lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm
+
+nodist_test_lookup2_SOURCES = test_lookup2.cc
+test_lookup2_LDADD = -lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm
+
+nodist_test_lookup3_SOURCES = test_lookup3.cc
+test_lookup3_LDADD = -lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm
+
+nodist_test_string_SOURCES = test_string.cc
+test_string_LDADD = -lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm

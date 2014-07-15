@@ -24,4 +24,8 @@ if ENABLE_TC_UTILS
   SUBDIRS += tc_utils
 endif
 
+#DIST_SUBDIRS = core \
+#	other \
+#	tc_utils
+
 MAINTAINERCLEANFILES 	= Makefile.in

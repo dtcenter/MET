@@ -4,13 +4,19 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = stat_analysis
 stat_analysis_SOURCES = stat_analysis.cc \
 	aggr_stat_line.cc \
 	parse_stat_line.cc \
 	stat_analysis_job.cc
-stat_analysis_CPPFLAGS = -I${includedir}
-stat_analysis_LDFLAGS = -L${libdir}
+stat_analysis_CPPFLAGS = ${MET_CPPFLAGS}
+stat_analysis_LDFLAGS = ${MET_LDFLAGS}
 stat_analysis_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \

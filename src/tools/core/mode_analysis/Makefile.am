@@ -4,11 +4,17 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = mode_analysis
 mode_analysis_SOURCES = mode_analysis.cc \
 	config_to_att.cc
-mode_analysis_CPPFLAGS = -I${includedir}
-mode_analysis_LDFLAGS = -L${libdir}
+mode_analysis_CPPFLAGS = ${MET_CPPFLAGS}
+mode_analysis_LDFLAGS = ${MET_LDFLAGS}
 mode_analysis_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \

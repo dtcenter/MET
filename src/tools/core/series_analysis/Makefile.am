@@ -4,11 +4,17 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = series_analysis
 series_analysis_SOURCES = series_analysis.cc \
 	series_analysis_conf_info.cc
-series_analysis_CPPFLAGS = -I${includedir}
-series_analysis_LDFLAGS = -L${libdir}
+series_analysis_CPPFLAGS = ${MET_CPPFLAGS}
+series_analysis_LDFLAGS = ${MET_LDFLAGS}
 series_analysis_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \

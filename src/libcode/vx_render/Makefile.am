@@ -4,29 +4,26 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-lib_LIBRARIES = libvx_render.a
-libvx_render_a_SOURCES = ascii85_filter.cc \
-              bit_filter.cc \
-              hex_filter.cc \
-              ps_filter.cc \
-              psout_filter.cc \
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The library
+
+noinst_LIBRARIES = libvx_render.a
+libvx_render_a_SOURCES = \
+              ascii85_filter.cc ascii85_filter.h \
+              bit_filter.cc bit_filter.h \
+              hex_filter.cc hex_filter.h \
+              ps_filter.cc ps_filter.h \
+              psout_filter.cc psout_filter.h \
               render_pbm.cc \
               render_pcm.cc \
               render_pgm.cc \
               render_ppm.cc \
-              renderinfo.cc \
-              rle_filter.cc \
-              flate_filter.cc \
-              uc_queue.cc
-libvx_render_a_CPPFLAGS = -I${includedir} -I../vx_ps
-
-include_HEADERS = ascii85_filter.h \
-              bit_filter.h \
-              hex_filter.h \
-              ps_filter.h \
-              psout_filter.h \
-              vx_render.h \
-              renderinfo.h \
-              rle_filter.h \
-              flate_filter.h \
-              uc_queue.h
+              renderinfo.cc renderinfo.h \
+              rle_filter.cc rle_filter.h \
+              flate_filter.cc flate_filter.h \
+              uc_queue.cc uc_queue.h \
+              vx_render.h
+libvx_render_a_CPPFLAGS = ${MET_CPPFLAGS}

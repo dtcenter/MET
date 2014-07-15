@@ -4,6 +4,12 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = modis_regrid
 modis_regrid_SOURCES = modis_regrid.cc \
 	sat_utils.cc \
@@ -11,8 +17,8 @@ modis_regrid_SOURCES = modis_regrid.cc \
 	data_plane_to_netcdf.cc \
 	data_averager.cc \
 	modis_file.cc
-modis_regrid_CPPFLAGS = -I${includedir}
-modis_regrid_LDFLAGS = -L${libdir}
+modis_regrid_CPPFLAGS = ${MET_CPPFLAGS}
+modis_regrid_LDFLAGS = ${MET_LDFLAGS}
 modis_regrid_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \

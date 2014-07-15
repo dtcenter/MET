@@ -4,6 +4,12 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = mode
 mode_SOURCES = mode.cc \
 	mode_ps_file.cc \
@@ -14,8 +20,8 @@ mode_SOURCES = mode.cc \
 	cluster_page.cc \
 	overlap_page.cc \
 	mode_exec.cc
-mode_CPPFLAGS = -I${includedir}
-mode_LDFLAGS = -L${libdir}
+mode_CPPFLAGS = ${MET_CPPFLAGS}
+mode_LDFLAGS = ${MET_LDFLAGS}
 mode_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \

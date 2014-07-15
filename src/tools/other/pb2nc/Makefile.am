@@ -4,6 +4,12 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+# Include the project definitions
+
+include ${top_srcdir}/Make-include
+
+# The program
+
 bin_PROGRAMS    = pb2nc
 pb2nc_SOURCES = pb2nc.cc \
 	pb2nc_conf_info.cc \
@@ -12,8 +18,8 @@ pb2nc_SOURCES = pb2nc.cc \
 	closepb.f \
 	readpb.f \
 	dumppb.f
-pb2nc_CPPFLAGS = -I${includedir}
-pb2nc_LDFLAGS = -L${libdir}
+pb2nc_CPPFLAGS = ${MET_CPPFLAGS}
+pb2nc_LDFLAGS = ${MET_LDFLAGS}
 pb2nc_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \

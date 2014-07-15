@@ -16,22 +16,12 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-hmtmasksdir = $(pkgdatadir)/poly/HMT_masks
+F2C_LIBNAME =
 
-hmtmasks_DATA = \
-	cnrfc_poly.nc \
-	huc4_1605_poly.nc \
-	huc4_1803_poly.nc \
-	huc4_1804_poly.nc \
-	huc4_1805_poly.nc \
-	huc4_1806_poly.nc
+CXX_FLAGS = $(CXX_FLAGS) $(ARCH_FLAGS)
 
-EXTRA_DIST = \
-	cnrfc_poly.nc \
-	huc4_1605_poly.nc \
-	huc4_1803_poly.nc \
-	huc4_1804_poly.nc \
-	huc4_1805_poly.nc \
-	huc4_1806_poly.nc
+ACLOCAL_AMFLAGS		= -I m4
+
+SUBDIRS 		= basic libcode
 
 MAINTAINERCLEANFILES 	= Makefile.in 
