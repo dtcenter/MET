@@ -53,6 +53,18 @@ enum TrackType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for 12-hour interpolation logic
+//
+
+enum Interp12Type {
+   Interp12Type_None,   // Do not apply 12-hour interpolation logic
+   Interp12Type_Fill,   // Fill in missing 'I' tracks with '2' tracks
+   Interp12Type_Replace // Replace all 'I' tracks with '2' tracks
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for all the possible STAT line types
 //
 
@@ -676,6 +688,10 @@ static const char conf_val_obs[]   = "OBS";
 // Track types: NONE, BOTH, ADECK, BDECK
 static const char conf_val_adeck[] = "ADECK";
 static const char conf_val_bdeck[] = "BDECK";
+
+// Interp12 Types: NONE, FILL, REPLACE
+static const char conf_val_fill[]    = "FILL";
+static const char conf_val_replace[] = "REPLACE";
 
 // Bootstrapping interval type
 static const char conf_val_pctile[] = "PCTILE";

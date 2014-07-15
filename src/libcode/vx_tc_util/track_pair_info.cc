@@ -507,7 +507,10 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type, const int ri_se
    double cur_avmax, cur_bvmax;
    double prv_avmax, prv_bvmax;
    bool adeck_ri, bdeck_ri;
-   
+ 
+   // Nothing to do.
+   if(track_type == TrackType_None) return(0);
+ 
    // Check threshold type for non-exact intensity differences.
    if(!exact_flag &&
       st.get_type() != thresh_lt && st.get_type() != thresh_le &&

@@ -1190,6 +1190,62 @@ ConcatString tracktype_to_string(TrackType type) {
 
 ////////////////////////////////////////////////////////////////////////
 
+Interp12Type int_to_interp12type(int v) {
+   Interp12Type t;
+
+   // Convert integer to enumerated Interp12Type
+        if(v == conf_const.lookup_int(conf_val_none))    t = Interp12Type_None;
+   else if(v == conf_const.lookup_int(conf_val_fill))    t = Interp12Type_Fill;
+   else if(v == conf_const.lookup_int(conf_val_replace)) t = Interp12Type_Replace;
+   else {
+      mlog << Error << "\nint_to_interp12type() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+Interp12Type string_to_interp12type(const char *s) {
+   Interp12Type t;
+
+   // Convert string to enumerated Interp12Type
+        if(strcasecmp(s, conf_val_none)    == 0) t = Interp12Type_None;
+   else if(strcasecmp(s, conf_val_fill)    == 0) t = Interp12Type_Fill;
+   else if(strcasecmp(s, conf_val_replace) == 0) t = Interp12Type_Replace;
+   else {
+      mlog << Error << "\nstring_to_interp12type() -> "
+           << "Unexpected Interp12Type string \"" << s << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString interp12type_to_string(Interp12Type type) {
+   ConcatString s;
+
+   // Convert enumerated Interp12Type to string
+   switch(type) {
+      case(Interp12Type_None):    s = conf_val_none;    break;
+      case(Interp12Type_Fill):    s = conf_val_fill;    break;
+      case(Interp12Type_Replace): s = conf_val_replace; break;
+      default:
+         mlog << Error << "\ninterp12type_to_string() -> "
+              << "Unexpected Interp12Type value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 MergeType int_to_mergetype(int v) {
    MergeType t;
 
