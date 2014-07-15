@@ -70,7 +70,7 @@ void TCPairsConfInfo::clear() {
    InitMask.clear();
    ValidMask.clear();
    CheckDup = true;
-   Interp12 = true;
+   Interp12 = Interp12Type_Replace;
    NConsensus = 0;
    LagTime.clear();
    BestBaseline.clear();
@@ -174,7 +174,7 @@ void TCPairsConfInfo::process_config() {
    CheckDup = Conf.lookup_bool(conf_key_check_dup);
 
    // Conf: Interp12
-   Interp12 = Conf.lookup_bool(conf_key_interp12);
+   Interp12 = int_to_interp12type(Conf.lookup_int(conf_key_interp12));
 
    // Conf: Consensus
    dict = Conf.lookup_array(conf_key_consensus);

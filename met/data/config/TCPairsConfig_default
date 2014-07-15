@@ -65,10 +65,10 @@ valid_mask = "";
 check_dup = FALSE;
 
 //
-// Specify if special processing should be performed for interpolated models with 
-// 12-hour spacing.  
+// Specify special processing to be performed for interpolated models.
+// Set to NONE, FILL, or REPLACE.
 //
-interp12 = TRUE;
+interp12 = REPLACE;
 
 //
 // Specify how consensus forecasts should be defined

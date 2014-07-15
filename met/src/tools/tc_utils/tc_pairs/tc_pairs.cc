@@ -16,8 +16,9 @@
 //   ----   ----      ----            -----------
 //   000    03/14/12  Halley Gotway   New
 //   001    05/20/14  Halley Gotway   Refine consensus to ensure the
-//                                      presence of required members at
-//                                      each lead time.
+//                                    presence of required members at
+//                                    each lead time.
+//   002    07/15/14  Halley Gotway   Simplify Interp12 logic.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +54,7 @@ static const int nvtx = 10;
 
 extern "C" {
    void acerr_(float [mxp], float [mxp], float [mxp], float [mxp],
-           int *, float [mxp], float [mxp], int *);           
+           int *, float [mxp], float [mxp], int *);
    void oclip_(char [2], int *, int *, int *, int *,
            float *,  float *,  float *, float *, float *,
            float *,  float *,  float *, float *, float *,
@@ -174,7 +175,7 @@ void process_command_line(int argc, char **argv) {
    // Set the output file name
    out_file.clear();
    out_file << out_base << tc_stat_file_ext;
-   
+
    // Check for the minimum number of arguments
    if(adeck_source.n_elements() == 0 ||
       bdeck_source.n_elements() == 0 ||
@@ -194,7 +195,7 @@ void process_command_line(int argc, char **argv) {
            << "] ADECK Source: " << adeck_source[i] << ", Model Suffix: "
            << adeck_model_suffix[i] << "\n";
    }
-   
+
    // List the input BDECK track files
    for(i=0; i<bdeck_source.n_elements(); i++) {
       mlog << Debug(1)
@@ -210,13 +211,13 @@ void process_command_line(int argc, char **argv) {
    mlog << Debug(1)
         << "Config File Default: " << default_config_file << "\n"
         << "Config File User: " << config_file << "\n";
-        
+
    // Read the config files
    conf_info.read_config(default_config_file, config_file);
 
    // Load the distance to land data file
    if(dland_dp.nx() == 0 || dland_dp.ny() == 0) load_dland();
-   
+
    return;
 }
 
@@ -272,7 +273,7 @@ void process_tracks() {
         << "Filtering " << adeck_tracks.n_tracks()
         << " ADECK tracks based on config file settings.\n";
    filter_tracks(adeck_tracks);
-        
+
    // Process the BDECK track files
    mlog << Debug(2)
         << "Processing " << bdeck_files.n_elements()
@@ -286,10 +287,10 @@ void process_tracks() {
    // Handle 12-hourly interpolated models
    if(conf_info.Interp12) {
       mlog << Debug(2)
-           << "Deriving 12-hour interpolated tracks.\n";
+           << "Deriving 12-hour interpolated ADECK tracks.\n";
       derive_interp12(adeck_tracks);
    }
-   
+
    // Derive consensus forecasts from the ADECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.NConsensus
@@ -305,7 +306,7 @@ void process_tracks() {
    i = derive_lag(adeck_tracks);
    mlog << Debug(2)
         << "Added " << i << " ADECK lag tracks(s).\n";
-        
+
    // Derive CLIPER/SHIFOR forecasts from the ADECK/BDECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.OperBaseline.n_elements() +
@@ -318,7 +319,7 @@ void process_tracks() {
    mlog << Debug(2)
         << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
         << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
-   
+
    // Loop through the ADECK tracks and find a matching BDECK track
    for(i=0; i<adeck_tracks.n_tracks(); i++) {
 
@@ -356,7 +357,7 @@ void process_tracks() {
 
    // Write the output file
    write_output(pairs);
-   
+
    return;
 }
 
@@ -403,10 +404,10 @@ void process_track_files(const StringArray &files,
             cs << cs_erase << line.technique() << model_suffix[i];
             line.set_technique(cs);
          }
-         
+
          // Check the keep status if requested
          if(check_keep && !is_keeper(line)) continue;
-         
+
          // Attempt to add the current line to the TrackInfoArray
          if(tracks.add(line, conf_info.CheckDup)) {
             cur_add++;
@@ -465,7 +466,7 @@ bool is_keeper(const ATCFLine &line) {
 
    // Decompose warning time
    unix_to_mdyhms(line.warning_time(), m, d, y, h, mm, s);
-   
+
    // Check model
    if(conf_info.Model.n_elements() > 0 &&
       !conf_info.Model.has(line.technique()))
@@ -517,12 +518,12 @@ void filter_tracks(TrackInfoArray &tracks) {
    int n_init, n_init_hour, n_vld, n_maski, n_maskv;
    bool status;
    TrackInfoArray t = tracks;
-   
+
    // Initialize
    tracks.clear();
    n_mod  = n_sid       = n_bas = n_cyc   = n_name  = 0;
    n_init = n_init_hour = n_vld = n_maski = n_maskv = 0;
-   
+
    // Loop through the tracks and determine which should be retained
    for(i=0; i<t.n_tracks(); i++) {
 
@@ -546,7 +547,7 @@ void filter_tracks(TrackInfoArray &tracks) {
          n_sid++;
          continue;
       }
-     
+
       // Check basin
       if(conf_info.Basin.n_elements() > 0 &&
          !conf_info.Basin.has(t[i].basin())) {
@@ -682,154 +683,91 @@ void filter_tracks(TrackInfoArray &tracks) {
 //
 // Apply the following logic to derive 12-hour interpolated tracks:
 //
-// - Loop through the track array to construct a mapping of cases to
-//   track initialization times.
-//   - Only process the track if the model name ends with an 'I'.
-//   - The map key consists of the model name and the STORMID.
-//   - The map value is a list of track initialization times.
-//
-// - Loop through and process each of the map entries.
-//   - Sort the track initialization time array.
-//   - Loop through the times and compute the time step.
-//   - If the time step is 12-hours, search for the following track:
-//     - Model name is the same, but ending in '2' instead of 'I'.
-//     - STORMID is the same.
-//     - INIT is the previous track initialization time plus 6 hours.
-//   - If found, create a copy of that track but rename the model to end
-//     in 'I' rather than '2'.
+// - The interp12 parameter is set to NONE, FILL, or REPLACE.
+// - Loop through the TrackInfoArray looking for models ending in '2'.
+// - For each track ending in '2', search for a corresponding one
+//   ending in 'I'.
+// - If not found, copy the '2' track, rename it 'I', and add it to
+//   the track list.
+// - If found and interp12 is set to REPLACE, copy the '2' track,
+//   rename it 'I', and replace the existing 'I' track.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void derive_interp12(TrackInfoArray &tracks) {
-   int i, j, ds, n_add, n;
-   ConcatString key, technique;
-   TimeArray val;
-   StringArray sa, track_cases;
+   int i, j, n_add, n_replace;
+   ConcatString track_case, imodel;
+   StringArray track_case_list;
    TrackInfo interp_track;
    const char *sep = ":";
 
-   // Interp12 case map
-   map<ConcatString,TimeArray> interp_map;
-   map<ConcatString,TimeArray>::iterator it;
-   
-   // Loop through the track array to construct maps
+   // If Interp12 logic set to NONE, Nothing to do.
+   if(conf_info.Interp12 == Interp12Type_None) return;
+
+   // Loop through the track array and store case information
    for(i=0; i<tracks.n_tracks(); i++) {
 
-      // Build track case key
-      key << cs_erase
-          << tracks[i].technique() << sep
-          << tracks[i].storm_id() << sep
-          << (tracks[i].init() > 0 ?
-              unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
-      track_cases.add(key);
+      // Build track case information as AMODEL:STORMID:INIT
+      track_case << cs_erase
+                 << tracks[i].technique() << sep
+                 << tracks[i].storm_id() << sep
+                 << (tracks[i].init() > 0 ?
+                     unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
+      track_case_list.add(track_case);
+   }
 
-      // Skip AMODEL names not ending in 'I'
+   // Loop through the track array and apply the interp12 logic
+   for(i=0, n_add=0, n_replace=0; i<tracks.n_tracks(); i++) {
+
+      // Skip AMODEL names not ending in '2'
       if(*(tracks[i].technique() +
-           strlen(tracks[i].technique()) - 1) != 'I') continue;
+           strlen(tracks[i].technique()) - 1) != '2') continue;
 
-      // Build interp map key
-      key << cs_erase
-          << tracks[i].technique() << sep
-          << tracks[i].storm_id();
+      // Swap the '2' for an 'I' in the AMODEL
+      imodel = tracks[i].technique();
+      imodel.chomp('2');
+      imodel << 'I';
 
-      // Add a new interpolation map entry, if necessary
-      if(interp_map.count(key) == 0) {
-         val.clear();
-         interp_map[key] = val;
+      // Create a copy the '2' track and rename it to 'I'.
+      interp_track = tracks[i];
+      interp_track.set_technique(imodel);
+
+      // Search for corresponding track with AMODEL name ending in 'I'
+      track_case << cs_erase
+                 << imodel << sep
+                 << tracks[i].storm_id() << sep
+                 << (tracks[i].init() > 0 ?
+                    unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
+
+      // If the 'I' track doesn't exist, add the new interp track.
+      if(!track_case_list.has(track_case, j)) {
+
+         mlog << Debug(3)
+              << "Adding new track for Interp12 case \"" << track_case
+              << "\" by renaming the " << tracks[i].technique() << " track\n";
+
+         tracks.add(interp_track);
+         n_add++;
       }
+      // If the 'I' track does exist, check logic, and replace it.
+      else {
 
-      // Add the current time to the interpolation map entry
-      if(!interp_map[key].has(tracks[i].init()))
-         interp_map[key].add(tracks[i].init());
+         // Check logic before replacing existing 'I' track with new one.
+         if(conf_info.Interp12 == Interp12Type_Replace) {
 
-   } // end for i
-
-   // Loop through and process each of the interpolation map entries
-   for(it = interp_map.begin(), n=0, n_add=0; it != interp_map.end(); it++) {
-
-      mlog << Debug(3)
-           << "[Case " << ++n << "] Processing " << it->second.n_elements()
-           << " initialization times to compute 12-hour interpolated tracks for "
-           << it->first << ".\n";
-
-      // Split the current map key
-      sa = it->first.split(sep);
-
-      // Sort the current map key value
-      it->second.sort_array();
-
-      // Loop through the initialization times and process the time step
-      for(i=0; i<it->second.n_elements(); i++) {
-
-         // Can't compute timestep for a single time
-         if(it->second.n_elements() == 1) break;
-
-         // Compute the time step
-         if(i == it->second.n_elements() - 1)
-            ds = it->second[i]   - it->second[i-1];
-         else
-            ds = it->second[i+1] - it->second[i];
-
-         // Check for a 12-hour time step
-         if(ds != 12*sec_per_hour) {
             mlog << Debug(3)
-                 << "For initialization time "
-                 << unix_to_yyyymmdd_hhmmss(it->second[i]) << ", skipping "
-                 << sec_to_hhmmss(ds) << " timestep.\n";
-            continue;
+                 << "Replacing existing track for Interp12 case \"" << track_case
+                 << "\" with the " << tracks[i].technique() << " track.\n";
+
+            tracks.set(j, interp_track);
+            n_replace++;
          }
-
-         // Swap the trailing 'I' for a '2'
-         technique = sa[0];
-         technique.chomp('I');
-         technique << '2';
-
-         // Build search key
-         key << cs_erase
-             << technique << sep
-             << sa[1] << sep
-             << unix_to_yyyymmdd_hhmmss(it->second[i] + 6*sec_per_hour);
-
-         // Search for this track description
-         if(track_cases.has(key, j)) {
-
-            // Process interpolated track
-            mlog << Debug(3)
-                 << "For initialization time "
-                 << unix_to_yyyymmdd_hhmmss(it->second[i])
-                 << ", found 12-hour interpolated track: "
-                 << key << "\n";
-
-            // Copy, rename, and add the interpolated track
-            interp_track = tracks[j];
-            interp_track.set_technique(sa[0]);
-            tracks.add(interp_track);
-            n_add++;
-
-            if(mlog.verbosity_level() >= 5) {
-               mlog << Debug(5)
-                    << "Adding 12-hour interpolated track:\n"
-                    << interp_track.serialize_r(1) << "\n";
-            }
-            else {
-               mlog << Debug(4)
-                    << "Adding 12-hour interpolated track:\n"
-                    << interp_track.serialize() << "\n";
-            }
-         }
-         else {
-            mlog << Debug(3)
-                 << "For initialization time "
-                 << unix_to_yyyymmdd_hhmmss(it->second[i])
-                 << ", could not find 12-hour interpolated track: "
-                 << key << "\n";
-         }
-      } //end for i
-   } // end for it
+      }
+   }
 
    mlog << Debug(2)
-        << "Finished deriving " << n_add
-        << " 12-hour interpolated tracks.\n";
+        << "Finished adding " << n_add << " and replacing " << n_replace
+        << " Interp12 track(s).\n";
 
    return;
 }
@@ -860,7 +798,7 @@ int derive_consensus(TrackInfoArray &tracks) {
 
       // Add this case
       if(!case_list.has(cur_case)) case_list.add(cur_case);
-      
+
    } // end for i
 
    mlog << Debug(3)
@@ -869,11 +807,11 @@ int derive_consensus(TrackInfoArray &tracks) {
 
    // Loop through the cases and process each consensus model
    for(i=0; i<case_list.n_elements(); i++) {
-     
+
       // Break the case back out into Basin, Cyclone, InitTime
       cur_case = case_list[i];
-      case_cmp = cur_case.split(sep);      
-     
+      case_cmp = cur_case.split(sep);
+
       // Loop through the consensus models
       for(j=0; j<conf_info.NConsensus; j++) {
 
@@ -885,7 +823,7 @@ int derive_consensus(TrackInfoArray &tracks) {
          // Loop through the consensus members
          for(k=0, skip=false;
              k<conf_info.Consensus[j].Members.n_elements(); k++) {
-            
+
             // Add required members to the list
             if(conf_info.Consensus[j].Required[k]) {
                req_list.add(conf_info.Consensus[j].Members[k]);
@@ -910,7 +848,7 @@ int derive_consensus(TrackInfoArray &tracks) {
                   break;
                }
             } // end for l
-            
+
             // Check if the model was not found
             if(!found) {
                mlog << Debug(5)
@@ -962,7 +900,7 @@ int derive_consensus(TrackInfoArray &tracks) {
                  << "Adding consensus track:\n"
                  << new_track.serialize() << "\n";
          }
-         
+
          // Add the consensus model
          tracks.add(new_track);
          n_add++;
@@ -982,13 +920,13 @@ int derive_lag(TrackInfoArray &tracks) {
    TrackPoint new_point;
    ConcatString lag_model;
    int n_add = 0;
-   
+
    // If no time lags are requested, nothing to do
    if(conf_info.LagTime.n_elements() == 0) return(0);
 
    // Store the input number of tracks to process
    n_tracks = tracks.n_tracks();
-        
+
    // Loop through the time lags to be applied
    for(i=0; i<conf_info.LagTime.n_elements(); i++) {
 
@@ -998,13 +936,13 @@ int derive_lag(TrackInfoArray &tracks) {
 
       // Store current lag time
       s = nint(conf_info.LagTime[i]);
-  
+
       // Loop through the tracks
       for(j=0; j<n_tracks; j++) {
 
          // Make a copy of the current track
          new_track = tracks[j];
-         
+
          // Adjust the TrackInfo model name
          lag_model << cs_erase << new_track.technique()
                    << "_LAG_" << sec_to_timestring(s);
@@ -1014,19 +952,19 @@ int derive_lag(TrackInfoArray &tracks) {
          new_track.set_init(new_track.init() + s);
          new_track.set_valid_min(new_track.valid_min() + s);
          new_track.set_valid_max(new_track.valid_max() + s);
-      
+
          // Loop over the track points
          for(k=0; k<new_track.n_points(); k++) {
 
             // Make a copy of the current track point
             new_point = new_track[k];
-            
+
             // Adjust the TrackPoint times
             new_point.set_valid(new_point.valid() + s);
 
             // Store the current time-lagged track point
             new_track.set_point(k, new_point);
-            
+
          } // end for k
 
          if(mlog.verbosity_level() >= 5) {
@@ -1058,7 +996,7 @@ int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
    ConcatString cur_case;
    StringArray case_list;
    int n_add = 0;
-   
+
    // If no baseline models are requested, nothing to do
    if(conf_info.OperBaseline.n_elements() == 0 &&
       conf_info.BestBaseline.n_elements() == 0) return(0);
@@ -1066,10 +1004,10 @@ int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
         << conf_info.OperBaseline.n_elements() << " method(s).\n";
-   
+
    // Loop over the ADECK tracks
    for(i=0; i<atracks.n_tracks(); i++) {
-     
+
       // Define the current case as stormid and initialization time
       cur_case << cs_erase
                << atracks[i].storm_id() << ":"
@@ -1077,7 +1015,7 @@ int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
 
       // Build a unique list of cases
       if(!case_list.has(cur_case)) case_list.add(cur_case);
-      
+
       // Only derive baselines from the CARQ model
       if(strcmp(atracks[i].technique(), OperTrackStr) != 0) continue;
 
@@ -1088,9 +1026,9 @@ int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
          derive_baseline_model(conf_info.OperBaseline[j],
                                atracks[i], 0, atracks);
          n_add++;
-      } // end for j                     
+      } // end for j
    } // end for i
-   
+
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR BEST track baseline forecasts using "
         << conf_info.BestBaseline.n_elements() << " method(s) for "
@@ -1112,7 +1050,7 @@ int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
 
          // Check if the current case is in the list
          if(!case_list.has(cur_case)) continue;
-        
+
          // Loop over the BEST track baseline methods
          for(k=0; k<conf_info.BestBaseline.n_elements(); k++) {
 
@@ -1153,7 +1091,7 @@ void derive_baseline_model(const ConcatString &model,
 
    // Populate input variables for operational baselines
    if(model[0] == 'O') {
-     
+
       // Loop over the track points and populate date/location arrays
       for(i=i_start, ntp=0; i<ti.n_points(); i++) {
 
@@ -1186,7 +1124,7 @@ void derive_baseline_model(const ConcatString &model,
 
          // Check if the current time is a 6-hour interval
          if((ti[i].valid()%(6*sec_per_hour)) != 0) continue;
-      
+
          // Process the valid time
          unix_to_mdyhms(ti[i].valid(),
                         mon, day, yr, hr, minute, sec);
@@ -1207,7 +1145,7 @@ void derive_baseline_model(const ConcatString &model,
 
    // Store the basin name
    strncpy(basin, ti.basin(), 2);
-    
+
    // Store the valid time of the starting point
    unix_to_mdyhms(ti[i_start].valid(),
                   mon, day, yr, hr, minute, sec);
@@ -1285,7 +1223,7 @@ void derive_baseline_model(const ConcatString &model,
    new_point.set_lon(tp_lon[0]);
    if(!is_bad_data(tp_vmax[0])) new_point.set_v_max(nint(tp_vmax[0]));
    new_track.add(new_point);
-   
+
    // Loop over the remaining track points
    for(i=0; i<nvtx; i++) {
 
@@ -1293,16 +1231,16 @@ void derive_baseline_model(const ConcatString &model,
       if(is_bad_data(bl_lat[i]) || is_bad_data(bl_lon[i]) ||
          bl_lat[i] < -90        || bl_lon[i] < -180       ||
          bl_lat[i] >  90        || bl_lat[i] >  180) break;
-        
+
          // Initialize
          new_point.clear();
 
          // Compute the lead time for the current point
          lead_sec = 12*sec_per_hour*(i+1);
-        
+
          // Compute the current valid time
          ut = ti[i_start].valid() + lead_sec;
-           
+
          // Setup the current track point
          new_point.set_valid(ut);
          new_point.set_lead(lead_sec);
@@ -1348,7 +1286,7 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
 
    // Initialize TrackPairInfo with the current tracks
    pair.initialize(adeck, bdeck);
-   
+
    // Compute the track errors
    compute_track_err(adeck, bdeck, valid_err, tk_err,
                      x_err, y_err, altk_err, crtk_err);
@@ -1384,7 +1322,7 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
       // Check for TrackPoints in both the ADECK and BDECK tracks
       if(conf_info.MatchPoints &&
          (i_adeck < 0 || i_bdeck < 0)) continue;
-      
+
       // Initialize distances and pointers
       adeck_dland = bdeck_dland = bad_data_double;
       adeck_point = bdeck_point = &empty_point;
@@ -1406,7 +1344,7 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
 
       // Initialize errors
       e_tk = e_x = e_y = e_altk = e_crtk = bad_data_double;
-      
+
       // Get the errors if ADECK and BDECK are both valid
       if(i_err >= 0 && i_adeck >= 0 && i_bdeck >= 0) {
          e_tk   = tk_err[i_err];
@@ -1427,7 +1365,7 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
       // Add this info to the TrackPairInfoArray
       pair.add(*adeck_point, *bdeck_point, adeck_dland, bdeck_dland,
                e_tk, e_x, e_y, e_altk, e_crtk);
-      
+
    } // end for i
 
    // Add the current TrackPairInfo object
@@ -1445,7 +1383,7 @@ double compute_dland(double lat, double lon) {
    // Check for empty grid
    if(dland_grid.nx() == 0 || dland_grid.ny() == 0)
       return(bad_data_double);
-   
+
    // Convert lat,lon to x,y
    dland_grid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
 
@@ -1488,7 +1426,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
 
    // Use the BDECK spacing to determine the valid increment
    ut_inc = bdeck.valid_inc();
-   
+
    // Round the valid times to the nearest valid increment
    if(ut_min%ut_inc != 0) ut_min = (ut_min/ut_inc + 1)*ut_inc;
    if(ut_max%ut_inc != 0) ut_max = (ut_max/ut_inc)*ut_inc;
@@ -1513,7 +1451,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
 
    // Loop through the valid times
    for(i=0; i<n_ut; i++) {
-     
+
       // Add the current valid time
       ut = ut_min+(i*ut_inc);
       vld_err.add(ut);
@@ -1570,7 +1508,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
             crtk_err.set(i, tc_nautical_miles_per_km*crtk[i]);
       }
    }
-   
+
    return;
 }
 
@@ -1583,13 +1521,13 @@ void load_dland() {
 
    // Get the path for the distance to land file
    file_name = replace_path(conf_info.DLandFile);
-   
+
    mlog << Debug(1)
         << "Distance to land file: " << file_name << "\n";
 
    // Check for no file provided
    if(file_name.empty()) return;
-  
+
    // Open the NetCDF output of the tc_dland tool
    MetNcFile MetNc;
    if(!MetNc.open(file_name)) {
@@ -1679,7 +1617,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
       // Parse the storm id
       ww_sid = dl[6];
       ww_sid.ws_strip();
-      
+
       // Determine the maximum severity watch/warning in effect
       for(i=0, ww_type=NoWatchWarnType; i<n_ww; i++) {
 
@@ -1704,7 +1642,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
 
 void write_output(const TrackPairInfoArray &p) {
    int i_row, i;
-   TcHdrColumns tchc;   
+   TcHdrColumns tchc;
 
    // Create the output file
    open_tc_txt_file(out, out_file);
@@ -1724,7 +1662,7 @@ void write_output(const TrackPairInfoArray &p) {
    else                                   tchc.set_init_mask(na_str);
    if(conf_info.ValidMask.n_points() > 0) tchc.set_valid_mask(conf_info.ValidMask.name());
    else                                   tchc.set_valid_mask(na_str);
-   
+
    // Loop through the TrackPairInfo objects
    for(i=0; i<p.n_pairs(); i++) {
 
@@ -1735,7 +1673,7 @@ void write_output(const TrackPairInfoArray &p) {
       tchc.set_basin(p[i].bdeck().basin());
       tchc.set_cyclone(p[i].bdeck().cyclone());
       tchc.set_storm_name(p[i].bdeck().storm_name());
-     
+
      // Write the current TrackPairInfo object
      write_tc_mpr_row(tchc, p[i], out_at, i_row);
    }
@@ -1768,11 +1706,11 @@ void setup_table(AsciiTable &at) {
 ////////////////////////////////////////////////////////////////////////
 
 void clean_up() {
-  
+
    // Write the AsciiTable contents and close the output file
    if(out != (ofstream *) 0) {
       *out << out_at;
-      
+
       // List the file being closed
       mlog << Debug(1)
            << "Output file: " << out_file << "\n";

@@ -67,6 +67,10 @@ extern TrackType    int_to_tracktype(int);
 extern TrackType    string_to_tracktype(const char *);
 extern ConcatString tracktype_to_string(TrackType);
 
+extern Interp12Type int_to_interp12type(int);
+extern Interp12Type string_to_interp12type(const char *);
+extern ConcatString interp12type_to_string(Interp12Type);
+
 extern MergeType    int_to_mergetype(int);
 extern ConcatString mergetype_to_string(MergeType);
 

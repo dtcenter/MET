@@ -63,8 +63,8 @@ class TCPairsConfInfo {
       // Check for duplicate ATCFLines
       bool CheckDup;
       
-      // Merge 6-hour TrackPoints into 12-hour interpolated tracks
-      bool Interp12;
+      // 12-hour track interpolation logic
+      Interp12Type Interp12;
       
       // Consensus model definition
       int NConsensus;           // Number of consensus models

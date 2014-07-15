@@ -33,6 +33,11 @@ BOTH           = 2;
 ADECK          = 3;
 BDECK          = 4;
 
+// Interp12 types
+NONE           = 1;
+FILL           = 2;
+REPLACE        = 3;
+
 // Output flag values
 NONE           = 1;
 BOTH           = 2;
