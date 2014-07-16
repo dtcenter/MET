@@ -16,13 +16,47 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+SUBDIRS = HMT_masks
+
+polydir = $(pkgdatadir)/poly
+
+poly_DATA = \
+	APL.poly \
+	ATC.poly \
+	CAM.poly \
+	CAR.poly \
+	CONUS.poly \
+	EAST.poly \
+	ECA.poly \
+	GLF.poly \
+	GMC.poly \
+	GRB.poly \
+	HWI.poly \
+	LMV.poly \
+	Makefile.am \
+	MDW.poly \
+	MEX.poly \
+	NAK.poly \
+	NAO.poly \
+	ncep_vx_regions.pdf \
+	NEC.poly \
+	NMT.poly \
+	NPL.poly \
+	NPO.poly \
+	NSA.poly \
+	NWC.poly \
+	PRI.poly \
+	SAK.poly \
+	SAO.poly \
+	SEC.poly \
+	SMT.poly \
+	SPL.poly \
+	SPO.poly \
+	SWC.poly \
+	SWD.poly \
+	WCA.poly \
+	WEST.poly
+
+EXTRA_DIST = ${poly_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

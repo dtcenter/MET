@@ -16,13 +16,45 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+psdir = $(pkgdatadir)/ps
+
+ps_DATA = \
+	00.afm \
+	01.afm \
+	02.afm \
+	03.afm \
+	04.afm \
+	05.afm \
+	06.afm \
+	07.afm \
+	08.afm \
+	09.afm \
+	10.afm \
+	11.afm \
+	12.afm \
+	13.afm \
+	14.afm \
+	15.afm \
+	16.afm \
+	17.afm \
+	18.afm \
+	19.afm \
+	20.afm \
+	21.afm \
+	22.afm \
+	23.afm \
+	24.afm \
+	25.afm \
+	26.afm \
+	27.afm \
+	28.afm \
+	29.afm \
+	30.afm \
+	31.afm \
+	32.afm \
+	33.afm \
+	README
+
+EXTRA_DIST = ${ps_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

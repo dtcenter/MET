@@ -16,13 +16,29 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+configdir = $(pkgdatadir)/config
+
+config_DATA = \
+	Ascii2NcConfig_default \
+	ConfigConstants \
+	ConfigMapData \
+	EnsembleStatConfig_default \
+	GridStatConfig_default \
+	Makefile.am \
+	MODEAnalysisConfig_default \
+	MODEConfig_default \
+	PB2NCConfig_default \
+	PointStatConfig_default \
+	README \
+	README_TC \
+	SeriesAnalysisConfig_default \
+	STATAnalysisConfig_default \
+	STATAnalysisConfig_GO_Index \
+	TCPairsConfig_default \
+	TCStatConfig_default \
+	WaveletStatConfig_default \
+	WWMCARegridConfig_default
+
+EXTRA_DIST = ${config_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 
