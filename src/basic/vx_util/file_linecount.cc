@@ -43,7 +43,7 @@ in.open(path);
 if ( !in )  {
 
    mlog << Error 
-        << "file_linecount() -> unable to open input file \"" << path << "\"\n\n";
+        << "\nfile_linecount() -> unable to open input file \"" << path << "\"\n\n";
 
    exit ( 1 );
 
