@@ -16,13 +16,10 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+mapadmindir = $(pkgdatadir)/map/update_2012/admin_by_country
+
+mapadmin_DATA = *_data
+
+EXTRA_DIST = ${mapadmin_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

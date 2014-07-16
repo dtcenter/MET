@@ -16,13 +16,16 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+hmtmasksdir = $(pkgdatadir)/poly/HMT_masks
+
+hmtmasks_DATA = \
+	cnrfc_poly.nc \
+	huc4_1605_poly.nc \
+	huc4_1803_poly.nc \
+	huc4_1804_poly.nc \
+	huc4_1805_poly.nc \
+	huc4_1806_poly.nc
+
+EXTRA_DIST = ${hmtmasks_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

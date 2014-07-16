@@ -16,13 +16,13 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+tablefilesdir = $(pkgdatadir)/table_files
+
+tablefiles_DATA = \
+	grib2_vars_flat.txt \
+	nceptab_flat.txt \
+	stat_column_description.txt
+
+EXTRA_DIST = ${tablefiles_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

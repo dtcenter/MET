@@ -16,13 +16,19 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+SUBDIRS 		= NCL_colortables
+
+ctabledir = $(pkgdatadir)/colortables
+
+ctable_DATA = \
+	met_default.ctable \
+	mode_obj.ctable \
+	mode_raw.ctable \
+	nws_radar_precip.ctable \
+	wrf_precip2.ctable \
+	wrf_precip.ctable \
+	wrf_precip_gray.ctable
+
+EXTRA_DIST = ${ctable_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

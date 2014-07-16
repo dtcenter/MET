@@ -16,13 +16,13 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+tcdatadir = $(pkgdatadir)/tc_data
+
+tcdata_DATA = \
+	aland.dat \
+	dland_nw_hem_tenth_degree.nc \
+	wwpts_us.txt
+
+EXTRA_DIST = ${tcdata_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

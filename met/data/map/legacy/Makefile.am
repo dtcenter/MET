@@ -16,13 +16,17 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+maplegacydir = $(pkgdatadir)/map/legacy
+
+maplegacy_DATA = \
+	country_data \
+	country_data_minus_usa \
+	Makefile.am \
+	usa_county_data \
+	usa_state_data \
+	world_data \
+	world_data_minus_usa
+
+EXTRA_DIST = ${maplegacy_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

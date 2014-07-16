@@ -16,13 +16,6 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+SUBDIRS 		= legacy update_2012
 
 MAINTAINERCLEANFILES 	= Makefile.in 
