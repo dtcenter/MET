@@ -687,19 +687,19 @@ return ( c );
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-int CommandLine::has_option(int & index) const
+
+bool CommandLine::has_option(const char *text) const
 
 {
 
-int status;
+bool status;
 
-status = args.has_option(index);
+status = ( args.has(text) == 1 );
 
 return ( status );
 
 }
-*/
+
 
 ////////////////////////////////////////////////////////////////////////
 
