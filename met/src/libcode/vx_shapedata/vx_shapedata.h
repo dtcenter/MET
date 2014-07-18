@@ -23,7 +23,6 @@
 
 #include "moments.h"
 #include "node.h"
-#include "polyline.h"
 #include "shapedata.h"
 #include "shape.h"
 #include "set.h"

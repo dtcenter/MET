@@ -53,6 +53,7 @@
 #include "two_to_one.h"
 #include "bool_to_string.h"
 #include "empty_string.h"
+#include "polyline.h"
 
 
 ////////////////////////////////////////////////////////////////////////
