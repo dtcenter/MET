@@ -14,7 +14,6 @@ noinst_LIBRARIES = libvx_shapedata.a
 libvx_shapedata_a_SOURCES = \
               moments.cc moments.h \
               node.cc node.h \
-              polyline.cc polyline.h \
               shape.h \
               shapedata.cc shapedata.h \
               set.cc set.h \

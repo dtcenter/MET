@@ -46,6 +46,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                util_constants.h \
                bool_to_string.h \
                empty_string.h \
+               polyline.h polyline.cc \
                vx_util.h
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 
