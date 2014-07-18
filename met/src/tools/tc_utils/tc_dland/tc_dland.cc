@@ -8,7 +8,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   gen_dland.cc
+//   Filename:   tc_dland.cc
 //
 //   Description:
 //
@@ -43,6 +43,7 @@ using namespace std;
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "write_netcdf.h"
+#include "tc_poly_array.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -59,8 +60,13 @@ static const LatLonData NWHemTenthData =
    { "NWHemTenthDegree", 0.0, -180.0, 0.1, 0.1, 601, 1801 };
 
 // Default location of data file
-static const char *default_land_data_file =
-   "MET_BASE/tc_data/aland.dat";
+static const char *default_land_data_files [] = {
+   "MET_BASE/tc_data/aland.dat",
+   "MET_BASE/tc_data/wland.dat",
+   "MET_BASE/tc_data/shland.dat"
+};
+static const int n_default_land_data_files =
+   sizeof(default_land_data_files)/sizeof(*default_land_data_files);
 
 ////////////////////////////////////////////////////////////////////////
 //    
@@ -71,17 +77,13 @@ static const char *default_land_data_file =
 static ConcatString out_filename;
 static LatLonData GridData = NWHemTenthData;
 static bool latlon_flag = true;
-static ConcatString land_data_file = default_land_data_file;
-
-////////////////////////////////////////////////////////////////////////
-
-extern "C" {
-   void aland_(const char *, float *, float *, float *);
-}
+static StringArray land_data_files;
+static TCPolyArray land_array;
 
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
+static void process_land_data();
 static void process_distances();
 static void usage();
 static void set_grid(const StringArray &);
@@ -102,6 +104,9 @@ int main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
+   // Process the land data files
+   process_land_data();
+   
    // Process the MODE file
    process_distances();
    
@@ -113,6 +118,13 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
+   //
+   // Initialize land data files
+   //
+   for(int i=0; i<n_default_land_data_files; i++) {
+      land_data_files.add(default_land_data_files[i]);
+   }
+   
    //
    // Check for too few arguments
    //
@@ -127,6 +139,11 @@ void process_command_line(int argc, char **argv) {
    // Set the usage function
    //
    cline.set_usage(usage);
+   
+   //
+   // Check if the -land option was used.
+   //
+   if(cline.has_option("-land")) land_data_files.clear();
 
    //
    // Add the options function calls
@@ -157,12 +174,24 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_land_data() {
+   
+   for(int i=0; i<land_data_files.n_elements(); i++) {
+      mlog << Debug(2)
+           << "Reading TC land data file: "
+           << replace_path(land_data_files[i]) << "\n";
+      land_array.add_file(replace_path(land_data_files[i]));
+   }
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void process_distances() {
    int n, x, y, c;
-   double latd, lond;
-   float latf, lonf;
+   double lat, lon;
    float *dland = (float *) 0;
-   ConcatString data_file = replace_path(land_data_file);
 
    // Instantiate the grid
    Grid grid(GridData);
@@ -224,23 +253,23 @@ void process_distances() {
 
          if(++c % (int) (grid.nx()*grid.ny()/100) == 0 &&
             mlog.verbosity_level() == 3) cout << "." << flush;
-        
+
          // Call two_to_one
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-        
+
          // Convert x,y to lat,lon
-         grid.xy_to_latlon(x, y, latd, lond);
-         latf = (float) latd;
-         lonf = (float) rescale_deg(-1.0*lond, -180.0, 180.0);
+         grid.xy_to_latlon(x, y, lat, lon);
+         lon = rescale_deg(lon, -180.0, 180.0);
 
          // Compute distance to land
-         aland_(data_file, &lonf, &latf, &dland[n]);
+         dland[n] = land_array.min_dist(lat, lon);
 
          // Convert to nuatical miles
          dland[n] *= nautical_miles_per_km;
 
          mlog << Debug(4)
-              << "Lat = " << latf << ", Lon = " << lonf
+              << "Lat = " << lat
+              << ", Lon = " << lon
               << ", Dist = " << dland[n] << " nm\n";
 
       } // end for y
@@ -293,8 +322,8 @@ void usage() {
         << "NW Hemisphere grid (optional).\n"
         << "\t\t   spec = lat_ll lon_ll delta_lat delta_lon n_lat n_lon\n"
 
-        << "\t\t\"-land file\" overwrites the default land data file (\""
-        << replace_path(default_land_data_file) << "\") (optional).\n"
+        << "\t\t\"-land file\" overwrites the default land data files "
+        << "(optional).\n"
 
         << "\t\t\"-noll\" skips writing the lat/lon variables in the "
         << "output NetCDF file to reduce the file size (optional).\n"
@@ -333,7 +362,7 @@ void set_noll(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_land(const StringArray & a) {
-   land_data_file = a[0];
+   land_data_files.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
