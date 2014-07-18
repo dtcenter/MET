@@ -180,7 +180,7 @@ class CommandLine {
 
       int length(int) const;   //  length of jth arg
 
-      // bool has_option(int & index) const;
+      bool has_option(const char *) const;
 
       int next_option(int & index) const;   //  -1 if no option found
 
