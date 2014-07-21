@@ -12,22 +12,22 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = ascii2nc
 ascii2nc_SOURCES = ascii2nc.cc \
-	ascii2nc_conf_info.cc \
-	file_handler.cc \
-	little_r_handler.cc \
-	met_handler.cc \
-	observation.cc \
-	summary_calc.cc \
-	summary_calc_max.cc \
-	summary_calc_mean.cc \
-	summary_calc_median.cc \
-	summary_calc_min.cc \
-	summary_calc_percentile.cc \
-	summary_calc_range.cc \
-	summary_calc_stdev.cc \
-	summary_key.cc \
-	surfrad_handler.cc \
-	time_summary_interval.cc
+	ascii2nc_conf_info.cc ascii2nc_conf_info.h \
+	file_handler.cc file_handler.h \
+	little_r_handler.cc little_r_handler.h \
+	met_handler.cc met_handler.h \
+	observation.cc observation.h \
+	summary_calc.cc summary_calc.h \
+	summary_calc_max.cc summary_calc_max.h \
+	summary_calc_mean.cc summary_calc_mean.h \
+	summary_calc_median.cc summary_calc_median.h \
+	summary_calc_min.cc summary_calc_min.h \
+	summary_calc_percentile.cc summary_calc_percentile.h \
+	summary_calc_range.cc summary_calc_range.h \
+	summary_calc_stdev.cc summary_calc_stdev.h \
+	summary_key.cc summary_key.h \
+	surfrad_handler.cc surfrad_handler.h \
+	time_summary_interval.cc time_summary_interval.h
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS}
 ascii2nc_LDFLAGS = ${MET_LDFLAGS}
 ascii2nc_LDADD = -lvx_shapedata \
@@ -58,20 +58,3 @@ ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
-
-EXTRA_DIST = ascii2nc_conf_info.h \
-	file_handler.h \
-	little_r_handler.h \
-	met_handler.h \
-	observation.h \
-	summary_calc.h \
-	summary_calc_max.h \
-	summary_calc_mean.h \
-	summary_calc_median.h \
-	summary_calc_min.h \
-	summary_calc_percentile.h \
-	summary_calc_range.h \
-	summary_calc_stdev.h \
-	summary_key.h \
-	surfrad_handler.h \
-	time_summary_interval.h

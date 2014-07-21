@@ -12,7 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_PROGRAMS = test_ps
 
-nodist_test_ps_SOURCES = test_ps.cc
+test_ps_SOURCES = test_ps.cc
 test_ps_CPPFLAGS = ${MET_CPPFLAGS}
 test_ps_LDFLAGS = -L. ${MET_LDFLAGS}
 test_ps_LDADD = -lvx_ps \

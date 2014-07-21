@@ -20,8 +20,11 @@ ACLOCAL_AMFLAGS		= -I m4
 
 EXTRA_DIST		= out scripts Make-include
 
-SUBDIRS 		= data src internal_tests
-DIST_SUBDIRS 		= data src
+SUBDIRS 		= data src
+
+#if IS_MET_DEVELOPMENT
+  SUBDIRS += internal_tests
+#endif
 
 MAINTAINERCLEANFILES 	= Makefile.in aclocal.m4 configure \
 			  config.h.in
