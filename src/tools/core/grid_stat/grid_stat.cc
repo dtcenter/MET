@@ -105,7 +105,7 @@ static void process_scores      ();
 static void setup_first_pass(const DataPlane &);
 static void setup_txt_files (unixtime, int);
 static void setup_table     (AsciiTable &);
-static void setup_nc_file   (unixtime, int);
+static void setup_nc_file   (const GridStatNcOutInfo &, unixtime, int);
 
 static void build_outfile_name(unixtime, int, const char *,
                                ConcatString &);
@@ -127,8 +127,8 @@ static void do_nbrcnt(NBRCNTInfo &, int, int, int,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
 
-static void write_nc(const DataPlane &, const DataPlane &,
-                     int, InterpMthd, int);
+static void write_nc(const GridStatNcOutInfo &, const DataPlane &, const DataPlane &, int, InterpMthd, int);
+
 static void add_var_att(NcVar *, const char *, const char *);
 
 static void finish_txt_files();
@@ -699,8 +699,10 @@ void process_scores() {
          // Write out the smoothed forecast, observation, and difference
          // fields in netCDF format for each GRIB code if requested in
          // the config file
-         if(conf_info.nc_pairs_flag)
-            write_nc(fcst_dp_smooth, obs_dp_smooth, i,
+         // if(conf_info.nc_pairs_flag)
+         if( ! (conf_info.nc_info.all_false()) )
+            write_nc(conf_info.nc_info, 
+                     fcst_dp_smooth, obs_dp_smooth, i,
                      conf_info.interp_mthd[j],
                      conf_info.interp_wdth[j]);
 
@@ -864,7 +866,7 @@ void setup_first_pass(const DataPlane &dp) {
 
    // If requested, create a NetCDF file to store the matched pairs and
    // difference fields for each GRIB code and masking region
-   if(conf_info.nc_pairs_flag) setup_nc_file(dp.valid(), dp.lead());
+   if ( ! (conf_info.nc_info.all_false()) ) setup_nc_file(conf_info.nc_info, dp.valid(), dp.lead());
 
    return;
 }
@@ -1032,7 +1034,9 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(unixtime valid_ut, int lead_sec) {
+void setup_nc_file(const GridStatNcOutInfo & nc_info, unixtime valid_ut, int lead_sec)
+
+{
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
@@ -1049,7 +1053,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_nc_file, program_name, conf_info.model);
-   nc_out->add_att("Difference", "Forecast Value - Observation Value");
+   if ( nc_info.do_diff )  nc_out->add_att("Difference", "Forecast Value - Observation Value");
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
@@ -1059,7 +1063,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
    lon_dim = nc_out->add_dim("lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+   if ( nc_info.do_latlon)  write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
 
    return;
 }
@@ -1501,8 +1505,11 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-              int i_vx, InterpMthd mthd, int wdth) {
+
+void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp, const DataPlane &obs_dp, int i_vx, InterpMthd mthd, int wdth)
+
+{
+
    int i, n, x, y;
    int fcst_flag, obs_flag, diff_flag;
    float *fcst_data = (float *) 0;
@@ -1518,9 +1525,12 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
    // Allocate memory for the forecast, observation, and difference
    // fields
-   fcst_data = new float [grid.nx()*grid.ny()];
-   obs_data  = new float [grid.nx()*grid.ny()];
-   diff_data = new float [grid.nx()*grid.ny()];
+   if ( nc_info.do_raw )  {
+      fcst_data = new float [grid.nx()*grid.ny()];
+      obs_data  = new float [grid.nx()*grid.ny()];
+   }
+
+   if ( nc_info.do_diff )  diff_data = new float [grid.nx()*grid.ny()];
 
    // Compute the difference field for each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
@@ -1571,9 +1581,18 @@ void write_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       fcst_flag = !fcst_var_sa.has(fcst_var_name);
       obs_flag  = !obs_var_sa.has(obs_var_name);
 
+      if ( ! (nc_info.do_raw) )  {
+
+         fcst_flag = false;
+          obs_flag = false;
+
+      }
+
       // Don't write the difference field for probability forecasts
       diff_flag = (!diff_var_sa.has(diff_var_name) &&
                    !conf_info.fcst_info[i_vx]->p_flag());
+
+      if ( ! (nc_info.do_diff) )  diff_flag = false;
 
       // Set up the forecast variable if not already defined
       if(fcst_flag) {

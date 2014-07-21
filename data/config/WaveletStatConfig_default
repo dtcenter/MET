@@ -73,7 +73,15 @@ output_flag = {
 //
 // NetCDF matched pairs and PostScript output files
 //
-nc_pairs_flag = TRUE;
+
+nc_pairs_flag   = {
+
+   latlon = true;
+   raw    = true;
+   diff   = true;
+
+};
+
 ps_plot_flag  = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////

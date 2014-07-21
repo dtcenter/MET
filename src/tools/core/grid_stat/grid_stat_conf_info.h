@@ -56,6 +56,31 @@ static const STATLineType txt_file_type[n_txt] = {
 
 ////////////////////////////////////////////////////////////////////////
 
+
+struct GridStatNcOutInfo {
+
+   bool do_latlon;
+
+   bool do_raw;
+
+   bool do_diff;
+
+      //////////////////
+
+   GridStatNcOutInfo();
+
+   void clear();   //  sets everything to true
+
+   bool all_false() const;
+
+   void set_all_false();
+   void set_all_true();
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
 class GridStatConfInfo {
 
    private:
@@ -103,7 +128,8 @@ class GridStatConfInfo {
       IntArray         nbrhd_wdth;         // Array for neighborhood widths
       ThreshArray      nbrhd_cov_ta;       // Neighborhood coverage thresholds
       STATOutputType   output_flag[n_txt]; // Flag for each output line type
-      bool             nc_pairs_flag;      // Flag for the output NetCDF pairs file
+      // bool             nc_pairs_flag;      // Flag for the output NetCDF pairs file
+      GridStatNcOutInfo   nc_info;
       bool             rank_corr_flag;     // Flag for computing rank correlations
       ConcatString     tmp_dir;            // Directory for temporary files
       ConcatString     output_prefix;      // String to customize output file name
@@ -117,6 +143,8 @@ class GridStatConfInfo {
       void read_config   (const char *, const char *);
       void process_config(GrdFileType, GrdFileType);
       void process_masks (const Grid &);
+
+      void parse_nc_info();
 
       // Dump out the counts
       int get_n_vx()          const;

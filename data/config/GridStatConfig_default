@@ -109,7 +109,14 @@ output_flag = {
 //
 // NetCDF matched pairs output file
 //
-nc_pairs_flag = TRUE;
+
+nc_pairs_flag   = {
+
+   latlon = true;
+   raw    = true;
+   diff   = true;
+
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 

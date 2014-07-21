@@ -39,6 +39,31 @@ static const STATLineType txt_file_type[n_txt] = {
 
 ////////////////////////////////////////////////////////////////////////
 
+
+struct WaveletStatNcOutInfo {
+
+   bool do_latlon;
+
+   bool do_raw;
+
+   bool do_diff;
+
+      ///////////////
+
+   WaveletStatNcOutInfo();
+
+   void clear();   //  sets everything to "true"
+
+   bool all_false() const;
+
+   void set_all_false();
+   void set_all_true();
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
 class WaveletStatConfInfo {
 
    private:
@@ -73,7 +98,8 @@ class WaveletStatConfInfo {
       gsl_wavelet           * wvlt_ptr;           // GSL wavelet pointer
       gsl_wavelet_workspace * wvlt_work_ptr;      // GSL wavelet workspace
       STATOutputType          output_flag[n_txt]; // Flag for each output line type
-      bool                    nc_pairs_flag;      // Flag for the output NetCDF pairs file
+      // bool                    nc_pairs_flag;      // Flag for the output NetCDF pairs file
+      WaveletStatNcOutInfo       nc_info;
       bool                    ps_plot_flag;       // Flag for the output PostScript image file
       ConcatString            met_data_dir;       // MET data directory
       PlotInfo                fcst_raw_pi;        // Raw forecast plotting info
@@ -92,6 +118,8 @@ class WaveletStatConfInfo {
       void process_tiles (const Grid &);
       void center_tiles  (int, int);
       void pad_tiles     (int, int);
+
+      void parse_nc_info();
 
       // Dump out the counts
       int get_n_vx        () const;

@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 #include "wavelet_stat_conf_info.h"
+#include "configobjecttype_to_string.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
@@ -76,7 +77,8 @@ void WaveletStatConfInfo::clear() {
    tile_yll.clear();
    pad_bb.set_llwh(0.0, 0.0, 0.0, 0.0);
    wvlt_type = WaveletType_None;
-   nc_pairs_flag = false;
+   // nc_pairs_flag = false;
+   nc_info.set_all_true();
    ps_plot_flag = false;
    met_data_dir.clear();
    output_prefix.clear();
@@ -365,7 +367,9 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    wvlt_ptr = wavelet_set(&type, wvlt_member);
    
    // Conf: nc_pairs_flag
-   nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
+   // nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
+
+   parse_nc_info();
 
    // Conf: ps_plot_flag
    ps_plot_flag = conf.lookup_bool(conf_key_ps_plot_flag);
@@ -387,6 +391,74 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void WaveletStatConfInfo::parse_nc_info()
+
+{
+
+const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+e = conf.lookup(conf_key_nc_pairs_flag);
+
+if ( !e )  {
+
+   mlog << Error
+        << "\n\n  WaveletStatConfInfo::parse_nc_info() -> lookup failed for key \""
+        << conf_key_nc_pairs_flag << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+const ConfigObjectType type = e->type();
+
+if ( type == BooleanType )  {
+
+   bool value = e->b_value();
+
+   if ( ! value )  nc_info.set_all_false();
+
+   return;
+
+}
+
+   //
+   //  it should be a dictionary
+   //
+
+if ( type != DictionaryType )  {
+
+   mlog << Error
+        << "\n\n  WaveletStatConfInfo::parse_nc_info() -> bad type ("
+        << configobjecttype_to_string(type)
+        << ") for key \""
+        << conf_key_nc_pairs_flag << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  parse the various entries
+   //
+
+Dictionary * d = e->dict_value();
+
+nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
+nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
+nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -588,3 +660,86 @@ int get_pow2(double n) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for struct WaveletStatNcInfo
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+WaveletStatNcOutInfo::WaveletStatNcOutInfo()
+
+{
+
+clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void WaveletStatNcOutInfo::clear()
+
+{
+
+set_all_true();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool WaveletStatNcOutInfo::all_false() const
+
+{
+
+bool status = do_latlon || do_raw || do_diff;
+
+return ( !status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void WaveletStatNcOutInfo::set_all_false()
+
+{
+
+do_latlon = false;
+do_raw    = false;
+do_diff   = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void WaveletStatNcOutInfo::set_all_true()
+
+{
+
+do_latlon = true;
+do_raw    = true;
+do_diff   = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
