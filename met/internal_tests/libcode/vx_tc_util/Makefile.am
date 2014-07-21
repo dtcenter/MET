@@ -12,7 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_PROGRAMS = test_read
 
-nodist_test_read_SOURCES = test_read.cc
+test_read_SOURCES = test_read.cc
 test_read_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_LDADD = -lvx_tc_util \

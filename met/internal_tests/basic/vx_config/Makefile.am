@@ -21,7 +21,7 @@ noinst_PROGRAMS = test_config \
               test_lookup3 \
               test_string
 
-nodist_test_config_SOURCES = test_config.cc
+test_config_SOURCES = test_config.cc
 test_config_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \
@@ -29,7 +29,7 @@ test_config_LDADD = -lvx_config \
 	-lvx_log \
 	-lm
 
-nodist_test_lookup_SOURCES = test_lookup.cc
+test_lookup_SOURCES = test_lookup.cc
 test_lookup_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \
@@ -37,7 +37,7 @@ test_lookup_LDADD = -lvx_config \
 	-lvx_log \
 	-lm
 
-nodist_test_lookup2_SOURCES = test_lookup2.cc
+test_lookup2_SOURCES = test_lookup2.cc
 test_lookup2_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \
@@ -45,7 +45,7 @@ test_lookup2_LDADD = -lvx_config \
 	-lvx_log \
 	-lm
 
-nodist_test_lookup3_SOURCES = test_lookup3.cc
+test_lookup3_SOURCES = test_lookup3.cc
 test_lookup3_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \
@@ -53,7 +53,7 @@ test_lookup3_LDADD = -lvx_config \
 	-lvx_log \
 	-lm
 
-nodist_test_string_SOURCES = test_string.cc
+test_string_SOURCES = test_string.cc
 test_string_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \

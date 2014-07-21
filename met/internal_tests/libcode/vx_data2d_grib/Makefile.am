@@ -12,7 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_PROGRAMS = test_read_grib1
 
-nodist_test_read_grib1_SOURCES = test_read_grib1.cc
+test_read_grib1_SOURCES = test_read_grib1.cc
 test_read_grib1_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_grib1_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_grib1_LDADD = -lvx_data2d_grib \

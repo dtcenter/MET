@@ -12,7 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_PROGRAMS = test_logger
 
-nodist_test_logger_SOURCES = test_logger.cc
+test_logger_SOURCES = test_logger.cc
 test_logger_CPPFLAGS = ${MET_CPPFLAGS}
 test_logger_LDFLAGS = -L. ${MET_LDFLAGS}
 test_logger_LDADD = -lvx_log

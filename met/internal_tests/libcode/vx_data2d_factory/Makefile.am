@@ -13,7 +13,7 @@ include ${top_srcdir}/Make-include
 noinst_PROGRAMS = test_is_grib \
 	test_factory
 
-nodist_test_is_grib_SOURCES = test_is_grib.cc
+test_is_grib_SOURCES = test_is_grib.cc
 test_is_grib_CPPFLAGS = ${MET_CPPFLAGS}
 test_is_grib_LDFLAGS = -L. ${MET_LDFLAGS}
 test_is_grib_LDADD = -lvx_data2d_factory \
@@ -22,7 +22,7 @@ test_is_grib_LDADD = -lvx_data2d_factory \
 	-lvx_util \
 	-lvx_log
 
-nodist_test_factory_SOURCES = test_factory.cc
+test_factory_SOURCES = test_factory.cc
 test_factory_CPPFLAGS = ${MET_CPPFLAGS}
 test_factory_LDFLAGS = -L. ${MET_LDFLAGS}
 test_factory_LDADD = -lvx_data2d_factory \
