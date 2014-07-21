@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 #include "grid_stat_conf_info.h"
+#include "configobjecttype_to_string.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
@@ -88,7 +89,8 @@ void GridStatConfInfo::clear() {
    interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
-   nc_pairs_flag = false;
+   // nc_pairs_flag = false;
+   nc_info.set_all_true();
    rank_corr_flag = false;
    tmp_dir.clear();
    output_prefix.clear();
@@ -458,7 +460,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    nbrhd_cov_ta = nbrhd_info.cov_ta;
 
    // Conf: nc_pairs_flag
-   nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
+   // nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
+
+      parse_nc_info();
 
    // Conf: rank_corr_flag
    rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);
@@ -471,6 +475,75 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridStatConfInfo::parse_nc_info()
+
+{
+
+const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+e = conf.lookup(conf_key_nc_pairs_flag);
+
+if ( !e )  {
+
+   mlog << Error
+        << "\n\n  GridStatConfInfo::parse_nc_info() -> lookup failed for key \""
+        << conf_key_nc_pairs_flag << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+const ConfigObjectType type = e->type();
+
+if ( type == BooleanType )  {
+
+   bool value = e->b_value();
+
+   if ( ! value )  nc_info.set_all_false();
+
+   return;
+
+}
+
+   //
+   //  it should be a dictionary
+   //
+
+if ( type != DictionaryType )  {
+
+   mlog << Error
+        << "\n\n  GridStatConfInfo::parse_nc_info() -> bad type ("
+        << configobjecttype_to_string(type)
+        << ") for key \""
+        << conf_key_nc_pairs_flag << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  parse the various entries
+   //
+
+Dictionary * d = e->dict_value();
+
+nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
+nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
+nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -653,3 +726,85 @@ int GridStatConfInfo::n_stat_row() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for struct GridStatNcOutInfo
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridStatNcOutInfo::GridStatNcOutInfo()
+
+{
+
+clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridStatNcOutInfo::clear()
+
+{
+
+set_all_true();
+
+return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool GridStatNcOutInfo::all_false() const
+
+{
+
+bool status = do_latlon || do_raw || do_diff;
+
+return ( !status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridStatNcOutInfo::set_all_false()
+
+{
+
+do_latlon = false;
+do_raw    = false;
+do_diff   = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridStatNcOutInfo::set_all_true()
+
+{
+
+do_latlon = true;
+do_raw    = true;
+do_diff   = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+

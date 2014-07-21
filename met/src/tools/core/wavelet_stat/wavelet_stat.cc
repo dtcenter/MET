@@ -70,7 +70,7 @@ static void clean_up();
 static void setup_first_pass(const DataPlane &);
 static void setup_txt_files (unixtime, int);
 static void setup_table     (AsciiTable &);
-static void setup_nc_file   (unixtime, int);
+static void setup_nc_file   (const WaveletStatNcOutInfo &, unixtime, int);
 static void setup_ps_file   (unixtime, int);
 
 static void build_outfile_name(unixtime, int, const char *,
@@ -91,9 +91,9 @@ static void compute_cts(const double *, const double *, int, ISCInfo &);
 static void compute_mse(const double *, const double *, int, double &);
 static void compute_energy(const double *, int, double &);
 
-static void write_nc_raw(const double *, const double *,
+static void write_nc_raw(const WaveletStatNcOutInfo &, const double *, const double *,
                          int, int, int);
-static void write_nc_wav(const double *, const double *,
+static void write_nc_wav(const WaveletStatNcOutInfo &, const double *, const double *,
                          int, int, int, int,
                          SingleThresh &, SingleThresh &);
 static void add_var_att(NcVar *, const char *, const char *);
@@ -487,8 +487,8 @@ void setup_first_pass(const DataPlane &dp) {
    setup_txt_files(dp.valid(), dp.lead());
 
    // If requested, create a NetCDF file
-   if(conf_info.nc_pairs_flag) {
-      setup_nc_file(dp.valid(), dp.lead());
+   if ( ! (conf_info.nc_info.all_false()) ) {
+      setup_nc_file(conf_info.nc_info, dp.valid(), dp.lead());
    }
 
    // If requested, create a PostScript file
@@ -592,7 +592,7 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(unixtime valid_ut, int lead_sec) {
+void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int lead_sec) {
    int i, x, y;
 
    // Create output NetCDF file name
@@ -610,7 +610,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec) {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_nc_file.text(), program_name, conf_info.model);
-   nc_out->add_att("Difference", "Forecast Value - Observation Value");
+   if ( nc_info.do_diff )  nc_out->add_att("Difference", "Forecast Value - Observation Value");
 
    // Set the NetCDF dimensions
    x_dim     = (NcDim *) 0;
@@ -955,8 +955,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    } // end for j
 
    // Write out the raw fields to NetCDF
-   if(conf_info.nc_pairs_flag) {
-      write_nc_raw(f_dat, o_dat, n, i_gc, i_tile);
+   if( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff ) {
+      write_nc_raw(conf_info.nc_info, f_dat, o_dat, n, i_gc, i_tile);
    }
 
    // Apply each threshold
@@ -992,14 +992,15 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       isc_info[i].compute_isc(-1);
 
       // Write the thresholded binary fields to NetCDF
-      if(conf_info.ps_plot_flag) {
-         write_nc_wav(f_dat, o_dat, n, i_gc, i_tile, -1,
+      // if(conf_info.ps_plot_flag) {   // ???
+      if ( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
+         write_nc_wav(conf_info.nc_info, f_dat, o_dat, n, i_gc, i_tile, -1,
                       isc_info[i].cts_fcst_thresh,
                       isc_info[i].cts_obs_thresh);
       }
 
       // Write the thresholded binary difference field to PostScript
-      if(conf_info.nc_pairs_flag) {
+      if ( ! (conf_info.nc_info.all_false()) ) {
          plot_ps_wvlt(diff, n, i_gc, i_tile, isc_info[i], -1, ns);
       }
 
@@ -1071,8 +1072,9 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          isc_info[i].compute_isc(j);
 
          // Write the decomposed fields for this scale to NetCDF
-         if(conf_info.nc_pairs_flag) {
-            write_nc_wav(f_scl, o_scl, n, i_gc, i_tile, j,
+         if ( ! (conf_info.nc_info.all_false()) ) {
+            write_nc_wav(conf_info.nc_info, 
+                         f_scl, o_scl, n, i_gc, i_tile, j,
                          isc_info[i].cts_fcst_thresh,
                          isc_info[i].cts_obs_thresh);
          }
@@ -1325,7 +1327,7 @@ void compute_energy(const double *arr, int n, double &en) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_raw(const double *fdata, const double *odata, int n,
+void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
                   int i_gc, int i_tile) {
    int i, d;
    float *fcst_data = (float *) 0;
@@ -1337,145 +1339,180 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
    ConcatString val;
 
    // Build the variable names
-   fcst_var_name.format("FCST_%s_%s_%s_%s_RAW",
-           conf_info.fcst_info[i_gc]->name().text(),
-           conf_info.fcst_info[i_gc]->level_name().text(),
-           conf_info.obs_info[i_gc]->name().text(),
-           conf_info.obs_info[i_gc]->level_name().text());
-   obs_var_name.format("OBS_%s_%s_%s_%s_RAW",
-           conf_info.fcst_info[i_gc]->name().text(),
-           conf_info.fcst_info[i_gc]->level_name().text(),
-           conf_info.obs_info[i_gc]->name().text(),
-           conf_info.obs_info[i_gc]->level_name().text());
-   diff_var_name.format("DIFF_%s_%s_%s_%s_RAW",
-           conf_info.fcst_info[i_gc]->name().text(),
-           conf_info.fcst_info[i_gc]->level_name().text(),
-           conf_info.obs_info[i_gc]->name().text(),
-           conf_info.obs_info[i_gc]->level_name().text());
+
+   if ( nc_info.do_raw)  {
+      fcst_var_name.format("FCST_%s_%s_%s_%s_RAW",
+              conf_info.fcst_info[i_gc]->name().text(),
+              conf_info.fcst_info[i_gc]->level_name().text(),
+              conf_info.obs_info[i_gc]->name().text(),
+              conf_info.obs_info[i_gc]->level_name().text());
+      obs_var_name.format("OBS_%s_%s_%s_%s_RAW",
+              conf_info.fcst_info[i_gc]->name().text(),
+              conf_info.fcst_info[i_gc]->level_name().text(),
+              conf_info.obs_info[i_gc]->name().text(),
+              conf_info.obs_info[i_gc]->level_name().text());
+   }
+
+   if ( nc_info.do_diff )  {
+      diff_var_name.format("DIFF_%s_%s_%s_%s_RAW",
+              conf_info.fcst_info[i_gc]->name().text(),
+              conf_info.fcst_info[i_gc]->level_name().text(),
+              conf_info.obs_info[i_gc]->name().text(),
+              conf_info.obs_info[i_gc]->level_name().text());
+
+   }
 
    // If this is the first tile, define new variables
    if(i_tile == 0) {
 
       // Define the forecast and difference variables
-      fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
-                                 tile_dim, x_dim, y_dim);
-      obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
-                                 tile_dim, x_dim, y_dim);
-      diff_var = nc_out->add_var(diff_var_name, ncFloat,
-                                 tile_dim, x_dim, y_dim);
+
+      if ( nc_info.do_raw )  {
+         fcst_var = nc_out->add_var(fcst_var_name, ncFloat, tile_dim, x_dim, y_dim);
+         obs_var  = nc_out->add_var(obs_var_name,  ncFloat, tile_dim, x_dim, y_dim);
+      }
+      if ( nc_info.do_diff )  diff_var = nc_out->add_var(diff_var_name, ncFloat, tile_dim, x_dim, y_dim);
 
       // Add variable attributes for the observation field
-      add_var_att(obs_var, "type", "Observation");
-      add_var_att(obs_var, "name", shc.get_obs_var());
-      val.format("%s at %s",
-              conf_info.obs_info[i_gc]->name().text(),
-              conf_info.obs_info[i_gc]->level_name().text());
-      add_var_att(obs_var, "long_name", val);
-      add_var_att(obs_var, "level", shc.get_obs_lev());
-      add_var_att(obs_var, "units", conf_info.fcst_info[i_gc]->units().text());
-      obs_var->add_att("_FillValue", bad_data_float);
-      write_netcdf_var_times(obs_var,
-         shc.get_obs_valid_beg() - shc.get_obs_lead_sec(),
-         shc.get_obs_valid_beg(), 0);
 
-      // Add variable attributes for the forecast field
-      add_var_att(fcst_var, "type", "Forecast");
-      add_var_att(fcst_var, "name", shc.get_fcst_var());
-      val.format("%s at %s",
-              conf_info.fcst_info[i_gc]->name().text(),
-              conf_info.fcst_info[i_gc]->level_name().text());
-      add_var_att(fcst_var, "long_name", val);
-      add_var_att(fcst_var, "level", shc.get_fcst_lev());
-      add_var_att(fcst_var, "units", conf_info.fcst_info[i_gc]->units().text());
-      fcst_var->add_att("_FillValue", bad_data_float);
-      write_netcdf_var_times(fcst_var,
-         shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
-         shc.get_fcst_valid_beg(), 0);
+      if ( nc_info.do_raw )  {
+         add_var_att(obs_var, "type", "Observation");
+         add_var_att(obs_var, "name", shc.get_obs_var());
+         val.format("%s at %s",
+                 conf_info.obs_info[i_gc]->name().text(),
+                 conf_info.obs_info[i_gc]->level_name().text());
+         add_var_att(obs_var, "long_name", val);
+         add_var_att(obs_var, "level", shc.get_obs_lev());
+         add_var_att(obs_var, "units", conf_info.fcst_info[i_gc]->units().text());
+         obs_var->add_att("_FillValue", bad_data_float);
+         write_netcdf_var_times(obs_var,
+            shc.get_obs_valid_beg() - shc.get_obs_lead_sec(),
+            shc.get_obs_valid_beg(), 0);
 
-      // Add variable attributes for the difference field
-      add_var_att(diff_var, "type", "Difference (F-O)");
-      val.format("Forecast %s minus Observed %s",
-              shc.get_fcst_var(), shc.get_obs_var());
-      add_var_att(diff_var, "name", val);
-      val.format("%s at %s and %s at %s",
-              conf_info.fcst_info[i_gc]->name().text(),
-              conf_info.fcst_info[i_gc]->level_name().text(),
-              conf_info.obs_info[i_gc]->name().text(),
-              conf_info.obs_info[i_gc]->level_name().text());
-      add_var_att(diff_var, "long_name", val);
-      val.format("%s and %s",
-              shc.get_fcst_lev(), shc.get_obs_lev());
-      add_var_att(diff_var, "level", val);
-      val.format("%s and %s",
-              conf_info.fcst_info[i_gc]->units().text(),
-              conf_info.obs_info[i_gc]->units().text());
-      add_var_att(diff_var, "units", val);
-      diff_var->add_att("_FillValue", bad_data_float);
-      write_netcdf_var_times(diff_var,
-         shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
-         shc.get_fcst_valid_beg(), 0);
+         // Add variable attributes for the forecast field
+         add_var_att(fcst_var, "type", "Forecast");
+         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         val.format("%s at %s",
+                 conf_info.fcst_info[i_gc]->name().text(),
+                 conf_info.fcst_info[i_gc]->level_name().text());
+         add_var_att(fcst_var, "long_name", val);
+         add_var_att(fcst_var, "level", shc.get_fcst_lev());
+         add_var_att(fcst_var, "units", conf_info.fcst_info[i_gc]->units().text());
+         fcst_var->add_att("_FillValue", bad_data_float);
+            write_netcdf_var_times(fcst_var,
+            shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
+            shc.get_fcst_valid_beg(), 0);
+
+      }
+
+      if ( nc_info.do_diff )  {
+
+         // Add variable attributes for the difference field
+         add_var_att(diff_var, "type", "Difference (F-O)");
+         val.format("Forecast %s minus Observed %s",
+                 shc.get_fcst_var(), shc.get_obs_var());
+         add_var_att(diff_var, "name", val);
+         val.format("%s at %s and %s at %s",
+                 conf_info.fcst_info[i_gc]->name().text(),
+                 conf_info.fcst_info[i_gc]->level_name().text(),
+                 conf_info.obs_info[i_gc]->name().text(),
+                 conf_info.obs_info[i_gc]->level_name().text());
+         add_var_att(diff_var, "long_name", val);
+         val.format("%s and %s",
+                 shc.get_fcst_lev(), shc.get_obs_lev());
+         add_var_att(diff_var, "level", val);
+         val.format("%s and %s",
+                 conf_info.fcst_info[i_gc]->units().text(),
+                 conf_info.obs_info[i_gc]->units().text());
+         add_var_att(diff_var, "units", val);
+         diff_var->add_att("_FillValue", bad_data_float);
+         write_netcdf_var_times(diff_var,
+            shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
+            shc.get_fcst_valid_beg(), 0);
+
+      }
+
    }
    // Otherwise, retrieve the previously defined variables
    else {
 
-      fcst_var = nc_out->get_var(fcst_var_name);
-      obs_var  = nc_out->get_var(obs_var_name);
-      diff_var = nc_out->get_var(diff_var_name);
+      if ( nc_info.do_raw )  {
+         fcst_var = nc_out->get_var(fcst_var_name);
+         obs_var  = nc_out->get_var(obs_var_name);
+      }
+      if ( nc_info.do_diff )  diff_var = nc_out->get_var(diff_var_name);
    }
 
    // Allocate memory for the forecast, observation, and difference
    // fields
-   fcst_data = new float [n];
-   obs_data  = new float [n];
-   diff_data = new float [n];
+   if ( nc_info.do_raw )  {
+      fcst_data = new float [n];
+      obs_data  = new float [n];
+   }
+   if ( nc_info.do_diff )  diff_data = new float [n];
 
    // Store the forecast, observation, and difference fields
    for(i=0; i<n; i++) {
 
-      // Set the forecast data
-      if(is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-      else                      fcst_data[i] = (float) fdata[i];
+      if ( nc_info.do_raw )  {
 
-      // Set the observation data
-      if(is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-      else                      obs_data[i]  = (float) odata[i];
+         // Set the forecast data
+         if(is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
+         else                      fcst_data[i] = (float) fdata[i];
 
-      // Set the difference data
-      if(is_bad_data(fdata[i]) ||
-         is_bad_data(odata[i]))
-         diff_data[i] = bad_data_float;
-      else
-         diff_data[i] = (float) (fdata[i] - odata[i]);
+         // Set the observation data
+         if(is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
+         else                      obs_data[i]  = (float) odata[i];
+
+      }
+
+      if ( nc_info.do_diff )  {
+         // Set the difference data
+         if(is_bad_data(fdata[i]) ||
+            is_bad_data(odata[i]))
+            diff_data[i] = bad_data_float;
+         else
+            diff_data[i] = (float) (fdata[i] - odata[i]);
+      }
+
    } // end for i
 
    // Retrieve the tile dimension
    d = conf_info.get_tile_dim();
 
-   // Write out the forecast field
-   if(!fcst_var->set_cur(i_tile, 0, 0) ||
-      !fcst_var->put(&fcst_data[0], 1, d, d)) {
-      mlog << Error << "\nwrite_nc_raw() -> "
-           << "error with the fcst_var->put for field "
-           << shc.get_fcst_var() << "\n\n";
-      exit(1);
+   if ( nc_info.do_raw )  {
+
+      // Write out the forecast field
+      if(!fcst_var->set_cur(i_tile, 0, 0) ||
+         !fcst_var->put(&fcst_data[0], 1, d, d)) {
+         mlog << Error << "\nwrite_nc_raw() -> "
+              << "error with the fcst_var->put for field "
+              << shc.get_fcst_var() << "\n\n";
+         exit(1);
+      }
+
+      // Write out the observation field
+      if(!obs_var->set_cur(i_tile, 0, 0) ||
+         !obs_var->put(&obs_data[0], 1, d, d)) {
+         mlog << Error << "\nwrite_nc_raw() -> "
+              << "error with the obs_var->put for field "
+              << shc.get_obs_var() << "\n\n";
+         exit(1);
+      }
+
    }
 
-   // Write out the observation field
-   if(!obs_var->set_cur(i_tile, 0, 0) ||
-      !obs_var->put(&obs_data[0], 1, d, d)) {
-      mlog << Error << "\nwrite_nc_raw() -> "
-           << "error with the obs_var->put for field "
-           << shc.get_obs_var() << "\n\n";
-      exit(1);
-   }
+   if ( nc_info.do_diff )  {
 
-   // Write out the difference field
-   if(!diff_var->set_cur(i_tile, 0, 0) ||
-      !diff_var->put(&diff_data[0], 1, d, d)) {
-      mlog << Error << "\nwrite_nc_raw() -> "
-           << "error with the diff_var->put for field "
-           << shc.get_fcst_var() << "\n\n";
-      exit(1);
+      // Write out the difference field
+      if(!diff_var->set_cur(i_tile, 0, 0) ||
+         !diff_var->put(&diff_data[0], 1, d, d)) {
+         mlog << Error << "\nwrite_nc_raw() -> "
+              << "error with the diff_var->put for field "
+              << shc.get_fcst_var() << "\n\n";
+         exit(1);
+      }
+
    }
 
    // Deallocate and clean up
@@ -1484,11 +1521,12 @@ void write_nc_raw(const double *fdata, const double *odata, int n,
    if(diff_data) { delete [] diff_data; diff_data = (float *) 0; }
 
    return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_wav(const double *fdata, const double *odata, int n,
+void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
                   int i_gc, int i_tile, int i_scale,
                   SingleThresh &fcst_st, SingleThresh &obs_st) {
    int i, d;
@@ -1503,164 +1541,209 @@ void write_nc_wav(const double *fdata, const double *odata, int n,
    fcst_thresh_str = fcst_st.get_abbr_str();
    obs_thresh_str  = obs_st.get_abbr_str();
 
-   // Build the variable names
-   fcst_var_name.format("FCST_%s_%s_%s_%s_%s_%s",
-           conf_info.fcst_info[i_gc]->name().text(),
-           conf_info.fcst_info[i_gc]->level_name().text(),
-           fcst_thresh_str.text(),
-           conf_info.obs_info[i_gc]->name().text(),
-           conf_info.obs_info[i_gc]->level_name().text(),
-           obs_thresh_str.text());
-   obs_var_name.format("OBS_%s_%s_%s_%s_%s_%s",
-           conf_info.fcst_info[i_gc]->name().text(),
-           conf_info.fcst_info[i_gc]->level_name().text(),
-           fcst_thresh_str.text(),
-           conf_info.obs_info[i_gc]->name().text(),
-           conf_info.obs_info[i_gc]->level_name().text(),
-           obs_thresh_str.text());
-   diff_var_name.format("DIFF_%s_%s_%s_%s_%s_%s",
-           conf_info.fcst_info[i_gc]->name().text(),
-           conf_info.fcst_info[i_gc]->level_name().text(),
-           fcst_thresh_str.text(),
-           conf_info.obs_info[i_gc]->name().text(),
-           conf_info.obs_info[i_gc]->level_name().text(),
-           obs_thresh_str.text());
+   if ( nc_info.do_raw )  {
+
+      // Build the variable names
+      fcst_var_name.format("FCST_%s_%s_%s_%s_%s_%s",
+              conf_info.fcst_info[i_gc]->name().text(),
+              conf_info.fcst_info[i_gc]->level_name().text(),
+              fcst_thresh_str.text(),
+              conf_info.obs_info[i_gc]->name().text(),
+              conf_info.obs_info[i_gc]->level_name().text(),
+              obs_thresh_str.text());
+      obs_var_name.format("OBS_%s_%s_%s_%s_%s_%s",
+              conf_info.fcst_info[i_gc]->name().text(),
+              conf_info.fcst_info[i_gc]->level_name().text(),
+              fcst_thresh_str.text(),
+              conf_info.obs_info[i_gc]->name().text(),
+              conf_info.obs_info[i_gc]->level_name().text(),
+              obs_thresh_str.text());
+   }
+
+   if ( nc_info.do_diff )  {
+
+      diff_var_name.format("DIFF_%s_%s_%s_%s_%s_%s",
+              conf_info.fcst_info[i_gc]->name().text(),
+              conf_info.fcst_info[i_gc]->level_name().text(),
+              fcst_thresh_str.text(),
+              conf_info.obs_info[i_gc]->name().text(),
+              conf_info.obs_info[i_gc]->level_name().text(),
+              obs_thresh_str.text());
+
+   }
 
    // If this is the binary field, define new variables
    if(i_tile == 0 && i_scale < 0) {
 
       // Define the forecast and difference variables
-      fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
-                                 tile_dim, scale_dim, x_dim, y_dim);
-      obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
-                                 tile_dim, scale_dim, x_dim, y_dim);
-      diff_var = nc_out->add_var(diff_var_name, ncFloat,
-                                 tile_dim, scale_dim, x_dim, y_dim);
 
-      // Add variable attributes for the observation field
-      add_var_att(obs_var, "type", "Observation");
-      add_var_att(obs_var, "name", shc.get_obs_var());
-      val.format("%s at %s",
-              conf_info.obs_info[i_gc]->name().text(),
-              conf_info.obs_info[i_gc]->level_name().text());
-      add_var_att(obs_var, "long_name", val);
-      add_var_att(obs_var, "level", shc.get_obs_lev());
-      add_var_att(obs_var, "units", conf_info.fcst_info[i_gc]->units().text());
-      add_var_att(obs_var, "threshold", fcst_thresh_str);
-      add_var_att(obs_var, "scale_0", "binary");
-      add_var_att(obs_var, "scale_n", "scale 2^(n-1)");
-      obs_var->add_att("_FillValue", bad_data_float);
-      write_netcdf_var_times(obs_var,
-         shc.get_obs_valid_beg() - shc.get_obs_lead_sec(),
-         shc.get_obs_valid_beg(), 0);
+      if ( nc_info.do_raw )  {
+         fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
+                                    tile_dim, scale_dim, x_dim, y_dim);
+         obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
+                                    tile_dim, scale_dim, x_dim, y_dim);
+      }
 
-      // Add variable attributes for the forecast field
-      add_var_att(fcst_var, "type", "Forecast");
-      add_var_att(fcst_var, "name", shc.get_fcst_var());
-      val.format("%s at %s",
-              conf_info.fcst_info[i_gc]->name().text(),
-              conf_info.fcst_info[i_gc]->level_name().text());
-      add_var_att(fcst_var, "long_name", val);
-      add_var_att(fcst_var, "level", shc.get_fcst_lev());
-      add_var_att(fcst_var, "units", conf_info.fcst_info[i_gc]->units().text());
-      add_var_att(fcst_var, "threshold", fcst_thresh_str);
-      add_var_att(fcst_var, "scale_0", "binary");
-      add_var_att(fcst_var, "scale_n", "scale 2^(n-1)");
-      fcst_var->add_att("_FillValue", bad_data_float);
-      write_netcdf_var_times(fcst_var,
-         shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
-         shc.get_fcst_valid_beg(), 0);
+      if ( nc_info.do_diff )  diff_var = nc_out->add_var(diff_var_name, ncFloat, tile_dim, scale_dim, x_dim, y_dim);
 
-      // Add variable attributes for the difference field
-      add_var_att(diff_var, "type", "Difference (F-O)");
-      val.format("Forecast %s minus Observed %s",
-              shc.get_fcst_var(), shc.get_obs_var());
-      add_var_att(diff_var, "name", val);
-      val.format("%s at %s and %s at %s",
-              conf_info.fcst_info[i_gc]->name().text(),
-              conf_info.fcst_info[i_gc]->level_name().text(),
-              conf_info.obs_info[i_gc]->name().text(),
-              conf_info.obs_info[i_gc]->level_name().text());
-      add_var_att(diff_var, "long_name", val);
-      val.format("%s and %s",
-              shc.get_fcst_lev(), shc.get_obs_lev());
-      add_var_att(diff_var, "level", val);
-      val.format("%s and %s",
-              conf_info.fcst_info[i_gc]->units().text(),
-              conf_info.obs_info[i_gc]->units().text());
-      add_var_att(diff_var, "units", val);
-      val.format("%s and %s",
-              fcst_thresh_str.text(),
-              obs_thresh_str.text());
-      add_var_att(diff_var, "threshold", val);
-      add_var_att(diff_var, "scale_0", "binary");
-      add_var_att(diff_var, "scale_n", "scale 2^(n-1)");
-      diff_var->add_att("_FillValue", bad_data_float);
-      write_netcdf_var_times(diff_var,
-         shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
-         shc.get_fcst_valid_beg(), 0);
+      if ( nc_info.do_raw )  {
+
+         // Add variable attributes for the observation field
+         add_var_att(obs_var, "type", "Observation");
+         add_var_att(obs_var, "name", shc.get_obs_var());
+         val.format("%s at %s",
+                 conf_info.obs_info[i_gc]->name().text(),
+                 conf_info.obs_info[i_gc]->level_name().text());
+         add_var_att(obs_var, "long_name", val);
+         add_var_att(obs_var, "level", shc.get_obs_lev());
+         add_var_att(obs_var, "units", conf_info.fcst_info[i_gc]->units().text());
+         add_var_att(obs_var, "threshold", fcst_thresh_str);
+         add_var_att(obs_var, "scale_0", "binary");
+         add_var_att(obs_var, "scale_n", "scale 2^(n-1)");
+         obs_var->add_att("_FillValue", bad_data_float);
+         write_netcdf_var_times(obs_var,
+            shc.get_obs_valid_beg() - shc.get_obs_lead_sec(),
+            shc.get_obs_valid_beg(), 0);
+
+         // Add variable attributes for the forecast field
+         add_var_att(fcst_var, "type", "Forecast");
+         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         val.format("%s at %s",
+                 conf_info.fcst_info[i_gc]->name().text(),
+                 conf_info.fcst_info[i_gc]->level_name().text());
+         add_var_att(fcst_var, "long_name", val);
+         add_var_att(fcst_var, "level", shc.get_fcst_lev());
+         add_var_att(fcst_var, "units", conf_info.fcst_info[i_gc]->units().text());
+         add_var_att(fcst_var, "threshold", fcst_thresh_str);
+         add_var_att(fcst_var, "scale_0", "binary");
+         add_var_att(fcst_var, "scale_n", "scale 2^(n-1)");
+         fcst_var->add_att("_FillValue", bad_data_float);
+         write_netcdf_var_times(fcst_var,
+            shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
+            shc.get_fcst_valid_beg(), 0);
+
+      }
+
+      if ( nc_info.do_diff )  {
+
+         // Add variable attributes for the difference field
+         add_var_att(diff_var, "type", "Difference (F-O)");
+         val.format("Forecast %s minus Observed %s",
+                 shc.get_fcst_var(), shc.get_obs_var());
+         add_var_att(diff_var, "name", val);
+         val.format("%s at %s and %s at %s",
+                 conf_info.fcst_info[i_gc]->name().text(),
+                 conf_info.fcst_info[i_gc]->level_name().text(),
+                 conf_info.obs_info[i_gc]->name().text(),
+                 conf_info.obs_info[i_gc]->level_name().text());
+         add_var_att(diff_var, "long_name", val);
+         val.format("%s and %s",
+                 shc.get_fcst_lev(), shc.get_obs_lev());
+         add_var_att(diff_var, "level", val);
+         val.format("%s and %s",
+                 conf_info.fcst_info[i_gc]->units().text(),
+                 conf_info.obs_info[i_gc]->units().text());
+         add_var_att(diff_var, "units", val);
+         val.format("%s and %s",
+                 fcst_thresh_str.text(),
+                 obs_thresh_str.text());
+         add_var_att(diff_var, "threshold", val);
+         add_var_att(diff_var, "scale_0", "binary");
+         add_var_att(diff_var, "scale_n", "scale 2^(n-1)");
+         diff_var->add_att("_FillValue", bad_data_float);
+         write_netcdf_var_times(diff_var,
+            shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
+            shc.get_fcst_valid_beg(), 0);
+      }
+
    }
    // Otherwise, retrieve the previously defined variables
    else {
 
-      fcst_var = nc_out->get_var(fcst_var_name);
-      obs_var  = nc_out->get_var(obs_var_name);
-      diff_var = nc_out->get_var(diff_var_name);
+      if ( nc_info.do_raw )  {
+
+         fcst_var = nc_out->get_var(fcst_var_name);
+         obs_var  = nc_out->get_var(obs_var_name);
+
+      }
+
+      if ( nc_info.do_diff )  diff_var = nc_out->get_var(diff_var_name);
+
    }
 
    // Allocate memory for the forecast, observation, and difference
    // fields
-   fcst_data = new float [n];
-   obs_data  = new float [n];
-   diff_data = new float [n];
+
+   if ( nc_info.do_raw )  {
+      fcst_data = new float [n];
+      obs_data  = new float [n];
+   }
+   if ( nc_info.do_diff )  diff_data = new float [n];
 
    // Store the forecast, observation, and difference fields
    for(i=0; i<n; i++) {
 
-      // Set the forecast data
-      if(is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-      else                      fcst_data[i] = (float) fdata[i];
+      if ( nc_info.do_raw )  {
 
-      // Set the observation data
-      if(is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-      else                      obs_data[i]  = (float) odata[i];
+         // Set the forecast data
+         if(is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
+         else                      fcst_data[i] = (float) fdata[i];
 
-      // Set the difference data
-      if(is_bad_data(fdata[i]) ||
-         is_bad_data(odata[i]))
-         diff_data[i] = bad_data_float;
-      else
-         diff_data[i] = (float) (fdata[i] - odata[i]);
+         // Set the observation data
+         if(is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
+         else                      obs_data[i]  = (float) odata[i];
+
+      }
+
+      if ( nc_info.do_diff )  {
+
+         // Set the difference data
+         if(is_bad_data(fdata[i]) ||
+            is_bad_data(odata[i]))
+            diff_data[i] = bad_data_float;
+         else
+            diff_data[i] = (float) (fdata[i] - odata[i]);
+
+      }
+
    } // end for i
 
    // Retrieve the tile dimensions
    d = conf_info.get_tile_dim();
 
-   // Write out the forecast field
-   if(!fcst_var->set_cur(i_tile, i_scale+1, 0, 0) ||
-      !fcst_var->put(&fcst_data[0], 1, 1, d, d)) {
-      mlog << Error << "\nwrite_nc_wav() -> "
-           << "error with the fcst_var->put for field "
-           << shc.get_fcst_var() << "\n\n";
-      exit(1);
+   if ( nc_info.do_raw )  {
+
+      // Write out the forecast field
+      if(!fcst_var->set_cur(i_tile, i_scale+1, 0, 0) ||
+         !fcst_var->put(&fcst_data[0], 1, 1, d, d)) {
+         mlog << Error << "\nwrite_nc_wav() -> "
+              << "error with the fcst_var->put for field "
+              << shc.get_fcst_var() << "\n\n";
+         exit(1);
+      }
+
+      // Write out the observation field
+      if(!obs_var->set_cur(i_tile, i_scale+1, 0, 0) ||
+         !obs_var->put(&obs_data[0], 1, 1, d, d)) {
+         mlog << Error << "\nwrite_nc_wav() -> "
+              << "error with the obs_var->put for field "
+              << shc.get_obs_var() << "\n\n";
+         exit(1);
+      }
+
    }
 
-   // Write out the observation field
-   if(!obs_var->set_cur(i_tile, i_scale+1, 0, 0) ||
-      !obs_var->put(&obs_data[0], 1, 1, d, d)) {
-      mlog << Error << "\nwrite_nc_wav() -> "
-           << "error with the obs_var->put for field "
-           << shc.get_obs_var() << "\n\n";
-      exit(1);
-   }
+   if ( nc_info.do_diff )  {
 
-   // Write out the difference field
-   if(!diff_var->set_cur(i_tile, i_scale+1, 0, 0) ||
-      !diff_var->put(&diff_data[0], 1, 1, d, d)) {
-      mlog << Error << "\nwrite_nc()_wav -> "
-           << "error with the diff_var->put for field "
-           << shc.get_fcst_var() << "\n\n";
-      exit(1);
+      // Write out the difference field
+      if(!diff_var->set_cur(i_tile, i_scale+1, 0, 0) ||
+         !diff_var->put(&diff_data[0], 1, 1, d, d)) {
+         mlog << Error << "\nwrite_nc()_wav -> "
+              << "error with the diff_var->put for field "
+              << shc.get_fcst_var() << "\n\n";
+         exit(1);
+      }
+
    }
 
    // Deallocate and clean up
@@ -1702,7 +1785,7 @@ void close_out_files() {
    }
 
    // Close the output NetCDF file as long as it was opened
-   if(nc_out && conf_info.nc_pairs_flag) {
+   if ( nc_out && !(conf_info.nc_info.all_false()) )  {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";

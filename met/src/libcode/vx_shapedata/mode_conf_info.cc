@@ -600,12 +600,7 @@ void ModeNcOutInfo::clear()
 
 {
 
-do_latlon     = true;
-do_raw        = true;
-do_object_raw = true;
-do_object_id  = true;
-do_cluster_id = true;
-do_polylines  = true;
+set_all_true();
 
 return;
 
