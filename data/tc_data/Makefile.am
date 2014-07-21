@@ -20,6 +20,8 @@ tcdatadir = $(pkgdatadir)/tc_data
 
 tcdata_DATA = \
 	aland.dat \
+	wland.dat \
+	shland.dat \
 	dland_nw_hem_tenth_degree.nc \
 	wwpts_us.txt
 
