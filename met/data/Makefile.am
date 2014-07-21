@@ -26,3 +26,7 @@ SUBDIRS = \
 	tc_data
 
 MAINTAINERCLEANFILES 	= Makefile.in 
+
+EXTRA_DIST = \
+	sample_fcst \
+	sample_obs

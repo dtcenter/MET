@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export PATH=$1/bin:$PATH
+export MET_BASE=$2
+
+cd scripts
+./test_all.sh

@@ -18,8 +18,6 @@
 
 ACLOCAL_AMFLAGS		= -I m4
 
-EXTRA_DIST		= out scripts Make-include
-
 SUBDIRS 		= data src
 
 #if IS_MET_DEVELOPMENT
@@ -29,5 +27,25 @@ SUBDIRS 		= data src
 MAINTAINERCLEANFILES 	= Makefile.in aclocal.m4 configure \
 			  config.h.in
 
+# Remove an SVN files from the distribution
+
 dist-hook:
 	-rm -rf `find $(distdir) -name .svn`
+
+# Run the non-standard test suite
+
+test:
+	run_tests ${abs_top_builddir} ${pkgdatadir}
+
+.PHONY: test
+
+# Other files/directories that need to be included
+# in the distribution
+
+EXTRA_DIST = \
+	out \
+	scripts \
+	Make-include \
+	run_tests
+
+
