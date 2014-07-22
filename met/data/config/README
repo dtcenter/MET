@@ -501,10 +501,19 @@ output_flag = {
 };
 
 //
-// The "nc_pairs_flag" entry is a boolean value for Grid-Stat and MODE indicating
-// whether a NetCDF file containing the gridded forecast and observation fields
-// for all verification tasks should be created.
+// The "nc_pairs_flag" can be set either to a boolean value or a dictionary
+// in either Grid-Stat, Wavelet-Stat or MODE. The dictionary (with slightly 
+// different entries for the various tools ... see the default config files)
+// has individual boolean settings turning on or off the writing out of the
+// various fields in the netcdf output file for the tool.  Setting all 
+// dictionary entries to false means the netcdf file will not be generated.
+// 
+// "nc_pairs_flag" can also be set to a boolean value.  In this case, a value
+// of true means to just accept the default settings (which will turn on 
+// the output of all the different fields).  A value of false means no
+// netcdf output will be generated.
 //
+
 nc_pairs_flag = TRUE;
 
 //
