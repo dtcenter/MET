@@ -22,7 +22,11 @@ AC_ARG_VAR([MET_NETCDFLIB], [Where netcdf libraries are located. Use if the libr
 
 if (test -n "$MET_NETCDFLIB" && test -z "$MET_NETCDFINC") || \
    (test -n "$MET_NETCDFINC" && test -z "$MET_NETCDFLIB"); then
-  AC_MSG_ERROR([both or neither MET_NETCDF variables])
+  if test -n "$MET_NETCDFLIB"; then
+    AC_MSG_ERROR([MET_NETCDFLIB environment variable set, but MET_NETCDFINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_NETCDFINC environment variable set, but MET_NETCDFLIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main NetCDF directory
@@ -82,7 +86,11 @@ AC_ARG_VAR([MET_GRIB2CLIB], [Where grib2c libraries are located. Use if the libr
 
 if (test -n "$MET_GRIB2CLIB" && test -z "$MET_GRIB2CINC") || \
    (test -n "$MET_GRIB2CINC" && test -z "$MET_GRIB2CLIB"); then
-  AC_MSG_ERROR([both or neither MET_GRIB2C variables])
+  if test -n "$MET_GRIB2CLIB"; then
+    AC_MSG_ERROR([MET_GRIB2CLIB environment variable set, but MET_GRIB2CINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_GRIB2CINC environment variable set, but MET_GRIB2CLIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main Grib2c directory
@@ -115,7 +123,11 @@ AC_ARG_VAR([MET_GSLLIB], [Where gsl libraries are located. Use if the libraries 
 
 if (test -n "$MET_GSLLIB" && test -z "$MET_GSLINC") || \
    (test -n "$MET_GSLINC" && test -z "$MET_GSLLIB"); then
-  AC_MSG_ERROR([both or neither MET_GSL variables])
+  if test -n "$MET_GSLLIB"; then
+    AC_MSG_ERROR([MET_GSLLIB environment variable set, but MET_GSLINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_GSLINC environment variable set, but MET_GSLLIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main Gsl directory
@@ -148,7 +160,11 @@ AC_ARG_VAR([MET_BUFRLIB], [Where bufr libraries are located. Use if the librarie
 
 if (test -n "$MET_BUFRLIB" && test -z "$MET_BUFRINC") || \
    (test -n "$MET_BUFRINC" && test -z "$MET_BUFRLIB"); then
-  AC_MSG_ERROR([both or neither MET_BUFR variables])
+  if test -n "$MET_BUFRLIB"; then
+    AC_MSG_ERROR([MET_BUFRLIB environment variable set, but MET_BUFRINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_BUFRINC environment variable set, but MET_BUFRLIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main Bufr directory
@@ -181,7 +197,11 @@ AC_ARG_VAR([MET_HDFLIB], [Where hdf libraries are located. Use if the libraries 
 
 if (test -n "$MET_HDFLIB" && test -z "$MET_HDFINC") || \
    (test -n "$MET_HDFINC" && test -z "$MET_HDFLIB"); then
-  AC_MSG_ERROR([both or neither MET_HDF variables])
+  if test -n "$MET_HDFLIB"; then
+    AC_MSG_ERROR([MET_HDFLIB environment variable set, but MET_HDFINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_HDFINC environment variable set, but MET_HDFLIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main Hdf directory
@@ -214,7 +234,11 @@ AC_ARG_VAR([MET_HDFEOSLIB], [Where hdfeos libraries are located. Use if the libr
 
 if (test -n "$MET_HDFEOSLIB" && test -z "$MET_HDFEOSINC") || \
    (test -n "$MET_HDFEOSINC" && test -z "$MET_HDFEOSLIB"); then
-  AC_MSG_ERROR([both or neither MET_HDFEOS variables])
+  if test -n "$MET_HDFEOSLIB"; then
+    AC_MSG_ERROR([MET_HDFEOSLIB environment variable set, but MET_HDFEOSINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_HDFEOSINC environment variable set, but MET_HDFEOSLIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main Hdfeos directory
@@ -247,7 +271,11 @@ AC_ARG_VAR([MET_CAIROLIB], [Where cairo libraries are located. Use if the librar
 
 if (test -n "$MET_CAIROLIB" && test -z "$MET_CAIROINC") || \
    (test -n "$MET_CAIROINC" && test -z "$MET_CAIROLIB"); then
-  AC_MSG_ERROR([both or neither MET_CAIRO variables])
+  if test -n "$MET_CAIROLIB"; then
+    AC_MSG_ERROR([MET_CAIROLIB environment variable set, but MET_CAIROINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_CAIROINC environment variable set, but MET_CAIROLIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main Cairo directory
@@ -280,7 +308,11 @@ AC_ARG_VAR([MET_FREETYPELIB], [Where freetype libraries are located. Use if the 
 
 if (test -n "$MET_FREETYPELIB" && test -z "$MET_FREETYPEINC") || \
    (test -n "$MET_FREETYPEINC" && test -z "$MET_FREETYPELIB"); then
-  AC_MSG_ERROR([both or neither MET_FREETYPE variables])
+  if test -n "$MET_FREETYPELIB"; then
+    AC_MSG_ERROR([MET_FREETYPELIB environment variable set, but MET_FREETYPEINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_FREETYPEINC environment variable set, but MET_FREETYPELIB not set.  If one of these variables is set, then both must be set.])
+  fi
 fi 
 
 # If the individual locations weren't specified, then the main Freetype directory
