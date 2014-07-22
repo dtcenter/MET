@@ -14,23 +14,23 @@ AM_INIT_AUTOMAKE([1.9 foreign])
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([NETCDF], [Where netcdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([NETCDFINC], [Where netcdf include files are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, NETCDFLIB must also be defined and NETCDF will be ignored.])
-AC_ARG_VAR([NETCDFLIB], [Where netcdf libraries are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, NETCDFINC must also be defined and NETCDF will be ignored.])
+AC_ARG_VAR([MET_NETCDF], [Where netcdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_NETCDFINC], [Where netcdf include files are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, MET_NETCDFLIB must also be defined and MET_NETCDF will be ignored.])
+AC_ARG_VAR([MET_NETCDFLIB], [Where netcdf libraries are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, MET_NETCDFINC must also be defined and MET_NETCDF will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$NETCDFLIB" && test -z "$NETCDFINC") || \
-   (test -n "$NETCDFINC" && test -z "$NETCDFLIB"); then
-  AC_MSG_ERROR([both or neither NETCDF variables])
+if (test -n "$MET_NETCDFLIB" && test -z "$MET_NETCDFINC") || \
+   (test -n "$MET_NETCDFINC" && test -z "$MET_NETCDFLIB"); then
+  AC_MSG_ERROR([both or neither MET_NETCDF variables])
 fi 
 
 # If the individual locations weren't specified, then the main NetCDF directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$NETCDFLIB" && test -n "$NETCDF"; then
-   NETCDFINC='${NETCDF}/include'
-   NETCDFLIB='${NETCDF}/lib'
+if test -z "$MET_NETCDFLIB" && test -n "$MET_NETCDF"; then
+   MET_NETCDFINC='${MET_NETCDF}/include'
+   MET_NETCDFLIB='${MET_NETCDF}/lib'
 fi
 
 # We don't currently look for the NetCDF libraries in "known"
@@ -63,9 +63,9 @@ fi
 # AC_SUBST command line variables.  If we get here, the NetCDF
 # libraries were found so no need to check
 
-if test -n "$NETCDFLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${NETCDFINC}"
-   LDFLAGS="${LDFLAGS} -L${NETCDFLIB}"
+if test -n "$MET_NETCDFLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_NETCDFINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_NETCDFLIB}"
 fi
 
 #
@@ -74,31 +74,31 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([GRIB2C], [Where grib2c lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([GRIB2CINC], [Where grib2c include files are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, GRIB2CLIB must also be defined and GRIB2C will be ignored.])
-AC_ARG_VAR([GRIB2CLIB], [Where grib2c libraries are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, GRIB2CINC must also be defined and GRIB2C will be ignored.])
+AC_ARG_VAR([MET_GRIB2C], [Where grib2c lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_GRIB2CINC], [Where grib2c include files are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CLIB must also be defined and MET_GRIB2C will be ignored.])
+AC_ARG_VAR([MET_GRIB2CLIB], [Where grib2c libraries are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CINC must also be defined and MET_GRIB2C will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$GRIB2CLIB" && test -z "$GRIB2CINC") || \
-   (test -n "$GRIB2CINC" && test -z "$GRIB2CLIB"); then
-  AC_MSG_ERROR([both or neither GRIB2C variables])
+if (test -n "$MET_GRIB2CLIB" && test -z "$MET_GRIB2CINC") || \
+   (test -n "$MET_GRIB2CINC" && test -z "$MET_GRIB2CLIB"); then
+  AC_MSG_ERROR([both or neither MET_GRIB2C variables])
 fi 
 
 # If the individual locations weren't specified, then the main Grib2c directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$GRIB2CLIB" && test -n "$GRIB2C"; then
-   GRIB2CINC='${GRIB2C}/include'
-   GRIB2CLIB='${GRIB2C}/lib'
+if test -z "$MET_GRIB2CLIB" && test -n "$MET_GRIB2C"; then
+   MET_GRIB2CINC='${MET_GRIB2C}/include'
+   MET_GRIB2CLIB='${MET_GRIB2C}/lib'
 fi
 
 # AC_SUBST command line variables.  If we get here, the Grib2c
 # libraries were found so no need to check
 
-if test -n "$GRIB2CLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${GRIB2CINC}"
-   LDFLAGS="${LDFLAGS} -L${GRIB2CLIB}"
+if test -n "$MET_GRIB2CLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_GRIB2CINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_GRIB2CLIB}"
 fi
 
 #
@@ -107,31 +107,31 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([GSL], [Where gsl lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([GSLINC], [Where gsl include files are located. Use if the libraries and include files are not under the same main gsl directory.  If used, GSLLIB must also be defined and GSL will be ignored.])
-AC_ARG_VAR([GSLLIB], [Where gsl libraries are located. Use if the libraries and include files are not under the same main gsl directory.  If used, GSLINC must also be defined and GSL will be ignored.])
+AC_ARG_VAR([MET_GSL], [Where gsl lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_GSLINC], [Where gsl include files are located. Use if the libraries and include files are not under the same main gsl directory.  If used, MET_GSLLIB must also be defined and MET_GSL will be ignored.])
+AC_ARG_VAR([MET_GSLLIB], [Where gsl libraries are located. Use if the libraries and include files are not under the same main gsl directory.  If used, MET_GSLINC must also be defined and MET_GSL will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$GSLLIB" && test -z "$GSLINC") || \
-   (test -n "$GSLINC" && test -z "$GSLLIB"); then
-  AC_MSG_ERROR([both or neither GSL variables])
+if (test -n "$MET_GSLLIB" && test -z "$MET_GSLINC") || \
+   (test -n "$MET_GSLINC" && test -z "$MET_GSLLIB"); then
+  AC_MSG_ERROR([both or neither MET_GSL variables])
 fi 
 
 # If the individual locations weren't specified, then the main Gsl directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$GSLLIB" && test -n "$GSL"; then
-   GSLINC='${GSL}/include'
-   GSLLIB='${GSL}/lib'
+if test -z "$MET_GSLLIB" && test -n "$MET_GSL"; then
+   MET_GSLINC='${MET_GSL}/include'
+   MET_GSLLIB='${MET_GSL}/lib'
 fi
 
 # AC_SUBST command line variables.  If we get here, the Gsl
 # libraries were found so no need to check
 
-if test -n "$GSLLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${GSLINC}"
-   LDFLAGS="${LDFLAGS} -L${GSLLIB}"
+if test -n "$MET_GSLLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_GSLINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_GSLLIB}"
 fi
 
 #
@@ -140,31 +140,31 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([BUFR], [Where bufr lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([BUFRINC], [Where bufr include files are located. Use if the libraries and include files are not under the same main bufr directory.  If used, BUFRLIB must also be defined and BUFR will be ignored.])
-AC_ARG_VAR([BUFRLIB], [Where bufr libraries are located. Use if the libraries and include files are not under the same main bufr directory.  If used, BUFRINC must also be defined and BUFR will be ignored.])
+AC_ARG_VAR([MET_BUFR], [Where bufr lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_BUFRINC], [Where bufr include files are located. Use if the libraries and include files are not under the same main bufr directory.  If used, MET_BUFRLIB must also be defined and MET_BUFR will be ignored.])
+AC_ARG_VAR([MET_BUFRLIB], [Where bufr libraries are located. Use if the libraries and include files are not under the same main bufr directory.  If used, MET_BUFRINC must also be defined and MET_BUFR will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$BUFRLIB" && test -z "$BUFRINC") || \
-   (test -n "$BUFRINC" && test -z "$BUFRLIB"); then
-  AC_MSG_ERROR([both or neither BUFR variables])
+if (test -n "$MET_BUFRLIB" && test -z "$MET_BUFRINC") || \
+   (test -n "$MET_BUFRINC" && test -z "$MET_BUFRLIB"); then
+  AC_MSG_ERROR([both or neither MET_BUFR variables])
 fi 
 
 # If the individual locations weren't specified, then the main Bufr directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$BUFRLIB" && test -n "$BUFR"; then
-   BUFRINC='${BUFR}/include'
-   BUFRLIB='${BUFR}/lib'
+if test -z "$MET_BUFRLIB" && test -n "$MET_BUFR"; then
+   MET_BUFRINC='${MET_BUFR}/include'
+   MET_BUFRLIB='${MET_BUFR}/lib'
 fi
 
 # AC_SUBST command line variables.  If we get here, the Bufr
 # libraries were found so no need to check
 
-if test -n "$BUFRLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${BUFRINC}"
-   LDFLAGS="${LDFLAGS} -L${BUFRLIB}"
+if test -n "$MET_BUFRLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_BUFRINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_BUFRLIB}"
 fi
 
 #
@@ -173,31 +173,31 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([HDF], [Where hdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([HDFINC], [Where hdf include files are located. Use if the libraries and include files are not under the same main hdf directory.  If used, HDFLIB must also be defined and HDF will be ignored.])
-AC_ARG_VAR([HDFLIB], [Where hdf libraries are located. Use if the libraries and include files are not under the same main hdf directory.  If used, HDFINC must also be defined and HDF will be ignored.])
+AC_ARG_VAR([MET_HDF], [Where hdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_HDFINC], [Where hdf include files are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFLIB must also be defined and MET_HDF will be ignored.])
+AC_ARG_VAR([MET_HDFLIB], [Where hdf libraries are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFINC must also be defined and MET_HDF will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$HDFLIB" && test -z "$HDFINC") || \
-   (test -n "$HDFINC" && test -z "$HDFLIB"); then
-  AC_MSG_ERROR([both or neither HDF variables])
+if (test -n "$MET_HDFLIB" && test -z "$MET_HDFINC") || \
+   (test -n "$MET_HDFINC" && test -z "$MET_HDFLIB"); then
+  AC_MSG_ERROR([both or neither MET_HDF variables])
 fi 
 
 # If the individual locations weren't specified, then the main Hdf directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$HDFLIB" && test -n "$HDF"; then
-   HDFINC='${HDF}/include'
-   HDFLIB='${HDF}/lib'
+if test -z "$MET_HDFLIB" && test -n "$MET_HDF"; then
+   MET_HDFINC='${MET_HDF}/include'
+   MET_HDFLIB='${MET_HDF}/lib'
 fi
 
 # AC_SUBST command line variables.  If we get here, the Hdf
 # libraries were found so no need to check
 
-if test -n "$HDFLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${HDFINC}"
-   LDFLAGS="${LDFLAGS} -L${HDFLIB}"
+if test -n "$MET_HDFLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_HDFINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_HDFLIB}"
 fi
 
 #
@@ -206,31 +206,31 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([HDFEOS], [Where hdfeos lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([HDFEOSINC], [Where hdfeos include files are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, HDFEOSLIB must also be defined and HDFEOS will be ignored.])
-AC_ARG_VAR([HDFEOSLIB], [Where hdfeos libraries are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, HDFEOSINC must also be defined and HDFEOS will be ignored.])
+AC_ARG_VAR([MET_HDFEOS], [Where hdfeos lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_HDFEOSINC], [Where hdfeos include files are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSLIB must also be defined and MET_HDFEOS will be ignored.])
+AC_ARG_VAR([MET_HDFEOSLIB], [Where hdfeos libraries are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSINC must also be defined and MET_HDFEOS will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$HDFEOSLIB" && test -z "$HDFEOSINC") || \
-   (test -n "$HDFEOSINC" && test -z "$HDFEOSLIB"); then
-  AC_MSG_ERROR([both or neither HDFEOS variables])
+if (test -n "$MET_HDFEOSLIB" && test -z "$MET_HDFEOSINC") || \
+   (test -n "$MET_HDFEOSINC" && test -z "$MET_HDFEOSLIB"); then
+  AC_MSG_ERROR([both or neither MET_HDFEOS variables])
 fi 
 
 # If the individual locations weren't specified, then the main Hdfeos directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$HDFEOSLIB" && test -n "$HDFEOS"; then
-   HDFEOSINC='${HDFEOS}/include'
-   HDFEOSLIB='${HDFEOS}/lib'
+if test -z "$MET_HDFEOSLIB" && test -n "$MET_HDFEOS"; then
+   MET_HDFEOSINC='${MET_HDFEOS}/include'
+   MET_HDFEOSLIB='${MET_HDFEOS}/lib'
 fi
 
 # AC_SUBST command line variables.  If we get here, the Hdfeos
 # libraries were found so no need to check
 
-if test -n "$HDFEOSLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${HDFEOSINC}"
-   LDFLAGS="${LDFLAGS} -L${HDFEOSLIB}"
+if test -n "$MET_HDFEOSLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_HDFEOSINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_HDFEOSLIB}"
 fi
 
 #
@@ -239,31 +239,31 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([CAIRO], [Where cairo lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Cairo is only needed if you are building the mode_graphics utility.])
-AC_ARG_VAR([CAIROINC], [Where cairo include files are located. Use if the libraries and include files are not under the same main cairo directory.  If used, CAIROLIB must also be defined and CAIRO will be ignored.])
-AC_ARG_VAR([CAIROLIB], [Where cairo libraries are located. Use if the libraries and include files are not under the same main cairo directory.  If used, CAIROINC must also be defined and CAIRO will be ignored.])
+AC_ARG_VAR([MET_CAIRO], [Where cairo lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Cairo is only needed if you are building the mode_graphics utility.])
+AC_ARG_VAR([MET_CAIROINC], [Where cairo include files are located. Use if the libraries and include files are not under the same main cairo directory.  If used, MET_CAIROLIB must also be defined and MET_CAIRO will be ignored.])
+AC_ARG_VAR([MET_CAIROLIB], [Where cairo libraries are located. Use if the libraries and include files are not under the same main cairo directory.  If used, MET_CAIROINC must also be defined and MET_CAIRO will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$CAIROLIB" && test -z "$CAIROINC") || \
-   (test -n "$CAIROINC" && test -z "$CAIROLIB"); then
-  AC_MSG_ERROR([both or neither CAIRO variables])
+if (test -n "$MET_CAIROLIB" && test -z "$MET_CAIROINC") || \
+   (test -n "$MET_CAIROINC" && test -z "$MET_CAIROLIB"); then
+  AC_MSG_ERROR([both or neither MET_CAIRO variables])
 fi 
 
 # If the individual locations weren't specified, then the main Cairo directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$CAIROLIB" && test -n "$CAIRO"; then
-   CAIROINC='${CAIRO}/include'
-   CAIROLIB='${CAIRO}/lib'
+if test -z "$MET_CAIROLIB" && test -n "$MET_CAIRO"; then
+   MET_CAIROINC='${MET_CAIRO}/include'
+   MET_CAIROLIB='${MET_CAIRO}/lib'
 fi
 
 # AC_SUBST command line variables.  If we get here, the Cairo
 # libraries were found so no need to check
 
-if test -n "$CAIROLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${CAIROINC}"
-   LDFLAGS="${LDFLAGS} -L${CAIROLIB}"
+if test -n "$MET_CAIROLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_CAIROINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_CAIROLIB}"
 fi
 
 #
@@ -272,31 +272,31 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([FREETYPE], [Where freetype lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Freetype is only needed if you are building the mode_graphics utility.])
-AC_ARG_VAR([FREETYPEINC], [Where freetype include files are located. Use if the libraries and include files are not under the same main freetype directory.  If used, FREETYPELIB must also be defined and FREETYPE will be ignored.])
-AC_ARG_VAR([FREETYPELIB], [Where freetype libraries are located. Use if the libraries and include files are not under the same main freetype directory.  If used, FREETYPEINC must also be defined and FREETYPE will be ignored.])
+AC_ARG_VAR([MET_FREETYPE], [Where freetype lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Freetype is only needed if you are building the mode_graphics utility.])
+AC_ARG_VAR([MET_FREETYPEINC], [Where freetype include files are located. Use if the libraries and include files are not under the same main freetype directory.  If used, MET_FREETYPELIB must also be defined and MET_FREETYPE will be ignored.])
+AC_ARG_VAR([MET_FREETYPELIB], [Where freetype libraries are located. Use if the libraries and include files are not under the same main freetype directory.  If used, MET_FREETYPEINC must also be defined and MET_FREETYPE will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$FREETYPELIB" && test -z "$FREETYPEINC") || \
-   (test -n "$FREETYPEINC" && test -z "$FREETYPELIB"); then
-  AC_MSG_ERROR([both or neither FREETYPE variables])
+if (test -n "$MET_FREETYPELIB" && test -z "$MET_FREETYPEINC") || \
+   (test -n "$MET_FREETYPEINC" && test -z "$MET_FREETYPELIB"); then
+  AC_MSG_ERROR([both or neither MET_FREETYPE variables])
 fi 
 
 # If the individual locations weren't specified, then the main Freetype directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
-if test -z "$FREETYPELIB" && test -n "$FREETYPE"; then
-   FREETYPEINC='${FREETYPE}/include'
-   FREETYPELIB='${FREETYPE}/lib'
+if test -z "$MET_FREETYPELIB" && test -n "$MET_FREETYPE"; then
+   MET_FREETYPEINC='${MET_FREETYPE}/include'
+   MET_FREETYPELIB='${MET_FREETYPE}/lib'
 fi
 
 # AC_SUBST command line variables.  If we get here, the Freetype
 # libraries were found so no need to check
 
-if test -n "$FREETYPELIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${FREETYPEINC}"
-   LDFLAGS="${LDFLAGS} -L${FREETYPELIB}"
+if test -n "$MET_FREETYPELIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_FREETYPEINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_FREETYPELIB}"
 fi
 
 #
