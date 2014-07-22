@@ -81,3 +81,9 @@ insitu_nc_to_ascii_LDADD = -lvx_util \
 	-lm -lnetcdf_c++ -lnetcdf
 
 EXTRA_DIST = insitu_nc_file.h
+
+# Build chk4copyright when making a distribution so that we can
+#  add missing copyrights to the source files
+
+dist-hook: chk4copyright
+
