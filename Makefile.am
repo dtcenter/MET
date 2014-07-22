@@ -24,13 +24,17 @@ SUBDIRS 		= data src
   SUBDIRS += internal_tests
 #endif
 
-MAINTAINERCLEANFILES 	= Makefile.in aclocal.m4 configure \
-			  config.h.in
+MAINTAINERCLEANFILES 	= \
+	Makefile.in \
+	aclocal.m4 \
+	configure \
+	config.h.in
 
 # Remove an SVN files from the distribution
 
 dist-hook:
-	-rm -rf `find $(distdir) -name .svn`
+	-rm -rf `find ${distdir} -name .svn`
+	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
 
 # Run the non-standard test suite
 

@@ -18,7 +18,6 @@ libvx_log_a_SOURCES = concat_string.cc concat_string.h \
                vx_log.h
 
 # Build the library when making a distribution so that
-# we can make enum_to_string and create all of the generated
-# sources.
+# we can make enum_to_string and chk4copyright.
 
 dist-hook: $(noinst_LIBRARIES)

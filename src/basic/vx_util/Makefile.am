@@ -59,6 +59,11 @@ asciitablejust_to_string.h asciitablejust_to_string.cc: ascii_table.h
 
 EXTRA_DIST = asciitablejust_to_string.h
 
+# Build the library when making a distribution so that
+# we can make chk4copyright to add the copyright notices.
+
+dist-hook: $(noinst_LIBRARIES)
+
 # Clean up extra local files
 
 clean-local:
