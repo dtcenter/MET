@@ -43,6 +43,8 @@ extern void            parse_sid_mask(const ConcatString &, StringArray &, Conca
 extern StringArray     parse_conf_obs_qty(Dictionary *dict);
 extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
+extern map<ConcatString,ConcatString>
+                       parse_conf_message_type_map(Dictionary *dict);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern InterpInfo      parse_conf_interp(Dictionary *dict);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict);

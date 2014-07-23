@@ -498,6 +498,43 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
+   Dictionary *msg_typ_dict = (Dictionary *) 0;
+   map<ConcatString,ConcatString> m;
+   ConcatString key, val;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_message_type_map() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: message_type_map
+   msg_typ_dict = dict->lookup_array(conf_key_message_type_map);
+
+   // Loop through the array entries
+   for(i=0; i<msg_typ_dict->n_entries(); i++) {
+      
+      // Lookup the key and value
+      key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
+      val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
+
+      if(m.count(key) >= 1) {
+         mlog << Warning << "\nparse_conf_message_type_map() -> "
+              << "found multiple entries for key \""
+              << key << "\"!\n\n";
+      }
+
+      // Add entry to the map
+      m.insert(pair<ConcatString, ConcatString>(key, val));
+   }
+
+   return(m);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 BootInfo parse_conf_boot(Dictionary *dict) {
    BootInfo info;
    int v;
