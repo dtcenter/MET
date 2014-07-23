@@ -35,8 +35,8 @@ using namespace std;
 
 const long FileHandler::HDR_ARRAY_LEN  = 3;  // Observation header length
 const long FileHandler::OBS_ARRAY_LEN  = 5;  // Observation values length
-const long FileHandler::MAX_STRING_LEN  = 40; // Maximum length for strings
-                                              //   in the netCDF file
+const long FileHandler::MAX_STRING_LEN = 40; // Maximum length for strings
+                                             //   in the netCDF file
 
 const float FileHandler::FILL_VALUE = -9999.f;
 

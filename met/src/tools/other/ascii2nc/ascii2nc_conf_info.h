@@ -32,7 +32,12 @@ public:
 
   TimeSummaryInfo getSummaryInfo() const
   {
-    return _timeSummaryInfo;
+     return _timeSummaryInfo;
+  }
+  
+  map<ConcatString,ConcatString> getMessageTypeMap() const
+  {
+     return _messageTypeMap;
   }
   
 protected:
@@ -49,6 +54,7 @@ protected:
 
   ConcatString _version;
   TimeSummaryInfo _timeSummaryInfo;
+  map<ConcatString,ConcatString> _messageTypeMap;
   
 
   ///////////////////////

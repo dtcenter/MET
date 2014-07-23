@@ -52,8 +52,6 @@ protected:
   // Protected members //
   ///////////////////////
 
-  map<ConcatString, ConcatString> MAP_MSG_TYP;
-
 
   ///////////////////////
   // Protected methods //

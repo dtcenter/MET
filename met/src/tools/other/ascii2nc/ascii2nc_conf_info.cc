@@ -53,6 +53,7 @@ void Ascii2NcConfInfo::init_from_scratch()
 void Ascii2NcConfInfo::clear()
 {
    _version.clear();
+   _messageTypeMap.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,6 +89,7 @@ void Ascii2NcConfInfo::process_config()
   check_met_version(_version);
 
   _timeSummaryInfo = parse_conf_time_summary(&_conf);
+  _messageTypeMap  = parse_conf_message_type_map(&_conf);
   
    return;
 }
