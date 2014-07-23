@@ -377,7 +377,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          else if( vinfo_lty == vinfo->g2_lty_to_level_type((*it)->LvlTyp) ){
 
             double rec_lvl1 = (double)((*it)->LvlVal1);
-            double rec_lvl2 = (double)((*it)->LvlVal1);
+            double rec_lvl2 = (double)((*it)->LvlVal2);
             if( LevelType_Pres == vinfo_lty ){
                rec_lvl1 /= 100;
                rec_lvl2 /= 100;
