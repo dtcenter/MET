@@ -513,14 +513,12 @@ output_flag = {
 // the output of all the different fields).  A value of false means no
 // netcdf output will be generated.
 //
-
 nc_pairs_flag = TRUE;
 
 //
 // The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
 // indicating whether a PostScript plot should be generated summarizing
 // the verification.
-//
 ps_plot_flag = TRUE;
 
 //
@@ -528,7 +526,6 @@ ps_plot_flag = TRUE;
 // and Spearman's Rank Correlation Coefficients (in the CNT line type) should
 // be computed.  Computing them over large datasets is computationally
 // intensive and slows down the runtime significantly.
-//
 rank_corr_flag = FALSE;
 
 //
@@ -622,6 +619,10 @@ version = "V4.1";
 //
 // Ascii2NcConfig_default
 //
+// A configuration file may be passed to the ascii2nc tool with the "-config"
+// command line argument.  If not specified, the default configuration file
+// will be used.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -647,7 +648,6 @@ version = "V4.1";
 // "mean", "stdev" (standard deviation), "median" and "p##" (percentile, with
 // the desired percentile value specified in place of ##).
 //
-
 time_summary = {
   flag = FALSE;
   beg = "000000";
@@ -657,6 +657,24 @@ time_summary = {
   grib_code = [ 11, 204, 211 ];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
 }
+
+//
+// The "message_type_map" entry is an array of dictionaries, each containing
+// a "key" string and "val" string.  This defines a mapping of input strings
+// to output message types.  This mapping is currently only applied when 
+// converting input little_r report types to output message types.
+//
+message_type_map = [
+   { key = "FM-12 SYNOP";  val = "ADPSFC"; },
+   { key = "FM-13 SHIP";   val = "SFCSHP"; },
+   { key = "FM-15 METAR";  val = "ADPSFC"; },
+   { key = "FM-18 BUOY";   val = "SFCSHP"; },
+   { key = "FM-281 QSCAT"; val = "ASCATW"; },
+   { key = "FM-32 PILOT";  val = "ADPUPA"; },
+   { key = "FM-35 TEMP";   val = "ADPUPA"; },
+   { key = "FM-88 SATOB";  val = "SATWND"; },
+   { key = "FM-97 ACARS";  val = "AIRCFT"; }
+];
 
 ////////////////////////////////////////////////////////////////////////////////
 //

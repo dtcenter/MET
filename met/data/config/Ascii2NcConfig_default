@@ -23,6 +23,21 @@ time_summary = {
 }
 
 //
+// Mapping of input little_r report types to output message types
+//
+message_type_map = [
+   { key = "FM-12 SYNOP";  val = "ADPSFC"; },
+   { key = "FM-13 SHIP";   val = "SFCSHP"; },
+   { key = "FM-15 METAR";  val = "ADPSFC"; },
+   { key = "FM-18 BUOY";   val = "SFCSHP"; },
+   { key = "FM-281 QSCAT"; val = "ASCATW"; },
+   { key = "FM-32 PILOT";  val = "ADPUPA"; },
+   { key = "FM-35 TEMP";   val = "ADPUPA"; },
+   { key = "FM-88 SATOB";  val = "SATWND"; },
+   { key = "FM-97 ACARS";  val = "AIRCFT"; }
+];
+
+//
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
