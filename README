@@ -138,60 +138,142 @@ platforms and compilers, please refer to the MET User's Guide in the doc/
 sub-directory, or the MET Online Tutorial:
   http://www.dtcenter.org/met/users/support/online_tutorial
 
-- In the top level directory, sample configuration files named user_defs.mk
-  are provided for compiling with GNU, PGI, Intel, or IBM compilers.
-  Make a copy of appropriate configuration file.  For example:
-   - cp user_defs_gnu.mk user_defs.mk
+- Set environment variables to point to the locations of the needed third party
+  libraries.  For each library, there are three possible environment variables.
+  If the library is installed in one location with an "include" subdirectory
+  containing the include files and a "lib" directory containing the library files,
+  the $MET_<lib> environment should be set to point to that main directory.
+  If the include and library files files are installed in any other way, the
+  $MET_<lib>INC and $MET_<lib>INC environment variables should both be set, with
+  $MET_<lib>INC pointing to the directory with the include files and $MET_<lib>LIB
+  pointing to the directory with the library files.  If $MET_<lib>INC and
+  $MET_<lib>LIB are defined, then $MET_<lib> is ignored.
 
-- Next, configure the user_defs.mk file as follows:
-   - Set "MAKE" to the full path for the GNU Make utility.
-   - Set "ARCH_FLAGS" architecture flags as needed.
+   - Set $MET_NETCDF to point to the main NetCDF directory, or set
+     $MET_NETCDFINC to point to the directory with the NetCDF include files
+     and set $MET_NETCDFLIB to point to the directory with the NetCDF
+     library files.
 
-   - Set "CXX" to the full path for your C++ compiler
-     (recommend GNU g++, PGI pgCC, Intel icc, or IBM xlC).
-   - Set "CXX_FLAGS" to the C++ compiler flags to be used.
-   - Set "CXX_LIBS" to link to any additional libraries required for the C++
-     compiler.
+   - Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRINC
+     to point to the directory with the BUFR include files and set $MET_BUFRLIB
+     to point to the directory with the BUFR library files.
 
-   - Set "FC" to the full path for your Fortran compiler
-     (recommend GNU g77/gfortran, PGI pgf77, Intel ifort, or IBM xlf).
-   - Set "FC_FLAGS" to the Fortran compiler flags to be used.
-   - Set "FC_LIBS" to link to any additional libraries required for the Fortran
-     compiler.
+   - Set $MET_GSL to point to the main GSL directory, or set $MET_GSLINC to
+     point to the directory with the GSL include files and set $MET_GSLLIB
+     to point to the directory with the GSL library files.
 
-   - Set "NETCDF_BASE", "NETCDF_INCS", and "NETCDF_LIBS" to point to the
-     location of the NetCDF library.
+   - If compiling support for GRIB2, set $MET_GRIB2C to point to the main
+     GRIB2C directory, or set $MET_GRIB2CINC to point to the directory with
+     the GRIB2C include files and set $MET_GRIB2CLIB to point to the directory
+     with the GRIB2C library files.
 
-   - Set "BUFR_BASE", "BUFR_INCS", and "BUFR_LIBS" to point to the location
-     of the BUFRLIB library.
+   - If compiling MODIS-Regrid, set $MET_HDF to point to the main HDF directory,
+     or set $MET_HDFINC to point to the directory with the HDF include files
+     and set $MET_HDFLIB to point to the directory with the HDF library files.
+     Also, set $MET_HDFEOS to point to the main HDF EOS directory, or set
+     $MET_HDFEOSINC to point to the directory with the HDF EOS include files
+     and set $MET_HDFEOSLIB to point to the directory with the HDF EOS library
+     files.
 
-   - Set "GSL_BASE", "GSL_INCS", and "GSL_LIBS" to point to the location of the
-     GSL library.
+   - If compiling MODE Graphics, set $MET_CAIRO to point to the main Cairo
+     directory, or set $MET_CAIROINC to point to the directory with the Cairo
+     include files and set $MET_CAIROLIB to point to the directory with the
+     Cairo library files. Also, set $MET_FREETYPE to point to the main FreeType
+     directory, or set $MET_FREETYPEINC to point to the directory with the
+     FreeType include files and set $MET_FREETYPELIB to point to the directory
+     with the FreeType library files.
 
-   - Set "F2C_BASE", "F2C_INCS", "F2C_LIBS", and "F2C_LIBNAME" to point to the
-     location of the F2C library.  Or leave empty for compilers which do not
-     require it, such as GNU gfortran and PGI pgf77.
+- Configure the installation for your system using the configure script.  The
+  configure script has command line options to specify where to install MET and
+  which MET utilities to install.  Include any of the following options that
+  apply to your system:
 
-   - If compiling support for GRIB2, set "WITH_GRIB2" to 1 and set
-     "GRIB2C_BASE", "GRIB2C_INCS", and "GRIB2C_LIBS" to point to the location
-     of the GRIB2C library.
+  --prefix=PREFIX
+      By default, MET will install all the files in "/usr/local/bin".  You can
+      specify an installation prefix other than "/usr/local" using "--prefix",
+      for instance "--prefix=$HOME" or "--prefix=`pwd`".
 
-   - If compiling MODIS-Regrid, set "HDF_BASE_DIR" and "HDF_EOS_BASE_DIR" to the
-     top-level library directories containing include and lib subdirectories.
+  --enable-grib2
+      Enable compilation of utilities using GRIB2
 
-   - Edit the "ENABLE_TOOL_NAME" settings if you would like to disable the
-     compilation of any of the MET tools.
+  --disable-ascii2nc
+      Disable compilation of ascii2nc
 
-   - Save and close the user_defs.mk file.
+  --disable-ensemble_stat
+      Disable compilation of ensemble_stat
 
-- Type 'make >& make_met.log &'
+  --disable-gen_poly_mask
+      Disable compilation of gen_poly_mask
+
+  --disable-grid_stat
+      Disable compilation of grid_stat
+ 
+  --disable-madis2nc
+      Disable compilation of madis2nc
+
+  --disable-mode
+      Disable compilation of mode
+
+  --disable-mode_analysis
+      Disable compilation of mode_analysis
+
+  --disable-pb2nc
+      Disable compilation of pb2nc
+
+  --disable-pcp_combine
+      Disable compilation of pcp_combine
+
+  --disable-plot_data_plane
+      Disable compilation of plot_data_plane
+
+  --disable-plot_point_obs
+      Disable compilation of plot_point_obs
+
+  --disable-point_stat
+      Disable compilation of point_stat
+
+  --disable-stat_analysis
+      Disable compilation of stat_analysis
+
+  --disable-wavelet_stat
+      Disable compilation of wavelet_stat
+
+  --disable-series_analysis
+      Disable compilation of series_analysis
+
+  --disable-wwmca
+      Disable compilation of wwmca
+
+  --disable-modis
+      Disable compilation of modis
+
+  --enable-mode_graphics
+      Enable compilation of mode_graphics
+
+  --disable-gen_circle_mask
+      Disable compilation of gen_circle_mask
+
+  --disable-tc_utils
+      Disable compilation of tc_utils
+
+  --disable-block4
+      Disable use of BLOCK4 in the compilation. Use this
+      if you have trouble using PrepBufr files.
+
+  So, to configure MET to install all of the available tools in the "bin"
+  subdirectory of your current directory, you would use the following command:
+
+  ./configure --prefix=`pwd` --enable-grib2 --enable-mode_graphics
+
+- Type 'make install >& make_met.log &'
 
 - Type 'tail -f make_met.log' to view the execution of the make.
 
 - When make is finished, type 'CNTRL-C' to quit the tail.
 
-- If all tools are enabled and the build is successful, the "bin" directory will
-  contain 21 executables:
+- If all tools are enabled and the build is successful, the "<prefix>/bin"
+  directory (where <prefix> is the prefix you specified on your configure
+  command line) will contain 21 executables:
    - ascii2nc
    - ensemble_stat
    - gen_poly_mask
@@ -214,11 +296,9 @@ sub-directory, or the MET Online Tutorial:
    - wwmca_plot
    - wwmca_regrid
 
-- Type 'ls bin' to check for the presence of the executables.
+- Type 'ls <prefix>/bin' to check for the presence of the executables.
 
-- Type 'cd scripts' to enter the scripts directory
-
-- Type './test_all.sh >& test_all.log &' to run all of the test scripts in the
+- Type 'make test >& test_all.log &' to run all of the test scripts in the
   directory.  These test scripts use test data supplied with the tarball.  For
   instructions on running your own data, please refer to the MET User's Guide.
 
@@ -226,11 +306,11 @@ sub-directory, or the MET Online Tutorial:
 
 - When the test script is finished, type 'CNTRL-C' to quit the tail.
 
-- Look in ../out to find the output files for these tests.
+- Look in "out" to find the output files for these tests.
 
 - In particular, check that the PB2NC tool ran without error.  If there was an
-  error, try adding or removing "-DBLOCK4" from the ARCH_FLAGS line in the
-  top-level Makefile.  Then rebuild MET, being sure to run "make clean" first.
+  error, run "make clean" then rerun your configure command adding
+  "--disable-block4" to your configure command line and rebuild MET.
 
 ================================================================================
 Release Notes
