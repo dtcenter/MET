@@ -850,6 +850,68 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([dup2 floor gethostname memset mkdir pow regcomp select setenv sqrt strcasecmp strchr strcspn strerror strncasecmp strrchr strstr])
 
+AC_CHECK_LIB(netcdf, nc_inq_libvers, [
+        echo "NetCDF library found"
+        ], [
+        echo "Error! Couldn't find the NetCDF library."
+        echo "Check your MET_NETCDF environment variable settings and try again."
+        exit -1
+        ])
+
+if test "x$ENABLE_GRIB2" = "xyes"; then
+  AC_CHECK_LIB(grib2c, seekgb, [
+          echo "GRIB2C library found"
+          ], [
+          echo "Error! Couldn't find the GRIB2C library."
+          echo "Check your MET_GRIB2C environment variable settings and try again."
+          exit -1
+          ])
+fi
+
+AC_CHECK_LIB([m],[cos])
+AC_CHECK_LIB([gslcblas],[cblas_dgemm])
+AC_CHECK_LIB(gsl, gsl_blas_dgemm, [
+        echo "GSL library found"
+        ], [
+        echo "Error! Couldn't find the GSL library."
+        echo "Check your MET_GSL environment variable settings and try again."
+        exit -1
+        ], [-lgslcblas -lm])
+
+#AC_CHECK_LIB(bufr, OPENBF, [], [
+#        echo "Error! Couldn't find the BUFR library."
+#        echo "Check your MET_BUFR environment variable settings and try again."
+#        exit -1
+#        ], [-lgslcblas -lm])
+
+#if test "x$ENABLE_MODIS" = "xyes"; then
+#  AC_CHECK_LIB(mfhdf, hdf_close, [], [
+#          echo "Error! Couldn't find the HDF library."
+#          echo "Check your MET_HDF environment variable settings and try again."
+#          exit -1
+#          ])
+#  AC_CHECK_LIB(hdfeos, hdf_close, [], [
+#          echo "Error! Couldn't find the HDF EOS library."
+#          echo "Check your MET_HDFEOS environment variable settings and try again."
+#          exit -1
+#          ])
+#fi
+
+#if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+#  AC_CHECK_LIB(cairo, hdf_close, [], [
+#          echo "Error! Couldn't find the Cairo library."
+#          echo "Check your MET_CAIRO environment variable settings and try again."
+#          exit -1
+#          ])
+#  AC_CHECK_LIB(freetype, hdf_close, [], [
+#          echo "Error! Couldn't find the FreeType library."
+#          echo "Check your MET_FREETYPE environment variable settings and try again."
+#          exit -1
+#          ])
+#fi
+
+# Create configured files
+
 AC_CONFIG_FILES([Makefile
                  data/Makefile
                  data/colortables/Makefile
