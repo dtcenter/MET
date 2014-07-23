@@ -36,6 +36,8 @@
 //                                     on the command line.
 //   011    07-07-14  Halley Gotway  Added the mask_grid and mask_poly
 //                                     options to filter spatially.
+//   012    07-23-14  Halley Gotway  Add message_type_map configuration
+//                                     file option.
 //                                    
 ////////////////////////////////////////////////////////////////////////
 
@@ -77,7 +79,7 @@ using namespace std;
 // Constants
 static const char *program_name = "ascii2nc";
 
-static const string DEFAULT_CONFIG_FILENAME =
+static const char *DEFAULT_CONFIG_FILENAME =
   "MET_BASE/config/Ascii2NcConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,7 +99,7 @@ static ASCIIFormat ascii_format = ASCIIFormat_None;
 static vector< ConcatString > asfile_list;
 static ConcatString ncfile;
 
-static bool config_file_used = false;
+static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 static Ascii2NcConfInfo config_info;
 
 static Grid grid_mask;
@@ -145,10 +147,10 @@ int main(int argc, char *argv[]) {
    //
    // Add the options function calls
    //
-   cline.add(set_format, "-format", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_config, "-config", 1);
+   cline.add(set_format,    "-format",    1);
+   cline.add(set_logfile,   "-log",       1);
+   cline.add(set_verbosity, "-v",         1);
+   cline.add(set_config,    "-config",    1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
    
@@ -171,6 +173,13 @@ int main(int argc, char *argv[]) {
    ncfile = cline[cline.n() - 1];
 
    //
+   // Read the config file
+   //
+   mlog << Debug(1)
+        << "Config File: " << config_filename << "\n";
+   config_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
+   
+   //
    // Create the file handler based on the ascii format specified on
    // the command line.  If one wasn't specified, we'll look in the
    // first file to guess the format.
@@ -188,21 +197,24 @@ int main(int argc, char *argv[]) {
    if(poly_mask.n_points() > 0)                 file_handler->setPolyMask(poly_mask);
 
    //
+   // Load the message type map
+   //
+   file_handler->setMessageTypeMap(config_info.getMessageTypeMap());
+   
+   //
    // Process the files.  If a configuration file was specified, do any
    // extra processing specified.
    //
    file_handler->readAsciiFiles(asfile_list);
 
-   if (config_file_used)
+   //
+   // Summarize the observations, if directed.  We need to use a different
+   // call to writeNetcdfFile in this case so that we can include the
+   // summarization details.
+   //
+   if (config_info.getSummaryInfo().flag)
    {
-     // Summarize the observations, if directed.  We need to use a different
-     // call to writeNetcdfFile in this case so that we can include the
-     // summarization details.
-
-     if (config_info.getSummaryInfo().flag)
-     {
-       file_handler->summarizeObs(config_info.getSummaryInfo());
-     }
+      file_handler->summarizeObs(config_info.getSummaryInfo());
    }
 
    int status = file_handler->writeNetcdfFile(ncfile.text());
@@ -420,17 +432,8 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_config(const StringArray & a)
-{
-  config_file_used = true;
-  
-  ConcatString config_filename = a[0];
-
-  // List the config file
-  mlog << Debug(1)
-       << "Config File: " << config_filename << "\n";
-
-  // Read the config files
-  config_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
+{  
+  config_filename = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////

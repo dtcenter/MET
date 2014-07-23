@@ -73,19 +73,6 @@ static const char *lr_rpt_reg_exp = "FM-[0-9]";
 LittleRHandler::LittleRHandler(const string &program_name) :
   FileHandler(program_name)
 {
-
-   //
-   // Load mapping of report types to message types
-   //
-   MAP_MSG_TYP["FM-12 SYNOP" ] = "ADPSFC";
-   MAP_MSG_TYP["FM-13 SHIP"  ] = "SFCSHP";
-   MAP_MSG_TYP["FM-15 METAR" ] = "ADPSFC";
-   MAP_MSG_TYP["FM-18 BUOY"  ] = "SFCSHP";
-   MAP_MSG_TYP["FM-281 QSCAT"] = "ASCATW";
-   MAP_MSG_TYP["FM-32 PILOT" ] = "ADPUPA";
-   MAP_MSG_TYP["FM-35 TEMP"  ] = "ADPUPA";
-   MAP_MSG_TYP["FM-88 SATOB" ] = "SATWND";
-   MAP_MSG_TYP["FM-97 ACARS" ] = "AIRCFT";
 }
 
 
@@ -160,9 +147,12 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     concat_string.ws_strip();
     ConcatString hdr_typ;
     
-    if (MAP_MSG_TYP[concat_string])
+    if (_messageTypeMap[concat_string])
     {
-      hdr_typ = MAP_MSG_TYP[concat_string];
+      hdr_typ = _messageTypeMap[concat_string];
+      mlog << Debug(5)
+           << "Switching little_r report type \"" << concat_string
+           << "\" to message type \"" << hdr_typ << "\".\n";
     }
     else
     {

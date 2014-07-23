@@ -38,6 +38,7 @@
 #include "summary_key.h"
 #include "time_summary_interval.h"
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -53,6 +54,7 @@ public:
   
   void setGridMask(Grid     &g);
   void setPolyMask(MaskPoly &p);
+  void setMessageTypeMap(map<ConcatString, ConcatString> m);
   
   bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
   bool writeNetcdfFile(const string &nc_filename);
@@ -99,9 +101,11 @@ protected:
 
   Grid     *_gridMask;
   MaskPoly *_polyMask;
-  
+
+  map<ConcatString, ConcatString> _messageTypeMap;
+
   bool _dataSummarized;
-  TimeSummaryInfo _summaryInfo;
+  TimeSummaryInfo _summaryInfo;  
   
   // List of observations read from the ascii files
 
@@ -295,6 +299,10 @@ protected:
 
 inline void FileHandler::setGridMask(Grid     &g) { _gridMask = &g; }
 inline void FileHandler::setPolyMask(MaskPoly &p) { _polyMask = &p; }
+inline void FileHandler::setMessageTypeMap(map<ConcatString, ConcatString> m) {
+   _messageTypeMap = m;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
