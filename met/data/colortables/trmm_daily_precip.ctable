@@ -1,0 +1,16 @@
+// First two columns indicate range of values followed by the color for that range
+// A colortable with min/max values of 0 and 1 will be rescaled to the min/max
+// values to be plotted.
+
+-100000    0    { 160,  32, 240 }
+0.0000  20.0 { 104,  34, 139 }
+20.0 40.0 {   0,   0, 238 }
+40.0 60.0 {  30, 144, 255 }
+60.0 80.0 {   0, 229, 238 }
+80.0 100.0 {  67, 205, 128 }
+100.0 120.0 {   0, 238,   0 }
+120.0 140.0 { 179, 238,  58 }
+140.0 160.0 { 255, 215,   0 }
+160.0 180.0 { 238, 173,  14 }
+180.0 200.0 { 238, 154,   0 }
+200.0 300.0 { 238,  44,  44 }
