@@ -152,26 +152,13 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_BUFR], [Where bufr lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_BUFRINC], [Where bufr include files are located. Use if the libraries and include files are not under the same main bufr directory.  If used, MET_BUFRLIB must also be defined and MET_BUFR will be ignored.])
-AC_ARG_VAR([MET_BUFRLIB], [Where bufr libraries are located. Use if the libraries and include files are not under the same main bufr directory.  If used, MET_BUFRINC must also be defined and MET_BUFR will be ignored.])
-
-# Ensure that both or neither are specified.
-
-if (test -n "$MET_BUFRLIB" && test -z "$MET_BUFRINC") || \
-   (test -n "$MET_BUFRINC" && test -z "$MET_BUFRLIB"); then
-  if test -n "$MET_BUFRLIB"; then
-    AC_MSG_ERROR([MET_BUFRLIB environment variable set, but MET_BUFRINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_BUFRINC environment variable set, but MET_BUFRLIB not set.  If one of these variables is set, then both must be set.])
-  fi
-fi 
+AC_ARG_VAR([MET_BUFR], [Where bufr lib subdirectory is located.  If it is installed in /usr/local, you don't have to specify it.])
+AC_ARG_VAR([MET_BUFRLIB], [Where bufr libraries are located. Use if the library files are not in a bin subdirectory.  If used MET_BUFR will be ignored.])
 
 # If the individual locations weren't specified, then the main Bufr directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
 if test -z "$MET_BUFRLIB" && test -n "$MET_BUFR"; then
-   MET_BUFRINC='${MET_BUFR}/include'
    MET_BUFRLIB='${MET_BUFR}/lib'
 fi
 
@@ -179,7 +166,6 @@ fi
 # libraries were found so no need to check
 
 if test -n "$MET_BUFRLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_BUFRINC}"
    LDFLAGS="${LDFLAGS} -L${MET_BUFRLIB}"
 fi
 

@@ -154,9 +154,10 @@ sub-directory, or the MET Online Tutorial:
      and set $MET_NETCDFLIB to point to the directory with the NetCDF
      library files.
 
-   - Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRINC
-     to point to the directory with the BUFR include files and set $MET_BUFRLIB
-     to point to the directory with the BUFR library files.
+   - Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRLIB
+     to point to the directory with the BUFR library files.  Because we don't
+     use any BUFR library include files, you don't need to specify
+     $MET_BUFRINC.
 
    - Set $MET_GSL to point to the main GSL directory, or set $MET_GSLINC to
      point to the directory with the GSL include files and set $MET_GSLLIB
