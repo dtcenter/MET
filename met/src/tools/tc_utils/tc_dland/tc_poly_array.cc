@@ -20,7 +20,114 @@ using namespace std;
 #include "vx_math.h"
 #include "nav.h"
 
-#include "tc_poly_array.h"
+#include "tc_poly.h"
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class TCPoly
+//
+////////////////////////////////////////////////////////////////////////
+
+TCPoly::TCPoly() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCPoly::~TCPoly() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCPoly::TCPoly(const TCPoly & p) {
+   
+   init_from_scratch();
+
+   assign(p);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCPoly & TCPoly::operator=(const TCPoly & p) {
+
+   if(this == &p) return(*this);
+
+   assign(p);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCPoly::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCPoly::clear() {
+
+   Name.clear();
+   LatLon.clear();
+   LatCen = bad_data_double;
+   LonCen = bad_data_double;
+   GnomonProj.clear();
+   GnomonXY.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCPoly::assign(const TCPoly & p) {
+   int i;
+
+   clear();
+
+   Name = p.Name;
+   LatLon = p.LatLon;
+   LatCen = p.LatCen;
+   LonCen = p.LonCen;
+   GnomonProj = p.GnomonProj;
+   GnomonXY = p.GnomonXY;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TCPoly::min_dist(double lat, double lon) const {
+   int i, j;
+   double dcur, dmin, x, y;
+
+   // Loop through the current polyline points
+   for(i=0, dmin=bad_data_double; i<LatLon.n_points; i++) {
+
+      // Wrap around from the last point back to the first
+      j = (i+1) % LatLon.n_points;
+
+      dcur = gc_dist_to_line(LatLon.v[i], LatLon.u[i],
+                             LatLon.v[j], LatLon.u[j],
+                             lat, lon);
+
+      // Keep track of the polyline minimum
+      if(is_bad_data(dmin)) dmin = dcur;
+      if(dcur < dmin)       dmin = dcur;
+   }
+
+   // Attempt to convert from lat/lon to gnmon xy
+   if(GnomonProj.latlon_to_uv(lat, lon, x, y)) {
+
+      // Inside the polyline is negative distance
+      if(GnomonXY.is_inside(x, y)) dmin *= -1.0;
+   }
+
+   return(dmin);
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -62,7 +169,7 @@ TCPolyArray & TCPolyArray::operator=(const TCPolyArray & a) {
 
 void TCPolyArray::init_from_scratch() {
 
-   Poly = (Polyline *) 0;
+   Poly = (TCPoly *) 0;
 
    clear();
 
@@ -73,9 +180,11 @@ void TCPolyArray::init_from_scratch() {
 
 void TCPolyArray::clear() {
 
-   if(Poly) { delete [] Poly;  Poly = (Polyline *) 0; }
-
+   if(Poly) { delete [] Poly;  Poly = (TCPoly *) 0; }
+   
    NPolys = NAlloc = 0;
+
+   CheckDist = bad_data_double;
 
    return;
 }
@@ -94,6 +203,7 @@ void TCPolyArray::assign(const TCPolyArray & a) {
    for(i=0; i<(a.NPolys); i++) Poly[i] = a.Poly[i];
 
    NPolys = a.NPolys;
+   CheckDist = a.CheckDist;
 
    return;
 }
@@ -111,9 +221,9 @@ void TCPolyArray::extend(int n) {
 
    n = k*tc_poly_array_alloc_inc;
 
-   Polyline * p = (Polyline *) 0;
+   TCPoly * p = (TCPoly *) 0;
 
-   p = new Polyline [n];
+   p = new TCPoly [n];
 
    if(!p) {
       mlog << Error
@@ -124,10 +234,10 @@ void TCPolyArray::extend(int n) {
 
    if(Poly) {
       for(i=0; i<NPolys; i++) p[i] = Poly[i];
-      delete [] Poly; Poly = (Polyline *) 0;
+      delete [] Poly; Poly = (TCPoly *) 0;
    }
 
-   Poly = p; p = (Polyline *) 0;
+   Poly = p; p = (TCPoly *) 0;
 
    NAlloc = n;
 
@@ -136,7 +246,7 @@ void TCPolyArray::extend(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-Polyline TCPolyArray::operator[](int n) const {
+TCPoly TCPolyArray::operator[](int n) const {
 
    if(n < 0 || n >= NPolys) {
       mlog << Error << "\nTCPolyArray::operator[](int) const -> "
@@ -149,7 +259,8 @@ Polyline TCPolyArray::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCPolyArray::add(const Polyline &p) {
+void TCPolyArray::add(const TCPoly & p) {
+   double lat, lon;
 
    extend(NPolys + 1);
    
@@ -162,8 +273,8 @@ void TCPolyArray::add(const Polyline &p) {
 
 bool TCPolyArray::add_file(const char *filename) {
    ifstream in;
-   Polyline p;
-   int n;
+   TCPoly p;
+   int n = 0;
    
    // Open the input file
    in.open(filename);
@@ -188,38 +299,51 @@ bool TCPolyArray::add_file(const char *filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double TCPolyArray::min_dist(double clat, double clon) const {
+void TCPolyArray::set_check_dist() {
+   int i;
+   NumArray dsp, dnp;
+ 
+   // Compute the distance from the polyline centroid to the north
+   // and south poles.
+   for(i=0; i<NPolys; i++) {
+      dnp.add(gc_dist(Poly[i].LatCen, Poly[i].LonCen,  90.0, 0.0));
+      dsp.add(gc_dist(Poly[i].LatCen, Poly[i].LonCen, -90.0, 0.0));
+   }
+   
+   // Find the maximum of the minimum distances to each pole.
+   CheckDist = max(dnp.min(), dsp.min()) + earth_radius_km;
+
+   mlog << Debug(3)
+        << "Skipping distance calculations for points more than "
+        << CheckDist << " km from TC land region centerpoints.\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TCPolyArray::min_dist(double lat, double lon, int &imin) const {
    int i, j;
-   double cur_d, poly_d, min_d;
-
+   double dcur, dmin, dcen, x, y;
+   
    // Loop through the polylines
-   for(i=0, min_d=bad_data_double; i<NPolys; i++) {
+   for(i=0, dmin=bad_data_double; i<NPolys; i++) {
 
-      // Loop through the current polyline points
-      for(j=0, poly_d=bad_data_double; j<Poly[i].n_points-1; j++) {
-
-         // Compute current line segment distance
-         cur_d = min_dist_linesegment(Poly[i].u[j],   Poly[i].v[j],
-                                      Poly[i].u[j+1], Poly[i].v[j+1],
-                                      clon, clat);
-
-         // Keep track of the polyline minimum
-         if(is_bad_data(poly_d)) poly_d = cur_d;
-         if(cur_d < poly_d)      poly_d = cur_d;
+      // Skip polylines whose centroids are too far away
+      if(!is_bad_data(CheckDist)) {
+         dcen = gc_dist(Poly[i].LatCen, Poly[i].LonCen, lat, lon);
+         if(dcen > CheckDist) continue;
       }
 
-      // Inside the polyline is negative distance      
-      if(Poly[i].is_inside(clon, clat) != 0) poly_d *= -1.0;
+      // Get the minimum distance to the current polyline
+      dcur = Poly[i].min_dist(lat, lon);
 
       // Keep track of the array minimum
-      if(is_bad_data(min_d)) min_d = poly_d;
-      if(poly_d < min_d)     min_d = poly_d;
+      if(is_bad_data(dmin)) { dmin = dcur; imin = i; }
+      if(dcur < dmin)       { dmin = dcur; imin = i; }
    }
 
-   // Convert degrees to km
-   min_d *= 111.12;
-
-   return(min_d);
+   return(dmin);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -228,8 +352,9 @@ double TCPolyArray::min_dist(double clat, double clon) const {
 //
 ////////////////////////////////////////////////////////////////////////
 
-bool operator>>(istream & in, Polyline & p) {
+bool operator>>(istream & in, TCPoly & p) {
    int i, n;
+   double x, y;
 
    p.clear();
 
@@ -251,25 +376,38 @@ bool operator>>(istream & in, Polyline & p) {
    name[8] = '\0';
    name_cs = name;
    name_cs.ws_strip();
-   p.set_name(name_cs);
+   p.Name = name_cs;
    
    mlog << Debug(4)
-        << "Reading " << n << " points for the \""
-        << p.name << "\" region.\n";
+        << "Reading " << n << " points for TC land region \""
+        << p.Name << "\".\n";
 
    // Parse the lat/lon data lines
    for(i=0; i<n; i++) {
       if(!line.read_line(in)) return (false);
       a = line.split(" ");
       // Convert from degrees east to west
-      p.add_point(rescale_lon(-1.0*atof(a[0])), atof(a[1]));
+      p.LatLon.add_point(rescale_lon(-1.0*atof(a[0])), atof(a[1]));
    }
    
-   if(p.n_points < 2) {
+   if(p.LatLon.n_points < 2) {
       mlog << Error
            << "bool operator>>(istream & in, Polyline & p) -> "
-           << "region \"" << p.name << "\" must have at least 2 points.\n\n";
+           << "region \"" << p.Name
+           << "\" must have at least 2 points.\n\n";
       exit(1);
+   }
+
+   // Set up the gnomonic projection
+   p.LatLon.centroid(p.LonCen, p.LatCen);
+   mlog << Debug(4) << "TC land region \"" << p.Name
+        << "\" centerpoint ("  << p.LatCen << ", " << p.LonCen << ").\n";
+   p.GnomonProj.set_center(p.LatCen, p.LonCen);
+
+   // Convert from lat/lon to gnomon xy
+   for(i=0; i<p.LatLon.n_points; i++) {
+      p.GnomonProj.latlon_to_uv(p.LatLon.v[i], p.LatLon.u[i], x, y);
+      p.GnomonXY.add_point(x, y);
    }
 
    return(true);

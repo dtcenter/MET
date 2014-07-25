@@ -15,6 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    03/19/12  Halley Gotway   New
+//   001    07/25/14  Halley Gotway   Add -land option and update how
+//                                    distances are computed.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -43,7 +45,7 @@ using namespace std;
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "write_netcdf.h"
-#include "tc_poly_array.h"
+#include "tc_poly.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -182,6 +184,8 @@ void process_land_data() {
            << replace_path(land_data_files[i]) << "\n";
       land_array.add_file(replace_path(land_data_files[i]));
    }
+
+   land_array.set_check_dist();
    
    return;
 }
@@ -189,7 +193,7 @@ void process_land_data() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_distances() {
-   int n, x, y, c;
+   int n, x, y, c, npts, nlog, imin;
    double lat, lon;
    float *dland = (float *) 0;
 
@@ -237,6 +241,7 @@ void process_distances() {
    dland_var = f_out->add_var("dland", ncFloat, lat_dim, lon_dim);
    dland_var->add_att("long_name", "distance to land");
    dland_var->add_att("units", "nm");
+   dland_var->add_att("_FillValue", bad_data_float);
 
    // Allocate memory to store the data values for each grid point
    dland = new float [grid.nx()*grid.ny()];
@@ -244,15 +249,19 @@ void process_distances() {
    // Dump out grid info
    mlog << Debug(2)
         << "Computing distances for " << grid.nx() * grid.ny()
-        << " points in grid (" << grid.serialize() << ")\n";
-        
-   // Loop over the grid and compute the distance to land for each point
-   if(mlog.verbosity_level() == 3) cout << "Processing" << flush;
+        << " points in grid (" << grid.serialize() << ")...\n";
+
+   // Determine how often to update the status
+   npts = grid.nx()*grid.ny();
+   nlog = npts/20;
+
+   // Loop over the grid and compute the distance to land for each point   
    for(x=0,c=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
-         if(++c % (int) (grid.nx()*grid.ny()/100) == 0 &&
-            mlog.verbosity_level() == 3) cout << "." << flush;
+         if(++c % nlog == 0 && mlog.verbosity_level() == 3) {
+            cout << nint((double) c/npts*100.0) << "% " << flush;
+         }
 
          // Call two_to_one
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
@@ -262,20 +271,20 @@ void process_distances() {
          lon = rescale_deg(lon, -180.0, 180.0);
 
          // Compute distance to land
-         dland[n] = land_array.min_dist(lat, lon);
+         dland[n] = land_array.min_dist(lat, lon, imin);
 
          // Convert to nuatical miles
-         dland[n] *= nautical_miles_per_km;
+         if(!is_bad_data(dland[n])) dland[n] *= nautical_miles_per_km;
 
          mlog << Debug(4)
-              << "Lat = " << lat
-              << ", Lon = " << lon
-              << ", Dist = " << dland[n] << " nm\n";
+              << "Lat = " << lat << ", Lon = " << lon
+              << ", Dist from \"" << land_array[imin].name()
+              << "\" = " << dland[n] << " nm\n";
 
       } // end for y
    } // end for x
 
-   if(mlog.verbosity_level() >= 3) cout << "done.\n" << flush;
+   if(mlog.verbosity_level() == 3) cout << "\n" << flush;
 
    // Write the computed distances to the output file
    mlog << Debug(3) << "Writing distance to land variable.\n";
