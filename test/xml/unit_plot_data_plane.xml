@@ -174,4 +174,32 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_TRMM_3B42_3hourly_nc">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42.20131125.03.7.G3.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42.20131125.03.7.G3.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -color_table &MET_BASE;/colortables/trmm_3hourly_precip.ctable \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42.20131125.03.7.G3.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_TRMM_3B42_daily_nc">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42_daily.2013.11.30.7.G3.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -color_table &MET_BASE;/colortables/trmm_daily_precip.ctable \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps</ps>
+    </output>
+  </test>
+
 </met_test>
