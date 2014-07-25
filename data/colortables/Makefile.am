@@ -25,6 +25,8 @@ ctable_DATA = \
 	mode_obj.ctable \
 	mode_raw.ctable \
 	nws_radar_precip.ctable \
+	trmm_3hourly_precip.ctable \
+	trmm_daily_precip.ctable \
 	wrf_precip2.ctable \
 	wrf_precip.ctable \
 	wrf_precip_gray.ctable
