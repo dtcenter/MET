@@ -29,6 +29,18 @@ using namespace std;
 //////////////////////////////////////////////////////////////////
 
 
+struct Vector3D {
+   double x, y, z;
+};
+
+extern Vector3D latlon_to_xyz(double lat, double lon);
+extern void xyz_to_latlon(Vector3D v, double &lat, double &lon);
+extern Vector3D cross_product(Vector3D v1, Vector3D v2);
+   
+
+//////////////////////////////////////////////////////////////////
+
+
    //
    //  gc_dist
    //
@@ -515,4 +527,102 @@ return;
 //////////////////////////////////////////////////////////////////
 
 
+   //
+   //  gc_dist_to_line
+   //
+   //  Calculates the great circle arc distance from the point
+   //     (lat3, lon3) to the great circle arc connecting
+   //     (lat1, lon1) and (lat2, lon2).
+   //
+   //  Units for latitudes and longitudes are degrees
+   //
+   //  Units for dist are kilometers
+   //
 
+
+//////////////////////////////////////////////////////////////////
+
+
+double gc_dist_to_line(double lat1, double lon1,
+                       double lat2, double lon2,
+                       double lat3, double lon3) {
+   double r = earth_radius_km;
+   Vector3D a, b, c, g, f, t;
+   double lat4, lon4, dist12, dist14, dist24, dist;
+
+   // Convert to cartesian coordinates
+   a = latlon_to_xyz(lat1, lon1);
+   b = latlon_to_xyz(lat2, lon2);
+   c = latlon_to_xyz(lat3, lon3);
+
+   // Compute intersection of arc AB with perpendicular from C
+   g = cross_product(a, b);
+   f = cross_product(c, g);
+   t = cross_product(g, f);
+
+   // Convert intersection point from cartesian back to lat/lon
+   xyz_to_latlon(t, lat4, lon4);
+   
+   // Length of the arc segment
+   dist12 = gc_dist(lat1, lon1, lat2, lon2);
+   
+   // Distance from intersection point to end points
+   dist14 = gc_dist(lat1, lon1, lat4, lon4);
+   dist24 = gc_dist(lat2, lon2, lat4, lon4);
+   
+   // If intersection is between the end points,
+   // use the perpendicular distance
+   if(dist14 <= dist12 && dist24 <= dist12) {
+      dist = gc_dist(lat3, lon3, lat4, lon4);
+   }
+   // Otherwise, use the minimum distance to the end points
+   else {
+      dist = min(gc_dist(lat1, lon1, lat3, lon3),
+                 gc_dist(lat2, lon2, lat3, lon3));
+   }
+   
+   return(dist);  
+}
+
+//////////////////////////////////////////////////////////////////
+
+Vector3D latlon_to_xyz(double lat, double lon) {
+   Vector3D v;
+   
+   v.x = cosd(lat) * cosd(lon) * earth_radius_km;
+   v.y = cosd(lat) * sind(lon) * earth_radius_km;
+   v.z = sind(lat) * earth_radius_km;
+   
+   return(v);
+}
+
+//////////////////////////////////////////////////////////////////
+
+void xyz_to_latlon(Vector3D v, double &lat, double &lon) {
+   
+   // Normalize to unit vector
+   double length = sqrt((v.x*v.x)+(v.y*v.y)+(v.z*v.z));
+   v.x /= length;
+   v.y /= length;
+   v.z /= length;
+
+   // Convert to lat/lon
+   lat = asind(v.z);
+   lon = atan2d(v.y, v.x);
+
+   return;
+}
+
+//////////////////////////////////////////////////////////////////
+
+Vector3D cross_product(Vector3D v1, Vector3D v2) {
+   Vector3D v;
+   
+   v.x = v1.y*v2.z - v2.y*v1.z;
+   v.y = v2.x*v1.z - v1.x*v2.z;
+   v.z = v1.x*v2.y - v1.y*v2.x; 
+   
+   return(v);
+}
+
+//////////////////////////////////////////////////////////////////

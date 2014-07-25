@@ -38,6 +38,9 @@ extern double        haversine(double a);
 extern double       ahaversine(double t);
 extern double        meridional_parts(double a);
 
+extern double  gc_dist_to_line(double lat1, double lon1,
+                               double lat2, double lon2,
+                               double lat3, double lon3);
 
 //////////////////////////////////////////////////////////////////
 
