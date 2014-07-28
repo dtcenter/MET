@@ -23,6 +23,7 @@ tcdata_DATA = \
 	wland.dat \
 	shland.dat \
 	dland_nw_hem_tenth_degree.nc \
+	dland_global_tenth_degree.nc \
 	wwpts_us.txt
 
 EXTRA_DIST = ${tcdata_DATA}
