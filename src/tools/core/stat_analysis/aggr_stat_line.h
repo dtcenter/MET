@@ -19,6 +19,7 @@
 //                    aggr_orank_lines.
 //   002    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   003    06/03/14  Halley Gotway   Add aggregate PHIST lines.
+//   004    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,6 +77,7 @@ struct AggrPSumInfo {
 
 struct AggrWindInfo {
    VL1L2Info vl1l2_info;
+   StringArray hdr_sa;
    NumArray uf_na, vf_na, uo_na, vo_na;
 };
 
@@ -148,6 +150,11 @@ extern void aggr_psum_lines(
                int &, int &);
 
 extern void aggr_wind_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrWindInfo> &,
+               int &, int &);
+
+extern void aggr_mpr_wind_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrWindInfo> &,
                int &, int &);

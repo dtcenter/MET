@@ -23,6 +23,7 @@
 //                    checking and add input line to error messages.
 //   005    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   006    06/03/14  Halley Gotway   Add aggregate PHIST lines.
+//   007    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -878,6 +879,273 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          n_out++;
       }
    } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
+                     map<ConcatString, AggrWindInfo> &m,
+                     int &n_in, int &n_out) {
+   STATLine line;
+   AggrWindInfo aggr;
+   VL1L2Info v_info;
+   MPRData cur;
+   ConcatString hdr, key;
+   double uf, vf, uo, vo, fwind, owind;
+   bool is_ugrd;
+   int i;
+   map<ConcatString, AggrWindInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         j.dump_stat_line(line);
+
+         parse_mpr_line(line, cur);
+         is_ugrd = (cur.fcst_var == "UGRD");
+         uf      = (is_ugrd ? cur.fcst        : bad_data_double);
+         uo      = (is_ugrd ? cur.obs         : bad_data_double);
+         vf      = (is_ugrd ? bad_data_double : cur.fcst);
+         vo      = (is_ugrd ? bad_data_double : cur.obs);
+
+         //
+         // Build header string for matching UGRD and VGRD lines
+         //
+         hdr << cs_erase
+             << line.model() << ":"
+             << sec_to_hhmmss(line.fcst_lead()) << ":"
+             << unix_to_yyyymmdd_hhmmss(line.fcst_valid_beg()) << ":"
+             << unix_to_yyyymmdd_hhmmss(line.fcst_valid_end()) << ":"
+             << sec_to_hhmmss(line.obs_lead()) << ":"
+             << unix_to_yyyymmdd_hhmmss(line.obs_valid_beg()) << ":"
+             << unix_to_yyyymmdd_hhmmss(line.obs_valid_end()) << ":"
+             << line.fcst_lev() << ":"
+             << line.obs_lev() << ":"
+             << line.obtype() << ":"
+             << line.vx_mask() << ":"
+             << line.interp_mthd() << ":"
+             << line.interp_pnts() << ":"
+             << cur.obs_sid << ":"
+             << cur.obs_lat << ":"
+             << cur.obs_lon << ":"
+             << cur.obs_lvl << ":"
+             << cur.obs_elv;
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            
+            //
+            // Clear contents
+            //
+            aggr.vl1l2_info.clear();
+            aggr.hdr_sa.clear();
+            aggr.uf_na.clear();
+            aggr.vf_na.clear();
+            aggr.uo_na.clear();
+            aggr.vo_na.clear();
+            
+            //
+            // Initialize values
+            //
+            aggr.hdr_sa.add(hdr);
+            aggr.uf_na.add(uf);
+            aggr.vf_na.add(vf);
+            aggr.uo_na.add(uo);
+            aggr.vo_na.add(vo);
+
+            //
+            // Add the new map entry
+            //
+            m[key] = aggr;
+         }
+         //
+         // Otherwise, add data to existing map entry
+         //
+         else {
+
+            //
+            // Add data for existing header entry
+            //
+            if(m[key].hdr_sa.has(hdr, i)) {
+              
+               //
+               // Check for duplicate UGRD lines
+               //
+               if((!is_bad_data(uf) && !is_bad_data(m[key].uf_na[i])) ||
+                  (!is_bad_data(uo) && !is_bad_data(m[key].uo_na[i]))) {
+                  mlog << Warning << "\naggr_mpr_wind_lines() -> "
+                       << "found duplicate UGRD lines for header:\n"
+                       << hdr << "\n\n";
+               }
+
+               //
+               // Check for duplicate VGRD lines
+               //
+               if((!is_bad_data(vf) && !is_bad_data(m[key].vf_na[i])) ||
+                  (!is_bad_data(vo) && !is_bad_data(m[key].vo_na[i]))) {
+                  mlog << Warning << "\naggr_mpr_wind_lines() -> "
+                       << "found duplicate VGRD lines for header:\n"
+                       << hdr << "\n\n";
+               }
+
+               //
+               // Update the existing values
+               //
+               if(!is_bad_data(uf)) m[key].uf_na.set(i, uf);
+               if(!is_bad_data(vf)) m[key].vf_na.set(i, vf);
+               if(!is_bad_data(uo)) m[key].uo_na.set(i, uo);
+               if(!is_bad_data(vo)) m[key].vo_na.set(i, vo);
+            }
+            //
+            // Add data for a new header entry
+            //
+            else {
+               m[key].hdr_sa.add(hdr);
+               m[key].uf_na.add(uf);
+               m[key].vf_na.add(vf);
+               m[key].uo_na.add(uo);
+               m[key].vo_na.add(vo);
+            }
+         } 
+
+         n_out++;
+      }
+   } // end while
+
+   //
+   // Loop over the map entries, discarding orphans and
+   // applyling the wind speed thresholds.
+   //
+   for(it = m.begin(); it != m.end(); it++) {
+
+      //
+      // Clear contents
+      //
+      aggr.vl1l2_info.clear();
+      aggr.hdr_sa.clear();
+      aggr.uf_na.clear();
+      aggr.vf_na.clear();
+      aggr.uo_na.clear();
+      aggr.vo_na.clear();
+
+      //
+      // Loop over the pairs for the current map entry
+      //
+      for(i=0; i<it->second.hdr_sa.n_elements(); i++) {
+         
+         //
+         // Check for missing UGRD data
+         //
+         if(is_bad_data(it->second.uf_na[i]) ||
+            is_bad_data(it->second.uo_na[i])) {
+            mlog << Warning << "\naggr_mpr_wind_lines() -> "
+                 << "could not find matching UGRD line for header:\n"
+                 << it->second.hdr_sa[i] << "\n\n";
+            continue;
+         }
+         
+         //
+         // Check for missing VGRD data
+         //
+         if(is_bad_data(it->second.vf_na[i]) ||
+            is_bad_data(it->second.vo_na[i])) {
+            mlog << Warning << "\naggr_mpr_wind_lines() -> "
+                 << "could not find matching VGRD line for header:\n"
+                 << it->second.hdr_sa[i] << "\n\n";
+            continue;
+         }
+
+         //
+         // Apply the wind speed thresholds
+         //
+         if(j.out_fcst_wind_thresh.type != thresh_na ||
+            j.out_obs_wind_thresh.type  != thresh_na) {
+
+            // Compute wind speeds
+            fwind = convert_u_v_to_wind(it->second.uf_na[i], it->second.vf_na[i]);
+            owind = convert_u_v_to_wind(it->second.uo_na[i], it->second.vo_na[i]);
+
+            if(!j.out_fcst_wind_thresh.check(fwind) ||
+               !j.out_obs_wind_thresh.check(owind)) {
+               mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
+                    << "vector forecast ("
+                    << it->second.uf_na[i] << ", " << it->second.vf_na[i]
+                    << ") wind speed (" << fwind << " "
+                    << j.out_fcst_wind_thresh.get_str() << ") or observation ("
+                    << it->second.uo_na[i] << ", " << it->second.vo_na[i]
+                    << ") wind speed (" << owind << " "
+                    << j.out_obs_wind_thresh.get_str()
+                    << ") threshold not met for header:\n"
+                    << it->second.hdr_sa[i] << "\n";
+               continue;
+            }
+         }
+
+         //
+         // Keep running partial sums of matches
+         //
+         v_info.vcount  = 1;
+         v_info.ufbar   = it->second.uf_na[i];
+         v_info.vfbar   = it->second.vf_na[i];
+         v_info.uobar   = it->second.uo_na[i];
+         v_info.vobar   = it->second.vo_na[i];
+         v_info.uvfobar = it->second.uf_na[i]*it->second.uo_na[i] +
+                          it->second.vf_na[i]*it->second.vo_na[i];
+         v_info.uvffbar = it->second.uf_na[i]*it->second.uf_na[i] +
+                          it->second.vf_na[i]*it->second.vf_na[i];
+         v_info.uvoobar = it->second.uo_na[i]*it->second.uo_na[i] +
+                          it->second.vo_na[i]*it->second.vo_na[i];
+         aggr.vl1l2_info += v_info;
+
+         //
+         // Check for vectors of length zero
+         //
+         if((is_eq(it->second.uf_na[i], 0.0) &&
+             is_eq(it->second.vf_na[i], 0.0)) ||
+            (is_eq(it->second.uo_na[i], 0.0) &&
+             is_eq(it->second.vo_na[i], 0.0))) {
+            mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
+                 << "angle not defined for zero forecast ("
+                 << it->second.uf_na[i] << ", " << it->second.vf_na[i]
+                 << ") or observation ("
+                 << it->second.uo_na[i] << ", " << it->second.vo_na[i]
+                 << ") vector for header:\n"
+                 << it->second.hdr_sa[i] << "\n";
+            continue;            
+         }
+
+         //
+         // Convert to and append unit vectors
+         //
+         aggr.hdr_sa.add(it->second.hdr_sa[i]);
+         convert_u_v_to_unit(it->second.uf_na[i], it->second.vf_na[i], uf, vf);
+         convert_u_v_to_unit(it->second.uo_na[i], it->second.vo_na[i], uo, vo);
+         aggr.uf_na.add(uf);
+         aggr.vf_na.add(vf);
+         aggr.uo_na.add(uo);
+         aggr.vo_na.add(vo);
+      }
+
+      //
+      // Reset the map entry
+      //
+      it->second = aggr;
+   }
 
    return;
 }

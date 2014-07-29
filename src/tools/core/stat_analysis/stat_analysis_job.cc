@@ -28,6 +28,7 @@
 //   008    05/08/13  Halley Gotway   Fix bug in write_job_aggr_wind().
 //   009    05/27/14  Halley Gotway   Range check the columns being read.
 //   010    06/03/14  Halley Gotway   Add aggregate PHIST lines.
+//   011    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -704,7 +705,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //    -line_type MPR,           -out_line_type FHO, CTC, CTS,
    //                                             MCTC, MCTS, CNT,
    //                                             SL1L2, SAL1L2,
-   //                                             PCT, PSTD, PJC, PRC
+   //                                             PCT, PSTD, PJC, PRC,
+   //                                             WDIR (wind direction)
    //    -line_type ORANK,         -out_line_type RHIST, PHIST
    //
 
@@ -764,6 +766,24 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             in_lt  == stat_val1l2) &&
             out_lt == stat_wdir) {
       aggr_wind_lines(f, j, wind_map, n_in, n_out);
+      write_job_aggr_wind(j, in_lt, wind_map, out_at);
+   }
+
+   //
+   // Sum the UGRD and VGRD matched pair lines:
+   //    MPR -> WDIR
+   //
+   else if(in_lt  == stat_mpr &&
+           out_lt == stat_wdir) {
+      
+      mlog << Debug(4) << "do_job_aggr_stat() -> "
+           << "For MPR to WDIR conversion, searching for UGRD and VGRD MPR lines.\n";
+
+      j.fcst_var.clear();
+      j.fcst_var.add("UGRD");
+      j.fcst_var.add("VGRD");
+
+      aggr_mpr_wind_lines(f, j, wind_map, n_in, n_out);
       write_job_aggr_wind(j, in_lt, wind_map, out_at);
    }
 
@@ -1450,12 +1470,17 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       // Compute the mean forecast and observation angles
       // from the unit vectors
       //
-      uf   = it->second.uf_na.sum()/it->second.uf_na.n_elements();
-      vf   = it->second.vf_na.sum()/it->second.vf_na.n_elements();
-      fbar = convert_u_v_to_wdir(uf, vf);
-      uo   = it->second.uo_na.sum()/it->second.uo_na.n_elements();
-      vo   = it->second.vo_na.sum()/it->second.vo_na.n_elements();
-      obar = convert_u_v_to_wdir(uo, vo);
+      if(n > 0) {
+         uf   = it->second.uf_na.sum()/it->second.uf_na.n_elements();
+         vf   = it->second.vf_na.sum()/it->second.vf_na.n_elements();
+         fbar = convert_u_v_to_wdir(uf, vf);
+         uo   = it->second.uo_na.sum()/it->second.uo_na.n_elements();
+         vo   = it->second.vo_na.sum()/it->second.vo_na.n_elements();
+         obar = convert_u_v_to_wdir(uo, vo);
+      }
+      else {
+         uf = vf = fbar = uo = vo = obar = bad_data_double;
+      }
 
       mlog << Debug(4) << "write_job_aggr_wind() -> "
            << "ROW_MEAN_WDIR: average forecast direction (u, v) = ("
@@ -1469,7 +1494,7 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       // Compute the mean error and the mean absolute error
       // from the unit vectors
       //
-      me = mae = 0.0;
+      me = mae = (n > 0 ? 0.0 : bad_data_double);
       for(i=0; i<n; i++) {
 
          angle = angle_difference(it->second.uf_na[i], it->second.vf_na[i],
@@ -1514,7 +1539,7 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       r++;
 
-      if(lt == stat_vl1l2) {
+      if(lt == stat_vl1l2 || lt == stat_mpr) {
          uf    = it->second.vl1l2_info.ufbar;
          vf    = it->second.vl1l2_info.vfbar;
          uo    = it->second.vl1l2_info.uobar;

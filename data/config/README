@@ -1563,7 +1563,8 @@ output_stats = {
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
-//                                                   PCT, PSTD, PJC, PRC
+//                                                   PCT, PSTD, PJC, PRC,
+//                                                   WDIR (wind direction)
 //          Required Args:
 //             -line_type, -out_line_type
 //          Additional Required Args for -line_type MPR:
@@ -1571,7 +1572,9 @@ output_stats = {
 //             When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
 //                                 PCT, PSTD, PJC, PRC
 //          Additional Optional Args for -line_type MPR:
-//             -mask_grid, -mask_poly
+//             -mask_grid, -mask_poly,
+//             -out_fcst_wind_thresh, -out_obs_wind_thresh
+//             When -out_line_type WDIR
 //          Additional Optional Args for -line_type ORANK -out_line_type PHIST:
 //             -out_bin_size
 //
