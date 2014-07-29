@@ -201,11 +201,13 @@ class STATAnalysisJob {
       int         n_dump;    // number of lines written to dump row
       AsciiTable  dump_at;   // AsciiTable for buffering dump row data
 
-      STATLineType out_line_type;   // output line type
-      ThreshArray  out_fcst_thresh; // output forecast threshold(s)
-      ThreshArray  out_obs_thresh;  // output observation threshold
-      double       out_alpha;       // output alpha value
-      double       out_bin_size;    // output PHIST bin size
+      STATLineType out_line_type;        // output line type
+      ThreshArray  out_fcst_thresh;      // output forecast threshold(s)
+      ThreshArray  out_obs_thresh;       // output observation threshold
+      SingleThresh out_fcst_wind_thresh; // output forecast wind speed threshold
+      SingleThresh out_obs_wind_thresh;  // output observation wind speed threshold
+      double       out_alpha;            // output alpha value
+      double       out_bin_size;         // output PHIST bin size
 
       //
       // Variables used for the stat_job_aggr_mpr job type
