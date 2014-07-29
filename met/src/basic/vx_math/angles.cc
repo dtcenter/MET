@@ -156,6 +156,10 @@ if ( is_bad_data(uf) || is_bad_data(vf) || is_bad_data(uo) || is_bad_data(vo) ) 
 convert_u_v_to_unit(uf, vf);
 convert_u_v_to_unit(uo, vo);
 
+   // Check for bad data in the normalized vectors
+
+if ( is_bad_data(uf) || is_bad_data(vf) || is_bad_data(uo) || is_bad_data(vo) )  return ( bad_data_double );
+
    // Compute sums
 
 a = vo*uf - uo*vf;
