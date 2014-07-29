@@ -154,7 +154,8 @@
     </param>
     <output>
       <exist>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT.out</exist>
-      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir.stat</stat>
     </output>
   </test>
 

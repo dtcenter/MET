@@ -30,10 +30,10 @@ obs_init_beg    = "";
 obs_init_end    = "";
 obs_init_hour   = [];
 
-fcst_var = [ "TMP" ];
+fcst_var = [];
 obs_var  = [];
 
-fcst_lev = [ "Z2" ];
+fcst_lev = [];
 obs_lev  = [];
 
 obtype = [];
@@ -62,9 +62,10 @@ weight = [];
 // Array of STAT-Analysis jobs to be performed on the filtered data
 //
 jobs = [
-   "-job aggregate_stat -line_type MPR -out_line_type CNT -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr.stat",
-   "-job aggregate_stat -line_type MPR -out_line_type CNT -by VX_MASK -n_boot_rep 0",
-   "-job aggregate      -line_type CTC                    -by FCST_THRESH"
+   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 -line_type MPR -out_line_type CNT -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt.stat",
+   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 -line_type MPR -out_line_type CNT -by VX_MASK -n_boot_rep 0",
+   "-job aggregate      -fcst_var TMP -fcst_lev Z2 -line_type CTC                    -by FCST_THRESH",
+   "-job aggregate_stat -line_type MPR -out_line_type WDIR -fcst_lev Z10 -out_fcst_wind_thresh >0 -out_obs_wind_thresh >0 -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir.stat"
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
