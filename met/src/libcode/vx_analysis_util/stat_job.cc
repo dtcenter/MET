@@ -170,6 +170,9 @@ void STATAnalysisJob::clear() {
    out_fcst_thresh.clear();
    out_obs_thresh.clear();
 
+   out_fcst_wind_thresh.clear();
+   out_obs_wind_thresh.clear();
+
    // Set to default values
    out_alpha      = default_alpha;
    out_bin_size   = default_bin_size;
@@ -192,75 +195,77 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    clear();
 
-   job_type         = aj.job_type;
+   job_type             = aj.job_type;
 
-   model            = aj.model;
+   model                = aj.model;
 
-   fcst_lead        = aj.fcst_lead;
-   obs_lead         = aj.obs_lead;
+   fcst_lead            = aj.fcst_lead;
+   obs_lead             = aj.obs_lead;
 
-   fcst_valid_beg   = aj.fcst_valid_beg;
-   fcst_valid_end   = aj.fcst_valid_end;
-   fcst_valid_hour  = aj.fcst_valid_hour;
+   fcst_valid_beg       = aj.fcst_valid_beg;
+   fcst_valid_end       = aj.fcst_valid_end;
+   fcst_valid_hour      = aj.fcst_valid_hour;
    
-   obs_valid_beg    = aj.obs_valid_beg;
-   obs_valid_end    = aj.obs_valid_end;
-   obs_valid_hour   = aj.obs_valid_hour;
+   obs_valid_beg        = aj.obs_valid_beg;
+   obs_valid_end        = aj.obs_valid_end;
+   obs_valid_hour       = aj.obs_valid_hour;
    
-   fcst_init_beg    = aj.fcst_init_beg;
-   fcst_init_end    = aj.fcst_init_end;
-   fcst_init_hour   = aj.fcst_init_hour;
+   fcst_init_beg        = aj.fcst_init_beg;
+   fcst_init_end        = aj.fcst_init_end;
+   fcst_init_hour       = aj.fcst_init_hour;
    
-   obs_init_beg     = aj.obs_init_beg;
-   obs_init_end     = aj.obs_init_end;
-   obs_init_hour    = aj.obs_init_hour;
+   obs_init_beg         = aj.obs_init_beg;
+   obs_init_end         = aj.obs_init_end;
+   obs_init_hour        = aj.obs_init_hour;
 
-   fcst_var         = aj.fcst_var;
-   obs_var          = aj.obs_var;
+   fcst_var             = aj.fcst_var;
+   obs_var              = aj.obs_var;
 
-   fcst_lev         = aj.fcst_lev;
-   obs_lev          = aj.obs_lev;
+   fcst_lev             = aj.fcst_lev;
+   obs_lev              = aj.obs_lev;
 
-   obtype           = aj.obtype;
+   obtype               = aj.obtype;
 
-   vx_mask          = aj.vx_mask;
+   vx_mask              = aj.vx_mask;
 
-   interp_mthd      = aj.interp_mthd;
-   interp_pnts      = aj.interp_pnts;
+   interp_mthd          = aj.interp_mthd;
+   interp_pnts          = aj.interp_pnts;
 
-   fcst_thresh      = aj.fcst_thresh;
-   obs_thresh       = aj.obs_thresh;
-   cov_thresh       = aj.cov_thresh;
+   fcst_thresh          = aj.fcst_thresh;
+   obs_thresh           = aj.obs_thresh;
+   cov_thresh           = aj.cov_thresh;
 
-   alpha            = aj.alpha;
+   alpha                = aj.alpha;
 
-   line_type        = aj.line_type;
-   column           = aj.column;
-   weight           = aj.weight;
+   line_type            = aj.line_type;
+   column               = aj.column;
+   weight               = aj.weight;
 
-   column_min_name  = aj.column_min_name;
-   column_min_value = aj.column_min_value;
+   column_min_name      = aj.column_min_name;
+   column_min_value     = aj.column_min_value;
 
-   column_max_name  = aj.column_max_name;
-   column_max_value = aj.column_max_value;
+   column_max_name      = aj.column_max_name;
+   column_max_value     = aj.column_max_value;
 
-   column_str_map   = aj.column_str_map;
+   column_str_map       = aj.column_str_map;
 
-   column_case      = aj.column_case;
+   column_case          = aj.column_case;
 
-   out_line_type    = aj.out_line_type;
+   out_line_type        = aj.out_line_type;
 
-   out_fcst_thresh  = aj.out_fcst_thresh;
-   out_obs_thresh   = aj.out_obs_thresh;
-   out_alpha        = aj.out_alpha;
-   out_bin_size     = aj.out_bin_size;
+   out_fcst_thresh      = aj.out_fcst_thresh;
+   out_obs_thresh       = aj.out_obs_thresh;
+   out_fcst_wind_thresh = aj.out_fcst_wind_thresh;
+   out_obs_wind_thresh  = aj.out_obs_wind_thresh;
+   out_alpha            = aj.out_alpha;
+   out_bin_size         = aj.out_bin_size;
 
-   boot_interval    = aj.boot_interval;
-   boot_rep_prop    = aj.boot_rep_prop;
-   n_boot_rep       = aj.n_boot_rep;
+   boot_interval        = aj.boot_interval;
+   boot_rep_prop        = aj.boot_rep_prop;
+   n_boot_rep           = aj.n_boot_rep;
 
-   rank_corr_flag   = aj.rank_corr_flag;
-   vif_flag         = aj.vif_flag;
+   rank_corr_flag       = aj.rank_corr_flag;
+   vif_flag             = aj.vif_flag;
 
    set_dump_row (aj.dump_row);
    set_mask_grid(aj.mask_grid);
@@ -407,6 +412,12 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "out_obs_thresh ...\n";
    out_obs_thresh.dump(out, depth + 1);
+
+   out << prefix << "out_fcst_wind_thresh ...\n";
+   out_fcst_wind_thresh.get_str();
+
+   out << prefix << "out_obs_wind_thresh ...\n";
+   out_obs_wind_thresh.get_str();
 
    out << prefix << "out_alpha = "
        << out_alpha << "\n";
@@ -1038,6 +1049,14 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          out_obs_thresh.add(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-out_fcst_wind_thresh") == 0) {
+         out_fcst_wind_thresh.set(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-out_obs_wind_thresh") == 0) {
+         out_obs_wind_thresh.set(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-out_alpha") == 0) {
          out_alpha = atof(jc_array[i+1]);
          i++;
@@ -1626,6 +1645,16 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       for(i=0; i<out_obs_thresh.n_elements(); i++) {
          js << "-out_obs_thresh " << out_obs_thresh[i].get_str() << " ";
       }
+   }
+
+   // out_fcst_wind_thresh
+   if(out_fcst_wind_thresh.type != thresh_na) {
+      js << "-out_fcst_wind_thresh " << out_fcst_wind_thresh.get_str() << " ";
+   }
+
+   // out_obs_wind_thresh
+   if(out_obs_wind_thresh.type != thresh_na) {
+      js << "-out_obs_wind_thresh " << out_obs_wind_thresh.get_str() << " ";
    }
 
    // Jobs which use out_alpha
