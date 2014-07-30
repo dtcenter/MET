@@ -48,6 +48,8 @@ class MaskPoly {
       NumArray U;
       NumArray V;
 
+      double LonShift;
+
       int Npoints;
 
    public:
