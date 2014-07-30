@@ -126,6 +126,8 @@ Lon.clear();
 U.clear();
 V.clear();
 
+LonShift = 0.0;
+
 Npoints = 0;
 
 return;
@@ -155,6 +157,8 @@ Lon = m.Lon;
 U = m.U;
 V = m.V;
 
+LonShift = m.LonShift;
+
 return;
 
 }
@@ -180,6 +184,7 @@ Indent p2(depth + 1);
 out << prefix << "Name     = \"" << Name     << "\"\n";
 out << prefix << "FileName = \"" << FileName << "\"\n";
 out << prefix << "Npoints  = "   << Npoints  << "\n";
+out << prefix << "LonShift = "   << LonShift << "\n";
 
 for (j=0; j<Npoints; ++j)  {
 
@@ -234,6 +239,8 @@ return ( Lat[i] );
 
 double MaskPoly::lon(int i) const {
 
+double lon;
+
 if ( i < 0 || i >= Npoints ) {
       
    mlog << Error << "\nMaskPoly::lon(int i) const -> "
@@ -243,11 +250,14 @@ if ( i < 0 || i >= Npoints ) {
 
 }
 
+lon  = Lon[i] - LonShift;
+lon -= 360.0*floor((lon + 180.0)/360.0);
+
    //
    //   done
    //
    
-return ( Lon[i] );
+return ( lon );
 
 }
 
@@ -328,7 +338,7 @@ while ( in.getline(line, sizeof(line)) ) {
    }
 
    b = -b;   //  toggle from degrees_west to degrees_east
-
+   
    b -= 360.0*floor((b + 180.0)/360.0);
 
    Lon.add ( b );
@@ -340,6 +350,25 @@ while ( in.getline(line, sizeof(line)) ) {
 }
 
 in.close();
+
+   //
+   // If the polyline crosses the international date line,
+   // shift the longitudes by 180 degrees
+   //
+
+if ( abs(Lon.max() - Lon.min()) > 180.0 ) {
+   
+   LonShift = 180.0;
+   
+   for ( j=0; j<Npoints; j++ ) {
+      
+      b  = Lon[j] + LonShift;
+      b -= 360.0*floor((b + 180.0)/360.0);
+      
+      Lon.set(j, b);
+        U.set(j, b);
+   }
+}
 
    //
    //  done
@@ -381,7 +410,12 @@ bool MaskPoly::latlon_is_inside_dege(double cur_lat, double cur_lon) const
 
 int status;
 
-status = is_inside(U, V, cur_lon, cur_lat);
+double lon;
+
+lon  = cur_lon + LonShift;
+lon -= 360.0*floor((lon + 180.0)/360.0);
+
+status = is_inside(U, V, lon, cur_lat);
 
 return ( status != 0 );
 

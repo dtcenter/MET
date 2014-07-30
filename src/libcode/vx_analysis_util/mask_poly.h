@@ -48,6 +48,8 @@ class MaskPoly {
       NumArray U;
       NumArray V;
 
+      double LonShift;
+
       int Npoints;
 
    public:
@@ -85,7 +87,7 @@ class MaskPoly {
       void load(const char * filename);
 
       bool latlon_is_inside      (double lat, double lon) const;
-      bool latlon_is_inside_dege (double lat, double lon) const;      
+      bool latlon_is_inside_dege (double lat, double lon) const;
 
 };
 
