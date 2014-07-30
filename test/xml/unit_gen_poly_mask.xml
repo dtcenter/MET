@@ -107,4 +107,22 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- global lat/lon grid for Southern Alaska polyline crossing the    -->
+  <!-- international date line                                          -->
+  <!--                                                                  -->
+
+  <test name="gen_poly_mask_GFS_LATLON_SAK">
+    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &MET_BASE;/poly/SAK.poly \
+      &OUTPUT_DIR;/gen_poly_mask/GFS_LATLON_SAK_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_poly_mask/GFS_LATLON_SAK_mask.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
