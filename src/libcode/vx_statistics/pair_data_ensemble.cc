@@ -1122,6 +1122,11 @@ double VxPairDataEnsemble::compute_interp(double obs_x, double obs_y,
                                     pd[0][0][i_interp].interp_dpth,
                                     interp_thresh);
 
+      // Check for bad data prior to vertical interpolation
+      if(is_bad_data(v_below) || is_bad_data(v_above)) {
+         return(bad_data_double);
+      }
+
       // If verifying specific humidity, do vertical interpolation in
       // the natural log of q
       if(fcst_info->is_specific_humidity() &&
