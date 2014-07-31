@@ -481,7 +481,7 @@ double compute_vert_zinterp(double v1, double lvl1,
    d2 = fabs(lvl2 - to_lvl);
 
    // Linearly interpolate betwen lvl_1 and lvl_2
-   v_interp = v1*d1/(d1+d2) + v2*d2/(d1+d2);
+   v_interp = v1*(1.0 - d1/(d1+d2)) + v2*(1.0 - d2/(d1+d2));
 
    return(v_interp);
 }
