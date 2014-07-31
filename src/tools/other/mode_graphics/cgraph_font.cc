@@ -23,7 +23,8 @@ static const int alloc_inc = 30;
 
 static const int total_predef_fonts = 34;
 
-static const char cg_font_env [] = "CGRAPH_FONT_DIR";
+// static const char cg_font_env [] = "CGRAPH_FONT_DIR";
+static const char cg_font_env [] = "MET_FONT_DIR";
 
 
 ////////////////////////////////////////////////////////////////////////
