@@ -546,7 +546,6 @@ return;
 double gc_dist_to_line(double lat1, double lon1,
                        double lat2, double lon2,
                        double lat3, double lon3) {
-   double r = earth_radius_km;
    Vector3D a, b, c, g, f, t;
    double lat4, lon4, dist12, dist14, dist24, dist;
 
