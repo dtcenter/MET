@@ -43,9 +43,9 @@ strDir1 = gsub("/$", "", listArgs[1]);
 strDir2 = gsub("/$", "", listArgs[2]);
 
 # build a list of files in each stat folder
-listTest1 = system(paste("find", strDir1, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
+listTest1 = system(paste("find", strDir1, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$|\\.png$' | sort"), intern=T);
 listTest1Files = gsub(paste(strDir1, "/", sep=""), "", listTest1);
-listTest2 = system(paste("find", strDir2, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$' | sort"), intern=T);
+listTest2 = system(paste("find", strDir2, "| egrep '\\.stat$|\\.txt$|\\.tcst|\\.nc$|\\.out$|\\.ps$|\\.png$' | sort"), intern=T);
 listTest2Files = gsub(paste(strDir2, "/", sep=""), "", listTest2);
 
 if( 1 <= verb ){ cat("dir1:", strDir1, "contains", length(listTest1Files), "files\n");
@@ -91,8 +91,10 @@ for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
 		compareNc(strFile1, strFile2, verb, strict);
 	}
 
-	# if the files are PostScript or end in .out, compare accordingly
-	else if( TRUE == grepl("\\.out$", strFile1, perl=T) || TRUE == grepl("\\.ps$",  strFile1, perl=T) ){
+	# if the files are PostScript, PNG, or end in .out, compare accordingly
+	else if( TRUE == grepl("\\.out$", strFile1, perl=T) ||
+				TRUE == grepl("\\.ps$",  strFile1, perl=T) ||
+				TRUE == grepl("\\.png$", strFile1, perl=T) ){
 		if( 1 <= verb ){ cat("file1: ", strFile1, "\nfile2: ", strFile2, "\n", sep=""); }
 		compareDiff(strFile1, strFile2, verb);
 	}
