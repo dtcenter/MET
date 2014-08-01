@@ -29,4 +29,7 @@ MAINTAINERCLEANFILES 	= Makefile.in
 
 EXTRA_DIST = \
 	sample_fcst \
-	sample_obs
+	sample_obs \
+	copyright_notice.txt
+
+
