@@ -81,22 +81,19 @@ static void   put_nc_var_arr(NcVar *&, int i, int len, const float *);
 static int    get_num_lvl(NcVar *&, const char *dim_str,
                           const long *cur, const long *dim);
 static float  get_nc_obs(NcFile *&f_in, const char *in_str,
-                         const long *cur, const long *dim,
-                         int &rej_fill, int &rej_qc);
+                         const long *cur, const long *dim);
 static float  get_nc_obs(NcFile *&f_in, const char *in_str,
                          const long *cur, const long *dim,
-                         int &rej_fill, int &rej_qc, char &qty);
+                         char &qty);
 static void   process_obs(NcFile *&f_in, const char *in_str,
                           const long *cur, const long *dim,
                           const int gc, const float conversion,
-                          float *obs_arr, int &i_obs,
-                          int &rej_fill, int &rej_qc);
+                          float *obs_arr);
 static void   process_obs(NcFile *&f_in, const char *in_str,
                           const long *cur, const long *dim,
                           const int gc, const float conversion,
-                          float *obs_arr, int &i_obs,
-                          int &rej_fill, int &rej_qc, char &qty);
-static void   write_qty(int &i_obs, char &qty);
+                          float *obs_arr, char &qty);
+static void   write_qty(char &qty);
 
 static MadisType get_madis_type(NcFile *&f_in);
 static void      parse_css(const char *, StringArray &);
@@ -161,7 +158,7 @@ void initialize() {
    ncfile.clear();
    qc_dd_sa.clear();
    lvl_dim_sa.clear();
-   i_obs      = 0;
+   i_obs    = 0;
    rej_fill = 0;
    rej_qc   = 0;
    rej_grid = 0;
@@ -624,7 +621,7 @@ int get_num_lvl(NcVar *&var, const char *dim_str,
 
 float get_nc_obs(NcFile *&f_in, const char *in_str,
                  const long *cur, const long *dim,
-                 int &rej_fill, int &rej_qc, char &qty) {
+                 char &qty) {
    float v, in_fill_value;
    ConcatString in_dd_str, dd_str;
 
@@ -691,10 +688,9 @@ float get_nc_obs(NcFile *&f_in, const char *in_str,
 ////////////////////////////////////////////////////////////////////////
 
 float get_nc_obs(NcFile *&f_in, const char *in_str,
-                 const long *cur, const long *dim,
-                 int &rej_fill, int &rej_qc) {
+                 const long *cur, const long *dim) {
    char qty;
-   return get_nc_obs(f_in, in_str, cur, dim, rej_fill, rej_qc, qty);
+   return get_nc_obs(f_in, in_str, cur, dim, qty);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -702,11 +698,9 @@ float get_nc_obs(NcFile *&f_in, const char *in_str,
 void process_obs(NcFile *&f_in, const char *in_str,
                  const long *cur, const long *dim,
                  const int in_gc, const float conversion,
-                 float *obs_arr, int &i_obs,
-                 int &rej_fill, int &rej_qc) {
+                 float *obs_arr) {
    char qty;
-   process_obs(f_in, in_str, cur, dim, in_gc, conversion, obs_arr, i_obs,
-               rej_fill, rej_qc, qty);
+   process_obs(f_in, in_str, cur, dim, in_gc, conversion, obs_arr, qty);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -714,9 +708,7 @@ void process_obs(NcFile *&f_in, const char *in_str,
 void process_obs(NcFile *&f_in, const char *in_str,
                  const long *cur, const long *dim,
                  const int in_gc, const float conversion,
-                 float *obs_arr, int &i_obs,
-                 int &rej_fill, int &rej_qc,
-                 char &qty) {
+                 float *obs_arr, char &qty) {
    //
    // Store the GRIB code
    //
@@ -725,7 +717,7 @@ void process_obs(NcFile *&f_in, const char *in_str,
    //
    // Get the observation value and store it
    //
-   obs_arr[4] = get_nc_obs(f_in, in_str, cur, dim, rej_fill, rej_qc, qty);
+   obs_arr[4] = get_nc_obs(f_in, in_str, cur, dim, qty);
 
    //
    // Check for bad data and apply conversion factor
@@ -733,7 +725,7 @@ void process_obs(NcFile *&f_in, const char *in_str,
    if(!is_bad_data(obs_arr[4])) {
       obs_arr[4] *= conversion;
       put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-      write_qty(i_obs, qty);
+      write_qty(qty);
       i_obs++;
    }
 
@@ -742,7 +734,7 @@ void process_obs(NcFile *&f_in, const char *in_str,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_qty(int &i_obs, char &qty) {
+void write_qty(char &qty) {
    ConcatString qty_str;
    qty_str << qty;
    qty_str.replace(" ", "_", false);
@@ -969,30 +961,24 @@ void process_madis_metar(NcFile *&f_in) {
       obs_arr[3] = bad_data_float;  // Height
 
       // Sea Level Pressure
-      process_obs(f_in, "seaLevelPress", cur, dim, 2, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "seaLevelPress", cur, dim, 2, conversion, obs_arr);
 
       // Visibility
-      process_obs(f_in, "visibility", cur, dim, 20, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "visibility", cur, dim, 20, conversion, obs_arr);
 
       // Temperature
-      process_obs(f_in, "temperature", cur, dim, 11, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "temperature", cur, dim, 11, conversion, obs_arr);
 
       // Dewpoint
-      process_obs(f_in, "dewpoint", cur, dim, 17, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "dewpoint", cur, dim, 17, conversion, obs_arr);
 
       // Wind Direction
-      process_obs(f_in, "windDir", cur, dim, 31, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windDir", cur, dim, 31, conversion, obs_arr);
       wdir = obs_arr[4];
 
       // Wind Speed
       char qty;
-      process_obs(f_in, "windSpeed", cur, dim, 32, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc, qty);
+      process_obs(f_in, "windSpeed", cur, dim, 32, conversion, obs_arr, qty);
       wind = obs_arr[4];
 
       // Convert the wind direction and speed into U and V components
@@ -1003,7 +989,7 @@ void process_madis_metar(NcFile *&f_in) {
       obs_arr[4] = ugrd;
       if(!is_bad_data(ugrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-         write_qty(i_obs, qty);
+         write_qty(qty);
          i_obs++;
       }
 
@@ -1012,48 +998,40 @@ void process_madis_metar(NcFile *&f_in) {
       obs_arr[4] = vgrd;
       if(!is_bad_data(vgrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-         write_qty(i_obs, qty);
+         write_qty(qty);
          i_obs++;
       }
 
       // Wind Gust
-      process_obs(f_in, "windGust", cur, dim, 180, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windGust", cur, dim, 180, conversion, obs_arr);
 
       // Min Temperature - 24 Hour
-      process_obs(f_in, "minTemp24Hour", cur, dim, 16, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "minTemp24Hour", cur, dim, 16, conversion, obs_arr);
 
       // Max Temperature - 24 Hour
-      process_obs(f_in, "maxTemp24Hour", cur, dim, 15, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "maxTemp24Hour", cur, dim, 15, conversion, obs_arr);
 
       conversion = 1000.0;
       // Precipitation - 1 Hour
       obs_arr[2] = 1.0*sec_per_hour;
-      process_obs(f_in, "precip1Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip1Hour", cur, dim, 61, conversion, obs_arr);
 
       // Precipitation - 3 Hour
       obs_arr[2] = 3.0*sec_per_hour;
-      process_obs(f_in, "precip3Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip3Hour", cur, dim, 61, conversion, obs_arr);
 
       // Precipitation - 6 Hour
       obs_arr[2] = 6.0*sec_per_hour;
-      process_obs(f_in, "precip6Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip6Hour", cur, dim, 61, conversion, obs_arr);
 
       // Precipitation - 24 Hour
       obs_arr[2] = 24.0*sec_per_hour;
-      process_obs(f_in, "precip24Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip24Hour", cur, dim, 61, conversion, obs_arr);
 
       conversion = 1.0;
       // Snow Cover
       obs_arr[2] = bad_data_float;
-      process_obs(f_in, "snowCover", cur, dim, 66, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "snowCover", cur, dim, 66, conversion, obs_arr);
    } // end for i_hdr
 
    print_rej_counts();
@@ -1070,7 +1048,7 @@ void process_madis_metar(NcFile *&f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_madis_raob(NcFile *&f_in) {
-   int nhdr, nlvl, i_lvl, n;
+   int nhdr, nlvl, i_lvl;
    long i_hdr;
    int hdr_sid_len;
    double tmp_dbl;
@@ -1209,8 +1187,8 @@ void process_madis_raob(NcFile *&f_in) {
          //
          // Get the pressure and height for this level
          //
-         obs_arr[2] = get_nc_obs(f_in, "prMan", cur, dim, n, n);
-         obs_arr[3] = get_nc_obs(f_in, "htMan", cur, dim, n, n);
+         obs_arr[2] = get_nc_obs(f_in, "prMan", cur, dim);
+         obs_arr[3] = get_nc_obs(f_in, "htMan", cur, dim);
 
          //
          // Check for bad data
@@ -1218,29 +1196,23 @@ void process_madis_raob(NcFile *&f_in) {
          if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
          // Pressure
-         process_obs(f_in, "prMan", cur, dim, 1, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "prMan", cur, dim, 1, conversion, obs_arr);
 
          // Height
-         process_obs(f_in, "htMan", cur, dim, 7, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "htMan", cur, dim, 7, conversion, obs_arr);
 
          // Temperature
-         process_obs(f_in, "tpMan", cur, dim, 11, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "tpMan", cur, dim, 11, conversion, obs_arr);
 
          // Dewpoint
-         process_obs(f_in, "tdMan", cur, dim, 17, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "tdMan", cur, dim, 17, conversion, obs_arr);
 
          // Wind Direction
-         process_obs(f_in, "wdMan", cur, dim, 31, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "wdMan", cur, dim, 31, conversion, obs_arr);
          wdir = obs_arr[4];
 
          // Wind Speed
-         process_obs(f_in, "wsMan", cur, dim, 32, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc, qty);
+         process_obs(f_in, "wsMan", cur, dim, 32, conversion, obs_arr, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1251,7 +1223,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1260,7 +1232,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1282,7 +1254,7 @@ void process_madis_raob(NcFile *&f_in) {
          //
          // Get the pressure and height for this level
          //
-         obs_arr[2] = get_nc_obs(f_in, "prSigT", cur, dim, n, n);
+         obs_arr[2] = get_nc_obs(f_in, "prSigT", cur, dim);
          obs_arr[3] = bad_data_float;
 
          //
@@ -1291,12 +1263,10 @@ void process_madis_raob(NcFile *&f_in) {
          if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
          // Temperature
-         process_obs(f_in, "tpSigT", cur, dim, 11, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "tpSigT", cur, dim, 11, conversion, obs_arr);
 
          // Dewpoint
-         process_obs(f_in, "tdSigT", cur, dim, 17, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "tdSigT", cur, dim, 17, conversion, obs_arr);
 
       } // end for i_lvl
 
@@ -1317,7 +1287,7 @@ void process_madis_raob(NcFile *&f_in) {
          // Get the pressure and height for this level
          //
          obs_arr[2] = bad_data_float;
-         obs_arr[3] = get_nc_obs(f_in, "htSigW", cur, dim, n, n);
+         obs_arr[3] = get_nc_obs(f_in, "htSigW", cur, dim);
 
          //
          // Check for bad data
@@ -1325,13 +1295,11 @@ void process_madis_raob(NcFile *&f_in) {
          if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
          // Wind Direction
-         process_obs(f_in, "wdSigW", cur, dim, 31, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "wdSigW", cur, dim, 31, conversion, obs_arr);
          wdir = obs_arr[4];
 
          // Wind Speed
-         process_obs(f_in, "wsSigW", cur, dim, 32, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc, qty);
+         process_obs(f_in, "wsSigW", cur, dim, 32, conversion, obs_arr, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1342,7 +1310,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1351,7 +1319,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1373,7 +1341,7 @@ void process_madis_raob(NcFile *&f_in) {
          //
          // Get the pressure and height for this level
          //
-         obs_arr[2] = get_nc_obs(f_in, "prSigW", cur, dim, n, n);
+         obs_arr[2] = get_nc_obs(f_in, "prSigW", cur, dim);
          obs_arr[3] = bad_data_float;
 
          //
@@ -1382,13 +1350,11 @@ void process_madis_raob(NcFile *&f_in) {
          if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
          // Wind Direction
-         process_obs(f_in, "wdSigPrW", cur, dim, 31, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "wdSigPrW", cur, dim, 31, conversion, obs_arr);
          wdir = obs_arr[4];
 
          // Wind Speed
-         process_obs(f_in, "wsSigPrW", cur, dim, 32, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc, qty);
+         process_obs(f_in, "wsSigPrW", cur, dim, 32, conversion, obs_arr, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1399,7 +1365,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1408,7 +1374,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1430,7 +1396,7 @@ void process_madis_raob(NcFile *&f_in) {
          //
          // Get the pressure and height for this level
          //
-         obs_arr[2] = get_nc_obs(f_in, "prTrop", cur, dim, n, n);
+         obs_arr[2] = get_nc_obs(f_in, "prTrop", cur, dim);
          obs_arr[3] = bad_data_float;
 
          //
@@ -1439,21 +1405,17 @@ void process_madis_raob(NcFile *&f_in) {
          if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
          // Temperature
-         process_obs(f_in, "tpTrop", cur, dim, 11, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "tpTrop", cur, dim, 11, conversion, obs_arr);
 
          // Dewpoint
-         process_obs(f_in, "tdTrop", cur, dim, 17, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "tdTrop", cur, dim, 17, conversion, obs_arr);
 
          // Wind Direction
-         process_obs(f_in, "wdTrop", cur, dim, 31, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "wdTrop", cur, dim, 31, conversion, obs_arr);
          wdir = obs_arr[4];
 
          // Wind Speed
-         process_obs(f_in, "wsTrop", cur, dim, 32, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc, qty);
+         process_obs(f_in, "wsTrop", cur, dim, 32, conversion, obs_arr, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1464,7 +1426,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1473,7 +1435,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1495,7 +1457,7 @@ void process_madis_raob(NcFile *&f_in) {
          //
          // Get the pressure and height for this level
          //
-         obs_arr[2] = get_nc_obs(f_in, "prMaxW", cur, dim, n, n);
+         obs_arr[2] = get_nc_obs(f_in, "prMaxW", cur, dim);
          obs_arr[3] = bad_data_float;
 
          //
@@ -1504,13 +1466,11 @@ void process_madis_raob(NcFile *&f_in) {
          if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
          // Wind Direction
-         process_obs(f_in, "wdMaxW", cur, dim, 31, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "wdMaxW", cur, dim, 31, conversion, obs_arr);
          wdir = obs_arr[4];
 
          // Wind Speed
-         process_obs(f_in, "wsMaxW", cur, dim, 32, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc, qty);
+         process_obs(f_in, "wsMaxW", cur, dim, 32, conversion, obs_arr, qty);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -1521,7 +1481,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1530,7 +1490,7 @@ void process_madis_raob(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-            write_qty(i_obs, qty);
+            write_qty(qty);
             i_obs++;
          }
 
@@ -1707,12 +1667,10 @@ void process_madis_profiler(NcFile *&f_in) {
          if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
          // Wind U
-         process_obs(f_in, "uComponent", cur, dim, 33, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "uComponent", cur, dim, 33, conversion, obs_arr);
 
          // Wind V
-         process_obs(f_in, "vComponent", cur, dim, 34, conversion,
-                     obs_arr, i_obs, rej_fill, rej_qc);
+         process_obs(f_in, "vComponent", cur, dim, 34, conversion, obs_arr);
 
       } // end for i_lvl
 
@@ -1873,53 +1831,42 @@ void process_madis_maritime(NcFile *&f_in) {
       if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
       // Wind Direction
-      process_obs(f_in, "windDir", cur, dim, 31, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windDir", cur, dim, 31, conversion, obs_arr);
 
       // Wind Speed
-      process_obs(f_in, "windSpeed", cur, dim, 32, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windSpeed", cur, dim, 32, conversion, obs_arr);
 
       // Temperature
-      process_obs(f_in, "temperature", cur, dim, 11, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "temperature", cur, dim, 11, conversion, obs_arr);
 
       // Dew Point temperature
-      process_obs(f_in, "dewpoint", cur, dim, 17, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "dewpoint", cur, dim, 17, conversion, obs_arr);
 
       // Pressure reduced to MSL
-      process_obs(f_in, "seaLevelPress", cur, dim, 2, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "seaLevelPress", cur, dim, 2, conversion, obs_arr);
 
       // Surface wind gust
-      process_obs(f_in, "windGust", cur, dim, 180, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windGust", cur, dim, 180, conversion, obs_arr);
 
       // APCP_01
       obs_arr[2] = 3600;
-      process_obs(f_in, "precip1Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip1Hour", cur, dim, 61, conversion, obs_arr);
 
       // APCP_06
       obs_arr[2] = 21600;
-      process_obs(f_in, "precip6Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip6Hour", cur, dim, 61, conversion, obs_arr);
 
       // APCP_12
       obs_arr[2] = 43200;
-      process_obs(f_in, "precip12Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip12Hour", cur, dim, 61, conversion, obs_arr);
 
       // APCP_18
       obs_arr[2] = 64800;
-      process_obs(f_in, "precip18Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip18Hour", cur, dim, 61, conversion, obs_arr);
 
       // APCP_24
       obs_arr[2] = 86400;
-      process_obs(f_in, "precip24Hour", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip24Hour", cur, dim, 61, conversion, obs_arr);
 
    } // end for i_hdr
 
@@ -2048,34 +1995,27 @@ void process_madis_mesonet(NcFile *&f_in) {
       obs_arr[3] = 0;               // Height for surface is 0 meters
 
       // Temperature
-      process_obs(f_in, "temperature", cur, dim, 11, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "temperature", cur, dim, 11, conversion, obs_arr);
 
       // Dewpoint
-      process_obs(f_in, "dewpoint", cur, dim, 17, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "dewpoint", cur, dim, 17, conversion, obs_arr);
 
       // Relative Humidity
-      process_obs(f_in, "relHumidity", cur, dim, 52, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "relHumidity", cur, dim, 52, conversion, obs_arr);
 
       // Station Pressure
-      process_obs(f_in, "stationPressure", cur, dim, 1, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "stationPressure", cur, dim, 1, conversion, obs_arr);
 
       // Sea Level Pressure
-      process_obs(f_in, "seaLevelPressure", cur, dim, 2, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "seaLevelPressure", cur, dim, 2, conversion, obs_arr);
 
       // Wind Direction
-      process_obs(f_in, "windDir", cur, dim, 31, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windDir", cur, dim, 31, conversion, obs_arr);
       wdir = obs_arr[4];
 
       // Wind Speed
       char qty;
-      process_obs(f_in, "windSpeed", cur, dim, 32, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc, qty);
+      process_obs(f_in, "windSpeed", cur, dim, 32, conversion, obs_arr, qty);
       wind = obs_arr[4];
 
       // Convert the wind direction and speed into U and V components
@@ -2086,7 +2026,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       obs_arr[4] = ugrd;
       if(!is_bad_data(ugrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-         write_qty(i_obs, qty);
+         write_qty(qty);
          i_obs++;
       }
 
@@ -2095,85 +2035,69 @@ void process_madis_mesonet(NcFile *&f_in) {
       obs_arr[4] = vgrd;
       if(!is_bad_data(vgrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-         write_qty(i_obs, qty);
+         write_qty(qty);
          i_obs++;
       }
 
       // Wind Gust
-      process_obs(f_in, "windGust", cur, dim, 180, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windGust", cur, dim, 180, conversion, obs_arr);
 
       // Visibility
-      process_obs(f_in, "visibility", cur, dim, 20, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "visibility", cur, dim, 20, conversion, obs_arr);
 
       // Precipitation Rate
       // Convert input meters/second to output millimeters/second
-      process_obs(f_in, "precipRate", cur, dim, 59, 1000.0,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precipRate", cur, dim, 59, 1000.0, obs_arr);
 
       // Solar Radiation
-      process_obs(f_in, "solarRadiation", cur, dim, 250, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "solarRadiation", cur, dim, 250, conversion, obs_arr);
 
       // Sea Surface Temperature
-      process_obs(f_in, "seaSurfaceTemp", cur, dim, 80, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "seaSurfaceTemp", cur, dim, 80, conversion, obs_arr);
 
       // Precipitable Water
       // Convert input cm to output mm
-      process_obs(f_in, "totalColumnPWV", cur, dim, 54, 10.0,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "totalColumnPWV", cur, dim, 54, 10.0, obs_arr);
 
       // Soil Temperature
-      process_obs(f_in, "soilTemperature", cur, dim, 85, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "soilTemperature", cur, dim, 85, conversion, obs_arr);
 
       // Minimum Temperature
-      process_obs(f_in, "minTemp24Hour", cur, dim, 16, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "minTemp24Hour", cur, dim, 16, conversion, obs_arr);
 
       // Maximum Temperature
-      process_obs(f_in, "maxTemp24Hour", cur, dim, 15, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "maxTemp24Hour", cur, dim, 15, conversion, obs_arr);
 
       // Precipitation - 3 Hour
       obs_arr[2] = 3.0*sec_per_hour;
-      process_obs(f_in, "precip3hr", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip3hr", cur, dim, 61, conversion, obs_arr);
 
       // Precipitation - 6 Hour
       obs_arr[2] = 6.0*sec_per_hour;
-      process_obs(f_in, "precip6hr", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip6hr", cur, dim, 61, conversion, obs_arr);
 
       // Precipitation - 12 Hour
       obs_arr[2] = 12.0*sec_per_hour;
-      process_obs(f_in, "precip12hr", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip12hr", cur, dim, 61, conversion, obs_arr);
 
       // Precipitation - 10 minutes
       obs_arr[2] = 600;
-      process_obs(f_in, "precip10min", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip10min", cur, dim, 61, conversion, obs_arr);
 
       // Precipitation - 1 minutes
       obs_arr[2] = 60;
-      process_obs(f_in, "precip1min", cur, dim, 61, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "precip1min", cur, dim, 61, conversion, obs_arr);
 
       // Set the level to bad data and the height to 10 meters
       obs_arr[2] = bad_data_float;
       obs_arr[3] = 10;
 
       // 10m Wind Direction
-      process_obs(f_in, "windDir10", cur, dim, 31, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc);
+      process_obs(f_in, "windDir10", cur, dim, 31, conversion, obs_arr);
       wdir = obs_arr[4];
 
       // 10m Wind Speed
-      process_obs(f_in, "windSpeed10", cur, dim, 32, conversion,
-                  obs_arr, i_obs, rej_fill, rej_qc, qty);
+      process_obs(f_in, "windSpeed10", cur, dim, 32, conversion, obs_arr, qty);
       wind = obs_arr[4];
 
       // Convert the wind direction and speed into U and V components
@@ -2184,7 +2108,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       obs_arr[4] = ugrd;
       if(!is_bad_data(ugrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-         write_qty(i_obs, qty);
+         write_qty(qty);
          i_obs++;
       }
 
@@ -2193,7 +2117,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       obs_arr[4] = vgrd;
       if(!is_bad_data(vgrd)) {
          put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
-         write_qty(i_obs, qty);
+         write_qty(qty);
          i_obs++;
       }
 

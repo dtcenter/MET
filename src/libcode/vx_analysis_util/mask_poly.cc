@@ -239,7 +239,7 @@ return ( Lat[i] );
 
 double MaskPoly::lon(int i) const {
 
-double lon;
+double adj_lon;
 
 if ( i < 0 || i >= Npoints ) {
       
@@ -250,14 +250,14 @@ if ( i < 0 || i >= Npoints ) {
 
 }
 
-lon  = Lon[i] - LonShift;
-lon -= 360.0*floor((lon + 180.0)/360.0);
+adj_lon  = Lon[i] - LonShift;
+adj_lon -= 360.0*floor((adj_lon + 180.0)/360.0);
 
    //
    //   done
    //
    
-return ( lon );
+return ( adj_lon );
 
 }
 
@@ -410,12 +410,12 @@ bool MaskPoly::latlon_is_inside_dege(double cur_lat, double cur_lon) const
 
 int status;
 
-double lon;
+double adj_lon;
 
-lon  = cur_lon + LonShift;
-lon -= 360.0*floor((lon + 180.0)/360.0);
+adj_lon  = cur_lon + LonShift;
+adj_lon -= 360.0*floor((adj_lon + 180.0)/360.0);
 
-status = is_inside(U, V, lon, cur_lat);
+status = is_inside(U, V, adj_lon, cur_lat);
 
 return ( status != 0 );
 

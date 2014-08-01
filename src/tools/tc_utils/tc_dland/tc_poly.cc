@@ -84,7 +84,6 @@ void TCPoly::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCPoly::assign(const TCPoly & p) {
-   int i;
 
    clear();
 
@@ -260,7 +259,6 @@ TCPoly TCPolyArray::operator[](int n) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCPolyArray::add(const TCPoly & p) {
-   double lat, lon;
 
    extend(NPolys + 1);
    
@@ -323,8 +321,8 @@ void TCPolyArray::set_check_dist() {
 ////////////////////////////////////////////////////////////////////////
 
 double TCPolyArray::min_dist(double lat, double lon, int &imin) const {
-   int i, j;
-   double dcur, dmin, dcen, x, y;
+   int i;
+   double dcur, dmin, dcen;
    
    // Loop through the polylines
    for(i=0, dmin=bad_data_double; i<NPolys; i++) {
