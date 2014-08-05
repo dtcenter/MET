@@ -168,11 +168,11 @@ static void get_data_ppm (ModeNcOutputFile &, Ppm &);
 static void fill_box (const Box &, const Color &, Cgraph &);
 static void clip_box (const Box &, Cgraph &);
 
-static void draw_map (Cgraph &, const double x_ll, const double y_ll, const Grid &);
+static void draw_map (Cgraph &, const Box & map_box, const Grid &);
 
-static void draw_mapfile (Cgraph &, const double x_ll, const double y_ll, const Grid &, Dictionary *);
+static void draw_mapfile (Cgraph &, const Box & map_box, const Grid &, Dictionary *);
 
-static void draw_region  (Cgraph &, const Grid &, const double x_ll, const double y_ll, const MapRegion &);
+static void draw_region  (Cgraph &, const Grid &, const Box & map_box, const MapRegion &);
 
 static Color        get_dict_color  (Dictionary *, const char * id);
 static int          get_dict_int    (Dictionary *, const char * id);
@@ -543,7 +543,7 @@ if ( do_anno )  {   //  set up clipping path, if needed
 
 }
 
-draw_map(plot, map_box.left(), map_box.bottom(), mode_in.grid());
+draw_map(plot, map_box, mode_in.grid());
 
 if ( do_anno )  plot.grestore();
 
@@ -886,7 +886,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_map(Cgraph & plot, const double x_ll, const double y_ll, const Grid & grid)
+void draw_map(Cgraph & plot, const Box & map_box, const Grid & grid)
 
 {
 
@@ -894,6 +894,8 @@ int j;
 Dictionary & s = *(sources);
 const DictionaryEntry * e = 0;
 Dictionary * dict = 0;
+// const double x_ll = map_box.left();
+// const double y_ll = map_box.bottom();
 
 
 for (j=0; j<n_sources; ++j)  {
@@ -912,7 +914,7 @@ for (j=0; j<n_sources; ++j)  {
 
    dict = e->dict_value();
 
-   draw_mapfile(plot, x_ll, y_ll, grid, dict);
+   draw_mapfile(plot, map_box, grid, dict);
 
 }
 
@@ -929,7 +931,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_mapfile(Cgraph & plot, const double x_ll, const double y_ll, const Grid & grid, Dictionary * dict)
+void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Dictionary * dict)
 
 {
 
@@ -974,7 +976,7 @@ plot.gsave();
 
    while ( in >> r )  {
 
-      draw_region(plot, grid, x_ll, y_ll, r);
+      draw_region(plot, grid, map_box, r);
 
    }
 
@@ -996,30 +998,61 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_region(Cgraph & plot, const Grid & grid, const double x_ll, const double y_ll, const MapRegion & r)
+void draw_region(Cgraph & plot, const Grid & grid, const Box & map_box, const MapRegion & r)
 
 {
 
 int j;
 double x_grid, y_grid;
-double x_page, y_page;
+double x_page_1, y_page_1, x_page_2, y_page_2;
+const double width = map_box.width();
+const double x_ll = map_box.left();
+const double y_ll = map_box.bottom();
 
 plot.newpath();
 
-for (j=0; j<(r.n_points); ++j)  {
+grid.latlon_to_xy(r.lat[0], r.lon[0], x_grid, y_grid);
+
+x_page_1 = x_grid*plot_size;
+y_page_1 = y_grid*plot_size;
+
+x_page_1 += x_ll;
+y_page_1 += y_ll;
+
+plot.moveto(x_page_1, y_page_1);
+
+for (j=1; j<(r.n_points); ++j)  {   //  j starts at one, here
 
    grid.latlon_to_xy(r.lat[j], r.lon[j], x_grid, y_grid);
 
-   x_page = x_grid*plot_size;
-   y_page = y_grid*plot_size;
+   x_page_2 = x_grid*plot_size;
+   y_page_2 = y_grid*plot_size;
 
-   x_page += x_ll;
-   y_page += y_ll;
+   x_page_2 += x_ll;
+   y_page_2 += y_ll;
 
-   if ( j == 0 )  plot.moveto(x_page, y_page);
-   else           plot.lineto(x_page, y_page);
+   // if ( j == 0 )  plot.moveto(x_page, y_page);
+   // else           plot.lineto(x_page, y_page);
 
-}
+      //
+      // Check for regions which overlap the edge of the grid
+      // Finish the previous path and begin a new one
+      //
+
+   if ( fabs(x_page_2 - x_page_1) > 0.90*width )  {
+
+      plot.stroke();
+
+      plot.newpath();
+
+      plot.moveto(x_page_2, y_page_2);
+
+   } else  plot.lineto(x_page_2, y_page_2);
+
+   x_page_1 = x_page_2;   
+   y_page_1 = y_page_2;   
+
+}   //  for j
 
 plot.stroke();
 

@@ -170,7 +170,9 @@ void draw_region(const Grid &gr, const Box &gr_bb, PSfile &p,
 
       px1 = px2;
       py1 = py2;
-   }
+
+   }   //  for i
+
    p.stroke();
 
    return;
