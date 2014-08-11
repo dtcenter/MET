@@ -286,6 +286,15 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    if(n_vx > 0) {
 
+      // Check to make sure the observation file type is defined
+      if(otype == FileType_None) {
+         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+              << "When \"fcst.field\" is non-empty, you must use "
+              << "\"-point_obs\" and/or \"-grid_obs\" to specify the "
+              << "verifying observations.\n\n";
+         exit(1);
+      }
+
       // Allocate space based on the number of verification tasks
       vx_pd   = new VxPairDataEnsemble [n_vx];
       msg_typ = new StringArray        [n_vx];
