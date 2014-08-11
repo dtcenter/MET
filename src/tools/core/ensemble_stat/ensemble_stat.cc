@@ -34,7 +34,7 @@
 //                    missing files, fields, and data values.
 //   009    08/30/12  Oldenburg       Add spread/skill functionality
 //   010    06/03/14  Halley Gotway   Add PHIST line type
-//   011    07/09/14  Halley Gotway   Add station id exclusion option. 
+//   011    07/09/14  Halley Gotway   Add station id exclusion option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -550,7 +550,7 @@ void process_vx() {
       if(point_obs_file_list.n_elements() == 0 &&
          grid_obs_file_list.n_elements()  == 0) {
          mlog << Error << "\nprocess_vx() -> "
-              << " when \"fcst_field\" is non-empty, you must use "
+              << " when \"fcst.field\" is non-empty, you must use "
               << "\"-point_obs\" and/or \"-grid_obs\" to specify the "
               << "verifying observations.\n\n";
          exit(1);
