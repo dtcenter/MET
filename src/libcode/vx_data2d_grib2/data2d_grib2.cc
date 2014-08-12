@@ -922,7 +922,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
    //  unrecognized grid
    else {
 
-      mlog << Error << "MetGrib2DataFile::data_plane() found unrecognized grid definition ("
+      mlog << Error << "\nMetGrib2DataFile::data_plane() found unrecognized grid definition ("
            << gfld->igdtnum << ")\n\n";
       exit(1);
 
@@ -979,7 +979,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
          case 96:  /* 0110 0000 */ idx_data =             x*n_y + y;               break;
          case 224: /* 1110 0000 */ idx_data = (n_x - x - 1)*n_y + y;               break;
          default:
-            mlog << Error << "MetGrib2DataFile::data_plane() found unrecognized ScanMode ("
+            mlog << Error << "\nMetGrib2DataFile::data_plane() found unrecognized ScanMode ("
                  << ScanMode << ")\n\n";
             exit(1);
          }
