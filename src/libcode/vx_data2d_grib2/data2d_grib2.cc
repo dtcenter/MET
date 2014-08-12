@@ -37,6 +37,7 @@ using namespace std;
 
 extern "C" {
   #include "grib2.h"
+  void g2_miss( gribfield *gfld, float *rmiss, int *nmiss );
 }
 
 static bool print_grid = true;
@@ -939,6 +940,8 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
    gribfield *gfld;
    unsigned char *cgrib;
    g2int numfields;
+   float v, v_miss[2];
+   int n_miss, i;
    if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld, cgrib, numfields) ){
       mlog << Error << "\nMetGrib2DataFile::read_grib2_record_data_plane() - failed to read "
            << "record at offset " << rec->ByteOffset << " and field number "
@@ -963,6 +966,9 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
    plane.clear();
    plane.set_size(n_x, n_y);
 
+   //  get the missing data value(s), if specified
+   g2_miss(gfld, v_miss, &n_miss);
+
    //  copy the data into the data plane buffer
    for(int x=0; x < n_x; x++){
       for(int y=0; y < n_y; y++){
@@ -978,20 +984,26 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
          case 160: /* 1010 0000 */ idx_data = (n_x - x - 1)*n_y + (n_x - x - 1);   break;
          case 96:  /* 0110 0000 */ idx_data =             x*n_y + y;               break;
          case 224: /* 1110 0000 */ idx_data = (n_x - x - 1)*n_y + y;               break;
+         case 80:  /* 0101 0000 */ idx_data = ( y % 2 == 0 ?
+                                                y*n_x + x :
+                                                y*n_x + (n_x - x - 1) );           break;
          default:
             mlog << Error << "\nMetGrib2DataFile::data_plane() found unrecognized ScanMode ("
                  << ScanMode << ")\n\n";
             exit(1);
          }
 
-         //  add the current value to the data plane, if it contains valid data
-         plane.set(
-            !apply_bmap || 0 != gfld->bmap[idx_data] ?
-               (float)gfld->fld[idx_data] :
-               bad_data_float,
-            x,
-            y
-          );
+         //  check bitmap for bad data
+         v = (!apply_bmap || 0 != gfld->bmap[idx_data] ?
+              (float)gfld->fld[idx_data] : bad_data_float);
+
+         //  check missing data values, if specified
+         for(i=0; i < n_miss; i++) {
+            if(is_eq(v, v_miss[i])) { v = bad_data_float; break; }
+         }
+
+         //  set the current data value
+         plane.set(v, x, y);
       }
    }
 
@@ -1006,13 +1018,18 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
    plane.data_range(plane_min, plane_max);
    mlog << Debug(4) << "\n"
         << "Data plane information:\n"
-        << "    plane min: " << plane_min << "\n"
-        << "    plane max: " << plane_max << "\n"
-        << "    scan mode: " << ScanMode << "\n"
-        << "   valid time: " << unix_to_yyyymmdd_hhmmss(rec->ValidTime) << "\n"
-        << "    lead time: " << sec_to_hhmmss(rec->LeadTime)  << "\n"
-        << "    init time: " << unix_to_yyyymmdd_hhmmss(rec->InitTime)  << "\n"
-        << "  bitmap flag: " << gfld->ibmap << "\n\n";
+        << "      plane min: " << plane_min << "\n"
+        << "      plane max: " << plane_max << "\n"
+        << "      scan mode: " << ScanMode << "\n"
+        << "     valid time: " << unix_to_yyyymmdd_hhmmss(rec->ValidTime) << "\n"
+        << "      lead time: " << sec_to_hhmmss(rec->LeadTime)  << "\n"
+        << "      init time: " << unix_to_yyyymmdd_hhmmss(rec->InitTime)  << "\n"
+        << "    bitmap flag: " << gfld->ibmap << "\n";
+   for(i=0; i < n_miss; i++) {
+      mlog << Debug(4)
+           << " missing val(" << i+1 << "): " << v_miss[i] << "\n";
+   }
+   mlog << Debug(4) << "\n";
 
    g2_free(gfld);
    delete [] cgrib;
