@@ -11,7 +11,7 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
-<!--  depends on unit_mode.xml  -->
+<!--  depends on unit_mode.xml and unit_met_test_scripts.xml -->
 
 <met_test>
 
@@ -54,6 +54,21 @@
     </param>
     <output>
       <exist>&OUTPUT_DIR;/plot_mode_field/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj_comp.png</exist>
+    </output>
+  </test>
+
+  <test name="mode_graphics_PLOT_MULTIPLE">
+    <exec>&MET_DIR;/bin/plot_mode_field</exec>
+    <param> \
+      -simple \
+      -obs \
+      -config &CONFIG_DIR;/PlotModeField.config \
+      &OUTPUT_DIR;/met_test_scripts/mode/mode_*_obj.nc
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/plot_mode_field/mode_120000L_20050807_120000V_000000A_obj_simple.png</exist>
+      <exist>&OUTPUT_DIR;/plot_mode_field/mode_120000L_20050807_120000V_120000A_obj_simple.png</exist>
+      <exist>&OUTPUT_DIR;/plot_mode_field/mode_240000L_20050808_000000V_240000A_obj_simple.png</exist>
     </output>
   </test>
 
