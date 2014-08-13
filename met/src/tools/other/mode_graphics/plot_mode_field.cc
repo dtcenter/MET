@@ -455,14 +455,14 @@ switch ( plot_field )  {
       output_filename << "_simple.png";
       is_object_field = true;
       n_fcst = mode_in.n_fcst_simple_objs();
-      n_obs  = mode_in.n_fcst_simple_objs();
+      n_obs  = mode_in.n_obs_simple_objs();
       break;
 
    case composite_obj_field:
       output_filename << "_comp.png";
       is_object_field = true;
       n_fcst = mode_in.n_fcst_comp_objs();
-      n_obs  = mode_in.n_fcst_comp_objs();
+      n_obs  = mode_in.n_obs_comp_objs();
       break;
 
       default:
