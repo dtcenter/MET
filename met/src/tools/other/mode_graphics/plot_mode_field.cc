@@ -64,7 +64,6 @@ static const char     borderwidth_name [] = "border_width";
 static const char         mapinfo_name [] = "map_info";
 static const char       linecolor_name [] = "line_color";
 static const char       linewidth_name [] = "line_width";
-// static const char        linedash_name [] = "line_dash";
 static const char          source_name [] = "source";
 static const char       rawctable_name [] = "raw_ctable_filename";
 static const char       objctable_name [] = "obj_ctable_filename";
@@ -157,6 +156,9 @@ static void set_raw       (const StringArray &);
 static void set_simple    (const StringArray &);
 static void set_composite (const StringArray &);
 
+static void set_logfile   (const StringArray &);
+static void set_verbosity (const StringArray &);
+
 static void sanity_check();
 
 static void read_config();
@@ -212,6 +214,9 @@ cline.add(set_raw,       "-raw",       0);
 cline.add(set_simple,    "-simple",    0);
 cline.add(set_composite, "-composite", 0);
 
+cline.add(set_logfile,   "-log",       1);
+cline.add(set_verbosity, "-v",         1);
+
 cline.parse();
 
 if ( cline.n() == 0 )  usage();
@@ -233,13 +238,12 @@ int j;
 
 for (j=0; j<(cline.n()); ++j)  {
 
-   cout << "Making plot " << (j + 1) << " of " << cline.n() << '\n' << flush;
+   mlog << Debug(2)
+        << "Making plot " << (j + 1) << " of " << cline.n() << '\n';
 
    do_plot(cline[j]);
 
 }
-
-
 
 
 return ( 0 );
@@ -254,6 +258,9 @@ void read_config()
 
 {
 
+mlog << Debug(1)
+     << "Config file: " << config_filename << "\n";
+
 if ( ! config.read(config_filename) )  {
 
    mlog << Error
@@ -264,9 +271,8 @@ if ( ! config.read(config_filename) )  {
 
 }
 
-// config.dump(cout);
+if ( mlog.verbosity_level() >= 5 ) config.dump(cout);
 
-// int j;
 const DictionaryEntry * e = 0;
 const char * name = 0;
 Dictionary * map_info = 0;
@@ -351,19 +357,7 @@ if ( !e )   {
 }
 
 map_info = e->dict_value();
-/*
-map_color = get_dict_color(map_info, mapcolor_name);
 
-   //
-   //  line width
-   //
-
-name = linewidth_name;
-
-e = map_info->lookup(name);
-
-map_linewidth = e->d_value();
-*/
    //
    //  map data
    //
@@ -421,7 +415,8 @@ Box whole_box, map_box, anno_box;
 bool is_object_field = false;
 int n_fcst, n_obs, n;
 
-
+mlog << Debug(1)
+     << "Reading MODE file: " << mode_nc_filename << "\n";
 
    //
    //  open the mode file
@@ -437,12 +432,13 @@ if ( ! mode_in.open(mode_nc_filename) )  {
 
 }
 
-// mode_in.dump(cout);
-
+if ( mlog.verbosity_level() >= 5 ) mode_in.dump(cout);
 
 output_filename << output_directory << '/' << get_short_name(mode_nc_filename);
 
 output_filename.chomp(".nc");
+
+output_filename << (do_obs ? "_obs" : "_fcst");
 
 switch ( plot_field )  {
 
@@ -472,7 +468,8 @@ switch ( plot_field )  {
 
 }   //  switch
 
-
+mlog << Debug(1)
+     << "Writing image file: " << output_filename << "\n";
 
    //
    //  read the colortable
@@ -593,7 +590,7 @@ void usage()
 
 {
 
-mlog << Error << "\n\n   usage:  " << program_name << ": -simple|-composite|-raw  -obs|-fcst -config path mode_nc_file_list\n\n";
+mlog << Error << "\n\n   usage:  " << program_name << ": -simple|-composite|-raw  -obs|-fcst -config path -log path -v n mode_nc_file_list\n\n";
 
 exit ( 1 );
 
@@ -686,6 +683,38 @@ void set_composite(const StringArray &)
 {
 
 plot_field = composite_obj_field;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_logfile(const StringArray & a)
+
+{
+
+ConcatString filename;
+
+filename = a[0];
+
+mlog.open_log_file(filename);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_verbosity(const StringArray & a)
+
+{
+
+mlog.set_verbosity_level(atoi(a[0]));
 
 return;
 
@@ -894,8 +923,6 @@ int j;
 Dictionary & s = *(sources);
 const DictionaryEntry * e = 0;
 Dictionary * dict = 0;
-// const double x_ll = map_box.left();
-// const double y_ll = map_box.bottom();
 
 
 for (j=0; j<n_sources; ++j)  {
@@ -939,7 +966,6 @@ ifstream in;
 MapRegion r;
 double map_linewidth = 1.0;
 ConcatString s;
-// ConcatString map_dash;
 ConcatString map_filename;
 Color map_color;
 
@@ -947,8 +973,6 @@ Color map_color;
 s = get_dict_string (dict, filename_name);
 
 map_filename  = replace_path(s);
-
-// map_dash      = get_dict_string (dict, linedash_name);
 
 map_linewidth = get_dict_double (dict, linewidth_name);
 
@@ -967,8 +991,6 @@ if ( !in )  {
 }
 
 plot.gsave();
-
-   // if ( map_dash.nonempty() )  plot.set_dash(map_dash);
 
    plot.setlinewidth(map_linewidth);
 
@@ -1030,9 +1052,6 @@ for (j=1; j<(r.n_points); ++j)  {   //  j starts at one, here
 
    x_page_2 += x_ll;
    y_page_2 += y_ll;
-
-   // if ( j == 0 )  plot.moveto(x_page, y_page);
-   // else           plot.lineto(x_page, y_page);
 
       //
       // Check for regions which overlap the edge of the grid
@@ -1284,9 +1303,6 @@ double scale, delta;
 double htab1, htab2;
 double vtab1, vtab2;
 const double scale_tol = 0.05;
-
-
-// mode_in.dump(cout);
 
 htab1 = border_width + 10.0;
 
