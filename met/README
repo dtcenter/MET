@@ -344,12 +344,13 @@ Version 5.0 Release Notes:
 - Enhancements to Existing Tools:
     - Distributed latest set of bug fixes for METv4.1.
     - Changes to existing logic:
-       - Fixed bug in STAT-Analysis when aggregating FSS values across cases.
+       - Fixed bug in STAT-Analysis when aggregating FSS values across multiple
+         cases.
        - Fixed bug in MODE where object intensity percentiles were only being
-         computed over value greater than zero, rather than the full range.
+         computed over values greater than zero, rather than the full range.
        - Fixed bug in pcp_combine -varname option that was preventing the use
          of underscores in the output variable name.
-       - Enhanced TC-Pairs to refine interpretation of zeros at bad data in
+       - Enhanced TC-Pairs to refine interpretation of zeros as bad data in
          many of the input ATCF columns.
        - Enhanced MADIS2NC by adding support for mesonet datasets.
        - Refined logic in TC-Pairs when computing consensus tracks by ensuring
@@ -360,11 +361,11 @@ Version 5.0 Release Notes:
        - Enhanced STAT-Analysis by adding support for an aggregate_stat job type
          conversion of MPR to WDIR that reads UGRD and VGRD matched pair lines
          and computes aggregated wind direction errors.  Added
-         -out_fcst_wind_thresh and -out_obs_wind_thresh to filter the U/V pairs
-         by wind speed prior to computing wind direction errors.
+         -out_fcst_wind_thresh and -out_obs_wind_thresh options to filter the
+         U/V pairs by wind speed prior to computing wind direction errors.
     - Added new output statistics:
        - Enhanced the SL1L2 and SAL1L2 line types from Point-Stat and Grid-Stat
-         by adding the mean absolute error (MAE), enabling it to be aggregated
+         by adding the mean absolute error (MAE), enabling MAE to be aggregated
          across multiple cases.
        - Enhanced the CNT line type from Point-Stat and Grid-Stat by adding the
          inter-quartile range of the error (EIQR) and the median absolute
@@ -372,7 +373,7 @@ Version 5.0 Release Notes:
        - Enhanced the CTS line type from Point-Stat and Grid-Stat by adding the
          log odds ratio (LODDS), odds ratio skill score (ORSS), extreme
          dependency score (EDS), symmetric EDS (SEDS), extreme dependency index
-         (EDI), symmetric EDI (SEDI), and the bias-adjusted gilbert skill score
+         (EDI), symmetric EDI (SEDI), and the bias-adjusted Gilbert skill score
          (BAGSS).
        - Enhanced the NBRCNT line type from Grid-Stat by adding the asymptotic
          fractions skill score (AFSS), uniform fractions skill score (UFSS), and
@@ -380,8 +381,9 @@ Version 5.0 Release Notes:
        - Enhanced the MPR line type from Point-Stat and the ORANK line type from
          Ensemble-Stat by adding the observation quality flag value.
        - Enhanced Ensemble-Stat by adding the probability integral transform
-         histogram (PHIST) line type and enhanced STAT-Analysis to aggregate
-         multiple cases together.
+         histogram (PHIST) line type.
+       - Enhanced STAT-Analysis to aggregate and recompute all the new
+         statistics listed above.
     - Added new command line and configuration options:
        - Enhanced Point-Stat and Ensemble-Stat by adding a station id exclusion,
          sid_exc, option to the configuration file to easily discard specific
@@ -394,7 +396,8 @@ Version 5.0 Release Notes:
          multiple times.
        - Enhanced the configuration files for MODE, Grid-Stat, and Wavelet-Stat
          to allow the user to select which fields should be included in the
-         gridded NetCDF output.  See METv5.0/data/config/README for details.
+         gridded NetCDF output.
+         See METv5.0/data/config/README for details.
        - Enhanced ASCII2NC by adding a message_type_map entry to the
          configuration file which defines a mapping of input little_R report
          types to output message types.  Previously this mapping had been hard
@@ -402,8 +405,8 @@ Version 5.0 Release Notes:
        - Enhanced MODE by adding a shift_right entry to configuration file to
          shift a global grid by some number of grid points.  This enables the
          user to define the location of the longitude cut line for global grids.
-       - Enhanced TC-Pairs by refining the configurable interp12 options.  See
-         METv5.0/data/config/README-TC for details.
+       - Enhanced TC-Pairs by refining the interp12 configuration option.
+         See METv5.0/data/config/README-TC for details.
        - Enhanced TC-Stat by adding an event_equal_lead configuration option
          to list specific lead times that must be present for a track to be
          included in the event equalization logic.
@@ -415,16 +418,17 @@ Version 5.0 Release Notes:
          http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42.shtml
          http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42_daily.shtml
        - Enhanced MET's handling of NetCDF files by reading and applying the
-         FillValue and/or missing_value variable attribute when parsing gridded
+         FillValue and/or missing_value variable attributes when parsing gridded
          data.
        - Enhanced STAT-Analysis and MODE-Analysis to include column headers in
          the output file specified with the -dump_row option.
-       - Enhanced the NetCDF output of MODE by adding the convex hull polyline
+       - Enhanced the NetCDF output of MODE by adding convex hull polyline
          points.
-       - Add the model name as a global attribute to the NetCDF output Grid-Stat
-         and Wavelet-Stat.
+       - Add the model name as a global attribute to the NetCDF output of 
+         Grid-Stat, Wavelet-Stat, Ensemble-Stat, MODE, and Series-Analysis.
        - Reduced the file size of the PostScript files generated by the MET
          tools by adding zlib compression.
+       - Enhanced the MODE PostScript files by placing the data into tables.
        - Right-justify all numeric output columns in the ASCII output of MET.
        - Update the GRIB1 and GRIB2 table definitions:
          http://www.nco.ncep.noaa.gov/pmb/docs/on388
