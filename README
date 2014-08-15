@@ -184,6 +184,10 @@ sub-directory, or the MET Online Tutorial:
      directory, or set $MET_FREETYPEINC to point to the directory with the
      FreeType include files and set $MET_FREETYPELIB to point to the directory
      with the FreeType library files.
+   
+   - When running MODE Graphics, set $MET_FONT_DIR to the directory containing
+     font data required at runtime.  A link to the tarball containing this font
+     data can be found on the MET website.
 
 - Configure the installation for your system using the configure script.  The
   configure script has command line options to specify where to install MET and
@@ -327,7 +331,7 @@ Version 5.0 Release Notes:
    - METv5.0 includes a major overhaul of the build process, the
      addition of two new tools, and several enhancement to existing tools.
    - The build and installation process is now done using autoconf by running
-     the "configure" script followed by "make install".
+     the "configure" script followed by "make install" and "make test".
 
 - New Tools:
    - The new gen_circle_mask tool generates a verification masking region
@@ -352,9 +356,12 @@ Version 5.0 Release Notes:
          that the required members are present at each lead time.
        - Major overhaul of the TC-Dland tool to compute global distances to land
          rather than being limited to the Atlantic and Eastern Pacific basins.
+         Add a global 1/10th degree distance to land data file to the release.
        - Enhanced STAT-Analysis by adding support for an aggregate_stat job type
          conversion of MPR to WDIR that reads UGRD and VGRD matched pair lines
-         and computes aggregated wind direction errors.
+         and computes aggregated wind direction errors.  Added
+         -out_fcst_wind_thresh and -out_obs_wind_thresh to filter the U/V pairs
+         by wind speed prior to computing wind direction errors.
     - Added new output statistics:
        - Enhanced the SL1L2 and SAL1L2 line types from Point-Stat and Grid-Stat
          by adding the mean absolute error (MAE), enabling it to be aggregated
@@ -422,9 +429,6 @@ Version 5.0 Release Notes:
        - Update the GRIB1 and GRIB2 table definitions:
          http://www.nco.ncep.noaa.gov/pmb/docs/on388
          http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml
-
-
-
 
 Version 4.1 Release Notes:
 -------------------------
