@@ -1,4 +1,4 @@
-Model Evaluation Tools METv4.1 (May 22, 2013)
+Model Evaluation Tools METv5.0 (August 2014)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -107,20 +107,21 @@ Dependencies
 ------------
 
 - MET requires the following to be installed on your system prior to building:
-   - NCEP's BUFRLIB Library
-      - http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB
    - UniData's NetCDF Library
       - http://www.unidata.ucar.edu/software/netcdf
    - GNU Scientific Library (GSL), developer's version
       - http://www.gnu.org/software/gsl
+   - NCEP's BUFRLIB Library, if wishing to compile PB2NC
+      - http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB
    - NCEP's GRIB2 Library in C (g2clib), if wishing to compile GRIB2 support
+      - jasperlib, libpng, and zlib also required for GRIB2 support
       - http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
-   - The F2C (or G2C) library for interfacing between fortran and C code
-      - Not needed for most compilers.
-      - http://www.netlib.org/f2c
-   - HDF4 and HDF-EOS2 libraries, if wishing to compile MODIS-Regrid.
+   - HDF4 and HDF-EOS2 libraries, if wishing to compile MODIS-Regrid
       - http://www.hdfgroup.org/products/hdf4
       - http://www.hdfgroup.org/hdfeos.html
+   - Cairo and FreeType, if wishing to compile MODE-Graphics
+      - http://cairographics.org/releases
+      - http://www.freetype.org/download.html
 
 - It is suggested that the following tools be used in conjunction with MET:
    - Unified Post-Processor
@@ -130,7 +131,7 @@ Dependencies
 NOTE: The required libraries should be compiled with the same set of compilers
       to be used in compiling MET.
 
-How to compile and run?
+How to compile and run? (Updated for METv5.0)
 -----------------------
 
 For more detailed instructions on building MET and for a list of supported
@@ -266,17 +267,18 @@ sub-directory, or the MET Online Tutorial:
 
   ./configure --prefix=`pwd` --enable-grib2 --enable-mode_graphics
 
-- Type 'make install >& make_met.log &'
+- Type 'make install >& make_install.log &'
 
-- Type 'tail -f make_met.log' to view the execution of the make.
+- Type 'tail -f make_install.log' to view the execution of the make.
 
 - When make is finished, type 'CNTRL-C' to quit the tail.
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 21 executables:
+  command line) will contain 23 executables:
    - ascii2nc
    - ensemble_stat
+   - gen_circle_mask
    - gen_poly_mask
    - grid_stat
    - madis2nc
@@ -286,6 +288,7 @@ sub-directory, or the MET Online Tutorial:
    - pb2nc
    - pcp_combine
    - plot_data_plane
+   - plot_mode_field
    - plot_point_obs
    - point_stat
    - series_analysis
@@ -299,11 +302,11 @@ sub-directory, or the MET Online Tutorial:
 
 - Type 'ls <prefix>/bin' to check for the presence of the executables.
 
-- Type 'make test >& test_all.log &' to run all of the test scripts in the
+- Type 'make test >& make_test.log &' to run all of the test scripts in the
   directory.  These test scripts use test data supplied with the tarball.  For
   instructions on running your own data, please refer to the MET User's Guide.
 
-- Type 'tail -f test_all.log' to view the execution of the test script.
+- Type 'tail -f make_test.log' to view the execution of the test script.
 
 - When the test script is finished, type 'CNTRL-C' to quit the tail.
 
@@ -316,6 +319,112 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 5.0 Release Notes:
+-------------------------
+
+- What's New:
+   - METv5.0 includes a major overhaul of the build process, the
+     addition of two new tools, and several enhancement to existing tools.
+   - The build and installation process is now done using autoconf by running
+     the "configure" script followed by "make install".
+
+- New Tools:
+   - The new gen_circle_mask tool generates a verification masking region
+     similar to the gen_poly_mask tool.  It draws a circle of configurable
+     radius around one or more lat/lon locations.  It may be useful in
+     defining areas close to radar locations or the area around a hurricane.
+   - The new plot_mode_field tool reads one or more MODE NetCDF output files
+     and creates PNG images to display the data.
+
+- Enhancements to Existing Tools:
+    - Distributed latest set of bug fixes for METv4.1.
+    - Changes to existing logic:
+       - Fixed bug in STAT-Analysis when aggregating FSS values across cases.
+       - Fixed bug in MODE where object intensity percentiles were only being
+         computed over value greater than zero, rather than the full range.
+       - Fixed bug in pcp_combine -varname option that was preventing the use
+         of underscores in the output variable name.
+       - Enhanced TC-Pairs to refine interpretation of zeros at bad data in
+         many of the input ATCF columns.
+       - Enhanced MADIS2NC by adding support for mesonet datasets.
+       - Refined logic in TC-Pairs when computing consensus tracks by ensuring
+         that the required members are present at each lead time.
+       - Major overhaul of the TC-Dland tool to compute global distances to land
+         rather than being limited to the Atlantic and Eastern Pacific basins.
+       - Enhanced STAT-Analysis by adding support for an aggregate_stat job type
+         conversion of MPR to WDIR that reads UGRD and VGRD matched pair lines
+         and computes aggregated wind direction errors.
+    - Added new output statistics:
+       - Enhanced the SL1L2 and SAL1L2 line types from Point-Stat and Grid-Stat
+         by adding the mean absolute error (MAE), enabling it to be aggregated
+         across multiple cases.
+       - Enhanced the CNT line type from Point-Stat and Grid-Stat by adding the
+         inter-quartile range of the error (EIQR) and the median absolute
+         deviation (MAD).
+       - Enhanced the CTS line type from Point-Stat and Grid-Stat by adding the
+         log odds ratio (LODDS), odds ratio skill score (ORSS), extreme
+         dependency score (EDS), symmetric EDS (SEDS), extreme dependency index
+         (EDI), symmetric EDI (SEDI), and the bias-adjusted gilbert skill score
+         (BAGSS).
+       - Enhanced the NBRCNT line type from Grid-Stat by adding the asymptotic
+         fractions skill score (AFSS), uniform fractions skill score (UFSS), and
+         the forecast and observation rates (F_RATE and O_RATE).
+       - Enhanced the MPR line type from Point-Stat and the ORANK line type from
+         Ensemble-Stat by adding the observation quality flag value.
+       - Enhanced Ensemble-Stat by adding the probability integral transform
+         histogram (PHIST) line type and enhanced STAT-Analysis to aggregate
+         multiple cases together.
+    - Added new command line and configuration options:
+       - Enhanced Point-Stat and Ensemble-Stat by adding a station id exclusion,
+         sid_exc, option to the configuration file to easily discard specific
+         stations known to contain bad data.
+         See METv5.0/data/config/README for details.
+       - Enhanced ASCII2NC and MADIS2NC by adding the -mask_poly and -mask_grid
+         command line options to filter the point observations spatially.
+       - Enhanced STAT-Analysis to support comma-separated lists of values on
+         the command line rather than using the same command line switch
+         multiple times.
+       - Enhanced the configuration files for MODE, Grid-Stat, and Wavelet-Stat
+         to allow the user to select which fields should be included in the
+         gridded NetCDF output.  See METv5.0/data/config/README for details.
+       - Enhanced ASCII2NC by adding a message_type_map entry to the
+         configuration file which defines a mapping of input little_R report
+         types to output message types.  Previously this mapping had been hard
+         coded and any changes required recompiling.
+       - Enhanced MODE by adding a shift_right entry to configuration file to
+         shift a global grid by some number of grid points.  This enables the
+         user to define the location of the longitude cut line for global grids.
+       - Enhanced TC-Pairs by refining the configurable interp12 options.  See
+         METv5.0/data/config/README-TC for details.
+       - Enhanced TC-Stat by adding an event_equal_lead configuration option
+         to list specific lead times that must be present for a track to be
+         included in the event equalization logic.
+       - Enhanced TC-Stat by refining the rapid intensification criteria in the
+         rapid_inten section of the configuration file.
+         See METv5.0/data/config/README_TC for details.
+    - Improved input and output behavior:
+       - Enhanced support for reading TRMM NetCDF data from these sources:
+         http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42.shtml
+         http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42_daily.shtml
+       - Enhanced MET's handling of NetCDF files by reading and applying the
+         FillValue and/or missing_value variable attribute when parsing gridded
+         data.
+       - Enhanced STAT-Analysis and MODE-Analysis to include column headers in
+         the output file specified with the -dump_row option.
+       - Enhanced the NetCDF output of MODE by adding the convex hull polyline
+         points.
+       - Add the model name as a global attribute to the NetCDF output Grid-Stat
+         and Wavelet-Stat.
+       - Reduced the file size of the PostScript files generated by the MET
+         tools by adding zlib compression.
+       - Right-justify all numeric output columns in the ASCII output of MET.
+       - Update the GRIB1 and GRIB2 table definitions:
+         http://www.nco.ncep.noaa.gov/pmb/docs/on388
+         http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml
+
+
+
 
 Version 4.1 Release Notes:
 -------------------------

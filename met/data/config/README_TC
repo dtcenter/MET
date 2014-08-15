@@ -202,14 +202,16 @@ model  = [];
 check_dup = FALSE;
 
 //
-// Specify whether special processing should be performed for interpolated
-// models with 12-hour spacing.  For model with a name ending in 'I' (e.g. AHWI)
-// search for the corresponding track whose model name ends in '2' (e.g. AHW2)
-// and merge its track points into the interpolated model's track.
+// Specify whether special processing should be performed for interpolated model
+// names ending in 'I' (e.g. AHWI).  Search for corresponding tracks whose model
+// name ends in '2' (e.g. AHW2) and apply the following logic:
+//  - "NONE"    to do nothing.
+//  - "FILL"    to create a copy of '2' track and rename it as 'I' only when the
+//              'I' track does not already exist.
+//  - "REPLACE" to create a copy of the '2' track and rename it as 'I' in all
+//              cases, replacing any 'I' tracks that may already exist.
 //
-// e.g. interp12 = TRUE;
-//
-interp12 = TRUE;
+interp12 = REPLACE;
 
 //
 // Specify how consensus forecasts should be defined:
@@ -443,6 +445,12 @@ landfall_end = 0;
 // e.g. event_equal = FALSE;
 //
 event_equal = FALSE;
+
+// 
+// Specify lead times that must be present for a track to be included in the
+// event equalization logic.
+//
+event_equal_lead = [ "12", "24", "36" ];
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the

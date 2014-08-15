@@ -1266,7 +1266,16 @@ plot_gcarc_flag = FALSE;
 // The ct_stats_flag can be set to TRUE or FALSE to produce additional output, in the form
 // of contingency table counts and statistics.
 //
-ct_stats_flag   = TRUE;
+ct_stats_flag = TRUE;
+
+//
+// When MODE is run on global grids, this parameter specifies how many grid squares to
+// shift the grid to the right.  MODE does not currently connect objects from one side
+// of a global grid to the other, potentially causing objects straddling that longitude
+// to be cut in half.  Shifting the grid by some amount enables the user to control
+// where that longitude cut line occurs.
+//
+shift_right = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
