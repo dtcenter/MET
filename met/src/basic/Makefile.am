@@ -17,9 +17,13 @@
 ## MA 02110-1301, USA.
 
 SUBDIRS = vx_log \
-	vx_cal \
-	enum_to_string \
-	vx_math \
+	vx_cal
+
+if ENABLE_DEVELOPMENT
+  SUBDIRS += enum_to_string
+endif
+
+SUBDIRS += vx_math \
 	vx_util \
 	vx_config
 

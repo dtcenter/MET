@@ -29,29 +29,26 @@ libvx_config_a_SOURCES = config.tab.yy config_scanner.ll \
               vx_config.h
 libvx_config_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-# Generated source files
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
 
-configobjecttype_to_string.h configobjecttype_to_string.cc: object_types.h
+if ENABLE_DEVELOPMENT
+    configobjecttype_to_string.cc configobjecttype_to_string.h: object_types.h
 	${ENUM_TO_STRING} -concat_string object_types.h
 
-grdfiletype_to_string.h grdfiletype_to_string.cc: data_file_type.h
+    grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
 	${ENUM_TO_STRING} -concat_string -reverse data_file_type.h
+
+    clean-local:
+	-rm -r configobjecttype_to_string.cc
+	-rm -r configobjecttype_to_string.h
+	-rm -r grdfiletype_to_string.cc
+	-rm -r grdfiletype_to_string.h
+endif
 
 # Extra distribution files
 
 EXTRA_DIST = config.tab.cc \
 	config.tab.h \
-	config_scanner.cc \
-	grdfiletype_to_string.h \
-	configobjecttype_to_string.h
-
-# Clean up extra local files
-
-clean-local:
-	-rm -f config.tab.cc
-	-rm -f config.tab.h
-	-rm -f config_scanner.cc
-	-rm -f configobjecttype_to_string.h
-	-rm -f configobjecttype_to_string.cc
-	-rm -f grdfiletype_to_string.h
-	-rm -f grdfiletype_to_string.cc
+	config_scanner.cc

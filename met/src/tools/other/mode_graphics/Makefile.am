@@ -49,16 +49,18 @@ plot_mode_field_LDADD = -lvx_cgraph \
         -lm  \
         -lz
 
-# Create generated files
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
 
-cgraphbase_plottype_to_string.h cgraphbase_plottype_to_string.cc \
-cgraphbase_fontfamily_to_string.h cgraphbase_fontfamily_to_string.cc: cgraph_main.h
+if ENABLE_DEVELOPMENT
+    cgraphbase_plottype_to_string.cc cgraphbase_plottype_to_string.h \
+    cgraphbase_fontfamily_to_string.cc cgraphbase_fontfamily_to_string.h: cgraph_main.h
 	${ENUM_TO_STRING} -prefix -concat_string cgraph_main.h
 
-# Clean up extra local files
-
-clean-local:
-	-rm -f cgraphbase_plottype_to_string.h
+    clean-local:
 	-rm -f cgraphbase_plottype_to_string.cc
-	-rm -f cgraphbase_fontfamily_to_string.h
+	-rm -f cgraphbase_plottype_to_string.h
 	-rm -f cgraphbase_fontfamily_to_string.cc
+	-rm -f cgraphbase_fontfamily_to_string.h
+endif

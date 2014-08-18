@@ -25,14 +25,15 @@ libvx_math_a_SOURCES = viewgravity_to_string.cc viewgravity_to_string.h \
                vx_math.h
 libvx_math_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-# Build rule for viewgravity_to_string.cc
-affine.cc viewgravity_to_string.cc viewgravity_to_string.h: affine.h
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
+
+if ENABLE_DEVELOPMENT
+    affine.cc viewgravity_to_string.cc viewgravity_to_string.h: affine.h
 	${ENUM_TO_STRING} -concat_string affine.h
 
-# Extra files to be included in the distribution
-EXTRA_DIST = viewgravity_to_string.h
-
-# Clean up extra local files
-clean-local:
-	-rm -f viewgravity_to_string.h
-	-rm -f viewgravity_to_string.cc
+    clean-local:
+	-rm -f affine.cc viewgravity_to_string.cc
+	-rm -f affine.cc viewgravity_to_string.h
+endif

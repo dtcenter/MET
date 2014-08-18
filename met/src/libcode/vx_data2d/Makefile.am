@@ -21,17 +21,15 @@ libvx_data2d_a_SOURCES = \
               vx_data2d.h
 libvx_data2d_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-# Generated source files
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
 
-leveltype_to_string.h leveltype_to_string.cc: level_info.h
+if ENABLE_DEVELOPMENT
+    leveltype_to_string.cc leveltype_to_string.h: level_info.h
 	${ENUM_TO_STRING} -concat_string -reverse level_info.h
 
-# Extra files to be included in the distribution
-
-EXTRA_DIST = leveltype_to_string.h
-
-# Clean up extra local files
-
-clean-local:
-	-rm -f leveltype_to_string.h
+    clean-local:
 	-rm -f leveltype_to_string.cc
+	-rm -f leveltype_to_string.h
+endif
