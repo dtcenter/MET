@@ -17,11 +17,14 @@
 ## MA 02110-1301, USA.
 
 SUBDIRS	= core \
-	dev_utils \
 	other
 
 if ENABLE_TC_UTILS
   SUBDIRS += tc_utils
+endif
+
+if ENABLE_DEVELOPMENT
+  SUBDIRS += dev_utils
 endif
 
 #DIST_SUBDIRS = core \

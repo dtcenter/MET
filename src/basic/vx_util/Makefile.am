@@ -50,22 +50,20 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                vx_util.h
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-# Generated source files
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
 
-asciitablejust_to_string.h asciitablejust_to_string.cc: ascii_table.h
+if ENABLE_DEVELOPMENT
+    asciitablejust_to_string.cc asciitablejust_to_string.h: ascii_table.h
 	${ENUM_TO_STRING} -concat_string ascii_table.h
 
-# Extra files to be included in the distribution
-
-EXTRA_DIST = asciitablejust_to_string.h
+    clean-local:
+	-rm -f asciitablejust_to_string.cc
+	-rm -f asciitablejust_to_string.h
+endif
 
 # Build the library when making a distribution so that
 # we can make chk4copyright to add the copyright notices.
 
 dist-hook: $(noinst_LIBRARIES)
-
-# Clean up extra local files
-
-clean-local:
-	-rm -f asciitablejust_to_string.h
-	-rm -f asciitablejust_to_string.cc

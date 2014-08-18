@@ -20,30 +20,18 @@ libvx_ps_a_SOURCES = \
               table_helper.cc table_helper.h
 libvx_ps_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-# Generated source files
+# If we are in development mode, generate the "to_string" files and
+# clean them up in a "make clean".  We don't want to do either of these
+# in a distribution because the enum_to_string utility isn't available.
 
-documentmedia_to_string.h \
-documentmedia_to_string.cc \
-documentorientation_to_string.h \
-documentorientation_to_string.cc : vx_ps.h
+if ENABLE_DEVELOPMENT
+    documentmedia_to_string.cc documentmedia_to_string.h \
+    documentorientation_to_string.cc documentorientation_to_string.h : vx_ps.h
 	${ENUM_TO_STRING} -concat_string vx_ps.h
 
-# Extra files to be included in the distribution
-
-EXTRA_DIST = fontfamily_to_string.h \
-	documentorientation_to_string.h \
-	documentmedia_to_string.h
-
-# Clean up extra local files
-
-clean-local:
-	-rm -f documentmedia_to_string.h
+    clean-local:
 	-rm -f documentmedia_to_string.cc
-	-rm -r documentorientation_to_string.h
-	-rm -r documentorientation_to_string.cc
-	-rm -r fontfamily_to_string.h
-	-rm -r fontfamily_to_string.cc
-
-
-
-
+	-rm -f documentmedia_to_string.h
+	-rm -f documentorientation_to_string.cc
+	-rm -f documentorientation_to_string.h
+endif
