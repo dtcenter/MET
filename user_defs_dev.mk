@@ -72,9 +72,9 @@ F2C_LIBNAME  =
 # installed in a standard location.
 # grib2c include directory specified as: -I/your/include/path
 # grib2c library directory specified as: -L/your/library/path
-GRIB2C_BASE  =
-GRIB2C_INCS  =
-GRIB2C_LIBS  =
+GRIB2C_BASE  = ${GRIB2C}
+GRIB2C_INCS  = -I$(GRIB2C_BASE)
+GRIB2C_LIBS  = -L$(GRIB2C_BASE) 
 
 # Top level directory for the HDF and HDF-EOS Libraries if they're not
 # installed in a standard location.  These need not be specified if

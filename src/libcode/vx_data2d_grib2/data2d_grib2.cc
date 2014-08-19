@@ -549,10 +549,11 @@ void MetGrib2DataFile::read_grib2_record_list() {
               5 != gfld->ipdtnum &&     //  probability forecast
               8 != gfld->ipdtnum &&     //  accumulation forecast
               9 != gfld->ipdtnum &&     //  probabilistic accumultion forecast
-             12 != gfld->ipdtnum ){     //  derived accumulation forecast (?)
-            mlog << Error << "\nMetGrib2DataFile::data_plane() - unexpected PDS template number ("
-                 << gfld->ipdtnum << ")\n\n";
-            exit(1);
+             12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
+             48 != gfld->ipdtnum ){     //  aerosol data
+            mlog << Warning << "\nMetGrib2DataFile::data_plane() - unexpected PDS template number ("
+                 << gfld->ipdtnum << ") may cause unexpected results. "
+                 << "Please email met_help@ucar.edu.\n\n";
          }
 
          //  store the record information
