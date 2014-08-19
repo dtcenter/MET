@@ -370,6 +370,9 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
       lvl_val1 = str_format("%f", field_lvl_val1);
       lvl_val2 = str_format("%f", field_lvl_val2);
 
+      lvl1 = field_lvl_val1;
+      lvl2 = (is_bad_data(field_lvl_val2) ? -1 : field_lvl_val2);
+
       //  set the level type based on the indexes
       //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
       //        http://www.nco.ncep.noaa.gov/pmb/docs/on388/table3.html
@@ -433,6 +436,9 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
    //  set the magic string
    MagicStr = str_format("%s/%s", field_name.text(), Level.name().text());
+
+   //  set the level type number, if specified
+   Level.set_type_num(dict.lookup_int(conf_key_GRIB_lvl_typ, false));
 
 }
 

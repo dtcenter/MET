@@ -202,7 +202,7 @@ bool is_exact_match(const VarInfoGrib & vinfo, const GribRecord & g)
 
 {
 
-int lower, upper, grib_lower, grib_upper;
+int lower, upper, grib_lower, grib_upper, grib_type_num;
 
    //
    //  check common logic
@@ -221,7 +221,14 @@ upper = nint ( vinfo.level().upper() );
    //  get the GRIB record's level values
    //
 
-read_pds_level(g, grib_lower, grib_upper);
+read_pds_level(g, grib_lower, grib_upper, grib_type_num);
+
+   //
+   //  check the level type number, if specified
+   //
+
+if ( !is_bad_data(vinfo.level().type_num()) &&
+     vinfo.level().type_num() != grib_type_num )  return ( false );
 
    //
    //  for non-accumulation intervals and specific record numbers,
@@ -248,7 +255,7 @@ bool is_range_match(const VarInfoGrib & vinfo, const GribRecord & g)
 
 {
   
-int lower, upper, grib_lower, grib_upper;
+int lower, upper, grib_lower, grib_upper, grib_type_num;
 
    //
    //  check common logic
@@ -267,7 +274,14 @@ upper = nint ( vinfo.level().upper() );
    //  get the GRIB record's level values
    //
 
-read_pds_level(g, grib_lower, grib_upper);
+read_pds_level(g, grib_lower, grib_upper, grib_type_num);
+
+   //
+   //  check the level type number, if specified
+   //
+
+if ( !is_bad_data(vinfo.level().type_num()) &&
+     vinfo.level().type_num() != grib_type_num )  return ( false );
 
    //
    //  for non-accumulation intervals and specific record number,
@@ -549,7 +563,7 @@ void read_pds_prob(const GribRecord &r, int &p_code,
 ////////////////////////////////////////////////////////////////////////
 
 
-void read_pds_level(const GribRecord & g, int &lower, int &upper)
+void read_pds_level(const GribRecord & g, int &lower, int &upper, int &type)
 
 {
 int j;
@@ -560,8 +574,10 @@ Section1_Header *pds = (Section1_Header *) g.pds;
    //  find the level information for this record
    //
 
+type = (int) pds->type;
+
 for ( j=0; j<n_grib_level_list; ++j ) {
-   if ( pds->type == grib_level_list[j].level ) break;
+   if ( type == grib_level_list[j].level ) break;
 }
 
    //

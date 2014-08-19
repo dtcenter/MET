@@ -41,7 +41,7 @@ extern void read_pds(const GribRecord &, int & bms_flag, unixtime & init_ut, uni
 extern void read_pds_prob(const GribRecord &,
                           int &p_code, double &p_thresh_lo, double &p_thresh_hi);
 
-extern void read_pds_level(const GribRecord &, int &lower, int &upper);
+extern void read_pds_level(const GribRecord &, int &lower, int &upper, int &type_num);
 
 
 ////////////////////////////////////////////////////////////////////////

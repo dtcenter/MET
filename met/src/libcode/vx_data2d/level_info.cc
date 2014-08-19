@@ -21,6 +21,8 @@ using namespace std;
 
 #include <map>
 
+#include "is_bad_data.h"
+
 #include "level_info.h"
 #include "leveltype_to_string.h"
 
@@ -79,6 +81,7 @@ void LevelInfo::assign(const LevelInfo &l) {
 
    // Copy
    Type    = l.type();
+   TypeNum = l.type_num();
    ReqName = l.req_name();
    Name    = l.name();
    Units   = l.units();
@@ -94,6 +97,7 @@ void LevelInfo::clear() {
 
    // Initialize
    Type = LevelType_None;
+   TypeNum = bad_data_int;
    ReqName.clear();
    Name.clear();
    Units.clear();
@@ -110,6 +114,7 @@ void LevelInfo::dump(ostream &out) const {
    // Dump out the contents
    out << "LevelInfo::dump():\n"
        << "  Type    = " << leveltype_to_string(Type) << "\n"
+       << "  TypeNum = " << TypeNum << "\n"
        << "  ReqName = " << (ReqName ? ReqName.text() : "(nul)") << "\n"
        << "  Name    = " << (Name ? Name.text() : "(nul)") << "\n"
        << "  Units   = " << (Units ? Units.text() : "(nul)") << "\n"
@@ -123,6 +128,13 @@ void LevelInfo::dump(ostream &out) const {
 
 void LevelInfo::set_type(LevelType lt) {
    Type = lt;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void LevelInfo::set_type_num(int i) {
+   TypeNum = i;
    return;
 }
 

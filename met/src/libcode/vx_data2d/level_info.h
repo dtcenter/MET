@@ -41,6 +41,7 @@ class LevelInfo
    protected:
 
       LevelType    Type;    // Type of level
+      int          TypeNum; // Level type number
       ConcatString ReqName; // Requested level name
       ConcatString Name;    // Level name
       ConcatString Units;   // Units for the level
@@ -67,6 +68,7 @@ class LevelInfo
          //
 
       LevelType    type()     const;
+      int          type_num() const;
       ConcatString req_name() const;
       ConcatString name()     const;
       ConcatString units()    const;
@@ -78,6 +80,7 @@ class LevelInfo
          //
 
       void set_type(LevelType);
+      void set_type_num(int);
       void set_req_name(const char *);
       void set_name(const char *);
       void set_units(const char *);
@@ -90,6 +93,7 @@ class LevelInfo
 ///////////////////////////////////////////////////////////////////////////////
 
 inline LevelType    LevelInfo::type()     const { return(Type);    }
+inline int          LevelInfo::type_num() const { return(TypeNum); }
 inline ConcatString LevelInfo::req_name() const { return(ReqName); }
 inline ConcatString LevelInfo::name()     const { return(Name);    }
 inline ConcatString LevelInfo::units()    const { return(Units);   }
