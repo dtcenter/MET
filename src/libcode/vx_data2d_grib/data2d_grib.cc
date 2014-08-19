@@ -466,7 +466,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array) {
    bool status = false;
-   int i, lower, upper;
+   int i, lower, upper, type_num;
    GribRecord r;
    VarInfoGrib *vinfo_grib = (VarInfoGrib *) &vinfo;
    VarInfoGrib vinfo_grib_winds;
@@ -494,7 +494,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
               << "\".\n";
 
          // Get the level information for this record
-         read_pds_level(r, lower, upper);
+         read_pds_level(r, lower, upper, type_num);
 
          // Read current record
          status = get_data_plane(r, cur_plane);
