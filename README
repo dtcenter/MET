@@ -164,10 +164,10 @@ sub-directory, or the MET Online Tutorial:
      point to the directory with the GSL include files and set $MET_GSLLIB
      to point to the directory with the GSL library files.
 
-   - If compiling support for GRIB2, set $MET_GRIB2C to point to the main
-     GRIB2C directory, or set $MET_GRIB2CINC to point to the directory with
-     the GRIB2C include files and set $MET_GRIB2CLIB to point to the directory
-     with the GRIB2C library files.
+   - If compiling support for GRIB2, set $MET_GRIB2CINC and $MET_GRIB2CLIB
+     to point to the main GRIB2C directory which contains both the include
+     and library files.  These are used instead of $MET_GRIB2C since the main
+     GRIB2C directory does not contain include and lib subdirectories.
 
    - If compiling MODIS-Regrid, set $MET_HDF to point to the main HDF directory,
      or set $MET_HDFINC to point to the directory with the HDF include files
