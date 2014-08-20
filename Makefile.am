@@ -47,6 +47,7 @@ test:
 # in the distribution
 
 EXTRA_DIST = \
+	doc \
 	out \
 	scripts \
 	Make-include \
