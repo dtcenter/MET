@@ -40,7 +40,7 @@ img_fmt  = "png256";
 img_ext  = "png";
 img_hgt  = 8.5;
 img_wdth = 11.0;
-img_res  = 300;
+img_res  = 72;
 
 # List of colors to be used for each plot type
 default_color_list = c("black", "red", "green", "blue", "purple", "orange");

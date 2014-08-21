@@ -2,6 +2,7 @@ COLUMN      DESCRIPTION                                     UNITS
 VERSION     "MET Version"                                   NA
 AMODEL      "ADeck Model"                                   NA
 BMODEL      "BDeck Model"                                   NA
+STORM_ID    "Storm ID"                                      NA
 BASIN       "Basin"                                         NA
 CYCLONE     "Cyclone Number"                                NA
 STORM_NAME  "Storm Name"                                    NA
