@@ -406,7 +406,7 @@ Version 5.0 Release Notes:
          shift a global grid by some number of grid points.  This enables the
          user to define the location of the longitude cut line for global grids.
        - Enhanced TC-Pairs by refining the interp12 configuration option.
-         See met-5.0/data/config/README-TC for details.
+         See met-5.0/data/config/README_TC for details.
        - Enhanced TC-Stat by adding an event_equal_lead configuration option
          to list specific lead times that must be present for a track to be
          included in the event equalization logic.
