@@ -415,8 +415,8 @@ Version 5.0 Release Notes:
          See met-5.0/data/config/README_TC for details.
     - Improved input and output behavior:
        - Enhanced support for reading TRMM NetCDF data from these sources:
-         http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42.shtml
-         http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42_daily.shtml
+         http://gdata1.sci.gsfc.nasa.gov/daac-bin/G3/gui.cgi?instance_id=TRMM_3-Hourly
+         http://gdata1.sci.gsfc.nasa.gov/daac-bin/G3/gui.cgi?instance_id=TRMM_3B42_Daily
        - Enhanced MET's handling of NetCDF files by reading and applying the
          FillValue and/or missing_value variable attributes when parsing gridded
          data.
