@@ -74,21 +74,31 @@
 
 library(boot);
 
-# Check that the MET_BASE environment variable is set
-MET_BASE = Sys.getenv("MET_BASE", unset=NA);
-if(is.na(MET_BASE)) {
-  cat("ERROR: The \"MET_BASE\" environment variable must be set.\n");
+# Check that the MET_BUILD_BASE environment variable is set
+MET_BUILD_BASE = Sys.getenv("MET_BUILD_BASE", unset=NA);
+if(is.na(MET_BUILD_BASE)) {
+  cat("ERROR: The \"MET_BUILD_BASE\" environment variable must be set to the MET source code directory.\n");
   quit(status=1);
 }
 
-source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_util.R", sep=''));
-source(paste(MET_BASE, "/scripts/Rscripts/include/Compute_STDerr.R", sep=''));
-source(paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_config_default.R", sep=''));
+source(paste(MET_BUILD_BASE, "/scripts/Rscripts/include/plot_tcmpr_util.R", sep=''));
+source(paste(MET_BUILD_BASE, "/scripts/Rscripts/include/Compute_STDerr.R", sep=''));
+source(paste(MET_BUILD_BASE, "/scripts/Rscripts/include/plot_tcmpr_config_default.R", sep=''));
 
 # Read the TCMPR column information from a data file.
 column_info = read.table(
-  paste(MET_BASE, "/scripts/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
+  paste(MET_BUILD_BASE, "/scripts/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
   header=TRUE, row.names=1);
+
+# Make sure that tc_stat can be found
+tc_stat = Sys.which("tc_stat");
+
+if(nchar(tc_stat) == 0) {
+  cat("ERROR: Cannot find the tc_stat tool in your path.\n");
+  quit(status=1);
+} else {
+  cat("Using tc_stat tool:", tc_stat);
+}
 
 ########################################################################
 #
@@ -149,9 +159,6 @@ usage = function() {
 # Constants.
 #
 ########################################################################
-
-# Path to the tc_stat tool
-tc_stat = "${MET_BASE}/bin/tc_stat";
 
 # Strings used to select the plots to be created
 boxplot_str = "BOXPLOT";
