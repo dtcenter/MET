@@ -31,7 +31,7 @@
 ##
 ##  Examples:
 ##    Rscript plot_mpr.R \
-##      METv3.0/out/point_stat/*_mpr.txt
+##      met-5.0/out/point_stat/*_mpr.txt
 ##
 ##   Author:
 ##      John Halley Gotway (johnhg@ucar.edu), NCAR-RAL/DTC
@@ -47,7 +47,7 @@ library(stats)
 #
 ########################################################################
 
-# Header for the MPR line type (METv3.0)
+# Header for the MPR line type (METv5.0)
 mpr_header <- c("VERSION", "MODEL",
                 "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
                 "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
@@ -58,7 +58,7 @@ mpr_header <- c("VERSION", "MODEL",
                 "FCST_THRESH", "OBS_THRESH", "COV_THRESH",
                 "ALPHA", "LINE_TYPE",
                 "TOTAL", "INDEX", "OBS_SID", "OBS_LAT", "OBS_LON",
-                "OBS_LVL", "OBS_ELV", "FCST", "OBS", "CLIMO")
+                "OBS_LVL", "OBS_ELV", "FCST", "OBS", "CLIMO", "OBS_QC")
 
 # Temporary input file name
 tmp_file <- "mpr_input.tmp"

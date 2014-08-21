@@ -34,7 +34,7 @@
 ##
 ##  Examples:
 ##    Rscript plot_cnt.R \
-##      METv3.0/out/point_stat/*_cnt.txt
+##      met-5.0/out/point_stat/*_cnt.txt
 ##
 ##   Author:
 ##      John Halley Gotway (johnhg@ucar.edu), NCAR-RAL/DTC
@@ -50,7 +50,7 @@ library(stats)
 #
 ########################################################################
 
-# Header for the CNT line type (METv3.0)
+# Header for the CNT line type (METv5.0)
 cnt_header <- c("VERSION", "MODEL",
                 "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
                 "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
@@ -78,7 +78,9 @@ cnt_header <- c("VERSION", "MODEL",
                 "E25", "E25_BCL", "E25_BCU",
                 "E50", "E50_BCL", "E50_BCU",
                 "E75", "E75_BCL", "E75_BCU",
-                "E90", "E90_BCL", "E90_BCU")
+                "E90", "E90_BCL", "E90_BCU",
+                "EIQR", "EIQR_BCL", "EIQR_BCU",
+                "MAD", "MAD_BCL", "MAD_BCU")
 
 # Temporary input file name
 tmp_file <- "cnt_input.tmp"
