@@ -16,48 +16,16 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = HMT_masks
+hmtmasksdir = $(pkgdatadir)/poly/HMT_masks
 
-polydir = $(pkgdatadir)/poly
+hmtmasks_DATA = \
+	cnrfc_poly.nc \
+	huc4_1605_poly.nc \
+	huc4_1803_poly.nc \
+	huc4_1804_poly.nc \
+	huc4_1805_poly.nc \
+	huc4_1806_poly.nc
 
-poly_DATA = \
-	APL.poly \
-	ATC.poly \
-	CAM.poly \
-	CAR.poly \
-	CONUS.poly \
-	EAST.poly \
-	ECA.poly \
-	GLF.poly \
-	GMC.poly \
-	GRB.poly \
-	HWI.poly \
-	LMV.poly \
-	Makefile.am \
-	MDW.poly \
-	MEX.poly \
-	NAK.poly \
-	NAO.poly \
-	ncep_vx_regions.pdf \
-	NEC.poly \
-	NMT.poly \
-	NPL.poly \
-	NPO.poly \
-	NSA.poly \
-	NWC.poly \
-	PRI.poly \
-	SAK.poly \
-	SAO.poly \
-	SEC.poly \
-	SMT.poly \
-	SPL.poly \
-	SPO.poly \
-	SWC.poly \
-	SWD.poly \
-	WCA.poly \
-	WEST.poly \
-	MLB_Stadiums.txt
-
-EXTRA_DIST = ${poly_DATA}
+EXTRA_DIST = ${hmtmasks_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 
