@@ -78,6 +78,7 @@ static void process_mask_file();
 static void write_netcdf();
 static void usage();
 static void set_mask_name(const StringArray &);
+static void set_radius(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
@@ -130,7 +131,7 @@ void process_command_line(int argc, char **argv) {
    // add the options function calls
    //
    cline.add(set_mask_name, "-name",   1);
-   cline.add(set_mask_name, "-radius", 1);
+   cline.add(set_radius,    "-radius", 1);
    cline.add(set_logfile,   "-log",    1);
    cline.add(set_verbosity, "-v",      1);
 
@@ -361,6 +362,12 @@ void usage() {
 
 void set_mask_name(const StringArray & a) {
    mask_name = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_radius(const StringArray & a) {
+   radius = atof(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
