@@ -250,8 +250,8 @@ sub-directory, or the MET Online Tutorial:
   --disable-wwmca
       Disable compilation of wwmca
 
-  --disable-modis
-      Disable compilation of modis
+  --enable-modis
+      Enable compilation of modis
 
   --enable-mode_graphics
       Enable compilation of mode_graphics

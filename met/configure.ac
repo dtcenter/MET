@@ -175,7 +175,7 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_HDF], [Where hdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_HDF], [Where hdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF is only needed if you are building the MODIS utility.])
 AC_ARG_VAR([MET_HDFINC], [Where hdf include files are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFLIB must also be defined and MET_HDF will be ignored.])
 AC_ARG_VAR([MET_HDFLIB], [Where hdf libraries are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFINC must also be defined and MET_HDF will be ignored.])
 
@@ -212,7 +212,7 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_HDFEOS], [Where hdfeos lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_HDFEOS], [Where hdfeos lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF EOS is only needed if you are building the MODIS utility.])
 AC_ARG_VAR([MET_HDFEOSINC], [Where hdfeos include files are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSLIB must also be defined and MET_HDFEOS will be ignored.])
 AC_ARG_VAR([MET_HDFEOSLIB], [Where hdfeos libraries are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSINC must also be defined and MET_HDFEOS will be ignored.])
 
@@ -684,12 +684,12 @@ fi
 # modis
 
 AC_ARG_ENABLE(modis,
-	  [AS_HELP_STRING([--disable-modis], [Disable compilation of modis])],
+	  [AS_HELP_STRING([--enable-modis], [Enable compilation of modis])],
   [case "${enableval}" in
      yes | no ) ENABLE_MODIS="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --disable-modis) ;;
    esac],
-  [ENABLE_MODIS="yes"]
+  [ENABLE_MODIS="no"]
 )
 
 AM_CONDITIONAL([ENABLE_MODIS], [test "x$ENABLE_MODIS" = "xyes"])
