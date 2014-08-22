@@ -16,7 +16,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = HMT_masks
+SUBDIRS =
 
 polydir = $(pkgdatadir)/poly
 
@@ -55,7 +55,8 @@ poly_DATA = \
 	SWC.poly \
 	SWD.poly \
 	WCA.poly \
-	WEST.poly
+	WEST.poly \
+	MLB_Stadiums.txt
 
 EXTRA_DIST = ${poly_DATA}
 

@@ -12,6 +12,11 @@ echo
 ./test_gen_poly_mask.sh
 
 echo
+echo "*** Testing Gen-Circle-Mask application ***"
+echo
+./test_gen_circle_mask.sh
+
+echo
 echo "*** Testing PCP-Combine application ***"
 echo
 ./test_pcp_combine.sh
