@@ -108,7 +108,7 @@ int main(int argc, char * argv[])
       //
       // set the default color table
       //
-   ColorTableName << MET_BASE << "/colortables/met_default.ctable";
+   ColorTableName << "MET_BASE/colortables/met_default.ctable";
 
       //
       // process the command line arguments
@@ -176,7 +176,7 @@ int main(int argc, char * argv[])
       // read in the color table file and scale the color table to fit
       // the data
       //
-   color_table.read(ColorTableName);
+   color_table.read(replace_path(ColorTableName));
 
    if (is_eq(color_table.data_min(bad_data_double), 0.0) &&
        is_eq(color_table.data_max(bad_data_double), 1.0))
