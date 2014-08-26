@@ -1238,7 +1238,6 @@ ifstream in;
 char c;
 char path[1024];
 
-//snprintf(path, sizeof(path), "%s/%s", MET_BASE, copyright_filename);
 snprintf(path, sizeof(path), "%s/%s", COPYRIGHT_DIR, copyright_filename);
 
 in.open(path);
