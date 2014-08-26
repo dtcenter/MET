@@ -121,8 +121,7 @@ ConfInfo = (ModeConfInfo *) 0;
 
 grid = (Grid *) 0;
 
-MetDataDir << cs_erase
-           << MET_BASE << "/data";
+MetDataDir = replace_path("MET_BASE");
 
 PageWidth  = default_PageWidth;
 PageHeight = default_PageHeight;
