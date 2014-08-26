@@ -42,7 +42,7 @@ static const int max_str_len          = 512;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int concat_string_default_precision =  2;
+static const int concat_string_default_precision =  5;
 
 static const int concat_string_max_precision     = 12;
 
