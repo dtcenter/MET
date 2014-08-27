@@ -458,7 +458,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModePsFile::outline_box(const Box & b, double linewidth)
+void ModePsFile::outline_box(const Box & b, const double linewidth)
 
 {
 
