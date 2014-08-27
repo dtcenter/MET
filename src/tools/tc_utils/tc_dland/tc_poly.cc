@@ -358,7 +358,7 @@ bool operator>>(istream & in, TCPoly & p) {
 
    ConcatString line, name_cs;
    StringArray a;
-   char name[8];
+   char name[9];
 
    // Read the map region meta data
    if(!line.read_line(in)) return (false);
