@@ -1240,7 +1240,6 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
          
       default:
          return;
-         break;
    }
 
    // Setup dimension name strings
