@@ -163,7 +163,9 @@ class ModePsFile : public PSfile {
 
       void make_plot();
 
-      void outline_box (const Box &, double linewidth);
+      using PSfile::outline_box;
+
+      void outline_box (const Box &, const double linewidth);
       void outline_view();
       void fill_box    (const Box &, const Color &);
 
