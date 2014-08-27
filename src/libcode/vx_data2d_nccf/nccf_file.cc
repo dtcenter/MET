@@ -21,6 +21,7 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 #include <string>
+#include <time.h>
 
 #include "vx_math.h"
 #include "vx_cal.h"
