@@ -430,7 +430,8 @@ double TTContingencyTable::lodds() const {
       v = bad_data_double;
    }
    else {
-      v = log(fy_oy()) + log(fn_on()) - log(fy_on()) - log(fn_oy());
+      v = log((double) fy_oy()) + log((double) fn_on()) - 
+          log((double) fy_on()) - log((double) fn_oy());
    }
    
    return(v);
