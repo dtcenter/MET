@@ -116,6 +116,8 @@ class CgraphBase : public PSfile {
       CgraphBase();
       virtual ~CgraphBase();
 
+      using PSfile::open;
+
       void open(const char * filename, int width, int height, PlotType = CgraphBase::png_type);
 
       void close();
