@@ -149,15 +149,6 @@ class CgraphBase : public PSfile {
          //  Type 1 fonts
          //
 
-      void  roman      (double size);
-      void  italic     (double size);
-      void  bold       (double size);
-      void  bolditalic (double size);
-
-      void  dingbats   (double size);   //  ZapfDingbats font (# 33)
-      void  symbol     (double size);   //  Symbol font       (# 27)
-
-
       void choose_font(int, double);                     //  from ps base class
 
 
