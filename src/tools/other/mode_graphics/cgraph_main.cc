@@ -25,7 +25,6 @@ using namespace std;
 #include "cgraph_main.h"
 #include "cgraph_font.h"
 #include "cgraphbase_plottype_to_string.h"
-// #include "cgraphbase_fontfamily_to_string.h"
 
 #include "gs_ps_map.h"
 
@@ -80,7 +79,6 @@ inline double my_max(double x, double y) { return ( (x > y) ? x : y ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-// static const CgraphBase::FontFamily default_font_family = CgraphBase::NewCentury;
 static const FontFamily default_font_family = ff_NewCentury;
 
 
@@ -88,11 +86,6 @@ static const FontFamily default_font_family = ff_NewCentury;
 
 
 static void remap_string(FT_Face, const char * in, const char * & out);
-
-// static int ff_to_roman      (const CgraphBase::FontFamily);
-// static int ff_to_italic     (const CgraphBase::FontFamily);
-// static int ff_to_bold       (const CgraphBase::FontFamily);
-// static int ff_to_bolditalic (const CgraphBase::FontFamily);
 
 static int my_cubic  (const FT_Vector * control1, const FT_Vector * control2, const FT_Vector * to, void *);
 static int my_conic  (const FT_Vector * control, const FT_Vector * to, void *);
@@ -304,7 +297,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool CgraphBase::open(const char * filename, int width, int height, CgraphBase::PlotType t)
+void CgraphBase::open(const char * filename, int width, int height, CgraphBase::PlotType t)
 
 {
 
@@ -314,9 +307,9 @@ if ( empty (filename) )  {
 
    mlog << Error << "\n\n  CgraphBase::open() -> empty filename!\n\n";
 
-   // exit ( 1 );
+   exit ( 1 );
 
-   return ( false );
+   // return ( false );
 
 }
 
@@ -391,7 +384,8 @@ if ( error )   {
    //  done
    //
 
-return ( true );
+// return ( true );
+return;
 
 }
 
@@ -749,75 +743,6 @@ return ( face );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void CgraphBase::choose_font(const char * name, FontWeight fw, double size)
-
-{
-
-choose_font(name, fw, CgraphBase::normal, size);
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void CgraphBase::choose_font(const char * name, FontWeight fw, FontSlant fs, double size)
-
-{
-
-cairo_font_weight_t cfw = CAIRO_FONT_WEIGHT_NORMAL;
-cairo_font_slant_t  cfs = CAIRO_FONT_SLANT_NORMAL;
-
-switch ( fw ) {
-
-   case CgraphBase::roman:  cfw = CAIRO_FONT_WEIGHT_NORMAL;   break;
-   case CgraphBase::bold:   cfw = CAIRO_FONT_WEIGHT_BOLD;     break;
-
-   default:
-      mlog << Error << "\n\n  choose_font() -> font weight "
-           << cgraphbase_fontweight_to_string(fw)
-           << " is not supported.\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch fw
-
-
-switch ( fs ) {
-
-   case normal:   cfs = CAIRO_FONT_SLANT_NORMAL;   break;
-   case italic:   cfs = CAIRO_FONT_SLANT_ITALIC;   break;
-   case oblique:  cfs = CAIRO_FONT_SLANT_OBLIQUE;  break;
-
-   default:
-      mlog << Error << "\n\n  choose_font() -> font slant "
-           << cgraphbase_fontslant_to_string(fs)
-           << " is not supported.\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch fs
-
-
-cairo_select_font_face (Cr, name, cfs, cfw);
-
-cairo_set_font_size (Cr, size);
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1284,8 +1209,6 @@ if ( error )  {
 const int W = slot->bitmap.width;
 const int H = slot->bitmap.rows;
 
-// cout << "Bitmap width = " << W << "\n";
-
 gsave();
 
 // translate(x, y);
@@ -1304,11 +1227,6 @@ buf = cairo_image_surface_get_data (i);
 bytes_per_row = W;
 
 d = buf;
-
-// cout << "\n\n   (x_ul, y_ul) = (" << x_ul << ", " << y_ul << ")\n";
-// 
-// cout <<   "\n   (W, H) = (" << W << ", " << H << ")\n\n";
-
 
 for (row=0; row<H; ++row)  {
 
@@ -1638,20 +1556,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void CgraphBase::set_family(CgraphBase::FontFamily f)
-
-{
-
-Family = f;
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 void CgraphBase::roman(double size)
 
@@ -1934,45 +1838,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void Cgraph::wct(double x, double y, double u, double v, const char * text)
-
-{
-
-if ( empty(text) )  {
-
-   mlog << Error << "\n\n  Cgraph::wct() -> empty string!\n\n";
-
-   exit ( 1 );
-
-}
-
-
-cairo_text_extents_t extents;
-
-cairo_text_extents(Cr, text, &extents);
-
-double xll, yll;
-const double W = extents.width;
-const double H = extents.height;
-
-
-xll = x - u*W;
-
-yll = y - v*H;
-
-cairo_move_to(Cr, xll, c_fudge_y(yll));
-
-cairo_show_text (Cr, text);
-
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 void Cgraph::write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char c, const bool render_flag)
 
@@ -2010,8 +1875,6 @@ return;
 void Cgraph::curveto(double x1, double y1, double x2, double y2, double x3, double y3)
 
 {
-
-// cout << " In Cgraph::curveto()\n" << ::flush;
 
 CgraphBase::curveto(x1, c_fudge_y(y1), x2, c_fudge_y(y2), x3, c_fudge_y(y3));
 
@@ -2448,142 +2311,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-int ff_to_roman(const CgraphBase::FontFamily f)
-
-{
-
-int n;
-
-
-switch ( f )  {
-
-   case CgraphBase::Helvetica:    n = 11;  break;
-   case CgraphBase::NewCentury:   n = 22;  break;
-   case CgraphBase::Palatino:     n = 26;  break;
-
-   case CgraphBase::Times:        n = 31;  break;
-   case CgraphBase::Courier:      n =  7;  break;
-   case CgraphBase::Bookman:      n =  5;  break;
-
-   default:
-      mlog << Error << "\n\n  ff_to_roman() -> bad font family ... "
-           << cgraphbase_fontfamily_to_string(f) << "\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-
-return ( n );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-int ff_to_italic(const CgraphBase::FontFamily f)
-
-{
-
-int n;
-
-
-switch ( f )  {
-
-   case CgraphBase::Helvetica:    n = 18;  break;
-   case CgraphBase::NewCentury:   n = 21;  break;
-   case CgraphBase::Palatino:     n = 25;  break;
-
-   case CgraphBase::Times:        n = 30;  break;
-   case CgraphBase::Courier:      n = 10;  break;
-   case CgraphBase::Bookman:      n =  6;  break;
-
-   default:
-      mlog << Error << "\n\n  ff_to_italic() -> bad font family ... "
-           << cgraphbase_fontfamily_to_string(f) << "\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-
-return ( n );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-int ff_to_bold(const CgraphBase::FontFamily f)
-
-{
-
-int n;
-
-
-switch ( f )  {
-
-   case CgraphBase::Helvetica:    n = 12;  break;
-   case CgraphBase::NewCentury:   n = 19;  break;
-   case CgraphBase::Palatino:     n = 23;  break;
-
-   case CgraphBase::Times:        n = 28;  break;
-   case CgraphBase::Courier:      n =  8;  break;
-   case CgraphBase::Bookman:      n =  3;  break;
-
-   default:
-      mlog << Error << "\n\n  ff_to_bold() -> bad font family ... "
-           << cgraphbase_fontfamily_to_string(f) << "\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-
-return ( n );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-int ff_to_bolditalic(const CgraphBase::FontFamily f)
-
-{
-
-int n;
-
-
-switch ( f )  {
-
-   case CgraphBase::Helvetica:    n = 13;  break;
-   case CgraphBase::NewCentury:   n = 20;  break;
-   case CgraphBase::Palatino:     n = 24;  break;
-
-   case CgraphBase::Times:        n = 29;  break;
-   case CgraphBase::Courier:      n =  9;  break;
-   case CgraphBase::Bookman:      n =  4;  break;
-
-   default:
-      mlog << Error << "\n\n  ff_to_bolditalic() -> bad font family ... "
-           << cgraphbase_fontfamily_to_string(f) << "\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-
-return ( n );
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
