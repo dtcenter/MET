@@ -529,7 +529,7 @@ return;
 
 
 void PSfile::write_centered_text(int center, int fill_flag,
-              double x, double y, double x_offset, double y_offset, const char * s)
+              double x, double y, double x_offset, double y_offset, const char * s, const bool render_flag)
 
    //
    //  center      =  1   <==>   Text is centered horizontally
@@ -624,18 +624,22 @@ y_cur += scale*dy;
    //  loop through the nodes
    //
 
-n = &node;
+if ( render_flag )  {
 
-while ( n )  {
+   n = &node;
 
-   // x_cur -= scale*(n->dx());
-      x_cur += scale*(n->dx());
+   while ( n )  {
 
-   write_single_node(n, x_cur, y_cur, fill_flag);
+      // x_cur -= scale*(n->dx());
+         x_cur += scale*(n->dx());
 
-   x_cur += scale*(n->width());
+      write_single_node(n, x_cur, y_cur, fill_flag);
 
-   n = n->next;
+      x_cur += scale*(n->width());
+
+      n = n->next;
+
+   }
 
 }
 

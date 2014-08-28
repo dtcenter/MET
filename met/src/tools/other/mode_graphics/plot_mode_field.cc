@@ -122,7 +122,7 @@ static Color anno_text_color  = black;
 static ConcatString raw_ctable_filename;
 static ConcatString obj_ctable_filename;
 
-static CgraphBase::FontFamily family = CgraphBase::Helvetica;
+static FontFamily family = ff_Helvetica;
 
 static double title_font_size = 30.0;
 static double anno_font_size  = 20.0;
@@ -301,11 +301,11 @@ plot_info = e->dict_value();
 
 s = get_dict_string(plot_info, fontfamily_name);
 
-     if ( s == "Helvetica")   family = CgraphBase::Helvetica;
-else if ( s == "NewCentury")  family = CgraphBase::NewCentury;
-else if ( s == "Palatino")    family = CgraphBase::Palatino;
-else if ( s == "Times")       family = CgraphBase::Times;
-else if ( s == "Courier")     family = CgraphBase::Courier;
+     if ( s == "Helvetica")   family = ff_Helvetica;
+else if ( s == "NewCentury")  family = ff_NewCentury;
+else if ( s == "Palatino")    family = ff_Palatino;
+else if ( s == "Times")       family = ff_Times;
+else if ( s == "Courier")     family = ff_Courier;
 else {
 
    mlog << Error 
