@@ -11,6 +11,10 @@
 #ifndef  __UTIL_CONSTANTS_H__
 #define  __UTIL_CONSTANTS_H__
 
+#if HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////
 
 static const char met_version[]          = "V5.0";
