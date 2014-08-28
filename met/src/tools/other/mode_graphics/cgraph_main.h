@@ -50,20 +50,7 @@ class CgraphBase : public PSfile {
           no_cgraph_plot_type
 
       };
-/*
-      enum FontFamily {
 
-         Helvetica,
-         NewCentury,
-         Palatino,
-         Times,
-         Courier,
-         Bookman,
-
-         none
-
-      };
-*/
    private:
 
       CgraphBase(const CgraphBase &);
@@ -115,17 +102,11 @@ class CgraphBase : public PSfile {
                        //  current color is needed for rendering text
 
 
-      // int CurrentFont;   //  -1 initially (as a flag value)
-
       FT_Library Library;
-
-      // FT_Face Face [n_standard_ps_fonts];
 
       CgFontCollection Fonts;
 
       CgFont * CurrentFont;   //  not allocated
-
-      // FontFamily Family;
 
       double LastTextWidth;
 
@@ -135,7 +116,7 @@ class CgraphBase : public PSfile {
       CgraphBase();
       virtual ~CgraphBase();
 
-      bool open(const char * filename, int width, int height, PlotType = CgraphBase::png_type);
+      void open(const char * filename, int width, int height, PlotType = CgraphBase::png_type);
 
       void close();
 
@@ -143,7 +124,7 @@ class CgraphBase : public PSfile {
 
       void pagenumber(int);   //  does nothing
 
-      void comment();   //  does nothing
+      void comment(const char *);   //  does nothing
 
       void set_do_kerning   (bool);
       void set_do_ligatures (bool);
@@ -167,9 +148,6 @@ class CgraphBase : public PSfile {
          //
          //  Type 1 fonts
          //
-
-      // void  set_family  (CgraphBase::FontFamily);
-      // void  set_family  (FontFamily);
 
       void  roman      (double size);
       void  italic     (double size);
@@ -260,16 +238,13 @@ class CgraphBase : public PSfile {
 ////////////////////////////////////////////////////////////////////////
 
 
-// inline double CgraphBase::image_to_ps(double __Y__)  { return ( MediaHeight - __Y__); }
-// inline double CgraphBase::image_to_ps(double __Y__)  { return ( __Y__); }
-
 inline void CgraphBase::finish() { return; }
 
 inline void CgraphBase::showpage() { close();  return; }
 
 inline void CgraphBase::pagenumber(int) { return; }
 
-inline void CgraphBase::comment() { return; }
+inline void CgraphBase::comment(const char *) { return; }
 
 inline void CgraphBase::setlinewidth(double __W__) { cairo_set_line_width(Cr, __W__);  return; }
 
@@ -344,8 +319,6 @@ class Cgraph : public CgraphBase {
       void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char,   const bool render_flag = true);
       void write_centered_text(int center, int fill_flag, double x_pin, double y_pin, double u, double v, const char *, const bool render_flag = true);
 
-      // void wct(double x, double y, double u, double v, const char *);
-
          //
          //  drawing utils
          //
@@ -372,8 +345,6 @@ class Cgraph : public CgraphBase {
 
       void arc  (double xcen, double ycen, double radius, double angle_start, double angle_stop);
       void arcn (double xcen, double ycen, double radius, double angle_start, double angle_stop);
-
-      // void line(double, double, double, double, bool = true);   //  don't need this
 
 };
 

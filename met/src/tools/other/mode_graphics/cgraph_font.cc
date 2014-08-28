@@ -106,17 +106,6 @@ afm = (Afm *) 0;
 
 face = 0;
 
-// const char * c = getenv(cgraph_font_dir_env);
-// 
-// if ( ! c )  {
-// 
-//    mlog << Error << "\n\n  CgFont::init_from_scratch() -> unable to get environment variable \""
-//         << cgraph_font_dir_env << "\"\n\n";
-// 
-//    exit ( 1 );
-// 
-// }
-
 const char * c = getenv (cg_font_env);
 
 if ( !c )  {
@@ -144,24 +133,6 @@ return;
 void CgFont::clear()
 
 {
-
-/*
-if ( face )  {
-
-   int error = FT_Done_Face(face);
-
-   if ( error )  {
-
-      mlog << Error << "\n\n  CgFont::clear() -> trouble closing typeface \"" << short_pfb_name << "\"\n\n";
-
-      exit ( 1 );
-
-   }
-
-   face = 0;
-}
-*/
-
 
 full_pfb_name.clear();
 short_pfb_name.clear();
