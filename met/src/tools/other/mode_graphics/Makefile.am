@@ -13,7 +13,6 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_cgraph.a
 libvx_cgraph_a_SOURCES = \
 	cgraphbase_plottype_to_string.cc cgraphbase_plottype_to_string.h \
-	cgraphbase_fontfamily_to_string.cc cgraphbase_fontfamily_to_string.h \
 	color_stack.cc color_stack.h \
 	cgraph_font.cc cgraph_font.h \
 	cgraph_main.cc cgraph_main.h \
@@ -54,13 +53,10 @@ plot_mode_field_LDADD = -lvx_cgraph \
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    cgraphbase_plottype_to_string.cc cgraphbase_plottype_to_string.h \
-    cgraphbase_fontfamily_to_string.cc cgraphbase_fontfamily_to_string.h: cgraph_main.h
+    cgraphbase_plottype_to_string.cc cgraphbase_plottype_to_string.h: cgraph_main.h
 	${ENUM_TO_STRING} -prefix -concat_string cgraph_main.h
 
     clean-local:
 	-rm -f cgraphbase_plottype_to_string.cc
 	-rm -f cgraphbase_plottype_to_string.h
-	-rm -f cgraphbase_fontfamily_to_string.cc
-	-rm -f cgraphbase_fontfamily_to_string.h
 endif
