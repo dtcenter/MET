@@ -50,7 +50,7 @@ class CgraphBase : public PSfile {
           no_cgraph_plot_type
 
       };
-
+/*
       enum FontFamily {
 
          Helvetica,
@@ -63,7 +63,7 @@ class CgraphBase : public PSfile {
          none
 
       };
-
+*/
    private:
 
       CgraphBase(const CgraphBase &);
@@ -125,7 +125,7 @@ class CgraphBase : public PSfile {
 
       CgFont * CurrentFont;   //  not allocated
 
-      FontFamily Family;
+      // FontFamily Family;
 
       double LastTextWidth;
 
@@ -168,7 +168,8 @@ class CgraphBase : public PSfile {
          //  Type 1 fonts
          //
 
-      void  set_family  (CgraphBase::FontFamily);
+      // void  set_family  (CgraphBase::FontFamily);
+      // void  set_family  (FontFamily);
 
       void  roman      (double size);
       void  italic     (double size);

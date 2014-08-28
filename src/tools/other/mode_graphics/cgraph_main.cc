@@ -25,7 +25,7 @@ using namespace std;
 #include "cgraph_main.h"
 #include "cgraph_font.h"
 #include "cgraphbase_plottype_to_string.h"
-#include "cgraphbase_fontfamily_to_string.h"
+// #include "cgraphbase_fontfamily_to_string.h"
 
 #include "gs_ps_map.h"
 
@@ -80,7 +80,8 @@ inline double my_max(double x, double y) { return ( (x > y) ? x : y ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-static const CgraphBase::FontFamily default_font_family = CgraphBase::NewCentury;
+// static const CgraphBase::FontFamily default_font_family = CgraphBase::NewCentury;
+static const FontFamily default_font_family = ff_NewCentury;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,10 +89,10 @@ static const CgraphBase::FontFamily default_font_family = CgraphBase::NewCentury
 
 static void remap_string(FT_Face, const char * in, const char * & out);
 
-static int ff_to_roman      (const CgraphBase::FontFamily);
-static int ff_to_italic     (const CgraphBase::FontFamily);
-static int ff_to_bold       (const CgraphBase::FontFamily);
-static int ff_to_bolditalic (const CgraphBase::FontFamily);
+// static int ff_to_roman      (const CgraphBase::FontFamily);
+// static int ff_to_italic     (const CgraphBase::FontFamily);
+// static int ff_to_bold       (const CgraphBase::FontFamily);
+// static int ff_to_bolditalic (const CgraphBase::FontFamily);
 
 static int my_cubic  (const FT_Vector * control1, const FT_Vector * control2, const FT_Vector * to, void *);
 static int my_conic  (const FT_Vector * control, const FT_Vector * to, void *);
@@ -1637,7 +1638,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void CgraphBase::set_family(CgraphBase::FontFamily f)
 
 {
@@ -1647,7 +1648,7 @@ Family = f;
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1656,7 +1657,7 @@ void CgraphBase::roman(double size)
 
 {
 
-if ( Family == CgraphBase::none )  {
+if ( Family == no_font_family )  {
 
    mlog << Error << "\n\n  CgraphBase::roman(double) -> no font family selected!\n\n";
 
@@ -1682,7 +1683,7 @@ void CgraphBase::italic(double size)
 
 {
 
-if ( Family == CgraphBase::none )  {
+if ( Family == no_font_family )  {
 
    mlog << Error << "\n\n  CgraphBase::italic(double) -> no font family selected!\n\n";
 
@@ -1708,7 +1709,7 @@ void CgraphBase::bold(double size)
 
 {
 
-if ( Family == CgraphBase::none )  {
+if ( Family == no_font_family )  {
 
    mlog << Error << "\n\n  CgraphBase::bold(double) -> no font family selected!\n\n";
 
@@ -1734,7 +1735,7 @@ void CgraphBase::bolditalic(double size)
 
 {
 
-if ( Family == CgraphBase::none )  {
+if ( Family == no_font_family )  {
 
    mlog << Error << "\n\n  CgraphBase::bolditalic(double) -> no font family selected!\n\n";
 
@@ -2413,13 +2414,13 @@ while ( j < N )  {
 
    if ( (c0 == 'f') && (c1 == 'i') && fi_glyph_index )  {
 
-      s[k++] = fi_ligature;
+      s[k++] = (char) fi_ligature;
 
       j += 2;
 
    } else if ( (c0 == 'f') && (c1 == 'l') && fl_glyph_index )  {
 
-      s[k++] = fl_ligature;
+      s[k++] = (char) fl_ligature;
 
       j += 2;
 
@@ -2450,7 +2451,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 int ff_to_roman(const CgraphBase::FontFamily f)
 
 {
@@ -2480,11 +2481,11 @@ switch ( f )  {
 return ( n );
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 int ff_to_italic(const CgraphBase::FontFamily f)
 
 {
@@ -2514,11 +2515,11 @@ switch ( f )  {
 return ( n );
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 int ff_to_bold(const CgraphBase::FontFamily f)
 
 {
@@ -2548,11 +2549,11 @@ switch ( f )  {
 return ( n );
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 int ff_to_bolditalic(const CgraphBase::FontFamily f)
 
 {
@@ -2582,7 +2583,7 @@ switch ( f )  {
 return ( n );
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 

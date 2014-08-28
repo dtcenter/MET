@@ -191,7 +191,7 @@ class PSfile {
       virtual void close();
 
 
-      virtual void write_centered_text(int, int, double, double, double, double, const char *);
+      virtual void write_centered_text(int, int, double, double, double, double, const char *, const bool render_flag = true);
 
       virtual void showpage();
 
