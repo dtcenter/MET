@@ -19,6 +19,7 @@
 //                                    presence of required members at
 //                                    each lead time.
 //   002    07/15/14  Halley Gotway   Simplify Interp12 logic.
+//   003    07/15/14  Halley Gotway   Fix bug in init_beg/end logic.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -490,9 +491,9 @@ bool is_keeper(const ATCFLine &line) {
 
    // Initialization time window
    else if((conf_info.InitBeg > 0 &&
-            conf_info.InitBeg < line.warning_time()) ||
+            conf_info.InitBeg > line.warning_time()) ||
            (conf_info.InitEnd > 0 &&
-            conf_info.InitEnd > line.warning_time()) ||
+            conf_info.InitEnd < line.warning_time()) ||
            (conf_info.InitInc.n_elements() > 0 &&
             !conf_info.InitInc.has(line.warning_time())) ||
            (conf_info.InitExc.n_elements() > 0 &&
@@ -580,9 +581,9 @@ void filter_tracks(TrackInfoArray &tracks) {
 
       // Initialization time window
       if((conf_info.InitBeg > 0 &&
-          conf_info.InitBeg < t[i].init()) ||
+          conf_info.InitBeg > t[i].init()) ||
          (conf_info.InitEnd > 0 &&
-          conf_info.InitEnd > t[i].init()) ||
+          conf_info.InitEnd < t[i].init()) ||
          (conf_info.InitInc.n_elements() > 0 &&
           !conf_info.InitInc.has(t[i].init())) ||
          (conf_info.InitExc.n_elements() > 0 &&
