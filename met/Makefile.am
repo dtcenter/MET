@@ -39,7 +39,7 @@ dist-hook:
 # Run the non-standard test suite
 
 test:
-	run_tests ${bindir} ${pkgdatadir}
+	./run_tests ${bindir} ${pkgdatadir}
 
 .PHONY: test
 
