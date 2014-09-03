@@ -80,6 +80,6 @@ MERGE_FCST     = 3;
 NO_MERGE       = 4;
 
 // PB2NC event stack
-TOP            = true;
-BOTTOM         = false;
+TOP            = TRUE;
+BOTTOM         = FALSE;
 
