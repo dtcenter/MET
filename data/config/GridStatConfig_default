@@ -112,9 +112,9 @@ output_flag = {
 
 nc_pairs_flag   = {
 
-   latlon = true;
-   raw    = true;
-   diff   = true;
+   latlon = TRUE;
+   raw    = TRUE;
+   diff   = TRUE;
 
 };
 
