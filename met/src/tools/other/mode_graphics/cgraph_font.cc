@@ -1,3 +1,10 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2014
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -23,7 +30,6 @@ static const int alloc_inc = 30;
 
 static const int total_predef_fonts = 34;
 
-// static const char cg_font_env [] = "CGRAPH_FONT_DIR";
 static const char cg_font_env [] = "MET_FONT_DIR";
 
 
