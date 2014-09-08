@@ -269,7 +269,7 @@ sub-directory, or the MET Online Tutorial:
   So, to configure MET to install all of the available tools in the "bin"
   subdirectory of your current directory, you would use the following command:
 
-  ./configure --prefix=`pwd` --enable-grib2 --enable-mode_graphics
+  ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-mode_graphics
 
 - Type 'make install >& make_install.log &'
 
