@@ -37,7 +37,9 @@ config_DATA = \
 	TCPairsConfig_default \
 	TCStatConfig_default \
 	WaveletStatConfig_default \
-	WWMCARegridConfig_default
+	WWMCARegridConfig_default \
+	PlotModeFieldConfig_default
+
 
 EXTRA_DIST = ${config_DATA}
 
