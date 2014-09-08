@@ -8,7 +8,7 @@ if [[ -z "${MET_BASE}"       ||
       -z "${MET_TEST_OUTPUT}" ]]; then
   echo
   echo "ERROR: Required environment variable(s) unset:"
-  echo "ERROR: \${MET_BASE}, \${MET_TEST_BASE}, \${MET_TEST_INPUT}, \${MET_TEST_OUTPUT}"
+  echo "ERROR: \${MET_BASE}, \${MET_BUILD_BASE}, \${MET_TEST_BASE}, \${MET_TEST_INPUT}, \${MET_TEST_OUTPUT}"
   echo
   exit
 else
