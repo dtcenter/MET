@@ -628,14 +628,29 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
          } else {
 
+            //  determine the index for the time unit and forecast time
+            int i_time_unit, i_fcst_time;
+            switch(gfld->ipdtnum){
+
+               //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_temp4-48.shtml
+               case 48:
+                  i_time_unit = 18;
+                  i_fcst_time = 19;
+                  break;
+               default:
+                  i_time_unit = 7;
+                  i_fcst_time = 8;
+                  break;
+            }
+
             //  determine the time unit of the lead time and calculate it
-            double sec_lead_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (int)gfld->ipdtmpl[7] );
+            double sec_lead_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (int)gfld->ipdtmpl[i_time_unit] );
             if( 0 >= sec_lead_unit ){
                mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - found unexpected "
-                    << "lead time unit of " << gfld->ipdtmpl[7] << "\n\n";
+                    << "lead time unit of " << gfld->ipdtmpl[i_time_unit] << "\n\n";
                exit(1);
             }
-            rec->LeadTime = nint(sec_lead_unit * gfld->ipdtmpl[8]);
+            rec->LeadTime = nint(sec_lead_unit * gfld->ipdtmpl[i_fcst_time]);
 
             //  set the forecast time information
             if     ( -1 == rec->ValidTime )   rec->ValidTime = rec->InitTime  + rec->LeadTime;
