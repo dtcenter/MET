@@ -169,6 +169,50 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+unixtime rfc3339_to_unix(const char * text)
+
+{
+
+int month, day, year, hour, minute, second;
+unixtime t;
+char junk[32];
+
+
+substring_vx_cal(text, junk, 0, 3);
+
+year = atoi(junk);
+
+substring_vx_cal(text, junk, 5, 6);
+
+month = atoi(junk);
+
+substring_vx_cal(text, junk, 8, 9);
+
+day = atoi(junk);
+
+substring_vx_cal(text, junk, 11, 12);
+
+hour = atoi(junk);
+
+substring_vx_cal(text, junk, 14, 15);
+
+minute = atoi(junk);
+
+substring_vx_cal(text, junk, 17, 18);
+
+second = atoi(junk);
+
+
+t = mdyhms_to_unix(month, day, year, hour, minute, second);
+
+return ( t );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 unixtime yyyymmdd_hh_to_unix(const char * text)
 
 {
@@ -399,6 +443,7 @@ else if ( is_yyyymmdd_hhmmss (text) )  t = yyyymmdd_hhmmss_to_unix (text);
 else if ( is_yyyymmdd_hh     (text) )  t = yyyymmdd_hh_to_unix     (text);
 else if ( is_yyyymmddhh      (text) )  t = yyyymmddhh_to_unix      (text);
 else if ( is_yyyymmdd        (text) )  t = yyyymmdd_to_unix        (text);
+else if ( is_rfc3339         (text) )  t = rfc3339_to_unix         (text);
 else {
 
    mlog << Error << "\ntimestring_to_unix(const char *) -> can't parse date/time string \"" << text << "\"\n\n";
@@ -457,6 +502,18 @@ bool is_yyyymmdd_hhmmss(const char * text)
 {
 
 return ( check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{6\\}$", text) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_rfc3339(const char * text)
+
+{
+
+return ( check_reg_exp("^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}[ |T][0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}", text) );
 
 }
 
