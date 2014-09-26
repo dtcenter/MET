@@ -57,29 +57,29 @@ class NcCfFile {
 
       int getNx() const
       {
-	if (_xDim == 0)
-	  return 0;
-	
-	return _xDim->size();
+        if (_xDim == 0)
+          return 0;
+
+        return _xDim->size();
       }
       
       int getNy() const
       {
-	if (_yDim == 0)
-	  return 0;
-	
-	return _yDim->size();
+        if (_yDim == 0)
+          return 0;
+
+        return _yDim->size();
       }
       
          //
          //  time
          //
 
-      unixtime ValidTime;
+      TimeArray ValidTime;
 
-      unixtime InitTime;
+      unixtime  InitTime;
 
-      int      lead_time () const;   //  seconds
+      int       lead_time () const;   //  seconds
 
 
          //
@@ -124,12 +124,13 @@ class NcCfFile {
 
       StringArray _dimNames;
 
-      // Pointers to the X/Y dimensions and the associated coordinate
+      // Pointers to the X/Y and time dimensions and the associated coordinate
       // variables.  Note that these are pointers into the _dims and Var
       // arrays so should not be deleted.
 
       NcDim *_xDim;
       NcDim *_yDim;
+      NcDim *_tDim;
 
       NcVar *_xCoordVar;
       NcVar *_yCoordVar;
@@ -170,6 +171,12 @@ class NcCfFile {
       bool get_grid_from_dimensions();
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern void parse_cf_time_string(const char *, unixtime &ref_ut, int &sec_per_unit);
 
 
 ////////////////////////////////////////////////////////////////////////

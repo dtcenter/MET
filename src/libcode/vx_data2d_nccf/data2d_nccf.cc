@@ -140,10 +140,10 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
     for (int i = 0; i < _file->Nvars; ++i)
     {
       if (strcmp(_file->Var[i].name, nccf_lat_var_name) != 0 &&
-	  strcmp(_file->Var[i].name, nccf_lon_var_name) != 0)
+          strcmp(_file->Var[i].name, nccf_lon_var_name) != 0)
       {
-	vinfo_nc->set_req_name(_file->Var[i].name);
-	break;
+        vinfo_nc->set_req_name(_file->Var[i].name);
+        break;
       }
     }
   }
@@ -153,8 +153,8 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   NcVarInfo *info = (NcVarInfo *) 0;
 
   bool status = _file->getData(vinfo_nc->req_name(),
-			       vinfo_nc->dimension(),
-			       plane, info);
+                               vinfo_nc->dimension(),
+                               plane, info);
 
   // Check that the times match those requested
 
@@ -170,9 +170,9 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
 
       mlog << Warning << "\nMetNcCFDataFile::data_plane() -> "
-	   << "for \"" << vinfo.req_name() << "\" variable, the valid "
-	   << "time does not match the requested valid time: ("
-	   << data_time_str << " != " << req_time_str << ")\n\n";
+           << "for \"" << vinfo.req_name() << "\" variable, the valid "
+           << "time does not match the requested valid time: ("
+           << data_time_str << " != " << req_time_str << ")\n\n";
       status = false;
     }
 
@@ -186,9 +186,9 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       ConcatString data_time_str = sec_to_hhmmss(plane.lead());
 
       mlog << Warning << "\nMetNcCFDataFile::data_plane() -> "
-	   << "for \"" << vinfo.req_name() << "\" variable, the lead "
-	   << "time does not match the requested lead time: ("
-	   << data_time_str << " != " << req_time_str << ")\n\n";
+           << "for \"" << vinfo.req_name() << "\" variable, the lead "
+           << "time does not match the requested lead time: ("
+           << data_time_str << " != " << req_time_str << ")\n\n";
       status = false;
     }
     
@@ -207,7 +207,21 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
     if (info->units_att.length() > 0)
       vinfo.set_units(info->units_att);
+    
+    //  print a report
+    double plane_min, plane_max;
+    plane.data_range(plane_min, plane_max);
+    mlog << Debug(4) << "\n"
+         << "Data plane information:\n"
+         << "      plane min: " << plane_min << "\n"
+         << "      plane max: " << plane_max << "\n"
+         << "     valid time: " << unix_to_yyyymmdd_hhmmss(plane.valid()) << "\n"
+         << "      lead time: " << sec_to_hhmmss(plane.lead()) << "\n"
+         << "      init time: " << unix_to_yyyymmdd_hhmmss(plane.init()) << "\n"
+         << "     accum time: " << sec_to_hhmmss(plane.accum()) << "\n";
   }
+  
+  
 
   return status;
 }
@@ -241,9 +255,9 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 
    if( NULL == _file->find_var_name( vinfo.name() ) ) return -1;
 
-   if( ( vinfo.valid() && _file->ValidTime   != vinfo.valid() ) ||
-       ( vinfo.init()  && _file->InitTime    != vinfo.init()  ) ||
-       ( vinfo.lead()  && _file->lead_time() != vinfo.lead()  ) )
+   if( ( vinfo.valid() && _file->ValidTime[0] != vinfo.valid() ) ||
+       ( vinfo.init()  && _file->InitTime     != vinfo.init()  ) ||
+       ( vinfo.lead()  && _file->lead_time()  != vinfo.lead()  ) )
       return -1;
 
    return 0;
