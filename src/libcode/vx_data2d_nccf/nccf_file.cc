@@ -1868,7 +1868,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
    
    // Check for expected time string format:
    //   [seconds|minutes|hours|days] since YYYY-MM-DD HH:MM:SS
-   if(!check_reg_exp("^[a-z|A-Z]* since [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]" , str)) {
+   if(!check_reg_exp("^[a-z|A-Z]* since [0-9]\\{4\\}" , str)) {      
       mlog << Warning << "\nparse_cf_time_string() -> "
            << "unexpected NetCDF CF convention time unit \""
            << str << "\"\n\n";
@@ -1892,9 +1892,13 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
          return;
       }
 
-      ConcatString time_str;
-      time_str << tok[2] << " " << tok[3];
-      ref_ut = timestring_to_unix(time_str);
+      // Parse the reference time
+      StringArray ymd, hms;
+      ymd.parse_delim(tok[2], "-");
+      if(tok.n_elements() > 3) hms.parse_delim(tok[3], ":");
+      else                     hms.parse_delim("00:00:00", ":");
+      ref_ut = mdyhms_to_unix(atoi(ymd[1]), atoi(ymd[2]), atoi(ymd[0]),
+                              atoi(hms[0]), atoi(hms[1]), atoi(hms[2]));
    }
 
    mlog << Debug(4) << "parse_cf_time_string() -> "
