@@ -73,6 +73,7 @@ using namespace std;
 #include "little_r_handler.h"
 #include "met_handler.h"
 #include "surfrad_handler.h"
+#include "wwsis_handler.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +90,8 @@ enum ASCIIFormat {
    ASCIIFormat_None,
    ASCIIFormat_MET,
    ASCIIFormat_Little_R,
-   ASCIIFormat_SurfRad
+   ASCIIFormat_SurfRad,
+   ASCIIFormat_WWSIS
 };
 static ASCIIFormat ascii_format = ASCIIFormat_None;
 
@@ -253,6 +255,11 @@ FileHandler *create_file_handler(const ASCIIFormat format,
     return (FileHandler *)new SurfradHandler(program_name);
   }
   
+  case ASCIIFormat_WWSIS:
+  {
+    return (FileHandler *)new SurfradHandler(program_name);
+  }
+  
   case ASCIIFormat_None:
   {
     return determine_ascii_format(ascii_filename);
@@ -326,6 +333,20 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
   delete surfrad_file;
   
   //
+  // See if this is a WWSIS file.
+  //
+  f_in.rewind();
+  WwsisHandler *wwsis_file = new WwsisHandler(program_name);
+  
+  if (wwsis_file->isFileType(f_in))
+  {
+    f_in.close();
+    return (FileHandler *)wwsis_file;
+  }
+  
+  delete wwsis_file;
+  
+  //
   // If we get here, we didn't recognize the file contents.
   //
   
@@ -361,8 +382,9 @@ void usage() {
 
         << "\t\t\"-format ASCII_format\" may be set to \""
         << MetHandler::getFormatString() << "\", \""
-        << LittleRHandler::getFormatString() << "\" or \""
-        << SurfradHandler::getFormatString() << "\" (optional).\n"
+        << LittleRHandler::getFormatString() << "\", \""
+        << SurfradHandler::getFormatString() << "\" or \""
+        << WwsisHandler::getFormatString() << "\" (optional).\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
@@ -410,6 +432,9 @@ void set_format(const StringArray & a) {
   }
   else if(SurfradHandler::getFormatString() == a[0]) {
     ascii_format = ASCIIFormat_SurfRad;
+  }
+  else if(WwsisHandler::getFormatString() == a[0]) {
+    ascii_format = ASCIIFormat_WWSIS;
   }
   else {
     mlog << Error << "\nset_format() -> "

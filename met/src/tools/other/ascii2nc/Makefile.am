@@ -27,7 +27,8 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	summary_calc_stdev.cc summary_calc_stdev.h \
 	summary_key.cc summary_key.h \
 	surfrad_handler.cc surfrad_handler.h \
-	time_summary_interval.cc time_summary_interval.h
+	time_summary_interval.cc time_summary_interval.h \
+	wwsis_handler.cc wwsis_handler.h
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS}
 ascii2nc_LDFLAGS = ${MET_LDFLAGS}
 ascii2nc_LDADD = -lvx_shapedata \
