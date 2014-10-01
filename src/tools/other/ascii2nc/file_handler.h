@@ -281,6 +281,21 @@ protected:
     return time_string;
   }
   
+  static time_t _stringToTime(const string &time_string)
+  {
+    struct tm time_struct;
+    memset(&time_struct, 0, sizeof(time_struct));
+
+    time_struct.tm_year = atoi(time_string.substr(0, 4).c_str()) - 1900;
+    time_struct.tm_mon = atoi(time_string.substr(4, 2).c_str()) - 1;
+    time_struct.tm_mday = atoi(time_string.substr(6, 2).c_str());
+    time_struct.tm_hour = atoi(time_string.substr(9, 2).c_str());
+    time_struct.tm_min = atoi(time_string.substr(11, 2).c_str());
+    time_struct.tm_sec = atoi(time_string.substr(13, 2).c_str());
+
+    return timegm(&time_struct);
+  }
+
   void _closeNetcdf();
   bool _openNetcdf(const string &nc_filename);
   bool _writeHdrInfo(const ConcatString &hdr_typ,
