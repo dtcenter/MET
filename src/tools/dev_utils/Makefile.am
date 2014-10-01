@@ -16,7 +16,8 @@ bin_PROGRAMS    = chk4copyright \
 	pbtime  \
 	gribtab_dat_to_flat  \
 	nceptab_to_flat  \
-	insitu_nc_to_ascii
+	insitu_nc_to_ascii \
+	swinging_door
 
 chk4copyright_SOURCES = chk4copyright.cc
 chk4copyright_CPPFLAGS = ${MET_CPPFLAGS}
@@ -73,14 +74,23 @@ nceptab_to_flat_LDADD = -lvx_pb_util \
 	$(FLIBS)
 
 insitu_nc_to_ascii_SOURCES = insitu_nc_to_ascii.cc \
-	insitu_nc_file.cc
+	insitu_nc_file.cc insitu_nc_file.h
 insitu_nc_to_ascii_CPPFLAGS = ${MET_CPPFLAGS}
 insitu_nc_to_ascii_LDFLAGS = ${MET_LDFLAGS}
 insitu_nc_to_ascii_LDADD = -lvx_util \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf
 
-EXTRA_DIST = insitu_nc_file.h
+swinging_door_SOURCES = swinging_door.cc \
+	met_nc_file.cc met_nc_file.h
+swinging_door_CPPFLAGS = ${MET_CPPFLAGS}
+swinging_door_LDFLAGS = ${MET_LDFLAGS}
+swinging_door_LDADD = -lvx_swinging_door \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm -lnetcdf_c++ -lnetcdf
 
 # Build chk4copyright when making a distribution so that we can
 #  add missing copyrights to the source files
