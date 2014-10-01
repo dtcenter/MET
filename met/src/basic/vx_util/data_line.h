@@ -70,6 +70,8 @@ class DataLine {
 
       int LineNumber;
 
+      char *Delimiter;
+      
    public:
 
       DataLine();
@@ -86,6 +88,8 @@ class DataLine {
          //  retrieve stuff
          //
 
+      const char *get_line() const;
+      
       const char * get_item(int) const;
 
       int n_items() const;
@@ -106,6 +110,8 @@ class DataLine {
 
       virtual int is_ok() const;
 
+      virtual void set_delimiter(const char *delimiter);
+      
 };
 
 
