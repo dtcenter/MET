@@ -115,6 +115,8 @@ N_items = 0;
 
 N_chars = N_ints = 0;
 
+Delimiter = new char[2];
+strcpy(Delimiter, " ");
 
 return;
 
@@ -236,6 +238,18 @@ for (j=0; j<N_items; ++j)  {
 out.flush();
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * DataLine::get_line() const
+
+{
+
+  return Line;
 
 }
 
@@ -425,7 +439,7 @@ if ( !f )  return ( 0 );
 char c;
 char * s = (char *) 0;
 char * p = (char *) 0;
-const char * delim = " ";
+
 int pos, count;
 
 
@@ -457,7 +471,7 @@ s = Line;
 
 count = 0;
 
-while ( (p = strtok(s, delim)) != NULL )  {
+while ( (p = strtok(s, Delimiter)) != NULL )  {
 
    pos = (int) (p - Line);
 
@@ -582,6 +596,19 @@ if ( N_items == 0 )  return ( 0 );
 
 return ( 1 );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DataLine::set_delimiter(const char *delimiter)
+
+{
+  delete [] Delimiter;
+  
+  Delimiter = new char[strlen(delimiter) + 1];
+  strcpy(Delimiter, delimiter);
 }
 
 
