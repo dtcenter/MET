@@ -212,4 +212,88 @@
     </output>
   </test>
   
+  <test name="ascii2nc_WWSIS_clear_pvwatts_one_min">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.csv \
+      &OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_WWSIS_clear_pvwatts_five_min">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_five_min_v3pt4.csv \
+      &OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_five_min_v3pt4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_five_min_v3pt4.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_WWSIS_clear_pvwatts_ten_min">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_ten_min_v3pt4.csv \
+      &OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_ten_min_v3pt4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_ten_min_v3pt4.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_WWSIS_clear_pvwatts_sixty_min">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.csv \
+      &OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_WWSIS_HA_pvwatts_sixty_min">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/wwsis/HA_pvwatts_315510615_2006_30MW_sixty_min_v3pt4.csv \
+      &OUTPUT_DIR;/wwsis/HA_pvwatts_315510615_2006_30MW_sixty_min_v3pt4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/wwsis/HA_pvwatts_315510615_2006_30MW_sixty_min_v3pt4.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_WWSIS_pvwatts_one_min">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/wwsis/pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.csv \
+      &OUTPUT_DIR;/wwsis/pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/wwsis/pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_WWSIS_pvwatts_sixty_min">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/wwsis/pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.csv \
+      &OUTPUT_DIR;/wwsis/pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/wwsis/pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>
