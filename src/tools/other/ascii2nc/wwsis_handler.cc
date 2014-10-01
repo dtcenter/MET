@@ -121,11 +121,13 @@ int WwsisHandler::_getYearFromFilename(const string &filename) const
     return 0;
   work_string = work_string.substr(0, underscore_pos);
   
-  // Remove the "pv"
+  // Remove the "pv", if it exists.  The "HA_pvwatts..." files don't have the
+  // "pv" part.
 
   if ((underscore_pos = work_string.rfind("_")) == string::npos)
     return 0;
-  work_string = work_string.substr(0, underscore_pos);
+  if (work_string.substr(underscore_pos) == "_pv")
+    work_string = work_string.substr(0, underscore_pos);
   
   // The next underscore will be the one before the year
 
