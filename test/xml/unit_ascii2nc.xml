@@ -1,4 +1,4 @@
-0;278;0c<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE met_test [
   <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
