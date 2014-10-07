@@ -1449,15 +1449,24 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
         strcmp(dim_units, "degreeN") == 0 ||
         strcmp(dim_units, "degreesN") == 0)
     {
-      _yDim = _dims[dim_num];
-
-      for (int var_num = 0; var_num < Nvars; ++var_num)
+      if (_yDim == 0)
       {
-        if (strcmp(Var[var_num].name, _yDim->name()) == 0)
+        _yDim = _dims[dim_num];
+
+        for (int var_num = 0; var_num < Nvars; ++var_num)
         {
-          _yCoordVar = Var[var_num].var;
-          break;
+          if (strcmp(Var[var_num].name, _yDim->name()) == 0)
+          {
+            _yCoordVar = Var[var_num].var;
+            break;
+          }
         }
+      }
+      else
+      {
+        mlog << Warning << "\n" << method_name << " -> "
+             << "Found multiple variables for latitude, using \""
+             << _yCoordVar->name() << "\".\n\n";
       }
     }
     
@@ -1468,15 +1477,24 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
         strcmp(dim_units, "degreeE") == 0 ||
         strcmp(dim_units, "degreesE") == 0)
     {
-      _xDim = _dims[dim_num];
-
-      for (int var_num = 0; var_num < Nvars; ++var_num)
+      if (_xDim == 0)
       {
-        if (strcmp(Var[var_num].name, _xDim->name()) == 0)
+        _xDim = _dims[dim_num];
+
+        for (int var_num = 0; var_num < Nvars; ++var_num)
         {
-          _xCoordVar = Var[var_num].var;
-          break;
+          if (strcmp(Var[var_num].name, _xDim->name()) == 0)
+          {
+            _xCoordVar = Var[var_num].var;
+            break;
+          }
         }
+      }
+      else
+      {
+        mlog << Warning << "\n" << method_name << " -> "
+             << "Found multiple variables for longitude, using \""
+             << _xCoordVar->name() << "\".\n\n";
       }
     }
     
@@ -1721,15 +1739,24 @@ bool NcCfFile::get_grid_from_dimensions()
         strcmp(dim_units, "degreeN") == 0 ||
         strcmp(dim_units, "degreesN") == 0)
     {
-      _yDim = _dims[dim_num];
-
-      for (int var_num = 0; var_num < Nvars; ++var_num)
+      if (_yDim == 0)
       {
-        if (strcmp(Var[var_num].name, _yDim->name()) == 0)
+        _yDim = _dims[dim_num];
+
+        for (int var_num = 0; var_num < Nvars; ++var_num)
         {
-          _yCoordVar = Var[var_num].var;
-          break;
+          if (strcmp(Var[var_num].name, _yDim->name()) == 0)
+          {
+            _yCoordVar = Var[var_num].var;
+            break;
+          }
         }
+      }
+      else
+      {
+        mlog << Warning << "\n" << method_name << " -> "
+             << "Found multiple variables for latitude, using \""
+             << _yCoordVar->name() << "\".\n\n";
       }
     }
     
@@ -1740,15 +1767,24 @@ bool NcCfFile::get_grid_from_dimensions()
         strcmp(dim_units, "degreeE") == 0 ||
         strcmp(dim_units, "degreesE") == 0)
     {
-      _xDim = _dims[dim_num];
-
-      for (int var_num = 0; var_num < Nvars; ++var_num)
+      if (_xDim == 0)
       {
-        if (strcmp(Var[var_num].name, _xDim->name()) == 0)
+        _xDim = _dims[dim_num];
+
+        for (int var_num = 0; var_num < Nvars; ++var_num)
         {
-          _xCoordVar = Var[var_num].var;
-          break;
+          if (strcmp(Var[var_num].name, _xDim->name()) == 0)
+          {
+            _xCoordVar = Var[var_num].var;
+            break;
+          }
         }
+      }
+      else
+      {
+        mlog << Warning << "\n" << method_name << " -> "
+             << "Found multiple variables for longitude, using \""
+             << _xCoordVar->name() << "\".\n\n";
       }
     }
     
