@@ -85,6 +85,8 @@ void TrackPairInfo::clear() {
    YErr.clear();
    AlongTrackErr.clear();
    CrossTrackErr.clear();
+   ADeckRIRW.clear();
+   BDeckRIRW.clear();
    Keep.clear();
 
    if(Line) { delete [] Line; Line = (TCStatLine *) 0; }
@@ -117,6 +119,10 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    AlongTrackErr.dump(out, indent_depth+1);
    out << prefix << "CrossTrackErr:\n";
    CrossTrackErr.dump(out, indent_depth+1);
+   out << prefix << "ADeckRIRW:\n";
+   ADeckRIRW.dump(out, indent_depth+1);
+   out << prefix << "BDeckRIRW:\n";
+   BDeckRIRW.dump(out, indent_depth+1);
    out << prefix << "Keep:\n";
    Keep.dump(out, indent_depth+1);
    out << prefix << "NLines = " << NLines << "\n";
@@ -196,6 +202,9 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
    YErr          = t.YErr;
    AlongTrackErr = t.AlongTrackErr;
    CrossTrackErr = t.CrossTrackErr;
+   ADeckRIRW     = t.ADeckRIRW;
+   BDeckRIRW     = t.BDeckRIRW;
+   Keep          = t.Keep;
 
    extend(t.NLines);
 
@@ -313,6 +322,8 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
    YErr.add(yerr);
    AlongTrackErr.add(altkerr);
    CrossTrackErr.add(crtkerr);
+   ADeckRIRW.add(bad_data_double);
+   BDeckRIRW.add(bad_data_double);
    Keep.add(1);
 
    return;
@@ -395,6 +406,8 @@ void TrackPairInfo::add(const TCStatLine &l) {
    YErr.add(atof(l.get_item("Y_ERR")));
    AlongTrackErr.add(atof(l.get_item("ALTK_ERR")));
    CrossTrackErr.add(atof(l.get_item("CRTK_ERR")));
+   ADeckRIRW.add(bad_data_double);
+   BDeckRIRW.add(bad_data_double);
    Keep.add(1);
 
    // Store the input line
@@ -500,35 +513,44 @@ int TrackPairInfo::check_water_only() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-int TrackPairInfo::check_rapid_inten(const TrackType track_type, const int ri_sec,
-                                     const bool exact_flag, const SingleThresh &st) {
+int TrackPairInfo::check_rapid_inten(const TrackType track_type,
+                                     const int sec_adeck, const int sec_bdeck,
+                                     const bool exact_adeck, const bool exact_bdeck,
+                                     const SingleThresh &st_adeck, const SingleThresh &st_bdeck) {
    int i, j, n_rej;
    unixtime delta_ut;
    double cur_avmax, cur_bvmax;
    double prv_avmax, prv_bvmax;
-   bool adeck_ri, bdeck_ri;
  
    // Nothing to do.
    if(track_type == TrackType_None) return(0);
  
    // Check threshold type for non-exact intensity differences.
-   if(!exact_flag &&
-      st.get_type() != thresh_lt && st.get_type() != thresh_le &&
-      st.get_type() != thresh_gt && st.get_type() != thresh_ge) {
+   if(!exact_adeck &&
+      st_adeck.get_type() != thresh_lt && st_adeck.get_type() != thresh_le &&
+      st_adeck.get_type() != thresh_gt && st_adeck.get_type() != thresh_ge) {
       mlog << Error << "\ncheck_rapid_inten() -> "
            << "for non-exact intensity differeces the RI/RW threshold ("
-           << st.get_str() << ") must be of type <, <=, >, or >=.\n\n";
+           << st_adeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
+      exit(1);
+   }
+
+   // Check threshold type for non-exact intensity differences.
+   if(!exact_bdeck &&
+      st_bdeck.get_type() != thresh_lt && st_bdeck.get_type() != thresh_le &&
+      st_bdeck.get_type() != thresh_gt && st_bdeck.get_type() != thresh_ge) {
+      mlog << Error << "\ncheck_rapid_inten() -> "
+           << "for non-exact intensity differeces the RI/RW threshold ("
+           << st_bdeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
    }
    
    // Loop over the track points
    for(i=0, n_rej=0; i<NPoints; i++) {
 
-      // Skip over track points we're not already keeping
-      if(!Keep[i]) continue;
-
       // Initialize
-      adeck_ri = bdeck_ri = false;
+      ADeckRIRW.set(i, bad_data_double);
+      BDeckRIRW.set(i, bad_data_double);
       
       // Store the current wind speed maximum
       cur_avmax = ADeck[i].v_max();
@@ -545,78 +567,90 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type, const int ri_se
          // Skip over future track points.
          if(delta_ut < 0) continue;
 
-         // Only check the end point of the time window
-         if(exact_flag && delta_ut == ri_sec) {
-            prv_avmax = ADeck[j].v_max();
-            prv_bvmax = BDeck[j].v_max();
-            break;
-         }
+         // Check for an exact ADeck time difference.
+         if(exact_adeck && delta_ut == sec_adeck) prv_avmax = ADeck[j].v_max();
 
-         // Check all points in the time window
-         if(!exact_flag && delta_ut <= ri_sec) {
+         // Check all ADeck points in the time window
+         if(!exact_adeck && delta_ut <= sec_adeck) {
 
-            // Initialize the previous intensities.
+            // Initialize the previous intensity.
             if(is_bad_data(prv_avmax)) prv_avmax = ADeck[j].v_max();
-            if(is_bad_data(prv_bvmax)) prv_bvmax = BDeck[j].v_max();
 
             // Update the previous ADeck intensity.
             if(!is_bad_data(prv_avmax) && !is_bad_data(ADeck[j].v_max())) {
 
                // For greater-than type thresholds, find the minimum value in the window.
-               if((st.get_type() == thresh_gt || st.get_type() == thresh_ge) &&
+               if((st_adeck.get_type() == thresh_gt || st_adeck.get_type() == thresh_ge) &&
                   ADeck[j].v_max() < prv_avmax) prv_avmax = ADeck[j].v_max();
 
                // For less-than type thresholds, find the maximum value in the window.
-               if((st.get_type() == thresh_lt || st.get_type() == thresh_le) &&
+               if((st_adeck.get_type() == thresh_lt || st_adeck.get_type() == thresh_le) &&
                   ADeck[j].v_max() > prv_avmax) prv_avmax = ADeck[j].v_max();
             }
+         }
 
-            // Update the previous BDeck intensity
+         // Check for an exact BDeck time difference.
+         if(exact_bdeck && delta_ut == sec_bdeck) prv_bvmax = BDeck[j].v_max();
+
+         // Check all BDeck points in the time window
+         if(!exact_bdeck && delta_ut <= sec_bdeck) {
+
+            // Initialize the previous intensity.
+            if(is_bad_data(prv_bvmax)) prv_bvmax = BDeck[j].v_max();
+
+            // Update the previous BDeck intensity.
             if(!is_bad_data(prv_bvmax) && !is_bad_data(BDeck[j].v_max())) {
 
                // For greater-than type thresholds, find the minimum value in the window.
-               if((st.get_type() == thresh_gt || st.get_type() == thresh_ge) &&
+               if((st_bdeck.get_type() == thresh_gt || st_bdeck.get_type() == thresh_ge) &&
                   BDeck[j].v_max() < prv_bvmax) prv_bvmax = BDeck[j].v_max();
 
                // For less-than type thresholds, find the maximum value in the window.
-               if((st.get_type() == thresh_lt || st.get_type() == thresh_le) &&
+               if((st_bdeck.get_type() == thresh_lt || st_bdeck.get_type() == thresh_le) &&
                   BDeck[j].v_max() > prv_bvmax) prv_bvmax = BDeck[j].v_max();
             }
          }
       } // end for j
 
       // Apply ADeck logic
-      if(!is_bad_data(cur_avmax) && !is_bad_data(prv_avmax) &&
-         st.check(cur_avmax - prv_avmax)) adeck_ri = true;
+      if(!is_bad_data(cur_avmax) && !is_bad_data(prv_avmax)) {
+         if(st_adeck.check(cur_avmax - prv_avmax)) ADeckRIRW.set(i, 1);
+         else                                      ADeckRIRW.set(i, 0);
+      }
 
       // Apply BDeck logic
-      if(!is_bad_data(cur_bvmax) && !is_bad_data(prv_bvmax) &&
-         st.check(cur_bvmax - prv_bvmax)) bdeck_ri = true;
+      if(!is_bad_data(cur_bvmax) && !is_bad_data(prv_bvmax)) {
+         if(st_bdeck.check(cur_bvmax - prv_bvmax)) BDeckRIRW.set(i, 1);
+         else                                      BDeckRIRW.set(i, 0);
+      }
 
       // Print debug message when rapid intensification is found
-      if(adeck_ri && (track_type == TrackType_ADeck ||
-                      track_type == TrackType_Both)) {
+      if(is_eq(ADeckRIRW[i], 1.0) &&
+         (track_type == TrackType_ADeck || track_type == TrackType_Both)) {
          mlog << Debug(4) << "Found ADECK RI/RW for valid time "
-              << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << " with "
-              << sec_to_hhmmss(ri_sec) << (exact_flag ? " exact " : " maximum " )
+              << unix_to_yyyymmdd_hhmmss(valid(i)) << " with "
+              << sec_to_hhmmss(sec_adeck) << (exact_adeck ? " exact " : " maximum " )
               << "change of " << prv_avmax << " to " << cur_avmax << " kt, "
-              << cur_avmax - prv_avmax << st.get_str()
+              << cur_avmax - prv_avmax << st_adeck.get_str()
               << " kt for " << case_info() << "\n";
       }
-      if(bdeck_ri && (track_type == TrackType_BDeck ||
-                      track_type == TrackType_Both)) {
+      if(is_eq(BDeckRIRW[i], 1.0) &&
+         (track_type == TrackType_BDeck || track_type == TrackType_Both)) {
          mlog << Debug(4) << "Found BDECK RI/RW for valid time "
-              << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << " with "
-              << sec_to_hhmmss(ri_sec) << (exact_flag ? " exact " : " maximum " )
+              << unix_to_yyyymmdd_hhmmss(valid(i)) << " with "
+              << sec_to_hhmmss(sec_bdeck) << (exact_bdeck ? " exact " : " maximum " )
               << "change of " << prv_bvmax << " to " << cur_bvmax << " kt, "
-              << cur_bvmax - prv_bvmax << st.get_str()
+              << cur_bvmax - prv_bvmax << st_bdeck.get_str()
               << " kt for " << case_info() << "\n";
       }
 
+      // Don't increment counts for track points we're not already keeping
+      if(!Keep[i]) continue;
+
       // Update the keep status
-      if((track_type == TrackType_ADeck && !adeck_ri) ||
-         (track_type == TrackType_BDeck && !bdeck_ri) ||
-         (track_type == TrackType_Both  && !adeck_ri && !bdeck_ri)) {
+      if((track_type == TrackType_ADeck && !ADeckRIRW[i]) ||
+         (track_type == TrackType_BDeck && !BDeckRIRW[i]) ||
+         (track_type == TrackType_Both  && !ADeckRIRW[i] && !BDeckRIRW[i])) {
          Keep.set(i, 0);
          n_rej++;
       }

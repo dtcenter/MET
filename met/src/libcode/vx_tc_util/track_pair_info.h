@@ -68,6 +68,10 @@ class TrackPairInfo {
       int          NAlloc;
       TCStatLine * Line;
 
+      // Status for whether RI/RW occurred
+      NumArray     ADeckRIRW;
+      NumArray     BDeckRIRW;
+
       // Status for whether this point should be used
       NumArray     Keep;
 
@@ -108,6 +112,8 @@ class TrackPairInfo {
       double             y_err(int)           const;
       double             along_track_err(int) const;
       double             cross_track_err(int) const;
+      int                adeck_rirw(int)      const;
+      int                bdeck_rirw(int)      const;
 
       int                n_lines()            const;
       const TCStatLine * line(int i)          const;
@@ -126,8 +132,9 @@ class TrackPairInfo {
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
       int  check_water_only();
-      int  check_rapid_inten(const TrackType, const int, const bool,
-                             const SingleThresh &);
+      int  check_rapid_inten(const TrackType, const int, const int,
+                             const bool, const bool,
+                             const SingleThresh &, const SingleThresh &);
       int  check_landfall(const int, const int);
       bool landfall_window(unixtime, unixtime) const;
 
@@ -136,19 +143,21 @@ class TrackPairInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int                TrackPairInfo::n_points()             const { return(NPoints);          }
-inline const TrackInfo &  TrackPairInfo::adeck()                const { return(ADeck);            }
-inline const TrackInfo &  TrackPairInfo::bdeck()                const { return(BDeck);            }
-inline double             TrackPairInfo::adeck_dland(int i)     const { return(ADeckDLand[i]);    }
-inline double             TrackPairInfo::bdeck_dland(int i)     const { return(BDeckDLand[i]);    }
-inline double             TrackPairInfo::track_err(int i)       const { return(TrackErr[i]);      }
-inline double             TrackPairInfo::x_err(int i)           const { return(XErr[i]);          }
-inline double             TrackPairInfo::y_err(int i)           const { return(YErr[i]);          }
-inline double             TrackPairInfo::along_track_err(int i) const { return(AlongTrackErr[i]); }
-inline double             TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]); }
-inline int                TrackPairInfo::n_lines()              const { return(NLines);           }
-inline const TCStatLine * TrackPairInfo::line(int i)            const { return(&Line[i]);         }
-inline bool               TrackPairInfo::keep(int i)            const { return(Keep[i] != 0);     }
+inline int                TrackPairInfo::n_points()             const { return(NPoints);            }
+inline const TrackInfo &  TrackPairInfo::adeck()                const { return(ADeck);              }
+inline const TrackInfo &  TrackPairInfo::bdeck()                const { return(BDeck);              }
+inline double             TrackPairInfo::adeck_dland(int i)     const { return(ADeckDLand[i]);      }
+inline double             TrackPairInfo::bdeck_dland(int i)     const { return(BDeckDLand[i]);      }
+inline double             TrackPairInfo::track_err(int i)       const { return(TrackErr[i]);        }
+inline double             TrackPairInfo::x_err(int i)           const { return(XErr[i]);            }
+inline double             TrackPairInfo::y_err(int i)           const { return(YErr[i]);            }
+inline double             TrackPairInfo::along_track_err(int i) const { return(AlongTrackErr[i]);   }
+inline double             TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]);   }
+inline int                TrackPairInfo::adeck_rirw(int i)      const { return(nint(ADeckRIRW[i])); }
+inline int                TrackPairInfo::bdeck_rirw(int i)      const { return(nint(BDeckRIRW[i])); }
+inline int                TrackPairInfo::n_lines()              const { return(NLines);             }
+inline const TCStatLine * TrackPairInfo::line(int i)            const { return(&Line[i]);           }
+inline bool               TrackPairInfo::keep(int i)            const { return(Keep[i] != 0);       }
 
 ////////////////////////////////////////////////////////////////////////
 //

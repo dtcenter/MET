@@ -18,6 +18,7 @@
 
 #include "tc_stat_files.h"
 
+#include "met_stats.h"
 #include "config_constants.h"
 #include "mask_poly.h"
 #include "vx_tc_util.h"
@@ -50,8 +51,21 @@ static const SingleThresh default_fsp_thresh(">0");
 ////////////////////////////////////////////////////////////////////////
 
 // Define struct to store the mapped StringArray and NumArray values
-struct MapData {
+struct SummaryMapData {
    NumArray    Val;
+   StringArray Hdr;
+   StringArray AModel;
+   TimeArray   Init;
+   NumArray    Lead;
+   TimeArray   Valid;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+// Define struct to store the mapped StringArray and RIRW contingency
+// table counts and statistics
+struct RIRWMapData {
+   CTSInfo     Info;
    StringArray Hdr;
    StringArray AModel;
    TimeArray   Init;
@@ -79,6 +93,8 @@ enum TCStatJobType {
                           // the lines to the filename specified.
    TCStatJobType_Summary, // Compute summary info for one or more
                           // columns of data.
+   TCStatJobType_RIRW,    // Derive contingency table and statistics
+                          // for RI/RW events.
    NoTCStatJobType        // Default value
 };
 
@@ -262,11 +278,11 @@ class TCStatJob {
       NumArray    EventEqualLead;
       StringArray EventEqualCases;
 
-      // Only retain TrackPoints with recent rapid intensification
+      // Rapid intensification/weakening logic for each track
       TrackType    RapidIntenTrack;
-      int          RapidIntenTime;
-      bool         RapidIntenExact;
-      SingleThresh RapidIntenThresh;
+      int          RapidIntenTimeADeck, RapidIntenTimeBDeck;
+      bool         RapidIntenExactADeck, RapidIntenExactBDeck;
+      SingleThresh RapidIntenThreshADeck, RapidIntenThreshBDeck;
 
       // Only retain TrackPoints in a time window around landfall
       bool Landfall;
@@ -328,7 +344,7 @@ class TCStatJobSummary : public TCStatJob {
 
       void process_track_pair(TrackPairInfo &);
       
-      void add_map(map<ConcatString,MapData,cs_cmp>&);
+      void add_map(map<ConcatString,SummaryMapData,cs_cmp>&);
 
       void do_output(ostream &);
 
@@ -350,16 +366,58 @@ class TCStatJobSummary : public TCStatJob {
       SingleThresh FSPThresh;
 
       // Map column and case info to column values
-      map<ConcatString,MapData,cs_cmp> SummaryMap;
+      map<ConcatString,SummaryMapData,cs_cmp> SummaryMap;
 
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-bool        is_time_series(const TimeArray &, const NumArray &,
+class TCStatJobRIRW : public TCStatJob {
+
+   private:
+
+      void init_from_scratch();
+
+      void assign(const TCStatJobRIRW &);
+
+   public:
+
+      TCStatJobRIRW();
+      virtual ~TCStatJobRIRW();
+      TCStatJobRIRW(const TCStatJobRIRW &);
+      TCStatJobRIRW & operator=(const TCStatJobRIRW &);
+
+      void clear();
+
+      StringArray parse_job_command(const char *);
+
+      ConcatString serialize() const;
+
+      void do_job(const StringArray &, TCLineCounts &); // virtual from base class
+
+      void process_track_pair(TrackPairInfo &);
+
+      void add_map(map<ConcatString,RIRWMapData,cs_cmp>&);
+
+      void do_output(ostream &);
+
+      // Store the case information
+      StringArray CaseColumn;
+
+      // Confidence interval alpha value
+      double OutAlpha;
+
+      // Map column and case info to column values
+      map<ConcatString,RIRWMapData,cs_cmp> RIRWMap;
+
+};
+
+////////////////////////////////////////////////////////////////////////
+
+extern bool        is_time_series(const TimeArray &, const NumArray &,
                            const TimeArray &, int &);
-int         compute_time_to_indep(const NumArray &, int);
-StringArray intersection(const StringArray &, const StringArray &);
+extern int         compute_time_to_indep(const NumArray &, int);
+extern StringArray intersection(const StringArray &, const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
