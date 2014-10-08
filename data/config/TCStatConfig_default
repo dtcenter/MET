@@ -124,9 +124,12 @@ water_only = FALSE;
 //
 rapid_inten = {
    track  = NONE;
-   time   = "24";
-   exact  = TRUE;
-   thresh = >=30.0;
+   adeck = {
+      time   = "24";
+      exact  = TRUE;
+      thresh = >=30.0;
+   }
+   bdeck = adeck;
 }
 
 //

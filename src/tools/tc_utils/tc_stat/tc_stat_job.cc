@@ -27,17 +27,20 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_math.h"
 #include "vx_config.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 static const char *TCStatJobType_FilterStr  = "filter";
 static const char *TCStatJobType_SummaryStr = "summary";
+static const char *TCStatJobType_RIRWStr    = "rirw";
 
 ////////////////////////////////////////////////////////////////////////
 
 // Functions for parsing command line options
 extern void parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
 extern void parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
+extern void setup_table        (AsciiTable &, int);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -62,6 +65,10 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
 
       case TCStatJobType_Summary:
          job = new TCStatJobSummary;
+         break;
+
+      case TCStatJobType_RIRW:
+         job = new TCStatJobRIRW;
          break;
 
       case NoTCStatJobType:
@@ -212,17 +219,20 @@ void TCStatJob::clear() {
    JobOut = (ofstream *) 0;
 
    // Set to default values
-   WaterOnly        = default_water_only;
-   RapidIntenTrack  = default_rapid_inten_track;
-   RapidIntenTime   = default_rapid_inten_time;
-   RapidIntenExact  = default_rapid_inten_exact;
-   RapidIntenThresh = default_rapid_inten_thresh;
-   Landfall         = default_landfall;
-   LandfallBeg      = default_landfall_beg;
-   LandfallEnd      = default_landfall_end;
-   MatchPoints      = default_match_points;
-   EventEqual       = default_event_equal;
-   EventEqualSet    = false;
+   WaterOnly             = default_water_only;
+   RapidIntenTrack       = default_rapid_inten_track;
+   RapidIntenTimeADeck   = default_rapid_inten_time;
+   RapidIntenTimeBDeck   = default_rapid_inten_time;
+   RapidIntenExactADeck  = default_rapid_inten_exact;
+   RapidIntenExactBDeck  = default_rapid_inten_exact;
+   RapidIntenThreshADeck = default_rapid_inten_thresh;
+   RapidIntenThreshBDeck = default_rapid_inten_thresh;
+   Landfall              = default_landfall;
+   LandfallBeg           = default_landfall_beg;
+   LandfallEnd           = default_landfall_end;
+   MatchPoints           = default_match_points;
+   EventEqual            = default_event_equal;
+   EventEqualSet         = false;
 
    OutInitMask.clear();
    OutValidMask.clear();
@@ -270,9 +280,12 @@ void TCStatJob::assign(const TCStatJob & j) {
    WaterOnly = j.WaterOnly;
 
    RapidIntenTrack = j.RapidIntenTrack;
-   RapidIntenTime = j.RapidIntenTime;
-   RapidIntenExact = j.RapidIntenExact;
-   RapidIntenThresh = j.RapidIntenThresh;
+   RapidIntenTimeADeck = j.RapidIntenTimeADeck;
+   RapidIntenTimeBDeck = j.RapidIntenTimeBDeck;
+   RapidIntenExactADeck = j.RapidIntenExactADeck;
+   RapidIntenExactBDeck = j.RapidIntenExactBDeck;
+   RapidIntenThreshADeck = j.RapidIntenThreshADeck;
+   RapidIntenThreshBDeck = j.RapidIntenThreshBDeck;
 
    Landfall = j.Landfall;
    LandfallBeg = j.LandfallBeg;
@@ -385,11 +398,17 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "RapidIntenTrack = " << tracktype_to_string(RapidIntenTrack) << "\n";
 
-   out << prefix << "RapidIntenTime = " << sec_to_hhmmss(RapidIntenTime) << "\n";
+   out << prefix << "RapidIntenTimeADeck = " << sec_to_hhmmss(RapidIntenTimeADeck) << "\n";
 
-   out << prefix << "RapidIntenExact = " << bool_to_string(RapidIntenExact) << "\n";
+   out << prefix << "RapidIntenTimeBDeck = " << sec_to_hhmmss(RapidIntenTimeBDeck) << "\n";
 
-   out << prefix << "RapidIntenThresh = " << RapidIntenThresh.get_str() << "\n";
+   out << prefix << "RapidIntenExactADeck = " << bool_to_string(RapidIntenExactADeck) << "\n";
+
+   out << prefix << "RapidIntenExactBDeck = " << bool_to_string(RapidIntenExactBDeck) << "\n";
+
+   out << prefix << "RapidIntenThreshADeck = " << RapidIntenThreshADeck.get_str() << "\n";
+
+   out << prefix << "RapidIntenThreshBDeck = " << RapidIntenThreshBDeck.get_str() << "\n";
 
    out << prefix << "Landfall = " << bool_to_string(Landfall) << "\n";
 
@@ -729,51 +748,60 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add_css(a[i+1]);                        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add_css(a[i+1]);                        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add_css(a[i+1]);                       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add_css(a[i+1]);                         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add_css(a[i+1]);                     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);          a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1]);          a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_inc"          ) == 0) { InitInc.add_css(a[i+1]);                       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1]);                       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add_css(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1]);                     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1]);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshMap);
-                                                                                                          a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrMap);
-                                                                                                          a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1], a[i+2], InitThreshMap);
-                                                                                                          a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1], a[i+2], InitStrMap);
-                                                                                                          a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rapid_inten_track" ) == 0) { RapidIntenTrack = string_to_tracktype(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rapid_inten_time"  ) == 0) { RapidIntenTime = timestring_to_sec(a[i+1]);    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rapid_inten_exact" ) == 0) { RapidIntenExact = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rapid_inten_thresh") == 0) { RapidIntenThresh.set(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);          a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1]);           a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();           a.shift_down(i, 1); }
-      else                                               {                                                b.add(a[i]);        }
+           if(strcasecmp(c, "-job"                     ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-amodel"                  ) == 0) { AModel.add_css(a[i+1]);                          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-bmodel"                  ) == 0) { BModel.add_css(a[i+1]);                          a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_id"                ) == 0) { StormId.add_css(a[i+1]);                         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-basin"                   ) == 0) { Basin.add_css(a[i+1]);                           a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-cyclone"                 ) == 0) { Cyclone.add_css(a[i+1]);                         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-storm_name"              ) == 0) { StormName.add_css(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_beg"                ) == 0) { InitBeg = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_end"                ) == 0) { InitEnd = timestring_to_unix(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_inc"                ) == 0) { InitInc.add_css(a[i+1]);                         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_exc"                ) == 0) { InitExc.add_css(a[i+1]);                         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_hour"               ) == 0) { InitHour.add_css_sec(a[i+1]);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead"                    ) == 0) { Lead.add_css_sec(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_beg"               ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);           a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_end"               ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);           a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_inc"               ) == 0) { ValidInc.add_css(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_exc"               ) == 0) { ValidExc.add_css(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_hour"              ) == 0) { ValidHour.add_css_sec(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_mask"               ) == 0) { InitMask.add_css(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_mask"              ) == 0) { ValidMask.add_css(a[i+1]);                       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-line_type"               ) == 0) { LineType.add_css(a[i+1]);                        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-track_watch_warn"        ) == 0) { TrackWatchWarn.add_css(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-column_thresh"           ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshMap);
+                                                                                                                  a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-column_str"              ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrMap);
+                                                                                                                  a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-init_thresh"             ) == 0) { parse_thresh_option(a[i+1], a[i+2], InitThreshMap);
+                                                                                                                  a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-init_str"                ) == 0) { parse_string_option(a[i+1], a[i+2], InitStrMap);
+                                                                                                                  a.shift_down(i, 2); }
+      else if(strcasecmp(c, "-water_only"              ) == 0) { WaterOnly = string_to_bool(a[i+1]);              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_track"       ) == 0) { RapidIntenTrack = string_to_tracktype(a[i+1]);   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_time"        ) == 0) { RapidIntenTimeADeck = timestring_to_sec(a[i+1]);
+                                                                 RapidIntenTimeBDeck = timestring_to_sec(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_time_adeck"  ) == 0) { RapidIntenTimeADeck = timestring_to_sec(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_time_bdeck"  ) == 0) { RapidIntenTimeBDeck = timestring_to_sec(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_exact"       ) == 0) { RapidIntenExactADeck = string_to_bool(a[i+1]);
+                                                                 RapidIntenExactBDeck = string_to_bool(a[i+1]);   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_exact_adeck" ) == 0) { RapidIntenExactADeck = string_to_bool(a[i+1]);   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_exact_bdeck" ) == 0) { RapidIntenExactBDeck = string_to_bool(a[i+1]);   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_thresh"      ) == 0) { RapidIntenThreshADeck.set(a[i+1]);
+                                                                 RapidIntenThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_thresh_adeck") == 0) { RapidIntenThreshADeck.set(a[i+1]);               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_thresh_bdeck") == 0) { RapidIntenThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall"                ) == 0) { Landfall = string_to_bool(a[i+1]);               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall_beg"            ) == 0) { LandfallBeg = atoi(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall_end"            ) == 0) { LandfallEnd = atoi(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-match_points"            ) == 0) { MatchPoints = string_to_bool(a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-event_equal"             ) == 0) { EventEqual = string_to_bool(a[i+1]);             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-event_equal_lead"        ) == 0) { EventEqualLead.add_css_sec(a[i+1]);              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_init_mask"           ) == 0) { set_mask(OutInitMask, a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_valid_mask"          ) == 0) { set_mask(OutValidMask, a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-dump_row"                ) == 0) { DumpFile = a[i+1]; open_dump_file();             a.shift_down(i, 1); }
+      else                                                     {                                                  b.add(a[i]);        }
    }
 
    return(b);
@@ -962,20 +990,29 @@ ConcatString TCStatJob::serialize() const {
    }
    if(WaterOnly != default_water_only)
       s << "-water_only " << bool_to_string(WaterOnly) << " ";
-   if(RapidIntenTrack != default_rapid_inten_track)
+   if(RapidIntenTrack != default_rapid_inten_track) {
       s << "-rapid_inten_track " << tracktype_to_string(RapidIntenTrack) << " ";
-   if(RapidIntenTime != default_rapid_inten_time)
-      s << "-rapid_inten_time " << sec_to_hhmmss(RapidIntenTime) << " ";
-   if(RapidIntenExact != default_rapid_inten_exact)
-      s << "-rapid_inten_exact " << bool_to_string(RapidIntenExact) << " ";
-   if(!(RapidIntenThresh == default_rapid_inten_thresh))
-      s << "-rapid_inten_thresh " << RapidIntenThresh.get_str() << " ";
-   if(Landfall != default_landfall)
-      s << "-landfall " << bool_to_string(Landfall) << " ";
-   if(LandfallBeg != default_landfall_beg ||
-      LandfallEnd != default_landfall_end)
-      s << "-landfall_beg " << LandfallBeg << " "
+      if(RapidIntenTimeADeck == RapidIntenTimeBDeck)
+         s << "-rapid_inten_time " << sec_to_hhmmss(RapidIntenTimeADeck) << " ";
+      else
+         s << "-rapid_inten_time_adeck " << sec_to_hhmmss(RapidIntenTimeADeck) << " "
+           << "-rapid_inten_time_bdeck " << sec_to_hhmmss(RapidIntenTimeBDeck) << " ";
+      if(RapidIntenExactADeck == RapidIntenExactBDeck)
+         s << "-rapid_inten_exact " << bool_to_string(RapidIntenExactADeck) << " ";
+      else
+         s << "-rapid_inten_exact_adeck " << bool_to_string(RapidIntenExactADeck) << " "
+           << "-rapid_inten_exact_bdeck " << bool_to_string(RapidIntenExactBDeck) << " ";
+      if(RapidIntenThreshADeck == RapidIntenThreshBDeck)
+         s << "-rapid_inten_thresh " << RapidIntenThreshADeck.get_str() << " ";
+      else
+         s << "-rapid_inten_thresh_adeck " << RapidIntenThreshADeck.get_str() << " "
+           << "-rapid_inten_thresh_bdeck " << RapidIntenThreshBDeck.get_str() << " ";
+   }
+   if(Landfall != default_landfall) {
+      s << "-landfall " << bool_to_string(Landfall) << " "
+        << "-landfall_beg " << LandfallBeg << " "
         << "-landfall_end " << LandfallEnd << " ";
+   }
    if(MatchPoints != default_match_points)
       s << "-match_points " << bool_to_string(MatchPoints) << " ";
    if(EventEqual != default_event_equal)
@@ -1124,8 +1161,10 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    if(RapidIntenTrack != TrackType_None) {
 
       // Determine the rapid intensification points
-      n_rej = tpi.check_rapid_inten(RapidIntenTrack, RapidIntenTime, 
-                                    RapidIntenExact, RapidIntenThresh);
+      n_rej = tpi.check_rapid_inten(RapidIntenTrack,
+                                    RapidIntenTimeADeck, RapidIntenTimeBDeck, 
+                                    RapidIntenExactADeck, RapidIntenExactBDeck,
+                                    RapidIntenThreshADeck, RapidIntenThreshBDeck);
 
       // Update counts
       n.RejRapidInten += n_rej;
@@ -1409,12 +1448,12 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-column"    ) == 0) { ReqColumn.add_css(a[i+1]);
-                                                   add_column(a[i+1]);         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"        ) == 0) { CaseColumn.add_css(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);      a.shift_down(i, 1); }
-      else                                       {                             b.add(a[i]);        }
+           if(strcasecmp(c, "-column"    ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
+                                                   add_column(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-by"        ) == 0) { CaseColumn.add_css(to_upper(a[i+1])); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);                a.shift_down(i, 1); }
+      else                                       {                                       b.add(a[i]);        }
    }
 
    return(b);
@@ -1547,10 +1586,9 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
 void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
    int i, j, k, lead;
-   map<ConcatString,MapData,cs_cmp> cur_map;
-   map<ConcatString,MapData,cs_cmp>::iterator it;
+   map<ConcatString,SummaryMapData,cs_cmp> cur_map;
    ConcatString key, cur;
-   MapData data;
+   SummaryMapData data;
    double val;
 
    // Initialize the map
@@ -1614,8 +1652,8 @@ void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::add_map(map<ConcatString,MapData,cs_cmp>&m) {
-   map<ConcatString,MapData,cs_cmp>::iterator it;
+void TCStatJobSummary::add_map(map<ConcatString,SummaryMapData,cs_cmp>&m) {
+   map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
 
    // Loop over the input map entries
    for(it = m.begin(); it != m.end(); it++) {
@@ -1655,7 +1693,7 @@ void TCStatJobSummary::add_map(map<ConcatString,MapData,cs_cmp>&m) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::do_output(ostream &out) {
-   map<ConcatString,MapData,cs_cmp>::iterator it;
+   map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
    StringArray sa;
    ConcatString line;
    AsciiTable out_at;
@@ -1809,7 +1847,7 @@ void TCStatJobSummary::do_output(ostream &out) {
 
 void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
                                    NumArray &ties) {
-   map<ConcatString,MapData,cs_cmp>::iterator it;
+   map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
    StringArray case_list;
    double v, best_val;
    ConcatString best_mod, s;
@@ -1958,9 +1996,10 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 TCStatJobType string_to_tcstatjobtype(const char *s) {
    TCStatJobType t;
 
-        if(strcasecmp(s, TCStatJobType_FilterStr) == 0)  t = TCStatJobType_Filter;
+        if(strcasecmp(s, TCStatJobType_FilterStr)  == 0) t = TCStatJobType_Filter;
    else if(strcasecmp(s, TCStatJobType_SummaryStr) == 0) t = TCStatJobType_Summary;
-   else                                              t = NoTCStatJobType;
+   else if(strcasecmp(s, TCStatJobType_RIRWStr)    == 0) t = TCStatJobType_RIRW;
+   else                                                  t = NoTCStatJobType;
 
    return(t);
 }
@@ -1973,6 +2012,7 @@ ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
    switch(t) {
       case TCStatJobType_Filter:  s = TCStatJobType_FilterStr;  break;
       case TCStatJobType_Summary: s = TCStatJobType_SummaryStr; break;
+      case TCStatJobType_RIRW:    s = TCStatJobType_RIRWStr;    break;
       default:                    s = na_str;                   break;
    }
 
@@ -2152,6 +2192,470 @@ void parse_string_option(const char *col_name, const char *col_val,
    // Add data to the map
    if(m.count(cs) > 0) m[col_name].add(sa);
    else                m.insert(pair<ConcatString, StringArray>(cs, sa));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class TCStatJobRIRW
+//
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobRIRW::TCStatJobRIRW() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobRIRW::~TCStatJobRIRW() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobRIRW::TCStatJobRIRW(const TCStatJobRIRW &j) {
+
+   init_from_scratch();
+
+   assign(j);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobRIRW & TCStatJobRIRW::operator=(const TCStatJobRIRW &j) {
+
+   if(this == &j) return(*this);
+
+   assign(j);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::init_from_scratch() {
+
+   TCStatJob::init_from_scratch();
+
+   // Ignore case when performing comparisons
+   CaseColumn.set_ignore_case(1);
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::clear() {
+
+   TCStatJob::clear();
+
+   JobType = TCStatJobType_RIRW;
+   
+   // Disable rapid intensification/weakening filtering logic.
+   RapidIntenTrack = TrackType_None;
+
+   CaseColumn.clear();
+   RIRWMap.clear();
+
+   // Set to default value
+   OutAlpha = default_tc_alpha;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::assign(const TCStatJobRIRW & j) {
+
+   TCStatJob::assign(j);
+
+   TCStatJob::assign(j);
+
+   CaseColumn = j.CaseColumn;
+   RIRWMap = j.RIRWMap;
+   OutAlpha = j.OutAlpha;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
+   StringArray a, b;
+   const char * c = (const char *) 0;
+   int i;
+
+   // Call the parent and store any unused options
+   a = TCStatJob::parse_job_command(jobstring);
+
+   // Loop over the StringArray elements
+   for(i=0; i<a.n_elements(); i++) {
+
+      // Point at the current entry
+      c = a[i];
+
+      // Check for a job command option
+      if(c[0] != '-') {
+         b.add(a[i]);
+         continue;
+      }
+
+      // Check job command options
+           if(strcasecmp(c, "-by"        ) == 0) { CaseColumn.add_css(to_upper(a[i+1])); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);              a.shift_down(i, 1); }
+      else                                       {                                       b.add(a[i]);        }
+   }
+
+   return(b);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString TCStatJobRIRW::serialize() const {
+   ConcatString s;
+   int i;
+
+   // Initialize the jobstring
+   s.set_precision(default_precision);
+
+   // Call the parent
+   s = TCStatJob::serialize();
+
+   // List the ADeck and BDeck rapid intensification logic
+   if(RapidIntenTimeADeck == RapidIntenTimeBDeck)
+      s << "-rapid_inten_time " << sec_to_hhmmss(RapidIntenTimeADeck) << " ";
+   else
+      s << "-rapid_inten_time_adeck " << sec_to_hhmmss(RapidIntenTimeADeck) << " "
+        << "-rapid_inten_time_bdeck " << sec_to_hhmmss(RapidIntenTimeBDeck) << " ";
+   if(RapidIntenExactADeck == RapidIntenExactBDeck)
+      s << "-rapid_inten_exact " << bool_to_string(RapidIntenExactADeck) << " ";
+   else
+      s << "-rapid_inten_exact_adeck " << bool_to_string(RapidIntenExactADeck) << " "
+        << "-rapid_inten_exact_bdeck " << bool_to_string(RapidIntenExactBDeck) << " ";
+   if(RapidIntenThreshADeck == RapidIntenThreshBDeck)
+      s << "-rapid_inten_thresh " << RapidIntenThreshADeck.get_str() << " ";
+   else
+      s << "-rapid_inten_thresh_adeck " << RapidIntenThreshADeck.get_str() << " "
+        << "-rapid_inten_thresh_bdeck " << RapidIntenThreshBDeck.get_str() << " ";
+
+   // Add RIRW job-specific options
+   for(i=0; i<CaseColumn.n_elements(); i++)
+      s << "-by " << CaseColumn[i] << " ";
+
+   // Always list the output alpha value used
+   s << "-out_alpha " << OutAlpha << " ";
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::do_job(const StringArray &file_list,
+                           TCLineCounts &n) {
+   TrackPairInfo tpi;
+
+   // Call the parent's do_job() to do event equalization
+   TCStatJob::do_job(file_list, n);
+
+   // Check for no common cases
+   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+      mlog << Debug(1)
+           << "Event equalization found no common cases.\n";
+   }
+   // Otherwise, process the track data
+   else {
+
+      // Rewind to the beginning of the track pair input
+      TCSTFiles.rewind();
+
+      // Process each of the track pairs
+      while(TCSTFiles >> tpi) {
+
+         // Process the track pair down to points to be used
+         subset_track_pair(tpi, n);
+
+         // Write out the retained lines
+         if(tpi.n_points() > 0) {
+
+            mlog << Debug(4)
+                 << "Processing track pair: " << tpi.case_info() << "\n";
+
+            // Process the track pair info for the summary job
+            process_track_pair(tpi);
+
+            if(DumpOut) dump_track_pair(tpi);
+         }
+      } // end while
+   } // end else
+   
+   // Close the dump file
+   if(DumpOut) close_dump_file();
+
+   // Process the RI/RW job output
+   if(JobOut) do_output(*JobOut);
+   else       do_output(cout);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
+   int i, j, lead, a, b;
+   map<ConcatString,RIRWMapData,cs_cmp> cur_map;
+   ConcatString key, cur, cat;
+   RIRWMapData data;
+
+   // Initialize the map
+   cur_map.clear();
+   
+   // Apply the rapid intensification/weakening logic
+   tpi.check_rapid_inten(TrackType_Both,
+                         RapidIntenTimeADeck, RapidIntenTimeBDeck, 
+                         RapidIntenExactADeck, RapidIntenExactBDeck,
+                         RapidIntenThreshADeck, RapidIntenThreshBDeck);
+   
+   // Loop over the track points and populate the contigency table
+   for(i=0; i<tpi.n_points(); i++) {
+
+      // Initialize the map key so it's never empty
+      key = "RIRW";
+
+      // Build case information for the map key
+      for(j=0; j<CaseColumn.n_elements(); j++) {
+
+         cur = tpi.line(i)->get_item(CaseColumn[j]);
+
+         // For bad data, use the NA string
+         if(is_bad_data(atoi(cur))) cur = na_str;
+
+         // Special handling for lead time:
+         // Switch 2-digit hours to 3-digit hours so that the
+         // summary job output is sorted nicely.
+         if(strcasecmp(CaseColumn[j], "LEAD") == 0 &&
+            cur != na_str &&
+            abs(lead = hhmmss_to_sec(cur)) < 100*sec_per_hour) {
+
+            // Handle positive and negative lead times
+            key << (lead < 0 ? ":-0" : ":0")
+                << sec_to_hhmmss(abs(lead));
+         }
+         // Otherwise, just append the current case info
+         else {
+            key << ":" << cur;
+         }
+      } // end for j
+
+      // Add map entry for this key, if necessary
+      if(cur_map.count(key) == 0) cur_map[key] = data;
+
+      // Determine the contingency table category
+      a = nint(tpi.adeck_rirw(i));
+      b = nint(tpi.bdeck_rirw(i));
+      if(is_bad_data(a) || is_bad_data(b)) {
+         cat = na_str;
+      }
+      else if(a == 1 && b == 1) {
+         cat = "Hit";
+         cur_map[key].Info.cts.inc_fy_oy();
+      }
+      else if(a == 1 && b == 0) {
+         cat = "False Alarm";
+         cur_map[key].Info.cts.inc_fy_on();
+      }
+      else if(a == 0 && b == 1) {
+         cat = "Miss";
+         cur_map[key].Info.cts.inc_fn_oy();
+      }
+      else if(a == 0 && b == 0) {
+         cat = "Correct Negative";
+         cur_map[key].Info.cts.inc_fn_on();
+      }
+
+      mlog << Debug(5) << "RI/RW Event Category (??? hour window): "
+           << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
+           << (is_bad_data(a) ? na_str : bool_to_string(a)) << ", "
+           << (is_bad_data(b) ? na_str : bool_to_string(b)) << " -> "
+           << cat << "\n";
+      
+      // Add values for this key
+      cur_map[key].Hdr.add(tpi.line(i)->header());
+      cur_map[key].AModel.add(tpi.line(i)->amodel());
+      cur_map[key].Init.add(tpi.line(i)->init());
+      cur_map[key].Lead.add(tpi.line(i)->lead());
+      cur_map[key].Valid.add(tpi.line(i)->valid());
+   } // end for i
+
+   // Add the current map
+   add_map(cur_map);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
+   map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
+
+   // Loop over the input map entries
+   for(it = m.begin(); it != m.end(); it++) {
+
+      // Current map key is not yet defined in RIRWMap
+      if(RIRWMap.count(it->first) == 0) {
+
+         mlog << Debug(5)
+              << "RIRW Map Insert (" << it->first << ") "
+              << it->second.Info.cts.total() << " contingency table entries: "
+              << it->second.Info.cts.fy_oy() << " hits, "
+              << it->second.Info.cts.fy_on() << " false alarms, "
+              << it->second.Info.cts.fn_oy() << " misses, "
+              << it->second.Info.cts.fn_on() << " correct negatives.\n";
+
+         // Add the pair to the map
+         RIRWMap[it->first] = it->second;
+      }
+      // Current map key is defined in RIRWMap
+      else {
+
+         mlog << Debug(5)
+              << "RIRW Map Add (" << it->first << ") "
+              << it->second.Info.cts.total() << " contingency table entries: "
+              << it->second.Info.cts.fy_oy() << " hits, "
+              << it->second.Info.cts.fy_on() << " false alarms, "
+              << it->second.Info.cts.fn_oy() << " misses, "
+              << it->second.Info.cts.fn_on() << " correct negatives.\n";
+
+         // Increment the counts for the existing key
+         RIRWMap[it->first].Info.cts.set_fy_oy(
+            RIRWMap[it->first].Info.cts.fy_oy() +
+            it->second.Info.cts.fy_oy());
+         RIRWMap[it->first].Info.cts.set_fy_on(
+            RIRWMap[it->first].Info.cts.fy_on() +
+            it->second.Info.cts.fy_on());
+         RIRWMap[it->first].Info.cts.set_fn_oy(
+            RIRWMap[it->first].Info.cts.fn_oy() +
+            it->second.Info.cts.fn_oy());
+         RIRWMap[it->first].Info.cts.set_fn_on(
+            RIRWMap[it->first].Info.cts.fn_on() +
+            it->second.Info.cts.fn_on());
+         RIRWMap[it->first].Hdr.add(it->second.Hdr);
+         RIRWMap[it->first].AModel.add(it->second.AModel);
+         RIRWMap[it->first].Init.add(it->second.Init);
+         RIRWMap[it->first].Lead.add(it->second.Lead);
+         RIRWMap[it->first].Valid.add(it->second.Valid);
+      }
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::do_output(ostream &out) {
+   map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
+   StringArray sa;
+   ConcatString line;
+   AsciiTable ctc_at, cts_at;
+   int i, ctc_r, ctc_c, cts_r, cts_c;
+
+   // Setup the output tables
+   ctc_at.set_size((int) RIRWMap.size() + 1,
+                   1 + CaseColumn.n_elements() + n_ctc_columns);
+   cts_at.set_size((int) RIRWMap.size() + 1,
+                   1 + CaseColumn.n_elements() + n_cts_columns);
+   setup_table(ctc_at, 1 + CaseColumn.n_elements());
+   setup_table(cts_at, 1 + CaseColumn.n_elements());   
+
+   // Initialize row and column indices
+   ctc_r = ctc_c = 0;
+   cts_r = cts_c = 0;
+
+   // Write the header row
+   ctc_at.set_entry(ctc_r, ctc_c++, "COL_NAME:");
+   cts_at.set_entry(cts_r, cts_c++, "COL_NAME:");
+
+   // Write case column names
+   for(i=0; i<CaseColumn.n_elements(); i++) {
+      ctc_at.set_entry(ctc_r, ctc_c++, CaseColumn[i]);
+      cts_at.set_entry(cts_r, cts_c++, CaseColumn[i]);
+   }
+   
+   // Write the header columns
+   write_header_row(ctc_columns, n_ctc_columns, 0, ctc_at, ctc_r, ctc_c);
+   write_header_row(cts_columns, n_cts_columns, 0, cts_at, cts_r, cts_c);
+
+   // Loop over the map entries and popluate the output table
+   for(it=RIRWMap.begin(),ctc_r=1,cts_r=1;
+       it!=RIRWMap.end();
+       it++,ctc_r++,cts_r++) {
+
+      // Allocate a single alpha value and compute statistics
+      it->second.Info.allocate_n_alpha(1);
+      it->second.Info.alpha[0] = OutAlpha;
+
+      // Compute the stats and confidence intervals
+      it->second.Info.compute_stats();
+      it->second.Info.compute_ci();
+
+      // Initialize column index
+      ctc_c = cts_c = 0;
+
+      // Split the current map key
+      sa = it->first.split(":");
+
+      // Write the table row
+      ctc_at.set_entry(ctc_r, ctc_c++, "RIRW_CTC:");
+      cts_at.set_entry(cts_r, cts_c++, "RIRW_CTS:");
+
+      // Write case column values
+      for(i=1; i<sa.n_elements(); i++) {
+         ctc_at.set_entry(ctc_r, ctc_c++, sa[i]);
+         cts_at.set_entry(cts_r, cts_c++, sa[i]);
+      }
+
+      // Write the contingency table counts and statistics
+      write_ctc_cols(it->second.Info, ctc_at, ctc_r, ctc_c);
+      write_cts_cols(it->second.Info, 0, cts_at, cts_r, cts_c);
+   }
+
+   // Build a simple output line
+   line << "JOB_LIST: " << serialize() << "\n";
+   out  << line;
+
+   // Write the tables
+   out << ctc_at << cts_at << "\n" << flush;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_table(AsciiTable &at, int n_hdr_cols) {
+   int i;
+
+   // Left-justify header columns and right-justify data columns
+   for(i=0;          i<n_hdr_cols; i++) at.set_column_just(i, LeftJust);
+   for(i=n_hdr_cols; i<at.ncols(); i++) at.set_column_just(i, RightJust);
+
+   // Right-justify the first column
+   at.set_column_just(0, RightJust);
+
+   // Set the precision
+   at.set_precision(default_precision);
+
+   // Set the bad data value
+   at.set_bad_data_value(bad_data_double);
+
+   // Set the bad data string
+   at.set_bad_data_str(na_str);
+
+   // Don't write out trailing blank rows
+   at.set_delete_trailing_blank_rows(1);
 
    return;
 }

@@ -17,7 +17,8 @@ tc_stat_SOURCES = tc_stat.cc \
 	tc_stat_job.cc
 tc_stat_CPPFLAGS = ${MET_CPPFLAGS}
 tc_stat_LDFLAGS = ${MET_LDFLAGS}
-tc_stat_LDADD = -lvx_config \
+tc_stat_LDADD = -lvx_stat_out \
+	-lvx_config \
 	-lvx_data2d_nc_met \
 	-lvx_analysis_util \
 	-lvx_tc_util \
@@ -29,6 +30,7 @@ tc_stat_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
 	-lm \
 	-lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
