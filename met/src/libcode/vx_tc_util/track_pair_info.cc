@@ -279,6 +279,7 @@ void TrackPairInfo::initialize(const TCStatLine &l) {
    ADeck.set_cyclone(l.cyclone());
    ADeck.set_storm_name(l.storm_name());
    ADeck.set_technique(l.amodel());
+   ADeck.set_initials(l.initials());
    ADeck.set_init(l.init());
    ADeck.set_storm_id();
 
@@ -287,6 +288,7 @@ void TrackPairInfo::initialize(const TCStatLine &l) {
    BDeck.set_cyclone(l.cyclone());
    BDeck.set_storm_name(l.storm_name());
    BDeck.set_technique(l.bmodel());
+   BDeck.set_initials(l.initials());
    BDeck.set_init((unixtime) 0);
    BDeck.set_storm_id();
    
