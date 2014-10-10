@@ -38,6 +38,7 @@ static const TrackType    default_rapid_inten_track  = TrackType_None;
 static const int          default_rapid_inten_time   = 86400;
 static const bool         default_rapid_inten_exact  = true;
 static const SingleThresh default_rapid_inten_thresh(">=30.0");
+static const int          default_rapid_inten_window = 0;
 
 // Default is 24 hours prior to landfall
 static const bool         default_landfall           = false;
@@ -184,16 +185,16 @@ class TCStatJob {
       double get_column_double(const TCStatLine &, const ConcatString &) const;
 
       //////////////////////////////////////////////////////////////////
-                               
+
       virtual StringArray parse_job_command(const char *);
 
       void set_mask(MaskPoly &, const char *);
 
-      void open_dump_file();
+      virtual void open_dump_file();
 
-      void dump_track_pair(const TrackPairInfo &);
+      virtual void close_dump_file();
 
-      void close_dump_file();
+      void dump_track_pair(const TrackPairInfo &, ofstream *);
 
       virtual ConcatString serialize() const;
 
@@ -202,7 +203,7 @@ class TCStatJob {
       virtual void do_job(const StringArray &, TCLineCounts &);
 
       void process_event_equal();
-      
+
       void subset_track_pair(TrackPairInfo &, TCLineCounts &);
 
       //////////////////////////////////////////////////////////////////
@@ -261,7 +262,6 @@ class TCStatJob {
       map<ConcatString,StringArray> InitStrMap;
       
       // Variables to the store the analysis job specification
-      
       ConcatString DumpFile;        // Dump TrackPairInfo used to a file
       ofstream    *DumpOut;         // Dump output file stream
       ofstream    *JobOut;          // Job output file stream (not allocated)
@@ -283,6 +283,7 @@ class TCStatJob {
       int          RapidIntenTimeADeck, RapidIntenTimeBDeck;
       bool         RapidIntenExactADeck, RapidIntenExactBDeck;
       SingleThresh RapidIntenThreshADeck, RapidIntenThreshBDeck;
+      int          RapidIntenWindow;
 
       // Only retain TrackPoints in a time window around landfall
       bool Landfall;
@@ -380,6 +381,9 @@ class TCStatJobRIRW : public TCStatJob {
 
       void assign(const TCStatJobRIRW &);
 
+      ConcatString DumpFileCTC[4];
+      ofstream    *DumpOutCTC[4];
+
    public:
 
       TCStatJobRIRW();
@@ -390,6 +394,10 @@ class TCStatJobRIRW : public TCStatJob {
       void clear();
 
       StringArray parse_job_command(const char *);
+
+      void open_dump_file();
+
+      void close_dump_file();
 
       ConcatString serialize() const;
 
