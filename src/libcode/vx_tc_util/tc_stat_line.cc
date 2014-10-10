@@ -237,6 +237,12 @@ const char * TCStatLine::valid_mask() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+const char * TCStatLine::initials() const {
+   return(get_item("INITIALS"));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 const char * TCStatLine::line_type() const {
    int offset = get_tc_col_offset(tc_header_cols, n_tc_header_cols,
                                   "LINE_TYPE");

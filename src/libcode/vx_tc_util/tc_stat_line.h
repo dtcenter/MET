@@ -76,6 +76,7 @@ class TCStatLine : public DataLine {
       int          valid_hour   () const; // valid%sec_per_day
       const char * init_mask    () const;
       const char * valid_mask   () const;
+      const char * initials     () const;
       const char * line_type    () const;
       ConcatString header       () const;
 
