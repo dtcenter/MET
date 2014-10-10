@@ -227,6 +227,7 @@ void TCStatJob::clear() {
    RapidIntenExactBDeck  = default_rapid_inten_exact;
    RapidIntenThreshADeck = default_rapid_inten_thresh;
    RapidIntenThreshBDeck = default_rapid_inten_thresh;
+   RapidIntenWindow      = default_rapid_inten_window;
    Landfall              = default_landfall;
    LandfallBeg           = default_landfall_beg;
    LandfallEnd           = default_landfall_end;
@@ -286,6 +287,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    RapidIntenExactBDeck = j.RapidIntenExactBDeck;
    RapidIntenThreshADeck = j.RapidIntenThreshADeck;
    RapidIntenThreshBDeck = j.RapidIntenThreshBDeck;
+   RapidIntenWindow = j.RapidIntenWindow;
 
    Landfall = j.Landfall;
    LandfallBeg = j.LandfallBeg;
@@ -409,6 +411,8 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "RapidIntenThreshADeck = " << RapidIntenThreshADeck.get_str() << "\n";
 
    out << prefix << "RapidIntenThreshBDeck = " << RapidIntenThreshBDeck.get_str() << "\n";
+
+   out << prefix << "RapidIntenWindow = " << sec_to_hhmmss(RapidIntenWindow) << "\n";
 
    out << prefix << "Landfall = " << bool_to_string(Landfall) << "\n";
 
@@ -792,6 +796,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
                                                                  RapidIntenThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rapid_inten_thresh_adeck") == 0) { RapidIntenThreshADeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rapid_inten_thresh_bdeck") == 0) { RapidIntenThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rapid_inten_window"      ) == 0) { RapidIntenWindow = timestring_to_sec(a[i+1]);    a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall"                ) == 0) { Landfall = string_to_bool(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_beg"            ) == 0) { LandfallBeg = atoi(a[i+1]);                      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_end"            ) == 0) { LandfallEnd = atoi(a[i+1]);                      a.shift_down(i, 1); }
@@ -858,17 +863,17 @@ void TCStatJob::close_dump_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
+void TCStatJob::dump_track_pair(const TrackPairInfo &tpi, ofstream *out) {
 
-   if(!DumpOut || tpi.n_points() == 0) return;
+   if(!out || tpi.n_points() == 0) return;
 
    TcHdrColumns tchc;
    AsciiTable out_at;
    int i_row, hdr_row;
 
    // Determine if we need to write a header row
-   if((int) DumpOut->tellp() == 0) hdr_row = 1;
-   else                            hdr_row = 0;
+   if((int) out->tellp() == 0) hdr_row = 1;
+   else                        hdr_row = 0;
 
    // Initialize the output AsciiTable
    out_at.set_size(tpi.n_points() + hdr_row,
@@ -903,7 +908,7 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi) {
    write_tc_mpr_row(tchc, tpi, out_at, i_row);
 
    // Write the AsciiTable to the file
-   *DumpOut << out_at;
+   *out << out_at;
 
    return;
 }
@@ -992,21 +997,28 @@ ConcatString TCStatJob::serialize() const {
       s << "-water_only " << bool_to_string(WaterOnly) << " ";
    if(RapidIntenTrack != default_rapid_inten_track) {
       s << "-rapid_inten_track " << tracktype_to_string(RapidIntenTrack) << " ";
-      if(RapidIntenTimeADeck == RapidIntenTimeBDeck)
+      if(RapidIntenTimeADeck == RapidIntenTimeBDeck) {
          s << "-rapid_inten_time " << sec_to_hhmmss(RapidIntenTimeADeck) << " ";
-      else
+      }
+      else {
          s << "-rapid_inten_time_adeck " << sec_to_hhmmss(RapidIntenTimeADeck) << " "
            << "-rapid_inten_time_bdeck " << sec_to_hhmmss(RapidIntenTimeBDeck) << " ";
-      if(RapidIntenExactADeck == RapidIntenExactBDeck)
+      }
+      if(RapidIntenExactADeck == RapidIntenExactBDeck) {
          s << "-rapid_inten_exact " << bool_to_string(RapidIntenExactADeck) << " ";
-      else
+      }
+      else {
          s << "-rapid_inten_exact_adeck " << bool_to_string(RapidIntenExactADeck) << " "
            << "-rapid_inten_exact_bdeck " << bool_to_string(RapidIntenExactBDeck) << " ";
-      if(RapidIntenThreshADeck == RapidIntenThreshBDeck)
+      }
+      if(RapidIntenThreshADeck == RapidIntenThreshBDeck) {
          s << "-rapid_inten_thresh " << RapidIntenThreshADeck.get_str() << " ";
-      else
+      }
+      else {
          s << "-rapid_inten_thresh_adeck " << RapidIntenThreshADeck.get_str() << " "
            << "-rapid_inten_thresh_bdeck " << RapidIntenThreshBDeck.get_str() << " ";
+      }
+      s << "-rapid_inten_window " << sec_to_hhmmss(RapidIntenWindow) << " ";
    }
    if(Landfall != default_landfall) {
       s << "-landfall " << bool_to_string(Landfall) << " "
@@ -1070,7 +1082,7 @@ void TCStatJob::process_event_equal() {
    // Process each of the track pairs
    while(TCSTFiles >> tpi) {
 
-      // Process the track pair down to points to be used
+      // Subset the track pair down to points to be used
       subset_track_pair(tpi, n);
 
       // Skip tracks missing any of the required lead times
@@ -1194,7 +1206,7 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
 
    // Subset the points marked for retention
    tpi = tpi.keep_subset();
-
+   
    return;
 }
 
@@ -1308,7 +1320,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
             mlog << Debug(4)
                  << "Processing track pair: " << tpi.case_info() << "\n";
 
-            if(DumpOut) dump_track_pair(tpi);
+            if(DumpOut) dump_track_pair(tpi, DumpOut);
          }
       } // end while
    } // end else
@@ -1567,7 +1579,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
             // Process the track pair info for the summary job
             process_track_pair(tpi);
 
-            if(DumpOut) dump_track_pair(tpi);
+            if(DumpOut) dump_track_pair(tpi, DumpOut);
          }
       } // end while
    } // end else
@@ -2237,6 +2249,9 @@ TCStatJobRIRW & TCStatJobRIRW::operator=(const TCStatJobRIRW &j) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::init_from_scratch() {
+   int i;
+   
+   for(i=0; i<4; i++) DumpOutCTC[i] = (ofstream *) 0;
 
    TCStatJob::init_from_scratch();
 
@@ -2251,6 +2266,7 @@ void TCStatJobRIRW::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::clear() {
+   int i;
 
    TCStatJob::clear();
 
@@ -2261,6 +2277,9 @@ void TCStatJobRIRW::clear() {
 
    CaseColumn.clear();
    RIRWMap.clear();
+
+   for(i=0; i<4; i++) DumpFileCTC[i].clear();
+   close_dump_file();
 
    // Set to default value
    OutAlpha = default_tc_alpha;
@@ -2316,6 +2335,53 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TCStatJobRIRW::open_dump_file() {
+   const char *category[] = { "FY_OY", "FY_ON", "FN_OY", "FN_ON" };
+   int i;
+
+   close_dump_file();
+
+   if(DumpFile.empty()) return;
+
+   // Use DumpFile entry to construct output file names for each category
+   for(i=0; i<4; i++) {
+
+      DumpFileCTC[i] << cs_erase << DumpFile << "_"  << category[i] << ".tcst";
+      DumpOutCTC[i] = new ofstream;
+      DumpOutCTC[i]->open(DumpFileCTC[i]);
+
+      if(!DumpOutCTC[i]) {
+         mlog << Error << "\nTCStatJob::open_dump_file()-> "
+              << "can't open the output file \"" << DumpFileCTC[i]
+              << "\" for writing!\n\n";
+         exit(1);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobRIRW::close_dump_file() {
+   int i;
+
+   for(i=0; i<4; i++) {
+      if(DumpOutCTC[i]) {
+         mlog << Debug(1)
+              << "Creating output dump file: " << DumpFileCTC[i] << "\n";
+
+         DumpOutCTC[i]->close();
+         delete DumpOutCTC[i];
+         DumpOutCTC[i] = (ofstream *) 0;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString TCStatJobRIRW::serialize() const {
    ConcatString s;
    int i;
@@ -2327,21 +2393,28 @@ ConcatString TCStatJobRIRW::serialize() const {
    s = TCStatJob::serialize();
 
    // List the ADeck and BDeck rapid intensification logic
-   if(RapidIntenTimeADeck == RapidIntenTimeBDeck)
+   if(RapidIntenTimeADeck == RapidIntenTimeBDeck) {
       s << "-rapid_inten_time " << sec_to_hhmmss(RapidIntenTimeADeck) << " ";
-   else
+   }
+   else {
       s << "-rapid_inten_time_adeck " << sec_to_hhmmss(RapidIntenTimeADeck) << " "
         << "-rapid_inten_time_bdeck " << sec_to_hhmmss(RapidIntenTimeBDeck) << " ";
-   if(RapidIntenExactADeck == RapidIntenExactBDeck)
+   }
+   if(RapidIntenExactADeck == RapidIntenExactBDeck) {
       s << "-rapid_inten_exact " << bool_to_string(RapidIntenExactADeck) << " ";
-   else
+   }
+   else {
       s << "-rapid_inten_exact_adeck " << bool_to_string(RapidIntenExactADeck) << " "
         << "-rapid_inten_exact_bdeck " << bool_to_string(RapidIntenExactBDeck) << " ";
-   if(RapidIntenThreshADeck == RapidIntenThreshBDeck)
+   }
+   if(RapidIntenThreshADeck == RapidIntenThreshBDeck) {
       s << "-rapid_inten_thresh " << RapidIntenThreshADeck.get_str() << " ";
-   else
+   }
+   else {
       s << "-rapid_inten_thresh_adeck " << RapidIntenThreshADeck.get_str() << " "
         << "-rapid_inten_thresh_bdeck " << RapidIntenThreshBDeck.get_str() << " ";
+   }
+   s << "-rapid_inten_window " << sec_to_hhmmss(RapidIntenWindow) << " ";
 
    // Add RIRW job-specific options
    for(i=0; i<CaseColumn.n_elements(); i++)
@@ -2361,7 +2434,7 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 
    // Call the parent's do_job() to do event equalization
    TCStatJob::do_job(file_list, n);
-
+   
    // Check for no common cases
    if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
@@ -2379,22 +2452,19 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
          // Process the track pair down to points to be used
          subset_track_pair(tpi, n);
 
-         // Write out the retained lines
          if(tpi.n_points() > 0) {
 
             mlog << Debug(4)
                  << "Processing track pair: " << tpi.case_info() << "\n";
 
-            // Process the track pair info for the summary job
+            // Process the track pair info for the RI/RW job
             process_track_pair(tpi);
-
-            if(DumpOut) dump_track_pair(tpi);
-         }
+         }   
       } // end while
    } // end else
    
    // Close the dump file
-   if(DumpOut) close_dump_file();
+   close_dump_file();
 
    // Process the RI/RW job output
    if(JobOut) do_output(*JobOut);
@@ -2406,10 +2476,12 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
-   int i, j, lead, a, b;
+   int i, j, lead, a, b, cur_dt, min_dt;
    map<ConcatString,RIRWMapData,cs_cmp> cur_map;
    ConcatString key, cur, cat;
    RIRWMapData data;
+   TimeArray btimes;
+   TrackPairInfo tpi_pt;
 
    // Initialize the map
    cur_map.clear();
@@ -2419,9 +2491,17 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
                          RapidIntenTimeADeck, RapidIntenTimeBDeck, 
                          RapidIntenExactADeck, RapidIntenExactBDeck,
                          RapidIntenThreshADeck, RapidIntenThreshBDeck);
-   
+
+   // Get the list of times when RI/RW occurred in the BDeck
+   for(i=0; i<tpi.n_points(); i++) {
+      if(nint(tpi.bdeck_rirw(i)) == 1) btimes.add(tpi.valid(i));
+   }
+
    // Loop over the track points and populate the contigency table
    for(i=0; i<tpi.n_points(); i++) {
+
+      // Skip marked lines
+      if(!tpi.keep(i)) continue;
 
       // Initialize the map key so it's never empty
       key = "RIRW";
@@ -2454,31 +2534,64 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
       // Add map entry for this key, if necessary
       if(cur_map.count(key) == 0) cur_map[key] = data;
 
-      // Determine the contingency table category
+      // Get the ADeck and BDeck events
       a = nint(tpi.adeck_rirw(i));
       b = nint(tpi.bdeck_rirw(i));
+
+      // Check for small enough timing error to consider the false alarm a hit
+      if(a == 1 && b == 0) {
+         
+         // Find closest RI/RW event in the BDeck
+         for(j=0, min_dt=bad_data_int; j<btimes.n_elements(); j++) {
+            cur_dt = abs(tpi.valid(i) - btimes[j]);
+            if(is_bad_data(min_dt))  min_dt = cur_dt;
+            else if(cur_dt < min_dt) min_dt = cur_dt;
+         } // end for j
+
+         // Check if the BDeck RI/RW event is close enough in time
+         if(min_dt <= RapidIntenWindow) {
+            mlog << Debug(5)
+                 << "Switching RI/RW Event Category from FY_ON to FY_OY since "
+                 << sec_to_hhmmss(min_dt) << " <= " << sec_to_hhmmss(RapidIntenWindow)
+                 << "\n";
+            b = 1;
+         }
+      }
+
+      // Determine the contingency table category      
       if(is_bad_data(a) || is_bad_data(b)) {
          cat = na_str;
       }
-      else if(a == 1 && b == 1) {
-         cat = "Hit";
-         cur_map[key].Info.cts.inc_fy_oy();
-      }
-      else if(a == 1 && b == 0) {
-         cat = "False Alarm";
-         cur_map[key].Info.cts.inc_fy_on();
-      }
-      else if(a == 0 && b == 1) {
-         cat = "Miss";
-         cur_map[key].Info.cts.inc_fn_oy();
-      }
-      else if(a == 0 && b == 0) {
-         cat = "Correct Negative";
-         cur_map[key].Info.cts.inc_fn_on();
+      else {
+
+         cat << cs_erase
+             << "F"  << (a == 1 ? "Y" : "N")
+             << "_O" << (b == 1 ? "Y" : "N");
+
+              if(a == 1 && b == 1) cur_map[key].Info.cts.inc_fy_oy();
+         else if(a == 1 && b == 0) cur_map[key].Info.cts.inc_fy_on();
+         else if(a == 0 && b == 1) cur_map[key].Info.cts.inc_fn_oy();
+         else if(a == 0 && b == 0) cur_map[key].Info.cts.inc_fn_on();
+
+         // Write the current point to the correct dump file
+         if(DumpOutCTC[0]) {
+            
+            // Create a track for the current point
+            tpi_pt.clear();
+            tpi_pt.add(*tpi.line(i));
+
+                 if(a == 1 && b == 1) dump_track_pair(tpi_pt, DumpOutCTC[0]);
+            else if(a == 1 && b == 0) dump_track_pair(tpi_pt, DumpOutCTC[1]);
+            else if(a == 0 && b == 1) dump_track_pair(tpi_pt, DumpOutCTC[2]);
+            else if(a == 0 && b == 0) dump_track_pair(tpi_pt, DumpOutCTC[3]);
+         }
       }
 
-      mlog << Debug(5) << "RI/RW Event Category (??? hour window): "
+      lead = tpi.adeck()[i].lead();
+      mlog << Debug(5)
+           << "RI/RW Event Category: "
            << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
+           << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << ", "
            << (is_bad_data(a) ? na_str : bool_to_string(a)) << ", "
            << (is_bad_data(b) ? na_str : bool_to_string(b)) << " -> "
            << cat << "\n";
@@ -2511,10 +2624,10 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
          mlog << Debug(5)
               << "RIRW Map Insert (" << it->first << ") "
               << it->second.Info.cts.total() << " contingency table entries: "
-              << it->second.Info.cts.fy_oy() << " hits, "
-              << it->second.Info.cts.fy_on() << " false alarms, "
-              << it->second.Info.cts.fn_oy() << " misses, "
-              << it->second.Info.cts.fn_on() << " correct negatives.\n";
+              << it->second.Info.cts.fy_oy() << " Hits, "
+              << it->second.Info.cts.fy_on() << " False Alarms, "
+              << it->second.Info.cts.fn_oy() << " Misses, "
+              << it->second.Info.cts.fn_on() << " Correct Negatives.\n";
 
          // Add the pair to the map
          RIRWMap[it->first] = it->second;
@@ -2565,11 +2678,11 @@ void TCStatJobRIRW::do_output(ostream &out) {
 
    // Setup the output tables
    ctc_at.set_size((int) RIRWMap.size() + 1,
-                   1 + CaseColumn.n_elements() + n_ctc_columns);
+                   8 + CaseColumn.n_elements() + n_ctc_columns);
    cts_at.set_size((int) RIRWMap.size() + 1,
-                   1 + CaseColumn.n_elements() + n_cts_columns);
-   setup_table(ctc_at, 1 + CaseColumn.n_elements());
-   setup_table(cts_at, 1 + CaseColumn.n_elements());   
+                   8 + CaseColumn.n_elements() + n_cts_columns);
+   setup_table(ctc_at, 8 + CaseColumn.n_elements());
+   setup_table(cts_at, 8 + CaseColumn.n_elements());   
 
    // Initialize row and column indices
    ctc_r = ctc_c = 0;
@@ -2578,13 +2691,30 @@ void TCStatJobRIRW::do_output(ostream &out) {
    // Write the header row
    ctc_at.set_entry(ctc_r, ctc_c++, "COL_NAME:");
    cts_at.set_entry(cts_r, cts_c++, "COL_NAME:");
+   
+   // Write the RI/RW event definition headers
+   ctc_at.set_entry(ctc_r, ctc_c++, "ATIME");
+   ctc_at.set_entry(ctc_r, ctc_c++, "BTIME");
+   ctc_at.set_entry(ctc_r, ctc_c++, "AEXACT");
+   ctc_at.set_entry(ctc_r, ctc_c++, "BEXACT");
+   ctc_at.set_entry(ctc_r, ctc_c++, "ATHRESH");
+   ctc_at.set_entry(ctc_r, ctc_c++, "BTHRESH");
+   ctc_at.set_entry(ctc_r, ctc_c++, "WINDOW");
+
+   cts_at.set_entry(cts_r, cts_c++, "ATIME");
+   cts_at.set_entry(cts_r, cts_c++, "BTIME");
+   cts_at.set_entry(cts_r, cts_c++, "AEXACT");
+   cts_at.set_entry(cts_r, cts_c++, "BEXACT");
+   cts_at.set_entry(cts_r, cts_c++, "ATHRESH");
+   cts_at.set_entry(cts_r, cts_c++, "BTHRESH");
+   cts_at.set_entry(cts_r, cts_c++, "WINDOW");
 
    // Write case column names
    for(i=0; i<CaseColumn.n_elements(); i++) {
       ctc_at.set_entry(ctc_r, ctc_c++, CaseColumn[i]);
       cts_at.set_entry(cts_r, cts_c++, CaseColumn[i]);
    }
-   
+
    // Write the header columns
    write_header_row(ctc_columns, n_ctc_columns, 0, ctc_at, ctc_r, ctc_c);
    write_header_row(cts_columns, n_cts_columns, 0, cts_at, cts_r, cts_c);
@@ -2612,6 +2742,23 @@ void TCStatJobRIRW::do_output(ostream &out) {
       ctc_at.set_entry(ctc_r, ctc_c++, "RIRW_CTC:");
       cts_at.set_entry(cts_r, cts_c++, "RIRW_CTS:");
 
+      // Write the RI/RW event definition
+      ctc_at.set_entry(ctc_r, ctc_c++, sec_to_hhmmss(RapidIntenTimeADeck));
+      ctc_at.set_entry(ctc_r, ctc_c++, sec_to_hhmmss(RapidIntenTimeBDeck));
+      ctc_at.set_entry(ctc_r, ctc_c++, bool_to_string(RapidIntenExactADeck));
+      ctc_at.set_entry(ctc_r, ctc_c++, bool_to_string(RapidIntenExactBDeck));
+      ctc_at.set_entry(ctc_r, ctc_c++, RapidIntenThreshADeck.get_str());
+      ctc_at.set_entry(ctc_r, ctc_c++, RapidIntenThreshBDeck.get_str());
+      ctc_at.set_entry(ctc_r, ctc_c++, sec_to_hhmmss(RapidIntenWindow));
+
+      cts_at.set_entry(cts_r, cts_c++, sec_to_hhmmss(RapidIntenTimeADeck));
+      cts_at.set_entry(cts_r, cts_c++, sec_to_hhmmss(RapidIntenTimeBDeck));
+      cts_at.set_entry(cts_r, cts_c++, bool_to_string(RapidIntenExactADeck));
+      cts_at.set_entry(cts_r, cts_c++, bool_to_string(RapidIntenExactBDeck));
+      cts_at.set_entry(cts_r, cts_c++, RapidIntenThreshADeck.get_str());
+      cts_at.set_entry(cts_r, cts_c++, RapidIntenThreshBDeck.get_str());
+      cts_at.set_entry(cts_r, cts_c++, sec_to_hhmmss(RapidIntenWindow));
+      
       // Write case column values
       for(i=1; i<sa.n_elements(); i++) {
          ctc_at.set_entry(ctc_r, ctc_c++, sa[i]);
