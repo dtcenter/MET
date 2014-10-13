@@ -410,16 +410,25 @@ water_only = FALSE;
 // Specify whether only those track points for which rapid intensification
 // or weakening of the maximum wind speed occurred in the previous time
 // step should be retained.
+//
 // The NHC considers a 24-hour change >=30 kts to constitute rapid
 // intensification or weakening.
-// May modify using the "-rapid_inten_track", "-rapid_inten_time",
-// "-rapid_inten_exact", and "rapid_inten_thresh" job command options.
 //
+// May modify using the following job command options:
+//    "-rapid_inten_track"
+//    "-rapid_inten_time" for both or "-rapid_inten_time_adeck" and "-rapid_inten_time_bdeck"
+//    "-rapid_inten_exact" for both or "-rapid_inten_exact_adeck" and "-rapid_inten_exact_bdeck"
+//    "-rapid_inten_thresh" for both or "-rapid_inten_thresh_adeck" and "-rapid_inten_thresh_bdeck"
+//
+
 rapid_inten = {
-   track  = NONE;   // Specify which track types to search (NONE, ADECK, BDECK, or BOTH)
-   time   = 24;     // Rapid intensification/weakening time period in HHMMSS format.
-   exact  = TRUE;   // Use the exact or maximum intensity difference over the time period.
-   thresh = >=30.0; // Threshold for the intensity change.
+   track  = NONE;       // Specify which track types to search (NONE, ADECK, BDECK, or BOTH)
+   adeck = {
+      time   = "24";    // Rapid intensification/weakening time period in HHMMSS format.
+      exact  = TRUE;    // Use the exact or maximum intensity difference over the time period.
+      thresh = >=30.0;  // Threshold for the intensity change.
+   }
+   bdeck = adeck;       // Copy settings to the BDECK or specify different logic.
 }
 
 //
@@ -530,8 +539,6 @@ out_valid_mask = "";
 //                                        with commas
 //
 //          Required Args: -dump_row
-//      
-//
 //
 //       "summary"
 //          To compute the mean, standard deviation, and percentiles
@@ -549,12 +556,33 @@ out_valid_mask = "";
 //             "ABS(col or col1-col2)" for the absolute value.
 //
 //          Required Args: -line_type, -column
-//          Optional Args (TCStat): -by column_name to specify case information
-//                                  -out_alpha to override default alpha value
+//          Optional Args: -by column_name to specify case information
+//                         -out_alpha to override default alpha value
+//
+//       "rirw"
+//          To define rapid intensification/weakening contingency table using
+//          the ADECK and BDECK RI/RW settings and the matching time window
+//          and output contingency table counts and statistics.
+//
+//          Optional Args:
+//             -rapid_inten_window HHMMSS to override default of 0, requiring exact match
+//             -rapid_inten_time or -rapid_inten_time_adeck and -rapid_inten_time_bdeck to override defaults
+//             -rapid_inten_exact or -rapid_inten_exact_adeck and -rapid_inten_exact_bdeck to override defaults
+//             -rapid_inten_thresh or -rapid_inten_thresh_adeck and -rapid_inten_thresh_bdeck to override defaults
+//             -by column_name to specify case information
+//             -out_alpha to override default alpha value
+//
+//          Note that the "-dump_row path" option results in 4 files being created:
+//             path_FY_OY.tcst, path_FY_ON.tcst, path_FN_OY.tcst, and path_FN_ON.tcst
+//             containing the TCST lines that were hits, false alarms, misses, and correct negatives,
+//             respectively.  These files may be used as input for additional TC-Stat analysis.
+//
+
 //
 //       e.g.
 //       jobs = ["-job filter -model AHW4 -dumprow ./tc_filter_job.tcst",
 //               "-job filter -column_min TK_ERR 100.000 -dumprow ./tc_filter_job.tcst",
-//               "-job summary -line_type TCMPR -column AC -dumprow ./tc_summary_job.tcst"]
+//               "-job summary -line_type TCMPR -column AC -dumprow ./tc_summary_job.tcst",
+//               "-job rirw -model AHW4 -dump_row ./tc_rirw_job" ]
 //
 jobs =[];
