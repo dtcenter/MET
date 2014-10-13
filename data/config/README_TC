@@ -577,8 +577,6 @@ out_valid_mask = "";
 //             containing the TCST lines that were hits, false alarms, misses, and correct negatives,
 //             respectively.  These files may be used as input for additional TC-Stat analysis.
 //
-
-//
 //       e.g.
 //       jobs = ["-job filter -model AHW4 -dumprow ./tc_filter_job.tcst",
 //               "-job filter -column_min TK_ERR 100.000 -dumprow ./tc_filter_job.tcst",
