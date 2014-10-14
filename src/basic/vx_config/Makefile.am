@@ -47,6 +47,15 @@ if ENABLE_DEVELOPMENT
 	-rm -r grdfiletype_to_string.h
 endif
 
+# If we are in development mode, clean up extra local files in a "make clean".
+
+if ENABLE_DEVELOPMENT
+    CLEANFILES = config_scanner.cc \
+        	config.tab.cc \
+        	config.tab.h \
+        	lex.config.cc
+endif
+
 # Extra distribution files
 
 EXTRA_DIST = config.tab.cc \
