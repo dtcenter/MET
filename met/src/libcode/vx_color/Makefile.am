@@ -25,9 +25,11 @@ libvx_color_a_SOURCES = \
               vx_color.h
 libvx_color_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-# Clean up extra local files
+# If we are in development mode, clean up extra local files in a "make clean".
 
-CLEANFILES = color_scanner.cc \
-	color_parser_yacc.cc \
-	color_parser_yacc.h \
-	lex.color.cc
+if ENABLE_DEVELOPMENT
+    CLEANFILES = color_scanner.cc \
+        	color_parser_yacc.cc \
+        	color_parser_yacc.h \
+        	lex.color.cc
+endif
