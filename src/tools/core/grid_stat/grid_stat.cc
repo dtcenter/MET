@@ -1525,12 +1525,9 @@ void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp, const
 
    // Allocate memory for the forecast, observation, and difference
    // fields
-   if ( nc_info.do_raw )  {
-      fcst_data = new float [grid.nx()*grid.ny()];
-      obs_data  = new float [grid.nx()*grid.ny()];
-   }
-
-   if ( nc_info.do_diff )  diff_data = new float [grid.nx()*grid.ny()];
+   fcst_data = new float [grid.nx()*grid.ny()];
+   obs_data  = new float [grid.nx()*grid.ny()];
+   diff_data = new float [grid.nx()*grid.ny()];
 
    // Compute the difference field for each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
