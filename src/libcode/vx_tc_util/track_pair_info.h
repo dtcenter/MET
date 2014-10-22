@@ -71,6 +71,10 @@ class TrackPairInfo {
       // Status for whether RI/RW occurred
       NumArray     ADeckRIRW;
       NumArray     BDeckRIRW;
+      
+      // Previous intensity values
+      NumArray     ADeckPrvInt;
+      NumArray     BDeckPrvInt;
 
       // Status for whether this point should be used
       NumArray     Keep;
@@ -114,6 +118,8 @@ class TrackPairInfo {
       double             cross_track_err(int) const;
       int                adeck_rirw(int)      const;
       int                bdeck_rirw(int)      const;
+      double             adeck_prv_int(int)   const;
+      double             bdeck_prv_int(int)   const;
 
       int                n_lines()            const;
       const TCStatLine * line(int i)          const;
@@ -155,6 +161,8 @@ inline double             TrackPairInfo::along_track_err(int i) const { return(A
 inline double             TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]);   }
 inline int                TrackPairInfo::adeck_rirw(int i)      const { return(nint(ADeckRIRW[i])); }
 inline int                TrackPairInfo::bdeck_rirw(int i)      const { return(nint(BDeckRIRW[i])); }
+inline double             TrackPairInfo::adeck_prv_int(int i)   const { return(ADeckPrvInt[i]);     }
+inline double             TrackPairInfo::bdeck_prv_int(int i)   const { return(BDeckPrvInt[i]);     }
 inline int                TrackPairInfo::n_lines()              const { return(NLines);             }
 inline const TCStatLine * TrackPairInfo::line(int i)            const { return(&Line[i]);           }
 inline bool               TrackPairInfo::keep(int i)            const { return(Keep[i] != 0);       }

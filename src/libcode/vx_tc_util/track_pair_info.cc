@@ -87,6 +87,8 @@ void TrackPairInfo::clear() {
    CrossTrackErr.clear();
    ADeckRIRW.clear();
    BDeckRIRW.clear();
+   ADeckPrvInt.clear();
+   BDeckPrvInt.clear();
    Keep.clear();
 
    if(Line) { delete [] Line; Line = (TCStatLine *) 0; }
@@ -123,6 +125,10 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    ADeckRIRW.dump(out, indent_depth+1);
    out << prefix << "BDeckRIRW:\n";
    BDeckRIRW.dump(out, indent_depth+1);
+   out << prefix << "ADeckPrvInt:\n";
+   ADeckPrvInt.dump(out, indent_depth+1);
+   out << prefix << "BDeckPrvInt:\n";
+   BDeckPrvInt.dump(out, indent_depth+1);
    out << prefix << "Keep:\n";
    Keep.dump(out, indent_depth+1);
    out << prefix << "NLines = " << NLines << "\n";
@@ -204,6 +210,8 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
    CrossTrackErr = t.CrossTrackErr;
    ADeckRIRW     = t.ADeckRIRW;
    BDeckRIRW     = t.BDeckRIRW;
+   ADeckPrvInt   = t.ADeckPrvInt;
+   BDeckPrvInt   = t.BDeckPrvInt;
    Keep          = t.Keep;
 
    extend(t.NLines);
@@ -326,6 +334,8 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
    CrossTrackErr.add(crtkerr);
    ADeckRIRW.add(bad_data_double);
    BDeckRIRW.add(bad_data_double);
+   ADeckPrvInt.add(bad_data_double);
+   BDeckPrvInt.add(bad_data_double);
    Keep.add(1);
 
    return;
@@ -410,6 +420,8 @@ void TrackPairInfo::add(const TCStatLine &l) {
    CrossTrackErr.add(atof(l.get_item("CRTK_ERR")));
    ADeckRIRW.add(bad_data_double);
    BDeckRIRW.add(bad_data_double);
+   ADeckPrvInt.add(bad_data_double);
+   BDeckPrvInt.add(bad_data_double);
    Keep.add(1);
 
    // Store the input line
@@ -553,7 +565,12 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
       // Initialize
       ADeckRIRW.set(i, bad_data_double);
       BDeckRIRW.set(i, bad_data_double);
-      
+      ADeckPrvInt.set(i, bad_data_double);
+      BDeckPrvInt.set(i, bad_data_double);
+
+      // Skip track points whose lead time is less than the RI/RW window
+      if(ADeck[i].lead() < sec_adeck) continue;
+
       // Store the current wind speed maximum
       cur_avmax = ADeck[i].v_max();
       cur_bvmax = BDeck[i].v_max();
@@ -626,24 +643,32 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
          else                                      BDeckRIRW.set(i, 0);
       }
 
+      // Store the previous vmax values
+      ADeckPrvInt.set(i, prv_avmax);
+      BDeckPrvInt.set(i, prv_bvmax);
+
       // Print debug message when rapid intensification is found
       if(is_eq(ADeckRIRW[i], 1.0) &&
          (track_type == TrackType_ADeck || track_type == TrackType_Both)) {
-         mlog << Debug(4) << "Found ADECK RI/RW for valid time "
-              << unix_to_yyyymmdd_hhmmss(valid(i)) << " with "
-              << sec_to_hhmmss(sec_adeck) << (exact_adeck ? " exact " : " maximum " )
-              << "change of " << prv_avmax << " to " << cur_avmax << " kt, "
-              << cur_avmax - prv_avmax << st_adeck.get_str()
-              << " kt for " << case_info() << "\n";
+         mlog << Debug(4)
+              << "Found ADECK RI/RW: " << case_info()
+              << ", VALID = " << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << ", "
+              << "LEAD = " << (is_bad_data(ADeck[i].lead()) ? na_str : sec_to_hhmmss(ADeck[i].lead())) << ", "
+              << sec_to_hhmmss(sec_adeck)
+              << (exact_adeck ? " exact " : " maximum " ) << "ADECK change "
+              << prv_avmax << " to " << cur_avmax << ", "
+              << cur_avmax - prv_avmax << st_adeck.get_str() << "\n";
       }
       if(is_eq(BDeckRIRW[i], 1.0) &&
          (track_type == TrackType_BDeck || track_type == TrackType_Both)) {
-         mlog << Debug(4) << "Found BDECK RI/RW for valid time "
-              << unix_to_yyyymmdd_hhmmss(valid(i)) << " with "
-              << sec_to_hhmmss(sec_bdeck) << (exact_bdeck ? " exact " : " maximum " )
-              << "change of " << prv_bvmax << " to " << cur_bvmax << " kt, "
-              << cur_bvmax - prv_bvmax << st_bdeck.get_str()
-              << " kt for " << case_info() << "\n";
+         mlog << Debug(4)
+              << "Found BDECK RI/RW: " << case_info()
+              << ", VALID = " << unix_to_yyyymmdd_hhmmss(BDeck[i].valid()) << ", "
+              << "LEAD = " << (is_bad_data(BDeck[i].lead()) ? na_str : sec_to_hhmmss(BDeck[i].lead())) << ", "
+              << sec_to_hhmmss(sec_bdeck)
+              << (exact_bdeck ? " exact " : " maximum " ) << "BDECK change "
+              << prv_bvmax << " to " << cur_bvmax << ", "
+              << cur_bvmax - prv_bvmax << st_bdeck.get_str() << "\n";
       }
 
       // Don't increment counts for track points we're not already keeping
