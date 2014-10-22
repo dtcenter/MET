@@ -569,7 +569,7 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
       BDeckPrvInt.set(i, bad_data_double);
 
       // Skip track points whose lead time is less than the RI/RW window
-      if(ADeck[i].lead() < sec_adeck) continue;
+      if(!is_bad_data(ADeck[i].lead()) && ADeck[i].lead() < sec_adeck) continue;
 
       // Store the current wind speed maximum
       cur_avmax = ADeck[i].v_max();
@@ -583,8 +583,8 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
          // Compute time offset
          delta_ut = valid(i) - valid(j);
 
-         // Skip over future track points.
-         if(delta_ut < 0) continue;
+         // Skip the current and future track points.
+         if(delta_ut <= 0) continue;
 
          // Check for an exact ADeck time difference.
          if(exact_adeck && delta_ut == sec_adeck) prv_avmax = ADeck[j].v_max();
