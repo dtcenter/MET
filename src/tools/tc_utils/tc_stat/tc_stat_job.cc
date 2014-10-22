@@ -2500,9 +2500,6 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
    // Loop over the track points and populate the contigency table
    for(i=0; i<tpi.n_points(); i++) {
 
-      // Skip marked lines
-      if(!tpi.keep(i)) continue;
-
       // Initialize the map key so it's never empty
       key = "RIRW";
 
