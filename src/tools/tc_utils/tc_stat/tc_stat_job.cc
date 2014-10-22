@@ -2476,7 +2476,7 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
-   int i, j, lead, a, b, cur_dt, min_dt;
+   int i, j, a, b, cur_dt, min_dt, lead;
    map<ConcatString,RIRWMapData,cs_cmp> cur_map;
    ConcatString key, cur, cat;
    RIRWMapData data;
@@ -2584,15 +2584,37 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
          }
       }
 
-      lead = tpi.adeck()[i].lead();
-      mlog << Debug(5)
-           << "RI/RW Event Category: "
-           << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
-           << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << ", "
-           << (is_bad_data(a) ? na_str : bool_to_string(a)) << ", "
-           << (is_bad_data(b) ? na_str : bool_to_string(b)) << " -> "
-           << cat << "\n";
+      // Write very detailed logging info
+      if(mlog.verbosity_level() >= 5) {
       
+                lead = tpi.adeck()[i].lead();
+         double acur = tpi.adeck()[i].v_max();
+         double aprv = tpi.adeck_prv_int(i);
+         double bcur = tpi.bdeck()[i].v_max();
+         double bprv = tpi.bdeck_prv_int(i);
+      
+         mlog << Debug(5)
+              << "RI/RW Event Category: "
+              << tpi.case_info() << ", "
+              << "VALID = " << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
+              << "LEAD = " << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << ", "
+              << sec_to_hhmmss(RapidIntenTimeADeck)
+              << (RapidIntenExactADeck ? " exact " : " maximum " ) << "ADECK change "
+              << (is_bad_data(aprv) ? na_str : str_format("%.0f", aprv)) << " to "
+              << (is_bad_data(acur) ? na_str : str_format("%.0f", acur)) << ", "
+              << (is_bad_data(acur) || is_bad_data(aprv) ? na_str : str_format("%.0f", acur - aprv))
+              << RapidIntenThreshADeck.get_str() << " ("
+              << (is_bad_data(a) ? na_str : bool_to_string(a)) << "), "
+              << sec_to_hhmmss(RapidIntenTimeBDeck)
+              << (RapidIntenExactBDeck ? " exact " : " maximum " ) << "BDECK change "
+              << (is_bad_data(bprv) ? na_str : str_format("%.0f", bprv)) << " to "
+              << (is_bad_data(bcur) ? na_str : str_format("%.0f", bcur)) << ", "
+              << (is_bad_data(bcur) || is_bad_data(bprv) ? na_str : str_format("%.0f", bcur - bprv))
+              << RapidIntenThreshBDeck.get_str() << " ("
+              << (is_bad_data(b) ? na_str : bool_to_string(b)) << ") -> "
+              << cat << "\n";
+      }
+
       // Add values for this key
       cur_map[key].Hdr.add(tpi.line(i)->header());
       cur_map[key].AModel.add(tpi.line(i)->amodel());
