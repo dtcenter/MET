@@ -68,10 +68,6 @@ struct SummaryMapData {
 struct RIRWMapData {
    CTSInfo     Info;
    StringArray Hdr;
-   StringArray AModel;
-   TimeArray   Init;
-   NumArray    Lead;
-   TimeArray   Valid;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -408,12 +404,18 @@ class TCStatJobRIRW : public TCStatJob {
       void add_map(map<ConcatString,RIRWMapData,cs_cmp>&);
 
       void do_output(ostream &);
+      void do_ctc_output(ostream &);
+      void do_cts_output(ostream &);
+      void do_mpr_output(ostream &);
 
       // Store the case information
       StringArray CaseColumn;
 
       // Confidence interval alpha value
       double OutAlpha;
+
+      // Output types
+      StringArray OutLineType;
 
       // Map column and case info to column values
       map<ConcatString,RIRWMapData,cs_cmp> RIRWMap;

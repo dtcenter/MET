@@ -533,8 +533,7 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
                                      const SingleThresh &st_adeck, const SingleThresh &st_bdeck) {
    int i, j, n_rej;
    unixtime delta_ut;
-   double cur_avmax, cur_bvmax;
-   double prv_avmax, prv_bvmax;
+   int acur, aprv, bcur, bprv;
  
    // Nothing to do.
    if(track_type == TrackType_None) return(0);
@@ -572,10 +571,10 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
       if(!is_bad_data(ADeck[i].lead()) && ADeck[i].lead() < sec_adeck) continue;
 
       // Store the current wind speed maximum
-      cur_avmax = ADeck[i].v_max();
-      cur_bvmax = BDeck[i].v_max();
-      prv_avmax = bad_data_double;
-      prv_bvmax = bad_data_double;
+      acur = ADeck[i].v_max();
+      bcur = BDeck[i].v_max();
+      aprv = bad_data_int;
+      bprv = bad_data_int;
 
       // Search other track points for previous times
       for(j=0; j<NPoints; j++) {
@@ -587,65 +586,65 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
          if(delta_ut <= 0) continue;
 
          // Check for an exact ADeck time difference.
-         if(exact_adeck && delta_ut == sec_adeck) prv_avmax = ADeck[j].v_max();
+         if(exact_adeck && delta_ut == sec_adeck) aprv = ADeck[j].v_max();
 
          // Check all ADeck points in the time window
          if(!exact_adeck && delta_ut <= sec_adeck) {
 
             // Initialize the previous intensity.
-            if(is_bad_data(prv_avmax)) prv_avmax = ADeck[j].v_max();
+            if(is_bad_data(aprv)) aprv = ADeck[j].v_max();
 
             // Update the previous ADeck intensity.
-            if(!is_bad_data(prv_avmax) && !is_bad_data(ADeck[j].v_max())) {
+            if(!is_bad_data(aprv) && !is_bad_data(ADeck[j].v_max())) {
 
                // For greater-than type thresholds, find the minimum value in the window.
                if((st_adeck.get_type() == thresh_gt || st_adeck.get_type() == thresh_ge) &&
-                  ADeck[j].v_max() < prv_avmax) prv_avmax = ADeck[j].v_max();
+                  ADeck[j].v_max() < aprv) aprv = ADeck[j].v_max();
 
                // For less-than type thresholds, find the maximum value in the window.
                if((st_adeck.get_type() == thresh_lt || st_adeck.get_type() == thresh_le) &&
-                  ADeck[j].v_max() > prv_avmax) prv_avmax = ADeck[j].v_max();
+                  ADeck[j].v_max() > aprv) aprv = ADeck[j].v_max();
             }
          }
 
          // Check for an exact BDeck time difference.
-         if(exact_bdeck && delta_ut == sec_bdeck) prv_bvmax = BDeck[j].v_max();
+         if(exact_bdeck && delta_ut == sec_bdeck) bprv = BDeck[j].v_max();
 
          // Check all BDeck points in the time window
          if(!exact_bdeck && delta_ut <= sec_bdeck) {
 
             // Initialize the previous intensity.
-            if(is_bad_data(prv_bvmax)) prv_bvmax = BDeck[j].v_max();
+            if(is_bad_data(bprv)) bprv = BDeck[j].v_max();
 
             // Update the previous BDeck intensity.
-            if(!is_bad_data(prv_bvmax) && !is_bad_data(BDeck[j].v_max())) {
+            if(!is_bad_data(bprv) && !is_bad_data(BDeck[j].v_max())) {
 
                // For greater-than type thresholds, find the minimum value in the window.
                if((st_bdeck.get_type() == thresh_gt || st_bdeck.get_type() == thresh_ge) &&
-                  BDeck[j].v_max() < prv_bvmax) prv_bvmax = BDeck[j].v_max();
+                  BDeck[j].v_max() < bprv) bprv = BDeck[j].v_max();
 
                // For less-than type thresholds, find the maximum value in the window.
                if((st_bdeck.get_type() == thresh_lt || st_bdeck.get_type() == thresh_le) &&
-                  BDeck[j].v_max() > prv_bvmax) prv_bvmax = BDeck[j].v_max();
+                  BDeck[j].v_max() > bprv) bprv = BDeck[j].v_max();
             }
          }
       } // end for j
 
       // Apply ADeck logic
-      if(!is_bad_data(cur_avmax) && !is_bad_data(prv_avmax)) {
-         if(st_adeck.check(cur_avmax - prv_avmax)) ADeckRIRW.set(i, 1);
+      if(!is_bad_data(acur) && !is_bad_data(aprv)) {
+         if(st_adeck.check(acur - aprv)) ADeckRIRW.set(i, 1);
          else                                      ADeckRIRW.set(i, 0);
       }
 
       // Apply BDeck logic
-      if(!is_bad_data(cur_bvmax) && !is_bad_data(prv_bvmax)) {
-         if(st_bdeck.check(cur_bvmax - prv_bvmax)) BDeckRIRW.set(i, 1);
+      if(!is_bad_data(bcur) && !is_bad_data(bprv)) {
+         if(st_bdeck.check(bcur - bprv)) BDeckRIRW.set(i, 1);
          else                                      BDeckRIRW.set(i, 0);
       }
 
       // Store the previous vmax values
-      ADeckPrvInt.set(i, prv_avmax);
-      BDeckPrvInt.set(i, prv_bvmax);
+      ADeckPrvInt.set(i, aprv);
+      BDeckPrvInt.set(i, bprv);
 
       // Print debug message when rapid intensification is found
       if(is_eq(ADeckRIRW[i], 1.0) &&
@@ -656,8 +655,8 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
               << "LEAD = " << (is_bad_data(ADeck[i].lead()) ? na_str : sec_to_hhmmss(ADeck[i].lead())) << ", "
               << sec_to_hhmmss(sec_adeck)
               << (exact_adeck ? " exact " : " maximum " ) << "ADECK change "
-              << prv_avmax << " to " << cur_avmax << ", "
-              << cur_avmax - prv_avmax << st_adeck.get_str() << "\n";
+              << aprv << " to " << acur << ", "
+              << acur - aprv << st_adeck.get_str() << "\n";
       }
       if(is_eq(BDeckRIRW[i], 1.0) &&
          (track_type == TrackType_BDeck || track_type == TrackType_Both)) {
@@ -667,8 +666,8 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
               << "LEAD = " << (is_bad_data(BDeck[i].lead()) ? na_str : sec_to_hhmmss(BDeck[i].lead())) << ", "
               << sec_to_hhmmss(sec_bdeck)
               << (exact_bdeck ? " exact " : " maximum " ) << "BDECK change "
-              << prv_bvmax << " to " << cur_bvmax << ", "
-              << cur_bvmax - prv_bvmax << st_bdeck.get_str() << "\n";
+              << bprv << " to " << bcur << ", "
+              << bcur - bprv << st_bdeck.get_str() << "\n";
       }
 
       // Don't increment counts for track points we're not already keeping
