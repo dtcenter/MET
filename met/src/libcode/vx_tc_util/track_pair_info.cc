@@ -567,9 +567,6 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
       ADeckPrvInt.set(i, bad_data_double);
       BDeckPrvInt.set(i, bad_data_double);
 
-      // Skip track points whose lead time is less than the RI/RW window
-      if(!is_bad_data(ADeck[i].lead()) && ADeck[i].lead() < sec_adeck) continue;
-
       // Store the current wind speed maximum
       acur = ADeck[i].v_max();
       bcur = BDeck[i].v_max();
@@ -631,15 +628,16 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
       } // end for j
 
       // Apply ADeck logic
-      if(!is_bad_data(acur) && !is_bad_data(aprv)) {
+      if(!is_bad_data(acur) && !is_bad_data(aprv) &&
+         ADeck[i].lead() >= sec_adeck) {
          if(st_adeck.check(acur - aprv)) ADeckRIRW.set(i, 1);
-         else                                      ADeckRIRW.set(i, 0);
+         else                            ADeckRIRW.set(i, 0);
       }
 
       // Apply BDeck logic
       if(!is_bad_data(bcur) && !is_bad_data(bprv)) {
          if(st_bdeck.check(bcur - bprv)) BDeckRIRW.set(i, 1);
-         else                                      BDeckRIRW.set(i, 0);
+         else                            BDeckRIRW.set(i, 0);
       }
 
       // Store the previous vmax values
@@ -674,13 +672,13 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
       if(!Keep[i]) continue;
 
       // Update the keep status
-      if((track_type == TrackType_ADeck && !ADeckRIRW[i]) ||
-         (track_type == TrackType_BDeck && !BDeckRIRW[i]) ||
-         (track_type == TrackType_Both  && !ADeckRIRW[i] && !BDeckRIRW[i])) {
+      if((track_type == TrackType_ADeck && !is_eq(ADeckRIRW[i], 1.0)) ||
+         (track_type == TrackType_BDeck && !is_eq(BDeckRIRW[i], 1.0)) ||
+         (track_type == TrackType_Both  && !is_eq(ADeckRIRW[i], 1.0) && !is_eq(BDeckRIRW[i], 1.0))) {
          Keep.set(i, 0);
          n_rej++;
       }
-   }
+   } // end for i
 
    return(n_rej);
 }
