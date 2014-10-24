@@ -2428,6 +2428,9 @@ ConcatString TCStatJobRIRW::serialize() const {
    // Add RIRW job-specific options
    for(i=0; i<CaseColumn.n_elements(); i++)
       s << "-by " << CaseColumn[i] << " ";
+   
+   for(i=0; i<OutLineType.n_elements(); i++)
+      s << "-out_line_type " << OutLineType[i] << " ";
 
    // Always list the output alpha value used
    s << "-out_alpha " << OutAlpha << " ";
