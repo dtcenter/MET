@@ -1440,7 +1440,7 @@ void write_header_cols(const StatHdrColumns &shc,
    at.set_entry(r,  9, shc.get_fcst_lev());           // Fcst level
    at.set_entry(r, 10, shc.get_obs_var());            // Obs variable
    at.set_entry(r, 11, shc.get_obs_lev());            // Obs level
-   at.set_entry(r, 12, shc.get_msg_typ());            // Verifying observation type
+   at.set_entry(r, 12, shc.get_obtype());             // Verifying observation type
    at.set_entry(r, 13, shc.get_mask());               // Verification masking region
    at.set_entry(r, 14, shc.get_interp_mthd_str());    // Interpolation method
    at.set_entry(r, 15, shc.get_interp_pnts_str());    // Interpolation points

@@ -62,8 +62,8 @@ class StatHdrColumns {
       ConcatString obs_var;
       ConcatString obs_lev;
 
-      // Obs message type
-      ConcatString msg_typ;
+      // Obs type
+      ConcatString obtype;
 
       // Verification region
       ConcatString mask;
@@ -136,7 +136,7 @@ class StatHdrColumns {
       void set_obs_var       (const char *);
       void set_obs_lev       (const char *);
 
-      void set_msg_typ       (const char *);
+      void set_obtype        (const char *);
       void set_mask          (const char *);
 
       void set_interp_mthd   (const InterpMthd);
@@ -179,7 +179,7 @@ class StatHdrColumns {
       const char *get_obs_var           () const;
       const char *get_obs_lev           () const;
 
-      const char *get_msg_typ           () const;
+      const char *get_obtype            () const;
       const char *get_mask              () const;
 
       InterpMthd  get_interp_mthd       () const;
@@ -228,7 +228,7 @@ inline const char *StatHdrColumns::get_fcst_lev          () const { return(fcst_
 inline const char *StatHdrColumns::get_obs_var           () const { return(obs_var);             }
 inline const char *StatHdrColumns::get_obs_lev           () const { return(obs_lev);             }
 
-inline const char *StatHdrColumns::get_msg_typ           () const { return(msg_typ);             }
+inline const char *StatHdrColumns::get_obtype            () const { return(obtype);              }
 inline const char *StatHdrColumns::get_mask              () const { return(mask);                }
 
 inline InterpMthd  StatHdrColumns::get_interp_mthd       () const { return(interp_mthd);         }

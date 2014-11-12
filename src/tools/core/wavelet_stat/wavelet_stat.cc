@@ -321,10 +321,10 @@ void process_scores() {
       // Setup strings for the GRIB code
       if(conf_info.fcst_info[i]->is_precipitation() &&
          conf_info.obs_info[i]->is_precipitation()) {
-         shc.set_msg_typ("MC_PCP");
+         shc.set_obtype("MC_PCP");
       }
       else {
-         shc.set_msg_typ("ANALYS");
+         shc.set_obtype("ANALYS");
       }
 
       // Store the forecast variable name

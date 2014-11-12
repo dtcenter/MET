@@ -76,7 +76,7 @@ void StatHdrColumns::clear() {
    obs_var.clear();
    obs_lev.clear();
 
-   msg_typ.clear();
+   obtype.clear();
    mask.clear();
 
    interp_mthd_str.clear();
@@ -205,8 +205,8 @@ void StatHdrColumns::set_obs_lev(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void StatHdrColumns::set_msg_typ(const char *s) {
-   msg_typ = s;
+void StatHdrColumns::set_obtype(const char *s) {
+   obtype = s;
    return;
 }
 

@@ -924,8 +924,8 @@ void process_point_scores() {
       // Loop through the message types
       for(j=0; j<conf_info.get_n_msg_typ(i); j++) {
 
-         // Store the message type
-         shc.set_msg_typ(conf_info.msg_typ[i][j]);
+         // Store the message type in the obtype column
+         shc.set_obtype(conf_info.msg_typ[i][j]);
 
          // Loop through the verification masking regions
          for(k=0; k<conf_info.get_n_mask(); k++) {
@@ -1073,10 +1073,10 @@ void process_grid_vx() {
       // Setup the obtype column
       if(conf_info.vx_pd[i].fcst_info->is_precipitation() &&
          conf_info.vx_pd[i].obs_info->is_precipitation()) {
-         shc.set_msg_typ("MC_PCP");
+         shc.set_obtype("MC_PCP");
       }
       else {
-         shc.set_msg_typ("ANALYS");
+         shc.set_obtype("ANALYS");
       }
 
       // Loop through each of the input ensemble files
@@ -1296,7 +1296,7 @@ void process_grid_vx() {
                  << conf_info.vx_pd[i].fcst_info->magic_str()
                  << " versus "
                  << conf_info.vx_pd[i].obs_info->magic_str()
-                 << ", for observation type " << shc.get_msg_typ()
+                 << ", for observation type " << shc.get_obtype()
                  << ", over region " << shc.get_mask()
                  << ", for interpolation method "
                  << shc.get_interp_mthd_str() << "("

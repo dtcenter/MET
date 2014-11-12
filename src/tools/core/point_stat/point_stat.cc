@@ -892,8 +892,8 @@ void process_scores() {
       // Loop through the message types
       for(j=0; j<conf_info.get_n_msg_typ(i); j++) {
 
-         // Store the message type
-         shc.set_msg_typ(conf_info.msg_typ[i][j]);
+         // Store the message type in the obtype column
+         shc.set_obtype(conf_info.msg_typ[i][j]);
 
          // Loop through the verification masking regions
          for(k=0; k<conf_info.get_n_mask(); k++) {
