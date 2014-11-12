@@ -144,7 +144,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    version = parse_conf_version(&conf);
 
    // Conf: model
-   model = parse_conf_model(&conf);
+   model = parse_conf_string(&conf, conf_key_model);
 
    // Conf: output_stats
    output_stats = parse_conf_output_stats(&conf);

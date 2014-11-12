@@ -296,6 +296,7 @@ static const char config_map_data_filename[] = "MET_BASE/config/ConfigMapData";
 
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
+static const char conf_key_obtype[]            = "obtype";
 static const char conf_key_output_flag[]       = "output_flag";
 static const char conf_key_obs_window[]        = "obs_window";
 static const char conf_key_beg[]               = "beg";
@@ -439,7 +440,6 @@ static const char conf_key_fcst_var[]          = "fcst_var";
 static const char conf_key_obs_var[]           = "obs_var";
 static const char conf_key_fcst_lev[]          = "fcst_lev";
 static const char conf_key_obs_lev[]           = "obs_lev";
-static const char conf_key_obtype[]            = "obtype";
 static const char conf_key_vx_mask[]           = "vx_mask";
 static const char conf_key_interp_mthd[]       = "interp_mthd";
 static const char conf_key_interp_pnts[]       = "interp_pnts";

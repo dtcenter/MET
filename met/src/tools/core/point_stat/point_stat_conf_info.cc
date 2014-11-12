@@ -157,7 +157,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    version = parse_conf_version(&conf);
 
    // Conf: model
-   model = parse_conf_model(&conf);
+   model = parse_conf_string(&conf, conf_key_model);
 
    // Conf: beg_ds and end_ds
    fcst_dict = conf.lookup_dictionary(conf_key_obs_window);

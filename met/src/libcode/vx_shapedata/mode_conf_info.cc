@@ -210,7 +210,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Conf: model
 
-   model = parse_conf_model(&conf);
+   model = parse_conf_string(&conf, conf_key_model);
 
       // Conf: fcst and obs
 
