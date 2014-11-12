@@ -32,7 +32,8 @@ static const int max_netcdf_int = 2147483647;
 ///////////////////////////////////////////////////////////////////////////////
 
 void write_netcdf_global(NcFile * f_out, const char *file_name,
-                         const char *program_name, const char *model_name)
+                         const char *program_name, const char *model_name,
+                         const char *obtype)
 
 {
 
@@ -51,7 +52,8 @@ sprintf(attribute_str,
 f_out->add_att("FileOrigins", attribute_str);
 f_out->add_att("MET_version", met_version);
 f_out->add_att("MET_tool", program_name);
-if(model_name) f_out->add_att("Model", model_name);
+if(model_name) f_out->add_att("model",  model_name);
+if(obtype)     f_out->add_att("obtype", obtype);
 
 return;
 

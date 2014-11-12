@@ -605,7 +605,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file.text(), program_name, conf_info.model);
+   write_netcdf_global(nc_out, out_nc_file.text(), program_name, conf_info.model, conf_info.obtype);
    if ( nc_info.do_diff )  nc_out->add_att("Difference", "Forecast Value - Observation Value");
 
    // Set the NetCDF dimensions
