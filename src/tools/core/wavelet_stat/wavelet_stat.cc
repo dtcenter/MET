@@ -30,6 +30,8 @@
 //   008    05/01/12  Halley Gotway   Move -fcst_valid, -fcst_lead,
 //                    -obs_valid, -obs_lead, -ps, -nc command line
 //                    options to config file.
+//   009    11/12/14  Halley Gotway  Pass the obtype entry from the
+//                    from the config file to the output files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -232,6 +234,9 @@ void process_command_line(int argc, char **argv) {
    // Set the model name
    shc.set_model(conf_info.model);
 
+   // Set the obtype column
+   shc.set_obtype(conf_info.obtype);
+
    // List the input files
    mlog << Debug(1)
         << "Forecast File: " << fcst_file   << "\n"
@@ -317,15 +322,6 @@ void process_scores() {
 
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
-
-      // Setup strings for the GRIB code
-      if(conf_info.fcst_info[i]->is_precipitation() &&
-         conf_info.obs_info[i]->is_precipitation()) {
-         shc.set_obtype("MC_PCP");
-      }
-      else {
-         shc.set_obtype("ANALYS");
-      }
 
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.fcst_info[i]->name());

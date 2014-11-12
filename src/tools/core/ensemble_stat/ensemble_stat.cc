@@ -35,6 +35,8 @@
 //   009    08/30/12  Oldenburg       Add spread/skill functionality
 //   010    06/03/14  Halley Gotway   Add PHIST line type
 //   011    07/09/14  Halley Gotway   Add station id exclusion option.
+//   012    11/12/14  Halley Gotway  Pass the obtype entry from the
+//                    from the config file to the output files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1044,6 +1046,9 @@ void process_grid_vx() {
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
+   // Set the obtype column
+   shc.set_obtype(conf_info.obtype);
+   
    // Allocate space to store the forecast fields
    fcst_dp        = new DataPlane [n_ens];
    fcst_dp_smooth = new DataPlane [n_ens];
@@ -1069,15 +1074,6 @@ void process_grid_vx() {
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_pd[i].obs_info->level_name().text());
-
-      // Setup the obtype column
-      if(conf_info.vx_pd[i].fcst_info->is_precipitation() &&
-         conf_info.vx_pd[i].obs_info->is_precipitation()) {
-         shc.set_obtype("MC_PCP");
-      }
-      else {
-         shc.set_obtype("ANALYS");
-      }
 
       // Loop through each of the input ensemble files
       for(j=0, n_miss=0; j<ens_file_list.n_elements(); j++) {

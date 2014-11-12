@@ -75,8 +75,9 @@ class EnsembleStatConfInfo {
       // Ensemble-Stat configuration object
       MetConfig conf;
 
-      // Store data parsed from the Grid-Stat configuration object
+      // Store data parsed from the Ensemble-Stat configuration object
       ConcatString         model;               // Model name
+      ConcatString         obtype;              // Observation type
       int                  beg_ds;              // Begin observation time window offset
       int                  end_ds;              // End observation time window offset
       VarInfo **           ens_info;            // Array of pointers for ensemble [n_ens_var]
@@ -108,7 +109,6 @@ class EnsembleStatConfInfo {
 
       bool                 ens_ssvar_flag;      // Indicator for calculation of ensemble spread/skill
       ConcatString         ens_ssvar_mean;      // Ensemble mean for spread/skill calculations
-
 
       EnsembleStatConfInfo();
      ~EnsembleStatConfInfo();
