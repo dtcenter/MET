@@ -94,12 +94,23 @@ MET tool stating the location of the parsing error.
 
 //
 // The "model" entry specifies a name for the model being verified.  This name
-// is written to the second column of the ASCII output generated.  If you're
+// is written to the MODEL column of the ASCII output generated.  If you're
 // verifying multiple models, you should choose descriptive model names (no 
 // whitespace) to distinguish between their output.
 // e.g. model = "GFS";
 //
 model = "WRF";
+
+//
+// The "obtype" entry specifies a name to describe the type of verifying gridded
+// observation used.  This name is written to the OBTYPE column in the ASCII
+// output generated.  If you're using multiple types of verifying observations,
+// you should choose a descriptive name (no whitespace) to distinguish between
+// their output.  When verifying against point observations the point
+// observation message type value is written to the OBTYPE column.  Otherwise,
+// the configuration file obtype value is written.
+//
+obtype = "ANALYS";
 
 //
 // The "fcst" entry is a dictionary containing information about the field(s)
