@@ -156,7 +156,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    version = parse_conf_version(&conf);
 
    // Conf: model
-   model = parse_conf_model(&conf);
+   model = parse_conf_string(&conf, conf_key_model);
 
    // Conf: beg_ds and end_ds
    ens_dict = conf.lookup_dictionary(conf_key_obs_window);

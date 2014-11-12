@@ -73,6 +73,8 @@
 //                    or more probabilstic thresholds.
 //   029    05/20/14  Halley Gotway  Add AFSS, UFSS, F_RATE, and O_RATE
 //                    to the NBRCNT line type.
+//   030    11/12/14  Halley Gotway  Pass the obtype entry from the
+//                    from the config file to the output files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -247,6 +249,9 @@ void process_command_line(int argc, char **argv) {
 
    // Set the model name
    shc.set_model(conf_info.model);
+   
+   // Set the obtype column
+   shc.set_msg_typ(conf_info.obtype);
 
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
@@ -371,15 +376,6 @@ void process_scores() {
 
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
-
-      // Setup the obtype column
-      if(conf_info.fcst_info[i]->is_precipitation() &&
-         conf_info.obs_info[i]->is_precipitation()) {
-         shc.set_msg_typ("MC_PCP");
-      }
-      else {
-         shc.set_msg_typ("ANALYS");
-      }
 
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.fcst_info[i]->name());

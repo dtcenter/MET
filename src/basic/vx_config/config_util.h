@@ -29,7 +29,7 @@ static MetConfig conf_const(replace_path(config_const_filename));
 ////////////////////////////////////////////////////////////////////////
 
 extern ConcatString    parse_conf_version(Dictionary *dict);
-extern ConcatString    parse_conf_model(Dictionary *dict);
+extern ConcatString    parse_conf_string(Dictionary *dict, const char *);
 extern GrdFileType     parse_conf_file_type(Dictionary *dict);
 extern map<STATLineType,STATOutputType>
                        parse_conf_output_flag(Dictionary *dict);

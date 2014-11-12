@@ -152,7 +152,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    version = parse_conf_version(&conf);
 
    // Conf: model
-   model = parse_conf_model(&conf);
+   model = parse_conf_string(&conf, conf_key_model);
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&conf);

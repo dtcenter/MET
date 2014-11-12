@@ -77,6 +77,7 @@ void GridStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   obtype.clear();
    fcst_wind_ta.clear();
    obs_wind_ta.clear();
    mask_name.clear();
@@ -167,7 +168,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    version = parse_conf_version(&conf);
 
    // Conf: model
-   model = parse_conf_model(&conf);
+   model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: obtype
+   obtype = parse_conf_string(&conf, conf_key_obtype);
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&conf);

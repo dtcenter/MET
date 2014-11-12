@@ -40,24 +40,24 @@ ConcatString parse_conf_version(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_conf_model(Dictionary *dict) {
+ConcatString parse_conf_string(Dictionary *dict, const char *conf_key) {
    ConcatString s;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_model() -> "
+      mlog << Error << "\nparse_conf_string() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
    
-   s = dict->lookup_string(conf_key_model);
+   s = dict->lookup_string(conf_key);
 
    if(dict->last_lookup_status()) {
    
       // Check that it's non-empty and contains no whitespace
       if(s.empty() || check_reg_exp(ws_reg_exp, s) == true) {
-         mlog << Error << "\nparse_conf_model() -> "
-              << "The model name (\"" << s << "\") must be non-empty and "
-              << "contain no embedded whitespace.\n\n";
+         mlog << Error << "\nparse_conf_string() -> "
+              << "The \"" << conf_key << "\" entry (\"" << s
+              << "\") must be non-empty and contain no embedded whitespace.\n\n";
          exit(1);
       }
    }
