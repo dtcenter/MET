@@ -251,7 +251,7 @@ void process_command_line(int argc, char **argv) {
    shc.set_model(conf_info.model);
    
    // Set the obtype column
-   shc.set_msg_typ(conf_info.obtype);
+   shc.set_obtype(conf_info.obtype);
 
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
