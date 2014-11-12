@@ -70,6 +70,7 @@ void WaveletStatConfInfo::clear() {
    n_scale      = 0;
 
    model.clear();
+   obtype.clear();
    mask_missing_flag = FieldType_None;
    grid_decomp_flag = GridDecompType_None;
    tile_dim = 0;
@@ -153,6 +154,9 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: obtype
+   obtype = parse_conf_string(&conf, conf_key_obtype);
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&conf);

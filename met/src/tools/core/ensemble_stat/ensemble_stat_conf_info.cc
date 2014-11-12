@@ -76,6 +76,7 @@ void EnsembleStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   obtype.clear();
    beg_ds = end_ds = bad_data_int;
    vld_ens_thresh = vld_data_thresh = bad_data_double;
    mask_name.clear();
@@ -157,6 +158,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: obtype
+   obtype = parse_conf_string(&conf, conf_key_obtype);
 
    // Conf: beg_ds and end_ds
    ens_dict = conf.lookup_dictionary(conf_key_obs_window);
