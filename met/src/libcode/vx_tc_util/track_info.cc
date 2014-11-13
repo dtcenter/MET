@@ -833,6 +833,8 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    int        pcnt;
    TrackPoint pavg, psum;
    QuadInfo   wavg;
+   NumArray   plon;
+   double     lon_range, lon_shift, lon_avg;
 
    // Check for at least one track
    if(tracks.n_tracks() == 0) {
@@ -894,6 +896,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Initialize TrackPoint
       pavg.clear();
       psum.clear();
+      plon.clear();
       pcnt = 0;
 
       // Loop through the tracks and get an average TrackPoint
@@ -915,6 +918,9 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          pcnt++;
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
+         
+         // Store the longitude values
+         plon.add(tracks.Track[j][i_pnt].lon());
       }
 
       // Check for missing required member and the minimum number of points
@@ -922,10 +928,23 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
       // Compute the average point
       pavg = psum;
-      if(!is_bad_data(pavg.lat()))   pavg.set_lat(psum.lat()/pcnt);
-      if(!is_bad_data(pavg.lon()))   pavg.set_lon(psum.lon()/pcnt);
       if(!is_bad_data(pavg.v_max())) pavg.set_v_max(nint(psum.v_max()/pcnt));
       if(!is_bad_data(pavg.mslp()))  pavg.set_mslp(nint(psum.mslp()/pcnt));
+
+      // Compute the range of longitude values
+      lon_range = plon.max() - plon.min();
+
+      // Sum the longitudes, shifting negative values if we've crossed
+      // the international date line
+      for(j=0, lon_avg=0; j<plon.n_elements(); j++) {
+         lon_shift = (lon_range > 180.0 && plon[j] < 0.0 ? 360.0 : 0.0);
+         lon_avg += (plon[j] + lon_shift);
+      }
+      lon_avg /= pcnt;
+
+      // Store the average lat/lon
+      if(!is_bad_data(pavg.lat())) pavg.set_lat(psum.lat()/pcnt);
+      if(!is_bad_data(pavg.lon())) pavg.set_lon(rescale_deg(lon_avg, -180.0, 180.0));
 
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
