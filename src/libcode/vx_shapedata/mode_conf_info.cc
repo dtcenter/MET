@@ -73,6 +73,7 @@ void ModeConfInfo::clear()
    // Initialize values
 
    model.clear();
+   obtype.clear();
 
    mask_missing_flag = FieldType_None;
 
@@ -211,6 +212,10 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: model
 
    model = parse_conf_string(&conf, conf_key_model);
+
+      // Conf: obtype
+
+   obtype = parse_conf_string(&conf, conf_key_obtype);
 
       // Conf: fcst and obs
 

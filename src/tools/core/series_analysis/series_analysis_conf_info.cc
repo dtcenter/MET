@@ -61,6 +61,7 @@ void SeriesAnalysisConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   obtype.clear();
    fcst_cat_ta.clear();
    obs_cat_ta.clear();
    ci_alpha.clear();
@@ -145,6 +146,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: obtype
+   obtype = parse_conf_string(&conf, conf_key_obtype);
 
    // Conf: output_stats
    output_stats = parse_conf_output_stats(&conf);

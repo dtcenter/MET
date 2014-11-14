@@ -80,6 +80,7 @@ class ModeConfInfo {
       MetConfig conf;                          // MODE configuration object
 
       ConcatString     model;                  // Model name
+      ConcatString     obtype;                 // Observation type
 
       VarInfo *        fcst_info;              // allocated
       VarInfo *        obs_info;               // allocated

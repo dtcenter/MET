@@ -772,7 +772,8 @@ if ( info.all_false() )  return;
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, out_file.text(), program_name, engine.conf_info.model);
+   write_netcdf_global(f_out, out_file.text(), program_name,
+                       engine.conf_info.model, engine.conf_info.obtype);
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);
