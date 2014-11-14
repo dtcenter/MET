@@ -459,11 +459,20 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
    // Get the index of the track initialization point
    i_init = tpi.i_init();
 
-   // If ADECK initialization filter is requested, check for a valid init time
-   if((InitThreshMap.size() > 0 || OutInitMask.n_points() > 0) &&
-       is_bad_data(i_init)) {
-      keep = false;
-      n.RejInitThresh += tpi.n_points();
+   // Check for bad track initialization point
+   if(is_bad_data(i_init)) {
+      if(InitThreshMap.size() > 0) {
+         keep = false;
+         n.RejInitThresh += tpi.n_points();
+      }
+      else if(InitStrMap.size() > 0) {
+         keep = false;
+         n.RejInitStr += tpi.n_points();
+      }
+      else if(OutInitMask.n_points() > 0) {
+         keep = false;
+         n.RejOutInitMask += tpi.n_points();
+      }
    }
 
    // Check InitThreshMap
