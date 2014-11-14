@@ -20,6 +20,7 @@
     <exec>&MET_DIR;/bin/series_analysis</exec>
     <env>
       <pair><name>MODEL</name>           <value>GFS</value></pair>
+      <pair><name>OBTYPE</name>          <value>STAGE4</value></pair>
       <pair><name>FCST_CAT_THRESH</name> <value>>0.0, >5.0</value></pair>
       <pair><name>FCST_FIELD</name>      <value>{ name = "APCP"; level = [ "A06" ]; }</value></pair>
       <pair><name>OBS_CAT_THRESH</name>  <value>>0.0, >5.0</value></pair>
@@ -81,6 +82,7 @@
           &MET_DIR;/bin/series_analysis</exec>
     <env>
       <pair><name>MODEL</name>           <value>SREF</value></pair>
+      <pair><name>OBTYPE</name>          <value>STAGE4</value></pair>
       <pair><name>FCST_CAT_THRESH</name> <value>>=0.00, >=0.25, >=0.50, >=0.75, >=1.00</value></pair>
       <pair><name>FCST_FIELD</name>      <value>{ name  = "PROB"; level = "A06"; prob  = { name = "APCP"; thresh_lo = 0.25; }; }</value></pair>
       <pair><name>OBS_CAT_THRESH</name>  <value>>0.25</value></pair>
@@ -114,6 +116,7 @@
     <exec>&MET_DIR;/bin/series_analysis</exec>
     <env>
       <pair><name>MODEL</name>           <value>ARW-FER-GEP1</value></pair>
+      <pair><name>OBTYPE</name>          <value>ANALYS</value></pair>
       <pair><name>FCST_CAT_THRESH</name> <value></value></pair>
       <pair><name>FCST_FIELD</name>      <value>{ name = "TMP"; level = [ "P1000", "P925", "P850", "P700", "P500", "P400", "P300", "P250", "P200", "P150", "P100" ]; }</value></pair>
       <pair><name>OBS_CAT_THRESH</name>  <value></value></pair>
