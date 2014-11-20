@@ -1015,8 +1015,8 @@ void get_field(const char * filename, const char * fld_accum_mag,
    var->set_dict( config );
 
    //  set the VarInfo timing object
-   var->set_valid(get_valid_ut);
-   var->set_init(get_init_ut);
+   if(get_valid_ut != 0) var->set_valid(get_valid_ut);
+   if(get_init_ut  != 0) var->set_init(get_init_ut);
 
    //  build an output field name using the magic string
    if( !var_info ){
