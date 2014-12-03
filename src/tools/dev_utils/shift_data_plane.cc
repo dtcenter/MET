@@ -73,7 +73,7 @@ static ConcatString shift_cs;
 static void process_command_line(int, char **);
 static void process_data_file();
 static void write_netcdf(const DataPlane &dp, const Grid &grid,
-                         const VarInfo *vinfo);
+                         const VarInfo *vinfo, const GrdFileType& ftype);
 static void usage();
 static void set_from(const StringArray &);
 static void set_to(const StringArray &);
@@ -240,7 +240,7 @@ void process_data_file() {
    } // end for x
    
    // Write the shifted data
-   write_netcdf(dp_shift, grid, vinfo);
+   write_netcdf(dp_shift, grid, vinfo, mtddf->file_type());
 
    // Clean up
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
@@ -252,7 +252,7 @@ void process_data_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf(const DataPlane &dp, const Grid &grid,
-                  const VarInfo *vinfo) {
+                  const VarInfo *vinfo, const GrdFileType &ftype) {
    ConcatString cs;
    
    // Create a new NetCDF file and open it
@@ -283,9 +283,14 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    
    // Define output variable and attributes
    cs << cs_erase << vinfo->name();
-   if(vinfo->level().type() != LevelType_Accum) {
+   if(vinfo->level().type() != LevelType_Accum &&
+      ftype != FileType_NcMet &&
+      ftype != FileType_General_Netcdf &&
+      ftype != FileType_NcPinterp &&
+      ftype != FileType_NcCF) {
       cs << "_" << vinfo->level_name();
    }
+
    NcVar *data_var = f_out->add_var(cs, ncFloat, lat_dim, lon_dim);
    data_var->add_att("name", cs);
    data_var->add_att("long_name", vinfo->long_name());
