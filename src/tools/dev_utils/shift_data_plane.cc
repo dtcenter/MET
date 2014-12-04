@@ -55,10 +55,10 @@ using namespace std;
 static ConcatString program_name;
 
 // Variables for command line arguments
-static double OldLat = bad_data_double;
-static double OldLon = bad_data_double;
-static double NewLat = bad_data_double;
-static double NewLon = bad_data_double;
+static double FrLat = bad_data_double;
+static double FrLon = bad_data_double;
+static double ToLat = bad_data_double;
+static double ToLon = bad_data_double;
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
 static ConcatString ConfigString;
@@ -140,8 +140,8 @@ void process_command_line(int argc, char **argv) {
    ConfigString   = cline[2];
 
    // Check definition of the shift
-   if(is_bad_data(OldLat) || is_bad_data(OldLon) ||
-      is_bad_data(NewLat) || is_bad_data(NewLon)) {
+   if(is_bad_data(FrLat) || is_bad_data(FrLon) ||
+      is_bad_data(ToLat) || is_bad_data(ToLon)) {
       mlog << Error << "\nprocess_command_line() -> "
            << "Missing the -from and/or -to options!\n\n";
       usage();
@@ -215,18 +215,18 @@ void process_data_file() {
            << dmin << " to " << dmax << ".\n";
    }
 
-   // Compute the shift
+   // Compute the shift, converting from degrees east to west
    grid = mtddf->grid();
-   grid.latlon_to_xy(OldLat, OldLon, fr_x, fr_y);
-   grid.latlon_to_xy(NewLat, NewLon, to_x, to_y);
+   grid.latlon_to_xy(FrLat, -1.0*FrLon, fr_x, fr_y);
+   grid.latlon_to_xy(ToLat, -1.0*ToLon, to_x, to_y);
    dx = to_x - fr_x;
    dy = to_y - fr_y;
    
    shift_cs << cs_erase << "Shifting from lat/lon ("
-            << OldLat << ", " << OldLon << ") to lat/lon ("
-            << NewLat << ", " << NewLon << ") is grid x/y shift ("
+            << FrLat << ", " << FrLon << ") to lat/lon ("
+            << ToLat << ", " << ToLon << ") is grid x/y shift ("
             << dx << ", " << dy << ")";
-             
+
    mlog << Debug(2) << shift_cs << "\n";
    
    // Shift the data
@@ -381,15 +381,15 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_from(const StringArray &a) {
-   OldLat = atof(a[0]);
-   OldLon = atof(a[1]);
+   FrLat = atof(a[0]);
+   FrLon = atof(a[1]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_to(const StringArray &a) {
-   NewLat = atof(a[0]);
-   NewLon = atof(a[1]);
+   ToLat = atof(a[0]);
+   ToLon = atof(a[1]);
 }
 
 ////////////////////////////////////////////////////////////////////////
