@@ -988,8 +988,9 @@ AC_CONFIG_FILES([Makefile
                  src/tools/dev_utils/Makefile
                  src/tools/other/Makefile
                  src/tools/other/ascii2nc/Makefile
-                 src/tools/other/gen_circle_mask/Makefile
                  src/tools/other/gen_poly_mask/Makefile
+                 src/tools/other/gen_circle_mask/Makefile
+                 src/tools/other/gen_vx_mask/Makefile
                  src/tools/other/madis2nc/Makefile
                  src/tools/other/mode_graphics/Makefile
                  src/tools/other/modis_regrid/Makefile
