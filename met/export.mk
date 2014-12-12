@@ -59,6 +59,7 @@ export ENABLE_MODIS
 export ENABLE_TC_UTILS
 export ENABLE_MODE_GRAPHICS
 export ENABLE_GEN_CIRCLE_MASK
+export ENABLE_GEN_VX_MASK
 
 ###############################################################################
 
