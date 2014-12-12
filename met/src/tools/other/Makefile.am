@@ -58,4 +58,8 @@ if ENABLE_GEN_CIRCLE_MASK
   SUBDIRS += gen_circle_mask
 endif
 
+if ENABLE_GEN_VX_MASK
+  SUBDIRS += gen_vx_mask
+endif
+
 MAINTAINERCLEANFILES 	= Makefile.in
