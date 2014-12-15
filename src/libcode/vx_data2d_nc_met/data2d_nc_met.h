@@ -38,16 +38,17 @@ class MetNcMetDataFile : public Met2dDataFile {
       MetNcMetDataFile(const MetNcMetDataFile &);
       MetNcMetDataFile & operator=(const MetNcMetDataFile &);
 
+   public:
+
+      MetNcMetDataFile();
+     ~MetNcMetDataFile();
+
          //
          //  NetCDF file
          //
       
       MetNcFile * MetNc;    //  allocated
 
-   public:
-
-      MetNcMetDataFile();
-     ~MetNcMetDataFile();
 
          //
          //  set stuff
