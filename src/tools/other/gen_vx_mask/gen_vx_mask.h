@@ -35,6 +35,10 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+static const char *program_name = "gen_vx_mask";
+
+////////////////////////////////////////////////////////////////////////
+
 enum MaskType {
    PolyMaskType,       // Polyline masking region
    CircleMaskType,     // Circle masking region
@@ -91,6 +95,9 @@ static MaskPoly poly_mask;
 // Grid on which the data field resides
 static Grid grid, grid_mask;
 
+// Configuration object for reading config strings
+static MetConfig config;
+
 ////////////////////////////////////////////////////////////////////////
 
 static void      process_command_line(int, char **);
@@ -98,6 +105,8 @@ static void      process_data_file(DataPlane &dp);
 static void      process_mask_file(DataPlane &dp);
 static void      get_data_plane(Met2dDataFile *mtddf_ptr,
                                 const char *config_str, DataPlane &dp);
+static bool      get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr,
+                                      DataPlane &dp);
 static void      apply_poly_mask(DataPlane &dp);
 static void      apply_circle_mask(DataPlane &dp);
 static void      apply_track_mask(DataPlane &dp);
