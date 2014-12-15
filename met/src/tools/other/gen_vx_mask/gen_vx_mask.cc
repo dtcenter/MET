@@ -41,18 +41,13 @@ using namespace std;
 #include "vx_log.h"
 #include "nav.h"
 #include "vx_math.h"
-#include "write_netcdf.h"
-
-////////////////////////////////////////////////////////////////////////
-
-static ConcatString program_name;
+#include "vx_nc_util.h"
+#include "data2d_nc_met.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
    static DataPlane dp_data, dp_mask, dp_out;
-
-   program_name = get_short_name(argv[0]);
 
    // Set handler to be called for memory allocation error
    set_new_handler(oom);
@@ -123,6 +118,9 @@ void process_command_line(int argc, char **argv) {
    mask_filename = cline[1];
    out_filename  = cline[2];
 
+   // Initialize the configuration object
+   config.read(replace_path(config_const_filename));
+   
    // List the input files
    mlog << Debug(1)
         << "Input File:\t\t" << data_filename << "\n"
@@ -151,12 +149,15 @@ void process_data_file(DataPlane &dp) {
    if(data_config_str.length() > 0) {
       get_data_plane(mtddf_ptr, data_config_str, dp);
    }
+   // Check for the output of a previous call to this tool
+   else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
+   }
    // Otherwise, fill the input data plane with zeros
    else {
       dp.set_size(grid.nx(), grid.ny());
       dp.set_constant(0.0);
    }
-
+   
    mlog << Debug(2)
         << "Parsed Data Grid:\t" << grid.name()
         << " (" << grid.nx() << " x " << grid.ny() << ")\n";
@@ -264,8 +265,6 @@ static void get_data_plane(Met2dDataFile *mtddf_ptr,
    double dmin, dmax;
    
    // Parse the config string
-   MetConfig config;
-   // JHG, uncomment this! config.read(replace_path(config_const_filename));
    config.read_string(config_str);
 
    // Allocate new VarInfo object
@@ -290,14 +289,50 @@ static void get_data_plane(Met2dDataFile *mtddf_ptr,
    // Dump the range of data values read
    dp.data_range(dmin, dmax);
    mlog << Debug(3)
-        << "Read field \"" << vi_ptr->magic_str()
-        << "\" with data ranging from " << dmin << " to "
-        << dmax << ".\n";
+        << "Read field \"" << vi_ptr->magic_str() << "\" from \""
+        << mtddf_ptr->filename() << "\" with data ranging from "
+        << dmin << " to " << dmax << ".\n";
 
    // Clean up
    if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) 0; }
    
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
+   bool status = false;
+   ConcatString tool, config_str;
+   int i;
+
+   // Must be MET NetCDF format
+   if(mtddf_ptr->file_type() != FileType_NcMet) return(status);
+   
+   // Cast pointer of correct type
+   MetNcMetDataFile *mnmdf_ptr = (MetNcMetDataFile *) mtddf_ptr;
+   
+   // Check for the MET_tool global attribute
+   if(!get_file_att(mnmdf_ptr->MetNc->Nc, "MET_tool", tool)) return(status);
+
+   // Check for gen_vx_mask output
+   if(tool != program_name) return(status);
+
+   // Loop through the NetCDF variables
+   for(i=0; i<mnmdf_ptr->MetNc->Nvars; i++) {
+
+      // Skip the lat/lon variables
+      if(mnmdf_ptr->MetNc->Var[i].name == "lat" ||
+         mnmdf_ptr->MetNc->Var[i].name == "lon") continue;
+
+      // Read the first non-lat/lon variable
+      config_str << "'name=\"" << mnmdf_ptr->MetNc->Var[i].name << "\"; level=\"(*,*)\";'";
+      get_data_plane(mtddf_ptr, config_str, dp);
+      status = true;
+      break;
+   }
+
+   return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -820,7 +855,7 @@ void usage() {
 
         << "\twhere\t\"data_file\" is the input gridded data file "
         << "(required).\n"
-        << "\t\t   May be the output of a previous call to this tool.\n"
+        << "\t\t   If " << program_name << " output, automatically read mask data.\n"
 
         << "\t\t\"mask_file\" defines the masking region (required).\n"
         << "\t\t   ASCII Lat/Lon file for \"poly\", \"circle\", and \"track\" masking.\n"
