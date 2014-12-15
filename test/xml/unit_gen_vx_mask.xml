@@ -14,119 +14,121 @@
 <met_test>
 
   <!--                                                                  -->
-  <!-- gen_vx_mask:                                                   -->
-  <!-- run on global and regional grids for supported projection types  -->
+  <!-- gen_vx_mask:                                                     -->
+  <!-- test all 5 masking types: poly, circle, track, grid, and data    -->
   <!--                                                                  -->
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
   
   <!--                                                                  -->
-  <!-- global lat/lon grid                                              -->
+  <!-- POLY: global lat/lon grid                                        -->
   <!--                                                                  -->
   
-  <test name="gen_vx_mask_GFS_LATLON">
+  <test name="gen_vx_mask_POLY_GFS_LATLON">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
       &MET_BASE;/poly/CONUS.poly \
-      &OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_CONUS_mask.nc \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_CONUS_mask.nc \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_CONUS_mask.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_CONUS_mask.nc</grid_nc>
     </output>
   </test>
 
   <!--                                                                  -->
-  <!-- global mercator grid                                             -->
+  <!-- POLY: global mercator grid                                       -->
   <!--                                                                  -->
   
-  <test name="gen_vx_mask_GFS_MERCATOR">
+  <test name="gen_vx_mask_POLY_GFS_MERCATOR">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_g008.grib \
       &MET_BASE;/poly/CONUS.poly \
-      &OUTPUT_DIR;/gen_vx_mask/GFS_MERCATOR_CONUS_mask.nc \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_MERCATOR_CONUS_mask.nc \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GFS_MERCATOR_CONUS_mask.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_MERCATOR_CONUS_mask.nc</grid_nc>
     </output>
   </test>
 
   <!--                                                                  -->
-  <!-- regional lambert conformal grid                                  -->
+  <!-- POLY: regional lambert conformal grid                            -->
   <!--                                                                  -->
 
-  <test name="gen_vx_mask_NAM_LAMBERT">
+  <test name="gen_vx_mask_POLY_NAM_LAMBERT">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
       &MET_BASE;/poly/CONUS.poly \
-      &OUTPUT_DIR;/gen_vx_mask/NAM_LAMBERT_CONUS_mask.nc \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_NAM_LAMBERT_CONUS_mask.nc \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/NAM_LAMBERT_CONUS_mask.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_NAM_LAMBERT_CONUS_mask.nc</grid_nc>
     </output>
   </test>
 
   <!--                                                                  -->
-  <!-- regional polar stereographic grid                                -->
+  <!-- POLY: regional polar stereographic grid                          -->
   <!--                                                                  -->
   
-  <test name="gen_vx_mask_HMT_STEREO">
+  <test name="gen_vx_mask_POLY_HMT_STEREO">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
       &MET_BASE;/poly/NWC.poly \
-      &OUTPUT_DIR;/gen_vx_mask/HMT_STEREO_NWC_mask.nc \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_HMT_STEREO_NWC_mask.nc \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/HMT_STEREO_NWC_mask.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_HMT_STEREO_NWC_mask.nc</grid_nc>
     </output>
   </test>
 
   <!--                                                                  -->
-  <!-- masking grid rather than a polyline                              -->
+  <!-- POLY: global lat/lon grid for Southern Alaska polyline crossing  -->
+  <!-- the international date line                                      -->
   <!--                                                                  -->
 
-  <test name="gen_vx_mask_GRID">
-    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
-    <param> \
-      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
-      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
-      &OUTPUT_DIR;/gen_vx_mask/NAM_GRID_mask.nc \
-      -name hmt_domain \
-      -v 1
-    </param>
-    <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/NAM_GRID_mask.nc</grid_nc>
-    </output>
-  </test>
-
-  <!--                                                                  -->
-  <!-- global lat/lon grid for Southern Alaska polyline crossing the    -->
-  <!-- international date line                                          -->
-  <!--                                                                  -->
-
-  <test name="gen_vx_mask_GFS_LATLON_SAK">
+  <test name="gen_vx_mask_POLY_GFS_LATLON_SAK">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
       &MET_BASE;/poly/SAK.poly \
-      &OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_SAK_mask.nc \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_SAK_mask.nc \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_SAK_mask.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_SAK_mask.nc</grid_nc>
+    </output>
+  </test>  
+  
+  <!--                                                                  -->
+  <!-- GRID: masking grid rather than a polyline                        -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_GRID_NAM_HMT_STEREO">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
+      &OUTPUT_DIR;/gen_vx_mask/GRID_NAM_HMT_STEREO_mask.nc \
+      -type grid -name hmt_domain \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GRID_NAM_HMT_STEREO_mask.nc</grid_nc>
     </output>
   </test>
 
-  
-  
+  <!--                                                                  -->
+  <!-- CIRCLE: compute minimum distances rather than a mask             -->
+  <!--                                                                  -->
+
   <test name="gen_vx_mask_CIRCLE">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
@@ -140,7 +142,11 @@
     </output>
   </test>
 
-  <test name="gen_vx_mask_CIRCLE_500">
+  <!--                                                                  -->
+  <!-- CIRCLE: threshold distance at 500km and name output              -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_CIRCLE_MASK">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
@@ -153,4 +159,140 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- CIRCLE: threshold distance at 500km and take complement          -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_CIRCLE_COMPLEMENT">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_BASE;/poly/MLB_Stadiums.txt \
+      &OUTPUT_DIR;/gen_vx_mask/CIRCLE_COMPLEMENT_mask.nc \
+      -type circle -thresh le500 -complement -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CIRCLE_COMPLEMENT_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- TRACK: compute mimum distances rather than a mask                -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_TRACK">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_BASE;/poly/MLB_Stadiums.txt \
+      &OUTPUT_DIR;/gen_vx_mask/TRACK_dist.nc \
+      -type track -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/TRACK_dist.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- TRACK: threshold track distance at 50km and set output value     -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_TRACK_MASK">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_BASE;/poly/MLB_Stadiums.txt \
+      &OUTPUT_DIR;/gen_vx_mask/TRACK_50_mask.nc \
+      -type track -thresh le50 -value 3 -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/TRACK_50_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- DATA: 24-hour APCP >= 0.1 inch                                   -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_DATA_APCP_24">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc \
+      -type data -mask_config 'name="APCP"; level="A24";' -thresh ge2.54 -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- POLY: Pass-through of previous mask values                       -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_POLY_PASS_THRU">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc \
+      &MET_BASE;/poly/LMV.poly \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_PASS_THRU_APCP_24_LMV_mask.nc \
+      -type poly -value 10 -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_PASS_THRU_APCP_24_LMV_mask.nc</grid_nc>
+    </output>
+  </test>
+  
+  <!--                                                                  -->
+  <!-- POLY: Intersection of input mask and polyline                    -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_POLY_INTERSECTION">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc \
+      &MET_BASE;/poly/LMV.poly \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_INTERSECTION_APCP_24_LMV_mask.nc \
+      -type poly -value 10 -intersection -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_INTERSECTION_APCP_24_LMV_mask.nc</grid_nc>
+    </output>
+  </test>
+  
+  <!--                                                                  -->
+  <!-- POLY: Union of input mask and polyline                           -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_POLY_UNION">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc \
+      &MET_BASE;/poly/LMV.poly \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_UNION_APCP_24_LMV_mask.nc \
+      -type poly -value 10 -union -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_UNION_APCP_24_LMV_mask.nc</grid_nc>
+    </output>
+  </test>
+  
+  <!--                                                                  -->
+  <!-- POLY: Symmetric difference of input mask and polyline            -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_POLY_SYMDIFF">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc \
+      &MET_BASE;/poly/LMV.poly \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_SYMDIFF_APCP_24_LMV_mask.nc \
+      -type poly -value 10 -symdiff -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_SYMDIFF_APCP_24_LMV_mask.nc</grid_nc>
+    </output>
+  </test>
+  
 </met_test>
