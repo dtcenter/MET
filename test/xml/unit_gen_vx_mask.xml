@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <!--                                                                  -->
+  <!-- gen_vx_mask:                                                   -->
+  <!-- run on global and regional grids for supported projection types  -->
+  <!--                                                                  -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+  
+  <!--                                                                  -->
+  <!-- global lat/lon grid                                              -->
+  <!--                                                                  -->
+  
+  <test name="gen_vx_mask_GFS_LATLON">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &MET_BASE;/poly/CONUS.poly \
+      &OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_CONUS_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_CONUS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- global mercator grid                                             -->
+  <!--                                                                  -->
+  
+  <test name="gen_vx_mask_GFS_MERCATOR">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_g008.grib \
+      &MET_BASE;/poly/CONUS.poly \
+      &OUTPUT_DIR;/gen_vx_mask/GFS_MERCATOR_CONUS_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GFS_MERCATOR_CONUS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- regional lambert conformal grid                                  -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_NAM_LAMBERT">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &MET_BASE;/poly/CONUS.poly \
+      &OUTPUT_DIR;/gen_vx_mask/NAM_LAMBERT_CONUS_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/NAM_LAMBERT_CONUS_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- regional polar stereographic grid                                -->
+  <!--                                                                  -->
+  
+  <test name="gen_vx_mask_HMT_STEREO">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
+      &MET_BASE;/poly/NWC.poly \
+      &OUTPUT_DIR;/gen_vx_mask/HMT_STEREO_NWC_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/HMT_STEREO_NWC_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- masking grid rather than a polyline                              -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_GRID">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F012.grib \
+      &OUTPUT_DIR;/gen_vx_mask/NAM_GRID_mask.nc \
+      -name hmt_domain \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/NAM_GRID_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- global lat/lon grid for Southern Alaska polyline crossing the    -->
+  <!-- international date line                                          -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_GFS_LATLON_SAK">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &MET_BASE;/poly/SAK.poly \
+      &OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_SAK_mask.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/GFS_LATLON_SAK_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  
+  
+  <test name="gen_vx_mask_CIRCLE">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_BASE;/poly/MLB_Stadiums.txt \
+      &OUTPUT_DIR;/gen_vx_mask/CIRCLE_dist.nc \
+      -type circle -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CIRCLE_dist.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="gen_vx_mask_CIRCLE_500">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_BASE;/poly/MLB_Stadiums.txt \
+      &OUTPUT_DIR;/gen_vx_mask/CIRCLE_500_mask.nc \
+      -type circle -thresh le500 -name distance_500km -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CIRCLE_500_mask.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

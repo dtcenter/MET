@@ -29,6 +29,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_pb2nc.xml \
           unit_gen_poly_mask.xml \
           unit_gen_circle_mask.xml \
+          unit_gen_vx_mask.xml \
           unit_pcp_combine.xml \
           unit_wwmca_regrid.xml \
           unit_point_stat.xml \
