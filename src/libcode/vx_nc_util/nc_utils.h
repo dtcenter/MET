@@ -43,6 +43,8 @@ extern NcVar* has_var(NcFile *, const char * var_name);
 
 extern NcDim* has_dim(NcFile *, const char * dim_name);
 
+extern bool get_file_att(const NcFile *, const ConcatString &, ConcatString &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __NC_UTILS_H__  */

@@ -188,3 +188,32 @@ NcDim* has_dim(NcFile *nc, const char * dim_name) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool get_file_att(const NcFile *nc, const ConcatString &att_name,
+                  ConcatString &att_val) {
+   int i, n;
+   NcAtt *att = (NcAtt *) 0;
+   bool status = false;
+   
+   // Initialize
+   att_val.clear();
+
+   n = nc->num_atts();
+
+   // Loop through the attributes looking for a match
+   for(i=0; i<n; i++) {
+
+      att = nc->get_att(i);
+
+      // Look for a match
+      if(strcmp(att_name, att->name()) == 0) {
+         att_val << att->as_string(0);
+         status = true;
+         break;
+      }
+   }
+   
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
