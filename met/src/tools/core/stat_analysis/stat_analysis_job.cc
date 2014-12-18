@@ -1966,7 +1966,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
-   else if(lt == stat_mctc)   write_mctc_header_row(0, j.out_fcst_thresh.n_elements(), at, 0, c);
+   else if(lt == stat_mctc)   write_mctc_header_row(0, j.out_fcst_thresh.n_elements()+1, at, 0, c);
    else if(lt == stat_mcts)   write_header_row(mcts_columns,   n_mcts_columns,   0, at, 0, c);
    else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
    else if(lt == stat_sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
