@@ -1,0 +1,29 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#ifndef  __VX_READ_FORTRAN_BINARY_H__
+#define  __VX_READ_FORTRAN_BINARY_H__
+
+
+////////////////////////////////////////////////////////////////////////
+
+   //
+   //  returns number of bytes read, not counting record pads
+   //
+
+extern long long read_fortran_binary(const int fd, void * buf, const int buf_size, 
+                                     const int rec_pad_length, 
+                                     const bool swap_endian);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   /*  __VX_READ_FORTRAN_BINARY_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
+
+
