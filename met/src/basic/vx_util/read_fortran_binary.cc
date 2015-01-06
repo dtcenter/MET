@@ -13,7 +13,7 @@ using namespace std;
 #include <fcntl.h>
 
 #include "read_fortran_binary.h"
-#include "chech_endian.h"
+#include "check_endian.h"
 
 
 ////////////////////////////////////////////////////////////////////////
