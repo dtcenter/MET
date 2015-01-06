@@ -781,6 +781,29 @@ else
     AC_MSG_NOTICE([tc_utils will not be compiled])
 fi
 
+
+
+# gsi_tools
+
+AC_ARG_ENABLE(gsi_tools,
+	  [AS_HELP_STRING([--disable-gsi_tools], [Disable compilation of gsi_tools])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_GSI_TOOLS="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gsi_tools) ;;
+   esac],
+  [ENABLE_GSI_TOOLS="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_GSI_TOOLS], [test "x$ENABLE_GSI_TOOLS" = "xyes"])
+
+if test "x$ENABLE_GSI_TOOLS" = "xyes"; then
+    AC_DEFINE([ENABLE_GSI_TOOLS], [], ["build gsi_tools"])
+    AC_MSG_NOTICE([gsi_tools will be compiled])
+else
+    AC_MSG_NOTICE([gsi_tools will not be compiled])
+fi
+
+
 # GRIB2
 
 AC_ARG_ENABLE(grib2,
@@ -998,6 +1021,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/plot_data_plane/Makefile
                  src/tools/other/plot_point_obs/Makefile
                  src/tools/other/wwmca_tool/Makefile
+                 src/tools/other/gsi_tools/Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile

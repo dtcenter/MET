@@ -62,4 +62,8 @@ if ENABLE_GEN_VX_MASK
   SUBDIRS += gen_vx_mask
 endif
 
+#if ENABLE_GSI_TOOLS
+  SUBDIRS += gsi_tools
+#endif
+
 MAINTAINERCLEANFILES 	= Makefile.in
