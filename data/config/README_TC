@@ -490,18 +490,19 @@ out_valid_mask = "";
 //    Where "job_name" is set to one of the following:
 //
 //       "filter"
-//          To filter out the STAT or TCMPR lines matching the job filtering criteria 
+//          To filter out the TCST lines matching the job filtering criteria 
 //          specified above and using the optional arguments below.  The 
-//          output STAT lines are written to the file specified using the 
+//          output TCST lines are written to the file specified using the 
 //          "-dump_row" argument.
 //          Required Args: -dump_row
 //
-//          To further refine the STAT data: Each optional argument may be used
+//          To further refine the TCST data: Each optional argument may be used
 //          in the job specification multiple times unless otherwise indicated.
 //          When multiple optional arguments of the same type are indicated, the 
 //          analysis will be performed over their union
 //
-//          "-model            name"
+//          "-amodel            name"
+//          "-bmodel            name"
 //          "-lead        HHMMSS"
 //          "-valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
 //          "-valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
@@ -579,9 +580,9 @@ out_valid_mask = "";
 //             respectively.  These files may be used as input for additional TC-Stat analysis.
 //
 //       e.g.
-//       jobs = ["-job filter -model AHW4 -dumprow ./tc_filter_job.tcst",
+//       jobs = ["-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
 //               "-job filter -column_min TK_ERR 100.000 -dumprow ./tc_filter_job.tcst",
 //               "-job summary -line_type TCMPR -column AC -dumprow ./tc_summary_job.tcst",
-//               "-job rirw -model AHW4 -dump_row ./tc_rirw_job" ]
+//               "-job rirw -amodel AHW4 -dump_row ./tc_rirw_job" ]
 //
 jobs =[];
