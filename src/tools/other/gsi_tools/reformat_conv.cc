@@ -36,9 +36,21 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Default values for command-line switches
+   //
+
+static ConcatString output_directory = ".";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 static ConcatString program_name;
 
-static const int buf_size = 1 << 17;
+static CommandLine cline;
+
+static const int buf_size = (1 << 17);
 
 static unsigned char buf[buf_size];
 
@@ -62,6 +74,10 @@ inline int fortran_two_to_one(const int N1, const int v1, const int v2) { return
 
 static void usage();
 
+static void set_outdir(const StringArray &);
+
+static void process(const char * conv_filename);
+
 static bool fortran_read(int fd, void *, int n_bytes);
 
 static double rdiag_get_2d(void *, const int nreal, int i, int j);   //  1-based
@@ -83,10 +99,45 @@ int main(int argc, char * argv [])
 
 program_name = get_short_name(argv[0]);
 
-if ( argc != 3 )  usage();
+cline.set(argc, argv);
 
-const ConcatString  input_filename = argv[1];
-const ConcatString output_filename = argv[2];
+cline.set_usage(usage);
+
+cline.add(set_outdir, "-outdir", 1);
+
+cline.parse();
+
+
+if ( cline.n() == 0  )  usage();
+
+int j;
+
+for (j=0; j<(cline.n()); ++j)  {
+
+   cout << "Processing \"" << cline[j] << "\" ... " << (j + 1) << " of " << cline.n() << '\n';
+
+   if ( (j%5) == 4 )  cout.put('\n');
+
+   cout.flush();
+
+   process(cline[j]);
+
+}
+
+
+
+
+return ( 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void process(const char * conv_filename)
+
+{
 
    //
    //  open files
@@ -105,6 +156,11 @@ ofstream out;
 AsciiTable table;
 StatHdrColumns columns;
 float * f = (float *) 0;
+ConcatString output_filename;
+
+output_filename << cs_erase
+                << output_directory << '/'
+                << get_short_name(conv_filename) << ".mpr";
 
 
 table.set_size(1, 32);   //  for MPR line types
@@ -119,10 +175,10 @@ for (j=0; j<n_mpr_columns; ++j)  {
 
 }
 
-if ( (in = open(input_filename, O_RDONLY)) < 0 )  {
+if ( (in = open(conv_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n\n  " << program_name << ": unable to open input file \""
-        << input_filename << "\n\n";
+        << conv_filename << "\n\n";
 
    exit ( 1 );
 
@@ -240,7 +296,7 @@ close(in);  in = -1;
 
 out.close();
 
-return ( 0 );
+return;
 
 }
 
@@ -252,9 +308,23 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " infile outfile\n\n";
+cerr << "\n\n   usage:  " << program_name << " [ -outdir path ] conv_file_list\n\n";
 
 exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_outdir(const StringArray & a)
+
+{
+
+output_directory = a[0];
 
 return;
 
