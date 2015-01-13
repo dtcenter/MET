@@ -36,7 +36,19 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Default values for command-line switches
+   //
+
+static int channel = -1;   //  zero based
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 static ConcatString program_name;
+
+static CommandLine cline;
 
 static const int buf_size = 1 << 14;
 
@@ -97,6 +109,8 @@ struct ChannelParams {
 
 static void usage();
 
+static void set_channel(const StringArray &);
+
 static void my_memcpy(void * to, unsigned char * & from, int);
 
 static void read_params(int fd, RadParams &);
@@ -104,6 +118,8 @@ static void read_params(int fd, RadParams &);
 static void read_channel(int fd, ChannelParams &);
 
 static bool read_data(int fd, const int n_diag, const int N1, const int N2, float * diag, float * diagchan);
+
+static void do_row(AsciiTable &, const int row, const unixtime t0, const int N1, const int N2, const float * diag, const float * diagchan);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -115,10 +131,20 @@ int main(int argc, char * argv [])
 
 program_name = get_short_name(argv[0]);
 
-if ( argc != 3 )  usage();
+cline.set(argc, argv);
 
-const ConcatString  input_filename = argv[1];
-const ConcatString output_filename = argv[2];
+cline.set_usage(usage);
+
+cline.add(set_channel, "-channel", 1);
+
+cline.parse();
+
+if ( cline.n() != 2 )  usage();
+
+if ( channel < 0 )  usage();
+
+const ConcatString  input_filename = cline[0];
+const ConcatString output_filename = cline[1];
 
    //
    //  open files
@@ -127,11 +153,14 @@ const ConcatString output_filename = argv[2];
 int j, k;
 int in = -1;
 int count;
+int row;
 ofstream out;
 AsciiTable table;
 StatHdrColumns columns;
 RadParams params;
-ChannelParams * channel = 0;
+unixtime t0;
+int month, day, year, hour;
+ChannelParams * cp = 0;
 bool status = false;
 float * diag     = 0;
 float * diagchan = 0;
@@ -175,11 +204,29 @@ if ( ! out )  {
 
 read_params(in, params);
 
-channel = new ChannelParams [params.nchanl];
+if ( channel >= params.nchanl )  {
+
+   cerr << "\n\n  " << program_name << ": bad channel selected ... there are only "
+        << params.nchanl << " channels\n\n";
+
+   exit ( 1 );
+
+}
+
+k = params.idate;   //  YYYYMMDDHH
+
+month = (k/10000)%100;
+day   = (k/100)%100;
+year  = k/1000000;
+hour  = k%100;
+
+t0 = mdyhms_to_unix(month, day, year, hour, 0, 0);
+
+cp = new ChannelParams [params.nchanl];
 
 for (j=0; j<(params.nchanl); ++j)  {
 
-   read_channel(in, channel[j]);
+   read_channel(in, cp[j]);
 
 }
 
@@ -196,17 +243,25 @@ const int N2 = params.nchanl;
 
 diagchan = new float [N1*N2];
 
-cout << "diag = " << n_diag << " floats\n";
+// cout << "(N1, N2) = (" << N1 << ", " << N2 << ")\n";
 
-cout << "diagchan = " << (N1*N2) << " floats\n";
+// cout << "diag = " << n_diag << " floats\n";
+// 
+// cout << "diagchan = " << (N1*N2) << " floats\n";
 
 count = 0;
+
+row = 0;
 
 while ( 1 )  {
 
    status = read_data(in, n_diag, N1, N2, diag, diagchan);
 
    if ( ! status )  break;
+
+   table.add_rows(1);
+
+   do_row(table, row++, t0, N1, N2, diag, diagchan);
 
    ++count;
 
@@ -220,13 +275,13 @@ cout << "\n\n  Read " << count << " data records\n\n";
     //  done
     //
 
-// out << table;
+out << table;
 
 close(in);  in = -1;
 
 out.close();
 
-if ( channel )  { delete [] channel;  channel = 0; }
+if ( cp )  { delete [] cp;  cp = 0; }
 
 if ( diag )  { delete [] diag;  diag = 0; }
 
@@ -244,9 +299,34 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " infile outfile\n\n";
+cerr << "\n\n   usage:  " << program_name << " -channel n infile outfile\n\n"
+     << "          (Note: channel numbers are 1-based)\n\n";
 
 exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_channel(const StringArray & a)
+
+{
+
+int k = atoi(a[0]);
+
+if ( k <= 0 )  {
+
+   cerr << "\n\n  " << program_name << ": bad channel number ... " << k << "\n\n";
+
+   exit ( 1 );
+
+}
+
+channel = k - 1;
 
 return;
 
@@ -374,7 +454,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void read_channel(int fd, ChannelParams & channel)
+void read_channel(int fd, ChannelParams & cp)
 
 {
 
@@ -392,25 +472,25 @@ if ( n_read != 32 )  {
 
 unsigned char * b = buf;
 
-my_memcpy( &(channel.freq),   b, 4);
-my_memcpy( &(channel.plo),    b, 4);
-my_memcpy( &(channel.wave),   b, 4);
-my_memcpy( &(channel.varch),  b, 4);
-my_memcpy( &(channel.tlap),   b, 4);
-my_memcpy( &(channel.iuse),   b, 4);
-my_memcpy( &(channel.nuchan), b, 4);
-my_memcpy( &(channel.ich),    b, 4);
+my_memcpy( &(cp.freq),   b, 4);
+my_memcpy( &(cp.plo),    b, 4);
+my_memcpy( &(cp.wave),   b, 4);
+my_memcpy( &(cp.varch),  b, 4);
+my_memcpy( &(cp.tlap),   b, 4);
+my_memcpy( &(cp.iuse),   b, 4);
+my_memcpy( &(cp.nuchan), b, 4);
+my_memcpy( &(cp.ich),    b, 4);
 
 if ( swap_endian )  {
 
-   shuffle_4( &(channel.freq)   );
-   shuffle_4( &(channel.plo)    );
-   shuffle_4( &(channel.wave)   );
-   shuffle_4( &(channel.varch)  );
-   shuffle_4( &(channel.tlap)   );
-   shuffle_4( &(channel.iuse)   );
-   shuffle_4( &(channel.nuchan) );
-   shuffle_4( &(channel.ich)    );
+   shuffle_4( &(cp.freq)   );
+   shuffle_4( &(cp.plo)    );
+   shuffle_4( &(cp.wave)   );
+   shuffle_4( &(cp.varch)  );
+   shuffle_4( &(cp.tlap)   );
+   shuffle_4( &(cp.iuse)   );
+   shuffle_4( &(cp.nuchan) );
+   shuffle_4( &(cp.ich)    );
 
 }
 
@@ -461,8 +541,8 @@ if ( n_read < bytes )  {
 
 unsigned char * b = buf;
 
-my_memcpy(diag,       b, 4*n_diag);
-my_memcpy(diagchan,   b, 4*n12);
+my_memcpy(diag,     b, 4*n_diag);
+my_memcpy(diagchan, b, 4*n12);
 
 if ( swap_endian )  {
 
@@ -480,6 +560,130 @@ if ( swap_endian )  {
    //
 
 return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_row(AsciiTable & table, const int row, const unixtime t0, const int N1, const int N2, const float * diag, const float * diagchan)
+
+{
+
+int k;
+int month, day, year, hour, minute, second;
+int col = 0;
+char junk[256];
+const char * model = "XXX";
+char date_string[256];
+unixtime t;
+
+const char * const variable = "variable";
+const char * const       id = "id";
+
+const double lat             = diag[lat_index - 1];
+const double lon             = diag[lon_index - 1];
+const double elev            = diag[elevation_index - 1];
+const double obs_time        = diag[dtime_index - 1];
+
+const double obs_value       = diagchan[fortran_two_to_one(N1,  btemp_chan_index - 1, channel)];
+const double obs_minus_guess = diagchan[fortran_two_to_one(N1, omg_bc_chan_index - 1, channel)];
+const double guess           = obs_value - obs_minus_guess;
+
+
+// cout << "Obs = " << obs_value << '\n';
+// cout << "(Lat, Lon) = (" << lat << ", " << lon << ")\n";
+// cout << "Elev = " << elev << "\n";
+cout << "Obs time = " << obs_time << "\n";
+
+
+k = nint(3600*obs_time);
+
+t = t0 + k;
+
+unix_to_mdyhms(t, month, day, year, hour, minute, second);
+
+sprintf(date_string, "%04d%02d%02d_%02d0000", year, month, day, hour);
+
+   //
+   //  first 21 columns
+   //
+
+table.set_entry(row, col++, met_version);   //  version
+
+table.set_entry(row, col++, model);         //  model
+
+table.set_entry(row, col++, "000000");      //  fcst lead
+
+table.set_entry(row, col++, date_string);   //  fcst valid begin
+table.set_entry(row, col++, date_string);   //  fcst valid end
+
+table.set_entry(row, col++, "000000");      //  obs lead
+
+table.set_entry(row, col++, date_string);   //  obs valid begin
+table.set_entry(row, col++, date_string);   //  obs valid end
+
+table.set_entry(row, col++, variable);      //  fcst var
+table.set_entry(row, col++, stat_na_str);   //  fcst level
+
+table.set_entry(row, col++, variable);      //  obs var
+table.set_entry(row, col++, stat_na_str);   //  obs level
+
+table.set_entry(row, col++, stat_na_str);   //  obtype
+
+table.set_entry(row, col++, stat_na_str);   //  mask
+
+table.set_entry(row, col++, stat_na_str);   //  interp method
+
+table.set_entry(row, col++, 0);             //  interp points
+
+table.set_entry(row, col++, stat_na_str);   //  fcst thresh
+table.set_entry(row, col++, stat_na_str);   //  obs  thresh
+table.set_entry(row, col++, stat_na_str);   //  cov  thresh
+
+table.set_entry(row, col++, stat_na_str);   //  alpha
+
+table.set_entry(row, col++, stat_mpr_str);  //  line type
+
+   //
+   //  MPR-specific columns
+   //
+
+table.set_entry(row, col++, 1);             //  total
+
+table.set_entry(row, col++, 0);             //  index
+
+table.set_entry(row, col++, id);            //  station id
+
+sprintf(junk, "%.4f", lat);
+table.set_entry(row, col++, junk);          //  latitude
+
+sprintf(junk, "%.4f", lon);
+table.set_entry(row, col++, junk);          //  longitude
+
+// sprintf(junk, "%.1f", pressure);
+// table.set_entry(row, col++, junk);          //  pressure (obs_lvl)
+
+sprintf(junk, "%.1f", elev);
+table.set_entry(row, col++, junk);          //  elevation
+
+sprintf(junk, "%.4f", guess);
+table.set_entry(row, col++, junk);          //  fcst value
+
+sprintf(junk, "%.4f", obs_value);
+table.set_entry(row, col++, junk);          //  obs value
+
+table.set_entry(row, col++, stat_na_str);   //  climatological value
+
+table.set_entry(row, col++, stat_na_str);   //  qc value
+
+
+   //
+   //  done
+   //
+
+return;
 
 }
 
