@@ -15,29 +15,43 @@
    //
 
 
-static const int obstype_index         =  1;    // observation type
-static const int obssubtype_index      =  2;    // observation subtype
-static const int lat_index             =  3;    // observation latitude (degrees)
-static const int lon_index             =  4;    // observation longitude (degrees)
+static const int lat_index              =  1;    // observation latitude (degrees)
+static const int lon_index              =  2;    // observation longitude (degrees)
+static const int elevation_index        =  3;    // model elevation (meters)
+static const int dtime_index            =  4;    // observation time (hours relative to analysis time)
 
-static const int elevation_index       =  5;    // station elevation (meters)
-static const int pressure_index        =  6;    // observation pressure (hPa)
-static const int height_index          =  7;    // observation height (meters)
-static const int obs_hours_index       =  8;    // obs time (hours relative to analysis time)
+static const int scanpos_index          =  5;    // scan position
+static const int sat_zenith_angle_index =  6;    // satellite zenith angle
+static const int sat_azimuth_index      =  7;    // satellite azimuth angle
+static const int sun_zenith_angle_index =  8;    // solar zenith angle
+static const int sun_azimuth_index      =  9;    // solar azimuth angle
 
-static const int input_qc_index        =  9;    // input prepbufr qc or event mark
-static const int setup_qc_index        = 10;    // setup qc or event mark (currently qtflg only)
-static const int usage_index           = 11;    // read_prepbufr data usage flag
-static const int analysis_use_index    = 12;    // analysis usage flag (1=use, -1=not used)
+static const int glint_index            = 10;    // solar glint angle
+static const int water_frac_index       = 11;    // fractional water coverage
+static const int land_frac_index        = 12;    // fractional land coverage
+static const int ice_frac_index         = 13;    // fractional ice coverage
+static const int snow_frac_index        = 14;    // fractional snow coverage
 
-static const int qc_weight_index       = 13;    // nonlinear qc relative weight
-static const int pb_inverse_index      = 14;    // prepbufr inverse obs error (K**-1)
-static const int read_pb_inverse_index = 15;    // read_prepbufr inverse obs error (K**-1)
-static const int final_inverse_index   = 16;    // final inverse observation error (K**-1)
+static const int water_temp_index       = 15;    // surface temperature over water
+static const int land_temp_index        = 16;    // surface temperature over land
+static const int ice_temp_index         = 17;    // surface temperature over ice
+static const int snow_temp_index        = 18;    // surface temperature over snow
+static const int soil_temp_index        = 19;    // soil temperature
 
-static const int obs_data_index        = 17;    // observation
-static const int omg_index             = 18;    // obs-ges used in analysis (K)
-static const int omg_no_bias_index     = 19;    // obs-ges w/o bias correction (K) (future slot)
+static const int soil_moisture_index    = 20;    // soil moisture
+static const int land_type_index        = 21;    // surface land type
+static const int veg_frac_index         = 22;    // vegetation fraction
+static const int snow_depth_index       = 23;    // snow depth
+static const int wind_speed_index       = 24;    // wind speed (m/s)
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const int btemp_chan_index       = 1;     //  observed brightness temperature
+static const int omg_bc_chan_index      = 2;     //  obs - guess brightness temperature (with bias correction)
+static const int omg_nobc_chan_index    = 3;     //  obs - guess brightness temperature (without bias correction)
+static const int inv_chan_index         = 4;     //  inverse observation error
 
 
 ////////////////////////////////////////////////////////////////////////
