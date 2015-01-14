@@ -2497,11 +2497,10 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
-   int i, j, a, b, cur_dt, min_dt, lead;
+   int i, j, a, b, cur_dt, min_dt, i_min_dt, lead;
    map<ConcatString,RIRWMapData,cs_cmp> cur_map;
    ConcatString key, cur, cat;
    RIRWMapData data;
-   TimeArray btimes;
    TrackPairInfo tpi_pt;
    int acur, aprv, adlt;
    int bcur, bprv, bdlt;
@@ -2515,11 +2514,6 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
                          RapidIntenTimeADeck, RapidIntenTimeBDeck, 
                          RapidIntenExactADeck, RapidIntenExactBDeck,
                          RapidIntenThreshADeck, RapidIntenThreshBDeck);
-
-   // Get the list of times when RI/RW occurred in the BDeck
-   for(i=0; i<tpi.n_points(); i++) {
-      if(nint(tpi.bdeck_rirw(i)) == 1) btimes.add(tpi.valid(i));
-   }
 
    // Loop over the track points and populate the contigency table
    for(i=0; i<tpi.n_points(); i++) {
@@ -2568,25 +2562,43 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
       bprv = tpi.bdeck_prv_int(i);
       bdlt = (is_bad_data(bcur) || is_bad_data(bprv) ? bad_data_int : bcur - bprv);
       
-      // Check for small enough timing error to consider the false alarm a hit
+      // Check for small enough timing error to consider a false alarm a hit
       if(a == 1 && b == 0) {
-         
-         // Find closest RI/RW event in the BDeck
-         for(j=0, min_dt=bad_data_int; j<btimes.n_elements(); j++) {
-            cur_dt = abs(tpi.valid(i) - btimes[j]);
-            if(is_bad_data(min_dt))  min_dt = cur_dt;
-            else if(cur_dt < min_dt) min_dt = cur_dt;
+
+         // Loop through the BDECK track points
+         for(j=0, min_dt=bad_data_int, i_min_dt=bad_data_int; j<tpi.n_points(); j++) {
+
+            // Skip non-RI/RW events
+            if(nint(tpi.bdeck_rirw(j)) != 1) continue;
+
+            // Find closet RI/RW in time
+            cur_dt = abs(tpi.valid(i) - tpi.valid(j));
+            if(is_bad_data(min_dt)) {
+               min_dt   = cur_dt;
+               i_min_dt = j;
+            }
+            else if(cur_dt < min_dt) {
+               min_dt   = cur_dt;
+               i_min_dt = j;
+            }
          } // end for j
 
          // Check if the BDeck RI/RW event is close enough in time
-         if(min_dt <= RapidIntenWindow) {
+         if(!is_bad_data(min_dt) && min_dt <= RapidIntenWindow) {
             mlog << Debug(4)
-                 << "Switching RI/RW Event Category from FY_ON to FY_OY since "
-                 << sec_to_hhmmss(min_dt) << " <= " << sec_to_hhmmss(RapidIntenWindow)
-                 << " for " << tpi.case_info() << ", "
+                 << "Switching FY_ON to FY_OY since BDECK RI/RW ("
+                 << tpi.bdeck_prv_int(i_min_dt) << " to "
+                 << tpi.bdeck()[i_min_dt].v_max() << ") occurred at "
+                 << unix_to_yyyymmdd_hhmmss(tpi.valid(i_min_dt)) << " ("
+                 << sec_to_hhmmss(min_dt) << " offset <= "
+                 << sec_to_hhmmss(RapidIntenWindow)
+                 << " window) for " << tpi.case_info() << ", "
                  << "VALID = " << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
                  << "LEAD = " << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << "\n";
             b = 1;
+            bcur = tpi.bdeck()[i_min_dt].v_max();
+            bprv = tpi.bdeck_prv_int(i_min_dt);
+            bdlt = bcur - bprv;
          }
       }
 
