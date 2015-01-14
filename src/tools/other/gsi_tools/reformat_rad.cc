@@ -251,7 +251,7 @@ diagchan = new float [N1*N2];
 
 count = 0;
 
-row = 0;
+row = 1;   //  allow for header line
 
 while ( 1 )  {
 
@@ -577,10 +577,9 @@ int col = 0;
 char junk[256];
 const char * model = "XXX";
 char date_string[256];
-unixtime t;
+char variable[256];
 
-const char * const variable = "variable";
-const char * const       id = "id";
+const char * const       id  = "id";
 
 const double lat             = diag[lat_index - 1];
 const double lon             = diag[lon_index - 1];
@@ -592,19 +591,21 @@ const double obs_minus_guess = diagchan[fortran_two_to_one(N1, omg_bc_chan_index
 const double guess           = obs_value - obs_minus_guess;
 
 
-// cout << "Obs = " << obs_value << '\n';
-// cout << "(Lat, Lon) = (" << lat << ", " << lon << ")\n";
-// cout << "Elev = " << elev << "\n";
-cout << "Obs time = " << obs_time << "\n";
+// cout << "Obs = "             << obs_value          << '\n';
+// cout << "Elev = "            << elev               << '\n';
+// cout << "Obs time = "        << obs_time           << '\n';
+// cout << "Obs minus guess = " << obs_minus_guess    << '\n';
+// cout << "(Lat, Lon) = ("     << lat << ", " << lon << ")\n";
+
+
+snprintf(variable, sizeof(variable), "TB_%02d", channel + 1);
 
 
 k = nint(3600*obs_time);
 
-t = t0 + k;
+unix_to_mdyhms(t0 + k, month, day, year, hour, minute, second);
 
-unix_to_mdyhms(t, month, day, year, hour, minute, second);
-
-sprintf(date_string, "%04d%02d%02d_%02d0000", year, month, day, hour);
+snprintf(date_string, sizeof(date_string), "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
 
    //
    //  first 21 columns
@@ -656,22 +657,23 @@ table.set_entry(row, col++, 0);             //  index
 
 table.set_entry(row, col++, id);            //  station id
 
-sprintf(junk, "%.4f", lat);
+snprintf(junk, sizeof(junk), "%.4f", lat);
 table.set_entry(row, col++, junk);          //  latitude
 
-sprintf(junk, "%.4f", lon);
+snprintf(junk, sizeof(junk), "%.4f", lon);
 table.set_entry(row, col++, junk);          //  longitude
 
-// sprintf(junk, "%.1f", pressure);
+// snprintf(junk, sizeof(junk), "%.1f", pressure);
 // table.set_entry(row, col++, junk);          //  pressure (obs_lvl)
+table.set_entry(row, col++, stat_na_str);
 
-sprintf(junk, "%.1f", elev);
+snprintf(junk, sizeof(junk), "%.1f", elev);
 table.set_entry(row, col++, junk);          //  elevation
 
-sprintf(junk, "%.4f", guess);
+snprintf(junk, sizeof(junk), "%.4f", guess);
 table.set_entry(row, col++, junk);          //  fcst value
 
-sprintf(junk, "%.4f", obs_value);
+snprintf(junk, sizeof(junk), "%.4f", obs_value);
 table.set_entry(row, col++, junk);          //  obs value
 
 table.set_entry(row, col++, stat_na_str);   //  climatological value
