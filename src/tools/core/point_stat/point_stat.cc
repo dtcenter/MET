@@ -1411,7 +1411,7 @@ void do_sl1l2(SL1L2Info &s_info, int i_vx, PairDataPoint *pd_ptr) {
       fo_sum      += f*o;
       ff_sum      += f*f;
       oo_sum      += o*o;
-      abs_err_sum += abs(f-o);
+      abs_err_sum += fabs(f-o);
 
       s_info.scount++;
 

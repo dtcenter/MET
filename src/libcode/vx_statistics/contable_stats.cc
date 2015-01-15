@@ -562,7 +562,7 @@ double TTContingencyTable::eds_ci(double alpha,
    // Compute the standard error
    //
    se = 2.0 *
-        abs(log(b)) / (h * pow(log(b) + log(h), 2.0)) *
+        fabs(log(b)) / (h * pow(log(b) + log(h), 2.0)) *
         sqrt(h * (1 - h) / (b * n()));
 
    compute_normal_ci(v, alpha, se, cl, cu);
@@ -660,7 +660,7 @@ double TTContingencyTable::edi_ci(double alpha,
    //
    // Compute the standard error
    //
-   se = 2.0 * abs(log(f) + h / (1.0 - h) * log(h)) /
+   se = 2.0 * fabs(log(f) + h / (1.0 - h) * log(h)) /
         (h * pow(log(f) + log(h), 2.0)) *
         sqrt(h * (1.0 - h) / (b * n()));
 
@@ -717,7 +717,7 @@ double TTContingencyTable::sedi_ci(double alpha,
    mh = 1.0 - h;
 
    se = 2.0 *
-        abs( (mh * mf + h * f) / (mh * mf) *
+        fabs( (mh * mf + h * f) / (mh * mf) *
              log(f * mh) + 2.0 * h / mh * log(h * mf) ) /
         (h * pow(log(f * mh) + log(h * mf), 2.0)) *
         sqrt(h * mh / (b * n()));

@@ -356,7 +356,7 @@ in.close();
    // shift the longitudes by 180 degrees
    //
 
-if ( abs(Lon.max() - Lon.min()) > 180.0 ) {
+if ( fabs(Lon.max() - Lon.min()) > 180.0 ) {
    
    LonShift = 180.0;
    
