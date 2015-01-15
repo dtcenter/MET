@@ -2157,7 +2157,7 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
       ff_sum      += f*f;
       oo_sum      += o*o;
       fo_sum      += f*o;
-      abs_err_sum += abs(f-o);
+      abs_err_sum += fabs(f-o);
       scount   += 1;
 
       //

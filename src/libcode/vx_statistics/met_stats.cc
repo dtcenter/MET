@@ -2421,7 +2421,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    // Compute the median absolute deviation
    //
    for(i=0; i<err_na.n_elements(); i++) {
-      dev_na.add(abs(err_na[i] - cnt_info.e50.v));
+      dev_na.add(fabs(err_na[i] - cnt_info.e50.v));
    }
    cnt_info.mad.v = dev_na.percentile_array(0.50);
 

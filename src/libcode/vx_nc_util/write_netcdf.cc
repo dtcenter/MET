@@ -148,7 +148,7 @@ void write_netcdf_var_times(NcVar *var, const unixtime init_ut,
    // Init time
    unix_to_yyyymmdd_hhmmss(init_ut, time_str);
    var->add_att("init_time", time_str);
-   if(abs(init_ut) > max_netcdf_int) {
+   if(labs(init_ut) > max_netcdf_int) {
       mlog << Warning << "\nwrite_netcdf_var_times() -> "
            << "can't write \"init_time_ut\" (" << init_ut
            << ") variable attribute due to integer overflow.\n\n";
@@ -160,7 +160,7 @@ void write_netcdf_var_times(NcVar *var, const unixtime init_ut,
    // Valid time
    unix_to_yyyymmdd_hhmmss(valid_ut, time_str);
    var->add_att("valid_time", time_str);
-   if(abs(valid_ut) > max_netcdf_int) {
+   if(labs(valid_ut) > max_netcdf_int) {
       mlog << Warning << "\nwrite_netcdf_var_times() -> "
            << "can't write \"valid_time_ut\" (" << valid_ut
            << ") variable attribute due to integer overflow.\n\n";
