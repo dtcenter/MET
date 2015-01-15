@@ -2572,7 +2572,7 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
             if(nint(tpi.bdeck_rirw(j)) != 1) continue;
 
             // Find closet RI/RW in time
-            cur_dt = abs(tpi.valid(i) - tpi.valid(j));
+            cur_dt = labs(tpi.valid(i) - tpi.valid(j));
             if(is_bad_data(min_dt)) {
                min_dt   = cur_dt;
                i_min_dt = j;
