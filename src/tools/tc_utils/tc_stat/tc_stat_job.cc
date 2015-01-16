@@ -2562,43 +2562,42 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
       bprv = tpi.bdeck_prv_int(i);
       bdlt = (is_bad_data(bcur) || is_bad_data(bprv) ? bad_data_int : bcur - bprv);
       
-      // Check for small enough timing error to consider a false alarm a hit
-      if(a == 1 && b == 0) {
+      // Check time window when the ADECK and BDECK disagree.
+      // Try to switch misses to hits and false alarms to correct negatives.
+      if(a != b) {
 
-         // Loop through the BDECK track points
+         // Loop through the ADECK track points
          for(j=0, min_dt=bad_data_int, i_min_dt=bad_data_int; j<tpi.n_points(); j++) {
 
-            // Skip non-RI/RW events
-            if(nint(tpi.bdeck_rirw(j)) != 1) continue;
+            // Skip ADECK points that are too far away in time
+            if((cur_dt = labs(tpi.valid(i) - tpi.valid(j))) > RapidIntenWindow) continue;
 
-            // Find closet RI/RW in time
-            cur_dt = labs(tpi.valid(i) - tpi.valid(j));
-            if(is_bad_data(min_dt)) {
-               min_dt   = cur_dt;
-               i_min_dt = j;
-            }
-            else if(cur_dt < min_dt) {
-               min_dt   = cur_dt;
-               i_min_dt = j;
-            }
+            // Skip ADECK points that don't agree with the BDECK category
+            if(nint(tpi.adeck_rirw(j)) != b) continue;
+
+            // Find closest match in time
+            if(is_bad_data(min_dt))  { min_dt = cur_dt; i_min_dt = j; }
+            else if(cur_dt < min_dt) { min_dt = cur_dt; i_min_dt = j; }
          } // end for j
 
-         // Check if the BDeck RI/RW event is close enough in time
-         if(!is_bad_data(min_dt) && min_dt <= RapidIntenWindow) {
+         // Switch the category if a match was found within the window
+         if(!is_bad_data(min_dt)) {
+            a = b;
+            acur = tpi.adeck()[i_min_dt].v_max();
+            aprv = tpi.adeck_prv_int(i_min_dt);
+            adlt = acur - aprv;
             mlog << Debug(4)
-                 << "Switching FY_ON to FY_OY since BDECK RI/RW ("
-                 << tpi.bdeck_prv_int(i_min_dt) << " to "
-                 << tpi.bdeck()[i_min_dt].v_max() << ") occurred at "
+                 << "Switching "
+                 << (b == 1 ? "FN_OY" : "FY_ON") << " to "
+                 << (b == 1 ? "FY_OY" : "FN_ON")
+                 << " since ADECK "  << (b == 1 ? "event" : "non-event")
+                 << " (" << aprv << " to " << acur << " = " << adlt << ") occurred at "
                  << unix_to_yyyymmdd_hhmmss(tpi.valid(i_min_dt)) << " ("
                  << sec_to_hhmmss(min_dt) << " offset <= "
                  << sec_to_hhmmss(RapidIntenWindow)
                  << " window) for " << tpi.case_info() << ", "
                  << "VALID = " << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
                  << "LEAD = " << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << "\n";
-            b = 1;
-            bcur = tpi.bdeck()[i_min_dt].v_max();
-            bprv = tpi.bdeck_prv_int(i_min_dt);
-            bdlt = bcur - bprv;
          }
       }
 
