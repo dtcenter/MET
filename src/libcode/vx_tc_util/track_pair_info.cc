@@ -527,10 +527,10 @@ int TrackPairInfo::check_water_only() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-int TrackPairInfo::check_rapid_inten(const TrackType track_type,
-                                     const int sec_adeck, const int sec_bdeck,
-                                     const bool exact_adeck, const bool exact_bdeck,
-                                     const SingleThresh &st_adeck, const SingleThresh &st_bdeck) {
+int TrackPairInfo::check_rirw(const TrackType track_type,
+                              const int sec_adeck, const int sec_bdeck,
+                              const bool exact_adeck, const bool exact_bdeck,
+                              const SingleThresh &st_adeck, const SingleThresh &st_bdeck) {
    int i, j, n_rej;
    unixtime delta_ut;
    int acur, aprv, bcur, bprv;
@@ -542,7 +542,7 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
    if(!exact_adeck &&
       st_adeck.get_type() != thresh_lt && st_adeck.get_type() != thresh_le &&
       st_adeck.get_type() != thresh_gt && st_adeck.get_type() != thresh_ge) {
-      mlog << Error << "\ncheck_rapid_inten() -> "
+      mlog << Error << "\ncheck_rirw() -> "
            << "for non-exact intensity differeces the RI/RW threshold ("
            << st_adeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
@@ -552,7 +552,7 @@ int TrackPairInfo::check_rapid_inten(const TrackType track_type,
    if(!exact_bdeck &&
       st_bdeck.get_type() != thresh_lt && st_bdeck.get_type() != thresh_le &&
       st_bdeck.get_type() != thresh_gt && st_bdeck.get_type() != thresh_ge) {
-      mlog << Error << "\ncheck_rapid_inten() -> "
+      mlog << Error << "\ncheck_rirw() -> "
            << "for non-exact intensity differeces the RI/RW threshold ("
            << st_bdeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);

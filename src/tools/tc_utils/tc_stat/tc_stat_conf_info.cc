@@ -270,17 +270,17 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool(conf_key_water_only);
 
-   // Conf: TCStatJob::RapidIntenTrack,
-   //       TCStatJob::RapidIntenTimeADeck, TCStatJob::RapidIntenTimeBDeck
-   //       TCStatJob::RapidIntenExactADeck, TCStatJob::RapidIntenExactBDeck,
-   //       TCStatJob::RapidIntenThreshADeck, TCStatJob::RapidIntenThreshBDeck
-   Filter.RapidIntenTrack       = int_to_tracktype(Conf.lookup_int(conf_key_rapid_inten_track));
-   Filter.RapidIntenTimeADeck   = timestring_to_sec(Conf.lookup_string(conf_key_rapid_inten_time_adeck));
-   Filter.RapidIntenTimeBDeck   = timestring_to_sec(Conf.lookup_string(conf_key_rapid_inten_time_bdeck));
-   Filter.RapidIntenExactADeck  = Conf.lookup_bool(conf_key_rapid_inten_exact_adeck);
-   Filter.RapidIntenExactBDeck  = Conf.lookup_bool(conf_key_rapid_inten_exact_bdeck);
-   Filter.RapidIntenThreshADeck = Conf.lookup_thresh(conf_key_rapid_inten_thresh_adeck);
-   Filter.RapidIntenThreshBDeck = Conf.lookup_thresh(conf_key_rapid_inten_thresh_bdeck);
+   // Conf: TCStatJob::RIRWTrack,
+   //       TCStatJob::RIRWTimeADeck, TCStatJob::RIRWTimeBDeck
+   //       TCStatJob::RIRWExactADeck, TCStatJob::RIRWExactBDeck,
+   //       TCStatJob::RIRWThreshADeck, TCStatJob::RIRWThreshBDeck
+   Filter.RIRWTrack       = int_to_tracktype(Conf.lookup_int(conf_key_rirw_track));
+   Filter.RIRWTimeADeck   = timestring_to_sec(Conf.lookup_string(conf_key_rirw_time_adeck));
+   Filter.RIRWTimeBDeck   = timestring_to_sec(Conf.lookup_string(conf_key_rirw_time_bdeck));
+   Filter.RIRWExactADeck  = Conf.lookup_bool(conf_key_rirw_exact_adeck);
+   Filter.RIRWExactBDeck  = Conf.lookup_bool(conf_key_rirw_exact_bdeck);
+   Filter.RIRWThreshADeck = Conf.lookup_thresh(conf_key_rirw_thresh_adeck);
+   Filter.RIRWThreshBDeck = Conf.lookup_thresh(conf_key_rirw_thresh_bdeck);
 
    // Conf: TCStatJob::Landfall, TCStatJob::LandfallBeg, TCStatJob::LandfallEnd
    Filter.Landfall    = Conf.lookup_bool(conf_key_landfall);

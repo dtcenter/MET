@@ -122,7 +122,7 @@ water_only = FALSE;
 // or weakening of the maximum wind speed occurred in the previous time
 // step should be retained. 
 //
-rapid_inten = {
+rirw = {
    track  = NONE;
    adeck = {
       time   = "24";

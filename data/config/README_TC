@@ -415,10 +415,10 @@ water_only = FALSE;
 // intensification or weakening.
 //
 // May modify using the following job command options:
-//    "-rapid_inten_track"
-//    "-rapid_inten_time" for both or "-rapid_inten_time_adeck" and "-rapid_inten_time_bdeck"
-//    "-rapid_inten_exact" for both or "-rapid_inten_exact_adeck" and "-rapid_inten_exact_bdeck"
-//    "-rapid_inten_thresh" for both or "-rapid_inten_thresh_adeck" and "-rapid_inten_thresh_bdeck"
+//    "-rirw_track"
+//    "-rirw_time" for both or "-rirw_time_adeck" and "-rirw_time_bdeck"
+//    "-rirw_exact" for both or "-rirw_exact_adeck" and "-rirw_exact_bdeck"
+//    "-rirw_thresh" for both or "-rirw_thresh_adeck" and "-rirw_thresh_bdeck"
 //
 
 rapid_inten = {
@@ -566,10 +566,10 @@ out_valid_mask = "";
 //          and output contingency table counts and statistics.
 //
 //          Optional Args:
-//             -rapid_inten_window HHMMSS to override default of 0, requiring exact match
-//             -rapid_inten_time or -rapid_inten_time_adeck and -rapid_inten_time_bdeck to override defaults
-//             -rapid_inten_exact or -rapid_inten_exact_adeck and -rapid_inten_exact_bdeck to override defaults
-//             -rapid_inten_thresh or -rapid_inten_thresh_adeck and -rapid_inten_thresh_bdeck to override defaults
+//             -rirw_window HHMMSS to override default of 0, requiring exact match
+//             -rirw_time or -rirw_time_adeck and -rirw_time_bdeck to override defaults
+//             -rirw_exact or -rirw_exact_adeck and -rirw_exact_bdeck to override defaults
+//             -rirw_thresh or -rirw_thresh_adeck and -rirw_thresh_bdeck to override defaults
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
 //             -out_line_type to specify which output types (CTC, CTS, and MPR) should be written

@@ -138,9 +138,9 @@ class TrackPairInfo {
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
       int  check_water_only();
-      int  check_rapid_inten(const TrackType, const int, const int,
-                             const bool, const bool,
-                             const SingleThresh &, const SingleThresh &);
+      int  check_rirw(const TrackType, const int, const int,
+                      const bool, const bool,
+                      const SingleThresh &, const SingleThresh &);
       int  check_landfall(const int, const int);
       bool landfall_window(unixtime, unixtime) const;
 
