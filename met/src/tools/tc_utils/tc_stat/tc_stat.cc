@@ -225,7 +225,7 @@ void process_jobs() {
            << "Rejected for init string       = " << n.RejInitStr        << "\n"
            << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"
            << "Rejected for water only        = " << n.RejWaterOnly      << "\n"
-           << "Rejected for rapid inten       = " << n.RejRapidInten     << "\n"
+           << "Rejected for rapid inten       = " << n.RejRIRW           << "\n"
            << "Rejected for landfall          = " << n.RejLandfall       << "\n"
            << "Rejected for amodel            = " << n.RejAModel         << "\n"
            << "Rejected for bmodel            = " << n.RejBModel         << "\n"

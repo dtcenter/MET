@@ -122,7 +122,7 @@ water_only = FALSE;
 // or weakening of the maximum wind speed occurred in the previous time
 // step should be retained.
 //
-rapid_inten = {
+rirw = {
    track  = NONE;
    time   = "24";
    exact  = TRUE;
@@ -169,8 +169,8 @@ out_valid_mask = "";
 jobs = [
    "-job summary -column TRACK -by AMODEL      -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP.tcst",
    "-job summary -column TRACK -by AMODEL,INIT -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst",
-   "-job filter  -amodel AHWI  -rapid_inten_track BDECK -rapid_inten_thresh >=30  -rapid_inten_exact FALSE -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_ri.tcst",
-   "-job filter  -amodel AHWI  -rapid_inten_track BDECK -rapid_inten_thresh <=-30 -rapid_inten_exact TRUE  -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_rw.tcst"
+   "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh >=30  -rirw_exact FALSE -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_ri.tcst",
+   "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh <=-30 -rirw_exact TRUE  -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_rw.tcst"
 ];
 
 //

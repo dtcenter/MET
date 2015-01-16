@@ -34,11 +34,11 @@ static const bool         default_match_points       = false;
 static const bool         default_event_equal        = false;
 
 // Default rapid intensification is an increase of 30 kts over 24 hours
-static const TrackType    default_rapid_inten_track  = TrackType_None;
-static const int          default_rapid_inten_time   = 86400;
-static const bool         default_rapid_inten_exact  = true;
-static const SingleThresh default_rapid_inten_thresh(">=30.0");
-static const int          default_rapid_inten_window = 0;
+static const TrackType    default_rirw_track  = TrackType_None;
+static const int          default_rirw_time   = 86400;
+static const bool         default_rirw_exact  = true;
+static const SingleThresh default_rirw_thresh(">=30.0");
+static const int          default_rirw_window = 0;
 
 // Default is 24 hours prior to landfall
 static const bool         default_landfall           = false;
@@ -113,7 +113,7 @@ struct TCLineCounts {
    int RejInitStr;
 
    // Filtering on track attributes
-   int RejRapidInten;
+   int RejRIRW;
    int RejLandfall;
 
    // Checking track point attributes
@@ -275,11 +275,11 @@ class TCStatJob {
       StringArray EventEqualCases;
 
       // Rapid intensification/weakening logic for each track
-      TrackType    RapidIntenTrack;
-      int          RapidIntenTimeADeck, RapidIntenTimeBDeck;
-      bool         RapidIntenExactADeck, RapidIntenExactBDeck;
-      SingleThresh RapidIntenThreshADeck, RapidIntenThreshBDeck;
-      int          RapidIntenWindow;
+      TrackType    RIRWTrack;
+      int          RIRWTimeADeck, RIRWTimeBDeck;
+      bool         RIRWExactADeck, RIRWExactBDeck;
+      SingleThresh RIRWThreshADeck, RIRWThreshBDeck;
+      int          RIRWWindow;
 
       // Only retain TrackPoints in a time window around landfall
       bool Landfall;
