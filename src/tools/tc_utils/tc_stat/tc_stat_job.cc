@@ -2564,7 +2564,7 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
       
       // Check time window when the ADECK and BDECK disagree.
       // Try to switch misses to hits and false alarms to correct negatives.
-      if(a != b) {
+      if(a != b && RIRWWindow > 0) {
 
          // Loop through the ADECK track points
          for(j=0, min_dt=bad_data_int, i_min_dt=bad_data_int; j<tpi.n_points(); j++) {
