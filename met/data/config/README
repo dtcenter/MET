@@ -1565,7 +1565,7 @@ output_stats = {
 //          types may be aggregated:
 //          -line_type FHO, CTC, MCTC,
 //                     SL1L2, SAL1L2, VL1L2, VAL1L2,
-//                     PCT, NBRCNT, NBRCTC, ISC, RHIST, PHIST
+//                     PCT, NBRCNT, NBRCTC, ISC, RHIST, PHIST, SSVAR
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
