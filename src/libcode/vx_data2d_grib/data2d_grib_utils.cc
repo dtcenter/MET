@@ -44,13 +44,11 @@ Section1_Header *pds = (Section1_Header *) g.pds;
 
    //
    //  check ptv
-   //  skip check of ptv in METv3.1, but add it back in for updated
-   //  config files
    //
 
-// k = (int) (pds->ptv);
+k = (int) (pds->ptv);
 
-// if ( vinfo.ptv() != k )  return ( false );
+if ( vinfo.ptv() != k )  return ( false );
 
    //
    //  store lower and upper level values
