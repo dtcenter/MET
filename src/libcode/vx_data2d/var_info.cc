@@ -361,7 +361,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
       if( is_bad_data(field_lvl_typ) ||
           is_bad_data(field_lvl_val1) ){
          mlog << Error << "\nVarInfo::set_level_info_grib() - either level or GRIB_lvl_typ, "
-              << "GRIB_lvl_val1 and GRIB2_lvl_val2 (if necessary) must be specified in field "
+              << "GRIB_lvl_val1 and GRIB_lvl_val2 (if necessary) must be specified in field "
               << "information\n\n";
          exit(1);
       }
