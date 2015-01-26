@@ -104,7 +104,7 @@ return ( 0 );
 ///////////////////////////////////////////////////////////////////////////////
 
 
-int rank(const double *array, double *rank, int n)
+int do_rank(const double *array, double *rank, int n)
 
 {
 

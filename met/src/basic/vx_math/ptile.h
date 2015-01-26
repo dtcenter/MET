@@ -37,7 +37,7 @@ extern void sort(double *array, int n);
 extern double percentile(const double *ordered_array, int n, double t);
 
 
-extern int rank(const double *array, double *rank, int n);
+extern int do_rank(const double *array, double *rank, int n);
 
 
 ///////////////////////////////////////////////////////////////////////////////

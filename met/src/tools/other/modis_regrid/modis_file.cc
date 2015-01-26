@@ -426,11 +426,11 @@ if ( !field )  {
 
 }
 
-if ( field->rank() != 2 )  {
+if ( field->get_rank() != 2 )  {
 
    mlog << Error
         << "\n\n  ModisFile::get_geo_field() -> bad rank ("
-        << (field->rank()) << ") for geolocation field \"" << name << "\"\n\n";
+        << (field->get_rank()) << ") for geolocation field \"" << name << "\"\n\n";
 
    exit ( 1 );
 
@@ -490,11 +490,11 @@ if ( !field )  {
 
 }
 
-if ( field->rank() != 2 )  {
+if ( field->get_rank() != 2 )  {
 
    mlog << Error
         << "\n\n  ModisFile::get_data_field() -> bad rank ("
-        << (field->rank()) << ") for data field \"" << name << "\"\n\n";
+        << (field->get_rank()) << ") for data field \"" << name << "\"\n\n";
 
    exit ( 1 );
 

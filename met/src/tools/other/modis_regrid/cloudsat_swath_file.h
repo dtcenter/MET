@@ -234,7 +234,7 @@ class SwathDataField {
 
       ConcatString name() const;
 
-      int rank() const;
+      int get_rank() const;
       int numbertype() const;
       int n_dimensions() const;
 
@@ -255,8 +255,8 @@ class SwathDataField {
 
 inline ConcatString SwathDataField::name() const { return ( Name ); }
 
-inline int SwathDataField::rank       () const { return ( Rank       ); }
-inline int SwathDataField::numbertype () const { return ( Numbertype ); }
+inline int SwathDataField::get_rank     () const { return ( Rank       ); }
+inline int SwathDataField::numbertype   () const { return ( Numbertype ); }
 
 inline int SwathDataField::n_dimensions () const { return ( Ndimensions ); }
 

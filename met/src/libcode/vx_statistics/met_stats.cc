@@ -2277,7 +2277,7 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
 
    // Compute the rank of the data and store the ranks in the data_rank array
    // Keep track of the number of ties in the ranks
-   ties = rank(data, data_rank, n);
+   ties = do_rank(data, data_rank, n);
 
    // Set up the dp_rank object
    dp_rank.set_size(dp.nx(), dp.ny());
