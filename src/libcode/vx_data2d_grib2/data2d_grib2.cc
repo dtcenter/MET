@@ -318,7 +318,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                                             vector<Grib2Record*> &listMatchExact,
                                             vector<Grib2Record*> &listMatchRange
                                           ){
-
+   
    //  clear the contents of the result vectors
    listMatchExact.clear();
    listMatchRange.clear();
@@ -336,6 +336,9 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       bool rec_match_ex = false;
       bool rec_match_rn = false;
 
+      double rec_lvl1 = (double)((*it)->LvlVal1);
+      double rec_lvl2 = (double)((*it)->LvlVal2);
+   
       //  test the timing information
       if( (!is_bad_data(vinfo->lead())  && vinfo->lead()  != (*it)->LeadTime)  ||
           (vinfo->valid()               && vinfo->valid() != (*it)->ValidTime) ||
@@ -356,32 +359,30 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                vinfo->name().text()  == (*it)->ParmName
              ){
 
-         //  accumulation level type
-         if( LevelType_Accum == vinfo_lty ){
-
-            rec_match_ex = ( is_eq(lvl1, (*it)->Accum) );
-
+         //  record number level type
+         if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
+            rec_match_ex = true;
          }
 
-         //  record number level type
-         else if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
-
-            rec_match_ex = true;
-
+         //  generic level type
+         else if( LevelType_None == vinfo_lty ){
+            rec_match_ex = ( is_eq(lvl1, rec_lvl1) ) && ( is_eq(lvl1, lvl2) || is_eq(lvl2, rec_lvl2) );
+            rec_match_rn = ( !is_eq(lvl1, lvl2) && lvl1 <= rec_lvl1 && lvl2 >= rec_lvl2 );
+         }
+         
+         //  accumulation level type
+         else if( LevelType_Accum == vinfo_lty ){
+            rec_match_ex = ( is_eq(lvl1, (*it)->Accum) );
          }
 
          //  pressure or vertical level type
          else if( vinfo_lty == vinfo->g2_lty_to_level_type((*it)->LvlTyp) ){
-
-            double rec_lvl1 = (double)((*it)->LvlVal1);
-            double rec_lvl2 = (double)((*it)->LvlVal2);
             if( LevelType_Pres == vinfo_lty ){
                rec_lvl1 /= 100;
                rec_lvl2 /= 100;
             }
             rec_match_ex = ( is_eq(lvl1, rec_lvl1) ) && ( is_eq(lvl1, lvl2) || is_eq(lvl2, rec_lvl2) );
             rec_match_rn = ( !is_eq(lvl1, lvl2) && lvl1 <= rec_lvl1 && lvl2 >= rec_lvl2 );
-
          }  //  END: if( level match )
 
          //  if seeking a probabilistic field, check the prob info
@@ -420,8 +421,6 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
             }
          }
-
-
       }  //  END: else if( parameter match )
 
       //  add the record to the result lists, depending on the match type
