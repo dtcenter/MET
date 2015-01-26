@@ -571,7 +571,7 @@ for(i=0; i<Nelements; i++) {
 // Compute the rank of the data and store the ranks in the data_rank array
 // Keep track of the number of ties in the ranks.
 //
-ties = rank(data, data_rank, n);
+ties = do_rank(data, data_rank, n);
 
 //
 // Store the data_rank values
