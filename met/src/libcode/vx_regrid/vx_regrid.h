@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2014
+// ** Copyright UCAR (c) 1992 - 2015
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,8 +18,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-include "vx_grid.h"
-include "data_plane.h"
+#include "vx_grid.h"
+#include "data_plane.h"
 
 
 ////////////////////////////////////////////////////////////////////////

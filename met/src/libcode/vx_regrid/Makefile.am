@@ -12,5 +12,5 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_regrid.a
 libvx_regrid_a_SOURCES = \
-              vx_regrid.h vx_regrid.cc \
+              vx_regrid.h vx_regrid.cc
 libvx_regrid_a_CPPFLAGS = ${MET_CPPFLAGS}

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2014
+// ** Copyright UCAR (c) 1992 - 2015
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,7 +11,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-include "vx_regrid.h"
+using namespace std;
+
+#include "vx_regrid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
