@@ -46,6 +46,6 @@ SUBDIRS += vx_data2d_factory \
 	vx_analysis_util \
 	vx_tc_util \
 	vx_swinging_door \
-	vx_regrid  \
+	vx_regrid
 
 MAINTAINERCLEANFILES 	= Makefile.in
