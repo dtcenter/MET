@@ -66,4 +66,8 @@ endif
   SUBDIRS += gsi_tools
 #endif
 
+#if ENABLE_REGRID_DATA_PLANE
+  SUBDIRS += regrid_data_plane
+#endif
+
 MAINTAINERCLEANFILES 	= Makefile.in
