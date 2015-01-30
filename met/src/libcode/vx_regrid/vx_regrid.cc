@@ -27,6 +27,13 @@ DataPlane out;
 
 out.set_size(to_grid.nx(), to_grid.ny());
 
+// Copy timing info
+out.set_init(in.init());
+out.set_valid(in.valid());
+out.set_lead(in.lead());
+out.set_accum(in.accum());
+
+
 
 return ( out );
 
