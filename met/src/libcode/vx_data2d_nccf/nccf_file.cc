@@ -1553,11 +1553,9 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   // Calculate dlat and dlon assuming they are constant.  MET requires that
   // dlat be equal to dlon
 
-  double dlat = (lat_values[_yDim->size()-1] - lat_values[0]) /
-    (_yDim->size() - 1);
-  double dlon = (lon_values[_xDim->size()-1] - lon_values[0]) /
-    (_xDim->size() - 1);
-  
+  double dlat = lat_values[1] - lat_values[0];
+  double dlon = rescale_lon(lon_values[1] - lon_values[0]);
+ 
   if (fabs(dlat - dlon) > DELTA_TOLERANCE)
   {
     mlog << Error << "\n" << method_name << " -> "
@@ -1581,7 +1579,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   
   for (int i = 1; i < _xDim->size(); ++i)
   {
-    double curr_delta = lon_values[i] - lon_values[i-1];
+    double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
     if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
     {
       mlog << Error << "\n" << method_name << " -> "
@@ -1831,12 +1829,10 @@ bool NcCfFile::get_grid_from_dimensions()
   
   // Calculate dlat and dlon assuming they are constant.  MET requires that
   // dlat be equal to dlon
-
-  double dlat = (lat_values[_yDim->size()-1] - lat_values[0]) /
-    (_yDim->size() - 1);
-  double dlon = (lon_values[_xDim->size()-1] - lon_values[0]) /
-    (_xDim->size() - 1);
   
+  double dlat = lat_values[1] - lat_values[0];
+  double dlon = rescale_lon(lon_values[1] - lon_values[0]);
+
   if (fabs(dlat - dlon) > DELTA_TOLERANCE)
   {
     mlog << Error << "\n" << method_name << " -> "
@@ -1860,7 +1856,7 @@ bool NcCfFile::get_grid_from_dimensions()
   
   for (int i = 1; i < _xDim->size(); ++i)
   {
-    double curr_delta = lon_values[i] - lon_values[i-1];
+    double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
     if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
     {
       mlog << Error << "\n" << method_name << " -> "
