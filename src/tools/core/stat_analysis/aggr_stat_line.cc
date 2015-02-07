@@ -24,6 +24,8 @@
 //   005    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   006    06/03/14  Halley Gotway   Add aggregate PHIST lines.
 //   007    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
+//   008    02/05/15  Halley Gotway   Add StatHdrInfo to keep track of
+//                    unique header entries for each aggregation.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +49,275 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 extern bool is_precip_var_name(const ConcatString &s);
+extern ConcatString write_css(const StringArray &sa);
+
+////////////////////////////////////////////////////////////////////////
+//
+// Initialize the StatHdrInfo structure values.
+//
+////////////////////////////////////////////////////////////////////////
+
+void clear_stat_hdr_info(StatHdrInfo &hdr) {
+   hdr.model.clear();
+   hdr.fcst_lead.clear();
+   hdr.fcst_valid_beg = hdr.fcst_valid_end = (unixtime) 0;
+   hdr.obs_lead.clear();
+   hdr.obs_valid_beg = hdr.obs_valid_end = (unixtime) 0;
+   hdr.fcst_var.clear();
+   hdr.fcst_lev.clear();
+   hdr.obs_var.clear();
+   hdr.obs_lev.clear();
+   hdr.obtype.clear();
+   hdr.vx_mask.clear();
+   hdr.interp_mthd.clear();
+   hdr.interp_pnts.clear();
+   hdr.fcst_thresh.clear();
+   hdr.obs_thresh.clear();
+   hdr.cov_thresh.clear();
+   hdr.alpha.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Keep track the unique STAT header entries for each line.
+//
+////////////////////////////////////////////////////////////////////////
+
+void add_stat_hdr_info(StatHdrInfo &hdr, const STATLine &line) {
+   if(!hdr.model.has(line.model()))
+      hdr.model.add(line.model());
+   if(!hdr.fcst_lead.has(line.fcst_lead()))
+      hdr.fcst_lead.add(line.fcst_lead());
+   if(hdr.fcst_valid_beg == (unixtime) 0 || line.fcst_valid_beg() < hdr.fcst_valid_beg)
+      hdr.fcst_valid_beg = line.fcst_valid_beg();
+   if(hdr.fcst_valid_end == (unixtime) 0 || line.fcst_valid_end() < hdr.fcst_valid_end)
+      hdr.fcst_valid_end = line.fcst_valid_end();
+   if(!hdr.obs_lead.has(line.obs_lead()))
+      hdr.obs_lead.add(line.obs_lead());
+   if(hdr.obs_valid_beg == (unixtime) 0 || line.obs_valid_beg() < hdr.obs_valid_beg)
+      hdr.obs_valid_beg = line.obs_valid_beg();
+   if(hdr.obs_valid_end == (unixtime) 0 || line.obs_valid_end() < hdr.obs_valid_end)
+      hdr.obs_valid_end = line.obs_valid_end();
+   if(!hdr.fcst_var.has(line.fcst_var()))
+      hdr.fcst_var.add(line.fcst_var());
+   if(!hdr.fcst_lev.has(line.fcst_lev()))
+      hdr.fcst_lev.add(line.fcst_lev());
+   if(!hdr.obs_var.has(line.obs_var()))
+      hdr.obs_var.add(line.obs_var());
+   if(!hdr.obs_lev.has(line.obs_lev()))
+      hdr.obs_lev.add(line.obs_lev());
+   if(!hdr.obtype.has(line.obtype()))
+      hdr.obtype.add(line.obtype());
+   if(!hdr.vx_mask.has(line.vx_mask()))
+      hdr.vx_mask.add(line.vx_mask());
+   if(!hdr.interp_mthd.has(line.interp_mthd()))
+      hdr.interp_mthd.add(line.interp_mthd());
+   if(!hdr.interp_pnts.has(line.interp_pnts()))
+      hdr.interp_pnts.add(line.interp_pnts());
+   if(!hdr.fcst_thresh.has(line.fcst_thresh()))
+      hdr.fcst_thresh.add(line.fcst_thresh());
+   if(!hdr.obs_thresh.has(line.obs_thresh()))
+      hdr.obs_thresh.add(line.obs_thresh());
+   if(!hdr.cov_thresh.has(line.cov_thresh()))
+      hdr.cov_thresh.add(line.cov_thresh());
+   if(!hdr.alpha.has(line.alpha()))
+      hdr.alpha.add(line.alpha());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Use the StatHdrInfo struct to populate a StatHdrColumns object
+//
+////////////////////////////////////////////////////////////////////////
+
+void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
+   ConcatString css;
+   
+   // MODEL
+   css = write_css(hdr.model);
+   if(hdr.model.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.model.n_elements()
+           << " unique values for MODEL, writing list: "
+           << css << "\n";
+   }
+   shc.set_model(css);
+   
+   // FCST_LEAD
+   if(hdr.fcst_lead.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.fcst_lead.n_elements()
+           << " unique values for FCST_LEAD, writing maximum: "
+           << sec_to_hhmmss(hdr.fcst_lead.max()) << "\n";
+   }   
+   shc.set_fcst_lead_sec(hdr.fcst_lead.max());
+   
+   // FCST_VALID_BEG, FCST_VALID_END
+   shc.set_fcst_valid_beg(hdr.fcst_valid_beg);
+   shc.set_fcst_valid_end(hdr.fcst_valid_end);
+   
+   // OBS_LEAD
+   if(hdr.obs_lead.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.obs_lead.n_elements()
+           << " unique values for OBS_LEAD, writing maximum: "
+           << sec_to_hhmmss(hdr.obs_lead.max()) << "\n";
+   }   
+   shc.set_obs_lead_sec(hdr.obs_lead.max());
+   
+   // OBS_VALID_BEG, OBS_VALID_END
+   shc.set_obs_valid_beg(hdr.obs_valid_beg);
+   shc.set_obs_valid_end(hdr.obs_valid_end);
+   
+   // FCST_VAR
+   css = write_css(hdr.fcst_var);
+   if(hdr.fcst_var.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.fcst_var.n_elements()
+           << " unique values for FCST_VAR, writing list: "
+           << css << "\n";
+   }
+   shc.set_fcst_var(css);
+
+   // FCST_LEV
+   css = write_css(hdr.fcst_lev);
+   if(hdr.fcst_lev.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.fcst_lev.n_elements()
+           << " unique values for FCST_LEV, writing list: "
+           << css << "\n";
+   }
+   shc.set_fcst_lev(css);
+   
+   // OBS_VAR
+   css = write_css(hdr.obs_var);
+   if(hdr.obs_var.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.obs_var.n_elements()
+           << " unique values for OBS_VAR, writing list: "
+           << css << "\n";
+   }
+   shc.set_obs_var(css);
+
+   // OBS_LEV
+   css = write_css(hdr.obs_lev);
+   if(hdr.obs_lev.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.obs_lev.n_elements()
+           << " unique values for OBS_LEV, writing list: "
+           << css << "\n";
+   }
+   shc.set_obs_lev(css);
+
+   // OBTYPE
+   css = write_css(hdr.obtype);
+   if(hdr.obtype.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.obtype.n_elements()
+           << " unique values for OBTYPE, writing list: "
+           << css << "\n";
+   }
+   shc.set_obtype(css);
+
+   // VX_MASK
+   css = write_css(hdr.vx_mask);
+   if(hdr.vx_mask.n_elements() > 1) {
+      mlog << Debug(3)
+           << "Found " << hdr.vx_mask.n_elements()
+           << " unique values for VX_MASK, writing list: "
+           << css << "\n";
+   }
+   shc.set_mask(css);
+
+   // INTERP_MTHD
+   if(hdr.interp_mthd.n_elements() > 1) {
+      mlog << Warning
+           << "Found " << hdr.interp_mthd.n_elements()
+           << " unique values for INTERP_MTHD, writing "
+           << na_str << ".\n";
+      shc.set_interp_mthd(InterpMthd_None);
+   }
+   else {
+      shc.set_interp_mthd(string_to_interpmthd(hdr.interp_mthd[0]));
+   }
+   
+   // INTERP_MTHD
+   if(hdr.interp_pnts.n_elements() > 1) {
+      mlog << Warning
+           << "Found " << hdr.interp_pnts.n_elements()
+           << " unique values for INTERP_PNTS, writing "
+           << na_str << ".\n";
+      shc.set_interp_wdth(bad_data_int);
+   }
+   else {
+      shc.set_interp_wdth(nint(sqrt(hdr.interp_pnts[0])));
+   }
+
+   // FCST_THRESH
+   shc.set_fcst_thresh(hdr.fcst_thresh);
+   if(hdr.fcst_thresh.n_elements() > 1) {
+      mlog << Warning
+           << "Found " << hdr.fcst_thresh.n_elements()
+           << " unique values for FCST_THRESH, writing list: "
+           << shc.get_fcst_thresh_str() << "\n";
+   }
+
+   // OBS_THRESH
+   shc.set_obs_thresh(hdr.obs_thresh);
+   if(hdr.obs_thresh.n_elements() > 1) {
+      mlog << Warning
+           << "Found " << hdr.obs_thresh.n_elements()
+           << " unique values for OBS_THRESH, writing list: "
+           << shc.get_obs_thresh_str() << "\n";
+   }
+
+   // COV_THRESH
+   if(hdr.cov_thresh.n_elements() > 1) {
+      mlog << Warning
+           << "Found " << hdr.cov_thresh.n_elements()
+           << " unique values for COV_THRESH, writing "
+           << na_str << ".\n";
+      SingleThresh na_thresh;
+      shc.set_cov_thresh(na_thresh);
+   }
+   else {
+      shc.set_cov_thresh(hdr.cov_thresh[0]);
+   }
+
+   // ALPHA
+   if(hdr.alpha.n_elements() > 1) {
+      mlog << Warning
+           << "Found " << hdr.alpha.n_elements()
+           << " unique values for ALPHA, writing "
+           << na_str << ".\n";
+      shc.set_alpha(bad_data_int);
+   }
+   else {
+      shc.set_alpha(hdr.alpha[0]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Build a comma-separated list of strings
+//
+////////////////////////////////////////////////////////////////////////
+
+ConcatString write_css(const StringArray &sa) {
+   ConcatString css;
+   
+   for(int i=0; i<sa.n_elements(); i++) {
+      css << (i == 0 ? "" : ",") << sa[i];
+   }
+
+   return(css);
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -128,6 +399,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.csi_ts.clear();
             aggr.hk_ts.clear();
             aggr.cts_info = cur;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
@@ -184,6 +456,11 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
             m[key].hk_ts.add(cur.hk.v);
          }
 
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
+         
          n_out++;
       }
    } // end while
@@ -304,6 +581,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.valid_ts.clear();
             aggr.acc_ts.clear();
             aggr.mcts_info = cur;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
@@ -368,6 +646,11 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
             m[key].acc_ts.add(cur.acc.v);
          }
 
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
+         
          n_out++;
       }
    } // end while
@@ -473,6 +756,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.baser_ts.clear();
             aggr.brier_ts.clear();
             aggr.pct_info = cur;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
@@ -551,6 +835,11 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
             m[key].baser_ts.add(cur.baser.v);
             m[key].brier_ts.add(cur.brier.v);
          }
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -690,12 +979,14 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.sl1l2_info  = cur_sl1l2;
             aggr.vl1l2_info  = cur_vl1l2;
             aggr.nbrcnt_info = cur_nbrcnt;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
          // Increment sums in the existing map entry
          //
          else {
+
             m[key].sl1l2_info  += cur_sl1l2;
             m[key].vl1l2_info  += cur_vl1l2;
             m[key].nbrcnt_info += cur_nbrcnt;                                          
@@ -734,6 +1025,11 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
             m[key].obar_ts.add(cur_cnt.obar.v);
             m[key].me_ts.add(cur_cnt.me.v);
          }
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -859,6 +1155,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.uo_na.clear();
             aggr.vo_na.clear();
             aggr.vl1l2_info = cur;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
@@ -875,6 +1172,11 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].vf_na.add(vf);
          m[key].uo_na.add(uo);
          m[key].vo_na.add(vo);
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -971,6 +1273,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Add the new map entry
             //
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
@@ -1022,6 +1325,11 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                m[key].vo_na.add(vo);
             }
          } 
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -1216,12 +1524,14 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.c_na.add(cur.climo);
             aggr.fcst_var = cur.fcst_var;
             aggr.obs_var = cur.obs_var;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
          // Increment sums in the existing map entry
          //
          else {
+
             m[key].f_na.add(cur.fcst);
             m[key].o_na.add(cur.obs);
             m[key].c_na.add(cur.climo);
@@ -1239,6 +1549,11 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
                throw(1);
             }
          }
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -1303,6 +1618,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
             aggr.isc_info.clear();
             aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) 0;
             aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          
@@ -1375,6 +1691,11 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
          m[key].oen_na[iscale].add(cur.oen);
          m[key].baser_na[iscale].add(cur.baser);
          m[key].fbias_na[iscale].add(cur.fbias);
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -1543,6 +1864,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.crps_num = aggr.crps_den = 0.0;
             aggr.ign_num  = aggr.ign_den  = 0.0;
             aggr.ens_pd.rhist_na = cur.rhist_na;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
@@ -1584,6 +1906,11 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
             m[key].ign_num += cur.total * cur.ign;
             m[key].ign_den += cur.total;
          }
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -1662,6 +1989,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
          if(m.count(key) == 0) {
             aggr.ens_pd.phist_bin_size = cur.bin_size;
             aggr.ens_pd.phist_na = cur.phist_na;
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
          //
@@ -1687,6 +2015,11 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
                m[key].ens_pd.phist_na.set(i, m[key].ens_pd.phist_na[i] + cur.phist_na[i]);
             }
          } // end else
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -1751,6 +2084,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.ens_pd.phist_bin_size = j.out_bin_size;
             n_bin = ceil(1.0 / aggr.ens_pd.phist_bin_size);
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
+            clear_stat_hdr_info(aggr.hdr);
             m[key] = aggr;
          }
 
@@ -1788,6 +2122,11 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].ens_pd.crps_na.add(crps);
          m[key].ens_pd.ign_na.add(ign);
          m[key].ens_pd.pit_na.add(pit);
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
@@ -1872,6 +2211,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(m.count(case_key) == 0) {
             aggr.ssvar_bins.clear();
+            clear_stat_hdr_info(aggr.hdr);
             m[case_key] = aggr;
          }
 
@@ -1887,6 +2227,11 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          else {
             m[case_key].ssvar_bins[bin_key] += cur;
          }
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[case_key].hdr, line);
 
          n_out++;
       }

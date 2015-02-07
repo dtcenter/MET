@@ -20,6 +20,8 @@
 //   002    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   003    06/03/14  Halley Gotway   Add aggregate PHIST lines.
 //   004    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
+//   005    02/05/15  Halley Gotway   Add StatHdrInfo to keep track of
+//                    unique header entries for each aggregation.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -44,6 +46,7 @@ using namespace std;
 #include "vx_gsl_prob.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -51,23 +54,36 @@ static const int min_time_series = 10;
 
 ////////////////////////////////////////////////////////////////////////
 
+struct StatHdrInfo {
+   StringArray model, fcst_var, fcst_lev, obs_var, obs_lev;
+   StringArray obtype, vx_mask, interp_mthd;
+   ThreshArray fcst_thresh, obs_thresh, cov_thresh;
+   NumArray fcst_lead, obs_lead, interp_pnts, alpha;
+   unixtime fcst_valid_beg, fcst_valid_end;
+   unixtime obs_valid_beg, obs_valid_end;
+};
+
 struct AggrCTCInfo {
+   StatHdrInfo hdr;
    CTSInfo cts_info;
    NumArray valid_ts, baser_ts, fmean_ts, acc_ts;
    NumArray pody_ts, podn_ts, pofd_ts, far_ts, csi_ts, hk_ts;
 };
 
 struct AggrMCTCInfo {
+   StatHdrInfo hdr;
    MCTSInfo mcts_info;
    NumArray valid_ts, acc_ts;
 };
 
 struct AggrPCTInfo {
+   StatHdrInfo hdr;
    PCTInfo pct_info;
    NumArray valid_ts, baser_ts, brier_ts;
 };
 
 struct AggrPSumInfo {
+   StatHdrInfo hdr;
    SL1L2Info  sl1l2_info;
    VL1L2Info  vl1l2_info;
    CNTInfo    cnt_info;
@@ -76,31 +92,37 @@ struct AggrPSumInfo {
 };
 
 struct AggrWindInfo {
+   StatHdrInfo hdr;
    VL1L2Info vl1l2_info;
    StringArray hdr_sa;
    NumArray uf_na, vf_na, uo_na, vo_na;
 };
 
 struct AggrMPRInfo {
+   StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
    NumArray f_na, o_na, c_na;
 };
 
 struct AggrISCInfo {
+   StatHdrInfo hdr;
    ISCInfo isc_info;
    NumArray *total_na, *mse_na, *fen_na, *oen_na, *baser_na, *fbias_na;
 };
 
 struct AggrRHISTInfo {
+   StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
    double crps_num, crps_den, ign_num, ign_den;
 };
 
 struct AggrPHISTInfo {
+   StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
 };
 
 struct AggrORANKInfo {
+   StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
 };
 
@@ -124,10 +146,15 @@ struct ssvar_bin_cmp {
 };
 
 struct AggrSSVARInfo {
+   StatHdrInfo hdr;
    map<ConcatString, SSVARInfo, ssvar_bin_cmp> ssvar_bins;
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+extern void clear_stat_hdr_info(StatHdrInfo &hdr);
+extern void add_stat_hdr_info(StatHdrInfo &hdr, const STATLine &line);
+extern void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc);
 
 extern void aggr_ctc_lines(
                LineDataFile &, STATAnalysisJob &,
