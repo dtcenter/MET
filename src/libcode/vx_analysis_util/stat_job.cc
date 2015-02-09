@@ -1392,7 +1392,8 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    // Retrieve value for each column_case option
    //
    for(i=0; i<column_case.n_elements(); i++) {
-      key << ":" << L.get_item(determine_column_offset(L, column_case[i]));
+      key << (i == 0 ? "" : ":")
+          << L.get_item(determine_column_offset(L, column_case[i]));
    }
 
    return(key);
