@@ -134,15 +134,16 @@ void add_stat_hdr_info(StatHdrInfo &hdr, const STATLine &line) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
+void stat_hdr_info_to_cols(const ConcatString &cur_case, 
+                           const StatHdrInfo &hdr, StatHdrColumns &shc) {
    ConcatString css;
    
    // MODEL
    css = write_css(hdr.model);
    if(hdr.model.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.model.n_elements()
-           << " unique values for MODEL, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.model.n_elements()
+           << " unique MODEL values, writing list: "
            << css << "\n";
    }
    shc.set_model(css);
@@ -150,8 +151,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    // FCST_LEAD
    if(hdr.fcst_lead.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.fcst_lead.n_elements()
-           << " unique values for FCST_LEAD, writing maximum: "
+           << "For case \"" << cur_case << "\", found " << hdr.fcst_lead.n_elements()
+           << " unique FCST_LEAD values, writing maximum: "
            << sec_to_hhmmss(hdr.fcst_lead.max()) << "\n";
    }   
    shc.set_fcst_lead_sec(hdr.fcst_lead.max());
@@ -163,8 +164,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    // OBS_LEAD
    if(hdr.obs_lead.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.obs_lead.n_elements()
-           << " unique values for OBS_LEAD, writing maximum: "
+           << "For case \"" << cur_case << "\", found " << hdr.obs_lead.n_elements()
+           << " unique OBS_LEAD values, writing maximum: "
            << sec_to_hhmmss(hdr.obs_lead.max()) << "\n";
    }   
    shc.set_obs_lead_sec(hdr.obs_lead.max());
@@ -177,8 +178,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    css = write_css(hdr.fcst_var);
    if(hdr.fcst_var.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.fcst_var.n_elements()
-           << " unique values for FCST_VAR, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.fcst_var.n_elements()
+           << " unique FCST_VAR values, writing list: "
            << css << "\n";
    }
    shc.set_fcst_var(css);
@@ -187,8 +188,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    css = write_css(hdr.fcst_lev);
    if(hdr.fcst_lev.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.fcst_lev.n_elements()
-           << " unique values for FCST_LEV, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.fcst_lev.n_elements()
+           << " unique FCST_LEV values, writing list: "
            << css << "\n";
    }
    shc.set_fcst_lev(css);
@@ -197,8 +198,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    css = write_css(hdr.obs_var);
    if(hdr.obs_var.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.obs_var.n_elements()
-           << " unique values for OBS_VAR, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.obs_var.n_elements()
+           << " unique OBS_VAR values, writing list: "
            << css << "\n";
    }
    shc.set_obs_var(css);
@@ -207,8 +208,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    css = write_css(hdr.obs_lev);
    if(hdr.obs_lev.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.obs_lev.n_elements()
-           << " unique values for OBS_LEV, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.obs_lev.n_elements()
+           << " unique OBS_LEV values, writing list: "
            << css << "\n";
    }
    shc.set_obs_lev(css);
@@ -217,8 +218,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    css = write_css(hdr.obtype);
    if(hdr.obtype.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.obtype.n_elements()
-           << " unique values for OBTYPE, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.obtype.n_elements()
+           << " unique OBTYPE values, writing list: "
            << css << "\n";
    }
    shc.set_obtype(css);
@@ -227,8 +228,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    css = write_css(hdr.vx_mask);
    if(hdr.vx_mask.n_elements() > 1) {
       mlog << Debug(3)
-           << "Found " << hdr.vx_mask.n_elements()
-           << " unique values for VX_MASK, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.vx_mask.n_elements()
+           << " unique VX_MASK values, writing list: "
            << css << "\n";
    }
    shc.set_mask(css);
@@ -236,8 +237,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    // INTERP_MTHD
    if(hdr.interp_mthd.n_elements() > 1) {
       mlog << Warning
-           << "Found " << hdr.interp_mthd.n_elements()
-           << " unique values for INTERP_MTHD, writing "
+           << "For case \"" << cur_case << "\", found " << hdr.interp_mthd.n_elements()
+           << " unique INTERP_MTHD values, writing "
            << na_str << ".\n";
       shc.set_interp_mthd(InterpMthd_None);
    }
@@ -248,8 +249,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    // INTERP_MTHD
    if(hdr.interp_pnts.n_elements() > 1) {
       mlog << Warning
-           << "Found " << hdr.interp_pnts.n_elements()
-           << " unique values for INTERP_PNTS, writing "
+           << "For case \"" << cur_case << "\", found " << hdr.interp_pnts.n_elements()
+           << " unique INTERP_PNTS values, writing "
            << na_str << ".\n";
       shc.set_interp_wdth(bad_data_int);
    }
@@ -261,8 +262,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    shc.set_fcst_thresh(hdr.fcst_thresh);
    if(hdr.fcst_thresh.n_elements() > 1) {
       mlog << Warning
-           << "Found " << hdr.fcst_thresh.n_elements()
-           << " unique values for FCST_THRESH, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.fcst_thresh.n_elements()
+           << " unique FCST_THRESH values, writing list: "
            << shc.get_fcst_thresh_str() << "\n";
    }
 
@@ -270,16 +271,16 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    shc.set_obs_thresh(hdr.obs_thresh);
    if(hdr.obs_thresh.n_elements() > 1) {
       mlog << Warning
-           << "Found " << hdr.obs_thresh.n_elements()
-           << " unique values for OBS_THRESH, writing list: "
+           << "For case \"" << cur_case << "\", found " << hdr.obs_thresh.n_elements()
+           << " unique OBS_THRESH values, writing list: "
            << shc.get_obs_thresh_str() << "\n";
    }
 
    // COV_THRESH
    if(hdr.cov_thresh.n_elements() > 1) {
       mlog << Warning
-           << "Found " << hdr.cov_thresh.n_elements()
-           << " unique values for COV_THRESH, writing "
+           << "For case \"" << cur_case << "\", found " << hdr.cov_thresh.n_elements()
+           << " unique COV_THRESH values, writing "
            << na_str << ".\n";
       SingleThresh na_thresh;
       shc.set_cov_thresh(na_thresh);
@@ -291,8 +292,8 @@ void stat_hdr_info_to_cols(const StatHdrInfo &hdr, StatHdrColumns &shc) {
    // ALPHA
    if(hdr.alpha.n_elements() > 1) {
       mlog << Warning
-           << "Found " << hdr.alpha.n_elements()
-           << " unique values for ALPHA, writing "
+           << "For case \"" << cur_case << "\", found " << hdr.alpha.n_elements()
+           << " unique ALPHA values, writing "
            << na_str << ".\n";
       shc.set_alpha(bad_data_int);
    }
