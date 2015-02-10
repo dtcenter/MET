@@ -6,8 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -78,6 +76,8 @@ void STATAnalysisJob::init_from_scratch() {
    dump_row  = (char *)     0;
    dr_out    = (ofstream *) 0;
    n_dump    =              0;
+   stat_file = (char *)     0;
+   stat_out  = (ofstream *) 0;
    mask_grid = (char *)     0;
    mask_poly = (char *)     0;
    boot_rng  = (char *)     0;
@@ -158,10 +158,11 @@ void STATAnalysisJob::clear() {
 
    column_case.clear();
 
-   if(dump_row) { delete [] dump_row; dump_row = (char *)    0; }
-
    close_dump_row_file();
+   close_stat_file();
 
+   if(dump_row)  { delete [] dump_row;  dump_row  = (char *) 0; }
+   if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
    if(mask_grid) { delete [] mask_grid; mask_grid = (char *) 0; }
    if(mask_poly) { delete [] mask_poly; mask_poly = (char *) 0; }
 
@@ -268,6 +269,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    vif_flag             = aj.vif_flag;
 
    set_dump_row (aj.dump_row);
+   set_stat_file(aj.stat_file);
    set_mask_grid(aj.mask_grid);
    set_mask_poly(aj.mask_poly);
    set_boot_rng (aj.boot_rng);
@@ -397,6 +399,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "dump_row = "
        << dump_row << "\n";
+
+   out << prefix << "stat_file = "
+       << stat_file << "\n";
 
    out << prefix << "mask_grid = "
        << (mask_grid ? mask_grid : na_str) << "\n";
@@ -1029,6 +1034,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          set_dump_row(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-out_stat") == 0) {
+         set_stat_file(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-mask_grid") == 0) {
          set_mask_grid(jc_array[i+1]);
          i++;
@@ -1138,6 +1147,20 @@ void STATAnalysisJob::set_dump_row(const char *c) {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::set_stat_file(const char *c) {
+
+   if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
+
+   if(!c) return;
+
+   stat_file = new char [strlen(c) + 1];
+
+   strcpy(stat_file, c);
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1241,6 +1264,144 @@ void STATAnalysisJob::close_dump_row_file() {
       delete dr_out;
       dr_out = (ofstream *) 0;
       n_dump = 0;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::open_stat_file() {
+
+   close_stat_file();
+
+   if(!stat_file) return;
+
+   stat_out = new ofstream;
+   stat_out->open(stat_file);
+
+   if(!(*stat_out)) {
+      mlog << Error << "\nSTATAnalysisJob::open_stat_file()-> "
+           << "can't open the output STAT file \"" << stat_file
+           << "\" for writing!\n\n";
+
+      throw(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::setup_stat_file(const STATLineType lt,
+                                      int n_row, int n) {
+   int n_col;
+
+   //
+   // Nothing to do unless output STAT file stream is defined
+   //
+   if(!stat_out) return;
+   
+   //
+   // Determine the number of output columns
+   //
+   n_col = n_header_columns;
+   switch(lt) {
+      case stat_sl1l2:  n_col += n_sl1l2_columns;        break;
+      case stat_sal1l2: n_col += n_sal1l2_columns;       break;
+      case stat_vl1l2:  n_col += n_vl1l2_columns;        break;
+      case stat_val1l2: n_col += n_val1l2_columns;       break;
+      case stat_fho:    n_col += n_fho_columns;          break;
+      case stat_ctc:    n_col += n_ctc_columns;          break;
+      case stat_cts:    n_col += n_cts_columns;          break;
+      case stat_mctc:   n_col += get_n_mctc_columns(n);  break;
+      case stat_mcts:   n_col += n_mcts_columns;         break;
+      case stat_cnt:    n_col += n_cnt_columns;          break;
+      case stat_pct:    n_col += get_n_pct_columns(n);   break;
+      case stat_pstd:   n_col += get_n_pstd_columns(n);  break;
+      case stat_pjc:    n_col += get_n_pjc_columns(n);   break;
+      case stat_prc:    n_col += get_n_prc_columns(n);   break;
+      case stat_mpr:    n_col += n_mpr_columns;          break;
+      case stat_nbrctc: n_col += n_nbrctc_columns;       break;
+      case stat_nbrcts: n_col += n_nbrcts_columns;       break;
+      case stat_nbrcnt: n_col += n_nbrcnt_columns;       break;
+      case stat_isc:    n_col += n_isc_columns;          break;
+      case stat_wdir:   n_col += n_job_wdir_columns;     break;
+      case stat_rhist:  n_col += get_n_rhist_columns(n); break;
+      case stat_phist:  n_col += get_n_phist_columns(n); break;
+      case stat_orank:  n_col += n_orank_columns;        break;
+      case stat_ssvar:  n_col += n_ssvar_columns;        break;
+      default:
+         mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
+              << "unexpected stat line type \"" << statlinetype_to_string(lt)
+              << "\"!\n\n";
+         exit(1);
+         break;
+   }
+
+   //
+   // Setup the STAT table
+   //
+   stat_at.set_size(n_row, n_col);
+   justify_stat_cols(stat_at);
+   stat_at.set_precision(default_precision);
+   stat_at.set_bad_data_value(bad_data_double);
+   stat_at.set_bad_data_str(na_str);
+   stat_at.set_delete_trailing_blank_rows(1);
+
+   //
+   // Write the STAT header row
+   //
+   switch(lt) {
+      case stat_sl1l2:  write_header_row       (sl1l2_columns, n_sl1l2_columns, 1,       stat_at, 0, 0); break;
+      case stat_sal1l2: write_header_row       (sal1l2_columns, n_sal1l2_columns, 1,     stat_at, 0, 0); break;
+      case stat_vl1l2:  write_header_row       (vl1l2_columns, n_vl1l2_columns, 1,       stat_at, 0, 0); break;
+      case stat_val1l2: write_header_row       (val1l2_columns, n_val1l2_columns, 1,     stat_at, 0, 0); break;
+      case stat_fho:    write_header_row       (fho_columns, n_fho_columns, 1,           stat_at, 0, 0); break;
+      case stat_ctc:    write_header_row       (ctc_columns, n_ctc_columns, 1,           stat_at, 0, 0); break;
+      case stat_cts:    write_header_row       (cts_columns, n_cts_columns, 1,           stat_at, 0, 0); break;
+      case stat_mctc:   write_mctc_header_row  (1, n,                                    stat_at, 0, 0); break;
+      case stat_mcts:   write_header_row       (mcts_columns, n_mcts_columns, 1,         stat_at, 0, 0); break;
+      case stat_cnt:    write_header_row       (cnt_columns, n_cnt_columns, 1,           stat_at, 0, 0); break;
+      case stat_pct:    write_pct_header_row   (1, n,                                    stat_at, 0, 0); break;
+      case stat_pstd:   write_pstd_header_row  (1, n,                                    stat_at, 0, 0); break;
+      case stat_pjc:    write_pjc_header_row   (1, n,                                    stat_at, 0, 0); break;
+      case stat_prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
+      case stat_mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
+      case stat_nbrctc: write_header_row       (nbrctc_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+      case stat_nbrcts: write_header_row       (nbrcts_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+      case stat_nbrcnt: write_header_row       (nbrcnt_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+      case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
+      case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
+      case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
+      case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
+      case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
+      case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
+      default:
+         mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
+              << "unexpected stat line type \"" << statlinetype_to_string(lt)
+              << "\"!\n\n";
+         exit(1);
+         break;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::close_stat_file() {
+
+   if(stat_out) {
+      
+      //
+      // Write any remaining lines
+      //
+      *(stat_out) << stat_at;
+
+      stat_out->close();
+      delete stat_out;
+      stat_out = (ofstream *) 0;
    }
 
    return;
@@ -1623,6 +1784,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // dump_row
    if(dump_row) js << "-dump_row " << dump_row << " ";
 
+   // out_stat
+   if(stat_file) js << "-out_stat " << stat_file << " ";
+   
    // mask_grid
    if(mask_grid) js << "-mask_grid " << mask_grid << " ";
 
