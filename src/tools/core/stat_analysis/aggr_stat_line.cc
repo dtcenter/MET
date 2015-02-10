@@ -50,6 +50,9 @@ using namespace std;
 
 extern bool is_precip_var_name(const ConcatString &s);
 extern ConcatString write_css(const StringArray &sa);
+extern ConcatString write_css(const ThreshArray &sa);
+extern ConcatString write_css(const NumArray &na);
+extern ConcatString write_css_hhmmss(const NumArray &na);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -142,18 +145,19 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    css = write_css(hdr.model);
    if(hdr.model.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.model.n_elements()
-           << " unique MODEL values, writing list: "
-           << css << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.model.n_elements()
+           << " unique MODEL values: " << css << "\n";
    }
    shc.set_model(css);
    
    // FCST_LEAD
+   css = write_css_hhmmss(hdr.fcst_lead);
    if(hdr.fcst_lead.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.fcst_lead.n_elements()
-           << " unique FCST_LEAD values, writing maximum: "
-           << sec_to_hhmmss(hdr.fcst_lead.max()) << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.fcst_lead.n_elements()
+           << " unique FCST_LEAD values: " << css << "\n";
    }   
    shc.set_fcst_lead_sec(hdr.fcst_lead.max());
    
@@ -162,11 +166,12 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    shc.set_fcst_valid_end(hdr.fcst_valid_end);
    
    // OBS_LEAD
+   css = write_css_hhmmss(hdr.obs_lead);
    if(hdr.obs_lead.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.obs_lead.n_elements()
-           << " unique OBS_LEAD values, writing maximum: "
-           << sec_to_hhmmss(hdr.obs_lead.max()) << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.obs_lead.n_elements()
+           << " unique OBS_LEAD values: " << css << "\n";
    }   
    shc.set_obs_lead_sec(hdr.obs_lead.max());
    
@@ -178,9 +183,9 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    css = write_css(hdr.fcst_var);
    if(hdr.fcst_var.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.fcst_var.n_elements()
-           << " unique FCST_VAR values, writing list: "
-           << css << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.fcst_var.n_elements()
+           << " unique FCST_VAR values: " << css << "\n";
    }
    shc.set_fcst_var(css);
 
@@ -188,9 +193,9 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    css = write_css(hdr.fcst_lev);
    if(hdr.fcst_lev.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.fcst_lev.n_elements()
-           << " unique FCST_LEV values, writing list: "
-           << css << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.fcst_lev.n_elements()
+           << " unique FCST_LEV values: " << css << "\n";
    }
    shc.set_fcst_lev(css);
    
@@ -198,9 +203,9 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    css = write_css(hdr.obs_var);
    if(hdr.obs_var.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.obs_var.n_elements()
-           << " unique OBS_VAR values, writing list: "
-           << css << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.obs_var.n_elements()
+           << " unique OBS_VAR values: " << css << "\n";
    }
    shc.set_obs_var(css);
 
@@ -208,9 +213,9 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    css = write_css(hdr.obs_lev);
    if(hdr.obs_lev.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.obs_lev.n_elements()
-           << " unique OBS_LEV values, writing list: "
-           << css << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.obs_lev.n_elements()
+           << " unique OBS_LEV values: " << css << "\n";
    }
    shc.set_obs_lev(css);
 
@@ -218,9 +223,9 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    css = write_css(hdr.obtype);
    if(hdr.obtype.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.obtype.n_elements()
-           << " unique OBTYPE values, writing list: "
-           << css << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.obtype.n_elements()
+           << " unique OBTYPE values: " << css << "\n";
    }
    shc.set_obtype(css);
 
@@ -228,30 +233,32 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    css = write_css(hdr.vx_mask);
    if(hdr.vx_mask.n_elements() > 1) {
       mlog << Debug(3)
-           << "For case \"" << cur_case << "\", found " << hdr.vx_mask.n_elements()
-           << " unique VX_MASK values, writing list: "
-           << css << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.vx_mask.n_elements()
+           << " unique VX_MASK values: " << css << "\n";
    }
    shc.set_mask(css);
 
    // INTERP_MTHD
+   css = write_css(hdr.interp_mthd);
    if(hdr.interp_mthd.n_elements() > 1) {
       mlog << Warning
-           << "For case \"" << cur_case << "\", found " << hdr.interp_mthd.n_elements()
-           << " unique INTERP_MTHD values, writing "
-           << na_str << ".\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.interp_mthd.n_elements()
+           << " unique INTERP_MTHD values: " << css << ".\n";
       shc.set_interp_mthd(InterpMthd_None);
    }
    else {
       shc.set_interp_mthd(string_to_interpmthd(hdr.interp_mthd[0]));
    }
    
-   // INTERP_MTHD
+   // INTERP_PNTS
+   css = write_css(hdr.interp_pnts);
    if(hdr.interp_pnts.n_elements() > 1) {
       mlog << Warning
-           << "For case \"" << cur_case << "\", found " << hdr.interp_pnts.n_elements()
-           << " unique INTERP_PNTS values, writing "
-           << na_str << ".\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.interp_pnts.n_elements()
+           << " unique INTERP_PNTS values: " << css << ".\n";
       shc.set_interp_wdth(bad_data_int);
    }
    else {
@@ -259,29 +266,32 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    }
 
    // FCST_THRESH
-   shc.set_fcst_thresh(hdr.fcst_thresh);
+   css = write_css(hdr.fcst_thresh);
    if(hdr.fcst_thresh.n_elements() > 1) {
       mlog << Warning
-           << "For case \"" << cur_case << "\", found " << hdr.fcst_thresh.n_elements()
-           << " unique FCST_THRESH values, writing list: "
-           << shc.get_fcst_thresh_str() << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.fcst_thresh.n_elements()
+           << " unique FCST_THRESH values: " << css << "\n";
    }
+   shc.set_fcst_thresh(hdr.fcst_thresh);
 
    // OBS_THRESH
-   shc.set_obs_thresh(hdr.obs_thresh);
+   css = write_css(hdr.obs_thresh);
    if(hdr.obs_thresh.n_elements() > 1) {
       mlog << Warning
-           << "For case \"" << cur_case << "\", found " << hdr.obs_thresh.n_elements()
-           << " unique OBS_THRESH values, writing list: "
-           << shc.get_obs_thresh_str() << "\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.obs_thresh.n_elements()
+           << " unique OBS_THRESH values: " << css << "\n";
    }
+   shc.set_obs_thresh(hdr.obs_thresh);
 
    // COV_THRESH
+   css = write_css(hdr.cov_thresh);
    if(hdr.cov_thresh.n_elements() > 1) {
       mlog << Warning
-           << "For case \"" << cur_case << "\", found " << hdr.cov_thresh.n_elements()
-           << " unique COV_THRESH values, writing "
-           << na_str << ".\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.cov_thresh.n_elements()
+           << " unique COV_THRESH values: " << css << ".\n";
       SingleThresh na_thresh;
       shc.set_cov_thresh(na_thresh);
    }
@@ -290,11 +300,12 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    }
 
    // ALPHA
+   css = write_css(hdr.alpha);
    if(hdr.alpha.n_elements() > 1) {
       mlog << Warning
-           << "For case \"" << cur_case << "\", found " << hdr.alpha.n_elements()
-           << " unique ALPHA values, writing "
-           << na_str << ".\n";
+           << "For case \"" << cur_case << "\", found "
+           << hdr.alpha.n_elements()
+           << " unique ALPHA values: " << css << ".\n";
       shc.set_alpha(bad_data_int);
    }
    else {
@@ -315,6 +326,42 @@ ConcatString write_css(const StringArray &sa) {
    
    for(int i=0; i<sa.n_elements(); i++) {
       css << (i == 0 ? "" : ",") << sa[i];
+   }
+
+   return(css);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString write_css(const ThreshArray &ta) {
+   ConcatString css;
+   
+   for(int i=0; i<ta.n_elements(); i++) {
+      css << (i == 0 ? "" : ",") << ta[i].get_str();
+   }
+
+   return(css);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString write_css(const NumArray &na) {
+   ConcatString css;
+   
+   for(int i=0; i<na.n_elements(); i++) {
+      css << (i == 0 ? "" : ",") << na[i];
+   }
+
+   return(css);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString write_css_hhmmss(const NumArray &na) {
+   ConcatString css;
+   
+   for(int i=0; i<na.n_elements(); i++) {
+      css << (i == 0 ? "" : ",") << sec_to_hhmmss(na[i]);
    }
 
    return(css);
