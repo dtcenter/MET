@@ -1044,8 +1044,8 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
+      stat_hdr_info_to_cols(it->first, it->second.hdr, shc);
       if(j.stat_out) {
-         stat_hdr_info_to_cols(it->first, it->second.hdr, shc);
          if(lt == stat_cts || lt == stat_nbrcts) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
       }
