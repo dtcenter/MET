@@ -113,6 +113,7 @@ class STATAnalysisJob {
 
       int  set_job_type (const char *);
       void set_dump_row (const char *);
+      void set_stat_file(const char *);
       void set_mask_grid(const char *);
       void set_mask_poly(const char *);
       void set_boot_rng (const char *);
@@ -121,6 +122,10 @@ class STATAnalysisJob {
       void open_dump_row_file ();
       void close_dump_row_file();
       void dump_stat_line     (const STATLine &);
+
+      void open_stat_file ();
+      void setup_stat_file(const STATLineType lt, int n_row, int n);
+      void close_stat_file();
 
       ConcatString get_case_info(const STATLine &) const;
 
@@ -200,6 +205,11 @@ class STATAnalysisJob {
       ofstream    *dr_out;   // output file stream for dump row
       int         n_dump;    // number of lines written to dump row
       AsciiTable  dump_at;   // AsciiTable for buffering dump row data
+
+      char        *stat_file; // dump output statistics to a STAT file
+      ofstream    *stat_out;  // output file stream for -out_stat
+      AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
+      
 
       STATLineType out_line_type;        // output line type
       ThreshArray  out_fcst_thresh;      // output forecast threshold(s)

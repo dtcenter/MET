@@ -142,10 +142,18 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    // If the -dump_row option was supplied, open the file
    //
    if(j.dump_row) {
-
-      mlog << Debug(1) << "Creating STAT output file \"" << j.dump_row
+      mlog << Debug(1) << "Creating dump row output file \"" << j.dump_row
            << "\"\n";
       j.open_dump_row_file();
+   }
+
+   //
+   // If the -out_stat option was supplied, open the file
+   //
+   if(j.stat_file) {
+      mlog << Debug(1) << "Creating STAT output file \"" << j.stat_file
+           << "\"\n";
+      j.open_stat_file();
    }
 
    //
@@ -208,9 +216,14 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
         << n_in << " STAT lines.\n";
 
    //
-   // If an output file was created, close it
+   // If an output dump row file was created, close it
    //
    if(j.dr_out) j.close_dump_row_file();
+
+   //
+   // If an output STAT file was created, close it
+   //
+   if(j.stat_out) j.close_stat_file();
 
    //
    // Close the input file stream
@@ -951,14 +964,14 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Write the Ascii Table and the job command line
+   // Write the ASCII Table and the job command line
    //
    write_jobstring(jobstring, sa_out);
    write_table(out_at, sa_out);
 
    return;
 }
-
+   
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
@@ -991,6 +1004,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    map<ConcatString, AggrCTCInfo>::iterator it;
    int n_row, n_col, r, c;
    NBRCTSInfo nbrcts_info;
+   StatHdrColumns shc;
 
    //
    // Setup the output table
@@ -1005,7 +1019,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
-   // Write the rest of the header row
+   // Write the output header row
    //
    c = 1 + j.column_case.n_elements();
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
@@ -1014,6 +1028,11 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_nbrctc) write_header_row(nbrctc_columns, n_nbrctc_columns, 0, at, 0, c);
    else if(lt == stat_nbrcts) write_header_row(nbrcts_columns, n_nbrcts_columns, 0, at, 0, c);
 
+   //
+   // Setup the output STAT file
+   //
+   j.setup_stat_file(lt, n_row, 0);
+
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
 
@@ -1021,6 +1040,15 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    // Loop through the map
    //
    for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      if(j.stat_out) {
+         stat_hdr_info_to_cols(it->first, it->second.hdr, shc);
+         if(lt == stat_cts || lt == stat_nbrcts) shc.set_alpha(j.out_alpha);
+         write_header_cols(shc, j.stat_at, r);
+      }
 
       //
       // Initialize
@@ -1034,6 +1062,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, "FHO:");
          write_case_cols(it->first, at, r, c);
          write_fho_cols(it->second.cts_info, at, r, c);
+         if(j.stat_out) write_fho_cols(it->second.cts_info, j.stat_at, r, n_header_columns);
       }
       //
       // CTC output line
@@ -1042,6 +1071,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, "CTC:");
          write_case_cols(it->first, at, r, c);
          write_ctc_cols(it->second.cts_info, at, r, c);
+         if(j.stat_out) write_ctc_cols(it->second.cts_info, j.stat_at, r, n_header_columns);
       }
       //
       // CTS output line
@@ -1067,6 +1097,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, "CTS:");
          write_case_cols(it->first, at, r, c);
          write_cts_cols(it->second.cts_info, 0, at, r, c);
+         if(j.stat_out) write_cts_cols(it->second.cts_info, 0, j.stat_at, r, n_header_columns);
       }
       //
       // NBRCTC output line
@@ -1079,6 +1110,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, "NBRCTC:");
          write_case_cols(it->first, at, r, c);
          write_nbrctc_cols(nbrcts_info, at, r, c);
+         if(j.stat_out) write_nbrctc_cols(nbrcts_info, j.stat_at, r, n_header_columns);
       }
       //
       // NBRCTS output line
@@ -1107,6 +1139,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, "NBRCTS:");
          write_case_cols(it->first, at, r, c);
          write_nbrcts_cols(nbrcts_info, 0, at, r, c);
+         if(j.stat_out) write_nbrcts_cols(nbrcts_info, 0, j.stat_at, r, n_header_columns);
       }
    } // end for it
 
@@ -1120,6 +1153,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
                          AsciiTable &at) {
    map<ConcatString, AggrMCTCInfo>::iterator it;
    int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
 
    //
    // Determine the maximum MCTC dimension
@@ -1202,6 +1236,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
                         AsciiTable &at) {
    map<ConcatString, AggrPCTInfo>::iterator it;
    int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
    
    //
    // Determine the maximum PCT dimension
@@ -1304,6 +1339,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
                          AsciiTable &at) {
    map<ConcatString, AggrPSumInfo>::iterator it;
    int n_row, n_col, r, c;
+   StatHdrColumns shc;
 
    //
    // Setup the output table
@@ -1427,6 +1463,7 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
    int i, n, n_row, n_col, r, c, count;
    double uf, vf, uo, vo, fbar, obar;
    double angle, me, mae;
+   StatHdrColumns shc;
 
    //
    // Setup the output table
@@ -1594,6 +1631,7 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
                           AsciiTable &at) {
    map<ConcatString, AggrRHISTInfo>::iterator it;
    int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
 
    //
    // Determine the maximum number of ranks
@@ -1646,6 +1684,7 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
                           AsciiTable &at) {
    map<ConcatString, AggrPHISTInfo>::iterator it;
    int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
 
    //
    // Determine the maximum number of bins
@@ -1700,6 +1739,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
    map<ConcatString, SSVARInfo>::iterator bin_it;
    int i, n, n_row, n_col, r, c;
    CNTInfo cnt_info;
+   StatHdrColumns shc;
 
    //
    // Allocate space for confidence intervals and derive continuous
@@ -1816,6 +1856,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
                           AsciiTable &at) {
    map<ConcatString, AggrORANKInfo>::iterator it;
    int n_rhist, n_phist, n_row, n_col, r, c;
+   StatHdrColumns shc;
 
    //
    // Determine the maximum number of ranks
@@ -1883,6 +1924,7 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
                         AsciiTable &at) {
    map<ConcatString, AggrISCInfo>::iterator it;
    int i, n, n_row, n_col, r, c;
+   StatHdrColumns shc;
    
    //
    // Determine the maximum number of scales
@@ -1933,6 +1975,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
                         gsl_rng *rng_ptr) {
    map<ConcatString, AggrMPRInfo>::iterator it;
    int n_row, n_col, r, c;
+   StatHdrColumns shc;
 
    CTSInfo   cts_info;
    MCTSInfo  mcts_info;
@@ -2829,5 +2872,5 @@ void write_case_cols(const ConcatString &cs, AsciiTable &at,
 
    return;
 }
-           
+
 ////////////////////////////////////////////////////////////////////////
