@@ -191,6 +191,9 @@ class STATAnalysisJob {
 
       map<ConcatString,StringArray> column_str_map;
 
+      StringArray hdr_name;
+      StringArray hdr_value;
+
       //
       // Store the case information for the -by option
       //
