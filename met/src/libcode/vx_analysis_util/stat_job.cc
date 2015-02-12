@@ -1044,6 +1044,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i+=2;
       }
       else if(strcmp(jc_array[i], "-set_hdr") == 0) {
+         n = get_column_offset ((const char **) 0, 0, to_upper(jc_array[i+1]));
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;
