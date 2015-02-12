@@ -96,6 +96,7 @@ void STATAnalysisJob::init_from_scratch() {
    column_min_name.set_ignore_case(1);
    column_max_name.set_ignore_case(1);
    column_case.set_ignore_case(1);
+   hdr_name.set_ignore_case(1);
 
    clear();
 
@@ -157,6 +158,9 @@ void STATAnalysisJob::clear() {
    column_str_map.clear();
 
    column_case.clear();
+
+   hdr_name.clear();
+   hdr_value.clear();
 
    close_dump_row_file();
    close_stat_file();
@@ -251,6 +255,9 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    column_str_map       = aj.column_str_map;
 
    column_case          = aj.column_case;
+
+   hdr_name             = aj.hdr_name;
+   hdr_value            = aj.hdr_value;
 
    out_line_type        = aj.out_line_type;
 
@@ -396,6 +403,12 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "column_case ...\n";
    column_case.dump(out, depth + 1);
+
+   out << prefix << "hdr_name ...\n";
+   hdr_name.dump(out, depth + 1);
+
+   out << prefix << "hdr_value ...\n";
+   hdr_value.dump(out, depth + 1);
 
    out << prefix << "dump_row = "
        << dump_row << "\n";
@@ -841,6 +854,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-column_str"     ) == 0) {
          column_str_map.clear();
       }
+      else if(strcmp(jc_array[i], "-set_hdr"     ) == 0) {
+         hdr_name.clear();
+         hdr_value.clear();
+      }
       else if(strcmp(jc_array[i], "-by"             ) == 0) {
          column_case.clear();
       }
@@ -1024,6 +1041,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          else {
             column_str_map.insert(pair<ConcatString, StringArray>(col_name, col_value));
          }
+         i+=2;
+      }
+      else if(strcmp(jc_array[i], "-set_hdr") == 0) {
+         hdr_name.add_css(to_upper(jc_array[i+1]));
+         hdr_value.add_css(jc_array[i+2]);
          i+=2;
       }
       else if(strcmp(jc_array[i], "-by") == 0) {
@@ -1779,6 +1801,13 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    if(column_case.n_elements() > 0) {
       for(i=0; i<column_case.n_elements(); i++)
          js << "-by " << column_case[i] << " ";
+   }
+
+   // set_hdr
+   if(hdr_name.n_elements() > 0) {
+      for(i=0; i<hdr_name.n_elements(); i++)
+         js << "-set_hdr " << hdr_name[i]
+            << " " << hdr_value[i] << " ";
    }
 
    // dump_row
