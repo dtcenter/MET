@@ -143,7 +143,10 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
                            const StringArray &hdr_value,
                            StatHdrColumns &shc) {
    ConcatString css;
-   int index;
+   InterpMthd mthd;
+   double alpha;
+   SingleThresh thresh;
+   int index, wdth;
 
    // MODEL
    css = write_css(hdr.model);
@@ -307,7 +310,7 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
    else {
       shc.set_mask(css);
    }
-   
+
    // INTERP_MTHD
    css = write_css(hdr.interp_mthd);
    if(hdr.interp_mthd.n_elements() > 1) {
@@ -315,22 +318,23 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << "For case \"" << cur_case << "\", found "
            << hdr.interp_mthd.n_elements()
            << " unique INTERP_MTHD values: " << css << ".\n";
-      if(hdr_name.has("INTERP_MTHD", index)) {
-         shc.set_interp_mthd(string_to_interpmthd(hdr_value[index]));
-      }
-      else {
-         shc.set_interp_mthd(InterpMthd_None);
-      }
+      mthd = InterpMthd_None;
    }
    else {
-      if(hdr_name.has("INTERP_MTHD", index)) {
-         shc.set_interp_mthd(string_to_interpmthd(hdr_value[index]));
-      }
-      else {
-         shc.set_interp_mthd(string_to_interpmthd(hdr.interp_mthd[0]));
-      }
+      mthd = string_to_interpmthd(hdr.interp_mthd[0]);
    }
    
+   if(hdr_name.has("INTERP_MTHD", index)) {
+      mthd = string_to_interpmthd(to_upper(hdr_value[index]));
+      if(mthd == InterpMthd_None) {
+         mlog << Error << "\nstat_hdr_info_to_cols() -> "
+              << "invalid interpolation method specified: "
+              << hdr_value[index] << "\n\n";
+         exit(1);
+      }
+   }
+   shc.set_interp_mthd(mthd);
+
    // INTERP_PNTS
    css = write_css(hdr.interp_pnts);
    if(hdr.interp_pnts.n_elements() > 1) {
@@ -338,21 +342,16 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << "For case \"" << cur_case << "\", found "
            << hdr.interp_pnts.n_elements()
            << " unique INTERP_PNTS values: " << css << ".\n";
-      if(hdr_name.has("INTERP_PNTS", index)) {
-         shc.set_interp_wdth(atoi(hdr_value[index]));
-      }
-      else {
-         shc.set_interp_wdth(bad_data_int);
-      }
+      wdth = bad_data_int;
    }
    else {
-      if(hdr_name.has("INTERP_PNTS", index)) {
-         shc.set_interp_wdth(atoi(hdr_value[index]));
-      }
-      else {
-         shc.set_interp_wdth(nint(sqrt(hdr.interp_pnts[0])));
-      }
+      wdth = nint(sqrt(hdr.interp_pnts[0]));
    }
+   
+   if(hdr_name.has("INTERP_PNTS", index)) {
+      wdth = nint(sqrt(atoi(hdr_value[index])));
+   }
+   shc.set_interp_wdth(wdth);
 
    // FCST_THRESH
    css = write_css(hdr.fcst_thresh);
@@ -391,22 +390,16 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << "For case \"" << cur_case << "\", found "
            << hdr.cov_thresh.n_elements()
            << " unique COV_THRESH values: " << css << ".\n";
-      SingleThresh na_thresh;
-      if(hdr_name.has("COV_THRESH", index)) {
-         shc.set_cov_thresh(hdr_value[index]);
-      }
-      else {
-         shc.set_cov_thresh(na_thresh);
-      }
+      thresh.clear();
    }
    else {
-     if(hdr_name.has("COV_THRESH", index)) {
-        shc.set_cov_thresh(hdr_value[index]);
-     }
-     else {
-        shc.set_cov_thresh(hdr.cov_thresh[0]);
-     }
+      thresh = hdr.cov_thresh[0];
    }
+
+   if(hdr_name.has("COV_THRESH", index)) {
+      thresh.set(hdr_value[index]);
+   }
+   shc.set_cov_thresh(thresh);
 
    // ALPHA
    css = write_css(hdr.alpha);
@@ -415,21 +408,16 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << "For case \"" << cur_case << "\", found "
            << hdr.alpha.n_elements()
            << " unique ALPHA values: " << css << ".\n";
-      if(hdr_name.has("ALPHA", index)) {
-         shc.set_alpha(atof(hdr_value[index]));
-      }
-      else {
-         shc.set_alpha(bad_data_int);
-      }
+      alpha = bad_data_double;
    }
    else {
-     if(hdr_name.has("ALPHA", index)) {
-        shc.set_alpha(atof(hdr_value[index]));
-     }
-     else {
-        shc.set_alpha(hdr.alpha[0]);
-     }
+      alpha = hdr.alpha[0];
    }
+
+   if(hdr_name.has("ALPHA", index)) {
+      alpha = atof(hdr_value[index]);
+   }
+   shc.set_alpha(alpha);
 
    return;
 }
