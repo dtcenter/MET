@@ -139,173 +139,173 @@ void add_stat_hdr_info(StatHdrInfo &hdr, const STATLine &line) {
 
 void stat_hdr_info_to_cols(const ConcatString &cur_case, 
                            const StatHdrInfo &hdr, 
-			   const StringArray &hdr_name,
-			   const StringArray &hdr_value, StatHdrColumns &shc) {
+                           const StringArray &hdr_name,
+                           const StringArray &hdr_value,
+                           StatHdrColumns &shc) {
    ConcatString css;
    int index;
-   
 
    // MODEL
    css = write_css(hdr.model);
    if(hdr.model.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.model.n_elements()
            << " unique MODEL values: " << css << "\n";
    }
    if(hdr_name.has("MODEL", index)) {
-     shc.set_model(hdr_value[index]);
+      shc.set_model(hdr_value[index]);
    }
    else {
-     shc.set_model(css);
+      shc.set_model(css);
    }
    
    // FCST_LEAD
    css = write_css_hhmmss(hdr.fcst_lead);
    if(hdr.fcst_lead.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.fcst_lead.n_elements()
            << " unique FCST_LEAD values: " << css << "\n";
    }   
    if(hdr_name.has("FCST_LEAD", index)) {
-     shc.set_fcst_lead_sec(timestring_to_sec(hdr_value[index]));
+      shc.set_fcst_lead_sec(timestring_to_sec(hdr_value[index]));
    }
    else {
-     shc.set_fcst_lead_sec(hdr.fcst_lead.max());
+      shc.set_fcst_lead_sec(hdr.fcst_lead.max());
    }   
 
    // FCST_VALID_BEG, FCST_VALID_END
    if(hdr_name.has("FCST_VALID_BEG", index)) {
-     shc.set_fcst_valid_beg(timestring_to_unix(hdr_value[index]));
+      shc.set_fcst_valid_beg(timestring_to_unix(hdr_value[index]));
    }
    else {
-     shc.set_fcst_valid_beg(hdr.fcst_valid_beg);
+      shc.set_fcst_valid_beg(hdr.fcst_valid_beg);
    }
    if(hdr_name.has("FCST_VALID_END", index)) {
-     shc.set_fcst_valid_end(timestring_to_unix(hdr_value[index]));
+      shc.set_fcst_valid_end(timestring_to_unix(hdr_value[index]));
    }
    else {
-     shc.set_fcst_valid_end(hdr.fcst_valid_end);
+      shc.set_fcst_valid_end(hdr.fcst_valid_end);
    }
    
    // OBS_LEAD
    css = write_css_hhmmss(hdr.obs_lead);
    if(hdr.obs_lead.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.obs_lead.n_elements()
            << " unique OBS_LEAD values: " << css << "\n";
    }   
    if(hdr_name.has("OBS_LEAD", index)) {
-     shc.set_obs_lead_sec(timestring_to_sec(hdr_value[index]));
+      shc.set_obs_lead_sec(timestring_to_sec(hdr_value[index]));
    }
    else {
-     shc.set_obs_lead_sec(hdr.obs_lead.max());
+      shc.set_obs_lead_sec(hdr.obs_lead.max());
    }
 
    // OBS_VALID_BEG, OBS_VALID_END
    if(hdr_name.has("OBS_VALID_BEG", index)) {
-     shc.set_obs_valid_beg(timestring_to_unix(hdr_value[index]));
+      shc.set_obs_valid_beg(timestring_to_unix(hdr_value[index]));
    }
    else {
-     shc.set_obs_valid_beg(hdr.obs_valid_beg);
+      shc.set_obs_valid_beg(hdr.obs_valid_beg);
    }
    if(hdr_name.has("OBS_VALID_END", index)) {
-     shc.set_obs_valid_end(timestring_to_unix(hdr_value[index]));
+      shc.set_obs_valid_end(timestring_to_unix(hdr_value[index]));
    }
    else {
-     shc.set_obs_valid_end(hdr.obs_valid_end);
+      shc.set_obs_valid_end(hdr.obs_valid_end);
    }
    
    // FCST_VAR
    css = write_css(hdr.fcst_var);
    if(hdr.fcst_var.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.fcst_var.n_elements()
            << " unique FCST_VAR values: " << css << "\n";
    }
    if(hdr_name.has("FCST_VAR", index)) {
-     shc.set_fcst_var(hdr_value[index]);
+      shc.set_fcst_var(hdr_value[index]);
    }
    else {
-     shc.set_fcst_var(css);
+      shc.set_fcst_var(css);
    }
 
    // FCST_LEV
    css = write_css(hdr.fcst_lev);
    if(hdr.fcst_lev.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.fcst_lev.n_elements()
            << " unique FCST_LEV values: " << css << "\n";
    }
    if(hdr_name.has("FCST_LEV", index)) {
-     shc.set_fcst_lev(hdr_value[index]);
+      shc.set_fcst_lev(hdr_value[index]);
    }
    else {
-     shc.set_fcst_lev(css);
+      shc.set_fcst_lev(css);
    }
    
    // OBS_VAR
    css = write_css(hdr.obs_var);
    if(hdr.obs_var.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.obs_var.n_elements()
            << " unique OBS_VAR values: " << css << "\n";
    }
    if(hdr_name.has("OBS_VAR", index)) {
-     shc.set_obs_var(hdr_value[index]);
+      shc.set_obs_var(hdr_value[index]);
    }
    else {
-     shc.set_obs_var(css);
+      shc.set_obs_var(css);
    }
 
    // OBS_LEV
    css = write_css(hdr.obs_lev);
    if(hdr.obs_lev.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.obs_lev.n_elements()
            << " unique OBS_LEV values: " << css << "\n";
    }
    if(hdr_name.has("OBS_LEV", index)) {
-     shc.set_obs_lev(hdr_value[index]);
+      shc.set_obs_lev(hdr_value[index]);
    }
    else {
-     shc.set_obs_lev(css);
+      shc.set_obs_lev(css);
    }
 
    // OBTYPE
    css = write_css(hdr.obtype);
    if(hdr.obtype.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.obtype.n_elements()
            << " unique OBTYPE values: " << css << "\n";
    }
    if(hdr_name.has("OBTYPE", index)) {
-     shc.set_obtype(hdr_value[index]);
+      shc.set_obtype(hdr_value[index]);
    }
    else {
-     shc.set_obtype(css);
+      shc.set_obtype(css);
    }
 
    // VX_MASK
    css = write_css(hdr.vx_mask);
    if(hdr.vx_mask.n_elements() > 1) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
            << hdr.vx_mask.n_elements()
            << " unique VX_MASK values: " << css << "\n";
    }
    if(hdr_name.has("VX_MASK", index)) {
-     shc.set_mask(hdr_value[index]);
+      shc.set_mask(hdr_value[index]);
    }
    else {
-     shc.set_mask(css);
+      shc.set_mask(css);
    }
    
    // INTERP_MTHD
@@ -316,18 +316,18 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << hdr.interp_mthd.n_elements()
            << " unique INTERP_MTHD values: " << css << ".\n";
       if(hdr_name.has("INTERP_MTHD", index)) {
-	shc.set_interp_mthd(string_to_interpmthd(hdr_value[index]));
+         shc.set_interp_mthd(string_to_interpmthd(hdr_value[index]));
       }
       else {
-	shc.set_interp_mthd(InterpMthd_None);
+         shc.set_interp_mthd(InterpMthd_None);
       }
    }
    else {
       if(hdr_name.has("INTERP_MTHD", index)) {
-	shc.set_interp_mthd(string_to_interpmthd(hdr_value[index]));
+         shc.set_interp_mthd(string_to_interpmthd(hdr_value[index]));
       }
       else {
-	shc.set_interp_mthd(string_to_interpmthd(hdr.interp_mthd[0]));
+         shc.set_interp_mthd(string_to_interpmthd(hdr.interp_mthd[0]));
       }
    }
    
@@ -339,18 +339,18 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << hdr.interp_pnts.n_elements()
            << " unique INTERP_PNTS values: " << css << ".\n";
       if(hdr_name.has("INTERP_PNTS", index)) {
-	shc.set_interp_wdth(atoi(hdr_value[index]));
+         shc.set_interp_wdth(atoi(hdr_value[index]));
       }
       else {
-	shc.set_interp_wdth(bad_data_int);
+         shc.set_interp_wdth(bad_data_int);
       }
    }
    else {
       if(hdr_name.has("INTERP_PNTS", index)) {
-	shc.set_interp_wdth(atoi(hdr_value[index]));
+         shc.set_interp_wdth(atoi(hdr_value[index]));
       }
       else {
-	shc.set_interp_wdth(nint(sqrt(hdr.interp_pnts[0])));
+         shc.set_interp_wdth(nint(sqrt(hdr.interp_pnts[0])));
       }
    }
 
@@ -363,12 +363,12 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << " unique FCST_THRESH values: " << css << "\n";
    }
    if(hdr_name.has("FCST_THRESH", index)) {
-     shc.set_fcst_thresh(hdr_value[index]);
+      shc.set_fcst_thresh(hdr_value[index]);
    }
    else {
-     shc.set_fcst_thresh(hdr.fcst_thresh);
+      shc.set_fcst_thresh(hdr.fcst_thresh);
    }
-      
+
    // OBS_THRESH
    css = write_css(hdr.obs_thresh);
    if(hdr.obs_thresh.n_elements() > 1) {
@@ -378,10 +378,10 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << " unique OBS_THRESH values: " << css << "\n";
    }
    if(hdr_name.has("OBS_THRESH", index)) {
-     shc.set_obs_thresh(hdr_value[index]);
+      shc.set_obs_thresh(hdr_value[index]);
    }
    else {
-     shc.set_obs_thresh(hdr.obs_thresh);
+      shc.set_obs_thresh(hdr.obs_thresh);
    }
 
    // COV_THRESH
@@ -393,18 +393,18 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << " unique COV_THRESH values: " << css << ".\n";
       SingleThresh na_thresh;
       if(hdr_name.has("COV_THRESH", index)) {
-	shc.set_cov_thresh(hdr_value[index]);
+         shc.set_cov_thresh(hdr_value[index]);
       }
       else {
-	shc.set_cov_thresh(na_thresh);
+         shc.set_cov_thresh(na_thresh);
       }
    }
    else {
      if(hdr_name.has("COV_THRESH", index)) {
-       shc.set_cov_thresh(hdr_value[index]);
+        shc.set_cov_thresh(hdr_value[index]);
      }
      else {
-       shc.set_cov_thresh(hdr.cov_thresh[0]);
+        shc.set_cov_thresh(hdr.cov_thresh[0]);
      }
    }
 
@@ -416,18 +416,18 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
            << hdr.alpha.n_elements()
            << " unique ALPHA values: " << css << ".\n";
       if(hdr_name.has("ALPHA", index)) {
-	shc.set_alpha(atof(hdr_value[index]));
+         shc.set_alpha(atof(hdr_value[index]));
       }
       else {
-	shc.set_alpha(bad_data_int);
+         shc.set_alpha(bad_data_int);
       }
    }
    else {
      if(hdr_name.has("ALPHA", index)) {
-       shc.set_alpha(atof(hdr_value[index]));
+        shc.set_alpha(atof(hdr_value[index]));
      }
      else {
-       shc.set_alpha(hdr.alpha[0]);
+        shc.set_alpha(hdr.alpha[0]);
      }
    }
 
