@@ -155,7 +155,9 @@ struct AggrSSVARInfo {
 extern void clear_stat_hdr_info(StatHdrInfo &hdr);
 extern void add_stat_hdr_info(StatHdrInfo &hdr, const STATLine &line);
 extern void stat_hdr_info_to_cols(const ConcatString &cur_case,
-                                  const StatHdrInfo &hdr, StatHdrColumns &shc);
+                                  const StatHdrInfo &hdr, 
+				  const StringArray &hdr_name,
+				  const StringArray &hdr_value, StatHdrColumns &shc);
 
 extern void aggr_ctc_lines(
                LineDataFile &, STATAnalysisJob &,
