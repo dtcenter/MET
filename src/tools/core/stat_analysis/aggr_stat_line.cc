@@ -137,11 +137,9 @@ void add_stat_hdr_info(StatHdrInfo &hdr, const STATLine &line) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void stat_hdr_info_to_cols(const ConcatString &cur_case, 
-                           const StatHdrInfo &hdr, 
-                           const StringArray &hdr_name,
-                           const StringArray &hdr_value,
-                           StatHdrColumns &shc) {
+void stat_hdr_info_to_cols(const ConcatString &cur_case, const StatHdrInfo &hdr,
+                           const StringArray &hdr_name, const StringArray &hdr_value,
+                           const STATLineType lt, StatHdrColumns &shc) {
    ConcatString css;
    InterpMthd mthd;
    double alpha;
@@ -418,6 +416,9 @@ void stat_hdr_info_to_cols(const ConcatString &cur_case,
       alpha = atof(hdr_value[index]);
    }
    shc.set_alpha(alpha);
+
+   // LINE_TYPE
+   shc.set_line_type(statlinetype_to_string(lt));
 
    return;
 }
