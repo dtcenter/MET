@@ -46,6 +46,7 @@
       -fcst_var TMP -vx_mask NWC -vx_mask GRB \
       -dump_row &OUTPUT_DIR;/stat_analysis/AGG_PHIST_dump.stat \
       -out_stat &OUTPUT_DIR;/stat_analysis/AGG_PHIST_out.stat \
+      -set_hdr VX_MASK NWC_AND_GRB \
       -out &OUTPUT_DIR;/stat_analysis/AGG_PHIST.out \
       -v 1
     </param>   
@@ -171,7 +172,7 @@
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_dump.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_out.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_by_vx_mask_out.stat</stat>
-      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh_out.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat</stat>
     </output>
   </test>
