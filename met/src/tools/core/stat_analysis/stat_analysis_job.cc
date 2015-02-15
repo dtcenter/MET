@@ -1975,6 +1975,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
             j.stat_at.set_entry(r, c++, cnt_info.mbias.v);
             j.stat_at.set_entry(r, c++, cnt_info.mse.v);
             j.stat_at.set_entry(r, c++, cnt_info.bcmse.v);
+            j.stat_at.set_entry(r, c++, cnt_info.rmse.v);
          }
       } // end for bin_it
    } // end for case_it
