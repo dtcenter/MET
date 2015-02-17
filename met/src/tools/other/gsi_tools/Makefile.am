@@ -14,7 +14,8 @@ bin_PROGRAMS    = reformat_conv \
                   reformat_rad
 
 
-reformat_conv_SOURCES = reformat_conv.cc
+reformat_conv_SOURCES = reformat_conv.cc \
+	conv_offsets.h
 reformat_conv_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_conv_LDFLAGS = ${MET_LDFLAGS}
 reformat_conv_LDADD = -lvx_stat_out \
@@ -27,7 +28,8 @@ reformat_conv_LDADD = -lvx_stat_out \
 	-lm
 
 
-reformat_rad_SOURCES = reformat_rad.cc
+reformat_rad_SOURCES = reformat_rad.cc \
+	rad_offsets.h
 reformat_rad_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_rad_LDFLAGS = ${MET_LDFLAGS}
 reformat_rad_LDADD = -lvx_stat_out \
