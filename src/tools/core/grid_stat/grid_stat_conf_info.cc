@@ -78,6 +78,7 @@ void GridStatConfInfo::clear() {
    // Initialize values
    model.clear();
    obtype.clear();
+   regrid_info.clear();
    fcst_wind_ta.clear();
    obs_wind_ta.clear();
    mask_name.clear();
@@ -90,7 +91,6 @@ void GridStatConfInfo::clear() {
    interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
-   // nc_pairs_flag = false;
    nc_info.set_all_true();
    rank_corr_flag = false;
    tmp_dir.clear();
@@ -144,8 +144,7 @@ void GridStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatConfInfo::process_config(GrdFileType ftype,
-                                      GrdFileType otype) {
+void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    int i, j, n;
    ConcatString s;
    StringArray sa;
@@ -172,6 +171,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: obtype
    obtype = parse_conf_string(&conf, conf_key_obtype);
+
+   // Conf: regrid
+   regrid_info = parse_conf_regrid(&conf);
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&conf);
@@ -464,9 +466,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    nbrhd_cov_ta = nbrhd_info.cov_ta;
 
    // Conf: nc_pairs_flag
-   // nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
-
-      parse_nc_info();
+   parse_nc_info();
 
    // Conf: rank_corr_flag
    rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);

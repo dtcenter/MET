@@ -488,8 +488,6 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    parse_nc_info();
 
-   // nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
-
       // Conf: ct_stats_flag
 
    ct_stats_flag = conf.lookup_bool(conf_key_ct_stats_flag);

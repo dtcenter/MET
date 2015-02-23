@@ -33,6 +33,74 @@ void process_poly_mask(const ConcatString &, const Grid &,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) {
+   Grid vx_grid;
+
+   // Check if regridding is disabled
+   if(!info.enable) {
+ 
+      // Check for a grid mismatch
+      if(!(fgrid == ogrid)) {
+         mlog << Error << "\nparse_vx_grid() -> "
+              << "The forecast and observation grids do not match: "
+              << fgrid->serialize() << " != " << ogrid->serialize()
+              << ".  Specify regridding logic in the config file \"regrid\" section.\n\n";
+         exit(1);
+      }
+      else {
+         mlog << Debug(3)
+              << "Verify on the matching forecast and observation grids.\n";
+         vx_grid = *fgrid;
+      }
+   }
+
+   // Otherwise, process regridding logic
+   else {
+
+      // Verify on the forecast grid
+      if(info.field == FieldType_Fcst) {
+         mlog << Debug(3)
+              << "Verify on the forecast grid.\n";
+         vx_grid = *fgrid;
+      }
+      // Verify on the observation grid
+      else if(info.field == FieldType_Obs) {
+         mlog << Debug(3)
+              << "Verify on the observation grid.\n";
+         vx_grid = *ogrid;
+      }
+      // Search for a named grid
+      else if(find_grid_by_name(info.name, vx_grid)) {
+         mlog << Debug(3)
+              << "Verify on the grid named \"" << info.name << "\".\n";
+      }
+      // Extract the grid from a gridded data file
+      else {
+
+         mlog << Debug(3)
+              << "Verify on the grid defined by \"" << info.name << "\".\n";
+
+         Met2dDataFileFactory mtddf_factory;
+         Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+         // Attempt to open the data file
+         if(!(mtddf = mtddf_factory.new_met_2d_data_file(info.name))) {
+            mlog << Error << "\nparse_vx_grid() -> "
+                 << "can't open file \"" << info.name << "\"\n\n";
+            exit(1);
+         }
+         vx_grid = mtddf->grid();
+      }
+   }
+
+   mlog << Debug(3)
+        << "Verification Grid: " << vx_grid.serialize() << "\n";
+
+   return(vx_grid);   
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
                      DataPlane &mask_dp, ConcatString &mask_name) {
    Grid mask_grid;
