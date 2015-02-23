@@ -433,3 +433,31 @@ return ( _e );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+const DictionaryEntry * MetConfig::lookup(const char * name, const ConfigObjectType expected_type)
+
+{
+
+const DictionaryEntry * _e = (const DictionaryEntry *) 0;
+
+_e = Dictionary::lookup(name);
+
+if ( !e || (_e->type() != expected_type) )  {
+
+   LastLookupStatus = false;
+
+   _e = 0;
+
+}
+
+return ( _e );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+

@@ -101,15 +101,15 @@ regrid_data_plane-regrid_data_plane.o: regrid_data_plane.cc \
  /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
  /usr/include/x86_64-linux-gnu/bits/environments.h \
  /usr/include/x86_64-linux-gnu/bits/confname.h /usr/include/getopt.h \
- /usr/include/netcdf.hh \
- /var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3/include/netcdfcpp.h \
- /var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3/include/ncvalues.h \
+ /d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/netcdf.hh \
+ /d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/netcdfcpp.h \
+ /d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/ncvalues.h \
  /usr/include/c++/4.7/sstream /usr/include/c++/4.7/bits/sstream.tcc \
  /usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/syslimits.h \
  /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
  /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
- /var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3/include/netcdf.h \
+ /d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/netcdf.h \
  /usr/include/errno.h /usr/include/x86_64-linux-gnu/bits/errno.h \
  /usr/include/linux/errno.h /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
@@ -209,7 +209,7 @@ regrid_data_plane-regrid_data_plane.o: regrid_data_plane.cc \
  ../../../../src/libcode/vx_data2d/data2d_utils.h \
  ../../../../src/basic/vx_util/data_plane.h \
  ../../../../src/libcode/vx_data2d/data_class.h \
- ../../../../src/basic/vx_config/grdfiletype_to_string.h \
+ ../../../../src/libcode/vx_data2d/grdfiletype_to_string.h \
  ../../../../src/libcode/vx_data2d/leveltype_to_string.h \
  ../../../../src/libcode/vx_data2d/table_lookup.h \
  ../../../../src/libcode/vx_data2d_factory/is_grib_file.h \
@@ -219,6 +219,7 @@ regrid_data_plane-regrid_data_plane.o: regrid_data_plane.cc \
  ../../../../src/libcode/vx_data2d_factory/is_pinterp_file.h \
  ../../../../src/libcode/vx_data2d_factory/var_info_factory.h \
  ../../../../src/libcode/vx_data2d/var_info.h \
+ ../../../../src/basic/vx_config/grdfiletype_to_string.h \
  ../../../../src/libcode/vx_nc_util/vx_nc_util.h \
  ../../../../src/libcode/vx_nc_util/grid_output.h \
  ../../../../src/libcode/vx_nc_util/nc_constants.h \
@@ -493,11 +494,11 @@ regrid_data_plane-regrid_data_plane.o: regrid_data_plane.cc \
 
 /usr/include/getopt.h:
 
-/usr/include/netcdf.hh:
+/d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/netcdf.hh:
 
-/var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3/include/netcdfcpp.h:
+/d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/netcdfcpp.h:
 
-/var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3/include/ncvalues.h:
+/d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/ncvalues.h:
 
 /usr/include/c++/4.7/sstream:
 
@@ -513,7 +514,7 @@ regrid_data_plane-regrid_data_plane.o: regrid_data_plane.cc \
 
 /usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
 
-/var/autofs/mnt/dakota_d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3/include/netcdf.h:
+/d1/bullock/otherlibs/netcdf/netcdf-3.6.3/include/netcdf.h:
 
 /usr/include/errno.h:
 
@@ -729,7 +730,7 @@ regrid_data_plane-regrid_data_plane.o: regrid_data_plane.cc \
 
 ../../../../src/libcode/vx_data2d/data_class.h:
 
-../../../../src/basic/vx_config/grdfiletype_to_string.h:
+../../../../src/libcode/vx_data2d/grdfiletype_to_string.h:
 
 ../../../../src/libcode/vx_data2d/leveltype_to_string.h:
 
@@ -748,6 +749,8 @@ regrid_data_plane-regrid_data_plane.o: regrid_data_plane.cc \
 ../../../../src/libcode/vx_data2d_factory/var_info_factory.h:
 
 ../../../../src/libcode/vx_data2d/var_info.h:
+
+../../../../src/basic/vx_config/grdfiletype_to_string.h:
 
 ../../../../src/libcode/vx_nc_util/vx_nc_util.h:
 
