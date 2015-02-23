@@ -73,6 +73,8 @@ class MetConfig : public Dictionary {
 
       const DictionaryEntry * lookup(const char * name);
 
+      const DictionaryEntry * lookup(const char * name, const ConfigObjectType expected_type);
+
 };
 
 

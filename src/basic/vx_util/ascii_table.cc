@@ -282,7 +282,8 @@ BadDataValue = a.BadDataValue;
 
 set_bad_data_str(a.BadDataStr);
 
-memcpy(FloatFormat, a.FloatFormat, sizeof(FloatFormat));
+memcpy(f_FloatFormat, a.f_FloatFormat, sizeof(f_FloatFormat));
+memcpy(g_FloatFormat, a.g_FloatFormat, sizeof(g_FloatFormat));
 
 DoCommaString = a.DoCommaString;
 
@@ -701,9 +702,11 @@ if ( (k < 0) || (k > ascii_table_max_precision) )  {
 
 Precision = k;
 
-memset(FloatFormat, 0, sizeof(FloatFormat));
+memset(f_FloatFormat, 0, sizeof(f_FloatFormat));
+memset(g_FloatFormat, 0, sizeof(g_FloatFormat));
 
-sprintf(FloatFormat, "%%.%df", Precision);
+sprintf(f_FloatFormat, "%%.%df", Precision);
+sprintf(g_FloatFormat, "%%.%dg", Precision);
 
 return;
 
@@ -984,7 +987,12 @@ void AsciiTable::set_entry(const int r, const int c, double x)
 char junk[256];
 
 if ( fabs(x - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
-else                                   sprintf(junk, FloatFormat, x);
+else  {
+
+   if ( fabs(x) >= 1.0 )  sprintf(junk, f_FloatFormat, x);
+   else                   sprintf(junk, g_FloatFormat, x);
+
+}
 
 if ( DoCommaString )  {
 

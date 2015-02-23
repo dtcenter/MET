@@ -161,7 +161,8 @@ class AsciiTable {
 
       char  *BadDataStr;
 
-      char   FloatFormat[16];
+      char   f_FloatFormat[16];
+      char   g_FloatFormat[16];
 
 
       bool   DoCommaString;   //  do comma string?
@@ -291,7 +292,8 @@ class AsciiTable {
 
       virtual int precision() const;
 
-      virtual const char * float_format() const;
+      virtual const char * f_float_format() const;
+      virtual const char * g_float_format() const;
 
       virtual bool delete_trailing_blank_rows() const;
 
@@ -319,7 +321,8 @@ inline int  AsciiTable::table_indent () const { return ( TableIndent ); }
 
 inline int  AsciiTable::precision() const { return ( Precision ); }
 
-inline const char * AsciiTable::float_format() const { return ( FloatFormat ); }
+inline const char * AsciiTable::f_float_format() const { return ( f_FloatFormat ); }
+inline const char * AsciiTable::g_float_format() const { return ( g_FloatFormat ); }
 
 inline bool AsciiTable::comma_string() const { return ( DoCommaString ); }
 
