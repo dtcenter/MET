@@ -174,7 +174,6 @@ struct BootInfo {
    ConcatString     seed;     // RNG seed value
 };
 
-
 ////////////////////////////////////////////////////////////////////////
 
 //
@@ -187,6 +186,21 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types   
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store regridding information
+//
+
+struct RegridInfo {
+   bool         enable; // Enable or disable regridding
+   FieldType    field;  // Forecast grid, observation grid, or none
+   ConcatString name;   // Named grid or path to gridded data file
+   InterpMthd   method; // Regridding method
+   int          width;  // Regridding width
+   void         clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -348,6 +362,8 @@ static const char conf_key_boot_rep_prop[]     = "boot.rep_prop";
 static const char conf_key_boot_n_rep[]        = "boot.n_rep";
 static const char conf_key_boot_rng[]          = "boot.rng";
 static const char conf_key_boot_seed[]         = "boot.seed";
+static const char conf_key_regrid[]            = "regrid";
+static const char conf_key_to_grid[]           = "to_grid";
 static const char conf_key_interp[]            = "interp";
 static const char conf_key_field[]             = "field";
 static const char conf_key_vld_thresh[]        = "vld_thresh";
@@ -600,7 +616,6 @@ static const char conf_key_interest_max[]                   = "interest_max";
 // WWMCA specific parameter key names
 //
 
-static const char conf_key_to_grid[]       = "to_grid";
 static const char conf_key_max_minutes[]   = "max_minutes";
 static const char conf_key_variable_name[] = "variable_name";
 static const char conf_key_units[]         = "units";

@@ -20,6 +20,16 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+void RegridInfo::clear() {
+   enable = false;
+   field = FieldType_None;
+   name.clear();
+   method = InterpMthd_None;
+   width = bad_data_int;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString parse_conf_version(Dictionary *dict) {
    ConcatString s;
 
@@ -593,6 +603,44 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+RegridInfo parse_conf_regrid(Dictionary *dict) {
+   Dictionary *regrid_dict = (Dictionary *) 0;
+   RegridInfo info;
+   int v;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_regrid() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+   
+   // Conf: regrid
+   regrid_dict = dict->lookup_dictionary(conf_key_regrid);
+   
+   // Parse to_grid as an integer
+   v = regrid_dict->lookup_int(conf_key_to_grid, false);
+
+   // If successful, convert to FieldType.
+   // If not, parse vx_grid as a string.
+   if(regrid_dict->last_lookup_status()) {
+      info.field  = int_to_fieldtype(v);
+      info.enable = (info.field == FieldType_Fcst ||
+                     info.field == FieldType_Obs);
+   }
+   else {
+      info.name   = regrid_dict->lookup_string(conf_key_to_grid);
+      info.enable = true;
+   }
+
+   // Parse method and width
+   info.method = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
+   info.width  = regrid_dict->lookup_int(conf_key_width);
+
+   return(info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 InterpInfo parse_conf_interp(Dictionary *dict) {
    Dictionary *interp_dict = (Dictionary *) 0;
    Dictionary *type_dict = (Dictionary *) 0;
@@ -668,19 +716,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       for(j=0; j<mthd_na.n_elements(); j++) {
 
          // Store interpolation method as a string
-              if(mthd_na[j] == conf_const.lookup_int(interpmthd_min_str))     method = interpmthd_min_str;
-         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_max_str))     method = interpmthd_max_str;
-         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_median_str))  method = interpmthd_median_str;
-         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_uw_mean_str)) method = interpmthd_uw_mean_str;
-         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_dw_mean_str)) method = interpmthd_dw_mean_str;
-         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_ls_fit_str))  method = interpmthd_ls_fit_str;
-         else if(mthd_na[j] == conf_const.lookup_int(interpmthd_bilin_str))   method = interpmthd_bilin_str;
-         else {
-            mlog << Error << "\nparse_conf_interval() -> "
-                 << "Unexpected config file value of " << mthd_na[j]
-                 << " for \"" << conf_key_method << "\".\n\n";
-            exit(1);
-         }
+         method = interpmthd_to_string(int_to_interpmthd(mthd_na[j]));
 
          // Loop over the widths
          for(k=0; k<wdth_na.n_elements(); k++) {
@@ -1000,6 +1036,28 @@ void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+InterpMthd int_to_interpmthd(int i) {
+   InterpMthd m;
+   
+        if(i == conf_const.lookup_int(interpmthd_min_str))     m = InterpMthd_Min;
+   else if(i == conf_const.lookup_int(interpmthd_max_str))     m = InterpMthd_Max;
+   else if(i == conf_const.lookup_int(interpmthd_median_str))  m = InterpMthd_Median;
+   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str)) m = InterpMthd_UW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str)) m = InterpMthd_DW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))  m = InterpMthd_LS_Fit;
+   else if(i == conf_const.lookup_int(interpmthd_bilin_str))   m = InterpMthd_Bilin;
+   else {
+      mlog << Error << "\nconf_int_to_interpmthd() -> "
+           << "Unexpected value of " << i
+           << " for \"" << conf_key_method << "\".\n\n";
+      exit(1);
+   }
+
+   return(m);
 }
 
 ////////////////////////////////////////////////////////////////////////

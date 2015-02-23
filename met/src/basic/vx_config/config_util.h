@@ -46,6 +46,7 @@ extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
+extern RegridInfo      parse_conf_regrid(Dictionary *dict);
 extern InterpInfo      parse_conf_interp(Dictionary *dict);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict);
 extern DuplicateType   parse_conf_duplicate_flag(Dictionary *dict);
@@ -56,7 +57,8 @@ extern PlotInfo        parse_conf_plot_info(Dictionary *dict);
 extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end);
 extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
 
-extern void check_prob_thresh(const ThreshArray &);
+extern InterpMthd   int_to_interpmthd(int);
+extern void         check_prob_thresh(const ThreshArray &);
 
 extern const char * statlinetype_to_string(const STATLineType);
 extern void         statlinetype_to_string(const STATLineType, char *);

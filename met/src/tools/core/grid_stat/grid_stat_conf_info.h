@@ -105,36 +105,36 @@ class GridStatConfInfo {
       MetConfig conf;
 
       // Store data parsed from the Grid-Stat configuration object
-      ConcatString     model;              // Model name
-      ConcatString     obtype;             // Observation type
-      VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
-      VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_vx]
-      ThreshArray *    fcst_ta;            // Array for fcst thresholds [n_vx]
-      ThreshArray *    obs_ta;             // Array for obs thresholds [n_vx]
-      ThreshArray      fcst_wind_ta;       // Wind speed fcst thresholds
-      ThreshArray      obs_wind_ta;        // Wind speed obs thresholds
-      StringArray      mask_name;          // Masking region names [n_mask]
-      DataPlane *      mask_dp;            // Array for masking regions [n_mask]
-      NumArray         ci_alpha;           // Alpha value for confidence intervals
-      BootIntervalType boot_interval;      // Bootstrap CI type
-      double           boot_rep_prop;      // Bootstrap replicate proportion
-      int              n_boot_rep;         // Number of bootstrap replicates
-      ConcatString     boot_rng;           // GSL random number generator
-      ConcatString     boot_seed;          // GSL RNG seed value
-      FieldType        interp_field;       // How to apply interpolation options
-      double           interp_thresh;      // Proportion of valid data values
-      InterpMthd *     interp_mthd;        // Array for interpolation methods [n_mask]
-      IntArray         interp_wdth;        // Array for interpolation widths [n_mask]
-      double           nbrhd_thresh;       // Proportion of valid data values
-      IntArray         nbrhd_wdth;         // Array for neighborhood widths
-      ThreshArray      nbrhd_cov_ta;       // Neighborhood coverage thresholds
-      STATOutputType   output_flag[n_txt]; // Flag for each output line type
-      // bool             nc_pairs_flag;      // Flag for the output NetCDF pairs file
-      GridStatNcOutInfo   nc_info;
-      bool             rank_corr_flag;     // Flag for computing rank correlations
-      ConcatString     tmp_dir;            // Directory for temporary files
-      ConcatString     output_prefix;      // String to customize output file name
-      ConcatString     version;            // Config file version
+      ConcatString      model;              // Model name
+      ConcatString      obtype;             // Observation type
+      RegridInfo        regrid_info;        // Regridding information
+      VarInfo **        fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
+      VarInfo **        obs_info;           // Array of pointers for obs VarInfo [n_vx]
+      ThreshArray *     fcst_ta;            // Array for fcst thresholds [n_vx]
+      ThreshArray *     obs_ta;             // Array for obs thresholds [n_vx]
+      ThreshArray       fcst_wind_ta;       // Wind speed fcst thresholds
+      ThreshArray       obs_wind_ta;        // Wind speed obs thresholds
+      StringArray       mask_name;          // Masking region names [n_mask]
+      DataPlane *       mask_dp;            // Array for masking regions [n_mask]
+      NumArray          ci_alpha;           // Alpha value for confidence intervals
+      BootIntervalType  boot_interval;      // Bootstrap CI type
+      double            boot_rep_prop;      // Bootstrap replicate proportion
+      int               n_boot_rep;         // Number of bootstrap replicates
+      ConcatString      boot_rng;           // GSL random number generator
+      ConcatString      boot_seed;          // GSL RNG seed value
+      FieldType         interp_field;       // How to apply interpolation options
+      double            interp_thresh;      // Proportion of valid data values
+      InterpMthd *      interp_mthd;        // Array for interpolation methods [n_interp]
+      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]
+      double            nbrhd_thresh;       // Proportion of valid data values
+      IntArray          nbrhd_wdth;         // Array for neighborhood widths
+      ThreshArray       nbrhd_cov_ta;       // Neighborhood coverage thresholds
+      STATOutputType    output_flag[n_txt]; // Flag for each output line type
+      GridStatNcOutInfo nc_info;            // Output NetCDF pairs file contents
+      bool              rank_corr_flag;     // Flag for computing rank correlations
+      ConcatString      tmp_dir;            // Directory for temporary files
+      ConcatString      output_prefix;      // String to customize output file name
+      ConcatString      version;            // Config file version
 
       GridStatConfInfo();
      ~GridStatConfInfo();
