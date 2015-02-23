@@ -113,6 +113,31 @@ model = "WRF";
 obtype = "ANALYS";
 
 //
+// The "regrid" entry is a dictionary containing information about how to handle
+// input gridded data files.  The "regrid" entry specifies regridding logic
+// using the following entries:
+//
+//   - The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, or the
+//     path to a gridded data file which defines the verification grid.
+//      - to_grid = NONE;   To disable regridding.
+//      - to_grid = FCST;   To regrid observations to the forecast grid.
+//      - to_grid = OBS;    To regrid forecasts to the observation grid.
+//      - to_grid = "G218"; To regrid both to a named grid.
+//      - to_grid = "path"; To regrid both to a grid defined by a file.
+//
+//   - The "method" entry defines the regridding method to be used.
+//      - method = UW_MEAN; To regrid using an unweighted average.
+//
+//   - The "width" entry specifies a regridding width, when applicable.
+//      - width = 4;        To regrid using a 4x4 box.
+//
+regrid = {
+   to_grid = NONE;
+   method  = UW_MEAN;
+   width   = 1;
+};
+
+//
 // The "fcst" entry is a dictionary containing information about the field(s)
 // to be verified.  This dictionary may include the following entries:
 //
