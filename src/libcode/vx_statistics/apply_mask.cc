@@ -40,7 +40,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    if(!info.enable) {
  
       // Check for a grid mismatch
-      if(!(fgrid == ogrid)) {
+      if(!(*fgrid == *ogrid)) {
          mlog << Error << "\nparse_vx_grid() -> "
               << "The forecast and observation grids do not match: "
               << fgrid->serialize() << " != " << ogrid->serialize()
