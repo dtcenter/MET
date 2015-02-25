@@ -75,6 +75,8 @@ void ModeConfInfo::clear()
    model.clear();
    obtype.clear();
 
+   regrid_info.clear();
+
    mask_missing_flag = FieldType_None;
 
    fcst_raw_thresh.clear();
@@ -159,7 +161,7 @@ void ModeConfInfo::clear()
    // Deallocate memory
    if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
    if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
-   
+
    return;
 
 }
@@ -196,7 +198,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
    Dictionary *obs_dict  = (Dictionary *) 0;
    Dictionary *dict      = (Dictionary *) 0;
    PlotInfo plot_info;
-   
+
       // Dump the contents of the config file
 
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -217,11 +219,15 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    obtype = parse_conf_string(&conf, conf_key_obtype);
 
+      // Conf: regrid
+
+   regrid_info = parse_conf_regrid(&conf);
+
       // Conf: fcst and obs
 
    fcst_dict = conf.lookup_dictionary(conf_key_fcst);
    obs_dict  = conf.lookup_dictionary(conf_key_obs);
-    
+
       // Allocate new VarInfo objects
 
    fcst_info = info_factory.new_var_info(ftype);
@@ -242,7 +248,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << "Parsed observation field:\n";
       obs_info->dump(cout);
    }
-   
+
       // No support for wind direction
 
    if(fcst_info->is_wind_direction() || obs_info->is_wind_direction()) {
@@ -271,7 +277,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << ") must be non-negative\n\n";
       exit(1);
    }
-   
+
       // Conf: fcst.conv_thresh and obs.conv_thresh
 
    fcst_conv_thresh = fcst_dict->lookup_thresh(conf_key_conv_thresh);
@@ -286,7 +292,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    fcst_area_thresh = fcst_dict->lookup_thresh(conf_key_area_thresh);
    obs_area_thresh  = obs_dict->lookup_thresh(conf_key_area_thresh);
-   
+
       // Conf: fcst.inten_perc and obs.inten_perc
 
    fcst_inten_perc_value = fcst_dict->lookup_int(conf_key_inten_perc_value);
@@ -310,7 +316,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: mask_missing_flag
 
    mask_missing_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_missing_flag));
-   
+
       // Conf: match_flag
 
    match_flag = int_to_matchtype(conf.lookup_int(conf_key_match_flag));
@@ -328,7 +334,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << mergetype_to_string(obs_merge_flag)
            << ") any merging information will be discarded.\n\n";
    }
-   
+
       // Conf: max_centroid_dist
 
    max_centroid_dist = conf.lookup_double(conf_key_max_centroid_dist);
@@ -376,7 +382,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << ") must be set between 0 and 100.\n\n";
       exit(1);
    }
-   
+
       // Check that the fuzzy engine weights are non-negative
 
    if(centroid_dist_wt    < 0 || boundary_dist_wt    < 0 ||
@@ -387,7 +393,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << "All of the fuzzy engine weights must be >= 0.\n\n";
       exit(1);
    }
-   
+
       // Check that the sum of the weights is non-zero for matching
 
    if(match_flag != MatchType_None &&
@@ -429,11 +435,11 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
-   
+
       // Conf: print_interest_thresh
 
    print_interest_thresh = conf.lookup_double(conf_key_print_interest_thresh);
-   
+
       // Check that print_interest_thresh is between 0 and 1.
 
    if(print_interest_thresh < 0 || print_interest_thresh > 1) {
@@ -462,7 +468,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: zero_border_size
 
    zero_border_size = conf.lookup_int(conf_key_zero_border_size);
-   
+
       // Check that zero_border_size >= 1
 
    if(zero_border_size < 1) {
@@ -483,7 +489,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: ps_plot_flag
 
    ps_plot_flag = conf.lookup_bool(conf_key_ps_plot_flag);
-   
+
       // Conf: nc_pairs_flag
 
    parse_nc_info();
@@ -491,7 +497,7 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: ct_stats_flag
 
    ct_stats_flag = conf.lookup_bool(conf_key_ct_stats_flag);
-   
+
       // Conf: output_prefix
 
    output_prefix = conf.lookup_string(conf_key_output_prefix);
@@ -518,8 +524,8 @@ e = conf.lookup(conf_key_nc_pairs_flag);
 
 if ( !e )  {
 
-   mlog << Error 
-        << "\n\n  ModeConfInfo::parse_nc_info() -> lookup failed for key \"" 
+   mlog << Error
+        << "\n\n  ModeConfInfo::parse_nc_info() -> lookup failed for key \""
         << conf_key_nc_pairs_flag << "\"\n\n";
 
    exit ( 1 );
@@ -536,7 +542,7 @@ if ( type == BooleanType )  {
 
    return;
 
-} 
+}
 
    //
    //  it should be a dictionary
@@ -544,7 +550,7 @@ if ( type == BooleanType )  {
 
 if ( type != DictionaryType )  {
 
-   mlog << Error 
+   mlog << Error
         << "\n\n  ModeConfInfo::parse_nc_info() -> bad type ("
         << configobjecttype_to_string(type)
         << ") for key \""
@@ -552,7 +558,7 @@ if ( type != DictionaryType )  {
 
    exit ( 1 );
 
-} 
+}
 
    //
    //  parse the various entries

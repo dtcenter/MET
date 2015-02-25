@@ -26,6 +26,7 @@ using namespace std;
 
 #include "mode_exec.h"
 #include "nc_utils.h"
+#include "vx_regrid.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -207,13 +208,28 @@ void ModeExecutive::setup_fcst_obs_data()
    Fcst_sd.clear();
     Obs_sd.clear();
 
+      // Determine the verification grid
+
+   grid = parse_vx_grid(engine.conf_info.regrid_info,
+                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
+
       // Read the gridded data from the input forecast file
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.fcst_info), Fcst_sd.data)) )  {
 
-      mlog << Error << "\nprocess_fcst_obs_files() -> "
+      mlog << Error << "\nsetup_fcst_obs_data() -> "
            << "can't get data from file \"" << fcst_file << "\"\n\n";
       exit(1);
+   }
+   
+      // Regrid, if necessary
+
+   if ( !(fcst_mtddf->grid() == grid) )  {
+      mlog << Debug(1)
+           << "Regridding forecast " << engine.conf_info.fcst_info->magic_str()
+           << " to the verification grid.\n";
+      Fcst_sd.data = upp_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
+                                &engine.conf_info.regrid_info.method);
    }
 
       // For probability fields, rescale from [0, 100] to [0, 1]
@@ -224,33 +240,30 @@ void ModeExecutive::setup_fcst_obs_data()
 
    if ( !(obs_mtddf->data_plane(*(engine.conf_info.obs_info), Obs_sd.data)) )  {
 
-      mlog << Error << "\nprocess_fcst_obs_files() -> "
+      mlog << Error << "\nsetup_fcst_obs_data() -> "
            << "can't get data from file \"" << obs_file << "\"\n\n";
       exit(1);
+   }
+
+      // Regrid, if necessary
+
+   if ( !(obs_mtddf->grid() == grid) )  {
+      mlog << Debug(1)
+           << "Regridding observation " << engine.conf_info.obs_info->magic_str()
+           << " to the verification grid.\n";
+      Obs_sd.data = upp_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
+                               &engine.conf_info.regrid_info.method);
    }
 
       // For probability fields, rescale from [0, 100] to [0, 1]
 
    if ( engine.conf_info.obs_info->p_flag() ) rescale_probability(Obs_sd.data);
 
-      // Check that the grids match
-
-   if ( !(fcst_mtddf->grid() == obs_mtddf->grid()) )  {
-
-      mlog << Error << "\nprocess_fcst_obs_files() -> "
-           << "The forecast and observation grids do not match: "
-           << fcst_mtddf->grid().serialize() << " != "
-           << obs_mtddf->grid().serialize() << "\n\n";
-      exit(1);
-   }
-
-   grid = fcst_mtddf->grid();
-
       // Print a warning if the valid times do not match
 
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-      mlog << Warning << "\nprocess_fcst_obs_files() -> "
+      mlog << Warning << "\nsetup_fcst_obs_data() -> "
            << "Forecast and observation valid times do not match "
            << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
            << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
@@ -264,7 +277,7 @@ void ModeExecutive::setup_fcst_obs_data()
       engine.conf_info.obs_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                != Obs_sd.data.accum()) {
 
-      mlog << Warning << "\nprocess_fcst_obs_files() -> "
+      mlog << Warning << "\nsetup_fcst_obs_data() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "

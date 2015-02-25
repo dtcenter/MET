@@ -49,6 +49,7 @@
 //   015    05/10/12  Halley Gotway  Move -fcst_valid, -fcst_lead,
 //                                   -obs_valid, and -obs_lead command line options
 //                                   to config file.
+//   016    02/25/15  Halley Gotway  Add automated regridding.
 //
 ///////////////////////////////////////////////////////////////////////
 
