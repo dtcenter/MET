@@ -236,7 +236,8 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
    
    // Determine the verification grid
-   grid = parse_vx_grid(conf_info.regrid_info, &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
+   grid = parse_vx_grid(conf_info.regrid_info,
+                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
    // Set the model name
    shc.set_model(conf_info.model);
