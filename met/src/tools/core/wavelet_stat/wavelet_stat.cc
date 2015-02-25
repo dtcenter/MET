@@ -32,6 +32,7 @@
 //                    options to config file.
 //   009    11/12/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output files.
+//   010    02/25/15  Halley Gotway  Add automated regridding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +55,7 @@ using namespace std;
 
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
+#include "vx_regrid.h"
 #include "vx_log.h"
 #include "vx_plot_util.h"
 
@@ -217,19 +219,9 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   // Check that the grids match
-   if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
-
-      mlog << Error << "\nprocess_scores() -> "
-           << "The forecast and observation grids do not match: "
-           << fcst_mtddf->grid().serialize() << " != "
-           << obs_mtddf->grid().serialize() << "\n\n";
-      exit(1);
-   }
-   // If they do, store the grid
-   else {
-      grid = fcst_mtddf->grid();
-   }
+   // Determine the verification grid
+   grid = parse_vx_grid(conf_info.regrid_info,
+                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
    // Set the model name
    shc.set_model(conf_info.model);
@@ -272,6 +264,15 @@ void process_scores() {
          continue;
       }
 
+      // Regrid, if necessary
+      if(!(fcst_mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding forecast " << conf_info.fcst_info[i]->magic_str()
+              << " to the verification grid.\n";
+         fcst_dp = upp_regrid(fcst_dp, fcst_mtddf->grid(), grid,
+                              &conf_info.regrid_info.method);
+      }
+
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
 
@@ -287,6 +288,15 @@ void process_scores() {
               << conf_info.obs_info[i]->magic_str()
               << " not found in file: " << obs_file << "\n\n";
          continue;
+      }
+
+      // Regrid, if necessary
+      if(!(obs_mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding observation " << conf_info.obs_info[i]->magic_str()
+              << " to the verification grid.\n";
+         obs_dp = upp_regrid(obs_dp, obs_mtddf->grid(), grid,
+                             &conf_info.regrid_info.method);
       }
 
       // Set the observation lead time
