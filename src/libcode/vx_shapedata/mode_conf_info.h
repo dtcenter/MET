@@ -82,6 +82,8 @@ class ModeConfInfo {
       ConcatString     model;                  // Model name
       ConcatString     obtype;                 // Observation type
 
+      RegridInfo       regrid_info;            // Regridding information
+
       VarInfo *        fcst_info;              // allocated
       VarInfo *        obs_info;               // allocated
 

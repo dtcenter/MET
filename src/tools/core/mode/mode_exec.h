@@ -108,9 +108,6 @@ class ModeExecutive {
 
       ShapeData Fcst_sd, Obs_sd;
 
-
-      // void process_fcst_obs_files();
-
       void setup_fcst_obs_data();
       void do_conv_thresh();
       void do_match_merge();
