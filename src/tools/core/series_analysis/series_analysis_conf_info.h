@@ -45,6 +45,7 @@ class SeriesAnalysisConfInfo {
       // Store data parsed from the Series-Analysis configuration object
       ConcatString     model;              // Model name
       ConcatString     obtype;             // Observation type
+      RegridInfo       regrid_info;        // Regridding information
       VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
       VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
       ThreshArray      fcst_cat_ta;        // Categorical fcst thresholds

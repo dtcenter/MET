@@ -18,6 +18,7 @@
 //   001    05/27/14  Halley Gotway   Add EIQR and MAD to CNT line type.
 //   002    11/14/14  Halley Gotway   Pass the obtype entry from the
 //                    from the config file to the output file.
+//   003    02/25/15  Halley Gotway   Add automated regridding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,6 +42,7 @@ using namespace std;
 
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
+#include "vx_regrid.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -209,20 +211,12 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   // Check that the grids match
-   if(!(fcst_mtddf->grid() == obs_mtddf->grid())) {
+   // Determine the verification grid
+   grid = parse_vx_grid(conf_info.regrid_info,
+                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
-      mlog << Error << "\nprocess_command_line() -> "
-           << "The forecast and observation grids do not match: "
-           << fcst_mtddf->grid().serialize() << " != "
-           << obs_mtddf->grid().serialize() << "\n\n";
-      exit(1);
-   }
-   // If they do, store the grid
-   else {
-      grid = fcst_mtddf->grid();
-      conf_info.process_masks(grid);
-   }
+   // Process masking regions
+   conf_info.process_masks(grid);
 
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
@@ -572,20 +566,8 @@ void get_series_entry(int i_series, VarInfo *info,
       // Open the data file
       mtddf = mtddf_factory.new_met_2d_data_file(cur_file, type);
 
-      // Check that the grid does not change
-      if(mtddf->grid() != grid) {
-         mlog << Error << "\nget_series_entry() -> "
-              << "the grid has changed in file \"" << cur_file << "\":\n"
-              << "Old: " << grid.serialize() << "\n"
-              << "New: " << mtddf->grid().serialize() << "\n\n";
-         exit(1);
-      }
-
       // Attempt to read the gridded data from the current file
       found = mtddf->data_plane(*info, dp);
-      
-      // Close the data file
-      delete mtddf; mtddf = (Met2dDataFile *) 0;
 
       // Check if the series entry was found
       if(found) {
@@ -593,12 +575,24 @@ void get_series_entry(int i_series, VarInfo *info,
               << "Found data for " << info->magic_str()
               << " in " << search_files[j] << "\n";
 
+         // Regrid, if necessary
+         if(!(mtddf->grid() == grid)) {
+            mlog << Debug(1)
+                 << "Regridding field " << info->magic_str()
+                 << " to the verification grid.\n";
+            dp = upp_regrid(dp, mtddf->grid(), grid,
+                            &conf_info.regrid_info.method);
+         }
+
          // Store the found file
          found_files.set(i_series, cur_file);
-
-         // Break out of the loop
-         break;
       }
+
+      // Close the data file
+      delete mtddf; mtddf = (Met2dDataFile *) 0;
+
+      // Break out of the loop
+      if(found) break;
    }
 
    // Check if the data plane was found
