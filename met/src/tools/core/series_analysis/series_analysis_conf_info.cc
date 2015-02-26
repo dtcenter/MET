@@ -62,6 +62,7 @@ void SeriesAnalysisConfInfo::clear() {
    // Initialize values
    model.clear();
    obtype.clear();
+   regrid_info.clear();
    fcst_cat_ta.clear();
    obs_cat_ta.clear();
    ci_alpha.clear();
@@ -149,6 +150,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
    // Conf: obtype
    obtype = parse_conf_string(&conf, conf_key_obtype);
+
+   // Conf: regrid
+   regrid_info = parse_conf_regrid(&conf);
 
    // Conf: output_stats
    output_stats = parse_conf_output_stats(&conf);
