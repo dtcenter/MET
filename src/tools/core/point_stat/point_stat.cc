@@ -74,6 +74,7 @@
 //   028    08/21/13  Halley Gotway  Fix sizing of output tables for 12
 //                    or more probabilstic thresholds.
 //   029    07/09/14  Halley Gotway  Add station id exclusion option.
+//   030    03/02/15  Halley Gotway  Add automated regridding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -96,6 +97,7 @@ using namespace std;
 
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
+#include "vx_regrid.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -297,9 +299,10 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 
    // Unset the flag
    is_first_pass = false;
-  
-   // Store the grid
-   grid = data_grid;
+
+   // Determine the verification grid
+   grid = parse_vx_grid(conf_info.regrid_info,
+                        &(data_grid), &(data_grid));
 
    // Process the masks
    conf_info.process_masks(grid);
@@ -540,17 +543,20 @@ void process_fcst_climo_files() {
       }
 
       // Setup the first pass through the data
-      if(is_first_pass) {
-         setup_first_pass(fcst_dpa[0], fcst_mtddf->grid());
-      }
-      // Check to make sure that the grid has not changed
-      else {
+      if(is_first_pass) setup_first_pass(fcst_dpa[0], fcst_mtddf->grid());
 
-         if(!(fcst_mtddf->grid() == grid)) {
-            mlog << Error << "\nprocess_fcst_climo_files() -> "
-                 << "The forecast grid has changed for field "
-                 << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n\n";
-            exit(1);
+      // Regrid, if necessary
+      if(!(fcst_mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding " << fcst_dpa.n_planes()
+              << " forecast field(s) for "
+              << conf_info.vx_pd[i].fcst_info->magic_str()
+              << " to the verification grid.\n";
+
+         // Loop through the forecast fields
+         for(j=0; j<fcst_dpa.n_planes(); j++) {
+            fcst_dpa[j] = upp_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
+                                     &conf_info.regrid_info.method);
          }
       }
 
@@ -560,12 +566,19 @@ void process_fcst_climo_files() {
          // Read the gridded data from the input climo file
          n_climo = climo_mtddf->data_plane_array(*conf_info.vx_pd[i].fcst_info, climo_dpa);
 
-         // Check that the grid has not changed
+         // Regrid, if necessary
          if(!(climo_mtddf->grid() == grid)) {
-            mlog << Error << "\nprocess_fcst_climo_files() -> "
-                 << "The climatology grid has changed for field "
-                 << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n\n";
-            exit(1);
+            mlog << Debug(1)
+                 << "Regridding " << climo_dpa.n_planes()
+                 << " climatology field(s) for "
+                 << conf_info.vx_pd[i].fcst_info->magic_str()
+                 << " to the verification grid.\n";
+
+            // Loop through the climatology fields
+            for(j=0; j<climo_dpa.n_planes(); j++) {
+               climo_dpa[j] = upp_regrid(climo_dpa[j], climo_mtddf->grid(), grid,
+                                         &conf_info.regrid_info.method);
+            }
          }
       }
       // No climo file specified
