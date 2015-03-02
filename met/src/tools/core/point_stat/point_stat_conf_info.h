@@ -83,6 +83,7 @@ class PointStatConfInfo {
 
       // Store data parsed from the Point-Stat configuration object
       ConcatString      model;              // Model name
+      RegridInfo        regrid_info;        // Regridding information
       int               beg_ds;             // Begin observation time window offset
       int               end_ds;             // End observation time window offset
       VxPairDataPoint * vx_pd;              // Array pair data [n_vx]

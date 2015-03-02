@@ -82,6 +82,7 @@ void PointStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
    fcst_wind_ta.clear();
    obs_wind_ta.clear();
@@ -158,6 +159,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: regrid
+   regrid_info = parse_conf_regrid(&conf);
 
    // Conf: beg_ds and end_ds
    fcst_dict = conf.lookup_dictionary(conf_key_obs_window);
