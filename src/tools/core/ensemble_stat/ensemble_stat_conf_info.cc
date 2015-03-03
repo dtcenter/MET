@@ -77,6 +77,7 @@ void EnsembleStatConfInfo::clear() {
    // Initialize values
    model.clear();
    obtype.clear();
+   regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
    vld_ens_thresh = vld_data_thresh = bad_data_double;
    mask_name.clear();
@@ -161,6 +162,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: obtype
    obtype = parse_conf_string(&conf, conf_key_obtype);
+
+   // Conf: regrid
+   regrid_info = parse_conf_regrid(&conf);
 
    // Conf: beg_ds and end_ds
    ens_dict = conf.lookup_dictionary(conf_key_obs_window);
