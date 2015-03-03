@@ -37,6 +37,7 @@
 //   011    07/09/14  Halley Gotway   Add station id exclusion option.
 //   012    11/12/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output files.
+//   013    03/02/15  Halley Gotway  Add automated regridding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -60,6 +61,7 @@ using namespace std;
 
 #include "vx_nc_util.h"
 #include "vx_data2d_nc_met.h"
+#include "vx_regrid.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,7 +80,6 @@ static void process_grid_scores   (DataPlane *&, DataPlane &, DataPlane &,
                                    DataPlane &, PairDataEnsemble &);
 
 static void parse_ens_file_list(const char *);
-static void set_grid(const Grid &);
 static void clear_counts(const DataPlane &, int);
 static void track_counts(const DataPlane &, int);
 
@@ -301,6 +302,10 @@ void process_command_line(int argc, char **argv)
    // Process the configuration
    conf_info.process_config(etype, otype);
 
+   // Determine the verification grid
+   grid = parse_vx_grid(conf_info.regrid_info, &(ens_mtddf->grid()),
+                        (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
+   
    // Set the model name
    shc.set_model(conf_info.model);
 
@@ -459,8 +464,15 @@ void process_ensemble() {
                n_vld++;
             }
 
-            // Set the grid
-            set_grid(ens_mtddf->grid());
+            // Regrid, if necessary
+            if(!(ens_mtddf->grid() == grid)) {
+               mlog << Debug(1)
+                    << "Regridding ensemble field "
+                    << conf_info.ens_info[i]->magic_str()
+                    << " to the verification grid.\n";
+               ens_dp = upp_regrid(ens_dp, ens_mtddf->grid(), grid,
+                                   &conf_info.regrid_info.method);
+            }
 
             // Store the ensemble valid time, if not already set
             if(ens_valid_ut == (unixtime) 0) {
@@ -803,7 +815,7 @@ void process_point_obs(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 int process_point_ens(int i_ens) {
-   int i, n_fcst;
+   int i, j, n_fcst;
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
    VarInfo *info = (VarInfo *) 0;
@@ -861,8 +873,19 @@ int process_point_ens(int i_ens) {
          exit(1);
       }
 
-      // Set the grid
-      set_grid(ens_mtddf->grid());
+      // Regrid, if necessary
+      if(!(ens_mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding " << fcst_dpa.n_planes()
+              << " ensemble field(s) " << info->magic_str()
+              << " to the verification grid.\n";
+
+         // Loop through the forecast fields
+         for(j=0; j<fcst_dpa.n_planes(); j++) {
+            fcst_dpa[j] = upp_regrid(fcst_dpa[j], ens_mtddf->grid(), grid,
+                                     &conf_info.regrid_info.method);
+         }
+      }
 
       // Dump out the number of levels found
       mlog << Debug(2) << "For " << info->magic_str()
@@ -1104,8 +1127,15 @@ void process_grid_vx() {
                continue;
             }
 
-            // Set the grid
-            set_grid(ens_mtddf->grid());
+            // Regrid, if necessary
+            if(!(ens_mtddf->grid() == grid)) {
+               mlog << Debug(1)
+                    << "Regridding ensemble field "
+                    << conf_info.vx_pd[i].fcst_info->magic_str()
+                    << " to the verification grid.\n";
+               fcst_dp[j] = upp_regrid(fcst_dp[j], ens_mtddf->grid(), grid,
+                                       &conf_info.regrid_info.method);
+            }
          }
          else {
             n_miss++;
@@ -1149,8 +1179,15 @@ void process_grid_vx() {
          if(!found) n_miss++;
          else {
 
-            // Set the grid
-            set_grid(obs_mtddf->grid());
+            // Regrid, if necessary
+            if(!(obs_mtddf->grid() == grid)) {
+               mlog << Debug(1)
+                    << "Regridding observation field "
+                    << conf_info.vx_pd[i].obs_info->magic_str()
+                    << " to the verification grid.\n";
+               obs_dp = upp_regrid(obs_dp, obs_mtddf->grid(), grid,
+                                   &conf_info.regrid_info.method);
+            }
 
             break;
          }
@@ -1460,26 +1497,6 @@ void parse_ens_file_list(const char *fcst_file) {
 
    // Close the input file
    f_in.close();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_grid(const Grid &gr) {
-
-   // Set the grid, if not already set
-   if(grid.nx() == 0 && grid.ny() == 0) {
-      grid = gr;
-   }
-   // Check to make sure that the grid doesn't change
-   else {
-      if(!(grid == gr)) {
-         mlog << Error << "\nset_grid() -> "
-              << "All data files must be on the same grid!\n\n";
-         exit(1);
-      }
-   }
 
    return;
 }
