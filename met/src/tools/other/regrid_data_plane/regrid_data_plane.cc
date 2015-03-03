@@ -46,17 +46,21 @@ using namespace std;
 #include "vx_grid.h"
 #include "vx_regrid.h"
 #include "vx_util.h"
+#include "vx_statistics.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
 
+// Constants
+static const InterpMthd DefaultInterpMthd = InterpMthd_UW_Mean;
+static const int        DefaultInterpWdth = 1;
+
 // Variables for command line arguments
 static ConcatString InputFilename;
-static ConcatString ToGridFilename;
 static ConcatString OutputFilename;
 static StringArray ConfigSA;
-static InterpMthd Method = InterpMthd_DW_Mean;
+static RegridInfo RGInfo;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -73,7 +77,8 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
 static void close_nc();
 static void usage();
 static void set_config(const StringArray &);
-static void set_interp(const StringArray &);
+static void set_method(const StringArray &);
+static void set_width(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
@@ -101,6 +106,12 @@ int main(int argc, char *argv[]) {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
+   // Set default regridding options
+   RGInfo.enable = true;
+   RGInfo.field  = FieldType_None;
+   RGInfo.method = DefaultInterpMthd;
+   RGInfo.width  = DefaultInterpWdth;
+   
    // Check for zero arguments
    if(argc == 1) usage();
 
@@ -112,7 +123,8 @@ void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_config,    "-config", 1);
-   cline.add(set_interp,    "-interp", 1);
+   cline.add(set_method,    "-method", 1);
+   cline.add(set_width,     "-width",  1);
    cline.add(set_logfile,   "-log",    1);
    cline.add(set_verbosity, "-v",      1);
 
@@ -125,7 +137,7 @@ void process_command_line(int argc, char **argv) {
 
    // Store the filenames and config string.
    InputFilename  = cline[0];
-   ToGridFilename = cline[1];
+   RGInfo.name    = cline[1];
    OutputFilename = cline[2];
 
    // Check for at least one configuration string
@@ -153,7 +165,6 @@ void process_data_file() {
    // Read the input data file
    Met2dDataFileFactory m_factory;
    Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
-   Met2dDataFile *to_mtddf = (Met2dDataFile *) 0;
 
    // Determine the "from" grid
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
@@ -168,15 +179,7 @@ void process_data_file() {
    mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
 
    // Determine the "to" grid
-   mlog << Debug(1)  << "Reading grid file: " << ToGridFilename << "\n";
-      to_mtddf = m_factory.new_met_2d_data_file(ToGridFilename);
-
-   if(!to_mtddf) {
-      mlog << Error << "\nprocess_data_file() -> "
-           << "\"" << ToGridFilename << "\" not a valid data file\n\n";
-      exit(1);
-   }
-   to_grid = to_mtddf->grid();
+   to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
    mlog << Debug(2) << "Output grid: " << to_grid.serialize() << "\n";
    
    // Build the run command string
@@ -215,7 +218,7 @@ void process_data_file() {
       }
  
       // Regrid the data plane
-      to_dp = upp_regrid(fr_dp, fr_grid, to_grid, &Method);
+      to_dp = upp_regrid(fr_dp, fr_grid, to_grid, &RGInfo.method);
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -239,7 +242,6 @@ void process_data_file() {
    
    // Clean up
    if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) 0; }
-   if(to_mtddf) { delete to_mtddf; to_mtddf = (Met2dDataFile *) 0; }
    if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       0; }
 
    return;
@@ -349,7 +351,7 @@ void usage() {
 
         << "Usage: " << program_name << "\n"
         << "\tinput_filename\n"
-        << "\tgrid_filename\n"
+        << "\tto_grid\n"
         << "\toutput_filename\n"
         << "\t-config string\n"
         << "\t[-method type]\n"
@@ -359,17 +361,21 @@ void usage() {
         << "\twhere\t\"input_filename\" is the gridded data file to be "
         << "read (required).\n"
 
-        << "\t\t\"grid_filename\" is the gridded data file that defines "
-        << "the output grid (required).\n"
+        << "\t\t\"to_grid\" is a named grid or a gridded data file "
+        << "defining the output grid (required).\n"
         
         << "\t\t\"output_filename\" is the output NetCDF file to be "
         << "written (required).\n"
 
         << "\t\t\"-config string\" may be used multiple times to define "
-        << "the data to be regridded (required).\n"
+        << "the field(s) to be regridded (required).\n"
 
         << "\t\t\"-method type\" overrides the default regridding "
-        << "method (JHG) (optional).\n"
+        << "method (" << interpmthd_to_string(RGInfo.method)
+        << ") (optional).\n"
+
+        << "\t\t\"-width n\" overrides the default regridding "
+        << "width (" << RGInfo.width << ") (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -388,8 +394,14 @@ void set_config(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_interp(const StringArray &a) {
-   Method = string_to_interpmthd(a[0]);
+void set_method(const StringArray &a) {
+   RGInfo.method = string_to_interpmthd(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_width(const StringArray &a) {
+   RGInfo.width = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
