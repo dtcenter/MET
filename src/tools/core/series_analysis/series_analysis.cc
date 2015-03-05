@@ -580,8 +580,8 @@ void get_series_entry(int i_series, VarInfo *info,
             mlog << Debug(1)
                  << "Regridding field " << info->magic_str()
                  << " to the verification grid.\n";
-            dp = upp_regrid(dp, mtddf->grid(), grid,
-                            &conf_info.regrid_info.method);
+            dp = met_regrid(dp, mtddf->grid(), grid,
+                            conf_info.regrid_info);
          }
 
          // Store the found file

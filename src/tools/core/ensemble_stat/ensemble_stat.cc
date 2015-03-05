@@ -470,8 +470,8 @@ void process_ensemble() {
                     << "Regridding ensemble field "
                     << conf_info.ens_info[i]->magic_str()
                     << " to the verification grid.\n";
-               ens_dp = upp_regrid(ens_dp, ens_mtddf->grid(), grid,
-                                   &conf_info.regrid_info.method);
+               ens_dp = met_regrid(ens_dp, ens_mtddf->grid(), grid,
+                                   conf_info.regrid_info);
             }
 
             // Store the ensemble valid time, if not already set
@@ -882,8 +882,8 @@ int process_point_ens(int i_ens) {
 
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {
-            fcst_dpa[j] = upp_regrid(fcst_dpa[j], ens_mtddf->grid(), grid,
-                                     &conf_info.regrid_info.method);
+            fcst_dpa[j] = met_regrid(fcst_dpa[j], ens_mtddf->grid(), grid,
+                                     conf_info.regrid_info);
          }
       }
 
@@ -1133,8 +1133,8 @@ void process_grid_vx() {
                     << "Regridding ensemble field "
                     << conf_info.vx_pd[i].fcst_info->magic_str()
                     << " to the verification grid.\n";
-               fcst_dp[j] = upp_regrid(fcst_dp[j], ens_mtddf->grid(), grid,
-                                       &conf_info.regrid_info.method);
+               fcst_dp[j] = met_regrid(fcst_dp[j], ens_mtddf->grid(), grid,
+                                       conf_info.regrid_info);
             }
          }
          else {
@@ -1185,8 +1185,8 @@ void process_grid_vx() {
                     << "Regridding observation field "
                     << conf_info.vx_pd[i].obs_info->magic_str()
                     << " to the verification grid.\n";
-               obs_dp = upp_regrid(obs_dp, obs_mtddf->grid(), grid,
-                                   &conf_info.regrid_info.method);
+               obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
+                                   conf_info.regrid_info);
             }
 
             break;
