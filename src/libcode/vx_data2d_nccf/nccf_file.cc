@@ -959,16 +959,19 @@ void NcCfFile::read_netcdf_grid()
     break;
     
   } /* endfor - i */
-  
+
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
 
-  NcAtt *grid_mapping_att = data_var->get_att("grid_mapping");
-
-  if (grid_mapping_att != 0)
+  if(data_var != 0)
   {
-    get_grid_from_grid_mapping(grid_mapping_att);
-    return;
+    NcAtt *grid_mapping_att = data_var->get_att("grid_mapping");
+
+    if (grid_mapping_att != 0)
+    {
+      get_grid_from_grid_mapping(grid_mapping_att);
+      return;
+    }
   }
   
   // If the grid mapping isn't provided, see if we can intuit a projection
