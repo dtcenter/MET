@@ -218,7 +218,7 @@ void process_data_file() {
       }
  
       // Regrid the data plane
-      to_dp = upp_regrid(fr_dp, fr_grid, to_grid, &RGInfo.method);
+      to_dp = met_regrid(fr_dp, fr_grid, to_grid, RGInfo);
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {

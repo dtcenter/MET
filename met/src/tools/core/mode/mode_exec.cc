@@ -228,8 +228,8 @@ void ModeExecutive::setup_fcst_obs_data()
       mlog << Debug(1)
            << "Regridding forecast " << engine.conf_info.fcst_info->magic_str()
            << " to the verification grid.\n";
-      Fcst_sd.data = upp_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
-                                &engine.conf_info.regrid_info.method);
+      Fcst_sd.data = met_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
+                                engine.conf_info.regrid_info);
    }
 
       // For probability fields, rescale from [0, 100] to [0, 1]
@@ -251,8 +251,8 @@ void ModeExecutive::setup_fcst_obs_data()
       mlog << Debug(1)
            << "Regridding observation " << engine.conf_info.obs_info->magic_str()
            << " to the verification grid.\n";
-      Obs_sd.data = upp_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
-                               &engine.conf_info.regrid_info.method);
+      Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
+                               engine.conf_info.regrid_info);
    }
 
       // For probability fields, rescale from [0, 100] to [0, 1]

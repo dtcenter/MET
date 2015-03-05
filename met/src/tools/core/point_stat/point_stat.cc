@@ -555,8 +555,8 @@ void process_fcst_climo_files() {
 
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {
-            fcst_dpa[j] = upp_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
-                                     &conf_info.regrid_info.method);
+            fcst_dpa[j] = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
+                                     conf_info.regrid_info);
          }
       }
 
@@ -576,8 +576,8 @@ void process_fcst_climo_files() {
 
             // Loop through the climatology fields
             for(j=0; j<climo_dpa.n_planes(); j++) {
-               climo_dpa[j] = upp_regrid(climo_dpa[j], climo_mtddf->grid(), grid,
-                                         &conf_info.regrid_info.method);
+               climo_dpa[j] = met_regrid(climo_dpa[j], climo_mtddf->grid(), grid,
+                                         conf_info.regrid_info);
             }
          }
       }

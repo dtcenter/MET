@@ -20,18 +20,21 @@
 
 #include "vx_grid.h"
 #include "data_plane.h"
+#include "config_constants.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  I'm setting the interp params to (void *) for now ... later it'll
-   //    probably be a pointer (or reference) to a struct
-   //
+extern DataPlane met_regrid (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
 
 
-extern DataPlane upp_regrid (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, void * interp_params);
+////////////////////////////////////////////////////////////////////////
+
+
+extern DataPlane met_regrid_bilinear    (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
+extern DataPlane met_regrid_nearest_nbr (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
+extern DataPlane met_regrid_budget      (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -318,8 +318,8 @@ void process_scores() {
          mlog << Debug(1)
               << "Regridding forecast " << conf_info.fcst_info[i]->magic_str()
               << " to the verification grid.\n";
-         fcst_dp = upp_regrid(fcst_dp, fcst_mtddf->grid(), grid,
-                              &conf_info.regrid_info.method);
+         fcst_dp = met_regrid(fcst_dp, fcst_mtddf->grid(), grid,
+                              conf_info.regrid_info);
       }
 
       // For probability fields, check to see if they need to be
@@ -349,8 +349,8 @@ void process_scores() {
          mlog << Debug(1)
               << "Regridding observation " << conf_info.obs_info[i]->magic_str()
               << " to the verification grid.\n";
-         obs_dp = upp_regrid(obs_dp, obs_mtddf->grid(), grid,
-                             &conf_info.regrid_info.method);
+         obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
+                             conf_info.regrid_info);
       }
 
       // Set the observation lead time

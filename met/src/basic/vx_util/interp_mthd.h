@@ -30,7 +30,11 @@ enum InterpMthd {
    InterpMthd_DW_Mean,
    InterpMthd_LS_Fit,
    InterpMthd_Nbrhd,
-   InterpMthd_Bilin
+   InterpMthd_Bilin, 
+
+   InterpMthd_NearestNbr,
+   InterpMthd_Budget,
+
 };
 
 //

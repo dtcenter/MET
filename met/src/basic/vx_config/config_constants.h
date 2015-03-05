@@ -200,6 +200,11 @@ struct RegridInfo {
    ConcatString name;   // Named grid or path to gridded data file
    InterpMthd   method; // Regridding method
    int          width;  // Regridding width
+
+   RegridInfo();
+
+   void *       hook;   //  not allocated
+
    void         clear();
 };
 
