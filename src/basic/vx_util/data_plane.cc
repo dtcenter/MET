@@ -415,6 +415,30 @@ return;
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+
+
+void DataPlane::put(const double value, const int x, const int y)
+
+{
+
+if ( !Data )  {
+
+   mlog << Error
+        << "\n\n  DataPlane::put() -> no data plane allocated!\n\n";
+
+   exit ( 1 );
+
+}
+
+const int n = two_to_one(x, y);   //  the two_to_one function does range checking on x and y
+
+Data[n] = value;
+
+return;
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
