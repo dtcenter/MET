@@ -21,19 +21,22 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-DataPlane met_regrid_budget (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+DataPlane met_regrid_budget (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
 
 {
 
-DataPlane out;
+DataPlane to_data;
 
-out.set_size(to_grid.nx(), to_grid.ny());
+to_data.set_size(to_grid.nx(), to_grid.ny());
 
-// Copy timing info
-out.set_init(in.init());
-out.set_valid(in.valid());
-out.set_lead(in.lead());
-out.set_accum(in.accum());
+   //
+   // Copy timing info
+   //
+
+to_data.set_init  (from_data.init());
+to_data.set_valid (from_data.valid());
+to_data.set_lead  (from_data.lead());
+to_data.set_accum (from_data.accum());
 
 
 
@@ -42,7 +45,7 @@ out.set_accum(in.accum());
    //  done
    //
 
-return ( out );
+return ( to_data );
 
 }
 
