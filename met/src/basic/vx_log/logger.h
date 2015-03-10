@@ -116,6 +116,7 @@ class LoggerWarning {
    public:
       int warn;
       bool ExitOnWarning;
+      bool NeedToExit;
 
       LoggerWarning();
       ~LoggerWarning();
