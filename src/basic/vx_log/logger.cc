@@ -217,6 +217,8 @@ LoggerWarning::LoggerWarning()
 
    ExitOnWarning = DefaultExitOnWarning;
 
+   NeedToExit = false;
+
 }
 
 
@@ -225,7 +227,7 @@ LoggerWarning::LoggerWarning()
 
 LoggerWarning::~LoggerWarning()
 {
-   if(ExitOnWarning)
+   if(Warning.NeedToExit)
    {
       mlog << Error
            << "\nExiting since exit_on_warning = TRUE;\n\n";
@@ -244,6 +246,7 @@ LoggerWarning::LoggerWarning(const LoggerWarning & lw)
 
    ExitOnWarning = lw.ExitOnWarning;
 
+   NeedToExit = lw.NeedToExit;
 }
 
 
@@ -255,6 +258,8 @@ LoggerWarning & LoggerWarning::operator=(const LoggerWarning & lw)
    warn = lw.warn;
 
    ExitOnWarning = lw.ExitOnWarning;
+
+   NeedToExit = lw.NeedToExit;
 
    return (*this);
 
@@ -1189,6 +1194,8 @@ Logger & Logger::operator<<(const LoggerError e)
 Logger & Logger::operator<<(const LoggerWarning w)
 {  
    (*this) << level(WarningMessageLevel);
+   
+   if (Warning.ExitOnWarning) Warning.NeedToExit = true;
    
    return (*this);
 
