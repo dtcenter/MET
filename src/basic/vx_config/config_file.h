@@ -55,6 +55,8 @@ class MetConfig : public Dictionary {
 
       void set_debug(bool = true);
 
+      void set_exit_on_warning();
+
          //
          //  get stuff
          //
