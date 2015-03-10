@@ -25,6 +25,7 @@ using namespace std;
 #include "is_bad_data.h"
 
 #include "config_file.h"
+#include "config_constants.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -217,6 +218,22 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void MetConfig::set_exit_on_warning()
+
+{
+
+bool b = lookup_bool(conf_key_exit_on_warning, false);
+
+if ( LastLookupStatus )  mlog.set_exit_on_warning(b);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool MetConfig::read(const char * name)
 
 {
@@ -305,6 +322,8 @@ LineNumber = 1;
 Column     = 1;
 
 is_lhs     = true;
+
+set_exit_on_warning();
 
 return ( true );
 
@@ -409,6 +428,8 @@ Column     = 1;
 
 is_lhs     = true;
 
+set_exit_on_warning();
+
 return ( true );
 
 }
@@ -461,3 +482,4 @@ return ( _e );
 
 
 
+////////////////////////////////////////////////////////////////////////

@@ -41,22 +41,6 @@ clear();
 
 ////////////////////////////////////////////////////////////////////////
 
-bool parse_conf_exit_on_warning(Dictionary *dict) {
-   bool b;
-
-   if(!dict) {
-      mlog << Error << "\nparse_conf_exit_on_warning() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   b = dict->lookup_bool(conf_key_exit_on_warning);
-
-   return(b);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 ConcatString parse_conf_version(Dictionary *dict) {
    ConcatString s;
 
