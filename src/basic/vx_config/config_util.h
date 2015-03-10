@@ -28,6 +28,7 @@ static MetConfig conf_const(replace_path(config_const_filename));
 
 ////////////////////////////////////////////////////////////////////////
 
+extern bool            parse_conf_exit_on_warning(Dictionary *dict);
 extern ConcatString    parse_conf_version(Dictionary *dict);
 extern ConcatString    parse_conf_string(Dictionary *dict, const char *);
 extern GrdFileType     parse_conf_file_type(Dictionary *dict);

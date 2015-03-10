@@ -35,6 +35,8 @@ static const int ErrorMessageLevel     = -1;
 
 static const int WarningMessageLevel   =  0;
 
+static const bool DefaultExitOnWarning =  false;
+
    //
    //  these need external linkage, do not make static or extern
    //
@@ -213,6 +215,8 @@ LoggerWarning::LoggerWarning()
 {
    warn = WarningMessageLevel;
 
+   ExitOnWarning = DefaultExitOnWarning;
+
 }
 
 
@@ -221,6 +225,13 @@ LoggerWarning::LoggerWarning()
 
 LoggerWarning::~LoggerWarning()
 {
+   if(ExitOnWarning)
+   {
+      mlog << Error
+           << "\nExiting since exit_on_warning = TRUE;\n\n";
+      exit(1);
+   }
+
 }
 
 
@@ -231,6 +242,8 @@ LoggerWarning::LoggerWarning(const LoggerWarning & lw)
 {
    warn = lw.warn;
 
+   ExitOnWarning = lw.ExitOnWarning;
+
 }
 
 
@@ -240,6 +253,8 @@ LoggerWarning::LoggerWarning(const LoggerWarning & lw)
 LoggerWarning & LoggerWarning::operator=(const LoggerWarning & lw)
 {
    warn = lw.warn;
+
+   ExitOnWarning = lw.ExitOnWarning;
 
    return (*this);
 
@@ -459,7 +474,7 @@ void Logger::dump(ostream & dump_out, int depth) const
       dump_out << "(nul)\n";
    else
       dump_out << '\"' << LogFilename << "\"\n";
-
+   
    dump_out.flush();
 
 }
@@ -479,6 +494,19 @@ void Logger::set_verbosity_level(const int i)
       // message level is less than or equal to the verbosity level.
       //
    VerbosityLevel = (i < MinimumMessageLevel) ? DefaultVerbosityLevel : i;
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
+void Logger::set_exit_on_warning(bool b)
+{
+      //
+      // if true, exit after writing the first warning message
+      //
+   Warning.ExitOnWarning = b;
 
 }
 
@@ -529,7 +557,7 @@ Logger & Logger::operator<<(const char * s)
    StringArray messages;
    char tmp[2];
    int i, len, msg_len;
-
+   
    memset(tmp, 0, sizeof(tmp));
 
    if (!s || !*s)
@@ -1159,9 +1187,9 @@ Logger & Logger::operator<<(const LoggerError e)
 
 
 Logger & Logger::operator<<(const LoggerWarning w)
-{
+{  
    (*this) << level(WarningMessageLevel);
-
+   
    return (*this);
 
 }
@@ -1183,7 +1211,7 @@ Logger & Logger::operator<<(const LoggerDebug d)
 
 
 void Logger::write_msg_type()
-{
+{  
       //
       // if the message level is -1, then this is an ERROR type message,
       // so write it to cerr
