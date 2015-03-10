@@ -313,6 +313,7 @@ static const char config_map_data_filename[] = "MET_BASE/config/ConfigMapData";
 // Parameter key names common to multiple tools
 //
 
+static const char conf_key_exit_on_warning[]   = "exit_on_warning";
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
 static const char conf_key_obtype[]            = "obtype";

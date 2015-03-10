@@ -39,6 +39,21 @@ clear();
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+bool parse_conf_exit_on_warning(Dictionary *dict) {
+   bool b;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_exit_on_warning() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   b = dict->lookup_bool(conf_key_exit_on_warning);
+
+   return(b);
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -474,7 +489,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
   if (!dict)
   {
     mlog << Error << "\nparse_conf_time_summary() -> "
-	 << "empty dictionary!\n\n";
+         << "empty dictionary!\n\n";
     exit(1);
   }
    
@@ -493,9 +508,9 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
   info.step = dict->lookup_int(conf_key_time_summary_step);
   if (info.step <= 0) {
     mlog << Error << "\nparse_conf_time_summary() -> "
-	 << "The \"" << conf_key_time_summary_step
-	 << "\" parameter (" << info.step
-	 << ") must be greater than 0!\n\n";
+         << "The \"" << conf_key_time_summary_step
+         << "\" parameter (" << info.step
+         << ") must be greater than 0!\n\n";
     exit(1);
   }
   
@@ -503,9 +518,9 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
   info.width = dict->lookup_int(conf_key_time_summary_width);
   if (info.width <= 0) {
     mlog << Error << "\nparse_conf_time_summary() -> "
-	 << "The \"" << conf_key_time_summary_width
-	 << "\" parameter (" << info.width
-	 << ") must be greater than 0!\n\n";
+         << "The \"" << conf_key_time_summary_width
+         << "\" parameter (" << info.width
+         << ") must be greater than 0!\n\n";
     exit(1);
   }
   
