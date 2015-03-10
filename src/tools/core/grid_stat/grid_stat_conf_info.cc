@@ -224,6 +224,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    fcst_ta   = new ThreshArray [n_vx];
    obs_ta    = new ThreshArray [n_vx];
 
+   // Initialize pointers
+   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
+   
    // Parse the fcst and obs field information
    for(i=0; i<n_vx; i++) {
     

@@ -214,6 +214,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    ens_info = new VarInfo * [n_ens_var];
    ens_ta   = new ThreshArray [n_ens_var];
 
+   // Initialize pointers
+   for(i=0; i<n_ens_var; i++) ens_info[i] = (VarInfo *) 0;
+
     // Parse the ensemble field information
    for(i=0,max_n_thresh=0; i<n_ens_var; i++) {
 

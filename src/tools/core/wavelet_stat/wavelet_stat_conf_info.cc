@@ -210,7 +210,10 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    obs_info  = new VarInfo *   [n_vx];
    fcst_ta   = new ThreshArray [n_vx];
    obs_ta    = new ThreshArray [n_vx];
-   
+
+   // Initialize pointers
+   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
+
    // Parse the fcst and obs field information
    max_n_thresh = 0;
    for(i=0; i<n_vx; i++) {

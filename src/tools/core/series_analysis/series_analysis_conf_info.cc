@@ -196,6 +196,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    fcst_info = new VarInfo * [n_fcst];
    obs_info  = new VarInfo * [n_obs];
 
+   // Initialize pointers
+   for(i=0; i<n_fcst; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
+
    // Parse the fcst field information
    for(i=0; i<n_fcst; i++) {
     
