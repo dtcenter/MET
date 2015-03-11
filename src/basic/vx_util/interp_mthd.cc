@@ -24,17 +24,19 @@ ConcatString interpmthd_to_string(const InterpMthd m) {
    ConcatString out;
 
    switch(m) {
-      case(InterpMthd_Min):     out = interpmthd_min_str;     break;
-      case(InterpMthd_Max):     out = interpmthd_max_str;     break;
-      case(InterpMthd_Median):  out = interpmthd_median_str;  break;
-      case(InterpMthd_UW_Mean): out = interpmthd_uw_mean_str; break;
-      case(InterpMthd_DW_Mean): out = interpmthd_dw_mean_str; break;
-      case(InterpMthd_LS_Fit):  out = interpmthd_ls_fit_str;  break;
-      case(InterpMthd_Nbrhd):   out = interpmthd_nbrhd_str;   break;
-      case(InterpMthd_Bilin):   out = interpmthd_bilin_str;   break;
+      case(InterpMthd_Min):        out = interpmthd_min_str;     break;
+      case(InterpMthd_Max):        out = interpmthd_max_str;     break;
+      case(InterpMthd_Median):     out = interpmthd_median_str;  break;
+      case(InterpMthd_UW_Mean):    out = interpmthd_uw_mean_str; break;
+      case(InterpMthd_DW_Mean):    out = interpmthd_dw_mean_str; break;
+      case(InterpMthd_LS_Fit):     out = interpmthd_ls_fit_str;  break;
+      case(InterpMthd_Nbrhd):      out = interpmthd_nbrhd_str;   break;
+      case(InterpMthd_Bilin):      out = interpmthd_bilin_str;   break;
+      case(InterpMthd_NearestNbr): out = interpmthd_nearest_str; break;
+      case(InterpMthd_Budget):     out = interpmthd_budget_str;  break;
 
       case(InterpMthd_None):
-      default:                  out = interpmthd_none_str;    break;
+      default:                     out = interpmthd_none_str;    break;
    }   //  switch
 
    return(out);
@@ -53,6 +55,8 @@ InterpMthd string_to_interpmthd(const char *mthd_str) {
    else if(strcmp(mthd_str, interpmthd_ls_fit_str)  == 0) m = InterpMthd_LS_Fit;
    else if(strcmp(mthd_str, interpmthd_nbrhd_str)   == 0) m = InterpMthd_Nbrhd;
    else if(strcmp(mthd_str, interpmthd_bilin_str)   == 0) m = InterpMthd_Bilin;
+   else if(strcmp(mthd_str, interpmthd_nearest_str) == 0) m = InterpMthd_NearestNbr;
+   else if(strcmp(mthd_str, interpmthd_budget_str)  == 0) m = InterpMthd_Budget;
    else                                                   m = InterpMthd_None;
 
    return(m);

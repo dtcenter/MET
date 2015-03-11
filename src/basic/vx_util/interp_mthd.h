@@ -31,7 +31,6 @@ enum InterpMthd {
    InterpMthd_LS_Fit,
    InterpMthd_Nbrhd,
    InterpMthd_Bilin, 
-
    InterpMthd_NearestNbr,
    InterpMthd_Budget,
 
@@ -49,6 +48,8 @@ static const char interpmthd_dw_mean_str[] = "DW_MEAN";
 static const char interpmthd_ls_fit_str[]  = "LS_FIT";
 static const char interpmthd_nbrhd_str[]   = "NBRHD";
 static const char interpmthd_bilin_str[]   = "BILIN";
+static const char interpmthd_nearest_str[] = "NEAREST";
+static const char interpmthd_budget_str[]  = "BUDGET";
 
 ///////////////////////////////////////////////////////////////////////////////
 
