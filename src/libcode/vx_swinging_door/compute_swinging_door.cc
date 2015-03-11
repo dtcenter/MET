@@ -90,10 +90,14 @@ bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
   // in data_values and return it in slopes.  Can use is_bad_data(value)
   // which returns 1 for bad, 0 for good.
 
+  // Check for empty list.
+
+  if (observations.size() == 0) return true; 
+  
   // Save the information for the first point
 
   vector< SDObservation >::const_iterator curr_obs = observations.begin();
-  
+
   time_t start_time = curr_obs->getValidTime();
   double start_value = curr_obs->getValue();
   double start_top_value = start_value + error;
