@@ -26,6 +26,22 @@ DataPlane met_regrid_budget (const DataPlane & from_data, const Grid & from_grid
 {
 
 DataPlane to_data;
+int i, j, ixt, iyt;
+int count;
+double dxt, dyt, dxf, dyf;
+double sum, lat, lon, value;
+double fraction;
+
+   //
+   //  this stuff is hard-coded for now ... will generalize later, 
+   //   when we know the code is working properly.
+   //
+
+const double target_fraction = 0.5;
+const int Radius = 2;
+const int N = 2*Radius + 1;
+const int NN = N*N;
+const double delta = 1.0/N;
 
 to_data.set_size(to_grid.nx(), to_grid.ny());
 
@@ -38,7 +54,48 @@ to_data.set_valid (from_data.valid());
 to_data.set_lead  (from_data.lead());
 to_data.set_accum (from_data.accum());
 
+   //
+   //  Do the interpolation
+   //
 
+for (ixt=0; ixt<(to_grid.nx()); ++ixt)  {
+
+   for (iyt=0; iyt<(to_grid.ny()); ++iyt)  {
+
+      sum = 0.0;
+
+      count = 0;
+
+      for (i=-Radius; i<=Radius; ++i)  {
+
+         dxt = ixt + i*delta;
+
+         for (j=-Radius; j<=Radius; ++j)  {
+
+            dyt = iyt + j*delta;
+
+            to_grid.xy_to_latlon(dxt, dyt, lat, lon);
+
+            from_grid.latlon_to_xy(lat, lon, dxf, dyf);
+            
+            value = interp_bilin(from_data, dxf, dyf);
+
+            if ( value != bad_data_double )  { sum += value;  ++count; }
+
+         }   //  for j
+
+      }   //  for i
+
+      fraction = ((double) count)/((double) NN);
+
+      if ( fraction >= target_fraction )  value = sum/count;
+      else                                value = bad_data_double;
+
+      to_data.put(value, ixt, iyt);
+
+   }   //  for iyt
+
+}   //  for ixt
 
 
    //
