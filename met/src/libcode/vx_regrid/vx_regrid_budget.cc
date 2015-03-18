@@ -26,7 +26,7 @@ DataPlane met_regrid_budget (const DataPlane & from_data, const Grid & from_grid
 {
 
 DataPlane to_data;
-int i, j, ixt, iyt;
+int i, j, ixt, iyt, ixf, iyf;
 int count;
 double dxt, dyt, dxf, dyf;
 double sum, lat, lon, value;
@@ -67,22 +67,25 @@ for (ixt=0; ixt<(to_grid.nx()); ++ixt)  {
       count = 0;
 
       for (i=-Radius; i<=Radius; ++i)  {
-      // for (i=0; i<N; ++i)  {
 
          dxt = ixt + i*delta;
 
          for (j=-Radius; j<=Radius; ++j)  {
-         // for (j=0; j<N; ++j)  {
 
             dyt = iyt + j*delta;
 
             to_grid.xy_to_latlon(dxt, dyt, lat, lon);
 
             from_grid.latlon_to_xy(lat, lon, dxf, dyf);
-            
+
             // value = interp_bilin(from_data, dxf, dyf);
 
-            value = from_data(nint(dxf), nint(dyf));
+            ixf = nint(dxf);
+            iyf = nint(dyf);
+
+            value = bad_data_double;
+            
+            if ( (ixf >= 0) && (ixf < from_grid.nx()) && (iyf >= 0) && (iyf < from_grid.ny()) )  value = from_data(ixf, iyf);
 
             if ( value != bad_data_double )  { sum += value;  ++count; }
 
