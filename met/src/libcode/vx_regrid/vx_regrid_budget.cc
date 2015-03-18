@@ -66,11 +66,13 @@ for (ixt=0; ixt<(to_grid.nx()); ++ixt)  {
 
       count = 0;
 
-      for (i=-Radius; i<=Radius; ++i)  {
+      // for (i=-Radius; i<=Radius; ++i)  {
+      for (i=0; i<N; ++i)  {
 
          dxt = ixt + i*delta;
 
-         for (j=-Radius; j<=Radius; ++j)  {
+         // for (j=-Radius; j<=Radius; ++j)  {
+         for (j=0; j<N; ++j)  {
 
             dyt = iyt + j*delta;
 
