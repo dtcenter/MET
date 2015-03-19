@@ -13,7 +13,5 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_regrid.a
 libvx_regrid_a_SOURCES = \
               vx_regrid.h vx_regrid.cc \
-              vx_regrid_bilinear.cc \
-              vx_regrid_budget.cc \
-              vx_regrid_nearest_nbr.cc
+              vx_regrid_budget.cc
 libvx_regrid_a_CPPFLAGS = ${MET_CPPFLAGS}

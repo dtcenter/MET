@@ -195,15 +195,16 @@ struct InterpInfo {
 //
 
 struct RegridInfo {
-   bool         enable; // Enable or disable regridding
-   FieldType    field;  // Forecast grid, observation grid, or none
-   ConcatString name;   // Named grid or path to gridded data file
-   InterpMthd   method; // Regridding method
-   int          width;  // Regridding width
+   bool         enable;     // Enable or disable regridding
+   FieldType    field;      // Forecast grid, observation grid, or none
+   double       vld_thresh; // Valid data interpolation threshold
+   ConcatString name;       // Named grid or path to gridded data file
+   InterpMthd   method;     // Regridding method
+   int          width;      // Regridding width
 
    RegridInfo();
 
-   void *       hook;   //  not allocated
+   void *       hook;       //  not allocated
 
    void         clear();
 };

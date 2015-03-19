@@ -38,7 +38,6 @@ double fraction;
    //   when we know the code is working properly.
    //
 
-const double target_fraction = 0.5;
 const int Radius = 2;
 const int N = 2*Radius + 1;
 const int NN = N*N;
@@ -96,7 +95,7 @@ for (ixt=0; ixt<(to_grid.nx()); ++ixt)  {
 
       fraction = ((double) count)/((double) NN);
 
-      if ( fraction >= target_fraction )  value = sum/count;
+      if ( fraction >= info.vld_thresh )  value = sum/count;
       else                                value = bad_data_double;
 
       to_data.put(value, ixt, iyt);
