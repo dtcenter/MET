@@ -55,6 +55,7 @@ static ConcatString program_name;
 // Constants
 static const InterpMthd DefaultInterpMthd = InterpMthd_UW_Mean;
 static const int        DefaultInterpWdth = 1;
+static const double     DefaultVldThresh  = 0.5;
 
 // Variables for command line arguments
 static ConcatString InputFilename;
@@ -79,6 +80,7 @@ static void usage();
 static void set_config(const StringArray &);
 static void set_method(const StringArray &);
 static void set_width(const StringArray &);
+static void set_vld_thresh(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
@@ -107,10 +109,11 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    // Set default regridding options
-   RGInfo.enable = true;
-   RGInfo.field  = FieldType_None;
-   RGInfo.method = DefaultInterpMthd;
-   RGInfo.width  = DefaultInterpWdth;
+   RGInfo.enable     = true;
+   RGInfo.field      = FieldType_None;
+   RGInfo.method     = DefaultInterpMthd;
+   RGInfo.width      = DefaultInterpWdth;
+   RGInfo.vld_thresh = DefaultVldThresh;
    
    // Check for zero arguments
    if(argc == 1) usage();
@@ -122,11 +125,12 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_config,    "-config", 1);
-   cline.add(set_method,    "-method", 1);
-   cline.add(set_width,     "-width",  1);
-   cline.add(set_logfile,   "-log",    1);
-   cline.add(set_verbosity, "-v",      1);
+   cline.add(set_config,     "-config",      1);
+   cline.add(set_method,     "-method",      1);
+   cline.add(set_width,      "-width",       1);
+   cline.add(set_vld_thresh, "-vld_thresh",  1);
+   cline.add(set_logfile,    "-log",         1);
+   cline.add(set_verbosity,  "-v",           1);
 
    // Parse the command line
    cline.parse();
@@ -181,6 +185,11 @@ void process_data_file() {
    // Determine the "to" grid
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
    mlog << Debug(2) << "Output grid: " << to_grid.serialize() << "\n";
+
+   mlog << Debug(2) << "Interpolation options: "
+        << "method = " << interpmthd_to_string(RGInfo.method)
+        << ", width = " << RGInfo.width
+        << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
    
    // Build the run command string
    run_cs << "Regrid from " << fr_grid.serialize() << " to " << to_grid.serialize();
@@ -194,7 +203,7 @@ void process_data_file() {
       mlog << Error << "\nprocess_data_file() -> "
            << "unable to determine file type of \"" << InputFilename
            << "\"\n\n";
-      exit (1);
+      exit(1);
    }
 
    // Open the output file
@@ -402,6 +411,18 @@ void set_method(const StringArray &a) {
 
 void set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_vld_thresh(const StringArray &a) {
+   RGInfo.vld_thresh = atof(a[0]);
+   if(RGInfo.vld_thresh > 1 || RGInfo.vld_thresh < 0) {
+      mlog << Error << "\nset_vld_thresh() -> "
+           << "-vld_thresh may only be set between 0 and 1: "
+           << RGInfo.vld_thresh << "\n\n";
+      exit(1);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////

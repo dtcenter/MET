@@ -23,6 +23,7 @@ using namespace std;
 void RegridInfo::clear() {
    enable = false;
    field = FieldType_None;
+   vld_thresh = bad_data_double;
    name.clear();
    method = InterpMthd_None;
    width = bad_data_int;
@@ -30,13 +31,8 @@ void RegridInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-
-RegridInfo::RegridInfo()
-
-{
-
-clear();
-
+RegridInfo::RegridInfo() {
+   clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -643,9 +639,10 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
       info.enable = true;
    }
 
-   // Parse method and width
-   info.method = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
-   info.width  = regrid_dict->lookup_int(conf_key_width);
+   // Parse valid data threshold, method, and width
+   info.vld_thresh = regrid_dict->lookup_double(conf_key_vld_thresh);
+   info.method     = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
+   info.width      = regrid_dict->lookup_int(conf_key_width);
 
    return(info);
 }
