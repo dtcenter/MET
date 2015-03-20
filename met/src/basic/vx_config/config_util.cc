@@ -653,7 +653,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
            << "\" since the regridding width is 1.\n\n";
       info.method = InterpMthd_Nearest;
    }
-   
+
    // Check the bilinear and budget special cases   
    if((info.method == InterpMthd_Bilin ||
        info.method == InterpMthd_Budget) &&
@@ -663,8 +663,8 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
            << info.width << " to 2 for regridding method \""
            << interpmthd_to_string(info.method) << "\".\n\n";
       info.width = 2;
-   }   
-   
+   }
+
    return(info);
 }
 
