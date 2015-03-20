@@ -377,37 +377,37 @@ double compute_horz_interp(const DataPlane &dp,
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
 
-      case(InterpMthd_Min):        // Minimum
+      case(InterpMthd_Min):     // Minimum
          v = interp_min(dp, x_ll, y_ll, wdth, interp_thresh);
          break;
 
-      case(InterpMthd_Max):        // Maximum
+      case(InterpMthd_Max):     // Maximum
          v = interp_max(dp, x_ll, y_ll, wdth, interp_thresh);
          break;
 
-      case(InterpMthd_Median):     // Median
+      case(InterpMthd_Median):  // Median
          v = interp_median(dp, x_ll, y_ll, wdth, interp_thresh);
          break;
 
-      case(InterpMthd_UW_Mean):    // Unweighted Mean
+      case(InterpMthd_UW_Mean): // Unweighted Mean
          v = interp_uw_mean(dp, x_ll, y_ll, wdth, interp_thresh);
          break;
 
-      case(InterpMthd_DW_Mean):    // Distance-Weighted Mean
+      case(InterpMthd_DW_Mean): // Distance-Weighted Mean
          v = interp_dw_mean(dp, x_ll, y_ll, wdth, obs_x, obs_y,
                             dw_mean_pow, interp_thresh);
          break;
 
-      case(InterpMthd_LS_Fit):     // Least-squares fit
+      case(InterpMthd_LS_Fit):  // Least-squares fit
          v = interp_ls_fit(dp, x_ll, y_ll, wdth, obs_x, obs_y,
                            interp_thresh);
          break;
 
-      case(InterpMthd_Bilin):      // Bilinear interpolation
+      case(InterpMthd_Bilin):   // Bilinear interpolation
          v = interp_bilin(dp, obs_x, obs_y);
          break;
 
-      case(InterpMthd_NearestNbr): // Nearest Neighbor
+      case(InterpMthd_Nearest): // Nearest Neighbor
          v = interp_uw_mean(dp, x_ll, y_ll, 1, interp_thresh);
          break;
 

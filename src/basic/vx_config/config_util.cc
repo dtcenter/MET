@@ -644,6 +644,27 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    info.method     = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
    info.width      = regrid_dict->lookup_int(conf_key_width);
 
+   // Check the nearest neighbor special case
+   if(info.method != InterpMthd_Nearest && info.width == 1) {
+      mlog << Warning << "\nparse_conf_regrid() -> "
+           << "Resetting the regridding method from \""
+           << interpmthd_to_string(info.method) << "\" to \""
+           << interpmthd_nearest_str
+           << "\" since the regridding width is 1.\n\n";
+      info.method = InterpMthd_Nearest;
+   }
+   
+   // Check the bilinear and budget special cases   
+   if((info.method == InterpMthd_Bilin ||
+       info.method == InterpMthd_Budget) &&
+      info.width != 2) {
+      mlog << Warning << "\nparse_conf_regrid() -> "
+           << "Resetting the regridding width from "
+           << info.width << " to 2 for regridding method \""
+           << interpmthd_to_string(info.method) << "\".\n\n";
+      info.width = 2;
+   }   
+   
    return(info);
 }
 
@@ -726,6 +747,14 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
          // Store interpolation method as a string
          method = interpmthd_to_string(int_to_interpmthd(mthd_na[j]));
 
+         // Check for budget interpolation
+         if(strcmp(method, interpmthd_budget_str)) {
+            mlog << Error << "\nparse_conf_interp() -> "
+                 << "\"" << interpmthd_budget_str
+                 << "\" not valid for interpolating, only regridding.\n\n";
+            exit(1);
+         }
+
          // Loop over the widths
          for(k=0; k<wdth_na.n_elements(); k++) {
 
@@ -733,13 +762,13 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
             width = nint(wdth_na[k]);
 
             // Check for the nearest neighbor special case
-            if(width == 1 && strcmp(method, interpmthd_uw_mean_str) != 0) {
+            if(width == 1 && strcmp(method, interpmthd_nearest_str) != 0) {
                mlog << Warning << "\nparse_conf_interp() -> "
                     << "For neareast neighbor interpolation method, "
                     << "resetting method from \"" << method << "\" to \""
-                    << interpmthd_uw_mean_str
+                    << interpmthd_nearest_str
                     << "\" since the interpolation width is 1.\n\n";
-               method = interpmthd_uw_mean_str;
+               method = interpmthd_nearest_str;
             }
 
             // Check for the bilinear interpolation special case
