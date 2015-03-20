@@ -37,7 +37,7 @@ switch ( info.method )  {
    case InterpMthd_DW_Mean:
    case InterpMthd_LS_Fit:
    case InterpMthd_Bilin:
-   case InterpMthd_NearestNbr:
+   case InterpMthd_Nearest:
       out = met_regrid_generic (in, from_grid, to_grid, info);
       break;
 
