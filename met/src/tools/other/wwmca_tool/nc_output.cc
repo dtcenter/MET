@@ -151,7 +151,7 @@ data_var->add_att("accum_time",  "1 hour");
    //  global attributes
    //
 
-grid_output(ginfo, ncfile);
+grid_output(ToGrid->info(), ncfile);
 
    //
    //  fill in lat/lon values

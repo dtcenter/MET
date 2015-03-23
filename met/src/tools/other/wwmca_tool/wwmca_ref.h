@@ -79,9 +79,6 @@ class WwmcaRegridder {
       InterpolationValue do_both_hemi(int to_x, int to_y) const;
 
 
-      GridInfo ginfo;
-
-
       StringArray grid_strings;
 
       GridHemisphere Hemi;

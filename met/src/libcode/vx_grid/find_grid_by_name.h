@@ -34,6 +34,7 @@
 //
 static const double ncep_earth_radius_km = 6371.20;
 
+static const bool west_longitude_positive = false;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,6 +42,8 @@ static const double ncep_earth_radius_km = 6371.20;
 extern bool find_grid_by_name(const char *, Grid &);
 
 extern bool find_grid_by_name(const char *, GridInfo &);
+
+extern bool parse_grid_def(const StringArray &, Grid &);
 
 
 ////////////////////////////////////////////////////////////////////////

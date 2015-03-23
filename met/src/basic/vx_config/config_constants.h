@@ -198,7 +198,8 @@ struct RegridInfo {
    bool         enable;     // Enable or disable regridding
    FieldType    field;      // Forecast grid, observation grid, or none
    double       vld_thresh; // Valid data interpolation threshold
-   ConcatString name;       // Named grid or path to gridded data file
+   ConcatString name;       // Named grid, path to gridded data file,
+                            // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
 

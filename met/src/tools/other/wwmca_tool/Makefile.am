@@ -31,8 +31,8 @@ wwmca_regrid_LDFLAGS = ${MET_LDFLAGS}
 wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
-	-lvx_render \
 	-lvx_ps \
+	-lvx_render \
 	-lvx_afm \
 	-lvx_stat_out \
 	-lvx_statistics \
@@ -40,12 +40,13 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_cal \
@@ -74,20 +75,21 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
 	-lvx_ps \
-	-lvx_afm \
 	-lvx_render \
+	-lvx_afm \
 	-lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
 	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_cal \

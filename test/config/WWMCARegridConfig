@@ -10,6 +10,8 @@
 // Specify the grid to which the data should be interpolated in one of the
 // following ways:
 //
+//    - The path to a gridded data file whose grid should be used
+//
 //    - Name ("GNNN" where NNN indicates the three digit NCEP grid number)
 //
 //    - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
@@ -21,21 +23,11 @@
 //
 //    - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
 //
-to_grid = "${GRID_DEF}";
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Interpolation methods
-//
-interp = {
-   vld_thresh = 0.50;
-
-   type = {
-      method = UW_MEAN;
-      width  = 5;
-   };
-   
+regrid = {
+   to_grid    = "${GRID_DEF}";
+   vld_thresh = 0.5;
+   method     = UW_MEAN;
+   width      = 5;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
