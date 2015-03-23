@@ -40,7 +40,7 @@ obtype = [];
 
 vx_mask = [ "DTC165", "DTC166" ];
 
-interp_mthd = [ "UW_MEAN" ];
+interp_mthd = [ "NEAREST" ];
 
 interp_pnts = [ 1 ];
 
