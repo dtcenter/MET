@@ -35,7 +35,7 @@ static const char * default_config_filename = "MET_BASE/config/WWMCARegridConfig
 
 
    //
-   //  default valued for command-line switches
+   //  default values for command-line switches
    //
 
 
