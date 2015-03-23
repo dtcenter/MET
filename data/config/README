@@ -117,13 +117,26 @@ obtype = "ANALYS";
 // input gridded data files.  The "regrid" entry specifies regridding logic
 // using the following entries:
 //
-//   - The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, or the
-//     path to a gridded data file which defines the verification grid.
+//   - The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
+//     to a gridded data file defining the grid, or an explicit grid specification
+//     string.
 //      - to_grid = NONE;   To disable regridding.
 //      - to_grid = FCST;   To regrid observations to the forecast grid.
 //      - to_grid = OBS;    To regrid forecasts to the observation grid.
 //      - to_grid = "G218"; To regrid both to a named grid.
 //      - to_grid = "path"; To regrid both to a grid defined by a file.
+//      - to_grid = "spec"; To define a grid specified as follows:
+//         - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
+//           [standard_parallel_2]
+//         - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
+//         - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
+//         - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+//
+//    - The "vld_thresh" entry specifies a proportion between 0 and 1 to define
+//      the required ratio of valid data points.  When regridding, compute
+//      a ratio of the number of valid data points to the total number of
+//      points in the neighborhood.  If that ratio is less than this threshold,
+//      write bad data for the current point.
 //
 //   - The "method" entry defines the regridding method to be used.
 //      - method = UW_MEAN; To regrid using an unweighted average.
@@ -132,9 +145,10 @@ obtype = "ANALYS";
 //      - width = 4;        To regrid using a 4x4 box.
 //
 regrid = {
-   to_grid = NONE;
-   method  = UW_MEAN;
-   width   = 1;
+   to_grid    = NONE;
+   vld_thresh = 0.5;
+   method     = UW_MEAN;
+   width      = 1;
 };
 
 //

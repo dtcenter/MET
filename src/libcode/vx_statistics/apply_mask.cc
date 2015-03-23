@@ -49,7 +49,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
       }
       else {
          mlog << Debug(3)
-              << "Verify on the matching forecast and observation grids.\n";
+              << "Use the matching forecast and observation grids.\n";
          vx_grid = *fgrid;
       }
    }
@@ -57,28 +57,37 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    // Otherwise, process regridding logic
    else {
 
+      // Parse info.name as a white-space separated string
+      StringArray sa;
+      sa.parse_wsss(info.name);
+
       // Verify on the forecast grid
       if(info.field == FieldType_Fcst) {
          mlog << Debug(3)
-              << "Verify on the forecast grid.\n";
+              << "Use the forecast grid.\n";
          vx_grid = *fgrid;
       }
       // Verify on the observation grid
       else if(info.field == FieldType_Obs) {
          mlog << Debug(3)
-              << "Verify on the observation grid.\n";
+              << "Use the observation grid.\n";
          vx_grid = *ogrid;
       }
       // Search for a named grid
-      else if(find_grid_by_name(info.name, vx_grid)) {
+      else if(sa.n_elements() == 1 && find_grid_by_name(info.name, vx_grid)) {
          mlog << Debug(3)
-              << "Verify on the grid named \"" << info.name << "\".\n";
+              << "Use the grid named \"" << info.name << "\".\n";
       }
+      // Parse grid definition
+      else if(sa.n_elements() > 1 && parse_grid_def(sa, vx_grid)) {
+         mlog << Debug(3)
+              << "Use the grid defined by string \"" << info.name << "\".\n";
+      }      
       // Extract the grid from a gridded data file
       else {
 
          mlog << Debug(3)
-              << "Verify on the grid defined by \"" << info.name << "\".\n";
+              << "Use the grid defined by file \"" << info.name << "\".\n";
 
          Met2dDataFileFactory mtddf_factory;
          Met2dDataFile *mtddf = (Met2dDataFile *) 0;
@@ -94,7 +103,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    }
 
    mlog << Debug(3)
-        << "Verification Grid: " << vx_grid.serialize() << "\n";
+        << "Grid Definition: " << vx_grid.serialize() << "\n";
 
    return(vx_grid);   
 }
