@@ -748,7 +748,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
          method = interpmthd_to_string(int_to_interpmthd(mthd_na[j]));
 
          // Check for budget interpolation
-         if(strcmp(method, interpmthd_budget_str)) {
+         if(strcmp(method, interpmthd_budget_str) == 0) {
             mlog << Error << "\nparse_conf_interp() -> "
                  << "\"" << interpmthd_budget_str
                  << "\" not valid for interpolating, only regridding.\n\n";
