@@ -62,6 +62,7 @@ static ConcatString InputFilename;
 static ConcatString OutputFilename;
 static StringArray ConfigSA;
 static RegridInfo RGInfo;
+static ConcatString VarName;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -81,6 +82,7 @@ static void set_config(const StringArray &);
 static void set_method(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
+static void set_name(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
@@ -125,12 +127,13 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_config,     "-config",      1);
-   cline.add(set_method,     "-method",      1);
-   cline.add(set_width,      "-width",       1);
-   cline.add(set_vld_thresh, "-vld_thresh",  1);
-   cline.add(set_logfile,    "-log",         1);
-   cline.add(set_verbosity,  "-v",           1);
+   cline.add(set_config,     "-config",     1);
+   cline.add(set_method,     "-method",     1);
+   cline.add(set_width,      "-width",      1);
+   cline.add(set_vld_thresh, "-vld_thresh", 1);
+   cline.add(set_name,       "-name",       1);   
+   cline.add(set_logfile,    "-log",        1);
+   cline.add(set_verbosity,  "-v",          1);
 
    // Parse the command line
    cline.parse();
@@ -314,20 +317,21 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 
 void write_nc(const DataPlane &dp, const Grid &grid,
               const VarInfo *vinfo, const GrdFileType &ftype) {
-   ConcatString cs;
    
-   // Define output variable and attributes
-   cs << cs_erase << vinfo->name();
-   if(vinfo->level().type() != LevelType_Accum &&
-      ftype != FileType_NcMet &&
-      ftype != FileType_General_Netcdf &&
-      ftype != FileType_NcPinterp &&
-      ftype != FileType_NcCF) {
-      cs << "_" << vinfo->level_name();
+   // Define output variable name, if not already set
+   if(VarName.length() == 0) {
+      VarName << cs_erase << vinfo->name();
+      if(vinfo->level().type() != LevelType_Accum &&
+         ftype != FileType_NcMet &&
+         ftype != FileType_General_Netcdf &&
+         ftype != FileType_NcPinterp &&
+         ftype != FileType_NcCF) {
+         VarName << "_" << vinfo->level_name();
+      }
    }
 
-   NcVar *data_var = nc_out->add_var(cs, ncFloat, lat_dim, lon_dim);
-   data_var->add_att("name", cs);
+   NcVar *data_var = nc_out->add_var(VarName, ncFloat, lat_dim, lon_dim);
+   data_var->add_att("name", VarName);
    data_var->add_att("long_name", vinfo->long_name());
    data_var->add_att("level", vinfo->level_name());
    data_var->add_att("units", vinfo->units());
@@ -385,6 +389,9 @@ void usage() {
         << "\toutput_filename\n"
         << "\t-config string\n"
         << "\t[-method type]\n"
+        << "\t[-width n]\n"
+        << "\t[-vld_thresh n]\n"
+        << "\t[-name str]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -406,6 +413,13 @@ void usage() {
 
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
+
+        << "\t\t\"-vld_thresh n\" overrides the default required "
+        << "ratio of valid data for regridding (" << RGInfo.vld_thresh
+        << ") (optional).\n"
+
+        << "\t\t\"-name str\" specifies the output variable name "
+        << "(optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -444,6 +458,12 @@ void set_vld_thresh(const StringArray &a) {
            << RGInfo.vld_thresh << "\n\n";
       exit(1);
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_name(const StringArray & a) {
+   VarName = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
