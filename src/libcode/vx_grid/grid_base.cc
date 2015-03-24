@@ -683,13 +683,7 @@ bool operator==(const Grid & g1, const Grid & g2)
 if ( !(g1.rep) )  return ( false );
 if ( !(g2.rep) )  return ( false );
 
-
-ConcatString s1, s2;
-
-s1 = g1.rep->serialize();
-s2 = g2.rep->serialize();
-
-return ( s1 == s2 );
+return ( g1.info() == g2.info() );
 
 }
 
@@ -711,5 +705,120 @@ return ( ! status );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool operator==(const GridInfo & i1, const GridInfo & i2)
+
+{
+
+     if ( i1.lc && i2.lc )  return ( is_eq(i1.lc, i2.lc) );
+else if ( i1.st && i2.st )  return ( is_eq(i1.st, i2.st) );
+else if ( i1.ll && i2.ll )  return ( is_eq(i1.ll, i2.ll) );
+else if ( i1.m  && i2.m  )  return ( is_eq(i1.m,  i2.m ) );
+
+return ( false );
+
+}
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const LambertData * lc1, const LambertData * lc2)
+
+{
+
+if ( !lc1 || !lc2 )  return ( false );
+
+bool status = false;
+
+if ( lc1->nx                == lc2->nx           &&
+     lc1->ny                == lc2->ny           &&
+     is_eq  (lc1->scale_lat_1, lc2->scale_lat_1) &&
+     is_eq  (lc1->scale_lat_2, lc2->scale_lat_2) &&
+     is_eq  (lc1->lat_pin,     lc2->lat_pin)     &&
+     is_eq  (lc1->lon_pin,     lc2->lon_pin)     &&
+     is_eq  (lc1->x_pin,       lc2->x_pin)       &&
+     is_eq  (lc1->y_pin,       lc2->y_pin)       &&
+     is_eq  (lc1->lon_orient,  lc2->lon_orient)  &&
+     is_eq  (lc1->d_km,        lc2->d_km)        &&
+     is_eq  (lc1->r_km,        lc2->r_km) )  status = true;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const StereographicData * st1, const StereographicData * st2)
+
+{
+   
+if ( !st1 || !st2 )  return ( false );
+
+bool status = false;
+
+if ( st1->nx               == st2->nx          &&
+     st1->ny               == st2->ny          &&
+     st1->hemisphere       == st2->hemisphere  &&
+     is_eq  (st1->scale_lat,  st2->scale_lat)  &&
+     is_eq  (st1->lat_pin,    st2->lat_pin)    &&
+     is_eq  (st1->lon_pin,    st2->lon_pin)    &&
+     is_eq  (st1->x_pin,      st2->x_pin)      &&
+     is_eq  (st1->y_pin,      st2->y_pin)      &&
+     is_eq  (st1->lon_orient, st2->lon_orient) &&
+     is_eq  (st1->d_km,       st2->d_km)       &&
+     is_eq  (st1->r_km,       st2->r_km) )  status = true;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const LatLonData * ll1, const LatLonData * ll2)
+
+{
+
+if ( !ll1 || !ll2 )  return ( false );
+
+bool status = false;
+
+if ( ll1->Nlat            == ll2->Nlat       &&
+     ll1->Nlon            == ll2->Nlon       &&
+     is_eq  (ll1->lat_ll,    ll2->lat_ll)    &&
+     is_eq  (ll1->lon_ll,    ll2->lon_ll)    &&
+     is_eq  (ll1->delta_lat, ll2->delta_lat) &&
+     is_eq  (ll1->delta_lon, ll2->delta_lon) )  status = true;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const MercatorData * m1, const MercatorData * m2)
+
+{
+
+if ( !m1 || !m2 )  return ( false );
+
+bool status = false;
+
+if ( m1->nx           == m2->nx      &&
+     m1->ny           == m2->ny      &&
+     is_eq  (m1->lat_ll, m2->lat_ll) &&
+     is_eq  (m1->lon_ll, m2->lon_ll) &&
+     is_eq  (m1->lat_ur, m2->lat_ur) &&
+     is_eq  (m1->lon_ur, m2->lon_ur) )  status = true;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////

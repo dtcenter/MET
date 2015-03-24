@@ -43,6 +43,8 @@ class Grid;   //  forward reference
 
 class GridInfo {
 
+   friend bool operator==(const GridInfo &, const GridInfo &);
+
    private:
 
       void init_from_scratch();
@@ -225,6 +227,13 @@ class Grid : public GridInterface {
 
 extern bool operator==(const Grid &, const Grid &);
 extern bool operator!=(const Grid &, const Grid &);
+extern bool operator==(const GridInfo &, const GridInfo &);
+
+extern bool is_eq(const LambertData *,       const LambertData *);
+extern bool is_eq(const StereographicData *, const StereographicData *);
+extern bool is_eq(const LatLonData *,        const LatLonData *);
+extern bool is_eq(const MercatorData *,      const MercatorData *);
+
 
 
 ////////////////////////////////////////////////////////////////////////
