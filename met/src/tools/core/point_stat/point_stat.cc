@@ -1731,23 +1731,17 @@ void usage() {
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"fcst_file\" is a forecast file in either GRIB "
-        << "or NetCDF format containing the field(s) to be verified "
-        << "(required).\n"
+        << "\twhere\t\"fcst_file\" is a gridded forecast file containing "
+        << "the field(s) to be verified (required).\n"
 
         << "\t\t\"obs_file\" is an observation file in NetCDF format "
-        << "(output of PB2NC or ASCII2NC) containing the verifying "
-        << "observation data points (required).\n"
+        << "containing the verifying point observations (required).\n"
 
         << "\t\t\"config_file\" is a PointStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
-        << "\t\t\"-climo climo_file\" is a climatological file in "
-        << "either Grid or NetCDF format on the same grid as the "
-        << "forecast file to be\n"
-        << "\t\tused when computing scalar and vector anomaly "
-        << "measures.  If not provided, scalar and vector "
-        << "anomaly values will not be computed (optional).\n"
+        << "\t\t\"-climo climo_file\" is a gridded climatological file "
+        << "used when computing scalar and vector anomaly statistics (optional).\n"
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
@@ -1765,7 +1759,7 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n";
+        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
    exit (1);
 }

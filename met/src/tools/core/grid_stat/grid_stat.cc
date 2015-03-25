@@ -1856,10 +1856,7 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n"
-
-        << "\n\tNOTE: The forecast and observation fields must be "
-        << "on the same grid.\n\n";
+        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
    exit(1);
 }
