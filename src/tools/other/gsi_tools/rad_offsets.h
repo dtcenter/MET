@@ -9,9 +9,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
    //
    //  these indices are 1-based
+   //
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  diag
    //
 
 
@@ -47,6 +53,10 @@ static const int wind_speed_index       = 24;    // wind speed (m/s)
 
 ////////////////////////////////////////////////////////////////////////
 
+
+   //
+   //  diagchan
+   //
 
 static const int btemp_chan_index       = 1;     //  observed brightness temperature
 static const int omg_bc_chan_index      = 2;     //  obs - guess brightness temperature (with bias correction)
