@@ -6,6 +6,8 @@
 static const int  rec_pad_length =    4;
 static const bool    swap_endian = true;
 
+static const bool verbose        = false;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -83,7 +85,14 @@ struct RadParams {
    int iextra;
    int jextra;
 
+   int idiag;
+   int angord;
+   int iversion;
+   int inewpc;
+
    RadParams();
+
+   void dump(ostream &) const;
 
 };
 
@@ -100,6 +109,8 @@ struct ChannelParams {
    int ich;
 
    ChannelParams();
+
+   void dump(ostream &) const;
 
 };
 
@@ -213,6 +224,14 @@ if ( channel >= params.nchanl )  {
 
 }
 
+if ( verbose )  {
+
+   cout << "\nParams:\n";
+
+   params.dump(cout);
+
+}
+
 k = params.idate;   //  YYYYMMDDHH
 
 month = (k/10000)%100;
@@ -238,16 +257,20 @@ const int n_diag = params.ireal;
 
 diag = new float [n_diag];
 
-const int N1 = params.ipchan + params.npred + 1;
+// const int N1 = params.ipchan + params.npred + 1;
+const int N1 = params.idiag;
 const int N2 = params.nchanl;
 
 diagchan = new float [N1*N2];
 
-// cout << "(N1, N2) = (" << N1 << ", " << N2 << ")\n";
-
-// cout << "diag = " << n_diag << " floats\n";
+// cout << '\n';
 // 
-// cout << "diagchan = " << (N1*N2) << " floats\n";
+// cout << "(N1, N2) = (" << N1 << ", " << N2 << ")\n";
+// 
+// cout << "diag     = " << n_diag  << " floats\n" << flush;
+// cout << "diagchan = " << (N1*N2) << " floats\n" << flush;
+// 
+// cout << '\n';
 
 count = 0;
 
@@ -353,6 +376,48 @@ ipchan = 0;
 iextra = 0;
 jextra = 0;
 
+idiag    = 0;
+angord   = 0;
+iversion = 0;
+inewpc   = 0;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RadParams::dump(ostream & out) const
+
+{
+
+out << "obstype  = \"" << obstype << "\"\n"
+    << "dplat    = \"" << dplat   << "\"\n"
+    << "isis     = \"" << isis    << "\"\n";
+
+out << "jiter    = " << jiter  << '\n'
+    << "nchanl   = " << nchanl << '\n'
+    << "npred    = " << npred  << '\n'
+    << "idate    = " << idate  << '\n'
+    << "ireal    = " << ireal  << '\n'
+    << "ipchan   = " << ipchan << '\n'
+    << "iextra   = " << iextra << '\n'
+    << "jextra   = " << jextra << '\n';
+
+out << "idiag    = " << idiag    << '\n'
+    << "angord   = " << angord   << '\n'
+    << "iversion = " << iversion << '\n'
+    << "inewpc   = " << inewpc   << '\n';
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
 }
 
 
@@ -412,6 +477,8 @@ if ( n_read < 72 )  {
 
 }
 
+// cout << "  read_params() -> n_read = " << n_read << '\n';
+
 unsigned char * b = buf;
 
 my_memcpy( &(params.isis),    b, 20);
@@ -427,6 +494,11 @@ my_memcpy( &(params.ipchan),  b, 4);
 my_memcpy( &(params.iextra),  b, 4);
 my_memcpy( &(params.jextra),  b, 4);
 
+my_memcpy( &(params.idiag),    b, 4);
+my_memcpy( &(params.angord),   b, 4);
+my_memcpy( &(params.iversion), b, 4);
+my_memcpy( &(params.inewpc),   b, 4);
+
 if ( swap_endian )  {
 
    shuffle_4( &(params.jiter)  );
@@ -437,6 +509,11 @@ if ( swap_endian )  {
    shuffle_4( &(params.ipchan) );
    shuffle_4( &(params.iextra) );
    shuffle_4( &(params.jextra) );
+
+   shuffle_4( &(params.idiag) );
+   shuffle_4( &(params.angord) );
+   shuffle_4( &(params.iversion) );
+   shuffle_4( &(params.inewpc) );
 
 }
 
@@ -517,6 +594,7 @@ bool read_data(int fd, const int n_diag, const int N1, const int N2, float * dia
 const int bytes = (int) ((n_diag + N1*N2)*sizeof(float));
 int n_read;
 const int n12 = N1*N2;
+static int rec_num = 0;
 
 if ( bytes > buf_size )  {
 
@@ -531,13 +609,15 @@ n_read = read_fortran_binary(fd, buf, buf_size, rec_pad_length, swap_endian);
 
 if ( n_read == 0 )  return ( false );
 
-if ( n_read < bytes )  {
+if ( n_read != bytes )  {
 
-   cerr << "\n\n  " << program_name << ": read_data() -> read error\n\n";
+   cerr << "  " << program_name << ": read_data() -> warning ... expected "
+        << bytes << " bytes, got " << n_read << "\n";
 
-   exit ( 1 );
+   // exit ( 1 );
 
 }
+
 
 unsigned char * b = buf;
 
@@ -550,14 +630,36 @@ if ( swap_endian )  {
 
    for (j=0; j<n_diag; ++j)  shuffle_4(diag + j);
 
-   for (j=0; j<n12; ++j)  shuffle_4(diagchan + j);
+   for (j=0; j<n12; ++j)     shuffle_4(diagchan + j);
+
+}
+
+/*
+int j, k;
+
+for (j=0; j<n_diag; ++j)  {
+
+   cout << rec_num << ' ' << "diag " << (j + 1) << " = " << diag[j] << '\n';
 
 }
 
 
+for (j=0; j<N1; ++j)  {
+
+   k = fortran_two_to_one(N1,  j, channel);
+
+   cout << rec_num << ' ' << "diagbuf[" << j << ", " << channel << "] = " << diagchan[k] << '\n';
+
+}
+
+cout << '\n';
+*/
+
    //
    //  done
    //
+
+++rec_num;
 
 return ( true );
 
@@ -586,8 +688,11 @@ const double lon             = diag[lon_index - 1];
 const double elev            = diag[elevation_index - 1];
 const double obs_time        = diag[dtime_index - 1];
 
-const double obs_value       = diagchan[fortran_two_to_one(N1,  btemp_chan_index - 1, channel)];
-const double obs_minus_guess = diagchan[fortran_two_to_one(N1, omg_bc_chan_index - 1, channel)];
+const int    obs_offset      = fortran_two_to_one(N1,  btemp_chan_index - 1, channel);
+const int    omg_offset      = fortran_two_to_one(N1, omg_bc_chan_index - 1, channel);
+
+const double obs_value       = diagchan[obs_offset];
+const double obs_minus_guess = diagchan[omg_offset];
 const double guess           = obs_value - obs_minus_guess;
 
 
