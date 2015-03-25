@@ -23,7 +23,7 @@ obtype = "MC_PCP";
 //
 regrid = {
    to_grid = NONE;
-   method  = UW_MEAN;
+   method  = NEAREST;
    width   = 1;
 };
 
@@ -90,7 +90,7 @@ interp = {
    field      = FCST;
    vld_thresh = 1.0;
 
-   type = [ { method = UW_MEAN; width  = 1; } ];
+   type = [ { method = NEAREST; width  = 1; } ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////

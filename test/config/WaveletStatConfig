@@ -23,7 +23,7 @@ obtype = "MC_PCP";
 //
 regrid = {
    to_grid = NONE;
-   method  = UW_MEAN;
+   method  = NEAREST;
    width   = 1;
 };
 

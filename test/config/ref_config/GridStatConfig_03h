@@ -71,7 +71,7 @@ interp = {
 
    type = [
       {
-         method = UW_MEAN;
+         method = NEAREST;
          width  = 1;
       }
    ];

@@ -23,7 +23,7 @@ obtype = "ANALYS";
 //
 regrid = {
    to_grid = NONE;
-   method  = UW_MEAN;
+   method  = NEAREST;
    width   = 1;
 };
 
@@ -82,7 +82,7 @@ interp = {
    vld_thresh = 1.0;
 
    type = [
-      { method = UW_MEAN; width  = 1; },
+      { method = NEAREST; width  = 1; },
       { method = UW_MEAN; width  = 3; },
       { method = MIN;     width  = 1; },
       { method = MAX;     width  = 3; }

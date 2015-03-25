@@ -6,7 +6,7 @@ model = "WRF";
 
 regrid = {
    to_grid = NONE;
-   method  = UW_MEAN;
+   method  = NEAREST;
    width   = 1;
 };
 
@@ -64,7 +64,7 @@ interp = {
 
    type = [
       { method = MEDIAN;   width  = 3;        },
-      { method = UW_MEAN;  width  = 1;        },
+      { method = NEAREST;  width  = 1;        },
       { method = DW_MEAN;  width  = [ 3, 5 ]; },
       { method = LS_FIT;   width  = [ 3, 5 ]; },
       { method = BILIN;    width  = 2;        }
