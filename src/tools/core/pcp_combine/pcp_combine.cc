@@ -600,9 +600,8 @@ void sum_data_files(Grid & grid, DataPlane & plane)
          //
          if(!(grid == gr)) {
             mlog << Error << "\nsum_data_files() -> "
-                 << "the input fields must be on the same grid: "
-                 << grid.serialize() << " != " << gr.serialize()
-                 << "\n\n";
+                 << "the input fields must be on the same grid.\n"
+                 << grid.serialize() << "\n" << gr.serialize() << "\n\n";
             exit(1);
          }
 
@@ -800,9 +799,8 @@ void do_add_command()
       //
       if( grid1 != grid2 ) {
          mlog << Error << "\ndo_add_command() -> "
-              << "the input fields must be on the same grid: "
-              << grid1.serialize() << " != " << grid2.serialize()
-              << "\n\n";
+              << "the input fields must be on the same grid.\n"
+              << grid1.serialize() << "\n" << grid2.serialize() << "\n\n";
          exit(1);
       }
 
@@ -890,9 +888,8 @@ void do_sub_command()
    //
    if( grid1 != grid2 ) {
       mlog << Error << "\ndo_sub_command() -> "
-           << "the input fields must be on the same grid: "
-           << grid1.serialize() << " != " << grid2.serialize()
-           << "\n\n";
+           << "the input fields must be on the same grid.\n"
+           << grid1.serialize() << "\n" << grid2.serialize() << "\n\n";
       exit(1);
    }
 
