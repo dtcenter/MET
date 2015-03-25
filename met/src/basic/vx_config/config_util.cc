@@ -1087,6 +1087,9 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_dw_mean_str)) m = InterpMthd_DW_Mean;
    else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))  m = InterpMthd_LS_Fit;
    else if(i == conf_const.lookup_int(interpmthd_bilin_str))   m = InterpMthd_Bilin;
+   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))   m = InterpMthd_Nbrhd;
+   else if(i == conf_const.lookup_int(interpmthd_nearest_str)) m = InterpMthd_Nearest;
+   else if(i == conf_const.lookup_int(interpmthd_budget_str))  m = InterpMthd_Budget;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i

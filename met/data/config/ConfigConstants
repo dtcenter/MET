@@ -29,6 +29,9 @@ UW_MEAN        = 4;
 DW_MEAN        = 5;
 LS_FIT         = 6;
 BILIN          = 7;
+NBRHD          = 8;
+NEAREST        = 9;
+BUDGET         = 10;
 
 // Interpolation types
 NONE           = 1;
