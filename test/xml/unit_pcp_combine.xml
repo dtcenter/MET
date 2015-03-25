@@ -173,7 +173,7 @@
 
   <!--                                    -->
   <!--  pcp_combine -add a single file    -->
-  <!--  using -varname option             -->
+  <!--  using -name option                -->
 
   <test name="pcp_combine_add_VARNAME">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
@@ -181,7 +181,7 @@
       -add \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib 12 \
       &OUTPUT_DIR;/pcp_combine/nam_2012040900_F012_VARNAME.nc \
-      -varname twelve_hour_precip
+      -name twelve_hour_precip
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F012_VARNAME.nc</grid_nc>
