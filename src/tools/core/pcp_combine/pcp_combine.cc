@@ -135,7 +135,7 @@ static StringArray  pcp_dir;
 static ConcatString pcp_reg_exp = default_reg_exp;
 static ConcatString user_dict = "";
 static ConcatString field_name = "";
-static bool         varname_flag = false;
+static bool         name_flag = false;
 static VarInfo*     var_info = (VarInfo *) 0;
 
 // Variables for the add and subtract commands
@@ -179,7 +179,7 @@ static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_user_dict(const StringArray & a);
-static void set_varname(const StringArray & a);
+static void set_name(const StringArray & a);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -247,7 +247,8 @@ void process_command_line(int argc, char **argv)
    cline.add(set_pcpdir,    "-pcpdir",   1);
    cline.add(set_pcprx,     "-pcprx",    1);
    cline.add(set_user_dict, "-config",   1);
-   cline.add(set_varname,   "-varname",  1);
+   cline.add(set_name,      "-name",     1);
+   cline.add(set_name,      "-varname",  1);
    cline.add(set_logfile,   "-log",      1);
    cline.add(set_verbosity, "-v",        1);   
 
@@ -1125,7 +1126,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // If the -varname command line option was used or the accumulation
    // interval is zero, just use the field_name
-   if(varname_flag || nc_accum <= 0) {
+   if(name_flag || nc_accum <= 0) {
       var_str = field_name;
    }
    // Otherwise, append the acculuation interval to the variable name
@@ -1223,7 +1224,7 @@ void usage()
         << "Usage: " << program_name << "\n"
         << "\t[[-sum] sum_args] | [-add add_args] | [-subtract subtract_args]\n"
         << "\t[-config config_str]\n"
-        << "\t[-varname variable_name]\n"
+        << "\t[-name variable_name]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -1242,7 +1243,7 @@ void usage()
         << "\t\t\"-config config_str\" configuration string to use when "
         << "searching for records in input files (optional).\n"
 
-        << "\t\t\"-varname variable_name\" name of combined variable in "
+        << "\t\t\"-name variable_name\" name of combined variable in "
         << "output NetCDF file (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
@@ -1405,10 +1406,10 @@ void set_user_dict(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_varname(const StringArray & a)
+void set_name(const StringArray & a)
 {
-   field_name   = a[0];
-   varname_flag = true;
+   field_name = a[0];
+   name_flag  = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
