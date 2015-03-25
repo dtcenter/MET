@@ -2863,13 +2863,11 @@ void usage() {
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"fcst_file\" is a forecast file in either Grib "
-        << "or netCDF format (output of pcp_combine) containing the "
-        << "field(s) to be verified (required).\n"
+        << "\twhere\t\"fcst_file\" is a gridded forecast file containing "
+        << "the field(s) to be verified (required).\n"
 
-        << "\t\t\"obs_file\" is an observation file in either Grib "
-        << "or netCDF format (output of pcp_combine) containing the "
-        << "verifying field(s) (required).\n"
+        << "\t\t\"obs_file\" is a gridded observation file containing "
+        << "the verifying field(s) (required).\n"
 
         << "\t\t\"config_file\" is a WaveletStatConfig file containing "
         << "the desired configuration settings (required).\n"
@@ -2881,10 +2879,7 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n"
-
-        << "\n\tNOTE: The forecast and observation fields must be "
-        << "on the same grid.\n\n" << flush;
+        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
    exit(1);
 }
