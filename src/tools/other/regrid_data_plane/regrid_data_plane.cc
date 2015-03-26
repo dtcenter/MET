@@ -53,7 +53,7 @@ using namespace std;
 static ConcatString program_name;
 
 // Constants
-static const InterpMthd DefaultInterpMthd = InterpMthd_UW_Mean;
+static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
 static const int        DefaultInterpWdth = 1;
 static const double     DefaultVldThresh  = 0.5;
 
@@ -398,8 +398,9 @@ void usage() {
         << "\twhere\t\"input_filename\" is the gridded data file to be "
         << "read (required).\n"
 
-        << "\t\t\"to_grid\" is a named grid or a gridded data file "
-        << "defining the output grid (required).\n"
+        << "\t\t\"to_grid\" defines the output grid a as named grid, the "
+        << "path to a gridded data file, or an explicit grid "
+        << "specification string (required).\n"
         
         << "\t\t\"output_filename\" is the output NetCDF file to be "
         << "written (required).\n"
