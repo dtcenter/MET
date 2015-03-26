@@ -522,11 +522,13 @@ void StringArray::parse_delim(const char * text, const char *delim)
 
 {
 
+// check for null pointer
+if ( !text ) return;
+
 char * line = (char *) 0;
 char * c    = (char *) 0;
 char * lp   = (char *) 0;
 const int n = strlen(text);
-
 
 clear();
 
