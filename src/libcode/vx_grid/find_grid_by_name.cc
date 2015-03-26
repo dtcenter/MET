@@ -486,7 +486,6 @@ ldata.lon_orient = lon_orient;
 ldata.d_km = D_km;
 ldata.r_km = R_km;
 
-
 if ( !west_longitude_positive )  {
 
    ldata.lon_pin    *= -1.0;
@@ -697,8 +696,7 @@ ldata.Nlon = Nx;
 
 if ( !west_longitude_positive )  {
 
-   ldata.lon_ll    *= -1.0;
-   ldata.delta_lon *= -1.0;
+   ldata.lon_ll *= -1.0;
 
 }
 
