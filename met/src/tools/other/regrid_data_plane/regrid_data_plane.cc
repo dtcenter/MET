@@ -317,21 +317,25 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 
 void write_nc(const DataPlane &dp, const Grid &grid,
               const VarInfo *vinfo, const GrdFileType &ftype) {
+   ConcatString nc_var_name;
    
    // Define output variable name, if not already set
    if(VarName.length() == 0) {
-      VarName << cs_erase << vinfo->name();
+      nc_var_name << cs_erase << vinfo->name();
       if(vinfo->level().type() != LevelType_Accum &&
          ftype != FileType_NcMet &&
          ftype != FileType_General_Netcdf &&
          ftype != FileType_NcPinterp &&
          ftype != FileType_NcCF) {
-         VarName << "_" << vinfo->level_name();
+         nc_var_name << "_" << vinfo->level_name();
       }
    }
+   else {
+      nc_var_name = VarName;
+   }
 
-   NcVar *data_var = nc_out->add_var(VarName, ncFloat, lat_dim, lon_dim);
-   data_var->add_att("name", VarName);
+   NcVar *data_var = nc_out->add_var(nc_var_name, ncFloat, lat_dim, lon_dim);
+   data_var->add_att("name", nc_var_name);
    data_var->add_att("long_name", vinfo->long_name());
    data_var->add_att("level", vinfo->level_name());
    data_var->add_att("units", vinfo->units());
