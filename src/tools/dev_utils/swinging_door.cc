@@ -44,7 +44,7 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
-#include "vx_swinging_door.h"
+#include "vx_time_series.h"
 
 #include "met_nc_file.h"
 

@@ -27,7 +27,7 @@
 
 #include "netcdf.hh"
 
-#include "vx_swinging_door.h"
+#include "vx_time_series.h"
 
 ////////////////////////////////////////////////////////////////////////
 
