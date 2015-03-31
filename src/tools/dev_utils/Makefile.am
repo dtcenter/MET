@@ -86,7 +86,7 @@ swinging_door_SOURCES = swinging_door.cc \
 	met_nc_file.cc met_nc_file.h
 swinging_door_CPPFLAGS = ${MET_CPPFLAGS}
 swinging_door_LDFLAGS = ${MET_LDFLAGS}
-swinging_door_LDADD = -lvx_swinging_door \
+swinging_door_LDADD = -lvx_time_series \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
