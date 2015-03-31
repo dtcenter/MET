@@ -13,5 +13,6 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_time_series.a
 libvx_time_series_a_SOURCES = \
                compute_swinging_door.cc compute_swinging_door.h \
+               time_series_util.cc time_series_util.h \
                vx_time_series.h
 libvx_time_series_a_CPPFLAGS = ${MET_CPPFLAGS}
