@@ -10,8 +10,8 @@ include ${top_srcdir}/Make-include
 
 # The library
 
-noinst_LIBRARIES = libvx_swinging_door.a
-libvx_swinging_door_a_SOURCES = \
+noinst_LIBRARIES = libvx_time_series.a
+libvx_time_series_a_SOURCES = \
                compute_swinging_door.cc compute_swinging_door.h \
-               vx_swinging_door.h
-libvx_swinging_door_a_CPPFLAGS = ${MET_CPPFLAGS}
+               vx_time_series.h
+libvx_time_series_a_CPPFLAGS = ${MET_CPPFLAGS}
