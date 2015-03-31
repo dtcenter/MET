@@ -178,7 +178,17 @@ void STATAnalysisJob::clear() {
    out_fcst_wind_thresh.clear();
    out_obs_wind_thresh.clear();
 
-   // Set to default values
+   // Initialize ramp job settings
+   ramp_time_fcst  = default_ramp_time;
+   ramp_time_obs   = default_ramp_time;
+   ramp_exact_fcst = default_ramp_exact;
+   ramp_exact_obs  = default_ramp_exact;
+   ramp_thresh_fcst.clear();
+   ramp_thresh_obs.clear();
+   ramp_window_beg = default_ramp_window;
+   ramp_window_end = default_ramp_window;
+
+   // Set to default values   
    out_alpha      = default_alpha;
    out_bin_size   = default_bin_size;
    boot_interval  = default_boot_interval;
@@ -268,6 +278,15 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    out_alpha            = aj.out_alpha;
    out_bin_size         = aj.out_bin_size;
 
+   ramp_time_fcst       = aj.ramp_time_fcst;
+   ramp_time_obs        = aj.ramp_time_obs;
+   ramp_exact_fcst      = aj.ramp_exact_fcst;
+   ramp_exact_obs       = aj.ramp_exact_obs;
+   ramp_thresh_fcst     = aj.ramp_thresh_fcst;
+   ramp_thresh_obs      = aj.ramp_thresh_obs;
+   ramp_window_beg      = aj.ramp_window_beg;
+   ramp_window_end      = aj.ramp_window_end;   
+   
    boot_interval        = aj.boot_interval;
    boot_rep_prop        = aj.boot_rep_prop;
    n_boot_rep           = aj.n_boot_rep;
@@ -442,6 +461,30 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "out_bin_size = "
        << out_bin_size << "\n";
+
+   out << prefix << "ramp_time_fcst = "
+       << sec_to_hhmmss(ramp_time_fcst) << "\n";
+
+   out << prefix << "ramp_time_obs = "
+       << sec_to_hhmmss(ramp_time_obs) << "\n";
+
+   out << prefix << "ramp_exact_fcst = "
+       << bool_to_string(ramp_exact_fcst) << "\n";
+
+   out << prefix << "ramp_exact_obs = "
+       << bool_to_string(ramp_exact_obs) << "\n";
+
+   out << prefix << "ramp_thresh_fcst ... "
+       << ramp_thresh_fcst.get_str() << "\n";
+
+   out << prefix << "ramp_thresh_obs ... "
+       << ramp_thresh_obs.get_str() << "\n";
+
+   out << prefix << "ramp_window_beg = "
+       << sec_to_hhmmss(ramp_window_beg) << "\n";
+
+   out << prefix << "ramp_window_end = "
+       << sec_to_hhmmss(ramp_window_end) << "\n";
 
    out << prefix << "boot_interval = "
        << boot_interval << "\n";
@@ -1092,6 +1135,48 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-out_alpha") == 0) {
          out_alpha = atof(jc_array[i+1]);
          i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_time") == 0) {
+         ramp_time_fcst = ramp_time_obs = timestring_to_sec(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_time_fcst") == 0) {
+         ramp_time_fcst = timestring_to_sec(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_time_obs") == 0) {
+         ramp_time_obs = timestring_to_sec(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_exact") == 0) {
+         ramp_exact_fcst = ramp_exact_obs = string_to_bool(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_exact_fcst") == 0) {
+         ramp_exact_fcst = string_to_bool(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_exact_obs") == 0) {
+         ramp_exact_obs = string_to_bool(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_thresh") == 0) {
+         ramp_thresh_fcst.set(jc_array[i+1]);
+         ramp_thresh_obs.set(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_thresh_fcst") == 0) {
+         ramp_thresh_fcst.set(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_thresh_obs") == 0) {
+         ramp_thresh_obs.set(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-ramp_window") == 0) {
+         ramp_window_beg = timestring_to_sec(jc_array[i+1]);
+         ramp_window_end = timestring_to_sec(jc_array[i+2]);
+         i+=2;
       }
       else if(strcmp(jc_array[i], "-out_bin_size") == 0) {
          out_bin_size = atof(jc_array[i+1]);
@@ -1865,6 +1950,44 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       js << "-out_alpha " << out_alpha << " ";
    }
 
+   // Ramp jobs
+   if(job_type == stat_job_ramp) {
+
+      // ramp_time
+      if(ramp_time_fcst == ramp_time_obs) {
+         js << "-ramp_time " << sec_to_hhmmss(ramp_time_fcst) << " ";
+      }
+      else {
+         js << "-ramp_time_fcst " << sec_to_hhmmss(ramp_time_fcst) << " "
+            << "-ramp_time_obs "  << sec_to_hhmmss(ramp_time_obs)  << " ";
+      }
+
+      // ramp_exact
+      if(ramp_exact_fcst != default_ramp_exact ||
+         ramp_exact_obs  != default_ramp_exact) {
+         if(ramp_exact_fcst == ramp_exact_obs) {
+            js << "-ramp_exact " << bool_to_string(ramp_exact_fcst) << " ";
+         }
+         else {
+            js << "-ramp_exact_fcst " << bool_to_string(ramp_exact_fcst) << " "
+               << "-ramp_exact_obs "  << bool_to_string(ramp_exact_obs)  << " ";
+         }
+      }
+
+      // ramp_thresh
+      if(ramp_thresh_fcst == ramp_thresh_obs) {
+         js << "-ramp_thresh " << ramp_thresh_fcst.get_str() << " ";
+      }
+      else {
+         js << "-ramp_thresh_fcst " << ramp_thresh_fcst.get_str() << " "
+            << "-ramp_thresh_obs "  << ramp_thresh_obs.get_str()  << " ";
+      }
+
+      // ramp_window
+      js << "-ramp_window " << sec_to_hhmmss(ramp_window_beg)
+         << " " << sec_to_hhmmss(ramp_window_end) << " ";
+   }
+
    // Jobs which use out_bin_size
    if(line_type.n_elements() > 0) {
       if(string_to_statlinetype(line_type[0]) == stat_orank &&
@@ -2028,6 +2151,8 @@ STATJobType string_to_statjobtype(const char *str) {
       t = stat_job_go_index;
    else if(strcasecmp(str, statjobtype_str[5]) == 0)
       t = stat_job_ss_index;
+   else if(strcasecmp(str, statjobtype_str[6]) == 0)
+      t = stat_job_ramp;
    else
       t = no_stat_job_type;
 

@@ -22,6 +22,7 @@
 //   004    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
 //   005    02/05/15  Halley Gotway   Add StatHdrInfo to keep track of
 //                    unique header entries for each aggregation.
+//   006    03/30/15  Halley Gotway   Add ramp job type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -148,6 +149,13 @@ struct AggrSSVARInfo {
    map<ConcatString, SSVARInfo, ssvar_bin_cmp> ssvar_bins;
 };
 
+struct AggrRampInfo {
+   StatHdrInfo hdr;
+   ConcatString fcst_var, obs_var;
+   NumArray f_na, o_na;
+   TimeArray valid_ts;
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 extern void clear_stat_hdr_info(StatHdrInfo &hdr);
@@ -215,6 +223,11 @@ extern void aggr_orank_lines(
 extern void aggr_ssvar_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrSSVARInfo> &,
+               int &, int &);
+
+extern void aggr_ramp_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrRampInfo> &,
                int &, int &);
 
 ////////////////////////////////////////////////////////////////////////
