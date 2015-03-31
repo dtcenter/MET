@@ -1012,7 +1012,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_shapedata/Makefile
                  src/libcode/vx_stat_out/Makefile
                  src/libcode/vx_statistics/Makefile
-                 src/libcode/vx_swinging_door/Makefile
+                 src/libcode/vx_time_series/Makefile
                  src/libcode/vx_regrid/Makefile
                  src/libcode/vx_tc_util/Makefile
                  src/tools/Makefile
