@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2013
+// ** Copyright UCAR (c) 1992 - 2015
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,8 +11,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __VX_SWINGING_DOOR_H__
-#define  __VX_SWINGING_DOOR_H__
+#ifndef  __VX_TIME_SERIES_H__
+#define  __VX_TIME_SERIES_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __VX_SWINGING_DOOR_H__
+#endif   //  __VX_TIME_SERIES_H__
 
 
 ////////////////////////////////////////////////////////////////////////
