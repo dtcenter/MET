@@ -543,7 +543,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
       st_adeck.get_type() != thresh_lt && st_adeck.get_type() != thresh_le &&
       st_adeck.get_type() != thresh_gt && st_adeck.get_type() != thresh_ge) {
       mlog << Error << "\ncheck_rirw() -> "
-           << "for non-exact intensity differeces the RI/RW threshold ("
+           << "for non-exact intensity differences the RI/RW threshold ("
            << st_adeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
    }
@@ -553,7 +553,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
       st_bdeck.get_type() != thresh_lt && st_bdeck.get_type() != thresh_le &&
       st_bdeck.get_type() != thresh_gt && st_bdeck.get_type() != thresh_ge) {
       mlog << Error << "\ncheck_rirw() -> "
-           << "for non-exact intensity differeces the RI/RW threshold ("
+           << "for non-exact intensity differences the RI/RW threshold ("
            << st_bdeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
    }
