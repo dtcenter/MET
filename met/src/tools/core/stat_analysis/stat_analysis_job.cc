@@ -30,6 +30,7 @@
 //   010    06/03/14  Halley Gotway   Add aggregate PHIST lines.
 //   011    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
 //   012    02/12/15  Halley Gotway   Write STAT output lines.
+//   013    03/30/15  Halley Gotway   Add ramp job type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -44,6 +45,7 @@ using namespace std;
 #include <unistd.h>
 #include <cmath>
 
+#include "vx_time_series.h"
 #include "vx_log.h"
 
 #include "stat_analysis_job.h"
@@ -163,7 +165,8 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    if(j.column_case.n_elements() > 0 &&
       j.job_type != stat_job_summary &&
       j.job_type != stat_job_aggr &&
-      j.job_type != stat_job_aggr_stat) {
+      j.job_type != stat_job_aggr_stat &&
+      j.job_type != stat_job_ramp) {
       mlog << Warning << "\nThe -by option is ignored for the \""
            << statjobtype_to_string(j.job_type) << "\" job type.\n\n";
    }
@@ -204,6 +207,10 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
 
       case(stat_job_ss_index):
          do_job_ss_index(jobstring, f, j, n_in, n_out, sa_out);
+         break;
+
+      case(stat_job_ramp):
+         do_job_ramp(jobstring, f, j, n_in, n_out, sa_out);
          break;
 
       default:
@@ -805,7 +812,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum the observation rank line types:
    //    ORANK -> RHIST, PHIST
    //
-   else if(in_lt  == stat_orank &&
+   else if(in_lt == stat_orank &&
            (out_lt == stat_rhist || out_lt == stat_phist)) {
       aggr_orank_lines(f, j, orank_map, n_in, n_out);
       write_job_aggr_orank(j, out_lt, orank_map, out_at);
@@ -2343,6 +2350,94 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void write_job_ramp(STATAnalysisJob &j,
+                    map<ConcatString, AggrRampInfo> &m,
+                    AsciiTable &at) {
+   map<ConcatString, AggrRampInfo>::iterator it;
+   NumArray framps, oramps;
+   int i, ts, ut_prv, ut_cur;
+   bool f, o;
+   CTSInfo cts_info;
+
+   mlog << Debug(2) << "Applying ramp detection logic for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Initialize output stats
+   //
+   cts_info.allocate_n_alpha(1);
+   cts_info.alpha[0] = j.out_alpha;
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(); it != m.end(); it++) {
+      
+      //
+      // Nothing to do
+      //
+      if(it->second.valid_ts.n_elements() == 0) continue;
+
+      // JHG, need to sort times!
+
+      //
+      // Print warning for inconsistent time step
+      //
+      for(i=1; i<it->second.valid_ts.n_elements(); i++) {
+         ut_cur = it->second.valid_ts[i];
+         ut_prv = it->second.valid_ts[i-1];
+         if(i == 1) ts = ut_cur - ut_prv;
+         if(ts != (ut_cur - ut_prv)) {
+            mlog << Warning << "\nwrite_job_ramp() -> "
+                 << "the time step changed from " << sec_to_hhmmss(ts)
+                 << " to " << sec_to_hhmmss(ut_cur - ut_prv) << " at "
+                 << unix_to_yyyymmdd_hhmmss(ut_cur) << ".\n\n";
+         }
+      }
+
+      //
+      // Define forecast and observed ramps
+      //
+      mlog << Debug(4)
+           << "Computing forecast ramps for case \""
+           << it->first << "\".\n";
+      framps = compute_ramps(it->second.f_na, it->second.valid_ts,
+                             j.ramp_time_fcst, j.ramp_exact_fcst,
+                             j.ramp_thresh_fcst);
+      mlog << Debug(4)
+           << "Computing observed ramps for case \""
+           << it->first << "\".\n";
+      oramps = compute_ramps(it->second.o_na, it->second.valid_ts,
+                             j.ramp_time_obs, j.ramp_exact_obs,
+                             j.ramp_thresh_obs);
+
+      //
+      // Populate the ramp contingency table
+      //
+      cts_info.cts.zero_out();
+      for(i=0; i<framps.n_elements(); i++) {
+         if(is_bad_data(framps[i]) || is_bad_data(oramps[i])) continue;
+         f = (framps[i] == 1);
+         o = (oramps[i] == 1);
+              if(f == 1 && o == 1) cts_info.cts.inc_fy_oy();
+         else if(f == 1 && o == 0) cts_info.cts.inc_fy_on();
+         else if(f == 0 && o == 1) cts_info.cts.inc_fn_oy();
+         else if(f == 0 && o == 0) cts_info.cts.inc_fn_on();
+      }
+
+      // JHG, work on output.
+      mlog << Debug(2) << "CTC for " << it->first << ": "
+           << cts_info.cts.fy_oy() << ", "
+           << cts_info.cts.fy_on() << ", "
+           << cts_info.cts.fn_oy() << ", "
+           << cts_info.cts.fn_on() << "\n";
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // The do_job_go_index() routine is used to compute the GO Index.
 // The GO Index is a special case of the Skill Score Index consisting
@@ -2458,6 +2553,88 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Write the Ascii Table and the job command line
+   //
+   write_jobstring(jobstring, sa_out);
+   write_table(out_at, sa_out);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// The do_job_ramp() routine applies rapid intensification/weakening
+// logic to a time series of forecast and observation values and
+// derives contingency table counts and statistics by thresholding the
+// changes between times.
+//
+////////////////////////////////////////////////////////////////////////
+
+void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
+                 STATAnalysisJob &j, int &n_in, int &n_out,
+                 ofstream *sa_out) {
+   STATLine line;
+   AsciiTable out_at;
+   AggrRampInfo ramp_info;
+
+   map<ConcatString, AggrRampInfo> ramp_map;
+
+   //
+   // Determine the input line type, use default if necessary
+   //
+   if(j.line_type.n_elements() == 0) j.line_type.add(default_ramp_line_type);
+   if(j.line_type.n_elements() != 1) {
+      mlog << Error << "\ndo_job_ramp() -> "
+           << "the \"-line_type\" option may be used at most once to "
+           << "specify the input line type: " << jobstring << "\n\n";
+      throw(1);
+   }
+
+   //
+   // Determine the ramp columns, use defaults if necessary
+   //
+   if(j.column.n_elements() == 0) {
+      j.column.add(default_ramp_fcst_col);
+      j.column.add(default_ramp_obs_col);
+   }
+   if(j.column.n_elements() != 2) {
+      mlog << Error << "\ndo_job_ramp() -> "
+           << "the \"-column\" option may be used exactly twice to "
+           << "specify the forecast and observation values for the "
+           << "ramp job: " << jobstring
+           << "\n\n";
+      throw(1);
+   }
+
+   //
+   // Determine the ramp thresholds, no defaults
+   //
+   if(j.ramp_thresh_fcst.type == thresh_na ||
+      j.ramp_thresh_obs.type  == thresh_na) {
+      mlog << Error << "\ndo_job_ramp() -> "
+           << "the \"-ramp_thresh\" or \"-ramp_thresh_fcst\" and "
+           << "\"-ramp_thresh_obs\" options must be used to define the "
+           << "ramp events: " << jobstring << "\n\n";
+      throw(1);
+   }
+   
+   //
+   // Parse the input stat lines
+   //
+   aggr_ramp_lines(f, j, ramp_map, n_in, n_out);
+   write_job_ramp(j, ramp_map, out_at);
+
+   //
+   // Check for no matching STAT lines
+   //
+   if(n_out == 0) {
+      mlog << Warning << "\ndo_job_ramp() -> "
+           << "no matching STAT lines found for job: " << jobstring
+           << "\n\n";
+      return;
+   }
+
+   //
+   // Write the ASCII Table and the job command line
    //
    write_jobstring(jobstring, sa_out);
    write_table(out_at, sa_out);

@@ -70,6 +70,9 @@ extern void do_job_go_index(const ConcatString &, LineDataFile &,
 extern void do_job_ss_index(const ConcatString &, LineDataFile &,
                STATAnalysisJob &, int &, int &, ofstream *);
 
+extern void do_job_ramp(const ConcatString &, LineDataFile &,
+               STATAnalysisJob &, int &, int &, ofstream *);
+
 ////////////////////////////////////////////////////////////////////////
 
 extern void write_job_aggr_hdr(STATAnalysisJob &,
@@ -108,6 +111,9 @@ extern void write_job_aggr_isc(STATAnalysisJob &, STATLineType,
 extern void write_job_aggr_mpr(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrMPRInfo> &, AsciiTable &,
                const char *, gsl_rng *);
+
+extern void write_job_ramp(STATAnalysisJob &,
+               map<ConcatString, AggrRampInfo> &, AsciiTable &);
 
 ////////////////////////////////////////////////////////////////////////
 

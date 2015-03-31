@@ -26,6 +26,7 @@
 //   007    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
 //   008    02/05/15  Halley Gotway   Add StatHdrInfo to keep track of
 //                    unique header entries for each aggregation.
+//   009    03/30/15  Halley Gotway   Add ramp job type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2388,6 +2389,76 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          // Keep track of the unique header column entries
          //
          add_stat_hdr_info(m[case_key].hdr, line);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_ramp_lines(LineDataFile &f, STATAnalysisJob &j,
+                     map<ConcatString, AggrRampInfo> &m,
+                     int &n_in, int &n_out) {
+   STATLine line;
+   AggrRampInfo cur;
+   ConcatString key;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         j.dump_stat_line(line);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            cur.f_na.clear();
+            cur.o_na.clear();
+            cur.valid_ts.clear();
+            clear_stat_hdr_info(cur.hdr);
+            cur.fcst_var = line.get_item(fcst_var_offset);
+            cur.obs_var  = line.get_item(obs_var_offset);;
+            m[key] = cur;
+         }
+
+         //
+         // Only aggregate consistent variable names
+         //
+         if(m[key].fcst_var != line.get_item(fcst_var_offset) ||
+            m[key].obs_var  != line.get_item(obs_var_offset)) {
+            mlog << Error << "\naggr_ramp_lines() -> "
+                 << "both the forecast and observation variable names must "
+                 << "remain constant.  Try setting \"-fcst_var\" and/or "
+                 << "\"-obs_var\".\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Increment existing map entry
+         //
+         m[key].f_na.add(atof(line.get_item(determine_column_offset(line, j.column[0]))));
+         m[key].o_na.add(atof(line.get_item(determine_column_offset(line, j.column[1]))));
+         m[key].valid_ts.add(yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset)));
+
+         //
+         // Keep track of the unique header column entries
+         //
+         add_stat_hdr_info(m[key].hdr, line);
 
          n_out++;
       }
