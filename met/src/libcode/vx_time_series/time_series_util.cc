@@ -27,7 +27,7 @@ using namespace std;
 // an array of the same length using 0 and 1 to indicate the occurance
 // of a ramp event.
 //
-// Assume the time-series is sorted.
+// Assume the data values are sorted by time.
 //
 ////////////////////////////////////////////////////////////////////////
 
