@@ -1052,7 +1052,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cts || lt == stat_nbrcts) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1202,7 +1202,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_mcts) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1305,7 +1305,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_pstd) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1423,7 +1423,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1730,7 +1730,7 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          write_header_cols(shc, j.stat_at, r);
       }
@@ -1797,7 +1797,7 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          write_header_cols(shc, j.stat_at, r);
       }
@@ -1873,7 +1873,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(case_it->first, case_it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = case_it->second.hdr.get_shc(case_it->first, j.hdr_name, j.hdr_value, lt);
 
       //
       // Loop through the bin map to determine the total count
@@ -2040,7 +2040,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          write_header_cols(shc, j.stat_at, r);
       }
@@ -2119,7 +2119,7 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
       //
       // Format the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
 
       //
       // ISC output line
@@ -2212,7 +2212,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      stat_hdr_info_to_cols(it->first, it->second.hdr, j.hdr_name, j.hdr_value, lt, shc);
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cts || lt == stat_nbrcts || lt == stat_mcts ||
             lt == stat_cnt || lt == stat_nbrcnt || lt == stat_pstd) shc.set_alpha(j.out_alpha);
@@ -2357,7 +2357,7 @@ void write_job_ramp(STATAnalysisJob &j,
    map<ConcatString, AggrRampInfo>::iterator it;
    NumArray framps, oramps;
    int i, ts, ut_prv, ut_cur;
-   bool f, o;
+   bool f, o, flag;
    CTSInfo cts_info;
 
    mlog << Debug(2) << "Applying ramp detection logic for "
@@ -2379,8 +2379,25 @@ void write_job_ramp(STATAnalysisJob &j,
       //
       if(it->second.valid_ts.n_elements() == 0) continue;
 
-      // JHG, need to sort times!
+      for(i=0; i<it->second.f_na.n_elements(); i++) {
+         cout << "BEFORE (" << i+1 << "): "
+              << unix_to_yyyymmdd_hhmmss(it->second.init_ts[i]) << ", "
+              << unix_to_yyyymmdd_hhmmss(it->second.valid_ts[i]) << ", "
+              << it->second.f_na[i] << ", " << it->second.o_na[i] << "\n";
+      }
 
+      //
+      // Sort the ramp data
+      //
+      it->second.sort();
+
+      for(i=0; i<it->second.f_na.n_elements(); i++) {
+         cout << "AFTER (" << i+1 << "): "
+              << unix_to_yyyymmdd_hhmmss(it->second.init_ts[i]) << ", "
+              << unix_to_yyyymmdd_hhmmss(it->second.valid_ts[i]) << ", "
+              << it->second.f_na[i] << ", " << it->second.o_na[i] << "\n";
+      }
+      
       //
       // Print warning for inconsistent time step
       //
@@ -2397,21 +2414,34 @@ void write_job_ramp(STATAnalysisJob &j,
       }
 
       //
+      // Check for series of valid (true) or initialization (false) times
+      //
+      flag = (it->second.valid_ts.n_elements() ==
+              it->second.f_na.n_elements());
+
+      //
       // Define forecast and observed ramps
       //
       mlog << Debug(4)
-           << "Computing forecast ramps for case \""
+           << "Computing forecast "
+           << (flag ? "valid" : "initialization")
+           <<  " time series ramps for case \""
            << it->first << "\".\n";
-      framps = compute_ramps(it->second.f_na, it->second.valid_ts,
-                             j.ramp_time_fcst, j.ramp_exact_fcst,
-                             j.ramp_thresh_fcst);
+      framps = compute_ramps(it->second.f_na,
+                  (flag ? it->second.valid_ts : it->second.init_ts),
+                  j.ramp_time_fcst, j.ramp_exact_fcst, j.ramp_thresh_fcst);
       mlog << Debug(4)
-           << "Computing observed ramps for case \""
+           << "Computing observed "
+           << (flag ? "valid" : "initialization")
+           <<  " time series ramps for case \""
            << it->first << "\".\n";
-      oramps = compute_ramps(it->second.o_na, it->second.valid_ts,
-                             j.ramp_time_obs, j.ramp_exact_obs,
-                             j.ramp_thresh_obs);
+      oramps = compute_ramps(it->second.o_na,
+                  (flag ? it->second.valid_ts : it->second.init_ts),
+                  j.ramp_time_obs, j.ramp_exact_obs, j.ramp_thresh_obs);
 
+
+      // JHG, add logic to search time window for matches.
+      
       //
       // Populate the ramp contingency table
       //

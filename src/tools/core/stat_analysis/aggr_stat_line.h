@@ -60,6 +60,15 @@ struct StatHdrInfo {
    NumArray fcst_lead, obs_lead, interp_pnts, alpha;
    unixtime fcst_valid_beg, fcst_valid_end;
    unixtime obs_valid_beg, obs_valid_end;
+
+   StatHdrInfo();
+   
+   void clear();
+   void add(const STATLine &line);
+   StatHdrColumns get_shc(const ConcatString &cur_case,
+                          const StringArray &hdr_name,
+                          const StringArray &hdr_value,
+                          const STATLineType lt);
 };
 
 struct AggrCTCInfo {
@@ -153,17 +162,14 @@ struct AggrRampInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
    NumArray f_na, o_na;
-   TimeArray valid_ts;
+   TimeArray init_ts, valid_ts;
+
+   AggrRampInfo();
+   void clear();
+   void sort();
 };
 
 ////////////////////////////////////////////////////////////////////////
-
-extern void clear_stat_hdr_info(StatHdrInfo &hdr);
-extern void add_stat_hdr_info(StatHdrInfo &hdr, const STATLine &line);
-extern void stat_hdr_info_to_cols(const ConcatString &cur_case,
-               const StatHdrInfo &hdr, 
-               const StringArray &hdr_name, const StringArray &hdr_value,
-               const STATLineType lt, StatHdrColumns &shc);
 
 extern void aggr_ctc_lines(
                LineDataFile &, STATAnalysisJob &,
