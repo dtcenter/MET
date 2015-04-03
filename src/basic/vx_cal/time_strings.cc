@@ -36,7 +36,12 @@ int hour, minute, second;
 
 sec_to_hms(in_sec, hour, minute, second);
 
-sprintf(str, "%.2i%.2i%.2i", hour, minute, second);
+if(in_sec < 0) {
+   sprintf(str, "-%.2i%.2i%.2i", abs(hour), abs(minute), abs(second));
+}
+else {
+   sprintf(str, "%.2i%.2i%.2i", hour, minute, second);
+}
 
 return;
 
