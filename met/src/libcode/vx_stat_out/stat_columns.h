@@ -282,6 +282,13 @@ static const char * job_wdir_columns [] = {
    "FBAR",        "OBAR",        "ME",           "MAE"
 };
 
+static const char * job_ramp_columns [] = {
+   "FTIME",      "OTIME",
+   "FEXACT",     "OEXACT",
+   "FTHRESH",    "OTHRESH",
+   "WINDOW_BEG", "WINDOW_END"
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 static const int max_stat_col       = 94;
@@ -315,6 +322,7 @@ static const int n_job_sum_columns  = sizeof(job_sum_columns)/sizeof(*job_sum_co
 static const int n_job_go_columns   = sizeof(job_go_columns)/sizeof(*job_go_columns);
 static const int n_job_ss_columns   = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
 static const int n_job_wdir_columns = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
+static const int n_job_ramp_columns = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 
 static const int n_rhist_columns    = sizeof(rhist_columns)/sizeof(*rhist_columns);
 static const int n_phist_columns    = sizeof(phist_columns)/sizeof(*phist_columns);

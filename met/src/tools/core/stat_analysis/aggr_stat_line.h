@@ -158,13 +158,13 @@ struct AggrSSVARInfo {
    map<ConcatString, SSVARInfo, ssvar_bin_cmp> ssvar_bins;
 };
 
-struct AggrRampInfo {
+struct AggrTimeSeriesInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
    NumArray f_na, o_na;
    TimeArray init_ts, valid_ts;
 
-   AggrRampInfo();
+   AggrTimeSeriesInfo();
    void clear();
    void sort();
 };
@@ -231,9 +231,9 @@ extern void aggr_ssvar_lines(
                map<ConcatString, AggrSSVARInfo> &,
                int &, int &);
 
-extern void aggr_ramp_lines(
+extern void aggr_time_series_lines(
                LineDataFile &, STATAnalysisJob &,
-               map<ConcatString, AggrRampInfo> &,
+               map<ConcatString, AggrTimeSeriesInfo> &,
                int &, int &);
 
 ////////////////////////////////////////////////////////////////////////
