@@ -2350,16 +2350,51 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Consider enhancing write_job_ramp() to write out CTS lines to both
+// the "out" and "stat" files.  Also consider writing time-series
+// matched pair information to the "out" file.  Add a switch to apply
+// the swinging door algorithm and include that switch in the ramp job
+// definition columns.
+//
+////////////////////////////////////////////////////////////////////////
 
 void write_job_ramp(STATAnalysisJob &j,
-                    map<ConcatString, AggrRampInfo> &m,
+                    map<ConcatString, AggrTimeSeriesInfo> &m,
                     AsciiTable &at) {
-   map<ConcatString, AggrRampInfo>::iterator it;
+   map<ConcatString, AggrTimeSeriesInfo>::iterator it;
    NumArray framps, oramps;
-   int i, ts, ut_prv, ut_cur;
-   bool f, o, flag;
+   TimeArray times;
+   int i, k, f, o, r, c;
+   int prv_dt, cur_dt, min_dt, i_min_dt;
+   int n_row, n_col;
+   bool sort_vld;
    CTSInfo cts_info;
+   StatHdrColumns shc;
+   ConcatString cs;
 
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements() +
+           n_job_ramp_columns + n_ctc_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the ramp job definition header columns
+   // followed by the CTC header columns
+   //
+   c = 1 + j.column_case.n_elements();
+   write_header_row(job_ramp_columns, n_job_ramp_columns, 0, at, 0, c);
+   c += n_job_ramp_columns;
+   write_header_row(ctc_columns, n_ctc_columns, 0, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   j.setup_stat_file(stat_ctc, n_row, 0);
+   
    mlog << Debug(2) << "Applying ramp detection logic for "
         << (int) m.size() << " case(s).\n";
 
@@ -2372,97 +2407,209 @@ void write_job_ramp(STATAnalysisJob &j,
    //
    // Loop through the map
    //
-   for(it = m.begin(); it != m.end(); it++) {
-      
+   for(it = m.begin(), r = 1; it != m.end(); it++) {
+
       //
       // Nothing to do
       //
       if(it->second.valid_ts.n_elements() == 0) continue;
-
-      for(i=0; i<it->second.f_na.n_elements(); i++) {
-         cout << "BEFORE (" << i+1 << "): "
-              << unix_to_yyyymmdd_hhmmss(it->second.init_ts[i]) << ", "
-              << unix_to_yyyymmdd_hhmmss(it->second.valid_ts[i]) << ", "
-              << it->second.f_na[i] << ", " << it->second.o_na[i] << "\n";
-      }
 
       //
       // Sort the ramp data
       //
       it->second.sort();
 
-      for(i=0; i<it->second.f_na.n_elements(); i++) {
-         cout << "AFTER (" << i+1 << "): "
-              << unix_to_yyyymmdd_hhmmss(it->second.init_ts[i]) << ", "
-              << unix_to_yyyymmdd_hhmmss(it->second.valid_ts[i]) << ", "
-              << it->second.f_na[i] << ", " << it->second.o_na[i] << "\n";
-      }
-      
-      //
-      // Print warning for inconsistent time step
-      //
-      for(i=1; i<it->second.valid_ts.n_elements(); i++) {
-         ut_cur = it->second.valid_ts[i];
-         ut_prv = it->second.valid_ts[i-1];
-         if(i == 1) ts = ut_cur - ut_prv;
-         if(ts != (ut_cur - ut_prv)) {
-            mlog << Warning << "\nwrite_job_ramp() -> "
-                 << "the time step changed from " << sec_to_hhmmss(ts)
-                 << " to " << sec_to_hhmmss(ut_cur - ut_prv) << " at "
-                 << unix_to_yyyymmdd_hhmmss(ut_cur) << ".\n\n";
-         }
-      }
-
       //
       // Check for series of valid (true) or initialization (false) times
       //
-      flag = (it->second.valid_ts.n_elements() ==
-              it->second.f_na.n_elements());
+      sort_vld = (it->second.valid_ts.n_elements() ==
+                  it->second.f_na.n_elements());
+      times    = (sort_vld ? it->second.valid_ts : it->second.init_ts);
+
+      //
+      // Print warning for inconsistent time step
+      //
+      for(i=1; i<times.n_elements(); i++, prv_dt=cur_dt) {
+         cur_dt = times[i] - times[i-1];
+         if(i == 1) prv_dt = cur_dt;
+         if(cur_dt != prv_dt) {
+            mlog << Warning << "\nwrite_job_ramp() -> "
+                 << "the time step changed from " << sec_to_hhmmss(prv_dt)
+                 << " to " << sec_to_hhmmss(cur_dt) << " at "
+                 << unix_to_yyyymmdd_hhmmss(times[i]) << ".\n\n";
+         }
+      } // end for i
 
       //
       // Define forecast and observed ramps
       //
       mlog << Debug(4)
            << "Computing forecast "
-           << (flag ? "valid" : "initialization")
+           << (sort_vld ? "valid" : "initialization")
            <<  " time series ramps for case \""
            << it->first << "\".\n";
-      framps = compute_ramps(it->second.f_na,
-                  (flag ? it->second.valid_ts : it->second.init_ts),
-                  j.ramp_time_fcst, j.ramp_exact_fcst, j.ramp_thresh_fcst);
+      framps = compute_ramps(it->second.f_na, times, j.ramp_time_fcst,
+                             j.ramp_exact_fcst, j.ramp_thresh_fcst);
       mlog << Debug(4)
            << "Computing observed "
-           << (flag ? "valid" : "initialization")
+           << (sort_vld ? "valid" : "initialization")
            <<  " time series ramps for case \""
            << it->first << "\".\n";
-      oramps = compute_ramps(it->second.o_na,
-                  (flag ? it->second.valid_ts : it->second.init_ts),
-                  j.ramp_time_obs, j.ramp_exact_obs, j.ramp_thresh_obs);
+      oramps = compute_ramps(it->second.o_na, times, j.ramp_time_obs,
+                             j.ramp_exact_obs, j.ramp_thresh_obs);
 
-
-      // JHG, add logic to search time window for matches.
-      
       //
       // Populate the ramp contingency table
       //
       cts_info.cts.zero_out();
-      for(i=0; i<framps.n_elements(); i++) {
+      for(i=0; i<times.n_elements(); i++) {
+
+         // Skip bad data
          if(is_bad_data(framps[i]) || is_bad_data(oramps[i])) continue;
-         f = (framps[i] == 1);
-         o = (oramps[i] == 1);
+
+         // Get current case
+         f = nint(framps[i]);
+         o = nint(oramps[i]);
+
+         //
+         // When f and o disagree, search the matching time window.
+         // Try to switch misses to hits and false alarms to correct negatives.
+         //
+         if(f != o && (j.ramp_window_end - j.ramp_window_beg) > 0) {
+
+            //
+            // Search for points in the time window
+            //
+            for(k=0, min_dt=bad_data_int, i_min_dt=bad_data_int;
+                k<times.n_elements(); k++) {
+            
+               //
+               // Skip points before the time window
+               //
+               if(times[k] < times[i] + j.ramp_window_beg) continue;
+
+               //
+               // Break out of the loop after the time window
+               //
+               if(times[k] > times[i] + j.ramp_window_end) break;
+
+               //
+               // Skip forecasts that don't agree with the current observation
+               //
+               if(framps[k] != o) continue;
+
+               //
+               // Find closest match in time
+               //
+               cur_dt = labs(times[i] - times[k]);
+               if(is_bad_data(min_dt))  { min_dt = cur_dt; i_min_dt = k; }
+               else if(cur_dt < min_dt) { min_dt = cur_dt; i_min_dt = k; }
+            } // end for j
+
+            //
+            // Switch the category if a match was found in the window
+            //
+            if(!is_bad_data(min_dt)) {
+               f = o;
+               mlog << Debug(4)
+                    << "Switching "
+                    << (o == 1 ? "FN_OY" : "FY_ON") << " to "
+                    << (o == 1 ? "FY_OY" : "FN_ON")
+                    << " at " << unix_to_yyyymmdd_hhmmss(times[i])
+                    << " since forecast "  << (o == 1 ? "event" : "non-event")
+                    << " at " << unix_to_yyyymmdd_hhmmss(times[i_min_dt])
+                    << " fell within the ramp time window.\n";
+            }
+         }
+
+         //
+         // Update the contingency table counts
+         //
               if(f == 1 && o == 1) cts_info.cts.inc_fy_oy();
          else if(f == 1 && o == 0) cts_info.cts.inc_fy_on();
          else if(f == 0 && o == 1) cts_info.cts.inc_fn_oy();
          else if(f == 0 && o == 0) cts_info.cts.inc_fn_on();
+      } // end for i
+
+      //
+      // Copy over the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, stat_ctc);
+
+      //
+      // Update FCST_VAR, if not user-defined
+      //
+      if(!j.hdr_name.has("FCST_VAR")) {
+         cs << cs_erase << shc.get_fcst_var() << "_RAMP";
+         shc.set_fcst_var(cs);
       }
 
-      // JHG, work on output.
-      mlog << Debug(2) << "CTC for " << it->first << ": "
-           << cts_info.cts.fy_oy() << ", "
-           << cts_info.cts.fy_on() << ", "
-           << cts_info.cts.fn_oy() << ", "
-           << cts_info.cts.fn_on() << "\n";
+      //
+      // Update OBS_VAR, if not user-defined
+      //
+      if(!j.hdr_name.has("OBS_VAR")) {
+         cs << cs_erase << shc.get_obs_var() << "_RAMP";
+         shc.set_obs_var(cs);
+      }
+
+      //
+      // Set FCST_THRESH, if not user-defined
+      //
+      if(!j.hdr_name.has("FCST_THRESH")) {
+         shc.set_fcst_thresh(j.ramp_thresh_fcst);
+      }
+
+      //
+      // Set OBS_THRESH, if not user-defined
+      //
+      if(!j.hdr_name.has("OBS_THRESH")) {
+         shc.set_obs_thresh(j.ramp_thresh_obs);
+      }
+
+      //
+      // Write the stat header columns
+      //
+      if(j.stat_out) write_header_cols(shc, j.stat_at, r);
+
+      //
+      // Write the ramp contingency table counts
+      //
+      c = 0;
+      at.set_entry(r, c++, "RAMP_CTC:");
+      write_case_cols(it->first, at, r, c);
+      write_job_ramp_cols(j, at, r, c);
+      write_ctc_cols(cts_info, at, r, c);
+      if(j.stat_out) write_ctc_cols(cts_info, j.stat_at, r, n_header_columns);
+
+      //
+      // Increment row counter
+      //
+      r++;
    } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_ramp_cols(const STATAnalysisJob &j, AsciiTable &at,
+                         int &r, int &c) {
+   
+   //
+   // Ramp Job Defintion columns:
+   //    FTIME,      OTIME,
+   //    FEXACT,     OEXACT,
+   //    FTHRESH,    OTHRESH,
+   //    WINDOW_BEG, WINDOW_END
+   //
+   at.set_entry(r, c++, sec_to_hhmmss(j.ramp_time_fcst));
+   at.set_entry(r, c++, sec_to_hhmmss(j.ramp_time_obs));
+   at.set_entry(r, c++, bool_to_string(j.ramp_exact_fcst));
+   at.set_entry(r, c++, bool_to_string(j.ramp_exact_obs));
+   at.set_entry(r, c++, j.ramp_thresh_fcst.get_str());
+   at.set_entry(r, c++, j.ramp_thresh_obs.get_str());
+   at.set_entry(r, c++, sec_to_hhmmss(j.ramp_window_beg));
+   at.set_entry(r, c++, sec_to_hhmmss(j.ramp_window_end));
 
    return;
 }
@@ -2604,9 +2751,8 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
                  ofstream *sa_out) {
    STATLine line;
    AsciiTable out_at;
-   AggrRampInfo ramp_info;
 
-   map<ConcatString, AggrRampInfo> ramp_map;
+   map<ConcatString, AggrTimeSeriesInfo> ramp_map;
 
    //
    // Determine the input line type, use default if necessary
@@ -2650,7 +2796,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Parse the input stat lines
    //
-   aggr_ramp_lines(f, j, ramp_map, n_in, n_out);
+   aggr_time_series_lines(f, j, ramp_map, n_in, n_out);
    write_job_ramp(j, ramp_map, out_at);
 
    //

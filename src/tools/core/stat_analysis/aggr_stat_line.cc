@@ -102,13 +102,13 @@ void StatHdrInfo::add(const STATLine &line) {
       fcst_lead.add(line.fcst_lead());
    if(fcst_valid_beg == (unixtime) 0 || line.fcst_valid_beg() < fcst_valid_beg)
       fcst_valid_beg = line.fcst_valid_beg();
-   if(fcst_valid_end == (unixtime) 0 || line.fcst_valid_end() < fcst_valid_end)
+   if(fcst_valid_end == (unixtime) 0 || line.fcst_valid_end() > fcst_valid_end)
       fcst_valid_end = line.fcst_valid_end();
    if(!obs_lead.has(line.obs_lead()))
       obs_lead.add(line.obs_lead());
    if(obs_valid_beg == (unixtime) 0 || line.obs_valid_beg() < obs_valid_beg)
       obs_valid_beg = line.obs_valid_beg();
-   if(obs_valid_end == (unixtime) 0 || line.obs_valid_end() < obs_valid_end)
+   if(obs_valid_end == (unixtime) 0 || line.obs_valid_end() > obs_valid_end)
       obs_valid_end = line.obs_valid_end();
    if(!fcst_var.has(line.fcst_var()))
       fcst_var.add(line.fcst_var());
@@ -434,17 +434,17 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for AggrRampInfo structure.
+// Code for AggrTimeSeriesInfo structure.
 //
 ////////////////////////////////////////////////////////////////////////
 
-AggrRampInfo::AggrRampInfo() {
+AggrTimeSeriesInfo::AggrTimeSeriesInfo() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void AggrRampInfo::clear() {
+void AggrTimeSeriesInfo::clear() {
    hdr.clear();
    fcst_var.clear();
    obs_var.clear();
@@ -456,9 +456,9 @@ void AggrRampInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void AggrRampInfo::sort() {
+void AggrTimeSeriesInfo::sort() {
    int i, j;
-   AggrRampInfo ri_sort;
+   AggrTimeSeriesInfo ri_sort;
 
    // Copy
    ri_sort.hdr      = hdr;
@@ -492,7 +492,7 @@ void AggrRampInfo::sort() {
       }
    }
    else {
-      mlog << Warning << "\nAggrRampInfo::sort() -> "
+      mlog << Warning << "\nAggrTimeSeriesInfo::sort() -> "
            << "can't sort when the number of times and the data values "
            << "differ.\n\n";
       return;
@@ -2479,11 +2479,11 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_ramp_lines(LineDataFile &f, STATAnalysisJob &j,
-                     map<ConcatString, AggrRampInfo> &m,
-                     int &n_in, int &n_out) {
+void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
+                            map<ConcatString, AggrTimeSeriesInfo> &m,
+                            int &n_in, int &n_out) {
    STATLine line;
-   AggrRampInfo cur;
+   AggrTimeSeriesInfo cur;
    ConcatString key;
    int lead_sec;
    unixtime init_ut, valid_ut;
@@ -2519,7 +2519,7 @@ void aggr_ramp_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(m[key].fcst_var != line.get_item(fcst_var_offset) ||
             m[key].obs_var  != line.get_item(obs_var_offset)) {
-            mlog << Error << "\naggr_ramp_lines() -> "
+            mlog << Error << "\naggr_time_series_lines() -> "
                  << "both the forecast and observation variable names must "
                  << "remain constant for case \"" << key
                  << "\".  Try setting \"-fcst_var\" and/or \"-obs_var\".\n"
@@ -2550,7 +2550,7 @@ void aggr_ramp_lines(LineDataFile &f, STATAnalysisJob &j,
             m[key].init_ts.add(init_ut);
          }
          else {
-            mlog << Warning << "\naggr_ramp_lines() -> "
+            mlog << Warning << "\naggr_time_series_lines() -> "
                  << "skipping time series line for case \"" << key
                  << "\" with " << unix_to_yyyymmdd_hhmmss(init_ut)
                  << " initialization, " << sec_to_hhmmss(lead_sec)
