@@ -460,7 +460,7 @@ void process_scores() {
                  << " versus "
                  << conf_info.obs_info[i]->magic_str()
                  << ", for interpolation method "
-                 << shc.get_interp_mthd_str() << "("
+                 << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
                  << "), over region " << shc.get_mask()
                  << ", using " << f_na.n_elements() << " pairs.\n";
@@ -767,7 +767,7 @@ void process_scores() {
                        << " versus "
                        << conf_info.obs_info[i]->magic_str()
                        << ", for interpolation method "
-                       << shc.get_interp_mthd_str() << "("
+                       << shc.get_interp_mthd() << "("
                        << shc.get_interp_pnts_str()
                        << "), raw thresholds of "
                        << conf_info.fcst_ta[i][k].get_str()

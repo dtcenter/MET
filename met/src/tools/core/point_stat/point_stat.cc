@@ -931,7 +931,7 @@ void process_scores() {
                     << ", for observation type " << pd_ptr->msg_typ
                     << ", over region " << pd_ptr->mask_name
                     << ", for interpolation method "
-                    << shc.get_interp_mthd_str() << "("
+                    << shc.get_interp_mthd() << "("
                     << shc.get_interp_pnts_str()
                     << "), using " << pd_ptr->n_pair << " pairs.\n";
 

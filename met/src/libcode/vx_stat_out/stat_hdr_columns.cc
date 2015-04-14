@@ -54,7 +54,6 @@ void StatHdrColumns::clear() {
    obs_valid_beg    = (unixtime) 0;
    obs_valid_end    = (unixtime) 0;
 
-   interp_mthd = InterpMthd_None;
    interp_wdth = bad_data_int;
 
    alpha = bad_data_double;
@@ -79,7 +78,7 @@ void StatHdrColumns::clear() {
    obtype.clear();
    mask.clear();
 
-   interp_mthd_str.clear();
+   interp_mthd.clear();
    interp_pnts_str.clear();
 
    line_type.clear();
@@ -219,9 +218,15 @@ void StatHdrColumns::set_mask(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void StatHdrColumns::set_interp_mthd(const char *s) {
+   interp_mthd = s;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void StatHdrColumns::set_interp_mthd(const InterpMthd m) {
-   interp_mthd = m;
-   set_interp_mthd_str();
+   set_interp_mthd(interpmthd_to_string(m));
    return;
 }
 
@@ -413,15 +418,6 @@ void StatHdrColumns::set_obs_valid_end_str() {
 
    // Set obs_valid_end_str
    obs_valid_end_str = tmp_str;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::set_interp_mthd_str() {
-
-   interp_mthd_str = interpmthd_to_string(interp_mthd);
 
    return;
 }
