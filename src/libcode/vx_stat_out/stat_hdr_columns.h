@@ -69,8 +69,7 @@ class StatHdrColumns {
       ConcatString mask;
 
       // Interpolation method
-      InterpMthd   interp_mthd;
-      ConcatString interp_mthd_str;
+      ConcatString interp_mthd;
 
       // Size of interpolation neighborhood
       int          interp_wdth;
@@ -102,7 +101,6 @@ class StatHdrColumns {
       void set_obs_lead_str();
       void set_obs_valid_beg_str();
       void set_obs_valid_end_str();
-      void set_interp_mthd_str();
       void set_interp_pnts_str();
       void set_fcst_thresh_str();
       void set_obs_thresh_str();
@@ -139,6 +137,7 @@ class StatHdrColumns {
       void set_obtype        (const char *);
       void set_mask          (const char *);
 
+      void set_interp_mthd   (const char *);
       void set_interp_mthd   (const InterpMthd);
       void set_interp_wdth   (const int);
 
@@ -182,8 +181,7 @@ class StatHdrColumns {
       const char *get_obtype            () const;
       const char *get_mask              () const;
 
-      InterpMthd  get_interp_mthd       () const;
-      const char *get_interp_mthd_str   () const;
+      const char *get_interp_mthd       () const;
       int         get_interp_wdth       () const;
       const char *get_interp_pnts_str   () const;
 
@@ -231,8 +229,7 @@ inline const char *StatHdrColumns::get_obs_lev           () const { return(obs_l
 inline const char *StatHdrColumns::get_obtype            () const { return(obtype);              }
 inline const char *StatHdrColumns::get_mask              () const { return(mask);                }
 
-inline InterpMthd  StatHdrColumns::get_interp_mthd       () const { return(interp_mthd);         }
-inline const char *StatHdrColumns::get_interp_mthd_str   () const { return(interp_mthd_str);     }
+inline const char *StatHdrColumns::get_interp_mthd       () const { return(interp_mthd);         }
 inline int         StatHdrColumns::get_interp_wdth       () const { return(interp_wdth);         }
 inline const char *StatHdrColumns::get_interp_pnts_str   () const { return(interp_pnts_str);     }
 

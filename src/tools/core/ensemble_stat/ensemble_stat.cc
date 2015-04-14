@@ -981,7 +981,7 @@ void process_point_scores() {
                     << ", for observation type " << pd_ptr->msg_typ
                     << ", over region " << pd_ptr->mask_name
                     << ", for interpolation method "
-                    << shc.get_interp_mthd_str() << "("
+                    << shc.get_interp_mthd() << "("
                     << shc.get_interp_pnts_str()
                     << "), using " << pd_ptr->n_pair << " pairs.\n";
 
@@ -1332,7 +1332,7 @@ void process_grid_vx() {
                  << ", for observation type " << shc.get_obtype()
                  << ", over region " << shc.get_mask()
                  << ", for interpolation method "
-                 << shc.get_interp_mthd_str() << "("
+                 << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
                  << "), using " << pd.n_pair << " pairs.\n";
 

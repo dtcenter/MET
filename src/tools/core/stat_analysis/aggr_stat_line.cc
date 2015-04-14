@@ -149,7 +149,6 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
                           const StringArray &hdr_value,
                           const STATLineType lt) {
    ConcatString css;
-   InterpMthd mthd;
    double out_alpha;
    SingleThresh thresh;
    int index, wdth;
@@ -325,22 +324,13 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << "For case \"" << cur_case << "\", found "
            << interp_mthd.n_elements()
            << " unique INTERP_MTHD values: " << css << ".\n";
-      mthd = InterpMthd_None;
+   }
+   if(hdr_name.has("INTERP_MTHD", index)) {
+      shc.set_interp_mthd(hdr_value[index]);
    }
    else {
-      mthd = string_to_interpmthd(interp_mthd[0]);
+      shc.set_interp_mthd(css);
    }
-   
-   if(hdr_name.has("INTERP_MTHD", index)) {
-      mthd = string_to_interpmthd(to_upper(hdr_value[index]));
-      if(mthd == InterpMthd_None) {
-         mlog << Error << "\nStatHdrInfo::get_shc() -> "
-              << "invalid interpolation method specified: "
-              << hdr_value[index] << "\n\n";
-         exit(1);
-      }
-   }
-   shc.set_interp_mthd(mthd);
 
    // INTERP_PNTS
    css = write_css(interp_pnts);
