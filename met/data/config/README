@@ -1695,10 +1695,12 @@ output_stats = {
 //             -ramp_exact true/false (-ramp_exact_fcst or -ramp_exact_obs)
 //                Defines ramps using an exact change (true, default) or maximum
 //                change in the time window (false).
+//             -ramp_window width in HH[MMSS] format
 //             -ramp_window beg end in HH[MMSS] format
 //                Defines a search time window when attempting to convert misses
-//                to hits and false alarms to correct negatives. 
-//                Default is 0 0.
+//                to hits and false alarms to correct negatives.  Use 1 argument
+//                to define a symmetric time window or 2 for an asymmetric window.
+//                Default window is 0 0, requiring an exact match.
 //
 //    Job command FILTERING options to further refine the STAT data:
 //       Each optional argument may be used in the job specification multiple
