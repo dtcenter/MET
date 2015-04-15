@@ -21,6 +21,16 @@ extern long long read_fortran_binary(const int fd, void * buf, const int buf_siz
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  report the value in the next record length pad, without moving the read pointer
+   //
+
+extern long long peek_record_size(int fd, const int rec_pad_length, const bool swap_endian);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   /*  __VX_READ_FORTRAN_BINARY_H__  */
 
 

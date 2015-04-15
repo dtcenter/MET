@@ -140,6 +140,70 @@ return ( rec_size_1 );
 ////////////////////////////////////////////////////////////////////////
 
 
+long long peek_record_size(int fd, const int rec_pad_length, const bool swap_endian)
+
+{
+
+int n_read;
+unsigned char local_buf[16];
+long long size;
+
+
+if ( rec_pad_length >= (int) sizeof(local_buf) )  {
+
+   cerr << "\n\n  peek_record_size(int fd) -> local buffer too small\n\n";
+
+   exit ( 1 );
+
+}
+
+n_read = read(fd, local_buf, rec_pad_length);
+
+if ( n_read == 0 )  return ( 0LL );
+
+switch ( rec_pad_length )  {
+
+   case 4:            
+      if ( swap_endian ) shuffle_4(local_buf);
+      break;
+
+   case 8:
+      if ( swap_endian ) shuffle_8(local_buf);
+      break;
+
+   default:
+      cerr << "\n\n  peek_record_size() -> bad record pad length\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+size = get_rec_size(local_buf, rec_pad_length);
+
+   //
+   //  put the read pointer back
+   //
+
+if ( lseek(fd, -rec_pad_length, SEEK_CUR) < 0 )  {
+
+   cerr << "\n\n  peek_record_size() -> lseek failed!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  done
+   //
+
+return ( size );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 long long get_rec_size(unsigned char * buf, const int rec_pad_length)
 
 {

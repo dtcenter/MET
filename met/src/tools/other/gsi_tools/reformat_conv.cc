@@ -50,9 +50,9 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int buf_size = (1 << 17);
+static int buf_size = 512;
 
-static unsigned char buf[buf_size];
+static unsigned char * buf = 0;
 
 static char date_string[256];
 
@@ -98,6 +98,8 @@ int main(int argc, char * argv [])
 {
 
 program_name = get_short_name(argv[0]);
+
+buf = new unsigned char [buf_size];
 
 cline.set(argc, argv);
 
@@ -156,7 +158,9 @@ ofstream out;
 AsciiTable table;
 StatHdrColumns columns;
 float * f = (float *) 0;
+long long size = 0;
 ConcatString output_filename;
+
 
 output_filename << cs_erase
                 << output_directory << '/'
@@ -255,17 +259,17 @@ while ( fortran_read(in, buf, 19) )  {
 
    n_bytes = cdiag_bytes + rdiag_bytes;
 
-   if ( n_bytes >= buf_size )  {
+   size = peek_record_size(in, rec_pad_length, swap_endian);
 
-      cerr << "\n\n  " << program_name << ": buffer too small ... increase to at least "
-           << n_bytes << " bytes!\n\n";
+   if ( size > buf_size )  {
 
-      exit ( 1 );
+      if ( buf )  { delete [] buf;  buf = 0; }
+
+      buf = new unsigned char [size];
+
+      buf_size = size;
 
    }
-
-
-   // cout << "\n\n  n_bytes = " << n_bytes << "\n\n";
 
    fortran_read(in, buf, n_bytes);
 
