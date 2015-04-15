@@ -279,7 +279,8 @@ class TCStatJob {
       int          RIRWTimeADeck, RIRWTimeBDeck;
       bool         RIRWExactADeck, RIRWExactBDeck;
       SingleThresh RIRWThreshADeck, RIRWThreshBDeck;
-      int          RIRWWindow;
+      int          RIRWWindowBeg;
+      int          RIRWWindowEnd;
 
       // Only retain TrackPoints in a time window around landfall
       bool Landfall;

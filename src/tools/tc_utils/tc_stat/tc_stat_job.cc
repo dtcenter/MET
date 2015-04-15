@@ -227,7 +227,8 @@ void TCStatJob::clear() {
    RIRWExactBDeck  = default_rirw_exact;
    RIRWThreshADeck = default_rirw_thresh;
    RIRWThreshBDeck = default_rirw_thresh;
-   RIRWWindow      = default_rirw_window;
+   RIRWWindowBeg   = default_rirw_window;
+   RIRWWindowEnd   = default_rirw_window;
    Landfall        = default_landfall;
    LandfallBeg     = default_landfall_beg;
    LandfallEnd     = default_landfall_end;
@@ -287,7 +288,8 @@ void TCStatJob::assign(const TCStatJob & j) {
    RIRWExactBDeck = j.RIRWExactBDeck;
    RIRWThreshADeck = j.RIRWThreshADeck;
    RIRWThreshBDeck = j.RIRWThreshBDeck;
-   RIRWWindow = j.RIRWWindow;
+   RIRWWindowBeg = j.RIRWWindowBeg;
+   RIRWWindowEnd = j.RIRWWindowEnd;
 
    Landfall = j.Landfall;
    LandfallBeg = j.LandfallBeg;
@@ -412,7 +414,9 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "RIRWThreshBDeck = " << RIRWThreshBDeck.get_str() << "\n";
 
-   out << prefix << "RIRWWindow = " << sec_to_hhmmss(RIRWWindow) << "\n";
+   out << prefix << "RIRWWindowBeg = " << sec_to_hhmmss(RIRWWindowBeg) << "\n";
+
+   out << prefix << "RIRWWindowEnd = " << sec_to_hhmmss(RIRWWindowEnd) << "\n";
 
    out << prefix << "Landfall = " << bool_to_string(Landfall) << "\n";
 
@@ -805,7 +809,12 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
                                                            RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_window"       ) == 0) { RIRWWindow = timestring_to_sec(a[i+1]);    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_window") == 0) {
+         if(i+2 < a.n_elements() && (a[i+2])[0] != '-')  { RIRWWindowBeg = timestring_to_sec(a[i+1]);
+                                                           RIRWWindowEnd = timestring_to_sec(a[i+2]); a.shift_down(i, 2); }
+         else                                            { RIRWWindowEnd = timestring_to_sec(a[i+1]);
+                                                           RIRWWindowBeg = -1 * RIRWWindowEnd;        a.shift_down(i, 1); }
+      }
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                a.shift_down(i, 1); }
@@ -1027,7 +1036,8 @@ ConcatString TCStatJob::serialize() const {
          s << "-rirw_thresh_adeck " << RIRWThreshADeck.get_str() << " "
            << "-rirw_thresh_bdeck " << RIRWThreshBDeck.get_str() << " ";
       }
-      s << "-rirw_window " << sec_to_hhmmss(RIRWWindow) << " ";
+      s << "-rirw_window " << sec_to_hhmmss(RIRWWindowBeg) << " "
+        << sec_to_hhmmss(RIRWWindowEnd) << " ";
    }
    if(Landfall != default_landfall) {
       s << "-landfall " << bool_to_string(Landfall) << " "
@@ -2432,7 +2442,8 @@ ConcatString TCStatJobRIRW::serialize() const {
       s << "-rirw_thresh_adeck " << RIRWThreshADeck.get_str() << " "
         << "-rirw_thresh_bdeck " << RIRWThreshBDeck.get_str() << " ";
    }
-   s << "-rirw_window " << sec_to_hhmmss(RIRWWindow) << " ";
+   s << "-rirw_window " << sec_to_hhmmss(RIRWWindowBeg) << " "
+     << sec_to_hhmmss(RIRWWindowEnd) << " ";
 
    // Add RIRW job-specific options
    for(i=0; i<CaseColumn.n_elements(); i++)
@@ -2562,22 +2573,24 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
       bprv = tpi.bdeck_prv_int(i);
       bdlt = (is_bad_data(bcur) || is_bad_data(bprv) ? bad_data_int : bcur - bprv);
       
-      // Check time window when the ADECK and BDECK disagree.
+      // Check time window when the ADECK and BDECK are both valid but disagree.
       // Try to switch misses to hits and false alarms to correct negatives.
-      if(a != b && RIRWWindow > 0) {
+      if(!is_bad_data(a) && !is_bad_data(b) && a != b &&
+         (RIRWWindowBeg != 0 || RIRWWindowEnd != 0)) {
 
          // Loop through the ADECK track points
          for(j=0, min_dt=bad_data_int, i_min_dt=bad_data_int; j<tpi.n_points(); j++) {
 
             // Skip ADECK points that are too far away in time
-            if((cur_dt = labs(tpi.valid(i) - tpi.valid(j))) > RIRWWindow) continue;
+            cur_dt = tpi.valid(i) - tpi.valid(j);
+            if(cur_dt < RIRWWindowBeg || cur_dt > RIRWWindowEnd) continue;
 
             // Skip ADECK points that don't agree with the BDECK category
             if(nint(tpi.adeck_rirw(j)) != b) continue;
 
             // Find closest match in time
-            if(is_bad_data(min_dt))  { min_dt = cur_dt; i_min_dt = j; }
-            else if(cur_dt < min_dt) { min_dt = cur_dt; i_min_dt = j; }
+            if(is_bad_data(min_dt))              { min_dt = cur_dt; i_min_dt = j; }
+            else if(labs(cur_dt) < labs(min_dt)) { min_dt = cur_dt; i_min_dt = j; }
          } // end for j
 
          // Switch the category if a match was found within the window
@@ -2593,8 +2606,8 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
                  << " since ADECK "  << (b == 1 ? "event" : "non-event")
                  << " (" << aprv << " to " << acur << " = " << adlt << ") occurred at "
                  << unix_to_yyyymmdd_hhmmss(tpi.valid(i_min_dt)) << " ("
-                 << sec_to_hhmmss(min_dt) << " offset <= "
-                 << sec_to_hhmmss(RIRWWindow)
+                 << sec_to_hhmmss(min_dt) << " offset within "
+                 << sec_to_hhmmss(RIRWWindowBeg) << " to " << sec_to_hhmmss(RIRWWindowEnd)
                  << " window) for " << tpi.case_info() << ", "
                  << "VALID = " << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
                  << "LEAD = " << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << "\n";
@@ -2736,8 +2749,8 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   8 + CaseColumn.n_elements() + n_ctc_columns);   
-   setup_table(out_at, 8 + CaseColumn.n_elements());
+                   9 + CaseColumn.n_elements() + n_ctc_columns);   
+   setup_table(out_at, 9 + CaseColumn.n_elements());
    
    // Initialize row and column indices
    r = c = 0;
@@ -2752,7 +2765,8 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    out_at.set_entry(r, c++, "BEXACT");
    out_at.set_entry(r, c++, "ATHRESH");
    out_at.set_entry(r, c++, "BTHRESH");
-   out_at.set_entry(r, c++, "WINDOW");
+   out_at.set_entry(r, c++, "WINDOW_BEG");
+   out_at.set_entry(r, c++, "WINDOW_END");
   
    // Write case column names
    for(i=0; i<CaseColumn.n_elements(); i++) {
@@ -2781,8 +2795,9 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
       out_at.set_entry(r, c++, bool_to_string(RIRWExactBDeck));
       out_at.set_entry(r, c++, RIRWThreshADeck.get_str());
       out_at.set_entry(r, c++, RIRWThreshBDeck.get_str());
-      out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindow));
-      
+      out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowBeg));
+      out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowEnd));
+
       // Write case column values
       for(i=1; i<sa.n_elements(); i++) {
          out_at.set_entry(r, c++, sa[i]);
@@ -2808,8 +2823,8 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   8 + CaseColumn.n_elements() + n_cts_columns);   
-   setup_table(out_at, 8 + CaseColumn.n_elements());
+                   9 + CaseColumn.n_elements() + n_cts_columns);   
+   setup_table(out_at, 9 + CaseColumn.n_elements());
    
    // Initialize row and column indices
    r = c = 0;
@@ -2824,7 +2839,8 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
    out_at.set_entry(r, c++, "BEXACT");
    out_at.set_entry(r, c++, "ATHRESH");
    out_at.set_entry(r, c++, "BTHRESH");
-   out_at.set_entry(r, c++, "WINDOW");
+   out_at.set_entry(r, c++, "WINDOW_BEG");
+   out_at.set_entry(r, c++, "WINDOW_END");
   
    // Write case column names
    for(i=0; i<CaseColumn.n_elements(); i++) {
@@ -2861,8 +2877,9 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
       out_at.set_entry(r, c++, bool_to_string(RIRWExactBDeck));
       out_at.set_entry(r, c++, RIRWThreshADeck.get_str());
       out_at.set_entry(r, c++, RIRWThreshBDeck.get_str());
-      out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindow));
-      
+      out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowBeg));
+      out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowEnd));
+
       // Write case column values
       for(i=1; i<sa.n_elements(); i++) {
          out_at.set_entry(r, c++, sa[i]);
@@ -2894,8 +2911,8 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
 
    // Format the output table
    out_at.set_size(r + 1,
-                   8 + CaseColumn.n_elements() + 15);
-   setup_table(out_at, 8 + CaseColumn.n_elements());
+                   9 + CaseColumn.n_elements() + 15);
+   setup_table(out_at, 9 + CaseColumn.n_elements());
 
    // Initialize row and column indices
    r = c = 0;
@@ -2910,7 +2927,8 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    out_at.set_entry(r, c++, "BEXACT");
    out_at.set_entry(r, c++, "ATHRESH");
    out_at.set_entry(r, c++, "BTHRESH");
-   out_at.set_entry(r, c++, "WINDOW");
+   out_at.set_entry(r, c++, "WINDOW_BEG");
+   out_at.set_entry(r, c++, "WINDOW_END");
   
    // Write case column names
    for(i=0; i<CaseColumn.n_elements(); i++) {
@@ -2953,7 +2971,8 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
          out_at.set_entry(r, c++, bool_to_string(RIRWExactBDeck));
          out_at.set_entry(r, c++, RIRWThreshADeck.get_str());
          out_at.set_entry(r, c++, RIRWThreshBDeck.get_str());
-         out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindow));
+         out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowBeg));
+         out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowEnd));
          
          // Write case column values
          sa = it->first.split(":");

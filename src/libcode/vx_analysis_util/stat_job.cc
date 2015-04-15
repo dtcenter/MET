@@ -1173,10 +1173,23 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          ramp_thresh_obs.set(jc_array[i+1]);
          i++;
       }
+      // May be specified using 1 or 2 arguments:
+      //  - 2 arguments for beginning and ending times
+      //  - 1 argument for a symmetric time window
       else if(strcmp(jc_array[i], "-ramp_window") == 0) {
-         ramp_window_beg = timestring_to_sec(jc_array[i+1]);
-         ramp_window_end = timestring_to_sec(jc_array[i+2]);
-         i+=2;
+
+         // Parse beginning and ending times
+         if(i+2 < jc_array.n_elements() && (jc_array[i+2])[0] != '-') {
+            ramp_window_beg = timestring_to_sec(jc_array[i+1]);
+            ramp_window_end = timestring_to_sec(jc_array[i+2]);
+            i+=2;
+         }
+         // Parse symmetric time window
+         else {
+            ramp_window_end = timestring_to_sec(jc_array[i+1]);
+            ramp_window_beg = -1 * ramp_window_end;
+            i+=1;
+         }
       }
       else if(strcmp(jc_array[i], "-out_bin_size") == 0) {
          out_bin_size = atof(jc_array[i+1]);
