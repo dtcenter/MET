@@ -52,9 +52,9 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int buf_size = (1 << 16);
+static int buf_size = 512;
 
-static unsigned char buf[buf_size];
+static unsigned char * buf = 0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -141,6 +141,8 @@ int main(int argc, char * argv [])
 {
 
 program_name = get_short_name(argv[0]);
+
+buf = new unsigned char [buf_size];
 
 cline.set(argc, argv);
 
@@ -595,13 +597,18 @@ const int bytes = (int) ((n_diag + N1*N2)*sizeof(float));
 int n_read;
 const int n12 = N1*N2;
 static int rec_num = 0;
+long long size = 0;
 
-if ( bytes > buf_size )  {
 
-   cerr << "\n\n  " << program_name << ": read_data() -> buffer too small "
-        << "... increase size to at least " << bytes << " bytes\n\n";
+size = peek_record_size(fd, rec_pad_length, swap_endian);
 
-   exit ( 1 );
+if ( size > buf_size )  {
+
+   if ( buf )  { delete [] buf;  buf = 0; }
+
+   buf = new unsigned char [size];
+
+   buf_size = size;
 
 }
 
