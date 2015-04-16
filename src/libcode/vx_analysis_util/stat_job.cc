@@ -1179,7 +1179,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-ramp_window") == 0) {
 
          // Parse beginning and ending times
-         if(i+2 < jc_array.n_elements() && (jc_array[i+2])[0] != '-') {
+         if(i+2 < jc_array.n_elements() && is_number(jc_array[i+2])) {
             ramp_window_beg = timestring_to_sec(jc_array[i+1]);
             ramp_window_end = timestring_to_sec(jc_array[i+2]);
             i+=2;

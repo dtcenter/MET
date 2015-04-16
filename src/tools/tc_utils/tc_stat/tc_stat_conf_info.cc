@@ -284,8 +284,8 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::Landfall, TCStatJob::LandfallBeg, TCStatJob::LandfallEnd
    Filter.Landfall    = Conf.lookup_bool(conf_key_landfall);
-   Filter.LandfallBeg = timestring_to_sec(Conf.lookup_string(conf_key_landfall_beg));
-   Filter.LandfallEnd = timestring_to_sec(Conf.lookup_string(conf_key_landfall_end));
+   Filter.LandfallBeg = Conf.lookup_seconds(conf_key_landfall_beg);
+   Filter.LandfallEnd = Conf.lookup_seconds(conf_key_landfall_end);
 
    // Conf: TCStatJob::MatchPoints
    Filter.MatchPoints = Conf.lookup_bool(conf_key_match_points);

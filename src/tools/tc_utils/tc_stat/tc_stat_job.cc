@@ -810,7 +810,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_window")        == 0) {
-         if(i+2 < a.n_elements() && (a[i+2])[0] != '-')  { RIRWWindowBeg = timestring_to_sec(a[i+1]);
+         if(i+2 < a.n_elements() && is_number(a[i+2]))   { RIRWWindowBeg = timestring_to_sec(a[i+1]);
                                                            RIRWWindowEnd = timestring_to_sec(a[i+2]); a.shift_down(i, 2); }
          else                                            { RIRWWindowEnd = timestring_to_sec(a[i+1]);
                                                            RIRWWindowBeg = -1 * RIRWWindowEnd;        a.shift_down(i, 1); }
@@ -818,7 +818,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_window")    == 0) {
                                                            Landfall = true; // For -landfall_window, set -landfall true
-         if(i+2 < a.n_elements() && (a[i+2])[0] != '-')  { LandfallBeg = timestring_to_sec(a[i+1]);
+         if(i+2 < a.n_elements() && is_number(a[i+2]))   { LandfallBeg = timestring_to_sec(a[i+1]);
                                                            LandfallEnd = timestring_to_sec(a[i+2]);   a.shift_down(i, 2); }
          else                                            { LandfallEnd = timestring_to_sec(a[i+1]);
                                                            LandfallBeg = -1 * LandfallEnd;            a.shift_down(i, 1); }
