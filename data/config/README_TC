@@ -436,16 +436,18 @@ rapid_inten = {
 // retained, and define the landfall retention window as a number of seconds
 // offset from the landfall time.  Landfall is defined as the last BDECK track
 // point before the distance to land switches from positive to 0 or negative.
-// May modify using the "-landfall", "-landfall_beg", and "-landfall_end" job
-// command options.
+// May modify using the "-landfall_window" job command option, which automatically
+// sets -landfall to TRUE.
+// Use "-landfall_window width" in HH[MMSS] format to define a symmetric time window.
+// Use "-landfall_window beg end" in HH[MMSS] format to define an asymmetric time window.
 //
 // e.g. landfall     = FALSE;
-//      landfall_beg = -86400; (24 hours prior to landfall)
-//      landfall_end = 0;
+//      landfall_beg = "-24"; (24 hours prior to landfall)
+//      landfall_end = "00";
 //
 landfall     = FALSE;
-landfall_beg = -86400;
-landfall_end = 0;
+landfall_beg = "-24";
+landfall_end = "00";
 
 //
 // Specify whether only those cases common to all models in the dataset should
