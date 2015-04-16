@@ -1945,6 +1945,11 @@ return ( Entry->array_value() );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+//
+// Seconds may be stored as an integer or as an HH[MMSS] timestring.
+//
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -1952,10 +1957,14 @@ int Dictionary::lookup_seconds(const char * name, bool error_out)
 
 {
 
-ConcatString cs = lookup_string(name, error_out);
+ConcatString cs = lookup_string(name, false);
 
-if ( cs.empty() )  return ( bad_data_int );
-else               return ( timestring_to_sec( cs ) );
+if ( LastLookupStatus )  {
+   if ( cs.empty() )  return ( bad_data_int );
+   else               return ( timestring_to_sec( cs ) );
+}
+
+return ( lookup_int(name, error_out) );
 
 }
 
