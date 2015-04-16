@@ -420,9 +420,9 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "Landfall = " << bool_to_string(Landfall) << "\n";
 
-   out << prefix << "LandfallBeg = " << LandfallBeg << "\n";
+   out << prefix << "LandfallBeg = " << sec_to_hhmmss(LandfallBeg) << "\n";
 
-   out << prefix << "LandfallEnd = " << LandfallEnd << "\n";
+   out << prefix << "LandfallEnd = " << sec_to_hhmmss(LandfallEnd) << "\n";
 
    out << prefix << "MatchPoints = " << bool_to_string(MatchPoints) << "\n";
 
@@ -809,15 +809,20 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
                                                            RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_window") == 0) {
+      else if(strcasecmp(c, "-rirw_window")        == 0) {
          if(i+2 < a.n_elements() && (a[i+2])[0] != '-')  { RIRWWindowBeg = timestring_to_sec(a[i+1]);
                                                            RIRWWindowEnd = timestring_to_sec(a[i+2]); a.shift_down(i, 2); }
          else                                            { RIRWWindowEnd = timestring_to_sec(a[i+1]);
                                                            RIRWWindowBeg = -1 * RIRWWindowEnd;        a.shift_down(i, 1); }
       }
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall_beg"      ) == 0) { LandfallBeg = atoi(a[i+1]);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall_end"      ) == 0) { LandfallEnd = atoi(a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall_window")    == 0) {
+                                                           Landfall = true; // For -landfall_window, set -landfall true
+         if(i+2 < a.n_elements() && (a[i+2])[0] != '-')  { LandfallBeg = timestring_to_sec(a[i+1]);
+                                                           LandfallEnd = timestring_to_sec(a[i+2]);   a.shift_down(i, 2); }
+         else                                            { LandfallEnd = timestring_to_sec(a[i+1]);
+                                                           LandfallBeg = -1 * LandfallEnd;            a.shift_down(i, 1); }
+      }
       else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1]);        a.shift_down(i, 1); }
@@ -1041,8 +1046,8 @@ ConcatString TCStatJob::serialize() const {
    }
    if(Landfall != default_landfall) {
       s << "-landfall " << bool_to_string(Landfall) << " "
-        << "-landfall_beg " << LandfallBeg << " "
-        << "-landfall_end " << LandfallEnd << " ";
+        << "-landfall_window " << sec_to_hhmmss(LandfallBeg) << " "
+        << sec_to_hhmmss(LandfallEnd) << " ";
    }
    if(MatchPoints != default_match_points)
       s << "-match_points " << bool_to_string(MatchPoints) << " ";
