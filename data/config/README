@@ -1627,12 +1627,12 @@ output_stats = {
 //          Required Args:
 //             -line_type, -out_line_type
 //          Additional Required Args for -line_type MPR:
-//             -out_fcst_thresh, -out_obs_thresh
+//             -out_thresh or -out_fcst_thresh and -out_obs_thresh
 //             When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
 //                                 PCT, PSTD, PJC, PRC
 //          Additional Optional Args for -line_type MPR:
 //             -mask_grid, -mask_poly,
-//             -out_fcst_wind_thresh, -out_obs_wind_thresh
+//             -out_wind_thresh or -out_fcst_wind_thresh and -out_obs_wind_thresh
 //             When -out_line_type WDIR
 //          Additional Optional Args for -line_type ORANK -out_line_type PHIST:
 //             -out_bin_size
@@ -1760,6 +1760,7 @@ output_stats = {
 //       "-mask_poly       file"
 //
 //       "-out_line_type   name"
+//       "-out_thresh      value" sets both -out_fcst_thresh and -out_obs_thresh
 //       "-out_fcst_thresh value" multiple for multi-category contingency tables
 //                                and probabilistic forecasts
 //       "-out_obs_thresh  value" multiple for multi-category contingency tables
