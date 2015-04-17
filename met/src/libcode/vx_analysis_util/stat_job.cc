@@ -842,9 +842,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          fcst_lead.clear();
       else if(strcmp(jc_array[i], "-obs_lead"       ) == 0)
          obs_lead.clear();
-      else if(strcmp(jc_array[i], "-fcst_valid_hour" ) == 0)
+      else if(strcmp(jc_array[i], "-fcst_valid_hour") == 0)
          fcst_valid_hour.clear();
-      else if(strcmp(jc_array[i], "-obs_valid_hour"  ) == 0)
+      else if(strcmp(jc_array[i], "-obs_valid_hour" ) == 0)
          obs_valid_hour.clear();
       else if(strcmp(jc_array[i], "-fcst_init_hour" ) == 0)
          fcst_init_hour.clear();
@@ -897,17 +897,23 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-column_str"     ) == 0) {
          column_str_map.clear();
       }
-      else if(strcmp(jc_array[i], "-set_hdr"     ) == 0) {
+      else if(strcmp(jc_array[i], "-set_hdr"        ) == 0) {
          hdr_name.clear();
          hdr_value.clear();
       }
       else if(strcmp(jc_array[i], "-by"             ) == 0) {
          column_case.clear();
       }
-      else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0)
+      else if(strcmp(jc_array[i], "-out_thresh"     ) == 0) {
          out_fcst_thresh.clear();
-      else if(strcmp(jc_array[i], "-out_obs_thresh" ) == 0)
          out_obs_thresh.clear();
+      }
+      else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0) {
+         out_fcst_thresh.clear();
+      }
+      else if(strcmp(jc_array[i], "-out_obs_thresh" ) == 0) {
+         out_obs_thresh.clear();
+      }
    }
 
    //
@@ -1116,12 +1122,22 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          out_line_type = string_to_statlinetype(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-out_thresh") == 0) {
+         out_fcst_thresh.add(jc_array[i+1]);
+         out_obs_thresh.add(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0) {
          out_fcst_thresh.add(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-out_obs_thresh") == 0) {
          out_obs_thresh.add(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-out_wind_thresh") == 0) {
+         out_fcst_wind_thresh.set(jc_array[i+1]);
+         out_obs_wind_thresh.set(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-out_fcst_wind_thresh") == 0) {
@@ -1926,28 +1942,41 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       js << "-out_line_type " << statlinetype_to_string(out_line_type) << " ";
    }
 
-   // out_fcst_thresh
-   if(out_fcst_thresh.n_elements() > 0) {
+   // out_fcst_thresh == out_obs_thresh
+   if(out_fcst_thresh == out_obs_thresh) {
+      for(i=0; i<out_fcst_thresh.n_elements(); i++) {
+         js << "-out_thresh " << out_fcst_thresh[i].get_str() << " ";
+      }
+   }
+   else {
+
+      // out_fcst_thresh
       for(i=0; i<out_fcst_thresh.n_elements(); i++) {
          js << "-out_fcst_thresh " << out_fcst_thresh[i].get_str() << " ";
       }
-   }
 
-   // out_obs_thresh
-   if(out_obs_thresh.n_elements() > 0) {
+      // out_obs_thresh
       for(i=0; i<out_obs_thresh.n_elements(); i++) {
          js << "-out_obs_thresh " << out_obs_thresh[i].get_str() << " ";
       }
    }
 
-   // out_fcst_wind_thresh
-   if(out_fcst_wind_thresh.type != thresh_na) {
-      js << "-out_fcst_wind_thresh " << out_fcst_wind_thresh.get_str() << " ";
+   // out_fcst_wind_thresh == out_obs_wind_thresh
+   if(out_fcst_wind_thresh == out_obs_wind_thresh) {
+      if(out_fcst_wind_thresh.type != thresh_na) {
+         js << "-out_wind_thresh " << out_fcst_wind_thresh.get_str() << " ";
+      }
    }
+   else {
+      // out_fcst_wind_thresh
+      if(out_fcst_wind_thresh.type != thresh_na) {
+         js << "-out_fcst_wind_thresh " << out_fcst_wind_thresh.get_str() << " ";
+      }
 
-   // out_obs_wind_thresh
-   if(out_obs_wind_thresh.type != thresh_na) {
-      js << "-out_obs_wind_thresh " << out_obs_wind_thresh.get_str() << " ";
+      // out_obs_wind_thresh
+      if(out_obs_wind_thresh.type != thresh_na) {
+         js << "-out_obs_wind_thresh " << out_obs_wind_thresh.get_str() << " ";
+      }
    }
 
    // Jobs which use out_alpha
