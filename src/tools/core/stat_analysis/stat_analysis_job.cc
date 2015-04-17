@@ -700,12 +700,12 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check that the -line_type option has been supplied only once
    //
-   if(j.line_type.n_elements() != 1) {
+   if(j.line_type.n_elements()     != 1 ||
+      j.out_line_type.n_elements() != 1) {
       mlog << Error << "\ndo_job_aggr_stat() -> "
            << "this function may only be called when the "
-           << "\"-line_type\" option has been used exactly once to "
-           << "specify a single line type over which to perform the "
-           << "aggregation: " << jobstring << "\n\n";
+           << "\"-line_type\" and \"-out_line_type\" options have been "
+           << "used exactly once: " << jobstring << "\n\n";
       throw(1);
    }
 
@@ -713,7 +713,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Determine the input and output line types for this job
    //
    in_lt  = string_to_statlinetype(j.line_type[0]);
-   out_lt = j.out_line_type;
+   out_lt = string_to_statlinetype(j.out_line_type[0]);
 
    //
    // Valid combinations of input and output line types:
