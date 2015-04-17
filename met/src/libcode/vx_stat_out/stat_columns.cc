@@ -447,7 +447,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
                    AsciiTable &txt_at, int &txt_row) {
 
    // FHO line type
-   shc.set_line_type("FHO");
+   shc.set_line_type(stat_fho_str);
 
    // Thresholds
    shc.set_fcst_thresh(cts_info.cts_fcst_thresh);
@@ -485,7 +485,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
                    AsciiTable &txt_at, int &txt_row) {
 
    // CTC line type
-   shc.set_line_type("CTC");
+   shc.set_line_type(stat_ctc_str);
 
    // Thresholds
    shc.set_fcst_thresh(cts_info.cts_fcst_thresh);
@@ -524,7 +524,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    int i;
 
    // CTS line type
-   shc.set_line_type("CTS");
+   shc.set_line_type(stat_cts_str);
 
    // Thresholds
    shc.set_fcst_thresh(cts_info.cts_fcst_thresh);
@@ -568,7 +568,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
                     AsciiTable &txt_at, int &txt_row) {
 
    // MCTC line type
-   shc.set_line_type("MCTC");
+   shc.set_line_type(stat_mctc_str);
 
    // Thresholds
    shc.set_fcst_thresh(mcts_info.cts_fcst_ta);
@@ -607,7 +607,7 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    int i;
 
    // MCTS line type
-   shc.set_line_type("MCTS");
+   shc.set_line_type(stat_mcts_str);
 
    // Thresholds
    shc.set_fcst_thresh(mcts_info.cts_fcst_ta);
@@ -652,7 +652,7 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
    int i;
 
    // CNT line type
-   shc.set_line_type("CNT");
+   shc.set_line_type(stat_cnt_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -694,7 +694,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
                      AsciiTable &txt_at, int &txt_row) {
 
    // SL1L2 line type
-   shc.set_line_type("SL1L2");
+   shc.set_line_type(stat_sl1l2_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -730,7 +730,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
                      AsciiTable &txt_at, int &txt_row) {
 
    // SL1L2 line type
-   shc.set_line_type("SL1L2");
+   shc.set_line_type(stat_sl1l2_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -766,7 +766,7 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
                       AsciiTable &txt_at, int &txt_row) {
 
    // SAL1L2 line type
-   shc.set_line_type("SAL1L2");
+   shc.set_line_type(stat_sal1l2_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -802,7 +802,7 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
                      AsciiTable &txt_at, int &txt_row) {
 
    // VL1L2 line type
-   shc.set_line_type("VL1L2");
+   shc.set_line_type(stat_vl1l2_str);
 
    // Thresholds
    shc.set_fcst_thresh(vl1l2_info.wind_fcst_thresh);
@@ -840,7 +840,7 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
                       AsciiTable &txt_at, int &txt_row) {
 
    // VAL1L2 line type
-   shc.set_line_type("VAL1L2");
+   shc.set_line_type(stat_val1l2_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -876,7 +876,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    AsciiTable &txt_at, int &txt_row) {
 
    // PCT line type
-   shc.set_line_type("PCT");
+   shc.set_line_type(stat_pct_str);
 
    // Thresholds
    shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
@@ -915,7 +915,7 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    int i;
 
    // PSTD line type
-   shc.set_line_type("PSTD");
+   shc.set_line_type(stat_pstd_str);
 
    // Thresholds
    shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
@@ -960,7 +960,7 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    AsciiTable &txt_at, int &txt_row) {
 
    // PJC line type
-   shc.set_line_type("PJC");
+   shc.set_line_type(stat_pjc_str);
 
    // Thresholds
    shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
@@ -998,7 +998,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    AsciiTable &txt_at, int &txt_row) {
 
    // PRC line type
-   shc.set_line_type("PRC");
+   shc.set_line_type(stat_prc_str);
 
    // Thresholds
    shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
@@ -1036,7 +1036,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
                    AsciiTable &txt_at, int &txt_row) {
 
    // NBRCTC line type
-   shc.set_line_type("NBRCTC");
+   shc.set_line_type(stat_nbrctc_str);
 
    // Raw thresholds
    shc.set_fcst_thresh(nbrcts_info.raw_fcst_thresh);
@@ -1077,7 +1077,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    int i;
 
    // NBRCTS line type
-   shc.set_line_type("NBRCTS");
+   shc.set_line_type(stat_nbrcts_str);
 
    // Raw thresholds
    shc.set_fcst_thresh(nbrcts_info.raw_fcst_thresh);
@@ -1123,7 +1123,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
    int i;
 
    // NBRCNT line type
-   shc.set_line_type("NBRCNT");
+   shc.set_line_type(stat_nbrcnt_str);
 
    // Raw thresholds
    shc.set_fcst_thresh(nbrcnt_info.raw_fcst_thresh);
@@ -1169,7 +1169,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    int i;
 
    // MPR line type
-   shc.set_line_type("MPR");
+   shc.set_line_type(stat_mpr_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -1214,7 +1214,7 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
    int i;
 
    // ISC line type
-   shc.set_line_type("ISC");
+   shc.set_line_type(stat_isc_str);
 
    // Not Applicable
    shc.set_interp_mthd(InterpMthd_None);
@@ -1255,7 +1255,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                      AsciiTable &txt_at, int &txt_row) {
 
    // RHIST line type
-   shc.set_line_type("RHIST");
+   shc.set_line_type(stat_rhist_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -1291,7 +1291,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                      AsciiTable &txt_at, int &txt_row) {
 
    // PHIST line type
-   shc.set_line_type("PHIST");
+   shc.set_line_type(stat_phist_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -1328,7 +1328,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    int i;
 
    // Observation Rank line type
-   shc.set_line_type("ORANK");
+   shc.set_line_type(stat_orank_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();
@@ -1373,7 +1373,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    int i;
 
    // SSVAR line type
-   shc.set_line_type("SSVAR");
+   shc.set_line_type(stat_ssvar_str);
 
    // Not Applicable
    shc.clear_fcst_thresh();

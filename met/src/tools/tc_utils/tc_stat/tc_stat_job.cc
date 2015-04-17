@@ -2310,8 +2310,8 @@ void TCStatJobRIRW::clear() {
    
    // Set to default values
    OutLineType.clear();
-   OutLineType.add("CTC");
-   OutLineType.add("CTS");
+   OutLineType.add(stat_ctc_str);
+   OutLineType.add(stat_cts_str);
 
    return;
 }
@@ -2737,9 +2737,9 @@ void TCStatJobRIRW::do_output(ostream &out) {
    line << "JOB_LIST: " << serialize() << "\n";
    out  << line;
    
-   if(OutLineType.has("CTC")) do_ctc_output(out);
-   if(OutLineType.has("CTS")) do_cts_output(out);
-   if(OutLineType.has("MPR")) do_mpr_output(out);
+   if(OutLineType.has(stat_ctc_str)) do_ctc_output(out);
+   if(OutLineType.has(stat_cts_str)) do_cts_output(out);
+   if(OutLineType.has(stat_mpr_str)) do_mpr_output(out);
    
    return;
 }
