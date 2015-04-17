@@ -1119,7 +1119,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-out_line_type") == 0) {
-         // JHG, check for valid line types
          out_line_type.add_css(to_upper(jc_array[i+1]));
          i++;
       }
