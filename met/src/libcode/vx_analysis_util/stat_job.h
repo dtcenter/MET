@@ -30,22 +30,23 @@
 //
 // Defaults to be used if not specified by the user
 //
-static const double default_alpha            = 0.05;
-static const double default_bin_size         = 0.05;
-static const int    default_boot_interval    = 1;
-static const double default_boot_rep_prop    = 1.0;
-static const int    default_n_boot_rep       = 1000;
-static const char   default_boot_rng[]       = "mt19937";
-static const char   default_boot_seed[]      = "";
-static const int    default_rank_corr_flag   = 1;
-static const int    default_vif_flag         = 0;
-static const char   default_tmp_dir[]        = "/tmp";
-static const char   default_ramp_line_type[] = "MPR";
-static const char   default_ramp_fcst_col[]  = "FCST";
-static const char   default_ramp_obs_col[]   = "OBS";
-static const int    default_ramp_time        = 3600; // 1 hour
-static const bool   default_ramp_exact       = true;
-static const int    default_ramp_window      = 0;
+static const double default_alpha                = 0.05;
+static const double default_bin_size             = 0.05;
+static const int    default_boot_interval        = 1;
+static const double default_boot_rep_prop        = 1.0;
+static const int    default_n_boot_rep           = 1000;
+static const char   default_boot_rng[]           = "mt19937";
+static const char   default_boot_seed[]          = "";
+static const int    default_rank_corr_flag       = 1;
+static const int    default_vif_flag             = 0;
+static const char   default_tmp_dir[]            = "/tmp";
+static const char   default_ramp_line_type[]     = "MPR";
+static const char   default_ramp_out_line_type[] = "CTC,CTS";
+static const char   default_ramp_fcst_col[]      = "FCST";
+static const char   default_ramp_obs_col[]       = "OBS";
+static const int    default_ramp_time            = 3600; // 1 hour
+static const bool   default_ramp_exact           = true;
+static const int    default_ramp_window          = 0;
 
 //
 // Dump buffer size
