@@ -2757,7 +2757,9 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Determine the input line type, use default if necessary
    //
-   if(j.line_type.n_elements() == 0) j.line_type.add(default_ramp_line_type);
+   if(j.line_type.n_elements() == 0) {
+      j.line_type.add(default_ramp_line_type);
+   }
    if(j.line_type.n_elements() != 1) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-line_type\" option may be used at most once to "
@@ -2765,6 +2767,22 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
       throw(1);
    }
 
+   //
+   // Determine the output line type(s), use default if necessary
+   //
+   if(j.out_line_type.n_elements() == 0) {
+      j.out_line_type.add_css(default_ramp_out_line_type);
+   }
+   if(!j.out_line_type.has(stat_ctc_str) &&
+      !j.out_line_type.has(stat_cts_str) &&
+      !j.out_line_type.has(stat_mpr_str)) {
+      mlog << Error << "\ndo_job_ramp() -> "
+           << "the \"-out_line_type\" option must be set to some "
+           << "combination of CTC, CTS, and/or MPR: "
+           << jobstring << "\n\n";
+      throw(1);
+   }
+   
    //
    // Determine the ramp columns, use defaults if necessary
    //
