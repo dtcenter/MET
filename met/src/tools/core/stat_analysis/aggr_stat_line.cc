@@ -1270,7 +1270,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
       //
       // Check for the minimum length of time series
       //
-      if(j.vif_flag && j.out_line_type == stat_cnt &&
+      if(j.vif_flag && j.out_line_type.has(stat_cnt_str) &&
          it->second.valid_ts.n_elements() < min_time_series) {
          mlog << Warning << "\naggr_psum_lines() -> "
               << "the variance inflation factor adjustment can only "
@@ -1282,7 +1282,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
       //
       // Compute the auto-correlations for VIF
       //
-      if(j.vif_flag && j.out_line_type == stat_cnt) {
+      if(j.vif_flag && j.out_line_type.has(stat_cnt_str)) {
 
          //
          // Sort the valid times
@@ -2875,8 +2875,8 @@ void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
    pct_info.allocate_n_alpha(1);
    pct_info.alpha[0] = j.out_alpha;
 
-   if(j.out_line_type == stat_pstd) pstd_flag = 1;
-   else                             pstd_flag = 0;
+   if(j.out_line_type.has(stat_pstd_str)) pstd_flag = 1;
+   else                                   pstd_flag = 0;
 
    //
    // Compute the probabilistic counts and statistics

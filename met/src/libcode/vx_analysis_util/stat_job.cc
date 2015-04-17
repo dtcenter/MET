@@ -170,7 +170,7 @@ void STATAnalysisJob::clear() {
    if(mask_grid) { delete [] mask_grid; mask_grid = (char *) 0; }
    if(mask_poly) { delete [] mask_poly; mask_poly = (char *) 0; }
 
-   out_line_type = no_stat_line_type;
+   out_line_type.clear();
 
    out_fcst_thresh.clear();
    out_obs_thresh.clear();
@@ -441,8 +441,8 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "mask_poly = "
        << (mask_poly ? mask_poly : na_str) << "\n";
 
-   out << prefix << "out_line_type = "
-       << statlinetype_to_string(out_line_type) << "\n";
+   out << prefix << "out_line_type ...\n";
+   out_line_type.dump(out, depth + 1);
 
    out << prefix << "out_fcst_thresh ...\n";
    out_fcst_thresh.dump(out, depth + 1);
@@ -1119,7 +1119,8 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-out_line_type") == 0) {
-         out_line_type = string_to_statlinetype(jc_array[i+1]);
+         // JHG, check for valid line types
+         out_line_type.add_css(to_upper(jc_array[i+1]));
          i++;
       }
       else if(strcmp(jc_array[i], "-out_thresh") == 0) {
@@ -1938,8 +1939,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    if(mask_poly) js << "-mask_poly " << mask_poly << " ";
 
    // out_line_type
-   if(out_line_type != no_stat_line_type) {
-      js << "-out_line_type " << statlinetype_to_string(out_line_type) << " ";
+   if(out_line_type.n_elements() > 0) {
+      for(i=0; i<out_line_type.n_elements(); i++)
+         js << "-out_line_type " << out_line_type[i] << " ";
    }
 
    // out_fcst_thresh == out_obs_thresh
@@ -1980,13 +1982,13 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which use out_alpha
-   if(job_type       == stat_job_summary ||
-       out_line_type == stat_cts         ||
-       out_line_type == stat_mcts        ||
-       out_line_type == stat_cnt         ||
-       out_line_type == stat_pstd        ||
-       out_line_type == stat_nbrcts      ||
-       out_line_type == stat_nbrcnt) {
+   if(job_type == stat_job_summary        ||
+       out_line_type.has(stat_cts_str)    ||
+       out_line_type.has(stat_mcts_str)   ||
+       out_line_type.has(stat_cnt_str)    ||
+       out_line_type.has(stat_pstd_str)   ||
+       out_line_type.has(stat_nbrcts_str) ||
+       out_line_type.has(stat_nbrcnt_str)) {
 
       // out_alpha
       js << "-out_alpha " << out_alpha << " ";
@@ -2033,7 +2035,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // Jobs which use out_bin_size
    if(line_type.n_elements() > 0) {
       if(string_to_statlinetype(line_type[0]) == stat_orank &&
-         out_line_type == stat_phist) {
+         out_line_type.has(stat_phist_str)) {
 
          // out_bin_size
         js << "-out_bin_size " << out_bin_size << " ";
@@ -2043,12 +2045,12 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // Jobs which perform bootstrapping
    if(line_type.n_elements() > 0) {
       type = string_to_statlinetype(line_type[0]);
-      if(type           == stat_mpr    &&
-         (out_line_type == stat_cts    ||
-          out_line_type == stat_mcts   ||
-          out_line_type == stat_cnt    ||
-          out_line_type == stat_nbrcts ||
-          out_line_type == stat_nbrcnt)) {
+      if(type == stat_mpr                    &&
+         (out_line_type.has(stat_cts_str)    ||
+          out_line_type.has(stat_mcts_str)   ||
+          out_line_type.has(stat_cnt_str)    ||
+          out_line_type.has(stat_nbrcts_str) ||
+          out_line_type.has(stat_nbrcnt_str))) {
 
          // Bootstrap Information
          js << "-boot_interval " << boot_interval << " ";
@@ -2067,7 +2069,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which compute rank correlations
-   if(out_line_type == stat_cnt) {
+   if(out_line_type.has(stat_cnt_str)) {
 
       // rank_corr_flag
       js << "-rank_corr_flag " << rank_corr_flag << " ";

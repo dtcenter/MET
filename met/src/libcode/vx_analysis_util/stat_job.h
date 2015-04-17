@@ -222,7 +222,7 @@ class STATAnalysisJob {
       AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
       
 
-      STATLineType out_line_type;        // output line type
+      StringArray  out_line_type;        // output line types
       ThreshArray  out_fcst_thresh;      // output forecast threshold(s)
       ThreshArray  out_obs_thresh;       // output observation threshold
       SingleThresh out_fcst_wind_thresh; // output forecast wind speed threshold
