@@ -843,8 +843,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to FHO, CTC, or "
                  << "CTS the \"-out_thresh\" option or \"-out_fcst_thresh\" "
-                 << "and \"-out_obs_thresh\" options must be specified "
-                 << "exactly once.\n\n";
+                 << "and \"-out_obs_thresh\" options must specify "
+                 << "exactly one threshold.\n\n";
             throw(1);
          }
       }
@@ -860,8 +860,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to MCTC or MCTS "
                  << "the \"-out_thresh\" option or \"-out_fcst_thresh\" and "
-                 << "\"-out_obs_thresh\" options must be specified "
-                 << "the same number of times and at least twice.\n\n";
+                 << "\"-out_obs_thresh\" options must specify "
+                 << "the same number of thresholds and at least two.\n\n";
             throw(1);
          }
 

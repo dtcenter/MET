@@ -1123,16 +1123,16 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-out_thresh") == 0) {
-         out_fcst_thresh.add(jc_array[i+1]);
-         out_obs_thresh.add(jc_array[i+1]);
+         out_fcst_thresh.add_css(jc_array[i+1]);
+         out_obs_thresh.add_css(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0) {
-         out_fcst_thresh.add(jc_array[i+1]);
+         out_fcst_thresh.add_css(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-out_obs_thresh") == 0) {
-         out_obs_thresh.add(jc_array[i+1]);
+         out_obs_thresh.add_css(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-out_wind_thresh") == 0) {
