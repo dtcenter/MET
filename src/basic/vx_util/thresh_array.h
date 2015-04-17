@@ -44,6 +44,7 @@ class ThreshArray {
 
       void dump(ostream &, int depth = 0) const;
 
+      bool operator==(const ThreshArray &) const;
       SingleThresh operator[](int) const;
 
       void add(const SingleThresh &);
