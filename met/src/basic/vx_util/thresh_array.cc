@@ -153,6 +153,21 @@ void ThreshArray::extend(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool ThreshArray::operator==(const ThreshArray &ta) const {
+
+   // Check for the same length
+   if(Nelements != ta.n_elements()) return(false);
+
+   // Check for equality of individual elements
+   for(int i=0; i<Nelements; i++) {
+      if(!(t[i] == ta[i])) return(false);
+   }
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 SingleThresh ThreshArray::operator[](int n) const {
 
    if((n < 0) || (n >= Nelements)) {
