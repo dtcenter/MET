@@ -2623,27 +2623,10 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
    cts_info.alpha[0] = j.out_alpha;
 
    //
-   // Store the thresholds to be applied.
+   // Store the thresholds
    //
-   if(j.out_fcst_thresh.n_elements() == 0) {
-      mlog << Error << "\nmpr_to_cts() -> "
-           << "when computing CTS lines, \"-out_fcst_thresh\" must be "
-           << "used.\n\n";
-      throw(1);
-   }
-   else {
-      cts_info.cts_fcst_thresh = j.out_fcst_thresh[0];
-   }
-
-   if(j.out_obs_thresh.n_elements() == 0) {
-      mlog << Error << "\nmpr_to_cts() -> "
-           << "when computing CTS lines, \"-out_obs_thresh\" must be "
-           << "used.\n\n";
-      throw(1);
-   }
-   else {
-      cts_info.cts_obs_thresh = j.out_obs_thresh[0];
-   }
+   cts_info.cts_fcst_thresh = j.out_fcst_thresh[0];
+   cts_info.cts_obs_thresh = j.out_obs_thresh[0];
 
    //
    // Compute the counts, stats, normal confidence intervals, and

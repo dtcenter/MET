@@ -842,8 +842,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             j.out_obs_thresh.n_elements()  != 1) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to FHO, CTC, or "
-                 << "CTS the \"-out_fcst_thresh\" and "
-                 << "\"-out_obs_thresh\" options must be specified "
+                 << "CTS the \"-out_thresh\" option or \"-out_fcst_thresh\" "
+                 << "and \"-out_obs_thresh\" options must be specified "
                  << "exactly once.\n\n";
             throw(1);
          }
@@ -859,7 +859,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             j.out_fcst_thresh.n_elements() != j.out_obs_thresh.n_elements()) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to MCTC or MCTS "
-                 << "the \"-out_fcst_thresh\" and "
+                 << "the \"-out_thresh\" option or \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must be specified "
                  << "the same number of times and at least twice.\n\n";
             throw(1);
