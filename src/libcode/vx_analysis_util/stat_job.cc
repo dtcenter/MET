@@ -1435,6 +1435,7 @@ void STATAnalysisJob::open_stat_file() {
 
 void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    STATLineType cur_lt, out_lt;
+   StringArray out_sa;
    int i, c, n_col;
 
    //
@@ -1445,16 +1446,17 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    //
    // Check for a single output line type
    //
-   out_lt = (out_line_type.n_elements() == 1 ?
-             string_to_statlinetype(out_line_type[0]) :
-             no_stat_line_type);
+   out_sa = (out_line_type.n_elements() > 0 ?
+             out_line_type : line_type);   
+   out_lt = (out_sa.n_elements() == 1 ?
+             string_to_statlinetype(out_sa[0]) : no_stat_line_type);
 
    //
    // Loop through the output line types and determine the number of
    // output columns
    //
-   for(i=0, n_col=0; i<out_line_type.n_elements(); i++) {
-      cur_lt = string_to_statlinetype(out_line_type[i]);
+   for(i=0, n_col=0; i<out_sa.n_elements(); i++) {
+      cur_lt = string_to_statlinetype(out_sa[i]);
       switch(cur_lt) {
          case stat_sl1l2:  c = n_sl1l2_columns;        break;
          case stat_sal1l2: c = n_sal1l2_columns;       break;
