@@ -698,7 +698,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrMPRInfo>   mpr_map;
 
    //
-   // Check that the -line_type option has been supplied only once
+   // Check that the -line_type and -out_line_type options have been
+   // supplied only once
    //
    if(j.line_type.n_elements()     != 1 ||
       j.out_line_type.n_elements() != 1) {
