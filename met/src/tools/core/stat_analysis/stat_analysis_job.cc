@@ -1039,7 +1039,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, 0);
+   j.setup_stat_file(n_row, 0);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1189,7 +1189,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, n);
+   j.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1292,7 +1292,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, n);
+   j.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1410,7 +1410,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, 0);
+   j.setup_stat_file(n_row, 0);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1717,7 +1717,7 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, n);
+   j.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1784,7 +1784,7 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, n);
+   j.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1860,7 +1860,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, 0);
+   j.setup_stat_file(n_row, 0);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -2026,8 +2026,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-        if(lt == stat_rhist) j.setup_stat_file(lt, n_row, n_rhist); 
-   else if(lt == stat_phist) j.setup_stat_file(lt, n_row, n_phist); 
+        if(lt == stat_rhist) j.setup_stat_file(n_row, n_rhist); 
+   else if(lt == stat_phist) j.setup_stat_file(n_row, n_phist); 
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -2106,7 +2106,7 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, 0);
+   j.setup_stat_file(n_row, 0);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -2199,7 +2199,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(lt, n_row, n);
+   j.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -2351,49 +2351,71 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Consider enhancing write_job_ramp() to write out CTS lines to both
-// the "out" and "stat" files.  Also consider writing time-series
-// matched pair information to the "out" file.  Add a switch to apply
-// the swinging door algorithm and include that switch in the ramp job
-// definition columns.
+// Add a switch to apply the swinging door algorithm and include that
+// switch in the ramp job definition columns.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_ramp(STATAnalysisJob &j,
                     map<ConcatString, AggrTimeSeriesInfo> &m,
-                    AsciiTable &at) {
+                    AsciiTable &ctc_at, AsciiTable &cts_at) {
    map<ConcatString, AggrTimeSeriesInfo>::iterator it;
    NumArray framps, oramps;
    TimeArray times;
-   int i, k, f, o, r, c;
+   int i, k, f, o, c;
    int prv_dt, cur_dt, min_dt, i_min_dt;
    int n_row, n_col;
    bool sort_vld;
    CTSInfo cts_info;
-   StatHdrColumns shc;
+   StatHdrColumns ctc_shc, cts_shc;
    ConcatString cs;
 
-   //
-   // Setup the output table
-   //
-   n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements() +
-           n_job_ramp_columns + n_ctc_columns;
-   write_job_aggr_hdr(j, n_row, n_col, at);
+   // Initialize to one header row
+   int n_stat_row = 1;
+   int r_stat, r_ctc, r_cts;
 
    //
-   // Write the ramp job definition header columns
-   // followed by the CTC header columns
+   // Setup CTC output table
    //
-   c = 1 + j.column_case.n_elements();
-   write_header_row(job_ramp_columns, n_job_ramp_columns, 0, at, 0, c);
-   c += n_job_ramp_columns;
-   write_header_row(ctc_columns, n_ctc_columns, 0, at, 0, c);
+   if(j.out_line_type.has(stat_ctc_str)) {
+      n_row = 1 + m.size();
+      n_stat_row += m.size();
+      n_col = 1 + j.column_case.n_elements() +
+              n_job_ramp_columns + n_ctc_columns;
+      write_job_aggr_hdr(j, n_row, n_col, ctc_at);
+
+      //
+      // Write the ramp job definition and CTC header columns
+      //
+      c = 1 + j.column_case.n_elements();
+      write_header_row(job_ramp_columns, n_job_ramp_columns, 0, ctc_at, 0, c);
+      c += n_job_ramp_columns;
+      write_header_row(ctc_columns, n_ctc_columns, 0, ctc_at, 0, c);
+   }
+
+   //
+   // Setup CTS output table
+   //
+   if(j.out_line_type.has(stat_cts_str)) {
+      n_row = 1 + m.size();
+      n_stat_row += m.size();
+      n_col = 1 + j.column_case.n_elements() +
+              n_job_ramp_columns + n_cts_columns;
+      write_job_aggr_hdr(j, n_row, n_col, cts_at);
+
+      //
+      // Write the ramp job definition and CTS header columns
+      //
+      c = 1 + j.column_case.n_elements();
+      write_header_row(job_ramp_columns, n_job_ramp_columns, 0, cts_at, 0, c);
+      c += n_job_ramp_columns;
+      write_header_row(cts_columns, n_cts_columns, 0, cts_at, 0, c);
+   }
 
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(stat_ctc, n_row, 0);
+   j.setup_stat_file(n_stat_row, 0);
    
    mlog << Debug(2) << "Applying ramp detection logic for "
         << (int) m.size() << " case(s).\n";
@@ -2407,7 +2429,7 @@ void write_job_ramp(STATAnalysisJob &j,
    //
    // Loop through the map
    //
-   for(it = m.begin(), r = 1; it != m.end(); it++) {
+   for(it = m.begin(), r_stat = r_ctc = r_cts = 1; it != m.end(); it++) {
 
       //
       // Nothing to do
@@ -2534,57 +2556,96 @@ void write_job_ramp(STATAnalysisJob &j,
       //
       // Copy over the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, stat_ctc);
+      ctc_shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, stat_ctc);
+      
+      //
+      // Compute contingency table statistics, if requested
+      //
+      if(j.out_line_type.has(stat_cts_str)) {
+         cts_shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, stat_cts);
+         cts_shc.set_alpha(j.out_alpha);
+         cts_info.compute_stats();
+         cts_info.compute_ci();
+      }
 
       //
       // Update FCST_VAR, if not user-defined
       //
       if(!j.hdr_name.has("FCST_VAR")) {
-         cs << cs_erase << shc.get_fcst_var() << "_RAMP";
-         shc.set_fcst_var(cs);
+         cs << cs_erase << ctc_shc.get_fcst_var() << "_" << j.column[0] << "_RAMP";
+         ctc_shc.set_fcst_var(cs);
+         cts_shc.set_fcst_var(cs);
       }
 
       //
       // Update OBS_VAR, if not user-defined
       //
       if(!j.hdr_name.has("OBS_VAR")) {
-         cs << cs_erase << shc.get_obs_var() << "_RAMP";
-         shc.set_obs_var(cs);
+         cs << cs_erase << ctc_shc.get_obs_var() << "_" << j.column[1] << "_RAMP";
+         ctc_shc.set_obs_var(cs);
+         cts_shc.set_obs_var(cs);
       }
 
       //
       // Set FCST_THRESH, if not user-defined
       //
       if(!j.hdr_name.has("FCST_THRESH")) {
-         shc.set_fcst_thresh(j.ramp_thresh_fcst);
+         ctc_shc.set_fcst_thresh(j.ramp_thresh_fcst);
+         cts_shc.set_fcst_thresh(j.ramp_thresh_fcst);
       }
 
       //
       // Set OBS_THRESH, if not user-defined
       //
       if(!j.hdr_name.has("OBS_THRESH")) {
-         shc.set_obs_thresh(j.ramp_thresh_obs);
+         ctc_shc.set_obs_thresh(j.ramp_thresh_obs);
+         cts_shc.set_obs_thresh(j.ramp_thresh_obs);
       }
 
       //
-      // Write the stat header columns
+      // Write the CTC and CTS lines to output STAT file
       //
-      if(j.stat_out) write_header_cols(shc, j.stat_at, r);
+      if(j.stat_out) {
+
+         // CTC line type
+         if(j.out_line_type.has(stat_ctc_str)) {
+            write_header_cols(ctc_shc, j.stat_at, r_stat);
+            write_ctc_cols(cts_info, j.stat_at, r_stat, n_header_columns);
+            r_stat++;
+         }
+
+         // CTS line type
+         if(j.out_line_type.has(stat_cts_str)) {
+            write_header_cols(cts_shc, j.stat_at, r_stat);
+            write_cts_cols(cts_info, 0, j.stat_at, r_stat, n_header_columns);
+            r_stat++;
+         }
+      }
 
       //
-      // Write the ramp contingency table counts
+      // Write the ramp CTC output lines
       //
-      c = 0;
-      at.set_entry(r, c++, "RAMP_CTC:");
-      write_case_cols(it->first, at, r, c);
-      write_job_ramp_cols(j, at, r, c);
-      write_ctc_cols(cts_info, at, r, c);
-      if(j.stat_out) write_ctc_cols(cts_info, j.stat_at, r, n_header_columns);
+      if(j.out_line_type.has(stat_ctc_str)) {
+         c = 0;
+         ctc_at.set_entry(r_ctc, c++, "RAMP_CTC:");
+         write_case_cols(it->first, ctc_at, r_ctc, c);
+         write_job_ramp_cols(j, ctc_at, r_ctc, c);
+         write_ctc_cols(cts_info, ctc_at, r_ctc, c);
+         r_ctc++;
+      }
 
       //
-      // Increment row counter
+      // Write the ramp CTS output lines
       //
-      r++;
+      if(j.out_line_type.has(stat_cts_str)) {
+         c = 0;
+         cts_at.set_entry(r_cts, c++, "RAMP_CTS:");
+         write_case_cols(it->first, cts_at, r_cts, c);
+         write_job_ramp_cols(j, cts_at, r_cts, c);
+         write_cts_cols(cts_info, 0, cts_at, r_cts, c);
+         r_cts++;
+      }
+
    } // end for it
 
    return;
@@ -2597,11 +2658,14 @@ void write_job_ramp_cols(const STATAnalysisJob &j, AsciiTable &at,
    
    //
    // Ramp Job Defintion columns:
+   //    FCOLUMN,    OCOLUMN,
    //    FTIME,      OTIME,
    //    FEXACT,     OEXACT,
    //    FTHRESH,    OTHRESH,
    //    WINDOW_BEG, WINDOW_END
    //
+   at.set_entry(r, c++, j.column[0]);
+   at.set_entry(r, c++, j.column[1]);
    at.set_entry(r, c++, sec_to_hhmmss(j.ramp_time_fcst));
    at.set_entry(r, c++, sec_to_hhmmss(j.ramp_time_obs));
    at.set_entry(r, c++, bool_to_string(j.ramp_exact_fcst));
@@ -2750,7 +2814,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
                  STATAnalysisJob &j, int &n_in, int &n_out,
                  ofstream *sa_out) {
    STATLine line;
-   AsciiTable out_at;
+   AsciiTable ctc_at, cts_at;
 
    map<ConcatString, AggrTimeSeriesInfo> ramp_map;
 
@@ -2774,11 +2838,9 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
       j.out_line_type.add_css(default_ramp_out_line_type);
    }
    if(!j.out_line_type.has(stat_ctc_str) &&
-      !j.out_line_type.has(stat_cts_str) &&
-      !j.out_line_type.has(stat_mpr_str)) {
+      !j.out_line_type.has(stat_cts_str)) {
       mlog << Error << "\ndo_job_ramp() -> "
-           << "the \"-out_line_type\" option must be set to some "
-           << "combination of CTC, CTS, and/or MPR: "
+           << "the \"-out_line_type\" option must be set to CTC and/or CTS: "
            << jobstring << "\n\n";
       throw(1);
    }
@@ -2815,7 +2877,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    // Parse the input stat lines
    //
    aggr_time_series_lines(f, j, ramp_map, n_in, n_out);
-   write_job_ramp(j, ramp_map, out_at);
+   write_job_ramp(j, ramp_map, ctc_at, cts_at);
 
    //
    // Check for no matching STAT lines
@@ -2831,7 +2893,8 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    // Write the ASCII Table and the job command line
    //
    write_jobstring(jobstring, sa_out);
-   write_table(out_at, sa_out);
+   if(j.out_line_type.has(stat_ctc_str)) write_table(ctc_at, sa_out);
+   if(j.out_line_type.has(stat_cts_str)) write_table(cts_at, sa_out);
 
    return;
 }

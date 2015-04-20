@@ -133,7 +133,7 @@ class STATAnalysisJob {
       void dump_stat_line     (const STATLine &);
 
       void open_stat_file ();
-      void setup_stat_file(const STATLineType lt, int n_row, int n);
+      void setup_stat_file(int n_row, int n);
       void close_stat_file();
 
       ConcatString get_case_info(const STATLine &) const;

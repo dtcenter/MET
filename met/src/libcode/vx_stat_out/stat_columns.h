@@ -283,6 +283,7 @@ static const char * job_wdir_columns [] = {
 };
 
 static const char * job_ramp_columns [] = {
+   "FCOLUMN",    "OCOLUMN",
    "FTIME",      "OTIME",
    "FEXACT",     "OEXACT",
    "FTHRESH",    "OTHRESH",
@@ -318,6 +319,7 @@ static const int n_nbrctc_columns   = sizeof(nbrctc_columns)/sizeof(*nbrctc_colu
 static const int n_nbrcts_columns   = sizeof(nbrcts_columns)/sizeof(*nbrcts_columns);
 static const int n_nbrcnt_columns   = sizeof(nbrcnt_columns)/sizeof(*nbrcnt_columns);
 static const int n_isc_columns      = sizeof(isc_columns)/sizeof(*isc_columns);
+
 static const int n_job_sum_columns  = sizeof(job_sum_columns)/sizeof(*job_sum_columns);
 static const int n_job_go_columns   = sizeof(job_go_columns)/sizeof(*job_go_columns);
 static const int n_job_ss_columns   = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
