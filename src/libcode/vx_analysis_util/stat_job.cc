@@ -904,6 +904,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-by"             ) == 0) {
          column_case.clear();
       }
+      else if(strcmp(jc_array[i], "-out_line_type"  ) == 0) {
+         out_line_type.clear();
+      }
       else if(strcmp(jc_array[i], "-out_thresh"     ) == 0) {
          out_fcst_thresh.clear();
          out_obs_thresh.clear();
@@ -1430,51 +1433,67 @@ void STATAnalysisJob::open_stat_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void STATAnalysisJob::setup_stat_file(const STATLineType lt,
-                                      int n_row, int n) {
-   int n_col;
+void STATAnalysisJob::setup_stat_file(int n_row, int n) {
+   STATLineType cur_lt, out_lt;
+   int i, c, n_col;
 
    //
    // Nothing to do unless output STAT file stream is defined
    //
    if(!stat_out) return;
-   
+
    //
-   // Determine the number of output columns
+   // Check for a single output line type
    //
-   n_col = n_header_columns;
-   switch(lt) {
-      case stat_sl1l2:  n_col += n_sl1l2_columns;        break;
-      case stat_sal1l2: n_col += n_sal1l2_columns;       break;
-      case stat_vl1l2:  n_col += n_vl1l2_columns;        break;
-      case stat_val1l2: n_col += n_val1l2_columns;       break;
-      case stat_fho:    n_col += n_fho_columns;          break;
-      case stat_ctc:    n_col += n_ctc_columns;          break;
-      case stat_cts:    n_col += n_cts_columns;          break;
-      case stat_mctc:   n_col += get_n_mctc_columns(n);  break;
-      case stat_mcts:   n_col += n_mcts_columns;         break;
-      case stat_cnt:    n_col += n_cnt_columns;          break;
-      case stat_pct:    n_col += get_n_pct_columns(n);   break;
-      case stat_pstd:   n_col += get_n_pstd_columns(n);  break;
-      case stat_pjc:    n_col += get_n_pjc_columns(n);   break;
-      case stat_prc:    n_col += get_n_prc_columns(n);   break;
-      case stat_mpr:    n_col += n_mpr_columns;          break;
-      case stat_nbrctc: n_col += n_nbrctc_columns;       break;
-      case stat_nbrcts: n_col += n_nbrcts_columns;       break;
-      case stat_nbrcnt: n_col += n_nbrcnt_columns;       break;
-      case stat_isc:    n_col += n_isc_columns;          break;
-      case stat_wdir:   n_col += n_job_wdir_columns;     break;
-      case stat_rhist:  n_col += get_n_rhist_columns(n); break;
-      case stat_phist:  n_col += get_n_phist_columns(n); break;
-      case stat_orank:  n_col += n_orank_columns;        break;
-      case stat_ssvar:  n_col += n_ssvar_columns;        break;
-      default:
-         mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
-              << "unexpected stat line type \"" << statlinetype_to_string(lt)
-              << "\"!\n\n";
-         exit(1);
-         break;
+   out_lt = (out_line_type.n_elements() == 1 ?
+             string_to_statlinetype(out_line_type[0]) :
+             no_stat_line_type);
+
+   //
+   // Loop through the output line types and determine the number of
+   // output columns
+   //
+   for(i=0, n_col=0; i<out_line_type.n_elements(); i++) {
+      cur_lt = string_to_statlinetype(out_line_type[i]);
+      switch(cur_lt) {
+         case stat_sl1l2:  c = n_sl1l2_columns;        break;
+         case stat_sal1l2: c = n_sal1l2_columns;       break;
+         case stat_vl1l2:  c = n_vl1l2_columns;        break;
+         case stat_val1l2: c = n_val1l2_columns;       break;
+         case stat_fho:    c = n_fho_columns;          break;
+         case stat_ctc:    c = n_ctc_columns;          break;
+         case stat_cts:    c = n_cts_columns;          break;
+         case stat_mctc:   c = get_n_mctc_columns(n);  break;
+         case stat_mcts:   c = n_mcts_columns;         break;
+         case stat_cnt:    c = n_cnt_columns;          break;
+         case stat_pct:    c = get_n_pct_columns(n);   break;
+         case stat_pstd:   c = get_n_pstd_columns(n);  break;
+         case stat_pjc:    c = get_n_pjc_columns(n);   break;
+         case stat_prc:    c = get_n_prc_columns(n);   break;
+         case stat_mpr:    c = n_mpr_columns;          break;
+         case stat_nbrctc: c = n_nbrctc_columns;       break;
+         case stat_nbrcts: c = n_nbrcts_columns;       break;
+         case stat_nbrcnt: c = n_nbrcnt_columns;       break;
+         case stat_isc:    c = n_isc_columns;          break;
+         case stat_wdir:   c = n_job_wdir_columns;     break;
+         case stat_rhist:  c = get_n_rhist_columns(n); break;
+         case stat_phist:  c = get_n_phist_columns(n); break;
+         case stat_orank:  c = n_orank_columns;        break;
+         case stat_ssvar:  c = n_ssvar_columns;        break;
+         default:
+            mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
+                 << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
+                 << "\"!\n\n";
+            exit(1);
+            break;
+      }
+      if(c > n_col) n_col = c;
    }
+
+   //
+   // Add the header columns
+   //
+   n_col += n_header_columns;
 
    //
    // Setup the STAT table
@@ -1489,7 +1508,7 @@ void STATAnalysisJob::setup_stat_file(const STATLineType lt,
    //
    // Write the STAT header row
    //
-   switch(lt) {
+   switch(out_lt) {
       case stat_sl1l2:  write_header_row       (sl1l2_columns, n_sl1l2_columns, 1,       stat_at, 0, 0); break;
       case stat_sal1l2: write_header_row       (sal1l2_columns, n_sal1l2_columns, 1,     stat_at, 0, 0); break;
       case stat_vl1l2:  write_header_row       (vl1l2_columns, n_vl1l2_columns, 1,       stat_at, 0, 0); break;
@@ -1514,9 +1533,16 @@ void STATAnalysisJob::setup_stat_file(const STATLineType lt,
       case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
       case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
       case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
+
+      //
+      // Write only header columns for unspecified line type
+      //
+      case no_stat_line_type:
+                        write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
+
       default:
          mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
-              << "unexpected stat line type \"" << statlinetype_to_string(lt)
+              << "unexpected stat line type \"" << statlinetype_to_string(out_lt)
               << "\"!\n\n";
          exit(1);
          break;

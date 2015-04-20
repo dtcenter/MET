@@ -113,7 +113,8 @@ extern void write_job_aggr_mpr(STATAnalysisJob &, STATLineType,
                const char *, gsl_rng *);
 
 extern void write_job_ramp(STATAnalysisJob &,
-               map<ConcatString, AggrTimeSeriesInfo> &, AsciiTable &);
+               map<ConcatString, AggrTimeSeriesInfo> &,
+               AsciiTable &, AsciiTable &);
 
 extern void write_job_ramp_cols(const STATAnalysisJob &, AsciiTable &,
                int &, int &);
