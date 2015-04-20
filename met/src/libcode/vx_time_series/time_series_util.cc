@@ -24,7 +24,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 //
 // Apply ramp definition criteria to a time series of values and return
-// an array of the same length using 0 and 1 to indicate the occurance
+// an array of the same length using 0 and 1 to indicate the occurence
 // of a ramp event.
 //
 // Assume the data values are sorted by time.
