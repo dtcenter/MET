@@ -134,8 +134,15 @@ void process_command_line(int argc, char **argv) {
 void process_data_file(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
+   GrdFileType ftype = FileType_None;
 
-   mtddf_ptr = mtddf_factory.new_met_2d_data_file(data_filename);
+   // Get the gridded file type from the data config string, if present
+   if(data_config_str.length() > 0) {
+      config.read_string(data_config_str);
+      ftype = parse_conf_file_type(&config);
+   }
+
+   mtddf_ptr = mtddf_factory.new_met_2d_data_file(data_filename, ftype);
    if(!mtddf_ptr) {
       mlog << Error << "\nprocess_data_file() -> "
            << "can't open data file \"" << data_filename << "\"\n\n";
@@ -173,6 +180,7 @@ void process_data_file(DataPlane &dp) {
 void process_mask_file(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
+   GrdFileType ftype = FileType_None;
 
    // Process the mask file as a lat/lon polyline file
    if(mask_type == PolyMaskType ||
@@ -189,7 +197,13 @@ void process_mask_file(DataPlane &dp) {
    // Otherwise, process the mask file as a gridded data file
    else {
 
-      mtddf_ptr = mtddf_factory.new_met_2d_data_file(mask_filename);
+      // Get the gridded file type from the mask config string, if present
+      if(mask_config_str.length() > 0) {
+         config.read_string(mask_config_str);
+         ftype = parse_conf_file_type(&config);
+      }
+
+      mtddf_ptr = mtddf_factory.new_met_2d_data_file(mask_filename, ftype);
       if(!mtddf_ptr) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "can't open gridded mask data file \"" << mask_filename << "\"\n\n";

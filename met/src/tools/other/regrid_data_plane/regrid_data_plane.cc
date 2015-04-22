@@ -183,12 +183,17 @@ void process_command_line(int argc, char **argv) {
 void process_data_file() {
    DataPlane fr_dp, to_dp;
    Grid fr_grid, to_grid;
+   GrdFileType ftype;
    double dmin, dmax;
    ConcatString run_cs;
 
    // Initialize configuration object
    MetConfig config;
    config.read(replace_path(config_const_filename));
+   config.read_string(ConfigSA[0]);
+
+   // Get the gridded file type from config string, if present
+   ftype = parse_conf_file_type(&config);
    
    // Read the input data file
    Met2dDataFileFactory m_factory;
@@ -196,7 +201,7 @@ void process_data_file() {
 
    // Determine the "from" grid
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
-   fr_mtddf = m_factory.new_met_2d_data_file(InputFilename);
+   fr_mtddf = m_factory.new_met_2d_data_file(InputFilename, ftype);
 
    if(!fr_mtddf) {
       mlog << Error << "\nprocess_data_file() -> "
