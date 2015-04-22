@@ -705,6 +705,7 @@ static const char conf_val_grib1[]       = "GRIB1";
 static const char conf_val_grib2[]       = "GRIB2";
 static const char conf_val_netcdf_met[]  = "NETCDF_MET";
 static const char conf_val_netcdf_pint[] = "NETCDF_PINT";
+static const char conf_val_netcdf_nccf[] = "NETCDF_NCCF";
 
 // Output flag values: NONE, BOTH, STAT
 static const char conf_val_none[] = "NONE";

@@ -100,6 +100,7 @@ int main(int argc, char * argv[])
    VarInfoFactory v_factory;
    DataPlane data_plane;
    Grid grid;
+   GrdFileType ftype;
    ColorTable color_table;
    double data_min, data_max;
 
@@ -114,11 +115,24 @@ int main(int argc, char * argv[])
    process_command_line(argc, argv);
 
       //
+      // parse the config string
+      //
+   MetConfig config;
+   config.read(replace_path(config_const_filename));
+   config.read(replace_path(config_map_data_filename));
+   config.read_string(ConfigString);
+   
+      //
+      // get the gridded file type from config string, if present
+      //
+   ftype = parse_conf_file_type(&config);
+
+      //
       // instantiate the Met2dDataFile object using the data_2d_factory
       // and the VarInfo object using the var_info_factory
       //
    mlog << Debug(1)  << "Opening data file: " << InputFilename << "\n";
-   met_ptr = m_factory.new_met_2d_data_file(InputFilename);
+   met_ptr = m_factory.new_met_2d_data_file(InputFilename, ftype);
 
    if (!met_ptr)
    {
@@ -139,10 +153,6 @@ int main(int argc, char * argv[])
       //
       // populate the var_info object from the magic string
       //
-   MetConfig config;
-   config.read(replace_path(config_const_filename));
-   config.read(replace_path(config_map_data_filename));
-   config.read_string( ConfigString );
    var_ptr->set_dict(config);
 
       //

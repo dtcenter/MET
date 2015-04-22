@@ -103,6 +103,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
       else if(v == conf_const.lookup_int(conf_val_grib2))       t = FileType_Gb2;
       else if(v == conf_const.lookup_int(conf_val_netcdf_met))  t = FileType_NcMet;
       else if(v == conf_const.lookup_int(conf_val_netcdf_pint)) t = FileType_NcPinterp;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_nccf)) t = FileType_NcCF;
       else {
          mlog << Error << "\nparse_conf_file_type() -> "
               << "Unexpected config file value of " << v << " for \""

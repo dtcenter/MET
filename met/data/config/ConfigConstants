@@ -20,6 +20,7 @@ GRIB1          = 1;
 GRIB2          = 2;
 NETCDF_MET     = 3;
 NETCDF_PINT    = 4;
+NETCDF_NCCF    = 5;
 
 // Interpolation method
 MIN            = 1;
