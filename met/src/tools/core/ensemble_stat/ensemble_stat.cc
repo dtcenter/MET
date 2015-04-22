@@ -288,7 +288,7 @@ void process_command_line(int argc, char **argv)
       otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
       // Read the first gridded observation file
-      if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0]))) {
+      if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0], otype))) {
          mlog << Error << "\nprocess_command_line() -> "
               << "Trouble reading gridded observation file \""
               << grid_obs_file_list[0] << "\"\n\n";
