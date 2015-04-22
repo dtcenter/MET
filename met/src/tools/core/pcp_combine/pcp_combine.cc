@@ -990,11 +990,26 @@ void get_field(const char * filename, const char * fld_accum_mag,
 
    Met2dDataFileFactory factory;
    Met2dDataFile * datafile = (Met2dDataFile *) 0;
+   GrdFileType ftype;
    VarInfoFactory var_fac;
    VarInfo* var;
 
+   //  build the field config string
+   ConcatString config_str = is_timestring(fld_accum_mag) ? user_dict.text() : fld_accum_mag;
+   if( config_str.empty() ){
+      config_str.format("name=\"APCP\";level=\"A%s\";", fld_accum_mag);
+   }
+
+   //  parse the config string
+   MetConfig config;
+   config.read(replace_path(config_const_filename));
+   config.read_string(config_str);
+   
+   //  get the gridded file type from config string, if present
+   ftype = parse_conf_file_type(&config);
+   
    //  open the data file and build a VarInfo object
-   datafile = factory.new_met_2d_data_file(filename);
+   datafile = factory.new_met_2d_data_file(filename, ftype);
    if( !datafile ){
       mlog << Error << "\nget_field() -> can't open data file \"" << filename
            << "\"\n\n";
@@ -1007,17 +1022,9 @@ void get_field(const char * filename, const char * fld_accum_mag,
            << filename << "\"\n\n";
       exit (1);
    }
-
-   //  build the field config string
-   ConcatString config_str = is_timestring(fld_accum_mag) ? user_dict.text() : fld_accum_mag;
-   if( config_str.empty() ){
-      config_str.format("name=\"APCP\";level=\"A%s\";", fld_accum_mag);
-   }
-
-   //  initialize the VarInfo object with a field dictionary
-   MetConfig config;
-   config.read_string( config_str );
-   var->set_dict( config );
+   
+   //  initialize the VarInfo object with a config
+   var->set_dict(config);
 
    //  set the VarInfo timing object
    if(get_valid_ut != 0) var->set_valid(get_valid_ut);
