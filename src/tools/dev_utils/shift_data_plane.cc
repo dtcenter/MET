@@ -155,15 +155,24 @@ void process_command_line(int argc, char **argv) {
 void process_data_file() {
    DataPlane dp_in, dp_shift;
    Grid grid;
+   GrdFileType ftype;
    double fr_x, fr_y, to_x, to_y, dx, dy, v;
    int x, y;
+
+   // Parse the config string
+   MetConfig config;
+   config.read(replace_path(config_const_filename));
+   config.read_string(ConfigString);
+
+   // Get the gridded file type from config string, if present
+   ftype = parse_conf_file_type(&config);
 
    // Read the input data file
    Met2dDataFileFactory m_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
    mlog << Debug(1)  << "Reading input file: " << InputFilename << "\n";
-   mtddf = m_factory.new_met_2d_data_file(InputFilename);
+   mtddf = m_factory.new_met_2d_data_file(InputFilename, ftype);
 
    if(!mtddf) {
       mlog << Error << "\nprocess_data_file() -> "
@@ -183,10 +192,7 @@ void process_data_file() {
       exit (1);
    }
 
-   // Populate the VarInfo object using the config string
-   MetConfig config;
-   config.read(replace_path(config_const_filename));
-   config.read_string(ConfigString);
+   // Populate the VarInfo object using config
    vinfo->set_dict(config);
    
    // Open the input file
