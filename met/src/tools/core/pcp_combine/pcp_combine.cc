@@ -980,6 +980,8 @@ void get_field(const char * filename, const int get_accum,
    get_field(filename, sec_to_hhmmss(get_accum), get_init_ut, get_valid_ut, grid, plane);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void get_field(const char * filename, const char * fld_accum_mag,
                const unixtime get_init_ut, const unixtime get_valid_ut,
                Grid & grid, DataPlane & plane)
