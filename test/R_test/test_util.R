@@ -138,6 +138,7 @@ compMapStr = function(m1, m2, warn, verb){
 	for(strAttr in listM1Names[ listM1Names %in% listM2Names ]){
 		if( strAttr == "FileOrigins" ){ next; }
 		if( strAttr == "RunCommand" ){ next; }
+		if( strAttr == "MET_version" ){ next; }
 		if( m1[[strAttr]] != m2[[strAttr]] ){
 			if( 1 <= verb ){ 
 				cat("WARNING:", warn, strAttr, "\n");
