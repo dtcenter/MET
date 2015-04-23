@@ -40,7 +40,7 @@ export HDF_EOS_BASE_DIR
 
 export ENABLE_ASCII2NC
 export ENABLE_ENSEMBLE_STAT
-export ENABLE_GEN_POLY_MASK
+export ENABLE_GEN_VX_MASK
 export ENABLE_GRID_STAT
 export ENABLE_MADIS2NC
 export ENABLE_MODE
@@ -58,8 +58,6 @@ export ENABLE_WWMCA
 export ENABLE_MODIS
 export ENABLE_TC_UTILS
 export ENABLE_MODE_GRAPHICS
-export ENABLE_GEN_CIRCLE_MASK
-export ENABLE_GEN_VX_MASK
 export ENABLE_GSI_TOOLS
 
 ###############################################################################
