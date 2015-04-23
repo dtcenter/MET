@@ -125,6 +125,7 @@ static int verbosity = 1;
 
 // Variables common to all commands
 static ConcatString out_filename;
+static MetConfig config;
 
 // Variables for the sum command
 static unixtime     init_time;
@@ -302,6 +303,11 @@ void process_command_line(int argc, char **argv)
    // If pcp_dir is not set, set it to the current directory.
    //
    if(pcp_dir.n_elements() == 0) pcp_dir.add(default_pcp_dir);
+
+   //
+   // Initialize the MetConfig object
+   //
+   config.read(replace_path(config_const_filename));
 
    //
    //  done
@@ -718,7 +724,6 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
          if( user_dict.empty() ){
             accum_dict.format("name=\"APCP\";level=\"A%s\";", sec_to_hhmmss(in_accum).text());
          }
-         MetConfig config;
          config.read_string( accum_dict.text() );
          var->set_dict( config );
 
@@ -1001,8 +1006,6 @@ void get_field(const char * filename, const char * fld_accum_mag,
    }
 
    //  parse the config string
-   MetConfig config;
-   config.read(replace_path(config_const_filename));
    config.read_string(config_str);
    
    //  get the gridded file type from config string, if present
