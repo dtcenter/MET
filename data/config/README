@@ -383,7 +383,7 @@ obs_window = {
 //         e.g. "MET_BASE/poly/EAST.poly" which consists of n points:
 //              "poly_name lat1 lon1 lat2 lon2... latn lonn"
 //
-//       - The NetCDF output of the gen_poly_mask tool.
+//       - The NetCDF output of the gen_vx_mask tool.
 //
 //       - A gridded data file on the same grid as the forecast data followed
 //         by a dictionary for the field to be used, and optionally, a
@@ -398,7 +398,7 @@ obs_window = {
 mask = {
    grid    = [ "FULL" ];
    poly    = [ "MET_BASE/poly/LMV.poly",
-               "MET_BASE/out/gen_poly_mask/CONUS_poly.nc",
+               "MET_BASE/out/gen_vx_mask/CONUS_poly.nc",
                "MET_BASE/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
                {name = \"TMP\"; level = \"Z2\";} >273"
              ];

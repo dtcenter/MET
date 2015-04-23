@@ -150,7 +150,7 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
 // The mask_poly_str contains masking regions defined one of 3 ways:
 //
 // (1) An ASCII file containing a lat/lon polygon.
-// (2) The NetCDF output of the gen_poly_mask tool.
+// (2) The NetCDF output of the gen_vx_mask tool.
 // (3) A 2D data file, followed by a description of the field to be used,
 //     and optionally, a threshold to be applied to the field.
 //
