@@ -401,24 +401,24 @@ else
     AC_MSG_NOTICE([ensemble_stat will not be compiled])
 fi
 
-# gen_poly_mask
+# gen_vx_mask
 
-AC_ARG_ENABLE(gen_poly_mask,
-	  [AS_HELP_STRING([--disable-gen_poly_mask], [Disable compilation of gen_poly_mask])],
+AC_ARG_ENABLE(gen_vx_mask,
+	  [AS_HELP_STRING([--disable-gen_vx_mask], [Disable compilation of gen_vx_mask])],
   [case "${enableval}" in
-     yes | no ) ENABLE_GEN_POLY_MASK="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gen_poly_mask) ;;
+     yes | no ) ENABLE_GEN_VX_MASK="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gen_vx_mask) ;;
    esac],
-  [ENABLE_GEN_POLY_MASK="yes"]
+  [ENABLE_GEN_VX_MASK="yes"]
 )
 
-AM_CONDITIONAL([ENABLE_GEN_POLY_MASK], [test "x$ENABLE_GEN_POLY_MASK" = "xyes"])
+AM_CONDITIONAL([ENABLE_GEN_VX_MASK], [test "x$ENABLE_GEN_VX_MASK" = "xyes"])
 
-if test "x$ENABLE_GEN_POLY_MASK" = "xyes"; then
-    AC_DEFINE([ENABLE_GEN_POLY_MASK], [], ["build gen_poly_mask"])
-    AC_MSG_NOTICE([gen_poly_mask will be compiled])
+if test "x$ENABLE_GEN_VX_MASK" = "xyes"; then
+    AC_DEFINE([ENABLE_GEN_VX_MASK], [], ["build gen_vx_mask"])
+    AC_MSG_NOTICE([gen_vx_mask will be compiled])
 else
-    AC_MSG_NOTICE([gen_poly_mask will not be compiled])
+    AC_MSG_NOTICE([gen_vx_mask will not be compiled])
 fi
 
 # grid_stat
@@ -721,46 +721,6 @@ else
     AC_MSG_NOTICE([mode_graphics will not be compiled])
 fi
 
-# gen_circle_mask
-
-AC_ARG_ENABLE(gen_circle_mask,
-	  [AS_HELP_STRING([--disable-gen_circle_mask], [Disable compilation of gen_circle_mask])],
-  [case "${enableval}" in
-     yes | no ) ENABLE_GEN_CIRCLE_MASK="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gen_circle_mask) ;;
-   esac],
-  [ENABLE_GEN_CIRCLE_MASK="yes"]
-)
-
-AM_CONDITIONAL([ENABLE_GEN_CIRCLE_MASK], [test "x$ENABLE_GEN_CIRCLE_MASK" = "xyes"])
-
-if test "x$ENABLE_GEN_CIRCLE_MASK" = "xyes"; then
-    AC_DEFINE([ENABLE_GEN_CIRCLE_MASK], [], ["build gen_circle_mask"])
-    AC_MSG_NOTICE([gen_circle_mask will be compiled])
-else
-    AC_MSG_NOTICE([gen_circle_mask will not be compiled])
-fi
-
-# gen_vx_mask
-
-AC_ARG_ENABLE(gen_vx_mask,
-     [AS_HELP_STRING([--disable-gen_vx_mask], [Disable compilation of gen_vx_mask])],
-  [case "${enableval}" in
-     yes | no ) ENABLE_GEN_VX_MASK="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gen_vx_mask) ;;
-   esac],
-  [ENABLE_GEN_VX_MASK="yes"]
-)
-
-AM_CONDITIONAL([ENABLE_GEN_VX_MASK], [test "x$ENABLE_GEN_VX_MASK" = "xyes"])
-
-if test "x$ENABLE_GEN_VX_MASK" = "xyes"; then
-    AC_DEFINE([ENABLE_GEN_VX_MASK], [], ["build gen_vx_mask"])
-    AC_MSG_NOTICE([gen_vx_mask will be compiled])
-else
-    AC_MSG_NOTICE([gen_vx_mask will not be compiled])
-fi
-
 # tc_utils
 
 AC_ARG_ENABLE(tc_utils,
@@ -1029,8 +989,6 @@ AC_CONFIG_FILES([Makefile
                  src/tools/dev_utils/Makefile
                  src/tools/other/Makefile
                  src/tools/other/ascii2nc/Makefile
-                 src/tools/other/gen_poly_mask/Makefile
-                 src/tools/other/gen_circle_mask/Makefile
                  src/tools/other/gen_vx_mask/Makefile
                  src/tools/other/madis2nc/Makefile
                  src/tools/other/mode_graphics/Makefile

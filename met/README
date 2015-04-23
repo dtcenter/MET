@@ -208,8 +208,8 @@ sub-directory, or the MET Online Tutorial:
   --disable-ensemble_stat
       Disable compilation of ensemble_stat
 
-  --disable-gen_poly_mask
-      Disable compilation of gen_poly_mask
+  --disable-gen_vx_mask
+      Disable compilation of gen_vx_mask
 
   --disable-grid_stat
       Disable compilation of grid_stat
@@ -262,9 +262,6 @@ sub-directory, or the MET Online Tutorial:
   --enable-mode_graphics
       Enable compilation of mode_graphics
 
-  --disable-gen_circle_mask
-      Disable compilation of gen_circle_mask
-
   --disable-tc_utils
       Disable compilation of tc_utils
 
@@ -288,8 +285,7 @@ sub-directory, or the MET Online Tutorial:
   command line) will contain 23 executables:
    - ascii2nc
    - ensemble_stat
-   - gen_circle_mask
-   - gen_poly_mask
+   - gen_vx_mask
    - grid_stat
    - madis2nc
    - mode

@@ -18,8 +18,8 @@
 
 SUBDIRS	= 
 
-if ENABLE_GEN_POLY_MASK
-  SUBDIRS += gen_poly_mask
+if ENABLE_GEN_VX_MASK
+  SUBDIRS += gen_vx_mask
 endif
 
 if ENABLE_PLOT_DATA_PLANE
@@ -52,14 +52,6 @@ endif
 
 if ENABLE_MODE_GRAPHICS
   SUBDIRS += mode_graphics
-endif
-
-if ENABLE_GEN_CIRCLE_MASK
-  SUBDIRS += gen_circle_mask
-endif
-
-if ENABLE_GEN_VX_MASK
-  SUBDIRS += gen_vx_mask
 endif
 
 #if ENABLE_GSI_TOOLS

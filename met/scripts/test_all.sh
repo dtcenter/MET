@@ -7,14 +7,9 @@ echo "*** Testing the Model Evaluation Tools Project ***"
 echo
 
 echo
-echo "*** Testing Gen-Poly-Mask application ***"
+echo "*** Testing Gen-Vx-Mask application ***"
 echo
-./test_gen_poly_mask.sh
-
-echo
-echo "*** Testing Gen-Circle-Mask application ***"
-echo
-./test_gen_circle_mask.sh
+./test_gen_vx_mask.sh
 
 echo
 echo "*** Testing PCP-Combine application ***"
