@@ -13,4 +13,4 @@ gen_vx_mask \
    ../data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
    $MET_BASE/poly/MLB_Stadiums.txt \
    ${TEST_OUT_DIR}/gen_vx_mask/CONUS_circles.nc \
-   -type circle -thresh \<=150 -v 2
+   -type circle -thresh le150 -v 2
