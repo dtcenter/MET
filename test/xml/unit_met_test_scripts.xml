@@ -21,36 +21,32 @@
   <exit_on_fail>true</exit_on_fail>
 
   <!--                                                                  -->
-  <!-- gen_poly_mask                                                    -->
+  <!-- gen_vx_mask                                                    -->
   <!--                                                                  -->
   
-  <test name="test_all_gen_poly_mask">
-    <exec>&MET_DIR;/bin/gen_poly_mask</exec>
+  <test name="test_all_gen_vx_mask_1">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/CONUS.poly \
-      &OUTPUT_DIR;/gen_poly_mask/CONUS_poly.nc \
+      &OUTPUT_DIR;/gen_vx_mask/CONUS_poly.nc \
       -v 2
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_poly_mask/CONUS_poly.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CONUS_poly.nc</grid_nc>
     </output>
   </test>
 
-  <!--                                                                  -->
-  <!-- gen_circle_mask                                                  -->
-  <!--                                                                  -->
-
-  <test name="test_all_gen_circle_mask">
-    <exec>&MET_DIR;/bin/gen_circle_mask</exec>
+  <test name="test_all_gen_vx_mask_2">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/MLB_Stadiums.txt \
-      &OUTPUT_DIR;/gen_circle_mask/CONUS_circles.nc \
-      -radius 150 -v 2
+      &OUTPUT_DIR;/gen_vx_mask/CONUS_circles.nc \
+      -type circle -thresh \<=150 -v 2
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_circle_mask/CONUS_circles.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CONUS_circles.nc</grid_nc>
     </output>
   </test>
 
