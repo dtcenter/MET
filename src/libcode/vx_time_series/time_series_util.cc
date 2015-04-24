@@ -31,13 +31,16 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-NumArray compute_ramps(const NumArray &vals, const TimeArray &times,
-                       const int step, const bool exact,
-                       const SingleThresh &thresh) {
+void compute_ramps(const NumArray &vals, const TimeArray &times,
+                   const int step, const bool exact,
+                   const SingleThresh &thresh,
+                   NumArray &ramps, NumArray &prv) {
    int i, j;
    unixtime delta_ut;
-   double cur, prv;
-   NumArray ramps;
+
+   // Initialize
+   ramps.clear();
+   prv.clear();
 
    // Check threshold type for non-exact differences
    if(!exact &&
@@ -52,12 +55,9 @@ NumArray compute_ramps(const NumArray &vals, const TimeArray &times,
    // Loop over the times
    for(i=0; i<times.n_elements(); i++) {
 
-      // Initialize current ramp value
+      // Initialize vals[i]rent ramp and previous values
       ramps.add(bad_data_double);
-
-      // Store the current wind speed maximum
-      cur = vals[i];
-      prv = bad_data_double;
+      prv.add(bad_data_double);
 
       // Search previous times
       for(j=0; j<i; j++) {
@@ -66,36 +66,36 @@ NumArray compute_ramps(const NumArray &vals, const TimeArray &times,
          delta_ut = times[i] - times[j];
 
          // Check for an exact time difference.
-         if(exact && delta_ut == step) prv = vals[j];
+         if(exact && delta_ut == step) prv.set(i, vals[j]);
 
          // Check all points in the time window
          if(!exact && delta_ut <= step) {
 
             // Initialize the previous value.
-            if(is_bad_data(prv)) prv = vals[j];
+            if(is_bad_data(prv[i])) prv.set(i, vals[j]);
 
             // Update the previous value.
-            if(!is_bad_data(prv) && !is_bad_data(vals[j])) {
+            if(!is_bad_data(prv[i]) && !is_bad_data(vals[j])) {
 
                // For greater-than type thresholds, find the minimum value.
                if((thresh.get_type() == thresh_gt ||
-                   thresh.get_type() == thresh_ge) && vals[j] < prv) {
-                  prv = vals[j];
+                   thresh.get_type() == thresh_ge) && vals[j] < prv[i]) {
+                  prv.set(i, vals[j]);
                }
 
                // For less-than type thresholds, find the maximum value.
                if((thresh.get_type() == thresh_lt ||
-                   thresh.get_type() == thresh_le) && vals[j] > prv) {
-                  prv = vals[j];
+                   thresh.get_type() == thresh_le) && vals[j] > prv[i]) {
+                  prv.set(i, vals[j]);
                }
             }
          }
       } // end for j
 
       // Threshold difference to define ramp events
-      if(!is_bad_data(cur) && !is_bad_data(prv)) {
-         if(thresh.check(cur - prv)) ramps.set(i, 1);
-         else                        ramps.set(i, 0);
+      if(!is_bad_data(vals[i]) && !is_bad_data(prv[i])) {
+         if(thresh.check(vals[i] - prv[i])) ramps.set(i, 1);
+         else                               ramps.set(i, 0);
       }
 
       // Print debug message when ramp event is found
@@ -103,12 +103,12 @@ NumArray compute_ramps(const NumArray &vals, const TimeArray &times,
          mlog << Debug(4)
               << "Found ramp event at " << unix_to_yyyymmdd_hhmmss(times[i])
               << (exact ? " exact " : " maximum " ) << sec_to_hhmmss(step)
-              << " change " << prv << " to " << cur << ", "
-              << cur - prv << thresh.get_str() << "\n";
+              << " change " << prv[i] << " to " << vals[i] << ", "
+              << vals[i] - prv[i] << thresh.get_str() << "\n";
       }
    } // end for i
 
-   return(ramps);
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

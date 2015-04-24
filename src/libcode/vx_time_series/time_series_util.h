@@ -17,9 +17,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-NumArray compute_ramps(const NumArray &vals, const TimeArray &times,
-                       const int step, const bool exact,
-                       const SingleThresh &thresh);
+void compute_ramps(const NumArray &vals, const TimeArray &times,
+                   const int step, const bool exact,
+                   const SingleThresh &thresh, NumArray &, NumArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
