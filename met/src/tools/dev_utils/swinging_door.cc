@@ -17,6 +17,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    08-19-14  Rehak          New
+//   001    04-27-154 Halley Gotway  List and format output files
 //                                    
 ////////////////////////////////////////////////////////////////////////
 
@@ -170,7 +171,7 @@ bool run_algorithm(const vector< SDObservation > &observations,
   // Run the algorithm
 
   vector< pair< SDObservation, SDObservation > > ramps;
-  
+ 
   if (!compute_swinging_door_ramps(observations, error_arg, ramps))
     return false;
   
@@ -224,6 +225,9 @@ bool write_observations(const vector< SDObservation > &observations,
 			const string &file_path)
 {
   static const string method_name = "write_observations()";
+
+  mlog << Debug(2)
+       << "Writing: " << file_path << "\n";
   
   // Open the output file
 
@@ -235,13 +239,19 @@ bool write_observations(const vector< SDObservation > &observations,
 	 << "Error opening output file: " << file_path << ".\n\n";
     return false;
   }
+
+
+  // Write the header line
+
+  fprintf(output_file, "valid_time,unix_time,value\n");
     
   // Write the observations
 
   vector< SDObservation >::const_iterator obs;
   for (obs = observations.begin(); obs != observations.end(); ++obs)
-    fprintf(output_file, "%d\t%f\n",
-	    obs->getValidTime(), obs->getValue());
+    fprintf(output_file, "%s,%d,%f\n",
+	    unix_to_yyyymmdd_hhmmss(obs->getValidTime()).text(),
+            obs->getValidTime(), obs->getValue());
 
   // Close the output file
 
@@ -256,6 +266,9 @@ bool write_ramps(const vector< SDObservation > &observations,
 		 const string &file_path)
 {
   static const string method_name = "write_ramps()";
+
+  mlog << Debug(2)
+       << "Writing: " << file_path << "\n";
   
   // Open the output file
 
