@@ -73,10 +73,9 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
       // Otherwise, the end point of the ramp is assigned the previous slope.
 
       if ( (ramp           == ramps.begin()                &&
-            valid_times[i] == ramp->first.getValidTime()) 
+            valid_times[i] == ramp->first.getValidTime())  || 
            (valid_times[i] >  ramp->first.getValidTime()   &&
-            valid_times[i] <= ramp->second.getValidTime()) ||
-           )
+            valid_times[i] <= ramp->second.getValidTime()) )
       {
          int    run_secs = ramp->second.getValidTime() - ramp->first.getValidTime();
          double rise     = ramp->second.getValue() - ramp->first.getValue();
