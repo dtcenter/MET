@@ -24,10 +24,6 @@ using namespace std;
 #include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Compute a normal confidence interval.
-//
-////////////////////////////////////////////////////////////////////////
 
 bool compute_swinging_door_slopes(const TimeArray &valid_times,
                                   const NumArray &data_values,
@@ -44,16 +40,15 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
   // Put the observations into an SDObservation array so we can
   // calculate the ramps.
 
-  vector< SDObservation > obs(valid_times.n_elements());
+  vector< SDObservation > obs;
   for (size_t i = 0; i < valid_times.n_elements(); ++i)
     obs.push_back(SDObservation((time_t)valid_times[i], data_values[i]));
 
   // Calculate the ramps
 
   vector< pair< SDObservation, SDObservation > > ramps;
-  if (!compute_swinging_door_ramps(obs, error, ramps))
-    return false;
-
+  if (!compute_swinging_door_ramps(obs, error, ramps)) return false;
+  
   // Convert the ramps to slope values
 
   slopes.empty();
@@ -73,10 +68,10 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
     vector< pair< SDObservation, SDObservation > >::const_iterator ramp;
     for (ramp = ramps.begin(); ramp != ramps.end(); ++ramp)
     {
-      if ( (valid_times[i] >= ramp->first.getValidTime()   &&
-            valid_times[i] <  ramp->second.getValidTime()) ||
-           (valid_times[i] == ramp->second.getValidTime()  &&
-            ramp+1 == ramps.end()) )
+      if ( (valid_times[i] >  ramp->first.getValidTime()   &&
+            valid_times[i] <= ramp->second.getValidTime()) ||
+           (ramp           == ramps.begin()                &&
+            valid_times[i] == ramp->first.getValidTime()) )
       {
          int    run_secs = ramp->second.getValidTime() - ramp->first.getValidTime();
          double rise     = ramp->second.getValue() - ramp->first.getValue();
@@ -161,7 +156,6 @@ bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
 
       start_time = curr_obs->getValidTime();
       start_value = curr_obs->getValue();
-//      start_value = end_value;
       start_top_value = start_value + error;
       start_bottom_value = start_value - error;
 
