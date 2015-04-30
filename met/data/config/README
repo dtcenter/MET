@@ -1682,11 +1682,20 @@ output_stats = {
 //
 //          Required Args:
 //             -ramp_thresh (-ramp_thresh_fcst or -ramp_thresh_obs)
-//                Threshold for the amount of change required to define an event.
+//                For DYDT, threshold for the amount of change required to define an event.
+//                For SWING, threshold the slope.
+//             -swing_width val
+//                Required for the swinging door algorithm width.
 //
 //          Optional Args:
+//             -ramp_type str
+//                Overrides the default ramp definition algorithm to be used.
+//                May be set to DYDT (default) or SWING for the swinging door algorithm. 
 //             -line_type str
 //                Overrides the default input line type, MPR.
+//             -out_line_type str
+//                Overrides the default output line types of CTC and CTS.
+//                Set to CTC,CTS,MPR for all possible output types.
 //             -column fcst_column,obs_column
 //                Overrides the default forecast and observation columns
 //                to be used, FCST and OBS.

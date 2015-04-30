@@ -179,6 +179,7 @@ void STATAnalysisJob::clear() {
    out_obs_wind_thresh.clear();
 
    // Initialize ramp job settings
+   ramp_type       = default_ramp_type;
    ramp_time_fcst  = default_ramp_time;
    ramp_time_obs   = default_ramp_time;
    ramp_exact_fcst = default_ramp_exact;
@@ -187,6 +188,7 @@ void STATAnalysisJob::clear() {
    ramp_thresh_obs.clear();
    ramp_window_beg = default_ramp_window;
    ramp_window_end = default_ramp_window;
+   swing_width     = bad_data_double;
 
    // Set to default values   
    out_alpha      = default_alpha;
@@ -278,6 +280,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    out_alpha            = aj.out_alpha;
    out_bin_size         = aj.out_bin_size;
 
+   ramp_type            = aj.ramp_type;
    ramp_time_fcst       = aj.ramp_time_fcst;
    ramp_time_obs        = aj.ramp_time_obs;
    ramp_exact_fcst      = aj.ramp_exact_fcst;
@@ -285,7 +288,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    ramp_thresh_fcst     = aj.ramp_thresh_fcst;
    ramp_thresh_obs      = aj.ramp_thresh_obs;
    ramp_window_beg      = aj.ramp_window_beg;
-   ramp_window_end      = aj.ramp_window_end;   
+   ramp_window_end      = aj.ramp_window_end;  
+   swing_width          = aj.swing_width;
    
    boot_interval        = aj.boot_interval;
    boot_rep_prop        = aj.boot_rep_prop;
@@ -462,6 +466,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "out_bin_size = "
        << out_bin_size << "\n";
 
+   out << prefix << "ramp_type = "
+       << timeseriestype_to_string(ramp_type) << "\n";
+
    out << prefix << "ramp_time_fcst = "
        << sec_to_hhmmss(ramp_time_fcst) << "\n";
 
@@ -485,6 +492,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "ramp_window_end = "
        << sec_to_hhmmss(ramp_window_end) << "\n";
+
+   out << prefix << "swing_width = "
+       << swing_width << "\n";
 
    out << prefix << "boot_interval = "
        << boot_interval << "\n";
@@ -1155,6 +1165,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          out_alpha = atof(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-ramp_type") == 0) {
+         ramp_type = string_to_timeseriestype(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-ramp_time") == 0) {
          ramp_time_fcst = ramp_time_obs = timestring_to_sec(jc_array[i+1]);
          i++;
@@ -1209,6 +1223,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
             ramp_window_beg = -1 * ramp_window_end;
             i+=1;
          }
+      }
+      else if(strcmp(jc_array[i], "-swing_width") == 0) {
+         swing_width = atof(jc_array[i+1]);
+         i++;
       }
       else if(strcmp(jc_array[i], "-out_bin_size") == 0) {
          out_bin_size = atof(jc_array[i+1]);
@@ -2024,25 +2042,37 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // Ramp jobs
    if(job_type == stat_job_ramp) {
 
-      // ramp_time
-      if(ramp_time_fcst == ramp_time_obs) {
-         js << "-ramp_time " << sec_to_hhmmss(ramp_time_fcst) << " ";
-      }
-      else {
-         js << "-ramp_time_fcst " << sec_to_hhmmss(ramp_time_fcst) << " "
-            << "-ramp_time_obs "  << sec_to_hhmmss(ramp_time_obs)  << " ";
-      }
+      // ramp_type
+      js << "-ramp_type " << timeseriestype_to_string(ramp_type) << " ";
 
-      // ramp_exact
-      if(ramp_exact_fcst != default_ramp_exact ||
-         ramp_exact_obs  != default_ramp_exact) {
-         if(ramp_exact_fcst == ramp_exact_obs) {
-            js << "-ramp_exact " << bool_to_string(ramp_exact_fcst) << " ";
+      if(ramp_type == TimeSeriesType_DyDt) {
+
+         // ramp_time
+         if(ramp_time_fcst == ramp_time_obs) {
+            js << "-ramp_time " << sec_to_hhmmss(ramp_time_fcst) << " ";
          }
          else {
-            js << "-ramp_exact_fcst " << bool_to_string(ramp_exact_fcst) << " "
-               << "-ramp_exact_obs "  << bool_to_string(ramp_exact_obs)  << " ";
+            js << "-ramp_time_fcst " << sec_to_hhmmss(ramp_time_fcst) << " "
+               << "-ramp_time_obs "  << sec_to_hhmmss(ramp_time_obs)  << " ";
          }
+
+         // ramp_exact
+         if(ramp_exact_fcst != default_ramp_exact ||
+            ramp_exact_obs  != default_ramp_exact) {
+            if(ramp_exact_fcst == ramp_exact_obs) {
+               js << "-ramp_exact " << bool_to_string(ramp_exact_fcst) << " ";
+            }
+            else {
+               js << "-ramp_exact_fcst " << bool_to_string(ramp_exact_fcst) << " "
+                  << "-ramp_exact_obs "  << bool_to_string(ramp_exact_obs)  << " ";
+            }
+         }
+      }
+
+      if(ramp_type == TimeSeriesType_Swing) {
+
+         // swing_width
+         js << "-swing_width " << swing_width << " ";
       }
 
       // ramp_thresh

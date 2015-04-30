@@ -20,6 +20,33 @@ using namespace std;
 #include <cmath>
 
 #include "time_series_util.h"
+#include "compute_swinging_door.h"
+
+////////////////////////////////////////////////////////////////////////
+
+TimeSeriesType string_to_timeseriestype(const char *s) {
+   TimeSeriesType t;
+
+        if(strcasecmp(s, timeseriestype_dydt_str)  == 0) t = TimeSeriesType_DyDt;
+   else if(strcasecmp(s, timeseriestype_swing_str) == 0) t = TimeSeriesType_Swing;
+   else                                                  t = TimeSeriesType_None;
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char * timeseriestype_to_string(const TimeSeriesType t) {
+   const char *s = (const char *) 0;
+
+   switch(t) {
+      case(TimeSeriesType_DyDt):  s = timeseriestype_dydt_str;  break;
+      case(TimeSeriesType_Swing): s = timeseriestype_swing_str; break;
+      default:                    s = na_str;                   break;
+   }
+
+   return(s);
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -31,10 +58,11 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_ramps(const NumArray &vals, const TimeArray &times,
-                   const int step, const bool exact,
-                   const SingleThresh &thresh,
-                   NumArray &ramps, NumArray &prv) {
+bool compute_dydt_ramps(const char *name,
+                        const NumArray &vals, const TimeArray &times,
+                        const int step, const bool exact,
+                        const SingleThresh &thresh,
+                        NumArray &ramps, NumArray &prv) {
    int i, j;
    unixtime delta_ut;
 
@@ -46,16 +74,16 @@ void compute_ramps(const NumArray &vals, const TimeArray &times,
    if(!exact &&
       thresh.get_type() != thresh_lt && thresh.get_type() != thresh_le &&
       thresh.get_type() != thresh_gt && thresh.get_type() != thresh_ge) {
-      mlog << Error << "\ncompute_ramps() -> "
+      mlog << Error << "\ncompute_dydt_ramps() -> "
            << "for non-exact differences the ramp threshold ("
            << thresh.get_str() << ") must be of type <, <=, >, or >=.\n\n";
-      exit(1);
+      return(false);
    }
 
    // Loop over the times
    for(i=0; i<times.n_elements(); i++) {
 
-      // Initialize vals[i]rent ramp and previous values
+      // Initialize current ramp and previous values
       ramps.add(bad_data_double);
       prv.add(bad_data_double);
 
@@ -101,14 +129,72 @@ void compute_ramps(const NumArray &vals, const TimeArray &times,
       // Print debug message when ramp event is found
       if(ramps[i] == 1) {
          mlog << Debug(4)
-              << "Found ramp event at " << unix_to_yyyymmdd_hhmmss(times[i])
+              << "Found " << name << " ramp event at "
+              << unix_to_yyyymmdd_hhmmss(times[i])
               << (exact ? " exact " : " maximum " ) << sec_to_hhmmss(step)
               << " change " << prv[i] << " to " << vals[i] << ", "
-              << vals[i] - prv[i] << thresh.get_str() << "\n";
+              << vals[i] - prv[i] << thresh.get_str() << ".\n";
       }
    } // end for i
 
-   return;
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Apply the swinging door algorithm to a time series of values and
+// return an array of the same length using 0 and 1 to indicate the
+// occurence of a ramp event.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool compute_swing_ramps(const char *name,
+                         const NumArray &vals, const TimeArray &times,
+                         const double width, const SingleThresh &thresh,
+                         NumArray &ramps, NumArray &slopes) {
+   int i;
+   bool ramp;
+
+   // Initialize
+   ramps.clear();
+   slopes.clear();
+
+   // Require at least 2 points
+   if(times.n_elements() < 2) {
+      for(i=0; i<times.n_elements(); i++) {
+         ramps.add(bad_data_double);
+         slopes.add(bad_data_double);
+      }
+      return(true);
+   }
+
+   mlog << Debug(4)
+        << "Calling swinging door algorithm.\n";
+
+   if(!compute_swinging_door_slopes(times, vals, width, slopes)) {
+      return(false);
+   }
+   
+   // Apply the slope threshold to define ramps
+   for(i=0; i<slopes.n_elements(); i++) {
+      if(is_bad_data(slopes[i])) ramps.add(bad_data_double);
+      else {
+         ramp = thresh.check(slopes[i]);
+         ramps.add((int) ramp);
+      }
+
+      // Print debug message when ramp event is found
+      if(ramp) {
+         mlog << Debug(4)
+              << "Found " << name << " swinging door ramp event at "
+              << unix_to_yyyymmdd_hhmmss(times[i])
+              << " for slope of " << slopes[i]
+              << thresh.get_str() << ".\n";
+      }
+      
+   }
+   
+   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////

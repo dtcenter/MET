@@ -283,6 +283,7 @@ static const char * job_wdir_columns [] = {
 };
 
 static const char * job_ramp_columns [] = {
+   "TYPE",
    "FCOLUMN",    "OCOLUMN",
    "FTIME",      "OTIME",
    "FEXACT",     "OEXACT",

@@ -67,12 +67,12 @@ static string station_id_arg;
 
 static bool process_file();
 static bool run_algorithm(const vector< SDObservation > &obs,
-			  vector< SDObservation > &compressed_obs);
+                          vector< SDObservation > &compressed_obs);
 static void usage();
 static bool write_observations(const vector< SDObservation > &observations,
-			       const string &file_path);
+                               const string &file_path);
 static bool write_ramps(const vector< SDObservation > &observations,
-			const string &file_path);
+                        const string &file_path);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +132,7 @@ bool process_file()
   vector< SDObservation > observations;
   
   if (!nc_file.readFile(grib_code_arg, station_id_arg, message_type_arg,
-			observations))
+                        observations))
     return false;
 
   // Write the raw observations to the output file
@@ -150,13 +150,12 @@ bool process_file()
   // Write the compressed observations to the output file
 
   if (!write_observations(compressed_observations,
-			  "compressed_obs.txt"))
+                          "compressed_obs.txt"))
     return false;
   
   // Write the compressed observations as ramps
 
-  if (!write_ramps(compressed_observations,
-		   "ramps.txt"))
+  if (!write_ramps(compressed_observations, "ramps.txt"))
     return false;
   
   return true;
@@ -166,7 +165,7 @@ bool process_file()
 ////////////////////////////////////////////////////////////////////////
 
 bool run_algorithm(const vector< SDObservation > &observations,
-		   vector< SDObservation > &compressed_observations)
+                   vector< SDObservation > &compressed_observations)
 {
   // Run the algorithm
 
@@ -222,7 +221,7 @@ void usage()
 ////////////////////////////////////////////////////////////////////////
 
 bool write_observations(const vector< SDObservation > &observations,
-			const string &file_path)
+                        const string &file_path)
 {
   static const string method_name = "write_observations()";
 
@@ -236,10 +235,9 @@ bool write_observations(const vector< SDObservation > &observations,
   if ((output_file = fopen(file_path.c_str(), "w")) == 0)
   {
     mlog << Error << "\n" + method_name + " -> "
-	 << "Error opening output file: " << file_path << ".\n\n";
+         << "Error opening output file: " << file_path << ".\n\n";
     return false;
   }
-
 
   // Write the header line
 
@@ -250,7 +248,7 @@ bool write_observations(const vector< SDObservation > &observations,
   vector< SDObservation >::const_iterator obs;
   for (obs = observations.begin(); obs != observations.end(); ++obs)
     fprintf(output_file, "%s,%d,%f\n",
-	    unix_to_yyyymmdd_hhmmss(obs->getValidTime()).text(),
+            unix_to_yyyymmdd_hhmmss(obs->getValidTime()).text(),
             obs->getValidTime(), obs->getValue());
 
   // Close the output file
@@ -263,7 +261,7 @@ bool write_observations(const vector< SDObservation > &observations,
 ////////////////////////////////////////////////////////////////////////
 
 bool write_ramps(const vector< SDObservation > &observations,
-		 const string &file_path)
+                 const string &file_path)
 {
   static const string method_name = "write_ramps()";
 
@@ -277,7 +275,7 @@ bool write_ramps(const vector< SDObservation > &observations,
   if ((output_file = fopen(file_path.c_str(), "w")) == 0)
   {
     mlog << Error << "\n" + method_name + " -> "
-	 << "Error opening output file: " << file_path << ".\n\n";
+         << "Error opening output file: " << file_path << ".\n\n";
     return false;
   }
     
@@ -290,9 +288,9 @@ bool write_ramps(const vector< SDObservation > &observations,
   if (observations.size() % 2 != 0)
   {
     mlog << Warning << "\n" + method_name + " -> "
-	 << "There should be an even number of compressed observations. "
-	 << "An odd number were found, so there is probably a programming error. "
-	 << "Printing out the ramps, ignoring the last observation.\n\n";
+         << "There should be an even number of compressed observations. "
+         << "An odd number were found, so there is probably a programming error. "
+         << "Printing out the ramps, ignoring the last observation.\n\n";
   }
   
   size_t num_ramps = observations.size() / 2;
@@ -307,9 +305,9 @@ bool write_ramps(const vector< SDObservation > &observations,
     double slope = rise / (double)run_secs;
     
     fprintf(output_file, "%s,%s,%d,%f,%f\n",
-	    observations[start_obs].getValidTimeString().c_str(),
-	    observations[end_obs].getValidTimeString().c_str(),
-	    run_secs, rise, slope);
+            observations[start_obs].getValidTimeString().c_str(),
+            observations[end_obs].getValidTimeString().c_str(),
+            run_secs, rise, slope);
   }
   
   // Close the output file

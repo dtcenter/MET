@@ -2362,12 +2362,14 @@ void write_job_ramp(STATAnalysisJob &j,
                     AsciiTable &ctc_at, AsciiTable &cts_at,
                     AsciiTable &mpr_at) {
    map<ConcatString, AggrTimeSeriesInfo>::iterator it;
-   NumArray framps, oramps, fprv, oprv;
-   TimeArray times;
-   int i, k, f, o, c;
-   int prv_dt, cur_dt, min_dt, i_min_dt, i_swap;
+   NumArray framps, oramps, fdat, odat;
+   NumArray vals_part, ramp_part, dat_part;
+   TimeArray ts, ts_part, beg, end;
+   int i, k, f, o, c, beg_i, end_i;
+   int cur_dt, min_dt, i_min_dt, i_swap;
    int n_row, n_col;
-   bool sort_vld;
+   bool sort_vld, status;
+   double delta;
    unixtime init_ut, valid_ut;
    CTSInfo cts_info;
    StatHdrColumns ctc_shc, cts_shc;
@@ -2469,47 +2471,96 @@ void write_job_ramp(STATAnalysisJob &j,
       //
       sort_vld = (it->second.valid_ts.n_elements() ==
                   it->second.f_na.n_elements());
-      times    = (sort_vld ? it->second.valid_ts : it->second.init_ts);
+      ts       = (sort_vld ? it->second.valid_ts : it->second.init_ts);
 
       //
-      // Print warning for inconsistent time step
+      // Subset the time series down to consistent time steps
       //
-      for(i=1; i<times.n_elements(); i++, prv_dt=cur_dt) {
-         cur_dt = times[i] - times[i-1];
-         if(i == 1) prv_dt = cur_dt;
-         if(cur_dt != prv_dt) {
-            mlog << Warning << "\nwrite_job_ramp() -> "
-                 << "the time step changed from " << sec_to_hhmmss(prv_dt)
-                 << " to " << sec_to_hhmmss(cur_dt) << " at "
-                 << unix_to_yyyymmdd_hhmmss(times[i]) << ".\n\n";
-         }
+      ts.equal_dt(beg, end);
+      
+      if(beg.n_elements() > 1) {
+         mlog << Debug(4)
+              << "Processing time series in " << beg.n_elements()
+              << " parts due to inconsistent time step.\n";
+      }
+
+      //
+      // Process each consistent time segement
+      //
+      for(i=0; i<beg.n_elements(); i++) {
+
+         //
+         // Get the current segment
+         //
+         ts_part = ts.subset(ts.index(beg[i]), ts.index(end[i]));
+
+         cur_dt = (beg[i] == end[i] ? 0 :
+                   (end[i] - beg[i]) / (ts_part.n_elements() - 1));
+
+         mlog << Debug(4)
+              << "Processing time series from "
+              << unix_to_yyyymmdd_hhmmss(beg[i]) << " to "
+              << unix_to_yyyymmdd_hhmmss(end[i]) << " with time step of "
+              << sec_to_hhmmss(cur_dt) << ".\n";
+         
+         //
+         // Compute forecast ramps
+         //           
+         cs << cs_erase << it->second.fcst_var << " " << j.column[0];
+         mlog << Debug(4)
+              << "Computing " << cs << " "
+              << (sort_vld ? "valid" : "initialization")
+              <<  " time series " << timeseriestype_to_string(j.ramp_type)
+              << " ramps for case \"" << it->first << "\".\n";
+
+         vals_part = it->second.f_na.subset(ts.index(beg[i]), ts.index(end[i]));
+         
+         status = (j.ramp_type == TimeSeriesType_DyDt ?
+                   compute_dydt_ramps(cs, vals_part, ts_part,
+                      j.ramp_time_fcst, j.ramp_exact_fcst, j.ramp_thresh_fcst,
+                      ramp_part, dat_part) :
+                   compute_swing_ramps(cs, vals_part, ts_part,
+                      j.swing_width, j.ramp_thresh_fcst,
+                      ramp_part, dat_part));
+
+         //
+         // Store data for current segment
+         //
+         framps.add(ramp_part);
+         fdat.add(dat_part);
+
+         //
+         // Compute observed ramps
+         //
+         cs << cs_erase << it->second.obs_var << " " << j.column[1];
+         mlog << Debug(4)
+              << "Computing " << cs << " "
+              << (sort_vld ? "valid" : "initialization")
+              <<  " time series " << timeseriestype_to_string(j.ramp_type)
+              << " ramps for case \"" << it->first << "\".\n";
+
+         vals_part = it->second.o_na.subset(ts.index(beg[i]), ts.index(end[i]));
+
+         status = (j.ramp_type == TimeSeriesType_DyDt ?
+                   compute_dydt_ramps(cs, vals_part, ts_part,
+                      j.ramp_time_obs, j.ramp_exact_obs, j.ramp_thresh_obs,
+                      ramp_part, dat_part) :
+                   compute_swing_ramps(cs, vals_part, ts_part,
+                      j.swing_width, j.ramp_thresh_obs,
+                      ramp_part, dat_part));
+
+         //
+         // Store data for current segment
+         //
+         oramps.add(ramp_part);
+         odat.add(dat_part);
       } // end for i
-
-      //
-      // Define forecast and observed ramps
-      //
-      mlog << Debug(4)
-           << "Computing forecast "
-           << (sort_vld ? "valid" : "initialization")
-           <<  " time series ramps for case \""
-           << it->first << "\".\n";
-      compute_ramps(it->second.f_na, times, j.ramp_time_fcst,
-                    j.ramp_exact_fcst, j.ramp_thresh_fcst,
-                    framps, fprv);
-      mlog << Debug(4)
-           << "Computing observed "
-           << (sort_vld ? "valid" : "initialization")
-           <<  " time series ramps for case \""
-           << it->first << "\".\n";
-      compute_ramps(it->second.o_na, times, j.ramp_time_obs,
-                    j.ramp_exact_obs, j.ramp_thresh_obs,
-                    oramps, oprv);
 
       //
       // Populate the ramp contingency table
       //
       cts_info.cts.zero_out();
-      for(i=0; i<times.n_elements(); i++) {
+      for(i=0; i<ts.n_elements(); i++) {
 
          // Initialize
          i_swap = bad_data_int;
@@ -2529,17 +2580,17 @@ void write_job_ramp(STATAnalysisJob &j,
             // Search for points in the time window
             //
             for(k=0, min_dt=bad_data_int, i_min_dt=bad_data_int;
-                k<times.n_elements(); k++) {
+                k<ts.n_elements(); k++) {
             
                //
                // Skip points before the time window
                //
-               if(times[k] < times[i] + j.ramp_window_beg) continue;
+               if(ts[k] < ts[i] + j.ramp_window_beg) continue;
 
                //
                // Break out of the loop after the time window
                //
-               if(times[k] > times[i] + j.ramp_window_end) break;
+               if(ts[k] > ts[i] + j.ramp_window_end) break;
 
                //
                // Skip forecasts that don't agree with the current observation
@@ -2549,7 +2600,7 @@ void write_job_ramp(STATAnalysisJob &j,
                //
                // Find closest match in time
                //
-               cur_dt = labs(times[i] - times[k]);
+               cur_dt = labs(ts[i] - ts[k]);
                if(is_bad_data(min_dt))  { min_dt = cur_dt; i_min_dt = k; }
                else if(cur_dt < min_dt) { min_dt = cur_dt; i_min_dt = k; }
             } // end for k
@@ -2564,9 +2615,9 @@ void write_job_ramp(STATAnalysisJob &j,
                     << "Switching "
                     << (o == 1 ? "FN_OY" : "FY_ON") << " to "
                     << (o == 1 ? "FY_OY" : "FN_ON")
-                    << " at " << unix_to_yyyymmdd_hhmmss(times[i])
+                    << " at " << unix_to_yyyymmdd_hhmmss(ts[i])
                     << " since forecast "  << (o == 1 ? "event" : "non-event")
-                    << " at " << unix_to_yyyymmdd_hhmmss(times[i_swap])
+                    << " at " << unix_to_yyyymmdd_hhmmss(ts[i_swap])
                     << " fell within the ramp time window.\n";
             }
          }
@@ -2612,15 +2663,29 @@ void write_job_ramp(STATAnalysisJob &j,
             mpr_at.set_entry(r_mpr, c++, unix_to_yyyymmdd_hhmmss(init_ut));
             mpr_at.set_entry(r_mpr, c++, sec_to_hhmmss((int) valid_ut - init_ut));
             mpr_at.set_entry(r_mpr, c++, unix_to_yyyymmdd_hhmmss(valid_ut));
-            mpr_at.set_entry(r_mpr, c++, fprv[k]);
-            mpr_at.set_entry(r_mpr, c++, it->second.f_na[k]);
-            mpr_at.set_entry(r_mpr, c++, (is_bad_data(fprv[k]) || is_bad_data(it->second.f_na[k]) ?
-                                          bad_data_double : it->second.f_na[k] - fprv[k]));
+            if(j.ramp_type == TimeSeriesType_DyDt) {
+               mpr_at.set_entry(r_mpr, c++, fdat[k]);
+               mpr_at.set_entry(r_mpr, c++, it->second.f_na[k]);
+               mpr_at.set_entry(r_mpr, c++, (is_bad_data(fdat[k]) || is_bad_data(it->second.f_na[k]) ?
+                                             bad_data_double : it->second.f_na[k] - fdat[k]));
+            }
+            else {
+               mpr_at.set_entry(r_mpr, c++, bad_data_double);
+               mpr_at.set_entry(r_mpr, c++, it->second.f_na[k]);
+               mpr_at.set_entry(r_mpr, c++, fdat[k]);
+            }
             mpr_at.set_entry(r_mpr, c++, (is_bad_data(f) ? na_str : bool_to_string(f)));
-            mpr_at.set_entry(r_mpr, c++, oprv[k]);
-            mpr_at.set_entry(r_mpr, c++, it->second.o_na[k]);
-            mpr_at.set_entry(r_mpr, c++, (is_bad_data(oprv[k]) || is_bad_data(it->second.o_na[k]) ?
-                                          bad_data_double : it->second.o_na[k] - oprv[k]));
+            if(j.ramp_type == TimeSeriesType_DyDt) {
+               mpr_at.set_entry(r_mpr, c++, odat[k]);
+               mpr_at.set_entry(r_mpr, c++, it->second.o_na[k]);
+               mpr_at.set_entry(r_mpr, c++, (is_bad_data(odat[k]) || is_bad_data(it->second.o_na[k]) ?
+                                             bad_data_double : it->second.o_na[k] - odat[k]));
+            }
+            else {
+               mpr_at.set_entry(r_mpr, c++, bad_data_double);
+               mpr_at.set_entry(r_mpr, c++, it->second.o_na[k]);
+               mpr_at.set_entry(r_mpr, c++, odat[k]);
+            }
             mpr_at.set_entry(r_mpr, c++, (is_bad_data(o) ? na_str : bool_to_string(o)));
             if(is_bad_data(f) || is_bad_data(o)) {
                cs = na_str;
@@ -2742,12 +2807,14 @@ void write_job_ramp_cols(const STATAnalysisJob &j, AsciiTable &at,
    
    //
    // Ramp Job Defintion columns:
+   //    TYPE,
    //    FCOLUMN,    OCOLUMN,
    //    FTIME,      OTIME,
    //    FEXACT,     OEXACT,
    //    FTHRESH,    OTHRESH,
    //    WINDOW_BEG, WINDOW_END
    //
+   at.set_entry(r, c++, timeseriestype_to_string(j.ramp_type));
    at.set_entry(r, c++, j.column[0]);
    at.set_entry(r, c++, j.column[1]);
    at.set_entry(r, c++, sec_to_hhmmss(j.ramp_time_fcst));
@@ -2946,6 +3013,28 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
       throw(1);
    }
 
+   //
+   // Check the ramp type
+   //
+   if(j.ramp_type != TimeSeriesType_DyDt &&
+      j.ramp_type != TimeSeriesType_Swing) {
+      mlog << Error << "\ndo_job_ramp() -> "
+           << "unsupported \"-ramp_type\" option: "
+           << jobstring << "\n\n";
+      throw(1);
+   }
+
+   //
+   // Check swing_width for the swinging door algorithm
+   //
+   if(j.ramp_type == TimeSeriesType_Swing &&
+      is_bad_data(j.swing_width)) {
+      mlog << Error << "\ndo_job_ramp() -> "
+           << "the \"-swing_width\" option is required for \"-ramp_type SWING\": "
+           << jobstring << "\n\n";
+      throw(1);
+   }
+   
    //
    // Determine the ramp thresholds, no defaults
    //

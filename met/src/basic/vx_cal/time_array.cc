@@ -449,6 +449,77 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+//
+// For each set of equally spaced times return the beginning and ending
+// times of the segment.
+//
+////////////////////////////////////////////////////////////////////////
+
+void TimeArray::equal_dt(TimeArray &beg, TimeArray &end) const
+
+{
+
+int i, cur_dt, prv_dt;
+bool new_ts;
+
+// Initialize
+end.clear();
+beg.clear();
+
+if ( Nelements == 0 )  return;
+
+// Use first point to begin first segment
+beg.add(e[0]);
+   
+for(i=1, new_ts=true; i<Nelements; i++, prv_dt=cur_dt) {
+   cur_dt = e[i] - e[i-1];
+   if(new_ts) {
+      prv_dt = cur_dt;
+      new_ts = false;
+   }
+
+   // When the time step changes, begin a new segment
+   if(cur_dt != prv_dt) {
+      end.add(e[i-1]);
+      beg.add(e[i]);
+      new_ts = true;
+   }
+}
+
+// Use last point to end the last segment
+end.add(e[Nelements - 1]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+TimeArray TimeArray::subset(int beg, int end) const
+
+{
+
+TimeArray subset;
+
+// Check bounds
+if ( beg < 0 || beg >= Nelements ||
+     end < 0 || end >= Nelements ||
+     end < beg )  {
+   mlog << Error << "\nTimeArray::subset(int, int) -> "
+        << "range check error\n\n";
+   exit ( 1 );
+}
+
+// Store subset
+for(int i=beg; i<=end; i++) subset.add(e[i]);
+
+return ( subset );
+
+}
+
+////////////////////////////////////////////////////////////////////////
 
 
 int compare_unixtime(const void *p1, const void *p2)

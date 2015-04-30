@@ -71,6 +71,10 @@ class TimeArray {
 
       void sort_array();
 
+      void equal_dt(TimeArray &beg, TimeArray &end) const;
+
+      TimeArray subset(int, int) const;
+
       unixtime min() const;
       unixtime max() const;
 

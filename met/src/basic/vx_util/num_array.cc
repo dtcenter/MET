@@ -824,3 +824,29 @@ return(s);
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+NumArray NumArray::subset(int beg, int end) const
+
+{
+   
+NumArray subset;
+
+// Check bounds
+if ( beg < 0 || beg >= Nelements ||
+     end < 0 || end >= Nelements ||
+     end < beg )  {
+   mlog << Error << "\nNumArray::subset(int, int) -> "
+        << "range check error\n\n";
+   exit ( 1 );
+}
+
+// Store subset
+for(int i=beg; i<=end; i++) subset.add(e[i]);
+
+return ( subset );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
