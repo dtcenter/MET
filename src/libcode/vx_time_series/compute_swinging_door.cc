@@ -68,10 +68,15 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
     vector< pair< SDObservation, SDObservation > >::const_iterator ramp;
     for (ramp = ramps.begin(); ramp != ramps.end(); ++ramp)
     {
-      if ( (valid_times[i] >  ramp->first.getValidTime()   &&
+
+      // For the first point, use slope of the first ramp.
+      // Otherwise, the end point of the ramp is assigned the previous slope.
+
+      if ( (ramp           == ramps.begin()                &&
+            valid_times[i] == ramp->first.getValidTime()) 
+           (valid_times[i] >  ramp->first.getValidTime()   &&
             valid_times[i] <= ramp->second.getValidTime()) ||
-           (ramp           == ramps.begin()                &&
-            valid_times[i] == ramp->first.getValidTime()) )
+           )
       {
          int    run_secs = ramp->second.getValidTime() - ramp->first.getValidTime();
          double rise     = ramp->second.getValue() - ramp->first.getValue();

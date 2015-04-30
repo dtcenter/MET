@@ -32,12 +32,12 @@ public:
   {}
 
   SDObservation(const time_t valid_time,
-		const double value) :
+                const double value) :
     _validTime(valid_time), _value(value)
   {}
   
   SDObservation(const string &valid_time_string,
-		const double value) :
+                const double value) :
     _validTime(_getTime(valid_time_string)), _value(value)
   {}
   
@@ -145,9 +145,9 @@ protected:
 //      Returns true if successful, false otherwise.
 
 extern bool compute_swinging_door_slopes(const TimeArray &valid_times,
-					 const NumArray &data_values,
-					 const double error,
-					 NumArray &slopes);
+                                         const NumArray &data_values,
+                                         const double error,
+                                         NumArray &slopes);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -162,8 +162,8 @@ extern bool compute_swinging_door_slopes(const TimeArray &valid_times,
 //      Returns true if successful, false otherwise.
 
 extern bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
-					const double error,
-					vector< pair< SDObservation, SDObservation > > &ramps);
+                                        const double error,
+                                        vector< pair< SDObservation, SDObservation > > &ramps);
 
 ////////////////////////////////////////////////////////////////////////
 
