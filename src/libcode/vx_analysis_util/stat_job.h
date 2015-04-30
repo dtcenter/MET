@@ -24,35 +24,41 @@
 #include "vx_cal.h"
 #include "vx_grid.h"
 #include "vx_util.h"
+#include "vx_time_series.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 //
 // Defaults to be used if not specified by the user
 //
-static const double default_alpha                = 0.05;
-static const double default_bin_size             = 0.05;
-static const int    default_boot_interval        = 1;
-static const double default_boot_rep_prop        = 1.0;
-static const int    default_n_boot_rep           = 1000;
-static const char   default_boot_rng[]           = "mt19937";
-static const char   default_boot_seed[]          = "";
-static const int    default_rank_corr_flag       = 1;
-static const int    default_vif_flag             = 0;
-static const char   default_tmp_dir[]            = "/tmp";
-static const char   default_ramp_line_type[]     = "MPR";
-static const char   default_ramp_out_line_type[] = "CTC,CTS";
-static const char   default_ramp_fcst_col[]      = "FCST";
-static const char   default_ramp_obs_col[]       = "OBS";
-static const int    default_ramp_time            = 3600; // 1 hour
-static const bool   default_ramp_exact           = true;
-static const int    default_ramp_window          = 0;
+static const double default_alpha          = 0.05;
+static const double default_bin_size       = 0.05;
+static const int    default_boot_interval  = 1;
+static const double default_boot_rep_prop  = 1.0;
+static const int    default_n_boot_rep     = 1000;
+static const char   default_boot_rng[]     = "mt19937";
+static const char   default_boot_seed[]    = "";
+static const int    default_rank_corr_flag = 1;
+static const int    default_vif_flag       = 0;
+static const char   default_tmp_dir[]      = "/tmp";
+
+//
+// Ramp job type defaults
+//
+static const TimeSeriesType default_ramp_type            = TimeSeriesType_DyDt;
+static const char           default_ramp_line_type[]     = "MPR";
+static const char           default_ramp_out_line_type[] = "CTC,CTS";
+static const char           default_ramp_fcst_col[]      = "FCST";
+static const char           default_ramp_obs_col[]       = "OBS";
+static const int            default_ramp_time            = 3600; // 1 hour
+static const bool           default_ramp_exact           = true;
+static const int            default_ramp_window          = 0;
 
 //
 // Dump buffer size
 //
-static const int    dump_stat_buffer_rows    = 512;
-static const int    dump_stat_buffer_cols    = 512;
+static const int dump_stat_buffer_rows = 512;
+static const int dump_stat_buffer_cols = 512;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -245,14 +251,16 @@ class STATAnalysisJob {
       // Variables used for the stat_job_ramp job type
       //
 
-      int          ramp_time_fcst;   // stored in seconds
-      int          ramp_time_obs;
-      bool         ramp_exact_fcst;  // exact or maximum change
-      bool         ramp_exact_obs;
-      SingleThresh ramp_thresh_fcst; // ramp event definition
-      SingleThresh ramp_thresh_obs;
-      int          ramp_window_beg;  // ramp event matching time window
-      int          ramp_window_end;
+      TimeSeriesType ramp_type;
+      int            ramp_time_fcst;   // stored in seconds
+      int            ramp_time_obs;
+      bool           ramp_exact_fcst;  // exact or maximum change
+      bool           ramp_exact_obs;
+      SingleThresh   ramp_thresh_fcst; // ramp event definition
+      SingleThresh   ramp_thresh_obs;
+      int            ramp_window_beg;  // ramp event matching time window
+      int            ramp_window_end;
+      double         swing_width;      // swinging door algorithm width
 
       //
       // Variables used for computing bootstrap confidence intervals

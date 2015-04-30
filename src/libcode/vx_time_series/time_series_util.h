@@ -17,9 +17,37 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_ramps(const NumArray &vals, const TimeArray &times,
-                   const int step, const bool exact,
-                   const SingleThresh &thresh, NumArray &, NumArray &);
+//
+// Enumeration for time-series analysis types
+//
+
+enum TimeSeriesType {
+   TimeSeriesType_None,  // Default
+   TimeSeriesType_DyDt,  // Threshold change over time window
+   TimeSeriesType_Swing  // Apply swinging door algorithm
+};
+
+static const char timeseriestype_dydt_str[]  = "DYDT";
+static const char timeseriestype_swing_str[] = "SWING";
+
+////////////////////////////////////////////////////////////////////////
+
+extern const char *   timeseriestype_to_string(const TimeSeriesType);
+extern TimeSeriesType string_to_timeseriestype(const char *);
+
+////////////////////////////////////////////////////////////////////////
+
+extern bool compute_dydt_ramps(const char *name, const NumArray &vals,
+                               const TimeArray &times,
+                               const int step, const bool exact,
+                               const SingleThresh &thresh,
+                               NumArray &, NumArray &);
+
+extern bool compute_swing_ramps(const char *name, const NumArray &vals,
+                                const TimeArray &times,
+                                const double width,
+                                const SingleThresh &thresh,
+                                NumArray &, NumArray &);
 
 ////////////////////////////////////////////////////////////////////////
 

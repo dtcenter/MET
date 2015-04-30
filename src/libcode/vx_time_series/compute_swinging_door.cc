@@ -6,7 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -25,17 +24,15 @@ using namespace std;
 #include "vx_math.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////
 //
 // Compute a normal confidence interval.
 //
 ////////////////////////////////////////////////////////////////////////
 
 bool compute_swinging_door_slopes(const TimeArray &valid_times,
-				  const NumArray &data_values,
-				  const double error,
-				  NumArray &slopes)
+                                  const NumArray &data_values,
+                                  const double error,
+                                  NumArray &slopes)
 {
   // Make sure that the valid times and data arrays are consistent.
 
@@ -56,7 +53,7 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
   vector< pair< SDObservation, SDObservation > > ramps;
   if (!compute_swinging_door_ramps(obs, error, ramps))
     return false;
-  
+
   // Convert the ramps to slope values
 
   slopes.empty();
@@ -67,13 +64,29 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
 
     if (is_bad_data(data_values[i]))
     {
-      slopes.set(i, bad_data_double);
+      slopes.add(bad_data_double);
       continue;
     }
-    
-    
-  }
-  
+
+    // Loop through the ramps and compute slope for current time
+
+    vector< pair< SDObservation, SDObservation > >::const_iterator ramp;
+    for (ramp = ramps.begin(); ramp != ramps.end(); ++ramp)
+    {
+      if ( (valid_times[i] >= ramp->first.getValidTime()   &&
+            valid_times[i] <  ramp->second.getValidTime()) ||
+           (valid_times[i] == ramp->second.getValidTime()  &&
+            ramp+1 == ramps.end()) )
+      {
+         int    run_secs = ramp->second.getValidTime() - ramp->first.getValidTime();
+         double rise     = ramp->second.getValue() - ramp->first.getValue();
+         double slope    = (run_secs == 0 ? bad_data_double : rise / (double)run_secs);
+         slopes.add(slope);
+         break;
+      }
+    } // end for ramp
+  } // end for i
+
   // NOTE: Use bad_data_double for missing data values.  Check for this
   // in data_values and return it in slopes.
 
@@ -83,8 +96,8 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
 ////////////////////////////////////////////////////////////////////////
 
 bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
-				 const double error,
-				 vector< pair< SDObservation, SDObservation > > &ramps)
+                                 const double error,
+                                 vector< pair< SDObservation, SDObservation > > &ramps)
 {
   // NOTE: Use bad_data_double for missing data values.  Check for this
   // in data_values and return it in slopes.  Can use is_bad_data(value)

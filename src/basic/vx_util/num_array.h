@@ -92,6 +92,8 @@ class NumArray {
 
       int n_elements() const;
 
+      NumArray subset(int, int) const;
+
 };
 
 
