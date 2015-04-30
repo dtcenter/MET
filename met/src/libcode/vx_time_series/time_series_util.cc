@@ -169,7 +169,7 @@ bool compute_swing_ramps(const char *name,
    }
 
    mlog << Debug(4)
-        << "Calling swinging door algorithm.\n";
+        << "Applying the swinging door algorithm.\n";
 
    if(!compute_swinging_door_slopes(times, vals, width, slopes)) {
       return(false);
