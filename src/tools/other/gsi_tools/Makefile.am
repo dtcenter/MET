@@ -29,7 +29,9 @@ reformat_conv_LDADD = -lvx_stat_out \
 
 
 reformat_rad_SOURCES = reformat_rad.cc \
-	rad_offsets.h
+	rad_offsets.h \
+	rad_config.h  \
+	rad_config.cc
 reformat_rad_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_rad_LDFLAGS = ${MET_LDFLAGS}
 reformat_rad_LDADD = -lvx_stat_out \
@@ -40,3 +42,4 @@ reformat_rad_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_log \
 	-lm
+
