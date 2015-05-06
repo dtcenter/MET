@@ -2462,6 +2462,14 @@ void write_job_ramp(STATAnalysisJob &j,
       if(it->second.valid_ts.n_elements() == 0) continue;
 
       //
+      // Initialize
+      //
+      framps.clear();
+      oramps.clear();
+      fdat.clear();
+      odat.clear();
+
+      //
       // Sort the ramp data
       //
       it->second.sort();
