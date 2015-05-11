@@ -181,7 +181,7 @@ for (j=0; j<n_mpr_columns; ++j)  {
 
 if ( (in = open(conv_filename, O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": unable to open input file \""
+   mlog << Error << "\n\n  " << program_name << ": unable to open input file \""
         << conv_filename << "\n\n";
 
    exit ( 1 );
@@ -192,7 +192,7 @@ out.open(output_filename);
 
 if ( ! out )  {
 
-   cerr << "\n\n  " << program_name << ": unable to open output file \""
+   mlog << Error << "\n\n  " << program_name << ": unable to open output file \""
         << output_filename << "\n\n";
 
    exit ( 1 );
@@ -312,7 +312,7 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " [ -outdir path ] conv_file_list\n\n";
+mlog << Error << "\n\n   usage:  " << program_name << " [ -outdir path ] conv_file_list\n\n";
 
 exit ( 1 );
 
@@ -350,7 +350,7 @@ if ( n_read == 0 )  return ( false );
 
 if ( (n_read < 0) || (n_read != n_bytes) )  {
 
-   cerr << "\n\n  " << program_name << ": fortran_read() -> read error!\n\n";
+   mlog << Error << "\n\n  " << program_name << ": fortran_read() -> read error!\n\n";
 
    exit ( 1 );
 
