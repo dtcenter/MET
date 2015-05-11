@@ -58,6 +58,16 @@ static char date_string[256];
 
 static char variable [4];
 
+static const char * const conv_extra_columns [] = {
+
+   "OBS_STYPE",    //  observation subtype
+   "PB_INV_ERR",   //  prepbufr inverse observation error
+   "FIN_INV_ERR",  //  final inverse observation error
+
+};
+
+static const int n_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_extra_columns);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -167,7 +177,7 @@ output_filename << cs_erase
                 << get_short_name(conv_filename) << ".mpr";
 
 
-table.set_size(1, 32);   //  for MPR line types
+table.set_size(1, n_header_columns + n_mpr_columns + n_extra_cols);   //   added 3 extra columns
 
 for (j=0; j<n_header_columns; ++j)  table.set_entry(0, j, hdr_columns[j]);
 
@@ -176,6 +186,14 @@ for (j=0; j<n_mpr_columns; ++j)  {
    k = n_header_columns + j;
 
    table.set_entry(0, k, mpr_columns[j]);
+
+}
+
+for (j=0; j<n_extra_cols; ++j)  {
+
+   k = n_header_columns + n_mpr_columns + j;
+
+   table.set_entry(0, k, conv_extra_columns[j]);
 
 }
 
@@ -472,6 +490,10 @@ const double pressure  = rdiag_get_2d(b, nreal,  pressure_index, j);
 const double obs_value = rdiag_get_2d(b, nreal,  obs_data_index, j);
 const double elevation = rdiag_get_2d(b, nreal, elevation_index, j);
 
+const double obs_subtype     = rdiag_get_2d(b, nreal,    obssubtype_index, j);
+const double pb_inv_error    = rdiag_get_2d(b, nreal,    pb_inverse_index, j);
+const double final_inv_error = rdiag_get_2d(b, nreal, final_inverse_index, j);
+
 const double guess         = rdiag_get_guess         (b, nreal, j);
 // const double guess_no_bias = rdiag_get_guess_no_bias (b, nreal, j);
 
@@ -551,6 +573,14 @@ table.set_entry(row, col++, stat_na_str);   //  climatological value
 
 table.set_entry(row, col++, stat_na_str);   //  qc value
 
+
+   //
+   //  extra columns
+   //
+
+table.set_entry(row, col++, obs_subtype);
+table.set_entry(row, col++, pb_inv_error);
+table.set_entry(row, col++, final_inv_error);
 
    //
    //  done
