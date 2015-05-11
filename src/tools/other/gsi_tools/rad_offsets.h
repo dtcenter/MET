@@ -63,6 +63,8 @@ static const int omg_bc_chan_index      = 2;     //  obs - guess brightness temp
 static const int omg_nobc_chan_index    = 3;     //  obs - guess brightness temperature (without bias correction)
 static const int inv_chan_index         = 4;     //  inverse observation error
 
+static const int surf_em_index          = 6;     //  surface emissivity
+
 
 ////////////////////////////////////////////////////////////////////////
 
