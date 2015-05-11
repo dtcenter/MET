@@ -56,6 +56,15 @@ static int buf_size = 512;
 
 static unsigned char * buf = 0;
 
+static const char * const rad_extra_columns [] = {
+
+   "INV_OBS_ERR",   //  inverse observation error
+   "SURF_EMIS",     //  surface emissivity
+
+};
+
+static const int n_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -179,7 +188,7 @@ float * diag     = 0;
 float * diagchan = 0;
 
 
-table.set_size(1, 32);   //  for MPR line types
+table.set_size(1, n_header_columns + n_mpr_columns + n_extra_cols);
 
 for (j=0; j<n_header_columns; ++j)  table.set_entry(0, j, hdr_columns[j]);
 
@@ -188,6 +197,14 @@ for (j=0; j<n_mpr_columns; ++j)  {
    k = n_header_columns + j;
 
    table.set_entry(0, k, mpr_columns[j]);
+
+}
+
+for (j=0; j<n_mpr_columns; ++j)  {
+
+   k = n_header_columns + n_mpr_columns + j;
+
+   table.set_entry(0, k, rad_extra_columns[j]);
 
 }
 
@@ -698,9 +715,15 @@ const double obs_time        = diag[dtime_index - 1];
 const int    obs_offset      = fortran_two_to_one(N1,  btemp_chan_index - 1, channel);
 const int    omg_offset      = fortran_two_to_one(N1, omg_bc_chan_index - 1, channel);
 
+const int    inv_obs_offset  = fortran_two_to_one(N1, inv_chan_index - 1, channel);
+const int    surf_em_offset  = fortran_two_to_one(N1, surf_em_index  - 1, channel);
+
 const double obs_value       = diagchan[obs_offset];
 const double obs_minus_guess = diagchan[omg_offset];
 const double guess           = obs_value - obs_minus_guess;
+
+const double inv_obs_error   = diagchan[inv_obs_offset];
+const double surf_em         = diagchan[surf_em_offset];
 
 
 // cout << "Obs = "             << obs_value          << '\n';
@@ -792,6 +815,12 @@ table.set_entry(row, col++, stat_na_str);   //  climatological value
 
 table.set_entry(row, col++, stat_na_str);   //  qc value
 
+   //
+   //  extra columns
+   //
+
+table.set_entry(row, col++, inv_obs_error);
+table.set_entry(row, col++, surf_em);
 
    //
    //  done
