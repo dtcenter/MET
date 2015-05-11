@@ -62,7 +62,7 @@ GsiRadConfig::GsiRadConfig(const GsiRadConfig & c)
 // 
 // assign(c);
 
-cerr << "\n\n  GsiRadConfig::GsiRadConfig(const GsiRadConfig &) -> should never be called!\n\n";
+mlog << Error  << "\n\n  GsiRadConfig::GsiRadConfig(const GsiRadConfig &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -80,7 +80,7 @@ GsiRadConfig & GsiRadConfig::operator=(const GsiRadConfig & c)
 // 
 // assign(c);
 
-cerr << "\n\n  GsiRadConfig::operator=(const GsiRadConfig &) -> should never be called!\n\n";
+mlog << Error  << "\n\n  GsiRadConfig::operator=(const GsiRadConfig &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -151,7 +151,7 @@ const DictionaryEntry * e = Config.lookup(data_threshold_key);
 
 if ( !e )  {
 
-   cerr << "\n\n  GsiRadConfig::get_config_data() -> lookup failed for key \"" << data_threshold_key << "\"\n\n";
+   mlog << Error  << "\n\n  GsiRadConfig::get_config_data() -> lookup failed for key \"" << data_threshold_key << "\"\n\n";
 
    exit ( 1 );
 
@@ -159,7 +159,7 @@ if ( !e )  {
 
 if ( e->type() != ThresholdType )  {
 
-   cerr << "\n\n  GsiRadConfig::get_config_data() -> bad object type for key \"" << data_threshold_key << "\"\n\n";
+   mlog << Error  << "\n\n  GsiRadConfig::get_config_data() -> bad object type for key \"" << data_threshold_key << "\"\n\n";
 
    exit ( 1 );
 

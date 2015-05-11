@@ -193,7 +193,7 @@ for (j=0; j<n_mpr_columns; ++j)  {
 
 if ( (in = open(input_filename, O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": unable to open input file \""
+   mlog << Error << "\n\n  " << program_name << ": unable to open input file \""
         << input_filename << "\n\n";
 
    exit ( 1 );
@@ -204,7 +204,7 @@ out.open(output_filename);
 
 if ( ! out )  {
 
-   cerr << "\n\n  " << program_name << ": unable to open output file \""
+   mlog << Error << "\n\n  " << program_name << ": unable to open output file \""
         << output_filename << "\n\n";
 
    exit ( 1 );
@@ -219,7 +219,7 @@ read_params(in, params);
 
 if ( channel >= params.nchanl )  {
 
-   cerr << "\n\n  " << program_name << ": bad channel selected ... there are only "
+   mlog << Error << "\n\n  " << program_name << ": bad channel selected ... there are only "
         << params.nchanl << " channels\n\n";
 
    exit ( 1 );
@@ -324,7 +324,7 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name << " -channel n infile outfile\n\n"
+mlog << Error << "\n\n   usage:  " << program_name << " -channel n infile outfile\n\n"
      << "          (Note: channel numbers are 1-based)\n\n";
 
 exit ( 1 );
@@ -345,7 +345,7 @@ int k = atoi(a[0]);
 
 if ( k <= 0 )  {
 
-   cerr << "\n\n  " << program_name << ": bad channel number ... " << k << "\n\n";
+   mlog << Error << "\n\n  " << program_name << ": bad channel number ... " << k << "\n\n";
 
    exit ( 1 );
 
@@ -473,7 +473,7 @@ n_read = read_fortran_binary(fd, buf, buf_size, rec_pad_length, swap_endian);
 
 if ( n_read < 72 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to read params\n\n";
+   mlog << Error << "\n\n  " << program_name << ": failed to read params\n\n";
 
    exit ( 1 );
 
@@ -543,7 +543,7 @@ n_read = read_fortran_binary(fd, buf, buf_size, rec_pad_length, swap_endian);
 
 if ( n_read != 32 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to read channel info\n\n";
+   mlog << Error << "\n\n  " << program_name << ": failed to read channel info\n\n";
 
    exit ( 1 );
 
@@ -618,7 +618,7 @@ if ( n_read == 0 )  return ( false );
 
 if ( n_read != bytes )  {
 
-   cerr << "  " << program_name << ": read_data() -> warning ... expected "
+   mlog << Error << "  " << program_name << ": read_data() -> warning ... expected "
         << bytes << " bytes, got " << n_read << "\n";
 
    // exit ( 1 );
