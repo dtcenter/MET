@@ -48,6 +48,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                empty_string.h \
                polyline.h polyline.cc \
                read_fortran_binary.h read_fortran_binary.cc \
+               met_buffer.h met_buffer.cc \
                vx_util.h
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 
