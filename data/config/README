@@ -147,7 +147,7 @@ obtype = "ANALYS";
 regrid = {
    to_grid    = NONE;
    vld_thresh = 0.5;
-   method     = UW_MEAN;
+   method     = NEAREST;
    width      = 1;
 };
 
