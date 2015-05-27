@@ -19,7 +19,8 @@ noinst_PROGRAMS = test_config \
               test_lookup \
               test_lookup2 \
               test_lookup3 \
-              test_string
+              test_string \
+              test_thresh
 
 test_config_SOURCES = test_config.cc
 test_config_LDADD = -lvx_config \
@@ -55,6 +56,14 @@ test_lookup3_LDADD = -lvx_config \
 
 test_string_SOURCES = test_string.cc
 test_string_LDADD = -lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm
+
+test_thresh_SOURCES = test_thresh.cc
+test_thresh_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
