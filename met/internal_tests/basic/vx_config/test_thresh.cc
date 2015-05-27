@@ -78,16 +78,16 @@ if ( dup2(1, 2) < 0 )  {
 config.set_debug(debug);
 
 bool status = false;
-ConcatString thresh_string = argv[1];
+ConcatString local_thresh_string = argv[1];
 const double value = atof(argv[2]);
 
 test_mode = true;
 
-status = config.read_string(thresh_string);
+status = config.read_string(local_thresh_string);
 
 if ( ! status )  {
 
-   cerr << "\n\n  " << program_name << ": failed to parse string \"" << thresh_string << "\"\n\n";
+   cerr << "\n\n  " << program_name << ": failed to parse string \"" << local_thresh_string << "\"\n\n";
 
    exit ( 1 );
 
@@ -105,7 +105,11 @@ if ( ! result )  {
 
 status = result->check(value);
 
-cout << "\n\n   " << (status ? "true" : "false") << "\n\n";
+cout << "\n\n" 
+     << "Evaluates as " << (status ? "true" : "false") << "\n\n";
+
+cout << "thresh_string = \"" << result->s.contents() << "\"\n\n";
+cout << "  abbr_string = \"" << result->abbr_s.contents() << "\"\n\n";
 
    //
    //  done

@@ -71,6 +71,8 @@ ThreshNode *      result                = 0;   //  for testing
 
 bool              test_mode             = false;
 
+ConcatString   number_string;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,6 +86,7 @@ static PiecewiseLinear pwl;
 static Dictionary DD;
 
 static SingleThresh ST;
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -253,8 +256,8 @@ simple_thresh : COMPARISON number { $$ = do_simple_thresh($1, $2); }
               ;
 
 
-number : INTEGER { }
-       | FLOAT   { }
+number : INTEGER { number_string = configtext; }
+       | FLOAT   { number_string = configtext; }
        ;
     
 
@@ -804,6 +807,7 @@ e.set_threshold(0, T);
 
 dict_stack->store(e);
 */
+
    //
    //  done
    //
@@ -891,6 +895,10 @@ And_Node * n = new And_Node;
 n->left_child  = a;
 n->right_child = b;
 
+n->s << a->s << "&&" << b->s;
+
+n->abbr_s << a->abbr_s << ".and." << b->abbr_s;
+
 return ( n );
 
 }
@@ -908,6 +916,10 @@ Or_Node * n = new Or_Node;
 n->left_child  = a;
 n->right_child = b;
 
+n->s << a->s << "||" << b->s;
+
+n->abbr_s << a->abbr_s << ".or." << b->abbr_s;
+
 return ( n );
 
 }
@@ -924,6 +936,10 @@ Not_Node * nn = new Not_Node;
 
 nn->child = n;
 
+nn->s << '!' << n->s;
+
+nn->abbr_s << ".not." << n->abbr_s;
+
 return ( nn );
 
 }
@@ -932,11 +948,25 @@ return ( nn );
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshNode * do_paren_thresh  (ThreshNode * a)
+ThreshNode * do_paren_thresh  (ThreshNode * n)
 
 {
 
-return ( a );
+ConcatString b;
+
+b.erase();
+
+b << '(' << n->s << ')';
+
+n->s = b;
+
+b.erase();
+
+b << '(' << n->abbr_s << ')';
+
+n->abbr_s = b;
+
+return ( n );
 
 }
 
@@ -953,6 +983,13 @@ Simple_Node * s = new Simple_Node;
 s->op = op;
 
 s->T = as_double(n);
+
+if ( op >= 0 )  {
+
+   s->s      << thresh_type_str[op] << number_string;
+   s->abbr_s << thresh_abbr_str[op] << number_string;
+
+}
 
 return ( s );
 
