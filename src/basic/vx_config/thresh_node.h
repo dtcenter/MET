@@ -30,6 +30,9 @@ class ThreshNode {
 
       virtual ThreshType type() const = 0;
 
+      ConcatString s;
+      ConcatString abbr_s;
+
 };
 
 
