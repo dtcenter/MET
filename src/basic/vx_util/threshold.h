@@ -28,7 +28,12 @@ enum ThreshType {
    thresh_eq = 3,
    thresh_ne = 4,
    thresh_gt = 5,
-   thresh_ge = 6
+   thresh_ge = 6, 
+
+   thresh_complex = -2, 
+
+   no_thresh_type = -1, 
+
 };
 
 static const int n_thresh_type = 7;

@@ -26,7 +26,10 @@ using namespace std;
 #include "scanner_stuff.h"
 #include "dictionary.h"
 #include "threshold.h"
+#include "is_number.h"
 #include "pwl.h"
+
+#include "thresh_node.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -63,6 +66,10 @@ const char *      bison_input_filename  = (const char *) 0;
 DictionaryStack * dict_stack            = (DictionaryStack *) 0;
 
 bool              is_lhs                = true;
+
+ThreshNode *      result                = 0;   //  for testing
+
+bool              test_mode             = false;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -112,13 +119,22 @@ static void do_number(const Number &);
 
 // static void do_array(const char * LHS);
 
-static void do_thresh(const ThreshType, const Number &);
+// static void do_thresh(const ThreshType, const Number &);
+
+static void do_thresh(ThreshNode *);
 
 static void do_na_thresh();
 
 static void add_point(const Number &, const Number &);
 
 static void do_pwl(const char * LHS);
+
+
+static ThreshNode * do_and_thresh    (ThreshNode *, ThreshNode *);
+static ThreshNode * do_or_thresh     (ThreshNode *, ThreshNode *);
+static ThreshNode * do_not_thresh    (ThreshNode *);
+static ThreshNode * do_paren_thresh  (ThreshNode *);
+static ThreshNode * do_simple_thresh (ThreshType, const Number &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,11 +153,14 @@ static void do_pwl(const char * LHS);
 
    ThreshType cval;
 
+   ThreshNode * node;
+
 }
 
 
 %token IDENTIFIER QUOTED_STRING INTEGER FLOAT BOOLEAN
 %token COMPARISON NA_COMPARISON
+%token LOGICAL_OP_NOT LOGICAL_OP_AND LOGICAL_OP_OR
 
 
 %type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix
@@ -152,17 +171,24 @@ static void do_pwl(const char * LHS);
 
 %type <cval> COMPARISON NA_COMPARISON
 
+%type <node> simple_thresh thresh_node
+
 
 %left '+' '-'
 %left '*' '/'
 %left '^'
+
+%left LOGICAL_OP_AND LOGICAL_OP_OR
+
 %nonassoc UNARY_MINUS
+%nonassoc LOGICAL_OP_NOT
 
 
 %%
 
 assignment_list : assignment                    { is_lhs = true; }
                 | assignment_list assignment    { is_lhs = true; }
+                | threshold                     {  }
                 ;
 
 
@@ -211,10 +237,20 @@ threshold_list : threshold
                | threshold_list ',' threshold
                ;
 
-
-threshold : COMPARISON number { do_thresh($1, $2); }
-          | NA_COMPARISON { do_na_thresh(); }
+threshold : thresh_node       { do_thresh($1); }
+          | NA_COMPARISON     { do_na_thresh(); }
           ;
+
+thresh_node : simple_thresh                          { $$ = $1; }
+            | thresh_node LOGICAL_OP_AND thresh_node { $$ = do_and_thresh   ($1, $3); }
+            | thresh_node LOGICAL_OP_OR  thresh_node { $$ = do_or_thresh    ($1, $3); }
+            | LOGICAL_OP_NOT             thresh_node { $$ = do_not_thresh   ($2);     }
+            | '(' thresh_node ')'                    { $$ = do_paren_thresh ($2);     }
+            ;
+
+
+simple_thresh : COMPARISON number { $$ = do_simple_thresh($1, $2); }
+              ;
 
 
 number : INTEGER { }
@@ -734,13 +770,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_thresh(const ThreshType t, const Number & n)
+void do_thresh(ThreshNode * node)
+
+// void do_thresh(const ThreshType t, const Number & n)
 
 {
 
+if ( test_mode )  {
+
+   result = node;
+
+   return;
+
+}
+
+/*
 if ( ! dict_stack->top_is_array() )  {
 
-   ST.set(as_double(n), t);
+   // ST.set(as_double(n), t);
+   ST.set(node);
 
    return;
 
@@ -749,12 +797,13 @@ if ( ! dict_stack->top_is_array() )  {
 DictionaryEntry e;
 SingleThresh T;
 
-T.set(as_double(n), t);
+// T.set(as_double(n), t);
+T.set(node);
 
 e.set_threshold(0, T);
 
 dict_stack->store(e);
-
+*/
    //
    //  done
    //
@@ -826,6 +875,86 @@ dict_stack->store(e);
 pwl.clear();
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * do_and_thresh    (ThreshNode * a, ThreshNode * b)
+
+{
+
+And_Node * n = new And_Node;
+
+n->left_child  = a;
+n->right_child = b;
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * do_or_thresh (ThreshNode * a, ThreshNode * b)
+
+{
+
+Or_Node * n = new Or_Node;
+
+n->left_child  = a;
+n->right_child = b;
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * do_not_thresh    (ThreshNode * n)
+
+{
+
+Not_Node * nn = new Not_Node;
+
+nn->child = n;
+
+return ( nn );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * do_paren_thresh  (ThreshNode * a)
+
+{
+
+return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * do_simple_thresh (ThreshType op, const Number & n)
+
+{
+
+Simple_Node * s = new Simple_Node;
+
+s->op = op;
+
+s->T = as_double(n);
+
+return ( s );
 
 }
 

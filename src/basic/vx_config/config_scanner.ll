@@ -20,10 +20,9 @@ using namespace std;
 #include "empty_string.h"
 #include "math_constants.h"
 #include "util_constants.h"
+#include "is_number.h"
 
-#include "threshold.h"       //  must be included before config.tab.h
-
-#include "scanner_stuff.h"   //  must be included before config.tab.h
+#include "thresh_node.h"     //  must be included before config.tab.h
 
 #include "config.tab.h"
 
@@ -123,6 +122,12 @@ WS          [ \n\t]*
 "=="                                { return ( do_comp() ); }
 "!="                                { return ( do_comp() ); }
 "NA"                                { return ( do_comp() ); }
+
+
+"&&"                                { Column+=2;   return ( LOGICAL_OP_AND ); }
+"||"                                { Column+=2;   return ( LOGICAL_OP_OR  ); }
+
+"!"                                 { Column+=1;   return ( LOGICAL_OP_NOT ); }
 
 
 "["                                 { ++Column;  is_lhs = false;  dict_stack->push_array();  return ( configtext[0] ); }

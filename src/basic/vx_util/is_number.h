@@ -32,6 +32,59 @@ struct Number {
 ////////////////////////////////////////////////////////////////////////
 
 
+inline void set_int(Number & n, int k)
+
+{
+
+n.is_int = true;
+
+n.i = k;
+
+n.d = 0.0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline void set_double(Number & n, double x)
+
+{
+
+n.is_int = false;
+
+n.i = 0;
+
+n.d = x;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline double as_double(const Number & n)
+
+{
+
+double x;
+
+if ( n.is_int )  x = (double) (n.i);
+else             x = n.d;
+
+return ( x );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern int is_number(const char *);   //  is integer or float
 
 extern int is_integer(const char *);

@@ -102,7 +102,6 @@ void ThreshArray::assign(const ThreshArray & a) {
 
 void ThreshArray::dump(ostream & out, int depth) const {
    int j;
-   char tmp_str[512];
 
    Indent prefix(depth);
    Indent prefix2(depth + 1);
@@ -111,9 +110,7 @@ void ThreshArray::dump(ostream & out, int depth) const {
    out << prefix << "Nalloc    = " << Nalloc    << "\n";
 
    for(j=0; j<Nelements; j++) {
-      t[j].get_str(tmp_str);
-      out << prefix2 << "Element # " << j << " = \""
-          << tmp_str << "\"\n";
+      out << prefix2 << "Element # " << j << " = \"" << t[j].get_str() << "\"\n";
    }
 
    out.flush();
