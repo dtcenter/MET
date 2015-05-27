@@ -106,10 +106,11 @@ if ( ! result )  {
 status = result->check(value);
 
 cout << "\n\n" 
-     << "Evaluates as " << (status ? "true" : "false") << "\n\n";
+     << "Evaluates as " << (status ? "true" : "false") << "\n\n\n";
 
 cout << "thresh_string = \"" << result->s.contents() << "\"\n\n";
 cout << "  abbr_string = \"" << result->abbr_s.contents() << "\"\n\n";
+cout << "        type  = " << result->type() << "\n\n";
 
    //
    //  done
