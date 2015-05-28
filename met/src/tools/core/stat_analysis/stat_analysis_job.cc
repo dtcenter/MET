@@ -870,12 +870,12 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
             if(j.out_fcst_thresh[i].thresh >  j.out_fcst_thresh[i+1].thresh ||
                j.out_obs_thresh[i].thresh  >  j.out_obs_thresh[i+1].thresh  ||
-               j.out_fcst_thresh[i].type   != j.out_fcst_thresh[i+1].type   ||
-               j.out_obs_thresh[i].type    != j.out_obs_thresh[i+1].type    ||
-               j.out_fcst_thresh[i].type   == thresh_eq              ||
-               j.out_fcst_thresh[i].type   == thresh_ne              ||
-               j.out_obs_thresh[i].type    == thresh_eq              ||
-               j.out_obs_thresh[i].type    == thresh_ne) {
+               j.out_fcst_thresh[i].get_type()   != j.out_fcst_thresh[i+1].get_type()   ||
+               j.out_obs_thresh[i].get_type()    != j.out_obs_thresh[i+1].get_type()    ||
+               j.out_fcst_thresh[i].get_type()   == thresh_eq              ||
+               j.out_fcst_thresh[i].get_type()   == thresh_ne              ||
+               j.out_obs_thresh[i].get_type()    == thresh_eq              ||
+               j.out_obs_thresh[i].get_type()    == thresh_ne) {
 
                mlog << Error << "\ndo_job_aggr_stat() -> "
                     << "when \"-out_line_type\" is set to MCTC or MCTS "
@@ -921,7 +921,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          for(i=0; i<n; i++) {
 
             // Check that all threshold types are >=
-            if(j.out_fcst_thresh[i].type != thresh_ge) {
+            if(j.out_fcst_thresh[i].get_type() != thresh_ge) {
                mlog << Error << "\ndo_job_aggr_stat() -> "
                     << "When verifying a probability field, all "
                     << "forecast probability thresholds must be set "
@@ -3046,8 +3046,8 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Determine the ramp thresholds, no defaults
    //
-   if(j.ramp_thresh_fcst.type == thresh_na ||
-      j.ramp_thresh_obs.type  == thresh_na) {
+   if(j.ramp_thresh_fcst.get_type() == thresh_na ||
+      j.ramp_thresh_obs.get_type()  == thresh_na) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-ramp_thresh\" or \"-ramp_thresh_fcst\" and "
            << "\"-ramp_thresh_obs\" options must be used to define the "

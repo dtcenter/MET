@@ -22,6 +22,375 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_log.h"
+#include "is_bad_data.h"
+#include "config_file.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern ThreshNode * result;
+
+extern bool test_mode;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class ThreshNode
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode::ThreshNode() { }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode::~ThreshNode() { }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ThreshNode::threshnode_assign(const ThreshNode * n)
+
+{
+
+s = n->s;
+
+abbr_s = n->abbr_s;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class Or_Node
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Or_Node::Or_Node()
+
+{
+
+left_child = right_child = 0;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Or_Node::~Or_Node()
+
+{
+
+if (  left_child )  { delete  left_child;   left_child = 0; }
+if ( right_child )  { delete right_child;  right_child = 0; }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Or_Node::check(double x) const
+
+{
+
+const bool tf_left = left_child->check(x);
+
+if ( tf_left )  return ( true );
+
+const bool tf_right = right_child->check(x);
+
+return ( tf_left || tf_right );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * Or_Node::copy() const
+
+{
+
+Or_Node * n = new Or_Node;
+
+if (  left_child )  n->left_child  = left_child->copy();
+if ( right_child )  n->right_child = right_child->copy();
+
+n->threshnode_assign(this);
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class And_Node
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+And_Node::And_Node()
+
+{
+
+left_child = right_child = 0;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+And_Node::~And_Node()
+
+{
+
+if (  left_child )  { delete  left_child;   left_child = 0; }
+if ( right_child )  { delete right_child;  right_child = 0; }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool And_Node::check(double x) const
+
+{
+
+const bool tf_left = left_child->check(x);
+
+if ( ! tf_left )  return ( false );
+
+const bool tf_right = right_child->check(x);
+
+return ( tf_left && tf_right );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * And_Node::copy() const
+
+{
+
+And_Node * n = new And_Node;
+
+if (  left_child )  n->left_child  = left_child->copy();
+if ( right_child )  n->right_child = right_child->copy();
+
+n->threshnode_assign(this);
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class Not_Node
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Not_Node::Not_Node()
+
+{
+
+child = 0;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Not_Node::~Not_Node()
+
+{
+
+if ( child )  { delete child;  child = 0; }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Not_Node::check(double x) const
+
+{
+
+const bool tf = child->check(x);
+
+return ( ! tf );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * Not_Node::copy() const
+
+{
+
+Not_Node * n = new Not_Node;
+
+if ( child )  n->child  = child->copy();
+
+n->threshnode_assign(this);
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class Simple_Node
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Simple_Node::Simple_Node()
+
+{
+
+T = 0.0;
+
+// op = no_thresh_type;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Simple_Node::~Simple_Node()
+
+{
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Simple_Node::check(double x) const
+
+{
+
+if ( op == thresh_na )  return ( true );
+
+bool tf = false;
+const bool eq = is_eq(x, T);
+
+switch ( op )  {
+
+   case thresh_le:   tf = ( eq || (x <= T));  break;
+   case thresh_lt:   tf = (!eq && (x <  T));  break;
+
+   case thresh_ge:   tf = ( eq || (x >= T));  break;
+   case thresh_gt:   tf = (!eq && (x >  T));  break;
+
+   case thresh_eq:   tf =  eq;  break;
+   case thresh_ne:   tf = !eq;  break;
+
+   default:
+      mlog << Error << "\n\n  Simple_Node::check(double) const -> bad op ... " << op << "\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+
+
+return ( tf );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * Simple_Node::copy() const
+
+{
+
+Simple_Node * n = new Simple_Node;
+
+n->T = T;
+
+n->op = op;
+
+n->threshnode_assign(this);
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshType Simple_Node::type() const
+
+{
+
+return ( op );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Simple_Node::set_na()
+
+{
+
+op = thresh_na;
+
+T = 0.0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -29,43 +398,60 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-SingleThresh::SingleThresh() {
-   init_from_scratch();
+SingleThresh::SingleThresh()
+
+{
+
+init_from_scratch();
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SingleThresh::~SingleThresh() {
-   clear();
+SingleThresh::~SingleThresh()
+
+{
+
+clear();
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SingleThresh::SingleThresh(const SingleThresh &c) {
+SingleThresh::SingleThresh(const SingleThresh & c)
 
-   init_from_scratch();
+{
 
-   assign(c);
+init_from_scratch();
+
+assign(c);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SingleThresh::SingleThresh(const char *str) {
+SingleThresh::SingleThresh(const char * str)
 
-   init_from_scratch();
+{
 
-   set(str);
+init_from_scratch();
+
+set(str);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SingleThresh & SingleThresh::operator=(const SingleThresh &c) {
+SingleThresh & SingleThresh::operator=(const SingleThresh & c)
 
-   if(this == &c) return(*this);
+{
 
-   assign(c);
+if ( this == &c ) return ( * this );
 
-   return(*this);
+assign(c);
+
+return ( * this );
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,48 +460,114 @@ bool SingleThresh::operator==(const SingleThresh &st) const
 
 {
 
-return (is_eq(thresh, st.thresh) && (type == st.type));
+if ( !node || !(st.node) )  return ( false );
+
+return ( node->s == (st.node->s) );
 
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void SingleThresh::init_from_scratch() {
+void SingleThresh::init_from_scratch()
 
-   clear();
+{
 
-   return;
+node = 0;
+
+clear();
+
+return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void SingleThresh::clear() {
+void SingleThresh::clear()
 
-   thresh = 0.0;
-   type   = thresh_na;
+{
 
-   return;
+if ( node )  { delete node;  node = 0; }
+
+thresh = 0.0;
+
+return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void SingleThresh::assign(const SingleThresh &c) {
+void SingleThresh::assign(const SingleThresh & c)
 
-   thresh = c.thresh;
-   type   = c.type;
+{
 
-   return;
+clear();
+
+if ( !(c.node) )  return;
+
+node = c.node->copy();
+
+return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void SingleThresh::set(double t, ThreshType ind) {
+void SingleThresh::set(double t, ThreshType ind)
 
-   thresh = t;
-   type   = ind;
+{
 
-   return;
+clear();
+
+Simple_Node * a = new Simple_Node;
+
+a->T  = t;
+a->op = ind;
+
+node = a;
+
+a = 0;
+
+return;
+
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleThresh::set(const ThreshNode * n)
+
+{
+
+clear();
+
+node = n->copy();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleThresh::set_na()
+
+{
+
+clear();
+
+Simple_Node * a = new Simple_Node;
+
+a->set_na();
+
+node = a;
+
+a = 0;
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -126,75 +578,64 @@ void SingleThresh::set(double t, ThreshType ind) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void SingleThresh::set(const char *str) {
-   int i, offset, found;
-   char test_type[3], test_abbr[3];
+void SingleThresh::set(const char *str)
+
+{
+
+int i, offset, found;
+char test_type[3], test_abbr[3];
 
    //
    // Check for bad data
    //
-   if(strcmp(str, na_str      ) == 0 ||
-      strcmp(str, bad_data_str) == 0) {
 
-      type = thresh_na;
-      thresh = 0.0;
-      return;
-   }
+if(strcmp(str, na_str ) == 0 || strcmp(str, bad_data_str) == 0) {
 
-   //
-   // Convert the first two characaters to lower case
-   //
-   test_type[0] = tolower(str[0]);
-   test_type[1] = tolower(str[1]);
-   test_type[2] = '\0';
-
-   strcpy(test_abbr, test_type);
-
-   if(test_type[1] != '=') test_type[1] = '\0';
-
-   //
-   // Search for the type of thresholding to be performed
-   //
-   found = 0;
-   for(i=0; i<n_thresh_type; i++) {
-
-      //
-      // Check for strings: na, <, <=, =, !=, >, >=
-      //
-      if(strcmp(test_type, thresh_type_str[i]) == 0) {
-         type   = (ThreshType) i;
-         offset = strlen(thresh_type_str[i]);
-         found  = 1;
-         break;
-      }
-
-      //
-      // Check for strings: na, lt, le, eq, ne, gt, ge
-      //
-      else if(strcmp(test_abbr, thresh_abbr_str[i]) == 0) {
-
-         type   = (ThreshType) i;
-         offset = strlen(thresh_abbr_str[i]);
-         found  = 1;
-         break;
-      }
-   }
-
-   if(!found) {
-      mlog << Error << "\nSingleThresh::set() -> "
-           << "each threshold value must be preceeded by one of "
-           << "\"lt, le, eq, ne, gt, ge\" or \"<, <=, =, !=, >, >=\" "
-           << "to indicate the type of thresholding to be performed \""
-           << str << "\".\n\n";
-      exit(1);
-   }
-
-   //
-   // Parse out the threshold value
-   //
-   thresh = atof(str+offset);
+   set_na();
 
    return;
+
+}
+
+   //
+   //  for real
+   //
+
+MetConfig config;
+bool status = false;
+
+test_mode = true;
+
+status = config.read_string(str);
+
+if ( ! status )  {
+
+   cerr << "\n\n  SingleThresh::set(const char *): failed to parse string \"" << str << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+test_mode = false;
+
+if ( ! result )  {
+
+   cerr << "\n\n  SingleThresh::set(const char *): no result from parsing string \"" << str << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+set(result);
+
+   //
+   //  done
+   //
+
+delete result;  result = 0;
+
+return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,18 +644,20 @@ void SingleThresh::set(const char *str) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString SingleThresh::get_str(int precision) const {
-   char tmp_str[max_str_len];
-   ConcatString t;
-  
-   get_str(tmp_str, precision);
-   t = tmp_str;
+ConcatString SingleThresh::get_str(int precision) const
 
-   return(t);
+{
+
+ConcatString t;
+
+if ( node )  t = node->s;
+  
+return(t);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+/*
 void SingleThresh::get_str(char *str, int precision) const {
    char fmt_str[max_str_len];
 
@@ -228,7 +671,7 @@ void SingleThresh::get_str(char *str, int precision) const {
 
    return;
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////
 //
 // Construct a string to represent the threshold type and value
@@ -236,17 +679,15 @@ void SingleThresh::get_str(char *str, int precision) const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString SingleThresh::get_abbr_str(int precision) const {
-   char tmp_str[max_str_len];
    ConcatString t;
 
-   get_abbr_str(tmp_str, precision);
-   t = tmp_str;
+   if ( node )  t = node->abbr_s;
 
    return(t);
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+/*
 void SingleThresh::get_abbr_str(char *str, int precision) const {
    char fmt_str[max_str_len];
 
@@ -260,14 +701,15 @@ void SingleThresh::get_abbr_str(char *str, int precision) const {
 
    return;
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////
 //
 // Check whether or not the value meets the threshold criteria.
 //
 ////////////////////////////////////////////////////////////////////////
-
+/*
 bool SingleThresh::check(double v) const {
+
    bool status = false;
 
    // Type of thresholding
@@ -304,8 +746,9 @@ bool SingleThresh::check(double v) const {
    }
 
    return(status);
-}
 
+}
+*/
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -315,8 +758,8 @@ void SingleThresh::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "thresh = " << thresh << "\n";
-out << prefix << "type   = " << type   << "\n";
+out << prefix << "thresh = " << thresh       << '\n';
+out << prefix << "type   = " << get_type()   << '\n';
 
 
    //

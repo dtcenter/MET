@@ -178,16 +178,13 @@ out << prefix << "Interp Mthd    = \"" << interp_mthd()<< "\"\n";
 out << prefix << "Interp Pnts    = \"" << interp_pnts()<< "\"\n";
 
 st = fcst_thresh();
-st.get_str(junk);
-out << prefix << "Fcst Thresh    = \"" << junk << "\"\n";
+out << prefix << "Fcst Thresh    = \"" << st.get_str() << "\"\n";
 
 st = obs_thresh();
-st.get_str(junk);
-out << prefix << "Obs Thresh     = \"" << junk << "\"\n";
+out << prefix << "Obs Thresh     = \"" << st.get_str() << "\"\n";
 
 st = cov_thresh();
-st.get_str(junk);
-out << prefix << "Cov Thresh     = \"" << junk << "\"\n";
+out << prefix << "Cov Thresh     = \"" << st.get_str() << "\"\n";
 
 out << prefix << "Alpha          = \"" << alpha() << "\"\n";
 

@@ -1911,8 +1911,8 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
       // Loop through each threshold
       for(i=0; i<conf_info.ens_ta[i_vx].n_elements(); i++) {
 
-         conf_info.ens_ta[i_vx][i].get_abbr_str(thresh_str);
-         sprintf(type_str, "ENS_FREQ_%s", thresh_str);
+         // conf_info.ens_ta[i_vx][i].get_abbr_str(thresh_str);
+         sprintf(type_str, "ENS_FREQ_%s", conf_info.ens_ta[i_vx][i].get_abbr_str().contents());
 
          // Store the data
          for(j=0; j<count_na.n_elements(); j++) {

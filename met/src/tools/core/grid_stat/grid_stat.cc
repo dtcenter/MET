@@ -1293,15 +1293,15 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
          ost = v_info[j].wind_obs_thresh;
 
          // Apply both wind speed thresholds
-         if(fst.type != thresh_na && ost.type  != thresh_na) {
+         if(fst.get_type() != thresh_na && ost.get_type()  != thresh_na) {
             if(!fst.check(fwind) || !ost.check(owind)) continue;
          }
          // Apply only the fcst wind speed threshold
-         else if(fst.type != thresh_na && ost.type  == thresh_na) {
+         else if(fst.get_type() != thresh_na && ost.get_type()  == thresh_na) {
             if(!fst.check(fwind)) continue;
          }
          // Apply only the obs wind speed threshold
-         else if(fst.type == thresh_na && ost.type  != thresh_na) {
+         else if(fst.get_type() == thresh_na && ost.get_type()  != thresh_na) {
             if(!ost.check(owind)) continue;
          }
 

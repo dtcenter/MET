@@ -22,7 +22,8 @@ using namespace std;
 #include "util_constants.h"
 #include "is_number.h"
 
-#include "thresh_node.h"     //  must be included before config.tab.h
+#include "scanner_stuff.h" //  must be included before config.tab.h
+#include "threshold.h"     //  must be included before config.tab.h
 
 #include "config.tab.h"
 

@@ -335,12 +335,12 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
          if(fcst_cat_ta[i].thresh >  fcst_cat_ta[i+1].thresh ||
             obs_cat_ta[i].thresh  >  obs_cat_ta[i+1].thresh  ||
-            fcst_cat_ta[i].type   != fcst_cat_ta[i+1].type   ||
-            obs_cat_ta[i].type    != obs_cat_ta[i+1].type    ||
-            fcst_cat_ta[i].type   == thresh_eq           ||
-            fcst_cat_ta[i].type   == thresh_ne           ||
-            obs_cat_ta[i].type    == thresh_eq           ||
-            obs_cat_ta[i].type    == thresh_ne) {
+            fcst_cat_ta[i].get_type()   != fcst_cat_ta[i+1].get_type()   ||
+            obs_cat_ta[i].get_type()    != obs_cat_ta[i+1].get_type()    ||
+            fcst_cat_ta[i].get_type()   == thresh_eq           ||
+            fcst_cat_ta[i].get_type()   == thresh_ne           ||
+            obs_cat_ta[i].get_type()    == thresh_eq           ||
+            obs_cat_ta[i].get_type()    == thresh_ne) {
 
             mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
                  << "when verifying using multi-category contingency "

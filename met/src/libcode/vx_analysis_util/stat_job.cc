@@ -2010,18 +2010,18 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
    // out_fcst_wind_thresh == out_obs_wind_thresh
    if(out_fcst_wind_thresh == out_obs_wind_thresh) {
-      if(out_fcst_wind_thresh.type != thresh_na) {
+      if(out_fcst_wind_thresh.get_type() != thresh_na) {
          js << "-out_wind_thresh " << out_fcst_wind_thresh.get_str() << " ";
       }
    }
    else {
       // out_fcst_wind_thresh
-      if(out_fcst_wind_thresh.type != thresh_na) {
+      if(out_fcst_wind_thresh.get_type() != thresh_na) {
          js << "-out_fcst_wind_thresh " << out_fcst_wind_thresh.get_str() << " ";
       }
 
       // out_obs_wind_thresh
-      if(out_obs_wind_thresh.type != thresh_na) {
+      if(out_obs_wind_thresh.get_type() != thresh_na) {
          js << "-out_obs_wind_thresh " << out_obs_wind_thresh.get_str() << " ";
       }
    }

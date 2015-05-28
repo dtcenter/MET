@@ -388,12 +388,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
                if(fcst_ta[i][j].thresh >  fcst_ta[i][j+1].thresh ||
                   obs_ta[i][j].thresh  >  obs_ta[i][j+1].thresh  ||
-                  fcst_ta[i][j].type   != fcst_ta[i][j+1].type   ||
-                  obs_ta[i][j].type    != obs_ta[i][j+1].type    ||
-                  fcst_ta[i][j].type   == thresh_eq              ||
-                  fcst_ta[i][j].type   == thresh_ne              ||
-                  obs_ta[i][j].type    == thresh_eq              ||
-                  obs_ta[i][j].type    == thresh_ne) {
+                  fcst_ta[i][j].get_type()   != fcst_ta[i][j+1].get_type()   ||
+                  obs_ta[i][j].get_type()    != obs_ta[i][j+1].get_type()    ||
+                  fcst_ta[i][j].get_type()   == thresh_eq              ||
+                  fcst_ta[i][j].get_type()   == thresh_ne              ||
+                  obs_ta[i][j].get_type()    == thresh_eq              ||
+                  obs_ta[i][j].get_type()    == thresh_ne) {
 
                   mlog << Error << "\nPointStatConfInfo::process_config() -> "
                        << "when verifying using multi-category contingency "
