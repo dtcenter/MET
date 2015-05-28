@@ -1608,8 +1608,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Apply the wind speed thresholds
          //
-         if(j.out_fcst_wind_thresh.type != thresh_na ||
-            j.out_obs_wind_thresh.type  != thresh_na) {
+         if(j.out_fcst_wind_thresh.get_type() != thresh_na ||
+            j.out_obs_wind_thresh.get_type()  != thresh_na) {
 
             // Compute wind speeds
             fwind = convert_u_v_to_wind(it->second.uf_na[i], it->second.vf_na[i]);

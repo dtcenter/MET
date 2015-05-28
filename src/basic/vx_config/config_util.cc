@@ -1123,7 +1123,7 @@ void check_prob_thresh(const ThreshArray &ta) {
    for(i=0; i<n; i++) {
 
       // Check that all threshold types are greater than or equal to
-      if(ta[i].type != thresh_ge) {
+      if(ta[i].get_type() != thresh_ge) {
          mlog << Error << "\ncheck_prob_thresh() -> "
               << "When verifying a probability field, all "
               << "thresholds must be set as equal to, "

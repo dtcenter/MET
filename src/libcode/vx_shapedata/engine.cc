@@ -538,7 +538,7 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
    //
    // Apply the area threshold
    //
-   if(conf_info.fcst_area_thresh.type != thresh_na) {
+   if(conf_info.fcst_area_thresh.get_type() != thresh_na) {
 
       fcst_mask->threshold_area(conf_info.fcst_area_thresh);
 
@@ -555,7 +555,7 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
    //
    // Apply the intensity threshold
    //
-   if(conf_info.fcst_inten_perc_thresh.type != thresh_na) {
+   if(conf_info.fcst_inten_perc_thresh.get_type() != thresh_na) {
       
       fcst_mask->threshold_intensity(fcst_filter,
                                      conf_info.fcst_inten_perc_value,
@@ -604,7 +604,7 @@ void ModeFuzzyEngine::do_obs_thresholding() {
    //
    // Apply the area threshold
    //
-   if(conf_info.obs_area_thresh.type != thresh_na) {
+   if(conf_info.obs_area_thresh.get_type() != thresh_na) {
       obs_mask->threshold_area(conf_info.obs_area_thresh);
 
       mlog << Debug(3) << "Applying area threshold "
@@ -620,7 +620,7 @@ void ModeFuzzyEngine::do_obs_thresholding() {
    //
    // Apply the intensity threshold
    //
-   if(conf_info.obs_inten_perc_thresh.type != thresh_na) {
+   if(conf_info.obs_inten_perc_thresh.get_type() != thresh_na) {
       obs_mask->threshold_intensity(obs_filter,
                                     conf_info.obs_inten_perc_value,
                                     conf_info.obs_inten_perc_thresh);

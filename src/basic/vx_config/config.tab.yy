@@ -29,7 +29,8 @@ using namespace std;
 #include "is_number.h"
 #include "pwl.h"
 
-#include "thresh_node.h"
+#include "scanner_stuff.h"
+#include "threshold.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,7 +87,6 @@ static PiecewiseLinear pwl;
 static Dictionary DD;
 
 static SingleThresh ST;
-
 
 
 ////////////////////////////////////////////////////////////////////////

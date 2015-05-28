@@ -25,7 +25,6 @@ libvx_config_a_SOURCES = config.tab.yy config_scanner.ll \
               data_file_type.h \
               object_types.h \
               scanner_stuff.h \
-              thresh_node.h thresh_node.cc \
               config_constants.h \
               vx_config.h
 libvx_config_a_CPPFLAGS = ${MET_CPPFLAGS}

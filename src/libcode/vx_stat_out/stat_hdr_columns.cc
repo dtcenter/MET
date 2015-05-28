@@ -438,10 +438,8 @@ void StatHdrColumns::set_interp_pnts_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_thresh_str() {
-   char tmp_str[max_str_len];
 
-   fcst_thresh.get_str(tmp_str);
-   fcst_thresh_str = tmp_str;
+   fcst_thresh_str = fcst_thresh.get_str();
 
    return;
 }
@@ -449,10 +447,8 @@ void StatHdrColumns::set_fcst_thresh_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_thresh_str() {
-   char tmp_str[max_str_len];
 
-   obs_thresh.get_str(tmp_str);
-   obs_thresh_str = tmp_str;
+   obs_thresh_str = obs_thresh.get_str();
 
    return;
 }
@@ -460,10 +456,8 @@ void StatHdrColumns::set_obs_thresh_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_cov_thresh_str() {
-   char tmp_str[max_str_len];
 
-   cov_thresh.get_str(tmp_str);
-   cov_thresh_str = tmp_str;
+   cov_thresh_str = cov_thresh.get_str();
 
    return;
 }

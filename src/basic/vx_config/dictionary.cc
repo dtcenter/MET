@@ -336,7 +336,7 @@ switch ( Type )  {
       break;
 
    case ThresholdType:
-      switch ( Thresh->type )  {
+      switch ( Thresh->get_type() )  {
 
          case thresh_lt:  out << "<";   break;
          case thresh_le:  out << "<=";  break;
@@ -349,12 +349,12 @@ switch ( Type )  {
 
          default:
          mlog << Error 
-              << "DictionaryEntry::dump_config_format() -> bad threshold type ... " << Thresh->type << "\n";
+              << "DictionaryEntry::dump_config_format() -> bad threshold type ... " << Thresh->get_type() << "\n";
          exit ( 1 );
          break;
 
       }  //  switch
-      if ( Thresh->type != thresh_na )  out << Thresh->thresh;
+      if ( Thresh->get_type() != thresh_na )  out << Thresh->thresh;
       out << ";\n";
       break;
 

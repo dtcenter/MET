@@ -27,7 +27,7 @@ using namespace std;
 #include "vx_util.h"
 
 #include "config_file.h"
-#include "thresh_node.h"
+#include "threshold.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -80,6 +80,7 @@ config.set_debug(debug);
 bool status = false;
 ConcatString local_thresh_string = argv[1];
 const double value = atof(argv[2]);
+SingleThresh st;
 
 test_mode = true;
 
@@ -103,10 +104,14 @@ if ( ! result )  {
 
 }
 
-status = result->check(value);
+st.set(result);
+
+// status = result->check(value);
+
+status = st.check(value);
 
 cout << "\n\n" 
-     << "Evaluates as " << (status ? "true" : "false") << "\n\n\n";
+     << "Evaluates as:  " << (status ? "true" : "false") << "\n\n\n";
 
 cout << "thresh_string = \"" << result->s.contents() << "\"\n\n";
 cout << "  abbr_string = \"" << result->abbr_s.contents() << "\"\n\n";

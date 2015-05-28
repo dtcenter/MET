@@ -374,9 +374,9 @@ int ThreshArray::check(double v) const {
    for(i=0; i<Nelements-1; i++) {
 
       if(t[i].thresh >  t[i+1].thresh ||
-         t[i].type   != t[i+1].type   ||
-         t[i].type   == thresh_eq     ||
-         t[i].type   == thresh_ne) {
+         t[i].get_type()   != t[i+1].get_type()   ||
+         t[i].get_type()   == thresh_eq     ||
+         t[i].get_type()   == thresh_ne) {
 
          mlog << Error << "\nThreshArray::check(double) const -> "
               << "thresholds must be monotonically increasing and be of "
@@ -387,7 +387,7 @@ int ThreshArray::check(double v) const {
    }
 
    // For < and <=, check thresholds left to right.
-   if(t[0].type == thresh_lt || t[0].type == thresh_le) {
+   if(t[0].get_type() == thresh_lt || t[0].get_type() == thresh_le) {
 
       for(i=0, bin=-1; i<Nelements; i++) {
          if(t[i].check(v)) {
