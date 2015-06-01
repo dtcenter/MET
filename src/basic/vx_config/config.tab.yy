@@ -27,6 +27,7 @@ using namespace std;
 #include "dictionary.h"
 #include "threshold.h"
 #include "is_number.h"
+#include "concat_string.h"
 #include "pwl.h"
 
 #include "scanner_stuff.h"
@@ -72,7 +73,9 @@ ThreshNode *      result                = 0;   //  for testing
 
 bool              test_mode             = false;
 
-ConcatString   number_string;
+// ConcatString   number_string;
+
+char number_string [max_id_length];
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -138,6 +141,9 @@ static ThreshNode * do_or_thresh     (ThreshNode *, ThreshNode *);
 static ThreshNode * do_not_thresh    (ThreshNode *);
 static ThreshNode * do_paren_thresh  (ThreshNode *);
 static ThreshNode * do_simple_thresh (ThreshType, const Number &);
+
+
+static void set_number_string();
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -256,8 +262,8 @@ simple_thresh : COMPARISON number { $$ = do_simple_thresh($1, $2); }
               ;
 
 
-number : INTEGER { number_string = configtext; }
-       | FLOAT   { number_string = configtext; }
+number : INTEGER { set_number_string(); }
+       | FLOAT   { set_number_string(); }
        ;
     
 
@@ -992,6 +998,24 @@ if ( op >= 0 )  {
 }
 
 return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_number_string()
+
+{
+
+const int k = (int) (sizeof(number_string));
+
+strncpy(number_string, configtext, k);
+
+number_string[k - 1] = (char) 0;
+
+return;
 
 }
 
