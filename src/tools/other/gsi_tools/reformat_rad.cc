@@ -122,7 +122,7 @@ for (j=0; j<n_mpr_columns; ++j)  {
 
 }
 
-for (j=0; j<n_mpr_columns; ++j)  {
+for (j=0; j<n_extra_cols; ++j)  {
 
    k = n_header_columns + n_mpr_columns + j;
 

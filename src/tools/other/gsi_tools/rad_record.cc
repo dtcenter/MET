@@ -609,7 +609,7 @@ if ( f.get_swap_endian() )  {
    int j;
    const int n = r.Ndiag + r.Ndiagchan + r.Nextra;
 
-   for (j=0; j<n; ++j)  shuffle_4(r.Buf + j);
+   for (j=0; j<n; ++j)  shuffle_4(r.Buf + 4*j);
 
 }
 
@@ -618,7 +618,7 @@ if ( f.get_swap_endian() )  {
    //  done
    //
 
-return ( false );
+return ( true );
 
 }
 
