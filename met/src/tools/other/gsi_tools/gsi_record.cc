@@ -153,6 +153,8 @@ if ( Buf )  {
 
    memcpy(u, Buf, Nalloc);
 
+   delete [] Buf;  Buf = 0;
+
 }
 
 Nalloc = n_bytes;

@@ -17,12 +17,7 @@ using namespace std;
 
 #include "conv_record.h"
 #include "conv_offsets.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-inline int fortran_two_to_one(const int N1, const int v1, const int v2) { return ( v2*N1 + v1 ); }
+#include "ftto.h"
 
 
 ////////////////////////////////////////////////////////////////////////

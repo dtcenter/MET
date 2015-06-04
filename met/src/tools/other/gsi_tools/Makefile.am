@@ -19,7 +19,8 @@ reformat_conv_SOURCES = gsi_record.h \
 	conv_record.h \
 	conv_record.cc \
 	reformat_conv.cc \
-	conv_offsets.h
+	conv_offsets.h \
+	ftto.h
 reformat_conv_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_conv_LDFLAGS = ${MET_LDFLAGS}
 reformat_conv_LDADD = -lvx_stat_out \
@@ -34,10 +35,13 @@ reformat_conv_LDADD = -lvx_stat_out \
 
 reformat_rad_SOURCES = gsi_record.h \
 	gsi_record.cc \
+	rad_record.h \
+	rad_record.cc \
 	reformat_rad.cc \
 	rad_offsets.h \
 	rad_config.h  \
-	rad_config.cc
+	rad_config.cc \
+	ftto.h
 reformat_rad_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_rad_LDFLAGS = ${MET_LDFLAGS}
 reformat_rad_LDADD = -lvx_stat_out \

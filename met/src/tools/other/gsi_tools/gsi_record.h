@@ -10,6 +10,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Base class for the other record types
+   //
+
+
 class GsiRecord {
 
    protected:
@@ -47,8 +52,6 @@ class GsiRecord {
          //
          //  get stuff
          //
-
-      bool has_extra() const;
 
       bool shuffle       () const;
       int rec_pad_length () const;
