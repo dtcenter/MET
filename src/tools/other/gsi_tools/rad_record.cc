@@ -192,6 +192,8 @@ Nextra    = 0;
 
 N1 = N2 = 0;
 
+Date = 0;
+
 return;
 
 }
@@ -599,6 +601,8 @@ r.extra    = 0;
 
 r.N1 = f.N1;
 r.N2 = f.N2;
+
+r.Date = f.Date;
 
 if ( f.get_swap_endian() )  {
 
