@@ -31,6 +31,7 @@ using namespace std;
 
 #include "read_fortran_binary.h"
 #include "conv_offsets.h"
+#include "conv_record.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,14 +51,6 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static int buf_size = 512;
-
-static unsigned char * buf = 0;
-
-static char date_string[256];
-
-static char variable [4];
-
 static const char * const conv_extra_columns [] = {
 
    "OBS_STYPE",    //  observation subtype
@@ -72,32 +65,13 @@ static const int n_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_extra_co
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  zero-based
-   //
-
-inline int fortran_two_to_one(const int N1, const int v1, const int v2) { return ( v2*N1 + v1 ); }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 static void usage();
 
 static void set_outdir(const StringArray &);
 
 static void process(const char * conv_filename);
 
-static bool fortran_read(int fd, void *, int n_bytes);
-
-static double rdiag_get_2d(void *, const int nreal, int i, int j);   //  1-based
-
-static double rdiag_get_guess          (void *, const int nreal, int j);   //  1-based
-// static double rdiag_get_guess_no_bias  (void *, const int nreal, int j);   //  1-based
-
-static void get_cdiag(int index, const void * cdiag_buf, char * out);   //  1-based
-
-static void do_row(AsciiTable & table, int row, const char * id, void * b, const int nreal, const int j);
+static void do_row(AsciiTable & table, int row, ConvRecord & r, const int j);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -108,8 +82,6 @@ int main(int argc, char * argv [])
 {
 
 program_name = get_short_name(argv[0]);
-
-buf = new unsigned char [buf_size];
 
 cline.set(argc, argv);
 
@@ -157,19 +129,18 @@ void process(const char * conv_filename)
 
 int j, k;
 int row;
-int in = -1;
 int date, n_bytes;
 int nchar, nreal, ii, mtype;
 int n_rdiag;
 int cdiag_bytes, rdiag_bytes;
 int year, month, day, hour;
-char id[9];
 ofstream out;
 AsciiTable table;
 StatHdrColumns columns;
-float * f = (float *) 0;
 long long size = 0;
 ConcatString output_filename;
+ConvFile f;
+ConvRecord r;
 
 
 output_filename << cs_erase
@@ -197,7 +168,7 @@ for (j=0; j<n_extra_cols; ++j)  {
 
 }
 
-if ( (in = open(conv_filename, O_RDONLY)) < 0 )  {
+if ( !(f.open(conv_filename)) )  {
 
    mlog << Error << "\n\n  " << program_name << ": unable to open input file \""
         << conv_filename << "\n\n";
@@ -218,91 +189,18 @@ if ( ! out )  {
 }
 
    //
-   //  read date
-   //
-
-fortran_read(in, &date, 4);
-
-if ( swap_endian )  shuffle_4(&date);
-
-// cout << "\n\n  " << date << "\n\n";
-
-year  = date/1000000;
-month = (date/10000)%100;
-day   = (date/100)%100;
-hour  = date%100;
-
-sprintf(date_string, "%04d%02d%02d_%02d0000", year, month, day, hour);
-
-
-   //
    //  read data
    //
 
 row = 1;
 
-while ( fortran_read(in, buf, 19) )  {
+while ( (f >> r) )  {
 
-   memcpy(variable, buf, 3);
+   table.add_rows(r.ii);
 
-   variable[3] = (char) 0;
+   for (j=0; j<(r.ii); ++j)  {
 
-   memcpy(&nchar, buf +  3, 4);
-   memcpy(&nreal, buf +  7, 4);
-   memcpy(&ii,    buf + 11, 4);
-   memcpy(&mtype, buf + 15, 4);
-
-   if ( swap_endian )  {
-
-      shuffle_4(&nchar);
-      shuffle_4(&nreal);
-      shuffle_4(&ii);
-      shuffle_4(&mtype);
-
-   }
-
-   // cout << "\n  ii    = " << ii    << "\n";
-   // cout << "\n  nreal = " << nreal << "\n";
-
-   // cout << "\n  var   = \"" << var << "\"\n";
-
-      //
-      //  read data
-      //
-
-   n_rdiag = nreal*ii;
-
-   cdiag_bytes = 8*ii;
-   rdiag_bytes = 4*n_rdiag;
-
-   n_bytes = cdiag_bytes + rdiag_bytes;
-
-   size = peek_record_size(in, rec_pad_length, swap_endian);
-
-   if ( size > buf_size )  {
-
-      if ( buf )  { delete [] buf;  buf = 0; }
-
-      buf = new unsigned char [size];
-
-      buf_size = size;
-
-   }
-
-   fortran_read(in, buf, n_bytes);
-
-   f = (float *) (buf + cdiag_bytes);
-
-   if ( swap_endian )  { for (j=0; j<n_rdiag; ++j)  shuffle_4(f + j); }
-
-   table.add_rows(ii);
-
-
-   for (j=1; j<=ii; ++j)  {
-
-      get_cdiag(j, buf, id);
-
-      do_row(table, row++, id, f, nreal, j);
+      do_row(table, row++, r, j);
 
    }
 
@@ -314,7 +212,7 @@ out << table;
     //  done
     //
 
-close(in);  in = -1;
+f.close();
 
 out.close();
 
@@ -356,146 +254,27 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool fortran_read(int fd, void * b, int n_bytes)
-
-{
-
-long long n_read;
-
-n_read = read_fortran_binary(fd, b, n_bytes, rec_pad_length, swap_endian);
-
-if ( n_read == 0 )  return ( false );
-
-if ( (n_read < 0) || (n_read != n_bytes) )  {
-
-   mlog << Error << "\n\n  " << program_name << ": fortran_read() -> read error!\n\n";
-
-   exit ( 1 );
-
-}
-
-return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double rdiag_get_2d(void * b, const int nreal, int i, int j)   //  1-based
-
-{
-
-float * f = (float *) b;
-int n;
-double value;
-
-
-n = fortran_two_to_one(nreal, i - 1, j - 1);
-
-// shuffle_4(f + n);
-
-value = (double) (f[n]);
-
-
-return ( value );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double rdiag_get_guess(void * b, const int nreal, int j)   //  1-based
-
-{
-
-double obs, obs_minus_guess;
-
-obs             = rdiag_get_2d(b, nreal, obs_data_index, j);
-
-obs_minus_guess = rdiag_get_2d(b, nreal, omg_index,      j);
-
-
-return ( obs - obs_minus_guess );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-double rdiag_get_guess_no_bias(void * b, const int nreal, int j)   //  1-based
-
-{
-
-double obs, obs_minus_guess;
-
-obs             = rdiag_get_2d(b, nreal, obs_data_index,    j);
-
-obs_minus_guess = rdiag_get_2d(b, nreal, omg_no_bias_index, j);
-
-
-return ( obs - obs_minus_guess );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-
-void get_cdiag(int index, const void * cdiag_buf, char * out)   //  1-based
-
-{
-
-const char * s = (const char *) cdiag_buf;
-
-memcpy(out, s + 8*(index - 1), 8);
-
-out[8] = (char) 0;
-
-int j;
-
-for (j=7; j>=0; --j)  {
-
-   if ( out[j] == ' ' )  out[j] = (char) 0;
-
-   else break;
-
-}
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-void do_row(AsciiTable & table, int row, const char * id, void * b, const int nreal, int j)
+void do_row(AsciiTable & table, int row, ConvRecord & r, const int j)
 
 {
 
 int col = 0;
 char junk[256];
 const char * model = "XXX";
+const ConcatString date_string = r.date_string();
+const ConcatString id          = r.station_name(j);
 
-const double lat       = rdiag_get_2d(b, nreal,       lat_index, j);
-const double lon       = rdiag_get_2d(b, nreal,       lon_index, j);
-const double pressure  = rdiag_get_2d(b, nreal,  pressure_index, j);
-const double obs_value = rdiag_get_2d(b, nreal,  obs_data_index, j);
-const double elevation = rdiag_get_2d(b, nreal, elevation_index, j);
+const double lat       = r.rdiag_get_2d(      lat_index - 1, j);
+const double lon       = r.rdiag_get_2d(      lon_index - 1, j);
+const double pressure  = r.rdiag_get_2d( pressure_index - 1, j);
+const double obs_value = r.rdiag_get_2d( obs_data_index - 1, j);
+const double elevation = r.rdiag_get_2d(elevation_index - 1, j);
 
-const double obs_subtype     = rdiag_get_2d(b, nreal,    obssubtype_index, j);
-const double pb_inv_error    = rdiag_get_2d(b, nreal,    pb_inverse_index, j);
-const double final_inv_error = rdiag_get_2d(b, nreal, final_inverse_index, j);
+const double obs_subtype     = r.rdiag_get_2d (  obssubtype_index - 1, j);
+const double pb_inv_error    = r.rdiag_get_2d(   pb_inverse_index - 1, j);
+const double final_inv_error = r.rdiag_get_2d(final_inverse_index - 1, j);
 
-const double guess         = rdiag_get_guess         (b, nreal, j);
-// const double guess_no_bias = rdiag_get_guess_no_bias (b, nreal, j);
+const double guess         = r.rdiag_get_guess (j);
 
 // cout << pressure << '\n';
 
@@ -517,10 +296,10 @@ table.set_entry(row, col++, "000000");      //  obs lead
 table.set_entry(row, col++, date_string);   //  obs valid begin
 table.set_entry(row, col++, date_string);   //  obs valid end
 
-table.set_entry(row, col++, variable);      //  fcst var
+table.set_entry(row, col++, r.variable);    //  fcst var
 table.set_entry(row, col++, stat_na_str);   //  fcst level
 
-table.set_entry(row, col++, variable);      //  obs var
+table.set_entry(row, col++, r.variable);    //  obs var
 table.set_entry(row, col++, stat_na_str);   //  obs level
 
 table.set_entry(row, col++, stat_na_str);   //  obtype
