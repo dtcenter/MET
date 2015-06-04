@@ -33,6 +33,7 @@ using namespace std;
 
 #include "read_fortran_binary.h"
 #include "rad_offsets.h"
+#include "rad_record.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,54 +75,6 @@ static const int n_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_colu
    //
 
 inline int fortran_two_to_one(const int N1, const int v1, const int v2) { return ( v2*N1 + v1 ); }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-struct RadParams {
-
-   char obstype [11]; 
-   char dplat   [11]; 
-   char isis    [21]; 
-
-   int jiter;
-   int nchanl;
-   int npred;
-   int idate;
-   int ireal;
-   int ipchan;
-   int iextra;
-   int jextra;
-
-   int idiag;
-   int angord;
-   int iversion;
-   int inewpc;
-
-   RadParams();
-
-   void dump(ostream &) const;
-
-};
-
-struct ChannelParams {
-
-   float freq;
-   float plo;
-   float wave;
-   float varch;
-   float tlap;
-
-   int iuse;
-   int nuchan;
-   int ich;
-
-   ChannelParams();
-
-   void dump(ostream &) const;
-
-};
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -371,91 +324,6 @@ if ( k <= 0 )  {
 channel = k - 1;
 
 return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-RadParams::RadParams()
-
-{
-
-memset(obstype, 0, sizeof(obstype));
-memset(dplat,   0, sizeof(dplat)); 
-memset(isis,    0, sizeof(isis)); 
-
-jiter  = 0;
-nchanl = 0;
-npred  = 0;
-idate  = 0;
-ireal  = 0;
-ipchan = 0;
-iextra = 0;
-jextra = 0;
-
-idiag    = 0;
-angord   = 0;
-iversion = 0;
-inewpc   = 0;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void RadParams::dump(ostream & out) const
-
-{
-
-out << "obstype  = \"" << obstype << "\"\n"
-    << "dplat    = \"" << dplat   << "\"\n"
-    << "isis     = \"" << isis    << "\"\n";
-
-out << "jiter    = " << jiter  << '\n'
-    << "nchanl   = " << nchanl << '\n'
-    << "npred    = " << npred  << '\n'
-    << "idate    = " << idate  << '\n'
-    << "ireal    = " << ireal  << '\n'
-    << "ipchan   = " << ipchan << '\n'
-    << "iextra   = " << iextra << '\n'
-    << "jextra   = " << jextra << '\n';
-
-out << "idiag    = " << idiag    << '\n'
-    << "angord   = " << angord   << '\n'
-    << "iversion = " << iversion << '\n'
-    << "inewpc   = " << inewpc   << '\n';
-
-
-   //
-   //  done
-   //
-
-out.flush();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-ChannelParams::ChannelParams()
-
-{
-
-freq  = 0.0;
-plo   = 0.0;
-wave  = 0.0;
-varch = 0.0;
-tlap  = 0.0;
-
-iuse   = 0;
-nuchan = 0;
-ich    = 0;
 
 }
 
