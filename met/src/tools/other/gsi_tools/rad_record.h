@@ -197,6 +197,8 @@ class RadRecord : public GsiRecord {
       int N1;
       int N2;
 
+      unixtime Date;
+
    public:
 
       RadRecord();
@@ -209,6 +211,8 @@ class RadRecord : public GsiRecord {
          //
 
       bool has_extra() const;
+
+      unixtime date() const;
 
          //
          //  do stuff
@@ -225,6 +229,8 @@ class RadRecord : public GsiRecord {
 
 
 inline bool RadRecord::has_extra() const { return ( extra != 0 ); }
+
+inline unixtime RadRecord::date() const { return ( Date ); }
 
 
 ////////////////////////////////////////////////////////////////////////

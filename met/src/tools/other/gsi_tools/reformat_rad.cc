@@ -3,10 +3,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int  rec_pad_length =    4;
-static const bool    swap_endian = true;
-
-static const bool verbose        = false;
+static const bool verbose = false;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,10 +50,6 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static int buf_size = 512;
-
-static unsigned char * buf = 0;
-
 static const char * const rad_extra_columns [] = {
 
    "INV_OBS_ERR",   //  inverse observation error
@@ -70,29 +63,11 @@ static const int n_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_colu
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  zero-based
-   //
-
-inline int fortran_two_to_one(const int N1, const int v1, const int v2) { return ( v2*N1 + v1 ); }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 static void usage();
 
 static void set_channel(const StringArray &);
 
-static void my_memcpy(void * to, unsigned char * & from, int);
-
-static void read_params(int fd, RadParams &);
-
-static void read_channel(int fd, ChannelParams &);
-
-static bool read_data(int fd, const int n_diag, const int N1, const int N2, float * diag, float * diagchan);
-
-static void do_row(AsciiTable &, const int row, const unixtime t0, const int N1, const int N2, const float * diag, const float * diagchan);
+static void do_row(AsciiTable &, const int row, const RadRecord &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -103,8 +78,6 @@ int main(int argc, char * argv [])
 {
 
 program_name = get_short_name(argv[0]);
-
-buf = new unsigned char [buf_size];
 
 cline.set(argc, argv);
 
@@ -126,19 +99,15 @@ const ConcatString output_filename = cline[1];
    //
 
 int j, k;
-int in = -1;
 int count;
 int row;
 ofstream out;
 AsciiTable table;
 StatHdrColumns columns;
-RadParams params;
-unixtime t0;
 int month, day, year, hour;
-ChannelParams * cp = 0;
 bool status = false;
-float * diag     = 0;
-float * diagchan = 0;
+RadFile f;
+RadRecord r;
 
 
 table.set_size(1, n_header_columns + n_mpr_columns + n_extra_cols);
@@ -161,7 +130,7 @@ for (j=0; j<n_mpr_columns; ++j)  {
 
 }
 
-if ( (in = open(input_filename, O_RDONLY)) < 0 )  {
+if ( !(f.open(input_filename)) < 0 )  {
 
    mlog << Error << "\n\n  " << program_name << ": unable to open input file \""
         << input_filename << "\n\n";
@@ -182,81 +151,18 @@ if ( ! out )  {
 }
 
    //
-   //  read parameters
-   //
-
-read_params(in, params);
-
-if ( channel >= params.nchanl )  {
-
-   mlog << Error << "\n\n  " << program_name << ": bad channel selected ... there are only "
-        << params.nchanl << " channels\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( verbose )  {
-
-   cout << "\nParams:\n";
-
-   params.dump(cout);
-
-}
-
-k = params.idate;   //  YYYYMMDDHH
-
-month = (k/10000)%100;
-day   = (k/100)%100;
-year  = k/1000000;
-hour  = k%100;
-
-t0 = mdyhms_to_unix(month, day, year, hour, 0, 0);
-
-cp = new ChannelParams [params.nchanl];
-
-for (j=0; j<(params.nchanl); ++j)  {
-
-   read_channel(in, cp[j]);
-
-}
-
-   //
    //  read data
    //
-
-const int n_diag = params.ireal;
-
-diag = new float [n_diag];
-
-// const int N1 = params.ipchan + params.npred + 1;
-const int N1 = params.idiag;
-const int N2 = params.nchanl;
-
-diagchan = new float [N1*N2];
-
-// cout << '\n';
-// 
-// cout << "(N1, N2) = (" << N1 << ", " << N2 << ")\n";
-// 
-// cout << "diag     = " << n_diag  << " floats\n" << flush;
-// cout << "diagchan = " << (N1*N2) << " floats\n" << flush;
-// 
-// cout << '\n';
 
 count = 0;
 
 row = 1;   //  allow for header line
 
-while ( 1 )  {
-
-   status = read_data(in, n_diag, N1, N2, diag, diagchan);
-
-   if ( ! status )  break;
+while ( (f >> r) )  {
 
    table.add_rows(1);
 
-   do_row(table, row++, t0, N1, N2, diag, diagchan);
+   do_row(table, row++, r);
 
    ++count;
 
@@ -272,15 +178,9 @@ cout << "\n\n  Read " << count << " data records\n\n";
 
 out << table;
 
-close(in);  in = -1;
+f.close();
 
 out.close();
-
-if ( cp )  { delete [] cp;  cp = 0; }
-
-if ( diag )  { delete [] diag;  diag = 0; }
-
-if ( diagchan )  { delete [] diagchan;  diagchan = 0; }
 
 return ( 0 );
 
@@ -331,237 +231,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void my_memcpy(void * to, unsigned char * & from, int n_bytes)
-
-{
-
-memcpy(to, from, n_bytes);
-
-from += n_bytes;
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void read_params(int fd, RadParams & params)
-
-{
-
-long long n_read;
-
-n_read = read_fortran_binary(fd, buf, buf_size, rec_pad_length, swap_endian);
-
-if ( n_read < 72 )  {
-
-   mlog << Error << "\n\n  " << program_name << ": failed to read params\n\n";
-
-   exit ( 1 );
-
-}
-
-// cout << "  read_params() -> n_read = " << n_read << '\n';
-
-unsigned char * b = buf;
-
-my_memcpy( &(params.isis),    b, 20);
-my_memcpy( &(params.dplat),   b, 10);
-my_memcpy( &(params.obstype), b, 10);
-
-my_memcpy( &(params.jiter),   b, 4);
-my_memcpy( &(params.nchanl),  b, 4);
-my_memcpy( &(params.npred),   b, 4);
-my_memcpy( &(params.idate),   b, 4);
-my_memcpy( &(params.ireal),   b, 4);
-my_memcpy( &(params.ipchan),  b, 4);
-my_memcpy( &(params.iextra),  b, 4);
-my_memcpy( &(params.jextra),  b, 4);
-
-my_memcpy( &(params.idiag),    b, 4);
-my_memcpy( &(params.angord),   b, 4);
-my_memcpy( &(params.iversion), b, 4);
-my_memcpy( &(params.inewpc),   b, 4);
-
-if ( swap_endian )  {
-
-   shuffle_4( &(params.jiter)  );
-   shuffle_4( &(params.nchanl) );
-   shuffle_4( &(params.npred)  );
-   shuffle_4( &(params.idate)  );
-   shuffle_4( &(params.ireal)  );
-   shuffle_4( &(params.ipchan) );
-   shuffle_4( &(params.iextra) );
-   shuffle_4( &(params.jextra) );
-
-   shuffle_4( &(params.idiag) );
-   shuffle_4( &(params.angord) );
-   shuffle_4( &(params.iversion) );
-   shuffle_4( &(params.inewpc) );
-
-}
-
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void read_channel(int fd, ChannelParams & cp)
-
-{
-
-long long n_read;
-
-n_read = read_fortran_binary(fd, buf, buf_size, rec_pad_length, swap_endian);
-
-if ( n_read != 32 )  {
-
-   mlog << Error << "\n\n  " << program_name << ": failed to read channel info\n\n";
-
-   exit ( 1 );
-
-}
-
-unsigned char * b = buf;
-
-my_memcpy( &(cp.freq),   b, 4);
-my_memcpy( &(cp.plo),    b, 4);
-my_memcpy( &(cp.wave),   b, 4);
-my_memcpy( &(cp.varch),  b, 4);
-my_memcpy( &(cp.tlap),   b, 4);
-my_memcpy( &(cp.iuse),   b, 4);
-my_memcpy( &(cp.nuchan), b, 4);
-my_memcpy( &(cp.ich),    b, 4);
-
-if ( swap_endian )  {
-
-   shuffle_4( &(cp.freq)   );
-   shuffle_4( &(cp.plo)    );
-   shuffle_4( &(cp.wave)   );
-   shuffle_4( &(cp.varch)  );
-   shuffle_4( &(cp.tlap)   );
-   shuffle_4( &(cp.iuse)   );
-   shuffle_4( &(cp.nuchan) );
-   shuffle_4( &(cp.ich)    );
-
-}
-
-
-
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool read_data(int fd, const int n_diag, const int N1, const int N2, float * diag, float * diagchan)
-
-{
-
-const int bytes = (int) ((n_diag + N1*N2)*sizeof(float));
-int n_read;
-const int n12 = N1*N2;
-static int rec_num = 0;
-long long size = 0;
-
-
-size = peek_record_size(fd, rec_pad_length, swap_endian);
-
-if ( size > buf_size )  {
-
-   if ( buf )  { delete [] buf;  buf = 0; }
-
-   buf = new unsigned char [size];
-
-   buf_size = size;
-
-}
-
-n_read = read_fortran_binary(fd, buf, buf_size, rec_pad_length, swap_endian);
-
-if ( n_read == 0 )  return ( false );
-
-if ( n_read != bytes )  {
-
-   mlog << Error << "  " << program_name << ": read_data() -> warning ... expected "
-        << bytes << " bytes, got " << n_read << "\n";
-
-   // exit ( 1 );
-
-}
-
-
-unsigned char * b = buf;
-
-my_memcpy(diag,     b, 4*n_diag);
-my_memcpy(diagchan, b, 4*n12);
-
-if ( swap_endian )  {
-
-   int j;
-
-   for (j=0; j<n_diag; ++j)  shuffle_4(diag + j);
-
-   for (j=0; j<n12; ++j)     shuffle_4(diagchan + j);
-
-}
-
-/*
-int j, k;
-
-for (j=0; j<n_diag; ++j)  {
-
-   cout << rec_num << ' ' << "diag " << (j + 1) << " = " << diag[j] << '\n';
-
-}
-
-
-for (j=0; j<N1; ++j)  {
-
-   k = fortran_two_to_one(N1,  j, channel);
-
-   cout << rec_num << ' ' << "diagbuf[" << j << ", " << channel << "] = " << diagchan[k] << '\n';
-
-}
-
-cout << '\n';
-*/
-
-   //
-   //  done
-   //
-
-++rec_num;
-
-return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void do_row(AsciiTable & table, const int row, const unixtime t0, const int N1, const int N2, const float * diag, const float * diagchan)
+void do_row(AsciiTable & table, const int row, const RadRecord & r)
 
 {
 
@@ -575,23 +245,18 @@ char variable[256];
 
 const char * const       id  = "id";
 
-const double lat             = diag[lat_index - 1];
-const double lon             = diag[lon_index - 1];
-const double elev            = diag[elevation_index - 1];
-const double obs_time        = diag[dtime_index - 1];
+const double lat             = r.diag_data(lat_index - 1);
+const double lon             = r.diag_data(lon_index - 1);
+const double elev            = r.diag_data(elevation_index - 1);
+const double obs_time        = r.diag_data(dtime_index - 1);
 
-const int    obs_offset      = fortran_two_to_one(N1,  btemp_chan_index - 1, channel);
-const int    omg_offset      = fortran_two_to_one(N1, omg_bc_chan_index - 1, channel);
+const double obs_value       = r.diagchan_data( btemp_chan_index - 1, channel);
+const double obs_minus_guess = r.diagchan_data(omg_bc_chan_index - 1, channel);
 
-const int    inv_obs_offset  = fortran_two_to_one(N1, inv_chan_index - 1, channel);
-const int    surf_em_offset  = fortran_two_to_one(N1, surf_em_index  - 1, channel);
+const double inv_obs_error   = r.diagchan_data(inv_chan_index - 1, channel);
+const double surf_em         = r.diagchan_data(surf_em_index  - 1, channel);
 
-const double obs_value       = diagchan[obs_offset];
-const double obs_minus_guess = diagchan[omg_offset];
 const double guess           = obs_value - obs_minus_guess;
-
-const double inv_obs_error   = diagchan[inv_obs_offset];
-const double surf_em         = diagchan[surf_em_offset];
 
 
 // cout << "Obs = "             << obs_value          << '\n';
@@ -606,7 +271,7 @@ snprintf(variable, sizeof(variable), "TB_%02d", channel + 1);
 
 k = nint(3600*obs_time);
 
-unix_to_mdyhms(t0 + k, month, day, year, hour, minute, second);
+unix_to_mdyhms(r.date() + k, month, day, year, hour, minute, second);
 
 snprintf(date_string, sizeof(date_string), "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
 
