@@ -53,9 +53,20 @@ static CommandLine cline;
 
 static const char * const conv_extra_columns [] = {
 
-   "OBS_STYPE",    //  observation subtype
-   "PB_INV_ERR",   //  prepbufr inverse observation error
-   "FIN_INV_ERR",  //  final inverse observation error
+   "OBS_STYPE",    //  observation subtype                 (1)
+   "OBERR_IN",     //  prepbufr inverse observation error  (14)
+   "FIN_INV_ERR",  //  final inverse observation error     (16)
+
+   "OBS_HGT",      //  observation height                  (7)
+   "OBS_TIME",     //  observation time                    (8)
+   "INPUT_QC",     //  input prepbufr qc                   (9)
+
+   "SETUP_QC",     //  setup qc                            (10)
+   "PREP_USE",     //  read_prepbufr usage                 (11)
+   "ANLY_USE",     //  analysis usage                      (12)
+
+   "RWGT",         //  non-linear qc rel weight            (13)
+   "OBERR_ADJ",    //  read_prepbufr inverse obs error     (15)
 
 };
 
@@ -276,6 +287,17 @@ const double final_inv_error = r.rdiag_get_2d(final_inverse_index - 1, j);
 
 const double guess         = r.rdiag_get_guess (j);
 
+const double obs_hgt       = r.rdiag_get_2d(         height_index - 1, j);
+const double obs_time      = r.rdiag_get_2d(      obs_hours_index - 1, j);
+const double input_qc      = r.rdiag_get_2d(       input_qc_index - 1, j);
+
+const double setup_qc      = r.rdiag_get_2d(       setup_qc_index - 1, j);
+const double prep_use      = r.rdiag_get_2d(          usage_index - 1, j);
+const double analy_use     = r.rdiag_get_2d(   analysis_use_index - 1, j);
+
+const double rwgt          = r.rdiag_get_2d(      qc_weight_index - 1, j);
+const double oberr_adj     = r.rdiag_get_2d(read_pb_inverse_index - 1, j);
+
 // cout << pressure << '\n';
 
    //
@@ -360,6 +382,17 @@ table.set_entry(row, col++, stat_na_str);   //  qc value
 table.set_entry(row, col++, obs_subtype);
 table.set_entry(row, col++, pb_inv_error);
 table.set_entry(row, col++, final_inv_error);
+
+table.set_entry(row, col++, obs_hgt);
+table.set_entry(row, col++, obs_time);
+table.set_entry(row, col++, input_qc);
+
+table.set_entry(row, col++, setup_qc);
+table.set_entry(row, col++, prep_use);
+table.set_entry(row, col++, analy_use);
+
+table.set_entry(row, col++, rwgt);
+table.set_entry(row, col++, oberr_adj);
 
    //
    //  done
