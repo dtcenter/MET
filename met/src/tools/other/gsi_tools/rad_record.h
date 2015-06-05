@@ -197,6 +197,9 @@ class RadRecord : public GsiRecord {
       int N1;
       int N2;
 
+      int iextra;
+      int jextra;
+
       unixtime Date;
 
    public:
@@ -210,7 +213,7 @@ class RadRecord : public GsiRecord {
          //  get stuff
          //
 
-      bool has_extra() const;
+      bool has_extra() const;   //  is "extra" data present?
 
       unixtime date() const;
 
@@ -218,9 +221,11 @@ class RadRecord : public GsiRecord {
          //  do stuff
          //
 
-      double diag_data(int) const;            //  zero-based
+      double diag_data     (int)      const;   //  zero-based
 
-      double diagchan_data(int, int) const;   //  zero-based
+      double diagchan_data (int, int) const;   //  zero-based
+
+      double extra_data    (int, int) const;   //  zero-based ... will error out if no "extra" data exists
 
 };
 

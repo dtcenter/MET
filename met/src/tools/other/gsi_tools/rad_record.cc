@@ -192,6 +192,8 @@ Nextra    = 0;
 
 N1 = N2 = 0;
 
+iextra = jextra = 0;
+
 Date = 0;
 
 return;
@@ -245,6 +247,36 @@ if ( (channel < 0) || (channel >= N2) )  {
 const int n = fortran_two_to_one(N1, index, channel);
 
 return ( (double) (diagchan[n]) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double RadRecord::extra_data(int i, int j) const
+
+{
+
+if ( ! extra )  {
+
+   cerr << "\n\n  RadRecord::extra_data(int, int) const -> no \"extra\" data in this record!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( (i < 0) || (i >= iextra) || (j < 0) || (j >= jextra) )  {
+
+   cerr << "\n\n  RadRecord::extra_data(int, int) const -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+const int n = fortran_two_to_one(iextra, i, j);
+
+return ( (double) (extra[n]) );
 
 }
 
@@ -496,6 +528,8 @@ int month, day, year, hour;
 
 read_rad_params();
 
+cout << "\n\n(iextra, jextra) = (" << R_params.iextra << ", " << R_params.jextra << ")\n\n";
+
 k = R_params.idate;   //  YYYYMMDDHH
 
 month = (k/10000)%100;
@@ -593,16 +627,21 @@ if ( n_read != bytes )  {
 
 r.Ndiag     = n_diag;
 r.Ndiagchan = n12;
-r.Nextra    = 0;
+r.Nextra    = (f.R_params.iextra)*(f.R_params.jextra);
 
 r.diag     = (float *) (r.Buf);
 r.diagchan = (float *) (r.Buf + 4*n_diag);
 r.extra    = 0;
 
+if ( r.Nextra > 0 )  r.extra = (float *) (r.Buf + 4*n_diag + 4*n12);
+
 r.N1 = f.N1;
 r.N2 = f.N2;
 
 r.Date = f.Date;
+
+r.iextra = f.R_params.iextra;
+r.jextra = f.R_params.jextra;
 
 if ( f.get_swap_endian() )  {
 
