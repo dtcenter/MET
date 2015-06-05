@@ -603,10 +603,16 @@ bool operator>>(RadFile & f, RadRecord & r)
 
 {
 
-int n_read;
+int n_read, bytes;
 const int n_diag = f.n_diag();
 const int n12    = f.n12();
-const int bytes  = (int) (n_diag + n12)*sizeof(float);
+const int iextra = f.iextra();
+const int jextra = f.jextra();
+
+
+bytes  = (int) (n_diag + n12)*sizeof(float);
+
+if ( f.has_extra() )  bytes += (int) (iextra*jextra)*sizeof(float);
 
 long long s = peek_record_size(f.Fd, f.get_rec_pad_size(), f.get_swap_endian());
 
@@ -627,7 +633,7 @@ if ( n_read != bytes )  {
 
 r.Ndiag     = n_diag;
 r.Ndiagchan = n12;
-r.Nextra    = (f.R_params.iextra)*(f.R_params.jextra);
+r.Nextra    = iextra*jextra;
 
 r.diag     = (float *) (r.Buf);
 r.diagchan = (float *) (r.Buf + 4*n_diag);
