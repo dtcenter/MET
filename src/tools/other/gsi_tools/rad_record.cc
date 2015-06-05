@@ -528,7 +528,7 @@ int month, day, year, hour;
 
 read_rad_params();
 
-cout << "\n\n(iextra, jextra) = (" << R_params.iextra << ", " << R_params.jextra << ")\n\n";
+// cout << "\n\n(iextra, jextra) = (" << R_params.iextra << ", " << R_params.jextra << ")\n\n";
 
 k = R_params.idate;   //  YYYYMMDDHH
 
