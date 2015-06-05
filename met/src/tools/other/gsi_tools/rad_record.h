@@ -129,6 +129,8 @@ class RadFile {
 
       int get_rec_pad_size() const;
 
+      bool has_extra() const;
+
       unixtime date() const;
 
       int n_channels() const;
@@ -137,6 +139,9 @@ class RadFile {
 
       int n1() const;
       int n2() const;
+
+      int iextra() const;
+      int jextra() const;
 
       int n12() const;
 
@@ -165,6 +170,11 @@ inline int RadFile::n1() const { return ( N1 ); }
 inline int RadFile::n2() const { return ( N2 ); }
 
 inline int RadFile::n12() const { return ( N1*N2 ); }
+
+inline int RadFile::iextra() const { return ( R_params.iextra ); }
+inline int RadFile::jextra() const { return ( R_params.jextra ); }
+
+inline bool RadFile::has_extra() const { return ( (R_params.iextra != 0) && (R_params.jextra != 0) ); }
 
 
 ////////////////////////////////////////////////////////////////////////
