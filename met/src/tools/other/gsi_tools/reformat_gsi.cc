@@ -42,6 +42,8 @@ using namespace std;
 #include "read_fortran_binary.h"
 #include "conv_offsets.h"
 #include "conv_record.h"
+#include "rad_offsets.h"
+#include "rad_record.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -89,8 +91,11 @@ static const int n_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_extra_co
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process(const char * conv_filename);
-static void do_row(AsciiTable & table, int row, ConvRecord & r, const int j);
+static void process_conv(const char * conv_filename);
+static void write_mpr_row_conv(AsciiTable & table, int row, ConvRecord & r, const int j);
+
+static void process_rad(const char * rad_filename);
+static void write_mpr_row_rad(AsciiTable & table, int row, RadRecord & r, const int j);
 
 static void usage();
 static void set_channel(const StringArray &);
@@ -130,18 +135,21 @@ int main(int argc, char * argv []) {
 
       if((i%5) == 4) mlog << Debug(1) << "\n";
 
-      process(cline[i]);
+      // Determine file type by the file name
+      if(strstr(get_short_name(cline[i]), "conv") != (char *) 0) {
+         process_conv(cline[i]);
+      }
+      else {
+         process_rad(cline[i]);
+      }
    }
 
-   return ( 0 );
+   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void process(const char * conv_filename)
-
-{
+void process_conv(const char *conv_filename) {
 
    //
    //  open files
@@ -223,7 +231,7 @@ while ( (f >> r) )  {
 
    for (j=0; j<(r.ii); ++j)  {
 
-      do_row(table, row++, r, j);
+      write_mpr_row_conv(table, row++, r, j);
 
    }
 
@@ -245,8 +253,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void do_row(AsciiTable & table, int row, ConvRecord & r, const int j)
+void write_mpr_row_conv(AsciiTable &table, int row, ConvRecord & r, const int j)
 
 {
 
@@ -256,28 +263,28 @@ const char * model = "XXX";
 const ConcatString date_string = r.date_string();
 const ConcatString id          = r.station_name(j);
 
-const double lat       = r.rdiag_get_2d(      lat_index - 1, j);
-const double lon       = r.rdiag_get_2d(      lon_index - 1, j);
-const double pressure  = r.rdiag_get_2d( pressure_index - 1, j);
-const double obs_value = r.rdiag_get_2d( obs_data_index - 1, j);
-const double elevation = r.rdiag_get_2d(elevation_index - 1, j);
+const double lat       = r.rdiag_get_2d(      conv_lat_index - 1, j);
+const double lon       = r.rdiag_get_2d(      conv_lon_index - 1, j);
+const double pressure  = r.rdiag_get_2d( conv_pressure_index - 1, j);
+const double obs_value = r.rdiag_get_2d( conv_obs_data_index - 1, j);
+const double elevation = r.rdiag_get_2d(conv_elevation_index - 1, j);
 
-const double obs_subtype     = r.rdiag_get_2d (  obssubtype_index - 1, j);
-const double pb_inv_error    = r.rdiag_get_2d(   pb_inverse_index - 1, j);
-const double final_inv_error = r.rdiag_get_2d(final_inverse_index - 1, j);
+const double obs_subtype     = r.rdiag_get_2d (  conv_obssubtype_index - 1, j);
+const double pb_inv_error    = r.rdiag_get_2d(   conv_pb_inverse_index - 1, j);
+const double final_inv_error = r.rdiag_get_2d(conv_final_inverse_index - 1, j);
 
 const double guess         = r.rdiag_get_guess (j);
 
-const double obs_hgt       = r.rdiag_get_2d(         height_index - 1, j);
-const double obs_time      = r.rdiag_get_2d(      obs_hours_index - 1, j);
-const double input_qc      = r.rdiag_get_2d(       input_qc_index - 1, j);
+const double obs_hgt       = r.rdiag_get_2d(         conv_height_index - 1, j);
+const double obs_time      = r.rdiag_get_2d(      conv_obs_hours_index - 1, j);
+const double input_qc      = r.rdiag_get_2d(       conv_input_qc_index - 1, j);
 
-const double setup_qc      = r.rdiag_get_2d(       setup_qc_index - 1, j);
-const double prep_use      = r.rdiag_get_2d(          usage_index - 1, j);
-const double analy_use     = r.rdiag_get_2d(   analysis_use_index - 1, j);
+const double setup_qc      = r.rdiag_get_2d(       conv_setup_qc_index - 1, j);
+const double prep_use      = r.rdiag_get_2d(          conv_usage_index - 1, j);
+const double analy_use     = r.rdiag_get_2d(   conv_analysis_use_index - 1, j);
 
-const double rwgt          = r.rdiag_get_2d(      qc_weight_index - 1, j);
-const double oberr_adj     = r.rdiag_get_2d(read_pb_inverse_index - 1, j);
+const double rwgt          = r.rdiag_get_2d(      conv_qc_weight_index - 1, j);
+const double oberr_adj     = r.rdiag_get_2d(conv_read_pb_inverse_index - 1, j);
 
    //
    //  first 21 columns
@@ -381,6 +388,18 @@ return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void process_rad(const char *rad_filename) {
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_mpr_row_rad(AsciiTable &table, int row, RadRecord & r, const int j) {
+   return;
+}
+   
 ////////////////////////////////////////////////////////////////////////
 
 void usage() {

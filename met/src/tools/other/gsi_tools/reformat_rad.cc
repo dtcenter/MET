@@ -245,16 +245,16 @@ char variable[256];
 
 const char * const       id  = "id";
 
-const double lat             = r.diag_data(lat_index - 1);
-const double lon             = r.diag_data(lon_index - 1);
-const double elev            = r.diag_data(elevation_index - 1);
-const double obs_time        = r.diag_data(dtime_index - 1);
+const double lat             = r.diag_data(rad_lat_index - 1);
+const double lon             = r.diag_data(rad_lon_index - 1);
+const double elev            = r.diag_data(rad_elevation_index - 1);
+const double obs_time        = r.diag_data(rad_dtime_index - 1);
 
-const double obs_value       = r.diagchan_data( btemp_chan_index - 1, channel);
-const double obs_minus_guess = r.diagchan_data(omg_bc_chan_index - 1, channel);
+const double obs_value       = r.diagchan_data( rad_btemp_chan_index - 1, channel);
+const double obs_minus_guess = r.diagchan_data(rad_omg_bc_chan_index - 1, channel);
 
-const double inv_obs_error   = r.diagchan_data(inv_chan_index - 1, channel);
-const double surf_em         = r.diagchan_data(surf_em_index  - 1, channel);
+const double inv_obs_error   = r.diagchan_data(rad_inv_chan_index - 1, channel);
+const double surf_em         = r.diagchan_data(rad_surf_em_index  - 1, channel);
 
 const double guess           = obs_value - obs_minus_guess;
 
