@@ -176,8 +176,8 @@ double ConvRecord::rdiag_get_guess(int station) const
 
 double obs, obs_minus_guess;
 
-obs             = rdiag_get_2d(obs_data_index - 1, station);
-obs_minus_guess = rdiag_get_2d(omg_index      - 1, station);
+obs             = rdiag_get_2d(conv_obs_data_index - 1, station);
+obs_minus_guess = rdiag_get_2d(conv_omg_index      - 1, station);
 
 return ( obs - obs_minus_guess );
 
