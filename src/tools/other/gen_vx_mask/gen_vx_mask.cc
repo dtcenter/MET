@@ -87,6 +87,9 @@ void process_command_line(int argc, char **argv) {
    // Check for zero arguments
    if(argc == 1) usage();
 
+   // Initialize the configuration object
+   config.read(replace_path(config_const_filename));
+
    // Parse the command line into tokens
    cline.set(argc, argv);
 
@@ -118,9 +121,6 @@ void process_command_line(int argc, char **argv) {
    mask_filename = cline[1];
    out_filename  = cline[2];
 
-   // Initialize the configuration object
-   config.read(replace_path(config_const_filename));
-   
    // List the input files
    mlog << Debug(1)
         << "Input File:\t\t" << data_filename << "\n"
