@@ -1,14 +1,23 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2015
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-static const int  rec_pad_length =    4;
-static const bool    swap_endian = true;
-
-
+//
+//   Filename:   reformat_gsi.cc
+//
+//   Description:
+//
+//   Mod#   Date      Name            Description
+//   ----   ----      ----            -----------
+//   000    6/9/15    Bullock         New
+//
 ////////////////////////////////////////////////////////////////////////
-
 
 using namespace std;
 
@@ -28,28 +37,34 @@ using namespace std;
 #include "vx_stat_out.h"
 #include "config_constants.h"
 #include "vx_stat_out.h"
+#include "vx_log.h"
 
 #include "read_fortran_binary.h"
 #include "conv_offsets.h"
 #include "conv_record.h"
 
-
+////////////////////////////////////////////////////////////////////////
+//
+// Constants
+//
 ////////////////////////////////////////////////////////////////////////
 
+static const char  *program_name = "reformat_gsi";
+static const int  rec_pad_length =    4;
+static const bool    swap_endian = true;
 
-   //
-   //  Default values for command-line switches
-   //
+////////////////////////////////////////////////////////////////////////
+//
+// Variables for Command Line Arguments
+//
+////////////////////////////////////////////////////////////////////////
 
 static ConcatString output_directory = ".";
-
+static NumArray channel;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-static ConcatString program_name;
-
-static CommandLine cline;
+// JHG, move this section to a header file
 
 static const char * const conv_extra_columns [] = {
 
@@ -72,60 +87,54 @@ static const char * const conv_extra_columns [] = {
 
 static const int n_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_extra_columns);
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-static void usage();
-
-static void set_outdir(const StringArray &);
 
 static void process(const char * conv_filename);
-
 static void do_row(AsciiTable & table, int row, ConvRecord & r, const int j);
 
+static void usage();
+static void set_channel(const StringArray &);
+static void set_outdir(const StringArray &);
+static void set_logfile(const StringArray &);
+static void set_verbosity(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
+int main(int argc, char * argv []) {
+   CommandLine cline;
+   
+   // Parse the command line into tokens
+   cline.set(argc, argv);
+   
+   // Set the usage
+   cline.set_usage(usage);
 
-int main(int argc, char * argv [])
+   // Add options
+   cline.add(set_channel,   "-channel", 1);
+   cline.add(set_outdir,    "-outdir",  1);
+   cline.add(set_logfile,   "-log",     1);
+   cline.add(set_verbosity, "-v",       1);
 
-{
+   // Parse the command line
+   cline.parse();
 
-program_name = get_short_name(argv[0]);
+   // Check for zero files to process
+   if(cline.n() == 0) usage();
 
-cline.set(argc, argv);
+   // Process each remaining argument
+   for (int i=0; i<(cline.n()); i++) {
 
-cline.set_usage(usage);
+      mlog << Debug(1)
+           << "Reading \"" << cline[i] << "\" ... " << (i + 1)
+           << " of " << cline.n() << "\n";
 
-cline.add(set_outdir, "-outdir", 1);
+      if((i%5) == 4) mlog << Debug(1) << "\n";
 
-cline.parse();
+      process(cline[i]);
+   }
 
-
-if ( cline.n() == 0  )  usage();
-
-int j;
-
-for (j=0; j<(cline.n()); ++j)  {
-
-   cout << "Processing \"" << cline[j] << "\" ... " << (j + 1) << " of " << cline.n() << '\n';
-
-   if ( (j%5) == 4 )  cout.put('\n');
-
-   cout.flush();
-
-   process(cline[j]);
-
+   return ( 0 );
 }
-
-
-
-
-return ( 0 );
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -188,6 +197,9 @@ if ( !(f.open(conv_filename)) )  {
 
 }
 
+mlog << Debug(1)
+     << "Writing \"" << output_filename << "\"\n";
+
 out.open(output_filename);
 
 if ( ! out )  {
@@ -231,37 +243,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-void usage()
-
-{
-
-mlog << Error << "\n\n   usage:  " << program_name << " [ -outdir path ] conv_file_list\n\n";
-
-exit ( 1 );
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_outdir(const StringArray & a)
-
-{
-
-output_directory = a[0];
-
-return;
-
-}
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -297,8 +278,6 @@ const double analy_use     = r.rdiag_get_2d(   analysis_use_index - 1, j);
 
 const double rwgt          = r.rdiag_get_2d(      qc_weight_index - 1, j);
 const double oberr_adj     = r.rdiag_get_2d(read_pb_inverse_index - 1, j);
-
-// cout << pressure << '\n';
 
    //
    //  first 21 columns
@@ -402,7 +381,61 @@ return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void usage() {
+
+   cout << "\n*** Model Evaluation Tools (MET" << met_version
+        << ") ***\n\n"
+
+        << "Usage: " << program_name << "\n"
+        << "\tgsi_file1 [gsi_file2 gsi_file3 ... gsi_filen]\n"
+        << "\t[-channel n]\n"
+        << "\t[-outdir path]\n"
+        << "\t[-log file]\n"
+        << "\t[-v level]\n\n"
+
+        << "\twhere\t\"gsi_file\" is a GSI binary file (conventional or "
+        << "radiance) to be reformatted (required).\n"
+        << "\t\t\"-channel n\" overrides the default processing of all "
+        << "radiance channels with a comma-separated list (optional).\n"
+        << "\t\t\"-outdir path\" overrides the default output directory ("
+        << output_directory << ") (optional).\n"
+        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "file (optional).\n"
+        << "\t\t\"-v level\" overrides the default level of logging ("
+        << mlog.verbosity_level() << ") (optional).\n\n"
+        << flush;
+
+   exit (1);
+}
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_channel(const StringArray & a) {
+   channel.add_css(a[0]);
+}
 
+////////////////////////////////////////////////////////////////////////
+
+void set_outdir(const StringArray & a) {
+   output_directory = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_logfile(const StringArray & a) {
+   ConcatString filename;
+
+   filename = a[0];
+
+   mlog.open_log_file(filename);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a) {
+   mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
