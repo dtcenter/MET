@@ -119,8 +119,7 @@ int main(int argc, char *argv[]) {
    //
    // check for zero arguments
    //
-   if (argc == 1)
-      usage();
+   if(argc == 1) usage();
 
    //
    // Initialize the grid bounding box to the whole grid
@@ -162,8 +161,7 @@ int main(int argc, char *argv[]) {
    // netCDF point observation filename and the output PostScript
    // filename.
    //
-   if (cline.n() != 2)
-      usage();
+   if(cline.n() != 2) usage();
 
    //
    // Store the input arguments
