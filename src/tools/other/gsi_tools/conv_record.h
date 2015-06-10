@@ -138,6 +138,8 @@ class ConvRecord : public GsiRecord {
 
       double rdiag_get_guess(int station) const;               //  zero-based
 
+      double rdiag_get_guess_v(int station) const;             //  zero-based
+
 };
 
 

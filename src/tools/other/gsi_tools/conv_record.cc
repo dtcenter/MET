@@ -187,6 +187,23 @@ return ( obs - obs_minus_guess );
 ////////////////////////////////////////////////////////////////////////
 
 
+double ConvRecord::rdiag_get_guess_v(int station) const
+
+{
+
+double obs, obs_minus_guess;
+
+obs             = rdiag_get_2d(conv_obs_v_data_index - 1, station);
+obs_minus_guess = rdiag_get_2d(conv_omg_v_index      - 1, station);
+
+return ( obs - obs_minus_guess );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class ConvFile
    //

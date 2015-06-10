@@ -52,7 +52,7 @@ static void setup_table(AsciiTable &);
 static void process_conv(const char *conv_filename, const char *output_filename);
 static void process_rad (const char *rad_filename, const char *output_filename);
 
-static void write_mpr_row_conv(AsciiTable & at, int row, ConvRecord & r, const int j);
+static void write_mpr_row_conv(AsciiTable & at, int row, ConvRecord & r, const int j, const char *);
 static void write_mpr_row_rad (AsciiTable & at, int row, RadRecord  & r, const int chan);
 
 static void usage();
@@ -89,9 +89,6 @@ int main(int argc, char * argv []) {
    // Check for zero files to process
    if(cline.n() == 0) usage();
    
-   // Initialize output StatHdrColumns
-   setup_header();
-   
    // Process each remaining argument
    for(int i=0; i<(cline.n()); i++) {
 
@@ -103,6 +100,9 @@ int main(int argc, char * argv []) {
       output_filename << cs_erase
                       << output_directory << '/'
                       << get_short_name(cline[i]) << suffix;
+
+      // Initialize output StatHdrColumns
+      setup_header();
 
       // Determine file type by the file name
       if(strstr(get_short_name(cline[i]), "conv") != (char *) 0) {
@@ -291,6 +291,7 @@ void process_conv(const char *conv_filename, const char *output_filename) {
    int n_in, n_out;
    ofstream out;
    AsciiTable at;
+   bool uv_flag;
 
    ConvFile f;
    ConvRecord r;
@@ -325,11 +326,19 @@ void process_conv(const char *conv_filename, const char *output_filename) {
    // Process each record
    n_in  = 0;
    n_out = 1; // 1 for header line
-   while((f >> r)) {
+   while(f >> r) {
 
-      at.add_rows(r.ii);
+      uv_flag = (str_trim(r.variable) == "uv");
+      at.add_rows((uv_flag ? 2 : 1)*r.ii); // double for uv lines
+      
       for (j=0; j<(r.ii); ++j)  {
-         write_mpr_row_conv(at, n_out++, r, j);
+         if(uv_flag) {
+            write_mpr_row_conv(at, n_out++, r, j, "u");
+            write_mpr_row_conv(at, n_out++, r, j, "v");
+         }
+         else {
+            write_mpr_row_conv(at, n_out++, r, j, str_trim(r.variable));
+         }
       }
 
       n_in++;
@@ -409,7 +418,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    // Process each record
    n_in  = 0;
    n_out = 1; // 1 for header line
-   while((f >> r))  {
+   while(f >> r)  {
 
       at.add_rows(do_channel.n_elements());
       for(i=0; i<do_channel.n_elements(); i++) {
@@ -434,32 +443,36 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j) {
+void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
+                        const int j, const char *variable) {
    unixtime ut;
    int col;
 
-   const double lat       = r.rdiag_get_2d(      conv_lat_index - 1, j);
-   const double lon       = r.rdiag_get_2d(      conv_lon_index - 1, j);
-   const double pressure  = r.rdiag_get_2d( conv_pressure_index - 1, j);
-   const double obs_value = r.rdiag_get_2d( conv_obs_data_index - 1, j);
-   const double elevation = r.rdiag_get_2d(conv_elevation_index - 1, j);
+   double lat       = r.rdiag_get_2d(      conv_lat_index - 1, j);
+   double lon       = r.rdiag_get_2d(      conv_lon_index - 1, j);
+   double pressure  = r.rdiag_get_2d( conv_pressure_index - 1, j);
+   double obs_value = (strcmp(variable, "v") == 0 ?
+                      r.rdiag_get_2d(conv_obs_v_data_index - 1, j) :
+                      r.rdiag_get_2d(conv_obs_data_index   - 1, j));
+   double elevation = r.rdiag_get_2d(conv_elevation_index  - 1, j);
 
-   const double obs_subtype     = r.rdiag_get_2d (  conv_obssubtype_index - 1, j);
-   const double pb_inv_error    = r.rdiag_get_2d(   conv_pb_inverse_index - 1, j);
-   const double final_inv_error = r.rdiag_get_2d(conv_final_inverse_index - 1, j);
+   ConcatString obs_subtype = nint(r.rdiag_get_2d (  conv_obssubtype_index - 1, j));
+   double pb_inv_error      = r.rdiag_get_2d(   conv_pb_inverse_index - 1, j);
+   double final_inv_error   = r.rdiag_get_2d(conv_final_inverse_index - 1, j);
 
-   const double guess         = r.rdiag_get_guess (j);
+   double guess    = (strcmp(variable, "v") == 0 ?
+                      r.rdiag_get_guess_v(j) : r.rdiag_get_guess(j));
 
-   const double obs_hgt       = r.rdiag_get_2d(         conv_height_index - 1, j);
-   const double obs_time      = r.rdiag_get_2d(      conv_obs_hours_index - 1, j);
-   const double input_qc      = r.rdiag_get_2d(       conv_input_qc_index - 1, j);
+   int    obs_hgt  = nint(r.rdiag_get_2d(         conv_height_index - 1, j));
+   double obs_time = r.rdiag_get_2d(      conv_obs_hours_index - 1, j);
+   int    obs_qc   = nint(r.rdiag_get_2d(       conv_input_qc_index - 1, j));
 
-   const double setup_qc      = r.rdiag_get_2d(       conv_setup_qc_index - 1, j);
-   const double prep_use      = r.rdiag_get_2d(          conv_usage_index - 1, j);
-   const double analy_use     = r.rdiag_get_2d(   conv_analysis_use_index - 1, j);
+   int    setup_qc  = nint(r.rdiag_get_2d(       conv_setup_qc_index - 1, j));
+   int    prep_use  = nint(r.rdiag_get_2d(          conv_usage_index - 1, j));
+   int    analy_use = nint(r.rdiag_get_2d(   conv_analysis_use_index - 1, j));
 
-   const double rwgt          = r.rdiag_get_2d(      conv_qc_weight_index - 1, j);
-   const double oberr_adj     = r.rdiag_get_2d(conv_read_pb_inverse_index - 1, j);
+   double qc_wght   = r.rdiag_get_2d(      conv_qc_weight_index - 1, j);
+   double oberr_adj = r.rdiag_get_2d(conv_read_pb_inverse_index - 1, j);
 
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date);
@@ -467,8 +480,18 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j) {
    ut = nint(r.date + (obs_time * sec_per_hour));
    if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(ut);
    if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(ut);
-   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(str_trim(r.variable));
-   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(str_trim(r.variable));
+   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(variable);
+   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(variable);
+   if(!hdr_name.has("OBTYPE"))         shc.set_obtype(obs_subtype);
+
+   // Range check the height
+   if(obs_hgt < 0) obs_hgt = bad_data_int;
+   
+   // Range check setup_qc
+   if(setup_qc == bad_setup_qc) setup_qc = bad_data_int;
+
+   // Set pressure for precipitable water to bad data
+   if(variable == "pw") pressure = bad_data_double;
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -487,23 +510,20 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j) {
    at.set_entry(row, col++, guess);             // FCST
    at.set_entry(row, col++, obs_value);         // OBS
    at.set_entry(row, col++, na_str);            // CLIMO
-   at.set_entry(row, col++, na_str);            // OBS_QC
+   at.set_entry(row, col++, obs_qc);            // OBS_QC
 
    // Write extra columns
-   at.set_entry(row, col++, obs_subtype);       // OBS_STYPE
-   at.set_entry(row, col++, pb_inv_error);      // OBERR_IN
-   at.set_entry(row, col++, final_inv_error);   // FIN_INV_ERR
-
    at.set_entry(row, col++, obs_hgt);           // OBS_HGT
-   at.set_entry(row, col++, obs_time);          // OBS_TIME
-   at.set_entry(row, col++, input_qc);          // INPUT_QC
 
-   at.set_entry(row, col++, setup_qc);          // SETUP_QC
+   at.set_entry(row, col++, pb_inv_error);      // OBS_ERR_IN
+   at.set_entry(row, col++, oberr_adj);         // OBS_ERR_ADJ
+   at.set_entry(row, col++, final_inv_error);   // OBS_ERR_FIN
+
    at.set_entry(row, col++, prep_use);          // PREP_USE
    at.set_entry(row, col++, analy_use);         // ANLY_USE
 
-   at.set_entry(row, col++, rwgt);              // RWGT
-   at.set_entry(row, col++, oberr_adj);         // OBERR_ADJ
+   at.set_entry(row, col++, setup_qc);          // SETUP_QC
+   at.set_entry(row, col++, qc_wght);           // QC_WGHT
 
    return;
 }
@@ -511,9 +531,9 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int chan) {
-   int col;
    ConcatString variable;
    unixtime ut;
+   int col;
 
    const double lat             = r.diag_data(rad_lat_index - 1);
    const double lon             = r.diag_data(rad_lon_index - 1);
@@ -581,8 +601,8 @@ void usage() {
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"gsi_file\" is a GSI binary file (conventional or "
-        << "radiance) to be reformatted (required).\n"
+        << "\twhere\t\"gsi_file\" is a binary GSI diagnostic file "
+        << "(conventional or radiance) to be reformatted (required).\n"
         << "\t\t\"-channel n\" overrides the default processing of all "
         << "radiance channels with a comma-separated list (optional).\n"
         << "\t\t\"-set_hdr col_name value\" specifies what should be "

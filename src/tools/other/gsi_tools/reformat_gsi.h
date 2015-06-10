@@ -37,6 +37,7 @@ using namespace std;
 static const char *program_name = "reformat_gsi";
 static const int   rec_pad_length = 4;
 static const bool  swap_endian = true;
+static const int   bad_setup_qc = -999;
 
 // Defaults for output header
 static const char  *default_model       = "GSI";
@@ -53,20 +54,17 @@ static const char  *default_line_type   = "MPR";
 ////////////////////////////////////////////////////////////////////////
 
 static const char *conv_extra_columns [] = {
-   "OBS_STYPE",    //  observation subtype                 (1)
-   "OBERR_IN",     //  prepbufr inverse observation error  (14)
-   "FIN_INV_ERR",  //  final inverse observation error     (16)
-
    "OBS_HGT",      //  observation height                  (7)
-   "OBS_TIME",     //  observation time                    (8)
-   "INPUT_QC",     //  input prepbufr qc                   (9)
 
-   "SETUP_QC",     //  setup qc                            (10)
+   "OBS_ERR_IN",   //  prepbufr inverse observation error  (14)
+   "OBS_ERR_ADJ",  //  read_prepbufr inverse obs error     (15)
+   "OBS_ERR_FIN",  //  final inverse observation error     (16)
+
    "PREP_USE",     //  read_prepbufr usage                 (11)
    "ANLY_USE",     //  analysis usage                      (12)
 
-   "RWGT",         //  non-linear qc rel weight            (13)
-   "OBERR_ADJ",    //  read_prepbufr inverse obs error     (15)
+   "SETUP_QC",     //  setup qc                            (10)
+   "QC_WGHT"       //  non-linear qc rel weight            (13)
 };
 
 static const int n_conv_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_extra_columns);
