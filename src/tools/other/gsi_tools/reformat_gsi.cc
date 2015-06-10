@@ -448,31 +448,32 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
    unixtime ut;
    int col;
 
-   double lat       = r.rdiag_get_2d(      conv_lat_index - 1, j);
-   double lon       = r.rdiag_get_2d(      conv_lon_index - 1, j);
-   double pressure  = r.rdiag_get_2d( conv_pressure_index - 1, j);
+   double lat       = r.rdiag_get_2d(conv_lat_index        - 1, j);
+   double lon       = r.rdiag_get_2d(conv_lon_index        - 1, j);
+   double pressure  = r.rdiag_get_2d(conv_pressure_index   - 1, j);
    double obs_value = (strcmp(variable, "v") == 0 ?
                       r.rdiag_get_2d(conv_obs_v_data_index - 1, j) :
                       r.rdiag_get_2d(conv_obs_data_index   - 1, j));
    double elevation = r.rdiag_get_2d(conv_elevation_index  - 1, j);
 
-   ConcatString obs_subtype = nint(r.rdiag_get_2d (  conv_obssubtype_index - 1, j));
-   double pb_inv_error      = r.rdiag_get_2d(   conv_pb_inverse_index - 1, j);
-   double final_inv_error   = r.rdiag_get_2d(conv_final_inverse_index - 1, j);
+   ConcatString obs_subtype = nint(r.rdiag_get_2d(conv_obssubtype_index    - 1, j));
+   double pb_inv_error      =      r.rdiag_get_2d(conv_pb_inverse_index    - 1, j);
+   double final_inv_error   =      r.rdiag_get_2d(conv_final_inverse_index - 1, j);
 
    double guess    = (strcmp(variable, "v") == 0 ?
-                      r.rdiag_get_guess_v(j) : r.rdiag_get_guess(j));
+                          r.rdiag_get_guess_v(j) :
+                          r.rdiag_get_guess(j));
 
-   int    obs_hgt  = nint(r.rdiag_get_2d(         conv_height_index - 1, j));
-   double obs_time = r.rdiag_get_2d(      conv_obs_hours_index - 1, j);
-   int    obs_qc   = nint(r.rdiag_get_2d(       conv_input_qc_index - 1, j));
+   int    obs_hgt  = nint(r.rdiag_get_2d(conv_height_index    - 1, j));
+   double obs_time =      r.rdiag_get_2d(conv_obs_hours_index - 1, j);
+   int    obs_qc   = nint(r.rdiag_get_2d(conv_input_qc_index  - 1, j));
 
-   int    setup_qc  = nint(r.rdiag_get_2d(       conv_setup_qc_index - 1, j));
-   int    prep_use  = nint(r.rdiag_get_2d(          conv_usage_index - 1, j));
-   int    analy_use = nint(r.rdiag_get_2d(   conv_analysis_use_index - 1, j));
+   int    setup_qc  = nint(r.rdiag_get_2d(conv_setup_qc_index     - 1, j));
+   int    prep_use  = nint(r.rdiag_get_2d(conv_usage_index        - 1, j));
+   int    analy_use = nint(r.rdiag_get_2d(conv_analysis_use_index - 1, j));
 
-   double qc_wght   = r.rdiag_get_2d(      conv_qc_weight_index - 1, j);
-   double oberr_adj = r.rdiag_get_2d(conv_read_pb_inverse_index - 1, j);
+   double qc_wght   =      r.rdiag_get_2d(conv_qc_weight_index       - 1, j);
+   double oberr_adj =      r.rdiag_get_2d(conv_read_pb_inverse_index - 1, j);
 
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date);
@@ -491,7 +492,7 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
    if(setup_qc == bad_setup_qc) setup_qc = bad_data_int;
 
    // Set pressure for precipitable water to bad data
-   if(variable == "pw") pressure = bad_data_double;
+   if(strcmp(variable, "pw") == 0) pressure = bad_data_double;
 
    // Write header columns
    write_header_cols(shc, at, row);
