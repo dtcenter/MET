@@ -54,7 +54,8 @@ reformat_rad_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm
 	
-reformat_gsi_SOURCES = gsi_record.h \
+reformat_gsi_SOURCES = reformatn_gsi.h \
+        gsi_record.h \
 	gsi_record.cc \
 	conv_record.h \
 	conv_record.cc \
@@ -69,10 +70,12 @@ reformat_gsi_SOURCES = gsi_record.h \
 reformat_gsi_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_gsi_LDFLAGS = ${MET_LDFLAGS}
 reformat_gsi_LDADD = -lvx_stat_out \
-	-lvx_color \
+	-lvx_statistics \
+	-lvx_gsl_prob \
 	-lvx_config \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
+	-lvx_color \
 	-lvx_log \
-	-lm
+	-lm -lgsl -lgslcblas
