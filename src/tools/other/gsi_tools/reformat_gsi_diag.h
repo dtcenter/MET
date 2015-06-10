@@ -8,7 +8,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   reformat_gsi.h
+//   Filename:   reformat_gsi_diag.h
 //
 //   Description:
 //
@@ -34,7 +34,7 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char *program_name = "reformat_gsi";
+static const char *program_name = "reformat_gsi_diag";
 static const int   rec_pad_length = 4;
 static const bool  swap_endian = true;
 static const int   bad_setup_qc = -999;

@@ -12,7 +12,7 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = reformat_conv \
                   reformat_rad  \
-                  reformat_gsi
+                  reformat_gsi_diag
 
 
 reformat_conv_SOURCES = gsi_record.h \
@@ -54,22 +54,22 @@ reformat_rad_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm
 	
-reformat_gsi_SOURCES = reformatn_gsi.h \
+reformat_gsi_diag_SOURCES = reformat_gsi_diag.h \
         gsi_record.h \
 	gsi_record.cc \
 	conv_record.h \
 	conv_record.cc \
 	rad_record.h \
 	rad_record.cc \
-	reformat_gsi.cc \
+	reformat_gsi_diag.cc \
 	conv_offsets.h \
 	rad_offsets.h \
 	rad_config.h  \
 	rad_config.cc \
 	ftto.h
-reformat_gsi_CPPFLAGS = ${MET_CPPFLAGS}
-reformat_gsi_LDFLAGS = ${MET_LDFLAGS}
-reformat_gsi_LDADD = -lvx_stat_out \
+reformat_gsi_diag_CPPFLAGS = ${MET_CPPFLAGS}
+reformat_gsi_diag_LDFLAGS = ${MET_LDFLAGS}
+reformat_gsi_diag_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_gsl_prob \
 	-lvx_config \
