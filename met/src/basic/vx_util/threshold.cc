@@ -384,6 +384,10 @@ op = thresh_na;
 
 T = 0.0;
 
+s = na_str;
+
+abbr_s = na_str;
+
 return;
 
 }
