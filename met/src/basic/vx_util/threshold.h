@@ -234,9 +234,9 @@ class SingleThresh {
 
 // inline double     SingleThresh::get_thresh() const { return(thresh); }
 
-inline ThreshType SingleThresh::get_type()   const { return ( node ? node->type() : no_thresh_type );   }
+inline ThreshType SingleThresh::get_type()   const { return ( node ? node->type() : thresh_na );   }
 
-inline bool       SingleThresh::check(double __x__) const { return ( node->check(__x__) ); }
+inline bool       SingleThresh::check(double __x__) const { return ( node ? node->check(__x__) : true ); }
 
 
 ////////////////////////////////////////////////////////////////////////
