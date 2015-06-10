@@ -39,6 +39,9 @@ static const int conv_obs_data_index        = 17;    // observation
 static const int conv_omg_index             = 18;    // obs-ges used in analysis (K)
 static const int conv_omg_no_bias_index     = 19;    // obs-ges w/o bias correction (K) (future slot)
 
+static const int conv_obs_v_data_index      = 20;    // v-wind observation
+static const int conv_omg_v_index           = 21;    // v-wind obs-ges using in analysis
+
 
 ////////////////////////////////////////////////////////////////////////
 
