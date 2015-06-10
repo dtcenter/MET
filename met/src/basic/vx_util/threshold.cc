@@ -593,7 +593,7 @@ char test_type[3], test_abbr[3];
    // Check for bad data
    //
 
-if(strcmp(str, na_str ) == 0 || strcmp(str, bad_data_str) == 0) {
+if(strcmp(str, na_str) == 0 || strcmp(str, bad_data_str) == 0) {
 
    set_na();
 
