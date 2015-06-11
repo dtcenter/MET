@@ -53,7 +53,7 @@ static void process_conv(const char *conv_filename, const char *output_filename)
 static void process_rad (const char *rad_filename, const char *output_filename);
 
 static void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j, const char *var);
-static void write_mpr_row_rad (AsciiTable &at, int row, RadRecord  & r, const int j);
+static void write_mpr_row_rad (AsciiTable &at, int row, RadRecord  & r, const int j, const int use);
 
 static void usage();
 static void set_channel(const StringArray &);
@@ -422,7 +422,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 
       at.add_rows(do_channel.n_elements());
       for(i=0; i<do_channel.n_elements(); i++) {
-         write_mpr_row_rad(at, n_out++, r, do_channel[i]-1);
+         write_mpr_row_rad(at, n_out++, r, do_channel[i]-1, f.use_channel(do_channel[i]-1));
       }
 
       n_in++;
@@ -532,7 +532,7 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j) {
+void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, const int use) {
    ConcatString var;
    int col;
 
@@ -545,7 +545,7 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j) {
 
    double obs        =       r.diagchan_data(rad_btemp_chan_index  - 1, j);
    double guess      = obs - r.diagchan_data(rad_omg_bc_chan_index - 1, j);
-   int    obs_qc     =  nint(r.diagchan_data(rad_qc_mark_index     - 1, j));
+   int    obs_qc     =  nint(r.diagchan_data(rad_qc_mark_index     - 1, j)) * use;
 
    var.format("TB_%02d", j + 1);
 
@@ -577,6 +577,7 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j) {
    at.set_entry(row, col++, obs_qc);            // OBS_QC
 
    // Write extra columns
+   at.set_entry(row, col++,                                                  use);   // CHAN_USE
    at.set_entry(row, col++,  nint(r.diag_data(rad_scanpos_index            - 1)));   // SCAN_POS
    at.set_entry(row, col++,       r.diag_data(rad_sat_zenith_index         - 1));    // SAT_ZNTH
    at.set_entry(row, col++,       r.diag_data(rad_sat_azimuth_index        - 1));    // SAT_AZMTH
@@ -616,9 +617,9 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j) {
    at.set_entry(row, col++,       r.diagchan_data(rad_surf_em_index        - 1, j)); // SFC_EMIS
    at.set_entry(row, col++,       r.diagchan_data(rad_stability_index      - 1, j)); // STABILITY
 
-   at.set_entry(row, col++,      (r.has_extra() ?                                    // PRS
-                                  r.diagchan_data(rad_extra_prs_index      - 1, j) :
-                                  bad_data_double));
+   double prs = (r.has_extra() ?  r.diagchan_data(rad_extra_prs_index      - 1, j) : bad_data_double);
+   if(prs > 1.0E8) prs = bad_data_double;
+   at.set_entry(row, col++, prs);                                                    // PRS
    
    return;
 }
