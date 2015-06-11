@@ -52,8 +52,8 @@ static void setup_table(AsciiTable &);
 static void process_conv(const char *conv_filename, const char *output_filename);
 static void process_rad (const char *rad_filename, const char *output_filename);
 
-static void write_mpr_row_conv(AsciiTable & at, int row, ConvRecord & r, const int j, const char *var);
-static void write_mpr_row_rad (AsciiTable & at, int row, RadRecord  & r, const int chan);
+static void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j, const char *var);
+static void write_mpr_row_rad (AsciiTable &at, int row, RadRecord  & r, const int j);
 
 static void usage();
 static void set_channel(const StringArray &);
@@ -446,22 +446,24 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
                         const int j, const char *var) {
    int col;
+   ConcatString obtype;
 
    double lat = r.rdiag_get_2d(conv_lat_index         - 1, j);
    double lon = r.rdiag_get_2d(conv_lon_index         - 1, j);
    double prs = r.rdiag_get_2d(conv_pressure_index    - 1, j);
    double elv = r.rdiag_get_2d(conv_elevation_index   - 1, j);
 
-   ConcatString obtype   = nint(r.rdiag_get_2d(conv_obssubtype_index - 1, j));
-   double       otime    =      r.rdiag_get_2d(conv_obs_hours_index  - 1, j);
-   unixtime     valid_ut = nint(r.date + (otime * sec_per_hour));
+   obtype << cs_erase << nint(r.rdiag_get_2d(conv_obssubtype_index - 1, j));
 
-   double guess = (strcmp(var, "v") == 0 ?
-                  r.rdiag_get_guess_v(j) :
-                  r.rdiag_get_guess(j));
+   double       otime  =      r.rdiag_get_2d(conv_obs_hours_index - 1, j);
+   unixtime     obs_ut = nint(r.date + (otime * sec_per_hour));
+
    double obs   = (strcmp(var, "v") == 0 ?
                   r.rdiag_get_2d(conv_obs_v_data_index - 1, j) :
                   r.rdiag_get_2d(conv_obs_data_index   - 1, j));
+   double guess = (strcmp(var, "v") == 0 ?
+                  r.rdiag_get_guess_v(j) :
+                  r.rdiag_get_guess(j));
 
    int    obs_qc = nint(r.rdiag_get_2d(conv_input_qc_index  - 1, j));
    int    hgt    = nint(r.rdiag_get_2d(conv_height_index    - 1, j));
@@ -478,8 +480,8 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date);
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(r.date);
-   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(valid_ut);
-   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(valid_ut);
+   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(obs_ut);
+   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(obs_ut);
    if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(var);
    if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(var);
    if(!hdr_name.has("OBTYPE"))         shc.set_obtype(obtype);
@@ -530,7 +532,7 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int chan) {
+void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j) {
    ConcatString var;
    int col;
 
@@ -538,22 +540,20 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int chan) {
    double lon = r.diag_data(rad_lon_index       - 1);
    double elv = r.diag_data(rad_elevation_index - 1);
    
-   double   otime    =      r.diag_data(rad_dtime_index - 1);
-   unixtime valid_ut = nint(r.date() + (otime * sec_per_hour));   
+   double   otime  =      r.diag_data(rad_dtime_index - 1);
+   unixtime obs_ut = nint(r.date() + (otime * sec_per_hour));   
 
-   double obs   =       r.diagchan_data( rad_btemp_chan_index - 1, chan);
-   double guess = obs - r.diagchan_data(rad_omg_bc_chan_index - 1, chan);
+   double obs        =       r.diagchan_data(rad_btemp_chan_index  - 1, j);
+   double guess      = obs - r.diagchan_data(rad_omg_bc_chan_index - 1, j);
+   int    obs_qc     =  nint(r.diagchan_data(rad_qc_mark_index     - 1, j));
 
-   double err_in  = r.diagchan_data(rad_inv_chan_index - 1, chan);
-   double surf_em = r.diagchan_data(rad_surf_em_index  - 1, chan);
-
-   var.format("TB_%02d", chan + 1);
+   var.format("TB_%02d", j + 1);
 
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date());
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(r.date());
-   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(valid_ut);
-   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(valid_ut);
+   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(obs_ut);
+   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(obs_ut);
    if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(var);
    if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(var);
 
@@ -574,15 +574,55 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int chan) {
    at.set_entry(row, col++, guess);             // FCST
    at.set_entry(row, col++, obs);               // OBS
    at.set_entry(row, col++, na_str);            // CLIMO
-   at.set_entry(row, col++, na_str);            // OBS_QC
+   at.set_entry(row, col++, obs_qc);            // OBS_QC
 
    // Write extra columns
-   at.set_entry(row, col++, err_in);            // ERR_IN
-   at.set_entry(row, col++, surf_em);           // SURF_EMIS
+   at.set_entry(row, col++,  nint(r.diag_data(rad_scanpos_index            - 1)));   // SCAN_POS
+   at.set_entry(row, col++,       r.diag_data(rad_sat_zenith_index         - 1));    // SAT_ZNTH
+   at.set_entry(row, col++,       r.diag_data(rad_sat_azimuth_index        - 1));    // SAT_AZMTH
 
+   at.set_entry(row, col++,       r.diag_data(rad_sun_zenith_index         - 1));    // SUN_ZNTH
+   at.set_entry(row, col++,       r.diag_data(rad_sun_azimuth_index        - 1));    // SUN_AZMTH
+   at.set_entry(row, col++,       r.diag_data(rad_glint_index              - 1));    // SUN_GLNT
+
+   at.set_entry(row, col++,       r.diag_data(rad_water_frac_index         - 1));    // FRAC_WTR
+   at.set_entry(row, col++,       r.diag_data(rad_land_frac_index          - 1));    // FRAC_LND
+   at.set_entry(row, col++,       r.diag_data(rad_ice_frac_index           - 1));    // FRAC_ICE
+   at.set_entry(row, col++,       r.diag_data(rad_snow_frac_index          - 1));    // FRAC_SNW
+
+   at.set_entry(row, col++,       r.diag_data(rad_water_temp_index         - 1));    // SFC_TWTR
+   at.set_entry(row, col++,       r.diag_data(rad_land_temp_index          - 1));    // SFC_TLND
+   at.set_entry(row, col++,       r.diag_data(rad_ice_temp_index           - 1));    // SFC_TICE
+   at.set_entry(row, col++,       r.diag_data(rad_snow_temp_index          - 1));    // SFC_TSNW
+
+   at.set_entry(row, col++,       r.diag_data(rad_soil_temp_index          - 1));    // TSOIL
+   at.set_entry(row, col++,       r.diag_data(rad_soil_moisture_index      - 1));    // SOILM
+
+   at.set_entry(row, col++,  nint(r.diag_data(rad_land_type_index          - 1)));   // LAND_TYPE
+   at.set_entry(row, col++,       r.diag_data(rad_veg_frac_index           - 1));    // FRAC_VEG
+   at.set_entry(row, col++,       r.diag_data(rad_snow_depth_index         - 1));    // SNW_DPTH
+   at.set_entry(row, col++,       r.diag_data(rad_wind_speed_index         - 1));    // SFC_WIND
+
+   at.set_entry(row, col++,       r.diag_data(rad_cloud_frac_index         - 1));    // FRAC_CLD
+   at.set_entry(row, col++,       r.diag_data(rad_cloud_top_pressure_index - 1));    // CTOP_PRS
+
+   at.set_entry(row, col++,       r.diag_data(rad_itref_index              - 1));    // ITREF
+   at.set_entry(row, col++,       r.diag_data(rad_idtw_index               - 1));    // IDTW
+   at.set_entry(row, col++,       r.diag_data(rad_idtc_index               - 1));    // IDTC
+   at.set_entry(row, col++,       r.diag_data(rad_itz_tr_index             - 1));    // ITZ_TR
+   
+   at.set_entry(row, col++,       r.diagchan_data(rad_inv_chan_index       - 1, j)); // OBS_ERR
+   at.set_entry(row, col++, obs - r.diagchan_data(rad_omg_nobc_chan_index  - 1, j)); // FCST_NOBC
+   at.set_entry(row, col++,       r.diagchan_data(rad_surf_em_index        - 1, j)); // SFC_EMIS
+   at.set_entry(row, col++,       r.diagchan_data(rad_stability_index      - 1, j)); // STABILITY
+
+   at.set_entry(row, col++,      (r.has_extra() ?                                    // PRS
+                                  r.diagchan_data(rad_extra_prs_index      - 1, j) :
+                                  bad_data_double));
+   
    return;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
 
 void usage() {

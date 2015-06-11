@@ -223,6 +223,9 @@ class RadRecord : public GsiRecord {
          //  get stuff
          //
 
+      int n1() const;
+      int n2() const;
+
       bool has_extra() const;   //  is "extra" data present?
 
       unixtime date() const;
@@ -242,6 +245,8 @@ class RadRecord : public GsiRecord {
 
 ////////////////////////////////////////////////////////////////////////
 
+inline int RadRecord::n1() const { return ( N1 ); }
+inline int RadRecord::n2() const { return ( N2 ); }
 
 inline bool RadRecord::has_extra() const { return ( extra != 0 ); }
 
