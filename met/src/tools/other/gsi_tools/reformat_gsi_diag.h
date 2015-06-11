@@ -54,17 +54,17 @@ static const char  *default_line_type   = "MPR";
 ////////////////////////////////////////////////////////////////////////
 
 static const char *conv_extra_columns [] = {
-   "OBS_HGT",      //  observation height                  (7)
+   "OBS_HGT",      // observation height                  (7)
 
-   "OBS_ERR_IN",   //  prepbufr inverse observation error  (14)
-   "OBS_ERR_ADJ",  //  read_prepbufr inverse obs error     (15)
-   "OBS_ERR_FIN",  //  final inverse observation error     (16)
+   "OBS_ERR_IN",   // prepbufr inverse observation error  (14)
+   "OBS_ERR_ADJ",  // read_prepbufr inverse obs error     (15)
+   "OBS_ERR_FIN",  // final inverse observation error     (16)
 
-   "PREP_USE",     //  read_prepbufr usage                 (11)
-   "ANLY_USE",     //  analysis usage                      (12)
+   "PREP_USE",     // read_prepbufr usage                 (11)
+   "ANLY_USE",     // analysis usage                      (12)
 
-   "SETUP_QC",     //  setup qc                            (10)
-   "QC_WGHT"       //  non-linear qc rel weight            (13)
+   "SETUP_QC",     // setup qc                            (10)
+   "QC_WGHT"       // non-linear qc rel weight            (13)
 };
 
 static const int n_conv_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_extra_columns);
@@ -72,8 +72,8 @@ static const int n_conv_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_ext
 ////////////////////////////////////////////////////////////////////////
 
 static const char * rad_extra_columns [] = {
-   "INV_OBS_ERR",   //  inverse observation error
-   "SURF_EMIS",     //  surface emissivity
+   "OBS_ERR_IN",    // inverse observation error
+   "SURF_EMIS",     // surface emissivity
 };
 
 static const int n_rad_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);

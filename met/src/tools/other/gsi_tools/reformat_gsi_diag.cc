@@ -52,7 +52,7 @@ static void setup_table(AsciiTable &);
 static void process_conv(const char *conv_filename, const char *output_filename);
 static void process_rad (const char *rad_filename, const char *output_filename);
 
-static void write_mpr_row_conv(AsciiTable & at, int row, ConvRecord & r, const int j, const char *);
+static void write_mpr_row_conv(AsciiTable & at, int row, ConvRecord & r, const int j, const char *var);
 static void write_mpr_row_rad (AsciiTable & at, int row, RadRecord  & r, const int chan);
 
 static void usage();
@@ -444,55 +444,54 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
-                        const int j, const char *variable) {
-   unixtime ut;
+                        const int j, const char *var) {
    int col;
 
-   double lat       = r.rdiag_get_2d(conv_lat_index        - 1, j);
-   double lon       = r.rdiag_get_2d(conv_lon_index        - 1, j);
-   double pressure  = r.rdiag_get_2d(conv_pressure_index   - 1, j);
-   double obs_value = (strcmp(variable, "v") == 0 ?
-                      r.rdiag_get_2d(conv_obs_v_data_index - 1, j) :
-                      r.rdiag_get_2d(conv_obs_data_index   - 1, j));
-   double elevation = r.rdiag_get_2d(conv_elevation_index  - 1, j);
+   double lat = r.rdiag_get_2d(conv_lat_index         - 1, j);
+   double lon = r.rdiag_get_2d(conv_lon_index         - 1, j);
+   double prs = r.rdiag_get_2d(conv_pressure_index    - 1, j);
+   double elv = r.rdiag_get_2d(conv_elevation_index   - 1, j);
 
-   ConcatString obs_subtype = nint(r.rdiag_get_2d(conv_obssubtype_index    - 1, j));
-   double pb_inv_error      =      r.rdiag_get_2d(conv_pb_inverse_index    - 1, j);
-   double final_inv_error   =      r.rdiag_get_2d(conv_final_inverse_index - 1, j);
+   ConcatString obtype   = nint(r.rdiag_get_2d(conv_obssubtype_index - 1, j));
+   double       otime    =      r.rdiag_get_2d(conv_obs_hours_index  - 1, j);
+   unixtime     valid_ut = nint(r.date + (otime * sec_per_hour));
 
-   double guess    = (strcmp(variable, "v") == 0 ?
-                          r.rdiag_get_guess_v(j) :
-                          r.rdiag_get_guess(j));
+   double guess = (strcmp(var, "v") == 0 ?
+                  r.rdiag_get_guess_v(j) :
+                  r.rdiag_get_guess(j));
+   double obs   = (strcmp(var, "v") == 0 ?
+                  r.rdiag_get_2d(conv_obs_v_data_index - 1, j) :
+                  r.rdiag_get_2d(conv_obs_data_index   - 1, j));
 
-   int    obs_hgt  = nint(r.rdiag_get_2d(conv_height_index    - 1, j));
-   double obs_time =      r.rdiag_get_2d(conv_obs_hours_index - 1, j);
-   int    obs_qc   = nint(r.rdiag_get_2d(conv_input_qc_index  - 1, j));
+   int    obs_qc = nint(r.rdiag_get_2d(conv_input_qc_index  - 1, j));
+   int    hgt    = nint(r.rdiag_get_2d(conv_height_index    - 1, j));
 
-   int    setup_qc  = nint(r.rdiag_get_2d(conv_setup_qc_index     - 1, j));
+   double err_in  = r.rdiag_get_2d(conv_pb_inverse_index      - 1, j);
+   double err_adj = r.rdiag_get_2d(conv_read_pb_inverse_index - 1, j);
+   double err_fin = r.rdiag_get_2d(conv_final_inverse_index   - 1, j);
+
    int    prep_use  = nint(r.rdiag_get_2d(conv_usage_index        - 1, j));
    int    analy_use = nint(r.rdiag_get_2d(conv_analysis_use_index - 1, j));
-
-   double qc_wght   =      r.rdiag_get_2d(conv_qc_weight_index       - 1, j);
-   double oberr_adj =      r.rdiag_get_2d(conv_read_pb_inverse_index - 1, j);
+   int    setup_qc  = nint(r.rdiag_get_2d(conv_setup_qc_index     - 1, j));
+   double qc_wght   =      r.rdiag_get_2d(conv_qc_weight_index    - 1, j);
 
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date);
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(r.date);
-   ut = nint(r.date + (obs_time * sec_per_hour));
-   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(ut);
-   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(ut);
-   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(variable);
-   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(variable);
-   if(!hdr_name.has("OBTYPE"))         shc.set_obtype(obs_subtype);
+   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(valid_ut);
+   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(valid_ut);
+   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(var);
+   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(var);
+   if(!hdr_name.has("OBTYPE"))         shc.set_obtype(obtype);
 
    // Range check the height
-   if(obs_hgt < 0) obs_hgt = bad_data_int;
+   if(hgt < 0) hgt = bad_data_int;
    
    // Range check setup_qc
    if(setup_qc == bad_setup_qc) setup_qc = bad_data_int;
 
    // Set pressure for precipitable water to bad data
-   if(strcmp(variable, "pw") == 0) pressure = bad_data_double;
+   if(strcmp(var, "pw") == 0) prs = bad_data_double;
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -505,20 +504,20 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
    at.set_entry(row, col++, r.station_name(j)); // OBS_SID
    at.set_entry(row, col++, lat);               // OBS_LAT
    at.set_entry(row, col++, rescale_lon(lon));  // OBS_LON
-   at.set_entry(row, col++, pressure);          // OBS_LVL
-   at.set_entry(row, col++, elevation);         // OBS_ELV
+   at.set_entry(row, col++, prs);               // OBS_LVL
+   at.set_entry(row, col++, elv);               // OBS_ELV
 
    at.set_entry(row, col++, guess);             // FCST
-   at.set_entry(row, col++, obs_value);         // OBS
+   at.set_entry(row, col++, obs);               // OBS
    at.set_entry(row, col++, na_str);            // CLIMO
    at.set_entry(row, col++, obs_qc);            // OBS_QC
 
    // Write extra columns
-   at.set_entry(row, col++, obs_hgt);           // OBS_HGT
+   at.set_entry(row, col++, hgt);               // OBS_HGT
 
-   at.set_entry(row, col++, pb_inv_error);      // OBS_ERR_IN
-   at.set_entry(row, col++, oberr_adj);         // OBS_ERR_ADJ
-   at.set_entry(row, col++, final_inv_error);   // OBS_ERR_FIN
+   at.set_entry(row, col++, err_in);            // OBS_ERR_IN
+   at.set_entry(row, col++, err_adj);           // OBS_ERR_ADJ
+   at.set_entry(row, col++, err_fin);           // OBS_ERR_FIN
 
    at.set_entry(row, col++, prep_use);          // PREP_USE
    at.set_entry(row, col++, analy_use);         // ANLY_USE
@@ -532,33 +531,31 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
 ////////////////////////////////////////////////////////////////////////
 
 void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int chan) {
-   ConcatString variable;
-   unixtime ut;
+   ConcatString var;
    int col;
 
-   const double lat             = r.diag_data(rad_lat_index - 1);
-   const double lon             = r.diag_data(rad_lon_index - 1);
-   const double elev            = r.diag_data(rad_elevation_index - 1);
-   const double obs_time        = r.diag_data(rad_dtime_index - 1);
+   double lat = r.diag_data(rad_lat_index       - 1);
+   double lon = r.diag_data(rad_lon_index       - 1);
+   double elv = r.diag_data(rad_elevation_index - 1);
+   
+   double   otime    =      r.diag_data(rad_dtime_index - 1);
+   unixtime valid_ut = nint(r.date() + (otime * sec_per_hour));   
 
-   const double obs_value       = r.diagchan_data( rad_btemp_chan_index - 1, chan);
-   const double obs_minus_guess = r.diagchan_data(rad_omg_bc_chan_index - 1, chan);
+   double obs   =       r.diagchan_data( rad_btemp_chan_index - 1, chan);
+   double guess = obs - r.diagchan_data(rad_omg_bc_chan_index - 1, chan);
 
-   const double inv_obs_error   = r.diagchan_data(rad_inv_chan_index - 1, chan);
-   const double surf_em         = r.diagchan_data(rad_surf_em_index  - 1, chan);
+   double err_in  = r.diagchan_data(rad_inv_chan_index - 1, chan);
+   double surf_em = r.diagchan_data(rad_surf_em_index  - 1, chan);
 
-   const double guess           = obs_value - obs_minus_guess;
-
-   variable.format("TB_%02d", chan + 1);
+   var.format("TB_%02d", chan + 1);
 
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date());
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(r.date());
-   ut = nint(r.date() + (obs_time * sec_per_hour));
-   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(ut);
-   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(ut);
-   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(variable);
-   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(variable);
+   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(valid_ut);
+   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(valid_ut);
+   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(var);
+   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(var);
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -572,15 +569,15 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int chan) {
    at.set_entry(row, col++, lat);               // OBS_LAT
    at.set_entry(row, col++, rescale_lon(lon));  // OBS_LON
    at.set_entry(row, col++, na_str);            // OBS_LVL
-   at.set_entry(row, col++, elev);              // OBS_ELV
+   at.set_entry(row, col++, elv);               // OBS_ELV
 
    at.set_entry(row, col++, guess);             // FCST
-   at.set_entry(row, col++, obs_value);         // OBS
+   at.set_entry(row, col++, obs);               // OBS
    at.set_entry(row, col++, na_str);            // CLIMO
    at.set_entry(row, col++, na_str);            // OBS_QC
 
    // Write extra columns
-   at.set_entry(row, col++, inv_obs_error);     // INV_OBS_ERR
+   at.set_entry(row, col++, err_in);            // ERR_IN
    at.set_entry(row, col++, surf_em);           // SURF_EMIS
 
    return;
