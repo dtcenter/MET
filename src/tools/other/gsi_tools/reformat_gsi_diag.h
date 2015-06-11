@@ -72,8 +72,37 @@ static const int n_conv_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_ext
 ////////////////////////////////////////////////////////////////////////
 
 static const char * rad_extra_columns [] = {
-   "OBS_ERR_IN",    // inverse observation error
-   "SURF_EMIS",     // surface emissivity
+   "SCAN_POS",   // sensor scan position
+   "SAT_ZNTH",   // satellite zenith angle (degrees)
+   "SAT_AZMTH",  // satellite azimuth angle (degrees)
+   "SUN_ZNTH",   // solar zenith angle (degrees)
+   "SUN_AZMTH",  // solar azimuth angle (degrees)
+   "SUN_GLNT",   // sun glint angle (degrees)
+   "FRAC_WTR",   // fractional coverage by water
+   "FRAC_LND",   // fractional coverage by land
+   "FRAC_ICE",   // fractional coverage by ice
+   "FRAC_SNW",   // fractional coverage by snow
+   "SFC_TWTR",   // surface temperature over water (K)
+   "SFC_TLND",   // surface temperature over land (K)
+   "SFC_TICE",   // surface temperature over ice (K)
+   "SFC_TSNW",   // surface temperature over snow (K)
+   "TSOIL",      // soil temperature (K)
+   "SOILM",      // soil moisture
+   "LAND_TYPE",  // surface land type
+   "FRAC_VEG",   // vegetation fraction
+   "SNW_DPTH",   // snow depth
+   "SFC_WIND",   // surface wind speed (m/s)
+   "FRAC_CLD",   // cloud fraction (%)
+   "CTOP_PRS",   // cloud top pressure (hPa)
+   "ITREF",      // itref
+   "IDTW",       // idtw
+   "IDTC",       // idtc
+   "ITZ_TR",     // itz_tr
+   "OBS_ERR",    // inverse observation error
+   "FCST_NOBC",  // Tb with no bias correction (K)
+   "SFC_EMIS",   // surface emissivity
+   "STABILITY",  // stability index
+   "PRS"         // extra pressure
 };
 
 static const int n_rad_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);
