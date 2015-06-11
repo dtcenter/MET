@@ -499,6 +499,27 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+int RadFile::use_channel(const int n) const
+
+{
+
+
+if ( (n < 0) || (n >= Nchannels) )  {
+
+   cerr << "\n\n  RadFile::use_channel(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( C_params[n].iuse );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool RadFile::open(const char * path, bool _swap_endian, int _rec_pad_size)
 
 {
@@ -557,10 +578,6 @@ for (k=0; k<Nchannels; ++k)  {
    read_channel(k);
 
 }
-
-
-
-
 
    //
    //  done

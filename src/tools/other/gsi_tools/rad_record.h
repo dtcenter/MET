@@ -135,6 +135,8 @@ class RadFile {
 
       int n_channels() const;
 
+      int use_channel(const int) const;
+
       int n_diag() const;
 
       int n1() const;
@@ -148,7 +150,6 @@ class RadFile {
          //
          //  do stuff
          //
-
 
 };
 

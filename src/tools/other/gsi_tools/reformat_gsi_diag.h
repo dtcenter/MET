@@ -72,6 +72,7 @@ static const int n_conv_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_ext
 ////////////////////////////////////////////////////////////////////////
 
 static const char * rad_extra_columns [] = {
+   "CHAN_USE",   // channel used
    "SCAN_POS",   // sensor scan position
    "SAT_ZNTH",   // satellite zenith angle (degrees)
    "SAT_AZMTH",  // satellite azimuth angle (degrees)
