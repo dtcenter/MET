@@ -120,7 +120,8 @@ ConcatString ConvRecord::station_name(int index) const  //  zero-based
 
 if ( (index < 0) || (index >= ii) )  {
 
-   cerr << "\n\n  ConvRecord::station_name() const -> range check error\n\n";
+   mlog << Error << "\nConvRecord::station_name() const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -305,10 +306,8 @@ long long s = read_fortran_binary(Fd, &idate, (int) sizeof(idate), RecPadSize, S
 
 if ( s <= 0 )  {
 
-   cerr << "\n\n  ConvFile::open() -> unable to read date from input file \""
-        << Filename << "\n\n";
-
-   // exit ( 1 );
+   mlog << Warning << "\nConvFile::open() -> "
+        << "unable to read date from input file: " << Filename << "\n\n";
 
    return ( false );
 
@@ -361,11 +360,10 @@ if ( s == 0 )  return ( false );
 
 if ( s != 19 )  {
 
-   cerr << "\n\n  operator>>(ConvFile &, ConvRecord &) -> trouble reading cdiag data\n\n";
+   mlog << Error << "\noperator>>(ConvFile &, ConvRecord &) -> "
+        << "trouble reading cdiag data\n\n";
 
    exit ( 1 );
-
-   // return ( false );
 
 }
 

@@ -210,7 +210,8 @@ double RadRecord::diag_data(int index) const
 
 if ( (index < 0) || (index >= Ndiag) )  {
 
-   cerr << "\n\n  RadRecord::diag_data(int) const -> range check error\n\n";
+   mlog << Error << "\nRadRecord::diag_data(int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -230,7 +231,8 @@ double RadRecord::diagchan_data(int index, int channel) const
 
 if ( (index < 0) || (index >= N1) )  {
 
-   cerr << "\n\n  RadRecord::diagchan_data() -> range check error on index ... " << index << "\n\n";
+   mlog << Error << "\nRadRecord::diagchan_data() -> "
+        << "range check error on index ... " << index << "\n\n";
 
    exit ( 1 );
 
@@ -238,7 +240,8 @@ if ( (index < 0) || (index >= N1) )  {
 
 if ( (channel < 0) || (channel >= N2) )  {
 
-   cerr << "\n\n  RadRecord::diagchan_data() -> range check error on channel ... " << channel << "\n\n";
+   mlog << Error << "\nRadRecord::diagchan_data() -> "
+        << "range check error on channel ... " << channel << "\n\n";
 
    exit ( 1 );
 
@@ -260,7 +263,8 @@ double RadRecord::extra_data(int i, int j) const
 
 if ( ! extra )  {
 
-   cerr << "\n\n  RadRecord::extra_data(int, int) const -> no \"extra\" data in this record!\n\n";
+   mlog << Error << "\nRadRecord::extra_data(int, int) const -> "
+        << "no \"extra\" data in this record!\n\n";
 
    exit ( 1 );
 
@@ -268,7 +272,8 @@ if ( ! extra )  {
 
 if ( (i < 0) || (i >= iextra) || (j < 0) || (j >= jextra) )  {
 
-   cerr << "\n\n  RadRecord::extra_data(int, int) const -> range check error\n\n";
+   mlog << Error << "\nRadRecord::extra_data(int, int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -442,7 +447,8 @@ void RadFile::read_channel(int n)
 
 if ( (n < 0) || (n >= Nchannels) )  {
 
-   cerr << "\n\n  RadFile::read_channel(int) -> range check error\n\n";
+   mlog << Error << "\nRadFile::read_channel(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -506,7 +512,8 @@ int RadFile::use_channel(const int n) const
 
 if ( (n < 0) || (n >= Nchannels) )  {
 
-   cerr << "\n\n  RadFile::use_channel(int) -> range check error\n\n";
+   mlog << Error << "\nRadFile::use_channel(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
