@@ -10,50 +10,8 @@ include ${top_srcdir}/Make-include
 
 # The programs
 
-bin_PROGRAMS    = reformat_conv \
-                  reformat_rad  \
-                  reformat_gsi_diag
+bin_PROGRAMS    = reformat_gsi_diag
 
-
-reformat_conv_SOURCES = gsi_record.h \
-	gsi_record.cc \
-	conv_record.h \
-	conv_record.cc \
-	reformat_conv.cc \
-	conv_offsets.h \
-	ftto.h
-reformat_conv_CPPFLAGS = ${MET_CPPFLAGS}
-reformat_conv_LDFLAGS = ${MET_LDFLAGS}
-reformat_conv_LDADD = -lvx_stat_out \
-	-lvx_color \
-	-lvx_config \
-	-lvx_cal \
-	-lvx_util \
-	-lvx_math \
-	-lvx_log \
-	-lm
-
-
-reformat_rad_SOURCES = gsi_record.h \
-	gsi_record.cc \
-	rad_record.h \
-	rad_record.cc \
-	reformat_rad.cc \
-	rad_offsets.h \
-	rad_config.h  \
-	rad_config.cc \
-	ftto.h
-reformat_rad_CPPFLAGS = ${MET_CPPFLAGS}
-reformat_rad_LDFLAGS = ${MET_LDFLAGS}
-reformat_rad_LDADD = -lvx_stat_out \
-	-lvx_color \
-	-lvx_config \
-	-lvx_cal \
-	-lvx_util \
-	-lvx_math \
-	-lvx_log \
-	-lm
-	
 reformat_gsi_diag_SOURCES = reformat_gsi_diag.h \
         gsi_record.h \
 	gsi_record.cc \
