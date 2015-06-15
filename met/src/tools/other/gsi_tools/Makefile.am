@@ -10,24 +10,24 @@ include ${top_srcdir}/Make-include
 
 # The programs
 
-bin_PROGRAMS    = reformat_gsi_diag
+bin_PROGRAMS    = gsid2mpr
 
-reformat_gsi_diag_SOURCES = reformat_gsi_diag.h \
+gsid2mpr_SOURCES = gsid2mpr.h \
         gsi_record.h \
 	gsi_record.cc \
 	conv_record.h \
 	conv_record.cc \
 	rad_record.h \
 	rad_record.cc \
-	reformat_gsi_diag.cc \
+	gsid2mpr.cc \
 	conv_offsets.h \
 	rad_offsets.h \
 	rad_config.h  \
 	rad_config.cc \
 	ftto.h
-reformat_gsi_diag_CPPFLAGS = ${MET_CPPFLAGS}
-reformat_gsi_diag_LDFLAGS = ${MET_LDFLAGS}
-reformat_gsi_diag_LDADD = -lvx_stat_out \
+gsid2mpr_CPPFLAGS = ${MET_CPPFLAGS}
+gsid2mpr_LDFLAGS = ${MET_LDFLAGS}
+gsid2mpr_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_gsl_prob \
 	-lvx_config \
