@@ -8,7 +8,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   reformat_gsi_diag.cc
+//   Filename:   gsid2mpr.cc
 //
 //   Description:
 //
@@ -42,7 +42,7 @@ using namespace std;
 #include "conv_record.h"
 #include "rad_offsets.h"
 #include "rad_record.h"
-#include "reformat_gsi_diag.h"
+#include "gsid2mpr.h"
 
 ////////////////////////////////////////////////////////////////////////
 
