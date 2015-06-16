@@ -8,13 +8,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   gsid2mpr.cc
+//   Filename:   gsidens2orank.cc
 //
 //   Description:
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    06/09/15  Bullock         New
+//   000    06/16/15  Halley Gotway   New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +42,7 @@ using namespace std;
 #include "conv_record.h"
 #include "rad_offsets.h"
 #include "rad_record.h"
-#include "gsid2mpr.h"
+#include "gsidens2orank.h"
 
 ////////////////////////////////////////////////////////////////////////
 
