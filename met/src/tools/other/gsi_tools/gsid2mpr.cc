@@ -49,6 +49,10 @@ using namespace std;
 static void setup_header();
 static void setup_table(AsciiTable &);
 
+static bool is_conv(const char *);
+static bool is_micro(const char *);
+static bool is_retr(const char *);
+
 static void process_conv(const char *conv_filename, const char *output_filename);
 static void process_rad (const char *rad_filename, const char *output_filename);
 
@@ -104,16 +108,39 @@ int main(int argc, char * argv []) {
       // Initialize output StatHdrColumns
       setup_header();
 
-      // Determine file type by the file name
-      if(strstr(get_short_name(cline[i]), "conv") != (char *) 0) {
-         process_conv(cline[i], output_filename);
-      }
-      else {
-         process_rad(cline[i], output_filename);
-      }
+      // Process by file type
+      if(is_conv(cline[i])) process_conv(cline[i], output_filename);
+      else                  process_rad (cline[i], output_filename);
    }
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_conv(const char *s) {
+   return(strstr(get_short_name(s), conv_id_str) != (char *) 0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_micro(const char *s) {
+   bool status = false;
+
+   for(int i=0; i<n_micro_id_str; i++) {
+      if(strstr(get_short_name(s), micro_id_str[i]) != 0) {
+         status = true;
+         break;
+      }
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_retr(const char *s) {
+   return(false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -382,7 +409,19 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
    write_header_row(rad_extra_columns, n_rad_extra_cols, 0, at, 0,
                     n_header_columns + n_mpr_columns);
+   
+   // Update header columns for microwave
+   if(is_micro(rad_filename)) {
+       write_header_row(micro_extra_columns, n_micro_extra_cols, 0, at, 0,
+                        n_header_columns + n_mpr_columns + micro_extra_begin);
+   }
 
+   // Update header columns for retrievals
+   if(is_retr(rad_filename)) {
+       write_header_row(retr_extra_columns, n_retr_extra_cols, 0, at, 0,
+                        n_header_columns + n_mpr_columns + retr_extra_begin);
+   }
+   
    // Open input file
    if(!(f.open(rad_filename))) {
       mlog << Error << "\nprocess_rad() -> "
@@ -604,8 +643,8 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, cons
    at.set_entry(row, col++,       r.diag_data(rad_snow_depth_index         - 1));    // SNW_DPTH
    at.set_entry(row, col++,       r.diag_data(rad_wind_speed_index         - 1));    // SFC_WIND
 
-   at.set_entry(row, col++,       r.diag_data(rad_cloud_frac_index         - 1));    // FRAC_CLD
-   at.set_entry(row, col++,       r.diag_data(rad_cloud_top_pressure_index - 1));    // CTOP_PRS
+   at.set_entry(row, col++,       r.diag_data(rad_cloud_frac_index         - 1));    // FRAC_CLD or CLDLW
+   at.set_entry(row, col++,       r.diag_data(rad_cloud_top_pressure_index - 1));    // CTOP_PRS or COLPW
 
    at.set_entry(row, col++,       r.diag_data(rad_itref_index              - 1));    // ITREF
    at.set_entry(row, col++,       r.diag_data(rad_idtw_index               - 1));    // IDTW
