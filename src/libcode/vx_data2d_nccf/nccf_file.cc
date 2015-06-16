@@ -187,13 +187,11 @@ bool NcCfFile::open(const char * filepath)
     // Time not in file, get from file name
     if ((ut = get_valid_time_from_file_path(filepath)) == 0)
     {
-      mlog << Warning << "\nNcCfFile::open() -> "
-           << "could not extract valid time from file name\n"
-           << "Using valid time of 0\n\n";
+       mlog << Warning << "\nNcCfFile::open() -> "
+            << "could not extract valid time from file name\n"
+            << "Using valid time of 0\n\n";
     }
-    else {
-       ValidTime.add(ut);
-    }
+    ValidTime.add(ut);
   }
   else
   {
@@ -884,7 +882,7 @@ bool NcCfFile::getData(const char *var_name,
   unixtime valid_ut;
   if(info->t_slot >= 0) valid_ut = ValidTime[a[info->t_slot]];
   else                  valid_ut = ValidTime[0];
-
+ 
   //  if unset, set the init time to the valid time
   unixtime init_ut = InitTime;
   if(init_ut == 0 && valid_ut != 0) init_ut = valid_ut;
@@ -959,19 +957,16 @@ void NcCfFile::read_netcdf_grid()
     break;
     
   } /* endfor - i */
-
+  
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
 
-  if(data_var != 0)
-  {
-    NcAtt *grid_mapping_att = data_var->get_att("grid_mapping");
+  NcAtt *grid_mapping_att = data_var->get_att("grid_mapping");
 
-    if (grid_mapping_att != 0)
-    {
-      get_grid_from_grid_mapping(grid_mapping_att);
-      return;
-    }
+  if (grid_mapping_att != 0)
+  {
+    get_grid_from_grid_mapping(grid_mapping_att);
+    return;
   }
   
   // If the grid mapping isn't provided, see if we can intuit a projection
@@ -1149,6 +1144,8 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mapping_var)
 {
   static const string method_name = "NcCfFile::get_grid_mapping_lambert_conformal_conic()";
+  double x_coord_to_m_cf = 1.0;
+  double y_coord_to_m_cf = 1.0;
 
   // standard_parallel -- there can be 1 or 2 of these
 
@@ -1291,12 +1288,14 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
            << "Cannot extract X coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
     }
-    else if (strcmp(x_coord_units_name, "m") != 0)
-    {
-      mlog << Error << "\n" << method_name << " -> "
-           << "X coordinates for lambert conformal data not given in meters.\n"
-           << "The coordinates must be in meters for MET.\n\n";
-      exit(1);
+    else {
+           if (strcmp(x_coord_units_name, "m" ) == 0) x_coord_to_m_cf = 1.0;
+      else if (strcmp(x_coord_units_name, "km") == 0) x_coord_to_m_cf = 1000.0;
+      else {
+        mlog << Error << "\n" << method_name << " -> "
+             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+        exit(1);
+      }
     }
   }
   
@@ -1315,15 +1314,17 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
            << "Cannot extract Y coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
     }
-    else if (strcmp(y_coord_units_name, "m") != 0)
-    {
-      mlog << Error << "\n" << method_name << " -> "
-           << "Y coordinates for lambert conformal data not given in meters.\n"
-           << "The coordinates must be in meters for MET.\n\n";
-      exit(1);
+    else {
+           if (strcmp(y_coord_units_name, "m" ) == 0) y_coord_to_m_cf = 1.0;
+      else if (strcmp(y_coord_units_name, "km") == 0) y_coord_to_m_cf = 1000.0;
+      else {
+        mlog << Error << "\n" << method_name << " -> "
+             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+        exit(1);
+      }
     }
   }
-  
+
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   double x_values[_xDim->size()];
@@ -1335,6 +1336,11 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   long y_counts = _yDim->size();
   
   _yCoordVar->get(y_values, &y_counts);
+
+  // Unit conversion
+
+  for (int i = 0; i<x_counts; ++i) x_values[i] *= x_coord_to_m_cf;
+  for (int i = 0; i<y_counts; ++i) y_values[i] *= y_coord_to_m_cf;
   
   // Calculate dx and dy assuming they are constant.  MET requires that dx be
   // equal to dy
