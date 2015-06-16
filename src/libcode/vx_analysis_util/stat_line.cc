@@ -824,7 +824,11 @@ for (j=0; j<N; ++j)  {
 
    } else if ( S_ISREG(sbuf.st_mode) )  {
 
-      if ( is_stat_filename(search_dirs[j]) )  a.add(search_dirs[j]);
+      //
+      //  process any explicitly specified regular file
+      //
+
+      a.add(search_dirs[j]);
 
    }
 
