@@ -125,6 +125,7 @@ class STATAnalysisJob {
       int  is_keeper(const STATLine &) const;
 
       void parse_job_command(const char *);
+      void add_column_thresh(const char *, const char *);
 
       int  set_job_type (const char *);
       void set_dump_row (const char *);
@@ -198,12 +199,10 @@ class STATAnalysisJob {
       StringArray column;
       NumArray    weight;
 
-      StringArray column_min_name;
-      NumArray    column_min_value;
+      // Numeric column thresholds
+      map<ConcatString,ThreshArray> column_thresh_map;
 
-      StringArray column_max_name;
-      NumArray    column_max_value;
-
+      // ASCII column string matching
       map<ConcatString,StringArray> column_str_map;
 
       StringArray hdr_name;

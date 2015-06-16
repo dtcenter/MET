@@ -93,8 +93,6 @@ void STATAnalysisJob::init_from_scratch() {
    interp_mthd.set_ignore_case(1);
    line_type.set_ignore_case(1);
    column.set_ignore_case(1);
-   column_min_name.set_ignore_case(1);
-   column_max_name.set_ignore_case(1);
    column_case.set_ignore_case(1);
    hdr_name.set_ignore_case(1);
 
@@ -149,12 +147,7 @@ void STATAnalysisJob::clear() {
    column.clear();
    weight.clear();
 
-   column_min_name.clear();
-   column_min_value.clear();
-
-   column_max_name.clear();
-   column_max_value.clear();
-
+   column_thresh_map.clear();
    column_str_map.clear();
 
    column_case.clear();
@@ -257,13 +250,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    line_type            = aj.line_type;
    column               = aj.column;
    weight               = aj.weight;
-
-   column_min_name      = aj.column_min_name;
-   column_min_value     = aj.column_min_value;
-
-   column_max_name      = aj.column_max_name;
-   column_max_value     = aj.column_max_value;
-
+   
+   column_thresh_map    = aj.column_thresh_map;
    column_str_map       = aj.column_str_map;
 
    column_case          = aj.column_case;
@@ -405,23 +393,18 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "weight ...\n";
    weight.dump(out, depth + 1);
 
-   out << prefix << "column_min_name ...\n";
-   column_min_name.dump(out, depth + 1);
-
-   out << prefix << "column_min_value ...\n";
-   column_min_value.dump(out, depth + 1);
-
-   out << prefix << "column_max_name ...\n";
-   column_max_name.dump(out, depth + 1);
-
-   out << prefix << "column_max_value ...\n";
-   column_max_value.dump(out, depth + 1);
+   out << prefix << "column_thresh_map ...\n";
+   for(map<ConcatString,ThreshArray>::const_iterator thr_it = column_thresh_map.begin();
+       thr_it != column_thresh_map.end(); thr_it++) {
+      out << prefix << thr_it->first << ": \n";
+      thr_it->second.dump(out, depth + 1);
+   }
 
    out << prefix << "column_str_map ...\n";
-   for(map<ConcatString,StringArray>::const_iterator it = column_str_map.begin();
-       it != column_str_map.end(); it++) {
-      out << prefix << it->first << ": \n";
-      it->second.dump(out, depth + 1);
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
+       str_it != column_str_map.end(); str_it++) {
+      out << prefix << str_it->first << ": \n";
+      str_it->second.dump(out, depth + 1);
    }
 
    out << prefix << "column_case ...\n";
@@ -737,67 +720,37 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    }
 
    //
-   // column_min
+   // column_thresh
    //
-   if(column_min_name.n_elements() > 0) {
-
-      n = column_min_name.n_elements();
-
-      for(j=0; j<n; ++j) {
-
-         //
-         // Determine the column offset and retrieve the value
-         //
-         c = determine_column_offset(L, column_min_name[j]);
-         v = atof(L.get_item(c));
-
-         //
-         // Check if the column's value is bad data or is not in the
-         // acceptable range
-         //
-         if(is_bad_data(v) ||
-            v < column_min_value[j]) return(0);
-      }
-   }
-
-   //
-   // column_max
-   //
-   if(column_max_name.n_elements() > 0) {
-
-      n = column_max_name.n_elements();
-
-      for(j=0; j<n; ++j) {
-
-         //
-         // Determine the column offset and retrieve the value
-         //
-         c = determine_column_offset(L, column_max_name[j]);
-         v = atof(L.get_item(c));
-
-         //
-         // Check if the column's value is bad data or is not in the
-         // acceptable range
-         //
-         if(is_bad_data(v) || v > column_max_value[j]) return(0);
-      }
-   }
-
-   //
-   // column_str
-   //
-   for(map<ConcatString,StringArray>::const_iterator it = column_str_map.begin();
-       it != column_str_map.end(); it++) {
+   for(map<ConcatString,ThreshArray>::const_iterator thr_it = column_thresh_map.begin();
+       thr_it != column_thresh_map.end(); thr_it++) {
       
       //
       // Determine the column offset
       //
-      c = determine_column_offset(L, it->first);
+      c = determine_column_offset(L, thr_it->first);
+   
+      //
+      // Check if the current value meets the threshold criteria
+      //
+      if(!thr_it->second.check_dbl(atof(L.get_item(c)))) return(0);
+   }
+   
+   //
+   // column_str
+   //
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
+       str_it != column_str_map.end(); str_it++) {
+      
+      //
+      // Determine the column offset
+      //
+      c = determine_column_offset(L, str_it->first);
    
       //
       // Check if the current value is in the list for the column
       //
-      if(!it->second.has(L.get_item(c))) return(0);
+      if(!str_it->second.has(L.get_item(c))) return(0);
    }
 
    return(1);
@@ -812,6 +765,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    const char delim [] = " ";
    ConcatString col_name;
    StringArray col_value;
+   ConcatString thresh_cs;
    int i, n;
 
    // If jobstring is null, simply return;
@@ -890,19 +844,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          column.clear();
       else if(strcmp(jc_array[i], "-weight"         ) == 0)
          weight.clear();
-      else if(strcmp(jc_array[i], "-column_min"     ) == 0) {
-         column_min_name.clear();
-         column_min_value.clear();
-      }
-      else if(strcmp(jc_array[i], "-column_max"     ) == 0) {
-         column_max_name.clear();
-         column_max_value.clear();
-      }
-      else if(strcmp(jc_array[i], "-column_eq"      ) == 0) {
-         column_min_name.clear();
-         column_min_value.clear();
-         column_max_name.clear();
-         column_max_value.clear();
+      else if(strcmp(jc_array[i], "-column_min"     ) == 0 ||
+              strcmp(jc_array[i], "-column_max"     ) == 0 ||
+              strcmp(jc_array[i], "-column_eq"      ) == 0 ||
+              strcmp(jc_array[i], "-column_thresh"  ) == 0) {
+         column_thresh_map.clear();
       }
       else if(strcmp(jc_array[i], "-column_str"     ) == 0) {
          column_str_map.clear();
@@ -1070,21 +1016,22 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-column_min") == 0) {
-         column_min_name.add_css(to_upper(jc_array[i+1]));
-         column_min_value.add_css(jc_array[i+2]);
+         thresh_cs << cs_erase << ">=" << jc_array[i+2];
+         add_column_thresh(jc_array[i+1], thresh_cs);
          i+=2;
       }
       else if(strcmp(jc_array[i], "-column_max") == 0) {
-         column_max_name.add_css(to_upper(jc_array[i+1]));
-         column_max_value.add_css(jc_array[i+2]);
+         thresh_cs << cs_erase << "<=" << jc_array[i+2];
+         add_column_thresh(jc_array[i+1], thresh_cs);
          i+=2;
       }
-      // For -column_eq, just add it to both column_min and column_max
       else if(strcmp(jc_array[i], "-column_eq") == 0) {
-         column_min_name.add_css(to_upper(jc_array[i+1]));
-         column_max_name.add_css(to_upper(jc_array[i+1]));
-         column_min_value.add_css(jc_array[i+2]);
-         column_max_value.add_css(jc_array[i+2]);
+         thresh_cs << cs_erase << "==" << jc_array[i+2];
+         add_column_thresh(jc_array[i+1], thresh_cs);
+         i+=2;
+      }
+      else if(strcmp(jc_array[i], "-column_thresh") == 0) {
+         add_column_thresh(jc_array[i+1], jc_array[i+2]);
          i+=2;
       }
       else if(strcmp(jc_array[i], "-column_str") == 0) {
@@ -1276,6 +1223,26 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    if(line) { delete [] line; line = (char *) 0; }
    lp = (char *) 0;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::add_column_thresh(const char *col_name, const char *thresh_str) {
+   ThreshArray col_thresh;
+
+   // Parse the threshold
+   col_thresh.add_css(thresh_str);
+
+   // If the column name is already present in the map, add to it
+   if(column_thresh_map.count(col_name) > 0) {
+      column_thresh_map[col_name].add(col_thresh);
+   }
+   // Otherwise, add a new map entry
+   else {
+      column_thresh_map.insert(pair<ConcatString, ThreshArray>(col_name, col_thresh));
+   }
 
    return;
 }
@@ -1935,26 +1902,21 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       }
    }
 
-   // column_min
-   if(column_min_name.n_elements() > 0) {
-      for(i=0; i<column_min_name.n_elements(); i++)
-         js << "-column_min " << column_min_name[i]
-            << " " << column_min_value[i] << " ";
-   }
-
-   // column_max
-   if(column_max_name.n_elements() > 0) {
-      for(i=0; i<column_max_name.n_elements(); i++)
-         js << "-column_max " << column_max_name[i]
-            << " " << column_max_value[i] << " ";
-   }
-
-   // column_str
-   for(map<ConcatString,StringArray>::const_iterator it = column_str_map.begin();
-       it != column_str_map.end(); it++) {
+   // column_thresh
+   for(map<ConcatString,ThreshArray>::const_iterator thr_it = column_thresh_map.begin();
+       thr_it != column_thresh_map.end(); thr_it++) {
       
-      for(i=0; i<it->second.n_elements(); i++) {
-         js << "-column_str " << it->first << " " << it->second[i] << " ";
+      for(i=0; i<thr_it->second.n_elements(); i++) {
+         js << "-column_thresh " << thr_it->first << " " << thr_it->second[i].get_str() << " ";
+      }
+   }
+   
+   // column_str
+   for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
+       str_it != column_str_map.end(); str_it++) {
+      
+      for(i=0; i<str_it->second.n_elements(); i++) {
+         js << "-column_str " << str_it->first << " " << str_it->second[i] << " ";
       }
    }
   
