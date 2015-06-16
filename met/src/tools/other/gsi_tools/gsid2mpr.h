@@ -122,8 +122,8 @@ static const int n_rad_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_
 ////////////////////////////////////////////////////////////////////////
 
 static const char *micro_extra_columns [] = {
-   "CLD_LW",      // cloud liquid water (kg/m**2)
-   "PWAT"         // total column precip. water (km/m**2)
+   "CLD_LWC",     // cloud liquid water (kg/m**2)
+   "TC_PWAT"      // total column precip. water (km/m**2)
 };
 
 static const int n_micro_extra_cols = sizeof(micro_extra_columns)/sizeof(*micro_extra_columns);
