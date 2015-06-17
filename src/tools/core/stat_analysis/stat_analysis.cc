@@ -540,16 +540,18 @@ void process_stat_file(const char *filename, const STATAnalysisJob &j,
    while(f >> line) {
 
       //
-      // Continue if the line is not a valid STAT line type.
+      // Continue if the line is not a valid STAT line.
       //
-      if(line.type() == no_stat_line_type)
-         continue;
+      if(line.type() == no_stat_line_type) continue;
 
-      n_read++;
+      if(!line.is_header()) n_read++;
 
-      if(j.is_keeper(line)) {
+      //
+      // Pass header lines through to the output
+      //
+      if(line.is_header() || j.is_keeper(line)) {
 
-         n_keep++;
+         if(!line.is_header()) n_keep++;
 
          tmp_out << line;
       }

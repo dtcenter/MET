@@ -49,6 +49,8 @@ class STATLine : public DataLine {
 
       int is_ok() const;               //  virtual from base class
 
+      int is_header() const;           //  virtual from base class
+
          //
          //  retrieve values of the header columns
          //
@@ -115,7 +117,8 @@ extern StringArray get_stat_filenames_from_dir(
 
 extern int is_stat_filename(const char * path);
 
-extern int determine_column_offset(const STATLine &, const char *);
+extern int determine_column_offset(const STATLine &, const char *,
+                                   bool error_out = true);
 
 ////////////////////////////////////////////////////////////////////////
 
