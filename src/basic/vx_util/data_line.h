@@ -71,6 +71,8 @@ class DataLine {
       int LineNumber;
 
       char *Delimiter;
+
+      LineDataFile * File;  //  not allocated
       
    public:
 
@@ -88,9 +90,11 @@ class DataLine {
          //  retrieve stuff
          //
 
-      const char *get_line() const;
-      
+      const char * get_line() const;
+
       const char * get_item(int) const;
+
+      const LineDataFile * get_file() const;
 
       int n_items() const;
 
@@ -109,6 +113,8 @@ class DataLine {
       virtual int read_fwf_line(LineDataFile *, const int *wdth, int n_wdth);
 
       virtual int is_ok() const;
+
+      virtual int is_header() const;
 
       virtual void set_delimiter(const char *delimiter);
       
@@ -141,6 +147,10 @@ class LineDataFile {
 
       int Last_Line_Number;
 
+      StringArray Header;
+
+      void set_header(DataLine &);
+
    public:
 
       LineDataFile();
@@ -165,6 +175,8 @@ class LineDataFile {
 
       int last_line_number() const;
 
+      const StringArray & header() const;
+
 };
 
 
@@ -176,6 +188,8 @@ inline const char * LineDataFile::filename() const { return ( Filename ); }
 inline const char * LineDataFile::short_filename() const { return ( ShortFilename ); }
 
 inline int LineDataFile::last_line_number() const { return ( Last_Line_Number ); }
+
+inline const StringArray & LineDataFile::header() const { return ( Header ); }
 
 
 ////////////////////////////////////////////////////////////////////////

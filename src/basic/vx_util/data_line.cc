@@ -58,11 +58,15 @@ DataLine::~DataLine()
 
 {
 
+
+
 if ( Line )  { delete [] Line;  Line = (char *) 0; }
 
 if ( Offset )  { delete [] Offset;  Offset = (int *) 0; }
 
 LineNumber = N_items = N_ints = N_chars = 0;
+
+File = (LineDataFile *) 0;
 
 }
 
@@ -118,6 +122,8 @@ N_chars = N_ints = 0;
 Delimiter = new char[2];
 strcpy(Delimiter, " ");
 
+File = (LineDataFile *) 0;
+
 return;
 
 }
@@ -146,6 +152,8 @@ if ( Offset )  {
 LineNumber = 0;
 
 N_items = 0;
+
+File = (LineDataFile *) 0;
 
 
 return;
@@ -179,6 +187,8 @@ for (j=0; j<(a.N_items); ++j)  {
 N_items = a.N_items;
 
 LineNumber = a.LineNumber;
+
+File = a.File;
 
 
 return;
@@ -272,6 +282,18 @@ if ( (k < 0) || (k >= N_items) )  {
 const char * c = Line + Offset[k];
 
 return ( c );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const LineDataFile * DataLine::get_file() const
+
+{
+
+  return File;
 
 }
 
@@ -436,6 +458,8 @@ ifstream & f = *(ldf->in);
 
 if ( !f )  return ( 0 );
 
+File = ldf;
+
 char c;
 char * s = (char *) 0;
 char * p = (char *) 0;
@@ -508,6 +532,8 @@ clear();
 ifstream & f = *(ldf->in);
 
 if ( !f )  return ( 0 );
+
+File = ldf;
 
 int i, j;
 char buf[max_str_len];
@@ -595,6 +621,18 @@ int DataLine::is_ok() const
 if ( N_items == 0 )  return ( 0 );
 
 return ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int DataLine::is_header() const
+
+{
+
+return ( 0 );
 
 }
 
@@ -690,6 +728,10 @@ in = (ifstream *) 0;
 
 Last_Line_Number = 0;
 
+Header.clear();
+
+Header.set_ignore_case(true);
+
 
 return;
 
@@ -718,10 +760,6 @@ if ( !in )  {
 in->open(path);
 
 if ( !(*in) )  {
-
-   // mlog << Error << "\nLineDataFile::open(const char *) -> can't open file \"" << path << "\"\n\n";
-
-   // exit ( 1 );
 
    return ( 0 );
 
@@ -853,10 +891,34 @@ do {
 
    ++Last_Line_Number;
 
+   if ( a.is_header() ) set_header(a);
+
 } while ( !(a.is_ok()) );
 
 
 return ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFile::set_header(DataLine & a)
+
+{
+   
+int j;
+
+Header.clear();
+
+for (j=0; j<a.n_items(); ++j)  {
+   
+   Header.add(a.get_item(j));
+   
+}
+
+return;
 
 }
 
