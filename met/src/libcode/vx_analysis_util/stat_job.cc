@@ -728,12 +728,14 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Determine the column offset
       //
-      c = determine_column_offset(L, thr_it->first);
+      c = determine_column_offset(L, thr_it->first, false);
    
       //
       // Check if the current value meets the threshold criteria
       //
-      if(!thr_it->second.check_dbl(atof(L.get_item(c)))) return(0);
+      if(!is_bad_data(c)) {
+         if(!thr_it->second.check_dbl(atof(L.get_item(c)))) return(0);
+      }
    }
    
    //
@@ -745,12 +747,14 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Determine the column offset
       //
-      c = determine_column_offset(L, str_it->first);
+      c = determine_column_offset(L, str_it->first, false);
    
       //
       // Check if the current value is in the list for the column
       //
-      if(!str_it->second.has(L.get_item(c))) return(0);
+      if(!is_bad_data(c)) {
+         if(!str_it->second.has(L.get_item(c))) return(0);
+      }
    }
 
    return(1);
@@ -1054,6 +1058,12 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       }
       else if(strcmp(jc_array[i], "-set_hdr") == 0) {
          n = get_column_offset ((const char **) 0, 0, to_upper(jc_array[i+1]));
+         if(is_bad_data(n)) {
+            mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
+                 << "no match found for header column named: \""
+                 << to_upper(jc_array[i+1]) << "\"\n\n";
+            throw(1);
+         }  
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;

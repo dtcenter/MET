@@ -275,6 +275,8 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -348,6 +350,8 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
    // Process the STAT lines
    //
    while(f >> line) {
+
+      if(line.is_header()) continue;
 
       n_in++;
 
@@ -3411,6 +3415,8 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    n_in = n_out = 0;
    while(f >> line) {
+
+      if(line.is_header()) continue;
 
       n_in++;
 
