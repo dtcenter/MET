@@ -569,6 +569,8 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -774,6 +776,8 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -947,6 +951,8 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
    // Process the STAT lines
    //
    while(f >> line) {
+
+      if(line.is_header()) continue;
 
       n_in++;
 
@@ -1143,6 +1149,8 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -1331,6 +1339,8 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -1431,6 +1441,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
    // Process the STAT lines
    //
    while(f >> line) {
+
+      if(line.is_header()) continue;
 
       n_in++;
 
@@ -1700,6 +1712,8 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -1806,6 +1820,8 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
    // Process the STAT lines
    //
    while(ldf >> line) {
+
+      if(line.is_header()) continue;
 
       n_in++;
 
@@ -2060,6 +2076,8 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -2186,6 +2204,8 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -2272,6 +2292,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
    // Process the STAT lines
    //
    while(f >> line) {
+
+      if(line.is_header()) continue;
 
       n_in++;
 
@@ -2379,6 +2401,8 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    while(f >> line) {
 
+      if(line.is_header()) continue;
+
       n_in++;
 
       if(j.is_keeper(line)) {
@@ -2482,6 +2506,8 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
    // Process the STAT lines
    //
    while(f >> line) {
+
+      if(line.is_header()) continue;
 
       n_in++;
 
