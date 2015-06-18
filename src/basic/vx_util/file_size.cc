@@ -16,13 +16,13 @@
 
 using namespace std;
 
-#include <cmath>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <cmath>
 
 #include "vx_log.h"
 
