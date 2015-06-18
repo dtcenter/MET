@@ -26,7 +26,6 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
-#include "vx_config.h"
 #include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
