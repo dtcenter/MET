@@ -19,7 +19,6 @@
 #include "tc_stat_files.h"
 
 #include "met_stats.h"
-#include "config_constants.h"
 #include "mask_poly.h"
 #include "vx_tc_util.h"
 #include "vx_util.h"
