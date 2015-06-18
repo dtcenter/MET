@@ -731,11 +731,14 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       c = determine_column_offset(L, thr_it->first, false);
    
       //
+      // Check that the column was found
+      //
+      if(is_bad_data(c)) return(0);
+
+      //
       // Check if the current value meets the threshold criteria
       //
-      if(!is_bad_data(c)) {
-         if(!thr_it->second.check_dbl(atof(L.get_item(c)))) return(0);
-      }
+      if(!thr_it->second.check_dbl(atof(L.get_item(c)))) return(0);
    }
    
    //
@@ -743,18 +746,21 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
        str_it != column_str_map.end(); str_it++) {
-      
+
       //
       // Determine the column offset
       //
       c = determine_column_offset(L, str_it->first, false);
+
+      //
+      // Check that the column was found
+      //
+      if(is_bad_data(c)) return(0);
    
       //
       // Check if the current value is in the list for the column
       //
-      if(!is_bad_data(c)) {
-         if(!str_it->second.has(L.get_item(c))) return(0);
-      }
+      if(!str_it->second.has(L.get_item(c))) return(0);
    }
 
    return(1);
