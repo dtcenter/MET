@@ -30,7 +30,6 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                substring.cc substring.h \
                temp_file.cc temp_file.h \
                thresh_array.cc thresh_array.h \
-               threshold.cc threshold.h \
                fix_float.cc fix_float.h \
                command_line.cc command_line.h \
                file_exists.cc file_exists.h \

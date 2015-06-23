@@ -17,6 +17,7 @@
 #include "config_util.h"
 #include "dictionary.h"
 #include "data_file_type.h"
+#include "threshold.h"
 
 ////////////////////////////////////////////////////////////////////////
 
