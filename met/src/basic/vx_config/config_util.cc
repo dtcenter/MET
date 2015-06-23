@@ -20,6 +20,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+// MetConfig object containing config value constants
+static MetConfig conf_const(replace_path(config_const_filename));
+
+////////////////////////////////////////////////////////////////////////
+
 void RegridInfo::clear() {
    enable = false;
    field = FieldType_None;
