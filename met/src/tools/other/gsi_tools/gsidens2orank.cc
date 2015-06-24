@@ -617,9 +617,9 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, cons
    at.set_entry(row, col++,       r.diagchan_data(rad_surf_em_index        - 1, j)); // SFC_EMIS
    at.set_entry(row, col++,       r.diagchan_data(rad_stability_index      - 1, j)); // STABILITY
 
-   double prs = (r.has_extra() ?  r.diagchan_data(rad_extra_prs_index      - 1, j) : bad_data_double);
+   double prs = (r.has_extra() ?  r.extra_data(rad_extra_prs_max_wgt_index - 1, j) : bad_data_double);
    if(prs > 1.0E8) prs = bad_data_double;
-   at.set_entry(row, col++, prs);                                                    // PRS
+   at.set_entry(row, col++, prs);                                                    // PRS_MAX_WGT
    
    return;
 }

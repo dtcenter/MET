@@ -83,7 +83,7 @@ static const int rad_stability_index          = 7; // stability index
    //
 
    
-static const int rad_extra_prs_index          = 1; // pressure
+static const int rad_extra_prs_max_wgt_index  = 1; // pressure of maximum weighting function 
 
 
 ////////////////////////////////////////////////////////////////////////
