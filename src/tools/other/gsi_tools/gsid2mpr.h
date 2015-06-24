@@ -114,7 +114,7 @@ static const char * rad_extra_columns [] = {
    "FCST_NOBC",  // Tb with no bias correction (K)
    "SFC_EMIS",   // surface emissivity
    "STABILITY",  // stability index
-   "PRS"         // extra pressure
+   "PRS_MAX_WGT" // pressure of the maximum weighing function
 };
 
 static const int n_rad_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);
