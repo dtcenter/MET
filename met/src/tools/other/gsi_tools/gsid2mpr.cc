@@ -57,7 +57,7 @@ static void process_conv(const char *conv_filename, const char *output_filename)
 static void process_rad (const char *rad_filename, const char *output_filename);
 
 static void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j, const char *var);
-static void write_mpr_row_rad (AsciiTable &at, int row, RadRecord  & r, const int j, const int use);
+static void write_mpr_row_rad (AsciiTable &at, int row, RadRecord  & r, const int j, const int chval, const int use);
 
 static void usage();
 static void set_channel(const StringArray &);
@@ -395,7 +395,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    int n_in, n_out;
    ofstream out;
    AsciiTable at;
-   NumArray do_channel;
+   NumArray i_channel;
    ConcatString cs;
 
    RadFile f;
@@ -442,16 +442,33 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 
    // Process all channels, if not otherwise specified
    if(channel.n_elements() == 0) {
-      for(i=0; i<f.n_channels(); i++) do_channel.add(i+1);      
+      for(i=0; i<f.n_channels(); i++) i_channel.add(i+1);
       mlog << Debug(2)
-           << "Processing all " << do_channel.n_elements() << " channels.\n";
+           << "Processing all " << i_channel.n_elements() << " channels.\n";
    }
    else {
-      do_channel = channel;
-      cs << cs_erase << "Processing " << do_channel.n_elements()
-         << " requested channels: " << nint(do_channel[0]);
-      for(i=1; i<do_channel.n_elements(); i++) cs << ", " << nint(do_channel[i]);
-      mlog << Debug(2) << cs << "\n";
+
+      // Find index for each requested channel
+      for(i=0; i<f.n_channels(); i++) {
+         if(channel.has(f.channel_val(i))) {
+            i_channel.add(i+1);
+            if(cs) cs << ", ";
+            cs << f.channel_val(i);
+         }
+      }
+
+      // Check for at least one matching channel
+      if(i_channel.n_elements() == 0) {
+         mlog << Error << "\nprocess_rad() -> "
+              << "none of the requested channel numbers found in \""
+              << rad_filename << "\".\n\n";
+         exit(1);
+      }
+
+      mlog << Debug(2)
+         << "Processing " << i_channel.n_elements() << " of "
+         << channel.n_elements() << " requested channels: "
+         << cs << "\n";
    }
 
    // Process each record
@@ -459,9 +476,11 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    n_out = 1; // 1 for header line
    while(f >> r)  {
 
-      at.add_rows(do_channel.n_elements());
-      for(i=0; i<do_channel.n_elements(); i++) {
-         write_mpr_row_rad(at, n_out++, r, do_channel[i]-1, f.use_channel(do_channel[i]-1));
+      at.add_rows(i_channel.n_elements());
+      for(i=0; i<i_channel.n_elements(); i++) {
+         write_mpr_row_rad(at, n_out++, r, i_channel[i]-1,
+                           f.channel_val(i_channel[i]-1),
+                           f.use_channel(i_channel[i]-1));
       }
 
       n_in++;
@@ -571,7 +590,8 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, const int use) {
+void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j,
+                       const int chval, const int use) {
    ConcatString var;
    int col;
 
@@ -586,7 +606,7 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, cons
    double guess      = obs - r.diagchan_data(rad_omg_bc_chan_index - 1, j);
    int    obs_qc     =  nint(r.diagchan_data(rad_qc_mark_index     - 1, j)) * use;
 
-   var.format("TB_%02d", j + 1);
+   var.format("TB_%02d", chval);
 
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date());
