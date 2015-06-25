@@ -505,6 +505,28 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+int RadFile::channel_val(const int n) const
+
+{
+
+
+if ( (n < 0) || (n >= Nchannels) )  {
+
+   mlog << Error << "\nRadFile::channel_val(int) -> "
+        << "range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( C_params[n].nuchan );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int RadFile::use_channel(const int n) const
 
 {
