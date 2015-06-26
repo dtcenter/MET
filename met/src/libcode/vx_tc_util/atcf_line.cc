@@ -20,6 +20,7 @@ using namespace std;
 #include "vx_math.h"
 
 #include "atcf_line.h"
+#include "atcf_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -28,7 +29,6 @@ extern int          parse_lat            (const char *);
 extern int          parse_lon            (const char *);
 extern int          parse_int            (const char *);
 extern int          parse_int_check_zero (const char *);
-extern ConcatString parse_str            (const char *);
   
 ////////////////////////////////////////////////////////////////////////
 //
@@ -48,40 +48,38 @@ ATCFLine::~ATCFLine() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ATCFLine::ATCFLine(const ATCFLine &t) {
+ATCFLine::ATCFLine(const ATCFLine &l) {
    init_from_scratch();
 
-   assign(t);
+   assign(l);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ATCFLine & ATCFLine::operator=(const ATCFLine &t) {
+ATCFLine & ATCFLine::operator=(const ATCFLine &l) {
 
-   if(this == &t) return(*this);
+   if(this == &l) return(*this);
 
-   assign(t);
+   assign(l);
 
    return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ATCFLine::operator==(const ATCFLine &t) {
-   bool match = false;
-
-   if(this == &t) return(true);
-
-   if(Line == t.Line) match = true;
-   else               match = false;
-
-   return(match);
+bool ATCFLine::operator==(const ATCFLine &l) {
+   return(get_line() == l.get_line());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ATCFLine::init_from_scratch() {
 
+   DataLine::init_from_scratch();
+
+   // ATCF lines are comma-delimited
+   set_delimiter(",");
+   
    clear();
 
    return;
@@ -89,44 +87,13 @@ void ATCFLine::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ATCFLine::clear() {
+void ATCFLine::assign(const ATCFLine &l) {
 
-   Line.clear();
-   Basin.clear();
-   CycloneNumber.clear();
-   WarningTime     = (unixtime) 0;
-   TechniqueNumber = bad_data_int;
-   ForecastPeriod  = bad_data_int;
-   Technique.clear();
-   LatTenths       = bad_data_int;
-   LonTenths       = bad_data_int;
-   Vmax            = bad_data_int;
-   MSLP            = bad_data_int;
-   Level           = NoCycloneLevel;
-   WindIntensity   = bad_data_int;
-   Quadrant        = NoQuadrantType;
-   Radius1         = bad_data_int;
-   Radius2         = bad_data_int;
-   Radius3         = bad_data_int;
-   Radius4         = bad_data_int;
-   IsobarPressure  = bad_data_int;
-   IsobarRadius    = bad_data_int;
-   MaxWindRadius   = bad_data_int;
-   Gusts           = bad_data_int;
-   EyeDiameter     = bad_data_int;
-   SubRegion       = NoSubregionCode;
-   MaxSeas         = bad_data_int;
-   Initials.clear();
-   StormDirection  = bad_data_int;
-   StormSpeed      = bad_data_int;
-   StormName.clear();
-   Depth           = NoSystemsDepth;
-   WaveHeight      = bad_data_int;
-   SeasCode        = NoQuadrantType;
-   SeasRadius1     = bad_data_int;
-   SeasRadius2     = bad_data_int;
-   SeasRadius3     = bad_data_int;
-   SeasRadius4     = bad_data_int;
+   clear();
+
+   DataLine::assign(l);
+
+   Technique = l.Technique;
 
    return;
 }
@@ -135,44 +102,50 @@ void ATCFLine::clear() {
 
 void ATCFLine::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
+   ConcatString cs;
 
-   out << prefix << "Line            = " << Line << "\n";
-   out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
-   out << prefix << "CycloneNumber   = \"" << (CycloneNumber ? CycloneNumber.text() : "(nul)") << "\"\n";
-   out << prefix << "WarningTime     = " << unix_to_yyyymmdd_hhmmss(WarningTime) << "\n";
-   out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
-   out << prefix << "ForecastPeriod  = " << ForecastPeriod << "\n";
+   out << prefix << "Line            = " << (*this) << "\n";
+   cs = basin();
+   out << prefix << "Basin           = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   cs = cyclone_number();
+   out << prefix << "CycloneNumber   = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "WarningTime     = " << unix_to_yyyymmdd_hhmmss(warning_time()) << "\n";
+   out << prefix << "TechniqueNumber = " << technique_number() << "\n";
+   out << prefix << "ForecastPeriod  = " << forecast_period() << "\n";
    out << prefix << "Valid           = " << unix_to_yyyymmdd_hhmmss(valid()) << "\n";
-   out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
+   cs = technique();
+   out << prefix << "Technique       = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
    out << prefix << "Lat             = " << lat() << "\n";
    out << prefix << "Lon             = " << lon() << "\n";
-   out << prefix << "Vmax            = " << Vmax << "\n";
-   out << prefix << "MSLP            = " << MSLP << "\n";
-   out << prefix << "Level           = " << cyclonelevel_to_string(Level) << "\n";
-   out << prefix << "WindIntensity   = " << WindIntensity << "\n";
-   out << prefix << "Quadrant        = " << quadranttype_to_string(Quadrant) << "\n";
-   out << prefix << "Radius1         = " << Radius1 << "\n";
-   out << prefix << "Radius2         = " << Radius2 << "\n";
-   out << prefix << "Radius3         = " << Radius3 << "\n";
-   out << prefix << "Radius4         = " << Radius4 << "\n";
-   out << prefix << "IsobarPressure  = " << IsobarPressure << "\n";
-   out << prefix << "IsobarRadius    = " << IsobarRadius << "\n";
-   out << prefix << "MaxWindRadius   = " << MaxWindRadius << "\n";
-   out << prefix << "Gusts           = " << Gusts << "\n";
-   out << prefix << "EyeDiameter     = " << EyeDiameter << "\n";
-   out << prefix << "SubRegion       = " << subregioncode_to_string(SubRegion) << "\n";
-   out << prefix << "MaxSeas         = " << MaxSeas << "\n";
-   out << prefix << "Initials        = \"" << (Initials ? Initials.text() : "(nul)") << "\"\n";
-   out << prefix << "StormDirection  = " << StormDirection << "\n";
-   out << prefix << "StormSpeed      = " << StormSpeed << "\n";
-   out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
-   out << prefix << "Depth           = " << systemsdepth_to_string(Depth) << "\n";
-   out << prefix << "WaveHeight      = " << WaveHeight << "\n";
-   out << prefix << "SeasCode        = " << quadranttype_to_string(SeasCode) << "\n";
-   out << prefix << "SeasRadius1     = " << SeasRadius1 << "\n";
-   out << prefix << "SeasRadius2     = " << SeasRadius2 << "\n";
-   out << prefix << "SeasRadius3     = " << SeasRadius3 << "\n";
-   out << prefix << "SeasRadius4     = " << SeasRadius4 << "\n";
+   out << prefix << "Vmax            = " << v_max() << "\n";
+   out << prefix << "MSLP            = " << mslp() << "\n";
+   out << prefix << "Level           = " << cyclonelevel_to_string(level()) << "\n";
+   out << prefix << "WindIntensity   = " << wind_intensity() << "\n";
+   out << prefix << "Quadrant        = " << quadranttype_to_string(quadrant()) << "\n";
+   out << prefix << "Radius1         = " << radius1() << "\n";
+   out << prefix << "Radius2         = " << radius2() << "\n";
+   out << prefix << "Radius3         = " << radius3() << "\n";
+   out << prefix << "Radius4         = " << radius4() << "\n";
+   out << prefix << "IsobarPressure  = " << isobar_pressure() << "\n";
+   out << prefix << "IsobarRadius    = " << isobar_radius() << "\n";
+   out << prefix << "MaxWindRadius   = " << max_wind_radius() << "\n";
+   out << prefix << "Gusts           = " << gusts() << "\n";
+   out << prefix << "EyeDiameter     = " << eye_diameter() << "\n";
+   out << prefix << "SubRegion       = " << subregioncode_to_string(subregion()) << "\n";
+   out << prefix << "MaxSeas         = " << max_seas() << "\n";
+   cs = initials();
+   out << prefix << "Initials        = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "StormDirection  = " << storm_direction() << "\n";
+   out << prefix << "StormSpeed      = " << storm_speed() << "\n";
+   cs = storm_name();
+   out << prefix << "StormName       = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "Depth           = " << systemsdepth_to_string(depth()) << "\n";
+   out << prefix << "WaveHeight      = " << wave_height() << "\n";
+   out << prefix << "SeasCode        = " << quadranttype_to_string(seas_code()) << "\n";
+   out << prefix << "SeasRadius1     = " << seas_radius1() << "\n";
+   out << prefix << "SeasRadius2     = " << seas_radius2() << "\n";
+   out << prefix << "SeasRadius3     = " << seas_radius3() << "\n";
+   out << prefix << "SeasRadius4     = " << seas_radius4() << "\n";
    out << flush;
    
    return;
@@ -180,80 +153,382 @@ void ATCFLine::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ATCFLine::assign(const ATCFLine &t) {
-  
-   clear();
+void ATCFLine::clear() {
+   DataLine::clear();
+   Technique.clear();
 
-   Line            = t.Line;
-   Basin           = t.Basin;
-   CycloneNumber   = t.CycloneNumber;
-   WarningTime     = t.WarningTime;
-   TechniqueNumber = t.TechniqueNumber;
-   Technique       = t.Technique;
-   ForecastPeriod  = t.ForecastPeriod;
-   LatTenths       = t.LatTenths;
-   LonTenths       = t.LonTenths;
-   Vmax            = t.Vmax;
-   MSLP            = t.MSLP;
-   Level           = t.Level;
-   WindIntensity   = t.WindIntensity;
-   Quadrant        = t.Quadrant;
-   Radius1         = t.Radius1;
-   Radius2         = t.Radius2;
-   Radius3         = t.Radius3;
-   Radius4         = t.Radius4;
-   IsobarPressure  = t.IsobarPressure;
-   IsobarRadius    = t.IsobarRadius;
-   MaxWindRadius   = t.MaxWindRadius;
-   Gusts           = t.Gusts;
-   EyeDiameter     = t.EyeDiameter;
-   SubRegion       = t.SubRegion;
-   MaxSeas         = t.MaxSeas;
-   Initials        = t.Initials;
-   StormDirection  = t.StormDirection;
-   StormSpeed      = t.StormSpeed;
-   StormName       = t.StormName;
-   Depth           = t.Depth;
-   WaveHeight      = t.WaveHeight;
-   SeasCode        = t.SeasCode;
-   SeasRadius1     = t.SeasRadius1;
-   SeasRadius2     = t.SeasRadius2;
-   SeasRadius3     = t.SeasRadius3;
-   SeasRadius4     = t.SeasRadius4;
-   
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+int ATCFLine::read_line(LineDataFile * ldf) {
+   int status;
+
+   status = DataLine::read_line(ldf);
+
+   // Check for bad return status or blank line
+   if(!status || n_items() == 0) {
+      clear();
+      return(0);
+   }
+
+   // Check for the minumum number of elements
+   if(n_items() < MinATCFElements) {
+      mlog << Warning
+           << "\nint ATCFLine::read_line(LineDataFile * ldf) -> "
+           << "found fewer than the expected number of elements ("
+           << n_items() << "<" << MinATCFElements << ") in ATCF line:\n"
+           << Line << "\n\n";
+      return(false);
+   }
+
+   return(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::is_header() const {
+   if(strcasecmp(basin(), "BASIN") == 0) return(1);
+   else                                  return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString ATCFLine::get_item(int i) const {
+   ConcatString cs;
+
+   cs = DataLine::get_item(i);
+
+   // Strip off any whitespace
+   cs.ws_strip();
+   
+   return(cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString ATCFLine::get_line() const {
+   ConcatString cs;
+
+   if(N_items == 0) return(cs);
+   
+   for(int i=0; i<N_items-1; i++) cs << DataLine::get_item(i) << Delimiter;
+   cs << DataLine::get_item(N_items-1);
+   
+   return(cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString ATCFLine::basin() const {
+   return(get_item(BasinOffset));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString ATCFLine::cyclone_number() const {
+   return(get_item(CycloneNumberOffset));   }
+
+////////////////////////////////////////////////////////////////////////
+
+unixtime ATCFLine::warning_time() const {
+   return(parse_time(get_item(WarningTimeOffset)));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::technique_number() const {
+   return(parse_int(get_item(TechniqueNumberOffset)));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString ATCFLine::technique() const {
+   ConcatString cs;
+
+   // Use Technique, if already set
+   if(Technique) cs = Technique;
+   else          cs = get_item(TechniqueOffset);
+
+   // Replace instances of AVN with GFS
+   cs.replace("AVN", "GFS");
+
+   return(cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::forecast_period() const {
+   return(parse_int(get_item(ForecastPeriodOffset)));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ATCFLine::lat() const {
+   double v = parse_lat(get_item(LatTenthsOffset));
+
+   return(0.1*v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ATCFLine::lon() const {
+   double v = parse_lon(get_item(LonTenthsOffset));
+
+   return(0.1*v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::v_max() const {
+   return(VMaxOffset < N_items ?
+          parse_int_check_zero(get_item(VMaxOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::mslp() const {
+   return(MSLPOffset < N_items ?
+          parse_int_check_zero(get_item(MSLPOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+CycloneLevel ATCFLine::level() const {
+   return(LevelOffset < N_items ?
+          string_to_cyclonelevel(get_item(LevelOffset)) :
+          NoCycloneLevel);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::wind_intensity() const {
+   return(WindIntensityOffset < N_items ?
+          parse_int_check_zero(get_item(WindIntensityOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+QuadrantType ATCFLine::quadrant() const {
+   return(QuadrantOffset < N_items ?
+          string_to_quadranttype(get_item(QuadrantOffset)) :
+          NoQuadrantType);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::radius1() const {
+   return(Radius1Offset < N_items ?
+          parse_int_check_zero(get_item(Radius1Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::radius2() const {
+   return(Radius2Offset < N_items ?
+          parse_int_check_zero(get_item(Radius2Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::radius3() const {
+   return(Radius3Offset < N_items ?
+          parse_int_check_zero(get_item(Radius3Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::radius4() const {
+   return(Radius4Offset < N_items ?
+          parse_int_check_zero(get_item(Radius4Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::isobar_pressure() const {
+   return(IsobarPressureOffset < N_items ?
+          parse_int_check_zero(get_item(IsobarPressureOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::isobar_radius() const {
+   return(IsobarRadiusOffset < N_items ?
+          parse_int_check_zero(get_item(IsobarRadiusOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::max_wind_radius() const {
+   return(MaxWindRadiusOffset < N_items ?
+          parse_int_check_zero(get_item(MaxWindRadiusOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::gusts() const {
+   return(GustsOffset < N_items ?
+          parse_int_check_zero(get_item(GustsOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::eye_diameter() const {
+   return(EyeDiameterOffset < N_items ?
+          parse_int_check_zero(get_item(EyeDiameterOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+SubregionCode ATCFLine::subregion() const {
+   return(SubRegionOffset < N_items ?
+          string_to_subregioncode(get_item(SubRegionOffset)) :
+          NoSubregionCode);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::max_seas() const {
+   return(MaxSeasOffset < N_items ?
+          parse_int_check_zero(get_item(MaxSeasOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString ATCFLine::initials() const {
+   return(InitialsOffset < N_items ?
+          get_item(InitialsOffset) :
+          "");
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::storm_direction() const {
+   return(StormDirectionOffset < N_items ?
+          parse_int(get_item(StormDirectionOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::storm_speed() const {
+   return(StormSpeedOffset < N_items ?
+          parse_int(get_item(StormSpeedOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString ATCFLine::storm_name() const {
+   return(StormNameOffset < N_items ?
+          get_item(StormNameOffset) :
+          "");
+}
+
+////////////////////////////////////////////////////////////////////////
+
+SystemsDepth ATCFLine::depth() const {
+   return(DepthOffset < N_items ?
+          string_to_systemsdepth(get_item(DepthOffset)) :
+          NoSystemsDepth);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::wave_height() const {
+   return(WaveHeightOffset < N_items ?
+          parse_int_check_zero(get_item(WaveHeightOffset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+QuadrantType ATCFLine::seas_code() const {
+   return(SeasCodeOffset < N_items ?
+          string_to_quadranttype(get_item(SeasCodeOffset)) :
+          NoQuadrantType);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::seas_radius1() const {
+   return(SeasRadius1Offset < N_items ?
+          parse_int_check_zero(get_item(SeasRadius1Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::seas_radius2() const {
+   return(SeasRadius2Offset < N_items ?
+          parse_int_check_zero(get_item(SeasRadius2Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::seas_radius3() const {
+   return(SeasRadius3Offset < N_items ?
+          parse_int_check_zero(get_item(SeasRadius3Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFLine::seas_radius4() const {
+   return(SeasRadius4Offset < N_items ?
+          parse_int_check_zero(get_item(SeasRadius4Offset)) :
+          bad_data_int);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 unixtime ATCFLine::valid() const {
-   unixtime u = 0;
+   unixtime wt = warning_time();
+   double   fp = forecast_period();
+   int      tn = technique_number();
+   unixtime ut = 0;
    
    // Compute the valid time if WarningTime and ForecastPeriod are valid
-   if(WarningTime > 0 && !is_bad_data(ForecastPeriod)) {
-      u = WarningTime + sec_per_hour * ForecastPeriod;
+   if(wt > 0 && !is_bad_data(fp)) {
+      ut = wt + sec_per_hour * fp;
    }
    
    // Add minutes for the BEST track
-   if(strcasecmp(Technique, BestTrackStr) == 0 &&
-      !is_bad_data(TechniqueNumber)) {
-      u += sec_per_minute * TechniqueNumber;
+   if(strcasecmp(technique(), BestTrackStr) == 0 &&
+      !is_bad_data(tn)) {
+      ut += sec_per_minute * tn;
    }
    
-   return(u);
+   return(ut);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFLine::lead() const {
-   int s = bad_data_int;
+   double fp = forecast_period();
+   int    s  = bad_data_int;
 
    // Lead time for the BEST track is 0
-   if(strcasecmp(Technique, BestTrackStr) == 0) {
+   if(strcasecmp(technique(), BestTrackStr) == 0) {
       s = 0;
    }
-   else if(!is_bad_data(ForecastPeriod)) {
-      s = sec_per_hour * ForecastPeriod;
+   else if(!is_bad_data(fp)) {
+      s = sec_per_hour * fp;
    }
 
    return(s);
@@ -263,99 +538,6 @@ int ATCFLine::lead() const {
 //
 //  Code for misc functions
 //
-////////////////////////////////////////////////////////////////////////
-
-bool operator>>(istream &in, ATCFLine &t) {
-   ConcatString element;
-   StringArray a;
-   const char delim [] = ",";
-   int j;
-
-   // Initialize
-   t.clear();
-
-   // Read line into ConcatString
-   if(!t.Line.read_line(in)) return(false);
-   t.Line.chomp('\n');
-
-   // Append an extra space before splitting
-   t.Line << " ";
-   
-   // Split the comma-delimited line
-   a = t.Line.split(delim);
-
-   // Check for a blank line
-   if(a.n_elements() == 0) return(false);
-
-   // Check for the minumum number of elements
-   if(a.n_elements() < MinATCFElements) {
-      mlog << Warning
-           << "\nbool operator>>(istream & in, ATCFLine & t) -> "
-           << "found fewer than the expected number of elements ("
-           << a.n_elements() << "<" << MinATCFElements << ") in ATCF line:\n"
-           << t.Line << "\n\n";
-      return(false);
-   }
-
-   // Remove whitespace from each element of the StringArray
-   for(j=0; j<a.n_elements(); j++) {
-      element.erase();
-      element << a[j];
-      element.ws_strip();
-      a.set(j, element);
-   }
-
-   // Loop through and parse each element
-   // For many numeric columns, replaces instances of 0 with NA
-   for(j=0; j<a.n_elements(); j++) {
-
-      switch(j) {
-        case (0): t.Basin           = parse_str(a[j]);               break;
-        case (1): t.CycloneNumber   = parse_str(a[j]);               break;
-        case (2): t.WarningTime     = parse_time(a[j]);              break;
-        case (3): t.TechniqueNumber = parse_int(a[j]);               break;
-
-        // Replace instances of AVN with GFS
-        case (4): t.Technique       = parse_str(a[j]);
-                  t.Technique.replace("AVN", "GFS");                 break;
-
-        case (5): t.ForecastPeriod  = parse_int(a[j]);               break;
-        case (6): t.LatTenths       = parse_lat(a[j]);               break;
-        case (7): t.LonTenths       = parse_lon(a[j]);               break;
-        case (8): t.Vmax            = parse_int_check_zero(a[j]);    break;
-        case (9): t.MSLP            = parse_int_check_zero(a[j]);    break;
-        case(10): t.Level           = string_to_cyclonelevel(a[j]);  break;
-        case(11): t.WindIntensity   = parse_int_check_zero(a[j]);    break;
-        case(12): t.Quadrant        = string_to_quadranttype(a[j]);  break;
-        case(13): t.Radius1         = parse_int_check_zero(a[j]);    break;
-        case(14): t.Radius2         = parse_int_check_zero(a[j]);    break;
-        case(15): t.Radius3         = parse_int_check_zero(a[j]);    break;
-        case(16): t.Radius4         = parse_int_check_zero(a[j]);    break;
-        case(17): t.IsobarPressure  = parse_int_check_zero(a[j]);    break;
-        case(18): t.IsobarRadius    = parse_int_check_zero(a[j]);    break;
-        case(19): t.MaxWindRadius   = parse_int_check_zero(a[j]);    break;
-        case(20): t.Gusts           = parse_int_check_zero(a[j]);    break;
-        case(21): t.EyeDiameter     = parse_int_check_zero(a[j]);    break;
-        case(22): t.SubRegion       = string_to_subregioncode(a[j]); break;
-        case(23): t.MaxSeas         = parse_int_check_zero(a[j]);    break;
-        case(24): t.Initials        = parse_str(a[j]);               break;
-        case(25): t.StormDirection  = parse_int(a[j]);               break;
-        case(26): t.StormSpeed      = parse_int(a[j]);               break;
-        case(27): t.StormName       = parse_str(a[j]);               break;
-        case(28): t.Depth           = string_to_systemsdepth(a[j]);  break;
-        case(29): t.WaveHeight      = parse_int_check_zero(a[j]);    break;
-        case(30): t.SeasCode        = string_to_quadranttype(a[j]);  break;
-        case(31): t.SeasRadius1     = parse_int_check_zero(a[j]);    break;
-        case(32): t.SeasRadius2     = parse_int_check_zero(a[j]);    break;
-        case(33): t.SeasRadius3     = parse_int_check_zero(a[j]);    break;
-        case(34): t.SeasRadius4     = parse_int_check_zero(a[j]);    break;
-        default:                                                     break;
-      } // end switch
-   } // end for
-
-   return (true);
-}
-
 ////////////////////////////////////////////////////////////////////////
 
 CycloneLevel wind_speed_to_cyclone_level(int s) {
@@ -445,16 +627,6 @@ int parse_int_check_zero(const char *s) {
 
    // Interpret values of 0 as bad data
    if(v == 0) v = bad_data_int;
-
-   return(v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString parse_str(const char *s) {
-   ConcatString v;
-
-   if(strlen(s) > 0) v = s;
 
    return(v);
 }
