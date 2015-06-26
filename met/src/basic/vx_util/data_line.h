@@ -94,6 +94,8 @@ class DataLine {
 
       const char * get_item(int) const;
 
+      const char * get_delimiter() const;
+
       const LineDataFile * get_file() const;
 
       int n_items() const;
@@ -124,9 +126,13 @@ class DataLine {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline  int           DataLine::n_items     () const { return ( N_items ); }
+inline  int           DataLine::n_items      () const { return ( N_items ); }
 
-inline  int           DataLine::line_number () const { return ( LineNumber ); }
+inline  int           DataLine::line_number  () const { return ( LineNumber ); }
+
+inline  const char *  DataLine::get_line     () const { return ( Line ); }
+
+inline  const char *  DataLine::get_delimiter() const { return ( Delimiter ); }
 
 
 ////////////////////////////////////////////////////////////////////////
