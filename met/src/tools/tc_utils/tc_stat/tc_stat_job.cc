@@ -525,7 +525,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
       for(str_it = InitStrMap.begin(); str_it != InitStrMap.end(); str_it++) {
 
          // Determine the column offset and retrieve the value
-         offset = determine_column_offset(tpi.line(i_init)->type(), str_it->first);
+         offset = determine_column_offset(*(tpi.line(i_init)), str_it->first);
          v_str  = tpi.line(i_init)->get_item(offset);
 
          // Check the string value
@@ -641,7 +641,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       for(str_it = ColumnStrMap.begin(); str_it != ColumnStrMap.end(); str_it++) {
          
          // Determine the column offset and retrieve the value
-         offset = determine_column_offset(line.type(), str_it->first);
+         offset = determine_column_offset(line, str_it->first);
          v_str  = line.get_item(offset);
 
          // Check the string value

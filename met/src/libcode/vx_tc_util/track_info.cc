@@ -403,13 +403,14 @@ bool TrackInfo::add(const ATCFLine &l, bool check_dup) {
    if(!is_match(l)) return(false);
    
    // Check if the storm name needs to be set or has changed
-   if(!StormName) StormName = l.storm_name();
-   else if(StormName && l.storm_name() &&
-           StormName != l.storm_name()) {
+   ConcatString name = l.storm_name();
+   if(StormName.length() == 0) StormName = name;
+   else if(StormName.length() > 0 && name.length() > 0 &&
+           StormName != name) {
       mlog << Debug(4)
            << "Updating storm name from \"" << StormName << "\" to \""
-           << l.storm_name() << "\" for " << StormId << ".\n";
-      StormName = l.storm_name();
+           << name << "\" for " << StormId << ".\n";
+      StormName = name;
    }
 
    // Check that the TrackPoint valid time is increasing
@@ -420,7 +421,7 @@ bool TrackInfo::add(const ATCFLine &l, bool check_dup) {
               << "skipping ATCFLine since the valid time is not increasing ("
               << unix_to_yyyymmdd_hhmmss(l.valid()) << " < "
               << unix_to_yyyymmdd_hhmmss(Point[NPoints-1].valid())
-              << "):\n" << l.line() << "\n\n";
+              << "):\n" << l.get_line() << "\n\n";
          return(false);
       }
    }
@@ -447,7 +448,7 @@ bool TrackInfo::add(const ATCFLine &l, bool check_dup) {
       MaxValidTime = l.valid();
 
    // Store the ATCFLine that was just added
-   if(check_dup) TrackLines.add(l.line());
+   if(check_dup) TrackLines.add(l.get_line());
 
    return(status);
 }
@@ -470,7 +471,7 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfo::has(const ATCFLine &l) const {
-   return(TrackLines.has(l.line()));
+   return(TrackLines.has(l.get_line()));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -774,7 +775,7 @@ bool TrackInfoArray::add(const ATCFLine &l, bool check_dup) {
          mlog << Warning
               << "\nTrackInfoArray::add(const ATCFLine &) -> "
               << "skipping duplicate ATCFLine:\n"
-              << l.line() << "\n\n";
+              << l.get_line() << "\n\n";
          return(false);
       }
    }

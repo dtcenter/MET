@@ -368,7 +368,7 @@ void process_track_files(const StringArray &files,
                          const StringArray &model_suffix,
                          TrackInfoArray &tracks, bool check_keep) {
    int i, cur_read, cur_add, tot_read, tot_add;
-   ifstream in;
+   LineDataFile f;
    ConcatString cs;
    ATCFLine line;
 
@@ -382,8 +382,7 @@ void process_track_files(const StringArray &files,
    for(i=0; i<files.n_elements(); i++) {
 
       // Open the current file
-      in.open(files[i]);
-      if(!in) {
+      if(!f.open(files[i])) {
          mlog << Error
               << "\nprocess_track_files() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
@@ -394,7 +393,7 @@ void process_track_files(const StringArray &files,
       cur_read = cur_add = 0;
 
       // Read each line in the file
-      while(in >> line) {
+      while(f >> line) {
 
          // Increment the line counts
          cur_read++;
@@ -423,7 +422,7 @@ void process_track_files(const StringArray &files,
            << " lines read from file \"" << files[i] << "\"\n";
 
       // Close the current file
-      in.close();
+      f.close();
 
    } // end for i
 

@@ -25,6 +25,7 @@
 enum TCStatLineType {
 
    TCStatLineType_TCMPR,
+   TCStatLineType_Header,
    NoTCStatLineType
 
 };
@@ -54,6 +55,8 @@ class TCStatLine : public DataLine {
       int read_line(LineDataFile *);   //  virtual from base class
 
       int is_ok() const;               //  virtual from base class
+
+      int is_header() const;           //  virtual from base class
 
       //
       // Retrieve values of the header columns
@@ -89,7 +92,8 @@ inline  TCStatLineType TCStatLine::type() const { return(Type); }
 
 ////////////////////////////////////////////////////////////////////////
 
-extern int determine_column_offset(TCStatLineType, const char *);
+extern int determine_column_offset(const TCStatLine &, const char *,
+                                   bool error_out = true);
 
 ////////////////////////////////////////////////////////////////////////
 

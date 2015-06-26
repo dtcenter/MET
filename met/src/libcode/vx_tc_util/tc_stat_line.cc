@@ -29,7 +29,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *TCStatLineType_TCMPR_Str = "TCMPR";
+static const char *TCStatLineType_TCMPR_Str  = "TCMPR";
+static const char *TCStatLineType_Header_Str = "LINE_TYPE";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -102,16 +103,20 @@ int TCStatLine::read_line(LineDataFile * ldf) {
 ////////////////////////////////////////////////////////////////////////
 
 int TCStatLine::is_ok() const {
+   return(DataLine::is_ok());
+}
 
-   if(!(DataLine::is_ok())) return(0);
+////////////////////////////////////////////////////////////////////////
 
-   // Get the first item in the line
-   const char *c = get_item(0);
-   
-   // Check if this is a header line   
-   if(strcmp(c, "VERSION") == 0) return(0);
+int TCStatLine::is_header() const {
 
-   return(1);
+   const char * c = line_type();
+
+   TCStatLineType t = string_to_tcstatlinetype(c);
+
+   if(t == TCStatLineType_Header) return(1);
+
+   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -128,7 +133,7 @@ const char * TCStatLine::get_item(int k) const {
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::get_item(const char * col_name) const {
-   int offset = determine_column_offset(Type, col_name);
+   int offset = determine_column_offset(*this, col_name);
 
    return(get_item(offset));
 }
@@ -285,8 +290,9 @@ void TCStatLine::determine_line_type() {
 TCStatLineType string_to_tcstatlinetype(const char *s) {
    TCStatLineType t;
 
-   if(strcmp(s, TCStatLineType_TCMPR_Str) == 0) t = TCStatLineType_TCMPR;
-   else                                         t = NoTCStatLineType;
+        if(strcmp(s, TCStatLineType_TCMPR_Str)  == 0) t = TCStatLineType_TCMPR;
+   else if(strcmp(s, TCStatLineType_Header_Str) == 0) t = TCStatLineType_Header;
+   else                                               t = NoTCStatLineType;
 
    return(t);
 }
@@ -297,8 +303,9 @@ ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
    const char *s = (const char *) 0;
 
    switch(t) {
-      case TCStatLineType_TCMPR: s = TCStatLineType_TCMPR_Str; break;
-      default:                   s = na_str;                   break;
+      case TCStatLineType_TCMPR:  s = TCStatLineType_TCMPR_Str;  break;
+      case TCStatLineType_Header: s = TCStatLineType_Header_Str; break;
+      default:                    s = na_str;                    break;
    }
 
    return(ConcatString(s));
@@ -310,10 +317,10 @@ ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-int determine_column_offset(TCStatLineType type, const char *c) {
-   int offset;
+int determine_column_offset(const TCStatLine &L, const char *c, bool error_out) {
+   int offset = bad_data_int;
 
-   switch(type) {
+   switch(L.type()) {
 
       case TCStatLineType_TCMPR:
          offset = get_tc_mpr_col_offset(c);
@@ -321,10 +328,22 @@ int determine_column_offset(TCStatLineType type, const char *c) {
 
       default:
          mlog << Error << "\ndetermine_column_offset() -> "
-              << "unexpected line type value of " << type << "\n\n";
+              << "unexpected line type value of " << L.type() << "\n\n";
          exit(1);
          break;
    };
+   
+   // Check any extra header columns
+   if(is_bad_data(offset)) {
+      if(!L.get_file()->header().has(c, offset)) offset = bad_data_int;
+   }
+   
+   // Check for no match
+   if(error_out && is_bad_data(offset)) {
+      mlog << Error << "\ndetermine_column_offset() -> "
+           << "no match found for column named: \"" << c << "\"\n\n";
+      exit(1);
+   }
 
    return(offset);
 }

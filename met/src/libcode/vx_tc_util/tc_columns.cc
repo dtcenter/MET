@@ -65,14 +65,13 @@ int get_tc_col_offset(const char **arr, int n_cols, const char *col_name) {
 ////////////////////////////////////////////////////////////////////////
 
 int get_tc_mpr_col_offset(const char *col_name) {
-   int i, j, wind, offset;
-   bool found = false;
+   int i, j, wind;
    ConcatString s;
+   int offset = bad_data_int;
 
    // Search the TC header columns first
    for(i=0; i<n_tc_header_cols; i++) {
       if(strcasecmp(tc_header_cols[i], col_name) == 0) {
-         found  = true;
          offset = i;
          break;
       }
@@ -96,14 +95,13 @@ int get_tc_mpr_col_offset(const char *col_name) {
    //    (for each wind intensity value)
 
    // Check the static columns
-   if(!found) {
+   if(is_bad_data(offset)) {
 
       // Loop through the static columns looking for a match
       for(i=0; i<n_tc_mpr_static; i++) {
 
          // Check for a match
          if(strcasecmp(tc_mpr_cols[i], col_name) == 0) {
-            found  = true;
             offset = n_tc_header_cols + i;
             break;
          }
@@ -111,7 +109,7 @@ int get_tc_mpr_col_offset(const char *col_name) {
    }
 
    // Check the variable columns
-   if(!found) {
+   if(is_bad_data(offset)) {
 
       // Loop through the variable columns looking for a match
       for(i=0; i<n_tc_mpr_var; i++) {
@@ -125,24 +123,15 @@ int get_tc_mpr_col_offset(const char *col_name) {
             // Loop through the wind intensities
             for(j=0; j<NWinds; j++) {
                if(WindIntensity[j] == wind) {
-                  found  = true;
                   offset = n_tc_header_cols + n_tc_mpr_static + j*n_tc_mpr_var + i;
                   break;
                }
             } // end for j
 
             // Check if it's been found
-            if(found) break;
+            if(!is_bad_data(offset)) break;
          }
       } // end for i
-   }
-   
-   if(!found) {
-      mlog << Error
-           << "\nget_tc_mpr_col_offset() -> "
-           << "no match found for the column name specified: \""
-           << col_name << "\"\n\n";
-      exit(1);
    }
 
    return(offset);
