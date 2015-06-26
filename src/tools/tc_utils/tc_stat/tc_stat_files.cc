@@ -161,6 +161,9 @@ bool TCStatFiles::operator>>(TrackPairInfo &tpi) {
    // Read lines to the end of the track or file
    while(CurLDF >> line) {
 
+      // Skip header lines
+      if(line.is_header()) continue;
+
       // Add the current point
       tpi.add(line);
       

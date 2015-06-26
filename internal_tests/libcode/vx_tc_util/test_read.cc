@@ -36,13 +36,12 @@ int main(int argc, char *argv[]) {
    }
    
    ConcatString input_filename = argv[1];
-   ifstream in;
+   LineDataFile f;
    ATCFLine t_line;
    TrackInfoArray t_array;
    int count, i;
-   in.open(input_filename);
    
-   if(!in) {
+   if(!f.open(input_filename)) {
       mlog << Error
            << "\n" << program_name
            << ": unable to open input file \"" << input_filename << "\"\n\n";
@@ -50,7 +49,7 @@ int main(int argc, char *argv[]) {
    }
    
    count = 0;
-   while(in >> t_line) {
+   while(f >> t_line) {
    
       // Increment the line count
       count++;
@@ -79,7 +78,7 @@ int main(int argc, char *argv[]) {
    }
 
    // Clean up
-   in.close();
+   f.close();
    
    return(0);
    
