@@ -688,8 +688,8 @@ void SingleThresh::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "thresh = " << get_value() << '\n';
-out << prefix << "type   = " << get_type()  << '\n';
+out << prefix << "type  = " << get_type()  << '\n';
+out << prefix << "value = " << get_value() << '\n';
 
 
    //
