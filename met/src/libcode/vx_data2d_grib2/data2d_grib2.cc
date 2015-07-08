@@ -395,28 +395,28 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                SingleThresh v_thr_hi = vinfo->p_thresh_hi();
 
                //  if both thresholds are in effect, check both values
-               if( !is_bad_data(v_thr_lo.thresh) &&
-                   !is_bad_data(v_thr_hi.thresh) ){
-                  rec_match_ex = ( is_eq(v_thr_lo.thresh, (*it)->ProbLower) &&
-                                   is_eq(v_thr_hi.thresh, (*it)->ProbUpper) &&
+               if( !is_bad_data(v_thr_lo.get_value()) &&
+                   !is_bad_data(v_thr_hi.get_value()) ){
+                  rec_match_ex = ( is_eq(v_thr_lo.get_value(), (*it)->ProbLower) &&
+                                   is_eq(v_thr_hi.get_value(), (*it)->ProbUpper) &&
                                    2 == (*it)->ProbType
                                  );
                }
 
                //  compare the single upper threshold case
-               else if( !is_bad_data(v_thr_hi.thresh) ){
+               else if( !is_bad_data(v_thr_hi.get_value()) ){
                   rec_match_ex = ( 0 == (*it)->ProbType &&
-                                   is_eq(v_thr_hi.thresh, (*it)->ProbLower) ) ||
+                                   is_eq(v_thr_hi.get_value(), (*it)->ProbLower) ) ||
                                  ( 4 == (*it)->ProbType &&
-                                   is_eq(v_thr_hi.thresh, (*it)->ProbUpper) );
+                                   is_eq(v_thr_hi.get_value(), (*it)->ProbUpper) );
                }
 
                //  compare the single lower threshold case
-               else if( !is_bad_data(v_thr_lo.thresh) ){
+               else if( !is_bad_data(v_thr_lo.get_value()) ){
                   rec_match_ex = ( 1 == (*it)->ProbType &&
-                                   is_eq(v_thr_lo.thresh, (*it)->ProbUpper) ) ||
+                                   is_eq(v_thr_lo.get_value(), (*it)->ProbUpper) ) ||
                                  ( 3 == (*it)->ProbType &&
-                                   is_eq(v_thr_lo.thresh, (*it)->ProbLower) );
+                                   is_eq(v_thr_lo.get_value(), (*it)->ProbLower) );
                }
 
             }

@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include "concat_string.h"
+#include "vx_cal.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -66,6 +67,8 @@ class ThreshNode {
 
       virtual ThreshType type() const = 0;
 
+      virtual double value() const = 0;
+
       ConcatString s;
       ConcatString abbr_s;
 
@@ -88,6 +91,8 @@ class Or_Node : public ThreshNode {
 
       ThreshType type() const;
 
+      double value() const;
+
       ThreshNode * left_child;
       ThreshNode * right_child;
 
@@ -97,7 +102,8 @@ class Or_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType Or_Node::type() const { return ( thresh_complex ); }
+inline ThreshType Or_Node::type()  const { return ( thresh_complex  ); }
+inline double     Or_Node::value() const { return ( bad_data_double ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -114,6 +120,8 @@ class And_Node : public ThreshNode {
 
       ThreshType type() const;
 
+      double value() const;
+
       ThreshNode * copy() const;
 
       ThreshNode * left_child;
@@ -125,8 +133,8 @@ class And_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType And_Node::type() const { return ( thresh_complex ); }
-
+inline ThreshType And_Node::type()  const { return ( thresh_complex  ); }
+inline double     And_Node::value() const { return ( bad_data_double ); }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -142,6 +150,8 @@ class Not_Node : public ThreshNode {
 
       ThreshType type() const;
 
+      double value() const;
+
       ThreshNode * copy() const;
 
       ThreshNode * child;
@@ -152,7 +162,8 @@ class Not_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType Not_Node::type() const { return ( thresh_complex ); }
+inline ThreshType Not_Node::type()  const { return ( thresh_complex  ); }
+inline double     Not_Node::value() const { return ( bad_data_double ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -170,6 +181,8 @@ class Simple_Node : public ThreshNode {
 
       ThreshType type() const;
 
+      double value() const;
+
       bool check(double) const;
 
       ThreshNode * copy() const;
@@ -182,10 +195,18 @@ class Simple_Node : public ThreshNode {
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+inline ThreshType Simple_Node::type()  const { return ( op ); }
+inline double     Simple_Node::value() const { return ( T  ); }
+
+
+////////////////////////////////////////////////////////////////////////
 //
 // Class to store a threshold value and type
 //
 ////////////////////////////////////////////////////////////////////////
+
 
 class SingleThresh {
 
@@ -207,9 +228,6 @@ class SingleThresh {
 
       ThreshNode * node;   //  allocated
 
-      double       thresh; // Threshold value
-      // ThreshType   type;   // Threshold type
-
       void         clear();
 
       void         set(double, ThreshType);
@@ -218,30 +236,27 @@ class SingleThresh {
 
       void         set_na();
 
-      // double       get_thresh() const;
       ThreshType   get_type() const;
+      double       get_value() const;
 
       ConcatString get_str(int precision = thresh_default_precision) const;
-      // void         get_str(char *, int precision = thresh_default_precision) const;
-
       ConcatString get_abbr_str(int precision = thresh_default_precision) const;
-      // void         get_abbr_str(char *, int precision = thresh_default_precision) const;
-
       bool         check(double) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-// inline double     SingleThresh::get_thresh() const { return(thresh); }
 
-inline ThreshType SingleThresh::get_type()   const { return ( node ? node->type() : thresh_na );   }
-
-inline bool       SingleThresh::check(double __x__) const { return ( node ? node->check(__x__) : true ); }
+inline ThreshType SingleThresh::get_type()          const { return ( node ? node->type()       : thresh_na       ); }
+inline double     SingleThresh::get_value()         const { return ( node ? node->value()      : bad_data_double ); }
+inline bool       SingleThresh::check(double __x__) const { return ( node ? node->check(__x__) : true            ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
 extern bool check_threshold(double, double, int);
+
 
 ////////////////////////////////////////////////////////////////////////
 

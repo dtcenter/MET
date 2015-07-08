@@ -866,7 +866,8 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    // Check for valid coverage thresholds
    for(i=0; i<info.cov_ta.n_elements(); i++) {
 
-      if(info.cov_ta[i].thresh < 0.0 || info.cov_ta[i].thresh > 1.0) {
+      if(info.cov_ta[i].get_value() < 0.0 ||
+         info.cov_ta[i].get_value() > 1.0) {
          mlog << Error << "\nparse_conf_nbrhd() -> "
               << "The neighborhood coverage threshold value must be set "
               << "between 0 and 1.\n\n";
@@ -1115,8 +1116,8 @@ void check_prob_thresh(const ThreshArray &ta) {
 
    // Check for at least 3 thresholds beginning with 0 and ending with 1.
    if(n < 3 ||
-      !is_eq(ta[0].thresh,   0.0) ||
-      !is_eq(ta[n-1].thresh, 1.0)) {
+      !is_eq(ta[0].get_value(),   0.0) ||
+      !is_eq(ta[n-1].get_value(), 1.0)) {
 
       mlog << Error << "\ncheck_prob_thresh() -> "
            << "When verifying a probability field, you must "
@@ -1137,8 +1138,8 @@ void check_prob_thresh(const ThreshArray &ta) {
       }
 
       // Check that all thresholds are in [0, 1].
-      if(ta[i].thresh < 0.0 ||
-         ta[i].thresh > 1.0) {
+      if(ta[i].get_value() < 0.0 ||
+         ta[i].get_value() > 1.0) {
 
          mlog << Error << "\ncheck_prob_thresh() -> "
               << "When verifying a probability field, all "

@@ -287,9 +287,7 @@ Simple_Node::Simple_Node()
 
 {
 
-T = 0.0;
-
-// op = no_thresh_type;
+T = bad_data_double;
 
 }
 
@@ -334,8 +332,6 @@ switch ( op )  {
 
 }   //  switch
 
-
-
 return ( tf );
 
 }
@@ -364,25 +360,13 @@ return ( n );
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshType Simple_Node::type() const
-
-{
-
-return ( op );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void Simple_Node::set_na()
 
 {
 
 op = thresh_na;
 
-T = 0.0;
+T = bad_data_double;
 
 s = na_str;
 
@@ -394,13 +378,11 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////
 //
 // Code for class SingleThresh
 //
 ////////////////////////////////////////////////////////////////////////
+
 
 SingleThresh::SingleThresh()
 
@@ -410,7 +392,9 @@ init_from_scratch();
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 SingleThresh::~SingleThresh()
 
@@ -420,7 +404,9 @@ clear();
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 SingleThresh::SingleThresh(const SingleThresh & c)
 
@@ -432,7 +418,9 @@ assign(c);
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 SingleThresh::SingleThresh(const char * str)
 
@@ -444,7 +432,9 @@ set(str);
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 SingleThresh & SingleThresh::operator=(const SingleThresh & c)
 
@@ -458,7 +448,9 @@ return ( * this );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 bool SingleThresh::operator==(const SingleThresh &st) const
 
@@ -470,7 +462,9 @@ return ( node->s == (st.node->s) );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 void SingleThresh::init_from_scratch()
 
@@ -484,7 +478,9 @@ return;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 void SingleThresh::clear()
 
@@ -492,13 +488,13 @@ void SingleThresh::clear()
 
 if ( node )  { delete node;  node = 0; }
 
-thresh = 0.0;
-
 return;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 void SingleThresh::assign(const SingleThresh & c)
 
@@ -514,7 +510,9 @@ return;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 void SingleThresh::set(double t, ThreshType ind)
 
@@ -534,6 +532,7 @@ a = 0;
 return;
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -581,6 +580,7 @@ return;
 // <, <=, =, !=, >, >=
 //
 ////////////////////////////////////////////////////////////////////////
+
 
 void SingleThresh::set(const char *str)
 
@@ -642,11 +642,13 @@ return;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Construct a string to represent the threshold type and value
 //
 ////////////////////////////////////////////////////////////////////////
+
 
 ConcatString SingleThresh::get_str(int precision) const
 
@@ -660,27 +662,13 @@ return(t);
 
 }
 
-////////////////////////////////////////////////////////////////////////
-/*
-void SingleThresh::get_str(char *str, int precision) const {
-   char fmt_str[max_str_len];
 
-   if(type == thresh_na) {
-      strcpy(str, na_str);
-   }
-   else {
-      sprintf(fmt_str, "%s%i%s", "%s%.", precision, "f");
-      sprintf(str, fmt_str, thresh_type_str[type], thresh);
-   }
-
-   return;
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 //
 // Construct a string to represent the threshold type and value
 //
 ////////////////////////////////////////////////////////////////////////
+
 
 ConcatString SingleThresh::get_abbr_str(int precision) const {
    ConcatString t;
@@ -690,69 +678,7 @@ ConcatString SingleThresh::get_abbr_str(int precision) const {
    return(t);
 }
 
-////////////////////////////////////////////////////////////////////////
-/*
-void SingleThresh::get_abbr_str(char *str, int precision) const {
-   char fmt_str[max_str_len];
 
-   if(type == thresh_na) {
-      strcpy(str, na_str);
-   }
-   else {
-      sprintf(fmt_str, "%s%i%s", "%s%.", precision, "f");
-      sprintf(str, fmt_str, thresh_abbr_str[type], thresh);
-   }
-
-   return;
-}
-*/
-////////////////////////////////////////////////////////////////////////
-//
-// Check whether or not the value meets the threshold criteria.
-//
-////////////////////////////////////////////////////////////////////////
-/*
-bool SingleThresh::check(double v) const {
-
-   bool status = false;
-
-   // Type of thresholding
-   switch(type) { 
-
-      case thresh_na: // no threshold 
-         status = true;
-         break;
-      case thresh_lt: // less than
-         if(!is_eq(v, thresh) && v < thresh) status = true;
-         break;
-      case thresh_le: // less than or equal to
-         if( is_eq(v, thresh) || v < thresh) status = true;
-         break;
-      case thresh_eq: // equal to
-         if( is_eq(v, thresh))               status = true;
-         break;
-      case thresh_ne: // not equal to
-         if(!is_eq(v, thresh))               status = true;
-         break;
-      case thresh_gt: // greater than
-         if(!is_eq(v, thresh) && v > thresh) status = true;
-         break;
-      case thresh_ge: // greater than or equal to
-         if( is_eq(v, thresh) || v > thresh) status = true;
-         break;
-
-      default:
-         mlog << Error << "\nSingleThresh::check() -> "
-              << "unexpected threshold indicator value of "
-              << type << ".\n\n";
-         exit(1); 
-         break; 
-   }
-
-   return(status);
-
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -762,8 +688,8 @@ void SingleThresh::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "thresh = " << thresh       << '\n';
-out << prefix << "type   = " << get_type()   << '\n';
+out << prefix << "thresh = " << get_value() << '\n';
+out << prefix << "type   = " << get_type()  << '\n';
 
 
    //
@@ -783,6 +709,7 @@ return;
 //
 ////////////////////////////////////////////////////////////////////////
 
+
 bool check_threshold(double v, double t, int t_ind) {
    SingleThresh st;
 
@@ -790,6 +717,7 @@ bool check_threshold(double v, double t, int t_ind) {
 
    return(st.check(v));
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 //
