@@ -131,8 +131,8 @@ if ( vinfo.level().type() == LevelType_Accum ) {
 
 if ( vinfo.p_flag() &&
      vinfo.p_code() > 0 &&
-     ( !is_bad_data ( vinfo.p_thresh_lo().thresh ) ||
-       !is_bad_data ( vinfo.p_thresh_hi().thresh ) ) ) {
+     ( !is_bad_data ( vinfo.p_thresh_lo().get_value() ) ||
+       !is_bad_data ( vinfo.p_thresh_hi().get_value() ) ) ) {
 
       //
       //  parse probability info from pds
@@ -151,14 +151,14 @@ if ( vinfo.p_flag() &&
       //
 
    if ( !is_bad_data ( p_thresh_lo ) &&
-        !is_eq ( vinfo.p_thresh_lo().thresh, p_thresh_lo, loose_tol ) )  return ( false );
+        !is_eq ( vinfo.p_thresh_lo().get_value(), p_thresh_lo, loose_tol ) )  return ( false );
 
       //
       //  upper probability threshold
       //
 
    if ( !is_bad_data ( p_thresh_hi ) &&
-        !is_eq ( vinfo.p_thresh_hi().thresh, p_thresh_hi, loose_tol ) )  return ( false );
+        !is_eq ( vinfo.p_thresh_hi().get_value(), p_thresh_hi, loose_tol ) )  return ( false );
 
 }
 

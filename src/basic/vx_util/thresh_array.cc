@@ -364,7 +364,7 @@ void ThreshArray::get_abbr_str(const char *sep, char *str, int precision) const 
 
 ////////////////////////////////////////////////////////////////////////
 
-int ThreshArray::check(double v) const {
+int ThreshArray::check_bins(double v) const {
    int i, bin;
 
    //
@@ -373,10 +373,10 @@ int ThreshArray::check(double v) const {
    //
    for(i=0; i<Nelements-1; i++) {
 
-      if(t[i].thresh >  t[i+1].thresh ||
-         t[i].get_type()   != t[i+1].get_type()   ||
-         t[i].get_type()   == thresh_eq     ||
-         t[i].get_type()   == thresh_ne) {
+      if(t[i].get_value() >  t[i+1].get_value() ||
+         t[i].get_type()  != t[i+1].get_type()  ||
+         t[i].get_type()  == thresh_eq          ||
+         t[i].get_type()  == thresh_ne) {
 
          mlog << Error << "\nThreshArray::check(double) const -> "
               << "thresholds must be monotonically increasing and be of "

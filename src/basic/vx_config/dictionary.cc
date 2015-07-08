@@ -354,7 +354,7 @@ switch ( Type )  {
          break;
 
       }  //  switch
-      if ( Thresh->get_type() != thresh_na )  out << Thresh->thresh;
+      if ( Thresh->get_type() != thresh_na )  out << Thresh->get_value();
       out << ";\n";
       break;
 

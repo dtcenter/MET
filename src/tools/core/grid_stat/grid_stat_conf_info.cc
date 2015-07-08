@@ -367,14 +367,14 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
             // and the threshold types are inequalities that remain the same
             for(j=0; j<fcst_ta[i].n_elements()-1; j++) {
 
-               if(fcst_ta[i][j].thresh >  fcst_ta[i][j+1].thresh ||
-                  obs_ta[i][j].thresh  >  obs_ta[i][j+1].thresh  ||
-                  fcst_ta[i][j].get_type()   != fcst_ta[i][j+1].get_type()   ||
-                  obs_ta[i][j].get_type()    != obs_ta[i][j+1].get_type()    ||
-                  fcst_ta[i][j].get_type()   == thresh_eq              ||
-                  fcst_ta[i][j].get_type()   == thresh_ne              ||
-                  obs_ta[i][j].get_type()    == thresh_eq              ||
-                  obs_ta[i][j].get_type()    == thresh_ne) {
+               if(fcst_ta[i][j].get_value() >  fcst_ta[i][j+1].get_value() ||
+                  obs_ta[i][j].get_value()  >  obs_ta[i][j+1].get_value()  ||
+                  fcst_ta[i][j].get_type()  != fcst_ta[i][j+1].get_type()  ||
+                  obs_ta[i][j].get_type()   != obs_ta[i][j+1].get_type()   ||
+                  fcst_ta[i][j].get_type()  == thresh_eq                   ||
+                  fcst_ta[i][j].get_type()  == thresh_ne                   ||
+                  obs_ta[i][j].get_type()   == thresh_eq                   ||
+                  obs_ta[i][j].get_type()   == thresh_ne) {
 
                   mlog << Error << "\nGridStatConfInfo::process_config() -> "
                        << "when verifying using multi-category contingency "

@@ -539,8 +539,8 @@ void MCTSInfo::add(double f, double o) {
    int r, c;
 
    // Find the row and column for the forecast and observation values.
-   r = cts_fcst_ta.check(f);
-   c = cts_obs_ta.check(o);
+   r = cts_fcst_ta.check_bins(f);
+   c = cts_obs_ta.check_bins(o);
 
    // Increment the corresponding contingency table entry.
    cts.inc_entry(r, c);
@@ -2901,7 +2901,7 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    p_thresh = new double [n_thresh];
 
    for(i=0; i<n_thresh; i++)
-      p_thresh[i] = pct_info.pct_fcst_thresh[i].thresh;
+      p_thresh[i] = pct_info.pct_fcst_thresh[i].get_value();
 
    //
    // Set up the Nx2ContingencyTable

@@ -872,14 +872,14 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
          for(i=0; i<j.out_fcst_thresh.n_elements()-1; i++) {
 
-            if(j.out_fcst_thresh[i].thresh >  j.out_fcst_thresh[i+1].thresh ||
-               j.out_obs_thresh[i].thresh  >  j.out_obs_thresh[i+1].thresh  ||
-               j.out_fcst_thresh[i].get_type()   != j.out_fcst_thresh[i+1].get_type()   ||
-               j.out_obs_thresh[i].get_type()    != j.out_obs_thresh[i+1].get_type()    ||
-               j.out_fcst_thresh[i].get_type()   == thresh_eq              ||
-               j.out_fcst_thresh[i].get_type()   == thresh_ne              ||
-               j.out_obs_thresh[i].get_type()    == thresh_eq              ||
-               j.out_obs_thresh[i].get_type()    == thresh_ne) {
+            if(j.out_fcst_thresh[i].get_value() >  j.out_fcst_thresh[i+1].get_value() ||
+               j.out_obs_thresh[i].get_value()  >  j.out_obs_thresh[i+1].get_value()  ||
+               j.out_fcst_thresh[i].get_type()  != j.out_fcst_thresh[i+1].get_type()  ||
+               j.out_obs_thresh[i].get_type()   != j.out_obs_thresh[i+1].get_type()   ||
+               j.out_fcst_thresh[i].get_type()  == thresh_eq                          ||
+               j.out_fcst_thresh[i].get_type()  == thresh_ne                          ||
+               j.out_obs_thresh[i].get_type()   == thresh_eq                          ||
+               j.out_obs_thresh[i].get_type()   == thresh_ne) {
 
                mlog << Error << "\ndo_job_aggr_stat() -> "
                     << "when \"-out_line_type\" is set to MCTC or MCTS "
@@ -911,8 +911,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
          // Check that the first threshold is 0 and the last is 1.
          if(n < 3 ||
-            !is_eq(j.out_fcst_thresh[0].thresh,   0.0) ||
-            !is_eq(j.out_fcst_thresh[n-1].thresh, 1.0)) {
+            !is_eq(j.out_fcst_thresh[0].get_value(),   0.0) ||
+            !is_eq(j.out_fcst_thresh[n-1].get_value(), 1.0)) {
 
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "When verifying a probability field, you must "
@@ -935,8 +935,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             }
 
             // Check that all thresholds are in [0, 1].
-            if(j.out_fcst_thresh[i].thresh < 0.0 ||
-               j.out_fcst_thresh[i].thresh > 1.0) {
+            if(j.out_fcst_thresh[i].get_value() < 0.0 ||
+               j.out_fcst_thresh[i].get_value() > 1.0) {
 
                mlog << Error << "\ndo_job_aggr_stat() -> "
                     << "When verifying a probability field, all "

@@ -333,14 +333,14 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       // and the threshold types are inequalities that remain the same
       for(i=0; i<fcst_cat_ta.n_elements()-1; i++) {
 
-         if(fcst_cat_ta[i].thresh >  fcst_cat_ta[i+1].thresh ||
-            obs_cat_ta[i].thresh  >  obs_cat_ta[i+1].thresh  ||
-            fcst_cat_ta[i].get_type()   != fcst_cat_ta[i+1].get_type()   ||
-            obs_cat_ta[i].get_type()    != obs_cat_ta[i+1].get_type()    ||
-            fcst_cat_ta[i].get_type()   == thresh_eq           ||
-            fcst_cat_ta[i].get_type()   == thresh_ne           ||
-            obs_cat_ta[i].get_type()    == thresh_eq           ||
-            obs_cat_ta[i].get_type()    == thresh_ne) {
+         if(fcst_cat_ta[i].get_value() >  fcst_cat_ta[i+1].get_value() ||
+            obs_cat_ta[i].get_value()  >  obs_cat_ta[i+1].get_value()  ||
+            fcst_cat_ta[i].get_type()  != fcst_cat_ta[i+1].get_type()  ||
+            obs_cat_ta[i].get_type()   != obs_cat_ta[i+1].get_type()   ||
+            fcst_cat_ta[i].get_type()  == thresh_eq                    ||
+            fcst_cat_ta[i].get_type()  == thresh_ne                    ||
+            obs_cat_ta[i].get_type()   == thresh_eq                    ||
+            obs_cat_ta[i].get_type()   == thresh_ne) {
 
             mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
                  << "when verifying using multi-category contingency "
