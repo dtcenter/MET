@@ -753,8 +753,6 @@ strncpy(junk, yytext + 2, sizeof(junk) - 1);
 
 junk[n - 3] = (char) 0;
 
-// cout << "environment variable \"" << junk << "\"\n" << flush;
-
 value = getenv(junk);
 
 if ( !value )  {
