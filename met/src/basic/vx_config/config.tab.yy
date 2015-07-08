@@ -574,8 +574,6 @@ e.set_threshold(name, ST);
 
 dict_stack->store(e);
 
-// dict_stack->pop_element(name);
-
 ST.clear();
 
 return;
@@ -659,8 +657,6 @@ void do_dict()
 
 {
 
-// cout << "   in do_dict()\n\n\n";
-
 DD = *(dict_stack->top());
 
 dict_stack->erase_top();
@@ -675,12 +671,6 @@ dict_stack->store(e);
 
 DD.clear();
 
-// dict_stack->pop_dict(0);
-
-// dict_stack->dump(cout);
-// cout << "   in do_dict()\n\n\n";
-// cout.flush();
-
 return;
 
 }
@@ -692,10 +682,6 @@ return;
 void do_assign_dict (const char * name)
 
 {
-
-// const bool is_array = dict_stack->top_is_array();
-
-// cout << "\n\n  in do_assign_dict() ... DD.n_entries() = " << DD.n_entries() << "\n\n" << flush;
 
 if ( DD.n_entries() > 0 )  {
 
@@ -781,42 +767,17 @@ return;
 
 void do_thresh(ThreshNode * node)
 
-// void do_thresh(const ThreshType t, const Number & n)
-
 {
-
-if ( test_mode )  {
-
-   result = node;
-
-   return;
-
-}
-
-/*
-if ( ! dict_stack->top_is_array() )  {
-
-   // ST.set(as_double(n), t);
-   ST.set(node);
-
-   return;
-
-}
 
 DictionaryEntry e;
 SingleThresh T;
 
-// T.set(as_double(n), t);
 T.set(node);
 
 e.set_threshold(0, T);
 
 dict_stack->store(e);
-*/
 
-   //
-   //  done
-   //
 
 return;
 
