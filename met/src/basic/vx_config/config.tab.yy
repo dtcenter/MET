@@ -769,15 +769,24 @@ void do_thresh(ThreshNode * node)
 
 {
 
-DictionaryEntry e;
-SingleThresh T;
+if ( test_mode )  {
 
-T.set(node);
+   result = node;
 
-e.set_threshold(0, T);
+}
 
-dict_stack->store(e);
+else {
 
+   DictionaryEntry e;
+   SingleThresh T;
+
+   T.set(node);
+
+   e.set_threshold(0, T);
+
+   dict_stack->store(e);
+
+}
 
 return;
 
