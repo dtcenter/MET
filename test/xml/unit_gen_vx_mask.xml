@@ -13,6 +13,11 @@
 
 <met_test>
 
+  <!-- JHG: This xml includes a temporary fix added on 20150709.        -->
+  <!-- Replace "le" and "lt" with escape sequences like &#60;&#61;      -->
+  <!-- This is a workaround for the fact that vx_config doesn't parse   -->
+  <!-- le, lt, eq, ne, gt, and ge yet.  This should be backed out.      -->
+
   <!--                                                                  -->
   <!-- gen_vx_mask:                                                     -->
   <!-- test all 5 masking types: poly, circle, track, grid, and data    -->
@@ -152,7 +157,7 @@
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/MLB_Stadiums.txt \
       &OUTPUT_DIR;/gen_vx_mask/CIRCLE_500_mask.nc \
-      -type circle -thresh le500 -name distance_500km -v 2
+      -type circle -thresh '&#60;&#61;500' -name distance_500km -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CIRCLE_500_mask.nc</grid_nc>
@@ -169,7 +174,7 @@
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/MLB_Stadiums.txt \
       &OUTPUT_DIR;/gen_vx_mask/CIRCLE_COMPLEMENT_mask.nc \
-      -type circle -thresh le500 -complement -v 2
+      -type circle -thresh '&#60;&#61;500' -complement -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/CIRCLE_COMPLEMENT_mask.nc</grid_nc>
@@ -203,7 +208,7 @@
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/MLB_Stadiums.txt \
       &OUTPUT_DIR;/gen_vx_mask/TRACK_50_mask.nc \
-      -type track -thresh le50 -value 3 -v 2
+      -type track -thresh '&#60;&#61;50' -value 3 -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/TRACK_50_mask.nc</grid_nc>
@@ -220,7 +225,7 @@
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc \
-      -type data -mask_config 'name="APCP"; level="A24";' -thresh ge2.54 -v 2
+      -type data -mask_config 'name="APCP"; level="A24";' -thresh '&#62;&#61;2.54' -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc</grid_nc>
