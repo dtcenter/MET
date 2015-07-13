@@ -393,6 +393,14 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
       o_data.obs_qc.clear();
    }
 
+   // Parse ENS_MEAN, if present
+   if(l.n_items() > orank_ens_mean_offset(o_data.n_ens)) {
+      o_data.ens_mean = atof(l.get_item(orank_ens_mean_offset(o_data.n_ens)));
+   }
+   else {
+      o_data.ens_mean = bad_data_double;
+   }
+
    return;
 }
 
