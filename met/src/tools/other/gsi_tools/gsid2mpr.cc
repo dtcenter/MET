@@ -100,7 +100,7 @@ int main(int argc, char * argv []) {
            << "\nReading: " << cline[i] << " ... " << (i + 1)
            << " of " << cline.n() << "\n";
 
-      // Concstruct output file name
+      // Construct output file name
       output_filename << cs_erase
                       << output_directory << '/'
                       << get_short_name(cline[i]) << suffix;
