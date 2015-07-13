@@ -14,7 +14,7 @@
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    06/16/15  Halley Gotway   New
+//   000    07/09/15  Halley Gotway   New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +25,8 @@
 
 using namespace std;
 
+#include <map>
+
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -34,7 +36,7 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char *program_name = "gsidens2orank";
+static const char *program_name = "gsid2mpr";
 static const int   rec_pad_length = 4;
 static const bool  swap_endian = true;
 static const int   bad_setup_qc = -999;
@@ -50,6 +52,15 @@ static const int    default_interp_wdth = 0;
 static const char  *default_thresh      = na_str;
 static const double default_alpha       = bad_data_double;
 static const char  *default_line_type   = "MPR";
+
+static const char  *conv_id_str         = "conv";
+
+static const char  *micro_id_str [] = {
+   "amsua", "amsub", "mhs",
+   "msu",   "hsb",   "ssmi",
+   "ssmis", "amsre", "atms"
+};
+static const int n_micro_id_str = sizeof(micro_id_str)/sizeof(*micro_id_str);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -103,10 +114,35 @@ static const char * rad_extra_columns [] = {
    "FCST_NOBC",  // Tb with no bias correction (K)
    "SFC_EMIS",   // surface emissivity
    "STABILITY",  // stability index
-   "PRS"         // extra pressure
+   "PRS_MAX_WGT" // pressure of the maximum weighing function
 };
 
 static const int n_rad_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);
+
+////////////////////////////////////////////////////////////////////////
+
+static const char *micro_extra_columns [] = {
+   "CLD_LWC",     // cloud liquid water (kg/m**2)
+   "TC_PWAT"      // total column precip. water (km/m**2)
+};
+
+static const int n_micro_extra_cols = sizeof(micro_extra_columns)/sizeof(*micro_extra_columns);
+static const int micro_extra_begin  = 21;
+
+////////////////////////////////////////////////////////////////////////
+
+static const char *retr_extra_columns [] = {
+   "SST_FG",     // SST first guess used for SST retrieval
+   "SST_NCEP",   // NCEP SST analysis at t
+   "SST_PHY",    // Physical SST retrieval
+   "SST_NAVY",   // Navy SST retrieval
+   "D_TA",       // d(ta) corresponding to sstph
+   "D_QA",       // d(qa) corresponding to sstph
+   "DATA_TYPE"   // data type
+};
+
+static const int n_retr_extra_cols = sizeof(retr_extra_columns)/sizeof(*retr_extra_columns);
+static const int retr_extra_begin  = 11;
 
 ////////////////////////////////////////////////////////////////////////
 //

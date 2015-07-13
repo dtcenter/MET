@@ -14,7 +14,7 @@
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    06/16/15  Halley Gotway   New
+//   000    07/09/15  Halley Gotway   New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -49,11 +49,15 @@ using namespace std;
 static void setup_header();
 static void setup_table(AsciiTable &);
 
+static bool is_conv(const char *);
+static bool is_micro(const char *);
+static bool is_retr(const char *);
+
 static void process_conv(const char *conv_filename, const char *output_filename);
 static void process_rad (const char *rad_filename, const char *output_filename);
 
 static void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r, const int j, const char *var);
-static void write_mpr_row_rad (AsciiTable &at, int row, RadRecord  & r, const int j, const int use);
+static void write_mpr_row_rad (AsciiTable &at, int row, RadRecord  & r, const int j, const int chval, const int use);
 
 static void usage();
 static void set_channel(const StringArray &);
@@ -104,16 +108,39 @@ int main(int argc, char * argv []) {
       // Initialize output StatHdrColumns
       setup_header();
 
-      // Determine file type by the file name
-      if(strstr(get_short_name(cline[i]), "conv") != (char *) 0) {
-         process_conv(cline[i], output_filename);
-      }
-      else {
-         process_rad(cline[i], output_filename);
-      }
+      // Process by file type
+      if(is_conv(cline[i])) process_conv(cline[i], output_filename);
+      else                  process_rad (cline[i], output_filename);
    }
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_conv(const char *s) {
+   return(strstr(get_short_name(s), conv_id_str) != (char *) 0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_micro(const char *s) {
+   bool status = false;
+
+   for(int i=0; i<n_micro_id_str; i++) {
+      if(strstr(get_short_name(s), micro_id_str[i]) != 0) {
+         status = true;
+         break;
+      }
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_retr(const char *s) {
+   return(false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -368,7 +395,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    int n_in, n_out;
    ofstream out;
    AsciiTable at;
-   NumArray do_channel;
+   NumArray i_channel;
    ConcatString cs;
 
    RadFile f;
@@ -382,7 +409,19 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
    write_header_row(rad_extra_columns, n_rad_extra_cols, 0, at, 0,
                     n_header_columns + n_mpr_columns);
+   
+   // Update header columns for microwave
+   if(is_micro(rad_filename)) {
+       write_header_row(micro_extra_columns, n_micro_extra_cols, 0, at, 0,
+                        n_header_columns + n_mpr_columns + micro_extra_begin);
+   }
 
+   // Update header columns for retrievals
+   if(is_retr(rad_filename)) {
+       write_header_row(retr_extra_columns, n_retr_extra_cols, 0, at, 0,
+                        n_header_columns + n_mpr_columns + retr_extra_begin);
+   }
+   
    // Open input file
    if(!(f.open(rad_filename))) {
       mlog << Error << "\nprocess_rad() -> "
@@ -403,16 +442,33 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 
    // Process all channels, if not otherwise specified
    if(channel.n_elements() == 0) {
-      for(i=0; i<f.n_channels(); i++) do_channel.add(i+1);      
+      for(i=0; i<f.n_channels(); i++) i_channel.add(i+1);
       mlog << Debug(2)
-           << "Processing all " << do_channel.n_elements() << " channels.\n";
+           << "Processing all " << i_channel.n_elements() << " channels.\n";
    }
    else {
-      do_channel = channel;
-      cs << cs_erase << "Processing " << do_channel.n_elements()
-         << " requested channels: " << nint(do_channel[0]);
-      for(i=1; i<do_channel.n_elements(); i++) cs << ", " << nint(do_channel[i]);
-      mlog << Debug(2) << cs << "\n";
+
+      // Find index for each requested channel
+      for(i=0; i<f.n_channels(); i++) {
+         if(channel.has(f.channel_val(i))) {
+            i_channel.add(i+1);
+            if(cs) cs << ", ";
+            cs << f.channel_val(i);
+         }
+      }
+
+      // Check for at least one matching channel
+      if(i_channel.n_elements() == 0) {
+         mlog << Error << "\nprocess_rad() -> "
+              << "none of the requested channel numbers found in \""
+              << rad_filename << "\".\n\n";
+         exit(1);
+      }
+
+      mlog << Debug(2)
+         << "Processing " << i_channel.n_elements() << " of "
+         << channel.n_elements() << " requested channels: "
+         << cs << "\n";
    }
 
    // Process each record
@@ -420,9 +476,11 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    n_out = 1; // 1 for header line
    while(f >> r)  {
 
-      at.add_rows(do_channel.n_elements());
-      for(i=0; i<do_channel.n_elements(); i++) {
-         write_mpr_row_rad(at, n_out++, r, do_channel[i]-1, f.use_channel(do_channel[i]-1));
+      at.add_rows(i_channel.n_elements());
+      for(i=0; i<i_channel.n_elements(); i++) {
+         write_mpr_row_rad(at, n_out++, r, i_channel[i]-1,
+                           f.channel_val(i_channel[i]-1),
+                           f.use_channel(i_channel[i]-1));
       }
 
       n_in++;
@@ -532,7 +590,8 @@ void write_mpr_row_conv(AsciiTable &at, int row, ConvRecord & r,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, const int use) {
+void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j,
+                       const int chval, const int use) {
    ConcatString var;
    int col;
 
@@ -547,7 +606,7 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, cons
    double guess      = obs - r.diagchan_data(rad_omg_bc_chan_index - 1, j);
    int    obs_qc     =  nint(r.diagchan_data(rad_qc_mark_index     - 1, j)) * use;
 
-   var.format("TB_%02d", j + 1);
+   var.format("TB_%02d", chval);
 
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(r.date());
@@ -604,8 +663,8 @@ void write_mpr_row_rad(AsciiTable &at, int row, RadRecord & r, const int j, cons
    at.set_entry(row, col++,       r.diag_data(rad_snow_depth_index         - 1));    // SNW_DPTH
    at.set_entry(row, col++,       r.diag_data(rad_wind_speed_index         - 1));    // SFC_WIND
 
-   at.set_entry(row, col++,       r.diag_data(rad_cloud_frac_index         - 1));    // FRAC_CLD
-   at.set_entry(row, col++,       r.diag_data(rad_cloud_top_pressure_index - 1));    // CTOP_PRS
+   at.set_entry(row, col++,       r.diag_data(rad_cloud_frac_index         - 1));    // FRAC_CLD or CLDLW
+   at.set_entry(row, col++,       r.diag_data(rad_cloud_top_pressure_index - 1));    // CTOP_PRS or COLPW
 
    at.set_entry(row, col++,       r.diag_data(rad_itref_index              - 1));    // ITREF
    at.set_entry(row, col++,       r.diag_data(rad_idtw_index               - 1));    // IDTW
