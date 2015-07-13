@@ -561,7 +561,8 @@ static const int orank_rank_offset       = nhc + 9;
 static const int orank_n_ens_vld_offset  = nhc + 10;
 static const int orank_n_ens_offset      = nhc + 11;
 inline int orank_ens_offset(int i)       { return(nhc + 12 + i); }
-inline int orank_obs_qc_offset(int i)    { return(nhc + 13 + i); } // OBS_QC is at the end
+inline int orank_obs_qc_offset(int i)    { return(nhc + 13 + i); } // OBS_QC is second to last
+inline int orank_ens_mean_offset(int i)  { return(nhc + 14 + i); } // ENS_MEAN is last
 
 //
 // SSVAR Line Type offsets

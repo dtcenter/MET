@@ -435,6 +435,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    }
 
    at.set_entry(r, c+12+n_ens, orank_columns[13]);
+   at.set_entry(r, c+13+n_ens, orank_columns[14]);
    
    return;
 }
@@ -2893,7 +2894,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //    OBS_ELV,     OBS,         PIT,
    //    RANK,        N_ENS_VLD,   N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC
+   //    OBS_QC,      ENS_MEAN
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_pair);
@@ -2944,6 +2945,10 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    // Observation Quality Control
    at.set_entry(r, c+12+pd_ptr->e_na[i].n_elements(), 
       pd_ptr->o_qc_sa[i]);
+   
+   // Ensemble mean values
+   at.set_entry(r, c+13+pd_ptr->e_na[i].n_elements(), 
+      pd_ptr->mn_na[i]);
 
    return;
 }

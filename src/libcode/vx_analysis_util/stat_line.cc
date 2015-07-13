@@ -1591,7 +1591,7 @@ int get_orank_column_offset(const char *col_name, const STATLine &L) {
    //    OBS_ELV,     OBS,         PIT,
    //    RANK,        N_ENS_VLD,   N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC
+   //    OBS_QC,      ENS_MEAN
    //
    
    //
@@ -1625,7 +1625,15 @@ int get_orank_column_offset(const char *col_name, const STATLine &L) {
    //
    if(strcasecmp(col_name, "OBS_QC") == 0) {
       n_ens  = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
-      offset = n_header_columns + 12 + n_ens;
+      offset = orank_obs_qc_offset(n_ens);
+   }
+
+   //
+   // Check for the ENS_MEAN special case after the variable columns
+   //
+   if(strcasecmp(col_name, "ENS_MEAN") == 0) {
+      n_ens  = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
+      offset = orank_ens_mean_offset(n_ens);
    }
 
    return(offset);
