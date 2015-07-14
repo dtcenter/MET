@@ -28,6 +28,8 @@ extern StringArray get_filenames(const StringArray & search_dirs, const StringAr
 
 extern StringArray get_filenames_from_dir(const char * directory_path, const StringArray & suffix);
 
+extern StringArray parse_ascii_file_list(const char * path);
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -154,3 +154,42 @@ return ( a );
 
 ////////////////////////////////////////////////////////////////////////
 
+
+StringArray parse_ascii_file_list(const char * path)
+
+{
+
+ifstream f_in;
+StringArray a;
+char file_name[PATH_MAX];
+   
+   //
+   //  Open the input ascii file
+   //
+
+f_in.open(path);
+if(!f_in) {
+   mlog << Error << "\nparse_ascii_file_list() -> "
+        << "can't open the ASCII file list \"" << path
+        << "\" for reading\n\n";
+   exit(1);
+}
+
+   //
+   //  Read and store the file names
+   //
+
+while(f_in >> file_name) a.add(file_name);
+
+   //
+   //  done
+   //
+
+f_in.close();
+
+return(a);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
