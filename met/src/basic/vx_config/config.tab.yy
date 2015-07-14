@@ -142,8 +142,11 @@ static ThreshNode * do_not_thresh    (ThreshNode *);
 static ThreshNode * do_paren_thresh  (ThreshNode *);
 static ThreshNode * do_simple_thresh (ThreshType, const Number &);
 
+static ThreshNode * do_fortran_thresh(const char *);
+
 
 static void set_number_string();
+static void set_number_string(const char *);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -170,9 +173,10 @@ static void set_number_string();
 %token IDENTIFIER QUOTED_STRING INTEGER FLOAT BOOLEAN
 %token COMPARISON NA_COMPARISON
 %token LOGICAL_OP_NOT LOGICAL_OP_AND LOGICAL_OP_OR
+%token FORTRAN_THRESHOLD
 
 
-%type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix
+%type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix FORTRAN_THRESHOLD
 
 %type <nval> INTEGER FLOAT number expression
 
@@ -259,6 +263,7 @@ thresh_node : simple_thresh                          { $$ = $1; }
 
 
 simple_thresh : COMPARISON number { $$ = do_simple_thresh($1, $2); }
+              | FORTRAN_THRESHOLD { $$ = do_fortran_thresh($1); }
               ;
 
 
@@ -994,13 +999,72 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
+ThreshNode * do_fortran_thresh(const char * text)
+
+{
+
+ThreshType op  = no_thresh_type;
+const char * p = text + 2;         //  we know that all the prefixes
+                                   //  (like "le" or "gt") are two  
+                                   //  characters long
+
+     if ( strncmp(text, "le", 2) == 0 )  op = thresh_le;
+else if ( strncmp(text, "lt", 2) == 0 )  op = thresh_lt;
+
+else if ( strncmp(text, "gt", 2) == 0 )  op = thresh_gt;
+else if ( strncmp(text, "ge", 2) == 0 )  op = thresh_ge;
+
+else if ( strncmp(text, "eq", 2) == 0 )  op = thresh_eq;
+else if ( strncmp(text, "ne", 2) == 0 )  op = thresh_ne;
+
+else {
+
+   mlog << Error
+        << "do_fortran_thresh(const char *) -> can't parse threshold text \""
+        << text << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+Number n;
+const double value = atof(p);
+
+n.is_int = 0;
+
+n.d = value;
+
+set_number_string(p);
+
+return ( do_simple_thresh (op, n) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void set_number_string()
+
+{
+
+set_number_string(configtext);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_number_string(const char * text)
 
 {
 
 const int k = (int) (sizeof(number_string));
 
-strncpy(number_string, configtext, k);
+strncpy(number_string, text, k);
 
 number_string[k - 1] = (char) 0;
 

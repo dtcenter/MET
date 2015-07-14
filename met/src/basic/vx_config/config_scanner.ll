@@ -90,6 +90,8 @@ static bool do_eof();
 
 static void do_env();
 
+static int do_fort_thresh();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,6 +116,12 @@ OPT_EXP     {EXP}?
 WS          [ \n\t]*
 
 
+INT_NUMBER  ("-"?){DIGITS}
+
+
+REAL_NUMBER  (("-"?){DIGITS}{EXP})|(("-"?)"."{DIGITS}{OPT_EXP})|(("-"?){DIGITS}"."{OPT_EXP})|(("-"?){DIGITS}"."{DIGITS}{OPT_EXP})
+
+
 %%
 
 "<"                                 { return ( do_comp() ); }
@@ -123,6 +131,14 @@ WS          [ \n\t]*
 "=="                                { return ( do_comp() ); }
 "!="                                { return ( do_comp() ); }
 "NA"                                { return ( do_comp() ); }
+
+
+"le"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
+"lt"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
+"gt"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
+"ge"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
+"eq"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
+"ne"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
 
 
 "&&"                                { Column+=2;   return ( LOGICAL_OP_AND ); }
@@ -160,17 +176,12 @@ WS          [ \n\t]*
 
 
 
-("-"?){DIGITS}                      { do_int();    return ( INTEGER ); }
+{INT_NUMBER}                        { do_int();    return ( INTEGER ); }
 
 
 
-("-"?){DIGITS}{EXP}                 { do_float();  return ( FLOAT ); }
+{REAL_NUMBER}                       { do_float();  return ( FLOAT ); }
 
-("-"?)"."{DIGITS}{OPT_EXP}          { do_float();  return ( FLOAT ); }
-
-("-"?){DIGITS}"."{OPT_EXP}          { do_float();  return ( FLOAT ); }
-
-("-"?){DIGITS}"."{DIGITS}{OPT_EXP}  { do_float();  return ( FLOAT ); }
 
 
 
@@ -778,6 +789,20 @@ config_switch_to_buffer(env_buffer);
    //
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int do_fort_thresh()
+
+{
+
+strncpy(configlval.text, configtext, sizeof(configlval.text));
+
+return ( FORTRAN_THRESHOLD );
 
 }
 
