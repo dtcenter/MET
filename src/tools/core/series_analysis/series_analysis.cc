@@ -96,7 +96,6 @@ static void set_config_file(const StringArray &);
 static void set_log_file(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void parse_file_list(const StringArray &, StringArray &);
-static void parse_ascii_file_list(const char *, StringArray &);
 static void parse_long_names();
 
 ////////////////////////////////////////////////////////////////////////
@@ -1936,34 +1935,7 @@ void parse_file_list(const StringArray & a, StringArray & list) {
    // If the read was successful, store the list of gridded files.
    // Otherwise, process entries as ASCII files.
    if(mtddf)                            list.add(a);
-   else for(i=0; i<a.n_elements(); i++) parse_ascii_file_list(a[0], list);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void parse_ascii_file_list(const char *file_list, StringArray & list) {
-   ifstream f_in;
-   char file_name[PATH_MAX];
-
-   mlog << Debug(1)
-        << "Reading ASCII file list: " << file_list << "\n";
-   
-   // Open the file list
-   f_in.open(file_list);
-   if(!f_in) {
-      mlog << Error << "\nparse_ascii_file_list() -> "
-           << "can't open the ASCII file list \"" << file_list
-           << "\" for reading\n\n";
-      exit(1);
-   }
-
-   // Read and store the file names
-   while(f_in >> file_name) list.add(file_name);
-
-   // Close the input file
-   f_in.close();
+   else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0]);
 
    return;
 }

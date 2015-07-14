@@ -79,7 +79,6 @@ static void process_grid_vx       ();
 static void process_grid_scores   (DataPlane *&, DataPlane &, DataPlane &,
                                    DataPlane &, PairDataEnsemble &);
 
-static void parse_ens_file_list(const char *);
 static void clear_counts(const DataPlane &, int);
 static void track_counts(const DataPlane &, int);
 
@@ -199,10 +198,13 @@ void process_command_line(int argc, char **argv)
       //
       // It should be a filename and then a config filename
       //
-      if(is_integer(cline[0]) == 0)
-         parse_ens_file_list(cline[0]);
-      else
+      if(is_integer(cline[0]) == 0) {
+         ens_file_list = parse_ascii_file_list(cline[0]);
+         n_ens = ens_file_list.n_elements();
+      }
+      else {
          usage();
+      }
 
    }
    else {
@@ -1470,33 +1472,6 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
       // Compute the ranks for the observations
       pd.compute_rank(rng_ptr);
    }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void parse_ens_file_list(const char *fcst_file) {
-   char ens_file_name[PATH_MAX];
-   ifstream f_in;
-
-   // Open the ensemble file list
-   f_in.open(fcst_file);
-   if(!f_in) {
-      mlog << Error << "\nparse_ens_file_list() -> "
-           << "can't open input ensemble file list \"" << fcst_file
-           << "\" for reading\n\n";
-      exit(1);
-   }
-
-   // Read each ensemble member listed in the file
-   while(f_in >> ens_file_name) {
-      ens_file_list.add(ens_file_name);
-      n_ens++;
-   }
-
-   // Close the input file
-   f_in.close();
 
    return;
 }
