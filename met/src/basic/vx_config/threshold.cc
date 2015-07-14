@@ -687,8 +687,9 @@ void SingleThresh::dump(ostream & out, int depth) const
 {
 
 Indent prefix(depth);
+ConcatString s = get_str();
 
-out << prefix << "type  = " << get_type()  << '\n';
+out << prefix << "type  = " << get_type()  << "   (" << s.contents() << ")\n";
 out << prefix << "value = " << get_value() << '\n';
 
 
