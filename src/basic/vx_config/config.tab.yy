@@ -89,7 +89,7 @@ static PiecewiseLinear pwl;
 
 static Dictionary DD;
 
-static SingleThresh ST;
+static SingleThresh STH;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -246,8 +246,8 @@ threshold_list : threshold
                | threshold_list ',' threshold
                ;
 
-threshold : thresh_node       { do_thresh($1); }
-          | NA_COMPARISON     { do_na_thresh(); }
+threshold : thresh_node       { do_thresh    ($1); }
+          | NA_COMPARISON     { do_na_thresh (); }
           ;
 
 thresh_node : simple_thresh                          { $$ = $1; }
@@ -570,11 +570,11 @@ void do_assign_threshold(const char * name)
 
 DictionaryEntry e;
 
-e.set_threshold(name, ST);
+e.set_threshold(name, STH);
 
 dict_stack->store(e);
 
-ST.clear();
+STH.clear();
 
 return;
 
@@ -773,8 +773,26 @@ if ( test_mode )  {
 
    result = node;
 
+} 
+
+else {
+
+   if ( dict_stack->top_is_array() )  {
+
+      DictionaryEntry e;
+      SingleThresh T;
+
+      T.set(node);
+
+      e.set_threshold(0, T);
+
+      dict_stack->store(e);
+
+   }  else STH.set(node);
+
 }
 
+/*
 else {
 
    DictionaryEntry e;
@@ -787,6 +805,7 @@ else {
    dict_stack->store(e);
 
 }
+*/
 
 return;
 
