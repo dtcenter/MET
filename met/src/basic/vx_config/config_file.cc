@@ -13,6 +13,7 @@
 using namespace std;
 
 #include <iostream>
+#include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cstdio>
@@ -23,6 +24,7 @@ using namespace std;
 #include "empty_string.h"
 #include "bool_to_string.h"
 #include "is_bad_data.h"
+#include "temp_file.h"
 
 #include "config_file.h"
 #include "config_constants.h"
@@ -340,97 +342,36 @@ bool MetConfig::read_string(const char * s)
 if ( empty(s) )  {
 
    mlog << Error
-        << "\nMetConfig::read_string() -> "
-        << "empty string!\n\n";
+        << "\n\n  MetConfig::read_string(const char *) -> empty input string!\n\n";
 
    exit ( 1 );
 
 }
 
-// clear();
+ofstream out;
+const ConcatString temp_filename = make_temp_file_name("config", ".temp");
 
-DictionaryStack DS(*this);
+out.open(temp_filename);
 
-bison_input_filename = "string";
-
-dict_stack = &DS;
-
-LineNumber = 1;
-
-Column     = 1;
-
-is_lhs     = true;
-
-Filename.add(bison_input_filename);
-
-configdebug = (Debug ? 1 : 0);
-
-start_string_scan(s);
-
-/*
-if ( (configin = fopen(bison_input_filename, "r")) == NULL )  {
+if ( ! out )  {
 
    mlog << Error
-        << "\nMetConfig::read(const char *) -> "
-        << "unable to open input file \"" << name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-*/
-
-int parse_status;
-
-parse_status = configparse();
-
-if ( parse_status != 0 )  {
-
-   return ( false );
-
-}
-
-finish_string_scan ();
-
-// yy_delete_buffer(bp);
-
-// DS.pop_dict("base");
-
-if ( DS.n_elements() != 1 )  {
-
-   mlog << Error 
-        << "\nMetConfig::read(const char *) -> "
-        << "should be only one dictionary left after parsing! ...("
-        << DS.n_elements() << ")\n\n";
-
-   DS.dump(cout);
-   DS.dump_config_format(cout);
-
-   mlog << Error 
-        << "\n"
-        << "  parse failed!\n"
-        << "\n";
+        << "\n\n  MetConfig::read_string(const char *) -> unable to open temp file \""
+        << temp_filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-   //
-   //  done
-   //
+out << s << '\n';
 
-bison_input_filename = (const char *) 0;
+out.close();
 
-dict_stack = (DictionaryStack *) 0;
+bool status = read(temp_filename);
 
-LineNumber = 1;
+remove_temp_file(temp_filename);
 
-Column     = 1;
-
-is_lhs     = true;
-
-set_exit_on_warning();
-
-return ( true );
+return ( status );
 
 }
 
