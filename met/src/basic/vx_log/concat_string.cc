@@ -231,9 +231,6 @@ void ConcatString::extend(int n)
 
 {
 
-// JHG, this line should be removed after figuring out segfaults
-if ( AllocInc == 0 ) AllocInc = default_cs_alloc_inc;
-
 if ( n < Nalloc )  return;
 
 int k;
