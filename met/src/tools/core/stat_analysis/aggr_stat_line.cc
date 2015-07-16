@@ -126,12 +126,12 @@ void StatHdrInfo::add(const STATLine &line) {
       interp_mthd.add(line.interp_mthd());
    if(!interp_pnts.has(line.interp_pnts()))
       interp_pnts.add(line.interp_pnts());
-   if(!fcst_thresh.has(line.fcst_thresh()))
-      fcst_thresh.add(line.fcst_thresh());
-   if(!obs_thresh.has(line.obs_thresh()))
-      obs_thresh.add(line.obs_thresh());
-   if(!cov_thresh.has(line.cov_thresh()))
-      cov_thresh.add(line.cov_thresh());
+   if(!fcst_thresh.has(line.get_item(fcst_thresh_offset)))
+      fcst_thresh.add(line.get_item(fcst_thresh_offset));
+   if(!obs_thresh.has(line.get_item(obs_thresh_offset)))
+      obs_thresh.add(line.get_item(obs_thresh_offset));
+   if(!cov_thresh.has(line.get_item(cov_thresh_offset)))
+      cov_thresh.add(line.get_item(cov_thresh_offset));
    if(!alpha.has(line.alpha()))
       alpha.add(line.alpha());
 
@@ -145,11 +145,12 @@ void StatHdrInfo::add(const STATLine &line) {
 ////////////////////////////////////////////////////////////////////////
 
 StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
-                          const StringArray &hdr_name,
-                          const StringArray &hdr_value,
-                          const STATLineType lt) {
+                                    const StringArray &hdr_name,
+                                    const StringArray &hdr_value,
+                                    const STATLineType lt) {
    ConcatString css;
    double out_alpha;
+   ThreshArray ta;
    SingleThresh thresh;
    int index, wdth;
    StatHdrColumns shc;
@@ -362,7 +363,9 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
       shc.set_fcst_thresh(hdr_value[index]);
    }
    else {
-      shc.set_fcst_thresh(fcst_thresh);
+      ta.clear();
+      ta.add_css(css);
+      shc.set_fcst_thresh(ta);
    }
 
    // OBS_THRESH
@@ -377,7 +380,9 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
       shc.set_obs_thresh(hdr_value[index]);
    }
    else {
-      shc.set_obs_thresh(obs_thresh);
+      ta.clear();
+      ta.add_css(css);
+      shc.set_obs_thresh(ta);
    }
 
    // COV_THRESH
