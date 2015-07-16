@@ -25,7 +25,7 @@ using namespace std;
 #include "scanner_stuff.h" //  must be included before config.tab.h
 #include "threshold.h"     //  must be included before config.tab.h
 
-#include "config.tab.hh"
+#include "config.tab.h"
 
 #include "dictionary.h"
 
