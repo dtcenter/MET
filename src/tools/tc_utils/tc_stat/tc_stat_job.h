@@ -36,9 +36,7 @@ static const bool         default_event_equal        = false;
 static const TrackType    default_rirw_track  = TrackType_None;
 static const int          default_rirw_time   = 86400;
 static const bool         default_rirw_exact  = true;
-// JHG, comment out to get around segfaut in tc_stat due to config language problem
-// static const SingleThresh default_rirw_thresh(">=30.0");
-static const SingleThresh default_rirw_thresh;
+static const SingleThresh default_rirw_thresh(">=30.0");
 static const int          default_rirw_window = 0;
 
 // Default is 24 hours prior to landfall
@@ -48,9 +46,7 @@ static const int          default_landfall_end       = 0;
 
 // Default alpha value and FSP significance threshold
 static const double       default_tc_alpha           = 0.05;
-// JHG, comment out to get around segfaut in tc_stat due to config language problem
-//static const SingleThresh default_fsp_thresh(">0");
-static const SingleThresh default_fsp_thresh;
+static const SingleThresh default_fsp_thresh(">0");
 
 ////////////////////////////////////////////////////////////////////////
 
