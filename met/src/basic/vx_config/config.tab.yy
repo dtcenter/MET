@@ -123,10 +123,6 @@ static void do_boolean(const bool &);
 
 static void do_number(const Number &);
 
-// static void do_array(const char * LHS);
-
-// static void do_thresh(const ThreshType, const Number &);
-
 static void do_thresh(ThreshNode *);
 
 static void do_na_thresh();
@@ -796,21 +792,6 @@ else {
    }  else STH.set(node);
 
 }
-
-/*
-else {
-
-   DictionaryEntry e;
-   SingleThresh T;
-
-   T.set(node);
-
-   e.set_threshold(0, T);
-
-   dict_stack->store(e);
-
-}
-*/
 
 return;
 
