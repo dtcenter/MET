@@ -1618,7 +1618,7 @@ output_stats = {
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
 //          -line_type PCT,           -out_line_type PSTD, PJC, PRC
 //          -line_type NBRCTC,        -out_line_type NBRCTS
-//          -line_type ORANK,         -out_line_type RHIST, PHIST
+//          -line_type ORANK,         -out_line_type RHIST, PHIST, SSVAR
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
@@ -1634,7 +1634,7 @@ output_stats = {
 //             -mask_grid, -mask_poly,
 //             -out_wind_thresh or -out_fcst_wind_thresh and -out_obs_wind_thresh
 //             When -out_line_type WDIR
-//          Additional Optional Args for -line_type ORANK -out_line_type PHIST:
+//          Additional Optional Args for -line_type ORANK -out_line_type PHIST, SSVAR:
 //             -out_bin_size
 //
 //       "ss_index"
