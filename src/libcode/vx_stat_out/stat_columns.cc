@@ -1179,7 +1179,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
-   for(i=0; i<pd_ptr->n_pair; i++) {
+   for(i=0; i<pd_ptr->n_obs; i++) {
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
@@ -1338,7 +1338,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    shc.set_alpha(bad_data_double);
 
    // Write a line for each ensemble pair
-   for(i=0; i<pd_ptr->n_pair; i++) {
+   for(i=0; i<pd_ptr->n_obs; i++) {
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
@@ -2709,7 +2709,7 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    //    CLIMO,       OBS_QC
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
-      pd_ptr->n_pair);
+      pd_ptr->n_obs);
 
    at.set_entry(r, c+1,  // Index of Current Pair
       i+1);
@@ -2897,7 +2897,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //    OBS_QC,      ENS_MEAN
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
-      pd_ptr->n_pair);
+      pd_ptr->n_obs);
 
    at.set_entry(r, c+1,  // Index of Current Pair
       i+1);
@@ -2930,24 +2930,24 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
       nint(pd_ptr->v_na[i]));
 
    at.set_entry(r, c+11, // Number of ensembles
-      pd_ptr->e_na[i].n_elements());
+      pd_ptr->n_ens);
 
    //
    // Write ENS_j for each ensemble member
    //
-   for(j=0, col=c+12; j<pd_ptr->e_na[i].n_elements(); j++) {
+   for(j=0, col=c+12; j<pd_ptr->n_ens; j++) {
 
       at.set_entry(r, col, // ENS_j
-         pd_ptr->e_na[i][j]);
+         pd_ptr->e_na[j][i]);
       col++;
    }
 
    // Observation Quality Control
-   at.set_entry(r, c+12+pd_ptr->e_na[i].n_elements(), 
+   at.set_entry(r, c+12+pd_ptr->n_ens, 
       pd_ptr->o_qc_sa[i]);
    
    // Ensemble mean values
-   at.set_entry(r, c+13+pd_ptr->e_na[i].n_elements(), 
+   at.set_entry(r, c+13+pd_ptr->n_ens, 
       pd_ptr->mn_na[i]);
 
    return;
@@ -2986,7 +2986,7 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    //
 
    at.set_entry(r, c+0,  // Total Number of Pairs
-      pd_ptr->n_pair);
+      pd_ptr->n_obs);
 
    at.set_entry(r, c+1,  // Total Number of Bins
       pd_ptr->ssvar_bins[i].n_bin);

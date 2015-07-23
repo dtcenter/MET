@@ -733,7 +733,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //                                             SL1L2, SAL1L2,
    //                                             PCT, PSTD, PJC, PRC,
    //                                             WDIR (wind direction)
-   //    -line_type ORANK,         -out_line_type RHIST, PHIST
+   //    -line_type ORANK,         -out_line_type RHIST, PHIST, SSVAR
    //
 
    //
@@ -815,10 +815,12 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the observation rank line types:
-   //    ORANK -> RHIST, PHIST
+   //    ORANK -> RHIST, PHIST, SSVAR
    //
    else if(in_lt == stat_orank &&
-           (out_lt == stat_rhist || out_lt == stat_phist)) {
+           (out_lt == stat_rhist ||
+            out_lt == stat_phist ||
+            out_lt == stat_ssvar)) {
       aggr_orank_lines(f, j, orank_map, n_in, n_out);
       write_job_aggr_orank(j, out_lt, orank_map, out_at);
    }
@@ -2001,38 +2003,54 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
                           map<ConcatString, AggrORANKInfo> &m,
                           AsciiTable &at) {
    map<ConcatString, AggrORANKInfo>::iterator it;
-   int n_rhist, n_phist, n_row, n_col, r, c;
+   int i, n, n_row, n_col, r, c;
    StatHdrColumns shc;
-
+   
    //
-   // Determine the maximum number of ranks
+   // Determine the maximum number of ranks for RHIST and PHIST or
+   // the total number of SSVAR bins.
    //
-   for(it = m.begin(), n_rhist = 0, n_phist = 0; it != m.end(); it++) {
-      n_rhist = max(it->second.ens_pd.rhist_na.n_elements(), n_rhist);
-      n_phist = max(it->second.ens_pd.phist_na.n_elements(), n_phist);
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+           if(lt == stat_rhist) n  = max(it->second.ens_pd.rhist_na.n_elements(), n);
+      else if(lt == stat_phist) n  = max(it->second.ens_pd.phist_na.n_elements(), n);
+      else if(lt == stat_ssvar) {
+         it->second.ens_pd.compute_ssvar();
+         if(it->second.ens_pd.ssvar_bins) n += it->second.ens_pd.ssvar_bins[0].n_bin;
+      }
    }
 
    //
    // Setup the output table
    //
-   n_row = 1 + m.size();
    n_col = 1 + j.column_case.n_elements();   
-        if(lt == stat_rhist) n_col += get_n_rhist_columns(n_rhist);
-   else if(lt == stat_phist) n_col += get_n_phist_columns(n_phist);   
+   if(lt == stat_rhist) {
+      n_row  = 1 + m.size();
+      n_col += get_n_rhist_columns(n);
+   }
+   else if(lt == stat_phist) {
+      n_row  = 1 + m.size(); 
+      n_col += get_n_phist_columns(n);
+   }
+   else if(lt == stat_ssvar) {
+      n_row  = 1 + n;
+      n_col += n_ssvar_columns;
+   }
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
    c = 1 + j.column_case.n_elements();
-        if(lt == stat_rhist) write_rhist_header_row(0, n_rhist, at, 0, c);
-   else if(lt == stat_phist) write_phist_header_row(0, n_phist, at, 0, c);
+        if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
+   else if(lt == stat_phist) write_phist_header_row(0, n, at, 0, c);
+   else if(lt == stat_ssvar) write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
 
    //
    // Setup the output STAT file
    //
-        if(lt == stat_rhist) j.setup_stat_file(n_row, n_rhist); 
-   else if(lt == stat_phist) j.setup_stat_file(n_row, n_phist); 
+        if(lt == stat_rhist) j.setup_stat_file(n_row, n);
+   else if(lt == stat_phist) j.setup_stat_file(n_row, n);
+   else if(lt == stat_ssvar) j.setup_stat_file(n_row, 0);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -2046,9 +2064,11 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       // Write the output STAT header columns
       //
       shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
-      if(j.stat_out) {
-         write_header_cols(shc, j.stat_at, r);
-      }
+
+      //
+      // Set SSVAR alpha value
+      //
+      if(lt == stat_ssvar) shc.set_alpha(j.out_alpha);
 
       //
       // Initialize
@@ -2062,7 +2082,10 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, "RHIST:");
          write_case_cols(it->first, at, r, c);
          write_rhist_cols(&(it->second.ens_pd), at, r, c);
-         if(j.stat_out) write_rhist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+         if(j.stat_out) {
+            write_header_cols(shc, j.stat_at, r);
+            write_rhist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+         }
       }
 
       //
@@ -2072,7 +2095,32 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
          at.set_entry(r, c++, "PHIST:");
          write_case_cols(it->first, at, r, c);
          write_phist_cols(&(it->second.ens_pd), at, r, c);
-         if(j.stat_out) write_phist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+         if(j.stat_out) {
+            write_header_cols(shc, j.stat_at, r);
+            write_phist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+         }
+      }
+
+      //
+      // SSVAR output lines
+      //
+      else if(lt == stat_ssvar) {
+
+         if(!it->second.ens_pd.ssvar_bins) continue;
+
+         //
+         // Write a line for each ssvar bin
+         //
+         for(i=0; i<it->second.ens_pd.ssvar_bins[0].n_bin; i++, r++) {
+            c = 0;
+            at.set_entry(r, c++, "SSVAR:");
+            write_case_cols(it->first, at, r, c);
+            write_ssvar_cols(&(it->second.ens_pd), i, j.out_alpha, at, r, c);
+            if(j.stat_out) {
+               write_header_cols(shc, j.stat_at, r);
+               write_ssvar_cols(&(it->second.ens_pd), i, j.out_alpha, j.stat_at, r, n_header_columns);
+            }
+         }
       }
    } // end for it
 
