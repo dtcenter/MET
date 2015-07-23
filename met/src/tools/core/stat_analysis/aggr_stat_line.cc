@@ -2334,10 +2334,12 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(m.count(key) == 0) {
             aggr.ens_pd.clear();
+            aggr.ens_pd.set_ens_size(cur.n_ens);
             for(i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
             aggr.ens_pd.phist_bin_size = j.out_bin_size;
-            n_bin = ceil(1.0 / aggr.ens_pd.phist_bin_size);
+            n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
             for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
+            aggr.ens_pd.ssvar_bin_size = j.out_bin_size;
             aggr.hdr.clear();
             m[key] = aggr;
          }
@@ -2345,12 +2347,20 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Check for N_ENS remaining constant
          //
-         if(m[key].ens_pd.rhist_na.n_elements() > 0 &&
-            m[key].ens_pd.rhist_na.n_elements() != cur.n_ens+1) {
+         if(m[key].ens_pd.n_ens != cur.n_ens) {
             mlog << Error << "\naggr_orank_lines() -> "
                  << "the \"N_ENS\" column must remain constant.  "
                  << "Try setting \"-column_eq N_ENS n\".\n\n";
             throw(1);
+         }
+
+         //
+         // Store the observation, ensemble mean, and ensemble member values
+         //
+         m[key].ens_pd.add_obs(0.0, 0.0, cur.obs);
+         m[key].ens_pd.mn_na.add(cur.ens_mean);
+         for(i=0; i<m[key].ens_pd.n_ens; i++) {
+            m[key].ens_pd.add_ens(i, cur.ens_na[i]);
          }
 
          //

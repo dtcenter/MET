@@ -72,7 +72,6 @@ PairDataEnsemble & PairDataEnsemble::operator=(const PairDataEnsemble &pd) {
 void PairDataEnsemble::init_from_scratch() {
 
    e_na       = (NumArray *) 0;
-   n_pair     = 0;
    n_ens      = 0;
    ssvar_bins = (SSVARInfo *) 0;
 
@@ -88,8 +87,9 @@ void PairDataEnsemble::clear() {
 
    PairBase::clear();
 
-   for(i=0; i<n_pair; i++) e_na[i].clear();
+   for(i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
+   n_ens = 0;
 
    v_na.clear();
    r_na.clear();
@@ -101,14 +101,10 @@ void PairDataEnsemble::clear() {
    var_na.clear();
    mn_na.clear();
 
-   if( ssvar_bins ) delete [] ssvar_bins;
-   ssvar_bins = 0;
+   if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
    
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
-
-   n_pair = 0;
-   n_ens  = 0;
 
    return;
 }
@@ -146,23 +142,21 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    var_na   = pd.var_na;
    mn_na    = pd.mn_na;
 
-   n_obs    = pd.n_obs;
-   n_pair   = pd.n_pair;
-   n_ens    = pd.n_ens;   
+   n_obs    = pd.n_obs;   
 
-   if( pd.ssvar_bins ){
-      ssvar_bins = new SSVARInfo[ pd.ssvar_bins[0].n_bin ];
+   if(pd.ssvar_bins){
+      ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
       for(i=0; i < pd.ssvar_bins[0].n_bin; i++){
          ssvar_bins[i] = pd.ssvar_bins[i];
       }
    } else ssvar_bins = 0;
-   
+
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
 
-   set_size();
+   set_ens_size(pd.n_ens);
 
-   for(i=0; i<n_pair; i++) e_na[i] = pd.e_na[i];
+   for(i=0; i<n_ens; i++) e_na[i] = pd.e_na[i];
 
    return;
 }
@@ -178,38 +172,11 @@ void PairDataEnsemble::add_ens(int i, double v) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::set_size() {
+void PairDataEnsemble::set_ens_size(int n) {
 
-   n_pair = n_obs;
-
-   // Allocate a NumArray to store ensemble values for each observation
-   e_na = new NumArray [n_pair];
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairDataEnsemble::set_n_ens() {
-   int i;
-   
-   // Look at the number of ensemble values present for each pair
-   for(i=0, n_ens=bad_data_int; i<n_pair; i++) {
-
-      // Set the number of ensemble members
-      if(is_bad_data(n_ens)) n_ens = e_na[i].n_elements();
-      else {
-
-         // Make sure the number of ensemble members doesn't change
-         if(n_ens != e_na[i].n_elements()) {
-            mlog << Error << "\nPairDataEnsemble::set_n_ens() -> "
-                 << "the number of ensemble members changed from "
-                 << n_ens << " to " << e_na[i].n_elements()
-                 << ".\n\n";
-            exit(1);
-         }
-      }
-   } // end for i
+   // Allocate a NumArray to store ensemble values for each member
+   n_ens = n;
+   e_na  = new NumArray [n_ens];
 
    return;
 }
@@ -224,17 +191,17 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
    for(i=0; i<o_na.n_elements(); i++) {
 
       // Compute the number of ensemble values less than the observation
-      for(j=0, n_vld=0, n_bel=0, n_tie=0; j<e_na[i].n_elements(); j++) {
+      for(j=0, n_vld=0, n_bel=0, n_tie=0; j<n_ens; j++) {
 
          // Skip bad data
-         if(!is_bad_data(e_na[i][j])) {
+         if(!is_bad_data(e_na[j][i])) {
 
             // Increment the valid count
             n_vld++;
 
             // Keep track of the number of ties and the number below
-            if(is_eq(e_na[i][j], o_na[i])) n_tie++;
-            else if(e_na[i][j] < o_na[i])  n_bel++;
+            if(is_eq(e_na[j][i], o_na[i])) n_tie++;
+            else if(e_na[j][i] < o_na[i])  n_bel++;
          }
       } // end for j
 
@@ -341,14 +308,17 @@ void PairDataEnsemble::compute_phist() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_stats() {
-   int i;
+   int i, j;
    double crps, ign, pit;
+   NumArray cur;
 
-   // Clear the CRPS array
+   // Initialize
    crps_na.clear();
+   ign_na.clear();
+   pit_na.clear();
 
    // Loop through the pairs and compute CRPS for each
-   for(i=0; i<n_pair; i++) {
+   for(i=0; i<n_obs; i++) {
 
       // Don't compute if any of the ensemble members are missing
       if(nint(v_na[i]) != n_ens) {
@@ -358,8 +328,11 @@ void PairDataEnsemble::compute_stats() {
          continue;
       }
 
+      // Store ensemble values for the current observation
+      for(j=0, cur.clear(); j<n_ens; j++) cur.add(e_na[j][i]);
+
       // Compute the stats
-      compute_crps_ign_pit(o_na[i], e_na[i], crps, ign, pit);
+      compute_crps_ign_pit(o_na[i], cur, crps, ign, pit);
 
       // Store the stats
       crps_na.add(crps);
@@ -389,14 +362,14 @@ void PairDataEnsemble::compute_ssvar() {
    for(i=0; i<o_na.n_elements(); i++) {
 
       // Add the deviation of each ensemble member
-      for(j=0, n_vld=0, var=0; j<e_na[i].n_elements(); j++) {
+      for(j=0, n_vld=0, var=0; j<n_ens; j++) {
 
          // Skip bad data
-         if(is_bad_data(e_na[i][j])) continue;
+         if(is_bad_data(e_na[j][i]) || is_bad_data(mn_na[i])) continue;
          n_vld++;
 
          // Add the squared deviation
-         dev = (e_na[i][j] - mn_na[i]);
+         dev = (e_na[j][i] - mn_na[i]);
          var += dev*dev;
 
       } // end for j
@@ -819,13 +792,13 @@ void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_ens_size() {
+void VxPairDataEnsemble::set_ens_size(int n) {
    int i, j, k;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
          for(k=0; k<n_interp; k++) {
-            pd[i][j][k].set_size();
+            pd[i][j][k].set_ens_size(n);
          }
       }
    }
@@ -1021,7 +994,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::add_ens(bool mn) {
+void VxPairDataEnsemble::add_ens(int member, bool mn) {
    int i, j, k, l;
    int fcst_lvl_below, fcst_lvl_above;
    double fcst_v;
@@ -1032,7 +1005,7 @@ void VxPairDataEnsemble::add_ens(bool mn) {
          for(k=0; k<n_interp; k++) {
 
             // Process each of the observations
-            for(l=0; l<pd[i][j][k].n_pair; l++) { 
+            for(l=0; l<pd[i][j][k].n_obs; l++) { 
 
                // For a single forecast field
                if(fcst_dpa.n_planes() == 1) {
@@ -1058,9 +1031,8 @@ void VxPairDataEnsemble::add_ens(bool mn) {
                                        pd[i][j][k].lvl_na[l], fcst_lvl_below, fcst_lvl_above);
 
                // Add the ensemble value, even if it's bad data
-               if( !mn ) pd[i][j][k].add_ens(l, fcst_v);
-               else      pd[i][j][k].mn_na.add(fcst_v);
-
+               if(!mn) pd[i][j][k].add_ens(member, fcst_v);
+               else    pd[i][j][k].mn_na.add(fcst_v);
             }
          } // end for k - n_interp
       } // end for j - n_mask
@@ -1135,8 +1107,7 @@ int VxPairDataEnsemble::get_n_pair() {
    for(i=0, n=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
          for(k=0; k<n_interp; k++) {
-
-            n += pd[i][j][k].n_pair;
+            n += pd[i][j][k].n_obs;
          }
       }
    }

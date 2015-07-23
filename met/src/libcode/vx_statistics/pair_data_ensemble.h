@@ -60,32 +60,29 @@ class PairDataEnsemble : public PairBase {
       //////////////////////////////////////////////////////////////////
 
       // Ensemble, valid count, and rank values
-      NumArray  *e_na;            // Ensemble values [n_pair][n_ens]
-      NumArray   v_na;            // Number of valid ensemble values [n_pair]
-      NumArray   r_na;            // Observation ranks [n_pair]
-      NumArray   crps_na;         // Continuous Ranked Probability Score [n_pair]
-      NumArray   ign_na;          // Ignorance Score [n_pair]
-      NumArray   pit_na;          // Probability Integral Transform [n_pair]
-      int        n_pair;          // Number of matched pairs
+      NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
+      NumArray   v_na;            // Number of valid ensemble values [n_obs]
+      NumArray   r_na;            // Observation ranks [n_obs]
+      NumArray   crps_na;         // Continuous Ranked Probability Score [n_obs]
+      NumArray   ign_na;          // Ignorance Score [n_obs]
+      NumArray   pit_na;          // Probability Integral Transform [n_obs]
       int        n_ens;           // Number of ensemble members
 
       NumArray   rhist_na;        // Ranked Histogram [n_ens+1]
       NumArray   phist_na;        // PIT Histogram [n_phist_bin]
-      
-      NumArray   var_na;          // Ensemble member value variance [n_pair]
-      NumArray   mn_na;           // Ensemble mean value [n_pair]
+
+      NumArray   var_na;          // Ensemble member value variance [n_obs]
+      NumArray   mn_na;           // Ensemble mean value [n_obs]
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
       double     phist_bin_size;  // Ensemble PIT histogram bin width
-
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void add_ens(int, double);
-      void set_size();
-      void set_n_ens();
+      void set_ens_size(int);
 
       void compute_rank(const gsl_rng *);
       void compute_rhist();
@@ -195,14 +192,14 @@ class VxPairDataEnsemble {
       void set_interp(int, InterpMthd, int);
 
       // Call set_ens_size before add_ens
-      void set_ens_size();
+      void set_ens_size(int n);
 
       void set_ssvar_bin_size(double);
       void set_phist_bin_size(double);
 
       void add_obs(float *, const char *, const char *, unixtime,
                    const char *, float *, Grid &);
-      void add_ens(bool mn);
+      void add_ens(int, bool mn);
 
       void find_vert_lvl(double, int &, int &);
 
@@ -216,8 +213,8 @@ class VxPairDataEnsemble {
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void   compute_crps_ign_pit(double, const NumArray &,
-                                   double &, double &, double &);
+extern void compute_crps_ign_pit(double, const NumArray &,
+                                 double &, double &, double &);
 
 ////////////////////////////////////////////////////////////////////////
 

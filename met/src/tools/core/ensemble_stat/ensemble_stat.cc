@@ -72,7 +72,7 @@ static void process_vx            ();
 
 static void process_point_vx      ();
 static void process_point_obs     (int);
-static int  process_point_ens     (int);
+static int  process_point_ens     (int, int);
 static void process_point_scores  ();
 
 static void process_grid_vx       ();
@@ -575,7 +575,7 @@ void process_vx() {
       conf_info.process_masks(grid);
 
       // Setup the GCPairData objects
-      conf_info.set_vx_pd();
+      conf_info.set_vx_pd(n_ens_vld);
 
       // Process the point observations
       if(point_obs_flag) process_point_vx();
@@ -614,16 +614,11 @@ void process_point_vx() {
       process_point_obs(i);
    }
 
-   // Set the size to store the ensemble data
-   for(i=0; i<conf_info.get_n_vx(); i++) {
-      conf_info.vx_pd[i].set_ens_size();
-   }
-
    // Process each ensemble file
    for(i=0, n_miss=0; i<ens_file_list.n_elements(); i++) {
 
       // If the current forecast file is valid, process it
-      if(ens_file_vld[i]) miss_flag = process_point_ens(i);
+      if(ens_file_vld[i]) miss_flag = process_point_ens(i, n_miss);
       else                miss_flag = 1;
 
       // Increment the missing count
@@ -640,7 +635,7 @@ void process_point_vx() {
    } // end for i
 
    // Process the ensemble mean, if spread/skill is activated
-   if(conf_info.ens_ssvar_flag) process_point_ens(-1);
+   if(conf_info.ens_ssvar_flag) process_point_ens(-1, n_miss);
 
    // Compute the scores and write them out
    process_point_scores();
@@ -816,7 +811,7 @@ void process_point_obs(int i_nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int process_point_ens(int i_ens) {
+int process_point_ens(int i_ens, int n_miss) {
    int i, j, n_fcst;
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
@@ -900,7 +895,7 @@ int process_point_ens(int i_ens) {
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
 
       // Compute forecast values for this ensemble member
-      conf_info.vx_pd[i].add_ens(ens_mn);
+      conf_info.vx_pd[i].add_ens(i_ens-n_miss, ens_mn);
 
    } // end for i
 
@@ -968,9 +963,6 @@ void process_point_scores() {
                shc.set_interp_wdth(conf_info.interp_wdth[l]);
 
                pd_ptr = &conf_info.vx_pd[i].pd[j][k][l];
-
-               // Determine the number of valid ensemble members
-               pd_ptr->set_n_ens();
                
                // Compute the ranks for the observations
                pd_ptr->compute_rank(rng_ptr);
@@ -985,10 +977,10 @@ void process_point_scores() {
                     << ", for interpolation method "
                     << shc.get_interp_mthd() << "("
                     << shc.get_interp_pnts_str()
-                    << "), using " << pd_ptr->n_pair << " pairs.\n";
+                    << "), using " << pd_ptr->n_obs << " pairs.\n";
 
                // Continue if there are no points
-               if(pd_ptr->n_pair == 0) continue;
+               if(pd_ptr->n_obs == 0) continue;
 
                // Compute ensemble statistics
                pd_ptr->compute_rhist();
@@ -1320,6 +1312,7 @@ void process_grid_vx() {
 
             // Initialize
             pd.clear();
+            pd.set_ens_size(n_ens_vld[i]);
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
@@ -1336,10 +1329,10 @@ void process_grid_vx() {
                  << ", for interpolation method "
                  << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
-                 << "), using " << pd.n_pair << " pairs.\n";
+                 << "), using " << pd.n_obs << " pairs.\n";
 
             // Continue if there are no points
-            if(pd.n_pair == 0) continue;
+            if(pd.n_obs == 0) continue;
 
             // Set the PHIST bin size
             pd.phist_bin_size = conf_info.ens_phist_bin_size[i];
@@ -1416,7 +1409,7 @@ void process_grid_vx() {
 void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
                          DataPlane &mn_dp,
                          DataPlane &mask_dp, PairDataEnsemble &pd) {
-   int i, j, x, y;
+   int i, j, x, y, n_miss;
    double v;
 
    // Loop through the observation field
@@ -1438,20 +1431,18 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
       for(y=0; y<mn_dp.ny(); y++)
          pd.mn_na.add(mn_dp.get(x, y));
 
-   // Allocate space for the ensemble data
-   pd.set_size();
-
    // Loop through the observation points
-   for(i=0; i<pd.n_pair; i++) {
+   for(i=0; i<pd.n_obs; i++) {
 
       x = nint(pd.x_na[i]);
       y = nint(pd.y_na[i]);
 
       // Loop through each of the ensemble members
-      for(j=0; j<n_ens; j++) {
+      for(j=0, n_miss=0; j<n_ens; j++) {
 
          // Skip missing data
          if(fcst_dp[j].nx() == 0 || fcst_dp[j].ny() == 0) {
+            n_miss++;
             continue;
          }
          // Get the ensemble value
@@ -1460,15 +1451,11 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
          }
 
          // Store the ensemble value
-         pd.add_ens(i, v);
+         pd.add_ens(j-n_miss, v);
       } // end for j
    } // end for i
    
-   if(pd.n_pair > 0) {
-     
-      // Determine the number of valid ensemble members
-      pd.set_n_ens();
-
+   if(pd.n_obs > 0) {
       // Compute the ranks for the observations
       pd.compute_rank(rng_ptr);
    }
@@ -2029,7 +2016,7 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
    }
 
    // Loop over all the pairs
-   for(i=0; i<pd.n_pair; i++) {
+   for(i=0; i<pd.n_obs; i++) {
      
       n = DefaultTO.two_to_one(grid.nx(), grid.ny(),
                                nint(pd.x_na[i]), nint(pd.y_na[i]));

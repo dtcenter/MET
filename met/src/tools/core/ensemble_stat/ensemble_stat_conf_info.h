@@ -119,7 +119,7 @@ class EnsembleStatConfInfo {
       void read_config   (const char *, const char *);
       void process_config(GrdFileType, GrdFileType);
       void process_masks (const Grid &);
-      void set_vx_pd     ();
+      void set_vx_pd     (const IntArray &);
 
       // Dump out the counts
       int get_n_ens_var()      const;
