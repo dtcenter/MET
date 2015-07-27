@@ -20,6 +20,8 @@ gsid2mpr_SOURCES = gsid2mpr.h \
 	conv_record.cc \
 	rad_record.h \
 	rad_record.cc \
+	gsi_util.h \
+	gsi_util.cc \
 	gsid2mpr.cc \
 	conv_offsets.h \
 	rad_offsets.h \
@@ -46,6 +48,8 @@ gsidens2orank_SOURCES = gsidens2orank.h \
 	conv_record.cc \
 	rad_record.h \
 	rad_record.cc \
+	gsi_util.h \
+	gsi_util.cc \
 	gsidens2orank.cc \
 	conv_offsets.h \
 	rad_offsets.h \
@@ -57,6 +61,15 @@ gsidens2orank_LDFLAGS = ${MET_LDFLAGS}
 gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_gsl_prob \
+	-lvx_data2d_factory \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
+	-lvx_data2d \
+	-lvx_nc_util \
+	-lvx_regrid \
+	-lvx_grid \
 	-lvx_config \
 	-lvx_cal \
 	-lvx_util \
