@@ -24,7 +24,7 @@ using namespace std;
 #include "rad_offsets.h"
 #include "rad_record.h"
 #include "gsi_util.h"
-
+   
 ////////////////////////////////////////////////////////////////////////
 
 ConvData parse_conv_data(const ConvRecord &r, const int i) {
@@ -139,6 +139,36 @@ RadData parse_rad_data(const RadRecord  &r, const int i,
    d.n_use     = 0;
    
    return(d);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString get_conv_key(const ConvData &d) {
+   ConcatString key;
+
+   key << d.var << key_sep << d.sid << key_sep
+       << d.lat << key_sep << d.lon << key_sep
+       << d.hgt << key_sep << d.elv << key_sep
+       << unix_to_yyyymmdd_hhmmss(d.fcst_ut) << key_sep
+       << unix_to_yyyymmdd_hhmmss(d.obs_ut) << key_sep
+       << d.obs;
+
+   return(key);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString get_rad_key(const RadData &d) {
+   ConcatString key;
+
+   key << d.var << key_sep
+       << d.lat << key_sep << d.lon << key_sep << d.elv << key_sep
+       << unix_to_yyyymmdd_hhmmss(d.fcst_ut) << key_sep
+       << unix_to_yyyymmdd_hhmmss(d.obs_ut) << key_sep
+       << d.obs;
+
+   return(key);   
 }
 
 ////////////////////////////////////////////////////////////////////////

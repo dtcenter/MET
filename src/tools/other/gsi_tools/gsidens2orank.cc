@@ -237,18 +237,11 @@ void process_conv(const char *conv_filename, int i_mem) {
 
 void process_conv_data(ConvData &d, int i_mem) {
    int i, i_obs;
-   ConcatString key, cs;
-   const char *sep = ":";
+   ConcatString cs;
    bool mn = (i_mem < 0);
 
    // Build current key
-   key << cs_erase
-       << d.var << sep << d.sid << sep
-       << d.lat << sep << d.lon << sep
-       << d.hgt << sep << d.elv << sep
-       << unix_to_yyyymmdd_hhmmss(d.fcst_ut) << sep
-       << unix_to_yyyymmdd_hhmmss(d.obs_ut) << sep
-       << d.obs;
+   ConcatString key = get_conv_key(d);
 
    // Add entry for new observation
    if(!obs_key.has(key)) {
@@ -288,9 +281,9 @@ void process_conv_data(ConvData &d, int i_mem) {
 
       // Check for duplicates
       if(!is_bad_data(ens_pd.e_na[i_mem][i_obs])) {
-         mlog << Warning << "\nprocess_conv_data() -> "
-              << "found duplicate entry for case \"" << key
-              << "\"\n\n";
+         mlog << Warning
+              << "\nSkipping duplicate entry for ensemble member "
+              << i_mem + 1 << " case \"" << key << "\"\n\n";
          return;
       }
 
@@ -390,17 +383,11 @@ void process_rad(const char *rad_filename, int i_mem) {
 
 void process_rad_data(RadData &d, int i_mem) {
    int i, i_obs;
-   ConcatString key, cs;
-   const char *sep = ":";
+   ConcatString cs;
    bool mn = (i_mem < 0);
 
    // Build current key
-   key << cs_erase
-       << d.var << sep
-       << d.lat << sep << d.lon << sep << d.elv << sep
-       << unix_to_yyyymmdd_hhmmss(d.fcst_ut) << sep
-       << unix_to_yyyymmdd_hhmmss(d.obs_ut) << sep
-       << d.obs;
+   ConcatString key = get_rad_key(d);
 
    // Add entry for new observation
    if(!obs_key.has(key)) {
@@ -462,9 +449,9 @@ void process_rad_data(RadData &d, int i_mem) {
 
       // Check for duplicates
       if(!is_bad_data(ens_pd.e_na[i_mem][i_obs])) {
-         mlog << Warning << "\nprocess_rad_data() -> "
-              << "found duplicate entry for case \"" << key
-              << "\"\n\n";
+         mlog << Warning
+              << "\nSkipping duplicate entry for ensemble member "
+              << i_mem + 1 << " case \"" << key << "\"\n\n";
          return;
       }
 

@@ -135,6 +135,9 @@ static ConcatString   suffix = ".stat";
 static ConcatString   output_directory = ".";
 static StatHdrColumns shc;
 
+// Store observation keys to search for duplicates
+static StringArray    obs_key;
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __GSID2MPR_H__  */
