@@ -25,10 +25,12 @@
 
 using namespace std;
 
-#include <map>
+#include <vector>
 
 #include "vx_util.h"
 #include "vx_log.h"
+
+#include "gsi_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -36,113 +38,80 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char *program_name = "gsid2mpr";
+static const char *program_name = "gsidens2orank";
 static const int   rec_pad_length = 4;
 static const bool  swap_endian = true;
-static const int   bad_setup_qc = -999;
-
-// Defaults for output header
-static const char  *default_model       = "GSI";
-static const int    default_lead        = 0;
-static const char  *default_lev         = na_str;
-static const char  *default_obtype      = na_str;
-static const char  *default_vx_mask     = na_str;
-static const char  *default_interp_mthd = na_str;
-static const int    default_interp_wdth = 0;
-static const char  *default_thresh      = na_str;
-static const double default_alpha       = bad_data_double;
-static const char  *default_line_type   = "MPR";
-
-static const char  *conv_id_str         = "conv";
-
-static const char  *micro_id_str [] = {
-   "amsua", "amsub", "mhs",
-   "msu",   "hsb",   "ssmi",
-   "ssmis", "amsre", "atms"
-};
-static const int n_micro_id_str = sizeof(micro_id_str)/sizeof(*micro_id_str);
 
 ////////////////////////////////////////////////////////////////////////
 
 static const char *conv_extra_columns [] = {
-   "OBS_HGT",      // observation height                  (7)
-
-   "OBS_ERR_IN",   // prepbufr inverse observation error  (14)
-   "OBS_ERR_ADJ",  // read_prepbufr inverse obs error     (15)
-   "OBS_ERR_FIN",  // final inverse observation error     (16)
-
-   "PREP_USE",     // read_prepbufr usage                 (11)
-   "ANLY_USE",     // analysis usage                      (12)
-
-   "SETUP_QC",     // setup qc                            (10)
-   "QC_WGHT"       // non-linear qc rel weight            (13)
+   "N_USE",    // number of ensemble members in which obs was used
+   "PREP_USE", // read_prepbufr usage
+   "SETUP_QC"  // setup qc
 };
 
-static const int n_conv_extra_cols = sizeof(conv_extra_columns)/sizeof(*conv_extra_columns);
+static const int n_conv_extra_cols =
+   sizeof(conv_extra_columns)/sizeof(*conv_extra_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
 static const char * rad_extra_columns [] = {
-   "CHAN_USE",   // channel used
-   "SCAN_POS",   // sensor scan position
-   "SAT_ZNTH",   // satellite zenith angle (degrees)
-   "SAT_AZMTH",  // satellite azimuth angle (degrees)
-   "SUN_ZNTH",   // solar zenith angle (degrees)
-   "SUN_AZMTH",  // solar azimuth angle (degrees)
-   "SUN_GLNT",   // sun glint angle (degrees)
-   "FRAC_WTR",   // fractional coverage by water
-   "FRAC_LND",   // fractional coverage by land
-   "FRAC_ICE",   // fractional coverage by ice
-   "FRAC_SNW",   // fractional coverage by snow
-   "SFC_TWTR",   // surface temperature over water (K)
-   "SFC_TLND",   // surface temperature over land (K)
-   "SFC_TICE",   // surface temperature over ice (K)
-   "SFC_TSNW",   // surface temperature over snow (K)
-   "TSOIL",      // soil temperature (K)
-   "SOILM",      // soil moisture
-   "LAND_TYPE",  // surface land type
-   "FRAC_VEG",   // vegetation fraction
-   "SNW_DPTH",   // snow depth
-   "SFC_WIND",   // surface wind speed (m/s)
-   "FRAC_CLD",   // cloud fraction (%)
-   "CTOP_PRS",   // cloud top pressure (hPa)
-   "ITREF",      // itref
-   "IDTW",       // idtw
-   "IDTC",       // idtc
-   "ITZ_TR",     // itz_tr
-   "OBS_ERR",    // inverse observation error
-   "FCST_NOBC",  // Tb with no bias correction (K)
-   "SFC_EMIS",   // surface emissivity
-   "STABILITY",  // stability index
-   "PRS_MAX_WGT" // pressure of the maximum weighing function
+   "N_USE",     // number of ensemble members in which obs was used
+   "CHAN_USE",  // channel used
+   "SCAN_POS",  // sensor scan position
+   "SAT_ZNTH",  // satellite zenith angle (degrees)
+   "SAT_AZMTH", // satellite azimuth angle (degrees)
+   "SUN_ZNTH",  // solar zenith angle (degrees)
+   "SUN_AZMTH", // solar azimuth angle (degrees)
+   "SUN_GLNT",  // sun glint angle (degrees)
+   "FRAC_WTR",  // fractional coverage by water
+   "FRAC_LND",  // fractional coverage by land
+   "FRAC_ICE",  // fractional coverage by ice
+   "FRAC_SNW",  // fractional coverage by snow
+   "SFC_TWTR",  // surface temperature over water (K)
+   "SFC_TLND",  // surface temperature over land (K)
+   "SFC_TICE",  // surface temperature over ice (K)
+   "SFC_TSNW",  // surface temperature over snow (K)
+   "TSOIL",     // soil temperature (K)
+   "SOILM",     // soil moisture
+   "LAND_TYPE", // surface land type
+   "FRAC_VEG",  // vegetation fraction
+   "SNW_DPTH",  // snow depth
+   "ITREF",     // itref
+   "IDTW",      // idtw
+   "IDTC",      // idtc
+   "ITZ_TR"     // itz_tr
 };
 
-static const int n_rad_extra_cols = sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);
+static const int n_rad_extra_cols =
+   sizeof(rad_extra_columns)/sizeof(*rad_extra_columns);
 
 ////////////////////////////////////////////////////////////////////////
 
 static const char *micro_extra_columns [] = {
-   "CLD_LWC",     // cloud liquid water (kg/m**2)
-   "TC_PWAT"      // total column precip. water (km/m**2)
+   "CLD_LWC", // cloud liquid water (kg/m**2)
+   "TC_PWAT"  // total column precip. water (km/m**2)
 };
 
-static const int n_micro_extra_cols = sizeof(micro_extra_columns)/sizeof(*micro_extra_columns);
-static const int micro_extra_begin  = 21;
+static const int n_micro_extra_cols =
+   sizeof(micro_extra_columns)/sizeof(*micro_extra_columns);
+static const int micro_extra_begin = 21;
 
 ////////////////////////////////////////////////////////////////////////
 
 static const char *retr_extra_columns [] = {
-   "SST_FG",     // SST first guess used for SST retrieval
-   "SST_NCEP",   // NCEP SST analysis at t
-   "SST_PHY",    // Physical SST retrieval
-   "SST_NAVY",   // Navy SST retrieval
-   "D_TA",       // d(ta) corresponding to sstph
-   "D_QA",       // d(qa) corresponding to sstph
-   "DATA_TYPE"   // data type
+   "SST_FG",   // SST first guess used for SST retrieval
+   "SST_NCEP", // NCEP SST analysis at t
+   "SST_PHY",  // Physical SST retrieval
+   "SST_NAVY", // Navy SST retrieval
+   "D_TA",     // d(ta) corresponding to sstph
+   "D_QA",     // d(qa) corresponding to sstph
+   "DATA_TYPE" // data type
 };
 
-static const int n_retr_extra_cols = sizeof(retr_extra_columns)/sizeof(*retr_extra_columns);
-static const int retr_extra_begin  = 11;
+static const int n_retr_extra_cols =
+   sizeof(retr_extra_columns)/sizeof(*retr_extra_columns);
+static const int retr_extra_begin = 11;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -150,12 +119,29 @@ static const int retr_extra_begin  = 11;
 //
 ////////////////////////////////////////////////////////////////////////
 
+static ConcatString   output_filename;
+static ConcatString   ens_mean_filename;
 static NumArray       channel;
 static StringArray    hdr_name;
 static StringArray    hdr_value;
-static ConcatString   suffix = ".stat";
-static ConcatString   output_directory = ".";
 static StatHdrColumns shc;
+static int            n_ens;
+static bool           conv_flag, micro_flag, retr_flag;
+
+// Pointer to the random number generator to be used
+static gsl_rng     *rng_ptr          = (gsl_rng *) 0;
+static const char  *default_rng_name = "mt19937";
+static const char  *default_rng_seed = "";
+static ConcatString rng_name;
+static ConcatString rng_seed;
+
+////////////////////////////////////////////////////////////////////////
+
+// Store conventional and radiance information
+static StringArray      obs_key;
+static vector<ConvData> conv_data;
+static vector<RadData>  rad_data;
+static PairDataEnsemble ens_pd;
 
 ////////////////////////////////////////////////////////////////////////
 
