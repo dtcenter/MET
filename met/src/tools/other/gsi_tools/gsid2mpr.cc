@@ -52,6 +52,8 @@ static void process_rad (const char *rad_filename, const char *output_filename);
 static void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d);
 static void write_mpr_row_rad (AsciiTable &at, int row, const RadData  &d);
 
+static bool is_dup(const char *);
+
 static void usage();
 static void set_channel(const StringArray &);
 static void set_hdr(const StringArray &);
@@ -124,7 +126,7 @@ void process_conv(const char *conv_filename, const char *output_filename) {
 
    ConvFile f;
    ConvRecord r;
-   ConvData d;
+   ConvData d, d_v;
    
    // Setup output AsciiTable
    at.set_size(1, n_header_columns + n_mpr_columns + n_conv_extra_cols);
@@ -160,17 +162,25 @@ void process_conv(const char *conv_filename, const char *output_filename) {
 
       uv_flag = (str_trim(r.variable) == "uv");
       at.add_rows((uv_flag ? 2 : 1)*r.ii); // double for uv lines
-      
+
       for(i=0; i<(r.ii); i++)  {
+
+         // Parse the current convetional data
          d = parse_conv_data(r, i);
+
+         // Handle uv pairs
          if(uv_flag) {
-            d.var = "u";
-            write_mpr_row_conv(at, n_out++, d);
-            d.var = "v";
-            write_mpr_row_conv(at, n_out++, d);
+            d_v       = d;
+            d.var     = "u";
+            d_v.var   = "v";
+            d_v.guess = d_v.guess_v;
+            d_v.obs   = d_v.obs_v;
+            if(!is_dup(get_conv_key(d)))   write_mpr_row_conv(at, n_out++, d);
+            if(!is_dup(get_conv_key(d_v))) write_mpr_row_conv(at, n_out++, d_v);
          }
+         // Handle other variable types
          else {
-            write_mpr_row_conv(at, n_out++, d);
+            if(!is_dup(get_conv_key(d))) write_mpr_row_conv(at, n_out++, d);
          }
       }
 
@@ -289,7 +299,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
                             f.channel_val(i_channel[i]-1),
                             f.use_channel(i_channel[i]-1));
          
-         write_mpr_row_rad(at, n_out++, d);
+         if(!is_dup(get_rad_key(d))) write_mpr_row_rad(at, n_out++, d);
       }
 
       n_in++;
@@ -317,8 +327,6 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
    int col;
 
-   bool v_flag = (strcmp(d.var, "v") == 0);
-
    // Update header for current data   
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d.fcst_ut);
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d.fcst_ut);
@@ -342,10 +350,8 @@ void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
    at.set_entry(row, col++, d.hgt);       // OBS_LVL
    at.set_entry(row, col++, d.elv);       // OBS_ELV
 
-   at.set_entry(row, col++, (v_flag ?     // FCST
-                d.guess_v : d.guess));
-   at.set_entry(row, col++, (v_flag ?     // OBS
-                d.obs_v   : d.obs));
+   at.set_entry(row, col++, d.guess);     // FCST
+   at.set_entry(row, col++, d.obs);       // OBS
    at.set_entry(row, col++, na_str);      // CLIMO
    at.set_entry(row, col++, d.obs_qc[0]); // OBS_QC
 
@@ -444,6 +450,24 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
    at.set_entry(row, col++, d.prs_max_wgt); // PRS_MAX_WGT
    
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_dup(const char *key) {
+   bool dup;
+
+   if(obs_key.has(key)) {
+      mlog << Warning
+           << "\nSkipping duplicate entry for case \"" << key << "\"\n\n";
+      dup = true;
+   }
+   else {
+      obs_key.add(key);
+      dup = false;
+   }
+
+   return(dup);
 }
 
 ////////////////////////////////////////////////////////////////////////

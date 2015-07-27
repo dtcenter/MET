@@ -31,6 +31,7 @@ static const char  *default_thresh      = na_str;
 static const double default_alpha       = bad_data_double;
 
 static const int    bad_setup_qc        = -999;
+static const char  *key_sep             = ":";
 
 static const char  *conv_id_str         = "conv";
 
@@ -84,6 +85,9 @@ struct RadData {
 ConvData parse_conv_data(const ConvRecord &r, const int i);
 RadData  parse_rad_data (const RadRecord  &r, const int i,
                          const int chval, const int use);
+
+ConcatString get_conv_key(const ConvData &d);
+ConcatString get_rad_key (const RadData &d);
 
 ////////////////////////////////////////////////////////////////////////
 
