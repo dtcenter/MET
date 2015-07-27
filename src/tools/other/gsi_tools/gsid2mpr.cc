@@ -103,6 +103,9 @@ int main(int argc, char * argv []) {
       // Initialize output StatHdrColumns
       setup_header(shc, hdr_name, hdr_value, "MPR");
 
+      // Initialize the observation key
+      obs_key.clear();
+
       // Process by file type
       if(is_conv(cline[i])) process_conv(cline[i], output_filename);
       else                  process_rad (cline[i], output_filename);
