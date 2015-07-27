@@ -163,9 +163,9 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::add_ens(int i, double v) {
+void PairDataEnsemble::add_ens(int member, double v) {
 
-   e_na[i].add(v);
+   e_na[member].add(v);
 
    return;
 }
