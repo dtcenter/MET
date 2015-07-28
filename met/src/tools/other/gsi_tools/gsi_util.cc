@@ -41,7 +41,7 @@ ConvData parse_conv_data(const ConvRecord &r, const int i) {
    
    d.elv        = r.rdiag_get_2d(conv_elevation_index - 1, i);
 
-   d.obtype << cs_erase << nint(r.rdiag_get_2d(conv_obssubtype_index - 1, i));
+   d.obtype << cs_erase << nint(r.rdiag_get_2d(conv_obstype_index - 1, i));
    d.fcst_ut    = r.date;
    d.obs_ut     = nint(r.date + (r.rdiag_get_2d(conv_obs_hours_index - 1, i) * sec_per_hour));
    d.obs        = r.rdiag_get_2d(conv_obs_data_index - 1, i);
