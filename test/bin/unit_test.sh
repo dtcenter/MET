@@ -49,7 +49,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_modis.xml  \
           unit_ref_config.xml \
           unit_mode_graphics.xml \
-          unit_regrid.xml"
+          unit_regrid.xml \
+          unit_gsi_tools.xml"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
