@@ -289,10 +289,10 @@ void process_conv_data(ConvData &d, int i_mem) {
 
       // Store the ensemble member value
       ens_pd.e_na[i_mem].set(i_obs, d.guess);
-   }
 
-   // Keep track of ensemble members using this observation
-   if(d.anly_use == 1) conv_data[i_obs].n_use++;
+      // Keep track of ensemble members using this observation
+      if(d.anly_use == 1) conv_data[i_obs].n_use++;
+   }
    
    // Keep track of unique quality control values
    if(!conv_data[i_obs].obs_qc.has(d.obs_qc[0])) {
@@ -457,10 +457,10 @@ void process_rad_data(RadData &d, int i_mem) {
 
       // Store the ensemble member value
       ens_pd.e_na[i_mem].set(i_obs, d.guess);
+
+      // Keep track of ensemble members using this observation
+      if(d.obs_qc[0] == 0) rad_data[i_obs].n_use++;
    }
-   
-   // Keep track of ensemble members using this observation
-   if(d.obs_qc[0] == 0) rad_data[i_obs].n_use++;
 
    // Keep track of unique quality control values
    if(!rad_data[i_obs].obs_qc.has(d.obs_qc[0])) {
