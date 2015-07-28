@@ -2058,7 +2058,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Loop through the map
    //
-   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+   for(it = m.begin(), r=1; it != m.end(); it++) {
 
       //
       // Write the output STAT header columns
@@ -2086,6 +2086,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
             write_header_cols(shc, j.stat_at, r);
             write_rhist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
          }
+         // Increment row counter
+         r++;
       }
 
       //
@@ -2099,6 +2101,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
             write_header_cols(shc, j.stat_at, r);
             write_phist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
          }
+         // Increment row counter
+         r++;
       }
 
       //
@@ -2111,7 +2115,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
          //
          // Write a line for each ssvar bin
          //
-         for(i=0; i<it->second.ens_pd.ssvar_bins[0].n_bin; i++, r++) {
+         for(i=0; i<it->second.ens_pd.ssvar_bins[0].n_bin; i++) {
             c = 0;
             at.set_entry(r, c++, "SSVAR:");
             write_case_cols(it->first, at, r, c);
@@ -2120,6 +2124,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
                write_header_cols(shc, j.stat_at, r);
                write_ssvar_cols(&(it->second.ens_pd), i, j.out_alpha, j.stat_at, r, n_header_columns);
             }
+            // Increment row counter
+            r++;
          }
       }
    } // end for it
