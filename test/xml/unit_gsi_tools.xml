@@ -53,11 +53,11 @@
     <exec>&MET_DIR;/bin/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_ORANK.txt \
+      -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_orank.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_ORANK.txt</stat>
+      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_orank.txt</stat>
     </output>
   </test>
 
@@ -67,11 +67,11 @@
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.ensmean \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_ORANK.txt \
+      -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_ORANK.txt</stat>
+      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt</stat>
     </output>
   </test>
 
@@ -80,11 +80,11 @@
     <exec>&MET_DIR;/bin/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem* \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_ORANK.txt \
+      -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_ORANK.txt</stat>
+      <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt</stat>
     </output>
   </test>
 
@@ -95,11 +95,11 @@
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem* \
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.ensmean \
       -channel 2,7,10 \
-      -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_ORANK.txt \
+      -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_ORANK.txt</stat>
+      <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt</stat>
     </output>
   </test>
 
@@ -122,14 +122,29 @@
   <test name="stat_analysis_ORANK_TO_RHIST">
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_ORANK.txt \
+      -lookin &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
       -job aggregate_stat -line_type ORANK -out_line_type RHIST -by fcst_var \
       -column_thresh N_USE ==20 \
-      -out_stat &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_RHIST.txt \
+      -out_stat &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_rhist.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_RHIST.txt</stat>
+      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_rhist.txt</stat>
+    </output>
+  </test>
+
+  <!-- Run stat_analysis on gsidens2orank output -->
+  <test name="stat_analysis_ORANK_TO_SSVAR">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
+      -job aggregate_stat -line_type ORANK -out_line_type SSVAR -by fcst_var \
+      -column_thresh N_USE ==20 -out_bin_size 0.10 \
+      -out_stat &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_ssvar.txt \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_ssvar.txt</stat>
     </output>
   </test>
 
