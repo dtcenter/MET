@@ -346,13 +346,14 @@ static const char conf_key_GRIB_lvl_val2[]     = "GRIB_lvl_val2";
 static const char conf_key_message_type[]      = "message_type";
 static const char conf_key_sid_exc[]           = "sid_exc";
 static const char conf_key_obs_qty[]           = "obs_quality";
+static const char conf_key_cnt_thresh[]        = "cnt_thresh";
+static const char conf_key_cnt_logic[]         = "cnt_logic";
 static const char conf_key_cat_thresh[]        = "cat_thresh";
 static const char conf_key_prob[]              = "prob";
 static const char conf_key_thresh_lo[]         = "thresh_lo";
 static const char conf_key_thresh_hi[]         = "thresh_hi";
 static const char conf_key_wind_thresh[]       = "wind_thresh";
-static const char conf_key_fcst_wind_thresh[]  = "fcst.wind_thresh";
-static const char conf_key_obs_wind_thresh[]   = "obs.wind_thresh";
+static const char conf_key_wind_logic[]        = "wind_logic";
 static const char conf_key_mask_grid[]         = "mask.grid";
 static const char conf_key_mask_poly[]         = "mask.poly";
 static const char conf_key_mask_sid[]          = "mask.sid";
@@ -717,6 +718,10 @@ static const char conf_val_stat[] = "STAT";
 // Field types: NONE, BOTH, FCST, OBS
 static const char conf_val_fcst[]  = "FCST";
 static const char conf_val_obs[]   = "OBS";
+
+// Logic types: NONE, UNION, INTERSECTION
+static const char conf_val_union[]        = "UNION";
+static const char conf_val_intersection[] = "INTERSECTION";
 
 // Track types: NONE, BOTH, ADECK, BDECK
 static const char conf_val_adeck[] = "ADECK";
