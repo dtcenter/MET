@@ -423,10 +423,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    }
 
    // Conf: fcst.wind_thresh
-   fcst_wind_ta = conf.lookup_thresh_array(conf_key_fcst_wind_thresh);
+   s << cs_erase << conf_key_fcst << "." << conf_key_wind_thresh;
+   fcst_wind_ta = conf.lookup_thresh_array(s);
 
    // Conf: obs.wind_thresh
-   obs_wind_ta = conf.lookup_thresh_array(conf_key_obs_wind_thresh);
+   s << cs_erase << conf_key_obs << "." << conf_key_wind_thresh;
+   obs_wind_ta = conf.lookup_thresh_array(s);
 
    // Check that the number of wind speed thresholds match
    if(fcst_wind_ta.n_elements() != obs_wind_ta.n_elements()) {
