@@ -62,6 +62,9 @@ extern STATLineType string_to_statlinetype(const char *);
 extern FieldType    int_to_fieldtype(int);
 extern ConcatString fieldtype_to_string(FieldType);
 
+extern SetLogic     int_to_setlogic(int);
+extern ConcatString setlogic_to_string(SetLogic);
+
 extern TrackType    int_to_tracktype(int);
 extern TrackType    string_to_tracktype(const char *);
 extern ConcatString tracktype_to_string(TrackType);

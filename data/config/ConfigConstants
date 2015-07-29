@@ -22,6 +22,12 @@ NETCDF_MET     = 3;
 NETCDF_PINT    = 4;
 NETCDF_NCCF    = 5;
 
+// Set Logic
+NONE           = 1;
+UNION          = 2;
+INTERSECTION   = 3;
+SYMDIFF        = 4;
+
 // Interpolation method
 MIN            = 1;
 MAX            = 2;

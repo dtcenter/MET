@@ -40,27 +40,16 @@ static const char *program_name = "gen_vx_mask";
 ////////////////////////////////////////////////////////////////////////
 
 enum MaskType {
-   PolyMaskType,       // Polyline masking region
-   CircleMaskType,     // Circle masking region
-   TrackMaskType,      // Track masking region
-   GridMaskType,       // Grid masking type
-   DataMaskType,       // Data masking type
-   NoMaskType
+   MaskType_Poly,   // Polyline masking region
+   MaskType_Circle, // Circle masking region
+   MaskType_Track,  // Track masking region
+   MaskType_Grid,   // Grid masking type
+   MaskType_Data,   // Data masking type
+   MaskType_None
 };
 
 extern MaskType string_to_masktype(const char *);
 extern const char * masktype_to_string(MaskType);
-
-////////////////////////////////////////////////////////////////////////
-
-enum SetLogic {
-   IntSetLogic,     // Intersection
-   UnionSetLogic,   // Union
-   SymDiffSetLogic, // Symmetric Difference
-   NoSetLogic
-};
-
-extern const char * setlogic_to_string(SetLogic);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -68,12 +57,12 @@ extern const char * setlogic_to_string(SetLogic);
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const MaskType default_mask_type = PolyMaskType;
+static const MaskType default_mask_type = MaskType_Poly;
 static const double default_mask_val = 1.0;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Variables for command line arguments
+// // Variables for command line arguments
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -83,7 +72,7 @@ static ConcatString data_filename, mask_filename, out_filename;
 // Optional arguments
 static MaskType mask_type = default_mask_type;
 static ConcatString data_config_str, mask_config_str;
-static SetLogic set_logic = NoSetLogic;
+static SetLogic set_logic = SetLogic_None;
 static bool complement = false;
 static SingleThresh thresh;
 static double mask_val = default_mask_val;
@@ -119,8 +108,8 @@ static void      set_type(const StringArray &);
 static void      set_data_config(const StringArray &);
 static void      set_mask_config(const StringArray &);
 static void      set_complement(const StringArray &);
-static void      set_intersection(const StringArray &);
 static void      set_union(const StringArray &);
+static void      set_intersection(const StringArray &);
 static void      set_symdiff(const StringArray &);
 static void      set_thresh(const StringArray &);
 static void      set_value(const StringArray &);

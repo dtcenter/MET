@@ -1275,6 +1275,46 @@ ConcatString fieldtype_to_string(FieldType type) {
 
 ////////////////////////////////////////////////////////////////////////
 
+SetLogic int_to_setlogic(int v) {
+   SetLogic t;
+
+   // Convert integer to enumerated SetLogic
+        if(v == conf_const.lookup_int(conf_val_none))         t = SetLogic_None;
+   else if(v == conf_const.lookup_int(conf_val_union))        t = SetLogic_Union;
+   else if(v == conf_const.lookup_int(conf_val_intersection)) t = SetLogic_Intersection;
+   else if(v == conf_const.lookup_int(conf_val_symdiff))      t = SetLogic_SymDiff;
+   else {
+      mlog << Error << "\nint_to_setlogic() -> "
+           << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString setlogic_to_string(SetLogic type) {
+   ConcatString s;
+
+   // Convert enumerated SetLogic to string
+   switch(type) {
+      case(SetLogic_None):         s = conf_val_none;         break;
+      case(SetLogic_Union):        s = conf_val_union;        break;
+      case(SetLogic_Intersection): s = conf_val_intersection; break;
+      case(SetLogic_SymDiff):      s = conf_val_symdiff;      break;
+      default:
+         mlog << Error << "\nsetlogic_to_string() -> "
+              << "Unexpected SetLogic value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 TrackType int_to_tracktype(int v) {
    TrackType t;
 

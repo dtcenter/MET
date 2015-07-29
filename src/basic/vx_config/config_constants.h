@@ -40,6 +40,19 @@ enum FieldType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for set logic
+//
+
+enum SetLogic {
+   SetLogic_None,         // Default
+   SetLogic_Union,        // Union
+   SetLogic_Intersection, // Intersection
+   SetLogic_SymDiff       // Symmetric Difference
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for track type configuration parameters
 //
 
@@ -716,12 +729,13 @@ static const char conf_val_both[] = "BOTH";
 static const char conf_val_stat[] = "STAT";
 
 // Field types: NONE, BOTH, FCST, OBS
-static const char conf_val_fcst[]  = "FCST";
-static const char conf_val_obs[]   = "OBS";
+static const char conf_val_fcst[] = "FCST";
+static const char conf_val_obs[]  = "OBS";
 
-// Logic types: NONE, UNION, INTERSECTION
+// Set Logic types: NONE, UNION, INTERSECTION, SYMDIFF
 static const char conf_val_union[]        = "UNION";
 static const char conf_val_intersection[] = "INTERSECTION";
+static const char conf_val_symdiff[]      = "SYMDIFF";
 
 // Track types: NONE, BOTH, ADECK, BDECK
 static const char conf_val_adeck[] = "ADECK";

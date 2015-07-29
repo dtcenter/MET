@@ -62,8 +62,8 @@ int main(int argc, char *argv[]) {
    process_mask_file(dp_mask);
 
    // Apply combination logic if the current mask is binary
-   if(mask_type == PolyMaskType ||
-      mask_type == GridMaskType ||
+   if(mask_type == MaskType_Poly ||
+      mask_type == MaskType_Grid ||
       thresh.get_type() != thresh_na) {
       dp_out = combine(dp_data, dp_mask, set_logic);
    }
@@ -101,8 +101,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_data_config,  "-data_config",  1);
    cline.add(set_mask_config,  "-mask_config",  1);
    cline.add(set_complement,   "-complement",   0);
-   cline.add(set_intersection, "-intersection", 0);
    cline.add(set_union,        "-union",        0);
+   cline.add(set_intersection, "-intersection", 0);
    cline.add(set_symdiff,      "-symdiff",      0);
    cline.add(set_thresh,       "-thresh",       1);
    cline.add(set_value,        "-value",        1);
@@ -183,9 +183,9 @@ void process_mask_file(DataPlane &dp) {
    GrdFileType ftype = FileType_None;
 
    // Process the mask file as a lat/lon polyline file
-   if(mask_type == PolyMaskType ||
-      mask_type == CircleMaskType ||
-      mask_type == TrackMaskType) {
+   if(mask_type == MaskType_Poly ||
+      mask_type == MaskType_Circle ||
+      mask_type == MaskType_Track) {
 
       poly_mask.clear();
       poly_mask.load(mask_filename);
@@ -218,7 +218,7 @@ void process_mask_file(DataPlane &dp) {
            << " (" << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
 
       // Check for matching grids
-      if(mask_type == DataMaskType && grid != grid_mask) {
+      if(mask_type == MaskType_Data && grid != grid_mask) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "The data grid and mask grid must be identical for \"data\" masking.\n"
               << "Data Grid -> " << grid.serialize() << "\n"
@@ -228,7 +228,7 @@ void process_mask_file(DataPlane &dp) {
    }
    
    // Read the mask data plane, if requested
-   if(mask_type == DataMaskType) {
+   if(mask_type == MaskType_Data) {
       if(mask_config_str.length() == 0) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "use \"-mask_config\" to specify the field for \"data\" masking.\n\n";
@@ -243,19 +243,19 @@ void process_mask_file(DataPlane &dp) {
 
    // Construct the mask
    switch(mask_type) {
-      case PolyMaskType:
+      case MaskType_Poly:
          apply_poly_mask(dp);
          break;
-      case CircleMaskType:
+      case MaskType_Circle:
          apply_circle_mask(dp);
          break;
-      case TrackMaskType:
+      case MaskType_Track:
          apply_track_mask(dp);
          break;
-      case GridMaskType:
+      case MaskType_Grid:
          apply_grid_mask(dp);
          break;
-      case DataMaskType:
+      case MaskType_Data:
          apply_data_mask(dp);
          break;
       default:
@@ -662,17 +662,17 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 
          switch(logic) {
 
-            case IntSetLogic:
-               if(v_data && v_mask) v = mask_val;
-               else                 v = 0.0;
-               break;
-
-            case UnionSetLogic:
+            case SetLogic_Union:
                if(v_data || v_mask) v = mask_val;
                else                 v = 0.0;
                break;
 
-            case SymDiffSetLogic:
+            case SetLogic_Intersection:
+               if(v_data && v_mask) v = mask_val;
+               else                 v = 0.0;
+               break;
+
+            case SetLogic_SymDiff:
                if((v_data && !v_mask) || (!v_data && v_mask)) v = mask_val;
                else                                           v = 0.0;
                break;
@@ -695,9 +695,9 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    } // end for x
 
    // List the number of points inside the mask
-   if(logic != NoSetLogic) {
+   if(logic != SetLogic_None) {
       mlog << Debug(3)
-           << "Mask " << setlogic_to_string(logic) << n_in
+           << "Mask " << setlogic_to_string(logic) << ": " << n_in
            << " of " << grid.nx() * grid.ny() << " points inside\n";
    }
 
@@ -744,9 +744,9 @@ void write_netcdf(const DataPlane &dp) {
 
    // Set the mask_name, if not already set
    if(mask_name.length() == 0) {
-      if(mask_type == PolyMaskType   ||
-         mask_type == CircleMaskType ||
-         mask_type == TrackMaskType) {
+      if(mask_type == MaskType_Poly   ||
+         mask_type == MaskType_Circle ||
+         mask_type == MaskType_Track) {
          mask_name = poly_mask.name();
       }
       else {
@@ -798,11 +798,11 @@ void write_netcdf(const DataPlane &dp) {
 MaskType string_to_masktype(const char *s) {
    MaskType t;
 
-        if(strcasecmp(s, "poly")   == 0) t = PolyMaskType;
-   else if(strcasecmp(s, "circle") == 0) t = CircleMaskType;
-   else if(strcasecmp(s, "track")  == 0) t = TrackMaskType;
-   else if(strcasecmp(s, "grid")   == 0) t = GridMaskType;
-   else if(strcasecmp(s, "data")   == 0) t = DataMaskType;
+        if(strcasecmp(s, "poly")   == 0) t = MaskType_Poly;
+   else if(strcasecmp(s, "circle") == 0) t = MaskType_Circle;
+   else if(strcasecmp(s, "track")  == 0) t = MaskType_Track;
+   else if(strcasecmp(s, "grid")   == 0) t = MaskType_Grid;
+   else if(strcasecmp(s, "data")   == 0) t = MaskType_Data;
    else {
       mlog << Error << "\nstring_to_masktype() -> "
            << "unsupported masking type \"" << s << "\"\n\n";
@@ -818,28 +818,13 @@ const char * masktype_to_string(const MaskType t) {
    const char *s = (const char *) 0;
 
    switch(t) {
-      case PolyMaskType:   s = "poly";           break;
-      case CircleMaskType: s = "circle";         break;
-      case TrackMaskType:  s = "track";          break;
-      case GridMaskType:   s = "grid";           break;
-      case DataMaskType:   s = "data";           break;
-      case NoMaskType:     s = na_str;           break;
-      default:             s = (const char *) 0; break;
-   }
-
-   return(s);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-const char * setlogic_to_string(const SetLogic l) {
-   const char *s = (const char *) 0;
-
-   switch(l) {
-      case IntSetLogic:     s = "Intersection:\t"; break;
-      case UnionSetLogic:   s = "Union:\t\t";      break;
-      case SymDiffSetLogic: s = "SymDiff:\t\t";    break;
-      default:              s = (const char *) 0;  break;
+      case MaskType_Poly:   s = "poly";           break;
+      case MaskType_Circle: s = "circle";         break;
+      case MaskType_Track:  s = "track";          break;
+      case MaskType_Grid:   s = "grid";           break;
+      case MaskType_Data:   s = "data";           break;
+      case MaskType_None:   s = na_str;           break;
+      default:              s = (const char *) 0; break;
    }
 
    return(s);
@@ -860,7 +845,7 @@ void usage() {
         << "\t[-data_config str]\n"
         << "\t[-mask_config str]\n"
         << "\t[-complement]\n"
-        << "\t[-intersection | -union | -symdiff]\n"
+        << "\t[-union | -intersection | -symdiff]\n"
         << "\t[-thresh str]\n"
         << "\t[-value n]\n"
         << "\t[-name str]\n"
@@ -888,7 +873,7 @@ void usage() {
 
         << "\t\t\"-complement\" to compute the complement of the area defined in \"mask_file\" (optional).\n"
 
-        << "\t\t\"-intersection | -union | -symdiff\" to specify how to combine the "
+        << "\t\t\"-union | -intersection | -symdiff\" to specify how to combine the "
         << "masks from \"data_file\" and \"mask_file\" (optional).\n"
 
         << "\t\t\"-thresh str\" defines the threshold to be applied (optional).\n"
@@ -938,20 +923,20 @@ void set_complement(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_intersection(const StringArray & a) {
-   set_logic = IntSetLogic;
+void set_union(const StringArray & a) {
+   set_logic = SetLogic_Union;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_union(const StringArray & a) {
-   set_logic = UnionSetLogic;
+void set_intersection(const StringArray & a) {
+   set_logic = SetLogic_Intersection;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_symdiff(const StringArray & a) {
-   set_logic = SymDiffSetLogic;
+   set_logic = SetLogic_SymDiff;
 }
 
 ////////////////////////////////////////////////////////////////////////
