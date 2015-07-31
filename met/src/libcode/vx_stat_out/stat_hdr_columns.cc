@@ -84,13 +84,8 @@ void StatHdrColumns::clear() {
    line_type.clear();
 
    fcst_thresh.clear();
-   fcst_thresh_str.clear();
-
    obs_thresh.clear();
-   obs_thresh_str.clear();
-
    cov_thresh.clear();
-   cov_thresh_str.clear();
 
    return;
 }
@@ -99,7 +94,6 @@ void StatHdrColumns::clear() {
 
 void StatHdrColumns::clear_fcst_thresh() {
    fcst_thresh.clear();
-   fcst_thresh_str = na_str;
    return;
 }
 
@@ -107,7 +101,6 @@ void StatHdrColumns::clear_fcst_thresh() {
 
 void StatHdrColumns::clear_obs_thresh() {
    obs_thresh.clear();
-   obs_thresh_str = na_str;
    return;
 }
 
@@ -115,7 +108,6 @@ void StatHdrColumns::clear_obs_thresh() {
 
 void StatHdrColumns::clear_cov_thresh() {
    cov_thresh.clear();
-   cov_thresh_str = na_str;
    return;
 }
 
@@ -248,8 +240,8 @@ void StatHdrColumns::set_line_type(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_thresh(const SingleThresh t) {
-   fcst_thresh = t;
-   set_fcst_thresh_str();
+   fcst_thresh.clear();
+   fcst_thresh.add(t);
    return;
 }
 
@@ -257,19 +249,15 @@ void StatHdrColumns::set_fcst_thresh(const SingleThresh t) {
 
 void StatHdrColumns::set_fcst_thresh(const ThreshArray t) {
    fcst_thresh.clear();
-   fcst_thresh_str.clear();
-
-   // Store the threshold string
-   fcst_thresh_str << t.get_str();
-
+   fcst_thresh = t;
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_thresh(const SingleThresh t) {
-   obs_thresh = t;
-   set_obs_thresh_str();
+   obs_thresh.clear();
+   obs_thresh.add(t);
    return;
 }
 
@@ -277,19 +265,15 @@ void StatHdrColumns::set_obs_thresh(const SingleThresh t) {
 
 void StatHdrColumns::set_obs_thresh(const ThreshArray t) {
    obs_thresh.clear();
-   obs_thresh_str.clear();
-
-   // Store the threshold string
-   obs_thresh_str == t.get_str();
-
+   obs_thresh = t;
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_cov_thresh(const SingleThresh t) {
-   cov_thresh = t;
-   set_cov_thresh_str();
+   cov_thresh.clear();
+   cov_thresh.add(t);
    return;
 }
 
@@ -425,33 +409,6 @@ void StatHdrColumns::set_interp_pnts_str() {
    else                            sprintf(tmp_str, "%i",
                                            interp_wdth*interp_wdth);
    interp_pnts_str = tmp_str;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::set_fcst_thresh_str() {
-
-   fcst_thresh_str = fcst_thresh.get_str();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::set_obs_thresh_str() {
-
-   obs_thresh_str = obs_thresh.get_str();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::set_cov_thresh_str() {
-
-   cov_thresh_str = cov_thresh.get_str();
 
    return;
 }
