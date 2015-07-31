@@ -25,6 +25,7 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+cat_thresh  = [ NA ];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
