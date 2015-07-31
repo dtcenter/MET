@@ -520,14 +520,10 @@ out_valid_mask = "";
 //          "-valid_mask         name"
 //          "-line_type          name"
 //          "-track_watch_warn   name"
-//          "-column_thresh_name name"
-//          "-column_val         name"
-//          "-column_str_name    name"
-//          "-column_str_val     name"
-//          "-init_thresh_name   name"
-//          "-init_val           name"
-//          "-init_str_name      name"
-//          "-init_str_val       name"
+//          "-column_thresh      name thresh"
+//          "-column_str         name string"
+//          "-init_thresh        name thresh"
+//          "-init_str           name string"
 //
 //          Additional filtering options that may be used only when -line_type 
 //          has been listed only once. These options take two arguments: the name 
