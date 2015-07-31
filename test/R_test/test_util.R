@@ -162,7 +162,7 @@ getStatHeaders = function(ver, lty){
 	strHeaderFile = paste(strDirHdr, "/met_", ver, ".hdr", sep="");
 	strHeaderCmd = paste("cat ", strHeaderFile, " | ",
 						 "egrep '^", toupper(lty), " +:' | ",
-						 "sed -r 's/.*: (.*)/\\1/'", sep="");
+						 "sed -r 's/.*: (.*)/\\1/' | sed -r 's/_VAR_//g'", sep="");
 	return ( unlist(strsplit(system( strHeaderCmd, intern=T ), '\\s+', perl=T)) );
 }
 
@@ -180,7 +180,7 @@ isLtyVarLength = function(lty, ver){
 	intMultiIdx = 0;
 	if( 0 < length( grep(paste("^", lty, "$", sep=""), system(strMultiCmd, intern=T)) ) ){
 		strIdxCmd = paste("egrep '^", lty, "' ", strHeaderFile, " | ",
-						  "sed -r 's/.+: (.+)/\\1/' | wc -w", sep="");
+						  "sed -r 's/.+: (.+)/\\1/' | sed -r 's/_VAR_//g' | wc -w", sep="");
 		intMultiIdx = as.numeric( system(strIdxCmd, intern=T) );
 	}
 	return (intMultiIdx);
@@ -215,7 +215,7 @@ readStatData = function(stat, ver, lty, rmTmp=TRUE){
 	listHdr = getStatHeaders(ver, lty);
 	strParse = paste("~/ LINE_TYPE / & / ", lty, " /", sep="");
 	if( 0 < intLtyIdx ){
-		if( intLtyLen <= intLtyIdx ){
+		if( intLtyLen < intLtyIdx ){
 			cat("ERROR: line type", lty, "shorter than minimum length", intLtyIdx, "\n");
 			return (NA);
 		}
@@ -233,7 +233,6 @@ readStatData = function(stat, ver, lty, rmTmp=TRUE){
 					  "perl -e'while(<>){@l=split(); next unless ", strParse, "; print $_;}' ",
 					  " >> ", strTmp, sep="");
 	system( strCmdTmp );
-
 	# read the temp file into a data frame and return it
 	dfStat = read.table(strTmp, header=T);
 	if( TRUE == rmTmp ){ rmFile(strTmp) }
