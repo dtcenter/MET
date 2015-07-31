@@ -329,15 +329,6 @@ ConcatString ThreshArray::get_str(const char *sep, int precision) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ThreshArray::get_str(const char *sep, char *str, int precision) const {
-   
-   strcpy(str, get_str(sep, precision));
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
    int i;
    ConcatString cur_str;
@@ -351,15 +342,6 @@ ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
    }
 
    return(tmp_str);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void ThreshArray::get_abbr_str(const char *sep, char *str, int precision) const {
-
-   strcpy(str, get_abbr_str(sep, precision));
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

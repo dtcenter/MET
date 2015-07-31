@@ -61,9 +61,7 @@ class ThreshArray {
       int has(const SingleThresh &, int & index) const;
       
       ConcatString get_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
-      void         get_str(const char *, char *, int precision = thresh_default_precision) const;
       ConcatString get_abbr_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
-      void         get_abbr_str(const char *, char *, int precision = thresh_default_precision) const;
 
       int check_bins(double) const;
       
