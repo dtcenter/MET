@@ -54,6 +54,7 @@ extern void            parse_conf_range_double(Dictionary *dict, double &beg, do
 
 extern InterpMthd   int_to_interpmthd(int);
 extern void         check_prob_thresh(const ThreshArray &);
+extern void         check_mctc_thresh(const ThreshArray &);
 
 extern const char * statlinetype_to_string(const STATLineType);
 extern void         statlinetype_to_string(const STATLineType, char *);
@@ -64,6 +65,8 @@ extern ConcatString fieldtype_to_string(FieldType);
 
 extern SetLogic     int_to_setlogic(int);
 extern ConcatString setlogic_to_string(SetLogic);
+
+extern SetLogic     check_setlogic(SetLogic, SetLogic);
 
 extern TrackType    int_to_tracktype(int);
 extern TrackType    string_to_tracktype(const char *);

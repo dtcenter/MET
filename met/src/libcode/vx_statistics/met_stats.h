@@ -13,6 +13,7 @@
 
 #include "contable.h"
 
+#include "vx_config.h"
 #include "vx_util.h"
 #include "vx_grid.h"
 
@@ -81,8 +82,8 @@ class CTSInfo {
       double *alpha;
 
       TTContingencyTable cts;
-      SingleThresh       cts_fcst_thresh;
-      SingleThresh       cts_obs_thresh;
+      SingleThresh       fthresh;
+      SingleThresh       othresh;
 
       CIInfo baser, fmean, acc, fbias;
       CIInfo pody, podn, pofd;
@@ -120,8 +121,8 @@ class MCTSInfo {
       double *alpha;
 
       ContingencyTable cts;
-      ThreshArray      cts_fcst_ta;
-      ThreshArray      cts_obs_ta;
+      ThreshArray      fthresh;
+      ThreshArray      othresh;
 
       CIInfo acc, hk, hss, ger;
 
@@ -150,6 +151,10 @@ class CNTInfo {
       ~CNTInfo();
       CNTInfo(const CNTInfo &);
       CNTInfo & operator=(const CNTInfo &);
+
+      // Filtering thresholds
+      SingleThresh fthresh;
+      SingleThresh othresh;
 
       // Confidence interval alpha values
       int     n_alpha;
@@ -198,6 +203,10 @@ class SL1L2Info {
       SL1L2Info & operator=(const SL1L2Info &);
       SL1L2Info & operator+=(const SL1L2Info &);
 
+      // Filtering thresholds
+      SingleThresh fthresh;
+      SingleThresh othresh;
+
       // SL1L2 Quantities
       double fbar, obar;
       double fobar;
@@ -237,9 +246,9 @@ class VL1L2Info {
       VL1L2Info & operator=(const VL1L2Info &);
       VL1L2Info & operator+=(const VL1L2Info &);
 
-      // Wind speed thresholds
-      SingleThresh wind_fcst_thresh;
-      SingleThresh wind_obs_thresh;
+      // Filtering thresholds
+      SingleThresh fthresh;
+      SingleThresh othresh;
 
       // VL1L2 Quantities
       double ufbar, vfbar, uobar, vobar;
@@ -284,8 +293,8 @@ class NBRCTSInfo {
       CTSInfo cts_info;
 
       // Fraction threshold applied
-      SingleThresh raw_fcst_thresh;
-      SingleThresh raw_obs_thresh;
+      SingleThresh fthresh;
+      SingleThresh othresh;
       SingleThresh frac_thresh;
 
       void clear();
@@ -319,8 +328,8 @@ class NBRCNTInfo {
       CNTInfo cnt_info;
 
       // Raw threshold applied to define the fractions
-      SingleThresh raw_fcst_thresh;
-      SingleThresh raw_obs_thresh;
+      SingleThresh fthresh;
+      SingleThresh othresh;
 
       // Fractions Brier Score,
       // Fractions Skill Score, 
@@ -355,8 +364,8 @@ class ISCInfo {
 
       // ContingencyTable
       TTContingencyTable cts;
-      SingleThresh       cts_fcst_thresh;
-      SingleThresh       cts_obs_thresh;
+      SingleThresh       fthresh;
+      SingleThresh       othresh;
 
       // Dimension of the tile
       int tile_dim;
@@ -421,10 +430,10 @@ class PCTInfo {
       Nx2ContingencyTable pct;
 
       // Multiple thresholds for the probabilistic forecast
-      ThreshArray         pct_fcst_thresh;
+      ThreshArray fthresh;
 
       // Single threshold for the scalar observation
-      SingleThresh        pct_obs_thresh;
+      SingleThresh othresh;
 
       CIInfo baser;
       CIInfo brier;
@@ -529,6 +538,14 @@ extern void   compute_mean_stdev(const NumArray &, const NumArray &,
 extern void   compute_i_mean_stdev(const NumArray &,
                                    int, double, int,
                                    CIInfo &, CIInfo &);
+
+extern void   subset_fo_na(const NumArray &, const SingleThresh &,
+                           const NumArray &, const SingleThresh &,
+                           const SetLogic, NumArray &, NumArray &);
+
+extern bool   check_fo_thresh(const double, const SingleThresh &,
+                              const double, const SingleThresh &,
+                              const SetLogic);
 
 ////////////////////////////////////////////////////////////////////////
 

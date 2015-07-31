@@ -75,6 +75,7 @@
 //                    or more probabilstic thresholds.
 //   029    07/09/14  Halley Gotway  Add station id exclusion option.
 //   030    03/02/15  Halley Gotway  Add automated regridding.
+//   031    07/30/15  Halley Gotway  Add conditional continuous verification.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -117,8 +118,8 @@ static void process_scores();
 
 static void do_cts  (CTSInfo   *&, int, PairDataPoint *);
 static void do_mcts (MCTSInfo   &, int, PairDataPoint *);
-static void do_cnt  (CNTInfo    &, int, PairDataPoint *);
-static void do_sl1l2(SL1L2Info  &, int, PairDataPoint *);
+static void do_cnt  (CNTInfo   *&, int, PairDataPoint *);
+static void do_sl1l2(SL1L2Info *&, int, PairDataPoint *);
 static void do_vl1l2(VL1L2Info *&, int, PairDataPoint *,
                                    int, PairDataPoint *);
 static void do_pct  (PCTInfo   *&, int, PairDataPoint *);
@@ -210,9 +211,10 @@ void process_command_line(int argc, char **argv) {
    cline.parse();
 
    //
-   // Check for error. There should be three arguments left; the
-   // forecast filename, the observation filename, and the config
-   // filename.
+   // Check for error. There should be three arguments left:
+   //   - forecast filename
+   //   - observation filename
+   //   - config filename
    //
    if(cline.n() != 3) usage();
 
@@ -333,8 +335,8 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = conf_info.get_max_n_prob_fcst_thresh();
-   n_cat  = conf_info.get_max_n_scal_thresh() + 1;
+   n_prob = conf_info.get_max_n_fprob_thresh();
+   n_cat  = conf_info.get_max_n_cat_thresh() + 1;
 
    max_prob_col = get_n_pjc_columns(n_prob);
    max_mctc_col = get_n_mctc_columns(n_cat);
@@ -799,10 +801,9 @@ void process_obs_file(int i_nc) {
 
       // Read the current observation quality flag
       strcpy(obs_qty_str, "");
-      if( ( obs_qty_var && obs_qty_var->is_valid() ) &&
-          ( !obs_qty_var->set_cur((long) i_obs) ||
-            !obs_qty_var->get(obs_qty_str, 1, strl_dim->size()) )
-        ) {
+      if((obs_qty_var && obs_qty_var->is_valid()) &&
+         (!obs_qty_var->set_cur((long) i_obs) ||
+          !obs_qty_var->get(obs_qty_str, 1, strl_dim->size()))) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the quality flag for observation "
               << "index " << i_obs << "\n\n";
@@ -842,14 +843,17 @@ void process_obs_file(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, j, k, l, m, max_scal_t, max_prob_t, wind_t;
-   PairDataPoint  *pd_ptr = (PairDataPoint *) 0;
-   CTSInfo   *cts_info = (CTSInfo *) 0;
-   MCTSInfo   mcts_info;
-   CNTInfo    cnt_info;
-   SL1L2Info  sl1l2_info;
-   VL1L2Info *vl1l2_info = (VL1L2Info *) 0;
-   PCTInfo   *pct_info = (PCTInfo *) 0;
+   int i, j, k, l, m;
+   int n_cat, n_cnt, n_wind, n_prob;
+
+   // Initialize pointers
+   PairDataPoint *pd_ptr     = (PairDataPoint *) 0;
+   CTSInfo       *cts_info   = (CTSInfo *)       0;
+   MCTSInfo       mcts_info;
+   CNTInfo       *cnt_info   = (CNTInfo *)       0;
+   SL1L2Info     *sl1l2_info = (SL1L2Info *)     0;
+   VL1L2Info     *vl1l2_info = (VL1L2Info *)     0;
+   PCTInfo       *pct_info   = (PCTInfo *)       0;
 
    mlog << Debug(2)
         << "\n" << sep_str << "\n\n";
@@ -857,20 +861,20 @@ void process_scores() {
    // Setup the output text files as requested in the config file
    setup_txt_files();
 
-   // Allocate enough space for the CTSInfo objects
-   max_scal_t = conf_info.get_max_n_scal_thresh();
-   cts_info   = new CTSInfo [max_scal_t];
+   // Store the maximum number of each threshold type
+   n_cnt  = conf_info.get_max_n_cnt_thresh();
+   n_cat  = conf_info.get_max_n_cat_thresh();
+   n_wind = conf_info.get_max_n_wind_thresh();
+   n_prob = conf_info.get_max_n_oprob_thresh();
 
-   // Allocate enough space for the VL1L2Info objects
-   wind_t     = conf_info.get_n_wind_thresh();
-   vl1l2_info = new VL1L2Info [wind_t];
+   // Allocate space for output statistics types
+   cts_info   = new CTSInfo   [n_cat];
+   cnt_info   = new CNTInfo   [n_cnt];
+   sl1l2_info = new SL1L2Info [n_cnt];
+   vl1l2_info = new VL1L2Info [n_wind];
+   pct_info   = new PCTInfo   [n_prob];
 
-   // Allocate enough space for the PCTInfo objects
-   max_prob_t = conf_info.get_max_n_prob_obs_thresh();
-   pct_info   = new PCTInfo [max_prob_t];
-
-   // Loop through the Pair Data objects, compute the scores requested,
-   // and write the output.
+   // Compute scores for each PairData object and write output
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Check for no forecast fields
@@ -951,8 +955,7 @@ void process_scores() {
                     << "Rejected: bad fcst value = " << conf_info.vx_pd[i].rej_fcst[j][k][l] << "\n"
                     << "Rejected: duplicates     = " << conf_info.vx_pd[i].rej_dup[j][k][l] << "\n";
 
-
-               // Continue if the number of points is <= 1
+               // Continue for no matched pairs
                if(pd_ptr->n_pair == 0) continue;
 
                // Write out the MPR lines
@@ -970,19 +973,19 @@ void process_scores() {
 
                // Compute CTS scores
                if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
-                   conf_info.fcst_ta[i].n_elements() > 0 &&
+                   conf_info.fcat_ta[i].n_elements() > 0 &&
                   (conf_info.output_flag[i_fho] != STATOutputType_None ||
                    conf_info.output_flag[i_ctc] != STATOutputType_None ||
                    conf_info.output_flag[i_cts] != STATOutputType_None)) {
 
                   // Initialize
-                  for(m=0; m<max_scal_t; m++) cts_info[m].clear();
+                  for(m=0; m<n_cat; m++) cts_info[m].clear();
 
                   // Compute CTS Info
                   do_cts(cts_info, i, pd_ptr);
 
-                  // Loop through all of the thresholds
-                  for(m=0; m<conf_info.fcst_ta[i].n_elements(); m++) {
+                  // Loop through the categorical thresholds
+                  for(m=0; m<conf_info.fcat_ta[i].n_elements(); m++) {
 
                      // Write out FHO
                      if(conf_info.output_flag[i_fho] != STATOutputType_None &&
@@ -1018,7 +1021,7 @@ void process_scores() {
 
                // Compute MCTS scores
                if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
-                   conf_info.fcst_ta[i].n_elements() > 1 &&
+                   conf_info.fcat_ta[i].n_elements() > 1 &&
                   (conf_info.output_flag[i_mctc] != STATOutputType_None ||
                    conf_info.output_flag[i_mcts] != STATOutputType_None)) {
 
@@ -1054,20 +1057,24 @@ void process_scores() {
                    conf_info.output_flag[i_cnt] != STATOutputType_None) {
 
                   // Initialize
-                  cnt_info.clear();
+                  for(m=0; m<n_cnt; m++) cnt_info[m].clear();
 
                   // Compute CNT
                   do_cnt(cnt_info, i, pd_ptr);
 
-                  // Write out CNT
-                  if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
-                     cnt_info.n > 0) {
+                  // Loop through the continuous thresholds
+                  for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
 
-                     write_cnt_row(shc, cnt_info,
-                        conf_info.output_flag[i_cnt] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_cnt], i_txt_row[i_cnt]);
-                  }
+                     // Write out CNT
+                     if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
+                        cnt_info[m].n > 0) {
+
+                        write_cnt_row(shc, cnt_info[m],
+                           conf_info.output_flag[i_cnt] == STATOutputType_Both,
+                           stat_at, i_stat_row,
+                           txt_at[i_cnt], i_txt_row[i_cnt]);
+                     }
+                  } // end for m
                } // end Compute CNT
 
                // Compute SL1L2 and SAL1L2 scores as long as the
@@ -1078,30 +1085,34 @@ void process_scores() {
                    conf_info.output_flag[i_sal1l2] != STATOutputType_None)) {
 
                   // Initialize
-                  sl1l2_info.zero_out();
+                  for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
 
                   // Compute SL1L2 and SAL1L2
                   do_sl1l2(sl1l2_info, i, pd_ptr);
 
-                  // Write out SL1L2
-                  if(conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
-                     sl1l2_info.scount > 0) {
+                  // Loop through the continuous thresholds
+                  for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
 
-                     write_sl1l2_row(shc, sl1l2_info,
-                        conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
-                  }
+                     // Write out SL1L2
+                     if(conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
+                        sl1l2_info[m].scount > 0) {
 
-                  // Write out SAL1L2
-                  if(conf_info.output_flag[i_sal1l2] != STATOutputType_None &&
-                     sl1l2_info.sacount > 0) {
+                        write_sl1l2_row(shc, sl1l2_info[m],
+                           conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
+                           stat_at, i_stat_row,
+                           txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
+                     }
 
-                     write_sal1l2_row(shc, sl1l2_info,
-                        conf_info.output_flag[i_sal1l2] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
-                  }
+                     // Write out SAL1L2
+                     if(conf_info.output_flag[i_sal1l2] != STATOutputType_None &&
+                        sl1l2_info[m].sacount > 0) {
+
+                        write_sal1l2_row(shc, sl1l2_info[m],
+                           conf_info.output_flag[i_sal1l2] == STATOutputType_Both,
+                           stat_at, i_stat_row,
+                          txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
+                     }
+                  } // end for m
                }  // end Compute SL1L2 and SAL1L2
 
                // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
@@ -1120,7 +1131,7 @@ void process_scores() {
                   shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                   // Initialize
-                  for(m=0; m<wind_t; m++) vl1l2_info[m].clear();
+                  for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
                   // Compute VL1L2 and VAL1L2
                   do_vl1l2(vl1l2_info,
@@ -1128,7 +1139,7 @@ void process_scores() {
                            i,   &conf_info.vx_pd[i].pd[j][k][l]);
 
                   // Loop through all of the wind speed thresholds
-                  for(m=0; m<conf_info.fcst_wind_ta.n_elements(); m++) {
+                  for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
 
                      // Write out VL1L2
                      if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
@@ -1167,13 +1178,13 @@ void process_scores() {
                    conf_info.output_flag[i_prc]  != STATOutputType_None)) {
 
                   // Initialize
-                  for(m=0; m<max_prob_t; m++) pct_info[m].clear();
+                  for(m=0; m<n_prob; m++) pct_info[m].clear();
 
                   // Compute PCT
                   do_pct(pct_info, i, pd_ptr);
 
                   // Loop through all of the thresholds
-                  for(m=0; m<max_prob_t; m++) {
+                  for(m=0; m<n_prob; m++) {
 
                      // Write out PCT
                      if(conf_info.output_flag[i_pct] != STATOutputType_None &&
@@ -1214,7 +1225,7 @@ void process_scores() {
                            stat_at, i_stat_row,
                            txt_at[i_prc], i_txt_row[i_prc]);
                      }
-                  }
+                  } // end for m
                } // end Compute PCT
 
             } // end for l
@@ -1227,6 +1238,8 @@ void process_scores() {
 
    // Deallocate memory
    if(cts_info)   { delete [] cts_info;   cts_info   = (CTSInfo *)   0; }
+   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   0; }
+   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) 0; }
    if(vl1l2_info) { delete [] vl1l2_info; vl1l2_info = (VL1L2Info *) 0; }
    if(pct_info)   { delete [] pct_info;   pct_info   = (PCTInfo *)   0; }
 
@@ -1236,25 +1249,25 @@ void process_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
-   int i, j, n_cts;
+   int i, j, n_cat;
    NumArray f_na, o_na;
+
+   mlog << Debug(2)
+        << "Computing Categorical Statistics.\n";
 
    //
    // Set up the CTSInfo thresholds and alpha values
    //
-   n_cts = conf_info.fcst_ta[i_vx].n_elements();
-   for(i=0; i<n_cts; i++) {
-      cts_info[i].cts_fcst_thresh = conf_info.fcst_ta[i_vx][i];
-      cts_info[i].cts_obs_thresh  = conf_info.obs_ta[i_vx][i];
+   n_cat = conf_info.fcat_ta[i_vx].n_elements();
+   for(i=0; i<n_cat; i++) {
+      cts_info[i].fthresh = conf_info.fcat_ta[i_vx][i];
+      cts_info[i].othresh = conf_info.ocat_ta[i_vx][i];
       cts_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
       for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
          cts_info[i].alpha[j] = conf_info.ci_alpha[j];
       }
    }
-
-   mlog << Debug(2)
-        << "Computing Categorical Statistics.\n";
 
    //
    // If there are no matched pairs to process, return
@@ -1269,7 +1282,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
    if(conf_info.boot_interval == boot_bca_flag) {
       compute_cts_stats_ci_bca(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
          conf_info.n_boot_rep,
-         cts_info, n_cts,
+         cts_info, n_cat,
          conf_info.output_flag[i_cts] != STATOutputType_None,
          conf_info.rank_corr_flag,
          conf_info.tmp_dir);
@@ -1278,7 +1291,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
       compute_cts_stats_ci_perc(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
          conf_info.n_boot_rep,
          conf_info.boot_rep_prop,
-         cts_info, n_cts,
+         cts_info, n_cat,
          conf_info.output_flag[i_cts] != STATOutputType_None,
          conf_info.rank_corr_flag,
          conf_info.tmp_dir);
@@ -1293,20 +1306,20 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
    int i;
    NumArray f_na, o_na;
 
+   mlog << Debug(2)
+        << "Computing Multi-Category Statistics.\n";
+   
    //
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
-   mcts_info.cts.set_size(conf_info.fcst_ta[i_vx].n_elements() + 1);
-   mcts_info.cts_fcst_ta = conf_info.fcst_ta[i_vx];
-   mcts_info.cts_obs_ta  = conf_info.obs_ta[i_vx];
+   mcts_info.cts.set_size(conf_info.fcat_ta[i_vx].n_elements() + 1);
+   mcts_info.fthresh = conf_info.fcat_ta[i_vx];
+   mcts_info.othresh = conf_info.ocat_ta[i_vx];
    mcts_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
 
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
       mcts_info.alpha[i] = conf_info.ci_alpha[i];
    }
-
-   mlog << Debug(2)
-        << "Computing Multi-Category Statistics.\n";
 
    //
    // If there are no matched pairs to process, return
@@ -1340,136 +1353,199 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void do_cnt(CNTInfo &cnt_info, int i_vx, PairDataPoint *pd_ptr) {
-   int i;
-
-   //
-   // Set up the CNTInfo alpha values
-   //
-   cnt_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
-   for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
-      cnt_info.alpha[i] = conf_info.ci_alpha[i];
-   }
+   
+void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
+   int i, j;
+   NumArray f_na, o_na;
 
    mlog << Debug(2)
         << "Computing Continuous Statistics.\n";
 
    //
-   // If there are no matched pairs to process, return
+   // Process each filtering threshold
    //
-   if(pd_ptr->f_na.n_elements() == 0 ||
-      pd_ptr->o_na.n_elements() == 0) return;
+   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) {
 
-   //
-   // Compute the stats, normal confidence intervals, and bootstrap
-   // bootstrap confidence intervals
-   //
-   if(conf_info.boot_interval == boot_bca_flag) {
-      compute_cnt_stats_ci_bca(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
-         conf_info.vx_pd[i_vx].fcst_info->is_precipitation() &
-         conf_info.vx_pd[i_vx].obs_info->is_precipitation(),
-         conf_info.n_boot_rep,
-         cnt_info,
-         conf_info.output_flag[i_cnt] != STATOutputType_None,
-         conf_info.rank_corr_flag,
-         conf_info.tmp_dir);
-   }
-   else {
-      compute_cnt_stats_ci_perc(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
-         conf_info.vx_pd[i_vx].fcst_info->is_precipitation() &
-         conf_info.vx_pd[i_vx].obs_info->is_precipitation(),
-         conf_info.n_boot_rep,
-         conf_info.boot_rep_prop,
-         cnt_info,
-         conf_info.output_flag[i_cnt],
-         conf_info.rank_corr_flag,
-         conf_info.tmp_dir);
-   }
+      //
+      // Store thresholds
+      //
+      cnt_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
+      cnt_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
+
+      //
+      // Setup alpha values
+      //
+      cnt_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
+      for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
+         cnt_info[i].alpha[j] = conf_info.ci_alpha[j];
+      }
+
+      //
+      // Apply continuous filtering thresholds
+      //
+      subset_fo_na(pd_ptr->f_na, cnt_info[i].fthresh,
+                   pd_ptr->o_na, cnt_info[i].othresh,
+                   conf_info.cnt_logic[i_vx],
+                   f_na, o_na);
+
+      mlog << Debug(3)
+           << "Found " << f_na.n_elements()
+           << " pairs for forecast filtering threshold "
+           << cnt_info[i].fthresh.get_str()
+           << ", observation filtering threshold "
+           << cnt_info[i].othresh.get_str() << ", and field logic "
+           << setlogic_to_string(conf_info.cnt_logic[i_vx])
+           << ".\n";
+
+      //
+      // Check for no matched pairs to process
+      //
+      if(f_na.n_elements() == 0) continue;
+
+      //
+      // Compute the stats, normal confidence intervals, and bootstrap
+      // bootstrap confidence intervals
+      //
+      if(conf_info.boot_interval == boot_bca_flag) {
+         compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na,
+            conf_info.vx_pd[i_vx].fcst_info->is_precipitation() &
+            conf_info.vx_pd[i_vx].obs_info->is_precipitation(),
+            conf_info.n_boot_rep,
+            cnt_info[i],
+            conf_info.output_flag[i_cnt] != STATOutputType_None,
+            conf_info.rank_corr_flag,
+            conf_info.tmp_dir);
+      }
+      else {
+         compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na,
+            conf_info.vx_pd[i_vx].fcst_info->is_precipitation() &
+            conf_info.vx_pd[i_vx].obs_info->is_precipitation(),
+            conf_info.n_boot_rep,
+            conf_info.boot_rep_prop,
+            cnt_info[i],
+            conf_info.output_flag[i_cnt],
+            conf_info.rank_corr_flag,
+            conf_info.tmp_dir);
+      }
+   } // end for i
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sl1l2(SL1L2Info &s_info, int i_vx, PairDataPoint *pd_ptr) {
-   int i;
+void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
+   int i, j;
    double f, o, c;
    double f_sum, o_sum, fo_sum, ff_sum, oo_sum;
    double fa_sum, oa_sum, foa_sum, ffa_sum, ooa_sum;
    double abs_err_sum;
+   NumArray f_na, o_na;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums.\n";
 
-   // Initialize the counts and sums
-   s_info.zero_out();
-   f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
-   fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0.0;
-   abs_err_sum = 0.0;
+   //
+   // Process each filtering threshold
+   //
+   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) { 
 
-   // Loop through the pair data and compute sums
-   for(i=0; i<pd_ptr->n_pair; i++) {
+      //
+      // Store thresholds
+      //
+      s_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
+      s_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
 
-      f = pd_ptr->f_na[i];
-      o = pd_ptr->o_na[i];
-      c = pd_ptr->c_na[i];
+      //
+      // Apply continuous filtering thresholds
+      //
+      subset_fo_na(pd_ptr->f_na, s_info[i].fthresh,
+                   pd_ptr->o_na, s_info[i].othresh,
+                   conf_info.cnt_logic[i_vx],
+                   f_na, o_na);
 
-      // Skip bad data values in the forecast or observation fields
-      if(is_bad_data(f) || is_bad_data(o)) continue;
+      mlog << Debug(3)
+           << "Found " << f_na.n_elements()
+           << " pairs for forecast filtering threshold "
+           << s_info[i].fthresh.get_str()
+           << ", observation filtering threshold "
+           << s_info[i].othresh.get_str() << ", and field logic "
+           << setlogic_to_string(conf_info.cnt_logic[i_vx])
+           << ".\n";
 
-      // SL1L2 sums
-      f_sum       += f;
-      o_sum       += o;
-      fo_sum      += f*o;
-      ff_sum      += f*f;
-      oo_sum      += o*o;
-      abs_err_sum += fabs(f-o);
+      //
+      // Check for no matched pairs to process
+      //
+      if(f_na.n_elements() == 0) continue;
+      
+      // Initialize the counts and sums
+      f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
+      fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0.0;
+      abs_err_sum = 0.0;
 
-      s_info.scount++;
+      // Loop through the pair data and compute sums
+      for(j=0; j<f_na.n_elements(); j++) {
 
-      // SAL1L2 sums
-      if(!is_bad_data(c)) {
+         f = pd_ptr->f_na[j];
+         o = pd_ptr->o_na[j];
+         c = pd_ptr->c_na[j];
 
-         fa_sum  += f-c;
-         oa_sum  += o-c;
-         foa_sum += (f-c)*(o-c);
-         ffa_sum += (f-c)*(f-c);
-         ooa_sum += (o-c)*(o-c);
+         // Skip bad data values in the forecast or observation fields
+         if(is_bad_data(f) || is_bad_data(o)) continue;
 
-         s_info.sacount++;
+         // SL1L2 sums
+         f_sum       += f;
+         o_sum       += o;
+         fo_sum      += f*o;
+         ff_sum      += f*f;
+         oo_sum      += o*o;
+         abs_err_sum += fabs(f-o);
+
+         s_info[i].scount++;
+
+         // SAL1L2 sums
+         if(!is_bad_data(c)) {
+
+            fa_sum  += f-c;
+            oa_sum  += o-c;
+            foa_sum += (f-c)*(o-c);
+            ffa_sum += (f-c)*(f-c);
+            ooa_sum += (o-c)*(o-c);
+
+            s_info[i].sacount++;
+         }
       }
-   }
 
-   if(s_info.scount == 0) {
-      mlog << Error << "\ndo_sl1l2() -> "
-           << "count is zero!\n\n";
-      exit(1);
-   }
+      if(s_info[i].scount == 0) {
+         mlog << Error << "\ndo_sl1l2() -> "
+              << "count is zero!\n\n";
+         exit(1);
+      }
 
-   // Compute the mean SL1L2 values
-   s_info.fbar  = f_sum/s_info.scount;
-   s_info.obar  = o_sum/s_info.scount;
-   s_info.fobar = fo_sum/s_info.scount;
-   s_info.ffbar = ff_sum/s_info.scount;
-   s_info.oobar = oo_sum/s_info.scount;
-   s_info.mae   = abs_err_sum/s_info.scount;
+      // Compute the mean SL1L2 values
+      s_info[i].fbar  = f_sum/s_info[i].scount;
+      s_info[i].obar  = o_sum/s_info[i].scount;
+      s_info[i].fobar = fo_sum/s_info[i].scount;
+      s_info[i].ffbar = ff_sum/s_info[i].scount;
+      s_info[i].oobar = oo_sum/s_info[i].scount;
+      s_info[i].mae   = abs_err_sum/s_info[i].scount;
 
-   // Compute the mean SAL1L2 values
-   if(s_info.sacount > 0) {
-      s_info.fabar  = fa_sum/s_info.sacount;
-      s_info.oabar  = oa_sum/s_info.sacount;
-      s_info.foabar = foa_sum/s_info.sacount;
-      s_info.ffabar = ffa_sum/s_info.sacount;
-      s_info.ooabar = ooa_sum/s_info.sacount;
-   }
-   else {
-      s_info.fabar  = bad_data_double;
-      s_info.oabar  = bad_data_double;
-      s_info.foabar = bad_data_double;
-      s_info.ffabar = bad_data_double;
-      s_info.ooabar = bad_data_double;
-   }
+      // Compute the mean SAL1L2 values
+      if(s_info[i].sacount > 0) {
+         s_info[i].fabar  = fa_sum/s_info[i].sacount;
+         s_info[i].oabar  = oa_sum/s_info[i].sacount;
+         s_info[i].foabar = foa_sum/s_info[i].sacount;
+         s_info[i].ffabar = ffa_sum/s_info[i].sacount;
+         s_info[i].ooabar = ooa_sum/s_info[i].sacount;
+      }
+      else {
+         s_info[i].fabar  = bad_data_double;
+         s_info[i].oabar  = bad_data_double;
+         s_info[i].foabar = bad_data_double;
+         s_info[i].ffabar = bad_data_double;
+         s_info[i].ooabar = bad_data_double;
+      }
+   } // end for i
 
    return;
 }
@@ -1479,9 +1555,8 @@ void do_sl1l2(SL1L2Info &s_info, int i_vx, PairDataPoint *pd_ptr) {
 void do_vl1l2(VL1L2Info *&v_info,
               int i_ugrd, PairDataPoint *ugrd_pd_ptr,
               int i_vgrd, PairDataPoint *vgrd_pd_ptr) {
-   int i, j, n_thresh;
+   int i, j, n_wind;
    double uf, vf, uc, vc, uo, vo, fwind, owind;
-   SingleThresh fst, ost;
 
    // Check that the number of pairs are the same
    if(ugrd_pd_ptr->n_pair != vgrd_pd_ptr->n_pair) {
@@ -1493,11 +1568,11 @@ void do_vl1l2(VL1L2Info *&v_info,
    }
 
    // Initialize all of the VL1L2Info objects
-   n_thresh = conf_info.get_n_wind_thresh();
-   for(i=0; i<n_thresh; i++) {
+   n_wind = conf_info.fwind_ta[i_vgrd].n_elements();
+   for(i=0; i<n_wind; i++) {
       v_info[i].zero_out();
-      v_info[i].wind_fcst_thresh = conf_info.fcst_wind_ta[i];
-      v_info[i].wind_obs_thresh  = conf_info.obs_wind_ta[i];
+      v_info[i].fthresh = conf_info.fwind_ta[i_vgrd][i];
+      v_info[i].othresh = conf_info.owind_ta[i_vgrd][i];
    }
 
    // Loop through the pair data and compute sums
@@ -1521,23 +1596,12 @@ void do_vl1l2(VL1L2Info *&v_info,
          is_bad_data(fwind) || is_bad_data(owind)) continue;
 
       // Loop through each of wind speed thresholds to be used
-      for(j=0; j<n_thresh; j++) {
+      for(j=0; j<n_wind; j++) {
 
-         fst = v_info[j].wind_fcst_thresh;
-         ost = v_info[j].wind_obs_thresh;
-
-         // Apply both wind speed thresholds
-         if(fst.get_type() != thresh_na && ost.get_type()  != thresh_na) {
-            if(!fst.check(fwind) || !ost.check(owind)) continue;
-         }
-         // Apply only the fcst wind speed threshold
-         else if(fst.get_type() != thresh_na && ost.get_type()  == thresh_na) {
-            if(!fst.check(fwind)) continue;
-         }
-         // Apply only the obs wind speed threshold
-         else if(fst.get_type() == thresh_na && ost.get_type()  != thresh_na) {
-            if(!ost.check(owind)) continue;
-         }
+         // Apply wind speed thresholds
+         if(!check_fo_thresh(fwind, v_info[j].fthresh,
+                             owind, v_info[j].othresh,
+                             conf_info.wind_logic[i_vgrd])) continue;
 
          // Add this pair to the VL1L2 and VAL1L2 counts
 
@@ -1567,13 +1631,13 @@ void do_vl1l2(VL1L2Info *&v_info,
    } // end for i
 
    // Compute means for the VL1L2Info objects
-   for(i=0; i<n_thresh; i++) {
+   for(i=0; i<n_wind; i++) {
 
       mlog << Debug(2)
            << "Computing Vector Partial Sums, for forecast wind speed "
-           << v_info[i].wind_fcst_thresh.get_str()
+           << v_info[i].fthresh.get_str()
            << ", for observation wind speed "
-           << v_info[i].wind_obs_thresh.get_str()
+           << v_info[i].othresh.get_str()
            << ", using " << v_info[i].vcount << " pairs.\n";
 
       if(v_info[i].vcount == 0) {
@@ -1640,14 +1704,14 @@ void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr) {
    //
    // Set up the PCTInfo thresholds and alpha values
    //
-   n_pct = conf_info.obs_ta[i_vx].n_elements();
+   n_pct = conf_info.ocat_ta[i_vx].n_elements();
    for(i=0; i<n_pct; i++) {
 
       // Use all of the selected forecast thresholds
-      pct_info[i].pct_fcst_thresh = conf_info.fcst_ta[i_vx];
+      pct_info[i].fthresh = conf_info.fcat_ta[i_vx];
 
       // Process the observation thresholds one at a time
-      pct_info[i].pct_obs_thresh  = conf_info.obs_ta[i_vx][i];
+      pct_info[i].othresh = conf_info.ocat_ta[i_vx][i];
 
       pct_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 

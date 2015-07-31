@@ -621,8 +621,8 @@ void do_cts(int n, const NumArray &f_na, const NumArray &o_na) {
 
    // Setup CTSInfo objects
    for(i=0; i<n_cts; i++) {
-      cts_info[i].cts_fcst_thresh = conf_info.fcst_cat_ta[i];
-      cts_info[i].cts_obs_thresh  = conf_info.obs_cat_ta[i];
+      cts_info[i].fthresh = conf_info.fcst_cat_ta[i];
+      cts_info[i].othresh = conf_info.obs_cat_ta[i];
 
       cts_info[i].allocate_n_alpha(conf_info.ci_alpha.n_elements());      
       for(j=0; j<conf_info.ci_alpha.n_elements(); j++) {
@@ -685,8 +685,8 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
 
    // Setup the MCTSInfo object
    mcts_info.cts.set_size(conf_info.fcst_cat_ta.n_elements() + 1);
-   mcts_info.cts_fcst_ta = conf_info.fcst_cat_ta;
-   mcts_info.cts_obs_ta  = conf_info.obs_cat_ta;
+   mcts_info.fthresh = conf_info.fcst_cat_ta;
+   mcts_info.othresh = conf_info.obs_cat_ta;
 
    mcts_info.allocate_n_alpha(conf_info.ci_alpha.n_elements());
    for(i=0; i<conf_info.ci_alpha.n_elements(); i++) {
@@ -782,7 +782,7 @@ void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
    PCTInfo pct_info;
 
    // Setup the PCTInfo object
-   pct_info.pct_fcst_thresh = conf_info.fcst_cat_ta;
+   pct_info.fthresh = conf_info.fcst_cat_ta;
    pct_info.allocate_n_alpha(conf_info.ci_alpha.n_elements());
 
    for(i=0; i<conf_info.ci_alpha.n_elements(); i++) {
@@ -793,7 +793,7 @@ void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
    for(i=0; i<conf_info.obs_cat_ta.n_elements(); i++) {
 
       // Set the current observation threshold
-      pct_info.pct_obs_thresh = conf_info.obs_cat_ta[i];
+      pct_info.othresh = conf_info.obs_cat_ta[i];
 
       // Compute the probabilistic counts and statistics
       compute_pctinfo(f_na, o_na, true, pct_info);
@@ -852,12 +852,12 @@ void store_stat_fho(int n, const ConcatString &col,
    var_name << cs_erase << "series_fho_" << c << "_";
 
    // Append threshold information
-   if(cts_info.cts_fcst_thresh == cts_info.cts_obs_thresh) {
-      var_name << cts_info.cts_fcst_thresh.get_abbr_str();
+   if(cts_info.fthresh == cts_info.othresh) {
+      var_name << cts_info.fthresh.get_abbr_str();
    }
    else {
-      var_name << "fcst" << cts_info.cts_fcst_thresh.get_abbr_str()
-               << "_obs" << cts_info.cts_obs_thresh.get_abbr_str();
+      var_name << "fcst" << cts_info.fthresh.get_abbr_str()
+               << "_obs" << cts_info.othresh.get_abbr_str();
    }
 
    // Add map for this variable name
@@ -868,8 +868,8 @@ void store_stat_fho(int n, const ConcatString &col,
      
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 cts_info.cts_fcst_thresh.get_str(),
-                 cts_info.cts_obs_thresh.get_str(),
+                 cts_info.fthresh.get_str(),
+                 cts_info.othresh.get_str(),
                  bad_data_double);
    }
 
@@ -906,12 +906,12 @@ void store_stat_ctc(int n, const ConcatString &col,
    var_name << cs_erase << "series_ctc_" << c << "_";
 
    // Append threshold information
-   if(cts_info.cts_fcst_thresh == cts_info.cts_obs_thresh) {
-      var_name << cts_info.cts_fcst_thresh.get_abbr_str();
+   if(cts_info.fthresh == cts_info.othresh) {
+      var_name << cts_info.fthresh.get_abbr_str();
    }
    else {
-      var_name << "fcst" << cts_info.cts_fcst_thresh.get_abbr_str()
-               << "_obs" << cts_info.cts_obs_thresh.get_abbr_str();
+      var_name << "fcst" << cts_info.fthresh.get_abbr_str()
+               << "_obs" << cts_info.othresh.get_abbr_str();
    }
    
    // Add map for this variable name
@@ -922,8 +922,8 @@ void store_stat_ctc(int n, const ConcatString &col,
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 cts_info.cts_fcst_thresh.get_str(),
-                 cts_info.cts_obs_thresh.get_str(),
+                 cts_info.fthresh.get_str(),
+                 cts_info.othresh.get_str(),
                  bad_data_double);
    }
    
@@ -1056,12 +1056,12 @@ void store_stat_cts(int n, const ConcatString &col,
       var_name << cs_erase << "series_cts_" << c << "_";
 
       // Append threshold information
-      if(cts_info.cts_fcst_thresh == cts_info.cts_obs_thresh) {
-         var_name << cts_info.cts_fcst_thresh.get_abbr_str();
+      if(cts_info.fthresh == cts_info.othresh) {
+         var_name << cts_info.fthresh.get_abbr_str();
       }
       else {
-         var_name << "fcst" << cts_info.cts_fcst_thresh.get_abbr_str()
-                  << "_obs" << cts_info.cts_obs_thresh.get_abbr_str();
+         var_name << "fcst" << cts_info.fthresh.get_abbr_str()
+                  << "_obs" << cts_info.othresh.get_abbr_str();
       }
 
       // Append confidence interval alpha value
@@ -1075,8 +1075,8 @@ void store_stat_cts(int n, const ConcatString &col,
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    cts_info.cts_fcst_thresh.get_str(),
-                    cts_info.cts_obs_thresh.get_str(),
+                    cts_info.fthresh.get_str(),
+                    cts_info.othresh.get_str(),
                     (n_ci > 1 ? cts_info.alpha[i] : bad_data_double));
       }
    
@@ -1143,8 +1143,8 @@ void store_stat_mctc(int n, const ConcatString &col,
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 mcts_info.cts_fcst_ta.get_str(","),
-                 mcts_info.cts_obs_ta.get_str(","),
+                 mcts_info.fthresh.get_str(","),
+                 mcts_info.othresh.get_str(","),
                  bad_data_double);
    }
    
@@ -1210,8 +1210,8 @@ void store_stat_mcts(int n, const ConcatString &col,
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    mcts_info.cts_fcst_ta.get_str(","),
-                    mcts_info.cts_obs_ta.get_str(","),
+                    mcts_info.fthresh.get_str(","),
+                    mcts_info.othresh.get_str(","),
                     (n_ci > 1 ? mcts_info.alpha[i] : bad_data_double));
       }
 
@@ -1440,7 +1440,7 @@ void store_stat_pct(int n, const ConcatString &col,
 
    // Construct the NetCDF variable name
    var_name << cs_erase << "series_pct_" << c
-            << "_obs" << pct_info.pct_obs_thresh.get_abbr_str();
+            << "_obs" << pct_info.othresh.get_abbr_str();
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
@@ -1450,8 +1450,8 @@ void store_stat_pct(int n, const ConcatString &col,
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 pct_info.pct_fcst_thresh.get_str(","),
-                 pct_info.pct_obs_thresh.get_str(),
+                 pct_info.fthresh.get_str(","),
+                 pct_info.othresh.get_str(),
                  bad_data_double);
    }
             
@@ -1513,8 +1513,8 @@ void store_stat_pstd(int n, const ConcatString &col,
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    pct_info.pct_fcst_thresh.get_str(","),
-                    pct_info.pct_obs_thresh.get_str(),
+                    pct_info.fthresh.get_str(","),
+                    pct_info.othresh.get_str(),
                     (n_ci > 1 ? pct_info.alpha[i] : bad_data_double));
       }
 
@@ -1582,7 +1582,7 @@ void store_stat_pjc(int n, const ConcatString &col,
 
    // Construct the NetCDF variable name
    var_name << cs_erase << "series_pjc_" << c
-            << "_obs" << pct_info.pct_obs_thresh.get_abbr_str();
+            << "_obs" << pct_info.othresh.get_abbr_str();
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
@@ -1592,8 +1592,8 @@ void store_stat_pjc(int n, const ConcatString &col,
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 pct_info.pct_fcst_thresh.get_str(","),
-                 pct_info.pct_obs_thresh.get_str(),
+                 pct_info.fthresh.get_str(","),
+                 pct_info.othresh.get_str(),
                  bad_data_double);
    }
             
@@ -1659,8 +1659,8 @@ void store_stat_prc(int n, const ConcatString &col,
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 pct_info.pct_fcst_thresh.get_str(","),
-                 pct_info.pct_obs_thresh.get_str(),
+                 pct_info.fthresh.get_str(","),
+                 pct_info.othresh.get_str(),
                  bad_data_double);
    }
             

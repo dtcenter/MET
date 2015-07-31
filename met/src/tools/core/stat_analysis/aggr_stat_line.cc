@@ -2666,8 +2666,8 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // Store the thresholds
    //
-   cts_info.cts_fcst_thresh = j.out_fcst_thresh[0];
-   cts_info.cts_obs_thresh = j.out_obs_thresh[0];
+   cts_info.fthresh = j.out_fcst_thresh[0];
+   cts_info.othresh = j.out_obs_thresh[0];
 
    //
    // Compute the counts, stats, normal confidence intervals, and
@@ -2706,8 +2706,8 @@ void mpr_to_mctc(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Setup
    //
    mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
-   mcts_info.cts_fcst_ta = j.out_fcst_thresh;
-   mcts_info.cts_obs_ta  = j.out_obs_thresh;
+   mcts_info.fthresh = j.out_fcst_thresh;
+   mcts_info.othresh = j.out_obs_thresh;
 
    //
    // Update the contingency table counts
@@ -2737,8 +2737,8 @@ void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Setup
    //
    mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
-   mcts_info.cts_fcst_ta = j.out_fcst_thresh;
-   mcts_info.cts_obs_ta  = j.out_obs_thresh;
+   mcts_info.fthresh = j.out_fcst_thresh;
+   mcts_info.othresh = j.out_obs_thresh;
 
    //
    // Store the out_alpha value
@@ -2911,8 +2911,8 @@ void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // Set up the PCTInfo thresholds and alpha values
    //
-   pct_info.pct_fcst_thresh = j.out_fcst_thresh;
-   pct_info.pct_obs_thresh  = j.out_obs_thresh[0];
+   pct_info.fthresh = j.out_fcst_thresh;
+   pct_info.othresh = j.out_obs_thresh[0];
    pct_info.allocate_n_alpha(1);
    pct_info.alpha[0] = j.out_alpha;
 

@@ -1117,8 +1117,8 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
    //
    n_cts = conf_info.fcst_ta[i_vx].n_elements();
    for(i=0; i<n_cts; i++) {
-      cts_info[i].cts_fcst_thresh = conf_info.fcst_ta[i_vx][i];
-      cts_info[i].cts_obs_thresh  = conf_info.obs_ta[i_vx][i];
+      cts_info[i].fthresh = conf_info.fcst_ta[i_vx][i];
+      cts_info[i].othresh = conf_info.obs_ta[i_vx][i];
       cts_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
       for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
@@ -1160,8 +1160,8 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
    mcts_info.cts.set_size(conf_info.fcst_ta[i_vx].n_elements() + 1);
-   mcts_info.cts_fcst_ta = conf_info.fcst_ta[i_vx];
-   mcts_info.cts_obs_ta  = conf_info.obs_ta[i_vx];
+   mcts_info.fthresh = conf_info.fcst_ta[i_vx];
+   mcts_info.othresh = conf_info.obs_ta[i_vx];
    mcts_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
 
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
@@ -1264,8 +1264,8 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    n_thresh = conf_info.get_n_wind_thresh();
    for(i=0; i<n_thresh; i++) {
       v_info[i].zero_out();
-      v_info[i].wind_fcst_thresh = conf_info.fcst_wind_ta[i];
-      v_info[i].wind_obs_thresh  = conf_info.obs_wind_ta[i];
+      v_info[i].fthresh = conf_info.fcst_wind_ta[i];
+      v_info[i].othresh = conf_info.obs_wind_ta[i];
    }
 
    // Loop through the pair data and compute sums
@@ -1289,8 +1289,8 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       // Loop through each of wind speed thresholds to be used
       for(j=0; j<n_thresh; j++) {
 
-         fst = v_info[j].wind_fcst_thresh;
-         ost = v_info[j].wind_obs_thresh;
+         fst = v_info[j].fthresh;
+         ost = v_info[j].othresh;
 
          // Apply both wind speed thresholds
          if(fst.get_type() != thresh_na && ost.get_type()  != thresh_na) {
@@ -1324,9 +1324,9 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 
       mlog << Debug(2) << "Computing Vector Partial Sums, "
            << "for forecast wind speed "
-           << v_info[i].wind_fcst_thresh.get_str()
+           << v_info[i].fthresh.get_str()
            << ", for observation wind speed "
-           << v_info[i].wind_obs_thresh.get_str()
+           << v_info[i].othresh.get_str()
            << ", using " << v_info[i].vcount << " pairs.\n";
 
       if(v_info[i].vcount == 0) {
@@ -1374,10 +1374,10 @@ void do_pct(PCTInfo *&pct_info, int i_vx,
    for(i=0; i<n_pct; i++) {
 
       // Use all of the selected forecast thresholds
-      pct_info[i].pct_fcst_thresh = conf_info.fcst_ta[i_vx];
+      pct_info[i].fthresh = conf_info.fcst_ta[i_vx];
 
       // Process the observation thresholds one at a time
-      pct_info[i].pct_obs_thresh  = conf_info.obs_ta[i_vx][i];
+      pct_info[i].othresh = conf_info.obs_ta[i_vx][i];
 
       pct_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
@@ -1408,16 +1408,16 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    n_nbrcts = conf_info.nbrhd_cov_ta.n_elements();
    for(i=0; i<n_nbrcts; i++) {
 
-      nbrcts_info[i].raw_fcst_thresh =
+      nbrcts_info[i].fthresh =
          conf_info.fcst_ta[i_vx][i_thresh];
-      nbrcts_info[i].raw_obs_thresh =
+      nbrcts_info[i].othresh =
          conf_info.obs_ta[i_vx][i_thresh];
       nbrcts_info[i].frac_thresh =
          conf_info.nbrhd_cov_ta[i];
 
-      nbrcts_info[i].cts_info.cts_fcst_thresh =
+      nbrcts_info[i].cts_info.fthresh =
          conf_info.nbrhd_cov_ta[i];
-      nbrcts_info[i].cts_info.cts_obs_thresh =
+      nbrcts_info[i].cts_info.othresh =
          conf_info.nbrhd_cov_ta[i];
       nbrcts_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
@@ -1468,9 +1468,9 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    //
    // Set up the NBRCNTInfo threshold and alpha values
    //
-   nbrcnt_info.raw_fcst_thresh =
+   nbrcnt_info.fthresh =
       conf_info.fcst_ta[i_vx][i_thresh];
-   nbrcnt_info.raw_obs_thresh =
+   nbrcnt_info.othresh =
       conf_info.obs_ta[i_vx][i_thresh];
 
    nbrcnt_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
