@@ -451,8 +451,8 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_line_type(stat_fho_str);
 
    // Thresholds
-   shc.set_fcst_thresh(cts_info.cts_fcst_thresh);
-   shc.set_obs_thresh(cts_info.cts_obs_thresh);
+   shc.set_fcst_thresh(cts_info.fthresh);
+   shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
    shc.set_alpha(bad_data_double);
@@ -489,8 +489,8 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_line_type(stat_ctc_str);
 
    // Thresholds
-   shc.set_fcst_thresh(cts_info.cts_fcst_thresh);
-   shc.set_obs_thresh(cts_info.cts_obs_thresh);
+   shc.set_fcst_thresh(cts_info.fthresh);
+   shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
    shc.set_alpha(bad_data_double);
@@ -528,8 +528,8 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_line_type(stat_cts_str);
 
    // Thresholds
-   shc.set_fcst_thresh(cts_info.cts_fcst_thresh);
-   shc.set_obs_thresh(cts_info.cts_obs_thresh);
+   shc.set_fcst_thresh(cts_info.fthresh);
+   shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
    shc.clear_cov_thresh();
@@ -572,8 +572,8 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    shc.set_line_type(stat_mctc_str);
 
    // Thresholds
-   shc.set_fcst_thresh(mcts_info.cts_fcst_ta);
-   shc.set_obs_thresh(mcts_info.cts_obs_ta);
+   shc.set_fcst_thresh(mcts_info.fthresh);
+   shc.set_obs_thresh(mcts_info.othresh);
 
    // Not Applicable
    shc.set_alpha(bad_data_double);
@@ -611,8 +611,8 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    shc.set_line_type(stat_mcts_str);
 
    // Thresholds
-   shc.set_fcst_thresh(mcts_info.cts_fcst_ta);
-   shc.set_obs_thresh(mcts_info.cts_obs_ta);
+   shc.set_fcst_thresh(mcts_info.fthresh);
+   shc.set_obs_thresh(mcts_info.othresh);
 
    // Not Applicable
    shc.clear_cov_thresh();
@@ -655,9 +655,11 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
    // CNT line type
    shc.set_line_type(stat_cnt_str);
 
+   // Thresholds
+   shc.set_fcst_thresh(cnt_info.fthresh);
+   shc.set_obs_thresh(cnt_info.othresh);
+
    // Not Applicable
-   shc.clear_fcst_thresh();
-   shc.clear_obs_thresh();
    shc.clear_cov_thresh();
 
    // Write a line for each alpha value
@@ -697,9 +699,11 @@ void write_sl1l2_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
    // SL1L2 line type
    shc.set_line_type(stat_sl1l2_str);
 
+   // Thresholds
+   shc.set_fcst_thresh(cnt_info.fthresh);
+   shc.set_obs_thresh(cnt_info.othresh);
+
    // Not Applicable
-   shc.clear_fcst_thresh();
-   shc.clear_obs_thresh();
    shc.clear_cov_thresh();
    shc.set_alpha(bad_data_double);
 
@@ -733,9 +737,11 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    // SL1L2 line type
    shc.set_line_type(stat_sl1l2_str);
 
+   // Thresholds
+   shc.set_fcst_thresh(sl1l2_info.fthresh);
+   shc.set_obs_thresh(sl1l2_info.othresh);
+
    // Not Applicable
-   shc.clear_fcst_thresh();
-   shc.clear_obs_thresh();
    shc.clear_cov_thresh();
    shc.set_alpha(bad_data_double);
 
@@ -769,9 +775,11 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    // SAL1L2 line type
    shc.set_line_type(stat_sal1l2_str);
 
+   // Thresholds
+   shc.set_fcst_thresh(sl1l2_info.fthresh);
+   shc.set_obs_thresh(sl1l2_info.othresh);
+
    // Not Applicable
-   shc.clear_fcst_thresh();
-   shc.clear_obs_thresh();
    shc.clear_cov_thresh();
    shc.set_alpha(bad_data_double);
 
@@ -806,8 +814,8 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    shc.set_line_type(stat_vl1l2_str);
 
    // Thresholds
-   shc.set_fcst_thresh(vl1l2_info.wind_fcst_thresh);
-   shc.set_obs_thresh(vl1l2_info.wind_obs_thresh);
+   shc.set_fcst_thresh(vl1l2_info.fthresh);
+   shc.set_obs_thresh(vl1l2_info.othresh);
 
    // Not Applicable
    shc.clear_cov_thresh();
@@ -843,9 +851,11 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    // VAL1L2 line type
    shc.set_line_type(stat_val1l2_str);
 
+   // Thresholds
+   shc.set_fcst_thresh(vl1l2_info.fthresh);
+   shc.set_obs_thresh(vl1l2_info.othresh);
+
    // Not Applicable
-   shc.clear_fcst_thresh();
-   shc.clear_obs_thresh();
    shc.clear_cov_thresh();
    shc.set_alpha(bad_data_double);
 
@@ -880,8 +890,8 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type(stat_pct_str);
 
    // Thresholds
-   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
-   shc.set_obs_thresh(pct_info.pct_obs_thresh);
+   shc.set_fcst_thresh(pct_info.fthresh);
+   shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
    shc.set_alpha(bad_data_double);
@@ -919,8 +929,8 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type(stat_pstd_str);
 
    // Thresholds
-   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
-   shc.set_obs_thresh(pct_info.pct_obs_thresh);
+   shc.set_fcst_thresh(pct_info.fthresh);
+   shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
    shc.clear_cov_thresh();
@@ -964,8 +974,8 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type(stat_pjc_str);
 
    // Thresholds
-   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
-   shc.set_obs_thresh(pct_info.pct_obs_thresh);
+   shc.set_fcst_thresh(pct_info.fthresh);
+   shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
    shc.set_alpha(bad_data_double);
@@ -1002,8 +1012,8 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_line_type(stat_prc_str);
 
    // Thresholds
-   shc.set_fcst_thresh(pct_info.pct_fcst_thresh);
-   shc.set_obs_thresh(pct_info.pct_obs_thresh);
+   shc.set_fcst_thresh(pct_info.fthresh);
+   shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
    shc.set_alpha(bad_data_double);
@@ -1039,9 +1049,9 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    // NBRCTC line type
    shc.set_line_type(stat_nbrctc_str);
 
-   // Raw thresholds
-   shc.set_fcst_thresh(nbrcts_info.raw_fcst_thresh);
-   shc.set_obs_thresh(nbrcts_info.raw_obs_thresh);
+   // Thresholds
+   shc.set_fcst_thresh(nbrcts_info.fthresh);
+   shc.set_obs_thresh(nbrcts_info.othresh);
 
    // Fractional coverage threshold
    shc.set_cov_thresh(nbrcts_info.frac_thresh);
@@ -1080,9 +1090,9 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    // NBRCTS line type
    shc.set_line_type(stat_nbrcts_str);
 
-   // Raw thresholds
-   shc.set_fcst_thresh(nbrcts_info.raw_fcst_thresh);
-   shc.set_obs_thresh(nbrcts_info.raw_obs_thresh);
+   // Thresholds
+   shc.set_fcst_thresh(nbrcts_info.fthresh);
+   shc.set_obs_thresh(nbrcts_info.othresh);
 
    // Fractional coverage threshold
    shc.set_cov_thresh(nbrcts_info.frac_thresh);
@@ -1126,9 +1136,9 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
    // NBRCNT line type
    shc.set_line_type(stat_nbrcnt_str);
 
-   // Raw thresholds
-   shc.set_fcst_thresh(nbrcnt_info.raw_fcst_thresh);
-   shc.set_obs_thresh(nbrcnt_info.raw_obs_thresh);
+   // Thresholds
+   shc.set_fcst_thresh(nbrcnt_info.fthresh);
+   shc.set_obs_thresh(nbrcnt_info.othresh);
 
    // Not applicable
    shc.clear_cov_thresh();

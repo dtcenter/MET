@@ -249,8 +249,8 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &v_info) {
    v_info.clear();
 
    v_info.nbr_wdth   = atoi(l.get_item(interp_pnts_offset));
-   v_info.raw_fcst_thresh.set(l.get_item(fcst_thresh_offset));
-   v_info.raw_obs_thresh.set(l.get_item(obs_thresh_offset));
+   v_info.fthresh.set(l.get_item(fcst_thresh_offset));
+   v_info.othresh.set(l.get_item(obs_thresh_offset));
    v_info.cnt_info.n = atoi(l.get_item(nbrcnt_total_offset));
    v_info.fbs.v      = atof(l.get_item(nbrcnt_fbs_offset));
    v_info.fss.v      = atof(l.get_item(nbrcnt_fss_offset));

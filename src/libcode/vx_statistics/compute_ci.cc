@@ -326,14 +326,14 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Allocate space to store categorical stats for each threshold
    // and for the output temp file streams
    //
-   cts_tmp    = new CTSInfo [n_cts];
-   cts_i_out  = new ofstream [n_cts];
-   cts_r_out  = new ofstream [n_cts];
+   cts_tmp    = new CTSInfo      [n_cts];
+   cts_i_out  = new ofstream     [n_cts];
+   cts_r_out  = new ofstream     [n_cts];
    cts_i_file = new ConcatString [n_cts];
    cts_r_file = new ConcatString [n_cts];
    for(i=0; i<n_cts; i++) {
-      cts_tmp[i].cts_fcst_thresh = cts_info[i].cts_fcst_thresh;
-      cts_tmp[i].cts_obs_thresh  = cts_info[i].cts_obs_thresh;
+      cts_tmp[i].fthresh = cts_info[i].fthresh;
+      cts_tmp[i].othresh = cts_info[i].othresh;
 
    }
 
@@ -1348,8 +1348,8 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    cts_r_out  = new ofstream [n_cts];
    cts_r_file = new ConcatString [n_cts];
    for(i=0; i<n_cts; i++) {
-      cts_tmp[i].cts_fcst_thresh = cts_info[i].cts_fcst_thresh;
-      cts_tmp[i].cts_obs_thresh  = cts_info[i].cts_obs_thresh;
+      cts_tmp[i].fthresh = cts_info[i].fthresh;
+      cts_tmp[i].othresh = cts_info[i].othresh;
    }
 
    //
@@ -2249,11 +2249,11 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    nbrcts_i_file = new ConcatString [n_nbrcts];
    nbrcts_r_file = new ConcatString [n_nbrcts];
    for(i=0; i<n_nbrcts; i++) {
-      nbrcts_tmp[i].cts_info.cts_fcst_thresh = nbrcts_info[i].cts_info.cts_fcst_thresh;
-      nbrcts_tmp[i].cts_info.cts_obs_thresh  = nbrcts_info[i].cts_info.cts_obs_thresh;
-      nbrcts_tmp[i].raw_fcst_thresh          = nbrcts_info[i].raw_fcst_thresh;
-      nbrcts_tmp[i].raw_obs_thresh           = nbrcts_info[i].raw_obs_thresh;
-      nbrcts_tmp[i].frac_thresh              = nbrcts_info[i].frac_thresh;
+      nbrcts_tmp[i].cts_info.fthresh = nbrcts_info[i].cts_info.fthresh;
+      nbrcts_tmp[i].cts_info.othresh = nbrcts_info[i].cts_info.othresh;
+      nbrcts_tmp[i].fthresh          = nbrcts_info[i].fthresh;
+      nbrcts_tmp[i].othresh          = nbrcts_info[i].othresh;
+      nbrcts_tmp[i].frac_thresh      = nbrcts_info[i].frac_thresh;
    }
 
    //
@@ -2885,11 +2885,11 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    nbrcts_r_out  = new ofstream [n_nbrcts];
    nbrcts_r_file = new ConcatString [n_nbrcts];
    for(i=0; i<n_nbrcts; i++) {
-      nbrcts_tmp[i].cts_info.cts_fcst_thresh = nbrcts_info[i].cts_info.cts_fcst_thresh;
-      nbrcts_tmp[i].cts_info.cts_obs_thresh  = nbrcts_info[i].cts_info.cts_obs_thresh;
-      nbrcts_tmp[i].raw_fcst_thresh          = nbrcts_info[i].raw_fcst_thresh;
-      nbrcts_tmp[i].raw_obs_thresh           = nbrcts_info[i].raw_obs_thresh;
-      nbrcts_tmp[i].frac_thresh              = nbrcts_info[i].frac_thresh;
+      nbrcts_tmp[i].cts_info.fthresh = nbrcts_info[i].cts_info.fthresh;
+      nbrcts_tmp[i].cts_info.othresh = nbrcts_info[i].cts_info.othresh;
+      nbrcts_tmp[i].fthresh          = nbrcts_info[i].fthresh;
+      nbrcts_tmp[i].othresh          = nbrcts_info[i].othresh;
+      nbrcts_tmp[i].frac_thresh      = nbrcts_info[i].frac_thresh;
    }
 
    //

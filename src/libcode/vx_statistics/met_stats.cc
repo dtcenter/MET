@@ -215,8 +215,8 @@ void CTSInfo::clear() {
    if(alpha) { delete [] alpha; alpha = (double *) 0; }
 
    cts.zero_out();
-   cts_fcst_thresh.clear();
-   cts_obs_thresh.clear();
+   fthresh.clear();
+   othresh.clear();
 
    baser.clear();
    fmean.clear();
@@ -250,8 +250,8 @@ void CTSInfo::assign(const CTSInfo &c) {
    clear();
 
    cts = c.cts;
-   cts_fcst_thresh = c.cts_fcst_thresh;
-   cts_obs_thresh  = c.cts_obs_thresh;
+   fthresh = c.fthresh;
+   othresh = c.othresh;
 
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
@@ -324,13 +324,11 @@ void CTSInfo::allocate_n_alpha(int i) {
 ////////////////////////////////////////////////////////////////////////
 
 void CTSInfo::add(double f, double o) {
-   SingleThresh ft = cts_fcst_thresh;
-   SingleThresh ot = cts_obs_thresh;
 
-   if     ( ft.check(f) &&  ot.check(o)) cts.inc_fy_oy();
-   else if( ft.check(f) && !ot.check(o)) cts.inc_fy_on();
-   else if(!ft.check(f) &&  ot.check(o)) cts.inc_fn_oy();
-   else if(!ft.check(f) && !ot.check(o)) cts.inc_fn_on();
+   if     ( fthresh.check(f) &&  othresh.check(o)) cts.inc_fy_oy();
+   else if( fthresh.check(f) && !othresh.check(o)) cts.inc_fy_on();
+   else if(!fthresh.check(f) &&  othresh.check(o)) cts.inc_fn_oy();
+   else if(!fthresh.check(f) && !othresh.check(o)) cts.inc_fn_on();
 
    return;
 }
@@ -475,8 +473,8 @@ void MCTSInfo::clear() {
    if(alpha) { delete [] alpha; alpha = (double *) 0; }
 
    cts.zero_out();
-   cts_fcst_ta.clear();
-   cts_obs_ta.clear();
+   fthresh.clear();
+   othresh.clear();
 
    acc.clear();
    hk.clear();
@@ -494,8 +492,8 @@ void MCTSInfo::assign(const MCTSInfo &c) {
    clear();
 
    cts = c.cts;
-   cts_fcst_ta = c.cts_fcst_ta;
-   cts_obs_ta  = c.cts_obs_ta;
+   fthresh = c.fthresh;
+   othresh = c.othresh;
 
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
@@ -539,8 +537,8 @@ void MCTSInfo::add(double f, double o) {
    int r, c;
 
    // Find the row and column for the forecast and observation values.
-   r = cts_fcst_ta.check_bins(f);
-   c = cts_obs_ta.check_bins(o);
+   r = fthresh.check_bins(f);
+   c = othresh.check_bins(o);
 
    // Increment the corresponding contingency table entry.
    cts.inc_entry(r, c);
@@ -634,9 +632,11 @@ void CNTInfo::clear() {
 
    n = 0;
    n_alpha = 0;
-
    if(alpha) { delete [] alpha; alpha = (double *) 0; }
 
+   fthresh.clear();
+   othresh.clear();
+   
    fbar.clear();
    fstdev.clear();
    obar.clear();
@@ -672,6 +672,9 @@ void CNTInfo::assign(const CNTInfo &c) {
    int i;
 
    clear();
+
+   fthresh = c.fthresh;
+   othresh = c.othresh;
 
    n = c.n;
    allocate_n_alpha(c.n_alpha);
@@ -994,6 +997,9 @@ void SL1L2Info::zero_out() {
 
 void SL1L2Info::clear() {
 
+   fthresh.clear();
+   othresh.clear();
+
    zero_out();
 
    return;
@@ -1004,6 +1010,9 @@ void SL1L2Info::clear() {
 void SL1L2Info::assign(const SL1L2Info &c) {
 
    clear();
+
+   fthresh = c.fthresh;
+   othresh = c.othresh;
 
    // SL1L2 Quantities
    fbar    = c.fbar;
@@ -1238,9 +1247,8 @@ void VL1L2Info::zero_out() {
 
 void VL1L2Info::clear() {
 
-   // Wind speed thresholds
-   wind_fcst_thresh.clear();
-   wind_obs_thresh.clear();
+   fthresh.clear();
+   othresh.clear();
 
    zero_out();
 
@@ -1252,6 +1260,9 @@ void VL1L2Info::clear() {
 void VL1L2Info::assign(const VL1L2Info &c) {
 
    clear();
+
+   fthresh = c.fthresh;
+   othresh = c.othresh;
 
    // VL1L2 Quantities
    ufbar    = c.ufbar;
@@ -1325,11 +1336,11 @@ void NBRCTSInfo::init_from_scratch() {
 
 void NBRCTSInfo::clear() {
 
+   fthresh.clear();
+   othresh.clear();
+   frac_thresh.clear();
    cts_info.clear();
    nbr_wdth = bad_data_int;
-   raw_fcst_thresh.clear();
-   raw_obs_thresh.clear();
-   frac_thresh.clear();
 
    return;
 }
@@ -1340,11 +1351,11 @@ void NBRCTSInfo::assign(const NBRCTSInfo &c) {
 
    clear();
 
-   cts_info        = c.cts_info;
-   nbr_wdth        = c.nbr_wdth;
-   raw_fcst_thresh = c.raw_fcst_thresh;
-   raw_obs_thresh  = c.raw_obs_thresh;
-   frac_thresh     = c.frac_thresh;
+   fthresh     = c.fthresh;
+   othresh     = c.othresh;
+   frac_thresh = c.frac_thresh;
+   cts_info    = c.cts_info;
+   nbr_wdth    = c.nbr_wdth;
 
    return;
 }
@@ -1475,6 +1486,9 @@ void NBRCNTInfo::init_from_scratch() {
 
 void NBRCNTInfo::clear() {
 
+   fthresh.clear();
+   othresh.clear();
+
    fbs.clear();
    fss.clear();
    afss.clear();
@@ -1483,8 +1497,6 @@ void NBRCNTInfo::clear() {
    o_rate.clear();
    cnt_info.clear();
    nbr_wdth = bad_data_int;
-   raw_fcst_thresh.clear();
-   raw_obs_thresh.clear();
 
    return;
 }
@@ -1495,16 +1507,16 @@ void NBRCNTInfo::assign(const NBRCNTInfo &c) {
 
    clear();
 
-   fbs             = c.fbs;
-   fss             = c.fss;
-   afss            = c.afss;
-   ufss            = c.ufss;
-   f_rate          = c.f_rate;
-   o_rate          = c.o_rate;
-   cnt_info        = c.cnt_info;
-   nbr_wdth        = c.nbr_wdth;
-   raw_fcst_thresh = c.raw_fcst_thresh;
-   raw_obs_thresh  = c.raw_obs_thresh;
+   fthresh  = c.fthresh;
+   othresh  = c.othresh;
+   fbs      = c.fbs;
+   fss      = c.fss;
+   afss     = c.afss;
+   ufss     = c.ufss;
+   f_rate   = c.f_rate;
+   o_rate   = c.o_rate;
+   cnt_info = c.cnt_info;
+   nbr_wdth = c.nbr_wdth;
 
    return;
 }
@@ -1613,7 +1625,8 @@ void ISCInfo::init_from_scratch() {
 void ISCInfo::clear() {
 
    cts.zero_out();
-   total = 0;
+   fthresh.clear();
+   othresh.clear();
 
    mse   = isc   = bad_data_double;
    fen   = oen   = bad_data_double;
@@ -1624,6 +1637,7 @@ void ISCInfo::clear() {
    tile_yll = bad_data_int;
 
    n_scale  = 0;
+   total    = 0;
 
    if(mse_scale) { delete [] mse_scale; mse_scale = (double *) 0; }
    if(isc_scale) { delete [] isc_scale; isc_scale = (double *) 0; }
@@ -1671,8 +1685,8 @@ void ISCInfo::assign(const ISCInfo &c) {
 
    cts = c.cts;
 
-   cts_fcst_thresh = c.cts_fcst_thresh;
-   cts_obs_thresh  = c.cts_obs_thresh;
+   fthresh = c.fthresh;
+   othresh  = c.othresh;
 
    mse   = c.mse;
    isc   = c.isc;
@@ -1853,8 +1867,8 @@ void PCTInfo::clear() {
    if(alpha) { delete [] alpha; alpha = (double *) 0; }
 
    pct.zero_out();
-   pct_fcst_thresh.clear();
-   pct_obs_thresh.clear();
+   fthresh.clear();
+   othresh.clear();
 
    baser.clear();
    brier.clear();
@@ -1870,8 +1884,8 @@ void PCTInfo::assign(const PCTInfo &c) {
    clear();
 
    pct = c.pct;
-   pct_fcst_thresh = c.pct_fcst_thresh;
-   pct_obs_thresh  = c.pct_obs_thresh;
+   fthresh = c.fthresh;
+   othresh  = c.othresh;
 
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
@@ -2897,11 +2911,11 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Store the thresholds as an array of doubles
    //
-   n_thresh = pct_info.pct_fcst_thresh.n_elements();
+   n_thresh = pct_info.fthresh.n_elements();
    p_thresh = new double [n_thresh];
 
    for(i=0; i<n_thresh; i++)
-      p_thresh[i] = pct_info.pct_fcst_thresh[i].get_value();
+      p_thresh[i] = pct_info.fthresh[i].get_value();
 
    //
    // Set up the Nx2ContingencyTable
@@ -2913,7 +2927,7 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Get the observation threshold value to be applied
    //
-   ot = pct_info.pct_obs_thresh;
+   ot = pct_info.othresh;
 
    //
    // Loop through the pair data and fill in the contingency table
@@ -3204,6 +3218,72 @@ void compute_i_mean_stdev(const NumArray &v_na,
                       mean_ci, stdev_ci);
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void subset_fo_na(const NumArray &f_na, const SingleThresh &ft,
+                  const NumArray &o_na, const SingleThresh &ot,
+                  const SetLogic type,
+                  NumArray &sub_f_na, NumArray &sub_o_na) {
+   int i;
+   bool fcheck, ocheck;
+   
+   if(f_na.n_elements() != o_na.n_elements()) {
+      mlog << Error << "\nsubset_fo_na() -> "
+           << "the number of forecast values (" << f_na.n_elements()
+           << ") must equal the number of observed values ("
+           << o_na.n_elements() << ")\n\n";
+      exit(1);
+   }
+
+   // Initialize
+   sub_f_na.clear();
+   sub_o_na.clear();
+
+   // Loop through the matched pairs
+   for(i=0; i<f_na.n_elements(); i++) {
+
+      // Add points which meet the thresholding logic
+      if(check_fo_thresh(f_na[i], ft, o_na[i], ot, type)) {
+         sub_f_na.add(f_na[i]);
+         sub_o_na.add(o_na[i]);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool check_fo_thresh(const double f, const SingleThresh &ft,
+                     const double o, const SingleThresh &ot,
+                     const SetLogic type) {
+   bool status = true;
+   bool fcheck = ft.check(f);
+   bool ocheck = ot.check(o);
+   
+   switch(type) {
+      case(SetLogic_Union):
+         if(!fcheck && !ocheck) status = false;
+         break;
+
+      case(SetLogic_Intersection):
+         if(!fcheck || !ocheck) status = false;
+         break;
+
+      case(SetLogic_SymDiff):
+         if(fcheck == ocheck) status = false;
+         break;
+
+      default:
+         mlog << Error << "\ncheck_fo_thresh() -> "
+              << "Unexpected SetLogic value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+   
+   return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1153,6 +1153,33 @@ void check_prob_thresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void check_mctc_thresh(const ThreshArray &ta) {
+   int i;
+
+   // Check that the threshold values are monotonically increasing
+   // and the threshold types are inequalities that remain the same
+   for(i=0; i<ta.n_elements()-1; i++) {
+
+      if(ta[i].get_value() >  ta[i+1].get_value() ||
+         ta[i].get_type()  != ta[i+1].get_type()  ||
+        (ta[i].get_type()  != thresh_lt           &&
+         ta[i].get_type()  != thresh_le           &&
+         ta[i].get_type()  != thresh_gt           &&
+         ta[i].get_type()  != thresh_ge)) {
+         mlog << Error << "\ncheck_mctc_thresh() -> "
+              << "when verifying using multi-category contingency "
+              << "tables, the thresholds must be monotonically "
+              << "increasing and be of the same inequality type "
+              << "(lt, le, gt, or ge).\n\n";
+         exit(1);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 const char * statlinetype_to_string(const STATLineType t) {
    const char *s = (const char *) 0;
 
@@ -1311,6 +1338,27 @@ ConcatString setlogic_to_string(SetLogic type) {
    }
 
    return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
+   SetLogic t;
+
+   // If not equal, select the non-default logic type
+        if(t1 == t2)            t = t1;
+   else if(t1 == SetLogic_None) t = t2;
+   else if(t2 == SetLogic_None) t = t1;
+   // If not equal and both non-default, error out
+   else {
+      mlog << Error << "\ncheck_setlogic() -> "
+           << "The forecast and observed logic must be consistent: "
+           << setlogic_to_string(t1) << " != " << setlogic_to_string(t2)
+           << "\n\n";
+      exit(1);
+   }
+
+   return(t);
 }
 
 ////////////////////////////////////////////////////////////////////////

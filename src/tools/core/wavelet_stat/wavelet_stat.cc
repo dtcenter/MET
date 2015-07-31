@@ -940,8 +940,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    n_isc = conf_info.fcst_ta[i_gc].n_elements();
    for(i=0; i<n_isc; i++) {
       isc_info[i].clear();
-      isc_info[i].cts_fcst_thresh = conf_info.fcst_ta[i_gc][i];
-      isc_info[i].cts_obs_thresh  = conf_info.obs_ta[i_gc][i];
+      isc_info[i].fthresh = conf_info.fcst_ta[i_gc][i];
+      isc_info[i].othresh = conf_info.obs_ta[i_gc][i];
       isc_info[i].allocate_n_scale(ns);
    }
 
@@ -968,8 +968,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    // Apply each threshold
    for(i=0; i<conf_info.fcst_ta[i_gc].n_elements(); i++) {
 
-      fcst_thresh_str = isc_info[i].cts_fcst_thresh.get_abbr_str();
-      obs_thresh_str  = isc_info[i].cts_obs_thresh.get_abbr_str();
+      fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
+      obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
 
       mlog << Debug(2) << "Computing Intensity-Scale decomposition for "
            << conf_info.fcst_info[i_gc]->magic_str() << " "
@@ -979,8 +979,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
       // Apply the threshold to each point to create 0/1 mask fields
       for(j=0; j<n; j++) {
-         f_dat[j] = isc_info[i].cts_fcst_thresh.check(f_na[j]);
-         o_dat[j] = isc_info[i].cts_obs_thresh.check(o_na[j]);
+         f_dat[j] = isc_info[i].fthresh.check(f_na[j]);
+         o_dat[j] = isc_info[i].othresh.check(o_na[j]);
          diff[j]  = f_dat[j] - o_dat[j];
       } // end for j
 
@@ -1001,8 +1001,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       // if(conf_info.ps_plot_flag) {   // ???
       if ( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
          write_nc_wav(conf_info.nc_info, f_dat, o_dat, n, i_gc, i_tile, -1,
-                      isc_info[i].cts_fcst_thresh,
-                      isc_info[i].cts_obs_thresh);
+                      isc_info[i].fthresh,
+                      isc_info[i].othresh);
       }
 
       // Write the thresholded binary difference field to PostScript
@@ -1081,8 +1081,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          if ( ! (conf_info.nc_info.all_false()) ) {
             write_nc_wav(conf_info.nc_info, 
                          f_scl, o_scl, n, i_gc, i_tile, j,
-                         isc_info[i].cts_fcst_thresh,
-                         isc_info[i].cts_obs_thresh);
+                         isc_info[i].fthresh,
+                         isc_info[i].othresh);
          }
 
          // Compute the difference field for this scale
@@ -1159,8 +1159,8 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_gc, int i_thresh,
    isc_aggr = isc_info[0][i_thresh];
    isc_aggr.zero_out();
 
-   fcst_thresh_str = isc_aggr.cts_fcst_thresh.get_abbr_str();
-   obs_thresh_str  = isc_aggr.cts_obs_thresh.get_abbr_str();
+   fcst_thresh_str = isc_aggr.fthresh.get_abbr_str();
+   obs_thresh_str  = isc_aggr.othresh.get_abbr_str();
 
    mlog << Debug(2) << "Aggregating ISC for "
         << conf_info.fcst_info[i_gc]->magic_str() << " " << fcst_thresh_str
@@ -2262,8 +2262,8 @@ void plot_ps_wvlt(const double *diff, int n, int i_gc, int i_tile,
    //
    ////////////////////////////////////////////////////////////////////////////
 
-   fcst_thresh_str = isc_info.cts_fcst_thresh.get_str();
-   obs_thresh_str  = isc_info.cts_obs_thresh.get_str();
+   fcst_thresh_str = isc_info.fthresh.get_str();
+   obs_thresh_str  = isc_info.othresh.get_str();
 
    label.format("%s %s vs %s %s",
                 conf_info.fcst_info[i_gc]->magic_str().text(),
