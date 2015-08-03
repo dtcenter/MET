@@ -657,6 +657,7 @@ ConcatString SingleThresh::get_str(int precision) const
 ConcatString t;
 
 if ( node )  t = node->s;
+else         t = na_str;
   
 return(t);
 
@@ -670,12 +671,17 @@ return(t);
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString SingleThresh::get_abbr_str(int precision) const {
-   ConcatString t;
+ConcatString SingleThresh::get_abbr_str(int precision) const
 
-   if ( node )  t = node->abbr_s;
+{
 
-   return(t);
+ConcatString t;
+
+if ( node )  t = node->abbr_s;
+else         t = na_str;
+
+return(t);
+
 }
 
 
@@ -711,12 +717,16 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool check_threshold(double v, double t, int t_ind) {
-   SingleThresh st;
+bool check_threshold(double v, double t, int t_ind)
 
-   st.set(t, (ThreshType) t_ind);
+{
 
-   return(st.check(v));
+SingleThresh st;
+
+st.set(t, (ThreshType) t_ind);
+
+return(st.check(v));
+
 }
 
 

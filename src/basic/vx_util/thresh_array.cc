@@ -317,6 +317,8 @@ ConcatString ThreshArray::get_str(const char *sep, int precision) const {
    ConcatString cur_str;
    ConcatString tmp_str;
 
+   if(Nelements == 0) tmp_str = na_str;
+
    for(i=0; i<Nelements; i++) {
       cur_str = t[i].get_str(precision);
 
@@ -333,6 +335,8 @@ ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
    int i;
    ConcatString cur_str;
    ConcatString tmp_str;
+
+   if(Nelements == 0) tmp_str = na_str;
 
    for(i=0; i<Nelements; i++) {
       cur_str = t[i].get_abbr_str(precision);
