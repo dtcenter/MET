@@ -1416,7 +1416,8 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
          // Add variable attributes for the difference field
          add_var_att(diff_var, "type", "Difference (F-O)");
          val.format("Forecast %s minus Observed %s",
-                 shc.get_fcst_var(), shc.get_obs_var());
+                 shc.get_fcst_var().text(),
+                 shc.get_obs_var().text());
          add_var_att(diff_var, "name", val);
          val.format("%s at %s and %s at %s",
                  conf_info.fcst_info[i_gc]->name().text(),
@@ -1425,7 +1426,8 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
                  conf_info.obs_info[i_gc]->level_name().text());
          add_var_att(diff_var, "long_name", val);
          val.format("%s and %s",
-                 shc.get_fcst_lev(), shc.get_obs_lev());
+                 shc.get_fcst_lev().text(),
+                 shc.get_obs_lev().text());
          add_var_att(diff_var, "level", val);
          val.format("%s and %s",
                  conf_info.fcst_info[i_gc]->units().text(),
@@ -1635,7 +1637,8 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
          // Add variable attributes for the difference field
          add_var_att(diff_var, "type", "Difference (F-O)");
          val.format("Forecast %s minus Observed %s",
-                 shc.get_fcst_var(), shc.get_obs_var());
+                 shc.get_fcst_var().text(),
+                 shc.get_obs_var().text());
          add_var_att(diff_var, "name", val);
          val.format("%s at %s and %s at %s",
                  conf_info.fcst_info[i_gc]->name().text(),
@@ -1644,7 +1647,8 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
                  conf_info.obs_info[i_gc]->level_name().text());
          add_var_att(diff_var, "long_name", val);
          val.format("%s and %s",
-                 shc.get_fcst_lev(), shc.get_obs_lev());
+                 shc.get_fcst_lev().text(),
+                 shc.get_obs_lev().text());
          add_var_att(diff_var, "level", val);
          val.format("%s and %s",
                  conf_info.fcst_info[i_gc]->units().text(),
