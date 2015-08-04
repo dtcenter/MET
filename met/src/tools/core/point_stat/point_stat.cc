@@ -120,8 +120,7 @@ static void do_cts  (CTSInfo   *&, int, PairDataPoint *);
 static void do_mcts (MCTSInfo   &, int, PairDataPoint *);
 static void do_cnt  (CNTInfo   *&, int, PairDataPoint *);
 static void do_sl1l2(SL1L2Info *&, int, PairDataPoint *);
-static void do_vl1l2(VL1L2Info *&, int, PairDataPoint *,
-                                   int, PairDataPoint *);
+static void do_vl1l2(VL1L2Info *&, int, PairDataPoint *, PairDataPoint *);
 static void do_pct  (PCTInfo   *&, int, PairDataPoint *);
 
 static void finish_txt_files();
@@ -1120,9 +1119,9 @@ void process_scores() {
                   for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
                   // Compute VL1L2 and VAL1L2
-                  do_vl1l2(vl1l2_info,
-                           i-1, &conf_info.vx_pd[i-1].pd[j][k][l],
-                           i,   &conf_info.vx_pd[i].pd[j][k][l]);
+                  do_vl1l2(vl1l2_info, i,
+                           &conf_info.vx_pd[i-1].pd[j][k][l],
+                           &conf_info.vx_pd[i].pd[j][k][l]);
 
                   // Loop through all of the wind speed thresholds
                   for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
@@ -1538,9 +1537,8 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_vl1l2(VL1L2Info *&v_info,
-              int i_ugrd, PairDataPoint *ugrd_pd_ptr,
-              int i_vgrd, PairDataPoint *vgrd_pd_ptr) {
+void do_vl1l2(VL1L2Info *&v_info, int i_vx,
+              PairDataPoint *ugrd_pd_ptr, PairDataPoint *vgrd_pd_ptr) {
    int i, j, n_wind;
    double uf, vf, uc, vc, uo, vo, fwind, owind;
 
@@ -1554,11 +1552,11 @@ void do_vl1l2(VL1L2Info *&v_info,
    }
 
    // Initialize all of the VL1L2Info objects
-   n_wind = conf_info.fwind_ta[i_vgrd].n_elements();
+   n_wind = conf_info.fwind_ta[i_vx].n_elements();
    for(i=0; i<n_wind; i++) {
       v_info[i].zero_out();
-      v_info[i].fthresh = conf_info.fwind_ta[i_vgrd][i];
-      v_info[i].othresh = conf_info.owind_ta[i_vgrd][i];
+      v_info[i].fthresh = conf_info.fwind_ta[i_vx][i];
+      v_info[i].othresh = conf_info.owind_ta[i_vx][i];
    }
 
    // Loop through the pair data and compute sums
@@ -1587,7 +1585,7 @@ void do_vl1l2(VL1L2Info *&v_info,
          // Apply wind speed thresholds
          if(!check_fo_thresh(fwind, v_info[j].fthresh,
                              owind, v_info[j].othresh,
-                             conf_info.wind_logic[i_vgrd])) continue;
+                             conf_info.wind_logic[i_vx])) continue;
 
          // Add this pair to the VL1L2 and VAL1L2 counts
 
