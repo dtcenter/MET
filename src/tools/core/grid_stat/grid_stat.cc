@@ -186,9 +186,9 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
+   cline.add(set_outdir,    "-outdir", 1);
+   cline.add(set_logfile,   "-log",    1);
+   cline.add(set_verbosity, "-v",      1);
 
    // Parse the command line
    cline.parse();

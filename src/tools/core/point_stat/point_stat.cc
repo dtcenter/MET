@@ -187,14 +187,14 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_climo_file, "-climo", 1);
-   cline.add(set_point_obs, "-point_obs", 1);
-   cline.add(set_ncfile, "-ncfile", 1);
+   cline.add(set_climo_file,         "-climo",         1);
+   cline.add(set_point_obs,          "-point_obs",     1);
+   cline.add(set_ncfile,             "-ncfile",        1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
-   cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
+   cline.add(set_outdir,             "-outdir",        1);
+   cline.add(set_logfile,            "-log",           1);
+   cline.add(set_verbosity,          "-v",             1);
 
    // Parse the command line
    cline.parse();
