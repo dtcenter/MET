@@ -176,26 +176,18 @@ void process_command_line(int argc, char **argv) {
 
    out_dir = ".";
 
-   //
-   // check for zero arguments
-   //
+   // Check for zero arguments
    if(argc == 1) usage();
 
    climo_file = "none";
 
-   //
-   // parse the command line into tokens
-   //
+   // Parse the command line into tokens
    cline.set(argc, argv);
 
-   //
-   // set the usage function
-   //
+   // Set the usage function
    cline.set_usage(usage);
 
-   //
-   // add the options function calls
-   //
+   // Add the options function calls
    cline.add(set_climo_file, "-climo", 1);
    cline.add(set_point_obs, "-point_obs", 1);
    cline.add(set_ncfile, "-ncfile", 1);
@@ -205,17 +197,11 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
 
-   //
-   // parse the command line
-   //
+   // Parse the command line
    cline.parse();
 
-   //
    // Check for error. There should be three arguments left:
-   //   - forecast filename
-   //   - observation filename
-   //   - config filename
-   //
+   // forecast, observation, and config filenames
    if(cline.n() != 3) usage();
 
    // Check that the end_ut >= beg_ut
