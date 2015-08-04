@@ -160,7 +160,7 @@ class PointStatConfInfo {
       int get_max_n_cnt_thresh()   const;
       int get_max_n_wind_thresh()  const;
       int get_max_n_fprob_thresh() const;
-      int get_max_n_oprob_thresh()  const;
+      int get_max_n_oprob_thresh() const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
