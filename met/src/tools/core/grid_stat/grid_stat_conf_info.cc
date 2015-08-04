@@ -328,7 +328,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    max_n_fprob_thresh = 0;
    max_n_oprob_thresh = 0;
 
-   // Parse and santiy check thresholds
+   // Parse and sanity check thresholds
    for(i=0; i<n_vx; i++) {
 
       // Get the current dictionaries
@@ -369,7 +369,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
               << "Forecast wind speed thresholds: "   << fwind_ta[i].get_str() << "\n"
               << "Observed wind speed thresholds: "   << owind_ta[i].get_str() << "\n"
               << "Wind speed threshold logic: "       << setlogic_to_string(wind_logic[i]) << "\n";
-         }
+      }
 
       // Verifying a probability field
       if(fcst_info[i]->p_flag() == 1) check_prob_thresh(fcat_ta[i]);
