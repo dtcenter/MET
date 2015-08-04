@@ -137,6 +137,6 @@ nc_pairs_flag   = {
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V5.0";
+version        = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////
