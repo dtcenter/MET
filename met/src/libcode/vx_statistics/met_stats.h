@@ -292,10 +292,12 @@ class NBRCTSInfo {
       // CTSInfo object
       CTSInfo cts_info;
 
-      // Fraction threshold applied
+      // Raw threshold applied to define the fractional coverage
       SingleThresh fthresh;
       SingleThresh othresh;
-      SingleThresh frac_thresh;
+
+      // Fractional coverage threshold
+      SingleThresh cthresh;
 
       void clear();
       void allocate_n_alpha(int);
@@ -327,7 +329,7 @@ class NBRCNTInfo {
       // CNTInfo object
       CNTInfo cnt_info;
 
-      // Raw threshold applied to define the fractions
+      // Raw threshold applied to define the fractional coverage
       SingleThresh fthresh;
       SingleThresh othresh;
 

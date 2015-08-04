@@ -1054,7 +1054,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    shc.set_obs_thresh(nbrcts_info.othresh);
 
    // Fractional coverage threshold
-   shc.set_cov_thresh(nbrcts_info.frac_thresh);
+   shc.set_cov_thresh(nbrcts_info.cthresh);
 
    // Not Applicable
    shc.set_alpha(bad_data_double);
@@ -1095,7 +1095,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    shc.set_obs_thresh(nbrcts_info.othresh);
 
    // Fractional coverage threshold
-   shc.set_cov_thresh(nbrcts_info.frac_thresh);
+   shc.set_cov_thresh(nbrcts_info.cthresh);
 
    // Write a line for each alpha value
    for(i=0; i<nbrcts_info.cts_info.n_alpha; i++) {

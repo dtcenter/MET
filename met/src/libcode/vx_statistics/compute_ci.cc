@@ -2253,7 +2253,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
       nbrcts_tmp[i].cts_info.othresh = nbrcts_info[i].cts_info.othresh;
       nbrcts_tmp[i].fthresh          = nbrcts_info[i].fthresh;
       nbrcts_tmp[i].othresh          = nbrcts_info[i].othresh;
-      nbrcts_tmp[i].frac_thresh      = nbrcts_info[i].frac_thresh;
+      nbrcts_tmp[i].cthresh          = nbrcts_info[i].cthresh;
    }
 
    //
@@ -2889,7 +2889,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
       nbrcts_tmp[i].cts_info.othresh = nbrcts_info[i].cts_info.othresh;
       nbrcts_tmp[i].fthresh          = nbrcts_info[i].fthresh;
       nbrcts_tmp[i].othresh          = nbrcts_info[i].othresh;
-      nbrcts_tmp[i].frac_thresh      = nbrcts_info[i].frac_thresh;
+      nbrcts_tmp[i].cthresh          = nbrcts_info[i].cthresh;
    }
 
    //
