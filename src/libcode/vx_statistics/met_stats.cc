@@ -1338,7 +1338,7 @@ void NBRCTSInfo::clear() {
 
    fthresh.clear();
    othresh.clear();
-   frac_thresh.clear();
+   cthresh.clear();
    cts_info.clear();
    nbr_wdth = bad_data_int;
 
@@ -1351,11 +1351,11 @@ void NBRCTSInfo::assign(const NBRCTSInfo &c) {
 
    clear();
 
-   fthresh     = c.fthresh;
-   othresh     = c.othresh;
-   frac_thresh = c.frac_thresh;
-   cts_info    = c.cts_info;
-   nbr_wdth    = c.nbr_wdth;
+   fthresh  = c.fthresh;
+   othresh  = c.othresh;
+   cthresh  = c.cthresh;
+   cts_info = c.cts_info;
+   nbr_wdth = c.nbr_wdth;
 
    return;
 }
