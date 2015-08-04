@@ -76,6 +76,7 @@
 //   030    11/12/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output files.
 //   031    02/19/15  Halley Gotway  Add automated regridding.
+//   032    08/04/15  Halley Gotway  Add conditional continuous verification.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -104,26 +105,27 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-static void process_scores      ();
+static void setup_first_pass    (const DataPlane &);
 
-static void setup_first_pass(const DataPlane &);
-static void setup_txt_files (unixtime, int);
-static void setup_table     (AsciiTable &);
-static void setup_nc_file   (const GridStatNcOutInfo &, unixtime, int);
+static void setup_txt_files(unixtime, int);
+static void setup_table    (AsciiTable &);
+static void setup_nc_file  (const GridStatNcOutInfo &, unixtime, int);
 
 static void build_outfile_name(unixtime, int, const char *,
                                ConcatString &);
+
+static void process_scores();
 
 static void do_cts   (CTSInfo *&, int,
                       const NumArray &, const NumArray &);
 static void do_mcts  (MCTSInfo &, int,
                       const NumArray &, const NumArray &);
-static void do_cnt   (CNTInfo &, int,
+static void do_cnt   (CNTInfo *&, int,
                       const NumArray &, const NumArray &);
 static void do_vl1l2 (VL1L2Info *&, int,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
-static void do_pct   (PCTInfo   *&, int,
+static void do_pct   (PCTInfo *&, int,
                       const NumArray &, const NumArray &);
 static void do_nbrcts(NBRCTSInfo *&, int, int, int,
                       const NumArray &, const NumArray &);
@@ -131,7 +133,8 @@ static void do_nbrcnt(NBRCNTInfo &, int, int, int,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
 
-static void write_nc(const GridStatNcOutInfo &, const DataPlane &, const DataPlane &, int, InterpMthd, int);
+static void write_nc(const GridStatNcOutInfo &, const DataPlane &,
+                     const DataPlane &, int, InterpMthd, int);
 
 static void add_var_att(NcVar *, const char *, const char *);
 
@@ -259,612 +262,12 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
-   int i, j, k, m, n;
-   bool status;
-   int max_scal_t, max_prob_t, wind_t, frac_t;
-
-   DataPlane fcst_dp,        obs_dp;
-   DataPlane fcst_dp_smooth, obs_dp_smooth;
-   DataPlane fcst_dp_thresh, obs_dp_thresh;
-
-   NumArray f_na, o_na, f_thr_na, o_thr_na;
-
-   // Objects to handle vector winds
-   DataPlane fcst_u_wind_dp,        obs_u_wind_dp;
-   DataPlane fcst_u_wind_dp_smooth, obs_u_wind_dp_smooth;
-   NumArray f_u_wind_na, o_u_wind_na;
-
-   CNTInfo     cnt_info;
-   CTSInfo    *cts_info = (CTSInfo    *) 0;
-   MCTSInfo    mcts_info;
-   VL1L2Info  *vl1l2_info = (VL1L2Info  *) 0;
-   NBRCNTInfo  nbrcnt_info;
-   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
-   PCTInfo    *pct_info = (PCTInfo    *) 0;
-
-   // Allocate enough space for the CTSInfo objects
-   max_scal_t  = conf_info.get_max_n_scal_thresh();
-   cts_info    = new CTSInfo [max_scal_t];
-
-   // Allocate enough space for the VL1L2Info objects
-   wind_t      = conf_info.get_n_wind_thresh();
-   vl1l2_info  = new VL1L2Info [wind_t];
-
-   // Allocate enough space for the NBRCTS objects
-   frac_t      = conf_info.nbrhd_cov_ta.n_elements();
-   nbrcts_info = new NBRCTSInfo [frac_t];
-
-   // Allocate enough space for the PCTInfo objects
-   max_prob_t  = conf_info.get_max_n_prob_obs_thresh();
-   pct_info    = new PCTInfo [max_prob_t];
-
-   // Loop through each of the fields to be verified
-   for(i=0; i<conf_info.get_n_vx(); i++) {
-
-      // Read the gridded data from the input forecast file
-      status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
-
-      if(!status) {
-         mlog << Warning << "\nprocess_scores() -> "
-              << conf_info.fcst_info[i]->magic_str()
-              << " not found in file: " << fcst_file
-              << "\n\n";
-         continue;
-      }
-      
-      // Regrid, if necessary
-      if(!(fcst_mtddf->grid() == grid)) {
-         mlog << Debug(1)
-              << "Regridding forecast " << conf_info.fcst_info[i]->magic_str()
-              << " to the verification grid.\n";
-         fcst_dp = met_regrid(fcst_dp, fcst_mtddf->grid(), grid,
-                              conf_info.regrid_info);
-      }
-
-      // For probability fields, check to see if they need to be
-      // rescaled from [0, 100] to [0, 1]
-      if(conf_info.fcst_info[i]->p_flag()) rescale_probability(fcst_dp);
-
-      // Set the forecast lead time
-      shc.set_fcst_lead_sec(fcst_dp.lead());
-
-      // Set the forecast valid time
-      shc.set_fcst_valid_beg(fcst_dp.valid());
-      shc.set_fcst_valid_end(fcst_dp.valid());
-
-      // Read the gridded data from the input observation file
-      status = obs_mtddf->data_plane(*conf_info.obs_info[i], obs_dp);
-
-      if(!status) {
-         mlog << Warning << "\nprocess_scores() -> "
-              << conf_info.obs_info[i]->magic_str()
-              << " not found in file: " << obs_file
-              << "\n\n";
-         continue;
-      }
-
-      // Regrid, if necessary
-      if(!(obs_mtddf->grid() == grid)) {
-         mlog << Debug(1)
-              << "Regridding observation " << conf_info.obs_info[i]->magic_str()
-              << " to the verification grid.\n";
-         obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
-                             conf_info.regrid_info);
-      }
-
-      // Set the observation lead time
-      shc.set_obs_lead_sec(obs_dp.lead());
-
-      // Set the observation valid time
-      shc.set_obs_valid_beg(obs_dp.valid());
-      shc.set_obs_valid_end(obs_dp.valid());
-
-      // Check that the valid times match
-      if(fcst_dp.valid() != obs_dp.valid()) {
-
-         mlog << Warning << "\nprocess_scores() -> "
-              << "Forecast and observation valid times do not match "
-              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
-              << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
-              << conf_info.fcst_info[i]->magic_str() << " versus "
-              << conf_info.obs_info[i]->magic_str() << ".\n\n";
-      }
-
-      // Check that the accumulation intervals match
-      if(conf_info.fcst_info[i]->level().type() == LevelType_Accum &&
-         conf_info.obs_info[i]->level().type()  == LevelType_Accum &&
-         fcst_dp.accum() != obs_dp.accum()) {
-
-         mlog << Warning << "\nprocess_scores() -> "
-              << "Forecast and observation accumulation times "
-              << "do not match " << sec_to_hhmmss(fcst_dp.accum())
-              << " != " << sec_to_hhmmss(obs_dp.accum())
-              << " for " << conf_info.fcst_info[i]->magic_str() << " versus "
-              << conf_info.obs_info[i]->magic_str() << ".\n\n";
-      }
-
-      // Setup the first pass through the data
-      if(is_first_pass) setup_first_pass(fcst_dp);
-
-      // Store the forecast variable name
-      shc.set_fcst_var(conf_info.fcst_info[i]->name());
-
-      // Set the forecast level name
-      shc.set_fcst_lev(conf_info.fcst_info[i]->level_name());
-
-      // Store the observation variable name
-      shc.set_obs_var(conf_info.obs_info[i]->name());
-
-      // Set the observation level name
-      shc.set_obs_lev(conf_info.obs_info[i]->level_name());
-
-      mlog << Debug(2) << "\n" << sep_str << "\n\n";
-
-      // If verifying vector winds, store the U-wind fields
-      if(conf_info.fcst_info[i]->is_u_wind() &&
-         conf_info.obs_info[i]->is_u_wind() &&
-         conf_info.fcst_info[i]->v_flag() &&
-         conf_info.obs_info[i]->v_flag()) {
-
-         fcst_u_wind_dp = fcst_dp;
-         obs_u_wind_dp  = obs_dp;
-      }
-
-      // Loop through and apply each of the smoothing operations
-      for(j=0; j<conf_info.get_n_interp(); j++) {
-
-         // Store the interpolation method and width being applied
-         shc.set_interp_mthd(conf_info.interp_mthd[j]);
-         shc.set_interp_wdth(conf_info.interp_wdth[j]);
-
-         // If requested in the config file, smooth the forecast field
-         if(conf_info.interp_field == FieldType_Fcst ||
-            conf_info.interp_field == FieldType_Both) {
-            smooth_field(fcst_dp, fcst_dp_smooth,
-                         conf_info.interp_mthd[j],
-                         conf_info.interp_wdth[j],
-                         conf_info.interp_thresh);
-         }
-         // Do not smooth the forecast field
-         else {
-            fcst_dp_smooth = fcst_dp;
-         }
-
-         // If requested in the config file, smooth the observation field
-         if(conf_info.interp_field == FieldType_Obs ||
-            conf_info.interp_field == FieldType_Both) {
-            smooth_field(obs_dp, obs_dp_smooth,
-                         conf_info.interp_mthd[j],
-                         conf_info.interp_wdth[j],
-                         conf_info.interp_thresh);
-         }
-         // Do not smooth the observation field
-         else {
-            obs_dp_smooth = obs_dp;
-         }
-
-         // Loop through the masks to be applied
-         for(k=0; k<conf_info.get_n_mask(); k++) {
-
-            // Apply the current mask to the fields
-            apply_mask(fcst_dp_smooth, obs_dp_smooth,
-                       conf_info.mask_dp[k],
-                       f_na, o_na);
-
-            // Set the mask name
-            shc.set_mask(conf_info.mask_name[k]);
-
-            mlog << Debug(2) << "Processing "
-                 << conf_info.fcst_info[i]->magic_str()
-                 << " versus "
-                 << conf_info.obs_info[i]->magic_str()
-                 << ", for interpolation method "
-                 << shc.get_interp_mthd() << "("
-                 << shc.get_interp_pnts_str()
-                 << "), over region " << shc.get_mask()
-                 << ", using " << f_na.n_elements() << " pairs.\n";
-
-            // Continue if no pairs were found
-            if(f_na.n_elements() == 0) continue;
-
-            // Compute CTS scores
-            if(!conf_info.fcst_info[i]->p_flag()      &&
-                conf_info.fcst_ta[i].n_elements() > 0 &&
-               (conf_info.output_flag[i_fho] != STATOutputType_None ||
-                conf_info.output_flag[i_ctc] != STATOutputType_None ||
-                conf_info.output_flag[i_cts] != STATOutputType_None)) {
-
-               // Initialize
-               for(m=0; m<max_scal_t; m++) cts_info[m].clear();
-
-               // Compute CTS
-               do_cts(cts_info, i, f_na, o_na);
-
-               // Loop through all of the thresholds
-               for(m=0; m<conf_info.fcst_ta[i].n_elements(); m++) {
-
-                  // Write out FHO
-                  if(conf_info.output_flag[i_fho] != STATOutputType_None &&
-                     cts_info[m].cts.n() > 0) {
-
-                     write_fho_row(shc, cts_info[m],
-                        conf_info.output_flag[i_fho] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_fho], i_txt_row[i_fho]);
-                  }
-
-                  // Write out CTC
-                  if(conf_info.output_flag[i_ctc] != STATOutputType_None &&
-                     cts_info[m].cts.n() > 0) {
-
-                     write_ctc_row(shc, cts_info[m],
-                        conf_info.output_flag[i_ctc] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_ctc], i_txt_row[i_ctc]);
-                  }
-
-                  // Write out CTS
-                  if(conf_info.output_flag[i_cts] != STATOutputType_None &&
-                     cts_info[m].cts.n() > 0) {
-
-                     write_cts_row(shc, cts_info[m],
-                        conf_info.output_flag[i_cts] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_cts], i_txt_row[i_cts]);
-                  }
-               } // end for m
-            } // end Compute CTS
-
-            // Compute MCTS scores
-            if(!conf_info.fcst_info[i]->p_flag()      &&
-                conf_info.fcst_ta[i].n_elements() > 1 &&
-               (conf_info.output_flag[i_mctc] != STATOutputType_None ||
-                conf_info.output_flag[i_mcts] != STATOutputType_None)) {
-
-               // Initialize
-               mcts_info.clear();
-
-               // Compute MCTS
-               do_mcts(mcts_info, i, f_na, o_na);
-
-               // Write out MCTC
-               if(conf_info.output_flag[i_mctc] != STATOutputType_None &&
-                  mcts_info.cts.total() > 0) {
-
-                  write_mctc_row(shc, mcts_info,
-                     conf_info.output_flag[i_mctc] == STATOutputType_Both,
-                     stat_at, i_stat_row,
-                     txt_at[i_mctc], i_txt_row[i_mctc]);
-               }
-
-               // Write out MCTS
-               if(conf_info.output_flag[i_mcts] != STATOutputType_None &&
-                  mcts_info.cts.total() > 0) {
-
-                  write_mcts_row(shc, mcts_info,
-                     conf_info.output_flag[i_mcts] == STATOutputType_Both,
-                     stat_at, i_stat_row,
-                     txt_at[i_mcts], i_txt_row[i_mcts]);
-               }
-            } // end Compute MCTS
-
-            // Compute CNT scores
-            if(!conf_info.fcst_info[i]->p_flag() &&
-               (conf_info.output_flag[i_cnt] != STATOutputType_None ||
-                conf_info.output_flag[i_sl1l2] != STATOutputType_None)) {
-
-               // Initialize
-               cnt_info.clear();
-
-               // Compute CNT
-               do_cnt(cnt_info, i, f_na, o_na);
-
-               // Write out CNT
-               if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
-                  cnt_info.n > 0) {
-
-                  write_cnt_row(shc, cnt_info,
-                     conf_info.output_flag[i_cnt] == STATOutputType_Both,
-                     stat_at, i_stat_row,
-                     txt_at[i_cnt], i_txt_row[i_cnt]);
-               }
-
-               // Write out SL1L2 as long as the vflag is not set
-               if(!conf_info.fcst_info[i]->v_flag() &&
-                  conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
-                  cnt_info.n > 0) {
-
-                  write_sl1l2_row(shc, cnt_info,
-                     conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
-                     stat_at, i_stat_row,
-                     txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
-               }
-
-            } // end Compute CNT
-
-            // Compute VL1L2 partial sums for UGRD,VGRD
-            if(!conf_info.fcst_info[i]->p_flag() &&
-                conf_info.fcst_info[i]->v_flag() &&
-               conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
-               i > 0 &&
-               conf_info.fcst_info[i]->is_v_wind() &&
-               conf_info.fcst_info[i-1]->is_u_wind()) {
-
-               // Store the forecast variable name
-               shc.set_fcst_var(ugrd_vgrd_abbr_str);
-
-               // Store the observation variable name
-               shc.set_obs_var(ugrd_vgrd_abbr_str);
-
-               // Initialize
-               for(m=0; m<wind_t; m++) vl1l2_info[m].clear();
-
-               // Apply current smoothing method to the UGRD fields
-               smooth_field(fcst_u_wind_dp, fcst_u_wind_dp_smooth,
-                            conf_info.interp_mthd[j],
-                            conf_info.interp_wdth[j],
-                            conf_info.interp_thresh);
-
-                smooth_field(obs_u_wind_dp, obs_u_wind_dp_smooth,
-                             conf_info.interp_mthd[j],
-                             conf_info.interp_wdth[j],
-                             conf_info.interp_thresh);
-
-               // Apply the current mask to the UGRD fields
-               apply_mask(fcst_u_wind_dp_smooth, obs_u_wind_dp_smooth,
-                          conf_info.mask_dp[k],
-                          f_u_wind_na, o_u_wind_na);
-
-               // Compute VL1L2
-               do_vl1l2(vl1l2_info, i,
-                        f_na, o_na, f_u_wind_na, o_u_wind_na);
-
-               // Loop through all of the wind speed thresholds
-               for(m=0; m<conf_info.fcst_wind_ta.n_elements(); m++) {
-
-                  // Write out VL1L2
-                  if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
-                     vl1l2_info[m].vcount > 0) {
-
-                     write_vl1l2_row(shc, vl1l2_info[m],
-                        conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
-                  }
-               } // end for m
-
-               // Reset the forecast variable name
-               shc.set_fcst_var(conf_info.fcst_info[i]->name());
-
-               // Reset the observation variable name
-               shc.set_obs_var(conf_info.obs_info[i]->name());
-
-            } // end Compute VL1L2
-
-            // Compute PCT counts and scores
-            if(conf_info.fcst_info[i]->p_flag() &&
-               (conf_info.output_flag[i_pct] != STATOutputType_None  ||
-                conf_info.output_flag[i_pstd] != STATOutputType_None ||
-                conf_info.output_flag[i_pjc] != STATOutputType_None  ||
-                conf_info.output_flag[i_prc] != STATOutputType_None)) {
-
-               // Initialize
-               for(m=0; m<max_prob_t; m++) pct_info[m].clear();
-
-               // Compute PCT
-               do_pct(pct_info, i, f_na, o_na);
-
-               // Loop through all of the thresholds
-               for(m=0; m<max_prob_t; m++) {
-
-                  // Write out PCT
-                  if(conf_info.output_flag[i_pct] != STATOutputType_None &&
-                     pct_info[m].pct.n() > 0) {
-
-                     write_pct_row(shc, pct_info[m],
-                        conf_info.output_flag[i_pct] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_pct], i_txt_row[i_pct]);
-                  }
-
-                  // Write out PSTD
-                  if(conf_info.output_flag[i_pstd] != STATOutputType_None &&
-                     pct_info[m].pct.n() > 0) {
-
-                     write_pstd_row(shc, pct_info[m],
-                        conf_info.output_flag[i_pstd] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_pstd], i_txt_row[i_pstd]);
-                  }
-
-                  // Write out PJC
-                  if(conf_info.output_flag[i_pjc] != STATOutputType_None &&
-                     pct_info[m].pct.n() > 0) {
-
-                     write_pjc_row(shc, pct_info[m],
-                        conf_info.output_flag[i_pjc] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_pjc], i_txt_row[i_pjc]);
-                  }
-
-                  // Write out PRC
-                  if(conf_info.output_flag[i_prc] != STATOutputType_None &&
-                     pct_info[m].pct.n() > 0) {
-
-                     write_prc_row(shc, pct_info[m],
-                        conf_info.output_flag[i_prc] == STATOutputType_Both,
-                        stat_at, i_stat_row,
-                        txt_at[i_prc], i_txt_row[i_prc]);
-                  }
-               }
-            } // end Compute PCT
-
-         } // end for k
-
-         // Write out the smoothed forecast, observation, and difference
-         // fields in netCDF format for each GRIB code if requested in
-         // the config file
-         // if(conf_info.nc_pairs_flag)
-         if( ! (conf_info.nc_info.all_false()) )
-            write_nc(conf_info.nc_info, 
-                     fcst_dp_smooth, obs_dp_smooth, i,
-                     conf_info.interp_mthd[j],
-                     conf_info.interp_wdth[j]);
-
-      } // end for j
-
-      // Loop through and apply the Neighborhood methods for each of the
-      // neighborhood widths if requested in the config file
-      if(!conf_info.fcst_info[i]->p_flag() &&
-         (conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
-          conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
-          conf_info.output_flag[i_nbrcnt] != STATOutputType_None)) {
-
-         // Initialize
-         for(j=0; j<frac_t; j++) nbrcts_info[j].clear();
-
-         // Loop through and apply each of the neighborhood widths
-         for(j=0; j<conf_info.get_n_nbrhd_wdth(); j++) {
-
-            // Store the interpolation method and width being applied
-            shc.set_interp_mthd(InterpMthd_Nbrhd);
-            shc.set_interp_wdth(conf_info.nbrhd_wdth[j]);
-
-            // Loop through and apply each of the raw threshold values
-            for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
-
-               // Compute the binary thresholded fields
-               fcst_dp_thresh = fcst_dp;
-               fcst_dp_thresh.threshold(conf_info.fcst_ta[i][k]);
-
-               obs_dp_thresh = obs_dp;
-               obs_dp_thresh.threshold(conf_info.obs_ta[i][k]);
-
-               // Compute the thresholded fractional coverage field
-               fractional_coverage(fcst_dp, fcst_dp_smooth,
-                                   conf_info.nbrhd_wdth[j],
-                                   conf_info.fcst_ta[i][k],
-                                   conf_info.nbrhd_thresh);
-
-               fractional_coverage(obs_dp, obs_dp_smooth,
-                                   conf_info.nbrhd_wdth[j],
-                                   conf_info.obs_ta[i][k],
-                                   conf_info.nbrhd_thresh);
-
-               // Loop through the masks to be applied
-               for(m=0; m<conf_info.get_n_mask(); m++) {
-
-                  // Apply the current mask to the fractional coverage
-                  // and thresholded fields
-                  apply_mask(fcst_dp_smooth, obs_dp_smooth,
-                             fcst_dp_thresh, obs_dp_thresh,
-                             conf_info.mask_dp[m],
-                             f_na, o_na, f_thr_na, o_thr_na);
-
-                  mlog << Debug(2) << "Processing "
-                       << conf_info.fcst_info[i]->magic_str()
-                       << " versus "
-                       << conf_info.obs_info[i]->magic_str()
-                       << ", for interpolation method "
-                       << shc.get_interp_mthd() << "("
-                       << shc.get_interp_pnts_str()
-                       << "), raw thresholds of "
-                       << conf_info.fcst_ta[i][k].get_str()
-                       << " and "
-                       << conf_info.obs_ta[i][k].get_str()
-                       << ", over region " << shc.get_mask()
-                       << ", using " << f_na.n_elements()
-                       << " pairs.\n";
-
-                  // Continue if no pairs were found
-                  if(f_na.n_elements() == 0) continue;
-
-                  // Set the mask name
-                  shc.set_mask(conf_info.mask_name[m]);
-
-                  // Compute NBRCTS scores
-                  if(conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
-                     conf_info.output_flag[i_nbrcts] != STATOutputType_None) {
-
-                     // Initialize
-                     for(n=0; n<conf_info.nbrhd_cov_ta.n_elements(); n++) {
-                        nbrcts_info[n].clear();
-                     }
-
-                     do_nbrcts(nbrcts_info, i, j, k, f_na, o_na);
-
-                     // Loop through all of the thresholds
-                     for(n=0; n<conf_info.nbrhd_cov_ta.n_elements(); n++) {
-
-                        // Only write out if n > 0
-                        if(nbrcts_info[n].cts_info.cts.n() > 0) {
-
-                           // Write out NBRCTC
-                           if(conf_info.output_flag[i_nbrctc] != STATOutputType_None) {
-
-                              write_nbrctc_row(shc, nbrcts_info[n],
-                                 conf_info.output_flag[i_nbrctc] == STATOutputType_Both,
-                                 stat_at, i_stat_row,
-                                 txt_at[i_nbrctc], i_txt_row[i_nbrctc]);
-                           }
-
-                           // Write out NBRCTS
-                           if(conf_info.output_flag[i_nbrcts] != STATOutputType_None) {
-
-                              write_nbrcts_row(shc, nbrcts_info[n],
-                                 conf_info.output_flag[i_nbrcts] == STATOutputType_Both,
-                                 stat_at, i_stat_row,
-                                 txt_at[i_nbrcts], i_txt_row[i_nbrcts]);
-                           }
-                        } // end if
-                     } // end for n
-                  } // end compute NBRCTS
-
-                  // Compute NBRCNT scores
-                  if(conf_info.output_flag[i_nbrcnt] != STATOutputType_None) {
-
-                     // Initialize
-                     nbrcnt_info.clear();
-
-                     do_nbrcnt(nbrcnt_info, i, j, k, f_na, o_na,
-                               f_thr_na, o_thr_na);
-
-                     // Write out NBRCNT
-                     if(nbrcnt_info.cnt_info.n > 0 &&
-                        conf_info.output_flag[i_nbrcnt]) {
-
-                        write_nbrcnt_row(shc, nbrcnt_info,
-                           conf_info.output_flag[i_nbrcnt] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_nbrcnt], i_txt_row[i_nbrcnt]);
-                     }
-                  } // end compute NBRCNT
-               } // end for m
-            } // end for k
-         } // end for j
-      } // end if
-   } // end for i
-
-   mlog << Debug(2) << "\n" << sep_str << "\n\n";
-
-   // Deallocate memory
-   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    0; }
-   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  0; }
-   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) 0; }
-   if(pct_info)    { delete [] pct_info;    pct_info    = (PCTInfo *)    0; }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void setup_first_pass(const DataPlane &dp) {
 
    // Unset the flag
    is_first_pass = false;
   
-   // Process masks Grids and Polylines in the config file
+   // Process masks grids and polylines in the config file
    conf_info.process_masks(grid);
 
    // Create output text files as requested in the config file
@@ -872,7 +275,9 @@ void setup_first_pass(const DataPlane &dp) {
 
    // If requested, create a NetCDF file to store the matched pairs and
    // difference fields for each GRIB code and masking region
-   if ( ! (conf_info.nc_info.all_false()) ) setup_nc_file(conf_info.nc_info, dp.valid(), dp.lead());
+   if(!(conf_info.nc_info.all_false())) {
+      setup_nc_file(conf_info.nc_info, dp.valid(), dp.lead());
+   }
 
    return;
 }
@@ -893,8 +298,8 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = conf_info.get_max_n_prob_fcst_thresh();
-   n_cat  = conf_info.get_max_n_scal_thresh() + 1;
+   n_prob = conf_info.get_max_n_fprob_thresh();
+   n_cat  = conf_info.get_max_n_cat_thresh() + 1;
 
    max_prob_col = get_n_pjc_columns(n_prob);
    max_mctc_col = get_n_mctc_columns(n_cat);
@@ -907,7 +312,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out   = (ofstream *) 0;
+   stat_out = (ofstream *) 0;
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -1040,9 +445,8 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const GridStatNcOutInfo & nc_info, unixtime valid_ut, int lead_sec)
-
-{
+void setup_nc_file(const GridStatNcOutInfo & nc_info,
+                   unixtime valid_ut, int lead_sec) {
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
@@ -1059,7 +463,9 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info, unixtime valid_ut, int lea
 
    // Add global attributes
    write_netcdf_global(nc_out, out_nc_file, program_name, conf_info.model, conf_info.obtype);
-   if ( nc_info.do_diff )  nc_out->add_att("Difference", "Forecast Value - Observation Value");
+   if(nc_info.do_diff) {
+      nc_out->add_att("Difference", "Forecast Value - Observation Value");
+   }
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
@@ -1069,7 +475,9 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info, unixtime valid_ut, int lea
    lon_dim = nc_out->add_dim("lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   if ( nc_info.do_latlon)  write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+   if(nc_info.do_latlon) {
+      write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+   }
 
    return;
 }
@@ -1108,6 +516,607 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_scores() {
+   int i, j, k, m, n;
+   bool status;
+   int n_cat, n_cnt, n_wind, n_prob, n_cov;
+
+   DataPlane fcst_dp,        obs_dp;
+   DataPlane fcst_dp_smooth, obs_dp_smooth;
+   DataPlane fcst_dp_thresh, obs_dp_thresh;
+
+   NumArray f_na, o_na, fthr_na, othr_na;
+
+   // Objects to handle vector winds
+   DataPlane fuwind_dp,        ouwind_dp;
+   DataPlane fuwind_dp_smooth, ouwind_dp_smooth;
+   NumArray fuwind_na, ouwind_na;
+
+   CTSInfo    *cts_info = (CTSInfo *) 0;
+   MCTSInfo    mcts_info;
+   CNTInfo    *cnt_info = (CNTInfo *) 0;
+   VL1L2Info  *vl1l2_info = (VL1L2Info *) 0;
+   NBRCNTInfo  nbrcnt_info;
+   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
+   PCTInfo    *pct_info = (PCTInfo *) 0;
+
+   // Store the maximum number of each threshold type
+   n_cnt  = conf_info.get_max_n_cnt_thresh();
+   n_cat  = conf_info.get_max_n_cat_thresh();
+   n_wind = conf_info.get_max_n_wind_thresh();
+   n_prob = conf_info.get_max_n_oprob_thresh();
+   n_cov  = conf_info.get_n_cov_thresh();
+
+   // Allocate space for output statistics types
+   cts_info    = new CTSInfo    [n_cat];
+   cnt_info    = new CNTInfo    [n_cnt];
+   vl1l2_info  = new VL1L2Info  [n_wind];
+   nbrcts_info = new NBRCTSInfo [n_cov];
+   pct_info    = new PCTInfo    [n_prob];
+
+   // Compute scores for each verification task and write output_flag
+   for(i=0; i<conf_info.get_n_vx(); i++) {
+
+      // Read the gridded data from the input forecast file
+      status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
+
+      if(!status) {
+         mlog << Warning << "\nprocess_scores() -> "
+              << conf_info.fcst_info[i]->magic_str()
+              << " not found in file: " << fcst_file
+              << "\n\n";
+         continue;
+      }
+      
+      // Regrid, if necessary
+      if(!(fcst_mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding forecast "
+              << conf_info.fcst_info[i]->magic_str()
+              << " to the verification grid.\n";
+         fcst_dp = met_regrid(fcst_dp, fcst_mtddf->grid(), grid,
+                              conf_info.regrid_info);
+      }
+
+      // For probability fields, check to see if they need to be
+      // rescaled from [0, 100] to [0, 1]
+      if(conf_info.fcst_info[i]->p_flag()) rescale_probability(fcst_dp);
+
+      // Set the forecast lead time
+      shc.set_fcst_lead_sec(fcst_dp.lead());
+
+      // Set the forecast valid time
+      shc.set_fcst_valid_beg(fcst_dp.valid());
+      shc.set_fcst_valid_end(fcst_dp.valid());
+
+      // Read the gridded data from the input observation file
+      status = obs_mtddf->data_plane(*conf_info.obs_info[i], obs_dp);
+
+      if(!status) {
+         mlog << Warning << "\nprocess_scores() -> "
+              << conf_info.obs_info[i]->magic_str()
+              << " not found in file: " << obs_file
+              << "\n\n";
+         continue;
+      }
+
+      // Regrid, if necessary
+      if(!(obs_mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding observation "
+              << conf_info.obs_info[i]->magic_str()
+              << " to the verification grid.\n";
+         obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
+                             conf_info.regrid_info);
+      }
+
+      // Set the observation lead time
+      shc.set_obs_lead_sec(obs_dp.lead());
+
+      // Set the observation valid time
+      shc.set_obs_valid_beg(obs_dp.valid());
+      shc.set_obs_valid_end(obs_dp.valid());
+
+      // Check that the valid times match
+      if(fcst_dp.valid() != obs_dp.valid()) {
+
+         mlog << Warning << "\nprocess_scores() -> "
+              << "Forecast and observation valid times do not match "
+              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
+              << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
+              << conf_info.fcst_info[i]->magic_str() << " versus "
+              << conf_info.obs_info[i]->magic_str() << ".\n\n";
+      }
+
+      // Check that the accumulation intervals match
+      if(conf_info.fcst_info[i]->level().type() == LevelType_Accum &&
+         conf_info.obs_info[i]->level().type()  == LevelType_Accum &&
+         fcst_dp.accum() != obs_dp.accum()) {
+
+         mlog << Warning << "\nprocess_scores() -> "
+              << "Forecast and observation accumulation times "
+              << "do not match " << sec_to_hhmmss(fcst_dp.accum())
+              << " != " << sec_to_hhmmss(obs_dp.accum())
+              << " for " << conf_info.fcst_info[i]->magic_str() << " versus "
+              << conf_info.obs_info[i]->magic_str() << ".\n\n";
+      }
+
+      // Setup the first pass through the data
+      if(is_first_pass) setup_first_pass(fcst_dp);
+
+      // Store the forecast variable name
+      shc.set_fcst_var(conf_info.fcst_info[i]->name());
+
+      // Set the forecast level name
+      shc.set_fcst_lev(conf_info.fcst_info[i]->level_name());
+
+      // Store the observation variable name
+      shc.set_obs_var(conf_info.obs_info[i]->name());
+
+      // Set the observation level name
+      shc.set_obs_lev(conf_info.obs_info[i]->level_name());
+
+      mlog << Debug(2) << "\n" << sep_str << "\n\n";
+
+      // If verifying vector winds, store the U-wind fields
+      if(conf_info.fcst_info[i]->is_u_wind() &&
+         conf_info.obs_info[i]->is_u_wind() &&
+         conf_info.fcst_info[i]->v_flag() &&
+         conf_info.obs_info[i]->v_flag()) {
+
+         fuwind_dp = fcst_dp;
+         ouwind_dp = obs_dp;
+      }
+
+      // Loop through and apply each of the smoothing operations
+      for(j=0; j<conf_info.get_n_interp(); j++) {
+
+         // Store the interpolation method and width being applied
+         shc.set_interp_mthd(conf_info.interp_mthd[j]);
+         shc.set_interp_wdth(conf_info.interp_wdth[j]);
+
+         // If requested in the config file, smooth the forecast field
+         if(conf_info.interp_field == FieldType_Fcst ||
+            conf_info.interp_field == FieldType_Both) {
+            smooth_field(fcst_dp, fcst_dp_smooth,
+                         conf_info.interp_mthd[j],
+                         conf_info.interp_wdth[j],
+                         conf_info.interp_thresh);
+         }
+         // Do not smooth the forecast field
+         else {
+            fcst_dp_smooth = fcst_dp;
+         }
+
+         // If requested in the config file, smooth the observation field
+         if(conf_info.interp_field == FieldType_Obs ||
+            conf_info.interp_field == FieldType_Both) {
+            smooth_field(obs_dp, obs_dp_smooth,
+                         conf_info.interp_mthd[j],
+                         conf_info.interp_wdth[j],
+                         conf_info.interp_thresh);
+         }
+         // Do not smooth the observation field
+         else {
+            obs_dp_smooth = obs_dp;
+         }
+
+         // Loop through the masks to be applied
+         for(k=0; k<conf_info.get_n_mask(); k++) {
+
+            // Apply the current mask to the fields
+            apply_mask(fcst_dp_smooth, obs_dp_smooth,
+                       conf_info.mask_dp[k],
+                       f_na, o_na);
+
+            // Set the mask name
+            shc.set_mask(conf_info.mask_name[k]);
+
+            mlog << Debug(2)
+                 << "Processing " << conf_info.fcst_info[i]->magic_str()
+                 << " versus " << conf_info.obs_info[i]->magic_str()
+                 << ", for interpolation method "
+                 << shc.get_interp_mthd() << "("
+                 << shc.get_interp_pnts_str()
+                 << "), over region " << shc.get_mask()
+                 << ", using " << f_na.n_elements() << " pairs.\n";
+
+            // Continue if no pairs were found
+            if(f_na.n_elements() == 0) continue;
+
+            // Compute CTS scores
+            if(!conf_info.fcst_info[i]->p_flag()      &&
+                conf_info.fcat_ta[i].n_elements() > 0 &&
+               (conf_info.output_flag[i_fho] != STATOutputType_None ||
+                conf_info.output_flag[i_ctc] != STATOutputType_None ||
+                conf_info.output_flag[i_cts] != STATOutputType_None)) {
+
+               // Initialize
+               for(m=0; m<n_cat; m++) cts_info[m].clear();
+
+               // Compute CTS
+               do_cts(cts_info, i, f_na, o_na);
+
+               // Loop through all of the thresholds
+               for(m=0; m<conf_info.fcat_ta[i].n_elements(); m++) {
+
+                  // Write out FHO
+                  if(conf_info.output_flag[i_fho] != STATOutputType_None &&
+                     cts_info[m].cts.n() > 0) {
+
+                     write_fho_row(shc, cts_info[m],
+                        conf_info.output_flag[i_fho] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_fho], i_txt_row[i_fho]);
+                  }
+
+                  // Write out CTC
+                  if(conf_info.output_flag[i_ctc] != STATOutputType_None &&
+                     cts_info[m].cts.n() > 0) {
+
+                     write_ctc_row(shc, cts_info[m],
+                        conf_info.output_flag[i_ctc] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_ctc], i_txt_row[i_ctc]);
+                  }
+
+                  // Write out CTS
+                  if(conf_info.output_flag[i_cts] != STATOutputType_None &&
+                     cts_info[m].cts.n() > 0) {
+
+                     write_cts_row(shc, cts_info[m],
+                        conf_info.output_flag[i_cts] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_cts], i_txt_row[i_cts]);
+                  }
+               } // end for m
+            } // end Compute CTS
+
+            // Compute MCTS scores
+            if(!conf_info.fcst_info[i]->p_flag()      &&
+                conf_info.fcat_ta[i].n_elements() > 1 &&
+               (conf_info.output_flag[i_mctc] != STATOutputType_None ||
+                conf_info.output_flag[i_mcts] != STATOutputType_None)) {
+
+               // Initialize
+               mcts_info.clear();
+
+               // Compute MCTS
+               do_mcts(mcts_info, i, f_na, o_na);
+
+               // Write out MCTC
+               if(conf_info.output_flag[i_mctc] != STATOutputType_None &&
+                  mcts_info.cts.total() > 0) {
+
+                  write_mctc_row(shc, mcts_info,
+                     conf_info.output_flag[i_mctc] == STATOutputType_Both,
+                     stat_at, i_stat_row,
+                     txt_at[i_mctc], i_txt_row[i_mctc]);
+               }
+
+               // Write out MCTS
+               if(conf_info.output_flag[i_mcts] != STATOutputType_None &&
+                  mcts_info.cts.total() > 0) {
+
+                  write_mcts_row(shc, mcts_info,
+                     conf_info.output_flag[i_mcts] == STATOutputType_Both,
+                     stat_at, i_stat_row,
+                     txt_at[i_mcts], i_txt_row[i_mcts]);
+               }
+            } // end Compute MCTS
+
+            // Compute CNT scores
+            if(!conf_info.fcst_info[i]->p_flag() &&
+               (conf_info.output_flag[i_cnt]   != STATOutputType_None ||
+                conf_info.output_flag[i_sl1l2] != STATOutputType_None)) {
+
+               // Initialize
+               for(m=0; m<n_cnt; m++) cnt_info[m].clear();
+
+               // Compute CNT
+               do_cnt(cnt_info, i, f_na, o_na);
+
+               // Loop through the continuous thresholds
+               for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
+
+                  // Write out CNT
+                  if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
+                     cnt_info[m].n > 0) {
+
+                     write_cnt_row(shc, cnt_info[m],
+                        conf_info.output_flag[i_cnt] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_cnt], i_txt_row[i_cnt]);
+                  }
+
+                  // Write out SL1L2 as long as the vflag is not set
+                  if(!conf_info.fcst_info[i]->v_flag() &&
+                     conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
+                     cnt_info[m].n > 0) {
+
+                     write_sl1l2_row(shc, cnt_info[m],
+                        conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
+                  }
+               } // end for m
+            } // end Compute CNT
+
+            // Compute VL1L2 partial sums for UGRD,VGRD
+            if(!conf_info.fcst_info[i]->p_flag() &&
+                conf_info.fcst_info[i]->v_flag() &&
+               conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
+               i > 0 &&
+               conf_info.fcst_info[i]->is_v_wind() &&
+               conf_info.fcst_info[i-1]->is_u_wind()) {
+
+               // Store the forecast variable name
+               shc.set_fcst_var(ugrd_vgrd_abbr_str);
+
+               // Store the observation variable name
+               shc.set_obs_var(ugrd_vgrd_abbr_str);
+
+               // Initialize
+               for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
+
+               // Apply current smoothing method to the UGRD fields
+               smooth_field(fuwind_dp, fuwind_dp_smooth,
+                            conf_info.interp_mthd[j],
+                            conf_info.interp_wdth[j],
+                            conf_info.interp_thresh);
+
+                smooth_field(ouwind_dp, ouwind_dp_smooth,
+                             conf_info.interp_mthd[j],
+                             conf_info.interp_wdth[j],
+                             conf_info.interp_thresh);
+
+               // Apply the current mask to the UGRD fields
+               apply_mask(fuwind_dp_smooth, ouwind_dp_smooth,
+                          conf_info.mask_dp[k],
+                          fuwind_na, ouwind_na);
+
+               // Compute VL1L2
+               do_vl1l2(vl1l2_info, i, f_na, o_na, fuwind_na, ouwind_na);
+
+               // Loop through all of the wind speed thresholds
+               for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
+
+                  // Write out VL1L2
+                  if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
+                     vl1l2_info[m].vcount > 0) {
+
+                     write_vl1l2_row(shc, vl1l2_info[m],
+                        conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
+                  }
+               } // end for m
+
+               // Reset the forecast variable name
+               shc.set_fcst_var(conf_info.fcst_info[i]->name());
+
+               // Reset the observation variable name
+               shc.set_obs_var(conf_info.obs_info[i]->name());
+
+            } // end Compute VL1L2
+
+            // Compute PCT counts and scores
+            if(conf_info.fcst_info[i]->p_flag() &&
+               (conf_info.output_flag[i_pct] != STATOutputType_None  ||
+                conf_info.output_flag[i_pstd] != STATOutputType_None ||
+                conf_info.output_flag[i_pjc] != STATOutputType_None  ||
+                conf_info.output_flag[i_prc] != STATOutputType_None)) {
+
+               // Initialize
+               for(m=0; m<n_prob; m++) pct_info[m].clear();
+
+               // Compute PCT
+               do_pct(pct_info, i, f_na, o_na);
+
+               // Loop through all of the thresholds
+               for(m=0; m<n_prob; m++) {
+
+                  // Write out PCT
+                  if(conf_info.output_flag[i_pct] != STATOutputType_None &&
+                     pct_info[m].pct.n() > 0) {
+
+                     write_pct_row(shc, pct_info[m],
+                        conf_info.output_flag[i_pct] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_pct], i_txt_row[i_pct]);
+                  }
+
+                  // Write out PSTD
+                  if(conf_info.output_flag[i_pstd] != STATOutputType_None &&
+                     pct_info[m].pct.n() > 0) {
+
+                     write_pstd_row(shc, pct_info[m],
+                        conf_info.output_flag[i_pstd] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_pstd], i_txt_row[i_pstd]);
+                  }
+
+                  // Write out PJC
+                  if(conf_info.output_flag[i_pjc] != STATOutputType_None &&
+                     pct_info[m].pct.n() > 0) {
+
+                     write_pjc_row(shc, pct_info[m],
+                        conf_info.output_flag[i_pjc] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_pjc], i_txt_row[i_pjc]);
+                  }
+
+                  // Write out PRC
+                  if(conf_info.output_flag[i_prc] != STATOutputType_None &&
+                     pct_info[m].pct.n() > 0) {
+
+                     write_prc_row(shc, pct_info[m],
+                        conf_info.output_flag[i_prc] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_prc], i_txt_row[i_prc]);
+                  }
+               } // end for m
+            } // end Compute PCT
+
+         } // end for k
+
+         // Write out the smoothed forecast, observation, and difference
+         // fields in netCDF format for each GRIB code if requested in
+         // the config file
+         if(!(conf_info.nc_info.all_false())) {
+            write_nc(conf_info.nc_info, 
+                     fcst_dp_smooth, obs_dp_smooth, i,
+                     conf_info.interp_mthd[j],
+                     conf_info.interp_wdth[j]);
+         }
+      } // end for j
+
+      // Loop through and apply the Neighborhood methods for each of the
+      // neighborhood widths if requested in the config file
+      if(!conf_info.fcst_info[i]->p_flag() &&
+         (conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
+          conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
+          conf_info.output_flag[i_nbrcnt] != STATOutputType_None)) {
+
+         // Initialize
+         for(j=0; j<n_cov; j++) nbrcts_info[j].clear();
+
+         // Loop through and apply each of the neighborhood widths
+         for(j=0; j<conf_info.get_n_nbrhd_wdth(); j++) {
+
+            // Store the interpolation method and width being applied
+            shc.set_interp_mthd(InterpMthd_Nbrhd);
+            shc.set_interp_wdth(conf_info.nbrhd_wdth[j]);
+
+            // Loop through and apply each of the raw threshold values
+            for(k=0; k<conf_info.fcat_ta[i].n_elements(); k++) {
+
+               // Compute the binary thresholded fields
+               fcst_dp_thresh = fcst_dp;
+               fcst_dp_thresh.threshold(conf_info.fcat_ta[i][k]);
+
+               obs_dp_thresh = obs_dp;
+               obs_dp_thresh.threshold(conf_info.ocat_ta[i][k]);
+
+               // Compute the thresholded fractional coverage field
+               fractional_coverage(fcst_dp, fcst_dp_smooth,
+                                   conf_info.nbrhd_wdth[j],
+                                   conf_info.fcat_ta[i][k],
+                                   conf_info.nbrhd_thresh);
+
+               fractional_coverage(obs_dp, obs_dp_smooth,
+                                   conf_info.nbrhd_wdth[j],
+                                   conf_info.ocat_ta[i][k],
+                                   conf_info.nbrhd_thresh);
+
+               // Loop through the masks to be applied
+               for(m=0; m<conf_info.get_n_mask(); m++) {
+
+                  // Apply the current mask to the fractional coverage
+                  // and thresholded fields
+                  apply_mask(fcst_dp_smooth, obs_dp_smooth,
+                             fcst_dp_thresh, obs_dp_thresh,
+                             conf_info.mask_dp[m],
+                             f_na, o_na, fthr_na, othr_na);
+
+                  mlog << Debug(2) << "Processing "
+                       << conf_info.fcst_info[i]->magic_str()
+                       << " versus "
+                       << conf_info.obs_info[i]->magic_str()
+                       << ", for interpolation method "
+                       << shc.get_interp_mthd() << "("
+                       << shc.get_interp_pnts_str()
+                       << "), raw thresholds of "
+                       << conf_info.fcat_ta[i][k].get_str()
+                       << " and "
+                       << conf_info.ocat_ta[i][k].get_str()
+                       << ", over region " << shc.get_mask()
+                       << ", using " << f_na.n_elements()
+                       << " pairs.\n";
+
+                  // Continue if no pairs were found
+                  if(f_na.n_elements() == 0) continue;
+
+                  // Set the mask name
+                  shc.set_mask(conf_info.mask_name[m]);
+
+                  // Compute NBRCTS scores
+                  if(conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
+                     conf_info.output_flag[i_nbrcts] != STATOutputType_None) {
+
+                     // Initialize
+                     for(n=0; n<conf_info.nbrhd_cov_ta.n_elements(); n++) {
+                        nbrcts_info[n].clear();
+                     }
+
+                     do_nbrcts(nbrcts_info, i, j, k, f_na, o_na);
+
+                     // Loop through all of the thresholds
+                     for(n=0; n<conf_info.nbrhd_cov_ta.n_elements(); n++) {
+
+                        // Only write out if n > 0
+                        if(nbrcts_info[n].cts_info.cts.n() > 0) {
+
+                           // Write out NBRCTC
+                           if(conf_info.output_flag[i_nbrctc] != STATOutputType_None) {
+
+                              write_nbrctc_row(shc, nbrcts_info[n],
+                                 conf_info.output_flag[i_nbrctc] == STATOutputType_Both,
+                                 stat_at, i_stat_row,
+                                 txt_at[i_nbrctc], i_txt_row[i_nbrctc]);
+                           }
+
+                           // Write out NBRCTS
+                           if(conf_info.output_flag[i_nbrcts] != STATOutputType_None) {
+
+                              write_nbrcts_row(shc, nbrcts_info[n],
+                                 conf_info.output_flag[i_nbrcts] == STATOutputType_Both,
+                                 stat_at, i_stat_row,
+                                 txt_at[i_nbrcts], i_txt_row[i_nbrcts]);
+                           }
+                        } // end if
+                     } // end for n
+                  } // end compute NBRCTS
+
+                  // Compute NBRCNT scores
+                  if(conf_info.output_flag[i_nbrcnt] != STATOutputType_None) {
+
+                     // Initialize
+                     nbrcnt_info.clear();
+
+                     do_nbrcnt(nbrcnt_info, i, j, k, f_na, o_na,
+                               fthr_na, othr_na);
+
+                     // Write out NBRCNT
+                     if(nbrcnt_info.cnt_info.n > 0 &&
+                        conf_info.output_flag[i_nbrcnt]) {
+
+                        write_nbrcnt_row(shc, nbrcnt_info,
+                           conf_info.output_flag[i_nbrcnt] == STATOutputType_Both,
+                           stat_at, i_stat_row,
+                           txt_at[i_nbrcnt], i_txt_row[i_nbrcnt]);
+                     }
+                  } // end compute NBRCNT
+               } // end for m
+            } // end for k
+         } // end for j
+      } // end if
+   } // end for i
+
+   mlog << Debug(2) << "\n" << sep_str << "\n\n";
+
+   // Deallocate memory
+   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    0; }
+   if(cnt_info)    { delete [] cnt_info;    cnt_info    = (CNTInfo *)    0; }
+   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  0; }
+   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) 0; }
+   if(pct_info)    { delete [] pct_info;    pct_info    = (PCTInfo *)    0; }
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void do_cts(CTSInfo *&cts_info, int i_vx,
             const NumArray &f_na, const NumArray &o_na) {
    int i, j, n_cts;
@@ -1115,10 +1124,10 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
    //
    // Set up the CTSInfo thresholds and alpha values
    //
-   n_cts = conf_info.fcst_ta[i_vx].n_elements();
+   n_cts = conf_info.fcat_ta[i_vx].n_elements();
    for(i=0; i<n_cts; i++) {
-      cts_info[i].fthresh = conf_info.fcst_ta[i_vx][i];
-      cts_info[i].othresh = conf_info.obs_ta[i_vx][i];
+      cts_info[i].fthresh = conf_info.fcat_ta[i_vx][i];
+      cts_info[i].othresh = conf_info.ocat_ta[i_vx][i];
       cts_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
       for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
@@ -1159,9 +1168,9 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    //
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
-   mcts_info.cts.set_size(conf_info.fcst_ta[i_vx].n_elements() + 1);
-   mcts_info.fthresh = conf_info.fcst_ta[i_vx];
-   mcts_info.othresh = conf_info.obs_ta[i_vx];
+   mcts_info.cts.set_size(conf_info.fcat_ta[i_vx].n_elements() + 1);
+   mcts_info.fthresh = conf_info.fcat_ta[i_vx];
+   mcts_info.othresh = conf_info.ocat_ta[i_vx];
    mcts_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
 
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
@@ -1199,42 +1208,77 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt(CNTInfo &cnt_info, int i_vx,
+void do_cnt(CNTInfo *&cnt_info, int i_vx,
             const NumArray &f_na, const NumArray &o_na) {
-   int i;
-
-   //
-   // Set up the CNTInfo alpha values
-   //
-   cnt_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
-   for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
-      cnt_info.alpha[i] = conf_info.ci_alpha[i];
-   }
+   int i, j;
+   NumArray ff_na, oo_na;
 
    mlog << Debug(2) << "Computing Continuous Statistics.\n";
 
    //
-   // Compute the stats, normal confidence intervals, and
-   // bootstrap confidence intervals
+   // Process each filtering threshold
    //
-   if(conf_info.boot_interval == BootIntervalType_BCA) {
-      compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na,
-         conf_info.fcst_info[i_vx]->is_precipitation() &
-         conf_info.obs_info[i_vx]->is_precipitation(),
-         conf_info.n_boot_rep,
-         cnt_info,
-         conf_info.output_flag[i_cnt] != STATOutputType_None,
-         conf_info.rank_corr_flag, conf_info.tmp_dir);
-   }
-   else {
-      compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na,
-         conf_info.fcst_info[i_vx]->is_precipitation() &
-         conf_info.obs_info[i_vx]->is_precipitation(),
-         conf_info.n_boot_rep, conf_info.boot_rep_prop,
-         cnt_info,
-         conf_info.output_flag[i_cnt] != STATOutputType_None,
-         conf_info.rank_corr_flag, conf_info.tmp_dir);
-   }
+   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) {
+
+      //
+      // Store thresholds
+      //
+      cnt_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
+      cnt_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
+   
+      //
+      // Setup the CNTInfo alpha values
+      //
+      cnt_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
+      for(j=0; j<conf_info.get_n_ci_alpha(); j++) {
+         cnt_info[i].alpha[j] = conf_info.ci_alpha[j];
+      }
+
+      //
+      // Apply continuous filtering thresholds
+      //
+      subset_fo_na(f_na, cnt_info[i].fthresh,
+                   o_na, cnt_info[i].othresh,
+                   conf_info.cnt_logic[i_vx],
+                   ff_na, oo_na);
+
+      mlog << Debug(3)
+           << "Found " << ff_na.n_elements()
+           << " pairs for forecast filtering threshold "
+           << cnt_info[i].fthresh.get_str()
+           << ", observation filtering threshold "
+           << cnt_info[i].othresh.get_str() << ", and field logic "
+           << setlogic_to_string(conf_info.cnt_logic[i_vx])
+           << ".\n";
+
+      //
+      // Check for no matched pairs to process
+      //
+      if(ff_na.n_elements() == 0) continue;
+
+      //
+      // Compute the stats, normal confidence intervals, and
+      // bootstrap confidence intervals
+      //
+      if(conf_info.boot_interval == BootIntervalType_BCA) {
+         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na,
+            conf_info.fcst_info[i_vx]->is_precipitation() &
+            conf_info.obs_info[i_vx]->is_precipitation(),
+            conf_info.n_boot_rep,
+            cnt_info[i],
+            conf_info.output_flag[i_cnt] != STATOutputType_None,
+            conf_info.rank_corr_flag, conf_info.tmp_dir);
+      }
+      else {
+         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na,
+            conf_info.fcst_info[i_vx]->is_precipitation() &
+            conf_info.obs_info[i_vx]->is_precipitation(),
+            conf_info.n_boot_rep, conf_info.boot_rep_prop,
+            cnt_info[i],
+            conf_info.output_flag[i_cnt] != STATOutputType_None,
+            conf_info.rank_corr_flag, conf_info.tmp_dir);
+      }
+   } // end for i
 
    return;
 }
@@ -1244,9 +1288,8 @@ void do_cnt(CNTInfo &cnt_info, int i_vx,
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const NumArray &vf_na, const NumArray &vo_na,
               const NumArray &uf_na, const NumArray &uo_na) {
-   int i, j, n_thresh;
+   int i, j, n_wind;
    double uf, vf, uo, vo, fwind, owind;
-   SingleThresh fst, ost;
 
    // Check that the number of pairs are the same
    if(vf_na.n_elements() != vo_na.n_elements() ||
@@ -1261,11 +1304,11 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    }
 
    // Initialize all of the VL1L2Info objects
-   n_thresh = conf_info.get_n_wind_thresh();
-   for(i=0; i<n_thresh; i++) {
+   n_wind = conf_info.fwind_ta[i_vx].n_elements();
+   for(i=0; i<n_wind; i++) {
       v_info[i].zero_out();
-      v_info[i].fthresh = conf_info.fcst_wind_ta[i];
-      v_info[i].othresh = conf_info.obs_wind_ta[i];
+      v_info[i].fthresh = conf_info.fwind_ta[i_vx][i];
+      v_info[i].othresh = conf_info.owind_ta[i_vx][i];
    }
 
    // Loop through the pair data and compute sums
@@ -1287,23 +1330,12 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
          is_bad_data(fwind) || is_bad_data(owind)) continue;
 
       // Loop through each of wind speed thresholds to be used
-      for(j=0; j<n_thresh; j++) {
+      for(j=0; j<n_wind; j++) {
 
-         fst = v_info[j].fthresh;
-         ost = v_info[j].othresh;
-
-         // Apply both wind speed thresholds
-         if(fst.get_type() != thresh_na && ost.get_type()  != thresh_na) {
-            if(!fst.check(fwind) || !ost.check(owind)) continue;
-         }
-         // Apply only the fcst wind speed threshold
-         else if(fst.get_type() != thresh_na && ost.get_type()  == thresh_na) {
-            if(!fst.check(fwind)) continue;
-         }
-         // Apply only the obs wind speed threshold
-         else if(fst.get_type() == thresh_na && ost.get_type()  != thresh_na) {
-            if(!ost.check(owind)) continue;
-         }
+         // Apply wind speed thresholds
+         if(!check_fo_thresh(fwind, v_info[j].fthresh,
+                             owind, v_info[j].othresh,
+                             conf_info.wind_logic[i_vx])) continue;
 
          // Add this pair to the VL1L2 counts
 
@@ -1320,7 +1352,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    } // end for i
 
    // Compute means for the VL1L2Info objects
-   for(i=0; i<n_thresh; i++) {
+   for(i=0; i<n_wind; i++) {
 
       mlog << Debug(2) << "Computing Vector Partial Sums, "
            << "for forecast wind speed "
@@ -1370,14 +1402,14 @@ void do_pct(PCTInfo *&pct_info, int i_vx,
    //
    // Set up the PCTInfo thresholds and alpha values
    //
-   n_pct = conf_info.obs_ta[i_vx].n_elements();
+   n_pct = conf_info.ocat_ta[i_vx].n_elements();
    for(i=0; i<n_pct; i++) {
 
       // Use all of the selected forecast thresholds
-      pct_info[i].fthresh = conf_info.fcst_ta[i_vx];
+      pct_info[i].fthresh = conf_info.fcat_ta[i_vx];
 
       // Process the observation thresholds one at a time
-      pct_info[i].othresh = conf_info.obs_ta[i_vx][i];
+      pct_info[i].othresh = conf_info.ocat_ta[i_vx][i];
 
       pct_info[i].allocate_n_alpha(conf_info.get_n_ci_alpha());
 
@@ -1409,10 +1441,10 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    for(i=0; i<n_nbrcts; i++) {
 
       nbrcts_info[i].fthresh =
-         conf_info.fcst_ta[i_vx][i_thresh];
+         conf_info.fcat_ta[i_vx][i_thresh];
       nbrcts_info[i].othresh =
-         conf_info.obs_ta[i_vx][i_thresh];
-      nbrcts_info[i].frac_thresh =
+         conf_info.ocat_ta[i_vx][i_thresh];
+      nbrcts_info[i].cthresh =
          conf_info.nbrhd_cov_ta[i];
 
       nbrcts_info[i].cts_info.fthresh =
@@ -1462,16 +1494,16 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
 void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
                int i_vx, int i_wdth, int i_thresh,
                const NumArray &f_na, const NumArray &o_na,
-               const NumArray &f_thr_na, const NumArray &o_thr_na) {
+               const NumArray &fthr_na, const NumArray &othr_na) {
    int i;
 
    //
    // Set up the NBRCNTInfo threshold and alpha values
    //
    nbrcnt_info.fthresh =
-      conf_info.fcst_ta[i_vx][i_thresh];
+      conf_info.fcat_ta[i_vx][i_thresh];
    nbrcnt_info.othresh =
-      conf_info.obs_ta[i_vx][i_thresh];
+      conf_info.ocat_ta[i_vx][i_thresh];
 
    nbrcnt_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
@@ -1491,7 +1523,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    //
    if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_nbrcnt_stats_ci_bca(rng_ptr, f_na, o_na,
-         f_thr_na, o_thr_na,
+         fthr_na, othr_na,
          conf_info.n_boot_rep,
          nbrcnt_info,
          conf_info.output_flag[i_nbrcnt] != STATOutputType_None,
@@ -1499,7 +1531,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    }
    else {
       compute_nbrcnt_stats_ci_perc(rng_ptr, f_na, o_na,
-         f_thr_na, o_thr_na,
+         fthr_na, othr_na,
          conf_info.n_boot_rep, conf_info.boot_rep_prop,
          nbrcnt_info,
          conf_info.output_flag[i_nbrcnt] != STATOutputType_None,
@@ -1511,11 +1543,8 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp, const DataPlane &obs_dp, int i_vx, InterpMthd mthd, int wdth)
-
-{
-
+void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp,
+              const DataPlane &obs_dp, int i_vx, InterpMthd mthd, int wdth) {
    int i, n, x, y;
    int fcst_flag, obs_flag, diff_flag;
    float *fcst_data = (float *) 0;
@@ -1584,18 +1613,16 @@ void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp, const
       fcst_flag = !fcst_var_sa.has(fcst_var_name);
       obs_flag  = !obs_var_sa.has(obs_var_name);
 
-      if ( ! (nc_info.do_raw) )  {
-
+      if(!(nc_info.do_raw)) {
          fcst_flag = false;
           obs_flag = false;
-
       }
 
       // Don't write the difference field for probability forecasts
       diff_flag = (!diff_var_sa.has(diff_var_name) &&
                    !conf_info.fcst_info[i_vx]->p_flag());
 
-      if ( ! (nc_info.do_diff) )  diff_flag = false;
+      if(!(nc_info.do_diff)) diff_flag = false;
 
       // Set up the forecast variable if not already defined
       if(fcst_flag) {

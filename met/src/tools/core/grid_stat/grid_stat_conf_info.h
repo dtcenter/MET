@@ -92,12 +92,15 @@ class GridStatConfInfo {
       int n_vx_scal;     // Number of scalar fields to be verified
       int n_vx_vect;     // Number of vector fields to be verified
       int n_vx_prob;     // Number of probability fields to be verified
+
       int n_mask;        // Number of masking regions
       int n_interp;      // Number of interpolation methods
 
-      int max_n_scal_thresh;      // Maximum number of scalar thresholds
-      int max_n_prob_fcst_thresh; // Maximum fcst prob thresholds
-      int max_n_prob_obs_thresh;  // Maximum obs prob thresholds
+      int max_n_cnt_thresh;   // Maximum number of continuous thresholds
+      int max_n_cat_thresh;   // Maximum number of categorical thresholds
+      int max_n_wind_thresh;  // Maximum number of wind speed thresholds
+      int max_n_fprob_thresh; // Maximum fcst prob thresholds
+      int max_n_oprob_thresh; // Maximum obs prob thresholds
 
    public:
 
@@ -108,30 +111,46 @@ class GridStatConfInfo {
       ConcatString      model;              // Model name
       ConcatString      obtype;             // Observation type
       RegridInfo        regrid_info;        // Regridding information
+
+      // Settings for each verification task
       VarInfo **        fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
       VarInfo **        obs_info;           // Array of pointers for obs VarInfo [n_vx]
-      ThreshArray *     fcst_ta;            // Array for fcst thresholds [n_vx]
-      ThreshArray *     obs_ta;             // Array for obs thresholds [n_vx]
-      ThreshArray       fcst_wind_ta;       // Wind speed fcst thresholds
-      ThreshArray       obs_wind_ta;        // Wind speed obs thresholds
+
+      ThreshArray *     fcat_ta;            // Array for fcst categorical thresholds [n_vx]
+      ThreshArray *     ocat_ta;            // Array for obs categorical thresholds [n_vx]
+
+      ThreshArray *     fcnt_ta;            // Array for fcst continuous thresholds [n_vx]
+      ThreshArray *     ocnt_ta;            // Array for obs continuous thresholds [n_vx]
+      SetLogic *        cnt_logic;          // Array of continuous threshold field logic [n_vx]
+
+      ThreshArray *     fwind_ta;           // Array for fcst wind speed thresholds [n_vx]
+      ThreshArray *     owind_ta;           // Array for obs wind speed thresholds [n_vx]
+      SetLogic *        wind_logic;         // Array of wind speed field logic [n_vx]
+
+      // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
       DataPlane *       mask_dp;            // Array for masking regions [n_mask]
+
       NumArray          ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType  boot_interval;      // Bootstrap CI type
       double            boot_rep_prop;      // Bootstrap replicate proportion
       int               n_boot_rep;         // Number of bootstrap replicates
       ConcatString      boot_rng;           // GSL random number generator
       ConcatString      boot_seed;          // GSL RNG seed value
+
       FieldType         interp_field;       // How to apply interpolation options
       double            interp_thresh;      // Proportion of valid data values
       InterpMthd *      interp_mthd;        // Array for interpolation methods [n_interp]
       IntArray          interp_wdth;        // Array for interpolation widths [n_interp]
+
       double            nbrhd_thresh;       // Proportion of valid data values
       IntArray          nbrhd_wdth;         // Array for neighborhood widths
       ThreshArray       nbrhd_cov_ta;       // Neighborhood coverage thresholds
+
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
       GridStatNcOutInfo nc_info;            // Output NetCDF pairs file contents
       bool              rank_corr_flag;     // Flag for computing rank correlations
+
       ConcatString      tmp_dir;            // Directory for temporary files
       ConcatString      output_prefix;      // String to customize output file name
       ConcatString      version;            // Config file version
@@ -153,7 +172,7 @@ class GridStatConfInfo {
       int get_n_vx_vect()     const;
       int get_n_vx_prob()     const;
       int get_n_mask()        const;
-      int get_n_wind_thresh() const;
+
       int get_n_interp()      const;
       int get_n_nbrhd_wdth()  const;
       int get_n_cov_thresh()  const;
@@ -161,9 +180,11 @@ class GridStatConfInfo {
       int get_vflag()         const;
       int get_pflag()         const;
 
-      int get_max_n_scal_thresh()      const;
-      int get_max_n_prob_fcst_thresh() const;
-      int get_max_n_prob_obs_thresh()  const;
+      int get_max_n_cat_thresh()   const;
+      int get_max_n_cnt_thresh()   const;
+      int get_max_n_wind_thresh()  const;
+      int get_max_n_fprob_thresh() const;
+      int get_max_n_oprob_thresh() const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
@@ -178,7 +199,6 @@ inline int GridStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);     
 inline int GridStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                 }
 inline int GridStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                 }
 inline int GridStatConfInfo::get_n_mask()        const { return(n_mask);                    }
-inline int GridStatConfInfo::get_n_wind_thresh() const { return(fcst_wind_ta.n_elements()); }
 inline int GridStatConfInfo::get_n_interp()      const { return(n_interp);                  }
 inline int GridStatConfInfo::get_n_nbrhd_wdth()  const { return(nbrhd_wdth.n_elements());   }
 inline int GridStatConfInfo::get_n_cov_thresh()  const { return(nbrhd_cov_ta.n_elements()); }
@@ -186,14 +206,20 @@ inline int GridStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_eleme
 inline int GridStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);             }
 inline int GridStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);             }
 
-inline int GridStatConfInfo::get_max_n_scal_thresh() const {
-   return(max_n_scal_thresh);
+inline int GridStatConfInfo::get_max_n_cat_thresh() const {
+   return(max_n_cat_thresh);
 }
-inline int GridStatConfInfo::get_max_n_prob_fcst_thresh() const {
-   return(max_n_prob_fcst_thresh);
+inline int GridStatConfInfo::get_max_n_cnt_thresh() const {
+   return(max_n_cnt_thresh);
 }
-inline int GridStatConfInfo::get_max_n_prob_obs_thresh() const {
-   return(max_n_prob_obs_thresh);
+inline int GridStatConfInfo::get_max_n_wind_thresh() const {
+   return(max_n_wind_thresh);
+}
+inline int GridStatConfInfo::get_max_n_fprob_thresh() const {
+   return(max_n_fprob_thresh);
+}
+inline int GridStatConfInfo::get_max_n_oprob_thresh() const {
+   return(max_n_oprob_thresh);
 }
 
 ////////////////////////////////////////////////////////////////////////
