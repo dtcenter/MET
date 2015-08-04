@@ -1342,6 +1342,48 @@ ConcatString setlogic_to_string(SetLogic type) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString setlogic_to_abbr(SetLogic type) {
+   ConcatString s;
+
+   // Convert enumerated SetLogic to an abbreviation
+   switch(type) {
+      case(SetLogic_None):         s = na_str;    break;
+      case(SetLogic_Union):        s = "or";      break;
+      case(SetLogic_Intersection): s = "and";     break;
+      case(SetLogic_SymDiff):      s = "symdiff"; break;
+      default:
+         mlog << Error << "\nsetlogic_to_abbr() -> "
+              << "Unexpected SetLogic value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString setlogic_to_symbol(SetLogic type) {
+   ConcatString s;
+
+   // Convert enumerated SetLogic to a symbol
+   switch(type) {
+      case(SetLogic_None):         s = na_str; break;
+      case(SetLogic_Union):        s = "||";   break;
+      case(SetLogic_Intersection): s = "&&";   break;
+      case(SetLogic_SymDiff):      s = "*";    break;
+      default:
+         mlog << Error << "\nsetlogic_to_symbol() -> "
+              << "Unexpected SetLogic value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
    SetLogic t;
 
