@@ -998,7 +998,6 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       isc_info[i].compute_isc(-1);
 
       // Write the thresholded binary fields to NetCDF
-      // if(conf_info.ps_plot_flag) {   // ???
       if ( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
          write_nc_wav(conf_info.nc_info, f_dat, o_dat, n, i_gc, i_tile, -1,
                       isc_info[i].fthresh,

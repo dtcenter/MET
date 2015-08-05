@@ -100,8 +100,7 @@ class WaveletStatConfInfo {
       gsl_wavelet           * wvlt_ptr;           // GSL wavelet pointer
       gsl_wavelet_workspace * wvlt_work_ptr;      // GSL wavelet workspace
       STATOutputType          output_flag[n_txt]; // Flag for each output line type
-      // bool                    nc_pairs_flag;      // Flag for the output NetCDF pairs file
-      WaveletStatNcOutInfo       nc_info;
+      WaveletStatNcOutInfo    nc_info;            // Output NetCDF pairs file
       bool                    ps_plot_flag;       // Flag for the output PostScript image file
       ConcatString            met_data_dir;       // MET data directory
       PlotInfo                fcst_raw_pi;        // Raw forecast plotting info
