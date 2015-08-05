@@ -19,6 +19,7 @@
 //   002    11/14/14  Halley Gotway   Pass the obtype entry from the
 //                    from the config file to the output file.
 //   003    02/25/15  Halley Gotway   Add automated regridding.
+//   004    08/04/15  Halley Gotway   Add conditional continuous verification.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +49,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-static void process_scores();
 
 static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
@@ -58,6 +58,8 @@ static void get_series_entry(int, VarInfo *,
 static void get_series_entry(int, VarInfo *,
                              const StringArray &, const GrdFileType,
                              StringArray &, DataPlane &);
+
+static void process_scores();
 
 static void do_cts (int, const NumArray &, const NumArray &);
 static void do_mcts(int, const NumArray &, const NumArray &);
@@ -75,7 +77,7 @@ static void store_stat_pct  (int, const ConcatString &, const PCTInfo &);
 static void store_stat_pstd (int, const ConcatString &, const PCTInfo &);
 static void store_stat_pjc  (int, const ConcatString &, const PCTInfo &);
 static void store_stat_prc  (int, const ConcatString &, const PCTInfo &);
-  
+
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_nc_var(const ConcatString &, const ConcatString &,
                        const ConcatString &, const ConcatString &,
@@ -84,7 +86,7 @@ static void put_nc_val(int, const ConcatString &, float);
 
 static void set_range(const unixtime &, unixtime &, unixtime &);
 static void set_range(const int &, int &, int &);
-         
+
 static void clean_up();
 
 static void usage();
@@ -282,175 +284,15 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
-   int nxny, i, x, y, i_read, n_reads, i_series, i_point;
-   VarInfo *fcst_info = (VarInfo *) 0;
-   VarInfo *obs_info  = (VarInfo *) 0;
-   NumArray *f_na = (NumArray *) 0;
-   NumArray *o_na = (NumArray *) 0;
-   DataPlane fcst_dp, obs_dp;
-
-   // Determine the block size
-   nxny    = grid.nx() * grid.ny();
-   n_reads = nint(ceil((double) nxny / conf_info.block_size));
-
-   // Allocate space to store the pairs for each grid point
-   f_na = new NumArray [conf_info.block_size];
-   o_na = new NumArray [conf_info.block_size];
-
-   mlog << Debug(2)
-        << "Computing statistics using a block size of "
-        << conf_info.block_size << ", requiring " << n_reads
-        << " passes through the " << grid.nx() << " x "
-        << grid.ny() << " grid.\n";
-
-   // Loop over the data reads
-   for(i_read=0; i_read<n_reads; i_read++) {
-     
-      // Starting grid point
-      i_point = i_read*conf_info.block_size;
-
-      mlog << Debug(2)
-           << "Processing data pass number " << i_read + 1 << " of "
-           << n_reads << " for grid points " << i_point + 1 << " to "
-           << min(i_point + conf_info.block_size, nxny) << ".\n";
-
-      // Loop over the series variable
-      for(i_series=0; i_series<n_series; i_series++) {
-
-         // Store the current VarInfo objects
-         fcst_info = (conf_info.get_n_fcst() > 1 ?
-                      conf_info.fcst_info[i_series] :
-                      conf_info.fcst_info[0]);
-         obs_info  = (conf_info.get_n_obs() > 1 ?
-                      conf_info.obs_info[i_series] :
-                      conf_info.obs_info[0]);
-
-         // Retrieve the data planes for the current series entry
-         get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
-
-         // Setup the output NetCDF file on the first pass
-         if(nc_out == (NcFile *) 0) setup_nc_file(fcst_info, obs_info);
-
-         // Update timing info
-         set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
-         set_range(fcst_dp.valid(), fcst_valid_beg, fcst_valid_end);
-         set_range(fcst_dp.lead(),  fcst_lead_beg,  fcst_lead_end);
-         set_range(obs_dp.init(),   obs_init_beg,   obs_init_end);
-         set_range(obs_dp.valid(),  obs_valid_beg,  obs_valid_end);
-         set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
-                          
-         // Store matched pairs for each grid point
-         for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
-
-            // Convert n to x, y
-            DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
-
-            // Store valid fcst/obs pairs where the mask is on
-            if(!is_bad_data(fcst_dp(x,y)) &&
-               !is_bad_data(obs_dp(x,y)) &&
-               !is_bad_data(conf_info.mask_dp(x,y))) {
-               f_na[i].add(fcst_dp(x, y));
-               o_na[i].add(obs_dp(x, y));
-            }
-
-         } // end for i
-
-      } // end for i_series
-
-      // Compute statistics for each grid point in the block
-      for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
-
-         // Determine x,y location
-         DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
-        
-         // Check for the required number of matched pairs
-         if(f_na[i].n_elements()/(double) n_series < conf_info.vld_data_thresh) {
-            mlog << Debug(4)
-                 << "[" << i+1 << " of " << conf_info.block_size
-                 << "] Skipping point (" << x << ", " << y << ") with "
-                 << f_na[i].n_elements() << " matched pairs.\n";
-            continue;
-         }
-         else {
-            mlog << Debug(4)
-                 << "[" << i+1 << " of " << conf_info.block_size
-                 << "] Processing point (" << x << ", " << y << ") with "
-                 << f_na[i].n_elements() << " matched pairs.\n";
-         }
-        
-         // Compute contingency table counts and statistics
-         if(!conf_info.fcst_info[0]->p_flag() &&
-            (conf_info.output_stats[stat_fho].n_elements() +
-             conf_info.output_stats[stat_ctc].n_elements() +
-             conf_info.output_stats[stat_cts].n_elements()) > 0) {
-            do_cts(i_point+i, f_na[i], o_na[i]);
-         }
-
-         // Compute multi-category contingency table counts and statistics
-         if(!conf_info.fcst_info[0]->p_flag() &&
-            (conf_info.output_stats[stat_mctc].n_elements() +
-             conf_info.output_stats[stat_mcts].n_elements()) > 0) {
-            do_mcts(i_point+i, f_na[i], o_na[i]);
-         }
-
-         // Compute continuous statistics
-         if(!conf_info.fcst_info[0]->p_flag() &&
-            (conf_info.output_stats[stat_cnt].n_elements() +
-             conf_info.output_stats[stat_sl1l2].n_elements()) > 0) {
-            do_cnt(i_point+i, f_na[i], o_na[i]);
-         }
-
-         // Compute probabilistics counts and statistics
-         if(conf_info.fcst_info[0]->p_flag() &&
-            (conf_info.output_stats[stat_pct].n_elements() +
-             conf_info.output_stats[stat_pstd].n_elements() +
-             conf_info.output_stats[stat_pjc].n_elements() +
-             conf_info.output_stats[stat_prc].n_elements()) > 0) {
-            do_pct(i_point+i, f_na[i], o_na[i]);
-         }
-      } // end for i
-
-      // Empty out the NumArray objects
-      for(i=0; i<conf_info.block_size; i++) {
-         f_na[i].empty();
-         o_na[i].empty();
-      }
-     
-   } // end for i_read
-
-   // Add time range information to the global NetCDF attributes
-   nc_out->add_att("fcst_init_beg",  unix_to_yyyymmdd_hhmmss(fcst_init_beg));
-   nc_out->add_att("fcst_init_end",  unix_to_yyyymmdd_hhmmss(fcst_init_end));
-   nc_out->add_att("fcst_valid_beg", unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
-   nc_out->add_att("fcst_valid_end", unix_to_yyyymmdd_hhmmss(fcst_valid_end));
-   nc_out->add_att("fcst_lead_beg",  sec_to_hhmmss(fcst_lead_beg));
-   nc_out->add_att("fcst_lead_end",  sec_to_hhmmss(fcst_lead_end));
-   nc_out->add_att("obs_init_beg",   unix_to_yyyymmdd_hhmmss(obs_init_beg));
-   nc_out->add_att("obs_init_end",   unix_to_yyyymmdd_hhmmss(obs_init_end));
-   nc_out->add_att("obs_valid_beg",  unix_to_yyyymmdd_hhmmss(obs_valid_beg));
-   nc_out->add_att("obs_valid_end",  unix_to_yyyymmdd_hhmmss(obs_valid_end));
-   nc_out->add_att("obs_lead_beg",   sec_to_hhmmss(obs_lead_beg));
-   nc_out->add_att("obs_lead_end",   sec_to_hhmmss(obs_lead_end));
-   
-   // Deallocate and clean up
-   if(f_na) { delete [] f_na; f_na = (NumArray *) 0; }
-   if(o_na) { delete [] o_na; o_na = (NumArray *) 0; }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void get_series_data(int i_series,
                      VarInfo *fcst_info, VarInfo *obs_info,
                      DataPlane &fcst_dp, DataPlane &obs_dp) {
-  
+
    mlog << Debug(2)
         << "Processing series entry " << i_series + 1 << " of "
         << n_series << ": " << fcst_info->magic_str()
         << " versus " << obs_info->magic_str() << "\n";
-  
+
    // Switch on the series type
    switch(series_type) {
 
@@ -481,7 +323,7 @@ void get_series_data(int i_series,
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp);
          break;
-         
+
       case SeriesType_Fcst_Files:
          get_series_entry(i_series, fcst_info, fcst_files[i_series],
                           ftype, found_fcst_files, fcst_dp);
@@ -561,7 +403,7 @@ void get_series_entry(int i_series, VarInfo *info,
 
       mlog << Debug(3)
            << "Searching file " << cur_file << "\n";
-      
+
       // Open the data file
       mtddf = mtddf_factory.new_met_2d_data_file(cur_file, type);
 
@@ -610,21 +452,181 @@ void get_series_entry(int i_series, VarInfo *info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_scores() {
+   int nxny, i, x, y, i_read, n_reads, i_series, i_point;
+   VarInfo *fcst_info = (VarInfo *) 0;
+   VarInfo *obs_info  = (VarInfo *) 0;
+   NumArray *f_na = (NumArray *) 0;
+   NumArray *o_na = (NumArray *) 0;
+   DataPlane fcst_dp, obs_dp;
+
+   // Determine the block size
+   nxny    = grid.nx() * grid.ny();
+   n_reads = nint(ceil((double) nxny / conf_info.block_size));
+
+   // Allocate space to store the pairs for each grid point
+   f_na = new NumArray [conf_info.block_size];
+   o_na = new NumArray [conf_info.block_size];
+
+   mlog << Debug(2)
+        << "Computing statistics using a block size of "
+        << conf_info.block_size << ", requiring " << n_reads
+        << " passes through the " << grid.nx() << " x "
+        << grid.ny() << " grid.\n";
+
+   // Loop over the data reads
+   for(i_read=0; i_read<n_reads; i_read++) {
+
+      // Starting grid point
+      i_point = i_read*conf_info.block_size;
+
+      mlog << Debug(2)
+           << "Processing data pass number " << i_read + 1 << " of "
+           << n_reads << " for grid points " << i_point + 1 << " to "
+           << min(i_point + conf_info.block_size, nxny) << ".\n";
+
+      // Loop over the series variable
+      for(i_series=0; i_series<n_series; i_series++) {
+
+         // Store the current VarInfo objects
+         fcst_info = (conf_info.get_n_fcst() > 1 ?
+                      conf_info.fcst_info[i_series] :
+                      conf_info.fcst_info[0]);
+         obs_info  = (conf_info.get_n_obs() > 1 ?
+                      conf_info.obs_info[i_series] :
+                      conf_info.obs_info[0]);
+
+         // Retrieve the data planes for the current series entry
+         get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
+
+         // Setup the output NetCDF file on the first pass
+         if(nc_out == (NcFile *) 0) setup_nc_file(fcst_info, obs_info);
+
+         // Update timing info
+         set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
+         set_range(fcst_dp.valid(), fcst_valid_beg, fcst_valid_end);
+         set_range(fcst_dp.lead(),  fcst_lead_beg,  fcst_lead_end);
+         set_range(obs_dp.init(),   obs_init_beg,   obs_init_end);
+         set_range(obs_dp.valid(),  obs_valid_beg,  obs_valid_end);
+         set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
+
+         // Store matched pairs for each grid point
+         for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
+
+            // Convert n to x, y
+            DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
+
+            // Store valid fcst/obs pairs where the mask is on
+            if(!is_bad_data(fcst_dp(x,y)) &&
+               !is_bad_data(obs_dp(x,y)) &&
+               !is_bad_data(conf_info.mask_dp(x,y))) {
+               f_na[i].add(fcst_dp(x, y));
+               o_na[i].add(obs_dp(x, y));
+            }
+
+         } // end for i
+
+      } // end for i_series
+
+      // Compute statistics for each grid point in the block
+      for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
+
+         // Determine x,y location
+         DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
+
+         // Check for the required number of matched pairs
+         if(f_na[i].n_elements()/(double) n_series < conf_info.vld_data_thresh) {
+            mlog << Debug(4)
+                 << "[" << i+1 << " of " << conf_info.block_size
+                 << "] Skipping point (" << x << ", " << y << ") with "
+                 << f_na[i].n_elements() << " matched pairs.\n";
+            continue;
+         }
+         else {
+            mlog << Debug(4)
+                 << "[" << i+1 << " of " << conf_info.block_size
+                 << "] Processing point (" << x << ", " << y << ") with "
+                 << f_na[i].n_elements() << " matched pairs.\n";
+         }
+
+         // Compute contingency table counts and statistics
+         if(!conf_info.fcst_info[0]->p_flag() &&
+            (conf_info.output_stats[stat_fho].n_elements() +
+             conf_info.output_stats[stat_ctc].n_elements() +
+             conf_info.output_stats[stat_cts].n_elements()) > 0) {
+            do_cts(i_point+i, f_na[i], o_na[i]);
+         }
+
+         // Compute multi-category contingency table counts and statistics
+         if(!conf_info.fcst_info[0]->p_flag() &&
+            (conf_info.output_stats[stat_mctc].n_elements() +
+             conf_info.output_stats[stat_mcts].n_elements()) > 0) {
+            do_mcts(i_point+i, f_na[i], o_na[i]);
+         }
+
+         // Compute continuous statistics
+         if(!conf_info.fcst_info[0]->p_flag() &&
+            (conf_info.output_stats[stat_cnt].n_elements() +
+             conf_info.output_stats[stat_sl1l2].n_elements()) > 0) {
+            do_cnt(i_point+i, f_na[i], o_na[i]);
+         }
+
+         // Compute probabilistics counts and statistics
+         if(conf_info.fcst_info[0]->p_flag() &&
+            (conf_info.output_stats[stat_pct].n_elements() +
+             conf_info.output_stats[stat_pstd].n_elements() +
+             conf_info.output_stats[stat_pjc].n_elements() +
+             conf_info.output_stats[stat_prc].n_elements()) > 0) {
+            do_pct(i_point+i, f_na[i], o_na[i]);
+         }
+      } // end for i
+
+      // Empty out the NumArray objects
+      for(i=0; i<conf_info.block_size; i++) {
+         f_na[i].empty();
+         o_na[i].empty();
+      }
+
+   } // end for i_read
+
+   // Add time range information to the global NetCDF attributes
+   nc_out->add_att("fcst_init_beg",  unix_to_yyyymmdd_hhmmss(fcst_init_beg));
+   nc_out->add_att("fcst_init_end",  unix_to_yyyymmdd_hhmmss(fcst_init_end));
+   nc_out->add_att("fcst_valid_beg", unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
+   nc_out->add_att("fcst_valid_end", unix_to_yyyymmdd_hhmmss(fcst_valid_end));
+   nc_out->add_att("fcst_lead_beg",  sec_to_hhmmss(fcst_lead_beg));
+   nc_out->add_att("fcst_lead_end",  sec_to_hhmmss(fcst_lead_end));
+   nc_out->add_att("obs_init_beg",   unix_to_yyyymmdd_hhmmss(obs_init_beg));
+   nc_out->add_att("obs_init_end",   unix_to_yyyymmdd_hhmmss(obs_init_end));
+   nc_out->add_att("obs_valid_beg",  unix_to_yyyymmdd_hhmmss(obs_valid_beg));
+   nc_out->add_att("obs_valid_end",  unix_to_yyyymmdd_hhmmss(obs_valid_end));
+   nc_out->add_att("obs_lead_beg",   sec_to_hhmmss(obs_lead_beg));
+   nc_out->add_att("obs_lead_end",   sec_to_hhmmss(obs_lead_end));
+
+   // Deallocate and clean up
+   if(f_na) { delete [] f_na; f_na = (NumArray *) 0; }
+   if(o_na) { delete [] o_na; o_na = (NumArray *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void do_cts(int n, const NumArray &f_na, const NumArray &o_na) {
    int i, j;
 
    mlog << Debug(4) << "Computing Categorical Statistics.\n";
 
    // Allocate objects to store categorical statistics
-   int n_cts = conf_info.fcst_cat_ta.n_elements();
+   int n_cts = conf_info.fcat_ta.n_elements();
    CTSInfo *cts_info = new CTSInfo [n_cts];
 
    // Setup CTSInfo objects
    for(i=0; i<n_cts; i++) {
-      cts_info[i].fthresh = conf_info.fcst_cat_ta[i];
-      cts_info[i].othresh = conf_info.obs_cat_ta[i];
+      cts_info[i].fthresh = conf_info.fcat_ta[i];
+      cts_info[i].othresh = conf_info.ocat_ta[i];
 
-      cts_info[i].allocate_n_alpha(conf_info.ci_alpha.n_elements());      
+      cts_info[i].allocate_n_alpha(conf_info.ci_alpha.n_elements());
       for(j=0; j<conf_info.ci_alpha.n_elements(); j++) {
          cts_info[i].alpha[j] = conf_info.ci_alpha[j];
       }
@@ -679,14 +681,14 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
    int i;
 
    mlog << Debug(4) << "Computing Multi-Category Statistics.\n";
-   
+
    // Object to store multi-category statistics
    MCTSInfo mcts_info;
 
    // Setup the MCTSInfo object
-   mcts_info.cts.set_size(conf_info.fcst_cat_ta.n_elements() + 1);
-   mcts_info.fthresh = conf_info.fcst_cat_ta;
-   mcts_info.othresh = conf_info.obs_cat_ta;
+   mcts_info.cts.set_size(conf_info.fcat_ta.n_elements() + 1);
+   mcts_info.fthresh = conf_info.fcat_ta;
+   mcts_info.othresh = conf_info.ocat_ta;
 
    mcts_info.allocate_n_alpha(conf_info.ci_alpha.n_elements());
    for(i=0; i<conf_info.ci_alpha.n_elements(); i++) {
@@ -707,7 +709,7 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
          mcts_info, true,
          conf_info.rank_corr_flag, conf_info.tmp_dir);
    }
-   
+
    // Add statistic value for each possible MCTC column
    for(i=0; i<conf_info.output_stats[stat_mctc].n_elements(); i++) {
       store_stat_mctc(n, conf_info.output_stats[stat_mctc][i],
@@ -726,47 +728,75 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
-   int i;
-  
+   int i, j;
+   NumArray ff_na, oo_na;
+
    mlog << Debug(4) << "Computing Continuous Statistics.\n";
 
-   // Object to store continuous statistics
-   CNTInfo cnt_info;
+   // Allocate objects to store continuous statistics
+   int n_cnt = conf_info.fcnt_ta.n_elements();
+   CNTInfo *cnt_info = new CNTInfo [n_cnt];
 
-   // Setup the CNTInfo object
-   cnt_info.allocate_n_alpha(conf_info.ci_alpha.n_elements());
-   for(i=0; i<conf_info.ci_alpha.n_elements(); i++) {
-      cnt_info.alpha[i] = conf_info.ci_alpha[i];
-   }
-      
-   // Compute the stats, normal confidence intervals, and
-   // bootstrap confidence intervals
-   if(conf_info.boot_interval == BootIntervalType_BCA) {
-      compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na,
-         conf_info.fcst_info[0]->is_precipitation() &
-         conf_info.obs_info[0]->is_precipitation(),
-         conf_info.n_boot_rep,
-         cnt_info, true, conf_info.rank_corr_flag, conf_info.tmp_dir);
-   }
-   else {
-      compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na,
-         conf_info.fcst_info[0]->is_precipitation() &
-         conf_info.obs_info[0]->is_precipitation(),
-         conf_info.n_boot_rep, conf_info.boot_rep_prop,
-         cnt_info, true, conf_info.rank_corr_flag, conf_info.tmp_dir);
+   // Loop over the continuous thresholds and compute stats
+   for(i=0; i<n_cnt; i++) {
+
+      // Store thresholds
+      cnt_info[i].fthresh = conf_info.fcnt_ta[i];
+      cnt_info[i].othresh = conf_info.ocnt_ta[i];
+
+      // Setup the CNTInfo alpha values
+      cnt_info[i].allocate_n_alpha(conf_info.ci_alpha.n_elements());
+      for(j=0; j<conf_info.ci_alpha.n_elements(); j++) {
+         cnt_info[i].alpha[j] = conf_info.ci_alpha[j];
+      }
+
+      // Apply continuous filtering thresholds
+      subset_fo_na(f_na, cnt_info[i].fthresh,
+                   o_na, cnt_info[i].othresh,
+                   conf_info.cnt_logic,
+                   ff_na, oo_na);
+
+      // Check for no matched pairs to process
+      if(ff_na.n_elements() == 0) continue;
+
+      // Compute the stats, normal confidence intervals, and
+      // bootstrap confidence intervals
+      if(conf_info.boot_interval == BootIntervalType_BCA) {
+         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na,
+            conf_info.fcst_info[0]->is_precipitation() &
+            conf_info.obs_info[0]->is_precipitation(),
+            conf_info.n_boot_rep,
+            cnt_info[i], true, conf_info.rank_corr_flag,
+            conf_info.tmp_dir);
+      }
+      else {
+         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na,
+            conf_info.fcst_info[0]->is_precipitation() &
+            conf_info.obs_info[0]->is_precipitation(),
+            conf_info.n_boot_rep, conf_info.boot_rep_prop,
+            cnt_info[i], true, conf_info.rank_corr_flag,
+            conf_info.tmp_dir);
+      }
    }
 
-   // Add statistic value for each possible CNT column
-   for(i=0; i<conf_info.output_stats[stat_cnt].n_elements(); i++) {
-      store_stat_cnt(n, conf_info.output_stats[stat_cnt][i],
-                     cnt_info);
-   }
+   // Loop over the continuous thresholds and write stats
+   for(i=0; i<n_cnt; i++) {
 
-   // Add statistic value for each possible SL1L2 column
-   for(i=0; i<conf_info.output_stats[stat_sl1l2].n_elements(); i++) {
-      store_stat_sl1l2(n, conf_info.output_stats[stat_sl1l2][i],
-                       cnt_info);
-   }
+      // Add statistic value for each possible CNT column
+      for(j=0; j<conf_info.output_stats[stat_cnt].n_elements(); j++) {
+         store_stat_cnt(n, conf_info.output_stats[stat_cnt][j],
+                        cnt_info[i]);
+      }
+
+      // Add statistic value for each possible SL1L2 column
+      for(j=0; j<conf_info.output_stats[stat_sl1l2].n_elements(); j++) {
+         store_stat_sl1l2(n, conf_info.output_stats[stat_sl1l2][j],
+                          cnt_info[i]);
+      }
+   } // end for i
+
+   // Deallocate memory
+   if(cnt_info) { delete [] cnt_info; cnt_info = (CNTInfo *) 0; }
 
    return;
 }
@@ -782,7 +812,7 @@ void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
    PCTInfo pct_info;
 
    // Setup the PCTInfo object
-   pct_info.fthresh = conf_info.fcst_cat_ta;
+   pct_info.fthresh = conf_info.fcat_ta;
    pct_info.allocate_n_alpha(conf_info.ci_alpha.n_elements());
 
    for(i=0; i<conf_info.ci_alpha.n_elements(); i++) {
@@ -790,10 +820,10 @@ void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
    }
 
    // Compute PCTInfo for each observation threshold
-   for(i=0; i<conf_info.obs_cat_ta.n_elements(); i++) {
+   for(i=0; i<conf_info.ocat_ta.n_elements(); i++) {
 
       // Set the current observation threshold
-      pct_info.othresh = conf_info.obs_cat_ta[i];
+      pct_info.othresh = conf_info.ocat_ta[i];
 
       // Compute the probabilistic counts and statistics
       compute_pctinfo(f_na, o_na, true, pct_info);
@@ -849,14 +879,14 @@ void store_stat_fho(int n, const ConcatString &col,
    }
 
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_fho_" << c << "_";
+   var_name << cs_erase << "series_fho_" << c;
 
    // Append threshold information
    if(cts_info.fthresh == cts_info.othresh) {
-      var_name << cts_info.fthresh.get_abbr_str();
+      var_name << "_" << cts_info.fthresh.get_abbr_str();
    }
    else {
-      var_name << "fcst" << cts_info.fthresh.get_abbr_str()
+      var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
                << "_obs" << cts_info.othresh.get_abbr_str();
    }
 
@@ -865,7 +895,7 @@ void store_stat_fho(int n, const ConcatString &col,
 
       // Build key
       lty_stat << "FHO_" << c;
-     
+
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
                  cts_info.fthresh.get_str(),
@@ -903,17 +933,17 @@ void store_stat_ctc(int n, const ConcatString &col,
    }
 
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_ctc_" << c << "_";
+   var_name << cs_erase << "series_ctc_" << c;
 
    // Append threshold information
    if(cts_info.fthresh == cts_info.othresh) {
-      var_name << cts_info.fthresh.get_abbr_str();
+      var_name << "_" << cts_info.fthresh.get_abbr_str();
    }
    else {
-      var_name << "fcst" << cts_info.fthresh.get_abbr_str()
+      var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
                << "_obs" << cts_info.othresh.get_abbr_str();
    }
-   
+
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
@@ -926,7 +956,7 @@ void store_stat_ctc(int n, const ConcatString &col,
                  cts_info.othresh.get_str(),
                  bad_data_double);
    }
-   
+
    // Store the statistic value
    put_nc_val(n, var_name, (float) v);
 
@@ -1053,20 +1083,20 @@ void store_stat_cts(int n, const ConcatString &col,
       }
 
       // Construct the NetCDF variable name
-      var_name << cs_erase << "series_cts_" << c << "_";
+      var_name << cs_erase << "series_cts_" << c;
 
       // Append threshold information
       if(cts_info.fthresh == cts_info.othresh) {
-         var_name << cts_info.fthresh.get_abbr_str();
+         var_name << "_" << cts_info.fthresh.get_abbr_str();
       }
       else {
-         var_name << "fcst" << cts_info.fthresh.get_abbr_str()
+         var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
                   << "_obs" << cts_info.othresh.get_abbr_str();
       }
 
       // Append confidence interval alpha value
       if(n_ci > 1) var_name << "_a"  << cts_info.alpha[i];
-      
+
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
@@ -1079,7 +1109,7 @@ void store_stat_cts(int n, const ConcatString &col,
                     cts_info.othresh.get_str(),
                     (n_ci > 1 ? cts_info.alpha[i] : bad_data_double));
       }
-   
+
       // Store the statistic value
       put_nc_val(n, var_name, (float) v);
 
@@ -1104,7 +1134,7 @@ void store_stat_mctc(int n, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL") { v = (double) mcts_info.cts.total(); }
    else if(c == "N_CAT") { v = (double) mcts_info.cts.nrows(); }
-   else if(check_reg_exp("F[0-9]*_O[0-9]*", c)) {               
+   else if(check_reg_exp("F[0-9]*_O[0-9]*", c)) {
 
       d = "FI_OJ";
 
@@ -1112,7 +1142,7 @@ void store_stat_mctc(int n, const ConcatString &col,
       sa = c.split("_");
       i  = atoi(sa[0]+1) - 1;
       j  = atoi(sa[1]+1) - 1;
-      
+
       // Range check
       if(i < 0 || i >= mcts_info.cts.nrows() ||
          j < 0 || j >= mcts_info.cts.ncols()) {
@@ -1123,7 +1153,7 @@ void store_stat_mctc(int n, const ConcatString &col,
       }
 
       // Retrieve the value
-      v = (double) mcts_info.cts.entry(i, j); 
+      v = (double) mcts_info.cts.entry(i, j);
    }
    else {
      mlog << Error << "\nstore_stat_mctc() -> "
@@ -1147,7 +1177,7 @@ void store_stat_mctc(int n, const ConcatString &col,
                  mcts_info.othresh.get_str(","),
                  bad_data_double);
    }
-   
+
    // Store the statistic value
    put_nc_val(n, var_name, (float) v);
 
@@ -1204,7 +1234,7 @@ void store_stat_mcts(int n, const ConcatString &col,
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
-         
+
          // Build key
          lty_stat << "MCTS_" << c;
 
@@ -1234,13 +1264,13 @@ void store_stat_cnt(int n, const ConcatString &col,
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
-   
+
    // Check for columns with normal or bootstrap confidence limits
    if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = cnt_info.n_alpha;
 
    // Loop over the alpha values, if necessary
    for(i=0; i<n_ci; i++) {
-   
+
       // Get the column value
            if(c == "TOTAL")       { v = (double) cnt_info.n;       }
       else if(c == "FBAR")        { v = cnt_info.fbar.v;           }
@@ -1328,17 +1358,28 @@ void store_stat_cnt(int n, const ConcatString &col,
 
       // Construct the NetCDF variable name
       var_name << cs_erase << "series_cnt_" << c;
+
+      // Append threshold information, if supplied
+      if(cnt_info.fthresh.get_type() != thresh_na ||
+         cnt_info.othresh.get_type() != thresh_na) {
+         var_name << "_fcst" << cnt_info.fthresh.get_abbr_str()
+                  << "_" << setlogic_to_abbr(conf_info.cnt_logic)
+                  << "_obs" << cnt_info.othresh.get_abbr_str();
+      }
+
+      // Append confidence interval alpha value
       if(n_ci > 1) var_name << "_a"  << cnt_info.alpha[i];
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
-         
+
          // Build key
          lty_stat << "CNT_" << c;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    "", "",
+                    cnt_info.fthresh.get_str(),
+                    cnt_info.othresh.get_str(),
                     (n_ci > 1 ? cnt_info.alpha[i] : bad_data_double));
       }
 
@@ -1378,6 +1419,14 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    // Construct the NetCDF variable name
    var_name << cs_erase << "series_sl1l2_" << c;
 
+   // Append threshold information, if supplied
+   if(cnt_info.fthresh.get_type() != thresh_na ||
+      cnt_info.othresh.get_type() != thresh_na) {
+      var_name << "_fcst" << cnt_info.fthresh.get_abbr_str()
+               << "_" << setlogic_to_abbr(conf_info.cnt_logic)
+               << "_obs" << cnt_info.othresh.get_abbr_str();
+   }
+
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
@@ -1386,10 +1435,11 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 "", "",
+                 cnt_info.fthresh.get_str(),
+                 cnt_info.othresh.get_str(),
                  bad_data_double);
    }
-   
+
    // Store the statistic value
    put_nc_val(n, var_name, (float) v);
 
@@ -1413,7 +1463,7 @@ void store_stat_pct(int n, const ConcatString &col,
 
       // Parse the index value from the column name
       i = atoi(strrchr(c, '_') + 1) - 1;
-      
+
       // Range check
       if(i < 0 || i >= pct_info.pct.nrows()) {
          mlog << Error << "\nstore_stat_pct() -> "
@@ -1422,7 +1472,7 @@ void store_stat_pct(int n, const ConcatString &col,
          exit(1);
       }
    }  // end if
-   
+
    // Get the column value
         if(c == "TOTAL")                     { v = (double) pct_info.pct.n();                      }
    else if(c == "N_THRESH")                  { v = (double) pct_info.pct.nrows() + 1;              }
@@ -1454,7 +1504,7 @@ void store_stat_pct(int n, const ConcatString &col,
                  pct_info.othresh.get_str(),
                  bad_data_double);
    }
-            
+
    // Store the statistic value
    put_nc_val(n, var_name, (float) v);
 
@@ -1537,7 +1587,7 @@ void store_stat_pjc(int n, const ConcatString &col,
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
    ConcatString d = c;
-   
+
    // Get index value for variable column numbers
    if(check_reg_exp("_[0-9]", c)) {
 
@@ -1596,7 +1646,7 @@ void store_stat_pjc(int n, const ConcatString &col,
                  pct_info.othresh.get_str(),
                  bad_data_double);
    }
-            
+
    // Store the statistic value
    put_nc_val(n, var_name, (float) v);
 
@@ -1632,7 +1682,7 @@ void store_stat_prc(int n, const ConcatString &col,
 
       // Get the 2x2 contingency table for this row
       ct = pct_info.pct.roc_point_by_row(i);
-      
+
    }  // end if
 
    // Get the column value
@@ -1663,7 +1713,7 @@ void store_stat_prc(int n, const ConcatString &col,
                  pct_info.othresh.get_str(),
                  bad_data_double);
    }
-            
+
    // Store the statistic value
    put_nc_val(n, var_name, (float) v);
 
@@ -1725,7 +1775,7 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-                             
+
 void add_nc_var(const ConcatString &var_name,
                 const ConcatString &name,
                 const ConcatString &long_name,
@@ -1744,7 +1794,7 @@ void add_nc_var(const ConcatString &var_name,
    if(fcst_thresh.length() > 0) d.var->add_att("fcst_thresh", fcst_thresh);
    if(obs_thresh.length() > 0)  d.var->add_att("obs_thresh", obs_thresh);
    if(!is_bad_data(alpha))      d.var->add_att("alpha", alpha);
-   
+
    // Store the new NcVarData object in the map
    stat_data[var_name] = d;
 
@@ -1758,7 +1808,7 @@ void put_nc_val(int n, const ConcatString &var_name, float v) {
 
    // Determine x,y location
    DefaultTO.one_to_two(grid.nx(), grid.ny(), n, x, y);
-   
+
    // Check for key in the map
    if(stat_data.count(var_name) == 0) {
       mlog << Error << "\nput_nc_val() -> "
@@ -1766,7 +1816,7 @@ void put_nc_val(int n, const ConcatString &var_name, float v) {
            << "\" does not exist in the map.\n\n";
       exit(1);
    }
-   
+
    // Get the NetCDF variable to be written
    NcVar *var = stat_data[var_name].var;
 

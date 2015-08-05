@@ -34,8 +34,8 @@ class SeriesAnalysisConfInfo {
       void init_from_scratch();
 
       // Counts based on the contents of the config file
-      int n_fcst;          // Number of forecast fields
-      int n_obs;           // Number of observation fields
+      int n_fcst;                          // Number of forecast fields
+      int n_obs;                           // Number of observation fields
 
    public:
 
@@ -46,24 +46,34 @@ class SeriesAnalysisConfInfo {
       ConcatString     model;              // Model name
       ConcatString     obtype;             // Observation type
       RegridInfo       regrid_info;        // Regridding information
+
       VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
       VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
-      ThreshArray      fcst_cat_ta;        // Categorical fcst thresholds
-      ThreshArray      obs_cat_ta;         // Categorical obs thresholds
+
+      ThreshArray      fcat_ta;            // Categorical fcst thresholds
+      ThreshArray      ocat_ta;            // Categorical obs thresholds
+
+      ThreshArray      fcnt_ta;            // Continuous fcst thresholds
+      ThreshArray      ocnt_ta;            // Continuous obs thresholds
+      SetLogic         cnt_logic;          // Continuous threshold field logic
+
       NumArray         ci_alpha;           // Alpha value for confidence intervals
       BootIntervalType boot_interval;      // Bootstrap CI type
       double           boot_rep_prop;      // Bootstrap replicate proportion
       int              n_boot_rep;         // Number of bootstrap replicates
       ConcatString     boot_rng;           // GSL random number generator
       ConcatString     boot_seed;          // GSL RNG seed value
+
       ConcatString     mask_grid_file;     // Path for masking grid area
       ConcatString     mask_grid_name;     // Name of masking grid area
       ConcatString     mask_poly_file;     // Path for masking poly area
       ConcatString     mask_poly_name;     // Name of masking poly area
       DataPlane        mask_dp;
+
       int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point
       bool             rank_corr_flag;     // Flag for computing rank correlations
+
       ConcatString     tmp_dir;            // Directory for temporary files
       ConcatString     version;            // Config file version
 

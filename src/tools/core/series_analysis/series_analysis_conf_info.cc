@@ -63,8 +63,11 @@ void SeriesAnalysisConfInfo::clear() {
    model.clear();
    obtype.clear();
    regrid_info.clear();
-   fcst_cat_ta.clear();
-   obs_cat_ta.clear();
+   fcat_ta.clear();
+   ocat_ta.clear();
+   fcnt_ta.clear();
+   ocnt_ta.clear();
+   cnt_logic = SetLogic_None;
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
    boot_rep_prop = bad_data_double;
@@ -126,13 +129,13 @@ void SeriesAnalysisConfInfo::read_config(const char *default_file_name,
 
 void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
                                             GrdFileType otype) {
-   int i;
+   int i, n;
    ConcatString s;
    StringArray sa;
    VarInfoFactory info_factory;
-   Dictionary *fcst_dict = (Dictionary *) 0;
-   Dictionary *obs_dict  = (Dictionary *) 0;
-   Dictionary i_fcst_dict, i_obs_dict;
+   Dictionary *fdict = (Dictionary *) 0;
+   Dictionary *odict = (Dictionary *) 0;
+   Dictionary i_fdict, i_odict;
    BootInfo boot_info;
    map<STATLineType,StringArray>::iterator it;
 
@@ -170,12 +173,12 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    }
 
    // Conf: fcst.field and obs.field
-   fcst_dict = conf.lookup_array(conf_key_fcst_field);
-   obs_dict  = conf.lookup_array(conf_key_obs_field);
+   fdict = conf.lookup_array(conf_key_fcst_field);
+   odict = conf.lookup_array(conf_key_obs_field);
 
    // Determine the number of fields (name/level) to be verified
-   n_fcst = parse_conf_n_vx(fcst_dict);
-   n_obs  = parse_conf_n_vx(obs_dict);
+   n_fcst = parse_conf_n_vx(fdict);
+   n_obs  = parse_conf_n_vx(odict);
 
    // Check for empty fcst and obs settings
    if(n_fcst == 0 || n_obs == 0) {
@@ -206,10 +209,10 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       fcst_info[i] = info_factory.new_var_info(ftype);
 
       // Get the current dictionaries
-      i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
+      i_fdict = parse_conf_i_vx_dict(fdict, i);
 
       // Set the current dictionaries
-      fcst_info[i]->set_dict(i_fcst_dict);
+      fcst_info[i]->set_dict(i_fdict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
@@ -234,10 +237,10 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       obs_info[i] = info_factory.new_var_info(otype);
 
       // Get the current dictionaries
-      i_obs_dict = parse_conf_i_vx_dict(obs_dict, i);
+      i_odict = parse_conf_i_vx_dict(odict, i);
 
       // Set the current dictionaries
-      obs_info[i]->set_dict(i_obs_dict);
+      obs_info[i]->set_dict(i_odict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
@@ -282,7 +285,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
 
-   // Only sanity check thresholds for thresholded statistics
+   // Sanity check categorical thresholds
    if((output_stats[stat_fho].n_elements()  +
        output_stats[stat_ctc].n_elements()  +
        output_stats[stat_cts].n_elements()  +
@@ -294,63 +297,63 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
        output_stats[stat_prc].n_elements()) > 0) {
 
       // Conf: fcst.cat_thresh
-      fcst_cat_ta = fcst_dict->lookup_thresh_array(conf_key_cat_thresh);
+      fcat_ta = fdict->lookup_thresh_array(conf_key_cat_thresh);
 
       // Conf: obs.cat_thresh
-      obs_cat_ta = obs_dict->lookup_thresh_array(conf_key_cat_thresh);
+      ocat_ta = odict->lookup_thresh_array(conf_key_cat_thresh);
 
-      // Dump the contents of the current thresholds
-      if(mlog.verbosity_level() >= 5) {
-         mlog << Debug(5)
-              << "Parsed forecast thresholds:\n";
-              fcst_cat_ta.dump(cout);
-         mlog << Debug(5)
-              << "Parsed observation thresholds:\n";
-              obs_cat_ta.dump(cout);
-      }
+      mlog << Debug(5)
+           << "Parsed forecast categorical thresholds: "  << fcat_ta.get_str() << "\n"
+           << "Parsed observed categorical thresholds: "  << ocat_ta.get_str() << "\n";
 
       // Verifying a probability field
-      if(fcst_info[0]->p_flag()) check_prob_thresh(fcst_cat_ta);
+      if(fcst_info[0]->p_flag()) check_prob_thresh(fcat_ta);
 
+      // Verifying non-probability fields
+      if(!fcst_info[0]->p_flag() &&
+         fcat_ta.n_elements() != ocat_ta.n_elements()) {
+
+         mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
+              << "The number of thresholds in \"fcst.cat_thresh\" must "
+              << "match the number of thresholds in \"obs.cat_thresh\".\n\n";
+         exit(1);
+      }
+
+      // Verifying with multi-category contingency tables
+      if(!fcst_info[0]->p_flag() &&
+         (output_stats[stat_mctc].n_elements() > 0 ||
+          output_stats[stat_mcts].n_elements() > 0)) {
+         check_mctc_thresh(fcat_ta);
+         check_mctc_thresh(ocat_ta);
+      }
    } // end if categorical
+   
+   // Sanity check continuous thresholds
+   if((output_stats[stat_sl1l2].n_elements()  +
+       output_stats[stat_cnt].n_elements()) > 0) {
 
-   // Verifying non-probability fields
-   if(!fcst_info[0]->p_flag() &&
-      fcst_cat_ta.n_elements() != obs_cat_ta.n_elements()) {
+      // Conf: fcst.cnt_thresh
+      fcnt_ta = fdict->lookup_thresh_array(conf_key_cnt_thresh);
 
-      mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
-           << "The number of thresholds in \"fcst.cat_thresh\" must "
-           << "match the number of thresholds in \"obs.cat_thresh\".\n\n";
-      exit(1);
-   }
+      // Conf: obs.cnt_thresh
+      ocnt_ta = odict->lookup_thresh_array(conf_key_cnt_thresh);
+   
+      // Conf: cnt_logic
+      cnt_logic = check_setlogic(
+                     int_to_setlogic(i_fdict.lookup_int(conf_key_cnt_logic)),
+                     int_to_setlogic(i_odict.lookup_int(conf_key_cnt_logic)));
 
-   // Verifying with multi-category contingency tables
-   if(!fcst_info[0]->p_flag() &&
-      (output_stats[stat_mctc].n_elements() > 0 ||
-       output_stats[stat_mcts].n_elements() > 0)) {
+      mlog << Debug(5)
+           << "Parsed forecast continuous thresholds: "  << fcnt_ta.get_str() << "\n"
+           << "Parsed observed continuous thresholds: "  << ocnt_ta.get_str() << "\n"
+           << "Parsed continuous threshold logic: "       << setlogic_to_string(cnt_logic) << "\n";
 
-      // Check that the threshold values are monotonically increasing
-      // and the threshold types are inequalities that remain the same
-      for(i=0; i<fcst_cat_ta.n_elements()-1; i++) {
+      // Add default continuous thresholds until the counts match
+      n = max(fcnt_ta.n_elements(), ocnt_ta.n_elements());
+      while(fcnt_ta.n_elements() < n) fcnt_ta.add(na_str);
+      while(ocnt_ta.n_elements() < n) ocnt_ta.add(na_str);
 
-         if(fcst_cat_ta[i].get_value() >  fcst_cat_ta[i+1].get_value() ||
-            obs_cat_ta[i].get_value()  >  obs_cat_ta[i+1].get_value()  ||
-            fcst_cat_ta[i].get_type()  != fcst_cat_ta[i+1].get_type()  ||
-            obs_cat_ta[i].get_type()   != obs_cat_ta[i+1].get_type()   ||
-            fcst_cat_ta[i].get_type()  == thresh_eq                    ||
-            fcst_cat_ta[i].get_type()  == thresh_ne                    ||
-            obs_cat_ta[i].get_type()   == thresh_eq                    ||
-            obs_cat_ta[i].get_type()   == thresh_ne) {
-
-            mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
-                 << "when verifying using multi-category contingency "
-                 << "tables, the thresholds must be monotonically "
-                 << "increasing and be of the same inequality type "
-                 << "(lt, le, gt, or ge).\n\n";
-            exit(1);
-         }
-      } // end for i
-   }
+   } // end if continuous
    
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);

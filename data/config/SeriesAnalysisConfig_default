@@ -30,12 +30,14 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+cat_thresh  = [ NA ];
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
-
-   cat_thresh  = [ >0.0, >=5.0 ];
 
    field = [
       {
