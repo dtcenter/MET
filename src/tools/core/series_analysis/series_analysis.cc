@@ -743,6 +743,7 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
       // Store thresholds
       cnt_info[i].fthresh = conf_info.fcnt_ta[i];
       cnt_info[i].othresh = conf_info.ocnt_ta[i];
+      cnt_info[i].logic   = conf_info.cnt_logic;
 
       // Setup the CNTInfo alpha values
       cnt_info[i].allocate_n_alpha(conf_info.ci_alpha.n_elements());
