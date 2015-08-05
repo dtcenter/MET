@@ -378,8 +378,6 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    wvlt_ptr = wavelet_set(&type, wvlt_member);
    
    // Conf: nc_pairs_flag
-   // nc_pairs_flag = conf.lookup_bool(conf_key_nc_pairs_flag);
-
    parse_nc_info();
 
    // Conf: ps_plot_flag
