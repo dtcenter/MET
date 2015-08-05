@@ -19,10 +19,13 @@ obs_window = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+
 fcst = {
 
-   wind_thresh = [ NA ];
-   
    field = [
       {
          name         = "PROB"; 
@@ -36,7 +39,6 @@ fcst = {
 
 obs = {
 
-   wind_thresh = [ NA ];
    sid_exc     = [];
    
    field = [
@@ -49,8 +51,6 @@ obs = {
    ];
 
 };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -19,13 +19,15 @@ obs_window = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-fcst = {
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
 
-   wind_thresh = [ NA ];
+fcst = {
    
    field = [
-      { name = "T2";   level = "(0,*,*)";      cat_thresh = [ <=273, >273 ]; },
-      //{ name = "TT";   level = "(0,9-13,*,*)"; cat_thresh = [ <=273, >273 ]; }
+      { name = "T2";   level = "(0,*,*)";     cat_thresh = [ <=273, >273 ]; },
       { name = "TT";   level = "(0,9-9,*,*)"; cat_thresh = [ <=273, >273 ]; }
    ];
 

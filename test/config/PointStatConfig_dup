@@ -24,11 +24,15 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
-   wind_thresh  = [ NA ];
    message_type = [ "ADPSFC" ];
    sid_exc      = [];
 
@@ -37,7 +41,6 @@ fcst = {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-        cat_thresh = [ >=5 ];
       }
    ];
 

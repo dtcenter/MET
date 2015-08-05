@@ -29,6 +29,9 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+
 //
 // Forecast and observation fields to be verified
 //
