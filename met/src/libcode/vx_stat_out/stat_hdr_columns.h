@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include "vx_config.h"
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
@@ -78,11 +79,10 @@ class StatHdrColumns {
       // Line type
       ConcatString line_type;
 
-      // Fcst threshold
+      // Fcst and obs thresholds
       ThreshArray fcst_thresh;
-
-      // Obs threshold
       ThreshArray obs_thresh;
+      SetLogic    thresh_logic;
 
       // Coverage field threshold
       ThreshArray cov_thresh;
@@ -106,10 +106,6 @@ class StatHdrColumns {
      ~StatHdrColumns();
 
       void clear();
-
-      void clear_fcst_thresh();
-      void clear_obs_thresh();
-      void clear_cov_thresh();
 
       // Set functions
       void set_model         (const char *);
@@ -141,6 +137,7 @@ class StatHdrColumns {
       void set_fcst_thresh   (const ThreshArray);
       void set_obs_thresh    (const SingleThresh);
       void set_obs_thresh    (const ThreshArray);
+      void set_thresh_logic  (const SetLogic);
 
       void set_cov_thresh    (const SingleThresh);
       void set_alpha         (const double);
@@ -187,6 +184,8 @@ class StatHdrColumns {
       ThreshArray  get_obs_thresh        () const;
       ConcatString get_obs_thresh_str    () const;
 
+      SetLogic     get_thresh_logic      () const;
+
       ThreshArray  get_cov_thresh        () const;
       ConcatString get_cov_thresh_str    () const;
 
@@ -231,10 +230,11 @@ inline ConcatString StatHdrColumns::get_interp_pnts_str   () const { return(inte
 inline ConcatString StatHdrColumns::get_line_type         () const { return(line_type);             }
 
 inline ThreshArray  StatHdrColumns::get_fcst_thresh       () const { return(fcst_thresh);           }
-inline ConcatString StatHdrColumns::get_fcst_thresh_str   () const { return(fcst_thresh.get_str()); }
 
 inline ThreshArray  StatHdrColumns::get_obs_thresh        () const { return(obs_thresh);            }
 inline ConcatString StatHdrColumns::get_obs_thresh_str    () const { return(obs_thresh.get_str());  }
+
+inline SetLogic     StatHdrColumns::get_thresh_logic      () const { return(thresh_logic);          }
 
 inline ThreshArray  StatHdrColumns::get_cov_thresh        () const { return(cov_thresh);            }
 inline ConcatString StatHdrColumns::get_cov_thresh_str    () const { return(cov_thresh.get_str());  }

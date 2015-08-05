@@ -1356,6 +1356,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       cnt_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
       cnt_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
+      cnt_info[i].logic   = conf_info.cnt_logic[i_vx];
 
       //
       // Setup alpha values
@@ -1440,6 +1441,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       s_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
       s_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
+      s_info[i].logic   = conf_info.cnt_logic[i_vx];
 
       //
       // Apply continuous filtering thresholds
@@ -1557,6 +1559,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       v_info[i].zero_out();
       v_info[i].fthresh = conf_info.fwind_ta[i_vx][i];
       v_info[i].othresh = conf_info.owind_ta[i_vx][i];
+      v_info[i].logic   = conf_info.wind_logic[i_vx];
    }
 
    // Loop through the pair data and compute sums

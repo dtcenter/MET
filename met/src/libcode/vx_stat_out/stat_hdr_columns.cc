@@ -87,27 +87,8 @@ void StatHdrColumns::clear() {
    obs_thresh.clear();
    cov_thresh.clear();
 
-   return;
-}
+   thresh_logic = SetLogic_None;
 
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::clear_fcst_thresh() {
-   fcst_thresh.clear();
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::clear_obs_thresh() {
-   obs_thresh.clear();
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::clear_cov_thresh() {
-   cov_thresh.clear();
    return;
 }
 
@@ -271,6 +252,13 @@ void StatHdrColumns::set_obs_thresh(const ThreshArray t) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void StatHdrColumns::set_thresh_logic(const SetLogic t) {
+   thresh_logic = t;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void StatHdrColumns::set_cov_thresh(const SingleThresh t) {
    cov_thresh.clear();
    cov_thresh.add(t);
@@ -282,6 +270,26 @@ void StatHdrColumns::set_cov_thresh(const SingleThresh t) {
 void StatHdrColumns::set_alpha(const double a) {
    alpha = a;
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString StatHdrColumns::get_fcst_thresh_str() const {
+   ConcatString cs;
+
+   cs << fcst_thresh.get_str();
+
+   // Append thresh_logic symbol
+   if(fcst_thresh.n_elements() == 1 &&
+      obs_thresh.n_elements()  == 1 &&
+      thresh_logic != SetLogic_None) {
+      
+      if(fcst_thresh[0].get_type() != thresh_na ||
+         obs_thresh[0].get_type()  != thresh_na) {
+         cs << setlogic_to_symbol(thresh_logic);
+      }
+   }
+   return(cs);
 }
 
 ////////////////////////////////////////////////////////////////////////

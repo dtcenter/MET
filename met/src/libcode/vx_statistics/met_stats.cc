@@ -636,6 +636,7 @@ void CNTInfo::clear() {
 
    fthresh.clear();
    othresh.clear();
+   logic = SetLogic_None;
    
    fbar.clear();
    fstdev.clear();
@@ -675,6 +676,7 @@ void CNTInfo::assign(const CNTInfo &c) {
 
    fthresh = c.fthresh;
    othresh = c.othresh;
+   logic   = c.logic;
 
    n = c.n;
    allocate_n_alpha(c.n_alpha);
@@ -999,6 +1001,7 @@ void SL1L2Info::clear() {
 
    fthresh.clear();
    othresh.clear();
+   logic = SetLogic_None;
 
    zero_out();
 
@@ -1013,6 +1016,7 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 
    fthresh = c.fthresh;
    othresh = c.othresh;
+   logic   = c.logic;
 
    // SL1L2 Quantities
    fbar    = c.fbar;
@@ -1249,6 +1253,7 @@ void VL1L2Info::clear() {
 
    fthresh.clear();
    othresh.clear();
+   logic = SetLogic_None;
 
    zero_out();
 
@@ -1263,6 +1268,7 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 
    fthresh = c.fthresh;
    othresh = c.othresh;
+   logic   = c.logic;
 
    // VL1L2 Quantities
    ufbar    = c.ufbar;

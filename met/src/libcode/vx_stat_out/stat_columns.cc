@@ -455,6 +455,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -493,6 +494,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -532,6 +534,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
@@ -576,6 +579,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    shc.set_obs_thresh(mcts_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -615,6 +619,7 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    shc.set_obs_thresh(mcts_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
@@ -658,6 +663,7 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
    // Thresholds
    shc.set_fcst_thresh(cnt_info.fthresh);
    shc.set_obs_thresh(cnt_info.othresh);
+   shc.set_thresh_logic(cnt_info.logic);
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
@@ -702,6 +708,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
    // Thresholds
    shc.set_fcst_thresh(cnt_info.fthresh);
    shc.set_obs_thresh(cnt_info.othresh);
+   shc.set_thresh_logic(cnt_info.logic);
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
@@ -740,6 +747,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    // Thresholds
    shc.set_fcst_thresh(sl1l2_info.fthresh);
    shc.set_obs_thresh(sl1l2_info.othresh);
+   shc.set_thresh_logic(sl1l2_info.logic);
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
@@ -778,6 +786,7 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    // Thresholds
    shc.set_fcst_thresh(sl1l2_info.fthresh);
    shc.set_obs_thresh(sl1l2_info.othresh);
+   shc.set_thresh_logic(sl1l2_info.logic);
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
@@ -816,6 +825,7 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    // Thresholds
    shc.set_fcst_thresh(vl1l2_info.fthresh);
    shc.set_obs_thresh(vl1l2_info.othresh);
+   shc.set_thresh_logic(vl1l2_info.logic);
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
@@ -854,6 +864,7 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    // Thresholds
    shc.set_fcst_thresh(vl1l2_info.fthresh);
    shc.set_obs_thresh(vl1l2_info.othresh);
+   shc.set_thresh_logic(vl1l2_info.logic);
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
@@ -894,6 +905,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -933,6 +945,7 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
@@ -978,6 +991,7 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -1016,6 +1030,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    shc.set_obs_thresh(pct_info.othresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -1057,6 +1072,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    shc.set_cov_thresh(nbrcts_info.cthresh);
 
    // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
 
    // Write the header columns
@@ -1096,6 +1112,9 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
 
    // Fractional coverage threshold
    shc.set_cov_thresh(nbrcts_info.cthresh);
+
+   // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
 
    // Write a line for each alpha value
    for(i=0; i<nbrcts_info.cts_info.n_alpha; i++) {
@@ -1141,6 +1160,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
    shc.set_obs_thresh(nbrcnt_info.othresh);
 
    // Not applicable
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
@@ -1185,6 +1205,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    // Not Applicable
    shc.set_fcst_thresh(na_str);
    shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1271,6 +1292,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    // Not Applicable
    shc.set_fcst_thresh(na_str);
    shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1307,6 +1329,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    // Not Applicable
    shc.set_fcst_thresh(na_str);
    shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1344,6 +1367,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    // Not Applicable
    shc.set_fcst_thresh(na_str);
    shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1389,6 +1413,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    // Not Applicable
    shc.set_fcst_thresh(na_str);
    shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
 
    // Alpha value

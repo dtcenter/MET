@@ -155,6 +155,7 @@ class CNTInfo {
       // Filtering thresholds
       SingleThresh fthresh;
       SingleThresh othresh;
+      SetLogic     logic;
 
       // Confidence interval alpha values
       int     n_alpha;
@@ -206,6 +207,7 @@ class SL1L2Info {
       // Filtering thresholds
       SingleThresh fthresh;
       SingleThresh othresh;
+      SetLogic     logic;
 
       // SL1L2 Quantities
       double fbar, obar;
@@ -249,6 +251,7 @@ class VL1L2Info {
       // Filtering thresholds
       SingleThresh fthresh;
       SingleThresh othresh;
+      SetLogic     logic;
 
       // VL1L2 Quantities
       double ufbar, vfbar, uobar, vobar;
