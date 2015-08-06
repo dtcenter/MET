@@ -3268,8 +3268,15 @@ bool check_fo_thresh(const double f, const SingleThresh &ft,
    bool status = true;
    bool fcheck = ft.check(f);
    bool ocheck = ot.check(o);
-   
-   switch(type) {
+   SetLogic t  = type;
+
+   // If either of the thresholds is NA, reset the logic to intersection
+   // because an NA threshold is always true.
+   if(ft.get_type() == thresh_na || ot.get_type() == thresh_na) {
+      t = SetLogic_Intersection;
+   }
+
+   switch(t) {
       case(SetLogic_Union):
          if(!fcheck && !ocheck) status = false;
          break;
@@ -3288,7 +3295,7 @@ bool check_fo_thresh(const double f, const SingleThresh &ft,
          exit(1);
          break;
    }
-   
+
    return(status);
 }
 

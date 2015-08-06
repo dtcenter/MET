@@ -283,8 +283,8 @@ ConcatString StatHdrColumns::get_fcst_thresh_str() const {
    if(fcst_thresh.n_elements() == 1 &&
       obs_thresh.n_elements()  == 1 &&
       thresh_logic != SetLogic_None) {
-      
-      if(fcst_thresh[0].get_type() != thresh_na ||
+
+      if(fcst_thresh[0].get_type() != thresh_na &&
          obs_thresh[0].get_type()  != thresh_na) {
          cs << setlogic_to_symbol(thresh_logic);
       }
