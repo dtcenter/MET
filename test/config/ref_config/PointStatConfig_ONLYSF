@@ -24,6 +24,10 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_logic  = INTERSECTION;
+
 //
 // Forecast and observation fields to be verified
 //
@@ -78,7 +82,9 @@ fcst = {
 
 };
 obs = fcst;
-obs = { wind_thresh = >2.572; };
+obs = {
+   wind_thresh = [ >2.572 ];
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -161,6 +167,6 @@ duplicate_flag = NONE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${MODEL}_F${FCST_TIME}_ONLYSF";
-version        = "V5.0";
+version        = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////
