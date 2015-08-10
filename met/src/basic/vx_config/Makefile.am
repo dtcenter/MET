@@ -10,7 +10,8 @@ include ${top_srcdir}/Make-include
 
 # Yacc/lex flags
 
-AM_YFLAGS	= -d -p config
+#AM_YFLAGS	= -d -p config
+AM_YFLAGS	= --defines=config.tab.h -p config
 AM_LFLAGS	= --prefix=config --outfile=lex.yy.c
 
 # The library
@@ -61,4 +62,5 @@ endif
 
 EXTRA_DIST = config.tab.cc \
 	config.tab.h \
+	config.tab.hh \
 	config_scanner.cc
