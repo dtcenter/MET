@@ -721,6 +721,27 @@ else
     AC_MSG_NOTICE([mode_graphics will not be compiled])
 fi
 
+
+# mode_time_domain
+
+AC_ARG_ENABLE(mode_time_domain,
+	  [AS_HELP_STRING([--enable-mode_time_domain], [Enable compilation of mode_time_domain])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_MODE_TIME_DOMAIN="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-mode_time_domain) ;;
+   esac],
+  [ENABLE_MODE_TIME_DOMAIN="no"]
+)
+
+AM_CONDITIONAL([ENABLE_MODE_TIME_DOMAIN], [test "x$ENABLE_MODE_TIME_DOMAIN" = "xyes"])
+
+if test "x$ENABLE_MODE_TIME_DOMAIN" = "xyes"; then
+    AC_DEFINE([ENABLE_MODE_TIME_DOMAIN], [], ["build mode_time_domain"])
+    AC_MSG_NOTICE([mode_time_domain will be compiled])
+else
+    AC_MSG_NOTICE([mode_time_domain will not be compiled])
+fi
+
 # tc_utils
 
 AC_ARG_ENABLE(tc_utils,
@@ -999,6 +1020,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/wwmca_tool/Makefile
                  src/tools/other/gsi_tools/Makefile
                  src/tools/other/regrid_data_plane/Makefile
+                 src/tools/other/mode_time_domain/Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile

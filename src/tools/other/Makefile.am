@@ -62,4 +62,8 @@ endif
   SUBDIRS += regrid_data_plane
 #endif
 
+#if ENABLE_MODE_TIME_DOMAIN
+  SUBDIRS += mode_time_domain
+#endif
+
 MAINTAINERCLEANFILES 	= Makefile.in
