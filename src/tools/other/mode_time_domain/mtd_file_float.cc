@@ -1,0 +1,563 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+using namespace std;
+
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <cstdio>
+#include <cmath>
+
+#include "mtd_file.h"
+#include "mtd_nc_defs.h"
+#include "nc_utils.h"
+
+#include "vx_math.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class MtdFloatFile
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MtdFloatFile::MtdFloatFile()
+
+{
+
+float_init_from_scratch();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MtdFloatFile::~MtdFloatFile()
+
+{
+
+clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MtdFloatFile::MtdFloatFile(const MtdFloatFile & f)
+
+{
+
+float_init_from_scratch();
+
+float_assign(f);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MtdFloatFile & MtdFloatFile::operator=(const MtdFloatFile & f)
+
+{
+
+if ( this == &f )  return ( * this );
+
+float_assign(f);
+
+return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::float_init_from_scratch()
+
+{
+
+Data = 0;
+
+clear();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::clear()
+
+{
+
+MtdFileBase::clear();
+
+if ( Data )  { delete [] Data;  Data = 0; }
+
+DataMin = DataMax = 0;
+
+Radius = -1;
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::float_assign(const MtdFloatFile & f)
+
+{
+
+clear();
+
+base_assign(f);
+
+DataMin = f.DataMin;
+DataMax = f.DataMax;
+
+Radius = f.Radius;
+
+const int n = Nx*Ny*Nt;
+
+if ( f.Data )  {
+
+   Data = new float [n];
+
+   memcpy(Data, f.Data, n*sizeof(float));
+
+}
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+MtdFileBase::dump(out, depth);
+
+if ( Radius >= 0 )  {
+
+   out << prefix << "Radius = " << Radius << '\n';
+
+}
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::set_size(int _nx, int _ny, int _nt)
+
+{
+
+
+if ( Data )  { delete [] Data;  Data = 0; }
+
+int j;
+const int n3 = _nx*_ny*_nt;
+
+Data = new float [n3];
+
+Nx = _nx;
+Ny = _ny;
+Nt = _nt;
+
+float * d = Data;
+
+for (j=0; j<n3; ++j)  *d++ = 0.0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::set_radius(int r)
+
+{
+
+if ( r < 0 )  {
+
+   cerr << "\n\n  MtdFloatFile::set_radius(int) -> bad value ... " << r << "\n\n";
+
+   exit ( 1 );
+
+}
+
+Radius = r;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::put(const float value, int _x, int _y, int _t)
+
+{
+
+const int n = mtd_three_to_one(Nx, Ny, Nt, _x, _y, _t);
+
+Data[n] = value;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::set_data_minmax(double _data_min, double _data_max)
+
+{
+
+DataMin = _data_min;
+
+DataMax = _data_max;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MtdIntFile MtdFloatFile::threshold(double T) const
+
+{
+
+MtdIntFile out;
+
+threshold(T, out);
+
+return ( out );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::threshold(double T, MtdIntFile & out) const
+
+{
+
+if ( !Data )  {
+
+   cerr << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
+
+   exit ( 1 );
+
+}
+
+int j;
+bool got_some = false;
+float fval;
+int ival;
+const int n3 = Nx*Ny*Nt;
+const float FT = (float) T;
+
+out.clear();
+
+out.base_assign(*this);
+
+out.set_size(Nx, Ny, Nt);
+
+float * d = Data;
+int * i = out.Data;
+
+
+for (j=0; j<n3; ++j)  {
+
+   fval = *d++;
+
+   ival = ( (fval >= FT) ? 1 : 0);
+
+   *i++ = ival;
+
+   if ( ival )  got_some = true;
+
+}
+
+ival = ( got_some ? 1 : 0 );
+
+out.set_data_minmax(0, ival);
+
+out.set_radius(Radius);
+
+out.set_threshold(T);
+
+out.set_filetype(mtd_file_mask);
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool MtdFloatFile::read(const char * _filename)
+
+{
+
+NcFile f(_filename);
+
+if ( ! f.is_valid() )  return ( false );
+
+Filename = _filename;
+
+MtdFloatFile::read(f);
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::read(NcFile & f)
+
+{
+
+NcVar * var = 0;
+
+
+
+   //
+   //  read the base class stuff
+   //
+
+MtdFileBase::read(f);
+
+   //  DataMin, DataMax
+
+DataMin = string_att_as_double (f, min_value_att_name);
+DataMax = string_att_as_double (f, max_value_att_name);
+
+   //  Data
+
+set_size(Nx, Ny, Nt);
+
+var = f.get_var(data_field_name);
+
+if ( !(var->set_cur(0, 0, 0)) )  {
+
+   cerr << "\n\n  MtdFloatFile::read() -> trouble setting corner\n\n";
+
+   exit ( 1 );
+
+}
+
+const time_t t_start = time(0);   //  for timing the data read operation
+
+if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
+
+   cerr << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
+
+   exit ( 1 );
+
+}
+
+const time_t t_stop = time(0);   //  for timing the data read operation
+
+cout << "\n\n  MtdFloatFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::write(NcFile & f) const
+
+{
+
+NcDim * nx_dim   = 0;
+NcDim * ny_dim   = 0;
+NcDim * nt_dim   = 0;
+NcVar * data_var = 0;
+const char format [] = "%.3f";
+char junk[256];
+
+
+   //
+   //  write stuff from parent class
+   //
+
+MtdFileBase::write(f);
+
+   //
+   //  get the dimensions of the data field
+   //
+
+nx_dim = f.get_dim(nx_dim_name);
+ny_dim = f.get_dim(ny_dim_name);
+nt_dim = f.get_dim(nt_dim_name);
+
+
+   //  DataMin, DataMax
+
+sprintf(junk, format, DataMin);
+
+f.add_att(min_value_att_name, junk);
+
+sprintf(junk, format, DataMax);
+
+f.add_att(max_value_att_name, junk);
+
+   //  Radius
+
+if ( Radius >= 0 )  {
+
+   f.add_att(radius_att_name, Radius);
+
+}
+
+   //  Data
+
+f.add_var(data_field_name, ncFloat, nt_dim, ny_dim, nx_dim);
+
+data_var = f.get_var(data_field_name);
+
+if ( !(data_var->set_cur(0, 0, 0)) )  {
+
+   cerr << "\n\n  MtdFloatFile::write() -> trouble setting corner on data field\n\n";
+
+   exit ( 1 );
+
+}
+
+const time_t t_start = time(0);   //  for timing the data write operation
+
+if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
+
+   cerr << "\n\n  MtdFloatFile::write() -> trouble with put in data field\n\n";
+
+   exit ( 1 );
+
+}
+
+
+const time_t t_stop = time(0);   //  for timing the data write operation
+
+cout << "\n\n  MtdFloatFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::write(const char * _filename) const
+
+{
+
+NcFile f(_filename, NcFile::Replace);
+
+if ( ! f.is_valid() )  {
+
+   cerr << "\n\n  MtdFloatFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
+
+   // exit ( 1 );
+
+   return;
+
+}
+
+MtdFloatFile::write(f);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
