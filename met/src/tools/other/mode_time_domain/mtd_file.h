@@ -220,6 +220,8 @@ class MtdFloatFile : public MtdFileBase {
       MtdIntFile threshold(double) const;
       void       threshold(double, MtdIntFile &) const;
 
+      MtdFloatFile  const_t_slice(int t) const;
+
 };
 
 
@@ -314,6 +316,8 @@ class MtdIntFile : public MtdFileBase {
       void split ();
 
       MtdIntFile select(int) const;
+
+      MtdIntFile const_t_slice(int t) const;
 
 };
 
