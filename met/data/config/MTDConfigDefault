@@ -94,6 +94,7 @@ mask = {
    grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
    poly      = "";
    poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,16 +104,20 @@ mask = {
    //
 
 weight = {
-   centroid_dist    = 2.0;
-   boundary_dist    = 4.0;
-   convex_hull_dist = 0.0;
-   angle_diff       = 1.0;
-   area_ratio       = 1.0;
-   int_area_ratio   = 2.0;
-   complexity_ratio = 0.0;
-   inten_perc_ratio = 0.0;
-   inten_perc_value = 50;
-}
+
+   speed_diff      = 1.0;
+
+   direction_diff  = 1.0;
+
+   volume_ratio    = 1.0;
+
+   axis_angle_diff = 1.0;
+
+   start_time_diff = 1.0;
+
+   end_time_diff   = 1.0;
+
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -122,48 +127,58 @@ weight = {
 
 interest_function = {
 
-   centroid_dist = (
-      (            0.0, 1.0 )
-      (  60.0/grid_res, 1.0 )
-      ( 600.0/grid_res, 0.0 )
+   speed_diff = (
+
+      (   0.0, 1.0 )
+      (  50.0, 0.5 )
+      ( 100.0, 0.0 )
+
    );
 
-   boundary_dist = (
-      (            0.0, 1.0 )
-      ( 400.0/grid_res, 0.0 )
+   direction_diff = (
+
+      (   0.0, 1.0 )
+      (  90.0, 0.0 )
+      ( 180.0, 0.0 )
+
    );
 
-   convex_hull_dist = (
-      (            0.0, 1.0 )
-      ( 400.0/grid_res, 0.0 )
+   volume_ratio = (
+
+      (  0.0, 0.0 )
+      (  0.5, 0.5 )
+      (  1.0, 1.0 )
+      (  1.5, 0.5 )
+      (  2.0, 0.0 )
+
    );
 
-   angle_diff = (
+   axis_angle_diff = (
+
       (  0.0, 1.0 )
       ( 30.0, 1.0 )
       ( 90.0, 0.0 )
+
    );
 
-   corner   = 0.8;
-   ratio_if = (
-      (    0.0, 0.0 )
-      ( corner, 1.0 )
-      (    1.0, 1.0 )
+   start_time_diff = (
+
+      (  0.0, 1.0 )
+      (  3.0, 0.5 )
+      (  5.0, 0.0 )
+
+   };
+
+   end_time_diff = (
+
+      (  0.0, 1.0 )
+      (  3.0, 0.5 )
+      (  5.0, 0.0 )
+
    );
 
-   area_ratio = ratio_if;
+};   //  interest functions
 
-   int_area_ratio = (
-      ( 0.00, 0.00 )
-      ( 0.10, 0.50 )
-      ( 0.25, 1.00 )
-      ( 1.00, 1.00 )
-   );
-
-   complexity_ratio = ratio_if;
-
-   inten_perc_ratio = ratio_if;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -179,6 +194,7 @@ total_interest_thresh = 0.7;
 
 print_interest_thresh = 0.0;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 
    //
@@ -188,38 +204,34 @@ print_interest_thresh = 0.0;
 
 zero_border_size = 1;
 
-   //
-   // Plot polyline edges using great circle arcs instead of straight lines
-   //
-
-plot_gcarc_flag = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
    //
-   // NetCDF matched pairs and contingency table output files
+   // Output flags
    //
 
-nc_pairs_flag   = {
+nc_output = {
 
-   latlon       = TRUE;
-   raw          = TRUE;
-   object_raw   = TRUE;
-   object_id    = TRUE;
-   cluster_id   = TRUE;
-   polylines    = TRUE;
+   latlon       = true;
+   raw          = true;
+   object_id    = true;
+   cluster_id   = true;
 
 };
 
-ct_stats_flag   = TRUE;
+txt_output = {
+
+   attributes_2d   = true;
+   attributes_3d   = true;
+
+   convex_hulls_2d = true;
+
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-shift_right = 0;   //  grid squares
-
-
-////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "";
 

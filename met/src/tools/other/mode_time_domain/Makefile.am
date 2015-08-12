@@ -16,6 +16,8 @@ mtd_SOURCES = mtd.cc  \
               mtdfiletype_to_string.cc  \
               nc_utils.cc  \
               nc_grid.cc  \
+              3d_moments.h  \
+              3d_moments.cc  \
               mtd_config_info.cc  \
               mtd_file_base.cc  \
               mtd_file_float.cc  \
