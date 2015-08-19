@@ -40,11 +40,16 @@ wind_logic  = UNION;
 fcst = {
 
    field = [
-      { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ <300, >=300 ]; },
-      { name = "DPT";   level = [ "Z2" ];  cat_thresh = [ <260, >=260 ]; },
-      { name = "UGRD";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ]; },
-      { name = "VGRD";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ]; },
-      { name = "WIND";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ]; }
+      { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ <273, >=273     ];
+                                           cnt_thresh = [ <273, >=273, NA ];
+                                           cnt_logic  = UNION;               },
+      { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ ];
+                                           cnt_thresh = [ <273, >=273 ];
+                                           cnt_logic  = INTERSECTION;        },
+      { name = "DPT";   level = [ "Z2" ];  cat_thresh = [ <260, >=260 ];     },
+      { name = "UGRD";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ];         },
+      { name = "VGRD";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ];         },
+      { name = "WIND";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ];         }
    ];
 
 };
