@@ -93,6 +93,24 @@
     </output>
   </test>
 
+  <test name="stat_analysis_AGG_STAT_ORANK_SSVAR">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type SSVAR \
+      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB -out_bin_size 0.25 \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR.out</exist>
+    </output>
+  </test>
+  
   <test name="stat_analysis_AGG_SSVAR">
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <param> \
