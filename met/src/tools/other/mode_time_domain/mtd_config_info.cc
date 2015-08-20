@@ -16,9 +16,11 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <cstdio>
 #include <cmath>
 
 #include "mtd_config_info.h"
+#include "3d_att.h"
 #include "configobjecttype_to_string.h"
 
 #include "vx_data2d_factory.h"
@@ -559,6 +561,140 @@ nc_info.do_raw        = d->lookup_bool(conf_key_raw_flag);
 nc_info.do_object_id  = d->lookup_bool(conf_key_object_id_flag);
 nc_info.do_cluster_id = d->lookup_bool(conf_key_cluster_id_flag);
 nc_info.do_polylines  = d->lookup_bool(conf_key_do_polylines_flag);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdConfigInfo::write_header_cols(AsciiTable & table, const int row) const
+
+{
+
+int c = 0;
+int month, day, year, hour, minute, second;
+char junk[512];
+ConcatString s;
+
+   //  version
+
+table.set_entry(row, c++, version.text());
+
+   //  model
+
+table.set_entry(row, c++, model.text());
+
+   //  fcst lead
+
+sec_to_hms(fcst_info->lead(), hour, minute, second);
+
+snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
+
+table.set_entry(row, c++, junk);
+
+   //  fcst valid
+
+unix_to_mdyhms(fcst_info->valid(), month, day, year, hour, minute, second);
+
+snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+
+table.set_entry(row, ++c, junk);
+
+   //  fcst time delta ... don't know this
+
+c++;
+
+   //  fcst accum
+
+c++;
+
+   //  obs lead
+
+sec_to_hms(obs_info->lead(), hour, minute, second);
+
+snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
+
+table.set_entry(row, c++, junk);
+
+   //  obs valid
+
+unix_to_mdyhms(obs_info->valid(), month, day, year, hour, minute, second);
+
+snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+
+table.set_entry(row, ++c, junk);
+
+   //  obs time delta ... don't know this
+
+c++;
+
+   //  obs accum
+
+c++;
+
+   //  fcst radius
+
+table.set_entry(row, ++c, fcst_conv_radius);
+
+   //  fcst threshold
+
+s = fcst_conv_thresh.get_str();
+
+table.set_entry(row, ++c, s.text());
+
+   //  obs radius
+
+table.set_entry(row, ++c, obs_conv_radius);
+
+   //  obs threshold
+
+s = obs_conv_thresh.get_str();
+
+table.set_entry(row, ++c, s.text());
+
+   //  fcst var
+
+s = fcst_info->name();
+
+table.set_entry(row, ++c, s.text());
+
+   //  fcst level
+
+s = fcst_info->level_name();
+
+table.set_entry(row, ++c, s.text());
+
+   //  obs var
+
+s = obs_info->name();
+
+table.set_entry(row, ++c, s.text());
+
+   //  obs level
+
+s = obs_info->level_name();
+
+table.set_entry(row, ++c, s.text());
+
+   //  object id
+
+c++;
+
+   //  object cat
+
+c++;
+
+
+
+
+
 
    //
    //  done

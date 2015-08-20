@@ -26,6 +26,13 @@ typedef MtdIntFile Object;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char hms_format     [] = "%02d%02d%02d";
+static const char ymd_hms_format [] = "%04d%02d%02d_%02d%02d%02d";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class SingleAtt3D {
 
       friend SingleAtt3D calc_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, int obj_number);
@@ -140,6 +147,7 @@ class SingleAtt3D {
          //  do stuff
          //
 
+      void write_txt(AsciiTable &, const int row) const;
 
 };
 
@@ -315,10 +323,10 @@ inline int PairAtt3D::end_time_delta   () const { return ( EndTimeDelta ); }
 
 extern SingleAtt3D calc_single_atts(const Object & mask, const Object & raw, const char * model, int obj_number);   //  0 based 
 
-extern PairAtt3D   calc_pair_atts(const Object & _fcst_obj, 
-                                       const Object & _obs_obj, 
-                                       const SingleAtt3D & _fa, 
-                                       const SingleAtt3D & _oa);
+extern PairAtt3D   calc_pair_atts(const Object      & _fcst_obj, 
+                                  const Object      & _obs_obj, 
+                                  const SingleAtt3D & _fa, 
+                                  const SingleAtt3D & _oa);
 
 
 ////////////////////////////////////////////////////////////////////////
