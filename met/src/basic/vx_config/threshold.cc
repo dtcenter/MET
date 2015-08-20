@@ -20,10 +20,10 @@ using namespace std;
 #include "threshold.h"
 #include "util_constants.h"
 
+#include "vx_config.h"
 #include "vx_math.h"
 #include "vx_log.h"
 #include "is_bad_data.h"
-#include "config_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -610,11 +610,20 @@ bool status = false;
 
 test_mode = true;
 
-status = config.read_string(str);
+   //
+   //  strip off trailing SetLogic symbols
+   //
+
+ConcatString cs = str;
+cs.chomp(setlogic_symbol_union);
+cs.chomp(setlogic_symbol_intersection);
+cs.chomp(setlogic_symbol_symdiff);
+
+status = config.read_string(cs);
 
 if ( ! status )  {
 
-   cerr << "\n\n  SingleThresh::set(const char *): failed to parse string \"" << str << "\"\n\n";
+   cerr << "\n\n  SingleThresh::set(const char *): failed to parse string \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
@@ -624,7 +633,7 @@ test_mode = false;
 
 if ( ! result )  {
 
-   cerr << "\n\n  SingleThresh::set(const char *): no result from parsing string \"" << str << "\"\n\n";
+   cerr << "\n\n  SingleThresh::set(const char *): no result from parsing string \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
