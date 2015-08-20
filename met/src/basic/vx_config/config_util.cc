@@ -1347,10 +1347,10 @@ ConcatString setlogic_to_abbr(SetLogic type) {
 
    // Convert enumerated SetLogic to an abbreviation
    switch(type) {
-      case(SetLogic_None):         s = na_str;    break;
-      case(SetLogic_Union):        s = "or";      break;
-      case(SetLogic_Intersection): s = "and";     break;
-      case(SetLogic_SymDiff):      s = "symdiff"; break;
+      case(SetLogic_None):         s = na_str;                     break;
+      case(SetLogic_Union):        s = setlogic_abbr_union;        break;
+      case(SetLogic_Intersection): s = setlogic_abbr_intersection; break;
+      case(SetLogic_SymDiff):      s = setlogic_abbr_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_abbr() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";
@@ -1368,10 +1368,10 @@ ConcatString setlogic_to_symbol(SetLogic type) {
 
    // Convert enumerated SetLogic to a symbol
    switch(type) {
-      case(SetLogic_None):         s = na_str; break;
-      case(SetLogic_Union):        s = "||";   break;
-      case(SetLogic_Intersection): s = "&&";   break;
-      case(SetLogic_SymDiff):      s = "*";    break;
+      case(SetLogic_None):         s = na_str;                       break;
+      case(SetLogic_Union):        s = setlogic_symbol_union;        break;
+      case(SetLogic_Intersection): s = setlogic_symbol_intersection; break;
+      case(SetLogic_SymDiff):      s = setlogic_symbol_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_symbol() -> "
               << "Unexpected SetLogic value of " << type << ".\n\n";

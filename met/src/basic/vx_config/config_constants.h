@@ -53,6 +53,20 @@ enum SetLogic {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Corresponding SetLogic strings
+//
+
+static const char setlogic_abbr_union[]          = "or";
+static const char setlogic_abbr_intersection[]   = "and";
+static const char setlogic_abbr_symdiff[]        = "symdiff";
+
+static const char setlogic_symbol_union[]        = "||";
+static const char setlogic_symbol_intersection[] = "&&";
+static const char setlogic_symbol_symdiff[]      = "*";
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for track type configuration parameters
 //
 
