@@ -169,9 +169,11 @@ void STATAnalysisJob::clear() {
 
    out_fcst_thresh.clear();
    out_obs_thresh.clear();
+   out_cnt_logic = SetLogic_Union;
 
    out_fcst_wind_thresh.clear();
    out_obs_wind_thresh.clear();
+   out_wind_logic = SetLogic_Union;
 
    // Initialize ramp job settings
    ramp_type       = default_ramp_type;
@@ -267,8 +269,10 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    out_fcst_thresh      = aj.out_fcst_thresh;
    out_obs_thresh       = aj.out_obs_thresh;
+   out_cnt_logic        = aj.out_cnt_logic;
    out_fcst_wind_thresh = aj.out_fcst_wind_thresh;
    out_obs_wind_thresh  = aj.out_obs_wind_thresh;
+   out_wind_logic       = aj.out_wind_logic;
    out_alpha            = aj.out_alpha;
    out_bin_size         = aj.out_bin_size;
 
@@ -444,11 +448,17 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "out_obs_thresh ...\n";
    out_obs_thresh.dump(out, depth + 1);
 
+   out << prefix << "out_cnt_logic = "
+       << setlogic_to_string(out_cnt_logic) << "\n";
+
    out << prefix << "out_fcst_wind_thresh ...\n";
    out_fcst_wind_thresh.get_str();
 
    out << prefix << "out_obs_wind_thresh ...\n";
    out_obs_wind_thresh.get_str();
+
+   out << prefix << "out_wind_logic = "
+       << setlogic_to_string(out_wind_logic) << "\n";
 
    out << prefix << "out_alpha = "
        << out_alpha << "\n";
@@ -1128,6 +1138,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          out_obs_thresh.add_css(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-out_cnt_logic") == 0) {
+         out_cnt_logic = string_to_setlogic(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-out_wind_thresh") == 0) {
          out_fcst_wind_thresh.set(jc_array[i+1]);
          out_obs_wind_thresh.set(jc_array[i+1]);
@@ -1139,6 +1153,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       }
       else if(strcmp(jc_array[i], "-out_obs_wind_thresh") == 0) {
          out_obs_wind_thresh.set(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-out_wind_logic") == 0) {
+         out_wind_logic = string_to_setlogic(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-out_alpha") == 0) {
@@ -2008,6 +2026,11 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       }
    }
 
+   // out_cnt_logic
+   if(out_cnt_logic != SetLogic_None) {
+      js << "-out_cnt_logic " << setlogic_to_string(out_cnt_logic) << " ";
+   }
+
    // out_fcst_wind_thresh == out_obs_wind_thresh
    if(out_fcst_wind_thresh == out_obs_wind_thresh) {
       if(out_fcst_wind_thresh.get_type() != thresh_na) {
@@ -2024,6 +2047,11 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       if(out_obs_wind_thresh.get_type() != thresh_na) {
          js << "-out_obs_wind_thresh " << out_obs_wind_thresh.get_str() << " ";
       }
+   }
+
+   // out_wind_logic
+   if(out_wind_logic != SetLogic_None) {
+      js << "-out_wind_logic " << setlogic_to_string(out_wind_logic) << " ";
    }
 
    // Jobs which use out_alpha

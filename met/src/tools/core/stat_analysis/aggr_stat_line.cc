@@ -1623,7 +1623,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          }
 
          //
-         // Apply the wind speed thresholds
+         // Apply the wind speed thresholds and logic
          //
          if(j.out_fcst_wind_thresh.get_type() != thresh_na ||
             j.out_obs_wind_thresh.get_type()  != thresh_na) {
@@ -1632,17 +1632,20 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             fwind = convert_u_v_to_wind(it->second.uf_na[i], it->second.vf_na[i]);
             owind = convert_u_v_to_wind(it->second.uo_na[i], it->second.vo_na[i]);
 
-            if(!j.out_fcst_wind_thresh.check(fwind) ||
-               !j.out_obs_wind_thresh.check(owind)) {
+            if(!check_fo_thresh(fwind, j.out_fcst_wind_thresh,
+                                owind, j.out_obs_wind_thresh,
+                                j.out_wind_logic)) {
                mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
-                    << "vector forecast ("
+                    << "skipping vector forecast ("
                     << it->second.uf_na[i] << ", " << it->second.vf_na[i]
-                    << ") wind speed (" << fwind << " "
-                    << j.out_fcst_wind_thresh.get_str() << ") or observation ("
+                    << ") wind speed threshold (" << fwind << " "
+                    << j.out_fcst_wind_thresh.get_str()
+                    << ") and vector observation ("
                     << it->second.uo_na[i] << ", " << it->second.vo_na[i]
-                    << ") wind speed (" << owind << " "
+                    << ") wind speed threshold (" << owind << " "
                     << j.out_obs_wind_thresh.get_str()
-                    << ") threshold not met for header:\n"
+                    << ") with " << setlogic_to_string(j.out_wind_logic)
+                    << " logic for header:\n"
                     << it->second.hdr_sa[i] << "\n";
                continue;
             }
@@ -1757,6 +1760,31 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
          // Build the map key for the current line
          //
          key = j.get_case_info(line);
+
+         //
+         // Apply the continuous statistics filtering threshold
+         //
+         if((j.out_line_type.has(stat_cnt_str) ||
+             j.out_line_type.has(stat_sl1l2_str)) &&
+            (j.out_fcst_thresh.n_elements() > 0 ||
+             j.out_obs_thresh.n_elements()  > 0)) {
+
+            SingleThresh fst, ost;
+            if(j.out_fcst_thresh.n_elements() > 0) fst = j.out_fcst_thresh[0];
+            if(j.out_obs_thresh.n_elements()  > 0) ost = j.out_obs_thresh[0];
+
+            if(!check_fo_thresh(cur.fcst, fst, cur.obs, ost, j.out_cnt_logic)) {
+               mlog << Debug(4) << "aggr_mpr_lines() -> "
+                    << "skipping forecast ("
+                    << cur.fcst << " " << j.out_fcst_thresh.get_str()
+                    << ") and observation ("
+                    << cur.obs << " " << j.out_obs_thresh.get_str()
+                    << ") matched pair with "
+                    << setlogic_to_string(j.out_cnt_logic)
+                    << " logic.\n";
+               continue;
+            }
+         }
 
          //
          // Add a new map entry, if necessary
