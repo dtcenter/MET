@@ -831,7 +831,7 @@ if ( a.n_times() <= 1 )  {
    //
    //  percentiles
    //
-/*
+
 Vol = a.Volume;
 
 values = new float [Vol];
@@ -860,15 +860,15 @@ for (j=0; j<n3; ++j)  {
    ++i; ++r;
  
 }
-*/
 
-// sort_f(values, n);
 
-// a.Ptile_10 = percentile_f(values, n, 0.10);
-// a.Ptile_25 = percentile_f(values, n, 0.25);
-// a.Ptile_50 = percentile_f(values, n, 0.50);
-// a.Ptile_75 = percentile_f(values, n, 0.75);
-// a.Ptile_90 = percentile_f(values, n, 0.90);
+sort_f(values, n);
+
+a.Ptile_10 = percentile_f(values, n, 0.10);
+a.Ptile_25 = percentile_f(values, n, 0.25);
+a.Ptile_50 = percentile_f(values, n, 0.50);
+a.Ptile_75 = percentile_f(values, n, 0.75);
+a.Ptile_90 = percentile_f(values, n, 0.90);
 
 
    //

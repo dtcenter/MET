@@ -167,6 +167,12 @@ class MtdConfigInfo {
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version
 
+         //
+         //  write the header columns to a table
+         //
+
+      void write_header_cols(AsciiTable &, const int row) const;
+
 };
 
 ////////////////////////////////////////////////////////////////////////
