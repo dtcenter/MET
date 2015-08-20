@@ -31,10 +31,16 @@ struct RankInfo {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-extern void sort(double *array, int n);
+extern void sort(double * array, const int n);
+
+extern double percentile(const double * ordered_array, const int n, const double t);
 
 
-extern double percentile(const double *ordered_array, int n, double t);
+
+extern void sort_f(float * array, const int n);
+
+extern float percentile_f(const float * ordered_array, const int n, const double t);
+
 
 
 extern int do_rank(const double *array, double *rank, int n);
