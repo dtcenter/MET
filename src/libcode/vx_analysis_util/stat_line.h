@@ -79,9 +79,9 @@ class STATLine : public DataLine {
       const char * interp_mthd    () const;
       int          interp_pnts    () const;
       SingleThresh fcst_thresh    () const;
-      SetLogic     thresh_logic   () const;
       SingleThresh obs_thresh     () const;
       SingleThresh cov_thresh     () const;
+      SetLogic     thresh_logic   () const;
       double       alpha          () const;
       const char * line_type      () const;
 
