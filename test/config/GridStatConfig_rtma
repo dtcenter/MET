@@ -42,9 +42,6 @@ fcst = {
    field = [
       { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ <273, >=273     ];
                                            cnt_thresh = [ <273, >=273, NA ];
-                                           cnt_logic  = UNION;               },
-      { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ ];
-                                           cnt_thresh = [ <273, >=273 ];
                                            cnt_logic  = INTERSECTION;        },
       { name = "DPT";   level = [ "Z2" ];  cat_thresh = [ <260, >=260 ];     },
       { name = "UGRD";  level = [ "Z10" ]; cat_thresh = [ <5, >=5 ];         },
