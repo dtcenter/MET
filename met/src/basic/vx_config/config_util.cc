@@ -1321,6 +1321,36 @@ SetLogic int_to_setlogic(int v) {
 
 ////////////////////////////////////////////////////////////////////////
 
+SetLogic string_to_setlogic(const char *s) {
+   SetLogic t;
+
+   // Convert string to enumerated SetLogic
+        if(strcasecmp(s, conf_val_none)                == 0) t = SetLogic_None;
+
+   else if(strcasecmp(s, conf_val_union)               == 0 ||
+           strcasecmp(s, setlogic_abbr_union)          == 0 ||
+           strcasecmp(s, setlogic_symbol_union)        == 0) t = SetLogic_Union;
+
+   else if(strcasecmp(s, conf_val_intersection)        == 0 ||
+           strcasecmp(s, setlogic_abbr_intersection)   == 0 ||
+           strcasecmp(s, setlogic_symbol_intersection) == 0) t = SetLogic_Intersection;
+
+   else if(strcasecmp(s, conf_val_symdiff)             == 0 ||
+           strcasecmp(s, setlogic_abbr_symdiff)        == 0 ||
+           strcasecmp(s, setlogic_symbol_symdiff)      == 0) t = SetLogic_SymDiff;
+
+   else {
+      mlog << Error << "\nstring_to_setlogic() -> "
+           << "Unexpected SetLogic string \"" << s << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString setlogic_to_string(SetLogic type) {
    ConcatString s;
 

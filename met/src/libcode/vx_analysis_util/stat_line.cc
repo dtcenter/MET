@@ -591,6 +591,28 @@ return ( st );
 }
 
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+SetLogic STATLine::thresh_logic() const
+
+{
+
+SetLogic t = SetLogic_None;
+
+ConcatString cs = get_item(fcst_thresh_offset);
+
+     if(cs.endswith(setlogic_symbol_union))        t = SetLogic_Union;
+else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic_Intersection;
+else if(cs.endswith(setlogic_symbol_symdiff))      t = SetLogic_SymDiff;
+else                                               t = SetLogic_None;
+
+return ( t );
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////
 
 

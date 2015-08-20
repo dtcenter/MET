@@ -193,6 +193,8 @@ class STATAnalysisJob {
       ThreshArray obs_thresh;
       ThreshArray cov_thresh;
 
+      SetLogic    thresh_logic;
+
       NumArray    alpha;
 
       StringArray line_type;

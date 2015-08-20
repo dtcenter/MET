@@ -1768,6 +1768,9 @@ output_stats = {
 //       "-fcst_thresh      t"
 //       "-obs_thresh       t"
 //       "-cov_thresh       t"
+//       "-thresh_logic     UNION, or, ||
+//                          INTERSECTION, and, &&
+//                          SYMDIFF, symdiff, *
 //       "-alpha            a"
 //       "-line_type        type"
 //       "-column           name"
