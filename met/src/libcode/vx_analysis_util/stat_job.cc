@@ -2027,7 +2027,10 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // out_cnt_logic
-   if(out_cnt_logic != SetLogic_None) {
+   if(job_type == stat_job_aggr_stat &&
+      line_type.has(stat_mpr_str) &&
+      (out_line_type.has(stat_cnt_str)  || out_line_type.has(stat_sl1l2_str)) &&
+      (out_fcst_thresh.n_elements() > 0 || out_obs_thresh.n_elements() > 0)) {
       js << "-out_cnt_logic " << setlogic_to_string(out_cnt_logic) << " ";
    }
 
@@ -2050,8 +2053,12 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // out_wind_logic
-   if(out_wind_logic != SetLogic_None) {
-      js << "-out_wind_logic " << setlogic_to_string(out_wind_logic) << " ";
+   if(job_type == stat_job_aggr_stat &&
+      line_type.has(stat_mpr_str) &&
+      out_line_type.has(stat_wdir_str) &&
+      (out_fcst_wind_thresh.get_type() != thresh_na ||
+       out_obs_wind_thresh.get_type()  != thresh_na)) {
+      js << "-out_wind_logic " << setlogic_to_string(out_cnt_logic) << " ";
    }
 
    // Jobs which use out_alpha
