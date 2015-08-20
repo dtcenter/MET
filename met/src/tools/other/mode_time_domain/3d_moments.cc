@@ -239,7 +239,6 @@ if ( ! IsCentralized )  {
 
 }
 
-
 vx = Sxt/Stt;
 
 vy = Syt/Stt;

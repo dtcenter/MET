@@ -75,7 +75,7 @@ void MtdConfigInfo::clear()
    model.clear();
    obtype.clear();
 
-   regrid_info.clear();
+   // regrid_info.clear();
 
    mask_missing_flag = FieldType_None;
 
@@ -116,25 +116,25 @@ void MtdConfigInfo::clear()
    mask_poly_name.clear();
    mask_poly_flag = FieldType_None;
 
-   centroid_dist_wt    = bad_data_double;
-   boundary_dist_wt    = bad_data_double;
-   convex_hull_dist_wt = bad_data_double;
-   angle_diff_wt       = bad_data_double;
-   area_ratio_wt       = bad_data_double;
-   int_area_ratio_wt   = bad_data_double;
-   complexity_ratio_wt = bad_data_double;
-   inten_perc_ratio_wt = bad_data_double;
+   space_centroid_dist_wt = bad_data_double;
+   time_centroid_delta_wt = bad_data_double;
+   speed_delta_wt         = bad_data_double;
+   direction_diff_wt      = bad_data_double;
+   volume_ratio_wt        = bad_data_double;
+   axis_angle_diff_wt     = bad_data_double;
+   start_time_delta_wt    = bad_data_double;
+   end_time_delta_wt      = bad_data_double;
 
-   inten_perc_value = bad_data_int;
+   // inten_perc_value = bad_data_int;
 
-   centroid_dist_if    = (PiecewiseLinear *) 0;
-   boundary_dist_if    = (PiecewiseLinear *) 0;
-   convex_hull_dist_if = (PiecewiseLinear *) 0;
-   angle_diff_if       = (PiecewiseLinear *) 0;
-   area_ratio_if       = (PiecewiseLinear *) 0;
-   int_area_ratio_if   = (PiecewiseLinear *) 0;
-   complexity_ratio_if = (PiecewiseLinear *) 0;
-   inten_perc_ratio_if = (PiecewiseLinear *) 0;
+   space_centroid_dist_if = (PiecewiseLinear *) 0;
+   time_centroid_delta_if = (PiecewiseLinear *) 0;
+   speed_delta_if         = (PiecewiseLinear *) 0;
+   direction_diff_if      = (PiecewiseLinear *) 0;
+   volume_ratio_if        = (PiecewiseLinear *) 0;
+   axis_angle_diff_if     = (PiecewiseLinear *) 0;
+   start_time_delta_if    = (PiecewiseLinear *) 0;
+   end_time_delta_if      = (PiecewiseLinear *) 0;
 
    total_interest_thresh = bad_data_double;
 
@@ -144,15 +144,11 @@ void MtdConfigInfo::clear()
 
    zero_border_size = bad_data_int;
 
-   plot_valid_flag = false;
-   plot_gcarc_flag = false;
-   ps_plot_flag    = false;
-
    nc_info.set_all_true();
 
    ct_stats_flag   = false;
 
-   shift_right = 0;
+   // shift_right = 0;
 
    output_prefix.clear();
 
@@ -180,7 +176,8 @@ void MtdConfigInfo::read_config(const char *default_file_name, const char *user_
    conf.read(default_file_name);
 
    // Read the user-specified config file
-   conf.read(user_file_name);
+
+   if ( user_file_name )  conf.read(user_file_name);
 
    return;
 
@@ -198,6 +195,8 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
    Dictionary *obs_dict  = (Dictionary *) 0;
    Dictionary *dict      = (Dictionary *) 0;
    PlotInfo plot_info;
+   bool status = false;
+   double sum;
 
       // Dump the contents of the config file
 
@@ -221,7 +220,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Conf: regrid
 
-   regrid_info = parse_conf_regrid(&conf);
+   // regrid_info = parse_conf_regrid(&conf);
 
       // Conf: fcst and obs
 
@@ -363,44 +362,57 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Parse the weights
 
-   centroid_dist_wt    = dict->lookup_double(conf_key_centroid_dist);
-   boundary_dist_wt    = dict->lookup_double(conf_key_boundary_dist);
-   convex_hull_dist_wt = dict->lookup_double(conf_key_convex_hull_dist);
-   angle_diff_wt       = dict->lookup_double(conf_key_angle_diff);
-   area_ratio_wt       = dict->lookup_double(conf_key_area_ratio);
-   int_area_ratio_wt   = dict->lookup_double(conf_key_int_area_ratio);
-   complexity_ratio_wt = dict->lookup_double(conf_key_complexity_ratio);
-   int_area_ratio_wt   = dict->lookup_double(conf_key_int_area_ratio);
-   inten_perc_ratio_wt = dict->lookup_double(conf_key_inten_perc_ratio);
-   inten_perc_value    = dict->lookup_int(conf_key_inten_perc_value);
+   space_centroid_dist_wt = dict->lookup_double(conf_key_space_centroid_dist);
+   time_centroid_delta_wt = dict->lookup_double(conf_key_time_centroid_delta);
+   speed_delta_wt         = dict->lookup_double(conf_key_speed_delta);
+   direction_diff_wt      = dict->lookup_double(conf_key_direction_diff);
+   volume_ratio_wt        = dict->lookup_double(conf_key_volume_ratio);
+   axis_angle_diff_wt     = dict->lookup_double(conf_key_axis_angle_diff);
+   start_time_delta_wt    = dict->lookup_double(conf_key_start_time_delta);
+   end_time_delta_wt      = dict->lookup_double(conf_key_end_time_delta);
 
       // Check that intensity_percentile >= 0 and <= 100
-
+/*
    if(inten_perc_value < 0 || inten_perc_value > 100) {
       mlog << Error << "\nMtdConfigInfo::process_config() -> "
            << "inten_perc_value (" << inten_perc_value
            << ") must be set between 0 and 100.\n\n";
       exit(1);
    }
-
+*/
       // Check that the fuzzy engine weights are non-negative
 
-   if(centroid_dist_wt    < 0 || boundary_dist_wt    < 0 ||
-      convex_hull_dist_wt < 0 || angle_diff_wt       < 0 ||
-      area_ratio_wt       < 0 || int_area_ratio_wt   < 0 ||
-      complexity_ratio_wt < 0 || inten_perc_ratio_wt < 0) {
+   status =    (space_centroid_dist_wt >= 0.0)
+            && (time_centroid_delta_wt >= 0.0)
+            && (speed_delta_wt         >= 0.0)
+            && (direction_diff_wt      >= 0.0)
+            && (volume_ratio_wt        >= 0.0)
+            && (axis_angle_diff_wt     >= 0.0)
+            && (start_time_delta_wt    >= 0.0)
+            && (end_time_delta_wt      >= 0.0);
+
+   if ( ! status ) {
+
       mlog << Error << "\nMtdConfigInfo::process_config() -> "
            << "All of the fuzzy engine weights must be >= 0.\n\n";
+
       exit(1);
+
    }
 
       // Check that the sum of the weights is non-zero for matching
 
+   sum =   space_centroid_dist_wt
+         + time_centroid_delta_wt
+         + speed_delta_wt
+         + direction_diff_wt
+         + volume_ratio_wt
+         + axis_angle_diff_wt
+         + start_time_delta_wt
+         + end_time_delta_wt;
+
    if(match_flag != MatchType_None &&
-      is_eq(centroid_dist_wt    + boundary_dist_wt   +
-            convex_hull_dist_wt + angle_diff_wt      +
-            area_ratio_wt       + int_area_ratio_wt  +
-            complexity_ratio_wt + inten_perc_ratio_wt, 0.0)) {
+      is_eq( sum, 0.0)) {
       mlog << Error << "\nMtdConfigInfo::process_config() -> "
            << "When matching is requested, the sum of the fuzzy engine "
            << "weights cannot be 0\n\n";
@@ -413,15 +425,14 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Parse the interest functions
 
-   centroid_dist_if    = dict->lookup_pwl(conf_key_centroid_dist);
-   boundary_dist_if    = dict->lookup_pwl(conf_key_boundary_dist);
-   convex_hull_dist_if = dict->lookup_pwl(conf_key_convex_hull_dist);
-   angle_diff_if       = dict->lookup_pwl(conf_key_angle_diff);
-   area_ratio_if       = dict->lookup_pwl(conf_key_area_ratio);
-   int_area_ratio_if   = dict->lookup_pwl(conf_key_int_area_ratio);
-   complexity_ratio_if = dict->lookup_pwl(conf_key_complexity_ratio);
-   int_area_ratio_if   = dict->lookup_pwl(conf_key_int_area_ratio);
-   inten_perc_ratio_if = dict->lookup_pwl(conf_key_inten_perc_ratio);
+   space_centroid_dist_if = dict->lookup_pwl(conf_key_space_centroid_dist);
+   time_centroid_delta_if = dict->lookup_pwl(conf_key_time_centroid_delta);
+   speed_delta_if         = dict->lookup_pwl(conf_key_speed_delta);
+   direction_diff_if      = dict->lookup_pwl(conf_key_direction_diff);
+   volume_ratio_if        = dict->lookup_pwl(conf_key_volume_ratio);
+   axis_angle_diff_if     = dict->lookup_pwl(conf_key_axis_angle_diff);
+   start_time_delta_if    = dict->lookup_pwl(conf_key_start_time_delta);
+   end_time_delta_if      = dict->lookup_pwl(conf_key_end_time_delta);
 
       // Conf: total_interest_thresh
 
@@ -453,18 +464,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    met_data_dir = replace_path(conf.lookup_string(conf_key_met_data_dir));
 
-      // Conf: fcst_raw_plot
-
-   fcst_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
-
-      // Conf: obs_raw_plot
-
-   obs_raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
-
-      // Conf: object_plot
-
-   object_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_object_plot));
-
       // Conf: zero_border_size
 
    zero_border_size = conf.lookup_int(conf_key_zero_border_size);
@@ -478,25 +477,13 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       exit(1);
    }
 
-      // Conf: plot_valid_flag
-
-   plot_valid_flag = conf.lookup_bool(conf_key_plot_valid_flag);
-
-      // Conf: plot_gcarc_flag
-
-   plot_gcarc_flag = conf.lookup_bool(conf_key_plot_gcarc_flag);
-
-      // Conf: ps_plot_flag
-
-   ps_plot_flag = conf.lookup_bool(conf_key_ps_plot_flag);
-
       // Conf: nc_pairs_flag
 
    parse_nc_info();
 
       // Conf: ct_stats_flag
 
-   ct_stats_flag = conf.lookup_bool(conf_key_ct_stats_flag);
+   // ct_stats_flag = conf.lookup_bool(conf_key_ct_stats_flag);
 
       // Conf: output_prefix
 
@@ -504,7 +491,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Conf: shift_right
 
-   shift_right = fcst_dict->lookup_int(conf_key_shift_right_value);
+   // shift_right = fcst_dict->lookup_int(conf_key_shift_right_value);
 
    return;
 
@@ -520,13 +507,13 @@ void MtdConfigInfo::parse_nc_info()
 
 const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
-e = conf.lookup(conf_key_nc_pairs_flag);
+e = conf.lookup(conf_key_nc_output);
 
 if ( !e )  {
 
    mlog << Error
         << "\n\n  MtdConfigInfo::parse_nc_info() -> lookup failed for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
+        << conf_key_nc_output << "\"\n\n";
 
    exit ( 1 );
 
@@ -568,10 +555,10 @@ Dictionary * d = e->dict_value();
 
 nc_info.do_latlon     = d->lookup_bool(conf_key_latlon_flag);
 nc_info.do_raw        = d->lookup_bool(conf_key_raw_flag);
-nc_info.do_object_raw = d->lookup_bool(conf_key_object_raw_flag);
+// nc_info.do_object_raw = d->lookup_bool(conf_key_object_raw_flag);
 nc_info.do_object_id  = d->lookup_bool(conf_key_object_id_flag);
 nc_info.do_cluster_id = d->lookup_bool(conf_key_cluster_id_flag);
-nc_info.do_polylines  = d->lookup_bool(conf_key_polylines_flag);
+nc_info.do_polylines  = d->lookup_bool(conf_key_do_polylines_flag);
 
    //
    //  done
@@ -623,7 +610,8 @@ bool MtdNcOutInfo::all_false() const
 
 {
 
-bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
+// bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
+   bool status = do_latlon || do_raw ||                  do_object_id || do_cluster_id || do_polylines;
 
 return ( !status );
 
@@ -639,7 +627,7 @@ void MtdNcOutInfo::set_all_false()
 
 do_latlon     = false;
 do_raw        = false;
-do_object_raw = false;
+// do_object_raw = false;
 do_object_id  = false;
 do_cluster_id = false;
 do_polylines  = false;
@@ -658,7 +646,7 @@ void MtdNcOutInfo::set_all_true()
 
 do_latlon     = true;
 do_raw        = true;
-do_object_raw = true;
+// do_object_raw = true;
 do_object_id  = true;
 do_cluster_id = true;
 do_polylines  = true;

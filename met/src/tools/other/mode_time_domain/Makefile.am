@@ -21,7 +21,14 @@ mtd_SOURCES = mtd.cc  \
               mtd_config_info.cc  \
               mtd_file_base.cc  \
               mtd_file_float.cc  \
-              mtd_file_int.cc
+              mtd_file_int.cc  \
+              3d_att.cc    \
+              3d_att.h    \
+              3d_conv.cc    \
+              3d_pair_columns.h    \
+              3d_single_columns.h  \
+              mtd_partition.h  \
+              mtd_partition.cc
 mtd_CPPFLAGS = ${MET_CPPFLAGS}
 mtd_LDFLAGS = ${MET_LDFLAGS}
 mtd_LDADD = -lvx_pxm \
@@ -57,8 +64,8 @@ mtd_LDADD = -lvx_pxm \
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    mtdfiletype_to_string.cc mtdfiletype_to_string.h : mtd_file.h
-	${ENUM_TO_STRING} -concat_string -reverse mtd_file.h
+    mtdfiletype_to_string.cc mtdfiletype_to_string.h : mtd_file_base.h
+	${ENUM_TO_STRING} -concat_string -reverse mtd_file_base.h
 
     clean-local:
 	-rm -f mtdfiletype_to_string.cc

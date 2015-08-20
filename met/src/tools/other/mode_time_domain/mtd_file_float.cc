@@ -13,6 +13,7 @@ using namespace std;
 #include <cmath>
 
 #include "mtd_file.h"
+#include "mtd_partition.h"
 #include "mtd_nc_defs.h"
 #include "nc_utils.h"
 
