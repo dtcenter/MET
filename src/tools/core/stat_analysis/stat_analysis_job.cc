@@ -2274,7 +2274,16 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cts || lt == stat_nbrcts || lt == stat_mcts ||
-            lt == stat_cnt || lt == stat_nbrcnt || lt == stat_pstd) shc.set_alpha(j.out_alpha);
+            lt == stat_cnt || lt == stat_nbrcnt || lt == stat_pstd) {
+            shc.set_alpha(j.out_alpha);
+         }
+         if(j.out_fcst_thresh.n_elements() > 0 || j.out_obs_thresh.n_elements() > 0) {
+            shc.set_fcst_thresh(j.out_fcst_thresh);
+            shc.set_obs_thresh(j.out_obs_thresh);
+            if(lt == stat_cnt || lt == stat_sl1l2) {
+               shc.set_thresh_logic(j.out_cnt_logic);
+            }
+         }
          write_header_cols(shc, j.stat_at, r);
       }
 
