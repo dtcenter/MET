@@ -170,6 +170,14 @@ regrid = {
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
 //
+//      - The "cnt_thresh" entry is an array of thresholds for filtering
+//        data prior to computing continuous statistics and partial sums.
+//
+//      - The "cnt_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+//        and controls the logic for how the forecast and observed cnt_thresh
+//        settings are combined when filtering matched pairs of forecast and
+//        observed values.
+//
 //   - The "file_type" entry specifies the input file type rather than letting
 //     the code determine it itself.  For valid file_type values, see "File types"
 //     in the data/config/ConfigConstants file.
@@ -178,6 +186,11 @@ regrid = {
 //     speed values when computing VL1L2 vector partial sums.  Only those U/V
 //     pairs that meet this wind speed criteria will be included in the sums.
 //     Setting this threshold to NA will result in all U/V pairs being used.
+//
+//   - The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+//     and controls the logic for how the forecast and observed wind_thresh
+//     settings are combined when filtering matched pairs of forecast and
+//     observed wind speeds.
 //
 //   - The "init_time" entry specifies the initialization time in YYYYMMDD[_HH[MMSS]] 
 //     format.  This entry can be included in the "fcst" entry as shown below or
@@ -243,7 +256,10 @@ regrid = {
 //
 //
 fcst = {
+   cnt_thresh   = [ NA ];
+   cnt_logic    = UNION;
    wind_thresh  = [ NA ];
+   wind_logic   = UNION;
    message_type = [ "ADPSFC" ];
    init_time    = "20120619_12";
    valid_time   = "20120620_00";
@@ -272,7 +288,10 @@ fcst = {
 //     or
 //
 //         fcst = {
+//           cnt_thresh  = [ NA ];
+//           cnt_logic   = UNION;
 //           wind_thresh = [ NA ];
+//           wind_logic  = UNION;
 //       
 //           field = [
 //              { 
@@ -285,7 +304,10 @@ fcst = {
 //
 //
 //         obs = {
+//           cnt_thresh  = [ NA ];
+//           cnt_logic   = UNION;
 //           wind_thresh = [ NA ];
+//           wind_logic  = UNION;
 //       
 //           field = [
 //              { 
@@ -306,7 +328,10 @@ fcst = {
 //     than one "message_type" entry is desired within the config file.  
 //     e.g.
 //     fcst = {
-//       wind_thresh  = [ NA ];
+//       cnt_thresh  = [ NA ];
+//       cnt_logic   = UNION;
+//       wind_thresh = [ NA ];
+//       wind_logic  = UNION;
 //
 //       field = [
 //          {
