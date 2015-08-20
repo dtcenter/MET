@@ -233,10 +233,10 @@ class STATAnalysisJob {
       StringArray  out_line_type;        // output line types
       ThreshArray  out_fcst_thresh;      // output forecast threshold(s)
       ThreshArray  out_obs_thresh;       // output observation threshold
-      SetLogic     out_cnt_logic;        // output continuous statistics logic
+      SetLogic     out_cnt_logic;        // output continuous thresholding logic
       SingleThresh out_fcst_wind_thresh; // output forecast wind speed threshold
       SingleThresh out_obs_wind_thresh;  // output observation wind speed threshold
-      SetLogic     out_wind_logic;       // output wind speed logic
+      SetLogic     out_wind_logic;       // output wind speed thresholding logic
       double       out_alpha;            // output alpha value
       double       out_bin_size;         // output PHIST bin size
 
