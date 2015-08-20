@@ -31,7 +31,7 @@ struct MtdNcOutInfo {
 
    bool do_raw;
 
-   bool do_object_raw;
+   // bool do_object_raw;
 
    bool do_object_id;
 
@@ -82,7 +82,7 @@ class MtdConfigInfo {
       ConcatString     model;                  // Model name
       ConcatString     obtype;                 // Observation type
 
-      RegridInfo       regrid_info;            // Regridding information
+      // RegridInfo       regrid_info;            // Regridding information
 
       VarInfo *        fcst_info;              // allocated
       VarInfo *        obs_info;               // allocated
@@ -126,25 +126,29 @@ class MtdConfigInfo {
       ConcatString     mask_poly_name;         // Path for masking poly area
       FieldType        mask_poly_flag;         // Define which fields should be masked out
 
-      double           centroid_dist_wt;       // Weights used as input to the fuzzy engine
-      double           boundary_dist_wt;
-      double           convex_hull_dist_wt;
-      double           angle_diff_wt;
-      double           area_ratio_wt;
-      double           int_area_ratio_wt;
-      double           complexity_ratio_wt;
-      double           inten_perc_ratio_wt;
+         //  Weights used as input to the fuzzy engine
 
-      int              inten_perc_value;       // Intensity percentile used for the intensity percentile ratio
+      double           space_centroid_dist_wt;
+      double           time_centroid_delta_wt;
+      double           speed_delta_wt;
+      double           direction_diff_wt;
+      double           volume_ratio_wt;
+      double           axis_angle_diff_wt;
+      double           start_time_delta_wt;
+      double           end_time_delta_wt;
 
-      PiecewiseLinear * centroid_dist_if;      // Interest functions used as input to the fuzzy engine
-      PiecewiseLinear * boundary_dist_if;      // not allocated
-      PiecewiseLinear * convex_hull_dist_if;
-      PiecewiseLinear * angle_diff_if;
-      PiecewiseLinear * area_ratio_if;
-      PiecewiseLinear * int_area_ratio_if;
-      PiecewiseLinear * complexity_ratio_if;
-      PiecewiseLinear * inten_perc_ratio_if;
+         // Interest functions used as input to the fuzzy engine
+         //   not allocated
+
+      PiecewiseLinear * space_centroid_dist_if;
+      PiecewiseLinear * time_centroid_delta_if;
+      PiecewiseLinear * speed_delta_if;
+      PiecewiseLinear * direction_diff_if;
+      PiecewiseLinear * volume_ratio_if;
+      PiecewiseLinear * axis_angle_diff_if;
+      PiecewiseLinear * start_time_delta_if;
+      PiecewiseLinear * end_time_delta_if;
+
 
       double           total_interest_thresh;  // Total interest threshold defining significance
 
@@ -152,20 +156,13 @@ class MtdConfigInfo {
 
       ConcatString     met_data_dir;           // MET data directory
 
-      PlotInfo         fcst_raw_pi;            // Raw forecast plotting info
-      PlotInfo         obs_raw_pi;             // Raw observation plotting info
-      PlotInfo         object_pi;              // Object plotting info
-
       int              zero_border_size;       // Zero out edge rows and columns for object definition      
 
-      bool             plot_valid_flag;        // Zoom up plot to the sub-region of valid data
-      bool             plot_gcarc_flag;        // Plot lines as great-circle arcs
-      bool             ps_plot_flag;           // Flag for the output PostScript image file      
       // bool             nc_pairs_flag;          // output NetCDF file
       MtdNcOutInfo    nc_info; 
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
 
-      int              shift_right;            //  shift amount for global grids
+      // int              shift_right;            //  shift amount for global grids
 
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version

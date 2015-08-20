@@ -528,6 +528,22 @@ static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
 static const char conf_key_shift_right_value[]     = "shift_right";
 
+   //
+   //  MTD specific parameter key names
+   //
+
+static const char conf_key_space_centroid_dist [] = "space_centroid_dist";
+static const char conf_key_time_centroid_delta [] = "time_centroid_delta";
+static const char conf_key_speed_delta         [] = "speed_delta";
+static const char conf_key_direction_diff      [] = "direction_diff";
+static const char conf_key_volume_ratio        [] = "volume_ratio";
+static const char conf_key_axis_angle_diff     [] = "axis_angle_diff";
+static const char conf_key_start_time_delta    [] = "start_time_delta";
+static const char conf_key_end_time_delta      [] = "end_time_delta";
+
+static const char conf_key_nc_output           [] = "nc_output";
+static const char conf_key_do_polylines_flag   [] = "do_polylines";
+
 //
 // PB2NC specific parameter key names
 //

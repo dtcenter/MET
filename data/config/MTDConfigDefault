@@ -18,6 +18,9 @@ model = "WRF";
 
 obtype = "ANALYS";
 
+
+met_data_dir = "MET_BASE";
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -105,17 +108,21 @@ mask = {
 
 weight = {
 
-   speed_diff      = 1.0;
+   space_centroid_dist  = 1.0;
 
-   direction_diff  = 1.0;
+   time_centroid_delta  = 1.0;
 
-   volume_ratio    = 1.0;
+   speed_delta          = 1.0;
 
-   axis_angle_diff = 1.0;
+   direction_diff       = 1.0;
 
-   start_time_diff = 1.0;
+   volume_ratio         = 1.0;
 
-   end_time_diff   = 1.0;
+   axis_angle_diff      = 1.0;
+
+   start_time_delta     = 1.0;
+
+   end_time_delta       = 1.0;
 
 };
 
@@ -127,11 +134,33 @@ weight = {
 
 interest_function = {
 
-   speed_diff = (
+   space_centroid_dist = (
 
       (   0.0, 1.0 )
       (  50.0, 0.5 )
       ( 100.0, 0.0 )
+
+   );
+
+   time_centroid_delta = (
+
+      ( -3.0, 0.0 )
+      ( -2.0, 0.5 )
+      ( -1.0, 0.8 )
+      (  0.0, 1.0 )
+      (  1.0, 0.8 )
+      (  2.0, 0.5 )
+      (  3.0, 0.0 )
+
+   );
+
+   speed_delta = (
+
+      ( -10.0, 0.0 )
+      (  -5.0, 0.5 )
+      (   0.0, 1.0 )
+      (   5.0, 0.5 )
+      (  10.0, 0.0 )
 
    );
 
@@ -161,15 +190,15 @@ interest_function = {
 
    );
 
-   start_time_diff = (
+   start_time_delta = (
 
       (  0.0, 1.0 )
       (  3.0, 0.5 )
       (  5.0, 0.0 )
 
-   };
+   );
 
-   end_time_diff = (
+   end_time_delta = (
 
       (  0.0, 1.0 )
       (  3.0, 0.5 )
@@ -217,6 +246,7 @@ nc_output = {
    raw          = true;
    object_id    = true;
    cluster_id   = true;
+   do_polylines = true;
 
 };
 
@@ -225,7 +255,7 @@ txt_output = {
    attributes_2d   = true;
    attributes_3d   = true;
 
-   convex_hulls_2d = true;
+   // convex_hulls_2d = true;
 
 };
 
