@@ -8,8 +8,8 @@ static const char mtd_config_filename    [] = "../../../../data/config/MTDConfig
 static const char local_config_filename  [] = "test_config";
 
 
-static const char fcst_filename [] = "/scratch/bullock/arw_20100517_00I.nc";
-static const char  obs_filename [] = "/scratch/bullock/obs_20100517_01L.nc";
+static const char fcst_filename [] = "/scratch/bullock/files/arw_20100517_00I.nc";
+static const char  obs_filename [] = "/scratch/bullock/files/obs_20100517_01L.nc";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
 MtdIntFile fcst_obj, obs_obj;
 
-/*
+
 if ( ! fcst_raw.read(fcst_filename) )  {
 
    cerr << "\n\n  " << program_name << ": unable to read fcst file \"" << fcst_filename << "\"\n\n";
@@ -69,7 +69,7 @@ if ( ! obs_raw.read(obs_filename) )  {
    exit ( 1 );
 
 }
-*/
+
 
 cout << "\n  fcst conv radius = " << (config.fcst_conv_radius) << "\n";
 cout << "\n   obs conv radius = " << (config.obs_conv_radius) << "\n";

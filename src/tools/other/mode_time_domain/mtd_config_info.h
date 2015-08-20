@@ -173,6 +173,10 @@ class MtdConfigInfo {
 
       void write_header_cols(AsciiTable &, const int row) const;
 
+         //
+         //  calculate total interest
+         //
+
 };
 
 ////////////////////////////////////////////////////////////////////////

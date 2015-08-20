@@ -171,17 +171,61 @@ void MtdConfigInfo::read_config(const char *default_file_name, const char *user_
 {
 
    // Read the config file constants
-   conf.read(replace_path(config_const_filename));
-   conf.read(replace_path(config_map_data_filename));
+
+conf.read(replace_path(config_const_filename));
+conf.read(replace_path(config_map_data_filename));
 
    // Read the default config file
-   conf.read(default_file_name);
+
+conf.read(default_file_name);
 
    // Read the user-specified config file
 
-   if ( user_file_name )  conf.read(user_file_name);
+if ( user_file_name )  conf.read(user_file_name);
 
-   return;
+   //  check the fuzzy-engine weights
+   //     calculation of total interest assumes these tests
+
+bool all_zero = true;
+
+if ( is_eq(space_centroid_dist_wt, 0.0) )  space_centroid_dist_wt = 0.0;
+else                                       all_zero = false;
+
+if ( is_eq(time_centroid_delta_wt, 0.0) )  time_centroid_delta_wt = 0.0;
+else                                       all_zero = false;
+
+if ( is_eq(speed_delta_wt, 0.0) )          speed_delta_wt = 0.0;
+else                                       all_zero = false;
+
+if ( is_eq(direction_diff_wt, 0.0) )       direction_diff_wt = 0.0;
+else                                       all_zero = false;
+
+if ( is_eq(volume_ratio_wt, 0.0) )         volume_ratio_wt = 0.0;
+else                                       all_zero = false;
+
+if ( is_eq(axis_angle_diff_wt, 0.0) )      axis_angle_diff_wt = 0.0;
+else                                       all_zero = false;
+
+if ( is_eq(start_time_delta_wt, 0.0) )     start_time_delta_wt = 0.0;
+else                                       all_zero = false;
+
+if ( is_eq(end_time_delta_wt, 0.0) )       end_time_delta_wt = 0.0;
+else                                       all_zero = false;
+
+
+if ( all_zero )  {
+
+   cerr << "\n\n  MtdConfigInfo::read_config() -> all the fuzzy engine weights are zero!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  done
+   //
+
+return;
 
 }
 
