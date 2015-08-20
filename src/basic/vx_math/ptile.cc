@@ -28,7 +28,8 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-static int compare_double(const void *, const void *);
+static int compare_double (const void *, const void *);
+static int compare_float  (const void *, const void *);
 
 static int compare_rank(const void *, const void *);
 
@@ -38,7 +39,7 @@ static void reset_rank(double *, int, int, double);
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void sort(double *array, int n)
+void sort(double *array, const int n)
 
 {
 
@@ -54,7 +55,7 @@ return;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-double percentile(const double *ordered_array, int n, double t)
+double percentile(const double *ordered_array, const int n, const double t)
 
 {
 
@@ -76,12 +77,75 @@ return ( p );
 ///////////////////////////////////////////////////////////////////////////////
 
 
+void sort_f(float * array, const int n)
+
+{
+
+if ( n <= 1 )  return;
+
+qsort(array, n, sizeof(float), compare_float);
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+float percentile_f(const float * ordered_array, const int n, const double t)
+
+{
+
+int index;
+float delta; 
+float p = bad_data_float;
+
+if ( n > 0 ) {
+
+   index = nint(floor((n - 1)*t));
+
+   delta = (n - 1)*t - index;
+
+   p = (1 - delta)*(ordered_array[index]) + delta*(ordered_array[index + 1]);
+
+}
+
+return ( p );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
 int compare_double(const void *p1, const void *p2)
 
 {
 
 const double *a = (const double *) p1;
 const double *b = (const double *) p2;
+
+
+if ( (*a) < (*b) )  return ( -1 );
+
+if ( (*a) > (*b) )  return (  1 );
+
+
+return ( 0 );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+int compare_float(const void * p1, const void * p2)
+
+{
+
+const float * a = (const float *) p1;
+const float * b = (const float *) p2;
 
 
 if ( (*a) < (*b) )  return ( -1 );
