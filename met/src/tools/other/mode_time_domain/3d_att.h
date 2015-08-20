@@ -15,6 +15,7 @@
 #include "vx_util.h"
 
 #include "mtd_file.h"
+#include "mtd_config_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -282,7 +283,7 @@ class PairAtt3D {
       double speed_delta () const;
 
       double volume_ratio () const;
-      double axis_diff    () const;
+      double axis_angle_diff () const;
 
       int start_time_delta () const;
       int end_time_delta   () const;
@@ -311,8 +312,8 @@ inline double PairAtt3D::space_centroid_dist () const { return ( SpaceCentroidDi
 inline double PairAtt3D::direction_difference () const { return ( DirectionDifference ); }
 inline double PairAtt3D::speed_delta () const { return ( SpeedDelta ); }
 
-inline double PairAtt3D::volume_ratio () const { return ( VolumeRatio ); }
-inline double PairAtt3D::axis_diff    () const { return ( AxisDiff ); }
+inline double PairAtt3D::volume_ratio    () const { return ( VolumeRatio ); }
+inline double PairAtt3D::axis_angle_diff () const { return ( AxisDiff ); }
 
 inline int PairAtt3D::start_time_delta () const { return ( StartTimeDelta ); }
 inline int PairAtt3D::end_time_delta   () const { return ( EndTimeDelta ); }
@@ -327,6 +328,8 @@ extern PairAtt3D   calc_pair_atts(const Object      & _fcst_obj,
                                   const Object      & _obs_obj, 
                                   const SingleAtt3D & _fa, 
                                   const SingleAtt3D & _oa);
+
+extern double calc_total_interest(const PairAtt3D &, const MtdConfigInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////

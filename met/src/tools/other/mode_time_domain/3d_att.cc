@@ -953,7 +953,7 @@ fcst_att.velocity(x1dot, y1dot);
    //  speed and direction differences
    //
 
-p.set_speed_delta(obs_att.speed() - fcst_att.speed());
+p.set_speed_delta(fcst_att.speed() - obs_att.speed());
 
 b = sqrt( x1dot*x1dot + y1dot*y1dot );
 
@@ -971,8 +971,8 @@ p.set_direction_diff( acosd( x1dot*x2dot + y1dot*y2dot ) );
    //  volume ratio
    //
 
-num = (double) (obs_att.volume());
-den = (double) (fcst_att.volume());
+num = (double) (fcst_att.volume());
+den = (double) (obs_att.volume());
 
 p.set_volume_ratio(num/den);
 
@@ -980,7 +980,7 @@ p.set_volume_ratio(num/den);
    //  axis difference
    //
 
-b = fabs( obs_att.spatial_axis() - fcst_att.spatial_axis() );
+b = fabs( fcst_att.spatial_axis() - obs_att.spatial_axis() );
 
 p.set_axis_diff(b);
 
@@ -988,7 +988,7 @@ p.set_axis_diff(b);
    //  start time delta
    //
 
-t = obs_att.tmin() - fcst_att.tmin();
+t = fcst_att.tmin() - obs_att.tmin();
 
 p.set_start_time_delta(t);
 
@@ -996,7 +996,7 @@ p.set_start_time_delta(t);
    //  end time delta
    //
 
-t = obs_att.tmax() - fcst_att.tmax();
+t = fcst_att.tmax() - obs_att.tmax();
 
 p.set_start_time_delta(t);
 
@@ -1005,6 +1005,188 @@ p.set_start_time_delta(t);
    //
 
 return ( p );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double calc_total_interest(const PairAtt3D & p, const MtdConfigInfo & conf)
+
+{
+
+double t = 0.0;
+double num, den;   //  numerator and denominator in the expression for total interest
+double I, w;
+PiecewiseLinear * f = 0;
+
+num = 0.0;
+den = 0.0;
+
+   //
+   //  We don't have to use "is_eq" to check whether each weight is
+   //     nonzero, because the MtdConfigInfo::read_config() function has
+   //     already done that.  That same function has already tested that
+   //     the weights are not all zero.
+   //
+
+   //
+   //  space centroid dist
+   //
+
+w = conf.space_centroid_dist_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.space_centroid_dist_if;
+
+   I = (*f)(p.space_centroid_dist());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  time centroid delta
+   //
+
+w = conf.time_centroid_delta_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.time_centroid_delta_if;
+
+   I = (*f)(p.time_centroid_delta());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  speed delta
+   //
+
+w = conf.speed_delta_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.speed_delta_if;
+
+   I = (*f)(p.speed_delta());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  direction difference
+   //
+
+w = conf.direction_diff_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.direction_diff_if;
+
+   I = (*f)(p.direction_difference());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  volume ratio
+   //
+
+w = conf.volume_ratio_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.volume_ratio_if;
+
+   I = (*f)(p.volume_ratio());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  axis angle difference
+   //
+
+w = conf.axis_angle_diff_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.axis_angle_diff_if;
+
+   I = (*f)(p.axis_angle_diff());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  start time delta
+   //
+
+w = conf.start_time_delta_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.start_time_delta_if;
+
+   I = (*f)(p.start_time_delta());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  end time delta
+   //
+
+w = conf.end_time_delta_wt;
+
+if ( w != 0.0 )  {
+
+   f = conf.end_time_delta_if;
+
+   I = (*f)(p.end_time_delta());
+
+   num += w*I;
+
+   den += w;
+
+}
+
+   //
+   //  The denominator is just the sum of the weights, 
+   //    which, as stated above, we already know is nonzero.
+   //
+
+t = num/den;
+
+   //
+   //  done
+   //
+
+return ( t );
 
 }
 
