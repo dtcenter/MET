@@ -141,6 +141,8 @@ void STATAnalysisJob::clear() {
    obs_thresh.clear();
    cov_thresh.clear();
 
+   thresh_logic = SetLogic_None;
+
    alpha.clear();
 
    line_type.clear();
@@ -244,6 +246,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    fcst_thresh          = aj.fcst_thresh;
    obs_thresh           = aj.obs_thresh;
    cov_thresh           = aj.cov_thresh;
+
+   thresh_logic         = aj.thresh_logic;
 
    alpha                = aj.alpha;
 
@@ -380,6 +384,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "cov_thresh ...\n";
    cov_thresh.dump(out, depth + 1);
+
+   out << prefix << "thresh_logic = "
+       << setlogic_to_string(thresh_logic) << "\n";
 
    out << prefix << "alpha ...\n";
    alpha.dump(out, depth + 1);
@@ -706,6 +713,12 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    }
 
    //
+   // thresh_logic
+   //
+   if(thresh_logic != SetLogic_None &&
+      thresh_logic != L.thresh_logic()) return(0);
+
+   //
    // alpha
    //
    if(alpha.n_elements() > 0) {
@@ -1007,6 +1020,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       }
       else if(strcmp(jc_array[i], "-cov_thresh") == 0) {
          cov_thresh.add_css(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-thresh_logic") == 0) {
+         thresh_logic = string_to_setlogic(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-alpha") == 0) {
@@ -1875,7 +1892,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          js << "-fcst_thresh " << fcst_thresh[i].get_str() << " ";
       }
    }
-
+   
    // obs_thresh
    if(obs_thresh.n_elements() > 0) {
       for(i=0; i<obs_thresh.n_elements(); i++) {
@@ -1888,6 +1905,11 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       for(i=0; i<cov_thresh.n_elements(); i++) {
          js << "-cov_thresh " << cov_thresh[i].get_str() << " ";
       }
+   }
+
+   // thresh_logic
+   if(thresh_logic != SetLogic_None) {
+      js << "-thresh_logic " << setlogic_to_string(thresh_logic) << " ";
    }
 
    // alpha

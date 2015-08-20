@@ -64,6 +64,7 @@ extern FieldType    int_to_fieldtype(int);
 extern ConcatString fieldtype_to_string(FieldType);
 
 extern SetLogic     int_to_setlogic(int);
+extern SetLogic     string_to_setlogic(const char *);
 extern ConcatString setlogic_to_string(SetLogic);
 extern ConcatString setlogic_to_abbr(SetLogic);
 extern ConcatString setlogic_to_symbol(SetLogic);
