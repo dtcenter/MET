@@ -152,7 +152,7 @@ class MtdConfigInfo {
 
       double           total_interest_thresh;  // Total interest threshold defining significance
 
-      double           print_interest_thresh;  // Only write output for pairs with this interest
+      double           print_interest_thresh;  // Only write output for pairs with >= this interest
 
       ConcatString     met_data_dir;           // MET data directory
 

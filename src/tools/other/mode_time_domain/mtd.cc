@@ -24,6 +24,7 @@ using namespace std;
 
 #include "mtd_config_info.h"
 #include "mtd_file.h"
+#include "interest_calc.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -52,6 +53,7 @@ MtdFloatFile fcst_raw, obs_raw;
 MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
 MtdIntFile fcst_obj, obs_obj;
+InterestCalculator calc;
 
 
 if ( ! fcst_raw.read(fcst_filename) )  {
@@ -69,6 +71,22 @@ if ( ! obs_raw.read(obs_filename) )  {
    exit ( 1 );
 
 }
+
+
+calc.add(config.space_centroid_dist_wt, config.space_centroid_dist_if, &PairAtt3D::SpaceCentroidDist);
+calc.add(config.time_centroid_delta_wt, config.time_centroid_delta_if, &PairAtt3D::TimeCentroidDelta);
+calc.add(config.speed_delta_wt,         config.speed_delta_if,         &PairAtt3D::SpeedDelta);
+calc.add(config.direction_diff_wt,      config.direction_diff_if,      &PairAtt3D::DirectionDifference);
+calc.add(config.volume_ratio_wt,        config.volume_ratio_if,        &PairAtt3D::VolumeRatio);
+calc.add(config.axis_angle_diff_wt,     config.axis_angle_diff_if,     &PairAtt3D::AxisDiff);
+calc.add(config.start_time_delta_wt,    config.start_time_delta_if,    &PairAtt3D::StartTimeDelta);
+calc.add(config.end_time_delta_wt,      config.end_time_delta_if,      &PairAtt3D::EndTimeDelta);
+
+// calc.add(5.0, &func1, &PairAtt3D::SpeedDelta);
+// calc.add(7.0, &func2, &PairAtt3D::VolumeRatio);
+
+calc.check();
+
 
 
 cout << "\n  fcst conv radius = " << (config.fcst_conv_radius) << "\n";
