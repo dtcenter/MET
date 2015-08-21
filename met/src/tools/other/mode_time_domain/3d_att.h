@@ -38,7 +38,7 @@ class SingleAtt3D {
 
       friend SingleAtt3D calc_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, int obj_number);
 
-   private:
+   public:
 
       void init_from_scratch();
 
@@ -204,7 +204,7 @@ class PairAtt3D {
                                       const SingleAtt3D & _fa, 
                                       const SingleAtt3D & _oa);
 
-   private:
+   public:
 
       void init_from_scratch();
 
@@ -226,8 +226,11 @@ class PairAtt3D {
       double VolumeRatio;
       double AxisDiff;
 
-      int StartTimeDelta;
-      int EndTimeDelta;
+         //  these need to be doubles rather than ints
+         //   (for the InterestCalculator class).
+
+      double StartTimeDelta;
+      double EndTimeDelta;
 
    public:
 
@@ -292,7 +295,7 @@ class PairAtt3D {
          //  do stuff
          //
 
-       void write_txt(AsciiTable &, const int row) const;
+      void write_txt(AsciiTable &, const int row) const;
 
 };
 
@@ -329,7 +332,7 @@ extern PairAtt3D   calc_pair_atts(const Object      & _fcst_obj,
                                   const SingleAtt3D & _fa, 
                                   const SingleAtt3D & _oa);
 
-extern double calc_total_interest(const PairAtt3D &, const MtdConfigInfo &);
+// extern double calc_total_interest(const PairAtt3D &, const MtdConfigInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////
