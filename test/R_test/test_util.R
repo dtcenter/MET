@@ -368,7 +368,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 		if( 0 < intNumDiff ){
 			if( 1 <= verb ){
 				cat("WARNING: header information mismatch in column ", 
-						listHeaderCols[intCol], sep="");
+						listHeaderCols[intCol], "\n", sep="");
 			}
 			return (list("hdr" = FALSE));
 		}
