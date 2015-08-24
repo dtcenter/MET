@@ -41,7 +41,6 @@ StringArray get_filenames(const StringArray & search_dirs, const StringArray & s
 int j;
 const int N = search_dirs.n_elements();
 StringArray a, b;
-ConcatString cur_suffix;
 struct stat sbuf;
 
 
@@ -66,9 +65,12 @@ for (j=0; j<N; ++j)  {
 
    } else if ( S_ISREG(sbuf.st_mode) )  {
 
-      cur_suffix = filename_suffix(search_dirs[j]);
-     
-      if ( suffix.has(cur_suffix) )  a.add(search_dirs[j]);
+      //
+      //  process any explicitly specified regular files
+      //  regardless of suffix
+      //
+ 
+      a.add(search_dirs[j]);
 
    }
 
@@ -93,7 +95,6 @@ StringArray a, b;
 char entry_path[PATH_MAX];
 ConcatString cur_suffix;
 struct stat sbuf;
-
 
 
 directory = opendir(directory_path);

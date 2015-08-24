@@ -111,15 +111,9 @@ inline  STATLineType  STATLine::type () const { return ( Type ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern StringArray get_stat_filenames(const StringArray &);
-
-extern StringArray get_stat_filenames_from_dir(
-                      const char * directory_path);
-
-extern int is_stat_filename(const char * path);
-
 extern int determine_column_offset(const STATLine &, const char *,
                                    bool error_out = true);
+
 
 ////////////////////////////////////////////////////////////////////////
 
