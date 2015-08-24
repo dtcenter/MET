@@ -87,18 +87,24 @@ int get_tc_mpr_col_offset(const char *col_name) {
    //    ADLAND,    BDLAND,
    //    AMSLP,     BMSLP,
    //    AMAX_WIND, BMAX_WIND,
-   //   [AAL_WIND_, BAL_WIND_,
-   //    ANE_WIND_, BNE_WIND_,
-   //    ASE_WIND_, BSE_WIND_,
-   //    ASW_WIND_, BSW_WIND_,
-   //    ANW_WIND_, BNW_WIND_]
-   //    (for each wind intensity value)
+   //    AAL_WIND_34/50/64, BAL_WIND_34/50/64,
+   //    ANE_WIND_34/50/64, BNE_WIND_34/50/64,
+   //    ASE_WIND_34/50/64, BSE_WIND_34/50/64,
+   //    ASW_WIND_34/50/64, BSW_WIND_34/50/64,
+   //    ANW_WIND_34/50/64, BNW_WIND_34/50/64,
+   //    ARADP,     BRADP,
+   //    ARRP,      BRRP,
+   //    AMRD,      BMRD,
+   //    AGUSTS,    BGUSTS,
+   //    AEYE,      BEYE,
+   //    ADIR,      BDIR,
+   //    ASPEED,    BSPEED,
+   //    ADEPTH,    BDEPTH
 
-   // Check the static columns
    if(is_bad_data(offset)) {
 
-      // Loop through the static columns looking for a match
-      for(i=0; i<n_tc_mpr_static; i++) {
+      // Loop through the TCMPR columns looking for a match
+      for(i=0; i<n_tc_mpr_cols; i++) {
 
          // Check for a match
          if(strcasecmp(tc_mpr_cols[i], col_name) == 0) {
@@ -108,51 +114,7 @@ int get_tc_mpr_col_offset(const char *col_name) {
       }
    }
 
-   // Check the variable columns
-   if(is_bad_data(offset)) {
-
-      // Loop through the variable columns looking for a match
-      for(i=0; i<n_tc_mpr_var; i++) {
-
-         if(strncasecmp(tc_mpr_cols[n_tc_mpr_static + i], col_name,
-                        strlen(tc_mpr_cols[n_tc_mpr_static + i])) == 0) {
-
-            // Parse the wind intensity from col_name
-            wind = parse_wind_intensity(col_name);
-
-            // Loop through the wind intensities
-            for(j=0; j<NWinds; j++) {
-               if(WindIntensity[j] == wind) {
-                  offset = n_tc_header_cols + n_tc_mpr_static + j*n_tc_mpr_var + i;
-                  break;
-               }
-            } // end for j
-
-            // Check if it's been found
-            if(!is_bad_data(offset)) break;
-         }
-      } // end for i
-   }
-
    return(offset);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int parse_wind_intensity(const char *col_name) {
-   int i;
-   const char *ptr;
-
-   if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
-   else {
-      mlog << Error
-           << "\nparse_wind_intensity() -> "
-           << "unexpected column name specified: \""
-           << col_name << "\"\n\n";
-      exit(1);
-   }
-
-   return(i);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -226,18 +188,9 @@ void write_tc_mpr_header_row(int hdr_flag, AsciiTable &at,
          at.set_entry(r, c++, tc_header_cols[i]);
    }
 
-   // Write the static columns names specific to the TCMPR line type
-   for(i=0; i<n_tc_mpr_static; i++) {
+   // Write the tc_mpr header columns
+   for(i=0; i<n_tc_mpr_cols; i++) {
       at.set_entry(r, c++, tc_mpr_cols[i]);
-   }
-
-   // Write the variable columns names specific to the TCMPR line type
-   for(i=0; i<NWinds; i++) {
-      for(j=0; j<n_tc_mpr_var; j++) {
-         s.format("%s%i", tc_mpr_cols[n_tc_mpr_static + j],
-                  WindIntensity[i]);
-         at.set_entry(r, c++, s);
-      }
    }
 
    return;
@@ -317,7 +270,7 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
                        AsciiTable &at, int r, int c) {
    int j;
 
-   // Write static columns
+   // Write tc_mpr columns
    at.set_entry(r, c++, p.n_points());
    at.set_entry(r, c++, i+1);
    at.set_entry(r, c++, cyclonelevel_to_string(p.bdeck()[i].level()));
@@ -340,7 +293,7 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, p.adeck()[i].v_max());
    at.set_entry(r, c++, p.bdeck()[i].v_max());
 
-   // Write variable columns
+   // Write the wind columns
    for(j=0; j<NWinds; j++) {
       at.set_entry(r, c++, p.adeck()[i][j].al_val());
       at.set_entry(r, c++, p.bdeck()[i][j].al_val());
@@ -354,6 +307,24 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
       at.set_entry(r, c++, p.bdeck()[i][j].nw_val());
    } // end for j
 
+   // Write remaining columns
+   at.set_entry(r, c++, p.adeck()[i].radp());
+   at.set_entry(r, c++, p.bdeck()[i].radp());
+   at.set_entry(r, c++, p.adeck()[i].rrp());
+   at.set_entry(r, c++, p.bdeck()[i].rrp());
+   at.set_entry(r, c++, p.adeck()[i].mrd());
+   at.set_entry(r, c++, p.bdeck()[i].mrd());
+   at.set_entry(r, c++, p.adeck()[i].gusts());
+   at.set_entry(r, c++, p.bdeck()[i].gusts());
+   at.set_entry(r, c++, p.adeck()[i].eye());
+   at.set_entry(r, c++, p.bdeck()[i].eye());
+   at.set_entry(r, c++, p.adeck()[i].direction());
+   at.set_entry(r, c++, p.bdeck()[i].direction());
+   at.set_entry(r, c++, p.adeck()[i].speed());
+   at.set_entry(r, c++, p.bdeck()[i].speed());
+   at.set_entry(r, c++, systemsdepth_to_string(p.adeck()[i].depth()));
+   at.set_entry(r, c++, systemsdepth_to_string(p.bdeck()[i].depth()));
+   
    return;
 }
 

@@ -929,8 +929,14 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
       // Compute the average point
       pavg = psum;
-      if(!is_bad_data(pavg.v_max())) pavg.set_v_max(nint(psum.v_max()/pcnt));
-      if(!is_bad_data(pavg.mslp()))  pavg.set_mslp(nint(psum.mslp()/pcnt));
+      if(!is_bad_data(pavg.v_max())) pavg.set_v_max(psum.v_max()/pcnt);
+      if(!is_bad_data(pavg.mslp()))  pavg.set_mslp(psum.mslp()/pcnt);
+      if(!is_bad_data(pavg.radp()))  pavg.set_radp(psum.radp()/pcnt);
+      if(!is_bad_data(pavg.rrp()))   pavg.set_rrp(psum.rrp()/pcnt);
+      if(!is_bad_data(pavg.mrd()))   pavg.set_mrd(psum.mrd()/pcnt);
+      if(!is_bad_data(pavg.gusts())) pavg.set_gusts(psum.gusts()/pcnt);
+      if(!is_bad_data(pavg.eye()))   pavg.set_eye(psum.eye()/pcnt);
+      if(!is_bad_data(pavg.speed())) pavg.set_speed(psum.speed()/pcnt);
 
       // Compute the range of longitude values
       lon_range = plon.max() - plon.min();

@@ -31,30 +31,46 @@ static const char * tc_header_cols [] = {
    "LINE_TYPE"
 };
 
-// The last 10 columns repeat for each wind intensity value
-static const char * tc_mpr_cols [] = {
-   "TOTAL",     "INDEX",
-   "LEVEL",     "WATCH_WARN", "INITIALS",
-   "ALAT",      "ALON",
-   "BLAT",      "BLON",
-   "TK_ERR",    "X_ERR",      "Y_ERR",
-   "ALTK_ERR",  "CRTK_ERR",
-   "ADLAND",    "BDLAND",
-   "AMSLP",     "BMSLP",
-   "AMAX_WIND", "BMAX_WIND",
-   "AAL_WIND_", "BAL_WIND_",
-   "ANE_WIND_", "BNE_WIND_",
-   "ASE_WIND_", "BSE_WIND_",
-   "ASW_WIND_", "BSW_WIND_",
-   "ANW_WIND_", "BNW_WIND_"
-};
+static const int n_tc_header_cols = sizeof(tc_header_cols)/sizeof(*tc_header_cols);
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int n_tc_header_cols = sizeof(tc_header_cols)/sizeof(*tc_header_cols);
-static const int n_tc_mpr_var     = 10;
-static const int n_tc_mpr_static  = sizeof(tc_mpr_cols)/sizeof(*tc_mpr_cols) - n_tc_mpr_var;
-static const int n_tc_mpr_cols    = n_tc_mpr_static + (n_tc_mpr_var * NWinds);
+static const char * tc_mpr_cols [] = {
+   "TOTAL",       "INDEX",
+   "LEVEL",       "WATCH_WARN", "INITIALS",
+   "ALAT",        "ALON",
+   "BLAT",        "BLON",
+   "TK_ERR",      "X_ERR",      "Y_ERR",
+   "ALTK_ERR",    "CRTK_ERR",
+   "ADLAND",      "BDLAND",
+   "AMSLP",       "BMSLP",
+   "AMAX_WIND",   "BMAX_WIND",
+   "AAL_WIND_34", "BAL_WIND_34",
+   "ANE_WIND_34", "BNE_WIND_34",
+   "ASE_WIND_34", "BSE_WIND_34",
+   "ASW_WIND_34", "BSW_WIND_34",
+   "ANW_WIND_34", "BNW_WIND_34",
+   "AAL_WIND_50", "BAL_WIND_50",
+   "ANE_WIND_50", "BNE_WIND_50",
+   "ASE_WIND_50", "BSE_WIND_50",
+   "ASW_WIND_50", "BSW_WIND_50",
+   "ANW_WIND_50", "BNW_WIND_50",
+   "AAL_WIND_64", "BAL_WIND_64",
+   "ANE_WIND_64", "BNE_WIND_64",
+   "ASE_WIND_64", "BSE_WIND_64",
+   "ASW_WIND_64", "BSW_WIND_64",
+   "ANW_WIND_64", "BNW_WIND_64",
+   "ARADP",       "BRADP",
+   "ARRP",        "BRRP",
+   "AMRD",        "BMRD",
+   "AGUSTS",      "BGUSTS",
+   "AEYE",        "BEYE",
+   "ADIR",        "BDIR",
+   "ASPEED",      "BSPEED",
+   "ADEPTH",      "BDEPTH"
+};
+
+static const int n_tc_mpr_cols = sizeof(tc_mpr_cols)/sizeof(*tc_mpr_cols);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +117,6 @@ static const int n_tc_cols_xy = sizeof(tc_cols_xy)/sizeof(*tc_cols_xy);
 
 extern int get_tc_col_offset    (const char **, int, const char *);
 extern int get_tc_mpr_col_offset(const char *);
-extern int parse_wind_intensity (const char *);
 
 ////////////////////////////////////////////////////////////////////////
 
