@@ -99,7 +99,7 @@ inline GribError::GribError(int ErrType, int LineNo, const char *FileName, const
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int gribfile_buf_size = 8388608;   //  2^23
+static const int default_gribfile_buf_size = (1 << 10);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -422,18 +422,18 @@ class GribFileRep {
       int fd;
       long file_start;
 
-      char *name;
+      char * name;
 
       int issue;
       int lead;
 
-      unsigned char *buf;
+      unsigned char * buf;
       int buf_size;
 
       int n_records;
       int n_alloc;
 
-      RecordInfo *record_info;
+      RecordInfo * record_info;
 
       GribFileRep();
      ~GribFileRep();
@@ -441,6 +441,8 @@ class GribFileRep {
       GribFileRep &operator=(const GribFileRep &);
 
       void record_extend(int);
+
+      void realloc_buf(int size);
 
 };
 
@@ -452,7 +454,7 @@ class GribFile {
 
    protected:
 
-      GribFileRep *rep;
+      GribFileRep * rep;
 
    public:
 

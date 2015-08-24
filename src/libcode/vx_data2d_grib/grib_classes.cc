@@ -698,6 +698,32 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void GribFileRep::realloc_buf(int n_bytes)
+
+{
+
+if ( buf )  { delete [] buf;  buf = 0;  buf_size = 0; }
+
+buf = new unsigned char [n_bytes];
+
+if ( !buf )  {
+
+   cerr << "\n\n  GribFileRep::realloc_buf(long long) -> memory allocation error\n\n";
+
+   exit ( 1 );
+
+}
+
+buf_size = n_bytes;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class GribFile
    //
@@ -788,7 +814,7 @@ if ( (rep->fd = ::open(filename, O_RDONLY)) < 0 )  {
    return( false );
 }
 
-if ( !(rep->buf = new unsigned char [gribfile_buf_size]) )  {
+if ( !(rep->buf = new unsigned char [default_gribfile_buf_size]) )  {
 
    mlog << Error << "\nGribFile::open(const char *) -> memory allocation error 2\n\n";
 
@@ -797,7 +823,7 @@ if ( !(rep->buf = new unsigned char [gribfile_buf_size]) )  {
 
 }
 
-rep->buf_size = gribfile_buf_size;
+rep->buf_size = default_gribfile_buf_size;
 
 if(!skip_header()) return ( false );
 
@@ -952,21 +978,23 @@ s = char3_to_int(g.is->length);
 
 g.record_lseek_offset = file_pos;
 
+if ( s > (rep->buf_size) )  rep->realloc_buf(s);
 
-if ( s > (rep->buf_size) )  {
+// if ( s > (rep->buf_size) )  {
+// 
+//    mlog << Error << "\nGribFile::read_record(GribRecord &) -> "
+//         << "found a grib record larger than the buffer size.\n\n"
+//         << "  Increase the buffer to at least " << s << " bytes.\n\n\n";
+// 
+//    exit ( 1 );
 
-   mlog << Error << "\nGribFile::read_record(GribRecord &) -> "
-        << "found a grib record larger than the buffer size.\n\n"
-        << "  Increase the buffer to at least " << s << " bytes.\n\n\n";
-
-   exit ( 1 );
 //   char temp_str[max_temp_str_length];
 
 //   sprintf(temp_str, "\n\n  GribFile::read_record(GribRecord &) -> found a grib record larger than the buffer size.\n\n  Increase the buffer to at least %d bytes.\n\n\n", s);
 
 //   throw GribError(record_size_error, __LINE__, __FILE__, temp_str);
 
-}
+// }
 
 if ( read(8, s - 8) == 0 )  return ( 0 );
 
