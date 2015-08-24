@@ -21,6 +21,7 @@
 
 #include "mtd_file_float.h"
 #include "3d_moments.h"
+#include "2d_moments.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -127,11 +128,15 @@ class MtdIntFile : public MtdFileBase {
 
       void sift_objects(const int n_new, const int * new_to_old);
 
-      MtdMoments calc_moments() const;
+      Mtd_3D_Moments calc_3d_moments() const;
+      Mtd_2D_Moments calc_2d_moments() const;
 
-      void calc_bbox(int & x_min, int & x_max, int & y_min, int & y_max, int & t_min, int & t_max) const;
+      void calc_3d_bbox(int & x_min, int & x_max, int & y_min, int & y_max, int & t_min, int & t_max) const;
 
-      void calc_centroid(double & xbar, double & ybar, double & tbar) const;
+      void calc_3d_centroid(double & xbar, double & ybar, double & tbar) const;
+
+      int x_left  (const int y) const;
+      int x_right (const int y) const;
 
 };
 
