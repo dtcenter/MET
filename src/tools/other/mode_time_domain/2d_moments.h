@@ -3,42 +3,38 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MTD_3D_MOMENTS_H__
-#define  __MTD_3D_MOMENTS_H__
+#ifndef  __MTD_2D_MOMENTS_H__
+#define  __MTD_2D_MOMENTS_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class Mtd_3D_Moments {
+class Mtd_2D_Moments {
 
    public:
 
       void init_from_scratch();
 
-      void assign(const Mtd_3D_Moments &);
+      void assign(const Mtd_2D_Moments &);
 
       int N;    //  0th order moments
 
       double Sx;    //  1st order moments
       double Sy;    // 
-      double St;    // 
 
       double Sxx;   //  2nd order CENTRAL moments
       double Sxy;   //  
-      double Sxt;   //  
       double Syy;   //  
-      double Syt;   //  
-      double Stt;   //  
 
       bool IsCentralized;   //  default: false
 
    public:
 
-      Mtd_3D_Moments();
-     ~Mtd_3D_Moments();
-      Mtd_3D_Moments(const Mtd_3D_Moments &);
-      Mtd_3D_Moments & operator=(const Mtd_3D_Moments &);
+      Mtd_2D_Moments();
+     ~Mtd_2D_Moments();
+      Mtd_2D_Moments(const Mtd_2D_Moments &);
+      Mtd_2D_Moments & operator=(const Mtd_2D_Moments &);
 
       void clear();
 
@@ -51,21 +47,19 @@ class Mtd_3D_Moments {
          //  get stuff
          //
 
-      int volume() const;
+      int area() const;
 
 
          //
          //  do stuff
          //
 
-      void add(double x, double y, double t);
+      void add(double x, double y);
 
       void centralize();
 
 
-      void calc_3d_velocity(double & vx, double & vy) const;
-
-      double calc_3d_axis_plane_angle() const;
+      double calc_2D_axis_plane_angle() const;
 
 
 
@@ -75,13 +69,13 @@ class Mtd_3D_Moments {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Mtd_3D_Moments::volume() const { return ( N ); }
+inline int Mtd_2D_Moments::area() const { return ( N ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MTD_3D_MOMENTS_H__  */
+#endif   /*  __MTD_2D_MOMENTS_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1197,9 +1197,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MtdIntFile::calc_bbox(int & x_min, int & x_max, 
-                           int & y_min, int & y_max, 
-                           int & t_min, int & t_max) const
+void MtdIntFile::calc_3d_bbox(int & x_min, int & x_max, 
+                              int & y_min, int & y_max, 
+                              int & t_min, int & t_max) const
 
 {
 
@@ -1247,7 +1247,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MtdIntFile::calc_centroid(double & xbar, double & ybar, double & tbar) const
+void MtdIntFile::calc_3d_centroid(double & xbar, double & ybar, double & tbar) const
 
 {
 
@@ -1284,7 +1284,7 @@ for (x=0; x<Nx; ++x)  {
 
 if ( count == 0 )  {
 
-   cerr << "\n\n  MtdIntFile::calc_centroid() const -> empty object!\n\n";
+   cerr << "\n\n  MtdIntFile::calc_3d_centroid() const -> empty object!\n\n";
 
    exit ( 1 );
 
@@ -1378,6 +1378,64 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
+int MtdIntFile::x_left(const int y) const
+
+{
+
+if ( (y < 0) || (y >= Ny) )  {
+
+   cerr << "\n\n  MtdIntFile::x_left(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+int x;
+
+for (x=0; x<Nx; ++x)  {
+
+   if ( Data[mtd_three_to_one(Nx, Ny, Nt, x, y, 0)] )  return ( x );
+
+}
+
+
+return ( -1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int MtdIntFile::x_right(const int y) const
+
+{
+
+if ( (y < 0) || (y >= Ny) )  {
+
+   cerr << "\n\n  MtdIntFile::x_left(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+int x;
+
+for (x=(Nx - 1); x>=0; --x)  {
+
+   if ( Data[mtd_three_to_one(Nx, Ny, Nt, x, y, 0)] )  return ( x );
+
+}
+
+
+return ( -1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -1386,12 +1444,12 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
-MtdMoments MtdIntFile::calc_moments() const
+Mtd_3D_Moments MtdIntFile::calc_3d_moments() const
 
 {
 
 int x, y, t, k, n;
-MtdMoments m;
+Mtd_3D_Moments m;
 
 for (t=0; t<Nt; ++t)  {
 
@@ -1427,6 +1485,50 @@ for (t=0; t<Nt; ++t)  {
    }   //  for y
 
 }   //  for t
+
+m.IsCentralized = false;
+
+return ( m );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Mtd_2D_Moments MtdIntFile::calc_2d_moments() const
+
+{
+
+int x, y, k, n;
+Mtd_2D_Moments m;
+
+
+for (y=0; y<Ny; ++y)  {
+
+   for (x=0; x<Nx; ++x)  {
+
+      n = mtd_three_to_one(Nx, Ny, Nt, x, y, 0);
+
+      k = Data[n];
+
+      if ( k )  {
+
+         ++(m.N);
+
+         m.Sx += x;
+         m.Sy += y;
+
+         m.Sxx += x*x;
+         m.Syy += y*y;
+         m.Sxy += x*y;
+
+      }   //  if k
+
+   }   //  for x
+
+}   //  for y
+
 
 m.IsCentralized = false;
 

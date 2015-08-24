@@ -18,12 +18,16 @@ mtd_SOURCES = mtd.cc  \
               nc_grid.cc  \
               3d_moments.h  \
               3d_moments.cc  \
+              2d_moments.h  \
+              2d_moments.cc  \
               mtd_config_info.cc  \
               mtd_file_base.cc  \
               mtd_file_float.cc  \
               mtd_file_int.cc  \
               3d_att.cc  \
               3d_att.h  \
+              2d_att.cc  \
+              2d_att.h  \
               3d_conv.cc    \
               3d_pair_columns.h    \
               3d_single_columns.h  \

@@ -101,6 +101,8 @@ void SingleAtt3D::clear()
 
 {
 
+ObjectNumber = 0;
+
 Volume = 0;
 
 Xbar = Ybar = Tbar = 0;
@@ -764,7 +766,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleAtt3D calc_single_atts(const Object & obj, const MtdFloatFile & raw, const char * model, int obj_number)
+SingleAtt3D calc_3d_single_atts(const Object & obj, const MtdFloatFile & raw, const char * model, int obj_number)
 
 {
 
@@ -776,7 +778,7 @@ ConcatString raw_filename;
 float * values = (float *) 0;
 const int   * i = 0;
 const float * r = 0;
-MtdMoments moments;
+Mtd_3D_Moments moments;
 MtdIntFile f;
 const int n3 = (obj.nx())*(obj.ny())*(obj.nt());
 
@@ -785,11 +787,11 @@ a.ObjectNumber = obj_number;
 
 f = obj.select(obj_number + 1);
 
-moments = f.calc_moments();
+moments = f.calc_3d_moments();
 
 if ( moments.N == 0 )  {
 
-   cerr << "\n\n  calc_single_atts() -> empty object!\n\n";
+   cerr << "\n\n  calc_3d_single_atts() -> empty object!\n\n";
 
    exit ( 1 );
 
@@ -801,7 +803,7 @@ a.Tbar = (moments.St)/(moments.N);
 
 a.Volume = obj.total_volume();
 
-f.calc_bbox(a.Xmin, a.Xmax, a.Ymin, a.Ymax, a.Tmin, a.Tmax);
+f.calc_3d_bbox(a.Xmin, a.Xmax, a.Ymin, a.Ymax, a.Tmin, a.Tmax);
 
 bbox_volume =  (a.Xmax - a.Xmin - 1.0)
               *(a.Ymax - a.Ymin - 1.0)
@@ -821,9 +823,9 @@ if ( a.n_times() <= 1 )  {
 
 } else {
 
-   moments.calc_velocity(a.Xvelocity, a.Yvelocity);
+   moments.calc_3d_velocity(a.Xvelocity, a.Yvelocity);
 
-   a.set_spatial_axis(moments.calc_3D_axis_plane_angle());
+   a.set_spatial_axis(moments.calc_3d_axis_plane_angle());
 
 }   //  else
 
@@ -838,7 +840,7 @@ values = new float [Vol];
 
 if ( !values )  {
 
-   cerr << "\n\n  calc_single_atts() -> memory allocation error\n\n";
+   cerr << "\n\n  calc_3d_single_atts() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -887,10 +889,10 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-PairAtt3D calc_pair_atts(const Object & fcst_obj,
-                         const Object & obs_obj,
-                         const SingleAtt3D & fcst_att,
-                         const SingleAtt3D & obs_att)
+PairAtt3D calc_3d_pair_atts(const Object      & fcst_obj,
+                            const Object      & obs_obj,
+                            const SingleAtt3D & fcst_att,
+                            const SingleAtt3D & obs_att)
 
 {
 

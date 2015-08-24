@@ -3,8 +3,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MTD_ATTRIBUTES_H__
-#define  __MTD_ATTRIBUTES_H__
+#ifndef  __MTD_3D_ATTRIBUTES_H__
+#define  __MTD_3D_ATTRIBUTES_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ static const char ymd_hms_format [] = "%04d%02d%02d_%02d%02d%02d";
 
 class SingleAtt3D {
 
-      friend SingleAtt3D calc_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, int obj_number);
+      friend SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, int obj_number);
 
    public:
 
@@ -199,10 +199,10 @@ inline double SingleAtt3D::ptile_90() const { return ( Ptile_90 ); }
 
 class PairAtt3D {
 
-      friend PairAtt3D calc_pair_atts(const Object & _fcst_obj, 
-                                      const MtdFloatFile & _obs_obj, 
-                                      const SingleAtt3D & _fa, 
-                                      const SingleAtt3D & _oa);
+      friend PairAtt3D calc_3d_pair_atts(const Object & _fcst_obj, 
+                                         const MtdFloatFile & _obs_obj, 
+                                         const SingleAtt3D & _fa, 
+                                         const SingleAtt3D & _oa);
 
    public:
 
@@ -325,12 +325,12 @@ inline int PairAtt3D::end_time_delta   () const { return ( EndTimeDelta ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt3D calc_single_atts(const Object & mask, const Object & raw, const char * model, int obj_number);   //  0 based 
+extern SingleAtt3D calc_3d_single_atts(const Object & mask, const Object & raw, const char * model, int obj_number);   //  0 based 
 
-extern PairAtt3D   calc_pair_atts(const Object      & _fcst_obj, 
-                                  const Object      & _obs_obj, 
-                                  const SingleAtt3D & _fa, 
-                                  const SingleAtt3D & _oa);
+extern PairAtt3D   calc_3d_pair_atts(const Object      & _fcst_obj, 
+                                     const Object      & _obs_obj, 
+                                     const SingleAtt3D & _fa, 
+                                     const SingleAtt3D & _oa);
 
 // extern double calc_total_interest(const PairAtt3D &, const MtdConfigInfo &);
 
@@ -338,7 +338,7 @@ extern PairAtt3D   calc_pair_atts(const Object      & _fcst_obj,
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MTD_ATTRIBUTES_H__  */
+#endif   /*  __MTD_3D_ATTRIBUTES_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
