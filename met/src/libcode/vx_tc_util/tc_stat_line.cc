@@ -123,6 +123,9 @@ int TCStatLine::is_header() const {
 
 const char * TCStatLine::get_item(int k) const {
 
+   // Return bad data instead of erroring out
+   if(k < 0 || k >= N_items) return(bad_data_str);
+
    const char * c = DataLine::get_item(k);
 
    // Check for the NA string and interpret it as bad data
@@ -134,7 +137,7 @@ const char * TCStatLine::get_item(int k) const {
 
 const char * TCStatLine::get_item(const char * col_name) const {
    int offset = determine_column_offset(*this, col_name);
-
+   
    return(get_item(offset));
 }
 
