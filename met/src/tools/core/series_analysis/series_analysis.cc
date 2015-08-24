@@ -1885,24 +1885,28 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-fcst file_1 ... file_n\n"
-        << "\t-obs file_1 ... file_n\n"
-        << "\t[-both file_1 ... file_n]\n"
+        << "\t-fcst  file_1 ... file_n | fcst_file_list\n"
+        << "\t-obs   file_1 ... file_n | obs_file_list\n"
+        << "\t[-both file_1 ... file_n | both_file_list]\n"
         << "\t-out file\n"
         << "\t-config file\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
         << "\twhere\t\"-fcst file_1 ... file_n\" are the gridded "
-        << "forecast files or ASCII files containing lists of file "
-        << "names to be used (required).\n"
+        << "forecast files to be used (required).\n"
 
-        << "\t\t\"-obs file_1 ... file_n\" are the gridded "
-        << "observation files or ASCII files containing lists of file "
-        << "names to be used (required).\n"
+        << "\t\t\"-fcst fcst_file_list\" is an ASCII file containing "
+        << "a list of gridded forecast files to be used (required).\n"
 
-        << "\t\t\"-both file_1 ... file_n\" sets the \"-fcst\" and "
-        << "\"-obs\" options to the same set of files (optional).\n"
+        << "\t\t\"-obs  file_1 ... file_n\" are the gridded "
+        << "observation files to be used (required).\n"
+
+        << "\t\t\"-obs  obs_file_list\" is an ASCII file containing "
+        << "a list of gridded observation files to be used (required).\n"
+
+        << "\t\t\"-both\" sets the \"-fcst\" and \"-obs\" options to "
+        << "the same set of files (optional).\n"
 
         << "\t\t\"-out file\" is the NetCDF output file containing "
         << "computed statistics (required).\n"
