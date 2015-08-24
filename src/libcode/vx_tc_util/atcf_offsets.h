@@ -60,7 +60,7 @@ static const int SeasRadius2Offset     = 32;
 static const int SeasRadius3Offset     = 33;
 static const int SeasRadius4Offset     = 34;
 
-static const int MinATCFElements       = 18;
+static const int MinATCFElements       = 8;
 
 ////////////////////////////////////////////////////////////////////////
 
