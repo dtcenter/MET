@@ -375,10 +375,26 @@ void TrackPairInfo::add(const TCStatLine &l) {
       cs << cs_erase << deck[i] << "LON";
       tp->set_lon(atof(l.get_item(cs)));
       cs << cs_erase << deck[i] << "MAX_WIND";
-      tp->set_v_max(atoi(l.get_item(cs)));
+      tp->set_v_max(atof(l.get_item(cs)));
       cs << cs_erase << deck[i] << "MSLP";
-      tp->set_mslp(atoi(l.get_item(cs)));
+      tp->set_mslp(atof(l.get_item(cs)));
       tp->set_level(string_to_cyclonelevel(l.get_item("LEVEL")));
+      cs << cs_erase << deck[i] << "RADP";
+      tp->set_radp(atof(l.get_item(cs)));
+      cs << cs_erase << deck[i] << "RRP";
+      tp->set_rrp(atof(l.get_item(cs)));
+      cs << cs_erase << deck[i] << "MRD";
+      tp->set_mrd(atof(l.get_item(cs)));
+      cs << cs_erase << deck[i] << "GUSTS";
+      tp->set_gusts(atof(l.get_item(cs)));
+      cs << cs_erase << deck[i] << "EYE";
+      tp->set_eye(atof(l.get_item(cs)));
+      cs << cs_erase << deck[i] << "DIR";
+      tp->set_direction(atof(l.get_item(cs)));
+      cs << cs_erase << deck[i] << "SPEED";
+      tp->set_speed(atof(l.get_item(cs)));
+      cs << cs_erase << deck[i] << "DEPTH";
+      tp->set_eye(string_to_systemsdepth(l.get_item(cs)));
       tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 
       // Loop over the winds

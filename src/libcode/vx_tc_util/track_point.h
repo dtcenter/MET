@@ -132,13 +132,31 @@ class TrackPoint {
       double        Lon;        //  degrees, + west, - east
 
       // Intensity
-      int           Vmax;       //  knots
-      int           MSLP;       //  millibars
+      double        Vmax;       //  knots
+      double        MSLP;       //  millibars
       CycloneLevel  Level;
 
-      // Speed and direction
-      double       Speed;
-      double       Direction;
+      // Pressure of the last closed isobar (900 - 1050 mb)
+      double        RadP;
+
+      // Radius of last closed isobar (nm)
+      double        RRP;
+
+      // Radius of maximum winds (nm) 
+      double        MRD;
+
+      // Gusts (kts)
+      double        Gusts;
+
+      // Diameter of eye (nm)
+      double        Eye;
+
+      // Direction and speed
+      double        Direction;
+      double        Speed;
+
+      // System Depth
+      SystemsDepth  Depth;
 
       // Watch/Warning status
       WatchWarnType WatchWarn; 
@@ -170,11 +188,17 @@ class TrackPoint {
       void set_lead(const int);
       void set_lat(const double);
       void set_lon(const double);
-      void set_v_max(const int);
-      void set_mslp(const int);
+      void set_v_max(const double);
+      void set_mslp(const double);
       void set_level(CycloneLevel);
-      void set_speed(const double);
+      void set_radp(const double);
+      void set_rrp(const double);
+      void set_mrd(const double);
+      void set_gusts(const double);
+      void set_eye(const double);
       void set_direction(const double);
+      void set_speed(const double);
+      void set_depth(SystemsDepth);
       void set_watch_warn(WatchWarnType);
       void set_watch_warn(WatchWarnType, unixtime);
 
@@ -187,11 +211,17 @@ class TrackPoint {
       int              lead()          const;
       double           lat()           const;
       double           lon()           const;
-      int              v_max()         const;
-      int              mslp()          const;
+      double           v_max()         const;
+      double           mslp()          const;
       CycloneLevel     level()         const;
-      double           speed()         const;
+      double           radp()          const;
+      double           rrp()           const;
+      double           mrd()           const;
+      double           gusts()         const;
+      double           eye()           const;
       double           direction()     const;
+      double           speed()         const;
+      SystemsDepth     depth()         const;
       WatchWarnType    watch_warn()    const;
 
          //
@@ -206,26 +236,38 @@ class TrackPoint {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void TrackPoint::set_valid(const unixtime u)    { ValidTime = u; }
-inline void TrackPoint::set_lead(const int s)          { LeadTime = s;  }
-inline void TrackPoint::set_lat(const double l)        { Lat = l;       }
-inline void TrackPoint::set_lon(const double l)        { Lon = l;       }
-inline void TrackPoint::set_v_max(const int v)         { Vmax = v;      }
-inline void TrackPoint::set_mslp(const int v)          { MSLP = v;      }
-inline void TrackPoint::set_level(CycloneLevel l)      { Level = l;     }
-inline void TrackPoint::set_speed(const double s)      { Speed = s;     }
-inline void TrackPoint::set_direction(const double d)  { Direction = d; }
-inline void TrackPoint::set_watch_warn(WatchWarnType t){ WatchWarn = t; }
+inline void TrackPoint::set_valid(const unixtime t)     { ValidTime = t; }
+inline void TrackPoint::set_lead(const int s)           { LeadTime  = s; }
+inline void TrackPoint::set_lat(const double v)         { Lat       = v; }
+inline void TrackPoint::set_lon(const double v)         { Lon       = v; }
+inline void TrackPoint::set_v_max(const double v)       { Vmax      = v; }
+inline void TrackPoint::set_mslp(const double v)        { MSLP      = v; }
+inline void TrackPoint::set_level(CycloneLevel t)       { Level     = t; }
+inline void TrackPoint::set_radp(const double v)        { RadP      = v; }
+inline void TrackPoint::set_rrp(const double v)         { RRP       = v; }
+inline void TrackPoint::set_mrd(const double v)         { MRD       = v; }
+inline void TrackPoint::set_gusts(const double v)       { Gusts     = v; }
+inline void TrackPoint::set_eye(const double v)         { Eye       = v; }
+inline void TrackPoint::set_direction(const double v)   { Direction = v; }
+inline void TrackPoint::set_speed(const double v)       { Speed     = v; }
+inline void TrackPoint::set_depth(SystemsDepth t)       { Depth     = t; }
+inline void TrackPoint::set_watch_warn(WatchWarnType t) { WatchWarn = t; }
 
 inline unixtime      TrackPoint::valid()      const { return(ValidTime); }
 inline int           TrackPoint::lead()       const { return(LeadTime);  }
 inline double        TrackPoint::lat()        const { return(Lat);       }
 inline double        TrackPoint::lon()        const { return(Lon);       }
-inline int           TrackPoint::v_max()      const { return(Vmax);      }
-inline int           TrackPoint::mslp()       const { return(MSLP);      }
+inline double        TrackPoint::v_max()      const { return(Vmax);      }
+inline double        TrackPoint::mslp()       const { return(MSLP);      }
 inline CycloneLevel  TrackPoint::level()      const { return(Level);     }
-inline double        TrackPoint::speed()      const { return(Speed);     }
+inline double        TrackPoint::radp()       const { return(RadP);      }
+inline double        TrackPoint::rrp()        const { return(RRP);       }
+inline double        TrackPoint::mrd()        const { return(MRD);       }
+inline double        TrackPoint::gusts()      const { return(Gusts);     }
+inline double        TrackPoint::eye()        const { return(Eye);       }
 inline double        TrackPoint::direction()  const { return(Direction); }
+inline double        TrackPoint::speed()      const { return(Speed);     }
+inline SystemsDepth  TrackPoint::depth()      const { return(Depth);     }
 inline WatchWarnType TrackPoint::watch_warn() const { return(WatchWarn); }
 
 ////////////////////////////////////////////////////////////////////////

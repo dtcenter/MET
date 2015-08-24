@@ -364,15 +364,27 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    }
    
    // Increment counts
-   if(is_bad_data(Lat)  || is_bad_data(p.lat()))   Lat   = bad_data_double;
-   else                                            Lat  += p.lat();
-   if(is_bad_data(Lon)  || is_bad_data(p.lon()))   Lon   = bad_data_double;
-   else                                            Lon  += p.lon();
-   if(is_bad_data(Vmax) || is_bad_data(p.v_max())) Vmax  = bad_data_double;
-   else                                            Vmax += p.v_max();
-   if(is_bad_data(MSLP) || is_bad_data(p.mslp()))  MSLP  = bad_data_double;
-   else                                            MSLP += p.mslp();
-
+   if(is_bad_data(Lat)   || is_bad_data(p.lat()))   Lat    = bad_data_double;
+   else                                             Lat   += p.lat();
+   if(is_bad_data(Lon)   || is_bad_data(p.lon()))   Lon    = bad_data_double;
+   else                                             Lon   += p.lon();
+   if(is_bad_data(Vmax)  || is_bad_data(p.v_max())) Vmax   = bad_data_double;
+   else                                             Vmax  += p.v_max();
+   if(is_bad_data(MSLP)  || is_bad_data(p.mslp()))  MSLP   = bad_data_double;
+   else                                             MSLP  += p.mslp();
+   if(is_bad_data(RadP)  || is_bad_data(p.radp()))  RadP   = bad_data_double;
+   else                                             RadP  += p.radp();
+   if(is_bad_data(RRP)   || is_bad_data(p.rrp()))   RRP    = bad_data_double;
+   else                                             RRP   += p.rrp();
+   if(is_bad_data(MRD)   || is_bad_data(p.mrd()))   MRD    = bad_data_double;
+   else                                             MRD   += p.mrd();
+   if(is_bad_data(Gusts) || is_bad_data(p.gusts())) Gusts  = bad_data_double;
+   else                                             Gusts += p.gusts();
+   if(is_bad_data(Eye)   || is_bad_data(p.eye()))   Eye    = bad_data_double;
+   else                                             Eye   += p.eye();
+   if(is_bad_data(Speed) || is_bad_data(p.speed())) Speed  = bad_data_double;
+   else                                             Speed += p.speed();
+   
    for(i=0; i<NWinds; i++) Wind[i] += p[i];
 
    return(*this);
@@ -401,8 +413,14 @@ void TrackPoint::clear() {
    Vmax      = bad_data_int;
    MSLP      = bad_data_int;
    Level     = NoCycloneLevel;
+   RadP      = bad_data_double;
+   RRP       = bad_data_double;
+   MRD       = bad_data_double;
+   Gusts     = bad_data_double;
+   Eye       = bad_data_double;
+   Direction = bad_data_double;   
    Speed     = bad_data_double;
-   Direction = bad_data_double;
+   Depth     = NoSystemsDepth;
    WatchWarn = NoWatchWarnType;
 
    // Call clear for each Wind object and then set intensity value
@@ -427,9 +445,14 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "Vmax      = " << Vmax << "\n";
    out << prefix << "MSLP      = " << MSLP << "\n";
    out << prefix << "Level     = " << cyclonelevel_to_string(Level) << "\n";
-   out << prefix << "Speed     = " << Speed << "\n";
+   out << prefix << "RadP      = " << RadP << "\n";
+   out << prefix << "RRP       = " << RRP << "\n";
+   out << prefix << "MRD       = " << MRD << "\n";
+   out << prefix << "Gusts     = " << Gusts << "\n";
+   out << prefix << "Eye       = " << Eye << "\n";
    out << prefix << "Direction = " << Direction << "\n";
-   out << prefix << "WatchWarn = " << watchwarntype_to_string(WatchWarn) << "\n";
+   out << prefix << "Speed     = " << Speed << "\n";
+   out << prefix << "Depth     = " << systemsdepth_to_string(Depth) << "\n";
 
    for(i=0; i<NWinds; i++) {
       out << prefix << "Wind[" << i+1 << "]:" << "\n";
@@ -454,8 +477,14 @@ ConcatString TrackPoint::serialize() const {
      << ", Vmax = " << Vmax
      << ", MSLP = " << MSLP
      << ", Level = " << cyclonelevel_to_string(Level)
-     << ", Speed = " << Speed
+     << ", RadP = " << RadP
+     << ", RRP = " << RRP
+     << ", MRD = " << MRD
+     << ", Gusts = " << Gusts
+     << ", Eye = " << Eye
      << ", Direction = " << Direction
+     << ", Speed = " << Speed
+     << ", Depth = " << systemsdepth_to_string(Depth)
      << ", WatchWarn = " << watchwarntype_to_string(WatchWarn);
 
    return(s);
@@ -492,8 +521,14 @@ void TrackPoint::assign(const TrackPoint &t) {
    Vmax      = t.Vmax;
    MSLP      = t.MSLP;
    Level     = t.Level;
-   Speed     = t.Speed;
+   RadP      = t.RadP;
+   RRP       = t.RRP;
+   MRD       = t.MRD;
+   Gusts     = t.Gusts;
+   Eye       = t.Eye;
    Direction = t.Direction;
+   Speed     = t.Speed;
+   Depth     = t.Depth;
    WatchWarn = t.WatchWarn;
    
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
@@ -514,8 +549,14 @@ void TrackPoint::initialize(const ATCFLine &l) {
    Vmax      = l.v_max();
    MSLP      = l.mslp();
    Level     = l.level();
+   RadP      = l.isobar_pressure();
+   RRP       = l.isobar_radius();
+   MRD       = l.max_wind_radius();
+   Gusts     = l.gusts();
+   Eye       = l.eye_diameter();
+   Direction = l.storm_direction();   
    Speed     = l.storm_speed();
-   Direction = l.storm_direction();
+   Depth     = l.depth();
 
    return;
 }
