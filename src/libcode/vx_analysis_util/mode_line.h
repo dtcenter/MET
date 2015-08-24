@@ -166,16 +166,6 @@ class ModeLine : public DataLine {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern StringArray get_mode_filenames(const StringArray &);
-
-extern StringArray get_mode_filenames_from_dir(const char * directory_path);
-
-extern int is_mode_filename(const char * path);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #endif   /*  __MODE_LINE_H__  */
 
 

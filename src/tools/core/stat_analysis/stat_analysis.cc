@@ -411,6 +411,7 @@ void process_search_dirs() {
    int n, i, j, max_len, n_read, n_keep;
    MetConfig go_conf;
    STATAnalysisJob go_job;
+   StringArray suffix_list;
 
    //
    // Initialize
@@ -418,9 +419,14 @@ void process_search_dirs() {
    n_read = n_keep = 0;
 
    //
+   // Search for files ending in .stat
+   //
+   suffix_list.add(stat_file_ext);
+
+   //
    // Get the list of stat files in the search directories
    //
-   files = get_stat_filenames(search_dirs);
+   files = get_filenames(search_dirs, suffix_list);
 
    n = files.n_elements();
 

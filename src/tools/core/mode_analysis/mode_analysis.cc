@@ -201,7 +201,7 @@ void parse_command_line(int argc, char **argv)
 {
 
 CommandLine cline;
-StringArray cmd_line;
+StringArray cmd_line, suffix_list;
 int j;
 
    //
@@ -299,15 +299,13 @@ if ( cmd_line.n_elements() != 0 )  {
 
 }
 
-for (j=0; j<(lookin_dirs.n_elements()); ++j)  {
+suffix_list.add("_obj.txt");
 
-   StringArray a;
+StringArray a;
 
-   a = get_mode_filenames_from_dir(lookin_dirs[j]);
+a = get_filenames(lookin_dirs, suffix_list);
 
-   mode_files.add(a);
-
-}
+mode_files.add(a);
 
 
    //
