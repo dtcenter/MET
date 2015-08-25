@@ -1046,6 +1046,8 @@ if ( eng_type == FFEng ) {
 
 }
 
+const int N = ct->n_entries();
+
    //
    // Convert the ShapeData object to PPM
    //
@@ -1068,10 +1070,13 @@ for(x=L; x<(XY_box.right()); x++) {
 
               if ( is_bad_data(v) )  c = fill_color;
          else if ( v_int == 0 )      c = white;
-         else if(v_int > 0 && fcst) { // Single fcst object field
-            c = eng.fcst_color[v_int - 1];
-         } else if(v_int > 0 && !fcst) { // Single obs object field
-            c = eng.obs_color[v_int - 1];
+         else if (v_int > 0 && fcst) { // Single object field
+
+            v_int = (v_int - 1)%N;
+
+            if ( fcst )  c = eng.fcst_color [v_int];
+            else         c = eng.obs_color  [v_int];
+
          }
 
       } else if ( split == 2 )  { // Cluster object field

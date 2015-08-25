@@ -11,6 +11,8 @@ static const char local_config_filename  [] = "test_config";
 static const char fcst_filename [] = "/scratch/bullock/files/arw_20100517_00I.nc";
 static const char  obs_filename [] = "/scratch/bullock/files/obs_20100517_01L.nc";
 
+static const int min_object_size = 1000;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,15 +84,39 @@ calc.add(config.axis_angle_diff_wt,     config.axis_angle_diff_if,     &PairAtt3
 calc.add(config.start_time_delta_wt,    config.start_time_delta_if,    &PairAtt3D::StartTimeDelta);
 calc.add(config.end_time_delta_wt,      config.end_time_delta_if,      &PairAtt3D::EndTimeDelta);
 
-// calc.add(5.0, &func1, &PairAtt3D::SpeedDelta);
-// calc.add(7.0, &func2, &PairAtt3D::VolumeRatio);
-
 calc.check();
 
 
 
 cout << "\n  fcst conv radius = " << (config.fcst_conv_radius) << "\n";
 cout << "\n   obs conv radius = " << (config.obs_conv_radius) << "\n";
+
+
+fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
+ obs_conv =  obs_raw.convolve(config.obs_conv_radius);
+
+fcst_mask = fcst_conv.threshold(config.fcst_conv_thresh);
+ obs_mask =  obs_conv.threshold(config.obs_conv_thresh);
+
+fcst_obj = fcst_mask;
+ obs_obj =  obs_mask;
+
+cout << "Start split\n" << flush;
+fcst_obj.split();
+cout << "mid split\n" << flush;
+ obs_obj.split();
+cout << "End split\n" << flush;
+
+
+fcst_conv.write("fcst_conv.nc");
+ obs_conv.write("obs_conv.nc");
+
+fcst_mask.write("fcst_mask.nc");
+ obs_mask.write("obs_mask.nc");
+
+fcst_obj.write("fcst_obj.nc");
+ obs_obj.write("obs_obj.nc");
+
 
 cout << "\n\n  fcst threshold:\n";
 config.fcst_conv_thresh.dump(cout);

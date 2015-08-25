@@ -159,7 +159,7 @@ class MtdConfigInfo {
       int              zero_border_size;       // Zero out edge rows and columns for object definition      
 
       // bool             nc_pairs_flag;          // output NetCDF file
-      MtdNcOutInfo    nc_info; 
+      MtdNcOutInfo      nc_info; 
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
 
       // int              shift_right;            //  shift amount for global grids

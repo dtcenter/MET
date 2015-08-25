@@ -97,6 +97,9 @@ class MtdFloatFile : public MtdFileBase {
       MtdIntFile threshold(double) const;
       void       threshold(double, MtdIntFile &) const;
 
+      MtdIntFile threshold(const SingleThresh &) const;
+      void       threshold(const SingleThresh &, MtdIntFile &) const;
+
       MtdFloatFile const_t_slice(int t) const;
 
       MtdFloatFile convolve(const int r) const;

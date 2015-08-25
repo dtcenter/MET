@@ -290,6 +290,22 @@ return ( out );
 ////////////////////////////////////////////////////////////////////////
 
 
+MtdIntFile MtdFloatFile::threshold(const SingleThresh & t) const
+
+{
+
+MtdIntFile out;
+
+threshold(t, out);
+
+return ( out );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void MtdFloatFile::threshold(double T, MtdIntFile & out) const
 
 {
@@ -338,6 +354,73 @@ out.set_data_minmax(0, ival);
 out.set_radius(Radius);
 
 out.set_threshold(T);
+
+out.set_filetype(mtd_file_mask);
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::threshold(const SingleThresh & t, MtdIntFile & out) const
+
+{
+
+if ( !Data )  {
+
+   cerr << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
+
+   exit ( 1 );
+
+}
+
+int j;
+bool got_some = false;
+float fval;
+int ival;
+const int n3 = Nx*Ny*Nt;
+bool status = false;
+
+out.clear();
+
+out.base_assign(*this);
+
+out.set_size(Nx, Ny, Nt);
+
+float * d = Data;
+int * i = out.Data;
+
+
+for (j=0; j<n3; ++j)  {
+
+   fval = *d++;
+
+   status = t.check((double) fval);
+
+   ival = ( status ? 1 : 0);
+
+   *i++ = ival;
+
+   if ( ival )  got_some = true;
+
+}
+
+ival = ( got_some ? 1 : 0 );
+
+out.set_data_minmax(0, ival);
+
+out.set_radius(Radius);
+
+out.set_threshold(-9999.0);
 
 out.set_filetype(mtd_file_mask);
 
