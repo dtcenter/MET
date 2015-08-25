@@ -161,6 +161,8 @@ Threshold = f.Threshold;
 
 Nobjects = f.Nobjects;
 
+FileType = f.FileType;
+
 n = Nx*Ny*Nt;
 
 if ( f.Data )  {
@@ -410,9 +412,12 @@ void MtdIntFile::write(NcFile & f) const
 NcDim * nx_dim   = 0;
 NcDim * ny_dim   = 0;
 NcDim * nt_dim   = 0;
+NcDim * n_obj_dim   = 0;
 NcVar * data_var = 0;
+NcVar * volumes_var = 0;
 const char format [] = "%d";
 char junk[256];
+const bool is_split = (ObjVolume != 0);
 
 
    //
@@ -420,6 +425,18 @@ char junk[256];
    //
 
 MtdFileBase::write(f);
+
+   //
+   //  add dimension for n_objects, if needed
+   //
+
+if ( is_split )  {
+
+   f.add_dim(nobj_dim_name, Nobjects);
+
+   n_obj_dim = f.get_dim(nobj_dim_name);
+
+}
 
    //
    //  get the dimensions of the data field
@@ -466,12 +483,31 @@ const time_t t_start = time(0);   //  for timing the data write operation
 
 if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
 
-   cerr << "\n\n  MtdIntFile::write() -> trouble with put in data field\n\n";
+   cerr << "\n\n  MtdIntFile::write() -> trouble writing data field\n\n";
 
    exit ( 1 );
 
 }
 
+   //
+   //  volumes, if needed
+   //
+
+if ( is_split )  {
+
+   f.add_var(volumes_name, ncInt, n_obj_dim);
+
+   volumes_var = f.get_var(volumes_name);
+
+   if ( !(volumes_var->put(ObjVolume, Nobjects)) )  {
+
+      cerr << "\n\n  MtdIntFile::write() -> trouble writing object volumes\n\n";
+
+      exit ( 1 );
+
+   }
+
+}   //  if is_split
 
 const time_t t_stop = time(0);   //  for timing the data write operation
 
@@ -973,6 +1009,12 @@ MtdIntFile old;
 
 old = ::split(*this, Nobjects);
 
+old.DataMax = Nobjects;
+
+old.Nobjects = Nobjects;
+
+old.FileType = mtd_file_object;
+
 const int Nxyt = Nx*Ny*Nt;
 
 if ( Nobjects == 0 )  return;
@@ -993,7 +1035,6 @@ for (j=0; j<Nxyt; ++j, ++d)  {
    old.ObjVolume[k - 1] += 1;
 
 }
-
 
 
    //
