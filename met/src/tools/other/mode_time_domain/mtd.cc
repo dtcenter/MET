@@ -11,7 +11,7 @@ static const char local_config_filename  [] = "test_config";
 static const char fcst_filename [] = "/scratch/bullock/files/arw_20100517_00I.nc";
 static const char  obs_filename [] = "/scratch/bullock/files/obs_20100517_01L.nc";
 
-static const int min_object_size = 1000;
+static const int min_object_size = 2000;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -114,9 +114,14 @@ fcst_conv.write("fcst_conv.nc");
 fcst_mask.write("fcst_mask.nc");
  obs_mask.write("obs_mask.nc");
 
-fcst_obj.write("fcst_obj.nc");
- obs_obj.write("obs_obj.nc");
+fcst_obj.write("fcst_obj_notoss.nc");
+ obs_obj.write("obs_obj_notoss.nc");
 
+fcst_obj.toss_small_objects(min_object_size);
+ obs_obj.toss_small_objects(min_object_size);
+
+fcst_obj.write("fcst_obj_toss.nc");
+ obs_obj.write("obs_obj_toss.nc");
 
 cout << "\n\n  fcst threshold:\n";
 config.fcst_conv_thresh.dump(cout);

@@ -129,7 +129,6 @@ conv_radius = R;
 
 cerr << "\n\n"
      << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
-     << "    MtdFloatFile::convolve(const int) const -> still doesn't distingush between radius and diameter!\n\n"
      << "\n\n";
 
 min_conv_value = 0.0;
