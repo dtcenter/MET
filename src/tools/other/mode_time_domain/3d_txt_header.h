@@ -31,8 +31,9 @@ static const char * header_3d_cols [] = {
    "FCST_LEV", 
    "OBS_VAR", 
    "OBS_LEV", 
-   "OBJECT_ID", 
-   "OBJECT_CAT", 
+
+   // "OBJECT_ID", 
+   // "OBJECT_CAT", 
 
 };
 

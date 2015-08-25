@@ -729,11 +729,11 @@ table.set_entry(row, ++c, s.text());
 
    //  object id
 
-c++;
+// c++;
 
    //  object cat
 
-c++;
+// c++;
 
 
 

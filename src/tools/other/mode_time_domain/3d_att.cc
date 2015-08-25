@@ -16,6 +16,17 @@ using namespace std;
 #include "vx_math.h"
 
 #include "3d_att.h"
+#include "3d_txt_header.h"
+#include "3d_single_columns.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char format_int        [] = "%d";
+
+static const char format_2_decimals [] = "%.2f";
+static const char format_3_decimals [] = "%.3f";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -111,6 +122,12 @@ Xmin = Xmax = 0;
 Ymin = Ymax = 0;
 Tmin = Tmax = 0;
 
+IsFcst   = true;
+IsSimple = true;
+
+Centroid_Lat = 0.0;
+Centroid_Lon = 0.0;
+
 Complexity = 0.0;
 
 Xvelocity = Yvelocity = 0.0;
@@ -141,6 +158,10 @@ ObjectNumber = a.ObjectNumber;
 
 Volume = a.Volume;
 
+IsFcst = a.IsFcst;
+
+IsSimple = a.IsSimple;
+
 Xbar = a.Xbar;
 Ybar = a.Ybar;
 Tbar = a.Tbar;
@@ -153,6 +174,9 @@ Ymax = a.Ymax;
 
 Tmin = a.Tmin;
 Tmax = a.Tmax;
+
+Centroid_Lat = a.Centroid_Lat;
+Centroid_Lon = a.Centroid_Lon;
 
 Complexity = a.Complexity;
 
@@ -193,8 +217,8 @@ return;
 
 
 void SingleAtt3D::bounding_box (int & _xmin, int & _xmax,
-                                     int & _ymin, int & _ymax,
-                                     int & _tmin, int & _tmax) const
+                                int & _ymin, int & _ymax,
+                                int & _tmin, int & _tmax) const
 
 {
 
@@ -263,9 +287,24 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void SingleAtt3D::set_centroid_latlon(double _lat, double _lon)
+
+{
+
+Centroid_Lat = _lat;
+Centroid_Lon = _lon;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void SingleAtt3D::set_bounding_box (int _xmin, int _xmax,
-                                         int _ymin, int _ymax,
-                                         int _tmin, int _tmax)
+                                    int _ymin, int _ymax,
+                                    int _tmin, int _tmax)
 
 {
 
@@ -366,6 +405,187 @@ int n;
 n = Tmax - Tmin + 1;
 
 return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt3D::set_fcst(bool tf)
+
+{
+
+IsFcst = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt3D::set_obs(bool tf)
+
+{
+
+IsFcst = !tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt3D::set_simple(bool tf)
+
+{
+
+IsSimple = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt3D::set_cluster(bool tf)
+
+{
+
+IsSimple = !tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt3D::write_txt(AsciiTable & table, const int row) const
+
+{
+
+char junk[512];
+int c = n_header_3d_cols;
+const char * format = 0;
+ConcatString s;
+
+
+   //  object number
+
+if ( is_cluster() )  s << 'C';
+
+if ( is_fcst() )  s << 'F';
+else              s << 'O';
+
+sprintf(junk, format_int, ObjectNumber);
+
+s << '_' << junk;
+
+table.set_entry(row, c++, s.text());
+
+   //  centroid x, y, t
+
+   format = format_2_decimals;
+
+sprintf(junk, format, Xbar);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Ybar);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Tbar);
+
+   table.set_entry(row, c++, junk);
+
+   //  space centroid lat, lon
+
+   format = format_2_decimals;
+
+sprintf(junk, format, Centroid_Lat);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Centroid_Lon);
+
+   table.set_entry(row, c++, junk);
+
+   //  velocity xdot, ydot
+
+   format = format_2_decimals;
+
+sprintf(junk, format, Xvelocity);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Yvelocity);
+
+   table.set_entry(row, c++, junk);
+
+   //  spatial axis angle
+
+   format = format_2_decimals;
+
+sprintf(junk, format, SpatialAxisAngle);
+
+   table.set_entry(row, c++, junk);
+
+   //  volume
+
+sprintf(junk, format_int, Volume);
+
+   table.set_entry(row, c++, junk);
+
+   //  start time, end time
+
+   format = format_int;
+
+sprintf(junk, format, Tmin);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Tmax);
+
+   table.set_entry(row, c++, junk);
+
+   //  intensities 10, 25, 50, 75, 90
+
+   format = format_2_decimals;
+
+sprintf(junk, format, Ptile_10);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Ptile_25);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Ptile_50);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Ptile_75);
+
+   table.set_entry(row, c++, junk);
+
+sprintf(junk, format, Ptile_90);
+
+   table.set_entry(row, c++, junk);
+
+   //
+   //  done
+   //
+
+return;
 
 }
 
@@ -474,6 +694,9 @@ AxisDiff    = 0.0;
 StartTimeDelta = 0;
 EndTimeDelta   = 0;
 
+TotalInterest = -1.0;
+
+
 return;
 
 }
@@ -504,6 +727,22 @@ SpeedDelta = a.SpeedDelta;
 
 FcstObjectNumber = a.FcstObjectNumber;
 ObsObjectNumber = a.ObsObjectNumber;
+
+TotalInterest = a.TotalInterest;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PairAtt3D::set_total_interest(double t)
+
+{
+
+TotalInterest = t;
 
 return;
 
@@ -686,11 +925,9 @@ void PairAtt3D::write_txt(AsciiTable & table, const int row) const
 {
 
 char junk[512];
-int c = 1;
+int c = n_header_3d_cols;
+const char * format = 0;
 
-   //  model
-
-   c++;
 
    //  object number
 
@@ -700,49 +937,55 @@ table.set_entry(row, c++, junk);
 
    //  space centroid distance
 
-sprintf(junk, "%.1f", SpaceCentroidDist);
+sprintf(junk, format_2_decimals, SpaceCentroidDist);
 
 table.set_entry(row, c++, junk);
 
    //  time centroid delta
 
-sprintf(junk, "%.1f", TimeCentroidDelta);
-
-table.set_entry(row, c++, junk);
-
-   //  speed delta
-
-sprintf(junk, "%.1f", SpeedDelta);
-
-table.set_entry(row, c++, junk);
-
-   //  direction diff
-
-sprintf(junk, "%.1f", DirectionDifference);
-
-table.set_entry(row, c++, junk);
-
-   //  volume ratio
-
-sprintf(junk, "%.2f", VolumeRatio);
+sprintf(junk, format_2_decimals, TimeCentroidDelta);
 
 table.set_entry(row, c++, junk);
 
    //  axis diff
 
-sprintf(junk, "%.2f", AxisDiff);
+sprintf(junk, format_3_decimals, AxisDiff);
+
+table.set_entry(row, c++, junk);
+
+   //  speed delta
+
+sprintf(junk, format_2_decimals, SpeedDelta);
+
+table.set_entry(row, c++, junk);
+
+   //  direction diff
+
+sprintf(junk, format_2_decimals, DirectionDifference);
+
+table.set_entry(row, c++, junk);
+
+   //  volume ratio
+
+sprintf(junk, format_2_decimals, VolumeRatio);
 
 table.set_entry(row, c++, junk);
 
    //  start time delta
 
-sprintf(junk, "%d", StartTimeDelta);
+sprintf(junk, format_int, StartTimeDelta);
 
 table.set_entry(row, c++, junk);
 
    //  end time delta
 
-sprintf(junk, "%d", EndTimeDelta);
+sprintf(junk, format_int, EndTimeDelta);
+
+table.set_entry(row, c++, junk);
+
+   //  total interest
+
+sprintf(junk, format_3_decimals, EndTimeDelta);
 
 table.set_entry(row, c++, junk);
 
@@ -774,6 +1017,7 @@ int j;
 int n, Vol;
 SingleAtt3D a;
 double bbox_volume;
+double lat, lon;
 ConcatString raw_filename;
 float * values = (float *) 0;
 const int   * i = 0;
@@ -800,6 +1044,12 @@ if ( moments.N == 0 )  {
 a.Xbar = (moments.Sx)/(moments.N);
 a.Ybar = (moments.Sy)/(moments.N);
 a.Tbar = (moments.St)/(moments.N);
+
+
+raw.xy_to_latlon(a.Xbar, a.Ybar, lat, lon);
+
+a.Centroid_Lat = lat;
+a.Centroid_Lon = lon;
 
 a.Volume = obj.total_volume();
 
@@ -890,9 +1140,9 @@ return ( a );
 
 
 PairAtt3D calc_3d_pair_atts(const Object      & fcst_obj,
-                            const Object      & obs_obj,
+                            const Object      &  obs_obj,
                             const SingleAtt3D & fcst_att,
-                            const SingleAtt3D & obs_att)
+                            const SingleAtt3D &  obs_att)
 
 {
 
