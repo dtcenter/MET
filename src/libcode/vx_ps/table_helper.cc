@@ -21,6 +21,7 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_color.h"
 #include "table_helper.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,7 +70,8 @@ TableHelper::TableHelper(const TableHelper &)
 
 {
 
-cerr << "\n\n  TableHelper::TableHelper(const TableHelper &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  TableHelper::TableHelper(const TableHelper &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -87,7 +89,8 @@ TableHelper & TableHelper::operator=(const TableHelper &)
 
 {
 
-cerr << "\n\n  TableHelper::operator=(const TableHelper &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  TableHelper::operator=(const TableHelper &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -156,7 +159,8 @@ Ncols = _ncols;
 
 if ( (Nrows <= 0) || (Ncols <= 0) )  {
 
-   cerr << "\n\n  TableHelper::set_size_rc() -> bad nrows or ncols\n\n";
+   mlog << Error
+        << "\n\n  TableHelper::set_size_rc() -> bad nrows or ncols\n\n";
 
    exit ( 1 );
 
@@ -191,7 +195,8 @@ void TableHelper::range_check_rc(int row, int col) const
 
 if ( (row < 0) || (row >= Nrows) || (col < 0) || (col >= Ncols) )  {
 
-   cerr << "\n\n  TableHelper::range_check_rc(int row, int col) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  TableHelper::range_check_rc(int row, int col) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -211,7 +216,8 @@ void TableHelper::range_check_r(int row) const
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   cerr << "\n\n  TableHelper::range_check_r(int row) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  TableHelper::range_check_r(int row) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -231,7 +237,7 @@ void TableHelper::range_check_c(int col) const
 
 if ( (col < 0) || (col >= Ncols) )  {
 
-   cerr << "\n\n  TableHelper::range_check_c(int col) const -> range check error\n\n";
+   mlog << Error << "\n\n  TableHelper::range_check_c(int col) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -251,7 +257,7 @@ void TableHelper::check_plot() const
 
 if ( !Plot )  {
 
-   cerr << "\n\n  void TableHelper::check_plot() const -> no plot set!\n\n";
+   mlog << Error << "\n\n  void TableHelper::check_plot() const -> no plot set!\n\n";
 
    exit ( 1 );
 
@@ -731,7 +737,7 @@ void TableHelper::set_cell_wh(double w, double h)
 
 if ( PinIsSet )  {
 
-   cerr << "\n\n  TableHelper::set_cell_wh() -> operation not permitted after pin is set!\n\n";
+   mlog << Error << "\n\n  TableHelper::set_cell_wh() -> operation not permitted after pin is set!\n\n";
 
    exit ( 1 );
 
@@ -757,7 +763,7 @@ void TableHelper::set_col_width(int c, double w)
 
 if ( PinIsSet )  {
 
-   cerr << "\n\n  TableHelper::set_col_width() -> operation not permitted after pin is set!\n\n";
+   mlog << Error << "\n\n  TableHelper::set_col_width() -> operation not permitted after pin is set!\n\n";
 
    exit ( 1 );
 
@@ -767,7 +773,7 @@ range_check_c(c);
 
 if ( w <= 0.0 )  {
 
-   cerr << "\n\n  TableHelper::set_col_width(int c, double w) -> bad width ... " << w << "\n\n";
+   mlog << Error << "\n\n  TableHelper::set_col_width(int c, double w) -> bad width ... " << w << "\n\n";
 
    exit ( 1 );
 
@@ -789,7 +795,7 @@ void TableHelper::set_row_height(int r, double h)
 
 if ( PinIsSet )  {
 
-   cerr << "\n\n  TableHelper::set_row_height() -> operation not permitted after pin is set!\n\n";
+   mlog << Error << "\n\n  TableHelper::set_row_height() -> operation not permitted after pin is set!\n\n";
 
    exit ( 1 );
 
@@ -799,7 +805,7 @@ range_check_r(r);
 
 if ( h < 0.0 )  {
 
-   cerr << "\n\n  TableHelper::set_row_height(int r, double w) -> bad height ... " << h << "\n\n";
+   mlog << Error << "\n\n  TableHelper::set_row_height(int r, double w) -> bad height ... " << h << "\n\n";
 
    exit ( 1 );
 
