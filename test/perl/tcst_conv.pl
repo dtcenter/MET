@@ -28,7 +28,8 @@ my @fld_tcst  = qw(AMODEL BMODEL STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VAL
                    TK_ERR X_ERR Y_ERR ALTK_ERR CRTK_ERR ADLAND BDLAND AMSLP BMSLP AMAX_WIND BMAX_WIND
                    AAL_WIND_34 BAL_WIND_34 ANE_WIND_34 BNE_WIND_34 ASE_WIND_34 BSE_WIND_34 ASW_WIND_34 BSW_WIND_34 ANW_WIND_34 BNW_WIND_34
                    AAL_WIND_50 BAL_WIND_50 ANE_WIND_50 BNE_WIND_50 ASE_WIND_50 BSE_WIND_50 ASW_WIND_50 BSW_WIND_50 ANW_WIND_50 BNW_WIND_50
-                   AAL_WIND_64 BAL_WIND_64 ANE_WIND_64 BNE_WIND_64 ASE_WIND_64 BSE_WIND_64 ASW_WIND_64 BSW_WIND_64 ANW_WIND_64 BNW_WIND_64);
+                   AAL_WIND_64 BAL_WIND_64 ANE_WIND_64 BNE_WIND_64 ASE_WIND_64 BSE_WIND_64 ASW_WIND_64 BSW_WIND_64 ANW_WIND_64 BNW_WIND_64
+                   ARADP BRADP ARRP BRRP AMRD BMRD AGUSTS BGUSTS AEYE BEYE ADIR BDIR ASPEED BSPEED ADEPTH BDEPTH);
 
 my $fmt_hdr = 
       "%-8s"  . # VERSION
@@ -111,7 +112,24 @@ my $fmt_tcst =
       "%15s"  . # ASW_WIND_64
       "%15s"  . # BSW_WIND_64
       "%15s"  . # ANW_WIND_64
-      "%15s";   # BNW_WIND_64
+      "%15s"  . # BNW_WIND_64
+      "%15s"  . # ARADP
+      "%15s"  . # BRADP
+      "%15s"  . # ARRP
+      "%15s"  . # BRRP
+      "%15s"  . # AMRD
+      "%15s"  . # BMRD
+      "%15s"  . # AGUSTS
+      "%15s"  . # BGUSTS
+      "%15s"  . # AEYE
+      "%15s"  . # BEYE
+      "%15s"  . # ADIR
+      "%15s"  . # BDIR
+      "%15s"  . # ASPEED
+      "%15s"  . # BSPEED
+      "%15s"  . # ADEPTH
+      "%15s";   # BDEPTH
+
 
 if( 1 > @ARGV && 2 < @ARGV ){ die "ERROR: unexpected number of arguments\n\n" . usage() }
 
@@ -157,7 +175,7 @@ while(<$fh_tcst_in>){
   );
 
   # write the output line
-  push @outs, (@vals[1 .. 6,10,11,13 .. 62]);
+  push @outs, (@vals[1 .. 6,10,11,13 .. 78]);
 
   # print the line
   printf("${fmt_hdr}${fmt_tcst}\n", @outs);
@@ -229,3 +247,19 @@ close($fh_tcst_in);
 #    60 BSW_WIND_64
 #    61 ANW_WIND_64
 #    62 BNW_WIND_64
+#    63  ARADP
+#    64  BRADP
+#    65  ARRP
+#    66  BRRP
+#    67  AMRD
+#    68  BMRD
+#    69  AGUSTS
+#    70  BGUSTS
+#    71  AEYE
+#    72  BEYE
+#    73  ADIR
+#    74  BDIR
+#    75  ASPEED
+#    76  BSPEED
+#    77  ADEPTH
+#    78  BDEPTH
