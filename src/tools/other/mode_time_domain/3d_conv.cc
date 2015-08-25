@@ -29,7 +29,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static int rm1o2;
+static int conv_radius = -1;
 
 static double * sum_plane_buf = 0;
 
@@ -124,6 +124,9 @@ double * s_above = 0;
 const double scale = 1.0/(R*R*3);
 
 
+conv_radius = R;
+
+
 cerr << "\n\n"
      << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
      << "    MtdFloatFile::convolve(const int) const -> still doesn't distingush between radius and diameter!\n\n"
@@ -169,19 +172,23 @@ for (t=0; t<Nt; ++t)  {
    s_this  = handle.sum_plane_this;
    s_above = handle.sum_plane_above;
 
-   // cout << "T = " << t << '\n';
+   if ( verbose )  {
 
-   // cout << "s_below range is " << dump_range(s_below, Nxy) << '\n';
-   // cout << "s_this  range is " << dump_range(s_this,  Nxy) << '\n';
-   // cout << "s_above range is " << dump_range(s_above, Nxy) << '\n';
+      // cout << "T = " << t << '\n';
 
-   // cout << '\n';
+      // cout << "s_below range is " << dump_range(s_below, Nxy) << '\n';
+      // cout << "s_this  range is " << dump_range(s_this,  Nxy) << '\n';
+      // cout << "s_above range is " << dump_range(s_above, Nxy) << '\n';
 
-   // cout << "data_below range is " << dump_range(handle.data_plane_below, Nxy) << '\n';
-   // cout << "data_this  range is " << dump_range(handle.data_plane_this,  Nxy) << '\n';
-   // cout << "data_above range is " << dump_range(handle.data_plane_above, Nxy) << '\n';
+      // cout << '\n';
 
-   // cout << "\n\n" << flush;
+      // cout << "data_below range is " << dump_range(handle.data_plane_below, Nxy) << '\n';
+      // cout << "data_this  range is " << dump_range(handle.data_plane_this,  Nxy) << '\n';
+      // cout << "data_above range is " << dump_range(handle.data_plane_above, Nxy) << '\n';
+
+      // cout << "\n\n" << flush;
+
+   }
 
    for (j=0; j<Nxy; ++j)  {
 
@@ -404,17 +411,25 @@ void calc_sum_plane(const int nx, const int ny, const double * data_plane, doubl
 {
 
 int x, y, n;
+static int count = 0;
+char junk[256];
 double moving_sum = 0.0;
 const int nxy = nx*ny;
-const int xmin = rm1o2;
-const int ymin = rm1o2;
-const int xmax = nx - rm1o2;
-const int ymax = ny - rm1o2;
+const int xmin = conv_radius;
+const int ymin = conv_radius;
+const int xmax = nx - 1 - conv_radius;
+const int ymax = ny - 1 - conv_radius;
 const double * front = 0;
 const double * back  = 0;
-double * put = 0;
+const double * in    = 0;
+      double * out   = 0;
+      double * put   = 0;
 
 // cout << "in calc_sum_plane\n" << flush;
+
+sprintf(junk, "raw_%02d", count);
+
+// data_pgm(data_plane, nx, ny, junk);
 
    //
    //  zero out the sum plane buffer
@@ -426,78 +441,106 @@ memset(sum_plane_buf, 0, nxy*sizeof(double));
    //  calculate sums in x-direction for each y
    //
 
+in = data_plane;
+
+out = sum_plane_buf;
+
+
 for (y=0; y<ny; ++y)  {
-
-   n = mtd_three_to_one(nx, ny, 0, 0, y, 0);
-
-   back = data_plane + n;
-
-   front = back + (xmin + 1);
-
-   put = sum_plane_buf + (n + xmin);
 
    moving_sum = 0.0;
 
-   for (x=0; x<=xmin; ++x)  moving_sum += back[x];
+   n = mtd_three_to_one(nx, ny, 1, 0, y, 0);
+
+   back = in + n;
+
+   for (x=0; x<=(2*conv_radius); ++x)  moving_sum += back[x];
+
+   front = back + (2*conv_radius + 1);
+
+   put = out + (n + conv_radius);
 
    for (x=xmin; x<xmax; ++x)  {
 
-      moving_sum += *front++;
+      *put = moving_sum;
 
-      *put++ = moving_sum;
+      moving_sum += *front;
 
-      moving_sum -= *back++;
+      moving_sum -= *back;
+
+      ++front;
+      ++back;
+      ++put;
 
    }
 
 }
 
+
 // cout << "buf plane range = " << dump_range(sum_plane_buf, nxy) << '\n' << flush;
+// 
+// sprintf(junk, "buf_%02d", count);
+// 
+// data_pgm(sum_plane_buf, nx, ny, junk);
+
 
    //
    //  calculate sums in y-direction for each x
    //
 
+in = sum_plane_buf;
+
+out = sum_plane;
+
 for (x=0; x<nx; ++x)  {
-
-   n = mtd_three_to_one(nx, ny, 0, x, 0, 0);
-
-   back = sum_plane_buf + n;
-
-   front = back + (ymin*nx);
-
-   put = sum_plane + (n + rm1o2*nx);
 
    moving_sum = 0.0;
 
-   for (y=0; y<=ymin; ++y)  moving_sum += back[y + y*nx];
+   n = mtd_three_to_one(nx, ny, 1, x, 0, 0);
+
+   back = in + n;
+
+   for (y=0; y<=(2*conv_radius); ++y)  moving_sum += back[y*nx];
+
+   front = back + (2*conv_radius + 1)*nx;
+
+   put = out + (n + conv_radius*nx);
 
    for (y=ymin; y<ymax; ++y)  {
 
-      moving_sum += *front;
-
-      front += nx;
-
       *put = moving_sum;
 
-      // if ( moving_sum > 3 )  cout << moving_sum << '\n' << flush;
-
-      put += nx;
+      moving_sum += *front;
 
       moving_sum -= *back;
 
-      back += nx;
+/*
+      if ( moving_sum < 0 )  {
+
+         cout << "moving_sum = " << moving_sum << " ... (x, y) = (" << x << ", " << y << ")\n";
+
+      }
+*/
+
+      front += nx;
+      back  += nx;
+      put   += nx;
 
    }
 
-}
+}   //  for x
 
-// cout << "sum plane range = " << dump_range(sum_plane, nxy) << '\n' << flush;
-
+// cout << "sum plane range = " << dump_range(out, nxy) << '\n' << flush;
+// 
+// sprintf(junk, "sum_%02d", count);
+// 
+// data_pgm(out, nx, ny, junk);
 
    //
    //  done
    //
+
+++count;
 
 return;
 
