@@ -254,6 +254,8 @@ for(i=0; i<eng.n_clus && Vtab >= Vmargin; i++) {
 
    c = 0;
 
+   if ( r >= t.nrows() )  break;
+
    Htab = Hmargin;
 
    // Cluster ID
