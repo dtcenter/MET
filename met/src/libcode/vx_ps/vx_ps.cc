@@ -1081,7 +1081,7 @@ void PSfile::comment(const char * text)
 
 if ( empty(text) )  {
 
-   cerr << "\n\n  PSfile::comment(const char *) -> empty string!\n\n";
+   mlog << Error << "\n\n  PSfile::comment(const char *) -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -1408,7 +1408,7 @@ void PSfile::setlinejoin(int k)
 
 if ( (k < 0) || (k > 2) )  {
 
-   cerr << "\n\n  PSfile::setlinejoin(int) -> invalid value for line join\n\n";
+   mlog << Error << "\n\n  PSfile::setlinejoin(int) -> invalid value for line join\n\n";
 
    exit ( 1 );
 
@@ -1434,7 +1434,7 @@ void PSfile::setlinecap(int k)
 
 if ( (k < 0) || (k > 2) )  {
 
-   cerr << "\n\n  PSfile::setlinecap(int) -> invalid value for line cap\n\n";
+   mlog << Error << "\n\n  PSfile::setlinecap(int) -> invalid value for line cap\n\n";
 
    exit ( 1 );
 
@@ -1467,7 +1467,7 @@ switch ( f )  {
       break;
 
    default:
-      cerr << "\n\n  PSfile::set_family(FontFamily) -> bad font family ... "
+      mlog << Error << "\n\n  PSfile::set_family(FontFamily) -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -1969,7 +1969,7 @@ switch ( f )  {
    case ff_Bookman:      n =  5;  break;
 
    default:
-      cerr << "\n\n  ff_to_roman() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_roman() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -2003,7 +2003,7 @@ switch ( f )  {
    case ff_Bookman:      n =  6;  break;
 
    default:
-      cerr << "\n\n  ff_to_italic() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_italic() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -2037,7 +2037,7 @@ switch ( f )  {
    case ff_Bookman:      n =  3;  break;
 
    default:
-      cerr << "\n\n  ff_to_bold() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_bold() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
@@ -2071,7 +2071,7 @@ switch ( f )  {
    case ff_Bookman:      n =  4;  break;
 
    default:
-      cerr << "\n\n  ff_to_bolditalic() -> bad font family ... "
+      mlog << Error << "\n\n  ff_to_bolditalic() -> bad font family ... "
            << fontfamily_to_string(f) << "\n\n";
       exit ( 1 );
       break;
