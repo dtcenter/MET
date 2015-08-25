@@ -1322,7 +1322,9 @@ void apply_mask(ShapeData &f, ShapeData &mask)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int ShapeData::n_objects() {
+int ShapeData::n_objects() const
+
+{
    int n;
    ShapeData sd;
 
