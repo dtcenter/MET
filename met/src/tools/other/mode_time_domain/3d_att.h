@@ -44,11 +44,17 @@ class SingleAtt3D {
 
       void assign(const SingleAtt3D &);
 
+
       int ObjectNumber;
 
       int Volume;
 
+      bool IsFcst;
+      bool IsSimple;
+
       double Xbar, Ybar, Tbar;
+
+      double Centroid_Lat, Centroid_Lon;
 
       int Xmin, Xmax;
       int Ymin, Ymax;
@@ -88,6 +94,8 @@ class SingleAtt3D {
 
       void set_centroid(double _xbar, double _ybar, double _tbar);
 
+      void set_centroid_latlon(double _lat, double _lon);
+
       void set_bounding_box (int _xmin, int _xmax, 
                              int _ymin, int _ymax, 
                              int _tmin, int _tmax);
@@ -98,15 +106,30 @@ class SingleAtt3D {
 
       void set_spatial_axis(double);
 
+      void set_fcst (bool = true);
+      void set_obs  (bool = true);
+
+      void set_simple  (bool = true);
+      void set_cluster (bool = true);
+
          //
          //  get stuff
          //
 
       int object_number () const;
 
+      bool is_fcst () const;
+      bool is_obs  () const;
+
+      bool is_simple  () const;
+      bool is_cluster () const;
+
       int volume () const;
 
       void centroid ( double & xbar, double & ybar, double & tbar) const;
+
+      double centroid_lat () const;
+      double centroid_lon () const;
 
       double xbar () const;
       double ybar () const;
@@ -158,6 +181,12 @@ class SingleAtt3D {
 
 inline int SingleAtt3D::object_number() const { return ( ObjectNumber ); }
 
+inline bool SingleAtt3D::is_fcst () const { return (   IsFcst ); }
+inline bool SingleAtt3D::is_obs  () const { return ( ! IsFcst ); }
+
+inline bool SingleAtt3D::is_simple  () const { return (   IsSimple ); }
+inline bool SingleAtt3D::is_cluster () const { return ( ! IsSimple ); }
+
 inline void SingleAtt3D::set_object_number(int _n) { ObjectNumber = _n;  return; }
 
 inline int SingleAtt3D::volume() const { return ( Volume ); }
@@ -172,6 +201,9 @@ inline void SingleAtt3D::set_complexity(double _v) { Complexity = _v;  return; }
 inline double SingleAtt3D::xbar() const { return ( Xbar ); }
 inline double SingleAtt3D::ybar() const { return ( Ybar ); }
 inline double SingleAtt3D::tbar() const { return ( Tbar ); }
+
+inline double SingleAtt3D::centroid_lat() const { return ( Centroid_Lat ); }
+inline double SingleAtt3D::centroid_lon() const { return ( Centroid_Lon ); }
 
 inline int SingleAtt3D::xmin() const { return ( Xmin ); }
 inline int SingleAtt3D::xmax() const { return ( Xmax ); }
@@ -232,6 +264,8 @@ class PairAtt3D {
       double StartTimeDelta;
       double EndTimeDelta;
 
+      double TotalInterest;
+
    public:
 
       PairAtt3D();
@@ -268,6 +302,8 @@ class PairAtt3D {
       void set_start_time_delta (int);
       void set_end_time_delta   (int);
 
+      void set_total_interest (double);
+
          //
          //  get stuff
          //
@@ -290,6 +326,8 @@ class PairAtt3D {
 
       int start_time_delta () const;
       int end_time_delta   () const;
+
+      double total_interest () const;
 
          //
          //  do stuff
@@ -320,6 +358,8 @@ inline double PairAtt3D::axis_angle_diff () const { return ( AxisDiff ); }
 
 inline int PairAtt3D::start_time_delta () const { return ( StartTimeDelta ); }
 inline int PairAtt3D::end_time_delta   () const { return ( EndTimeDelta ); }
+
+inline double PairAtt3D::total_interest () const { return ( TotalInterest ); }
 
 
 ////////////////////////////////////////////////////////////////////////

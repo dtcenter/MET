@@ -1246,11 +1246,11 @@ void MtdIntFile::calc_3d_bbox(int & x_min, int & x_max,
 
 int x, y, t, n;
 
-x_min = y_min = t_min = 0;
+x_max = y_max = t_max = -1;
 
-x_max = Nx;
-y_max = Ny;
-t_max = Nt;
+x_min = 2*Nx;
+y_min = 2*Ny;
+t_min = 2*Nt;
 
 for (x=0; x<Nx; ++x)  {
 
