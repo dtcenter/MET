@@ -1020,7 +1020,7 @@ void Pcm::all_black()
 
 {
 
-cerr << "\n\n  Pcm::all_black() -> does nothing!\n\n";
+mlog << Error << "\n\n  Pcm::all_black() -> does nothing!\n\n";
 
 return;
 
@@ -1034,7 +1034,7 @@ void Pcm::all_white()
 
 {
 
-cerr << "\n\n  Pcm::all_white() -> does nothing!\n\n";
+mlog << Error << "\n\n  Pcm::all_white() -> does nothing!\n\n";
 
 return;
 

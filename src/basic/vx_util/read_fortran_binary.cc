@@ -14,6 +14,7 @@ using namespace std;
 
 #include "read_fortran_binary.h"
 #include "check_endian.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -55,7 +56,7 @@ switch ( rec_pad_length )  {
    case 8:  shuffle = shuffle_8;  break;
 
    default:
-      cerr << "\n\n  read_fortran_binary() -> bad record pad size ... "
+      mlog << Error << "\n\n  read_fortran_binary() -> bad record pad size ... "
            << rec_pad_length << "\n\n";
       exit ( 1 );
       break;
@@ -85,7 +86,7 @@ rec_size_1 = get_rec_size(local_buf, rec_pad_length);
 
 if ( rec_size_1 > buf_size )  {
 
-   cerr << "\n\n  read_fortran_binary() -> buffer too small ... "
+   mlog << Error << "\n\n  read_fortran_binary() -> buffer too small ... "
         << "increase buffer size to at least " << rec_size_1 << " bytes!\n\n";
 
    exit ( 1 );
@@ -94,7 +95,7 @@ if ( rec_size_1 > buf_size )  {
 
 if ( (n_read = read(fd, buf, rec_size_1)) != rec_size_1 )  {
 
-   cerr << "\n\n  read_fortran_binary() -> read error ... "
+   mlog << Error << "\n\n  read_fortran_binary() -> read error ... "
         << "tried to read " << rec_size_1 << " bytes, got "
         << n_read << "\n\n";
 
@@ -110,7 +111,7 @@ n_read = ::read(fd, local_buf, rec_pad_length);
 
 if ( n_read != rec_pad_length )  {
 
-   cerr << "\n\n  read_fortran_binary() -> trouble reading second record pad\n\n";
+   mlog << Error << "\n\n  read_fortran_binary() -> trouble reading second record pad\n\n";
 
    exit ( 1 );
 
@@ -122,7 +123,7 @@ rec_size_2 = get_rec_size(local_buf, rec_pad_length);
 
 if ( rec_size_2 != rec_size_1 )  {
 
-   cerr << "\n\n  read_fortran_binary() -> first and second record pads don't match!\n\n";
+   mlog << Error << "\n\n  read_fortran_binary() -> first and second record pads don't match!\n\n";
 
    exit ( 1 );
 
@@ -151,7 +152,7 @@ long long size;
 
 if ( rec_pad_length >= (int) sizeof(local_buf) )  {
 
-   cerr << "\n\n  peek_record_size(int fd) -> local buffer too small\n\n";
+   mlog << Error << "\n\n  peek_record_size(int fd) -> local buffer too small\n\n";
 
    exit ( 1 );
 
@@ -172,7 +173,7 @@ switch ( rec_pad_length )  {
       break;
 
    default:
-      cerr << "\n\n  peek_record_size() -> bad record pad length\n\n";
+      mlog << Error << "\n\n  peek_record_size() -> bad record pad length\n\n";
       exit ( 1 );
       break;
 
@@ -186,7 +187,7 @@ size = get_rec_size(local_buf, rec_pad_length);
 
 if ( lseek(fd, -rec_pad_length, SEEK_CUR) < 0 )  {
 
-   cerr << "\n\n  peek_record_size() -> lseek failed!\n\n";
+   mlog << Error << "\n\n  peek_record_size() -> lseek failed!\n\n";
 
    exit ( 1 );
 

@@ -88,7 +88,7 @@ ModePsFile::ModePsFile(const ModePsFile &)
 
 // mpsf_init_from_scratch();
 
-cerr << "\n\n  ModePsFile::ModePsFile(const ModePsFile &) -> shoule never be called!\n\n";
+mlog << Error << "\n\n  ModePsFile::ModePsFile(const ModePsFile &) -> shoule never be called!\n\n";
 
 exit ( 1 );
 
@@ -106,7 +106,7 @@ ModePsFile & ModePsFile::operator=(const ModePsFile &)
 // 
 // assign(m);
 
-cerr << "\n\n  ModePsFile::operator=(const ModePsFile &) -> should never be called!\n\n";
+mlog << Error << "\n\n  ModePsFile::operator=(const ModePsFile &) -> should never be called!\n\n";
 
 exit ( 1 );
 

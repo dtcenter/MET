@@ -623,7 +623,7 @@ status = config.read_string(cs);
 
 if ( ! status )  {
 
-   cerr << "\n\n  SingleThresh::set(const char *): failed to parse string \"" << cs << "\"\n\n";
+   mlog << Error << "\n\n  SingleThresh::set(const char *): failed to parse string \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
@@ -633,7 +633,7 @@ test_mode = false;
 
 if ( ! result )  {
 
-   cerr << "\n\n  SingleThresh::set(const char *): no result from parsing string \"" << cs << "\"\n\n";
+   mlog << Error << "\n\n  SingleThresh::set(const char *): no result from parsing string \"" << cs << "\"\n\n";
 
    exit ( 1 );
 

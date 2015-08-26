@@ -221,7 +221,7 @@ ConcatString tab;
 
 tab.set_repeat(' ', 13);
 
-cerr << "\n\n"
+cout << "\n\n"
      << "   Usage:  " << program_name << '\n'
      << tab << "-data_file path\n"
      << tab << "-field name\n"
