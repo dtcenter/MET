@@ -708,7 +708,7 @@ buf = new unsigned char [n_bytes];
 
 if ( !buf )  {
 
-   cerr << "\n\n  GribFileRep::realloc_buf(long long) -> memory allocation error\n\n";
+   mlog << Error << "\n\n  GribFileRep::realloc_buf(long long) -> memory allocation error\n\n";
 
    exit ( 1 );
 
