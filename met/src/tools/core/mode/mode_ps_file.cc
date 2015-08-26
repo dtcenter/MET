@@ -1083,7 +1083,7 @@ for(x=L; x<(XY_box.right()); x++) {
 
               if ( is_bad_data(v) )  c = fill_color;
          else if ( v_int == 0 )      c = white;
-         else if (v_int > 0 && fcst) { // Single object field
+         else if ( v_int > 0 ) { // Single object field
 
             v_int = (v_int - 1)%n_colors;
 
