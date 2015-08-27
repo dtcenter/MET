@@ -318,12 +318,12 @@ double InterestCalculator::operator()(const PairAtt3D & p)
 {
 
 int j;
-double num;
+double sum;
 double w, x, I;
 PWL f = 0;
 Argument a = 0;
 
-num = 0.0;
+sum = 0.0;
 
 for (j=0; j<Nelements; ++j)  {
 
@@ -337,14 +337,14 @@ for (j=0; j<Nelements; ++j)  {
 
    I = (*f)(x);
 
-   num += w*I;
+   sum += w*I;
 
 }   //  for j
 
 
-num *= Scale;
+sum *= Scale;
 
-return ( num );
+return ( sum );
 
 }
 

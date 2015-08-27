@@ -209,9 +209,9 @@ Stt = stt_old - N*T_bar*T_bar;
 
 Sxy = sxy_old - N*X_bar*Y_bar;
 
-Sxt = sxt_old - N*X_bar*Y_bar;
+Sxt = sxt_old - N*X_bar*T_bar;
 
-Syt = syt_old - N*Y_bar*Y_bar;
+Syt = syt_old - N*Y_bar*T_bar;
 
    //
    //  done

@@ -129,6 +129,8 @@ Radius = -1;
 
 Threshold = -1.0;
 
+Nobjects = 0;
+
 
    //
    //  done
@@ -1367,7 +1369,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-MtdIntFile MtdIntFile::select(int n) const
+MtdIntFile MtdIntFile::select(int n) const   //  1-based
 
 {
 
@@ -1395,7 +1397,7 @@ s.set_to_zeroes();
 int * in  = Data;
 int * out = s.Data;
 
-v = 0;
+v = ObjVolume[n - 1];
 
 for (j=0; j<n3; ++j)  {
 

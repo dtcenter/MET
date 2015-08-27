@@ -479,6 +479,8 @@ ConcatString s;
 
 
    //  object number
+   //  object number
+   //
 
 if ( is_cluster() )  s << 'C';
 
@@ -491,7 +493,9 @@ s << '_' << junk;
 
 table.set_entry(row, c++, s.text());
 
+   //
    //  centroid x, y, t
+   //
 
    format = format_2_decimals;
 
@@ -507,7 +511,9 @@ sprintf(junk, format, Tbar);
 
    table.set_entry(row, c++, junk);
 
+   //
    //  space centroid lat, lon
+   //
 
    format = format_2_decimals;
 
@@ -519,7 +525,9 @@ sprintf(junk, format, Centroid_Lon);
 
    table.set_entry(row, c++, junk);
 
+   //
    //  velocity xdot, ydot
+   //
 
    format = format_2_decimals;
 
@@ -531,7 +539,9 @@ sprintf(junk, format, Yvelocity);
 
    table.set_entry(row, c++, junk);
 
+   //
    //  spatial axis angle
+   //
 
    format = format_2_decimals;
 
@@ -539,13 +549,17 @@ sprintf(junk, format, SpatialAxisAngle);
 
    table.set_entry(row, c++, junk);
 
+   //
    //  volume
+   //
 
 sprintf(junk, format_int, Volume);
 
    table.set_entry(row, c++, junk);
 
+   //
    //  start time, end time
+   //
 
    format = format_int;
 
@@ -557,7 +571,9 @@ sprintf(junk, format, Tmax);
 
    table.set_entry(row, c++, junk);
 
+   //
    //  intensities 10, 25, 50, 75, 90
+   //
 
    format = format_2_decimals;
 
@@ -1001,6 +1017,41 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void PairAtt3D::dump(ostream & out, int depth) const
+
+{
+
+Indent indent(depth);
+
+out << indent << "FcstObjectNumber    = " << FcstObjectNumber    << '\n';
+out << indent << " ObsObjectNumber    = " <<  ObsObjectNumber    << '\n';
+out << indent << "IntersectionVol     = " << IntersectionVol     << '\n';
+out << indent << "UnionVol            = " << UnionVol            << '\n';
+out << indent << "TimeCentroidDelta   = " << TimeCentroidDelta   << '\n';
+out << indent << "SpaceCentroidDist   = " << SpaceCentroidDist   << '\n';
+out << indent << "DirectionDifference = " << DirectionDifference << '\n';
+out << indent << "SpeedDelta          = " << SpeedDelta          << '\n';
+out << indent << "VolumeRatio         = " << VolumeRatio         << '\n';
+out << indent << "AxisDiff            = " << AxisDiff            << '\n';
+out << indent << "StartTimeDelta      = " << StartTimeDelta      << '\n';
+out << indent << "EndTimeDelta        = " << EndTimeDelta        << '\n';
+out << indent << "TotalInterest       = " << TotalInterest       << '\n';
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -1008,6 +1059,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+   // 0-based
 
 SingleAtt3D calc_3d_single_atts(const Object & obj, const MtdFloatFile & raw, const char * model, int obj_number)
 
@@ -1023,15 +1075,16 @@ float * values = (float *) 0;
 const int   * i = 0;
 const float * r = 0;
 Mtd_3D_Moments moments;
-MtdIntFile f;
+MtdIntFile sel;
+const int num_plus_1 = obj_number + 1;
 const int n3 = (obj.nx())*(obj.ny())*(obj.nt());
 
 
-a.ObjectNumber = obj_number;
+a.ObjectNumber = num_plus_1;
 
-f = obj.select(obj_number + 1);
+sel = obj.select(num_plus_1);
 
-moments = f.calc_3d_moments();
+moments = sel.calc_3d_moments();
 
 if ( moments.N == 0 )  {
 
@@ -1045,15 +1098,17 @@ a.Xbar = (moments.Sx)/(moments.N);
 a.Ybar = (moments.Sy)/(moments.N);
 a.Tbar = (moments.St)/(moments.N);
 
+moments.centralize();
+
 
 raw.xy_to_latlon(a.Xbar, a.Ybar, lat, lon);
 
 a.Centroid_Lat = lat;
 a.Centroid_Lon = lon;
 
-a.Volume = obj.total_volume();
+a.Volume = obj.volume(obj_number);
 
-f.calc_3d_bbox(a.Xmin, a.Xmax, a.Ymin, a.Ymax, a.Tmin, a.Tmax);
+sel.calc_3d_bbox(a.Xmin, a.Xmax, a.Ymin, a.Ymax, a.Tmin, a.Tmax);
 
 bbox_volume =  (a.Xmax - a.Xmin - 1.0)
               *(a.Ymax - a.Ymin - 1.0)
@@ -1098,7 +1153,7 @@ if ( !values )  {
 
 n = 0;
 
-i = obj.data();
+i = sel.data();
 r = raw.data();
 
 for (j=0; j<n3; ++j)  {
