@@ -21,7 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-typedef MtdIntFile Object;
+typedef MtdIntFile   Object;
+typedef MtdFloatFile Raw;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -36,7 +37,7 @@ static const char ymd_hms_format [] = "%04d%02d%02d_%02d%02d%02d";
 
 class SingleAtt3D {
 
-      friend SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, int obj_number);
+      friend SingleAtt3D calc_3d_single_atts(const Object & obj, const Raw & raw, const char * model, int obj_number);
 
    public:
 
@@ -365,7 +366,7 @@ inline double PairAtt3D::total_interest () const { return ( TotalInterest ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt3D calc_3d_single_atts(const Object & mask, const Object & raw, const char * model, int obj_number);   //  0 based 
+extern SingleAtt3D calc_3d_single_atts(const Object & obj, const Raw & raw, const char * model, int obj_number);   //  0 based 
 
 extern PairAtt3D   calc_3d_pair_atts(const Object      & _fcst_obj, 
                                      const Object      & _obs_obj, 

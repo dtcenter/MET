@@ -622,6 +622,7 @@ void MtdConfigInfo::write_header_cols(AsciiTable & table, const int row) const
 
 {
 
+int k;
 int c = 0;
 int month, day, year, hour, minute, second;
 char junk[512];
@@ -637,9 +638,19 @@ table.set_entry(row, c++, model.text());
 
    //  fcst lead
 
-sec_to_hms(fcst_info->lead(), hour, minute, second);
+k = fcst_info->lead();
 
-snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
+if ( k >= 0 )  {
+
+   sec_to_hms(fcst_info->lead(), hour, minute, second);
+
+   snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
+
+} else {
+
+   snprintf(junk, sizeof(junk), "%d", k);
+
+}
 
 table.set_entry(row, c++, junk);
 
@@ -649,7 +660,7 @@ unix_to_mdyhms(fcst_info->valid(), month, day, year, hour, minute, second);
 
 snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
 
-table.set_entry(row, ++c, junk);
+table.set_entry(row, c++, junk);
 
    //  fcst time delta ... don't know this
 
@@ -661,9 +672,19 @@ c++;
 
    //  obs lead
 
-sec_to_hms(obs_info->lead(), hour, minute, second);
+k = obs_info->lead();
 
-snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
+if ( k >= 0 )  {
+
+   sec_to_hms(obs_info->lead(), hour, minute, second);
+
+   snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
+
+} else {
+
+   snprintf(junk, sizeof(junk), "%d", k);
+
+}
 
 table.set_entry(row, c++, junk);
 
@@ -673,7 +694,7 @@ unix_to_mdyhms(obs_info->valid(), month, day, year, hour, minute, second);
 
 snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
 
-table.set_entry(row, ++c, junk);
+table.set_entry(row, c++, junk);
 
    //  obs time delta ... don't know this
 
@@ -685,47 +706,47 @@ c++;
 
    //  fcst radius
 
-table.set_entry(row, ++c, fcst_conv_radius);
+table.set_entry(row, c++, fcst_conv_radius);
 
    //  fcst threshold
 
 s = fcst_conv_thresh.get_str();
 
-table.set_entry(row, ++c, s.text());
+table.set_entry(row, c++, s.text());
 
    //  obs radius
 
-table.set_entry(row, ++c, obs_conv_radius);
+table.set_entry(row, c++, obs_conv_radius);
 
    //  obs threshold
 
 s = obs_conv_thresh.get_str();
 
-table.set_entry(row, ++c, s.text());
+table.set_entry(row, c++, s.text());
 
    //  fcst var
 
 s = fcst_info->name();
 
-table.set_entry(row, ++c, s.text());
+table.set_entry(row, c++, s.text());
 
    //  fcst level
 
 s = fcst_info->level_name();
 
-table.set_entry(row, ++c, s.text());
+table.set_entry(row, c++, s.text());
 
    //  obs var
 
 s = obs_info->name();
 
-table.set_entry(row, ++c, s.text());
+table.set_entry(row, c++, s.text());
 
    //  obs level
 
 s = obs_info->level_name();
 
-table.set_entry(row, ++c, s.text());
+table.set_entry(row, c++, s.text());
 
    //  object id
 
@@ -734,7 +755,6 @@ table.set_entry(row, ++c, s.text());
    //  object cat
 
 // c++;
-
 
 
 

@@ -24,13 +24,19 @@ mtd_SOURCES = mtd.cc  \
               mtd_file_base.cc  \
               mtd_file_float.cc  \
               mtd_file_int.cc  \
-              3d_att.cc  \
               3d_att.h  \
-              2d_att.cc  \
+              3d_att.cc  \
+              3d_att_single_array.h  \
+              3d_att_single_array.cc  \
+              3d_att_pair_array.h  \
+              3d_att_pair_array.cc  \
               2d_att.h  \
+              2d_att.cc  \
               3d_conv.cc    \
               3d_pair_columns.h    \
               3d_single_columns.h  \
+              mtd_txt_output.h  \
+              mtd_txt_output.cc  \
               interest_calc.h  \
               interest_calc.cc  \
               mtd_partition.h  \

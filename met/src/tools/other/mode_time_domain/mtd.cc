@@ -27,6 +27,8 @@ using namespace std;
 #include "mtd_config_info.h"
 #include "mtd_file.h"
 #include "interest_calc.h"
+#include "3d_att_single_array.h"
+#include "mtd_txt_output.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,6 +53,7 @@ config.read_config(mtd_config_filename, local_config_filename);
 // config.process_config(FileType_General_Netcdf, FileType_General_Netcdf);
 config.process_config(FileType_NcMet, FileType_NcMet);
 
+int j;
 MtdFloatFile fcst_raw, obs_raw;
 MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
@@ -128,6 +131,57 @@ config.fcst_conv_thresh.dump(cout);
 
 cout << "\n\n  obs threshold:\n";
 config.obs_conv_thresh.dump(cout);
+
+
+cout << "\n\n   n_header_3d_cols = " << n_header_3d_cols << '\n';
+cout << "\n\n   n_3d_single_cols = " << n_3d_single_cols << '\n';
+
+   //
+   // get single attributes
+   //
+
+SingleAtt3D att;
+SingleAtt3DArray fcst_att, obs_att;
+// MtdIntFile s;
+
+cout << "calculating fcst atts\n" << flush;
+
+for (j=0; j<(fcst_obj.n_objects()); ++j)  {
+
+   att = calc_3d_single_atts(fcst_obj, fcst_raw, config.model, j);
+
+   att.set_fcst();
+
+   att.set_simple();
+
+   fcst_att.add(att);
+
+}
+
+cout << "calculating obs atts\n" << flush;
+
+for (j=0; j<(obs_obj.n_objects()); ++j)  {
+
+   att = calc_3d_single_atts(obs_obj, obs_raw, config.model, j);
+
+   att.set_obs();
+
+   att.set_simple();
+
+   obs_att.add(att);
+
+}
+
+// s = obs_obj.select(1);
+// 
+// s.write("obs_1_select.nc");
+
+cout << "\n\n  Obs single atts:\n\n";
+
+obs_att.dump(cout);
+
+do_3d_single_txt_output(fcst_att, obs_att, config, "a.txt");
+
 
 
 
