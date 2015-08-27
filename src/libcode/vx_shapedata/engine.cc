@@ -278,8 +278,8 @@ void ModeFuzzyEngine::clear_colors() {
    int j;
 
    for(j=0; j<max_singles; j++) {
-      fcst_color[j].clear();
-      obs_color[j].clear();
+      fcst_color[j] = unmatched_color;
+      obs_color[j]  = unmatched_color;
    }
 
    return;
