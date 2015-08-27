@@ -121,7 +121,9 @@ double * p = 0;
 double * s_below = 0;
 double * s_this  = 0;
 double * s_above = 0;
-const double scale = 1.0/(R*R*3);
+const int trp1 = 2*R + 1;
+const double scale = 1.0/(3*trp1*trp1);
+
 
 
 conv_radius = R;
