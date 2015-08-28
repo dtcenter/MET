@@ -1045,6 +1045,5 @@ AC_CONFIG_FILES([internal_tests/Makefile
                     internal_tests/libcode/vx_plot_util/Makefile
                     internal_tests/libcode/vx_ps/Makefile
                     internal_tests/libcode/vx_tc_util/Makefile])
-#                    internal_tests/libcode/vx_tc_util/Makefile])])
 
 AC_OUTPUT

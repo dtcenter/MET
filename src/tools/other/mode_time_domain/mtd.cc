@@ -36,6 +36,8 @@ using namespace std;
 
 static ConcatString program_name;
 
+static void test_velocity();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -194,6 +196,114 @@ do_3d_single_txt_output(fcst_att, obs_att, config, "a.txt");
 return ( 0 );
 
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const int Nx = 500;
+static const int Ny = 500;
+static const int Nt =  24;
+
+static const int x_start = 400;
+static const int y_start =  50;
+
+static const double vx_target =  -9.6;
+static const double vy_target =  12.7;
+
+static const double rect_width  = 20.0;
+static const double rect_length = 40.0;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+using namespace std;
+
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <cmath>
+
+// #include "mtd_config_info.h"
+// #include "mtd_file.h"
+// #include "interest_calc.h"
+// #include "3d_att_single_array.h"
+// #include "mtd_txt_output.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static ConcatString output_filename = "a.nc";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void test_velocity()
+
+{
+
+
+int x, y, t;
+MtdFloatFile raw;
+MtdIntFile obj;
+SingleAtt3D att;
+const char model [] = "test";
+
+   //
+   //  make a junk raw file filled with zeroes
+   //
+
+raw.set_size(Nx, Ny, Nt);
+
+for (x=0; x<Nx; ++x)    {
+
+   for (y=0; y<Ny; ++y)    {
+
+      for (t=0; t<Nt; ++t)    {
+
+         raw.put(0.0, x, y, t);
+
+      }
+
+   }
+
+}
+
+   //
+   //  make the 3D object
+   //
+
+obj.set_size(Nx, Ny, Nt);
+
+   //
+   //  get the velocity
+   //
+
+att = calc_3d_single_atts(obj, raw, "test", 0);
+
+
+
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
