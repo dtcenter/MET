@@ -79,6 +79,8 @@ class MtdIntFile : public MtdFileBase {
 
       void set_volumes(int n, const int *);
 
+      void set_n_objects(int);
+
          //
          //  get stuff
          //
