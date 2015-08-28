@@ -422,8 +422,8 @@ void apply_mask(DataPlane &dp, const DataPlane &mask_dp) {
    for(x=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
 
-         // Put bad data everywhere the mask is turned off
-         if(!mask_dp(x, y)) dp.set(bad_data_double, x, y);
+         // Put bad data everywhere the mask is bad data or turned off
+         if(is_bad_data(mask_dp(x, y)) || !mask_dp(x, y)) dp.set(bad_data_double, x, y);
       }
    }
 
