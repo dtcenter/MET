@@ -97,7 +97,8 @@ static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
 static void set_log_file(const StringArray &);
 static void set_verbosity(const StringArray &);
-static void parse_file_list(const StringArray &, StringArray &);
+
+static StringArray parse_file_list(const StringArray &, const GrdFileType);
 static void parse_long_names();
 
 ////////////////////////////////////////////////////////////////////////
@@ -191,6 +192,10 @@ void process_command_line(int argc, char **argv) {
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
+   // Parse the forecast and observation file lists
+   fcst_files = parse_file_list(fcst_files, ftype);
+   obs_files  = parse_file_list(obs_files,  otype);
+   
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_files[0], ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
@@ -1926,13 +1931,13 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_fcst_files(const StringArray & a) {
-   parse_file_list(a, fcst_files);
+   fcst_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_obs_files(const StringArray & a) {
-   parse_file_list(a, obs_files);
+   obs_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1972,10 +1977,10 @@ void set_verbosity(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_file_list(const StringArray & a, StringArray & list) {
+StringArray parse_file_list(const StringArray & a, const GrdFileType type) {
    int i;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-   GrdFileType type = FileType_None;
+   StringArray list;
 
    // Check for empty list
    if(a.n_elements() == 0) {
@@ -1992,7 +1997,7 @@ void parse_file_list(const StringArray & a, StringArray & list) {
    if(mtddf)                            list.add(a);
    else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0]);
 
-   return;
+   return(list);
 }
 
 ////////////////////////////////////////////////////////////////////////
