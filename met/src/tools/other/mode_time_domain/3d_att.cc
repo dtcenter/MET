@@ -1314,7 +1314,7 @@ p.set_start_time_delta(t);
 
 t = fcst_att.tmax() - obs_att.tmax();
 
-p.set_start_time_delta(t);
+p.set_end_time_delta(t);
 
    //
    //  done
