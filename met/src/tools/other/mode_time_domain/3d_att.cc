@@ -691,7 +691,7 @@ void PairAtt3D::clear()
 
 IntersectionVol = 0;
 
-UnionVol = 0;
+// UnionVol = 0;
 
 TimeCentroidDelta = 0.0;
 
@@ -728,10 +728,13 @@ void PairAtt3D::assign(const PairAtt3D & a)
 clear();
 
 
+FcstObjectNumber = a.FcstObjectNumber;
+ObsObjectNumber  = a.ObsObjectNumber;
 
 IntersectionVol = a.IntersectionVol;
 
-UnionVol = a.UnionVol;
+// UnionVol = a.UnionVol;
+
 
 TimeCentroidDelta = a.TimeCentroidDelta;
 
@@ -741,8 +744,11 @@ DirectionDifference = a.DirectionDifference;
 
 SpeedDelta = a.SpeedDelta;
 
-FcstObjectNumber = a.FcstObjectNumber;
-ObsObjectNumber = a.ObsObjectNumber;
+VolumeRatio = a.VolumeRatio;
+AxisDiff    = a.AxisDiff;
+
+StartTimeDelta = a.StartTimeDelta;
+EndTimeDelta   = a.EndTimeDelta;
 
 TotalInterest = a.TotalInterest;
 
@@ -809,7 +815,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void PairAtt3D::set_union_volume(int k)
 
 {
@@ -819,7 +825,7 @@ UnionVol = k;
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1026,7 +1032,7 @@ Indent indent(depth);
 out << indent << "FcstObjectNumber    = " << FcstObjectNumber    << '\n';
 out << indent << " ObsObjectNumber    = " <<  ObsObjectNumber    << '\n';
 out << indent << "IntersectionVol     = " << IntersectionVol     << '\n';
-out << indent << "UnionVol            = " << UnionVol            << '\n';
+// out << indent << "UnionVol            = " << UnionVol            << '\n';
 out << indent << "TimeCentroidDelta   = " << TimeCentroidDelta   << '\n';
 out << indent << "SpaceCentroidDist   = " << SpaceCentroidDist   << '\n';
 out << indent << "DirectionDifference = " << DirectionDifference << '\n';
@@ -1240,7 +1246,7 @@ for (x=0; x<(fcst_obj.nx()); ++x)  {
 }
 
 p.set_intersection_volume (IV);
-p.set_union_volume        (UV);
+// p.set_union_volume        (UV);
 
    //
    //  centroid distances
@@ -1272,7 +1278,10 @@ b = sqrt( x2dot*x2dot + y2dot*y2dot );
 x2dot /= b;
 y2dot /= b;
 
-p.set_direction_diff( acosd( x1dot*x2dot + y1dot*y2dot ) );
+b = x1dot*x2dot + y1dot*y2dot;
+
+if ( b > 0.999999 )  p.set_direction_diff( 0.0 );
+else                 p.set_direction_diff( acosd(b) );
 
    //
    //  volume ratio

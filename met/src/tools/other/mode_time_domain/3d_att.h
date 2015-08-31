@@ -233,9 +233,9 @@ inline double SingleAtt3D::ptile_90() const { return ( Ptile_90 ); }
 class PairAtt3D {
 
       friend PairAtt3D calc_3d_pair_atts(const Object & _fcst_obj, 
-                                         const MtdFloatFile & _obs_obj, 
-                                         const SingleAtt3D & _fa, 
-                                         const SingleAtt3D & _oa);
+                                         const Object &  _obs_obj, 
+                                         const SingleAtt3D &  _fa, 
+                                         const SingleAtt3D &  _oa);
 
    public:
 
@@ -247,7 +247,7 @@ class PairAtt3D {
       int ObsObjectNumber;
 
       int IntersectionVol;
-      int UnionVol;
+      // int UnionVol;
 
       double TimeCentroidDelta;
       double SpaceCentroidDist;
@@ -346,7 +346,7 @@ inline int PairAtt3D::fcst_obj_number() const { return ( FcstObjectNumber ); }
 inline int  PairAtt3D::obs_obj_number() const { return ( ObsObjectNumber ); }
 
 inline int PairAtt3D::intersection_vol () const { return ( IntersectionVol ); }
-inline int PairAtt3D::union_vol        () const { return ( UnionVol ); }
+// inline int PairAtt3D::union_vol        () const { return ( UnionVol ); }
 
 inline double PairAtt3D::time_centroid_delta () const { return ( TimeCentroidDelta ); }
 inline double PairAtt3D::space_centroid_dist () const { return ( SpaceCentroidDist ); }

@@ -9,7 +9,8 @@ static const char local_config_filename  [] = "test_config";
 
 
 static const char fcst_filename [] = "/scratch/bullock/files/arw_20100517_00I.nc";
-static const char  obs_filename [] = "/scratch/bullock/files/obs_20100517_01L.nc";
+// static const char  obs_filename [] = "/scratch/bullock/files/obs_20100517_01L.nc";
+static const char  obs_filename [] = "/scratch/bullock/files/arw_20100517_00I.nc";
 
 static const int min_object_size = 2000;
 
@@ -36,8 +37,6 @@ using namespace std;
 
 static ConcatString program_name;
 
-static void test_velocity();
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +54,7 @@ config.read_config(mtd_config_filename, local_config_filename);
 // config.process_config(FileType_General_Netcdf, FileType_General_Netcdf);
 config.process_config(FileType_NcMet, FileType_NcMet);
 
-int j;
+int j, k;
 MtdFloatFile fcst_raw, obs_raw;
 MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
@@ -178,12 +177,46 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 // 
 // s.write("obs_1_select.nc");
 
-cout << "\n\n  Obs single atts:\n\n";
+// cout << "\n\n  Obs single atts:\n\n";
 
-obs_att.dump(cout);
+// obs_att.dump(cout);
 
 do_3d_single_txt_output(fcst_att, obs_att, config, "a.txt");
 
+PairAtt3DArray a;
+PairAtt3D p;
+MtdIntFile fo, oo;
+
+cout << "\n\n  calculating pair atts\n\n";
+
+for (j=0; j<(fcst_obj.n_objects()); ++j)  {
+
+   fo = fcst_obj.select(j + 1);
+
+   for (k=0; k<(obs_obj.n_objects()); ++k)  {
+
+      oo = obs_obj.select(k + 1);
+
+      cout << "   (" << j << ", " << k << ")\n" << flush;
+
+      if ( (j == 4) && (k == 4) )  {
+
+         cout << "stop\n";
+
+      }
+
+      p = calc_3d_pair_atts(fo, oo, fcst_att[j], obs_att[k]);
+
+      p.set_total_interest(calc(p));
+
+      a.add(p);
+
+   }
+
+}
+
+
+a.dump(cout);
 
 
 
@@ -197,113 +230,8 @@ return ( 0 );
 
 }
 
-////////////////////////////////////////////////////////////////////////
-
-
-
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int Nx = 500;
-static const int Ny = 500;
-static const int Nt =  24;
-
-static const int x_start = 400;
-static const int y_start =  50;
-
-static const double vx_target =  -9.6;
-static const double vy_target =  12.7;
-
-static const double rect_width  = 20.0;
-static const double rect_length = 40.0;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
-
-#include <iostream>
-#include <unistd.h>
-#include <stdlib.h>
-#include <cmath>
-
-// #include "mtd_config_info.h"
-// #include "mtd_file.h"
-// #include "interest_calc.h"
-// #include "3d_att_single_array.h"
-// #include "mtd_txt_output.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static ConcatString output_filename = "a.nc";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void test_velocity()
-
-{
-
-
-int x, y, t;
-MtdFloatFile raw;
-MtdIntFile obj;
-SingleAtt3D att;
-const char model [] = "test";
-
-   //
-   //  make a junk raw file filled with zeroes
-   //
-
-raw.set_size(Nx, Ny, Nt);
-
-for (x=0; x<Nx; ++x)    {
-
-   for (y=0; y<Ny; ++y)    {
-
-      for (t=0; t<Nt; ++t)    {
-
-         raw.put(0.0, x, y, t);
-
-      }
-
-   }
-
-}
-
-   //
-   //  make the 3D object
-   //
-
-obj.set_size(Nx, Ny, Nt);
-
-   //
-   //  get the velocity
-   //
-
-att = calc_3d_single_atts(obj, raw, "test", 0);
-
-
-
-
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-////////////////////////////////////////////////////////////////////////
 
