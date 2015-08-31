@@ -16,6 +16,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+typedef int GraphNodeType;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class FO_Graph {
 
    private:
@@ -27,7 +33,9 @@ class FO_Graph {
       int Nfcst;
       int Nobs;
 
-      int * TheGraph;   //  allocated
+      int Nalloc;    //  N(N + 1)/2, where N = Nfcst + Nobs
+
+      GraphNodeType * TheGraph;   //  allocated
 
    public:
 
@@ -35,6 +43,8 @@ class FO_Graph {
      ~FO_Graph();
       FO_Graph(const FO_Graph &);
       FO_Graph & operator=(const FO_Graph &);
+
+      void clear();
 
          //
          //  set stuff
@@ -59,9 +69,9 @@ class FO_Graph {
          //  do stuff
          //
 
-      add_fo_edge(int n_f,   n_o);
-      add_ff_edge(int n_f_1, n_f_2);
-      add_oo_edge(int n_o_1, n_o_2);
+      void add_fo_edge(int n_f,   int n_o);
+      void add_ff_edge(int n_f_1, int n_f_2);
+      void add_oo_edge(int n_o_1, int n_o_2);
 
       void erase_edges();
 
@@ -75,13 +85,13 @@ class FO_Graph {
 inline int FO_Graph::n_fcst () const { return ( Nfcst ); }
 inline int FO_Graph::n_obs  () const { return ( Nobs  ); }
 
-inline int FO_Graph::n_totas () const { return ( Nfcst + Nobs  ); }
+inline int FO_Graph::n_total () const { return ( Nfcst + Nobs  ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern FO_Graph union(const FO_Graph &, const FO_Graph &);
+extern FO_Graph do_union(const FO_Graph &, const FO_Graph &);
 
 
 ////////////////////////////////////////////////////////////////////////

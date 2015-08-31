@@ -22,6 +22,8 @@ mtd_SOURCES = mtd.cc  \
               2d_moments.cc  \
               fo_node.h  \
               fo_node.cc  \
+              fo_graph.h  \
+              fo_graph.cc  \
               mtd_config_info.cc  \
               mtd_file_base.cc  \
               mtd_file_float.cc  \
