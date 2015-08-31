@@ -407,7 +407,7 @@ if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
 
 const time_t t_stop = time(0);   //  for timing the data read operation
 
-cout << "\n\n  MtdIntFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+// cout << "\n\n  MtdIntFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
@@ -527,7 +527,7 @@ if ( is_split )  {
 
 const time_t t_stop = time(0);   //  for timing the data write operation
 
-cout << "\n\n  MtdIntFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+// cout << "\n\n  MtdIntFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
