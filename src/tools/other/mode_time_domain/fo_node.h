@@ -10,6 +10,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <iostream>
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class FO_Node {
 
    private:
@@ -25,6 +31,8 @@ class FO_Node {
 
       bool IsVisited;
 
+      bool HasEdge;
+
 
    public:
 
@@ -36,6 +44,8 @@ class FO_Node {
 
       void clear();
 
+      void dump(ostream &, int) const;
+
          //
          //  set stuff
          //
@@ -45,7 +55,8 @@ class FO_Node {
 
       void set_number(int);
 
-      void set_visited(bool = true);
+      void set_visited  (bool = true);
+      void set_has_edge (bool = true);
 
          //
          //  get stuff
@@ -55,6 +66,7 @@ class FO_Node {
       bool is_obs() const;
 
       bool is_visited() const;
+      bool has_edge() const;
 
       int number() const;
 
@@ -74,6 +86,8 @@ inline bool FO_Node::is_fcst() const { return (   IsFcst ); }
 inline bool FO_Node::is_obs() const  { return ( ! IsFcst ); }
 
 inline bool FO_Node::is_visited() const  { return ( IsVisited ); }
+
+inline bool FO_Node::has_edge() const  { return ( HasEdge ); }
 
 inline int FO_Node::number() const  { return ( Number ); }
 

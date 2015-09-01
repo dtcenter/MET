@@ -10,6 +10,8 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include "vx_util.h"
+
 #include "fo_node.h"
 
 
@@ -100,6 +102,8 @@ IsFcst    = false;
 
 IsVisited = false;
 
+HasEdge   = false;
+
 return;
 
 }
@@ -115,12 +119,40 @@ void FO_Node::assign(const FO_Node & n)
 clear();
 
 
-Number = n.Number;
+Number    = n.Number;
 
-IsFcst = n.IsFcst;
+IsFcst    = n.IsFcst;
 
 IsVisited = n.IsVisited;
 
+HasEdge   = n.HasEdge;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void FO_Node::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+out << prefix << "Number    = " << Number                    << '\n';
+out << prefix << "IsFcst    = " << bool_to_string(IsFcst)    << '\n';
+out << prefix << "IsVisited = " << bool_to_string(IsVisited) << '\n';
+out << prefix << "HasEdge   = " << bool_to_string(IsVisited) << '\n';
+
+
+   //
+   //  done
+   //
+
+out.flush();
 
 return;
 
@@ -149,6 +181,20 @@ void FO_Node::set_visited(bool tf)
 {
 
 IsVisited = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void FO_Node::set_has_edge(bool tf)
+
+{
+
+HasEdge = tf;
 
 return;
 
