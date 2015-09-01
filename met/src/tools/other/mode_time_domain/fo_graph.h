@@ -16,7 +16,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-typedef int GraphNodeType;
+// typedef int GraphNodeType;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,12 +30,19 @@ class FO_Graph {
 
       void assign(const FO_Graph &);
 
-      int Nfcst;
-      int Nobs;
+      int two_to_one(int, int) const;
 
-      int Nalloc;    //  N(N + 1)/2, where N = Nfcst + Nobs
+      int N_fcst;
+      int N_obs;
 
-      GraphNodeType * TheGraph;   //  allocated
+      int N_total;
+
+      int N_nodes;   //  N_total*N_total
+                     //
+                     //  Note that this is the number of nodes,
+                     //  not the number of bytes
+
+      FO_Node * TheGraph;   //  allocated
 
    public:
 
@@ -61,19 +68,26 @@ class FO_Graph {
 
       int n_total()  const;
 
-      bool fo_edge(int n_f,   int n_o) const;
-      bool ff_edge(int n_f_1, int n_f_2) const;
-      bool oo_edge(int n_o_1, int n_o_2) const;
+      int n_nodes()  const;
+
+      bool fo_edge(int n_f,   int n_o)   const;   //  0-based
+      bool ff_edge(int n_f_1, int n_f_2) const;   //  0-based
+      bool oo_edge(int n_o_1, int n_o_2) const;   //  0-based
+
+      int f_index(int f_num) const;
+      int o_index(int o_num) const;
 
          //
          //  do stuff
          //
 
-      void add_fo_edge(int n_f,   int n_o);
-      void add_ff_edge(int n_f_1, int n_f_2);
-      void add_oo_edge(int n_o_1, int n_o_2);
+      void add_fo_edge(int n_f,   int n_o);     //  0-based
+      void add_ff_edge(int n_f_1, int n_f_2);   //  0-based
+      void add_oo_edge(int n_o_1, int n_o_2);   //  0-based
 
       void erase_edges();
+
+      void dump_as_table(ostream &) const;
 
 
 };
@@ -82,10 +96,14 @@ class FO_Graph {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int FO_Graph::n_fcst () const { return ( Nfcst ); }
-inline int FO_Graph::n_obs  () const { return ( Nobs  ); }
+inline int FO_Graph::n_fcst () const { return ( N_fcst ); }
+inline int FO_Graph::n_obs  () const { return ( N_obs  ); }
 
-inline int FO_Graph::n_total () const { return ( Nfcst + Nobs  ); }
+inline int FO_Graph::n_nodes () const { return ( N_nodes ); }
+
+inline int FO_Graph::n_total () const { return ( N_fcst + N_obs  ); }
+
+inline int FO_Graph::two_to_one(int _a, int _b) const { return ( _a*N_total + _b ); }
 
 
 ////////////////////////////////////////////////////////////////////////
