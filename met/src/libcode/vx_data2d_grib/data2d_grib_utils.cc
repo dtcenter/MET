@@ -88,7 +88,7 @@ read_pds(g, bms_flag, init_ut, valid_ut, accum);
 
 ut = vinfo.init();
 
-if ( ut > 0 && ut != init_ut )  return ( false );
+if ( ut != 0 && ut != init_ut )  return ( false );
 
    //
    //  valid time
@@ -96,7 +96,7 @@ if ( ut > 0 && ut != init_ut )  return ( false );
 
 ut = vinfo.valid();
 
-if ( ut > 0 && ut != valid_ut )  return ( false );
+if ( ut != 0 && ut != valid_ut )  return ( false );
 
    //
    //  lead time
@@ -505,6 +505,17 @@ void read_pds(const GribRecord &r, int &bms_flag,
           pp1[0] = pds->p1;
           pp1[1] = pds->p2;
           valid_ut = (unixtime) (init_ut + char2_to_int(pp1)*sec_per_fcst_unit);
+          accum = 0;
+          break;
+
+      case 51: // Climatological Mean Value
+          if(pds->p1 != 0 || pds->p2 != 0) {
+             mlog << Warning << "\nread_pds() -> "
+                  << "encountered non-zero p1 (" << pds->p1 << ") or p2 ("
+                  << pds->p2 << ") value for climotological time range "
+                  << "indicator value of 51.\n\n";
+          }
+          valid_ut = init_ut;
           accum = 0;
           break;
 
