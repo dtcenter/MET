@@ -70,9 +70,9 @@ class FO_Graph {
 
       int n_nodes()  const;
 
-      bool fo_edge(int n_f,   int n_o)   const;   //  0-based
-      bool ff_edge(int n_f_1, int n_f_2) const;   //  0-based
-      bool oo_edge(int n_o_1, int n_o_2) const;   //  0-based
+      bool has_fo_edge(int n_f,   int n_o)   const;   //  0-based
+      bool has_ff_edge(int n_f_1, int n_f_2) const;   //  0-based
+      bool has_oo_edge(int n_o_1, int n_o_2) const;   //  0-based
 
       int f_index(int f_num) const;
       int o_index(int o_num) const;
@@ -81,9 +81,9 @@ class FO_Graph {
          //  do stuff
          //
 
-      void add_fo_edge(int n_f,   int n_o);     //  0-based
-      void add_ff_edge(int n_f_1, int n_f_2);   //  0-based
-      void add_oo_edge(int n_o_1, int n_o_2);   //  0-based
+      void set_fo_edge(int n_f,   int n_o);     //  0-based
+      void set_ff_edge(int n_f_1, int n_f_2);   //  0-based
+      void set_oo_edge(int n_o_1, int n_o_2);   //  0-based
 
       void erase_edges();
 

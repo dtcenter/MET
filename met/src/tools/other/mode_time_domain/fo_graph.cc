@@ -233,7 +233,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool FO_Graph::fo_edge(int n_f, int n_o) const
+bool FO_Graph::has_fo_edge(int n_f, int n_o) const
 
 {
 
@@ -250,7 +250,7 @@ return ( TheGraph[n].has_edge() );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool FO_Graph::ff_edge(int n_f_1, int n_f_2) const
+bool FO_Graph::has_ff_edge(int n_f_1, int n_f_2) const
 
 {
 
@@ -267,7 +267,7 @@ return ( TheGraph[n].has_edge() );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool FO_Graph::oo_edge(int n_o_1, int n_o_2) const
+bool FO_Graph::has_oo_edge(int n_o_1, int n_o_2) const
 
 {
 
@@ -284,7 +284,7 @@ return ( TheGraph[n].has_edge() );
 ////////////////////////////////////////////////////////////////////////
 
 
-void FO_Graph::add_fo_edge(int n_f, int n_o)
+void FO_Graph::set_fo_edge(int n_f, int n_o)
 
 {
 
@@ -306,7 +306,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void FO_Graph::add_ff_edge(int n_f_1, int n_f_2)
+void FO_Graph::set_ff_edge(int n_f_1, int n_f_2)
 
 {
 
@@ -327,7 +327,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void FO_Graph::add_oo_edge(int n_o_1, int n_o_2)
+void FO_Graph::set_oo_edge(int n_o_1, int n_o_2)
 
 {
 
@@ -455,7 +455,7 @@ for (j=0; j<N_fcst; ++j)  {
 
    for (k=0; k<N_fcst; ++k)  {
 
-      if ( ff_edge(j, k) )  {
+      if ( has_ff_edge(j, k) )  {
 
          r = fcst_start + j;
          c = fcst_start + k;
@@ -476,7 +476,7 @@ for (j=0; j<N_obs; ++j)  {
 
    for (k=0; k<N_obs; ++k)  {
 
-      if ( oo_edge(j, k) )  {
+      if ( has_oo_edge(j, k) )  {
 
          r = obs_start + j;
          c = obs_start + k;
@@ -498,7 +498,7 @@ for (j=0; j<N_fcst; ++j)  {
 
    for (k=0; k<N_obs; ++k)  {
 
-      if ( fo_edge(j, k) )  {
+      if ( has_fo_edge(j, k) )  {
 
          r = fcst_start + j;
          c =  obs_start + k;

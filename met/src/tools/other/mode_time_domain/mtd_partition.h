@@ -52,6 +52,8 @@ class EquivalenceClass {
 
       void clear();
 
+      void dump(ostream &, int = 0) const;
+
          //
          //  set stuff
          //
@@ -66,6 +68,8 @@ class EquivalenceClass {
 
       int n_max() const;
 
+      int n_elements() const;
+
          //
          //  do stuff
          //
@@ -73,6 +77,12 @@ class EquivalenceClass {
       void add_no_repeat(int);
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int EquivalenceClass::n_elements() const { return ( Nelements ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -138,6 +148,8 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
 
       void clear();
 
+      void dump(ostream &, int = 0) const;
+
          //
          //  set stuff
          //
@@ -153,6 +165,8 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
       int which_class(int) const;
 
       int n_elements() const;
+
+      const EquivalenceClass * operator()(int) const;
 
          //
          //  do stuff
