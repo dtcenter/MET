@@ -509,12 +509,6 @@ void read_pds(const GribRecord &r, int &bms_flag,
           break;
 
       case 51: // Climatological Mean Value
-          if(pds->p1 != 0 || pds->p2 != 0) {
-             mlog << Warning << "\nread_pds() -> "
-                  << "encountered non-zero p1 (" << pds->p1 << ") or p2 ("
-                  << pds->p2 << ") value for climotological time range "
-                  << "indicator value of 51.\n\n";
-          }
           valid_ut = init_ut;
           accum = 0;
           break;
