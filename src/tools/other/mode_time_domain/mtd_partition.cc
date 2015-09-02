@@ -24,6 +24,7 @@ using namespace std;
 #include <time.h>
 
 #include "nint.h"
+#include "indent.h"
 #include "mtd_partition.h"
 
 
@@ -261,6 +262,40 @@ return ( E[k] );
 ////////////////////////////////////////////////////////////////////////
 
 
+void EquivalenceClass::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+out << prefix << '(' << Nelements << ") {";
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   out << E[j];
+
+   if ( j != (Nelements - 1) )  out << ',';
+
+}
+
+out << "}\n";
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int EquivalenceClass::n_max() const
 
 {
@@ -458,6 +493,37 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+void Mtd_Partition::dump(ostream & out, int depth) const
+
+{
+
+int j;
+Indent prefix(depth);
+
+out << prefix << '[' << Nelements << " equivalence classes]\n";
+
+for (j=0; j<Nelements; ++j)  {
+
+   C[j]->dump(out, depth + 1);
+
+}
+
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 /*
 bool Mtd_Partition::has(int k) const
 
@@ -625,6 +691,27 @@ C[Nelements]->add_no_repeat(k);
 ++Nelements;
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const EquivalenceClass * Mtd_Partition::operator()(int k) const
+
+{
+
+if ( (k < 0) || (k >= Nelements) )  {
+
+   cerr << "\n\n  Mtd_Partition::operator()(int) const -> range chekc error\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( C[k] );
 
 }
 
