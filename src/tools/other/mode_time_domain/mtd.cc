@@ -3,16 +3,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char mtd_config_filename    [] = "../../../../data/config/MTDConfigDefault";
-
-static const char local_config_filename  [] = "test_config";
-
-
-static const char fcst_filename [] = "/scratch/bullock/files/arw_20100517_00I.nc";
-// static const char  obs_filename [] = "/scratch/bullock/files/obs_20100517_01L.nc";
-static const char  obs_filename [] = "/scratch/bullock/files/arw_20100517_00I.nc";
-
-static const int min_object_size = 2000;
+static const char default_config_path [] = "MET_BASE/config/MTDConfig_default";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,12 +21,33 @@ using namespace std;
 #include "interest_calc.h"
 #include "3d_att_single_array.h"
 #include "mtd_txt_output.h"
+#include "mtd_read_data.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static ConcatString program_name;
+
+static CommandLine cline;
+
+static StringArray fcst_filenames;
+static StringArray  obs_filenames;
+
+static ConcatString local_config_filename;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void usage();
+
+static void set_fcst   (const StringArray &);
+static void set_obs    (const StringArray &);
+static void set_config (const StringArray &);
+
+static void set_verbosity (const StringArray &);
+static void set_logfile   (const StringArray &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -47,12 +59,41 @@ int main(int argc, char * argv [])
 
 program_name = get_short_name(argv[0]);
 
+cline.set(argc, argv);
+
+cline.set_usage(usage);
+
+cline.add(set_fcst,      "-fcst",   -1);
+cline.add(set_obs,       "-obs",    -1);
+cline.add(set_config,    "-config",  1);
+cline.add(set_verbosity, "-v",       1);
+cline.add(set_logfile,   "-log",     1);
+
+cline.parse();
+
+cout << "\n\n  Verbosity = " << mlog.verbosity_level() << "\n\n";
+
+if ( cline.n() != 0 )  usage();   //  should only be config file left on command line
+
+   //
+   //  read the config file
+   //
+
 MtdConfigInfo config;
+ConcatString default_config_filename;
+ConcatString path;
 
-config.read_config(mtd_config_filename, local_config_filename);
 
-// config.process_config(FileType_General_Netcdf, FileType_General_Netcdf);
+default_config_filename = replace_path(default_config_path);
+
+cout << "\n\n  Default config file = \"" << default_config_filename << "\"\n\n" << flush;
+
+
+config.read_config(default_config_filename, local_config_filename);
+
 config.process_config(FileType_NcMet, FileType_NcMet);
+
+// exit ( 1 );
 
 int j, k;
 MtdFloatFile fcst_raw, obs_raw;
@@ -61,7 +102,16 @@ MtdIntFile fcst_mask, obs_mask;
 MtdIntFile fcst_obj, obs_obj;
 InterestCalculator calc;
 
+   //
+   //  read the data files
+   //
 
+mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
+// mtd_read_data(config,  obs_filenames,  obs_raw);
+
+exit ( 1 );
+
+/*
 if ( ! fcst_raw.read(fcst_filename) )  {
 
    cerr << "\n\n  " << program_name << ": unable to read fcst file \"" << fcst_filename << "\"\n\n";
@@ -77,7 +127,7 @@ if ( ! obs_raw.read(obs_filename) )  {
    exit ( 1 );
 
 }
-
+*/
 
 calc.add(config.space_centroid_dist_wt, config.space_centroid_dist_if, &PairAtt3D::SpaceCentroidDist);
 calc.add(config.time_centroid_delta_wt, config.time_centroid_delta_if, &PairAtt3D::TimeCentroidDelta);
@@ -121,8 +171,8 @@ fcst_mask.write("fcst_mask.nc");
 fcst_obj.write("fcst_obj_notoss.nc");
  obs_obj.write("obs_obj_notoss.nc");
 
-fcst_obj.toss_small_objects(min_object_size);
- obs_obj.toss_small_objects(min_object_size);
+fcst_obj.toss_small_objects(config.min_volume);
+ obs_obj.toss_small_objects(config.min_volume);
 
 fcst_obj.write("fcst_obj_toss.nc");
  obs_obj.write("obs_obj_toss.nc");
@@ -232,6 +282,117 @@ return ( 0 );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void usage()
+
+{
+
+ConcatString tab;
+
+tab.set_repeat(' ', 10 + program_name.length());
+
+cout << "Usage: " << program_name << '\n';
+
+cout << tab << "-fcst   file_list\n";
+cout << tab << "-obs    file_list\n";
+cout << tab << "-config config_file\n";
+cout << tab << "[ -log  file ]\n";
+cout << tab << "[ -v    level ]\n";
+
+
+   //
+   //  done
+   //
+
+cout << "\n\n";
+
+exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_fcst (const StringArray & a)
+
+{
+
+fcst_filenames = a;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_obs  (const StringArray & a)
+
+{
+
+obs_filenames = a;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_config  (const StringArray & a)
+
+{
+
+local_config_filename = a[0];
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_verbosity  (const StringArray & a)
+
+{
+
+int k = atoi(a[0]);
+
+mlog.set_verbosity_level(k);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_logfile  (const StringArray & a)
+
+{
+
+ConcatString filename;
+
+filename = a[0];
+
+mlog.open_log_file(filename);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 
 

@@ -73,6 +73,7 @@ class StringArray {
       void insert(int i, const char *);
 
       int n_elements() const;
+      int n() const;   //  same thing
 
       int max_length() const;
 
@@ -107,6 +108,8 @@ class StringArray {
 
 
 inline int StringArray::n_elements() const { return ( Nelements ); }
+
+inline int StringArray::n         () const { return ( Nelements ); }
 
 inline int StringArray::max_length() const { return ( MaxLength ); }
 

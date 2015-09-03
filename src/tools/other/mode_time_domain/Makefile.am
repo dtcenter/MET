@@ -30,6 +30,8 @@ mtd_SOURCES = mtd.cc  \
               mtd_file_base.cc  \
               mtd_file_float.cc  \
               mtd_file_int.cc  \
+              mtd_read_data.h  \
+              mtd_read_data.cc  \
               3d_att.h  \
               3d_att.cc  \
               3d_att_single_array.h  \
