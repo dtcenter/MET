@@ -322,8 +322,8 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Conf: fcst.raw_thresh and obs.raw_thresh
 
-   fcst_raw_thresh = fcst_dict->lookup_thresh(conf_key_raw_thresh);
-   obs_raw_thresh  = obs_dict->lookup_thresh(conf_key_raw_thresh);
+   // fcst_raw_thresh = fcst_dict->lookup_thresh(conf_key_raw_thresh);
+   // obs_raw_thresh  = obs_dict->lookup_thresh(conf_key_raw_thresh);
 
       // Conf: fcst.conv_radius and obs.conv_radius
 
@@ -347,44 +347,44 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Conf: fcst.vld_thresh and obs.vld_thresh
 
-   fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
-   obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
+   // fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
+   // obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
 
       // Conf: fcst.area_thresh and obs.area_thresh
 
-   fcst_area_thresh = fcst_dict->lookup_thresh(conf_key_area_thresh);
-   obs_area_thresh  = obs_dict->lookup_thresh(conf_key_area_thresh);
+   // fcst_area_thresh = fcst_dict->lookup_thresh(conf_key_area_thresh);
+   // obs_area_thresh  = obs_dict->lookup_thresh(conf_key_area_thresh);
 
       // Conf: fcst.inten_perc and obs.inten_perc
 
-   fcst_inten_perc_value = fcst_dict->lookup_int(conf_key_inten_perc_value);
-   obs_inten_perc_value  = obs_dict->lookup_int(conf_key_inten_perc_value);
+   // fcst_inten_perc_value = fcst_dict->lookup_int(conf_key_inten_perc_value);
+   // obs_inten_perc_value  = obs_dict->lookup_int(conf_key_inten_perc_value);
 
       // Conf: fcst.inten_perc_thresh and obs.inten_perc_thresh
 
-   fcst_inten_perc_thresh = fcst_dict->lookup_thresh(conf_key_inten_perc_thresh);
-   obs_inten_perc_thresh  = obs_dict->lookup_thresh(conf_key_inten_perc_thresh);
+   // fcst_inten_perc_thresh = fcst_dict->lookup_thresh(conf_key_inten_perc_thresh);
+   // obs_inten_perc_thresh  = obs_dict->lookup_thresh(conf_key_inten_perc_thresh);
 
       // Conf: fcst.merge_thresh and obs.merge_thresh
 
-   fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
-   obs_merge_thresh  = obs_dict->lookup_thresh(conf_key_merge_thresh);
+   // fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
+   // obs_merge_thresh  = obs_dict->lookup_thresh(conf_key_merge_thresh);
 
       // Conf: fcst.merge_flag and obs.merge_flag
 
-   fcst_merge_flag = int_to_mergetype(fcst_dict->lookup_int(conf_key_merge_flag));
-   obs_merge_flag  = int_to_mergetype(obs_dict->lookup_int(conf_key_merge_flag));
+   // fcst_merge_flag = int_to_mergetype(fcst_dict->lookup_int(conf_key_merge_flag));
+   // obs_merge_flag  = int_to_mergetype(obs_dict->lookup_int(conf_key_merge_flag));
 
       // Conf: mask_missing_flag
 
-   mask_missing_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_missing_flag));
+   // mask_missing_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_missing_flag));
 
       // Conf: match_flag
 
-   match_flag = int_to_matchtype(conf.lookup_int(conf_key_match_flag));
+   // match_flag = int_to_matchtype(conf.lookup_int(conf_key_match_flag));
 
       // Check that match_flag is set between 0 and 3
-
+/*
    if(match_flag == MatchType_None &&
       (fcst_merge_flag != MergeType_None || obs_merge_flag  != MergeType_None) ) {
       mlog << Warning << "\nMtdConfigInfo::process_config() -> "
@@ -396,7 +396,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << mergetype_to_string(obs_merge_flag)
            << ") any merging information will be discarded.\n\n";
    }
-
+*/
       // Conf: max_centroid_dist
 
    max_centroid_dist = conf.lookup_double(conf_key_max_centroid_dist);
