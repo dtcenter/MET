@@ -167,6 +167,8 @@ class MtdConfigInfo {
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version
 
+      int              min_volume;             //  throw away 3D objects with volumes smaller than this
+
          //
          //  write the header columns to a table
          //

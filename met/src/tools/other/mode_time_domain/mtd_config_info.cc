@@ -27,6 +27,12 @@ using namespace std;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+
+static const int default_min_volume = 2000;
+
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class MtdConfigInfo
 //
@@ -152,6 +158,8 @@ void MtdConfigInfo::clear()
 
    // shift_right = 0;
 
+   min_volume = default_min_volume;
+
    output_prefix.clear();
 
    version.clear();
@@ -164,7 +172,9 @@ void MtdConfigInfo::clear()
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 void MtdConfigInfo::read_config(const char *default_file_name, const char *user_file_name)
 
@@ -186,6 +196,12 @@ if ( user_file_name )  conf.read(user_file_name);
    //  check the fuzzy-engine weights
    //     calculation of total interest assumes these tests
 
+   //
+   //  Update: these tests are not really needed since the InterestCalculator
+   //          class checks this
+   //
+
+/*
 bool all_zero = true;
 
 if ( is_eq(space_centroid_dist_wt, 0.0) )  space_centroid_dist_wt = 0.0;
@@ -220,6 +236,7 @@ if ( all_zero )  {
    exit ( 1 );
 
 }
+*/
 
    //
    //  done
@@ -539,7 +556,16 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    // shift_right = fcst_dict->lookup_int(conf_key_shift_right_value);
 
-   return;
+      // Conf: min_volume
+
+   min_volume = conf.lookup_int(conf_key_min_volume);
+
+
+   //
+   //  done
+   //
+
+return;
 
 }
 
