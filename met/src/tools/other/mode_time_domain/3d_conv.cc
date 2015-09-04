@@ -49,9 +49,9 @@ struct DataHandle {
    double * sum_plane_this;
    double * sum_plane_above;
 
-   // bool * ok_plane_below;
-   // bool * ok_plane_this;
-   // bool * ok_plane_above;
+   bool * ok_plane_below;
+   bool * ok_plane_this;
+   bool * ok_plane_above;
 
    void set_size(int _nx, int _ny);
 
@@ -63,7 +63,7 @@ struct DataHandle {
 
        sum_plane_below =  sum_plane_this =  sum_plane_above = 0;
 
-      // ok_plane_below = ok_plane_this = ok_plane_above = 0;
+      ok_plane_below = ok_plane_this = ok_plane_above = 0;
 
    }
 
@@ -79,9 +79,9 @@ struct DataHandle {
       if (  sum_plane_this  ) { delete  sum_plane_this ;   sum_plane_this  = 0; }
       if (  sum_plane_above ) { delete  sum_plane_above;   sum_plane_above = 0; }
 
-      // if ( ok_plane_below ) { delete ok_plane_below;  ok_plane_below = 0; }
-      // if ( ok_plane_this  ) { delete ok_plane_this ;  ok_plane_this  = 0; }
-      // if ( ok_plane_above ) { delete ok_plane_above;  ok_plane_above = 0; }
+      if ( ok_plane_below ) { delete ok_plane_below;  ok_plane_below = 0; }
+      if ( ok_plane_this  ) { delete ok_plane_this ;  ok_plane_this  = 0; }
+      if ( ok_plane_above ) { delete ok_plane_above;  ok_plane_above = 0; }
 
       return;
 
@@ -340,15 +340,15 @@ sum_plane_below  = new double [nxy];
 sum_plane_this   = new double [nxy];
 sum_plane_above  = new double [nxy];
 
-// ok_plane_below = new bool [nxy];
-// ok_plane_this  = new bool [nxy];
-// ok_plane_above = new bool [nxy];
+ok_plane_below = new bool [nxy];
+ok_plane_this  = new bool [nxy];
+ok_plane_above = new bool [nxy];
 
 for (j=0; j<nxy; ++j)  {
 
    data_plane_below[j] = 0.0;
 
-   // ok_plane_below[j] = true;
+   ok_plane_below[j] = true;
 
 }
 
@@ -359,8 +359,8 @@ memcpy(sum_plane_below, data_plane_below, nxy*sizeof(double));
 memcpy(sum_plane_this,  data_plane_below, nxy*sizeof(double));
 memcpy(sum_plane_above, data_plane_below, nxy*sizeof(double));
 
-// memcpy(ok_plane_this,  ok_plane_below, nxy*sizeof(bool));
-// memcpy(ok_plane_above, ok_plane_below, nxy*sizeof(bool));
+memcpy(ok_plane_this,  ok_plane_below, nxy*sizeof(bool));
+memcpy(ok_plane_above, ok_plane_below, nxy*sizeof(bool));
 
 
 return;

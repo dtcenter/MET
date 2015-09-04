@@ -269,7 +269,7 @@ int DataPlane::two_to_one(int x, int y) const {
       exit(1);
    }
 
-   n = y*Nx + x;
+   n = y*Nx + x;   //  don't change this!  lots of downstream code depends on this!
 
    return(n);
 }

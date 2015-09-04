@@ -20,6 +20,7 @@
 #include "vx_grid.h"
 
 #include "mtd_file_base.h"
+#include "data_plane.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,6 +91,8 @@ class MtdFloatFile : public MtdFileBase {
 
       void put   (const float, int _x, int _y, int _t);
 
+      void put   (const DataPlane &, const int t);
+
       bool read  (const char * filename);
 
       void write (const char * filename) const;
@@ -103,6 +106,8 @@ class MtdFloatFile : public MtdFileBase {
       MtdFloatFile const_t_slice(int t) const;
 
       MtdFloatFile convolve(const int r) const;
+
+      void calc_data_minmax();
 
 };
 

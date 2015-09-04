@@ -118,6 +118,8 @@ void VarInfoNcMet::clear() {
 
 void VarInfoNcMet::dump(ostream &out) const {
 
+   VarInfo::dump(out);
+
    // Dump out the contents
    out << "VarInfoNcMet::dump():\n"
        << "  Dimension:\n";
