@@ -32,6 +32,7 @@ using namespace std;
 static int conv_radius = -1;
 
 static double * sum_plane_buf = 0;
+static bool   *  ok_plane_buf = 0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -63,7 +64,7 @@ struct DataHandle {
 
        sum_plane_below =  sum_plane_this =  sum_plane_above = 0;
 
-      ok_plane_below = ok_plane_this = ok_plane_above = 0;
+        ok_plane_below =   ok_plane_this =   ok_plane_above = 0;
 
    }
 
@@ -93,13 +94,11 @@ struct DataHandle {
 ////////////////////////////////////////////////////////////////////////
 
 
-static void get_data_plane(const MtdFloatFile &, const int t, double * data_plane);
+static void get_data_plane(const MtdFloatFile &, const int t, double * data_plane, bool * ok_plane);
 
 static void calc_sum_plane(const int nx, const int ny, const double * data_plane, double * sum_plane);
 
 static void load_handle(DataHandle &, const MtdFloatFile & in, const int t);
-
-// static const char * dump_range(const double *, const int);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,6 +138,7 @@ max_conv_value = 0.0;
 const int Nxy = Nx*Ny;
 
 sum_plane_buf = new double [Nxy];
+ ok_plane_buf = new bool   [Nxy];
 
 handle.set_size(Nx, Ny);
 
@@ -173,24 +173,6 @@ for (t=0; t<Nt; ++t)  {
    s_this  = handle.sum_plane_this;
    s_above = handle.sum_plane_above;
 
-   if ( verbose )  {
-
-      // cout << "T = " << t << '\n';
-
-      // cout << "s_below range is " << dump_range(s_below, Nxy) << '\n';
-      // cout << "s_this  range is " << dump_range(s_this,  Nxy) << '\n';
-      // cout << "s_above range is " << dump_range(s_above, Nxy) << '\n';
-
-      // cout << '\n';
-
-      // cout << "data_below range is " << dump_range(handle.data_plane_below, Nxy) << '\n';
-      // cout << "data_this  range is " << dump_range(handle.data_plane_this,  Nxy) << '\n';
-      // cout << "data_above range is " << dump_range(handle.data_plane_above, Nxy) << '\n';
-
-      // cout << "\n\n" << flush;
-
-   }
-
    for (j=0; j<Nxy; ++j)  {
 
       value = (*s_below) + (*s_this) + (*s_above);
@@ -214,33 +196,6 @@ time_stop = time(0);
 
 cout << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n" << flush;
 
-
-
-// min_conv_value = max_conv_value = calc_conv_value(in, 0, 0, 0);
-/*
-for (x=0; x<Nx; ++x)  {
-
-   // if ( verbose && ((x%100) == 0) )  cout << "Pass 1: x = " << x << " of " << Nx << "\n" << flush;
-
-   for (y=0; y<Ny; ++y)  {
-
-      for (t=0; t<Nt; ++t)  {
-
-         value = calc_conv_value(in, x, y, t);
-
-         n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
-
-         conv_data[n] = value;
-
-         if ( value < min_conv_value )  min_conv_value = value;
-         if ( value > max_conv_value )  max_conv_value = value;
-
-      }
-
-   }
-
-}
-*/
 
 if ( verbose )  {
 
@@ -302,7 +257,8 @@ for (x=0; x<Nx; ++x)  {
 
 if ( conv_data )  { delete [] conv_data;  conv_data = (double *) 0; }
 
-if ( sum_plane_buf )  { delete sum_plane_buf;  sum_plane_buf = 0; }
+if ( sum_plane_buf )  { delete [] sum_plane_buf;  sum_plane_buf = 0; }
+if (  ok_plane_buf )  { delete []  ok_plane_buf;   ok_plane_buf = 0; }
 
 return ( out );
 
@@ -371,13 +327,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_data_plane(const MtdFloatFile & mtd, const int t, double * data_plane)
+void get_data_plane(const MtdFloatFile & mtd, const int t, double * data_plane, bool * ok_plane)
 
 {
 
 int x, y;
 double * d = data_plane;
+bool * ok = ok_plane;
 double value;
+bool status = false;
 const int nx = mtd.nx();
 const int ny = mtd.ny();
 
@@ -389,7 +347,11 @@ for (y=0; y<ny; ++y)  {
 
       value = mtd(x, y, t);
 
+      status = (value < -9000.0);
+
       *d++ = (float) value;
+
+      *ok++ = status;
 
    }
 
@@ -411,10 +373,11 @@ void calc_sum_plane(const int nx, const int ny, const double * data_plane, doubl
 
 {
 
-int x, y, n;
+int j, x, y, n;
 static int count = 0;
 char junk[256];
 double moving_sum = 0.0;
+bool * b = 0;
 const int nxy = nx*ny;
 const int xmin = conv_radius;
 const int ymin = conv_radius;
@@ -437,6 +400,10 @@ sprintf(junk, "raw_%02d", count);
    //
 
 memset(sum_plane_buf, 0, nxy*sizeof(double));
+
+b = ok_plane_buf;
+
+for (j=0; j<nxy; ++j)  *b++ = true;
 
    //
    //  calculate sums in x-direction for each y
@@ -476,13 +443,6 @@ for (y=0; y<ny; ++y)  {
    }
 
 }
-
-
-// cout << "buf plane range = " << dump_range(sum_plane_buf, nxy) << '\n' << flush;
-// 
-// sprintf(junk, "buf_%02d", count);
-// 
-// data_pgm(sum_plane_buf, nx, ny, junk);
 
 
    //
@@ -531,12 +491,6 @@ for (x=0; x<nx; ++x)  {
 
 }   //  for x
 
-// cout << "sum plane range = " << dump_range(out, nxy) << '\n' << flush;
-// 
-// sprintf(junk, "sum_%02d", count);
-// 
-// data_pgm(out, nx, ny, junk);
-
    //
    //  done
    //
@@ -563,8 +517,8 @@ const int bytes = (in.nx())*(in.ny())*sizeof(double);
 
 if ( first )  {
 
-   get_data_plane(in, 0, handle.data_plane_this);
-   get_data_plane(in, 1, handle.data_plane_above);
+   get_data_plane(in, 0, handle.data_plane_this,  handle.ok_plane_this);
+   get_data_plane(in, 1, handle.data_plane_above, handle.ok_plane_above);
 
    calc_sum_plane(in.nx(), in.ny(), handle.data_plane_this,  handle.sum_plane_this);
    calc_sum_plane(in.nx(), in.ny(), handle.data_plane_above, handle.sum_plane_above);
@@ -588,7 +542,7 @@ if ( last )  {
 } else {
 
    // get_data_plane(in, t, handle.data_plane_above);
-   get_data_plane(in, t + 1, handle.data_plane_above);
+   get_data_plane(in, t + 1, handle.data_plane_above, handle.ok_plane_above);
 
    calc_sum_plane(in.nx(), in.ny(), handle.data_plane_above, handle.sum_plane_above);
 
@@ -605,34 +559,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-const char * dump_range(const double * p, const int n)
-
-{
-
-int j;
-double value, min_value, max_value;
-static char junk[256];
-
-max_value = min_value = *p;
-
-for (j=1; j<n; ++j)  {
-
-   value = *p++;
-
-   if ( value < min_value )  min_value = value;
-   if ( value > max_value )  max_value = value;
-
-}
-
-sprintf(junk, "%.3f to %.3f", min_value, max_value);
-
-return ( junk );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
 
 
 
