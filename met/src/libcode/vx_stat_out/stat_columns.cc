@@ -2771,8 +2771,8 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+8,  // Observation Value
       pd_ptr->o_na[i]);
 
-   at.set_entry(r, c+9,  // Climatology Value
-      pd_ptr->c_na[i]);
+   at.set_entry(r, c+9,  // Climatology Mean Value
+      pd_ptr->cmn_na[i]);
 
    at.set_entry(r, c+10, // Observation Quality Control
       pd_ptr->o_qc_sa[i]);

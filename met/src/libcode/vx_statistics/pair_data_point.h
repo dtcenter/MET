@@ -42,21 +42,19 @@ class PairDataPoint : public PairBase {
       //////////////////////////////////////////////////////////////////
 
       // Forecast and climatological values
-      NumArray f_na;    // Forecast [n_pair]
-      NumArray c_na;    // Climatology [n_pair]
-      int      n_pair;
+      NumArray f_na; // Forecast [n_obs]
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       bool add_pair(const char *, double, double, double, double,
-                    unixtime, double, double, double, double, double,
-                    const char *);
+                    unixtime, double, double, double, double,
+                    const char *, double, double);
 
       void set_pair(int, const char *, double, double, double, double,
-                    unixtime, double, double, double, double, double,
-                    const char *);
+                    unixtime, double, double, double, double,
+                    const char *, double, double);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -87,6 +85,7 @@ class VxPairDataPoint {
       //////////////////////////////////////////////////////////////////
 
       VarInfo     *fcst_info;  // Forecast field, allocated by VarInfoFactory
+      VarInfo     *climo_info; // Climatology field, allocated by VarInfoFactory
       VarInfoGrib *obs_info;   // Observation field, allocated by VarInfoFactory
 
       double interp_thresh;    // Threshold between 0 and 1 used when
@@ -95,13 +94,14 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
       //
-      // Forecast and climatological fields falling between the
-      // requested levels.  Store the fields in a data plane array.
+      // Forecast and climatology fields falling between the requested
+      // levels.  Store the fields in a data plane array.
       //
       //////////////////////////////////////////////////////////////////
 
-      DataPlaneArray fcst_dpa;   // Forecast data plane array
-      DataPlaneArray climo_dpa;  // Climatology data plane array
+      DataPlaneArray fcst_dpa;     // Forecast data plane array
+      DataPlaneArray climo_mn_dpa; // Climatology mean data plane array
+      DataPlaneArray climo_sd_dpa; // Climatology standard deviation data plane array
 
       //////////////////////////////////////////////////////////////////
 
@@ -149,11 +149,13 @@ class VxPairDataPoint {
       void clear();
 
       void set_fcst_info(VarInfo *);
+      void set_climo_info(VarInfo *);
       void set_obs_info(VarInfoGrib *);
       void set_interp_thresh(double);
 
       void set_fcst_dpa(const DataPlaneArray &);
-      void set_climo_dpa(const DataPlaneArray &);
+      void set_climo_mn_dpa(const DataPlaneArray &);
+      void set_climo_sd_dpa(const DataPlaneArray &);
 
       void set_fcst_ut(const unixtime);
       void set_beg_ut(const unixtime);
@@ -171,10 +173,10 @@ class VxPairDataPoint {
       void set_interp(int, const char *, int);
       void set_interp(int, InterpMthd, int);
 
-      void add_obs(float *, char *, char *, unixtime, char *, float *, Grid &);
+      void add_obs(float *, const char *, const char *, unixtime,
+                   const char *, float *, Grid &);
 
-      void find_fcst_vert_lvl(double, int &, int &);
-      void find_climo_vert_lvl(double, int &, int &);
+      void find_vert_lvl(const DataPlaneArray &, double, int &, int &);
 
       int  get_n_pair();
 
@@ -186,8 +188,8 @@ class VxPairDataPoint {
       void inc_count(int ***&, int, int);
       void inc_count(int ***&, int, int, int);
 
-      double compute_fcst_interp(double, double, int, double, int, int);
-      double compute_climo_interp(double, double, int, double, int, int);
+      double compute_interp(const DataPlaneArray &, double, double, int,
+                            double, int, int);
 };
 
 ////////////////////////////////////////////////////////////////////////

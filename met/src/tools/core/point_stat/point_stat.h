@@ -103,7 +103,6 @@ static const char *txt_file_abbr[n_txt] = {
 
 // Input files
 static ConcatString fcst_file;
-static ConcatString climo_file;
 static StringArray  obs_file;
 
 // Input Config file
@@ -114,7 +113,6 @@ static PointStatConfInfo conf_info;
 static unixtime     obs_valid_beg_ut = (unixtime) 0;
 static unixtime     obs_valid_end_ut = (unixtime) 0;
 static ConcatString out_dir;
-static bool         climo_flag       = false;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -150,8 +148,7 @@ static bool is_first_pass = true;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf  = (Met2dDataFile *) 0;
-static Met2dDataFile *climo_mtddf = (Met2dDataFile *) 0;
+static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = (gsl_rng *) 0;

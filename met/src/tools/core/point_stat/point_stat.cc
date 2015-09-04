@@ -128,7 +128,6 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
-static void set_climo_file(const StringArray &);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
@@ -178,8 +177,6 @@ void process_command_line(int argc, char **argv) {
    // Check for zero arguments
    if(argc == 1) usage();
 
-   climo_file = "none";
-
    // Parse the command line into tokens
    cline.set(argc, argv);
 
@@ -187,7 +184,6 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_climo_file,         "-climo",         1);
    cline.add(set_point_obs,          "-point_obs",     1);
    cline.add(set_ncfile,             "-ncfile",        1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
@@ -246,17 +242,6 @@ void process_command_line(int argc, char **argv) {
    // Store the forecast file type
    ftype = fcst_mtddf->file_type();
 
-   // Read the climo file
-   if(climo_flag) {
-     
-      // Read climatology file
-      if(!(climo_mtddf = mtddf_factory.new_met_2d_data_file(climo_file, ftype))) {
-         mlog << Error << "\nTrouble reading climatology file \""
-              << climo_file << "\"\n\n";
-         exit(1);
-      }
-   }
-
    // Process the configuration
    conf_info.process_config(ftype);   
 
@@ -269,8 +254,7 @@ void process_command_line(int argc, char **argv) {
 
    // List the input files
    mlog << Debug(1)
-        << "Forecast File: "      << fcst_file << "\n"
-        << "Climatology File: "   << climo_file << "\n";
+        << "Forecast File: " << fcst_file << "\n";
 
    for(i=0; i<obs_file.n_elements(); i++) {
       mlog << Debug(1)
@@ -502,7 +486,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 void process_fcst_climo_files() {
    int i, j;
    int n_fcst, n_climo;
-   DataPlaneArray fcst_dpa, climo_dpa;
+   DataPlaneArray fcst_dpa, climo_mn_dpa, climo_sd_dpa;
    NumArray fcst_lvl_na, climo_lvl_na;
    unixtime file_ut, beg_ut, end_ut;
    
@@ -547,32 +531,6 @@ void process_fcst_climo_files() {
          }
       }
 
-      // Process the climo file if specified
-      if(climo_flag) {
-
-         // Read the gridded data from the input climo file
-         n_climo = climo_mtddf->data_plane_array(*conf_info.vx_pd[i].fcst_info, climo_dpa);
-
-         // Regrid, if necessary
-         if(!(climo_mtddf->grid() == grid)) {
-            mlog << Debug(1)
-                 << "Regridding " << climo_dpa.n_planes()
-                 << " climatology field(s) for "
-                 << conf_info.vx_pd[i].fcst_info->magic_str()
-                 << " to the verification grid.\n";
-
-            // Loop through the climatology fields
-            for(j=0; j<climo_dpa.n_planes(); j++) {
-               climo_dpa[j] = met_regrid(climo_dpa[j], climo_mtddf->grid(), grid,
-                                         conf_info.regrid_info);
-            }
-         }
-      }
-      // No climo file specified
-      else {
-         n_climo = 0;
-      }
-
       // For probability fields, check to see if they need to be
       // rescaled from [0, 100] to [0, 1]
       if(conf_info.vx_pd[i].fcst_info->p_flag()) {
@@ -584,8 +542,12 @@ void process_fcst_climo_files() {
       // Store information for the raw forecast fields
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
 
+      // JHG, need to read climo data for this verification task
+      n_climo = 0;
+      
       // Store information for the raw climo fields
-      conf_info.vx_pd[i].set_climo_dpa(climo_dpa);
+      conf_info.vx_pd[i].set_climo_mn_dpa(climo_mn_dpa);
+      conf_info.vx_pd[i].set_climo_sd_dpa(climo_sd_dpa);
 
       // Get the valid time for the first field
       file_ut = fcst_dpa[0].valid();
@@ -922,11 +884,11 @@ void process_scores() {
                     << ", for interpolation method "
                     << shc.get_interp_mthd() << "("
                     << shc.get_interp_pnts_str()
-                    << "), using " << pd_ptr->n_pair << " pairs.\n";
+                    << "), using " << pd_ptr->n_obs << " pairs.\n";
 
                // Dump out detailed information about why observations were rejected
                mlog << Debug(3)
-                    << "Number of matched pairs  = " << pd_ptr->n_pair << "\n"
+                    << "Number of matched pairs  = " << pd_ptr->n_obs << "\n"
                     << "Observations processed   = " << conf_info.vx_pd[i].n_try << "\n"
                     << "Rejected: SID exclusion  = " << conf_info.vx_pd[i].rej_sid_exc << "\n"
                     << "Rejected: GRIB code      = " << conf_info.vx_pd[i].rej_gc << "\n"
@@ -941,7 +903,7 @@ void process_scores() {
                     << "Rejected: duplicates     = " << conf_info.vx_pd[i].rej_dup[j][k][l] << "\n";
 
                // Continue for no matched pairs
-               if(pd_ptr->n_pair == 0) continue;
+               if(pd_ptr->n_obs == 0) continue;
 
                // Write out the MPR lines
                if(conf_info.output_flag[i_mpr] != STATOutputType_None) {
@@ -1475,7 +1437,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
 
          f = pd_ptr->f_na[j];
          o = pd_ptr->o_na[j];
-         c = pd_ptr->c_na[j];
+         c = pd_ptr->cmn_na[j];
 
          // Skip bad data values in the forecast or observation fields
          if(is_bad_data(f) || is_bad_data(o)) continue;
@@ -1545,10 +1507,10 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    double uf, vf, uc, vc, uo, vo, fwind, owind;
 
    // Check that the number of pairs are the same
-   if(ugrd_pd_ptr->n_pair != vgrd_pd_ptr->n_pair) {
+   if(ugrd_pd_ptr->n_obs != vgrd_pd_ptr->n_obs) {
       mlog << Error << "\ndo_vl1l2() -> "
            << "the number of UGRD pairs != the number of VGRD pairs: "
-           << ugrd_pd_ptr->n_pair << " != " << vgrd_pd_ptr->n_pair
+           << ugrd_pd_ptr->n_obs << " != " << vgrd_pd_ptr->n_obs
            << "\n\n";
       exit(1);
    }
@@ -1563,13 +1525,13 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    }
 
    // Loop through the pair data and compute sums
-   for(i=0; i<ugrd_pd_ptr->n_pair; i++) {
+   for(i=0; i<ugrd_pd_ptr->n_obs; i++) {
 
       // Retrieve the U,V values
       uf = ugrd_pd_ptr->f_na[i];
       vf = vgrd_pd_ptr->f_na[i];
-      uc = ugrd_pd_ptr->c_na[i];
-      vc = vgrd_pd_ptr->c_na[i];
+      uc = ugrd_pd_ptr->cmn_na[i];
+      vc = vgrd_pd_ptr->cmn_na[i];
       uo = ugrd_pd_ptr->o_na[i];
       vo = vgrd_pd_ptr->o_na[i];
 
@@ -1754,8 +1716,7 @@ void clean_up() {
    finish_txt_files();
 
    // Deallocate memory for data files
-   if(fcst_mtddf)  { delete fcst_mtddf;  fcst_mtddf  = (Met2dDataFile *) 0; }
-   if(climo_mtddf) { delete climo_mtddf; climo_mtddf = (Met2dDataFile *) 0; }
+   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) 0; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);
@@ -1774,7 +1735,6 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
-        << "\t[-climo climo_file]\n"
         << "\t[-point_obs file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
@@ -1790,9 +1750,6 @@ void usage() {
 
         << "\t\t\"config_file\" is a PointStatConfig file containing "
         << "the desired configuration settings (required).\n"
-
-        << "\t\t\"-climo climo_file\" is a gridded climatological file "
-        << "used when computing scalar and vector anomaly statistics (optional).\n"
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
@@ -1813,14 +1770,6 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
    exit (1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_climo_file(const StringArray & a)
-{
-   climo_file = a[0];
-   climo_flag = true;
 }
 
 ////////////////////////////////////////////////////////////////////////

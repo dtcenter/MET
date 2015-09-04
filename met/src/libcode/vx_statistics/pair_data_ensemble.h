@@ -36,7 +36,6 @@ struct ens_ssvar_pt {
 typedef deque<ens_ssvar_pt>       ssvar_pt_list;
 typedef map<string,ssvar_pt_list> ssvar_bin_map;  // Indexed by bin min
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Class to store ensemble pair data
@@ -120,6 +119,7 @@ class VxPairDataEnsemble {
       //////////////////////////////////////////////////////////////////
       
       VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
+      VarInfo *climo_info;       // Climatology field, allocated by VarInfoFactory
       VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
 
       double interp_thresh;      // Threshold between 0 and 1 used when
@@ -128,12 +128,14 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
       //
-      // Forecast fields falling between the requested levels.
-      // Store the fields in a data plane array.
+      // Forecast and climotology fields falling between the requested
+      // levels.  Store the fields in a data plane array.
       //
       //////////////////////////////////////////////////////////////////
 
-      DataPlaneArray fcst_dpa;   // Forecast data plane array
+      DataPlaneArray fcst_dpa;     // Forecast data plane array
+      DataPlaneArray climo_mn_dpa; // Climatology mean data plane array
+      DataPlaneArray climo_sd_dpa; // Climatology standard deviation data plane array
 
       //////////////////////////////////////////////////////////////////
 
@@ -148,8 +150,8 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
-      ConcatString ens_ssvar_mean;      // Name of ensemble spread/skill mean file
-      bool         ens_ssvar_flag;      // Flag to trigger spread/skill calculations
+      ConcatString ens_ssvar_mean; // Name of ensemble spread/skill mean file
+      bool         ens_ssvar_flag; // Flag to trigger spread/skill calculations
 
       //////////////////////////////////////////////////////////////////
 
@@ -170,10 +172,13 @@ class VxPairDataEnsemble {
       void clear();
 
       void set_fcst_info(VarInfo *);
+      void set_climo_info(VarInfo *);
       void set_obs_info(VarInfo *);
       void set_interp_thresh(double);
 
       void set_fcst_dpa(const DataPlaneArray &);
+      void set_climo_mn_dpa(const DataPlaneArray &);
+      void set_climo_sd_dpa(const DataPlaneArray &);
 
       void set_fcst_ut(const unixtime);
       void set_beg_ut(const unixtime);
@@ -201,14 +206,15 @@ class VxPairDataEnsemble {
                    const char *, float *, Grid &);
       void add_ens(int, bool mn);
 
-      void find_vert_lvl(double, int &, int &);
+      void find_vert_lvl(const DataPlaneArray &, double, int &, int &);
 
       int  get_n_pair();
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
       void print_duplicate_report();
 
-      double compute_interp(double, double, int, double, int, int);
+      double compute_interp(const DataPlaneArray &, double, double, int,
+                            double, int, int);
 };
 
 ////////////////////////////////////////////////////////////////////////
