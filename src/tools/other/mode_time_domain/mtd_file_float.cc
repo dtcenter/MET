@@ -258,6 +258,68 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void MtdFloatFile::put(const DataPlane & plane, const int t)
+
+{
+
+if ( (plane.nx() != Nx) || (plane.ny() != Ny) )  {
+
+   cerr << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> plane wrong size!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( (t < 0) || (t >= Nt) )  {
+
+   cerr << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> bad time\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  Unfortunately, we can't do a memcpy here, because the
+   //     DataPlane stores data as doubles, while this class
+   //     stores it's data as floats ... too bad
+   //
+
+int x, y, n;
+int count;
+double value;
+
+count = 0;
+
+for (x=0; x<Nx; ++x)  {
+
+   for (y=0; y<Ny; ++y)  {
+
+      value = plane(x, y);
+
+      if ( value == bad_data_double )  ++count;
+
+      mtd_three_to_one(Nx, Ny, Nt, x, y, t);
+
+      Data[n] = (float) value;
+
+   }
+
+}
+
+cout << "\n\n  Bad data count is " << count << "\n\n";
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void MtdFloatFile::set_data_minmax(double _data_min, double _data_max)
 
 {
@@ -265,6 +327,48 @@ void MtdFloatFile::set_data_minmax(double _data_min, double _data_max)
 DataMin = _data_min;
 
 DataMax = _data_max;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::calc_data_minmax()
+
+{
+
+int j;
+const int N = Nx*Ny*Nt;
+bool ok = false;
+const float * f = Data;
+float value;
+
+DataMin = DataMax = bad_data_float;
+
+for (j=0; j<N; ++j)  {
+
+   value = *f++;
+
+   if ( value == bad_data_float )  continue;
+
+   if ( !ok )  {
+
+      DataMin = DataMax = value;
+
+      ok = true;
+
+   } else {
+
+      if ( value < DataMin )  DataMin = value;
+      if ( value > DataMax )  DataMax = value;
+
+   }
+
+}   //  for j
+
 
 return;
 

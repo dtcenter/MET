@@ -75,6 +75,8 @@ cout << "\n\n  Verbosity = " << mlog.verbosity_level() << "\n\n";
 
 if ( cline.n() != 0 )  usage();   //  should only be config file left on command line
 
+// fcst_filenames.dump(cout);
+
    //
    //  read the config file
    //
@@ -106,10 +108,12 @@ InterestCalculator calc;
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
-// mtd_read_data(config,  obs_filenames,  obs_raw);
+// config.fcst_info->dump(cout);
 
-exit ( 1 );
+mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
+mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
+
+// exit ( 1 );
 
 /*
 if ( ! fcst_raw.read(fcst_filename) )  {
