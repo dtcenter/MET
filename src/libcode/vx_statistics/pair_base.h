@@ -62,7 +62,11 @@ class PairBase {
       StringArray o_qc_sa; // Observation quality control [n_obs]
       int         n_obs;   // Number of observations
 
-      unixtime   fcst_ut;  // Forecast valid time
+      // Climatology Information
+      NumArray    cmn_na;  // Climatology mean [n_obs]
+      NumArray    csd_na;  // Climatology standard deviation [n_obs]
+
+      unixtime    fcst_ut; // Forecast valid time
 
       bool check_unique;   // Check for duplicates, keeping unique obs
       bool check_single;   // Check for duplicates, keeping single obs
@@ -93,11 +97,13 @@ class PairBase {
                        double, double, int &);
 
       bool add_obs(const char *, double, double, double, double,
-                   unixtime, double, double, double, const char *);
+                   unixtime, double, double, double, const char *,
+                   double, double);
       void add_obs(double, double, double);
 
       void set_obs(int, const char *, double, double, double, double,
-                   unixtime, double, double, double, const char *);
+                   unixtime, double, double, double, const char *,
+                   double, double);
       void set_obs(int, double, double, double);
 
       void print_duplicate_report();

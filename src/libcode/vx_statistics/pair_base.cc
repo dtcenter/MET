@@ -74,6 +74,8 @@ void PairBase::clear() {
    elv_na.clear();
    o_na.clear();
    o_qc_sa.clear();
+   cmn_na.clear();
+   csd_na.clear();
 
    n_obs = 0;
 
@@ -211,7 +213,8 @@ bool PairBase::add_obs(const char *sid,
                        double lat, double lon,
                        double x, double y, unixtime ut,
                        double lvl, double elv,
-                       double o, const char *qc) {
+                       double o, const char *qc,
+                       double cmn, double csd) {
 
    if( check_unique ){
 
@@ -299,6 +302,8 @@ bool PairBase::add_obs(const char *sid,
    elv_na.add(elv);
    o_na.add(o);
    o_qc_sa.add(qc);
+   cmn_na.add(cmn);
+   csd_na.add(csd);
 
    // Increment the number of pairs
    n_obs += 1;
@@ -435,6 +440,8 @@ void PairBase::add_obs(double x, double y, double o) {
    elv_na.add(bad_data_double);
    o_na.add(o);
    o_qc_sa.add(na_str);
+   cmn_na.add(bad_data_double);
+   csd_na.add(bad_data_double);
 
    // Increment the number of observations
    n_obs += 1;
@@ -448,7 +455,8 @@ void PairBase::set_obs(int i_obs, const char *sid,
                        double lat, double lon,
                        double x, double y, unixtime ut,
                        double lvl, double elv,
-                       double o, const char *qc) {
+                       double o, const char *qc,
+                       double cmn, double csd) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairBase::set_obs() -> "
@@ -468,6 +476,8 @@ void PairBase::set_obs(int i_obs, const char *sid,
    elv_na.set(i_obs, elv);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, qc);
+   cmn_na.set(i_obs, cmn);
+   csd_na.set(i_obs, csd);
 
    return;
 }
@@ -494,6 +504,8 @@ void PairBase::set_obs(int i_obs, double x, double y, double o) {
    elv_na.set(i_obs, bad_data_double);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, na_str);
+   cmn_na.set(i_obs, bad_data_double);
+   csd_na.set(i_obs, bad_data_double);
 
    return;
 }
