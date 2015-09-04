@@ -69,6 +69,59 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Climatology data
+//
+climo = {
+
+   //
+   // Climatology mean and standard deviation files.  May list multiple.
+   // Standard deviations are optional.  May be defined separately for
+   // each entry climo.field entry.
+   //
+   mean_file_name  = [];
+   stdev_file_name = [];
+
+   //
+   // Method for regridding climatology data to the verification grid.
+   //
+   regrid = {
+      method = NEAREST;
+      width  = 1;
+   }
+
+   //
+   // Method for interpolating climatology to forecast valid time:
+   //    NEAREST for data closest in time
+   //    UW_MEAN for average of data before and after
+   //    DW_MEAN for linear interpolation in time of data before and after
+   //
+   time_interp_method = DW_MEAN;
+
+   //   
+   // When searching climatology data, only consider times where the month
+   // matches the forecast month.  Set match_day to TRUE or FALSE to define
+   // whether the climatology day must also match.
+   //    match_day = FALSE for monthly climatology
+   //    match_day = TRUE  for daily climatology
+   //
+   match_day = FALSE;
+
+   //
+   // Time step of the climatology data in seconds.  Set to 60*60*6 for
+   // 6-hourly data or 60*60 for hourly data.
+   //
+   time_step = 60*60*6;
+
+   //
+   // Climatology fields to be used
+   // Must be empty or the same length as fcst.field.
+   //
+   field = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Point observation time window
 //
 obs_window = {
