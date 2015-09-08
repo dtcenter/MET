@@ -21,5 +21,6 @@ libvx_statistics_a_SOURCES = \
                pair_base.cc pair_base.h \
                pair_data_point.cc pair_data_point.h \
                pair_data_ensemble.cc pair_data_ensemble.h \
+               read_climo.cc read_climo.h \
                vx_statistics.h
 libvx_statistics_a_CPPFLAGS = ${MET_CPPFLAGS}

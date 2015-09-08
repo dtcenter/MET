@@ -77,6 +77,8 @@
 //                    from the config file to the output files.
 //   031    02/19/15  Halley Gotway  Add automated regridding.
 //   032    08/04/15  Halley Gotway  Add conditional continuous verification.
+//   033    09/04/15  Halley Gotway  Add climatology and SAL1L2 and VAL1L2
+//                                   output line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -122,7 +124,10 @@ static void do_mcts  (MCTSInfo &, int,
                       const NumArray &, const NumArray &);
 static void do_cnt   (CNTInfo *&, int,
                       const NumArray &, const NumArray &);
+static void do_sl1l2 (SL1L2Info *&, int,
+                      const NumArray &, const NumArray &, const NumArray &);
 static void do_vl1l2 (VL1L2Info *&, int,
+                      const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
 static void do_pct   (PCTInfo *&, int,
@@ -521,24 +526,36 @@ void process_scores() {
    bool status;
    int n_cat, n_cnt, n_wind, n_prob, n_cov;
 
+   // Forecast and observation fields
+   DataPlane mask_dp;
    DataPlane fcst_dp,        obs_dp;
    DataPlane fcst_dp_smooth, obs_dp_smooth;
    DataPlane fcst_dp_thresh, obs_dp_thresh;
 
-   NumArray f_na, o_na, fthr_na, othr_na;
+   // Climatology mean and standard deviations
+   DataPlane cmn_dp,        csd_dp;
+   DataPlane cmn_dp_smooth, csd_dp_smooth;
+   DataPlane cmn_dp_thresh, csd_dp_thresh;
 
+   // Forecast, observation, and climatology pairs
+   NumArray f_na, o_na, cmn_na, csd_na;
+
+   // Thresholded fractional coverage pairs
+   NumArray fthr_na, othr_na;
+   
    // Objects to handle vector winds
-   DataPlane fuwind_dp,        ouwind_dp;
-   DataPlane fuwind_dp_smooth, ouwind_dp_smooth;
-   NumArray fuwind_na, ouwind_na;
+   DataPlane fu_dp, ou_dp, cmnu_dp, csdu_dp;
+   DataPlane fu_dp_smooth, ou_dp_smooth, cmnu_dp_smooth, csdu_dp_smooth;
+   NumArray fu_na, ou_na, cmnu_na, csdu_na;
 
-   CTSInfo    *cts_info = (CTSInfo *) 0;
+   CTSInfo    *cts_info    = (CTSInfo *) 0;
    MCTSInfo    mcts_info;
-   CNTInfo    *cnt_info = (CNTInfo *) 0;
-   VL1L2Info  *vl1l2_info = (VL1L2Info *) 0;
+   CNTInfo    *cnt_info    = (CNTInfo *) 0;
+   SL1L2Info  *sl1l2_info  = (SL1L2Info *) 0;
+   VL1L2Info  *vl1l2_info  = (VL1L2Info *) 0;
    NBRCNTInfo  nbrcnt_info;
    NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
-   PCTInfo    *pct_info = (PCTInfo *) 0;
+   PCTInfo    *pct_info    = (PCTInfo *) 0;
 
    // Store the maximum number of each threshold type
    n_cnt  = conf_info.get_max_n_cnt_thresh();
@@ -550,6 +567,7 @@ void process_scores() {
    // Allocate space for output statistics types
    cts_info    = new CTSInfo    [n_cat];
    cnt_info    = new CNTInfo    [n_cnt];
+   sl1l2_info  = new SL1L2Info  [n_cnt];
    vl1l2_info  = new VL1L2Info  [n_wind];
    nbrcts_info = new NBRCTSInfo [n_cov];
    pct_info    = new PCTInfo    [n_prob];
@@ -641,6 +659,10 @@ void process_scores() {
               << conf_info.obs_info[i]->magic_str() << ".\n\n";
       }
 
+      // Read climatology data
+      read_climo_data_plane(conf_info.conf.lookup_dictionary(conf_key_climo),
+                            i, fcst_dp.valid(), grid, cmn_dp, csd_dp);
+
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
 
@@ -664,8 +686,10 @@ void process_scores() {
          conf_info.fcst_info[i]->v_flag() &&
          conf_info.obs_info[i]->v_flag()) {
 
-         fuwind_dp = fcst_dp;
-         ouwind_dp = obs_dp;
+         fu_dp   = fcst_dp;
+         ou_dp   = obs_dp;
+         cmnu_dp = cmn_dp;
+         csdu_dp = csd_dp;
       }
 
       // Loop through and apply each of the smoothing operations
@@ -675,10 +699,19 @@ void process_scores() {
          shc.set_interp_mthd(conf_info.interp_mthd[j]);
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 
-         // If requested in the config file, smooth the forecast field
+         // If requested in the config file, smooth the forecast
+         // and climatology fields
          if(conf_info.interp_field == FieldType_Fcst ||
             conf_info.interp_field == FieldType_Both) {
             smooth_field(fcst_dp, fcst_dp_smooth,
+                         conf_info.interp_mthd[j],
+                         conf_info.interp_wdth[j],
+                         conf_info.interp_thresh);
+            smooth_field(cmn_dp, cmn_dp_smooth,
+                         conf_info.interp_mthd[j],
+                         conf_info.interp_wdth[j],
+                         conf_info.interp_thresh);
+            smooth_field(csd_dp, csd_dp_smooth,
                          conf_info.interp_mthd[j],
                          conf_info.interp_wdth[j],
                          conf_info.interp_thresh);
@@ -686,6 +719,8 @@ void process_scores() {
          // Do not smooth the forecast field
          else {
             fcst_dp_smooth = fcst_dp;
+            cmn_dp_smooth  = cmn_dp;
+            csd_dp_smooth  = csd_dp;
          }
 
          // If requested in the config file, smooth the observation field
@@ -704,10 +739,18 @@ void process_scores() {
          // Loop through the masks to be applied
          for(k=0; k<conf_info.get_n_mask(); k++) {
 
-            // Apply the current mask to the fields
-            apply_mask(fcst_dp_smooth, obs_dp_smooth,
-                       conf_info.mask_dp[k],
-                       f_na, o_na);
+            // Store the current mask
+            mask_dp = conf_info.mask_dp[k];
+
+            // Turn off the mask for bad forecast or observation values
+            mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
+            mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+
+            // Apply the current mask to the current fields
+            apply_mask(fcst_dp_smooth, mask_dp, f_na);
+            apply_mask(obs_dp_smooth,  mask_dp, o_na);
+            apply_mask(cmn_dp_smooth,  mask_dp, cmn_na);
+            apply_mask(csd_dp_smooth,  mask_dp, csd_na);
 
             // Set the mask name
             shc.set_mask(conf_info.mask_name[k]);
@@ -807,8 +850,7 @@ void process_scores() {
 
             // Compute CNT scores
             if(!conf_info.fcst_info[i]->p_flag() &&
-               (conf_info.output_flag[i_cnt]   != STATOutputType_None ||
-                conf_info.output_flag[i_sl1l2] != STATOutputType_None)) {
+               conf_info.output_flag[i_cnt] != STATOutputType_None) {
 
                // Initialize
                for(m=0; m<n_cnt; m++) cnt_info[m].clear();
@@ -828,24 +870,52 @@ void process_scores() {
                         stat_at, i_stat_row,
                         txt_at[i_cnt], i_txt_row[i_cnt]);
                   }
+               } // end for m
+            } // end Compute CNT
 
-                  // Write out SL1L2 as long as the vflag is not set
-                  if(!conf_info.fcst_info[i]->v_flag() &&
-                     conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
-                     cnt_info[m].n > 0) {
+            // Compute SL1L2 and SAL1L2 scores as long as the
+            // vflag is not set
+            if(!conf_info.fcst_info[i]->p_flag() &&
+               !conf_info.fcst_info[i]->v_flag() &&
+               (conf_info.output_flag[i_sl1l2]  != STATOutputType_None ||
+                conf_info.output_flag[i_sal1l2] != STATOutputType_None)) {
 
-                     write_sl1l2_row(shc, cnt_info[m],
+               // Initialize
+               for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
+
+               // Compute SL1L2 and SAL1L2
+               do_sl1l2(sl1l2_info, i, f_na, o_na, cmn_na);
+
+               // Loop through the continuous thresholds
+               for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
+
+                  // Write out SL1L2
+                  if(conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
+                     sl1l2_info[m].scount > 0) {
+
+                     write_sl1l2_row(shc, sl1l2_info[m],
                         conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
                   }
-               } // end for m
-            } // end Compute CNT
 
-            // Compute VL1L2 partial sums for UGRD,VGRD
+                  // Write out SAL1L2
+                  if(conf_info.output_flag[i_sal1l2] != STATOutputType_None &&
+                     sl1l2_info[m].sacount > 0) {
+
+                     write_sal1l2_row(shc, sl1l2_info[m],
+                        conf_info.output_flag[i_sal1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
+                  }
+               } // end for m
+            }  // end Compute SL1L2 and SAL1L2
+
+            // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
             if(!conf_info.fcst_info[i]->p_flag() &&
                 conf_info.fcst_info[i]->v_flag() &&
-               conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
+               (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
+                conf_info.output_flag[i_val1l2] != STATOutputType_None) &&
                i > 0 &&
                conf_info.fcst_info[i]->is_v_wind() &&
                conf_info.fcst_info[i-1]->is_u_wind()) {
@@ -859,24 +929,52 @@ void process_scores() {
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
-               // Apply current smoothing method to the UGRD fields
-               smooth_field(fuwind_dp, fuwind_dp_smooth,
-                            conf_info.interp_mthd[j],
-                            conf_info.interp_wdth[j],
-                            conf_info.interp_thresh);
+               // If requested in the config file, smooth the forecast
+               // and climatology U-wind fields
+               if(conf_info.interp_field == FieldType_Fcst ||
+                  conf_info.interp_field == FieldType_Both) {
+                  smooth_field(fu_dp, fu_dp_smooth,
+                               conf_info.interp_mthd[j],
+                               conf_info.interp_wdth[j],
+                               conf_info.interp_thresh);
+                  smooth_field(cmnu_dp, cmnu_dp_smooth,
+                               conf_info.interp_mthd[j],
+                               conf_info.interp_wdth[j],
+                               conf_info.interp_thresh);
+                  smooth_field(csdu_dp, csdu_dp_smooth,
+                               conf_info.interp_mthd[j],
+                               conf_info.interp_wdth[j],
+                               conf_info.interp_thresh);
+               }
+               // Do not smooth the forecast field
+               else {
+                  fu_dp_smooth   = fu_dp;
+                  cmnu_dp_smooth = cmnu_dp;
+                  csdu_dp_smooth = csdu_dp;
+               }
 
-                smooth_field(ouwind_dp, ouwind_dp_smooth,
-                             conf_info.interp_mthd[j],
-                             conf_info.interp_wdth[j],
-                             conf_info.interp_thresh);
+               // If requested in the config file, smooth the observation
+               // U-wind field
+               if(conf_info.interp_field == FieldType_Obs ||
+                  conf_info.interp_field == FieldType_Both) {
+                  smooth_field(ou_dp, ou_dp_smooth,
+                               conf_info.interp_mthd[j],
+                               conf_info.interp_wdth[j],
+                               conf_info.interp_thresh);
+               }
+               // Do not smooth the observation field
+               else {
+                  ou_dp_smooth = ou_dp;
+               }
 
-               // Apply the current mask to the UGRD fields
-               apply_mask(fuwind_dp_smooth, ouwind_dp_smooth,
-                          conf_info.mask_dp[k],
-                          fuwind_na, ouwind_na);
+               // Apply the current mask to the U-wind fields
+               apply_mask(fu_dp_smooth,   mask_dp, fu_na);
+               apply_mask(ou_dp_smooth,   mask_dp, ou_na);
+               apply_mask(cmnu_dp_smooth, mask_dp, cmnu_na);
+               apply_mask(csdu_dp_smooth, mask_dp, csdu_na);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, f_na, o_na, fuwind_na, ouwind_na);
+               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na, cmnu_na, cmn_na);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
@@ -889,6 +987,16 @@ void process_scores() {
                         conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
+                  }
+
+                  // Write out VAL1L2
+                  if(conf_info.output_flag[i_val1l2] != STATOutputType_None &&
+                     vl1l2_info[m].vacount > 0) {
+
+                     write_val1l2_row(shc, vl1l2_info[m],
+                        conf_info.output_flag[i_val1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
                } // end for m
 
@@ -1012,12 +1120,21 @@ void process_scores() {
                // Loop through the masks to be applied
                for(m=0; m<conf_info.get_n_mask(); m++) {
 
+                  // Store the current mask
+                  mask_dp = conf_info.mask_dp[m];
+
+                  // Turn off the mask for bad forecast or observation values
+                  mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
+                  mask_bad_data(mask_dp, fcst_dp_thresh, 0.0);
+                  mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+                  mask_bad_data(mask_dp, obs_dp_thresh,  0.0);
+
                   // Apply the current mask to the fractional coverage
                   // and thresholded fields
-                  apply_mask(fcst_dp_smooth, obs_dp_smooth,
-                             fcst_dp_thresh, obs_dp_thresh,
-                             conf_info.mask_dp[m],
-                             f_na, o_na, fthr_na, othr_na);
+                  apply_mask(fcst_dp_smooth, mask_dp, f_na);
+                  apply_mask(fcst_dp_thresh, mask_dp, fthr_na);
+                  apply_mask(obs_dp_smooth,  mask_dp, o_na);
+                  apply_mask(obs_dp_thresh,  mask_dp, othr_na);
 
                   mlog << Debug(2) << "Processing "
                        << conf_info.fcst_info[i]->magic_str()
@@ -1088,7 +1205,7 @@ void process_scores() {
                                fthr_na, othr_na);
 
                      // Write out NBRCNT
-                     if(nbrcnt_info.cnt_info.n > 0 &&
+                     if(nbrcnt_info.sl1l2_info.scount > 0 &&
                         conf_info.output_flag[i_nbrcnt]) {
 
                         write_nbrcnt_row(shc, nbrcnt_info,
@@ -1108,6 +1225,7 @@ void process_scores() {
    // Deallocate memory
    if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    0; }
    if(cnt_info)    { delete [] cnt_info;    cnt_info    = (CNTInfo *)    0; }
+   if(sl1l2_info)  { delete [] sl1l2_info;  sl1l2_info  = (SL1L2Info *)  0; }
    if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  0; }
    if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) 0; }
    if(pct_info)    { delete [] pct_info;    pct_info    = (PCTInfo *)    0; }
@@ -1286,103 +1404,71 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
+void do_sl1l2(SL1L2Info *&s_info, int i_vx,
+              const NumArray &f_na, const NumArray &o_na,
+              const NumArray &c_na) {
+   int i;
+
+   mlog << Debug(2)
+        << "Computing Scalar Partial Sums.\n";
+
+   //
+   // Process each filtering threshold
+   //
+   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) { 
+
+      //
+      // Store thresholds
+      //
+      s_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
+      s_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
+      s_info[i].logic   = conf_info.cnt_logic[i_vx];
+
+      //
+      // Compute partial sums
+      //
+      s_info[i].set(f_na, o_na, c_na);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
-              const NumArray &vf_na, const NumArray &vo_na,
-              const NumArray &uf_na, const NumArray &uo_na) {
-   int i, j, n_wind;
-   double uf, vf, uo, vo, fwind, owind;
+              const NumArray &uf_na, const NumArray &vf_na,
+              const NumArray &uo_na, const NumArray &vo_na,
+              const NumArray &uc_na, const NumArray &vc_na) {
+   int i;
 
    // Check that the number of pairs are the same
-   if(vf_na.n_elements() != vo_na.n_elements() ||
-      uf_na.n_elements() != uo_na.n_elements() ||
-      vf_na.n_elements() != uf_na.n_elements()) {
-
+   if(uf_na.n_elements() != uo_na.n_elements() ||
+      uf_na.n_elements() != vf_na.n_elements() ||
+      vf_na.n_elements() != vo_na.n_elements()) {
       mlog << Error << "\ndo_vl1l2() -> "
-           << "the number of UGRD pairs != the number of VGRD pairs: "
-           << vf_na.n_elements() << " != " << uf_na.n_elements()
-           << "\n\n";
+           << "unequal number of UGRD and VGRD pairs ("
+           << uf_na.n_elements() << " != " << uo_na.n_elements()
+           << ")\n\n";
       exit(1);
    }
 
-   // Initialize all of the VL1L2Info objects
-   n_wind = conf_info.fwind_ta[i_vx].n_elements();
-   for(i=0; i<n_wind; i++) {
+   // Set all of the VL1L2Info objects
+   for(i=0; i<conf_info.fwind_ta[i_vx].n_elements(); i++) {
+
+      //
+      // Store thresholds
+      //
       v_info[i].zero_out();
       v_info[i].fthresh = conf_info.fwind_ta[i_vx][i];
       v_info[i].othresh = conf_info.owind_ta[i_vx][i];
       v_info[i].logic   = conf_info.wind_logic[i_vx];
-   }
 
-   // Loop through the pair data and compute sums
-   for(i=0; i<vf_na.n_elements(); i++) {
+      //
+      // Compute partial sums
+      //
+      v_info[i].set(uf_na, vf_na, uo_na, vo_na, uc_na, vc_na);
 
-      // Retrieve the U,V values
-      uf = uf_na[i];
-      vf = vf_na[i];
-      uo = uo_na[i];
-      vo = vo_na[i];
-
-      // Compute wind speeds
-      fwind = convert_u_v_to_wind(uf, vf);
-      owind = convert_u_v_to_wind(uo, vo);
-
-      // Skip bad data values in the forecast or observation fields
-      if(is_bad_data(uf)    || is_bad_data(vf) ||
-         is_bad_data(uo)    || is_bad_data(vo) ||
-         is_bad_data(fwind) || is_bad_data(owind)) continue;
-
-      // Loop through each of wind speed thresholds to be used
-      for(j=0; j<n_wind; j++) {
-
-         // Apply wind speed thresholds
-         if(!check_fo_thresh(fwind, v_info[j].fthresh,
-                             owind, v_info[j].othresh,
-                             conf_info.wind_logic[i_vx])) continue;
-
-         // Add this pair to the VL1L2 counts
-
-         // VL1L2 sums
-         v_info[j].vcount  += 1;
-         v_info[j].ufbar   += uf;
-         v_info[j].vfbar   += vf;
-         v_info[j].uobar   += uo;
-         v_info[j].vobar   += vo;
-         v_info[j].uvfobar += uf*uo+vf*vo;
-         v_info[j].uvffbar += uf*uf+vf*vf;
-         v_info[j].uvoobar += uo*uo+vo*vo;
-      } // end for j
-   } // end for i
-
-   // Compute means for the VL1L2Info objects
-   for(i=0; i<n_wind; i++) {
-
-      mlog << Debug(2) << "Computing Vector Partial Sums, "
-           << "for forecast wind speed "
-           << v_info[i].fthresh.get_str()
-           << ", for observation wind speed "
-           << v_info[i].othresh.get_str()
-           << ", using " << v_info[i].vcount << " pairs.\n";
-
-      if(v_info[i].vcount == 0) {
-         // Set to bad data
-         v_info[i].ufbar   = bad_data_double;
-         v_info[i].vfbar   = bad_data_double;
-         v_info[i].uobar   = bad_data_double;
-         v_info[i].vobar   = bad_data_double;
-         v_info[i].uvfobar = bad_data_double;
-         v_info[i].uvffbar = bad_data_double;
-         v_info[i].uvoobar = bad_data_double;
-      }
-      else {
-         // Compute the mean VL1L2 values
-         v_info[i].ufbar   /= v_info[i].vcount;
-         v_info[i].vfbar   /= v_info[i].vcount;
-         v_info[i].uobar   /= v_info[i].vcount;
-         v_info[i].vobar   /= v_info[i].vcount;
-         v_info[i].uvfobar /= v_info[i].vcount;
-         v_info[i].uvffbar /= v_info[i].vcount;
-         v_info[i].uvoobar /= v_info[i].vcount;
-      }
    } // end for i
 
    return;
@@ -1509,7 +1595,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
    nbrcnt_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {
-      nbrcnt_info.cnt_info.alpha[i] = conf_info.ci_alpha[i];
+      nbrcnt_info.alpha[i] = conf_info.ci_alpha[i];
    }
 
    //
