@@ -71,7 +71,7 @@ cline.add(set_logfile,   "-log",     1);
 
 cline.parse();
 
-cout << "\n\n  Verbosity = " << mlog.verbosity_level() << "\n\n";
+cout << "\n  Verbosity = " << mlog.verbosity_level() << "\n";
 
 if ( cline.n() != 0 )  usage();   //  should only be config file left on command line
 
@@ -88,7 +88,7 @@ ConcatString path;
 
 default_config_filename = replace_path(default_config_path);
 
-cout << "\n\n  Default config file = \"" << default_config_filename << "\"\n\n" << flush;
+// cout << "Default config file = \"" << default_config_filename << "\"\n" << flush;
 
 
 config.read_config(default_config_filename, local_config_filename);
@@ -139,12 +139,12 @@ cout << "\n   obs conv radius = " << (config.obs_conv_radius) << "\n";
  obs_conv =  obs_raw.convolve(config.obs_conv_radius);
 fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
 
-cout << "\n\n  fcst_conv (0, 0, 0) = " << fcst_conv(0, 0, 0) << "\n\n";
+cout << "\n\n  obs_conv (134, 7, 0) = " << obs_conv(134, 7, 0) << "\n\n";
 
-fcst_conv.write("fcst_conv.nc");
  obs_conv.write("obs_conv.nc");
+fcst_conv.write("fcst_conv.nc");
 
-exit ( 1 );
+// exit ( 1 );
 
 fcst_mask = fcst_conv.threshold(config.fcst_conv_thresh);
  obs_mask =  obs_conv.threshold(config.obs_conv_thresh);
