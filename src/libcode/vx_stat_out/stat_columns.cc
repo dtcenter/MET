@@ -697,45 +697,6 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_sl1l2_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
-                     bool txt_flag,
-                     AsciiTable &stat_at, int &stat_row,
-                     AsciiTable &txt_at, int &txt_row) {
-
-   // SL1L2 line type
-   shc.set_line_type(stat_sl1l2_str);
-
-   // Thresholds
-   shc.set_fcst_thresh(cnt_info.fthresh);
-   shc.set_obs_thresh(cnt_info.othresh);
-   shc.set_thresh_logic(cnt_info.logic);
-
-   // Not Applicable
-   shc.set_cov_thresh(na_str);
-   shc.set_alpha(bad_data_double);
-
-   // Write the header columns
-   write_header_cols(shc, stat_at, stat_row);
-
-   // Write the data columns
-   write_sl1l2_cols(cnt_info, stat_at, stat_row, n_header_columns);
-
-   // If requested, copy row to the text file
-   if(txt_flag) {
-      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
-
-      // Increment the text row counter
-      txt_row++;
-   }
-
-   // Increment the STAT row counter
-   stat_row++;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
                      bool txt_flag,
                      AsciiTable &stat_at, int &stat_row,
@@ -1164,10 +1125,10 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
-   for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++) {
+   for(i=0; i<nbrcnt_info.n_alpha; i++) {
 
       // Alpha value
-      shc.set_alpha(nbrcnt_info.cnt_info.alpha[i]);
+      shc.set_alpha(nbrcnt_info.alpha[i]);
 
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
@@ -2123,42 +2084,6 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_sl1l2_cols(const CNTInfo &cnt_info,
-                      AsciiTable &at, int r, int c) {
-
-   //
-   // Scalar L1L2 Line Type (SL1L2)
-   // Dump out the SL1L2 line:
-   //    TOTAL,       FBAR,        OBAR,
-   //    FOBAR,       FFBAR,       OOBAR,
-   //    MAE 
-   //
-   at.set_entry(r, c+0,  // Total Count
-      cnt_info.n);
-
-   at.set_entry(r, c+1,  // FBAR
-      cnt_info.fbar.v);
-
-   at.set_entry(r, c+2,  // OBAR
-      cnt_info.obar.v);
-
-   at.set_entry(r, c+3,  // FOBAR
-      cnt_info.fobar);
-
-   at.set_entry(r, c+4,  // FFBAR
-      cnt_info.ffbar);
-
-   at.set_entry(r, c+5,  // OOBAR
-      cnt_info.oobar);
-
-   at.set_entry(r, c+6,  // MAE
-      cnt_info.mae.v);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_mctc_cols(const MCTSInfo &mcts_info,
                      AsciiTable &at, int r, int c) {
    int i, j, col;
@@ -2672,7 +2597,7 @@ void write_nbrcnt_cols(const NBRCNTInfo &nbrcnt_info, int i,
    //    O_RATE,      O_RATE_BCL,  O_RATE_BCU
    //
    at.set_entry(r, c+0,  // Total Count
-      nbrcnt_info.cnt_info.n);
+      nbrcnt_info.sl1l2_info.scount);
 
    at.set_entry(r, c+1,  // Fractions Brier Score
       nbrcnt_info.fbs.v);
