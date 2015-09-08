@@ -177,8 +177,6 @@ class CNTInfo {
 
       int n_ranks, frank_ties, orank_ties;
 
-      double fobar, ffbar, oobar;
-
       void clear();
       void allocate_n_alpha(int);
       void compute_ci();
@@ -224,6 +222,10 @@ class SL1L2Info {
       // Mean absolute error
       double mae;
 
+      // Compute sums
+      void set(const NumArray &f_na, const NumArray &o_na,
+               const NumArray &c_na);
+
       void zero_out();
       void clear();
 };
@@ -264,6 +266,11 @@ class VL1L2Info {
       double uvfoabar;
       double uvffabar, uvooabar;
       int    vacount;
+
+      // Compute sums
+      void set(const NumArray &uf_na, const NumArray &vf_na,
+               const NumArray &uo_na, const NumArray &vo_na,
+               const NumArray &uc_na, const NumArray &vc_na);
 
       void zero_out();
       void clear();
@@ -329,12 +336,16 @@ class NBRCNTInfo {
       // Neighborhood width used
       int nbr_wdth;
 
-      // CNTInfo object
-      CNTInfo cnt_info;
+      // SL1L2 object
+      SL1L2Info sl1l2_info;
 
       // Raw threshold applied to define the fractional coverage
       SingleThresh fthresh;
       SingleThresh othresh;
+
+      // Confidence interval alpha values
+      int     n_alpha;
+      double *alpha;
 
       // Fractions Brier Score,
       // Fractions Skill Score, 

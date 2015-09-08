@@ -662,8 +662,6 @@ void CNTInfo::clear() {
 
    n_ranks = frank_ties = orank_ties = 0;
 
-   fobar = ffbar = oobar = bad_data_double;
-
    return;
 }
 
@@ -706,9 +704,6 @@ void CNTInfo::assign(const CNTInfo &c) {
    n_ranks     = c.n_ranks;
    frank_ties  = c.frank_ties;
    orank_ties  = c.orank_ties;
-   fobar       = c.fobar;
-   ffbar       = c.ffbar;
-   oobar       = c.oobar;
 
    return;
 }
@@ -1041,12 +1036,116 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
-   double den, f, o, v;
+void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
+                    const NumArray &c_na) {
+   int i;
+   double f, o, c;
+   double f_sum, o_sum, fo_sum, ff_sum, oo_sum;
+   double fa_sum, oa_sum, foa_sum, ffa_sum, ooa_sum;
+   double abs_err_sum;
+   NumArray ff_na, oo_na, cc_na;
 
-   // Handle the count
-   if(!aflag) cnt_info.n = s.scount;
-   else       cnt_info.n = s.sacount;
+   // Initialize
+   zero_out();
+
+   // Apply filtering thresholds to subset the matched pairs
+   subset_fo_na(f_na, fthresh, o_na, othresh, logic, ff_na, oo_na);
+   
+   mlog << Debug(3)
+        << "Found " << f_na.n_elements()
+        << " pairs for forecast filtering threshold "
+        << fthresh.get_str()
+        << ", observation filtering threshold "
+        << othresh.get_str() << ", and field logic "
+        << setlogic_to_string(logic)
+        << ".\n";
+
+   // Check for no matched pairs to process
+   if(f_na.n_elements() == 0) return;
+
+   // Check for mismatch
+   if(f_na.n_elements() != o_na.n_elements()) {
+      mlog << Error << "\nSL1L2Info::set() -> "
+           << "forecast and observation count mismatch ("
+           << f_na.n_elements() << " != " << o_na.n_elements()
+           << ")\n\n";
+      exit(1);
+   }
+
+   // Initialize the counts and sums
+   f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
+   fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0.0;
+   abs_err_sum = 0.0;
+
+   // Loop through the pair data and compute sums
+   for(i=0; i<f_na.n_elements(); i++) {
+
+      f = f_na[i];
+      o = o_na[i];
+      c = (c_na.n_elements() == f_na.n_elements() ? c_na[i] : bad_data_double);
+
+      // Skip bad data values in the forecast or observation fields
+      if(is_bad_data(f) || is_bad_data(o)) continue;
+
+      // SL1L2 sums
+      f_sum       += f;
+      o_sum       += o;
+      fo_sum      += f*o;
+      ff_sum      += f*f;
+      oo_sum      += o*o;
+      abs_err_sum += fabs(f-o);
+      scount++;
+
+      // SAL1L2 sums
+      if(!is_bad_data(c)) {
+
+         fa_sum  += f-c;
+         oa_sum  += o-c;
+         foa_sum += (f-c)*(o-c);
+         ffa_sum += (f-c)*(f-c);
+         ooa_sum += (o-c)*(o-c);
+         sacount++;
+      }
+   }
+
+   if(scount == 0) {
+      mlog << Error << "\nSL1L2Info::set() -> "
+           << "count is zero!\n\n";
+      exit(1);
+   }
+
+   // Compute the mean SL1L2 values
+   fbar  = f_sum/scount;
+   obar  = o_sum/scount;
+   fobar = fo_sum/scount;
+   ffbar = ff_sum/scount;
+   oobar = oo_sum/scount;
+   mae   = abs_err_sum/scount;
+
+   // Compute the mean SAL1L2 values
+   if(sacount > 0) {
+      fabar  = fa_sum/sacount;
+      oabar  = oa_sum/sacount;
+      foabar = foa_sum/sacount;
+      ffabar = ffa_sum/sacount;
+      ooabar = ooa_sum/sacount;
+   }
+   else {
+      fabar  = bad_data_double;
+      oabar  = bad_data_double;
+      foabar = bad_data_double;
+      ffabar = bad_data_double;
+      ooabar = bad_data_double;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
+   double fbar, obar, ffbar, fobar, oobar, v, den;
+   int n;
 
    // Set the quantities that can't be derived from SL1L2Info to bad data
    cnt_info.sp_corr.set_bad_data();
@@ -1062,90 +1161,62 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    cnt_info.frank_ties = 0;
    cnt_info.orank_ties = 0;
 
-   // Compute forecast mean
-   if(!aflag) cnt_info.fbar.v = s.fbar;
-   else       cnt_info.fbar.v = s.fabar;
+   // Get partial sums
+   n     = (aflag ? s.sacount : s.scount);
+   fbar  = (aflag ? s.fabar   : s.fbar);
+   obar  = (aflag ? s.oabar   : s.obar);
+   fobar = (aflag ? s.foabar  : s.fobar);
+   ffbar = (aflag ? s.ffabar  : s.ffbar);
+   oobar = (aflag ? s.ooabar  : s.oobar);
+   
+   // Number of matched pairs
+   cnt_info.n = n;
+   
+   // Forecast mean and standard deviation
+   cnt_info.fbar.v   = fbar;
+   cnt_info.fstdev.v = compute_stdev(fbar*n, ffbar*n, n);
 
-   // Compute forecast standard deviation
-   if(!aflag) cnt_info.fstdev.v = compute_stdev(s.fbar*s.scount,
-                                                s.ffbar*s.scount,
-                                                s.scount);
-   else       cnt_info.fstdev.v = compute_stdev(s.fabar*s.sacount,
-                                                s.ffabar*s.sacount,
-                                                s.sacount);
+   // Observation mean and standard deviation
+   cnt_info.obar.v   = obar;
+   cnt_info.ostdev.v = compute_stdev(obar*n, oobar*n, n);   
 
-   // Compute observation mean
-   if(!aflag) cnt_info.obar.v = s.obar;
-   else       cnt_info.obar.v = s.oabar;
+   // Multiplicative bias
+   cnt_info.mbias.v = (is_eq(obar, 0.0) ? bad_data_double : fbar/obar);
 
-   // Compute observation standard deviation
-   if(!aflag) cnt_info.ostdev.v = compute_stdev(s.obar*s.scount,
-                                                s.oobar*s.scount,
-                                                s.scount);
-   else       cnt_info.ostdev.v = compute_stdev(s.oabar*s.sacount,
-                                                s.ooabar*s.sacount,
-                                                s.sacount);
-
-   // Compute f*o mean
-   if(!aflag) cnt_info.fobar = s.fobar;
-   else       cnt_info.fobar = s.foabar;
-
-   // Compute forecast squared mean
-   if(!aflag) cnt_info.ffbar = s.ffbar;
-   else       cnt_info.ffbar = s.ffabar;
-
-   // Compute observation squared mean
-   if(!aflag) cnt_info.oobar = s.oobar;
-   else       cnt_info.oobar = s.ooabar;
-
-   // Compute multiplicative bias
-   if(is_eq(cnt_info.obar.v, 0.0)) cnt_info.mbias.v = bad_data_double;
-   else                            cnt_info.mbias.v = cnt_info.fbar.v/cnt_info.obar.v;
-
-   // Compute correlation coefficient
-   v =  (cnt_info.n*cnt_info.ffbar*cnt_info.n
-       - cnt_info.fbar.v*cnt_info.n*cnt_info.fbar.v*cnt_info.n)
-        *
-        (cnt_info.n*cnt_info.oobar*cnt_info.n
-       - cnt_info.obar.v*cnt_info.n*cnt_info.obar.v*cnt_info.n);
+   // Correlation coefficient
+   v = (ffbar*n*n - fbar*fbar*n*n) * (oobar*n*n - obar*obar*n*n);
 
    if(v < 0 || is_eq(v, 0.0)) {
       cnt_info.pr_corr.v = bad_data_double;
    }
    else {
       den = sqrt(v);
-      cnt_info.pr_corr.v = (  (cnt_info.n*cnt_info.fobar*cnt_info.n)
-                            - (cnt_info.fbar.v*cnt_info.n*cnt_info.obar.v*cnt_info.n))
-                           /den;
+      cnt_info.pr_corr.v = ((fobar*n*n) - (fbar*obar*n*n)) / den;
    }
 
    // Check that the correlation is not bigger than 1
    if(cnt_info.pr_corr.v > 1) cnt_info.pr_corr.v = bad_data_double;
 
    // Compute mean error
-   cnt_info.me.v = cnt_info.fbar.v - cnt_info.obar.v;
+   cnt_info.me.v = fbar - obar;
 
    // Compute mean absolute error
    cnt_info.mae.v = s.mae;
 
    // Compute mean squared error
-   cnt_info.mse.v = cnt_info.ffbar + cnt_info.oobar - 2.0*cnt_info.fobar;
+   cnt_info.mse.v = ffbar + oobar - 2.0*fobar;
 
    // Compute standard deviation of the mean error
-   cnt_info.estdev.v = compute_stdev(cnt_info.me.v*cnt_info.n,
-                                     cnt_info.mse.v*cnt_info.n, cnt_info.n);
+   cnt_info.estdev.v = compute_stdev(cnt_info.me.v*n,
+                                     cnt_info.mse.v*n, n);
 
    // Compute bias corrected mean squared error (decomposition of MSE)
-   f = cnt_info.fbar.v;
-   o = cnt_info.obar.v;
-   cnt_info.bcmse.v = cnt_info.mse.v - (f-o)*(f-o);
+   cnt_info.bcmse.v = cnt_info.mse.v - (fbar - obar)*(fbar - obar);
 
    // Compute root mean squared error
    cnt_info.rmse.v = sqrt(cnt_info.mse.v);
 
-   //
    // Compute normal confidence intervals
-   //
    cnt_info.compute_ci();
 
    return;
@@ -1294,6 +1365,135 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void VL1L2Info::set(const NumArray &uf_na, const NumArray &vf_na,
+                    const NumArray &uo_na, const NumArray &vo_na,
+                    const NumArray &uc_na, const NumArray &vc_na) {
+   int i;
+   double uf, vf, uo, vo, uc, vc, fwind, owind;
+   bool climo_flag;
+
+   // Initialize
+   zero_out();
+
+   // Check that the number of pairs are the same
+   if(uf_na.n_elements() != uo_na.n_elements() ||
+      uf_na.n_elements() != vf_na.n_elements() ||
+      vf_na.n_elements() != vo_na.n_elements()) {
+      mlog << Error << "\nVL1L2Info::set() -> "
+           << "unequal number of UGRD and VGRD pairs ("
+           << uf_na.n_elements() << " != " << uo_na.n_elements()
+           << ")\n\n";
+      exit(1);
+   }
+
+   // Check for climatology values
+   climo_flag = (uc_na.n_elements() == uf_na.n_elements() &&
+                 vc_na.n_elements() == vf_na.n_elements());
+
+   // Loop through the pair data and compute sums
+   for(i=0; i<uf_na.n_elements(); i++) {
+
+      // Retrieve the U,V values
+      uf = uf_na[i];
+      vf = vf_na[i];
+      uo = uo_na[i];
+      vo = vo_na[i];
+      uc = (climo_flag ? uc_na[i] : bad_data_double);
+      vc = (climo_flag ? vc_na[i] : bad_data_double);
+
+      // Compute wind speeds
+      fwind = convert_u_v_to_wind(uf, vf);
+      owind = convert_u_v_to_wind(uo, vo);
+
+      // Skip bad data values in the forecast or observation fields
+      if(is_bad_data(uf)    || is_bad_data(vf) ||
+         is_bad_data(uo)    || is_bad_data(vo) ||
+         is_bad_data(fwind) || is_bad_data(owind)) continue;
+
+      // Apply wind speed thresholds
+      if(!check_fo_thresh(fwind, fthresh, owind, othresh,
+                          logic)) continue;
+
+      // Add this pair to the VL1L2 and VAL1L2 counts
+
+      // VL1L2 sums
+      vcount  += 1;
+      ufbar   += uf;
+      vfbar   += vf;
+      uobar   += uo;
+      vobar   += vo;
+      uvfobar += uf*uo+vf*vo;
+      uvffbar += uf*uf+vf*vf;
+      uvoobar += uo*uo+vo*vo;
+
+      // VAL1L2 sums
+      if(!is_bad_data(uc) && !is_bad_data(vc)) {
+         vacount  += 1;
+         ufabar   += uf-uc;
+         vfabar   += vf-vc;
+         uoabar   += uo-uc;
+         voabar   += vo-vc;
+         uvfoabar += (uf-uc)*(uo-uc)+(vf-vc)*(vo-vc);
+         uvffabar += (uf-uc)*(uf-uc)+(vf-vc)*(vf-vc);
+         uvooabar += (uo-uc)*(uo-uc)+(vo-vc)*(vo-vc);
+      }
+   } // end for i
+
+   // Compute means
+   mlog << Debug(3)
+        << "Found " << vcount
+        << " vector pairs for forecast wind speed threshold "
+        << fthresh.get_str() << ", observation wind speed threshold "
+        << othresh.get_str() << ", and field logic "
+        << setlogic_to_string(logic) << ".\n";
+
+   if(vcount == 0) {
+      // Set to bad data
+      ufbar   = bad_data_double;
+      vfbar   = bad_data_double;
+      uobar   = bad_data_double;
+      vobar   = bad_data_double;
+      uvfobar = bad_data_double;
+      uvffbar = bad_data_double;
+      uvoobar = bad_data_double;
+   }
+   else {
+      // Compute the mean VL1L2 values
+      ufbar   /= vcount;
+      vfbar   /= vcount;
+      uobar   /= vcount;
+      vobar   /= vcount;
+      uvfobar /= vcount;
+      uvffbar /= vcount;
+      uvoobar /= vcount;
+   }
+
+   if(vacount == 0) {
+      // Set to bad data
+      ufabar   = bad_data_double;
+      vfabar   = bad_data_double;
+      uoabar   = bad_data_double;
+      voabar   = bad_data_double;
+      uvfoabar = bad_data_double;
+      uvffabar = bad_data_double;
+      uvooabar = bad_data_double;
+   }
+   else {
+      // Compute the mean VAL1L2 values
+      ufabar   /= vacount;
+      vfabar   /= vacount;
+      uoabar   /= vacount;
+      voabar   /= vacount;
+      uvfoabar /= vacount;
+      uvffabar /= vacount;
+      uvooabar /= vacount;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class NBRCTSInfo
 //
@@ -1418,20 +1618,20 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
    NBRCNTInfo n_info;
    double den;
 
-   n_info.cnt_info.n = cnt_info.n + c.cnt_info.n;
+   n_info.sl1l2_info.scount = sl1l2_info.scount + c.sl1l2_info.scount;
 
-   if(n_info.cnt_info.n) {
+   if(n_info.sl1l2_info.scount) {
       
       //
       // Aggregate FBS as a weighted average
       //
-      if(is_bad_data(cnt_info.n*fbs.v) ||
-         is_bad_data(c.cnt_info.n*c.fbs.v)) {
+      if(is_bad_data(sl1l2_info.scount*fbs.v) ||
+         is_bad_data(c.sl1l2_info.scount*c.fbs.v)) {
          n_info.fbs.v = bad_data_double;
       }
       else {
-         n_info.fbs.v = (cnt_info.n*fbs.v + c.cnt_info.n*c.fbs.v) /
-                         n_info.cnt_info.n;
+         n_info.fbs.v = (sl1l2_info.scount*fbs.v + c.sl1l2_info.scount*c.fbs.v) /
+                         n_info.sl1l2_info.scount;
       }
 
       //
@@ -1444,9 +1644,9 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
          den = bad_data_double;
       }
       else {
-         den = (  cnt_info.n *  fbs.v / (1.0 - fss.v  ) +
-                c.cnt_info.n *c.fbs.v / (1.0 - c.fss.v)) /
-                n_info.cnt_info.n;
+         den = (  sl1l2_info.scount *  fbs.v / (1.0 - fss.v  ) +
+                c.sl1l2_info.scount *c.fbs.v / (1.0 - c.fss.v)) /
+                n_info.sl1l2_info.scount;
       }
 
       //
@@ -1462,10 +1662,10 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
       //
       // Aggregate F_RATE and O_RATE as weighted averages
       //
-      n_info.f_rate.v = (cnt_info.n*f_rate.v + c.cnt_info.n*c.f_rate.v) /
-                         n_info.cnt_info.n;
-      n_info.o_rate.v = (cnt_info.n*o_rate.v + c.cnt_info.n*c.o_rate.v) /
-                         n_info.cnt_info.n;
+      n_info.f_rate.v = (sl1l2_info.scount*f_rate.v + c.sl1l2_info.scount*c.f_rate.v) /
+                         n_info.sl1l2_info.scount;
+      n_info.o_rate.v = (sl1l2_info.scount*o_rate.v + c.sl1l2_info.scount*c.o_rate.v) /
+                         n_info.sl1l2_info.scount;
       
       //
       // Recompute AFSS and UFSS using the aggregated rates
@@ -1492,6 +1692,9 @@ void NBRCNTInfo::init_from_scratch() {
 
 void NBRCNTInfo::clear() {
 
+   n_alpha = 0;
+   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+
    fthresh.clear();
    othresh.clear();
 
@@ -1501,7 +1704,7 @@ void NBRCNTInfo::clear() {
    ufss.clear();
    f_rate.clear();
    o_rate.clear();
-   cnt_info.clear();
+   sl1l2_info.clear();
    nbr_wdth = bad_data_int;
 
    return;
@@ -1513,16 +1716,16 @@ void NBRCNTInfo::assign(const NBRCNTInfo &c) {
 
    clear();
 
-   fthresh  = c.fthresh;
-   othresh  = c.othresh;
-   fbs      = c.fbs;
-   fss      = c.fss;
-   afss     = c.afss;
-   ufss     = c.ufss;
-   f_rate   = c.f_rate;
-   o_rate   = c.o_rate;
-   cnt_info = c.cnt_info;
-   nbr_wdth = c.nbr_wdth;
+   fthresh    = c.fthresh;
+   othresh    = c.othresh;
+   fbs        = c.fbs;
+   fss        = c.fss;
+   afss       = c.afss;
+   ufss       = c.ufss;
+   f_rate     = c.f_rate;
+   o_rate     = c.o_rate;
+   sl1l2_info = c.sl1l2_info;
+   nbr_wdth   = c.nbr_wdth;
 
    return;
 }
@@ -1531,14 +1734,25 @@ void NBRCNTInfo::assign(const NBRCNTInfo &c) {
 
 void NBRCNTInfo::allocate_n_alpha(int i) {
 
-   cnt_info.allocate_n_alpha(i);
+   n_alpha = i;
 
-   fbs.allocate_n_alpha(i);
-   fss.allocate_n_alpha(i);
-   afss.allocate_n_alpha(i);
-   ufss.allocate_n_alpha(i);
-   f_rate.allocate_n_alpha(i);
-   o_rate.allocate_n_alpha(i);
+   if(n_alpha > 0) {
+
+      alpha = new double [n_alpha];
+
+      if(!alpha) {
+         mlog << Error << "\nNBRCNTInfo::allocate_n_alpha() -> "
+              << "Memory allocation error!\n\n";
+        exit(1);
+      }
+
+      fbs.allocate_n_alpha(i);
+      fss.allocate_n_alpha(i);
+      afss.allocate_n_alpha(i);
+      ufss.allocate_n_alpha(i);
+      f_rate.allocate_n_alpha(i);
+      o_rate.allocate_n_alpha(i);
+   }
 
    return;
 }
@@ -1552,8 +1766,8 @@ void NBRCNTInfo::compute_stats() {
    //
    // Compute FBS
    //
-   n   = cnt_info.n;
-   num = cnt_info.ffbar*n + cnt_info.oobar*n - 2.0*cnt_info.fobar*n;
+   n   = sl1l2_info.scount;
+   num = sl1l2_info.ffbar*n + sl1l2_info.oobar*n - 2.0*sl1l2_info.fobar*n;
 
    if(n == 0) fbs.v = bad_data_double;
    else       fbs.v = (double) num/n;
@@ -1562,7 +1776,7 @@ void NBRCNTInfo::compute_stats() {
    // Compute FSS
    //
    num = fbs.v;
-   den = cnt_info.ffbar + cnt_info.oobar;
+   den = sl1l2_info.ffbar + sl1l2_info.oobar;
 
    if(is_eq(den, 0.0)) fss.v = bad_data_double;
    else                fss.v = 1.0 - (num/den);
@@ -2396,13 +2610,6 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    cnt_info.ostdev.v = compute_stdev(o_sum, oo_sum, n);
 
    //
-   // Compute f*o, f*f, and o*o means
-   //
-   cnt_info.fobar = fo_sum/n;
-   cnt_info.ffbar = ff_sum/n;
-   cnt_info.oobar = oo_sum/n;
-
-   //
    // If the cnt_flag is not set return after computing the partial sums
    //
    if(!cnt_flag) return;
@@ -3022,14 +3229,14 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Store the sample size
    //
-   nbrcnt_info.cnt_info.n = n;
+   nbrcnt_info.sl1l2_info.scount = n;
 
    //
    // Compute the f*o, f*f, and o*o means
    //
-   nbrcnt_info.cnt_info.fobar = fo_sum/n;
-   nbrcnt_info.cnt_info.ffbar = ff_sum/n;
-   nbrcnt_info.cnt_info.oobar = oo_sum/n;
+   nbrcnt_info.sl1l2_info.fobar = fo_sum/n;
+   nbrcnt_info.sl1l2_info.ffbar = ff_sum/n;
+   nbrcnt_info.sl1l2_info.oobar = oo_sum/n;
 
    //
    // Compute f_rate and o_rate
