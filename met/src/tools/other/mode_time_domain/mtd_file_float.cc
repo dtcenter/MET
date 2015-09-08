@@ -298,7 +298,7 @@ for (x=0; x<Nx; ++x)  {
 
       if ( value == bad_data_double )  ++count;
 
-      mtd_three_to_one(Nx, Ny, Nt, x, y, t);
+      n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
 
       Data[n] = (float) value;
 
@@ -306,7 +306,7 @@ for (x=0; x<Nx; ++x)  {
 
 }
 
-cout << "\n\n  Bad data count is " << count << "\n\n";
+cout << "   Bad data count is " << count << "\n";
 
    //
    //  done
