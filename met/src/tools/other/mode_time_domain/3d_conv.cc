@@ -5,6 +5,8 @@
 
 static const bool verbose = true;
 
+static const bool do_ppms = false;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,6 +116,7 @@ static void calc_sum_plane(const int nx, const int ny,
 static void load_handle(DataHandle &, const MtdFloatFile & in, const int t);
 
 static void data_handle_ppm(const double * data_plane, const int nx, const int ny, const char * filename);
+static void   ok_handle_ppm(const bool * ok_plane, const int nx, const int ny, const char * filename);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -127,6 +130,8 @@ int j, n;
 int x, y, t;
 double value;
 bool ok = false;
+bool t_last  = false;
+bool t_first = false;
 MtdFloatFile out;
 double min_conv_value, max_conv_value;
 double * conv_data = (double *) 0;
@@ -184,6 +189,9 @@ time_start = time(0);
 
 for (t=0; t<Nt; ++t)  {
 
+   t_first = (t == 0);
+   t_last  = (t == (Nt - 1));
+
    n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
    p = conv_data + n;
@@ -199,6 +207,20 @@ for (t=0; t<Nt; ++t)  {
    ok_above = handle.ok_sum_plane_above;
 
    // if ( t == 0 )  data_handle_ppm(handle.sum_plane_this, handle.nx, handle.ny, "sum_00.ppm");
+
+      // 
+      //   the order of loops is important, here
+      // 
+
+/*
+   for (y=0; y<Ny; ++y)  {
+
+      for (x=0; x<Nx; ++x)  {
+
+      }   //  for x
+
+   }   //  for y
+*/
 
    for (j=0; j<Nxy; ++j)  {
 
@@ -350,7 +372,7 @@ for (j=0; j<nxy; ++j)  {
 
    data_plane_below[j] = 0.0;
 
-     ok_plane_below[j] = true;
+     ok_plane_below[j] = false;
 
 }
 
@@ -427,7 +449,7 @@ void calc_sum_plane(const int nx, const int ny,
 
 int j, x, y, n;
 int bad_count;
-// static int t_count = 0;
+static int t_count = 0;
 char junk[256];
 double value, value_front, value_back;
 bool      ok, ok_front, ok_back;
@@ -547,6 +569,18 @@ for (y=0; y<ny; ++y)  {
 // memcpy(   sum_plane,    sum_plane_buf, nxy*sizeof(double));
 // memcpy(ok_sum_plane, ok_sum_plane_buf, nxy*sizeof(bool));
 
+if ( do_ppms )  {
+
+   sprintf(junk, "sum_a_%02d.ppm", t_count);
+
+   data_handle_ppm(data_out_p, nx, ny, junk);
+
+   sprintf(junk, "ok_a_%02d.ppm", t_count);
+
+   ok_handle_ppm(ok_out_p, nx, ny, junk);
+
+}
+
    //
    //  calculate sums in y-direction for each x
    //
@@ -622,11 +656,23 @@ for (x=0; x<nx; ++x)  {
 
 }   //  for x
 
+if ( do_ppms )  {
+
+   sprintf(junk, "sum_b_%02d.ppm", t_count);
+
+   data_handle_ppm(data_out_p, nx, ny, junk);
+
+   sprintf(junk, "ok_b_%02d.ppm", t_count);
+
+   ok_handle_ppm(ok_out_p, nx, ny, junk);
+
+}
+
    //
    //  done
    //
 
-// ++t_count;
+++t_count;
 
 return;
 
@@ -658,6 +704,8 @@ if ( first )  {
 
    calc_sum_plane(in.nx(), in.ny(), handle.data_plane_above, handle.ok_plane_above, 
                                     handle.sum_plane_above,  handle.ok_sum_plane_above);
+
+   for (j=0; j<nxy; ++j)  handle.ok_plane_below[j] = handle.ok_sum_plane_below[j] = false;
 
    return;
 
@@ -772,6 +820,8 @@ for (x=0; x<nx; ++x)  {
 
 }
 
+cout << "writing image file \"" << filename << "\"\n";
+
 if ( ! image.write(filename) )  {
 
    cerr << "\n\n  unable to write image file \"" << filename << "\"\n\n";
@@ -783,6 +833,55 @@ if ( ! image.write(filename) )  {
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ok_handle_ppm(const bool * ok_plane, const int nx, const int ny, const char * filename)
+
+{
+
+int x, y, n;
+Ppm image;
+bool tf = false;
+Color c;
+const Color white (255, 255, 255);
+const Color black (  0,   0,   0);
+
+
+image.set_size_xy(nx, ny);
+
+for (x=0; x<nx; ++x)  {
+
+   for (y=0; y<ny; ++y)  {
+
+      n = y*nx + x;
+
+      tf = ok_plane[n];
+
+      if ( tf )  c = white;
+      else       c = black;
+
+      image.putxy(c, x, y);
+
+   }
+
+}
+
+cout << "writing image file \"" << filename << "\"\n";
+
+if ( ! image.write(filename) )  {
+
+   cerr << "\n\n  unable to write image file \"" << filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
 
 return;
 
