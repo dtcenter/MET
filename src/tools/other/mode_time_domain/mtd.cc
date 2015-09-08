@@ -113,25 +113,11 @@ InterestCalculator calc;
 mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
 mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
 
+fcst_raw.write("fcst_raw.nc");
+ obs_raw.write("obs_raw.nc");
+
 // exit ( 1 );
 
-/*
-if ( ! fcst_raw.read(fcst_filename) )  {
-
-   cerr << "\n\n  " << program_name << ": unable to read fcst file \"" << fcst_filename << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( ! obs_raw.read(obs_filename) )  {
-
-   cerr << "\n\n  " << program_name << ": unable to read obs file \"" << obs_filename << "\"\n\n";
-
-   exit ( 1 );
-
-}
-*/
 
 calc.add(config.space_centroid_dist_wt, config.space_centroid_dist_if, &PairAtt3D::SpaceCentroidDist);
 calc.add(config.time_centroid_delta_wt, config.time_centroid_delta_if, &PairAtt3D::TimeCentroidDelta);
@@ -150,8 +136,15 @@ cout << "\n  fcst conv radius = " << (config.fcst_conv_radius) << "\n";
 cout << "\n   obs conv radius = " << (config.obs_conv_radius) << "\n";
 
 
-fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
  obs_conv =  obs_raw.convolve(config.obs_conv_radius);
+fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
+
+cout << "\n\n  fcst_conv (0, 0, 0) = " << fcst_conv(0, 0, 0) << "\n\n";
+
+fcst_conv.write("fcst_conv.nc");
+ obs_conv.write("obs_conv.nc");
+
+exit ( 1 );
 
 fcst_mask = fcst_conv.threshold(config.fcst_conv_thresh);
  obs_mask =  obs_conv.threshold(config.obs_conv_thresh);
@@ -166,8 +159,6 @@ cout << "mid split\n" << flush;
 cout << "End split\n" << flush;
 
 
-fcst_conv.write("fcst_conv.nc");
- obs_conv.write("obs_conv.nc");
 
 fcst_mask.write("fcst_mask.nc");
  obs_mask.write("obs_mask.nc");
