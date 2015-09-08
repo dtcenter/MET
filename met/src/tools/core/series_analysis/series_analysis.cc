@@ -61,10 +61,11 @@ static void get_series_entry(int, VarInfo *,
 
 static void process_scores();
 
-static void do_cts (int, const NumArray &, const NumArray &);
-static void do_mcts(int, const NumArray &, const NumArray &);
-static void do_cnt (int, const NumArray &, const NumArray &);
-static void do_pct (int, const NumArray &, const NumArray &);
+static void do_cts   (int, const NumArray &, const NumArray &);
+static void do_mcts  (int, const NumArray &, const NumArray &);
+static void do_cnt   (int, const NumArray &, const NumArray &);
+static void do_sl1l2 (int, const NumArray &, const NumArray &);
+static void do_pct   (int, const NumArray &, const NumArray &);
 
 static void store_stat_fho  (int, const ConcatString &, const CTSInfo &);
 static void store_stat_ctc  (int, const ConcatString &, const CTSInfo &);
@@ -72,7 +73,7 @@ static void store_stat_cts  (int, const ConcatString &, const CTSInfo &);
 static void store_stat_mctc (int, const ConcatString &, const MCTSInfo &);
 static void store_stat_mcts (int, const ConcatString &, const MCTSInfo &);
 static void store_stat_cnt  (int, const ConcatString &, const CNTInfo &);
-static void store_stat_sl1l2(int, const ConcatString &, const CNTInfo &);
+static void store_stat_sl1l2(int, const ConcatString &, const SL1L2Info &);
 static void store_stat_pct  (int, const ConcatString &, const PCTInfo &);
 static void store_stat_pstd (int, const ConcatString &, const PCTInfo &);
 static void store_stat_pjc  (int, const ConcatString &, const PCTInfo &);
@@ -569,10 +570,15 @@ void process_scores() {
             do_mcts(i_point+i, f_na[i], o_na[i]);
          }
 
+         // Compute partial sums
+         if(!conf_info.fcst_info[0]->p_flag() &&
+            conf_info.output_stats[stat_sl1l2].n_elements() > 0) {
+            do_cnt(i_point+i, f_na[i], o_na[i]);
+         }
+
          // Compute continuous statistics
          if(!conf_info.fcst_info[0]->p_flag() &&
-            (conf_info.output_stats[stat_cnt].n_elements() +
-             conf_info.output_stats[stat_sl1l2].n_elements()) > 0) {
+            conf_info.output_stats[stat_cnt].n_elements() > 0) {
             do_cnt(i_point+i, f_na[i], o_na[i]);
          }
 
@@ -735,30 +741,30 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
 void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
    int i, j;
    NumArray ff_na, oo_na;
+   CNTInfo cnt_info;
 
    mlog << Debug(4) << "Computing Continuous Statistics.\n";
 
-   // Allocate objects to store continuous statistics
-   int n_cnt = conf_info.fcnt_ta.n_elements();
-   CNTInfo *cnt_info = new CNTInfo [n_cnt];
-
    // Loop over the continuous thresholds and compute stats
-   for(i=0; i<n_cnt; i++) {
+   for(i=0; i<conf_info.fcnt_ta.n_elements(); i++) {
+
+      // Initialize
+      cnt_info.clear();
 
       // Store thresholds
-      cnt_info[i].fthresh = conf_info.fcnt_ta[i];
-      cnt_info[i].othresh = conf_info.ocnt_ta[i];
-      cnt_info[i].logic   = conf_info.cnt_logic;
+      cnt_info.fthresh = conf_info.fcnt_ta[i];
+      cnt_info.othresh = conf_info.ocnt_ta[i];
+      cnt_info.logic   = conf_info.cnt_logic;
 
       // Setup the CNTInfo alpha values
-      cnt_info[i].allocate_n_alpha(conf_info.ci_alpha.n_elements());
+      cnt_info.allocate_n_alpha(conf_info.ci_alpha.n_elements());
       for(j=0; j<conf_info.ci_alpha.n_elements(); j++) {
-         cnt_info[i].alpha[j] = conf_info.ci_alpha[j];
+         cnt_info.alpha[j] = conf_info.ci_alpha[j];
       }
 
       // Apply continuous filtering thresholds
-      subset_fo_na(f_na, cnt_info[i].fthresh,
-                   o_na, cnt_info[i].othresh,
+      subset_fo_na(f_na, cnt_info.fthresh,
+                   o_na, cnt_info.othresh,
                    conf_info.cnt_logic,
                    ff_na, oo_na);
 
@@ -772,7 +778,7 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
             conf_info.fcst_info[0]->is_precipitation() &
             conf_info.obs_info[0]->is_precipitation(),
             conf_info.n_boot_rep,
-            cnt_info[i], true, conf_info.rank_corr_flag,
+            cnt_info, true, conf_info.rank_corr_flag,
             conf_info.tmp_dir);
       }
       else {
@@ -780,29 +786,45 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
             conf_info.fcst_info[0]->is_precipitation() &
             conf_info.obs_info[0]->is_precipitation(),
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
-            cnt_info[i], true, conf_info.rank_corr_flag,
+            cnt_info, true, conf_info.rank_corr_flag,
             conf_info.tmp_dir);
       }
-   }
-
-   // Loop over the continuous thresholds and write stats
-   for(i=0; i<n_cnt; i++) {
 
       // Add statistic value for each possible CNT column
       for(j=0; j<conf_info.output_stats[stat_cnt].n_elements(); j++) {
          store_stat_cnt(n, conf_info.output_stats[stat_cnt][j],
-                        cnt_info[i]);
-      }
-
-      // Add statistic value for each possible SL1L2 column
-      for(j=0; j<conf_info.output_stats[stat_sl1l2].n_elements(); j++) {
-         store_stat_sl1l2(n, conf_info.output_stats[stat_sl1l2][j],
-                          cnt_info[i]);
+                        cnt_info);
       }
    } // end for i
 
-   // Deallocate memory
-   if(cnt_info) { delete [] cnt_info; cnt_info = (CNTInfo *) 0; }
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_sl1l2(int n, const NumArray &f_na, const NumArray &o_na) {
+   int i, j;
+   NumArray c_na;
+   SL1L2Info s_info;
+
+   mlog << Debug(4) << "Computing Scalar Partial Sums.\n";
+
+   // Loop over the continuous thresholds and compute scalar partial sums
+   for(i=0; i<conf_info.fcnt_ta.n_elements(); i++) {
+
+      // Store thresholds
+      s_info.fthresh = conf_info.fcnt_ta[i];
+      s_info.othresh = conf_info.ocnt_ta[i];
+      s_info.logic   = conf_info.cnt_logic;
+
+      // Compute partial sums
+      s_info.set(f_na, o_na, c_na);
+
+      // Add statistic value for each possible SL1L2 column
+      for(j=0; j<conf_info.output_stats[stat_sl1l2].n_elements(); j++) {
+         store_stat_sl1l2(n, conf_info.output_stats[stat_sl1l2][j], s_info);
+      }
+   } // end for i
 
    return;
 }
@@ -1400,7 +1422,7 @@ void store_stat_cnt(int n, const ConcatString &col,
 ////////////////////////////////////////////////////////////////////////
 
 void store_stat_sl1l2(int n, const ConcatString &col,
-                      const CNTInfo &cnt_info) {
+                      const SL1L2Info &s_info) {
    double v;
    ConcatString lty_stat, var_name;
 
@@ -1408,13 +1430,13 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Get the column value
-        if(c == "TOTAL") { v = (double) cnt_info.n; }
-   else if(c == "FBAR")  { v = cnt_info.fbar.v;     }
-   else if(c == "OBAR")  { v = cnt_info.obar.v;     }
-   else if(c == "FOBAR") { v = cnt_info.fobar;      }
-   else if(c == "FFBAR") { v = cnt_info.ffbar;      }
-   else if(c == "OOBAR") { v = cnt_info.oobar;      }
-   else if(c == "MAE")   { v = cnt_info.mae.v;      }
+        if(c == "TOTAL") { v = (double) s_info.scount; }
+   else if(c == "FBAR")  { v = s_info.fbar;            }
+   else if(c == "OBAR")  { v = s_info.obar;            }
+   else if(c == "FOBAR") { v = s_info.fobar;           }
+   else if(c == "FFBAR") { v = s_info.ffbar;           }
+   else if(c == "OOBAR") { v = s_info.oobar;           }
+   else if(c == "MAE")   { v = s_info.mae;             }
    else {
      mlog << Error << "\nstore_stat_sl1l2() -> "
           << "unsupported column name requested \"" << c
@@ -1426,11 +1448,11 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    var_name << cs_erase << "series_sl1l2_" << c;
 
    // Append threshold information, if supplied
-   if(cnt_info.fthresh.get_type() != thresh_na ||
-      cnt_info.othresh.get_type() != thresh_na) {
-      var_name << "_fcst" << cnt_info.fthresh.get_abbr_str()
+   if(s_info.fthresh.get_type() != thresh_na ||
+      s_info.othresh.get_type() != thresh_na) {
+      var_name << "_fcst" << s_info.fthresh.get_abbr_str()
                << "_" << setlogic_to_abbr(conf_info.cnt_logic)
-               << "_obs" << cnt_info.othresh.get_abbr_str();
+               << "_obs" << s_info.othresh.get_abbr_str();
    }
 
    // Add map for this variable name
@@ -1441,8 +1463,8 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 cnt_info.fthresh.get_str(),
-                 cnt_info.othresh.get_str(),
+                 s_info.fthresh.get_str(),
+                 s_info.othresh.get_str(),
                  bad_data_double);
    }
 
