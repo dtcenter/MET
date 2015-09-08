@@ -485,9 +485,8 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 void process_fcst_climo_files() {
    int i, j;
-   int n_fcst, n_climo;
-   DataPlaneArray fcst_dpa, climo_mn_dpa, climo_sd_dpa;
-   NumArray fcst_lvl_na, climo_lvl_na;
+   int n_fcst;
+   DataPlaneArray fcst_dpa, cmn_dpa, csd_dpa;
    unixtime file_ut, beg_ut, end_ut;
    
    // Loop through each of the fields to be verified and extract
@@ -539,15 +538,14 @@ void process_fcst_climo_files() {
          }
       } // end for j
 
-      // Store information for the raw forecast fields
-      conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
+      // Read climatology data
+      read_climo_data_plane_array(conf_info.conf.lookup_dictionary(conf_key_climo),
+                                  i, fcst_dpa[0].valid(), grid, cmn_dpa, csd_dpa);
 
-      // JHG, need to read climo data for this verification task
-      n_climo = 0;
-      
-      // Store information for the raw climo fields
-      conf_info.vx_pd[i].set_climo_mn_dpa(climo_mn_dpa);
-      conf_info.vx_pd[i].set_climo_sd_dpa(climo_sd_dpa);
+      // Store data for the current verification task
+      conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
+      conf_info.vx_pd[i].set_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_pd[i].set_climo_sd_dpa(csd_dpa);
 
       // Get the valid time for the first field
       file_ut = fcst_dpa[0].valid();
@@ -573,7 +571,7 @@ void process_fcst_climo_files() {
       mlog << Debug(2)
            << "For " << conf_info.vx_pd[i].fcst_info->magic_str()
            << " found " << n_fcst << " forecast levels and "
-           << n_climo << " climatology levels.\n";
+           << cmn_dpa.n_planes() << " climatology levels.\n";
 
    } // end for i
 
@@ -1383,12 +1381,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
-   int i, j;
-   double f, o, c;
-   double f_sum, o_sum, fo_sum, ff_sum, oo_sum;
-   double fa_sum, oa_sum, foa_sum, ffa_sum, ooa_sum;
-   double abs_err_sum;
-   NumArray f_na, o_na;
+   int i;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums.\n";
@@ -1401,99 +1394,16 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       // Store thresholds
       //
+      s_info[i].zero_out();
       s_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
       s_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
       s_info[i].logic   = conf_info.cnt_logic[i_vx];
 
       //
-      // Apply continuous filtering thresholds
+      // Compute partial sums
       //
-      subset_fo_na(pd_ptr->f_na, s_info[i].fthresh,
-                   pd_ptr->o_na, s_info[i].othresh,
-                   conf_info.cnt_logic[i_vx],
-                   f_na, o_na);
+      s_info[i].set(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na);
 
-      mlog << Debug(3)
-           << "Found " << f_na.n_elements()
-           << " pairs for forecast filtering threshold "
-           << s_info[i].fthresh.get_str()
-           << ", observation filtering threshold "
-           << s_info[i].othresh.get_str() << ", and field logic "
-           << setlogic_to_string(conf_info.cnt_logic[i_vx])
-           << ".\n";
-
-      //
-      // Check for no matched pairs to process
-      //
-      if(f_na.n_elements() == 0) continue;
-      
-      // Initialize the counts and sums
-      f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
-      fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0.0;
-      abs_err_sum = 0.0;
-
-      // Loop through the pair data and compute sums
-      for(j=0; j<f_na.n_elements(); j++) {
-
-         f = pd_ptr->f_na[j];
-         o = pd_ptr->o_na[j];
-         c = pd_ptr->cmn_na[j];
-
-         // Skip bad data values in the forecast or observation fields
-         if(is_bad_data(f) || is_bad_data(o)) continue;
-
-         // SL1L2 sums
-         f_sum       += f;
-         o_sum       += o;
-         fo_sum      += f*o;
-         ff_sum      += f*f;
-         oo_sum      += o*o;
-         abs_err_sum += fabs(f-o);
-
-         s_info[i].scount++;
-
-         // SAL1L2 sums
-         if(!is_bad_data(c)) {
-
-            fa_sum  += f-c;
-            oa_sum  += o-c;
-            foa_sum += (f-c)*(o-c);
-            ffa_sum += (f-c)*(f-c);
-            ooa_sum += (o-c)*(o-c);
-
-            s_info[i].sacount++;
-         }
-      }
-
-      if(s_info[i].scount == 0) {
-         mlog << Error << "\ndo_sl1l2() -> "
-              << "count is zero!\n\n";
-         exit(1);
-      }
-
-      // Compute the mean SL1L2 values
-      s_info[i].fbar  = f_sum/s_info[i].scount;
-      s_info[i].obar  = o_sum/s_info[i].scount;
-      s_info[i].fobar = fo_sum/s_info[i].scount;
-      s_info[i].ffbar = ff_sum/s_info[i].scount;
-      s_info[i].oobar = oo_sum/s_info[i].scount;
-      s_info[i].mae   = abs_err_sum/s_info[i].scount;
-
-      // Compute the mean SAL1L2 values
-      if(s_info[i].sacount > 0) {
-         s_info[i].fabar  = fa_sum/s_info[i].sacount;
-         s_info[i].oabar  = oa_sum/s_info[i].sacount;
-         s_info[i].foabar = foa_sum/s_info[i].sacount;
-         s_info[i].ffabar = ffa_sum/s_info[i].sacount;
-         s_info[i].ooabar = ooa_sum/s_info[i].sacount;
-      }
-      else {
-         s_info[i].fabar  = bad_data_double;
-         s_info[i].oabar  = bad_data_double;
-         s_info[i].foabar = bad_data_double;
-         s_info[i].ffabar = bad_data_double;
-         s_info[i].ooabar = bad_data_double;
-      }
    } // end for i
 
    return;
@@ -1503,133 +1413,34 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
 
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               PairDataPoint *ugrd_pd_ptr, PairDataPoint *vgrd_pd_ptr) {
-   int i, j, n_wind;
-   double uf, vf, uc, vc, uo, vo, fwind, owind;
+   int i;
 
    // Check that the number of pairs are the same
    if(ugrd_pd_ptr->n_obs != vgrd_pd_ptr->n_obs) {
       mlog << Error << "\ndo_vl1l2() -> "
-           << "the number of UGRD pairs != the number of VGRD pairs: "
+           << "unequal number of UGRD and VGRD pairs ("
            << ugrd_pd_ptr->n_obs << " != " << vgrd_pd_ptr->n_obs
-           << "\n\n";
+           << ")\n\n";
       exit(1);
    }
 
-   // Initialize all of the VL1L2Info objects
-   n_wind = conf_info.fwind_ta[i_vx].n_elements();
-   for(i=0; i<n_wind; i++) {
+   // Set all of the VL1L2Info objects
+   for(i=0; i<conf_info.fwind_ta[i_vx].n_elements(); i++) {
+
+      //
+      // Store thresholds
+      //
       v_info[i].zero_out();
       v_info[i].fthresh = conf_info.fwind_ta[i_vx][i];
       v_info[i].othresh = conf_info.owind_ta[i_vx][i];
       v_info[i].logic   = conf_info.wind_logic[i_vx];
-   }
 
-   // Loop through the pair data and compute sums
-   for(i=0; i<ugrd_pd_ptr->n_obs; i++) {
-
-      // Retrieve the U,V values
-      uf = ugrd_pd_ptr->f_na[i];
-      vf = vgrd_pd_ptr->f_na[i];
-      uc = ugrd_pd_ptr->cmn_na[i];
-      vc = vgrd_pd_ptr->cmn_na[i];
-      uo = ugrd_pd_ptr->o_na[i];
-      vo = vgrd_pd_ptr->o_na[i];
-
-      // Compute wind speeds
-      fwind = convert_u_v_to_wind(uf, vf);
-      owind = convert_u_v_to_wind(uo, vo);
-
-      // Skip bad data values in the forecast or observation fields
-      if(is_bad_data(uf)    || is_bad_data(vf) ||
-         is_bad_data(uo)    || is_bad_data(vo) ||
-         is_bad_data(fwind) || is_bad_data(owind)) continue;
-
-      // Loop through each of wind speed thresholds to be used
-      for(j=0; j<n_wind; j++) {
-
-         // Apply wind speed thresholds
-         if(!check_fo_thresh(fwind, v_info[j].fthresh,
-                             owind, v_info[j].othresh,
-                             conf_info.wind_logic[i_vx])) continue;
-
-         // Add this pair to the VL1L2 and VAL1L2 counts
-
-         // VL1L2 sums
-         v_info[j].vcount  += 1;
-         v_info[j].ufbar   += uf;
-         v_info[j].vfbar   += vf;
-         v_info[j].uobar   += uo;
-         v_info[j].vobar   += vo;
-         v_info[j].uvfobar += uf*uo+vf*vo;
-         v_info[j].uvffbar += uf*uf+vf*vf;
-         v_info[j].uvoobar += uo*uo+vo*vo;
-
-         // VAL1L2 sums
-         if(!is_bad_data(uc) && !is_bad_data(vc)) {
-
-            v_info[j].vacount  += 1;
-            v_info[j].ufabar   += uf-uc;
-            v_info[j].vfabar   += vf-vc;
-            v_info[j].uoabar   += uo-uc;
-            v_info[j].voabar   += vo-vc;
-            v_info[j].uvfoabar += (uf-uc)*(uo-uc)+(vf-vc)*(vo-vc);
-            v_info[j].uvffabar += (uf-uc)*(uf-uc)+(vf-vc)*(vf-vc);
-            v_info[j].uvooabar += (uo-uc)*(uo-uc)+(vo-vc)*(vo-vc);
-         }
-      } // end for j
-   } // end for i
-
-   // Compute means for the VL1L2Info objects
-   for(i=0; i<n_wind; i++) {
-
-      mlog << Debug(2)
-           << "Computing Vector Partial Sums, for forecast wind speed "
-           << v_info[i].fthresh.get_str()
-           << ", for observation wind speed "
-           << v_info[i].othresh.get_str()
-           << ", using " << v_info[i].vcount << " pairs.\n";
-
-      if(v_info[i].vcount == 0) {
-         // Set to bad data
-         v_info[i].ufbar   = bad_data_double;
-         v_info[i].vfbar   = bad_data_double;
-         v_info[i].uobar   = bad_data_double;
-         v_info[i].vobar   = bad_data_double;
-         v_info[i].uvfobar = bad_data_double;
-         v_info[i].uvffbar = bad_data_double;
-         v_info[i].uvoobar = bad_data_double;
-      }
-      else {
-         // Compute the mean VL1L2 values
-         v_info[i].ufbar   /= v_info[i].vcount;
-         v_info[i].vfbar   /= v_info[i].vcount;
-         v_info[i].uobar   /= v_info[i].vcount;
-         v_info[i].vobar   /= v_info[i].vcount;
-         v_info[i].uvfobar /= v_info[i].vcount;
-         v_info[i].uvffbar /= v_info[i].vcount;
-         v_info[i].uvoobar /= v_info[i].vcount;
-      }
-
-      if(v_info[i].vacount == 0) {
-         // Set to bad data
-         v_info[i].ufabar   = bad_data_double;
-         v_info[i].vfabar   = bad_data_double;
-         v_info[i].uoabar   = bad_data_double;
-         v_info[i].voabar   = bad_data_double;
-         v_info[i].uvfoabar = bad_data_double;
-         v_info[i].uvffabar = bad_data_double;
-         v_info[i].uvooabar = bad_data_double;
-      }
-      else {
-         // Compute the mean VAL1L2 values
-         v_info[i].ufabar   /= v_info[i].vacount;
-         v_info[i].vfabar   /= v_info[i].vacount;
-         v_info[i].uoabar   /= v_info[i].vacount;
-         v_info[i].voabar   /= v_info[i].vacount;
-         v_info[i].uvfoabar /= v_info[i].vacount;
-         v_info[i].uvffabar /= v_info[i].vacount;
-         v_info[i].uvooabar /= v_info[i].vacount;
-      }
+      //
+      // Compute partial sums
+      //
+      v_info[i].set(ugrd_pd_ptr->f_na,   vgrd_pd_ptr->f_na,
+                    ugrd_pd_ptr->o_na,   vgrd_pd_ptr->o_na,
+                    ugrd_pd_ptr->cmn_na, vgrd_pd_ptr->cmn_na);
    } // end for i
 
    return;

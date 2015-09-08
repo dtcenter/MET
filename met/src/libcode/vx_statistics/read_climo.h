@@ -6,36 +6,28 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#ifndef  __VX_STATISTICS_H__
-#define  __VX_STATISTICS_H__
-
+#ifndef  __READ_CLIMO_H__
+#define  __READ_CLIMO_H__
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#include "apply_mask.h"
-#include "compute_ci.h"
-#include "contable.h"
-#include "met_stats.h"
-#include "pair_base.h"
-#include "pair_data_point.h"
-#include "pair_data_ensemble.h"
-#include "read_climo.h"
-
+#include "vx_config.h"
+#include "vx_grid.h"
+#include "vx_cal.h"
+#include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
+extern void read_climo_data_plane(
+               Dictionary *, int, unixtime, const Grid &,
+               DataPlane &cmn_dp, DataPlane &csd_dp);
 
-#endif   //  __VX_STATISTICS_H__
-
+extern void read_climo_data_plane_array(
+                Dictionary *, int, unixtime, const Grid &,
+                DataPlaneArray &cmn_dpa, DataPlaneArray &csd_dpa);
 
 ////////////////////////////////////////////////////////////////////////
 
+#endif   // __READ_CLIMO_H__
 
-
-
+////////////////////////////////////////////////////////////////////////

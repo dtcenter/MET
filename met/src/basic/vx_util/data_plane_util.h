@@ -43,17 +43,11 @@ extern void smooth_field(const DataPlane &, DataPlane &,
 extern void fractional_coverage(const DataPlane &, DataPlane &,
                                 int, SingleThresh, double);
 
-extern void apply_mask(const DataPlane &, const DataPlane &, const DataPlane &,
-                       NumArray &, NumArray &);
-
-extern void apply_mask(const DataPlane &, const DataPlane &,
-                       const DataPlane &, const DataPlane &,
-                       const DataPlane &,
-                       NumArray &, NumArray &, NumArray &, NumArray &);
+extern void apply_mask(const DataPlane &, const DataPlane &, NumArray &);
 
 extern void apply_mask(DataPlane &, const DataPlane &);
 
-extern void mask_bad_data(DataPlane &, const DataPlane &);
+extern void mask_bad_data(DataPlane &, const DataPlane &, double v = bad_data_double);
 
 ////////////////////////////////////////////////////////////////////////
 
