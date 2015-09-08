@@ -2728,9 +2728,9 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       s = nbrcnt_info.fbs.v;
       read_ldf(nbrcnt_i_file, 1, si_na);
       read_ldf(nbrcnt_r_file, 1, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.fbs.v_bcl[i],
                               nbrcnt_info.fbs.v_bcu[i]);
 
@@ -2740,9 +2740,9 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       s = nbrcnt_info.fss.v;
       read_ldf(nbrcnt_i_file, 2, si_na);
       read_ldf(nbrcnt_r_file, 2, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.fss.v_bcl[i],
                               nbrcnt_info.fss.v_bcu[i]);
 
@@ -2752,9 +2752,9 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       s = nbrcnt_info.afss.v;
       read_ldf(nbrcnt_i_file, 3, si_na);
       read_ldf(nbrcnt_r_file, 3, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.afss.v_bcl[i],
                               nbrcnt_info.afss.v_bcu[i]);
 
@@ -2764,9 +2764,9 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       s = nbrcnt_info.ufss.v;
       read_ldf(nbrcnt_i_file, 4, si_na);
       read_ldf(nbrcnt_r_file, 4, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.ufss.v_bcl[i],
                               nbrcnt_info.ufss.v_bcu[i]);
 
@@ -2776,9 +2776,9 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       s = nbrcnt_info.f_rate.v;
       read_ldf(nbrcnt_i_file, 5, si_na);
       read_ldf(nbrcnt_r_file, 5, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.f_rate.v_bcl[i],
                               nbrcnt_info.f_rate.v_bcu[i]);
 
@@ -2788,9 +2788,9 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       s = nbrcnt_info.o_rate.v;
       read_ldf(nbrcnt_i_file, 6, si_na);
       read_ldf(nbrcnt_r_file, 6, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.o_rate.v_bcl[i],
                               nbrcnt_info.o_rate.v_bcu[i]);
 
@@ -3303,9 +3303,9 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       s = nbrcnt_info.fbs.v;
       read_ldf(nbrcnt_r_file, 1, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.fbs.v_bcl[i],
                               nbrcnt_info.fbs.v_bcu[i]);
 
@@ -3314,9 +3314,9 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       s = nbrcnt_info.fss.v;
       read_ldf(nbrcnt_r_file, 2, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.fss.v_bcl[i],
                               nbrcnt_info.fss.v_bcu[i]);
 
@@ -3325,9 +3325,9 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       s = nbrcnt_info.afss.v;
       read_ldf(nbrcnt_r_file, 3, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.afss.v_bcl[i],
                               nbrcnt_info.afss.v_bcu[i]);
 
@@ -3336,9 +3336,9 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       s = nbrcnt_info.ufss.v;
       read_ldf(nbrcnt_r_file, 4, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.ufss.v_bcl[i],
                               nbrcnt_info.ufss.v_bcu[i]);
 
@@ -3347,9 +3347,9 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       s = nbrcnt_info.f_rate.v;
       read_ldf(nbrcnt_r_file, 5, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.f_rate.v_bcl[i],
                               nbrcnt_info.f_rate.v_bcu[i]);
 
@@ -3358,9 +3358,9 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       s = nbrcnt_info.o_rate.v;
       read_ldf(nbrcnt_r_file, 6, sr_na);
-      for(i=0; i<nbrcnt_info.cnt_info.n_alpha; i++)
+      for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
-                              nbrcnt_info.cnt_info.alpha[i],
+                              nbrcnt_info.alpha[i],
                               nbrcnt_info.o_rate.v_bcl[i],
                               nbrcnt_info.o_rate.v_bcu[i]);
 
