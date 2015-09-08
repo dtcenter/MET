@@ -244,28 +244,28 @@ void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &v_info) {
+void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &n_info) {
 
-   v_info.clear();
+   n_info.clear();
 
-   v_info.nbr_wdth   = atoi(l.get_item(interp_pnts_offset));
-   v_info.fthresh.set(l.get_item(fcst_thresh_offset));
-   v_info.othresh.set(l.get_item(obs_thresh_offset));
-   v_info.cnt_info.n = atoi(l.get_item(nbrcnt_total_offset));
-   v_info.fbs.v      = atof(l.get_item(nbrcnt_fbs_offset));
-   v_info.fss.v      = atof(l.get_item(nbrcnt_fss_offset));
+   n_info.nbr_wdth   = atoi(l.get_item(interp_pnts_offset));
+   n_info.fthresh.set(l.get_item(fcst_thresh_offset));
+   n_info.othresh.set(l.get_item(obs_thresh_offset));
+   n_info.sl1l2_info.scount = atoi(l.get_item(nbrcnt_total_offset));
+   n_info.fbs.v      = atof(l.get_item(nbrcnt_fbs_offset));
+   n_info.fss.v      = atof(l.get_item(nbrcnt_fss_offset));
    
    // Parse AFSS, UFSS, F_RATE, and O_RATE, if present
-   v_info.afss.v     = (l.n_items() > nbrcnt_afss_offset ?
+   n_info.afss.v     = (l.n_items() > nbrcnt_afss_offset ?
                         atof(l.get_item(nbrcnt_afss_offset)) : 
                         bad_data_double);
-   v_info.ufss.v     = (l.n_items() > nbrcnt_ufss_offset ?
+   n_info.ufss.v     = (l.n_items() > nbrcnt_ufss_offset ?
                         atof(l.get_item(nbrcnt_ufss_offset)) : 
                         bad_data_double);
-   v_info.f_rate.v   = (l.n_items() > nbrcnt_f_rate_offset ?
+   n_info.f_rate.v   = (l.n_items() > nbrcnt_f_rate_offset ?
                         atof(l.get_item(nbrcnt_f_rate_offset)) : 
                         bad_data_double);
-   v_info.o_rate.v   = (l.n_items() > nbrcnt_o_rate_offset ?
+   n_info.o_rate.v   = (l.n_items() > nbrcnt_o_rate_offset ?
                         atof(l.get_item(nbrcnt_o_rate_offset)) : 
                         bad_data_double);
 
