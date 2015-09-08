@@ -389,8 +389,6 @@ extern void write_mcts_row  (StatHdrColumns &, const MCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_cnt_row   (StatHdrColumns &, const CNTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_sl1l2_row (StatHdrColumns &, const CNTInfo &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
 extern void write_sl1l2_row (StatHdrColumns &, const SL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_sal1l2_row(StatHdrColumns &, const SL1L2Info &, bool,
@@ -438,7 +436,6 @@ extern void write_cts_cols   (const CTSInfo &,     int, AsciiTable &, int, int);
 extern void write_mctc_cols  (const MCTSInfo &,         AsciiTable &, int, int);
 extern void write_mcts_cols  (const MCTSInfo &,    int, AsciiTable &, int, int);
 extern void write_cnt_cols   (const CNTInfo &,     int, AsciiTable &, int, int);
-extern void write_sl1l2_cols (const CNTInfo &,          AsciiTable &, int, int);
 extern void write_sl1l2_cols (const SL1L2Info &,        AsciiTable &, int, int);
 extern void write_sal1l2_cols(const SL1L2Info &,        AsciiTable &, int, int);
 extern void write_vl1l2_cols (const VL1L2Info &,        AsciiTable &, int, int);
