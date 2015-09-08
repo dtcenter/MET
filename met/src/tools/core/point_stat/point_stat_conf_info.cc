@@ -156,6 +156,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    map<STATLineType,STATOutputType>output_map;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
+   Dictionary *cdict = (Dictionary *) 0;
    Dictionary i_fdict, i_odict;
    BootInfo boot_info;
    InterpInfo interp_info;
@@ -205,9 +206,10 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       exit(1);
    }
 
-   // Conf: fcst.field and obs.field
+   // Conf: fcst.field, obs.field, and climo.field
    fdict = conf.lookup_array(conf_key_fcst_field);
    odict = conf.lookup_array(conf_key_obs_field);
+   cdict = conf.lookup_array(conf_key_climo_field);
 
    // Determine the number of fields (name/level) to be verified
    n_vx = parse_conf_n_vx(fdict);
@@ -218,6 +220,17 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
            << "The number of verification tasks in \""
            << conf_key_obs_field
            << "\" must be non-zero and match the number in \""
+           << conf_key_fcst_field << "\".\n\n";
+      exit(1);
+   }
+
+   // Check for a valid number of climatology fields
+   n = parse_conf_n_vx(cdict);
+   if(n != 0 && n != n_vx) {
+      mlog << Error << "\nPointStatConfInfo::process_config() -> "
+           << "The number of climatology fields in \""
+           << conf_key_climo_field
+           << "\" must be zero or match the number in \""
            << conf_key_fcst_field << "\".\n\n";
       exit(1);
    }
@@ -606,15 +619,8 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
    switch(i_txt_row) {
 
       case(i_fho):
-         // Maximum number of FHO lines possible =
-         //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
-         n = n_vx_scal * max_n_msg_typ * n_mask * n_interp *
-             max_n_cat_thresh;
-         break;
-
       case(i_ctc):
-         // Maximum number of CTC lines possible =
+         // Maximum number of FHO or CTC lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
          //    Max Thresholds
          n = n_vx_scal * max_n_msg_typ * n_mask * n_interp *
@@ -652,15 +658,8 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       case(i_sl1l2):
-         // Maximum number of SL1L2 lines possible =
-         //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
-         n = n_vx_scal * max_n_msg_typ * n_mask * n_interp *
-             max_n_cnt_thresh;
-         break;
-
       case(i_sal1l2):
-         // Maximum number of SAL1L2 lines possible =
+         // Maximum number of SL1L2 or SAL1L2 lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
          //    Max Thresholds
          n = n_vx_scal * max_n_msg_typ * n_mask * n_interp *
@@ -668,15 +667,8 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       case(i_vl1l2):
-         // Maximum number of VL1L2 lines possible =
-         //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
-         n = n_vx_vect * max_n_msg_typ * n_mask * n_interp *
-             max_n_wind_thresh;
-         break;
-
       case(i_val1l2):
-         // Maximum number of VAL1L2 lines possible =
+         // Maximum number of VL1L2 or VAL1L2 lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
          //    Max Thresholds
          n = n_vx_vect * max_n_msg_typ * n_mask * n_interp *
@@ -684,7 +676,9 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       case(i_pct):
-         // Maximum number of PCT lines possible =
+      case(i_pjc):
+      case(i_prc):
+         // Maximum number of PCT, PJC, or PRC lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
          //    Max Thresholds
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
@@ -697,22 +691,6 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          //    Max Thresholds * Alphas
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
              max_n_oprob_thresh * get_n_ci_alpha();
-         break;
-
-      case(i_pjc):
-         // Maximum number of PJC lines possible =
-         //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
-         n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
-             max_n_oprob_thresh;
-         break;
-
-      case(i_prc):
-         // Maximum number of PRC lines possible =
-         //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
-         n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
-             max_n_oprob_thresh;
          break;
 
       case(i_mpr):
@@ -742,7 +720,6 @@ int PointStatConfInfo::n_stat_row() {
    // Set the maximum number of STAT output lines by summing the counts
    // for the optional text files that have been requested
    for(i=0, n=0; i<n_txt; i++) {
-
       if(output_flag[i] != STATOutputType_None) n += n_txt_row(i);
    }
 

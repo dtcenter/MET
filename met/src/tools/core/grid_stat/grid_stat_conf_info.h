@@ -35,23 +35,26 @@ static const int i_mctc   = 3;
 static const int i_mcts   = 4;
 static const int i_cnt    = 5;
 static const int i_sl1l2  = 6;
-static const int i_vl1l2  = 7;
-static const int i_pct    = 8;
-static const int i_pstd   = 9;
-static const int i_pjc    = 10;
-static const int i_prc    = 11;
-static const int i_nbrctc = 12;
-static const int i_nbrcts = 13;
-static const int i_nbrcnt = 14;
-static const int n_txt    = 15;
+static const int i_sal1l2 = 7;
+static const int i_vl1l2  = 8;
+static const int i_val1l2 = 9;
+static const int i_pct    = 10;
+static const int i_pstd   = 11;
+static const int i_pjc    = 12;
+static const int i_prc    = 13;
+static const int i_nbrctc = 14;
+static const int i_nbrcts = 15;
+static const int i_nbrcnt = 16;
+static const int n_txt    = 17;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
    stat_fho,    stat_ctc,    stat_cts,
    stat_mctc,   stat_mcts,   stat_cnt,
-   stat_sl1l2,  stat_vl1l2,  stat_pct,
-   stat_pstd,   stat_pjc,    stat_prc,
-   stat_nbrctc, stat_nbrcts, stat_nbrcnt
+   stat_sl1l2,  stat_sal1l2, stat_vl1l2,
+   stat_val1l2, stat_pct,    stat_pstd,
+   stat_pjc,    stat_prc,    stat_nbrctc,
+   stat_nbrcts, stat_nbrcnt
 };
 
 ////////////////////////////////////////////////////////////////////////

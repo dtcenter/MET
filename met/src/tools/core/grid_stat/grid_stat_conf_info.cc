@@ -133,7 +133,7 @@ void GridStatConfInfo::clear() {
          if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
       delete obs_info; obs_info = (VarInfo **) 0;
    }
-
+   
    // Reset count
    n_vx = 0;
 
@@ -167,6 +167,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    map<STATLineType,STATOutputType>output_map;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
+   Dictionary *cdict = (Dictionary *) 0;
    Dictionary i_fdict, i_odict;
    BootInfo boot_info;
    InterpInfo interp_info;
@@ -216,9 +217,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       exit(1);
    }
 
-   // Conf: fcst.field and obs.field
+   // Conf: fcst.field, obs.field, and climo.field
    fdict = conf.lookup_array(conf_key_fcst_field);
    odict = conf.lookup_array(conf_key_obs_field);
+   cdict = conf.lookup_array(conf_key_climo_field);
 
    // Determine the number of fields (name/level) to be verified
    n_vx = parse_conf_n_vx(fdict);
@@ -229,6 +231,17 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
            << "The number of verification tasks in \""
            << conf_key_obs_field
            << "\" must be non-zero and match the number in \""
+           << conf_key_fcst_field << "\".\n\n";
+      exit(1);
+   }
+
+   // Check for a valid number of climatology fields
+   n = parse_conf_n_vx(cdict);
+   if(n != 0 && n != n_vx) {
+      mlog << Error << "\nGridStatConfInfo::process_config() -> "
+           << "The number of climatology fields in \""
+           << conf_key_climo_field
+           << "\" must be zero or match the number in \""
            << conf_key_fcst_field << "\".\n\n";
       exit(1);
    }
@@ -290,9 +303,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       }
    } // end for i   
 
-   // If VL1L2 is requested, check the specified fields and turn
+   // If VL1L2 or VAL1L2 is requested, check the specified fields and turn
    // on the vflag when UGRD is followed by VGRD at the same level
-   if(output_flag[i_vl1l2] != STATOutputType_None) {
+   if(output_flag[i_vl1l2]  != STATOutputType_None ||
+      output_flag[i_val1l2] != STATOutputType_None) {
 
       for(i=0, n_vx_vect = 0; i<n_vx; i++) {
 
@@ -610,13 +624,8 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
    switch(i_txt_row) {
 
       case(i_fho):
-         // Maximum number of FHO lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_scal * n_mask * n_interp * max_n_cat_thresh;
-         break;
-
       case(i_ctc):
-         // Maximum number of CTC lines possible =
+         // Maximum number of FHO or CTC lines possible =
          //    Fields * Masks * Smoothing Methods * Max Thresholds
          n = n_vx_scal * n_mask * n_interp * max_n_cat_thresh;
          break;
@@ -650,13 +659,15 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       case(i_sl1l2):
-         // Maximum number of SL1L2 lines possible =
+      case(i_sal1l2):
+         // Maximum number of SL1L2 or SAL1L2 lines possible =
          //    Fields * Masks * Smoothing Methods * Max Thresholds
          n = n_vx_scal * n_mask * n_interp * max_n_cnt_thresh;
          break;
 
       case(i_vl1l2):
-         // Maximum number of VL1L2 lines possible =
+      case(i_val1l2):
+         // Maximum number of VL1L2 or VAL1L2 lines possible =
          //    Fields * Masks * Smoothing Methods * Max Thresholds
          n = n_vx_vect * n_mask * n_interp * max_n_wind_thresh;
          break;
@@ -679,16 +690,17 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       case(i_nbrcnt):
-         // Maximum number of NBRCTS lines possible =
+         // Maximum number of NBRCNT lines possible =
          //    Fields * Masks * Max Thresholds *
-         //    Neighborhoods * Frac Thresholds * Alphas
+         //    Neighborhoods * Alphas
          n = n_vx_scal * n_mask * max_n_cat_thresh *
-             get_n_nbrhd_wdth() * get_n_cov_thresh() *
-             get_n_ci_alpha();
+             get_n_nbrhd_wdth() * get_n_ci_alpha();
          break;
 
       case(i_pct):
-         // Maximum number of PCT lines possible =
+      case(i_pjc):
+      case(i_prc):
+         // Maximum number of PCT, PJC, or PRC lines possible =
          //    Fields * Masks * Smoothing Methods * Max Thresholds
          n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh;
          break;
@@ -699,18 +711,6 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          //    Alphas
          n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
              get_n_ci_alpha();
-         break;
-
-      case(i_pjc):
-         // Maximum number of PJC lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh;
-         break;
-
-      case(i_prc):
-         // Maximum number of PRC lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh;
          break;
 
       default:
@@ -732,7 +732,6 @@ int GridStatConfInfo::n_stat_row() {
    // Set the maximum number of STAT output lines by summing the counts
    // for the optional text files that have been requested
    for(i=0, n=0; i<n_txt; i++) {
-
       if(output_flag[i] != STATOutputType_None) n += n_txt_row(i);
    }
 
