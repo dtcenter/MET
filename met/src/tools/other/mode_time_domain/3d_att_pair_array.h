@@ -49,16 +49,35 @@ class PairAtt3DArray {
 
       void dump(ostream &, int = 0) const;
 
-      void set_alloc_inc(int = 0);   //  0 means default value (100)
+         //
+         //  set stuff
+         //
+
+
+         //
+         //  get stuff
+         //
 
       int n_elements() const;
 
       int n         () const;
 
+      PairAtt3D & operator[](int) const;
+
+      int fcst_obj_number(int index) const;  //  one-based
+      int  obs_obj_number(int index) const;  //  one-based
+
+      double total_interest(int index) const;
+
+         //
+         //  do stuff
+         //
+
+      void set_alloc_inc(int = 0);   //  0 means default value (100)
+
       void add(const PairAtt3D &);
       void add(const PairAtt3DArray &);
 
-      PairAtt3D & operator[](int) const;
 
 };
 

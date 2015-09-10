@@ -46,7 +46,7 @@ class SingleAtt3D {
       void assign(const SingleAtt3D &);
 
 
-      int ObjectNumber;
+      int ObjectNumber;   //  one-based
 
       int Volume;
 
@@ -89,7 +89,7 @@ class SingleAtt3D {
          //  set stuff
          //
 
-      void set_object_number (int);
+      void set_object_number (int);   //  one-based
 
       void set_volume (int);
 
@@ -117,7 +117,7 @@ class SingleAtt3D {
          //  get stuff
          //
 
-      int object_number () const;
+      int object_number () const;   //  one-based
 
       bool is_fcst () const;
       bool is_obs  () const;
@@ -243,8 +243,8 @@ class PairAtt3D {
 
       void assign(const PairAtt3D &);
 
-      int FcstObjectNumber;
-      int ObsObjectNumber;
+      int FcstObjectNumber;   //  one-based
+      int ObsObjectNumber;    //  one-based
 
       int IntersectionVol;
       // int UnionVol;
@@ -285,8 +285,8 @@ class PairAtt3D {
          //  set stuff
          //
 
-      void set_fcst_obj_number (int);
-      void set_obs_obj_number  (int);
+      void set_fcst_obj_number (int);   //  one-based
+      void set_obs_obj_number  (int);   //  one-based
 
       void set_intersection_volume (int);
       void set_union_volume        (int);
@@ -309,8 +309,8 @@ class PairAtt3D {
          //  get stuff
          //
 
-      int fcst_obj_number() const;
-      int  obs_obj_number() const;
+      int fcst_obj_number() const;   //  one-based
+      int  obs_obj_number() const;   //  one-based
 
       int intersection_vol () const;
       int union_vol        () const;

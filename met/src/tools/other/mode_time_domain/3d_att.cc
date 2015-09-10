@@ -245,7 +245,10 @@ void SingleAtt3D::dump(ostream & out, int depth) const
 
 Indent prefix;
 
-out << prefix << "Volume           = " << Volume << "\n";
+out << prefix << "ObjectNumber     = " << ObjectNumber << "\n";
+out << prefix << "Volume           = " << Volume       << "\n";
+out << prefix << "IsFcst           = " << bool_to_string(IsFcst) << "\n";
+out << prefix << "IsSimple         = " << bool_to_string(IsSimple) << "\n";
 out << prefix << "Centroid         = " << '(' << Xbar << ", " << Ybar << ", " << Tbar << ")\n";
 out << prefix << "Bbox             = " << '(' << Xmin << ", " << Ymax << ")   "
                                        << '(' << Ymin << ", " << Ymax << ")   "

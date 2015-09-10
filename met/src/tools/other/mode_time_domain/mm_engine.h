@@ -40,6 +40,8 @@ class MM_Engine {
 
       void clear();
 
+      void partition_dump(ostream &) const;
+
       InterestCalculator calc;
 
       Mtd_Partition part;

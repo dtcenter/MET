@@ -292,3 +292,63 @@ return ( e[N] );
 ////////////////////////////////////////////////////////////////////////
 
 
+int PairAtt3DArray::fcst_obj_number(int k) const
+
+{
+
+if ( (k < 0) || (k >= Nelements) )  {
+
+   cerr << "\n\n  PairAtt3DArray::fcst_obj_number(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( e[k].fcst_obj_number() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int PairAtt3DArray::obs_obj_number(int k) const
+
+{
+
+if ( (k < 0) || (k >= Nelements) )  {
+
+   cerr << "\n\n  PairAtt3DArray::obs_obj_number(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( e[k].obs_obj_number() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double PairAtt3DArray::total_interest(int k) const
+
+{
+
+if ( (k < 0) || (k >= Nelements) )  {
+
+   cerr << "\n\n  PairAtt3DArray::total_interest(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( e[k].total_interest() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
