@@ -5,6 +5,8 @@
 
 static const char default_config_path [] = "MET_BASE/config/MTDConfig_default";
 
+static const bool debug = true;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,6 +24,7 @@ using namespace std;
 #include "3d_att_single_array.h"
 #include "mtd_txt_output.h"
 #include "mtd_read_data.h"
+#include "mm_engine.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -102,88 +105,126 @@ MtdFloatFile fcst_raw, obs_raw;
 MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
 MtdIntFile fcst_obj, obs_obj;
-InterestCalculator calc;
+MM_Engine e;
+const int ti_thresh = config.total_interest_thresh;
 
    //
    //  read the data files
    //
 
-// config.fcst_info->dump(cout);
-
 mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
 mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
 
-fcst_raw.write("fcst_raw.nc");
- obs_raw.write("obs_raw.nc");
+if ( debug )  {
+
+   fcst_raw.write("fcst_raw.nc");
+    obs_raw.write("obs_raw.nc");
+
+}
 
 // exit ( 1 );
 
+   //
+   //  set up the total interest calculator
+   //
 
-calc.add(config.space_centroid_dist_wt, config.space_centroid_dist_if, &PairAtt3D::SpaceCentroidDist);
-calc.add(config.time_centroid_delta_wt, config.time_centroid_delta_if, &PairAtt3D::TimeCentroidDelta);
-calc.add(config.speed_delta_wt,         config.speed_delta_if,         &PairAtt3D::SpeedDelta);
-calc.add(config.direction_diff_wt,      config.direction_diff_if,      &PairAtt3D::DirectionDifference);
-calc.add(config.volume_ratio_wt,        config.volume_ratio_if,        &PairAtt3D::VolumeRatio);
-calc.add(config.axis_angle_diff_wt,     config.axis_angle_diff_if,     &PairAtt3D::AxisDiff);
-calc.add(config.start_time_delta_wt,    config.start_time_delta_if,    &PairAtt3D::StartTimeDelta);
-calc.add(config.end_time_delta_wt,      config.end_time_delta_if,      &PairAtt3D::EndTimeDelta);
+e.calc.add(config.space_centroid_dist_wt, config.space_centroid_dist_if, &PairAtt3D::SpaceCentroidDist);
+e.calc.add(config.time_centroid_delta_wt, config.time_centroid_delta_if, &PairAtt3D::TimeCentroidDelta);
+e.calc.add(config.speed_delta_wt,         config.speed_delta_if,         &PairAtt3D::SpeedDelta);
+e.calc.add(config.direction_diff_wt,      config.direction_diff_if,      &PairAtt3D::DirectionDifference);
+e.calc.add(config.volume_ratio_wt,        config.volume_ratio_if,        &PairAtt3D::VolumeRatio);
+e.calc.add(config.axis_angle_diff_wt,     config.axis_angle_diff_if,     &PairAtt3D::AxisDiff);
+e.calc.add(config.start_time_delta_wt,    config.start_time_delta_if,    &PairAtt3D::StartTimeDelta);
+e.calc.add(config.end_time_delta_wt,      config.end_time_delta_if,      &PairAtt3D::EndTimeDelta);
 
-calc.check();
+   //
+   //  make sure that not all of the weights are zero
+   //
 
+e.calc.check();
 
+   //
+   //
+   //
 
-cout << "\n  fcst conv radius = " << (config.fcst_conv_radius) << "\n";
-cout << "\n   obs conv radius = " << (config.obs_conv_radius) << "\n";
+// cout << "\n  fcst conv radius = " << (config.fcst_conv_radius) << "\n";
+// cout << "\n   obs conv radius = " << (config.obs_conv_radius) << "\n";
 
+   //
+   //  convolve
+   //
 
  obs_conv =  obs_raw.convolve(config.obs_conv_radius);
 fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
 
-cout << "\n\n  obs_conv (134, 7, 0) = " << obs_conv(134, 7, 0) << "\n\n";
+if ( debug )  {
 
- obs_conv.write("obs_conv.nc");
-fcst_conv.write("fcst_conv.nc");
+    obs_conv.write("obs_conv.nc");
+   fcst_conv.write("fcst_conv.nc");
+
+}
 
 // exit ( 1 );
+
+   //
+   //  threshold
+   //
 
 fcst_mask = fcst_conv.threshold(config.fcst_conv_thresh);
  obs_mask =  obs_conv.threshold(config.obs_conv_thresh);
 
+   //
+   //  number objects
+   //
+
 fcst_obj = fcst_mask;
  obs_obj =  obs_mask;
 
-cout << "Start split\n" << flush;
+if ( debug )  cout << "Start split\n" << flush;
 fcst_obj.split();
-cout << "mid split\n" << flush;
+if ( debug )  cout << "mid split\n" << flush;
  obs_obj.split();
-cout << "End split\n" << flush;
+if ( debug )  cout << "End split\n" << flush;
 
+if ( debug )  {
 
+   fcst_mask.write("fcst_mask.nc");
+    obs_mask.write("obs_mask.nc");
 
-fcst_mask.write("fcst_mask.nc");
- obs_mask.write("obs_mask.nc");
+   fcst_obj.write("fcst_obj_notoss.nc");
+    obs_obj.write("obs_obj_notoss.nc");
 
-fcst_obj.write("fcst_obj_notoss.nc");
- obs_obj.write("obs_obj_notoss.nc");
+}
+
+   //
+   //  toss small objects
+   //
 
 fcst_obj.toss_small_objects(config.min_volume);
  obs_obj.toss_small_objects(config.min_volume);
 
-fcst_obj.write("fcst_obj_toss.nc");
- obs_obj.write("obs_obj_toss.nc");
+if ( debug )  {
 
-cout << "\n\n  fcst threshold:\n";
-config.fcst_conv_thresh.dump(cout);
+   fcst_obj.write("fcst_obj_toss.nc");
+    obs_obj.write("obs_obj_toss.nc");
 
-cout << "\n\n  obs threshold:\n";
-config.obs_conv_thresh.dump(cout);
+}
 
+if ( debug )  {
 
-cout << "\n\n   n_header_3d_cols = " << n_header_3d_cols << '\n';
-cout << "\n\n   n_3d_single_cols = " << n_3d_single_cols << '\n';
+   cout << "\n\n  fcst threshold:\n";
+   config.fcst_conv_thresh.dump(cout);
+
+   cout << "\n\n  obs threshold:\n";
+   config.obs_conv_thresh.dump(cout);
+
+}
+
+// cout << "\n   n_header_3d_cols = " << n_header_3d_cols << '\n';
+// cout << "\n   n_3d_single_cols = " << n_3d_single_cols << '\n';
 
    //
-   // get single attributes
+   //  get single attributes
    //
 
 SingleAtt3D att;
@@ -218,15 +259,16 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
 }
 
-// s = obs_obj.select(1);
-// 
-// s.write("obs_1_select.nc");
 
-// cout << "\n\n  Obs single atts:\n\n";
-
-// obs_att.dump(cout);
+   //
+   //  write single simple attributes
+   //
 
 do_3d_single_txt_output(fcst_att, obs_att, config, "a.txt");
+
+   //
+   //  get pair attributes
+   //
 
 PairAtt3DArray a;
 PairAtt3D p;
@@ -244,15 +286,9 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       cout << "   (" << j << ", " << k << ")\n" << flush;
 
-      if ( (j == 4) && (k == 4) )  {
-
-         cout << "stop\n";
-
-      }
-
       p = calc_3d_pair_atts(fo, oo, fcst_att[j], obs_att[k]);
 
-      p.set_total_interest(calc(p));
+      p.set_total_interest(e.calc(p));
 
       a.add(p);
 
@@ -261,7 +297,9 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 }
 
 
-a.dump(cout);
+if ( debug )  a.dump(cout);
+
+
 
 
 

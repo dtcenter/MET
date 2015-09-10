@@ -48,7 +48,9 @@ mtd_SOURCES = mtd.cc  \
               interest_calc.h  \
               interest_calc.cc  \
               mtd_partition.h  \
-              mtd_partition.cc
+              mtd_partition.cc  \
+              mm_engine.h  \
+              mm_engine.cc
 mtd_CPPFLAGS = ${MET_CPPFLAGS}
 mtd_LDFLAGS = ${MET_LDFLAGS}
 mtd_LDADD = -lvx_pxm \
