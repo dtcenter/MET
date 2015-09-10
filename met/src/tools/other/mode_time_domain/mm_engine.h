@@ -28,7 +28,8 @@ class MM_Engine {
 
       void assign(const MM_Engine &);
 
-
+      // int N_Fcst_Composites;
+      // int N_Obs_Composites;
 
 
    public:
@@ -58,11 +59,19 @@ class MM_Engine {
          //  get stuff
          //
 
-      int n_fcst_simple()    const;
-      int n_obs_simple()     const;
+      int n_fcst_simples()    const;
+      int n_obs_simples()     const;
 
-      int n_fcst_composite() const;
-      int n_obs_composite()  const;
+      // int n_fcst_composites() const;
+      // int n_obs_composites()  const;
+
+          //
+          //  return the index of the composite (ie, equivalence class) that
+          //    has the given fcst or obs object number
+          //
+
+      int composite_with_fcst (const int) const;   //  zero-based (both input and output)
+      int composite_with_obs  (const int) const;   //  zero-based (both input and output)
 
          //
          //  do stuff
@@ -74,10 +83,20 @@ class MM_Engine {
 
       int n_composites() const;
 
-      IntArray fcst_composite(int _comp_number) const;
-      IntArray  obs_composite(int _comp_number) const;
+      IntArray fcst_composite(int _composite_number) const;   //  zero-based
+      IntArray  obs_composite(int _composite_number) const;   //  zero-based
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int MM_Engine::n_fcst_simples () const { return ( graph.n_fcst () ); }
+inline int MM_Engine::n_obs_simples  () const { return ( graph.n_obs  () ); }
+
+// inline int MM_Engine::n_fcst_composites  () const { return ( N_Fcst_Composites ); }
+// inline int MM_Engine::n_obs_composites   () const { return ( N_Obs_Composites ); }
 
 
 ////////////////////////////////////////////////////////////////////////

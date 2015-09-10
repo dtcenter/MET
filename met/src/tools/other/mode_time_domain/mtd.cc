@@ -308,7 +308,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 }
 
 
-if ( debug )  pa.dump(cout);
+// if ( debug )  pa.dump(cout);
 
    //
    //  create graph
@@ -329,6 +329,25 @@ e.do_match_merge();
 if ( debug )  e.partition_dump(cout);
 
 
+IntArray a;
+
+for (j=0; j<(e.part.n_elements()); ++j)  {
+
+   cout << "Fcst objects in composite " << j << ":\n";
+
+   a = e.fcst_composite(j);
+
+   a.dump_one_line(cout);
+
+   cout << "Obs  objects in composite " << j << ":\n";
+
+   a = e.obs_composite(j);
+
+   a.dump_one_line(cout);
+
+   cout << '\n';
+
+}
 
 
 

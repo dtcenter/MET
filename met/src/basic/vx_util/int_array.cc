@@ -265,6 +265,37 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void IntArray::dump_one_line(ostream & out, int depth) const
+
+{
+
+int j;
+Indent prefix(depth);
+
+out << prefix << '(' << Nelements << ") ";
+
+for (j=0; j<Nelements; ++j)  {
+
+   if ( j > 0 )  out << ' ';
+
+   out << e[j];
+
+}
+
+   //
+   //  done
+   //
+
+out << '\n' << flush;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int IntArray::operator[](int n) const
 
 {

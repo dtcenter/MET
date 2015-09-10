@@ -101,6 +101,12 @@ class StringArray {
 
       int has_option(int & index) const;
 
+         //
+         //  sort in increasing lex order  (uses qsort)
+         //
+
+      void sort();
+
 };
 
 
