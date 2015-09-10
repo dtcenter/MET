@@ -45,9 +45,9 @@ static ConcatString local_config_filename;
 
 static void usage();
 
-static void set_fcst   (const StringArray &);
-static void set_obs    (const StringArray &);
-static void set_config (const StringArray &);
+static void set_fcst      (const StringArray &);
+static void set_obs       (const StringArray &);
+static void set_config    (const StringArray &);
 
 static void set_verbosity (const StringArray &);
 static void set_logfile   (const StringArray &);
@@ -106,7 +106,10 @@ MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
 MtdIntFile fcst_obj, obs_obj;
 MM_Engine e;
-const int ti_thresh = config.total_interest_thresh;
+const double ti_thresh = config.total_interest_thresh;
+
+
+if ( debug )  cout << "\n  total interest threshold = " << ti_thresh << "\n\n";
 
    //
    //  read the data files
@@ -224,6 +227,12 @@ if ( debug )  {
 // cout << "\n   n_3d_single_cols = " << n_3d_single_cols << '\n';
 
    //
+   //  set up the match/merge engine
+   //
+
+e.set_size(fcst_obj.n_objects(), obs_obj.n_objects());
+
+   //
    //  get single attributes
    //
 
@@ -231,7 +240,7 @@ SingleAtt3D att;
 SingleAtt3DArray fcst_att, obs_att;
 // MtdIntFile s;
 
-cout << "calculating fcst atts\n" << flush;
+cout << "calculating fcst single atts\n" << flush;
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
@@ -245,7 +254,9 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
 }
 
-cout << "calculating obs atts\n" << flush;
+// fcst_att.dump(cout);
+
+cout << "calculating obs single atts\n" << flush;
 
 for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
@@ -270,7 +281,7 @@ do_3d_single_txt_output(fcst_att, obs_att, config, "a.txt");
    //  get pair attributes
    //
 
-PairAtt3DArray a;
+PairAtt3DArray pa;
 PairAtt3D p;
 MtdIntFile fo, oo;
 
@@ -290,15 +301,32 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       p.set_total_interest(e.calc(p));
 
-      a.add(p);
+      pa.add(p);
 
    }
 
 }
 
 
-if ( debug )  a.dump(cout);
+if ( debug )  pa.dump(cout);
 
+   //
+   //  create graph
+   //
+
+for (j=0; j<(pa.n()); ++j)  {
+
+   if ( pa.total_interest(j) < ti_thresh )  continue;
+
+   e.graph.set_fo_edge(pa.fcst_obj_number(j) - 1, pa.obs_obj_number(j) - 1);
+
+}   //  for j
+
+if ( debug )  e.graph.dump_as_table(cout);
+
+e.do_match_merge();
+
+if ( debug )  e.partition_dump(cout);
 
 
 

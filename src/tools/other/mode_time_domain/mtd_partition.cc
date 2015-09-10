@@ -25,6 +25,9 @@ using namespace std;
 
 #include "nint.h"
 #include "indent.h"
+#include "concat_string.h"
+#include "string_array.h"
+
 #include "mtd_partition.h"
 
 
@@ -712,6 +715,67 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 
 return ( C[k] );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Mtd_Partition::specialized_dump(ostream & out, const int Nf, const int No) const
+
+{
+
+int j, k, n;
+int id;
+static const char tab [] = "   ";
+const EquivalenceClass * c = 0;
+ConcatString s;
+StringArray a;
+
+out << '[' << Nelements << " equivalence classes]\n";
+
+for (j=0; j<Nelements; ++j)  {
+
+   c = C[j];
+
+   a.clear();
+
+   out << tab << '(' << (c->n_elements()) << ") { ";
+
+   for (k=0; k<(c->n_elements()); ++k)  {
+
+      s.erase();
+
+      n = c->element(k);
+
+      if ( n < Nf )  { s << 'F';  id = n; }
+      else           { s << 'O';  id = n - Nf; }
+
+      s << '_' << id;
+
+      a.add(s);
+
+   }
+
+   // a.sort();
+
+   for (k=0; k<(a.n_elements()); ++k)  {
+
+      out << a[k];
+
+      if ( k != (a.n_elements() - 1) )  out << ' ';
+
+   }
+
+   out << " }\n";
+
+}   //  for j
+
+
+
+
+return;
 
 }
 

@@ -131,3 +131,100 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void MM_Engine::set_size(const int _n_fcst, const int _n_obs)
+
+{
+
+graph.set_size(_n_fcst, _n_obs);
+
+   //
+   //  set up the initial partition
+   //
+
+int j;
+
+for (j=0; j<(graph.n_total()); ++j)  {
+
+   part.add_no_repeat(j);
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MM_Engine::do_match_merge()
+
+{
+
+int j, k;
+int f_i, o_i;
+
+
+   //
+   //  fcst, obs
+   //
+
+for (j=0; j<(graph.n_fcst()); ++j)  {
+
+   f_i = graph.f_index(j);
+
+   for (k=0; k<(graph.n_obs()); ++k)  {
+
+      o_i = graph.o_index(k);
+
+      if ( ! graph.has_fo_edge(j, k) )  continue;
+
+      // cout << "\n  Merging fcst " << j << ", obs " << k << '\n' << flush;
+
+      part.merge_values(f_i, o_i);
+
+      // specialzed_dump(graph.n_fcst(), graph.n_obs(), p);
+
+   }   //  for k
+
+}   //  for j
+
+
+   //
+   //  fcst, fcst
+   //
+
+   //
+   //  obs, obs
+   //
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MM_Engine::partition_dump(ostream & out) const
+
+{
+
+part.specialized_dump(out, graph.n_fcst(), graph.n_obs());
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
