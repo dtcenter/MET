@@ -61,6 +61,8 @@ class IntArray {
 
       void dump(ostream &, int depth = 0) const;
 
+      void dump_one_line(ostream &, int depth = 0) const;
+
       int operator[](int) const;
 
       int has(int) const;

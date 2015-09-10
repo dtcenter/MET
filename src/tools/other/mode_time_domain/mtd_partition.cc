@@ -758,7 +758,7 @@ for (j=0; j<Nelements; ++j)  {
 
    }
 
-   // a.sort();
+   a.sort();
 
    for (k=0; k<(a.n_elements()); ++k)  {
 
