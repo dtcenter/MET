@@ -150,7 +150,7 @@ class MtdConfigInfo {
       PiecewiseLinear * end_time_delta_if;
 
 
-      double           total_interest_thresh;  // Total interest threshold defining significance
+      double           total_interest_thresh;  // Total interest threshold
 
       double           print_interest_thresh;  // Only write output for pairs with >= this interest
 

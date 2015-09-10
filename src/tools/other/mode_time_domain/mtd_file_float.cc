@@ -306,7 +306,7 @@ for (x=0; x<Nx; ++x)  {
 
 }
 
-cout << "   Bad data count is " << count << "\n";
+// cout << "   Bad data count is " << count << "\n";
 
    //
    //  done
