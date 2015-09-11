@@ -76,6 +76,7 @@
 //   029    07/09/14  Halley Gotway  Add station id exclusion option.
 //   030    03/02/15  Halley Gotway  Add automated regridding.
 //   031    07/30/15  Halley Gotway  Add conditional continuous verification.
+//   032    09/11/15  Halley Gotway  Add climatology to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -539,8 +540,13 @@ void process_fcst_climo_files() {
       } // end for j
 
       // Read climatology data
-      read_climo_data_plane_array(conf_info.conf.lookup_dictionary(conf_key_climo),
-                                  i, fcst_dpa[0].valid(), grid, cmn_dpa, csd_dpa);
+      cmn_dpa = read_climo_data_plane_array(
+                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   i, fcst_dpa[0].valid(), grid);
+
+      csd_dpa = read_climo_data_plane_array(
+                   conf_info.conf.lookup_dictionary(conf_key_climo_stdev_field, false),
+                   i, fcst_dpa[0].valid(), grid);
 
       // Store data for the current verification task
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
