@@ -18,13 +18,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void read_climo_data_plane(
-               Dictionary *, int, unixtime, const Grid &,
-               DataPlane &cmn_dp, DataPlane &csd_dp);
+extern DataPlane read_climo_data_plane(Dictionary *, int,
+                                       unixtime, const Grid &);
 
-extern void read_climo_data_plane_array(
-                Dictionary *, int, unixtime, const Grid &,
-                DataPlaneArray &cmn_dpa, DataPlaneArray &csd_dpa);
+extern DataPlaneArray read_climo_data_plane_array(Dictionary *, int,
+                                                  unixtime, const Grid &);
 
 ////////////////////////////////////////////////////////////////////////
 
