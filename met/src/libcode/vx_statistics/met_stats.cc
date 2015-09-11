@@ -1683,6 +1683,8 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
 
 void NBRCNTInfo::init_from_scratch() {
 
+   alpha = (double *) 0;
+
    clear();
 
    return;
