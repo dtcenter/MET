@@ -167,7 +167,6 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    map<STATLineType,STATOutputType>output_map;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
-   Dictionary *cdict = (Dictionary *) 0;
    Dictionary i_fdict, i_odict;
    BootInfo boot_info;
    InterpInfo interp_info;
@@ -220,7 +219,6 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    // Conf: fcst.field, obs.field, and climo.field
    fdict = conf.lookup_array(conf_key_fcst_field);
    odict = conf.lookup_array(conf_key_obs_field);
-   cdict = conf.lookup_array(conf_key_climo_field);
 
    // Determine the number of fields (name/level) to be verified
    n_vx = parse_conf_n_vx(fdict);
@@ -235,17 +233,28 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       exit(1);
    }
 
-   // Check for a valid number of climatology fields
-   n = parse_conf_n_vx(cdict);
+   // Check for a valid number of climatology mean fields
+   n = parse_conf_n_vx(conf.lookup_array(conf_key_climo_mean_field));
    if(n != 0 && n != n_vx) {
       mlog << Error << "\nGridStatConfInfo::process_config() -> "
-           << "The number of climatology fields in \""
-           << conf_key_climo_field
+           << "The number of climatology mean fields in \""
+           << conf_key_climo_mean_field
            << "\" must be zero or match the number in \""
            << conf_key_fcst_field << "\".\n\n";
       exit(1);
    }
 
+   // Check for a valid number of climatology standard deviation fields
+   n = parse_conf_n_vx(conf.lookup_array(conf_key_climo_stdev_field));
+   if(n != 0 && n != n_vx) {
+      mlog << Error << "\nGridStatConfInfo::process_config() -> "
+           << "The number of climatology standard deviation fields in \""
+           << conf_key_climo_stdev_field
+           << "\" must be zero or match the number in \""
+           << conf_key_fcst_field << "\".\n\n";
+      exit(1);
+   }
+   
    // Allocate space based on the number of verification tasks
    fcst_info  = new VarInfo *   [n_vx];
    obs_info   = new VarInfo *   [n_vx];
@@ -562,6 +571,7 @@ Dictionary * d = e->dict_value();
 nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
 nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
 nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
+nc_info.do_climo  = d->lookup_bool(conf_key_climo_flag);
 
 
    //
@@ -778,7 +788,7 @@ bool GridStatNcOutInfo::all_false() const
 
 {
 
-bool status = do_latlon || do_raw || do_diff;
+bool status = do_latlon || do_raw || do_diff || do_climo;
 
 return ( !status );
 
@@ -795,6 +805,7 @@ void GridStatNcOutInfo::set_all_false()
 do_latlon = false;
 do_raw    = false;
 do_diff   = false;
+do_climo  = false;
 
 return;
 
@@ -811,6 +822,7 @@ void GridStatNcOutInfo::set_all_true()
 do_latlon = true;
 do_raw    = true;
 do_diff   = true;
+do_climo  = true;
 
 return;
 

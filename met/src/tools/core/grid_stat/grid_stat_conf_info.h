@@ -68,6 +68,8 @@ struct GridStatNcOutInfo {
 
    bool do_diff;
 
+   bool do_climo;
+
       //////////////////
 
    GridStatNcOutInfo();

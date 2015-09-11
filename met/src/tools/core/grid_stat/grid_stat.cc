@@ -78,7 +78,7 @@
 //   031    02/19/15  Halley Gotway  Add automated regridding.
 //   032    08/04/15  Halley Gotway  Add conditional continuous verification.
 //   033    09/04/15  Halley Gotway  Add climatology and SAL1L2 and VAL1L2
-//                                   output line type.
+//                                   output line types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -138,8 +138,10 @@ static void do_nbrcnt(NBRCNTInfo &, int, int, int,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
 
-static void write_nc(const GridStatNcOutInfo &, const DataPlane &,
-                     const DataPlane &, int, InterpMthd, int);
+static void write_nc(const GridStatNcOutInfo &,
+                     const DataPlane &, const DataPlane &,
+                     const DataPlane &, const DataPlane &,
+                     int, InterpMthd, int);
 
 static void add_var_att(NcVar *, const char *, const char *);
 
@@ -575,6 +577,10 @@ void process_scores() {
    // Compute scores for each verification task and write output_flag
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      mlog << Debug(3)
+           << "Reading forecast data for "
+           << conf_info.fcst_info[i]->magic_str() << ".\n";
+
       // Read the gridded data from the input forecast file
       status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
 
@@ -606,6 +612,10 @@ void process_scores() {
       // Set the forecast valid time
       shc.set_fcst_valid_beg(fcst_dp.valid());
       shc.set_fcst_valid_end(fcst_dp.valid());
+
+      mlog << Debug(3)
+           << "Reading observation data for "
+           << conf_info.obs_info[i]->magic_str() << ".\n";
 
       // Read the gridded data from the input observation file
       status = obs_mtddf->data_plane(*conf_info.obs_info[i], obs_dp);
@@ -660,9 +670,24 @@ void process_scores() {
       }
 
       // Read climatology data
-      read_climo_data_plane(conf_info.conf.lookup_dictionary(conf_key_climo),
-                            i, fcst_dp.valid(), grid, cmn_dp, csd_dp);
+      cmn_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                  i, fcst_dp.valid(), grid);
 
+      mlog << Debug(3)
+           << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
+           << " climatology mean field(s) for forecast "
+           << conf_info.fcst_info[i]->magic_str() << ".\n";
+
+      csd_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                  i, fcst_dp.valid(), grid);
+
+      mlog << Debug(3)
+           << "Found " << (csd_dp.nx() == 0 ? 0 : 1)
+           << " climatology standard deviation field(s) for forecast "
+           << conf_info.fcst_info[i]->magic_str() << ".\n";
+      
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
 
@@ -1073,7 +1098,8 @@ void process_scores() {
          // the config file
          if(!(conf_info.nc_info.all_false())) {
             write_nc(conf_info.nc_info, 
-                     fcst_dp_smooth, obs_dp_smooth, i,
+                     fcst_dp_smooth, obs_dp_smooth,
+                     cmn_dp_smooth, csd_dp_smooth, i,
                      conf_info.interp_mthd[j],
                      conf_info.interp_wdth[j]);
          }
@@ -1631,55 +1657,57 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp,
-              const DataPlane &obs_dp, int i_vx, InterpMthd mthd, int wdth) {
+void write_nc(const GridStatNcOutInfo & nc_info,
+              const DataPlane &fcst_dp, const DataPlane &obs_dp,
+              const DataPlane &cmn_dp,  const DataPlane &csd_dp,
+              int i_vx, InterpMthd mthd, int wdth) {
    int i, n, x, y;
-   int fcst_flag, obs_flag, diff_flag;
+   int fcst_flag, obs_flag, diff_flag, cmn_flag, csd_flag;
+   double fval, oval, cmnval, csdval;
+   ConcatString fcst_var_name, obs_var_name, diff_var_name;
+   ConcatString cmn_var_name, csd_var_name;
+   ConcatString att_str, mthd_str, smooth_str, cs;
+
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
-   double fval, oval;
-   NcVar *fcst_var = (NcVar *) 0, *obs_var = (NcVar *) 0, *diff_var = (NcVar *) 0;
-   ConcatString fcst_var_name, obs_var_name, diff_var_name;
-   ConcatString att_str, mthd_str;
-
-   // Get the interpolation method string
+   float *cmn_data  = (float *) 0;
+   float *csd_data  = (float *) 0;
+   
+   NcVar *fcst_var = (NcVar *) 0, *obs_var = (NcVar *) 0;
+   NcVar *diff_var = (NcVar *) 0;
+   NcVar *cmn_var  = (NcVar *) 0, *csd_var = (NcVar *) 0;
+   
+   // Get the interpolation strings
    mthd_str = interpmthd_to_string(mthd);
+   if(wdth > 1) smooth_str << "_" << mthd_str << "_" << wdth*wdth;
 
    // Allocate memory for the forecast, observation, and difference
    // fields
    fcst_data = new float [grid.nx()*grid.ny()];
    obs_data  = new float [grid.nx()*grid.ny()];
    diff_data = new float [grid.nx()*grid.ny()];
+   cmn_data  = new float [grid.nx()*grid.ny()];
+   csd_data  = new float [grid.nx()*grid.ny()];
 
    // Compute the difference field for each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
 
-      // Build the forecast variable name
-      fcst_var_name << cs_erase << "FCST_"
-                    << conf_info.fcst_info[i_vx]->name() << "_"
-                    << conf_info.fcst_info[i_vx]->level_name() << "_"
-                    << conf_info.mask_name[i];
-      
-      // Append smoothing information
-      if((wdth > 1) &&
-         (conf_info.interp_field == FieldType_Fcst ||
-          conf_info.interp_field == FieldType_Both)) {
-         fcst_var_name << "_" << mthd_str << "_" << wdth*wdth;
-      }
+      // Build the variable names
+      cs << cs_erase 
+         << conf_info.fcst_info[i_vx]->name() << "_"
+         << conf_info.fcst_info[i_vx]->level_name() << "_"
+         << conf_info.mask_name[i] << smooth_str;
+
+      fcst_var_name << cs_erase << "FCST_" << cs;
+      cmn_var_name  << cs_erase << "CLIMO_MEAN_" << cs;
+      csd_var_name  << cs_erase << "CLIMO_STDEV_" << cs;
 
       // Build the observation variable name
       obs_var_name << cs_erase << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
                    << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << conf_info.mask_name[i];
-
-      // Append smoothing information
-      if((wdth > 1) &&
-         (conf_info.interp_field == FieldType_Obs ||
-          conf_info.interp_field == FieldType_Both)) {
-         obs_var_name << "_" << mthd_str << "_" << wdth*wdth;
-      }
+                   << conf_info.mask_name[i] << smooth_str;
 
       // Build the difference variable name
       diff_var_name << cs_erase << "DIFF_"
@@ -1687,32 +1715,36 @@ void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp,
                     << conf_info.fcst_info[i_vx]->level_name() << "_"
                     << conf_info.obs_info[i_vx]->name() << "_"
                     << conf_info.obs_info[i_vx]->level_name() << "_"
-                    << conf_info.mask_name[i];
-      
-      // Append smoothing information
-      if(wdth > 1) {
-         diff_var_name << "_"
-                       << mthd_str << "_"
-                       << wdth*wdth;
-      }
+                    << conf_info.mask_name[i] << smooth_str;
 
-      // Figure out if the forecast, observation, and difference
-      // fields should be written out.
+      // Figure out which fields should be written
       fcst_flag = !fcst_var_sa.has(fcst_var_name);
       obs_flag  = !obs_var_sa.has(obs_var_name);
+      diff_flag = !diff_var_sa.has(diff_var_name);
+      cmn_flag  = !cmn_var_sa.has(cmn_var_name);
+      csd_flag  = !csd_var_sa.has(csd_var_name);
 
+      // Check the config file flags
       if(!(nc_info.do_raw)) {
          fcst_flag = false;
-          obs_flag = false;
+         obs_flag  = false;
+      }
+      if(!(nc_info.do_climo)) {
+         cmn_flag  = false;
+         csd_flag  = false;
+      }
+      if(!(nc_info.do_diff)) {
+         diff_flag = false;
       }
 
-      // Don't write the difference field for probability forecasts
-      diff_flag = (!diff_var_sa.has(diff_var_name) &&
-                   !conf_info.fcst_info[i_vx]->p_flag());
+      // Skip differences for probability forecasts
+      if(conf_info.fcst_info[i_vx]->p_flag()) diff_flag = false;
 
-      if(!(nc_info.do_diff)) diff_flag = false;
+      // Skip empty climatology mean and standard deviation
+      if(cmn_dp.nx() == 0 && cmn_dp.ny() == 0) cmn_flag = false;
+      if(csd_dp.nx() == 0 && csd_dp.ny() == 0) csd_flag = false;
 
-      // Set up the forecast variable if not already defined
+      // Add the forecast variable
       if(fcst_flag) {
 
          // Define the forecast variable
@@ -1794,7 +1826,57 @@ void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp,
          diff_var->add_att("smoothing_neighborhood", wdth*wdth);
       } // end diff_flag
 
-      // Store the forecast, observation, and difference values
+      // Add the climatology mean variable
+      if(cmn_flag) {
+
+         // Define the forecast variable
+         cmn_var = nc_out->add_var(cmn_var_name, ncFloat,
+                                   lat_dim, lon_dim);
+
+         // Add to the list of previously defined variables
+         cmn_var_sa.add(cmn_var_name);
+
+         // Add variable attributes for the climatology mean field
+         add_var_att(cmn_var, "name", shc.get_fcst_var());
+         att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
+                 << " at "
+                 << conf_info.fcst_info[i_vx]->level_name();
+         add_var_att(cmn_var, "long_name", att_str);
+         add_var_att(cmn_var, "level", shc.get_fcst_lev());
+         add_var_att(cmn_var, "units", conf_info.fcst_info[i_vx]->units());
+         write_netcdf_var_times(cmn_var, cmn_dp);
+         cmn_var->add_att("_FillValue", bad_data_float);
+         add_var_att(cmn_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att(cmn_var, "smoothing_method", mthd_str);
+         cmn_var->add_att("smoothing_neighborhood", wdth*wdth);
+      } // end cmn_flag
+
+      // Add the climatology stdev variable
+      if(csd_flag) {
+
+         // Define the forecast variable
+         csd_var = nc_out->add_var(csd_var_name, ncFloat,
+                                   lat_dim, lon_dim);
+
+         // Add to the list of previously defined variables
+         csd_var_sa.add(csd_var_name);
+
+         // Add variable attributes for the climatology stdev field
+         add_var_att(csd_var, "name", shc.get_fcst_var());
+         att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
+                 << " at "
+                 << conf_info.fcst_info[i_vx]->level_name();
+         add_var_att(csd_var, "long_name", att_str);
+         add_var_att(csd_var, "level", shc.get_fcst_lev());
+         add_var_att(csd_var, "units", conf_info.fcst_info[i_vx]->units());
+         write_netcdf_var_times(csd_var, csd_dp);
+         csd_var->add_att("_FillValue", bad_data_float);
+         add_var_att(csd_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att(csd_var, "smoothing_method", mthd_str);
+         csd_var->add_att("smoothing_neighborhood", wdth*wdth);
+      } // end csd_flag
+
+      // Store the forecast, observation, difference, and climatology values
       for(x=0; x<grid.nx(); x++) {
          for(y=0; y<grid.ny(); y++) {
 
@@ -1805,25 +1887,25 @@ void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp,
                fcst_data[n] = bad_data_float;
                obs_data[n]  = bad_data_float;
                diff_data[n] = bad_data_float;
+               cmn_data[n]  = bad_data_float;
+               csd_data[n]  = bad_data_float;
                continue;
             }
 
-            // Retrieve the forecast and observation values
-            fval = fcst_dp.get(x, y);
-            oval = obs_dp.get(x, y);
+            // Retrieve the data values
+            fval   = fcst_dp.get(x, y);
+            oval   = obs_dp.get(x, y);
+            cmnval = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
+            csdval = (csd_flag ? csd_dp.get(x, y) : bad_data_double);
 
-            // Set the forecast data
-            if(is_bad_data(fval)) fcst_data[n] = bad_data_float;
-            else                  fcst_data[n] = fval;
+            // Store the values
+            fcst_data[n] = (is_bad_data(fval)   ? bad_data_float : fval);
+            obs_data[n]  = (is_bad_data(oval)   ? bad_data_float : oval);
+            diff_data[n] = (is_bad_data(fval) || is_bad_data(oval) ?
+                            bad_data_float : fval - oval);
+            cmn_data[n]  = (is_bad_data(cmnval) ? bad_data_float : cmnval);
+            csd_data[n]  = (is_bad_data(csdval) ? bad_data_float : csdval);
 
-            // Set the observation data
-            if(is_bad_data(oval)) obs_data[n]  = bad_data_float;
-            else                  obs_data[n]  = oval;
-
-            // Set the difference data
-            if(is_bad_data(fval) ||
-               is_bad_data(oval)) diff_data[n] = bad_data_float;
-            else                  diff_data[n] = fval - oval;
          } // end for y
       } // end for x
 
@@ -1863,12 +1945,38 @@ void write_nc(const GridStatNcOutInfo & nc_info, const DataPlane &fcst_dp,
          }
       }
 
+      // Write out the climatology mean field
+      if(cmn_flag) {
+         if(!cmn_var->put(&cmn_data[0], grid.ny(), grid.nx())) {
+            mlog << Error << "\nwrite_nc() -> "
+                 << "error with the cmn_var->put for fields "
+                 << shc.get_fcst_var() << " and " << shc.get_obs_var()
+                 << " and masking region " << conf_info.mask_name[i]
+                 << "\n\n";
+            exit(1);
+         }
+      }
+
+      // Write out the climatology stdev field
+      if(csd_flag) {
+         if(!csd_var->put(&csd_data[0], grid.ny(), grid.nx())) {
+            mlog << Error << "\nwrite_nc() -> "
+                 << "error with the csd_var->put for fields "
+                 << shc.get_fcst_var() << " and " << shc.get_obs_var()
+                 << " and masking region " << conf_info.mask_name[i]
+                 << "\n\n";
+            exit(1);
+         }
+      }
+
    } // end for i
 
    // Deallocate and clean up
    if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }
    if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
    if(diff_data) { delete [] diff_data; diff_data = (float *) 0; }
+   if(cmn_data)  { delete [] cmn_data;  cmn_data  = (float *) 0; }
+   if(csd_data)  { delete [] csd_data;  csd_data  = (float *) 0; }
 
    return;
 }
