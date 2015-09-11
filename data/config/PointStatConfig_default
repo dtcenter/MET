@@ -76,24 +76,27 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology data
+// Climatology mean data
 //
-climo = {
+climo_mean = {
 
    //
-   // Climatology mean and standard deviation files.  May list multiple.
-   // Standard deviations are optional.  May be defined separately for
-   // each entry climo.field entry.
+   // Climatology mean files.
    //
-   mean_file_name  = [];
-   stdev_file_name = [];
+   file_name = [];
+
+   //
+   // field must be empty or the same length as fcst.field.
+   //
+   field = [];
 
    //
    // Method for regridding climatology data to the verification grid.
    //
    regrid = {
-      method = NEAREST;
-      width  = 1;
+      vld_thresh = 0.5;
+      method     = NEAREST;
+      width      = 1;
    }
 
    //
@@ -117,14 +120,13 @@ climo = {
    // Time step of the climatology data in seconds.  Set to 60*60*6 for
    // 6-hourly data or 60*60 for hourly data.
    //
-   time_step = 60*60*6;
-
-   //
-   // Climatology fields to be used
-   // Must be empty or the same length as fcst.field.
-   //
-   field = [];
+   time_step = 21600;
 }
+
+//
+// Climatology standard deviation data
+//
+climo_stdev = climo_mean;
 
 ////////////////////////////////////////////////////////////////////////////////
 
