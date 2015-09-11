@@ -354,10 +354,8 @@ static const char conf_key_beg[]               = "beg";
 static const char conf_key_end[]               = "end";
 static const char conf_key_fcst[]              = "fcst";
 static const char conf_key_obs[]               = "obs";
-static const char conf_key_climo[]             = "climo";
 static const char conf_key_fcst_field[]        = "fcst.field";
 static const char conf_key_obs_field[]         = "obs.field";
-static const char conf_key_climo_field[]       = "climo.field";
 static const char conf_key_file_type[]         = "file_type";
 static const char conf_key_init_time[]         = "init_time";  // YYYYMMDD[_HH[MMSS]]
 static const char conf_key_valid_time[]        = "valid_time"; // YYYYMMDD[_HH[MMSS]]
@@ -431,13 +429,24 @@ static const char conf_key_line_color[]        = "line_color";
 static const char conf_key_line_width[]        = "line_width";
 static const char conf_key_line_dash[]         = "line_dash";
 
-static const char conf_key_latlon_flag       [] = "latlon";
-static const char conf_key_raw_flag          [] = "raw";
-static const char conf_key_diff_flag         [] = "diff";
-static const char conf_key_object_raw_flag   [] = "object_raw";
-static const char conf_key_object_id_flag    [] = "object_id";
-static const char conf_key_cluster_id_flag   [] = "cluster_id";
-static const char conf_key_polylines_flag    [] = "polylines";
+static const char conf_key_latlon_flag[]       = "latlon";
+static const char conf_key_raw_flag[]          = "raw";
+static const char conf_key_diff_flag[]         = "diff";
+static const char conf_key_climo_flag[]        = "climo";
+static const char conf_key_object_raw_flag[]   = "object_raw";
+static const char conf_key_object_id_flag[]    = "object_id";
+static const char conf_key_cluster_id_flag[]   = "cluster_id";
+static const char conf_key_polylines_flag[]    = "polylines";
+
+//
+// Climatology parameter key names
+//
+
+static const char conf_key_climo_mean_field[]  = "climo_mean.field";
+static const char conf_key_climo_stdev_field[] = "climo_stdev.field";
+static const char conf_key_time_interp_method[]= "time_interp_method";
+static const char conf_key_match_day[]         = "match_day";
+static const char conf_key_time_step[]         = "time_step";
 
 //
 // Wavelet-Stat specific parameter key names

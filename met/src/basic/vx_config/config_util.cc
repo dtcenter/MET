@@ -633,15 +633,16 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    // Parse to_grid as an integer
    v = regrid_dict->lookup_int(conf_key_to_grid, false);
 
-   // If successful, convert to FieldType.
-   // If not, parse vx_grid as a string.
+   // If integer lookup successful, convert to FieldType.
    if(regrid_dict->last_lookup_status()) {
       info.field  = int_to_fieldtype(v);
       info.enable = (info.field == FieldType_Fcst ||
                      info.field == FieldType_Obs);
    }
+   // If integer lookup unsuccessful, parse vx_grid as a string.
+   // Do not error out since to_grid isn't specified for climo.regrid.
    else {
-      info.name   = regrid_dict->lookup_string(conf_key_to_grid);
+      info.name   = regrid_dict->lookup_string(conf_key_to_grid, false);
       info.enable = true;
    }
 
