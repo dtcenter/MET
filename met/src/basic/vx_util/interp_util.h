@@ -26,6 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "data_plane.h"
+#include "interp_mthd.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -57,6 +58,15 @@ extern double interp_bilin  (const DataPlane &, double, double);
 extern double compute_horz_interp(const DataPlane &, double, double, int, int, double);
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);
+
+////////////////////////////////////////////////////////////////////////
+//
+// Interpolate two fields in time
+//
+///////////////////////////////////////////////////////////////////////////////
+
+extern DataPlane valid_time_interp(const DataPlane &, const DataPlane &,
+                                   const unixtime, InterpMthd);
 
 ///////////////////////////////////////////////////////////////////////////////
 

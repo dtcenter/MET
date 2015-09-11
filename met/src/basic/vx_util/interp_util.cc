@@ -491,3 +491,105 @@ double compute_vert_zinterp(double v1, double lvl1,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
+                            const unixtime to_ut, InterpMthd mthd) {
+   DataPlane dp, dp1, dp2;
+   int x, y;
+   bool use_min;
+   double v, v1, v2, w1, w2;
+
+   // Store min and max valid times.
+   dp1 = (in1.valid() <= in2.valid() ? in1 : in2);
+   dp2 = (in1.valid() >  in2.valid() ? in1 : in2);
+
+   // Range check the times
+   if(dp1.valid() > to_ut || dp2.valid() < to_ut ||
+      dp1.valid() == dp2.valid()) {
+      mlog << Error << "\time_interp() -> "
+           << "the interpolation time " << unix_to_yyyymmdd_hhmmss(to_ut)
+           << " must fall between the input times: "
+           << unix_to_yyyymmdd_hhmmss(dp1.valid()) << " and "
+           << unix_to_yyyymmdd_hhmmss(dp2.valid()) << ".\n\n";
+      exit(1);
+   }
+
+   // Check grid dimensions
+   if(dp1.nx() != dp2.nx() || dp1.ny() != dp2.ny()) {
+      mlog << Error << "\nvalid_time_interp() -> "
+           << "the grid dimensions don't match: "
+           << dp1.nx() << " x " << dp1.ny() << " != "
+           << dp2.nx() << " x " << dp2.ny() << ".\n\n";
+      exit(1);
+   }
+
+   // Compute interpolation weights
+   switch(mthd) {
+      case(InterpMthd_Min):     // Minimum
+      case(InterpMthd_Max):     // Maximum
+         w1 = w2 = bad_data_double;
+         break;
+
+      case(InterpMthd_UW_Mean): // Unweighted Mean
+         w1 = w2 = 0.5;
+         break;
+
+      case(InterpMthd_DW_Mean): // Distance-Weighted Mean
+         w1 = (double) (dp2.valid() - to_ut) /
+                       (dp2.valid() - dp1.valid());
+         w2 = (double) (to_ut - dp1.valid()) /
+                       (dp2.valid() - dp1.valid());
+         break;
+
+      case(InterpMthd_Nearest): // Nearest Neighbor
+         use_min = ((to_ut - dp1.valid()) <=
+                    (dp2.valid() - to_ut));
+         w1 = (use_min ? 1.0 : 0.0);
+         w2 = (use_min ? 0.0 : 1.0);         
+         break;
+
+      case(InterpMthd_Median):  // Median
+      case(InterpMthd_LS_Fit):  // Least-squares fit
+      case(InterpMthd_Bilin):   // Bilinear interpolation
+      default:
+         mlog << Error << "\nvalid_time_interp() -> "
+              << "unsupported interpolation method encountered: "
+              << interpmthd_to_string(mthd) << "\n\n";
+         exit(1);
+         break;
+   }
+
+   // Initialize
+   dp.clear();
+   dp.set_size(dp1.nx(), dp1.ny());
+   dp.set_valid(to_ut);
+
+   // Compute interpolated value for each point
+   for(x=0; x<dp.nx(); x++) {
+      for(y=0; y<dp.ny(); y++) {
+
+         // Get current values
+         v1 = dp1.get(x, y);
+         v2 = dp2.get(x, y);
+         v  = bad_data_double;
+
+         // Check for bad data
+         if(!is_bad_data(v1) && !is_bad_data(v2)) {
+            
+            // Minimum
+                 if(mthd == InterpMthd_Min) v = min(v1, v2);
+            // Maximum
+            else if(mthd == InterpMthd_Max) v = max(v1, v2);
+            // Apply weights
+            else                            v = w1*v1 + w2*v2;
+         }
+
+         // Store interpolated value
+         dp.set(v, x, y);
+      } // end for y
+   } // end for x
+
+   return(dp);
+}
+
+////////////////////////////////////////////////////////////////////////
