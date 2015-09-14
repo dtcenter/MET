@@ -62,6 +62,7 @@ static void check_dbl(double d1, double d2, const char *col, const char *key);
 static void usage();
 static void set_out(const StringArray &);
 static void set_ens_mean(const StringArray &);
+static void set_no_swap(const StringArray &);
 static void set_channel(const StringArray &);
 static void set_rng_name(const StringArray &);
 static void set_rng_seed(const StringArray &);
@@ -82,14 +83,15 @@ int main(int argc, char * argv []) {
    cline.set_usage(usage);
 
    // Add options
-   cline.add(set_out,       "-out",       1);
-   cline.add(set_ens_mean,  "-ens_mean",  1);
-   cline.add(set_channel,   "-channel",   1);
-   cline.add(set_hdr,       "-set_hdr",   2);
-   cline.add(set_rng_name,  "-rng_name",  1);
+   cline.add(set_out,       "-out",      1);
+   cline.add(set_ens_mean,  "-ens_mean", 1);
+   cline.add(set_no_swap,   "-no_swap",  0);
+   cline.add(set_channel,   "-channel",  1);
+   cline.add(set_hdr,       "-set_hdr",  2);
+   cline.add(set_rng_name,  "-rng_name", 1);
    cline.add(set_rng_seed,  "-rng_seed", 1);
-   cline.add(set_logfile,   "-log",       1);
-   cline.add(set_verbosity, "-v",         1);
+   cline.add(set_logfile,   "-log",      1);
+   cline.add(set_verbosity, "-v",        1);
 
    // Parse the command line
    cline.parse();
@@ -192,7 +194,7 @@ void process_conv(const char *conv_filename, int i_mem) {
    ConvData d, d_v;
 
    // Open input file
-   if(!(f.open(conv_filename))) {
+   if(!(f.open(conv_filename, swap_endian))) {
       mlog << Error << "\nprocess_conv() -> "
            << "can't open input file \"" << conv_filename << "\"\n\n";
       exit(1);
@@ -319,7 +321,7 @@ void process_rad(const char *rad_filename, int i_mem) {
    RadData d;
 
    // Open input file
-   if(!(f.open(rad_filename))) {
+   if(!(f.open(rad_filename, swap_endian))) {
       mlog << Error << "\nprocess_rad() -> "
            << "can't open input file \"" << rad_filename << "\"\n\n";
       exit(1);
@@ -736,6 +738,7 @@ void usage() {
         << "\tens_file_1 ... ens_file_n | ens_file_list\n"
         << "\t-out path\n"
         << "\t[-ens_mean path]\n"
+        << "\t[-no_swap]\n"
         << "\t[-channel n]\n"
         << "\t[-rng_name str]\n"
         << "\t[-rng_seed str]\n"
@@ -752,6 +755,8 @@ void usage() {
         << "\".stat\" file (required).\n"
         << "\t\t\"-ens_mean path\" is the ensemble mean binary GSI "
         << "diagnostic file (optional).\n"
+        << "\t\t\"-no_swap\" to not switch the endianess of the input "
+        << "binary files (optional).\n"
         << "\t\t\"-channel n\" overrides the default processing of all "
         << "radiance channels with a comma-separated list (optional).\n"
         << "\t\t\"-rng_name str\" overrides the default random number "
@@ -779,6 +784,12 @@ void set_out(const StringArray & a) {
 
 void set_ens_mean(const StringArray & a) {
    ens_mean_filename = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_no_swap(const StringArray & a) {
+   swap_endian = false;
 }
 
 ////////////////////////////////////////////////////////////////////////

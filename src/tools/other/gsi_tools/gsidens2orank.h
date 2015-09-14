@@ -40,7 +40,6 @@ using namespace std;
 
 static const char *program_name = "gsidens2orank";
 static const int   rec_pad_length = 4;
-static const bool  swap_endian = true;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -119,6 +118,7 @@ static const int retr_extra_begin = 11;
 //
 ////////////////////////////////////////////////////////////////////////
 
+static bool           swap_endian = true;
 static ConcatString   output_filename;
 static ConcatString   ens_mean_filename;
 static NumArray       channel;

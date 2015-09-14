@@ -38,7 +38,6 @@ using namespace std;
 
 static const char *program_name = "gsid2mpr";
 static const int   rec_pad_length = 4;
-static const bool  swap_endian = true;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,6 +127,7 @@ static const int retr_extra_begin  = 11;
 //
 ////////////////////////////////////////////////////////////////////////
 
+static bool           swap_endian = true;
 static NumArray       channel;
 static StringArray    hdr_name;
 static StringArray    hdr_value;

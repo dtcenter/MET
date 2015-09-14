@@ -55,6 +55,7 @@ static void write_mpr_row_rad (AsciiTable &at, int row, const RadData  &d);
 static bool is_dup(const char *);
 
 static void usage();
+static void set_no_swap(const StringArray &);
 static void set_channel(const StringArray &);
 static void set_hdr(const StringArray &);
 static void set_suffix(const StringArray &);
@@ -75,6 +76,7 @@ int main(int argc, char * argv []) {
    cline.set_usage(usage);
 
    // Add options
+   cline.add(set_no_swap,   "-no_swap", 0);
    cline.add(set_channel,   "-channel", 1);
    cline.add(set_hdr,       "-set_hdr", 2);
    cline.add(set_suffix,    "-suffix",  1);
@@ -141,7 +143,7 @@ void process_conv(const char *conv_filename, const char *output_filename) {
                     n_header_columns + n_mpr_columns);
 
    // Open input file
-   if(!(f.open(conv_filename))) {
+   if(!(f.open(conv_filename, swap_endian))) {
       mlog << Error << "\nprocess_conv() -> "
            << "can't open input file \"" << conv_filename << "\"\n\n";
       exit(1);
@@ -241,9 +243,9 @@ void process_rad(const char *rad_filename, const char *output_filename) {
        write_header_row(retr_extra_columns, n_retr_extra_cols, 0, at, 0,
                         n_header_columns + n_mpr_columns + retr_extra_begin);
    }
-   
+
    // Open input file
-   if(!(f.open(rad_filename))) {
+   if(!(f.open(rad_filename, swap_endian))) {
       mlog << Error << "\nprocess_rad() -> "
            << "can't open input file \"" << rad_filename << "\"\n\n";
       exit(1);
@@ -482,6 +484,7 @@ void usage() {
 
         << "Usage: " << program_name << "\n"
         << "\tgsi_file1 [gsi_file2 gsi_file3 ... gsi_filen]\n"
+        << "\t[-no_swap]\n"
         << "\t[-channel n]\n"
         << "\t[-set_hdr col_name value]\n"        
         << "\t[-suffix string]\n"
@@ -491,6 +494,8 @@ void usage() {
 
         << "\twhere\t\"gsi_file\" is a binary GSI diagnostic file "
         << "(conventional or radiance) to be reformatted (required).\n"
+        << "\t\t\"-no_swap\" to not switch the endianess of the input "
+        << "binary files (optional).\n"
         << "\t\t\"-channel n\" overrides the default processing of all "
         << "radiance channels with a comma-separated list (optional).\n"
         << "\t\t\"-set_hdr col_name value\" specifies what should be "
@@ -506,6 +511,12 @@ void usage() {
         << flush;
 
    exit (1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_no_swap(const StringArray & a) {
+   swap_endian = false;
 }
 
 ////////////////////////////////////////////////////////////////////////
