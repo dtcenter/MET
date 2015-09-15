@@ -1307,7 +1307,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
    
 void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
    int i, j;
-   NumArray f_na, o_na;
+   NumArray f_na, o_na, c_na;
 
    mlog << Debug(2)
         << "Computing Continuous Statistics.\n";
@@ -1337,8 +1337,8 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       subset_fo_na(pd_ptr->f_na, cnt_info[i].fthresh,
                    pd_ptr->o_na, cnt_info[i].othresh,
-                   conf_info.cnt_logic[i_vx],
-                   f_na, o_na);
+                   pd_ptr->cmn_na, conf_info.cnt_logic[i_vx],
+                   f_na, o_na, c_na);
 
       mlog << Debug(3)
            << "Found " << f_na.n_elements()

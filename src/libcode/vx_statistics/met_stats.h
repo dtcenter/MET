@@ -557,7 +557,8 @@ extern void   compute_i_mean_stdev(const NumArray &,
 
 extern void   subset_fo_na(const NumArray &, const SingleThresh &,
                            const NumArray &, const SingleThresh &,
-                           const SetLogic, NumArray &, NumArray &);
+                           const NumArray &, const SetLogic,
+                           NumArray &, NumArray &, NumArray &);
 
 extern bool   check_fo_thresh(const double, const SingleThresh &,
                               const double, const SingleThresh &,

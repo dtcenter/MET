@@ -123,7 +123,7 @@ static void do_cts   (CTSInfo *&, int,
 static void do_mcts  (MCTSInfo &, int,
                       const NumArray &, const NumArray &);
 static void do_cnt   (CNTInfo *&, int,
-                      const NumArray &, const NumArray &);
+                      const NumArray &, const NumArray &, const NumArray &);
 static void do_sl1l2 (SL1L2Info *&, int,
                       const NumArray &, const NumArray &, const NumArray &);
 static void do_vl1l2 (VL1L2Info *&, int,
@@ -881,7 +881,7 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) cnt_info[m].clear();
 
                // Compute CNT
-               do_cnt(cnt_info, i, f_na, o_na);
+               do_cnt(cnt_info, i, f_na, o_na, cmn_na);
 
                // Loop through the continuous thresholds
                for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
@@ -1353,9 +1353,10 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_cnt(CNTInfo *&cnt_info, int i_vx,
-            const NumArray &f_na, const NumArray &o_na) {
+            const NumArray &f_na, const NumArray &o_na,
+            const NumArray &c_na) {
    int i, j;
-   NumArray ff_na, oo_na;
+   NumArray ff_na, oo_na, cc_na;
 
    mlog << Debug(2) << "Computing Continuous Statistics.\n";
 
@@ -1384,8 +1385,8 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       //
       subset_fo_na(f_na, cnt_info[i].fthresh,
                    o_na, cnt_info[i].othresh,
-                   conf_info.cnt_logic[i_vx],
-                   ff_na, oo_na);
+                   c_na, cnt_info[i].logic,
+                   ff_na, oo_na, cc_na);
 
       mlog << Debug(3)
            << "Found " << ff_na.n_elements()
@@ -1393,7 +1394,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
            << cnt_info[i].fthresh.get_str()
            << ", observation filtering threshold "
            << cnt_info[i].othresh.get_str() << ", and field logic "
-           << setlogic_to_string(conf_info.cnt_logic[i_vx])
+           << setlogic_to_string(cnt_info[i].logic)
            << ".\n";
 
       //
@@ -1449,7 +1450,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
       s_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
       s_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
       s_info[i].logic   = conf_info.cnt_logic[i_vx];
-
+      
       //
       // Compute partial sums
       //
