@@ -741,6 +741,7 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
 void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
    int i, j;
    NumArray ff_na, oo_na;
+   NumArray c_na, cc_na;
    CNTInfo cnt_info;
 
    mlog << Debug(4) << "Computing Continuous Statistics.\n";
@@ -765,8 +766,8 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
       // Apply continuous filtering thresholds
       subset_fo_na(f_na, cnt_info.fthresh,
                    o_na, cnt_info.othresh,
-                   conf_info.cnt_logic,
-                   ff_na, oo_na);
+                   c_na, conf_info.cnt_logic,
+                   ff_na, oo_na, cc_na);
 
       // Check for no matched pairs to process
       if(ff_na.n_elements() == 0) continue;

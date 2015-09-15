@@ -1036,20 +1036,22 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
-                    const NumArray &c_na) {
+void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
+                    const NumArray &in_c_na) {
    int i;
    double f, o, c;
    double f_sum, o_sum, fo_sum, ff_sum, oo_sum;
    double fa_sum, oa_sum, foa_sum, ffa_sum, ooa_sum;
    double abs_err_sum;
-   NumArray ff_na, oo_na, cc_na;
+   NumArray f_na, o_na, c_na;
+   bool cflag;
 
    // Initialize
    zero_out();
 
    // Apply filtering thresholds to subset the matched pairs
-   subset_fo_na(f_na, fthresh, o_na, othresh, logic, ff_na, oo_na);
+   subset_fo_na(in_f_na, fthresh, in_o_na, othresh, in_c_na,
+                logic, f_na, o_na, c_na);
    
    mlog << Debug(3)
         << "Found " << f_na.n_elements()
@@ -1072,6 +1074,9 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
       exit(1);
    }
 
+   // Flag to process climo
+   cflag = (c_na.n_elements() == f_na.n_elements());
+
    // Initialize the counts and sums
    f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
    fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0.0;
@@ -1082,7 +1087,7 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
 
       f = f_na[i];
       o = o_na[i];
-      c = (c_na.n_elements() == f_na.n_elements() ? c_na[i] : bad_data_double);
+      c = (cflag ? c_na[i] : bad_data_double);
 
       // Skip bad data values in the forecast or observation fields
       if(is_bad_data(f) || is_bad_data(o)) continue;
@@ -1098,7 +1103,6 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
 
       // SAL1L2 sums
       if(!is_bad_data(c)) {
-
          fa_sum  += f-c;
          oa_sum  += o-c;
          foa_sum += (f-c)*(o-c);
@@ -3439,10 +3443,10 @@ void compute_i_mean_stdev(const NumArray &v_na,
 
 void subset_fo_na(const NumArray &f_na, const SingleThresh &ft,
                   const NumArray &o_na, const SingleThresh &ot,
-                  const SetLogic type,
-                  NumArray &sub_f_na, NumArray &sub_o_na) {
+                  const NumArray &c_na, const SetLogic type,
+                  NumArray &ff_na, NumArray &oo_na, NumArray &cc_na) {
    int i;
-   bool fcheck, ocheck;
+   bool fcheck, ocheck, cflag;
    
    if(f_na.n_elements() != o_na.n_elements()) {
       mlog << Error << "\nsubset_fo_na() -> "
@@ -3452,17 +3456,22 @@ void subset_fo_na(const NumArray &f_na, const SingleThresh &ft,
       exit(1);
    }
 
+   // Flag to process climo
+   cflag = (c_na.n_elements() == f_na.n_elements());
+
    // Initialize
-   sub_f_na.clear();
-   sub_o_na.clear();
+   ff_na.clear();
+   oo_na.clear();
+   cc_na.clear();
 
    // Loop through the matched pairs
    for(i=0; i<f_na.n_elements(); i++) {
 
       // Add points which meet the thresholding logic
       if(check_fo_thresh(f_na[i], ft, o_na[i], ot, type)) {
-         sub_f_na.add(f_na[i]);
-         sub_o_na.add(o_na[i]);
+         ff_na.add(f_na[i]);
+         oo_na.add(o_na[i]);
+         if(cflag) cc_na.add(c_na[i]);
       }
    }
 
