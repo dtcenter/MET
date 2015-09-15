@@ -42,9 +42,9 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
       // Check for a grid mismatch
       if(!(*fgrid == *ogrid)) {
          mlog << Error << "\nparse_vx_grid() -> "
-              << "The forecast and observation grids do not match: "
-              << fgrid->serialize() << " != " << ogrid->serialize()
-              << ".  Specify regridding logic in the config file \"regrid\" section.\n\n";
+              << "The forecast and observation grids do not match:\n"
+              << fgrid->serialize() << " !=\n" << ogrid->serialize()
+              << "\nSpecify regridding logic in the config file \"regrid\" section.\n\n";
          exit(1);
       }
       else {
@@ -198,7 +198,9 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
       // Check that the masking grid matches the input grid
       if(!(mtddf->grid() == grid)) {
          mlog << Error << "\nparse_poly_mask() -> "
-              << "the masking grid does not match the input grid.\n\n";
+              << "The masking and verification grids do not match:\n"
+              << mtddf->grid().serialize() << " !=\n" << grid.serialize()
+              << "\n\n";
          exit(1);
       }
       
