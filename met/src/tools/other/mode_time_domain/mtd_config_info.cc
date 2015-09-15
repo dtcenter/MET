@@ -632,7 +632,7 @@ nc_info.do_raw        = d->lookup_bool(conf_key_raw_flag);
 // nc_info.do_object_raw = d->lookup_bool(conf_key_object_raw_flag);
 nc_info.do_object_id  = d->lookup_bool(conf_key_object_id_flag);
 nc_info.do_cluster_id = d->lookup_bool(conf_key_cluster_id_flag);
-nc_info.do_polylines  = d->lookup_bool(conf_key_do_polylines_flag);
+// nc_info.do_polylines  = d->lookup_bool(conf_key_do_polylines_flag);
 
    //
    //  done
@@ -852,7 +852,7 @@ bool MtdNcOutInfo::all_false() const
 {
 
 // bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
-   bool status = do_latlon || do_raw ||                  do_object_id || do_cluster_id || do_polylines;
+   bool status = do_latlon || do_raw ||                  do_object_id || do_cluster_id;
 
 return ( !status );
 
@@ -871,7 +871,7 @@ do_raw        = false;
 // do_object_raw = false;
 do_object_id  = false;
 do_cluster_id = false;
-do_polylines  = false;
+// do_polylines  = false;
 
 return;
 
@@ -890,7 +890,24 @@ do_raw        = true;
 // do_object_raw = true;
 do_object_id  = true;
 do_cluster_id = true;
-do_polylines  = true;
+// do_polylines  = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdNcOutInfo::dump(ostream & out) const
+
+{
+
+out << "do_latlon     = " << bool_to_string(do_latlon)     << "\n";
+out << "do_raw        = " << bool_to_string(do_raw)        << "\n";
+out << "do_object_id  = " << bool_to_string(do_object_id)  << "\n";
+out << "do_cluster_id = " << bool_to_string(do_cluster_id) << "\n";
 
 return;
 

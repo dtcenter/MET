@@ -25,6 +25,7 @@ using namespace std;
 #include "mtd_txt_output.h"
 #include "mtd_read_data.h"
 #include "mm_engine.h"
+#include "mtd_nc_output.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -98,7 +99,7 @@ config.read_config(default_config_filename, local_config_filename);
 
 config.process_config(FileType_NcMet, FileType_NcMet);
 
-config.fcst_info->dump(cout);
+// config.fcst_info->dump(cout);
 
 // exit ( 1 );
 
@@ -371,7 +372,11 @@ for (j=0; j<(e.part.n_elements()); ++j)  {
 
 }
 
+   //
+   //  netcdf output
+   //
 
+do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, "c.nc");
 
 
    //

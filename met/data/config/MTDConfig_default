@@ -253,7 +253,6 @@ nc_output = {
    raw          = true;
    object_id    = true;
    cluster_id   = true;
-   do_polylines = true;
 
 };
 

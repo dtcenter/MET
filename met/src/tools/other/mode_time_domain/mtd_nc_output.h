@@ -24,10 +24,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void do_mtd_nc_output(MtdNcOutInfo &, 
+extern void do_mtd_nc_output(const MtdNcOutInfo &, const MM_Engine &, 
                              const MtdFloatFile & fcst_raw, const MtdFloatFile & obs_raw, 
-                             const MtdIntFile   & fcst_obj, const MtdFloatFile & obs_obj, 
-                             const MM_Engine &);
+                             const MtdIntFile   & fcst_obj, const MtdIntFile   & obs_obj, 
+                             const char * output_filename);
 
 
 

@@ -37,7 +37,7 @@ struct MtdNcOutInfo {
 
    bool do_cluster_id;
 
-   bool do_polylines;
+   // bool do_polylines;
 
       ///////////////
 
@@ -49,6 +49,8 @@ struct MtdNcOutInfo {
 
    void set_all_false();
    void set_all_true();
+
+   void dump(ostream &) const;
 
 };
 

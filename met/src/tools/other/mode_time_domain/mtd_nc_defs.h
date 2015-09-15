@@ -19,6 +19,9 @@ static const char     data_field_name [] = "MtdData";
 static const char        volumes_name [] = "Volumes";
 static const char      intensity_name [] = "MaxConvIntensity";
 
+static const char            lat_name [] = "lat";
+static const char            lon_name [] = "lon";
+
 static const char start_time_att_name [] = "StartTime";
 static const char    delta_t_att_name [] = "DeltaT";
 static const char     radius_att_name [] = "Radius";
