@@ -164,6 +164,8 @@ void MtdConfigInfo::clear()
 
    version.clear();
 
+   delta_t_seconds = 0;
+
    // Deallocate memory
    if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
    if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
@@ -690,11 +692,11 @@ table.set_entry(row, c++, junk);
 
    //  fcst time delta ... don't know this
 
-c++;
+// c++;
 
    //  fcst accum
 
-c++;
+// c++;
 
    //  obs lead
 
@@ -724,11 +726,24 @@ table.set_entry(row, c++, junk);
 
    //  obs time delta ... don't know this
 
-c++;
+// c++;
 
    //  obs accum
 
-c++;
+// c++;
+
+   //  time delta
+
+if ( delta_t_seconds < 0 )  table.set_entry(row, c++, delta_t_seconds);
+else {
+
+   sec_to_hms(delta_t_seconds, hour, minute, second);
+
+   snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
+
+   table.set_entry(row, c++, junk);
+
+}
 
    //  fcst radius
 

@@ -98,6 +98,8 @@ config.read_config(default_config_filename, local_config_filename);
 
 config.process_config(FileType_NcMet, FileType_NcMet);
 
+config.fcst_info->dump(cout);
+
 // exit ( 1 );
 
 int j, k;
@@ -117,6 +119,16 @@ if ( debug )  cout << "\n  total interest threshold = " << ti_thresh << "\n\n";
 
 mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
 mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
+
+if ( fcst_raw.delta_t() != obs_raw.delta_t() )  {
+
+   cerr << "\n\n  " << program_name << ": forecast time difference is different that obervation time difference!\n\n";
+
+   exit ( 1 );
+
+}
+
+config.delta_t_seconds = fcst_raw.delta_t();
 
 if ( debug )  {
 

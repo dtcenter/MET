@@ -170,6 +170,12 @@ class MtdConfigInfo {
       int              min_volume;             //  throw away 3D objects with volumes smaller than this
 
          //
+         //  delta_t_seconds:  this is not from the config file
+         //
+
+      int              delta_t_seconds;
+
+         //
          //  write the header columns to a table
          //
 
