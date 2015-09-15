@@ -35,17 +35,11 @@ int j;
 Met2dDataFile * data_2d_file = 0;
 Met2dDataFileFactory factory;
 DataPlane plane;
-unixtime * valid = 0;
+unixtime * valid_times = 0;
 
-   //
-   //  read the first file
-   //
 
-// dict = config.conf.lookup_dictionary(conf_key_fcst);
-// 
-// ft = parse_conf_file_type(dict);
 
-valid = new unixtime [filenames.n()];
+valid_times = new unixtime [filenames.n()];
 
    //
    //  read the files
@@ -73,13 +67,13 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    }
 
-   valid[j] = plane.valid();
+   valid_times[j] = plane.valid();
 
    if ( j == 0 )  {
 
       raw.set_size(plane.nx(), plane.ny(), filenames.n());
 
-      raw.set_start_time(valid[0]);
+      raw.set_start_time(valid_times[0]);
 
       raw.set_grid(data_2d_file->grid());
 
@@ -91,6 +85,10 @@ for (j=0; j<(filenames.n()); ++j)  {
 
 }   //  for j
 
+// varinfo.set_lead
+// varinfo.set_init
+varinfo.set_valid(valid_times[0]);
+
 
    //
    //  check the time intervals
@@ -98,11 +96,11 @@ for (j=0; j<(filenames.n()); ++j)  {
 
 unixtime dt_start, dt;
 
-dt_start = valid[1] - valid[0];
+dt_start = valid_times[1] - valid_times[0];
 
 for (j=2; j<(filenames.n()); ++j)  {
 
-   dt = valid[j] - valid[j - 1];
+   dt = valid_times[j] - valid_times[j - 1];
 
    if ( dt != dt_start )  {
 
@@ -132,7 +130,7 @@ raw.calc_data_minmax();
    //  done
    //
 
-if ( valid )  { delete [] valid;  valid = 0; }
+if ( valid_times )  { delete [] valid_times;  valid_times = 0; }
 
 return;
 
