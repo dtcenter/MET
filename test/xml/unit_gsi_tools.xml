@@ -25,7 +25,7 @@
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem001 \
       -set_hdr MODEL GSI_MEM001 \
       -outdir &OUTPUT_DIR;/gsid2mpr \
-      -v 1
+      -swap -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001.stat</stat>
@@ -40,7 +40,7 @@
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem002 \
       -outdir &OUTPUT_DIR;/gsid2mpr \
       -suffix _mpr.txt \
-      -v 1
+      -swap -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/gsid2mpr/diag_amsua_n18_ges.mem001_mpr.txt</stat>
@@ -54,7 +54,7 @@
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
       -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_orank.txt \
-      -v 1
+      -swap -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_orank.txt</stat>
@@ -68,7 +68,7 @@
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.ensmean \
       -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
-      -v 1
+      -swap -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt</stat>
@@ -81,7 +81,7 @@
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem* \
       -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt \
-      -v 1
+      -swap -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt</stat>
@@ -96,7 +96,7 @@
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.ensmean \
       -channel 2,7,10 \
       -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt \
-      -v 1
+      -swap -v 1
     </param>
     <output>
       <stat>&OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_some_channels_orank.txt</stat>

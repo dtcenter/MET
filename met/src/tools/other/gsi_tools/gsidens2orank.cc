@@ -62,7 +62,7 @@ static void check_dbl(double d1, double d2, const char *col, const char *key);
 static void usage();
 static void set_out(const StringArray &);
 static void set_ens_mean(const StringArray &);
-static void set_no_swap(const StringArray &);
+static void set_swap(const StringArray &);
 static void set_channel(const StringArray &);
 static void set_rng_name(const StringArray &);
 static void set_rng_seed(const StringArray &);
@@ -85,7 +85,7 @@ int main(int argc, char * argv []) {
    // Add options
    cline.add(set_out,       "-out",      1);
    cline.add(set_ens_mean,  "-ens_mean", 1);
-   cline.add(set_no_swap,   "-no_swap",  0);
+   cline.add(set_swap,      "-swap",     0);
    cline.add(set_channel,   "-channel",  1);
    cline.add(set_hdr,       "-set_hdr",  2);
    cline.add(set_rng_name,  "-rng_name", 1);
@@ -738,7 +738,7 @@ void usage() {
         << "\tens_file_1 ... ens_file_n | ens_file_list\n"
         << "\t-out path\n"
         << "\t[-ens_mean path]\n"
-        << "\t[-no_swap]\n"
+        << "\t[-swap]\n"
         << "\t[-channel n]\n"
         << "\t[-rng_name str]\n"
         << "\t[-rng_seed str]\n"
@@ -755,8 +755,8 @@ void usage() {
         << "\".stat\" file (required).\n"
         << "\t\t\"-ens_mean path\" is the ensemble mean binary GSI "
         << "diagnostic file (optional).\n"
-        << "\t\t\"-no_swap\" to not switch the endianess of the input "
-        << "binary files (optional).\n"
+        << "\t\t\"-swap\" to switch the endianness when reading the "
+        << "input binary files (optional).\n"
         << "\t\t\"-channel n\" overrides the default processing of all "
         << "radiance channels with a comma-separated list (optional).\n"
         << "\t\t\"-rng_name str\" overrides the default random number "
@@ -788,8 +788,8 @@ void set_ens_mean(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_no_swap(const StringArray & a) {
-   swap_endian = false;
+void set_swap(const StringArray & a) {
+   swap_endian = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
