@@ -45,6 +45,8 @@ mtd_SOURCES = mtd.cc  \
               3d_single_columns.h  \
               mtd_txt_output.h  \
               mtd_txt_output.cc  \
+              mtd_nc_output.h  \
+              mtd_nc_output.cc  \
               interest_calc.h  \
               interest_calc.cc  \
               mtd_partition.h  \
