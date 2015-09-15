@@ -211,7 +211,8 @@ double RadRecord::diag_data(int index) const
 if ( (index < 0) || (index >= Ndiag) )  {
 
    mlog << Error << "\nRadRecord::diag_data(int) const -> "
-        << "range check error\n\n";
+        << "range check error ... value = "
+        << index << " ... Ndiag = " << Ndiag << "\n\n";
 
    exit ( 1 );
 

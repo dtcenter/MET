@@ -333,13 +333,13 @@ IntArray a;
 
 for (j=0; j<(e.part.n_elements()); ++j)  {
 
-   cout << "Fcst objects in composite " << j << ":\n";
+   cout << "Fcst objects in composite " << j << ":  ";
 
    a = e.fcst_composite(j);
 
    a.dump_one_line(cout);
 
-   cout << "Obs  objects in composite " << j << ":\n";
+   cout << "Obs  objects in composite " << j << ":  ";
 
    a = e.obs_composite(j);
 
