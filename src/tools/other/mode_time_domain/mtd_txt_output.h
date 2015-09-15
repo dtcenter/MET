@@ -29,6 +29,11 @@ extern void do_3d_single_txt_output(const SingleAtt3DArray & fcst_att,
                                     const char * output_filename);
 
 
+extern void do_3d_pair_txt_output(const PairAtt3DArray &, 
+                                  const MtdConfigInfo &, 
+                                  const char * output_filename);
+
+
 ////////////////////////////////////////////////////////////////////////
 
 

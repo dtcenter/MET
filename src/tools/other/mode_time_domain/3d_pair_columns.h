@@ -12,6 +12,8 @@
 
 static const char * att_3d_pair_cols [] = {
 
+   "OBJ_ID", 
+
    "SPACE_CENTROID_DIST", 
    "TIME_CENTROID_DELTA", 
 

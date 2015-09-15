@@ -956,7 +956,7 @@ const char * format = 0;
 
    //  object number
 
-sprintf(junk, "O_%d_F_%d", ObsObjectNumber, FcstObjectNumber);
+sprintf(junk, "F_%d_O_%d", FcstObjectNumber, ObsObjectNumber);
 
 table.set_entry(row, c++, junk);
 
@@ -1008,9 +1008,15 @@ sprintf(junk, format_int, EndTimeDelta);
 
 table.set_entry(row, c++, junk);
 
+   //  intersection volumet
+
+sprintf(junk, format_int, IntersectionVol);
+
+table.set_entry(row, c++, junk);
+
    //  total interest
 
-sprintf(junk, format_3_decimals, EndTimeDelta);
+sprintf(junk, format_3_decimals, TotalInterest);
 
 table.set_entry(row, c++, junk);
 
@@ -1300,6 +1306,8 @@ p.set_volume_ratio(num/den);
    //
 
 b = fabs( fcst_att.spatial_axis() - obs_att.spatial_axis() );
+
+if ( b > 90.0 )  b -= 90.0;   //  we want the smaller of the two angles that the intersecting lines (planes) make
 
 p.set_axis_diff(b);
 

@@ -118,3 +118,103 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void do_3d_pair_txt_output(const PairAtt3DArray & pa,
+                           const MtdConfigInfo & config,
+                           const char * output_filename)
+
+{
+
+int j, r, c;
+ofstream out;
+AsciiTable table;
+
+
+out.open(output_filename);
+
+if ( ! out )  {
+
+   cerr << "\n\n  do_3d_pair_txt_output() -> unable to open output filename \""
+        << output_filename << "\'\n\n";
+
+   exit ( 1 );
+
+}
+
+table.set_size(1 + pa.n(), n_header_3d_cols + n_att_3d_pair_cols);
+
+table.set_ics(2);
+
+   //
+   //  column headings
+   //
+
+r = 0;
+
+c = 0;
+
+for (j=0; j<n_header_3d_cols; ++j)  {
+
+   table.set_entry(r, c++, header_3d_cols[j]);
+
+}
+
+for (j=0; j<n_att_3d_pair_cols; ++j)  {
+
+   table.set_entry(r, c++, att_3d_pair_cols[j]);
+
+}
+
+   //
+   //  leading columns
+   //
+
+for (j=0; j<(pa.n()); ++j)  {
+
+   r = j + 1;
+
+   config.write_header_cols(table, r);
+
+}
+
+   //
+   //  attributes
+   //
+
+r = 1;
+
+for (j=0; j<(pa.n()); ++j)  {
+
+   pa[j].write_txt(table, r++);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   //
+   //  done
+   //
+
+out << table;
+
+out.close();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+

@@ -307,20 +307,30 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       oo = obs_obj.select(k + 1);
 
-      cout << "   (" << j << ", " << k << ")\n" << flush;
 
       p = calc_3d_pair_atts(fo, oo, fcst_att[j], obs_att[k]);
 
       p.set_total_interest(e.calc(p));
 
+      cout << "   (F_" << j << ", O_" << k << ")   "
+           << p.total_interest() << '\n' << flush;
+
       pa.add(p);
 
    }
+
+   cout.put('\n');
 
 }
 
 
 // if ( debug )  pa.dump(cout);
+
+   //
+   //  write simple pair attributes
+   //
+
+do_3d_pair_txt_output(pa, config, "b.txt");
 
    //
    //  create graph
