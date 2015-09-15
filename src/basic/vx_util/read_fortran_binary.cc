@@ -84,7 +84,7 @@ rec_size_1 = get_rec_size(local_buf, rec_pad_length);
    //  data
    //
 
-if ( rec_size_1 > buf_size )  {
+if ( rec_size_1 < 0 || rec_size_1 > buf_size )  {
 
    mlog << Error << "\n\n  read_fortran_binary() -> buffer too small ... "
         << "increase buffer size to at least " << rec_size_1 << " bytes!\n"
