@@ -87,7 +87,9 @@ rec_size_1 = get_rec_size(local_buf, rec_pad_length);
 if ( rec_size_1 > buf_size )  {
 
    mlog << Error << "\n\n  read_fortran_binary() -> buffer too small ... "
-        << "increase buffer size to at least " << rec_size_1 << " bytes!\n\n";
+        << "increase buffer size to at least " << rec_size_1 << " bytes!\n"
+        << "  Try using the -swap option to switch the endianness of the "
+        << "input binary files.\n\n";
 
    exit ( 1 );
 

@@ -127,7 +127,7 @@ static const int retr_extra_begin  = 11;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static bool           swap_endian = true;
+static bool           swap_endian = false;
 static NumArray       channel;
 static StringArray    hdr_name;
 static StringArray    hdr_value;
