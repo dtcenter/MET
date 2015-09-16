@@ -24,13 +24,16 @@ static NcDim * nt_dim = 0;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void do_latlon(NcFile & out, const Grid &);
+static void do_latlon     (NcFile & out, const Grid &);
+static void do_raw        (NcFile & out, const MtdFloatFile & raw, const bool is_fcst);
+static void do_object_id  (NcFile & out, const MtdIntFile   &  id, const bool is_fcst);
+static void do_cluster_id (NcFile & out, const MtdIntFile   &  id, const bool is_fcst, const MM_Engine &);
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_mtd_nc_output(const MtdNcOutInfo & nc_info, const MM_Engine &, 
+void do_mtd_nc_output(const MtdNcOutInfo &  nc_info, const MM_Engine    & e, 
                       const MtdFloatFile & fcst_raw, const MtdFloatFile & obs_raw,
                       const MtdIntFile   & fcst_obj, const MtdIntFile   & obs_obj,
                       const char * output_filename)
@@ -71,12 +74,40 @@ nt_dim = out.get_dim(nt_dim_name);
    //  global attributes
    //
 
+write_nc_grid(out, fcst_raw.grid());
+
    //
    //  variables
    //
 
-if ( nc_info.do_latlon )  do_latlon(out, fcst_raw.grid());
+if ( nc_info.do_latlon )  {
 
+   do_latlon(out, fcst_raw.grid());
+
+}
+
+
+if ( nc_info.do_raw )  {
+
+   do_raw(out, fcst_raw, true);
+   do_raw(out,  obs_raw, false);
+
+}
+
+if ( nc_info.do_object_id )  {
+
+   do_object_id (out, fcst_obj, true);
+   do_object_id (out,  obs_obj, false);
+
+}
+
+
+if ( nc_info.do_cluster_id )  {
+
+   do_cluster_id (out, fcst_obj, true,  e);
+   do_cluster_id (out,  obs_obj, false, e);
+
+}
 
 
 
@@ -105,8 +136,9 @@ float * Lon = 0;
 const int nx = grid.nx();
 const int ny = grid.ny();
 
-out.add_var(lat_name, ncFloat, nx_dim, ny_dim);
-out.add_var(lon_name, ncFloat, nx_dim, ny_dim);
+
+out.add_var(lat_name, ncFloat, ny_dim, nx_dim);
+out.add_var(lon_name, ncFloat, ny_dim, nx_dim);
 
 NcVar * lat_var = out.get_var(lat_name);
 NcVar * lon_var = out.get_var(lon_name);
@@ -122,7 +154,9 @@ for (y=0; y<ny; ++y)  {
 
    for (x=0; x<nx; ++x)  {
 
-      grid.latlon_to_xy((double) x, (double) y, lat, lon);
+      grid.xy_to_latlon((double) x, (double) y, lat, lon);
+
+      lon = -lon;
 
       *Lat++ = (float) lat;
       *Lon++ = (float) lon;
@@ -133,12 +167,12 @@ for (y=0; y<ny; ++y)  {
 
 lat_var->set_cur(0, 0);
 
-lat_var->put(lat_data, nx, ny);
+lat_var->put(lat_data, ny, nx);
 
 
 lon_var->set_cur(0, 0);
 
-lon_var->put(lon_data, nx, ny);
+lon_var->put(lon_data, ny, nx);
 
 
 
@@ -148,6 +182,144 @@ lon_var->put(lon_data, nx, ny);
 
 if ( lat_data )  { delete [] lat_data;  lat_data = 0; }
 if ( lon_data )  { delete [] lon_data;  lon_data = 0; }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_raw(NcFile & out, const MtdFloatFile & raw, const bool is_fcst)
+
+{
+
+const int nx = raw.nx();
+const int ny = raw.ny();
+const int nt = raw.nt();
+
+const char * const name = ( is_fcst ? fcst_raw_name : obs_raw_name );
+
+out.add_var(name, ncFloat, nt_dim, ny_dim, nx_dim);
+
+NcVar * var = out.get_var(name);
+
+var->set_cur(0, 0, 0);
+
+var->put(raw.data(), nt, ny, nx);
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_object_id (NcFile & out, const MtdIntFile & id, const bool is_fcst)
+
+{
+
+const int nx = id.nx();
+const int ny = id.ny();
+const int nt = id.nt();
+
+const char * const name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
+
+out.add_var(name, ncInt, nt_dim, ny_dim, nx_dim);
+
+NcVar * var = out.get_var(name);
+
+var->set_cur(0, 0, 0);
+
+var->put(id.data(), nt, ny, nx);
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_cluster_id (NcFile & out, const MtdIntFile & id, const bool is_fcst, const MM_Engine & e)
+
+{
+
+int j, k;
+const int nx = id.nx();
+const int ny = id.ny();
+const int nt = id.nt();
+const int * ip = id.data();
+int * out_data = 0;
+int * op = 0;
+int * remap = 0;
+
+const int n3 = nx*ny*nt;
+
+
+out_data = new int [n3];
+
+const char * const name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
+
+out.add_var(name, ncInt, nt_dim, ny_dim, nx_dim);
+
+NcVar * var = out.get_var(name);
+
+   //
+   //  create mapping array
+   //
+
+const int n_clusters = e.n_composites();
+
+cout << "\n\n  " << n_clusters << " clusters\n\n";
+
+remap = new int [n_clusters + 1];
+
+remap[0] = 0;
+
+for (j=1; j<=n_clusters; ++j)  {
+
+   if ( is_fcst )  k = e.map_fcst_id_to_composite (j - 1);
+   else            k = e.map_obs_id_to_composite  (j - 1);
+
+   remap[j] = 1 + k;
+
+   cout << "remap[" << j << "] = " << remap[j] << '\n';
+
+}
+
+op = out_data;
+
+for (j=0; j<n3; ++j)  {
+
+   *op++ = remap[*ip++];
+
+}
+
+
+var->set_cur(0, 0, 0);
+
+var->put(out_data, nt, ny, nx);
+
+   //
+   //  done
+   //
+
+if ( remap )  { delete [] remap;  remap = 0; }
+
+if ( out_data )  { delete [] out_data;  out_data = 0; }
 
 return;
 

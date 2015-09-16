@@ -83,6 +83,9 @@ class MM_Engine {
 
       int n_composites() const;
 
+      int map_fcst_id_to_composite (const int id) const;      //  zero-based
+      int map_obs_id_to_composite  (const int id) const;      //  zero-based
+
       IntArray fcst_composite(int _composite_number) const;   //  zero-based
       IntArray  obs_composite(int _composite_number) const;   //  zero-based
 
@@ -94,6 +97,8 @@ class MM_Engine {
 
 inline int MM_Engine::n_fcst_simples () const { return ( graph.n_fcst () ); }
 inline int MM_Engine::n_obs_simples  () const { return ( graph.n_obs  () ); }
+
+inline int MM_Engine::n_composites   () const { return ( part.n_elements() ); }
 
 // inline int MM_Engine::n_fcst_composites  () const { return ( N_Fcst_Composites ); }
 // inline int MM_Engine::n_obs_composites   () const { return ( N_Obs_Composites ); }
