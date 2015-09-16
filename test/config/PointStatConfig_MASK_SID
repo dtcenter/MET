@@ -44,7 +44,7 @@ obs = fcst;
 
 climo_mean = fcst;
 climo_mean = {
-   file_name = "${CLIMO_FILE}"; 
+   file_name = [ ${CLIMO_FILE} ]; 
 };
 
 ////////////////////////////////////////////////////////////////////////////////
