@@ -1694,13 +1694,19 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    // Compute the difference field for each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
 
-      // Build the variable names
+      // Build the forecast variable name
       cs << cs_erase 
          << conf_info.fcst_info[i_vx]->name() << "_"
          << conf_info.fcst_info[i_vx]->level_name() << "_"
-         << conf_info.mask_name[i] << smooth_str;
+         << conf_info.mask_name[i];
 
       fcst_var_name << cs_erase << "FCST_" << cs;
+      if(conf_info.interp_field == FieldType_Fcst ||
+         conf_info.interp_field == FieldType_Both) {
+         fcst_var_name << smooth_str;
+      }
+
+      // Build the climatology variable names (no smoothing)
       cmn_var_name  << cs_erase << "CLIMO_MEAN_" << cs;
       csd_var_name  << cs_erase << "CLIMO_STDEV_" << cs;
 
@@ -1708,7 +1714,11 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       obs_var_name << cs_erase << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
                    << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << conf_info.mask_name[i] << smooth_str;
+                   << conf_info.mask_name[i];
+      if(conf_info.interp_field == FieldType_Obs ||
+         conf_info.interp_field == FieldType_Both) {
+         obs_var_name << smooth_str;
+      }
 
       // Build the difference variable name
       diff_var_name << cs_erase << "DIFF_"
