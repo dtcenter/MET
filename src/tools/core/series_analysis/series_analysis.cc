@@ -573,7 +573,7 @@ void process_scores() {
          // Compute partial sums
          if(!conf_info.fcst_info[0]->p_flag() &&
             conf_info.output_stats[stat_sl1l2].n_elements() > 0) {
-            do_cnt(i_point+i, f_na[i], o_na[i]);
+            do_sl1l2(i_point+i, f_na[i], o_na[i]);
          }
 
          // Compute continuous statistics
