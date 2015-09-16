@@ -362,3 +362,43 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+int MM_Engine::map_fcst_id_to_composite(const int id) const   //  zero-based
+
+{
+
+int j, k;
+
+
+k = id;
+
+j = part.which_class(k);
+
+
+return ( j );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int MM_Engine::map_obs_id_to_composite(const int id) const   //  zero-based
+
+{
+
+int j, k;
+
+
+k = id + graph.n_fcst();
+
+j = part.which_class(k);
+
+
+return ( j );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+

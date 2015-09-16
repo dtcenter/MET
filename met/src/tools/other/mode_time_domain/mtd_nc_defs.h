@@ -22,6 +22,15 @@ static const char      intensity_name [] = "MaxConvIntensity";
 static const char            lat_name [] = "lat";
 static const char            lon_name [] = "lon";
 
+static const char       fcst_raw_name [] = "fcst_raw";
+static const char        obs_raw_name [] = "obs_raw";
+
+static const char    fcst_obj_id_name [] = "fcst_object_id";
+static const char     obs_obj_id_name [] = "obs_object_id";
+
+static const char   fcst_clus_id_name [] = "fcst_cluster_id";
+static const char    obs_clus_id_name [] = "obs_cluster_id";
+
 static const char start_time_att_name [] = "StartTime";
 static const char    delta_t_att_name [] = "DeltaT";
 static const char     radius_att_name [] = "Radius";
