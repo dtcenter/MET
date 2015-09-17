@@ -102,11 +102,6 @@ climo_mean = {
    time_step = 21600;
 }
 
-//
-// Climatology standard deviation data
-//
-climo_stdev = climo_mean;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //

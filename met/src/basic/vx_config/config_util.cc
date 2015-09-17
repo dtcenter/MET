@@ -213,12 +213,8 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
 int parse_conf_n_vx(Dictionary *dict) {
    int i, total;
 
-   if(!dict) {
-      mlog << Error << "\nparse_conf_n_vx() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-   
+   if(!dict) return(0);
+
    // Check that this dictionary is an array
    if(!dict->is_array()) {
       mlog << Error << "\nparse_conf_n_vx() -> "

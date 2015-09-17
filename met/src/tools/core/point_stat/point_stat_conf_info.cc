@@ -223,7 +223,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    }
 
    // Check for a valid number of climatology mean fields
-   n = parse_conf_n_vx(conf.lookup_array(conf_key_climo_mean_field));
+   n = parse_conf_n_vx(conf.lookup_array(conf_key_climo_mean_field, false));
    if(n != 0 && n != n_vx) {
       mlog << Error << "\nPointStatConfInfo::process_config() -> "
            << "The number of climatology mean fields in \""
@@ -234,7 +234,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    }
 
    // Check for a valid number of climatology standard deviation fields
-   n = parse_conf_n_vx(conf.lookup_array(conf_key_climo_stdev_field));
+   n = parse_conf_n_vx(conf.lookup_array(conf_key_climo_stdev_field, false));
    if(n != 0 && n != n_vx) {
       mlog << Error << "\nPointStatConfInfo::process_config() -> "
            << "The number of climatology standard deviation fields in \""
