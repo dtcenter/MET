@@ -40,6 +40,8 @@ mtd_SOURCES = mtd.cc  \
               3d_att_pair_array.cc  \
               2d_att.h  \
               2d_att.cc  \
+              2d_att_array.h  \
+              2d_att_array.cc  \
               3d_conv.cc    \
               3d_pair_columns.h    \
               3d_single_columns.h  \
