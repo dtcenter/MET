@@ -169,9 +169,9 @@ class CNTInfo {
 
       // Correlation Coefficients: Pearson's, Spearman's Rank,
       // and Kendall Tau Rank
-      CIInfo pr_corr, sp_corr, kt_corr;
+      CIInfo pr_corr, sp_corr, kt_corr, anom_corr;
 
-      CIInfo me, estdev, mbias, mae, mse, bcmse, rmse;
+      CIInfo me, me2, estdev, mbias, mae, mse, msess, bcmse, rmse;
       CIInfo e10, e25, e50, e75, e90, eiqr;
       CIInfo mad;
 
@@ -520,12 +520,11 @@ extern int    compute_rank(const DataPlane &, DataPlane &, double *, int &);
 extern void   compute_cntinfo(const SL1L2Info &, int, CNTInfo &);
 
 extern void   compute_cntinfo(const NumArray &, const NumArray &,
-                              const NumArray &,
-                              int, int, int, int,
-                              CNTInfo &);
+                              const NumArray &, const NumArray &,
+                              int, int, int, CNTInfo &);
 extern void   compute_i_cntinfo(const NumArray &, const NumArray &,
-                                int, int, int, int,
-                                CNTInfo &);
+                                const NumArray &, int,
+                                int, int, int, CNTInfo &);
 
 extern void   compute_ctsinfo(const NumArray &, const NumArray &,
                               const NumArray &, int, int, CTSInfo &);
@@ -555,7 +554,7 @@ extern void   compute_i_mean_stdev(const NumArray &,
                                    int, double, int,
                                    CIInfo &, CIInfo &);
 
-extern void   subset_fo_na(const NumArray &, const SingleThresh &,
+extern void   subset_pairs(const NumArray &, const SingleThresh &,
                            const NumArray &, const SingleThresh &,
                            const NumArray &, const SetLogic,
                            NumArray &, NumArray &, NumArray &);

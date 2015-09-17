@@ -2829,15 +2829,17 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    if(j.boot_interval == boot_bca_flag) {
 
-      compute_cnt_stats_ci_bca(rng_ptr, info.f_na, info.o_na,
-         precip_flag, j.n_boot_rep,
-         cnt_info, 1, j.rank_corr_flag, tmp_dir);
+      compute_cnt_stats_ci_bca(rng_ptr,
+         info.f_na, info.o_na, info.c_na,
+         precip_flag, j.rank_corr_flag, j.n_boot_rep,
+         cnt_info, tmp_dir);
    }
    else {
 
-      compute_cnt_stats_ci_perc(rng_ptr, info.f_na, info.o_na,
-         precip_flag, j.n_boot_rep, j.boot_rep_prop,
-         cnt_info, 1, j.rank_corr_flag, tmp_dir);
+      compute_cnt_stats_ci_perc(rng_ptr,
+         info.f_na, info.o_na, info.c_na,
+         precip_flag, j.rank_corr_flag, j.n_boot_rep, j.boot_rep_prop,
+         cnt_info, tmp_dir);
    }
 
    return;

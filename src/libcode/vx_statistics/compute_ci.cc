@@ -279,7 +279,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
                               int b, CTSInfo *&cts_info, int n_cts,
                               int cts_flag, int rank_flag,
                               const char *tmp_dir) {
-   int n, i, j;
+   int n, i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    CTSInfo *cts_tmp = (CTSInfo *) 0;
@@ -288,7 +288,9 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Temp file streams for categorical statistics
    //
    ofstream *cts_i_out = (ofstream *) 0, *cts_r_out = (ofstream *) 0;
-   ConcatString *cts_i_file = (ConcatString *) 0, *cts_r_file = (ConcatString *) 0, prefix;
+   ConcatString *cts_i_file = (ConcatString *) 0;
+   ConcatString *cts_r_file = (ConcatString *) 0;
+   ConcatString prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -412,11 +414,16 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
       for(i=0; i<n_cts; i++) {
 
          //
+         // Initialize column counter
+         //
+         c = 1;
+
+         //
          // Compute bootstrap interval for baser
          //
          s = cts_info[i].baser.v;
-         read_ldf(cts_i_file[i], 1, si_na);
-         read_ldf(cts_r_file[i], 1, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -427,8 +434,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fmean
          //
          s = cts_info[i].fmean.v;
-         read_ldf(cts_i_file[i], 2, si_na);
-         read_ldf(cts_r_file[i], 2, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -439,8 +446,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for acc
          //
          s = cts_info[i].acc.v;
-         read_ldf(cts_i_file[i], 3, si_na);
-         read_ldf(cts_r_file[i], 3, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -451,8 +458,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fbias
          //
          s = cts_info[i].fbias.v;
-         read_ldf(cts_i_file[i], 4, si_na);
-         read_ldf(cts_r_file[i], 4, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -463,8 +470,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pody
          //
          s = cts_info[i].pody.v;
-         read_ldf(cts_i_file[i], 5, si_na);
-         read_ldf(cts_r_file[i], 5, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -475,8 +482,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for podn
          //
          s = cts_info[i].podn.v;
-         read_ldf(cts_i_file[i], 6, si_na);
-         read_ldf(cts_r_file[i], 6, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -487,8 +494,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pofd
          //
          s = cts_info[i].pofd.v;
-         read_ldf(cts_i_file[i], 7, si_na);
-         read_ldf(cts_r_file[i], 7, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -499,8 +506,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for far
          //
          s = cts_info[i].far.v;
-         read_ldf(cts_i_file[i], 8, si_na);
-         read_ldf(cts_r_file[i], 8, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -511,8 +518,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for csi
          //
          s = cts_info[i].csi.v;
-         read_ldf(cts_i_file[i], 9, si_na);
-         read_ldf(cts_r_file[i], 9, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -523,8 +530,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for gss
          //
          s = cts_info[i].gss.v;
-         read_ldf(cts_i_file[i], 10, si_na);
-         read_ldf(cts_r_file[i], 10, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -535,8 +542,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hk
          //
          s = cts_info[i].hk.v;
-         read_ldf(cts_i_file[i], 11, si_na);
-         read_ldf(cts_r_file[i], 11, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -547,8 +554,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hss
          //
          s = cts_info[i].hss.v;
-         read_ldf(cts_i_file[i], 12, si_na);
-         read_ldf(cts_r_file[i], 12, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -559,8 +566,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for odds
          //
          s = cts_info[i].odds.v;
-         read_ldf(cts_i_file[i], 13, si_na);
-         read_ldf(cts_r_file[i], 13, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -571,8 +578,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for lodds
          //
          s = cts_info[i].lodds.v;
-         read_ldf(cts_i_file[i], 14, si_na);
-         read_ldf(cts_r_file[i], 14, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -583,8 +590,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for orss
          //
          s = cts_info[i].orss.v;
-         read_ldf(cts_i_file[i], 15, si_na);
-         read_ldf(cts_r_file[i], 15, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -595,8 +602,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for eds
          //
          s = cts_info[i].eds.v;
-         read_ldf(cts_i_file[i], 16, si_na);
-         read_ldf(cts_r_file[i], 16, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -607,8 +614,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for seds
          //
          s = cts_info[i].seds.v;
-         read_ldf(cts_i_file[i], 17, si_na);
-         read_ldf(cts_r_file[i], 17, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -619,8 +626,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for edi
          //
          s = cts_info[i].edi.v;
-         read_ldf(cts_i_file[i], 18, si_na);
-         read_ldf(cts_r_file[i], 18, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -631,8 +638,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for sedi
          //
          s = cts_info[i].sedi.v;
-         read_ldf(cts_i_file[i], 19, si_na);
-         read_ldf(cts_r_file[i], 19, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -643,8 +650,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for bagss
          //
          s = cts_info[i].bagss.v;
-         read_ldf(cts_i_file[i], 20, si_na);
-         read_ldf(cts_r_file[i], 20, sr_na);
+         read_ldf(cts_i_file[i], c,   si_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  cts_info[i].alpha[j],
@@ -714,7 +721,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
                                int b, MCTSInfo &mcts_info,
                                int mcts_flag, int rank_flag,
                                const char *tmp_dir) {
-   int n, i;
+   int n, i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    MCTSInfo mcts_tmp;
@@ -820,11 +827,16 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       mcts_r_out.close();
 
       //
+      // Initialize column counter
+      //
+      c = 1;
+      
+      //
       // Compute bootstrap interval for acc
       //
       s = mcts_info.acc.v;
-      read_ldf(mcts_i_file, 1, si_na);
-      read_ldf(mcts_r_file, 1, sr_na);
+      read_ldf(mcts_i_file, c,   si_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               mcts_info.alpha[i],
@@ -835,8 +847,8 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for hk
       //
       s = mcts_info.hk.v;
-      read_ldf(mcts_i_file, 2, si_na);
-      read_ldf(mcts_r_file, 2, sr_na);
+      read_ldf(mcts_i_file, c,   si_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               mcts_info.alpha[i],
@@ -847,8 +859,8 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for hss
       //
       s = mcts_info.hss.v;
-      read_ldf(mcts_i_file, 3, si_na);
-      read_ldf(mcts_r_file, 3, sr_na);
+      read_ldf(mcts_i_file, c,   si_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               mcts_info.alpha[i],
@@ -859,8 +871,8 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for ger
       //
       s = mcts_info.ger.v;
-      read_ldf(mcts_i_file, 4, si_na);
-      read_ldf(mcts_r_file, 4, sr_na);
+      read_ldf(mcts_i_file, c,   si_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               mcts_info.alpha[i],
@@ -876,8 +888,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
 
       mlog << Error << "\ncompute_mcts_stats_ci_bca() -> "
            << "encountered an error value of " << i_err
-           << ".  Deleting temp files before exiting.\n\n"
-          ;
+           << ".  Deleting temp files before exiting.\n\n";
 
       //
       // Attempt to delete temp files
@@ -914,10 +925,11 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
 void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               const NumArray &f_na,
                               const NumArray &o_na,
-                              bool precip_flag, int b,
-                              CNTInfo &cnt_info, int cnt_flag,
-                              int rank_flag, const char *tmp_dir) {
-   int n, i;
+                              const NumArray &c_na,
+                              int precip_flag, int rank_flag,
+                              int b, CNTInfo &cnt_info,
+                              const char *tmp_dir) {
+   int n, i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    CNTInfo cnt_tmp;
@@ -950,14 +962,13 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Compute continuous stats from the raw data with the
    // normal_ci_flag set
    //
-   compute_cntinfo(f_na, o_na, i_na, precip_flag, cnt_flag,
-                   rank_flag, 1, cnt_info);
+   compute_cntinfo(f_na, o_na, c_na, i_na, precip_flag, rank_flag, 1,
+                   cnt_info);
 
    //
-   // Do not compute bootstrap CI's if n<=1, the number of replicates
-   // is zero, or the cnf_flag is off
+   // Do not compute bootstrap CI's if n<=1 or b==0
    //
-   if(n<=1 || b<1 || !cnt_flag) return;
+   if(n<=1 || b<1) return;
 
    //
    // Build the temp file names
@@ -992,8 +1003,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_cntinfo(f_na, o_na, precip_flag, i, 0, 0,
-                           cnt_tmp);
+         compute_i_cntinfo(f_na, o_na, c_na, i, precip_flag, 0, 0, cnt_tmp);
          write_cntinfo(cnt_i_out, cnt_tmp);
       }
 
@@ -1006,9 +1016,9 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
 
          //
          // Compute continuous stats for each replicate with the
-         // cnt_flag set, and the rank_flag and normal_ci_flag unset
+         // rank_flag and normal_ci_flag unset
          //
-         compute_cntinfo(f_na, o_na, ir_na, precip_flag, 1, 0, 0,
+         compute_cntinfo(f_na, o_na, c_na, ir_na, precip_flag, 0, 0,
                          cnt_tmp);
          write_cntinfo(cnt_r_out, cnt_tmp);
       }
@@ -1020,11 +1030,16 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       cnt_r_out.close();
 
       //
+      // Initialize column counter
+      //
+      c = 1;
+   
+      //
       // Compute bootstrap interval for fbar
       //
       s = cnt_info.fbar.v;
-      read_ldf(cnt_i_file, 1, si_na);
-      read_ldf(cnt_r_file, 1, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1035,8 +1050,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for fstdev
       //
       s = cnt_info.fstdev.v;
-      read_ldf(cnt_i_file, 2, si_na);
-      read_ldf(cnt_r_file, 2, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1047,8 +1062,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for obar
       //
       s = cnt_info.obar.v;
-      read_ldf(cnt_i_file, 3, si_na);
-      read_ldf(cnt_r_file, 3, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1059,8 +1074,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for ostdev
       //
       s = cnt_info.ostdev.v;
-      read_ldf(cnt_i_file, 4, si_na);
-      read_ldf(cnt_r_file, 4, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1072,8 +1087,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for pr_corr
       //
       s = cnt_info.pr_corr.v;
-      read_ldf(cnt_i_file, 5, si_na);
-      read_ldf(cnt_r_file, 5, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1081,11 +1096,23 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               cnt_info.pr_corr.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for anom_corr
+      //
+      s = cnt_info.anom_corr.v;
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              cnt_info.alpha[i],
+                              cnt_info.anom_corr.v_bcl[i],
+                              cnt_info.anom_corr.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for me
       //
       s = cnt_info.me.v;
-      read_ldf(cnt_i_file, 8, si_na);
-      read_ldf(cnt_r_file, 8, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1093,11 +1120,23 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               cnt_info.me.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for me2
+      //
+      s = cnt_info.me2.v;
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              cnt_info.alpha[i],
+                              cnt_info.me2.v_bcl[i],
+                              cnt_info.me2.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for estdev
       //
       s = cnt_info.estdev.v;
-      read_ldf(cnt_i_file, 9, si_na);
-      read_ldf(cnt_r_file, 9, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1108,8 +1147,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mbias
       //
       s = cnt_info.mbias.v;
-      read_ldf(cnt_i_file, 10, si_na);
-      read_ldf(cnt_r_file, 10, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1120,8 +1159,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mae
       //
       s = cnt_info.mae.v;
-      read_ldf(cnt_i_file, 11, si_na);
-      read_ldf(cnt_r_file, 11, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1132,8 +1171,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mse
       //
       s = cnt_info.mse.v;
-      read_ldf(cnt_i_file, 12, si_na);
-      read_ldf(cnt_r_file, 12, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1141,11 +1180,23 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               cnt_info.mse.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for msess
+      //
+      s = cnt_info.msess.v;
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              cnt_info.alpha[i],
+                              cnt_info.msess.v_bcl[i],
+                              cnt_info.msess.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for bcmse
       //
       s = cnt_info.bcmse.v;
-      read_ldf(cnt_i_file, 13, si_na);
-      read_ldf(cnt_r_file, 13, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1156,8 +1207,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for rmse
       //
       s = cnt_info.rmse.v;
-      read_ldf(cnt_i_file, 14, si_na);
-      read_ldf(cnt_r_file, 14, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1168,8 +1219,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e10
       //
       s = cnt_info.e10.v;
-      read_ldf(cnt_i_file, 15, si_na);
-      read_ldf(cnt_r_file, 15, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1180,8 +1231,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e25
       //
       s = cnt_info.e25.v;
-      read_ldf(cnt_i_file, 16, si_na);
-      read_ldf(cnt_r_file, 16, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1192,8 +1243,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e50
       //
       s = cnt_info.e50.v;
-      read_ldf(cnt_i_file, 17, si_na);
-      read_ldf(cnt_r_file, 17, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1204,8 +1255,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e75
       //
       s = cnt_info.e75.v;
-      read_ldf(cnt_i_file, 18, si_na);
-      read_ldf(cnt_r_file, 18, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1216,8 +1267,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e90
       //
       s = cnt_info.e90.v;
-      read_ldf(cnt_i_file, 19, si_na);
-      read_ldf(cnt_r_file, 19, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1228,8 +1279,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for eiqr
       //
       s = cnt_info.eiqr.v;
-      read_ldf(cnt_i_file, 20, si_na);
-      read_ldf(cnt_r_file, 20, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1240,8 +1291,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mad
       //
       s = cnt_info.mad.v;
-      read_ldf(cnt_i_file, 21, si_na);
-      read_ldf(cnt_r_file, 21, sr_na);
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               cnt_info.alpha[i],
@@ -1292,7 +1343,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
                                CTSInfo *&cts_info, int n_cts,
                                int cts_flag, int rank_flag,
                                const char *tmp_dir) {
-   int n, i, j, m;
+   int n, i, j, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    CTSInfo *cts_tmp = (CTSInfo *) 0;
@@ -1407,10 +1458,15 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
       for(i=0; i<n_cts; i++) {
 
          //
+         // Initialize column counter
+         //
+         c = 1;
+
+         //
          // Compute bootstrap interval for baser
          //
          s = cts_info[i].baser.v;
-         read_ldf(cts_r_file[i], 1, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1421,7 +1477,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fmean
          //
          s = cts_info[i].fmean.v;
-         read_ldf(cts_r_file[i], 2, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1432,7 +1488,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for acc
          //
          s = cts_info[i].acc.v;
-         read_ldf(cts_r_file[i], 3, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1443,7 +1499,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fbias
          //
          s = cts_info[i].fbias.v;
-         read_ldf(cts_r_file[i], 4, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1454,7 +1510,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pody
          //
          s = cts_info[i].pody.v;
-         read_ldf(cts_r_file[i], 5, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1465,7 +1521,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for podn
          //
          s = cts_info[i].podn.v;
-         read_ldf(cts_r_file[i], 6, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1476,7 +1532,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pofd
          //
          s = cts_info[i].pofd.v;
-         read_ldf(cts_r_file[i], 7, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1487,7 +1543,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for far
          //
          s = cts_info[i].far.v;
-         read_ldf(cts_r_file[i], 8, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1498,7 +1554,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for csi
          //
          s = cts_info[i].csi.v;
-         read_ldf(cts_r_file[i], 9, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1509,7 +1565,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for gss
          //
          s = cts_info[i].gss.v;
-         read_ldf(cts_r_file[i], 10, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1520,7 +1576,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hk
          //
          s = cts_info[i].hk.v;
-         read_ldf(cts_r_file[i], 11, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1531,7 +1587,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hss
          //
          s = cts_info[i].hss.v;
-         read_ldf(cts_r_file[i], 12, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1542,7 +1598,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for odds
          //
          s = cts_info[i].odds.v;
-         read_ldf(cts_r_file[i], 13, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1553,7 +1609,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for lodds 
          //
          s = cts_info[i].lodds.v;
-         read_ldf(cts_r_file[i], 14, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1564,7 +1620,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for orss
          //
          s = cts_info[i].orss.v;
-         read_ldf(cts_r_file[i], 15, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1575,7 +1631,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for eds
          //
          s = cts_info[i].eds.v;
-         read_ldf(cts_r_file[i], 16, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1586,7 +1642,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for seds
          //
          s = cts_info[i].seds.v;
-         read_ldf(cts_r_file[i], 17, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1597,7 +1653,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for edi
          //
          s = cts_info[i].edi.v;
-         read_ldf(cts_r_file[i], 18, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1608,7 +1664,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for sedi
          //
          s = cts_info[i].sedi.v;
-         read_ldf(cts_r_file[i], 19, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1619,7 +1675,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for bagss
          //
          s = cts_info[i].bagss.v;
-         read_ldf(cts_r_file[i], 20, sr_na);
+         read_ldf(cts_r_file[i], c++, sr_na);
          for(j=0; j<cts_info[i].n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  cts_info[i].alpha[j],
@@ -1679,7 +1735,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                 MCTSInfo &mcts_info,
                                 int mcts_flag, int rank_flag,
                                 const char *tmp_dir) {
-   int n, i, m;
+   int n, i, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    MCTSInfo mcts_tmp;
@@ -1774,10 +1830,15 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
       mcts_r_out.close();
 
       //
+      // Initialize column counter
+      //
+      c = 1;
+
+      //
       // Compute bootstrap interval for acc
       //
       s = mcts_info.acc.v;
-      read_ldf(mcts_r_file, 1, sr_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                mcts_info.alpha[i],
@@ -1788,7 +1849,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for hk
       //
       s = mcts_info.hk.v;
-      read_ldf(mcts_r_file, 2, sr_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                mcts_info.alpha[i],
@@ -1799,7 +1860,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for hss
       //
       s = mcts_info.hss.v;
-      read_ldf(mcts_r_file, 3, sr_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                mcts_info.alpha[i],
@@ -1810,7 +1871,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for ger
       //
       s = mcts_info.ger.v;
-      read_ldf(mcts_r_file, 4, sr_na);
+      read_ldf(mcts_r_file, c++, sr_na);
       for(i=0; i<mcts_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                mcts_info.alpha[i],
@@ -1855,14 +1916,14 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
 void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                const NumArray &f_na,
                                const NumArray &o_na,
-                               bool precip_flag, int b,
-                               double m_prop, CNTInfo &cnt_info,
-                               int cnt_flag, int rank_flag,
+                               const NumArray &c_na,
+                               int precip_flag, int rank_flag,
+                               int b, double m_prop, CNTInfo &cnt_info,
                                const char *tmp_dir) {
-   int n, i, m;
+   int n, i, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
-   CNTInfo  cnt_tmp;
+   CNTInfo cnt_tmp;
 
    //
    // Temp file streams for continuous statistics
@@ -1897,14 +1958,14 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Compute continuous stats from the raw data with the
    // normal_ci_flag set
    //
-   compute_cntinfo(f_na, o_na, i_na, precip_flag, cnt_flag,
-                   rank_flag, 1, cnt_info);
+   compute_cntinfo(f_na, o_na, c_na, i_na,
+                   precip_flag, rank_flag, 1,
+                   cnt_info);
 
    //
-   // Do not compute bootstrap CI's if n<=1, the number of replicates
-   // is zero, or the cnt_flag is off
+   // Do not compute bootstrap CI's if n<=1 or b== 0
    //
-   if(n<=1 || b<1 || !cnt_flag) return;
+   if(n<=1 || b<1) return;
 
    //
    // Build the temp file names
@@ -1938,9 +1999,10 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
 
          //
          // Compute continuous stats for each replicate with the
-         // cnt_flag set and the rank_flag and normal_ci_flag unset
+         // rank_flag and normal_ci_flag unset
          //
-         compute_cntinfo(f_na, o_na, ir_na, precip_flag, 1, 0, 0,
+         compute_cntinfo(f_na, o_na, c_na, ir_na,
+                         precip_flag, 0, 0,
                          cnt_tmp);
          write_cntinfo(cnt_r_out, cnt_tmp);
       }
@@ -1951,10 +2013,15 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       cnt_r_out.close();
 
       //
+      // Initialize column counter
+      //
+      c = 1;
+
+      //
       // Compute bootstrap interval for fbar
       //
       s = cnt_info.fbar.v;
-      read_ldf(cnt_r_file, 1, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -1965,7 +2032,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for fstdev
       //
       s = cnt_info.fstdev.v;
-      read_ldf(cnt_r_file, 2, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -1976,7 +2043,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for obar
       //
       s = cnt_info.obar.v;
-      read_ldf(cnt_r_file, 3, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -1987,7 +2054,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for ostdev
       //
       s = cnt_info.ostdev.v;
-      read_ldf(cnt_r_file, 4, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -1999,7 +2066,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for pr_corr
       //
       s = cnt_info.pr_corr.v;
-      read_ldf(cnt_r_file, 5, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2007,10 +2074,21 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                cnt_info.pr_corr.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for anom_corr
+      //
+      s = cnt_info.anom_corr.v;
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               cnt_info.alpha[i],
+                               cnt_info.anom_corr.v_bcl[i],
+                               cnt_info.anom_corr.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for me
       //
       s = cnt_info.me.v;
-      read_ldf(cnt_r_file, 8, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2018,10 +2096,21 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                cnt_info.me.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for me2
+      //
+      s = cnt_info.me2.v;
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               cnt_info.alpha[i],
+                               cnt_info.me2.v_bcl[i],
+                               cnt_info.me2.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for estdev
       //
       s = cnt_info.estdev.v;
-      read_ldf(cnt_r_file, 9, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2032,7 +2121,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mbias
       //
       s = cnt_info.mbias.v;
-      read_ldf(cnt_r_file, 10, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2043,7 +2132,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mae
       //
       s = cnt_info.mae.v;
-      read_ldf(cnt_r_file, 11, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2054,7 +2143,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mse
       //
       s = cnt_info.mse.v;
-      read_ldf(cnt_r_file, 12, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2062,10 +2151,21 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                cnt_info.mse.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for msess
+      //
+      s = cnt_info.msess.v;
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               cnt_info.alpha[i],
+                               cnt_info.msess.v_bcl[i],
+                               cnt_info.msess.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for bcmse
       //
       s = cnt_info.bcmse.v;
-      read_ldf(cnt_r_file, 13, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2076,7 +2176,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for rmse
       //
       s = cnt_info.rmse.v;
-      read_ldf(cnt_r_file, 14, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2087,7 +2187,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e10
       //
       s = cnt_info.e10.v;
-      read_ldf(cnt_r_file, 15, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2098,7 +2198,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e25
       //
       s = cnt_info.e25.v;
-      read_ldf(cnt_r_file, 16, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2109,7 +2209,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e50
       //
       s = cnt_info.e50.v;
-      read_ldf(cnt_r_file, 17, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2120,7 +2220,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e75
       //
       s = cnt_info.e75.v;
-      read_ldf(cnt_r_file, 18, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2131,7 +2231,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for e90
       //
       s = cnt_info.e90.v;
-      read_ldf(cnt_r_file, 19, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2142,7 +2242,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for eiqr
       //
       s = cnt_info.eiqr.v;
-      read_ldf(cnt_r_file, 20, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2153,7 +2253,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for mad
       //
       s = cnt_info.mad.v;
-      read_ldf(cnt_r_file, 21, sr_na);
+      read_ldf(cnt_r_file, c++, sr_na);
       for(i=0; i<cnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                                cnt_info.alpha[i],
@@ -2195,7 +2295,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
                                  int b, NBRCTSInfo *&nbrcts_info,
                                  int n_nbrcts, int nbrcts_flag,
                                  const char *tmp_dir) {
-   int n, i, j;
+   int n, i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCTSInfo *nbrcts_tmp = (NBRCTSInfo *) 0;
@@ -2331,11 +2431,16 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
       for(i=0; i<n_nbrcts; i++) {
 
          //
+         // Initialize column counter
+         //
+         c = 1;
+         
+         //
          // Compute bootstrap interval for baser
          //
          s = nbrcts_info[i].cts_info.baser.v;
-         read_ldf(nbrcts_i_file[i], 1, si_na);
-         read_ldf(nbrcts_r_file[i], 1, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2346,8 +2451,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fmean
          //
          s = nbrcts_info[i].cts_info.fmean.v;
-         read_ldf(nbrcts_i_file[i], 2, si_na);
-         read_ldf(nbrcts_r_file[i], 2, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2358,8 +2463,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for acc
          //
          s = nbrcts_info[i].cts_info.acc.v;
-         read_ldf(nbrcts_i_file[i], 3, si_na);
-         read_ldf(nbrcts_r_file[i], 3, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2370,8 +2475,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fbias
          //
          s = nbrcts_info[i].cts_info.fbias.v;
-         read_ldf(nbrcts_i_file[i], 4, si_na);
-         read_ldf(nbrcts_r_file[i], 4, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2382,8 +2487,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pody
          //
          s = nbrcts_info[i].cts_info.pody.v;
-         read_ldf(nbrcts_i_file[i], 5, si_na);
-         read_ldf(nbrcts_r_file[i], 5, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2394,8 +2499,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for podn
          //
          s = nbrcts_info[i].cts_info.podn.v;
-         read_ldf(nbrcts_i_file[i], 6, si_na);
-         read_ldf(nbrcts_r_file[i], 6, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2406,8 +2511,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pofd
          //
          s = nbrcts_info[i].cts_info.pofd.v;
-         read_ldf(nbrcts_i_file[i], 7, si_na);
-         read_ldf(nbrcts_r_file[i], 7, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2418,8 +2523,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for far
          //
          s = nbrcts_info[i].cts_info.far.v;
-         read_ldf(nbrcts_i_file[i], 8, si_na);
-         read_ldf(nbrcts_r_file[i], 8, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2430,8 +2535,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for csi
          //
          s = nbrcts_info[i].cts_info.csi.v;
-         read_ldf(nbrcts_i_file[i], 9, si_na);
-         read_ldf(nbrcts_r_file[i], 9, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2442,8 +2547,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for gss
          //
          s = nbrcts_info[i].cts_info.gss.v;
-         read_ldf(nbrcts_i_file[i], 10, si_na);
-         read_ldf(nbrcts_r_file[i], 10, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2454,8 +2559,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hk
          //
          s = nbrcts_info[i].cts_info.hk.v;
-         read_ldf(nbrcts_i_file[i], 11, si_na);
-         read_ldf(nbrcts_r_file[i], 11, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2466,8 +2571,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hss
          //
          s = nbrcts_info[i].cts_info.hss.v;
-         read_ldf(nbrcts_i_file[i], 12, si_na);
-         read_ldf(nbrcts_r_file[i], 12, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2478,8 +2583,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for odds
          //
          s = nbrcts_info[i].cts_info.odds.v;
-         read_ldf(nbrcts_i_file[i], 13, si_na);
-         read_ldf(nbrcts_r_file[i], 13, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2490,8 +2595,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for lodds
          //
          s = nbrcts_info[i].cts_info.lodds.v;
-         read_ldf(nbrcts_i_file[i], 14, si_na);
-         read_ldf(nbrcts_r_file[i], 14, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2502,8 +2607,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for orss
          //
          s = nbrcts_info[i].cts_info.orss.v;
-         read_ldf(nbrcts_i_file[i], 15, si_na);
-         read_ldf(nbrcts_r_file[i], 15, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2514,8 +2619,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for eds
          //
          s = nbrcts_info[i].cts_info.eds.v;
-         read_ldf(nbrcts_i_file[i], 16, si_na);
-         read_ldf(nbrcts_r_file[i], 16, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2526,8 +2631,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for seds
          //
          s = nbrcts_info[i].cts_info.seds.v;
-         read_ldf(nbrcts_i_file[i], 17, si_na);
-         read_ldf(nbrcts_r_file[i], 17, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2538,8 +2643,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for edi
          //
          s = nbrcts_info[i].cts_info.edi.v;
-         read_ldf(nbrcts_i_file[i], 18, si_na);
-         read_ldf(nbrcts_r_file[i], 18, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2550,8 +2655,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for sedi
          //
          s = nbrcts_info[i].cts_info.sedi.v;
-         read_ldf(nbrcts_i_file[i], 19, si_na);
-         read_ldf(nbrcts_r_file[i], 19, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2562,8 +2667,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for bagss
          //
          s = nbrcts_info[i].cts_info.bagss.v;
-         read_ldf(nbrcts_i_file[i], 20, si_na);
-         read_ldf(nbrcts_r_file[i], 20, sr_na);
+         read_ldf(nbrcts_i_file[i], c,   si_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_bca_interval(s, si_na, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -2622,7 +2727,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
                                  int b, NBRCNTInfo &nbrcnt_info,
                                  int nbrcnt_flag,
                                  const char *tmp_dir) {
-   int n, i;
+   int n, i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCNTInfo nbrcnt_tmp;
@@ -2723,11 +2828,16 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       nbrcnt_r_out.close();
 
       //
+      // Initialize column counter
+      //
+      c = 1;
+
+      //
       // Compute bootstrap interval for FBS
       //
       s = nbrcnt_info.fbs.v;
-      read_ldf(nbrcnt_i_file, 1, si_na);
-      read_ldf(nbrcnt_r_file, 1, sr_na);
+      read_ldf(nbrcnt_i_file, c,   si_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               nbrcnt_info.alpha[i],
@@ -2738,8 +2848,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for FSS
       //
       s = nbrcnt_info.fss.v;
-      read_ldf(nbrcnt_i_file, 2, si_na);
-      read_ldf(nbrcnt_r_file, 2, sr_na);
+      read_ldf(nbrcnt_i_file, c,   si_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               nbrcnt_info.alpha[i],
@@ -2750,8 +2860,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for AFSS
       //
       s = nbrcnt_info.afss.v;
-      read_ldf(nbrcnt_i_file, 3, si_na);
-      read_ldf(nbrcnt_r_file, 3, sr_na);
+      read_ldf(nbrcnt_i_file, c,   si_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               nbrcnt_info.alpha[i],
@@ -2762,8 +2872,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for UFSS
       //
       s = nbrcnt_info.ufss.v;
-      read_ldf(nbrcnt_i_file, 4, si_na);
-      read_ldf(nbrcnt_r_file, 4, sr_na);
+      read_ldf(nbrcnt_i_file, c,   si_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               nbrcnt_info.alpha[i],
@@ -2774,8 +2884,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for F_RATE
       //
       s = nbrcnt_info.f_rate.v;
-      read_ldf(nbrcnt_i_file, 5, si_na);
-      read_ldf(nbrcnt_r_file, 5, sr_na);
+      read_ldf(nbrcnt_i_file, c,   si_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               nbrcnt_info.alpha[i],
@@ -2786,8 +2896,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for O_RATE
       //
       s = nbrcnt_info.o_rate.v;
-      read_ldf(nbrcnt_i_file, 6, si_na);
-      read_ldf(nbrcnt_r_file, 6, sr_na);
+      read_ldf(nbrcnt_i_file, c,   si_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_bca_interval(s, si_na, sr_na,
                               nbrcnt_info.alpha[i],
@@ -2833,7 +2943,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                   NBRCTSInfo *&nbrcts_info,
                                   int n_nbrcts, int nbrcts_flag,
                                   const char *tmp_dir) {
-   int n, i, j;
+   int n, i, j, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCTSInfo *nbrcts_tmp = ( NBRCTSInfo *) 0;
@@ -2948,10 +3058,15 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
       for(i=0; i<n_nbrcts; i++) {
 
          //
+         // Initialize column counter
+         //
+         c = 1;
+
+         //
          // Compute bootstrap interval for baser
          //
          s = nbrcts_info[i].cts_info.baser.v;
-         read_ldf(nbrcts_r_file[i], 1, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -2962,7 +3077,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fmean
          //
          s = nbrcts_info[i].cts_info.fmean.v;
-         read_ldf(nbrcts_r_file[i], 2, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -2973,7 +3088,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for acc
          //
          s = nbrcts_info[i].cts_info.acc.v;
-         read_ldf(nbrcts_r_file[i], 3, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -2984,7 +3099,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for fbias
          //
          s = nbrcts_info[i].cts_info.fbias.v;
-         read_ldf(nbrcts_r_file[i], 4, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -2995,7 +3110,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pody
          //
          s = nbrcts_info[i].cts_info.pody.v;
-         read_ldf(nbrcts_r_file[i], 5, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3006,7 +3121,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for podn
          //
          s = nbrcts_info[i].cts_info.podn.v;
-         read_ldf(nbrcts_r_file[i], 6, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3017,7 +3132,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for pofd
          //
          s = nbrcts_info[i].cts_info.pofd.v;
-         read_ldf(nbrcts_r_file[i], 7, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3028,7 +3143,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for far
          //
          s = nbrcts_info[i].cts_info.far.v;
-         read_ldf(nbrcts_r_file[i], 8, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3039,7 +3154,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for csicompute_mean_stdev
          //
          s = nbrcts_info[i].cts_info.csi.v;
-         read_ldf(nbrcts_r_file[i], 9, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3050,7 +3165,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for gss
          //
          s = nbrcts_info[i].cts_info.gss.v;
-         read_ldf(nbrcts_r_file[i], 10, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3061,7 +3176,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hk
          //
          s = nbrcts_info[i].cts_info.hk.v;
-         read_ldf(nbrcts_r_file[i], 11, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3072,7 +3187,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for hss
          //
          s = nbrcts_info[i].cts_info.hss.v;
-         read_ldf(nbrcts_r_file[i], 12, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3083,7 +3198,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for odds
          //
          s = nbrcts_info[i].cts_info.odds.v;
-         read_ldf(nbrcts_r_file[i], 13, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                   nbrcts_info[i].cts_info.alpha[j],
@@ -3094,7 +3209,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for lodds 
          //
          s = nbrcts_info[i].cts_info.lodds.v;
-         read_ldf(nbrcts_r_file[i], 14, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -3105,7 +3220,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for orss
          //
          s = nbrcts_info[i].cts_info.orss.v;
-         read_ldf(nbrcts_r_file[i], 15, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -3116,7 +3231,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for eds
          //
          s = nbrcts_info[i].cts_info.eds.v;
-         read_ldf(nbrcts_r_file[i], 16, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -3127,7 +3242,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for seds
          //
          s = nbrcts_info[i].cts_info.seds.v;
-         read_ldf(nbrcts_r_file[i], 17, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -3138,7 +3253,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for edi
          //
          s = nbrcts_info[i].cts_info.edi.v;
-         read_ldf(nbrcts_r_file[i], 18, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -3149,7 +3264,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for sedi
          //
          s = nbrcts_info[i].cts_info.sedi.v;
-         read_ldf(nbrcts_r_file[i], 19, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -3160,7 +3275,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute bootstrap interval for bagss
          //
          s = nbrcts_info[i].cts_info.bagss.v;
-         read_ldf(nbrcts_r_file[i], 20, sr_na);
+         read_ldf(nbrcts_r_file[i], c++, sr_na);
          for(j=0; j<nbrcts_info[i].cts_info.n_alpha; j++)
             compute_perc_interval(s, sr_na,
                                  nbrcts_info[i].cts_info.alpha[j],
@@ -3214,7 +3329,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                   NBRCNTInfo &nbrcnt_info,
                                   int nbrcnt_flag,
                                   const char *tmp_dir) {
-   int n, i;
+   int n, i, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCNTInfo nbrcnt_tmp;
@@ -3299,10 +3414,15 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       nbrcnt_r_out.close();
 
       //
+      // Initialize column counter
+      //
+      c = 1;
+
+      //
       // Compute bootstrap interval for FBS
       //
       s = nbrcnt_info.fbs.v;
-      read_ldf(nbrcnt_r_file, 1, sr_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                               nbrcnt_info.alpha[i],
@@ -3313,7 +3433,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for FSS
       //
       s = nbrcnt_info.fss.v;
-      read_ldf(nbrcnt_r_file, 2, sr_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                               nbrcnt_info.alpha[i],
@@ -3324,7 +3444,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for AFSS
       //
       s = nbrcnt_info.afss.v;
-      read_ldf(nbrcnt_r_file, 3, sr_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                               nbrcnt_info.alpha[i],
@@ -3335,7 +3455,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for UFSS
       //
       s = nbrcnt_info.ufss.v;
-      read_ldf(nbrcnt_r_file, 4, sr_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                               nbrcnt_info.alpha[i],
@@ -3346,7 +3466,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for F_RATE
       //
       s = nbrcnt_info.f_rate.v;
-      read_ldf(nbrcnt_r_file, 5, sr_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                               nbrcnt_info.alpha[i],
@@ -3357,7 +3477,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       // Compute bootstrap interval for O_RATE
       //
       s = nbrcnt_info.o_rate.v;
-      read_ldf(nbrcnt_r_file, 6, sr_na);
+      read_ldf(nbrcnt_r_file, c++, sr_na);
       for(i=0; i<nbrcnt_info.n_alpha; i++)
          compute_perc_interval(s, sr_na,
                               nbrcnt_info.alpha[i],
@@ -3663,13 +3783,13 @@ void write_cntinfo(ofstream &tmp_out, const CNTInfo &c) {
    char line[max_line_len];
 
    sprintf(line,
-           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
-           c.fbar.v,    c.fstdev.v,  c.obar.v,    c.ostdev.v,
-           c.pr_corr.v, c.sp_corr.v, c.kt_corr.v, c. me.v,
-           c.estdev.v,  c.mbias.v,   c.mae.v,     c.mse.v,
-           c.bcmse.v,   c.rmse.v,    c.e10.v,     c.e25.v,
-           c.e50.v,     c.e75.v,     c.e90.v,     c.eiqr.v,
-           c.mad.v);
+           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+           c.fbar.v,    c.fstdev.v,    c.obar.v,    c.ostdev.v,
+           c.pr_corr.v, c.anom_corr.v, c. me.v,     c.me2.v,
+           c.estdev.v,  c.mbias.v,     c.mae.v,     c.mse.v,
+           c.msess.v,   c.bcmse.v,     c.rmse.v,    c.e10.v,
+           c.e25.v,     c.e50.v,       c.e75.v,     c.e90.v,
+           c.eiqr.v,    c.mad.v);
 
    tmp_out << line << "\n";
 

@@ -1383,7 +1383,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       //
       // Apply continuous filtering thresholds
       //
-      subset_fo_na(f_na, cnt_info[i].fthresh,
+      subset_pairs(f_na, cnt_info[i].fthresh,
                    o_na, cnt_info[i].othresh,
                    c_na, cnt_info[i].logic,
                    ff_na, oo_na, cc_na);
@@ -1406,23 +1406,20 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       // Compute the stats, normal confidence intervals, and
       // bootstrap confidence intervals
       //
+      int precip_flag = (conf_info.fcst_info[i_vx]->is_precipitation() &&
+                         conf_info.obs_info[i_vx]->is_precipitation());
+
       if(conf_info.boot_interval == BootIntervalType_BCA) {
-         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na,
-            conf_info.fcst_info[i_vx]->is_precipitation() &
-            conf_info.obs_info[i_vx]->is_precipitation(),
+         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na, cc_na,
+            precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep,
-            cnt_info[i],
-            conf_info.output_flag[i_cnt] != STATOutputType_None,
-            conf_info.rank_corr_flag, conf_info.tmp_dir);
+            cnt_info[i], conf_info.tmp_dir);
       }
       else {
-         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na,
-            conf_info.fcst_info[i_vx]->is_precipitation() &
-            conf_info.obs_info[i_vx]->is_precipitation(),
+         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na, cc_na,
+            precip_flag, conf_info.rank_corr_flag, 
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
-            cnt_info[i],
-            conf_info.output_flag[i_cnt] != STATOutputType_None,
-            conf_info.rank_corr_flag, conf_info.tmp_dir);
+            cnt_info[i], conf_info.tmp_dir);
       }
    } // end for i
 

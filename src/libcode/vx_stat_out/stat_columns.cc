@@ -1827,27 +1827,31 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    // Continuous Variable Stats
    // Dump out the CNT line:
    //    TOTAL,
-   //    FBAR,        FBAR_NCL,    FBAR_NCU,    FBAR_BCL,    FBAR_BCU,
-   //    FSTDEV,      FSTDEV_NCL,  FSTDEV_NCU,  FSTDEV_BCL,  FSTDEV_BCU,
-   //    OBAR,        OBAR_NCL,    OBAR_NCU,    OBAR_BCL,    OBAR_BCU,
-   //    OSTDEV,      OSTDEV_NCL,  OSTDEV_NCU,  OSTDEV_BCL,  OSTDEV_BCU,
-   //    PR_CORR,     PR_CORR_NCL, PR_CORR_NCU, PR_CORR_BCL, PR_CORR_BCU,
-   //    SP_CORR,     KT_CORR,     RANKS,       FRANK_TIES,  ORANK_TIES,
-   //    ME,          ME_NCL,      ME_NCU,      ME_BCL,      ME_BCU,
-   //    ESTDEV,      ESTDEV_NCL,  ESTDEV_NCU,  ESTDEV_BCL,  ESTDEV_BCU,
-   //    MBIAS,       MBIAS_BCL,   MBIAS_BCU,
-   //    MAE,         MAE_BCL,     MAE_BCU,
-   //    MSE,         MSE_BCL,     MSE_BCU,
-   //    BCMSE,       BCMSE_BCL,   BCMSE_BCU,
-   //    RMSE,        RMSE_BCL,    RMSE_BCU,
-   //    E10,         E10_BCL,     E10_BCU,
-   //    E25,         E25_BCL,     E25_BCU,
-   //    E50,         E50_BCL,     E50_BCU,
-   //    E75,         E75_BCL,     E75_BCU,
-   //    E90,         E90_BCL,     E90_BCU,
-   //    EIQR,        EIQR_BCL,    EIQR_BCU,
-   //    MAD,         MAD_BCL,     MAD_BCU
+   //    FBAR,        FBAR_NCL,      FBAR_NCU,      FBAR_BCL,      FBAR_BCU,
+   //    FSTDEV,      FSTDEV_NCL,    FSTDEV_NCU,    FSTDEV_BCL,    FSTDEV_BCU,
+   //    OBAR,        OBAR_NCL,      OBAR_NCU,      OBAR_BCL,      OBAR_BCU,
+   //    OSTDEV,      OSTDEV_NCL,    OSTDEV_NCU,    OSTDEV_BCL,    OSTDEV_BCU,
+   //    PR_CORR,     PR_CORR_NCL,   PR_CORR_NCU,   PR_CORR_BCL,   PR_CORR_BCU,
+   //    SP_CORR,     KT_CORR,       RANKS,         FRANK_TIES,    ORANK_TIES,
+   //    ME,          ME_NCL,        ME_NCU,        ME_BCL,        ME_BCU,
+   //    ESTDEV,      ESTDEV_NCL,    ESTDEV_NCU,    ESTDEV_BCL,    ESTDEV_BCU,
+   //    MBIAS,       MBIAS_BCL,     MBIAS_BCU,
+   //    MAE,         MAE_BCL,       MAE_BCU,
+   //    MSE,         MSE_BCL,       MSE_BCU,
+   //    BCMSE,       BCMSE_BCL,     BCMSE_BCU,
+   //    RMSE,        RMSE_BCL,      RMSE_BCU,
+   //    E10,         E10_BCL,       E10_BCU,
+   //    E25,         E25_BCL,       E25_BCU,
+   //    E50,         E50_BCL,       E50_BCU,
+   //    E75,         E75_BCL,       E75_BCU,
+   //    E90,         E90_BCL,       E90_BCU,
+   //    EIQR,        EIQR_BCL,      EIQR_BCU,
+   //    MAD,         MAD_BCL,       MAD_BCU
+   //    ME2,         ME2_BCL,       ME2_BCU,
+   //    MSESS,       MSESS_BCL,     MSESS_BCU,
+   //    ANOM_CORR,   ANOM_CORR_NCL, ANOM_CORR_NCU, ANOM_CORR_BCL, ANOM_CORR_BCU
    //
+
    at.set_entry(r, c+0,  // Total Number of Grid Points
       cnt_info.n);
 
@@ -1896,19 +1900,19 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    at.set_entry(r, c+15, // Observation Mean BCU
       cnt_info.obar.v_bcu[i]);
 
-   at.set_entry(r, c+16, // Obsevation Standard Deviation
+   at.set_entry(r, c+16, // Observation Standard Deviation
       cnt_info.ostdev.v);
 
-   at.set_entry(r, c+17, // Obsevation Standard Deviation NCL
+   at.set_entry(r, c+17, // Observation Standard Deviation NCL
       cnt_info.ostdev.v_ncl[i]);
 
-   at.set_entry(r, c+18, // Obsevation Standard Deviation NCU
+   at.set_entry(r, c+18, // Observation Standard Deviation NCU
       cnt_info.ostdev.v_ncu[i]);
 
-   at.set_entry(r, c+19, // Obsevation Standard Deviation BCL
+   at.set_entry(r, c+19, // Observation Standard Deviation BCL
       cnt_info.ostdev.v_bcl[i]);
 
-   at.set_entry(r, c+20, // Obsevation Standard Deviation BCU
+   at.set_entry(r, c+20, // Observation Standard Deviation BCU
       cnt_info.ostdev.v_bcu[i]);
 
    at.set_entry(r, c+21, // Pearson's Correlation Coefficient
@@ -2079,6 +2083,39 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    at.set_entry(r, c+76, // Median Absolute Deviation BCU
       cnt_info.mad.v_bcu[i]);
 
+   at.set_entry(r, c+77, // Mean Error Squared
+      cnt_info.me2.v);
+
+   at.set_entry(r, c+78, // Mean Error Squared BCL
+      cnt_info.me2.v_bcl[i]);
+
+   at.set_entry(r, c+79, // Mean Error Squared BCU
+      cnt_info.me2.v_bcu[i]);
+   
+   at.set_entry(r, c+80, // Mean Squared Error Skill Score
+      cnt_info.msess.v);
+
+   at.set_entry(r, c+81, // Mean Squared Error Skill Score BCL
+      cnt_info.msess.v_bcl[i]);
+
+   at.set_entry(r, c+82, // Mean Squared Error Skill Score BCU
+      cnt_info.msess.v_bcu[i]);
+
+   at.set_entry(r, c+83, // Anomaly Correlation
+      cnt_info.anom_corr.v);
+
+   at.set_entry(r, c+84, // Anomaly Correlation NCL
+      cnt_info.anom_corr.v_ncl[i]);
+
+   at.set_entry(r, c+85, // Anomaly Correlation NCU
+      cnt_info.anom_corr.v_ncu[i]);
+
+   at.set_entry(r, c+86, // Anomaly Correlation BCL
+      cnt_info.anom_corr.v_bcl[i]);
+
+   at.set_entry(r, c+87, // Anomaly Correlation BCU
+      cnt_info.anom_corr.v_bcu[i]);
+   
    return;
 }
 
@@ -3003,13 +3040,13 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+18, // Observation Mean NCU
       cnt_info.obar.v_ncu[0]);
 
-   at.set_entry(r, c+19, // Obsevation Standard Deviation
+   at.set_entry(r, c+19, // Observation Standard Deviation
       cnt_info.ostdev.v);
 
-   at.set_entry(r, c+20, // Obsevation Standard Deviation NCL
+   at.set_entry(r, c+20, // Observation Standard Deviation NCL
       cnt_info.ostdev.v_ncl[0]);
 
-   at.set_entry(r, c+21, // Obsevation Standard Deviation NCU
+   at.set_entry(r, c+21, // Observation Standard Deviation NCU
       cnt_info.ostdev.v_ncu[0]);
 
    at.set_entry(r, c+22, // Pearson's Correlation Coefficient
