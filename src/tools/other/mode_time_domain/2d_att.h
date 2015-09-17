@@ -48,6 +48,8 @@ class SingleAtt2D {
 
       int TimeIndex;
 
+      bool IsFcst;
+
    public:
 
       SingleAtt2D();
@@ -73,6 +75,9 @@ class SingleAtt2D {
 
       void set_time_index(int);
 
+      void set_fcst (bool = true);
+      void set_obs  (bool = true);
+
          //
          //  get stuff
          //
@@ -92,6 +97,9 @@ class SingleAtt2D {
       double axis() const;
 
       int time_index () const;
+
+      bool is_fcst () const;
+      bool is_obs  () const;
 
          //
          //  do stuff
@@ -125,6 +133,9 @@ inline double SingleAtt2D::centroid_lat() const { return ( CentroidLat ); }
 inline double SingleAtt2D::centroid_lon() const { return ( CentroidLon ); }
 
 inline double SingleAtt2D::axis() const { return ( AxisAngle ); }
+
+inline bool   SingleAtt2D::is_fcst() const { return (   IsFcst ); }
+inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
 
 
 ////////////////////////////////////////////////////////////////////////

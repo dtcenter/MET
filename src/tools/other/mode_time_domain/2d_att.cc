@@ -122,6 +122,8 @@ AxisAngle = 0.0;
 
 TimeIndex = -1;
 
+IsFcst = true;
+
 return;
 
 }
@@ -149,6 +151,8 @@ TimeIndex = a.TimeIndex;
 
 CentroidLat = a.CentroidLat;
 CentroidLon = a.CentroidLon;
+
+IsFcst = a.IsFcst;
 
 
 return;
@@ -224,6 +228,34 @@ void SingleAtt2D::set_axis(double angle)
 angle += 180.0*floor((90.0 - angle)/180.0);
 
 AxisAngle = angle;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt2D::set_fcst(bool tf)
+
+{
+
+IsFcst = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt2D::set_obs(bool tf)
+
+{
+
+IsFcst = !tf;
 
 return;
 
@@ -337,12 +369,18 @@ void SingleAtt2D::write_txt(AsciiTable & table, const int row) const
 int c = n_header_3d_cols;
 const char * format = 0;
 char junk[512];
+ConcatString s;
 
    //
    //  object number
    //
 
-table.set_entry(row, c++, ObjectNumber);
+if ( IsFcst )  s << 'F';
+else           s << 'O';
+
+s << '_' << ObjectNumber;
+
+table.set_entry(row, c++, s.text());
 
    //
    //  time index
