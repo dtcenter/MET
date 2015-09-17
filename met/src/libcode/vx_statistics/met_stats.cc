@@ -2143,11 +2143,13 @@ void PCTInfo::clear() {
    if(alpha) { delete [] alpha; alpha = (double *) 0; }
 
    pct.zero_out();
+   climo_pct.zero_out();
    fthresh.clear();
    othresh.clear();
 
    baser.clear();
    brier.clear();
+   bss = bad_data_double;
 
    return;
 }
@@ -2160,6 +2162,7 @@ void PCTInfo::assign(const PCTInfo &c) {
    clear();
 
    pct = c.pct;
+   climo_pct = c.climo_pct;
    fthresh = c.fthresh;
    othresh  = c.othresh;
 
@@ -2168,6 +2171,7 @@ void PCTInfo::assign(const PCTInfo &c) {
 
    baser = c.baser;
    brier = c.brier;
+   bss   = c.bss;
 
    return;
 }
@@ -2198,9 +2202,21 @@ void PCTInfo::allocate_n_alpha(int i) {
 ////////////////////////////////////////////////////////////////////////
 
 void PCTInfo::compute_stats() {
+   double ref;
 
    baser.v = pct.baser();
    brier.v = pct.brier_score();
+
+   //
+   // Compute the brier skill score
+   //
+   ref = climo_pct.brier_score();
+   if(is_bad_data(brier.v) || is_bad_data(ref) || is_eq(ref, 0.0)) {
+      bss = bad_data_double;
+   }
+   else {
+      bss = (brier.v - ref)/ref;
+   }
 
    return;
 }
@@ -3210,10 +3226,12 @@ void compute_i_mctsinfo(const NumArray &f_na, const NumArray &o_na,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
+                     const NumArray &c_na,
                      int pstd_flag, PCTInfo &pct_info) {
    int i, n_thresh, n_pair;
    double *p_thresh = (double *) 0;
    SingleThresh ot;
+   bool cflag;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -3226,21 +3244,32 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    }
    n_pair = f_na.n_elements();
 
+   // Flag to process climo
+   cflag = set_cflag(f_na, c_na);
+   
    //
    // Store the thresholds as an array of doubles
    //
    n_thresh = pct_info.fthresh.n_elements();
    p_thresh = new double [n_thresh];
 
-   for(i=0; i<n_thresh; i++)
+   for(i=0; i<n_thresh; i++) {
       p_thresh[i] = pct_info.fthresh[i].get_value();
+   }
 
    //
-   // Set up the Nx2ContingencyTable
+   // Set up the forecast Nx2ContingencyTable
    //
    pct_info.pct.clear();
    pct_info.pct.set_size(n_thresh-1);
    pct_info.pct.set_thresholds(p_thresh);
+
+   //
+   // Set up the climatology Nx2ContingencyTable
+   //
+   pct_info.climo_pct.clear();
+   pct_info.climo_pct.set_size(n_thresh-1);
+   pct_info.climo_pct.set_thresholds(p_thresh);
 
    //
    // Get the observation threshold value to be applied
@@ -3255,8 +3284,14 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
       //
       // Check the observation thresholds and increment accordingly
       //
-      if(ot.check(o_na[i])) pct_info.pct.inc_event(f_na[i]);
-      else                  pct_info.pct.inc_nonevent(f_na[i]);
+      if(ot.check(o_na[i])) {
+         pct_info.pct.inc_event(f_na[i]);
+         if(cflag) pct_info.climo_pct.inc_event(c_na[i]);
+      }
+      else {
+         pct_info.pct.inc_nonevent(f_na[i]);
+         if(cflag) pct_info.climo_pct.inc_nonevent(c_na[i]);
+      }
    } // end for i
 
    //

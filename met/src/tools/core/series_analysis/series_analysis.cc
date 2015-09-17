@@ -833,6 +833,7 @@ void do_sl1l2(int n, const NumArray &f_na, const NumArray &o_na) {
 
 void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
    int i, j;
+   NumArray c_na;
 
    mlog << Debug(4) << "Computing Probabilistic Statistics.\n";
 
@@ -854,7 +855,7 @@ void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
       pct_info.othresh = conf_info.ocat_ta[i];
 
       // Compute the probabilistic counts and statistics
-      compute_pctinfo(f_na, o_na, true, pct_info);
+      compute_pctinfo(f_na, o_na, c_na, true, pct_info);
 
       // Add statistic value for each possible PCT column
       for(j=0; j<conf_info.output_stats[stat_pct].n_elements(); j++) {

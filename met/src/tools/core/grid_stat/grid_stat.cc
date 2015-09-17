@@ -131,7 +131,7 @@ static void do_vl1l2 (VL1L2Info *&, int,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &);
 static void do_pct   (PCTInfo *&, int,
-                      const NumArray &, const NumArray &);
+                      const NumArray &, const NumArray &, const NumArray &);
 static void do_nbrcts(NBRCTSInfo *&, int, int, int,
                       const NumArray &, const NumArray &);
 static void do_nbrcnt(NBRCNTInfo &, int, int, int,
@@ -1044,7 +1044,7 @@ void process_scores() {
                for(m=0; m<n_prob; m++) pct_info[m].clear();
 
                // Compute PCT
-               do_pct(pct_info, i, f_na, o_na);
+               do_pct(pct_info, i, f_na, o_na, cmn_na);
 
                // Loop through all of the thresholds
                for(m=0; m<n_prob; m++) {
@@ -1501,7 +1501,8 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_pct(PCTInfo *&pct_info, int i_vx,
-            const NumArray &f_na, const NumArray &o_na) {
+            const NumArray &f_na, const NumArray &o_na,
+            const NumArray &c_na) {
    int i, j, n_pct;
 
    mlog << Debug(2) << "Computing Probabilistic Statistics.\n";
@@ -1532,7 +1533,7 @@ void do_pct(PCTInfo *&pct_info, int i_vx,
       //
       // Compute the probabilistic counts and statistics
       //
-      compute_pctinfo(f_na, o_na, conf_info.output_flag[i_pstd],
+      compute_pctinfo(f_na, o_na, c_na, conf_info.output_flag[i_pstd],
                       pct_info[i]);
    } // end for i
 

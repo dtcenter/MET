@@ -444,6 +444,7 @@ class PCTInfo {
       double *alpha;
 
       Nx2ContingencyTable pct;
+      Nx2ContingencyTable climo_pct;
 
       // Multiple thresholds for the probabilistic forecast
       ThreshArray fthresh;
@@ -453,6 +454,7 @@ class PCTInfo {
 
       CIInfo baser;
       CIInfo brier;
+      double bss;
 
       void clear();
       void allocate_n_alpha(int);
@@ -537,7 +539,7 @@ extern void   compute_i_mctsinfo(const NumArray &, const NumArray &,
                                  int, int, MCTSInfo &);
 
 extern void   compute_pctinfo(const NumArray &, const NumArray &,
-                              int, PCTInfo &);
+                              const NumArray &, int, PCTInfo &);
 
 extern void   compute_nbrcntinfo(const NumArray &, const NumArray &,
                                  const NumArray &, const NumArray &,

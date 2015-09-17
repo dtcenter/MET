@@ -161,7 +161,7 @@ static const char * pstd_columns [] = {
    "BASER_NCL",   "BASER_NCU",   "RELIABILITY",
    "RESOLUTION",  "UNCERTAINTY", "ROC_AUC",
    "BRIER",       "BRIER_NCL",   "BRIER_NCU",
-   "THRESH_"
+   "BSS",         "THRESH_"
 };
 
 static const char * pjc_columns [] = {
@@ -348,7 +348,7 @@ static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_co
 
 inline int get_n_mctc_columns  (int n) { return(2  + n*n); }
 inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
-inline int get_n_pstd_columns  (int n) { return(12 +    max(1, n)   ); }
+inline int get_n_pstd_columns  (int n) { return(13 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_rhist_columns (int n) { return(4  + n);               } // n = N_RANK
