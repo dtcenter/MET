@@ -17,6 +17,14 @@ using namespace std;
 
 #include "2d_att.h"
 #include "2d_moments.h"
+#include "3d_txt_header.h"
+#include "2d_columns.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char format_2_decimals [] = "%.2f";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -106,9 +114,13 @@ ObjectNumber = 0;
 
 Area = 0;
 
-Xbar = Ybar = 0;
+Xbar = Ybar = 0.0;
+
+CentroidLat = CentroidLon = 0.0;
 
 AxisAngle = 0.0;
+
+TimeIndex = -1;
 
 return;
 
@@ -133,6 +145,10 @@ Ybar = a.Ybar;
 
 AxisAngle = a.AxisAngle;
 
+TimeIndex = a.TimeIndex;
+
+CentroidLat = a.CentroidLat;
+CentroidLon = a.CentroidLon;
 
 
 return;
@@ -225,28 +241,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleAtt2D calc_2d_single_atts(const Object & obj, const MtdFloatFile & raw, const char * model, int obj_number)
+SingleAtt2D calc_2d_single_atts(const MtdIntFile & mask_2d, const int obj_number)   //  zero-based
 
 {
 
-// int j;
-// int n, Vol;
 SingleAtt2D a;
-// double bbox_volume;
-ConcatString raw_filename;
-// float * values = (float *) 0;
-// const int   * i = 0;
-// const float * r = 0;
 Mtd_2D_Moments moments;
-MtdIntFile f;
-// const int n3 = (obj.nx())*(obj.ny())*(obj.nt());
 
 
 a.ObjectNumber = obj_number;
 
-f = obj.select(obj_number + 1);
-
-moments = f.calc_2d_moments();
+moments = mask_2d.calc_2d_moments();
 
 if ( moments.N == 0 )  {
 
@@ -259,7 +264,9 @@ if ( moments.N == 0 )  {
 a.Xbar = (moments.Sx)/(moments.N);
 a.Ybar = (moments.Sy)/(moments.N);
 
-a.Area = obj.total_volume();
+mask_2d.grid().xy_to_latlon(a.Xbar, a.Ybar, a.CentroidLat, a.CentroidLon);
+
+a.Area = mask_2d.volume(0);
 
 a.set_axis(moments.calc_2D_axis_plane_angle());
 
@@ -316,6 +323,83 @@ a.Ptile_90 = percentile_f(values, n, 0.90);
 // a.dump(cout);
 
 return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt2D::write_txt(AsciiTable & table, const int row) const
+
+{
+
+int c = n_header_3d_cols;
+const char * format = 0;
+char junk[512];
+
+   //
+   //  object number
+   //
+
+table.set_entry(row, c++, ObjectNumber);
+
+   //
+   //  time index
+   //
+
+table.set_entry(row, c++, TimeIndex);
+
+   //
+   //  area
+   //
+
+table.set_entry(row, c++, Area);
+
+   //
+   //  centroid (x, y)
+   //
+
+format = format_2_decimals;
+
+snprintf(junk, sizeof(junk), format, Xbar);
+
+table.set_entry(row, c++, junk);
+
+snprintf(junk, sizeof(junk), format, Ybar);
+
+table.set_entry(row, c++, junk);
+
+   //
+   //  centroid lat/lon
+   //
+
+format = format_2_decimals;
+
+snprintf(junk, sizeof(junk), format, CentroidLat);
+
+table.set_entry(row, c++, junk);
+
+snprintf(junk, sizeof(junk), format, -CentroidLon);   //  toggle sign
+
+table.set_entry(row, c++, junk);
+
+   //
+   //  axis angle
+   //
+
+format = format_2_decimals;
+
+snprintf(junk, sizeof(junk), format, AxisAngle);
+
+table.set_entry(row, c++, junk);
+
+
+   //
+   //  done
+   //
+
+return;
 
 }
 

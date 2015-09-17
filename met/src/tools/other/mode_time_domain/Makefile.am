@@ -43,6 +43,7 @@ mtd_SOURCES = mtd.cc  \
               3d_conv.cc    \
               3d_pair_columns.h    \
               3d_single_columns.h  \
+              2d_columns.h  \
               mtd_txt_output.h  \
               mtd_txt_output.cc  \
               mtd_nc_output.h  \

@@ -571,7 +571,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-MtdIntFile MtdIntFile::const_t_slice(int t) const
+MtdIntFile MtdIntFile::const_t_slice(const int t) const
 
 {
 
@@ -590,6 +590,7 @@ int fmin, fmax;
 MtdIntFile f;
 int * d;
 int value;
+
 
 f.base_assign(*this);
 
@@ -622,6 +623,80 @@ for (j=0; j<nxy; ++j)  {
 
 f.DataMin = fmin;
 f.DataMax = fmax;
+
+   //
+   //  done
+   //
+
+return ( f );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MtdIntFile MtdIntFile::const_t_mask(const int t, const int obj_num) const   //  1-based
+
+{
+
+if ( (t < 0) || (t >= Nt) )  {
+
+   cerr << "\n\n  MtdIntFile MtdIntFile::const_t_mask(int) const -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+int j, n;
+const int nxy = Nx*Ny;
+int bytes = nxy*sizeof(int);
+MtdIntFile f;
+int * d;
+int value, vol;
+
+
+f.base_assign(*this);
+
+f.Nt = 1;
+
+f.DeltaT = 0;
+
+f.StartTime = StartTime + t*DeltaT;
+
+f.Radius = Radius;
+
+f.DataMin = 0;
+f.DataMax = 1;
+
+f.Data = new int [Nx*Ny];
+
+n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
+
+memcpy(f.Data, Data + n, bytes);
+
+d = f.Data;
+
+vol = 0;
+
+for (j=0; j<nxy; ++j)  {
+
+   value = *d;
+
+   if ( value == obj_num )  {
+
+      value = 1;
+
+      ++vol;
+
+   } else value = 0;
+
+   *d++ = value;
+
+}
+
+f.set_volumes(1, &vol);
+
 
    //
    //  done
@@ -1556,6 +1631,14 @@ return ( m );
 Mtd_2D_Moments MtdIntFile::calc_2d_moments() const
 
 {
+
+if ( Nt != 1 )  {
+
+   cerr << "\n\n  MtdIntFile::calc_2d_moments() const -> not a 2D object!\n\n";
+
+   exit ( 1 );
+
+}
 
 int x, y, k, n;
 Mtd_2D_Moments m;

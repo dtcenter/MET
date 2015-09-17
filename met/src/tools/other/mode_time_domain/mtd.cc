@@ -288,7 +288,7 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
    //  write single simple attributes
    //
 
-do_3d_single_txt_output(fcst_att, obs_att, config, "a.txt");
+do_3d_single_txt_output(fcst_att, obs_att, config, "s.txt");
 
    //
    //  get pair attributes
@@ -331,7 +331,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
    //  write simple pair attributes
    //
 
-do_3d_pair_txt_output(pa, config, "b.txt");
+do_3d_pair_txt_output(pa, config, "p.txt");
 
    //
    //  create graph
