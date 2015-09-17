@@ -268,7 +268,7 @@ mask_2d.grid().xy_to_latlon(a.Xbar, a.Ybar, a.CentroidLat, a.CentroidLon);
 
 a.Area = mask_2d.volume(0);
 
-a.set_axis(moments.calc_2D_axis_plane_angle());
+a.AxisAngle = moments.calc_2D_axis_plane_angle();
 
 
    //

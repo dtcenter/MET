@@ -18,6 +18,8 @@
 #include "3d_single_columns.h"
 #include "3d_pair_columns.h"
 #include "3d_txt_header.h"
+#include "2d_columns.h"
+#include "2d_att_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,6 +34,12 @@ extern void do_3d_single_txt_output(const SingleAtt3DArray & fcst_att,
 extern void do_3d_pair_txt_output(const PairAtt3DArray &, 
                                   const MtdConfigInfo &, 
                                   const char * output_filename);
+
+
+extern void do_2d_txt_output(const SingleAtt2DArray & fcst_att, 
+                             const SingleAtt2DArray &  obs_att, 
+                             const MtdConfigInfo &, 
+                             const char * output_filename);
 
 
 ////////////////////////////////////////////////////////////////////////
