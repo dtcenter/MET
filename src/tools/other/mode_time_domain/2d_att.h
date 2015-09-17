@@ -28,7 +28,7 @@ typedef MtdIntFile Object;
 
 class SingleAtt2D {
 
-      friend SingleAtt2D calc_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, int obj_number);
+      friend SingleAtt2D calc_single_atts(const Object & mask_3d, const int obj_number);
 
    public:
 
@@ -42,7 +42,11 @@ class SingleAtt2D {
 
       double Xbar, Ybar;
 
+      double CentroidLat, CentroidLon;
+
       double AxisAngle;
+
+      int TimeIndex;
 
    public:
 
@@ -67,6 +71,8 @@ class SingleAtt2D {
 
       void set_axis(double);
 
+      void set_time_index(int);
+
          //
          //  get stuff
          //
@@ -80,12 +86,18 @@ class SingleAtt2D {
       double xbar () const;
       double ybar () const;
 
+      double centroid_lat () const;
+      double centroid_lon () const;
+
       double axis() const;
+
+      int time_index () const;
 
          //
          //  do stuff
          //
 
+      void write_txt(AsciiTable &, const int row) const;
 
 };
 
@@ -95,15 +107,22 @@ class SingleAtt2D {
 
 inline int SingleAtt2D::object_number() const { return ( ObjectNumber ); }
 
+inline int SingleAtt2D::time_index() const { return ( TimeIndex ); }
+
 inline void SingleAtt2D::set_object_number(int _n) { ObjectNumber = _n;  return; }
 
 inline int SingleAtt2D::area() const { return ( Area ); }
 
 inline void SingleAtt2D::set_area(int _A) { Area = _A;  return; }
 
+inline void SingleAtt2D::set_time_index(int _t) { TimeIndex = _t;  return; }
+
 
 inline double SingleAtt2D::xbar() const { return ( Xbar ); }
 inline double SingleAtt2D::ybar() const { return ( Ybar ); }
+
+inline double SingleAtt2D::centroid_lat() const { return ( CentroidLat ); }
+inline double SingleAtt2D::centroid_lon() const { return ( CentroidLon ); }
 
 inline double SingleAtt2D::axis() const { return ( AxisAngle ); }
 
@@ -111,7 +130,7 @@ inline double SingleAtt2D::axis() const { return ( AxisAngle ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt2D calc_2d_single_atts(const Object & mask, const Object & raw, const char * model, int obj_number);   //  0 based 
+extern SingleAtt2D calc_2d_single_atts(const Object & mask_2d, const int obj_number);   //  0 based 
 
 
 ////////////////////////////////////////////////////////////////////////

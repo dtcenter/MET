@@ -481,7 +481,7 @@ const char * format = 0;
 ConcatString s;
 
 
-   //  object number
+   //
    //  object number
    //
 
@@ -502,15 +502,15 @@ table.set_entry(row, c++, s.text());
 
    format = format_2_decimals;
 
-sprintf(junk, format, Xbar);
+snprintf(junk, sizeof(junk), format, Xbar);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Ybar);
+snprintf(junk, sizeof(junk), format, Ybar);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Tbar);
+snprintf(junk, sizeof(junk), format, Tbar);
 
    table.set_entry(row, c++, junk);
 
@@ -520,11 +520,11 @@ sprintf(junk, format, Tbar);
 
    format = format_2_decimals;
 
-sprintf(junk, format, Centroid_Lat);
+snprintf(junk, sizeof(junk), format, Centroid_Lat);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Centroid_Lon);
+snprintf(junk, sizeof(junk), format, Centroid_Lon);
 
    table.set_entry(row, c++, junk);
 
@@ -534,11 +534,11 @@ sprintf(junk, format, Centroid_Lon);
 
    format = format_2_decimals;
 
-sprintf(junk, format, Xvelocity);
+snprintf(junk, sizeof(junk), format, Xvelocity);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Yvelocity);
+snprintf(junk, sizeof(junk), format, Yvelocity);
 
    table.set_entry(row, c++, junk);
 
@@ -548,7 +548,7 @@ sprintf(junk, format, Yvelocity);
 
    format = format_2_decimals;
 
-sprintf(junk, format, SpatialAxisAngle);
+snprintf(junk, sizeof(junk), format, SpatialAxisAngle);
 
    table.set_entry(row, c++, junk);
 
@@ -556,7 +556,7 @@ sprintf(junk, format, SpatialAxisAngle);
    //  volume
    //
 
-sprintf(junk, format_int, Volume);
+snprintf(junk, sizeof(junk), format_int, Volume);
 
    table.set_entry(row, c++, junk);
 
@@ -566,11 +566,11 @@ sprintf(junk, format_int, Volume);
 
    format = format_int;
 
-sprintf(junk, format, Tmin);
+snprintf(junk, sizeof(junk), format, Tmin);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Tmax);
+snprintf(junk, sizeof(junk), format, Tmax);
 
    table.set_entry(row, c++, junk);
 
@@ -580,23 +580,23 @@ sprintf(junk, format, Tmax);
 
    format = format_2_decimals;
 
-sprintf(junk, format, Ptile_10);
+snprintf(junk, sizeof(junk), format, Ptile_10);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Ptile_25);
+snprintf(junk, sizeof(junk), format, Ptile_25);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Ptile_50);
+snprintf(junk, sizeof(junk), format, Ptile_50);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Ptile_75);
+snprintf(junk, sizeof(junk), format, Ptile_75);
 
    table.set_entry(row, c++, junk);
 
-sprintf(junk, format, Ptile_90);
+snprintf(junk, sizeof(junk), format, Ptile_90);
 
    table.set_entry(row, c++, junk);
 

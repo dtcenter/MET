@@ -118,7 +118,8 @@ class MtdIntFile : public MtdFileBase {
 
       MtdIntFile select(int) const;   //  1-based
 
-      MtdIntFile const_t_slice(int t) const;
+      MtdIntFile  const_t_slice (const int t) const;
+      MtdIntFile  const_t_mask  (const int t, const int obj_num) const;   //  obj_num is 1-based
 
       void fatten();   //  for 2D slices
 
