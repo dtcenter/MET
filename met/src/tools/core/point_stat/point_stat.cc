@@ -1335,7 +1335,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       // Apply continuous filtering thresholds
       //
-      subset_fo_na(pd_ptr->f_na, cnt_info[i].fthresh,
+      subset_pairs(pd_ptr->f_na, cnt_info[i].fthresh,
                    pd_ptr->o_na, cnt_info[i].othresh,
                    pd_ptr->cmn_na, conf_info.cnt_logic[i_vx],
                    f_na, o_na, c_na);
@@ -1358,26 +1358,20 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
       // Compute the stats, normal confidence intervals, and bootstrap
       // bootstrap confidence intervals
       //
+      int precip_flag = (conf_info.vx_pd[i_vx].fcst_info->is_precipitation() &&
+                         conf_info.vx_pd[i_vx].obs_info->is_precipitation());
+
       if(conf_info.boot_interval == boot_bca_flag) {
-         compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na,
-            conf_info.vx_pd[i_vx].fcst_info->is_precipitation() &
-            conf_info.vx_pd[i_vx].obs_info->is_precipitation(),
-            conf_info.n_boot_rep,
-            cnt_info[i],
-            conf_info.output_flag[i_cnt] != STATOutputType_None,
-            conf_info.rank_corr_flag,
-            conf_info.tmp_dir);
+         compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na, c_na,
+            precip_flag, conf_info.rank_corr_flag,
+            conf_info.n_boot_rep, 
+            cnt_info[i], conf_info.tmp_dir);
       }
       else {
-         compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na,
-            conf_info.vx_pd[i_vx].fcst_info->is_precipitation() &
-            conf_info.vx_pd[i_vx].obs_info->is_precipitation(),
-            conf_info.n_boot_rep,
-            conf_info.boot_rep_prop,
-            cnt_info[i],
-            conf_info.output_flag[i_cnt],
-            conf_info.rank_corr_flag,
-            conf_info.tmp_dir);
+         compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na, c_na,
+            precip_flag, conf_info.rank_corr_flag,
+            conf_info.n_boot_rep, conf_info.boot_rep_prop,
+            cnt_info[i], conf_info.tmp_dir);
       }
    } // end for i
 

@@ -24,6 +24,10 @@ using namespace std;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+extern bool set_cflag(const NumArray &, const NumArray &);
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class CIInfo
 //
@@ -645,11 +649,14 @@ void CNTInfo::clear() {
    pr_corr.clear();
    sp_corr.clear();
    kt_corr.clear();
+   anom_corr.clear();
    me.clear();
+   me2.clear();
    estdev.clear();
    mbias.clear();
    mae.clear();
    mse.clear();
+   msess.clear();
    bcmse.clear();
    rmse.clear();
    e10.clear();
@@ -687,11 +694,14 @@ void CNTInfo::assign(const CNTInfo &c) {
    pr_corr     = c.pr_corr;
    sp_corr     = c.sp_corr;
    kt_corr     = c.kt_corr;
+   anom_corr   = c.anom_corr;
    me          = c.me;
+   me2         = c.me2;
    estdev      = c.estdev;
    mbias       = c.mbias;
    mae         = c.mae;
    mse         = c.mse;
+   msess       = c.msess;
    bcmse       = c.bcmse;
    rmse        = c.rmse;
    e10         = c.e10;
@@ -731,11 +741,14 @@ void CNTInfo::allocate_n_alpha(int i) {
       pr_corr.allocate_n_alpha(n_alpha);
       sp_corr.allocate_n_alpha(n_alpha);
       kt_corr.allocate_n_alpha(n_alpha);
+      anom_corr.allocate_n_alpha(n_alpha);
       me.allocate_n_alpha(n_alpha);
+      me2.allocate_n_alpha(n_alpha);
       estdev.allocate_n_alpha(n_alpha);
       mbias.allocate_n_alpha(n_alpha);
       mae.allocate_n_alpha(n_alpha);
       mse.allocate_n_alpha(n_alpha);
+      msess.allocate_n_alpha(n_alpha);
       bcmse.allocate_n_alpha(n_alpha);
       rmse.allocate_n_alpha(n_alpha);
       e10.allocate_n_alpha(n_alpha);
@@ -771,14 +784,14 @@ void CNTInfo::compute_ci() {
       // Check for the degenerate case
       //
       if(n <= 1) {
-         fbar.v_ncl[i]    = fbar.v_ncu[i]    = bad_data_double;
-         fstdev.v_ncl[i]  = fstdev.v_ncu[i]  = bad_data_double;
-         obar.v_ncl[i]    = obar.v_ncu[i]    = bad_data_double;
-         ostdev.v_ncl[i]  = ostdev.v_ncu[i]  = bad_data_double;
-         pr_corr.v_ncl[i] = pr_corr.v_ncu[i] = bad_data_double;
-         me.v_ncl[i]      = me.v_ncu[i]      = bad_data_double;
-         estdev.v_ncl[i]  = estdev.v_ncu[i]  = bad_data_double;
-
+         fbar.v_ncl[i]      = fbar.v_ncu[i]      = bad_data_double;
+         fstdev.v_ncl[i]    = fstdev.v_ncu[i]    = bad_data_double;
+         obar.v_ncl[i]      = obar.v_ncu[i]      = bad_data_double;
+         ostdev.v_ncl[i]    = ostdev.v_ncu[i]    = bad_data_double;
+         pr_corr.v_ncl[i]   = pr_corr.v_ncu[i]   = bad_data_double;
+         anom_corr.v_ncl[i] = anom_corr.v_ncu[i] = bad_data_double;
+         me.v_ncl[i]        = me.v_ncu[i]        = bad_data_double;
+         estdev.v_ncl[i]    = estdev.v_ncu[i]    = bad_data_double;
          continue;
       }
 
@@ -844,10 +857,10 @@ void CNTInfo::compute_ci() {
       else      ostdev.v_ncu[i] = sqrt(v);
 
       //
-      // Compute confidence interval for the correlation coefficient
+      // Compute confidence interval for the pearson correlation coefficient
       //
       if(is_bad_data(pr_corr.v) || n <= 3 ||
-         is_eq(pr_corr.v, 1.0) || is_eq(pr_corr.v, -1.0)) {
+         is_eq(pr_corr.v, 1.0)  || is_eq(pr_corr.v, -1.0)) {
          pr_corr.v_ncl[i] = bad_data_double;
          pr_corr.v_ncu[i] = bad_data_double;
       }
@@ -857,6 +870,22 @@ void CNTInfo::compute_ci() {
          cu = v + cv_normal_u/sqrt((double) (n-3));
          pr_corr.v_ncl[i] = (pow(vx_math_e, 2*cl) - 1)/(pow(vx_math_e, 2*cl) + 1);
          pr_corr.v_ncu[i] = (pow(vx_math_e, 2*cu) - 1)/(pow(vx_math_e, 2*cu) + 1);
+      }
+
+      //
+      // Compute confidence interval for the anomaly correlation coefficient
+      //
+      if(is_bad_data(anom_corr.v) || n <= 3 ||
+         is_eq(anom_corr.v, 1.0)  || is_eq(anom_corr.v, -1.0)) {
+         anom_corr.v_ncl[i] = bad_data_double;
+         anom_corr.v_ncu[i] = bad_data_double;
+      }
+      else {
+         v = 0.5*log((1 + anom_corr.v)/(1 - anom_corr.v));
+         cl = v + cv_normal_l/sqrt((double) (n-3));
+         cu = v + cv_normal_u/sqrt((double) (n-3));
+         anom_corr.v_ncl[i] = (pow(vx_math_e, 2*cl) - 1)/(pow(vx_math_e, 2*cl) + 1);
+         anom_corr.v_ncu[i] = (pow(vx_math_e, 2*cu) - 1)/(pow(vx_math_e, 2*cu) + 1);
       }
 
       //
@@ -1050,7 +1079,7 @@ void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
    zero_out();
 
    // Apply filtering thresholds to subset the matched pairs
-   subset_fo_na(in_f_na, fthresh, in_o_na, othresh, in_c_na,
+   subset_pairs(in_f_na, fthresh, in_o_na, othresh, in_c_na,
                 logic, f_na, o_na, c_na);
    
    mlog << Debug(3)
@@ -1075,7 +1104,7 @@ void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
    }
 
    // Flag to process climo
-   cflag = (c_na.n_elements() == f_na.n_elements());
+   cflag = set_cflag(f_na, c_na);
 
    // Initialize the counts and sums
    f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
@@ -1148,7 +1177,7 @@ void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
-   double fbar, obar, ffbar, fobar, oobar, v, den;
+   double fbar, obar, ffbar, fobar, oobar, v, den, corr;
    int n;
 
    // Set the quantities that can't be derived from SL1L2Info to bad data
@@ -1191,24 +1220,45 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    v = (ffbar*n*n - fbar*fbar*n*n) * (oobar*n*n - obar*obar*n*n);
 
    if(v < 0 || is_eq(v, 0.0)) {
-      cnt_info.pr_corr.v = bad_data_double;
+      corr = bad_data_double;
    }
    else {
       den = sqrt(v);
-      cnt_info.pr_corr.v = ((fobar*n*n) - (fbar*obar*n*n)) / den;
+      corr = ((fobar*n*n) - (fbar*obar*n*n)) / den;
+      if(corr > 1) corr = bad_data_double;
    }
 
-   // Check that the correlation is not bigger than 1
-   if(cnt_info.pr_corr.v > 1) cnt_info.pr_corr.v = bad_data_double;
+   // Handle SAL1L2 data
+   if(aflag) {
+      cnt_info.pr_corr.v   = bad_data_double;
+      cnt_info.anom_corr.v = corr;
+   }
+   // Handle SL1L2 data
+   else {
+      cnt_info.pr_corr.v   = corr;
+      cnt_info.anom_corr.v = bad_data_double;
+   }
 
    // Compute mean error
    cnt_info.me.v = fbar - obar;
+
+   // Compute mean error squared
+   cnt_info.me2.v = cnt_info.me.v * cnt_info.me.v;
 
    // Compute mean absolute error
    cnt_info.mae.v = s.mae;
 
    // Compute mean squared error
    cnt_info.mse.v = ffbar + oobar - 2.0*fobar;
+
+   // Compute mean squared error skill score
+   den = cnt_info.ostdev.v * cnt_info.ostdev.v;
+   if(!is_eq(den, 0.0)) {
+      cnt_info.msess.v = 1.0 - cnt_info.mse.v / den;
+   }
+   else {
+      cnt_info.msess.v = bad_data_double;
+   }
 
    // Compute standard deviation of the mean error
    cnt_info.estdev.v = compute_stdev(cnt_info.me.v*n,
@@ -2538,18 +2588,21 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
 ////////////////////////////////////////////////////////////////////////
 //
 // Assume that the input f_na and o_na contain only valid data.
+// Assume that c_na is either empty or contains only valid data.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
-                     const NumArray &i_na,
-                     int precip_flag, int cnt_flag,
-                     int rank_flag, int normal_ci_flag,
+                     const NumArray &c_na, const NumArray &i_na,
+                     int precip_flag, int rank_flag, int normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
-   double f, o, v, f_sum, o_sum, ff_sum, oo_sum, fo_sum;
+   double f, o, c, v;
+   double f_sum, o_sum, ff_sum, oo_sum, fo_sum;
+   double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
    double err, err_sum, abs_err_sum, err_sq_sum, den;
    NumArray err_na, dev_na;
+   bool cflag;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2563,16 +2616,18 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    }
 
    //
-   // Loop over the length of the index array
+   // Flag to process climo
    //
-   n = i_na.n_elements();
+   cflag = set_cflag(f_na, c_na);
 
    //
    // Compute the continuous statistics from the fcst and obs arrays
    //
-   f_sum = o_sum = ff_sum = oo_sum = fo_sum = 0.0;
+   n       = 0;
+   f_sum   = o_sum       = ff_sum     = oo_sum  = fo_sum  = 0.0;
+   fa_sum  = oa_sum      = ffa_sum    = ooa_sum = foa_sum = 0.0;
    err_sum = abs_err_sum = err_sq_sum = 0.0;
-   for(i=0; i<n; i++) {
+   for(i=0; i<i_na.n_elements(); i++) {
 
       //
       // Get the index to be used from the index num array
@@ -2581,6 +2636,13 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
 
       f = f_na[j];
       o = o_na[j];
+      c = (cflag ? c_na[j] : bad_data_double);
+
+      //
+      // Should be no bad data, but checking to be sure
+      //
+      if((is_bad_data(f) || is_bad_data(o)) ||
+         (cflag          && is_bad_data(c))) continue;
 
       //
       // Compute the error
@@ -2596,12 +2658,21 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       err_sum     += err;
       abs_err_sum += fabs(err);
       err_sq_sum  += err*err;
+      n++;
+
+      if(cflag) {
+         fa_sum  += f-c;
+         oa_sum  += o-c;
+         foa_sum += (f-c)*(o-c);
+         ffa_sum += (f-c)*(f-c);
+         ooa_sum += (o-c)*(o-c);
+      }
    } // end for i
 
    //
    // Store the sample size
    //
-   cnt_info.n = n;
+   if((cnt_info.n = n) == 0) return;
 
    //
    // Compute forecast mean and standard deviation
@@ -2614,11 +2685,6 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    cnt_info.obar.v   = o_sum/n;
    cnt_info.ostdev.v = compute_stdev(o_sum, oo_sum, n);
-
-   //
-   // If the cnt_flag is not set return after computing the partial sums
-   //
-   if(!cnt_flag) return;
 
    //
    // Compute multiplicative bias
@@ -2638,6 +2704,23 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    else {
       den = sqrt(v);
       cnt_info.pr_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
+   }
+   
+   //
+   // Compute Anomaly Correlation
+   //
+   if(cflag) {
+      v = (n*ffa_sum - fa_sum*fa_sum)*(n*ooa_sum - oa_sum*oa_sum);
+      if(v < 0 || is_eq(v, 0.0)) {
+         cnt_info.anom_corr.v = bad_data_double;
+      }
+      else {
+         den = sqrt(v);
+         cnt_info.anom_corr.v = ((n*foa_sum) - (fa_sum*oa_sum))/den;
+      }
+   }
+   else {
+      cnt_info.anom_corr.v = bad_data_double;
    }
 
    //
@@ -2665,6 +2748,11 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    cnt_info.estdev.v = compute_stdev(err_sum, err_sq_sum, n);
 
    //
+   // Compute mean error squared
+   //
+   cnt_info.me2.v = cnt_info.me.v * cnt_info.me.v;
+   
+   //
    // Compute mean absolute error
    //
    cnt_info.mae.v = abs_err_sum/n;
@@ -2673,6 +2761,13 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    // Compute mean squared error
    //
    cnt_info.mse.v = err_sq_sum/n;
+
+   //
+   // Compute mean squared error skill score
+   //
+   den = cnt_info.ostdev.v * cnt_info.ostdev.v;
+   cnt_info.msess.v = (is_eq(den, 0.0) ? bad_data_double :
+                       1.0 - (cnt_info.mse.v / den));
 
    //
    // Compute bias corrected mean squared error (decomposition of MSE)
@@ -2746,10 +2841,8 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       n_o_rank  = o_na_rank.rank_array(n_o_rank_ties);
 
       if(n_f_rank != n_o_rank) {
-
          mlog << Error << "\ncompute_cntinfo() -> "
-              << "n_f_rank does not equal n_o_rank!\n\n"
-             ;
+              << "n_f_rank does not equal n_o_rank!\n\n";
          throw(1);
       }
       else {
@@ -2833,8 +2926,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    } // end if rank_flag
 
    //
-   // Compute normal confidence intervals if the normal_ci_flag
-   // is set
+   // Compute normal confidence intervals if the normal_ci_flag is set
    //
    if(normal_ci_flag) cnt_info.compute_ci();
 
@@ -2843,17 +2935,17 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Compute the CNTInfo object from the pairs of data but remove the
-// i-th data point.
+// Compute the CNTInfo object from the pairs but remove the i-th pair.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
-                       int precip_flag, int skip,
-                       int rank_flag, int normal_ci_flag,
+                       const NumArray &c_na, int skip,
+                       int precip_flag, int rank_flag, int normal_ci_flag,
                        CNTInfo &cnt_info) {
    int i, n, count;
-   NumArray f_na_i, o_na_i, i_na_i;
+   NumArray f_na_i, o_na_i, c_na_i, i_na_i;
+   bool cflag;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2876,6 +2968,11 @@ void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
    }
 
    //
+   // Flag to process climo
+   //
+   cflag = set_cflag(f_na, c_na);
+
+   //
    // Copy over the forecast, observation, and index values except
    // for the one to be skipped
    //
@@ -2883,12 +2980,14 @@ void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
       if(i == skip) continue;
       f_na_i.add(f_na[i]);
       o_na_i.add(o_na[i]);
+      if(cflag) c_na_i.add(c_na[i]);
       i_na_i.add(count);
       count++;
    }
 
-   compute_cntinfo(f_na_i, o_na_i, i_na_i, precip_flag,
-                   1, rank_flag, normal_ci_flag, cnt_info);
+   compute_cntinfo(f_na_i, o_na_i, c_na_i, i_na_i,
+                   precip_flag, rank_flag, normal_ci_flag,
+                   cnt_info);
 
    return;
 }
@@ -3441,7 +3540,7 @@ void compute_i_mean_stdev(const NumArray &v_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void subset_fo_na(const NumArray &f_na, const SingleThresh &ft,
+void subset_pairs(const NumArray &f_na, const SingleThresh &ft,
                   const NumArray &o_na, const SingleThresh &ot,
                   const NumArray &c_na, const SetLogic type,
                   NumArray &ff_na, NumArray &oo_na, NumArray &cc_na) {
@@ -3449,7 +3548,7 @@ void subset_fo_na(const NumArray &f_na, const SingleThresh &ft,
    bool fcheck, ocheck, cflag;
    
    if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\nsubset_fo_na() -> "
+      mlog << Error << "\nsubset_pairs() -> "
            << "the number of forecast values (" << f_na.n_elements()
            << ") must equal the number of observed values ("
            << o_na.n_elements() << ")\n\n";
@@ -3457,7 +3556,7 @@ void subset_fo_na(const NumArray &f_na, const SingleThresh &ft,
    }
 
    // Flag to process climo
-   cflag = (c_na.n_elements() == f_na.n_elements());
+   cflag = set_cflag(f_na, c_na);
 
    // Initialize
    ff_na.clear();
@@ -3467,6 +3566,10 @@ void subset_fo_na(const NumArray &f_na, const SingleThresh &ft,
    // Loop through the matched pairs
    for(i=0; i<f_na.n_elements(); i++) {
 
+      // Skip bad data
+      if((is_bad_data(f_na[i]) || is_bad_data(o_na[i])) ||
+         (cflag                && is_bad_data(c_na[i]))) continue;
+      
       // Add points which meet the thresholding logic
       if(check_fo_thresh(f_na[i], ft, o_na[i], ot, type)) {
          ff_na.add(f_na[i]);
@@ -3515,6 +3618,20 @@ bool check_fo_thresh(const double f, const SingleThresh &ft,
    }
 
    return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool set_cflag(const NumArray &f_na, const NumArray &c_na) {
+
+   // The climo values must be non-zero and match the forecast values
+   if(c_na.n_elements() != f_na.n_elements() ||
+      c_na.n_elements() < 1) return(false);
+   
+   // The first climo value must be valid
+   if(is_bad_data(c_na[0]))  return(false);
+      
+   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////

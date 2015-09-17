@@ -764,7 +764,7 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
       }
 
       // Apply continuous filtering thresholds
-      subset_fo_na(f_na, cnt_info.fthresh,
+      subset_pairs(f_na, cnt_info.fthresh,
                    o_na, cnt_info.othresh,
                    c_na, conf_info.cnt_logic,
                    ff_na, oo_na, cc_na);
@@ -774,21 +774,20 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
 
       // Compute the stats, normal confidence intervals, and
       // bootstrap confidence intervals
+      int precip_flag = (conf_info.fcst_info[0]->is_precipitation() &&
+                         conf_info.obs_info[0]->is_precipitation());
+
       if(conf_info.boot_interval == BootIntervalType_BCA) {
-         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na,
-            conf_info.fcst_info[0]->is_precipitation() &
-            conf_info.obs_info[0]->is_precipitation(),
+         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na, cc_na,
+            precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep,
-            cnt_info, true, conf_info.rank_corr_flag,
-            conf_info.tmp_dir);
+            cnt_info, conf_info.tmp_dir);
       }
       else {
-         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na,
-            conf_info.fcst_info[0]->is_precipitation() &
-            conf_info.obs_info[0]->is_precipitation(),
+         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na, cc_na,
+            precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
-            cnt_info, true, conf_info.rank_corr_flag,
-            conf_info.tmp_dir);
+            cnt_info, conf_info.tmp_dir);
       }
 
       // Add statistic value for each possible CNT column
@@ -1301,83 +1300,94 @@ void store_stat_cnt(int n, const ConcatString &col,
    for(i=0; i<n_ci; i++) {
 
       // Get the column value
-           if(c == "TOTAL")       { v = (double) cnt_info.n;       }
-      else if(c == "FBAR")        { v = cnt_info.fbar.v;           }
-      else if(c == "FBAR_NCL")    { v = cnt_info.fbar.v_ncl[i];    }
-      else if(c == "FBAR_NCU")    { v = cnt_info.fbar.v_ncu[i];    }
-      else if(c == "FBAR_BCL")    { v = cnt_info.fbar.v_bcl[i];    }
-      else if(c == "FBAR_BCU")    { v = cnt_info.fbar.v_bcu[i];    }
-      else if(c == "FSTDEV")      { v = cnt_info.fstdev.v;         }
-      else if(c == "FSTDEV_NCL")  { v = cnt_info.fstdev.v_ncl[i];  }
-      else if(c == "FSTDEV_NCU")  { v = cnt_info.fstdev.v_ncu[i];  }
-      else if(c == "FSTDEV_BCL")  { v = cnt_info.fstdev.v_bcl[i];  }
-      else if(c == "FSTDEV_BCU")  { v = cnt_info.fstdev.v_bcu[i];  }
-      else if(c == "OBAR")        { v = cnt_info.obar.v;           }
-      else if(c == "OBAR_NCL")    { v = cnt_info.obar.v_ncl[i];    }
-      else if(c == "OBAR_NCU")    { v = cnt_info.obar.v_ncu[i];    }
-      else if(c == "OBAR_BCL")    { v = cnt_info.obar.v_bcl[i];    }
-      else if(c == "OBAR_BCU")    { v = cnt_info.obar.v_bcu[i];    }
-      else if(c == "OSTDEV")      { v = cnt_info.ostdev.v;         }
-      else if(c == "OSTDEV_NCL")  { v = cnt_info.ostdev.v_ncl[i];  }
-      else if(c == "OSTDEV_NCU")  { v = cnt_info.ostdev.v_ncu[i];  }
-      else if(c == "OSTDEV_BCL")  { v = cnt_info.ostdev.v_bcl[i];  }
-      else if(c == "OSTDEV_BCU")  { v = cnt_info.ostdev.v_bcu[i];  }
-      else if(c == "PR_CORR")     { v = cnt_info.pr_corr.v;        }
-      else if(c == "PR_CORR_NCL") { v = cnt_info.pr_corr.v_ncl[i]; }
-      else if(c == "PR_CORR_NCU") { v = cnt_info.pr_corr.v_ncu[i]; }
-      else if(c == "PR_CORR_BCL") { v = cnt_info.pr_corr.v_bcl[i]; }
-      else if(c == "PR_CORR_BCU") { v = cnt_info.pr_corr.v_bcu[i]; }
-      else if(c == "SP_CORR")     { v = cnt_info.sp_corr.v;        }
-      else if(c == "KT_CORR")     { v = cnt_info.kt_corr.v;        }
-      else if(c == "RANKS")       { v = cnt_info.n_ranks;          }
-      else if(c == "FRANK_TIES")  { v = cnt_info.frank_ties;       }
-      else if(c == "ORANK_TIES")  { v = cnt_info.orank_ties;       }
-      else if(c == "ME")          { v = cnt_info.me.v;             }
-      else if(c == "ME_NCL")      { v = cnt_info.me.v_ncl[i];      }
-      else if(c == "ME_NCU")      { v = cnt_info.me.v_ncu[i];      }
-      else if(c == "ME_BCL")      { v = cnt_info.me.v_bcl[i];      }
-      else if(c == "ME_BCU")      { v = cnt_info.me.v_bcu[i];      }
-      else if(c == "ESTDEV")      { v = cnt_info.estdev.v;         }
-      else if(c == "ESTDEV_NCL")  { v = cnt_info.estdev.v_ncl[i];  }
-      else if(c == "ESTDEV_NCU")  { v = cnt_info.estdev.v_ncu[i];  }
-      else if(c == "ESTDEV_BCL")  { v = cnt_info.estdev.v_bcl[i];  }
-      else if(c == "ESTDEV_BCU")  { v = cnt_info.estdev.v_bcu[i];  }
-      else if(c == "MBIAS")       { v = cnt_info.mbias.v;          }
-      else if(c == "MBIAS_BCL")   { v = cnt_info.mbias.v_bcl[i];   }
-      else if(c == "MBIAS_BCU")   { v = cnt_info.mbias.v_bcu[i];   }
-      else if(c == "MAE")         { v = cnt_info.mae.v;            }
-      else if(c == "MAE_BCL")     { v = cnt_info.mae.v_bcl[i];     }
-      else if(c == "MAE_BCU")     { v = cnt_info.mae.v_bcu[i];     }
-      else if(c == "MSE")         { v = cnt_info.mse.v;            }
-      else if(c == "MSE_BCL")     { v = cnt_info.mse.v_bcl[i];     }
-      else if(c == "MSE_BCU")     { v = cnt_info.mse.v_bcu[i];     }
-      else if(c == "BCMSE")       { v = cnt_info.bcmse.v;          }
-      else if(c == "BCMSE_BCL")   { v = cnt_info.bcmse.v_bcl[i];   }
-      else if(c == "BCMSE_BCU")   { v = cnt_info.bcmse.v_bcu[i];   }
-      else if(c == "RMSE")        { v = cnt_info.rmse.v;           }
-      else if(c == "RMSE_BCL")    { v = cnt_info.rmse.v_bcl[i];    }
-      else if(c == "RMSE_BCU")    { v = cnt_info.rmse.v_bcu[i];    }
-      else if(c == "E10")         { v = cnt_info.e10.v;            }
-      else if(c == "E10_BCL")     { v = cnt_info.e10.v_bcl[i];     }
-      else if(c == "E10_BCU")     { v = cnt_info.e10.v_bcu[i];     }
-      else if(c == "E25")         { v = cnt_info.e25.v;            }
-      else if(c == "E25_BCL")     { v = cnt_info.e25.v_bcl[i];     }
-      else if(c == "E25_BCU")     { v = cnt_info.e25.v_bcu[i];     }
-      else if(c == "E50")         { v = cnt_info.e50.v;            }
-      else if(c == "E50_BCL")     { v = cnt_info.e50.v_bcl[i];     }
-      else if(c == "E50_BCU")     { v = cnt_info.e50.v_bcu[i];     }
-      else if(c == "E75")         { v = cnt_info.e75.v;            }
-      else if(c == "E75_BCL")     { v = cnt_info.e75.v_bcl[i];     }
-      else if(c == "E75_BCU")     { v = cnt_info.e75.v_bcu[i];     }
-      else if(c == "E90")         { v = cnt_info.e90.v;            }
-      else if(c == "E90_BCL")     { v = cnt_info.e90.v_bcl[i];     }
-      else if(c == "E90_BCU")     { v = cnt_info.e90.v_bcu[i];     }
-      else if(c == "EIQR")        { v = cnt_info.eiqr.v;           }
-      else if(c == "EIQR_BCL")    { v = cnt_info.eiqr.v_bcl[i];    }
-      else if(c == "EIQR_BCU")    { v = cnt_info.eiqr.v_bcu[i];    }
-      else if(c == "MAD")         { v = cnt_info.mad.v;            }
-      else if(c == "MAD_BCL")     { v = cnt_info.mad.v_bcl[i];     }
-      else if(c == "MAD_BCU")     { v = cnt_info.mad.v_bcu[i];     }
+           if(c == "TOTAL")         { v = (double) cnt_info.n;         }
+      else if(c == "FBAR")          { v = cnt_info.fbar.v;             }
+      else if(c == "FBAR_NCL")      { v = cnt_info.fbar.v_ncl[i];      }
+      else if(c == "FBAR_NCU")      { v = cnt_info.fbar.v_ncu[i];      }
+      else if(c == "FBAR_BCL")      { v = cnt_info.fbar.v_bcl[i];      }
+      else if(c == "FBAR_BCU")      { v = cnt_info.fbar.v_bcu[i];      }
+      else if(c == "FSTDEV")        { v = cnt_info.fstdev.v;           }
+      else if(c == "FSTDEV_NCL")    { v = cnt_info.fstdev.v_ncl[i];    }
+      else if(c == "FSTDEV_NCU")    { v = cnt_info.fstdev.v_ncu[i];    }
+      else if(c == "FSTDEV_BCL")    { v = cnt_info.fstdev.v_bcl[i];    }
+      else if(c == "FSTDEV_BCU")    { v = cnt_info.fstdev.v_bcu[i];    }
+      else if(c == "OBAR")          { v = cnt_info.obar.v;             }
+      else if(c == "OBAR_NCL")      { v = cnt_info.obar.v_ncl[i];      }
+      else if(c == "OBAR_NCU")      { v = cnt_info.obar.v_ncu[i];      }
+      else if(c == "OBAR_BCL")      { v = cnt_info.obar.v_bcl[i];      }
+      else if(c == "OBAR_BCU")      { v = cnt_info.obar.v_bcu[i];      }
+      else if(c == "OSTDEV")        { v = cnt_info.ostdev.v;           }
+      else if(c == "OSTDEV_NCL")    { v = cnt_info.ostdev.v_ncl[i];    }
+      else if(c == "OSTDEV_NCU")    { v = cnt_info.ostdev.v_ncu[i];    }
+      else if(c == "OSTDEV_BCL")    { v = cnt_info.ostdev.v_bcl[i];    }
+      else if(c == "OSTDEV_BCU")    { v = cnt_info.ostdev.v_bcu[i];    }
+      else if(c == "PR_CORR")       { v = cnt_info.pr_corr.v;          }
+      else if(c == "PR_CORR_NCL")   { v = cnt_info.pr_corr.v_ncl[i];   }
+      else if(c == "PR_CORR_NCU")   { v = cnt_info.pr_corr.v_ncu[i];   }
+      else if(c == "PR_CORR_BCL")   { v = cnt_info.pr_corr.v_bcl[i];   }
+      else if(c == "PR_CORR_BCU")   { v = cnt_info.pr_corr.v_bcu[i];   }
+      else if(c == "ANOM_CORR")     { v = cnt_info.anom_corr.v;        }
+      else if(c == "ANOM_CORR_NCL") { v = cnt_info.anom_corr.v_ncl[i]; }
+      else if(c == "ANOM_CORR_NCU") { v = cnt_info.anom_corr.v_ncu[i]; }
+      else if(c == "ANOM_CORR_BCL") { v = cnt_info.anom_corr.v_bcl[i]; }
+      else if(c == "ANOM_CORR_BCU") { v = cnt_info.anom_corr.v_bcu[i]; }
+      else if(c == "SP_CORR")       { v = cnt_info.sp_corr.v;          }
+      else if(c == "KT_CORR")       { v = cnt_info.kt_corr.v;          }
+      else if(c == "RANKS")         { v = cnt_info.n_ranks;            }
+      else if(c == "FRANK_TIES")    { v = cnt_info.frank_ties;         }
+      else if(c == "ORANK_TIES")    { v = cnt_info.orank_ties;         }
+      else if(c == "ME")            { v = cnt_info.me.v;               }
+      else if(c == "ME_NCL")        { v = cnt_info.me.v_ncl[i];        }
+      else if(c == "ME_NCU")        { v = cnt_info.me.v_ncu[i];        }
+      else if(c == "ME_BCL")        { v = cnt_info.me.v_bcl[i];        }
+      else if(c == "ME_BCU")        { v = cnt_info.me.v_bcu[i];        }
+      else if(c == "ME2")           { v = cnt_info.me2.v;              }
+      else if(c == "ME2_BCL")       { v = cnt_info.me2.v_bcl[i];       }
+      else if(c == "ME2_BCU")       { v = cnt_info.me2.v_bcu[i];       }
+      else if(c == "ESTDEV")        { v = cnt_info.estdev.v;           }
+      else if(c == "ESTDEV_NCL")    { v = cnt_info.estdev.v_ncl[i];    }
+      else if(c == "ESTDEV_NCU")    { v = cnt_info.estdev.v_ncu[i];    }
+      else if(c == "ESTDEV_BCL")    { v = cnt_info.estdev.v_bcl[i];    }
+      else if(c == "ESTDEV_BCU")    { v = cnt_info.estdev.v_bcu[i];    }
+      else if(c == "MBIAS")         { v = cnt_info.mbias.v;            }
+      else if(c == "MBIAS_BCL")     { v = cnt_info.mbias.v_bcl[i];     }
+      else if(c == "MBIAS_BCU")     { v = cnt_info.mbias.v_bcu[i];     }
+      else if(c == "MAE")           { v = cnt_info.mae.v;              }
+      else if(c == "MAE_BCL")       { v = cnt_info.mae.v_bcl[i];       }
+      else if(c == "MAE_BCU")       { v = cnt_info.mae.v_bcu[i];       }
+      else if(c == "MSE")           { v = cnt_info.mse.v;              }
+      else if(c == "MSE_BCL")       { v = cnt_info.mse.v_bcl[i];       }
+      else if(c == "MSE_BCU")       { v = cnt_info.mse.v_bcu[i];       }
+      else if(c == "MSESS")         { v = cnt_info.msess.v;            }
+      else if(c == "MSESS_BCL")     { v = cnt_info.msess.v_bcl[i];     }
+      else if(c == "MSESS_BCU")     { v = cnt_info.msess.v_bcu[i];     }
+      else if(c == "BCMSE")         { v = cnt_info.bcmse.v;            }
+      else if(c == "BCMSE_BCL")     { v = cnt_info.bcmse.v_bcl[i];     }
+      else if(c == "BCMSE_BCU")     { v = cnt_info.bcmse.v_bcu[i];     }
+      else if(c == "RMSE")          { v = cnt_info.rmse.v;             }
+      else if(c == "RMSE_BCL")      { v = cnt_info.rmse.v_bcl[i];      }
+      else if(c == "RMSE_BCU")      { v = cnt_info.rmse.v_bcu[i];      }
+      else if(c == "E10")           { v = cnt_info.e10.v;              }
+      else if(c == "E10_BCL")       { v = cnt_info.e10.v_bcl[i];       }
+      else if(c == "E10_BCU")       { v = cnt_info.e10.v_bcu[i];       }
+      else if(c == "E25")           { v = cnt_info.e25.v;              }
+      else if(c == "E25_BCL")       { v = cnt_info.e25.v_bcl[i];       }
+      else if(c == "E25_BCU")       { v = cnt_info.e25.v_bcu[i];       }
+      else if(c == "E50")           { v = cnt_info.e50.v;              }
+      else if(c == "E50_BCL")       { v = cnt_info.e50.v_bcl[i];       }
+      else if(c == "E50_BCU")       { v = cnt_info.e50.v_bcu[i];       }
+      else if(c == "E75")           { v = cnt_info.e75.v;              }
+      else if(c == "E75_BCL")       { v = cnt_info.e75.v_bcl[i];       }
+      else if(c == "E75_BCU")       { v = cnt_info.e75.v_bcu[i];       }
+      else if(c == "E90")           { v = cnt_info.e90.v;              }
+      else if(c == "E90_BCL")       { v = cnt_info.e90.v_bcl[i];       }
+      else if(c == "E90_BCU")       { v = cnt_info.e90.v_bcu[i];       }
+      else if(c == "EIQR")          { v = cnt_info.eiqr.v;             }
+      else if(c == "EIQR_BCL")      { v = cnt_info.eiqr.v_bcl[i];      }
+      else if(c == "EIQR_BCU")      { v = cnt_info.eiqr.v_bcu[i];      }
+      else if(c == "MAD")           { v = cnt_info.mad.v;              }
+      else if(c == "MAD_BCL")       { v = cnt_info.mad.v_bcl[i];       }
+      else if(c == "MAD_BCU")       { v = cnt_info.mad.v_bcu[i];       }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c
