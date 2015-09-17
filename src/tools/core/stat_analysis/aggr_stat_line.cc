@@ -2952,7 +2952,7 @@ void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // Compute the probabilistic counts and statistics
    //
-   compute_pctinfo(info.f_na, info.o_na, pstd_flag, pct_info);
+   compute_pctinfo(info.f_na, info.o_na, info.c_na, pstd_flag, pct_info);
 
    return;
 }

@@ -1482,9 +1482,8 @@ void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       // Compute the probabilistic counts and statistics
       //
-      compute_pctinfo(pd_ptr->f_na, pd_ptr->o_na,
-            conf_info.output_flag[i_pstd],
-            pct_info[i]);
+      compute_pctinfo(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na,
+            conf_info.output_flag[i_pstd], pct_info[i]);
    } // end for i
 
    return;

@@ -18,7 +18,7 @@ using namespace std;
 
 #include "stat_columns.h"
 
-#include "vx_util.h"
+#include "vx_util.h" 
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -2423,7 +2423,7 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //    BASER_NCL,   BASER_NCU,   RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
-   //    [THRESH] (for each threshold)
+   //    BSS,         [THRESH] (for each threshold)
    //
    at.set_entry(r, c+0,  // Total count
       pct_info.pct.n());
@@ -2461,10 +2461,13 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    at.set_entry(r, c+11, // BRIER_NCU
       pct_info.brier.v_ncu[alpha_i]);
 
+   at.set_entry(r, c+12,  // BSS
+      pct_info.bss);
+
    //
    // Write THRESH_i for each probability threshold
    //
-   for(i=0, col=c+12; i<=pct_info.pct.nrows(); i++) {
+   for(i=0, col=c+13; i<=pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
