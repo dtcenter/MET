@@ -297,6 +297,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    if(n_vx > 0) {
 
+      // Check climatology fields
+      check_climo_n_vx(&conf, n_vx);
+
       // Check to make sure the observation file type is defined
       if(otype == FileType_None) {
          mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
