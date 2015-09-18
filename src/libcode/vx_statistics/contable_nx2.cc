@@ -468,7 +468,7 @@ return ( x );
 
 double Nx2ContingencyTable::baser() const {
 
-   return((double) event_col_total()/n());
+   return ( (double) event_col_total()/n() );
 }
 
 
@@ -483,7 +483,7 @@ double Nx2ContingencyTable::baser_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return ( v );
 }
 
 
@@ -599,13 +599,7 @@ double Nx2ContingencyTable::brier_score() const
 
 const int N = n();
 
-if ( N == 0 )  {
-
-   mlog << Error << "\nNx2ContingencyTable::brier_score() const -> table empty!\n\n";
-
-   exit ( 1 );
-
-}
+if ( N == 0 )  return ( bad_data_double );
 
 int j, count;
 double t, yi, sum;
@@ -864,7 +858,7 @@ for(j=0, area=0.0; j<Nrows; ++j)  {
 
 }
 
-return(area);
+return ( area );
 
 }
 
@@ -893,7 +887,7 @@ const double N = (double) n();
 const double Ninv = 1.0/N;
 
 
-bs = brier_score();
+if(is_bad_data(bs = brier_score()))  return ( bad_data_double );
 
 degf = N - 1.0;
 
