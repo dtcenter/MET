@@ -497,6 +497,12 @@ s << '_' << junk;
 table.set_entry(row, c++, s.text());
 
    //
+   //  cluster number
+   //
+
+c++;
+
+   //
    //  centroid x, y, t
    //
 
@@ -959,6 +965,12 @@ const char * format = 0;
 sprintf(junk, "F_%d_O_%d", FcstObjectNumber, ObsObjectNumber);
 
 table.set_entry(row, c++, junk);
+
+   //
+   //  cluster number
+   //
+
+++c;
 
    //  space centroid distance
 

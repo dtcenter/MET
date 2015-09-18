@@ -15,11 +15,13 @@ static const char * att_3d_single_cols [] = {
 
    "OBJ_ID", 
 
+   "CLUSTER_ID", 
+
    "CENTROID_X", 
    "CENTROID_Y", 
    "CENTROID_T", 
    "CENTROID_LAT", 
-   "CENTROID_LON ", 
+   "CENTROID_LON", 
 
    "X_DOT", 
    "Y_DOT", 
