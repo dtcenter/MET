@@ -15,6 +15,8 @@ static const char * att_2d_cols [] = {
 
    "OBJ_ID",       
 
+   "CLUSTER_ID",       
+
    "TIME_INDEX",       
 
    "AREA",       

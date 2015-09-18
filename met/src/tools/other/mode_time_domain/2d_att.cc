@@ -382,6 +382,12 @@ s << '_' << ObjectNumber;
 
 table.set_entry(row, c++, s.text());
 
+   // 
+   //   cluster number
+   // 
+
+c++;
+
    //
    //  time index
    //
