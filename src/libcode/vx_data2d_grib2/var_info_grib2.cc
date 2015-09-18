@@ -338,6 +338,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_parm       ( tab.index_c );
    set_p_flag     ( true        );
    set_p_units    ( tab.units   );
+   set_units      ( tab.units   );
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
