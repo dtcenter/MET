@@ -1081,6 +1081,36 @@ void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void check_climo_n_vx(Dictionary *dict, const int n_vx) {
+   int n;
+   
+   // Check for a valid number of climatology mean fields
+   n = parse_conf_n_vx(dict->lookup_array(conf_key_climo_mean_field, false));
+   if(n != 0 && n != n_vx) {
+      mlog << Error << "\ncheck_climo_n_vx() -> "
+           << "The number of climatology mean fields in \""
+           << conf_key_climo_mean_field
+           << "\" must be zero or match the number (" << n_vx
+           << ") in \"" << conf_key_fcst_field << "\".\n\n";
+      exit(1);
+   }
+
+   // Check for a valid number of climatology standard deviation fields
+   n = parse_conf_n_vx(dict->lookup_array(conf_key_climo_stdev_field, false));
+   if(n != 0 && n != n_vx) {
+      mlog << Error << "\ncheck_climo_n_vx() -> "
+           << "The number of climatology standard deviation fields in \""
+           << conf_key_climo_stdev_field
+           << "\" must be zero or match the number ("
+           << n_vx << ") in \"" << conf_key_fcst_field << "\".\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 InterpMthd int_to_interpmthd(int i) {
    InterpMthd m;
    

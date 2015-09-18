@@ -52,6 +52,8 @@ extern PlotInfo        parse_conf_plot_info(Dictionary *dict);
 extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end);
 extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
 
+extern void         check_climo_n_vx(Dictionary *dict, const int);
+
 extern InterpMthd   int_to_interpmthd(int);
 extern void         check_prob_thresh(const ThreshArray &);
 extern void         check_mctc_thresh(const ThreshArray &);
