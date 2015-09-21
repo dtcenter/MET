@@ -487,7 +487,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 void process_fcst_climo_files() {
    int i, j;
    int n_fcst;
-   DataPlaneArray fcst_dpa, cmn_dpa, csd_dpa;
+   DataPlaneArray fcst_dpa, cmn_dpa;
    unixtime file_ut, beg_ut, end_ut;
    
    // Loop through each of the fields to be verified and extract
@@ -544,14 +544,9 @@ void process_fcst_climo_files() {
                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                    i, fcst_dpa[0].valid(), grid);
 
-      csd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_dictionary(conf_key_climo_stdev_field, false),
-                   i, fcst_dpa[0].valid(), grid);
-
       // Store data for the current verification task
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
       conf_info.vx_pd[i].set_climo_mn_dpa(cmn_dpa);
-      conf_info.vx_pd[i].set_climo_sd_dpa(csd_dpa);
 
       // Get the valid time for the first field
       file_ut = fcst_dpa[0].valid();

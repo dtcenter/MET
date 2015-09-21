@@ -20,6 +20,7 @@
 //                    from the config file to the output file.
 //   003    02/25/15  Halley Gotway   Add automated regridding.
 //   004    08/04/15  Halley Gotway   Add conditional continuous verification.
+//   005    09/21/15  Halley Gotway   Add climatology and SAL1L2 output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -63,9 +64,12 @@ static void process_scores();
 
 static void do_cts   (int, const NumArray &, const NumArray &);
 static void do_mcts  (int, const NumArray &, const NumArray &);
-static void do_cnt   (int, const NumArray &, const NumArray &);
-static void do_sl1l2 (int, const NumArray &, const NumArray &);
-static void do_pct   (int, const NumArray &, const NumArray &);
+static void do_cnt   (int, const NumArray &, const NumArray &,
+                      const NumArray &);
+static void do_sl1l2 (int, const NumArray &, const NumArray &,
+                      const NumArray &);
+static void do_pct   (int, const NumArray &, const NumArray &,
+                      const NumArray &);
 
 static void store_stat_fho  (int, const ConcatString &, const CTSInfo &);
 static void store_stat_ctc  (int, const ConcatString &, const CTSInfo &);
@@ -464,7 +468,9 @@ void process_scores() {
    VarInfo *obs_info  = (VarInfo *) 0;
    NumArray *f_na = (NumArray *) 0;
    NumArray *o_na = (NumArray *) 0;
-   DataPlane fcst_dp, obs_dp;
+   NumArray *c_na = (NumArray *) 0;
+   DataPlane fcst_dp, obs_dp, cmn_dp;
+   bool cmn_flag;
 
    // Determine the block size
    nxny    = grid.nx() * grid.ny();
@@ -473,6 +479,7 @@ void process_scores() {
    // Allocate space to store the pairs for each grid point
    f_na = new NumArray [conf_info.block_size];
    o_na = new NumArray [conf_info.block_size];
+   c_na = new NumArray [conf_info.block_size];
 
    mlog << Debug(2)
         << "Computing statistics using a block size of "
@@ -505,6 +512,17 @@ void process_scores() {
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
 
+         // Read climatology data for the current series entry
+         cmn_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                  i_series, fcst_dp.valid(), grid);
+
+         cmn_flag = (cmn_dp.nx() == fcst_dp.nx() && cmn_dp.ny() == fcst_dp.ny()); 
+         mlog << Debug(3)
+              << "Found " << (cmn_flag ? 1 : 0)
+              << " climatology mean field(s) for forecast "
+              << fcst_info->magic_str() << ".\n";
+
          // Setup the output NetCDF file on the first pass
          if(nc_out == (NcFile *) 0) setup_nc_file(fcst_info, obs_info);
 
@@ -522,12 +540,13 @@ void process_scores() {
             // Convert n to x, y
             DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
 
-            // Store valid fcst/obs pairs where the mask is on
-            if(!is_bad_data(fcst_dp(x,y)) &&
-               !is_bad_data(obs_dp(x,y)) &&
-               !is_bad_data(conf_info.mask_dp(x,y))) {
+            // Store valid fcst/obs/climo pairs where the mask is on
+            if(!is_bad_data(fcst_dp(x, y)) &&
+               !is_bad_data(obs_dp(x, y))  &&
+               !is_bad_data(conf_info.mask_dp(x, y))) {
                f_na[i].add(fcst_dp(x, y));
                o_na[i].add(obs_dp(x, y));
+               c_na[i].add((cmn_flag ? cmn_dp(x, y) : bad_data_double));
             }
 
          } // end for i
@@ -573,13 +592,14 @@ void process_scores() {
          // Compute continuous statistics
          if(!conf_info.fcst_info[0]->p_flag() &&
             conf_info.output_stats[stat_cnt].n_elements() > 0) {
-            do_cnt(i_point+i, f_na[i], o_na[i]);
+            do_cnt(i_point+i, f_na[i], o_na[i], c_na[i]);
          }
 
          // Compute partial sums
          if(!conf_info.fcst_info[0]->p_flag() &&
-            conf_info.output_stats[stat_sl1l2].n_elements() > 0) {
-            do_sl1l2(i_point+i, f_na[i], o_na[i]);
+            (conf_info.output_stats[stat_sl1l2].n_elements()  > 0 ||
+             conf_info.output_stats[stat_sal1l2].n_elements() > 0)) {
+            do_sl1l2(i_point+i, f_na[i], o_na[i], c_na[i]);
          }
 
          // Compute probabilistics counts and statistics
@@ -588,7 +608,7 @@ void process_scores() {
              conf_info.output_stats[stat_pstd].n_elements() +
              conf_info.output_stats[stat_pjc].n_elements() +
              conf_info.output_stats[stat_prc].n_elements()) > 0) {
-            do_pct(i_point+i, f_na[i], o_na[i]);
+            do_pct(i_point+i, f_na[i], o_na[i], c_na[i]);
          }
       } // end for i
 
@@ -596,6 +616,7 @@ void process_scores() {
       for(i=0; i<conf_info.block_size; i++) {
          f_na[i].empty();
          o_na[i].empty();
+         c_na[i].empty();
       }
 
    } // end for i_read
@@ -617,6 +638,7 @@ void process_scores() {
    // Deallocate and clean up
    if(f_na) { delete [] f_na; f_na = (NumArray *) 0; }
    if(o_na) { delete [] o_na; o_na = (NumArray *) 0; }
+   if(c_na) { delete [] c_na; c_na = (NumArray *) 0; }
 
    return;
 }
@@ -738,10 +760,10 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
+void do_cnt(int n, const NumArray &f_na, const NumArray &o_na,
+            const NumArray &c_na) {
    int i, j;
-   NumArray ff_na, oo_na;
-   NumArray c_na, cc_na;
+   NumArray ff_na, oo_na, cc_na;
    CNTInfo cnt_info;
 
    mlog << Debug(4) << "Computing Continuous Statistics.\n";
@@ -802,9 +824,9 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sl1l2(int n, const NumArray &f_na, const NumArray &o_na) {
+void do_sl1l2(int n, const NumArray &f_na, const NumArray &o_na,
+              const NumArray &c_na) {
    int i, j;
-   NumArray c_na;
    SL1L2Info s_info;
 
    mlog << Debug(4) << "Computing Scalar Partial Sums.\n";
@@ -831,9 +853,9 @@ void do_sl1l2(int n, const NumArray &f_na, const NumArray &o_na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(int n, const NumArray &f_na, const NumArray &o_na) {
+void do_pct(int n, const NumArray &f_na, const NumArray &o_na,
+            const NumArray &c_na) {
    int i, j;
-   NumArray c_na;
 
    mlog << Debug(4) << "Computing Probabilistic Statistics.\n";
 
@@ -1389,6 +1411,17 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "MAD")           { v = cnt_info.mad.v;              }
       else if(c == "MAD_BCL")       { v = cnt_info.mad.v_bcl[i];       }
       else if(c == "MAD_BCU")       { v = cnt_info.mad.v_bcu[i];       }
+      else if(c == "ME2")           { v = cnt_info.me2.v;              }
+      else if(c == "ME2_BCL")       { v = cnt_info.me2.v_bcl[i];       }
+      else if(c == "ME2_BCU")       { v = cnt_info.me2.v_bcu[i];       }
+      else if(c == "MSESS")         { v = cnt_info.msess.v;            }
+      else if(c == "MSESS_BCL")     { v = cnt_info.msess.v_bcl[i];     }
+      else if(c == "MSESS_BCU")     { v = cnt_info.msess.v_bcu[i];     }
+      else if(c == "ANOM_CORR")     { v = cnt_info.anom_corr.v;        }
+      else if(c == "ANOM_CORR_NCL") { v = cnt_info.anom_corr.v_ncl[i]; }
+      else if(c == "ANOM_CORR_NCU") { v = cnt_info.anom_corr.v_ncu[i]; }
+      else if(c == "ANOM_CORR_BCL") { v = cnt_info.anom_corr.v_bcl[i]; }
+      else if(c == "ANOM_CORR_BCU") { v = cnt_info.anom_corr.v_bcu[i]; }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c
@@ -1442,13 +1475,18 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Get the column value
-        if(c == "TOTAL") { v = (double) s_info.scount; }
-   else if(c == "FBAR")  { v = s_info.fbar;            }
-   else if(c == "OBAR")  { v = s_info.obar;            }
-   else if(c == "FOBAR") { v = s_info.fobar;           }
-   else if(c == "FFBAR") { v = s_info.ffbar;           }
-   else if(c == "OOBAR") { v = s_info.oobar;           }
-   else if(c == "MAE")   { v = s_info.mae;             }
+        if(c == "TOTAL")  { v = (double) s_info.scount; }
+   else if(c == "FBAR")   { v = s_info.fbar;            }
+   else if(c == "OBAR")   { v = s_info.obar;            }
+   else if(c == "FOBAR")  { v = s_info.fobar;           }
+   else if(c == "FFBAR")  { v = s_info.ffbar;           }
+   else if(c == "OOBAR")  { v = s_info.oobar;           }
+   else if(c == "MAE")    { v = s_info.mae;             }
+   else if(c == "FABAR")  { v = s_info.fabar;           }
+   else if(c == "OABAR")  { v = s_info.oabar;           }
+   else if(c == "FOABAR") { v = s_info.foabar;          }
+   else if(c == "FFABAR") { v = s_info.ffabar;          }
+   else if(c == "OOABAR") { v = s_info.ooabar;          }
    else {
      mlog << Error << "\nstore_stat_sl1l2() -> "
           << "unsupported column name requested \"" << c
@@ -1582,6 +1620,7 @@ void store_stat_pstd(int n, const ConcatString &col,
       else if(c == "BRIER")       { v = pct_info.brier.v;                  }
       else if(c == "BRIER_NCL")   { v = pct_info.brier.v_ncl[i];           }
       else if(c == "BRIER_NCU")   { v = pct_info.brier.v_ncu[i];           }
+      else if(c == "BSS")         { v = pct_info.bss;                      }
       else {
         mlog << Error << "\nstore_stat_pstd() -> "
              << "unsupported column name requested \"" << c
