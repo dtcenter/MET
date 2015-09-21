@@ -38,7 +38,7 @@
 //   012    11/12/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output files.
 //   013    03/02/15  Halley Gotway  Add automated regridding.
-//   014    09/11/15  Halley Gotway  Add climatology to config file.
+//   014    09/11/15  Halley Gotway  Add climatology.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -78,10 +78,9 @@ static int  process_point_ens     (int, int);
 static void process_point_scores  ();
 
 static void process_grid_vx       ();
-static void process_grid_scores   (DataPlane *&,
-                                   DataPlane &, DataPlane &,
-                                   DataPlane &, DataPlane &,
-                                   DataPlane &, PairDataEnsemble &);
+static void process_grid_scores   (DataPlane *&, DataPlane &,
+                                   DataPlane &,  DataPlane &, 
+                                   DataPlane &,  PairDataEnsemble &);
 
 static void clear_counts(const DataPlane &, int);
 static void track_counts(const DataPlane &, int);
@@ -654,7 +653,7 @@ void process_point_vx() {
 
 void process_point_climo() {
    int i;
-   DataPlaneArray cmn_dpa, csd_dpa;
+   DataPlaneArray cmn_dpa;
 
    // Loop through each of the fields to be verified and extract
    // the climatology fields for verification
@@ -665,14 +664,8 @@ void process_point_climo() {
                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                    i, ens_valid_ut, grid);
 
-      // Read standard deviation fields
-      csd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_dictionary(conf_key_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
-
       // Store climatology information
       conf_info.vx_pd[i].set_climo_mn_dpa(cmn_dpa);
-      conf_info.vx_pd[i].set_climo_sd_dpa(csd_dpa);
    } // end for i
 
    return;
@@ -1094,7 +1087,7 @@ void process_grid_vx() {
    DataPlane *fcst_dp_smooth = (DataPlane *) 0;
    DataPlane  obs_dp, obs_dp_smooth;
    DataPlane  emn_dp, emn_dp_smooth;
-   DataPlane  cmn_dp, csd_dp;
+   DataPlane  cmn_dp;
    PairDataEnsemble pd;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1190,15 +1183,6 @@ void process_grid_vx() {
       mlog << Debug(3)
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
            << " climatology mean field(s) for forecast "
-           << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n";
-
-      csd_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                  i, ens_valid_ut, grid);
-
-      mlog << Debug(3)
-           << "Found " << (csd_dp.nx() == 0 ? 0 : 1)
-           << " climatology standard deviation field(s) for forecast "
            << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n";
 
       // If requested in the config file, create a NetCDF file to store
@@ -1369,7 +1353,7 @@ void process_grid_vx() {
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
-                                emn_dp_smooth, cmn_dp, csd_dp,
+                                emn_dp_smooth, cmn_dp,
                                 conf_info.mask_dp[k], pd);
 
             mlog << Debug(2)
@@ -1460,16 +1444,14 @@ void process_grid_vx() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
-        DataPlane &emn_dp, DataPlane &cmn_dp, DataPlane &csd_dp,
+        DataPlane &emn_dp, DataPlane &cmn_dp,
         DataPlane &mask_dp, PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
-   double v, cmn, csd;
+   double v, cmn;
 
    // Climatology flags
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
                     cmn_dp.ny() == obs_dp.ny());
-   bool csd_flag = (csd_dp.nx() == obs_dp.nx() &&
-                    csd_dp.ny() == obs_dp.ny());
 
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
@@ -1481,10 +1463,9 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 
          // Get current climatology value
          cmn = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
-         csd = (csd_flag ? csd_dp.get(x, y) : bad_data_double);
          
          // Add the observation point
-         pd.add_obs(x, y, obs_dp.get(x, y), cmn, csd);
+         pd.add_obs(x, y, obs_dp.get(x, y), cmn, bad_data_double);
       } // end for y
    } // end for x
 

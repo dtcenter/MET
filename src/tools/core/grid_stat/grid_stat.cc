@@ -140,8 +140,7 @@ static void do_nbrcnt(NBRCNTInfo &, int, int, int,
 
 static void write_nc(const GridStatNcOutInfo &,
                      const DataPlane &, const DataPlane &,
-                     const DataPlane &, const DataPlane &,
-                     int, InterpMthd, int);
+                     const DataPlane &, int, InterpMthd, int);
 
 static void add_var_att(NcVar *, const char *, const char *);
 
@@ -534,11 +533,11 @@ void process_scores() {
    DataPlane fcst_dp_smooth, obs_dp_smooth;
    DataPlane fcst_dp_thresh, obs_dp_thresh;
 
-   // Climatology mean and standard deviations
-   DataPlane cmn_dp, csd_dp;
+   // Climatology mean
+   DataPlane cmn_dp;
 
    // Forecast, observation, and climatology pairs
-   NumArray f_na, o_na, cmn_na, csd_na;
+   NumArray f_na, o_na, c_na;
 
    // Thresholded fractional coverage pairs
    NumArray fthr_na, othr_na;
@@ -546,8 +545,8 @@ void process_scores() {
    // Objects to handle vector winds
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
-   DataPlane cmnu_dp, csdu_dp;
-   NumArray fu_na, ou_na, cmnu_na, csdu_na;
+   DataPlane cmnu_dp;
+   NumArray fu_na, ou_na, cmnu_na;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
    MCTSInfo    mcts_info;
@@ -677,15 +676,6 @@ void process_scores() {
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
            << " climatology mean field(s) for forecast "
            << conf_info.fcst_info[i]->magic_str() << ".\n";
-
-      csd_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                  i, fcst_dp.valid(), grid);
-
-      mlog << Debug(3)
-           << "Found " << (csd_dp.nx() == 0 ? 0 : 1)
-           << " climatology standard deviation field(s) for forecast "
-           << conf_info.fcst_info[i]->magic_str() << ".\n";
       
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
@@ -713,7 +703,6 @@ void process_scores() {
          fu_dp   = fcst_dp;
          ou_dp   = obs_dp;
          cmnu_dp = cmn_dp;
-         csdu_dp = csd_dp;
       }
 
       // Loop through and apply each of the smoothing operations
@@ -762,8 +751,7 @@ void process_scores() {
             // Apply the current mask to the current fields
             apply_mask(fcst_dp_smooth, mask_dp, f_na);
             apply_mask(obs_dp_smooth,  mask_dp, o_na);
-            apply_mask(cmn_dp,         mask_dp, cmn_na);
-            apply_mask(csd_dp,         mask_dp, csd_na);
+            apply_mask(cmn_dp,         mask_dp, c_na);
 
             // Set the mask name
             shc.set_mask(conf_info.mask_name[k]);
@@ -869,7 +857,7 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) cnt_info[m].clear();
 
                // Compute CNT
-               do_cnt(cnt_info, i, f_na, o_na, cmn_na);
+               do_cnt(cnt_info, i, f_na, o_na, c_na);
 
                // Loop through the continuous thresholds
                for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
@@ -897,7 +885,7 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
 
                // Compute SL1L2 and SAL1L2
-               do_sl1l2(sl1l2_info, i, f_na, o_na, cmn_na);
+               do_sl1l2(sl1l2_info, i, f_na, o_na, c_na);
 
                // Loop through the continuous thresholds
                for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
@@ -974,10 +962,9 @@ void process_scores() {
                apply_mask(fu_dp_smooth,   mask_dp, fu_na);
                apply_mask(ou_dp_smooth,   mask_dp, ou_na);
                apply_mask(cmnu_dp,        mask_dp, cmnu_na);
-               apply_mask(csdu_dp,        mask_dp, csdu_na);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na, cmnu_na, cmn_na);
+               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na, cmnu_na, c_na);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
@@ -1022,7 +1009,7 @@ void process_scores() {
                for(m=0; m<n_prob; m++) pct_info[m].clear();
 
                // Compute PCT
-               do_pct(pct_info, i, f_na, o_na, cmn_na);
+               do_pct(pct_info, i, f_na, o_na, c_na);
 
                // Loop through all of the thresholds
                for(m=0; m<n_prob; m++) {
@@ -1076,7 +1063,7 @@ void process_scores() {
          // the config file
          if(!(conf_info.nc_info.all_false())) {
             write_nc(conf_info.nc_info, 
-                     fcst_dp_smooth, obs_dp_smooth, cmn_dp, csd_dp, i,
+                     fcst_dp_smooth, obs_dp_smooth, cmn_dp, i,
                      conf_info.interp_mthd[j],
                      conf_info.interp_wdth[j]);
          }
@@ -1635,24 +1622,24 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 
 void write_nc(const GridStatNcOutInfo & nc_info,
               const DataPlane &fcst_dp, const DataPlane &obs_dp,
-              const DataPlane &cmn_dp,  const DataPlane &csd_dp,
+              const DataPlane &cmn_dp,
               int i_vx, InterpMthd mthd, int wdth) {
    int i, n, x, y;
-   int fcst_flag, obs_flag, diff_flag, cmn_flag, csd_flag;
-   double fval, oval, cmnval, csdval;
+   int fcst_flag, obs_flag, diff_flag, cmn_flag;
+   double fval, oval, cmnval;
    ConcatString fcst_var_name, obs_var_name, diff_var_name;
-   ConcatString cmn_var_name, csd_var_name;
+   ConcatString cmn_var_name;
    ConcatString att_str, mthd_str, smooth_str, cs;
 
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
    float *cmn_data  = (float *) 0;
-   float *csd_data  = (float *) 0;
    
-   NcVar *fcst_var = (NcVar *) 0, *obs_var = (NcVar *) 0;
+   NcVar *fcst_var = (NcVar *) 0;
+   NcVar *obs_var  = (NcVar *) 0;
    NcVar *diff_var = (NcVar *) 0;
-   NcVar *cmn_var  = (NcVar *) 0, *csd_var = (NcVar *) 0;
+   NcVar *cmn_var  = (NcVar *) 0;
    
    // Get the interpolation strings
    mthd_str = interpmthd_to_string(mthd);
@@ -1664,7 +1651,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    obs_data  = new float [grid.nx()*grid.ny()];
    diff_data = new float [grid.nx()*grid.ny()];
    cmn_data  = new float [grid.nx()*grid.ny()];
-   csd_data  = new float [grid.nx()*grid.ny()];
 
    // Compute the difference field for each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
@@ -1683,7 +1669,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
       // Build the climatology variable names (no smoothing)
       cmn_var_name  << cs_erase << "CLIMO_MEAN_" << cs;
-      csd_var_name  << cs_erase << "CLIMO_STDEV_" << cs;
 
       // Build the observation variable name
       obs_var_name << cs_erase << "OBS_"
@@ -1708,7 +1693,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       obs_flag  = !obs_var_sa.has(obs_var_name);
       diff_flag = !diff_var_sa.has(diff_var_name);
       cmn_flag  = !cmn_var_sa.has(cmn_var_name);
-      csd_flag  = !csd_var_sa.has(csd_var_name);
 
       // Check the config file flags
       if(!(nc_info.do_raw)) {
@@ -1717,7 +1701,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       }
       if(!(nc_info.do_climo)) {
          cmn_flag  = false;
-         csd_flag  = false;
       }
       if(!(nc_info.do_diff)) {
          diff_flag = false;
@@ -1726,9 +1709,8 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       // Skip differences for probability forecasts
       if(conf_info.fcst_info[i_vx]->p_flag()) diff_flag = false;
 
-      // Skip empty climatology mean and standard deviation
+      // Skip empty climatology mean
       cmn_flag = (cmn_dp.nx() == 0 && cmn_dp.ny() == 0);
-      csd_flag = (csd_dp.nx() == 0 && csd_dp.ny() == 0);
 
       // Add the forecast variable
       if(fcst_flag) {
@@ -1837,31 +1819,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
          cmn_var->add_att("smoothing_neighborhood", wdth*wdth);
       } // end cmn_flag
 
-      // Add the climatology stdev variable
-      if(csd_flag) {
-
-         // Define the forecast variable
-         csd_var = nc_out->add_var(csd_var_name, ncFloat,
-                                   lat_dim, lon_dim);
-
-         // Add to the list of previously defined variables
-         csd_var_sa.add(csd_var_name);
-
-         // Add variable attributes for the climatology stdev field
-         add_var_att(csd_var, "name", shc.get_fcst_var());
-         att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
-                 << " at "
-                 << conf_info.fcst_info[i_vx]->level_name();
-         add_var_att(csd_var, "long_name", att_str);
-         add_var_att(csd_var, "level", shc.get_fcst_lev());
-         add_var_att(csd_var, "units", conf_info.fcst_info[i_vx]->units());
-         write_netcdf_var_times(csd_var, csd_dp);
-         csd_var->add_att("_FillValue", bad_data_float);
-         add_var_att(csd_var, "masking_region", conf_info.mask_name[i]);
-         add_var_att(csd_var, "smoothing_method", mthd_str);
-         csd_var->add_att("smoothing_neighborhood", wdth*wdth);
-      } // end csd_flag
-
       // Store the forecast, observation, difference, and climatology values
       for(x=0; x<grid.nx(); x++) {
          for(y=0; y<grid.ny(); y++) {
@@ -1874,7 +1831,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
                obs_data[n]  = bad_data_float;
                diff_data[n] = bad_data_float;
                cmn_data[n]  = bad_data_float;
-               csd_data[n]  = bad_data_float;
                continue;
             }
 
@@ -1882,7 +1838,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
             fval   = fcst_dp.get(x, y);
             oval   = obs_dp.get(x, y);
             cmnval = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
-            csdval = (csd_flag ? csd_dp.get(x, y) : bad_data_double);
 
             // Store the values
             fcst_data[n] = (is_bad_data(fval)   ? bad_data_float : fval);
@@ -1890,7 +1845,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
             diff_data[n] = (is_bad_data(fval) || is_bad_data(oval) ?
                             bad_data_float : fval - oval);
             cmn_data[n]  = (is_bad_data(cmnval) ? bad_data_float : cmnval);
-            csd_data[n]  = (is_bad_data(csdval) ? bad_data_float : csdval);
 
          } // end for y
       } // end for x
@@ -1943,18 +1897,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
          }
       }
 
-      // Write out the climatology stdev field
-      if(csd_flag) {
-         if(!csd_var->put(&csd_data[0], grid.ny(), grid.nx())) {
-            mlog << Error << "\nwrite_nc() -> "
-                 << "error with the csd_var->put for fields "
-                 << shc.get_fcst_var() << " and " << shc.get_obs_var()
-                 << " and masking region " << conf_info.mask_name[i]
-                 << "\n\n";
-            exit(1);
-         }
-      }
-
    } // end for i
 
    // Deallocate and clean up
@@ -1962,7 +1904,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
    if(diff_data) { delete [] diff_data; diff_data = (float *) 0; }
    if(cmn_data)  { delete [] cmn_data;  cmn_data  = (float *) 0; }
-   if(csd_data)  { delete [] csd_data;  csd_data  = (float *) 0; }
 
    return;
 }

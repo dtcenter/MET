@@ -195,6 +195,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
 
+   // Check climatology fields
+   check_climo_n_vx(&conf, n_fcst);
+
    // Allocate space based on the number of verification tasks
    fcst_info = new VarInfo * [n_fcst];
    obs_info  = new VarInfo * [n_obs];
@@ -330,6 +333,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    
    // Sanity check continuous thresholds
    if((output_stats[stat_sl1l2].n_elements()  +
+       output_stats[stat_sal1l2].n_elements() +
        output_stats[stat_cnt].n_elements()) > 0) {
 
       // Conf: fcst.cnt_thresh
